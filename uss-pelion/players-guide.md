@@ -301,6 +301,16 @@ A functioning, equipped sickbay grants +2 to Medicine for diagnosis and treatmen
 
 Removing injury boxes removes their associated penalties, but major organ damage, severe burns, and complex internal trauma can still require a procedure and recovery period set by the GM. The physician determines whether the patient is fit for duty. Pain suppression does not itself heal an injury. Stun normally wears off at the end of the scene; prolonged unconsciousness requires assessment.
 
+## Natural recovery
+
+Injuries also heal with time. Each **full day of rest** clears one injury box. Rest means light duty at most: no combat, no away missions, nothing strenuous. A day spent working hard or fighting clears nothing.
+
+- **At three boxes, rest alone clears nothing.** An Incapacitated patient needs treatment (field care or sickbay) to clear the first box; after that, rest takes over.
+- **Rest and medicine combine.** Treatment clears boxes immediately; rest clears what remains, one box a day.
+- **Serious trauma takes longer.** For major organ damage, severe burns, or complex internal trauma, the GM can require a set recovery period before rest clears anything, and the ship's physician decides when the patient is fit for duty.
+
+*Example:* Ensign Reyes ends a mission Seriously wounded (two boxes). Sickbay is busy with worse cases, so Reyes rests in quarters: one box clears the first day and the second the next, and Reyes is back on duty on the third day.
+
 ## Alien medicine and limits
 
 Unknown illness or physiology requires discovering the cause and a suitable treatment before boxes can be restored. Medicine can receive assistance from Life Sciences, Sensors, or Computers. Existing assistance limits apply. Missing essential equipment or incompatible supplies can prevent a procedure. Disintegration and other unsurvivable injuries cannot be reversed by an ordinary Medicine roll.
@@ -521,7 +531,7 @@ Will protects your resolve; Presence influences others. Leadership and Diplomacy
 
 **Damage:** the weapon decides. Fists, clubs, knives, arrows and primitive firearms mark 1 box; heavy blades mark 2; a phaser or disruptor on kill marks 3 and leaves the target Dying (dead at the end of the scene unless stabilized); stun marks none. At three boxes, another hit from a 2-box or killing weapon is fatal.
 
-**Medicine:** one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery.
+**Medicine:** one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery. Rest clears one box per full day, but not from three boxes: treatment must clear the first one.
 
 **Will:** resist overwhelming fear or mental intrusion and maintain concentration. Ordinary danger needs no roll. Fear or distraction failure normally causes hesitation or −2 on your next action.
 
