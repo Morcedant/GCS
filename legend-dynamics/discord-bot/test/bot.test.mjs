@@ -253,10 +253,16 @@ test("the old /duty, /grit, /pelion and /grimm names still work, and register on
 
   const { commandsFor } = await import("../src/worker.js");
   const names = (e) => commandsFor(e).map((c) => c.name);
-  assert.ok(!names({}).includes("duty"), "a new bot registers only the new names");
-  assert.deepEqual(names({ DUTY: {} }).slice(-2), ["pelion", "duty"]);
-  assert.deepEqual(names({ GRIT: {} }).slice(-2), ["grimm", "grit"]);
-  assert.equal(names({ LEGACY_COMMANDS: "yes" }).length, names({}).length + 4);
+  assert.deepEqual(names({ DUTY: {} }).slice(-4), ["pelion", "duty", "grimm", "grit"], "every Worker registers all four old names");
+  assert.deepEqual(names({}).slice(-4), ["pelion", "duty", "grimm", "grit"]);
+  assert.ok(!names({ LEGACY_COMMANDS: "no" }).includes("grit"));
+  // On the Pelion Worker, /grit works too (points named for the server's game).
+  assert.match((await signedCall(pel, sub("grit", "show"))).content, /Duty points/);
+  const unknown = await signedCall(pel, { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name: "phaser" } });
+  assert.match(unknown.content, /doesn't know \/phaser.*\/register/);
+  const notGM = await signedCall(pel, sub("game", "set", [{ name: "game", value: "grimm" }]));
+  assert.match(notGM.content, /Manage Server/);
+  assert.match((await signedCall(env, sub("game", "set", [{ name: "game", value: "grimm" }], { gm: true }))).content, /needs the bot's storage/);
   const duty = commandsFor({ DUTY: {} }).find((c) => c.name === "duty");
   assert.match(duty.description, /Duty points/); assert.equal(duty.options.length, 5);
 });

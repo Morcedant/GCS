@@ -67,11 +67,12 @@ What carries over:
 What changes for players:
 
 - The old commands still work: `/pelion` or `/grimm` rolls, and `/duty` or `/grit` tracks points.
-  `/register` keeps them alongside the new commands on that Worker.
+  `/register` adds all four to every Worker, alongside the new commands. Points take the server's game's
+  name, so `/grit` on a USS Pelion server shows Duty points.
 - The new names work too: `/roll` and `/points`, plus `/track`, `/seed` and `/game`.
 - The reroll button still says Duty or Grit.
 
-To have all four old names on a new bot as well, add the setting `LEGACY_COMMANDS` = `yes` and open `/register` again.
+If you'd rather not see the old names, add the setting `LEGACY_COMMANDS` = `no` and open `/register` again.
 
 Any server on that bot can now also switch games with `/game set`.
 
@@ -170,3 +171,6 @@ If there's a problem on the Discord side:
   or Discord hasn't refreshed yet. Press Ctrl+R (Cmd+R on a Mac) in Discord.
 - **"The application did not respond"**: the Interactions Endpoint URL points somewhere else, or the Worker code is out of date.
 - **"…need the bot's storage"**: bind the KV namespace as `STORE` (step 3).
+- **"Only the GM can change the game"**: `/game set` needs the **Manage Server** permission on that Discord server.
+- **"This bot doesn't know /…"**, or a command is missing from the list: Discord still has the old command list.
+  Add `DISCORD_BOT_TOKEN` back, open `/register`, check that it names the command, then press Ctrl+R in Discord.

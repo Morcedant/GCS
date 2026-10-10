@@ -9,9 +9,8 @@
 //   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, grimm or pelion); default western
 // Binding (Settings → Bindings → KV namespace):
 //   STORE                    optional; turns on /game, /points, /clock and /track, and makes rerolls spend real points
-//                            (a USS Pelion or Grimm Worker's DUTY or GRIT binding works too, and /register then
-//                            also registers that bot's old names: /pelion and /duty, or /grimm and /grit)
-//   LEGACY_COMMANDS          optional: "yes" registers all four old names on any Worker
+//                            (a USS Pelion or Grimm Worker's DUTY or GRIT binding works too)
+//   LEGACY_COMMANDS          optional: "no" stops /register adding the old /pelion, /duty, /grimm and /grit names
 
 // ---- Setting packs: written by tools/build-legend.py from legend-dynamics/packs/*/pack.json ----
 
@@ -1026,18 +1025,15 @@ export const COMMANDS = commands();
 
 // The USS Pelion and Grimm bots' old command names keep working: /pelion and /grimm roll, /duty and /grit track points.
 const ALIASES = { pelion: "roll", grimm: "roll", duty: "points", grit: "points" };
-const LEGACY = { DUTY: ["pelion", "duty"], GRIT: ["grimm", "grit"] };
 const aliasOf = (name, target, game) => {
   const base = COMMANDS.find((c) => c.name === target);
   return { ...base, name, description: target === "roll" ? `Roll 3d6 under your target (same as /roll)` : `Track ${game} points (same as /points)` };
 };
 
-/** The commands to register: the full set, plus the old names on a Pelion or Grimm Worker (or with LEGACY_COMMANDS=yes). */
+/** The commands to register: the full set plus the four old names, unless LEGACY_COMMANDS is "no". */
 export function commandsFor(env = {}) {
-  const all = String(env.LEGACY_COMMANDS || "").trim().toLowerCase() === "yes";
-  const extra = Object.entries(LEGACY).filter(([binding]) => all || env[binding]).flatMap(([binding, [roll, points]]) =>
-    [aliasOf(roll, "roll"), aliasOf(points, "points", binding === "DUTY" ? "Duty" : "Grit")]);
-  return [...COMMANDS, ...extra];
+  if (String(env.LEGACY_COMMANDS || "").trim().toLowerCase() === "no") return [...COMMANDS];
+  return [...COMMANDS, aliasOf("pelion", "roll"), aliasOf("duty", "points", "Duty"), aliasOf("grimm", "roll"), aliasOf("grit", "points", "Grit")];
 }
 const commandList = (cmds) => { const n = cmds.map((c) => `/${c.name}`); return `${n.slice(0, -1).join(", ")} and ${n[n.length - 1]}`; };
 
@@ -1071,7 +1067,8 @@ export default {
       const handler = HANDLERS[interaction.data?.name] || HANDLERS[ALIASES[interaction.data?.name]];
       if (handler) return json(await handler(interaction, env, await gameOf(env, guildOf(interaction))));
     }
-    return json({ type: MESSAGE, data: { content: "Unknown command.", flags: EPHEMERAL } });
+    const name = interaction.data?.name || interaction.data?.custom_id || "that";
+    return json({ type: MESSAGE, data: { content: `This bot doesn't know /${name}. Discord may be showing an old command list: the GM can open the Worker's /register page to refresh it.`, flags: EPHEMERAL } });
   },
 };
 
@@ -1418,8 +1415,8 @@ async function gameCommand(interaction, env, game) {
       (env.STORE ? "" : " (Connect the bot's storage to change it.)"));
   }
   if (sub === "set") {
-    if (!env.STORE) return needsStore("Choosing a game");
-    if (!isGM(interaction)) return gmOnly();
+    if (!env.STORE) return reply("Choosing a game needs the bot's storage: bind a KV namespace to the Worker as STORE (or keep the Pelion bot's DUTY / Grimm bot's GRIT binding). Until then every server plays " + pickGame(defaultGameId(env)).title + ".", true);
+    if (!isGM(interaction)) return reply("Only the GM can change the game: that's anyone with the Manage Server permission on this Discord server.", true);
     if (!PACKS[opt.game]) return reply(`Unknown game. Choose one of: ${GAME_IDS().map((id) => PACKS[id].title).join(", ")}.`, true);
     await env.STORE.put(`game:${guildOf(interaction)}`, opt.game);
     const g = PACKS[opt.game];
