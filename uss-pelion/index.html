@@ -241,7 +241,8 @@ tr.lvl-U td.target { color: var(--muted); font-weight: 500; }
               <input type="text" id="f-rank" list="ranks" placeholder="e.g. Lieutenant">
               <datalist id="ranks"><option>Ensign</option><option>Lieutenant (j.g.)</option><option>Lieutenant</option><option>Lieutenant Commander</option><option>Commander</option><option>Captain</option><option>Chief Petty Officer</option><option>Yeoman</option><option>Crewman</option></datalist></div>
             <div class="field wide"><label for="f-role">What you contribute</label>
-              <textarea id="f-role" rows="2" placeholder="e.g. Ship's sciences officer; first to read an anomaly and last to stop asking about it."></textarea></div>
+              <textarea id="f-role" rows="2"></textarea>
+              <span class="small muted" id="role-hint"></span></div>
           </div>
         </section>
 
@@ -457,6 +458,18 @@ tr.lvl-U td.target { color: var(--muted); font-weight: 500; }
     ["Science", "sciences"], ["Medical", "sciences"],
     ["Engineering", "operations"], ["Security", "operations"], ["Communications", "operations"],
   ];
+  // Starting text for "What you contribute"; replaced on department change unless the player has written their own.
+  const ROLE_SUGGESTIONS = {
+    Command: "Command officer: coordinates the crew with Leadership and negotiates with Diplomacy when orders and circumstances collide.",
+    Helm: "Helm officer: flies the Pelion and her shuttles, evading, pursuing, or gaining position when it counts.",
+    Navigation: "Navigator: plots safe courses, fixes the ship's position, and finds the way out when the way in has closed.",
+    Science: "Ship's sciences officer: first to read an anomaly and the one who explains it to the captain.",
+    Medical: "Medical officer: diagnoses, stabilizes, and treats the crew, from field kits on an away mission to surgery in sickbay.",
+    Engineering: "Engineer: keeps the Pelion's machinery and power running, and improvises repairs when the parts run out.",
+    Security: "Security officer: protects the away team, secures the ship, and decides when a phaser stays on stun.",
+    Communications: "Communications officer: establishes contact, cuts through interference, and hears what a signal is really saying.",
+  };
+  const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
   const ADVANTAGES = [
     ["steady", "Steady Hands", "+2 to Medicine for delicate surgery or removing a dangerous embedded object. It does not improve diagnosis or all medical treatment.", "Medicine"],
     ["emergency", "Emergency Physician", "+2 to Medicine for emergency stabilization of an injured patient. It does not apply to subsequent field healing or sickbay recovery.", "Medicine"],
@@ -511,7 +524,7 @@ tr.lvl-U td.target { color: var(--muted); font-weight: 500; }
 
   function blank() {
     return {
-      id: uid(), example: false, name: "", species: "", rank: "", dept: "Science", role: "", reason: "",
+      id: uid(), example: false, name: "", species: "", rank: "", dept: "Science", role: ROLE_SUGGESTIONS.Science, reason: "",
       speciesNotes: "", connection: "", notes: "", otherEquip: "",
       attrs: { Body: 10, Agility: 10, Intellect: 10, Presence: 10, Will: 10 },
       skills: Object.fromEntries(SKILLS.map(([n]) => [n, "U"])),
@@ -525,7 +538,7 @@ tr.lvl-U td.target { color: var(--muted); font-weight: 500; }
     const c = blank();
     Object.assign(c, {
       example: true, name: "T'Rena Okafor", species: "Human", rank: "Lieutenant", dept: "Science",
-      role: "Ship's sciences officer: first to read an anomaly and the one who explains it to the captain.",
+      role: ROLE_SUGGESTIONS.Science,
       reason: "Grew up on a survey colony and wanted to see what the long-range scans only hinted at.",
       connection: "Owes the chief engineer a favor for rebuilding her tricorder after Deneb.",
       attrs: { Body: 10, Agility: 10, Intellect: 13, Presence: 11, Will: 11 },
@@ -642,6 +655,9 @@ tr.lvl-U td.target { color: var(--muted); font-weight: 500; }
     $("hdr-name").textContent = ch.name.trim() || "Unnamed officer";
     $("hdr-sub").textContent = [ch.rank, ch.species, ch.dept && ch.dept + " department"].filter(Boolean).join(" · ") || "—";
     $("example-banner").hidden = !ch.example;
+    $("f-role").placeholder = ROLE_SUGGESTIONS[ch.dept] || "";
+    $("role-hint").textContent = ROLE_TEXTS.has(ch.role)
+      ? `Suggested text for ${ch.dept}. It follows the department until you write your own.` : "";
 
     // attributes
     const sp = spent(), left = POOL - sp;
@@ -846,7 +862,11 @@ tr.lvl-U td.target { color: var(--muted); font-weight: 500; }
   });
   document.addEventListener("change", (e) => {
     const t = e.target;
-    if (t.id === "f-dept") { ch.dept = t.value; touch(); render(); }
+    if (t.id === "f-dept") {
+      ch.dept = t.value;
+      if (!ch.role.trim() || ROLE_TEXTS.has(ch.role)) { ch.role = ROLE_SUGGESTIONS[ch.dept] || ""; $("f-role").value = ch.role; }
+      touch(); render();
+    }
     else if (t.id === "f-adv") { ch.adv.id = t.value; touch(); render(); }
     else if (t.id === "f-comp") { ch.comp.id = t.value; touch(); render(); }
     else if (t.dataset.eq) { ch.equipment[t.dataset.eq] = t.checked; touch(); render(); }
