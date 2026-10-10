@@ -12,7 +12,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # Per game: Word file name, heading color, table header fill.
 GAMES = {
     "uss-pelion": ("USS_Pelion_Players_Guide.docx", "1B2A4A", "E9EEF6"),
-    "grimm-west": ("Grimm_Wild_West_Players_Guide.docx", "4A2A12", "F1E6D2"),
+    "grimm-west": ("Grimm_Players_Guide.docx", "4A2A12", "F1E6D2"),
 }
 SRC = APP = DOCX = None
 NAVY, GOLD_FILL = "1B2A4A", "E9EEF6"

@@ -1,4 +1,4 @@
-// Grimm Wild West dice bot: a Cloudflare Worker that answers Discord slash commands over HTTP.
+// Grimm dice bot: a Cloudflare Worker that answers Discord slash commands over HTTP.
 // One self-contained file, so it can be pasted straight into the Cloudflare dashboard.
 // Discord signs every request; unsigned or badly signed requests are rejected with 401.
 //
@@ -88,7 +88,7 @@ export function targetLine(base, modifier) {
 export const COMMANDS = [
   {
     name: "grimm",
-    description: "Roll 3d6 under your target (Grimm Wild West rules)",
+    description: "Roll 3d6 under your target (Grimm rules)",
     options: [
       { type: 4, name: "target", description: "Skill or attribute from your sheet, e.g. 13 for Tracking 13", required: true, min_value: 1, max_value: 30 },
       { type: 4, name: "modifier", description: "Total of circumstance, assistance, advantage and injury modifiers, e.g. -2", required: false, min_value: -12, max_value: 12 },
@@ -110,7 +110,7 @@ export const COMMANDS = [
   },
   {
     name: "contest",
-    description: "Opposed roll: you against an opponent (Grimm Wild West rules)",
+    description: "Opposed roll: you against an opponent (Grimm rules)",
     options: [
       { type: 4, name: "target", description: "Your skill or attribute target", required: true, min_value: 1, max_value: 30 },
       { type: 4, name: "opponent", description: "The opponent's skill target", required: true, min_value: 1, max_value: 30 },
@@ -210,7 +210,7 @@ const cleanKey = (k) => {
 function statusPage(env) {
   const check = (ok, good, bad) => `${ok ? "OK " : "!! "} ${ok ? good : bad}`;
   const lines = [
-    "Grimm Wild West dice bot is running.",
+    "Grimm dice bot is running.",
     "",
     check(!!cleanKey(env.DISCORD_PUBLIC_KEY), "DISCORD_PUBLIC_KEY is set and looks right.",
       env.DISCORD_PUBLIC_KEY ? "DISCORD_PUBLIC_KEY is set but isn't 64 hex characters. Copy the Public Key again from General Information."
@@ -241,7 +241,7 @@ function rollCommand(interaction) {
         color: r.success ? GREEN : RED,
         description: `<@${user.id}> rolls 3d6 under ${targetLine(base, modifier)}\n` +
           `🎲 ${r.dice.join(" + ")} = **${r.total}**  ·  **${r.success ? "SUCCESS" : "FAILURE"}**\n` + describe(r).join("\n"),
-        footer: { text: `${Math.round(odds(base + modifier) * 100)}% chance · Grimm Wild West` },
+        footer: { text: `${Math.round(odds(base + modifier) * 100)}% chance · Grimm` },
       }],
       components: [{
         type: 1,
@@ -277,7 +277,7 @@ function contestCommand(interaction) {
         description: `<@${user.id}>: ${targetLine(clampInt(o.target), intOr0(o.modifier))}\n${rollLine(mine)}\n\n` +
           `${foe}: ${targetLine(clampInt(o.opponent), intOr0(o.opponent_modifier))}\n${rollLine(theirs)}\n\n` +
           `**${winner === "me" ? `<@${user.id}> wins` : `${foe} wins`}** (${why}). Defender: ${defender === "me" ? `<@${user.id}>` : foe}.`,
-        footer: { text: "Opposed contest · Grimm Wild West" },
+        footer: { text: "Opposed contest · Grimm" },
       }],
     },
   };
@@ -301,7 +301,7 @@ function assistCommand(interaction) {
         color: lead.success ? GREEN : RED,
         description: `**Assist.** ${helper} rolls under ${targetLine(clampInt(o.helper_target), intOr0(o.helper_modifier))}\n${rollLine(help)}\n${helpNote}\n\n` +
           `**Lead.** <@${user.id}> rolls under ${targetLine(base, mod + bonus)}\n🎲 ${lead.dice.join(" + ")} = **${lead.total}**  ·  **${lead.success ? "SUCCESS" : "FAILURE"}**\n` + describe(lead).join("\n"),
-        footer: { text: "One assistant per roll · Grimm Wild West" },
+        footer: { text: "One assistant per roll · Grimm" },
       }],
       components: [{ type: 1, components: [{ type: 2, style: 2, label: "Spend a Grit point to reroll", custom_id: `reroll|${user.id}|${base}|${mod + bonus}|${label}` }] }],
     },

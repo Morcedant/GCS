@@ -2,7 +2,7 @@
   "name": "grimm-dice",
   "private": true,
   "type": "module",
-  "description": "Grimm Wild West 3d6 roll-under dice bot for Discord, hosted on Cloudflare Workers",
+  "description": "Grimm 3d6 roll-under dice bot for Discord, hosted on Cloudflare Workers",
   "scripts": {
     "test": "node --test test/bot.test.mjs",
     "register": "node register-commands.mjs",

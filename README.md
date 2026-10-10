@@ -4,15 +4,15 @@ GCS Templates: character creators, players' guides and Discord dice bots for 3d6
 | Game | Folder | Setting |
 |---|---|---|
 | USS Pelion | `uss-pelion/`, `discord-bot/` | Star Trek, campaign year 2268 |
-| Grimm Wild West | `grimm-west/` | The Grimm-verse on the Oregon frontier, 1889 |
+| Grimm | `grimm-west/` | Gothic horror in the Grimm-verse, the late 1800s |
 
 Both games share the same rules engine. To start another variant, copy one game's folder and change its data
-(see *Grimm Wild West* below for what changed), then build its guide with `python3 tools/build-guide.py --game <folder> --docx`.
+(see *Grimm* below for what changed), then build its guide with `python3 tools/build-guide.py --game <folder> --docx`.
 
-## Grimm Wild West Character Creator
+## Grimm Character Creator
 
-`grimm-west/index.html` is the same creator re-flavored for a Grimm game in the late-1800s West
-(Black Pine, Oregon, 1889). Open it in any browser.
+`grimm-west/index.html` is the same creator re-flavored for a gothic Grimm game set in the late 1800s,
+with a dark, old-book look. Open it in any browser.
 
 - **Calling** (Law, Learned or Frontier groups) replaces department; **Well-rounded** (Specialty +3, nine Trained) or
   **Old hand** (Expert +5, seven Trained) replaces officer and General Services.
@@ -27,7 +27,7 @@ Both games share the same rules engine. To start another variant, copy one game'
   with woge profiles that apply while woged, an optional **Allegiance**, Incantare Lenses as ritual styles, and horror-only
   heritages behind a switch. Edit `grimm-west/data/heritages.json`, then run `python3 tools/gen-heritages.py` and
   `python3 tools/build-guide.py --game grimm-west --docx`.
-- The guide is `grimm-west/players-guide.md` and `grimm-west/Grimm_Wild_West_Players_Guide.docx`; the Discord bot
+- The guide is `grimm-west/players-guide.md` and `grimm-west/Grimm_Players_Guide.docx`; the Discord bot
   (`/grimm`, `/grit`, `/clock`, `/contest`, `/assist`) is in `grimm-west/discord-bot/`.
 
 ## USS Pelion Officer Creator

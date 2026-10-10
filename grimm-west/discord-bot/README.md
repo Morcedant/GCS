@@ -1,8 +1,8 @@
-# Grimm Wild West dice bot
+# Grimm dice bot
 
 This is a copy of the USS Pelion bot with Grimm names: `/grimm` instead of `/pelion` and Grit points instead of Duty points. Set it up as its **own** Discord application and its **own** Cloudflare Worker (`grimm-dice`), so the two games never share commands or points. If you've set up the Pelion bot before, the steps are identical.
 
-A Discord slash command for the Grimm Wild West rules:
+A Discord slash command for the Grimm rules:
 
 ```
 /grimm target:13 modifier:-2 label:Tracking
@@ -123,7 +123,7 @@ Open the Worker's address (`https://grimm-dice.YOUR-NAME.workers.dev`) in a brow
 |---|---|
 | "Hello World!" | The bot code wasn't deployed. Paste `src/worker.js` again in **Edit code** and press **Deploy**. |
 | An error page (e.g. 1101) | Only part of the code was pasted. Paste the whole file again and **Deploy**. |
-| "Grimm Wild West dice bot is running." with `!!` lines | A setting is missing or mistyped; the line says which. |
+| "Grimm dice bot is running." with `!!` lines | A setting is missing or mistyped; the line says which. |
 | All `OK` lines | The Worker is fine; check the Discord side below. |
 
 On the Discord side:

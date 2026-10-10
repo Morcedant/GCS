@@ -1,6 +1,6 @@
 # Converting the GURPS templates: draft for review
 
-This is the plan for turning the 13 GURPS Character Sheet templates into Grimm Wild West heritages, with two samples (Blutbad and Grimm) converted in full. Once the pattern is approved, the other eleven follow it, and the creator, guide and ready-made posse are updated to match.
+This is the plan for turning the 13 GURPS Character Sheet templates into Grimm heritages, with two samples (Blutbad and Grimm) converted in full. Once the pattern is approved, the other eleven follow it, and the creator, guide and ready-made characters are updated to match.
 
 Decisions already made:
 

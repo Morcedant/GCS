@@ -1,38 +1,38 @@
 <!doctype html>
-<title>Grimm Wild West Characters</title>
+<title>Grimm</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&family=IM+Fell+English+SC&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=IM+Fell+English+SC&family=IM+Fell+DW+Pica+SC&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap">
 <style>
-/* Layout: a frontier lawman's ledger by lamplight. Dark leather-and-ink panels with brass rules,
-   drifting embers behind. Builder steps on the left, readiness on the right; the second tab is the play sheet.
-   One deliberate look: dark only. The accent follows the character's group (the Law brass,
-   the Learned verdigris, the Frontier oxblood), as on the badge. */
+/* Layout: a Grimm's journal by candlelight. Near-black slate panels with tarnished-silver rules,
+   ash drifting down behind, blackletter for names and old-book serif for text. Builder steps on the left,
+   readiness on the right; the second tab is the play sheet. One deliberate look: dark only. The accent
+   follows the character's group (the Law pewter, the Learned verdigris, the Frontier blood red), as on the seal. */
 :root {
-  --space: #0d0906;
-  --glass: rgba(36, 25, 16, .88);
-  --glass-hi: rgba(52, 36, 22, .9);
-  --well: rgba(14, 9, 5, .72);
-  --fg: #f0e4cc;
-  --muted: #a8977c;
-  --line: rgba(201, 160, 99, .26);
-  --chrome: #d9a65e;
-  --chrome-dim: rgba(217, 166, 94, .6);
-  --gold: #e3b04b;
-  --blue: #6fb5a5;
-  --red: #d0623f;
-  --good: #96c86e;
-  --bad: #e2543c;
-  --warn: #eba63c;
+  --space: #090b0d;
+  --glass: rgba(18, 22, 26, .9);
+  --glass-hi: rgba(28, 33, 38, .92);
+  --well: rgba(6, 8, 10, .74);
+  --fg: #e4e2da;
+  --muted: #8e958f;
+  --line: rgba(160, 172, 166, .22);
+  --chrome: #b9c2bd;
+  --chrome-dim: rgba(185, 194, 189, .55);
+  --gold: #c5ccc8;
+  --blue: #5f9e8f;
+  --red: #b8383a;
+  --good: #8fb59a;
+  --bad: #c9393b;
+  --warn: #c99a4e;
   --accent: var(--gold);
-  --on-accent: #120c07;
+  --on-accent: #0b0d0f;
   --display: "IM Fell English SC", "Palatino Linotype", Georgia, serif;
-  --title: "Rye", "IM Fell English SC", Georgia, serif;
-  --body: "Crimson Pro", Georgia, "Times New Roman", serif;
-  --mono: "Special Elite", "Courier New", ui-monospace, monospace;
-  --radius: 10px;
+  --title: "Pirata One", "UnifrakturMaguntia", "IM Fell English SC", Georgia, serif;
+  --body: "EB Garamond", Garamond, Georgia, "Times New Roman", serif;
+  --mono: "IM Fell DW Pica SC", "EB Garamond", Georgia, serif;
+  --radius: 6px;
   color-scheme: dark;
 }
 [data-div="law"] { --accent: var(--gold); }
@@ -42,8 +42,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html { background: var(--space); }
-body { background: radial-gradient(1200px 600px at 85% -10%, rgba(150, 60, 20, .22), transparent 60%),
-  radial-gradient(900px 500px at -10% 110%, rgba(90, 40, 15, .2), transparent 60%), var(--space);
+body { background: radial-gradient(1200px 600px at 85% -10%, rgba(110, 14, 18, .26), transparent 60%),
+  radial-gradient(900px 500px at -10% 110%, rgba(24, 54, 58, .3), transparent 60%), var(--space);
   background-attachment: fixed; color: var(--fg); font: 17px/1.5 var(--body); margin: 0; min-height: 100vh; }
 #embers { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 64px; }
@@ -56,11 +56,11 @@ b, strong { font-weight: 600; }
 .eyebrow { font-family: var(--mono); font-size: .74rem; letter-spacing: .2em; text-transform: uppercase; color: var(--chrome); }
 .muted { color: var(--muted); }
 .small { font-size: .86rem; }
-.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums lining-nums; }
 
 /* HUD frame: glass panel with corner brackets */
 .hud { position: relative; background: var(--glass); border: 1px solid var(--line); border-radius: var(--radius);
-  backdrop-filter: blur(6px); box-shadow: inset 0 1px 0 rgba(240, 210, 160, .08), 0 10px 40px rgba(0, 0, 0, .35); }
+  backdrop-filter: blur(6px); box-shadow: inset 0 1px 0 rgba(220, 228, 224, .08), 0 10px 40px rgba(0, 0, 0, .35); }
 .hud::before, .hud::after { content: ""; position: absolute; width: 22px; height: 22px; pointer-events: none; border-color: var(--chrome); border-style: solid; opacity: .85; }
 .hud::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; border-top-left-radius: var(--radius); }
 .hud::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; border-bottom-right-radius: var(--radius); }
@@ -71,15 +71,15 @@ b, strong { font-weight: 600; }
 .masthead .who { display: grid; gap: 6px; min-width: 0; }
 .masthead h1 { overflow-wrap: anywhere; }
 .delta { flex: none; width: 62px; height: 62px; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent) 60%, transparent)); }
-.delta .outer { fill: url(#delta-gold); stroke: #5a3a10; stroke-width: 2; }
-.delta .ring { fill: none; stroke: #5a3a10; stroke-width: 2; stroke-dasharray: 2 3; }
+.delta .outer { fill: url(#delta-gold); stroke: #23292a; stroke-width: 2; }
+.delta .ring { fill: none; stroke: #23292a; stroke-width: 2; stroke-dasharray: 2 3; }
 .delta .emblem { fill: #0a0a0d; }
 .delta .emblem.stroke { fill: none; stroke: #0a0a0d; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
-.scanbar { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--accent) 0 22%, transparent 22% 24%, var(--chrome-dim) 24% 58%, transparent 58% 60%, rgba(217, 166, 94, .25) 60% 100%); width: 100%; }
+.scanbar { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--accent) 0 22%, transparent 22% 24%, var(--chrome-dim) 24% 58%, transparent 58% 60%, rgba(185, 194, 189, .25) 60% 100%); width: 100%; }
 .tabs { display: flex; gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 999px; background: var(--well); }
 .tab { font: 600 .9rem/1 var(--display); letter-spacing: .14em; text-transform: uppercase; padding: 11px 18px; border: 0; background: transparent; color: var(--muted); border-radius: 999px; cursor: pointer; }
 .tab:hover { color: var(--fg); }
-.tab[aria-selected="true"] { background: var(--chrome); color: var(--on-accent); box-shadow: 0 0 18px rgba(217, 166, 94, .45); }
+.tab[aria-selected="true"] { background: var(--chrome); color: var(--on-accent); box-shadow: 0 0 18px rgba(185, 194, 189, .45); }
 
 /* Main grid */
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 22px; margin-top: 22px; align-items: start; }
@@ -98,15 +98,15 @@ b, strong { font-weight: 600; }
 label, .label { font: 600 .72rem/1.3 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--chrome-dim); }
 input[type="text"], select, textarea { width: 100%; font: inherit; color: var(--fg); background: var(--well); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; }
 input[type="text"]:hover, select:hover, textarea:hover { border-color: var(--chrome-dim); }
-select option, select optgroup { background: #1c140d; color: var(--fg); }
+select option, select optgroup { background: #12161a; color: var(--fg); }
 textarea { resize: vertical; min-height: 64px; }
-::placeholder { color: rgba(168, 151, 124, .6); }
+::placeholder { color: rgba(142, 149, 143, .6); }
 input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, .seg input:focus-visible + span { outline: 2px solid var(--chrome); outline-offset: 2px; }
 input[type="checkbox"] { accent-color: var(--chrome); width: 16px; height: 16px; }
 input[type="file"] { color: var(--muted); font-size: .85rem; max-width: 100%; }
 button { font: inherit; cursor: pointer; }
-.btn { border: 1px solid var(--chrome-dim); background: rgba(217, 166, 94, .06); color: var(--fg); border-radius: 999px; padding: 8px 16px; font: 600 .8rem/1.2 var(--display); letter-spacing: .12em; text-transform: uppercase; }
-.btn:hover:not(:disabled) { background: rgba(217, 166, 94, .16); border-color: var(--chrome); }
+.btn { border: 1px solid var(--chrome-dim); background: rgba(185, 194, 189, .06); color: var(--fg); border-radius: 999px; padding: 8px 16px; font: 600 .8rem/1.2 var(--display); letter-spacing: .12em; text-transform: uppercase; }
+.btn:hover:not(:disabled) { background: rgba(185, 194, 189, .16); border-color: var(--chrome); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 40%, transparent); }
 .btn.primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.1); }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
@@ -125,10 +125,10 @@ button { font: inherit; cursor: pointer; }
 .adj-chip.up { color: var(--good); }
 .adj-chip.down { color: var(--warn); }
 .attr .base { font: .72rem var(--mono); letter-spacing: .06em; color: var(--muted); }
-.attr .val { font: 400 2.1rem/1 var(--mono); color: var(--chrome); text-shadow: 0 0 14px rgba(217, 166, 94, .5); }
+.attr .val { font: 400 2.1rem/1 var(--mono); color: var(--chrome); text-shadow: 0 0 14px rgba(185, 194, 189, .5); }
 .stepper { display: flex; gap: 6px; }
 .stepper button { width: 38px; height: 30px; border: 1px solid var(--chrome-dim); background: transparent; color: var(--chrome); border-radius: 999px; font: 600 1.05rem/1 var(--mono); }
-.stepper button:hover:not(:disabled) { background: rgba(217, 166, 94, .15); }
+.stepper button:hover:not(:disabled) { background: rgba(185, 194, 189, .15); }
 .stepper button:disabled { opacity: .25; cursor: not-allowed; }
 .pool { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
 .pip { width: 30px; height: 10px; border-radius: 2px; border: 1px solid var(--accent); transform: skewX(-20deg); }
@@ -141,9 +141,9 @@ button { font: inherit; cursor: pointer; }
 .chip.no { color: var(--warn); border-color: currentColor; }
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--well); }
 table { border-collapse: collapse; width: 100%; min-width: 600px; }
-th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid rgba(201, 160, 99, .12); vertical-align: middle; }
-th { font: 600 .68rem/1.2 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--chrome-dim); background: rgba(217, 166, 94, .05); }
-tbody tr:hover { background: rgba(217, 166, 94, .05); }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid rgba(160, 172, 166, .12); vertical-align: middle; }
+th { font: 600 .68rem/1.2 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--chrome-dim); background: rgba(185, 194, 189, .05); }
+tbody tr:hover { background: rgba(185, 194, 189, .05); }
 tr:last-child td { border-bottom: 0; }
 td.target { font: 400 1.3rem/1 var(--mono); width: 64px; text-align: right; color: var(--chrome); }
 td.pct { font-family: var(--mono); font-size: .82rem; color: var(--muted); width: 64px; text-align: right; }
@@ -162,7 +162,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .seg input:disabled + span { opacity: .3; }
 
 /* Traits */
-.trait-desc { background: rgba(217, 166, 94, .05); border: 1px solid var(--line); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 8px; font-size: .92rem; color: #dccdb2; }
+.trait-desc { background: rgba(185, 194, 189, .05); border: 1px solid var(--line); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 8px; font-size: .92rem; color: #cfd3cd; }
 .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
 .pair .trait-desc { display: grid; gap: 4px; }
 .trait-desc.comp { border-left-color: var(--warn); }
@@ -179,15 +179,15 @@ tr.lvl-U td.target { color: var(--muted); }
 .checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .9rem; }
 .checklist li { display: flex; gap: 10px; align-items: flex-start; }
 .mark { flex: none; width: 8px; height: 18px; border-radius: 2px; margin-top: 2px; font-size: 0; }
-.mark.ok { background: var(--good); box-shadow: 0 0 8px rgba(150, 200, 110, .6); }
+.mark.ok { background: var(--good); box-shadow: 0 0 8px rgba(143, 181, 154, .6); }
 .mark.no { background: transparent; border: 1.5px solid var(--warn); }
 .status { font: 600 1.15rem/1.1 var(--display); letter-spacing: .14em; text-transform: uppercase; }
-.status.ok { color: var(--good); text-shadow: 0 0 14px rgba(150, 200, 110, .45); }
+.status.ok { color: var(--good); text-shadow: 0 0 14px rgba(143, 181, 154, .45); }
 .status.no { color: var(--warn); }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .stat { background: var(--well); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; display: grid; gap: 2px; }
 .stat .eyebrow { font-size: .64rem; }
-.stat b { font: 400 1.6rem/1 var(--mono); color: var(--chrome); text-shadow: 0 0 12px rgba(217, 166, 94, .45); }
+.stat b { font: 400 1.6rem/1 var(--mono); color: var(--chrome); text-shadow: 0 0 12px rgba(185, 194, 189, .45); }
 .roster { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .roster li { display: flex; gap: 6px; align-items: center; justify-content: space-between; font-size: .9rem; }
 .roster li span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -210,9 +210,9 @@ tr.lvl-U td.target { color: var(--muted); }
 .attr-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
 @media (max-width: 480px) { .attr-strip { grid-template-columns: repeat(3, 1fr); } }
 .attr-strip div { text-align: center; border: 1px solid var(--line); border-radius: 10px; padding: 8px 4px; background: var(--well); }
-.attr-strip b { display: block; font: 400 1.8rem/1.1 var(--mono); color: var(--chrome); text-shadow: 0 0 12px rgba(217, 166, 94, .45); }
+.attr-strip b { display: block; font: 400 1.8rem/1.1 var(--mono); color: var(--chrome); text-shadow: 0 0 12px rgba(185, 194, 189, .45); }
 .skill-cols { columns: 2 220px; column-gap: 28px; }
-.skill-line { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(201, 160, 99, .12); break-inside: avoid; }
+.skill-line { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(160, 172, 166, .12); break-inside: avoid; }
 .skill-line .lv { font: .66rem var(--mono); color: var(--muted); letter-spacing: .12em; text-transform: uppercase; margin-left: 8px; }
 .skill-line.S .lv { color: var(--accent); }
 .skill-line.S b { color: var(--accent); }
@@ -222,26 +222,26 @@ tr.lvl-U td.target { color: var(--muted); }
 .boxes { display: flex; gap: 6px; }
 .box { width: 64px; height: 26px; border: 1px solid var(--chrome-dim); border-radius: 4px; background: transparent; transform: skewX(-20deg); font-size: 0; }
 .box:hover { border-color: var(--chrome); }
-.box.on { background: var(--bad); border-color: var(--bad); box-shadow: 0 0 12px rgba(226, 84, 60, .55); }
+.box.on { background: var(--bad); border-color: var(--bad); box-shadow: 0 0 12px rgba(201, 57, 59, .55); }
 .condition { font-family: var(--display); letter-spacing: .1em; text-transform: uppercase; }
 .duty { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .duty .count { font: 400 2.2rem/1 var(--mono); min-width: 2ch; text-align: center; color: var(--accent); text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent); }
 .dice { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.die { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--chrome); display: grid; place-items: center; font: 400 1.4rem/1 var(--mono); color: var(--chrome); background: rgba(217, 166, 94, .08); box-shadow: 0 0 14px rgba(217, 166, 94, .3), inset 0 0 10px rgba(217, 166, 94, .15); }
+.die { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--chrome); display: grid; place-items: center; font: 400 1.4rem/1 var(--mono); color: var(--chrome); background: rgba(185, 194, 189, .08); box-shadow: 0 0 14px rgba(185, 194, 189, .3), inset 0 0 10px rgba(185, 194, 189, .15); }
 .result { border-radius: 10px; padding: 14px; display: grid; gap: 8px; border: 1px solid var(--line); background: var(--well); }
-.result.succ { border-color: var(--good); box-shadow: 0 0 20px rgba(150, 200, 110, .15); }
-.result.fail { border-color: var(--bad); box-shadow: 0 0 20px rgba(226, 84, 60, .15); }
+.result.succ { border-color: var(--good); box-shadow: 0 0 20px rgba(143, 181, 154, .15); }
+.result.fail { border-color: var(--bad); box-shadow: 0 0 20px rgba(201, 57, 59, .15); }
 .verdict { font: 600 1.4rem/1 var(--display); letter-spacing: .16em; text-transform: uppercase; }
 .succ .verdict { color: var(--good); }
 .fail .verdict { color: var(--bad); }
 .log { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font: .84rem var(--mono); max-height: 220px; overflow-y: auto; }
-.log li { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid rgba(201, 160, 99, .12); padding: 3px 0; }
+.log li { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid rgba(160, 172, 166, .12); padding: 3px 0; }
 .log .s { color: var(--good); }
 .log .f { color: var(--bad); }
 .ref { display: grid; gap: 6px; font-size: .88rem; margin: 0; }
 .ref dt { font: 600 .72rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--chrome); }
-.ref dd { margin: 0 0 6px; color: #dccdb2; }
-.example-banner { margin-top: 16px; background: rgba(217, 166, 94, .06); border: 1px dashed var(--chrome-dim); border-radius: var(--radius); padding: 12px 16px; font-size: .9rem; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.ref dd { margin: 0 0 6px; color: #cfd3cd; }
+.example-banner { margin-top: 16px; background: rgba(185, 194, 189, .06); border: 1px dashed var(--chrome-dim); border-radius: var(--radius); padding: 12px 16px; font-size: .9rem; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 @media (prefers-reduced-motion: no-preference) {
   .die.rolling { animation: tumble .4s ease-out; }
   @keyframes tumble { from { transform: rotate(-120deg) scale(.6); opacity: .3; } to { transform: none; opacity: 1; } }
@@ -251,7 +251,7 @@ tr.lvl-U td.target { color: var(--muted); }
 /* Portrait / token */
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .portrait-drop { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; border: 1px dashed var(--chrome-dim); border-radius: 12px; padding: 14px; background: var(--well); }
-.portrait-drop.dragging { border-color: var(--chrome); background: rgba(217, 166, 94, .08); }
+.portrait-drop.dragging { border-color: var(--chrome); background: rgba(185, 194, 189, .08); }
 .portrait-actions { display: grid; gap: 10px; flex: 1 1 220px; min-width: 0; justify-items: start; }
 .portrait-frame { flex: none; width: 112px; height: 112px; display: grid; place-items: center; border: 2px solid var(--accent); background: var(--glass); overflow: hidden; border-radius: 50%; box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent); }
 .portrait-frame.portrait { width: 96px; height: 128px; border-radius: 10px; }
@@ -276,7 +276,7 @@ tr.lvl-U td.target { color: var(--muted); }
   /* Create: readiness rides along at the bottom instead of sitting above step 1. */
   #app[data-view="create"] .mobile-status, #app:not([data-view]) .mobile-status {
     display: flex; position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); z-index: 20;
-    align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: rgba(28, 19, 12, .95); }
+    align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: rgba(12, 15, 18, .95); }
   .mobile-status .status { font-size: .82rem; min-width: 0; }
   .mobile-status .btn-row { flex-wrap: nowrap; flex: none; }
   .mobile-status .btn { padding: 9px 12px; }
@@ -334,7 +334,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
 /* Phaser power */
 .ph-meter { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; height: 14px; }
-.ph-meter span { border-radius: 2px; background: rgba(217, 166, 94, .12); border: 1px solid var(--line); }
+.ph-meter span { border-radius: 2px; background: rgba(185, 194, 189, .12); border: 1px solid var(--line); }
 .ph-meter span.on { background: var(--chrome); border-color: var(--chrome); }
 .ph-meter.low span.on { background: var(--warn); border-color: var(--warn); }
 #ph-fire .btn { font-size: .72rem; padding: 7px 10px; }
@@ -345,8 +345,8 @@ tr.lvl-U td.target { color: var(--muted); }
 .clocks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .clock { display: grid; justify-items: center; gap: 4px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--well); text-align: center; }
 .clock svg { width: 96px; height: 96px; }
-.clock path { stroke: var(--space); stroke-width: 2; cursor: pointer; fill: rgba(217, 166, 94, .08); }
-.clock path:hover { fill: rgba(217, 166, 94, .22); }
+.clock path { stroke: var(--space); stroke-width: 2; cursor: pointer; fill: rgba(185, 194, 189, .08); }
+.clock path:hover { fill: rgba(185, 194, 189, .22); }
 .clock.danger path.on { fill: var(--bad); }
 .clock.progress path.on { fill: var(--good); }
 .clock .ring { fill: none; stroke: var(--chrome-dim); stroke-width: 1.5; pointer-events: none; }
@@ -355,7 +355,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .clock b { font-size: .92rem; overflow-wrap: anywhere; }
 .clock .kind { font: .66rem var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .ship { display: grid; gap: 8px; }
-.ship-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; padding-bottom: 6px; border-bottom: 1px solid rgba(201, 160, 99, .12); }
+.ship-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; padding-bottom: 6px; border-bottom: 1px solid rgba(160, 172, 166, .12); }
 .ship-row .eff { grid-column: 1 / -1; }
 .ship-row .label { font-size: .68rem; }
 .ship-row .boxes { gap: 4px; }
@@ -393,7 +393,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-duty { display: flex; align-items: center; gap: 6px; }
 .gm-duty b { font: 400 1.3rem var(--mono); color: var(--accent); min-width: 1.5ch; text-align: center; }
 .gm-duty button { width: 34px; height: 30px; border: 1px solid var(--chrome-dim); background: transparent; color: var(--chrome); border-radius: 999px; font: 600 1rem var(--mono); }
-.gm-skills { font-size: .84rem; color: #dccdb2; }
+.gm-skills { font-size: .84rem; color: #cfd3cd; }
 .gm-skills b { color: var(--accent); }
 .gm-traits { font-size: .82rem; color: var(--muted); display: grid; gap: 2px; }
 .gm-traits strong { color: var(--fg); }
@@ -435,7 +435,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .guide h3 { font-size: .95rem; margin: 1.4em 0 .4em; color: var(--accent); }
 .guide p, .guide ul, .guide ol { margin: 0 0 .9em; }
 .guide li { margin-bottom: .3em; }
-.guide em { color: #e3d4b8; }
+.guide em { color: #d8dbd5; }
 .guide a { color: var(--chrome); }
 .guide strong { color: #fff; }
 .guide table { width: 100%; min-width: 0; margin: 0 0 1.2em; font-size: .9rem; border: 1px solid var(--line); border-radius: 10px; border-collapse: separate; border-spacing: 0; overflow: hidden; background: var(--well); }
@@ -478,11 +478,14 @@ tr.lvl-U td.target { color: var(--muted); }
   .print-only { display: grid !important; }
 }
 .print-only { display: none; }
+/* Numbers in the book serif with even, aligned figures; the small-caps label face keeps old-style figures. */
+.num, .attr .val, .stat b, td.target, td.pct, .skill-line b, .attr-strip b, .duty .count, .die, .gm-stats b, .gm-duty b, .log, .verdict + p, .clock .kind {
+  font-family: "EB Garamond", Garamond, Georgia, serif; font-variant-numeric: lining-nums tabular-nums; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <linearGradient id="delta-gold" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#fbe2a6"/><stop offset=".35" stop-color="#d9a84f"/><stop offset=".7" stop-color="#a8732a"/><stop offset="1" stop-color="#6e4614"/>
+    <stop offset="0" stop-color="#eef1ef"/><stop offset=".35" stop-color="#aab3ae"/><stop offset=".7" stop-color="#6b7571"/><stop offset="1" stop-color="#363d3a"/>
   </linearGradient></defs></svg>
 <canvas id="embers" aria-hidden="true"></canvas>
 <div class="wrap" id="app" data-div="law">
@@ -491,14 +494,14 @@ tr.lvl-U td.target { color: var(--muted); }
       <img class="avatar" id="hdr-portrait" alt="" hidden>
       <svg class="delta" id="hdr-delta" viewBox="0 0 100 100" aria-hidden="true"><circle class="outer" cx="50" cy="50" r="47"/><circle class="ring" cx="50" cy="50" r="40"/><path class="emblem" data-emblem d=""/></svg>
       <div class="who">
-        <span class="eyebrow">Grimm Wild West · Black Pine, Oregon · 1889</span>
-        <h1 id="hdr-name">Unnamed rider</h1>
+        <span class="eyebrow">Grimm</span>
+        <h1 id="hdr-name">Unnamed character</h1>
         <span class="muted" id="hdr-sub">—</span>
       </div>
     </div>
     <div class="tabs" role="tablist" aria-label="View">
       <button class="tab" role="tab" id="tab-create" aria-selected="true" aria-controls="view-create">Create</button>
-      <button class="tab" role="tab" id="tab-sheet" aria-selected="false" aria-controls="view-sheet">Ride</button>
+      <button class="tab" role="tab" id="tab-sheet" aria-selected="false" aria-controls="view-sheet">Play</button>
       <button class="tab" role="tab" id="tab-guide" aria-selected="false" aria-controls="view-guide">Players' Guide</button>
       <button class="tab" role="tab" id="tab-gm" aria-selected="false" aria-controls="view-gm">GM view</button>
     </div>
@@ -518,7 +521,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">1</span><h2>Choose your calling</h2>
-            <p class="muted small">Pick a calling and describe what you bring to the posse. A title is agreed with the GM and gives no bonus.</p></div>
+            <p class="muted small">Pick a calling and describe what your character brings. A title is agreed with the GM and gives no bonus.</p></div>
           <div class="fields">
             <div class="field"><label for="f-dept">Calling</label>
               <select id="f-dept"></select></div>
@@ -597,7 +600,7 @@ tr.lvl-U td.target { color: var(--muted); }
                   <span class="toast" id="portrait-msg" role="status" aria-live="polite"></span>
                 </div>
               </div></div>
-            <div class="field wide"><label for="f-reason">Why you ride with the posse</label>
+            <div class="field wide"><label for="f-reason">Why you stand against the dark</label>
               <select id="f-reasonpick" aria-label="Quick pick a reason"></select>
               <textarea id="f-reason" rows="2" placeholder="Pick one of the top 10 above, or write your own."></textarea></div>
             <div class="field wide"><label for="f-speciesnotes">Other ability (GM approval required)</label>
@@ -659,7 +662,7 @@ tr.lvl-U td.target { color: var(--muted); }
         </section>
 
         <section class="step hud">
-          <div class="step-head"><span class="step-no">5</span><h2>Prepare to ride</h2>
+          <div class="step-head"><span class="step-no">5</span><h2>Prepare for the hunt</h2>
             <p class="muted small">You begin uninjured, with two Grit points (three with True grit) and your gear.</p></div>
           <div class="field"><span class="label">Gear</span>
             <div class="checks" id="equip"></div></div>
@@ -668,9 +671,9 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field" id="gear-wrap" hidden><label for="f-gearitem">Fine weapon or tool (Edge)</label><input type="text" id="f-gearitem" placeholder="e.g. Grandfather's Grimm axe"></div>
             <div class="field" id="gearskill-wrap" hidden><label for="f-gearskill">+2 to</label><select id="f-gearskill"></select></div>
             <div class="field wide"><label for="f-otherequip">Other gear</label><input type="text" id="f-otherequip" placeholder="Anything else you carry"></div>
-            <div class="field wide"><label for="f-connection">Connection to another rider</label>
+            <div class="field wide"><label for="f-connection">Connection to another character</label>
               <select id="f-connpick" aria-label="Quick pick a connection"></select>
-              <textarea id="f-connection" rows="2" placeholder="Pick one of the top 10 above, or write your own. Name the rider if you know who."></textarea></div>
+              <textarea id="f-connection" rows="2" placeholder="Pick one of the top 10 above, or write your own. Name the character if you know who."></textarea></div>
             <div class="field wide"><label for="f-notes">Notes</label><textarea id="f-notes" rows="2"></textarea></div>
           </div>
         </section>
@@ -702,8 +705,8 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="toast" id="toast" role="status" aria-live="polite"></div>
         </div>
         <div class="panel hud">
-          <div class="eyebrow">Ready-made posse</div>
-          <select id="f-pregen" aria-label="Load a ready-made rider"></select>
+          <div class="eyebrow">Ready-made characters</div>
+          <select id="f-pregen" aria-label="Load a ready-made character"></select>
           <div class="eyebrow">Saved in this browser</div>
           <ul class="roster" id="roster"></ul>
           <div class="btn-row">
@@ -732,16 +735,16 @@ tr.lvl-U td.target { color: var(--muted); }
   <section id="view-gm" role="tabpanel" aria-labelledby="tab-gm" hidden>
     <div class="gm-top">
       <div class="card hud no-print">
-        <h3>Posse</h3>
-        <p class="small muted">Open the players' character files to see the whole posse. Changes here (injuries, Grit) are the GM's copies; save the posse to a file to keep them.</p>
+        <h3>Characters</h3>
+        <p class="small muted">Open the players' character files to see every character. Changes here (injuries, Grit) are the GM's copies; save them all to a file to keep them.</p>
         <div class="btn-row">
-          <label class="btn primary" for="gm-files" id="gm-open" tabindex="0">Open character or posse files</label>
+          <label class="btn primary" for="gm-files" id="gm-open" tabindex="0">Open character files</label>
           <input type="file" id="gm-files" accept=".json,application/json,text/plain" multiple class="visually-hidden">
-          <button class="btn" id="gm-save">Save posse to file</button>
+          <button class="btn" id="gm-save">Save all to file</button>
         </div>
         <div class="fields">
           <div class="field"><label for="gm-add-saved">Add from this browser</label><select id="gm-add-saved"></select></div>
-          <div class="field"><label for="gm-add-pregen">Add ready-made riders</label><select id="gm-add-pregen"></select></div>
+          <div class="field"><label for="gm-add-pregen">Add ready-made characters</label><select id="gm-add-pregen"></select></div>
         </div>
         <div class="btn-row">
           <button class="btn" id="gm-newsession">New session: reset everyone's Grit</button>
@@ -751,7 +754,7 @@ tr.lvl-U td.target { color: var(--muted); }
       </div>
       <div class="card hud">
         <h3>Turn order</h3>
-        <p class="small muted">Highest Agility first. Players choose the order among tied riders; the GM places opponents.</p>
+        <p class="small muted">Highest Agility first. Players choose the order among tied characters; the GM places opponents.</p>
         <ol class="turns" id="gm-turns"></ol>
       </div>
     </div>
@@ -797,10 +800,10 @@ tr.lvl-U td.target { color: var(--muted); }
     <div class="guide-layout">
       <nav class="guide-toc hud no-print" aria-label="Guide contents"><details id="toc-details" open><summary class="eyebrow">Contents</summary><ol id="guide-toc"></ol></details></nav>
       <article class="guide hud" id="guide">
-        <header class="guide-title"><span class="eyebrow">Black Pine, Oregon · 1889</span><h2 class="h1">Grimm Wild West Players' Guide</h2>
-          <span class="muted">A frontier game in the Grimm-verse</span></header>
+        <header class="guide-title"><span class="eyebrow">Gothic horror in the Grimm-verse</span><h2 class="h1">Grimm Players' Guide</h2>
+          <span class="muted">The late 1800s</span></header>
 <!-- GUIDE:START -->
-<p>The Oregon frontier is wide and the law is thin. Timber camps, silver strikes, the railroad and the river steamers bring strangers from every corner of the world, and some of them are not what they seem. Wesen walk among the settlers wearing human faces. Grimms, the old hunters, can see through them. The Royal Families pull strings from across the ocean, and men and women with real magic hide inside fraternal lodges and country churches. You ride with a small posse that knows the truth and tries to keep the peace, or at least to keep people alive.</p>
+<p>Every fairy tale was a warning. The Brothers Grimm wrote down what their family had hunted for centuries, and the things in those stories never went away. In fog-bound towns and lamplit camps, Wesen walk among the living wearing human faces. Grimms, the last of the old hunters, can see through them. The Royal Families pull strings from across the ocean, and men and women with real magic hide inside lodges and country churches. You know the truth, and you stand between it and the people who don’t.</p>
 <p>This guide uses the same rules as the USS Pelion game: concrete skills, 3d6 roll-under, and a small pool of Grit points. It is an unofficial fan game inspired by the television series <em>Grimm</em> and is not affiliated with its makers.</p>
 <h2 id="g-the-rule-to-remember">The rule to remember</h2>
 <p>Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes your training and attribute. Do not add the attribute again.</p>
@@ -816,12 +819,10 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Ordo Sancti Cultelli</strong> (Order of the Holy Knife) is a Church-affiliated order of assassins sworn to cleanse the Earth of supernatural threats, Wesen and Incantare alike.</li>
 <li><strong>Ordo Hermeticus Aurorae Aureae</strong> (the Hermetic Order of the Golden Dawn) presents itself as a fraternal order with odd trappings. Inside it, layer under layer, are secrets and real magicians.</li>
 </ul>
-<h2 id="g-black-pine-oregon">Black Pine, Oregon</h2>
-<p>The default home of the posse is Black Pine, a timber and silver town in the Cascade foothills, two days’ ride from Portland. It has a sheriff who would rather not know, a newspaper that would very much like to, a railroad survey camp, and more Wesen than anyone admits. Use it, or set your game anywhere in the West.</p>
 <h1 id="g-create-your-character">Create your character</h1>
-<p>Work through the five steps in order. The Grimm Wild West Character Creator follows the same steps and checks the rules for you.</p>
+<p>Work through the five steps in order. The Grimm character creator follows the same steps and checks the rules for you.</p>
 <h2 id="g-step-1-choose-your-calling">Step 1: Choose your calling</h2>
-<p>Choose a calling and describe what you bring to the posse. Your calling places you in one of three groups, which only changes your sheet’s colors and badge. A title such as “Deputy U.S. Marshal” or “Doc” is agreed with the GM and gives no bonus.</p>
+<p>Choose a calling and describe what your character brings. Your calling places you in one of three groups, which only changes your sheet’s colors and badge. A title such as “Deputy U.S. Marshal” or “Doc” is agreed with the GM and gives no bonus.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -839,7 +840,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="odd">
 <td>Marshal</td>
 <td>The Law</td>
-<td>Lead the posse and carry what authority there is</td>
+<td>Lead others and carry what authority there is</td>
 </tr>
 <tr class="even">
 <td>Deputy</td>
@@ -859,7 +860,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="odd">
 <td>Doctor</td>
 <td>The Learned</td>
-<td>Patch up the posse and read what a body tells you</td>
+<td>Patch up the wounded and read what a body tells you</td>
 </tr>
 <tr class="even">
 <td>Apothecary</td>
@@ -884,7 +885,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="even">
 <td>Scout</td>
 <td>The Frontier</td>
-<td>Find the trail, read the land, keep the posse alive in it</td>
+<td>Find the trail, read the land, keep everyone alive in it</td>
 </tr>
 <tr class="odd">
 <td>Gambler</td>
@@ -1002,8 +1003,8 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Each Extra Trained skill Edge adds one more Trained skill. A <strong>Grimm’s</strong> Wesen Lore is always at least Trained and doesn’t use one of the Trained picks.</p>
 <p><strong>Broadening.</strong> An Old hand can broaden later (the GM’s call, usually after a significant case): the Expert skill becomes a Specialty at +3, and two more skills become Trained.</p>
 <h2 id="g-step-4-describe-your-character">Step 4: Describe your character</h2>
-<p>Choose your name, title if any, and a short reason you ride with the posse. Then choose <strong>one advantage</strong> and <strong>one complication</strong>.</p>
-<h3 id="g-top-10-reasons-to-ride-with-the-posse">Top 10 reasons to ride with the posse</h3>
+<p>Choose your name, title if any, and a short reason you stand against the dark. Then choose <strong>one advantage</strong> and <strong>one complication</strong>.</p>
+<h3 id="g-top-10-reasons-to-stand-against-the-dark">Top 10 reasons to stand against the dark</h3>
 <ol type="1">
 <li><strong>The family gift.</strong> The Grimm blood woke in me, and it came with a duty.</li>
 <li><strong>Vengeance.</strong> Something that wore a human face killed someone I loved.</li>
@@ -1014,7 +1015,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>The bounty.</strong> The pay’s good, and nobody else will take these jobs.</li>
 <li><strong>Knowledge.</strong> The hidden world is the greatest mystery there is, and I want to understand it.</li>
 <li><strong>Faith.</strong> The Lord sent me here for a reason, and I believe this is it.</li>
-<li><strong>Nowhere else to go.</strong> The posse took me in when no one else would.</li>
+<li><strong>Nowhere else to go.</strong> These people took me in when no one else would.</li>
 </ol>
 <ul>
 <li><strong>Advantage.</strong> Choose either a general advantage or one of your heritage advantages. A heritage advantage replaces the general advantage and always brings its companion complication. An Incantare’s heritage advantage is their <strong>Lens</strong>.</li>
@@ -1065,9 +1066,9 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<h2 id="g-step-5-prepare-to-ride">Step 5: Prepare to ride</h2>
-<p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points (three with True grit) and your gear. Name your friend in town or your fine weapon or tool, if you took those Edges. Describe one connection to another member of the posse.</p>
-<h3 id="g-top-10-connections-to-another-rider">Top 10 connections to another rider</h3>
+<h2 id="g-step-5-prepare-for-the-hunt">Step 5: Prepare for the hunt</h2>
+<p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points (three with True grit) and your gear. Name your friend in town or your fine weapon or tool, if you took those Edges. Describe one connection to another player’s character.</p>
+<h3 id="g-top-10-connections-to-another-character">Top 10 connections to another character</h3>
 <ol type="1">
 <li><strong>Rode together in the war.</strong> We served in the same company and still watch each other’s backs.</li>
 <li><strong>They saved my life.</strong> They cut me down from a lynch mob’s rope, and I owe them my life.</li>
@@ -1087,7 +1088,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Trained:</strong> Read People 14, Wesen Lore 14, Tracking 14, Survival 14, Gambling 14, Occult 14, Persuasion 12, Deception 12, Shooting 12, Riding 12.</li>
 <li><strong>Dodge:</strong> Athletics is Untrained, so Dodge is 9.</li>
 <li><strong>Advantage:</strong> Astute Observer. <strong>Complication:</strong> Cannot Leave a Mystery Alone.</li>
-<li><strong>Friend in town:</strong> a clerk in the Pinkertons’ Portland office who’ll pull a file, quietly.</li>
+<li><strong>Friend in town:</strong> a clerk in the Pinkertons’ regional office who’ll pull a file, quietly.</li>
 </ul>
 <h1 id="g-skills-and-gear">Skills and gear</h1>
 <p>Choose the skill that matches your method. Investigation finds the clues; Wesen Lore says what kind of creature left them. Medicine treats the body; Apothecary brews the remedy. The GM chooses one primary skill for each distinct task.</p>
@@ -1108,7 +1109,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="odd">
 <td>Leadership</td>
 <td>Presence</td>
-<td>Command the posse, rally a crowd, give clear orders</td>
+<td>Command others, rally a crowd, give clear orders</td>
 </tr>
 <tr class="even">
 <td>Persuasion</td>
@@ -1307,7 +1308,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>A natural 3 or 4 always succeeds. A natural 17 or 18 always fails. An impossible action receives no roll.</p>
 <p>In an opposed contest, each side rolls its relevant skill. One success beats one failure. If both succeed, the larger success margin wins. A tie, or two failures, favors the defender or preserves the situation. For an automatic success above its target, count its contest margin as zero.</p>
 <h2 id="g-assistance">Assistance</h2>
-<p>One qualified assistant can roll a relevant skill before the lead character rolls. Success grants +1 to the lead roll; success by 5 or more grants +2. Failure gives no bonus. An 18 introduces a complication described by the GM. Additional riders can do other tasks but cannot stack assistance bonuses on the same roll.</p>
+<p>One qualified assistant can roll a relevant skill before the lead character rolls. Success grants +1 to the lead roll; success by 5 or more grants +2. Failure gives no bonus. An 18 introduces a complication described by the GM. Additional characters can do other tasks but cannot stack assistance bonuses on the same roll.</p>
 <h2 id="g-failure-and-another-attempt">Failure and another attempt</h2>
 <p>Failure changes the situation: time passes, the trail goes cold, supplies run out, or danger grows. Do not repeat an unchanged roll until it succeeds. A new approach, new evidence, better tools, or more time may justify another attempt.</p>
 <h2 id="g-success-at-a-cost">Success at a cost</h2>
@@ -1316,13 +1317,13 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>A <strong>clock</strong> is a circle cut into 4, 6 or 8 segments that tracks something that takes time or builds toward disaster: <em>The mob forms (6)</em>, <em>Nightfall (4)</em>, <em>Find the lair (6)</em>, <em>Win the clan’s trust (8)</em>.</p>
 <ul>
 <li><strong>Danger clocks</strong> fill when things go wrong: a failed roll, a success at a cost, or time passing. When one fills, the danger happens.</li>
-<li><strong>Progress clocks</strong> fill as the posse succeeds: one segment for a success, two for success by 5 or more. When one fills, the goal is achieved.</li>
+<li><strong>Progress clocks</strong> fill as the characters succeed: one segment for a success, two for success by 5 or more. When one fills, the goal is achieved.</li>
 <li>The GM sizes the clock (4 = urgent or simple, 6 = substantial, 8 = long or complex) and shows it to the players.</li>
 </ul>
 <h2 id="g-investigation-and-social-scenes">Investigation and social scenes</h2>
 <p>Ask concrete questions and explain your approach. Evidence may require several different tasks. Persuasion can secure cooperation, Read People offers insight into behavior, and Wesen Lore explains what the evidence means. A successful roll does not force someone to abandon a core belief or reveal what they do not know.</p>
 <h2 id="g-chases">Chases</h2>
-<p>Run a chase as a progress clock for the pursuers against a danger clock for the quarry’s escape. Each exchange, riders roll <strong>Riding</strong> (or Athletics on foot): success ticks the pursuers’ clock, failure ticks the escape. Terrain, a tired horse, or a shot fired from the saddle (Shooting at −2) adjust the rolls.</p>
+<p>Run a chase as a progress clock for the pursuers against a danger clock for the quarry’s escape. Each exchange, characters roll <strong>Riding</strong> (or Athletics on foot): success ticks the pursuers’ clock, failure ticks the escape. Terrain, a tired horse, or a shot fired from the saddle (Shooting at −2) adjust the rolls.</p>
 <h1 id="g-the-woge-and-the-hidden-world">The woge and the hidden world</h1>
 <h2 id="g-wesen-and-the-woge">Wesen and the woge</h2>
 <p>Every Wesen heritage follows the <strong>core Wesen rules</strong> and has a <strong>woge profile</strong> (both in the Heritages chapter). In short:</p>
@@ -1355,10 +1356,10 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Magic draws attention.</strong> Using it openly can mark a box of <strong>Exposure</strong>, the Order of the Holy Knife hunts known Incantare, and a Grimm gets +1 to sense your magic for each charm or potion you carry.</p>
 <p><strong>Hexenbiests and Zauberbiests</strong> work rituals the same way, through their innate magic, in their own style (curses, potions and sendings).</p>
 <h2 id="g-the-code-of-swabia">The Code of Swabia</h2>
-<p>The Code of Swabia is the old law between Wesen and the rest of the world, and Grimms are its enforcers. At its heart, Wesen must not reveal themselves to humanity. How far it reaches beyond that, and how mercifully a Grimm enforces it, is a question your posse will answer for itself.</p>
+<p>The Code of Swabia is the old law between Wesen and the rest of the world, and Grimms are its enforcers. At its heart, Wesen must not reveal themselves to humanity. How far it reaches beyond that, and how mercifully a Grimm enforces it, is a question your characters will answer for themselves.</p>
 <h1 id="g-personal-combat">Personal combat</h1>
 <h2 id="g-turn-order-and-actions">Turn order and actions</h2>
-<p>Act in descending Agility order. Players choose the order of tied riders; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as shooting, reloading, helping, or attempting a task.</p>
+<p>Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as shooting, reloading, helping, or attempting a task.</p>
 <h2 id="g-attacking-and-defending">Attacking and defending</h2>
 <p>Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.</p>
 <p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.</p>
@@ -1599,7 +1600,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </table>
 <p>Gain one point when one of your complications creates a meaningful problem you accept, including a companion complication from a heritage advantage. You can decline the proposed complication without penalty.</p>
 <h2 id="g-trouble">Trouble</h2>
-<p>The posse shares three Trouble tracks. They fill as the hidden world strains against the ordinary one; the GM narrates what each box means.</p>
+<p>The characters share three Trouble tracks. They fill as the hidden world strains against the ordinary one; the GM narrates what each box means.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -1710,7 +1711,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="even">
 <td>10</td>
 <td>A cattle drive spooked by something</td>
-<td>Portland’s waterfront</td>
+<td>A fog-bound waterfront</td>
 <td>A Hässlich demanding tolls at a bridge</td>
 </tr>
 <tr class="odd">
@@ -1721,7 +1722,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="even">
 <td>12</td>
-<td>A Wesen asks the posse for help</td>
+<td>A Wesen asks for help</td>
 <td>A snowbound mountain pass</td>
 <td>A Golden Dawn magician’s working gone wrong</td>
 </tr>
@@ -1775,7 +1776,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="even">
 <td>6</td>
-<td>A rider’s complication comes into play</td>
+<td>A character’s complication comes into play</td>
 <td>The river floods (8)</td>
 <td>A frightened Eisbiber family</td>
 </tr>
@@ -1807,11 +1808,11 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>11</td>
 <td>Another Grimm hunts the same quarry</td>
 <td>The Wesen flees the territory (6)</td>
-<td>An Incantare who needs the posse’s protection</td>
+<td>An Incantare who needs protection</td>
 </tr>
 <tr class="even">
 <td>12</td>
-<td>The trail leads to someone a rider loves</td>
+<td>The trail leads to someone a character loves</td>
 <td>The snows close the pass (8)</td>
 <td>A dying Grimm with a last request</td>
 </tr>
@@ -1824,17 +1825,17 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Who stood out?</strong> A moment worth remembering.</li>
 <li><strong>Complications.</strong> Which ones came into play, and what did they cost?</li>
 <li><strong>For the books.</strong> A new Wesen kind, weakness or custom worth recording.</li>
-<li><strong>Advancement.</strong> After a significant case, the GM may authorize one skill step for each rider.</li>
+<li><strong>Advancement.</strong> After a significant case, the GM may authorize one skill step for each character.</li>
 </ol>
-<h1 id="g-ready-made-posse">Ready-made posse</h1>
-<p>Six riders ready to play. Each follows the creation rules exactly, Edges included, and their connections tie them together.</p>
+<h1 id="g-ready-made-characters">Ready-made characters</h1>
+<p>Six characters ready to play. Each follows the creation rules exactly, Edges included, and their connections tie them together.</p>
 <h2 id="g-eliza-kessler">Eliza Kessler</h2>
-<p><em>Deputy U.S. Marshal, Marshal. Grimm (Tier 2).</em> Leads the posse and carries the badge: the law, and the Code, in one person.</p>
+<p><em>Deputy U.S. Marshal, Marshal. Grimm (Tier 2).</em> Wears the badge: the law, and the Code, in one person.</p>
 <ul>
 <li><strong>Attributes:</strong> Body 12, Agility 13, Intellect 10, Presence 8, Will 12. <strong>Dodge</strong> 12.</li>
 <li><strong>Skills:</strong> Shooting 16 (Specialty). Trained: Riding 14, Melee 14, Brawling 14, Athletics 13, Investigation 11, Tracking 11, Read People 11, Survival 11, Leadership 9; Wesen Lore 11 (free).</li>
 <li><strong>Edge:</strong> True grit. <strong>Grimm gift:</strong> Keeper of the Books (companion: The Books Must Be Kept). <strong>Complication:</strong> Law and Order; trigger: a Wesen suspect could be killed instead of arrested.</li>
-<li><strong>Why I ride:</strong> The Grimm blood woke in me, and it came with a duty. <strong>Connection:</strong> Gus Brandt cut her down from a lynch mob’s rope before anyone knew what she was.</li>
+<li><strong>Why I stand against the dark:</strong> The Grimm blood woke in me, and it came with a duty. <strong>Connection:</strong> Gus Brandt cut her down from a lynch mob’s rope before anyone knew what she was.</li>
 </ul>
 <h2 id="g-gus-brandt">Gus Brandt</h2>
 <p><em>Blacksmith and gunsmith, Tinker. Blutbad (Tier 2).</em> Shoes the horses, fixes the guns, and hasn’t hunted in eleven years.</p>
@@ -1842,23 +1843,23 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Attributes:</strong> Body 11, Agility 11, Intellect 13, Presence 10, Will 10. <strong>Dodge</strong> 10. <strong>In woge:</strong> Body 13, Agility 12; claws and fangs mark 2 boxes.</li>
 <li><strong>Skills:</strong> Tinkering 16 (Specialty). Trained: Tracking 14, Wesen Lore 14, Investigation 14, Survival 14, Read People 14, Brawling 12, Melee 12, Athletics 12, Persuasion 11.</li>
 <li><strong>Edge:</strong> A fine tool: a master gunsmith’s tools (+2 Tinkering). <strong>Advantage:</strong> Blutbad Nose (companion: The Bloodlust). <strong>Complication:</strong> Keeps a Dangerous Secret; trigger: someone from his old pack turns up.</li>
-<li><strong>Why I ride:</strong> I did harm once. I mean to balance the ledger. <strong>Connection:</strong> Owes Roz Vey for the remedies that keep the urge quiet.</li>
+<li><strong>Why I stand against the dark:</strong> I did harm once. I mean to balance the ledger. <strong>Connection:</strong> Owes Roz Vey for the remedies that keep the urge quiet.</li>
 </ul>
 <h2 id="g-roz-vey">Roz Vey</h2>
 <p><em>Spice and tea merchant, Apothecary. Fuchsbau (Tier 1).</em> Sells tea out front, and other things in the back.</p>
 <ul>
 <li><strong>Attributes:</strong> Body 9, Agility 11, Intellect 13, Presence 12, Will 10. <strong>Dodge</strong> 9.</li>
 <li><strong>Skills:</strong> Apothecary 16 (Specialty). Trained: Medicine 14, Wesen Lore 14, Read People 14, Investigation 14, Gambling 14, Survival 14, Occult 14, Persuasion 13, Deception 13, Stealth 12.</li>
-<li><strong>Edges:</strong> Extra Trained skill; a friend in town: her cousin Ambrose, a Fuchsbau smuggler on the Portland docks who can find any ingredient, for a price. <strong>Advantage:</strong> Fuchsbau Remedies (companion: Criminal Kin). <strong>Complication:</strong> Protects Others at Personal Risk; trigger: a sick or hurt stranger turns up at the shop.</li>
-<li><strong>Why I ride:</strong> Wesen and humans can live side by side, and I mean to prove it. <strong>Connection:</strong> Trades notes with Dr. Whitlock, who still won’t admit some of her remedies work better than his.</li>
+<li><strong>Edges:</strong> Extra Trained skill; a friend in town: her cousin Ambrose, a Fuchsbau smuggler on the river docks who can find any ingredient, for a price. <strong>Advantage:</strong> Fuchsbau Remedies (companion: Criminal Kin). <strong>Complication:</strong> Protects Others at Personal Risk; trigger: a sick or hurt stranger turns up at the shop.</li>
+<li><strong>Why I stand against the dark:</strong> Wesen and humans can live side by side, and I mean to prove it. <strong>Connection:</strong> Trades notes with Dr. Whitlock, who still won’t admit some of her remedies work better than his.</li>
 </ul>
 <h2 id="g-dr.-thaddeus-whitlock">Dr. Thaddeus Whitlock</h2>
-<p><em>Town physician, Doctor. Human (Tier 0).</em> Army surgeon in the war; now he digs bullets out of the posse and asks too many questions about what made the other wounds.</p>
+<p><em>Town physician, Doctor. Human (Tier 0).</em> Army surgeon in the war; now he digs bullets out of his friends and asks too many questions about what made the other wounds.</p>
 <ul>
 <li><strong>Attributes:</strong> Body 10, Agility 10, Intellect 13, Presence 12, Will 11. <strong>Dodge</strong> 8.</li>
 <li><strong>Skills:</strong> Medicine 16 (Specialty). Trained: Apothecary 14, Read People 14, Investigation 14, Wesen Lore 14, Occult 14, Persuasion 13, Leadership 13, Riding 11, Shooting 11.</li>
 <li><strong>Edges:</strong> +1 attribute point; second advantage: Battlefield Surgeon; a fine tool: his army surgeon’s instruments (+2 Medicine). <strong>Advantage:</strong> Steady Hands. <strong>Complication:</strong> Haunted by the War; trigger: gunfire in the dark.</li>
-<li><strong>Why I ride:</strong> I saw what I saw, and no one else believes me. <strong>Connection:</strong> Rode with Silas Thorne’s regiment in the war and has never trusted him since.</li>
+<li><strong>Why I stand against the dark:</strong> I saw what I saw, and no one else believes me. <strong>Connection:</strong> Rode with Silas Thorne’s regiment in the war and has never trusted him since.</li>
 </ul>
 <h2 id="g-cora-ridgeway">Cora Ridgeway</h2>
 <p><em>Scout and sharpshooter, Scout. Coyotl (Tier 1).</em> Knows the plains and the high country, and keeps her clan’s ways close.</p>
@@ -1866,18 +1867,18 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Attributes:</strong> Body 11, Agility 14, Intellect 10, Presence 11, Will 9. <strong>Dodge</strong> 13. <strong>In woge:</strong> Body 12, Agility 15, Dodge 15; claws mark 2 boxes.</li>
 <li><strong>Skills:</strong> Shooting 17 (Specialty). Trained: Riding 15, Stealth 15, Brawling 15, Melee 15, Persuasion 12, Athletics 12, Tracking 11, Survival 11, Read People 11, Gambling 11.</li>
 <li><strong>Edges:</strong> Extra Trained skill; True grit. <strong>Advantage:</strong> Plains Wanderer (companion: Restless). <strong>Complication:</strong> Sworn Vengeance; trigger: word of the men who burned her clan’s camp.</li>
-<li><strong>Why I ride:</strong> Something that wore a human face killed someone I loved. <strong>Connection:</strong> Eliza Kessler taught her what she knows about the hidden world.</li>
+<li><strong>Why I stand against the dark:</strong> Something that wore a human face killed someone I loved. <strong>Connection:</strong> Eliza Kessler taught her what she knows about the hidden world.</li>
 </ul>
 <h2 id="g-silas-thorne">Silas Thorne</h2>
-<p><em>Professional gambler, Gambler. Ziegevolk (Tier 1); Old hand.</em> Charming, well-dressed, and in debt to the wrong people in San Francisco.</p>
+<p><em>Professional gambler, Gambler. Ziegevolk (Tier 1); Old hand.</em> Charming, well-dressed, and in debt to the wrong people.</p>
 <ul>
 <li><strong>Attributes:</strong> Body 10, Agility 10, Intellect 13, Presence 13, Will 9. <strong>Dodge</strong> 8.</li>
 <li><strong>Skills:</strong> Gambling 18 (Expert). Trained: Deception 14, Persuasion 14, Read People 14, Investigation 14, Shooting 11, Stealth 11, Riding 11.</li>
-<li><strong>Edges:</strong> Second advantage: Poker Face; a friend in town: Mae Lin, a faro dealer in San Francisco who hears everything said at her table. <strong>Advantage:</strong> Ziegevolk Pheromones (companion: Pheromone Suspicion). <strong>Complication:</strong> Owes the Wrong People; trigger: a collector from San Francisco arrives.</li>
-<li><strong>Why I ride:</strong> The pay’s good, and nobody else will take these jobs. <strong>Connection:</strong> Plays cards with Cora every Saturday; she’s the only one who can tell when he’s bluffing.</li>
+<li><strong>Edges:</strong> Second advantage: Poker Face; a friend in town: Mae Lin, a faro dealer who hears everything said at her table. <strong>Advantage:</strong> Ziegevolk Pheromones (companion: Pheromone Suspicion). <strong>Complication:</strong> Owes the Wrong People; trigger: a debt collector arrives.</li>
+<li><strong>Why I stand against the dark:</strong> The pay’s good, and nobody else will take these jobs. <strong>Connection:</strong> Plays cards with Cora every Saturday; she’s the only one who can tell when he’s bluffing.</li>
 </ul>
 <h1 id="g-threats">Threats</h1>
-<p>Opponents use the same rules as the posse. <strong>Minor opponents</strong> (hired guns, a mob, a Royal’s footmen) have <strong>one box</strong>: any hit that gets through takes them out of the fight.</p>
+<p>Opponents use the same rules as the characters. <strong>Minor opponents</strong> (hired guns, a mob, a Royal’s footmen) have <strong>one box</strong>: any hit that gets through takes them out of the fight.</p>
 <table style="width:100%;">
 <colgroup>
 <col style="width: 16%" />
@@ -2041,7 +2042,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="even">
 <td>Cool Head</td>
-<td>+2 to Leadership when coordinating the posse in a sudden emergency.</td>
+<td>+2 to Leadership when coordinating others in a sudden emergency.</td>
 </tr>
 <tr class="odd">
 <td>Unshakable Courage</td>
@@ -2245,7 +2246,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Woge profiles.</strong> While you’re in full woge, your profile’s attribute bonuses apply to rolls using those attributes (including the skills based on them), even above the starting maximum. Its other traits and drawbacks apply too. “Tough” means each hit that marks 2 or more boxes marks one fewer, never below 1.</p>
 <h2 id="g-human">Human</h2>
 <p><em>Tier 0 · 3 Edges · None</em></p>
-<p>Most of the frontier, and most of the posse. You know the truth about the hidden world, which already sets you apart.</p>
+<p>Most people are human. You know the truth about the hidden world, which already sets you apart.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -2727,7 +2728,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="odd">
 <td>Veneficare Lens (Sorcerer)</td>
 <td>Quick casting along one or two Paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm.</td>
-<td><strong>Bound Purpose.</strong> Your power follows one narrow calling. Accept the cost of serving it when it clashes with the posse’s needs.</td>
+<td><strong>Bound Purpose.</strong> Your power follows one narrow calling. Accept the cost of serving it when it clashes with your friends’ needs.</td>
 </tr>
 </tbody>
 </table>
@@ -3072,7 +3073,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="odd">
 <td>Someone Back Home</td>
-<td>A family or a sweetheart pulls you away from the posse’s work.</td>
+<td>A family or a sweetheart pulls you away from the work.</td>
 </tr>
 <tr class="even">
 <td>Sworn Vengeance</td>
@@ -3237,7 +3238,7 @@ tr.lvl-U td.target { color: var(--muted); }
         </div>
         <div class="card hud no-print" id="card-ship">
           <h3>Trouble</h3>
-          <p class="small muted">Shared by the posse. A full woge seen by townsfolk, open magic, or a body left to be found can mark a box. Lying low between cases can clear one. Tap a box to mark or clear it.</p>
+          <p class="small muted">Shared by all the characters. A full woge seen by townsfolk, open magic, or a body left to be found can mark a box. Lying low between cases can clear one. Tap a box to mark or clear it.</p>
           <div class="ship" id="ship"></div>
           <button class="linkish" id="ship-reset">Clear all Trouble</button>
         </div>
@@ -3271,7 +3272,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["Will", "Resolve, concentration, resisting fear and magic"],
   ];
   const SKILLS = [
-    ["Leadership", "Presence", "Command the posse, rally a crowd, give clear orders"],
+    ["Leadership", "Presence", "Command others, rally a crowd, give clear orders"],
     ["Persuasion", "Presence", "Convince, negotiate, calm a mob"],
     ["Deception", "Presence", "Lie, bluff, disguise and misdirect"],
     ["Read People", "Intellect", "Judge motives, spot a lie, read a face"],
@@ -3301,32 +3302,32 @@ tr.lvl-U td.target { color: var(--muted); }
   const GROUP_NAMES = { law: "The Law", learned: "The Learned", frontier: "The Frontier" };
   // Starting text for "What you bring"; replaced on calling change unless the player has written their own.
   const ROLE_SUGGESTIONS = {
-    Marshal: "Marshal: leads the posse and carries what authority there is, with Leadership and a steady gun.",
+    Marshal: "Marshal: carries what authority there is, with Leadership and a steady gun.",
     Deputy: "Deputy: keeps order, guards prisoners, and backs up the marshal when it comes to shooting.",
     Detective: "Detective: investigates crimes for the Pinkertons or a private client, and follows the paper trail nobody else reads.",
     "Bounty Hunter": "Bounty hunter: tracks and brings in wanted men, and the things that only look like men.",
-    Doctor: "Doctor: patches up the posse and reads what a body says about what killed it.",
+    Doctor: "Doctor: patches up the wounded and reads what a body says about what killed it.",
     Apothecary: "Apothecary: brews remedies, antidotes and stranger things, and knows which ingredients come from where.",
     Scholar: "Scholar: knows the old books, the old languages and the occult, and finds the answer in a footnote.",
-    Preacher: "Preacher: comforts the frightened, counsels the posse, and stands against the dark with faith and a shotgun.",
+    Preacher: "Preacher: comforts the frightened, counsels the troubled, and stands against the dark with faith and a shotgun.",
     Gunslinger: "Gunslinger: the fastest and steadiest gun in the room, and the one who decides when it's time to draw.",
-    Scout: "Scout: finds the trail, reads the land, and keeps the posse alive out in it.",
+    Scout: "Scout: finds the trail, reads the land, and keeps everyone alive out in it.",
     Gambler: "Gambler: reads people, bluffs, and hears everything the saloon hears.",
     Tinker: "Tinker: fixes the guns, builds the traps, and makes the gadget nobody else thought possible.",
   };
-  // Group badges: a sheriff's star for the Law, an open book for the Learned, a horseshoe for the Frontier.
+  // Group seals: a Grimm's key for the Law, an open book for the Learned, a crescent moon for the Frontier.
   const starPath = (n, R, r) => Array.from({ length: n * 2 }, (_, i) => { const a = (i * Math.PI) / n - Math.PI / 2, d = i % 2 ? r : R; return `${i ? "L" : "M"}${(50 + d * Math.cos(a)).toFixed(1)} ${(50 + d * Math.sin(a)).toFixed(1)}`; }).join(" ") + " Z";
   const EMBLEMS = {
-    law: { d: starPath(6, 27, 14), stroke: false },
+    law: { d: "M41 30 A9 9 0 1 0 59 30 A9 9 0 1 0 41 30 M50 39 L50 80 M50 64 L60 64 M50 74 L58 74", stroke: true },
     learned: { d: "M22 35 Q35 29 48 35 L48 69 Q35 63 22 69 Z M52 35 Q65 29 78 35 L78 69 Q65 63 52 69 Z", stroke: false },
-    frontier: { d: "M35 73 L35 50 A15 15 0 0 1 65 50 L65 73", stroke: true },
+    frontier: { d: "M60 22 A28 28 0 1 0 60 78 A22 22 0 1 1 60 22 Z", stroke: false },
   };
   const DELTA_SVG = `<svg class="delta" viewBox="0 0 100 100" aria-hidden="true"><circle class="outer" cx="50" cy="50" r="47"/><circle class="ring" cx="50" cy="50" r="40"/><path class="emblem" data-emblem d=""/></svg>`;
   // A badge drawn with its group's emblem already in place (for the sheet and GM cards).
   const badgeSvg = (div) => DELTA_SVG.replace('class="emblem" data-emblem d=""', `class="emblem${EMBLEMS[div].stroke ? " stroke" : ""}" d="${EMBLEMS[div].d}"`);
   // Heritages adjust starting attributes; every set totals 0.
   // Heritages are generated from data/heritages.json by tools/gen-heritages.py.
-  /* HERITAGES:START */const HERITAGE_DATA = {"wesenCore":[["Hidden face","Humans see your Wesen face only when you choose a full woge."],["Wesen sight","You see other Wesen when they woge, and you see a Grimm's eyes."],["Woge","A free action, in or out. Anger, frustration or fright can force one: when an enemy appears, you're frightened or you're attacked, the GM can call for a Will roll; on a failure you woge."],["Monstrous while woged","Ordinary people panic or attack; Persuasion with them is impossible. A full woge seen by townsfolk marks Exposure (2 boxes for a Tier 3 heritage)."],["Animals bolt","−2 to Riding while woged; a horse won't carry a woged rider."],["The Code","Your secret is deadly. Wesen who expose themselves answer to the Council, and to Grimms."]],"heritages":[{"id":"human","name":"Human","tier":0,"adj":{},"desc":"Most of the frontier, and most of the posse. You know the truth about the hidden world, which already sets you apart.","source":"No template","core":[],"woge":null,"skills":[],"traits":[["h-grit","Frontier Grit","+2 to Will against fear when facing something that shouldn't exist.","Will",true,"Nobody Believes You","When you tell ordinary folk what you've seen, accept being called mad, drunk or a liar."],["h-gut","Gut Instinct","+2 to Read People when judging, face to face, whether someone is lying.","Read People",true,"Acts on Hunches","You act on an unproven feeling. Accept the consequence when it costs time, trust or position."]]},{"id":"fuchsbau","name":"Fuchsbau","tier":1,"wesen":true,"adj":{"Intellect":2,"Body":-1,"Will":-1},"desc":"Fox-like Wesen, clever and quick, with a long tradition of trade in herbs, remedies and harder-to-find ingredients. Other Wesen call them disreputable, and not always unfairly.","source":"Fuchsbau template: IQ +2; Bad Reputation (disreputable among Wesen). About 132 points.","core":[],"skills":["Tracking","Riding","Melee","Shooting","Gambling","Wesen Lore"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Keen senses: track by scent and hearing"],"drawbacks":[]},"traits":[["f-remedies","Fuchsbau Remedies","+2 to Apothecary when brewing a remedy, antidote or potion from the old recipes.","Apothecary",true,"Criminal Kin","Your family deals in the Wesen black market. Accept their demands or their trouble."],["f-cunning","Fox's Cunning","+2 to Deception when misleading a pursuer or covering your tracks.","Deception",true,"Too Clever by Half","You overplay your hand. Accept the consequence when the trick backfires."],["f-archer","Horse Archer","+2 to Shooting with a bow from the saddle.","Shooting",true,"Disreputable","Wesen assume a Fuchsbau is up to something. Accept the distrust when it costs you."]]},{"id":"coyotl","name":"Coyotl","tier":1,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Will":-1},"desc":"Coyote-like Wesen of the plains and desert country who live in clans bound by old customs, and fight together like a pack.","source":"Coyotl template: DX +2, HT +1, ST +2. About 141 points.","core":[],"skills":["Brawling","Shooting","Tracking","Survival"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":1,"traits":["Claws mark 2 boxes","Keen senses: track by scent and hearing","Swift: +2 to Athletics when running"],"drawbacks":[]},"traits":[["co-pack","Pack Fighter","+2 to Brawling or Melee against a target an ally attacked this round.","Brawling",true,"Clan Law","The clan's customs bind you. Accept the clan's demand."],["co-plains","Plains Wanderer","+2 to Survival in dry, open country: plains, desert and badlands.","Survival",true,"Restless","You can't stay put for long. Accept leaving, or the strain of staying, at a bad time."]]},{"id":"eisbiber","name":"Eisbiber","tier":1,"wesen":true,"adj":{"Intellect":1,"Will":-1},"desc":"Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, and easily frightened by violence. Bullies like the Hässlich prey on them.","source":"No template; adapted from the show.","core":[],"skills":["Tinkering","Athletics","Persuasion","Investigation"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Teeth gnaw through wood and rope (a bite marks 1 box)","Swimmer: holds breath for minutes; +2 to Athletics when swimming"],"drawbacks":[]},"traits":[["e-builder","Master Builder","+2 to Tinkering when building or shoring up structures, dams or mechanisms.","Tinkering",true,"Timid","Violence makes you freeze. Accept losing your first action when a fight breaks out."],["e-lodge","The Lodge","+2 to Investigation when asking the local Wesen community for news.","Investigation",true,"Lodge Obligations","The lodge expects favors. Accept the call when it comes at a bad time."]]},{"id":"bauerschwein","name":"Bauerschwein","tier":1,"wesen":true,"adj":{"Body":1,"Will":1,"Agility":-1,"Presence":-1},"desc":"Pig-like Wesen: stubborn, hard-working, with senses sharp even in human form, and old enemies of the Blutbaden. Their feud is settled, when it must be, by the Ehrenkampf, a ritual duel.","source":"No template; adapted from the show.","core":["Sharp senses even unwoged: you can identify people and things by smell in either form."],"skills":["Athletics","Brawling","Investigation","Survival"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Tusks: a gore marks 1 box"],"drawbacks":[]},"traits":[["bs-stubborn","Stubborn as Stone","+2 to Will to resist intimidation, especially from a Blutbad.","Will",true,"Old Feud","Blutbaden are your people's enemies. When one is near, accept the quarrel, or the challenge to Ehrenkampf."],["bs-snout","Keen Snout","+2 to Intellect rolls to notice or identify something by smell.","Intellect",true,"Blunt to a Fault","Your honesty offends someone who matters. Accept the lost goodwill."]]},{"id":"mauzhertz","name":"Mauzhertz","tier":1,"wesen":true,"adj":{"Agility":1,"Body":-1},"desc":"Mouse-like Wesen, small, quick and wary, with excellent hearing. Gentle by nature, but one pushed too far can snap.","source":"No template; adapted from the show.","core":[],"skills":["Stealth","Athletics","Read People","Investigation"],"woge":{"attrs":{"Agility":1},"dodge":1,"traits":["Keen hearing: hear whispers through walls"],"drawbacks":[]},"traits":[["m-quick","Small and Quick","+2 to Stealth when hiding or slipping away.","Stealth",true,"Easily Startled","Sudden noise or danger makes you flinch. Accept −2 on your next action."],["m-hearing","Keen Hearing","+2 to Intellect rolls to hear faint or distant sounds.","Intellect",true,"Breaking Point","Pushed too far, you snap into violence. Accept what you do in that moment."]]},{"id":"ziegevolk","name":"Ziegevolk","tier":1,"wesen":true,"adj":{"Presence":2,"Intellect":-1,"Will":-1},"desc":"Goat-like Wesen whose pheromones, working even in human form, make them unnaturally persuasive and unnaturally popular. A Fuchsbau remedy can protect against them.","source":"No template; adapted from the show.","core":[],"skills":["Persuasion","Deception","Read People","Gambling"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Horns: a butt marks 1 box"],"drawbacks":[]},"traits":[["z-pheromones","Ziegevolk Pheromones","+2 to Persuasion face to face at close quarters, in either form. Grimms and anyone dosed with the antidote are unaffected.","Persuasion",true,"Pheromone Suspicion","Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust."],["z-smooth","Smooth Operator","+2 to Deception when talking your way past a guard or official.","Deception",true,"Scandal Follows You","Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex."]]},{"id":"steinadler","name":"Steinadler","tier":1,"wesen":true,"adj":{"Agility":1,"Intellect":1,"Body":-1,"Will":-1},"desc":"Eagle-like Wesen with remarkable eyesight, a hunter's pride, and a taste for working alone, sometimes for hire.","source":"No template; adapted from the show.","core":[],"skills":["Shooting","Tracking","Stealth","Survival"],"woge":{"attrs":{"Agility":1},"dodge":0,"traits":["Talons mark 2 boxes","Eagle sight: see detail a mile away"],"drawbacks":[]},"traits":[["st-eye","Eagle Eye","+2 to Intellect rolls to spot detail at a great distance.","Intellect",true,"Proud as an Eagle","You won't back down or beg. Accept the consequence of your pride."],["st-hunter","Hunter's Eye","+2 to Shooting at long range after aiming for an action.","Shooting",true,"Hunter's Code","You won't shoot an unarmed or fleeing foe. Accept the escape."]]},{"id":"taniwha","name":"Taniwha","tier":1,"wesen":true,"horror":true,"adj":{"Body":1,"Presence":-1},"desc":"Water-dwelling Wesen from New Zealand: guardians of rivers and the people they claim, reptile-like in woge, and dangerous to anyone else. Horror campaigns only.","source":"Taniwha template (150-point): poison resistance; Dependency (human flesh, seasonal). About 157 points.","core":["Resists poison: +4 to Body against any poison.","Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can't clear, every three days."],"skills":["Athletics","Brawling","Survival","Stealth"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Amphibious: breathes water, swims as fast as a horse runs","Burrows through earth","Dark sight"],"drawbacks":["Must be submerged in water daily, or mark a box that rest can't clear, each hour","Pounamu (greenstone) wounds mark one extra box"]},"traits":[["ta-bite","Paralyzing Bite","Ability, in full woge: a bite marks 1 box, and the target rolls Body or is paralyzed for the scene.","Brawling",false,"Guardian's Duty","You protect those you've claimed as yours. Accept the danger when they need you."],["ta-river","River Guardian","+2 to Athletics and Survival in rivers, lakes and the sea.","Athletics",true,"Peculiar Appetite","Gluttony, and an odd craving (frogs, to start with). Accept the distraction at a bad time."]]},{"id":"blutbad","name":"Blutbad","tier":2,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Will":-1},"desc":"Wolf-like Wesen with keen senses and a predator's appetite; the root of the werewolf legend. Wesen who know your kind assume you hunt humans. You don't, or not anymore.","source":"Blutbaad template: DX +3, HT +2, ST +2; Loner; Enemy (Bauerschwein). About 208 points.","core":["Reputation: Eats Humans. Wesen who know your kind assume the worst."],"skills":["Brawling","Shooting","Survival","Tracking"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws and fangs mark 2 boxes","Keen senses: track by scent and hearing","Dark sight","Leaper: +2 to Athletics to jump","Shrugs off cold"],"drawbacks":[]},"traits":[["b-nose","Blutbad Nose","+2 to Tracking by scent, in either form.","Tracking",true,"The Bloodlust","When blood is spilled near you or something runs, roll Will or woge and give chase. Accept the cost of the urge."],["b-night","Night Hunter","+2 to Stealth when stalking at night.","Stealth",true,"Loner","You shun company. Accept the cost of going it alone."],["b-enemy","Old Enemy","+2 to Brawling against a Bauerschwein.","Brawling",true,"Old Feud","Bauerschwein are your enemies. When one is near, accept the quarrel."]]},{"id":"mauvaisdentes","name":"Mauvais Dentes","tier":2,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Presence":-1},"desc":"Sabre-toothed, panther-like Wesen, so deadly that the Royal Families have kept them as assassins. Rare, solitary, and feared even by other Wesen.","source":"Mauvais Dentes template: DX +2, HT +3, ST +3; Loner. About 213 points.","core":["Reputation: Eats Humans. Wesen who know your kind assume the worst."],"skills":["Brawling","Shooting","Survival","Tracking"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Sabre teeth and claws mark 2 boxes","Keen senses: track by scent and hearing","Dark sight","Leaper: +2 to Athletics to jump","Shrugs off cold"],"drawbacks":[]},"traits":[["md-hunter","Relentless Hunter","+2 to Tracking when hunting a single named quarry.","Tracking",true,"Royal Debt","The Royals bred your line as killers. When one of their agents calls on you, accept the demand or the danger of refusing."],["md-pounce","Pounce","+2 to Brawling on your first attack of a fight, leaping from hiding.","Brawling",true,"Killer's Instinct","In a fight you go for the throat. Accept the death you didn't intend."]]},{"id":"skalengeck","name":"Skalengeck","tier":2,"wesen":true,"adj":{"Agility":1,"Presence":-1},"desc":"Lizard-like Wesen, cold-eyed and hard to kill, with a poisonous bite. Common among outlaws and hired guns.","source":"Skalengeck template: no human-form changes. About 189 points.","core":[],"skills":["Shooting","Brawling","Wesen Lore","Stealth"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Immune to poison","Keen smell"],"drawbacks":[]},"traits":[["sk-bite","Poison Bite","Ability, in full woge: a bite that marks a box also poisons. Each hour the victim rolls Body −3 or marks another box, until treated with Apothecary.","Brawling",false,"Callous","You don't much care who gets hurt. Accept the cost when that shows."],["sk-subdue","Hard to Subdue","+2 to Body to resist being knocked out, stunned or restrained.","Body",true,"Cornered Lizard","When you're trapped, you woge and fight. Accept the Exposure and the damage."]]},{"id":"jagerbar","name":"Jägerbär","tier":2,"wesen":true,"adj":{"Body":2,"Agility":-1,"Intellect":-1},"desc":"Bear-like Wesen, enormously strong and durable. Traditional families still keep the Roh-Hatz, a coming-of-age hunt, and fight with an old Germanic weapon whose claw-like scoop disembowels.","source":"No template; adapted from the show.","core":[],"skills":["Athletics","Brawling","Melee","Survival"],"woge":{"attrs":{"Body":2},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Keen smell"],"drawbacks":[]},"traits":[["j-strength","Bear's Strength","+2 to Athletics for feats of raw strength: lifting, breaking, holding.","Athletics",true,"The Roh-Hatz","Your family keeps the old hunting rite. Accept the obligation, or the shame of refusing it."],["j-weapon","Family Weapon","+2 to Melee with your family's claw-bladed hunting weapon.","Melee",true,"Slow to Calm","Once angered, you're hard to stop. Accept the harm you do to something you shouldn't."]]},{"id":"naschazer","name":"Naschazer","tier":2,"wesen":true,"horror":true,"adj":{"Body":2,"Intellect":-1,"Presence":-1},"desc":"Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror campaigns only.","source":"Naschazer template: HT +4; Dependency and Uncontrollable Appetite (human flesh); Greed; Proud. About 197 points.","core":["Hunger (horror): each month you must eat human flesh; until you do, mark a box that rest can't clear, every day."],"skills":["Brawling","Melee","Athletics","Shooting"],"woge":{"attrs":{"Body":2},"dodge":0,"traits":["Huge strength: fists and fangs mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Feels no pain: ignore the Wounded penalty","Heals fast: rest clears a box every day","Dark sight"],"drawbacks":[]},"traits":[["n-brute","Brute Strength","+2 to Athletics to lift, break or hold.","Athletics",true,"Greed","Riches are hard to refuse. Accept the bribe's strings or the risk of taking more."],["n-cook","Butcher's Hands","+2 to Melee with a cleaver, axe or knife.","Melee",true,"Proud","You won't be slighted. Accept the fight your pride starts."]]},{"id":"vallachi","name":"Vallachi","tier":2,"wesen":true,"horror":true,"adj":{"Presence":1,"Body":1,"Will":-1,"Agility":-1},"desc":"Long-lived, handsome, vampire-like Wesen who feed on the lifeforce of others and shun the sun. Horror campaigns only.","source":"Vallachi template: Attractive; Extended Lifespan; HT +2; Dependency and Uncontrollable Appetite (lifeforce); Weakness (sunlight); Lifebane. About 223 points.","core":["Lifedrain (horror): by touch, roll Will against the victim's Body; on a success they mark a box and you clear one.","Hunger (horror): each week you must drain lifeforce; until you do, mark a box that rest can't clear, every six hours.","Sunlight: −2 to all rolls in direct sun, and you tire quickly.","Lifebane: plants wilt and animals shy around you."],"skills":["Persuasion","Deception","Stealth","Read People"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Tough: hits of 2+ boxes mark one fewer, except from a pointed wooden stake","Keen senses","Dark sight"],"drawbacks":[]},"traits":[["v-charm","Night Charm","+2 to Persuasion face to face, after dark.","Persuasion",true,"Old Grudges","You've lived long enough to make enemies. Accept it when one of them turns up."],["v-ageless","Ageless","+2 to Intellect rolls to recall something you lived through decades ago.","Intellect",true,"Secret Age","You don't age as you should. Accept the lie or the slip when someone notices."]]},{"id":"grimm","name":"Grimm","tier":2,"adj":{"Body":1,"Agility":1,"Presence":-2},"desc":"A descendant of the old hunters, the Decapitare: stronger and faster than ordinary people, able to see the Wesen hidden among us, and feared by them.","source":"Decapitare template: ST, DX, HT +1; Combat Reflexes; Detect (Wesen, Magic); Magic Resistance 7; Talent (Grimm); Reputation (Frightening Decapitare).","core":["The Sight: you see a Wesen's face when it's stirred by strong emotion.","Grimm eyes: woged Wesen and other Grimms see them; humans don't.","Uneasy sense: you feel when a Wesen or magic is near, with no details.","Never freeze: you're never surprised, and +2 to Will against fear.","Hard to bewitch: +2 to Will against magic.","Raised on the books: Wesen Lore is always at least Trained, free.","Grimm blood: a Hexenbiest or Zauberbiest who drinks it under a full moon loses their powers (see Grimm blood)."],"skills":["Wesen Lore","Melee","Shooting","Investigation","Tracking"],"woge":null,"traits":[["g-danger","Danger Sense","Ability: when an ambush or trap threatens you, the GM secretly rolls your Intellect; success warns you in time to act.","Intellect",false,"Nightmares","The dead you've seen come back at night. Accept the lost sleep at a bad time."],["g-iron","Iron Bones","Ability: each hit that marks 2 or more boxes marks one fewer (never below 1).","",false,"Fanaticism","Wesen must die. Accept the trouble when mercy would be wiser."],["g-heal","Quick to Heal","Ability: rest clears a box every day, not every two, and works even at three boxes.","",false,"Workaholic","You won't rest when there's a case. Accept the strain."],["g-hardy","Hardy","+2 to Body to resist poison, disease and exhaustion.","Body",true,"Stubbornness","You won't back down. Accept the cost."],["g-gun","Gunslinger","+2 to Shooting with a pistol at close range, with no need to aim.","Shooting",true,"Bad Temper","Accept the fight you start."],["g-balance","Perfect Balance","+2 to Athletics and Melee to keep your feet or fight on bad ground.","Athletics",true,"Curious","Accept the risk your curiosity brings."],["g-heavy","Heavy Hand","Ability: your Brawling hits mark 2 boxes.","Brawling",false,"Bloodlust","You don't stop at the surrender. Accept the consequences."],["g-weapon","Bonded Weapon","+2 to Melee or Shooting with one named heirloom weapon.","Melee",true,"The Weapon Must Be Kept","When it's lost or taken, accept the risk to get it back."],["g-hard","Hard to Kill","Ability: Dying lasts until the end of the next scene, not this one.","",false,"Vow: Protect the Innocent","You've sworn to protect the innocent from Wesen. Accept the danger."],["g-pain","Pain Means Nothing","Ability: ignore the Wounded penalty (−1).","",false,"Honesty","You won't lie, even to Wesen. Accept the consequence."],["g-books","Keeper of the Books","+2 to Wesen Lore when you can consult your family's books.","Wesen Lore",true,"The Books Must Be Kept","The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them."]]},{"id":"incantare","name":"Incantare","tier":2,"adj":{"Intellect":1,"Will":1,"Body":-1,"Presence":-1},"desc":"A human who works real magic through a Lens: a tradition and a way of seeing. The Wesen Council, the Royals and the Order of the Holy Knife all watch for people like you.","source":"Incantare template: seven Lenses (Ritual Path Magic).","core":["Rituals: roll Occult to fill a ritual clock (minor 2, significant 4, major 6 segments). Your Lens sets how.","Charms: you can carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).","Grimms sense your magic: +1 to notice it for each charm or potion you carry."],"skills":["Occult","Wesen Lore","Apothecary","Read People"],"woge":null,"traits":[["i-chymiater","Chymiater Lens (Alchemist)","Brews elixirs, potions and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing. Only a Chymiater can brew the Grimm-blood draught.","Occult",true,"Price of the Work","Your craft feeds a vice: greed, drink, lechery or gluttony (agree which). Accept it when it bites."],["i-figmatarum","Figmatarum Lens (Illusionist)","Glamours, illusions and mesmerism worked through performance, music or art, in minutes. +2 to Occult for illusion and mesmerism.","Occult",true,"Artist's Vanity","You need an audience and can't bear an insult to your art. Accept the trouble your vanity causes."],["i-magi","Magi Lens (Wizard)","Scholarly ritual from grimoires: any kind of effect, but an hour per roll, and it needs books. +2 to Occult for divination and wards.","Occult",true,"Obsession: Magical Knowledge","A grimoire, a ritual or a secret tempts you beyond sense. Accept the risk to get it."],["i-malifica","Malifica Lens (Witch or Warlock)","Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link.","Occult",true,"Wicked Reputation","People whisper that you're a witch, and the Order of the Holy Knife listens. Accept the suspicion."],["i-phitonissa","Phitonissa Lens (Pagan)","Cunning-folk rites of the seasons, nature and the old gods, worked outdoors. +2 to Occult for nature and folk magic.","Occult",true,"Disciplines of Faith","The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them."],["i-scaenarfex","Scaenarfex Lens (Artistic Enchanter)","Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm.","Occult",true,"Artist's Temperament","Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you."],["i-veneficare","Veneficare Lens (Sorcerer)","Quick casting along one or two Paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm.","Occult",false,"Bound Purpose","Your power follows one narrow calling. Accept the cost of serving it when it clashes with the posse's needs."]]},{"id":"hexenbiest","name":"Hexenbiest or Zauberbiest","tier":3,"wesen":true,"adj":{"Will":1,"Presence":1,"Body":-1,"Agility":-1},"desc":"Witch-like Wesen (Zauberbiest for the men), beautiful in human form and horrific in woge, with innate magic that lives in their Wesen spirit. Coven traditions bind them; Grimm blood can strip them.","source":"Hexenbiest and Zauberbiest template: Beautiful/Handsome; Sorcery 5; Ritual Adept 2; Vow (coven traditions). About 279 points.","core":["Telekinesis: in full or partial woge, roll Will to throw a person or object with your mind (1 box), seize something out of reach, or turn aside one attack (+2 Dodge).","Innate magic: you can work rituals with Occult like an Incantare, in the Hexenbiest style: curses, potions and sendings.","Grimm blood: drunk under a full moon, it strips your powers until the Contaminatio Ritualis restores them."],"skills":["Occult","Apothecary","Deception","Persuasion"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer"],"drawbacks":["Horrific: even other Wesen recoil"]},"traits":[["hx-spell","Hexenbiest Spellcraft","+2 to Occult for curses, potions and sendings.","Occult",true,"The Price of Magic","Every spell costs blood, pain or something precious. Accept the cost when it bites."],["hx-levitate","Levitation","Ability, in woge: roll Will to lift yourself and float or fly a short way.","Will",false,"Hexenbiest Pride","You cannot abide being bested or slighted. Accept the feud you start."],["hx-crush","TK Crush","Ability, in full woge: roll Will against the target's Body; on a success they mark 1 box, which Dodge can't avoid.","Will",false,"Coven Traditions","Your family or coven has rules and expectations. Accept the demand."]]},{"id":"murcielago","name":"Murcielago","tier":3,"wesen":true,"adj":{},"desc":"Bat-like Wesen with uncanny hearing and a sonic scream that drops a room full of people to their knees.","source":"Murcielago template: no human-form changes; Sonic Scream 6, Sonar. About 283 points.","core":["Sonic scream: in full woge, roll Will. Everyone nearby you choose who can hear rolls Body −2; a failure loses their next action and takes −2 for the scene. Earplugs protect. Heard in town, it marks Exposure."],"skills":["Stealth","Athletics","Brawling","Investigation"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":0,"traits":["Claws and fangs mark 2 boxes","Sonar: no penalty for darkness; sense the shape of a room by sound","Keen hearing: hear heartbeats","Swift"],"drawbacks":[]},"traits":[["mu-echo","Echo Sight","+2 to Intellect rolls to find something hidden in the dark by sound.","Intellect",true,"Sensitive Ears","Loud noise disorients you. When a gun or explosion goes off nearby, accept −2 on your next action."],["mu-hear","Eavesdropper","+2 to Intellect rolls to hear faint or distant voices.","Intellect",true,"Can't Unhear","You hear secrets you shouldn't. Accept the trouble that knowing brings."]]},{"id":"fuchsteufelwild","name":"Fuchsteufelwild","tier":3,"wesen":true,"adj":{"Intellect":2,"Body":1,"Presence":-2,"Will":-1},"desc":"Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; the root of Rumpelstiltskin. Clever, spiteful, and bound by an old obsession with names and bargains.","source":"Fuchsteurfelwild template: ST +1, HT +2, IQ +3, Super Jump 5; Obsession (Guess My Name); Bully; Callous; Sadism (now a companion). About 424 points; trimmed to Tier 3.","core":["Acid talons: in full woge, claw hits mark 2 boxes and ignore Tough and armor.","Leaper, in either form: jumps of many yards; +2 to Athletics to jump."],"skills":["Brawling","Athletics","Deception","Investigation"],"woge":{"attrs":{"Agility":1},"dodge":1,"traits":["Keen senses: track by scent and hearing","Swift"],"drawbacks":["Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged","Disturbing voice"]},"traits":[["ft-tremor","Tremor","Ability, in full woge: stomp, and everyone nearby rolls Athletics or falls and loses their next action.","Athletics",false,"Cruel Streak","When an enemy is helpless, you're tempted to make them suffer. Accept the lost allies, or the Suspicion it brings."],["ft-bargain","Strike a Bargain","+2 to Persuasion or Deception when making a deal.","Persuasion",true,"Guess My Name","Your true name holds power over you. When someone hunts for it, or speaks it, accept the consequence."]]}]};/* HERITAGES:END */
+  /* HERITAGES:START */const HERITAGE_DATA = {"wesenCore":[["Hidden face","Humans see your Wesen face only when you choose a full woge."],["Wesen sight","You see other Wesen when they woge, and you see a Grimm's eyes."],["Woge","A free action, in or out. Anger, frustration or fright can force one: when an enemy appears, you're frightened or you're attacked, the GM can call for a Will roll; on a failure you woge."],["Monstrous while woged","Ordinary people panic or attack; Persuasion with them is impossible. A full woge seen by townsfolk marks Exposure (2 boxes for a Tier 3 heritage)."],["Animals bolt","−2 to Riding while woged; a horse won't carry a woged rider."],["The Code","Your secret is deadly. Wesen who expose themselves answer to the Council, and to Grimms."]],"heritages":[{"id":"human","name":"Human","tier":0,"adj":{},"desc":"Most people are human. You know the truth about the hidden world, which already sets you apart.","source":"No template","core":[],"woge":null,"skills":[],"traits":[["h-grit","Frontier Grit","+2 to Will against fear when facing something that shouldn't exist.","Will",true,"Nobody Believes You","When you tell ordinary folk what you've seen, accept being called mad, drunk or a liar."],["h-gut","Gut Instinct","+2 to Read People when judging, face to face, whether someone is lying.","Read People",true,"Acts on Hunches","You act on an unproven feeling. Accept the consequence when it costs time, trust or position."]]},{"id":"fuchsbau","name":"Fuchsbau","tier":1,"wesen":true,"adj":{"Intellect":2,"Body":-1,"Will":-1},"desc":"Fox-like Wesen, clever and quick, with a long tradition of trade in herbs, remedies and harder-to-find ingredients. Other Wesen call them disreputable, and not always unfairly.","source":"Fuchsbau template: IQ +2; Bad Reputation (disreputable among Wesen). About 132 points.","core":[],"skills":["Tracking","Riding","Melee","Shooting","Gambling","Wesen Lore"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Keen senses: track by scent and hearing"],"drawbacks":[]},"traits":[["f-remedies","Fuchsbau Remedies","+2 to Apothecary when brewing a remedy, antidote or potion from the old recipes.","Apothecary",true,"Criminal Kin","Your family deals in the Wesen black market. Accept their demands or their trouble."],["f-cunning","Fox's Cunning","+2 to Deception when misleading a pursuer or covering your tracks.","Deception",true,"Too Clever by Half","You overplay your hand. Accept the consequence when the trick backfires."],["f-archer","Horse Archer","+2 to Shooting with a bow from the saddle.","Shooting",true,"Disreputable","Wesen assume a Fuchsbau is up to something. Accept the distrust when it costs you."]]},{"id":"coyotl","name":"Coyotl","tier":1,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Will":-1},"desc":"Coyote-like Wesen of the plains and desert country who live in clans bound by old customs, and fight together like a pack.","source":"Coyotl template: DX +2, HT +1, ST +2. About 141 points.","core":[],"skills":["Brawling","Shooting","Tracking","Survival"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":1,"traits":["Claws mark 2 boxes","Keen senses: track by scent and hearing","Swift: +2 to Athletics when running"],"drawbacks":[]},"traits":[["co-pack","Pack Fighter","+2 to Brawling or Melee against a target an ally attacked this round.","Brawling",true,"Clan Law","The clan's customs bind you. Accept the clan's demand."],["co-plains","Plains Wanderer","+2 to Survival in dry, open country: plains, desert and badlands.","Survival",true,"Restless","You can't stay put for long. Accept leaving, or the strain of staying, at a bad time."]]},{"id":"eisbiber","name":"Eisbiber","tier":1,"wesen":true,"adj":{"Intellect":1,"Will":-1},"desc":"Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, and easily frightened by violence. Bullies like the Hässlich prey on them.","source":"No template; adapted from the show.","core":[],"skills":["Tinkering","Athletics","Persuasion","Investigation"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Teeth gnaw through wood and rope (a bite marks 1 box)","Swimmer: holds breath for minutes; +2 to Athletics when swimming"],"drawbacks":[]},"traits":[["e-builder","Master Builder","+2 to Tinkering when building or shoring up structures, dams or mechanisms.","Tinkering",true,"Timid","Violence makes you freeze. Accept losing your first action when a fight breaks out."],["e-lodge","The Lodge","+2 to Investigation when asking the local Wesen community for news.","Investigation",true,"Lodge Obligations","The lodge expects favors. Accept the call when it comes at a bad time."]]},{"id":"bauerschwein","name":"Bauerschwein","tier":1,"wesen":true,"adj":{"Body":1,"Will":1,"Agility":-1,"Presence":-1},"desc":"Pig-like Wesen: stubborn, hard-working, with senses sharp even in human form, and old enemies of the Blutbaden. Their feud is settled, when it must be, by the Ehrenkampf, a ritual duel.","source":"No template; adapted from the show.","core":["Sharp senses even unwoged: you can identify people and things by smell in either form."],"skills":["Athletics","Brawling","Investigation","Survival"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Tusks: a gore marks 1 box"],"drawbacks":[]},"traits":[["bs-stubborn","Stubborn as Stone","+2 to Will to resist intimidation, especially from a Blutbad.","Will",true,"Old Feud","Blutbaden are your people's enemies. When one is near, accept the quarrel, or the challenge to Ehrenkampf."],["bs-snout","Keen Snout","+2 to Intellect rolls to notice or identify something by smell.","Intellect",true,"Blunt to a Fault","Your honesty offends someone who matters. Accept the lost goodwill."]]},{"id":"mauzhertz","name":"Mauzhertz","tier":1,"wesen":true,"adj":{"Agility":1,"Body":-1},"desc":"Mouse-like Wesen, small, quick and wary, with excellent hearing. Gentle by nature, but one pushed too far can snap.","source":"No template; adapted from the show.","core":[],"skills":["Stealth","Athletics","Read People","Investigation"],"woge":{"attrs":{"Agility":1},"dodge":1,"traits":["Keen hearing: hear whispers through walls"],"drawbacks":[]},"traits":[["m-quick","Small and Quick","+2 to Stealth when hiding or slipping away.","Stealth",true,"Easily Startled","Sudden noise or danger makes you flinch. Accept −2 on your next action."],["m-hearing","Keen Hearing","+2 to Intellect rolls to hear faint or distant sounds.","Intellect",true,"Breaking Point","Pushed too far, you snap into violence. Accept what you do in that moment."]]},{"id":"ziegevolk","name":"Ziegevolk","tier":1,"wesen":true,"adj":{"Presence":2,"Intellect":-1,"Will":-1},"desc":"Goat-like Wesen whose pheromones, working even in human form, make them unnaturally persuasive and unnaturally popular. A Fuchsbau remedy can protect against them.","source":"No template; adapted from the show.","core":[],"skills":["Persuasion","Deception","Read People","Gambling"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Horns: a butt marks 1 box"],"drawbacks":[]},"traits":[["z-pheromones","Ziegevolk Pheromones","+2 to Persuasion face to face at close quarters, in either form. Grimms and anyone dosed with the antidote are unaffected.","Persuasion",true,"Pheromone Suspicion","Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust."],["z-smooth","Smooth Operator","+2 to Deception when talking your way past a guard or official.","Deception",true,"Scandal Follows You","Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex."]]},{"id":"steinadler","name":"Steinadler","tier":1,"wesen":true,"adj":{"Agility":1,"Intellect":1,"Body":-1,"Will":-1},"desc":"Eagle-like Wesen with remarkable eyesight, a hunter's pride, and a taste for working alone, sometimes for hire.","source":"No template; adapted from the show.","core":[],"skills":["Shooting","Tracking","Stealth","Survival"],"woge":{"attrs":{"Agility":1},"dodge":0,"traits":["Talons mark 2 boxes","Eagle sight: see detail a mile away"],"drawbacks":[]},"traits":[["st-eye","Eagle Eye","+2 to Intellect rolls to spot detail at a great distance.","Intellect",true,"Proud as an Eagle","You won't back down or beg. Accept the consequence of your pride."],["st-hunter","Hunter's Eye","+2 to Shooting at long range after aiming for an action.","Shooting",true,"Hunter's Code","You won't shoot an unarmed or fleeing foe. Accept the escape."]]},{"id":"taniwha","name":"Taniwha","tier":1,"wesen":true,"horror":true,"adj":{"Body":1,"Presence":-1},"desc":"Water-dwelling Wesen from New Zealand: guardians of rivers and the people they claim, reptile-like in woge, and dangerous to anyone else. Horror campaigns only.","source":"Taniwha template (150-point): poison resistance; Dependency (human flesh, seasonal). About 157 points.","core":["Resists poison: +4 to Body against any poison.","Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can't clear, every three days."],"skills":["Athletics","Brawling","Survival","Stealth"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Amphibious: breathes water, swims as fast as a horse runs","Burrows through earth","Dark sight"],"drawbacks":["Must be submerged in water daily, or mark a box that rest can't clear, each hour","Pounamu (greenstone) wounds mark one extra box"]},"traits":[["ta-bite","Paralyzing Bite","Ability, in full woge: a bite marks 1 box, and the target rolls Body or is paralyzed for the scene.","Brawling",false,"Guardian's Duty","You protect those you've claimed as yours. Accept the danger when they need you."],["ta-river","River Guardian","+2 to Athletics and Survival in rivers, lakes and the sea.","Athletics",true,"Peculiar Appetite","Gluttony, and an odd craving (frogs, to start with). Accept the distraction at a bad time."]]},{"id":"blutbad","name":"Blutbad","tier":2,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Will":-1},"desc":"Wolf-like Wesen with keen senses and a predator's appetite; the root of the werewolf legend. Wesen who know your kind assume you hunt humans. You don't, or not anymore.","source":"Blutbaad template: DX +3, HT +2, ST +2; Loner; Enemy (Bauerschwein). About 208 points.","core":["Reputation: Eats Humans. Wesen who know your kind assume the worst."],"skills":["Brawling","Shooting","Survival","Tracking"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws and fangs mark 2 boxes","Keen senses: track by scent and hearing","Dark sight","Leaper: +2 to Athletics to jump","Shrugs off cold"],"drawbacks":[]},"traits":[["b-nose","Blutbad Nose","+2 to Tracking by scent, in either form.","Tracking",true,"The Bloodlust","When blood is spilled near you or something runs, roll Will or woge and give chase. Accept the cost of the urge."],["b-night","Night Hunter","+2 to Stealth when stalking at night.","Stealth",true,"Loner","You shun company. Accept the cost of going it alone."],["b-enemy","Old Enemy","+2 to Brawling against a Bauerschwein.","Brawling",true,"Old Feud","Bauerschwein are your enemies. When one is near, accept the quarrel."]]},{"id":"mauvaisdentes","name":"Mauvais Dentes","tier":2,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Presence":-1},"desc":"Sabre-toothed, panther-like Wesen, so deadly that the Royal Families have kept them as assassins. Rare, solitary, and feared even by other Wesen.","source":"Mauvais Dentes template: DX +2, HT +3, ST +3; Loner. About 213 points.","core":["Reputation: Eats Humans. Wesen who know your kind assume the worst."],"skills":["Brawling","Shooting","Survival","Tracking"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Sabre teeth and claws mark 2 boxes","Keen senses: track by scent and hearing","Dark sight","Leaper: +2 to Athletics to jump","Shrugs off cold"],"drawbacks":[]},"traits":[["md-hunter","Relentless Hunter","+2 to Tracking when hunting a single named quarry.","Tracking",true,"Royal Debt","The Royals bred your line as killers. When one of their agents calls on you, accept the demand or the danger of refusing."],["md-pounce","Pounce","+2 to Brawling on your first attack of a fight, leaping from hiding.","Brawling",true,"Killer's Instinct","In a fight you go for the throat. Accept the death you didn't intend."]]},{"id":"skalengeck","name":"Skalengeck","tier":2,"wesen":true,"adj":{"Agility":1,"Presence":-1},"desc":"Lizard-like Wesen, cold-eyed and hard to kill, with a poisonous bite. Common among outlaws and hired guns.","source":"Skalengeck template: no human-form changes. About 189 points.","core":[],"skills":["Shooting","Brawling","Wesen Lore","Stealth"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Immune to poison","Keen smell"],"drawbacks":[]},"traits":[["sk-bite","Poison Bite","Ability, in full woge: a bite that marks a box also poisons. Each hour the victim rolls Body −3 or marks another box, until treated with Apothecary.","Brawling",false,"Callous","You don't much care who gets hurt. Accept the cost when that shows."],["sk-subdue","Hard to Subdue","+2 to Body to resist being knocked out, stunned or restrained.","Body",true,"Cornered Lizard","When you're trapped, you woge and fight. Accept the Exposure and the damage."]]},{"id":"jagerbar","name":"Jägerbär","tier":2,"wesen":true,"adj":{"Body":2,"Agility":-1,"Intellect":-1},"desc":"Bear-like Wesen, enormously strong and durable. Traditional families still keep the Roh-Hatz, a coming-of-age hunt, and fight with an old Germanic weapon whose claw-like scoop disembowels.","source":"No template; adapted from the show.","core":[],"skills":["Athletics","Brawling","Melee","Survival"],"woge":{"attrs":{"Body":2},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Keen smell"],"drawbacks":[]},"traits":[["j-strength","Bear's Strength","+2 to Athletics for feats of raw strength: lifting, breaking, holding.","Athletics",true,"The Roh-Hatz","Your family keeps the old hunting rite. Accept the obligation, or the shame of refusing it."],["j-weapon","Family Weapon","+2 to Melee with your family's claw-bladed hunting weapon.","Melee",true,"Slow to Calm","Once angered, you're hard to stop. Accept the harm you do to something you shouldn't."]]},{"id":"naschazer","name":"Naschazer","tier":2,"wesen":true,"horror":true,"adj":{"Body":2,"Intellect":-1,"Presence":-1},"desc":"Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror campaigns only.","source":"Naschazer template: HT +4; Dependency and Uncontrollable Appetite (human flesh); Greed; Proud. About 197 points.","core":["Hunger (horror): each month you must eat human flesh; until you do, mark a box that rest can't clear, every day."],"skills":["Brawling","Melee","Athletics","Shooting"],"woge":{"attrs":{"Body":2},"dodge":0,"traits":["Huge strength: fists and fangs mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Feels no pain: ignore the Wounded penalty","Heals fast: rest clears a box every day","Dark sight"],"drawbacks":[]},"traits":[["n-brute","Brute Strength","+2 to Athletics to lift, break or hold.","Athletics",true,"Greed","Riches are hard to refuse. Accept the bribe's strings or the risk of taking more."],["n-cook","Butcher's Hands","+2 to Melee with a cleaver, axe or knife.","Melee",true,"Proud","You won't be slighted. Accept the fight your pride starts."]]},{"id":"vallachi","name":"Vallachi","tier":2,"wesen":true,"horror":true,"adj":{"Presence":1,"Body":1,"Will":-1,"Agility":-1},"desc":"Long-lived, handsome, vampire-like Wesen who feed on the lifeforce of others and shun the sun. Horror campaigns only.","source":"Vallachi template: Attractive; Extended Lifespan; HT +2; Dependency and Uncontrollable Appetite (lifeforce); Weakness (sunlight); Lifebane. About 223 points.","core":["Lifedrain (horror): by touch, roll Will against the victim's Body; on a success they mark a box and you clear one.","Hunger (horror): each week you must drain lifeforce; until you do, mark a box that rest can't clear, every six hours.","Sunlight: −2 to all rolls in direct sun, and you tire quickly.","Lifebane: plants wilt and animals shy around you."],"skills":["Persuasion","Deception","Stealth","Read People"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Tough: hits of 2+ boxes mark one fewer, except from a pointed wooden stake","Keen senses","Dark sight"],"drawbacks":[]},"traits":[["v-charm","Night Charm","+2 to Persuasion face to face, after dark.","Persuasion",true,"Old Grudges","You've lived long enough to make enemies. Accept it when one of them turns up."],["v-ageless","Ageless","+2 to Intellect rolls to recall something you lived through decades ago.","Intellect",true,"Secret Age","You don't age as you should. Accept the lie or the slip when someone notices."]]},{"id":"grimm","name":"Grimm","tier":2,"adj":{"Body":1,"Agility":1,"Presence":-2},"desc":"A descendant of the old hunters, the Decapitare: stronger and faster than ordinary people, able to see the Wesen hidden among us, and feared by them.","source":"Decapitare template: ST, DX, HT +1; Combat Reflexes; Detect (Wesen, Magic); Magic Resistance 7; Talent (Grimm); Reputation (Frightening Decapitare).","core":["The Sight: you see a Wesen's face when it's stirred by strong emotion.","Grimm eyes: woged Wesen and other Grimms see them; humans don't.","Uneasy sense: you feel when a Wesen or magic is near, with no details.","Never freeze: you're never surprised, and +2 to Will against fear.","Hard to bewitch: +2 to Will against magic.","Raised on the books: Wesen Lore is always at least Trained, free.","Grimm blood: a Hexenbiest or Zauberbiest who drinks it under a full moon loses their powers (see Grimm blood)."],"skills":["Wesen Lore","Melee","Shooting","Investigation","Tracking"],"woge":null,"traits":[["g-danger","Danger Sense","Ability: when an ambush or trap threatens you, the GM secretly rolls your Intellect; success warns you in time to act.","Intellect",false,"Nightmares","The dead you've seen come back at night. Accept the lost sleep at a bad time."],["g-iron","Iron Bones","Ability: each hit that marks 2 or more boxes marks one fewer (never below 1).","",false,"Fanaticism","Wesen must die. Accept the trouble when mercy would be wiser."],["g-heal","Quick to Heal","Ability: rest clears a box every day, not every two, and works even at three boxes.","",false,"Workaholic","You won't rest when there's a case. Accept the strain."],["g-hardy","Hardy","+2 to Body to resist poison, disease and exhaustion.","Body",true,"Stubbornness","You won't back down. Accept the cost."],["g-gun","Gunslinger","+2 to Shooting with a pistol at close range, with no need to aim.","Shooting",true,"Bad Temper","Accept the fight you start."],["g-balance","Perfect Balance","+2 to Athletics and Melee to keep your feet or fight on bad ground.","Athletics",true,"Curious","Accept the risk your curiosity brings."],["g-heavy","Heavy Hand","Ability: your Brawling hits mark 2 boxes.","Brawling",false,"Bloodlust","You don't stop at the surrender. Accept the consequences."],["g-weapon","Bonded Weapon","+2 to Melee or Shooting with one named heirloom weapon.","Melee",true,"The Weapon Must Be Kept","When it's lost or taken, accept the risk to get it back."],["g-hard","Hard to Kill","Ability: Dying lasts until the end of the next scene, not this one.","",false,"Vow: Protect the Innocent","You've sworn to protect the innocent from Wesen. Accept the danger."],["g-pain","Pain Means Nothing","Ability: ignore the Wounded penalty (−1).","",false,"Honesty","You won't lie, even to Wesen. Accept the consequence."],["g-books","Keeper of the Books","+2 to Wesen Lore when you can consult your family's books.","Wesen Lore",true,"The Books Must Be Kept","The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them."]]},{"id":"incantare","name":"Incantare","tier":2,"adj":{"Intellect":1,"Will":1,"Body":-1,"Presence":-1},"desc":"A human who works real magic through a Lens: a tradition and a way of seeing. The Wesen Council, the Royals and the Order of the Holy Knife all watch for people like you.","source":"Incantare template: seven Lenses (Ritual Path Magic).","core":["Rituals: roll Occult to fill a ritual clock (minor 2, significant 4, major 6 segments). Your Lens sets how.","Charms: you can carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).","Grimms sense your magic: +1 to notice it for each charm or potion you carry."],"skills":["Occult","Wesen Lore","Apothecary","Read People"],"woge":null,"traits":[["i-chymiater","Chymiater Lens (Alchemist)","Brews elixirs, potions and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing. Only a Chymiater can brew the Grimm-blood draught.","Occult",true,"Price of the Work","Your craft feeds a vice: greed, drink, lechery or gluttony (agree which). Accept it when it bites."],["i-figmatarum","Figmatarum Lens (Illusionist)","Glamours, illusions and mesmerism worked through performance, music or art, in minutes. +2 to Occult for illusion and mesmerism.","Occult",true,"Artist's Vanity","You need an audience and can't bear an insult to your art. Accept the trouble your vanity causes."],["i-magi","Magi Lens (Wizard)","Scholarly ritual from grimoires: any kind of effect, but an hour per roll, and it needs books. +2 to Occult for divination and wards.","Occult",true,"Obsession: Magical Knowledge","A grimoire, a ritual or a secret tempts you beyond sense. Accept the risk to get it."],["i-malifica","Malifica Lens (Witch or Warlock)","Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link.","Occult",true,"Wicked Reputation","People whisper that you're a witch, and the Order of the Holy Knife listens. Accept the suspicion."],["i-phitonissa","Phitonissa Lens (Pagan)","Cunning-folk rites of the seasons, nature and the old gods, worked outdoors. +2 to Occult for nature and folk magic.","Occult",true,"Disciplines of Faith","The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them."],["i-scaenarfex","Scaenarfex Lens (Artistic Enchanter)","Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm.","Occult",true,"Artist's Temperament","Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you."],["i-veneficare","Veneficare Lens (Sorcerer)","Quick casting along one or two Paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm.","Occult",false,"Bound Purpose","Your power follows one narrow calling. Accept the cost of serving it when it clashes with your friends' needs."]]},{"id":"hexenbiest","name":"Hexenbiest or Zauberbiest","tier":3,"wesen":true,"adj":{"Will":1,"Presence":1,"Body":-1,"Agility":-1},"desc":"Witch-like Wesen (Zauberbiest for the men), beautiful in human form and horrific in woge, with innate magic that lives in their Wesen spirit. Coven traditions bind them; Grimm blood can strip them.","source":"Hexenbiest and Zauberbiest template: Beautiful/Handsome; Sorcery 5; Ritual Adept 2; Vow (coven traditions). About 279 points.","core":["Telekinesis: in full or partial woge, roll Will to throw a person or object with your mind (1 box), seize something out of reach, or turn aside one attack (+2 Dodge).","Innate magic: you can work rituals with Occult like an Incantare, in the Hexenbiest style: curses, potions and sendings.","Grimm blood: drunk under a full moon, it strips your powers until the Contaminatio Ritualis restores them."],"skills":["Occult","Apothecary","Deception","Persuasion"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer"],"drawbacks":["Horrific: even other Wesen recoil"]},"traits":[["hx-spell","Hexenbiest Spellcraft","+2 to Occult for curses, potions and sendings.","Occult",true,"The Price of Magic","Every spell costs blood, pain or something precious. Accept the cost when it bites."],["hx-levitate","Levitation","Ability, in woge: roll Will to lift yourself and float or fly a short way.","Will",false,"Hexenbiest Pride","You cannot abide being bested or slighted. Accept the feud you start."],["hx-crush","TK Crush","Ability, in full woge: roll Will against the target's Body; on a success they mark 1 box, which Dodge can't avoid.","Will",false,"Coven Traditions","Your family or coven has rules and expectations. Accept the demand."]]},{"id":"murcielago","name":"Murcielago","tier":3,"wesen":true,"adj":{},"desc":"Bat-like Wesen with uncanny hearing and a sonic scream that drops a room full of people to their knees.","source":"Murcielago template: no human-form changes; Sonic Scream 6, Sonar. About 283 points.","core":["Sonic scream: in full woge, roll Will. Everyone nearby you choose who can hear rolls Body −2; a failure loses their next action and takes −2 for the scene. Earplugs protect. Heard in town, it marks Exposure."],"skills":["Stealth","Athletics","Brawling","Investigation"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":0,"traits":["Claws and fangs mark 2 boxes","Sonar: no penalty for darkness; sense the shape of a room by sound","Keen hearing: hear heartbeats","Swift"],"drawbacks":[]},"traits":[["mu-echo","Echo Sight","+2 to Intellect rolls to find something hidden in the dark by sound.","Intellect",true,"Sensitive Ears","Loud noise disorients you. When a gun or explosion goes off nearby, accept −2 on your next action."],["mu-hear","Eavesdropper","+2 to Intellect rolls to hear faint or distant voices.","Intellect",true,"Can't Unhear","You hear secrets you shouldn't. Accept the trouble that knowing brings."]]},{"id":"fuchsteufelwild","name":"Fuchsteufelwild","tier":3,"wesen":true,"adj":{"Intellect":2,"Body":1,"Presence":-2,"Will":-1},"desc":"Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; the root of Rumpelstiltskin. Clever, spiteful, and bound by an old obsession with names and bargains.","source":"Fuchsteurfelwild template: ST +1, HT +2, IQ +3, Super Jump 5; Obsession (Guess My Name); Bully; Callous; Sadism (now a companion). About 424 points; trimmed to Tier 3.","core":["Acid talons: in full woge, claw hits mark 2 boxes and ignore Tough and armor.","Leaper, in either form: jumps of many yards; +2 to Athletics to jump."],"skills":["Brawling","Athletics","Deception","Investigation"],"woge":{"attrs":{"Agility":1},"dodge":1,"traits":["Keen senses: track by scent and hearing","Swift"],"drawbacks":["Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged","Disturbing voice"]},"traits":[["ft-tremor","Tremor","Ability, in full woge: stomp, and everyone nearby rolls Athletics or falls and loses their next action.","Athletics",false,"Cruel Streak","When an enemy is helpless, you're tempted to make them suffer. Accept the lost allies, or the Suspicion it brings."],["ft-bargain","Strike a Bargain","+2 to Persuasion or Deception when making a deal.","Persuasion",true,"Guess My Name","Your true name holds power over you. When someone hunts for it, or speaks it, accept the consequence."]]}]};/* HERITAGES:END */
   const HERITAGES = HERITAGE_DATA.heritages;
   const SPECIES = HERITAGES.map((h) => [h.id, h.name, h.adj, h.desc]);
   const WESEN = new Set(HERITAGES.filter((h) => h.wesen).map((h) => h.id));
@@ -3362,7 +3363,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["The bounty", "The pay's good, and nobody else will take these jobs."],
     ["Knowledge", "The hidden world is the greatest mystery there is, and I want to understand it."],
     ["Faith", "The Lord sent me here for a reason, and I believe this is it."],
-    ["Nowhere else to go", "The posse took me in when no one else would."],
+    ["Nowhere else to go", "These people took me in when no one else would."],
   ];
   const REASON_TEXTS = new Set(REASONS.map((r) => r[1]));
   const CONNECTIONS = [
@@ -3379,10 +3380,10 @@ tr.lvl-U td.target { color: var(--muted); }
   ];
   const CONNECTION_TEXTS = new Set(CONNECTIONS.map((r) => r[1]));
   const TRIGGERS = {
-    mystery: ["A strange track or body no one can explain", "The posse is ready to ride on, and something is still wrong", "An old book or letter mentions the hidden world"],
-    protects: ["A rider is pinned down or hurt", "Townsfolk are caught in the danger", "Someone volunteers for a deadly job in your place"],
+    mystery: ["A strange track or body no one can explain", "Everyone's ready to move on, and something is still wrong", "An old book or letter mentions the hidden world"],
+    protects: ["A friend is pinned down or hurt", "Townsfolk are caught in the danger", "Someone volunteers for a deadly job in your place"],
     code: ["The enemy is unarmed or has turned to run", "A promise you made becomes dangerous to keep", "The easy shot is in someone's back"],
-    lawful: ["A Wesen suspect could be killed instead of arrested", "The town wants a hanging without a trial", "The posse plans to take the law into its own hands"],
+    lawful: ["A Wesen suspect could be killed instead of arrested", "The town wants a hanging without a trial", "Your friends plan to take the law into their own hands"],
     reputation: ["Someone questions your nerve in front of others", "A job is beyond what you're ready for", "Getting help means admitting a mistake"],
     war: ["Gunfire in the dark", "Meeting a man who fought on the other side", "A field hospital, cannon, or a burning farm"],
     secret: ["Someone starts asking the wrong questions", "Evidence that could expose you turns up", "Keeping the secret means lying to a friend"],
@@ -3394,18 +3395,18 @@ tr.lvl-U td.target { color: var(--muted); }
     game: ["A high-stakes game in town", "Someone dares you", "A sure thing that isn't"],
     wanted: ["A lawman from back east comes asking", "Your face on a poster", "A bounty hunter rides into town"],
     debt: ["A collector arrives", "Your creditor wants a favor instead", "The interest comes due"],
-    nonlethal: ["A Wesen surrenders, but it's a killer", "The only fast solution would kill someone", "The posse votes to shoot first"],
-    "vow-human": ["A human killer has you in their sights", "The posse decides a man must die", "Only a killing shot will stop him"],
+    nonlethal: ["A Wesen surrenders, but it's a killer", "The only fast solution would kill someone", "Your friends vote to shoot first"],
+    "vow-human": ["A human killer has you in their sights", "Your friends decide a man must die", "Only a killing shot will stop him"],
     "hunted-church": ["A stranger in clerical black asks about you", "A sign of the Holy Knife on your door", "The Church comes to town"],
     "hunted-royal": ["A Royal agent arrives", "Someone offers money for your whereabouts", "A Mauvais Dentes is seen nearby"],
     "hunted-society": ["A symbol you recognize, chalked on a wall", "An initiate asks too many questions", "A ritual site turns up near you"],
     "hunted-council": ["A Council emissary comes to town", "A Wesen you trusted reports you", "Exposure reaches 3 boxes"],
     "hunted-grimm": ["A Grimm comes to town", "Someone in town has a Grimm's eyes", "Your kind is named in a Grimm's journal"],
   };
-  // Six ready-to-play riders; their connections point at each other.
+  // Six ready-to-play characters; their connections point at each other.
   const PREGENS = [
     { name: "Eliza Kessler", rank: "Deputy U.S. Marshal", dept: "Marshal", path: "rounded", species: "Grimm", speciesId: "grimm",
-      role: "Leads the posse and carries the badge: the law, and the Code, in one person.",
+      role: "Wears the badge: the law, and the Code, in one person.",
       reason: "The Grimm blood woke in me, and it came with a duty.", connection: "Gus Brandt cut her down from a lynch mob's rope before anyone knew what she was.",
       attrs: { Body: 12, Agility: 13, Intellect: 10, Presence: 8, Will: 12 },
       skills: { Shooting: "S", Riding: "T", Melee: "T", Brawling: "T", Athletics: "T", Investigation: "T", "Wesen Lore": "T", Tracking: "T", "Read People": "T", Leadership: "T", Survival: "T" },
@@ -3425,11 +3426,11 @@ tr.lvl-U td.target { color: var(--muted); }
       reason: "Wesen and humans can live side by side, and I mean to prove it.", connection: "Trades notes with Dr. Whitlock, who still won't admit some of her remedies work better than his.",
       attrs: { Body: 9, Agility: 11, Intellect: 13, Presence: 12, Will: 10 },
       skills: { Apothecary: "S", Medicine: "T", "Wesen Lore": "T", "Read People": "T", Investigation: "T", Gambling: "T", Survival: "T", Persuasion: "T", Deception: "T", Stealth: "T", Occult: "T" },
-      edges: { skill: 1, contact: 1 }, contact: "Her cousin Ambrose, a Fuchsbau smuggler on the Portland docks, who can find any ingredient for a price",
+      edges: { skill: 1, contact: 1 }, contact: "Her cousin Ambrose, a Fuchsbau smuggler on the river docks, who can find any ingredient for a price",
       adv: { id: "" }, sadv: { id: "f-remedies" }, comp: { id: "protects", trigger: "A sick or hurt stranger turns up at the shop" },
       equipment: { apothecary: true, doctorbag: true, knife: true, lantern: true }, play: { gun: { type: "derringer", rounds: 2, spares: 1 } } },
     { name: "Dr. Thaddeus Whitlock", rank: "Town physician", dept: "Doctor", path: "rounded", species: "Human", speciesId: "human",
-      role: "Army surgeon in the war; now he digs bullets out of the posse and asks too many questions about what made the other wounds.",
+      role: "Army surgeon in the war; now he digs bullets out of his friends and asks too many questions about what made the other wounds.",
       reason: "I saw what I saw, and no one else believes me.", connection: "Rode with Silas Thorne's regiment in the war and has never trusted him since.",
       attrs: { Body: 10, Agility: 10, Intellect: 13, Presence: 12, Will: 11 },
       edges: { attr: 1, adv2: 1, gear: 1 }, adv2: { id: "surgeon" }, gear: { item: "His army surgeon's instruments", skill: "Medicine" },
@@ -3445,12 +3446,12 @@ tr.lvl-U td.target { color: var(--muted); }
       adv: { id: "" }, sadv: { id: "co-plains" }, comp: { id: "vengeance", trigger: "Word of the men who burned her clan's camp" },
       equipment: { rifle: true, knife: true, horse: true, trailkit: true } },
     { name: "Silas Thorne", rank: "Professional gambler", dept: "Gambler", path: "hand", species: "Ziegevolk", speciesId: "ziegevolk",
-      role: "Charming, well-dressed, and in debt to the wrong people in San Francisco.",
+      role: "Charming, well-dressed, and in debt to the wrong people.",
       reason: "The pay's good, and nobody else will take these jobs.", connection: "Plays cards with Cora every Saturday; she's the only one who can tell when he's bluffing.",
       attrs: { Body: 10, Agility: 10, Intellect: 13, Presence: 13, Will: 9 },
       skills: { Gambling: "S", Deception: "T", Persuasion: "T", "Read People": "T", Investigation: "T", Shooting: "T", Stealth: "T", Riding: "T" },
-      adv: { id: "" }, sadv: { id: "z-pheromones" }, comp: { id: "debt", trigger: "A collector from San Francisco arrives" },
-      edges: { contact: 1, adv2: 1 }, adv2: { id: "poker" }, contact: "Mae Lin, a faro dealer in San Francisco who hears everything said at her table",
+      adv: { id: "" }, sadv: { id: "z-pheromones" }, comp: { id: "debt", trigger: "A debt collector arrives" },
+      edges: { contact: 1, adv2: 1 }, adv2: { id: "poker" }, contact: "Mae Lin, a faro dealer who hears everything said at her table",
       equipment: { revolver: true, horse: true } },
   ];
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
@@ -3473,7 +3474,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["poker", "Poker Face", "+2 to Deception to hide what you know or feel under questioning.", "Deception"],
     ["hunter", "Monster Hunter", "+2 to Wesen Lore to identify a Wesen from what it left behind: tracks, wounds, a body.", "Wesen Lore"],
     ["gunsmith", "Gunsmith", "+2 to Tinkering when repairing or modifying a firearm.", "Tinkering"],
-    ["coolhead", "Cool Head", "+2 to Leadership when coordinating the posse in a sudden emergency.", "Leadership"],
+    ["coolhead", "Cool Head", "+2 to Leadership when coordinating others in a sudden emergency.", "Leadership"],
     ["courage", "Unshakable Courage", "+2 to Will against overwhelming fear.", "Will"],
     ["ironwill", "Iron Will", "+2 to Will when resisting magic or a Wesen's influence.", "Will"],
     ["knife", "Knife Fighter", "+2 to Melee with a knife in close quarters.", "Melee"],
@@ -3488,7 +3489,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["war", "Haunted by the War", "A specific reminder of the war causes hesitation or a hard choice. Define the reminder together."],
     ["secret", "Keeps a Dangerous Secret", "An agreed secret threatens trust or safety. Earn a point when protecting or revealing it has a real consequence."],
     ["rival", "Old Rival", "A recurring rival complicates your work with concrete problems."],
-    ["home", "Someone Back Home", "A family or a sweetheart pulls you away from the posse's work."],
+    ["home", "Someone Back Home", "A family or a sweetheart pulls you away from the work."],
     ["vengeance", "Sworn Vengeance", "You've sworn to kill someone. Accept the risk when the chance comes."],
     ["temper", "Short Fuse", "You answer insults with fists or guns. Accept the fight you start."],
     ["bottle", "The Bottle", "Whiskey or laudanum has a hold on you. Accept the lost night or the slip at a bad time."],
@@ -3561,7 +3562,7 @@ tr.lvl-U td.target { color: var(--muted); }
       reason: "Took a case in Kansas that ended with a man's face changing in front of her, and has been chasing the truth ever since.",
       connection: "Owes the town doctor for keeping quiet about what really killed her last client.",
       attrs: { Body: 10, Agility: 11, Intellect: 13, Presence: 11, Will: 11 },
-      edges: { attr: 1, skill: 1, contact: 1 }, contact: "A clerk in the Pinkertons' Portland office who'll pull a file, quietly",
+      edges: { attr: 1, skill: 1, contact: 1 }, contact: "A clerk in the Pinkertons' regional office who'll pull a file, quietly",
       adv: { id: "observer", name: "", text: "", detail: "" },
       comp: { id: "mystery", name: "", text: "", trigger: "A strange track or body no one can explain" },
     });
@@ -3697,7 +3698,7 @@ tr.lvl-U td.target { color: var(--muted); }
         : ch.sadv.id ? "Finish the custom heritage advantage and its companion" : ch.adv.id ? "Finish the advantage details" : "Choose an advantage"],
       [!!compOk, compOk ? "Complication chosen" : ch.comp.id ? "Finish the complication details" : "Choose a complication"],
       [!!ch.comp.trigger.trim(), "Complication trigger agreed with the GM"],
-      [!!ch.connection.trim(), "Connection to another rider"],
+      [!!ch.connection.trim(), "Connection to another character"],
     ];
   }
 
@@ -3729,7 +3730,7 @@ tr.lvl-U td.target { color: var(--muted); }
     REASONS.map(([label], i) => `<option value="${i}">${i + 1}. ${label}</option>`).join("");
   $("f-connpick").innerHTML = `<option value="">Top 10 connections: quick pick…</option>` +
     CONNECTIONS.map(([label], i) => `<option value="${i}">${i + 1}. ${label}</option>`).join("");
-  $("f-pregen").innerHTML = `<option value="">Load a ready-made rider…</option>` +
+  $("f-pregen").innerHTML = `<option value="">Load a ready-made character…</option>` +
     PREGENS.map((c, i) => `<option value="${i}">${esc(c.name)}: ${esc(c.dept)}, ${esc(c.species)}</option>`).join("");
   $("f-speciesid").innerHTML = SPECIES.map(([id, n, adj]) => `<option value="${id}">${n}${Object.keys(adj).length ? "" : ""}</option>`).join("") + `<option value="custom">Custom heritage…</option>`;
   $("species-adj").innerHTML = ATTRS.map(([n]) => `<div class="adj"><span class="label">${n}</span>
@@ -3778,7 +3779,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   function render() {
     $("app").dataset.div = division();
-    $("hdr-name").textContent = ch.name.trim() || "Unnamed rider";
+    $("hdr-name").textContent = ch.name.trim() || "Unnamed character";
     const shapeCls = ch.portraitShape === "portrait" ? "portrait" : "";
     $("hdr-portrait").hidden = !ch.portrait;
     $("hdr-delta").style.display = ch.portrait ? "none" : "";
@@ -3911,7 +3912,7 @@ tr.lvl-U td.target { color: var(--muted); }
     // side
     const list = checks(), ready = list.every((c) => c[0]);
     $("ready-status").className = "status " + (ready ? "ok" : "no");
-    $("ready-status").textContent = ready ? "Ready to ride" : `${list.filter((c) => !c[0]).length} items outstanding`;
+    $("ready-status").textContent = ready ? "Ready to play" : `${list.filter((c) => !c[0]).length} items outstanding`;
     $("ms-text").textContent = $("ready-status").textContent;
     $("ms-text").className = $("ready-status").className;
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
@@ -3932,7 +3933,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function renderRoster() {
     if (!roster.length) { $("roster").innerHTML = `<li class="muted small">No saved characters yet. Save this one to keep it.</li>`; return; }
     $("roster").innerHTML = roster.map((c) => `<li class="${c.id === ch.id ? "current" : ""}">
-      <span title="${esc(c.name)}">${esc(c.name || "Unnamed rider")}</span>
+      <span title="${esc(c.name)}">${esc(c.name || "Unnamed character")}</span>
       <span><button class="linkish" data-open="${c.id}">Open</button><button class="linkish danger" data-del="${c.id}">Delete</button></span></li>`).join("");
   }
 
@@ -3945,8 +3946,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const advText = ch.adv.id === "custom" ? ch.adv.text : advDef()?.[2] || "";
     const compText = ch.comp.id === "custom" ? ch.comp.text : compDef()?.[2] || "";
     $("sheet-main").innerHTML = `
-      <div class="sheet-title">${ch.portrait ? `<img class="sheet-portrait ${ch.portraitShape === "portrait" ? "portrait" : ""}" src="${ch.portrait}" alt="Portrait of ${esc(ch.name || "the character")}">` : badgeSvg(division())}<div><span class="eyebrow">${GROUP_NAMES[division()]}${isGS() ? " · Old hand" : ""} · Black Pine, Oregon, 1889</span>
-        <h2 style="font-size:1.7rem">${esc(ch.name || "Unnamed rider")}</h2></div></div>
+      <div class="sheet-title">${ch.portrait ? `<img class="sheet-portrait ${ch.portraitShape === "portrait" ? "portrait" : ""}" src="${ch.portrait}" alt="Portrait of ${esc(ch.name || "the character")}">` : badgeSvg(division())}<div><span class="eyebrow">${GROUP_NAMES[division()]}${isGS() ? " · Old hand" : ""}</span>
+        <h2 style="font-size:1.7rem">${esc(ch.name || "Unnamed character")}</h2></div></div>
       <div class="idgrid">
         <div><span class="label">Title</span><b>${esc(ch.rank || "—")}</b></div>
         <div><span class="label">Calling</span><b>${esc(ch.dept)}</b></div>
@@ -3979,7 +3980,7 @@ tr.lvl-U td.target { color: var(--muted); }
       <div class="fields">
         <div class="field"><span class="label">Gear</span><span>${esc(eq.join(", ") || "—")}</span></div>
         <div class="field"><span class="label">Connection</span><span>${esc(ch.connection || "—")}</span></div>
-        ${ch.reason ? `<div class="field"><span class="label">Why I ride</span><span>${esc(ch.reason)}</span></div>` : ""}
+        ${ch.reason ? `<div class="field"><span class="label">Why I stand against the dark</span><span>${esc(ch.reason)}</span></div>` : ""}
         ${ch.speciesNotes ? `<div class="field"><span class="label">Other ability (GM approved)</span><span>${esc(ch.speciesNotes)}</span></div>` : ""}
         ${ch.notes ? `<div class="field wide"><span class="label">Notes</span><span>${esc(ch.notes)}</span></div>` : ""}
         ${ch.advances.length ? `<div class="field wide"><span class="label">Advancement</span><span>${ch.advances.map((a) => `${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ")}</span></div>` : ""}
@@ -4393,7 +4394,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const STORE_GM = "grimm.posse.v1";
   let gmCrew = (store.get(STORE_GM, []) || []).filter((c) => c && typeof c === "object").map(normalize);
   const gmSay = (m, err) => { const el = $("gm-msg"); el.textContent = m; el.className = "toast" + (err ? " err" : ""); };
-  const saveGM = () => { if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the posse. Save the posse to a file.", true); };
+  const saveGM = () => { if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true); };
   // Work out a crew member's numbers with the same rules as the sheet, by briefly treating them as the current character.
   function gmCalc(c) {
     const saved = ch; ch = c;
@@ -4417,22 +4418,22 @@ tr.lvl-U td.target { color: var(--muted); }
   function renderGM() {
     if (gmReady) { renderLogForm(); renderSeed(); renderLogBook(); } // the log and seed panels exist once their data has loaded
     $("gm-add-saved").innerHTML = `<option value="">${roster.length ? "Choose a saved character…" : "No characters saved in this browser"}</option>` +
-      roster.map((c, i) => `<option value="${i}">${esc(c.name || "Unnamed rider")}</option>`).join("");
-    $("gm-add-pregen").innerHTML = `<option value="">Choose a ready-made rider…</option>` +
+      roster.map((c, i) => `<option value="${i}">${esc(c.name || "Unnamed character")}</option>`).join("");
+    $("gm-add-pregen").innerHTML = `<option value="">Choose a ready-made character…</option>` +
       PREGENS.map((c, i) => `<option value="${i}">${esc(c.name)}: ${esc(c.dept)}</option>`).join("");
     // Turn order: Agility, highest first; ties flagged for the players to settle.
     const order = gmCrew.map((c) => ({ c, a: c.attrs.Agility })).sort((x, y) => y.a - x.a || x.c.name.localeCompare(y.c.name));
     $("gm-turns").innerHTML = order.length ? order.map(({ c, a }, i) => {
       const tied = order.some((o, j) => j !== i && o.a === a);
       return `<li>${esc(c.name || "Unnamed")}<span class="num">Agility ${a}</span>${tied ? '<span class="tie">tie</span>' : ""}${c.play.injury >= 3 ? ' <span class="tie">down</span>' : ""}</li>`;
-    }).join("") : `<li class="muted" style="list-style:none;margin-left:-1.6em">Add riders to see the turn order.</li>`;
+    }).join("") : `<li class="muted" style="list-style:none;margin-left:-1.6em">Add characters to see the turn order.</li>`;
     $("gm-grid").innerHTML = gmCrew.length ? gmCrew.map((c) => {
       const k = gmCalc(c), inj = c.play.injury;
       const cond = INJURY[inj][0] + (INJURY[inj][2] ? ` (${INJURY[inj][2]} physical)` : "");
       const art = c.portrait ? `<img class="avatar ${c.portraitShape === "portrait" ? "portrait" : ""}" src="${c.portrait}" alt="">`
         : badgeSvg(k.div);
       return `<article class="gm-card hud ${inj >= 3 ? "down" : ""}" data-div="${k.div}">
-        <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed rider")}</b>
+        <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed character")}</b>
           <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span></div></div>
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b>${c.attrs[n]}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div></div>
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
@@ -4444,7 +4445,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <span><strong>Complication:</strong> ${esc(k.comp || "—")}${c.comp.trigger ? ` (trigger: ${esc(c.comp.trigger)})` : ""}${k.scomp ? `; ${esc(k.scomp)}` : ""}</span></div>
         <div class="btn-row"><button class="linkish" data-gm="${c.id}" data-gmsave>Save character file</button><button class="linkish danger" data-gm="${c.id}" data-gmrm>Remove from view</button></div>
       </article>`;
-    }).join("") : `<div class="card hud"><p class="muted">No riders yet. Ask each player to <b>Save to file</b> and send you the file, then open them all at once above. You can also add characters saved in this browser, or the ready-made posse for a quick game.</p></div>`;
+    }).join("") : `<div class="card hud"><p class="muted">No characters yet. Ask each player to <b>Save to file</b> and send you the file, then open them all at once above. You can also add characters saved in this browser, or the ready-made characters for a quick game.</p></div>`;
   }
   $("gm-grid").addEventListener("click", (e) => {
     const el = e.target.closest("[data-gm]"); if (!el || el.matches("input")) return;
@@ -4453,7 +4454,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
     else if ("gmrm" in el.dataset) gmCrew = gmCrew.filter((x) => x !== c);
     else if ("gmsave" in el.dataset) {
-      const name = (c.name.trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLowerCase() || "rider") + ".json";
+      const name = (c.name.trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLowerCase() || "character") + ".json";
       saveText(JSON.stringify({ format: "grimm-west-character", version: 1, ...c, play: { ...c.play, log: [] } }, null, 2), name, gmSay);
       return;
     }
@@ -4477,28 +4478,28 @@ tr.lvl-U td.target { color: var(--muted); }
       } catch { bad++; }
     }
     const { added, updated } = gmAdd(found);
-    gmSay(`${added} added${updated ? `, ${updated} updated` : ""}${bad ? `; ${bad} file${bad > 1 ? "s weren't" : " wasn't"} a Grimm Wild West character file` : ""}.`, !!bad && !added && !updated);
+    gmSay(`${added} added${updated ? `, ${updated} updated` : ""}${bad ? `; ${bad} file${bad > 1 ? "s weren't" : " wasn't"} a Grimm character file` : ""}.`, !!bad && !added && !updated);
   });
   $("gm-open").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("gm-files").click(); } });
-  $("gm-add-saved").addEventListener("change", (e) => { const c = roster[+e.target.value]; if (e.target.value !== "" && c) { gmAdd([c]); gmSay(`Added ${c.name || "rider"}.`); } e.target.value = ""; });
+  $("gm-add-saved").addEventListener("change", (e) => { const c = roster[+e.target.value]; if (e.target.value !== "" && c) { gmAdd([c]); gmSay(`Added ${c.name || "character"}.`); } e.target.value = ""; });
   $("gm-add-pregen").addEventListener("change", (e) => {
     const c = PREGENS[+e.target.value];
     if (e.target.value !== "" && c) { gmAdd([{ ...JSON.parse(JSON.stringify(c)), id: uid() }]); gmSay(`Added ${c.name}.`); }
     e.target.value = "";
   });
   $("gm-save").onclick = () => {
-    if (!gmCrew.length) { gmSay("Add some riders first.", true); return; }
+    if (!gmCrew.length) { gmSay("Add some characters first.", true); return; }
     saveText(JSON.stringify({ format: "grimm-west-posse", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog }, null, 2), "grimm-posse.json", gmSay);
   };
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay("New session: everyone is back to their starting Grit."); };
   let gmClearArmed = false;
   $("gm-clear").onclick = () => {
     if (!gmClearArmed) { gmClearArmed = true; $("gm-clear").textContent = "Tap again to remove everyone"; setTimeout(() => { gmClearArmed = false; $("gm-clear").textContent = "Remove everyone"; }, 4000); return; }
-    gmClearArmed = false; gmCrew = []; saveGM(); renderGM(); $("gm-clear").textContent = "Remove everyone"; gmSay("Posse view cleared. Players' own files are untouched.");
+    gmClearArmed = false; gmCrew = []; saveGM(); renderGM(); $("gm-clear").textContent = "Remove everyone"; gmSay("View cleared. Players' own files are untouched.");
   };
 
   // ---- mission seeds ----
-  const SEEDS = {"mission": ["Case", ["A body torn apart at the edge of town", "A stagecoach that never arrived", "Livestock slaughtered in the night", "A child gone missing", "A miner raving about monsters", "A bounty on a man who isn't a man", "Travelers vanishing on the trail", "A traveling medicine show", "A new preacher packs the church", "A cattle drive spooked by something", "A hanging that went wrong", "A Wesen asks the posse for help"]], "place": ["Place", ["A silver boomtown", "A logging camp in the deep woods", "A river steamboat", "The railroad's end-of-track camp", "A lonely homestead", "A ghost town", "A mission church", "A saloon and gambling hall", "A frontier fort", "Portland's waterfront", "A canyon ranch", "A snowbound mountain pass"]], "strange": ["The hidden world", ["A Wendigo that has acquired the taste", "A Blutbad pack that's gone back to the hunt", "A Siegbarste whom bullets barely trouble", "A Mauvais Dentes, sent by a Royal Family", "A Spinnetod keeping herself young", "Geier selling organs to the highest bidder", "A Hexenbiest's curse", "A Ziegevolk swindler with half the town in thrall", "A Löwen fight ring", "A Hässlich demanding tolls at a bridge", "A Brotherhood of the Holy Earth rite against the railroad", "A Golden Dawn magician's working gone wrong"]], "twist": ["Twist", ["The victim was the monster", "The law is in on it", "Two Wesen clans are feuding", "The Wesen Council wants it hushed up", "A Royal Family's agent is behind it", "A rider's complication comes into play", "The Wesen is protecting its family", "A human is using the Wesen", "The town wants a hanging, any hanging", "The Order of the Holy Knife arrives to cleanse", "Another Grimm hunts the same quarry", "The trail leads to someone a rider loves"]], "clock": ["Ticking clock", [["The mob forms", 6], ["Nightfall", 4], ["The next victim", 6], ["The stage leaves town", 4], ["The Reapers arrive", 6], ["The river floods", 8], ["The trail goes cold", 4], ["The hanging at dawn", 4], ["The newspaper prints the story", 8], ["The fire spreads", 4], ["The Wesen flees the territory", 6], ["The snows close the pass", 8]]], "who": ["Key character", ["A sheriff who wants it simple", "A widow who knows more than she says", "A traveling doctor", "A Pinkerton detective", "A railroad baron", "A frightened Eisbiber family", "A Blutbad trying to stay clean", "A child who saw the woge", "A preacher with a past", "A newspaperman who's close to the truth", "An Incantare who needs the posse's protection", "A dying Grimm with a last request"]]};
+  const SEEDS = {"mission": ["Case", ["A body torn apart at the edge of town", "A stagecoach that never arrived", "Livestock slaughtered in the night", "A child gone missing", "A miner raving about monsters", "A bounty on a man who isn't a man", "Travelers vanishing on the trail", "A traveling medicine show", "A new preacher packs the church", "A cattle drive spooked by something", "A hanging that went wrong", "A Wesen asks for help"]], "place": ["Place", ["A silver boomtown", "A logging camp in the deep woods", "A river steamboat", "The railroad's end-of-track camp", "A lonely homestead", "A ghost town", "A mission church", "A saloon and gambling hall", "A frontier fort", "A fog-bound waterfront", "A canyon ranch", "A snowbound mountain pass"]], "strange": ["The hidden world", ["A Wendigo that has acquired the taste", "A Blutbad pack that's gone back to the hunt", "A Siegbarste whom bullets barely trouble", "A Mauvais Dentes, sent by a Royal Family", "A Spinnetod keeping herself young", "Geier selling organs to the highest bidder", "A Hexenbiest's curse", "A Ziegevolk swindler with half the town in thrall", "A Löwen fight ring", "A Hässlich demanding tolls at a bridge", "A Brotherhood of the Holy Earth rite against the railroad", "A Golden Dawn magician's working gone wrong"]], "twist": ["Twist", ["The victim was the monster", "The law is in on it", "Two Wesen clans are feuding", "The Wesen Council wants it hushed up", "A Royal Family's agent is behind it", "A character's complication comes into play", "The Wesen is protecting its family", "A human is using the Wesen", "The town wants a hanging, any hanging", "The Order of the Holy Knife arrives to cleanse", "Another Grimm hunts the same quarry", "The trail leads to someone a character loves"]], "clock": ["Ticking clock", [["The mob forms", 6], ["Nightfall", 4], ["The next victim", 6], ["The stage leaves town", 4], ["The Reapers arrive", 6], ["The river floods", 8], ["The trail goes cold", 4], ["The hanging at dawn", 4], ["The newspaper prints the story", 8], ["The fire spreads", 4], ["The Wesen flees the territory", 6], ["The snows close the pass", 8]]], "who": ["Key character", ["A sheriff who wants it simple", "A widow who knows more than she says", "A traveling doctor", "A Pinkerton detective", "A railroad baron", "A frightened Eisbiber family", "A Blutbad trying to stay clean", "A child who saw the woge", "A preacher with a past", "A newspaperman who's close to the truth", "An Incantare who needs protection", "A dying Grimm with a last request"]]};
   const SEED_KEYS = ["mission", "place", "strange", "twist", "clock", "who"];
   const STORE_SEED = "grimm.seed.v1";
   const d12 = () => Math.floor(Math.random() * 12);
@@ -4519,7 +4520,7 @@ tr.lvl-U td.target { color: var(--muted); }
   $("seed-clock").onclick = () => {
     const [name, size] = SEEDS.clock[1][seed.clock];
     clocks.push({ id: uid(), name, size, kind: "danger", filled: 0 }); store.set(STORE_CLOCKS, clocks); renderClocks();
-    $("seed-msg").textContent = `Started "${name}" (${size}) on the Ride tab's Clocks.`;
+    $("seed-msg").textContent = `Started "${name}" (${size}) on the Play tab's Clocks.`;
   };
   const copyText = (txt, say) => {
     const p = navigator.clipboard?.writeText(txt);
@@ -4571,7 +4572,7 @@ tr.lvl-U td.target { color: var(--muted); }
     store.set(STORE_LOG, missionLog); saveGM();
     ["log-title", "log-notes", "log-books", "log-commend", "log-stardate"].forEach((id) => ($(id).value = ""));
     renderGM(); renderLogBook();
-    logSay(advances.length ? `Logged. ${advances.length} advancement${advances.length > 1 ? "s" : ""} applied: save each rider's file for their player.` : "Logged.");
+    logSay(advances.length ? `Logged. ${advances.length} advancement${advances.length > 1 ? "s" : ""} applied: save each character's file for their player.` : "Logged.");
   };
   $("log-entries").addEventListener("click", (e) => {
     const b = e.target.closest("[data-rmlog]"); if (!b) return;
@@ -4696,7 +4697,7 @@ tr.lvl-U td.target { color: var(--muted); }
   // ---- character files ----
   // In the claude.ai viewer, saving goes through its download prompt; opened directly, a normal download works.
   const exportText = () => JSON.stringify({ format: "grimm-west-character", version: 1, ...ch, example: false, play: { ...ch.play, log: [] } }, null, 2);
-  const fileName = () => (ch.name.trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLowerCase() || "rider") + ".json";
+  const fileName = () => (ch.name.trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLowerCase() || "character") + ".json";
   const downloadsReady = window.claude?.use ? window.claude.use("downloads").catch(() => null) : Promise.resolve(null);
   downloadsReady.then((dl) => {
     if (dl || !framed) return;
@@ -4753,13 +4754,13 @@ tr.lvl-U td.target { color: var(--muted); }
       renderRoster();
       toast(`Opened ${ch.name || "character"}.`);
     } catch {
-      toast("That isn't a Grimm Wild West character file. Open a .json file saved from this creator.", true);
+      toast("That isn't a Grimm character file. Open a .json file saved from this creator.", true);
     }
   }
   $("btn-import").onclick = () => importText($("f-json").value);
 
-  // Embers: a slow drift upward, like sparks off a campfire. Static when reduced motion is requested.
-  (function embers() {
+  // Ash: a slow drift downward, like soot after a fire. Static when reduced motion is requested.
+  (function ash() {
     const cv = $("embers"), ctx = cv.getContext("2d");
     if (!ctx) return;
     const still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -4775,9 +4776,9 @@ tr.lvl-U td.target { color: var(--muted); }
     function draw(t) {
       ctx.clearRect(0, 0, w, h);
       for (const s of pts) {
-        if (!still) { s.y -= 0.08 + s.z * 0.25; s.x += Math.sin(t / 1400 + s.p) * 0.15; if (s.y < -4) { s.y = h + 4; s.x = Math.random() * w; } }
+        if (!still) { s.y += 0.05 + s.z * 0.18; s.x += Math.sin(t / 1800 + s.p) * 0.2; if (s.y > h + 4) { s.y = -4; s.x = Math.random() * w; } }
         const a = 0.15 + s.z * 0.45 + (still ? 0 : Math.sin(t / 500 + s.p) * 0.15);
-        ctx.fillStyle = `rgba(255, ${120 + s.z * 70 | 0}, ${40 + s.z * 30 | 0}, ${Math.max(0, a)})`;
+        ctx.fillStyle = `rgba(${170 + s.z * 40 | 0}, ${178 + s.z * 40 | 0}, ${174 + s.z * 40 | 0}, ${Math.max(0, a * 0.55)})`;
         const r = 0.6 + s.z * 1.4;
         ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, 6.283); ctx.fill();
       }

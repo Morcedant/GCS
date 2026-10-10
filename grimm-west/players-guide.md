@@ -1,9 +1,9 @@
 ---
-title: "Grimm Wild West Players' Guide"
-subtitle: "Oregon, 1889 · A frontier game in the Grimm-verse"
+title: "Grimm Players' Guide"
+subtitle: "Gothic horror in the Grimm-verse, the late 1800s"
 ---
 
-The Oregon frontier is wide and the law is thin. Timber camps, silver strikes, the railroad and the river steamers bring strangers from every corner of the world, and some of them are not what they seem. Wesen walk among the settlers wearing human faces. Grimms, the old hunters, can see through them. The Royal Families pull strings from across the ocean, and men and women with real magic hide inside fraternal lodges and country churches. You ride with a small posse that knows the truth and tries to keep the peace, or at least to keep people alive.
+Every fairy tale was a warning. The Brothers Grimm wrote down what their family had hunted for centuries, and the things in those stories never went away. In fog-bound towns and lamplit camps, Wesen walk among the living wearing human faces. Grimms, the last of the old hunters, can see through them. The Royal Families pull strings from across the ocean, and men and women with real magic hide inside lodges and country churches. You know the truth, and you stand between it and the people who don't.
 
 This guide uses the same rules as the USS Pelion game: concrete skills, 3d6 roll-under, and a small pool of Grit points. It is an unofficial fan game inspired by the television series *Grimm* and is not affiliated with its makers.
 
@@ -29,30 +29,26 @@ Three orders matter on the frontier:
 - **Ordo Sancti Cultelli** (Order of the Holy Knife) is a Church-affiliated order of assassins sworn to cleanse the Earth of supernatural threats, Wesen and Incantare alike.
 - **Ordo Hermeticus Aurorae Aureae** (the Hermetic Order of the Golden Dawn) presents itself as a fraternal order with odd trappings. Inside it, layer under layer, are secrets and real magicians.
 
-## Black Pine, Oregon
-
-The default home of the posse is Black Pine, a timber and silver town in the Cascade foothills, two days' ride from Portland. It has a sheriff who would rather not know, a newspaper that would very much like to, a railroad survey camp, and more Wesen than anyone admits. Use it, or set your game anywhere in the West.
-
 # Create your character
 
-Work through the five steps in order. The Grimm Wild West Character Creator follows the same steps and checks the rules for you.
+Work through the five steps in order. The Grimm character creator follows the same steps and checks the rules for you.
 
 ## Step 1: Choose your calling
 
-Choose a calling and describe what you bring to the posse. Your calling places you in one of three groups, which only changes your sheet's colors and badge. A title such as "Deputy U.S. Marshal" or "Doc" is agreed with the GM and gives no bonus.
+Choose a calling and describe what your character brings. Your calling places you in one of three groups, which only changes your sheet's colors and badge. A title such as "Deputy U.S. Marshal" or "Doc" is agreed with the GM and gives no bonus.
 
 | Calling | Group | Typical contribution |
 |---|---|---|
-| Marshal | The Law | Lead the posse and carry what authority there is |
+| Marshal | The Law | Lead others and carry what authority there is |
 | Deputy | The Law | Keep order, guard prisoners, back up the marshal |
 | Detective | The Law | Investigate crimes for the Pinkertons or a private client |
 | Bounty Hunter | The Law | Track and bring in wanted men, and things that aren't men |
-| Doctor | The Learned | Patch up the posse and read what a body tells you |
+| Doctor | The Learned | Patch up the wounded and read what a body tells you |
 | Apothecary | The Learned | Brew remedies, antidotes and stranger things |
 | Scholar | The Learned | Know the old books, the old languages and the occult |
 | Preacher | The Learned | Comfort, counsel, and stand against the dark |
 | Gunslinger | The Frontier | Be the fastest and steadiest gun in the room |
-| Scout | The Frontier | Find the trail, read the land, keep the posse alive in it |
+| Scout | The Frontier | Find the trail, read the land, keep everyone alive in it |
 | Gambler | The Frontier | Read people, bluff, and hear what the saloon hears |
 | Tinker | The Frontier | Fix guns, build traps, and make the impossible gadget |
 
@@ -119,9 +115,9 @@ Each Extra Trained skill Edge adds one more Trained skill. A **Grimm's** Wesen L
 
 ## Step 4: Describe your character
 
-Choose your name, title if any, and a short reason you ride with the posse. Then choose **one advantage** and **one complication**.
+Choose your name, title if any, and a short reason you stand against the dark. Then choose **one advantage** and **one complication**.
 
-### Top 10 reasons to ride with the posse
+### Top 10 reasons to stand against the dark
 
 1. **The family gift.** The Grimm blood woke in me, and it came with a duty.
 2. **Vengeance.** Something that wore a human face killed someone I loved.
@@ -132,7 +128,7 @@ Choose your name, title if any, and a short reason you ride with the posse. Then
 7. **The bounty.** The pay's good, and nobody else will take these jobs.
 8. **Knowledge.** The hidden world is the greatest mystery there is, and I want to understand it.
 9. **Faith.** The Lord sent me here for a reason, and I believe this is it.
-10. **Nowhere else to go.** The posse took me in when no one else would.
+10. **Nowhere else to go.** These people took me in when no one else would.
 
 - **Advantage.** Choose either a general advantage or one of your heritage advantages. A heritage advantage replaces the general advantage and always brings its companion complication. An Incantare's heritage advantage is their **Lens**.
 - **Complication.** Choose one complication. You keep it even if you take a heritage advantage, so a character with a heritage advantage has two complications.
@@ -152,11 +148,11 @@ Anyone can owe allegiance to one of the powers of the hidden world. It's a benef
 | The Wesen Council | Contacts in the local Wesen community | Duty: the Council calls on you, and others know you're its operative |
 | A Grimm family | Access to the family books and kin | Duty to the family name, and to fight its enemies |
 
-## Step 5: Prepare to ride
+## Step 5: Prepare for the hunt
 
-Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points (three with True grit) and your gear. Name your friend in town or your fine weapon or tool, if you took those Edges. Describe one connection to another member of the posse.
+Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points (three with True grit) and your gear. Name your friend in town or your fine weapon or tool, if you took those Edges. Describe one connection to another player's character.
 
-### Top 10 connections to another rider
+### Top 10 connections to another character
 
 1. **Rode together in the war.** We served in the same company and still watch each other's backs.
 2. **They saved my life.** They cut me down from a lynch mob's rope, and I owe them my life.
@@ -177,7 +173,7 @@ Human (Tier 0, 3 Edges: +1 attribute point, Extra Trained skill, A friend in tow
 - **Trained:** Read People 14, Wesen Lore 14, Tracking 14, Survival 14, Gambling 14, Occult 14, Persuasion 12, Deception 12, Shooting 12, Riding 12.
 - **Dodge:** Athletics is Untrained, so Dodge is 9.
 - **Advantage:** Astute Observer. **Complication:** Cannot Leave a Mystery Alone.
-- **Friend in town:** a clerk in the Pinkertons' Portland office who'll pull a file, quietly.
+- **Friend in town:** a clerk in the Pinkertons' regional office who'll pull a file, quietly.
 
 # Skills and gear
 
@@ -185,7 +181,7 @@ Choose the skill that matches your method. Investigation finds the clues; Wesen 
 
 | Skill | Attribute | Typical use |
 |---|---|---|
-| Leadership | Presence | Command the posse, rally a crowd, give clear orders |
+| Leadership | Presence | Command others, rally a crowd, give clear orders |
 | Persuasion | Presence | Convince, negotiate, calm a mob |
 | Deception | Presence | Lie, bluff, disguise and misdirect |
 | Read People | Intellect | Judge motives, spot a lie, read a face |
@@ -254,7 +250,7 @@ In an opposed contest, each side rolls its relevant skill. One success beats one
 
 ## Assistance
 
-One qualified assistant can roll a relevant skill before the lead character rolls. Success grants +1 to the lead roll; success by 5 or more grants +2. Failure gives no bonus. An 18 introduces a complication described by the GM. Additional riders can do other tasks but cannot stack assistance bonuses on the same roll.
+One qualified assistant can roll a relevant skill before the lead character rolls. Success grants +1 to the lead roll; success by 5 or more grants +2. Failure gives no bonus. An 18 introduces a complication described by the GM. Additional characters can do other tasks but cannot stack assistance bonuses on the same roll.
 
 ## Failure and another attempt
 
@@ -269,7 +265,7 @@ When a roll fails by only **1 or 2**, the GM may offer **success at a cost**: yo
 A **clock** is a circle cut into 4, 6 or 8 segments that tracks something that takes time or builds toward disaster: *The mob forms (6)*, *Nightfall (4)*, *Find the lair (6)*, *Win the clan's trust (8)*.
 
 - **Danger clocks** fill when things go wrong: a failed roll, a success at a cost, or time passing. When one fills, the danger happens.
-- **Progress clocks** fill as the posse succeeds: one segment for a success, two for success by 5 or more. When one fills, the goal is achieved.
+- **Progress clocks** fill as the characters succeed: one segment for a success, two for success by 5 or more. When one fills, the goal is achieved.
 - The GM sizes the clock (4 = urgent or simple, 6 = substantial, 8 = long or complex) and shows it to the players.
 
 ## Investigation and social scenes
@@ -278,7 +274,7 @@ Ask concrete questions and explain your approach. Evidence may require several d
 
 ## Chases
 
-Run a chase as a progress clock for the pursuers against a danger clock for the quarry's escape. Each exchange, riders roll **Riding** (or Athletics on foot): success ticks the pursuers' clock, failure ticks the escape. Terrain, a tired horse, or a shot fired from the saddle (Shooting at −2) adjust the rolls.
+Run a chase as a progress clock for the pursuers against a danger clock for the quarry's escape. Each exchange, characters roll **Riding** (or Athletics on foot): success ticks the pursuers' clock, failure ticks the escape. Terrain, a tired horse, or a shot fired from the saddle (Shooting at −2) adjust the rolls.
 
 # The woge and the hidden world
 
@@ -324,13 +320,13 @@ An Incantare's **Lens** is their heritage advantage. The Lens decides *how* magi
 
 ## The Code of Swabia
 
-The Code of Swabia is the old law between Wesen and the rest of the world, and Grimms are its enforcers. At its heart, Wesen must not reveal themselves to humanity. How far it reaches beyond that, and how mercifully a Grimm enforces it, is a question your posse will answer for itself.
+The Code of Swabia is the old law between Wesen and the rest of the world, and Grimms are its enforcers. At its heart, Wesen must not reveal themselves to humanity. How far it reaches beyond that, and how mercifully a Grimm enforces it, is a question your characters will answer for themselves.
 
 # Personal combat
 
 ## Turn order and actions
 
-Act in descending Agility order. Players choose the order of tied riders; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as shooting, reloading, helping, or attempting a task.
+Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as shooting, reloading, helping, or attempting a task.
 
 ## Attacking and defending
 
@@ -443,7 +439,7 @@ Gain one point when one of your complications creates a meaningful problem you a
 
 ## Trouble
 
-The posse shares three Trouble tracks. They fill as the hidden world strains against the ordinary one; the GM narrates what each box means.
+The characters share three Trouble tracks. They fill as the hidden world strains against the ordinary one; the GM narrates what each box means.
 
 | Track | Boxes | Effect as boxes fill |
 |---|---|---|
@@ -474,9 +470,9 @@ Roll 1d12 on each table, or pick what you like: a *case* at a *place*, caused by
 | 7 | Travelers vanishing on the trail | A mission church | A Hexenbiest's curse |
 | 8 | A traveling medicine show | A saloon and gambling hall | A Ziegevolk swindler with half the town in thrall |
 | 9 | A new preacher packs the church | A frontier fort | A Löwen fight ring |
-| 10 | A cattle drive spooked by something | Portland's waterfront | A Hässlich demanding tolls at a bridge |
+| 10 | A cattle drive spooked by something | A fog-bound waterfront | A Hässlich demanding tolls at a bridge |
 | 11 | A hanging that went wrong | A canyon ranch | A Brotherhood of the Holy Earth rite against the railroad |
-| 12 | A Wesen asks the posse for help | A snowbound mountain pass | A Golden Dawn magician's working gone wrong |
+| 12 | A Wesen asks for help | A snowbound mountain pass | A Golden Dawn magician's working gone wrong |
 
 | d12 | Twist | Ticking clock (segments) | Key character |
 |---|---|---|---|
@@ -485,13 +481,13 @@ Roll 1d12 on each table, or pick what you like: a *case* at a *place*, caused by
 | 3 | Two Wesen clans are feuding | The next victim (6) | A traveling doctor |
 | 4 | The Wesen Council wants it hushed up | The stage leaves town (4) | A Pinkerton detective |
 | 5 | A Royal Family's agent is behind it | The Reapers arrive (6) | A railroad baron |
-| 6 | A rider's complication comes into play | The river floods (8) | A frightened Eisbiber family |
+| 6 | A character's complication comes into play | The river floods (8) | A frightened Eisbiber family |
 | 7 | The Wesen is protecting its family | The trail goes cold (4) | A Blutbad trying to stay clean |
 | 8 | A human is using the Wesen | The hanging at dawn (4) | A child who saw the woge |
 | 9 | The town wants a hanging, any hanging | The newspaper prints the story (8) | A preacher with a past |
 | 10 | The Order of the Holy Knife arrives to cleanse | The fire spreads (4) | A newspaperman who's close to the truth |
-| 11 | Another Grimm hunts the same quarry | The Wesen flees the territory (6) | An Incantare who needs the posse's protection |
-| 12 | The trail leads to someone a rider loves | The snows close the pass (8) | A dying Grimm with a last request |
+| 11 | Another Grimm hunts the same quarry | The Wesen flees the territory (6) | An Incantare who needs protection |
+| 12 | The trail leads to someone a character loves | The snows close the pass (8) | A dying Grimm with a last request |
 
 ## The case journal
 
@@ -501,20 +497,20 @@ End each case with a short journal entry, written together, as the Grimms have a
 2. **Who stood out?** A moment worth remembering.
 3. **Complications.** Which ones came into play, and what did they cost?
 4. **For the books.** A new Wesen kind, weakness or custom worth recording.
-5. **Advancement.** After a significant case, the GM may authorize one skill step for each rider.
+5. **Advancement.** After a significant case, the GM may authorize one skill step for each character.
 
-# Ready-made posse
+# Ready-made characters
 
-Six riders ready to play. Each follows the creation rules exactly, Edges included, and their connections tie them together.
+Six characters ready to play. Each follows the creation rules exactly, Edges included, and their connections tie them together.
 
 ## Eliza Kessler
 
-*Deputy U.S. Marshal, Marshal. Grimm (Tier 2).* Leads the posse and carries the badge: the law, and the Code, in one person.
+*Deputy U.S. Marshal, Marshal. Grimm (Tier 2).* Wears the badge: the law, and the Code, in one person.
 
 - **Attributes:** Body 12, Agility 13, Intellect 10, Presence 8, Will 12. **Dodge** 12.
 - **Skills:** Shooting 16 (Specialty). Trained: Riding 14, Melee 14, Brawling 14, Athletics 13, Investigation 11, Tracking 11, Read People 11, Survival 11, Leadership 9; Wesen Lore 11 (free).
 - **Edge:** True grit. **Grimm gift:** Keeper of the Books (companion: The Books Must Be Kept). **Complication:** Law and Order; trigger: a Wesen suspect could be killed instead of arrested.
-- **Why I ride:** The Grimm blood woke in me, and it came with a duty. **Connection:** Gus Brandt cut her down from a lynch mob's rope before anyone knew what she was.
+- **Why I stand against the dark:** The Grimm blood woke in me, and it came with a duty. **Connection:** Gus Brandt cut her down from a lynch mob's rope before anyone knew what she was.
 
 ## Gus Brandt
 
@@ -523,7 +519,7 @@ Six riders ready to play. Each follows the creation rules exactly, Edges include
 - **Attributes:** Body 11, Agility 11, Intellect 13, Presence 10, Will 10. **Dodge** 10. **In woge:** Body 13, Agility 12; claws and fangs mark 2 boxes.
 - **Skills:** Tinkering 16 (Specialty). Trained: Tracking 14, Wesen Lore 14, Investigation 14, Survival 14, Read People 14, Brawling 12, Melee 12, Athletics 12, Persuasion 11.
 - **Edge:** A fine tool: a master gunsmith's tools (+2 Tinkering). **Advantage:** Blutbad Nose (companion: The Bloodlust). **Complication:** Keeps a Dangerous Secret; trigger: someone from his old pack turns up.
-- **Why I ride:** I did harm once. I mean to balance the ledger. **Connection:** Owes Roz Vey for the remedies that keep the urge quiet.
+- **Why I stand against the dark:** I did harm once. I mean to balance the ledger. **Connection:** Owes Roz Vey for the remedies that keep the urge quiet.
 
 ## Roz Vey
 
@@ -531,17 +527,17 @@ Six riders ready to play. Each follows the creation rules exactly, Edges include
 
 - **Attributes:** Body 9, Agility 11, Intellect 13, Presence 12, Will 10. **Dodge** 9.
 - **Skills:** Apothecary 16 (Specialty). Trained: Medicine 14, Wesen Lore 14, Read People 14, Investigation 14, Gambling 14, Survival 14, Occult 14, Persuasion 13, Deception 13, Stealth 12.
-- **Edges:** Extra Trained skill; a friend in town: her cousin Ambrose, a Fuchsbau smuggler on the Portland docks who can find any ingredient, for a price. **Advantage:** Fuchsbau Remedies (companion: Criminal Kin). **Complication:** Protects Others at Personal Risk; trigger: a sick or hurt stranger turns up at the shop.
-- **Why I ride:** Wesen and humans can live side by side, and I mean to prove it. **Connection:** Trades notes with Dr. Whitlock, who still won't admit some of her remedies work better than his.
+- **Edges:** Extra Trained skill; a friend in town: her cousin Ambrose, a Fuchsbau smuggler on the river docks who can find any ingredient, for a price. **Advantage:** Fuchsbau Remedies (companion: Criminal Kin). **Complication:** Protects Others at Personal Risk; trigger: a sick or hurt stranger turns up at the shop.
+- **Why I stand against the dark:** Wesen and humans can live side by side, and I mean to prove it. **Connection:** Trades notes with Dr. Whitlock, who still won't admit some of her remedies work better than his.
 
 ## Dr. Thaddeus Whitlock
 
-*Town physician, Doctor. Human (Tier 0).* Army surgeon in the war; now he digs bullets out of the posse and asks too many questions about what made the other wounds.
+*Town physician, Doctor. Human (Tier 0).* Army surgeon in the war; now he digs bullets out of his friends and asks too many questions about what made the other wounds.
 
 - **Attributes:** Body 10, Agility 10, Intellect 13, Presence 12, Will 11. **Dodge** 8.
 - **Skills:** Medicine 16 (Specialty). Trained: Apothecary 14, Read People 14, Investigation 14, Wesen Lore 14, Occult 14, Persuasion 13, Leadership 13, Riding 11, Shooting 11.
 - **Edges:** +1 attribute point; second advantage: Battlefield Surgeon; a fine tool: his army surgeon's instruments (+2 Medicine). **Advantage:** Steady Hands. **Complication:** Haunted by the War; trigger: gunfire in the dark.
-- **Why I ride:** I saw what I saw, and no one else believes me. **Connection:** Rode with Silas Thorne's regiment in the war and has never trusted him since.
+- **Why I stand against the dark:** I saw what I saw, and no one else believes me. **Connection:** Rode with Silas Thorne's regiment in the war and has never trusted him since.
 
 ## Cora Ridgeway
 
@@ -550,20 +546,20 @@ Six riders ready to play. Each follows the creation rules exactly, Edges include
 - **Attributes:** Body 11, Agility 14, Intellect 10, Presence 11, Will 9. **Dodge** 13. **In woge:** Body 12, Agility 15, Dodge 15; claws mark 2 boxes.
 - **Skills:** Shooting 17 (Specialty). Trained: Riding 15, Stealth 15, Brawling 15, Melee 15, Persuasion 12, Athletics 12, Tracking 11, Survival 11, Read People 11, Gambling 11.
 - **Edges:** Extra Trained skill; True grit. **Advantage:** Plains Wanderer (companion: Restless). **Complication:** Sworn Vengeance; trigger: word of the men who burned her clan's camp.
-- **Why I ride:** Something that wore a human face killed someone I loved. **Connection:** Eliza Kessler taught her what she knows about the hidden world.
+- **Why I stand against the dark:** Something that wore a human face killed someone I loved. **Connection:** Eliza Kessler taught her what she knows about the hidden world.
 
 ## Silas Thorne
 
-*Professional gambler, Gambler. Ziegevolk (Tier 1); Old hand.* Charming, well-dressed, and in debt to the wrong people in San Francisco.
+*Professional gambler, Gambler. Ziegevolk (Tier 1); Old hand.* Charming, well-dressed, and in debt to the wrong people.
 
 - **Attributes:** Body 10, Agility 10, Intellect 13, Presence 13, Will 9. **Dodge** 8.
 - **Skills:** Gambling 18 (Expert). Trained: Deception 14, Persuasion 14, Read People 14, Investigation 14, Shooting 11, Stealth 11, Riding 11.
-- **Edges:** Second advantage: Poker Face; a friend in town: Mae Lin, a faro dealer in San Francisco who hears everything said at her table. **Advantage:** Ziegevolk Pheromones (companion: Pheromone Suspicion). **Complication:** Owes the Wrong People; trigger: a collector from San Francisco arrives.
-- **Why I ride:** The pay's good, and nobody else will take these jobs. **Connection:** Plays cards with Cora every Saturday; she's the only one who can tell when he's bluffing.
+- **Edges:** Second advantage: Poker Face; a friend in town: Mae Lin, a faro dealer who hears everything said at her table. **Advantage:** Ziegevolk Pheromones (companion: Pheromone Suspicion). **Complication:** Owes the Wrong People; trigger: a debt collector arrives.
+- **Why I stand against the dark:** The pay's good, and nobody else will take these jobs. **Connection:** Plays cards with Cora every Saturday; she's the only one who can tell when he's bluffing.
 
 # Threats
 
-Opponents use the same rules as the posse. **Minor opponents** (hired guns, a mob, a Royal's footmen) have **one box**: any hit that gets through takes them out of the fight.
+Opponents use the same rules as the characters. **Minor opponents** (hired guns, a mob, a Royal's footmen) have **one box**: any hit that gets through takes them out of the fight.
 
 | Threat | Attack (target) | Dodge | Boxes | Weapon | Trait |
 |---|---|---|---|---|---|
@@ -597,7 +593,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Poker Face | +2 to Deception to hide what you know or feel under questioning. |
 | Monster Hunter | +2 to Wesen Lore to identify a Wesen from what it left behind: tracks, wounds, a body. |
 | Gunsmith | +2 to Tinkering when repairing or modifying a firearm. |
-| Cool Head | +2 to Leadership when coordinating the posse in a sudden emergency. |
+| Cool Head | +2 to Leadership when coordinating others in a sudden emergency. |
 | Unshakable Courage | +2 to Will against overwhelming fear. |
 | Iron Will | +2 to Will when resisting magic or a Wesen's influence. |
 | Knife Fighter | +2 to Melee with a knife in close quarters. |
@@ -650,7 +646,7 @@ Every Wesen heritage has these, on top of its own entry below. They come from th
 
 *Tier 0 · 3 Edges · None*
 
-Most of the frontier, and most of the posse. You know the truth about the hidden world, which already sets you apart.
+Most people are human. You know the truth about the hidden world, which already sets you apart.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
@@ -883,7 +879,7 @@ A human who works real magic through a Lens: a tradition and a way of seeing. Th
 | Malifica Lens (Witch or Warlock) | Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link. | **Wicked Reputation.** People whisper that you're a witch, and the Order of the Holy Knife listens. Accept the suspicion. |
 | Phitonissa Lens (Pagan) | Cunning-folk rites of the seasons, nature and the old gods, worked outdoors. +2 to Occult for nature and folk magic. | **Disciplines of Faith.** The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them. |
 | Scaenarfex Lens (Artistic Enchanter) | Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm. | **Artist's Temperament.** Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you. |
-| Veneficare Lens (Sorcerer) | Quick casting along one or two Paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it when it clashes with the posse's needs. |
+| Veneficare Lens (Sorcerer) | Quick casting along one or two Paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it when it clashes with your friends' needs. |
 
 *Source: Incantare template: seven Lenses (Ritual Path Magic).*
 
@@ -1070,7 +1066,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 | Haunted by the War | A specific reminder of the war causes hesitation or a hard choice. Define the reminder together. |
 | Keeps a Dangerous Secret | An agreed secret threatens trust or safety. Earn a point when protecting or revealing it has a real consequence. |
 | Old Rival | A recurring rival complicates your work with concrete problems. |
-| Someone Back Home | A family or a sweetheart pulls you away from the posse's work. |
+| Someone Back Home | A family or a sweetheart pulls you away from the work. |
 | Sworn Vengeance | You've sworn to kill someone. Accept the risk when the chance comes. |
 | Short Fuse | You answer insults with fists or guns. Accept the fight you start. |
 | The Bottle | Whiskey or laudanum has a hold on you. Accept the lost night or the slip at a bad time. |
