@@ -129,6 +129,21 @@ Choose ten different skills: one **Specialty** at its governing attribute +3 and
 
 Choose your name, rank, department, and a short reason you serve in Starfleet. Then choose **one advantage** and **one complication**.
 
+### Top 10 reasons for joining Starfleet
+
+Pick one as a starting point and make it your own, or write something else entirely.
+
+1. **Explore the unknown.** To see what's out there: strange new worlds and phenomena no one has charted yet.
+2. **Family tradition.** Starfleet runs in my family, and I mean to live up to the name.
+3. **Science and discovery.** The best laboratory in the galaxy is a starship on the frontier.
+4. **Protect others.** To protect the Federation and the people who can't protect themselves.
+5. **Inspired by a hero.** A Starfleet officer once saved my home, and I want to be that person for someone else.
+6. **Believe in the ideals.** I believe in what the Federation stands for and want to serve it.
+7. **Prove myself.** To prove I'm good enough, to everyone who doubted me and to myself.
+8. **Leave the past behind.** To leave behind a past, a world, or a life that was too small for me.
+9. **Make amends.** To make up for a mistake I can't undo.
+10. **Build bridges.** To build bridges between my people and the rest of the Federation.
+
 - **Advantage.** Choose either a general advantage or one of your species' advantages. A species advantage replaces the general advantage and always brings its companion complication.
 - **Complication.** Choose one complication. You keep it even if you take a species advantage, so a character with a species advantage has two complications.
 

@@ -475,7 +475,9 @@ tr.lvl-U td.target { color: var(--muted); }
                   <span class="toast" id="portrait-msg" role="status" aria-live="polite"></span>
                 </div>
               </div></div>
-            <div class="field wide"><label for="f-reason">Why you serve in Starfleet</label><textarea id="f-reason" rows="2"></textarea></div>
+            <div class="field wide"><label for="f-reason">Why you serve in Starfleet</label>
+              <select id="f-reasonpick" aria-label="Quick pick a reason"></select>
+              <textarea id="f-reason" rows="2" placeholder="Pick one of the top 10 above, or write your own."></textarea></div>
             <div class="field wide"><label for="f-speciesnotes">Species ability (GM approval required)</label>
               <textarea id="f-speciesnotes" rows="2" placeholder="Agreed ability and its limitation, if any. Leave blank if none is approved."></textarea></div>
           </div>
@@ -809,6 +811,20 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Choose ten different skills: one <strong>Specialty</strong> at its governing attribute +3 and nine <strong>Trained</strong> skills at attribute +1. All other skills are <strong>Untrained</strong> at attribute −4 when an attempt is plausible. Use these same three training levels for every skill. Each skill has its own final target number; do not add the attribute again when rolling.</p>
 <h2 id="g-step-4-describe-your-character">Step 4: Describe your character</h2>
 <p>Choose your name, rank, department, and a short reason you serve in Starfleet. Then choose <strong>one advantage</strong> and <strong>one complication</strong>.</p>
+<h3 id="g-top-10-reasons-for-joining-starfleet">Top 10 reasons for joining Starfleet</h3>
+<p>Pick one as a starting point and make it your own, or write something else entirely.</p>
+<ol type="1">
+<li><strong>Explore the unknown.</strong> To see what’s out there: strange new worlds and phenomena no one has charted yet.</li>
+<li><strong>Family tradition.</strong> Starfleet runs in my family, and I mean to live up to the name.</li>
+<li><strong>Science and discovery.</strong> The best laboratory in the galaxy is a starship on the frontier.</li>
+<li><strong>Protect others.</strong> To protect the Federation and the people who can’t protect themselves.</li>
+<li><strong>Inspired by a hero.</strong> A Starfleet officer once saved my home, and I want to be that person for someone else.</li>
+<li><strong>Believe in the ideals.</strong> I believe in what the Federation stands for and want to serve it.</li>
+<li><strong>Prove myself.</strong> To prove I’m good enough, to everyone who doubted me and to myself.</li>
+<li><strong>Leave the past behind.</strong> To leave behind a past, a world, or a life that was too small for me.</li>
+<li><strong>Make amends.</strong> To make up for a mistake I can’t undo.</li>
+<li><strong>Build bridges.</strong> To build bridges between my people and the rest of the Federation.</li>
+</ol>
 <ul>
 <li><strong>Advantage.</strong> Choose either a general advantage or one of your species’ advantages. A species advantage replaces the general advantage and always brings its companion complication.</li>
 <li><strong>Complication.</strong> Choose one complication. You keep it even if you take a species advantage, so a character with a species advantage has two complications.</li>
@@ -1941,6 +1957,20 @@ tr.lvl-U td.target { color: var(--muted); }
     ["trill", "Trill", { Intellect: 1, Body: -1 }, "A spotted humanoid people, some of whom are joined with a long-lived symbiont that carries the memories of its earlier hosts. In this era the Trill keep joining a closely guarded secret from outsiders, Starfleet included."],
     ["saurian", "Saurian", { Body: 1, Intellect: 1, Agility: -1, Presence: -1 }, "A reptilian people with tough scaled skin and large, dark eyes, known across the quadrant for Saurian brandy. Lt. Linus served aboard USS Discovery in the 2250s."],
   ];
+  // Top 10 reasons for joining Starfleet, for quick selection; the text stays editable.
+  const REASONS = [
+    ["Explore the unknown", "To see what's out there: strange new worlds and phenomena no one has charted yet."],
+    ["Family tradition", "Starfleet runs in my family, and I mean to live up to the name."],
+    ["Science and discovery", "The best laboratory in the galaxy is a starship on the frontier."],
+    ["Protect others", "To protect the Federation and the people who can't protect themselves."],
+    ["Inspired by a hero", "A Starfleet officer once saved my home, and I want to be that person for someone else."],
+    ["Believe in the ideals", "I believe in what the Federation stands for and want to serve it."],
+    ["Prove myself", "To prove I'm good enough, to everyone who doubted me and to myself."],
+    ["Leave the past behind", "To leave behind a past, a world, or a life that was too small for me."],
+    ["Make amends", "To make up for a mistake I can't undo."],
+    ["Build bridges", "To build bridges between my people and the rest of the Federation."],
+  ];
+  const REASON_TEXTS = new Set(REASONS.map((r) => r[1]));
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
   // Species advantages, each paired with a companion complication that comes with it.
   // [id, name, effect, roll, gives +2?, companion name, companion text]
@@ -2219,6 +2249,8 @@ tr.lvl-U td.target { color: var(--muted); }
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
   $("equip").innerHTML = EQUIPMENT.map(([k, n]) => `<label><input type="checkbox" id="eq-${k}" data-eq="${k}"> ${n}</label>`).join("");
 
+  $("f-reasonpick").innerHTML = `<option value="">Top 10 reasons: quick pick…</option>` +
+    REASONS.map(([label], i) => `<option value="${i}">${i + 1}. ${label}</option>`).join("");
   $("f-speciesid").innerHTML = SPECIES.map(([id, n, adj]) => `<option value="${id}">${n}${Object.keys(adj).length ? "" : ""}</option>`).join("") + `<option value="custom">Custom species…</option>`;
   $("species-adj").innerHTML = ATTRS.map(([n]) => `<div class="adj"><span class="label">${n}</span>
     <span class="stepper"><button type="button" data-adj="${n}" data-d="-1" aria-label="Lower ${n} adjustment">−</button>
@@ -2547,6 +2579,12 @@ tr.lvl-U td.target { color: var(--muted); }
   document.addEventListener("change", (e) => {
     const t = e.target;
     if (t.id === "f-dept") { setDept(t.value); touch(); render(); }
+    else if (t.id === "f-reasonpick" && t.value !== "") {
+      // Replace an empty box or another quick pick; add to anything the player wrote themselves.
+      const text = REASONS[+t.value][1], cur = ch.reason.trim();
+      ch.reason = !cur || REASON_TEXTS.has(cur) ? text : `${cur} ${text}`;
+      $("f-reason").value = ch.reason; t.value = ""; touch(); render();
+    }
     else if (t.id === "f-speciesid") {
       const had = ch.sadv.id && sAdvName();
       setSpecies(t.value); $("f-species").value = ch.species; touch(); render();
