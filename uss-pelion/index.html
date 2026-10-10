@@ -83,7 +83,7 @@ b, strong { font-weight: 600; }
 
 /* Main grid */
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 22px; margin-top: 22px; align-items: start; }
-@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } .side { order: -1; } }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
 .steps { display: grid; gap: 20px; min-width: 0; }
 .step { padding: 22px; display: grid; gap: 16px; min-width: 0; }
 .step-head { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
@@ -262,6 +262,57 @@ tr.lvl-U td.target { color: var(--muted); }
 .sheet-portrait { flex: none; width: 88px; height: 88px; border-radius: 50%; border: 2px solid var(--accent); }
 .sheet-portrait.portrait { width: 84px; height: 112px; border-radius: 8px; }
 
+/* ---- Phones and tablets ---- */
+.play-col { display: grid; gap: 16px; }
+.mobile-status { display: none; }
+#toc-details > summary { cursor: pointer; list-style: none; }
+#toc-details > summary::-webkit-details-marker { display: none; }
+#app[data-view="sheet"] .example-banner, #app[data-view="guide"] .example-banner { display: none !important; }
+@media (max-width: 900px) {
+  /* Duty station: condition and roller first, the full sheet after them. */
+  .sheet { display: flex; flex-direction: column; }
+  .play-col { display: contents; }
+  #card-condition { order: 1; } #card-roll { order: 2; } #sheet-main { order: 3; } #card-ref { order: 4; }
+  /* Create: readiness rides along at the bottom instead of sitting above step 1. */
+  #app[data-view="create"] .mobile-status, #app:not([data-view]) .mobile-status {
+    display: flex; position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); z-index: 20;
+    align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: rgba(8, 18, 34, .94); }
+  .mobile-status .status { font-size: .95rem; }
+  .wrap { padding-bottom: 96px; }
+  .guide-toc summary::after { content: " ▾"; }
+}
+@media (max-width: 640px) {
+  .masthead { padding: 16px; gap: 14px; }
+  .tabs { width: 100%; }
+  .tab { flex: 1; padding: 11px 4px; font-size: .74rem; letter-spacing: .06em; }
+  .step, .card { padding: 16px; }
+  /* Skills become one card per skill: name, then attribute and target, then full-width training buttons. */
+  .table-wrap.skills { overflow: visible; border: 0; background: none; }
+  .skills table, .skills tbody { display: block; min-width: 0; }
+  .skills thead { display: none; }
+  .skills tr { display: grid; grid-template-columns: 1fr auto auto; gap: 8px 12px; align-items: center; padding: 12px; margin-bottom: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--well); }
+  .skills td { display: block; padding: 0; border: 0; width: auto !important; }
+  .skills td:nth-child(1) { grid-column: 1 / -1; grid-row: 1; }
+  .skills td:nth-child(2) { grid-column: 1; grid-row: 2; color: var(--muted); }
+  .skills td.target { grid-column: 2; grid-row: 2; }
+  .skills td.pct { grid-column: 3; grid-row: 2; }
+  .skills td:nth-child(3) { grid-column: 1 / -1; grid-row: 3; }
+  .skills .seg { display: flex; width: 100%; }
+  .skills .seg label { flex: 1; text-align: center; }
+  .attr-strip { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .attr-strip .label { font-size: .58rem; letter-spacing: .06em; }
+  .attr-strip b { font-size: 1.4rem; }
+}
+/* Bigger touch targets wherever the pointer is a finger. */
+@media (pointer: coarse) {
+  .stepper button { width: 46px; height: 40px; font-size: 1.2rem; }
+  .seg span { padding: 11px 12px; }
+  .box { height: 38px; width: 70px; }
+  .checks label { min-height: 40px; }
+  .btn { padding: 11px 16px; }
+  .linkish { padding: 8px 6px; }
+}
+
 /* Players' Guide */
 .guide-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 @media (max-width: 900px) { .guide-layout { grid-template-columns: minmax(0, 1fr); } }
@@ -392,7 +443,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="step-head"><span class="step-no">3</span><h2>Choose trained skills</h2>
             <p class="muted small">One <b>Specialty</b> at attribute +3 and nine <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling.</p></div>
           <div class="tally" id="skill-tally"></div>
-          <div class="table-wrap">
+          <div class="table-wrap skills">
             <table>
               <thead><tr><th>Skill</th><th>Attribute</th><th>Training</th><th style="text-align:right">Target</th><th style="text-align:right" title="Chance on 3d6 with no modifiers">Odds</th></tr></thead>
               <tbody id="skill-rows"></tbody>
@@ -519,10 +570,13 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
   </section>
 
+  <!-- Phone-only readiness bar for the Create tab -->
+  <div class="mobile-status hud no-print" id="mobile-status"><span class="status" id="ms-text"></span><button type="button" class="btn" id="ms-go">Checklist</button></div>
+
   <!-- GUIDE -->
   <section id="view-guide" role="tabpanel" aria-labelledby="tab-guide" hidden>
     <div class="guide-layout">
-      <nav class="guide-toc hud no-print" aria-label="Guide contents"><div class="eyebrow">Contents</div><ol id="guide-toc"></ol></nav>
+      <nav class="guide-toc hud no-print" aria-label="Guide contents"><details id="toc-details" open><summary class="eyebrow">Contents</summary><ol id="guide-toc"></ol></details></nav>
       <article class="guide hud" id="guide">
         <header class="guide-title"><span class="eyebrow">U.S.S. Pelion · NCC-1750 · Campaign year 2268</span><h2 class="h1">USS Pelion Players' Guide</h2>
           <span class="muted">Revised edition with species, species advantages, and General Services</span></header>
@@ -1731,8 +1785,8 @@ tr.lvl-U td.target { color: var(--muted); }
           <span>☐ Wounded (−1 physical) &nbsp; ☐ Seriously wounded (−2 physical) &nbsp; ☐ Incapacitated</span></div>
         <div class="field"><span class="label">Duty points (start each session with 2)</span><span>☐ ☐ ☐ ☐ ☐</span></div>
       </div>
-      <div style="display:grid;gap:16px">
-        <div class="card hud no-print">
+      <div class="play-col">
+        <div class="card hud no-print" id="card-condition">
           <h3>Condition</h3>
           <div class="field"><span class="label">Injury track</span>
             <div class="boxes" id="boxes"></div>
@@ -1749,7 +1803,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label></div>
         </div>
 
-        <div class="card hud no-print">
+        <div class="card hud no-print" id="card-roll">
           <h3>Roll 3d6</h3>
           <div class="fields">
             <div class="field wide"><label for="r-skill">Skill or attribute</label><select id="r-skill"></select></div>
@@ -1779,7 +1833,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="field"><span class="label">Roll log</span><ul class="log" id="r-log"></ul></div>
         </div>
 
-        <div class="card hud">
+        <div class="card hud" id="card-ref">
           <h3>Quick reference</h3>
           <dl class="ref">
             <dt>Resolution</dt><dd>3d6 at or below adjusted skill. Natural 3–4 always succeeds; 17–18 always fails. Margin = target − roll.</dd>
@@ -2285,6 +2339,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const list = checks(), ready = list.every((c) => c[0]);
     $("ready-status").className = "status " + (ready ? "ok" : "no");
     $("ready-status").textContent = ready ? "Cleared for duty" : `${list.filter((c) => !c[0]).length} items outstanding`;
+    $("ms-text").textContent = $("ready-status").textContent;
+    $("ms-text").className = $("ready-status").className;
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
     $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${LEVELS[ch.skills.Athletics].name} Athletics)`;
@@ -2588,6 +2644,11 @@ tr.lvl-U td.target { color: var(--muted); }
   $("tab-create").onclick = () => selectTab("create");
   $("tab-sheet").onclick = () => selectTab("sheet");
   $("tab-guide").onclick = () => selectTab("guide");
+  $("ms-go").onclick = () => $("checklist").scrollIntoView({ behavior: "smooth", block: "center" });
+  // On narrow screens the guide's contents list starts folded and folds again after a jump.
+  const narrow = window.matchMedia && matchMedia("(max-width: 900px)");
+  if (narrow && narrow.matches) $("toc-details").open = false;
+  $("guide-toc").addEventListener("click", (e) => { if (e.target.closest("a") && narrow && narrow.matches) $("toc-details").open = false; });
   // Guide contents: one entry per chapter heading.
   $("guide").id = "guide";
   $("guide-toc").innerHTML = `<li><a href="#guide">Introduction</a></li>` +
