@@ -2072,9 +2072,13 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Badge: Deputy U.S. Marshal</td>
 <td>Federal authority across states and territories: serving federal warrants, pursuing fugitives across county and state lines, swearing in deputies, and calling on local lawmen for help. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.</td>
 </tr>
+<tr class="even">
+<td>Pinkerton Credentials</td>
+<td>A commission from the Pinkerton National Detective Agency: carry arms on the job, work a client’s case across county and state lines, and draw on the agency’s offices and files (records, photographs and descriptions of wanted men). +2 to Investigation when using the agency’s records or contacts. You have no powers of arrest beyond any citizen’s unless local law deputizes you, and you answer to the client and the agency.</td>
+</tr>
 </tbody>
 </table>
-<p><strong>Badges.</strong> A badge is legal authority, not a magic word: Wesen, outlaws and the powers of the hidden world don’t care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge.</p>
+<p><strong>Badges.</strong> A badge is legal authority, not a magic word: Wesen, outlaws and the powers of the hidden world don’t care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency’s reach and files, but no badge.</p>
 <!-- HERITAGES:START -->
 <h1 id="g-heritages">Heritages</h1>
 <p>Each heritage has a <strong>tier</strong>. A character has 3 points to split between heritage power and Edges: the higher the tier, the fewer Edges (see Step 2). Adjustments always total zero. Heritages marked <em>horror</em> are only available when the whole table has agreed to a horror-tinged campaign.</p>
@@ -3317,7 +3321,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const ROLE_SUGGESTIONS = {
     Marshal: "Marshal: carries what authority there is (take a Badge advantage), with Leadership and a steady gun.",
     Deputy: "Deputy: keeps order, guards prisoners, and backs up the marshal when it comes to shooting.",
-    Detective: "Detective: investigates crimes for the Pinkertons or a private client, and follows the paper trail nobody else reads.",
+    Detective: "Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads.",
     "Bounty Hunter": "Bounty hunter: tracks and brings in wanted men, and the things that only look like men.",
     Doctor: "Doctor: patches up the wounded and reads what a body says about what killed it.",
     Apothecary: "Apothecary: brews remedies, antidotes and stranger things, and knows which ingredients come from where.",
@@ -3495,6 +3499,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["badge-local", "Badge: Town Police or Deputy", "Legal authority in one town or county: you can carry arms where others can't, question witnesses, make arrests and hold suspects. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. Outside your jurisdiction it's just tin.", "Leadership"],
     ["badge-sheriff", "Badge: Sheriff", "Authority across your county: everything a deputy can do, plus serving warrants, running the jail, and swearing in deputies and armed citizens. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.", "Leadership"],
     ["badge-marshal", "Badge: Deputy U.S. Marshal", "Federal authority across states and territories: serving federal warrants, pursuing fugitives across county and state lines, swearing in deputies, and calling on local lawmen for help. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.", "Leadership"],
+    ["pinkerton", "Pinkerton Credentials", "A commission from the Pinkerton National Detective Agency: carry arms on the job, work a client's case across county and state lines, and draw on the agency's offices and files (records, photographs and descriptions of wanted men). +2 to Investigation when using the agency's records or contacts. You have no powers of arrest beyond any citizen's unless local law deputizes you, and you answer to the client and the agency.", "Investigation"],
   ];
   const COMPLICATIONS = [
     ["mystery", "Cannot Leave a Mystery Alone", "A strange discovery tempts you to linger, spend something scarce, or take a risky look. Accept a specific cost."],
