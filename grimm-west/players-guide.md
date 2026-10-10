@@ -21,7 +21,7 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 The **seven Royal Families** are ancient, wealthy and influential. They no longer rule whole countries, but they still manipulate events through their public cousins, field loyal Wesen armies, and seek control over all Wesen and over ordinary humanity too.
 
-**Incantare** is the catch-all name for anyone who works real magic. Most magic is ritual, in many styles and beliefs, and each practitioner sees it through a **Lens**. The Wesen Council and the Royal Families both consider Incantare extremely dangerous, and Grimms are often tasked with watching or destroying them. **The blood of a Grimm is a powerful anti-magic agent:** injected or drunk, it neutralizes the powers of any human or Wesen magic user, and it kills the Wesen spirit within a Hexenbiest or Zauberbiest.
+**Incantare** is the catch-all name for anyone who works real magic. Most magic is ritual, in many styles and beliefs, and each practitioner sees it through a **Lens**. The Wesen Council and the Royal Families both consider Incantare extremely dangerous, and Grimms are often tasked with watching or destroying them. **The blood of a Grimm is a powerful anti-magic agent.** A Hexenbiest or Zauberbiest who drinks it under a full moon loses their powers, and a Chymiater can brew it into a draught that strips anyone's magical gifts for days (see Grimm blood).
 
 Three orders matter on the frontier:
 
@@ -63,7 +63,7 @@ Choose how your character trained (see Step 3):
 - **Well-rounded:** one Specialty at +3 and nine Trained skills.
 - **Old hand:** one Expert skill at +5 and seven Trained skills. Old hands have spent a lifetime at one thing.
 
-## Step 2: Choose a heritage and assign attributes
+## Step 2: Choose a heritage, spend Edges, assign attributes
 
 ### Attributes
 
@@ -75,70 +75,45 @@ Choose how your character trained (see Step 3):
 | Presence | Leadership, persuasion, social influence |
 | Will | Resolve, concentration, resisting fear and magic |
 
-### Heritage adjustments
+### Heritage and tier
 
-Every attribute starts at 10. Your heritage then adjusts some of them; the result is your **heritage base**. Each heritage's adjustments total zero, so no heritage starts ahead of another.
+Choose a heritage from the **Heritages** chapter: Human, Grimm, Incantare, or one of the Wesen kinds. Every attribute starts at 10, and your heritage adjusts some of them; the result is your **heritage base**. Adjustments always total zero.
 
-| Heritage | Adjustments |
-|---|---|
-| Human | None |
-| Grimm | Body +1, Agility +1, Presence −2 |
-| Incantare | Intellect +1, Will +1, Body −1, Presence −1 |
-| Blutbad | Body +1, Agility +1, Intellect −1, Will −1 |
-| Fuchsbau | Intellect +1, Presence +1, Body −1, Will −1 |
-| Eisbiber | Intellect +1, Will −1 |
-| Hexenbiest or Zauberbiest | Will +1, Presence +1, Body −1, Agility −1 |
-| Jägerbar | Body +2, Agility −1, Intellect −1 |
-| Bauerschwein | Body +1, Will +1, Agility −1, Presence −1 |
-| Mauzhertz | Agility +1, Body −1 |
-| Ziegevolk | Presence +2, Intellect −1, Will −1 |
-| Steinadler | Agility +1, Intellect +1, Body −1, Will −1 |
-| Coyotl | Agility +1, Presence +1, Intellect −1, Will −1 |
+Heritages differ in power, so each has a **tier** from 0 to 3. Every character has **3 points** to split between heritage power and **Edges**: Tier 0 (Human) leaves 3 Edges, Tier 1 leaves 2, Tier 2 leaves 1, and Tier 3 leaves none. Edges are useful in every scene; a Wesen's power mostly shows while woged, and that risks Exposure.
+
+**Horror heritages.** Naschazer, Taniwha and Vallachi must feed on human flesh or lifeforce. They're available only when the whole table has agreed to a horror-tinged campaign.
+
+### Edges
+
+Spend all your Edges. Each one buys:
+
+| Edge | What you get | Limit |
+|---|---|---|
+| +1 attribute point | One more point to spend in the next step, within the normal maximum | 2 |
+| Extra Trained skill | One more Trained skill in Step 3 | 3 |
+| Second advantage | A second general advantage, with no extra complication | 1 |
+| True grit | Start every session with 3 Grit instead of 2 | 1 |
+| A friend in town | A named contact who helps once per case | 1 |
+| A fine weapon or tool | An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one named skill when it's used | 1 |
 
 ### Spending points
 
-After applying your heritage, distribute **five additional points** among the attributes.
+After applying your heritage, distribute **five additional points** among the attributes, plus one for each attribute Edge.
 
-- The starting maximum is **13**, plus any heritage bonus to that attribute. A Jägerbar can start with Body 15.
+- The starting maximum is **13**, plus any heritage bonus to that attribute. A Jägerbär can start with Body 15.
 - You cannot lower an attribute below its heritage base to gain points.
-
-### Heritage descriptions
-
-**Human.** Most of the frontier, and most of the posse. You know the truth about the hidden world, which already sets you apart.
-
-**Grimm.** A descendant of the old hunters, stronger and faster than ordinary people. You see through a Wesen's human face whenever it is stirred by strong emotion. Wesen who recognize you are afraid of you, and with reason.
-
-**Incantare.** A human who works real magic through a Lens: a tradition, a belief, a way of seeing. Choose your Lens as your heritage advantage. The Council, the Royals and the Order of the Holy Knife all watch for people like you.
-
-**Blutbad.** Wolf-like Wesen with keen senses and a predator's appetite. Some live clean, abstaining from the hunt, and others never try.
-
-**Fuchsbau.** Fox-like Wesen, clever and charming, with a long tradition of trade in herbs, remedies and harder-to-find ingredients.
-
-**Eisbiber.** Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, and easily frightened by violence.
-
-**Hexenbiest or Zauberbiest.** Witch-like Wesen (Zauberbiest for the men) with innate magic. Their power lives in their Wesen spirit, which Grimm blood can kill.
-
-**Jägerbar.** Bear-like Wesen, enormously strong, with old hunting rites that their families still keep.
-
-**Bauerschwein.** Pig-like Wesen: stubborn, hard-working, and old enemies of the Blutbaden.
-
-**Mauzhertz.** Mouse-like Wesen, small, quick and wary, with excellent hearing.
-
-**Ziegevolk.** Goat-like Wesen whose pheromones make them unnaturally persuasive, and unnaturally popular.
-
-**Steinadler.** Eagle-like Wesen with remarkable eyesight and a hunter's pride.
-
-**Coyotl.** Coyote-like Wesen of the desert country who live in clans bound by old customs.
 
 ### Custom heritage
 
-Agree on a heritage with the GM and give it adjustments from −2 to +2 per attribute that total zero. The normal starting maximum and heritage base rules apply.
+Agree on a heritage with the GM, give it adjustments from −2 to +2 per attribute that total zero, and agree its tier. The normal starting maximum and heritage base rules apply.
 
 ## Step 3: Choose trained skills
 
 A **Well-rounded** character chooses ten different skills: one **Specialty** at its governing attribute +3 and nine **Trained** skills at attribute +1. An **Old hand** chooses **one Expert skill at +5** and **seven Trained skills at +1**. All other skills are **Untrained** at attribute −4 when an attempt is plausible. Each skill has its own final target number; do not add the attribute again when rolling.
 
 The Expert's extra bonus matters most when the work is hard. With Intellect 13, an Expert gambler has a target of 18, which only natural 17–18 can fail; under a −4 "very difficult" penalty the target is still 14. If Athletics is the Expert skill, Dodge adds +2, the same as a Specialty.
+
+Each Extra Trained skill Edge adds one more Trained skill. A **Grimm's** Wesen Lore is always at least Trained and doesn't use one of the Trained picks.
 
 **Broadening.** An Old hand can broaden later (the GM's call, usually after a significant case): the Expert skill becomes a Specialty at +3, and two more skills become Trained.
 
@@ -161,12 +136,25 @@ Choose your name, title if any, and a short reason you ride with the posse. Then
 
 - **Advantage.** Choose either a general advantage or one of your heritage advantages. A heritage advantage replaces the general advantage and always brings its companion complication. An Incantare's heritage advantage is their **Lens**.
 - **Complication.** Choose one complication. You keep it even if you take a heritage advantage, so a character with a heritage advantage has two complications.
+- **Allegiance (optional).** Choose an allegiance below, or none.
 
 An advantage gives +2 to one narrowly defined kind of task when the GM agrees it applies. It cannot improve every use of a broad skill. A complication creates choices and problems; it is not a permanent penalty.
 
+### Allegiance
+
+Anyone can owe allegiance to one of the powers of the hidden world. It's a benefit paired with a burden; the burden works like a complication and earns Grit when it causes you a real problem.
+
+| Allegiance | Benefit | Burden |
+|---|---|---|
+| The Church | Once per case, shelter, records or a favor from the clergy | Duty: the Church gives you orders. Sicarii discipline ties you to the Order of the Holy Knife. |
+| A Royal Family | Once per case, money, papers or a door opened | Duty: an involuntary call to serve, and the family's rivals hunt you |
+| A secret society | Once per case, lore, a meeting place or a fellow initiate (the Golden Dawn, the Brotherhood of the Holy Earth) | Duty and Vow: keep its secrets and follow its traditions |
+| The Wesen Council | Contacts in the local Wesen community | Duty: the Council calls on you, and others know you're its operative |
+| A Grimm family | Access to the family books and kin | Duty to the family name, and to fight its enemies |
+
 ## Step 5: Prepare to ride
 
-Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points and your gear. Describe one connection to another member of the posse.
+Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points (three with True grit) and your gear. Name your friend in town or your fine weapon or tool, if you took those Edges. Describe one connection to another member of the posse.
 
 ### Top 10 connections to another rider
 
@@ -183,12 +171,13 @@ Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained,
 
 ## Example detective
 
-Human. Body 10, Agility 10, Intellect 13, Presence 11, Will 11.
+Human (Tier 0, 3 Edges: +1 attribute point, Extra Trained skill, A friend in town). Body 10, Agility 11, Intellect 13, Presence 11, Will 11.
 
 - **Specialty:** Investigation 16.
-- **Trained:** Read People 14, Wesen Lore 14, Tracking 14, Survival 14, Gambling 14, Persuasion 12, Deception 12, Shooting 11, Riding 11.
-- **Dodge:** Athletics is Untrained, so Dodge is 8.
+- **Trained:** Read People 14, Wesen Lore 14, Tracking 14, Survival 14, Gambling 14, Occult 14, Persuasion 12, Deception 12, Shooting 12, Riding 12.
+- **Dodge:** Athletics is Untrained, so Dodge is 9.
 - **Advantage:** Astute Observer. **Complication:** Cannot Leave a Mystery Alone.
+- **Friend in town:** a clerk in the Pinkertons' Portland office who'll pull a file, quietly.
 
 # Skills and gear
 
@@ -295,23 +284,43 @@ Run a chase as a progress clock for the pursuers against a danger clock for the 
 
 ## Wesen and the woge
 
-A Wesen character can **woge** at will, as a free action, and return just as easily. Physical heritage advantages, such as claws or a Blutbad's fighting form, work only in **full woge**.
+Every Wesen heritage follows the **core Wesen rules** and has a **woge profile** (both in the Heritages chapter). In short:
 
-**Losing control.** Fury, terror or pain can force a woge. When it matters, the GM calls for a **Will** roll; on a failure you woge, briefly or fully as the GM decides.
-
-**Who sees it.** A full woge is visible to anyone. A **Grimm** sees a flash of the Wesen face whenever a Wesen is stirred by strong emotion, even when the Wesen means to hide it. A Wesen who looks into the eyes of a Grimm in that moment knows the Grimm for what they are.
-
-**Exposure.** A full woge in front of ordinary people breaks the Code of Swabia. Mark a box of **Exposure** on the Trouble tracks.
+- **Woging** is a free action, in or out. Physical heritage advantages and the woge profile work only in **full woge**.
+- **Losing control.** When an enemy appears, you're frightened or you're attacked, the GM can call for a **Will** roll; on a failure you woge.
+- **Your profile.** While woged, the profile's attribute bonuses apply to rolls on those attributes and the skills based on them, even above the starting maximum; its other traits and drawbacks apply too. The creator's **In full woge** box adds them for you.
+- **Who sees it.** A full woge is visible to anyone. A **Grimm** sees a flash of the Wesen face whenever a Wesen is stirred by strong emotion. A Wesen who looks into the eyes of a Grimm in that moment knows the Grimm for what they are.
+- **Exposure.** A full woge in front of ordinary people breaks the Code of Swabia: mark a box of **Exposure** (two for a Tier 3 heritage).
 
 ## Grimms
 
-A Grimm sees woge as described above, and is stronger and faster than ordinary people; the Grimm heritage adjustments reflect that. Grimms enforce the Code, and Wesen know it, so many flee, lie or fight on recognizing one. A Grimm's blood neutralizes magic: drunk or injected, it strips an Incantare or Wesen magic user of their power, and it kills the Wesen spirit in a Hexenbiest or Zauberbiest. Who gets that blood, and how, is always a serious matter.
+A Grimm's core gifts come with the heritage: the Sight, Grimm eyes, an uneasy sense of nearby Wesen and magic, never freezing (+2 to Will against fear), resisting magic (+2 to Will against it), and Wesen Lore at least Trained for free. Each Grimm also chooses one **Grimm gift** as their heritage advantage. Grimms enforce the Code, and Wesen know it, so many flee, lie or fight on recognizing one.
 
-## Incantare and their Lenses
+### Grimm blood
 
-An Incantare's **Lens** is their heritage advantage: an ability, not a +2. To work magic, describe the effect, then roll **Occult** (or the skill the Lens names). The GM sets what the magic can do, how long it takes and what it needs **before** the roll. Most magic is ritual: it needs minutes or hours, components, and a place to work. Quick magic in a fight is the exception, not the rule.
+- **Against a Hexenbiest or Zauberbiest.** A Hexenbiest or Zauberbiest who drinks a Grimm's blood under a full moon loses their powers. It happens whether the Grimm intends it or not, and it lasts until the *Contaminatio Ritualis* restores them.
+- **The Chymiater's draught.** A Chymiater (alchemist) Incantare can brew a Grimm's fresh blood into a draught in a major ritual (6 segments). Injected or drunk, it neutralizes the target's magical gifts for **1d6 days**: an Incantare's Lens, a Hexenbiest's telekinesis and spells, or a Wesen's magical signature power. It does not stop a woge.
+- **A dangerous commodity.** Everyone in the hidden world knows what Grimm blood can do. Who gets it, and how, is always a serious matter.
 
-Magic draws attention. Using it openly can mark a box of **Exposure**, and the Order of the Holy Knife hunts known Incantare. Grimm blood neutralizes any Incantare's magic.
+## Incantare and rituals
+
+An Incantare's **Lens** is their heritage advantage. The Lens decides *how* magic is worked: how long it takes, what it needs, what it costs and what it's best at. Any Lens can attempt any effect.
+
+**Working a ritual.**
+
+1. **Describe the effect.** The GM sets its weight: **minor** (2 segments), **significant** (4) or **major** (6), and says what it can and can't do before you start.
+2. **Gather the energy.** Fill a progress clock of that size with **Occult** rolls. Each roll takes your Lens's casting time (usually ten minutes; an hour for a Magi, one action for a Veneficare). Success fills one segment; success by 5 or more fills two. A failure costs time or ticks a danger clock.
+3. **The effect happens** when the clock is full. A ritual interrupted with energy gathered may go wrong.
+
+**Trappings.** The right materials and correspondences (stones, herbs, stars, places) remove one segment from the clock.
+
+**Charms.** A finished ritual can be stored in an object and released by breaking it: a bottle thrown, a pendant snapped, a bullet-charm fired. You can carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4.
+
+**Elixirs and potions** spoil. They stay good until the end of the day, or a week on a success by 5 or more.
+
+**Magic draws attention.** Using it openly can mark a box of **Exposure**, the Order of the Holy Knife hunts known Incantare, and a Grimm gets +1 to sense your magic for each charm or potion you carry.
+
+**Hexenbiests and Zauberbiests** work rituals the same way, through their innate magic, in their own style (curses, potions and sendings).
 
 ## The Code of Swabia
 
@@ -422,7 +431,7 @@ Each **two full days of rest** clear one injury box. Rest means no riding, no fi
 
 ## Using Grit points
 
-Begin each session with two Grit points; unused points do not carry over. Spend no more than one point on a single roll or injury event.
+Begin each session with two Grit points (three with True grit); unused points do not carry over. Spend no more than one point on a single roll or injury event.
 
 | Spend one point to | Timing and limits |
 |---|---|
@@ -496,60 +505,60 @@ End each case with a short journal entry, written together, as the Grimms have a
 
 # Ready-made posse
 
-Six riders ready to play. Each follows the creation rules exactly, and their connections tie them together.
+Six riders ready to play. Each follows the creation rules exactly, Edges included, and their connections tie them together.
 
 ## Eliza Kessler
 
-*Deputy U.S. Marshal, Marshal. Grimm.* Leads the posse and carries the badge: the law, and the Code, in one person.
+*Deputy U.S. Marshal, Marshal. Grimm (Tier 2).* Leads the posse and carries the badge: the law, and the Code, in one person.
 
 - **Attributes:** Body 12, Agility 13, Intellect 10, Presence 8, Will 12. **Dodge** 12.
-- **Skills:** Shooting 16 (Specialty). Trained: Riding 14, Melee 14, Brawling 14, Athletics 13, Investigation 11, Wesen Lore 11, Tracking 11, Read People 11, Leadership 9.
-- **Advantage:** Keeper of the Books (heritage; companion: The Books Must Be Kept). **Complication:** Law and Order; trigger: a Wesen suspect could be killed instead of arrested.
+- **Skills:** Shooting 16 (Specialty). Trained: Riding 14, Melee 14, Brawling 14, Athletics 13, Investigation 11, Tracking 11, Read People 11, Survival 11, Leadership 9; Wesen Lore 11 (free).
+- **Edge:** True grit. **Grimm gift:** Keeper of the Books (companion: The Books Must Be Kept). **Complication:** Law and Order; trigger: a Wesen suspect could be killed instead of arrested.
 - **Why I ride:** The Grimm blood woke in me, and it came with a duty. **Connection:** Gus Brandt cut her down from a lynch mob's rope before anyone knew what she was.
 
 ## Gus Brandt
 
-*Blacksmith and gunsmith, Tinker. Blutbad.* Shoes the horses, fixes the guns, and hasn't hunted in eleven years.
+*Blacksmith and gunsmith, Tinker. Blutbad (Tier 2).* Shoes the horses, fixes the guns, and hasn't hunted in eleven years.
 
-- **Attributes:** Body 11, Agility 11, Intellect 13, Presence 10, Will 10. **Dodge** 10.
+- **Attributes:** Body 11, Agility 11, Intellect 13, Presence 10, Will 10. **Dodge** 10. **In woge:** Body 13, Agility 12; claws and fangs mark 2 boxes.
 - **Skills:** Tinkering 16 (Specialty). Trained: Tracking 14, Wesen Lore 14, Investigation 14, Survival 14, Read People 14, Brawling 12, Melee 12, Athletics 12, Persuasion 11.
-- **Advantage:** Blutbad Nose (heritage; companion: The Bloodlust). **Complication:** Keeps a Dangerous Secret; trigger: someone from his old pack turns up.
+- **Edge:** A fine tool: a master gunsmith's tools (+2 Tinkering). **Advantage:** Blutbad Nose (companion: The Bloodlust). **Complication:** Keeps a Dangerous Secret; trigger: someone from his old pack turns up.
 - **Why I ride:** I did harm once. I mean to balance the ledger. **Connection:** Owes Roz Vey for the remedies that keep the urge quiet.
 
 ## Roz Vey
 
-*Owner of the spice and tea shop, Apothecary. Fuchsbau.* Sells tea out front, and other things in the back.
+*Spice and tea merchant, Apothecary. Fuchsbau (Tier 1).* Sells tea out front, and other things in the back.
 
 - **Attributes:** Body 9, Agility 11, Intellect 13, Presence 12, Will 10. **Dodge** 9.
-- **Skills:** Apothecary 16 (Specialty). Trained: Medicine 14, Wesen Lore 14, Read People 14, Investigation 14, Gambling 14, Survival 14, Persuasion 13, Deception 13, Stealth 12.
-- **Advantage:** Fuchsbau Remedies (heritage; companion: Criminal Kin). **Complication:** Protects Others at Personal Risk; trigger: a sick or hurt stranger turns up at the shop.
+- **Skills:** Apothecary 16 (Specialty). Trained: Medicine 14, Wesen Lore 14, Read People 14, Investigation 14, Gambling 14, Survival 14, Occult 14, Persuasion 13, Deception 13, Stealth 12.
+- **Edges:** Extra Trained skill; a friend in town: her cousin Ambrose, a Fuchsbau smuggler on the Portland docks who can find any ingredient, for a price. **Advantage:** Fuchsbau Remedies (companion: Criminal Kin). **Complication:** Protects Others at Personal Risk; trigger: a sick or hurt stranger turns up at the shop.
 - **Why I ride:** Wesen and humans can live side by side, and I mean to prove it. **Connection:** Trades notes with Dr. Whitlock, who still won't admit some of her remedies work better than his.
 
 ## Dr. Thaddeus Whitlock
 
-*Town physician, Doctor. Human.* Army surgeon in the war; now he digs bullets out of the posse and asks too many questions about what made the other wounds.
+*Town physician, Doctor. Human (Tier 0).* Army surgeon in the war; now he digs bullets out of the posse and asks too many questions about what made the other wounds.
 
-- **Attributes:** Body 10, Agility 10, Intellect 13, Presence 11, Will 11. **Dodge** 8.
-- **Skills:** Medicine 16 (Specialty). Trained: Apothecary 14, Read People 14, Investigation 14, Wesen Lore 14, Occult 14, Persuasion 12, Leadership 12, Riding 11, Shooting 11.
-- **Advantage:** Steady Hands. **Complication:** Haunted by the War; trigger: gunfire in the dark.
+- **Attributes:** Body 10, Agility 10, Intellect 13, Presence 12, Will 11. **Dodge** 8.
+- **Skills:** Medicine 16 (Specialty). Trained: Apothecary 14, Read People 14, Investigation 14, Wesen Lore 14, Occult 14, Persuasion 13, Leadership 13, Riding 11, Shooting 11.
+- **Edges:** +1 attribute point; second advantage: Battlefield Surgeon; a fine tool: his army surgeon's instruments (+2 Medicine). **Advantage:** Steady Hands. **Complication:** Haunted by the War; trigger: gunfire in the dark.
 - **Why I ride:** I saw what I saw, and no one else believes me. **Connection:** Rode with Silas Thorne's regiment in the war and has never trusted him since.
 
 ## Cora Ridgeway
 
-*Scout and sharpshooter, Scout. Coyotl.* Knows the desert and the high country, and keeps her clan's ways close.
+*Scout and sharpshooter, Scout. Coyotl (Tier 1).* Knows the plains and the high country, and keeps her clan's ways close.
 
-- **Attributes:** Body 10, Agility 14, Intellect 10, Presence 11, Will 10. **Dodge** 13.
-- **Skills:** Shooting 17 (Specialty). Trained: Riding 15, Stealth 15, Brawling 15, Melee 15, Persuasion 12, Tracking 11, Survival 11, Read People 11, Athletics 11.
-- **Advantage:** Desert Wanderer (heritage; companion: Clan Law). **Complication:** Sworn Vengeance; trigger: word of the men who burned her clan's camp.
+- **Attributes:** Body 11, Agility 14, Intellect 10, Presence 11, Will 9. **Dodge** 13. **In woge:** Body 12, Agility 15, Dodge 15; claws mark 2 boxes.
+- **Skills:** Shooting 17 (Specialty). Trained: Riding 15, Stealth 15, Brawling 15, Melee 15, Persuasion 12, Athletics 12, Tracking 11, Survival 11, Read People 11, Gambling 11.
+- **Edges:** Extra Trained skill; True grit. **Advantage:** Plains Wanderer (companion: Restless). **Complication:** Sworn Vengeance; trigger: word of the men who burned her clan's camp.
 - **Why I ride:** Something that wore a human face killed someone I loved. **Connection:** Eliza Kessler taught her what she knows about the hidden world.
 
 ## Silas Thorne
 
-*Professional gambler, Gambler. Ziegevolk; Old hand.* Charming, well-dressed, and in debt to the wrong people in San Francisco.
+*Professional gambler, Gambler. Ziegevolk (Tier 1); Old hand.* Charming, well-dressed, and in debt to the wrong people in San Francisco.
 
 - **Attributes:** Body 10, Agility 10, Intellect 13, Presence 13, Will 9. **Dodge** 8.
 - **Skills:** Gambling 18 (Expert). Trained: Deception 14, Persuasion 14, Read People 14, Investigation 14, Shooting 11, Stealth 11, Riding 11.
-- **Advantage:** Ziegevolk Pheromones (heritage; companion: Pheromone Suspicion). **Complication:** Owes the Wrong People; trigger: a collector from San Francisco arrives.
+- **Edges:** Second advantage: Poker Face; a friend in town: Mae Lin, a faro dealer in San Francisco who hears everything said at her table. **Advantage:** Ziegevolk Pheromones (companion: Pheromone Suspicion). **Complication:** Owes the Wrong People; trigger: a collector from San Francisco arrives.
 - **Why I ride:** The pay's good, and nobody else will take these jobs. **Connection:** Plays cards with Cora every Saturday; she's the only one who can tell when he's bluffing.
 
 # Threats
@@ -563,7 +572,7 @@ Opponents use the same rules as the posse. **Minor opponents** (hired guns, a mo
 | Blutbad in full woge | Brawling 13, Tracking 14 | 9 | 3 | Claws and fangs (2) | **Relentless.** Ignores the Wounded penalty. |
 | Siegbarste | Brawling 14 | 6 | 4 | Fists (2), clubs | **Iron bones.** Bullets and blades mark 1 box at most; a Siegbarste's weakness must be learned. |
 | Mauvais Dentes | Brawling 15, Stealth 13 | 10 | 4 | Sabre teeth (2) | **Royal hound.** Hunts one named target and doesn't stop. |
-| Hexenbiest | Occult 14, Deception 13 | 8 | 3 | Spells, knives | **Telekinesis.** Once per round, throws a person (1 box) instead of attacking. Grimm blood ends her power. |
+| Hexenbiest | Occult 14, Deception 13 | 8 | 3 | Spells, knives | **Telekinesis.** Once per round, throws a person (1 box) instead of attacking. Grimm blood drunk under a full moon ends her power. |
 | Wendigo | Brawling 13, Stealth 14 | 9 | 3 | Claws (2) | **Larder.** Drags victims away alive; a Survival roll finds the cache. |
 | Hundjäger (Royal enforcer) | Melee 13, Tracking 14 | 9 | 3 | Blade (2), crossbow | **Pack.** Comes in threes; +1 to attack a target an ally hit this round. |
 | Order of the Holy Knife assassin | Melee 14, Stealth 14 | 10 | 3 | Consecrated knife (1) | **Ambush.** +2 on the first attack from hiding; poisons blades (Body roll or 1 more box). |
@@ -594,105 +603,458 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Knife Fighter | +2 to Melee with a knife in close quarters. |
 | Hellfire Preacher | +2 to Persuasion when calming or rousing a crowd. |
 
-# Heritage advantages
+<!-- HERITAGES:START -->
+# Heritages
 
-A heritage advantage **replaces** your general advantage and comes with a **companion complication**, which earns Grit like any other. You keep your regular complication as well. Most give +2 in one narrow situation; a few are abilities (marked as such) that name the roll and give no +2. Wesen physical advantages work only in full woge.
+Each heritage has a **tier**. A character has 3 points to split between heritage power and Edges: the higher the tier, the fewer Edges (see Step 2). Adjustments always total zero. Heritages marked *horror* are only available when the whole table has agreed to a horror-tinged campaign.
+
+| Heritage | Tier | Edges | Adjustments |
+|---|---|---|---|
+| Human | 0 | 3 | None |
+| Bauerschwein | 1 | 2 | Body +1, Agility −1, Presence −1, Will +1 |
+| Coyotl | 1 | 2 | Body +1, Agility +1, Intellect −1, Will −1 |
+| Eisbiber | 1 | 2 | Intellect +1, Will −1 |
+| Fuchsbau | 1 | 2 | Body −1, Intellect +2, Will −1 |
+| Mauzhertz | 1 | 2 | Body −1, Agility +1 |
+| Steinadler | 1 | 2 | Body −1, Agility +1, Intellect +1, Will −1 |
+| Taniwha (horror) | 1 | 2 | Body +1, Presence −1 |
+| Ziegevolk | 1 | 2 | Intellect −1, Presence +2, Will −1 |
+| Blutbad | 2 | 1 | Body +1, Agility +1, Intellect −1, Will −1 |
+| Grimm | 2 | 1 | Body +1, Agility +1, Presence −2 |
+| Incantare | 2 | 1 | Body −1, Intellect +1, Presence −1, Will +1 |
+| Jägerbär | 2 | 1 | Body +2, Agility −1, Intellect −1 |
+| Mauvais Dentes | 2 | 1 | Body +1, Agility +1, Intellect −1, Presence −1 |
+| Naschazer (horror) | 2 | 1 | Body +2, Intellect −1, Presence −1 |
+| Skalengeck | 2 | 1 | Agility +1, Presence −1 |
+| Vallachi (horror) | 2 | 1 | Body +1, Agility −1, Presence +1, Will −1 |
+| Fuchsteufelwild | 3 | 0 | Body +1, Intellect +2, Presence −2, Will −1 |
+| Hexenbiest or Zauberbiest | 3 | 0 | Body −1, Agility −1, Presence +1, Will +1 |
+| Murcielago | 3 | 0 | None |
+
+## Core Wesen rules
+
+Every Wesen heritage has these, on top of its own entry below. They come from the traits all the Wesen templates share.
+
+| Rule | What it means |
+|---|---|
+| Hidden face | Humans see your Wesen face only when you choose a full woge. |
+| Wesen sight | You see other Wesen when they woge, and you see a Grimm's eyes. |
+| Woge | A free action, in or out. Anger, frustration or fright can force one: when an enemy appears, you're frightened or you're attacked, the GM can call for a Will roll; on a failure you woge. |
+| Monstrous while woged | Ordinary people panic or attack; Persuasion with them is impossible. A full woge seen by townsfolk marks Exposure (2 boxes for a Tier 3 heritage). |
+| Animals bolt | −2 to Riding while woged; a horse won't carry a woged rider. |
+| The Code | Your secret is deadly. Wesen who expose themselves answer to the Council, and to Grimms. |
+
+**Woge profiles.** While you're in full woge, your profile's attribute bonuses apply to rolls using those attributes (including the skills based on them), even above the starting maximum. Its other traits and drawbacks apply too. "Tough" means each hit that marks 2 or more boxes marks one fewer, never below 1.
 
 ## Human
+
+*Tier 0 · 3 Edges · None*
+
+Most of the frontier, and most of the posse. You know the truth about the hidden world, which already sets you apart.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
 | Frontier Grit | +2 to Will against fear when facing something that shouldn't exist. | **Nobody Believes You.** When you tell ordinary folk what you've seen, accept being called mad, drunk or a liar. |
 | Gut Instinct | +2 to Read People when judging, face to face, whether someone is lying. | **Acts on Hunches.** You act on an unproven feeling. Accept the consequence when it costs time, trust or position. |
 
-## Grimm
+*Source: No template*
+
+## Bauerschwein
+
+*Tier 1 (Minor) · 2 Edges · Body +1, Agility −1, Presence −1, Will +1*
+
+Pig-like Wesen: stubborn, hard-working, with senses sharp even in human form, and old enemies of the Blutbaden. Their feud is settled, when it must be, by the Ehrenkampf, a ritual duel.
+
+**Heritage rules:**
+
+- Sharp senses even unwoged: you can identify people and things by smell in either form.
+
+**Woge profile:** Body +1; Tusks: a gore marks 1 box.
+
+**Suggested skills:** Athletics, Brawling, Investigation, Survival.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Keeper of the Books | +2 to Wesen Lore when you can consult your family's books. | **The Books Must Be Kept.** The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them. |
-| Decapitare | +2 to Melee against a Wesen in full woge. | **Reapers.** Wesen who hunt Grimms know your family name. Accept the danger when they find you. |
-| Grimm's Gaze | +2 to Presence rolls to intimidate a Wesen who has recognized you. | **Wesen Know Your Face.** When Wesen recognize you, they lie, flee or close ranks. Accept the lost cooperation. |
+| Stubborn as Stone | +2 to Will to resist intimidation, especially from a Blutbad. | **Old Feud.** Blutbaden are your people's enemies. When one is near, accept the quarrel, or the challenge to Ehrenkampf. |
+| Keen Snout | +2 to Intellect rolls to notice or identify something by smell. | **Blunt to a Fault.** Your honesty offends someone who matters. Accept the lost goodwill. |
 
-## Incantare
+*Source: No template; adapted from the show.*
 
-Choose your Lens. Each is an ability: roll **Occult**, with limits the GM sets before the roll.
+## Coyotl
 
-| Lens | Effect | Companion complication |
-|---|---|---|
-| Hermetic Lens | Ritual magic from texts, circles and sigils: wards, bindings, divination, sendings. Needs time, a prepared circle and the right materials. | **Bound by Oaths.** Your order's secrets and superiors come first. Accept the order's demand or the cost of refusing. |
-| Druidic Lens | Rites of the living earth: weather, beasts, growth and decay. Only on living ground, outdoors. | **Iron Sickness.** Railroads, factories and mines sicken you. Near them, accept −2 on Will and Occult rolls. |
-| Folk Lens | Charms, hexes and protective tokens: small, quick magic from cunning folk and hedge witches. | **Old Superstitions.** Your charms demand their rituals. Accept the delay or odd behavior the rules require. |
-| Spiritualist Lens | Speak with the dead through séance, dream or trance. The dead know only what they knew. | **The Dead Follow You.** Restless spirits find you. Accept the haunting at a bad moment. |
+*Tier 1 (Minor) · 2 Edges · Body +1, Agility +1, Intellect −1, Will −1*
 
-## Blutbad
+Coyote-like Wesen of the plains and desert country who live in clans bound by old customs, and fight together like a pack.
+
+**Woge profile:** Body +1; Agility +1; Dodge +1; Claws mark 2 boxes; Keen senses: track by scent and hearing; Swift: +2 to Athletics when running.
+
+**Suggested skills:** Brawling, Shooting, Tracking, Survival.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Blutbad Nose | +2 to Tracking by scent. | **The Bloodlust.** When blood is spilled near you or something runs, the hunt calls. Accept the Will roll or the cost of the urge. |
-| Fang and Claw | Ability, in full woge: your Brawling hits mark 2 boxes. | **Blutbad Reputation.** Other Wesen, especially Bauerschwein, fear and hate your kind. Accept the hostility. |
+| Pack Fighter | +2 to Brawling or Melee against a target an ally attacked this round. | **Clan Law.** The clan's customs bind you. Accept the clan's demand. |
+| Plains Wanderer | +2 to Survival in dry, open country: plains, desert and badlands. | **Restless.** You can't stay put for long. Accept leaving, or the strain of staying, at a bad time. |
 
-## Fuchsbau
-
-| Advantage | Effect | Companion complication |
-|---|---|---|
-| Fuchsbau Remedies | +2 to Apothecary when brewing a remedy, antidote or potion from the old recipes. | **Criminal Kin.** Your family deals in the Wesen black market. Accept their demands or their trouble. |
-| Fox's Cunning | +2 to Deception when misleading a pursuer or covering your tracks. | **Too Clever by Half.** You overplay your hand. Accept the consequence when the trick backfires. |
+*Source: Coyotl template: DX +2, HT +1, ST +2. About 141 points.*
 
 ## Eisbiber
+
+*Tier 1 (Minor) · 2 Edges · Intellect +1, Will −1*
+
+Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, and easily frightened by violence. Bullies like the Hässlich prey on them.
+
+**Woge profile:** Body +1; Teeth gnaw through wood and rope (a bite marks 1 box); Swimmer: holds breath for minutes; +2 to Athletics when swimming.
+
+**Suggested skills:** Tinkering, Athletics, Persuasion, Investigation.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
 | Master Builder | +2 to Tinkering when building or shoring up structures, dams or mechanisms. | **Timid.** Violence makes you freeze. Accept losing your first action when a fight breaks out. |
 | The Lodge | +2 to Investigation when asking the local Wesen community for news. | **Lodge Obligations.** The lodge expects favors. Accept the call when it comes at a bad time. |
 
-## Hexenbiest or Zauberbiest
+*Source: No template; adapted from the show.*
+
+## Fuchsbau
+
+*Tier 1 (Minor) · 2 Edges · Body −1, Intellect +2, Will −1*
+
+Fox-like Wesen, clever and quick, with a long tradition of trade in herbs, remedies and harder-to-find ingredients. Other Wesen call them disreputable, and not always unfairly.
+
+**Woge profile:** Body +1; Agility +1; Claws mark 2 boxes; Keen senses: track by scent and hearing.
+
+**Suggested skills:** Tracking, Riding, Melee, Shooting, Gambling, Wesen Lore.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Hexenbiest Spellcraft | Ability: with ingredients and time, roll Occult to cast a spell: a curse, a sleep, a sending, a disguise. | **The Price of Magic.** Every spell costs blood, pain or something precious. Accept the cost when it bites. |
-| Telekinesis | Ability, in full woge: roll Will to throw a person or object with your mind (1 box). | **Hexenbiest Pride.** You cannot abide being bested or slighted. Accept the feud you start. |
+| Fuchsbau Remedies | +2 to Apothecary when brewing a remedy, antidote or potion from the old recipes. | **Criminal Kin.** Your family deals in the Wesen black market. Accept their demands or their trouble. |
+| Fox's Cunning | +2 to Deception when misleading a pursuer or covering your tracks. | **Too Clever by Half.** You overplay your hand. Accept the consequence when the trick backfires. |
+| Horse Archer | +2 to Shooting with a bow from the saddle. | **Disreputable.** Wesen assume a Fuchsbau is up to something. Accept the distrust when it costs you. |
 
-## Jägerbar
-
-| Advantage | Effect | Companion complication |
-|---|---|---|
-| Bear's Strength | +2 to Athletics for feats of raw strength: lifting, breaking, holding. | **The Old Rites.** Your family's hunting rites pull at you. Accept the obligation or the shame of refusing. |
-| Maul | Ability, in full woge: your Brawling hits mark 2 boxes. | **Slow to Calm.** Once angered, you're hard to stop. Accept the harm you do to something you shouldn't. |
-
-## Bauerschwein
-
-| Advantage | Effect | Companion complication |
-|---|---|---|
-| Stubborn as Stone | +2 to Will to resist intimidation, especially from a Blutbad. | **Old Feud.** Blutbaden are your people's enemies. When one is near, accept the quarrel. |
-| Keen Snout | +2 to Intellect rolls to notice or identify something by smell. | **Blunt to a Fault.** Your honesty offends someone who matters. Accept the lost goodwill. |
+*Source: Fuchsbau template: IQ +2; Bad Reputation (disreputable among Wesen). About 132 points.*
 
 ## Mauzhertz
+
+*Tier 1 (Minor) · 2 Edges · Body −1, Agility +1*
+
+Mouse-like Wesen, small, quick and wary, with excellent hearing. Gentle by nature, but one pushed too far can snap.
+
+**Woge profile:** Agility +1; Dodge +1; Keen hearing: hear whispers through walls.
+
+**Suggested skills:** Stealth, Athletics, Read People, Investigation.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
 | Small and Quick | +2 to Stealth when hiding or slipping away. | **Easily Startled.** Sudden noise or danger makes you flinch. Accept −2 on your next action. |
-| Keen Hearing | +2 to Intellect rolls to hear faint or distant sounds. | **Prey's Heart.** Facing a predator Wesen, accept hesitation at the worst moment. |
+| Keen Hearing | +2 to Intellect rolls to hear faint or distant sounds. | **Breaking Point.** Pushed too far, you snap into violence. Accept what you do in that moment. |
 
-## Ziegevolk
-
-| Advantage | Effect | Companion complication |
-|---|---|---|
-| Ziegevolk Pheromones | +2 to Persuasion face to face at close quarters. Grimms and anyone with an antidote are unaffected. | **Pheromone Suspicion.** Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust. |
-| Smooth Operator | +2 to Deception when talking your way past a guard or official. | **Scandal Follows You.** Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex. |
+*Source: No template; adapted from the show.*
 
 ## Steinadler
+
+*Tier 1 (Minor) · 2 Edges · Body −1, Agility +1, Intellect +1, Will −1*
+
+Eagle-like Wesen with remarkable eyesight, a hunter's pride, and a taste for working alone, sometimes for hire.
+
+**Woge profile:** Agility +1; Talons mark 2 boxes; Eagle sight: see detail a mile away.
+
+**Suggested skills:** Shooting, Tracking, Stealth, Survival.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
 | Eagle Eye | +2 to Intellect rolls to spot detail at a great distance. | **Proud as an Eagle.** You won't back down or beg. Accept the consequence of your pride. |
 | Hunter's Eye | +2 to Shooting at long range after aiming for an action. | **Hunter's Code.** You won't shoot an unarmed or fleeing foe. Accept the escape. |
 
-## Coyotl
+*Source: No template; adapted from the show.*
+
+## Taniwha
+
+*Tier 1 (Minor) · 2 Edges · Body +1, Presence −1 · horror campaigns only*
+
+Water-dwelling Wesen from New Zealand: guardians of rivers and the people they claim, reptile-like in woge, and dangerous to anyone else. Horror campaigns only.
+
+**Heritage rules:**
+
+- Resists poison: +4 to Body against any poison.
+- Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can't clear, every three days.
+
+**Woge profile:** Body +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Amphibious: breathes water, swims as fast as a horse runs; Burrows through earth; Dark sight. **Drawbacks:** Must be submerged in water daily, or mark a box that rest can't clear, each hour; Pounamu (greenstone) wounds mark one extra box.
+
+**Suggested skills:** Athletics, Brawling, Survival, Stealth.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Pack Fighter | +2 to Brawling or Melee against a target an ally attacked this round. | **Clan Law.** The clan's customs bind you. Accept the clan's demand. |
-| Desert Wanderer | +2 to Survival in dry, open country. | **Restless.** You can't stay put for long. Accept leaving, or the strain of staying, at a bad time. |
+| Paralyzing Bite | Ability, in full woge: a bite marks 1 box, and the target rolls Body or is paralyzed for the scene. | **Guardian's Duty.** You protect those you've claimed as yours. Accept the danger when they need you. |
+| River Guardian | +2 to Athletics and Survival in rivers, lakes and the sea. | **Peculiar Appetite.** Gluttony, and an odd craving (frogs, to start with). Accept the distraction at a bad time. |
+
+*Source: Taniwha template (150-point): poison resistance; Dependency (human flesh, seasonal). About 157 points.*
+
+## Ziegevolk
+
+*Tier 1 (Minor) · 2 Edges · Intellect −1, Presence +2, Will −1*
+
+Goat-like Wesen whose pheromones, working even in human form, make them unnaturally persuasive and unnaturally popular. A Fuchsbau remedy can protect against them.
+
+**Woge profile:** Body +1; Horns: a butt marks 1 box.
+
+**Suggested skills:** Persuasion, Deception, Read People, Gambling.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Ziegevolk Pheromones | +2 to Persuasion face to face at close quarters, in either form. Grimms and anyone dosed with the antidote are unaffected. | **Pheromone Suspicion.** Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust. |
+| Smooth Operator | +2 to Deception when talking your way past a guard or official. | **Scandal Follows You.** Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex. |
+
+*Source: No template; adapted from the show.*
+
+## Blutbad
+
+*Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Intellect −1, Will −1*
+
+Wolf-like Wesen with keen senses and a predator's appetite; the root of the werewolf legend. Wesen who know your kind assume you hunt humans. You don't, or not anymore.
+
+**Heritage rules:**
+
+- Reputation: Eats Humans. Wesen who know your kind assume the worst.
+
+**Woge profile:** Body +2; Agility +1; Claws and fangs mark 2 boxes; Keen senses: track by scent and hearing; Dark sight; Leaper: +2 to Athletics to jump; Shrugs off cold.
+
+**Suggested skills:** Brawling, Shooting, Survival, Tracking.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Blutbad Nose | +2 to Tracking by scent, in either form. | **The Bloodlust.** When blood is spilled near you or something runs, roll Will or woge and give chase. Accept the cost of the urge. |
+| Night Hunter | +2 to Stealth when stalking at night. | **Loner.** You shun company. Accept the cost of going it alone. |
+| Old Enemy | +2 to Brawling against a Bauerschwein. | **Old Feud.** Bauerschwein are your enemies. When one is near, accept the quarrel. |
+
+*Source: Blutbaad template: DX +3, HT +2, ST +2; Loner; Enemy (Bauerschwein). About 208 points.*
+
+## Grimm
+
+*Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Presence −2*
+
+A descendant of the old hunters, the Decapitare: stronger and faster than ordinary people, able to see the Wesen hidden among us, and feared by them.
+
+**Heritage rules:**
+
+- The Sight: you see a Wesen's face when it's stirred by strong emotion.
+- Grimm eyes: woged Wesen and other Grimms see them; humans don't.
+- Uneasy sense: you feel when a Wesen or magic is near, with no details.
+- Never freeze: you're never surprised, and +2 to Will against fear.
+- Hard to bewitch: +2 to Will against magic.
+- Raised on the books: Wesen Lore is always at least Trained, free.
+- Grimm blood: a Hexenbiest or Zauberbiest who drinks it under a full moon loses their powers (see Grimm blood).
+
+**Suggested skills:** Wesen Lore, Melee, Shooting, Investigation, Tracking.
+
+| Gift | Effect | Companion complication |
+|---|---|---|
+| Danger Sense | Ability: when an ambush or trap threatens you, the GM secretly rolls your Intellect; success warns you in time to act. | **Nightmares.** The dead you've seen come back at night. Accept the lost sleep at a bad time. |
+| Iron Bones | Ability: each hit that marks 2 or more boxes marks one fewer (never below 1). | **Fanaticism.** Wesen must die. Accept the trouble when mercy would be wiser. |
+| Quick to Heal | Ability: rest clears a box every day, not every two, and works even at three boxes. | **Workaholic.** You won't rest when there's a case. Accept the strain. |
+| Hardy | +2 to Body to resist poison, disease and exhaustion. | **Stubbornness.** You won't back down. Accept the cost. |
+| Gunslinger | +2 to Shooting with a pistol at close range, with no need to aim. | **Bad Temper.** Accept the fight you start. |
+| Perfect Balance | +2 to Athletics and Melee to keep your feet or fight on bad ground. | **Curious.** Accept the risk your curiosity brings. |
+| Heavy Hand | Ability: your Brawling hits mark 2 boxes. | **Bloodlust.** You don't stop at the surrender. Accept the consequences. |
+| Bonded Weapon | +2 to Melee or Shooting with one named heirloom weapon. | **The Weapon Must Be Kept.** When it's lost or taken, accept the risk to get it back. |
+| Hard to Kill | Ability: Dying lasts until the end of the next scene, not this one. | **Vow: Protect the Innocent.** You've sworn to protect the innocent from Wesen. Accept the danger. |
+| Pain Means Nothing | Ability: ignore the Wounded penalty (−1). | **Honesty.** You won't lie, even to Wesen. Accept the consequence. |
+| Keeper of the Books | +2 to Wesen Lore when you can consult your family's books. | **The Books Must Be Kept.** The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them. |
+
+*Source: Decapitare template: ST, DX, HT +1; Combat Reflexes; Detect (Wesen, Magic); Magic Resistance 7; Talent (Grimm); Reputation (Frightening Decapitare).*
+
+## Incantare
+
+*Tier 2 (Major) · 1 Edge · Body −1, Intellect +1, Presence −1, Will +1*
+
+A human who works real magic through a Lens: a tradition and a way of seeing. The Wesen Council, the Royals and the Order of the Holy Knife all watch for people like you.
+
+**Heritage rules:**
+
+- Rituals: roll Occult to fill a ritual clock (minor 2, significant 4, major 6 segments). Your Lens sets how.
+- Charms: you can carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).
+- Grimms sense your magic: +1 to notice it for each charm or potion you carry.
+
+**Suggested skills:** Occult, Wesen Lore, Apothecary, Read People.
+
+| Lens | Effect | Companion complication |
+|---|---|---|
+| Chymiater Lens (Alchemist) | Brews elixirs, potions and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing. Only a Chymiater can brew the Grimm-blood draught. | **Price of the Work.** Your craft feeds a vice: greed, drink, lechery or gluttony (agree which). Accept it when it bites. |
+| Figmatarum Lens (Illusionist) | Glamours, illusions and mesmerism worked through performance, music or art, in minutes. +2 to Occult for illusion and mesmerism. | **Artist's Vanity.** You need an audience and can't bear an insult to your art. Accept the trouble your vanity causes. |
+| Magi Lens (Wizard) | Scholarly ritual from grimoires: any kind of effect, but an hour per roll, and it needs books. +2 to Occult for divination and wards. | **Obsession: Magical Knowledge.** A grimoire, a ritual or a secret tempts you beyond sense. Accept the risk to get it. |
+| Malifica Lens (Witch or Warlock) | Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link. | **Wicked Reputation.** People whisper that you're a witch, and the Order of the Holy Knife listens. Accept the suspicion. |
+| Phitonissa Lens (Pagan) | Cunning-folk rites of the seasons, nature and the old gods, worked outdoors. +2 to Occult for nature and folk magic. | **Disciplines of Faith.** The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them. |
+| Scaenarfex Lens (Artistic Enchanter) | Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm. | **Artist's Temperament.** Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you. |
+| Veneficare Lens (Sorcerer) | Quick casting along one or two Paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it when it clashes with the posse's needs. |
+
+*Source: Incantare template: seven Lenses (Ritual Path Magic).*
+
+## Jägerbär
+
+*Tier 2 (Major) · 1 Edge · Body +2, Agility −1, Intellect −1*
+
+Bear-like Wesen, enormously strong and durable. Traditional families still keep the Roh-Hatz, a coming-of-age hunt, and fight with an old Germanic weapon whose claw-like scoop disembowels.
+
+**Woge profile:** Body +2; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Keen smell.
+
+**Suggested skills:** Athletics, Brawling, Melee, Survival.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Bear's Strength | +2 to Athletics for feats of raw strength: lifting, breaking, holding. | **The Roh-Hatz.** Your family keeps the old hunting rite. Accept the obligation, or the shame of refusing it. |
+| Family Weapon | +2 to Melee with your family's claw-bladed hunting weapon. | **Slow to Calm.** Once angered, you're hard to stop. Accept the harm you do to something you shouldn't. |
+
+*Source: No template; adapted from the show.*
+
+## Mauvais Dentes
+
+*Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Intellect −1, Presence −1*
+
+Sabre-toothed, panther-like Wesen, so deadly that the Royal Families have kept them as assassins. Rare, solitary, and feared even by other Wesen.
+
+**Heritage rules:**
+
+- Reputation: Eats Humans. Wesen who know your kind assume the worst.
+
+**Woge profile:** Body +2; Agility +1; Sabre teeth and claws mark 2 boxes; Keen senses: track by scent and hearing; Dark sight; Leaper: +2 to Athletics to jump; Shrugs off cold.
+
+**Suggested skills:** Brawling, Shooting, Survival, Tracking.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Relentless Hunter | +2 to Tracking when hunting a single named quarry. | **Royal Debt.** The Royals bred your line as killers. When one of their agents calls on you, accept the demand or the danger of refusing. |
+| Pounce | +2 to Brawling on your first attack of a fight, leaping from hiding. | **Killer's Instinct.** In a fight you go for the throat. Accept the death you didn't intend. |
+
+*Source: Mauvais Dentes template: DX +2, HT +3, ST +3; Loner. About 213 points.*
+
+## Naschazer
+
+*Tier 2 (Major) · 1 Edge · Body +2, Intellect −1, Presence −1 · horror campaigns only*
+
+Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror campaigns only.
+
+**Heritage rules:**
+
+- Hunger (horror): each month you must eat human flesh; until you do, mark a box that rest can't clear, every day.
+
+**Woge profile:** Body +2; Huge strength: fists and fangs mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Feels no pain: ignore the Wounded penalty; Heals fast: rest clears a box every day; Dark sight.
+
+**Suggested skills:** Brawling, Melee, Athletics, Shooting.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Brute Strength | +2 to Athletics to lift, break or hold. | **Greed.** Riches are hard to refuse. Accept the bribe's strings or the risk of taking more. |
+| Butcher's Hands | +2 to Melee with a cleaver, axe or knife. | **Proud.** You won't be slighted. Accept the fight your pride starts. |
+
+*Source: Naschazer template: HT +4; Dependency and Uncontrollable Appetite (human flesh); Greed; Proud. About 197 points.*
+
+## Skalengeck
+
+*Tier 2 (Major) · 1 Edge · Agility +1, Presence −1*
+
+Lizard-like Wesen, cold-eyed and hard to kill, with a poisonous bite. Common among outlaws and hired guns.
+
+**Woge profile:** Body +2; Agility +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Immune to poison; Keen smell.
+
+**Suggested skills:** Shooting, Brawling, Wesen Lore, Stealth.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Poison Bite | Ability, in full woge: a bite that marks a box also poisons. Each hour the victim rolls Body −3 or marks another box, until treated with Apothecary. | **Callous.** You don't much care who gets hurt. Accept the cost when that shows. |
+| Hard to Subdue | +2 to Body to resist being knocked out, stunned or restrained. | **Cornered Lizard.** When you're trapped, you woge and fight. Accept the Exposure and the damage. |
+
+*Source: Skalengeck template: no human-form changes. About 189 points.*
+
+## Vallachi
+
+*Tier 2 (Major) · 1 Edge · Body +1, Agility −1, Presence +1, Will −1 · horror campaigns only*
+
+Long-lived, handsome, vampire-like Wesen who feed on the lifeforce of others and shun the sun. Horror campaigns only.
+
+**Heritage rules:**
+
+- Lifedrain (horror): by touch, roll Will against the victim's Body; on a success they mark a box and you clear one.
+- Hunger (horror): each week you must drain lifeforce; until you do, mark a box that rest can't clear, every six hours.
+- Sunlight: −2 to all rolls in direct sun, and you tire quickly.
+- Lifebane: plants wilt and animals shy around you.
+
+**Woge profile:** Body +2; Agility +1; Tough: hits of 2+ boxes mark one fewer, except from a pointed wooden stake; Keen senses; Dark sight.
+
+**Suggested skills:** Persuasion, Deception, Stealth, Read People.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Night Charm | +2 to Persuasion face to face, after dark. | **Old Grudges.** You've lived long enough to make enemies. Accept it when one of them turns up. |
+| Ageless | +2 to Intellect rolls to recall something you lived through decades ago. | **Secret Age.** You don't age as you should. Accept the lie or the slip when someone notices. |
+
+*Source: Vallachi template: Attractive; Extended Lifespan; HT +2; Dependency and Uncontrollable Appetite (lifeforce); Weakness (sunlight); Lifebane. About 223 points.*
+
+## Fuchsteufelwild
+
+*Tier 3 (Apex) · 0 Edges · Body +1, Intellect +2, Presence −2, Will −1*
+
+Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; the root of Rumpelstiltskin. Clever, spiteful, and bound by an old obsession with names and bargains.
+
+**Heritage rules:**
+
+- Acid talons: in full woge, claw hits mark 2 boxes and ignore Tough and armor.
+- Leaper, in either form: jumps of many yards; +2 to Athletics to jump.
+
+**Woge profile:** Agility +1; Dodge +1; Keen senses: track by scent and hearing; Swift. **Drawbacks:** Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged; Disturbing voice.
+
+**Suggested skills:** Brawling, Athletics, Deception, Investigation.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Tremor | Ability, in full woge: stomp, and everyone nearby rolls Athletics or falls and loses their next action. | **Cruel Streak.** When an enemy is helpless, you're tempted to make them suffer. Accept the lost allies, or the Suspicion it brings. |
+| Strike a Bargain | +2 to Persuasion or Deception when making a deal. | **Guess My Name.** Your true name holds power over you. When someone hunts for it, or speaks it, accept the consequence. |
+
+*Source: Fuchsteurfelwild template: ST +1, HT +2, IQ +3, Super Jump 5; Obsession (Guess My Name); Bully; Callous; Sadism (now a companion). About 424 points; trimmed to Tier 3.*
+
+## Hexenbiest or Zauberbiest
+
+*Tier 3 (Apex) · 0 Edges · Body −1, Agility −1, Presence +1, Will +1*
+
+Witch-like Wesen (Zauberbiest for the men), beautiful in human form and horrific in woge, with innate magic that lives in their Wesen spirit. Coven traditions bind them; Grimm blood can strip them.
+
+**Heritage rules:**
+
+- Telekinesis: in full or partial woge, roll Will to throw a person or object with your mind (1 box), seize something out of reach, or turn aside one attack (+2 Dodge).
+- Innate magic: you can work rituals with Occult like an Incantare, in the Hexenbiest style: curses, potions and sendings.
+- Grimm blood: drunk under a full moon, it strips your powers until the Contaminatio Ritualis restores them.
+
+**Woge profile:** Body +2; Agility +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer. **Drawbacks:** Horrific: even other Wesen recoil.
+
+**Suggested skills:** Occult, Apothecary, Deception, Persuasion.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Hexenbiest Spellcraft | +2 to Occult for curses, potions and sendings. | **The Price of Magic.** Every spell costs blood, pain or something precious. Accept the cost when it bites. |
+| Levitation | Ability, in woge: roll Will to lift yourself and float or fly a short way. | **Hexenbiest Pride.** You cannot abide being bested or slighted. Accept the feud you start. |
+| TK Crush | Ability, in full woge: roll Will against the target's Body; on a success they mark 1 box, which Dodge can't avoid. | **Coven Traditions.** Your family or coven has rules and expectations. Accept the demand. |
+
+*Source: Hexenbiest and Zauberbiest template: Beautiful/Handsome; Sorcery 5; Ritual Adept 2; Vow (coven traditions). About 279 points.*
+
+## Murcielago
+
+*Tier 3 (Apex) · 0 Edges · None*
+
+Bat-like Wesen with uncanny hearing and a sonic scream that drops a room full of people to their knees.
+
+**Heritage rules:**
+
+- Sonic scream: in full woge, roll Will. Everyone nearby you choose who can hear rolls Body −2; a failure loses their next action and takes −2 for the scene. Earplugs protect. Heard in town, it marks Exposure.
+
+**Woge profile:** Body +1; Agility +1; Claws and fangs mark 2 boxes; Sonar: no penalty for darkness; sense the shape of a room by sound; Keen hearing: hear heartbeats; Swift.
+
+**Suggested skills:** Stealth, Athletics, Brawling, Investigation.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Echo Sight | +2 to Intellect rolls to find something hidden in the dark by sound. | **Sensitive Ears.** Loud noise disorients you. When a gun or explosion goes off nearby, accept −2 on your next action. |
+| Eavesdropper | +2 to Intellect rolls to hear faint or distant voices. | **Can't Unhear.** You hear secrets you shouldn't. Accept the trouble that knowing brings. |
+
+*Source: Murcielago template: no human-form changes; Sonic Scream 6, Sonar. About 283 points.*
+
+<!-- HERITAGES:END -->
 
 # Complications
 
@@ -716,10 +1078,16 @@ Choose one complication. These are sources of meaningful choices, not constant p
 | Wanted | There's a price on your head somewhere. Accept trouble when lawmen or bounty hunters come. |
 | Owes the Wrong People | A debt to dangerous people comes due. Accept their demand. |
 | Reluctant to Kill | You seek a way that doesn't end a life, even a Wesen's. Accept the extra danger. |
+| Vow: Never Kill a Human | Whatever else you do, you won't take a human life. Accept the cost when that's the only way out. |
+| Hunted by the Church | Zealous clergy, or the Order of the Holy Knife, want you dead. Accept the danger when they find you. |
+| Hunted by a Royal Family | A Royal Family wants you dead or in chains. Accept the danger when their agents find you. |
+| Hunted by a Secret Society | A secret society wants you silenced. Accept the danger when its members find you. |
+| Hunted by the Wesen Council | The Council has marked you. Accept the danger when its enforcers find you. |
+| Hunted by Grimms | A Grimm family has your name in its books. Accept the danger when one finds you. |
 
 # Quick reference
 
-**Creation:** attributes start at 10, adjusted by heritage (always totaling zero), plus 5 points; maximum 13 plus any heritage bonus. Well-rounded: one Specialty and nine Trained. Old hand: one Expert at +5 and seven Trained. One advantage (general or heritage) and one complication.
+**Creation:** attributes start at 10, adjusted by heritage (always totaling zero), plus 5 points; maximum 13 plus any heritage bonus. 3 points split between heritage tier and Edges (Tier 0: 3 Edges; Tier 3: none). Well-rounded: one Specialty and nine Trained. Old hand: one Expert at +5 and seven Trained. One advantage (general or heritage) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Old hand) = attribute +5.
 
@@ -735,6 +1103,8 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). A surgery gives +2 and clears 2 (3 on margin 5+). Rest: one box per two days, not from three.
 
-**Woge:** free action for a Wesen; a forced woge on a failed Will roll. Grimms see woge under strong emotion. A full woge before townsfolk marks Exposure.
+**Woge:** free action for a Wesen; a forced woge on a failed Will roll. The woge profile's bonuses apply while woged. Grimms see woge under strong emotion. A full woge before townsfolk marks Exposure (2 boxes at Tier 3).
 
-**Grit:** start each session with two. Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.
+**Rituals:** describe the effect; fill a clock of 2, 4 or 6 segments with Occult rolls at your Lens's pace. Trappings remove a segment. Charms: Trained 2, Specialty 3, Expert 4.
+
+**Grit:** start each session with two (three with True grit). Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.

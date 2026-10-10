@@ -158,12 +158,21 @@ All Lenses can attempt any effect. The Lens decides **how**: time, materials, wh
 | **Scaenarfex** (Artistic Enchanter) | Enchants objects and works of art; the best charm-maker | Enchanting objects and charms | **Artist's Temperament:** the template's temperament disadvantages |
 | **Veneficare** (Sorcerer) | Quick casting (Ritual Adept, Time 3), but only along one or two Paths, with few prepared spells | Its one or two Paths. Its clocks fill two segments per success, but it can hold only one charm. | **Higher Purpose bound:** a single narrow calling it must follow |
 
-## 8. Things to confirm
+## 8. Decisions (settled)
 
-1. **Grimm blood.** Your setting notes say it neutralizes **any** human or Wesen magic user, drunk or injected. The Grimm template says it neutralizes **only Hexenbiest or Zauberbiest**, only **under a full moon**, only when **drunk**, can't be controlled, and can be undone by *Contaminatio Ritualis*. Which wins? Or should the template's version apply to Hexenbiests, and the notes' version to Incantare?
-2. **Fuchsteufelwild** is far above the rest (Acid Talons alone are 245 points). I'd make Acid Talons its Tier 3 signature power (claws that eat through anything, marking 2 boxes and ignoring Tough), and make Tremor a heritage advantage. Sadism: swap it for a companion complication, or make the kind horror only?
-3. **Spellings.** I'll use Blutbad, Hexenbiest, Zauberbiest and Fuchsteufelwild unless your table spells them the way the file names do (Blutbaad, Hexebiest, Zauerbiest, Fuchsteurfelwild).
-4. **The Wesen without templates** (Eisbiber, Jägerbar, Bauerschwein, Mauzhertz, Ziegevolk, Steinadler) keep their current entries, converted to the same format.
+1. **Grimm blood.** As in the template: a Hexenbiest or Zauberbiest who drinks it under a full moon loses their powers, involuntarily, until the *Contaminatio Ritualis* restores them. In addition, a Chymiater can brew a Grimm's fresh blood in a major ritual into a draught that, injected or drunk, neutralizes anyone's magical gifts for 1d6 days.
+2. **Fuchsteufelwild.** Playable at Tier 3. Acid Talons became its signature power, Tremor a heritage advantage, and Sadism became the companion complication *Cruel Streak*.
+3. **Vallachi.** Horror only, with Naschazer and Taniwha.
+4. **Wesen without templates** (Eisbiber, Jägerbär, Bauerschwein, Mauzhertz, Ziegevolk, Steinadler) were adapted from the show. The fandom wiki is blocked from the build environment, so these rest on general knowledge of the series. Confirmed: the Jägerbär Roh-Hatz rite, Ziegevolk pheromones working in human form, Bauerschwein senses working unwoged. Check the rest against your table's canon.
+5. **Spellings** follow the show: Blutbad, Hexenbiest, Zauberbiest, Fuchsteufelwild, Jägerbär.
+
+## 9. Where the results live
+
+Every heritage, converted, is in `data/heritages.json`: adjustments, tier, heritage rules, woge profile, suggested skills, heritage advantages with companions, and the source template. `tools/gen-heritages.py` writes that file into the creator and into the guide's **Heritages** chapter, so the two can't drift apart:
+
+```
+python3 tools/gen-heritages.py && python3 tools/build-guide.py --game grimm-west --docx
+```
 
 ---
 

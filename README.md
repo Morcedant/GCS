@@ -23,6 +23,10 @@ Both games share the same rules engine. To start another variant, copy one game'
   both barrels, covering fire, reloads, jams on a natural 18) instead of phaser power, and **Trouble** tracks
   (Suspicion, Exposure, Attention) instead of the ship.
 - The GM view rolls **case seeds** and keeps a **case journal** (with a "for the books" entry); six ready-made riders.
+- **Heritages come from your GURPS templates** (see `grimm-west/gurps-conversion.md`), in power tiers balanced by **Edges**,
+  with woge profiles that apply while woged, an optional **Allegiance**, Incantare Lenses as ritual styles, and horror-only
+  heritages behind a switch. Edit `grimm-west/data/heritages.json`, then run `python3 tools/gen-heritages.py` and
+  `python3 tools/build-guide.py --game grimm-west --docx`.
 - The guide is `grimm-west/players-guide.md` and `grimm-west/Grimm_Wild_West_Players_Guide.docx`; the Discord bot
   (`/grimm`, `/grit`, `/clock`, `/contest`, `/assist`) is in `grimm-west/discord-bot/`.
 

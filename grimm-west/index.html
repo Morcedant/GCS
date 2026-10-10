@@ -315,6 +315,16 @@ tr.lvl-U td.target { color: var(--muted); }
   .linkish { padding: 8px 6px; }
 }
 
+/* Edges and heritage info */
+.edges { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: var(--well); }
+.edge-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px 16px; }
+.edge { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; }
+.edge .small { grid-column: 1 / -1; }
+.edge .gm-duty b { min-width: 1.5ch; }
+.heritage-info { display: grid; gap: 6px; margin-top: 10px; font-size: .9rem; }
+.heritage-info ul { margin: 0; padding-left: 1.2em; }
+.tier-chip { color: var(--accent); }
+
 /* Equipment */
 #equip { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px 16px; }
 #equip .eq-item { align-items: flex-start; }
@@ -523,14 +533,22 @@ tr.lvl-U td.target { color: var(--muted); }
         </section>
 
         <section class="step hud">
-          <div class="step-head"><span class="step-no">2</span><h2>Heritage and attributes</h2>
-            <p class="muted small">All five attributes start at 10, then your heritage adjusts them. Spend 5 more points on top. The starting maximum is 13, plus any heritage bonus to that attribute. You can't lower an attribute to gain points.</p></div>
+          <div class="step-head"><span class="step-no">2</span><h2>Heritage, Edges and attributes</h2>
+            <p class="muted small">All five attributes start at 10, then your heritage adjusts them. Your heritage's tier sets how many Edges you get (3 points split between them). Spend 5 attribute points on top, plus any from Edges. The starting maximum is 13, plus any heritage bonus to that attribute.</p></div>
           <div class="fields">
             <div class="field"><label for="f-speciesid">Heritage</label><select id="f-speciesid"></select></div>
             <div class="field" id="species-name-wrap" hidden><label for="f-species">Heritage name</label><input type="text" id="f-species" placeholder="e.g. Seltenvogel"></div>
+            <div class="field" id="custom-tier-wrap" hidden><label for="f-customtier">Tier (agreed with the GM)</label>
+              <select id="f-customtier"><option value="0">Tier 0: 3 Edges</option><option value="1">Tier 1: 2 Edges</option><option value="2">Tier 2: 1 Edge</option><option value="3">Tier 3: no Edges</option></select></div>
+            <div class="field wide"><div class="checks"><label><input type="checkbox" id="f-horror"> Horror campaign: show the man-eating heritages (only if the whole table has agreed)</label></div></div>
             <div class="field wide"><div class="trait-desc" id="species-desc"></div></div>
             <div class="field wide" id="species-adj-wrap" hidden><span class="label">Custom adjustments (must total 0, each −2 to +2)</span>
               <div class="adj-grid" id="species-adj"></div></div>
+          </div>
+          <div class="edges">
+            <div class="tally"><span class="label">Edges</span><span class="chip" id="edge-tally"></span></div>
+            <p class="small muted" id="edge-intro"></p>
+            <div class="edge-list" id="edge-list"></div>
           </div>
           <div class="pool"><span class="label">Points to spend</span><span id="pool-pips" class="pool"></span><span class="num" id="pool-left"></span></div>
           <div class="attrs" id="attrs"></div>
@@ -611,6 +629,19 @@ tr.lvl-U td.target { color: var(--muted); }
             <span class="small muted">A heritage advantage replaces the regular advantage and always brings its companion complication, which earns Grit like any other. Your regular complication still applies.</span></div>
           </div>
 
+          <div class="fields" id="adv2-wrap" hidden>
+            <div class="field wide"><label for="f-adv2">Second advantage (Edge)</label><select id="f-adv2"></select></div>
+            <div class="field wide" id="adv2-detail-wrap" hidden><label for="f-adv2detail" id="adv2-detail-label">Detail</label><input type="text" id="f-adv2detail"></div>
+            <div class="field wide"><div class="trait-desc" id="adv2-desc"></div></div>
+          </div>
+
+          <div class="fields">
+            <div class="field wide"><label for="f-allegiance">Allegiance (optional)</label><select id="f-allegiance"></select></div>
+            <div class="field wide" id="allegiance-desc-wrap" hidden><div class="pair">
+              <div class="trait-desc"><span class="label">Benefit</span><div id="allegiance-benefit"></div></div>
+              <div class="trait-desc comp"><span class="label">Burden (earns Grit)</span><div id="allegiance-burden"></div></div></div></div>
+          </div>
+
           <div class="fields">
             <div class="field wide"><label for="f-comp">Complication</label><select id="f-comp"></select></div>
             <div class="field wide" id="comp-custom" hidden>
@@ -629,10 +660,13 @@ tr.lvl-U td.target { color: var(--muted); }
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">5</span><h2>Prepare to ride</h2>
-            <p class="muted small">You begin uninjured, with two Grit points and your gear.</p></div>
+            <p class="muted small">You begin uninjured, with two Grit points (three with True grit) and your gear.</p></div>
           <div class="field"><span class="label">Gear</span>
             <div class="checks" id="equip"></div></div>
           <div class="fields">
+            <div class="field wide" id="contact-wrap" hidden><label for="f-contact">A friend in town (Edge)</label><input type="text" id="f-contact" placeholder="Who, and what they can do for you"></div>
+            <div class="field" id="gear-wrap" hidden><label for="f-gearitem">Fine weapon or tool (Edge)</label><input type="text" id="f-gearitem" placeholder="e.g. Grandfather's Grimm axe"></div>
+            <div class="field" id="gearskill-wrap" hidden><label for="f-gearskill">+2 to</label><select id="f-gearskill"></select></div>
             <div class="field wide"><label for="f-otherequip">Other gear</label><input type="text" id="f-otherequip" placeholder="Anything else you carry"></div>
             <div class="field wide"><label for="f-connection">Connection to another rider</label>
               <select id="f-connpick" aria-label="Quick pick a connection"></select>
@@ -651,7 +685,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="panel hud">
           <div class="stats">
             <div class="stat"><span class="eyebrow">Dodge</span><b id="st-dodge"></b></div>
-            <div class="stat"><span class="eyebrow">Grit</span><b>2</b></div>
+            <div class="stat"><span class="eyebrow">Grit</span><b id="st-grit">2</b></div>
             <div class="stat"><span class="eyebrow">Best</span><b id="st-best"></b></div>
           </div>
           <p class="small muted" id="st-dodge-note"></p>
@@ -710,7 +744,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="field"><label for="gm-add-pregen">Add ready-made riders</label><select id="gm-add-pregen"></select></div>
         </div>
         <div class="btn-row">
-          <button class="btn" id="gm-newsession">New session: everyone back to 2 Grit</button>
+          <button class="btn" id="gm-newsession">New session: reset everyone's Grit</button>
           <button class="linkish danger" id="gm-clear">Remove everyone</button>
         </div>
         <div class="toast" id="gm-msg" role="status" aria-live="polite"></div>
@@ -775,7 +809,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Wesen</strong> look like ordinary people but have a hidden form, almost always a two-legged blend of human and animal. The change between the two is the <strong>woge</strong> (VOH-gə). Each kind of Wesen has its own culture and traditions, and many of the oldest involve hunting or eating humans. The Blutbad, a wolf-like Wesen, gave rise to the werewolf legend. Their names are German, as are many of the old words of this hidden world.</p>
 <p><strong>Grimms</strong> are supernaturally gifted warriors, stronger and faster than ordinary people, who can see the Wesen hidden among us. Their old Latin name, <em>Decapitare</em>, comes from their habit of beheading the creatures they hunt. The gift passes only occasionally, sometimes skipping a generation or two, and the Grimm families keep themselves anonymous. Grimms enforce the <strong>Code of Swabia</strong>, the old law between Wesen and the rest of the world. Some Grimms enforce it fairly; others believe every Wesen is an abomination to be destroyed.</p>
 <p>The <strong>seven Royal Families</strong> are ancient, wealthy and influential. They no longer rule whole countries, but they still manipulate events through their public cousins, field loyal Wesen armies, and seek control over all Wesen and over ordinary humanity too.</p>
-<p><strong>Incantare</strong> is the catch-all name for anyone who works real magic. Most magic is ritual, in many styles and beliefs, and each practitioner sees it through a <strong>Lens</strong>. The Wesen Council and the Royal Families both consider Incantare extremely dangerous, and Grimms are often tasked with watching or destroying them. <strong>The blood of a Grimm is a powerful anti-magic agent:</strong> injected or drunk, it neutralizes the powers of any human or Wesen magic user, and it kills the Wesen spirit within a Hexenbiest or Zauberbiest.</p>
+<p><strong>Incantare</strong> is the catch-all name for anyone who works real magic. Most magic is ritual, in many styles and beliefs, and each practitioner sees it through a <strong>Lens</strong>. The Wesen Council and the Royal Families both consider Incantare extremely dangerous, and Grimms are often tasked with watching or destroying them. <strong>The blood of a Grimm is a powerful anti-magic agent.</strong> A Hexenbiest or Zauberbiest who drinks it under a full moon loses their powers, and a Chymiater can brew it into a draught that strips anyone’s magical gifts for days (see Grimm blood).</p>
 <p>Three orders matter on the frontier:</p>
 <ul>
 <li><strong>Bruderschaft der Heiligen Erde</strong> (Brotherhood of the Holy Earth) protects the Earth from industry. Luddites with magic, they claim descent from druidic orders, and the railroad is their enemy.</li>
@@ -870,7 +904,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Well-rounded:</strong> one Specialty at +3 and nine Trained skills.</li>
 <li><strong>Old hand:</strong> one Expert skill at +5 and seven Trained skills. Old hands have spent a lifetime at one thing.</li>
 </ul>
-<h2 id="g-step-2-choose-a-heritage-and-assign-attributes">Step 2: Choose a heritage and assign attributes</h2>
+<h2 id="g-step-2-choose-a-heritage-spend-edges-assign-attributes">Step 2: Choose a heritage, spend Edges, assign attributes</h2>
 <h3 id="g-attributes">Attributes</h3>
 <table>
 <thead>
@@ -902,99 +936,70 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<h3 id="g-heritage-adjustments">Heritage adjustments</h3>
-<p>Every attribute starts at 10. Your heritage then adjusts some of them; the result is your <strong>heritage base</strong>. Each heritage’s adjustments total zero, so no heritage starts ahead of another.</p>
+<h3 id="g-heritage-and-tier">Heritage and tier</h3>
+<p>Choose a heritage from the <strong>Heritages</strong> chapter: Human, Grimm, Incantare, or one of the Wesen kinds. Every attribute starts at 10, and your heritage adjusts some of them; the result is your <strong>heritage base</strong>. Adjustments always total zero.</p>
+<p>Heritages differ in power, so each has a <strong>tier</strong> from 0 to 3. Every character has <strong>3 points</strong> to split between heritage power and <strong>Edges</strong>: Tier 0 (Human) leaves 3 Edges, Tier 1 leaves 2, Tier 2 leaves 1, and Tier 3 leaves none. Edges are useful in every scene; a Wesen’s power mostly shows while woged, and that risks Exposure.</p>
+<p><strong>Horror heritages.</strong> Naschazer, Taniwha and Vallachi must feed on human flesh or lifeforce. They’re available only when the whole table has agreed to a horror-tinged campaign.</p>
+<h3 id="g-edges">Edges</h3>
+<p>Spend all your Edges. Each one buys:</p>
 <table>
 <colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th>Heritage</th>
-<th>Adjustments</th>
+<th>Edge</th>
+<th>What you get</th>
+<th>Limit</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Human</td>
-<td>None</td>
+<td>+1 attribute point</td>
+<td>One more point to spend in the next step, within the normal maximum</td>
+<td>2</td>
 </tr>
 <tr class="even">
-<td>Grimm</td>
-<td>Body +1, Agility +1, Presence −2</td>
+<td>Extra Trained skill</td>
+<td>One more Trained skill in Step 3</td>
+<td>3</td>
 </tr>
 <tr class="odd">
-<td>Incantare</td>
-<td>Intellect +1, Will +1, Body −1, Presence −1</td>
+<td>Second advantage</td>
+<td>A second general advantage, with no extra complication</td>
+<td>1</td>
 </tr>
 <tr class="even">
-<td>Blutbad</td>
-<td>Body +1, Agility +1, Intellect −1, Will −1</td>
+<td>True grit</td>
+<td>Start every session with 3 Grit instead of 2</td>
+<td>1</td>
 </tr>
 <tr class="odd">
-<td>Fuchsbau</td>
-<td>Intellect +1, Presence +1, Body −1, Will −1</td>
+<td>A friend in town</td>
+<td>A named contact who helps once per case</td>
+<td>1</td>
 </tr>
 <tr class="even">
-<td>Eisbiber</td>
-<td>Intellect +1, Will −1</td>
-</tr>
-<tr class="odd">
-<td>Hexenbiest or Zauberbiest</td>
-<td>Will +1, Presence +1, Body −1, Agility −1</td>
-</tr>
-<tr class="even">
-<td>Jägerbar</td>
-<td>Body +2, Agility −1, Intellect −1</td>
-</tr>
-<tr class="odd">
-<td>Bauerschwein</td>
-<td>Body +1, Will +1, Agility −1, Presence −1</td>
-</tr>
-<tr class="even">
-<td>Mauzhertz</td>
-<td>Agility +1, Body −1</td>
-</tr>
-<tr class="odd">
-<td>Ziegevolk</td>
-<td>Presence +2, Intellect −1, Will −1</td>
-</tr>
-<tr class="even">
-<td>Steinadler</td>
-<td>Agility +1, Intellect +1, Body −1, Will −1</td>
-</tr>
-<tr class="odd">
-<td>Coyotl</td>
-<td>Agility +1, Presence +1, Intellect −1, Will −1</td>
+<td>A fine weapon or tool</td>
+<td>An heirloom weapon, a master’s instruments or a charm-maker’s kit: +2 to one named skill when it’s used</td>
+<td>1</td>
 </tr>
 </tbody>
 </table>
 <h3 id="g-spending-points">Spending points</h3>
-<p>After applying your heritage, distribute <strong>five additional points</strong> among the attributes.</p>
+<p>After applying your heritage, distribute <strong>five additional points</strong> among the attributes, plus one for each attribute Edge.</p>
 <ul>
-<li>The starting maximum is <strong>13</strong>, plus any heritage bonus to that attribute. A Jägerbar can start with Body 15.</li>
+<li>The starting maximum is <strong>13</strong>, plus any heritage bonus to that attribute. A Jägerbär can start with Body 15.</li>
 <li>You cannot lower an attribute below its heritage base to gain points.</li>
 </ul>
-<h3 id="g-heritage-descriptions">Heritage descriptions</h3>
-<p><strong>Human.</strong> Most of the frontier, and most of the posse. You know the truth about the hidden world, which already sets you apart.</p>
-<p><strong>Grimm.</strong> A descendant of the old hunters, stronger and faster than ordinary people. You see through a Wesen’s human face whenever it is stirred by strong emotion. Wesen who recognize you are afraid of you, and with reason.</p>
-<p><strong>Incantare.</strong> A human who works real magic through a Lens: a tradition, a belief, a way of seeing. Choose your Lens as your heritage advantage. The Council, the Royals and the Order of the Holy Knife all watch for people like you.</p>
-<p><strong>Blutbad.</strong> Wolf-like Wesen with keen senses and a predator’s appetite. Some live clean, abstaining from the hunt, and others never try.</p>
-<p><strong>Fuchsbau.</strong> Fox-like Wesen, clever and charming, with a long tradition of trade in herbs, remedies and harder-to-find ingredients.</p>
-<p><strong>Eisbiber.</strong> Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, and easily frightened by violence.</p>
-<p><strong>Hexenbiest or Zauberbiest.</strong> Witch-like Wesen (Zauberbiest for the men) with innate magic. Their power lives in their Wesen spirit, which Grimm blood can kill.</p>
-<p><strong>Jägerbar.</strong> Bear-like Wesen, enormously strong, with old hunting rites that their families still keep.</p>
-<p><strong>Bauerschwein.</strong> Pig-like Wesen: stubborn, hard-working, and old enemies of the Blutbaden.</p>
-<p><strong>Mauzhertz.</strong> Mouse-like Wesen, small, quick and wary, with excellent hearing.</p>
-<p><strong>Ziegevolk.</strong> Goat-like Wesen whose pheromones make them unnaturally persuasive, and unnaturally popular.</p>
-<p><strong>Steinadler.</strong> Eagle-like Wesen with remarkable eyesight and a hunter’s pride.</p>
-<p><strong>Coyotl.</strong> Coyote-like Wesen of the desert country who live in clans bound by old customs.</p>
 <h3 id="g-custom-heritage">Custom heritage</h3>
-<p>Agree on a heritage with the GM and give it adjustments from −2 to +2 per attribute that total zero. The normal starting maximum and heritage base rules apply.</p>
+<p>Agree on a heritage with the GM, give it adjustments from −2 to +2 per attribute that total zero, and agree its tier. The normal starting maximum and heritage base rules apply.</p>
 <h2 id="g-step-3-choose-trained-skills">Step 3: Choose trained skills</h2>
 <p>A <strong>Well-rounded</strong> character chooses ten different skills: one <strong>Specialty</strong> at its governing attribute +3 and nine <strong>Trained</strong> skills at attribute +1. An <strong>Old hand</strong> chooses <strong>one Expert skill at +5</strong> and <strong>seven Trained skills at +1</strong>. All other skills are <strong>Untrained</strong> at attribute −4 when an attempt is plausible. Each skill has its own final target number; do not add the attribute again when rolling.</p>
 <p>The Expert’s extra bonus matters most when the work is hard. With Intellect 13, an Expert gambler has a target of 18, which only natural 17–18 can fail; under a −4 “very difficult” penalty the target is still 14. If Athletics is the Expert skill, Dodge adds +2, the same as a Specialty.</p>
+<p>Each Extra Trained skill Edge adds one more Trained skill. A <strong>Grimm’s</strong> Wesen Lore is always at least Trained and doesn’t use one of the Trained picks.</p>
 <p><strong>Broadening.</strong> An Old hand can broaden later (the GM’s call, usually after a significant case): the Expert skill becomes a Specialty at +3, and two more skills become Trained.</p>
 <h2 id="g-step-4-describe-your-character">Step 4: Describe your character</h2>
 <p>Choose your name, title if any, and a short reason you ride with the posse. Then choose <strong>one advantage</strong> and <strong>one complication</strong>.</p>
@@ -1014,10 +1019,54 @@ tr.lvl-U td.target { color: var(--muted); }
 <ul>
 <li><strong>Advantage.</strong> Choose either a general advantage or one of your heritage advantages. A heritage advantage replaces the general advantage and always brings its companion complication. An Incantare’s heritage advantage is their <strong>Lens</strong>.</li>
 <li><strong>Complication.</strong> Choose one complication. You keep it even if you take a heritage advantage, so a character with a heritage advantage has two complications.</li>
+<li><strong>Allegiance (optional).</strong> Choose an allegiance below, or none.</li>
 </ul>
 <p>An advantage gives +2 to one narrowly defined kind of task when the GM agrees it applies. It cannot improve every use of a broad skill. A complication creates choices and problems; it is not a permanent penalty.</p>
+<h3 id="g-allegiance">Allegiance</h3>
+<p>Anyone can owe allegiance to one of the powers of the hidden world. It’s a benefit paired with a burden; the burden works like a complication and earns Grit when it causes you a real problem.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Allegiance</th>
+<th>Benefit</th>
+<th>Burden</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>The Church</td>
+<td>Once per case, shelter, records or a favor from the clergy</td>
+<td>Duty: the Church gives you orders. Sicarii discipline ties you to the Order of the Holy Knife.</td>
+</tr>
+<tr class="even">
+<td>A Royal Family</td>
+<td>Once per case, money, papers or a door opened</td>
+<td>Duty: an involuntary call to serve, and the family’s rivals hunt you</td>
+</tr>
+<tr class="odd">
+<td>A secret society</td>
+<td>Once per case, lore, a meeting place or a fellow initiate (the Golden Dawn, the Brotherhood of the Holy Earth)</td>
+<td>Duty and Vow: keep its secrets and follow its traditions</td>
+</tr>
+<tr class="even">
+<td>The Wesen Council</td>
+<td>Contacts in the local Wesen community</td>
+<td>Duty: the Council calls on you, and others know you’re its operative</td>
+</tr>
+<tr class="odd">
+<td>A Grimm family</td>
+<td>Access to the family books and kin</td>
+<td>Duty to the family name, and to fight its enemies</td>
+</tr>
+</tbody>
+</table>
 <h2 id="g-step-5-prepare-to-ride">Step 5: Prepare to ride</h2>
-<p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points and your gear. Describe one connection to another member of the posse.</p>
+<p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points (three with True grit) and your gear. Name your friend in town or your fine weapon or tool, if you took those Edges. Describe one connection to another member of the posse.</p>
 <h3 id="g-top-10-connections-to-another-rider">Top 10 connections to another rider</h3>
 <ol type="1">
 <li><strong>Rode together in the war.</strong> We served in the same company and still watch each other’s backs.</li>
@@ -1032,12 +1081,13 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Bad blood.</strong> They blame me for something that went wrong on a past job.</li>
 </ol>
 <h2 id="g-example-detective">Example detective</h2>
-<p>Human. Body 10, Agility 10, Intellect 13, Presence 11, Will 11.</p>
+<p>Human (Tier 0, 3 Edges: +1 attribute point, Extra Trained skill, A friend in town). Body 10, Agility 11, Intellect 13, Presence 11, Will 11.</p>
 <ul>
 <li><strong>Specialty:</strong> Investigation 16.</li>
-<li><strong>Trained:</strong> Read People 14, Wesen Lore 14, Tracking 14, Survival 14, Gambling 14, Persuasion 12, Deception 12, Shooting 11, Riding 11.</li>
-<li><strong>Dodge:</strong> Athletics is Untrained, so Dodge is 8.</li>
+<li><strong>Trained:</strong> Read People 14, Wesen Lore 14, Tracking 14, Survival 14, Gambling 14, Occult 14, Persuasion 12, Deception 12, Shooting 12, Riding 12.</li>
+<li><strong>Dodge:</strong> Athletics is Untrained, so Dodge is 9.</li>
 <li><strong>Advantage:</strong> Astute Observer. <strong>Complication:</strong> Cannot Leave a Mystery Alone.</li>
+<li><strong>Friend in town:</strong> a clerk in the Pinkertons’ Portland office who’ll pull a file, quietly.</li>
 </ul>
 <h1 id="g-skills-and-gear">Skills and gear</h1>
 <p>Choose the skill that matches your method. Investigation finds the clues; Wesen Lore says what kind of creature left them. Medicine treats the body; Apothecary brews the remedy. The GM chooses one primary skill for each distinct task.</p>
@@ -1275,15 +1325,35 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Run a chase as a progress clock for the pursuers against a danger clock for the quarry’s escape. Each exchange, riders roll <strong>Riding</strong> (or Athletics on foot): success ticks the pursuers’ clock, failure ticks the escape. Terrain, a tired horse, or a shot fired from the saddle (Shooting at −2) adjust the rolls.</p>
 <h1 id="g-the-woge-and-the-hidden-world">The woge and the hidden world</h1>
 <h2 id="g-wesen-and-the-woge">Wesen and the woge</h2>
-<p>A Wesen character can <strong>woge</strong> at will, as a free action, and return just as easily. Physical heritage advantages, such as claws or a Blutbad’s fighting form, work only in <strong>full woge</strong>.</p>
-<p><strong>Losing control.</strong> Fury, terror or pain can force a woge. When it matters, the GM calls for a <strong>Will</strong> roll; on a failure you woge, briefly or fully as the GM decides.</p>
-<p><strong>Who sees it.</strong> A full woge is visible to anyone. A <strong>Grimm</strong> sees a flash of the Wesen face whenever a Wesen is stirred by strong emotion, even when the Wesen means to hide it. A Wesen who looks into the eyes of a Grimm in that moment knows the Grimm for what they are.</p>
-<p><strong>Exposure.</strong> A full woge in front of ordinary people breaks the Code of Swabia. Mark a box of <strong>Exposure</strong> on the Trouble tracks.</p>
+<p>Every Wesen heritage follows the <strong>core Wesen rules</strong> and has a <strong>woge profile</strong> (both in the Heritages chapter). In short:</p>
+<ul>
+<li><strong>Woging</strong> is a free action, in or out. Physical heritage advantages and the woge profile work only in <strong>full woge</strong>.</li>
+<li><strong>Losing control.</strong> When an enemy appears, you’re frightened or you’re attacked, the GM can call for a <strong>Will</strong> roll; on a failure you woge.</li>
+<li><strong>Your profile.</strong> While woged, the profile’s attribute bonuses apply to rolls on those attributes and the skills based on them, even above the starting maximum; its other traits and drawbacks apply too. The creator’s <strong>In full woge</strong> box adds them for you.</li>
+<li><strong>Who sees it.</strong> A full woge is visible to anyone. A <strong>Grimm</strong> sees a flash of the Wesen face whenever a Wesen is stirred by strong emotion. A Wesen who looks into the eyes of a Grimm in that moment knows the Grimm for what they are.</li>
+<li><strong>Exposure.</strong> A full woge in front of ordinary people breaks the Code of Swabia: mark a box of <strong>Exposure</strong> (two for a Tier 3 heritage).</li>
+</ul>
 <h2 id="g-grimms">Grimms</h2>
-<p>A Grimm sees woge as described above, and is stronger and faster than ordinary people; the Grimm heritage adjustments reflect that. Grimms enforce the Code, and Wesen know it, so many flee, lie or fight on recognizing one. A Grimm’s blood neutralizes magic: drunk or injected, it strips an Incantare or Wesen magic user of their power, and it kills the Wesen spirit in a Hexenbiest or Zauberbiest. Who gets that blood, and how, is always a serious matter.</p>
-<h2 id="g-incantare-and-their-lenses">Incantare and their Lenses</h2>
-<p>An Incantare’s <strong>Lens</strong> is their heritage advantage: an ability, not a +2. To work magic, describe the effect, then roll <strong>Occult</strong> (or the skill the Lens names). The GM sets what the magic can do, how long it takes and what it needs <strong>before</strong> the roll. Most magic is ritual: it needs minutes or hours, components, and a place to work. Quick magic in a fight is the exception, not the rule.</p>
-<p>Magic draws attention. Using it openly can mark a box of <strong>Exposure</strong>, and the Order of the Holy Knife hunts known Incantare. Grimm blood neutralizes any Incantare’s magic.</p>
+<p>A Grimm’s core gifts come with the heritage: the Sight, Grimm eyes, an uneasy sense of nearby Wesen and magic, never freezing (+2 to Will against fear), resisting magic (+2 to Will against it), and Wesen Lore at least Trained for free. Each Grimm also chooses one <strong>Grimm gift</strong> as their heritage advantage. Grimms enforce the Code, and Wesen know it, so many flee, lie or fight on recognizing one.</p>
+<h3 id="g-grimm-blood">Grimm blood</h3>
+<ul>
+<li><strong>Against a Hexenbiest or Zauberbiest.</strong> A Hexenbiest or Zauberbiest who drinks a Grimm’s blood under a full moon loses their powers. It happens whether the Grimm intends it or not, and it lasts until the <em>Contaminatio Ritualis</em> restores them.</li>
+<li><strong>The Chymiater’s draught.</strong> A Chymiater (alchemist) Incantare can brew a Grimm’s fresh blood into a draught in a major ritual (6 segments). Injected or drunk, it neutralizes the target’s magical gifts for <strong>1d6 days</strong>: an Incantare’s Lens, a Hexenbiest’s telekinesis and spells, or a Wesen’s magical signature power. It does not stop a woge.</li>
+<li><strong>A dangerous commodity.</strong> Everyone in the hidden world knows what Grimm blood can do. Who gets it, and how, is always a serious matter.</li>
+</ul>
+<h2 id="g-incantare-and-rituals">Incantare and rituals</h2>
+<p>An Incantare’s <strong>Lens</strong> is their heritage advantage. The Lens decides <em>how</em> magic is worked: how long it takes, what it needs, what it costs and what it’s best at. Any Lens can attempt any effect.</p>
+<p><strong>Working a ritual.</strong></p>
+<ol type="1">
+<li><strong>Describe the effect.</strong> The GM sets its weight: <strong>minor</strong> (2 segments), <strong>significant</strong> (4) or <strong>major</strong> (6), and says what it can and can’t do before you start.</li>
+<li><strong>Gather the energy.</strong> Fill a progress clock of that size with <strong>Occult</strong> rolls. Each roll takes your Lens’s casting time (usually ten minutes; an hour for a Magi, one action for a Veneficare). Success fills one segment; success by 5 or more fills two. A failure costs time or ticks a danger clock.</li>
+<li><strong>The effect happens</strong> when the clock is full. A ritual interrupted with energy gathered may go wrong.</li>
+</ol>
+<p><strong>Trappings.</strong> The right materials and correspondences (stones, herbs, stars, places) remove one segment from the clock.</p>
+<p><strong>Charms.</strong> A finished ritual can be stored in an object and released by breaking it: a bottle thrown, a pendant snapped, a bullet-charm fired. You can carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4.</p>
+<p><strong>Elixirs and potions</strong> spoil. They stay good until the end of the day, or a week on a success by 5 or more.</p>
+<p><strong>Magic draws attention.</strong> Using it openly can mark a box of <strong>Exposure</strong>, the Order of the Holy Knife hunts known Incantare, and a Grimm gets +1 to sense your magic for each charm or potion you carry.</p>
+<p><strong>Hexenbiests and Zauberbiests</strong> work rituals the same way, through their innate magic, in their own style (curses, potions and sendings).</p>
 <h2 id="g-the-code-of-swabia">The Code of Swabia</h2>
 <p>The Code of Swabia is the old law between Wesen and the rest of the world, and Grimms are its enforcers. At its heart, Wesen must not reveal themselves to humanity. How far it reaches beyond that, and how mercifully a Grimm enforces it, is a question your posse will answer for itself.</p>
 <h1 id="g-personal-combat">Personal combat</h1>
@@ -1500,7 +1570,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Each <strong>two full days of rest</strong> clear one injury box. Rest means no riding, no fighting, nothing strenuous. At three boxes, rest alone clears nothing: treatment must clear the first box.</p>
 <h1 id="g-grit-points-and-trouble">Grit points and Trouble</h1>
 <h2 id="g-using-grit-points">Using Grit points</h2>
-<p>Begin each session with two Grit points; unused points do not carry over. Spend no more than one point on a single roll or injury event.</p>
+<p>Begin each session with two Grit points (three with True grit); unused points do not carry over. Spend no more than one point on a single roll or injury event.</p>
 <table>
 <colgroup>
 <col style="width: 50%" />
@@ -1757,53 +1827,53 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Advancement.</strong> After a significant case, the GM may authorize one skill step for each rider.</li>
 </ol>
 <h1 id="g-ready-made-posse">Ready-made posse</h1>
-<p>Six riders ready to play. Each follows the creation rules exactly, and their connections tie them together.</p>
+<p>Six riders ready to play. Each follows the creation rules exactly, Edges included, and their connections tie them together.</p>
 <h2 id="g-eliza-kessler">Eliza Kessler</h2>
-<p><em>Deputy U.S. Marshal, Marshal. Grimm.</em> Leads the posse and carries the badge: the law, and the Code, in one person.</p>
+<p><em>Deputy U.S. Marshal, Marshal. Grimm (Tier 2).</em> Leads the posse and carries the badge: the law, and the Code, in one person.</p>
 <ul>
 <li><strong>Attributes:</strong> Body 12, Agility 13, Intellect 10, Presence 8, Will 12. <strong>Dodge</strong> 12.</li>
-<li><strong>Skills:</strong> Shooting 16 (Specialty). Trained: Riding 14, Melee 14, Brawling 14, Athletics 13, Investigation 11, Wesen Lore 11, Tracking 11, Read People 11, Leadership 9.</li>
-<li><strong>Advantage:</strong> Keeper of the Books (heritage; companion: The Books Must Be Kept). <strong>Complication:</strong> Law and Order; trigger: a Wesen suspect could be killed instead of arrested.</li>
+<li><strong>Skills:</strong> Shooting 16 (Specialty). Trained: Riding 14, Melee 14, Brawling 14, Athletics 13, Investigation 11, Tracking 11, Read People 11, Survival 11, Leadership 9; Wesen Lore 11 (free).</li>
+<li><strong>Edge:</strong> True grit. <strong>Grimm gift:</strong> Keeper of the Books (companion: The Books Must Be Kept). <strong>Complication:</strong> Law and Order; trigger: a Wesen suspect could be killed instead of arrested.</li>
 <li><strong>Why I ride:</strong> The Grimm blood woke in me, and it came with a duty. <strong>Connection:</strong> Gus Brandt cut her down from a lynch mob’s rope before anyone knew what she was.</li>
 </ul>
 <h2 id="g-gus-brandt">Gus Brandt</h2>
-<p><em>Blacksmith and gunsmith, Tinker. Blutbad.</em> Shoes the horses, fixes the guns, and hasn’t hunted in eleven years.</p>
+<p><em>Blacksmith and gunsmith, Tinker. Blutbad (Tier 2).</em> Shoes the horses, fixes the guns, and hasn’t hunted in eleven years.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 11, Agility 11, Intellect 13, Presence 10, Will 10. <strong>Dodge</strong> 10.</li>
+<li><strong>Attributes:</strong> Body 11, Agility 11, Intellect 13, Presence 10, Will 10. <strong>Dodge</strong> 10. <strong>In woge:</strong> Body 13, Agility 12; claws and fangs mark 2 boxes.</li>
 <li><strong>Skills:</strong> Tinkering 16 (Specialty). Trained: Tracking 14, Wesen Lore 14, Investigation 14, Survival 14, Read People 14, Brawling 12, Melee 12, Athletics 12, Persuasion 11.</li>
-<li><strong>Advantage:</strong> Blutbad Nose (heritage; companion: The Bloodlust). <strong>Complication:</strong> Keeps a Dangerous Secret; trigger: someone from his old pack turns up.</li>
+<li><strong>Edge:</strong> A fine tool: a master gunsmith’s tools (+2 Tinkering). <strong>Advantage:</strong> Blutbad Nose (companion: The Bloodlust). <strong>Complication:</strong> Keeps a Dangerous Secret; trigger: someone from his old pack turns up.</li>
 <li><strong>Why I ride:</strong> I did harm once. I mean to balance the ledger. <strong>Connection:</strong> Owes Roz Vey for the remedies that keep the urge quiet.</li>
 </ul>
 <h2 id="g-roz-vey">Roz Vey</h2>
-<p><em>Owner of the spice and tea shop, Apothecary. Fuchsbau.</em> Sells tea out front, and other things in the back.</p>
+<p><em>Spice and tea merchant, Apothecary. Fuchsbau (Tier 1).</em> Sells tea out front, and other things in the back.</p>
 <ul>
 <li><strong>Attributes:</strong> Body 9, Agility 11, Intellect 13, Presence 12, Will 10. <strong>Dodge</strong> 9.</li>
-<li><strong>Skills:</strong> Apothecary 16 (Specialty). Trained: Medicine 14, Wesen Lore 14, Read People 14, Investigation 14, Gambling 14, Survival 14, Persuasion 13, Deception 13, Stealth 12.</li>
-<li><strong>Advantage:</strong> Fuchsbau Remedies (heritage; companion: Criminal Kin). <strong>Complication:</strong> Protects Others at Personal Risk; trigger: a sick or hurt stranger turns up at the shop.</li>
+<li><strong>Skills:</strong> Apothecary 16 (Specialty). Trained: Medicine 14, Wesen Lore 14, Read People 14, Investigation 14, Gambling 14, Survival 14, Occult 14, Persuasion 13, Deception 13, Stealth 12.</li>
+<li><strong>Edges:</strong> Extra Trained skill; a friend in town: her cousin Ambrose, a Fuchsbau smuggler on the Portland docks who can find any ingredient, for a price. <strong>Advantage:</strong> Fuchsbau Remedies (companion: Criminal Kin). <strong>Complication:</strong> Protects Others at Personal Risk; trigger: a sick or hurt stranger turns up at the shop.</li>
 <li><strong>Why I ride:</strong> Wesen and humans can live side by side, and I mean to prove it. <strong>Connection:</strong> Trades notes with Dr. Whitlock, who still won’t admit some of her remedies work better than his.</li>
 </ul>
 <h2 id="g-dr.-thaddeus-whitlock">Dr. Thaddeus Whitlock</h2>
-<p><em>Town physician, Doctor. Human.</em> Army surgeon in the war; now he digs bullets out of the posse and asks too many questions about what made the other wounds.</p>
+<p><em>Town physician, Doctor. Human (Tier 0).</em> Army surgeon in the war; now he digs bullets out of the posse and asks too many questions about what made the other wounds.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 10, Agility 10, Intellect 13, Presence 11, Will 11. <strong>Dodge</strong> 8.</li>
-<li><strong>Skills:</strong> Medicine 16 (Specialty). Trained: Apothecary 14, Read People 14, Investigation 14, Wesen Lore 14, Occult 14, Persuasion 12, Leadership 12, Riding 11, Shooting 11.</li>
-<li><strong>Advantage:</strong> Steady Hands. <strong>Complication:</strong> Haunted by the War; trigger: gunfire in the dark.</li>
+<li><strong>Attributes:</strong> Body 10, Agility 10, Intellect 13, Presence 12, Will 11. <strong>Dodge</strong> 8.</li>
+<li><strong>Skills:</strong> Medicine 16 (Specialty). Trained: Apothecary 14, Read People 14, Investigation 14, Wesen Lore 14, Occult 14, Persuasion 13, Leadership 13, Riding 11, Shooting 11.</li>
+<li><strong>Edges:</strong> +1 attribute point; second advantage: Battlefield Surgeon; a fine tool: his army surgeon’s instruments (+2 Medicine). <strong>Advantage:</strong> Steady Hands. <strong>Complication:</strong> Haunted by the War; trigger: gunfire in the dark.</li>
 <li><strong>Why I ride:</strong> I saw what I saw, and no one else believes me. <strong>Connection:</strong> Rode with Silas Thorne’s regiment in the war and has never trusted him since.</li>
 </ul>
 <h2 id="g-cora-ridgeway">Cora Ridgeway</h2>
-<p><em>Scout and sharpshooter, Scout. Coyotl.</em> Knows the desert and the high country, and keeps her clan’s ways close.</p>
+<p><em>Scout and sharpshooter, Scout. Coyotl (Tier 1).</em> Knows the plains and the high country, and keeps her clan’s ways close.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 10, Agility 14, Intellect 10, Presence 11, Will 10. <strong>Dodge</strong> 13.</li>
-<li><strong>Skills:</strong> Shooting 17 (Specialty). Trained: Riding 15, Stealth 15, Brawling 15, Melee 15, Persuasion 12, Tracking 11, Survival 11, Read People 11, Athletics 11.</li>
-<li><strong>Advantage:</strong> Desert Wanderer (heritage; companion: Clan Law). <strong>Complication:</strong> Sworn Vengeance; trigger: word of the men who burned her clan’s camp.</li>
+<li><strong>Attributes:</strong> Body 11, Agility 14, Intellect 10, Presence 11, Will 9. <strong>Dodge</strong> 13. <strong>In woge:</strong> Body 12, Agility 15, Dodge 15; claws mark 2 boxes.</li>
+<li><strong>Skills:</strong> Shooting 17 (Specialty). Trained: Riding 15, Stealth 15, Brawling 15, Melee 15, Persuasion 12, Athletics 12, Tracking 11, Survival 11, Read People 11, Gambling 11.</li>
+<li><strong>Edges:</strong> Extra Trained skill; True grit. <strong>Advantage:</strong> Plains Wanderer (companion: Restless). <strong>Complication:</strong> Sworn Vengeance; trigger: word of the men who burned her clan’s camp.</li>
 <li><strong>Why I ride:</strong> Something that wore a human face killed someone I loved. <strong>Connection:</strong> Eliza Kessler taught her what she knows about the hidden world.</li>
 </ul>
 <h2 id="g-silas-thorne">Silas Thorne</h2>
-<p><em>Professional gambler, Gambler. Ziegevolk; Old hand.</em> Charming, well-dressed, and in debt to the wrong people in San Francisco.</p>
+<p><em>Professional gambler, Gambler. Ziegevolk (Tier 1); Old hand.</em> Charming, well-dressed, and in debt to the wrong people in San Francisco.</p>
 <ul>
 <li><strong>Attributes:</strong> Body 10, Agility 10, Intellect 13, Presence 13, Will 9. <strong>Dodge</strong> 8.</li>
 <li><strong>Skills:</strong> Gambling 18 (Expert). Trained: Deception 14, Persuasion 14, Read People 14, Investigation 14, Shooting 11, Stealth 11, Riding 11.</li>
-<li><strong>Advantage:</strong> Ziegevolk Pheromones (heritage; companion: Pheromone Suspicion). <strong>Complication:</strong> Owes the Wrong People; trigger: a collector from San Francisco arrives.</li>
+<li><strong>Edges:</strong> Second advantage: Poker Face; a friend in town: Mae Lin, a faro dealer in San Francisco who hears everything said at her table. <strong>Advantage:</strong> Ziegevolk Pheromones (companion: Pheromone Suspicion). <strong>Complication:</strong> Owes the Wrong People; trigger: a collector from San Francisco arrives.</li>
 <li><strong>Why I ride:</strong> The pay’s good, and nobody else will take these jobs. <strong>Connection:</strong> Plays cards with Cora every Saturday; she’s the only one who can tell when he’s bluffing.</li>
 </ul>
 <h1 id="g-threats">Threats</h1>
@@ -1874,7 +1944,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>8</td>
 <td>3</td>
 <td>Spells, knives</td>
-<td><strong>Telekinesis.</strong> Once per round, throws a person (1 box) instead of attacking. Grimm blood ends her power.</td>
+<td><strong>Telekinesis.</strong> Once per round, throws a person (1 box) instead of attacking. Grimm blood drunk under a full moon ends her power.</td>
 </tr>
 <tr class="odd">
 <td>Wendigo</td>
@@ -1991,9 +2061,191 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<h1 id="g-heritage-advantages">Heritage advantages</h1>
-<p>A heritage advantage <strong>replaces</strong> your general advantage and comes with a <strong>companion complication</strong>, which earns Grit like any other. You keep your regular complication as well. Most give +2 in one narrow situation; a few are abilities (marked as such) that name the roll and give no +2. Wesen physical advantages work only in full woge.</p>
+<!-- HERITAGES:START -->
+<h1 id="g-heritages">Heritages</h1>
+<p>Each heritage has a <strong>tier</strong>. A character has 3 points to split between heritage power and Edges: the higher the tier, the fewer Edges (see Step 2). Adjustments always total zero. Heritages marked <em>horror</em> are only available when the whole table has agreed to a horror-tinged campaign.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Heritage</th>
+<th>Tier</th>
+<th>Edges</th>
+<th>Adjustments</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Human</td>
+<td>0</td>
+<td>3</td>
+<td>None</td>
+</tr>
+<tr class="even">
+<td>Bauerschwein</td>
+<td>1</td>
+<td>2</td>
+<td>Body +1, Agility −1, Presence −1, Will +1</td>
+</tr>
+<tr class="odd">
+<td>Coyotl</td>
+<td>1</td>
+<td>2</td>
+<td>Body +1, Agility +1, Intellect −1, Will −1</td>
+</tr>
+<tr class="even">
+<td>Eisbiber</td>
+<td>1</td>
+<td>2</td>
+<td>Intellect +1, Will −1</td>
+</tr>
+<tr class="odd">
+<td>Fuchsbau</td>
+<td>1</td>
+<td>2</td>
+<td>Body −1, Intellect +2, Will −1</td>
+</tr>
+<tr class="even">
+<td>Mauzhertz</td>
+<td>1</td>
+<td>2</td>
+<td>Body −1, Agility +1</td>
+</tr>
+<tr class="odd">
+<td>Steinadler</td>
+<td>1</td>
+<td>2</td>
+<td>Body −1, Agility +1, Intellect +1, Will −1</td>
+</tr>
+<tr class="even">
+<td>Taniwha (horror)</td>
+<td>1</td>
+<td>2</td>
+<td>Body +1, Presence −1</td>
+</tr>
+<tr class="odd">
+<td>Ziegevolk</td>
+<td>1</td>
+<td>2</td>
+<td>Intellect −1, Presence +2, Will −1</td>
+</tr>
+<tr class="even">
+<td>Blutbad</td>
+<td>2</td>
+<td>1</td>
+<td>Body +1, Agility +1, Intellect −1, Will −1</td>
+</tr>
+<tr class="odd">
+<td>Grimm</td>
+<td>2</td>
+<td>1</td>
+<td>Body +1, Agility +1, Presence −2</td>
+</tr>
+<tr class="even">
+<td>Incantare</td>
+<td>2</td>
+<td>1</td>
+<td>Body −1, Intellect +1, Presence −1, Will +1</td>
+</tr>
+<tr class="odd">
+<td>Jägerbär</td>
+<td>2</td>
+<td>1</td>
+<td>Body +2, Agility −1, Intellect −1</td>
+</tr>
+<tr class="even">
+<td>Mauvais Dentes</td>
+<td>2</td>
+<td>1</td>
+<td>Body +1, Agility +1, Intellect −1, Presence −1</td>
+</tr>
+<tr class="odd">
+<td>Naschazer (horror)</td>
+<td>2</td>
+<td>1</td>
+<td>Body +2, Intellect −1, Presence −1</td>
+</tr>
+<tr class="even">
+<td>Skalengeck</td>
+<td>2</td>
+<td>1</td>
+<td>Agility +1, Presence −1</td>
+</tr>
+<tr class="odd">
+<td>Vallachi (horror)</td>
+<td>2</td>
+<td>1</td>
+<td>Body +1, Agility −1, Presence +1, Will −1</td>
+</tr>
+<tr class="even">
+<td>Fuchsteufelwild</td>
+<td>3</td>
+<td>0</td>
+<td>Body +1, Intellect +2, Presence −2, Will −1</td>
+</tr>
+<tr class="odd">
+<td>Hexenbiest or Zauberbiest</td>
+<td>3</td>
+<td>0</td>
+<td>Body −1, Agility −1, Presence +1, Will +1</td>
+</tr>
+<tr class="even">
+<td>Murcielago</td>
+<td>3</td>
+<td>0</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-core-wesen-rules">Core Wesen rules</h2>
+<p>Every Wesen heritage has these, on top of its own entry below. They come from the traits all the Wesen templates share.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Rule</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hidden face</td>
+<td>Humans see your Wesen face only when you choose a full woge.</td>
+</tr>
+<tr class="even">
+<td>Wesen sight</td>
+<td>You see other Wesen when they woge, and you see a Grimm’s eyes.</td>
+</tr>
+<tr class="odd">
+<td>Woge</td>
+<td>A free action, in or out. Anger, frustration or fright can force one: when an enemy appears, you’re frightened or you’re attacked, the GM can call for a Will roll; on a failure you woge.</td>
+</tr>
+<tr class="even">
+<td>Monstrous while woged</td>
+<td>Ordinary people panic or attack; Persuasion with them is impossible. A full woge seen by townsfolk marks Exposure (2 boxes for a Tier 3 heritage).</td>
+</tr>
+<tr class="odd">
+<td>Animals bolt</td>
+<td>−2 to Riding while woged; a horse won’t carry a woged rider.</td>
+</tr>
+<tr class="even">
+<td>The Code</td>
+<td>Your secret is deadly. Wesen who expose themselves answer to the Council, and to Grimms.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Woge profiles.</strong> While you’re in full woge, your profile’s attribute bonuses apply to rolls using those attributes (including the skills based on them), even above the starting maximum. Its other traits and drawbacks apply too. “Tough” means each hit that marks 2 or more boxes marks one fewer, never below 1.</p>
 <h2 id="g-human">Human</h2>
+<p><em>Tier 0 · 3 Edges · None</em></p>
+<p>Most of the frontier, and most of the posse. You know the truth about the hidden world, which already sets you apart.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -2020,7 +2272,16 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<h2 id="g-grimm">Grimm</h2>
+<p><em>Source: No template</em></p>
+<h2 id="g-bauerschwein">Bauerschwein</h2>
+<p><em>Tier 1 (Minor) · 2 Edges · Body +1, Agility −1, Presence −1, Will +1</em></p>
+<p>Pig-like Wesen: stubborn, hard-working, with senses sharp even in human form, and old enemies of the Blutbaden. Their feud is settled, when it must be, by the Ehrenkampf, a ritual duel.</p>
+<p><strong>Heritage rules:</strong></p>
+<ul>
+<li>Sharp senses even unwoged: you can identify people and things by smell in either form.</li>
+</ul>
+<p><strong>Woge profile:</strong> Body +1; Tusks: a gore marks 1 box.</p>
+<p><strong>Suggested skills:</strong> Athletics, Brawling, Investigation, Survival.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -2036,61 +2297,23 @@ tr.lvl-U td.target { color: var(--muted); }
 </thead>
 <tbody>
 <tr class="odd">
-<td>Keeper of the Books</td>
-<td>+2 to Wesen Lore when you can consult your family’s books.</td>
-<td><strong>The Books Must Be Kept.</strong> The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them.</td>
+<td>Stubborn as Stone</td>
+<td>+2 to Will to resist intimidation, especially from a Blutbad.</td>
+<td><strong>Old Feud.</strong> Blutbaden are your people’s enemies. When one is near, accept the quarrel, or the challenge to Ehrenkampf.</td>
 </tr>
 <tr class="even">
-<td>Decapitare</td>
-<td>+2 to Melee against a Wesen in full woge.</td>
-<td><strong>Reapers.</strong> Wesen who hunt Grimms know your family name. Accept the danger when they find you.</td>
-</tr>
-<tr class="odd">
-<td>Grimm’s Gaze</td>
-<td>+2 to Presence rolls to intimidate a Wesen who has recognized you.</td>
-<td><strong>Wesen Know Your Face.</strong> When Wesen recognize you, they lie, flee or close ranks. Accept the lost cooperation.</td>
+<td>Keen Snout</td>
+<td>+2 to Intellect rolls to notice or identify something by smell.</td>
+<td><strong>Blunt to a Fault.</strong> Your honesty offends someone who matters. Accept the lost goodwill.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="g-incantare">Incantare</h2>
-<p>Choose your Lens. Each is an ability: roll <strong>Occult</strong>, with limits the GM sets before the roll.</p>
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Lens</th>
-<th>Effect</th>
-<th>Companion complication</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Hermetic Lens</td>
-<td>Ritual magic from texts, circles and sigils: wards, bindings, divination, sendings. Needs time, a prepared circle and the right materials.</td>
-<td><strong>Bound by Oaths.</strong> Your order’s secrets and superiors come first. Accept the order’s demand or the cost of refusing.</td>
-</tr>
-<tr class="even">
-<td>Druidic Lens</td>
-<td>Rites of the living earth: weather, beasts, growth and decay. Only on living ground, outdoors.</td>
-<td><strong>Iron Sickness.</strong> Railroads, factories and mines sicken you. Near them, accept −2 on Will and Occult rolls.</td>
-</tr>
-<tr class="odd">
-<td>Folk Lens</td>
-<td>Charms, hexes and protective tokens: small, quick magic from cunning folk and hedge witches.</td>
-<td><strong>Old Superstitions.</strong> Your charms demand their rituals. Accept the delay or odd behavior the rules require.</td>
-</tr>
-<tr class="even">
-<td>Spiritualist Lens</td>
-<td>Speak with the dead through séance, dream or trance. The dead know only what they knew.</td>
-<td><strong>The Dead Follow You.</strong> Restless spirits find you. Accept the haunting at a bad moment.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="g-blutbad">Blutbad</h2>
+<p><em>Source: No template; adapted from the show.</em></p>
+<h2 id="g-coyotl">Coyotl</h2>
+<p><em>Tier 1 (Minor) · 2 Edges · Body +1, Agility +1, Intellect −1, Will −1</em></p>
+<p>Coyote-like Wesen of the plains and desert country who live in clans bound by old customs, and fight together like a pack.</p>
+<p><strong>Woge profile:</strong> Body +1; Agility +1; Dodge +1; Claws mark 2 boxes; Keen senses: track by scent and hearing; Swift: +2 to Athletics when running.</p>
+<p><strong>Suggested skills:</strong> Brawling, Shooting, Tracking, Survival.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -2106,45 +2329,23 @@ tr.lvl-U td.target { color: var(--muted); }
 </thead>
 <tbody>
 <tr class="odd">
-<td>Blutbad Nose</td>
-<td>+2 to Tracking by scent.</td>
-<td><strong>The Bloodlust.</strong> When blood is spilled near you or something runs, the hunt calls. Accept the Will roll or the cost of the urge.</td>
+<td>Pack Fighter</td>
+<td>+2 to Brawling or Melee against a target an ally attacked this round.</td>
+<td><strong>Clan Law.</strong> The clan’s customs bind you. Accept the clan’s demand.</td>
 </tr>
 <tr class="even">
-<td>Fang and Claw</td>
-<td>Ability, in full woge: your Brawling hits mark 2 boxes.</td>
-<td><strong>Blutbad Reputation.</strong> Other Wesen, especially Bauerschwein, fear and hate your kind. Accept the hostility.</td>
+<td>Plains Wanderer</td>
+<td>+2 to Survival in dry, open country: plains, desert and badlands.</td>
+<td><strong>Restless.</strong> You can’t stay put for long. Accept leaving, or the strain of staying, at a bad time.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="g-fuchsbau">Fuchsbau</h2>
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Advantage</th>
-<th>Effect</th>
-<th>Companion complication</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Fuchsbau Remedies</td>
-<td>+2 to Apothecary when brewing a remedy, antidote or potion from the old recipes.</td>
-<td><strong>Criminal Kin.</strong> Your family deals in the Wesen black market. Accept their demands or their trouble.</td>
-</tr>
-<tr class="even">
-<td>Fox’s Cunning</td>
-<td>+2 to Deception when misleading a pursuer or covering your tracks.</td>
-<td><strong>Too Clever by Half.</strong> You overplay your hand. Accept the consequence when the trick backfires.</td>
-</tr>
-</tbody>
-</table>
+<p><em>Source: Coyotl template: DX +2, HT +1, ST +2. About 141 points.</em></p>
 <h2 id="g-eisbiber">Eisbiber</h2>
+<p><em>Tier 1 (Minor) · 2 Edges · Intellect +1, Will −1</em></p>
+<p>Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, and easily frightened by violence. Bullies like the Hässlich prey on them.</p>
+<p><strong>Woge profile:</strong> Body +1; Teeth gnaw through wood and rope (a bite marks 1 box); Swimmer: holds breath for minutes; +2 to Athletics when swimming.</p>
+<p><strong>Suggested skills:</strong> Tinkering, Athletics, Persuasion, Investigation.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -2171,7 +2372,12 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<h2 id="g-hexenbiest-or-zauberbiest">Hexenbiest or Zauberbiest</h2>
+<p><em>Source: No template; adapted from the show.</em></p>
+<h2 id="g-fuchsbau">Fuchsbau</h2>
+<p><em>Tier 1 (Minor) · 2 Edges · Body −1, Intellect +2, Will −1</em></p>
+<p>Fox-like Wesen, clever and quick, with a long tradition of trade in herbs, remedies and harder-to-find ingredients. Other Wesen call them disreputable, and not always unfairly.</p>
+<p><strong>Woge profile:</strong> Body +1; Agility +1; Claws mark 2 boxes; Keen senses: track by scent and hearing.</p>
+<p><strong>Suggested skills:</strong> Tracking, Riding, Melee, Shooting, Gambling, Wesen Lore.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -2187,72 +2393,28 @@ tr.lvl-U td.target { color: var(--muted); }
 </thead>
 <tbody>
 <tr class="odd">
-<td>Hexenbiest Spellcraft</td>
-<td>Ability: with ingredients and time, roll Occult to cast a spell: a curse, a sleep, a sending, a disguise.</td>
-<td><strong>The Price of Magic.</strong> Every spell costs blood, pain or something precious. Accept the cost when it bites.</td>
+<td>Fuchsbau Remedies</td>
+<td>+2 to Apothecary when brewing a remedy, antidote or potion from the old recipes.</td>
+<td><strong>Criminal Kin.</strong> Your family deals in the Wesen black market. Accept their demands or their trouble.</td>
 </tr>
 <tr class="even">
-<td>Telekinesis</td>
-<td>Ability, in full woge: roll Will to throw a person or object with your mind (1 box).</td>
-<td><strong>Hexenbiest Pride.</strong> You cannot abide being bested or slighted. Accept the feud you start.</td>
+<td>Fox’s Cunning</td>
+<td>+2 to Deception when misleading a pursuer or covering your tracks.</td>
+<td><strong>Too Clever by Half.</strong> You overplay your hand. Accept the consequence when the trick backfires.</td>
 </tr>
-</tbody>
-</table>
-<h2 id="g-jägerbar">Jägerbar</h2>
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Advantage</th>
-<th>Effect</th>
-<th>Companion complication</th>
-</tr>
-</thead>
-<tbody>
 <tr class="odd">
-<td>Bear’s Strength</td>
-<td>+2 to Athletics for feats of raw strength: lifting, breaking, holding.</td>
-<td><strong>The Old Rites.</strong> Your family’s hunting rites pull at you. Accept the obligation or the shame of refusing.</td>
-</tr>
-<tr class="even">
-<td>Maul</td>
-<td>Ability, in full woge: your Brawling hits mark 2 boxes.</td>
-<td><strong>Slow to Calm.</strong> Once angered, you’re hard to stop. Accept the harm you do to something you shouldn’t.</td>
+<td>Horse Archer</td>
+<td>+2 to Shooting with a bow from the saddle.</td>
+<td><strong>Disreputable.</strong> Wesen assume a Fuchsbau is up to something. Accept the distrust when it costs you.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="g-bauerschwein">Bauerschwein</h2>
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Advantage</th>
-<th>Effect</th>
-<th>Companion complication</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Stubborn as Stone</td>
-<td>+2 to Will to resist intimidation, especially from a Blutbad.</td>
-<td><strong>Old Feud.</strong> Blutbaden are your people’s enemies. When one is near, accept the quarrel.</td>
-</tr>
-<tr class="even">
-<td>Keen Snout</td>
-<td>+2 to Intellect rolls to notice or identify something by smell.</td>
-<td><strong>Blunt to a Fault.</strong> Your honesty offends someone who matters. Accept the lost goodwill.</td>
-</tr>
-</tbody>
-</table>
+<p><em>Source: Fuchsbau template: IQ +2; Bad Reputation (disreputable among Wesen). About 132 points.</em></p>
 <h2 id="g-mauzhertz">Mauzhertz</h2>
+<p><em>Tier 1 (Minor) · 2 Edges · Body −1, Agility +1</em></p>
+<p>Mouse-like Wesen, small, quick and wary, with excellent hearing. Gentle by nature, but one pushed too far can snap.</p>
+<p><strong>Woge profile:</strong> Agility +1; Dodge +1; Keen hearing: hear whispers through walls.</p>
+<p><strong>Suggested skills:</strong> Stealth, Athletics, Read People, Investigation.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -2275,38 +2437,16 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="even">
 <td>Keen Hearing</td>
 <td>+2 to Intellect rolls to hear faint or distant sounds.</td>
-<td><strong>Prey’s Heart.</strong> Facing a predator Wesen, accept hesitation at the worst moment.</td>
+<td><strong>Breaking Point.</strong> Pushed too far, you snap into violence. Accept what you do in that moment.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="g-ziegevolk">Ziegevolk</h2>
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Advantage</th>
-<th>Effect</th>
-<th>Companion complication</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Ziegevolk Pheromones</td>
-<td>+2 to Persuasion face to face at close quarters. Grimms and anyone with an antidote are unaffected.</td>
-<td><strong>Pheromone Suspicion.</strong> Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust.</td>
-</tr>
-<tr class="even">
-<td>Smooth Operator</td>
-<td>+2 to Deception when talking your way past a guard or official.</td>
-<td><strong>Scandal Follows You.</strong> Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex.</td>
-</tr>
-</tbody>
-</table>
+<p><em>Source: No template; adapted from the show.</em></p>
 <h2 id="g-steinadler">Steinadler</h2>
+<p><em>Tier 1 (Minor) · 2 Edges · Body −1, Agility +1, Intellect +1, Will −1</em></p>
+<p>Eagle-like Wesen with remarkable eyesight, a hunter’s pride, and a taste for working alone, sometimes for hire.</p>
+<p><strong>Woge profile:</strong> Agility +1; Talons mark 2 boxes; Eagle sight: see detail a mile away.</p>
+<p><strong>Suggested skills:</strong> Shooting, Tracking, Stealth, Survival.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -2333,7 +2473,17 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<h2 id="g-coyotl">Coyotl</h2>
+<p><em>Source: No template; adapted from the show.</em></p>
+<h2 id="g-taniwha">Taniwha</h2>
+<p><em>Tier 1 (Minor) · 2 Edges · Body +1, Presence −1 · horror campaigns only</em></p>
+<p>Water-dwelling Wesen from New Zealand: guardians of rivers and the people they claim, reptile-like in woge, and dangerous to anyone else. Horror campaigns only.</p>
+<p><strong>Heritage rules:</strong></p>
+<ul>
+<li>Resists poison: +4 to Body against any poison.</li>
+<li>Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can’t clear, every three days.</li>
+</ul>
+<p><strong>Woge profile:</strong> Body +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Amphibious: breathes water, swims as fast as a horse runs; Burrows through earth; Dark sight. <strong>Drawbacks:</strong> Must be submerged in water daily, or mark a box that rest can’t clear, each hour; Pounamu (greenstone) wounds mark one extra box.</p>
+<p><strong>Suggested skills:</strong> Athletics, Brawling, Survival, Stealth.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -2349,17 +2499,531 @@ tr.lvl-U td.target { color: var(--muted); }
 </thead>
 <tbody>
 <tr class="odd">
-<td>Pack Fighter</td>
-<td>+2 to Brawling or Melee against a target an ally attacked this round.</td>
-<td><strong>Clan Law.</strong> The clan’s customs bind you. Accept the clan’s demand.</td>
+<td>Paralyzing Bite</td>
+<td>Ability, in full woge: a bite marks 1 box, and the target rolls Body or is paralyzed for the scene.</td>
+<td><strong>Guardian’s Duty.</strong> You protect those you’ve claimed as yours. Accept the danger when they need you.</td>
 </tr>
 <tr class="even">
-<td>Desert Wanderer</td>
-<td>+2 to Survival in dry, open country.</td>
-<td><strong>Restless.</strong> You can’t stay put for long. Accept leaving, or the strain of staying, at a bad time.</td>
+<td>River Guardian</td>
+<td>+2 to Athletics and Survival in rivers, lakes and the sea.</td>
+<td><strong>Peculiar Appetite.</strong> Gluttony, and an odd craving (frogs, to start with). Accept the distraction at a bad time.</td>
 </tr>
 </tbody>
 </table>
+<p><em>Source: Taniwha template (150-point): poison resistance; Dependency (human flesh, seasonal). About 157 points.</em></p>
+<h2 id="g-ziegevolk">Ziegevolk</h2>
+<p><em>Tier 1 (Minor) · 2 Edges · Intellect −1, Presence +2, Will −1</em></p>
+<p>Goat-like Wesen whose pheromones, working even in human form, make them unnaturally persuasive and unnaturally popular. A Fuchsbau remedy can protect against them.</p>
+<p><strong>Woge profile:</strong> Body +1; Horns: a butt marks 1 box.</p>
+<p><strong>Suggested skills:</strong> Persuasion, Deception, Read People, Gambling.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ziegevolk Pheromones</td>
+<td>+2 to Persuasion face to face at close quarters, in either form. Grimms and anyone dosed with the antidote are unaffected.</td>
+<td><strong>Pheromone Suspicion.</strong> Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust.</td>
+</tr>
+<tr class="even">
+<td>Smooth Operator</td>
+<td>+2 to Deception when talking your way past a guard or official.</td>
+<td><strong>Scandal Follows You.</strong> Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: No template; adapted from the show.</em></p>
+<h2 id="g-blutbad">Blutbad</h2>
+<p><em>Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Intellect −1, Will −1</em></p>
+<p>Wolf-like Wesen with keen senses and a predator’s appetite; the root of the werewolf legend. Wesen who know your kind assume you hunt humans. You don’t, or not anymore.</p>
+<p><strong>Heritage rules:</strong></p>
+<ul>
+<li>Reputation: Eats Humans. Wesen who know your kind assume the worst.</li>
+</ul>
+<p><strong>Woge profile:</strong> Body +2; Agility +1; Claws and fangs mark 2 boxes; Keen senses: track by scent and hearing; Dark sight; Leaper: +2 to Athletics to jump; Shrugs off cold.</p>
+<p><strong>Suggested skills:</strong> Brawling, Shooting, Survival, Tracking.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Blutbad Nose</td>
+<td>+2 to Tracking by scent, in either form.</td>
+<td><strong>The Bloodlust.</strong> When blood is spilled near you or something runs, roll Will or woge and give chase. Accept the cost of the urge.</td>
+</tr>
+<tr class="even">
+<td>Night Hunter</td>
+<td>+2 to Stealth when stalking at night.</td>
+<td><strong>Loner.</strong> You shun company. Accept the cost of going it alone.</td>
+</tr>
+<tr class="odd">
+<td>Old Enemy</td>
+<td>+2 to Brawling against a Bauerschwein.</td>
+<td><strong>Old Feud.</strong> Bauerschwein are your enemies. When one is near, accept the quarrel.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: Blutbaad template: DX +3, HT +2, ST +2; Loner; Enemy (Bauerschwein). About 208 points.</em></p>
+<h2 id="g-grimm">Grimm</h2>
+<p><em>Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Presence −2</em></p>
+<p>A descendant of the old hunters, the Decapitare: stronger and faster than ordinary people, able to see the Wesen hidden among us, and feared by them.</p>
+<p><strong>Heritage rules:</strong></p>
+<ul>
+<li>The Sight: you see a Wesen’s face when it’s stirred by strong emotion.</li>
+<li>Grimm eyes: woged Wesen and other Grimms see them; humans don’t.</li>
+<li>Uneasy sense: you feel when a Wesen or magic is near, with no details.</li>
+<li>Never freeze: you’re never surprised, and +2 to Will against fear.</li>
+<li>Hard to bewitch: +2 to Will against magic.</li>
+<li>Raised on the books: Wesen Lore is always at least Trained, free.</li>
+<li>Grimm blood: a Hexenbiest or Zauberbiest who drinks it under a full moon loses their powers (see Grimm blood).</li>
+</ul>
+<p><strong>Suggested skills:</strong> Wesen Lore, Melee, Shooting, Investigation, Tracking.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Gift</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Danger Sense</td>
+<td>Ability: when an ambush or trap threatens you, the GM secretly rolls your Intellect; success warns you in time to act.</td>
+<td><strong>Nightmares.</strong> The dead you’ve seen come back at night. Accept the lost sleep at a bad time.</td>
+</tr>
+<tr class="even">
+<td>Iron Bones</td>
+<td>Ability: each hit that marks 2 or more boxes marks one fewer (never below 1).</td>
+<td><strong>Fanaticism.</strong> Wesen must die. Accept the trouble when mercy would be wiser.</td>
+</tr>
+<tr class="odd">
+<td>Quick to Heal</td>
+<td>Ability: rest clears a box every day, not every two, and works even at three boxes.</td>
+<td><strong>Workaholic.</strong> You won’t rest when there’s a case. Accept the strain.</td>
+</tr>
+<tr class="even">
+<td>Hardy</td>
+<td>+2 to Body to resist poison, disease and exhaustion.</td>
+<td><strong>Stubbornness.</strong> You won’t back down. Accept the cost.</td>
+</tr>
+<tr class="odd">
+<td>Gunslinger</td>
+<td>+2 to Shooting with a pistol at close range, with no need to aim.</td>
+<td><strong>Bad Temper.</strong> Accept the fight you start.</td>
+</tr>
+<tr class="even">
+<td>Perfect Balance</td>
+<td>+2 to Athletics and Melee to keep your feet or fight on bad ground.</td>
+<td><strong>Curious.</strong> Accept the risk your curiosity brings.</td>
+</tr>
+<tr class="odd">
+<td>Heavy Hand</td>
+<td>Ability: your Brawling hits mark 2 boxes.</td>
+<td><strong>Bloodlust.</strong> You don’t stop at the surrender. Accept the consequences.</td>
+</tr>
+<tr class="even">
+<td>Bonded Weapon</td>
+<td>+2 to Melee or Shooting with one named heirloom weapon.</td>
+<td><strong>The Weapon Must Be Kept.</strong> When it’s lost or taken, accept the risk to get it back.</td>
+</tr>
+<tr class="odd">
+<td>Hard to Kill</td>
+<td>Ability: Dying lasts until the end of the next scene, not this one.</td>
+<td><strong>Vow: Protect the Innocent.</strong> You’ve sworn to protect the innocent from Wesen. Accept the danger.</td>
+</tr>
+<tr class="even">
+<td>Pain Means Nothing</td>
+<td>Ability: ignore the Wounded penalty (−1).</td>
+<td><strong>Honesty.</strong> You won’t lie, even to Wesen. Accept the consequence.</td>
+</tr>
+<tr class="odd">
+<td>Keeper of the Books</td>
+<td>+2 to Wesen Lore when you can consult your family’s books.</td>
+<td><strong>The Books Must Be Kept.</strong> The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: Decapitare template: ST, DX, HT +1; Combat Reflexes; Detect (Wesen, Magic); Magic Resistance 7; Talent (Grimm); Reputation (Frightening Decapitare).</em></p>
+<h2 id="g-incantare">Incantare</h2>
+<p><em>Tier 2 (Major) · 1 Edge · Body −1, Intellect +1, Presence −1, Will +1</em></p>
+<p>A human who works real magic through a Lens: a tradition and a way of seeing. The Wesen Council, the Royals and the Order of the Holy Knife all watch for people like you.</p>
+<p><strong>Heritage rules:</strong></p>
+<ul>
+<li>Rituals: roll Occult to fill a ritual clock (minor 2, significant 4, major 6 segments). Your Lens sets how.</li>
+<li>Charms: you can carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).</li>
+<li>Grimms sense your magic: +1 to notice it for each charm or potion you carry.</li>
+</ul>
+<p><strong>Suggested skills:</strong> Occult, Wesen Lore, Apothecary, Read People.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Lens</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Chymiater Lens (Alchemist)</td>
+<td>Brews elixirs, potions and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing. Only a Chymiater can brew the Grimm-blood draught.</td>
+<td><strong>Price of the Work.</strong> Your craft feeds a vice: greed, drink, lechery or gluttony (agree which). Accept it when it bites.</td>
+</tr>
+<tr class="even">
+<td>Figmatarum Lens (Illusionist)</td>
+<td>Glamours, illusions and mesmerism worked through performance, music or art, in minutes. +2 to Occult for illusion and mesmerism.</td>
+<td><strong>Artist’s Vanity.</strong> You need an audience and can’t bear an insult to your art. Accept the trouble your vanity causes.</td>
+</tr>
+<tr class="odd">
+<td>Magi Lens (Wizard)</td>
+<td>Scholarly ritual from grimoires: any kind of effect, but an hour per roll, and it needs books. +2 to Occult for divination and wards.</td>
+<td><strong>Obsession: Magical Knowledge.</strong> A grimoire, a ritual or a secret tempts you beyond sense. Accept the risk to get it.</td>
+</tr>
+<tr class="even">
+<td>Malifica Lens (Witch or Warlock)</td>
+<td>Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link.</td>
+<td><strong>Wicked Reputation.</strong> People whisper that you’re a witch, and the Order of the Holy Knife listens. Accept the suspicion.</td>
+</tr>
+<tr class="odd">
+<td>Phitonissa Lens (Pagan)</td>
+<td>Cunning-folk rites of the seasons, nature and the old gods, worked outdoors. +2 to Occult for nature and folk magic.</td>
+<td><strong>Disciplines of Faith.</strong> The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them.</td>
+</tr>
+<tr class="even">
+<td>Scaenarfex Lens (Artistic Enchanter)</td>
+<td>Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm.</td>
+<td><strong>Artist’s Temperament.</strong> Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you.</td>
+</tr>
+<tr class="odd">
+<td>Veneficare Lens (Sorcerer)</td>
+<td>Quick casting along one or two Paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm.</td>
+<td><strong>Bound Purpose.</strong> Your power follows one narrow calling. Accept the cost of serving it when it clashes with the posse’s needs.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: Incantare template: seven Lenses (Ritual Path Magic).</em></p>
+<h2 id="g-jägerbär">Jägerbär</h2>
+<p><em>Tier 2 (Major) · 1 Edge · Body +2, Agility −1, Intellect −1</em></p>
+<p>Bear-like Wesen, enormously strong and durable. Traditional families still keep the Roh-Hatz, a coming-of-age hunt, and fight with an old Germanic weapon whose claw-like scoop disembowels.</p>
+<p><strong>Woge profile:</strong> Body +2; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Keen smell.</p>
+<p><strong>Suggested skills:</strong> Athletics, Brawling, Melee, Survival.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bear’s Strength</td>
+<td>+2 to Athletics for feats of raw strength: lifting, breaking, holding.</td>
+<td><strong>The Roh-Hatz.</strong> Your family keeps the old hunting rite. Accept the obligation, or the shame of refusing it.</td>
+</tr>
+<tr class="even">
+<td>Family Weapon</td>
+<td>+2 to Melee with your family’s claw-bladed hunting weapon.</td>
+<td><strong>Slow to Calm.</strong> Once angered, you’re hard to stop. Accept the harm you do to something you shouldn’t.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: No template; adapted from the show.</em></p>
+<h2 id="g-mauvais-dentes">Mauvais Dentes</h2>
+<p><em>Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Intellect −1, Presence −1</em></p>
+<p>Sabre-toothed, panther-like Wesen, so deadly that the Royal Families have kept them as assassins. Rare, solitary, and feared even by other Wesen.</p>
+<p><strong>Heritage rules:</strong></p>
+<ul>
+<li>Reputation: Eats Humans. Wesen who know your kind assume the worst.</li>
+</ul>
+<p><strong>Woge profile:</strong> Body +2; Agility +1; Sabre teeth and claws mark 2 boxes; Keen senses: track by scent and hearing; Dark sight; Leaper: +2 to Athletics to jump; Shrugs off cold.</p>
+<p><strong>Suggested skills:</strong> Brawling, Shooting, Survival, Tracking.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Relentless Hunter</td>
+<td>+2 to Tracking when hunting a single named quarry.</td>
+<td><strong>Royal Debt.</strong> The Royals bred your line as killers. When one of their agents calls on you, accept the demand or the danger of refusing.</td>
+</tr>
+<tr class="even">
+<td>Pounce</td>
+<td>+2 to Brawling on your first attack of a fight, leaping from hiding.</td>
+<td><strong>Killer’s Instinct.</strong> In a fight you go for the throat. Accept the death you didn’t intend.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: Mauvais Dentes template: DX +2, HT +3, ST +3; Loner. About 213 points.</em></p>
+<h2 id="g-naschazer">Naschazer</h2>
+<p><em>Tier 2 (Major) · 1 Edge · Body +2, Intellect −1, Presence −1 · horror campaigns only</em></p>
+<p>Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror campaigns only.</p>
+<p><strong>Heritage rules:</strong></p>
+<ul>
+<li>Hunger (horror): each month you must eat human flesh; until you do, mark a box that rest can’t clear, every day.</li>
+</ul>
+<p><strong>Woge profile:</strong> Body +2; Huge strength: fists and fangs mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Feels no pain: ignore the Wounded penalty; Heals fast: rest clears a box every day; Dark sight.</p>
+<p><strong>Suggested skills:</strong> Brawling, Melee, Athletics, Shooting.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Brute Strength</td>
+<td>+2 to Athletics to lift, break or hold.</td>
+<td><strong>Greed.</strong> Riches are hard to refuse. Accept the bribe’s strings or the risk of taking more.</td>
+</tr>
+<tr class="even">
+<td>Butcher’s Hands</td>
+<td>+2 to Melee with a cleaver, axe or knife.</td>
+<td><strong>Proud.</strong> You won’t be slighted. Accept the fight your pride starts.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: Naschazer template: HT +4; Dependency and Uncontrollable Appetite (human flesh); Greed; Proud. About 197 points.</em></p>
+<h2 id="g-skalengeck">Skalengeck</h2>
+<p><em>Tier 2 (Major) · 1 Edge · Agility +1, Presence −1</em></p>
+<p>Lizard-like Wesen, cold-eyed and hard to kill, with a poisonous bite. Common among outlaws and hired guns.</p>
+<p><strong>Woge profile:</strong> Body +2; Agility +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Immune to poison; Keen smell.</p>
+<p><strong>Suggested skills:</strong> Shooting, Brawling, Wesen Lore, Stealth.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Poison Bite</td>
+<td>Ability, in full woge: a bite that marks a box also poisons. Each hour the victim rolls Body −3 or marks another box, until treated with Apothecary.</td>
+<td><strong>Callous.</strong> You don’t much care who gets hurt. Accept the cost when that shows.</td>
+</tr>
+<tr class="even">
+<td>Hard to Subdue</td>
+<td>+2 to Body to resist being knocked out, stunned or restrained.</td>
+<td><strong>Cornered Lizard.</strong> When you’re trapped, you woge and fight. Accept the Exposure and the damage.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: Skalengeck template: no human-form changes. About 189 points.</em></p>
+<h2 id="g-vallachi">Vallachi</h2>
+<p><em>Tier 2 (Major) · 1 Edge · Body +1, Agility −1, Presence +1, Will −1 · horror campaigns only</em></p>
+<p>Long-lived, handsome, vampire-like Wesen who feed on the lifeforce of others and shun the sun. Horror campaigns only.</p>
+<p><strong>Heritage rules:</strong></p>
+<ul>
+<li>Lifedrain (horror): by touch, roll Will against the victim’s Body; on a success they mark a box and you clear one.</li>
+<li>Hunger (horror): each week you must drain lifeforce; until you do, mark a box that rest can’t clear, every six hours.</li>
+<li>Sunlight: −2 to all rolls in direct sun, and you tire quickly.</li>
+<li>Lifebane: plants wilt and animals shy around you.</li>
+</ul>
+<p><strong>Woge profile:</strong> Body +2; Agility +1; Tough: hits of 2+ boxes mark one fewer, except from a pointed wooden stake; Keen senses; Dark sight.</p>
+<p><strong>Suggested skills:</strong> Persuasion, Deception, Stealth, Read People.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Night Charm</td>
+<td>+2 to Persuasion face to face, after dark.</td>
+<td><strong>Old Grudges.</strong> You’ve lived long enough to make enemies. Accept it when one of them turns up.</td>
+</tr>
+<tr class="even">
+<td>Ageless</td>
+<td>+2 to Intellect rolls to recall something you lived through decades ago.</td>
+<td><strong>Secret Age.</strong> You don’t age as you should. Accept the lie or the slip when someone notices.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: Vallachi template: Attractive; Extended Lifespan; HT +2; Dependency and Uncontrollable Appetite (lifeforce); Weakness (sunlight); Lifebane. About 223 points.</em></p>
+<h2 id="g-fuchsteufelwild">Fuchsteufelwild</h2>
+<p><em>Tier 3 (Apex) · 0 Edges · Body +1, Intellect +2, Presence −2, Will −1</em></p>
+<p>Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; the root of Rumpelstiltskin. Clever, spiteful, and bound by an old obsession with names and bargains.</p>
+<p><strong>Heritage rules:</strong></p>
+<ul>
+<li>Acid talons: in full woge, claw hits mark 2 boxes and ignore Tough and armor.</li>
+<li>Leaper, in either form: jumps of many yards; +2 to Athletics to jump.</li>
+</ul>
+<p><strong>Woge profile:</strong> Agility +1; Dodge +1; Keen senses: track by scent and hearing; Swift. <strong>Drawbacks:</strong> Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged; Disturbing voice.</p>
+<p><strong>Suggested skills:</strong> Brawling, Athletics, Deception, Investigation.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tremor</td>
+<td>Ability, in full woge: stomp, and everyone nearby rolls Athletics or falls and loses their next action.</td>
+<td><strong>Cruel Streak.</strong> When an enemy is helpless, you’re tempted to make them suffer. Accept the lost allies, or the Suspicion it brings.</td>
+</tr>
+<tr class="even">
+<td>Strike a Bargain</td>
+<td>+2 to Persuasion or Deception when making a deal.</td>
+<td><strong>Guess My Name.</strong> Your true name holds power over you. When someone hunts for it, or speaks it, accept the consequence.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: Fuchsteurfelwild template: ST +1, HT +2, IQ +3, Super Jump 5; Obsession (Guess My Name); Bully; Callous; Sadism (now a companion). About 424 points; trimmed to Tier 3.</em></p>
+<h2 id="g-hexenbiest-or-zauberbiest">Hexenbiest or Zauberbiest</h2>
+<p><em>Tier 3 (Apex) · 0 Edges · Body −1, Agility −1, Presence +1, Will +1</em></p>
+<p>Witch-like Wesen (Zauberbiest for the men), beautiful in human form and horrific in woge, with innate magic that lives in their Wesen spirit. Coven traditions bind them; Grimm blood can strip them.</p>
+<p><strong>Heritage rules:</strong></p>
+<ul>
+<li>Telekinesis: in full or partial woge, roll Will to throw a person or object with your mind (1 box), seize something out of reach, or turn aside one attack (+2 Dodge).</li>
+<li>Innate magic: you can work rituals with Occult like an Incantare, in the Hexenbiest style: curses, potions and sendings.</li>
+<li>Grimm blood: drunk under a full moon, it strips your powers until the Contaminatio Ritualis restores them.</li>
+</ul>
+<p><strong>Woge profile:</strong> Body +2; Agility +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer. <strong>Drawbacks:</strong> Horrific: even other Wesen recoil.</p>
+<p><strong>Suggested skills:</strong> Occult, Apothecary, Deception, Persuasion.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hexenbiest Spellcraft</td>
+<td>+2 to Occult for curses, potions and sendings.</td>
+<td><strong>The Price of Magic.</strong> Every spell costs blood, pain or something precious. Accept the cost when it bites.</td>
+</tr>
+<tr class="even">
+<td>Levitation</td>
+<td>Ability, in woge: roll Will to lift yourself and float or fly a short way.</td>
+<td><strong>Hexenbiest Pride.</strong> You cannot abide being bested or slighted. Accept the feud you start.</td>
+</tr>
+<tr class="odd">
+<td>TK Crush</td>
+<td>Ability, in full woge: roll Will against the target’s Body; on a success they mark 1 box, which Dodge can’t avoid.</td>
+<td><strong>Coven Traditions.</strong> Your family or coven has rules and expectations. Accept the demand.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: Hexenbiest and Zauberbiest template: Beautiful/Handsome; Sorcery 5; Ritual Adept 2; Vow (coven traditions). About 279 points.</em></p>
+<h2 id="g-murcielago">Murcielago</h2>
+<p><em>Tier 3 (Apex) · 0 Edges · None</em></p>
+<p>Bat-like Wesen with uncanny hearing and a sonic scream that drops a room full of people to their knees.</p>
+<p><strong>Heritage rules:</strong></p>
+<ul>
+<li>Sonic scream: in full woge, roll Will. Everyone nearby you choose who can hear rolls Body −2; a failure loses their next action and takes −2 for the scene. Earplugs protect. Heard in town, it marks Exposure.</li>
+</ul>
+<p><strong>Woge profile:</strong> Body +1; Agility +1; Claws and fangs mark 2 boxes; Sonar: no penalty for darkness; sense the shape of a room by sound; Keen hearing: hear heartbeats; Swift.</p>
+<p><strong>Suggested skills:</strong> Stealth, Athletics, Brawling, Investigation.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Echo Sight</td>
+<td>+2 to Intellect rolls to find something hidden in the dark by sound.</td>
+<td><strong>Sensitive Ears.</strong> Loud noise disorients you. When a gun or explosion goes off nearby, accept −2 on your next action.</td>
+</tr>
+<tr class="even">
+<td>Eavesdropper</td>
+<td>+2 to Intellect rolls to hear faint or distant voices.</td>
+<td><strong>Can’t Unhear.</strong> You hear secrets you shouldn’t. Accept the trouble that knowing brings.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Source: Murcielago template: no human-form changes; Sonic Scream 6, Sonar. About 283 points.</em></p>
+<!-- HERITAGES:END -->
 <h1 id="g-complications">Complications</h1>
 <p>Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Grit point if you accept it. Every complication needs a trigger agreed with the GM; the creator suggests three for each.</p>
 <table>
@@ -2438,10 +3102,34 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Reluctant to Kill</td>
 <td>You seek a way that doesn’t end a life, even a Wesen’s. Accept the extra danger.</td>
 </tr>
+<tr class="odd">
+<td>Vow: Never Kill a Human</td>
+<td>Whatever else you do, you won’t take a human life. Accept the cost when that’s the only way out.</td>
+</tr>
+<tr class="even">
+<td>Hunted by the Church</td>
+<td>Zealous clergy, or the Order of the Holy Knife, want you dead. Accept the danger when they find you.</td>
+</tr>
+<tr class="odd">
+<td>Hunted by a Royal Family</td>
+<td>A Royal Family wants you dead or in chains. Accept the danger when their agents find you.</td>
+</tr>
+<tr class="even">
+<td>Hunted by a Secret Society</td>
+<td>A secret society wants you silenced. Accept the danger when its members find you.</td>
+</tr>
+<tr class="odd">
+<td>Hunted by the Wesen Council</td>
+<td>The Council has marked you. Accept the danger when its enforcers find you.</td>
+</tr>
+<tr class="even">
+<td>Hunted by Grimms</td>
+<td>A Grimm family has your name in its books. Accept the danger when one finds you.</td>
+</tr>
 </tbody>
 </table>
 <h1 id="g-quick-reference">Quick reference</h1>
-<p><strong>Creation:</strong> attributes start at 10, adjusted by heritage (always totaling zero), plus 5 points; maximum 13 plus any heritage bonus. Well-rounded: one Specialty and nine Trained. Old hand: one Expert at +5 and seven Trained. One advantage (general or heritage) and one complication.</p>
+<p><strong>Creation:</strong> attributes start at 10, adjusted by heritage (always totaling zero), plus 5 points; maximum 13 plus any heritage bonus. 3 points split between heritage tier and Edges (Tier 0: 3 Edges; Tier 3: none). Well-rounded: one Specialty and nine Trained. Old hand: one Expert at +5 and seven Trained. One advantage (general or heritage) and one complication; an optional Allegiance.</p>
 <p><strong>Skills:</strong> Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Old hand) = attribute +5.</p>
 <p><strong>Modifiers:</strong> favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails.</p>
 <p><strong>Assistance:</strong> success +1; success by 5 or more +2; 18 causes a complication. One assistant per roll.</p>
@@ -2449,8 +3137,9 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Damage:</strong> fists, clubs, knives and arrows 1 box; guns, heavy blades and Wesen claws 2; a close-range shotgun or buffalo rifle 3 and Dying. A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.</p>
 <p><strong>Guns:</strong> derringer 2, revolver 6, shotgun 2, rifle 15. Reload: one action. Natural 18 jams.</p>
 <p><strong>Medicine:</strong> stabilize in one action. Field care clears 1 box (2 on margin 5+). A surgery gives +2 and clears 2 (3 on margin 5+). Rest: one box per two days, not from three.</p>
-<p><strong>Woge:</strong> free action for a Wesen; a forced woge on a failed Will roll. Grimms see woge under strong emotion. A full woge before townsfolk marks Exposure.</p>
-<p><strong>Grit:</strong> start each session with two. Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.</p>
+<p><strong>Woge:</strong> free action for a Wesen; a forced woge on a failed Will roll. The woge profile’s bonuses apply while woged. Grimms see woge under strong emotion. A full woge before townsfolk marks Exposure (2 boxes at Tier 3).</p>
+<p><strong>Rituals:</strong> describe the effect; fill a clock of 2, 4 or 6 segments with Occult rolls at your Lens’s pace. Trappings remove a segment. Charms: Trained 2, Specialty 3, Expert 4.</p>
+<p><strong>Grit:</strong> start each session with two (three with True grit). Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.</p>
 <!-- GUIDE:END -->
       </article>
     </div>
@@ -2477,7 +3166,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <button class="btn" id="duty-minus" aria-label="Spend a Grit point">Spend</button>
               <span class="count" id="duty-count"></span>
               <button class="btn" id="duty-plus" aria-label="Gain a Grit point">Gain</button>
-              <button class="linkish" id="duty-reset">New session (reset to 2)</button>
+              <button class="linkish" id="duty-reset">New session (reset)</button>
             </div>
             <span class="muted small">Max one point per roll or injury event. Earn one when you accept a meaningful problem from your complication.</span></div>
           <div class="checks"><label><input type="checkbox" id="f-stunned"> Dazed: −2 on next action roll</label>
@@ -2539,7 +3228,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <p class="small muted">Danger clocks fill on failures and time; progress clocks fill on successes. Tap a segment to fill up to it.</p>
           <div class="clock-add">
             <input type="text" id="clk-name" placeholder="e.g. The mob forms" aria-label="Clock name">
-            <select id="clk-size" aria-label="Segments"><option value="4">4</option><option value="6" selected>6</option><option value="8">8</option></select>
+            <select id="clk-size" aria-label="Segments"><option value="2">2</option><option value="4">4</option><option value="6" selected>6</option><option value="8">8</option></select>
             <select id="clk-kind" aria-label="Clock type"><option value="danger">Danger</option><option value="progress">Progress</option></select>
             <button class="btn" id="clk-add">Add</button>
           </div>
@@ -2636,22 +3325,33 @@ tr.lvl-U td.target { color: var(--muted); }
   // A badge drawn with its group's emblem already in place (for the sheet and GM cards).
   const badgeSvg = (div) => DELTA_SVG.replace('class="emblem" data-emblem d=""', `class="emblem${EMBLEMS[div].stroke ? " stroke" : ""}" d="${EMBLEMS[div].d}"`);
   // Heritages adjust starting attributes; every set totals 0.
-  const SPECIES = [
-    ["human", "Human", {}, "Most of the frontier, and most of the posse. You know the truth about the hidden world, which already sets you apart. No adjustments."],
-    ["grimm", "Grimm", { Body: 1, Agility: 1, Presence: -2 }, "A descendant of the old hunters, the Decapitare: stronger and faster than ordinary people. You see through a Wesen's human face whenever it is stirred by strong emotion, and Wesen who recognize you are afraid."],
-    ["incantare", "Incantare", { Intellect: 1, Will: 1, Body: -1, Presence: -1 }, "A human who works real magic through a Lens. Choose your Lens as your heritage advantage. The Wesen Council, the Royals and the Order of the Holy Knife all watch for people like you, and Grimm blood neutralizes your power."],
-    ["blutbad", "Blutbad", { Body: 1, Agility: 1, Intellect: -1, Will: -1 }, "Wolf-like Wesen with keen senses and a predator's appetite; the root of the werewolf legend. Some live clean, abstaining from the hunt, and others never try."],
-    ["fuchsbau", "Fuchsbau", { Intellect: 1, Presence: 1, Body: -1, Will: -1 }, "Fox-like Wesen, clever and charming, with a long tradition of trade in herbs, remedies and harder-to-find ingredients."],
-    ["eisbiber", "Eisbiber", { Intellect: 1, Will: -1 }, "Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, and easily frightened by violence."],
-    ["hexenbiest", "Hexenbiest or Zauberbiest", { Will: 1, Presence: 1, Body: -1, Agility: -1 }, "Witch-like Wesen (Zauberbiest for the men) with innate magic. Their power lives in their Wesen spirit, which Grimm blood can kill."],
-    ["jagerbar", "Jägerbar", { Body: 2, Agility: -1, Intellect: -1 }, "Bear-like Wesen, enormously strong, with old hunting rites their families still keep."],
-    ["bauerschwein", "Bauerschwein", { Body: 1, Will: 1, Agility: -1, Presence: -1 }, "Pig-like Wesen: stubborn, hard-working, and old enemies of the Blutbaden."],
-    ["mauzhertz", "Mauzhertz", { Agility: 1, Body: -1 }, "Mouse-like Wesen, small, quick and wary, with excellent hearing."],
-    ["ziegevolk", "Ziegevolk", { Presence: 2, Intellect: -1, Will: -1 }, "Goat-like Wesen whose pheromones make them unnaturally persuasive, and unnaturally popular."],
-    ["steinadler", "Steinadler", { Agility: 1, Intellect: 1, Body: -1, Will: -1 }, "Eagle-like Wesen with remarkable eyesight and a hunter's pride."],
-    ["coyotl", "Coyotl", { Agility: 1, Presence: 1, Intellect: -1, Will: -1 }, "Coyote-like Wesen of the desert country who live in clans bound by old customs."],
+  // Heritages are generated from data/heritages.json by tools/gen-heritages.py.
+  /* HERITAGES:START */const HERITAGE_DATA = {"wesenCore":[["Hidden face","Humans see your Wesen face only when you choose a full woge."],["Wesen sight","You see other Wesen when they woge, and you see a Grimm's eyes."],["Woge","A free action, in or out. Anger, frustration or fright can force one: when an enemy appears, you're frightened or you're attacked, the GM can call for a Will roll; on a failure you woge."],["Monstrous while woged","Ordinary people panic or attack; Persuasion with them is impossible. A full woge seen by townsfolk marks Exposure (2 boxes for a Tier 3 heritage)."],["Animals bolt","−2 to Riding while woged; a horse won't carry a woged rider."],["The Code","Your secret is deadly. Wesen who expose themselves answer to the Council, and to Grimms."]],"heritages":[{"id":"human","name":"Human","tier":0,"adj":{},"desc":"Most of the frontier, and most of the posse. You know the truth about the hidden world, which already sets you apart.","source":"No template","core":[],"woge":null,"skills":[],"traits":[["h-grit","Frontier Grit","+2 to Will against fear when facing something that shouldn't exist.","Will",true,"Nobody Believes You","When you tell ordinary folk what you've seen, accept being called mad, drunk or a liar."],["h-gut","Gut Instinct","+2 to Read People when judging, face to face, whether someone is lying.","Read People",true,"Acts on Hunches","You act on an unproven feeling. Accept the consequence when it costs time, trust or position."]]},{"id":"fuchsbau","name":"Fuchsbau","tier":1,"wesen":true,"adj":{"Intellect":2,"Body":-1,"Will":-1},"desc":"Fox-like Wesen, clever and quick, with a long tradition of trade in herbs, remedies and harder-to-find ingredients. Other Wesen call them disreputable, and not always unfairly.","source":"Fuchsbau template: IQ +2; Bad Reputation (disreputable among Wesen). About 132 points.","core":[],"skills":["Tracking","Riding","Melee","Shooting","Gambling","Wesen Lore"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Keen senses: track by scent and hearing"],"drawbacks":[]},"traits":[["f-remedies","Fuchsbau Remedies","+2 to Apothecary when brewing a remedy, antidote or potion from the old recipes.","Apothecary",true,"Criminal Kin","Your family deals in the Wesen black market. Accept their demands or their trouble."],["f-cunning","Fox's Cunning","+2 to Deception when misleading a pursuer or covering your tracks.","Deception",true,"Too Clever by Half","You overplay your hand. Accept the consequence when the trick backfires."],["f-archer","Horse Archer","+2 to Shooting with a bow from the saddle.","Shooting",true,"Disreputable","Wesen assume a Fuchsbau is up to something. Accept the distrust when it costs you."]]},{"id":"coyotl","name":"Coyotl","tier":1,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Will":-1},"desc":"Coyote-like Wesen of the plains and desert country who live in clans bound by old customs, and fight together like a pack.","source":"Coyotl template: DX +2, HT +1, ST +2. About 141 points.","core":[],"skills":["Brawling","Shooting","Tracking","Survival"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":1,"traits":["Claws mark 2 boxes","Keen senses: track by scent and hearing","Swift: +2 to Athletics when running"],"drawbacks":[]},"traits":[["co-pack","Pack Fighter","+2 to Brawling or Melee against a target an ally attacked this round.","Brawling",true,"Clan Law","The clan's customs bind you. Accept the clan's demand."],["co-plains","Plains Wanderer","+2 to Survival in dry, open country: plains, desert and badlands.","Survival",true,"Restless","You can't stay put for long. Accept leaving, or the strain of staying, at a bad time."]]},{"id":"eisbiber","name":"Eisbiber","tier":1,"wesen":true,"adj":{"Intellect":1,"Will":-1},"desc":"Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, and easily frightened by violence. Bullies like the Hässlich prey on them.","source":"No template; adapted from the show.","core":[],"skills":["Tinkering","Athletics","Persuasion","Investigation"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Teeth gnaw through wood and rope (a bite marks 1 box)","Swimmer: holds breath for minutes; +2 to Athletics when swimming"],"drawbacks":[]},"traits":[["e-builder","Master Builder","+2 to Tinkering when building or shoring up structures, dams or mechanisms.","Tinkering",true,"Timid","Violence makes you freeze. Accept losing your first action when a fight breaks out."],["e-lodge","The Lodge","+2 to Investigation when asking the local Wesen community for news.","Investigation",true,"Lodge Obligations","The lodge expects favors. Accept the call when it comes at a bad time."]]},{"id":"bauerschwein","name":"Bauerschwein","tier":1,"wesen":true,"adj":{"Body":1,"Will":1,"Agility":-1,"Presence":-1},"desc":"Pig-like Wesen: stubborn, hard-working, with senses sharp even in human form, and old enemies of the Blutbaden. Their feud is settled, when it must be, by the Ehrenkampf, a ritual duel.","source":"No template; adapted from the show.","core":["Sharp senses even unwoged: you can identify people and things by smell in either form."],"skills":["Athletics","Brawling","Investigation","Survival"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Tusks: a gore marks 1 box"],"drawbacks":[]},"traits":[["bs-stubborn","Stubborn as Stone","+2 to Will to resist intimidation, especially from a Blutbad.","Will",true,"Old Feud","Blutbaden are your people's enemies. When one is near, accept the quarrel, or the challenge to Ehrenkampf."],["bs-snout","Keen Snout","+2 to Intellect rolls to notice or identify something by smell.","Intellect",true,"Blunt to a Fault","Your honesty offends someone who matters. Accept the lost goodwill."]]},{"id":"mauzhertz","name":"Mauzhertz","tier":1,"wesen":true,"adj":{"Agility":1,"Body":-1},"desc":"Mouse-like Wesen, small, quick and wary, with excellent hearing. Gentle by nature, but one pushed too far can snap.","source":"No template; adapted from the show.","core":[],"skills":["Stealth","Athletics","Read People","Investigation"],"woge":{"attrs":{"Agility":1},"dodge":1,"traits":["Keen hearing: hear whispers through walls"],"drawbacks":[]},"traits":[["m-quick","Small and Quick","+2 to Stealth when hiding or slipping away.","Stealth",true,"Easily Startled","Sudden noise or danger makes you flinch. Accept −2 on your next action."],["m-hearing","Keen Hearing","+2 to Intellect rolls to hear faint or distant sounds.","Intellect",true,"Breaking Point","Pushed too far, you snap into violence. Accept what you do in that moment."]]},{"id":"ziegevolk","name":"Ziegevolk","tier":1,"wesen":true,"adj":{"Presence":2,"Intellect":-1,"Will":-1},"desc":"Goat-like Wesen whose pheromones, working even in human form, make them unnaturally persuasive and unnaturally popular. A Fuchsbau remedy can protect against them.","source":"No template; adapted from the show.","core":[],"skills":["Persuasion","Deception","Read People","Gambling"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Horns: a butt marks 1 box"],"drawbacks":[]},"traits":[["z-pheromones","Ziegevolk Pheromones","+2 to Persuasion face to face at close quarters, in either form. Grimms and anyone dosed with the antidote are unaffected.","Persuasion",true,"Pheromone Suspicion","Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust."],["z-smooth","Smooth Operator","+2 to Deception when talking your way past a guard or official.","Deception",true,"Scandal Follows You","Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex."]]},{"id":"steinadler","name":"Steinadler","tier":1,"wesen":true,"adj":{"Agility":1,"Intellect":1,"Body":-1,"Will":-1},"desc":"Eagle-like Wesen with remarkable eyesight, a hunter's pride, and a taste for working alone, sometimes for hire.","source":"No template; adapted from the show.","core":[],"skills":["Shooting","Tracking","Stealth","Survival"],"woge":{"attrs":{"Agility":1},"dodge":0,"traits":["Talons mark 2 boxes","Eagle sight: see detail a mile away"],"drawbacks":[]},"traits":[["st-eye","Eagle Eye","+2 to Intellect rolls to spot detail at a great distance.","Intellect",true,"Proud as an Eagle","You won't back down or beg. Accept the consequence of your pride."],["st-hunter","Hunter's Eye","+2 to Shooting at long range after aiming for an action.","Shooting",true,"Hunter's Code","You won't shoot an unarmed or fleeing foe. Accept the escape."]]},{"id":"taniwha","name":"Taniwha","tier":1,"wesen":true,"horror":true,"adj":{"Body":1,"Presence":-1},"desc":"Water-dwelling Wesen from New Zealand: guardians of rivers and the people they claim, reptile-like in woge, and dangerous to anyone else. Horror campaigns only.","source":"Taniwha template (150-point): poison resistance; Dependency (human flesh, seasonal). About 157 points.","core":["Resists poison: +4 to Body against any poison.","Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can't clear, every three days."],"skills":["Athletics","Brawling","Survival","Stealth"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Amphibious: breathes water, swims as fast as a horse runs","Burrows through earth","Dark sight"],"drawbacks":["Must be submerged in water daily, or mark a box that rest can't clear, each hour","Pounamu (greenstone) wounds mark one extra box"]},"traits":[["ta-bite","Paralyzing Bite","Ability, in full woge: a bite marks 1 box, and the target rolls Body or is paralyzed for the scene.","Brawling",false,"Guardian's Duty","You protect those you've claimed as yours. Accept the danger when they need you."],["ta-river","River Guardian","+2 to Athletics and Survival in rivers, lakes and the sea.","Athletics",true,"Peculiar Appetite","Gluttony, and an odd craving (frogs, to start with). Accept the distraction at a bad time."]]},{"id":"blutbad","name":"Blutbad","tier":2,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Will":-1},"desc":"Wolf-like Wesen with keen senses and a predator's appetite; the root of the werewolf legend. Wesen who know your kind assume you hunt humans. You don't, or not anymore.","source":"Blutbaad template: DX +3, HT +2, ST +2; Loner; Enemy (Bauerschwein). About 208 points.","core":["Reputation: Eats Humans. Wesen who know your kind assume the worst."],"skills":["Brawling","Shooting","Survival","Tracking"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws and fangs mark 2 boxes","Keen senses: track by scent and hearing","Dark sight","Leaper: +2 to Athletics to jump","Shrugs off cold"],"drawbacks":[]},"traits":[["b-nose","Blutbad Nose","+2 to Tracking by scent, in either form.","Tracking",true,"The Bloodlust","When blood is spilled near you or something runs, roll Will or woge and give chase. Accept the cost of the urge."],["b-night","Night Hunter","+2 to Stealth when stalking at night.","Stealth",true,"Loner","You shun company. Accept the cost of going it alone."],["b-enemy","Old Enemy","+2 to Brawling against a Bauerschwein.","Brawling",true,"Old Feud","Bauerschwein are your enemies. When one is near, accept the quarrel."]]},{"id":"mauvaisdentes","name":"Mauvais Dentes","tier":2,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Presence":-1},"desc":"Sabre-toothed, panther-like Wesen, so deadly that the Royal Families have kept them as assassins. Rare, solitary, and feared even by other Wesen.","source":"Mauvais Dentes template: DX +2, HT +3, ST +3; Loner. About 213 points.","core":["Reputation: Eats Humans. Wesen who know your kind assume the worst."],"skills":["Brawling","Shooting","Survival","Tracking"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Sabre teeth and claws mark 2 boxes","Keen senses: track by scent and hearing","Dark sight","Leaper: +2 to Athletics to jump","Shrugs off cold"],"drawbacks":[]},"traits":[["md-hunter","Relentless Hunter","+2 to Tracking when hunting a single named quarry.","Tracking",true,"Royal Debt","The Royals bred your line as killers. When one of their agents calls on you, accept the demand or the danger of refusing."],["md-pounce","Pounce","+2 to Brawling on your first attack of a fight, leaping from hiding.","Brawling",true,"Killer's Instinct","In a fight you go for the throat. Accept the death you didn't intend."]]},{"id":"skalengeck","name":"Skalengeck","tier":2,"wesen":true,"adj":{"Agility":1,"Presence":-1},"desc":"Lizard-like Wesen, cold-eyed and hard to kill, with a poisonous bite. Common among outlaws and hired guns.","source":"Skalengeck template: no human-form changes. About 189 points.","core":[],"skills":["Shooting","Brawling","Wesen Lore","Stealth"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Immune to poison","Keen smell"],"drawbacks":[]},"traits":[["sk-bite","Poison Bite","Ability, in full woge: a bite that marks a box also poisons. Each hour the victim rolls Body −3 or marks another box, until treated with Apothecary.","Brawling",false,"Callous","You don't much care who gets hurt. Accept the cost when that shows."],["sk-subdue","Hard to Subdue","+2 to Body to resist being knocked out, stunned or restrained.","Body",true,"Cornered Lizard","When you're trapped, you woge and fight. Accept the Exposure and the damage."]]},{"id":"jagerbar","name":"Jägerbär","tier":2,"wesen":true,"adj":{"Body":2,"Agility":-1,"Intellect":-1},"desc":"Bear-like Wesen, enormously strong and durable. Traditional families still keep the Roh-Hatz, a coming-of-age hunt, and fight with an old Germanic weapon whose claw-like scoop disembowels.","source":"No template; adapted from the show.","core":[],"skills":["Athletics","Brawling","Melee","Survival"],"woge":{"attrs":{"Body":2},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Keen smell"],"drawbacks":[]},"traits":[["j-strength","Bear's Strength","+2 to Athletics for feats of raw strength: lifting, breaking, holding.","Athletics",true,"The Roh-Hatz","Your family keeps the old hunting rite. Accept the obligation, or the shame of refusing it."],["j-weapon","Family Weapon","+2 to Melee with your family's claw-bladed hunting weapon.","Melee",true,"Slow to Calm","Once angered, you're hard to stop. Accept the harm you do to something you shouldn't."]]},{"id":"naschazer","name":"Naschazer","tier":2,"wesen":true,"horror":true,"adj":{"Body":2,"Intellect":-1,"Presence":-1},"desc":"Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror campaigns only.","source":"Naschazer template: HT +4; Dependency and Uncontrollable Appetite (human flesh); Greed; Proud. About 197 points.","core":["Hunger (horror): each month you must eat human flesh; until you do, mark a box that rest can't clear, every day."],"skills":["Brawling","Melee","Athletics","Shooting"],"woge":{"attrs":{"Body":2},"dodge":0,"traits":["Huge strength: fists and fangs mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Feels no pain: ignore the Wounded penalty","Heals fast: rest clears a box every day","Dark sight"],"drawbacks":[]},"traits":[["n-brute","Brute Strength","+2 to Athletics to lift, break or hold.","Athletics",true,"Greed","Riches are hard to refuse. Accept the bribe's strings or the risk of taking more."],["n-cook","Butcher's Hands","+2 to Melee with a cleaver, axe or knife.","Melee",true,"Proud","You won't be slighted. Accept the fight your pride starts."]]},{"id":"vallachi","name":"Vallachi","tier":2,"wesen":true,"horror":true,"adj":{"Presence":1,"Body":1,"Will":-1,"Agility":-1},"desc":"Long-lived, handsome, vampire-like Wesen who feed on the lifeforce of others and shun the sun. Horror campaigns only.","source":"Vallachi template: Attractive; Extended Lifespan; HT +2; Dependency and Uncontrollable Appetite (lifeforce); Weakness (sunlight); Lifebane. About 223 points.","core":["Lifedrain (horror): by touch, roll Will against the victim's Body; on a success they mark a box and you clear one.","Hunger (horror): each week you must drain lifeforce; until you do, mark a box that rest can't clear, every six hours.","Sunlight: −2 to all rolls in direct sun, and you tire quickly.","Lifebane: plants wilt and animals shy around you."],"skills":["Persuasion","Deception","Stealth","Read People"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Tough: hits of 2+ boxes mark one fewer, except from a pointed wooden stake","Keen senses","Dark sight"],"drawbacks":[]},"traits":[["v-charm","Night Charm","+2 to Persuasion face to face, after dark.","Persuasion",true,"Old Grudges","You've lived long enough to make enemies. Accept it when one of them turns up."],["v-ageless","Ageless","+2 to Intellect rolls to recall something you lived through decades ago.","Intellect",true,"Secret Age","You don't age as you should. Accept the lie or the slip when someone notices."]]},{"id":"grimm","name":"Grimm","tier":2,"adj":{"Body":1,"Agility":1,"Presence":-2},"desc":"A descendant of the old hunters, the Decapitare: stronger and faster than ordinary people, able to see the Wesen hidden among us, and feared by them.","source":"Decapitare template: ST, DX, HT +1; Combat Reflexes; Detect (Wesen, Magic); Magic Resistance 7; Talent (Grimm); Reputation (Frightening Decapitare).","core":["The Sight: you see a Wesen's face when it's stirred by strong emotion.","Grimm eyes: woged Wesen and other Grimms see them; humans don't.","Uneasy sense: you feel when a Wesen or magic is near, with no details.","Never freeze: you're never surprised, and +2 to Will against fear.","Hard to bewitch: +2 to Will against magic.","Raised on the books: Wesen Lore is always at least Trained, free.","Grimm blood: a Hexenbiest or Zauberbiest who drinks it under a full moon loses their powers (see Grimm blood)."],"skills":["Wesen Lore","Melee","Shooting","Investigation","Tracking"],"woge":null,"traits":[["g-danger","Danger Sense","Ability: when an ambush or trap threatens you, the GM secretly rolls your Intellect; success warns you in time to act.","Intellect",false,"Nightmares","The dead you've seen come back at night. Accept the lost sleep at a bad time."],["g-iron","Iron Bones","Ability: each hit that marks 2 or more boxes marks one fewer (never below 1).","",false,"Fanaticism","Wesen must die. Accept the trouble when mercy would be wiser."],["g-heal","Quick to Heal","Ability: rest clears a box every day, not every two, and works even at three boxes.","",false,"Workaholic","You won't rest when there's a case. Accept the strain."],["g-hardy","Hardy","+2 to Body to resist poison, disease and exhaustion.","Body",true,"Stubbornness","You won't back down. Accept the cost."],["g-gun","Gunslinger","+2 to Shooting with a pistol at close range, with no need to aim.","Shooting",true,"Bad Temper","Accept the fight you start."],["g-balance","Perfect Balance","+2 to Athletics and Melee to keep your feet or fight on bad ground.","Athletics",true,"Curious","Accept the risk your curiosity brings."],["g-heavy","Heavy Hand","Ability: your Brawling hits mark 2 boxes.","Brawling",false,"Bloodlust","You don't stop at the surrender. Accept the consequences."],["g-weapon","Bonded Weapon","+2 to Melee or Shooting with one named heirloom weapon.","Melee",true,"The Weapon Must Be Kept","When it's lost or taken, accept the risk to get it back."],["g-hard","Hard to Kill","Ability: Dying lasts until the end of the next scene, not this one.","",false,"Vow: Protect the Innocent","You've sworn to protect the innocent from Wesen. Accept the danger."],["g-pain","Pain Means Nothing","Ability: ignore the Wounded penalty (−1).","",false,"Honesty","You won't lie, even to Wesen. Accept the consequence."],["g-books","Keeper of the Books","+2 to Wesen Lore when you can consult your family's books.","Wesen Lore",true,"The Books Must Be Kept","The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them."]]},{"id":"incantare","name":"Incantare","tier":2,"adj":{"Intellect":1,"Will":1,"Body":-1,"Presence":-1},"desc":"A human who works real magic through a Lens: a tradition and a way of seeing. The Wesen Council, the Royals and the Order of the Holy Knife all watch for people like you.","source":"Incantare template: seven Lenses (Ritual Path Magic).","core":["Rituals: roll Occult to fill a ritual clock (minor 2, significant 4, major 6 segments). Your Lens sets how.","Charms: you can carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).","Grimms sense your magic: +1 to notice it for each charm or potion you carry."],"skills":["Occult","Wesen Lore","Apothecary","Read People"],"woge":null,"traits":[["i-chymiater","Chymiater Lens (Alchemist)","Brews elixirs, potions and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing. Only a Chymiater can brew the Grimm-blood draught.","Occult",true,"Price of the Work","Your craft feeds a vice: greed, drink, lechery or gluttony (agree which). Accept it when it bites."],["i-figmatarum","Figmatarum Lens (Illusionist)","Glamours, illusions and mesmerism worked through performance, music or art, in minutes. +2 to Occult for illusion and mesmerism.","Occult",true,"Artist's Vanity","You need an audience and can't bear an insult to your art. Accept the trouble your vanity causes."],["i-magi","Magi Lens (Wizard)","Scholarly ritual from grimoires: any kind of effect, but an hour per roll, and it needs books. +2 to Occult for divination and wards.","Occult",true,"Obsession: Magical Knowledge","A grimoire, a ritual or a secret tempts you beyond sense. Accept the risk to get it."],["i-malifica","Malifica Lens (Witch or Warlock)","Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link.","Occult",true,"Wicked Reputation","People whisper that you're a witch, and the Order of the Holy Knife listens. Accept the suspicion."],["i-phitonissa","Phitonissa Lens (Pagan)","Cunning-folk rites of the seasons, nature and the old gods, worked outdoors. +2 to Occult for nature and folk magic.","Occult",true,"Disciplines of Faith","The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them."],["i-scaenarfex","Scaenarfex Lens (Artistic Enchanter)","Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm.","Occult",true,"Artist's Temperament","Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you."],["i-veneficare","Veneficare Lens (Sorcerer)","Quick casting along one or two Paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm.","Occult",false,"Bound Purpose","Your power follows one narrow calling. Accept the cost of serving it when it clashes with the posse's needs."]]},{"id":"hexenbiest","name":"Hexenbiest or Zauberbiest","tier":3,"wesen":true,"adj":{"Will":1,"Presence":1,"Body":-1,"Agility":-1},"desc":"Witch-like Wesen (Zauberbiest for the men), beautiful in human form and horrific in woge, with innate magic that lives in their Wesen spirit. Coven traditions bind them; Grimm blood can strip them.","source":"Hexenbiest and Zauberbiest template: Beautiful/Handsome; Sorcery 5; Ritual Adept 2; Vow (coven traditions). About 279 points.","core":["Telekinesis: in full or partial woge, roll Will to throw a person or object with your mind (1 box), seize something out of reach, or turn aside one attack (+2 Dodge).","Innate magic: you can work rituals with Occult like an Incantare, in the Hexenbiest style: curses, potions and sendings.","Grimm blood: drunk under a full moon, it strips your powers until the Contaminatio Ritualis restores them."],"skills":["Occult","Apothecary","Deception","Persuasion"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer"],"drawbacks":["Horrific: even other Wesen recoil"]},"traits":[["hx-spell","Hexenbiest Spellcraft","+2 to Occult for curses, potions and sendings.","Occult",true,"The Price of Magic","Every spell costs blood, pain or something precious. Accept the cost when it bites."],["hx-levitate","Levitation","Ability, in woge: roll Will to lift yourself and float or fly a short way.","Will",false,"Hexenbiest Pride","You cannot abide being bested or slighted. Accept the feud you start."],["hx-crush","TK Crush","Ability, in full woge: roll Will against the target's Body; on a success they mark 1 box, which Dodge can't avoid.","Will",false,"Coven Traditions","Your family or coven has rules and expectations. Accept the demand."]]},{"id":"murcielago","name":"Murcielago","tier":3,"wesen":true,"adj":{},"desc":"Bat-like Wesen with uncanny hearing and a sonic scream that drops a room full of people to their knees.","source":"Murcielago template: no human-form changes; Sonic Scream 6, Sonar. About 283 points.","core":["Sonic scream: in full woge, roll Will. Everyone nearby you choose who can hear rolls Body −2; a failure loses their next action and takes −2 for the scene. Earplugs protect. Heard in town, it marks Exposure."],"skills":["Stealth","Athletics","Brawling","Investigation"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":0,"traits":["Claws and fangs mark 2 boxes","Sonar: no penalty for darkness; sense the shape of a room by sound","Keen hearing: hear heartbeats","Swift"],"drawbacks":[]},"traits":[["mu-echo","Echo Sight","+2 to Intellect rolls to find something hidden in the dark by sound.","Intellect",true,"Sensitive Ears","Loud noise disorients you. When a gun or explosion goes off nearby, accept −2 on your next action."],["mu-hear","Eavesdropper","+2 to Intellect rolls to hear faint or distant voices.","Intellect",true,"Can't Unhear","You hear secrets you shouldn't. Accept the trouble that knowing brings."]]},{"id":"fuchsteufelwild","name":"Fuchsteufelwild","tier":3,"wesen":true,"adj":{"Intellect":2,"Body":1,"Presence":-2,"Will":-1},"desc":"Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; the root of Rumpelstiltskin. Clever, spiteful, and bound by an old obsession with names and bargains.","source":"Fuchsteurfelwild template: ST +1, HT +2, IQ +3, Super Jump 5; Obsession (Guess My Name); Bully; Callous; Sadism (now a companion). About 424 points; trimmed to Tier 3.","core":["Acid talons: in full woge, claw hits mark 2 boxes and ignore Tough and armor.","Leaper, in either form: jumps of many yards; +2 to Athletics to jump."],"skills":["Brawling","Athletics","Deception","Investigation"],"woge":{"attrs":{"Agility":1},"dodge":1,"traits":["Keen senses: track by scent and hearing","Swift"],"drawbacks":["Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged","Disturbing voice"]},"traits":[["ft-tremor","Tremor","Ability, in full woge: stomp, and everyone nearby rolls Athletics or falls and loses their next action.","Athletics",false,"Cruel Streak","When an enemy is helpless, you're tempted to make them suffer. Accept the lost allies, or the Suspicion it brings."],["ft-bargain","Strike a Bargain","+2 to Persuasion or Deception when making a deal.","Persuasion",true,"Guess My Name","Your true name holds power over you. When someone hunts for it, or speaks it, accept the consequence."]]}]};/* HERITAGES:END */
+  const HERITAGES = HERITAGE_DATA.heritages;
+  const SPECIES = HERITAGES.map((h) => [h.id, h.name, h.adj, h.desc]);
+  const WESEN = new Set(HERITAGES.filter((h) => h.wesen).map((h) => h.id));
+  const SPECIES_TRAITS = Object.fromEntries(HERITAGES.map((h) => [h.id, h.traits]));
+  const heritageOf = (c = ch) => HERITAGES.find((h) => h.id === c.speciesId);
+  const tierOf = (c = ch) => (c.speciesId === "custom" ? c.customTier : heritageOf(c)?.tier ?? 0);
+  // Edges: every character has 3 points shared between heritage tier and Edges.
+  const EDGE_POINTS = 3;
+  const EDGE_DEFS = [
+    ["attr", "+1 attribute point", "One more point to spend on attributes, within the normal maximum.", 2],
+    ["skill", "Extra Trained skill", "One more Trained skill.", 3],
+    ["adv2", "Second advantage", "A second general advantage, with no extra complication.", 1],
+    ["grit", "True grit", "Start every session with 3 Grit instead of 2.", 1],
+    ["contact", "A friend in town", "A named contact who helps once per case.", 1],
+    ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one skill when it's used.", 1],
   ];
-  const WESEN = new Set(["blutbad", "fuchsbau", "eisbiber", "hexenbiest", "jagerbar", "bauerschwein", "mauzhertz", "ziegevolk", "steinadler", "coyotl"]);
+  const ALLEGIANCES = [
+    ["", "None", "", ""],
+    ["church", "The Church", "Once per case, shelter, records or a favor from the clergy.", "Duty: the Church gives you orders. Sicarii discipline ties you to the Order of the Holy Knife."],
+    ["royal", "A Royal Family", "Once per case, money, papers or a door opened.", "Duty: an involuntary call to serve, and the family's rivals hunt you."],
+    ["society", "A secret society", "Once per case, lore, a meeting place or a fellow initiate (the Golden Dawn, the Brotherhood of the Holy Earth).", "Duty and Vow: keep its secrets and follow its traditions."],
+    ["council", "The Wesen Council", "Contacts in the local Wesen community.", "Duty: the Council calls on you, and others know you're its operative."],
+    ["family", "A Grimm family", "Access to the family books and kin.", "Duty to the family name, and to fight its enemies."],
+  ];
+  const STORE_HORROR = "grimm.horror.v1";
   const REASONS = [
     ["The family gift", "The Grimm blood woke in me, and it came with a duty."],
     ["Vengeance", "Something that wore a human face killed someone I loved."],
@@ -2695,6 +3395,12 @@ tr.lvl-U td.target { color: var(--muted); }
     wanted: ["A lawman from back east comes asking", "Your face on a poster", "A bounty hunter rides into town"],
     debt: ["A collector arrives", "Your creditor wants a favor instead", "The interest comes due"],
     nonlethal: ["A Wesen surrenders, but it's a killer", "The only fast solution would kill someone", "The posse votes to shoot first"],
+    "vow-human": ["A human killer has you in their sights", "The posse decides a man must die", "Only a killing shot will stop him"],
+    "hunted-church": ["A stranger in clerical black asks about you", "A sign of the Holy Knife on your door", "The Church comes to town"],
+    "hunted-royal": ["A Royal agent arrives", "Someone offers money for your whereabouts", "A Mauvais Dentes is seen nearby"],
+    "hunted-society": ["A symbol you recognize, chalked on a wall", "An initiate asks too many questions", "A ritual site turns up near you"],
+    "hunted-council": ["A Council emissary comes to town", "A Wesen you trusted reports you", "Exposure reaches 3 boxes"],
+    "hunted-grimm": ["A Grimm comes to town", "Someone in town has a Grimm's eyes", "Your kind is named in a Grimm's journal"],
   };
   // Six ready-to-play riders; their connections point at each other.
   const PREGENS = [
@@ -2702,8 +3408,9 @@ tr.lvl-U td.target { color: var(--muted); }
       role: "Leads the posse and carries the badge: the law, and the Code, in one person.",
       reason: "The Grimm blood woke in me, and it came with a duty.", connection: "Gus Brandt cut her down from a lynch mob's rope before anyone knew what she was.",
       attrs: { Body: 12, Agility: 13, Intellect: 10, Presence: 8, Will: 12 },
-      skills: { Shooting: "S", Riding: "T", Melee: "T", Brawling: "T", Athletics: "T", Investigation: "T", "Wesen Lore": "T", Tracking: "T", "Read People": "T", Leadership: "T" },
+      skills: { Shooting: "S", Riding: "T", Melee: "T", Brawling: "T", Athletics: "T", Investigation: "T", "Wesen Lore": "T", Tracking: "T", "Read People": "T", Leadership: "T", Survival: "T" },
       adv: { id: "" }, sadv: { id: "g-books" }, comp: { id: "lawful", trigger: "A Wesen suspect could be killed instead of arrested" },
+      edges: { grit: 1 }, play: { duty: 3 },
       equipment: { revolver: true, rifle: true, horse: true, trailkit: true, journals: true } },
     { name: "Gus Brandt", rank: "Blacksmith and gunsmith", dept: "Tinker", path: "rounded", species: "Blutbad", speciesId: "blutbad",
       role: "Shoes the horses, fixes the guns, and hasn't hunted in eleven years.",
@@ -2711,27 +3418,31 @@ tr.lvl-U td.target { color: var(--muted); }
       attrs: { Body: 11, Agility: 11, Intellect: 13, Presence: 10, Will: 10 },
       skills: { Tinkering: "S", Tracking: "T", "Wesen Lore": "T", Investigation: "T", Survival: "T", "Read People": "T", Brawling: "T", Melee: "T", Athletics: "T", Persuasion: "T" },
       adv: { id: "" }, sadv: { id: "b-nose" }, comp: { id: "secret", trigger: "Someone from his old pack turns up" },
+      edges: { gear: 1 }, gear: { item: "A master gunsmith's tools", skill: "Tinkering" },
       equipment: { shotgun: true, knife: true, tools: true, horse: true } },
     { name: "Roz Vey", rank: "Spice and tea merchant", dept: "Apothecary", path: "rounded", species: "Fuchsbau", speciesId: "fuchsbau",
       role: "Sells tea out front, and other things in the back.",
       reason: "Wesen and humans can live side by side, and I mean to prove it.", connection: "Trades notes with Dr. Whitlock, who still won't admit some of her remedies work better than his.",
       attrs: { Body: 9, Agility: 11, Intellect: 13, Presence: 12, Will: 10 },
-      skills: { Apothecary: "S", Medicine: "T", "Wesen Lore": "T", "Read People": "T", Investigation: "T", Gambling: "T", Survival: "T", Persuasion: "T", Deception: "T", Stealth: "T" },
+      skills: { Apothecary: "S", Medicine: "T", "Wesen Lore": "T", "Read People": "T", Investigation: "T", Gambling: "T", Survival: "T", Persuasion: "T", Deception: "T", Stealth: "T", Occult: "T" },
+      edges: { skill: 1, contact: 1 }, contact: "Her cousin Ambrose, a Fuchsbau smuggler on the Portland docks, who can find any ingredient for a price",
       adv: { id: "" }, sadv: { id: "f-remedies" }, comp: { id: "protects", trigger: "A sick or hurt stranger turns up at the shop" },
       equipment: { apothecary: true, doctorbag: true, knife: true, lantern: true }, play: { gun: { type: "derringer", rounds: 2, spares: 1 } } },
     { name: "Dr. Thaddeus Whitlock", rank: "Town physician", dept: "Doctor", path: "rounded", species: "Human", speciesId: "human",
       role: "Army surgeon in the war; now he digs bullets out of the posse and asks too many questions about what made the other wounds.",
       reason: "I saw what I saw, and no one else believes me.", connection: "Rode with Silas Thorne's regiment in the war and has never trusted him since.",
-      attrs: { Body: 10, Agility: 10, Intellect: 13, Presence: 11, Will: 11 },
+      attrs: { Body: 10, Agility: 10, Intellect: 13, Presence: 12, Will: 11 },
+      edges: { attr: 1, adv2: 1, gear: 1 }, adv2: { id: "surgeon" }, gear: { item: "His army surgeon's instruments", skill: "Medicine" },
       skills: { Medicine: "S", Apothecary: "T", "Read People": "T", Investigation: "T", "Wesen Lore": "T", Occult: "T", Persuasion: "T", Leadership: "T", Riding: "T", Shooting: "T" },
       adv: { id: "steady" }, sadv: { id: "" }, comp: { id: "war", trigger: "Gunfire in the dark" },
       equipment: { doctorbag: true, horse: true, lantern: true } },
     { name: "Cora Ridgeway", rank: "Scout", dept: "Scout", path: "rounded", species: "Coyotl", speciesId: "coyotl",
       role: "Knows the desert and the high country, and keeps her clan's ways close.",
       reason: "Something that wore a human face killed someone I loved.", connection: "Eliza Kessler taught her what she knows about the hidden world.",
-      attrs: { Body: 10, Agility: 14, Intellect: 10, Presence: 11, Will: 10 },
-      skills: { Shooting: "S", Riding: "T", Stealth: "T", Brawling: "T", Melee: "T", Persuasion: "T", Tracking: "T", Survival: "T", "Read People": "T", Athletics: "T" },
-      adv: { id: "" }, sadv: { id: "co-desert" }, comp: { id: "vengeance", trigger: "Word of the men who burned her clan's camp" },
+      attrs: { Body: 11, Agility: 14, Intellect: 10, Presence: 11, Will: 9 },
+      skills: { Shooting: "S", Riding: "T", Stealth: "T", Brawling: "T", Melee: "T", Persuasion: "T", Tracking: "T", Survival: "T", "Read People": "T", Athletics: "T", Gambling: "T" },
+      edges: { skill: 1, grit: 1 }, play: { duty: 3 },
+      adv: { id: "" }, sadv: { id: "co-plains" }, comp: { id: "vengeance", trigger: "Word of the men who burned her clan's camp" },
       equipment: { rifle: true, knife: true, horse: true, trailkit: true } },
     { name: "Silas Thorne", rank: "Professional gambler", dept: "Gambler", path: "hand", species: "Ziegevolk", speciesId: "ziegevolk",
       role: "Charming, well-dressed, and in debt to the wrong people in San Francisco.",
@@ -2739,97 +3450,10 @@ tr.lvl-U td.target { color: var(--muted); }
       attrs: { Body: 10, Agility: 10, Intellect: 13, Presence: 13, Will: 9 },
       skills: { Gambling: "S", Deception: "T", Persuasion: "T", "Read People": "T", Investigation: "T", Shooting: "T", Stealth: "T", Riding: "T" },
       adv: { id: "" }, sadv: { id: "z-pheromones" }, comp: { id: "debt", trigger: "A collector from San Francisco arrives" },
+      edges: { contact: 1, adv2: 1 }, adv2: { id: "poker" }, contact: "Mae Lin, a faro dealer in San Francisco who hears everything said at her table",
       equipment: { revolver: true, horse: true } },
   ];
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
-  // Heritage advantages, each paired with a companion complication.
-  // [id, name, effect, roll, gives +2?, companion name, companion text]
-  const SPECIES_TRAITS = {
-    human: [
-      ["h-grit", "Frontier Grit", "+2 to Will against fear when facing something that shouldn't exist.", "Will", true,
-        "Nobody Believes You", "When you tell ordinary folk what you've seen, accept being called mad, drunk or a liar."],
-      ["h-gut", "Gut Instinct", "+2 to Read People when judging, face to face, whether someone is lying.", "Read People", true,
-        "Acts on Hunches", "You act on an unproven feeling. Accept the consequence when it costs time, trust or position."],
-    ],
-    grimm: [
-      ["g-books", "Keeper of the Books", "+2 to Wesen Lore when you can consult your family's books.", "Wesen Lore", true,
-        "The Books Must Be Kept", "The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them."],
-      ["g-decap", "Decapitare", "+2 to Melee against a Wesen in full woge.", "Melee", true,
-        "Reapers", "Wesen who hunt Grimms know your family name. Accept the danger when they find you."],
-      ["g-gaze", "Grimm's Gaze", "+2 to Presence rolls to intimidate a Wesen who has recognized you.", "Presence", true,
-        "Wesen Know Your Face", "When Wesen recognize you, they lie, flee or close ranks. Accept the lost cooperation."],
-    ],
-    incantare: [
-      ["i-hermetic", "Hermetic Lens", "Ritual magic from texts, circles and sigils: wards, bindings, divination, sendings. Roll Occult; needs time, a prepared circle and the right materials. The GM sets the limits before the roll.", "Occult", false,
-        "Bound by Oaths", "Your order's secrets and superiors come first. Accept the order's demand or the cost of refusing."],
-      ["i-druidic", "Druidic Lens", "Rites of the living earth: weather, beasts, growth and decay. Roll Occult; only on living ground, outdoors. The GM sets the limits before the roll.", "Occult", false,
-        "Iron Sickness", "Railroads, factories and mines sicken you. Near them, accept −2 on Will and Occult rolls."],
-      ["i-folk", "Folk Lens", "Charms, hexes and protective tokens: small, quick magic from cunning folk and hedge witches. Roll Occult; the GM sets the limits before the roll.", "Occult", false,
-        "Old Superstitions", "Your charms demand their rituals. Accept the delay or odd behavior the rules require."],
-      ["i-spirit", "Spiritualist Lens", "Speak with the dead through séance, dream or trance. Roll Occult; the dead know only what they knew.", "Occult", false,
-        "The Dead Follow You", "Restless spirits find you. Accept the haunting at a bad moment."],
-    ],
-    blutbad: [
-      ["b-nose", "Blutbad Nose", "+2 to Tracking by scent.", "Tracking", true,
-        "The Bloodlust", "When blood is spilled near you or something runs, the hunt calls. Accept the Will roll or the cost of the urge."],
-      ["b-claw", "Fang and Claw", "In full woge, your Brawling hits mark 2 boxes.", "Brawling", false,
-        "Blutbad Reputation", "Other Wesen, especially Bauerschwein, fear and hate your kind. Accept the hostility."],
-    ],
-    fuchsbau: [
-      ["f-remedies", "Fuchsbau Remedies", "+2 to Apothecary when brewing a remedy, antidote or potion from the old recipes.", "Apothecary", true,
-        "Criminal Kin", "Your family deals in the Wesen black market. Accept their demands or their trouble."],
-      ["f-cunning", "Fox's Cunning", "+2 to Deception when misleading a pursuer or covering your tracks.", "Deception", true,
-        "Too Clever by Half", "You overplay your hand. Accept the consequence when the trick backfires."],
-    ],
-    eisbiber: [
-      ["e-builder", "Master Builder", "+2 to Tinkering when building or shoring up structures, dams or mechanisms.", "Tinkering", true,
-        "Timid", "Violence makes you freeze. Accept losing your first action when a fight breaks out."],
-      ["e-lodge", "The Lodge", "+2 to Investigation when asking the local Wesen community for news.", "Investigation", true,
-        "Lodge Obligations", "The lodge expects favors. Accept the call when it comes at a bad time."],
-    ],
-    hexenbiest: [
-      ["hx-spell", "Hexenbiest Spellcraft", "With ingredients and time, roll Occult to cast a spell: a curse, a sleep, a sending, a disguise. The GM sets the limits before the roll.", "Occult", false,
-        "The Price of Magic", "Every spell costs blood, pain or something precious. Accept the cost when it bites."],
-      ["hx-push", "Telekinesis", "In full woge, roll Will to throw a person or object with your mind (1 box).", "Will", false,
-        "Hexenbiest Pride", "You cannot abide being bested or slighted. Accept the feud you start."],
-    ],
-    jagerbar: [
-      ["j-strength", "Bear's Strength", "+2 to Athletics for feats of raw strength: lifting, breaking, holding.", "Athletics", true,
-        "The Old Rites", "Your family's hunting rites pull at you. Accept the obligation or the shame of refusing."],
-      ["j-maul", "Maul", "In full woge, your Brawling hits mark 2 boxes.", "Brawling", false,
-        "Slow to Calm", "Once angered, you're hard to stop. Accept the harm you do to something you shouldn't."],
-    ],
-    bauerschwein: [
-      ["bs-stubborn", "Stubborn as Stone", "+2 to Will to resist intimidation, especially from a Blutbad.", "Will", true,
-        "Old Feud", "Blutbaden are your people's enemies. When one is near, accept the quarrel."],
-      ["bs-snout", "Keen Snout", "+2 to Intellect rolls to notice or identify something by smell.", "Intellect", true,
-        "Blunt to a Fault", "Your honesty offends someone who matters. Accept the lost goodwill."],
-    ],
-    mauzhertz: [
-      ["m-quick", "Small and Quick", "+2 to Stealth when hiding or slipping away.", "Stealth", true,
-        "Easily Startled", "Sudden noise or danger makes you flinch. Accept −2 on your next action."],
-      ["m-hearing", "Keen Hearing", "+2 to Intellect rolls to hear faint or distant sounds.", "Intellect", true,
-        "Prey's Heart", "Facing a predator Wesen, accept hesitation at the worst moment."],
-    ],
-    ziegevolk: [
-      ["z-pheromones", "Ziegevolk Pheromones", "+2 to Persuasion face to face at close quarters. Grimms and anyone with an antidote are unaffected.", "Persuasion", true,
-        "Pheromone Suspicion", "Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust."],
-      ["z-smooth", "Smooth Operator", "+2 to Deception when talking your way past a guard or official.", "Deception", true,
-        "Scandal Follows You", "Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex."],
-    ],
-    steinadler: [
-      ["st-eye", "Eagle Eye", "+2 to Intellect rolls to spot detail at a great distance.", "Intellect", true,
-        "Proud as an Eagle", "You won't back down or beg. Accept the consequence of your pride."],
-      ["st-hunter", "Hunter's Eye", "+2 to Shooting at long range after aiming for an action.", "Shooting", true,
-        "Hunter's Code", "You won't shoot an unarmed or fleeing foe. Accept the escape."],
-    ],
-    coyotl: [
-      ["co-pack", "Pack Fighter", "+2 to Brawling or Melee against a target an ally attacked this round.", "Brawling", true,
-        "Clan Law", "The clan's customs bind you. Accept the clan's demand."],
-      ["co-desert", "Desert Wanderer", "+2 to Survival in dry, open country.", "Survival", true,
-        "Restless", "You can't stay put for long. Accept leaving, or the strain of staying, at a bad time."],
-    ],
-  };
   const sTraitList = () => SPECIES_TRAITS[ch.speciesId] || [];
   const sTraitDef = () => sTraitList().find((t) => t[0] === ch.sadv.id);
   const sAdvName = () => ch.sadv.id === "custom" ? (ch.sadv.name || "Custom heritage advantage") : sTraitDef()?.[1] || "";
@@ -2872,6 +3496,12 @@ tr.lvl-U td.target { color: var(--muted); }
     ["wanted", "Wanted", "There's a price on your head somewhere. Accept trouble when lawmen or bounty hunters come."],
     ["debt", "Owes the Wrong People", "A debt to dangerous people comes due. Accept their demand."],
     ["nonlethal", "Reluctant to Kill", "You seek a way that doesn't end a life, even a Wesen's. Accept the extra danger."],
+    ["vow-human", "Vow: Never Kill a Human", "Whatever else you do, you won't take a human life. Accept the cost when that's the only way out."],
+    ["hunted-church", "Hunted by the Church", "Zealous clergy, or the Order of the Holy Knife, want you dead. Accept the danger when they find you."],
+    ["hunted-royal", "Hunted by a Royal Family", "A Royal Family wants you dead or in chains. Accept the danger when their agents find you."],
+    ["hunted-society", "Hunted by a Secret Society", "A secret society wants you silenced. Accept the danger when its members find you."],
+    ["hunted-council", "Hunted by the Wesen Council", "The Council has marked you. Accept the danger when its enforcers find you."],
+    ["hunted-grimm", "Hunted by Grimms", "A Grimm family has your name in its books. Accept the danger when one finds you."],
   ];
   // Gear with its effect (same text as the guide's Gear table).
   const EQUIPMENT = [
@@ -2896,7 +3526,7 @@ tr.lvl-U td.target { color: var(--muted); }
   ];
   // Ways to roll each total on 3d6, index 0 = total 3.
   const WAYS = [1, 3, 6, 10, 15, 21, 25, 27, 27, 25, 21, 15, 10, 6, 3, 1];
-  const STORE_ROSTER = "grimm.roster.v1", STORE_CURRENT = "grimm.current.v1", POOL = 5, BASE = 10, MAX_START = 13;
+  const STORE_ROSTER = "grimm.roster.v1", STORE_CURRENT = "grimm.current.v1", BASE = 10, MAX_START = 13;
   // Guns: rounds each holds, and what each kind of shot costs (null = any gun).
   const GUNS = { derringer: ["Derringer", 2], revolver: ["Revolver", 6], shotgun: ["Double-barrel shotgun", 2], rifle: ["Lever-action rifle", 15] };
   const FIRE = [["single", "Single shot", 1, null], ["fan", "Fan the hammer", 3, ["revolver"]], ["both", "Both barrels", 2, ["shotgun"]], ["cover", "Covering fire", 3, null]];
@@ -2917,6 +3547,8 @@ tr.lvl-U td.target { color: var(--muted); }
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
+      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" },
+      allegiance: "", customTier: 1,
       portrait: "", portraitShape: "token",
       play: { injury: 0, duty: 2, stunned: false, woge: false, log: [] },
     };
@@ -2928,14 +3560,15 @@ tr.lvl-U td.target { color: var(--muted); }
       role: ROLE_SUGGESTIONS.Detective,
       reason: "Took a case in Kansas that ended with a man's face changing in front of her, and has been chasing the truth ever since.",
       connection: "Owes the town doctor for keeping quiet about what really killed her last client.",
-      attrs: { Body: 10, Agility: 10, Intellect: 13, Presence: 11, Will: 11 },
+      attrs: { Body: 10, Agility: 11, Intellect: 13, Presence: 11, Will: 11 },
+      edges: { attr: 1, skill: 1, contact: 1 }, contact: "A clerk in the Pinkertons' Portland office who'll pull a file, quietly",
       adv: { id: "observer", name: "", text: "", detail: "" },
       comp: { id: "mystery", name: "", text: "", trigger: "A strange track or body no one can explain" },
     });
     c.equipment = { ...c.equipment, revolver: true, horse: true, lantern: true };
     c.play.gun = { type: "revolver", rounds: 6, spares: 2 };
     c.skills.Investigation = "S";
-    ["Read People", "Wesen Lore", "Tracking", "Survival", "Gambling", "Persuasion", "Deception", "Shooting", "Riding"].forEach((s) => (c.skills[s] = "T"));
+    ["Read People", "Wesen Lore", "Tracking", "Survival", "Gambling", "Persuasion", "Deception", "Shooting", "Riding", "Occult"].forEach((s) => (c.skills[s] = "T"));
     return c;
   }
   function normalize(c) {
@@ -2957,7 +3590,16 @@ tr.lvl-U td.target { color: var(--muted); }
       : (() => { const t = ["revolver", "rifle", "shotgun"].find((k) => out.equipment[k]); return t ? { type: t, rounds: GUNS[t][1], spares: 2 } : { type: "", rounds: 0, spares: 0 }; })();
     out.advances = out.advances.filter((a) => a && SKILLS.some(([n]) => n === a.skill) && ["UT", "TS"].includes(a.from + a.to));
     if (out.sadv.id && out.adv.id) out.adv.id = ""; // a heritage advantage replaces the regular one
+    out.edges = Object.fromEntries(EDGE_DEFS.map(([k, , , max]) => [k, Math.max(0, Math.min(max, parseInt((c.edges || {})[k], 10) || 0))]));
+    out.adv2 = { id: "", detail: "", ...(c.adv2 || {}) };
+    if (!ADVANTAGES.some((a) => a[0] === out.adv2.id)) out.adv2.id = "";
+    out.gear = { item: "", skill: "", ...(c.gear || {}) };
+    if (!ALLEGIANCES.some((a) => a[0] === out.allegiance)) out.allegiance = "";
+    out.customTier = [0, 1, 2, 3].includes(+out.customTier) ? +out.customTier : 1;
+    if (typeof out.contact !== "string") out.contact = "";
     if (!SPECIES.some((x) => x[0] === out.speciesId) && out.speciesId !== "custom") out.speciesId = "human";
+    // Heritage advantages that no longer exist for this heritage are cleared, so the checklist asks again.
+    if (out.sadv.id && out.sadv.id !== "custom" && !(SPECIES_TRAITS[out.speciesId] || []).some((t) => t[0] === out.sadv.id)) out.sadv.id = "";
     for (const k of Object.keys(out.skills)) if (!LEVELS[out.skills[k]]) out.skills[k] = "U";
     for (const k of Object.keys(out.attrs)) out.attrs[k] = Math.max(1, Math.min(20, parseInt(out.attrs[k], 10) || BASE));
     if (!Array.isArray(out.play.log)) out.play.log = [];
@@ -2985,6 +3627,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function setSpecies(id) {
     const before = adjOf();
     ch.speciesId = id;
+    if (id === "grimm" && ch.skills["Wesen Lore"] === "U") ch.skills["Wesen Lore"] = "T"; // raised on the books
     if (ch.sadv.id && ch.sadv.id !== "custom" && !(SPECIES_TRAITS[id] || []).some((t) => t[0] === ch.sadv.id)) ch.sadv.id = "";
     if (id !== "custom") ch.species = speciesDef()[1];
     else if (SPECIES.some((x) => x[1] === ch.species)) ch.species = "";
@@ -2996,7 +3639,14 @@ tr.lvl-U td.target { color: var(--muted); }
   }
   // Old hands: one Expert skill (+5) and seven Trained; everyone else: one Specialty (+3) and nine Trained.
   const isGS = () => ch.path === "hand";
-  const trainedMax = () => (isGS() ? 7 : 9);
+  const edgeN = (k, c = ch) => (c.edges || {})[k] || 0;
+  const edgesAvail = (c = ch) => EDGE_POINTS - tierOf(c);
+  const edgesSpent = (c = ch) => EDGE_DEFS.reduce((a, [k]) => a + edgeN(k, c), 0);
+  const pool = () => 5 + edgeN("attr");
+  const gritStart = (c = ch) => 2 + edgeN("grit", c);
+  // A Grimm's Wesen Lore is Trained for free.
+  const freeSkill = (name, c = ch) => c.speciesId === "grimm" && name === "Wesen Lore" && c.skills[name] === "T";
+  const trainedMax = () => (isGS() ? 7 : 9) + edgeN("skill");
   // Advancement (after significant missions) adds skill steps beyond the creation limits.
   const advCount = (from, to) => (ch.advances || []).filter((a) => a.from === from && a.to === to).length;
   const specialtyMax = () => 1 + advCount("T", "S");
@@ -3008,7 +3658,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const levelName = (l, name) => (l === "S" && isGS() && !(name && advancedToS(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
-  const count = (lvl) => Object.values(ch.skills).filter((v) => v === lvl).length;
+  const count = (lvl) => Object.entries(ch.skills).filter(([k, v]) => v === lvl && !freeSkill(k)).length;
   function odds(t) {
     let w = 0;
     for (let s = 3; s <= 18; s++) if (s <= 4 || (s <= 16 && s <= t)) w += WAYS[s - 3];
@@ -3029,11 +3679,18 @@ tr.lvl-U td.target { color: var(--muted); }
     const advOk = ch.sadv.id ? sAdvOk : ch.adv.id && (ch.adv.id !== "custom" || (ch.adv.name.trim() && ch.adv.text.trim())) &&
       (!(advDef()?.[4]) || ch.adv.detail.trim());
     const compOk = ch.comp.id && (ch.comp.id !== "custom" || (ch.comp.name.trim() && ch.comp.text.trim()));
+    const POOL = pool(), ea = edgesAvail(), es = edgesSpent();
+    const edgeNeeds = [edgeN("adv2") && !ch.adv2.id ? "choose the second advantage" : "", edgeN("adv2") && ADVANTAGES.find((a) => a[0] === ch.adv2.id)?.[4] && !ch.adv2.detail.trim() ? "finish the second advantage" : "",
+      edgeN("contact") && !ch.contact.trim() ? "name your friend in town" : "", edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill) ? "describe the fine weapon or tool and its skill" : ""].filter(Boolean);
+    const horrorOff = heritageOf()?.horror && !horrorOn();
     return [
       [!!ch.name.trim(), ch.name.trim() ? "Name entered" : "Enter a name"],
       [!!ch.dept, "Calling chosen"],
       [!!speciesOk, speciesOk ? `Heritage: ${ch.species || "—"}` : !ch.species.trim() ? "Name your custom heritage" : `Custom adjustments total ${signed(adjTotal())}; they must total 0`],
-      [sp === POOL && !overMax.length, sp === POOL ? (overMax.length ? `Check ${overMax.join(", ")}: outside the heritage range` : "5 attribute points spent") : `Attribute points spent: ${sp} of ${POOL}`],
+      ...(horrorOff ? [[false, `${ch.species} is for horror campaigns only: tick Horror campaign if your table agreed`]] : []),
+      [es === ea && !edgeNeeds.length, es !== ea ? `Edges: ${es} of ${ea} spent` : edgeNeeds.length ? `Edges: ${edgeNeeds.join(", ")}` : ea ? `${ea} Edge${ea > 1 ? "s" : ""} spent` : "No Edges at this tier"],
+      [sp === POOL && !overMax.length, sp === POOL ? (overMax.length ? `Check ${overMax.join(", ")}: outside the heritage range` : `${POOL} attribute points spent`) : `Attribute points spent: ${sp} of ${POOL}`],
+      ...(ch.speciesId === "grimm" ? [[ch.skills["Wesen Lore"] !== "U", "Grimm: Wesen Lore at least Trained"]] : []),
       [nS === specialtyMax(), nS === specialtyMax() ? (specialtyMax() === 1 ? `One ${levelName("S")}` : `${specialtyMax()} top skills`) : `${levelName("S")} skills: ${nS} of ${specialtyMax()}`],
       [nT === trainedAllowed(), nT === trainedAllowed() ? `${trainedAllowed()} Trained skills` : `Trained skills: ${nT} of ${trainedAllowed()}`],
       [!!advOk, advOk ? (ch.sadv.id ? `Heritage advantage: ${sAdvName()} (companion: ${sCompName()})` : "Advantage chosen")
@@ -3052,6 +3709,22 @@ tr.lvl-U td.target { color: var(--muted); }
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
   $("equip").innerHTML = EQUIPMENT.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="eq-${k}" data-eq="${k}"><span><b>${n}</b><span class="small muted">${eff}</span></span></label>`).join("");
 
+  $("edge-list").innerHTML = EDGE_DEFS.map(([k, n, d]) => `<div class="edge"><b>${n}</b>
+    <span class="gm-duty"><button type="button" id="edge-m-${k}" data-edge="${k}" data-d="-1" aria-label="One fewer: ${n}">−</button><b id="edge-n-${k}">0</b><button type="button" id="edge-p-${k}" data-edge="${k}" data-d="1" aria-label="One more: ${n}">+</button></span>
+    <span class="small muted">${d}</span></div>`).join("");
+  $("f-adv2").innerHTML = `<option value="">Choose a second advantage…</option>` + ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("");
+  $("f-allegiance").innerHTML = ALLEGIANCES.map(([id, n]) => `<option value="${id}">${n}</option>`).join("");
+  $("f-gearskill").innerHTML = `<option value="">Choose the skill…</option>` + SKILLS.map(([n]) => `<option>${n}</option>`).join("");
+  const horrorOn = () => store.get(STORE_HORROR, false) === true;
+  // The heritage's own rules, woge profile and suggested skills, shown under its description.
+  function heritageInfo(c = ch) {
+    const h = heritageOf(c); if (!h) return "";
+    const w = h.woge, wb = w ? [...ATTRS.filter(([n]) => w.attrs[n]).map(([n]) => `${n} ${signed(w.attrs[n])}`), ...(w.dodge ? [`Dodge ${signed(w.dodge)}`] : []), ...w.traits] : [];
+    const core = [...(h.wesen ? ["Core Wesen rules: hidden face, Wesen sight, woge (a Will roll can force one), monstrous while woged, animals bolt"] : []), ...h.core];
+    return `<div class="heritage-info">${core.length ? `<ul>${core.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      ${w ? `<span><b>Woge profile:</b> ${esc(wb.join("; "))}${w.drawbacks.length ? `. <b>Drawbacks:</b> ${esc(w.drawbacks.join("; "))}` : ""}.</span>` : ""}
+      ${h.skills.length ? `<span class="muted"><b>Suggested skills:</b> ${esc(h.skills.join(", "))}.</span>` : ""}</div>`;
+  }
   $("f-reasonpick").innerHTML = `<option value="">Top 10 reasons: quick pick…</option>` +
     REASONS.map(([label], i) => `<option value="${i}">${i + 1}. ${label}</option>`).join("");
   $("f-connpick").innerHTML = `<option value="">Top 10 connections: quick pick…</option>` +
@@ -3100,6 +3773,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
     EQUIPMENT.forEach(([k]) => ($("eq-" + k).checked = !!ch.equipment[k]));
     $("f-stunned").checked = !!ch.play.stunned;
+    $("f-contact").value = ch.contact; $("f-gearitem").value = ch.gear.item; $("f-adv2detail").value = ch.adv2.detail;
   }
 
   function render() {
@@ -3118,13 +3792,48 @@ tr.lvl-U td.target { color: var(--muted); }
     $("shape-portrait").checked = ch.portraitShape === "portrait";
     $("hdr-sub").textContent = [ch.rank, ch.species, ch.dept, isGS() ? "Old hand" : ""].filter(Boolean).join(" · ") || "—";
     $("example-banner").hidden = !ch.example;
+    const hk = horrorOn() + "|" + ch.speciesId;
+    if ($("f-speciesid").dataset.for !== hk) {
+      $("f-speciesid").innerHTML = [0, 1, 2, 3].map((t) => `<optgroup label="Tier ${t}: ${EDGE_POINTS - t} Edge${EDGE_POINTS - t === 1 ? "" : "s"}">` +
+        HERITAGES.filter((h) => h.tier === t && (!h.horror || horrorOn() || h.id === ch.speciesId)).map((h) => `<option value="${h.id}">${esc(h.name)}${h.horror ? " (horror)" : ""}</option>`).join("") + `</optgroup>`).join("") +
+        `<option value="custom">Custom heritage…</option>`;
+      $("f-speciesid").dataset.for = hk;
+    }
+    $("f-horror").checked = horrorOn();
     $("f-speciesid").value = ch.speciesId;
     const custom = ch.speciesId === "custom", sd = speciesDef();
+    $("custom-tier-wrap").hidden = !custom;
+    $("f-customtier").value = ch.customTier;
     $("species-name-wrap").hidden = !custom;
     $("species-adj-wrap").hidden = !custom;
     const adjNow = adjOf();
     $("species-desc").innerHTML = (custom ? "Record a heritage agreed with your GM. Adjustments must total 0, from −2 to +2 each." : esc(sd[3])) +
-      `<div class="adj-chips">${ATTRS.filter(([n]) => adjNow[n]).map(([n]) => `<span class="adj-chip ${adjNow[n] > 0 ? "up" : "down"}">${n} ${signed(adjNow[n])}</span>`).join("") || `<span class="adj-chip">No adjustments</span>`}</div>`;
+      `<div class="adj-chips"><span class="adj-chip tier-chip">Tier ${tierOf()}</span>${ATTRS.filter(([n]) => adjNow[n]).map(([n]) => `<span class="adj-chip ${adjNow[n] > 0 ? "up" : "down"}">${n} ${signed(adjNow[n])}</span>`).join("") || `<span class="adj-chip">No adjustments</span>`}</div>` +
+      heritageInfo();
+    // Edges
+    const ea = edgesAvail(), es = edgesSpent();
+    $("edge-tally").textContent = `${es} of ${ea}`;
+    $("edge-tally").className = "chip " + (es === ea ? "ok" : "no");
+    $("edge-intro").textContent = ea ? `Tier ${tierOf()} leaves ${ea} Edge${ea > 1 ? "s" : ""}. Spend ${ea > 1 ? "them" : "it"} below.` : "Tier 3 heritages have no Edges: their power is the heritage itself.";
+    EDGE_DEFS.forEach(([k, , , max]) => {
+      $("edge-n-" + k).textContent = edgeN(k);
+      $("edge-m-" + k).disabled = edgeN(k) <= 0;
+      $("edge-p-" + k).disabled = edgeN(k) >= max || es >= ea;
+    });
+    $("adv2-wrap").hidden = !edgeN("adv2");
+    const a2 = ADVANTAGES.find((a) => a[0] === ch.adv2.id);
+    $("f-adv2").value = ch.adv2.id;
+    $("adv2-detail-wrap").hidden = !(a2 && a2[4]);
+    if (a2 && a2[4]) $("adv2-detail-label").textContent = a2[4];
+    $("adv2-desc").textContent = a2 ? a2[2] : "Any general advantage. It brings no extra complication.";
+    $("contact-wrap").hidden = !edgeN("contact");
+    $("gear-wrap").hidden = $("gearskill-wrap").hidden = !edgeN("gear");
+    $("f-gearskill").value = ch.gear.skill;
+    const al = ALLEGIANCES.find((a) => a[0] === ch.allegiance) || ALLEGIANCES[0];
+    $("f-allegiance").value = al[0];
+    $("allegiance-desc-wrap").hidden = !al[0];
+    $("allegiance-benefit").textContent = al[2];
+    $("allegiance-burden").textContent = al[3];
     if ($("f-adv").dataset.for !== ch.speciesId + "|" + ch.species) {
       $("f-adv").innerHTML = `<option value="">Choose an advantage…</option>` +
         `<optgroup label="${esc(ch.species || "Heritage")} ${ch.speciesId === "incantare" ? "Lenses" : "advantages"} (with companion complication)">` +
@@ -3144,7 +3853,7 @@ tr.lvl-U td.target { color: var(--muted); }
       ? `Suggested text for ${ch.dept}. It follows the calling until you write your own.` : "";
 
     // attributes
-    const sp = spent(), left = POOL - sp;
+    const POOL = pool(), sp = spent(), left = POOL - sp;
     $("pool-pips").innerHTML = Array.from({ length: POOL }, (_, i) => `<span class="pip ${i < sp ? "on" : ""}"></span>`).join("");
     $("pool-left").textContent = left >= 0 ? `${left} left` : `${-left} over`;
     ATTRS.forEach(([n]) => {
@@ -3169,7 +3878,9 @@ tr.lvl-U td.target { color: var(--muted); }
       ["U", "T", "S"].forEach((l) => {
         const r = $(`sk-${key}-${l}`);
         r.checked = lvl === l;
-        r.disabled = (l === "T" && lvl !== "T" && nT >= trainedAllowed()) || (l === "S" && lvl !== "S" && specialtyMax() > 1 && nS >= specialtyMax());
+        r.disabled = (l === "T" && lvl !== "T" && nT >= trainedAllowed() && !(ch.speciesId === "grimm" && n === "Wesen Lore")) || (l === "S" && lvl !== "S" && specialtyMax() > 1 && nS >= specialtyMax())
+          || (l === "U" && ch.speciesId === "grimm" && n === "Wesen Lore");
+        if (l === "T") r.nextElementSibling.textContent = freeSkill(n) ? "Trained (free)" : "Trained";
         if (l === "S") r.nextElementSibling.textContent = levelName("S", n);
       });
       $("st-" + key).textContent = t;
@@ -3205,6 +3916,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("ms-text").className = $("ready-status").className;
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
+    $("st-grit").textContent = gritStart();
     $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`;
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
@@ -3238,7 +3950,7 @@ tr.lvl-U td.target { color: var(--muted); }
       <div class="idgrid">
         <div><span class="label">Title</span><b>${esc(ch.rank || "—")}</b></div>
         <div><span class="label">Calling</span><b>${esc(ch.dept)}</b></div>
-        <div><span class="label">Heritage</span><b>${esc(ch.species || "—")}</b><span class="small muted">${esc(adjText(adjOf()))}</span></div>
+        <div><span class="label">Heritage</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge()}</b></div>
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
@@ -3254,6 +3966,16 @@ tr.lvl-U td.target { color: var(--muted); }
       ${ch.sadv.id ? `<div class="fields">
         <div class="field"><span class="label">Companion complication</span><b>${esc(sCompName())}</b><span class="small muted">${esc(sCompText())}</span></div>
       </div>` : ""}
+      ${heritageOf() && (heritageOf().core.length || heritageOf().woge || heritageOf().wesen) ? `<div><h3 style="margin-bottom:6px">Heritage</h3>${heritageInfo()}</div>` : ""}
+      ${(() => { const a2 = ADVANTAGES.find((a) => a[0] === ch.adv2.id), al = ALLEGIANCES.find((a) => a[0] === ch.allegiance && a[0]);
+        const ed = EDGE_DEFS.filter(([k]) => edgeN(k)).map(([k, n]) => n + (edgeN(k) > 1 ? ` ×${edgeN(k)}` : ""));
+        return `<div class="fields">
+        ${ed.length ? `<div class="field"><span class="label">Edges</span><span>${esc(ed.join(", "))}</span></div>` : ""}
+        ${a2 && edgeN("adv2") ? `<div class="field"><span class="label">Second advantage</span><b>${esc(a2[1])}${ch.adv2.detail ? ": " + esc(ch.adv2.detail) : ""}</b><span class="small muted">${esc(a2[2])}</span></div>` : ""}
+        ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">Friend in town</span><span>${esc(ch.contact)}</span></div>` : ""}
+        ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 ${esc(ch.gear.skill)})` : ""}</span></div>` : ""}
+        ${al ? `<div class="field"><span class="label">Allegiance: ${esc(al[1])}</span><span class="small">${esc(al[2])}</span><span class="small muted">${esc(al[3])}</span></div>` : ""}
+      </div>`; })()}
       <div class="fields">
         <div class="field"><span class="label">Gear</span><span>${esc(eq.join(", ") || "—")}</span></div>
         <div class="field"><span class="label">Connection</span><span>${esc(ch.connection || "—")}</span></div>
@@ -3305,6 +4027,14 @@ tr.lvl-U td.target { color: var(--muted); }
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
+    // In full woge, the woge profile's bonuses apply to rolls on those attributes and their skills; horses balk.
+    const w = ch.play.woge && WESEN.has(ch.speciesId) && heritageOf()?.woge;
+    if (w) {
+      const attr = name === "Dodge" ? null : ch.attrs[name] != null ? name : SKILLS.find((x) => x[0] === name)?.[1];
+      const wb = name === "Dodge" ? (w.dodge || 0) + (w.attrs.Agility || 0) : w.attrs[attr] || 0;
+      if (wb) parts.push(wb);
+      if (name === "Riding") parts.push(-2);
+    }
     // Fanning the hammer is −2, both barrels +2.
     const shot = !$("r-setting-wrap").hidden ? { fan: -2, both: 2 }[$("r-setting").value] || 0 : 0;
     return { name, base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) + shot, shot };
@@ -3322,7 +4052,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const t = base + total;
     const incap = ch.play.injury >= 3;
     $("r-target").textContent = incap ? "Incapacitated: you can't act until treatment clears a box."
-      : `${name} ${base} ${total ? signed(total) + " " : ""}→ target ${t} · ${pct(t)} chance`;
+      : `${name} ${base} ${total ? signed(total) + " " : ""}→ target ${t} · ${pct(t)} chance${ch.play.woge && WESEN.has(ch.speciesId) ? " (woge included)" : ""}`;
     $("r-roll").disabled = incap;
   }
 
@@ -3395,13 +4125,14 @@ tr.lvl-U td.target { color: var(--muted); }
   function touch() { if (ch.example) ch.example = false; }
 
   // ---- events ----
-  const textMap = { "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
+  const textMap = { "f-contact": "contact", "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
     "f-speciesnotes": "speciesNotes", "f-connection": "connection", "f-notes": "notes", "f-otherequip": "otherEquip" };
   document.addEventListener("input", (e) => {
     const id = e.target.id;
     if (textMap[id]) { ch[textMap[id]] = e.target.value; touch(); render(); return; }
     const sub = { "f-advname": ["adv", "name"], "f-advtext": ["adv", "text"], "f-advdetail": ["adv", "detail"],
       "f-compname": ["comp", "name"], "f-comptext": ["comp", "text"], "f-comptrigger": ["comp", "trigger"],
+      "f-gearitem": ["gear", "item"], "f-adv2detail": ["adv2", "detail"],
       "f-sadvname": ["sadv", "name"], "f-sadvtext": ["sadv", "text"], "f-scompname": ["sadv", "compName"], "f-scomptext": ["sadv", "compText"] }[id];
     if (sub) { ch[sub[0]][sub[1]] = e.target.value; touch(); render(); }
   });
@@ -3413,7 +4144,12 @@ tr.lvl-U td.target { color: var(--muted); }
       if (!isGS()) toast("Broadened: the Expert skill becomes a Specialty (+3), and you can train two more skills.");
       else if (count("T") > 7) toast(`Old hands have seven Trained skills; untrain ${count("T") - 7} and your Specialty becomes Expert (+5).`);
     }
-    else if (t.id === "f-woge") { ch.play.woge = t.checked; save(); }
+    else if (t.id === "f-woge") { ch.play.woge = t.checked; save(); updateTarget(); }
+    else if (t.id === "f-horror") { store.set(STORE_HORROR, t.checked); render(); }
+    else if (t.id === "f-customtier") { ch.customTier = +t.value; touch(); render(); }
+    else if (t.id === "f-adv2") { ch.adv2.id = t.value; touch(); render(); }
+    else if (t.id === "f-allegiance") { ch.allegiance = t.value; touch(); render(); }
+    else if (t.id === "f-gearskill") { ch.gear.skill = t.value; touch(); render(); }
     else if (t.id === "f-reasonpick" && t.value !== "") {
       // Replace an empty box or another quick pick; add to anything the player wrote themselves.
       const text = REASONS[+t.value][1], cur = ch.reason.trim();
@@ -3479,11 +4215,21 @@ tr.lvl-U td.target { color: var(--muted); }
       t.value = "";
     }
   });
+  $("edge-list").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-edge]"); if (!b || b.disabled) return;
+    const k = b.dataset.edge, max = EDGE_DEFS.find((x) => x[0] === k)[3], v = edgeN(k) + +b.dataset.d;
+    if (v < 0 || v > max || (+b.dataset.d > 0 && edgesSpent() >= edgesAvail())) return;
+    ch.edges = { ...ch.edges, [k]: v };
+    // Taking back an attribute Edge returns points from the highest attribute above its base.
+    while (spent() > pool()) { const n = ATTRS.map(([a]) => a).filter((a) => ch.attrs[a] > baseOf(a)).sort((x, y) => ch.attrs[y] - ch.attrs[x])[0]; if (!n) break; ch.attrs[n]--; }
+    if (k === "grit" && ch.play.duty < gritStart()) ch.play.duty = gritStart();
+    touch(); render();
+  });
   $("attrs").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-attr]"); if (!b || b.disabled) return;
     const n = b.dataset.attr, d = +b.dataset.d;
     const next = ch.attrs[n] + d;
-    if (next < baseOf(n) || next > maxOf(n) || (d > 0 && spent() >= POOL)) return;
+    if (next < baseOf(n) || next > maxOf(n) || (d > 0 && spent() >= pool())) return;
     ch.attrs[n] = next; touch(); render();
   });
   $("species-adj").addEventListener("click", (e) => {
@@ -3744,7 +4490,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!gmCrew.length) { gmSay("Add some riders first.", true); return; }
     saveText(JSON.stringify({ format: "grimm-west-posse", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog }, null, 2), "grimm-posse.json", gmSay);
   };
-  $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = 2)); saveGM(); renderGM(); gmSay("New session: everyone has 2 Grit points."); };
+  $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay("New session: everyone is back to their starting Grit."); };
   let gmClearArmed = false;
   $("gm-clear").onclick = () => {
     if (!gmClearArmed) { gmClearArmed = true; $("gm-clear").textContent = "Tap again to remove everyone"; setTimeout(() => { gmClearArmed = false; $("gm-clear").textContent = "Remove everyone"; }, 4000); return; }
@@ -3887,7 +4633,7 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   $("duty-minus").onclick = () => { if (ch.play.duty > 0) { ch.play.duty--; render(); } };
   $("duty-plus").onclick = () => { ch.play.duty++; render(); };
-  $("duty-reset").onclick = () => { ch.play.duty = 2; ch.play.log = []; render(); };
+  $("duty-reset").onclick = () => { ch.play.duty = gritStart(); ch.play.log = []; render(); };
   $("r-roll").onclick = () => doRoll(false);
 
   function selectTab(which) {

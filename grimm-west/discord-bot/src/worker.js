@@ -141,7 +141,7 @@ export const COMMANDS = [
       { type: 1, name: "new", description: "Start a clock",
         options: [
           { type: 3, name: "name", description: "e.g. The mob forms", required: true, max_length: 40 },
-          { type: 4, name: "segments", description: "4 urgent, 6 substantial, 8 long", required: true, choices: [{ name: "4", value: 4 }, { name: "6", value: 6 }, { name: "8", value: 8 }] },
+          { type: 4, name: "segments", description: "2 minor ritual, 4 urgent, 6 substantial, 8 long", required: true, choices: [{ name: "2", value: 2 }, { name: "4", value: 4 }, { name: "6", value: 6 }, { name: "8", value: 8 }] },
           { type: 3, name: "kind", description: "Danger fills on failures; progress on successes", required: false, choices: [{ name: "danger", value: "danger" }, { name: "progress", value: "progress" }] },
         ] },
       { type: 1, name: "tick", description: "Fill segments on a clock",
