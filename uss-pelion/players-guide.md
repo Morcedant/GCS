@@ -439,6 +439,57 @@ The ship has its own sheet, tracked like an injury track. Encounters stay descri
 
 After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement. General Services characters advance the same way, but only their starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they are commissioned (see Step 3).
 
+# Running missions
+
+## Mission seeds
+
+Short of a plot? Roll 1d12 on each table, or pick what you like. Read the results together: a *mission* in a *place*, made strange by *something strange*, turned by a *twist*, against a *ticking clock*, with a *key character* at its heart. The GM view in the creator rolls these for you and can start the clock.
+
+| d12 | Mission | Place | Something strange |
+|---|---|---|---|
+| 1 | Answer a distress call | A storm-wracked ocean world | A subspace anomaly that distorts time |
+| 2 | Survey an uncharted system | A dead world with ancient ruins | A non-corporeal life form |
+| 3 | Make first contact | A struggling frontier colony | An ancient machine that still works |
+| 4 | Escort a diplomatic delegation | An asteroid mining station | Duplicates of the crew |
+| 5 | Find a missing ship or outpost | A drifting derelict starship | A signal repeating a crew member's name |
+| 6 | Deliver urgent medical supplies | An ice-covered moon of a gas giant | A planet-wide illusion |
+| 7 | Evacuate a colony | A pre-warp civilization's world | A rift into another universe |
+| 8 | Patrol the Neutral Zone border | A nebula that blinds the sensors | A disease no one recognizes |
+| 9 | Recover a lost probe or artifact | A starbase in crisis | A gravity well that traps ships |
+| 10 | Mediate a dispute between two worlds | A world that seems too perfect | A godlike being testing the crew |
+| 11 | Test experimental technology | A jungle planet thick with life | An alien probe draining power |
+| 12 | Shore leave that goes wrong | Deep space between the stars | Memories that aren't the crew's own |
+
+| d12 | Twist | Ticking clock (segments) | Key character |
+|---|---|---|---|
+| 1 | Klingons arrive with their own claim | Orbit decays (6) | An idealistic Federation ambassador |
+| 2 | The people asking for help are lying | Warp core breach (4) | A Klingon captain with a grudge |
+| 3 | A crew member's complication comes into play | Klingon battle cruiser arrives (6) | A stranded Orion trader |
+| 4 | Orders conflict with doing the right thing | The disease reaches the ship (8) | A brilliant, reckless scientist |
+| 5 | The Prime Directive forbids interfering | The storm closes the beam-out window (4) | A colony leader hiding a secret |
+| 6 | A cloaked Romulan ship is watching | Life support fails on the station (6) | A former Starfleet officer gone rogue |
+| 7 | Orion pirates want the same prize | The anomaly collapses (6) | A local child who has seen too much |
+| 8 | The Pelion's systems start failing | Peace talks break down (8) | A disapproving Vulcan observer |
+| 9 | A respected visitor has a hidden agenda | The hostages' air runs out (4) | An old friend of one of the crew |
+| 10 | The 'threat' is only defending itself | The star goes nova (8) | A Romulan who wants to defect |
+| 11 | Contact with Starfleet is cut off | Shields fail under bombardment (4) | A Starfleet admiral with sealed orders |
+| 12 | A civilian is trapped out of reach | The away team is discovered (6) | An android that wants to be free |
+
+*Example:* 3, 9, 5, 10, 2, 4 gives **first contact** at **a starbase in crisis**, where **a signal repeats a crew member's name**; **the "threat" is only defending itself**, a **warp core breach** clock (4) is ticking, and **a brilliant, reckless scientist** is in the middle of it.
+
+## Captain's log
+
+End each mission with a short log, written together:
+
+1. **The mission.** What were we sent to do, and did we do it: completed, partly, or failed?
+2. **Who stood out?** Name a commendation, or a moment worth remembering.
+3. **Complications.** Which ones came into play, and what did they cost?
+4. **What changed?** Damage to the ship, new allies or enemies, open threads for next time.
+5. **Advancement.** After a significant mission, the GM may authorize one skill step for each crew member (Untrained to Trained, or Trained to Specialty), or a revision of an advantage or complication.
+
+The creator's GM view keeps the log, applies each crew member's advancement to the GM's copy, and saves both with the crew file. Players record an approved advancement on their own sheet under Step 3, so their character still passes the checklist.
+
+
 # Ready-made crew
 
 Six crew members ready to play, for one-shots, new players, or a crew in a hurry. Each follows the creation rules exactly, and their connections tie them to one another. In the creator, choose **Load a ready-made crew member** to open one and make it your own.

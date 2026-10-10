@@ -339,6 +339,10 @@ tr.lvl-U td.target { color: var(--muted); }
 .ship-row .eff { font-size: .8rem; color: var(--muted); }
 .ship-row.hit .eff { color: var(--warn); } .ship-row.out .eff { color: var(--bad); font-weight: 600; }
 
+.advance-box { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
+.advance-box select { max-width: 100%; width: auto; flex: 1 1 220px; }
+.adv-list { margin: 0; padding-left: 1.2em; }
+
 /* GM view */
 .gm-top { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 @media (max-width: 900px) { .gm-top { grid-template-columns: minmax(0, 1fr); } }
@@ -371,6 +375,22 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-traits strong { color: var(--fg); }
 .gm-cond { font-size: .82rem; }
 .gm-cond.hurt { color: var(--warn); } .gm-cond.out { color: var(--bad); font-weight: 600; }
+
+.gm-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
+@media (max-width: 900px) { .gm-tools { grid-template-columns: minmax(0, 1fr); } }
+.seed { margin: 0; display: grid; gap: 8px; }
+.seed div { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; }
+@media (max-width: 480px) { .seed div { grid-template-columns: minmax(0, 1fr) auto; } .seed dt { grid-column: 1 / -1; } }
+.seed dt { font: 600 .68rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--chrome-dim); }
+.seed dd { margin: 0; }
+.seed button { border: 0; background: none; color: var(--chrome); cursor: pointer; font-size: 1rem; padding: 4px 8px; }
+.log-adv { display: grid; gap: 6px; }
+.log-adv label { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 8px; align-items: center; text-transform: none; letter-spacing: 0; font: .88rem var(--body); color: var(--fg); }
+@media (max-width: 480px) { .log-adv label { grid-template-columns: 1fr; } }
+.log-entries { margin: 0; padding-left: 1.4em; display: grid; gap: 10px; }
+.log-entries li { font-size: .9rem; }
+.log-entries .meta { font: .7rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--chrome-dim); }
+.log-entries p { margin: 2px 0; }
 
 /* Players' Guide */
 .guide-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
@@ -510,6 +530,15 @@ tr.lvl-U td.target { color: var(--muted); }
               <thead><tr><th>Skill</th><th>Attribute</th><th>Training</th><th style="text-align:right">Target</th><th style="text-align:right" title="Chance on 3d6 with no modifiers">Odds</th></tr></thead>
               <tbody id="skill-rows"></tbody>
             </table>
+          </div>
+          <div class="advance-box">
+            <span class="label">Advancement (after a significant mission, with the GM's approval)</span>
+            <div class="btn-row">
+              <select id="f-advance" aria-label="Skill to advance"></select>
+              <button class="btn" id="btn-advance">Record advancement</button>
+              <button class="linkish" id="btn-unadvance" hidden>Undo last</button>
+            </div>
+            <ul class="small muted adv-list" id="adv-list"></ul>
           </div>
         </section>
 
@@ -675,6 +704,36 @@ tr.lvl-U td.target { color: var(--muted); }
         <h3>Turn order</h3>
         <p class="small muted">Highest Agility first. Players choose the order among tied crew; the GM places opponents.</p>
         <ol class="turns" id="gm-turns"></ol>
+      </div>
+    </div>
+    <div class="gm-tools">
+      <div class="card hud no-print">
+        <h3>Mission seed</h3>
+        <p class="small muted">Roll a mission, then re-roll any part you don't like. The same tables are in the Players' Guide (Running missions).</p>
+        <dl class="seed" id="seed"></dl>
+        <div class="btn-row">
+          <button class="btn primary" id="seed-roll">Roll a mission</button>
+          <button class="btn" id="seed-clock">Start its clock</button>
+          <button class="btn" id="seed-copy">Copy</button>
+        </div>
+        <div class="toast" id="seed-msg" role="status" aria-live="polite"></div>
+      </div>
+      <div class="card hud no-print">
+        <h3>Captain's log</h3>
+        <p class="small muted">Write it together at the end of a mission. Advancements apply to the GM's copies; use each card's <b>Save officer file</b> to send a player their update.</p>
+        <div class="fields">
+          <div class="field"><label for="log-stardate">Stardate</label><input type="text" id="log-stardate"></div>
+          <div class="field"><label for="log-outcome">Outcome</label>
+            <select id="log-outcome"><option>Completed</option><option>Partly completed</option><option>Failed</option><option>Ongoing</option></select></div>
+          <div class="field wide"><label for="log-title">Mission</label><input type="text" id="log-title" placeholder="e.g. First contact at Starbase 9"></div>
+          <div class="field wide"><label for="log-notes">What happened</label>
+            <textarea id="log-notes" rows="3" placeholder="What changed? Which complications came into play? What's left open for next time?"></textarea></div>
+          <div class="field wide"><label for="log-commend">Commendations</label><input type="text" id="log-commend" placeholder="Who stood out, and for what"></div>
+          <div class="field wide" id="log-adv-wrap"><span class="label">Advancement (significant missions only)</span><div class="log-adv" id="log-adv"></div></div>
+        </div>
+        <div class="btn-row"><button class="btn primary" id="log-add">Add to the log</button><button class="btn" id="log-copy">Copy the whole log</button></div>
+        <div class="toast" id="log-msg" role="status" aria-live="polite"></div>
+        <ol class="log-entries" id="log-entries" reversed></ol>
       </div>
     </div>
     <div class="gm-grid" id="gm-grid"></div>
@@ -1413,6 +1472,200 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Firing.</strong> Tactical rolls <strong>Phasers</strong> for ship weapons, against the enemy ship’s own tracks, which the GM keeps the same way.</p>
 <h2 id="g-advancement">Advancement</h2>
 <p>After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement. General Services characters advance the same way, but only their starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they are commissioned (see Step 3).</p>
+<h1 id="g-running-missions">Running missions</h1>
+<h2 id="g-mission-seeds">Mission seeds</h2>
+<p>Short of a plot? Roll 1d12 on each table, or pick what you like. Read the results together: a <em>mission</em> in a <em>place</em>, made strange by <em>something strange</em>, turned by a <em>twist</em>, against a <em>ticking clock</em>, with a <em>key character</em> at its heart. The GM view in the creator rolls these for you and can start the clock.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>d12</th>
+<th>Mission</th>
+<th>Place</th>
+<th>Something strange</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Answer a distress call</td>
+<td>A storm-wracked ocean world</td>
+<td>A subspace anomaly that distorts time</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Survey an uncharted system</td>
+<td>A dead world with ancient ruins</td>
+<td>A non-corporeal life form</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Make first contact</td>
+<td>A struggling frontier colony</td>
+<td>An ancient machine that still works</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Escort a diplomatic delegation</td>
+<td>An asteroid mining station</td>
+<td>Duplicates of the crew</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Find a missing ship or outpost</td>
+<td>A drifting derelict starship</td>
+<td>A signal repeating a crew member’s name</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Deliver urgent medical supplies</td>
+<td>An ice-covered moon of a gas giant</td>
+<td>A planet-wide illusion</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Evacuate a colony</td>
+<td>A pre-warp civilization’s world</td>
+<td>A rift into another universe</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Patrol the Neutral Zone border</td>
+<td>A nebula that blinds the sensors</td>
+<td>A disease no one recognizes</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>Recover a lost probe or artifact</td>
+<td>A starbase in crisis</td>
+<td>A gravity well that traps ships</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>Mediate a dispute between two worlds</td>
+<td>A world that seems too perfect</td>
+<td>A godlike being testing the crew</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Test experimental technology</td>
+<td>A jungle planet thick with life</td>
+<td>An alien probe draining power</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>Shore leave that goes wrong</td>
+<td>Deep space between the stars</td>
+<td>Memories that aren’t the crew’s own</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>d12</th>
+<th>Twist</th>
+<th>Ticking clock (segments)</th>
+<th>Key character</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Klingons arrive with their own claim</td>
+<td>Orbit decays (6)</td>
+<td>An idealistic Federation ambassador</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>The people asking for help are lying</td>
+<td>Warp core breach (4)</td>
+<td>A Klingon captain with a grudge</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>A crew member’s complication comes into play</td>
+<td>Klingon battle cruiser arrives (6)</td>
+<td>A stranded Orion trader</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Orders conflict with doing the right thing</td>
+<td>The disease reaches the ship (8)</td>
+<td>A brilliant, reckless scientist</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>The Prime Directive forbids interfering</td>
+<td>The storm closes the beam-out window (4)</td>
+<td>A colony leader hiding a secret</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>A cloaked Romulan ship is watching</td>
+<td>Life support fails on the station (6)</td>
+<td>A former Starfleet officer gone rogue</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Orion pirates want the same prize</td>
+<td>The anomaly collapses (6)</td>
+<td>A local child who has seen too much</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>The Pelion’s systems start failing</td>
+<td>Peace talks break down (8)</td>
+<td>A disapproving Vulcan observer</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>A respected visitor has a hidden agenda</td>
+<td>The hostages’ air runs out (4)</td>
+<td>An old friend of one of the crew</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>The ‘threat’ is only defending itself</td>
+<td>The star goes nova (8)</td>
+<td>A Romulan who wants to defect</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Contact with Starfleet is cut off</td>
+<td>Shields fail under bombardment (4)</td>
+<td>A Starfleet admiral with sealed orders</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>A civilian is trapped out of reach</td>
+<td>The away team is discovered (6)</td>
+<td>An android that wants to be free</td>
+</tr>
+</tbody>
+</table>
+<p><em>Example:</em> 3, 9, 5, 10, 2, 4 gives <strong>first contact</strong> at <strong>a starbase in crisis</strong>, where <strong>a signal repeats a crew member’s name</strong>; <strong>the “threat” is only defending itself</strong>, a <strong>warp core breach</strong> clock (4) is ticking, and <strong>a brilliant, reckless scientist</strong> is in the middle of it.</p>
+<h2 id="g-captains-log">Captain’s log</h2>
+<p>End each mission with a short log, written together:</p>
+<ol type="1">
+<li><strong>The mission.</strong> What were we sent to do, and did we do it: completed, partly, or failed?</li>
+<li><strong>Who stood out?</strong> Name a commendation, or a moment worth remembering.</li>
+<li><strong>Complications.</strong> Which ones came into play, and what did they cost?</li>
+<li><strong>What changed?</strong> Damage to the ship, new allies or enemies, open threads for next time.</li>
+<li><strong>Advancement.</strong> After a significant mission, the GM may authorize one skill step for each crew member (Untrained to Trained, or Trained to Specialty), or a revision of an advantage or complication.</li>
+</ol>
+<p>The creator’s GM view keeps the log, applies each crew member’s advancement to the GM’s copy, and saves both with the crew file. Players record an approved advancement on their own sheet under Step 3, so their character still passes the checklist.</p>
 <h1 id="g-ready-made-crew">Ready-made crew</h1>
 <p>Six crew members ready to play, for one-shots, new players, or a crew in a hurry. Each follows the creation rules exactly, and their connections tie them to one another. In the creator, choose <strong>Load a ready-made crew member</strong> to open one and make it your own.</p>
 <h2 id="g-thelan-shvari">Thelan sh’Vari</h2>
@@ -2574,6 +2827,8 @@ tr.lvl-U td.target { color: var(--muted); }
     if (typeof out.portrait !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(out.portrait)) out.portrait = "";
     if (out.portraitShape !== "portrait") out.portraitShape = "token";
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
+    if (!Array.isArray(out.advances)) out.advances = [];
+    out.advances = out.advances.filter((a) => a && SKILLS.some(([n]) => n === a.skill) && ["UT", "TS"].includes(a.from + a.to));
     if (out.sadv.id && out.adv.id) out.adv.id = ""; // a species advantage replaces the regular one
     // Half-Vulcan was removed as a preset; keep such characters valid as a custom species.
     if (c.speciesId === "halfvulcan") {
@@ -2626,9 +2881,16 @@ tr.lvl-U td.target { color: var(--muted); }
   // General Services: one Expert skill (+5) and seven Trained; officers: one Specialty (+3) and nine Trained.
   const isGS = () => ch.dept === "General Services";
   const trainedMax = () => (isGS() ? 7 : 9);
-  const levelMod = (l) => (l === "S" && isGS() ? 5 : LEVELS[l].mod);
-  const levelName = (l) => (l === "S" && isGS() ? "Expert" : LEVELS[l].name);
-  const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name]); };
+  // Advancement (after significant missions) adds skill steps beyond the creation limits.
+  const advCount = (from, to) => (ch.advances || []).filter((a) => a.from === from && a.to === to).length;
+  const specialtyMax = () => 1 + advCount("T", "S");
+  const trainedAllowed = () => trainedMax() + advCount("U", "T") - advCount("T", "S");
+  // Only a General Services character's starting top skill is Expert; skills raised later stop at Specialty.
+  const advancedToS = (name) => (ch.advances || []).some((a) => a.skill === name && a.to === "S");
+  const isExpert = (name) => isGS() && ch.skills[name] === "S" && !advancedToS(name);
+  const levelMod = (l, name) => (l === "S" && isGS() && !(name && advancedToS(name)) ? 5 : LEVELS[l].mod);
+  const levelName = (l, name) => (l === "S" && isGS() && !(name && advancedToS(name)) ? "Expert" : LEVELS[l].name);
+  const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
   const count = (lvl) => Object.values(ch.skills).filter((v) => v === lvl).length;
   function odds(t) {
@@ -2656,8 +2918,8 @@ tr.lvl-U td.target { color: var(--muted); }
       [!!ch.dept, "Department chosen"],
       [!!speciesOk, speciesOk ? `Species: ${ch.species || "—"}` : !ch.species.trim() ? "Name your custom species" : `Custom adjustments total ${signed(adjTotal())}; they must total 0`],
       [sp === POOL && !overMax.length, sp === POOL ? (overMax.length ? `Check ${overMax.join(", ")}: outside the species range` : "5 attribute points spent") : `Attribute points spent: ${sp} of ${POOL}`],
-      [nS === 1, nS === 1 ? `One ${levelName("S")}` : `${levelName("S")} skills: ${nS} of 1`],
-      [nT === trainedMax(), nT === trainedMax() ? `${trainedMax() === 9 ? "Nine" : "Seven"} Trained skills` : `Trained skills: ${nT} of ${trainedMax()}`],
+      [nS === specialtyMax(), nS === specialtyMax() ? (specialtyMax() === 1 ? `One ${levelName("S")}` : `${specialtyMax()} top skills`) : `${levelName("S")} skills: ${nS} of ${specialtyMax()}`],
+      [nT === trainedAllowed(), nT === trainedAllowed() ? `${trainedAllowed()} Trained skills` : `Trained skills: ${nT} of ${trainedAllowed()}`],
       [!!advOk, advOk ? (ch.sadv.id ? `Species advantage: ${sAdvName()} (companion: ${sCompName()})` : "Advantage chosen")
         : ch.sadv.id ? "Finish the custom species advantage and its companion" : ch.adv.id ? "Finish the advantage details" : "Choose an advantage"],
       [!!compOk, compOk ? "Complication chosen" : ch.comp.id ? "Finish the complication details" : "Choose a complication"],
@@ -2789,7 +3051,8 @@ tr.lvl-U td.target { color: var(--muted); }
     // skills
     const nS = count("S"), nT = count("T");
     $("skill-tally").innerHTML =
-      `<span class="chip ${nS === 1 ? "ok" : "no"}">${levelName("S")} ${nS}/1</span><span class="chip ${nT === trainedMax() ? "ok" : "no"}">Trained ${nT}/${trainedMax()}</span>`;
+      `<span class="chip ${nS === specialtyMax() ? "ok" : "no"}">${levelName("S")} ${nS}/${specialtyMax()}</span><span class="chip ${nT === trainedAllowed() ? "ok" : "no"}">Trained ${nT}/${trainedAllowed()}</span>` +
+      (ch.advances.length ? `<span class="chip">${ch.advances.length} advancement${ch.advances.length > 1 ? "s" : ""}</span>` : "");
     $("skills-intro").innerHTML = isGS()
       ? "General Services crew are specialists: one <b>Expert</b> skill at attribute +5 and seven <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling."
       : "One <b>Specialty</b> at attribute +3 and nine <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling.";
@@ -2799,8 +3062,8 @@ tr.lvl-U td.target { color: var(--muted); }
       ["U", "T", "S"].forEach((l) => {
         const r = $(`sk-${key}-${l}`);
         r.checked = lvl === l;
-        r.disabled = l === "T" && lvl !== "T" && nT >= trainedMax();
-        if (l === "S") r.nextElementSibling.textContent = levelName("S");
+        r.disabled = (l === "T" && lvl !== "T" && nT >= trainedAllowed()) || (l === "S" && lvl !== "S" && specialtyMax() > 1 && nS >= specialtyMax());
+        if (l === "S") r.nextElementSibling.textContent = levelName("S", n);
       });
       $("st-" + key).textContent = t;
       $("sp-" + key).textContent = pct(t);
@@ -2835,10 +3098,11 @@ tr.lvl-U td.target { color: var(--muted); }
     $("ms-text").className = $("ready-status").className;
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
-    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics)} Athletics)`;
+    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`;
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
+    renderAdvance();
     renderSheet();
     const em = EMBLEMS[division()];
     document.querySelectorAll("[data-emblem]").forEach((e) => { e.setAttribute("d", em.d); e.classList.toggle("stroke", em.stroke); });
@@ -2872,7 +3136,7 @@ tr.lvl-U td.target { color: var(--muted); }
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
       <div class="attr-strip">${ATTRS.map(([n]) => `<div><span class="label">${n}</span><b>${ch.attrs[n]}</b></div>`).join("")}</div>
       <div><h3 style="margin-bottom:6px">Skills</h3>
-        <div class="skill-cols">${sorted.map((s) => `<div class="skill-line ${s.l}"><span>${s.n}<span class="lv">${s.l === "U" ? "untrained" : levelName(s.l)}</span></span><b>${s.t}</b></div>`).join("")}</div></div>
+        <div class="skill-cols">${sorted.map((s) => `<div class="skill-line ${s.l}"><span>${s.n}<span class="lv">${s.l === "U" ? "untrained" : levelName(s.l, s.n)}</span></span><b>${s.t}</b></div>`).join("")}</div></div>
       <div class="fields">
         ${ch.sadv.id ? `<div class="field"><span class="label">Species advantage</span><b>${esc(sAdvName())}</b><span class="small muted">${esc(sAdvText())}</span></div>`
           : `<div class="field"><span class="label">Advantage</span><b>${esc(advName() || "—")}${ch.adv.detail && advDef()?.[4] ? ": " + esc(ch.adv.detail) : ""}</b><span class="small muted">${esc(advText)}</span></div>`}
@@ -2888,6 +3152,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ch.reason ? `<div class="field"><span class="label">Why I serve</span><span>${esc(ch.reason)}</span></div>` : ""}
         ${ch.speciesNotes ? `<div class="field"><span class="label">Species ability (GM approved)</span><span>${esc(ch.speciesNotes)}</span></div>` : ""}
         ${ch.notes ? `<div class="field wide"><span class="label">Notes</span><span>${esc(ch.notes)}</span></div>` : ""}
+        ${ch.advances.length ? `<div class="field wide"><span class="label">Advancement</span><span>${ch.advances.map((a) => `${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ")}</span></div>` : ""}
       </div>`;
 
     // condition
@@ -3077,7 +3342,8 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.dataset.eq) { ch.equipment[t.dataset.eq] = t.checked; touch(); render(); }
     else if (t.dataset.skill) {
       const n = t.dataset.skill, v = t.value;
-      if (v === "S") for (const k of Object.keys(ch.skills)) if (ch.skills[k] === "S" && k !== n) ch.skills[k] = "U";
+      // With a single top skill, picking a new one replaces the old; advanced characters choose freely within their limits.
+      if (v === "S" && specialtyMax() === 1) for (const k of Object.keys(ch.skills)) if (ch.skills[k] === "S" && k !== n) ch.skills[k] = "U";
       ch.skills[n] = v; touch(); render();
     }
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
@@ -3170,6 +3436,35 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   renderShip(); renderClocks();
 
+  // ---- advancement: one skill step at a time, recorded so the limits stay right ----
+  function advanceOptionsFor(c) {
+    return SKILLS.filter(([n]) => c.skills[n] !== "S").map(([n]) => [n, c.skills[n] === "U" ? `${n}: Untrained → Trained` : `${n}: Trained → Specialty`]);
+  }
+  function applyAdvance(c, skill, note) {
+    const from = c.skills[skill];
+    if (!from || from === "S") return false;
+    const to = from === "U" ? "T" : "S";
+    c.skills[skill] = to;
+    c.advances = [...(c.advances || []), { skill, from, to, note: note || "", date: new Date().toISOString().slice(0, 10) }];
+    return true;
+  }
+  function undoAdvance(c) {
+    const a = (c.advances || []).pop();
+    if (a && c.skills[a.skill] === a.to) c.skills[a.skill] = a.from;
+    return a;
+  }
+  function renderAdvance() {
+    $("f-advance").innerHTML = `<option value="">Choose a skill to advance…</option>` + advanceOptionsFor(ch).map(([n, t]) => `<option value="${esc(n)}">${esc(t)}</option>`).join("");
+    $("adv-list").innerHTML = ch.advances.map((a) => `<li>${esc(a.skill)}: ${LEVELS[a.from].name} → ${LEVELS[a.to].name}${a.note ? ` (${esc(a.note)})` : ""}${a.date ? ` · ${a.date}` : ""}</li>`).join("");
+    $("btn-unadvance").hidden = !ch.advances.length;
+  }
+  $("btn-advance").onclick = () => {
+    const n = $("f-advance").value;
+    if (!n) { toast("Choose the skill your GM approved first.", true); return; }
+    applyAdvance(ch, n, ""); touch(); render(); toast(`Advanced ${n}. Save to file to keep it.`);
+  };
+  $("btn-unadvance").onclick = () => { const a = undoAdvance(ch); render(); if (a) toast(`Undid the ${a.skill} advancement.`); };
+
   // ---- GM view: the whole crew at a glance ----
   const STORE_GM = "pelion.gmcrew.v1";
   let gmCrew = (store.get(STORE_GM, []) || []).filter((c) => c && typeof c === "object").map(normalize);
@@ -3179,7 +3474,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function gmCalc(c) {
     const saved = ch; ch = c;
     try {
-      const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n) })).filter((x) => x.l !== "U")
+      const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n), lab: levelName(c.skills[n], n) })).filter((x) => x.l !== "U")
         .sort((a, b) => (b.l === "S") - (a.l === "S") || b.t - a.t);
       return { skills, dodge: dodge(), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
     } finally { ch = saved; }
@@ -3196,6 +3491,7 @@ tr.lvl-U td.target { color: var(--muted); }
     return { added, updated };
   }
   function renderGM() {
+    if (gmReady) { renderLogForm(); renderSeed(); renderLogBook(); } // the log and seed panels exist once their data has loaded
     $("gm-add-saved").innerHTML = `<option value="">${roster.length ? "Choose a saved officer…" : "No officers saved in this browser"}</option>` +
       roster.map((c, i) => `<option value="${i}">${esc(c.name || "Unnamed officer")}</option>`).join("");
     $("gm-add-pregen").innerHTML = `<option value="">Choose a ready-made crew member…</option>` +
@@ -3218,10 +3514,10 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a Duty point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a Duty point">+</button><span class="small muted">Duty</span></span></div>
         <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
-        <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${k.top})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
+        <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${x.lab})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
         <div class="gm-traits"><span><strong>Advantage:</strong> ${esc(k.adv || "—")}</span>
           <span><strong>Complication:</strong> ${esc(k.comp || "—")}${c.comp.trigger ? ` (trigger: ${esc(c.comp.trigger)})` : ""}${k.scomp ? `; ${esc(k.scomp)}` : ""}</span></div>
-        <button class="linkish danger" data-gm="${c.id}" data-gmrm>Remove from view</button>
+        <div class="btn-row"><button class="linkish" data-gm="${c.id}" data-gmsave>Save officer file</button><button class="linkish danger" data-gm="${c.id}" data-gmrm>Remove from view</button></div>
       </article>`;
     }).join("") : `<div class="card hud"><p class="muted">No crew yet. Ask each player to <b>Save to file</b> and send you the file, then open them all at once above. You can also add officers saved in this browser, or the ready-made crew for a quick game.</p></div>`;
   }
@@ -3231,6 +3527,11 @@ tr.lvl-U td.target { color: var(--muted); }
     if (el.dataset.gmbox) { const i = +el.dataset.gmbox; c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; }
     else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
     else if ("gmrm" in el.dataset) gmCrew = gmCrew.filter((x) => x !== c);
+    else if ("gmsave" in el.dataset) {
+      const name = (c.name.trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLowerCase() || "officer") + ".json";
+      saveText(JSON.stringify({ format: "uss-pelion-officer", version: 1, ...c, play: { ...c.play, log: [] } }, null, 2), name, gmSay);
+      return;
+    }
     saveGM(); renderGM();
   });
   $("gm-grid").addEventListener("change", (e) => {
@@ -3243,6 +3544,7 @@ tr.lvl-U td.target { color: var(--muted); }
     for (const f of files) {
       try {
         const data = JSON.parse(await f.text());
+        if (Array.isArray(data.log)) mergeLog(data.log);
         const list = Array.isArray(data) ? data : Array.isArray(data.crew) ? data.crew : [data];
         const ok = list.filter((x) => x && x.attrs && x.skills);
         if (!ok.length) bad++;
@@ -3261,7 +3563,7 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   $("gm-save").onclick = () => {
     if (!gmCrew.length) { gmSay("Add some crew first.", true); return; }
-    saveText(JSON.stringify({ format: "uss-pelion-crew", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })) }, null, 2), "pelion-crew.json", gmSay);
+    saveText(JSON.stringify({ format: "uss-pelion-crew", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog }, null, 2), "pelion-crew.json", gmSay);
   };
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = 2)); saveGM(); renderGM(); gmSay("New session: everyone has 2 Duty points."); };
   let gmClearArmed = false;
@@ -3269,6 +3571,90 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!gmClearArmed) { gmClearArmed = true; $("gm-clear").textContent = "Tap again to remove everyone"; setTimeout(() => { gmClearArmed = false; $("gm-clear").textContent = "Remove everyone"; }, 4000); return; }
     gmClearArmed = false; gmCrew = []; saveGM(); renderGM(); $("gm-clear").textContent = "Remove everyone"; gmSay("Crew view cleared. Players' own files are untouched.");
   };
+
+  // ---- mission seeds ----
+  const SEEDS = {"mission": ["Mission", ["Answer a distress call", "Survey an uncharted system", "Make first contact", "Escort a diplomatic delegation", "Find a missing ship or outpost", "Deliver urgent medical supplies", "Evacuate a colony", "Patrol the Neutral Zone border", "Recover a lost probe or artifact", "Mediate a dispute between two worlds", "Test experimental technology", "Shore leave that goes wrong"]], "place": ["Place", ["A storm-wracked ocean world", "A dead world with ancient ruins", "A struggling frontier colony", "An asteroid mining station", "A drifting derelict starship", "An ice-covered moon of a gas giant", "A pre-warp civilization's world", "A nebula that blinds the sensors", "A starbase in crisis", "A world that seems too perfect", "A jungle planet thick with life", "Deep space between the stars"]], "strange": ["Something strange", ["A subspace anomaly that distorts time", "A non-corporeal life form", "An ancient machine that still works", "Duplicates of the crew", "A signal repeating a crew member's name", "A planet-wide illusion", "A rift into another universe", "A disease no one recognizes", "A gravity well that traps ships", "A godlike being testing the crew", "An alien probe draining power", "Memories that aren't the crew's own"]], "twist": ["Twist", ["Klingons arrive with their own claim", "The people asking for help are lying", "A crew member's complication comes into play", "Orders conflict with doing the right thing", "The Prime Directive forbids interfering", "A cloaked Romulan ship is watching", "Orion pirates want the same prize", "The Pelion's systems start failing", "A respected visitor has a hidden agenda", "The 'threat' is only defending itself", "Contact with Starfleet is cut off", "A civilian is trapped out of reach"]], "clock": ["Ticking clock", [["Orbit decays", 6], ["Warp core breach", 4], ["Klingon battle cruiser arrives", 6], ["The disease reaches the ship", 8], ["The storm closes the beam-out window", 4], ["Life support fails on the station", 6], ["The anomaly collapses", 6], ["Peace talks break down", 8], ["The hostages' air runs out", 4], ["The star goes nova", 8], ["Shields fail under bombardment", 4], ["The away team is discovered", 6]]], "who": ["Key character", ["An idealistic Federation ambassador", "A Klingon captain with a grudge", "A stranded Orion trader", "A brilliant, reckless scientist", "A colony leader hiding a secret", "A former Starfleet officer gone rogue", "A local child who has seen too much", "A disapproving Vulcan observer", "An old friend of one of the crew", "A Romulan who wants to defect", "A Starfleet admiral with sealed orders", "An android that wants to be free"]]};
+  const SEED_KEYS = ["mission", "place", "strange", "twist", "clock", "who"];
+  const STORE_SEED = "pelion.seed.v1";
+  const d12 = () => Math.floor(Math.random() * 12);
+  let seed = store.get(STORE_SEED, null);
+  if (!seed || SEED_KEYS.some((k) => !Number.isInteger(seed[k]))) seed = null;
+  const seedText = (k) => (k === "clock" ? `${SEEDS.clock[1][seed.clock][0]} (${SEEDS.clock[1][seed.clock][1]})` : SEEDS[k][1][seed[k]]);
+  function renderSeed() {
+    $("seed").innerHTML = seed ? SEED_KEYS.map((k) => `<div><dt>${SEEDS[k][0]}</dt><dd>${esc(seedText(k))}</dd><button data-reseed="${k}" aria-label="Re-roll ${SEEDS[k][0]}" title="Re-roll">↻</button></div>`).join("")
+      : `<p class="small muted">No mission rolled yet.</p>`;
+    $("seed-clock").disabled = $("seed-copy").disabled = !seed;
+  }
+  $("seed-roll").onclick = () => { seed = Object.fromEntries(SEED_KEYS.map((k) => [k, d12()])); store.set(STORE_SEED, seed); renderSeed(); $("seed-msg").textContent = ""; };
+  $("seed").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-reseed]"); if (!b) return;
+    let n; do { n = d12(); } while (n === seed[b.dataset.reseed]);
+    seed[b.dataset.reseed] = n; store.set(STORE_SEED, seed); renderSeed();
+  });
+  $("seed-clock").onclick = () => {
+    const [name, size] = SEEDS.clock[1][seed.clock];
+    clocks.push({ id: uid(), name, size, kind: "danger", filled: 0 }); store.set(STORE_CLOCKS, clocks); renderClocks();
+    $("seed-msg").textContent = `Started "${name}" (${size}) on the Duty station's Clocks.`;
+  };
+  const copyText = (txt, say) => {
+    const p = navigator.clipboard?.writeText(txt);
+    if (p) p.then(() => say("Copied."), () => say("Copying is blocked here; select the text and copy it yourself.", true));
+    else say("Copying is blocked here; select the text and copy it yourself.", true);
+  };
+  $("seed-copy").onclick = () => copyText(SEED_KEYS.map((k) => `${SEEDS[k][0]}: ${seedText(k)}`).join("\n"), (m, err) => { $("seed-msg").textContent = m; $("seed-msg").className = "toast" + (err ? " err" : ""); });
+
+  // ---- captain's log ----
+  const STORE_LOG = "pelion.log.v1";
+  let missionLog = store.get(STORE_LOG, []);
+  if (!Array.isArray(missionLog)) missionLog = [];
+  const logSay = (m, err) => { $("log-msg").textContent = m; $("log-msg").className = "toast" + (err ? " err" : ""); };
+  const freshStardate = () => {
+    const last = missionLog.length ? parseFloat(missionLog[missionLog.length - 1].stardate) : NaN;
+    return (Number.isFinite(last) ? last + 10 + Math.random() * 40 : 5000 + Math.random() * 900).toFixed(1);
+  };
+  function mergeLog(entries) {
+    for (const e of entries) if (e && e.id && !missionLog.some((x) => x.id === e.id)) missionLog.push(e);
+    store.set(STORE_LOG, missionLog); renderLogBook();
+  }
+  function renderLogForm() {
+    if (!$("log-stardate").value) $("log-stardate").value = freshStardate();
+    $("log-adv-wrap").hidden = !gmCrew.length;
+    $("log-adv").innerHTML = gmCrew.map((c) => `<label>${esc(c.name || "Unnamed")}<select data-logadv="${c.id}"><option value="">No advancement</option>${advanceOptionsFor(c).map(([n, t]) => `<option value="${esc(n)}">${esc(t)}</option>`).join("")}</select></label>`).join("");
+  }
+  const logEntryText = (e) => [`Captain's log, stardate ${e.stardate}. ${e.title || "Mission"}: ${e.outcome}.`, e.notes, e.commend ? `Commendations: ${e.commend}` : "",
+    e.advances.length ? `Advancement: ${e.advances.map((a) => `${a.name}, ${a.skill} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}` : ""].filter(Boolean).join("\n");
+  function renderLogBook() {
+    $("log-entries").innerHTML = missionLog.slice().reverse().map((e) => `<li><span class="meta">Stardate ${esc(e.stardate)} · ${esc(e.outcome)}</span>
+      <p><b>${esc(e.title || "Mission")}</b></p>${e.notes ? `<p>${esc(e.notes)}</p>` : ""}${e.commend ? `<p class="small">Commendations: ${esc(e.commend)}</p>` : ""}
+      ${e.advances.length ? `<p class="small muted">Advancement: ${e.advances.map((a) => `${esc(a.name)}, ${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}</p>` : ""}
+      <button class="linkish danger" data-rmlog="${e.id}">Remove entry</button></li>`).join("");
+    $("log-copy").disabled = !missionLog.length;
+  }
+  $("log-add").onclick = () => {
+    const title = $("log-title").value.trim(), notes = $("log-notes").value.trim();
+    if (!title && !notes) { logSay("Give the mission a name or say what happened first.", true); return; }
+    const advances = [];
+    document.querySelectorAll("[data-logadv]").forEach((sel) => {
+      const c = gmCrew.find((x) => x.id === sel.dataset.logadv);
+      if (!c || !sel.value) return;
+      const from = c.skills[sel.value];
+      if (applyAdvance(c, sel.value, title || `Stardate ${$("log-stardate").value}`)) advances.push({ name: c.name, skill: sel.value, from, to: c.skills[sel.value] });
+    });
+    missionLog.push({ id: uid(), stardate: $("log-stardate").value.trim(), title, outcome: $("log-outcome").value, notes, commend: $("log-commend").value.trim(), advances, date: new Date().toISOString().slice(0, 10) });
+    store.set(STORE_LOG, missionLog); saveGM();
+    ["log-title", "log-notes", "log-commend", "log-stardate"].forEach((id) => ($(id).value = ""));
+    renderGM(); renderLogBook();
+    logSay(advances.length ? `Logged. ${advances.length} advancement${advances.length > 1 ? "s" : ""} applied: save each officer's file for their player.` : "Logged.");
+  };
+  $("log-entries").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-rmlog]"); if (!b) return;
+    if (b.dataset.armed !== "1") { b.dataset.armed = "1"; b.textContent = "Tap again to remove"; setTimeout(() => { if (b.isConnected) { b.dataset.armed = ""; b.textContent = "Remove entry"; } }, 4000); return; }
+    missionLog = missionLog.filter((x) => x.id !== b.dataset.rmlog); store.set(STORE_LOG, missionLog); renderLogBook();
+  });
+  $("log-copy").onclick = () => copyText(missionLog.map(logEntryText).join("\n\n"), logSay);
+  $("log-title").addEventListener("focus", () => { if (!$("log-title").value && seed) $("log-title").placeholder = `${SEEDS.mission[1][seed.mission]} (${SEEDS.place[1][seed.place].toLowerCase()})`; });
+
+  var gmReady = true;
 
   // ---- portrait ----
   // Images are scaled down in the browser so a character stays small enough to save and share as JSON.
@@ -3476,6 +3862,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   bindFields();
   render();
+  renderGM();
   $("r-phys").checked = PHYSICAL.has($("r-skill").value);
   updateTarget();
   try { const t = sessionStorage.getItem("pelion.tab"); if (t === "sheet" || t === "guide" || t === "gm") selectTab(t); } catch {}

@@ -51,3 +51,11 @@ The **GM view** tab shows the whole crew: open every player's character file at 
 officers saved in the browser or the ready-made crew, and track each one's injuries and Duty points from a card that
 also shows attributes, Dodge, skills, advantage and complication. A turn-order list sorts the crew by Agility.
 **Save crew to file** keeps the GM's copies.
+
+### Mission seeds, captain's log and advancement
+
+The GM view also rolls **mission seeds** (mission, place, something strange, twist, ticking clock, key character;
+re-roll any part, start the clock) and keeps a **captain's log**. Logging a mission can apply each crew member's
+advancement to the GM's copy; **Save officer file** on a crew card hands the update back. Players can also record an
+approved advancement under Step 3, which raises their skill limits so the character still passes the checklist.
+The same tables and log questions are in the guide's *Running missions* chapter.
