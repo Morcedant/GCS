@@ -193,11 +193,23 @@ async function registerCommands(env) {
   if (!env.DISCORD_APPLICATION_ID || !env.DISCORD_BOT_TOKEN) {
     return new Response("Add DISCORD_APPLICATION_ID and DISCORD_BOT_TOKEN to the Worker's settings, then reload this page.", { status: 400 });
   }
-  const res = await fetch(`https://discord.com/api/v10/applications/${String(env.DISCORD_APPLICATION_ID).trim()}/commands`, {
+  const put = () => fetch(`https://discord.com/api/v10/applications/${String(env.DISCORD_APPLICATION_ID).trim()}/commands`, {
     method: "PUT",
     headers: { Authorization: `Bot ${String(env.DISCORD_BOT_TOKEN).trim()}`, "Content-Type": "application/json" },
     body: JSON.stringify(COMMANDS),
   });
-  return new Response(res.ok ? "Registered /pelion. It can take a minute to appear in Discord." : `Discord refused the command (${res.status}): ${await res.text()}`,
-    { status: res.ok ? 200 : 502 });
+  let res = await put();
+  // Discord rate-limits command registration. Wait out a short limit once instead of failing.
+  if (res.status === 429) {
+    const wait = Number((await res.clone().json().catch(() => ({}))).retry_after) || 0;
+    if (wait > 0 && wait <= 60) {
+      await new Promise((r) => setTimeout(r, Math.ceil(wait * 1000) + 500));
+      res = await put();
+    }
+  }
+  if (res.ok) return new Response("Registered /pelion. It can take a minute to appear in Discord.");
+  const detail = await res.text();
+  const hint = res.status === 429 ? "\n\nDiscord is rate-limiting registration. Wait a minute or two, then reload this page once."
+    : res.status === 401 ? "\n\nThe bot token is wrong or was reset. Reset it on the Bot page and update DISCORD_BOT_TOKEN." : "";
+  return new Response(`Discord refused the command (${res.status}): ${detail}${hint}`, { status: 502 });
 }
