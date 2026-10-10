@@ -113,72 +113,156 @@
   {
    "name": "Marshal",
    "group": "law",
-   "text": "Marshal: carries what authority there is (take a Badge advantage), with Leadership and a steady gun."
+   "text": "Marshal: carries what authority there is (take a Badge advantage), with Leadership and a steady gun.",
+   "skills": [
+    "Leadership",
+    "Shooting",
+    "Law",
+    "Riding"
+   ]
   },
   {
    "name": "Deputy",
    "group": "law",
-   "text": "Deputy: keeps order, guards prisoners, and backs up the marshal when it comes to shooting."
+   "text": "Deputy: keeps order, guards prisoners, and backs up the marshal when it comes to shooting.",
+   "skills": [
+    "Shooting",
+    "Brawling",
+    "Riding",
+    "Read People"
+   ]
   },
   {
    "name": "Detective",
    "group": "law",
-   "text": "Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads."
+   "text": "Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads.",
+   "skills": [
+    "Investigation",
+    "Read People",
+    "Deception",
+    "Stealth"
+   ]
   },
   {
    "name": "Bounty Hunter",
    "group": "law",
-   "text": "Bounty hunter: tracks wanted men across three territories and brings them in, upright or across a saddle."
+   "text": "Bounty hunter: tracks wanted men across three territories and brings them in, upright or across a saddle.",
+   "skills": [
+    "Tracking",
+    "Shooting",
+    "Riding",
+    "Survival"
+   ]
   },
   {
    "name": "Doctor",
    "group": "learned",
-   "text": "Doctor: digs out bullets, sets bones, and reads what a body says about how it died."
+   "text": "Doctor: digs out bullets, sets bones, and reads what a body says about how it died.",
+   "skills": [
+    "Medicine",
+    "Investigation",
+    "Read People",
+    "Persuasion"
+   ]
   },
   {
    "name": "Occultist",
    "group": "learned",
-   "text": "Occultist: knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears."
+   "text": "Occultist: knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears.",
+   "skills": [
+    "Occult",
+    "Investigation",
+    "Persuasion",
+    "Read People"
+   ]
   },
   {
    "name": "Lawyer",
    "group": "learned",
-   "text": "Lawyer: knows the law better than the men who wear the badges, and isn't afraid to say so."
+   "text": "Lawyer: knows the law better than the men who wear the badges, and isn't afraid to say so.",
+   "skills": [
+    "Law",
+    "Persuasion",
+    "Read People",
+    "Investigation"
+   ]
   },
   {
    "name": "Journalist",
    "group": "learned",
-   "text": "Journalist: asks the questions no one wants asked, and prints the answers."
+   "text": "Journalist: asks the questions no one wants asked, and prints the answers.",
+   "skills": [
+    "Investigation",
+    "Persuasion",
+    "Read People",
+    "Stealth"
+   ]
   },
   {
    "name": "Preacher",
    "group": "learned",
-   "text": "Preacher: comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun."
+   "text": "Preacher: comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun.",
+   "skills": [
+    "Persuasion",
+    "Leadership",
+    "Occult",
+    "Shooting"
+   ]
   },
   {
    "name": "Gunslinger",
    "group": "frontier",
-   "text": "Gunslinger: the fastest and steadiest gun in the room, and the one who decides when it's time to draw."
+   "text": "Gunslinger: the fastest and steadiest gun in the room, and the one who decides when it's time to draw.",
+   "skills": [
+    "Shooting",
+    "Athletics",
+    "Read People",
+    "Riding"
+   ]
   },
   {
    "name": "Scout",
    "group": "frontier",
-   "text": "Scout: finds the trail, reads the land, and keeps everyone alive out in it."
+   "text": "Scout: finds the trail, reads the land, and keeps everyone alive out in it.",
+   "skills": [
+    "Tracking",
+    "Survival",
+    "Riding",
+    "Stealth"
+   ]
   },
   {
    "name": "Gambler",
    "group": "frontier",
-   "text": "Gambler: reads people, bluffs, and hears everything the saloon hears."
+   "text": "Gambler: reads people, bluffs, and hears everything the saloon hears.",
+   "skills": [
+    "Gambling",
+    "Read People",
+    "Deception",
+    "Shooting"
+   ]
   },
   {
    "name": "Wrangler",
    "group": "frontier",
-   "text": "Wrangler: breaks horses, drives cattle, and can ride anything with four legs."
+   "text": "Wrangler: breaks horses, drives cattle, and can ride anything with four legs.",
+   "skills": [
+    "Animal Handling",
+    "Riding",
+    "Survival",
+    "Brawling"
+   ]
   },
   {
    "name": "Undertaker",
    "group": "frontier",
-   "text": "Undertaker: buries the dead, and makes sure they stay buried."
+   "text": "Undertaker: buries the dead, and makes sure they stay buried.",
+   "skills": [
+    "Occult",
+    "Medicine",
+    "Investigation",
+    "Melee"
+   ]
   }
  ],
  "skills": [

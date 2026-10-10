@@ -512,7 +512,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <p class="muted small">Pick a department and describe what you bring to the crew. Rank and assignment are agreed with the GM; rank gives no mechanical bonus.</p></div>
           <div class="fields">
             <div class="field"><label for="f-dept">Department</label>
-              <select id="f-dept"></select></div>
+              <select id="f-dept"></select>
+              <span class="small muted" id="role-skills"></span></div>
             <div class="field"><label for="f-rankselect">Rank</label>
               <select id="f-rankselect"></select>
               <input type="text" id="f-rank" aria-label="Other rank" placeholder="Type the rank" hidden></div>
@@ -786,10 +787,11 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Choose a department and describe what you contribute to the crew. Rank and assignment are agreed with the GM; rank gives no mechanical bonus.</p>
 <table>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -797,6 +799,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <th>Division</th>
 <th>Uniform</th>
 <th>Typical contribution</th>
+<th>Core skills</th>
 </tr>
 </thead>
 <tbody>
@@ -805,57 +808,67 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Command</td>
 <td>Gold</td>
 <td>Coordinate the crew and negotiate</td>
+<td>Leadership, Diplomacy, Psychology, Phasers</td>
 </tr>
 <tr class="even">
 <td>Helm</td>
 <td>Command</td>
 <td>Gold</td>
 <td>Fly the ship and her shuttles</td>
+<td>Helm, Navigation, Sensors, Phasers</td>
 </tr>
 <tr class="odd">
 <td>Navigation</td>
 <td>Command</td>
 <td>Gold</td>
 <td>Plot courses and fix position</td>
+<td>Navigation, Sensors, Helm, Computers</td>
 </tr>
 <tr class="even">
 <td>Science</td>
 <td>Sciences</td>
 <td>Blue</td>
 <td>Read and explain anomalies</td>
+<td>Sensors, Physical Sciences, Life Sciences, Computers</td>
 </tr>
 <tr class="odd">
 <td>Medical</td>
 <td>Sciences</td>
 <td>Blue</td>
 <td>Diagnose, stabilize, and treat</td>
+<td>Medicine, Life Sciences, Psychology, Sensors</td>
 </tr>
 <tr class="even">
 <td>Engineering</td>
 <td>Operations</td>
 <td>Red</td>
 <td>Keep machinery and power running</td>
+<td>Engineering, Electronics, Computers, Physical Sciences</td>
 </tr>
 <tr class="odd">
 <td>Security</td>
 <td>Operations</td>
 <td>Red</td>
 <td>Protect the away team and the ship</td>
+<td>Phasers, Unarmed Combat, Athletics, Stealth</td>
 </tr>
 <tr class="even">
 <td>Communications</td>
 <td>Operations</td>
 <td>Red</td>
 <td>Establish contact and cut through interference</td>
+<td>Communications, Electronics, Computers, Diplomacy</td>
 </tr>
 <tr class="odd">
 <td>General Services</td>
 <td>General Services</td>
 <td>Red</td>
 <td>Keep records, carry orders, handle the ship’s daily business</td>
+<td>Computers, Electronics, Athletics, Communications</td>
 </tr>
 </tbody>
 </table>
+<p>The creator marks your department’s four <strong>core skills</strong> (in the table above) Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing department swaps the core skills you haven’t changed.</p>
 <h3 id="g-officers-and-enlisted-crew">Officers and enlisted crew</h3>
 <p>Officers hold ranks from Ensign through Captain. <strong>General Services</strong> is the division for enlisted crew: Crewman 3rd, 2nd, and 1st Class, Crewman, and Yeoman 3rd, 2nd, and 1st Class, and Yeoman. A character with a Crewman or Yeoman rank belongs to General Services. Enlisted crew use the same creation rules as officers, except for their skills (see Step 3): they are specialists rather than generalists.</p>
 <h2 id="g-step-2-choose-a-species-and-assign-attributes">Step 2: Choose a species and assign attributes</h2>
@@ -2757,6 +2770,8 @@ tr.lvl-U td.target { color: var(--muted); }
     ["Engineering", "operations"], ["Security", "operations"], ["Communications", "operations"],
     ["General Services", "services"],
   ];
+  // Core skills for each role: marked Trained when the role is picked.
+  const ROLE_SKILLS = {"Command": ["Leadership", "Diplomacy", "Psychology", "Phasers"], "Helm": ["Helm", "Navigation", "Sensors", "Phasers"], "Navigation": ["Navigation", "Sensors", "Helm", "Computers"], "Science": ["Sensors", "Physical Sciences", "Life Sciences", "Computers"], "Medical": ["Medicine", "Life Sciences", "Psychology", "Sensors"], "Engineering": ["Engineering", "Electronics", "Computers", "Physical Sciences"], "Security": ["Phasers", "Unarmed Combat", "Athletics", "Stealth"], "Communications": ["Communications", "Electronics", "Computers", "Diplomacy"], "General Services": ["Computers", "Electronics", "Athletics", "Communications"]};
   // Starting text for "What you contribute"; replaced on department change unless the player has written their own.
   const ROLE_SUGGESTIONS = {
     Command: "Command officer: coordinates the crew with Leadership and negotiates with Diplomacy when orders and circumstances collide.",
@@ -3256,6 +3271,7 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   function render() {
+    $("role-skills").textContent = (ROLE_SKILLS[ch.dept] || []).length ? `Core skills: ${ROLE_SKILLS[ch.dept].join(", ")} (marked Trained for you)` : "";
     $("app").dataset.div = division();
     $("hdr-name").textContent = ch.name.trim() || "Unnamed officer";
     const shapeCls = ch.portraitShape === "portrait" ? "portrait" : "";
@@ -3544,8 +3560,19 @@ tr.lvl-U td.target { color: var(--muted); }
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
   function load(c) { ch = normalize(c); rankOther = false; last = null; $("r-result").hidden = true; bindFields(); render(); }
   let rankOther = false; // "Other rank…" chosen, even before anything is typed
+  // A role's core skills are marked Trained when the role is chosen (and on a new character). Changing
+  // role swaps them, leaving every skill the player trained or raised themselves.
+  function applyRoleSkills() {
+    const want = ROLE_SKILLS[ch.dept] || [];
+    const auto = (ch.roleSkills || []).filter((s) => ch.skills[s] === "T");
+    auto.filter((s) => !want.includes(s)).forEach((s) => { ch.skills[s] = "U"; });
+    const kept = auto.filter((s) => want.includes(s));
+    want.forEach((s) => { if (ch.skills[s] === "U" && count("T") < trainedAllowed()) { ch.skills[s] = "T"; kept.push(s); } });
+    ch.roleSkills = kept;
+  }
   function setDept(d) {
     ch.dept = d;
+    applyRoleSkills();
     if (!ch.role.trim() || ROLE_TEXTS.has(ch.role)) { ch.role = ROLE_SUGGESTIONS[ch.dept] || ""; $("f-role").value = ch.role; }
   }
   function touch() { if (ch.example) ch.example = false; }
@@ -4087,7 +4114,7 @@ tr.lvl-U td.target { color: var(--muted); }
   // Wide tables scroll inside their own box on narrow screens.
   $("guide").querySelectorAll("table").forEach((t) => { const w = document.createElement("div"); w.className = "table-scroll"; t.before(w); w.append(t); });
 
-  function newOfficer() { load(blank()); selectTab("create"); toast("New officer started."); }
+  function newOfficer() { load(blank()); applyRoleSkills(); render(); selectTab("create"); toast("New officer started."); }
   $("btn-new").onclick = newOfficer;
   $("banner-new").onclick = newOfficer;
   $("btn-example").onclick = () => { load(example()); toast("Example science officer loaded."); };

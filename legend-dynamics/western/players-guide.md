@@ -25,22 +25,24 @@ Work through the five steps in order. The character creator follows the same ste
 
 Choose a calling and describe what you bring. Your calling places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
 
-| Calling | Group | Typical contribution |
-|---|---|---|
-| Marshal | The Law | carries what authority there is (take a Badge advantage), with Leadership and a steady gun. |
-| Deputy | The Law | keeps order, guards prisoners, and backs up the marshal when it comes to shooting. |
-| Detective | The Law | investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads. |
-| Bounty Hunter | The Law | tracks wanted men across three territories and brings them in, upright or across a saddle. |
-| Doctor | The Learned | digs out bullets, sets bones, and reads what a body says about how it died. |
-| Occultist | The Learned | knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears. |
-| Lawyer | The Learned | knows the law better than the men who wear the badges, and isn't afraid to say so. |
-| Journalist | The Learned | asks the questions no one wants asked, and prints the answers. |
-| Preacher | The Learned | comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun. |
-| Gunslinger | The Frontier | the fastest and steadiest gun in the room, and the one who decides when it's time to draw. |
-| Scout | The Frontier | finds the trail, reads the land, and keeps everyone alive out in it. |
-| Gambler | The Frontier | reads people, bluffs, and hears everything the saloon hears. |
-| Wrangler | The Frontier | breaks horses, drives cattle, and can ride anything with four legs. |
-| Undertaker | The Frontier | buries the dead, and makes sure they stay buried. |
+| Calling | Group | Typical contribution | Core skills |
+|---|---|---|---|
+| Marshal | The Law | carries what authority there is (take a Badge advantage), with Leadership and a steady gun. | Leadership, Shooting, Law, Riding |
+| Deputy | The Law | keeps order, guards prisoners, and backs up the marshal when it comes to shooting. | Shooting, Brawling, Riding, Read People |
+| Detective | The Law | investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads. | Investigation, Read People, Deception, Stealth |
+| Bounty Hunter | The Law | tracks wanted men across three territories and brings them in, upright or across a saddle. | Tracking, Shooting, Riding, Survival |
+| Doctor | The Learned | digs out bullets, sets bones, and reads what a body says about how it died. | Medicine, Investigation, Read People, Persuasion |
+| Occultist | The Learned | knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears. | Occult, Investigation, Persuasion, Read People |
+| Lawyer | The Learned | knows the law better than the men who wear the badges, and isn't afraid to say so. | Law, Persuasion, Read People, Investigation |
+| Journalist | The Learned | asks the questions no one wants asked, and prints the answers. | Investigation, Persuasion, Read People, Stealth |
+| Preacher | The Learned | comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun. | Persuasion, Leadership, Occult, Shooting |
+| Gunslinger | The Frontier | the fastest and steadiest gun in the room, and the one who decides when it's time to draw. | Shooting, Athletics, Read People, Riding |
+| Scout | The Frontier | finds the trail, reads the land, and keeps everyone alive out in it. | Tracking, Survival, Riding, Stealth |
+| Gambler | The Frontier | reads people, bluffs, and hears everything the saloon hears. | Gambling, Read People, Deception, Shooting |
+| Wrangler | The Frontier | breaks horses, drives cattle, and can ride anything with four legs. | Animal Handling, Riding, Survival, Brawling |
+| Undertaker | The Frontier | buries the dead, and makes sure they stay buried. | Occult, Medicine, Investigation, Melee |
+
+The creator marks your calling's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven't changed.
 
 ### Well-rounded or Old hand
 

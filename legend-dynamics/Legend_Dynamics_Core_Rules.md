@@ -25,6 +25,8 @@ Choose a role and describe what you bring. Your role places you in a group, whic
 
 *Your setting pack supplies this (roles).*
 
+The creator marks your role's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing role swaps the core skills you haven't changed.
+
 ### Generalist or Specialist
 
 Choose how your character trained (see Step 3):

@@ -23,17 +23,19 @@ Work through the five steps in order. The character creator follows the same ste
 
 Choose a role and describe what you bring. Your role places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
 
-| Role | Group | Typical contribution |
-|---|---|---|
-| Captain | Command | commands the ship and crew, and makes the decisions no one else wants to. |
-| Pilot | Command | flies the ship and its shuttles through anything, at any speed, on a dare. |
-| Diplomat | Command | speaks for the crew to governments, warlords and strangers, and keeps the peace when it can be kept. |
-| Scientist | Science | reads the anomaly, explains it to the captain, and wants to get closer. |
-| Medic | Science | patches up the crew, from a medkit on a hostile world to surgery in sickbay. |
-| Navigator | Science | plots the jump, finds the way through, and knows where the ship is when no one else does. |
-| Engineer | Operations | keeps the engines running and the lights on, and improvises when the parts run out. |
-| Security | Operations | first through the airlock, last to leave, and the one who decides when the blaster stays on stun. |
-| Comms | Operations | opens the channel, breaks the code, and hears what a signal is really saying. |
+| Role | Group | Typical contribution | Core skills |
+|---|---|---|---|
+| Captain | Command | commands the ship and crew, and makes the decisions no one else wants to. | Leadership, Diplomacy, Piloting, Blasters |
+| Pilot | Command | flies the ship and its shuttles through anything, at any speed, on a dare. | Piloting, Navigation, Sensors, Engineering |
+| Diplomat | Command | speaks for the crew to governments, warlords and strangers, and keeps the peace when it can be kept. | Diplomacy, Psychology, Deception, Communications |
+| Scientist | Science | reads the anomaly, explains it to the captain, and wants to get closer. | Sensors, Physical Sciences, Life Sciences, Computers |
+| Medic | Science | patches up the crew, from a medkit on a hostile world to surgery in sickbay. | Medicine, Life Sciences, Psychology, Sensors |
+| Navigator | Science | plots the jump, finds the way through, and knows where the ship is when no one else does. | Navigation, Sensors, Piloting, Computers |
+| Engineer | Operations | keeps the engines running and the lights on, and improvises when the parts run out. | Engineering, Computers, Physical Sciences, Sensors |
+| Security | Operations | first through the airlock, last to leave, and the one who decides when the blaster stays on stun. | Blasters, Close Combat, Athletics, Stealth |
+| Comms | Operations | opens the channel, breaks the code, and hears what a signal is really saying. | Communications, Computers, Diplomacy, Sensors |
+
+The creator marks your role's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing role swaps the core skills you haven't changed.
 
 ### Officer or Specialist
 

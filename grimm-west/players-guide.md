@@ -37,20 +37,22 @@ Work through the five steps in order. The Grimm character creator follows the sa
 
 Choose a calling and describe what your character brings. Your calling places you in one of three groups, which only changes your sheet's colors and badge. A title such as "Deputy U.S. Marshal" or "Doc" is agreed with the GM and gives no bonus.
 
-| Calling | Group | Typical contribution |
-|---|---|---|
-| Marshal | The Law | Lead others and carry what authority there is |
-| Deputy | The Law | Keep order, guard prisoners, back up the marshal |
-| Detective | The Law | Investigate crimes for the Pinkertons or a private client |
-| Bounty Hunter | The Law | Track and bring in wanted men, and things that aren't men |
-| Doctor | The Learned | Patch up the wounded and read what a body tells you |
-| Apothecary | The Learned | Brew remedies, antidotes and stranger things |
-| Scholar | The Learned | Know the old books, the old languages and the occult |
-| Preacher | The Learned | Comfort, counsel, and stand against the dark |
-| Gunslinger | The Frontier | Be the fastest and steadiest gun in the room |
-| Scout | The Frontier | Find the trail, read the land, keep everyone alive in it |
-| Gambler | The Frontier | Read people, bluff, and hear what the saloon hears |
-| Tinker | The Frontier | Fix guns, build traps, and make the impossible gadget |
+| Calling | Group | Typical contribution | Core skills |
+|---|---|---|---|
+| Marshal | The Law | Lead others and carry what authority there is | Leadership, Shooting, Riding, Read People |
+| Deputy | The Law | Keep order, guard prisoners, back up the marshal | Shooting, Brawling, Riding, Read People |
+| Detective | The Law | Investigate crimes for the Pinkertons or a private client | Investigation, Read People, Deception, Stealth |
+| Bounty Hunter | The Law | Track and bring in wanted men, and things that aren't men | Tracking, Shooting, Riding, Wesen Lore |
+| Doctor | The Learned | Patch up the wounded and read what a body tells you | Medicine, Investigation, Read People, Apothecary |
+| Apothecary | The Learned | Brew remedies, antidotes and stranger things | Apothecary, Medicine, Occult, Wesen Lore |
+| Scholar | The Learned | Know the old books, the old languages and the occult | Wesen Lore, Occult, Investigation, Persuasion |
+| Preacher | The Learned | Comfort, counsel, and stand against the dark | Persuasion, Leadership, Occult, Shooting |
+| Gunslinger | The Frontier | Be the fastest and steadiest gun in the room | Shooting, Athletics, Read People, Riding |
+| Scout | The Frontier | Find the trail, read the land, keep everyone alive in it | Tracking, Survival, Riding, Stealth |
+| Gambler | The Frontier | Read people, bluff, and hear what the saloon hears | Gambling, Read People, Deception, Shooting |
+| Tinker | The Frontier | Fix guns, build traps, and make the impossible gadget | Tinkering, Shooting, Investigation, Athletics |
+
+The creator marks your calling's four **core skills** (in the table above) Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven't changed.
 
 ### Well-rounded or Old hand
 

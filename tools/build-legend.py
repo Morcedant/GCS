@@ -159,7 +159,7 @@ def gen(name, pack, t):
         return discord_chapter.chapter(discord_chapter.game_info(p["id"], t["title"], t["point"], p.get("tracks", []), p.get("seeds", {}), t["tracksTitle"]))
     if name == "roles":
         g = {x["id"]: x["name"] for x in p["groups"]}
-        return table([t["role"], "Group", "Typical contribution"], [[r["name"], g[r["group"]], r["text"].split(": ", 1)[-1]] for r in p["roles"]])
+        return table([t["role"], "Group", "Typical contribution", "Core skills"], [[r["name"], g[r["group"]], r["text"].split(": ", 1)[-1], ", ".join(r.get("skills", []))] for r in p["roles"]])
     if name == "origin-tiers":
         e = p.get("edgePoints", 3)
         return table([t["origin"], "Tier", "Edges", "Adjustments"], [[o["name"] + (f" ({t['restrictedTag']})" if o.get("restricted") else ""), o["tier"], e - o["tier"], adj_text(o["adj"])] for o in sorted(p["origins"], key=lambda o: (o["tier"], o["name"]))])

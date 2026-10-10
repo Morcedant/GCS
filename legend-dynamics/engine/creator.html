@@ -498,7 +498,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <p class="muted small">Pick a {{roleLower}} and describe what your character brings. A title is agreed with the GM and gives no bonus.</p></div>
           <div class="fields">
             <div class="field"><label for="f-dept">{{role}}</label>
-              <select id="f-dept"></select></div>
+              <select id="f-dept"></select>
+              <span class="small muted" id="role-skills"></span></div>
             <div class="field"><label for="f-rank">Title (optional)</label>
               <input type="text" id="f-rank" placeholder="e.g. Deputy U.S. Marshal"></div>
             <div class="field wide"><label for="f-path">Training</label>
@@ -904,6 +905,8 @@ tr.lvl-U td.target { color: var(--muted); }
   const GROUP_NAMES = Object.fromEntries(PACK.groups.map((g) => [g.id, g.name]));
   // Starting text for "What you bring"; replaced on role change unless the player has written their own.
   const ROLE_SUGGESTIONS = Object.fromEntries(PACK.roles.map((r) => [r.name, r.text]));
+  // Core skills for each role: marked Trained when the role is picked.
+  const ROLE_SKILLS = Object.fromEntries(PACK.roles.map((r) => [r.name, r.skills || []]));
   const EMBLEMS = Object.fromEntries(PACK.groups.map((g) => [g.id, { d: g.emblem, stroke: !!g.stroke }]));
   const DELTA_SVG = `<svg class="delta" viewBox="0 0 100 100" aria-hidden="true"><circle class="outer" cx="50" cy="50" r="47"/><circle class="ring" cx="50" cy="50" r="40"/><path class="emblem" data-emblem d=""/></svg>`;
   // A badge drawn with its group's emblem already in place (for the sheet and GM cards).
@@ -1201,6 +1204,7 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   function render() {
+    $("role-skills").textContent = (ROLE_SKILLS[ch.dept] || []).length ? `Core skills: ${ROLE_SKILLS[ch.dept].join(", ")} (marked Trained for you)` : "";
     $("app").dataset.div = division();
     $("hdr-name").textContent = ch.name.trim() || "Unnamed character";
     const shapeCls = ch.portraitShape === "portrait" ? "portrait" : "";
@@ -1542,8 +1546,19 @@ tr.lvl-U td.target { color: var(--muted); }
   function save() { store.set(STORE_CURRENT, ch); }
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
   function load(c) { ch = normalize(c); last = null; $("r-setting").innerHTML = ""; $("r-result").hidden = true; bindFields(); render(); }
+  // A role's core skills are marked Trained when the role is chosen (and on a new character). Changing
+  // role swaps them, leaving every skill the player trained or raised themselves.
+  function applyRoleSkills() {
+    const want = ROLE_SKILLS[ch.dept] || [];
+    const auto = (ch.roleSkills || []).filter((s) => ch.skills[s] === "T" && !freeSkill(s));
+    auto.filter((s) => !want.includes(s)).forEach((s) => { ch.skills[s] = "U"; });
+    const kept = auto.filter((s) => want.includes(s));
+    want.forEach((s) => { if (ch.skills[s] === "U" && count("T") < trainedAllowed()) { ch.skills[s] = "T"; kept.push(s); } });
+    ch.roleSkills = kept;
+  }
   function setDept(d) {
     ch.dept = d;
+    applyRoleSkills();
     if (!ch.role.trim() || ROLE_TEXTS.has(ch.role)) { ch.role = ROLE_SUGGESTIONS[ch.dept] || ""; $("f-role").value = ch.role; }
   }
   function touch() { if (ch.example) ch.example = false; }
@@ -2088,7 +2103,7 @@ tr.lvl-U td.target { color: var(--muted); }
   // Wide tables scroll inside their own box on narrow screens.
   $("guide").querySelectorAll("table").forEach((t) => { const w = document.createElement("div"); w.className = "table-scroll"; t.before(w); w.append(t); });
 
-  function newOfficer() { load(blank()); selectTab("create"); toast("New character started."); }
+  function newOfficer() { load(blank()); applyRoleSkills(); render(); selectTab("create"); toast("New character started."); }
   $("btn-new").onclick = newOfficer;
   $("banner-new").onclick = newOfficer;
   $("btn-example").onclick = () => { load(example()); toast(`Example loaded: ${ch.name}.`); };

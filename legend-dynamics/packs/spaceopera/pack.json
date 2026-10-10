@@ -99,47 +99,101 @@
   {
    "name": "Captain",
    "group": "command",
-   "text": "Captain: commands the ship and crew, and makes the decisions no one else wants to."
+   "text": "Captain: commands the ship and crew, and makes the decisions no one else wants to.",
+   "skills": [
+    "Leadership",
+    "Diplomacy",
+    "Piloting",
+    "Blasters"
+   ]
   },
   {
    "name": "Pilot",
    "group": "command",
-   "text": "Pilot: flies the ship and its shuttles through anything, at any speed, on a dare."
+   "text": "Pilot: flies the ship and its shuttles through anything, at any speed, on a dare.",
+   "skills": [
+    "Piloting",
+    "Navigation",
+    "Sensors",
+    "Engineering"
+   ]
   },
   {
    "name": "Diplomat",
    "group": "command",
-   "text": "Diplomat: speaks for the crew to governments, warlords and strangers, and keeps the peace when it can be kept."
+   "text": "Diplomat: speaks for the crew to governments, warlords and strangers, and keeps the peace when it can be kept.",
+   "skills": [
+    "Diplomacy",
+    "Psychology",
+    "Deception",
+    "Communications"
+   ]
   },
   {
    "name": "Scientist",
    "group": "science",
-   "text": "Scientist: reads the anomaly, explains it to the captain, and wants to get closer."
+   "text": "Scientist: reads the anomaly, explains it to the captain, and wants to get closer.",
+   "skills": [
+    "Sensors",
+    "Physical Sciences",
+    "Life Sciences",
+    "Computers"
+   ]
   },
   {
    "name": "Medic",
    "group": "science",
-   "text": "Medic: patches up the crew, from a medkit on a hostile world to surgery in sickbay."
+   "text": "Medic: patches up the crew, from a medkit on a hostile world to surgery in sickbay.",
+   "skills": [
+    "Medicine",
+    "Life Sciences",
+    "Psychology",
+    "Sensors"
+   ]
   },
   {
    "name": "Navigator",
    "group": "science",
-   "text": "Navigator: plots the jump, finds the way through, and knows where the ship is when no one else does."
+   "text": "Navigator: plots the jump, finds the way through, and knows where the ship is when no one else does.",
+   "skills": [
+    "Navigation",
+    "Sensors",
+    "Piloting",
+    "Computers"
+   ]
   },
   {
    "name": "Engineer",
    "group": "operations",
-   "text": "Engineer: keeps the engines running and the lights on, and improvises when the parts run out."
+   "text": "Engineer: keeps the engines running and the lights on, and improvises when the parts run out.",
+   "skills": [
+    "Engineering",
+    "Computers",
+    "Physical Sciences",
+    "Sensors"
+   ]
   },
   {
    "name": "Security",
    "group": "operations",
-   "text": "Security: first through the airlock, last to leave, and the one who decides when the blaster stays on stun."
+   "text": "Security: first through the airlock, last to leave, and the one who decides when the blaster stays on stun.",
+   "skills": [
+    "Blasters",
+    "Close Combat",
+    "Athletics",
+    "Stealth"
+   ]
   },
   {
    "name": "Comms",
    "group": "operations",
-   "text": "Comms officer: opens the channel, breaks the code, and hears what a signal is really saying."
+   "text": "Comms officer: opens the channel, breaks the code, and hears what a signal is really saying.",
+   "skills": [
+    "Communications",
+    "Computers",
+    "Diplomacy",
+    "Sensors"
+   ]
   }
  ],
  "skills": [

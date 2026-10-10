@@ -25,6 +25,8 @@ Choose {{a:roleLower}} and describe what you bring. Your {{roleLower}} places yo
 
 {{GEN:roles}}
 
+The creator marks your {{roleLower}}'s four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing {{roleLower}} swaps the core skills you haven't changed.
+
 ### {{pathRounded}} or {{pathExpert}}
 
 Choose how your character trained (see Step 3):
