@@ -71,7 +71,7 @@ show **Ready** in the checklist, which means they follow the creation rules exac
 
 ## Discord dice bot
 
-[`discord-bot/`](discord-bot/README.md) is one free Discord bot for every pack: `/roll`, `/contest`, `/assist`,
+[`discord-bot/`](discord-bot/README.md) is one free Discord bot for every pack, plus USS Pelion and Grimm: `/roll`, `/contest`, `/assist`,
 `/points`, `/clock`, `/track`, `/seed` and `/game`. Each server picks its game with `/game set`. The point name,
 shared tracks and seed tables come from the packs: the builder writes them into `discord-bot/src/worker.js`
 on every run, so redeploy the bot after changing a pack.

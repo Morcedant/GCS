@@ -1,0 +1,43 @@
+{
+ "id": "grimm",
+ "title": "Grimm",
+ "point": "Grit",
+ "mission": "Case",
+ "trackTitle": "Trouble",
+ "seedsFrom": "grimm-west/index.html",
+ "tracks": [
+  {
+   "name": "Suspicion",
+   "boxes": 4,
+   "effects": [
+    "Nobody's looking",
+    "Talk in the saloon",
+    "Rumors: −2 to Persuasion with townsfolk",
+    "The sheriff is watching you",
+    "A warrant or a mob: start a Lynch mob clock"
+   ]
+  },
+  {
+   "name": "Exposure",
+   "boxes": 4,
+   "effects": [
+    "The hidden world is hidden",
+    "Odd stories going around",
+    "The newspaper asks questions",
+    "Wesen close ranks: −2 to Investigation among them",
+    "The Wesen Council sends someone"
+   ]
+  },
+  {
+   "name": "Attention",
+   "boxes": 4,
+   "effects": [
+    "No one's watching",
+    "A stranger asks questions",
+    "A mark or a warning",
+    "They're in town",
+    "They strike: start a clock"
+   ]
+  }
+ ]
+}

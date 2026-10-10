@@ -295,7 +295,7 @@ def core_rules(docx=False):
 
 
 def bot_packs():
-    """Write every pack's bot data (point name, tracks, seed tables) into the Discord bot."""
+    """Write every pack's bot data (point name, tracks, seed tables), plus discord-bot/games/*.json, into the Discord bot."""
     bot = LD / "discord-bot" / "src" / "worker.js"
     data = {}
     for d in sorted(p for p in (LD / "packs").iterdir() if (p / "pack.json").exists()):
@@ -303,6 +303,13 @@ def bot_packs():
         t = terms_of(pack)
         data[pack["id"]] = {"id": pack["id"], "title": t["title"], "point": t["point"], "mission": t["mission"],
                             "trackTitle": t["tracksTitle"], "tracks": pack.get("tracks", []), "seeds": pack.get("seeds", {})}
+    # Games outside Legend Dynamics (USS Pelion, Grimm): their own data, seed tables read from their creators.
+    for f in sorted((LD / "discord-bot" / "games").glob("*.json")):
+        game = json.loads(f.read_text())
+        page = (ROOT / game.pop("seedsFrom")).read_text() if "seedsFrom" in game else ""
+        m = re.search(r"const SEEDS = (\{.*?\});\n", page)
+        game.setdefault("seeds", json.loads(m.group(1)) if m else {})
+        data[game["id"]] = game
     src = bot.read_text()
     block = "/* PACKS:START */\nexport const PACKS = " + json.dumps(data, ensure_ascii=False, indent=1) + ";\n/* PACKS:END */"
     new = re.sub(r"/\* PACKS:START \*/.*?/\* PACKS:END \*/", lambda m: block, src, flags=re.S)

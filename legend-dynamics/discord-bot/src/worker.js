@@ -1,14 +1,15 @@
 // Legend Dynamics dice bot: a Cloudflare Worker that answers Discord slash commands over HTTP.
 // One self-contained file, so it can be pasted straight into the Cloudflare dashboard.
 // Discord signs every request; unsigned or badly signed requests are rejected with 401.
-// One bot serves every Legend Dynamics setting; the GM picks each server's game with /game.
+// One bot serves every Legend Dynamics setting, plus USS Pelion and Grimm; the GM picks each server's game with /game.
 //
 // Settings (Cloudflare → Worker → Settings → Variables and Secrets):
 //   DISCORD_PUBLIC_KEY       required, from the Discord Developer Portal
 //   DISCORD_APPLICATION_ID   and DISCORD_BOT_TOKEN: only needed to register commands by visiting /register
-//   DEFAULT_GAME             optional: the game a server starts on (western or spaceopera); default western
+//   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, grimm or pelion); default western
 // Binding (Settings → Bindings → KV namespace):
 //   STORE                    optional; turns on /game, /points, /clock and /track, and makes rerolls spend real points
+//                            (a USS Pelion or Grimm Worker's DUTY or GRIT binding works too)
 
 // ---- Setting packs: written by tools/build-legend.py from legend-dynamics/packs/*/pack.json ----
 
@@ -415,6 +416,418 @@ export const PACKS = {
     ]
    ]
   }
+ },
+ "grimm": {
+  "id": "grimm",
+  "title": "Grimm",
+  "point": "Grit",
+  "mission": "Case",
+  "trackTitle": "Trouble",
+  "tracks": [
+   {
+    "name": "Suspicion",
+    "boxes": 4,
+    "effects": [
+     "Nobody's looking",
+     "Talk in the saloon",
+     "Rumors: −2 to Persuasion with townsfolk",
+     "The sheriff is watching you",
+     "A warrant or a mob: start a Lynch mob clock"
+    ]
+   },
+   {
+    "name": "Exposure",
+    "boxes": 4,
+    "effects": [
+     "The hidden world is hidden",
+     "Odd stories going around",
+     "The newspaper asks questions",
+     "Wesen close ranks: −2 to Investigation among them",
+     "The Wesen Council sends someone"
+    ]
+   },
+   {
+    "name": "Attention",
+    "boxes": 4,
+    "effects": [
+     "No one's watching",
+     "A stranger asks questions",
+     "A mark or a warning",
+     "They're in town",
+     "They strike: start a clock"
+    ]
+   }
+  ],
+  "seeds": {
+   "mission": [
+    "Case",
+    [
+     "A body torn apart at the edge of town",
+     "A stagecoach that never arrived",
+     "Livestock slaughtered in the night",
+     "A child gone missing",
+     "A miner raving about monsters",
+     "A bounty on a man who isn't a man",
+     "Travelers vanishing on the trail",
+     "A traveling medicine show",
+     "A new preacher packs the church",
+     "A cattle drive spooked by something",
+     "A hanging that went wrong",
+     "A Wesen asks for help"
+    ]
+   ],
+   "place": [
+    "Place",
+    [
+     "A silver boomtown",
+     "A logging camp in the deep woods",
+     "A river steamboat",
+     "The railroad's end-of-track camp",
+     "A lonely homestead",
+     "A ghost town",
+     "A mission church",
+     "A saloon and gambling hall",
+     "A frontier fort",
+     "A fog-bound waterfront",
+     "A canyon ranch",
+     "A snowbound mountain pass"
+    ]
+   ],
+   "strange": [
+    "The hidden world",
+    [
+     "A Wendigo that has acquired the taste",
+     "A Blutbad pack that's gone back to the hunt",
+     "A Siegbarste whom bullets barely trouble",
+     "A Mauvais Dentes, sent by a Royal Family",
+     "A Spinnetod keeping herself young",
+     "Geier selling organs to the highest bidder",
+     "A Hexenbiest's curse",
+     "A Ziegevolk swindler with half the town in thrall",
+     "A Löwen fight ring",
+     "A Hässlich demanding tolls at a bridge",
+     "A Brotherhood of the Holy Earth rite against the railroad",
+     "A Golden Dawn magician's working gone wrong"
+    ]
+   ],
+   "twist": [
+    "Twist",
+    [
+     "The victim was the monster",
+     "The law is in on it",
+     "Two Wesen clans are feuding",
+     "The Wesen Council wants it hushed up",
+     "A Royal Family's agent is behind it",
+     "A character's complication comes into play",
+     "The Wesen is protecting its family",
+     "A human is using the Wesen",
+     "The town wants a hanging, any hanging",
+     "The Order of the Holy Knife arrives to cleanse",
+     "Another Grimm hunts the same quarry",
+     "The trail leads to someone a character loves"
+    ]
+   ],
+   "clock": [
+    "Ticking clock",
+    [
+     [
+      "The mob forms",
+      6
+     ],
+     [
+      "Nightfall",
+      4
+     ],
+     [
+      "The next victim",
+      6
+     ],
+     [
+      "The stage leaves town",
+      4
+     ],
+     [
+      "The Reapers arrive",
+      6
+     ],
+     [
+      "The river floods",
+      8
+     ],
+     [
+      "The trail goes cold",
+      4
+     ],
+     [
+      "The hanging at dawn",
+      4
+     ],
+     [
+      "The newspaper prints the story",
+      8
+     ],
+     [
+      "The fire spreads",
+      4
+     ],
+     [
+      "The Wesen flees the territory",
+      6
+     ],
+     [
+      "The snows close the pass",
+      8
+     ]
+    ]
+   ],
+   "who": [
+    "Key character",
+    [
+     "A sheriff who wants it simple",
+     "A widow who knows more than she says",
+     "A traveling doctor",
+     "A Pinkerton detective",
+     "A railroad baron",
+     "A frightened Eisbiber family",
+     "A Blutbad trying to stay clean",
+     "A child who saw the woge",
+     "A preacher with a past",
+     "A newspaperman who's close to the truth",
+     "An Incantare who needs protection",
+     "A dying Grimm with a last request"
+    ]
+   ]
+  }
+ },
+ "pelion": {
+  "id": "pelion",
+  "title": "USS Pelion",
+  "point": "Duty",
+  "mission": "Mission",
+  "trackTitle": "Ship status",
+  "tracks": [
+   {
+    "name": "Shields",
+    "boxes": 3,
+    "effects": [
+     "Up",
+     "Weakened",
+     "Failing",
+     "Down: hits go to Hull and a system"
+    ]
+   },
+   {
+    "name": "Hull",
+    "boxes": 4,
+    "effects": [
+     "Intact",
+     "Scarred",
+     "Minor breaches",
+     "Serious breaches, decks lost",
+     "Breaking up: start an Abandon ship clock"
+    ]
+   },
+   {
+    "name": "Weapons",
+    "boxes": 3,
+    "effects": [
+     "Working",
+     "Damaged: −2",
+     "Crippled: −4, basic function only",
+     "Offline"
+    ]
+   },
+   {
+    "name": "Engines",
+    "boxes": 3,
+    "effects": [
+     "Working",
+     "Damaged: −2",
+     "Crippled: −4, basic function only",
+     "Offline"
+    ]
+   },
+   {
+    "name": "Sensors",
+    "boxes": 3,
+    "effects": [
+     "Working",
+     "Damaged: −2",
+     "Crippled: −4, basic function only",
+     "Offline"
+    ]
+   },
+   {
+    "name": "Communications",
+    "boxes": 3,
+    "effects": [
+     "Working",
+     "Damaged: −2",
+     "Crippled: −4, basic function only",
+     "Offline"
+    ]
+   },
+   {
+    "name": "Transporters",
+    "boxes": 3,
+    "effects": [
+     "Working",
+     "Damaged: −2",
+     "Crippled: −4, basic function only",
+     "Offline"
+    ]
+   },
+   {
+    "name": "Life support",
+    "boxes": 3,
+    "effects": [
+     "Working",
+     "Damaged: −2",
+     "Crippled: −4, basic function only",
+     "Offline"
+    ]
+   }
+  ],
+  "seeds": {
+   "mission": [
+    "Mission",
+    [
+     "Answer a distress call",
+     "Survey an uncharted system",
+     "Make first contact",
+     "Escort a diplomatic delegation",
+     "Find a missing ship or outpost",
+     "Deliver urgent medical supplies",
+     "Evacuate a colony",
+     "Patrol the Neutral Zone border",
+     "Recover a lost probe or artifact",
+     "Mediate a dispute between two worlds",
+     "Test experimental technology",
+     "Shore leave that goes wrong"
+    ]
+   ],
+   "place": [
+    "Place",
+    [
+     "A storm-wracked ocean world",
+     "A dead world with ancient ruins",
+     "A struggling frontier colony",
+     "An asteroid mining station",
+     "A drifting derelict starship",
+     "An ice-covered moon of a gas giant",
+     "A pre-warp civilization's world",
+     "A nebula that blinds the sensors",
+     "A starbase in crisis",
+     "A world that seems too perfect",
+     "A jungle planet thick with life",
+     "Deep space between the stars"
+    ]
+   ],
+   "strange": [
+    "Something strange",
+    [
+     "A subspace anomaly that distorts time",
+     "A non-corporeal life form",
+     "An ancient machine that still works",
+     "Duplicates of the crew",
+     "A signal repeating a crew member's name",
+     "A planet-wide illusion",
+     "A rift into another universe",
+     "A disease no one recognizes",
+     "A gravity well that traps ships",
+     "A godlike being testing the crew",
+     "An alien probe draining power",
+     "Memories that aren't the crew's own"
+    ]
+   ],
+   "twist": [
+    "Twist",
+    [
+     "Klingons arrive with their own claim",
+     "The people asking for help are lying",
+     "A crew member's complication comes into play",
+     "Orders conflict with doing the right thing",
+     "The Prime Directive forbids interfering",
+     "A cloaked Romulan ship is watching",
+     "Orion pirates want the same prize",
+     "The Pelion's systems start failing",
+     "A respected visitor has a hidden agenda",
+     "The 'threat' is only defending itself",
+     "Contact with Starfleet is cut off",
+     "A civilian is trapped out of reach"
+    ]
+   ],
+   "clock": [
+    "Ticking clock",
+    [
+     [
+      "Orbit decays",
+      6
+     ],
+     [
+      "Warp core breach",
+      4
+     ],
+     [
+      "Klingon battle cruiser arrives",
+      6
+     ],
+     [
+      "The disease reaches the ship",
+      8
+     ],
+     [
+      "The storm closes the beam-out window",
+      4
+     ],
+     [
+      "Life support fails on the station",
+      6
+     ],
+     [
+      "The anomaly collapses",
+      6
+     ],
+     [
+      "Peace talks break down",
+      8
+     ],
+     [
+      "The hostages' air runs out",
+      4
+     ],
+     [
+      "The star goes nova",
+      8
+     ],
+     [
+      "Shields fail under bombardment",
+      4
+     ],
+     [
+      "The away team is discovered",
+      6
+     ]
+    ]
+   ],
+   "who": [
+    "Key character",
+    [
+     "An idealistic Federation ambassador",
+     "A Klingon captain with a grudge",
+     "A stranded Orion trader",
+     "A brilliant, reckless scientist",
+     "A colony leader hiding a secret",
+     "A former Starfleet officer gone rogue",
+     "A local child who has seen too much",
+     "A disapproving Vulcan observer",
+     "An old friend of one of the crew",
+     "A Romulan who wants to defect",
+     "A Starfleet admiral with sealed orders",
+     "An android that wants to be free"
+    ]
+   ]
+  }
  }
 };
 /* PACKS:END */
@@ -512,7 +925,7 @@ export function commands() {
   return [
     {
       name: "roll",
-      description: "Roll 3d6 under your target (Legend Dynamics)",
+      description: "Roll 3d6 under your target",
       options: [
         { type: 4, name: "target", description: "Skill or attribute from your sheet, e.g. 13 for Shooting 13", required: true, min_value: 1, max_value: 30 },
         { type: 4, name: "modifier", description: "Total of circumstance, assistance, advantage and injury modifiers, e.g. -2", required: false, min_value: -12, max_value: 12 },
@@ -547,7 +960,7 @@ export function commands() {
     },
     {
       name: "points",
-      description: "Track Grit, Resolve or Legend points (start each session with 2)",
+      description: "Track Duty, Grit or Resolve points (start each session with 2)",
       options: [
         { type: 1, name: "show", description: "Show points", options: [{ type: 6, name: "player", description: "Whose points (default: yours)", required: false }] },
         { type: 1, name: "spend", description: "Spend one of your points" },
@@ -579,7 +992,7 @@ export function commands() {
     },
     {
       name: "track",
-      description: "The game's shared tracks (e.g. Heat, Whispers and The Dark, or the ship's status)",
+      description: "The game's shared tracks (Trouble, or the ship's status)",
       options: [
         { type: 1, name: "show", description: "Show every track and what it means now" },
         { type: 1, name: "mark", description: "Mark boxes on a track",
@@ -598,7 +1011,7 @@ export function commands() {
     { name: "seed", description: "Roll an adventure seed from the game's tables" },
     {
       name: "game",
-      description: "Which Legend Dynamics setting this server plays",
+      description: "Which game this server plays: Iron Roads, Starward, Grimm or USS Pelion",
       options: [
         { type: 1, name: "show", description: "Show this server's game" },
         { type: 1, name: "set", description: "GM: choose this server's game",
@@ -617,8 +1030,16 @@ const PONG = 1, MESSAGE = 4, UPDATE_MESSAGE = 7;
 const EPHEMERAL = 64;
 const GREEN = 0x52e3a0, RED = 0xff6a5c, NEUTRAL = 0x8aa2c2;
 
+// The USS Pelion and Grimm bots kept their storage as DUTY and GRIT. Pasting this file into one of those
+// Workers keeps working: that binding becomes the storage, and the server starts on that bot's game.
+export function withLegacy(env) {
+  if (env.STORE || !(env.DUTY || env.GRIT)) return env;
+  return { ...env, STORE: env.DUTY || env.GRIT, rawStore: env.DUTY ? "DUTY" : "GRIT", DEFAULT_GAME: env.DEFAULT_GAME || (env.DUTY ? "pelion" : "grimm") };
+}
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, rawEnv) {
+    const env = withLegacy(rawEnv);
     if (request.method === "GET" && new URL(request.url).pathname === "/register") return registerCommands(env);
     if (request.method !== "POST") return statusPage(env);
     const body = await request.text();
@@ -660,6 +1081,8 @@ const cleanKey = (k) => {
   return /^[0-9a-f]{64}$/.test(v) ? v : "";
 };
 
+const rawStoreName = (env) => (env.rawStore || "STORE");
+
 // Visiting the Worker's address shows which settings it can see, without revealing them.
 function statusPage(env) {
   const check = (ok, good, bad) => `${ok ? "OK " : "!! "} ${ok ? good : bad}`;
@@ -672,7 +1095,7 @@ function statusPage(env) {
         : "DISCORD_PUBLIC_KEY is missing. Add it under Settings > Variables and Secrets."),
     check(/^\d{15,25}$/.test(String(env.DISCORD_APPLICATION_ID || "").trim()), "DISCORD_APPLICATION_ID is set.",
       "DISCORD_APPLICATION_ID is missing or not a number (only needed for /register)."),
-    check(!!env.STORE, "STORE storage is connected: /game, /points, /clock and /track work, and rerolls spend points.",
+    check(!!env.STORE, `${rawStoreName(env)} storage is connected: /game, /points, /clock and /track work, and rerolls spend points.`,
       "STORE storage isn't connected (optional): bind a KV namespace named STORE to turn on /game, /points, /clock and /track."),
     check(!env.DEFAULT_GAME || !!PACKS[String(env.DEFAULT_GAME).trim()], "DEFAULT_GAME is fine.",
       `DEFAULT_GAME isn't one of: ${GAME_IDS().join(", ")}.`),

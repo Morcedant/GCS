@@ -207,3 +207,36 @@ test("/seed rolls one entry from each of the game's tables, without storage", as
   assert.ok(!/,\d/.test(seed.embeds[0].description), "no raw arrays");
   assert.match(seed.embeds[0].title, /Job seed/);
 });
+
+test("USS Pelion and Grimm are games too, and their old storage bindings still work", async () => {
+  const { PACKS } = await import("../src/worker.js");
+  assert.equal(PACKS.pelion.point, "Duty"); assert.equal(PACKS.grimm.point, "Grit");
+  assert.equal(PACKS.pelion.tracks.length, 8); assert.equal(Object.keys(PACKS.grimm.seeds).length, 6);
+  assert.equal(PACKS.grimm.seeds.mission[0], "Case");
+
+  // A Pelion Worker's DUTY binding: storage works and the server starts on USS Pelion.
+  const pel = { ...env, DUTY: new MemoryKV() };
+  assert.match((await signedCall(pel, sub("game", "show"))).content, /USS Pelion.*Duty points.*Shields, Hull/);
+  assert.match((await signedCall(pel, sub("points", "show"))).content, /2 Duty points/);
+  assert.match((await signedCall(pel, sub("track", "mark", [{ name: "name", value: "life" }]))).content, /\*\*Life support\*\* ■□□ 1\/3: Damaged: −2/);
+  const roll = await signedCall(pel, { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name: "roll", options: [{ name: "target", value: 16 }] } });
+  assert.equal(roll.components[0].components[0].label, "Spend a Duty point to reroll");
+  assert.match(roll.embeds[0].footer.text, /USS Pelion/);
+  const page = await (await worker.fetch(new Request("https://bot.example/"), pel)).text();
+  assert.match(page, /OK  DUTY storage is connected/);
+
+  // A Grimm Worker's GRIT binding.
+  const gr = { ...env, GRIT: new MemoryKV() };
+  assert.match((await signedCall(gr, sub("track", "mark", [{ name: "name", value: "exposure" }]))).content, /Exposure\*\* ■□□□ 1\/4: Odd stories/);
+  const seed = await signedCall(gr, { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name: "seed" } });
+  assert.match(seed.embeds[0].title, /Case seed/);
+  assert.match(seed.embeds[0].description, /\*\*The hidden world:\*\*/);
+
+  // The GM can switch a server to Grimm on the shared bot.
+  const shared = { ...env, STORE: new MemoryKV() };
+  await signedCall(shared, sub("game", "set", [{ name: "game", value: "grimm" }], { gm: true }));
+  assert.match((await signedCall(shared, sub("track", "show"))).content, /Suspicion.*Exposure.*Attention/s);
+  const { COMMANDS } = await import("../src/worker.js");
+  const choices = COMMANDS.find((c) => c.name === "game").options[1].options[0].choices.map((c) => c.name);
+  assert.deepEqual([...choices].sort(), ["Grimm", "Iron Roads", "Starward", "USS Pelion"]);
+});
