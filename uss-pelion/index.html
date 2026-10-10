@@ -1,0 +1,953 @@
+<!doctype html>
+<title>USS Pelion Officer Creator</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Extra+Condensed:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: personnel file. Step-by-step builder on the left, readiness panel on the right;
+   a second tab turns the record into a play sheet with injury track, Duty points and a 3d6 roller.
+   Accent follows the officer's division (TOS tunic colors: command gold, sciences blue, operations red). */
+:root {
+  --bg: #eceff4;
+  --surface: #ffffff;
+  --sunken: #f5f7fa;
+  --fg: #141a24;
+  --muted: #586378;
+  --line: #d2d8e2;
+  --gold: #8f6a0c;
+  --blue: #2357a6;
+  --red: #ad2e27;
+  --good: #1f7a46;
+  --bad: #b3261e;
+  --warn: #8a5a00;
+  --accent: var(--gold);
+  --on-accent: #ffffff;
+  --display: "Saira Extra Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1017; --surface: #141a24; --sunken: #10151d; --fg: #e5e9f0; --muted: #93a0b5; --line: #273142;
+    --gold: #e2b94c; --blue: #7ea8ec; --red: #f0837a; --good: #5fcf8e; --bad: #ff8a80; --warn: #f0b85a;
+    --on-accent: #0c1017; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1017; --surface: #141a24; --sunken: #10151d; --fg: #e5e9f0; --muted: #93a0b5; --line: #273142;
+  --gold: #e2b94c; --blue: #7ea8ec; --red: #f0837a; --good: #5fcf8e; --bad: #ff8a80; --warn: #f0b85a;
+  --on-accent: #0c1017; color-scheme: dark;
+}
+[data-div="command"] { --accent: var(--gold); }
+[data-div="sciences"] { --accent: var(--blue); }
+[data-div="operations"] { --accent: var(--red); }
+
+*, *::before, *::after { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--body); margin: 0; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 64px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; text-wrap: balance; margin: 0; letter-spacing: .01em; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1; }
+h2 { font-size: 1.6rem; line-height: 1.1; }
+h3 { font-size: 1.15rem; line-height: 1.2; }
+p { margin: 0; }
+.eyebrow { font-family: var(--mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.small { font-size: .86rem; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* Header */
+.masthead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; padding-bottom: 16px; border-bottom: 3px solid var(--accent); }
+.masthead .who { display: grid; gap: 6px; min-width: 0; }
+.masthead h1 { overflow-wrap: anywhere; }
+.chev { display: inline-block; width: 14px; height: 18px; background: var(--accent); clip-path: polygon(50% 0, 100% 100%, 50% 78%, 0 100%); vertical-align: -2px; margin-right: 8px; }
+.tabs { display: flex; gap: 4px; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius); padding: 4px; }
+.tab { font: 700 1rem/1 var(--display); letter-spacing: .06em; text-transform: uppercase; padding: 10px 16px; border: 0; background: transparent; color: var(--muted); border-radius: 4px; cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--accent); color: var(--on-accent); }
+
+/* Main grid */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; margin-top: 24px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } .side { order: -1; } }
+.steps { display: grid; gap: 20px; min-width: 0; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; gap: 16px; min-width: 0; }
+.step-head { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+.step-no { font: 700 .8rem/1 var(--mono); color: var(--accent); border: 1.5px solid var(--accent); border-radius: 3px; padding: 4px 6px; }
+.step-head p { flex-basis: 100%; }
+
+/* Forms */
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field.wide { grid-column: 1 / -1; }
+label, .label { font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+input[type="text"], select, textarea { width: 100%; font: inherit; color: var(--fg); background: var(--sunken); border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; }
+textarea { resize: vertical; min-height: 64px; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, .seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+button { font: inherit; cursor: pointer; }
+.btn { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 4px; padding: 7px 12px; font-weight: 700; font-size: .9rem; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Attributes */
+.attrs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.attr { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; display: grid; gap: 6px; background: var(--sunken); }
+.attr .top { display: flex; justify-content: space-between; align-items: baseline; }
+.attr .val { font: 700 2rem/1 var(--mono); }
+.stepper { display: flex; gap: 6px; }
+.stepper button { width: 36px; height: 32px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 4px; font: 700 1.1rem/1 var(--mono); }
+.stepper button:disabled { opacity: .35; cursor: not-allowed; }
+.pool { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.pip { width: 18px; height: 18px; border-radius: 3px; border: 1.5px solid var(--accent); }
+.pip.on { background: var(--accent); }
+
+/* Skills */
+.tally { display: flex; gap: 16px; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--sunken); }
+.chip.ok { color: var(--good); border-color: currentColor; }
+.chip.no { color: var(--warn); border-color: currentColor; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: var(--sunken); font-weight: 700; }
+tr:last-child td { border-bottom: 0; }
+td.target { font: 700 1.15rem/1 var(--mono); width: 64px; text-align: right; }
+td.pct { font-family: var(--mono); font-size: .82rem; color: var(--muted); width: 64px; text-align: right; }
+tr.lvl-S td.target { color: var(--accent); }
+tr.lvl-U td.target { color: var(--muted); font-weight: 500; }
+.skillname { font-weight: 700; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.seg label { position: relative; text-transform: none; letter-spacing: 0; font-weight: 700; color: var(--fg); font-size: .82rem; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg input:disabled { cursor: not-allowed; }
+.seg span { display: block; padding: 5px 10px; border-left: 1px solid var(--line); }
+.seg label:first-child span { border-left: 0; }
+.seg input:checked + span { background: var(--accent); color: var(--on-accent); }
+.seg input:disabled + span { opacity: .35; }
+
+/* Traits */
+.trait-desc { background: var(--sunken); border-left: 3px solid var(--accent); padding: 10px 12px; border-radius: 0 4px 4px 0; font-size: .92rem; }
+.checks { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.checks label { text-transform: none; letter-spacing: 0; font-size: .92rem; font-weight: 400; color: var(--fg); display: flex; gap: 6px; align-items: center; }
+
+/* Side panel */
+.side { display: grid; gap: 16px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+@media (max-width: 900px) { .side { position: static; } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; gap: 12px; }
+.checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .9rem; }
+.checklist li { display: flex; gap: 8px; align-items: flex-start; }
+.mark { flex: none; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font: 700 .7rem/1 var(--mono); margin-top: 2px; }
+.mark.ok { background: var(--good); color: var(--surface); }
+.mark.no { border: 1.5px solid var(--warn); color: var(--warn); }
+.status { font: 700 1.1rem/1.1 var(--display); letter-spacing: .05em; text-transform: uppercase; }
+.status.ok { color: var(--good); }
+.status.no { color: var(--warn); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--sunken); border-radius: 4px; padding: 8px; display: grid; gap: 2px; }
+.stat b { font: 700 1.4rem/1 var(--mono); }
+.roster { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.roster li { display: flex; gap: 6px; align-items: center; justify-content: space-between; font-size: .9rem; }
+.roster li span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.roster li.current span { font-weight: 700; color: var(--accent); }
+.linkish { background: none; border: 0; padding: 2px 4px; color: var(--muted); font-size: .8rem; text-decoration: underline; }
+.linkish.danger { color: var(--bad); }
+.toast { font-size: .85rem; color: var(--good); min-height: 1.2em; }
+.toast.err { color: var(--bad); }
+
+/* Sheet */
+.sheet { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; margin-top: 24px; align-items: start; }
+@media (max-width: 900px) { .sheet { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; gap: 16px; min-width: 0; }
+.idgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px 20px; }
+.idgrid div { display: grid; gap: 2px; min-width: 0; }
+.idgrid b { font-weight: 700; overflow-wrap: anywhere; }
+.attr-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+@media (max-width: 480px) { .attr-strip { grid-template-columns: repeat(3, 1fr); } }
+.attr-strip div { text-align: center; border: 1px solid var(--line); border-radius: 4px; padding: 8px 4px; }
+.attr-strip b { display: block; font: 700 1.6rem/1 var(--mono); }
+.skill-cols { columns: 2 220px; column-gap: 24px; }
+.skill-line { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: 1px dotted var(--line); break-inside: avoid; }
+.skill-line .lv { font-size: .72rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-left: 6px; }
+.skill-line.S .lv { color: var(--accent); font-weight: 700; }
+.skill-line.U { color: var(--muted); }
+.skill-line b { font-family: var(--mono); }
+.boxes { display: flex; gap: 8px; }
+.box { width: 44px; height: 44px; border: 2px solid var(--fg); border-radius: 4px; background: var(--surface); display: grid; place-items: center; font: 700 1.3rem/1 var(--mono); color: var(--bad); }
+.box.on { background: var(--sunken); }
+.box.on::after { content: "✕"; }
+.condition { font-weight: 700; }
+.duty { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.duty .count { font: 700 2rem/1 var(--mono); min-width: 2ch; text-align: center; }
+.dice { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.die { width: 42px; height: 42px; border-radius: 8px; border: 2px solid var(--fg); display: grid; place-items: center; font: 700 1.3rem/1 var(--mono); background: var(--surface); }
+.result { border-radius: var(--radius); padding: 14px; display: grid; gap: 8px; border: 2px solid var(--line); }
+.result.succ { border-color: var(--good); }
+.result.fail { border-color: var(--bad); }
+.verdict { font: 700 1.5rem/1 var(--display); letter-spacing: .04em; text-transform: uppercase; }
+.succ .verdict { color: var(--good); }
+.fail .verdict { color: var(--bad); }
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: .84rem; max-height: 220px; overflow-y: auto; }
+.log li { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--line); padding: 3px 0; }
+.log .s { color: var(--good); font-weight: 700; }
+.log .f { color: var(--bad); font-weight: 700; }
+.ref { display: grid; gap: 8px; font-size: .88rem; }
+.ref dt { font-weight: 700; }
+.ref dd { margin: 0 0 4px; color: var(--muted); }
+.example-banner { background: var(--sunken); border: 1px dashed var(--accent); border-radius: var(--radius); padding: 10px 14px; font-size: .9rem; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+@media (prefers-reduced-motion: no-preference) {
+  .die.rolling { animation: tumble .35s ease-out; }
+  @keyframes tumble { from { transform: rotate(-90deg) scale(.7); opacity: .3; } to { transform: none; opacity: 1; } }
+}
+@media print {
+  .tabs, .side, .no-print, #view-create { display: none !important; }
+  #view-sheet { display: block !important; }
+  .sheet { grid-template-columns: 1fr; }
+  body { background: #fff; }
+}
+</style>
+
+<div class="wrap" id="app" data-div="sciences">
+  <header class="masthead">
+    <div class="who">
+      <span class="eyebrow"><span class="chev" aria-hidden="true"></span>USS Pelion · NCC-1750 · Personnel file · 2268</span>
+      <h1 id="hdr-name">Unnamed officer</h1>
+      <span class="muted" id="hdr-sub">—</span>
+    </div>
+    <div class="tabs" role="tablist" aria-label="View">
+      <button class="tab" role="tab" id="tab-create" aria-selected="true" aria-controls="view-create">Create</button>
+      <button class="tab" role="tab" id="tab-sheet" aria-selected="false" aria-controls="view-sheet">Sheet &amp; play</button>
+    </div>
+  </header>
+
+  <div id="example-banner" class="example-banner" hidden>
+    <span>This is the guide's <b>example science officer</b>, loaded so you can see a finished build. Start your own when you're ready.</span>
+    <button class="btn primary" id="banner-new">Start a new officer</button>
+  </div>
+
+  <!-- CREATE -->
+  <section id="view-create" role="tabpanel" aria-labelledby="tab-create">
+    <div class="layout">
+      <div class="steps">
+
+        <section class="step">
+          <div class="step-head"><span class="step-no">1</span><h2>Choose your role</h2>
+            <p class="muted small">Pick a department and describe what you bring to the crew. Rank and assignment are agreed with the GM; rank gives no mechanical bonus.</p></div>
+          <div class="fields">
+            <div class="field"><label for="f-dept">Department</label>
+              <select id="f-dept"></select></div>
+            <div class="field"><label for="f-rank">Rank</label>
+              <input type="text" id="f-rank" list="ranks" placeholder="e.g. Lieutenant">
+              <datalist id="ranks"><option>Ensign</option><option>Lieutenant (j.g.)</option><option>Lieutenant</option><option>Lieutenant Commander</option><option>Commander</option><option>Captain</option><option>Chief Petty Officer</option><option>Yeoman</option><option>Crewman</option></datalist></div>
+            <div class="field wide"><label for="f-role">What you contribute</label>
+              <textarea id="f-role" rows="2" placeholder="e.g. Ship's sciences officer; first to read an anomaly and last to stop asking about it."></textarea></div>
+          </div>
+        </section>
+
+        <section class="step">
+          <div class="step-head"><span class="step-no">2</span><h2>Assign attributes</h2>
+            <p class="muted small">All five start at 10. Spend 5 more points, with a starting maximum of 13. You can't lower an attribute to gain points.</p></div>
+          <div class="pool"><span class="label">Points to spend</span><span id="pool-pips" class="pool"></span><span class="num" id="pool-left"></span></div>
+          <div class="attrs" id="attrs"></div>
+        </section>
+
+        <section class="step">
+          <div class="step-head"><span class="step-no">3</span><h2>Choose trained skills</h2>
+            <p class="muted small">One <b>Specialty</b> at attribute +3 and nine <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling.</p></div>
+          <div class="tally" id="skill-tally"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Skill</th><th>Attribute</th><th>Training</th><th style="text-align:right">Target</th><th style="text-align:right" title="Chance on 3d6 with no modifiers">Odds</th></tr></thead>
+              <tbody id="skill-rows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="step">
+          <div class="step-head"><span class="step-no">4</span><h2>Describe your character</h2>
+            <p class="muted small">Species is descriptive until a package is approved; the species name alone grants no bonus.</p></div>
+          <div class="fields">
+            <div class="field"><label for="f-name">Name</label><input type="text" id="f-name" placeholder="Officer's name"></div>
+            <div class="field"><label for="f-species">Species</label><input type="text" id="f-species" list="species" placeholder="e.g. Human">
+              <datalist id="species"><option>Human</option><option>Vulcan</option><option>Andorian</option><option>Tellarite</option><option>Half-Vulcan</option><option>Caitian</option></datalist></div>
+            <div class="field wide"><label for="f-reason">Why you serve in Starfleet</label><textarea id="f-reason" rows="2"></textarea></div>
+            <div class="field wide"><label for="f-speciesnotes">Species ability (GM approval required)</label>
+              <textarea id="f-speciesnotes" rows="2" placeholder="Agreed ability and its limitation, if any. Leave blank if none is approved."></textarea></div>
+          </div>
+
+          <div class="fields">
+            <div class="field wide"><label for="f-adv">Advantage</label><select id="f-adv"></select></div>
+            <div class="field wide" id="adv-custom" hidden>
+              <div class="fields">
+                <div class="field"><label for="f-advname">Custom advantage name</label><input type="text" id="f-advname"></div>
+                <div class="field wide"><label for="f-advtext">When does the +2 apply?</label><textarea id="f-advtext" rows="2" placeholder="One narrow kind of task, agreed with the GM."></textarea></div>
+              </div>
+            </div>
+            <div class="field wide" id="adv-detail-wrap" hidden><label for="f-advdetail" id="adv-detail-label">Detail</label><input type="text" id="f-advdetail"></div>
+            <div class="field wide"><div class="trait-desc" id="adv-desc"></div></div>
+          </div>
+
+          <div class="fields">
+            <div class="field wide"><label for="f-comp">Complication</label><select id="f-comp"></select></div>
+            <div class="field wide" id="comp-custom" hidden>
+              <div class="fields">
+                <div class="field"><label for="f-compname">Custom complication name</label><input type="text" id="f-compname"></div>
+                <div class="field wide"><label for="f-comptext">What problem does it create?</label><textarea id="f-comptext" rows="2"></textarea></div>
+              </div>
+            </div>
+            <div class="field wide"><div class="trait-desc" id="comp-desc"></div></div>
+            <div class="field wide"><label for="f-comptrigger">Trigger, agreed with the GM</label>
+              <input type="text" id="f-comptrigger" placeholder="e.g. An unexplained reading while the team is ordered to withdraw"></div>
+          </div>
+        </section>
+
+        <section class="step">
+          <div class="step-head"><span class="step-no">5</span><h2>Prepare for duty</h2>
+            <p class="muted small">You begin uninjured, with two Duty points and your assigned equipment.</p></div>
+          <div class="field"><span class="label">Assigned equipment</span>
+            <div class="checks" id="equip"></div></div>
+          <div class="fields">
+            <div class="field wide"><label for="f-otherequip">Other equipment</label><input type="text" id="f-otherequip" placeholder="Anything else issued for this assignment"></div>
+            <div class="field wide"><label for="f-connection">Connection to another crew member</label><textarea id="f-connection" rows="2"></textarea></div>
+            <div class="field wide"><label for="f-notes">Notes</label><textarea id="f-notes" rows="2"></textarea></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="side">
+        <div class="panel">
+          <div class="eyebrow">Readiness</div>
+          <div class="status" id="ready-status"></div>
+          <ul class="checklist" id="checklist"></ul>
+        </div>
+        <div class="panel">
+          <div class="stats">
+            <div class="stat"><span class="eyebrow">Dodge</span><b id="st-dodge"></b></div>
+            <div class="stat"><span class="eyebrow">Duty</span><b>2</b></div>
+            <div class="stat"><span class="eyebrow">Best</span><b id="st-best"></b></div>
+          </div>
+          <p class="small muted" id="st-dodge-note"></p>
+        </div>
+        <div class="panel">
+          <div class="eyebrow">Officers on file</div>
+          <ul class="roster" id="roster"></ul>
+          <div class="btn-row">
+            <button class="btn primary" id="btn-save">Save officer</button>
+            <button class="btn" id="btn-new">New</button>
+            <button class="btn" id="btn-example">Load example</button>
+          </div>
+          <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        </div>
+        <div class="panel">
+          <div class="eyebrow">Transfer</div>
+          <p class="small muted">Copy this officer as JSON to share with your GM, or paste a file you were sent.</p>
+          <textarea id="f-json" rows="3" placeholder="Paste officer JSON here" aria-label="Officer JSON"></textarea>
+          <div class="btn-row">
+            <button class="btn" id="btn-copy">Copy JSON</button>
+            <button class="btn" id="btn-import">Load pasted JSON</button>
+          </div>
+          <label class="small" for="f-file" style="text-transform:none;letter-spacing:0;font-weight:400">Or open a .json file</label>
+          <input type="file" id="f-file" accept=".json,application/json">
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- SHEET -->
+  <section id="view-sheet" role="tabpanel" aria-labelledby="tab-sheet" hidden>
+    <div class="sheet">
+      <div class="card" id="sheet-main"></div>
+      <div style="display:grid;gap:16px">
+        <div class="card no-print">
+          <h3>Condition</h3>
+          <div class="field"><span class="label">Injury track</span>
+            <div class="boxes" id="boxes"></div>
+            <span><span class="condition" id="cond"></span> <span class="muted small" id="cond-effect"></span></span></div>
+          <div class="field"><span class="label">Duty points</span>
+            <div class="duty">
+              <button class="btn" id="duty-minus" aria-label="Spend a Duty point">Spend</button>
+              <span class="count" id="duty-count"></span>
+              <button class="btn" id="duty-plus" aria-label="Gain a Duty point">Gain</button>
+              <button class="linkish" id="duty-reset">New session (reset to 2)</button>
+            </div>
+            <span class="muted small">Max one point per roll or injury event. Earn one when you accept a meaningful problem from your complication.</span></div>
+          <div class="checks"><label><input type="checkbox" id="f-stunned"> Stunned: −2 on next action roll</label></div>
+        </div>
+
+        <div class="card no-print">
+          <h3>Roll 3d6</h3>
+          <div class="fields">
+            <div class="field wide"><label for="r-skill">Skill or attribute</label><select id="r-skill"></select></div>
+            <div class="field"><label for="r-mod">Circumstances</label>
+              <select id="r-mod">
+                <option value="2">Favorable +2</option>
+                <option value="0" selected>Ordinary 0</option>
+                <option value="-2">Difficult −2</option>
+                <option value="-4">Very difficult −4</option>
+                <option value="-6">Extreme −6</option>
+              </select></div>
+            <div class="field"><label for="r-assist">Assistance</label>
+              <select id="r-assist">
+                <option value="0">None</option>
+                <option value="1">Assist succeeded +1</option>
+                <option value="2">Assist by 5+ +2</option>
+              </select></div>
+          </div>
+          <div class="checks">
+            <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
+            <label><input type="checkbox" id="r-phys"> Physical action (injury penalty)</label>
+            <label><input type="checkbox" id="r-stun"> Stun penalty −2</label>
+          </div>
+          <div class="btn-row"><button class="btn primary" id="r-roll">Roll</button>
+            <span class="muted small" id="r-target"></span></div>
+          <div id="r-result" hidden></div>
+          <div class="field"><span class="label">Roll log</span><ul class="log" id="r-log"></ul></div>
+        </div>
+
+        <div class="card">
+          <h3>Quick reference</h3>
+          <dl class="ref">
+            <dt>Resolution</dt><dd>3d6 at or below adjusted skill. Natural 3–4 always succeeds; 17–18 always fails. Margin = target − roll.</dd>
+            <dt>Opposed</dt><dd>Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender.</dd>
+            <dt>Combat</dt><dd>Move a short distance and take one action. Hit → target may Dodge once per round → weapon effect. Partial cover −2.</dd>
+            <dt>Phasers</dt><dd>Stun: target rolls Body −2, fail = out for the scene, success = −2 next action. Lethal: two boxes.</dd>
+            <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). Sickbay +2, clears 2 (3 on margin 5+).</dd>
+            <dt>Duty points</dt><dd>Reroll (keep second), reduce an injury by one box, or establish a small preparation.</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const ATTRS = [
+    ["Body", "Strength, endurance, resisting injury"],
+    ["Agility", "Coordination, reflexes, movement"],
+    ["Intellect", "Reasoning, observation, technical understanding"],
+    ["Presence", "Leadership, persuasion, social influence"],
+    ["Will", "Resolve, concentration, resisting fear and mental intrusion"],
+  ];
+  const SKILLS = [
+    ["Leadership", "Presence", "Coordinate people and give clear direction"],
+    ["Diplomacy", "Presence", "Negotiate and resolve disputes"],
+    ["Psychology", "Intellect", "Interpret behavior and emotional state"],
+    ["Sensors", "Intellect", "Operate ship sensors or a tricorder"],
+    ["Physical Sciences", "Intellect", "Analyze energy, matter, space, and geology"],
+    ["Life Sciences", "Intellect", "Analyze organisms and ecosystems"],
+    ["Medicine", "Intellect", "Diagnose, treat, and perform medical procedures"],
+    ["Engineering", "Intellect", "Diagnose and repair mechanical and power systems"],
+    ["Electronics", "Intellect", "Repair circuitry, controls, and electronic devices"],
+    ["Computers", "Intellect", "Retrieve data, program, and examine software"],
+    ["Helm", "Agility", "Pilot a starship or shuttle"],
+    ["Navigation", "Intellect", "Plot courses and determine position"],
+    ["Communications", "Intellect", "Operate signals and overcome interference"],
+    ["Phasers", "Agility", "Use hand phasers or ship weapons"],
+    ["Unarmed Combat", "Agility", "Strike, grapple, or restrain"],
+    ["Athletics", "Body", "Climb, swim, jump, and exert yourself"],
+    ["Stealth", "Agility", "Move quietly and avoid notice"],
+    ["Survival", "Intellect", "Find shelter and manage wilderness hazards"],
+  ];
+  const PHYSICAL = new Set(["Helm", "Phasers", "Unarmed Combat", "Athletics", "Stealth", "Survival", "Body", "Agility", "Dodge"]);
+  const LEVELS = { U: { name: "Untrained", mod: -4, dodge: 0 }, T: { name: "Trained", mod: 1, dodge: 1 }, S: { name: "Specialty", mod: 3, dodge: 2 } };
+  const DEPTS = [
+    ["Command", "command"], ["Helm", "command"], ["Navigation", "command"],
+    ["Science", "sciences"], ["Medical", "sciences"],
+    ["Engineering", "operations"], ["Security", "operations"], ["Communications", "operations"],
+  ];
+  const ADVANTAGES = [
+    ["steady", "Steady Hands", "+2 to Medicine for delicate surgery or removing a dangerous embedded object. It does not improve diagnosis or all medical treatment.", "Medicine"],
+    ["emergency", "Emergency Physician", "+2 to Medicine for emergency stabilization of an injured patient. It does not apply to subsequent field healing or sickbay recovery.", "Medicine"],
+    ["alienphys", "Alien Physiology Specialist", "Choose one species or narrow biological group. Gain +2 to Medicine when diagnosing or treating that group. Unknown organisms do not qualify merely because they are alien.", "Medicine", "Species or biological group"],
+    ["subspace", "Subspace Specialist", "+2 to Physical Sciences when analyzing subspace phenomena. Operating sensors and repairing warp machinery use their own skills.", "Physical Sciences"],
+    ["observer", "Astute Observer", "+2 to Intellect rolls to notice a concealed physical clue during a deliberate examination. It does not improve every perception roll or automatically detect invisible threats.", "Intellect"],
+    ["signal", "Signal Analyst", "+2 to Communications when separating a meaningful transmission from interference or identifying a disguised signal.", "Communications"],
+    ["forensics", "Computer Forensics Expert", "+2 to Computers when tracing unauthorized changes or recovering deliberately concealed data. Access and suitable tools are still required.", "Computers"],
+    ["improv", "Improvisational Engineer", "+2 to Engineering when making a temporary repair with inadequate but workable materials. The repair has limits agreed with the GM.", "Engineering"],
+    ["precision", "Precision Technician", "+2 to Electronics when repairing a delicate control circuit or sensor component. It does not apply to general Engineering.", "Electronics"],
+    ["ace", "Shuttle Ace", "+2 to Helm for hazardous shuttle maneuvers. It does not improve piloting the Pelion or ordinary Navigation.", "Helm"],
+    ["diplo", "Diplomatic Insight", "+2 to Diplomacy when negotiating across a cultural misunderstanding you have identified. It does not apply to every disagreement.", "Diplomacy"],
+    ["crisis", "Crisis Leader", "+2 to Leadership when coordinating an immediate response to a sudden emergency. It does not improve routine orders or direct combat rolls.", "Leadership"],
+    ["discipline", "Mental Discipline", "+2 to Will to maintain concentration despite pain or severe distraction. It does not improve resistance to fear or mental intrusion.", "Will"],
+    ["courage", "Unshakable Courage", "+2 to Will against overwhelming fear. It does not protect against alien compulsion or guarantee sensible decisions.", "Will"],
+    ["guarded", "Guarded Mind", "+2 to Will when resisting an external mental intrusion or compulsion. It provides no telepathy or ability to detect the source.", "Will"],
+    ["marksman", "Careful Marksman", "+2 to Phasers after spending your preceding action aiming at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it.", "Phasers"],
+  ];
+  const COMPLICATIONS = [
+    ["mystery", "Cannot Leave a Mystery Alone", "An unexplained reading or strange discovery tempts you to delay departure, spend a scarce resource, or pursue a risky investigation. Accept a specific cost rather than receiving points merely for asking questions."],
+    ["protects", "Protects Others at Personal Risk", "You can shield someone, stay behind, or volunteer for a hazardous rescue at a real cost to yourself. This does not automatically prevent their injury."],
+    ["duty", "Duty Before Self", "You prioritize your assignment despite exhaustion, injury, or a conflicting personal need. Accept a concrete setback; ordinary professionalism earns no point."],
+    ["conscience", "Conscience Above Orders", "A particular order conflicts with your ethical convictions. Accept a meaningful delay, formal challenge, or consequence of refusing it. The Complication does not determine what your captain orders."],
+    ["book", "By the Book", "You insist on an established procedure when improvisation would be faster. Accept a genuine loss of time or opportunity, rather than penalizing every roll."],
+    ["distrust", "Distrusts Command Decisions", "A troubling order makes you demand clarification or independent verification at a critical moment. Agree on the resulting delay or strain; it is not permission to disrupt every scene."],
+    ["reputation", "Reputation to Uphold", "Pride in your record tempts you to conceal uncertainty, refuse help, or accept a task beyond your readiness. Take a real consequence when that choice matters."],
+    ["haunted", "Haunted by a Previous Mission", "A specific reminder of an earlier loss or disaster causes hesitation, distraction, or a difficult choice. Define the reminder and effect together; avoid a penalty whenever danger appears."],
+    ["telepathy", "Uneasy Around Telepathy", "You hesitate to cooperate with a mind meld or another mental procedure, complicating a situation where it could help. This grants neither mental resistance nor knowledge of someone's intentions."],
+    ["culture", "Cultural Friction", "An established custom or expectation clashes with a local practice. Accept a misunderstanding, difficult negotiation, or lost opportunity. Species identity alone is not a Complication."],
+    ["rival", "Old Rival", "An agreed recurring rival challenges your credibility or complicates your assignment. The rival's intervention must create a concrete problem, not merely an unpleasant conversation."],
+    ["home", "Someone Back Home", "A personal obligation or concern conflicts with mission demands. Establish who matters to you and what kinds of conflict are welcome before using this Complication."],
+    ["medical", "Medical Restriction", "An agreed condition or treatment requirement becomes relevant under particular circumstances. Define its trigger and consequence; it does not impose a blanket penalty or entitle the GM to invent new symptoms."],
+    ["experimental", "Experimental Enthusiasm", "You are tempted to use an unproven technique before adequate testing. Accept a specific risk, resource cost, or troublesome side effect agreed before attempting it."],
+    ["secret", "Keeps a Dangerous Secret", "An agreed secret threatens trust, reputation, or an assignment. Earn a point when protecting or revealing it creates an actual consequence. Establish the secret with the GM rather than inventing it to avoid a problem."],
+    ["nonlethal", "Reluctant to Use Lethal Force", "You seek a nonlethal approach even when it costs time or tactical position. Ordinary Starfleet restraint earns no point; there must be a meaningful additional difficulty."],
+  ];
+  const EQUIPMENT = [["communicator", "Communicator"], ["tricorder", "Tricorder"], ["phaser", "Hand phaser"], ["medkit", "Medical kit"], ["engkit", "Engineering kit"]];
+  const INJURY = [
+    ["Uninjured", "No injury penalty", 0],
+    ["Wounded", "−1 to physical actions", -1],
+    ["Seriously wounded", "−2 to physical actions", -2],
+    ["Incapacitated", "Unable to act; medical aid needed", null],
+  ];
+  // Ways to roll each total on 3d6, index 0 = total 3.
+  const WAYS = [1, 3, 6, 10, 15, 21, 25, 27, 27, 25, 21, 15, 10, 6, 3, 1];
+  const STORE_ROSTER = "pelion.roster.v1", STORE_CURRENT = "pelion.current.v1", POOL = 5, BASE = 10, MAX_START = 13;
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const uid = () => Math.random().toString(36).slice(2, 10);
+  const signed = (n) => (n > 0 ? "+" + n : n < 0 ? "−" + Math.abs(n) : "0");
+
+  function blank() {
+    return {
+      id: uid(), example: false, name: "", species: "", rank: "", dept: "Science", role: "", reason: "",
+      speciesNotes: "", connection: "", notes: "", otherEquip: "",
+      attrs: { Body: 10, Agility: 10, Intellect: 10, Presence: 10, Will: 10 },
+      skills: Object.fromEntries(SKILLS.map(([n]) => [n, "U"])),
+      adv: { id: "", name: "", text: "", detail: "" },
+      comp: { id: "", name: "", text: "", trigger: "" },
+      equipment: { communicator: true, tricorder: false, phaser: true, medkit: false, engkit: false },
+      play: { injury: 0, duty: 2, stunned: false, log: [] },
+    };
+  }
+  function example() {
+    const c = blank();
+    Object.assign(c, {
+      example: true, name: "T'Rena Okafor", species: "Human", rank: "Lieutenant", dept: "Science",
+      role: "Ship's sciences officer: first to read an anomaly and the one who explains it to the captain.",
+      reason: "Grew up on a survey colony and wanted to see what the long-range scans only hinted at.",
+      connection: "Owes the chief engineer a favor for rebuilding her tricorder after Deneb.",
+      attrs: { Body: 10, Agility: 10, Intellect: 13, Presence: 11, Will: 11 },
+      adv: { id: "subspace", name: "", text: "", detail: "" },
+      comp: { id: "mystery", name: "", text: "", trigger: "An unexplained reading while the away team is ordered to withdraw" },
+      equipment: { communicator: true, tricorder: true, phaser: true, medkit: false, engkit: false },
+    });
+    c.skills.Sensors = "S";
+    ["Physical Sciences", "Computers", "Electronics", "Life Sciences", "Medicine", "Engineering", "Communications", "Diplomacy", "Phasers"].forEach((s) => (c.skills[s] = "T"));
+    return c;
+  }
+  function normalize(c) {
+    const b = blank();
+    const out = { ...b, ...c, attrs: { ...b.attrs, ...(c.attrs || {}) }, skills: { ...b.skills, ...(c.skills || {}) },
+      adv: { ...b.adv, ...(c.adv || {}) }, comp: { ...b.comp, ...(c.comp || {}) },
+      equipment: { ...b.equipment, ...(c.equipment || {}) }, play: { ...b.play, ...(c.play || {}) } };
+    if (!out.id) out.id = uid();
+    for (const k of Object.keys(out.skills)) if (!LEVELS[out.skills[k]]) out.skills[k] = "U";
+    for (const k of Object.keys(out.attrs)) out.attrs[k] = Math.max(1, Math.min(20, parseInt(out.attrs[k], 10) || BASE));
+    if (!Array.isArray(out.play.log)) out.play.log = [];
+    return out;
+  }
+
+  // ---- storage (best effort) ----
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
+  };
+  let roster = store.get(STORE_ROSTER, []);
+  if (!Array.isArray(roster)) roster = [];
+  let ch = normalize(store.get(STORE_CURRENT, null) || example());
+
+  // ---- rules ----
+  const spent = () => ATTRS.reduce((a, [n]) => a + Math.max(0, ch.attrs[n] - BASE), 0);
+  const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + LEVELS[ch.skills[name]].mod; };
+  const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
+  const count = (lvl) => Object.values(ch.skills).filter((v) => v === lvl).length;
+  function odds(t) {
+    let w = 0;
+    for (let s = 3; s <= 18; s++) if (s <= 4 || (s <= 16 && s <= t)) w += WAYS[s - 3];
+    return w / 216;
+  }
+  const pct = (t) => Math.round(odds(t) * 100) + "%";
+  const advDef = () => ADVANTAGES.find((a) => a[0] === ch.adv.id);
+  const compDef = () => COMPLICATIONS.find((a) => a[0] === ch.comp.id);
+  const advName = () => ch.adv.id === "custom" ? (ch.adv.name || "Custom advantage") : advDef()?.[1] || "";
+  const compName = () => ch.comp.id === "custom" ? (ch.comp.name || "Custom complication") : compDef()?.[1] || "";
+  const division = () => (DEPTS.find((d) => d[0] === ch.dept) || DEPTS[3])[1];
+
+  function checks() {
+    const sp = spent(), nS = count("S"), nT = count("T");
+    const overMax = ATTRS.filter(([n]) => ch.attrs[n] > MAX_START).map(([n]) => n);
+    const advOk = ch.adv.id && (ch.adv.id !== "custom" || (ch.adv.name.trim() && ch.adv.text.trim())) &&
+      (!(advDef()?.[4]) || ch.adv.detail.trim());
+    const compOk = ch.comp.id && (ch.comp.id !== "custom" || (ch.comp.name.trim() && ch.comp.text.trim()));
+    return [
+      [!!ch.name.trim(), ch.name.trim() ? "Officer named" : "Name your officer"],
+      [!!ch.dept, "Department chosen"],
+      [sp === POOL && !overMax.length, sp === POOL ? (overMax.length ? `Lower ${overMax.join(", ")} to 13 or less` : "5 attribute points spent") : `Attribute points spent: ${sp} of ${POOL}`],
+      [nS === 1, nS === 1 ? "One Specialty" : `Specialty skills: ${nS} of 1`],
+      [nT === 9, nT === 9 ? "Nine Trained skills" : `Trained skills: ${nT} of 9`],
+      [!!advOk, advOk ? "Advantage chosen" : ch.adv.id ? "Finish the advantage details" : "Choose an advantage"],
+      [!!compOk, compOk ? "Complication chosen" : ch.comp.id ? "Finish the complication details" : "Choose a complication"],
+      [!!ch.comp.trigger.trim(), "Complication trigger agreed with the GM"],
+      [!!ch.connection.trim(), "Connection to a crewmate"],
+    ];
+  }
+
+  // ---- static UI ----
+  $("f-dept").innerHTML = DEPTS.map(([d]) => `<option>${d}</option>`).join("");
+  $("f-adv").innerHTML = `<option value="">Choose an advantage…</option>` +
+    ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("") + `<option value="custom">Custom advantage…</option>`;
+  $("f-comp").innerHTML = `<option value="">Choose a complication…</option>` +
+    COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
+  $("equip").innerHTML = EQUIPMENT.map(([k, n]) => `<label><input type="checkbox" id="eq-${k}" data-eq="${k}"> ${n}</label>`).join("");
+
+  $("attrs").innerHTML = ATTRS.map(([n, use]) => `
+    <div class="attr">
+      <div class="top"><span class="label">${n}</span><span class="val num" id="av-${n}"></span></div>
+      <span class="small muted">${use}</span>
+      <div class="stepper">
+        <button type="button" id="am-${n}" data-attr="${n}" data-d="-1" aria-label="Lower ${n}">−</button>
+        <button type="button" id="ap-${n}" data-attr="${n}" data-d="1" aria-label="Raise ${n}">+</button>
+      </div>
+    </div>`).join("");
+
+  $("skill-rows").innerHTML = SKILLS.map(([n, a, use]) => {
+    const key = n.replace(/\s+/g, "-");
+    return `<tr id="sr-${key}">
+      <td><div class="skillname">${n}</div><div class="small muted">${use}</div></td>
+      <td class="small">${a}</td>
+      <td><div class="seg" role="radiogroup" aria-label="${n} training">
+        ${["U", "T", "S"].map((l) => `<label><input type="radio" name="sk-${key}" id="sk-${key}-${l}" value="${l}" data-skill="${n}"><span>${LEVELS[l].name}</span></label>`).join("")}
+      </div></td>
+      <td class="target num" id="st-${key}"></td>
+      <td class="pct" id="sp-${key}"></td>
+    </tr>`;
+  }).join("");
+
+  // ---- render ----
+  function bindFields() {
+    const map = { "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
+      "f-speciesnotes": "speciesNotes", "f-connection": "connection", "f-notes": "notes", "f-otherequip": "otherEquip" };
+    for (const [id, k] of Object.entries(map)) $(id).value = ch[k];
+    $("f-dept").value = ch.dept;
+    $("f-adv").value = ch.adv.id; $("f-advname").value = ch.adv.name; $("f-advtext").value = ch.adv.text; $("f-advdetail").value = ch.adv.detail;
+    $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
+    EQUIPMENT.forEach(([k]) => ($("eq-" + k).checked = !!ch.equipment[k]));
+    $("f-stunned").checked = !!ch.play.stunned;
+  }
+
+  function render() {
+    $("app").dataset.div = division();
+    $("hdr-name").textContent = ch.name.trim() || "Unnamed officer";
+    $("hdr-sub").textContent = [ch.rank, ch.species, ch.dept && ch.dept + " department"].filter(Boolean).join(" · ") || "—";
+    $("example-banner").hidden = !ch.example;
+
+    // attributes
+    const sp = spent(), left = POOL - sp;
+    $("pool-pips").innerHTML = Array.from({ length: POOL }, (_, i) => `<span class="pip ${i < sp ? "on" : ""}"></span>`).join("");
+    $("pool-left").textContent = left >= 0 ? `${left} left` : `${-left} over`;
+    ATTRS.forEach(([n]) => {
+      $("av-" + n).textContent = ch.attrs[n];
+      $("am-" + n).disabled = ch.attrs[n] <= BASE;
+      $("ap-" + n).disabled = ch.attrs[n] >= MAX_START || left <= 0;
+    });
+
+    // skills
+    const nS = count("S"), nT = count("T");
+    $("skill-tally").innerHTML =
+      `<span class="chip ${nS === 1 ? "ok" : "no"}">Specialty ${nS}/1</span><span class="chip ${nT === 9 ? "ok" : "no"}">Trained ${nT}/9</span>`;
+    SKILLS.forEach(([n]) => {
+      const key = n.replace(/\s+/g, "-"), lvl = ch.skills[n], t = skillTarget(n);
+      $("sr-" + key).className = "lvl-" + lvl;
+      ["U", "T", "S"].forEach((l) => {
+        const r = $(`sk-${key}-${l}`);
+        r.checked = lvl === l;
+        r.disabled = l === "T" && lvl !== "T" && nT >= 9;
+      });
+      $("st-" + key).textContent = t;
+      $("sp-" + key).textContent = pct(t);
+    });
+
+    // traits
+    $("adv-custom").hidden = ch.adv.id !== "custom";
+    const ad = advDef();
+    $("adv-detail-wrap").hidden = !(ad && ad[4]);
+    if (ad && ad[4]) $("adv-detail-label").textContent = ad[4];
+    $("adv-desc").innerHTML = ad ? esc(ad[2]) : ch.adv.id === "custom"
+      ? "Custom advantages give +2 to one narrowly defined kind of task when the GM agrees it applies. They can't improve every use of a broad skill."
+      : "An advantage gives +2 to one narrow kind of task when the GM agrees it applies. It grants no training and never replaces essential equipment.";
+    $("comp-custom").hidden = ch.comp.id !== "custom";
+    const cd = compDef();
+    $("comp-desc").innerHTML = cd ? esc(cd[2]) : ch.comp.id === "custom"
+      ? "Custom complications need a clear trigger and a meaningful, accepted consequence."
+      : "A complication creates choices and problems. When it causes a meaningful problem you accept, you gain a Duty point.";
+
+    // side
+    const list = checks(), ready = list.every((c) => c[0]);
+    $("ready-status").className = "status " + (ready ? "ok" : "no");
+    $("ready-status").textContent = ready ? "Cleared for duty" : `${list.filter((c) => !c[0]).length} items outstanding`;
+    $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
+    $("st-dodge").textContent = dodge();
+    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 ${signed(LEVELS[ch.skills.Athletics].dodge)} (${LEVELS[ch.skills.Athletics].name} Athletics)`;
+    const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
+    $("st-best").textContent = best;
+    renderRoster();
+    renderSheet();
+    save();
+  }
+
+  function renderRoster() {
+    if (!roster.length) { $("roster").innerHTML = `<li class="muted small">No saved officers yet. Save this one to keep it.</li>`; return; }
+    $("roster").innerHTML = roster.map((c) => `<li class="${c.id === ch.id ? "current" : ""}">
+      <span title="${esc(c.name)}">${esc(c.name || "Unnamed officer")}</span>
+      <span><button class="linkish" data-open="${c.id}">Open</button><button class="linkish danger" data-del="${c.id}">Delete</button></span></li>`).join("");
+  }
+
+  function renderSheet() {
+    const lvlOrder = { S: 0, T: 1, U: 2 };
+    const sorted = SKILLS.map(([n, a]) => ({ n, a, l: ch.skills[n], t: skillTarget(n) }))
+      .sort((x, y) => lvlOrder[x.l] - lvlOrder[y.l] || y.t - x.t || x.n.localeCompare(y.n));
+    const eq = EQUIPMENT.filter(([k]) => ch.equipment[k]).map(([, n]) => n);
+    if (ch.otherEquip.trim()) eq.push(ch.otherEquip.trim());
+    const advText = ch.adv.id === "custom" ? ch.adv.text : advDef()?.[2] || "";
+    const compText = ch.comp.id === "custom" ? ch.comp.text : compDef()?.[2] || "";
+    $("sheet-main").innerHTML = `
+      <div><span class="eyebrow">Starfleet officer · USS Pelion NCC-1750</span>
+        <h2 style="font-size:2rem">${esc(ch.name || "Unnamed officer")}</h2></div>
+      <div class="idgrid">
+        <div><span class="label">Rank</span><b>${esc(ch.rank || "—")}</b></div>
+        <div><span class="label">Department</span><b>${esc(ch.dept)}</b></div>
+        <div><span class="label">Species</span><b>${esc(ch.species || "—")}</b></div>
+        <div><span class="label">Dodge</span><b class="num">${dodge()}</b></div>
+      </div>
+      ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
+      <div class="attr-strip">${ATTRS.map(([n]) => `<div><span class="label">${n}</span><b>${ch.attrs[n]}</b></div>`).join("")}</div>
+      <div><h3 style="margin-bottom:6px">Skills</h3>
+        <div class="skill-cols">${sorted.map((s) => `<div class="skill-line ${s.l}"><span>${s.n}<span class="lv">${s.l === "U" ? "untrained" : LEVELS[s.l].name}</span></span><b>${s.t}</b></div>`).join("")}</div></div>
+      <div class="fields">
+        <div class="field"><span class="label">Advantage</span><b>${esc(advName() || "—")}${ch.adv.detail && advDef()?.[4] ? ": " + esc(ch.adv.detail) : ""}</b><span class="small muted">${esc(advText)}</span></div>
+        <div class="field"><span class="label">Complication</span><b>${esc(compName() || "—")}</b><span class="small muted">${esc(compText)}</span>
+          ${ch.comp.trigger ? `<span class="small"><b>Trigger:</b> ${esc(ch.comp.trigger)}</span>` : ""}</div>
+      </div>
+      <div class="fields">
+        <div class="field"><span class="label">Equipment</span><span>${esc(eq.join(", ") || "—")}</span></div>
+        <div class="field"><span class="label">Connection</span><span>${esc(ch.connection || "—")}</span></div>
+        ${ch.reason ? `<div class="field"><span class="label">Why I serve</span><span>${esc(ch.reason)}</span></div>` : ""}
+        ${ch.speciesNotes ? `<div class="field"><span class="label">Species ability (GM approved)</span><span>${esc(ch.speciesNotes)}</span></div>` : ""}
+        ${ch.notes ? `<div class="field wide"><span class="label">Notes</span><span>${esc(ch.notes)}</span></div>` : ""}
+      </div>`;
+
+    // condition
+    const inj = ch.play.injury;
+    $("boxes").innerHTML = [1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-box="${i}" aria-label="Injury box ${i}${i <= inj ? ", marked" : ""}"></button>`).join("");
+    $("cond").textContent = INJURY[inj][0] + ".";
+    $("cond-effect").textContent = INJURY[inj][1];
+    $("duty-count").textContent = ch.play.duty;
+    $("duty-minus").disabled = ch.play.duty <= 0;
+    $("r-stun").checked = !!ch.play.stunned;
+
+    // roller options
+    const sel = $("r-skill"), prev = sel.value;
+    sel.innerHTML = `<optgroup label="Skills">${sorted.map((s) => `<option value="${esc(s.n)}">${s.n} (${s.t})</option>`).join("")}</optgroup>
+      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}</optgroup>
+      <optgroup label="Attributes">${ATTRS.map(([n]) => `<option value="${n}">${n} (${ch.attrs[n]})</option>`).join("")}</optgroup>`;
+    if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
+    const an = advName();
+    $("r-adv-label").textContent = an ? `${an} applies +2` : "Advantage applies +2";
+    $("r-adv").disabled = !an;
+    updateTarget();
+    renderLog();
+  }
+
+  function baseOf(name) {
+    if (name === "Dodge") return dodge();
+    if (ch.attrs[name] != null) return ch.attrs[name];
+    return skillTarget(name);
+  }
+  function rollMods() {
+    const name = $("r-skill").value;
+    const parts = [];
+    const mod = +$("r-mod").value; if (mod) parts.push(mod);
+    const asst = +$("r-assist").value; if (asst) parts.push(asst);
+    if ($("r-adv").checked && !$("r-adv").disabled) parts.push(2);
+    const injPen = INJURY[ch.play.injury][2];
+    if ($("r-phys").checked && injPen) parts.push(injPen);
+    if ($("r-stun").checked) parts.push(-2);
+    return { name, base: baseOf(name), total: parts.reduce((a, b) => a + b, 0) };
+  }
+  function updateTarget() {
+    const { name, base, total } = rollMods();
+    const t = base + total;
+    const incap = ch.play.injury >= 3;
+    $("r-target").textContent = incap ? "Incapacitated: you can't act until treatment clears a box."
+      : `${name} ${base} ${total ? signed(total) + " " : ""}→ target ${t} · ${pct(t)} chance`;
+    $("r-roll").disabled = incap;
+  }
+
+  let last = null;
+  function doRoll(isReroll) {
+    const { name, base, total } = rollMods();
+    const t = base + total;
+    const dice = [1, 2, 3].map(() => 1 + Math.floor(Math.random() * 6));
+    const sum = dice[0] + dice[1] + dice[2];
+    const auto = sum <= 4 ? "auto-s" : sum >= 17 ? "auto-f" : "";
+    const ok = auto === "auto-s" || (auto !== "auto-f" && sum <= t);
+    const margin = t - sum;
+    last = { name, t, dice, sum, ok, margin, auto, rerolled: !!isReroll };
+    ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
+    ch.play.log = ch.play.log.slice(0, 12);
+    if ($("r-stun").checked) { ch.play.stunned = false; $("f-stunned").checked = false; }
+    showResult();
+    renderSheet();
+    save();
+  }
+  function showResult() {
+    const r = last, el = $("r-result");
+    el.hidden = false;
+    el.className = "result " + (r.ok ? "succ" : "fail");
+    let note;
+    if (r.auto === "auto-s") note = r.margin < 0 ? "Natural " + r.sum + ": automatic success. Counts as margin 0 in a contest." : "Natural " + r.sum + ": automatic success.";
+    else if (r.auto === "auto-f") note = "Natural " + r.sum + ": automatic failure.";
+    else note = r.ok ? `Succeeded by ${r.margin}.` : `Failed by ${-r.margin}.`;
+    if (r.ok && r.margin >= 5) note += " Margin 5+: assistance gives +2; medical care clears an extra box.";
+    if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
+    el.innerHTML = `
+      <div class="dice">${r.dice.map((d) => `<span class="die rolling">${d}</span>`).join("")}
+        <span class="num" style="font-size:1.3rem">= ${r.sum}</span><span class="muted">vs ${r.t}</span></div>
+      <div class="verdict">${r.ok ? "Success" : "Failure"}</div>
+      <p class="small">${note}${r.rerolled ? " <i>Duty point reroll: this result stands.</i>" : ""}</p>
+      ${!r.rerolled && ch.play.duty > 0 ? `<div><button class="btn" id="r-reroll">Spend a Duty point to reroll</button></div>` : ""}`;
+    const rr = $("r-reroll");
+    if (rr) rr.onclick = () => { ch.play.duty -= 1; doRoll(true); };
+  }
+  function renderLog() {
+    const log = ch.play.log;
+    $("r-log").innerHTML = log.length ? log.map((l) => `<li><span>${esc(l.name)}${l.rr ? " (reroll)" : ""}</span>
+      <span class="num">${l.sum} vs ${l.t} <span class="${l.ok ? "s" : "f"}">${l.ok ? "✓ " + Math.max(0, l.margin) : "✗ " + l.margin}</span></span></li>`).join("")
+      : `<li class="muted">No rolls yet this session.</li>`;
+  }
+
+  // ---- persistence ----
+  function save() { store.set(STORE_CURRENT, ch); }
+  function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
+  function load(c) { ch = normalize(c); last = null; $("r-result").hidden = true; bindFields(); render(); }
+  function touch() { if (ch.example) ch.example = false; }
+
+  // ---- events ----
+  const textMap = { "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
+    "f-speciesnotes": "speciesNotes", "f-connection": "connection", "f-notes": "notes", "f-otherequip": "otherEquip" };
+  document.addEventListener("input", (e) => {
+    const id = e.target.id;
+    if (textMap[id]) { ch[textMap[id]] = e.target.value; touch(); render(); return; }
+    const sub = { "f-advname": ["adv", "name"], "f-advtext": ["adv", "text"], "f-advdetail": ["adv", "detail"],
+      "f-compname": ["comp", "name"], "f-comptext": ["comp", "text"], "f-comptrigger": ["comp", "trigger"] }[id];
+    if (sub) { ch[sub[0]][sub[1]] = e.target.value; touch(); render(); }
+  });
+  document.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.id === "f-dept") { ch.dept = t.value; touch(); render(); }
+    else if (t.id === "f-adv") { ch.adv.id = t.value; touch(); render(); }
+    else if (t.id === "f-comp") { ch.comp.id = t.value; touch(); render(); }
+    else if (t.dataset.eq) { ch.equipment[t.dataset.eq] = t.checked; touch(); render(); }
+    else if (t.dataset.skill) {
+      const n = t.dataset.skill, v = t.value;
+      if (v === "S") for (const k of Object.keys(ch.skills)) if (ch.skills[k] === "S" && k !== n) ch.skills[k] = "U";
+      ch.skills[n] = v; touch(); render();
+    }
+    else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
+    else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
+    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value); updateTarget(); }
+    else if (["r-mod", "r-assist", "r-adv", "r-phys"].includes(t.id)) updateTarget();
+    else if (t.id === "f-file" && t.files[0]) {
+      const fr = new FileReader();
+      fr.onload = () => importText(fr.result);
+      fr.readAsText(t.files[0]);
+      t.value = "";
+    }
+  });
+  $("attrs").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-attr]"); if (!b || b.disabled) return;
+    const n = b.dataset.attr, d = +b.dataset.d;
+    const next = ch.attrs[n] + d;
+    if (next < BASE || next > MAX_START || (d > 0 && spent() >= POOL)) return;
+    ch.attrs[n] = next; touch(); render();
+  });
+  $("boxes").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-box]"); if (!b) return;
+    const i = +b.dataset.box;
+    ch.play.injury = ch.play.injury === i ? i - 1 : i;
+    render();
+  });
+  $("duty-minus").onclick = () => { if (ch.play.duty > 0) { ch.play.duty--; render(); } };
+  $("duty-plus").onclick = () => { ch.play.duty++; render(); };
+  $("duty-reset").onclick = () => { ch.play.duty = 2; ch.play.log = []; render(); };
+  $("r-roll").onclick = () => doRoll(false);
+
+  function selectTab(which) {
+    const create = which === "create";
+    $("tab-create").setAttribute("aria-selected", create);
+    $("tab-sheet").setAttribute("aria-selected", !create);
+    $("view-create").hidden = !create;
+    $("view-sheet").hidden = create;
+    try { sessionStorage.setItem("pelion.tab", which); } catch {}
+  }
+  $("tab-create").onclick = () => selectTab("create");
+  $("tab-sheet").onclick = () => selectTab("sheet");
+
+  function newOfficer() { load(blank()); selectTab("create"); toast("New officer started."); }
+  $("btn-new").onclick = newOfficer;
+  $("banner-new").onclick = newOfficer;
+  $("btn-example").onclick = () => { load(example()); toast("Example science officer loaded."); };
+  $("btn-save").onclick = () => {
+    const copy = JSON.parse(JSON.stringify(ch));
+    copy.example = false;
+    ch.example = false;
+    const i = roster.findIndex((c) => c.id === ch.id);
+    if (i >= 0) roster[i] = copy; else roster.push(copy);
+    const ok = store.set(STORE_ROSTER, roster);
+    render();
+    toast(ok ? `Saved ${ch.name || "officer"} in this browser.` : "This browser blocked saving. Use Copy JSON to keep a copy.", !ok);
+  };
+  const pendingDelete = new Set();
+  $("roster").addEventListener("click", (e) => {
+    const o = e.target.closest("[data-open]"), d = e.target.closest("[data-del]");
+    if (o) { const c = roster.find((x) => x.id === o.dataset.open); if (c) { load(c); toast(`Opened ${c.name || "officer"}.`); } }
+    if (d) {
+      const id = d.dataset.del;
+      if (!pendingDelete.has(id)) { pendingDelete.add(id); d.textContent = "Confirm delete"; setTimeout(() => { pendingDelete.delete(id); if (d.isConnected) d.textContent = "Delete"; }, 4000); return; }
+      pendingDelete.delete(id);
+      roster = roster.filter((x) => x.id !== id);
+      store.set(STORE_ROSTER, roster);
+      renderRoster();
+      toast("Officer deleted from this browser.");
+    }
+  });
+  $("btn-copy").onclick = () => {
+    const txt = JSON.stringify({ ...ch, play: { ...ch.play, log: [] } }, null, 2);
+    $("f-json").value = txt;
+    const p = navigator.clipboard?.writeText(txt);
+    if (p) p.then(() => toast("Officer JSON copied."), () => { $("f-json").select(); toast("Copy blocked here. The JSON is selected below; copy it manually."); });
+    else { $("f-json").select(); toast("The JSON is selected below; copy it manually."); }
+  };
+  function importText(txt) {
+    try {
+      const data = JSON.parse(txt);
+      if (!data || typeof data !== "object" || !data.attrs || !data.skills) throw new Error("missing fields");
+      data.id = roster.some((c) => c.id === data.id) ? data.id : data.id || uid();
+      data.example = false;
+      load(data);
+      toast(`Loaded ${ch.name || "officer"}. Save it to keep it in this browser.`);
+    } catch {
+      toast("That isn't an officer file. Paste the JSON exactly as it was copied.", true);
+    }
+  }
+  $("btn-import").onclick = () => importText($("f-json").value);
+
+  bindFields();
+  render();
+  $("r-phys").checked = PHYSICAL.has($("r-skill").value);
+  updateTarget();
+  try { if (sessionStorage.getItem("pelion.tab") === "sheet") selectTab("sheet"); } catch {}
+})();
+</script>
