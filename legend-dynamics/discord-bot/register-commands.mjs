@@ -1,6 +1,8 @@
 // Registers the Legend Dynamics slash commands from a terminal. (Visiting your Worker's /register page does the same.)
 //   DISCORD_APPLICATION_ID=... DISCORD_BOT_TOKEN=... node register-commands.mjs
-import { COMMANDS } from "./src/worker.js";
+import { commandsFor } from "./src/worker.js";
+// LEGACY_COMMANDS=yes also registers the old /pelion, /duty, /grimm and /grit names.
+const COMMANDS = commandsFor({ LEGACY_COMMANDS: process.env.LEGACY_COMMANDS });
 
 const appId = process.env.DISCORD_APPLICATION_ID;
 const token = process.env.DISCORD_BOT_TOKEN;

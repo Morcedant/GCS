@@ -240,3 +240,23 @@ test("USS Pelion and Grimm are games too, and their old storage bindings still w
   const choices = COMMANDS.find((c) => c.name === "game").options[1].options[0].choices.map((c) => c.name);
   assert.deepEqual([...choices].sort(), ["Grimm", "Iron Roads", "Starward", "USS Pelion"]);
 });
+
+test("the old /duty, /grit, /pelion and /grimm names still work, and register on their own Workers", async () => {
+  const pel = { ...env, DUTY: new MemoryKV() };
+  assert.match((await signedCall(pel, sub("duty", "show"))).content, /2 Duty points/);
+  const gr = { ...env, GRIT: new MemoryKV() };
+  assert.match((await signedCall(gr, sub("grit", "spend"))).content, /1 Grit point\*\* left/);
+  const r = await signedCall(pel, { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name: "pelion", options: [{ name: "target", value: 16 }] } });
+  assert.equal(r.components[0].components[0].label, "Spend a Duty point to reroll");
+  const g = await signedCall(gr, { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name: "grimm", options: [{ name: "target", value: 12 }] } });
+  assert.match(g.embeds[0].footer.text, /Grimm/);
+
+  const { commandsFor } = await import("../src/worker.js");
+  const names = (e) => commandsFor(e).map((c) => c.name);
+  assert.ok(!names({}).includes("duty"), "a new bot registers only the new names");
+  assert.deepEqual(names({ DUTY: {} }).slice(-2), ["pelion", "duty"]);
+  assert.deepEqual(names({ GRIT: {} }).slice(-2), ["grimm", "grit"]);
+  assert.equal(names({ LEGACY_COMMANDS: "yes" }).length, names({}).length + 4);
+  const duty = commandsFor({ DUTY: {} }).find((c) => c.name === "duty");
+  assert.match(duty.description, /Duty points/); assert.equal(duty.options.length, 5);
+});

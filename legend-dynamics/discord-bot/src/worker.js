@@ -9,7 +9,9 @@
 //   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, grimm or pelion); default western
 // Binding (Settings → Bindings → KV namespace):
 //   STORE                    optional; turns on /game, /points, /clock and /track, and makes rerolls spend real points
-//                            (a USS Pelion or Grimm Worker's DUTY or GRIT binding works too)
+//                            (a USS Pelion or Grimm Worker's DUTY or GRIT binding works too, and /register then
+//                            also registers that bot's old names: /pelion and /duty, or /grimm and /grit)
+//   LEGACY_COMMANDS          optional: "yes" registers all four old names on any Worker
 
 // ---- Setting packs: written by tools/build-legend.py from legend-dynamics/packs/*/pack.json ----
 
@@ -1021,7 +1023,23 @@ export function commands() {
   ];
 }
 export const COMMANDS = commands();
-const COMMAND_LIST = "/roll, /contest, /assist, /points, /clock, /track, /seed and /game";
+
+// The USS Pelion and Grimm bots' old command names keep working: /pelion and /grimm roll, /duty and /grit track points.
+const ALIASES = { pelion: "roll", grimm: "roll", duty: "points", grit: "points" };
+const LEGACY = { DUTY: ["pelion", "duty"], GRIT: ["grimm", "grit"] };
+const aliasOf = (name, target, game) => {
+  const base = COMMANDS.find((c) => c.name === target);
+  return { ...base, name, description: target === "roll" ? `Roll 3d6 under your target (same as /roll)` : `Track ${game} points (same as /points)` };
+};
+
+/** The commands to register: the full set, plus the old names on a Pelion or Grimm Worker (or with LEGACY_COMMANDS=yes). */
+export function commandsFor(env = {}) {
+  const all = String(env.LEGACY_COMMANDS || "").trim().toLowerCase() === "yes";
+  const extra = Object.entries(LEGACY).filter(([binding]) => all || env[binding]).flatMap(([binding, [roll, points]]) =>
+    [aliasOf(roll, "roll"), aliasOf(points, "points", binding === "DUTY" ? "Duty" : "Grit")]);
+  return [...COMMANDS, ...extra];
+}
+const commandList = (cmds) => { const n = cmds.map((c) => `/${c.name}`); return `${n.slice(0, -1).join(", ")} and ${n[n.length - 1]}`; };
 
 // ---- Discord request handling ----
 
@@ -1040,7 +1058,7 @@ export function withLegacy(env) {
 export default {
   async fetch(request, rawEnv) {
     const env = withLegacy(rawEnv);
-    if (request.method === "GET" && new URL(request.url).pathname === "/register") return registerCommands(env);
+    if (request.method === "GET" && new URL(request.url).pathname === "/register") return registerCommands(rawEnv);
     if (request.method !== "POST") return statusPage(env);
     const body = await request.text();
     const ok = await verify(request, body, env.DISCORD_PUBLIC_KEY);
@@ -1050,7 +1068,7 @@ export default {
     if (interaction.type === PING) return json({ type: PONG });
     if (interaction.type === COMPONENT && interaction.data?.custom_id?.startsWith("reroll|")) return json(await reroll(interaction, env));
     if (interaction.type === COMMAND) {
-      const handler = HANDLERS[interaction.data?.name];
+      const handler = HANDLERS[interaction.data?.name] || HANDLERS[ALIASES[interaction.data?.name]];
       if (handler) return json(await handler(interaction, env, await gameOf(env, guildOf(interaction))));
     }
     return json({ type: MESSAGE, data: { content: "Unknown command.", flags: EPHEMERAL } });
@@ -1425,10 +1443,11 @@ async function registerCommands(env) {
   if (!env.DISCORD_APPLICATION_ID || !env.DISCORD_BOT_TOKEN) {
     return new Response("Add DISCORD_APPLICATION_ID and DISCORD_BOT_TOKEN to the Worker's settings, then reload this page.", { status: 400 });
   }
+  const cmds = commandsFor(env);
   const put = () => fetch(`https://discord.com/api/v10/applications/${String(env.DISCORD_APPLICATION_ID).trim()}/commands`, {
     method: "PUT",
     headers: { Authorization: `Bot ${String(env.DISCORD_BOT_TOKEN).trim()}`, "Content-Type": "application/json" },
-    body: JSON.stringify(COMMANDS),
+    body: JSON.stringify(cmds),
   });
   let res = await put();
   // Discord rate-limits command registration. Wait out a short limit once instead of failing.
@@ -1439,7 +1458,7 @@ async function registerCommands(env) {
       res = await put();
     }
   }
-  if (res.ok) return new Response(`Registered ${COMMAND_LIST}. They can take a minute to appear in Discord.`);
+  if (res.ok) return new Response(`Registered ${commandList(cmds)}. They can take a minute to appear in Discord.`);
   const detail = await res.text();
   const hint = res.status === 429 ? "\n\nDiscord is rate-limiting registration. Wait a minute or two, then reload this page once."
     : res.status === 401 ? "\n\nThe bot token is wrong or was reset. Reset it on the Bot page and update DISCORD_BOT_TOKEN." : "";

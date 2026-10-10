@@ -66,9 +66,12 @@ What carries over:
 
 What changes for players:
 
-- `/roll` replaces `/pelion` and `/grimm`.
-- `/points` replaces `/duty` and `/grit`.
+- The old commands still work: `/pelion` or `/grimm` rolls, and `/duty` or `/grit` tracks points.
+  `/register` keeps them alongside the new commands on that Worker.
+- The new names work too: `/roll` and `/points`, plus `/track`, `/seed` and `/game`.
 - The reroll button still says Duty or Grit.
+
+To have all four old names on a new bot as well, add the setting `LEGACY_COMMANDS` = `yes` and open `/register` again.
 
 Any server on that bot can now also switch games with `/game set`.
 
