@@ -439,6 +439,64 @@ The ship has its own sheet, tracked like an injury track. Encounters stay descri
 
 After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement. General Services characters advance the same way, but only their starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they are commissioned (see Step 3).
 
+# Ready-made crew
+
+Six crew members ready to play, for one-shots, new players, or a crew in a hurry. Each follows the creation rules exactly, and their connections tie them to one another. In the creator, choose **Load a ready-made crew member** to open one and make it your own.
+
+## Thelan sh'Vari
+
+*Lieutenant Commander, Command. Andorian.* First officer: keeps the crew moving when the captain's plan meets reality, and keeps the captain honest.
+
+- **Attributes:** Body 10, Agility 12, Intellect 10, Presence 13, Will 10. **Dodge** 11.
+- **Skills:** Leadership 16 (Specialty). Trained: Diplomacy 14, Helm 13, Phasers 13, Unarmed Combat 13, Navigation 11, Psychology 11, Athletics 11, Sensors 11, Communications 11.
+- **Advantage:** Crisis Leader. **Complication:** Reputation to Uphold; trigger: someone questions your competence in front of others.
+- **Why I serve:** Starfleet runs in my family, and I mean to live up to the name. **Connection:** Took Yeoman Rrinn under their wing when Rrinn first came aboard.
+
+## Sevek
+
+*Lieutenant, Science. Vulcan.* Ship's sciences officer: reads the anomaly, names the risk, and calculates the odds no one asked for.
+
+- **Attributes:** Body 11, Agility 11, Intellect 13, Presence 8, Will 12. **Dodge** 10.
+- **Skills:** Physical Sciences 16 (Specialty). Trained: Sensors 14, Computers 14, Life Sciences 14, Navigation 14, Engineering 14, Electronics 14, Psychology 14, Unarmed Combat 12, Athletics 12.
+- **Advantage:** Eidetic Recall (species; companion: Suppressed Emotion). **Complication:** Cannot Leave a Mystery Alone; trigger: sensor data that contradicts known science.
+- **Why I serve:** The best laboratory in the galaxy is a starship on the frontier. **Connection:** Friendly rivals with Lt. Grath: they argue every engineering theory, and both enjoy it.
+
+## Dr. Vessik
+
+*Lieutenant Commander, Medical. Denobulan.* Chief medical officer: patches up the crew, argues with the captain, and keeps an alarming menagerie of medicinal creatures in sickbay.
+
+- **Attributes:** Body 9, Agility 9, Intellect 13, Presence 12, Will 12. **Dodge** 7.
+- **Skills:** Medicine 16 (Specialty). Trained: Life Sciences 14, Psychology 14, Sensors 14, Computers 14, Electronics 14, Survival 14, Communications 14, Diplomacy 13, Leadership 13.
+- **Advantage:** Denobulan Pharmacopoeia (species; companion: Unorthodox Methods). **Complication:** Protects Others at Personal Risk; trigger: civilians are caught in the danger.
+- **Why I serve:** To protect the Federation and the people who can't protect themselves. **Connection:** Pulled Lt. Reyes out of a burning shuttle on a survey mission; Reyes has never let the doctor pay for a drink since.
+
+## Grath
+
+*Lieutenant, Engineering. Tellarite.* Engineer: keeps the Pelion's power flowing and will tell you, at length, exactly why your idea won't work.
+
+- **Attributes:** Body 12, Agility 10, Intellect 13, Presence 9, Will 11. **Dodge** 9.
+- **Skills:** Engineering 16 (Specialty). Trained: Electronics 14, Computers 14, Physical Sciences 14, Sensors 14, Communications 14, Survival 14, Athletics 13, Helm 11, Unarmed Combat 11.
+- **Advantage:** Improvisational Engineer. **Complication:** Experimental Enthusiasm; trigger: an untested device or technique could solve the problem.
+- **Why I serve:** To prove I'm good enough, to everyone who doubted me and to myself. **Connection:** Off-duty friends with Commander sh'Vari: a weekly game of Andorian chess in which both of them cheat.
+
+## Marisol Reyes
+
+*Lieutenant (j.g.), Security. Human.* Security officer: first through the door on every away mission, and the last to set a phaser to kill.
+
+- **Attributes:** Body 12, Agility 13, Intellect 10, Presence 10, Will 10. **Dodge** 12.
+- **Skills:** Phasers 16 (Specialty). Trained: Unarmed Combat 14, Stealth 14, Helm 14, Athletics 13, Survival 11, Sensors 11, Medicine 11, Leadership 11, Communications 11.
+- **Advantage:** Careful Marksman. **Complication:** Reluctant to Use Lethal Force; trigger: a hostile refuses to surrender.
+- **Why I serve:** A Starfleet officer once saved my home, and I want to be that person for someone else. **Connection:** Owes Dr. Vessik their life after a shuttle crash, and never lets the doctor forget it.
+
+## Rrinn
+
+*Yeoman 2nd Class, General Services. Caitian.* Captain's yeoman: keeps the records, carries the orders, and hears everything said on the bridge.
+
+- **Attributes:** Body 9, Agility 12, Intellect 13, Presence 11, Will 10. **Dodge** 11.
+- **Skills:** Computers 18 (Expert). Trained: Communications 14, Psychology 14, Sensors 14, Electronics 14, Stealth 13, Diplomacy 12, Athletics 10.
+- **Advantage:** Keen Hearing (species; companion: Sensitive Ears). **Complication:** Someone Back Home; trigger: a message from home arrives.
+- **Why I serve:** To leave behind a past, a world, or a life that was too small for me. **Connection:** Shares a secret with Lt. Sevek from a mission neither of them talks about.
+
 # Threats
 
 Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge once per round, and mark injury boxes. Each threat below is one line of numbers and one special trait.
