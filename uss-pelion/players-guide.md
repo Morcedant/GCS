@@ -155,6 +155,21 @@ An advantage gives +2 to one narrowly defined kind of task when the GM agrees it
 
 Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.
 
+### Top 10 connections to a crewmate
+
+Pick one, name the crewmate with their player, and agree on the details together.
+
+1. **Academy roommates.** We shared quarters at Starfleet Academy and still look out for each other.
+2. **They saved my life.** They pulled me out of a burning shuttle, and I owe them my life.
+3. **I saved theirs.** I saved their life on a past posting, and they haven't forgotten it.
+4. **Mentor.** They took me under their wing when I first came aboard.
+5. **Friendly rivals.** We competed for the same posting, and the rivalry is still mostly friendly.
+6. **Same homeworld.** We grew up on the same world and know each other's families.
+7. **An unpaid favor.** I owe them a favor I haven't repaid yet.
+8. **A shared secret.** We share a secret from a mission neither of us talks about.
+9. **Off-duty friends.** We meet every week in the rec room for chess, cards, or music.
+10. **Unfinished business.** They blame me for something that went wrong on a past mission.
+
 ## Example science officer
 
 Human. Body 10, Agility 10, Intellect 13, Presence 11, Will 11.

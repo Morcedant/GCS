@@ -529,7 +529,9 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="checks" id="equip"></div></div>
           <div class="fields">
             <div class="field wide"><label for="f-otherequip">Other equipment</label><input type="text" id="f-otherequip" placeholder="Anything else issued for this assignment"></div>
-            <div class="field wide"><label for="f-connection">Connection to another crew member</label><textarea id="f-connection" rows="2"></textarea></div>
+            <div class="field wide"><label for="f-connection">Connection to another crew member</label>
+              <select id="f-connpick" aria-label="Quick pick a connection"></select>
+              <textarea id="f-connection" rows="2" placeholder="Pick one of the top 10 above, or write your own. Name the crewmate if you know who."></textarea></div>
             <div class="field wide"><label for="f-notes">Notes</label><textarea id="f-notes" rows="2"></textarea></div>
           </div>
         </section>
@@ -833,6 +835,20 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><em>Examples:</em> Steady Hands gives +2 to delicate medical procedures. Subspace Specialist gives +2 when analyzing subspace phenomena. Complications might be Cannot Leave a Mystery Alone, Distrusts Command Decisions, or Protects Others at Personal Risk. Define their triggers with the GM.</p>
 <h2 id="g-step-5-prepare-for-duty">Step 5: Prepare for duty</h2>
 <p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.</p>
+<h3 id="g-top-10-connections-to-a-crewmate">Top 10 connections to a crewmate</h3>
+<p>Pick one, name the crewmate with their player, and agree on the details together.</p>
+<ol type="1">
+<li><strong>Academy roommates.</strong> We shared quarters at Starfleet Academy and still look out for each other.</li>
+<li><strong>They saved my life.</strong> They pulled me out of a burning shuttle, and I owe them my life.</li>
+<li><strong>I saved theirs.</strong> I saved their life on a past posting, and they haven’t forgotten it.</li>
+<li><strong>Mentor.</strong> They took me under their wing when I first came aboard.</li>
+<li><strong>Friendly rivals.</strong> We competed for the same posting, and the rivalry is still mostly friendly.</li>
+<li><strong>Same homeworld.</strong> We grew up on the same world and know each other’s families.</li>
+<li><strong>An unpaid favor.</strong> I owe them a favor I haven’t repaid yet.</li>
+<li><strong>A shared secret.</strong> We share a secret from a mission neither of us talks about.</li>
+<li><strong>Off-duty friends.</strong> We meet every week in the rec room for chess, cards, or music.</li>
+<li><strong>Unfinished business.</strong> They blame me for something that went wrong on a past mission.</li>
+</ol>
 <h2 id="g-example-science-officer">Example science officer</h2>
 <p>Human. Body 10, Agility 10, Intellect 13, Presence 11, Will 11.</p>
 <ul>
@@ -1971,6 +1987,20 @@ tr.lvl-U td.target { color: var(--muted); }
     ["Build bridges", "To build bridges between my people and the rest of the Federation."],
   ];
   const REASON_TEXTS = new Set(REASONS.map((r) => r[1]));
+  // Top 10 connections to a crewmate, same quick-pick behaviour.
+  const CONNECTIONS = [
+    ["Academy roommates", "We shared quarters at Starfleet Academy and still look out for each other."],
+    ["They saved my life", "They pulled me out of a burning shuttle, and I owe them my life."],
+    ["I saved theirs", "I saved their life on a past posting, and they haven't forgotten it."],
+    ["Mentor", "They took me under their wing when I first came aboard."],
+    ["Friendly rivals", "We competed for the same posting, and the rivalry is still mostly friendly."],
+    ["Same homeworld", "We grew up on the same world and know each other's families."],
+    ["An unpaid favor", "I owe them a favor I haven't repaid yet."],
+    ["A shared secret", "We share a secret from a mission neither of us talks about."],
+    ["Off-duty friends", "We meet every week in the rec room for chess, cards, or music."],
+    ["Unfinished business", "They blame me for something that went wrong on a past mission."],
+  ];
+  const CONNECTION_TEXTS = new Set(CONNECTIONS.map((r) => r[1]));
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
   // Species advantages, each paired with a companion complication that comes with it.
   // [id, name, effect, roll, gives +2?, companion name, companion text]
@@ -2251,6 +2281,8 @@ tr.lvl-U td.target { color: var(--muted); }
 
   $("f-reasonpick").innerHTML = `<option value="">Top 10 reasons: quick pick…</option>` +
     REASONS.map(([label], i) => `<option value="${i}">${i + 1}. ${label}</option>`).join("");
+  $("f-connpick").innerHTML = `<option value="">Top 10 connections: quick pick…</option>` +
+    CONNECTIONS.map(([label], i) => `<option value="${i}">${i + 1}. ${label}</option>`).join("");
   $("f-speciesid").innerHTML = SPECIES.map(([id, n, adj]) => `<option value="${id}">${n}${Object.keys(adj).length ? "" : ""}</option>`).join("") + `<option value="custom">Custom species…</option>`;
   $("species-adj").innerHTML = ATTRS.map(([n]) => `<div class="adj"><span class="label">${n}</span>
     <span class="stepper"><button type="button" data-adj="${n}" data-d="-1" aria-label="Lower ${n} adjustment">−</button>
@@ -2584,6 +2616,11 @@ tr.lvl-U td.target { color: var(--muted); }
       const text = REASONS[+t.value][1], cur = ch.reason.trim();
       ch.reason = !cur || REASON_TEXTS.has(cur) ? text : `${cur} ${text}`;
       $("f-reason").value = ch.reason; t.value = ""; touch(); render();
+    }
+    else if (t.id === "f-connpick" && t.value !== "") {
+      const text = CONNECTIONS[+t.value][1], cur = ch.connection.trim();
+      ch.connection = !cur || CONNECTION_TEXTS.has(cur) ? text : `${cur} ${text}`;
+      $("f-connection").value = ch.connection; t.value = ""; touch(); render();
     }
     else if (t.id === "f-speciesid") {
       const had = ch.sadv.id && sAdvName();
