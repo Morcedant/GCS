@@ -116,6 +116,15 @@ button { font: inherit; cursor: pointer; }
 .attrs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
 .attr { border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: grid; gap: 6px; background: var(--well); }
 .attr .top { display: flex; justify-content: space-between; align-items: baseline; }
+.adj-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.adj { display: grid; gap: 6px; min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; background: var(--well); }
+.adj .stepper { align-items: center; }
+.adj .num { min-width: 3ch; text-align: center; color: var(--chrome); }
+.adj-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.adj-chip { font: .74rem/1 var(--mono); letter-spacing: .08em; padding: 5px 9px; border-radius: 999px; border: 1px solid currentColor; }
+.adj-chip.up { color: var(--good); }
+.adj-chip.down { color: var(--warn); }
+.attr .base { font: .72rem var(--mono); letter-spacing: .06em; color: var(--muted); }
 .attr .val { font: 400 2.1rem/1 var(--mono); color: var(--chrome); text-shadow: 0 0 14px rgba(92, 200, 255, .5); }
 .stepper { display: flex; gap: 6px; }
 .stepper button { width: 38px; height: 30px; border: 1px solid var(--chrome-dim); background: transparent; color: var(--chrome); border-radius: 999px; font: 600 1.05rem/1 var(--mono); }
@@ -306,8 +315,15 @@ tr.lvl-U td.target { color: var(--muted); }
         </section>
 
         <section class="step hud">
-          <div class="step-head"><span class="step-no">2</span><h2>Assign attributes</h2>
-            <p class="muted small">All five start at 10. Spend 5 more points, with a starting maximum of 13. You can't lower an attribute to gain points.</p></div>
+          <div class="step-head"><span class="step-no">2</span><h2>Species and attributes</h2>
+            <p class="muted small">All five attributes start at 10, then your species adjusts them. Spend 5 more points on top. The starting maximum is 13, plus any species bonus to that attribute. You can't lower an attribute to gain points.</p></div>
+          <div class="fields">
+            <div class="field"><label for="f-speciesid">Species</label><select id="f-speciesid"></select></div>
+            <div class="field" id="species-name-wrap" hidden><label for="f-species">Species name</label><input type="text" id="f-species" placeholder="e.g. Orion"></div>
+            <div class="field wide"><div class="trait-desc" id="species-desc"></div></div>
+            <div class="field wide" id="species-adj-wrap" hidden><span class="label">Custom adjustments (must total 0, each −2 to +2)</span>
+              <div class="adj-grid" id="species-adj"></div></div>
+          </div>
           <div class="pool"><span class="label">Points to spend</span><span id="pool-pips" class="pool"></span><span class="num" id="pool-left"></span></div>
           <div class="attrs" id="attrs"></div>
         </section>
@@ -326,11 +342,9 @@ tr.lvl-U td.target { color: var(--muted); }
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">4</span><h2>Describe your character</h2>
-            <p class="muted small">Species is descriptive until a package is approved; the species name alone grants no bonus.</p></div>
+            <p class="muted small">Any special species ability beyond its attribute adjustments needs GM approval.</p></div>
           <div class="fields">
             <div class="field"><label for="f-name">Name</label><input type="text" id="f-name" placeholder="Officer's name"></div>
-            <div class="field"><label for="f-species">Species</label><input type="text" id="f-species" list="species" placeholder="e.g. Human">
-              <datalist id="species"><option>Human</option><option>Vulcan</option><option>Andorian</option><option>Tellarite</option><option>Half-Vulcan</option><option>Caitian</option></datalist></div>
             <div class="field wide"><label for="f-reason">Why you serve in Starfleet</label><textarea id="f-reason" rows="2"></textarea></div>
             <div class="field wide"><label for="f-speciesnotes">Species ability (GM approval required)</label>
               <textarea id="f-speciesnotes" rows="2" placeholder="Agreed ability and its limitation, if any. Leave blank if none is approved."></textarea></div>
@@ -547,6 +561,19 @@ tr.lvl-U td.target { color: var(--muted); }
   const OFFICER_RANKS = ["Ensign", "Lieutenant (j.g.)", "Lieutenant", "Lieutenant Commander", "Commander", "Captain"];
   const ENLISTED_RANKS = ["Crewman 3rd Class", "Crewman 2nd Class", "Crewman 1st Class", "Crewman", "Yeoman 3rd Class", "Yeoman 2nd Class", "Yeoman 1st Class", "Yeoman"];
   const isEnlisted = (rank) => /^\s*(crewman|yeoman)\b/i.test(rank || "");
+  // Species adjust starting attributes; every set totals 0.
+  const SPECIES = [
+    ["human", "Human", {}, "Adaptable and widespread across Starfleet. No adjustments; spend your points wherever you like."],
+    ["vulcan", "Vulcan", { Body: 1, Will: 1, Presence: -2 }, "Physically stronger than humans and trained from childhood in logic and emotional control. Their reserve can read as cold to other species."],
+    ["andorian", "Andorian", { Agility: 1, Will: -1 }, "Blue-skinned, antennaed people from the icy moon Andoria. Quick and fiercely loyal, with a passionate, sometimes volatile temper."],
+    ["tellarite", "Tellarite", { Body: 1, Will: 1, Agility: -1, Presence: -1 }, "Stocky, stubborn, and fond of argument as a form of respect. Hard to move once they have made up their minds."],
+    ["aenar", "Aenar", { Will: 1, Intellect: 1, Body: -1, Agility: -1 }, "A blind, pale subspecies of Andorian with strong telepathic gifts and a pacifist culture. Hemmer served as the Enterprise's chief engineer. Telepathy needs a GM-approved package."],
+    ["illyrian", "Illyrian", { Body: 1, Presence: -1 }, "A people who reshape themselves through genetic modification. Federation law bars augmented officers, so Illyrians in Starfleet, like Una Chin-Riley, have faced suspicion and secrecy."],
+    ["halfvulcan", "Half-Vulcan", { Intellect: 1, Presence: -1 }, "Raised between two cultures, like Spock. Vulcan training and a human heritage that does not always stay quiet."],
+    ["lanthanite", "Lanthanite", { Intellect: 1, Agility: -1 }, "Extremely long-lived people who look human and have quietly lived on Earth for millennia, like Pelia. Centuries of experience; a body that dislikes hurrying."],
+    ["caitian", "Caitian", { Agility: 1, Body: -1 }, "A feline species with keen senses and quick reflexes; Lt. M'Ress served aboard the Enterprise in this era."],
+    ["aurelian", "Aurelian", { Agility: 1, Intellect: 1, Body: -2 }, "A winged, avian people known as scholars and historians, like Aleek-Om. Capable of flight, but light-boned and physically frail."],
+  ];
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
   const ADVANTAGES = [
     ["steady", "Steady Hands", "+2 to Medicine for delicate surgery or removing a dangerous embedded object. It does not improve diagnosis or all medical treatment.", "Medicine"],
@@ -602,7 +629,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   function blank() {
     return {
-      id: uid(), example: false, name: "", species: "", rank: "", dept: "Science", role: ROLE_SUGGESTIONS.Science, reason: "",
+      id: uid(), example: false, name: "", species: "Human", speciesId: "human", speciesAdj: {}, rank: "", dept: "Science", role: ROLE_SUGGESTIONS.Science, reason: "",
       speciesNotes: "", connection: "", notes: "", otherEquip: "",
       attrs: { Body: 10, Agility: 10, Intellect: 10, Presence: 10, Will: 10 },
       skills: Object.fromEntries(SKILLS.map(([n]) => [n, "U"])),
@@ -615,7 +642,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function example() {
     const c = blank();
     Object.assign(c, {
-      example: true, name: "T'Rena Okafor", species: "Human", rank: "Lieutenant", dept: "Science",
+      example: true, name: "T'Rena Okafor", species: "Human", speciesId: "human", rank: "Lieutenant", dept: "Science",
       role: ROLE_SUGGESTIONS.Science,
       reason: "Grew up on a survey colony and wanted to see what the long-range scans only hinted at.",
       connection: "Owes the chief engineer a favor for rebuilding her tricorder after Deneb.",
@@ -634,6 +661,13 @@ tr.lvl-U td.target { color: var(--muted); }
       adv: { ...b.adv, ...(c.adv || {}) }, comp: { ...b.comp, ...(c.comp || {}) },
       equipment: { ...b.equipment, ...(c.equipment || {}) }, play: { ...b.play, ...(c.play || {}) } };
     if (!out.id) out.id = uid();
+    if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
+    if (!SPECIES.some((x) => x[0] === c.speciesId) && c.speciesId !== "custom") {
+      // Older saves stored species as free text.
+      const hit = SPECIES.find((x) => x[1].toLowerCase() === String(c.species || "").trim().toLowerCase());
+      out.speciesId = hit ? hit[0] : c.species ? "custom" : "human";
+      if (hit) out.species = hit[1];
+    }
     for (const k of Object.keys(out.skills)) if (!LEVELS[out.skills[k]]) out.skills[k] = "U";
     for (const k of Object.keys(out.attrs)) out.attrs[k] = Math.max(1, Math.min(20, parseInt(out.attrs[k], 10) || BASE));
     if (!Array.isArray(out.play.log)) out.play.log = [];
@@ -650,7 +684,25 @@ tr.lvl-U td.target { color: var(--muted); }
   let ch = normalize(store.get(STORE_CURRENT, null) || example());
 
   // ---- rules ----
-  const spent = () => ATTRS.reduce((a, [n]) => a + Math.max(0, ch.attrs[n] - BASE), 0);
+  const speciesDef = () => SPECIES.find((x) => x[0] === ch.speciesId);
+  const adjOf = (c = ch) => (c.speciesId === "custom" ? c.speciesAdj : (SPECIES.find((x) => x[0] === c.speciesId) || [, , {}])[2]) || {};
+  const baseOf = (n, c = ch) => BASE + (adjOf(c)[n] || 0);
+  const maxOf = (n, c = ch) => MAX_START + Math.max(0, adjOf(c)[n] || 0);
+  const adjTotal = () => ATTRS.reduce((a, [n]) => a + (ch.speciesAdj[n] || 0), 0);
+  const spent = () => ATTRS.reduce((a, [n]) => a + Math.max(0, ch.attrs[n] - baseOf(n)), 0);
+  const adjText = (adj) => ATTRS.filter(([n]) => adj[n]).map(([n]) => `${n} ${signed(adj[n])}`).join(", ") || "No adjustments";
+  // Changing species moves each attribute by the difference in adjustments, keeping the points already spent.
+  function setSpecies(id) {
+    const before = adjOf();
+    ch.speciesId = id;
+    if (id !== "custom") ch.species = speciesDef()[1];
+    else if (SPECIES.some((x) => x[1] === ch.species)) ch.species = "";
+    const after = adjOf();
+    ATTRS.forEach(([n]) => {
+      const v = ch.attrs[n] - (before[n] || 0) + (after[n] || 0);
+      ch.attrs[n] = Math.max(baseOf(n), Math.min(maxOf(n), v));
+    });
+  }
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + LEVELS[ch.skills[name]].mod; };
   const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
   const count = (lvl) => Object.values(ch.skills).filter((v) => v === lvl).length;
@@ -668,14 +720,16 @@ tr.lvl-U td.target { color: var(--muted); }
 
   function checks() {
     const sp = spent(), nS = count("S"), nT = count("T");
-    const overMax = ATTRS.filter(([n]) => ch.attrs[n] > MAX_START).map(([n]) => n);
+    const overMax = ATTRS.filter(([n]) => ch.attrs[n] > maxOf(n) || ch.attrs[n] < baseOf(n)).map(([n]) => n);
+    const speciesOk = ch.speciesId !== "custom" || (ch.species.trim() && adjTotal() === 0);
     const advOk = ch.adv.id && (ch.adv.id !== "custom" || (ch.adv.name.trim() && ch.adv.text.trim())) &&
       (!(advDef()?.[4]) || ch.adv.detail.trim());
     const compOk = ch.comp.id && (ch.comp.id !== "custom" || (ch.comp.name.trim() && ch.comp.text.trim()));
     return [
       [!!ch.name.trim(), ch.name.trim() ? "Name entered" : "Enter a name"],
       [!!ch.dept, "Department chosen"],
-      [sp === POOL && !overMax.length, sp === POOL ? (overMax.length ? `Lower ${overMax.join(", ")} to 13 or less` : "5 attribute points spent") : `Attribute points spent: ${sp} of ${POOL}`],
+      [!!speciesOk, speciesOk ? `Species: ${ch.species || "—"}` : !ch.species.trim() ? "Name your custom species" : `Custom adjustments total ${signed(adjTotal())}; they must total 0`],
+      [sp === POOL && !overMax.length, sp === POOL ? (overMax.length ? `Check ${overMax.join(", ")}: outside the species range` : "5 attribute points spent") : `Attribute points spent: ${sp} of ${POOL}`],
       [nS === 1, nS === 1 ? "One Specialty" : `Specialty skills: ${nS} of 1`],
       [nT === 9, nT === 9 ? "Nine Trained skills" : `Trained skills: ${nT} of 9`],
       [!!advOk, advOk ? "Advantage chosen" : ch.adv.id ? "Finish the advantage details" : "Choose an advantage"],
@@ -693,9 +747,15 @@ tr.lvl-U td.target { color: var(--muted); }
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
   $("equip").innerHTML = EQUIPMENT.map(([k, n]) => `<label><input type="checkbox" id="eq-${k}" data-eq="${k}"> ${n}</label>`).join("");
 
+  $("f-speciesid").innerHTML = SPECIES.map(([id, n, adj]) => `<option value="${id}">${n}${Object.keys(adj).length ? "" : ""}</option>`).join("") + `<option value="custom">Custom species…</option>`;
+  $("species-adj").innerHTML = ATTRS.map(([n]) => `<div class="adj"><span class="label">${n}</span>
+    <span class="stepper"><button type="button" data-adj="${n}" data-d="-1" aria-label="Lower ${n} adjustment">−</button>
+    <span class="num" id="adj-${n}"></span>
+    <button type="button" data-adj="${n}" data-d="1" aria-label="Raise ${n} adjustment">+</button></span></div>`).join("");
   $("attrs").innerHTML = ATTRS.map(([n, use]) => `
     <div class="attr">
       <div class="top"><span class="label">${n}</span><span class="val num" id="av-${n}"></span></div>
+      <span class="base" id="ab-${n}"></span>
       <span class="small muted">${use}</span>
       <div class="stepper">
         <button type="button" id="am-${n}" data-attr="${n}" data-d="-1" aria-label="Lower ${n}">−</button>
@@ -733,6 +793,14 @@ tr.lvl-U td.target { color: var(--muted); }
     $("hdr-name").textContent = ch.name.trim() || "Unnamed officer";
     $("hdr-sub").textContent = [ch.rank, ch.species, ch.dept && ch.dept + " department"].filter(Boolean).join(" · ") || "—";
     $("example-banner").hidden = !ch.example;
+    $("f-speciesid").value = ch.speciesId;
+    const custom = ch.speciesId === "custom", sd = speciesDef();
+    $("species-name-wrap").hidden = !custom;
+    $("species-adj-wrap").hidden = !custom;
+    const adjNow = adjOf();
+    $("species-desc").innerHTML = (custom ? "Record a species agreed with your GM. Adjustments must total 0, from −2 to +2 each." : esc(sd[3])) +
+      `<div class="adj-chips">${ATTRS.filter(([n]) => adjNow[n]).map(([n]) => `<span class="adj-chip ${adjNow[n] > 0 ? "up" : "down"}">${n} ${signed(adjNow[n])}</span>`).join("") || `<span class="adj-chip">No adjustments</span>`}</div>`;
+    ATTRS.forEach(([n]) => { if ($("adj-" + n)) $("adj-" + n).textContent = signed(ch.speciesAdj[n] || 0); });
     $("f-role").placeholder = ROLE_SUGGESTIONS[ch.dept] || "";
     const ranks = ch.dept === "General Services" ? ENLISTED_RANKS : OFFICER_RANKS;
     if ($("ranks").dataset.for !== ch.dept) { $("ranks").innerHTML = ranks.map((r) => `<option>${r}</option>`).join(""); $("ranks").dataset.for = ch.dept; }
@@ -746,8 +814,10 @@ tr.lvl-U td.target { color: var(--muted); }
     $("pool-left").textContent = left >= 0 ? `${left} left` : `${-left} over`;
     ATTRS.forEach(([n]) => {
       $("av-" + n).textContent = ch.attrs[n];
-      $("am-" + n).disabled = ch.attrs[n] <= BASE;
-      $("ap-" + n).disabled = ch.attrs[n] >= MAX_START || left <= 0;
+      const adj = adjOf()[n] || 0;
+      $("ab-" + n).textContent = adj ? `Base ${baseOf(n)} (${ch.species || "species"} ${signed(adj)}) · max ${maxOf(n)}` : `Base 10 · max ${maxOf(n)}`;
+      $("am-" + n).disabled = ch.attrs[n] <= baseOf(n);
+      $("ap-" + n).disabled = ch.attrs[n] >= maxOf(n) || left <= 0;
     });
 
     // skills
@@ -817,7 +887,7 @@ tr.lvl-U td.target { color: var(--muted); }
       <div class="idgrid">
         <div><span class="label">Rank</span><b>${esc(ch.rank || "—")}</b></div>
         <div><span class="label">Department</span><b>${esc(ch.dept)}</b></div>
-        <div><span class="label">Species</span><b>${esc(ch.species || "—")}</b></div>
+        <div><span class="label">Species</span><b>${esc(ch.species || "—")}</b><span class="small muted">${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge()}</b></div>
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
@@ -859,7 +929,7 @@ tr.lvl-U td.target { color: var(--muted); }
     renderLog();
   }
 
-  function baseOf(name) {
+  function rollBase(name) {
     if (name === "Dodge") return dodge();
     if (ch.attrs[name] != null) return ch.attrs[name];
     return skillTarget(name);
@@ -873,7 +943,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
-    return { name, base: baseOf(name), total: parts.reduce((a, b) => a + b, 0) };
+    return { name, base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) };
   }
   function updateTarget() {
     const { name, base, total } = rollMods();
@@ -950,6 +1020,7 @@ tr.lvl-U td.target { color: var(--muted); }
   document.addEventListener("change", (e) => {
     const t = e.target;
     if (t.id === "f-dept") { setDept(t.value); touch(); render(); }
+    else if (t.id === "f-speciesid") { setSpecies(t.value); $("f-species").value = ch.species; touch(); render(); }
     else if (t.id === "f-rank" && isEnlisted(t.value) && ch.dept !== "General Services") {
       setDept("General Services"); $("f-dept").value = ch.dept; touch(); render();
       toast("Crewmen and yeomen serve in General Services, so the department was changed.");
@@ -977,8 +1048,17 @@ tr.lvl-U td.target { color: var(--muted); }
     const b = e.target.closest("button[data-attr]"); if (!b || b.disabled) return;
     const n = b.dataset.attr, d = +b.dataset.d;
     const next = ch.attrs[n] + d;
-    if (next < BASE || next > MAX_START || (d > 0 && spent() >= POOL)) return;
+    if (next < baseOf(n) || next > maxOf(n) || (d > 0 && spent() >= POOL)) return;
     ch.attrs[n] = next; touch(); render();
+  });
+  $("species-adj").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-adj]"); if (!b) return;
+    const n = b.dataset.adj, v = (ch.speciesAdj[n] || 0) + +b.dataset.d;
+    if (v < -2 || v > 2) return;
+    const before = adjOf()[n] || 0;
+    ch.speciesAdj = { ...ch.speciesAdj, [n]: v };
+    ch.attrs[n] = Math.max(baseOf(n), Math.min(maxOf(n), ch.attrs[n] - before + v));
+    touch(); render();
   });
   $("boxes").addEventListener("click", (e) => {
     const b = e.target.closest("[data-box]"); if (!b) return;

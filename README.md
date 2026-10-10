@@ -7,7 +7,7 @@ GCS Templates
 *USS Pelion* Players' Guide (3d6 roll-under, campaign year 2268). Open it in any browser; no build step.
 
 - **Look**: a Strange New Worlds-style bridge console with a delta insignia and accent color that follow the department.
-- **Create**: the guide's five steps: department (including General Services for enlisted Crewman and Yeoman ranks), attributes (10 base, +5 points, max 13),
+- **Create**: the guide's five steps: department (including General Services for enlisted Crewman and Yeoman ranks), species with net-zero attribute adjustments (Human, Vulcan, Andorian, Tellarite, Aenar, Illyrian, Half-Vulcan, Lanthanite, Caitian, Aurelian, or custom), attributes (10 + species adjustment, +5 points, max 13 + species bonus),
   one Specialty (+3) and nine Trained (+1) skills with Untrained at −4, advantage, complication,
   equipment and crew connection. A readiness checklist flags anything that breaks the creation rules.
 - **Duty station**: final skill targets with 3d6 odds, Dodge, injury track, Duty points, and a roller that
