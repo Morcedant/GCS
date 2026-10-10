@@ -34,17 +34,19 @@ Work through the five steps in order. The USS Pelion Officer Creator follows the
 
 Choose a department and describe what you contribute to the crew. Rank and assignment are agreed with the GM; rank gives no mechanical bonus.
 
-| Department | Division | Uniform | Typical contribution |
-|---|---|---|---|
-| Command | Command | Gold | Coordinate the crew and negotiate |
-| Helm | Command | Gold | Fly the ship and her shuttles |
-| Navigation | Command | Gold | Plot courses and fix position |
-| Science | Sciences | Blue | Read and explain anomalies |
-| Medical | Sciences | Blue | Diagnose, stabilize, and treat |
-| Engineering | Operations | Red | Keep machinery and power running |
-| Security | Operations | Red | Protect the away team and the ship |
-| Communications | Operations | Red | Establish contact and cut through interference |
-| General Services | General Services | Red | Keep records, carry orders, handle the ship's daily business |
+| Department | Division | Uniform | Typical contribution | Core skills |
+|---|---|---|---|---|
+| Command | Command | Gold | Coordinate the crew and negotiate | Leadership, Diplomacy, Psychology, Phasers |
+| Helm | Command | Gold | Fly the ship and her shuttles | Helm, Navigation, Sensors, Phasers |
+| Navigation | Command | Gold | Plot courses and fix position | Navigation, Sensors, Helm, Computers |
+| Science | Sciences | Blue | Read and explain anomalies | Sensors, Physical Sciences, Life Sciences, Computers |
+| Medical | Sciences | Blue | Diagnose, stabilize, and treat | Medicine, Life Sciences, Psychology, Sensors |
+| Engineering | Operations | Red | Keep machinery and power running | Engineering, Electronics, Computers, Physical Sciences |
+| Security | Operations | Red | Protect the away team and the ship | Phasers, Unarmed Combat, Athletics, Stealth |
+| Communications | Operations | Red | Establish contact and cut through interference | Communications, Electronics, Computers, Diplomacy |
+| General Services | General Services | Red | Keep records, carry orders, handle the ship's daily business | Computers, Electronics, Athletics, Communications |
+
+The creator marks your department's four **core skills** (in the table above) Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing department swaps the core skills you haven't changed.
 
 ### Officers and enlisted crew
 
