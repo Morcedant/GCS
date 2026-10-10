@@ -272,7 +272,7 @@ tr.lvl-U td.target { color: var(--muted); }
   /* Duty station: condition and roller first, the full sheet after them. */
   .sheet { display: flex; flex-direction: column; }
   .play-col { display: contents; }
-  #card-condition { order: 1; } #card-roll { order: 2; } #card-clocks { order: 3; } #card-ship { order: 4; } #sheet-main { order: 5; } #card-ref { order: 6; }
+  #card-condition { order: 1; } #card-roll { order: 2; } #card-phaser { order: 3; } #card-clocks { order: 4; } #card-ship { order: 5; } #sheet-main { order: 6; } #card-ref { order: 7; }
   /* Create: readiness rides along at the bottom instead of sitting above step 1. */
   #app[data-view="create"] .mobile-status, #app:not([data-view]) .mobile-status {
     display: flex; position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); z-index: 20;
@@ -314,6 +314,13 @@ tr.lvl-U td.target { color: var(--muted); }
   .btn { padding: 11px 16px; }
   .linkish { padding: 8px 6px; }
 }
+
+/* Phaser power */
+.ph-meter { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; height: 14px; }
+.ph-meter span { border-radius: 2px; background: rgba(92, 200, 255, .12); border: 1px solid var(--line); }
+.ph-meter span.on { background: var(--chrome); border-color: var(--chrome); }
+.ph-meter.low span.on { background: var(--warn); border-color: var(--warn); }
+#ph-fire .btn { font-size: .72rem; padding: 7px 10px; }
 
 /* Clocks and ship */
 .clock-add { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; }
@@ -1333,6 +1340,69 @@ tr.lvl-U td.target { color: var(--muted); }
 </tbody>
 </table>
 <p>Declare the setting before firing. Stun effects do not stack; a later failed resistance roll still incapacitates the target. Unarmed strikes normally mark one box. A grapple uses an opposed Unarmed Combat contest; winning restrains the target while the hold is maintained. Escape uses an action and a new contest.</p>
+<h2 id="g-phaser-power">Phaser power</h2>
+<p>Hand phasers run on power cells, and every shot draws on them. This is a campaign rule; the GM tracks opponents’ weapons loosely.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Phaser</th>
+<th>Power</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Type 1 hand phaser</td>
+<td>8</td>
+</tr>
+<tr class="even">
+<td>Type 2 phaser pistol</td>
+<td>16</td>
+</tr>
+<tr class="odd">
+<td>Phaser rifle</td>
+<td>30</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Setting</th>
+<th>Power per use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Stun</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>Heat or cut</td>
+<td>1 per use as a tool</td>
+</tr>
+<tr class="odd">
+<td>Kill</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td>Wide-beam stun (everyone in a small area; each target makes the stun roll)</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td>Disintegrate (when the GM allows it)</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Firing spends power whether the shot hits or misses.</strong> A Duty point reroll repeats the same shot and costs nothing extra.</li>
+<li><strong>A drained phaser won’t fire.</strong> Swap in a spare power cell (one action) to refill it, or recharge it fully in the ship’s armory between missions. Having packed a spare cell is a good use of a Duty point’s <em>small preparation</em>.</li>
+<li><strong>Overload.</strong> A phaser with at least 4 power left can be set to overload: it whines for a round and explodes at the end of the next round, as an explosion (1 box to everyone nearby, 2 at the centre). The phaser is destroyed.</li>
+</ul>
 <h1 id="g-medical-care">Medical care</h1>
 <p>Starfleet physicians in 2268 have advanced diagnostic scanners, potent pharmaceuticals, portable emergency equipment, and sophisticated sickbay facilities. Familiar injuries often respond quickly to treatment. Severe trauma, incompatible biology, missing supplies, and unidentified conditions still challenge an experienced doctor. The treatment values below are campaign rules inspired by the series, rather than numerical rules stated in canon.</p>
 <h2 id="g-diagnosis-and-stabilization">Diagnosis and stabilization</h2>
@@ -2352,6 +2422,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Damage:</strong> the weapon decides. Fists, clubs, knives, arrows and primitive firearms mark 1 box; heavy blades mark 2; a phaser or disruptor on kill marks 3 and leaves the target Dying (dead at the end of the scene unless stabilized); stun marks none. At three boxes, another hit from a 2-box or killing weapon is fatal.</p>
 <p><strong>Near misses:</strong> fail by 1–2 and the GM may offer success at a cost; never on a natural 17–18.</p>
 <p><strong>Clocks:</strong> 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).</p>
+<p><strong>Phaser power:</strong> Type 1 holds 8, Type 2 16, rifle 30. Stun 1, heat/cut 1, kill 2, wide-beam stun 3, disintegrate 4. Spare cell refills; overload needs 4+.</p>
 <p><strong>Ship:</strong> Shields (3) take hits first; then Hull (4) and a system (3 each: −2, −4, offline). Normal hit 1 box, heavy hit 2. Helm evades once per exchange; Engineering clears a box.</p>
 <p><strong>Medicine:</strong> one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery. Rest clears one box per full day, but not from three boxes: treatment must clear the first one.</p>
 <p><strong>Will:</strong> resist overwhelming fear or mental intrusion and maintain concentration. Ordinary danger needs no roll. Fear or distraction failure normally causes hesitation or −2 on your next action.</p>
@@ -2393,6 +2464,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <h3>Roll 3d6</h3>
           <div class="fields">
             <div class="field wide"><label for="r-skill">Skill or attribute</label><select id="r-skill"></select></div>
+            <div class="field wide" id="r-setting-wrap" hidden><label for="r-setting">Phaser setting (spends power)</label><select id="r-setting"></select></div>
             <div class="field"><label for="r-mod">Circumstances</label>
               <select id="r-mod">
                 <option value="2">Favorable +2</option>
@@ -2419,6 +2491,25 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="field"><span class="label">Roll log</span><ul class="log" id="r-log"></ul></div>
         </div>
 
+        <div class="card hud no-print" id="card-phaser">
+          <h3>Phaser power</h3>
+          <div class="fields">
+            <div class="field"><label for="ph-type">Phaser</label>
+              <select id="ph-type"><option value="">None carried</option><option value="type1">Type 1 hand phaser (8)</option><option value="type2">Type 2 phaser pistol (16)</option><option value="rifle">Phaser rifle (30)</option></select></div>
+            <div class="field"><span class="label">Spare power cells</span>
+              <div class="gm-duty"><button id="ph-spare-minus" aria-label="One fewer spare cell">−</button><b id="ph-spares">0</b><button id="ph-spare-plus" aria-label="One more spare cell">+</button></div></div>
+          </div>
+          <div id="ph-body">
+            <div class="ph-meter" id="ph-meter" aria-hidden="true"></div>
+            <p class="small"><b id="ph-power"></b> <span class="muted" id="ph-note"></span></p>
+            <div class="btn-row" id="ph-fire"></div>
+            <div class="btn-row">
+              <button class="btn" id="ph-swap">Swap in a spare cell</button>
+              <button class="btn" id="ph-recharge">Recharge aboard ship</button>
+              <button class="linkish danger" id="ph-overload">Set to overload</button>
+            </div>
+          </div>
+        </div>
         <div class="card hud no-print" id="card-clocks">
           <h3>Clocks</h3>
           <p class="small muted">Danger clocks fill on failures and time; progress clocks fill on successes. Tap a segment to fill up to it.</p>
@@ -2445,6 +2536,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <dt>Damage</dt><dd>Fists, clubs, knives, arrows: 1 box. Heavy blades: 2. Phaser or disruptor on kill: 3 boxes and Dying. Stun: Body −2 roll, no box.</dd>
             <dt>Dying</dt><dd>Dies at the end of the scene unless stabilized (one action, Medicine roll, medical kit). At 3 boxes, a hit from a 2-box or killing weapon is fatal.</dd>
             <dt>Phasers</dt><dd>Stun: target rolls Body −2, fail = out for the scene, success = −2 next action. Kill: three boxes and Dying.</dd>
+            <dt>Phaser power</dt><dd>Type 1: 8, Type 2: 16, rifle: 30. Stun 1, heat 1, kill 2, wide-beam 3, disintegrate 4. A spare cell refills it.</dd>
             <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). Sickbay +2, clears 2 (3 on margin 5+).</dd>
             <dt>Rest</dt><dd>One box per full day of rest (light duty only). Not from 3 boxes: treatment must clear the first.</dd>
             <dt>Duty points</dt><dd>Reroll (keep second), reduce an injury by one box, or establish a small preparation.</dd>
@@ -2828,6 +2920,11 @@ tr.lvl-U td.target { color: var(--muted); }
     if (out.portraitShape !== "portrait") out.portraitShape = "token";
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     if (!Array.isArray(out.advances)) out.advances = [];
+    // Phaser power: older characters with a hand phaser start with a full Type 1.
+    const ph = c.play && c.play.phaser;
+    out.play.phaser = ph && typeof ph === "object" && (ph.type === "" || ["type1", "type2", "rifle"].includes(ph.type))
+      ? { type: ph.type, power: Math.max(0, Math.min(ph.type === "type2" ? 16 : ph.type === "rifle" ? 30 : 8, parseInt(ph.power, 10) || 0)), spares: Math.max(0, parseInt(ph.spares, 10) || 0) }
+      : (out.equipment.phaser ? { type: "type1", power: 8, spares: 0 } : { type: "", power: 0, spares: 0 });
     out.advances = out.advances.filter((a) => a && SKILLS.some(([n]) => n === a.skill) && ["UT", "TS"].includes(a.from + a.to));
     if (out.sadv.id && out.adv.id) out.adv.id = ""; // a species advantage replaces the regular one
     // Half-Vulcan was removed as a preset; keep such characters valid as a custom species.
@@ -3104,6 +3201,7 @@ tr.lvl-U td.target { color: var(--muted); }
     renderRoster();
     renderAdvance();
     renderSheet();
+    renderPhaser();
     const em = EMBLEMS[division()];
     document.querySelectorAll("[data-emblem]").forEach((e) => { e.setAttribute("d", em.d); e.classList.toggle("stroke", em.stroke); });
     save();
@@ -3217,6 +3315,12 @@ tr.lvl-U td.target { color: var(--muted); }
 
   let last = null;
   function doRoll(isReroll) {
+    let phaserNote = "";
+    if (!isReroll && !$("r-setting-wrap").hidden && $("r-setting").value !== "ship") {
+      const set = spendPhaser($("r-setting").value);
+      if (!set) { toast("Not enough phaser power for that setting. Swap in a spare cell or pick a lower setting.", true); return; }
+      phaserNote = `${set[1]}: ${set[2]} power used, ${phaserOf().power} left.`;
+    }
     const { name, base, total } = rollMods();
     const t = base + total;
     const dice = [1, 2, 3].map(() => 1 + Math.floor(Math.random() * 6));
@@ -3224,12 +3328,13 @@ tr.lvl-U td.target { color: var(--muted); }
     const auto = sum <= 4 ? "auto-s" : sum >= 17 ? "auto-f" : "";
     const ok = auto === "auto-s" || (auto !== "auto-f" && sum <= t);
     const margin = t - sum;
-    last = { name, t, dice, sum, ok, margin, auto, rerolled: !!isReroll };
+    last = { name, t, dice, sum, ok, margin, auto, rerolled: !!isReroll, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
     ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
     ch.play.log = ch.play.log.slice(0, 12);
     if ($("r-stun").checked) { ch.play.stunned = false; $("f-stunned").checked = false; }
     showResult();
     renderSheet();
+    renderPhaser();
     save();
   }
   function showResult() {
@@ -3243,6 +3348,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (r.ok && r.margin >= 5) note += " Margin 5+: assistance gives +2; medical care clears an extra box.";
     if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
     if (!r.ok && !r.auto && r.margin >= -2) note += ` Missed by ${-r.margin}: the GM may offer success at a cost.`;
+    if (r.phaserNote) note += ` Phaser ${r.phaserNote.charAt(0).toLowerCase()}${r.phaserNote.slice(1)}`;
     el.innerHTML = `
       <div class="dice">${r.dice.map((d) => `<span class="die rolling">${d}</span>`).join("")}
         <span class="num" style="font-size:1.3rem">= ${r.sum}</span><span class="muted">vs ${r.t}</span></div>
@@ -3339,7 +3445,11 @@ tr.lvl-U td.target { color: var(--muted); }
       ch.comp.trigger = !cur || presets.has(cur) ? text : `${cur}; ${text.charAt(0).toLowerCase()}${text.slice(1)}`;
       $("f-comptrigger").value = ch.comp.trigger; t.value = ""; touch(); render();
     }
-    else if (t.dataset.eq) { ch.equipment[t.dataset.eq] = t.checked; touch(); render(); }
+    else if (t.dataset.eq) {
+      ch.equipment[t.dataset.eq] = t.checked;
+      if (t.dataset.eq === "phaser") ch.play.phaser = t.checked ? (phaserOf().type ? phaserOf() : { type: "type1", power: 8, spares: phaserOf().spares }) : { type: "", power: 0, spares: phaserOf().spares };
+      touch(); render();
+    }
     else if (t.dataset.skill) {
       const n = t.dataset.skill, v = t.value;
       // With a single top skill, picking a new one replaces the old; advanced characters choose freely within their limits.
@@ -3349,7 +3459,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
-    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value); updateTarget(); }
+    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value); updateTarget(); renderPhaser(); }
     else if (["r-mod", "r-assist", "r-adv", "r-phys"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
@@ -3378,6 +3488,63 @@ tr.lvl-U td.target { color: var(--muted); }
   const STORE_CLOCKS = "pelion.clocks.v1", STORE_SHIP = "pelion.ship.v1";
   let clocks = store.get(STORE_CLOCKS, []);
   if (!Array.isArray(clocks)) clocks = [];
+  // Phaser power: capacity per weapon, cost per setting (campaign rule).
+  const PHASERS = { type1: ["Type 1 hand phaser", 8], type2: ["Type 2 phaser pistol", 16], rifle: ["Phaser rifle", 30] };
+  const PHASER_SETTINGS = [["stun", "Stun", 1], ["heat", "Heat or cut", 1], ["kill", "Kill", 2], ["wide", "Wide-beam stun", 3], ["disintegrate", "Disintegrate", 4]];
+  const phaserOf = () => ch.play.phaser;
+  function renderPhaser() {
+    const ph = phaserOf(), def = PHASERS[ph.type];
+    $("ph-type").value = ph.type;
+    $("ph-spares").textContent = ph.spares;
+    $("ph-body").hidden = !def;
+    $("ph-spare-minus").disabled = ph.spares <= 0;
+    if (def) {
+      const [label, max] = def, low = ph.power <= Math.max(2, Math.floor(max / 4));
+      $("ph-meter").className = "ph-meter" + (low ? " low" : "");
+      $("ph-meter").innerHTML = Array.from({ length: max }, (_, i) => `<span class="${i < ph.power ? "on" : ""}"></span>`).join("");
+      $("ph-power").textContent = `${ph.power} of ${max} power`;
+      $("ph-note").textContent = ph.power === 0 ? "Drained: it won't fire until recharged or given a spare cell." : low ? "Running low." : label;
+      $("ph-fire").innerHTML = PHASER_SETTINGS.map(([id, n, cost]) => `<button class="btn" data-fire="${id}" ${ph.power < cost ? "disabled" : ""}>${n} (${cost})</button>`).join("");
+      $("ph-swap").disabled = ph.spares <= 0 || ph.power === max;
+      $("ph-recharge").disabled = ph.power === max;
+      $("ph-overload").disabled = ph.power < 4;
+    }
+    // The roller offers the setting when rolling Phasers with a hand weapon.
+    const show = !!def && $("r-skill").value === "Phasers";
+    $("r-setting-wrap").hidden = !show;
+    if (show) {
+      const prev = $("r-setting").value || "stun";
+      $("r-setting").innerHTML = PHASER_SETTINGS.map(([id, n, cost]) => `<option value="${id}" ${ph.power < cost ? "disabled" : ""}>${n} (${cost} power)</option>`).join("") + `<option value="ship">Ship's phasers (no hand power)</option>`;
+      $("r-setting").value = PHASER_SETTINGS.some(([id, , cost]) => id === prev && ph.power >= cost) || prev === "ship" ? prev : "ship";
+    }
+  }
+  function spendPhaser(id) {
+    const ph = phaserOf(), set = PHASER_SETTINGS.find((x) => x[0] === id);
+    if (!set || !PHASERS[ph.type] || ph.power < set[2]) return null;
+    ph.power -= set[2];
+    return set;
+  }
+  $("ph-type").addEventListener("change", (e) => {
+    const t = e.target.value;
+    ch.play.phaser = { ...phaserOf(), type: t, power: PHASERS[t] ? PHASERS[t][1] : 0 };
+    ch.equipment.phaser = !!PHASERS[t]; touch(); render();
+  });
+  $("ph-fire").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-fire]"); if (!b) return;
+    const set = spendPhaser(b.dataset.fire);
+    if (set) { render(); toast(`${set[1]}: ${set[2]} power used, ${phaserOf().power} left.`); }
+  });
+  $("ph-spare-plus").onclick = () => { phaserOf().spares++; render(); };
+  $("ph-spare-minus").onclick = () => { const ph = phaserOf(); if (ph.spares > 0) { ph.spares--; render(); } };
+  $("ph-swap").onclick = () => { const ph = phaserOf(); if (ph.spares > 0) { ph.spares--; ph.power = PHASERS[ph.type][1]; render(); toast("Fresh power cell in: full power."); } };
+  $("ph-recharge").onclick = () => { const ph = phaserOf(); ph.power = PHASERS[ph.type][1]; render(); toast("Recharged in the ship's armory: full power."); };
+  let overloadArmed = false;
+  $("ph-overload").onclick = () => {
+    if (!overloadArmed) { overloadArmed = true; $("ph-overload").textContent = "Tap again: it explodes at the end of next round"; setTimeout(() => { overloadArmed = false; $("ph-overload").textContent = "Set to overload"; }, 4000); return; }
+    overloadArmed = false; phaserOf().power = 0; render(); $("ph-overload").textContent = "Set to overload";
+    toast("Overloading! It explodes at the end of the next round: 1 box to everyone nearby, 2 at the centre.");
+  };
+
   const SHIP_TRACKS = [["Shields", 3], ["Hull", 4], ["Weapons", 3], ["Engines", 3], ["Sensors", 3], ["Communications", 3], ["Transporters", 3], ["Life support", 3]];
   let ship = store.get(STORE_SHIP, {});
   if (!ship || typeof ship !== "object") ship = {};
@@ -3513,6 +3680,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b>${c.attrs[n]}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div></div>
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a Duty point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a Duty point">+</button><span class="small muted">Duty</span></span></div>
+        ${PHASERS[c.play.phaser.type] ? `<div class="small muted">${PHASERS[c.play.phaser.type][0]}: <b style="color:var(--chrome)">${c.play.phaser.power}/${PHASERS[c.play.phaser.type][1]}</b> power${c.play.phaser.spares ? `, ${c.play.phaser.spares} spare cell${c.play.phaser.spares > 1 ? "s" : ""}` : ""}</div>` : ""}
         <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
         <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${x.lab})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
         <div class="gm-traits"><span><strong>Advantage:</strong> ${esc(k.adv || "—")}</span>

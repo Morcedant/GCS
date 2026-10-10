@@ -343,6 +343,28 @@ To take someone down without hurting them, use a phaser on stun, a grapple, or t
 
 Declare the setting before firing. Stun effects do not stack; a later failed resistance roll still incapacitates the target. Unarmed strikes normally mark one box. A grapple uses an opposed Unarmed Combat contest; winning restrains the target while the hold is maintained. Escape uses an action and a new contest.
 
+## Phaser power
+
+Hand phasers run on power cells, and every shot draws on them. This is a campaign rule; the GM tracks opponents' weapons loosely.
+
+| Phaser | Power |
+|---|---|
+| Type 1 hand phaser | 8 |
+| Type 2 phaser pistol | 16 |
+| Phaser rifle | 30 |
+
+| Setting | Power per use |
+|---|---|
+| Stun | 1 |
+| Heat or cut | 1 per use as a tool |
+| Kill | 2 |
+| Wide-beam stun (everyone in a small area; each target makes the stun roll) | 3 |
+| Disintegrate (when the GM allows it) | 4 |
+
+- **Firing spends power whether the shot hits or misses.** A Duty point reroll repeats the same shot and costs nothing extra.
+- **A drained phaser won't fire.** Swap in a spare power cell (one action) to refill it, or recharge it fully in the ship's armory between missions. Having packed a spare cell is a good use of a Duty point's *small preparation*.
+- **Overload.** A phaser with at least 4 power left can be set to overload: it whines for a round and explodes at the end of the next round, as an explosion (1 box to everyone nearby, 2 at the centre). The phaser is destroyed.
+
 # Medical care
 
 Starfleet physicians in 2268 have advanced diagnostic scanners, potent pharmaceuticals, portable emergency equipment, and sophisticated sickbay facilities. Familiar injuries often respond quickly to treatment. Severe trauma, incompatible biology, missing supplies, and unidentified conditions still challenge an experienced doctor. The treatment values below are campaign rules inspired by the series, rather than numerical rules stated in canon.
@@ -756,6 +778,8 @@ Will protects your resolve; Presence influences others. Leadership and Diplomacy
 **Near misses:** fail by 1–2 and the GM may offer success at a cost; never on a natural 17–18.
 
 **Clocks:** 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).
+
+**Phaser power:** Type 1 holds 8, Type 2 16, rifle 30. Stun 1, heat/cut 1, kill 2, wide-beam stun 3, disintegrate 4. Spare cell refills; overload needs 4+.
 
 **Ship:** Shields (3) take hits first; then Hull (4) and a system (3 each: −2, −4, offline). Normal hit 1 box, heavy hit 2. Helm evades once per exchange; Engineering clears a box.
 
