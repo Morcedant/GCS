@@ -167,6 +167,8 @@ tr.lvl-U td.target { color: var(--muted); }
 .pair .trait-desc { display: grid; gap: 4px; }
 .trait-desc.comp { border-left-color: var(--warn); }
 .checks { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.checks label.injured { color: var(--warn); }
+.checks label.applied { color: var(--bad); font-weight: 600; }
 .checks label { text-transform: none; letter-spacing: 0; font: 400 .92rem/1.4 var(--body); color: var(--fg); display: flex; gap: 8px; align-items: center; }
 
 /* Side console */
@@ -1609,7 +1611,7 @@ tr.lvl-U td.target { color: var(--muted); }
           </div>
           <div class="checks">
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
-            <label><input type="checkbox" id="r-phys"> Physical action (injury penalty)</label>
+            <label id="r-phys-wrap"><input type="checkbox" id="r-phys"> <span id="r-phys-label">Physical action (injury penalty)</span></label>
             <label><input type="checkbox" id="r-stun"> Stun penalty −2</label>
           </div>
           <div class="btn-row"><button class="btn primary" id="r-roll">Roll</button>
@@ -2204,7 +2206,15 @@ tr.lvl-U td.target { color: var(--muted); }
     if ($("r-stun").checked) parts.push(-2);
     return { name, base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) };
   }
+  function updateInjuryToggle() {
+    const pen = INJURY[ch.play.injury][2];
+    const label = pen ? `Physical action: injury ${signed(pen)}` : "Physical action (no injury penalty now)";
+    $("r-phys-label").textContent = label;
+    $("r-phys-wrap").classList.toggle("injured", !!pen);
+    $("r-phys-wrap").classList.toggle("applied", !!pen && $("r-phys").checked);
+  }
   function updateTarget() {
+    updateInjuryToggle();
     const { name, base, total } = rollMods();
     const t = base + total;
     const incap = ch.play.injury >= 3;
@@ -2373,6 +2383,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const b = e.target.closest("[data-box]"); if (!b) return;
     const i = +b.dataset.box;
     ch.play.injury = ch.play.injury === i ? i - 1 : i;
+    // A new injury applies straight away to physical rolls; other rolls stay unticked unless the player ticks them.
+    $("r-phys").checked = PHYSICAL.has($("r-skill").value);
     render();
   });
   $("duty-minus").onclick = () => { if (ch.play.duty > 0) { ch.play.duty--; render(); } };
