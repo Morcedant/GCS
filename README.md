@@ -22,3 +22,12 @@ Open `uss-pelion/index.html` directly in a browser (not the hosted artifact, whi
 build or load your officer, then press **Save as PDF** in the header (or Ctrl/Cmd+P) and choose
 "Save as PDF" as the destination. The printout is a light, ink-friendly version of the character sheet
 with blank injury and Duty point tracks and the quick reference.
+
+## Players' Guide
+
+`uss-pelion/players-guide.md` is the revised Players' Guide: the original rules plus General Services,
+species attribute adjustments, and species advantages with companion complications. It appears in the
+creator's **Players' Guide** tab and as `uss-pelion/USS_Pelion_Players_Guide.docx`.
+
+After editing the Markdown, rebuild both with `python3 tools/build-guide.py --docx`
+(needs pandoc; python-docx adds table borders to the Word file).

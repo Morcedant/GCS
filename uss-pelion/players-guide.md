@@ -1,0 +1,484 @@
+---
+title: "USS Pelion Players' Guide"
+subtitle: "Campaign year 2268 · Revised edition with species and General Services"
+---
+
+You are a member of Starfleet aboard USS Pelion, NCC-1750. Explore unfamiliar worlds, investigate strange phenomena, protect your crewmates, and make difficult decisions when orders and circumstances collide. Your training matters, and the crew succeeds by working together.
+
+This guide presents the Pelion rules in a form you can use at the table. It combines concrete skills and 3d6 roll-under resolution with a small pool of Duty points.
+
+## The rule to remember
+
+Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes your training and attribute. Do not add the attribute again.
+
+*Example:* Sensors 13, with a −2 penalty for interference, gives a target of 11. A roll of 9 succeeds by 2. A roll of 12 fails by 1.
+
+## What this edition adds
+
+This revision keeps every rule from the original guide and adds four campaign rules:
+
+- **General Services**, a division for enlisted crew holding Crewman and Yeoman ranks.
+- **Species attribute adjustments**, which shift starting attributes and always total zero.
+- **Species advantages**, which can replace your regular advantage and always come with a companion complication.
+- **Custom species**, built with the GM under the same limits.
+
+## Guide scope
+
+Personal actions and away-team encounters are covered here. Starship stations use the same skills. Species abilities beyond the adjustments and species advantages in this guide still require GM approval. Numerical ship combat is outside this guide's scope.
+
+# Create your character
+
+Work through the five steps in order. The USS Pelion Officer Creator follows the same steps and checks the rules for you.
+
+## Step 1: Choose your role
+
+Choose a department and describe what you contribute to the crew. Rank and assignment are agreed with the GM; rank gives no mechanical bonus.
+
+| Department | Division | Uniform | Typical contribution |
+|---|---|---|---|
+| Command | Command | Gold | Coordinate the crew and negotiate |
+| Helm | Command | Gold | Fly the ship and her shuttles |
+| Navigation | Command | Gold | Plot courses and fix position |
+| Science | Sciences | Blue | Read and explain anomalies |
+| Medical | Sciences | Blue | Diagnose, stabilize, and treat |
+| Engineering | Operations | Red | Keep machinery and power running |
+| Security | Operations | Red | Protect the away team and the ship |
+| Communications | Operations | Red | Establish contact and cut through interference |
+| General Services | General Services | Red | Keep records, carry orders, handle the ship's daily business |
+
+### Officers and enlisted crew
+
+Officers hold ranks from Ensign through Captain. **General Services** is the division for enlisted crew: Crewman 3rd, 2nd, and 1st Class, Crewman, and Yeoman 3rd, 2nd, and 1st Class, and Yeoman. A character with a Crewman or Yeoman rank belongs to General Services. Enlisted crew use exactly the same creation rules as officers.
+
+## Step 2: Choose a species and assign attributes
+
+### Attributes
+
+| Attribute | Used for |
+|---|---|
+| Body | Strength, endurance, resisting injury |
+| Agility | Coordination, reflexes, movement |
+| Intellect | Reasoning, observation, technical understanding |
+| Presence | Leadership, persuasion, social influence |
+| Will | Resolve, concentration, resisting fear and mental intrusion |
+
+### Species adjustments
+
+Every attribute starts at 10. Your species then adjusts some of them; the result is your **species base**. Each species' adjustments total zero, so no species starts ahead of another.
+
+| Species | Adjustments |
+|---|---|
+| Human | None |
+| Vulcan | Body +1, Will +1, Presence −2 |
+| Andorian | Agility +1, Will −1 |
+| Tellarite | Body +1, Will +1, Agility −1, Presence −1 |
+| Aenar | Will +1, Intellect +1, Body −1, Agility −1 |
+| Illyrian | Body +1, Presence −1 |
+| Half-Vulcan | Intellect +1, Presence −1 |
+| Lanthanite | Intellect +1, Agility −1 |
+| Caitian | Agility +1, Body −1 |
+| Aurelian | Agility +1, Intellect +1, Body −2 |
+
+### Spending points
+
+After applying your species, distribute **five additional points** among the attributes.
+
+- The starting maximum is **13**, plus any species bonus to that attribute. A Vulcan can start with Body or Will at 14.
+- You cannot lower an attribute below its species base to gain points.
+
+### Species descriptions
+
+**Human.** Adaptable and widespread across Starfleet. No adjustments; spend your points wherever you like.
+
+**Vulcan.** Physically stronger than humans and trained from childhood in logic and emotional control. Their reserve can read as cold to other species.
+
+**Andorian.** Blue-skinned, antennaed people from the icy moon Andoria. Quick and fiercely loyal, with a passionate, sometimes volatile temper.
+
+**Tellarite.** Stocky, stubborn, and fond of argument as a form of respect. Hard to move once they have made up their minds.
+
+**Aenar.** A blind, pale subspecies of Andorian with strong telepathic gifts and a pacifist culture. Hemmer served as the Enterprise's chief engineer.
+
+**Illyrian.** A people who reshape themselves through genetic modification. Federation law bars augmented officers, so Illyrians in Starfleet, like Una Chin-Riley, have faced suspicion and secrecy.
+
+**Half-Vulcan.** Raised between two cultures, like Spock. Vulcan training and a human heritage that does not always stay quiet.
+
+**Lanthanite.** Extremely long-lived people who look human and have quietly lived on Earth for millennia, like Pelia. Centuries of experience; a body that dislikes hurrying.
+
+**Caitian.** A feline species with keen senses and quick reflexes. Lt. M'Ress served aboard the Enterprise in this era.
+
+**Aurelian.** A winged, avian people known as scholars and historians, like Aleek-Om. Capable of flight, but light-boned and physically frail.
+
+### Custom species
+
+Agree on a species with the GM and give it adjustments from −2 to +2 per attribute that total zero. The normal starting maximum and species base rules apply.
+
+## Step 3: Choose trained skills
+
+Choose ten different skills: one **Specialty** at its governing attribute +3 and nine **Trained** skills at attribute +1. All other skills are **Untrained** at attribute −4 when an attempt is plausible. Use these same three training levels for every skill. Each skill has its own final target number; do not add the attribute again when rolling.
+
+## Step 4: Describe your character
+
+Choose your name, rank, department, and a short reason you serve in Starfleet. Then choose **one advantage** and **one complication**.
+
+- **Advantage.** Choose either a general advantage or one of your species' advantages. A species advantage replaces the general advantage and always brings its companion complication.
+- **Complication.** Choose one complication. You keep it even if you take a species advantage, so a character with a species advantage has two complications.
+
+An advantage gives +2 to one narrowly defined kind of task when the GM agrees it applies. It cannot improve every use of a broad skill. A complication creates choices and problems; it is not a permanent penalty.
+
+*Examples:* Steady Hands gives +2 to delicate medical procedures. Subspace Specialist gives +2 when analyzing subspace phenomena. Complications might be Cannot Leave a Mystery Alone, Distrusts Command Decisions, or Protects Others at Personal Risk. Define their triggers with the GM.
+
+## Step 5: Prepare for duty
+
+Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.
+
+## Example science officer
+
+Human. Body 10, Agility 10, Intellect 13, Presence 11, Will 11.
+
+- **Specialty:** Sensors 16.
+- **Trained:** Physical Sciences 14, Computers 14, Electronics 14, Life Sciences 14, Medicine 14, Engineering 14, Communications 14, Diplomacy 12, Phasers 11.
+- **Dodge:** Athletics is Untrained, so Dodge is 8.
+- **Advantage:** Subspace Specialist. **Complication:** Cannot Leave a Mystery Alone.
+
+# Skills and equipment
+
+Choose the skill that matches your method. Sensors finds the readings; Physical Sciences interprets the physics. Engineering diagnoses machinery; Electronics repairs its control circuitry. The GM chooses one primary skill for each distinct task.
+
+| Skill | Attribute | Typical use |
+|---|---|---|
+| Leadership | Presence | Coordinate people and give clear direction |
+| Diplomacy | Presence | Negotiate and resolve disputes |
+| Psychology | Intellect | Interpret behavior and emotional state |
+| Sensors | Intellect | Operate ship sensors or a tricorder |
+| Physical Sciences | Intellect | Analyze energy, matter, space, and geology |
+| Life Sciences | Intellect | Analyze organisms and ecosystems |
+| Medicine | Intellect | Diagnose, treat, and perform medical procedures |
+| Engineering | Intellect | Diagnose and repair mechanical and power systems |
+| Electronics | Intellect | Repair circuitry, controls, and electronic devices |
+| Computers | Intellect | Retrieve data, program, and examine software |
+| Helm | Agility | Pilot a starship or shuttle |
+| Navigation | Intellect | Plot courses and determine position |
+| Communications | Intellect | Operate signals and overcome interference |
+| Phasers | Agility | Use hand phasers or ship weapons |
+| Unarmed Combat | Agility | Strike, grapple, or restrain |
+| Athletics | Body | Climb, swim, jump, and exert yourself |
+| Stealth | Agility | Move quietly and avoid notice |
+| Survival | Intellect | Find shelter and manage wilderness hazards |
+
+## Untrained actions
+
+A plausible untrained attempt uses attribute −4. Specialized procedures such as surgery or warp-core repair require relevant training or direct guidance. Guidance permits an attempt only when the GM finds it credible; it does not automatically grant the expert's skill.
+
+## Standard equipment
+
+A communicator provides contact when range and interference permit. A tricorder gathers readings using Sensors; interpreting unusual results may need a science skill. An engineering kit or medical kit enables appropriate work. Ordinary equipment grants no blanket bonus; exceptional tools or preparation may justify +2. Missing essential tools can make a task impossible.
+
+Transporters, computers, and scanners have limits set by the situation. State the information or destination you need. A successful scan reveals useful evidence, not necessarily the complete explanation.
+
+# Actions and teamwork
+
+## When to roll
+
+Routine work succeeds automatically when you have appropriate training, equipment, and time. Roll when failure could change the situation. Before rolling, establish your goal, the relevant skill, any modifiers, and what is at stake.
+
+| Circumstances | Modifier |
+|---|---|
+| Favorable conditions or excellent preparation | +2 |
+| Ordinary challenge under pressure | 0 |
+| Difficult | −2 |
+| Very difficult | −4 |
+| Extreme | −6 |
+
+Apply the main circumstance modifier once. Add separately specified effects such as assistance or injury when they apply. The GM avoids charging twice for the same obstacle.
+
+## Results and margins
+
+Add the three dice. A total at or below the adjusted skill succeeds. Margin of success equals the adjusted skill minus the roll. A larger margin may mean better information, more precise work, or a stronger position; agree any special threshold before rolling.
+
+A natural 3 or 4 always succeeds. A natural 17 or 18 always fails. These are automatic outcomes, not a separate critical-hit system. An impossible action receives no roll.
+
+In an opposed contest, each side rolls its relevant skill. One success beats one failure. If both succeed, the larger success margin wins. A tie, or two failures, favors the defender or preserves the situation. For an automatic success above its target, count its contest margin as zero.
+
+## Assistance
+
+One qualified assistant can roll a relevant skill before the lead character rolls. Success grants +1 to the lead roll; success by 5 or more grants +2. Failure gives no bonus. An 18 introduces a complication described by the GM. Additional crew members can perform other tasks but cannot stack assistance bonuses on the same roll.
+
+*Example:* Engineering detects that an alien device is building an overload. A science officer assists with Physical Sciences 14 and rolls 9, succeeding by 5. The engineer receives +2 to the repair attempt. Each officer contributes a different kind of expertise.
+
+## Failure and another attempt
+
+Failure changes the situation: time passes, information remains incomplete, resources are consumed, or danger increases. Do not repeat an unchanged roll until it succeeds. A new approach, new evidence, better tools, or additional time may justify another attempt.
+
+## Investigation and social scenes
+
+Ask concrete questions and explain your approach. Evidence may require several different tasks. Diplomacy can secure cooperation or concessions, while Psychology offers insight into behavior. A successful roll does not force someone to abandon a core belief or provide information they do not possess.
+
+# Personal combat
+
+## Turn order and actions
+
+Act in descending Agility order. Players choose the order of tied crew members; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as attacking, using equipment, helping, or attempting a task. The GM judges movement by the scene; there is no fixed grid scale.
+
+## Attacking and defending
+
+Roll Phasers for a ranged attack or Unarmed Combat for a melee attack. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty. Untrained Athletics adds nothing. Use the training level, not the final Athletics score. Each target gets one Dodge attempt per round, refreshed at the start of the round. A successful Dodge cancels the hit. Apply physical injury penalties to Dodge.
+
+Solid cover blocks a shot. Partial cover imposes −2 on the attack. Other difficult conditions use the normal modifier scale. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage under these rules.
+
+## Injury
+
+| Boxes marked | Condition | Effect |
+|---|---|---|
+| 0 | Uninjured | No injury penalty |
+| 1 | Wounded | −1 to physical actions |
+| 2 | Seriously wounded | −2 to physical actions |
+| 3 | Incapacitated | Unable to act; medical aid needed |
+
+A normal damaging hit marks one box. A powerful attack can mark two. Injury penalties replace each other rather than stacking. They apply to movement, attacks, Dodge, and other tasks the injury physically hinders. The GM announces especially lethal hazards before resolution where possible. Disintegration and comparable hazards can bypass the track; further injury at three boxes may be fatal.
+
+## Phaser settings
+
+| Setting | Effect on a hit |
+|---|---|
+| Stun | Target rolls Body at −2. Failure incapacitates them for the scene; success gives −2 on their next action roll. Stun marks no injury boxes. |
+| Heat or cut | Controlled tool use. Material, time, and the task determine the skill and difficulty. |
+| Lethal | Marks two injury boxes. Disintegration requires a deliberate setting and an exposed target; the GM determines whether it is possible. |
+
+Declare the setting before firing. Stun effects do not stack; a later failed resistance roll still incapacitates the target. Unarmed strikes normally mark one box. A grapple uses an opposed Unarmed Combat contest; winning restrains the target while the hold is maintained. Escape uses an action and a new contest.
+
+# Medical care
+
+Starfleet physicians in 2268 have advanced diagnostic scanners, potent pharmaceuticals, portable emergency equipment, and sophisticated sickbay facilities. Familiar injuries often respond quickly to treatment. Severe trauma, incompatible biology, missing supplies, and unidentified conditions still challenge an experienced doctor. The treatment values below are campaign rules inspired by the series, rather than numerical rules stated in canon.
+
+## Diagnosis and stabilization
+
+A medical scanner identifies ordinary injuries automatically. Roll Medicine when the diagnosis is uncertain, physiology is unfamiliar, or an urgent treatment decision has meaningful consequences. Routine established treatments also succeed automatically when qualified staff have sufficient time and facilities.
+
+Emergency stabilization takes one action and a successful Medicine roll with a medical kit. It prevents deterioration from the treated injury while the patient is protected from further harm. Stabilization alone removes no injury boxes. A patient at three boxes remains incapacitated until treatment clears a box.
+
+## Field treatment
+
+With a medical kit and several uninterrupted minutes, successful Medicine removes one injury box. Success by 5 or more removes two. Each injury receives one field-treatment attempt, even if that attempt fails; further attempts require changed circumstances such as better equipment, new diagnostic information, or access to sickbay. New injuries can receive their own treatment, but cannot justify treating an old injury repeatedly.
+
+## Sickbay treatment
+
+A functioning, equipped sickbay grants +2 to Medicine for diagnosis and treatment. A successful treatment removes two injury boxes; success by 5 or more removes three. Allow the time the procedure requires rather than completing surgery in one combat action. Sickbay care can follow field treatment. Do not repeat an unsuccessful procedure without a meaningful change in the situation.
+
+Removing injury boxes removes their associated penalties, but major organ damage, severe burns, and complex internal trauma can still require a procedure and recovery period set by the GM. The physician determines whether the patient is fit for duty. Pain suppression does not itself heal an injury. Stun normally wears off at the end of the scene; prolonged unconsciousness requires assessment.
+
+## Alien medicine and limits
+
+Unknown illness or physiology requires discovering the cause and a suitable treatment before boxes can be restored. Medicine can receive assistance from Life Sciences, Sensors, or Computers. Existing assistance limits apply. Missing essential equipment or incompatible supplies can prevent a procedure. Disintegration and other unsurvivable injuries cannot be reversed by an ordinary Medicine roll.
+
+Crew of other species may need care suited to their biology. An Alien Physiology Specialist, or a physician with access to the right species data, keeps that care from becoming guesswork.
+
+## Examples from the original series
+
+*Journey to Babel:* McCoy performs complex surgery on Sarek during a ship crisis; compatible blood and postoperative care remain important. *The Devil in the Dark:* McCoy improvises a treatment suited to the Horta's unusual biology. *Miri:* diagnosing an unfamiliar disease and establishing a safe treatment require investigation. These stories support powerful medicine whose limits come from the medical problem and available resources.
+
+Canon reference: StarTrek.com, "8 Times Leonard 'Bones' McCoy's Medical Knowledge Saved the Day." <https://www.startrek.com/news/mccoys-medical-knowledge-saved-the-day>
+
+# Duty points and bridge duty
+
+## Using Duty points
+
+Begin each session with two Duty points; unused points do not carry into the next session. Spend no more than one point on a single roll or injury event. Duty points belong to your character and cannot be transferred.
+
+| Spend one point to | Timing and limits |
+|---|---|
+| Reroll your own roll | Declare after seeing the result but before its consequences are resolved. Keep the second result, even if worse. |
+| Reduce an injury by one box | Declare when a hit would mark boxes, before applying them. Does not prevent disintegration or another hazard that bypasses the injury track. |
+| Establish a small preparation | Propose a plausible detail, such as having brought a field kit. GM approval is required; it cannot contradict established facts or solve the mission outright. |
+
+Gain one point when one of your complications creates a meaningful problem you accept. This includes a companion complication from a species advantage. The GM offers or approves the award. You can decline the proposed complication without a penalty. Repeating a harmless habit does not earn points.
+
+*Example:* your curiosity tempts you to remain beside an anomaly while the team withdraws. If you accept the resulting separation and danger, the GM awards one Duty point. The point does not remove that danger.
+
+## Working on the bridge
+
+Describe the effect you want before selecting a skill. Each exchange gives occupied stations a chance to contribute. Roll for consequential decisions and uncertain work; routine station operation needs no roll.
+
+| Station | Skill and contribution |
+|---|---|
+| Captain | Leadership to coordinate; Diplomacy to negotiate |
+| Helm | Helm to evade, pursue, or gain position |
+| Navigation | Navigation to plot a safe course or escape |
+| Science | Sensors to identify threats, weaknesses, or anomalies |
+| Engineering | Engineering to repair systems or redirect power |
+| Communications | Communications to establish contact or overcome interference |
+| Tactical | Phasers to fire ship weapons |
+
+Leadership can assist another officer when orders or coordination meaningfully help. It uses the normal assistance rule and does not provide an automatic bonus to every station.
+
+## Ship encounters
+
+Ship encounters use descriptive consequences. The GM states what is at stake before rolls and describes changes to shields, hull, systems, and position afterward. Numerical ship damage is outside this guide's scope.
+
+## Advancement
+
+After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement.
+
+# Advantages
+
+Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances; describe how it helps before rolling. An advantage does not grant training, authorize an otherwise impossible action, or replace essential equipment. If more than one advantage could apply, use only one advantage bonus. Assistance and circumstance modifiers still apply, without counting the same benefit twice.
+
+| Advantage | Effect |
+|---|---|
+| Steady Hands | +2 to Medicine for delicate surgery or removing a dangerous embedded object. It does not improve diagnosis or all medical treatment. |
+| Emergency Physician | +2 to Medicine for emergency stabilization of an injured patient. It does not apply to subsequent field healing or sickbay recovery. |
+| Alien Physiology Specialist | Choose one species or narrow biological group. Gain +2 to Medicine when diagnosing or treating that group. Unknown organisms do not qualify merely because they are alien. |
+| Subspace Specialist | +2 to Physical Sciences when analyzing subspace phenomena. Operating sensors and repairing warp machinery use their own skills. |
+| Astute Observer | +2 to Intellect rolls to notice a concealed physical clue during a deliberate examination. It does not improve every perception roll or automatically detect invisible threats. |
+| Signal Analyst | +2 to Communications when separating a meaningful transmission from interference or identifying a disguised signal. |
+| Computer Forensics Expert | +2 to Computers when tracing unauthorized changes or recovering deliberately concealed data. Access and suitable tools are still required. |
+| Improvisational Engineer | +2 to Engineering when making a temporary repair with inadequate but workable materials. The repair has limits agreed with the GM. |
+| Precision Technician | +2 to Electronics when repairing a delicate control circuit or sensor component. It does not apply to general Engineering. |
+| Shuttle Ace | +2 to Helm for hazardous shuttle maneuvers. It does not improve piloting the Pelion or ordinary Navigation. |
+| Diplomatic Insight | +2 to Diplomacy when negotiating across a cultural misunderstanding you have identified. It does not apply to every disagreement. |
+| Crisis Leader | +2 to Leadership when coordinating an immediate response to a sudden emergency. It does not improve routine orders or direct combat rolls. |
+| Mental Discipline | +2 to Will to maintain concentration despite pain or severe distraction. It does not improve resistance to fear or mental intrusion. |
+| Unshakable Courage | +2 to Will against overwhelming fear. It does not protect against alien compulsion or guarantee sensible decisions. |
+| Guarded Mind | +2 to Will when resisting an external mental intrusion or compulsion. It provides no telepathy or ability to detect the source. |
+| Careful Marksman | +2 to Phasers after spending your preceding action aiming at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it. |
+
+# Species advantages
+
+A species advantage **replaces** your general advantage. Each one comes with a **companion complication** that you take along with it. The companion works like any other complication: the GM proposes a concrete problem, and you gain a Duty point if you accept it. You keep your regular complication as well.
+
+Most species advantages give +2 in one narrow situation, following the same rules as general advantages. A few are abilities instead (Vulcan Mind Meld, Aenar Telepathy, and Flight): they name the roll to make, and the GM sets the limits before the roll. They give no +2.
+
+A custom species advantage follows the same pattern: a narrow +2 or an ability with agreed limits, paired with a companion complication that has a clear trigger and a real consequence.
+
+## Human
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Indomitable Spirit | +2 to Will when refusing to abandon a crewmate or give up on a rescue. It does not help against alien compulsion. | **Reckless Hope.** You keep going after the odds have clearly turned. When the GM shows the cost of pressing on, accept the danger, delay, or lost resource. |
+| Gut Instinct | +2 to Psychology when judging, face to face, whether someone is lying to you. It does not reveal what the truth is. | **Acts on Hunches.** You act on an unverified feeling when procedure says wait. Accept the consequence when the hunch costs time, trust, or position. |
+
+## Vulcan
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Vulcan Mind Meld | By touch, with a willing or restrained subject, roll Will to share thoughts or memories. The GM sets what can be learned before the roll. A resisting mind uses an opposed Will contest, and a meld never reveals what the subject does not know. | **Meld Echoes.** After a meld, fragments of the other mind linger. Accept −2 on your next Will roll, or an uncharacteristic emotional moment, at a time that matters. |
+| Vulcan Nerve Pinch | +2 to Unarmed Combat to render a humanoid unconscious when you reach an unaware or restrained target. Unfamiliar anatomy needs study first. | **Logic Before Feeling.** You dismiss an emotional appeal or a colleague's intuition at a key moment. Accept the strained relationship or the missed warning. |
+| Eidetic Recall | +2 to Intellect rolls to recall exactly something you have read, heard, or seen. It does not supply knowledge you never encountered. | **Suppressed Emotion.** Under severe strain, an emotion you have held down breaks through. Accept a visible loss of control at an inconvenient moment. |
+
+## Andorian
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Antennae Sense | +2 to Intellect rolls to sense movement nearby, in darkness, or behind you. It does not detect anything shielded or perfectly still. | **Born on Ice.** Andoria is a frozen moon. When heat is a real factor, accept −2 on physical actions for the scene or a forced rest. |
+| Fierce Loyalty | +2 to Will against fear or intimidation while a sworn friend or crewmate is in danger. | **Code of Honor.** An insult to you or your clan demands an answer. Accept the consequences of a challenge, a public quarrel, or a duel you cannot refuse. |
+
+## Tellarite
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Tireless Debater | +2 to Diplomacy when arguing a position in a formal negotiation or debate where argument is expected. It does not help when quiet persuasion is needed. | **Argumentative.** You challenge an order or a colleague's claim at an awkward moment. Accept the delay or the bruised relationship. |
+| Keen Nose | +2 to Intellect rolls to notice or identify something by smell, such as a gas leak, a chemical, or someone hiding nearby. | **Blunt to a Fault.** Your honesty offends someone whose cooperation matters. Accept the lost goodwill rather than softening the truth. |
+
+## Aenar
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Aenar Telepathy | Roll Will to sense the emotions and surface thoughts of a nearby mind. The GM sets the limits before the roll. A resisting or shielded mind uses an opposed Will contest, and distance or unfamiliar minds may make it impossible. | **Blind.** You navigate by telepathy and your other senses. When telepathy is blocked or you must read a display, writing, or other visual information unaided, accept a delay or need a crewmate's help. |
+| Perceptive Mind | +2 to Psychology when reading the emotional state of someone you can sense nearby. | **Pacifist Conviction.** You refuse to harm a living being even when it costs the team. Accept the setback your refusal causes. |
+
+## Illyrian
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Adaptive Physiology | +2 to Body when resisting cold, toxins, or thin atmosphere. It does not protect against vacuum, radiation, or weapons. | **Hidden Augmentation.** Federation law bars augmented officers, so you hide what you are. When a medical scan or inquiry could expose you, accept the lie, the risk, or a revealing choice. |
+| Enhanced Endurance | +2 to Athletics when pushing through prolonged exertion: long swims, forced marches, or enduring extreme conditions. | **Prejudice Against Augments.** Someone who knows or suspects your heritage treats you with suspicion. Accept the obstruction or lost trust when it matters. |
+
+## Half-Vulcan
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Between Two Worlds | +2 to Diplomacy when mediating between logic-driven and emotional parties, or bridging a misunderstanding between Vulcan and human ways. | **Divided Self.** When a situation forces a choice between logic and feeling, your inner conflict surfaces. Accept hesitation or an emotional outburst. |
+| Vulcan Strength | +2 to Body when lifting, forcing, or holding something through raw strength. | **Neither One Nor the Other.** Members of either culture doubt where you belong. Accept a slight, exclusion, or challenge to your judgment that matters. |
+
+## Lanthanite
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Centuries of Experience | +2 to Intellect rolls to recall a historical event, old custom, or obsolete technology you could plausibly have lived through. | **Secret Age.** You keep your true age quiet. When your history threatens to show, accept a lie, a slip, or a revealing consequence. |
+| Old Hand | +2 to Engineering when repairing antique, obsolete, or improvised equipment. It does not apply to current Starfleet systems. | **Rules Are Temporary.** After millennia, regulations seem fleeting. You skip a procedure and accept the consequences when it matters. |
+
+## Caitian
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Feline Reflexes | +2 to Athletics when jumping, climbing, or landing safely from a fall. | **Chase Instinct.** Sudden movement or a fleeing creature triggers a pursuit reflex. Accept a momentary distraction or a rash move. |
+| Keen Hearing | +2 to Intellect rolls to hear faint or distant sounds. | **Sensitive Ears.** Loud noise disorients you. When an alarm, explosion, or sonic weapon goes off nearby, accept −2 on your next action. |
+
+## Aurelian
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Flight | You can fly short distances in normal gravity and breathable air. Roll Athletics for difficult flying. It does not work in low pressure, high gravity, or cramped spaces. | **Fragile Bones.** Your light bones break easily. When a fall, crush, or heavy blow hits you, accept the GM marking one extra injury box. |
+| Scholar's Memory | +2 to Intellect rolls to recall the history, legends, or cultural records of another world. | **Lost in History.** A historical find tempts you to stop and study it. Accept the lost time or the danger of lingering. |
+
+# Complications
+
+Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Duty point if you accept it. You may decline without penalty. A personality description, harmless habit, or repeated inconvenience earns no point by itself. Agree on boundaries before a complication affects another player's character.
+
+| Complication | What it does |
+|---|---|
+| Cannot Leave a Mystery Alone | An unexplained reading or strange discovery tempts you to delay departure, spend a scarce resource, or pursue a risky investigation. Accept a specific cost rather than receiving points merely for asking questions. |
+| Protects Others at Personal Risk | You can shield someone, stay behind, or volunteer for a hazardous rescue at a real cost to yourself. This does not automatically prevent their injury. |
+| Duty Before Self | You prioritize your assignment despite exhaustion, injury, or a conflicting personal need. Accept a concrete setback; ordinary professionalism earns no point. |
+| Conscience Above Orders | A particular order conflicts with your ethical convictions. Accept a meaningful delay, formal challenge, or consequence of refusing it. The complication does not determine what your captain orders. |
+| By the Book | You insist on an established procedure when improvisation would be faster. Accept a genuine loss of time or opportunity, rather than penalizing every roll. |
+| Distrusts Command Decisions | A troubling order makes you demand clarification or independent verification at a critical moment. Agree on the resulting delay or strain; it is not permission to disrupt every scene. |
+| Reputation to Uphold | Pride in your record tempts you to conceal uncertainty, refuse help, or accept a task beyond your readiness. Take a real consequence when that choice matters. |
+| Haunted by a Previous Mission | A specific reminder of an earlier loss or disaster causes hesitation, distraction, or a difficult choice. Define the reminder and effect together; avoid a penalty whenever danger appears. |
+| Uneasy Around Telepathy | You hesitate to cooperate with a mind meld or another mental procedure, complicating a situation where it could help. This grants neither mental resistance nor knowledge of someone's intentions. |
+| Cultural Friction | An established custom or expectation clashes with a local practice. Accept a misunderstanding, difficult negotiation, or lost opportunity. Species identity alone is not a complication. |
+| Old Rival | An agreed recurring rival challenges your credibility or complicates your assignment. The rival's intervention must create a concrete problem, not merely an unpleasant conversation. |
+| Someone Back Home | A personal obligation or concern conflicts with mission demands. Establish who matters to you and what kinds of conflict are welcome before using this complication. |
+| Medical Restriction | An agreed condition or treatment requirement becomes relevant under particular circumstances. Define its trigger and consequence; it does not impose a blanket penalty or entitle the GM to invent new symptoms. |
+| Experimental Enthusiasm | You are tempted to use an unproven technique before adequate testing. Accept a specific risk, resource cost, or troublesome side effect agreed before attempting it. |
+| Keeps a Dangerous Secret | An agreed secret threatens trust, reputation, or an assignment. Earn a point when protecting or revealing it creates an actual consequence. Establish the secret with the GM rather than inventing it to avoid a problem. |
+| Reluctant to Use Lethal Force | You seek a nonlethal approach even when it costs time or tactical position. Ordinary Starfleet restraint earns no point; there must be a meaningful additional difficulty. |
+
+## Using and revising traits
+
+General advantages and complications describe individual crew members and can suit any species when appropriate. A Vulcan might choose Mental Discipline as a general advantage; species advantages are the only traits tied to a species. At a mission milestone, revise a trait when events change the character. Custom advantages follow the same narrow +2 benefit; custom complications need a clear trigger and a meaningful, accepted consequence.
+
+# Quick reference
+
+## Will and mental resistance
+
+Roll against Will to resist overwhelming fear, alien compulsion, or mental intrusion, or to maintain concentration through severe distraction. Apply the normal difficulty modifiers. Ordinary danger does not require a Will roll. If an adversary actively imposes mental influence, use an opposed contest of your Will against the adversary's relevant ability.
+
+Before the roll, the GM states the possible effect and its duration. Failed fear or concentration rolls normally cause brief hesitation or −2 on your next action, rather than forcing a belief or personal decision. Mental intrusion can impose a specific effect established before the roll; resisting that effect does not reveal the intruder's identity or intentions.
+
+Will protects your resolve; Presence influences others. Leadership and Diplomacy still use Presence. Species adjustments may change your starting Will, but mental advantages apply only to their agreed, narrow circumstances.
+
+## At the table
+
+1. State your goal and approach.
+2. Choose the skill and apply modifiers.
+3. Resolve one assistant's roll if applicable.
+4. Roll 3d6 at or below the adjusted skill.
+5. Apply the result and describe what changes.
+
+## Summary
+
+**Creation:** attributes start at 10, adjusted by species (always totaling zero), plus 5 points; maximum 13 plus any species bonus. One Specialty and nine Trained skills. One advantage (general or species) and one complication; a species advantage brings its companion complication.
+
+**Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3.
+
+**Modifiers:** favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails. Margin = adjusted skill − roll.
+
+**Assistance:** success +1; success by 5 or more +2; failure no bonus; 18 causes a complication. One assistant per roll.
+
+**Combat:** short movement plus one action. Successful attack → optional Dodge → weapon effect. Dodge = Agility −2, plus Athletics training (+0 Untrained, +1 Trained, +2 Specialty), once per round. One injury box gives −1 to physical actions; two give −2; three incapacitate.
+
+**Medicine:** one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery.
+
+**Will:** resist overwhelming fear or mental intrusion and maintain concentration. Ordinary danger needs no roll. Fear or distraction failure normally causes hesitation or −2 on your next action.
+
+**Duty points:** start each session with two. Spend one to reroll, reduce an injury by one box, or establish a plausible preparation. Earn one when an accepted complication, including a companion complication, creates a meaningful problem.

@@ -245,6 +245,35 @@ tr.lvl-U td.target { color: var(--muted); }
   .scanbar { background-size: 200% 100%; animation: scan 1.2s ease-out 1; }
   @keyframes scan { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 }
+/* Players' Guide */
+.guide-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
+@media (max-width: 900px) { .guide-layout { grid-template-columns: minmax(0, 1fr); } }
+.guide-toc { padding: 16px 18px; display: grid; gap: 8px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+@media (max-width: 900px) { .guide-toc { position: static; } }
+.guide-toc ol { margin: 0; padding-left: 1.4em; display: grid; gap: 4px; font-size: .9rem; }
+.guide-toc a { color: var(--fg); text-decoration: none; }
+.guide-toc a:hover { color: var(--chrome); text-decoration: underline; }
+.guide { padding: 26px clamp(18px, 4vw, 40px); min-width: 0; font-size: 1rem; line-height: 1.65; }
+.guide > * { max-width: 72ch; }
+.guide > .table-scroll, .guide > table { max-width: none; }
+.guide .table-scroll { overflow-x: auto; margin: 0 0 1.2em; }
+.guide .table-scroll table { margin: 0; }
+.guide h1 { font-size: 1.7rem; margin: 2.2em 0 .6em; padding-bottom: 8px; border-bottom: 1px solid var(--line); color: var(--fg); }
+.guide h1:first-of-type { margin-top: .4em; }
+.guide h2 { font-size: 1.15rem; margin: 1.8em 0 .5em; color: var(--chrome); }
+.guide h3 { font-size: .95rem; margin: 1.4em 0 .4em; color: var(--accent); }
+.guide p, .guide ul, .guide ol { margin: 0 0 .9em; }
+.guide li { margin-bottom: .3em; }
+.guide em { color: #c3d3ea; }
+.guide a { color: var(--chrome); }
+.guide strong { color: #fff; }
+.guide table { width: 100%; min-width: 0; margin: 0 0 1.2em; font-size: .9rem; border: 1px solid var(--line); border-radius: 10px; border-collapse: separate; border-spacing: 0; overflow: hidden; background: var(--well); }
+.guide th, .guide td { vertical-align: top; }
+.guide td:first-child { font-weight: 600; white-space: nowrap; }
+@media (max-width: 640px) { .guide td:first-child { white-space: normal; } .guide table { font-size: .84rem; } }
+.guide-title { display: grid; gap: 4px; margin-bottom: 1.4em; }
+.guide-title .h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.4rem); color: var(--fg); letter-spacing: .06em; }
+
 @media print {
   /* Paper version of the sheet: same layout, ink-friendly colors, no glow. */
   :root { --fg: #10151d; --muted: #4a5568; --line: #b9c3d0; --chrome: #0d4a80; --chrome-dim: #2f5b85;
@@ -253,7 +282,16 @@ tr.lvl-U td.target { color: var(--muted); }
   html, body { background: #fff !important; color: var(--fg); font-size: 11pt; }
   #stars, .tabs, .side, .no-print, #view-create, .example-banner, .scanbar, #btn-print { display: none !important; }
   .ref dd, .trait-desc { color: var(--fg); }
-  #view-sheet { display: block !important; }
+  #app:not([data-view="guide"]) #view-sheet { display: block !important; }
+  #app[data-view="guide"] #view-guide { display: block !important; }
+  #app[data-view="guide"] #view-sheet { display: none !important; }
+  .guide-layout { display: block; }
+  .guide { padding: 0; border: 0; font-size: 10pt; line-height: 1.45; }
+  .guide h2 { margin-top: 1.2em; }
+  .guide .table-scroll { overflow: visible; }
+  .guide h1 { break-before: page; }
+  .guide table { break-inside: auto; }
+  .guide tr { break-inside: avoid; }
   .wrap { max-width: none; padding: 0; }
   .masthead { padding: 0 0 8px; border: 0; border-bottom: 2px solid var(--accent); border-radius: 0; }
   .sheet { grid-template-columns: 1fr; margin-top: 10px; gap: 10px; }
@@ -287,6 +325,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <div class="tabs" role="tablist" aria-label="View">
       <button class="tab" role="tab" id="tab-create" aria-selected="true" aria-controls="view-create">Create</button>
       <button class="tab" role="tab" id="tab-sheet" aria-selected="false" aria-controls="view-sheet">Duty station</button>
+      <button class="tab" role="tab" id="tab-guide" aria-selected="false" aria-controls="view-guide">Players' Guide</button>
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
@@ -442,6 +481,1019 @@ tr.lvl-U td.target { color: var(--muted); }
           <input type="file" id="f-file" accept=".json,application/json">
         </div>
       </aside>
+    </div>
+  </section>
+
+  <!-- GUIDE -->
+  <section id="view-guide" role="tabpanel" aria-labelledby="tab-guide" hidden>
+    <div class="guide-layout">
+      <nav class="guide-toc hud no-print" aria-label="Guide contents"><div class="eyebrow">Contents</div><ol id="guide-toc"></ol></nav>
+      <article class="guide hud" id="guide">
+        <header class="guide-title"><span class="eyebrow">U.S.S. Pelion · NCC-1750 · Campaign year 2268</span><h2 class="h1">USS Pelion Players' Guide</h2>
+          <span class="muted">Revised edition with species, species advantages, and General Services</span></header>
+<!-- GUIDE:START -->
+<p>You are a member of Starfleet aboard USS Pelion, NCC-1750. Explore unfamiliar worlds, investigate strange phenomena, protect your crewmates, and make difficult decisions when orders and circumstances collide. Your training matters, and the crew succeeds by working together.</p>
+<p>This guide presents the Pelion rules in a form you can use at the table. It combines concrete skills and 3d6 roll-under resolution with a small pool of Duty points.</p>
+<h2 id="g-the-rule-to-remember">The rule to remember</h2>
+<p>Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes your training and attribute. Do not add the attribute again.</p>
+<p><em>Example:</em> Sensors 13, with a −2 penalty for interference, gives a target of 11. A roll of 9 succeeds by 2. A roll of 12 fails by 1.</p>
+<h2 id="g-what-this-edition-adds">What this edition adds</h2>
+<p>This revision keeps every rule from the original guide and adds four campaign rules:</p>
+<ul>
+<li><strong>General Services</strong>, a division for enlisted crew holding Crewman and Yeoman ranks.</li>
+<li><strong>Species attribute adjustments</strong>, which shift starting attributes and always total zero.</li>
+<li><strong>Species advantages</strong>, which can replace your regular advantage and always come with a companion complication.</li>
+<li><strong>Custom species</strong>, built with the GM under the same limits.</li>
+</ul>
+<h2 id="g-guide-scope">Guide scope</h2>
+<p>Personal actions and away-team encounters are covered here. Starship stations use the same skills. Species abilities beyond the adjustments and species advantages in this guide still require GM approval. Numerical ship combat is outside this guide’s scope.</p>
+<h1 id="g-create-your-character">Create your character</h1>
+<p>Work through the five steps in order. The USS Pelion Officer Creator follows the same steps and checks the rules for you.</p>
+<h2 id="g-step-1-choose-your-role">Step 1: Choose your role</h2>
+<p>Choose a department and describe what you contribute to the crew. Rank and assignment are agreed with the GM; rank gives no mechanical bonus.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Department</th>
+<th>Division</th>
+<th>Uniform</th>
+<th>Typical contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Command</td>
+<td>Command</td>
+<td>Gold</td>
+<td>Coordinate the crew and negotiate</td>
+</tr>
+<tr class="even">
+<td>Helm</td>
+<td>Command</td>
+<td>Gold</td>
+<td>Fly the ship and her shuttles</td>
+</tr>
+<tr class="odd">
+<td>Navigation</td>
+<td>Command</td>
+<td>Gold</td>
+<td>Plot courses and fix position</td>
+</tr>
+<tr class="even">
+<td>Science</td>
+<td>Sciences</td>
+<td>Blue</td>
+<td>Read and explain anomalies</td>
+</tr>
+<tr class="odd">
+<td>Medical</td>
+<td>Sciences</td>
+<td>Blue</td>
+<td>Diagnose, stabilize, and treat</td>
+</tr>
+<tr class="even">
+<td>Engineering</td>
+<td>Operations</td>
+<td>Red</td>
+<td>Keep machinery and power running</td>
+</tr>
+<tr class="odd">
+<td>Security</td>
+<td>Operations</td>
+<td>Red</td>
+<td>Protect the away team and the ship</td>
+</tr>
+<tr class="even">
+<td>Communications</td>
+<td>Operations</td>
+<td>Red</td>
+<td>Establish contact and cut through interference</td>
+</tr>
+<tr class="odd">
+<td>General Services</td>
+<td>General Services</td>
+<td>Red</td>
+<td>Keep records, carry orders, handle the ship’s daily business</td>
+</tr>
+</tbody>
+</table>
+<h3 id="g-officers-and-enlisted-crew">Officers and enlisted crew</h3>
+<p>Officers hold ranks from Ensign through Captain. <strong>General Services</strong> is the division for enlisted crew: Crewman 3rd, 2nd, and 1st Class, Crewman, and Yeoman 3rd, 2nd, and 1st Class, and Yeoman. A character with a Crewman or Yeoman rank belongs to General Services. Enlisted crew use exactly the same creation rules as officers.</p>
+<h2 id="g-step-2-choose-a-species-and-assign-attributes">Step 2: Choose a species and assign attributes</h2>
+<h3 id="g-attributes">Attributes</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Attribute</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Body</td>
+<td>Strength, endurance, resisting injury</td>
+</tr>
+<tr class="even">
+<td>Agility</td>
+<td>Coordination, reflexes, movement</td>
+</tr>
+<tr class="odd">
+<td>Intellect</td>
+<td>Reasoning, observation, technical understanding</td>
+</tr>
+<tr class="even">
+<td>Presence</td>
+<td>Leadership, persuasion, social influence</td>
+</tr>
+<tr class="odd">
+<td>Will</td>
+<td>Resolve, concentration, resisting fear and mental intrusion</td>
+</tr>
+</tbody>
+</table>
+<h3 id="g-species-adjustments">Species adjustments</h3>
+<p>Every attribute starts at 10. Your species then adjusts some of them; the result is your <strong>species base</strong>. Each species’ adjustments total zero, so no species starts ahead of another.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Species</th>
+<th>Adjustments</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Human</td>
+<td>None</td>
+</tr>
+<tr class="even">
+<td>Vulcan</td>
+<td>Body +1, Will +1, Presence −2</td>
+</tr>
+<tr class="odd">
+<td>Andorian</td>
+<td>Agility +1, Will −1</td>
+</tr>
+<tr class="even">
+<td>Tellarite</td>
+<td>Body +1, Will +1, Agility −1, Presence −1</td>
+</tr>
+<tr class="odd">
+<td>Aenar</td>
+<td>Will +1, Intellect +1, Body −1, Agility −1</td>
+</tr>
+<tr class="even">
+<td>Illyrian</td>
+<td>Body +1, Presence −1</td>
+</tr>
+<tr class="odd">
+<td>Half-Vulcan</td>
+<td>Intellect +1, Presence −1</td>
+</tr>
+<tr class="even">
+<td>Lanthanite</td>
+<td>Intellect +1, Agility −1</td>
+</tr>
+<tr class="odd">
+<td>Caitian</td>
+<td>Agility +1, Body −1</td>
+</tr>
+<tr class="even">
+<td>Aurelian</td>
+<td>Agility +1, Intellect +1, Body −2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="g-spending-points">Spending points</h3>
+<p>After applying your species, distribute <strong>five additional points</strong> among the attributes.</p>
+<ul>
+<li>The starting maximum is <strong>13</strong>, plus any species bonus to that attribute. A Vulcan can start with Body or Will at 14.</li>
+<li>You cannot lower an attribute below its species base to gain points.</li>
+</ul>
+<h3 id="g-species-descriptions">Species descriptions</h3>
+<p><strong>Human.</strong> Adaptable and widespread across Starfleet. No adjustments; spend your points wherever you like.</p>
+<p><strong>Vulcan.</strong> Physically stronger than humans and trained from childhood in logic and emotional control. Their reserve can read as cold to other species.</p>
+<p><strong>Andorian.</strong> Blue-skinned, antennaed people from the icy moon Andoria. Quick and fiercely loyal, with a passionate, sometimes volatile temper.</p>
+<p><strong>Tellarite.</strong> Stocky, stubborn, and fond of argument as a form of respect. Hard to move once they have made up their minds.</p>
+<p><strong>Aenar.</strong> A blind, pale subspecies of Andorian with strong telepathic gifts and a pacifist culture. Hemmer served as the Enterprise’s chief engineer.</p>
+<p><strong>Illyrian.</strong> A people who reshape themselves through genetic modification. Federation law bars augmented officers, so Illyrians in Starfleet, like Una Chin-Riley, have faced suspicion and secrecy.</p>
+<p><strong>Half-Vulcan.</strong> Raised between two cultures, like Spock. Vulcan training and a human heritage that does not always stay quiet.</p>
+<p><strong>Lanthanite.</strong> Extremely long-lived people who look human and have quietly lived on Earth for millennia, like Pelia. Centuries of experience; a body that dislikes hurrying.</p>
+<p><strong>Caitian.</strong> A feline species with keen senses and quick reflexes. Lt. M’Ress served aboard the Enterprise in this era.</p>
+<p><strong>Aurelian.</strong> A winged, avian people known as scholars and historians, like Aleek-Om. Capable of flight, but light-boned and physically frail.</p>
+<h3 id="g-custom-species">Custom species</h3>
+<p>Agree on a species with the GM and give it adjustments from −2 to +2 per attribute that total zero. The normal starting maximum and species base rules apply.</p>
+<h2 id="g-step-3-choose-trained-skills">Step 3: Choose trained skills</h2>
+<p>Choose ten different skills: one <strong>Specialty</strong> at its governing attribute +3 and nine <strong>Trained</strong> skills at attribute +1. All other skills are <strong>Untrained</strong> at attribute −4 when an attempt is plausible. Use these same three training levels for every skill. Each skill has its own final target number; do not add the attribute again when rolling.</p>
+<h2 id="g-step-4-describe-your-character">Step 4: Describe your character</h2>
+<p>Choose your name, rank, department, and a short reason you serve in Starfleet. Then choose <strong>one advantage</strong> and <strong>one complication</strong>.</p>
+<ul>
+<li><strong>Advantage.</strong> Choose either a general advantage or one of your species’ advantages. A species advantage replaces the general advantage and always brings its companion complication.</li>
+<li><strong>Complication.</strong> Choose one complication. You keep it even if you take a species advantage, so a character with a species advantage has two complications.</li>
+</ul>
+<p>An advantage gives +2 to one narrowly defined kind of task when the GM agrees it applies. It cannot improve every use of a broad skill. A complication creates choices and problems; it is not a permanent penalty.</p>
+<p><em>Examples:</em> Steady Hands gives +2 to delicate medical procedures. Subspace Specialist gives +2 when analyzing subspace phenomena. Complications might be Cannot Leave a Mystery Alone, Distrusts Command Decisions, or Protects Others at Personal Risk. Define their triggers with the GM.</p>
+<h2 id="g-step-5-prepare-for-duty">Step 5: Prepare for duty</h2>
+<p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.</p>
+<h2 id="g-example-science-officer">Example science officer</h2>
+<p>Human. Body 10, Agility 10, Intellect 13, Presence 11, Will 11.</p>
+<ul>
+<li><strong>Specialty:</strong> Sensors 16.</li>
+<li><strong>Trained:</strong> Physical Sciences 14, Computers 14, Electronics 14, Life Sciences 14, Medicine 14, Engineering 14, Communications 14, Diplomacy 12, Phasers 11.</li>
+<li><strong>Dodge:</strong> Athletics is Untrained, so Dodge is 8.</li>
+<li><strong>Advantage:</strong> Subspace Specialist. <strong>Complication:</strong> Cannot Leave a Mystery Alone.</li>
+</ul>
+<h1 id="g-skills-and-equipment">Skills and equipment</h1>
+<p>Choose the skill that matches your method. Sensors finds the readings; Physical Sciences interprets the physics. Engineering diagnoses machinery; Electronics repairs its control circuitry. The GM chooses one primary skill for each distinct task.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Skill</th>
+<th>Attribute</th>
+<th>Typical use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Leadership</td>
+<td>Presence</td>
+<td>Coordinate people and give clear direction</td>
+</tr>
+<tr class="even">
+<td>Diplomacy</td>
+<td>Presence</td>
+<td>Negotiate and resolve disputes</td>
+</tr>
+<tr class="odd">
+<td>Psychology</td>
+<td>Intellect</td>
+<td>Interpret behavior and emotional state</td>
+</tr>
+<tr class="even">
+<td>Sensors</td>
+<td>Intellect</td>
+<td>Operate ship sensors or a tricorder</td>
+</tr>
+<tr class="odd">
+<td>Physical Sciences</td>
+<td>Intellect</td>
+<td>Analyze energy, matter, space, and geology</td>
+</tr>
+<tr class="even">
+<td>Life Sciences</td>
+<td>Intellect</td>
+<td>Analyze organisms and ecosystems</td>
+</tr>
+<tr class="odd">
+<td>Medicine</td>
+<td>Intellect</td>
+<td>Diagnose, treat, and perform medical procedures</td>
+</tr>
+<tr class="even">
+<td>Engineering</td>
+<td>Intellect</td>
+<td>Diagnose and repair mechanical and power systems</td>
+</tr>
+<tr class="odd">
+<td>Electronics</td>
+<td>Intellect</td>
+<td>Repair circuitry, controls, and electronic devices</td>
+</tr>
+<tr class="even">
+<td>Computers</td>
+<td>Intellect</td>
+<td>Retrieve data, program, and examine software</td>
+</tr>
+<tr class="odd">
+<td>Helm</td>
+<td>Agility</td>
+<td>Pilot a starship or shuttle</td>
+</tr>
+<tr class="even">
+<td>Navigation</td>
+<td>Intellect</td>
+<td>Plot courses and determine position</td>
+</tr>
+<tr class="odd">
+<td>Communications</td>
+<td>Intellect</td>
+<td>Operate signals and overcome interference</td>
+</tr>
+<tr class="even">
+<td>Phasers</td>
+<td>Agility</td>
+<td>Use hand phasers or ship weapons</td>
+</tr>
+<tr class="odd">
+<td>Unarmed Combat</td>
+<td>Agility</td>
+<td>Strike, grapple, or restrain</td>
+</tr>
+<tr class="even">
+<td>Athletics</td>
+<td>Body</td>
+<td>Climb, swim, jump, and exert yourself</td>
+</tr>
+<tr class="odd">
+<td>Stealth</td>
+<td>Agility</td>
+<td>Move quietly and avoid notice</td>
+</tr>
+<tr class="even">
+<td>Survival</td>
+<td>Intellect</td>
+<td>Find shelter and manage wilderness hazards</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-untrained-actions">Untrained actions</h2>
+<p>A plausible untrained attempt uses attribute −4. Specialized procedures such as surgery or warp-core repair require relevant training or direct guidance. Guidance permits an attempt only when the GM finds it credible; it does not automatically grant the expert’s skill.</p>
+<h2 id="g-standard-equipment">Standard equipment</h2>
+<p>A communicator provides contact when range and interference permit. A tricorder gathers readings using Sensors; interpreting unusual results may need a science skill. An engineering kit or medical kit enables appropriate work. Ordinary equipment grants no blanket bonus; exceptional tools or preparation may justify +2. Missing essential tools can make a task impossible.</p>
+<p>Transporters, computers, and scanners have limits set by the situation. State the information or destination you need. A successful scan reveals useful evidence, not necessarily the complete explanation.</p>
+<h1 id="g-actions-and-teamwork">Actions and teamwork</h1>
+<h2 id="g-when-to-roll">When to roll</h2>
+<p>Routine work succeeds automatically when you have appropriate training, equipment, and time. Roll when failure could change the situation. Before rolling, establish your goal, the relevant skill, any modifiers, and what is at stake.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Circumstances</th>
+<th>Modifier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Favorable conditions or excellent preparation</td>
+<td>+2</td>
+</tr>
+<tr class="even">
+<td>Ordinary challenge under pressure</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td>Difficult</td>
+<td>−2</td>
+</tr>
+<tr class="even">
+<td>Very difficult</td>
+<td>−4</td>
+</tr>
+<tr class="odd">
+<td>Extreme</td>
+<td>−6</td>
+</tr>
+</tbody>
+</table>
+<p>Apply the main circumstance modifier once. Add separately specified effects such as assistance or injury when they apply. The GM avoids charging twice for the same obstacle.</p>
+<h2 id="g-results-and-margins">Results and margins</h2>
+<p>Add the three dice. A total at or below the adjusted skill succeeds. Margin of success equals the adjusted skill minus the roll. A larger margin may mean better information, more precise work, or a stronger position; agree any special threshold before rolling.</p>
+<p>A natural 3 or 4 always succeeds. A natural 17 or 18 always fails. These are automatic outcomes, not a separate critical-hit system. An impossible action receives no roll.</p>
+<p>In an opposed contest, each side rolls its relevant skill. One success beats one failure. If both succeed, the larger success margin wins. A tie, or two failures, favors the defender or preserves the situation. For an automatic success above its target, count its contest margin as zero.</p>
+<h2 id="g-assistance">Assistance</h2>
+<p>One qualified assistant can roll a relevant skill before the lead character rolls. Success grants +1 to the lead roll; success by 5 or more grants +2. Failure gives no bonus. An 18 introduces a complication described by the GM. Additional crew members can perform other tasks but cannot stack assistance bonuses on the same roll.</p>
+<p><em>Example:</em> Engineering detects that an alien device is building an overload. A science officer assists with Physical Sciences 14 and rolls 9, succeeding by 5. The engineer receives +2 to the repair attempt. Each officer contributes a different kind of expertise.</p>
+<h2 id="g-failure-and-another-attempt">Failure and another attempt</h2>
+<p>Failure changes the situation: time passes, information remains incomplete, resources are consumed, or danger increases. Do not repeat an unchanged roll until it succeeds. A new approach, new evidence, better tools, or additional time may justify another attempt.</p>
+<h2 id="g-investigation-and-social-scenes">Investigation and social scenes</h2>
+<p>Ask concrete questions and explain your approach. Evidence may require several different tasks. Diplomacy can secure cooperation or concessions, while Psychology offers insight into behavior. A successful roll does not force someone to abandon a core belief or provide information they do not possess.</p>
+<h1 id="g-personal-combat">Personal combat</h1>
+<h2 id="g-turn-order-and-actions">Turn order and actions</h2>
+<p>Act in descending Agility order. Players choose the order of tied crew members; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as attacking, using equipment, helping, or attempting a task. The GM judges movement by the scene; there is no fixed grid scale.</p>
+<h2 id="g-attacking-and-defending">Attacking and defending</h2>
+<p>Roll Phasers for a ranged attack or Unarmed Combat for a melee attack. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty. Untrained Athletics adds nothing. Use the training level, not the final Athletics score. Each target gets one Dodge attempt per round, refreshed at the start of the round. A successful Dodge cancels the hit. Apply physical injury penalties to Dodge.</p>
+<p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Other difficult conditions use the normal modifier scale. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage under these rules.</p>
+<h2 id="g-injury">Injury</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Boxes marked</th>
+<th>Condition</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>Uninjured</td>
+<td>No injury penalty</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>Wounded</td>
+<td>−1 to physical actions</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>Seriously wounded</td>
+<td>−2 to physical actions</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>Incapacitated</td>
+<td>Unable to act; medical aid needed</td>
+</tr>
+</tbody>
+</table>
+<p>A normal damaging hit marks one box. A powerful attack can mark two. Injury penalties replace each other rather than stacking. They apply to movement, attacks, Dodge, and other tasks the injury physically hinders. The GM announces especially lethal hazards before resolution where possible. Disintegration and comparable hazards can bypass the track; further injury at three boxes may be fatal.</p>
+<h2 id="g-phaser-settings">Phaser settings</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Setting</th>
+<th>Effect on a hit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Stun</td>
+<td>Target rolls Body at −2. Failure incapacitates them for the scene; success gives −2 on their next action roll. Stun marks no injury boxes.</td>
+</tr>
+<tr class="even">
+<td>Heat or cut</td>
+<td>Controlled tool use. Material, time, and the task determine the skill and difficulty.</td>
+</tr>
+<tr class="odd">
+<td>Lethal</td>
+<td>Marks two injury boxes. Disintegration requires a deliberate setting and an exposed target; the GM determines whether it is possible.</td>
+</tr>
+</tbody>
+</table>
+<p>Declare the setting before firing. Stun effects do not stack; a later failed resistance roll still incapacitates the target. Unarmed strikes normally mark one box. A grapple uses an opposed Unarmed Combat contest; winning restrains the target while the hold is maintained. Escape uses an action and a new contest.</p>
+<h1 id="g-medical-care">Medical care</h1>
+<p>Starfleet physicians in 2268 have advanced diagnostic scanners, potent pharmaceuticals, portable emergency equipment, and sophisticated sickbay facilities. Familiar injuries often respond quickly to treatment. Severe trauma, incompatible biology, missing supplies, and unidentified conditions still challenge an experienced doctor. The treatment values below are campaign rules inspired by the series, rather than numerical rules stated in canon.</p>
+<h2 id="g-diagnosis-and-stabilization">Diagnosis and stabilization</h2>
+<p>A medical scanner identifies ordinary injuries automatically. Roll Medicine when the diagnosis is uncertain, physiology is unfamiliar, or an urgent treatment decision has meaningful consequences. Routine established treatments also succeed automatically when qualified staff have sufficient time and facilities.</p>
+<p>Emergency stabilization takes one action and a successful Medicine roll with a medical kit. It prevents deterioration from the treated injury while the patient is protected from further harm. Stabilization alone removes no injury boxes. A patient at three boxes remains incapacitated until treatment clears a box.</p>
+<h2 id="g-field-treatment">Field treatment</h2>
+<p>With a medical kit and several uninterrupted minutes, successful Medicine removes one injury box. Success by 5 or more removes two. Each injury receives one field-treatment attempt, even if that attempt fails; further attempts require changed circumstances such as better equipment, new diagnostic information, or access to sickbay. New injuries can receive their own treatment, but cannot justify treating an old injury repeatedly.</p>
+<h2 id="g-sickbay-treatment">Sickbay treatment</h2>
+<p>A functioning, equipped sickbay grants +2 to Medicine for diagnosis and treatment. A successful treatment removes two injury boxes; success by 5 or more removes three. Allow the time the procedure requires rather than completing surgery in one combat action. Sickbay care can follow field treatment. Do not repeat an unsuccessful procedure without a meaningful change in the situation.</p>
+<p>Removing injury boxes removes their associated penalties, but major organ damage, severe burns, and complex internal trauma can still require a procedure and recovery period set by the GM. The physician determines whether the patient is fit for duty. Pain suppression does not itself heal an injury. Stun normally wears off at the end of the scene; prolonged unconsciousness requires assessment.</p>
+<h2 id="g-alien-medicine-and-limits">Alien medicine and limits</h2>
+<p>Unknown illness or physiology requires discovering the cause and a suitable treatment before boxes can be restored. Medicine can receive assistance from Life Sciences, Sensors, or Computers. Existing assistance limits apply. Missing essential equipment or incompatible supplies can prevent a procedure. Disintegration and other unsurvivable injuries cannot be reversed by an ordinary Medicine roll.</p>
+<p>Crew of other species may need care suited to their biology. An Alien Physiology Specialist, or a physician with access to the right species data, keeps that care from becoming guesswork.</p>
+<h2 id="g-examples-from-the-original-series">Examples from the original series</h2>
+<p><em>Journey to Babel:</em> McCoy performs complex surgery on Sarek during a ship crisis; compatible blood and postoperative care remain important. <em>The Devil in the Dark:</em> McCoy improvises a treatment suited to the Horta’s unusual biology. <em>Miri:</em> diagnosing an unfamiliar disease and establishing a safe treatment require investigation. These stories support powerful medicine whose limits come from the medical problem and available resources.</p>
+<p>Canon reference: StarTrek.com, “8 Times Leonard ‘Bones’ McCoy’s Medical Knowledge Saved the Day.” <a href="https://www.startrek.com/news/mccoys-medical-knowledge-saved-the-day" class="uri">https://www.startrek.com/news/mccoys-medical-knowledge-saved-the-day</a></p>
+<h1 id="g-duty-points-and-bridge-duty">Duty points and bridge duty</h1>
+<h2 id="g-using-duty-points">Using Duty points</h2>
+<p>Begin each session with two Duty points; unused points do not carry into the next session. Spend no more than one point on a single roll or injury event. Duty points belong to your character and cannot be transferred.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Spend one point to</th>
+<th>Timing and limits</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reroll your own roll</td>
+<td>Declare after seeing the result but before its consequences are resolved. Keep the second result, even if worse.</td>
+</tr>
+<tr class="even">
+<td>Reduce an injury by one box</td>
+<td>Declare when a hit would mark boxes, before applying them. Does not prevent disintegration or another hazard that bypasses the injury track.</td>
+</tr>
+<tr class="odd">
+<td>Establish a small preparation</td>
+<td>Propose a plausible detail, such as having brought a field kit. GM approval is required; it cannot contradict established facts or solve the mission outright.</td>
+</tr>
+</tbody>
+</table>
+<p>Gain one point when one of your complications creates a meaningful problem you accept. This includes a companion complication from a species advantage. The GM offers or approves the award. You can decline the proposed complication without a penalty. Repeating a harmless habit does not earn points.</p>
+<p><em>Example:</em> your curiosity tempts you to remain beside an anomaly while the team withdraws. If you accept the resulting separation and danger, the GM awards one Duty point. The point does not remove that danger.</p>
+<h2 id="g-working-on-the-bridge">Working on the bridge</h2>
+<p>Describe the effect you want before selecting a skill. Each exchange gives occupied stations a chance to contribute. Roll for consequential decisions and uncertain work; routine station operation needs no roll.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Station</th>
+<th>Skill and contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Captain</td>
+<td>Leadership to coordinate; Diplomacy to negotiate</td>
+</tr>
+<tr class="even">
+<td>Helm</td>
+<td>Helm to evade, pursue, or gain position</td>
+</tr>
+<tr class="odd">
+<td>Navigation</td>
+<td>Navigation to plot a safe course or escape</td>
+</tr>
+<tr class="even">
+<td>Science</td>
+<td>Sensors to identify threats, weaknesses, or anomalies</td>
+</tr>
+<tr class="odd">
+<td>Engineering</td>
+<td>Engineering to repair systems or redirect power</td>
+</tr>
+<tr class="even">
+<td>Communications</td>
+<td>Communications to establish contact or overcome interference</td>
+</tr>
+<tr class="odd">
+<td>Tactical</td>
+<td>Phasers to fire ship weapons</td>
+</tr>
+</tbody>
+</table>
+<p>Leadership can assist another officer when orders or coordination meaningfully help. It uses the normal assistance rule and does not provide an automatic bonus to every station.</p>
+<h2 id="g-ship-encounters">Ship encounters</h2>
+<p>Ship encounters use descriptive consequences. The GM states what is at stake before rolls and describes changes to shields, hull, systems, and position afterward. Numerical ship damage is outside this guide’s scope.</p>
+<h2 id="g-advancement">Advancement</h2>
+<p>After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement.</p>
+<h1 id="g-advantages">Advantages</h1>
+<p>Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances; describe how it helps before rolling. An advantage does not grant training, authorize an otherwise impossible action, or replace essential equipment. If more than one advantage could apply, use only one advantage bonus. Assistance and circumstance modifiers still apply, without counting the same benefit twice.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Steady Hands</td>
+<td>+2 to Medicine for delicate surgery or removing a dangerous embedded object. It does not improve diagnosis or all medical treatment.</td>
+</tr>
+<tr class="even">
+<td>Emergency Physician</td>
+<td>+2 to Medicine for emergency stabilization of an injured patient. It does not apply to subsequent field healing or sickbay recovery.</td>
+</tr>
+<tr class="odd">
+<td>Alien Physiology Specialist</td>
+<td>Choose one species or narrow biological group. Gain +2 to Medicine when diagnosing or treating that group. Unknown organisms do not qualify merely because they are alien.</td>
+</tr>
+<tr class="even">
+<td>Subspace Specialist</td>
+<td>+2 to Physical Sciences when analyzing subspace phenomena. Operating sensors and repairing warp machinery use their own skills.</td>
+</tr>
+<tr class="odd">
+<td>Astute Observer</td>
+<td>+2 to Intellect rolls to notice a concealed physical clue during a deliberate examination. It does not improve every perception roll or automatically detect invisible threats.</td>
+</tr>
+<tr class="even">
+<td>Signal Analyst</td>
+<td>+2 to Communications when separating a meaningful transmission from interference or identifying a disguised signal.</td>
+</tr>
+<tr class="odd">
+<td>Computer Forensics Expert</td>
+<td>+2 to Computers when tracing unauthorized changes or recovering deliberately concealed data. Access and suitable tools are still required.</td>
+</tr>
+<tr class="even">
+<td>Improvisational Engineer</td>
+<td>+2 to Engineering when making a temporary repair with inadequate but workable materials. The repair has limits agreed with the GM.</td>
+</tr>
+<tr class="odd">
+<td>Precision Technician</td>
+<td>+2 to Electronics when repairing a delicate control circuit or sensor component. It does not apply to general Engineering.</td>
+</tr>
+<tr class="even">
+<td>Shuttle Ace</td>
+<td>+2 to Helm for hazardous shuttle maneuvers. It does not improve piloting the Pelion or ordinary Navigation.</td>
+</tr>
+<tr class="odd">
+<td>Diplomatic Insight</td>
+<td>+2 to Diplomacy when negotiating across a cultural misunderstanding you have identified. It does not apply to every disagreement.</td>
+</tr>
+<tr class="even">
+<td>Crisis Leader</td>
+<td>+2 to Leadership when coordinating an immediate response to a sudden emergency. It does not improve routine orders or direct combat rolls.</td>
+</tr>
+<tr class="odd">
+<td>Mental Discipline</td>
+<td>+2 to Will to maintain concentration despite pain or severe distraction. It does not improve resistance to fear or mental intrusion.</td>
+</tr>
+<tr class="even">
+<td>Unshakable Courage</td>
+<td>+2 to Will against overwhelming fear. It does not protect against alien compulsion or guarantee sensible decisions.</td>
+</tr>
+<tr class="odd">
+<td>Guarded Mind</td>
+<td>+2 to Will when resisting an external mental intrusion or compulsion. It provides no telepathy or ability to detect the source.</td>
+</tr>
+<tr class="even">
+<td>Careful Marksman</td>
+<td>+2 to Phasers after spending your preceding action aiming at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it.</td>
+</tr>
+</tbody>
+</table>
+<h1 id="g-species-advantages">Species advantages</h1>
+<p>A species advantage <strong>replaces</strong> your general advantage. Each one comes with a <strong>companion complication</strong> that you take along with it. The companion works like any other complication: the GM proposes a concrete problem, and you gain a Duty point if you accept it. You keep your regular complication as well.</p>
+<p>Most species advantages give +2 in one narrow situation, following the same rules as general advantages. A few are abilities instead (Vulcan Mind Meld, Aenar Telepathy, and Flight): they name the roll to make, and the GM sets the limits before the roll. They give no +2.</p>
+<p>A custom species advantage follows the same pattern: a narrow +2 or an ability with agreed limits, paired with a companion complication that has a clear trigger and a real consequence.</p>
+<h2 id="g-human">Human</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Indomitable Spirit</td>
+<td>+2 to Will when refusing to abandon a crewmate or give up on a rescue. It does not help against alien compulsion.</td>
+<td><strong>Reckless Hope.</strong> You keep going after the odds have clearly turned. When the GM shows the cost of pressing on, accept the danger, delay, or lost resource.</td>
+</tr>
+<tr class="even">
+<td>Gut Instinct</td>
+<td>+2 to Psychology when judging, face to face, whether someone is lying to you. It does not reveal what the truth is.</td>
+<td><strong>Acts on Hunches.</strong> You act on an unverified feeling when procedure says wait. Accept the consequence when the hunch costs time, trust, or position.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-vulcan">Vulcan</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Vulcan Mind Meld</td>
+<td>By touch, with a willing or restrained subject, roll Will to share thoughts or memories. The GM sets what can be learned before the roll. A resisting mind uses an opposed Will contest, and a meld never reveals what the subject does not know.</td>
+<td><strong>Meld Echoes.</strong> After a meld, fragments of the other mind linger. Accept −2 on your next Will roll, or an uncharacteristic emotional moment, at a time that matters.</td>
+</tr>
+<tr class="even">
+<td>Vulcan Nerve Pinch</td>
+<td>+2 to Unarmed Combat to render a humanoid unconscious when you reach an unaware or restrained target. Unfamiliar anatomy needs study first.</td>
+<td><strong>Logic Before Feeling.</strong> You dismiss an emotional appeal or a colleague’s intuition at a key moment. Accept the strained relationship or the missed warning.</td>
+</tr>
+<tr class="odd">
+<td>Eidetic Recall</td>
+<td>+2 to Intellect rolls to recall exactly something you have read, heard, or seen. It does not supply knowledge you never encountered.</td>
+<td><strong>Suppressed Emotion.</strong> Under severe strain, an emotion you have held down breaks through. Accept a visible loss of control at an inconvenient moment.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-andorian">Andorian</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Antennae Sense</td>
+<td>+2 to Intellect rolls to sense movement nearby, in darkness, or behind you. It does not detect anything shielded or perfectly still.</td>
+<td><strong>Born on Ice.</strong> Andoria is a frozen moon. When heat is a real factor, accept −2 on physical actions for the scene or a forced rest.</td>
+</tr>
+<tr class="even">
+<td>Fierce Loyalty</td>
+<td>+2 to Will against fear or intimidation while a sworn friend or crewmate is in danger.</td>
+<td><strong>Code of Honor.</strong> An insult to you or your clan demands an answer. Accept the consequences of a challenge, a public quarrel, or a duel you cannot refuse.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-tellarite">Tellarite</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tireless Debater</td>
+<td>+2 to Diplomacy when arguing a position in a formal negotiation or debate where argument is expected. It does not help when quiet persuasion is needed.</td>
+<td><strong>Argumentative.</strong> You challenge an order or a colleague’s claim at an awkward moment. Accept the delay or the bruised relationship.</td>
+</tr>
+<tr class="even">
+<td>Keen Nose</td>
+<td>+2 to Intellect rolls to notice or identify something by smell, such as a gas leak, a chemical, or someone hiding nearby.</td>
+<td><strong>Blunt to a Fault.</strong> Your honesty offends someone whose cooperation matters. Accept the lost goodwill rather than softening the truth.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-aenar">Aenar</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Aenar Telepathy</td>
+<td>Roll Will to sense the emotions and surface thoughts of a nearby mind. The GM sets the limits before the roll. A resisting or shielded mind uses an opposed Will contest, and distance or unfamiliar minds may make it impossible.</td>
+<td><strong>Blind.</strong> You navigate by telepathy and your other senses. When telepathy is blocked or you must read a display, writing, or other visual information unaided, accept a delay or need a crewmate’s help.</td>
+</tr>
+<tr class="even">
+<td>Perceptive Mind</td>
+<td>+2 to Psychology when reading the emotional state of someone you can sense nearby.</td>
+<td><strong>Pacifist Conviction.</strong> You refuse to harm a living being even when it costs the team. Accept the setback your refusal causes.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-illyrian">Illyrian</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Adaptive Physiology</td>
+<td>+2 to Body when resisting cold, toxins, or thin atmosphere. It does not protect against vacuum, radiation, or weapons.</td>
+<td><strong>Hidden Augmentation.</strong> Federation law bars augmented officers, so you hide what you are. When a medical scan or inquiry could expose you, accept the lie, the risk, or a revealing choice.</td>
+</tr>
+<tr class="even">
+<td>Enhanced Endurance</td>
+<td>+2 to Athletics when pushing through prolonged exertion: long swims, forced marches, or enduring extreme conditions.</td>
+<td><strong>Prejudice Against Augments.</strong> Someone who knows or suspects your heritage treats you with suspicion. Accept the obstruction or lost trust when it matters.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-half-vulcan">Half-Vulcan</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Between Two Worlds</td>
+<td>+2 to Diplomacy when mediating between logic-driven and emotional parties, or bridging a misunderstanding between Vulcan and human ways.</td>
+<td><strong>Divided Self.</strong> When a situation forces a choice between logic and feeling, your inner conflict surfaces. Accept hesitation or an emotional outburst.</td>
+</tr>
+<tr class="even">
+<td>Vulcan Strength</td>
+<td>+2 to Body when lifting, forcing, or holding something through raw strength.</td>
+<td><strong>Neither One Nor the Other.</strong> Members of either culture doubt where you belong. Accept a slight, exclusion, or challenge to your judgment that matters.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-lanthanite">Lanthanite</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Centuries of Experience</td>
+<td>+2 to Intellect rolls to recall a historical event, old custom, or obsolete technology you could plausibly have lived through.</td>
+<td><strong>Secret Age.</strong> You keep your true age quiet. When your history threatens to show, accept a lie, a slip, or a revealing consequence.</td>
+</tr>
+<tr class="even">
+<td>Old Hand</td>
+<td>+2 to Engineering when repairing antique, obsolete, or improvised equipment. It does not apply to current Starfleet systems.</td>
+<td><strong>Rules Are Temporary.</strong> After millennia, regulations seem fleeting. You skip a procedure and accept the consequences when it matters.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-caitian">Caitian</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Feline Reflexes</td>
+<td>+2 to Athletics when jumping, climbing, or landing safely from a fall.</td>
+<td><strong>Chase Instinct.</strong> Sudden movement or a fleeing creature triggers a pursuit reflex. Accept a momentary distraction or a rash move.</td>
+</tr>
+<tr class="even">
+<td>Keen Hearing</td>
+<td>+2 to Intellect rolls to hear faint or distant sounds.</td>
+<td><strong>Sensitive Ears.</strong> Loud noise disorients you. When an alarm, explosion, or sonic weapon goes off nearby, accept −2 on your next action.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-aurelian">Aurelian</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Flight</td>
+<td>You can fly short distances in normal gravity and breathable air. Roll Athletics for difficult flying. It does not work in low pressure, high gravity, or cramped spaces.</td>
+<td><strong>Fragile Bones.</strong> Your light bones break easily. When a fall, crush, or heavy blow hits you, accept the GM marking one extra injury box.</td>
+</tr>
+<tr class="even">
+<td>Scholar’s Memory</td>
+<td>+2 to Intellect rolls to recall the history, legends, or cultural records of another world.</td>
+<td><strong>Lost in History.</strong> A historical find tempts you to stop and study it. Accept the lost time or the danger of lingering.</td>
+</tr>
+</tbody>
+</table>
+<h1 id="g-complications">Complications</h1>
+<p>Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Duty point if you accept it. You may decline without penalty. A personality description, harmless habit, or repeated inconvenience earns no point by itself. Agree on boundaries before a complication affects another player’s character.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Complication</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cannot Leave a Mystery Alone</td>
+<td>An unexplained reading or strange discovery tempts you to delay departure, spend a scarce resource, or pursue a risky investigation. Accept a specific cost rather than receiving points merely for asking questions.</td>
+</tr>
+<tr class="even">
+<td>Protects Others at Personal Risk</td>
+<td>You can shield someone, stay behind, or volunteer for a hazardous rescue at a real cost to yourself. This does not automatically prevent their injury.</td>
+</tr>
+<tr class="odd">
+<td>Duty Before Self</td>
+<td>You prioritize your assignment despite exhaustion, injury, or a conflicting personal need. Accept a concrete setback; ordinary professionalism earns no point.</td>
+</tr>
+<tr class="even">
+<td>Conscience Above Orders</td>
+<td>A particular order conflicts with your ethical convictions. Accept a meaningful delay, formal challenge, or consequence of refusing it. The complication does not determine what your captain orders.</td>
+</tr>
+<tr class="odd">
+<td>By the Book</td>
+<td>You insist on an established procedure when improvisation would be faster. Accept a genuine loss of time or opportunity, rather than penalizing every roll.</td>
+</tr>
+<tr class="even">
+<td>Distrusts Command Decisions</td>
+<td>A troubling order makes you demand clarification or independent verification at a critical moment. Agree on the resulting delay or strain; it is not permission to disrupt every scene.</td>
+</tr>
+<tr class="odd">
+<td>Reputation to Uphold</td>
+<td>Pride in your record tempts you to conceal uncertainty, refuse help, or accept a task beyond your readiness. Take a real consequence when that choice matters.</td>
+</tr>
+<tr class="even">
+<td>Haunted by a Previous Mission</td>
+<td>A specific reminder of an earlier loss or disaster causes hesitation, distraction, or a difficult choice. Define the reminder and effect together; avoid a penalty whenever danger appears.</td>
+</tr>
+<tr class="odd">
+<td>Uneasy Around Telepathy</td>
+<td>You hesitate to cooperate with a mind meld or another mental procedure, complicating a situation where it could help. This grants neither mental resistance nor knowledge of someone’s intentions.</td>
+</tr>
+<tr class="even">
+<td>Cultural Friction</td>
+<td>An established custom or expectation clashes with a local practice. Accept a misunderstanding, difficult negotiation, or lost opportunity. Species identity alone is not a complication.</td>
+</tr>
+<tr class="odd">
+<td>Old Rival</td>
+<td>An agreed recurring rival challenges your credibility or complicates your assignment. The rival’s intervention must create a concrete problem, not merely an unpleasant conversation.</td>
+</tr>
+<tr class="even">
+<td>Someone Back Home</td>
+<td>A personal obligation or concern conflicts with mission demands. Establish who matters to you and what kinds of conflict are welcome before using this complication.</td>
+</tr>
+<tr class="odd">
+<td>Medical Restriction</td>
+<td>An agreed condition or treatment requirement becomes relevant under particular circumstances. Define its trigger and consequence; it does not impose a blanket penalty or entitle the GM to invent new symptoms.</td>
+</tr>
+<tr class="even">
+<td>Experimental Enthusiasm</td>
+<td>You are tempted to use an unproven technique before adequate testing. Accept a specific risk, resource cost, or troublesome side effect agreed before attempting it.</td>
+</tr>
+<tr class="odd">
+<td>Keeps a Dangerous Secret</td>
+<td>An agreed secret threatens trust, reputation, or an assignment. Earn a point when protecting or revealing it creates an actual consequence. Establish the secret with the GM rather than inventing it to avoid a problem.</td>
+</tr>
+<tr class="even">
+<td>Reluctant to Use Lethal Force</td>
+<td>You seek a nonlethal approach even when it costs time or tactical position. Ordinary Starfleet restraint earns no point; there must be a meaningful additional difficulty.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-using-and-revising-traits">Using and revising traits</h2>
+<p>General advantages and complications describe individual crew members and can suit any species when appropriate. A Vulcan might choose Mental Discipline as a general advantage; species advantages are the only traits tied to a species. At a mission milestone, revise a trait when events change the character. Custom advantages follow the same narrow +2 benefit; custom complications need a clear trigger and a meaningful, accepted consequence.</p>
+<h1 id="g-quick-reference">Quick reference</h1>
+<h2 id="g-will-and-mental-resistance">Will and mental resistance</h2>
+<p>Roll against Will to resist overwhelming fear, alien compulsion, or mental intrusion, or to maintain concentration through severe distraction. Apply the normal difficulty modifiers. Ordinary danger does not require a Will roll. If an adversary actively imposes mental influence, use an opposed contest of your Will against the adversary’s relevant ability.</p>
+<p>Before the roll, the GM states the possible effect and its duration. Failed fear or concentration rolls normally cause brief hesitation or −2 on your next action, rather than forcing a belief or personal decision. Mental intrusion can impose a specific effect established before the roll; resisting that effect does not reveal the intruder’s identity or intentions.</p>
+<p>Will protects your resolve; Presence influences others. Leadership and Diplomacy still use Presence. Species adjustments may change your starting Will, but mental advantages apply only to their agreed, narrow circumstances.</p>
+<h2 id="g-at-the-table">At the table</h2>
+<ol type="1">
+<li>State your goal and approach.</li>
+<li>Choose the skill and apply modifiers.</li>
+<li>Resolve one assistant’s roll if applicable.</li>
+<li>Roll 3d6 at or below the adjusted skill.</li>
+<li>Apply the result and describe what changes.</li>
+</ol>
+<h2 id="g-summary">Summary</h2>
+<p><strong>Creation:</strong> attributes start at 10, adjusted by species (always totaling zero), plus 5 points; maximum 13 plus any species bonus. One Specialty and nine Trained skills. One advantage (general or species) and one complication; a species advantage brings its companion complication.</p>
+<p><strong>Skills:</strong> Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3.</p>
+<p><strong>Modifiers:</strong> favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails. Margin = adjusted skill − roll.</p>
+<p><strong>Assistance:</strong> success +1; success by 5 or more +2; failure no bonus; 18 causes a complication. One assistant per roll.</p>
+<p><strong>Combat:</strong> short movement plus one action. Successful attack → optional Dodge → weapon effect. Dodge = Agility −2, plus Athletics training (+0 Untrained, +1 Trained, +2 Specialty), once per round. One injury box gives −1 to physical actions; two give −2; three incapacitate.</p>
+<p><strong>Medicine:</strong> one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery.</p>
+<p><strong>Will:</strong> resist overwhelming fear or mental intrusion and maintain concentration. Ordinary danger needs no roll. Fear or distraction failure normally causes hesitation or −2 on your next action.</p>
+<p><strong>Duty points:</strong> start each session with two. Spend one to reroll, reduce an injury by one box, or establish a plausible preparation. Earn one when an accepted complication, including a companion complication, creates a meaningful problem.</p>
+<!-- GUIDE:END -->
+      </article>
     </div>
   </section>
 
@@ -1198,11 +2250,11 @@ tr.lvl-U td.target { color: var(--muted); }
   $("r-roll").onclick = () => doRoll(false);
 
   function selectTab(which) {
-    const create = which === "create";
-    $("tab-create").setAttribute("aria-selected", create);
-    $("tab-sheet").setAttribute("aria-selected", !create);
-    $("view-create").hidden = !create;
-    $("view-sheet").hidden = create;
+    for (const v of ["create", "sheet", "guide"]) {
+      $("tab-" + v).setAttribute("aria-selected", v === which);
+      $("view-" + v).hidden = v !== which;
+    }
+    $("app").dataset.view = which;
     try { sessionStorage.setItem("pelion.tab", which); } catch {}
   }
   // Printing works when the file is opened directly; embedded viewers block it, so hide the button there.
@@ -1212,6 +2264,13 @@ tr.lvl-U td.target { color: var(--muted); }
   $("btn-print").onclick = () => window.print();
   $("tab-create").onclick = () => selectTab("create");
   $("tab-sheet").onclick = () => selectTab("sheet");
+  $("tab-guide").onclick = () => selectTab("guide");
+  // Guide contents: one entry per chapter heading.
+  $("guide").id = "guide";
+  $("guide-toc").innerHTML = `<li><a href="#guide">Introduction</a></li>` +
+    [...$("guide").querySelectorAll("h1")].map((h) => `<li><a href="#${h.id}">${esc(h.textContent)}</a></li>`).join("");
+  // Wide tables scroll inside their own box on narrow screens.
+  $("guide").querySelectorAll("table").forEach((t) => { const w = document.createElement("div"); w.className = "table-scroll"; t.before(w); w.append(t); });
 
   function newOfficer() { load(blank()); selectTab("create"); toast("New officer started."); }
   $("btn-new").onclick = newOfficer;
@@ -1295,6 +2354,6 @@ tr.lvl-U td.target { color: var(--muted); }
   render();
   $("r-phys").checked = PHYSICAL.has($("r-skill").value);
   updateTarget();
-  try { if (sessionStorage.getItem("pelion.tab") === "sheet") selectTab("sheet"); } catch {}
+  try { const t = sessionStorage.getItem("pelion.tab"); if (t === "sheet" || t === "guide") selectTab(t); } catch {}
 })();
 </script>
