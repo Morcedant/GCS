@@ -11,6 +11,9 @@ It also writes legend-dynamics/Legend_Dynamics_Core_Rules.md, the setting-neutra
 """
 import argparse, html, importlib.util, json, pathlib, re, subprocess, sys
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import discord_chapter
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LD = ROOT / "legend-dynamics"
 ENGINE = LD / "engine"
@@ -152,6 +155,8 @@ def char_block(c, pack, t, heading):
 
 def gen(name, pack, t):
     p = pack
+    if name == "discord":
+        return discord_chapter.chapter(discord_chapter.game_info(p["id"], t["title"], t["point"], p.get("tracks", []), p.get("seeds", {}), t["tracksTitle"]))
     if name == "roles":
         g = {x["id"]: x["name"] for x in p["groups"]}
         return table([t["role"], "Group", "Typical contribution"], [[r["name"], g[r["group"]], r["text"].split(": ", 1)[-1]] for r in p["roles"]])
@@ -279,6 +284,7 @@ def core_rules(docx=False):
     t = terms_of({"terms": {}})
     core = (ENGINE / "core.md").read_text()
     core = core.replace("{{PACK:intro}}", "Legend Dynamics is a roleplaying system for heroic stories in any genre: concrete skills, a 3d6 roll-under core, and a small pool of Legend points that reward characters for their flaws. These core rules are setting-neutral. A **setting pack** supplies the roles, origins, skills, gear, weapons, tracks and dangers of one genre, and renames a few terms to suit it.")
+    core = core.replace("# Discord commands\n\n{{GEN:discord}}\n\n", "")
     core = re.sub(r"\{\{PACK:(\w+)\}\}", "", core)
     core = re.sub(r"\{\{GEN:([\w-]+)\}\}", lambda m: f"*Your setting pack supplies this ({m.group(1).replace('-', ' ')}).*", core)
     core = fill(core, t).replace("This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Legend Dynamics** setting: its roles, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Legend points**.",

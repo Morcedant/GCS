@@ -335,4 +335,8 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 {{PACK:quickref}}
 
+# Discord commands
+
+{{GEN:discord}}
+
 *Legend Dynamics RPG system. The core rules and this setting are original works.*
