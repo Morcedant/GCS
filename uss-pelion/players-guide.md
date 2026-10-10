@@ -239,6 +239,28 @@ Solid cover blocks a shot. Partial cover imposes −2 on the attack. Other diffi
 
 A normal damaging hit marks one box. A powerful attack can mark two. Injury penalties replace each other rather than stacking. They apply to movement, attacks, Dodge, and other tasks the injury physically hinders. The GM announces especially lethal hazards before resolution where possible. Disintegration and comparable hazards can bypass the track; further injury at three boxes may be fatal.
 
+## Weapons and damage
+
+How many boxes a hit marks depends on the **weapon**, not on how well the attack roll succeeded. Apply it only after the hit survives any Dodge. This list sorts common weapons into the one-box and two-box categories above; the GM places anything else by comparison.
+
+| Weapon | Boxes on a hit | What the injury looks like |
+|---|---|---|
+| Punch, kick, headbutt | 1 | Bruising, a split lip, cracked ribs |
+| Club, rifle butt, thrown rock | 1 | A concussion, a broken finger, heavy bruising |
+| Knife or dagger, such as a Klingon d'k tahg | 1 | A cut or stab wound that bleeds |
+| Arrow, spear, or primitive firearm | 1 | A puncture or gunshot wound |
+| Heavy melee weapon, such as a Vulcan lirpa, a sword, or an axe | 2 | A deep wound or a broken bone |
+| Phaser on stun | 0 | No wound; the target makes the stun roll (see Phaser settings) |
+| Phaser on a lethal setting | 2 | Severe burns and energy trauma |
+| Klingon disruptor | 2 | Severe burns and tissue disruption |
+| Phaser rifle, or a ship's weapon fired at a person | 2, or disintegration if the GM rules it | Massive energy trauma |
+| Explosion | 1 to everyone nearby, 2 at the centre | Blast, shrapnel, and burns; Dodge means diving clear, so you need somewhere to go |
+| Fall | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+
+*Example:* a Klingon's punch leaves Ensign Reyes Wounded (−1). On the next round a d'k tahg slash marks a second box: Seriously wounded (−2). Had that second hit been a disruptor shot, it would have marked two boxes and taken Reyes to three: Incapacitated. Spending a Duty point when the disruptor hits would reduce it to one box, leaving Reyes Seriously wounded but still standing.
+
+To take someone down without hurting them, use a phaser on stun, a grapple, or the Vulcan nerve pinch rather than a weapon from this list.
+
 ## Phaser settings
 
 | Setting | Effect on a hit |
@@ -486,6 +508,8 @@ Will protects your resolve; Presence influences others. Leadership and Diplomacy
 **Assistance:** success +1; success by 5 or more +2; failure no bonus; 18 causes a complication. One assistant per roll.
 
 **Combat:** short movement plus one action. Successful attack → optional Dodge → weapon effect. Dodge = Agility −2, plus Athletics training (+0 Untrained, +1 Trained, +2 Specialty), once per round. One injury box gives −1 to physical actions; two give −2; three incapacitate.
+
+**Damage:** the weapon decides. Fists, clubs, knives, arrows and primitive firearms mark 1 box; heavy blades, phasers on a lethal setting and disruptors mark 2; stun marks none.
 
 **Medicine:** one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery.
 
