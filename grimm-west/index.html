@@ -525,7 +525,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <p class="muted small">Pick a calling and describe what your character brings. A title is agreed with the GM and gives no bonus.</p></div>
           <div class="fields">
             <div class="field"><label for="f-dept">Calling</label>
-              <select id="f-dept"></select></div>
+              <select id="f-dept"></select>
+              <span class="small muted" id="role-skills"></span></div>
             <div class="field"><label for="f-rank">Title (optional)</label>
               <input type="text" id="f-rank" placeholder="e.g. Deputy U.S. Marshal"></div>
             <div class="field wide"><label for="f-path">Training</label>
@@ -826,15 +827,17 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Choose a calling and describe what your character brings. Your calling places you in one of three groups, which only changes your sheet’s colors and badge. A title such as “Deputy U.S. Marshal” or “Doc” is agreed with the GM and gives no bonus.</p>
 <table>
 <colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Calling</th>
 <th>Group</th>
 <th>Typical contribution</th>
+<th>Core skills</th>
 </tr>
 </thead>
 <tbody>
@@ -842,64 +845,77 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Marshal</td>
 <td>The Law</td>
 <td>Lead others and carry what authority there is</td>
+<td>Leadership, Shooting, Riding, Read People</td>
 </tr>
 <tr class="even">
 <td>Deputy</td>
 <td>The Law</td>
 <td>Keep order, guard prisoners, back up the marshal</td>
+<td>Shooting, Brawling, Riding, Read People</td>
 </tr>
 <tr class="odd">
 <td>Detective</td>
 <td>The Law</td>
 <td>Investigate crimes for the Pinkertons or a private client</td>
+<td>Investigation, Read People, Deception, Stealth</td>
 </tr>
 <tr class="even">
 <td>Bounty Hunter</td>
 <td>The Law</td>
 <td>Track and bring in wanted men, and things that aren’t men</td>
+<td>Tracking, Shooting, Riding, Wesen Lore</td>
 </tr>
 <tr class="odd">
 <td>Doctor</td>
 <td>The Learned</td>
 <td>Patch up the wounded and read what a body tells you</td>
+<td>Medicine, Investigation, Read People, Apothecary</td>
 </tr>
 <tr class="even">
 <td>Apothecary</td>
 <td>The Learned</td>
 <td>Brew remedies, antidotes and stranger things</td>
+<td>Apothecary, Medicine, Occult, Wesen Lore</td>
 </tr>
 <tr class="odd">
 <td>Scholar</td>
 <td>The Learned</td>
 <td>Know the old books, the old languages and the occult</td>
+<td>Wesen Lore, Occult, Investigation, Persuasion</td>
 </tr>
 <tr class="even">
 <td>Preacher</td>
 <td>The Learned</td>
 <td>Comfort, counsel, and stand against the dark</td>
+<td>Persuasion, Leadership, Occult, Shooting</td>
 </tr>
 <tr class="odd">
 <td>Gunslinger</td>
 <td>The Frontier</td>
 <td>Be the fastest and steadiest gun in the room</td>
+<td>Shooting, Athletics, Read People, Riding</td>
 </tr>
 <tr class="even">
 <td>Scout</td>
 <td>The Frontier</td>
 <td>Find the trail, read the land, keep everyone alive in it</td>
+<td>Tracking, Survival, Riding, Stealth</td>
 </tr>
 <tr class="odd">
 <td>Gambler</td>
 <td>The Frontier</td>
 <td>Read people, bluff, and hear what the saloon hears</td>
+<td>Gambling, Read People, Deception, Shooting</td>
 </tr>
 <tr class="even">
 <td>Tinker</td>
 <td>The Frontier</td>
 <td>Fix guns, build traps, and make the impossible gadget</td>
+<td>Tinkering, Shooting, Investigation, Athletics</td>
 </tr>
 </tbody>
 </table>
+<p>The creator marks your calling’s four <strong>core skills</strong> (in the table above) Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven’t changed.</p>
 <h3 id="g-well-rounded-or-old-hand">Well-rounded or Old hand</h3>
 <p>Choose how your character trained (see Step 3):</p>
 <ul>
@@ -3423,6 +3439,8 @@ tr.lvl-U td.target { color: var(--muted); }
     ["Gunslinger", "frontier"], ["Scout", "frontier"], ["Gambler", "frontier"], ["Tinker", "frontier"],
   ];
   const GROUP_NAMES = { law: "The Law", learned: "The Learned", frontier: "The Frontier" };
+  // Core skills for each role: marked Trained when the role is picked.
+  const ROLE_SKILLS = {"Marshal": ["Leadership", "Shooting", "Riding", "Read People"], "Deputy": ["Shooting", "Brawling", "Riding", "Read People"], "Detective": ["Investigation", "Read People", "Deception", "Stealth"], "Bounty Hunter": ["Tracking", "Shooting", "Riding", "Wesen Lore"], "Doctor": ["Medicine", "Investigation", "Read People", "Apothecary"], "Apothecary": ["Apothecary", "Medicine", "Occult", "Wesen Lore"], "Scholar": ["Wesen Lore", "Occult", "Investigation", "Persuasion"], "Preacher": ["Persuasion", "Leadership", "Occult", "Shooting"], "Gunslinger": ["Shooting", "Athletics", "Read People", "Riding"], "Scout": ["Tracking", "Survival", "Riding", "Stealth"], "Gambler": ["Gambling", "Read People", "Deception", "Shooting"], "Tinker": ["Tinkering", "Shooting", "Investigation", "Athletics"]};
   // Starting text for "What you bring"; replaced on calling change unless the player has written their own.
   const ROLE_SUGGESTIONS = {
     Marshal: "Marshal: carries what authority there is (take a Badge advantage), with Leadership and a steady gun.",
@@ -3912,6 +3930,7 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   function render() {
+    $("role-skills").textContent = (ROLE_SKILLS[ch.dept] || []).length ? `Core skills: ${ROLE_SKILLS[ch.dept].join(", ")} (marked Trained for you)` : "";
     $("app").dataset.div = division();
     $("hdr-name").textContent = ch.name.trim() || "Unnamed character";
     const shapeCls = ch.portraitShape === "portrait" ? "portrait" : "";
@@ -4253,8 +4272,19 @@ tr.lvl-U td.target { color: var(--muted); }
   function save() { store.set(STORE_CURRENT, ch); }
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
   function load(c) { ch = normalize(c); last = null; $("r-setting").innerHTML = ""; $("r-result").hidden = true; bindFields(); render(); }
+  // A role's core skills are marked Trained when the role is chosen (and on a new character). Changing
+  // role swaps them, leaving every skill the player trained or raised themselves.
+  function applyRoleSkills() {
+    const want = ROLE_SKILLS[ch.dept] || [];
+    const auto = (ch.roleSkills || []).filter((s) => ch.skills[s] === "T" && !freeSkill(s));
+    auto.filter((s) => !want.includes(s)).forEach((s) => { ch.skills[s] = "U"; });
+    const kept = auto.filter((s) => want.includes(s));
+    want.forEach((s) => { if (ch.skills[s] === "U" && count("T") < trainedAllowed()) { ch.skills[s] = "T"; kept.push(s); } });
+    ch.roleSkills = kept;
+  }
   function setDept(d) {
     ch.dept = d;
+    applyRoleSkills();
     if (!ch.role.trim() || ROLE_TEXTS.has(ch.role)) { ch.role = ROLE_SUGGESTIONS[ch.dept] || ""; $("f-role").value = ch.role; }
   }
   function touch() { if (ch.example) ch.example = false; }
@@ -4801,7 +4831,7 @@ tr.lvl-U td.target { color: var(--muted); }
   // Wide tables scroll inside their own box on narrow screens.
   $("guide").querySelectorAll("table").forEach((t) => { const w = document.createElement("div"); w.className = "table-scroll"; t.before(w); w.append(t); });
 
-  function newOfficer() { load(blank()); selectTab("create"); toast("New character started."); }
+  function newOfficer() { load(blank()); applyRoleSkills(); render(); selectTab("create"); toast("New character started."); }
   $("btn-new").onclick = newOfficer;
   $("banner-new").onclick = newOfficer;
   $("btn-example").onclick = () => { load(example()); toast("Example detective loaded."); };
