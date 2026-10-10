@@ -245,7 +245,7 @@ tr.lvl-U td.target { color: var(--muted); }
   /* Duty station: condition and roller first, the full sheet after them. */
   .sheet { display: flex; flex-direction: column; }
   .play-col { display: contents; }
-  #card-condition { order: 1; } #card-roll { order: 2; } #card-phaser { order: 3; } #card-clocks { order: 4; } #card-ship { order: 5; } #sheet-main { order: 6; } #card-ref { order: 7; }
+  #card-condition { order: 1; } #card-roll { order: 2; } #card-weapon { order: 3; } #card-clocks { order: 4; } #card-ship { order: 5; } #sheet-main { order: 6; } #card-ref { order: 7; }
   /* Create: readiness rides along at the bottom instead of sitting above step 1. */
   #app[data-view="create"] .mobile-status, #app:not([data-view]) .mobile-status {
     display: flex; position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); z-index: 20;
@@ -305,7 +305,7 @@ tr.lvl-U td.target { color: var(--muted); }
 #equip .eq-item > span { display: grid; gap: 1px; }
 #equip .eq-item b { font-weight: 600; }
 
-/* Phaser power */
+/* Weapon charge */
 .ph-meter { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; height: 14px; }
 .ph-meter span { border-radius: 2px; background: rgba({{theme.glow}}, .12); border: 1px solid var(--line); }
 .ph-meter span.on { background: var(--chrome); border-color: var(--chrome); }
@@ -806,7 +806,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <span class="muted small">Max one point per roll or injury event. Earn one when you accept a meaningful problem from your complication.</span></div>
           <div class="checks"><label><input type="checkbox" id="f-stunned"> {{stun}}: −2 on next action roll</label>
             <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label>
-            <label id="woge-wrap" hidden><input type="checkbox" id="f-woge"> {{formToggle}}</label></div>
+            <label id="form-wrap" hidden><input type="checkbox" id="f-form"> {{formToggle}}</label></div>
         </div>
 
         <div class="card hud no-print" id="card-roll">
@@ -840,7 +840,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="field"><span class="label">Roll log</span><ul class="log" id="r-log"></ul></div>
         </div>
 
-        <div class="card hud no-print" id="card-phaser">
+        <div class="card hud no-print" id="card-weapon">
           <h3>{{weaponsTitle}}</h3>
           <div class="fields">
             <div class="field"><label for="ph-type">Weapon</label>
@@ -910,7 +910,7 @@ tr.lvl-U td.target { color: var(--muted); }
   // Origins (species, heritages, backgrounds) adjust starting attributes; every set totals 0.
   const HERITAGES = PACK.origins;
   const SPECIES = HERITAGES.map((h) => [h.id, h.name, h.adj, h.desc]);
-  const WESEN = new Set(HERITAGES.filter((h) => h.form).map((h) => h.id)); // origins with an alternate form
+  const FORMED = new Set(HERITAGES.filter((h) => h.form).map((h) => h.id)); // origins with an alternate form
   const SPECIES_TRAITS = Object.fromEntries(HERITAGES.map((h) => [h.id, h.traits]));
   const heritageOf = (c = ch) => HERITAGES.find((h) => h.id === c.speciesId);
   const tierOf = (c = ch) => (c.speciesId === "custom" ? c.customTier : heritageOf(c)?.tier ?? 0);
@@ -974,7 +974,7 @@ tr.lvl-U td.target { color: var(--muted); }
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" },
       allegiance: "", customTier: 1,
       portrait: "", portraitShape: "token",
-      play: { injury: 0, duty: 2, stunned: false, woge: false, log: [] },
+      play: { injury: 0, duty: 2, stunned: false, form: false, log: [] },
     };
   }
   function example() {
@@ -1183,7 +1183,7 @@ tr.lvl-U td.target { color: var(--muted); }
     for (const [id, k] of Object.entries(map)) $(id).value = ch[k];
     $("f-dept").value = ch.dept;
     $("f-path").value = ch.path;
-    $("f-woge").checked = !!ch.play.woge;
+    $("f-form").checked = !!ch.play.form;
     $("f-adv").value = ch.adv.id; $("f-advname").value = ch.adv.name; $("f-advtext").value = ch.adv.text; $("f-advdetail").value = ch.adv.detail;
     $("f-sadvname").value = ch.sadv.name; $("f-sadvtext").value = ch.sadv.text; $("f-scompname").value = ch.sadv.compName; $("f-scomptext").value = ch.sadv.compText;
     $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
@@ -1408,7 +1408,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("cond-effect").textContent = inj === 3 && ch.play.dying ? `Dying: needs stabilizing (one action, Medicine roll, ${T.medkit}) before the scene ends.` : INJURY[inj][1];
     if (inj < 3) ch.play.dying = false; // clearing a box ends Dying
     $("dying-wrap").hidden = inj < 3;
-    $("woge-wrap").hidden = !WESEN.has(ch.speciesId);
+    $("form-wrap").hidden = !FORMED.has(ch.speciesId);
     $("f-dying").checked = !!ch.play.dying;
     $("duty-count").textContent = ch.play.duty;
     $("duty-minus").disabled = ch.play.duty <= 0;
@@ -1444,7 +1444,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
     // In an alternate form, the form profile's bonuses apply to rolls on those attributes and their skills.
-    const w = ch.play.woge && WESEN.has(ch.speciesId) && heritageOf()?.form;
+    const w = ch.play.form && FORMED.has(ch.speciesId) && heritageOf()?.form;
     if (w) {
       const attr = name === "Dodge" ? null : ch.attrs[name] != null ? name : SKILLS.find((x) => x[0] === name)?.[1];
       const wb = name === "Dodge" ? (w.dodge || 0) + (w.attrs.Agility || 0) : w.attrs[attr] || 0;
@@ -1468,17 +1468,17 @@ tr.lvl-U td.target { color: var(--muted); }
     const t = base + total;
     const incap = ch.play.injury >= 3;
     $("r-target").textContent = incap ? "Incapacitated: you can't act until treatment clears a box."
-      : `${name} ${base} ${total ? signed(total) + " " : ""}→ target ${t} · ${pct(t)} chance${ch.play.woge && WESEN.has(ch.speciesId) ? ` (${T.formName} included)` : ""}`;
+      : `${name} ${base} ${total ? signed(total) + " " : ""}→ target ${t} · ${pct(t)} chance${ch.play.form && FORMED.has(ch.speciesId) ? ` (${T.formName} included)` : ""}`;
     $("r-roll").disabled = incap;
   }
 
   let last = null;
   function doRoll(isReroll) {
-    let phaserNote = "";
+    let weaponNote = "";
     if (!isReroll && !$("r-setting-wrap").hidden && $("r-setting").value !== "none") {
       const set = spendGun($("r-setting").value);
       if (!set) { toast(`Not enough ${T.ammo} for that ${T.shot.toLowerCase()}. ${T.reload.replace(/ \(.*\)$/, "")}, or pick another.`, true); return; }
-      phaserNote = `${set[1]}: ${set[2]} ${set[2] > 1 ? T.ammo : T.ammoOne} ${T.spent}, ${gunOf().rounds} left.`;
+      weaponNote = `${set[1]}: ${set[2]} ${set[2] > 1 ? T.ammo : T.ammoOne} ${T.spent}, ${gunOf().rounds} left.`;
     }
 
     const { name, base, total, shot } = rollMods();
@@ -1490,8 +1490,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const auto = sum <= 4 ? "auto-s" : sum >= 17 ? "auto-f" : "";
     const ok = auto === "auto-s" || (auto !== "auto-f" && sum <= t);
     const margin = t - sum;
-    const jam = PACK.weapons.jamOn18 && sum === 18 && (phaserNote || (isReroll && last && last.phaserNote));
-    last = { name, t, dice, sum, ok, margin, auto, jam, rerolled: !!isReroll, fireMod, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
+    const jam = PACK.weapons.jamOn18 && sum === 18 && (weaponNote || (isReroll && last && last.weaponNote));
+    last = { name, t, dice, sum, ok, margin, auto, jam, rerolled: !!isReroll, fireMod, weaponNote: weaponNote || (isReroll && last ? last.weaponNote : "") };
     ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
     ch.play.log = ch.play.log.slice(0, 12);
     if ($("r-stun").checked) { ch.play.stunned = false; $("f-stunned").checked = false; }
@@ -1511,7 +1511,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (r.ok && r.margin >= 5) note += " Margin 5+: assistance gives +2; medical care clears an extra box; a progress clock gets 2 segments.";
     if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
     if (!r.ok && !r.auto && r.margin >= -2) note += ` Missed by ${-r.margin}: the GM may offer success at a cost.`;
-    if (r.phaserNote) note += ` ${r.phaserNote}`;
+    if (r.weaponNote) note += ` ${r.weaponNote}`;
     if (r.fireMod) note += ` (${signed(r.fireMod)} for the shot included.)`;
     if (r.jam) note += " Natural 18: the gun jams. Clearing it takes an action.";
     el.innerHTML = `
@@ -1560,7 +1560,7 @@ tr.lvl-U td.target { color: var(--muted); }
       if (!isGS()) toast("Broadened: the Expert skill becomes a Specialty (+3), and you can train two more skills.");
       else if (count("T") > 7) toast(`${T.pathExpertPlural} have seven Trained skills; untrain ${count("T") - 7} and your Specialty becomes Expert (+5).`);
     }
-    else if (t.id === "f-woge") { ch.play.woge = t.checked; save(); updateTarget(); }
+    else if (t.id === "f-form") { ch.play.form = t.checked; save(); updateTarget(); }
     else if (t.id === "f-horror") { store.set(STORE_HORROR, t.checked); render(); }
     else if (t.id === "f-customtier") { ch.customTier = +t.value; touch(); render(); }
     else if (t.id === "f-adv2") { ch.adv2.id = t.value; touch(); render(); }
@@ -1587,7 +1587,7 @@ tr.lvl-U td.target { color: var(--muted); }
       const had = ch.sadv.id && sAdvName();
       setSpecies(t.value); $("f-species").value = ch.species; touch(); render();
       if (had && !ch.sadv.id) toast(`${had} belongs to another ${T.originLower}, so your advantage was cleared. Choose a new one in step 4.`);
-      if (!WESEN.has(ch.speciesId)) ch.play.woge = false;
+      if (!FORMED.has(ch.speciesId)) ch.play.form = false;
     }
     else if (t.id === "f-adv") {
       // One advantage: picking an origin advantage clears the regular one, and vice versa.
@@ -1849,7 +1849,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b>${c.attrs[n]}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div></div>
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span></div>
-        ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.woge ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.woge ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
+        ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.form ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.form ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
         <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
         <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${x.lab})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
         <div class="gm-traits"><span><strong>Advantage:</strong> ${esc(k.adv || "—")}</span>

@@ -13,7 +13,7 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Legend Dynamics** setting: its roles, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Legend points**.
+These are the **Legend Dynamics core rules**, which every setting shares. A setting pack adds its roles, origins, skills, gear, weapons and dangers, and may rename terms: Legend points might be Grit in a Western or Resolve in space opera.
 
 # Create your character
 

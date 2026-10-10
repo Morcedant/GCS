@@ -275,16 +275,23 @@ def build(pid, docx):
         print(f"wrote {(out / name).relative_to(ROOT)}")
 
 
-def core_rules():
+def core_rules(docx=False):
     t = terms_of({"terms": {}})
     core = (ENGINE / "core.md").read_text()
     core = core.replace("{{PACK:intro}}", "Legend Dynamics is a roleplaying system for heroic stories in any genre: concrete skills, a 3d6 roll-under core, and a small pool of Legend points that reward characters for their flaws. These core rules are setting-neutral. A **setting pack** supplies the roles, origins, skills, gear, weapons, tracks and dangers of one genre, and renames a few terms to suit it.")
     core = re.sub(r"\{\{PACK:(\w+)\}\}", "", core)
     core = re.sub(r"\{\{GEN:([\w-]+)\}\}", lambda m: f"*Your setting pack supplies this ({m.group(1).replace('-', ' ')}).*", core)
-    core = core.replace("This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Legend Dynamics** setting: its roles, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Legend points**.",
+    core = fill(core, t).replace("This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Legend Dynamics** setting: its roles, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Legend points**.",
                         "These are the **Legend Dynamics core rules**, which every setting shares. A setting pack adds its roles, origins, skills, gear, weapons and dangers, and may rename terms: Legend points might be Grit in a Western or Resolve in space opera.")
-    (LD / "Legend_Dynamics_Core_Rules.md").write_text(re.sub(r"\n{3,}", "\n\n", fill(core, t)))
+    md = re.sub(r"\n{3,}", "\n\n", core)
+    (LD / "Legend_Dynamics_Core_Rules.md").write_text(md)
     print("wrote legend-dynamics/Legend_Dynamics_Core_Rules.md")
+    if docx:
+        out = LD / "Legend_Dynamics_Core_Rules.docx"
+        subprocess.run(["pandoc", "-f", "markdown", "-o", str(out)], input=md, text=True, check=True)
+        spec = importlib.util.spec_from_file_location("bg", ROOT / "tools" / "build-guide.py"); bg = importlib.util.module_from_spec(spec); spec.loader.exec_module(bg)
+        bg.finish_docx(out)
+        print(f"wrote {out.relative_to(ROOT)}")
 
 
 def main():
@@ -295,7 +302,7 @@ def main():
     packs = a.packs or sorted(p.name for p in (LD / "packs").iterdir() if (p / "pack.json").exists())
     for pid in packs:
         build(pid, a.docx)
-    core_rules()
+    core_rules(a.docx)
 
 
 if __name__ == "__main__":
