@@ -1,0 +1,1686 @@
+{
+ "id": "western",
+ "terms": {
+  "title": "Iron Roads",
+  "eyebrow": "Legend Dynamics · Western",
+  "guideTitle": "Iron Roads Players' Guide",
+  "guideSubtitle": "A Western setting for the Legend Dynamics RPG system",
+  "point": "Grit",
+  "role": "Calling",
+  "roleLower": "calling",
+  "origin": "Background",
+  "originLower": "background",
+  "originPlural": "Backgrounds",
+  "pathRounded": "Well-rounded",
+  "pathExpert": "Old hand",
+  "pathExpertPlural": "Old hands",
+  "reasonLabel": "Why you ride",
+  "reasonSheet": "Why I ride",
+  "gear": "Gear",
+  "gearLower": "gear",
+  "tabPlay": "Ride",
+  "readyText": "Ready to ride",
+  "stun": "Dazed",
+  "medkit": "doctor's bag",
+  "mission": "Job",
+  "missionLower": "job",
+  "missionsChapter": "Running jobs",
+  "journal": "Trail journal",
+  "journalIntro": "Write it together at the end of a job. Advancements apply to the GM's copies; use each card's Save character file to send a player their update.",
+  "journalTitlePlaceholder": "e.g. The Harlan County range war",
+  "journalDateLabel": "Date",
+  "journalExtraLabel": "",
+  "journalExtraPlaceholder": "",
+  "weaponsTitle": "Gun and rounds",
+  "ammo": "rounds",
+  "ammoOne": "round",
+  "shot": "Shot",
+  "spent": "fired",
+  "sparesLabel": "Spare reloads",
+  "reload": "Reload (one action)",
+  "reloadDone": "Reloaded. That took your action.",
+  "restock": "Restock in town",
+  "restockDone": "Restocked in town: fully loaded.",
+  "emptyNote": "Empty: it won't fire until you reload.",
+  "otherWeapon": "Another weapon (no rounds)",
+  "tracksTitle": "Trouble",
+  "tracksIntro": "Shared by all the characters. A killing in the street, a robbery gone wrong, or a grudge left unsettled can mark a box. Lying low between jobs can clear one.",
+  "tracksReset": "Clear all Trouble",
+  "exampleName": "example detective",
+  "fontsHref": "https://fonts.googleapis.com/css2?family=Rye&family=IM+Fell+English+SC&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap",
+  "rangedSkill": "Shooting",
+  "meleeSkill": "Melee",
+  "unarmedSkill": "Brawling",
+  "chaseSkill": "Riding",
+  "facility": "A doctor's surgery with instruments, chloroform and a clean table",
+  "restText": "two full days"
+ },
+ "theme": {
+  "comment": "A frontier ledger by lamplight: leather-and-ink panels, brass rules, embers rising.",
+  "css": "--space: #0d0906; --glass: rgba(36, 25, 16, .88); --glass-hi: rgba(52, 36, 22, .9); --well: rgba(14, 9, 5, .72); --fg: #f0e4cc; --muted: #a8977c; --line: rgba(201, 160, 99, .26); --chrome: #d9a65e; --chrome-dim: rgba(217, 166, 94, .6); --gold: #e3b04b; --blue: #6fb5a5; --red: #d0623f; --good: #96c86e; --bad: #e2543c; --warn: #eba63c; --on-accent: #120c07; --display: \"IM Fell English SC\", Georgia, serif; --title: \"Rye\", Georgia, serif; --body: \"Crimson Pro\", Georgia, serif; --mono: \"Special Elite\", \"Courier New\", monospace; --numbers: \"Crimson Pro\", Georgia, serif; --radius: 10px;",
+  "glow": "217, 166, 94",
+  "line": "201, 160, 99",
+  "highlight": "240, 210, 160",
+  "wash1": "150, 60, 20, .22",
+  "wash2": "90, 40, 15, .2",
+  "optionBg": "#1c140d",
+  "barBg": "28, 19, 12, .95",
+  "text2": "#dccdb2",
+  "particles": {
+   "direction": "up",
+   "rgb": "255, 160, 70",
+   "density": 16000
+  }
+ },
+ "groups": [
+  {
+   "id": "law",
+   "name": "The Law",
+   "color": "--gold",
+   "emblem": "M50.0 23.0 L57.0 37.9 L73.4 36.5 L64.0 50.0 L73.4 63.5 L57.0 62.1 L50.0 77.0 L43.0 62.1 L26.6 63.5 L36.0 50.0 L26.6 36.5 L43.0 37.9 Z",
+   "stroke": false
+  },
+  {
+   "id": "learned",
+   "name": "The Learned",
+   "color": "--blue",
+   "emblem": "M22 35 Q35 29 48 35 L48 69 Q35 63 22 69 Z M52 35 Q65 29 78 35 L78 69 Q65 63 52 69 Z",
+   "stroke": false
+  },
+  {
+   "id": "frontier",
+   "name": "The Frontier",
+   "color": "--red",
+   "emblem": "M35 73 L35 50 A15 15 0 0 1 65 50 L65 73",
+   "stroke": true
+  }
+ ],
+ "roles": [
+  {
+   "name": "Marshal",
+   "group": "law",
+   "text": "Marshal: carries what authority there is (take a Badge advantage), with Leadership and a steady gun."
+  },
+  {
+   "name": "Deputy",
+   "group": "law",
+   "text": "Deputy: keeps order, guards prisoners, and backs up the marshal when it comes to shooting."
+  },
+  {
+   "name": "Detective",
+   "group": "law",
+   "text": "Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads."
+  },
+  {
+   "name": "Bounty Hunter",
+   "group": "law",
+   "text": "Bounty hunter: tracks wanted men across three territories and brings them in, upright or across a saddle."
+  },
+  {
+   "name": "Doctor",
+   "group": "learned",
+   "text": "Doctor: digs out bullets, sets bones, and reads what a body says about how it died."
+  },
+  {
+   "name": "Lawyer",
+   "group": "learned",
+   "text": "Lawyer: knows the law better than the men who wear the badges, and isn't afraid to say so."
+  },
+  {
+   "name": "Journalist",
+   "group": "learned",
+   "text": "Journalist: asks the questions no one wants asked, and prints the answers."
+  },
+  {
+   "name": "Preacher",
+   "group": "learned",
+   "text": "Preacher: comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun."
+  },
+  {
+   "name": "Gunslinger",
+   "group": "frontier",
+   "text": "Gunslinger: the fastest and steadiest gun in the room, and the one who decides when it's time to draw."
+  },
+  {
+   "name": "Scout",
+   "group": "frontier",
+   "text": "Scout: finds the trail, reads the land, and keeps everyone alive out in it."
+  },
+  {
+   "name": "Gambler",
+   "group": "frontier",
+   "text": "Gambler: reads people, bluffs, and hears everything the saloon hears."
+  },
+  {
+   "name": "Wrangler",
+   "group": "frontier",
+   "text": "Wrangler: breaks horses, drives cattle, and can ride anything with four legs."
+  }
+ ],
+ "skills": [
+  [
+   "Leadership",
+   "Presence",
+   "Give orders, rally a crowd, keep people together"
+  ],
+  [
+   "Persuasion",
+   "Presence",
+   "Convince, negotiate, calm a mob"
+  ],
+  [
+   "Deception",
+   "Presence",
+   "Lie, bluff, disguise and misdirect"
+  ],
+  [
+   "Animal Handling",
+   "Presence",
+   "Calm, train and handle horses, cattle and dogs"
+  ],
+  [
+   "Read People",
+   "Intellect",
+   "Judge motives, spot a lie, read a face"
+  ],
+  [
+   "Investigation",
+   "Intellect",
+   "Search a scene, examine clues, follow paper trails"
+  ],
+  [
+   "Law",
+   "Intellect",
+   "Statutes, warrants, courts, claims and contracts"
+  ],
+  [
+   "Medicine",
+   "Intellect",
+   "Diagnose, treat and perform surgery"
+  ],
+  [
+   "Tinkering",
+   "Intellect",
+   "Fix and modify guns, locks, machines and traps"
+  ],
+  [
+   "Gambling",
+   "Intellect",
+   "Play cards and dice, figure odds, spot a cheat"
+  ],
+  [
+   "Tracking",
+   "Intellect",
+   "Follow a trail and read signs of passage"
+  ],
+  [
+   "Survival",
+   "Intellect",
+   "Find water, shelter and food; manage wilderness hazards"
+  ],
+  [
+   "Riding",
+   "Agility",
+   "Ride, drive a wagon, handle horses in a chase"
+  ],
+  [
+   "Shooting",
+   "Agility",
+   "Revolvers, rifles and shotguns"
+  ],
+  [
+   "Melee",
+   "Agility",
+   "Knives, clubs, sabers and axes"
+  ],
+  [
+   "Brawling",
+   "Agility",
+   "Punch, wrestle, grapple and restrain"
+  ],
+  [
+   "Athletics",
+   "Body",
+   "Climb, swim, jump, run and exert yourself"
+  ],
+  [
+   "Stealth",
+   "Agility",
+   "Move quietly, hide and pick a pocket"
+  ]
+ ],
+ "physical": [
+  "Riding",
+  "Shooting",
+  "Melee",
+  "Brawling",
+  "Athletics",
+  "Stealth",
+  "Survival"
+ ],
+ "edgePoints": 3,
+ "formCore": [],
+ "origins": [
+  {
+   "id": "frontier",
+   "name": "Frontier-born",
+   "tier": 0,
+   "adj": {
+    "Body": 1,
+    "Intellect": -1
+   },
+   "desc": "Raised on a homestead or a ranch, a long way from schools and doctors. Tough, practical, and at home in hard country.",
+   "core": [],
+   "form": null,
+   "skills": [
+    "Riding",
+    "Survival",
+    "Shooting",
+    "Animal Handling"
+   ],
+   "traits": [
+    [
+     "fr-weather",
+     "Weather-Wise",
+     "+2 to Survival to read the sky and find shelter before a storm or blizzard hits.",
+     "Survival",
+     true,
+     "Plain-Spoken",
+     "You say what you think, in words townsfolk find rough. Accept the offense it gives at a bad moment."
+    ],
+    [
+     "fr-horse",
+     "Horse Sense",
+     "+2 to Animal Handling to calm, gentle or keep control of a frightened horse.",
+     "Animal Handling",
+     true,
+     "Suspicious of Town Folk",
+     "You don't trust slick talkers and city ways. Accept the cost when your suspicion is wrong."
+    ]
+   ]
+  },
+  {
+   "id": "city",
+   "name": "City-bred",
+   "tier": 0,
+   "adj": {
+    "Intellect": 1,
+    "Body": -1
+   },
+   "desc": "Schooled back east or in a western city: you read, you write, you know how the world runs on money and paper. The frontier is still learning you.",
+   "core": [],
+   "form": null,
+   "skills": [
+    "Law",
+    "Investigation",
+    "Persuasion",
+    "Read People"
+   ],
+   "traits": [
+    [
+     "ci-letters",
+     "Well Read",
+     "+2 to Intellect rolls to recall something from books, newspapers or schooling.",
+     "Intellect",
+     true,
+     "Tenderfoot",
+     "Hard country catches you out. Accept the blister, the lost trail or the laughter when it does."
+    ],
+    [
+     "ci-connected",
+     "Connected",
+     "+2 to Persuasion with bankers, lawyers, officials and the well-to-do.",
+     "Persuasion",
+     true,
+     "Family Expectations",
+     "Your family expects you home, married, or respectable. Accept their letters, visits and pressure."
+    ]
+   ]
+  },
+  {
+   "id": "veteran",
+   "name": "War Veteran",
+   "tier": 0,
+   "adj": {
+    "Will": 1,
+    "Presence": -1
+   },
+   "desc": "You fought in the war, blue or gray, and came west with what was left of you. You know how to take orders, give them, and keep your head under fire.",
+   "core": [],
+   "form": null,
+   "skills": [
+    "Shooting",
+    "Leadership",
+    "Medicine",
+    "Riding"
+   ],
+   "traits": [
+    [
+     "ve-fire",
+     "Steady Under Fire",
+     "+2 to Will against fear when bullets are flying.",
+     "Will",
+     true,
+     "Old War Wounds",
+     "The war left more than scars. Accept the nightmares, the shakes or the old wound acting up at a bad time."
+    ],
+    [
+     "ve-drill",
+     "Drilled",
+     "+2 to Leadership when organizing armed people to fight or defend.",
+     "Leadership",
+     true,
+     "Old Loyalties",
+     "Men from the other side still hate you, and men from your side still call on you. Accept the grudge or the favor."
+    ]
+   ]
+  },
+  {
+   "id": "drifter",
+   "name": "Drifter",
+   "tier": 0,
+   "adj": {
+    "Agility": 1,
+    "Will": -1
+   },
+   "desc": "No home, no ties, no questions: you've drifted from town to town for years and learned to read a room on the way in.",
+   "core": [],
+   "form": null,
+   "skills": [
+    "Gambling",
+    "Read People",
+    "Stealth",
+    "Brawling"
+   ],
+   "traits": [
+    [
+     "dr-read",
+     "Seen It All",
+     "+2 to Read People when sizing up a stranger, a saloon or a town on first sight.",
+     "Read People",
+     true,
+     "No Roots",
+     "You never stay long. Accept leaving when you're needed, or the strain of staying put."
+    ],
+    [
+     "dr-slip",
+     "Slippery",
+     "+2 to Stealth when slipping out of a building, a crowd or a town unnoticed.",
+     "Stealth",
+     true,
+     "A Past That Follows",
+     "Someone from one of those towns remembers you. Accept it when they turn up."
+    ]
+   ]
+  },
+  {
+   "id": "immigrant",
+   "name": "Immigrant",
+   "tier": 0,
+   "adj": {
+    "Will": 1,
+    "Presence": -1
+   },
+   "desc": "You crossed an ocean to get here, from Ireland, China, Germany, Italy, Mexico or anywhere else, and you've had to work twice as hard to be treated half as well.",
+   "core": [],
+   "form": null,
+   "skills": [
+    "Athletics",
+    "Tinkering",
+    "Persuasion",
+    "Survival"
+   ],
+   "traits": [
+    [
+     "im-tongue",
+     "Two Tongues",
+     "+2 to Persuasion with people of your homeland, and you speak its language fluently.",
+     "Persuasion",
+     true,
+     "Prejudice",
+     "Some people will never accept you. Accept the slight, the closed door or the threat."
+    ],
+    [
+     "im-grit",
+     "Hard Worker",
+     "+2 to Body to keep going through long, exhausting labor.",
+     "Body",
+     true,
+     "Family Abroad",
+     "People back home depend on the money you send. Accept the pressure when it runs short."
+    ]
+   ]
+  },
+  {
+   "id": "oldmoney",
+   "name": "Old Money",
+   "tier": 0,
+   "adj": {
+    "Presence": 1,
+    "Body": -1
+   },
+   "desc": "Your family has money, land or a name that opens doors. Out here it buys less than it used to, but it still buys plenty.",
+   "core": [],
+   "form": null,
+   "skills": [
+    "Persuasion",
+    "Leadership",
+    "Law",
+    "Gambling"
+   ],
+   "traits": [
+    [
+     "om-purse",
+     "Deep Pockets",
+     "+2 to Persuasion when money changes hands: bribes, deals and favors bought.",
+     "Persuasion",
+     true,
+     "Spoiled",
+     "You're used to getting your way. Accept the cost when you don't and won't let it go."
+    ],
+    [
+     "om-name",
+     "A Name That Opens Doors",
+     "+2 to Leadership or Persuasion with people who know your family's name.",
+     "Leadership",
+     true,
+     "Family Enemies",
+     "Your family made enemies getting rich. Accept it when they come for you."
+    ]
+   ]
+  },
+  {
+   "id": "railroad",
+   "name": "Railroad Hand",
+   "tier": 0,
+   "adj": {
+    "Body": 1,
+    "Presence": -1
+   },
+   "desc": "You laid track, drove spikes, fired the engines or blew the tunnels. You know machines, explosives, and how the railroad treats its men.",
+   "core": [],
+   "form": null,
+   "skills": [
+    "Tinkering",
+    "Athletics",
+    "Brawling",
+    "Survival"
+   ],
+   "traits": [
+    [
+     "rr-powder",
+     "Powder Man",
+     "+2 to Tinkering when setting, timing or defusing dynamite.",
+     "Tinkering",
+     true,
+     "Union Man",
+     "You stand with working men against the bosses. Accept the trouble when the company comes down on you."
+    ],
+    [
+     "rr-iron",
+     "Iron Grip",
+     "+2 to Athletics for feats of raw strength: lifting, bending, holding.",
+     "Athletics",
+     true,
+     "Blasting Deaf",
+     "Years of dynamite took some of your hearing. Accept it when you miss something said quietly."
+    ]
+   ]
+  }
+ ],
+ "allegiances": [
+  [
+   "railroad",
+   "The Railroad",
+   "Once per job, a free ticket, a telegraph message on the company wire, or a word with a division boss.",
+   "Duty: the company expects you to protect its interests, even when they aren't right."
+  ],
+  [
+   "baron",
+   "A Cattle Baron",
+   "Once per job, money, horses or hired hands.",
+   "Duty: the baron's range wars become your fights."
+  ],
+  [
+   "army",
+   "The Army",
+   "Once per job, help from a fort: supplies, an escort or a doctor.",
+   "Duty: orders from a commanding officer, and old soldiers' quarrels."
+  ],
+  [
+   "church",
+   "The Church",
+   "Once per job, shelter, records or a favor from the clergy.",
+   "Duty: the Church gives you orders, and its enemies are yours."
+  ],
+  [
+   "gang",
+   "An Outlaw Gang",
+   "Once per job, a hideout, a fence or a gun at your side.",
+   "Duty: the gang calls in favors, and the law knows your face."
+  ]
+ ],
+ "reasons": [
+  [
+   "Justice",
+   "Somebody has to stand up for the people who can't."
+  ],
+  [
+   "Vengeance",
+   "Someone did me wrong, and I mean to settle it."
+  ],
+  [
+   "Fortune",
+   "There's money out here for anyone with nerve enough to take it."
+  ],
+  [
+   "A fresh start",
+   "Nobody out here knows what I did back east."
+  ],
+  [
+   "Duty",
+   "I took an oath, and I keep my word."
+  ],
+  [
+   "Freedom",
+   "No boss, no fences, no one to answer to."
+  ],
+  [
+   "Family",
+   "Everything I do is for my family."
+  ],
+  [
+   "Faith",
+   "The Lord sent me here for a reason, and I believe this is it."
+  ],
+  [
+   "Redemption",
+   "I did harm once. I mean to balance the ledger."
+  ],
+  [
+   "Nowhere else to go",
+   "These people took me in when no one else would."
+  ]
+ ],
+ "connections": [
+  [
+   "Rode together in the war",
+   "We served in the same company and still watch each other's backs."
+  ],
+  [
+   "They saved my life",
+   "They cut me down from a lynch mob's rope, and I owe them my life."
+  ],
+  [
+   "I saved theirs",
+   "I pulled them out of a burning barn, and they haven't forgotten it."
+  ],
+  [
+   "Mentor",
+   "They taught me to shoot, ride and survive out here."
+  ],
+  [
+   "Friendly rivals",
+   "We're always competing over the same bounty, the same card game or the same sweetheart."
+  ],
+  [
+   "Same hometown",
+   "We grew up in the same town and know each other's families."
+  ],
+  [
+   "An unpaid debt",
+   "I owe them money, or a favor, and I haven't paid it yet."
+  ],
+  [
+   "A shared secret",
+   "We share a secret from a job neither of us talks about."
+  ],
+  [
+   "Saloon regulars",
+   "We meet every Saturday night for cards, whiskey and lies."
+  ],
+  [
+   "Bad blood",
+   "They blame me for something that went wrong on a past job."
+  ]
+ ],
+ "advantages": [
+  [
+   "steady",
+   "Steady Hands",
+   "+2 to Medicine for surgery or digging out a bullet. It does not improve diagnosis.",
+   "Medicine"
+  ],
+  [
+   "surgeon",
+   "Battlefield Surgeon",
+   "+2 to Medicine for emergency stabilization of a wounded patient.",
+   "Medicine"
+  ],
+  [
+   "observer",
+   "Astute Observer",
+   "+2 to Intellect rolls to notice a concealed physical clue during a deliberate search.",
+   "Intellect"
+  ],
+  [
+   "quickdraw",
+   "Quick Draw",
+   "+2 to Shooting on your first shot of a fight, with a holstered revolver.",
+   "Shooting"
+  ],
+  [
+   "marksman",
+   "Careful Marksman",
+   "+2 to Shooting after spending your preceding action aiming at the same visible target.",
+   "Shooting"
+  ],
+  [
+   "saddle",
+   "Born in the Saddle",
+   "+2 to Riding in a chase or on dangerous ground.",
+   "Riding"
+  ],
+  [
+   "bloodhound",
+   "Bloodhound",
+   "+2 to Tracking when the trail is more than a day old.",
+   "Tracking"
+  ],
+  [
+   "sharp",
+   "Card Sharp",
+   "+2 to Gambling at cards, including spotting someone else's cheating.",
+   "Gambling"
+  ],
+  [
+   "poker",
+   "Poker Face",
+   "+2 to Deception to hide what you know or feel under questioning.",
+   "Deception"
+  ],
+  [
+   "gunsmith",
+   "Gunsmith",
+   "+2 to Tinkering when repairing or modifying a firearm.",
+   "Tinkering"
+  ],
+  [
+   "coolhead",
+   "Cool Head",
+   "+2 to Leadership when coordinating others in a sudden emergency.",
+   "Leadership"
+  ],
+  [
+   "courage",
+   "Unshakable Courage",
+   "+2 to Will against overwhelming fear.",
+   "Will"
+  ],
+  [
+   "ironwill",
+   "Iron Will",
+   "+2 to Will to resist intimidation, threats or torture.",
+   "Will"
+  ],
+  [
+   "knife",
+   "Knife Fighter",
+   "+2 to Melee with a knife in close quarters.",
+   "Melee"
+  ],
+  [
+   "preacher",
+   "Hellfire Preacher",
+   "+2 to Persuasion when calming or rousing a crowd.",
+   "Persuasion"
+  ],
+  [
+   "bargain",
+   "Hard Bargainer",
+   "+2 to Persuasion when buying, selling or settling a deal.",
+   "Persuasion"
+  ],
+  [
+   "badge-local",
+   "Badge: Town Police or Deputy",
+   "Legal authority in one town or county: you can carry arms where others can't, question witnesses, make arrests and hold suspects. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. Outside your jurisdiction it's just tin.",
+   "Leadership"
+  ],
+  [
+   "badge-sheriff",
+   "Badge: Sheriff",
+   "Authority across your county: everything a deputy can do, plus serving warrants, running the jail, and swearing in deputies and armed citizens. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.",
+   "Leadership"
+  ],
+  [
+   "badge-marshal",
+   "Badge: Deputy U.S. Marshal",
+   "Federal authority across states and territories: serving federal warrants, pursuing fugitives across county and state lines, swearing in deputies, and calling on local lawmen for help. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.",
+   "Leadership"
+  ],
+  [
+   "pinkerton",
+   "Pinkerton Credentials",
+   "A commission from the Pinkerton National Detective Agency: carry arms on the job, work a client's case across county and state lines, and draw on the agency's offices and files (records, photographs and descriptions of wanted men). +2 to Investigation when using the agency's records or contacts. You have no powers of arrest beyond any citizen's unless local law deputizes you, and you answer to the client and the agency.",
+   "Investigation"
+  ]
+ ],
+ "complications": [
+  [
+   "mystery",
+   "Cannot Leave a Mystery Alone",
+   "A strange discovery tempts you to linger, spend something scarce, or take a risky look. Accept a specific cost."
+  ],
+  [
+   "protects",
+   "Protects Others at Personal Risk",
+   "You shield someone or volunteer for a hazardous rescue at a real cost to yourself."
+  ],
+  [
+   "code",
+   "Code of the West",
+   "You won't shoot an unarmed man, break your word, or strike from behind. Accept the setback your code causes."
+  ],
+  [
+   "lawful",
+   "Law and Order",
+   "You insist on arrest, trial and due process. Accept the delay or danger it costs."
+  ],
+  [
+   "reputation",
+   "Reputation to Uphold",
+   "Pride tempts you to refuse help or take on too much. Take a real consequence when it matters."
+  ],
+  [
+   "war",
+   "Haunted by the War",
+   "A specific reminder of the war causes hesitation or a hard choice. Define the reminder together."
+  ],
+  [
+   "secret",
+   "Keeps a Dangerous Secret",
+   "An agreed secret threatens trust or safety. Earn a point when protecting or revealing it has a real consequence."
+  ],
+  [
+   "rival",
+   "Old Rival",
+   "A recurring rival complicates your work with concrete problems."
+  ],
+  [
+   "home",
+   "Someone Back Home",
+   "A family or a sweetheart pulls you away from the work."
+  ],
+  [
+   "vengeance",
+   "Sworn Vengeance",
+   "You've sworn to kill someone. Accept the risk when the chance comes."
+  ],
+  [
+   "temper",
+   "Short Fuse",
+   "You answer insults with fists or guns. Accept the fight you start."
+  ],
+  [
+   "bottle",
+   "The Bottle",
+   "Whiskey or laudanum has a hold on you. Accept the lost night or the slip at a bad time."
+  ],
+  [
+   "game",
+   "Can't Walk Away from a Game",
+   "A card game, a bet or a dare is irresistible. Accept the time or money lost."
+  ],
+  [
+   "wanted",
+   "Wanted",
+   "There's a price on your head somewhere. Accept trouble when lawmen or bounty hunters come."
+  ],
+  [
+   "debt",
+   "Owes the Wrong People",
+   "A debt to dangerous people comes due. Accept their demand."
+  ],
+  [
+   "nonlethal",
+   "Reluctant to Kill",
+   "You seek a way that doesn't end a life. Accept the extra danger."
+  ]
+ ],
+ "triggers": {
+  "mystery": [
+   "A strange track or body no one can explain",
+   "Everyone's ready to move on, and something is still wrong",
+   "An old letter hints at a buried story"
+  ],
+  "protects": [
+   "A friend is pinned down or hurt",
+   "Townsfolk are caught in the crossfire",
+   "Someone volunteers for a deadly job in your place"
+  ],
+  "code": [
+   "The enemy is unarmed or has turned to run",
+   "A promise you made becomes dangerous to keep",
+   "The easy shot is in someone's back"
+  ],
+  "lawful": [
+   "A suspect could be shot instead of arrested",
+   "The town wants a hanging without a trial",
+   "Your friends plan to take the law into their own hands"
+  ],
+  "reputation": [
+   "Someone questions your nerve in front of others",
+   "A job is beyond what you're ready for",
+   "Getting help means admitting a mistake"
+  ],
+  "war": [
+   "Gunfire in the dark",
+   "Meeting a man who fought on the other side",
+   "A field hospital, cannon, or a burning farm"
+  ],
+  "secret": [
+   "Someone starts asking the wrong questions",
+   "Evidence that could expose you turns up",
+   "Keeping the secret means lying to a friend"
+  ],
+  "rival": [
+   "Your rival is after the same quarry",
+   "Your rival takes credit for your work",
+   "Your rival needs your help"
+  ],
+  "home": [
+   "A letter from home arrives",
+   "The job leads near your family",
+   "Someone you love is in danger"
+  ],
+  "vengeance": [
+   "Word of the one you swore to kill",
+   "A face from that day turns up",
+   "The chance comes at the worst possible moment"
+  ],
+  "temper": [
+   "Someone insults you or yours",
+   "You're called a coward",
+   "A bully picks on someone weaker"
+  ],
+  "bottle": [
+   "A long night with nothing to do but wait",
+   "Pain that won't quit",
+   "A hard loss"
+  ],
+  "game": [
+   "A high-stakes game in town",
+   "Someone dares you",
+   "A sure thing that isn't"
+  ],
+  "wanted": [
+   "A lawman from back east comes asking",
+   "Your face on a poster",
+   "A bounty hunter rides into town"
+  ],
+  "debt": [
+   "A collector arrives",
+   "Your creditor wants a favor instead",
+   "The interest comes due"
+  ],
+  "nonlethal": [
+   "The man who surrenders is a killer",
+   "The only fast solution would kill someone",
+   "Your friends vote to shoot first"
+  ]
+ },
+ "equipment": [
+  [
+   "revolver",
+   "Revolver",
+   "Six shots; reloading takes an action. Hits mark 2 boxes."
+  ],
+  [
+   "rifle",
+   "Rifle",
+   "A lever-action repeater with fifteen shots and long range. Hits mark 2 boxes."
+  ],
+  [
+   "shotgun",
+   "Shotgun",
+   "Two barrels. Devastating close up (3 boxes and Dying), weak beyond a few paces (1 box)."
+  ],
+  [
+   "knife",
+   "Knife",
+   "A tool and a weapon; hits mark 1 box."
+  ],
+  [
+   "doctorbag",
+   "Doctor's bag",
+   "Instruments, laudanum, carbolic and bandages. Needed to stabilize a patient and give field treatment."
+  ],
+  [
+   "tools",
+   "Tool roll",
+   "Gunsmith's and carpenter's tools. Needed for most Tinkering in the field."
+  ],
+  [
+   "horse",
+   "Horse and tack",
+   "Carries you across the territory. Riding in a chase needs one."
+  ],
+  [
+   "trailkit",
+   "Trail kit",
+   "Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones."
+  ],
+  [
+   "lantern",
+   "Lantern and matches",
+   "Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible."
+  ],
+  [
+   "glasses",
+   "Field glasses",
+   "See detail at a distance. Spotting something far off without them is very difficult (−4) or impossible."
+  ],
+  [
+   "lawbooks",
+   "Law books and blank warrants",
+   "Needed to draw up papers, check a statute or argue a point of law away from a courthouse."
+  ],
+  [
+   "dynamite",
+   "Dynamite",
+   "Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre."
+  ]
+ ],
+ "weapons": {
+  "skill": "Shooting",
+  "jamOn18": true,
+  "defaultSpares": 2,
+  "items": {
+   "derringer": [
+    "Derringer",
+    2
+   ],
+   "revolver": [
+    "Revolver",
+    6
+   ],
+   "shotgun": [
+    "Double-barrel shotgun",
+    2
+   ],
+   "rifle": [
+    "Lever-action rifle",
+    15
+   ]
+  },
+  "equipLinked": [
+   "revolver",
+   "rifle",
+   "shotgun"
+  ],
+  "modes": [
+   [
+    "single",
+    "Single shot",
+    1,
+    null,
+    0
+   ],
+   [
+    "fan",
+    "Fan the hammer",
+    3,
+    [
+     "revolver"
+    ],
+    -2
+   ],
+   [
+    "both",
+    "Both barrels",
+    2,
+    [
+     "shotgun"
+    ],
+    2
+   ],
+   [
+    "cover",
+    "Covering fire",
+    3,
+    null,
+    0
+   ]
+  ]
+ },
+ "tracks": [
+  {
+   "name": "Heat",
+   "boxes": 4,
+   "effects": [
+    "The law isn't looking",
+    "Questions at the sheriff's office",
+    "Wanted posters: −2 to Persuasion with lawmen",
+    "A posse is out",
+    "A warrant and a manhunt: start a Manhunt clock"
+   ]
+  },
+  {
+   "name": "Feud",
+   "boxes": 4,
+   "effects": [
+    "No one's holding a grudge",
+    "Hard words in the saloon",
+    "Enemies are gathering",
+    "They're in town",
+    "They strike: start a clock"
+   ]
+  },
+  {
+   "name": "Talk",
+   "boxes": 4,
+   "effects": [
+    "Nobody's talking",
+    "Gossip at the general store",
+    "The newspaper prints a story",
+    "Your names are known in three territories",
+    "Everyone knows your faces: −2 to Stealth and Deception with strangers"
+   ]
+  }
+ ],
+ "seeds": {
+  "mission": [
+   "Job",
+   [
+    "Escort a payroll through bandit country",
+    "Bring in a man with a price on his head",
+    "Find a stagecoach that never arrived",
+    "Settle a range war before it starts",
+    "Protect a town from the gang that's coming",
+    "Recover stolen cattle",
+    "Find a missing child",
+    "Guard a witness until the trial",
+    "Track down a train robber",
+    "Solve a murder no one wants solved",
+    "Clear an innocent man of a hanging charge",
+    "Deliver medicine through a blizzard"
+   ]
+  ],
+  "place": [
+   "Place",
+   [
+    "A silver boomtown",
+    "A logging camp in the deep woods",
+    "A river steamboat",
+    "The railroad's end-of-track camp",
+    "A lonely homestead",
+    "A ghost town",
+    "A mission church",
+    "A saloon and gambling hall",
+    "A frontier fort",
+    "A fog-bound waterfront",
+    "A canyon ranch",
+    "A snowbound mountain pass"
+   ]
+  ],
+  "strange": [
+   "The trouble",
+   [
+    "A gang that's bought the sheriff",
+    "A cattle baron who wants the water",
+    "A railroad that wants the land",
+    "A feud two generations old",
+    "A fraud selling worthless land",
+    "A killer who signs his work",
+    "A mine that's poisoning the creek",
+    "A con man with a medicine show",
+    "A hired gun with a grudge",
+    "A bank that's about to fail",
+    "A war hero who isn't",
+    "A drought that's driving men desperate"
+   ]
+  ],
+  "twist": [
+   "Twist",
+   [
+    "The victim was the villain",
+    "The law is in on it",
+    "Two families are feuding",
+    "The client lied about everything",
+    "A rich man pays for silence",
+    "A character's complication comes into play",
+    "The outlaw is protecting his family",
+    "Someone is using the outlaw",
+    "The town wants a hanging, any hanging",
+    "The army arrives with its own orders",
+    "Another bounty hunter is after the same man",
+    "The trail leads to someone a character loves"
+   ]
+  ],
+  "clock": [
+   "Ticking clock",
+   [
+    [
+     "The mob forms",
+     6
+    ],
+    [
+     "Nightfall",
+     4
+    ],
+    [
+     "The gang rides in",
+     6
+    ],
+    [
+     "The stage leaves town",
+     4
+    ],
+    [
+     "The witness is found",
+     6
+    ],
+    [
+     "The river floods",
+     8
+    ],
+    [
+     "The trail goes cold",
+     4
+    ],
+    [
+     "The hanging at dawn",
+     4
+    ],
+    [
+     "The newspaper prints the story",
+     8
+    ],
+    [
+     "The fire spreads",
+     4
+    ],
+    [
+     "The outlaw crosses the border",
+     6
+    ],
+    [
+     "The snows close the pass",
+     8
+    ]
+   ]
+  ],
+  "who": [
+   "Key character",
+   [
+    "A sheriff who wants it simple",
+    "A widow who knows more than she says",
+    "A traveling doctor",
+    "A Pinkerton detective",
+    "A railroad baron",
+    "A frightened homesteader family",
+    "A gunfighter trying to retire",
+    "A child who saw it happen",
+    "A preacher with a past",
+    "A newspaperman who's close to the truth",
+    "A judge who can be bought",
+    "A dying outlaw with a last request"
+   ]
+  ]
+ },
+ "journal": {
+  "mode": "calendar",
+  "start": [
+   1878,
+   3,
+   2
+  ],
+  "outcomes": [
+   "Done",
+   "Partly done",
+   "Failed",
+   "Ongoing"
+  ]
+ },
+ "formPenalties": {},
+ "restricted": null,
+ "example": {
+  "name": "Josephine Hale",
+  "rank": "Pinkerton operative",
+  "dept": "Detective",
+  "path": "rounded",
+  "speciesId": "city",
+  "role": "Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads.",
+  "reason": "Somebody has to stand up for the people who can't.",
+  "connection": "Owes the town doctor for keeping quiet about how her last client really died.",
+  "attrs": {
+   "Body": 9,
+   "Agility": 11,
+   "Intellect": 14,
+   "Presence": 11,
+   "Will": 11
+  },
+  "skills": {
+   "Investigation": "S",
+   "Read People": "T",
+   "Law": "T",
+   "Tracking": "T",
+   "Survival": "T",
+   "Gambling": "T",
+   "Persuasion": "T",
+   "Deception": "T",
+   "Shooting": "T",
+   "Riding": "T",
+   "Medicine": "T"
+  },
+  "adv": {
+   "id": "pinkerton"
+  },
+  "comp": {
+   "id": "mystery",
+   "trigger": "A strange track or body no one can explain"
+  },
+  "edges": {
+   "attr": 1,
+   "skill": 1,
+   "contact": 1
+  },
+  "contact": "A clerk in the Pinkertons' regional office who'll pull a file, quietly",
+  "equipment": {
+   "revolver": true,
+   "horse": true,
+   "lantern": true
+  },
+  "play": {
+   "gun": {
+    "type": "revolver",
+    "rounds": 6,
+    "spares": 2
+   }
+  }
+ },
+ "pregens": [
+  {
+   "name": "Ruth Calloway",
+   "rank": "Deputy U.S. Marshal",
+   "dept": "Marshal",
+   "path": "rounded",
+   "speciesId": "frontier",
+   "species": "Frontier-born",
+   "role": "Wears the badge in three counties, and rides alone more often than she'd like.",
+   "reason": "I took an oath, and I keep my word.",
+   "connection": "Isaiah Booker brought in the man who killed her father, alive, when he could have collected either way.",
+   "attrs": {
+    "Body": 12,
+    "Agility": 13,
+    "Intellect": 9,
+    "Presence": 11,
+    "Will": 11
+   },
+   "skills": {
+    "Shooting": "S",
+    "Riding": "T",
+    "Brawling": "T",
+    "Athletics": "T",
+    "Tracking": "T",
+    "Leadership": "T",
+    "Read People": "T",
+    "Survival": "T",
+    "Animal Handling": "T",
+    "Law": "T"
+   },
+   "adv": {
+    "id": "quickdraw"
+   },
+   "sadv": {
+    "id": ""
+   },
+   "comp": {
+    "id": "lawful",
+    "trigger": "The town wants a hanging without a trial"
+   },
+   "edges": {
+    "attr": 1,
+    "adv2": 1,
+    "grit": 1
+   },
+   "adv2": {
+    "id": "badge-marshal"
+   },
+   "play": {
+    "duty": 3,
+    "gun": {
+     "type": "revolver",
+     "rounds": 6,
+     "spares": 2
+    }
+   },
+   "equipment": {
+    "revolver": true,
+    "rifle": true,
+    "horse": true,
+    "trailkit": true
+   }
+  },
+  {
+   "name": "Dr. Elias Webb",
+   "rank": "Town physician",
+   "dept": "Doctor",
+   "path": "rounded",
+   "speciesId": "city",
+   "species": "City-bred",
+   "role": "Left a Philadelphia practice for reasons he won't discuss, and patches up whoever comes through the door.",
+   "reason": "Nobody out here knows what I did back east.",
+   "connection": "Reverend Stone is the only one who knows why he left Philadelphia.",
+   "attrs": {
+    "Body": 9,
+    "Agility": 10,
+    "Intellect": 13,
+    "Presence": 12,
+    "Will": 11
+   },
+   "skills": {
+    "Medicine": "S",
+    "Investigation": "T",
+    "Read People": "T",
+    "Law": "T",
+    "Persuasion": "T",
+    "Leadership": "T",
+    "Riding": "T",
+    "Survival": "T",
+    "Tinkering": "T",
+    "Gambling": "T"
+   },
+   "adv": {
+    "id": "steady"
+   },
+   "sadv": {
+    "id": ""
+   },
+   "comp": {
+    "id": "bottle",
+    "trigger": "Pain that won't quit"
+   },
+   "edges": {
+    "adv2": 1,
+    "gear": 1,
+    "contact": 1
+   },
+   "adv2": {
+    "id": "surgeon"
+   },
+   "gear": {
+    "item": "His surgeon's instruments",
+    "skill": "Medicine"
+   },
+   "contact": "The editor of the territorial newspaper, who owes him a life",
+   "equipment": {
+    "doctorbag": true,
+    "horse": true,
+    "lantern": true
+   }
+  },
+  {
+   "name": "Tom Feeney",
+   "rank": "Horse breaker",
+   "dept": "Wrangler",
+   "path": "rounded",
+   "speciesId": "immigrant",
+   "species": "Immigrant",
+   "role": "Came from County Clare with nothing, and can ride anything with four legs.",
+   "reason": "Everything I do is for my family.",
+   "connection": "Plays cards with Lucinda Marsh every Saturday, and loses.",
+   "attrs": {
+    "Body": 12,
+    "Agility": 12,
+    "Intellect": 10,
+    "Presence": 10,
+    "Will": 11
+   },
+   "skills": {
+    "Riding": "S",
+    "Animal Handling": "T",
+    "Athletics": "T",
+    "Brawling": "T",
+    "Shooting": "T",
+    "Survival": "T",
+    "Tracking": "T",
+    "Tinkering": "T",
+    "Melee": "T",
+    "Gambling": "T",
+    "Stealth": "T"
+   },
+   "adv": {
+    "id": ""
+   },
+   "sadv": {
+    "id": "im-grit"
+   },
+   "comp": {
+    "id": "temper",
+    "trigger": "Someone insults you or yours"
+   },
+   "edges": {
+    "skill": 1,
+    "grit": 1,
+    "gear": 1
+   },
+   "gear": {
+    "item": "Bramble, a mustang who'll run all day",
+    "skill": "Riding"
+   },
+   "play": {
+    "duty": 3,
+    "gun": {
+     "type": "rifle",
+     "rounds": 15,
+     "spares": 2
+    }
+   },
+   "equipment": {
+    "horse": true,
+    "rifle": true,
+    "knife": true,
+    "trailkit": true
+   }
+  },
+  {
+   "name": "Lucinda Marsh",
+   "rank": "Professional gambler",
+   "dept": "Gambler",
+   "path": "hand",
+   "speciesId": "drifter",
+   "species": "Drifter",
+   "role": "Has dealt faro in every boomtown from Deadwood to Tombstone, and remembers every face.",
+   "reason": "There's money out here for anyone with nerve enough to take it.",
+   "connection": "Owes Ruth Calloway a favor for a warrant that went missing.",
+   "attrs": {
+    "Body": 10,
+    "Agility": 11,
+    "Intellect": 13,
+    "Presence": 12,
+    "Will": 10
+   },
+   "skills": {
+    "Gambling": "S",
+    "Read People": "T",
+    "Deception": "T",
+    "Persuasion": "T",
+    "Shooting": "T",
+    "Stealth": "T",
+    "Investigation": "T",
+    "Riding": "T"
+   },
+   "adv": {
+    "id": ""
+   },
+   "sadv": {
+    "id": "dr-read"
+   },
+   "comp": {
+    "id": "debt",
+    "trigger": "A collector arrives"
+   },
+   "edges": {
+    "attr": 1,
+    "adv2": 1,
+    "contact": 1
+   },
+   "adv2": {
+    "id": "sharp"
+   },
+   "contact": "Mae Lin, a faro dealer who hears everything said at her table",
+   "play": {
+    "gun": {
+     "type": "derringer",
+     "rounds": 2,
+     "spares": 1
+    }
+   },
+   "equipment": {
+    "lantern": true
+   }
+  },
+  {
+   "name": "Isaiah Booker",
+   "rank": "Bounty hunter",
+   "dept": "Bounty Hunter",
+   "path": "rounded",
+   "speciesId": "veteran",
+   "species": "War Veteran",
+   "role": "Fought with the colored troops in the war, and has brought in more wanted men than any hunter in the territory.",
+   "reason": "Somebody has to stand up for the people who can't.",
+   "connection": "Taught Tom Feeney to shoot straight, and still reminds him of it.",
+   "attrs": {
+    "Body": 12,
+    "Agility": 13,
+    "Intellect": 11,
+    "Presence": 9,
+    "Will": 11
+   },
+   "skills": {
+    "Shooting": "S",
+    "Tracking": "T",
+    "Riding": "T",
+    "Survival": "T",
+    "Athletics": "T",
+    "Brawling": "T",
+    "Stealth": "T",
+    "Read People": "T",
+    "Investigation": "T",
+    "Melee": "T",
+    "Law": "T"
+   },
+   "adv": {
+    "id": ""
+   },
+   "sadv": {
+    "id": "ve-fire"
+   },
+   "comp": {
+    "id": "code",
+    "trigger": "The easy shot is in someone's back"
+   },
+   "edges": {
+    "attr": 1,
+    "skill": 1,
+    "gear": 1
+   },
+   "gear": {
+    "item": "A Sharps rifle with a telescopic sight",
+    "skill": "Shooting"
+   },
+   "play": {
+    "gun": {
+     "type": "rifle",
+     "rounds": 15,
+     "spares": 2
+    }
+   },
+   "equipment": {
+    "rifle": true,
+    "revolver": true,
+    "horse": true,
+    "trailkit": true,
+    "glasses": true
+   }
+  },
+  {
+   "name": "Rev. Abigail Stone",
+   "rank": "Circuit preacher",
+   "dept": "Preacher",
+   "path": "rounded",
+   "speciesId": "oldmoney",
+   "species": "Old Money",
+   "role": "Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across her knees.",
+   "reason": "The Lord sent me here for a reason, and I believe this is it.",
+   "connection": "Keeps Dr. Webb's secret, and his whiskey hidden.",
+   "attrs": {
+    "Body": 9,
+    "Agility": 10,
+    "Intellect": 11,
+    "Presence": 14,
+    "Will": 12
+   },
+   "skills": {
+    "Persuasion": "S",
+    "Leadership": "T",
+    "Read People": "T",
+    "Medicine": "T",
+    "Law": "T",
+    "Investigation": "T",
+    "Survival": "T",
+    "Riding": "T",
+    "Shooting": "T",
+    "Athletics": "T"
+   },
+   "adv": {
+    "id": "preacher"
+   },
+   "sadv": {
+    "id": ""
+   },
+   "comp": {
+    "id": "protects",
+    "trigger": "Townsfolk are caught in the crossfire"
+   },
+   "allegiance": "church",
+   "edges": {
+    "attr": 1,
+    "adv2": 1,
+    "contact": 1
+   },
+   "adv2": {
+    "id": "courage"
+   },
+   "contact": "Bishop Harrow, who answers her letters and asks no questions",
+   "play": {
+    "gun": {
+     "type": "shotgun",
+     "rounds": 2,
+     "spares": 2
+    }
+   },
+   "equipment": {
+    "shotgun": true,
+    "horse": true,
+    "lantern": true
+   }
+  }
+ ],
+ "docxColors": [
+  "4A2A12",
+  "F1E6D2"
+ ],
+ "quickRef": [
+  [
+   "Damage",
+   "Fists, clubs, knives, arrows: 1 box. Guns, heavy blades: 2. Close-range shotgun or buffalo rifle: 3 and Dying."
+  ],
+  [
+   "Guns",
+   "Derringer 2, revolver 6, shotgun 2, rifle 15. Fan the hammer 3 (−2), both barrels 2 (+2 close), covering fire 3. Reload: one action. Natural 18 jams."
+  ]
+ ]
+}
