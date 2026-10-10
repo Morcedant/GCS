@@ -64,3 +64,24 @@ npx wrangler deploy      # deploy from the terminal instead of the dashboard
 npx wrangler secret put DISCORD_PUBLIC_KEY
 DISCORD_APPLICATION_ID=... DISCORD_BOT_TOKEN=... npm run register
 ```
+
+## If it isn't working
+
+Open the Worker's address (`https://pelion-dice.YOUR-NAME.workers.dev`) in a browser first.
+
+| What you see | What it means |
+|---|---|
+| "Hello World!" | The bot code wasn't deployed. Paste `src/worker.js` again in **Edit code** and press **Deploy**. |
+| An error page (e.g. 1101) | Only part of the code was pasted. Paste the whole file again and **Deploy**. |
+| "USS Pelion dice bot is running." with `!!` lines | A setting is missing or mistyped; the line says which. |
+| All `OK` lines | The Worker is fine; check the Discord side below. |
+
+On the Discord side:
+
+- **"Interactions endpoint URL could not be verified"** when saving: the Public Key in Cloudflare doesn't match this app's
+  General Information page, or the URL is wrong. Use the exact `https://…workers.dev` address with nothing after it.
+- **`/register` shows "Discord refused the command (401)"**: the bot token is wrong or was reset. Reset it again on the
+  **Bot** page and update `DISCORD_BOT_TOKEN`.
+- **`/pelion` doesn't appear in Discord**: the app isn't installed on that server (Installation step), or Discord hasn't
+  refreshed. Press Ctrl+R (Cmd+R on a Mac) in Discord.
+- **"The application did not respond"**: the Interactions Endpoint URL points somewhere else, or the Worker code is out of date.

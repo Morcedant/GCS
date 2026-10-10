@@ -87,7 +87,7 @@ const GREEN = 0x52e3a0, RED = 0xff6a5c;
 export default {
   async fetch(request, env) {
     if (request.method === "GET" && new URL(request.url).pathname === "/register") return registerCommands(env);
-    if (request.method !== "POST") return new Response("USS Pelion dice bot is running.", { status: 200 });
+    if (request.method !== "POST") return statusPage(env);
     const body = await request.text();
     const ok = await verify(request, body, env.DISCORD_PUBLIC_KEY);
     if (!ok) return new Response("Bad request signature.", { status: 401 });
@@ -103,13 +103,42 @@ export default {
 async function verify(request, body, publicKeyHex) {
   const signature = request.headers.get("X-Signature-Ed25519");
   const timestamp = request.headers.get("X-Signature-Timestamp");
-  if (!signature || !timestamp || !publicKeyHex) return false;
-  try {
-    const key = await crypto.subtle.importKey("raw", hex(publicKeyHex), { name: "Ed25519" }, false, ["verify"]);
-    return await crypto.subtle.verify("Ed25519", key, hex(signature), new TextEncoder().encode(timestamp + body));
-  } catch {
-    return false;
+  const keyHex = cleanKey(publicKeyHex);
+  if (!signature || !timestamp || !keyHex) return false;
+  const data = new TextEncoder().encode(timestamp + body);
+  // Standard Ed25519 first; older Workers runtimes only know the NODE-ED25519 name.
+  for (const alg of [{ name: "Ed25519" }, { name: "NODE-ED25519", namedCurve: "NODE-ED25519" }]) {
+    try {
+      const key = await crypto.subtle.importKey("raw", hex(keyHex), alg, false, ["verify"]);
+      return await crypto.subtle.verify(alg, key, hex(signature), data);
+    } catch {
+      // try the next algorithm name
+    }
   }
+  return false;
+}
+
+// Copying the Public Key often brings spaces or a line break along; Discord's key is 64 hex characters.
+const cleanKey = (k) => {
+  const v = String(k || "").replace(/\s+/g, "").toLowerCase();
+  return /^[0-9a-f]{64}$/.test(v) ? v : "";
+};
+
+// Visiting the Worker's address shows which settings it can see, without revealing them.
+function statusPage(env) {
+  const check = (ok, good, bad) => `${ok ? "OK " : "!! "} ${ok ? good : bad}`;
+  const lines = [
+    "USS Pelion dice bot is running.",
+    "",
+    check(!!cleanKey(env.DISCORD_PUBLIC_KEY), "DISCORD_PUBLIC_KEY is set and looks right.",
+      env.DISCORD_PUBLIC_KEY ? "DISCORD_PUBLIC_KEY is set but isn't 64 hex characters. Copy the Public Key again from General Information."
+        : "DISCORD_PUBLIC_KEY is missing. Add it under Settings > Variables and Secrets."),
+    check(/^\d{15,25}$/.test(String(env.DISCORD_APPLICATION_ID || "").trim()), "DISCORD_APPLICATION_ID is set.",
+      "DISCORD_APPLICATION_ID is missing or not a number (only needed for /register)."),
+    check(!!env.DISCORD_BOT_TOKEN, "DISCORD_BOT_TOKEN is set (you can delete it after /register works).",
+      "DISCORD_BOT_TOKEN is not set (only needed for /register)."),
+  ];
+  return new Response(lines.join("\n"), { headers: { "Content-Type": "text/plain; charset=utf-8" } });
 }
 
 function rollCommand(interaction) {
@@ -164,9 +193,9 @@ async function registerCommands(env) {
   if (!env.DISCORD_APPLICATION_ID || !env.DISCORD_BOT_TOKEN) {
     return new Response("Add DISCORD_APPLICATION_ID and DISCORD_BOT_TOKEN to the Worker's settings, then reload this page.", { status: 400 });
   }
-  const res = await fetch(`https://discord.com/api/v10/applications/${env.DISCORD_APPLICATION_ID}/commands`, {
+  const res = await fetch(`https://discord.com/api/v10/applications/${String(env.DISCORD_APPLICATION_ID).trim()}/commands`, {
     method: "PUT",
-    headers: { Authorization: `Bot ${env.DISCORD_BOT_TOKEN}`, "Content-Type": "application/json" },
+    headers: { Authorization: `Bot ${String(env.DISCORD_BOT_TOKEN).trim()}`, "Content-Type": "application/json" },
     body: JSON.stringify(COMMANDS),
   });
   return new Response(res.ok ? "Registered /pelion. It can take a minute to appear in Discord." : `Discord refused the command (${res.status}): ${await res.text()}`,

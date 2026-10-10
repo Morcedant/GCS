@@ -57,3 +57,15 @@ test("GET /register explains missing settings instead of failing silently", asyn
   assert.equal(res.status, 400);
   assert.match(await res.text(), /DISCORD_APPLICATION_ID/);
 });
+
+test("status page reports settings, and a key pasted with spaces still verifies", async () => {
+  const page = await (await worker.fetch(new Request("https://bot.example/"), env)).text();
+  assert.match(page, /OK  DISCORD_PUBLIC_KEY is set/);
+  const spaced = { DISCORD_PUBLIC_KEY: ` ${pub.slice(0, 32)} ${pub.slice(32).toUpperCase()}\n` };
+  const body = JSON.stringify({ type: 1 }), ts = "1700000000";
+  const sig = Buffer.from(await crypto.subtle.sign("Ed25519", keys.privateKey, new TextEncoder().encode(ts + body))).toString("hex");
+  const res = await worker.fetch(new Request("https://bot.example/", { method: "POST", body, headers: { "X-Signature-Ed25519": sig, "X-Signature-Timestamp": ts } }), spaced);
+  assert.equal(res.status, 200);
+  const missing = await (await worker.fetch(new Request("https://bot.example/"), {})).text();
+  assert.match(missing, /!!  DISCORD_PUBLIC_KEY is missing/);
+});
