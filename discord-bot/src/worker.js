@@ -4,7 +4,9 @@
 //
 // Settings (Cloudflare → Worker → Settings → Variables and Secrets):
 //   DISCORD_PUBLIC_KEY       required, from the Discord Developer Portal
-//   DISCORD_APPLICATION_ID   and DISCORD_BOT_TOKEN: only needed to register /pelion by visiting /register
+//   DISCORD_APPLICATION_ID   and DISCORD_BOT_TOKEN: only needed to register commands by visiting /register
+// Binding (Settings → Bindings → KV namespace):
+//   DUTY                     optional; turns on /duty and makes the reroll button spend a real Duty point
 
 // ---- Rules: 3d6 roll-under, as written in the Players' Guide ----
 
@@ -75,6 +77,19 @@ export const COMMANDS = [
       { type: 3, name: "label", description: "What you're rolling, e.g. Sensors", required: false, max_length: 40 },
     ],
   },
+  {
+    name: "duty",
+    description: "Track Duty points (start each session with 2)",
+    options: [
+      { type: 1, name: "show", description: "Show Duty points", options: [{ type: 6, name: "player", description: "Whose points (default: yours)", required: false }] },
+      { type: 1, name: "spend", description: "Spend one of your Duty points" },
+      { type: 1, name: "gain", description: "Gain a Duty point (the GM can award one to a player)",
+        options: [{ type: 6, name: "player", description: "GM only: who receives the point", required: false }] },
+      { type: 1, name: "set", description: "GM: set a player's Duty points",
+        options: [{ type: 6, name: "player", description: "Player", required: true }, { type: 4, name: "points", description: "New total", required: true, min_value: 0, max_value: 20 }] },
+      { type: 1, name: "newsession", description: "GM: start a new session; everyone goes back to 2" },
+    ],
+  },
 ];
 
 // ---- Discord request handling ----
@@ -95,7 +110,8 @@ export default {
     const interaction = JSON.parse(body);
     if (interaction.type === PING) return json({ type: PONG });
     if (interaction.type === COMMAND && interaction.data?.name === "pelion") return json(rollCommand(interaction));
-    if (interaction.type === COMPONENT && interaction.data?.custom_id?.startsWith("reroll|")) return json(reroll(interaction));
+    if (interaction.type === COMMAND && interaction.data?.name === "duty") return json(await dutyCommand(interaction, env));
+    if (interaction.type === COMPONENT && interaction.data?.custom_id?.startsWith("reroll|")) return json(await reroll(interaction, env));
     return json({ type: MESSAGE, data: { content: "Unknown command.", flags: EPHEMERAL } });
   },
 };
@@ -135,6 +151,8 @@ function statusPage(env) {
         : "DISCORD_PUBLIC_KEY is missing. Add it under Settings > Variables and Secrets."),
     check(/^\d{15,25}$/.test(String(env.DISCORD_APPLICATION_ID || "").trim()), "DISCORD_APPLICATION_ID is set.",
       "DISCORD_APPLICATION_ID is missing or not a number (only needed for /register)."),
+    check(!!env.DUTY, "DUTY storage is connected: /duty works and rerolls spend points.",
+      "DUTY storage isn't connected (optional): bind a KV namespace named DUTY to turn on /duty."),
     check(!!env.DISCORD_BOT_TOKEN, "DISCORD_BOT_TOKEN is set (you can delete it after /register works).",
       "DISCORD_BOT_TOKEN is not set (only needed for /register)."),
   ];
@@ -167,20 +185,91 @@ function rollCommand(interaction) {
   };
 }
 
-function reroll(interaction) {
+async function reroll(interaction, env) {
   const [, ownerId, baseStr, modStr] = interaction.data.custom_id.split("|");
   const user = userOf(interaction);
   if (user.id !== ownerId) {
     return { type: MESSAGE, data: { content: "Only the player who rolled can spend their Duty point on this roll.", flags: EPHEMERAL } };
+  }
+  let left = null;
+  if (env.DUTY) {
+    const guild = guildOf(interaction);
+    const have = await getDuty(env, guild, user.id);
+    if (have <= 0) return { type: MESSAGE, data: { content: "You have no Duty points left this session.", flags: EPHEMERAL } };
+    left = have - 1;
+    await setDuty(env, guild, user.id, left);
   }
   const target = Number(baseStr) + Number(modStr);
   const r = resolve(rollDice(), target);
   const embed = { ...(interaction.message?.embeds?.[0] || {}) };
   embed.color = r.success ? GREEN : RED;
   embed.description = (embed.description || "") +
-    `\n\n**Duty point reroll** (this result stands)\n🎲 ${r.dice.join(" + ")} = **${r.total}**  ·  **${r.success ? "SUCCESS" : "FAILURE"}**\n` +
+    `\n\n**Duty point reroll** (this result stands${left === null ? "" : ` · ${left} Duty point${left === 1 ? "" : "s"} left`})\n🎲 ${r.dice.join(" + ")} = **${r.total}**  ·  **${r.success ? "SUCCESS" : "FAILURE"}**\n` +
     describe(r).join("\n");
   return { type: UPDATE_MESSAGE, data: { embeds: [embed], components: [] } };
+}
+
+// ---- Duty points ----
+// Stored per server and player. Each server has a session number; a player's record from an
+// earlier session counts as the starting 2, so /duty newsession is a single write.
+
+const START_DUTY = 2;
+const MANAGE_GUILD = 1n << 5n;
+const guildOf = (interaction) => interaction.guild_id || "dm";
+const isGM = (interaction) => !interaction.guild_id || (BigInt(interaction.member?.permissions || "0") & MANAGE_GUILD) !== 0n;
+
+async function sessionOf(env, guild) {
+  return Number(await env.DUTY.get(`session:${guild}`)) || 1;
+}
+async function getDuty(env, guild, userId) {
+  const [rec, session] = await Promise.all([env.DUTY.get(`duty:${guild}:${userId}`, "json"), sessionOf(env, guild)]);
+  return rec && rec.session === session ? rec.points : START_DUTY;
+}
+async function setDuty(env, guild, userId, points) {
+  await env.DUTY.put(`duty:${guild}:${userId}`, JSON.stringify({ points, session: await sessionOf(env, guild) }));
+}
+
+async function dutyCommand(interaction, env) {
+  const reply = (content, priv = false) => ({ type: MESSAGE, data: { content, flags: priv ? EPHEMERAL : 0, allowed_mentions: { parse: [] } } });
+  if (!env.DUTY) {
+    return reply("Duty point tracking isn't switched on yet. Bind a KV namespace named DUTY to the Worker (see the bot's README).", true);
+  }
+  const sub = interaction.data.options?.[0] || {};
+  const opt = Object.fromEntries((sub.options || []).map((o) => [o.name, o.value]));
+  const me = userOf(interaction).id, guild = guildOf(interaction);
+  const pts = (n) => `${n} Duty point${n === 1 ? "" : "s"}`;
+  const gmOnly = () => reply("Only the GM (someone with Manage Server) can do that.", true);
+
+  switch (sub.name) {
+    case "show": {
+      const who = opt.player || me;
+      return reply(`<@${who}> has **${pts(await getDuty(env, guild, who))}**.`);
+    }
+    case "spend": {
+      const have = await getDuty(env, guild, me);
+      if (have <= 0) return reply("You have no Duty points left this session.", true);
+      await setDuty(env, guild, me, have - 1);
+      return reply(`<@${me}> spends a Duty point and has **${pts(have - 1)}** left.`);
+    }
+    case "gain": {
+      const who = opt.player || me;
+      if (who !== me && !isGM(interaction)) return gmOnly();
+      const now = (await getDuty(env, guild, who)) + 1;
+      await setDuty(env, guild, who, now);
+      return reply(`<@${who}> gains a Duty point and now has **${pts(now)}**.`);
+    }
+    case "set": {
+      if (!isGM(interaction)) return gmOnly();
+      await setDuty(env, guild, opt.player, opt.points);
+      return reply(`<@${opt.player}> now has **${pts(opt.points)}**.`);
+    }
+    case "newsession": {
+      if (!isGM(interaction)) return gmOnly();
+      await env.DUTY.put(`session:${guild}`, String((await sessionOf(env, guild)) + 1));
+      return reply(`New session. Everyone starts with **${pts(START_DUTY)}**; unused points from last session are gone.`);
+    }
+  }
+  return reply("Unknown /duty option.", true);
 }
 
 const userOf = (interaction) => interaction.member?.user || interaction.user || { id: "0" };
@@ -207,7 +296,7 @@ async function registerCommands(env) {
       res = await put();
     }
   }
-  if (res.ok) return new Response("Registered /pelion. It can take a minute to appear in Discord.");
+  if (res.ok) return new Response("Registered /pelion and /duty. They can take a minute to appear in Discord.");
   const detail = await res.text();
   const hint = res.status === 429 ? "\n\nDiscord is rate-limiting registration. Wait a minute or two, then reload this page once."
     : res.status === 401 ? "\n\nThe bot token is wrong or was reset. Reset it on the Bot page and update DISCORD_BOT_TOKEN." : "";

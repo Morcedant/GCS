@@ -46,6 +46,33 @@ command to the Worker's web address, so there is no server to keep running.
 
 Type `/pelion` in your server to roll. New commands can take a minute to appear.
 
+## Track Duty points (optional)
+
+With storage connected, the bot keeps each player's Duty points per server:
+
+| Command | Who | What it does |
+|---|---|---|
+| `/duty show [player]` | anyone | Shows your points, or another player's |
+| `/duty spend` | player | Spends one of your points (not below 0) |
+| `/duty gain` | player | Gains a point, e.g. when you accept a complication |
+| `/duty gain player:@name` | GM | Awards a point to a player |
+| `/duty set player:@name points:N` | GM | Corrects a player's total |
+| `/duty newsession` | GM | New session: everyone back to 2, as the guide says |
+
+"GM" means anyone with the **Manage Server** permission. Everyone starts at 2. The **Spend a Duty point to reroll**
+button then takes a real point and refuses when you have none.
+
+To switch it on (free; Workers KV allows 1,000 changes a day):
+
+1. In Cloudflare, open **Storage & databases → Workers KV → Create**, and name it `pelion-duty`.
+2. Open the `pelion-dice` Worker → **Settings → Bindings → Add → KV namespace**. Set **Variable name** to `DUTY`
+   and pick `pelion-duty`. Save; this redeploys the Worker.
+3. Paste the latest [`src/worker.js`](src/worker.js) in **Edit code** and **Deploy**.
+4. Add `DISCORD_BOT_TOKEN` back for a moment, open `/register` once (it should say "Registered /pelion and /duty"),
+   then delete the token again.
+
+The Worker's home page shows "DUTY storage is connected" when it's working.
+
 ## Options
 
 | Option | Required | Meaning |

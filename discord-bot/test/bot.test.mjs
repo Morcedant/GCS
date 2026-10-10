@@ -69,3 +69,45 @@ test("status page reports settings, and a key pasted with spaces still verifies"
   const missing = await (await worker.fetch(new Request("https://bot.example/"), {})).text();
   assert.match(missing, /!!  DISCORD_PUBLIC_KEY is missing/);
 });
+
+class MemoryKV {
+  constructor() { this.m = new Map(); }
+  async get(k, type) { const v = this.m.get(k); return v == null ? null : type === "json" ? JSON.parse(v) : v; }
+  async put(k, v) { this.m.set(k, String(v)); }
+}
+
+test("/duty tracks points per player, GM powers, new sessions, and rerolls spend points", async () => {
+  const kv = new MemoryKV();
+  const env2 = { ...env, DUTY: kv };
+  const call = async (sub, { id = "42", gm = false, options = [] } = {}) => {
+    const payload = { type: 2, guild_id: "G1", member: { user: { id }, permissions: gm ? String(1 << 5) : "0" },
+      data: { name: "duty", options: [{ type: 1, name: sub, options }] } };
+    const body = JSON.stringify(payload), ts = "1700000000";
+    const sig = Buffer.from(await crypto.subtle.sign("Ed25519", keys.privateKey, new TextEncoder().encode(ts + body))).toString("hex");
+    const res = await worker.fetch(new Request("https://bot.example/", { method: "POST", body, headers: { "X-Signature-Ed25519": sig, "X-Signature-Timestamp": ts } }), env2);
+    return (await res.json()).data;
+  };
+  assert.match((await call("show")).content, /\*\*2 Duty points\*\*/);
+  assert.match((await call("spend")).content, /1 Duty point\*\* left/);
+  assert.match((await call("spend")).content, /0 Duty points\*\* left/);
+  assert.equal((await call("spend")).flags, 64, "can't go below zero");
+  assert.equal((await call("gain", { id: "7", options: [{ name: "player", value: "42" }] })).flags, 64, "players can't award others");
+  assert.match((await call("gain", { id: "9", gm: true, options: [{ name: "player", value: "42" }] })).content, /now has \*\*1 Duty point\*\*/);
+  assert.equal((await call("newsession")).flags, 64, "only the GM starts a session");
+  await call("newsession", { gm: true });
+  assert.match((await call("show")).content, /\*\*2 Duty points\*\*/, "back to 2 after a new session");
+
+  // Reroll button spends a point and refuses at zero.
+  await call("set", { gm: true, options: [{ name: "player", value: "42" }, { name: "points", value: 1 }] });
+  const click = async () => {
+    const payload = { type: 3, guild_id: "G1", member: { user: { id: "42" } }, data: { custom_id: "reroll|42|14|0|Sensors" }, message: { embeds: [{ description: "x" }] } };
+    const body = JSON.stringify(payload), ts = "1700000000";
+    const sig = Buffer.from(await crypto.subtle.sign("Ed25519", keys.privateKey, new TextEncoder().encode(ts + body))).toString("hex");
+    return (await worker.fetch(new Request("https://bot.example/", { method: "POST", body, headers: { "X-Signature-Ed25519": sig, "X-Signature-Timestamp": ts } }), env2)).json();
+  };
+  const first = await click();
+  assert.equal(first.type, 7);
+  assert.match(first.data.embeds[0].description, /0 Duty points left/);
+  const second = await click();
+  assert.equal(second.data.flags, 64, "no points, no reroll");
+});
