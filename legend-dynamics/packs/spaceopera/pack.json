@@ -56,7 +56,8 @@
   "meleeSkill": "Close Combat",
   "unarmedSkill": "Close Combat",
   "chaseSkill": "Piloting",
-  "fontsHref": "https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600&family=Exo+2:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap"
+  "fontsHref": "https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600&family=Exo+2:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap",
+  "prepareTitle": "Prepare for the mission"
  },
  "theme": {
   "comment": "A starship console: dark glass panels with cyan rules over a slow starfield.",

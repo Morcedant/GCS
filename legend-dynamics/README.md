@@ -7,8 +7,9 @@ Legend points that reward characters for accepting trouble from their flaws. The
 | | |
 |---|---|
 | `Legend_Dynamics_Core_Rules.md` (and `.docx`) | The setting-neutral core rules |
-| `western/` | **Iron Roads**, a Western: creator (`index.html`), Players' Guide (`players-guide.md`, `.docx`) |
+| `western/` | **Iron Roads**, a Gothic Western: creator (`index.html`), Players' Guide (`players-guide.md`, `.docx`) |
 | `spaceopera/` | **Starward**, space opera: creator, Players' Guide |
+| `fantasy/` | **The Shattered Crown**, sword and sorcery: creator, Players' Guide (with cantrips and a Corruption track) |
 | `packs/<id>/` | Each pack's source: `pack.json` (data) and `setting.md` (setting chapters) |
 | `engine/` | The creator template (`creator.html`) and the core rules text (`core.md`) shared by every pack |
 
@@ -55,7 +56,9 @@ file are produced from them; nothing in the engine needs to change.
 | `weapons` | The ammunition or power tracker: `skill`, `items` (`id: [name, capacity]`), `modes` (`[id, name, cost, only these weapons or null, roll modifier]`), `equipLinked`, `jamOn18`, `defaultSpares` |
 | `tracks` | Shared tracks (a ship, Trouble…): `name`, `boxes`, and `effects` for 0…boxes |
 | `seeds` | Six d12 tables: `mission`, `place`, `strange`, `twist`, `clock` (`[name, segments]`), `who` |
-| `journal` | `mode` (`calendar` with a `start` date, or `stardate` with a `start` number) and `outcomes` |
+| `journal` | `mode` (`calendar` with a `start` date, `stardate` with a `start` number, or `reign` with `months`, an `era` and a `start` of `[year, month index, day]`) and `outcomes` |
+| `spells` | Optional. Cantrips a caster picks: `skill`, `plural`, `known` (`[Trained, Specialty, Expert]`), who can cast (`roles`, `advantages`, `originAdvantages`), a `note`, and `list` (`[id, name, effect]`) |
+| `personalTrack` | Optional. A track every character keeps on their own sheet (e.g. Corruption): `name`, `boxes`, `effects` for 0…boxes |
 | `quickRef` | Extra quick-reference lines for the play sheet |
 | `example`, `pregens` | Characters in the creator's save format; the guide's text for them is generated, numbers included |
 

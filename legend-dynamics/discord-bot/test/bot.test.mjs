@@ -238,7 +238,7 @@ test("USS Pelion and Grimm are games too, and their old storage bindings still w
   assert.match((await signedCall(shared, sub("track", "show"))).content, /Suspicion.*Exposure.*Attention/s);
   const { COMMANDS } = await import("../src/worker.js");
   const choices = COMMANDS.find((c) => c.name === "game").options[1].options[0].choices.map((c) => c.name);
-  assert.deepEqual([...choices].sort(), ["Grimm", "Iron Roads", "Starward", "USS Pelion"]);
+  assert.deepEqual([...choices].sort(), ["Grimm", "Iron Roads", "Starward", "The Shattered Crown", "USS Pelion"]);
 });
 
 test("the old /duty, /grit, /pelion and /grimm names still work, and register on their own Workers", async () => {

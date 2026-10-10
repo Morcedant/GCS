@@ -634,10 +634,15 @@ tr.lvl-U td.target { color: var(--muted); }
               <input type="text" id="f-comptrigger" placeholder="e.g. A strange track or body no one can explain"></div>
           </div>
 
+          <div class="fields" id="spells-wrap" hidden>
+            <div class="field wide"><span class="label" id="spells-label"></span>
+              <div class="checks" id="spell-list"></div>
+              <span class="muted small" id="spells-note"></span></div>
+          </div>
         </section>
 
         <section class="step hud">
-          <div class="step-head"><span class="step-no">5</span><h2>Prepare for the hunt</h2>
+          <div class="step-head"><span class="step-no">5</span><h2>{{prepareTitle}}</h2>
             <p class="muted small">You begin uninjured, with two {{point}} points (three with Extra {{point}}) and your {{gearLower}}.</p></div>
           <div class="field"><span class="label">{{gear}}</span>
             <div class="checks" id="equip"></div></div>
@@ -791,6 +796,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="field"><span class="label">Injury track</span>
           <span>☐ Wounded (−1 physical) &nbsp; ☐ Seriously wounded (−2 physical) &nbsp; ☐ Incapacitated</span></div>
         <div class="field"><span class="label">{{point}} points (start each session with 2)</span><span>☐ ☐ ☐ ☐ ☐</span></div>
+        <div class="field" id="ptrack-print" hidden></div>
       </div>
       <div class="play-col">
         <div class="card hud no-print" id="card-condition">
@@ -806,6 +812,9 @@ tr.lvl-U td.target { color: var(--muted); }
               <button class="linkish" id="duty-reset">New session (reset)</button>
             </div>
             <span class="muted small">Max one point per roll or injury event. Earn one when you accept a meaningful problem from your complication.</span></div>
+          <div class="field" id="ptrack-wrap" hidden><span class="label" id="ptrack-label"></span>
+            <div class="boxes" id="ptrack-boxes"></div>
+            <span class="muted small" id="ptrack-effect"></span></div>
           <div class="checks"><label><input type="checkbox" id="f-stunned"> {{stun}}: −2 on next action roll</label>
             <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label>
             <label id="form-wrap" hidden><input type="checkbox" id="f-form"> {{formToggle}}</label></div>
@@ -929,6 +938,10 @@ tr.lvl-U td.target { color: var(--muted); }
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a fine kit: +2 to one skill when it's used.", 1],
   ];
   const ALLEGIANCES = [["", "None", "", ""], ...PACK.allegiances];
+  // Optional: spells a caster picks (how many depends on their training in the spell skill), and a
+  // personal track every character keeps on their sheet (e.g. Corruption).
+  const SPELLS = PACK.spells || null;
+  const PTRACK = PACK.personalTrack || null;
   const STORE_HORROR = PACK.id + ".restricted.v1";
   const REASONS = PACK.reasons;
   const REASON_TEXTS = new Set(REASONS.map((r) => r[1]));
@@ -978,7 +991,8 @@ tr.lvl-U td.target { color: var(--muted); }
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" },
       allegiance: "", customTier: 1,
       portrait: "", portraitShape: "token",
-      play: { injury: 0, duty: 2, stunned: false, form: false, log: [] },
+      spells: [],
+      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [] },
     };
   }
   function example() {
@@ -992,6 +1006,7 @@ tr.lvl-U td.target { color: var(--muted); }
       adv: { ...b.adv, ...(c.adv || {}) }, comp: { ...b.comp, ...(c.comp || {}) }, sadv: { ...b.sadv, ...(c.sadv || {}) },
       equipment: { ...b.equipment, ...(c.equipment || {}) }, play: { ...b.play, ...(c.play || {}) } };
     if (!out.id) out.id = uid();
+    if (!Array.isArray(out.spells)) out.spells = [];
     if (typeof out.portrait !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(out.portrait)) out.portrait = "";
     if (out.portraitShape !== "portrait") out.portraitShape = "token";
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
@@ -1079,6 +1094,10 @@ tr.lvl-U td.target { color: var(--muted); }
   const advancedToS = (name) => (ch.advances || []).some((a) => a.skill === name && a.to === "S");
   const isExpert = (name) => isGS() && ch.skills[name] === "S" && !advancedToS(name);
   const levelMod = (l, name) => (l === "S" && isGS() && !(name && advancedToS(name)) ? 5 : LEVELS[l].mod);
+  // Who can cast: the pack's casting roles, or a general or origin advantage that grants it.
+  const canCast = (c = ch) => !!SPELLS && ((SPELLS.roles || []).includes(c.dept) || (SPELLS.advantages || []).some((a) => a === c.adv.id || (edgeN("adv2", c) && a === c.adv2.id))
+    || (SPELLS.originAdvantages || []).includes(c.sadv.id));
+  const spellsKnown = (c = ch) => { const l = c.skills[SPELLS.skill]; return !canCast(c) || !l || l === "U" ? 0 : l === "T" ? SPELLS.known[0] : c.path === "hand" ? SPELLS.known[2] : SPELLS.known[1]; };
   const levelName = (l, name) => (l === "S" && isGS() && !(name && advancedToS(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
@@ -1120,6 +1139,8 @@ tr.lvl-U td.target { color: var(--muted); }
       [!!advOk, advOk ? (ch.sadv.id ? `${T.origin} advantage: ${sAdvName()} (companion: ${sCompName()})` : "Advantage chosen")
         : ch.sadv.id ? `Finish the custom ${T.originLower} advantage and its companion` : ch.adv.id ? "Finish the advantage details" : "Choose an advantage"],
       [!!compOk, compOk ? "Complication chosen" : ch.comp.id ? "Finish the complication details" : "Choose a complication"],
+      ...(canCast() ? [[ch.spells.length === spellsKnown(), spellsKnown() ? (ch.spells.length === spellsKnown() ? `${spellsKnown()} ${SPELLS.plural} chosen` : `${SPELLS.plural}: ${ch.spells.length} of ${spellsKnown()} chosen`)
+        : `Train ${SPELLS.skill} to cast ${SPELLS.plural.toLowerCase()}`]] : []),
       [!!ch.comp.trigger.trim(), "Complication trigger agreed with the GM"],
       [!!ch.connection.trim(), "Connection to another character"],
     ];
@@ -1133,6 +1154,7 @@ tr.lvl-U td.target { color: var(--muted); }
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
   $("equip").innerHTML = EQUIPMENT.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="eq-${k}" data-eq="${k}"><span><b>${n}</b><span class="small muted">${eff}</span></span></label>`).join("");
 
+  if (SPELLS) $("spell-list").innerHTML = SPELLS.list.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="sp-${k}" data-spell="${k}"><span><b>${n}</b><span class="small muted">${eff}</span></span></label>`).join("");
   $("edge-list").innerHTML = EDGE_DEFS.map(([k, n, d]) => `<div class="edge"><b>${n}</b>
     <span class="gm-duty"><button type="button" id="edge-m-${k}" data-edge="${k}" data-d="-1" aria-label="One fewer: ${n}">−</button><b id="edge-n-${k}">0</b><button type="button" id="edge-p-${k}" data-edge="${k}" data-d="1" aria-label="One more: ${n}">+</button></span>
     <span class="small muted">${d}</span></div>`).join("");
@@ -1401,6 +1423,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ed.length ? `<div class="field"><span class="label">Edges</span><span>${esc(ed.join(", "))}</span></div>` : ""}
         ${a2 && edgeN("adv2") ? `<div class="field"><span class="label">Second advantage</span><b>${esc(a2[1])}${ch.adv2.detail ? ": " + esc(ch.adv2.detail) : ""}</b><span class="small muted">${esc(a2[2])}</span></div>` : ""}
         ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">A friend</span><span>${esc(ch.contact)}</span></div>` : ""}
+        ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([, n, eff]) => `<b>${esc(n)}:</b> ${esc(eff)}`).join("<br>")}</span></div>` : ""}
         ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 ${esc(ch.gear.skill)})` : ""}</span></div>` : ""}
         ${al ? `<div class="field"><span class="label">Allegiance: ${esc(al[1])}</span><span class="small">${esc(al[2])}</span><span class="small muted">${esc(al[3])}</span></div>` : ""}
       </div>`; })()}
@@ -1423,6 +1446,21 @@ tr.lvl-U td.target { color: var(--muted); }
     $("form-wrap").hidden = !FORMED.has(ch.speciesId);
     $("f-dying").checked = !!ch.play.dying;
     $("duty-count").textContent = ch.play.duty;
+    $("spells-wrap").hidden = !canCast();
+    if (SPELLS && canCast()) {
+      const known = spellsKnown(), full = ch.spells.length >= known;
+      $("spells-label").textContent = `${SPELLS.plural} (${ch.spells.length} of ${known})`;
+      $("spells-note").textContent = known ? SPELLS.note : `Train ${SPELLS.skill} to know ${SPELLS.plural.toLowerCase()}: ${SPELLS.known[0]} at Trained, ${SPELLS.known[1]} at Specialty, ${SPELLS.known[2]} at Expert.`;
+      SPELLS.list.forEach(([k]) => { const b = $("sp-" + k); b.checked = ch.spells.includes(k); b.disabled = !b.checked && full; });
+    }
+    if (PTRACK) {
+      const pt = Math.min(PTRACK.boxes, ch.play.ptrack || 0);
+      $("ptrack-wrap").hidden = false; $("ptrack-print").hidden = false;
+      $("ptrack-label").textContent = PTRACK.name;
+      $("ptrack-boxes").innerHTML = Array.from({ length: PTRACK.boxes }, (_, i) => `<button class="box ${i < pt ? "on" : ""}" data-pbox="${i + 1}" aria-label="${PTRACK.name} box ${i + 1}${i < pt ? ", marked" : ""}"></button>`).join("");
+      $("ptrack-effect").textContent = PTRACK.effects[pt];
+      $("ptrack-print").innerHTML = `<span class="label">${PTRACK.name}</span><span>${PTRACK.effects.slice(1).map((e) => "☐ " + esc(e.split(":")[0])).join(" &nbsp; ")}</span>`;
+    }
     $("duty-minus").disabled = ch.play.duty <= 0;
     $("r-stun").checked = !!ch.play.stunned;
 
@@ -1629,6 +1667,11 @@ tr.lvl-U td.target { color: var(--muted); }
       const presets = new Set(Object.values(TRIGGERS).flat());
       ch.comp.trigger = !cur || presets.has(cur) ? text : `${cur}; ${text.charAt(0).toLowerCase()}${text.slice(1)}`;
       $("f-comptrigger").value = ch.comp.trigger; t.value = ""; touch(); render();
+    }
+    else if (t.dataset.spell) {
+      const k = t.dataset.spell;
+      ch.spells = t.checked ? [...new Set([...ch.spells, k])] : ch.spells.filter((x) => x !== k);
+      touch(); render();
     }
     else if (t.dataset.eq) {
       ch.equipment[t.dataset.eq] = t.checked;
@@ -1972,6 +2015,13 @@ tr.lvl-U td.target { color: var(--muted); }
   // The next entry's date: a little after the last one, as a calendar date or a stardate-style number.
   const freshStardate = () => {
     const J = PACK.journal, last = missionLog.length ? missionLog[missionLog.length - 1].stardate : "";
+    if (J.mode === "reign") {
+      // "14 Frostfall, 712 AS": months of 30 days, counted from the pack's start.
+      const m = /^(\d+) (.+), (\d+)/.exec(last || ""), mi = m ? J.months.indexOf(m[2]) : -1;
+      let day = J.start[2], mon = J.start[1], yr = J.start[0];
+      if (m && mi >= 0) { day = +m[1] + 3 + Math.floor(Math.random() * 18); mon = mi; yr = +m[3]; while (day > 30) { day -= 30; mon++; if (mon >= J.months.length) { mon = 0; yr++; } } }
+      return `${day} ${J.months[mon]}, ${yr} ${J.era}`;
+    }
     if (J.mode === "stardate") { const n = parseFloat(last); return (Number.isFinite(n) ? n + 10 + Math.random() * 40 : J.start + Math.random() * 900).toFixed(1); }
     const prev = last ? new Date(last) : null;
     const d = prev && !isNaN(prev) ? new Date(prev.getTime() + (3 + Math.floor(Math.random() * 18)) * 864e5) : new Date(J.start[0], J.start[1], J.start[2]);
@@ -2067,6 +2117,12 @@ tr.lvl-U td.target { color: var(--muted); }
     ch.play.injury = ch.play.injury === i ? i - 1 : i;
     // A new injury applies straight away to physical rolls; other rolls stay unticked unless the player ticks them.
     $("r-phys").checked = PHYSICAL.has($("r-skill").value);
+    render();
+  });
+  $("ptrack-boxes").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-pbox]"); if (!b) return;
+    const i = +b.dataset.pbox;
+    ch.play.ptrack = (ch.play.ptrack || 0) === i ? i - 1 : i;
     render();
   });
   $("duty-minus").onclick = () => { if (ch.play.duty > 0) { ch.play.duty--; render(); } };

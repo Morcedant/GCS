@@ -17,6 +17,8 @@ EXAMPLES = {
                 "assist": "Hold the door", "helperSkill": "Athletics", "track": "dark", "trackFull": "The Dark"},
     "spaceopera": {"skill": "Piloting", "target": 14, "foe": "Hegemony trooper", "foeTarget": 12, "contest": "Grapple",
                    "assist": "Reroute power", "helperSkill": "Engineering", "track": "shields", "trackFull": "Shields"},
+    "fantasy": {"skill": "Melee", "target": 14, "foe": "Serpent-priest", "foeTarget": 13, "contest": "Grapple",
+                "assist": "Force the tomb door", "helperSkill": "Athletics", "track": "doom", "trackFull": "Doom"},
     "grimm": {"skill": "Tracking", "target": 13, "foe": "Blutbad", "foeTarget": 14, "contest": "Grapple",
               "assist": "Hold the door", "helperSkill": "Athletics", "track": "exposure", "trackFull": "Exposure",
               "old": ("grimm", "grit")},

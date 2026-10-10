@@ -61,7 +61,8 @@
   "formCoreSummary": "Monstrous form: changing is a free action; strong emotion can force it (Will roll); its profile applies while changed; townsfolk who see it panic",
   "restrictedToggle": "Horror campaign: show vampires as player characters (they must drink human blood; only if the whole table agreed)",
   "restrictedTag": "horror",
-  "restrictedCheck": "for horror campaigns only: tick Horror campaign if your table agreed"
+  "restrictedCheck": "for horror campaigns only: tick Horror campaign if your table agreed",
+  "prepareTitle": "Prepare for the hunt"
  },
  "theme": {
   "comment": "A gothic ledger by candlelight: slate panels, tarnished-silver rules, blood-red accents, ash falling.",

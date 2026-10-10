@@ -6,7 +6,7 @@
 // Settings (Cloudflare → Worker → Settings → Variables and Secrets):
 //   DISCORD_PUBLIC_KEY       required, from the Discord Developer Portal
 //   DISCORD_APPLICATION_ID   and DISCORD_BOT_TOKEN: only needed to register commands by visiting /register
-//   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, grimm or pelion); default western
+//   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, fantasy, grimm or pelion); default western
 // Binding (Settings → Bindings → KV namespace):
 //   STORE                    optional; turns on /game, /points, /clock and /track, and makes rerolls spend real points
 //                            (a USS Pelion or Grimm Worker's DUTY or GRIT binding works too)
@@ -16,6 +16,199 @@
 
 /* PACKS:START */
 export const PACKS = {
+ "fantasy": {
+  "id": "fantasy",
+  "title": "The Shattered Crown",
+  "point": "Fortune",
+  "mission": "Venture",
+  "trackTitle": "Troubles",
+  "tracks": [
+   {
+    "name": "Infamy",
+    "boxes": 4,
+    "effects": [
+     "Unknown",
+     "Talk in the taverns",
+     "Wanted posters: −2 to Persuasion with the watch",
+     "Bounty hunters on your trail",
+     "Outlawed: start a Manhunt clock"
+    ]
+   },
+   {
+    "name": "Doom",
+    "boxes": 4,
+    "effects": [
+     "Unnoticed",
+     "Ill omens: ravens, black cats, bad dreams",
+     "A sorcerer scries you: −2 to Stealth against magic",
+     "Its servants come hunting",
+     "It comes for you: start a clock"
+    ]
+   },
+   {
+    "name": "Debt",
+    "boxes": 4,
+    "effects": [
+     "Paid up",
+     "A reminder, politely delivered",
+     "Collectors: −2 to Persuasion with merchants",
+     "Your gear or mounts are seized",
+     "A creditor names the price: a job you can't refuse"
+    ]
+   },
+   {
+    "name": "Hunger",
+    "boxes": 4,
+    "effects": [
+     "Well supplied",
+     "Short rations",
+     "Hungry: −1 to all rolls on the road",
+     "Starving: hirelings desert, mounts falter",
+     "Collapse: find food today or someone dies"
+    ]
+   }
+  ],
+  "seeds": {
+   "mission": [
+    "Venture",
+    [
+     "Rob a merchant prince's vault",
+     "Loot a tomb of the serpent kings",
+     "Rescue a captive from a sorcerer's tower",
+     "Escort a caravan across the Burning Sands",
+     "Steal a shard of the Crown",
+     "Hunt a beast that's eating a village",
+     "Guard a prince who hired you to die for him",
+     "Find a lost city in the jungle",
+     "Break a friend out of the arena pits",
+     "Deliver a cursed idol before the moon is full",
+     "Win a war for a warlord who can't pay",
+     "Recover a stolen god"
+    ]
+   ],
+   "place": [
+    "Place",
+    [
+     "A decadent city of the Gilded Coast",
+     "A clan hall in the Frozen North",
+     "A buried city in the Burning Sands",
+     "A corsair haven in the Shattered Isles",
+     "A Deepkin city under the mountains",
+     "The blasted Ashlands where the Crown broke",
+     "A sorcerer's tower above a swamp",
+     "An arena and its slave pits",
+     "A jungle temple strangled by vines",
+     "A plague-struck port",
+     "A ship becalmed on a black sea",
+     "A monastery of a dying god"
+    ]
+   ],
+   "strange": [
+    "The darkness",
+    [
+     "A sorcerer-prince who holds a Crown shard",
+     "A demon summoned and not dismissed",
+     "A cult that feeds its god with the living",
+     "Serpent-priests rising from the deep temples",
+     "A tomb whose dead will not stay dead",
+     "A thing from the Deep that dreams of the surface",
+     "A curse on a royal bloodline",
+     "A lotus that makes slaves of those who dream",
+     "A god's corpse leaking power",
+     "An Undying sorcerer and their phylactery",
+     "A beast-cult of skinchangers",
+     "A shard that whispers to whoever holds it"
+    ]
+   ],
+   "twist": [
+    "Twist",
+    [
+     "The employer plans to betray you",
+     "The treasure is a living thing",
+     "A rival band wants the same prize",
+     "The monster is protecting something",
+     "The victim was the villain",
+     "A character's complication comes into play",
+     "The shard is a fake, or the real one is somewhere else",
+     "The guards are already dead",
+     "Someone in the party is marked by the darkness",
+     "The sorcerer wants to be stopped",
+     "The city is about to fall",
+     "The god is listening"
+    ]
+   ],
+   "clock": [
+    "Ticking clock",
+    [
+     [
+      "The guards change watch",
+      4
+     ],
+     [
+      "The ritual completes at moonrise",
+      6
+     ],
+     [
+      "The tomb floods",
+      4
+     ],
+     [
+      "The mob storms the palace",
+      6
+     ],
+     [
+      "The ship sails at dawn",
+      4
+     ],
+     [
+      "The demon breaks its binding",
+      6
+     ],
+     [
+      "The sands bury the city again",
+      8
+     ],
+     [
+      "The plague reaches the port",
+      8
+     ],
+     [
+      "The rival band arrives",
+      6
+     ],
+     [
+      "The sorcerer finishes the scrying",
+      4
+     ],
+     [
+      "The tower collapses",
+      4
+     ],
+     [
+      "The water runs out",
+      6
+     ]
+    ]
+   ],
+   "who": [
+    "Key character",
+    [
+     "A merchant prince with a hidden debt",
+     "A sorcerer who needs one more sacrifice",
+     "A slave who knows the way in",
+     "A corsair queen",
+     "A priest of a dead god",
+     "A Northland jarl's runaway heir",
+     "A Deepkin smith who forged something terrible",
+     "A serpent-kin scholar",
+     "A mercenary captain with a grudge",
+     "A child who hears the Crown",
+     "A demon in a human skin",
+     "An old thief's last apprentice"
+    ]
+   ]
+  }
+ },
  "spaceopera": {
   "id": "spaceopera",
   "title": "Starward",
@@ -1012,7 +1205,7 @@ export function commands() {
     { name: "seed", description: "Roll an adventure seed from the game's tables" },
     {
       name: "game",
-      description: "Which game this server plays: Iron Roads, Starward, Grimm or USS Pelion",
+      description: "Which game this server plays (Iron Roads, Starward, The Shattered Crown, Grimm, USS Pelion)",
       options: [
         { type: 1, name: "show", description: "Show this server's game" },
         { type: 1, name: "set", description: "GM: choose this server's game",
