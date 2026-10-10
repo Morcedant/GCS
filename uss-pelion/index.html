@@ -277,7 +277,9 @@ tr.lvl-U td.target { color: var(--muted); }
   #app[data-view="create"] .mobile-status, #app:not([data-view]) .mobile-status {
     display: flex; position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); z-index: 20;
     align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: rgba(8, 18, 34, .94); }
-  .mobile-status .status { font-size: .95rem; }
+  .mobile-status .status { font-size: .82rem; min-width: 0; }
+  .mobile-status .btn-row { flex-wrap: nowrap; flex: none; }
+  .mobile-status .btn { padding: 9px 12px; }
   .wrap { padding-bottom: 96px; }
   .guide-toc summary::after { content: " ▾"; }
 }
@@ -545,33 +547,44 @@ tr.lvl-U td.target { color: var(--muted); }
           </div>
           <p class="small muted" id="st-dodge-note"></p>
         </div>
-        <div class="panel hud">
-          <div class="eyebrow">Officers on file</div>
-          <ul class="roster" id="roster"></ul>
+        <div class="panel hud" id="panel-files">
+          <div class="eyebrow">Character file</div>
+          <p class="small muted">A file is the lasting copy: it goes to your Downloads folder and opens on any computer or phone.</p>
           <div class="btn-row">
-            <button class="btn primary" id="btn-save">Save officer</button>
-            <button class="btn" id="btn-new">New</button>
-            <button class="btn" id="btn-example">Load example</button>
+            <button class="btn primary" id="btn-save-file">Save to file</button>
+            <label class="btn" for="f-file" id="btn-open-file" tabindex="0">Open file</label>
+            <input type="file" id="f-file" accept=".json,application/json,text/plain" class="visually-hidden">
           </div>
+          <p class="small muted" id="file-note" hidden></p>
           <div class="toast" id="toast" role="status" aria-live="polite"></div>
         </div>
         <div class="panel hud">
-          <div class="eyebrow">Transfer</div>
-          <p class="small muted">Copy this officer as JSON to share with your GM, or paste a file you were sent.</p>
-          <textarea id="f-json" rows="3" placeholder="Paste officer JSON here" aria-label="Officer JSON"></textarea>
+          <div class="eyebrow">Saved in this browser</div>
+          <ul class="roster" id="roster"></ul>
           <div class="btn-row">
-            <button class="btn" id="btn-copy">Copy JSON</button>
-            <button class="btn" id="btn-import">Load pasted JSON</button>
+            <button class="btn" id="btn-save">Save in browser</button>
+            <button class="btn" id="btn-new">New</button>
+            <button class="btn" id="btn-example">Load example</button>
           </div>
-          <label class="small" for="f-file" style="text-transform:none;letter-spacing:0;font-weight:400">Or open a .json file</label>
-          <input type="file" id="f-file" accept=".json,application/json">
+          <p class="small muted">Quick saves for this device and this browser only. Clearing browsing data erases them, so keep a file too.</p>
+        </div>
+        <div class="panel hud">
+          <details>
+            <summary class="eyebrow" style="cursor:pointer">Share as text</summary>
+            <p class="small muted">Copy the officer as text to paste into a message, or paste text you were sent.</p>
+            <textarea id="f-json" rows="3" placeholder="Paste officer text here" aria-label="Officer text"></textarea>
+            <div class="btn-row">
+              <button class="btn" id="btn-copy">Copy as text</button>
+              <button class="btn" id="btn-import">Load pasted text</button>
+            </div>
+          </details>
         </div>
       </aside>
     </div>
   </section>
 
   <!-- Phone-only readiness bar for the Create tab -->
-  <div class="mobile-status hud no-print" id="mobile-status"><span class="status" id="ms-text"></span><button type="button" class="btn" id="ms-go">Checklist</button></div>
+  <div class="mobile-status hud no-print" id="mobile-status"><span class="status" id="ms-text"></span><span class="btn-row"><button type="button" class="btn" id="ms-save">Save</button><button type="button" class="btn" id="ms-go">Checklist</button></span></div>
 
   <!-- GUIDE -->
   <section id="view-guide" role="tabpanel" aria-labelledby="tab-guide" hidden>
@@ -2700,8 +2713,43 @@ tr.lvl-U td.target { color: var(--muted); }
       toast("Officer deleted from this browser.");
     }
   });
+  // ---- character files ----
+  // In the claude.ai viewer, saving goes through its download prompt; opened directly, a normal download works.
+  const exportText = () => JSON.stringify({ format: "uss-pelion-officer", version: 1, ...ch, example: false, play: { ...ch.play, log: [] } }, null, 2);
+  const fileName = () => (ch.name.trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLowerCase() || "officer") + ".json";
+  const downloadsReady = window.claude?.use ? window.claude.use("downloads").catch(() => null) : Promise.resolve(null);
+  downloadsReady.then((dl) => {
+    if (dl || !framed) return;
+    $("btn-save-file").hidden = true; $("ms-save").hidden = true;
+    $("file-note").hidden = false;
+    $("file-note").textContent = "Saving files isn't available in this view. Use Share as text below, or open the creator's HTML file directly.";
+  });
+  async function saveFile() {
+    const txt = exportText(), name = fileName();
+    const dl = await downloadsReady;
+    if (dl) {
+      try { await dl.save({ filename: name, data: txt }); ch.example = false; render(); toast(`Saved ${name}. Find it in your Downloads.`); }
+      catch (e) {
+        const code = e && e.code;
+        if (code === "declined") toast("Save cancelled.");
+        else if (code === "rate_limited") toast("A save prompt is already open.");
+        else toast("This view couldn't save the file. Use Share as text instead.", true);
+      }
+      return;
+    }
+    const url = URL.createObjectURL(new Blob([txt], { type: "application/json" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    ch.example = false; render();
+    toast(`Saved ${name}. Find it in your Downloads.`);
+  }
+  $("btn-save-file").onclick = saveFile;
+  $("ms-save").onclick = saveFile;
+  $("btn-open-file").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("f-file").click(); } });
+
   $("btn-copy").onclick = () => {
-    const txt = JSON.stringify({ ...ch, play: { ...ch.play, log: [] } }, null, 2);
+    const txt = exportText();
     $("f-json").value = txt;
     const p = navigator.clipboard?.writeText(txt);
     if (p) p.then(() => toast("Officer JSON copied."), () => { $("f-json").select(); toast("Copy blocked here. The JSON is selected below; copy it manually."); });
@@ -2714,9 +2762,15 @@ tr.lvl-U td.target { color: var(--muted); }
       data.id = roster.some((c) => c.id === data.id) ? data.id : data.id || uid();
       data.example = false;
       load(data);
-      toast(`Loaded ${ch.name || "officer"}. Save it to keep it in this browser.`);
+      // Keep what was opened as a quick save in this browser too.
+      const i = roster.findIndex((c) => c.id === ch.id);
+      const copy = JSON.parse(JSON.stringify(ch));
+      if (i >= 0) roster[i] = copy; else roster.push(copy);
+      store.set(STORE_ROSTER, roster);
+      renderRoster();
+      toast(`Opened ${ch.name || "officer"}.`);
     } catch {
-      toast("That isn't an officer file. Paste the JSON exactly as it was copied.", true);
+      toast("That isn't a USS Pelion character file. Open a .json file saved from this creator.", true);
     }
   }
   $("btn-import").onclick = () => importText($("f-json").value);

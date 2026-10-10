@@ -15,7 +15,7 @@ GCS Templates
 - **Duty station**: final skill targets with 3d6 odds, Dodge, injury track, Duty points, and a roller that
   applies circumstance modifiers, assistance, advantage, injury and stun penalties, natural 3–4 / 17–18,
   margins, and Duty point rerolls.
-- Officers save in the browser and can be shared as JSON.
+- **Save to file** writes the character to a `.json` file in Downloads; **Open file** loads it on any computer or phone. Quick saves also stay in the browser, but only on that device.
 
 ### Saving a sheet as PDF
 
