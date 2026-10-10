@@ -509,7 +509,7 @@ Six characters ready to play. Each follows the creation rules exactly, Edges inc
 
 - **Attributes:** Body 12, Agility 13, Intellect 10, Presence 8, Will 12. **Dodge** 12.
 - **Skills:** Shooting 16 (Specialty). Trained: Riding 14, Melee 14, Brawling 14, Athletics 13, Investigation 11, Tracking 11, Read People 11, Survival 11, Leadership 9; Wesen Lore 11 (free).
-- **Edge:** True grit. **Grimm gift:** Keeper of the Books (companion: The Books Must Be Kept). **Complication:** Law and Order; trigger: a Wesen suspect could be killed instead of arrested.
+- **Edge:** Second advantage: Badge: Deputy U.S. Marshal. **Grimm gift:** Keeper of the Books (companion: The Books Must Be Kept). **Complication:** Law and Order; trigger: a Wesen suspect could be killed instead of arrested.
 - **Why I stand against the dark:** The Grimm blood woke in me, and it came with a duty. **Connection:** Gus Brandt cut her down from a lynch mob's rope before anyone knew what she was.
 
 ## Gus Brandt
@@ -598,6 +598,11 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Iron Will | +2 to Will when resisting magic or a Wesen's influence. |
 | Knife Fighter | +2 to Melee with a knife in close quarters. |
 | Hellfire Preacher | +2 to Persuasion when calming or rousing a crowd. |
+| Badge: Town Police or Deputy | Legal authority in one town or county: you can carry arms where others can't, question witnesses, make arrests and hold suspects. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. Outside your jurisdiction it's just tin. |
+| Badge: Sheriff | Authority across your county: everything a deputy can do, plus serving warrants, running the jail, and swearing in deputies and armed citizens. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. |
+| Badge: Deputy U.S. Marshal | Federal authority across states and territories: serving federal warrants, pursuing fugitives across county and state lines, swearing in deputies, and calling on local lawmen for help. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. |
+
+**Badges.** A badge is legal authority, not a magic word: Wesen, outlaws and the powers of the hidden world don't care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge.
 
 <!-- HERITAGES:START -->
 # Heritages

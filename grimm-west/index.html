@@ -1834,7 +1834,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <ul>
 <li><strong>Attributes:</strong> Body 12, Agility 13, Intellect 10, Presence 8, Will 12. <strong>Dodge</strong> 12.</li>
 <li><strong>Skills:</strong> Shooting 16 (Specialty). Trained: Riding 14, Melee 14, Brawling 14, Athletics 13, Investigation 11, Tracking 11, Read People 11, Survival 11, Leadership 9; Wesen Lore 11 (free).</li>
-<li><strong>Edge:</strong> True grit. <strong>Grimm gift:</strong> Keeper of the Books (companion: The Books Must Be Kept). <strong>Complication:</strong> Law and Order; trigger: a Wesen suspect could be killed instead of arrested.</li>
+<li><strong>Edge:</strong> Second advantage: Badge: Deputy U.S. Marshal. <strong>Grimm gift:</strong> Keeper of the Books (companion: The Books Must Be Kept). <strong>Complication:</strong> Law and Order; trigger: a Wesen suspect could be killed instead of arrested.</li>
 <li><strong>Why I stand against the dark:</strong> The Grimm blood woke in me, and it came with a duty. <strong>Connection:</strong> Gus Brandt cut her down from a lynch mob’s rope before anyone knew what she was.</li>
 </ul>
 <h2 id="g-gus-brandt">Gus Brandt</h2>
@@ -2060,8 +2060,21 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Hellfire Preacher</td>
 <td>+2 to Persuasion when calming or rousing a crowd.</td>
 </tr>
+<tr class="odd">
+<td>Badge: Town Police or Deputy</td>
+<td>Legal authority in one town or county: you can carry arms where others can’t, question witnesses, make arrests and hold suspects. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. Outside your jurisdiction it’s just tin.</td>
+</tr>
+<tr class="even">
+<td>Badge: Sheriff</td>
+<td>Authority across your county: everything a deputy can do, plus serving warrants, running the jail, and swearing in deputies and armed citizens. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.</td>
+</tr>
+<tr class="odd">
+<td>Badge: Deputy U.S. Marshal</td>
+<td>Federal authority across states and territories: serving federal warrants, pursuing fugitives across county and state lines, swearing in deputies, and calling on local lawmen for help. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.</td>
+</tr>
 </tbody>
 </table>
+<p><strong>Badges.</strong> A badge is legal authority, not a magic word: Wesen, outlaws and the powers of the hidden world don’t care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge.</p>
 <!-- HERITAGES:START -->
 <h1 id="g-heritages">Heritages</h1>
 <p>Each heritage has a <strong>tier</strong>. A character has 3 points to split between heritage power and Edges: the higher the tier, the fewer Edges (see Step 2). Adjustments always total zero. Heritages marked <em>horror</em> are only available when the whole table has agreed to a horror-tinged campaign.</p>
@@ -3302,7 +3315,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const GROUP_NAMES = { law: "The Law", learned: "The Learned", frontier: "The Frontier" };
   // Starting text for "What you bring"; replaced on calling change unless the player has written their own.
   const ROLE_SUGGESTIONS = {
-    Marshal: "Marshal: carries what authority there is, with Leadership and a steady gun.",
+    Marshal: "Marshal: carries what authority there is (take a Badge advantage), with Leadership and a steady gun.",
     Deputy: "Deputy: keeps order, guards prisoners, and backs up the marshal when it comes to shooting.",
     Detective: "Detective: investigates crimes for the Pinkertons or a private client, and follows the paper trail nobody else reads.",
     "Bounty Hunter": "Bounty hunter: tracks and brings in wanted men, and the things that only look like men.",
@@ -3411,7 +3424,7 @@ tr.lvl-U td.target { color: var(--muted); }
       attrs: { Body: 12, Agility: 13, Intellect: 10, Presence: 8, Will: 12 },
       skills: { Shooting: "S", Riding: "T", Melee: "T", Brawling: "T", Athletics: "T", Investigation: "T", "Wesen Lore": "T", Tracking: "T", "Read People": "T", Leadership: "T", Survival: "T" },
       adv: { id: "" }, sadv: { id: "g-books" }, comp: { id: "lawful", trigger: "A Wesen suspect could be killed instead of arrested" },
-      edges: { grit: 1 }, play: { duty: 3 },
+      edges: { adv2: 1 }, adv2: { id: "badge-marshal" },
       equipment: { revolver: true, rifle: true, horse: true, trailkit: true, journals: true } },
     { name: "Gus Brandt", rank: "Blacksmith and gunsmith", dept: "Tinker", path: "rounded", species: "Blutbad", speciesId: "blutbad",
       role: "Shoes the horses, fixes the guns, and hasn't hunted in eleven years.",
@@ -3479,6 +3492,9 @@ tr.lvl-U td.target { color: var(--muted); }
     ["ironwill", "Iron Will", "+2 to Will when resisting magic or a Wesen's influence.", "Will"],
     ["knife", "Knife Fighter", "+2 to Melee with a knife in close quarters.", "Melee"],
     ["preacher", "Hellfire Preacher", "+2 to Persuasion when calming or rousing a crowd.", "Persuasion"],
+    ["badge-local", "Badge: Town Police or Deputy", "Legal authority in one town or county: you can carry arms where others can't, question witnesses, make arrests and hold suspects. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. Outside your jurisdiction it's just tin.", "Leadership"],
+    ["badge-sheriff", "Badge: Sheriff", "Authority across your county: everything a deputy can do, plus serving warrants, running the jail, and swearing in deputies and armed citizens. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.", "Leadership"],
+    ["badge-marshal", "Badge: Deputy U.S. Marshal", "Federal authority across states and territories: serving federal warrants, pursuing fugitives across county and state lines, swearing in deputies, and calling on local lawmen for help. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.", "Leadership"],
   ];
   const COMPLICATIONS = [
     ["mystery", "Cannot Leave a Mystery Alone", "A strange discovery tempts you to linger, spend something scarce, or take a risky look. Accept a specific cost."],
