@@ -10,6 +10,7 @@ GCS Templates
 - **Create**: the guide's five steps: department (including General Services for enlisted Crewman and Yeoman ranks), species with net-zero attribute adjustments (Human, Vulcan, Andorian, Tellarite, Aenar, Illyrian, Half-Vulcan, Lanthanite, Caitian, Aurelian, or custom), attributes (10 + species adjustment, +5 points, max 13 + species bonus),
   one Specialty (+3) and nine Trained (+1) skills with Untrained at −4, advantage, complication,
   equipment and crew connection. A readiness checklist flags anything that breaks the creation rules.
+- **Species advantages**: each species offers two or three optional advantages (a narrow +2 or a GM-limited ability), each paired with a companion complication that comes with it. Custom pairs are supported.
 - **Duty station**: final skill targets with 3d6 odds, Dodge, injury track, Duty points, and a roller that
   applies circumstance modifiers, assistance, advantage, injury and stun penalties, natural 3–4 / 17–18,
   margins, and Duty point rerolls.

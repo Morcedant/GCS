@@ -163,6 +163,9 @@ tr.lvl-U td.target { color: var(--muted); }
 
 /* Traits */
 .trait-desc { background: rgba(92, 200, 255, .05); border: 1px solid var(--line); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 8px; font-size: .92rem; color: #c9d8ec; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.pair .trait-desc { display: grid; gap: 4px; }
+.trait-desc.comp { border-left-color: var(--warn); }
 .checks { display: flex; flex-wrap: wrap; gap: 8px 18px; }
 .checks label { text-transform: none; letter-spacing: 0; font: 400 .92rem/1.4 var(--body); color: var(--fg); display: flex; gap: 8px; align-items: center; }
 
@@ -374,6 +377,23 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide"><label for="f-comptrigger">Trigger, agreed with the GM</label>
               <input type="text" id="f-comptrigger" placeholder="e.g. An unexplained reading while the team is ordered to withdraw"></div>
           </div>
+
+          <div class="fields">
+            <div class="field wide"><label for="f-sadv">Species advantage (optional)</label><select id="f-sadv"></select>
+              <span class="small muted">Taken in addition to your advantage and complication. It always comes with its companion complication, which earns Duty points like any other.</span></div>
+            <div class="field wide" id="sadv-custom" hidden>
+              <div class="fields">
+                <div class="field"><label for="f-sadvname">Species advantage name</label><input type="text" id="f-sadvname"></div>
+                <div class="field wide"><label for="f-sadvtext">What it does</label><textarea id="f-sadvtext" rows="2" placeholder="A narrow +2, or an ability with agreed limits."></textarea></div>
+                <div class="field"><label for="f-scompname">Companion complication</label><input type="text" id="f-scompname"></div>
+                <div class="field wide"><label for="f-scomptext">What problem it creates</label><textarea id="f-scomptext" rows="2"></textarea></div>
+              </div>
+            </div>
+            <div class="field wide" id="sadv-desc-wrap" hidden><div class="pair">
+              <div class="trait-desc"><span class="label">Advantage</span><div id="sadv-desc"></div></div>
+              <div class="trait-desc comp"><span class="label" id="scomp-name"></span><div id="scomp-desc"></div></div>
+            </div></div>
+          </div>
         </section>
 
         <section class="step hud">
@@ -476,6 +496,7 @@ tr.lvl-U td.target { color: var(--muted); }
           </div>
           <div class="checks">
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
+            <label id="r-sadv-wrap"><input type="checkbox" id="r-sadv"> <span id="r-sadv-label">Species advantage applies +2</span></label>
             <label><input type="checkbox" id="r-phys"> Physical action (injury penalty)</label>
             <label><input type="checkbox" id="r-stun"> Stun penalty −2</label>
           </div>
@@ -575,6 +596,79 @@ tr.lvl-U td.target { color: var(--muted); }
     ["aurelian", "Aurelian", { Agility: 1, Intellect: 1, Body: -2 }, "A winged, avian people known as scholars and historians, like Aleek-Om. Capable of flight, but light-boned and physically frail."],
   ];
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
+  // Species advantages, each paired with a companion complication that comes with it.
+  // [id, name, effect, roll, gives +2?, companion name, companion text]
+  const SPECIES_TRAITS = {
+    human: [
+      ["h-spirit", "Indomitable Spirit", "+2 to Will when refusing to abandon a crewmate or give up on a rescue. It does not help against alien compulsion.", "Will", true,
+        "Reckless Hope", "You keep going after the odds have clearly turned. When the GM shows the cost of pressing on, accept the danger, delay, or lost resource."],
+      ["h-gut", "Gut Instinct", "+2 to Psychology when judging, face to face, whether someone is lying to you. It does not reveal what the truth is.", "Psychology", true,
+        "Acts on Hunches", "You act on an unverified feeling when procedure says wait. Accept the consequence when the hunch costs time, trust, or position."],
+    ],
+    vulcan: [
+      ["v-meld", "Vulcan Mind Meld", "By touch, with a willing or restrained subject, roll Will to share thoughts or memories. The GM sets what can be learned before the roll. A resisting mind uses an opposed Will contest, and a meld never reveals what the subject does not know.", "Will", false,
+        "Meld Echoes", "After a meld, fragments of the other mind linger. Accept −2 on your next Will roll, or an uncharacteristic emotional moment, at a time that matters."],
+      ["v-pinch", "Vulcan Nerve Pinch", "+2 to Unarmed Combat to render a humanoid unconscious when you reach an unaware or restrained target. Unfamiliar anatomy needs study first.", "Unarmed Combat", true,
+        "Logic Before Feeling", "You dismiss an emotional appeal or a colleague's intuition at a key moment. Accept the strained relationship or the missed warning."],
+      ["v-recall", "Eidetic Recall", "+2 to Intellect rolls to recall exactly something you have read, heard, or seen. It does not supply knowledge you never encountered.", "Intellect", true,
+        "Suppressed Emotion", "Under severe strain, an emotion you have held down breaks through. Accept a visible loss of control at an inconvenient moment."],
+    ],
+    andorian: [
+      ["a-antennae", "Antennae Sense", "+2 to Intellect rolls to sense movement nearby, in darkness, or behind you. It does not detect anything shielded or perfectly still.", "Intellect", true,
+        "Born on Ice", "Andoria is a frozen moon. When heat is a real factor, accept −2 on physical actions for the scene or a forced rest."],
+      ["a-loyalty", "Fierce Loyalty", "+2 to Will against fear or intimidation while a sworn friend or crewmate is in danger.", "Will", true,
+        "Code of Honor", "An insult to you or your clan demands an answer. Accept the consequences of a challenge, a public quarrel, or a duel you cannot refuse."],
+    ],
+    tellarite: [
+      ["t-debate", "Tireless Debater", "+2 to Diplomacy when arguing a position in a formal negotiation or debate where argument is expected. It does not help when quiet persuasion is needed.", "Diplomacy", true,
+        "Argumentative", "You challenge an order or a colleague's claim at an awkward moment. Accept the delay or the bruised relationship."],
+      ["t-nose", "Keen Nose", "+2 to Intellect rolls to notice or identify something by smell, such as a gas leak, a chemical, or someone hiding nearby.", "Intellect", true,
+        "Blunt to a Fault", "Your honesty offends someone whose cooperation matters. Accept the lost goodwill rather than softening the truth."],
+    ],
+    aenar: [
+      ["ae-telepathy", "Aenar Telepathy", "Roll Will to sense the emotions and surface thoughts of a nearby mind. The GM sets the limits before the roll. A resisting or shielded mind uses an opposed Will contest, and distance or unfamiliar minds may make it impossible.", "Will", false,
+        "Blind", "You navigate by telepathy and your other senses. When telepathy is blocked or you must read a display, writing, or other visual information unaided, accept a delay or need a crewmate's help."],
+      ["ae-empath", "Perceptive Mind", "+2 to Psychology when reading the emotional state of someone you can sense nearby.", "Psychology", true,
+        "Pacifist Conviction", "You refuse to harm a living being even when it costs the team. Accept the setback your refusal causes."],
+    ],
+    illyrian: [
+      ["i-adaptive", "Adaptive Physiology", "+2 to Body when resisting cold, toxins, or thin atmosphere. It does not protect against vacuum, radiation, or weapons.", "Body", true,
+        "Hidden Augmentation", "Federation law bars augmented officers, so you hide what you are. When a medical scan or inquiry could expose you, accept the lie, the risk, or a revealing choice."],
+      ["i-endurance", "Enhanced Endurance", "+2 to Athletics when pushing through prolonged exertion: long swims, forced marches, or enduring extreme conditions.", "Athletics", true,
+        "Prejudice Against Augments", "Someone who knows or suspects your heritage treats you with suspicion. Accept the obstruction or lost trust when it matters."],
+    ],
+    halfvulcan: [
+      ["hv-bridge", "Between Two Worlds", "+2 to Diplomacy when mediating between logic-driven and emotional parties, or bridging a misunderstanding between Vulcan and human ways.", "Diplomacy", true,
+        "Divided Self", "When a situation forces a choice between logic and feeling, your inner conflict surfaces. Accept hesitation or an emotional outburst."],
+      ["hv-strength", "Vulcan Strength", "+2 to Body when lifting, forcing, or holding something through raw strength.", "Body", true,
+        "Neither One Nor the Other", "Members of either culture doubt where you belong. Accept a slight, exclusion, or challenge to your judgment that matters."],
+    ],
+    lanthanite: [
+      ["l-history", "Centuries of Experience", "+2 to Intellect rolls to recall a historical event, old custom, or obsolete technology you could plausibly have lived through.", "Intellect", true,
+        "Secret Age", "You keep your true age quiet. When your history threatens to show, accept a lie, a slip, or a revealing consequence."],
+      ["l-antique", "Old Hand", "+2 to Engineering when repairing antique, obsolete, or improvised equipment. It does not apply to current Starfleet systems.", "Engineering", true,
+        "Rules Are Temporary", "After millennia, regulations seem fleeting. You skip a procedure and accept the consequences when it matters."],
+    ],
+    caitian: [
+      ["c-reflex", "Feline Reflexes", "+2 to Athletics when jumping, climbing, or landing safely from a fall.", "Athletics", true,
+        "Chase Instinct", "Sudden movement or a fleeing creature triggers a pursuit reflex. Accept a momentary distraction or a rash move."],
+      ["c-hearing", "Keen Hearing", "+2 to Intellect rolls to hear faint or distant sounds.", "Intellect", true,
+        "Sensitive Ears", "Loud noise disorients you. When an alarm, explosion, or sonic weapon goes off nearby, accept −2 on your next action."],
+    ],
+    aurelian: [
+      ["au-flight", "Flight", "You can fly short distances in normal gravity and breathable air. Roll Athletics for difficult flying. It does not work in low pressure, high gravity, or cramped spaces.", "Athletics", false,
+        "Fragile Bones", "Your light bones break easily. When a fall, crush, or heavy blow hits you, accept the GM marking one extra injury box."],
+      ["au-scholar", "Scholar's Memory", "+2 to Intellect rolls to recall the history, legends, or cultural records of another world.", "Intellect", true,
+        "Lost in History", "A historical find tempts you to stop and study it. Accept the lost time or the danger of lingering."],
+    ],
+  };
+  const sTraitList = () => SPECIES_TRAITS[ch.speciesId] || [];
+  const sTraitDef = () => sTraitList().find((t) => t[0] === ch.sadv.id);
+  const sAdvName = () => ch.sadv.id === "custom" ? (ch.sadv.name || "Custom species advantage") : sTraitDef()?.[1] || "";
+  const sAdvText = () => ch.sadv.id === "custom" ? ch.sadv.text : sTraitDef()?.[2] || "";
+  const sCompName = () => ch.sadv.id === "custom" ? (ch.sadv.compName || "Companion complication") : sTraitDef()?.[5] || "";
+  const sCompText = () => ch.sadv.id === "custom" ? ch.sadv.compText : sTraitDef()?.[6] || "";
+  const sAdvBonus = () => ch.sadv.id === "custom" ? true : !!sTraitDef()?.[4];
   const ADVANTAGES = [
     ["steady", "Steady Hands", "+2 to Medicine for delicate surgery or removing a dangerous embedded object. It does not improve diagnosis or all medical treatment.", "Medicine"],
     ["emergency", "Emergency Physician", "+2 to Medicine for emergency stabilization of an injured patient. It does not apply to subsequent field healing or sickbay recovery.", "Medicine"],
@@ -634,6 +728,7 @@ tr.lvl-U td.target { color: var(--muted); }
       attrs: { Body: 10, Agility: 10, Intellect: 10, Presence: 10, Will: 10 },
       skills: Object.fromEntries(SKILLS.map(([n]) => [n, "U"])),
       adv: { id: "", name: "", text: "", detail: "" },
+      sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: { communicator: true, tricorder: false, phaser: true, medkit: false, engkit: false },
       play: { injury: 0, duty: 2, stunned: false, log: [] },
@@ -658,7 +753,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function normalize(c) {
     const b = blank();
     const out = { ...b, ...c, attrs: { ...b.attrs, ...(c.attrs || {}) }, skills: { ...b.skills, ...(c.skills || {}) },
-      adv: { ...b.adv, ...(c.adv || {}) }, comp: { ...b.comp, ...(c.comp || {}) },
+      adv: { ...b.adv, ...(c.adv || {}) }, comp: { ...b.comp, ...(c.comp || {}) }, sadv: { ...b.sadv, ...(c.sadv || {}) },
       equipment: { ...b.equipment, ...(c.equipment || {}) }, play: { ...b.play, ...(c.play || {}) } };
     if (!out.id) out.id = uid();
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
@@ -695,6 +790,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function setSpecies(id) {
     const before = adjOf();
     ch.speciesId = id;
+    if (ch.sadv.id && ch.sadv.id !== "custom" && !(SPECIES_TRAITS[id] || []).some((t) => t[0] === ch.sadv.id)) ch.sadv.id = "";
     if (id !== "custom") ch.species = speciesDef()[1];
     else if (SPECIES.some((x) => x[1] === ch.species)) ch.species = "";
     const after = adjOf();
@@ -721,6 +817,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function checks() {
     const sp = spent(), nS = count("S"), nT = count("T");
     const overMax = ATTRS.filter(([n]) => ch.attrs[n] > maxOf(n) || ch.attrs[n] < baseOf(n)).map(([n]) => n);
+    const sAdvOk = ch.sadv.id !== "custom" || (ch.sadv.name.trim() && ch.sadv.text.trim() && ch.sadv.compName.trim() && ch.sadv.compText.trim());
     const speciesOk = ch.speciesId !== "custom" || (ch.species.trim() && adjTotal() === 0);
     const advOk = ch.adv.id && (ch.adv.id !== "custom" || (ch.adv.name.trim() && ch.adv.text.trim())) &&
       (!(advDef()?.[4]) || ch.adv.detail.trim());
@@ -736,6 +833,7 @@ tr.lvl-U td.target { color: var(--muted); }
       [!!compOk, compOk ? "Complication chosen" : ch.comp.id ? "Finish the complication details" : "Choose a complication"],
       [!!ch.comp.trigger.trim(), "Complication trigger agreed with the GM"],
       [!!ch.connection.trim(), "Connection to a crewmate"],
+      ...(ch.sadv.id ? [[!!sAdvOk, sAdvOk ? `Species advantage: ${sAdvName()} (with ${sCompName()})` : "Finish the custom species advantage and its companion"]] : []),
     ];
   }
 
@@ -783,6 +881,7 @@ tr.lvl-U td.target { color: var(--muted); }
     for (const [id, k] of Object.entries(map)) $(id).value = ch[k];
     $("f-dept").value = ch.dept;
     $("f-adv").value = ch.adv.id; $("f-advname").value = ch.adv.name; $("f-advtext").value = ch.adv.text; $("f-advdetail").value = ch.adv.detail;
+    $("f-sadvname").value = ch.sadv.name; $("f-sadvtext").value = ch.sadv.text; $("f-scompname").value = ch.sadv.compName; $("f-scomptext").value = ch.sadv.compText;
     $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
     EQUIPMENT.forEach(([k]) => ($("eq-" + k).checked = !!ch.equipment[k]));
     $("f-stunned").checked = !!ch.play.stunned;
@@ -800,6 +899,14 @@ tr.lvl-U td.target { color: var(--muted); }
     const adjNow = adjOf();
     $("species-desc").innerHTML = (custom ? "Record a species agreed with your GM. Adjustments must total 0, from −2 to +2 each." : esc(sd[3])) +
       `<div class="adj-chips">${ATTRS.filter(([n]) => adjNow[n]).map(([n]) => `<span class="adj-chip ${adjNow[n] > 0 ? "up" : "down"}">${n} ${signed(adjNow[n])}</span>`).join("") || `<span class="adj-chip">No adjustments</span>`}</div>`;
+    const sOpts = `<option value="">None</option>` + sTraitList().map((t) => `<option value="${t[0]}">${t[1]} (companion: ${t[5]})</option>`).join("") + `<option value="custom">Custom species advantage…</option>`;
+    if ($("f-sadv").dataset.for !== ch.speciesId) { $("f-sadv").innerHTML = sOpts; $("f-sadv").dataset.for = ch.speciesId; }
+    $("f-sadv").value = ch.sadv.id;
+    $("sadv-custom").hidden = ch.sadv.id !== "custom";
+    $("sadv-desc-wrap").hidden = !ch.sadv.id || (ch.sadv.id === "custom" && !ch.sadv.text && !ch.sadv.compText);
+    $("sadv-desc").textContent = sAdvText();
+    $("scomp-name").textContent = "Companion: " + sCompName();
+    $("scomp-desc").textContent = sCompText();
     ATTRS.forEach(([n]) => { if ($("adj-" + n)) $("adj-" + n).textContent = signed(ch.speciesAdj[n] || 0); });
     $("f-role").placeholder = ROLE_SUGGESTIONS[ch.dept] || "";
     const ranks = ch.dept === "General Services" ? ENLISTED_RANKS : OFFICER_RANKS;
@@ -899,6 +1006,10 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="field"><span class="label">Complication</span><b>${esc(compName() || "—")}</b><span class="small muted">${esc(compText)}</span>
           ${ch.comp.trigger ? `<span class="small"><b>Trigger:</b> ${esc(ch.comp.trigger)}</span>` : ""}</div>
       </div>
+      ${ch.sadv.id ? `<div class="fields">
+        <div class="field"><span class="label">Species advantage</span><b>${esc(sAdvName())}</b><span class="small muted">${esc(sAdvText())}</span></div>
+        <div class="field"><span class="label">Companion complication</span><b>${esc(sCompName())}</b><span class="small muted">${esc(sCompText())}</span></div>
+      </div>` : ""}
       <div class="fields">
         <div class="field"><span class="label">Equipment</span><span>${esc(eq.join(", ") || "—")}</span></div>
         <div class="field"><span class="label">Connection</span><span>${esc(ch.connection || "—")}</span></div>
@@ -924,6 +1035,10 @@ tr.lvl-U td.target { color: var(--muted); }
     if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
     const an = advName();
     $("r-adv-label").textContent = an ? `${an} applies +2` : "Advantage applies +2";
+    const showS = !!ch.sadv.id && sAdvBonus();
+    $("r-sadv-wrap").hidden = !showS;
+    if (!showS) $("r-sadv").checked = false;
+    $("r-sadv-label").textContent = `${sAdvName()} applies +2`;
     $("r-adv").disabled = !an;
     updateTarget();
     renderLog();
@@ -939,7 +1054,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const parts = [];
     const mod = +$("r-mod").value; if (mod) parts.push(mod);
     const asst = +$("r-assist").value; if (asst) parts.push(asst);
-    if ($("r-adv").checked && !$("r-adv").disabled) parts.push(2);
+    if (($("r-adv").checked && !$("r-adv").disabled) || $("r-sadv").checked) parts.push(2); // only one advantage bonus per roll
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
@@ -1014,7 +1129,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const id = e.target.id;
     if (textMap[id]) { ch[textMap[id]] = e.target.value; touch(); render(); return; }
     const sub = { "f-advname": ["adv", "name"], "f-advtext": ["adv", "text"], "f-advdetail": ["adv", "detail"],
-      "f-compname": ["comp", "name"], "f-comptext": ["comp", "text"], "f-comptrigger": ["comp", "trigger"] }[id];
+      "f-compname": ["comp", "name"], "f-comptext": ["comp", "text"], "f-comptrigger": ["comp", "trigger"],
+      "f-sadvname": ["sadv", "name"], "f-sadvtext": ["sadv", "text"], "f-scompname": ["sadv", "compName"], "f-scomptext": ["sadv", "compText"] }[id];
     if (sub) { ch[sub[0]][sub[1]] = e.target.value; touch(); render(); }
   });
   document.addEventListener("change", (e) => {
@@ -1027,6 +1143,7 @@ tr.lvl-U td.target { color: var(--muted); }
     }
     else if (t.id === "f-adv") { ch.adv.id = t.value; touch(); render(); }
     else if (t.id === "f-comp") { ch.comp.id = t.value; touch(); render(); }
+    else if (t.id === "f-sadv") { ch.sadv.id = t.value; touch(); render(); }
     else if (t.dataset.eq) { ch.equipment[t.dataset.eq] = t.checked; touch(); render(); }
     else if (t.dataset.skill) {
       const n = t.dataset.skill, v = t.value;
@@ -1036,7 +1153,12 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value); updateTarget(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys"].includes(t.id)) updateTarget();
+    else if (t.id === "r-adv" || t.id === "r-sadv") {
+      // The guide allows only one advantage bonus on a roll.
+      if (t.checked) $(t.id === "r-adv" ? "r-sadv" : "r-adv").checked = false;
+      updateTarget();
+    }
+    else if (["r-mod", "r-assist", "r-phys"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
