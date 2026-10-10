@@ -1049,6 +1049,13 @@ tr.lvl-U td.target { color: var(--muted); }
       const v = ch.attrs[n] - (before[n] || 0) + (after[n] || 0);
       ch.attrs[n] = Math.max(baseOf(n), Math.min(maxOf(n), v));
     });
+    // A higher tier leaves fewer Edges. If the ones taken no longer fit, clear them all to choose again,
+    // and undo what they gave: the extra attribute points and the extra starting point.
+    if (edgesSpent() <= edgesAvail()) return false;
+    ch.edges = {};
+    while (spent() > pool()) { const n = ATTRS.map(([a]) => a).filter((a) => ch.attrs[a] > baseOf(a)).sort((x, y) => ch.attrs[y] - ch.attrs[x])[0]; if (!n) break; ch.attrs[n]--; }
+    if (ch.play && ch.play.duty > gritStart()) ch.play.duty = gritStart();
+    return true;
   }
   // Old hands: one Expert skill (+5) and seven Trained; everyone else: one Specialty (+3) and nine Trained.
   const isGS = () => ch.path === "hand";
@@ -1586,7 +1593,8 @@ tr.lvl-U td.target { color: var(--muted); }
     }
     else if (t.id === "f-speciesid") {
       const had = ch.sadv.id && sAdvName();
-      setSpecies(t.value); $("f-species").value = ch.species; touch(); render();
+      const edgesCleared = setSpecies(t.value); $("f-species").value = ch.species; touch(); render();
+      if (edgesCleared) toast(`This ${T.originLower} has ${edgesAvail()} Edge${edgesAvail() === 1 ? "" : "s"}, fewer than you had taken, so your Edges were cleared. Choose again in step 2.`);
       if (had && !ch.sadv.id) toast(`${had} belongs to another ${T.originLower}, so your advantage was cleared. Choose a new one in step 4.`);
       if (!FORMED.has(ch.speciesId)) ch.play.form = false;
     }
