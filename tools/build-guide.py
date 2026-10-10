@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
-"""Build the USS Pelion Players' Guide from uss-pelion/players-guide.md.
+"""Build a game's Players' Guide from <game>/players-guide.md.
 
 Writes the guide into the creator's "Players' Guide" tab (between the GUIDE markers
-in uss-pelion/index.html) and, with --docx, a Word version.
+in <game>/index.html) and, with --docx, a Word version.
 
-  python3 tools/build-guide.py [--docx [--reference-doc original.docx]]
+  python3 tools/build-guide.py [--game uss-pelion|grimm-west] [--docx [--reference-doc original.docx]]
 """
 import argparse, pathlib, re, subprocess, sys
 
-NAVY, GOLD_FILL = "1B2A4A", "E9EEF6"
-
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SRC = ROOT / "uss-pelion" / "players-guide.md"
-APP = ROOT / "uss-pelion" / "index.html"
-DOCX = ROOT / "uss-pelion" / "USS_Pelion_Players_Guide.docx"
+# Per game: Word file name, heading color, table header fill.
+GAMES = {
+    "uss-pelion": ("USS_Pelion_Players_Guide.docx", "1B2A4A", "E9EEF6"),
+    "grimm-west": ("Grimm_Wild_West_Players_Guide.docx", "4A2A12", "F1E6D2"),
+}
+SRC = APP = DOCX = None
+NAVY, GOLD_FILL = "1B2A4A", "E9EEF6"
 START, END = "<!-- GUIDE:START -->", "<!-- GUIDE:END -->"
 
 
@@ -23,9 +25,13 @@ def pandoc(*args):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--game", choices=sorted(GAMES), default="uss-pelion", help="which game folder to build")
     ap.add_argument("--docx", action="store_true", help="also write the Word version")
     ap.add_argument("--reference-doc", help="a .docx whose styles the Word version should use")
     a = ap.parse_args()
+    global SRC, APP, DOCX, NAVY, GOLD_FILL
+    docx_name, NAVY, GOLD_FILL = GAMES[a.game]
+    SRC, APP, DOCX = ROOT / a.game / "players-guide.md", ROOT / a.game / "index.html", ROOT / a.game / docx_name
 
     html = pandoc("-f", "markdown", "-t", "html", "--id-prefix=g-", "--wrap=none")
     app = APP.read_text()

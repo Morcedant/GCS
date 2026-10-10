@@ -1,5 +1,30 @@
 # GCS
-GCS Templates
+GCS Templates: character creators, players' guides and Discord dice bots for 3d6 roll-under games.
+
+| Game | Folder | Setting |
+|---|---|---|
+| USS Pelion | `uss-pelion/`, `discord-bot/` | Star Trek, campaign year 2268 |
+| Grimm Wild West | `grimm-west/` | The Grimm-verse on the Oregon frontier, 1889 |
+
+Both games share the same rules engine. To start another variant, copy one game's folder and change its data
+(see *Grimm Wild West* below for what changed), then build its guide with `python3 tools/build-guide.py --game <folder> --docx`.
+
+## Grimm Wild West Character Creator
+
+`grimm-west/index.html` is the same creator re-flavored for a Grimm game in the late-1800s West
+(Black Pine, Oregon, 1889). Open it in any browser.
+
+- **Calling** (Law, Learned or Frontier groups) replaces department; **Well-rounded** (Specialty +3, nine Trained) or
+  **Old hand** (Expert +5, seven Trained) replaces officer and General Services.
+- **Heritage** replaces species: Human, Grimm, Incantare (magic users, who choose a Lens) and ten Wesen kinds,
+  each with net-zero adjustments and heritage advantages paired with companion complications.
+- 19 frontier skills (including Wesen Lore, Occult, Apothecary, Riding, Shooting, Melee), **Grit** points instead of
+  Duty points, a **woge** toggle for Wesen, **guns and rounds** (derringer, revolver, shotgun, rifle; fan the hammer,
+  both barrels, covering fire, reloads, jams on a natural 18) instead of phaser power, and **Trouble** tracks
+  (Suspicion, Exposure, Attention) instead of the ship.
+- The GM view rolls **case seeds** and keeps a **case journal** (with a "for the books" entry); six ready-made riders.
+- The guide is `grimm-west/players-guide.md` and `grimm-west/Grimm_Wild_West_Players_Guide.docx`; the Discord bot
+  (`/grimm`, `/grit`, `/clock`, `/contest`, `/assist`) is in `grimm-west/discord-bot/`.
 
 ## USS Pelion Officer Creator
 
@@ -30,7 +55,7 @@ with blank injury and Duty point tracks and the quick reference.
 species attribute adjustments, and species advantages with companion complications. It appears in the
 creator's **Players' Guide** tab and as `uss-pelion/USS_Pelion_Players_Guide.docx`.
 
-After editing the Markdown, rebuild both with `python3 tools/build-guide.py --docx`
+After editing the Markdown, rebuild both with `python3 tools/build-guide.py --docx` (add `--game grimm-west` for the Grimm guide)
 (needs pandoc; python-docx adds table borders to the Word file).
 
 ## Discord dice bot
