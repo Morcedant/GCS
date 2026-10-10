@@ -416,9 +416,9 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="fields">
             <div class="field"><label for="f-dept">Department</label>
               <select id="f-dept"></select></div>
-            <div class="field"><label for="f-rank">Rank</label>
-              <input type="text" id="f-rank" list="ranks" placeholder="e.g. Lieutenant">
-              <datalist id="ranks"></datalist></div>
+            <div class="field"><label for="f-rankselect">Rank</label>
+              <select id="f-rankselect"></select>
+              <input type="text" id="f-rank" aria-label="Other rank" placeholder="Type the rank" hidden></div>
             <div class="field wide"><label for="f-role">What you contribute</label>
               <textarea id="f-role" rows="2"></textarea>
               <span class="small muted" id="role-hint"></span></div>
@@ -2286,9 +2286,17 @@ tr.lvl-U td.target { color: var(--muted); }
     $("scomp-desc").textContent = sCompText();
     ATTRS.forEach(([n]) => { if ($("adj-" + n)) $("adj-" + n).textContent = signed(ch.speciesAdj[n] || 0); });
     $("f-role").placeholder = ROLE_SUGGESTIONS[ch.dept] || "";
+    // A real dropdown: browsers show every option, unlike text-box suggestions, which some filter by what's typed.
     const ranks = ch.dept === "General Services" ? ENLISTED_RANKS : OFFICER_RANKS;
-    if ($("ranks").dataset.for !== ch.dept) { $("ranks").innerHTML = ranks.map((r) => `<option>${r}</option>`).join(""); $("ranks").dataset.for = ch.dept; }
-    $("f-rank").placeholder = ch.dept === "General Services" ? "e.g. Yeoman 3rd Class" : "e.g. Lieutenant";
+    if ($("f-rankselect").dataset.for !== ch.dept) {
+      $("f-rankselect").innerHTML = `<option value="">Choose a rank…</option>` + ranks.map((r) => `<option>${r}</option>`).join("") + `<option value="__other">Other rank…</option>`;
+      $("f-rankselect").dataset.for = ch.dept;
+    }
+    const listed = ranks.includes(ch.rank);
+    const other = rankOther || (!!ch.rank && !listed);
+    $("f-rankselect").value = other ? "__other" : ch.rank;
+    $("f-rank").hidden = !other;
+    if (other && document.activeElement !== $("f-rank")) $("f-rank").value = ch.rank;
     $("role-hint").textContent = ROLE_TEXTS.has(ch.role)
       ? `Suggested text for ${ch.dept}. It follows the department until you write your own.` : "";
 
@@ -2504,7 +2512,8 @@ tr.lvl-U td.target { color: var(--muted); }
   // ---- persistence ----
   function save() { store.set(STORE_CURRENT, ch); }
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
-  function load(c) { ch = normalize(c); last = null; $("r-result").hidden = true; bindFields(); render(); }
+  function load(c) { ch = normalize(c); rankOther = false; last = null; $("r-result").hidden = true; bindFields(); render(); }
+  let rankOther = false; // "Other rank…" chosen, even before anything is typed
   function setDept(d) {
     ch.dept = d;
     if (!ch.role.trim() || ROLE_TEXTS.has(ch.role)) { ch.role = ROLE_SUGGESTIONS[ch.dept] || ""; $("f-role").value = ch.role; }
@@ -2530,8 +2539,15 @@ tr.lvl-U td.target { color: var(--muted); }
       setSpecies(t.value); $("f-species").value = ch.species; touch(); render();
       if (had && !ch.sadv.id) toast(`${had} belongs to another species, so your advantage was cleared. Choose a new one in step 4.`);
     }
+    else if (t.id === "f-rankselect") {
+      rankOther = t.value === "__other";
+      if (rankOther) { if (OFFICER_RANKS.includes(ch.rank) || ENLISTED_RANKS.includes(ch.rank)) ch.rank = ""; touch(); render(); $("f-rank").focus(); }
+      else { ch.rank = t.value; touch(); render(); }
+    }
     else if (t.id === "f-rank" && isEnlisted(t.value) && ch.dept !== "General Services") {
-      setDept("General Services"); $("f-dept").value = ch.dept; touch(); render();
+      setDept("General Services"); $("f-dept").value = ch.dept;
+      if (ENLISTED_RANKS.includes(ch.rank)) rankOther = false; // now a listed rank: show it in the dropdown
+      touch(); render();
       toast("Crewmen and yeomen serve in General Services, so the department was changed.");
     }
     else if (t.id === "f-adv") {
