@@ -441,6 +441,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .guide table { width: 100%; min-width: 0; margin: 0 0 1.2em; font-size: .9rem; border: 1px solid var(--line); border-radius: 10px; border-collapse: separate; border-spacing: 0; overflow: hidden; background: var(--well); }
 .guide th, .guide td { vertical-align: top; }
 .guide td:first-child { font-weight: 600; white-space: nowrap; }
+.guide td code { white-space: normal; overflow-wrap: anywhere; }
 @media (max-width: 640px) { .guide td:first-child { white-space: normal; } .guide table { font-size: .84rem; } }
 .guide-title { display: grid; gap: 4px; margin-bottom: 1.4em; }
 .guide-title .h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.4rem); color: var(--fg); letter-spacing: .06em; }
@@ -3158,6 +3159,111 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Woge:</strong> free action for a Wesen; a forced woge on a failed Will roll. The woge profile’s bonuses apply while woged. Grimms see woge under strong emotion. A full woge before townsfolk marks Exposure (2 boxes at Tier 3).</p>
 <p><strong>Rituals:</strong> describe the effect; fill a clock of 2, 4 or 6 segments with Occult rolls at your Lens’s pace. Trappings remove a segment. Charms: Trained 2, Specialty 3, Expert 4.</p>
 <p><strong>Grit:</strong> start each session with two (three with True grit). Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.</p>
+<!-- DISCORD:START -->
+<h1 id="g-discord-commands">Discord commands</h1>
+<p>The table’s Discord bot rolls the dice and keeps the shared Grit points, clocks and Trouble tracks for the server. Type <code>/</code> in a channel to see the commands; Discord shows each option as you fill it in. The bot doesn’t know your sheet, so you give it the target number.</p>
+<h2 id="g-for-players">For players</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>/roll target:13 modifier:-2 label:Tracking</code></td>
+<td>Roll 3d6 under your target. Use the number from your sheet, and add up every modifier yourself: circumstance, injury, assistance. The bot shows the result, the margin and your chance. <strong>Spend a Grit point to reroll</strong> lets you reroll once, and the second result stands.</td>
+</tr>
+<tr class="even">
+<td><code>/contest target:13 opponent:14 opponent_name:"Blutbad" label:Grapple</code></td>
+<td>An opposed roll. The bot rolls both sides and names the winner. Ties and double failures go to the defender, which is the opponent unless you add <code>defender:me</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>/assist target:12 helper_target:14 helper:@name label:"Hold the door"</code></td>
+<td>Someone helps you. They roll first (Athletics, say): success gives +1, success by 5 or more +2, and a natural 18 brings a complication. Then you roll with their bonus.</td>
+</tr>
+<tr class="even">
+<td><code>/points show</code></td>
+<td>Your Grit points this session. Add <code>player:@name</code> to see someone else’s.</td>
+</tr>
+<tr class="odd">
+<td><code>/points spend</code></td>
+<td>Spend a Grit point without rolling, e.g. to reduce an injury by one box or to establish a small preparation.</td>
+</tr>
+<tr class="even">
+<td><code>/points gain</code></td>
+<td>Gain a Grit point, e.g. when you accept a complication the GM offers. With Extra Grit, use it once at the start of a session.</td>
+</tr>
+<tr class="odd">
+<td><code>/clock show</code></td>
+<td>Every clock the GM is running.</td>
+</tr>
+<tr class="even">
+<td><code>/track show</code></td>
+<td>The shared Trouble tracks (Suspicion, Exposure, Attention) and what each one means right now.</td>
+</tr>
+</tbody>
+</table>
+<p>The bot’s original names still work: <code>/grimm</code> is the same as <code>/roll</code>, and <code>/grit</code> is the same as <code>/points</code>.</p>
+<p>Only the player who rolled can press the reroll button. Rolls that miss by 1 or 2 remind the GM that success at a cost is on offer.</p>
+<h2 id="g-for-the-gm">For the GM</h2>
+<p>GM commands need the <strong>Manage Server</strong> permission on the Discord server. Everyone can see clocks, tracks and points.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>/game set game:Grimm</code></td>
+<td>Choose this server’s game. Do it once; <code>/game show</code> checks it.</td>
+</tr>
+<tr class="even">
+<td><code>/points newsession</code></td>
+<td>Start a session: everyone goes back to two Grit points, and unused points are gone.</td>
+</tr>
+<tr class="odd">
+<td><code>/points gain player:@name</code></td>
+<td>Award a Grit point, e.g. for an accepted complication.</td>
+</tr>
+<tr class="even">
+<td><code>/points set player:@name points:3</code></td>
+<td>Correct a player’s total.</td>
+</tr>
+<tr class="odd">
+<td><code>/clock new name:"The mob forms" segments:6 kind:danger</code></td>
+<td>Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use <code>kind:progress</code> for one that fills on successes.</td>
+</tr>
+<tr class="even">
+<td><code>/clock tick name:"The mob forms"</code></td>
+<td>Fill one segment. Add <code>segments:2</code> for two, or <code>segments:-1</code> to undo. <code>/clock remove</code> deletes a clock.</td>
+</tr>
+<tr class="odd">
+<td><code>/track mark name:exposure</code></td>
+<td>Mark a box on a track; a partial name works (“exposure” finds Exposure). <code>/track clear</code> clears one, and <code>/track reset</code> clears them all.</td>
+</tr>
+<tr class="even">
+<td><code>/seed</code></td>
+<td>Roll an adventure seed: one line from each seed table, and the command to start its ticking clock.</td>
+</tr>
+<tr class="odd">
+<td><code>/contest ... defender:me</code></td>
+<td>When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them.</td>
+</tr>
+</tbody>
+</table>
+<p>Each server keeps its own points, clocks and tracks. If a command is missing from Discord’s list, open the bot’s <code>/register</code> page once (see the bot’s README), then press Ctrl+R in Discord. <!-- DISCORD:END --></p>
 <!-- GUIDE:END -->
       </article>
     </div>
@@ -3658,6 +3764,13 @@ tr.lvl-U td.target { color: var(--muted); }
       const v = ch.attrs[n] - (before[n] || 0) + (after[n] || 0);
       ch.attrs[n] = Math.max(baseOf(n), Math.min(maxOf(n), v));
     });
+    // A higher tier leaves fewer Edges. If the ones taken no longer fit, clear them all to choose again,
+    // and undo what they gave: the extra attribute points and the extra starting point.
+    if (edgesSpent() <= edgesAvail()) return false;
+    ch.edges = {};
+    while (spent() > pool()) { const n = ATTRS.map(([a]) => a).filter((a) => ch.attrs[a] > baseOf(a)).sort((x, y) => ch.attrs[y] - ch.attrs[x])[0]; if (!n) break; ch.attrs[n]--; }
+    if (ch.play && ch.play.duty > gritStart()) ch.play.duty = gritStart();
+    return true;
   }
   // Old hands: one Expert skill (+5) and seven Trained; everyone else: one Specialty (+3) and nine Trained.
   const isGS = () => ch.path === "hand";
@@ -4191,7 +4304,8 @@ tr.lvl-U td.target { color: var(--muted); }
     }
     else if (t.id === "f-speciesid") {
       const had = ch.sadv.id && sAdvName();
-      setSpecies(t.value); $("f-species").value = ch.species; touch(); render();
+      const edgesCleared = setSpecies(t.value); $("f-species").value = ch.species; touch(); render();
+      if (edgesCleared) toast(`This heritage has ${edgesAvail()} Edge${edgesAvail() === 1 ? "" : "s"}, fewer than you had taken, so your Edges were cleared. Choose again in step 2.`);
       if (had && !ch.sadv.id) toast(`${had} belongs to another heritage, so your advantage was cleared. Choose a new one in step 4.`);
       if (!WESEN.has(ch.speciesId)) ch.play.woge = false;
     }
