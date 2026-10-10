@@ -256,6 +256,24 @@ One qualified assistant can roll a relevant skill before the lead character roll
 
 Failure changes the situation: time passes, information remains incomplete, resources are consumed, or danger increases. Do not repeat an unchanged roll until it succeeds. A new approach, new evidence, better tools, or additional time may justify another attempt.
 
+## Success at a cost
+
+When a roll fails by only **1 or 2**, the GM may offer **success at a cost**: you get what you were after, but something else goes wrong. Typical costs are a Wounded box, a damaged tool or ship system, lost time (tick a clock), a new problem in the scene, or someone else noticing. The GM names the cost before you accept; you can always take the plain failure instead.
+
+A natural 17 or 18 is never a success at a cost. A cost that comes from your complication can still earn a Duty point, as usual.
+
+*Example:* Lieutenant Okafor needs 12 or less to lock the transporter on a falling shuttle and rolls 13. The GM offers success at a cost: the crew beams out, but the transporter burns out a relay and is offline until Engineering repairs it. Okafor accepts.
+
+## Progress clocks
+
+A **clock** is a circle cut into 4, 6 or 8 segments that tracks something that takes time or builds toward disaster: *Warp core breach (4)*, *Repair the shuttle (6)*, *Klingon reinforcements arrive (4)*, *Win the council's trust (8)*.
+
+- **Danger clocks** fill when things go wrong: a failed roll, a success at a cost, or time passing. When one fills, the danger happens.
+- **Progress clocks** fill as the crew succeeds: one segment for a success, two for success by 5 or more. When one fills, the goal is achieved.
+- The GM sizes the clock (4 = urgent or simple, 6 = substantial, 8 = long or complex) and shows it to the players, so everyone can see the pressure building.
+
+Clocks are how a failed roll changes the situation without stopping the story. Racing a progress clock against a danger clock makes a strong climax.
+
 ## Investigation and social scenes
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. Diplomacy can secure cooperation or concessions, while Psychology offers insight into behavior. A successful roll does not force someone to abandon a core belief or provide information they do not possess.
@@ -399,13 +417,46 @@ Describe the effect you want before selecting a skill. Each exchange gives occup
 
 Leadership can assist another officer when orders or coordination meaningfully help. It uses the normal assistance rule and does not provide an automatic bonus to every station.
 
-## Ship encounters
+## The USS Pelion
 
-Ship encounters use descriptive consequences. The GM states what is at stake before rolls and describes changes to shields, hull, systems, and position afterward. Numerical ship damage is outside this guide's scope.
+The ship has its own sheet, tracked like an injury track. Encounters stay descriptive: the GM states what is at stake before rolls and narrates what each box means. This light structure is a campaign rule; detailed starship combat stays outside this guide.
+
+| Track | Boxes | Effect as boxes fill |
+|---|---|---|
+| Shields | 3 | Hits mark Shields first. At 3 boxes shields are down, and hits go to the Hull and a system. |
+| Hull | 4 | 1–2: scarred, minor breaches sealed. 3: serious breaches, decks lost. 4: the ship is breaking up; start an *Abandon ship* clock. |
+| Weapons, Engines, Sensors, Communications, Transporters, Life support | 3 each | 1 **Damaged**: −2 to rolls using it. 2 **Crippled**: −4, and it can do only its most basic job. 3 **Offline**: it doesn't work until repaired. |
+
+**Taking hits.** A normal hit (a phaser bank, a disruptor) marks 1 box; a heavy hit (photon torpedo, ramming, a disruptor volley) marks 2. Once Shields are down, each hit marks the Hull and the system the GM chooses, or roll 1d6: 1 Weapons, 2 Engines, 3 Sensors, 4 Communications, 5 Transporters, 6 Life support.
+
+**Defending.** When an enemy ship hits, Helm may roll **Helm** to evade, once per exchange, like Dodge: success cancels the hit. Engines damage applies its penalty.
+
+**Repairs.** In the middle of a crisis, a successful **Engineering** roll clears one box from Shields or a system (two on success by 5); it takes the engineer's action that exchange. The Hull can only be patched by one box per scene, and fully repaired at a starbase. Between encounters, the crew can clear the rest of the systems with time.
+
+**Firing.** Tactical rolls **Phasers** for ship weapons, against the enemy ship's own tracks, which the GM keeps the same way.
 
 ## Advancement
 
 After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement. General Services characters advance the same way, but only their starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they are commissioned (see Step 3).
+
+# Threats
+
+Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge once per round, and mark injury boxes. Each threat below is one line of numbers and one special trait.
+
+**Minor opponents** (guards, crewmen, a mob) have **one box**: any hit that gets through takes them out of the fight. Save full injury tracks for threats that matter.
+
+| Threat | Attack (target) | Dodge | Boxes | Weapon | Trait |
+|---|---|---|---|---|---|
+| Security guard (minor) | Phasers or disruptor 11 | 7 | 1 | Hand weapon | **Numbers.** Usually two or three; they surrender or flee when half are down. |
+| Klingon warrior | Disruptor 12, Blade 13, Unarmed 12 | 9 | 3 | Disruptor (kill), d'k tahg | **Relentless.** Ignores the Wounded penalty; only Seriously wounded slows them. |
+| Klingon officer | Disruptor 12, Leadership 13 | 9 | 3 | Disruptor (kill) | **Battle commander.** Once per round, gives one ally +1 on an attack. |
+| Romulan centurion | Disruptor 12, Stealth 13 | 9 | 3 | Disruptor (kill) | **Ambush.** +2 on the first attack from hiding; prefers to withdraw rather than be captured. |
+| Orion pirate | Disruptor 11, Blade 12, Stealth 12 | 9 | 3 | Disruptor, knife | **Dirty fighter.** Winning a grapple also disarms the target. |
+| Gorn warrior | Unarmed 14 | 6 | 4 | Claws, thrown rocks | **Immense strength.** Unarmed hits mark 2 boxes; slow, so it acts last in a round. |
+| Mugato | Unarmed (bite and horn) 13 | 8 | 3 | Venomous bite | **Venom.** A bite that marks a box also poisons: without Medicine before the scene ends, mark another box. |
+| Rogue android | Unarmed 13, Computers 15 | 7 | 4 | Crushing grip | **Logic trap.** A Diplomacy or Psychology contest that presents a paradox stuns it for the scene. |
+
+**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship tracks above: a Klingon battle cruiser has Shields 3, Hull 4, and Phasers 12 for its gunners.
 
 # Advantages
 
@@ -592,6 +643,12 @@ Will protects your resolve; Presence influences others. Leadership and Diplomacy
 **Combat:** short movement plus one action. Successful attack → optional Dodge → weapon effect. Dodge = Agility −2, plus Athletics training (+0 Untrained, +1 Trained, +2 Specialty), once per round. One injury box gives −1 to physical actions; two give −2; three incapacitate.
 
 **Damage:** the weapon decides. Fists, clubs, knives, arrows and primitive firearms mark 1 box; heavy blades mark 2; a phaser or disruptor on kill marks 3 and leaves the target Dying (dead at the end of the scene unless stabilized); stun marks none. At three boxes, another hit from a 2-box or killing weapon is fatal.
+
+**Near misses:** fail by 1–2 and the GM may offer success at a cost; never on a natural 17–18.
+
+**Clocks:** 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).
+
+**Ship:** Shields (3) take hits first; then Hull (4) and a system (3 each: −2, −4, offline). Normal hit 1 box, heavy hit 2. Helm evades once per exchange; Engineering clears a box.
 
 **Medicine:** one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery. Rest clears one box per full day, but not from three boxes: treatment must clear the first one.
 

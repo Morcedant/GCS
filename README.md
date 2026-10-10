@@ -38,3 +38,9 @@ After editing the Markdown, rebuild both with `python3 tools/build-guide.py --do
 `discord-bot/` is a free `/pelion` slash command for Discord that rolls 3d6 under a target with the
 guide's rules and offers a Duty point reroll. It runs on Cloudflare Workers; setup steps are in
 [`discord-bot/README.md`](discord-bot/README.md).
+
+### Play aids
+
+The Duty station tab also has **Clocks** (danger and progress clocks you tap to fill) and **USS Pelion status**
+(Shields, Hull and six systems with damage boxes). Both are kept in the browser for the table, not in a character
+file. The guide covers success at a cost, clocks, the ship's tracks, and a Threats chapter of ready opponents.

@@ -272,7 +272,7 @@ tr.lvl-U td.target { color: var(--muted); }
   /* Duty station: condition and roller first, the full sheet after them. */
   .sheet { display: flex; flex-direction: column; }
   .play-col { display: contents; }
-  #card-condition { order: 1; } #card-roll { order: 2; } #sheet-main { order: 3; } #card-ref { order: 4; }
+  #card-condition { order: 1; } #card-roll { order: 2; } #card-clocks { order: 3; } #card-ship { order: 4; } #sheet-main { order: 5; } #card-ref { order: 6; }
   /* Create: readiness rides along at the bottom instead of sitting above step 1. */
   #app[data-view="create"] .mobile-status, #app:not([data-view]) .mobile-status {
     display: flex; position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); z-index: 20;
@@ -314,6 +314,30 @@ tr.lvl-U td.target { color: var(--muted); }
   .btn { padding: 11px 16px; }
   .linkish { padding: 8px 6px; }
 }
+
+/* Clocks and ship */
+.clock-add { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; }
+.clock-add input { grid-column: 1 / -1; }
+.clocks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.clock { display: grid; justify-items: center; gap: 4px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--well); text-align: center; }
+.clock svg { width: 96px; height: 96px; }
+.clock path { stroke: var(--space); stroke-width: 2; cursor: pointer; fill: rgba(92, 200, 255, .08); }
+.clock path:hover { fill: rgba(92, 200, 255, .22); }
+.clock.danger path.on { fill: var(--bad); }
+.clock.progress path.on { fill: var(--good); }
+.clock .ring { fill: none; stroke: var(--chrome-dim); stroke-width: 1.5; pointer-events: none; }
+.clock.full { border-color: currentColor; }
+.clock.danger.full { color: var(--bad); } .clock.progress.full { color: var(--good); }
+.clock b { font-size: .92rem; overflow-wrap: anywhere; }
+.clock .kind { font: .66rem var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.ship { display: grid; gap: 8px; }
+.ship-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; padding-bottom: 6px; border-bottom: 1px solid rgba(92, 170, 255, .12); }
+.ship-row .eff { grid-column: 1 / -1; }
+.ship-row .label { font-size: .68rem; }
+.ship-row .boxes { gap: 4px; }
+.ship-row .box { width: 34px; height: 22px; }
+.ship-row .eff { font-size: .8rem; color: var(--muted); }
+.ship-row.hit .eff { color: var(--warn); } .ship-row.out .eff { color: var(--bad); font-weight: 600; }
 
 /* Players' Guide */
 .guide-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
@@ -1018,6 +1042,18 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><em>Example:</em> Engineering detects that an alien device is building an overload. A science officer assists with Physical Sciences 14 and rolls 9, succeeding by 5. The engineer receives +2 to the repair attempt. Each officer contributes a different kind of expertise.</p>
 <h2 id="g-failure-and-another-attempt">Failure and another attempt</h2>
 <p>Failure changes the situation: time passes, information remains incomplete, resources are consumed, or danger increases. Do not repeat an unchanged roll until it succeeds. A new approach, new evidence, better tools, or additional time may justify another attempt.</p>
+<h2 id="g-success-at-a-cost">Success at a cost</h2>
+<p>When a roll fails by only <strong>1 or 2</strong>, the GM may offer <strong>success at a cost</strong>: you get what you were after, but something else goes wrong. Typical costs are a Wounded box, a damaged tool or ship system, lost time (tick a clock), a new problem in the scene, or someone else noticing. The GM names the cost before you accept; you can always take the plain failure instead.</p>
+<p>A natural 17 or 18 is never a success at a cost. A cost that comes from your complication can still earn a Duty point, as usual.</p>
+<p><em>Example:</em> Lieutenant Okafor needs 12 or less to lock the transporter on a falling shuttle and rolls 13. The GM offers success at a cost: the crew beams out, but the transporter burns out a relay and is offline until Engineering repairs it. Okafor accepts.</p>
+<h2 id="g-progress-clocks">Progress clocks</h2>
+<p>A <strong>clock</strong> is a circle cut into 4, 6 or 8 segments that tracks something that takes time or builds toward disaster: <em>Warp core breach (4)</em>, <em>Repair the shuttle (6)</em>, <em>Klingon reinforcements arrive (4)</em>, <em>Win the council’s trust (8)</em>.</p>
+<ul>
+<li><strong>Danger clocks</strong> fill when things go wrong: a failed roll, a success at a cost, or time passing. When one fills, the danger happens.</li>
+<li><strong>Progress clocks</strong> fill as the crew succeeds: one segment for a success, two for success by 5 or more. When one fills, the goal is achieved.</li>
+<li>The GM sizes the clock (4 = urgent or simple, 6 = substantial, 8 = long or complex) and shows it to the players, so everyone can see the pressure building.</li>
+</ul>
+<p>Clocks are how a failed roll changes the situation without stopping the story. Racing a progress clock against a danger clock makes a strong climax.</p>
 <h2 id="g-investigation-and-social-scenes">Investigation and social scenes</h2>
 <p>Ask concrete questions and explain your approach. Evidence may require several different tasks. Diplomacy can secure cooperation or concessions, while Psychology offers insight into behavior. A successful roll does not force someone to abandon a core belief or provide information they do not possess.</p>
 <h1 id="g-personal-combat">Personal combat</h1>
@@ -1270,10 +1306,135 @@ tr.lvl-U td.target { color: var(--muted); }
 </tbody>
 </table>
 <p>Leadership can assist another officer when orders or coordination meaningfully help. It uses the normal assistance rule and does not provide an automatic bonus to every station.</p>
-<h2 id="g-ship-encounters">Ship encounters</h2>
-<p>Ship encounters use descriptive consequences. The GM states what is at stake before rolls and describes changes to shields, hull, systems, and position afterward. Numerical ship damage is outside this guide’s scope.</p>
+<h2 id="g-the-uss-pelion">The USS Pelion</h2>
+<p>The ship has its own sheet, tracked like an injury track. Encounters stay descriptive: the GM states what is at stake before rolls and narrates what each box means. This light structure is a campaign rule; detailed starship combat stays outside this guide.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Track</th>
+<th>Boxes</th>
+<th>Effect as boxes fill</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Shields</td>
+<td>3</td>
+<td>Hits mark Shields first. At 3 boxes shields are down, and hits go to the Hull and a system.</td>
+</tr>
+<tr class="even">
+<td>Hull</td>
+<td>4</td>
+<td>1–2: scarred, minor breaches sealed. 3: serious breaches, decks lost. 4: the ship is breaking up; start an <em>Abandon ship</em> clock.</td>
+</tr>
+<tr class="odd">
+<td>Weapons, Engines, Sensors, Communications, Transporters, Life support</td>
+<td>3 each</td>
+<td>1 <strong>Damaged</strong>: −2 to rolls using it. 2 <strong>Crippled</strong>: −4, and it can do only its most basic job. 3 <strong>Offline</strong>: it doesn’t work until repaired.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Taking hits.</strong> A normal hit (a phaser bank, a disruptor) marks 1 box; a heavy hit (photon torpedo, ramming, a disruptor volley) marks 2. Once Shields are down, each hit marks the Hull and the system the GM chooses, or roll 1d6: 1 Weapons, 2 Engines, 3 Sensors, 4 Communications, 5 Transporters, 6 Life support.</p>
+<p><strong>Defending.</strong> When an enemy ship hits, Helm may roll <strong>Helm</strong> to evade, once per exchange, like Dodge: success cancels the hit. Engines damage applies its penalty.</p>
+<p><strong>Repairs.</strong> In the middle of a crisis, a successful <strong>Engineering</strong> roll clears one box from Shields or a system (two on success by 5); it takes the engineer’s action that exchange. The Hull can only be patched by one box per scene, and fully repaired at a starbase. Between encounters, the crew can clear the rest of the systems with time.</p>
+<p><strong>Firing.</strong> Tactical rolls <strong>Phasers</strong> for ship weapons, against the enemy ship’s own tracks, which the GM keeps the same way.</p>
 <h2 id="g-advancement">Advancement</h2>
 <p>After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement. General Services characters advance the same way, but only their starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they are commissioned (see Step 3).</p>
+<h1 id="g-threats">Threats</h1>
+<p>Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge once per round, and mark injury boxes. Each threat below is one line of numbers and one special trait.</p>
+<p><strong>Minor opponents</strong> (guards, crewmen, a mob) have <strong>one box</strong>: any hit that gets through takes them out of the fight. Save full injury tracks for threats that matter.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Threat</th>
+<th>Attack (target)</th>
+<th>Dodge</th>
+<th>Boxes</th>
+<th>Weapon</th>
+<th>Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Security guard (minor)</td>
+<td>Phasers or disruptor 11</td>
+<td>7</td>
+<td>1</td>
+<td>Hand weapon</td>
+<td><strong>Numbers.</strong> Usually two or three; they surrender or flee when half are down.</td>
+</tr>
+<tr class="even">
+<td>Klingon warrior</td>
+<td>Disruptor 12, Blade 13, Unarmed 12</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor (kill), d’k tahg</td>
+<td><strong>Relentless.</strong> Ignores the Wounded penalty; only Seriously wounded slows them.</td>
+</tr>
+<tr class="odd">
+<td>Klingon officer</td>
+<td>Disruptor 12, Leadership 13</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor (kill)</td>
+<td><strong>Battle commander.</strong> Once per round, gives one ally +1 on an attack.</td>
+</tr>
+<tr class="even">
+<td>Romulan centurion</td>
+<td>Disruptor 12, Stealth 13</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor (kill)</td>
+<td><strong>Ambush.</strong> +2 on the first attack from hiding; prefers to withdraw rather than be captured.</td>
+</tr>
+<tr class="odd">
+<td>Orion pirate</td>
+<td>Disruptor 11, Blade 12, Stealth 12</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor, knife</td>
+<td><strong>Dirty fighter.</strong> Winning a grapple also disarms the target.</td>
+</tr>
+<tr class="even">
+<td>Gorn warrior</td>
+<td>Unarmed 14</td>
+<td>6</td>
+<td>4</td>
+<td>Claws, thrown rocks</td>
+<td><strong>Immense strength.</strong> Unarmed hits mark 2 boxes; slow, so it acts last in a round.</td>
+</tr>
+<tr class="odd">
+<td>Mugato</td>
+<td>Unarmed (bite and horn) 13</td>
+<td>8</td>
+<td>3</td>
+<td>Venomous bite</td>
+<td><strong>Venom.</strong> A bite that marks a box also poisons: without Medicine before the scene ends, mark another box.</td>
+</tr>
+<tr class="even">
+<td>Rogue android</td>
+<td>Unarmed 13, Computers 15</td>
+<td>7</td>
+<td>4</td>
+<td>Crushing grip</td>
+<td><strong>Logic trap.</strong> A Diplomacy or Psychology contest that presents a paradox stuns it for the scene.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship tracks above: a Klingon battle cruiser has Shields 3, Hull 4, and Phasers 12 for its gunners.</p>
 <h1 id="g-advantages">Advantages</h1>
 <p>Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances; describe how it helps before rolling. An advantage does not grant training, authorize an otherwise impossible action, or replace essential equipment. If more than one advantage could apply, use only one advantage bonus. Assistance and circumstance modifiers still apply, without counting the same benefit twice.</p>
 <table>
@@ -1818,6 +1979,9 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Assistance:</strong> success +1; success by 5 or more +2; failure no bonus; 18 causes a complication. One assistant per roll.</p>
 <p><strong>Combat:</strong> short movement plus one action. Successful attack → optional Dodge → weapon effect. Dodge = Agility −2, plus Athletics training (+0 Untrained, +1 Trained, +2 Specialty), once per round. One injury box gives −1 to physical actions; two give −2; three incapacitate.</p>
 <p><strong>Damage:</strong> the weapon decides. Fists, clubs, knives, arrows and primitive firearms mark 1 box; heavy blades mark 2; a phaser or disruptor on kill marks 3 and leaves the target Dying (dead at the end of the scene unless stabilized); stun marks none. At three boxes, another hit from a 2-box or killing weapon is fatal.</p>
+<p><strong>Near misses:</strong> fail by 1–2 and the GM may offer success at a cost; never on a natural 17–18.</p>
+<p><strong>Clocks:</strong> 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).</p>
+<p><strong>Ship:</strong> Shields (3) take hits first; then Hull (4) and a system (3 each: −2, −4, offline). Normal hit 1 box, heavy hit 2. Helm evades once per exchange; Engineering clears a box.</p>
 <p><strong>Medicine:</strong> one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery. Rest clears one box per full day, but not from three boxes: treatment must clear the first one.</p>
 <p><strong>Will:</strong> resist overwhelming fear or mental intrusion and maintain concentration. Ordinary danger needs no roll. Fear or distraction failure normally causes hesitation or −2 on your next action.</p>
 <p><strong>Duty points:</strong> start each session with two. Spend one to reroll, reduce an injury by one box, or establish a plausible preparation. Earn one when an accepted complication, including a companion complication, creates a meaningful problem.</p>
@@ -1884,6 +2048,23 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="field"><span class="label">Roll log</span><ul class="log" id="r-log"></ul></div>
         </div>
 
+        <div class="card hud no-print" id="card-clocks">
+          <h3>Clocks</h3>
+          <p class="small muted">Danger clocks fill on failures and time; progress clocks fill on successes. Tap a segment to fill up to it.</p>
+          <div class="clock-add">
+            <input type="text" id="clk-name" placeholder="e.g. Warp core breach" aria-label="Clock name">
+            <select id="clk-size" aria-label="Segments"><option value="4">4</option><option value="6" selected>6</option><option value="8">8</option></select>
+            <select id="clk-kind" aria-label="Clock type"><option value="danger">Danger</option><option value="progress">Progress</option></select>
+            <button class="btn" id="clk-add">Add</button>
+          </div>
+          <div class="clocks" id="clocks"></div>
+        </div>
+        <div class="card hud no-print" id="card-ship">
+          <h3>USS Pelion status</h3>
+          <p class="small muted">Shields take hits first. Then the Hull and a system (1d6: Weapons, Engines, Sensors, Comms, Transporters, Life support). Tap a box to mark or clear it.</p>
+          <div class="ship" id="ship"></div>
+          <button class="linkish" id="ship-reset">Full repair (starbase)</button>
+        </div>
         <div class="card hud" id="card-ref">
           <h3>Quick reference</h3>
           <dl class="ref">
@@ -2674,6 +2855,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else note = r.ok ? `Succeeded by ${r.margin}.` : `Failed by ${-r.margin}.`;
     if (r.ok && r.margin >= 5) note += " Margin 5+: assistance gives +2; medical care clears an extra box.";
     if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
+    if (!r.ok && !r.auto && r.margin >= -2) note += ` Missed by ${-r.margin}: the GM may offer success at a cost.`;
     el.innerHTML = `
       <div class="dice">${r.dice.map((d) => `<span class="die rolling">${d}</span>`).join("")}
         <span class="num" style="font-size:1.3rem">= ${r.sum}</span><span class="muted">vs ${r.t}</span></div>
@@ -2798,6 +2980,68 @@ tr.lvl-U td.target { color: var(--muted); }
     ch.attrs[n] = Math.max(baseOf(n), Math.min(maxOf(n), ch.attrs[n] - before + v));
     touch(); render();
   });
+  // ---- clocks and ship (table-wide, kept in this browser, not in a character file) ----
+  const STORE_CLOCKS = "pelion.clocks.v1", STORE_SHIP = "pelion.ship.v1";
+  let clocks = store.get(STORE_CLOCKS, []);
+  if (!Array.isArray(clocks)) clocks = [];
+  const SHIP_TRACKS = [["Shields", 3], ["Hull", 4], ["Weapons", 3], ["Engines", 3], ["Sensors", 3], ["Communications", 3], ["Transporters", 3], ["Life support", 3]];
+  let ship = store.get(STORE_SHIP, {});
+  if (!ship || typeof ship !== "object") ship = {};
+  function shipEffect(name, n) {
+    if (name === "Shields") return ["Up", "Weakened", "Failing", "Down: hits go to Hull and a system"][n];
+    if (name === "Hull") return ["Intact", "Scarred", "Minor breaches", "Serious breaches, decks lost", "Breaking up: start an Abandon ship clock"][n];
+    return ["Working", "Damaged: −2", "Crippled: −4, basic function only", "Offline"][n];
+  }
+  function renderShip() {
+    $("ship").innerHTML = SHIP_TRACKS.map(([name, max]) => {
+      const n = Math.min(max, ship[name] || 0);
+      return `<div class="ship-row ${n >= max ? "out" : n ? "hit" : ""}"><span class="label">${name}</span>
+        <span class="boxes">${Array.from({ length: max }, (_, i) => `<button class="box ${i < n ? "on" : ""}" data-track="${name}" data-i="${i + 1}" aria-label="${name} box ${i + 1}${i < n ? ", marked" : ""}"></button>`).join("")}</span>
+        <span class="eff">${shipEffect(name, n)}</span></div>`;
+    }).join("");
+  }
+  $("ship").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-track]"); if (!b) return;
+    const name = b.dataset.track, i = +b.dataset.i;
+    ship[name] = (ship[name] || 0) === i ? i - 1 : i;
+    store.set(STORE_SHIP, ship); renderShip();
+  });
+  let resetArmed = false;
+  $("ship-reset").onclick = () => {
+    if (!resetArmed) { resetArmed = true; $("ship-reset").textContent = "Tap again to clear every box"; setTimeout(() => { resetArmed = false; $("ship-reset").textContent = "Full repair (starbase)"; }, 4000); return; }
+    resetArmed = false; ship = {}; store.set(STORE_SHIP, ship); renderShip(); $("ship-reset").textContent = "Full repair (starbase)";
+  };
+  function clockSvg(c) {
+    const r = 44, cx = 48, cy = 48, segs = [];
+    for (let i = 0; i < c.size; i++) {
+      const a0 = (i / c.size) * 2 * Math.PI - Math.PI / 2, a1 = ((i + 1) / c.size) * 2 * Math.PI - Math.PI / 2;
+      const p = (a) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy + r * Math.sin(a)).toFixed(2)}`;
+      segs.push(`<path class="${i < c.filled ? "on" : ""}" data-clock="${c.id}" data-seg="${i + 1}" d="M${cx} ${cy} L${p(a0)} A${r} ${r} 0 0 1 ${p(a1)} Z"><title>Segment ${i + 1}</title></path>`);
+    }
+    return `<svg viewBox="0 0 96 96" role="img" aria-label="${esc(c.name)}: ${c.filled} of ${c.size}">${segs.join("")}<circle class="ring" cx="48" cy="48" r="44"/></svg>`;
+  }
+  function renderClocks() {
+    $("clocks").innerHTML = clocks.length ? clocks.map((c) => `<div class="clock ${c.kind} ${c.filled >= c.size ? "full" : ""}">
+        ${clockSvg(c)}<b>${esc(c.name)}</b><span class="kind">${c.kind} · ${c.filled}/${c.size}${c.filled >= c.size ? (c.kind === "danger" ? " · it happens" : " · done") : ""}</span>
+        <button class="linkish danger" data-rmclock="${c.id}">Remove</button></div>`).join("")
+      : `<p class="small muted">No clocks running. Add one when something takes time or a danger is building.</p>`;
+  }
+  $("clk-add").onclick = () => {
+    const name = $("clk-name").value.trim();
+    if (!name) { $("clk-name").focus(); return; }
+    clocks.push({ id: uid(), name: name.slice(0, 60), size: +$("clk-size").value, kind: $("clk-kind").value, filled: 0 });
+    $("clk-name").value = ""; store.set(STORE_CLOCKS, clocks); renderClocks();
+  };
+  $("clk-name").addEventListener("keydown", (e) => { if (e.key === "Enter") $("clk-add").click(); });
+  $("clocks").addEventListener("click", (e) => {
+    const seg = e.target.closest("[data-seg]"), rm = e.target.closest("[data-rmclock]");
+    if (seg) { const c = clocks.find((x) => x.id === seg.dataset.clock); const i = +seg.dataset.seg; c.filled = c.filled === i ? i - 1 : i; }
+    else if (rm) clocks = clocks.filter((x) => x.id !== rm.dataset.rmclock);
+    else return;
+    store.set(STORE_CLOCKS, clocks); renderClocks();
+  });
+  renderShip(); renderClocks();
+
   // ---- portrait ----
   // Images are scaled down in the browser so a character stays small enough to save and share as JSON.
   const MAX_SIDE = 480;

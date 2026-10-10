@@ -111,3 +111,24 @@ test("/duty tracks points per player, GM powers, new sessions, and rerolls spend
   const second = await click();
   assert.equal(second.data.flags, 64, "no points, no reroll");
 });
+
+test("/clock creates, ticks, shows and removes clocks; near misses are flagged", async () => {
+  const env2 = { ...env, DUTY: new MemoryKV() };
+  const call = async (sub, options = []) => {
+    const payload = { type: 2, guild_id: "G1", member: { user: { id: "42" }, permissions: "0" }, data: { name: "clock", options: [{ type: 1, name: sub, options }] } };
+    const body = JSON.stringify(payload), ts = "1700000000";
+    const sig = Buffer.from(await crypto.subtle.sign("Ed25519", keys.privateKey, new TextEncoder().encode(ts + body))).toString("hex");
+    return (await (await worker.fetch(new Request("https://bot.example/", { method: "POST", body, headers: { "X-Signature-Ed25519": sig, "X-Signature-Timestamp": ts } }), env2)).json()).data;
+  };
+  assert.match((await call("new", [{ name: "name", value: "Warp core breach" }, { name: "segments", value: 4 }])).content, /○○○○ 0\/4/);
+  assert.match((await call("tick", [{ name: "name", value: "warp core BREACH" }, { name: "segments", value: 3 }])).content, /●●●○ 3\/4/);
+  assert.match((await call("tick", [{ name: "name", value: "Warp core breach" }])).content, /It happens/);
+  assert.equal((await call("tick", [{ name: "name", value: "Nope" }])).flags, 64);
+  assert.match((await call("show")).content, /Warp core breach/);
+  assert.match((await call("remove", [{ name: "name", value: "Warp core breach" }])).content, /Removed/);
+  assert.match((await call("show")).content, /No clocks/);
+  const { describe, resolve } = await import("../src/worker.js");
+  assert.ok(describe(resolve([5, 4, 4], 11)).some((l) => /success at a cost/.test(l)), "miss by 2");
+  assert.ok(!describe(resolve([5, 5, 4], 11)).some((l) => /success at a cost/.test(l)), "miss by 3");
+  assert.ok(!describe(resolve([6, 6, 5], 16)).some((l) => /success at a cost/.test(l)), "natural 17 never");
+});

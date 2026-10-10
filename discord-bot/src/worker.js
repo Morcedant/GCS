@@ -58,6 +58,7 @@ export function describe(r) {
   else lines.push(r.success ? `Succeeded by ${r.margin}.` : `Failed by ${-r.margin}.`);
   if (r.success && r.margin >= 5) lines.push("Margin 5+: as an assistant this gives +2; in medical care it clears an extra box.");
   if (r.total === 18) lines.push("As an assistant, an 18 introduces a complication.");
+  if (!r.success && !r.auto && r.margin >= -2) lines.push(`Missed by ${-r.margin}: the GM may offer success at a cost.`);
   return lines;
 }
 
@@ -90,6 +91,25 @@ export const COMMANDS = [
       { type: 1, name: "newsession", description: "GM: start a new session; everyone goes back to 2" },
     ],
   },
+  {
+    name: "clock",
+    description: "Progress and danger clocks for the table",
+    options: [
+      { type: 1, name: "new", description: "Start a clock",
+        options: [
+          { type: 3, name: "name", description: "e.g. Warp core breach", required: true, max_length: 40 },
+          { type: 4, name: "segments", description: "4 urgent, 6 substantial, 8 long", required: true, choices: [{ name: "4", value: 4 }, { name: "6", value: 6 }, { name: "8", value: 8 }] },
+          { type: 3, name: "kind", description: "Danger fills on failures; progress on successes", required: false, choices: [{ name: "danger", value: "danger" }, { name: "progress", value: "progress" }] },
+        ] },
+      { type: 1, name: "tick", description: "Fill segments on a clock",
+        options: [
+          { type: 3, name: "name", description: "Which clock", required: true },
+          { type: 4, name: "segments", description: "How many (default 1; use -1 to undo)", required: false, min_value: -8, max_value: 8 },
+        ] },
+      { type: 1, name: "show", description: "Show all clocks" },
+      { type: 1, name: "remove", description: "Remove a clock", options: [{ type: 3, name: "name", description: "Which clock", required: true }] },
+    ],
+  },
 ];
 
 // ---- Discord request handling ----
@@ -111,6 +131,7 @@ export default {
     if (interaction.type === PING) return json({ type: PONG });
     if (interaction.type === COMMAND && interaction.data?.name === "pelion") return json(rollCommand(interaction));
     if (interaction.type === COMMAND && interaction.data?.name === "duty") return json(await dutyCommand(interaction, env));
+    if (interaction.type === COMMAND && interaction.data?.name === "clock") return json(await clockCommand(interaction, env));
     if (interaction.type === COMPONENT && interaction.data?.custom_id?.startsWith("reroll|")) return json(await reroll(interaction, env));
     return json({ type: MESSAGE, data: { content: "Unknown command.", flags: EPHEMERAL } });
   },
@@ -151,7 +172,7 @@ function statusPage(env) {
         : "DISCORD_PUBLIC_KEY is missing. Add it under Settings > Variables and Secrets."),
     check(/^\d{15,25}$/.test(String(env.DISCORD_APPLICATION_ID || "").trim()), "DISCORD_APPLICATION_ID is set.",
       "DISCORD_APPLICATION_ID is missing or not a number (only needed for /register)."),
-    check(!!env.DUTY, "DUTY storage is connected: /duty works and rerolls spend points.",
+    check(!!env.DUTY, "DUTY storage is connected: /duty and /clock work, and rerolls spend points.",
       "DUTY storage isn't connected (optional): bind a KV namespace named DUTY to turn on /duty."),
     check(!!env.DISCORD_BOT_TOKEN, "DISCORD_BOT_TOKEN is set (you can delete it after /register works).",
       "DISCORD_BOT_TOKEN is not set (only needed for /register)."),
@@ -272,6 +293,49 @@ async function dutyCommand(interaction, env) {
   return reply("Unknown /duty option.", true);
 }
 
+// ---- Clocks ----
+// Stored per server in the same KV namespace as Duty points: { [lowercased name]: {name, size, filled, kind} }.
+
+const clockBar = (c) => "●".repeat(Math.min(c.filled, c.size)) + "○".repeat(Math.max(0, c.size - c.filled));
+const clockLine = (c) => `**${c.name}** (${c.kind}) ${clockBar(c)} ${c.filled}/${c.size}` +
+  (c.filled >= c.size ? (c.kind === "danger" ? "  **It happens.**" : "  **Done.**") : "");
+
+async function clockCommand(interaction, env) {
+  const reply = (content, priv = false) => ({ type: MESSAGE, data: { content, flags: priv ? EPHEMERAL : 0, allowed_mentions: { parse: [] } } });
+  if (!env.DUTY) return reply("Clocks need the bot's storage. Bind a KV namespace named DUTY to the Worker (see the bot's README).", true);
+  const sub = interaction.data.options?.[0] || {};
+  const opt = Object.fromEntries((sub.options || []).map((o) => [o.name, o.value]));
+  const key = `clocks:${guildOf(interaction)}`;
+  const all = (await env.DUTY.get(key, "json")) || {};
+  const id = String(opt.name || "").trim().toLowerCase();
+  const save = () => env.DUTY.put(key, JSON.stringify(all));
+  switch (sub.name) {
+    case "new": {
+      if (Object.keys(all).length >= 20 && !all[id]) return reply("This server already has 20 clocks. Remove one first.", true);
+      all[id] = { name: String(opt.name).trim().slice(0, 40), size: opt.segments, filled: 0, kind: opt.kind === "progress" ? "progress" : "danger" };
+      await save();
+      return reply(`New clock: ${clockLine(all[id])}`);
+    }
+    case "tick": {
+      const c = all[id];
+      if (!c) return reply(`No clock called "${opt.name}". Use /clock show to see them.`, true);
+      c.filled = Math.max(0, Math.min(c.size, c.filled + (Number.isInteger(opt.segments) ? opt.segments : 1)));
+      await save();
+      return reply(clockLine(c));
+    }
+    case "show": {
+      const list = Object.values(all);
+      return reply(list.length ? list.map(clockLine).join("\n") : "No clocks running. Start one with /clock new.");
+    }
+    case "remove": {
+      if (!all[id]) return reply(`No clock called "${opt.name}".`, true);
+      const name = all[id].name; delete all[id]; await save();
+      return reply(`Removed the clock **${name}**.`);
+    }
+  }
+  return reply("Unknown /clock option.", true);
+}
+
 const userOf = (interaction) => interaction.member?.user || interaction.user || { id: "0" };
 const clampInt = (v) => Math.max(MIN_TARGET, Math.min(MAX_TARGET, Number.isInteger(v) ? v : 10));
 const json = (data) => new Response(JSON.stringify(data), { headers: { "Content-Type": "application/json" } });
@@ -296,7 +360,7 @@ async function registerCommands(env) {
       res = await put();
     }
   }
-  if (res.ok) return new Response("Registered /pelion and /duty. They can take a minute to appear in Discord.");
+  if (res.ok) return new Response("Registered /pelion, /duty and /clock. They can take a minute to appear in Discord.");
   const detail = await res.text();
   const hint = res.status === 429 ? "\n\nDiscord is rate-limiting registration. Wait a minute or two, then reload this page once."
     : res.status === 401 ? "\n\nThe bot token is wrong or was reset. Reset it on the Bot page and update DISCORD_BOT_TOKEN." : "";

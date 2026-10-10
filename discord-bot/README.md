@@ -73,6 +73,20 @@ To switch it on (free; Workers KV allows 1,000 changes a day):
 
 The Worker's home page shows "DUTY storage is connected" when it's working.
 
+## Clocks (needs the same storage as Duty points)
+
+| Command | What it does |
+|---|---|
+| `/clock new name:"Warp core breach" segments:4 kind:danger` | Starts a clock (4, 6 or 8 segments; danger or progress) |
+| `/clock tick name:"Warp core breach"` | Fills one segment; add `segments:2`, or `-1` to undo |
+| `/clock show` | Lists every clock on this server, e.g. **Warp core breach** ●●●○ 3/4 |
+| `/clock remove name:"Warp core breach"` | Removes a clock |
+
+After updating the Worker code, add `DISCORD_BOT_TOKEN` back for a moment and open `/register` once more
+("Registered /pelion, /duty and /clock"), then delete the token again.
+
+Rolls that fail by 1 or 2 now say "the GM may offer success at a cost", following the guide.
+
 ## Options
 
 | Option | Required | Meaning |
