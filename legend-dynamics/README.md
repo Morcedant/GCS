@@ -68,3 +68,10 @@ Chapters marked with `<!-- SECTION:name -->`: `intro`, `weapons` (the damage tab
 
 The builder stops on unfilled terms. Open the built `index.html`: the example and every ready-made character should
 show **Ready** in the checklist, which means they follow the creation rules exactly.
+
+## Discord dice bot
+
+[`discord-bot/`](discord-bot/README.md) is one free Discord bot for every pack: `/roll`, `/contest`, `/assist`,
+`/points`, `/clock`, `/track`, `/seed` and `/game`. Each server picks its game with `/game set`. The point name,
+shared tracks and seed tables come from the packs: the builder writes them into `discord-bot/src/worker.js`
+on every run, so redeploy the bot after changing a pack.

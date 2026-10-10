@@ -294,6 +294,23 @@ def core_rules(docx=False):
         print(f"wrote {out.relative_to(ROOT)}")
 
 
+def bot_packs():
+    """Write every pack's bot data (point name, tracks, seed tables) into the Discord bot."""
+    bot = LD / "discord-bot" / "src" / "worker.js"
+    data = {}
+    for d in sorted(p for p in (LD / "packs").iterdir() if (p / "pack.json").exists()):
+        pack = json.loads((d / "pack.json").read_text())
+        t = terms_of(pack)
+        data[pack["id"]] = {"id": pack["id"], "title": t["title"], "point": t["point"], "mission": t["mission"],
+                            "trackTitle": t["tracksTitle"], "tracks": pack.get("tracks", []), "seeds": pack.get("seeds", {})}
+    src = bot.read_text()
+    block = "/* PACKS:START */\nexport const PACKS = " + json.dumps(data, ensure_ascii=False, indent=1) + ";\n/* PACKS:END */"
+    new = re.sub(r"/\* PACKS:START \*/.*?/\* PACKS:END \*/", lambda m: block, src, flags=re.S)
+    if new != src:
+        bot.write_text(new)
+    print(f"wrote {len(data)} packs into {bot.relative_to(ROOT)}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--docx", action="store_true")
@@ -303,6 +320,7 @@ def main():
     for pid in packs:
         build(pid, a.docx)
     core_rules(a.docx)
+    bot_packs()
 
 
 if __name__ == "__main__":
