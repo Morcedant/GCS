@@ -25,8 +25,10 @@ command to the Worker's web address, so there is no server to keep running.
 ### 2. Create the Worker
 
 1. Sign up at <https://dash.cloudflare.com> (free; no card needed for Workers).
-2. Open **Workers & Pages → Create → Create Worker**, name it `pelion-dice`, and **Deploy** the starter.
-3. Choose **Edit code**, replace everything in `worker.js` with the contents of [`src/worker.js`](src/worker.js), and **Deploy**.
+2. Open **Workers & Pages → Create**. On the "Make something new" screen choose **Start with Hello World!**,
+   name it `pelion-dice`, and **Deploy** the starter. (Skip Connect GitHub/GitLab and Upload your static files.)
+3. Choose **Edit code** (top right), replace everything in the open file (`worker.js` or `index.js`) with the
+   contents of [`src/worker.js`](src/worker.js), and **Deploy**.
 4. In the Worker's **Settings → Variables and Secrets**, add:
    - `DISCORD_PUBLIC_KEY` = the Public Key
    - `DISCORD_APPLICATION_ID` = the Application ID
