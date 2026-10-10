@@ -245,6 +245,20 @@ tr.lvl-U td.target { color: var(--muted); }
   .scanbar { background-size: 200% 100%; animation: scan 1.2s ease-out 1; }
   @keyframes scan { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 }
+/* Portrait / token */
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.portrait-drop { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; border: 1px dashed var(--chrome-dim); border-radius: 12px; padding: 14px; background: var(--well); }
+.portrait-drop.dragging { border-color: var(--chrome); background: rgba(92, 200, 255, .08); }
+.portrait-actions { display: grid; gap: 10px; flex: 1 1 220px; min-width: 0; justify-items: start; }
+.portrait-frame { flex: none; width: 112px; height: 112px; display: grid; place-items: center; border: 2px solid var(--accent); background: var(--glass); overflow: hidden; border-radius: 50%; box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent); }
+.portrait-frame.portrait { width: 96px; height: 128px; border-radius: 10px; }
+.portrait-frame img, .avatar, .sheet-portrait { object-fit: cover; display: block; }
+.portrait-frame img { width: 100%; height: 100%; }
+.avatar { flex: none; width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--accent); box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 50%, transparent); }
+.avatar.portrait { width: 54px; height: 72px; border-radius: 8px; }
+.sheet-portrait { flex: none; width: 88px; height: 88px; border-radius: 50%; border: 2px solid var(--accent); }
+.sheet-portrait.portrait { width: 84px; height: 112px; border-radius: 8px; }
+
 /* Players' Guide */
 .guide-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 @media (max-width: 900px) { .guide-layout { grid-template-columns: minmax(0, 1fr); } }
@@ -315,7 +329,8 @@ tr.lvl-U td.target { color: var(--muted); }
 <div class="wrap" id="app" data-div="sciences">
   <header class="masthead hud">
     <div class="id">
-      <svg class="delta" viewBox="0 0 100 140" aria-hidden="true"><path class="outer" d="M50 2 C63 36 80 95 85 138 C72 124 60 115 50 113 C40 115 28 124 15 138 C20 95 37 36 50 2 Z"/><path class="emblem" data-emblem d=""/></svg>
+      <img class="avatar" id="hdr-portrait" alt="" hidden>
+      <svg class="delta" id="hdr-delta" viewBox="0 0 100 140" aria-hidden="true"><path class="outer" d="M50 2 C63 36 80 95 85 138 C72 124 60 115 50 113 C40 115 28 124 15 138 C20 95 37 36 50 2 Z"/><path class="emblem" data-emblem d=""/></svg>
       <div class="who">
         <span class="eyebrow">U.S.S. Pelion · NCC-1750 · Starfleet personnel record</span>
         <h1 id="hdr-name">Unnamed officer</h1>
@@ -387,6 +402,23 @@ tr.lvl-U td.target { color: var(--muted); }
             <p class="muted small">Any special species ability beyond its attribute adjustments needs GM approval.</p></div>
           <div class="fields">
             <div class="field"><label for="f-name">Name</label><input type="text" id="f-name" placeholder="Officer's name"></div>
+            <div class="field wide"><span class="label" id="portrait-label">Portrait or token</span>
+              <div class="portrait-drop" id="portrait-drop" aria-labelledby="portrait-label">
+                <div class="portrait-frame" id="portrait-frame"><img id="portrait-preview" alt="Character portrait" hidden><span id="portrait-empty" class="small muted">No image</span></div>
+                <div class="portrait-actions">
+                  <p class="small muted">Drop an image here, paste one, or choose a file. It's resized to fit and saved with the character.</p>
+                  <div class="btn-row">
+                    <label class="btn" for="f-portrait" tabindex="0" id="portrait-choose">Choose image</label>
+                    <input type="file" id="f-portrait" accept="image/*" class="visually-hidden">
+                    <button type="button" class="btn" id="portrait-remove">Remove</button>
+                  </div>
+                  <div class="seg" role="radiogroup" aria-label="Image style">
+                    <label><input type="radio" name="portrait-shape" id="shape-token" value="token"><span>Round token</span></label>
+                    <label><input type="radio" name="portrait-shape" id="shape-portrait" value="portrait"><span>Portrait</span></label>
+                  </div>
+                  <span class="toast" id="portrait-msg" role="status" aria-live="polite"></span>
+                </div>
+              </div></div>
             <div class="field wide"><label for="f-reason">Why you serve in Starfleet</label><textarea id="f-reason" rows="2"></textarea></div>
             <div class="field wide"><label for="f-speciesnotes">Species ability (GM approval required)</label>
               <textarea id="f-speciesnotes" rows="2" placeholder="Agreed ability and its limitation, if any. Leave blank if none is approved."></textarea></div>
@@ -1818,6 +1850,7 @@ tr.lvl-U td.target { color: var(--muted); }
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: { communicator: true, tricorder: false, phaser: true, medkit: false, engkit: false },
+      portrait: "", portraitShape: "token",
       play: { injury: 0, duty: 2, stunned: false, log: [] },
     };
   }
@@ -1843,6 +1876,8 @@ tr.lvl-U td.target { color: var(--muted); }
       adv: { ...b.adv, ...(c.adv || {}) }, comp: { ...b.comp, ...(c.comp || {}) }, sadv: { ...b.sadv, ...(c.sadv || {}) },
       equipment: { ...b.equipment, ...(c.equipment || {}) }, play: { ...b.play, ...(c.play || {}) } };
     if (!out.id) out.id = uid();
+    if (typeof out.portrait !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(out.portrait)) out.portrait = "";
+    if (out.portraitShape !== "portrait") out.portraitShape = "token";
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     if (out.sadv.id && out.adv.id) out.adv.id = ""; // a species advantage replaces the regular one
     // Half-Vulcan was removed as a preset; keep such characters valid as a custom species.
@@ -1984,6 +2019,17 @@ tr.lvl-U td.target { color: var(--muted); }
   function render() {
     $("app").dataset.div = division();
     $("hdr-name").textContent = ch.name.trim() || "Unnamed officer";
+    const shapeCls = ch.portraitShape === "portrait" ? "portrait" : "";
+    $("hdr-portrait").hidden = !ch.portrait;
+    $("hdr-delta").style.display = ch.portrait ? "none" : "";
+    if (ch.portrait) { $("hdr-portrait").src = ch.portrait; $("hdr-portrait").className = "avatar " + shapeCls; }
+    $("portrait-preview").hidden = !ch.portrait;
+    $("portrait-empty").hidden = !!ch.portrait;
+    if (ch.portrait) $("portrait-preview").src = ch.portrait; else $("portrait-preview").removeAttribute("src");
+    $("portrait-frame").className = "portrait-frame " + shapeCls;
+    $("portrait-remove").disabled = !ch.portrait;
+    $("shape-token").checked = ch.portraitShape !== "portrait";
+    $("shape-portrait").checked = ch.portraitShape === "portrait";
     $("hdr-sub").textContent = [ch.rank, ch.species, ch.dept && ch.dept + " department"].filter(Boolean).join(" · ") || "—";
     $("example-banner").hidden = !ch.example;
     $("f-speciesid").value = ch.speciesId;
@@ -2089,7 +2135,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const advText = ch.adv.id === "custom" ? ch.adv.text : advDef()?.[2] || "";
     const compText = ch.comp.id === "custom" ? ch.comp.text : compDef()?.[2] || "";
     $("sheet-main").innerHTML = `
-      <div class="sheet-title">${DELTA_SVG}<div><span class="eyebrow">${ch.dept === "General Services" ? "Starfleet enlisted crew" : "Starfleet officer"} · U.S.S. Pelion NCC-1750</span>
+      <div class="sheet-title">${ch.portrait ? `<img class="sheet-portrait ${ch.portraitShape === "portrait" ? "portrait" : ""}" src="${ch.portrait}" alt="Portrait of ${esc(ch.name || "the character")}">` : DELTA_SVG}<div><span class="eyebrow">${ch.dept === "General Services" ? "Starfleet enlisted crew" : "Starfleet officer"} · U.S.S. Pelion NCC-1750</span>
         <h2 style="font-size:1.7rem">${esc(ch.name || "Unnamed officer")}</h2></div></div>
       <div class="idgrid">
         <div><span class="label">Rank</span><b>${esc(ch.rank || "—")}</b></div>
@@ -2283,6 +2329,46 @@ tr.lvl-U td.target { color: var(--muted); }
     ch.attrs[n] = Math.max(baseOf(n), Math.min(maxOf(n), ch.attrs[n] - before + v));
     touch(); render();
   });
+  // ---- portrait ----
+  // Images are scaled down in the browser so a character stays small enough to save and share as JSON.
+  const MAX_SIDE = 480;
+  function loadPortrait(file) {
+    if (!file || !/^image\//.test(file.type)) { portraitMsg("That file isn't an image. Use a PNG, JPEG, WebP or GIF.", true); return; }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+      const cv = document.createElement("canvas");
+      cv.width = Math.max(1, Math.round(img.naturalWidth * scale));
+      cv.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(url);
+      // Keep transparency for tokens; WebP keeps it small. Fall back to PNG where WebP encoding is missing.
+      const keepAlpha = file.type !== "image/jpeg";
+      let data = cv.toDataURL(keepAlpha ? "image/webp" : "image/jpeg", 0.85);
+      if (keepAlpha && !data.startsWith("data:image/webp")) data = cv.toDataURL("image/png");
+      ch.portrait = data; touch(); render();
+      const saved = store.set(STORE_CURRENT, ch);
+      portraitMsg(saved ? "Image added." : "Image added, but this browser couldn't save it. Use Copy JSON to keep it.", !saved);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); portraitMsg("That image couldn't be read. Try a PNG or JPEG.", true); };
+    img.src = url;
+  }
+  function portraitMsg(m, err) { const el = $("portrait-msg"); el.textContent = m; el.className = "toast" + (err ? " err" : ""); }
+  $("f-portrait").addEventListener("change", (e) => { loadPortrait(e.target.files[0]); e.target.value = ""; });
+  $("portrait-choose").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("f-portrait").click(); } });
+  $("portrait-remove").onclick = () => { ch.portrait = ""; touch(); render(); portraitMsg("Image removed."); };
+  document.querySelectorAll('input[name="portrait-shape"]').forEach((r) => r.addEventListener("change", () => { ch.portraitShape = r.value; touch(); render(); }));
+  const drop = $("portrait-drop");
+  ["dragenter", "dragover"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("dragging"); }));
+  ["dragleave", "drop"].forEach((t) => drop.addEventListener(t, () => drop.classList.remove("dragging")));
+  drop.addEventListener("drop", (e) => { e.preventDefault(); loadPortrait(e.dataTransfer.files[0]); });
+  document.addEventListener("paste", (e) => {
+    if ($("view-create").hidden) return;
+    const item = [...(e.clipboardData?.items || [])].find((i) => i.type.startsWith("image/"));
+    if (item) { e.preventDefault(); loadPortrait(item.getAsFile()); }
+  });
+
   $("boxes").addEventListener("click", (e) => {
     const b = e.target.closest("[data-box]"); if (!b) return;
     const i = +b.dataset.box;
