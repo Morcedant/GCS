@@ -14,3 +14,10 @@ GCS Templates
   applies circumstance modifiers, assistance, advantage, injury and stun penalties, natural 3–4 / 17–18,
   margins, and Duty point rerolls.
 - Officers save in the browser and can be shared as JSON.
+
+### Saving a sheet as PDF
+
+Open `uss-pelion/index.html` directly in a browser (not the hosted artifact, which blocks printing),
+build or load your officer, then press **Save as PDF** in the header (or Ctrl/Cmd+P) and choose
+"Save as PDF" as the destination. The printout is a light, ink-friendly version of the character sheet
+with blank injury and Duty point tracks and the quick reference.

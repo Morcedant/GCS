@@ -233,12 +233,27 @@ tr.lvl-U td.target { color: var(--muted); }
   @keyframes scan { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 }
 @media print {
-  #stars, .tabs, .side, .no-print, #view-create, .example-banner { display: none !important; }
+  /* Paper version of the sheet: same layout, ink-friendly colors, no glow. */
+  :root { --fg: #10151d; --muted: #4a5568; --line: #b9c3d0; --chrome: #0d4a80; --chrome-dim: #2f5b85;
+    --glass: #fff; --well: #fff; --gold: #8a6100; --blue: #1d4f9c; --red: #a32a1f; --good: #1f7a46; --bad: #b3261e; color-scheme: light; }
+  @page { margin: 12mm; }
+  html, body { background: #fff !important; color: var(--fg); font-size: 11pt; }
+  #stars, .tabs, .side, .no-print, #view-create, .example-banner, .scanbar, #btn-print { display: none !important; }
+  .ref dd, .trait-desc { color: var(--fg); }
   #view-sheet { display: block !important; }
-  .sheet { grid-template-columns: 1fr; }
-  body, html { background: #fff !important; color: #000; }
-  .hud { background: #fff; box-shadow: none; border-color: #999; }
+  .wrap { max-width: none; padding: 0; }
+  .masthead { padding: 0 0 8px; border: 0; border-bottom: 2px solid var(--accent); border-radius: 0; }
+  .sheet { grid-template-columns: 1fr; margin-top: 10px; gap: 10px; }
+  .sheet > div { display: block !important; }
+  .hud { background: #fff; box-shadow: none; backdrop-filter: none; }
+  .hud::before, .hud::after { display: none; }
+  .card { padding: 10px 0; border: 0; break-inside: avoid; }
+  #sheet-main .sheet-title { display: none; }
+  * { text-shadow: none !important; box-shadow: none !important; }
+  .delta { filter: none; }
+  .print-only { display: grid !important; }
 }
+.print-only { display: none; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -260,6 +275,7 @@ tr.lvl-U td.target { color: var(--muted); }
       <button class="tab" role="tab" id="tab-create" aria-selected="true" aria-controls="view-create">Create</button>
       <button class="tab" role="tab" id="tab-sheet" aria-selected="false" aria-controls="view-sheet">Duty station</button>
     </div>
+    <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
   </header>
 
@@ -401,6 +417,12 @@ tr.lvl-U td.target { color: var(--muted); }
   <section id="view-sheet" role="tabpanel" aria-labelledby="tab-sheet" hidden>
     <div class="sheet">
       <div class="card hud" id="sheet-main"></div>
+      <div class="card print-only">
+        <h3>Condition</h3>
+        <div class="field"><span class="label">Injury track</span>
+          <span>☐ Wounded (−1 physical) &nbsp; ☐ Seriously wounded (−2 physical) &nbsp; ☐ Incapacitated</span></div>
+        <div class="field"><span class="label">Duty points (start each session with 2)</span><span>☐ ☐ ☐ ☐ ☐</span></div>
+      </div>
       <div style="display:grid;gap:16px">
         <div class="card hud no-print">
           <h3>Condition</h3>
@@ -963,6 +985,11 @@ tr.lvl-U td.target { color: var(--muted); }
     $("view-sheet").hidden = create;
     try { sessionStorage.setItem("pelion.tab", which); } catch {}
   }
+  // Printing works when the file is opened directly; embedded viewers block it, so hide the button there.
+  let framed = true;
+  try { framed = window.self !== window.top; } catch {}
+  $("btn-print").hidden = framed;
+  $("btn-print").onclick = () => window.print();
   $("tab-create").onclick = () => selectTab("create");
   $("tab-sheet").onclick = () => selectTab("sheet");
 
