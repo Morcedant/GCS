@@ -74,10 +74,11 @@ Every attribute starts at 10. Your species then adjusts some of them; the result
 | Tellarite | Body +1, Will +1, Agility −1, Presence −1 |
 | Aenar | Will +1, Intellect +1, Body −1, Agility −1 |
 | Illyrian | Body +1, Presence −1 |
-| Half-Vulcan | Intellect +1, Presence −1 |
 | Lanthanite | Intellect +1, Agility −1 |
 | Caitian | Agility +1, Body −1 |
 | Aurelian | Agility +1, Intellect +1, Body −2 |
+| Orion | Body +1, Presence +1, Intellect −1, Will −1 |
+| Denobulan | Intellect +1, Presence +1, Body −1, Agility −1 |
 
 ### Spending points
 
@@ -100,13 +101,15 @@ After applying your species, distribute **five additional points** among the att
 
 **Illyrian.** A people who reshape themselves through genetic modification. Federation law bars augmented officers, so Illyrians in Starfleet, like Una Chin-Riley, have faced suspicion and secrecy.
 
-**Half-Vulcan.** Raised between two cultures, like Spock. Vulcan training and a human heritage that does not always stay quiet.
-
 **Lanthanite.** Extremely long-lived people who look human and have quietly lived on Earth for millennia, like Pelia. Centuries of experience; a body that dislikes hurrying.
 
 **Caitian.** A feline species with keen senses and quick reflexes. Lt. M'Ress served aboard the Enterprise in this era.
 
 **Aurelian.** A winged, avian people known as scholars and historians, like Aleek-Om. Capable of flight, but light-boned and physically frail.
+
+**Orion.** Green-skinned people whose homeworld is better known for the Orion Syndicate's smugglers and pirates than for Starfleet service. Orions in uniform are rare in this era and often have to prove themselves.
+
+**Denobulan.** Cheerful, sociable people with large extended families. They need little sleep most of the year, then hibernate for several days. Dr. Phlox served aboard Enterprise NX-01 a century earlier.
 
 ### Custom species
 
@@ -392,13 +395,6 @@ A custom species advantage follows the same pattern: a narrow +2 or an ability w
 | Adaptive Physiology | +2 to Body when resisting cold, toxins, or thin atmosphere. It does not protect against vacuum, radiation, or weapons. | **Hidden Augmentation.** Federation law bars augmented officers, so you hide what you are. When a medical scan or inquiry could expose you, accept the lie, the risk, or a revealing choice. |
 | Enhanced Endurance | +2 to Athletics when pushing through prolonged exertion: long swims, forced marches, or enduring extreme conditions. | **Prejudice Against Augments.** Someone who knows or suspects your heritage treats you with suspicion. Accept the obstruction or lost trust when it matters. |
 
-## Half-Vulcan
-
-| Advantage | Effect | Companion complication |
-|---|---|---|
-| Between Two Worlds | +2 to Diplomacy when mediating between logic-driven and emotional parties, or bridging a misunderstanding between Vulcan and human ways. | **Divided Self.** When a situation forces a choice between logic and feeling, your inner conflict surfaces. Accept hesitation or an emotional outburst. |
-| Vulcan Strength | +2 to Body when lifting, forcing, or holding something through raw strength. | **Neither One Nor the Other.** Members of either culture doubt where you belong. Accept a slight, exclusion, or challenge to your judgment that matters. |
-
 ## Lanthanite
 
 | Advantage | Effect | Companion complication |
@@ -419,6 +415,20 @@ A custom species advantage follows the same pattern: a narrow +2 or an ability w
 |---|---|---|
 | Flight | You can fly short distances in normal gravity and breathable air. Roll Athletics for difficult flying. It does not work in low pressure, high gravity, or cramped spaces. | **Fragile Bones.** Your light bones break easily. When a fall, crush, or heavy blow hits you, accept the GM marking one extra injury box. |
 | Scholar's Memory | +2 to Intellect rolls to recall the history, legends, or cultural records of another world. | **Lost in History.** A historical find tempts you to stop and study it. Accept the lost time or the danger of lingering. |
+
+## Orion
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Orion Pheromones | +2 to Diplomacy when persuading someone face to face in close quarters, if their species is affected by Orion pheromones. Many species, including Vulcans, are not. | **Pheromone Suspicion.** Crewmates who know about Orion pheromones question whether they were persuaded or manipulated. Accept the distrust or a formal complaint when it matters. |
+| Syndicate Savvy | +2 to Psychology when spotting a con, a bribe, a smuggler's trick, or a pirate's bluff. | **Syndicate Ties.** Someone from the Orion Syndicate knows you and wants something. Accept the obligation, the threat, or the suspicion that follows. |
+
+## Denobulan
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Denobulan Pharmacopoeia | +2 to Medicine when treating a patient with an unconventional remedy, including medicinal organisms kept in sickbay. | **Unorthodox Methods.** Patients and crewmates balk at your strange remedies. Accept a refusal, a delay, or a complaint to the captain. |
+| Wakeful | +2 to Body when resisting fatigue or going without sleep for days. | **Hibernation Cycle.** Once a year you must hibernate for several days. When the cycle comes due at a bad moment, accept your absence or −2 on Intellect rolls until you rest. |
 
 # Complications
 
