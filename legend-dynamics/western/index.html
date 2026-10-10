@@ -4,12 +4,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&family=IM+Fell+English+SC&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=IM+Fell+English+SC&family=IM+Fell+DW+Pica+SC&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap">
 <style>
-/* Legend Dynamics character creator. Theme: A frontier ledger by lamplight: leather-and-ink panels, brass rules, embers rising.
+/* Legend Dynamics character creator. Theme: A gothic ledger by candlelight: slate panels, tarnished-silver rules, blood-red accents, ash falling.
    Builder steps on the left, readiness on the right; the second tab is the play sheet. Dark only.
    The accent follows the character's role group. */
-:root { --space: #0d0906; --glass: rgba(36, 25, 16, .88); --glass-hi: rgba(52, 36, 22, .9); --well: rgba(14, 9, 5, .72); --fg: #f0e4cc; --muted: #a8977c; --line: rgba(201, 160, 99, .26); --chrome: #d9a65e; --chrome-dim: rgba(217, 166, 94, .6); --gold: #e3b04b; --blue: #6fb5a5; --red: #d0623f; --good: #96c86e; --bad: #e2543c; --warn: #eba63c; --on-accent: #120c07; --display: "IM Fell English SC", Georgia, serif; --title: "Rye", Georgia, serif; --body: "Crimson Pro", Georgia, serif; --mono: "Special Elite", "Courier New", monospace; --numbers: "Crimson Pro", Georgia, serif; --radius: 10px; --accent: var(--gold); color-scheme: dark; }
+:root { --space: #090b0d; --glass: rgba(18, 22, 26, .9); --glass-hi: rgba(28, 33, 38, .92); --well: rgba(6, 8, 10, .74); --fg: #e4e2da; --muted: #8e958f; --line: rgba(160, 172, 166, .22); --chrome: #b9c2bd; --chrome-dim: rgba(185, 194, 189, .55); --gold: #c5ccc8; --blue: #5f9e8f; --red: #b8383a; --good: #8fb59a; --bad: #c9393b; --warn: #c99a4e; --on-accent: #0b0d0f; --display: "IM Fell English SC", Georgia, serif; --title: "Pirata One", "IM Fell English SC", Georgia, serif; --body: "EB Garamond", Garamond, Georgia, serif; --mono: "IM Fell DW Pica SC", "EB Garamond", Georgia, serif; --numbers: "EB Garamond", Garamond, Georgia, serif; --radius: 6px; --accent: var(--gold); color-scheme: dark; }
 [data-div="law"] { --accent: var(--gold); }
 [data-div="learned"] { --accent: var(--blue); }
 [data-div="frontier"] { --accent: var(--red); }
@@ -17,8 +17,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html { background: var(--space); }
-body { background: radial-gradient(1200px 600px at 85% -10%, rgba(150, 60, 20, .22), transparent 60%),
-  radial-gradient(900px 500px at -10% 110%, rgba(90, 40, 15, .2), transparent 60%), var(--space);
+body { background: radial-gradient(1200px 600px at 85% -10%, rgba(110, 14, 18, .26), transparent 60%),
+  radial-gradient(900px 500px at -10% 110%, rgba(24, 54, 58, .3), transparent 60%), var(--space);
   background-attachment: fixed; color: var(--fg); font: 17px/1.5 var(--body); margin: 0; min-height: 100vh; }
 #embers { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 64px; }
@@ -35,7 +35,7 @@ b, strong { font-weight: 600; }
 
 /* HUD frame: glass panel with corner brackets */
 .hud { position: relative; background: var(--glass); border: 1px solid var(--line); border-radius: var(--radius);
-  backdrop-filter: blur(6px); box-shadow: inset 0 1px 0 rgba(240, 210, 160, .08), 0 10px 40px rgba(0, 0, 0, .35); }
+  backdrop-filter: blur(6px); box-shadow: inset 0 1px 0 rgba(220, 228, 224, .08), 0 10px 40px rgba(0, 0, 0, .35); }
 .hud::before, .hud::after { content: ""; position: absolute; width: 22px; height: 22px; pointer-events: none; border-color: var(--chrome); border-style: solid; opacity: .85; }
 .hud::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; border-top-left-radius: var(--radius); }
 .hud::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; border-bottom-right-radius: var(--radius); }
@@ -46,15 +46,15 @@ b, strong { font-weight: 600; }
 .masthead .who { display: grid; gap: 6px; min-width: 0; }
 .masthead h1 { overflow-wrap: anywhere; }
 .delta { flex: none; width: 62px; height: 62px; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent) 60%, transparent)); }
-.delta .outer { fill: url(#delta-gold); stroke: #5a3a10; stroke-width: 2; }
-.delta .ring { fill: none; stroke: #5a3a10; stroke-width: 2; stroke-dasharray: 2 3; }
+.delta .outer { fill: url(#delta-gold); stroke: #23292a; stroke-width: 2; }
+.delta .ring { fill: none; stroke: #23292a; stroke-width: 2; stroke-dasharray: 2 3; }
 .delta .emblem { fill: #0a0a0d; }
 .delta .emblem.stroke { fill: none; stroke: #0a0a0d; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
-.scanbar { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--accent) 0 22%, transparent 22% 24%, var(--chrome-dim) 24% 58%, transparent 58% 60%, rgba(217, 166, 94, .25) 60% 100%); width: 100%; }
+.scanbar { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--accent) 0 22%, transparent 22% 24%, var(--chrome-dim) 24% 58%, transparent 58% 60%, rgba(185, 194, 189, .25) 60% 100%); width: 100%; }
 .tabs { display: flex; gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 999px; background: var(--well); }
 .tab { font: 600 .9rem/1 var(--display); letter-spacing: .14em; text-transform: uppercase; padding: 11px 18px; border: 0; background: transparent; color: var(--muted); border-radius: 999px; cursor: pointer; }
 .tab:hover { color: var(--fg); }
-.tab[aria-selected="true"] { background: var(--chrome); color: var(--on-accent); box-shadow: 0 0 18px rgba(217, 166, 94, .45); }
+.tab[aria-selected="true"] { background: var(--chrome); color: var(--on-accent); box-shadow: 0 0 18px rgba(185, 194, 189, .45); }
 
 /* Main grid */
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 22px; margin-top: 22px; align-items: start; }
@@ -73,15 +73,15 @@ b, strong { font-weight: 600; }
 label, .label { font: 600 .72rem/1.3 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--chrome-dim); }
 input[type="text"], select, textarea { width: 100%; font: inherit; color: var(--fg); background: var(--well); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; }
 input[type="text"]:hover, select:hover, textarea:hover { border-color: var(--chrome-dim); }
-select option, select optgroup { background: #1c140d; color: var(--fg); }
+select option, select optgroup { background: #12161a; color: var(--fg); }
 textarea { resize: vertical; min-height: 64px; }
-::placeholder { color: rgba(138, 162, 194, .6); }
+::placeholder { color: rgba(142, 149, 143, .6); }
 input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, .seg input:focus-visible + span { outline: 2px solid var(--chrome); outline-offset: 2px; }
 input[type="checkbox"] { accent-color: var(--chrome); width: 16px; height: 16px; }
 input[type="file"] { color: var(--muted); font-size: .85rem; max-width: 100%; }
 button { font: inherit; cursor: pointer; }
-.btn { border: 1px solid var(--chrome-dim); background: rgba(217, 166, 94, .06); color: var(--fg); border-radius: 999px; padding: 8px 16px; font: 600 .8rem/1.2 var(--display); letter-spacing: .12em; text-transform: uppercase; }
-.btn:hover:not(:disabled) { background: rgba(217, 166, 94, .16); border-color: var(--chrome); }
+.btn { border: 1px solid var(--chrome-dim); background: rgba(185, 194, 189, .06); color: var(--fg); border-radius: 999px; padding: 8px 16px; font: 600 .8rem/1.2 var(--display); letter-spacing: .12em; text-transform: uppercase; }
+.btn:hover:not(:disabled) { background: rgba(185, 194, 189, .16); border-color: var(--chrome); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 40%, transparent); }
 .btn.primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.1); }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
@@ -100,10 +100,10 @@ button { font: inherit; cursor: pointer; }
 .adj-chip.up { color: var(--good); }
 .adj-chip.down { color: var(--warn); }
 .attr .base { font: .72rem var(--mono); letter-spacing: .06em; color: var(--muted); }
-.attr .val { font: 400 2.1rem/1 var(--mono); color: var(--chrome); text-shadow: 0 0 14px rgba(217, 166, 94, .5); }
+.attr .val { font: 400 2.1rem/1 var(--mono); color: var(--chrome); text-shadow: 0 0 14px rgba(185, 194, 189, .5); }
 .stepper { display: flex; gap: 6px; }
 .stepper button { width: 38px; height: 30px; border: 1px solid var(--chrome-dim); background: transparent; color: var(--chrome); border-radius: 999px; font: 600 1.05rem/1 var(--mono); }
-.stepper button:hover:not(:disabled) { background: rgba(217, 166, 94, .15); }
+.stepper button:hover:not(:disabled) { background: rgba(185, 194, 189, .15); }
 .stepper button:disabled { opacity: .25; cursor: not-allowed; }
 .pool { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
 .pip { width: 30px; height: 10px; border-radius: 2px; border: 1px solid var(--accent); transform: skewX(-20deg); }
@@ -116,9 +116,9 @@ button { font: inherit; cursor: pointer; }
 .chip.no { color: var(--warn); border-color: currentColor; }
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--well); }
 table { border-collapse: collapse; width: 100%; min-width: 600px; }
-th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid rgba(201, 160, 99, .12); vertical-align: middle; }
-th { font: 600 .68rem/1.2 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--chrome-dim); background: rgba(217, 166, 94, .05); }
-tbody tr:hover { background: rgba(217, 166, 94, .05); }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid rgba(160, 172, 166, .12); vertical-align: middle; }
+th { font: 600 .68rem/1.2 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--chrome-dim); background: rgba(185, 194, 189, .05); }
+tbody tr:hover { background: rgba(185, 194, 189, .05); }
 tr:last-child td { border-bottom: 0; }
 td.target { font: 400 1.3rem/1 var(--mono); width: 64px; text-align: right; color: var(--chrome); }
 td.pct { font-family: var(--mono); font-size: .82rem; color: var(--muted); width: 64px; text-align: right; }
@@ -137,7 +137,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .seg input:disabled + span { opacity: .3; }
 
 /* Traits */
-.trait-desc { background: rgba(217, 166, 94, .05); border: 1px solid var(--line); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 8px; font-size: .92rem; color: #dccdb2; }
+.trait-desc { background: rgba(185, 194, 189, .05); border: 1px solid var(--line); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 8px; font-size: .92rem; color: #cfd3cd; }
 .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
 .pair .trait-desc { display: grid; gap: 4px; }
 .trait-desc.comp { border-left-color: var(--warn); }
@@ -154,15 +154,15 @@ tr.lvl-U td.target { color: var(--muted); }
 .checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .9rem; }
 .checklist li { display: flex; gap: 10px; align-items: flex-start; }
 .mark { flex: none; width: 8px; height: 18px; border-radius: 2px; margin-top: 2px; font-size: 0; }
-.mark.ok { background: var(--good); box-shadow: 0 0 8px rgba(82, 227, 160, .6); }
+.mark.ok { background: var(--good); box-shadow: 0 0 8px rgba(143, 181, 154, .6); }
 .mark.no { background: transparent; border: 1.5px solid var(--warn); }
 .status { font: 600 1.15rem/1.1 var(--display); letter-spacing: .14em; text-transform: uppercase; }
-.status.ok { color: var(--good); text-shadow: 0 0 14px rgba(82, 227, 160, .45); }
+.status.ok { color: var(--good); text-shadow: 0 0 14px rgba(143, 181, 154, .45); }
 .status.no { color: var(--warn); }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .stat { background: var(--well); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; display: grid; gap: 2px; }
 .stat .eyebrow { font-size: .64rem; }
-.stat b { font: 400 1.6rem/1 var(--mono); color: var(--chrome); text-shadow: 0 0 12px rgba(217, 166, 94, .45); }
+.stat b { font: 400 1.6rem/1 var(--mono); color: var(--chrome); text-shadow: 0 0 12px rgba(185, 194, 189, .45); }
 .roster { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .roster li { display: flex; gap: 6px; align-items: center; justify-content: space-between; font-size: .9rem; }
 .roster li span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -185,9 +185,9 @@ tr.lvl-U td.target { color: var(--muted); }
 .attr-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
 @media (max-width: 480px) { .attr-strip { grid-template-columns: repeat(3, 1fr); } }
 .attr-strip div { text-align: center; border: 1px solid var(--line); border-radius: 10px; padding: 8px 4px; background: var(--well); }
-.attr-strip b { display: block; font: 400 1.8rem/1.1 var(--mono); color: var(--chrome); text-shadow: 0 0 12px rgba(217, 166, 94, .45); }
+.attr-strip b { display: block; font: 400 1.8rem/1.1 var(--mono); color: var(--chrome); text-shadow: 0 0 12px rgba(185, 194, 189, .45); }
 .skill-cols { columns: 2 220px; column-gap: 28px; }
-.skill-line { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(201, 160, 99, .12); break-inside: avoid; }
+.skill-line { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(160, 172, 166, .12); break-inside: avoid; }
 .skill-line .lv { font: .66rem var(--mono); color: var(--muted); letter-spacing: .12em; text-transform: uppercase; margin-left: 8px; }
 .skill-line.S .lv { color: var(--accent); }
 .skill-line.S b { color: var(--accent); }
@@ -197,26 +197,26 @@ tr.lvl-U td.target { color: var(--muted); }
 .boxes { display: flex; gap: 6px; }
 .box { width: 64px; height: 26px; border: 1px solid var(--chrome-dim); border-radius: 4px; background: transparent; transform: skewX(-20deg); font-size: 0; }
 .box:hover { border-color: var(--chrome); }
-.box.on { background: var(--bad); border-color: var(--bad); box-shadow: 0 0 12px rgba(255, 106, 92, .55); }
+.box.on { background: var(--bad); border-color: var(--bad); box-shadow: 0 0 12px rgba(201, 57, 59, .55); }
 .condition { font-family: var(--display); letter-spacing: .1em; text-transform: uppercase; }
 .duty { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .duty .count { font: 400 2.2rem/1 var(--mono); min-width: 2ch; text-align: center; color: var(--accent); text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent); }
 .dice { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.die { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--chrome); display: grid; place-items: center; font: 400 1.4rem/1 var(--mono); color: var(--chrome); background: rgba(217, 166, 94, .08); box-shadow: 0 0 14px rgba(217, 166, 94, .3), inset 0 0 10px rgba(217, 166, 94, .15); }
+.die { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--chrome); display: grid; place-items: center; font: 400 1.4rem/1 var(--mono); color: var(--chrome); background: rgba(185, 194, 189, .08); box-shadow: 0 0 14px rgba(185, 194, 189, .3), inset 0 0 10px rgba(185, 194, 189, .15); }
 .result { border-radius: 10px; padding: 14px; display: grid; gap: 8px; border: 1px solid var(--line); background: var(--well); }
-.result.succ { border-color: var(--good); box-shadow: 0 0 20px rgba(82, 227, 160, .15); }
-.result.fail { border-color: var(--bad); box-shadow: 0 0 20px rgba(255, 106, 92, .15); }
+.result.succ { border-color: var(--good); box-shadow: 0 0 20px rgba(143, 181, 154, .15); }
+.result.fail { border-color: var(--bad); box-shadow: 0 0 20px rgba(201, 57, 59, .15); }
 .verdict { font: 600 1.4rem/1 var(--display); letter-spacing: .16em; text-transform: uppercase; }
 .succ .verdict { color: var(--good); }
 .fail .verdict { color: var(--bad); }
 .log { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font: .84rem var(--mono); max-height: 220px; overflow-y: auto; }
-.log li { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid rgba(201, 160, 99, .12); padding: 3px 0; }
+.log li { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid rgba(160, 172, 166, .12); padding: 3px 0; }
 .log .s { color: var(--good); }
 .log .f { color: var(--bad); }
 .ref { display: grid; gap: 6px; font-size: .88rem; margin: 0; }
 .ref dt { font: 600 .72rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--chrome); }
-.ref dd { margin: 0 0 6px; color: #dccdb2; }
-.example-banner { margin-top: 16px; background: rgba(217, 166, 94, .06); border: 1px dashed var(--chrome-dim); border-radius: var(--radius); padding: 12px 16px; font-size: .9rem; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.ref dd { margin: 0 0 6px; color: #cfd3cd; }
+.example-banner { margin-top: 16px; background: rgba(185, 194, 189, .06); border: 1px dashed var(--chrome-dim); border-radius: var(--radius); padding: 12px 16px; font-size: .9rem; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 @media (prefers-reduced-motion: no-preference) {
   .die.rolling { animation: tumble .4s ease-out; }
   @keyframes tumble { from { transform: rotate(-120deg) scale(.6); opacity: .3; } to { transform: none; opacity: 1; } }
@@ -226,7 +226,7 @@ tr.lvl-U td.target { color: var(--muted); }
 /* Portrait / token */
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .portrait-drop { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; border: 1px dashed var(--chrome-dim); border-radius: 12px; padding: 14px; background: var(--well); }
-.portrait-drop.dragging { border-color: var(--chrome); background: rgba(217, 166, 94, .08); }
+.portrait-drop.dragging { border-color: var(--chrome); background: rgba(185, 194, 189, .08); }
 .portrait-actions { display: grid; gap: 10px; flex: 1 1 220px; min-width: 0; justify-items: start; }
 .portrait-frame { flex: none; width: 112px; height: 112px; display: grid; place-items: center; border: 2px solid var(--accent); background: var(--glass); overflow: hidden; border-radius: 50%; box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent); }
 .portrait-frame.portrait { width: 96px; height: 128px; border-radius: 10px; }
@@ -251,7 +251,7 @@ tr.lvl-U td.target { color: var(--muted); }
   /* Create: readiness rides along at the bottom instead of sitting above step 1. */
   #app[data-view="create"] .mobile-status, #app:not([data-view]) .mobile-status {
     display: flex; position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); z-index: 20;
-    align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: rgba(28, 19, 12, .95); }
+    align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: rgba(12, 15, 18, .95); }
   .mobile-status .status { font-size: .82rem; min-width: 0; }
   .mobile-status .btn-row { flex-wrap: nowrap; flex: none; }
   .mobile-status .btn { padding: 9px 12px; }
@@ -309,7 +309,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
 /* Weapon charge */
 .ph-meter { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; height: 14px; }
-.ph-meter span { border-radius: 2px; background: rgba(217, 166, 94, .12); border: 1px solid var(--line); }
+.ph-meter span { border-radius: 2px; background: rgba(185, 194, 189, .12); border: 1px solid var(--line); }
 .ph-meter span.on { background: var(--chrome); border-color: var(--chrome); }
 .ph-meter.low span.on { background: var(--warn); border-color: var(--warn); }
 #ph-fire .btn { font-size: .72rem; padding: 7px 10px; }
@@ -320,8 +320,8 @@ tr.lvl-U td.target { color: var(--muted); }
 .clocks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .clock { display: grid; justify-items: center; gap: 4px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--well); text-align: center; }
 .clock svg { width: 96px; height: 96px; }
-.clock path { stroke: var(--space); stroke-width: 2; cursor: pointer; fill: rgba(217, 166, 94, .08); }
-.clock path:hover { fill: rgba(217, 166, 94, .22); }
+.clock path { stroke: var(--space); stroke-width: 2; cursor: pointer; fill: rgba(185, 194, 189, .08); }
+.clock path:hover { fill: rgba(185, 194, 189, .22); }
 .clock.danger path.on { fill: var(--bad); }
 .clock.progress path.on { fill: var(--good); }
 .clock .ring { fill: none; stroke: var(--chrome-dim); stroke-width: 1.5; pointer-events: none; }
@@ -330,7 +330,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .clock b { font-size: .92rem; overflow-wrap: anywhere; }
 .clock .kind { font: .66rem var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .ship { display: grid; gap: 8px; }
-.ship-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; padding-bottom: 6px; border-bottom: 1px solid rgba(201, 160, 99, .12); }
+.ship-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; padding-bottom: 6px; border-bottom: 1px solid rgba(160, 172, 166, .12); }
 .ship-row .eff { grid-column: 1 / -1; }
 .ship-row .label { font-size: .68rem; }
 .ship-row .boxes { gap: 4px; }
@@ -368,7 +368,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-duty { display: flex; align-items: center; gap: 6px; }
 .gm-duty b { font: 400 1.3rem var(--mono); color: var(--accent); min-width: 1.5ch; text-align: center; }
 .gm-duty button { width: 34px; height: 30px; border: 1px solid var(--chrome-dim); background: transparent; color: var(--chrome); border-radius: 999px; font: 600 1rem var(--mono); }
-.gm-skills { font-size: .84rem; color: #dccdb2; }
+.gm-skills { font-size: .84rem; color: #cfd3cd; }
 .gm-skills b { color: var(--accent); }
 .gm-traits { font-size: .82rem; color: var(--muted); display: grid; gap: 2px; }
 .gm-traits strong { color: var(--fg); }
@@ -410,7 +410,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .guide h3 { font-size: .95rem; margin: 1.4em 0 .4em; color: var(--accent); }
 .guide p, .guide ul, .guide ol { margin: 0 0 .9em; }
 .guide li { margin-bottom: .3em; }
-.guide em { color: #dccdb2; }
+.guide em { color: #cfd3cd; }
 .guide a { color: var(--chrome); }
 .guide strong { color: #fff; }
 .guide table { width: 100%; min-width: 0; margin: 0 0 1.2em; font-size: .9rem; border: 1px solid var(--line); border-radius: 10px; border-collapse: separate; border-spacing: 0; overflow: hidden; background: var(--well); }
@@ -460,7 +460,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <linearGradient id="delta-gold" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#fff0b8"/><stop offset=".35" stop-color="#e9bd55"/><stop offset=".7" stop-color="#c38f2a"/><stop offset="1" stop-color="#8f6216"/>
+    <stop offset="0" stop-color="#eef1ef"/><stop offset=".35" stop-color="#aab3ae"/><stop offset=".7" stop-color="#6b7571"/><stop offset="1" stop-color="#363d3a"/>
   </linearGradient></defs></svg>
 <canvas id="embers" aria-hidden="true"></canvas>
 <div class="wrap" id="app" data-div="law">
@@ -469,7 +469,7 @@ tr.lvl-U td.target { color: var(--muted); }
       <img class="avatar" id="hdr-portrait" alt="" hidden>
       <svg class="delta" id="hdr-delta" viewBox="0 0 100 100" aria-hidden="true"><circle class="outer" cx="50" cy="50" r="47"/><circle class="ring" cx="50" cy="50" r="40"/><path class="emblem" data-emblem d=""/></svg>
       <div class="who">
-        <span class="eyebrow">Legend Dynamics · Western</span>
+        <span class="eyebrow">Legend Dynamics · Gothic Western</span>
         <h1 id="hdr-name">Unnamed character</h1>
         <span class="muted" id="hdr-sub">—</span>
       </div>
@@ -511,14 +511,14 @@ tr.lvl-U td.target { color: var(--muted); }
         </section>
 
         <section class="step hud">
-          <div class="step-head"><span class="step-no">2</span><h2>Background, Edges and attributes</h2>
-            <p class="muted small">All five attributes start at 10, then your background adjusts them. Your background's tier sets how many Edges you get (3 points split between them). Spend 5 attribute points on top, plus any from Edges. The starting maximum is 13, plus any background bonus to that attribute.</p></div>
+          <div class="step-head"><span class="step-no">2</span><h2>Origin, Edges and attributes</h2>
+            <p class="muted small">All five attributes start at 10, then your origin adjusts them. Your origin's tier sets how many Edges you get (3 points split between them). Spend 5 attribute points on top, plus any from Edges. The starting maximum is 13, plus any origin bonus to that attribute.</p></div>
           <div class="fields">
-            <div class="field"><label for="f-speciesid">Background</label><select id="f-speciesid"></select></div>
-            <div class="field" id="species-name-wrap" hidden><label for="f-species">Background name</label><input type="text" id="f-species" placeholder="Name it"></div>
+            <div class="field"><label for="f-speciesid">Origin</label><select id="f-speciesid"></select></div>
+            <div class="field" id="species-name-wrap" hidden><label for="f-species">Origin name</label><input type="text" id="f-species" placeholder="Name it"></div>
             <div class="field" id="custom-tier-wrap" hidden><label for="f-customtier">Tier (agreed with the GM)</label>
               <select id="f-customtier"><option value="0">Tier 0: 3 Edges</option><option value="1">Tier 1: 2 Edges</option><option value="2">Tier 2: 1 Edge</option><option value="3">Tier 3: no Edges</option></select></div>
-            <div class="field wide" id="horror-wrap"><div class="checks"><label><input type="checkbox" id="f-horror"> Show restricted options (only if your table agreed)</label></div></div>
+            <div class="field wide" id="horror-wrap"><div class="checks"><label><input type="checkbox" id="f-horror"> Horror campaign: show vampires as player characters (they must drink human blood; only if the whole table agreed)</label></div></div>
             <div class="field wide"><div class="trait-desc" id="species-desc"></div></div>
             <div class="field wide" id="species-adj-wrap" hidden><span class="label">Custom adjustments (must total 0, each −2 to +2)</span>
               <div class="adj-grid" id="species-adj"></div></div>
@@ -555,7 +555,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">4</span><h2>Describe your character</h2>
-            <p class="muted small">Any special ability beyond your background advantage needs GM approval.</p></div>
+            <p class="muted small">Any special ability beyond your origin advantage needs GM approval.</p></div>
           <div class="fields">
             <div class="field"><label for="f-name">Name</label><input type="text" id="f-name" placeholder="Character's name"></div>
             <div class="field wide"><span class="label" id="portrait-label">Portrait or token</span>
@@ -575,7 +575,7 @@ tr.lvl-U td.target { color: var(--muted); }
                   <span class="toast" id="portrait-msg" role="status" aria-live="polite"></span>
                 </div>
               </div></div>
-            <div class="field wide"><label for="f-reason">Why you ride</label>
+            <div class="field wide"><label for="f-reason">Why you face the dark</label>
               <select id="f-reasonpick" aria-label="Quick pick a reason"></select>
               <textarea id="f-reason" rows="2" placeholder="Pick one of the top 10 above, or write your own."></textarea></div>
             <div class="field wide"><label for="f-speciesnotes">Other ability (GM approval required)</label>
@@ -593,7 +593,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide" id="adv-detail-wrap" hidden><label for="f-advdetail" id="adv-detail-label">Detail</label><input type="text" id="f-advdetail"></div>
             <div class="field wide" id="sadv-custom" hidden>
               <div class="fields">
-                <div class="field"><label for="f-sadvname">Background advantage name</label><input type="text" id="f-sadvname"></div>
+                <div class="field"><label for="f-sadvname">Origin advantage name</label><input type="text" id="f-sadvname"></div>
                 <div class="field wide"><label for="f-sadvtext">What it does</label><textarea id="f-sadvtext" rows="2" placeholder="A narrow +2, or an ability with agreed limits."></textarea></div>
                 <div class="field"><label for="f-scompname">Companion complication</label><input type="text" id="f-scompname"></div>
                 <div class="field wide"><label for="f-scomptext">What problem it creates</label><textarea id="f-scomptext" rows="2"></textarea></div>
@@ -601,10 +601,10 @@ tr.lvl-U td.target { color: var(--muted); }
             </div>
             <div class="field wide" id="adv-desc-wrap"><div class="trait-desc" id="adv-desc"></div></div>
             <div class="field wide" id="sadv-desc-wrap" hidden><div class="pair">
-              <div class="trait-desc"><span class="label">Background advantage</span><div id="sadv-desc"></div></div>
+              <div class="trait-desc"><span class="label">Origin advantage</span><div id="sadv-desc"></div></div>
               <div class="trait-desc comp"><span class="label" id="scomp-name"></span><div id="scomp-desc"></div></div>
             </div>
-            <span class="small muted">A background advantage replaces the regular advantage and always brings its companion complication, which earns Grit like any other. Your regular complication still applies.</span></div>
+            <span class="small muted">A origin advantage replaces the regular advantage and always brings its companion complication, which earns Grit like any other. Your regular complication still applies.</span></div>
           </div>
 
           <div class="fields" id="adv2-wrap" hidden>
@@ -775,16 +775,16 @@ tr.lvl-U td.target { color: var(--muted); }
     <div class="guide-layout">
       <nav class="guide-toc hud no-print" aria-label="Guide contents"><details id="toc-details" open><summary class="eyebrow">Contents</summary><ol id="guide-toc"></ol></details></nav>
       <article class="guide hud" id="guide">
-        <header class="guide-title"><span class="eyebrow">Legend Dynamics · Western</span><h2 class="h1">Iron Roads Players' Guide</h2>
-          <span class="muted">A Western setting for the Legend Dynamics RPG system</span></header>
+        <header class="guide-title"><span class="eyebrow">Legend Dynamics · Gothic Western</span><h2 class="h1">Iron Roads Players' Guide</h2>
+          <span class="muted">A Gothic Western for the Legend Dynamics RPG system</span></header>
 <!-- GUIDE:START -->
-<p>The railroad is coming, and everything is changing. Boomtowns rise around silver strikes and burn down by winter. Cattle barons fence the open range, homesteaders fight them for the water, and the law is a tin star and whoever will stand behind it. <em>Iron Roads</em> is a Western setting for the Legend Dynamics RPG system: lawmen and outlaws, doctors and gamblers, drifters and preachers, in the years when the frontier was closing.</p>
+<p>The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. <em>Iron Roads</em> is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.</p>
 <p>Iron Roads is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.</p>
 <h2 id="g-the-rule-to-remember">The rule to remember</h2>
 <p>Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes your training and attribute. Do not add the attribute again.</p>
 <p><em>Example:</em> a skill of 13, with a −2 penalty for bad conditions, gives a target of 11. A roll of 9 succeeds by 2. A roll of 12 fails by 1.</p>
 <h2 id="g-how-this-book-is-organized">How this book is organized</h2>
-<p>This book combines the <strong>Legend Dynamics core rules</strong>, which every setting shares, with the <strong>Iron Roads</strong> setting: its callings, backgrounds, skills, gear, weapons and dangers. In this setting, the core rules’ Legend points are called <strong>Grit points</strong>.</p>
+<p>This book combines the <strong>Legend Dynamics core rules</strong>, which every setting shares, with the <strong>Iron Roads</strong> setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules’ Legend points are called <strong>Grit points</strong>.</p>
 <h1 id="g-create-your-character">Create your character</h1>
 <p>Work through the five steps in order. The character creator follows the same steps and checks the rules for you.</p>
 <h2 id="g-step-1-choose-your-calling">Step 1: Choose your calling</h2>
@@ -829,39 +829,49 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>digs out bullets, sets bones, and reads what a body says about how it died.</td>
 </tr>
 <tr class="even">
+<td>Occultist</td>
+<td>The Learned</td>
+<td>knows the old books, the rituals and the names of things that shouldn’t exist, and what each one fears.</td>
+</tr>
+<tr class="odd">
 <td>Lawyer</td>
 <td>The Learned</td>
 <td>knows the law better than the men who wear the badges, and isn’t afraid to say so.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Journalist</td>
 <td>The Learned</td>
 <td>asks the questions no one wants asked, and prints the answers.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Preacher</td>
 <td>The Learned</td>
 <td>comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Gunslinger</td>
 <td>The Frontier</td>
 <td>the fastest and steadiest gun in the room, and the one who decides when it’s time to draw.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Scout</td>
 <td>The Frontier</td>
 <td>finds the trail, reads the land, and keeps everyone alive out in it.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Gambler</td>
 <td>The Frontier</td>
 <td>reads people, bluffs, and hears everything the saloon hears.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Wrangler</td>
 <td>The Frontier</td>
 <td>breaks horses, drives cattle, and can ride anything with four legs.</td>
+</tr>
+<tr class="even">
+<td>Undertaker</td>
+<td>The Frontier</td>
+<td>buries the dead, and makes sure they stay buried.</td>
 </tr>
 </tbody>
 </table>
@@ -871,7 +881,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Well-rounded:</strong> one Specialty at +3 and nine Trained skills.</li>
 <li><strong>Old hand:</strong> one Expert skill at +5 and seven Trained skills: a lifetime spent at one thing.</li>
 </ul>
-<h2 id="g-step-2-choose-your-background-spend-edges-assign-attributes">Step 2: Choose your background, spend Edges, assign attributes</h2>
+<h2 id="g-step-2-choose-your-origin-spend-edges-assign-attributes">Step 2: Choose your origin, spend Edges, assign attributes</h2>
 <h3 id="g-attributes">Attributes</h3>
 <table>
 <thead>
@@ -903,13 +913,13 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<h3 id="g-background-and-tier">Background and tier</h3>
-<p>Choose your background from the <strong>Backgrounds</strong> chapter. Every attribute starts at 10, and your background adjusts some of them; the result is your <strong>base</strong>. Adjustments always total zero.</p>
-<p>Backgrounds can differ in power, so each has a <strong>tier</strong> from 0 to 3. Every character has <strong>3 points</strong> to split between background power and <strong>Edges</strong>: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.</p>
+<h3 id="g-origin-and-tier">Origin and tier</h3>
+<p>Choose your origin from the <strong>Origins</strong> chapter. Every attribute starts at 10, and your origin adjusts some of them; the result is your <strong>base</strong>. Adjustments always total zero.</p>
+<p>Origins can differ in power, so each has a <strong>tier</strong> from 0 to 3. Every character has <strong>3 points</strong> to split between origin power and <strong>Edges</strong>: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.</p>
 <table>
 <thead>
 <tr class="header">
-<th>Background</th>
+<th>Origin</th>
 <th>Tier</th>
 <th>Edges</th>
 <th>Adjustments</th>
@@ -957,6 +967,48 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>0</td>
 <td>3</td>
 <td>Presence −1, Will +1</td>
+</tr>
+<tr class="even">
+<td>Sighted</td>
+<td>1</td>
+<td>2</td>
+<td>Presence −1, Will +1</td>
+</tr>
+<tr class="odd">
+<td>Dhampir</td>
+<td>2</td>
+<td>1</td>
+<td>Body −1, Agility +1, Presence +1, Will −1</td>
+</tr>
+<tr class="even">
+<td>Practitioner</td>
+<td>2</td>
+<td>1</td>
+<td>Body −1, Intellect +1, Presence −1, Will +1</td>
+</tr>
+<tr class="odd">
+<td>Revenant</td>
+<td>2</td>
+<td>1</td>
+<td>Body +1, Presence −2, Will +1</td>
+</tr>
+<tr class="even">
+<td>Werewolf</td>
+<td>2</td>
+<td>1</td>
+<td>Body +1, Agility +1, Intellect −1, Will −1</td>
+</tr>
+<tr class="odd">
+<td>Pact-Bound</td>
+<td>3</td>
+<td>0</td>
+<td>Body −2, Agility −1, Presence +1, Will +2</td>
+</tr>
+<tr class="even">
+<td>Vampire (horror)</td>
+<td>3</td>
+<td>0</td>
+<td>Body −1, Agility +1, Presence +2, Will −2</td>
 </tr>
 </tbody>
 </table>
@@ -1009,17 +1061,17 @@ tr.lvl-U td.target { color: var(--muted); }
 </tbody>
 </table>
 <h3 id="g-spending-points">Spending points</h3>
-<p>After applying your background, distribute <strong>five additional points</strong> among the attributes, plus one for each attribute Edge.</p>
+<p>After applying your origin, distribute <strong>five additional points</strong> among the attributes, plus one for each attribute Edge.</p>
 <ul>
-<li>The starting maximum is <strong>13</strong>, plus any background bonus to that attribute.</li>
+<li>The starting maximum is <strong>13</strong>, plus any origin bonus to that attribute.</li>
 <li>You cannot lower an attribute below its base to gain points.</li>
 </ul>
-<h3 id="g-custom-background">Custom background</h3>
-<p>Agree on a background with the GM, give it adjustments from −2 to +2 per attribute that total zero, and agree its tier. The normal starting maximum and base rules apply.</p>
+<h3 id="g-custom-origin">Custom origin</h3>
+<p>Agree on an origin with the GM, give it adjustments from −2 to +2 per attribute that total zero, and agree its tier. The normal starting maximum and base rules apply.</p>
 <h2 id="g-step-3-choose-trained-skills">Step 3: Choose trained skills</h2>
 <p><strong>A Well-rounded</strong> character chooses ten different skills: one <strong>Specialty</strong> at its governing attribute +3 and nine <strong>Trained</strong> skills at attribute +1. <strong>An Old hand</strong> chooses <strong>one Expert skill at +5</strong> and <strong>seven Trained skills at +1</strong>. Each Extra Trained skill Edge adds one more Trained skill. All other skills are <strong>Untrained</strong> at attribute −4 when an attempt is plausible. Each skill has its own final target number; do not add the attribute again when rolling.</p>
 <p>The Expert’s extra bonus matters most when the work is hard. With an attribute of 13, an Expert has a target of 18, which only natural 17–18 can fail; under a −4 “very difficult” penalty the target is still 14. If Athletics is the Expert skill, Dodge adds +2, the same as a Specialty.</p>
-<p>Some backgrounds give one skill Trained for free; it doesn’t use one of your Trained picks.</p>
+<p>Some origins give one skill Trained for free; it doesn’t use one of your Trained picks.</p>
 <p><strong>Broadening.</strong> An Old hand can broaden later (the GM’s call, usually after a significant job): the Expert skill becomes a Specialty at +3, and two more skills become Trained.</p>
 <h2 id="g-step-4-describe-your-character">Step 4: Describe your character</h2>
 <p>Choose your name, title if any, and a short reason for what you do. Then choose <strong>one advantage</strong> and <strong>one complication</strong>.</p>
@@ -1037,8 +1089,8 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Nowhere else to go.</strong> These people took me in when no one else would.</li>
 </ol>
 <ul>
-<li><strong>Advantage.</strong> Choose either a general advantage or one of your background’s advantages. A background advantage replaces the general advantage and always brings its companion complication.</li>
-<li><strong>Complication.</strong> Choose one complication. You keep it even if you take a background advantage, so a character with a background advantage has two complications.</li>
+<li><strong>Advantage.</strong> Choose either a general advantage or one of your origin’s advantages. An origin advantage replaces the general advantage and always brings its companion complication.</li>
+<li><strong>Complication.</strong> Choose one complication. You keep it even if you take an origin advantage, so a character with an origin advantage has two complications.</li>
 <li><strong>Allegiance (optional).</strong> Choose an allegiance below, or none.</li>
 </ul>
 <p>An advantage gives +2 to one narrowly defined kind of task when the GM agrees it applies. It cannot improve every use of a broad skill. A complication creates choices and problems; it is not a permanent penalty.</p>
@@ -1082,6 +1134,16 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>An Outlaw Gang</td>
 <td>Once per job, a hideout, a fence or a gun at your side.</td>
 <td>Duty: the gang calls in favors, and the law knows your face.</td>
+</tr>
+<tr class="even">
+<td>The Order of the Iron Cross</td>
+<td>Once per job, silver, holy water, a hunter’s help or the Order’s bestiary.</td>
+<td>Duty: the Order sends you after monsters, and some of its hunters would count you among them.</td>
+</tr>
+<tr class="odd">
+<td>A coven</td>
+<td>Once per job, a ritual, a remedy or a safe house among witches.</td>
+<td>Duty and Vow: the coven’s secrets and its quarrels.</td>
 </tr>
 </tbody>
 </table>
@@ -1161,56 +1223,61 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Statutes, warrants, courts, claims and contracts</td>
 </tr>
 <tr class="even">
+<td>Occult</td>
+<td>Intellect</td>
+<td>Monsters, magic, rituals, curses and their weaknesses</td>
+</tr>
+<tr class="odd">
 <td>Medicine</td>
 <td>Intellect</td>
 <td>Diagnose, treat and perform surgery</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Tinkering</td>
 <td>Intellect</td>
 <td>Fix and modify guns, locks, machines and traps</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Gambling</td>
 <td>Intellect</td>
 <td>Play cards and dice, figure odds, spot a cheat</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Tracking</td>
 <td>Intellect</td>
 <td>Follow a trail and read signs of passage</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Survival</td>
 <td>Intellect</td>
 <td>Find water, shelter and food; manage wilderness hazards</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Riding</td>
 <td>Agility</td>
 <td>Ride, drive a wagon, handle horses in a chase</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Shooting</td>
 <td>Agility</td>
 <td>Revolvers, rifles and shotguns</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Melee</td>
 <td>Agility</td>
 <td>Knives, clubs, sabers and axes</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Brawling</td>
 <td>Agility</td>
 <td>Punch, wrestle, grapple and restrain</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Athletics</td>
 <td>Body</td>
 <td>Climb, swim, jump, run and exert yourself</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Stealth</td>
 <td>Agility</td>
 <td>Move quietly, hide and pick a pocket</td>
@@ -1280,6 +1347,26 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="even">
 <td>Dynamite</td>
 <td>Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre.</td>
+</tr>
+<tr class="odd">
+<td>Silver bullets</td>
+<td>One reload of silver rounds. Silver marks an extra box on werewolves and similar creatures, and ignores their toughness.</td>
+</tr>
+<tr class="even">
+<td>Holy water</td>
+<td>Three flasks. Thrown or splashed, it burns undead and demons (1 box) and breaks minor hexes.</td>
+</tr>
+<tr class="odd">
+<td>Stakes and mallet</td>
+<td>A wooden stake through a helpless vampire’s heart incapacitates it.</td>
+</tr>
+<tr class="even">
+<td>Ritual kit</td>
+<td>Chalk, candles, herbs, bones and old books. Needed for rituals away from a prepared place.</td>
+</tr>
+<tr class="odd">
+<td>Holy symbol</td>
+<td>Held up against undead and demons: −2 to their actions against you, if your faith is real.</td>
 </tr>
 </tbody>
 </table>
@@ -1421,36 +1508,41 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>A deep wound or a broken bone</td>
 </tr>
 <tr class="odd">
+<td>Claws and fangs of a monster</td>
+<td>2</td>
+<td>Torn flesh</td>
+</tr>
+<tr class="even">
 <td>Derringer, revolver or rifle</td>
 <td>2</td>
 <td>A gunshot wound</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Shotgun, within a few paces</td>
 <td>3, and Dying</td>
 <td>A ruinous wound</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Shotgun, farther away</td>
 <td>1</td>
 <td>Scattered pellets</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Buffalo rifle</td>
 <td>3, and Dying</td>
 <td>A ruinous wound</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Dynamite</td>
 <td>1 to everyone nearby, 3 and Dying at the centre</td>
 <td>Blast and burns; Dodge means diving clear</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Fall</td>
 <td>1 for a bad fall, 2 for a long one</td>
 <td>A sprain or a fracture</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Fire</td>
 <td>1 each round in the flames</td>
 <td>Burns</td>
@@ -1523,7 +1615,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Jams.</strong> A natural 18 with this weapon also jams it: clearing it takes an action.</li>
 </ul>
 <h1 id="g-medical-care">Medical care</h1>
-<p>Frontier medicine has chloroform, carbolic acid, laudanum and steady hands, and not much else. Infection kills more men than bullets do.</p>
+<p>Frontier medicine has chloroform, carbolic acid, laudanum and steady hands, and not much else. Infection kills more men than bullets do, and no doctor’s bag holds a cure for a bite from something that should be dead. See <em>Bites and curses</em> below.</p>
 <h2 id="g-diagnosis-and-stabilization">Diagnosis and stabilization</h2>
 <p>Roll Medicine when the diagnosis is uncertain or an urgent treatment decision matters. Emergency stabilization takes one action and a successful Medicine roll with a doctor’s bag. It ends Dying and stops deterioration, but removes no boxes.</p>
 <h2 id="g-field-treatment">Field treatment</h2>
@@ -1563,7 +1655,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </table>
 <p>Gain one point when one of your complications creates a meaningful problem you accept, including a companion complication. You can decline the proposed complication without penalty.</p>
 <h2 id="g-trouble">Trouble</h2>
-<p>The characters share three Trouble tracks. They fill as their deeds catch up with them; the GM narrates what each box means. A killing in the street, a robbery gone wrong, or a success at a cost can mark a box. Lying low between jobs, a good alibi (Deception) or doing the town a public good can clear one per job.</p>
+<p>The characters share three Trouble tracks. <strong>Heat</strong> is the law and the powerful taking notice; <strong>Whispers</strong> is the town talking about what it saw; <strong>The Dark</strong> is the things in the night learning your names. They fill as your deeds catch up with you; the GM narrates what each box means. A killing in the street, a monster seen in the open, a ritual worked carelessly, or a success at a cost can mark a box. Lying low between jobs, a good alibi (Deception) or doing the town a public good can clear one per job.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -1584,14 +1676,14 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>1: Questions at the sheriff’s office; 2: Wanted posters: −2 to Persuasion with lawmen; 3: A posse is out; 4: A warrant and a manhunt: start a Manhunt clock</td>
 </tr>
 <tr class="even">
-<td>Feud</td>
+<td>Whispers</td>
 <td>4</td>
-<td>1: Hard words in the saloon; 2: Enemies are gathering; 3: They’re in town; 4: They strike: start a clock</td>
+<td>1: Talk of strange things in the saloon; 2: The preacher names you from the pulpit: −2 to Persuasion with townsfolk; 3: Folk bar their doors; 4: A mob with torches: start a Mob clock</td>
 </tr>
 <tr class="odd">
-<td>Talk</td>
+<td>The Dark</td>
 <td>4</td>
-<td>1: Gossip at the general store; 2: The newspaper prints a story; 3: Your names are known in three territories; 4: Everyone knows your faces: −2 to Stealth and Deception with strangers</td>
+<td>1: Dogs howl at your door; 2: Signs and warnings: a marked door, a dead bird; 3: Something follows you at night; 4: It comes: start a clock</td>
 </tr>
 </tbody>
 </table>
@@ -1612,81 +1704,81 @@ tr.lvl-U td.target { color: var(--muted); }
 <th>d12</th>
 <th>Job</th>
 <th>Place</th>
-<th>The trouble</th>
+<th>The darkness</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>Escort a payroll through bandit country</td>
+<td>A body found drained of blood</td>
 <td>A silver boomtown</td>
-<td>A gang that’s bought the sheriff</td>
+<td>A werewolf that has acquired the taste</td>
 </tr>
 <tr class="even">
 <td>2</td>
-<td>Bring in a man with a price on his head</td>
+<td>A stagecoach that never arrived</td>
 <td>A logging camp in the deep woods</td>
-<td>A cattle baron who wants the water</td>
+<td>A vampire who owns the town</td>
 </tr>
 <tr class="odd">
 <td>3</td>
-<td>Find a stagecoach that never arrived</td>
+<td>Livestock torn apart in the night</td>
 <td>A river steamboat</td>
-<td>A railroad that wants the land</td>
+<td>The dead rising from a flooded graveyard</td>
 </tr>
 <tr class="even">
 <td>4</td>
-<td>Settle a range war before it starts</td>
+<td>A child gone missing</td>
 <td>The railroad’s end-of-track camp</td>
-<td>A feud two generations old</td>
+<td>A witch’s curse on a family</td>
 </tr>
 <tr class="odd">
 <td>5</td>
-<td>Protect a town from the gang that’s coming</td>
+<td>A miner raving about the dead walking</td>
 <td>A lonely homestead</td>
-<td>A fraud selling worthless land</td>
+<td>A ghost that wants justice</td>
 </tr>
 <tr class="even">
 <td>6</td>
-<td>Recover stolen cattle</td>
+<td>A bounty on a man who died last year</td>
 <td>A ghost town</td>
-<td>A killer who signs his work</td>
+<td>Ghouls in the mine</td>
 </tr>
 <tr class="odd">
 <td>7</td>
-<td>Find a missing child</td>
-<td>A mission church</td>
-<td>A mine that’s poisoning the creek</td>
+<td>Travelers vanishing on the trail</td>
+<td>A burned mission church</td>
+<td>A demon summoned by a desperate man</td>
 </tr>
 <tr class="even">
 <td>8</td>
-<td>Guard a witness until the trial</td>
+<td>A traveling medicine show</td>
 <td>A saloon and gambling hall</td>
-<td>A con man with a medicine show</td>
+<td>A necromancer raising an army</td>
 </tr>
 <tr class="odd">
 <td>9</td>
-<td>Track down a train robber</td>
+<td>A new preacher packs the church</td>
 <td>A frontier fort</td>
-<td>A hired gun with a grudge</td>
+<td>A revenant gunslinger</td>
 </tr>
 <tr class="even">
 <td>10</td>
-<td>Solve a murder no one wants solved</td>
+<td>A town where no one sleeps</td>
 <td>A fog-bound waterfront</td>
-<td>A bank that’s about to fail</td>
+<td>A hellhound on someone’s trail</td>
 </tr>
 <tr class="odd">
 <td>11</td>
-<td>Clear an innocent man of a hanging charge</td>
-<td>A canyon ranch</td>
-<td>A war hero who isn’t</td>
+<td>A hanging that went wrong</td>
+<td>A canyon cemetery</td>
+<td>A cult in the church cellar</td>
 </tr>
 <tr class="even">
 <td>12</td>
-<td>Deliver medicine through a blizzard</td>
+<td>A monster asks for help</td>
 <td>A snowbound mountain pass</td>
-<td>A drought that’s driving men desperate</td>
+<td>A sorcerer’s working gone wrong</td>
 </tr>
 </tbody>
 </table>
@@ -1708,7 +1800,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>The victim was the villain</td>
+<td>The victim was the monster</td>
 <td>The mob forms (6)</td>
 <td>A sheriff who wants it simple</td>
 </tr>
@@ -1720,20 +1812,20 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="odd">
 <td>3</td>
-<td>Two families are feuding</td>
-<td>The gang rides in (6)</td>
+<td>Two monsters are at war</td>
+<td>The full moon rises (4)</td>
 <td>A traveling doctor</td>
 </tr>
 <tr class="even">
 <td>4</td>
 <td>The client lied about everything</td>
-<td>The stage leaves town (4)</td>
+<td>The next victim (6)</td>
 <td>A Pinkerton detective</td>
 </tr>
 <tr class="odd">
 <td>5</td>
 <td>A rich man pays for silence</td>
-<td>The witness is found (6)</td>
+<td>The dead finish rising (6)</td>
 <td>A railroad baron</td>
 </tr>
 <tr class="even">
@@ -1744,39 +1836,39 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="odd">
 <td>7</td>
-<td>The outlaw is protecting his family</td>
+<td>The monster is protecting its family</td>
 <td>The trail goes cold (4)</td>
-<td>A gunfighter trying to retire</td>
+<td>A werewolf trying to stay human</td>
 </tr>
 <tr class="even">
 <td>8</td>
-<td>Someone is using the outlaw</td>
+<td>Someone is using the monster</td>
 <td>The hanging at dawn (4)</td>
 <td>A child who saw it happen</td>
 </tr>
 <tr class="odd">
 <td>9</td>
 <td>The town wants a hanging, any hanging</td>
-<td>The newspaper prints the story (8)</td>
+<td>The ritual completes (6)</td>
 <td>A preacher with a past</td>
 </tr>
 <tr class="even">
 <td>10</td>
-<td>The army arrives with its own orders</td>
+<td>The Order of the Iron Cross arrives to burn everything</td>
 <td>The fire spreads (4)</td>
 <td>A newspaperman who’s close to the truth</td>
 </tr>
 <tr class="odd">
 <td>11</td>
-<td>Another bounty hunter is after the same man</td>
-<td>The outlaw crosses the border (6)</td>
-<td>A judge who can be bought</td>
+<td>Another hunter is after the same prey</td>
+<td>The curse takes hold (8)</td>
+<td>A witch who needs protection</td>
 </tr>
 <tr class="even">
 <td>12</td>
 <td>The trail leads to someone a character loves</td>
 <td>The snows close the pass (8)</td>
-<td>A dying outlaw with a last request</td>
+<td>A dying hunter with a last request</td>
 </tr>
 </tbody>
 </table>
@@ -1789,20 +1881,97 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>What changed?</strong> New allies or enemies, damage, open threads for next time.</li>
 <li><strong>Advancement.</strong> After a significant job, the GM may authorize one skill step for each character.</li>
 </ol>
-<h1 id="g-the-frontier">The frontier</h1>
-<h2 id="g-powers-on-the-frontier">Powers on the frontier</h2>
+<h1 id="g-monsters-and-magic">Monsters and magic</h1>
+<h2 id="g-the-sight">The Sight</h2>
+<p>A few people are born <strong>Sighted</strong>. They see ghosts, the true faces of monsters wearing human ones, and magic at work. To everyone else the darkness is a rumor, until it isn’t.</p>
+<h2 id="g-monstrous-forms">Monstrous forms</h2>
+<p>Werewolves and vampires have a <strong>monstrous form</strong>: the wolf, or the feral face. Changing is a free action, but fury, terror or pain can force it (a Will roll), and a werewolf has no choice at moonrise under the full moon. While changed, the form’s profile applies: the creator’s <strong>In monstrous form</strong> box adds its bonuses to your rolls. Horses bolt (−2 to Riding), and a monstrous form seen by townsfolk marks a box of <strong>Whispers</strong>.</p>
+<h2 id="g-magic">Magic</h2>
+<p><strong>Practitioners</strong> work rituals in a tradition. Describe the effect; the GM sets its weight and says what it can and can’t do. Fill a clock of that size with <strong>Occult</strong> rolls at your tradition’s pace (usually ten minutes a roll; an hour for a Hermeticist; one action for a Sorcerer). Success fills one segment, success by 5 or more two; a failure costs time or ticks a danger clock.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Weight</th>
+<th>Segments</th>
+<th>For example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Minor</td>
+<td>2</td>
+<td>A charm against a hex, a candle that shows the hidden, a sleep that lasts the night</td>
+</tr>
+<tr class="even">
+<td>Significant</td>
+<td>4</td>
+<td>A curse that withers a crop, a ward on a house, a question asked of the dead</td>
+</tr>
+<tr class="odd">
+<td>Major</td>
+<td>6</td>
+<td>Binding a demon, raising the dead, lifting a werewolf’s curse for a month</td>
+</tr>
+</tbody>
+</table>
 <ul>
-<li><strong>The railroad.</strong> It brings towns, money and law, and it takes land, water and lives to do it. Its agents carry more weight than most judges.</li>
-<li><strong>The cattle barons.</strong> They own the range, or act as if they do. Their hired guns settle disputes the courts are too slow for.</li>
-<li><strong>The law.</strong> Town marshals, county sheriffs and deputy U.S. marshals, spread thin across enormous country. A badge is only as good as the person wearing it.</li>
-<li><strong>The Pinkertons.</strong> The detective agency hunts train robbers and strikers for whoever pays, and its files hold the faces of every wanted man.</li>
-<li><strong>The army.</strong> Forts guard the trails and the reservations. Its officers have their own orders, and their own politics.</li>
-<li><strong>The outlaws.</strong> Gangs, rustlers and road agents, some desperate, some vicious, some folk heroes in the towns they rob around.</li>
+<li><strong>Trappings.</strong> The right materials (grave dirt, silver, a lock of hair, the hour of midnight) remove one segment.</li>
+<li><strong>Charms.</strong> A finished ritual can be stored in an object and released by breaking it. Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4.</li>
+<li><strong>Attention.</strong> Magic worked openly can mark a box of <strong>The Dark</strong>, and the Order of the Iron Cross hunts known practitioners.</li>
 </ul>
-<h2 id="g-a-note-on-history">A note on history</h2>
-<p>The real frontier was brutal to the people who already lived there, and to many who came. Iron Roads leaves room for those stories without making anyone a stereotype: Native nations, Chinese railroad workers, Black homesteaders and cowboys, and Mexican vaqueros are all part of the West, and any of them can be a player character. Agree with your table what tone you want.</p>
+<h2 id="g-weaknesses">Weaknesses</h2>
+<p>Every monster has a weakness, and finding it is often the whole job. <strong>Occult</strong> identifies a creature and its weakness; the Monster Hunter advantage and the Sighted’s Monster’s Eye help.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Creature</th>
+<th>Weakness</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Werewolf</td>
+<td>Silver: an extra box, and its toughness doesn’t help. Wolfsbane keeps it away.</td>
+</tr>
+<tr class="even">
+<td>Vampire</td>
+<td>A wooden stake through the heart incapacitates; fire, sunlight and beheading destroy. Holy symbols hold it back; it can’t enter a home uninvited.</td>
+</tr>
+<tr class="odd">
+<td>Zombie</td>
+<td>A shot to the head (−2 to hit) or fire puts it down for good; anything else just slows it.</td>
+</tr>
+<tr class="even">
+<td>Ghost</td>
+<td>Can’t be hurt. Lay it to rest by finishing its business, or bind it with a ritual.</td>
+</tr>
+<tr class="odd">
+<td>Ghoul</td>
+<td>Fire and daylight. It flees from holy ground.</td>
+</tr>
+<tr class="even">
+<td>Demon</td>
+<td>Holy water burns it; a ritual banishes it. It must keep a bargain to the letter.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-bites-and-curses">Bites and curses</h2>
+<ul>
+<li><strong>Zombie bite.</strong> A bite that marks a box starts a 4-segment <strong>Infection</strong> clock, ticking each hour. A successful Medicine roll with an Occult remedy stops it; when it fills, you die, and rise.</li>
+<li><strong>Werewolf bite.</strong> A bite under the full moon can pass on the curse; the GM decides, and lifting it is a major ritual.</li>
+<li><strong>Vampire bite.</strong> A vampire who drains a victim to Dying can choose to turn them.</li>
+</ul>
 <h1 id="g-threats">Threats</h1>
-<p>Opponents use the same rules as the characters. <strong>Minor opponents</strong> (hired guns, a mob, a rustler’s crew) have <strong>one box</strong>: any hit that gets through takes them out of the fight.</p>
+<p>Opponents use the same rules as the characters. <strong>Minor opponents</strong> (hired guns, a mob, shambling dead) have <strong>one box</strong>: any hit that gets through takes them out of the fight.</p>
 <table style="width:100%;">
 <colgroup>
 <col style="width: 16%" />
@@ -1840,52 +2009,68 @@ tr.lvl-U td.target { color: var(--muted); }
 <td><strong>Quick draw.</strong> +2 on the first shot of a fight.</td>
 </tr>
 <tr class="odd">
-<td>Gang leader</td>
-<td>Shooting 13, Leadership 13</td>
-<td>9</td>
-<td>3</td>
-<td>Revolver</td>
-<td><strong>Orders.</strong> Once per round, gives one ally +1 on an attack.</td>
+<td>Zombie (minor, many)</td>
+<td>Brawling 10</td>
+<td>4</td>
+<td>1 each</td>
+<td>Bite (1)</td>
+<td><strong>Horde.</strong> Only a headshot (−2) or fire puts one down; other hits just knock it over. Its bite infects.</td>
 </tr>
 <tr class="even">
-<td>Gunfighter</td>
+<td>Ghoul</td>
+<td>Brawling 12, Stealth 13</td>
+<td>8</td>
+<td>3</td>
+<td>Claws (2)</td>
+<td><strong>Corpse-eater.</strong> Drags the fallen away; flees daylight and fire.</td>
+</tr>
+<tr class="odd">
+<td>Werewolf</td>
+<td>Brawling 14, Tracking 14</td>
+<td>10</td>
+<td>4</td>
+<td>Claws and fangs (2)</td>
+<td><strong>Relentless.</strong> Ignores the Wounded penalty; only silver marks more than 1 box at a time.</td>
+</tr>
+<tr class="even">
+<td>Vampire</td>
+<td>Brawling 13, Persuasion 15</td>
+<td>10</td>
+<td>4</td>
+<td>Fangs (2)</td>
+<td><strong>Mesmerize.</strong> Once per scene, a Presence contest makes one victim obey a simple command.</td>
+</tr>
+<tr class="odd">
+<td>Ghost</td>
+<td>Will 14</td>
+<td>—</td>
+<td>—</td>
+<td>Terror, cold</td>
+<td><strong>Haunting.</strong> Can’t be hurt; once per scene, everyone present rolls Will or flees in terror.</td>
+</tr>
+<tr class="even">
+<td>Witch</td>
+<td>Occult 14, Deception 13</td>
+<td>8</td>
+<td>3</td>
+<td>Curses</td>
+<td><strong>Hex.</strong> Once per round, a target with a link to her rolls Will or marks a box.</td>
+</tr>
+<tr class="odd">
+<td>Hellhound</td>
+<td>Brawling 14</td>
+<td>10</td>
+<td>3</td>
+<td>Burning jaws (2)</td>
+<td><strong>Hunter.</strong> Always finds its quarry; holy water drives it off.</td>
+</tr>
+<tr class="even">
+<td>Revenant gunslinger</td>
 <td>Shooting 15</td>
 <td>11</td>
-<td>3</td>
-<td>Two revolvers</td>
-<td><strong>Fast.</strong> Acts first in the round, whatever the order.</td>
-</tr>
-<tr class="odd">
-<td>Range rider (hired muscle)</td>
-<td>Brawling 13, Riding 13</td>
-<td>9</td>
-<td>3</td>
-<td>Rifle, rope</td>
-<td><strong>Lasso.</strong> A Riding hit drags the target down and loses them their next action.</td>
-</tr>
-<tr class="even">
-<td>Card cheat</td>
-<td>Deception 14, Shooting 10</td>
-<td>8</td>
-<td>2</td>
-<td>Derringer</td>
-<td><strong>Sleight of hand.</strong> Has a hidden derringer, and a friend in the room.</td>
-</tr>
-<tr class="odd">
-<td>Lynch mob (minor, many)</td>
-<td>Brawling 10</td>
-<td>6</td>
-<td>1 each</td>
-<td>Clubs, rope</td>
-<td><strong>Crowd.</strong> A Persuasion contest against the leader can turn them; failure makes them worse.</td>
-</tr>
-<tr class="even">
-<td>Grizzly bear</td>
-<td>Brawling 14</td>
-<td>6</td>
 <td>4</td>
-<td>Claws (2)</td>
-<td><strong>Huge.</strong> Its hits mark 2 boxes; it ignores the Wounded penalty.</td>
+<td>Two revolvers</td>
+<td><strong>Undying.</strong> Rises at the next midnight unless its grave is salted and burned.</td>
 </tr>
 </tbody>
 </table>
@@ -1893,13 +2078,13 @@ tr.lvl-U td.target { color: var(--muted); }
 <h1 id="g-ready-made-characters">Ready-made characters</h1>
 <p>Characters ready to play, for one-shots, new players, or a group in a hurry. Each follows the creation rules exactly, and their connections tie them together. In the creator, choose one from the ready-made list to open it and make it your own.</p>
 <h2 id="g-ruth-calloway">Ruth Calloway</h2>
-<p><em>Deputy U.S. Marshal, Marshal. Frontier-born (tier 0).</em> Wears the badge in three counties, and rides alone more often than she’d like.</p>
+<p><em>Deputy U.S. Marshal, Marshal. Sighted (tier 1).</em> Wears the badge in three counties, and sees what’s under the faces of the men she arrests.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 12, Agility 13, Intellect 9, Presence 11, Will 11. <strong>Dodge</strong> 12.</li>
-<li><strong>Skills:</strong> Shooting 16 (Specialty). Trained: Brawling 14, Riding 14, Athletics 13, Animal Handling 12, Leadership 12, Law 10, Read People 10, Survival 10, Tracking 10.</li>
-<li><strong>Edges:</strong> +1 attribute point, Second advantage, Extra Grit; second advantage: Badge: Deputy U.S. Marshal.</li>
-<li><strong>Advantage:</strong> Quick Draw. <strong>Complication:</strong> Law and Order; trigger: the town wants a hanging without a trial.</li>
-<li><strong>Why I ride:</strong> I took an oath, and I keep my word. <strong>Connection:</strong> Isaiah Booker brought in the man who killed her father, alive, when he could have collected either way.</li>
+<li><strong>Attributes:</strong> Body 12, Agility 13, Intellect 10, Presence 9, Will 11. <strong>Dodge</strong> 12.</li>
+<li><strong>Skills:</strong> Shooting 16 (Specialty). Trained: Brawling 14, Riding 14, Athletics 13, Law 11, Occult 11, Read People 11, Survival 11, Tracking 11, Leadership 10.</li>
+<li><strong>Edges:</strong> Second advantage, Extra Grit; second advantage: Badge: Deputy U.S. Marshal.</li>
+<li><strong>Advantage:</strong> Monster’s Eye (origin; companion: Haunted). <strong>Complication:</strong> Law and Order; trigger: the town wants a hanging without a trial.</li>
+<li><strong>Why I face the dark:</strong> I took an oath, and I keep my word. <strong>Connection:</strong> Isaiah Booker brought in the man who killed her father, alive, when he could have collected either way.</li>
 </ul>
 <h2 id="g-dr.-elias-webb">Dr. Elias Webb</h2>
 <p><em>Town physician, Doctor. City-bred (tier 0).</em> Left a Philadelphia practice for reasons he won’t discuss, and patches up whoever comes through the door.</p>
@@ -1908,34 +2093,34 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Skills:</strong> Medicine 16 (Specialty). Trained: Gambling 14, Investigation 14, Law 14, Read People 14, Survival 14, Tinkering 14, Leadership 13, Persuasion 13, Riding 11.</li>
 <li><strong>Edges:</strong> Second advantage, A fine weapon or tool, A friend; second advantage: Battlefield Surgeon; a friend: the editor of the territorial newspaper, who owes him a life; a fine tool: his surgeon’s instruments (+2 Medicine).</li>
 <li><strong>Advantage:</strong> Steady Hands. <strong>Complication:</strong> The Bottle; trigger: pain that won’t quit.</li>
-<li><strong>Why I ride:</strong> Nobody out here knows what I did back east. <strong>Connection:</strong> Reverend Stone is the only one who knows why he left Philadelphia.</li>
+<li><strong>Why I face the dark:</strong> Nobody out here knows what I did back east. <strong>Connection:</strong> Reverend Stone is the only one who knows why he left Philadelphia.</li>
 </ul>
 <h2 id="g-tom-feeney">Tom Feeney</h2>
-<p><em>Horse breaker, Wrangler. Immigrant (tier 0).</em> Came from County Clare with nothing, and can ride anything with four legs.</p>
+<p><em>Horse breaker, Wrangler. Werewolf (tier 2).</em> Came from County Clare with nothing but a curse, and chains himself in the root cellar every full moon.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 12, Agility 12, Intellect 10, Presence 10, Will 11. <strong>Dodge</strong> 11.</li>
-<li><strong>Skills:</strong> Riding 15 (Specialty). Trained: Athletics 13, Brawling 13, Melee 13, Shooting 13, Stealth 13, Animal Handling 11, Gambling 11, Survival 11, Tinkering 11, Tracking 11.</li>
-<li><strong>Edges:</strong> Extra Trained skill, Extra Grit, A fine weapon or tool; a fine tool: Bramble, a mustang who’ll run all day (+2 Riding).</li>
-<li><strong>Advantage:</strong> Hard Worker (background; companion: Family Abroad). <strong>Complication:</strong> Short Fuse; trigger: someone insults you or yours.</li>
-<li><strong>Why I ride:</strong> Everything I do is for my family. <strong>Connection:</strong> Plays cards with Lucinda Marsh every Saturday, and loses.</li>
+<li><strong>Attributes:</strong> Body 13, Agility 13, Intellect 9, Presence 11, Will 9. <strong>Dodge</strong> 12. <strong>In monstrous form:</strong> Body 15, Agility 14, Dodge 13.</li>
+<li><strong>Skills:</strong> Riding 16 (Specialty). Trained: Athletics 14, Brawling 14, Melee 14, Shooting 14, Stealth 14, Animal Handling 12, Gambling 10, Survival 10, Tinkering 10, Tracking 10.</li>
+<li><strong>Edges:</strong> Extra Trained skill.</li>
+<li><strong>Advantage:</strong> Wolf’s Nose (origin; companion: The Hunger). <strong>Complication:</strong> Short Fuse; trigger: someone insults you or yours.</li>
+<li><strong>Why I face the dark:</strong> Everything I do is for my family. <strong>Connection:</strong> Plays cards with Lucinda Marsh every Saturday, and loses.</li>
 </ul>
 <h2 id="g-lucinda-marsh">Lucinda Marsh</h2>
-<p><em>Professional gambler, Gambler. Drifter (tier 0); Old hand.</em> Has dealt faro in every boomtown from Deadwood to Tombstone, and remembers every face.</p>
+<p><em>Professional gambler, Gambler. Practitioner (tier 2); Old hand.</em> Deals faro by night and reads the cards for anyone who’ll pay, and the cards are never wrong.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 10, Agility 11, Intellect 13, Presence 12, Will 10. <strong>Dodge</strong> 9.</li>
-<li><strong>Skills:</strong> Gambling 18 (Expert). Trained: Investigation 14, Read People 14, Deception 13, Persuasion 13, Riding 12, Shooting 12, Stealth 12.</li>
-<li><strong>Edges:</strong> +1 attribute point, Second advantage, A friend; second advantage: Card Sharp; a friend: Mae Lin, a faro dealer who hears everything said at her table.</li>
-<li><strong>Advantage:</strong> Seen It All (background; companion: No Roots). <strong>Complication:</strong> Owes the Wrong People; trigger: a collector arrives.</li>
-<li><strong>Why I ride:</strong> There’s money out here for anyone with nerve enough to take it. <strong>Connection:</strong> Owes Ruth Calloway a favor for a warrant that went missing.</li>
+<li><strong>Attributes:</strong> Body 9, Agility 10, Intellect 13, Presence 12, Will 11. <strong>Dodge</strong> 8.</li>
+<li><strong>Skills:</strong> Gambling 18 (Expert). Trained: Investigation 14, Occult 14, Read People 14, Deception 13, Persuasion 13, Riding 11, Stealth 11.</li>
+<li><strong>Edges:</strong> A friend; a friend: Mae Lin, a faro dealer who hears everything said at her table.</li>
+<li><strong>Advantage:</strong> Cunning Folk (origin; companion: Old Superstitions). <strong>Complication:</strong> Owes the Wrong People; trigger: a collector arrives.</li>
+<li><strong>Why I face the dark:</strong> There’s money out here for anyone with nerve enough to take it. <strong>Connection:</strong> Owes Ruth Calloway a favor for a warrant that went missing.</li>
 </ul>
 <h2 id="g-isaiah-booker">Isaiah Booker</h2>
-<p><em>Bounty hunter, Bounty Hunter. War Veteran (tier 0).</em> Fought with the colored troops in the war, and has brought in more wanted men than any hunter in the territory.</p>
+<p><em>Bounty hunter, Bounty Hunter. Revenant (tier 2).</em> Shot in the back in ’69 by the gang he was hunting. He got up again, and he’s still hunting them.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 12, Agility 13, Intellect 11, Presence 9, Will 11. <strong>Dodge</strong> 12.</li>
-<li><strong>Skills:</strong> Shooting 16 (Specialty). Trained: Brawling 14, Melee 14, Riding 14, Stealth 14, Athletics 13, Investigation 12, Law 12, Read People 12, Survival 12, Tracking 12.</li>
-<li><strong>Edges:</strong> +1 attribute point, Extra Trained skill, A fine weapon or tool; a fine tool: a Sharps rifle with a telescopic sight (+2 Shooting).</li>
-<li><strong>Advantage:</strong> Steady Under Fire (background; companion: Old War Wounds). <strong>Complication:</strong> Code of the West; trigger: the easy shot is in someone’s back.</li>
-<li><strong>Why I ride:</strong> Somebody has to stand up for the people who can’t. <strong>Connection:</strong> Taught Tom Feeney to shoot straight, and still reminds him of it.</li>
+<li><strong>Attributes:</strong> Body 12, Agility 13, Intellect 11, Presence 8, Will 11. <strong>Dodge</strong> 12.</li>
+<li><strong>Skills:</strong> Shooting 16 (Specialty). Trained: Brawling 14, Melee 14, Riding 14, Stealth 14, Athletics 13, Investigation 12, Read People 12, Survival 12, Tracking 12.</li>
+<li><strong>Edges:</strong> A fine weapon or tool; a fine tool: a Sharps rifle with a telescopic sight (+2 Shooting).</li>
+<li><strong>Advantage:</strong> Unfeeling (origin; companion: Unfinished Business). <strong>Complication:</strong> Code of the West; trigger: the easy shot is in someone’s back.</li>
+<li><strong>Why I face the dark:</strong> Someone did me wrong, and I mean to settle it. <strong>Connection:</strong> Taught Tom Feeney to shoot straight, and still reminds him of it.</li>
 </ul>
 <h2 id="g-rev.-abigail-stone">Rev. Abigail Stone</h2>
 <p><em>Circuit preacher, Preacher. Old Money (tier 0).</em> Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across her knees.</p>
@@ -1944,10 +2129,10 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Skills:</strong> Persuasion 17 (Specialty). Trained: Leadership 15, Investigation 12, Law 12, Medicine 12, Read People 12, Survival 12, Riding 11, Shooting 11, Athletics 10.</li>
 <li><strong>Edges:</strong> +1 attribute point, Second advantage, A friend; second advantage: Unshakable Courage; a friend: Bishop Harrow, who answers her letters and asks no questions.</li>
 <li><strong>Advantage:</strong> Hellfire Preacher. <strong>Complication:</strong> Protects Others at Personal Risk; trigger: townsfolk are caught in the crossfire.</li>
-<li><strong>Why I ride:</strong> The Lord sent me here for a reason, and I believe this is it. <strong>Connection:</strong> Keeps Dr. Webb’s secret, and his whiskey hidden.</li>
+<li><strong>Why I face the dark:</strong> The Lord sent me here for a reason, and I believe this is it. <strong>Connection:</strong> Keeps Dr. Webb’s secret, and his whiskey hidden.</li>
 </ul>
 <h1 id="g-advantages">Advantages</h1>
-<p>Choose one advantage at character creation: a general advantage from this chapter, or a background advantage from the next. Each grants +2 only in the listed circumstances. An advantage does not grant training, authorize an impossible action, or replace essential gear. Use only one advantage bonus per roll.</p>
+<p>Choose one advantage at character creation: a general advantage from this chapter, or an origin advantage from the next. Each grants +2 only in the listed circumstances. An advantage does not grant training, authorize an impossible action, or replace essential gear. Use only one advantage bonus per roll.</p>
 <table>
 <colgroup>
 <col style="width: 50%" />
@@ -2040,14 +2225,22 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Pinkerton Credentials</td>
 <td>A commission from the Pinkerton National Detective Agency: carry arms on the job, work a client’s case across county and state lines, and draw on the agency’s offices and files (records, photographs and descriptions of wanted men). +2 to Investigation when using the agency’s records or contacts. You have no powers of arrest beyond any citizen’s unless local law deputizes you, and you answer to the client and the agency.</td>
 </tr>
+<tr class="odd">
+<td>Monster Hunter</td>
+<td>+2 to Occult to identify a creature from what it left behind: tracks, wounds, a body.</td>
+</tr>
+<tr class="even">
+<td>Unshaken Faith</td>
+<td>+2 to Will against magic, possession and the undead’s influence.</td>
+</tr>
 </tbody>
 </table>
 <p><strong>Badges.</strong> A badge is legal authority, not a magic word: outlaws and the powerful don’t always care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency’s reach and files, but no badge.</p>
-<h1 id="g-backgrounds">Backgrounds</h1>
+<h1 id="g-origins">Origins</h1>
 <table>
 <thead>
 <tr class="header">
-<th>Background</th>
+<th>Origin</th>
 <th>Tier</th>
 <th>Edges</th>
 <th>Adjustments</th>
@@ -2095,6 +2288,79 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>0</td>
 <td>3</td>
 <td>Presence −1, Will +1</td>
+</tr>
+<tr class="even">
+<td>Sighted</td>
+<td>1</td>
+<td>2</td>
+<td>Presence −1, Will +1</td>
+</tr>
+<tr class="odd">
+<td>Dhampir</td>
+<td>2</td>
+<td>1</td>
+<td>Body −1, Agility +1, Presence +1, Will −1</td>
+</tr>
+<tr class="even">
+<td>Practitioner</td>
+<td>2</td>
+<td>1</td>
+<td>Body −1, Intellect +1, Presence −1, Will +1</td>
+</tr>
+<tr class="odd">
+<td>Revenant</td>
+<td>2</td>
+<td>1</td>
+<td>Body +1, Presence −2, Will +1</td>
+</tr>
+<tr class="even">
+<td>Werewolf</td>
+<td>2</td>
+<td>1</td>
+<td>Body +1, Agility +1, Intellect −1, Will −1</td>
+</tr>
+<tr class="odd">
+<td>Pact-Bound</td>
+<td>3</td>
+<td>0</td>
+<td>Body −2, Agility −1, Presence +1, Will +2</td>
+</tr>
+<tr class="even">
+<td>Vampire (horror)</td>
+<td>3</td>
+<td>0</td>
+<td>Body −1, Agility +1, Presence +2, Will −2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-shared-rules">Shared rules</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Rule</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Changing</td>
+<td>A free action, in or out, except when the moon or the hunger forces it.</td>
+</tr>
+<tr class="even">
+<td>Losing control</td>
+<td>Fury, terror or pain can force a change: when it matters, the GM calls for a Will roll.</td>
+</tr>
+<tr class="odd">
+<td>Monstrous form</td>
+<td>While changed, your form’s attribute bonuses apply to rolls on those attributes and their skills, even above the starting maximum; its traits and drawbacks apply too.</td>
+</tr>
+<tr class="even">
+<td>Seen</td>
+<td>A monstrous form seen by townsfolk marks a box of Whispers.</td>
 </tr>
 </tbody>
 </table>
@@ -2308,6 +2574,284 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
+<h2 id="g-sighted">Sighted</h2>
+<p><em>Tier 1 · 2 Edges · Presence −1, Will +1</em></p>
+<p>Born with the second sight. You see ghosts, the true faces of monsters wearing human ones, and magic at work. Most people think you strange; monsters think you dangerous.</p>
+<p><strong>Origin rules:</strong></p>
+<ul>
+<li>The Sight: when a ghost, a disguised monster or working magic is near, you see it for what it is. Monsters who notice your stare may know what you are.</li>
+</ul>
+<p><strong>Suggested skills:</strong> Occult, Read People, Investigation, Shooting.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Monster’s Eye</td>
+<td>+2 to Occult to identify a creature and its weakness from what you’ve seen or what it left behind.</td>
+<td><strong>Haunted.</strong> The dead you’ve seen follow you. Accept the sleepless night or the ghost at a bad moment.</td>
+</tr>
+<tr class="even">
+<td>Ghost Talker</td>
+<td>Ability: speak with a ghost that will listen. Roll Will; the dead know only what they knew, and want something in return.</td>
+<td><strong>The Dead Know You.</strong> Spirits seek you out. Accept the haunting and its demands.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-dhampir">Dhampir</h2>
+<p><em>Tier 2 · 1 Edge · Body −1, Agility +1, Presence +1, Will −1</em></p>
+<p>Child of a vampire and a living mother. You walk in daylight, you heal fast, and the undead fear you, and want you.</p>
+<p><strong>Origin rules:</strong></p>
+<ul>
+<li>Undead sense: you feel a vampire or other undead within a short distance, with no details.</li>
+<li>Fast healing: rest clears a box every day.</li>
+<li>Garlic and holy ground make you queasy: −2 to Will rolls there.</li>
+</ul>
+<p><strong>Suggested skills:</strong> Melee, Stealth, Occult, Athletics.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bane of the Undead</td>
+<td>+2 to Melee and Shooting against vampires and other undead.</td>
+<td><strong>The Thirst.</strong> The blood calls to you. When it’s spilled near you, roll Will or feel the hunger take hold; accept the cost.</td>
+</tr>
+<tr class="even">
+<td>Unnatural Grace</td>
+<td>+2 to Athletics to leap, climb or land safely from a fall.</td>
+<td><strong>A Father’s Shadow.</strong> Your vampire parent wants you back. Accept it when their servants find you.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-practitioner">Practitioner</h2>
+<p><em>Tier 2 · 1 Edge · Body −1, Intellect +1, Presence −1, Will +1</em></p>
+<p>A human who works real magic in a tradition: alchemy, witchcraft, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.</p>
+<p><strong>Origin rules:</strong></p>
+<ul>
+<li>Rituals: describe the effect; the GM sets its weight (minor 2, significant 4, major 6 segments); fill that clock with Occult rolls at your tradition’s pace.</li>
+<li>Charms: carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).</li>
+<li>Magic draws attention: working it openly can mark The Dark.</li>
+</ul>
+<p><strong>Suggested skills:</strong> Occult, Read People, Medicine, Investigation.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Alchemist</td>
+<td>Brews elixirs, poisons and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing; elixirs keep until the end of the day (a week on success by 5+).</td>
+<td><strong>Price of the Work.</strong> Your craft feeds a vice: greed, drink or worse. Accept it when it bites.</td>
+</tr>
+<tr class="even">
+<td>Hermeticist</td>
+<td>Ritual magic from grimoires, circles and sigils: wards, bindings, divination. An hour per roll, and it needs books. +2 to Occult for wards and bindings.</td>
+<td><strong>Obsession: Forbidden Knowledge.</strong> A grimoire or a secret tempts you beyond sense. Accept the risk to get it.</td>
+</tr>
+<tr class="odd">
+<td>Witch</td>
+<td>Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link.</td>
+<td><strong>Witch’s Name.</strong> People whisper, and the righteous listen. Accept the suspicion, or the mob.</td>
+</tr>
+<tr class="even">
+<td>Cunning Folk</td>
+<td>Charms, cards, tokens and folk remedies: small, quick magic. +2 to Occult for charms and fortune-telling.</td>
+<td><strong>Old Superstitions.</strong> Your charms demand their rituals. Accept the delay or the odd behavior they require.</td>
+</tr>
+<tr class="odd">
+<td>Spiritualist</td>
+<td>Séances and trances that speak with the dead. +2 to Occult to call or question a spirit.</td>
+<td><strong>The Dead Follow You.</strong> Restless spirits find you. Accept the haunting at a bad moment.</td>
+</tr>
+<tr class="even">
+<td>Necromancer</td>
+<td>Commands the dead: wake a corpse to answer questions, or to fight for a scene (a minor zombie). +2 to Occult over corpses and the undead.</td>
+<td><strong>Grave-Robber.</strong> Your work needs bodies, and people notice. Accept the Heat, the Whispers or the grieving family.</td>
+</tr>
+<tr class="odd">
+<td>Sorcerer</td>
+<td>Quick casting along one or two paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm.</td>
+<td><strong>Bound Purpose.</strong> Your power follows one narrow calling. Accept the cost of serving it.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-revenant">Revenant</h2>
+<p><em>Tier 2 · 1 Edge · Body +1, Presence −2, Will +1</em></p>
+<p>You died, and came back for unfinished business. Your heart doesn’t beat, your skin is cold, and you won’t rest until it’s done.</p>
+<p><strong>Origin rules:</strong></p>
+<ul>
+<li>Dead flesh: you don’t breathe, eat or sleep, and poison and disease don’t affect you. Medicine treats you at −2.</li>
+<li>Hard to kill: Dying lasts until the end of the next scene, not this one.</li>
+<li>Laid to rest: when your business is done, you are too. Agree with the GM what it is.</li>
+</ul>
+<p><strong>Suggested skills:</strong> Shooting, Tracking, Brawling, Survival.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Unfeeling</td>
+<td>Ability: ignore the Wounded penalty (−1).</td>
+<td><strong>Unfinished Business.</strong> Your purpose comes first. When it calls, accept the danger or the abandoned plan.</td>
+</tr>
+<tr class="even">
+<td>Grave Cold</td>
+<td>+2 to Will against fear.</td>
+<td><strong>The Smell of the Grave.</strong> The living sense what you are. Accept the recoil, the dog that won’t stop barking, the closed door.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-werewolf">Werewolf</h2>
+<p><em>Tier 2 · 1 Edge · Body +1, Agility +1, Intellect −1, Will −1</em></p>
+<p>Cursed with the wolf. By day you pass for anyone; under the full moon, or in fury, the beast takes you.</p>
+<p><strong>Origin rules:</strong></p>
+<ul>
+<li>Full moon: at moonrise you change, whether you want to or not. A Will roll at −2 delays it a few minutes.</li>
+<li>Silver: silver weapons mark one extra box on you and ignore Tough.</li>
+<li>The curse: your bite can pass it on, if the GM says so.</li>
+</ul>
+<p><strong>Monstrous form:</strong> Body +2; Agility +1; Claws and fangs mark 2 boxes; Tough: hits of 2+ boxes mark one fewer, except silver; Keen senses: track by scent; Dark sight. <strong>Drawbacks:</strong> Horses bolt; townsfolk panic.</p>
+<p><strong>Suggested skills:</strong> Brawling, Tracking, Survival, Athletics.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Wolf’s Nose</td>
+<td>+2 to Tracking by scent, in either form.</td>
+<td><strong>The Hunger.</strong> When blood is spilled or something runs, the wolf wants it. Roll Will or change and give chase; accept the cost.</td>
+</tr>
+<tr class="even">
+<td>Pack Hunter</td>
+<td>+2 to Brawling or Melee against a target an ally attacked this round.</td>
+<td><strong>Moon-Bound.</strong> The full moon always comes at the worst time. Accept the changed plans, or the danger to your friends.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-pact-bound">Pact-Bound</h2>
+<p><em>Tier 3 · 0 Edges · Body −2, Agility −1, Presence +1, Will +2</em></p>
+<p>You made a bargain with something from below. It gave you power, and it will collect.</p>
+<p><strong>Origin rules:</strong></p>
+<ul>
+<li>Infernal power: once per scene, work a minor magical effect with a single Occult roll, no clock. Larger works need rituals.</li>
+<li>Hellfire: roll Occult as an attack; a hit marks 2 boxes and sets things alight.</li>
+<li>Marked: holy ground, holy water and consecrated silver burn you (1 box).</li>
+</ul>
+<p><strong>Suggested skills:</strong> Occult, Persuasion, Deception, Read People.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Infernal Bargain</td>
+<td>+2 to Persuasion when making a deal or a promise.</td>
+<td><strong>The Debt Comes Due.</strong> Your patron wants something. Accept the errand, or the price of refusing.</td>
+</tr>
+<tr class="even">
+<td>Whispers from Below</td>
+<td>Ability: once per session, ask your patron one question and get a true, unhelpful answer.</td>
+<td><strong>Possessive Patron.</strong> Your patron won’t share you. Accept it when it interferes with your friends, your faith or your heart.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-vampire">Vampire</h2>
+<p><em>Tier 3 · 0 Edges · Body −1, Agility +1, Presence +2, Will −2 · horror</em></p>
+<p>Undead, ageless and beautiful, with a thirst that never ends. You walk at night and remember centuries. Horror campaigns only.</p>
+<p><strong>Origin rules:</strong></p>
+<ul>
+<li>Undead: you don’t breathe or age; Medicine can’t heal you. Drinking blood can: Will against the victim’s Body, and on a success you clear a box and they mark one.</li>
+<li>Thirst (horror): each night you must drink human blood, or mark a box that only drinking clears.</li>
+<li>Sunlight: 1 box each round in direct sun.</li>
+<li>Weaknesses: a wooden stake through the heart incapacitates you; fire and beheading kill; holy symbols give −2 to your actions against their bearer; you can’t cross a home’s threshold uninvited.</li>
+</ul>
+<p><strong>Monstrous form:</strong> Body +2; Agility +1; Fangs and claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer, except fire and wooden stakes; Dark sight. <strong>Drawbacks:</strong> Your feral face terrifies everyone who sees it.</p>
+<p><strong>Suggested skills:</strong> Persuasion, Deception, Stealth, Read People.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mesmerize</td>
+<td>Ability: meet someone’s eyes and roll Presence against their Will; on a success they obey one simple command.</td>
+<td><strong>Old Enemies.</strong> Centuries make enemies. Accept it when one turns up.</td>
+</tr>
+<tr class="even">
+<td>Mist and Shadow</td>
+<td>Ability: once per scene at night, become mist and escape through any gap.</td>
+<td><strong>Pride of the Old Blood.</strong> You won’t be slighted by the living. Accept the feud you start.</td>
+</tr>
+</tbody>
+</table>
 <h1 id="g-complications">Complications</h1>
 <p>Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Grit point if you accept it. Every complication needs a trigger agreed with the GM; the creator suggests three for each.</p>
 <table>
@@ -2386,10 +2930,22 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Reluctant to Kill</td>
 <td>You seek a way that doesn’t end a life. Accept the extra danger.</td>
 </tr>
+<tr class="odd">
+<td>Cursed</td>
+<td>Something cursed you, and the curse has a will of its own. Agree what it does; accept it when it strikes.</td>
+</tr>
+<tr class="even">
+<td>Haunted by a Ghost</td>
+<td>A spirit follows you, and wants something. Accept the haunting and the trouble it brings.</td>
+</tr>
+<tr class="odd">
+<td>Marked by the Dark</td>
+<td>Things that live in the dark know your scent. Accept it when they find you first.</td>
+</tr>
 </tbody>
 </table>
 <h1 id="g-quick-reference">Quick reference</h1>
-<p><strong>Creation:</strong> attributes start at 10, adjusted by background (always totaling zero), plus 5 points; maximum 13 plus any background bonus. 3 points split between background tier and Edges. Well-rounded: one Specialty and nine Trained. Old hand: one Expert at +5 and seven Trained. One advantage (general or background) and one complication; an optional Allegiance.</p>
+<p><strong>Creation:</strong> attributes start at 10, adjusted by origin (always totaling zero), plus 5 points; maximum 13 plus any origin bonus. 3 points split between origin tier and Edges. Well-rounded: one Specialty and nine Trained. Old hand: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.</p>
 <p><strong>Skills:</strong> Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Old hand) = attribute +5.</p>
 <p><strong>Modifiers:</strong> favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails.</p>
 <p><strong>Assistance:</strong> success +1; success by 5 or more +2; 18 causes a complication. One assistant per roll.</p>
@@ -2430,7 +2986,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <span class="muted small">Max one point per roll or injury event. Earn one when you accept a meaningful problem from your complication.</span></div>
           <div class="checks"><label><input type="checkbox" id="f-stunned"> Dazed: −2 on next action roll</label>
             <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label>
-            <label id="form-wrap" hidden><input type="checkbox" id="f-form"> In alternate form</label></div>
+            <label id="form-wrap" hidden><input type="checkbox" id="f-form"> In monstrous form</label></div>
         </div>
 
         <div class="card hud no-print" id="card-roll">
@@ -2496,7 +3052,7 @@ tr.lvl-U td.target { color: var(--muted); }
         </div>
         <div class="card hud no-print" id="card-ship">
           <h3>Trouble</h3>
-          <p class="small muted">Shared by all the characters. A killing in the street, a robbery gone wrong, or a grudge left unsettled can mark a box. Lying low between jobs can clear one.</p>
+          <p class="small muted">Shared by all the characters. A killing in the street, a monster seen by townsfolk, or magic worked in the open can mark a box. Lying low between jobs can clear one.</p>
           <div class="ship" id="ship"></div>
           <button class="linkish" id="ship-reset">Clear all Trouble</button>
         </div>
@@ -2510,8 +3066,10 @@ tr.lvl-U td.target { color: var(--muted); }
             <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2, clears 2 (3 on margin 5+).</dd>
             <dt>Rest</dt><dd>One box per two full days of rest. Not from 3 boxes: treatment must clear the first.</dd>
             <dt>Grit</dt><dd>Reroll (keep second), reduce an injury by one box, or establish a small preparation.</dd>
-            <dt>Damage</dt><dd>Fists, clubs, knives, arrows: 1 box. Guns, heavy blades: 2. Close-range shotgun or buffalo rifle: 3 and Dying.</dd>
+            <dt>Damage</dt><dd>Fists, clubs, knives, arrows: 1 box. Guns, heavy blades, claws: 2. Close-range shotgun or buffalo rifle: 3 and Dying.</dd>
             <dt>Guns</dt><dd>Derringer 2, revolver 6, shotgun 2, rifle 15. Fan the hammer 3 (−2), both barrels 2 (+2 close), covering fire 3. Reload: one action. Natural 18 jams.</dd>
+            <dt>Monsters</dt><dd>Silver: werewolves. Stake, fire, sunlight, beheading: vampires. Headshot or fire: zombies. Holy water: undead and demons.</dd>
+            <dt>Rituals</dt><dd>Describe the effect; fill a 2-, 4- or 6-segment clock with Occult rolls at your tradition&#x27;s pace. Charms: Trained 2, Specialty 3, Expert 4.</dd>
           </dl>
         </div>
       </div>
@@ -2521,7 +3079,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
 <script>
 (() => {
-  /* PACK:START */const PACK = {"id":"western","terms":{"title":"Iron Roads","eyebrow":"Legend Dynamics · Western","guideTitle":"Iron Roads Players' Guide","guideSubtitle":"A Western setting for the Legend Dynamics RPG system","point":"Grit","role":"Calling","roleLower":"calling","origin":"Background","originLower":"background","originPlural":"Backgrounds","pathRounded":"Well-rounded","pathExpert":"Old hand","pathExpertPlural":"Old hands","reasonLabel":"Why you ride","reasonSheet":"Why I ride","gear":"Gear","gearLower":"gear","tabPlay":"Ride","readyText":"Ready to ride","stun":"Dazed","medkit":"doctor's bag","facility":"A doctor's surgery with instruments, chloroform and a clean table","restText":"two full days","mission":"Job","missionLower":"job","missionsChapter":"Running jobs","journal":"Trail journal","journalIntro":"Write it together at the end of a job. Advancements apply to the GM's copies; use each card's Save character file to send a player their update.","journalTitlePlaceholder":"e.g. The Harlan County range war","journalDateLabel":"Date","journalExtraLabel":"","journalExtraPlaceholder":"","weaponsTitle":"Gun and rounds","ammo":"rounds","ammoOne":"round","shot":"Shot","spent":"fired","sparesLabel":"Spare reloads","reload":"Reload (one action)","reloadDone":"Reloaded. That took your action.","restock":"Restock in town","restockDone":"Restocked in town: fully loaded.","emptyNote":"Empty: it won't fire until you reload.","otherWeapon":"Another weapon (no rounds)","tracksTitle":"Trouble","tracksIntro":"Shared by all the characters. A killing in the street, a robbery gone wrong, or a grudge left unsettled can mark a box. Lying low between jobs can clear one.","tracksReset":"Clear all Trouble","exampleName":"example detective","formToggle":"In alternate form","formName":"form","formProfile":"Form profile","formCoreSummary":"","restrictedToggle":"Show restricted options (only if your table agreed)","restrictedTag":"restricted","restrictedCheck":"only available when your table has agreed","chaseSkill":"Riding","rangedSkill":"Shooting","meleeSkill":"Melee","unarmedSkill":"Brawling","fontsHref":"https://fonts.googleapis.com/css2?family=Rye&family=IM+Fell+English+SC&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap","rolePluralLower":"callings","originPluralLower":"backgrounds","journalLower":"trail journal","edgePoints":"3"},"theme":{"comment":"A frontier ledger by lamplight: leather-and-ink panels, brass rules, embers rising.","glow":"217, 166, 94","line":"201, 160, 99","highlight":"240, 210, 160","wash1":"150, 60, 20, .22","wash2":"90, 40, 15, .2","optionBg":"#1c140d","barBg":"28, 19, 12, .95","text2":"#dccdb2","goodRgb":"82, 227, 160","badRgb":"255, 106, 92","placeholder":"rgba(138, 162, 194, .6)","badgeStops":"<stop offset=\"0\" stop-color=\"#fff0b8\"/><stop offset=\".35\" stop-color=\"#e9bd55\"/><stop offset=\".7\" stop-color=\"#c38f2a\"/><stop offset=\"1\" stop-color=\"#8f6216\"/>","badgeEdge":"#5a3a10","css":"--space: #0d0906; --glass: rgba(36, 25, 16, .88); --glass-hi: rgba(52, 36, 22, .9); --well: rgba(14, 9, 5, .72); --fg: #f0e4cc; --muted: #a8977c; --line: rgba(201, 160, 99, .26); --chrome: #d9a65e; --chrome-dim: rgba(217, 166, 94, .6); --gold: #e3b04b; --blue: #6fb5a5; --red: #d0623f; --good: #96c86e; --bad: #e2543c; --warn: #eba63c; --on-accent: #120c07; --display: \"IM Fell English SC\", Georgia, serif; --title: \"Rye\", Georgia, serif; --body: \"Crimson Pro\", Georgia, serif; --mono: \"Special Elite\", \"Courier New\", monospace; --numbers: \"Crimson Pro\", Georgia, serif; --radius: 10px;","particles":{"direction":"up","rgb":"255, 160, 70","density":16000}},"groups":[{"id":"law","name":"The Law","color":"--gold","emblem":"M50.0 23.0 L57.0 37.9 L73.4 36.5 L64.0 50.0 L73.4 63.5 L57.0 62.1 L50.0 77.0 L43.0 62.1 L26.6 63.5 L36.0 50.0 L26.6 36.5 L43.0 37.9 Z","stroke":false},{"id":"learned","name":"The Learned","color":"--blue","emblem":"M22 35 Q35 29 48 35 L48 69 Q35 63 22 69 Z M52 35 Q65 29 78 35 L78 69 Q65 63 52 69 Z","stroke":false},{"id":"frontier","name":"The Frontier","color":"--red","emblem":"M35 73 L35 50 A15 15 0 0 1 65 50 L65 73","stroke":true}],"roles":[{"name":"Marshal","group":"law","text":"Marshal: carries what authority there is (take a Badge advantage), with Leadership and a steady gun."},{"name":"Deputy","group":"law","text":"Deputy: keeps order, guards prisoners, and backs up the marshal when it comes to shooting."},{"name":"Detective","group":"law","text":"Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads."},{"name":"Bounty Hunter","group":"law","text":"Bounty hunter: tracks wanted men across three territories and brings them in, upright or across a saddle."},{"name":"Doctor","group":"learned","text":"Doctor: digs out bullets, sets bones, and reads what a body says about how it died."},{"name":"Lawyer","group":"learned","text":"Lawyer: knows the law better than the men who wear the badges, and isn't afraid to say so."},{"name":"Journalist","group":"learned","text":"Journalist: asks the questions no one wants asked, and prints the answers."},{"name":"Preacher","group":"learned","text":"Preacher: comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun."},{"name":"Gunslinger","group":"frontier","text":"Gunslinger: the fastest and steadiest gun in the room, and the one who decides when it's time to draw."},{"name":"Scout","group":"frontier","text":"Scout: finds the trail, reads the land, and keeps everyone alive out in it."},{"name":"Gambler","group":"frontier","text":"Gambler: reads people, bluffs, and hears everything the saloon hears."},{"name":"Wrangler","group":"frontier","text":"Wrangler: breaks horses, drives cattle, and can ride anything with four legs."}],"skills":[["Leadership","Presence","Give orders, rally a crowd, keep people together"],["Persuasion","Presence","Convince, negotiate, calm a mob"],["Deception","Presence","Lie, bluff, disguise and misdirect"],["Animal Handling","Presence","Calm, train and handle horses, cattle and dogs"],["Read People","Intellect","Judge motives, spot a lie, read a face"],["Investigation","Intellect","Search a scene, examine clues, follow paper trails"],["Law","Intellect","Statutes, warrants, courts, claims and contracts"],["Medicine","Intellect","Diagnose, treat and perform surgery"],["Tinkering","Intellect","Fix and modify guns, locks, machines and traps"],["Gambling","Intellect","Play cards and dice, figure odds, spot a cheat"],["Tracking","Intellect","Follow a trail and read signs of passage"],["Survival","Intellect","Find water, shelter and food; manage wilderness hazards"],["Riding","Agility","Ride, drive a wagon, handle horses in a chase"],["Shooting","Agility","Revolvers, rifles and shotguns"],["Melee","Agility","Knives, clubs, sabers and axes"],["Brawling","Agility","Punch, wrestle, grapple and restrain"],["Athletics","Body","Climb, swim, jump, run and exert yourself"],["Stealth","Agility","Move quietly, hide and pick a pocket"]],"physical":["Riding","Shooting","Melee","Brawling","Athletics","Stealth","Survival"],"edgePoints":3,"formCore":[],"origins":[{"id":"frontier","name":"Frontier-born","tier":0,"adj":{"Body":1,"Intellect":-1},"desc":"Raised on a homestead or a ranch, a long way from schools and doctors. Tough, practical, and at home in hard country.","core":[],"form":null,"skills":["Riding","Survival","Shooting","Animal Handling"],"traits":[["fr-weather","Weather-Wise","+2 to Survival to read the sky and find shelter before a storm or blizzard hits.","Survival",true,"Plain-Spoken","You say what you think, in words townsfolk find rough. Accept the offense it gives at a bad moment."],["fr-horse","Horse Sense","+2 to Animal Handling to calm, gentle or keep control of a frightened horse.","Animal Handling",true,"Suspicious of Town Folk","You don't trust slick talkers and city ways. Accept the cost when your suspicion is wrong."]]},{"id":"city","name":"City-bred","tier":0,"adj":{"Intellect":1,"Body":-1},"desc":"Schooled back east or in a western city: you read, you write, you know how the world runs on money and paper. The frontier is still learning you.","core":[],"form":null,"skills":["Law","Investigation","Persuasion","Read People"],"traits":[["ci-letters","Well Read","+2 to Intellect rolls to recall something from books, newspapers or schooling.","Intellect",true,"Tenderfoot","Hard country catches you out. Accept the blister, the lost trail or the laughter when it does."],["ci-connected","Connected","+2 to Persuasion with bankers, lawyers, officials and the well-to-do.","Persuasion",true,"Family Expectations","Your family expects you home, married, or respectable. Accept their letters, visits and pressure."]]},{"id":"veteran","name":"War Veteran","tier":0,"adj":{"Will":1,"Presence":-1},"desc":"You fought in the war, blue or gray, and came west with what was left of you. You know how to take orders, give them, and keep your head under fire.","core":[],"form":null,"skills":["Shooting","Leadership","Medicine","Riding"],"traits":[["ve-fire","Steady Under Fire","+2 to Will against fear when bullets are flying.","Will",true,"Old War Wounds","The war left more than scars. Accept the nightmares, the shakes or the old wound acting up at a bad time."],["ve-drill","Drilled","+2 to Leadership when organizing armed people to fight or defend.","Leadership",true,"Old Loyalties","Men from the other side still hate you, and men from your side still call on you. Accept the grudge or the favor."]]},{"id":"drifter","name":"Drifter","tier":0,"adj":{"Agility":1,"Will":-1},"desc":"No home, no ties, no questions: you've drifted from town to town for years and learned to read a room on the way in.","core":[],"form":null,"skills":["Gambling","Read People","Stealth","Brawling"],"traits":[["dr-read","Seen It All","+2 to Read People when sizing up a stranger, a saloon or a town on first sight.","Read People",true,"No Roots","You never stay long. Accept leaving when you're needed, or the strain of staying put."],["dr-slip","Slippery","+2 to Stealth when slipping out of a building, a crowd or a town unnoticed.","Stealth",true,"A Past That Follows","Someone from one of those towns remembers you. Accept it when they turn up."]]},{"id":"immigrant","name":"Immigrant","tier":0,"adj":{"Will":1,"Presence":-1},"desc":"You crossed an ocean to get here, from Ireland, China, Germany, Italy, Mexico or anywhere else, and you've had to work twice as hard to be treated half as well.","core":[],"form":null,"skills":["Athletics","Tinkering","Persuasion","Survival"],"traits":[["im-tongue","Two Tongues","+2 to Persuasion with people of your homeland, and you speak its language fluently.","Persuasion",true,"Prejudice","Some people will never accept you. Accept the slight, the closed door or the threat."],["im-grit","Hard Worker","+2 to Body to keep going through long, exhausting labor.","Body",true,"Family Abroad","People back home depend on the money you send. Accept the pressure when it runs short."]]},{"id":"oldmoney","name":"Old Money","tier":0,"adj":{"Presence":1,"Body":-1},"desc":"Your family has money, land or a name that opens doors. Out here it buys less than it used to, but it still buys plenty.","core":[],"form":null,"skills":["Persuasion","Leadership","Law","Gambling"],"traits":[["om-purse","Deep Pockets","+2 to Persuasion when money changes hands: bribes, deals and favors bought.","Persuasion",true,"Spoiled","You're used to getting your way. Accept the cost when you don't and won't let it go."],["om-name","A Name That Opens Doors","+2 to Leadership or Persuasion with people who know your family's name.","Leadership",true,"Family Enemies","Your family made enemies getting rich. Accept it when they come for you."]]},{"id":"railroad","name":"Railroad Hand","tier":0,"adj":{"Body":1,"Presence":-1},"desc":"You laid track, drove spikes, fired the engines or blew the tunnels. You know machines, explosives, and how the railroad treats its men.","core":[],"form":null,"skills":["Tinkering","Athletics","Brawling","Survival"],"traits":[["rr-powder","Powder Man","+2 to Tinkering when setting, timing or defusing dynamite.","Tinkering",true,"Union Man","You stand with working men against the bosses. Accept the trouble when the company comes down on you."],["rr-iron","Iron Grip","+2 to Athletics for feats of raw strength: lifting, bending, holding.","Athletics",true,"Blasting Deaf","Years of dynamite took some of your hearing. Accept it when you miss something said quietly."]]}],"allegiances":[["railroad","The Railroad","Once per job, a free ticket, a telegraph message on the company wire, or a word with a division boss.","Duty: the company expects you to protect its interests, even when they aren't right."],["baron","A Cattle Baron","Once per job, money, horses or hired hands.","Duty: the baron's range wars become your fights."],["army","The Army","Once per job, help from a fort: supplies, an escort or a doctor.","Duty: orders from a commanding officer, and old soldiers' quarrels."],["church","The Church","Once per job, shelter, records or a favor from the clergy.","Duty: the Church gives you orders, and its enemies are yours."],["gang","An Outlaw Gang","Once per job, a hideout, a fence or a gun at your side.","Duty: the gang calls in favors, and the law knows your face."]],"reasons":[["Justice","Somebody has to stand up for the people who can't."],["Vengeance","Someone did me wrong, and I mean to settle it."],["Fortune","There's money out here for anyone with nerve enough to take it."],["A fresh start","Nobody out here knows what I did back east."],["Duty","I took an oath, and I keep my word."],["Freedom","No boss, no fences, no one to answer to."],["Family","Everything I do is for my family."],["Faith","The Lord sent me here for a reason, and I believe this is it."],["Redemption","I did harm once. I mean to balance the ledger."],["Nowhere else to go","These people took me in when no one else would."]],"connections":[["Rode together in the war","We served in the same company and still watch each other's backs."],["They saved my life","They cut me down from a lynch mob's rope, and I owe them my life."],["I saved theirs","I pulled them out of a burning barn, and they haven't forgotten it."],["Mentor","They taught me to shoot, ride and survive out here."],["Friendly rivals","We're always competing over the same bounty, the same card game or the same sweetheart."],["Same hometown","We grew up in the same town and know each other's families."],["An unpaid debt","I owe them money, or a favor, and I haven't paid it yet."],["A shared secret","We share a secret from a job neither of us talks about."],["Saloon regulars","We meet every Saturday night for cards, whiskey and lies."],["Bad blood","They blame me for something that went wrong on a past job."]],"advantages":[["steady","Steady Hands","+2 to Medicine for surgery or digging out a bullet. It does not improve diagnosis.","Medicine"],["surgeon","Battlefield Surgeon","+2 to Medicine for emergency stabilization of a wounded patient.","Medicine"],["observer","Astute Observer","+2 to Intellect rolls to notice a concealed physical clue during a deliberate search.","Intellect"],["quickdraw","Quick Draw","+2 to Shooting on your first shot of a fight, with a holstered revolver.","Shooting"],["marksman","Careful Marksman","+2 to Shooting after spending your preceding action aiming at the same visible target.","Shooting"],["saddle","Born in the Saddle","+2 to Riding in a chase or on dangerous ground.","Riding"],["bloodhound","Bloodhound","+2 to Tracking when the trail is more than a day old.","Tracking"],["sharp","Card Sharp","+2 to Gambling at cards, including spotting someone else's cheating.","Gambling"],["poker","Poker Face","+2 to Deception to hide what you know or feel under questioning.","Deception"],["gunsmith","Gunsmith","+2 to Tinkering when repairing or modifying a firearm.","Tinkering"],["coolhead","Cool Head","+2 to Leadership when coordinating others in a sudden emergency.","Leadership"],["courage","Unshakable Courage","+2 to Will against overwhelming fear.","Will"],["ironwill","Iron Will","+2 to Will to resist intimidation, threats or torture.","Will"],["knife","Knife Fighter","+2 to Melee with a knife in close quarters.","Melee"],["preacher","Hellfire Preacher","+2 to Persuasion when calming or rousing a crowd.","Persuasion"],["bargain","Hard Bargainer","+2 to Persuasion when buying, selling or settling a deal.","Persuasion"],["badge-local","Badge: Town Police or Deputy","Legal authority in one town or county: you can carry arms where others can't, question witnesses, make arrests and hold suspects. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. Outside your jurisdiction it's just tin.","Leadership"],["badge-sheriff","Badge: Sheriff","Authority across your county: everything a deputy can do, plus serving warrants, running the jail, and swearing in deputies and armed citizens. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.","Leadership"],["badge-marshal","Badge: Deputy U.S. Marshal","Federal authority across states and territories: serving federal warrants, pursuing fugitives across county and state lines, swearing in deputies, and calling on local lawmen for help. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.","Leadership"],["pinkerton","Pinkerton Credentials","A commission from the Pinkerton National Detective Agency: carry arms on the job, work a client's case across county and state lines, and draw on the agency's offices and files (records, photographs and descriptions of wanted men). +2 to Investigation when using the agency's records or contacts. You have no powers of arrest beyond any citizen's unless local law deputizes you, and you answer to the client and the agency.","Investigation"]],"complications":[["mystery","Cannot Leave a Mystery Alone","A strange discovery tempts you to linger, spend something scarce, or take a risky look. Accept a specific cost."],["protects","Protects Others at Personal Risk","You shield someone or volunteer for a hazardous rescue at a real cost to yourself."],["code","Code of the West","You won't shoot an unarmed man, break your word, or strike from behind. Accept the setback your code causes."],["lawful","Law and Order","You insist on arrest, trial and due process. Accept the delay or danger it costs."],["reputation","Reputation to Uphold","Pride tempts you to refuse help or take on too much. Take a real consequence when it matters."],["war","Haunted by the War","A specific reminder of the war causes hesitation or a hard choice. Define the reminder together."],["secret","Keeps a Dangerous Secret","An agreed secret threatens trust or safety. Earn a point when protecting or revealing it has a real consequence."],["rival","Old Rival","A recurring rival complicates your work with concrete problems."],["home","Someone Back Home","A family or a sweetheart pulls you away from the work."],["vengeance","Sworn Vengeance","You've sworn to kill someone. Accept the risk when the chance comes."],["temper","Short Fuse","You answer insults with fists or guns. Accept the fight you start."],["bottle","The Bottle","Whiskey or laudanum has a hold on you. Accept the lost night or the slip at a bad time."],["game","Can't Walk Away from a Game","A card game, a bet or a dare is irresistible. Accept the time or money lost."],["wanted","Wanted","There's a price on your head somewhere. Accept trouble when lawmen or bounty hunters come."],["debt","Owes the Wrong People","A debt to dangerous people comes due. Accept their demand."],["nonlethal","Reluctant to Kill","You seek a way that doesn't end a life. Accept the extra danger."]],"triggers":{"mystery":["A strange track or body no one can explain","Everyone's ready to move on, and something is still wrong","An old letter hints at a buried story"],"protects":["A friend is pinned down or hurt","Townsfolk are caught in the crossfire","Someone volunteers for a deadly job in your place"],"code":["The enemy is unarmed or has turned to run","A promise you made becomes dangerous to keep","The easy shot is in someone's back"],"lawful":["A suspect could be shot instead of arrested","The town wants a hanging without a trial","Your friends plan to take the law into their own hands"],"reputation":["Someone questions your nerve in front of others","A job is beyond what you're ready for","Getting help means admitting a mistake"],"war":["Gunfire in the dark","Meeting a man who fought on the other side","A field hospital, cannon, or a burning farm"],"secret":["Someone starts asking the wrong questions","Evidence that could expose you turns up","Keeping the secret means lying to a friend"],"rival":["Your rival is after the same quarry","Your rival takes credit for your work","Your rival needs your help"],"home":["A letter from home arrives","The job leads near your family","Someone you love is in danger"],"vengeance":["Word of the one you swore to kill","A face from that day turns up","The chance comes at the worst possible moment"],"temper":["Someone insults you or yours","You're called a coward","A bully picks on someone weaker"],"bottle":["A long night with nothing to do but wait","Pain that won't quit","A hard loss"],"game":["A high-stakes game in town","Someone dares you","A sure thing that isn't"],"wanted":["A lawman from back east comes asking","Your face on a poster","A bounty hunter rides into town"],"debt":["A collector arrives","Your creditor wants a favor instead","The interest comes due"],"nonlethal":["The man who surrenders is a killer","The only fast solution would kill someone","Your friends vote to shoot first"]},"equipment":[["revolver","Revolver","Six shots; reloading takes an action. Hits mark 2 boxes."],["rifle","Rifle","A lever-action repeater with fifteen shots and long range. Hits mark 2 boxes."],["shotgun","Shotgun","Two barrels. Devastating close up (3 boxes and Dying), weak beyond a few paces (1 box)."],["knife","Knife","A tool and a weapon; hits mark 1 box."],["doctorbag","Doctor's bag","Instruments, laudanum, carbolic and bandages. Needed to stabilize a patient and give field treatment."],["tools","Tool roll","Gunsmith's and carpenter's tools. Needed for most Tinkering in the field."],["horse","Horse and tack","Carries you across the territory. Riding in a chase needs one."],["trailkit","Trail kit","Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones."],["lantern","Lantern and matches","Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible."],["glasses","Field glasses","See detail at a distance. Spotting something far off without them is very difficult (−4) or impossible."],["lawbooks","Law books and blank warrants","Needed to draw up papers, check a statute or argue a point of law away from a courthouse."],["dynamite","Dynamite","Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre."]],"weapons":{"skill":"Shooting","jamOn18":true,"defaultSpares":2,"items":{"derringer":["Derringer",2],"revolver":["Revolver",6],"shotgun":["Double-barrel shotgun",2],"rifle":["Lever-action rifle",15]},"equipLinked":["revolver","rifle","shotgun"],"modes":[["single","Single shot",1,null,0],["fan","Fan the hammer",3,["revolver"],-2],["both","Both barrels",2,["shotgun"],2],["cover","Covering fire",3,null,0]]},"tracks":[{"name":"Heat","boxes":4,"effects":["The law isn't looking","Questions at the sheriff's office","Wanted posters: −2 to Persuasion with lawmen","A posse is out","A warrant and a manhunt: start a Manhunt clock"]},{"name":"Feud","boxes":4,"effects":["No one's holding a grudge","Hard words in the saloon","Enemies are gathering","They're in town","They strike: start a clock"]},{"name":"Talk","boxes":4,"effects":["Nobody's talking","Gossip at the general store","The newspaper prints a story","Your names are known in three territories","Everyone knows your faces: −2 to Stealth and Deception with strangers"]}],"seeds":{"mission":["Job",["Escort a payroll through bandit country","Bring in a man with a price on his head","Find a stagecoach that never arrived","Settle a range war before it starts","Protect a town from the gang that's coming","Recover stolen cattle","Find a missing child","Guard a witness until the trial","Track down a train robber","Solve a murder no one wants solved","Clear an innocent man of a hanging charge","Deliver medicine through a blizzard"]],"place":["Place",["A silver boomtown","A logging camp in the deep woods","A river steamboat","The railroad's end-of-track camp","A lonely homestead","A ghost town","A mission church","A saloon and gambling hall","A frontier fort","A fog-bound waterfront","A canyon ranch","A snowbound mountain pass"]],"strange":["The trouble",["A gang that's bought the sheriff","A cattle baron who wants the water","A railroad that wants the land","A feud two generations old","A fraud selling worthless land","A killer who signs his work","A mine that's poisoning the creek","A con man with a medicine show","A hired gun with a grudge","A bank that's about to fail","A war hero who isn't","A drought that's driving men desperate"]],"twist":["Twist",["The victim was the villain","The law is in on it","Two families are feuding","The client lied about everything","A rich man pays for silence","A character's complication comes into play","The outlaw is protecting his family","Someone is using the outlaw","The town wants a hanging, any hanging","The army arrives with its own orders","Another bounty hunter is after the same man","The trail leads to someone a character loves"]],"clock":["Ticking clock",[["The mob forms",6],["Nightfall",4],["The gang rides in",6],["The stage leaves town",4],["The witness is found",6],["The river floods",8],["The trail goes cold",4],["The hanging at dawn",4],["The newspaper prints the story",8],["The fire spreads",4],["The outlaw crosses the border",6],["The snows close the pass",8]]],"who":["Key character",["A sheriff who wants it simple","A widow who knows more than she says","A traveling doctor","A Pinkerton detective","A railroad baron","A frightened homesteader family","A gunfighter trying to retire","A child who saw it happen","A preacher with a past","A newspaperman who's close to the truth","A judge who can be bought","A dying outlaw with a last request"]]},"journal":{"mode":"calendar","start":[1878,3,2],"outcomes":["Done","Partly done","Failed","Ongoing"]},"formPenalties":{},"restricted":null,"example":{"name":"Josephine Hale","rank":"Pinkerton operative","dept":"Detective","path":"rounded","speciesId":"city","role":"Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads.","reason":"Somebody has to stand up for the people who can't.","connection":"Owes the town doctor for keeping quiet about how her last client really died.","attrs":{"Body":9,"Agility":11,"Intellect":14,"Presence":11,"Will":11},"skills":{"Investigation":"S","Read People":"T","Law":"T","Tracking":"T","Survival":"T","Gambling":"T","Persuasion":"T","Deception":"T","Shooting":"T","Riding":"T","Medicine":"T"},"adv":{"id":"pinkerton"},"comp":{"id":"mystery","trigger":"A strange track or body no one can explain"},"edges":{"attr":1,"skill":1,"contact":1},"contact":"A clerk in the Pinkertons' regional office who'll pull a file, quietly","equipment":{"revolver":true,"horse":true,"lantern":true},"play":{"gun":{"type":"revolver","rounds":6,"spares":2}}},"pregens":[{"name":"Ruth Calloway","rank":"Deputy U.S. Marshal","dept":"Marshal","path":"rounded","speciesId":"frontier","species":"Frontier-born","role":"Wears the badge in three counties, and rides alone more often than she'd like.","reason":"I took an oath, and I keep my word.","connection":"Isaiah Booker brought in the man who killed her father, alive, when he could have collected either way.","attrs":{"Body":12,"Agility":13,"Intellect":9,"Presence":11,"Will":11},"skills":{"Shooting":"S","Riding":"T","Brawling":"T","Athletics":"T","Tracking":"T","Leadership":"T","Read People":"T","Survival":"T","Animal Handling":"T","Law":"T"},"adv":{"id":"quickdraw"},"sadv":{"id":""},"comp":{"id":"lawful","trigger":"The town wants a hanging without a trial"},"edges":{"attr":1,"adv2":1,"grit":1},"adv2":{"id":"badge-marshal"},"play":{"duty":3,"gun":{"type":"revolver","rounds":6,"spares":2}},"equipment":{"revolver":true,"rifle":true,"horse":true,"trailkit":true}},{"name":"Dr. Elias Webb","rank":"Town physician","dept":"Doctor","path":"rounded","speciesId":"city","species":"City-bred","role":"Left a Philadelphia practice for reasons he won't discuss, and patches up whoever comes through the door.","reason":"Nobody out here knows what I did back east.","connection":"Reverend Stone is the only one who knows why he left Philadelphia.","attrs":{"Body":9,"Agility":10,"Intellect":13,"Presence":12,"Will":11},"skills":{"Medicine":"S","Investigation":"T","Read People":"T","Law":"T","Persuasion":"T","Leadership":"T","Riding":"T","Survival":"T","Tinkering":"T","Gambling":"T"},"adv":{"id":"steady"},"sadv":{"id":""},"comp":{"id":"bottle","trigger":"Pain that won't quit"},"edges":{"adv2":1,"gear":1,"contact":1},"adv2":{"id":"surgeon"},"gear":{"item":"His surgeon's instruments","skill":"Medicine"},"contact":"The editor of the territorial newspaper, who owes him a life","equipment":{"doctorbag":true,"horse":true,"lantern":true}},{"name":"Tom Feeney","rank":"Horse breaker","dept":"Wrangler","path":"rounded","speciesId":"immigrant","species":"Immigrant","role":"Came from County Clare with nothing, and can ride anything with four legs.","reason":"Everything I do is for my family.","connection":"Plays cards with Lucinda Marsh every Saturday, and loses.","attrs":{"Body":12,"Agility":12,"Intellect":10,"Presence":10,"Will":11},"skills":{"Riding":"S","Animal Handling":"T","Athletics":"T","Brawling":"T","Shooting":"T","Survival":"T","Tracking":"T","Tinkering":"T","Melee":"T","Gambling":"T","Stealth":"T"},"adv":{"id":""},"sadv":{"id":"im-grit"},"comp":{"id":"temper","trigger":"Someone insults you or yours"},"edges":{"skill":1,"grit":1,"gear":1},"gear":{"item":"Bramble, a mustang who'll run all day","skill":"Riding"},"play":{"duty":3,"gun":{"type":"rifle","rounds":15,"spares":2}},"equipment":{"horse":true,"rifle":true,"knife":true,"trailkit":true}},{"name":"Lucinda Marsh","rank":"Professional gambler","dept":"Gambler","path":"hand","speciesId":"drifter","species":"Drifter","role":"Has dealt faro in every boomtown from Deadwood to Tombstone, and remembers every face.","reason":"There's money out here for anyone with nerve enough to take it.","connection":"Owes Ruth Calloway a favor for a warrant that went missing.","attrs":{"Body":10,"Agility":11,"Intellect":13,"Presence":12,"Will":10},"skills":{"Gambling":"S","Read People":"T","Deception":"T","Persuasion":"T","Shooting":"T","Stealth":"T","Investigation":"T","Riding":"T"},"adv":{"id":""},"sadv":{"id":"dr-read"},"comp":{"id":"debt","trigger":"A collector arrives"},"edges":{"attr":1,"adv2":1,"contact":1},"adv2":{"id":"sharp"},"contact":"Mae Lin, a faro dealer who hears everything said at her table","play":{"gun":{"type":"derringer","rounds":2,"spares":1}},"equipment":{"lantern":true}},{"name":"Isaiah Booker","rank":"Bounty hunter","dept":"Bounty Hunter","path":"rounded","speciesId":"veteran","species":"War Veteran","role":"Fought with the colored troops in the war, and has brought in more wanted men than any hunter in the territory.","reason":"Somebody has to stand up for the people who can't.","connection":"Taught Tom Feeney to shoot straight, and still reminds him of it.","attrs":{"Body":12,"Agility":13,"Intellect":11,"Presence":9,"Will":11},"skills":{"Shooting":"S","Tracking":"T","Riding":"T","Survival":"T","Athletics":"T","Brawling":"T","Stealth":"T","Read People":"T","Investigation":"T","Melee":"T","Law":"T"},"adv":{"id":""},"sadv":{"id":"ve-fire"},"comp":{"id":"code","trigger":"The easy shot is in someone's back"},"edges":{"attr":1,"skill":1,"gear":1},"gear":{"item":"A Sharps rifle with a telescopic sight","skill":"Shooting"},"play":{"gun":{"type":"rifle","rounds":15,"spares":2}},"equipment":{"rifle":true,"revolver":true,"horse":true,"trailkit":true,"glasses":true}},{"name":"Rev. Abigail Stone","rank":"Circuit preacher","dept":"Preacher","path":"rounded","speciesId":"oldmoney","species":"Old Money","role":"Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across her knees.","reason":"The Lord sent me here for a reason, and I believe this is it.","connection":"Keeps Dr. Webb's secret, and his whiskey hidden.","attrs":{"Body":9,"Agility":10,"Intellect":11,"Presence":14,"Will":12},"skills":{"Persuasion":"S","Leadership":"T","Read People":"T","Medicine":"T","Law":"T","Investigation":"T","Survival":"T","Riding":"T","Shooting":"T","Athletics":"T"},"adv":{"id":"preacher"},"sadv":{"id":""},"comp":{"id":"protects","trigger":"Townsfolk are caught in the crossfire"},"allegiance":"church","edges":{"attr":1,"adv2":1,"contact":1},"adv2":{"id":"courage"},"contact":"Bishop Harrow, who answers her letters and asks no questions","play":{"gun":{"type":"shotgun","rounds":2,"spares":2}},"equipment":{"shotgun":true,"horse":true,"lantern":true}}],"docxColors":["4A2A12","F1E6D2"],"quickRef":[["Damage","Fists, clubs, knives, arrows: 1 box. Guns, heavy blades: 2. Close-range shotgun or buffalo rifle: 3 and Dying."],["Guns","Derringer 2, revolver 6, shotgun 2, rifle 15. Fan the hammer 3 (−2), both barrels 2 (+2 close), covering fire 3. Reload: one action. Natural 18 jams."]]};/* PACK:END */
+  /* PACK:START */const PACK = {"id":"western","terms":{"title":"Iron Roads","eyebrow":"Legend Dynamics · Gothic Western","guideTitle":"Iron Roads Players' Guide","guideSubtitle":"A Gothic Western for the Legend Dynamics RPG system","point":"Grit","role":"Calling","roleLower":"calling","origin":"Origin","originLower":"origin","originPlural":"Origins","pathRounded":"Well-rounded","pathExpert":"Old hand","pathExpertPlural":"Old hands","reasonLabel":"Why you face the dark","reasonSheet":"Why I face the dark","gear":"Gear","gearLower":"gear","tabPlay":"Ride","readyText":"Ready to ride","stun":"Dazed","medkit":"doctor's bag","facility":"A doctor's surgery with instruments, chloroform and a clean table","restText":"two full days","mission":"Job","missionLower":"job","missionsChapter":"Running jobs","journal":"Trail journal","journalIntro":"Write it together at the end of a job. Advancements apply to the GM's copies; use each card's Save character file to send a player their update.","journalTitlePlaceholder":"e.g. The Harlan County range war","journalDateLabel":"Date","journalExtraLabel":"","journalExtraPlaceholder":"","weaponsTitle":"Gun and rounds","ammo":"rounds","ammoOne":"round","shot":"Shot","spent":"fired","sparesLabel":"Spare reloads","reload":"Reload (one action)","reloadDone":"Reloaded. That took your action.","restock":"Restock in town","restockDone":"Restocked in town: fully loaded.","emptyNote":"Empty: it won't fire until you reload.","otherWeapon":"Another weapon (no rounds)","tracksTitle":"Trouble","tracksIntro":"Shared by all the characters. A killing in the street, a monster seen by townsfolk, or magic worked in the open can mark a box. Lying low between jobs can clear one.","tracksReset":"Clear all Trouble","exampleName":"example detective","formToggle":"In monstrous form","formName":"monstrous form","formProfile":"Monstrous form","formCoreSummary":"Monstrous form: changing is a free action; strong emotion can force it (Will roll); its profile applies while changed; townsfolk who see it panic","restrictedToggle":"Horror campaign: show vampires as player characters (they must drink human blood; only if the whole table agreed)","restrictedTag":"horror","restrictedCheck":"for horror campaigns only: tick Horror campaign if your table agreed","chaseSkill":"Riding","rangedSkill":"Shooting","meleeSkill":"Melee","unarmedSkill":"Brawling","fontsHref":"https://fonts.googleapis.com/css2?family=Pirata+One&family=IM+Fell+English+SC&family=IM+Fell+DW+Pica+SC&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap","originPluralLower":"origins","rolePluralLower":"callings","journalLower":"trail journal","edgePoints":"3"},"theme":{"comment":"A gothic ledger by candlelight: slate panels, tarnished-silver rules, blood-red accents, ash falling.","glow":"185, 194, 189","line":"160, 172, 166","highlight":"220, 228, 224","wash1":"110, 14, 18, .26","wash2":"24, 54, 58, .3","optionBg":"#12161a","barBg":"12, 15, 18, .95","text2":"#cfd3cd","goodRgb":"143, 181, 154","badRgb":"201, 57, 59","placeholder":"rgba(142, 149, 143, .6)","badgeStops":"<stop offset=\"0\" stop-color=\"#eef1ef\"/><stop offset=\".35\" stop-color=\"#aab3ae\"/><stop offset=\".7\" stop-color=\"#6b7571\"/><stop offset=\"1\" stop-color=\"#363d3a\"/>","badgeEdge":"#23292a","css":"--space: #090b0d; --glass: rgba(18, 22, 26, .9); --glass-hi: rgba(28, 33, 38, .92); --well: rgba(6, 8, 10, .74); --fg: #e4e2da; --muted: #8e958f; --line: rgba(160, 172, 166, .22); --chrome: #b9c2bd; --chrome-dim: rgba(185, 194, 189, .55); --gold: #c5ccc8; --blue: #5f9e8f; --red: #b8383a; --good: #8fb59a; --bad: #c9393b; --warn: #c99a4e; --on-accent: #0b0d0f; --display: \"IM Fell English SC\", Georgia, serif; --title: \"Pirata One\", \"IM Fell English SC\", Georgia, serif; --body: \"EB Garamond\", Garamond, Georgia, serif; --mono: \"IM Fell DW Pica SC\", \"EB Garamond\", Georgia, serif; --numbers: \"EB Garamond\", Garamond, Georgia, serif; --radius: 6px;","particles":{"direction":"down","rgb":"190, 198, 194","density":16000,"alpha":0.55}},"groups":[{"id":"law","name":"The Law","color":"--gold","emblem":"M50.0 23.0 L57.0 37.9 L73.4 36.5 L64.0 50.0 L73.4 63.5 L57.0 62.1 L50.0 77.0 L43.0 62.1 L26.6 63.5 L36.0 50.0 L26.6 36.5 L43.0 37.9 Z","stroke":false},{"id":"learned","name":"The Learned","color":"--blue","emblem":"M22 35 Q35 29 48 35 L48 69 Q35 63 22 69 Z M52 35 Q65 29 78 35 L78 69 Q65 63 52 69 Z","stroke":false},{"id":"frontier","name":"The Frontier","color":"--red","emblem":"M60 22 A28 28 0 1 0 60 78 A22 22 0 1 1 60 22 Z","stroke":false}],"roles":[{"name":"Marshal","group":"law","text":"Marshal: carries what authority there is (take a Badge advantage), with Leadership and a steady gun."},{"name":"Deputy","group":"law","text":"Deputy: keeps order, guards prisoners, and backs up the marshal when it comes to shooting."},{"name":"Detective","group":"law","text":"Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads."},{"name":"Bounty Hunter","group":"law","text":"Bounty hunter: tracks wanted men across three territories and brings them in, upright or across a saddle."},{"name":"Doctor","group":"learned","text":"Doctor: digs out bullets, sets bones, and reads what a body says about how it died."},{"name":"Occultist","group":"learned","text":"Occultist: knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears."},{"name":"Lawyer","group":"learned","text":"Lawyer: knows the law better than the men who wear the badges, and isn't afraid to say so."},{"name":"Journalist","group":"learned","text":"Journalist: asks the questions no one wants asked, and prints the answers."},{"name":"Preacher","group":"learned","text":"Preacher: comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun."},{"name":"Gunslinger","group":"frontier","text":"Gunslinger: the fastest and steadiest gun in the room, and the one who decides when it's time to draw."},{"name":"Scout","group":"frontier","text":"Scout: finds the trail, reads the land, and keeps everyone alive out in it."},{"name":"Gambler","group":"frontier","text":"Gambler: reads people, bluffs, and hears everything the saloon hears."},{"name":"Wrangler","group":"frontier","text":"Wrangler: breaks horses, drives cattle, and can ride anything with four legs."},{"name":"Undertaker","group":"frontier","text":"Undertaker: buries the dead, and makes sure they stay buried."}],"skills":[["Leadership","Presence","Give orders, rally a crowd, keep people together"],["Persuasion","Presence","Convince, negotiate, calm a mob"],["Deception","Presence","Lie, bluff, disguise and misdirect"],["Animal Handling","Presence","Calm, train and handle horses, cattle and dogs"],["Read People","Intellect","Judge motives, spot a lie, read a face"],["Investigation","Intellect","Search a scene, examine clues, follow paper trails"],["Law","Intellect","Statutes, warrants, courts, claims and contracts"],["Occult","Intellect","Monsters, magic, rituals, curses and their weaknesses"],["Medicine","Intellect","Diagnose, treat and perform surgery"],["Tinkering","Intellect","Fix and modify guns, locks, machines and traps"],["Gambling","Intellect","Play cards and dice, figure odds, spot a cheat"],["Tracking","Intellect","Follow a trail and read signs of passage"],["Survival","Intellect","Find water, shelter and food; manage wilderness hazards"],["Riding","Agility","Ride, drive a wagon, handle horses in a chase"],["Shooting","Agility","Revolvers, rifles and shotguns"],["Melee","Agility","Knives, clubs, sabers and axes"],["Brawling","Agility","Punch, wrestle, grapple and restrain"],["Athletics","Body","Climb, swim, jump, run and exert yourself"],["Stealth","Agility","Move quietly, hide and pick a pocket"]],"physical":["Riding","Shooting","Melee","Brawling","Athletics","Stealth","Survival"],"edgePoints":3,"formCore":[["Changing","A free action, in or out, except when the moon or the hunger forces it."],["Losing control","Fury, terror or pain can force a change: when it matters, the GM calls for a Will roll."],["Monstrous form","While changed, your form's attribute bonuses apply to rolls on those attributes and their skills, even above the starting maximum; its traits and drawbacks apply too."],["Seen","A monstrous form seen by townsfolk marks a box of Whispers."]],"origins":[{"id":"frontier","name":"Frontier-born","tier":0,"adj":{"Body":1,"Intellect":-1},"desc":"Raised on a homestead or a ranch, a long way from schools and doctors. Tough, practical, and at home in hard country.","core":[],"form":null,"skills":["Riding","Survival","Shooting","Animal Handling"],"traits":[["fr-weather","Weather-Wise","+2 to Survival to read the sky and find shelter before a storm or blizzard hits.","Survival",true,"Plain-Spoken","You say what you think, in words townsfolk find rough. Accept the offense it gives at a bad moment."],["fr-horse","Horse Sense","+2 to Animal Handling to calm, gentle or keep control of a frightened horse.","Animal Handling",true,"Suspicious of Town Folk","You don't trust slick talkers and city ways. Accept the cost when your suspicion is wrong."]]},{"id":"city","name":"City-bred","tier":0,"adj":{"Intellect":1,"Body":-1},"desc":"Schooled back east or in a western city: you read, you write, you know how the world runs on money and paper. The frontier is still learning you.","core":[],"form":null,"skills":["Law","Investigation","Persuasion","Read People"],"traits":[["ci-letters","Well Read","+2 to Intellect rolls to recall something from books, newspapers or schooling.","Intellect",true,"Tenderfoot","Hard country catches you out. Accept the blister, the lost trail or the laughter when it does."],["ci-connected","Connected","+2 to Persuasion with bankers, lawyers, officials and the well-to-do.","Persuasion",true,"Family Expectations","Your family expects you home, married, or respectable. Accept their letters, visits and pressure."]]},{"id":"veteran","name":"War Veteran","tier":0,"adj":{"Will":1,"Presence":-1},"desc":"You fought in the war, blue or gray, and came west with what was left of you. You know how to take orders, give them, and keep your head under fire.","core":[],"form":null,"skills":["Shooting","Leadership","Medicine","Riding"],"traits":[["ve-fire","Steady Under Fire","+2 to Will against fear when bullets are flying.","Will",true,"Old War Wounds","The war left more than scars. Accept the nightmares, the shakes or the old wound acting up at a bad time."],["ve-drill","Drilled","+2 to Leadership when organizing armed people to fight or defend.","Leadership",true,"Old Loyalties","Men from the other side still hate you, and men from your side still call on you. Accept the grudge or the favor."]]},{"id":"drifter","name":"Drifter","tier":0,"adj":{"Agility":1,"Will":-1},"desc":"No home, no ties, no questions: you've drifted from town to town for years and learned to read a room on the way in.","core":[],"form":null,"skills":["Gambling","Read People","Stealth","Brawling"],"traits":[["dr-read","Seen It All","+2 to Read People when sizing up a stranger, a saloon or a town on first sight.","Read People",true,"No Roots","You never stay long. Accept leaving when you're needed, or the strain of staying put."],["dr-slip","Slippery","+2 to Stealth when slipping out of a building, a crowd or a town unnoticed.","Stealth",true,"A Past That Follows","Someone from one of those towns remembers you. Accept it when they turn up."]]},{"id":"immigrant","name":"Immigrant","tier":0,"adj":{"Will":1,"Presence":-1},"desc":"You crossed an ocean to get here, from Ireland, China, Germany, Italy, Mexico or anywhere else, and you've had to work twice as hard to be treated half as well.","core":[],"form":null,"skills":["Athletics","Tinkering","Persuasion","Survival"],"traits":[["im-tongue","Two Tongues","+2 to Persuasion with people of your homeland, and you speak its language fluently.","Persuasion",true,"Prejudice","Some people will never accept you. Accept the slight, the closed door or the threat."],["im-grit","Hard Worker","+2 to Body to keep going through long, exhausting labor.","Body",true,"Family Abroad","People back home depend on the money you send. Accept the pressure when it runs short."]]},{"id":"oldmoney","name":"Old Money","tier":0,"adj":{"Presence":1,"Body":-1},"desc":"Your family has money, land or a name that opens doors. Out here it buys less than it used to, but it still buys plenty.","core":[],"form":null,"skills":["Persuasion","Leadership","Law","Gambling"],"traits":[["om-purse","Deep Pockets","+2 to Persuasion when money changes hands: bribes, deals and favors bought.","Persuasion",true,"Spoiled","You're used to getting your way. Accept the cost when you don't and won't let it go."],["om-name","A Name That Opens Doors","+2 to Leadership or Persuasion with people who know your family's name.","Leadership",true,"Family Enemies","Your family made enemies getting rich. Accept it when they come for you."]]},{"id":"railroad","name":"Railroad Hand","tier":0,"adj":{"Body":1,"Presence":-1},"desc":"You laid track, drove spikes, fired the engines or blew the tunnels. You know machines, explosives, and how the railroad treats its men.","core":[],"form":null,"skills":["Tinkering","Athletics","Brawling","Survival"],"traits":[["rr-powder","Powder Man","+2 to Tinkering when setting, timing or defusing dynamite.","Tinkering",true,"Union Man","You stand with working men against the bosses. Accept the trouble when the company comes down on you."],["rr-iron","Iron Grip","+2 to Athletics for feats of raw strength: lifting, bending, holding.","Athletics",true,"Blasting Deaf","Years of dynamite took some of your hearing. Accept it when you miss something said quietly."]]},{"id":"sighted","name":"Sighted","tier":1,"adj":{"Will":1,"Presence":-1},"desc":"Born with the second sight. You see ghosts, the true faces of monsters wearing human ones, and magic at work. Most people think you strange; monsters think you dangerous.","core":["The Sight: when a ghost, a disguised monster or working magic is near, you see it for what it is. Monsters who notice your stare may know what you are."],"form":null,"skills":["Occult","Read People","Investigation","Shooting"],"traits":[["si-eye","Monster's Eye","+2 to Occult to identify a creature and its weakness from what you've seen or what it left behind.","Occult",true,"Haunted","The dead you've seen follow you. Accept the sleepless night or the ghost at a bad moment."],["si-ghost","Ghost Talker","Ability: speak with a ghost that will listen. Roll Will; the dead know only what they knew, and want something in return.","Will",false,"The Dead Know You","Spirits seek you out. Accept the haunting and its demands."]]},{"id":"werewolf","name":"Werewolf","tier":2,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Will":-1},"desc":"Cursed with the wolf. By day you pass for anyone; under the full moon, or in fury, the beast takes you.","core":["Full moon: at moonrise you change, whether you want to or not. A Will roll at −2 delays it a few minutes.","Silver: silver weapons mark one extra box on you and ignore Tough.","The curse: your bite can pass it on, if the GM says so."],"form":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws and fangs mark 2 boxes","Tough: hits of 2+ boxes mark one fewer, except silver","Keen senses: track by scent","Dark sight"],"drawbacks":["Horses bolt; townsfolk panic"]},"skills":["Brawling","Tracking","Survival","Athletics"],"traits":[["ww-nose","Wolf's Nose","+2 to Tracking by scent, in either form.","Tracking",true,"The Hunger","When blood is spilled or something runs, the wolf wants it. Roll Will or change and give chase; accept the cost."],["ww-pack","Pack Hunter","+2 to Brawling or Melee against a target an ally attacked this round.","Brawling",true,"Moon-Bound","The full moon always comes at the worst time. Accept the changed plans, or the danger to your friends."]]},{"id":"dhampir","name":"Dhampir","tier":2,"adj":{"Agility":1,"Presence":1,"Body":-1,"Will":-1},"desc":"Child of a vampire and a living mother. You walk in daylight, you heal fast, and the undead fear you, and want you.","core":["Undead sense: you feel a vampire or other undead within a short distance, with no details.","Fast healing: rest clears a box every day.","Garlic and holy ground make you queasy: −2 to Will rolls there."],"form":null,"skills":["Melee","Stealth","Occult","Athletics"],"traits":[["dh-hunter","Bane of the Undead","+2 to Melee and Shooting against vampires and other undead.","Melee",true,"The Thirst","The blood calls to you. When it's spilled near you, roll Will or feel the hunger take hold; accept the cost."],["dh-grace","Unnatural Grace","+2 to Athletics to leap, climb or land safely from a fall.","Athletics",true,"A Father's Shadow","Your vampire parent wants you back. Accept it when their servants find you."]]},{"id":"revenant","name":"Revenant","tier":2,"adj":{"Body":1,"Will":1,"Presence":-2},"desc":"You died, and came back for unfinished business. Your heart doesn't beat, your skin is cold, and you won't rest until it's done.","core":["Dead flesh: you don't breathe, eat or sleep, and poison and disease don't affect you. Medicine treats you at −2.","Hard to kill: Dying lasts until the end of the next scene, not this one.","Laid to rest: when your business is done, you are too. Agree with the GM what it is."],"form":null,"skills":["Shooting","Tracking","Brawling","Survival"],"traits":[["re-numb","Unfeeling","Ability: ignore the Wounded penalty (−1).","",false,"Unfinished Business","Your purpose comes first. When it calls, accept the danger or the abandoned plan."],["re-cold","Grave Cold","+2 to Will against fear.","Will",true,"The Smell of the Grave","The living sense what you are. Accept the recoil, the dog that won't stop barking, the closed door."]]},{"id":"practitioner","name":"Practitioner","tier":2,"adj":{"Intellect":1,"Will":1,"Body":-1,"Presence":-1},"desc":"A human who works real magic in a tradition: alchemy, witchcraft, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.","core":["Rituals: describe the effect; the GM sets its weight (minor 2, significant 4, major 6 segments); fill that clock with Occult rolls at your tradition's pace.","Charms: carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).","Magic draws attention: working it openly can mark The Dark."],"form":null,"skills":["Occult","Read People","Medicine","Investigation"],"traits":[["pr-alch","Alchemist","Brews elixirs, poisons and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing; elixirs keep until the end of the day (a week on success by 5+).","Occult",true,"Price of the Work","Your craft feeds a vice: greed, drink or worse. Accept it when it bites."],["pr-herm","Hermeticist","Ritual magic from grimoires, circles and sigils: wards, bindings, divination. An hour per roll, and it needs books. +2 to Occult for wards and bindings.","Occult",true,"Obsession: Forbidden Knowledge","A grimoire or a secret tempts you beyond sense. Accept the risk to get it."],["pr-witch","Witch","Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link.","Occult",true,"Witch's Name","People whisper, and the righteous listen. Accept the suspicion, or the mob."],["pr-folk","Cunning Folk","Charms, cards, tokens and folk remedies: small, quick magic. +2 to Occult for charms and fortune-telling.","Occult",true,"Old Superstitions","Your charms demand their rituals. Accept the delay or the odd behavior they require."],["pr-medium","Spiritualist","Séances and trances that speak with the dead. +2 to Occult to call or question a spirit.","Occult",true,"The Dead Follow You","Restless spirits find you. Accept the haunting at a bad moment."],["pr-necro","Necromancer","Commands the dead: wake a corpse to answer questions, or to fight for a scene (a minor zombie). +2 to Occult over corpses and the undead.","Occult",true,"Grave-Robber","Your work needs bodies, and people notice. Accept the Heat, the Whispers or the grieving family."],["pr-sorc","Sorcerer","Quick casting along one or two paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm.","Occult",false,"Bound Purpose","Your power follows one narrow calling. Accept the cost of serving it."]]},{"id":"vampire","name":"Vampire","tier":3,"adj":{"Presence":2,"Agility":1,"Body":-1,"Will":-2},"desc":"Undead, ageless and beautiful, with a thirst that never ends. You walk at night and remember centuries. Horror campaigns only.","core":["Undead: you don't breathe or age; Medicine can't heal you. Drinking blood can: Will against the victim's Body, and on a success you clear a box and they mark one.","Thirst (horror): each night you must drink human blood, or mark a box that only drinking clears.","Sunlight: 1 box each round in direct sun.","Weaknesses: a wooden stake through the heart incapacitates you; fire and beheading kill; holy symbols give −2 to your actions against their bearer; you can't cross a home's threshold uninvited."],"form":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Fangs and claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer, except fire and wooden stakes","Dark sight"],"drawbacks":["Your feral face terrifies everyone who sees it"]},"skills":["Persuasion","Deception","Stealth","Read People"],"traits":[["va-mesmer","Mesmerize","Ability: meet someone's eyes and roll Presence against their Will; on a success they obey one simple command.","Presence",false,"Old Enemies","Centuries make enemies. Accept it when one turns up."],["va-mist","Mist and Shadow","Ability: once per scene at night, become mist and escape through any gap.","",false,"Pride of the Old Blood","You won't be slighted by the living. Accept the feud you start."]],"restricted":true},{"id":"pactbound","name":"Pact-Bound","tier":3,"adj":{"Will":2,"Presence":1,"Body":-2,"Agility":-1},"desc":"You made a bargain with something from below. It gave you power, and it will collect.","core":["Infernal power: once per scene, work a minor magical effect with a single Occult roll, no clock. Larger works need rituals.","Hellfire: roll Occult as an attack; a hit marks 2 boxes and sets things alight.","Marked: holy ground, holy water and consecrated silver burn you (1 box)."],"form":null,"skills":["Occult","Persuasion","Deception","Read People"],"traits":[["pb-bargain","Infernal Bargain","+2 to Persuasion when making a deal or a promise.","Persuasion",true,"The Debt Comes Due","Your patron wants something. Accept the errand, or the price of refusing."],["pb-whisper","Whispers from Below","Ability: once per session, ask your patron one question and get a true, unhelpful answer.","",false,"Possessive Patron","Your patron won't share you. Accept it when it interferes with your friends, your faith or your heart."]]}],"allegiances":[["railroad","The Railroad","Once per job, a free ticket, a telegraph message on the company wire, or a word with a division boss.","Duty: the company expects you to protect its interests, even when they aren't right."],["baron","A Cattle Baron","Once per job, money, horses or hired hands.","Duty: the baron's range wars become your fights."],["army","The Army","Once per job, help from a fort: supplies, an escort or a doctor.","Duty: orders from a commanding officer, and old soldiers' quarrels."],["church","The Church","Once per job, shelter, records or a favor from the clergy.","Duty: the Church gives you orders, and its enemies are yours."],["gang","An Outlaw Gang","Once per job, a hideout, a fence or a gun at your side.","Duty: the gang calls in favors, and the law knows your face."],["order","The Order of the Iron Cross","Once per job, silver, holy water, a hunter's help or the Order's bestiary.","Duty: the Order sends you after monsters, and some of its hunters would count you among them."],["coven","A coven","Once per job, a ritual, a remedy or a safe house among witches.","Duty and Vow: the coven's secrets and its quarrels."]],"reasons":[["Justice","Somebody has to stand up for the people who can't."],["Vengeance","Someone did me wrong, and I mean to settle it."],["Fortune","There's money out here for anyone with nerve enough to take it."],["A fresh start","Nobody out here knows what I did back east."],["Duty","I took an oath, and I keep my word."],["Freedom","No boss, no fences, no one to answer to."],["Family","Everything I do is for my family."],["Faith","The Lord sent me here for a reason, and I believe this is it."],["Redemption","I did harm once. I mean to balance the ledger."],["Nowhere else to go","These people took me in when no one else would."]],"connections":[["Rode together in the war","We served in the same company and still watch each other's backs."],["They saved my life","They cut me down from a lynch mob's rope, and I owe them my life."],["I saved theirs","I pulled them out of a burning barn, and they haven't forgotten it."],["Mentor","They taught me to shoot, ride and survive out here."],["Friendly rivals","We're always competing over the same bounty, the same card game or the same sweetheart."],["Same hometown","We grew up in the same town and know each other's families."],["An unpaid debt","I owe them money, or a favor, and I haven't paid it yet."],["A shared secret","We share a secret from a job neither of us talks about."],["Saloon regulars","We meet every Saturday night for cards, whiskey and lies."],["Bad blood","They blame me for something that went wrong on a past job."]],"advantages":[["steady","Steady Hands","+2 to Medicine for surgery or digging out a bullet. It does not improve diagnosis.","Medicine"],["surgeon","Battlefield Surgeon","+2 to Medicine for emergency stabilization of a wounded patient.","Medicine"],["observer","Astute Observer","+2 to Intellect rolls to notice a concealed physical clue during a deliberate search.","Intellect"],["quickdraw","Quick Draw","+2 to Shooting on your first shot of a fight, with a holstered revolver.","Shooting"],["marksman","Careful Marksman","+2 to Shooting after spending your preceding action aiming at the same visible target.","Shooting"],["saddle","Born in the Saddle","+2 to Riding in a chase or on dangerous ground.","Riding"],["bloodhound","Bloodhound","+2 to Tracking when the trail is more than a day old.","Tracking"],["sharp","Card Sharp","+2 to Gambling at cards, including spotting someone else's cheating.","Gambling"],["poker","Poker Face","+2 to Deception to hide what you know or feel under questioning.","Deception"],["gunsmith","Gunsmith","+2 to Tinkering when repairing or modifying a firearm.","Tinkering"],["coolhead","Cool Head","+2 to Leadership when coordinating others in a sudden emergency.","Leadership"],["courage","Unshakable Courage","+2 to Will against overwhelming fear.","Will"],["ironwill","Iron Will","+2 to Will to resist intimidation, threats or torture.","Will"],["knife","Knife Fighter","+2 to Melee with a knife in close quarters.","Melee"],["preacher","Hellfire Preacher","+2 to Persuasion when calming or rousing a crowd.","Persuasion"],["bargain","Hard Bargainer","+2 to Persuasion when buying, selling or settling a deal.","Persuasion"],["badge-local","Badge: Town Police or Deputy","Legal authority in one town or county: you can carry arms where others can't, question witnesses, make arrests and hold suspects. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. Outside your jurisdiction it's just tin.","Leadership"],["badge-sheriff","Badge: Sheriff","Authority across your county: everything a deputy can do, plus serving warrants, running the jail, and swearing in deputies and armed citizens. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.","Leadership"],["badge-marshal","Badge: Deputy U.S. Marshal","Federal authority across states and territories: serving federal warrants, pursuing fugitives across county and state lines, swearing in deputies, and calling on local lawmen for help. +2 to Leadership or Persuasion when invoking that authority with people who respect the law.","Leadership"],["pinkerton","Pinkerton Credentials","A commission from the Pinkerton National Detective Agency: carry arms on the job, work a client's case across county and state lines, and draw on the agency's offices and files (records, photographs and descriptions of wanted men). +2 to Investigation when using the agency's records or contacts. You have no powers of arrest beyond any citizen's unless local law deputizes you, and you answer to the client and the agency.","Investigation"],["monster","Monster Hunter","+2 to Occult to identify a creature from what it left behind: tracks, wounds, a body.","Occult"],["faith","Unshaken Faith","+2 to Will against magic, possession and the undead's influence.","Will"]],"complications":[["mystery","Cannot Leave a Mystery Alone","A strange discovery tempts you to linger, spend something scarce, or take a risky look. Accept a specific cost."],["protects","Protects Others at Personal Risk","You shield someone or volunteer for a hazardous rescue at a real cost to yourself."],["code","Code of the West","You won't shoot an unarmed man, break your word, or strike from behind. Accept the setback your code causes."],["lawful","Law and Order","You insist on arrest, trial and due process. Accept the delay or danger it costs."],["reputation","Reputation to Uphold","Pride tempts you to refuse help or take on too much. Take a real consequence when it matters."],["war","Haunted by the War","A specific reminder of the war causes hesitation or a hard choice. Define the reminder together."],["secret","Keeps a Dangerous Secret","An agreed secret threatens trust or safety. Earn a point when protecting or revealing it has a real consequence."],["rival","Old Rival","A recurring rival complicates your work with concrete problems."],["home","Someone Back Home","A family or a sweetheart pulls you away from the work."],["vengeance","Sworn Vengeance","You've sworn to kill someone. Accept the risk when the chance comes."],["temper","Short Fuse","You answer insults with fists or guns. Accept the fight you start."],["bottle","The Bottle","Whiskey or laudanum has a hold on you. Accept the lost night or the slip at a bad time."],["game","Can't Walk Away from a Game","A card game, a bet or a dare is irresistible. Accept the time or money lost."],["wanted","Wanted","There's a price on your head somewhere. Accept trouble when lawmen or bounty hunters come."],["debt","Owes the Wrong People","A debt to dangerous people comes due. Accept their demand."],["nonlethal","Reluctant to Kill","You seek a way that doesn't end a life. Accept the extra danger."],["cursed","Cursed","Something cursed you, and the curse has a will of its own. Agree what it does; accept it when it strikes."],["ghost","Haunted by a Ghost","A spirit follows you, and wants something. Accept the haunting and the trouble it brings."],["dark","Marked by the Dark","Things that live in the dark know your scent. Accept it when they find you first."]],"triggers":{"mystery":["A strange track or body no one can explain","Everyone's ready to move on, and something is still wrong","An old letter hints at a buried story"],"protects":["A friend is pinned down or hurt","Townsfolk are caught in the crossfire","Someone volunteers for a deadly job in your place"],"code":["The enemy is unarmed or has turned to run","A promise you made becomes dangerous to keep","The easy shot is in someone's back"],"lawful":["A suspect could be shot instead of arrested","The town wants a hanging without a trial","Your friends plan to take the law into their own hands"],"reputation":["Someone questions your nerve in front of others","A job is beyond what you're ready for","Getting help means admitting a mistake"],"war":["Gunfire in the dark","Meeting a man who fought on the other side","A field hospital, cannon, or a burning farm"],"secret":["Someone starts asking the wrong questions","Evidence that could expose you turns up","Keeping the secret means lying to a friend"],"rival":["Your rival is after the same quarry","Your rival takes credit for your work","Your rival needs your help"],"home":["A letter from home arrives","The job leads near your family","Someone you love is in danger"],"vengeance":["Word of the one you swore to kill","A face from that day turns up","The chance comes at the worst possible moment"],"temper":["Someone insults you or yours","You're called a coward","A bully picks on someone weaker"],"bottle":["A long night with nothing to do but wait","Pain that won't quit","A hard loss"],"game":["A high-stakes game in town","Someone dares you","A sure thing that isn't"],"wanted":["A lawman from back east comes asking","Your face on a poster","A bounty hunter rides into town"],"debt":["A collector arrives","Your creditor wants a favor instead","The interest comes due"],"nonlethal":["The man who surrenders is a killer","The only fast solution would kill someone","Your friends vote to shoot first"],"cursed":["The curse's sign appears","Someone tries to lift it","The one who cursed you comes back"],"ghost":["A cold room and a familiar voice","The anniversary of the death","Someone the ghost hated comes near"],"dark":["Nightfall away from town","A howl that answers you","Something has been watching the house"]},"equipment":[["revolver","Revolver","Six shots; reloading takes an action. Hits mark 2 boxes."],["rifle","Rifle","A lever-action repeater with fifteen shots and long range. Hits mark 2 boxes."],["shotgun","Shotgun","Two barrels. Devastating close up (3 boxes and Dying), weak beyond a few paces (1 box)."],["knife","Knife","A tool and a weapon; hits mark 1 box."],["doctorbag","Doctor's bag","Instruments, laudanum, carbolic and bandages. Needed to stabilize a patient and give field treatment."],["tools","Tool roll","Gunsmith's and carpenter's tools. Needed for most Tinkering in the field."],["horse","Horse and tack","Carries you across the territory. Riding in a chase needs one."],["trailkit","Trail kit","Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones."],["lantern","Lantern and matches","Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible."],["glasses","Field glasses","See detail at a distance. Spotting something far off without them is very difficult (−4) or impossible."],["lawbooks","Law books and blank warrants","Needed to draw up papers, check a statute or argue a point of law away from a courthouse."],["dynamite","Dynamite","Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre."],["silver","Silver bullets","One reload of silver rounds. Silver marks an extra box on werewolves and similar creatures, and ignores their toughness."],["holywater","Holy water","Three flasks. Thrown or splashed, it burns undead and demons (1 box) and breaks minor hexes."],["stakes","Stakes and mallet","A wooden stake through a helpless vampire's heart incapacitates it."],["ritualkit","Ritual kit","Chalk, candles, herbs, bones and old books. Needed for rituals away from a prepared place."],["holysymbol","Holy symbol","Held up against undead and demons: −2 to their actions against you, if your faith is real."]],"weapons":{"skill":"Shooting","jamOn18":true,"defaultSpares":2,"items":{"derringer":["Derringer",2],"revolver":["Revolver",6],"shotgun":["Double-barrel shotgun",2],"rifle":["Lever-action rifle",15]},"equipLinked":["revolver","rifle","shotgun"],"modes":[["single","Single shot",1,null,0],["fan","Fan the hammer",3,["revolver"],-2],["both","Both barrels",2,["shotgun"],2],["cover","Covering fire",3,null,0]]},"tracks":[{"name":"Heat","boxes":4,"effects":["The law isn't looking","Questions at the sheriff's office","Wanted posters: −2 to Persuasion with lawmen","A posse is out","A warrant and a manhunt: start a Manhunt clock"]},{"name":"Whispers","boxes":4,"effects":["Nobody's talking","Talk of strange things in the saloon","The preacher names you from the pulpit: −2 to Persuasion with townsfolk","Folk bar their doors","A mob with torches: start a Mob clock"]},{"name":"The Dark","boxes":4,"effects":["Nothing has noticed you","Dogs howl at your door","Signs and warnings: a marked door, a dead bird","Something follows you at night","It comes: start a clock"]}],"seeds":{"mission":["Job",["A body found drained of blood","A stagecoach that never arrived","Livestock torn apart in the night","A child gone missing","A miner raving about the dead walking","A bounty on a man who died last year","Travelers vanishing on the trail","A traveling medicine show","A new preacher packs the church","A town where no one sleeps","A hanging that went wrong","A monster asks for help"]],"place":["Place",["A silver boomtown","A logging camp in the deep woods","A river steamboat","The railroad's end-of-track camp","A lonely homestead","A ghost town","A burned mission church","A saloon and gambling hall","A frontier fort","A fog-bound waterfront","A canyon cemetery","A snowbound mountain pass"]],"strange":["The darkness",["A werewolf that has acquired the taste","A vampire who owns the town","The dead rising from a flooded graveyard","A witch's curse on a family","A ghost that wants justice","Ghouls in the mine","A demon summoned by a desperate man","A necromancer raising an army","A revenant gunslinger","A hellhound on someone's trail","A cult in the church cellar","A sorcerer's working gone wrong"]],"twist":["Twist",["The victim was the monster","The law is in on it","Two monsters are at war","The client lied about everything","A rich man pays for silence","A character's complication comes into play","The monster is protecting its family","Someone is using the monster","The town wants a hanging, any hanging","The Order of the Iron Cross arrives to burn everything","Another hunter is after the same prey","The trail leads to someone a character loves"]],"clock":["Ticking clock",[["The mob forms",6],["Nightfall",4],["The full moon rises",4],["The next victim",6],["The dead finish rising",6],["The river floods",8],["The trail goes cold",4],["The hanging at dawn",4],["The ritual completes",6],["The fire spreads",4],["The curse takes hold",8],["The snows close the pass",8]]],"who":["Key character",["A sheriff who wants it simple","A widow who knows more than she says","A traveling doctor","A Pinkerton detective","A railroad baron","A frightened homesteader family","A werewolf trying to stay human","A child who saw it happen","A preacher with a past","A newspaperman who's close to the truth","A witch who needs protection","A dying hunter with a last request"]]},"journal":{"mode":"calendar","start":[1878,3,2],"outcomes":["Done","Partly done","Failed","Ongoing"]},"formPenalties":{"Riding":-2},"restricted":null,"example":{"name":"Josephine Hale","rank":"Pinkerton operative","dept":"Detective","path":"rounded","speciesId":"city","role":"Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads.","reason":"Somebody has to stand up for the people who can't.","connection":"Owes the town doctor for keeping quiet about how her last client really died.","attrs":{"Body":9,"Agility":11,"Intellect":14,"Presence":11,"Will":11},"skills":{"Investigation":"S","Read People":"T","Law":"T","Tracking":"T","Survival":"T","Gambling":"T","Persuasion":"T","Deception":"T","Shooting":"T","Riding":"T","Medicine":"T"},"adv":{"id":"pinkerton"},"comp":{"id":"mystery","trigger":"A strange track or body no one can explain"},"edges":{"attr":1,"skill":1,"contact":1},"contact":"A clerk in the Pinkertons' regional office who'll pull a file, quietly","equipment":{"revolver":true,"horse":true,"lantern":true},"play":{"gun":{"type":"revolver","rounds":6,"spares":2}}},"pregens":[{"name":"Ruth Calloway","rank":"Deputy U.S. Marshal","dept":"Marshal","path":"rounded","speciesId":"sighted","species":"Sighted","role":"Wears the badge in three counties, and sees what's under the faces of the men she arrests.","reason":"I took an oath, and I keep my word.","connection":"Isaiah Booker brought in the man who killed her father, alive, when he could have collected either way.","attrs":{"Body":12,"Agility":13,"Intellect":10,"Presence":9,"Will":11},"skills":{"Shooting":"S","Riding":"T","Brawling":"T","Athletics":"T","Tracking":"T","Occult":"T","Read People":"T","Survival":"T","Leadership":"T","Law":"T"},"adv":{"id":""},"sadv":{"id":"si-eye"},"comp":{"id":"lawful","trigger":"The town wants a hanging without a trial"},"edges":{"adv2":1,"grit":1},"adv2":{"id":"badge-marshal"},"play":{"duty":3,"gun":{"type":"revolver","rounds":6,"spares":2}},"equipment":{"revolver":true,"rifle":true,"horse":true,"trailkit":true}},{"name":"Dr. Elias Webb","rank":"Town physician","dept":"Doctor","path":"rounded","speciesId":"city","species":"City-bred","role":"Left a Philadelphia practice for reasons he won't discuss, and patches up whoever comes through the door.","reason":"Nobody out here knows what I did back east.","connection":"Reverend Stone is the only one who knows why he left Philadelphia.","attrs":{"Body":9,"Agility":10,"Intellect":13,"Presence":12,"Will":11},"skills":{"Medicine":"S","Investigation":"T","Read People":"T","Law":"T","Persuasion":"T","Leadership":"T","Riding":"T","Survival":"T","Tinkering":"T","Gambling":"T"},"adv":{"id":"steady"},"sadv":{"id":""},"comp":{"id":"bottle","trigger":"Pain that won't quit"},"edges":{"adv2":1,"gear":1,"contact":1},"adv2":{"id":"surgeon"},"gear":{"item":"His surgeon's instruments","skill":"Medicine"},"contact":"The editor of the territorial newspaper, who owes him a life","equipment":{"doctorbag":true,"horse":true,"lantern":true}},{"name":"Tom Feeney","rank":"Horse breaker","dept":"Wrangler","path":"rounded","speciesId":"werewolf","species":"Werewolf","role":"Came from County Clare with nothing but a curse, and chains himself in the root cellar every full moon.","reason":"Everything I do is for my family.","connection":"Plays cards with Lucinda Marsh every Saturday, and loses.","attrs":{"Body":13,"Agility":13,"Intellect":9,"Presence":11,"Will":9},"skills":{"Riding":"S","Animal Handling":"T","Athletics":"T","Brawling":"T","Shooting":"T","Survival":"T","Tracking":"T","Tinkering":"T","Melee":"T","Gambling":"T","Stealth":"T"},"adv":{"id":""},"sadv":{"id":"ww-nose"},"comp":{"id":"temper","trigger":"Someone insults you or yours"},"edges":{"skill":1},"gear":{"item":"","skill":""},"play":{"gun":{"type":"rifle","rounds":15,"spares":2}},"equipment":{"horse":true,"rifle":true,"knife":true,"trailkit":true}},{"name":"Lucinda Marsh","rank":"Professional gambler","dept":"Gambler","path":"hand","speciesId":"practitioner","species":"Practitioner","role":"Deals faro by night and reads the cards for anyone who'll pay, and the cards are never wrong.","reason":"There's money out here for anyone with nerve enough to take it.","connection":"Owes Ruth Calloway a favor for a warrant that went missing.","attrs":{"Body":9,"Agility":10,"Intellect":13,"Presence":12,"Will":11},"skills":{"Gambling":"S","Read People":"T","Deception":"T","Persuasion":"T","Occult":"T","Stealth":"T","Investigation":"T","Riding":"T"},"adv":{"id":""},"sadv":{"id":"pr-folk"},"comp":{"id":"debt","trigger":"A collector arrives"},"edges":{"contact":1},"adv2":{"id":""},"contact":"Mae Lin, a faro dealer who hears everything said at her table","play":{"gun":{"type":"derringer","rounds":2,"spares":1}},"equipment":{"lantern":true}},{"name":"Isaiah Booker","rank":"Bounty hunter","dept":"Bounty Hunter","path":"rounded","speciesId":"revenant","species":"Revenant","role":"Shot in the back in '69 by the gang he was hunting. He got up again, and he's still hunting them.","reason":"Someone did me wrong, and I mean to settle it.","connection":"Taught Tom Feeney to shoot straight, and still reminds him of it.","attrs":{"Body":12,"Agility":13,"Intellect":11,"Presence":8,"Will":11},"skills":{"Shooting":"S","Tracking":"T","Riding":"T","Survival":"T","Athletics":"T","Brawling":"T","Stealth":"T","Read People":"T","Investigation":"T","Melee":"T"},"adv":{"id":""},"sadv":{"id":"re-numb"},"comp":{"id":"code","trigger":"The easy shot is in someone's back"},"edges":{"gear":1},"gear":{"item":"A Sharps rifle with a telescopic sight","skill":"Shooting"},"play":{"gun":{"type":"rifle","rounds":15,"spares":2}},"equipment":{"rifle":true,"revolver":true,"horse":true,"trailkit":true,"glasses":true}},{"name":"Rev. Abigail Stone","rank":"Circuit preacher","dept":"Preacher","path":"rounded","speciesId":"oldmoney","species":"Old Money","role":"Gave up a Boston fortune for a circuit of mining camps, and preaches with a shotgun across her knees.","reason":"The Lord sent me here for a reason, and I believe this is it.","connection":"Keeps Dr. Webb's secret, and his whiskey hidden.","attrs":{"Body":9,"Agility":10,"Intellect":11,"Presence":14,"Will":12},"skills":{"Persuasion":"S","Leadership":"T","Read People":"T","Medicine":"T","Law":"T","Investigation":"T","Survival":"T","Riding":"T","Shooting":"T","Athletics":"T"},"adv":{"id":"preacher"},"sadv":{"id":""},"comp":{"id":"protects","trigger":"Townsfolk are caught in the crossfire"},"allegiance":"church","edges":{"attr":1,"adv2":1,"contact":1},"adv2":{"id":"courage"},"contact":"Bishop Harrow, who answers her letters and asks no questions","play":{"gun":{"type":"shotgun","rounds":2,"spares":2}},"equipment":{"shotgun":true,"horse":true,"lantern":true}}],"docxColors":["2A2F33","E6E8E6"],"quickRef":[["Damage","Fists, clubs, knives, arrows: 1 box. Guns, heavy blades, claws: 2. Close-range shotgun or buffalo rifle: 3 and Dying."],["Guns","Derringer 2, revolver 6, shotgun 2, rifle 15. Fan the hammer 3 (−2), both barrels 2 (+2 close), covering fire 3. Reload: one action. Natural 18 jams."],["Monsters","Silver: werewolves. Stake, fire, sunlight, beheading: vampires. Headshot or fire: zombies. Holy water: undead and demons."],["Rituals","Describe the effect; fill a 2-, 4- or 6-segment clock with Occult rolls at your tradition's pace. Charms: Trained 2, Specialty 3, Expert 4."]]};/* PACK:END */
   const T = PACK.terms;
   const ATTRS = [
     ["Body", "Strength, endurance, resisting injury"],

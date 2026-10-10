@@ -1,9 +1,9 @@
 ---
 title: "Iron Roads Players' Guide"
-subtitle: "A Western setting for the Legend Dynamics RPG system"
+subtitle: "A Gothic Western for the Legend Dynamics RPG system"
 ---
 
-The railroad is coming, and everything is changing. Boomtowns rise around silver strikes and burn down by winter. Cattle barons fence the open range, homesteaders fight them for the water, and the law is a tin star and whoever will stand behind it. *Iron Roads* is a Western setting for the Legend Dynamics RPG system: lawmen and outlaws, doctors and gamblers, drifters and preachers, in the years when the frontier was closing.
+The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. *Iron Roads* is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.
 
 Iron Roads is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.
 
@@ -15,7 +15,7 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Iron Roads** setting: its callings, backgrounds, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Iron Roads** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**.
 
 # Create your character
 
@@ -32,6 +32,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 | Detective | The Law | investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads. |
 | Bounty Hunter | The Law | tracks wanted men across three territories and brings them in, upright or across a saddle. |
 | Doctor | The Learned | digs out bullets, sets bones, and reads what a body says about how it died. |
+| Occultist | The Learned | knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears. |
 | Lawyer | The Learned | knows the law better than the men who wear the badges, and isn't afraid to say so. |
 | Journalist | The Learned | asks the questions no one wants asked, and prints the answers. |
 | Preacher | The Learned | comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun. |
@@ -39,6 +40,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 | Scout | The Frontier | finds the trail, reads the land, and keeps everyone alive out in it. |
 | Gambler | The Frontier | reads people, bluffs, and hears everything the saloon hears. |
 | Wrangler | The Frontier | breaks horses, drives cattle, and can ride anything with four legs. |
+| Undertaker | The Frontier | buries the dead, and makes sure they stay buried. |
 
 ### Well-rounded or Old hand
 
@@ -47,7 +49,7 @@ Choose how your character trained (see Step 3):
 - **Well-rounded:** one Specialty at +3 and nine Trained skills.
 - **Old hand:** one Expert skill at +5 and seven Trained skills: a lifetime spent at one thing.
 
-## Step 2: Choose your background, spend Edges, assign attributes
+## Step 2: Choose your origin, spend Edges, assign attributes
 
 ### Attributes
 
@@ -59,13 +61,13 @@ Choose how your character trained (see Step 3):
 | Presence | Leadership, persuasion, social influence |
 | Will | Resolve, concentration, resisting fear and influence |
 
-### Background and tier
+### Origin and tier
 
-Choose your background from the **Backgrounds** chapter. Every attribute starts at 10, and your background adjusts some of them; the result is your **base**. Adjustments always total zero.
+Choose your origin from the **Origins** chapter. Every attribute starts at 10, and your origin adjusts some of them; the result is your **base**. Adjustments always total zero.
 
-Backgrounds can differ in power, so each has a **tier** from 0 to 3. Every character has **3 points** to split between background power and **Edges**: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.
+Origins can differ in power, so each has a **tier** from 0 to 3. Every character has **3 points** to split between origin power and **Edges**: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.
 
-| Background | Tier | Edges | Adjustments |
+| Origin | Tier | Edges | Adjustments |
 |---|---|---|---|
 | City-bred | 0 | 3 | Body −1, Intellect +1 |
 | Drifter | 0 | 3 | Agility +1, Will −1 |
@@ -74,6 +76,13 @@ Backgrounds can differ in power, so each has a **tier** from 0 to 3. Every chara
 | Old Money | 0 | 3 | Body −1, Presence +1 |
 | Railroad Hand | 0 | 3 | Body +1, Presence −1 |
 | War Veteran | 0 | 3 | Presence −1, Will +1 |
+| Sighted | 1 | 2 | Presence −1, Will +1 |
+| Dhampir | 2 | 1 | Body −1, Agility +1, Presence +1, Will −1 |
+| Practitioner | 2 | 1 | Body −1, Intellect +1, Presence −1, Will +1 |
+| Revenant | 2 | 1 | Body +1, Presence −2, Will +1 |
+| Werewolf | 2 | 1 | Body +1, Agility +1, Intellect −1, Will −1 |
+| Pact-Bound | 3 | 0 | Body −2, Agility −1, Presence +1, Will +2 |
+| Vampire (horror) | 3 | 0 | Body −1, Agility +1, Presence +2, Will −2 |
 
 ### Edges
 
@@ -90,14 +99,14 @@ Spend all your Edges. Each one buys:
 
 ### Spending points
 
-After applying your background, distribute **five additional points** among the attributes, plus one for each attribute Edge.
+After applying your origin, distribute **five additional points** among the attributes, plus one for each attribute Edge.
 
-- The starting maximum is **13**, plus any background bonus to that attribute.
+- The starting maximum is **13**, plus any origin bonus to that attribute.
 - You cannot lower an attribute below its base to gain points.
 
-### Custom background
+### Custom origin
 
-Agree on a background with the GM, give it adjustments from −2 to +2 per attribute that total zero, and agree its tier. The normal starting maximum and base rules apply.
+Agree on an origin with the GM, give it adjustments from −2 to +2 per attribute that total zero, and agree its tier. The normal starting maximum and base rules apply.
 
 ## Step 3: Choose trained skills
 
@@ -105,7 +114,7 @@ Agree on a background with the GM, give it adjustments from −2 to +2 per attri
 
 The Expert's extra bonus matters most when the work is hard. With an attribute of 13, an Expert has a target of 18, which only natural 17–18 can fail; under a −4 "very difficult" penalty the target is still 14. If Athletics is the Expert skill, Dodge adds +2, the same as a Specialty.
 
-Some backgrounds give one skill Trained for free; it doesn't use one of your Trained picks.
+Some origins give one skill Trained for free; it doesn't use one of your Trained picks.
 
 **Broadening.** An Old hand can broaden later (the GM's call, usually after a significant job): the Expert skill becomes a Specialty at +3, and two more skills become Trained.
 
@@ -126,8 +135,8 @@ Choose your name, title if any, and a short reason for what you do. Then choose 
 9. **Redemption.** I did harm once. I mean to balance the ledger.
 10. **Nowhere else to go.** These people took me in when no one else would.
 
-- **Advantage.** Choose either a general advantage or one of your background's advantages. A background advantage replaces the general advantage and always brings its companion complication.
-- **Complication.** Choose one complication. You keep it even if you take a background advantage, so a character with a background advantage has two complications.
+- **Advantage.** Choose either a general advantage or one of your origin's advantages. An origin advantage replaces the general advantage and always brings its companion complication.
+- **Complication.** Choose one complication. You keep it even if you take an origin advantage, so a character with an origin advantage has two complications.
 - **Allegiance (optional).** Choose an allegiance below, or none.
 
 An advantage gives +2 to one narrowly defined kind of task when the GM agrees it applies. It cannot improve every use of a broad skill. A complication creates choices and problems; it is not a permanent penalty.
@@ -143,6 +152,8 @@ Anyone can owe allegiance to one of the setting's powers. It's a benefit paired 
 | The Army | Once per job, help from a fort: supplies, an escort or a doctor. | Duty: orders from a commanding officer, and old soldiers' quarrels. |
 | The Church | Once per job, shelter, records or a favor from the clergy. | Duty: the Church gives you orders, and its enemies are yours. |
 | An Outlaw Gang | Once per job, a hideout, a fence or a gun at your side. | Duty: the gang calls in favors, and the law knows your face. |
+| The Order of the Iron Cross | Once per job, silver, holy water, a hunter's help or the Order's bestiary. | Duty: the Order sends you after monsters, and some of its hunters would count you among them. |
+| A coven | Once per job, a ritual, a remedy or a safe house among witches. | Duty and Vow: the coven's secrets and its quarrels. |
 
 ## Step 5: Prepare
 
@@ -184,6 +195,7 @@ Choose the skill that matches your method. The GM chooses one primary skill for 
 | Read People | Intellect | Judge motives, spot a lie, read a face |
 | Investigation | Intellect | Search a scene, examine clues, follow paper trails |
 | Law | Intellect | Statutes, warrants, courts, claims and contracts |
+| Occult | Intellect | Monsters, magic, rituals, curses and their weaknesses |
 | Medicine | Intellect | Diagnose, treat and perform surgery |
 | Tinkering | Intellect | Fix and modify guns, locks, machines and traps |
 | Gambling | Intellect | Play cards and dice, figure odds, spot a cheat |
@@ -218,6 +230,11 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Field glasses | See detail at a distance. Spotting something far off without them is very difficult (−4) or impossible. |
 | Law books and blank warrants | Needed to draw up papers, check a statute or argue a point of law away from a courthouse. |
 | Dynamite | Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre. |
+| Silver bullets | One reload of silver rounds. Silver marks an extra box on werewolves and similar creatures, and ignores their toughness. |
+| Holy water | Three flasks. Thrown or splashed, it burns undead and demons (1 box) and breaks minor hexes. |
+| Stakes and mallet | A wooden stake through a helpless vampire's heart incapacitates it. |
+| Ritual kit | Chalk, candles, herbs, bones and old books. Needed for rituals away from a prepared place. |
+| Holy symbol | Held up against undead and demons: −2 to their actions against you, if your faith is real. |
 
 # Actions and teamwork
 
@@ -312,6 +329,7 @@ How many boxes a hit marks depends on the **weapon**, not on how well the attack
 | Club, bottle, pistol-whip | 1 | A concussion or a broken finger |
 | Knife, hatchet, arrow | 1 | A cut or stab wound that bleeds |
 | Axe, saber or bowie knife used to kill | 2 | A deep wound or a broken bone |
+| Claws and fangs of a monster | 2 | Torn flesh |
 | Derringer, revolver or rifle | 2 | A gunshot wound |
 | Shotgun, within a few paces | 3, and Dying | A ruinous wound |
 | Shotgun, farther away | 1 | Scattered pellets |
@@ -346,7 +364,7 @@ To take someone down without killing them, use fists, a club, a grapple, or a la
 
 # Medical care
 
-Frontier medicine has chloroform, carbolic acid, laudanum and steady hands, and not much else. Infection kills more men than bullets do.
+Frontier medicine has chloroform, carbolic acid, laudanum and steady hands, and not much else. Infection kills more men than bullets do, and no doctor's bag holds a cure for a bite from something that should be dead. See *Bites and curses* below.
 
 ## Diagnosis and stabilization
 
@@ -380,13 +398,13 @@ Gain one point when one of your complications creates a meaningful problem you a
 
 ## Trouble
 
-The characters share three Trouble tracks. They fill as their deeds catch up with them; the GM narrates what each box means. A killing in the street, a robbery gone wrong, or a success at a cost can mark a box. Lying low between jobs, a good alibi (Deception) or doing the town a public good can clear one per job.
+The characters share three Trouble tracks. **Heat** is the law and the powerful taking notice; **Whispers** is the town talking about what it saw; **The Dark** is the things in the night learning your names. They fill as your deeds catch up with you; the GM narrates what each box means. A killing in the street, a monster seen in the open, a ritual worked carelessly, or a success at a cost can mark a box. Lying low between jobs, a good alibi (Deception) or doing the town a public good can clear one per job.
 
 | Track | Boxes | As boxes fill |
 |---|---|---|
 | Heat | 4 | 1: Questions at the sheriff's office; 2: Wanted posters: −2 to Persuasion with lawmen; 3: A posse is out; 4: A warrant and a manhunt: start a Manhunt clock |
-| Feud | 4 | 1: Hard words in the saloon; 2: Enemies are gathering; 3: They're in town; 4: They strike: start a clock |
-| Talk | 4 | 1: Gossip at the general store; 2: The newspaper prints a story; 3: Your names are known in three territories; 4: Everyone knows your faces: −2 to Stealth and Deception with strangers |
+| Whispers | 4 | 1: Talk of strange things in the saloon; 2: The preacher names you from the pulpit: −2 to Persuasion with townsfolk; 3: Folk bar their doors; 4: A mob with torches: start a Mob clock |
+| The Dark | 4 | 1: Dogs howl at your door; 2: Signs and warnings: a marked door, a dead bird; 3: Something follows you at night; 4: It comes: start a clock |
 
 ## Advancement
 
@@ -398,35 +416,35 @@ After a significant job, the GM may authorize one relevant skill to advance from
 
 Roll 1d12 on each table, or pick what you like. The GM view in the creator rolls these for you and can start the clock.
 
-| d12 | Job | Place | The trouble |
+| d12 | Job | Place | The darkness |
 |---|---|---|---|
-| 1 | Escort a payroll through bandit country | A silver boomtown | A gang that's bought the sheriff |
-| 2 | Bring in a man with a price on his head | A logging camp in the deep woods | A cattle baron who wants the water |
-| 3 | Find a stagecoach that never arrived | A river steamboat | A railroad that wants the land |
-| 4 | Settle a range war before it starts | The railroad's end-of-track camp | A feud two generations old |
-| 5 | Protect a town from the gang that's coming | A lonely homestead | A fraud selling worthless land |
-| 6 | Recover stolen cattle | A ghost town | A killer who signs his work |
-| 7 | Find a missing child | A mission church | A mine that's poisoning the creek |
-| 8 | Guard a witness until the trial | A saloon and gambling hall | A con man with a medicine show |
-| 9 | Track down a train robber | A frontier fort | A hired gun with a grudge |
-| 10 | Solve a murder no one wants solved | A fog-bound waterfront | A bank that's about to fail |
-| 11 | Clear an innocent man of a hanging charge | A canyon ranch | A war hero who isn't |
-| 12 | Deliver medicine through a blizzard | A snowbound mountain pass | A drought that's driving men desperate |
+| 1 | A body found drained of blood | A silver boomtown | A werewolf that has acquired the taste |
+| 2 | A stagecoach that never arrived | A logging camp in the deep woods | A vampire who owns the town |
+| 3 | Livestock torn apart in the night | A river steamboat | The dead rising from a flooded graveyard |
+| 4 | A child gone missing | The railroad's end-of-track camp | A witch's curse on a family |
+| 5 | A miner raving about the dead walking | A lonely homestead | A ghost that wants justice |
+| 6 | A bounty on a man who died last year | A ghost town | Ghouls in the mine |
+| 7 | Travelers vanishing on the trail | A burned mission church | A demon summoned by a desperate man |
+| 8 | A traveling medicine show | A saloon and gambling hall | A necromancer raising an army |
+| 9 | A new preacher packs the church | A frontier fort | A revenant gunslinger |
+| 10 | A town where no one sleeps | A fog-bound waterfront | A hellhound on someone's trail |
+| 11 | A hanging that went wrong | A canyon cemetery | A cult in the church cellar |
+| 12 | A monster asks for help | A snowbound mountain pass | A sorcerer's working gone wrong |
 
 | d12 | Twist | Ticking clock (segments) | Key character |
 |---|---|---|---|
-| 1 | The victim was the villain | The mob forms (6) | A sheriff who wants it simple |
+| 1 | The victim was the monster | The mob forms (6) | A sheriff who wants it simple |
 | 2 | The law is in on it | Nightfall (4) | A widow who knows more than she says |
-| 3 | Two families are feuding | The gang rides in (6) | A traveling doctor |
-| 4 | The client lied about everything | The stage leaves town (4) | A Pinkerton detective |
-| 5 | A rich man pays for silence | The witness is found (6) | A railroad baron |
+| 3 | Two monsters are at war | The full moon rises (4) | A traveling doctor |
+| 4 | The client lied about everything | The next victim (6) | A Pinkerton detective |
+| 5 | A rich man pays for silence | The dead finish rising (6) | A railroad baron |
 | 6 | A character's complication comes into play | The river floods (8) | A frightened homesteader family |
-| 7 | The outlaw is protecting his family | The trail goes cold (4) | A gunfighter trying to retire |
-| 8 | Someone is using the outlaw | The hanging at dawn (4) | A child who saw it happen |
-| 9 | The town wants a hanging, any hanging | The newspaper prints the story (8) | A preacher with a past |
-| 10 | The army arrives with its own orders | The fire spreads (4) | A newspaperman who's close to the truth |
-| 11 | Another bounty hunter is after the same man | The outlaw crosses the border (6) | A judge who can be bought |
-| 12 | The trail leads to someone a character loves | The snows close the pass (8) | A dying outlaw with a last request |
+| 7 | The monster is protecting its family | The trail goes cold (4) | A werewolf trying to stay human |
+| 8 | Someone is using the monster | The hanging at dawn (4) | A child who saw it happen |
+| 9 | The town wants a hanging, any hanging | The ritual completes (6) | A preacher with a past |
+| 10 | The Order of the Iron Cross arrives to burn everything | The fire spreads (4) | A newspaperman who's close to the truth |
+| 11 | Another hunter is after the same prey | The curse takes hold (8) | A witch who needs protection |
+| 12 | The trail leads to someone a character loves | The snows close the pass (8) | A dying hunter with a last request |
 
 ## The trail journal
 
@@ -438,35 +456,65 @@ End each job with a short entry, written together:
 4. **What changed?** New allies or enemies, damage, open threads for next time.
 5. **Advancement.** After a significant job, the GM may authorize one skill step for each character.
 
-# The frontier
+# Monsters and magic
 
-## Powers on the frontier
+## The Sight
 
-- **The railroad.** It brings towns, money and law, and it takes land, water and lives to do it. Its agents carry more weight than most judges.
-- **The cattle barons.** They own the range, or act as if they do. Their hired guns settle disputes the courts are too slow for.
-- **The law.** Town marshals, county sheriffs and deputy U.S. marshals, spread thin across enormous country. A badge is only as good as the person wearing it.
-- **The Pinkertons.** The detective agency hunts train robbers and strikers for whoever pays, and its files hold the faces of every wanted man.
-- **The army.** Forts guard the trails and the reservations. Its officers have their own orders, and their own politics.
-- **The outlaws.** Gangs, rustlers and road agents, some desperate, some vicious, some folk heroes in the towns they rob around.
+A few people are born **Sighted**. They see ghosts, the true faces of monsters wearing human ones, and magic at work. To everyone else the darkness is a rumor, until it isn't.
 
-## A note on history
+## Monstrous forms
 
-The real frontier was brutal to the people who already lived there, and to many who came. Iron Roads leaves room for those stories without making anyone a stereotype: Native nations, Chinese railroad workers, Black homesteaders and cowboys, and Mexican vaqueros are all part of the West, and any of them can be a player character. Agree with your table what tone you want.
+Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. Changing is a free action, but fury, terror or pain can force it (a Will roll), and a werewolf has no choice at moonrise under the full moon. While changed, the form's profile applies: the creator's **In monstrous form** box adds its bonuses to your rolls. Horses bolt (−2 to Riding), and a monstrous form seen by townsfolk marks a box of **Whispers**.
+
+## Magic
+
+**Practitioners** work rituals in a tradition. Describe the effect; the GM sets its weight and says what it can and can't do. Fill a clock of that size with **Occult** rolls at your tradition's pace (usually ten minutes a roll; an hour for a Hermeticist; one action for a Sorcerer). Success fills one segment, success by 5 or more two; a failure costs time or ticks a danger clock.
+
+| Weight | Segments | For example |
+|---|---|---|
+| Minor | 2 | A charm against a hex, a candle that shows the hidden, a sleep that lasts the night |
+| Significant | 4 | A curse that withers a crop, a ward on a house, a question asked of the dead |
+| Major | 6 | Binding a demon, raising the dead, lifting a werewolf's curse for a month |
+
+- **Trappings.** The right materials (grave dirt, silver, a lock of hair, the hour of midnight) remove one segment.
+- **Charms.** A finished ritual can be stored in an object and released by breaking it. Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4.
+- **Attention.** Magic worked openly can mark a box of **The Dark**, and the Order of the Iron Cross hunts known practitioners.
+
+## Weaknesses
+
+Every monster has a weakness, and finding it is often the whole job. **Occult** identifies a creature and its weakness; the Monster Hunter advantage and the Sighted's Monster's Eye help.
+
+| Creature | Weakness |
+|---|---|
+| Werewolf | Silver: an extra box, and its toughness doesn't help. Wolfsbane keeps it away. |
+| Vampire | A wooden stake through the heart incapacitates; fire, sunlight and beheading destroy. Holy symbols hold it back; it can't enter a home uninvited. |
+| Zombie | A shot to the head (−2 to hit) or fire puts it down for good; anything else just slows it. |
+| Ghost | Can't be hurt. Lay it to rest by finishing its business, or bind it with a ritual. |
+| Ghoul | Fire and daylight. It flees from holy ground. |
+| Demon | Holy water burns it; a ritual banishes it. It must keep a bargain to the letter. |
+
+## Bites and curses
+
+- **Zombie bite.** A bite that marks a box starts a 4-segment **Infection** clock, ticking each hour. A successful Medicine roll with an Occult remedy stops it; when it fills, you die, and rise.
+- **Werewolf bite.** A bite under the full moon can pass on the curse; the GM decides, and lifting it is a major ritual.
+- **Vampire bite.** A vampire who drains a victim to Dying can choose to turn them.
 
 # Threats
 
-Opponents use the same rules as the characters. **Minor opponents** (hired guns, a mob, a rustler's crew) have **one box**: any hit that gets through takes them out of the fight.
+Opponents use the same rules as the characters. **Minor opponents** (hired guns, a mob, shambling dead) have **one box**: any hit that gets through takes them out of the fight.
 
 | Threat | Attack (target) | Dodge | Boxes | Weapon | Trait |
 |---|---|---|---|---|---|
 | Hired gun (minor) | Shooting 11 | 7 | 1 | Revolver | **Numbers.** Two or three of them; they flee when half are down. |
 | Outlaw | Shooting 13, Brawling 11 | 9 | 3 | Revolver, rifle | **Quick draw.** +2 on the first shot of a fight. |
-| Gang leader | Shooting 13, Leadership 13 | 9 | 3 | Revolver | **Orders.** Once per round, gives one ally +1 on an attack. |
-| Gunfighter | Shooting 15 | 11 | 3 | Two revolvers | **Fast.** Acts first in the round, whatever the order. |
-| Range rider (hired muscle) | Brawling 13, Riding 13 | 9 | 3 | Rifle, rope | **Lasso.** A Riding hit drags the target down and loses them their next action. |
-| Card cheat | Deception 14, Shooting 10 | 8 | 2 | Derringer | **Sleight of hand.** Has a hidden derringer, and a friend in the room. |
-| Lynch mob (minor, many) | Brawling 10 | 6 | 1 each | Clubs, rope | **Crowd.** A Persuasion contest against the leader can turn them; failure makes them worse. |
-| Grizzly bear | Brawling 14 | 6 | 4 | Claws (2) | **Huge.** Its hits mark 2 boxes; it ignores the Wounded penalty. |
+| Zombie (minor, many) | Brawling 10 | 4 | 1 each | Bite (1) | **Horde.** Only a headshot (−2) or fire puts one down; other hits just knock it over. Its bite infects. |
+| Ghoul | Brawling 12, Stealth 13 | 8 | 3 | Claws (2) | **Corpse-eater.** Drags the fallen away; flees daylight and fire. |
+| Werewolf | Brawling 14, Tracking 14 | 10 | 4 | Claws and fangs (2) | **Relentless.** Ignores the Wounded penalty; only silver marks more than 1 box at a time. |
+| Vampire | Brawling 13, Persuasion 15 | 10 | 4 | Fangs (2) | **Mesmerize.** Once per scene, a Presence contest makes one victim obey a simple command. |
+| Ghost | Will 14 | — | — | Terror, cold | **Haunting.** Can't be hurt; once per scene, everyone present rolls Will or flees in terror. |
+| Witch | Occult 14, Deception 13 | 8 | 3 | Curses | **Hex.** Once per round, a target with a link to her rolls Will or marks a box. |
+| Hellhound | Brawling 14 | 10 | 3 | Burning jaws (2) | **Hunter.** Always finds its quarry; holy water drives it off. |
+| Revenant gunslinger | Shooting 15 | 11 | 4 | Two revolvers | **Undying.** Rises at the next midnight unless its grave is salted and burned. |
 
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
 
@@ -476,13 +524,13 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 ## Ruth Calloway
 
-*Deputy U.S. Marshal, Marshal. Frontier-born (tier 0).* Wears the badge in three counties, and rides alone more often than she'd like.
+*Deputy U.S. Marshal, Marshal. Sighted (tier 1).* Wears the badge in three counties, and sees what's under the faces of the men she arrests.
 
-- **Attributes:** Body 12, Agility 13, Intellect 9, Presence 11, Will 11. **Dodge** 12.
-- **Skills:** Shooting 16 (Specialty). Trained: Brawling 14, Riding 14, Athletics 13, Animal Handling 12, Leadership 12, Law 10, Read People 10, Survival 10, Tracking 10.
-- **Edges:** +1 attribute point, Second advantage, Extra Grit; second advantage: Badge: Deputy U.S. Marshal.
-- **Advantage:** Quick Draw. **Complication:** Law and Order; trigger: the town wants a hanging without a trial.
-- **Why I ride:** I took an oath, and I keep my word. **Connection:** Isaiah Booker brought in the man who killed her father, alive, when he could have collected either way.
+- **Attributes:** Body 12, Agility 13, Intellect 10, Presence 9, Will 11. **Dodge** 12.
+- **Skills:** Shooting 16 (Specialty). Trained: Brawling 14, Riding 14, Athletics 13, Law 11, Occult 11, Read People 11, Survival 11, Tracking 11, Leadership 10.
+- **Edges:** Second advantage, Extra Grit; second advantage: Badge: Deputy U.S. Marshal.
+- **Advantage:** Monster's Eye (origin; companion: Haunted). **Complication:** Law and Order; trigger: the town wants a hanging without a trial.
+- **Why I face the dark:** I took an oath, and I keep my word. **Connection:** Isaiah Booker brought in the man who killed her father, alive, when he could have collected either way.
 
 ## Dr. Elias Webb
 
@@ -492,37 +540,37 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 - **Skills:** Medicine 16 (Specialty). Trained: Gambling 14, Investigation 14, Law 14, Read People 14, Survival 14, Tinkering 14, Leadership 13, Persuasion 13, Riding 11.
 - **Edges:** Second advantage, A fine weapon or tool, A friend; second advantage: Battlefield Surgeon; a friend: the editor of the territorial newspaper, who owes him a life; a fine tool: his surgeon's instruments (+2 Medicine).
 - **Advantage:** Steady Hands. **Complication:** The Bottle; trigger: pain that won't quit.
-- **Why I ride:** Nobody out here knows what I did back east. **Connection:** Reverend Stone is the only one who knows why he left Philadelphia.
+- **Why I face the dark:** Nobody out here knows what I did back east. **Connection:** Reverend Stone is the only one who knows why he left Philadelphia.
 
 ## Tom Feeney
 
-*Horse breaker, Wrangler. Immigrant (tier 0).* Came from County Clare with nothing, and can ride anything with four legs.
+*Horse breaker, Wrangler. Werewolf (tier 2).* Came from County Clare with nothing but a curse, and chains himself in the root cellar every full moon.
 
-- **Attributes:** Body 12, Agility 12, Intellect 10, Presence 10, Will 11. **Dodge** 11.
-- **Skills:** Riding 15 (Specialty). Trained: Athletics 13, Brawling 13, Melee 13, Shooting 13, Stealth 13, Animal Handling 11, Gambling 11, Survival 11, Tinkering 11, Tracking 11.
-- **Edges:** Extra Trained skill, Extra Grit, A fine weapon or tool; a fine tool: Bramble, a mustang who'll run all day (+2 Riding).
-- **Advantage:** Hard Worker (background; companion: Family Abroad). **Complication:** Short Fuse; trigger: someone insults you or yours.
-- **Why I ride:** Everything I do is for my family. **Connection:** Plays cards with Lucinda Marsh every Saturday, and loses.
+- **Attributes:** Body 13, Agility 13, Intellect 9, Presence 11, Will 9. **Dodge** 12. **In monstrous form:** Body 15, Agility 14, Dodge 13.
+- **Skills:** Riding 16 (Specialty). Trained: Athletics 14, Brawling 14, Melee 14, Shooting 14, Stealth 14, Animal Handling 12, Gambling 10, Survival 10, Tinkering 10, Tracking 10.
+- **Edges:** Extra Trained skill.
+- **Advantage:** Wolf's Nose (origin; companion: The Hunger). **Complication:** Short Fuse; trigger: someone insults you or yours.
+- **Why I face the dark:** Everything I do is for my family. **Connection:** Plays cards with Lucinda Marsh every Saturday, and loses.
 
 ## Lucinda Marsh
 
-*Professional gambler, Gambler. Drifter (tier 0); Old hand.* Has dealt faro in every boomtown from Deadwood to Tombstone, and remembers every face.
+*Professional gambler, Gambler. Practitioner (tier 2); Old hand.* Deals faro by night and reads the cards for anyone who'll pay, and the cards are never wrong.
 
-- **Attributes:** Body 10, Agility 11, Intellect 13, Presence 12, Will 10. **Dodge** 9.
-- **Skills:** Gambling 18 (Expert). Trained: Investigation 14, Read People 14, Deception 13, Persuasion 13, Riding 12, Shooting 12, Stealth 12.
-- **Edges:** +1 attribute point, Second advantage, A friend; second advantage: Card Sharp; a friend: Mae Lin, a faro dealer who hears everything said at her table.
-- **Advantage:** Seen It All (background; companion: No Roots). **Complication:** Owes the Wrong People; trigger: a collector arrives.
-- **Why I ride:** There's money out here for anyone with nerve enough to take it. **Connection:** Owes Ruth Calloway a favor for a warrant that went missing.
+- **Attributes:** Body 9, Agility 10, Intellect 13, Presence 12, Will 11. **Dodge** 8.
+- **Skills:** Gambling 18 (Expert). Trained: Investigation 14, Occult 14, Read People 14, Deception 13, Persuasion 13, Riding 11, Stealth 11.
+- **Edges:** A friend; a friend: Mae Lin, a faro dealer who hears everything said at her table.
+- **Advantage:** Cunning Folk (origin; companion: Old Superstitions). **Complication:** Owes the Wrong People; trigger: a collector arrives.
+- **Why I face the dark:** There's money out here for anyone with nerve enough to take it. **Connection:** Owes Ruth Calloway a favor for a warrant that went missing.
 
 ## Isaiah Booker
 
-*Bounty hunter, Bounty Hunter. War Veteran (tier 0).* Fought with the colored troops in the war, and has brought in more wanted men than any hunter in the territory.
+*Bounty hunter, Bounty Hunter. Revenant (tier 2).* Shot in the back in '69 by the gang he was hunting. He got up again, and he's still hunting them.
 
-- **Attributes:** Body 12, Agility 13, Intellect 11, Presence 9, Will 11. **Dodge** 12.
-- **Skills:** Shooting 16 (Specialty). Trained: Brawling 14, Melee 14, Riding 14, Stealth 14, Athletics 13, Investigation 12, Law 12, Read People 12, Survival 12, Tracking 12.
-- **Edges:** +1 attribute point, Extra Trained skill, A fine weapon or tool; a fine tool: a Sharps rifle with a telescopic sight (+2 Shooting).
-- **Advantage:** Steady Under Fire (background; companion: Old War Wounds). **Complication:** Code of the West; trigger: the easy shot is in someone's back.
-- **Why I ride:** Somebody has to stand up for the people who can't. **Connection:** Taught Tom Feeney to shoot straight, and still reminds him of it.
+- **Attributes:** Body 12, Agility 13, Intellect 11, Presence 8, Will 11. **Dodge** 12.
+- **Skills:** Shooting 16 (Specialty). Trained: Brawling 14, Melee 14, Riding 14, Stealth 14, Athletics 13, Investigation 12, Read People 12, Survival 12, Tracking 12.
+- **Edges:** A fine weapon or tool; a fine tool: a Sharps rifle with a telescopic sight (+2 Shooting).
+- **Advantage:** Unfeeling (origin; companion: Unfinished Business). **Complication:** Code of the West; trigger: the easy shot is in someone's back.
+- **Why I face the dark:** Someone did me wrong, and I mean to settle it. **Connection:** Taught Tom Feeney to shoot straight, and still reminds him of it.
 
 ## Rev. Abigail Stone
 
@@ -532,11 +580,11 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 - **Skills:** Persuasion 17 (Specialty). Trained: Leadership 15, Investigation 12, Law 12, Medicine 12, Read People 12, Survival 12, Riding 11, Shooting 11, Athletics 10.
 - **Edges:** +1 attribute point, Second advantage, A friend; second advantage: Unshakable Courage; a friend: Bishop Harrow, who answers her letters and asks no questions.
 - **Advantage:** Hellfire Preacher. **Complication:** Protects Others at Personal Risk; trigger: townsfolk are caught in the crossfire.
-- **Why I ride:** The Lord sent me here for a reason, and I believe this is it. **Connection:** Keeps Dr. Webb's secret, and his whiskey hidden.
+- **Why I face the dark:** The Lord sent me here for a reason, and I believe this is it. **Connection:** Keeps Dr. Webb's secret, and his whiskey hidden.
 
 # Advantages
 
-Choose one advantage at character creation: a general advantage from this chapter, or a background advantage from the next. Each grants +2 only in the listed circumstances. An advantage does not grant training, authorize an impossible action, or replace essential gear. Use only one advantage bonus per roll.
+Choose one advantage at character creation: a general advantage from this chapter, or an origin advantage from the next. Each grants +2 only in the listed circumstances. An advantage does not grant training, authorize an impossible action, or replace essential gear. Use only one advantage bonus per roll.
 
 | Advantage | Effect |
 |---|---|
@@ -560,12 +608,14 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Badge: Sheriff | Authority across your county: everything a deputy can do, plus serving warrants, running the jail, and swearing in deputies and armed citizens. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. |
 | Badge: Deputy U.S. Marshal | Federal authority across states and territories: serving federal warrants, pursuing fugitives across county and state lines, swearing in deputies, and calling on local lawmen for help. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. |
 | Pinkerton Credentials | A commission from the Pinkerton National Detective Agency: carry arms on the job, work a client's case across county and state lines, and draw on the agency's offices and files (records, photographs and descriptions of wanted men). +2 to Investigation when using the agency's records or contacts. You have no powers of arrest beyond any citizen's unless local law deputizes you, and you answer to the client and the agency. |
+| Monster Hunter | +2 to Occult to identify a creature from what it left behind: tracks, wounds, a body. |
+| Unshaken Faith | +2 to Will against magic, possession and the undead's influence. |
 
 **Badges.** A badge is legal authority, not a magic word: outlaws and the powerful don't always care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency's reach and files, but no badge.
 
-# Backgrounds
+# Origins
 
-| Background | Tier | Edges | Adjustments |
+| Origin | Tier | Edges | Adjustments |
 |---|---|---|---|
 | City-bred | 0 | 3 | Body −1, Intellect +1 |
 | Drifter | 0 | 3 | Agility +1, Will −1 |
@@ -574,6 +624,22 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Old Money | 0 | 3 | Body −1, Presence +1 |
 | Railroad Hand | 0 | 3 | Body +1, Presence −1 |
 | War Veteran | 0 | 3 | Presence −1, Will +1 |
+| Sighted | 1 | 2 | Presence −1, Will +1 |
+| Dhampir | 2 | 1 | Body −1, Agility +1, Presence +1, Will −1 |
+| Practitioner | 2 | 1 | Body −1, Intellect +1, Presence −1, Will +1 |
+| Revenant | 2 | 1 | Body +1, Presence −2, Will +1 |
+| Werewolf | 2 | 1 | Body +1, Agility +1, Intellect −1, Will −1 |
+| Pact-Bound | 3 | 0 | Body −2, Agility −1, Presence +1, Will +2 |
+| Vampire (horror) | 3 | 0 | Body −1, Agility +1, Presence +2, Will −2 |
+
+## Shared rules
+
+| Rule | What it means |
+|---|---|
+| Changing | A free action, in or out, except when the moon or the hunger forces it. |
+| Losing control | Fury, terror or pain can force a change: when it matters, the GM calls for a Will roll. |
+| Monstrous form | While changed, your form's attribute bonuses apply to rolls on those attributes and their skills, even above the starting maximum; its traits and drawbacks apply too. |
+| Seen | A monstrous form seen by townsfolk marks a box of Whispers. |
 
 ## City-bred
 
@@ -666,6 +732,147 @@ You fought in the war, blue or gray, and came west with what was left of you. Yo
 | Steady Under Fire | +2 to Will against fear when bullets are flying. | **Old War Wounds.** The war left more than scars. Accept the nightmares, the shakes or the old wound acting up at a bad time. |
 | Drilled | +2 to Leadership when organizing armed people to fight or defend. | **Old Loyalties.** Men from the other side still hate you, and men from your side still call on you. Accept the grudge or the favor. |
 
+## Sighted
+
+*Tier 1 · 2 Edges · Presence −1, Will +1*
+
+Born with the second sight. You see ghosts, the true faces of monsters wearing human ones, and magic at work. Most people think you strange; monsters think you dangerous.
+
+**Origin rules:**
+
+- The Sight: when a ghost, a disguised monster or working magic is near, you see it for what it is. Monsters who notice your stare may know what you are.
+
+**Suggested skills:** Occult, Read People, Investigation, Shooting.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Monster's Eye | +2 to Occult to identify a creature and its weakness from what you've seen or what it left behind. | **Haunted.** The dead you've seen follow you. Accept the sleepless night or the ghost at a bad moment. |
+| Ghost Talker | Ability: speak with a ghost that will listen. Roll Will; the dead know only what they knew, and want something in return. | **The Dead Know You.** Spirits seek you out. Accept the haunting and its demands. |
+
+## Dhampir
+
+*Tier 2 · 1 Edge · Body −1, Agility +1, Presence +1, Will −1*
+
+Child of a vampire and a living mother. You walk in daylight, you heal fast, and the undead fear you, and want you.
+
+**Origin rules:**
+
+- Undead sense: you feel a vampire or other undead within a short distance, with no details.
+- Fast healing: rest clears a box every day.
+- Garlic and holy ground make you queasy: −2 to Will rolls there.
+
+**Suggested skills:** Melee, Stealth, Occult, Athletics.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Bane of the Undead | +2 to Melee and Shooting against vampires and other undead. | **The Thirst.** The blood calls to you. When it's spilled near you, roll Will or feel the hunger take hold; accept the cost. |
+| Unnatural Grace | +2 to Athletics to leap, climb or land safely from a fall. | **A Father's Shadow.** Your vampire parent wants you back. Accept it when their servants find you. |
+
+## Practitioner
+
+*Tier 2 · 1 Edge · Body −1, Intellect +1, Presence −1, Will +1*
+
+A human who works real magic in a tradition: alchemy, witchcraft, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.
+
+**Origin rules:**
+
+- Rituals: describe the effect; the GM sets its weight (minor 2, significant 4, major 6 segments); fill that clock with Occult rolls at your tradition's pace.
+- Charms: carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).
+- Magic draws attention: working it openly can mark The Dark.
+
+**Suggested skills:** Occult, Read People, Medicine, Investigation.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Alchemist | Brews elixirs, poisons and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing; elixirs keep until the end of the day (a week on success by 5+). | **Price of the Work.** Your craft feeds a vice: greed, drink or worse. Accept it when it bites. |
+| Hermeticist | Ritual magic from grimoires, circles and sigils: wards, bindings, divination. An hour per roll, and it needs books. +2 to Occult for wards and bindings. | **Obsession: Forbidden Knowledge.** A grimoire or a secret tempts you beyond sense. Accept the risk to get it. |
+| Witch | Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link. | **Witch's Name.** People whisper, and the righteous listen. Accept the suspicion, or the mob. |
+| Cunning Folk | Charms, cards, tokens and folk remedies: small, quick magic. +2 to Occult for charms and fortune-telling. | **Old Superstitions.** Your charms demand their rituals. Accept the delay or the odd behavior they require. |
+| Spiritualist | Séances and trances that speak with the dead. +2 to Occult to call or question a spirit. | **The Dead Follow You.** Restless spirits find you. Accept the haunting at a bad moment. |
+| Necromancer | Commands the dead: wake a corpse to answer questions, or to fight for a scene (a minor zombie). +2 to Occult over corpses and the undead. | **Grave-Robber.** Your work needs bodies, and people notice. Accept the Heat, the Whispers or the grieving family. |
+| Sorcerer | Quick casting along one or two paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it. |
+
+## Revenant
+
+*Tier 2 · 1 Edge · Body +1, Presence −2, Will +1*
+
+You died, and came back for unfinished business. Your heart doesn't beat, your skin is cold, and you won't rest until it's done.
+
+**Origin rules:**
+
+- Dead flesh: you don't breathe, eat or sleep, and poison and disease don't affect you. Medicine treats you at −2.
+- Hard to kill: Dying lasts until the end of the next scene, not this one.
+- Laid to rest: when your business is done, you are too. Agree with the GM what it is.
+
+**Suggested skills:** Shooting, Tracking, Brawling, Survival.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Unfeeling | Ability: ignore the Wounded penalty (−1). | **Unfinished Business.** Your purpose comes first. When it calls, accept the danger or the abandoned plan. |
+| Grave Cold | +2 to Will against fear. | **The Smell of the Grave.** The living sense what you are. Accept the recoil, the dog that won't stop barking, the closed door. |
+
+## Werewolf
+
+*Tier 2 · 1 Edge · Body +1, Agility +1, Intellect −1, Will −1*
+
+Cursed with the wolf. By day you pass for anyone; under the full moon, or in fury, the beast takes you.
+
+**Origin rules:**
+
+- Full moon: at moonrise you change, whether you want to or not. A Will roll at −2 delays it a few minutes.
+- Silver: silver weapons mark one extra box on you and ignore Tough.
+- The curse: your bite can pass it on, if the GM says so.
+
+**Monstrous form:** Body +2; Agility +1; Claws and fangs mark 2 boxes; Tough: hits of 2+ boxes mark one fewer, except silver; Keen senses: track by scent; Dark sight. **Drawbacks:** Horses bolt; townsfolk panic.
+
+**Suggested skills:** Brawling, Tracking, Survival, Athletics.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Wolf's Nose | +2 to Tracking by scent, in either form. | **The Hunger.** When blood is spilled or something runs, the wolf wants it. Roll Will or change and give chase; accept the cost. |
+| Pack Hunter | +2 to Brawling or Melee against a target an ally attacked this round. | **Moon-Bound.** The full moon always comes at the worst time. Accept the changed plans, or the danger to your friends. |
+
+## Pact-Bound
+
+*Tier 3 · 0 Edges · Body −2, Agility −1, Presence +1, Will +2*
+
+You made a bargain with something from below. It gave you power, and it will collect.
+
+**Origin rules:**
+
+- Infernal power: once per scene, work a minor magical effect with a single Occult roll, no clock. Larger works need rituals.
+- Hellfire: roll Occult as an attack; a hit marks 2 boxes and sets things alight.
+- Marked: holy ground, holy water and consecrated silver burn you (1 box).
+
+**Suggested skills:** Occult, Persuasion, Deception, Read People.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Infernal Bargain | +2 to Persuasion when making a deal or a promise. | **The Debt Comes Due.** Your patron wants something. Accept the errand, or the price of refusing. |
+| Whispers from Below | Ability: once per session, ask your patron one question and get a true, unhelpful answer. | **Possessive Patron.** Your patron won't share you. Accept it when it interferes with your friends, your faith or your heart. |
+
+## Vampire
+
+*Tier 3 · 0 Edges · Body −1, Agility +1, Presence +2, Will −2 · horror*
+
+Undead, ageless and beautiful, with a thirst that never ends. You walk at night and remember centuries. Horror campaigns only.
+
+**Origin rules:**
+
+- Undead: you don't breathe or age; Medicine can't heal you. Drinking blood can: Will against the victim's Body, and on a success you clear a box and they mark one.
+- Thirst (horror): each night you must drink human blood, or mark a box that only drinking clears.
+- Sunlight: 1 box each round in direct sun.
+- Weaknesses: a wooden stake through the heart incapacitates you; fire and beheading kill; holy symbols give −2 to your actions against their bearer; you can't cross a home's threshold uninvited.
+
+**Monstrous form:** Body +2; Agility +1; Fangs and claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer, except fire and wooden stakes; Dark sight. **Drawbacks:** Your feral face terrifies everyone who sees it.
+
+**Suggested skills:** Persuasion, Deception, Stealth, Read People.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Mesmerize | Ability: meet someone's eyes and roll Presence against their Will; on a success they obey one simple command. | **Old Enemies.** Centuries make enemies. Accept it when one turns up. |
+| Mist and Shadow | Ability: once per scene at night, become mist and escape through any gap. | **Pride of the Old Blood.** You won't be slighted by the living. Accept the feud you start. |
+
 # Complications
 
 Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Grit point if you accept it. Every complication needs a trigger agreed with the GM; the creator suggests three for each.
@@ -688,10 +895,13 @@ Choose one complication. These are sources of meaningful choices, not constant p
 | Wanted | There's a price on your head somewhere. Accept trouble when lawmen or bounty hunters come. |
 | Owes the Wrong People | A debt to dangerous people comes due. Accept their demand. |
 | Reluctant to Kill | You seek a way that doesn't end a life. Accept the extra danger. |
+| Cursed | Something cursed you, and the curse has a will of its own. Agree what it does; accept it when it strikes. |
+| Haunted by a Ghost | A spirit follows you, and wants something. Accept the haunting and the trouble it brings. |
+| Marked by the Dark | Things that live in the dark know your scent. Accept it when they find you first. |
 
 # Quick reference
 
-**Creation:** attributes start at 10, adjusted by background (always totaling zero), plus 5 points; maximum 13 plus any background bonus. 3 points split between background tier and Edges. Well-rounded: one Specialty and nine Trained. Old hand: one Expert at +5 and seven Trained. One advantage (general or background) and one complication; an optional Allegiance.
+**Creation:** attributes start at 10, adjusted by origin (always totaling zero), plus 5 points; maximum 13 plus any origin bonus. 3 points split between origin tier and Edges. Well-rounded: one Specialty and nine Trained. Old hand: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Old hand) = attribute +5.
 

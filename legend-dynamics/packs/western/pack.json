@@ -2,20 +2,20 @@
  "id": "western",
  "terms": {
   "title": "Iron Roads",
-  "eyebrow": "Legend Dynamics · Western",
+  "eyebrow": "Legend Dynamics · Gothic Western",
   "guideTitle": "Iron Roads Players' Guide",
-  "guideSubtitle": "A Western setting for the Legend Dynamics RPG system",
+  "guideSubtitle": "A Gothic Western for the Legend Dynamics RPG system",
   "point": "Grit",
   "role": "Calling",
   "roleLower": "calling",
-  "origin": "Background",
-  "originLower": "background",
-  "originPlural": "Backgrounds",
+  "origin": "Origin",
+  "originLower": "origin",
+  "originPlural": "Origins",
   "pathRounded": "Well-rounded",
   "pathExpert": "Old hand",
   "pathExpertPlural": "Old hands",
-  "reasonLabel": "Why you ride",
-  "reasonSheet": "Why I ride",
+  "reasonLabel": "Why you face the dark",
+  "reasonSheet": "Why I face the dark",
   "gear": "Gear",
   "gearLower": "gear",
   "tabPlay": "Ride",
@@ -44,32 +44,46 @@
   "emptyNote": "Empty: it won't fire until you reload.",
   "otherWeapon": "Another weapon (no rounds)",
   "tracksTitle": "Trouble",
-  "tracksIntro": "Shared by all the characters. A killing in the street, a robbery gone wrong, or a grudge left unsettled can mark a box. Lying low between jobs can clear one.",
+  "tracksIntro": "Shared by all the characters. A killing in the street, a monster seen by townsfolk, or magic worked in the open can mark a box. Lying low between jobs can clear one.",
   "tracksReset": "Clear all Trouble",
   "exampleName": "example detective",
-  "fontsHref": "https://fonts.googleapis.com/css2?family=Rye&family=IM+Fell+English+SC&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap",
+  "fontsHref": "https://fonts.googleapis.com/css2?family=Pirata+One&family=IM+Fell+English+SC&family=IM+Fell+DW+Pica+SC&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap",
   "rangedSkill": "Shooting",
   "meleeSkill": "Melee",
   "unarmedSkill": "Brawling",
   "chaseSkill": "Riding",
   "facility": "A doctor's surgery with instruments, chloroform and a clean table",
-  "restText": "two full days"
+  "restText": "two full days",
+  "originPluralLower": "origins",
+  "formToggle": "In monstrous form",
+  "formName": "monstrous form",
+  "formProfile": "Monstrous form",
+  "formCoreSummary": "Monstrous form: changing is a free action; strong emotion can force it (Will roll); its profile applies while changed; townsfolk who see it panic",
+  "restrictedToggle": "Horror campaign: show vampires as player characters (they must drink human blood; only if the whole table agreed)",
+  "restrictedTag": "horror",
+  "restrictedCheck": "for horror campaigns only: tick Horror campaign if your table agreed"
  },
  "theme": {
-  "comment": "A frontier ledger by lamplight: leather-and-ink panels, brass rules, embers rising.",
-  "css": "--space: #0d0906; --glass: rgba(36, 25, 16, .88); --glass-hi: rgba(52, 36, 22, .9); --well: rgba(14, 9, 5, .72); --fg: #f0e4cc; --muted: #a8977c; --line: rgba(201, 160, 99, .26); --chrome: #d9a65e; --chrome-dim: rgba(217, 166, 94, .6); --gold: #e3b04b; --blue: #6fb5a5; --red: #d0623f; --good: #96c86e; --bad: #e2543c; --warn: #eba63c; --on-accent: #120c07; --display: \"IM Fell English SC\", Georgia, serif; --title: \"Rye\", Georgia, serif; --body: \"Crimson Pro\", Georgia, serif; --mono: \"Special Elite\", \"Courier New\", monospace; --numbers: \"Crimson Pro\", Georgia, serif; --radius: 10px;",
-  "glow": "217, 166, 94",
-  "line": "201, 160, 99",
-  "highlight": "240, 210, 160",
-  "wash1": "150, 60, 20, .22",
-  "wash2": "90, 40, 15, .2",
-  "optionBg": "#1c140d",
-  "barBg": "28, 19, 12, .95",
-  "text2": "#dccdb2",
+  "comment": "A gothic ledger by candlelight: slate panels, tarnished-silver rules, blood-red accents, ash falling.",
+  "css": "--space: #090b0d; --glass: rgba(18, 22, 26, .9); --glass-hi: rgba(28, 33, 38, .92); --well: rgba(6, 8, 10, .74); --fg: #e4e2da; --muted: #8e958f; --line: rgba(160, 172, 166, .22); --chrome: #b9c2bd; --chrome-dim: rgba(185, 194, 189, .55); --gold: #c5ccc8; --blue: #5f9e8f; --red: #b8383a; --good: #8fb59a; --bad: #c9393b; --warn: #c99a4e; --on-accent: #0b0d0f; --display: \"IM Fell English SC\", Georgia, serif; --title: \"Pirata One\", \"IM Fell English SC\", Georgia, serif; --body: \"EB Garamond\", Garamond, Georgia, serif; --mono: \"IM Fell DW Pica SC\", \"EB Garamond\", Georgia, serif; --numbers: \"EB Garamond\", Garamond, Georgia, serif; --radius: 6px;",
+  "glow": "185, 194, 189",
+  "line": "160, 172, 166",
+  "highlight": "220, 228, 224",
+  "wash1": "110, 14, 18, .26",
+  "wash2": "24, 54, 58, .3",
+  "optionBg": "#12161a",
+  "barBg": "12, 15, 18, .95",
+  "text2": "#cfd3cd",
+  "goodRgb": "143, 181, 154",
+  "badRgb": "201, 57, 59",
+  "placeholder": "rgba(142, 149, 143, .6)",
+  "badgeStops": "<stop offset=\"0\" stop-color=\"#eef1ef\"/><stop offset=\".35\" stop-color=\"#aab3ae\"/><stop offset=\".7\" stop-color=\"#6b7571\"/><stop offset=\"1\" stop-color=\"#363d3a\"/>",
+  "badgeEdge": "#23292a",
   "particles": {
-   "direction": "up",
-   "rgb": "255, 160, 70",
-   "density": 16000
+   "direction": "down",
+   "rgb": "190, 198, 194",
+   "density": 16000,
+   "alpha": 0.55
   }
  },
  "groups": [
@@ -91,8 +105,8 @@
    "id": "frontier",
    "name": "The Frontier",
    "color": "--red",
-   "emblem": "M35 73 L35 50 A15 15 0 0 1 65 50 L65 73",
-   "stroke": true
+   "emblem": "M60 22 A28 28 0 1 0 60 78 A22 22 0 1 1 60 22 Z",
+   "stroke": false
   }
  ],
  "roles": [
@@ -120,6 +134,11 @@
    "name": "Doctor",
    "group": "learned",
    "text": "Doctor: digs out bullets, sets bones, and reads what a body says about how it died."
+  },
+  {
+   "name": "Occultist",
+   "group": "learned",
+   "text": "Occultist: knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears."
   },
   {
    "name": "Lawyer",
@@ -155,6 +174,11 @@
    "name": "Wrangler",
    "group": "frontier",
    "text": "Wrangler: breaks horses, drives cattle, and can ride anything with four legs."
+  },
+  {
+   "name": "Undertaker",
+   "group": "frontier",
+   "text": "Undertaker: buries the dead, and makes sure they stay buried."
   }
  ],
  "skills": [
@@ -192,6 +216,11 @@
    "Law",
    "Intellect",
    "Statutes, warrants, courts, claims and contracts"
+  ],
+  [
+   "Occult",
+   "Intellect",
+   "Monsters, magic, rituals, curses and their weaknesses"
   ],
   [
    "Medicine",
@@ -259,7 +288,24 @@
   "Survival"
  ],
  "edgePoints": 3,
- "formCore": [],
+ "formCore": [
+  [
+   "Changing",
+   "A free action, in or out, except when the moon or the hunger forces it."
+  ],
+  [
+   "Losing control",
+   "Fury, terror or pain can force a change: when it matters, the GM calls for a Will roll."
+  ],
+  [
+   "Monstrous form",
+   "While changed, your form's attribute bonuses apply to rolls on those attributes and their skills, even above the starting maximum; its traits and drawbacks apply too."
+  ],
+  [
+   "Seen",
+   "A monstrous form seen by townsfolk marks a box of Whispers."
+  ]
+ ],
  "origins": [
   {
    "id": "frontier",
@@ -526,6 +572,385 @@
      "Years of dynamite took some of your hearing. Accept it when you miss something said quietly."
     ]
    ]
+  },
+  {
+   "id": "sighted",
+   "name": "Sighted",
+   "tier": 1,
+   "adj": {
+    "Will": 1,
+    "Presence": -1
+   },
+   "desc": "Born with the second sight. You see ghosts, the true faces of monsters wearing human ones, and magic at work. Most people think you strange; monsters think you dangerous.",
+   "core": [
+    "The Sight: when a ghost, a disguised monster or working magic is near, you see it for what it is. Monsters who notice your stare may know what you are."
+   ],
+   "form": null,
+   "skills": [
+    "Occult",
+    "Read People",
+    "Investigation",
+    "Shooting"
+   ],
+   "traits": [
+    [
+     "si-eye",
+     "Monster's Eye",
+     "+2 to Occult to identify a creature and its weakness from what you've seen or what it left behind.",
+     "Occult",
+     true,
+     "Haunted",
+     "The dead you've seen follow you. Accept the sleepless night or the ghost at a bad moment."
+    ],
+    [
+     "si-ghost",
+     "Ghost Talker",
+     "Ability: speak with a ghost that will listen. Roll Will; the dead know only what they knew, and want something in return.",
+     "Will",
+     false,
+     "The Dead Know You",
+     "Spirits seek you out. Accept the haunting and its demands."
+    ]
+   ]
+  },
+  {
+   "id": "werewolf",
+   "name": "Werewolf",
+   "tier": 2,
+   "adj": {
+    "Body": 1,
+    "Agility": 1,
+    "Intellect": -1,
+    "Will": -1
+   },
+   "desc": "Cursed with the wolf. By day you pass for anyone; under the full moon, or in fury, the beast takes you.",
+   "core": [
+    "Full moon: at moonrise you change, whether you want to or not. A Will roll at −2 delays it a few minutes.",
+    "Silver: silver weapons mark one extra box on you and ignore Tough.",
+    "The curse: your bite can pass it on, if the GM says so."
+   ],
+   "form": {
+    "attrs": {
+     "Body": 2,
+     "Agility": 1
+    },
+    "dodge": 0,
+    "traits": [
+     "Claws and fangs mark 2 boxes",
+     "Tough: hits of 2+ boxes mark one fewer, except silver",
+     "Keen senses: track by scent",
+     "Dark sight"
+    ],
+    "drawbacks": [
+     "Horses bolt; townsfolk panic"
+    ]
+   },
+   "skills": [
+    "Brawling",
+    "Tracking",
+    "Survival",
+    "Athletics"
+   ],
+   "traits": [
+    [
+     "ww-nose",
+     "Wolf's Nose",
+     "+2 to Tracking by scent, in either form.",
+     "Tracking",
+     true,
+     "The Hunger",
+     "When blood is spilled or something runs, the wolf wants it. Roll Will or change and give chase; accept the cost."
+    ],
+    [
+     "ww-pack",
+     "Pack Hunter",
+     "+2 to Brawling or Melee against a target an ally attacked this round.",
+     "Brawling",
+     true,
+     "Moon-Bound",
+     "The full moon always comes at the worst time. Accept the changed plans, or the danger to your friends."
+    ]
+   ]
+  },
+  {
+   "id": "dhampir",
+   "name": "Dhampir",
+   "tier": 2,
+   "adj": {
+    "Agility": 1,
+    "Presence": 1,
+    "Body": -1,
+    "Will": -1
+   },
+   "desc": "Child of a vampire and a living mother. You walk in daylight, you heal fast, and the undead fear you, and want you.",
+   "core": [
+    "Undead sense: you feel a vampire or other undead within a short distance, with no details.",
+    "Fast healing: rest clears a box every day.",
+    "Garlic and holy ground make you queasy: −2 to Will rolls there."
+   ],
+   "form": null,
+   "skills": [
+    "Melee",
+    "Stealth",
+    "Occult",
+    "Athletics"
+   ],
+   "traits": [
+    [
+     "dh-hunter",
+     "Bane of the Undead",
+     "+2 to Melee and Shooting against vampires and other undead.",
+     "Melee",
+     true,
+     "The Thirst",
+     "The blood calls to you. When it's spilled near you, roll Will or feel the hunger take hold; accept the cost."
+    ],
+    [
+     "dh-grace",
+     "Unnatural Grace",
+     "+2 to Athletics to leap, climb or land safely from a fall.",
+     "Athletics",
+     true,
+     "A Father's Shadow",
+     "Your vampire parent wants you back. Accept it when their servants find you."
+    ]
+   ]
+  },
+  {
+   "id": "revenant",
+   "name": "Revenant",
+   "tier": 2,
+   "adj": {
+    "Body": 1,
+    "Will": 1,
+    "Presence": -2
+   },
+   "desc": "You died, and came back for unfinished business. Your heart doesn't beat, your skin is cold, and you won't rest until it's done.",
+   "core": [
+    "Dead flesh: you don't breathe, eat or sleep, and poison and disease don't affect you. Medicine treats you at −2.",
+    "Hard to kill: Dying lasts until the end of the next scene, not this one.",
+    "Laid to rest: when your business is done, you are too. Agree with the GM what it is."
+   ],
+   "form": null,
+   "skills": [
+    "Shooting",
+    "Tracking",
+    "Brawling",
+    "Survival"
+   ],
+   "traits": [
+    [
+     "re-numb",
+     "Unfeeling",
+     "Ability: ignore the Wounded penalty (−1).",
+     "",
+     false,
+     "Unfinished Business",
+     "Your purpose comes first. When it calls, accept the danger or the abandoned plan."
+    ],
+    [
+     "re-cold",
+     "Grave Cold",
+     "+2 to Will against fear.",
+     "Will",
+     true,
+     "The Smell of the Grave",
+     "The living sense what you are. Accept the recoil, the dog that won't stop barking, the closed door."
+    ]
+   ]
+  },
+  {
+   "id": "practitioner",
+   "name": "Practitioner",
+   "tier": 2,
+   "adj": {
+    "Intellect": 1,
+    "Will": 1,
+    "Body": -1,
+    "Presence": -1
+   },
+   "desc": "A human who works real magic in a tradition: alchemy, witchcraft, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.",
+   "core": [
+    "Rituals: describe the effect; the GM sets its weight (minor 2, significant 4, major 6 segments); fill that clock with Occult rolls at your tradition's pace.",
+    "Charms: carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).",
+    "Magic draws attention: working it openly can mark The Dark."
+   ],
+   "form": null,
+   "skills": [
+    "Occult",
+    "Read People",
+    "Medicine",
+    "Investigation"
+   ],
+   "traits": [
+    [
+     "pr-alch",
+     "Alchemist",
+     "Brews elixirs, poisons and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing; elixirs keep until the end of the day (a week on success by 5+).",
+     "Occult",
+     true,
+     "Price of the Work",
+     "Your craft feeds a vice: greed, drink or worse. Accept it when it bites."
+    ],
+    [
+     "pr-herm",
+     "Hermeticist",
+     "Ritual magic from grimoires, circles and sigils: wards, bindings, divination. An hour per roll, and it needs books. +2 to Occult for wards and bindings.",
+     "Occult",
+     true,
+     "Obsession: Forbidden Knowledge",
+     "A grimoire or a secret tempts you beyond sense. Accept the risk to get it."
+    ],
+    [
+     "pr-witch",
+     "Witch",
+     "Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link.",
+     "Occult",
+     true,
+     "Witch's Name",
+     "People whisper, and the righteous listen. Accept the suspicion, or the mob."
+    ],
+    [
+     "pr-folk",
+     "Cunning Folk",
+     "Charms, cards, tokens and folk remedies: small, quick magic. +2 to Occult for charms and fortune-telling.",
+     "Occult",
+     true,
+     "Old Superstitions",
+     "Your charms demand their rituals. Accept the delay or the odd behavior they require."
+    ],
+    [
+     "pr-medium",
+     "Spiritualist",
+     "Séances and trances that speak with the dead. +2 to Occult to call or question a spirit.",
+     "Occult",
+     true,
+     "The Dead Follow You",
+     "Restless spirits find you. Accept the haunting at a bad moment."
+    ],
+    [
+     "pr-necro",
+     "Necromancer",
+     "Commands the dead: wake a corpse to answer questions, or to fight for a scene (a minor zombie). +2 to Occult over corpses and the undead.",
+     "Occult",
+     true,
+     "Grave-Robber",
+     "Your work needs bodies, and people notice. Accept the Heat, the Whispers or the grieving family."
+    ],
+    [
+     "pr-sorc",
+     "Sorcerer",
+     "Quick casting along one or two paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm.",
+     "Occult",
+     false,
+     "Bound Purpose",
+     "Your power follows one narrow calling. Accept the cost of serving it."
+    ]
+   ]
+  },
+  {
+   "id": "vampire",
+   "name": "Vampire",
+   "tier": 3,
+   "adj": {
+    "Presence": 2,
+    "Agility": 1,
+    "Body": -1,
+    "Will": -2
+   },
+   "desc": "Undead, ageless and beautiful, with a thirst that never ends. You walk at night and remember centuries. Horror campaigns only.",
+   "core": [
+    "Undead: you don't breathe or age; Medicine can't heal you. Drinking blood can: Will against the victim's Body, and on a success you clear a box and they mark one.",
+    "Thirst (horror): each night you must drink human blood, or mark a box that only drinking clears.",
+    "Sunlight: 1 box each round in direct sun.",
+    "Weaknesses: a wooden stake through the heart incapacitates you; fire and beheading kill; holy symbols give −2 to your actions against their bearer; you can't cross a home's threshold uninvited."
+   ],
+   "form": {
+    "attrs": {
+     "Body": 2,
+     "Agility": 1
+    },
+    "dodge": 0,
+    "traits": [
+     "Fangs and claws mark 2 boxes",
+     "Tough: hits of 2+ boxes mark one fewer, except fire and wooden stakes",
+     "Dark sight"
+    ],
+    "drawbacks": [
+     "Your feral face terrifies everyone who sees it"
+    ]
+   },
+   "skills": [
+    "Persuasion",
+    "Deception",
+    "Stealth",
+    "Read People"
+   ],
+   "traits": [
+    [
+     "va-mesmer",
+     "Mesmerize",
+     "Ability: meet someone's eyes and roll Presence against their Will; on a success they obey one simple command.",
+     "Presence",
+     false,
+     "Old Enemies",
+     "Centuries make enemies. Accept it when one turns up."
+    ],
+    [
+     "va-mist",
+     "Mist and Shadow",
+     "Ability: once per scene at night, become mist and escape through any gap.",
+     "",
+     false,
+     "Pride of the Old Blood",
+     "You won't be slighted by the living. Accept the feud you start."
+    ]
+   ],
+   "restricted": true
+  },
+  {
+   "id": "pactbound",
+   "name": "Pact-Bound",
+   "tier": 3,
+   "adj": {
+    "Will": 2,
+    "Presence": 1,
+    "Body": -2,
+    "Agility": -1
+   },
+   "desc": "You made a bargain with something from below. It gave you power, and it will collect.",
+   "core": [
+    "Infernal power: once per scene, work a minor magical effect with a single Occult roll, no clock. Larger works need rituals.",
+    "Hellfire: roll Occult as an attack; a hit marks 2 boxes and sets things alight.",
+    "Marked: holy ground, holy water and consecrated silver burn you (1 box)."
+   ],
+   "form": null,
+   "skills": [
+    "Occult",
+    "Persuasion",
+    "Deception",
+    "Read People"
+   ],
+   "traits": [
+    [
+     "pb-bargain",
+     "Infernal Bargain",
+     "+2 to Persuasion when making a deal or a promise.",
+     "Persuasion",
+     true,
+     "The Debt Comes Due",
+     "Your patron wants something. Accept the errand, or the price of refusing."
+    ],
+    [
+     "pb-whisper",
+     "Whispers from Below",
+     "Ability: once per session, ask your patron one question and get a true, unhelpful answer.",
+     "",
+     false,
+     "Possessive Patron",
+     "Your patron won't share you. Accept it when it interferes with your friends, your faith or your heart."
+    ]
+   ]
   }
  ],
  "allegiances": [
@@ -558,6 +983,18 @@
    "An Outlaw Gang",
    "Once per job, a hideout, a fence or a gun at your side.",
    "Duty: the gang calls in favors, and the law knows your face."
+  ],
+  [
+   "order",
+   "The Order of the Iron Cross",
+   "Once per job, silver, holy water, a hunter's help or the Order's bestiary.",
+   "Duty: the Order sends you after monsters, and some of its hunters would count you among them."
+  ],
+  [
+   "coven",
+   "A coven",
+   "Once per job, a ritual, a remedy or a safe house among witches.",
+   "Duty and Vow: the coven's secrets and its quarrels."
   ]
  ],
  "reasons": [
@@ -764,6 +1201,18 @@
    "Pinkerton Credentials",
    "A commission from the Pinkerton National Detective Agency: carry arms on the job, work a client's case across county and state lines, and draw on the agency's offices and files (records, photographs and descriptions of wanted men). +2 to Investigation when using the agency's records or contacts. You have no powers of arrest beyond any citizen's unless local law deputizes you, and you answer to the client and the agency.",
    "Investigation"
+  ],
+  [
+   "monster",
+   "Monster Hunter",
+   "+2 to Occult to identify a creature from what it left behind: tracks, wounds, a body.",
+   "Occult"
+  ],
+  [
+   "faith",
+   "Unshaken Faith",
+   "+2 to Will against magic, possession and the undead's influence.",
+   "Will"
   ]
  ],
  "complications": [
@@ -846,6 +1295,21 @@
    "nonlethal",
    "Reluctant to Kill",
    "You seek a way that doesn't end a life. Accept the extra danger."
+  ],
+  [
+   "cursed",
+   "Cursed",
+   "Something cursed you, and the curse has a will of its own. Agree what it does; accept it when it strikes."
+  ],
+  [
+   "ghost",
+   "Haunted by a Ghost",
+   "A spirit follows you, and wants something. Accept the haunting and the trouble it brings."
+  ],
+  [
+   "dark",
+   "Marked by the Dark",
+   "Things that live in the dark know your scent. Accept it when they find you first."
   ]
  ],
  "triggers": {
@@ -928,6 +1392,21 @@
    "The man who surrenders is a killer",
    "The only fast solution would kill someone",
    "Your friends vote to shoot first"
+  ],
+  "cursed": [
+   "The curse's sign appears",
+   "Someone tries to lift it",
+   "The one who cursed you comes back"
+  ],
+  "ghost": [
+   "A cold room and a familiar voice",
+   "The anniversary of the death",
+   "Someone the ghost hated comes near"
+  ],
+  "dark": [
+   "Nightfall away from town",
+   "A howl that answers you",
+   "Something has been watching the house"
   ]
  },
  "equipment": [
@@ -990,6 +1469,31 @@
    "dynamite",
    "Dynamite",
    "Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre."
+  ],
+  [
+   "silver",
+   "Silver bullets",
+   "One reload of silver rounds. Silver marks an extra box on werewolves and similar creatures, and ignores their toughness."
+  ],
+  [
+   "holywater",
+   "Holy water",
+   "Three flasks. Thrown or splashed, it burns undead and demons (1 box) and breaks minor hexes."
+  ],
+  [
+   "stakes",
+   "Stakes and mallet",
+   "A wooden stake through a helpless vampire's heart incapacitates it."
+  ],
+  [
+   "ritualkit",
+   "Ritual kit",
+   "Chalk, candles, herbs, bones and old books. Needed for rituals away from a prepared place."
+  ],
+  [
+   "holysymbol",
+   "Holy symbol",
+   "Held up against undead and demons: −2 to their actions against you, if your faith is real."
   ]
  ],
  "weapons": {
@@ -1067,25 +1571,25 @@
    ]
   },
   {
-   "name": "Feud",
-   "boxes": 4,
-   "effects": [
-    "No one's holding a grudge",
-    "Hard words in the saloon",
-    "Enemies are gathering",
-    "They're in town",
-    "They strike: start a clock"
-   ]
-  },
-  {
-   "name": "Talk",
+   "name": "Whispers",
    "boxes": 4,
    "effects": [
     "Nobody's talking",
-    "Gossip at the general store",
-    "The newspaper prints a story",
-    "Your names are known in three territories",
-    "Everyone knows your faces: −2 to Stealth and Deception with strangers"
+    "Talk of strange things in the saloon",
+    "The preacher names you from the pulpit: −2 to Persuasion with townsfolk",
+    "Folk bar their doors",
+    "A mob with torches: start a Mob clock"
+   ]
+  },
+  {
+   "name": "The Dark",
+   "boxes": 4,
+   "effects": [
+    "Nothing has noticed you",
+    "Dogs howl at your door",
+    "Signs and warnings: a marked door, a dead bird",
+    "Something follows you at night",
+    "It comes: start a clock"
    ]
   }
  ],
@@ -1093,18 +1597,18 @@
   "mission": [
    "Job",
    [
-    "Escort a payroll through bandit country",
-    "Bring in a man with a price on his head",
-    "Find a stagecoach that never arrived",
-    "Settle a range war before it starts",
-    "Protect a town from the gang that's coming",
-    "Recover stolen cattle",
-    "Find a missing child",
-    "Guard a witness until the trial",
-    "Track down a train robber",
-    "Solve a murder no one wants solved",
-    "Clear an innocent man of a hanging charge",
-    "Deliver medicine through a blizzard"
+    "A body found drained of blood",
+    "A stagecoach that never arrived",
+    "Livestock torn apart in the night",
+    "A child gone missing",
+    "A miner raving about the dead walking",
+    "A bounty on a man who died last year",
+    "Travelers vanishing on the trail",
+    "A traveling medicine show",
+    "A new preacher packs the church",
+    "A town where no one sleeps",
+    "A hanging that went wrong",
+    "A monster asks for help"
    ]
   ],
   "place": [
@@ -1116,45 +1620,45 @@
     "The railroad's end-of-track camp",
     "A lonely homestead",
     "A ghost town",
-    "A mission church",
+    "A burned mission church",
     "A saloon and gambling hall",
     "A frontier fort",
     "A fog-bound waterfront",
-    "A canyon ranch",
+    "A canyon cemetery",
     "A snowbound mountain pass"
    ]
   ],
   "strange": [
-   "The trouble",
+   "The darkness",
    [
-    "A gang that's bought the sheriff",
-    "A cattle baron who wants the water",
-    "A railroad that wants the land",
-    "A feud two generations old",
-    "A fraud selling worthless land",
-    "A killer who signs his work",
-    "A mine that's poisoning the creek",
-    "A con man with a medicine show",
-    "A hired gun with a grudge",
-    "A bank that's about to fail",
-    "A war hero who isn't",
-    "A drought that's driving men desperate"
+    "A werewolf that has acquired the taste",
+    "A vampire who owns the town",
+    "The dead rising from a flooded graveyard",
+    "A witch's curse on a family",
+    "A ghost that wants justice",
+    "Ghouls in the mine",
+    "A demon summoned by a desperate man",
+    "A necromancer raising an army",
+    "A revenant gunslinger",
+    "A hellhound on someone's trail",
+    "A cult in the church cellar",
+    "A sorcerer's working gone wrong"
    ]
   ],
   "twist": [
    "Twist",
    [
-    "The victim was the villain",
+    "The victim was the monster",
     "The law is in on it",
-    "Two families are feuding",
+    "Two monsters are at war",
     "The client lied about everything",
     "A rich man pays for silence",
     "A character's complication comes into play",
-    "The outlaw is protecting his family",
-    "Someone is using the outlaw",
+    "The monster is protecting its family",
+    "Someone is using the monster",
     "The town wants a hanging, any hanging",
-    "The army arrives with its own orders",
-    "Another bounty hunter is after the same man",
+    "The Order of the Iron Cross arrives to burn everything",
+    "Another hunter is after the same prey",
     "The trail leads to someone a character loves"
    ]
   ],
@@ -1170,15 +1674,15 @@
      4
     ],
     [
-     "The gang rides in",
-     6
-    ],
-    [
-     "The stage leaves town",
+     "The full moon rises",
      4
     ],
     [
-     "The witness is found",
+     "The next victim",
+     6
+    ],
+    [
+     "The dead finish rising",
      6
     ],
     [
@@ -1194,16 +1698,16 @@
      4
     ],
     [
-     "The newspaper prints the story",
-     8
+     "The ritual completes",
+     6
     ],
     [
      "The fire spreads",
      4
     ],
     [
-     "The outlaw crosses the border",
-     6
+     "The curse takes hold",
+     8
     ],
     [
      "The snows close the pass",
@@ -1220,12 +1724,12 @@
     "A Pinkerton detective",
     "A railroad baron",
     "A frightened homesteader family",
-    "A gunfighter trying to retire",
+    "A werewolf trying to stay human",
     "A child who saw it happen",
     "A preacher with a past",
     "A newspaperman who's close to the truth",
-    "A judge who can be bought",
-    "A dying outlaw with a last request"
+    "A witch who needs protection",
+    "A dying hunter with a last request"
    ]
   ]
  },
@@ -1243,7 +1747,9 @@
    "Ongoing"
   ]
  },
- "formPenalties": {},
+ "formPenalties": {
+  "Riding": -2
+ },
  "restricted": null,
  "example": {
   "name": "Josephine Hale",
@@ -1306,16 +1812,16 @@
    "rank": "Deputy U.S. Marshal",
    "dept": "Marshal",
    "path": "rounded",
-   "speciesId": "frontier",
-   "species": "Frontier-born",
-   "role": "Wears the badge in three counties, and rides alone more often than she'd like.",
+   "speciesId": "sighted",
+   "species": "Sighted",
+   "role": "Wears the badge in three counties, and sees what's under the faces of the men she arrests.",
    "reason": "I took an oath, and I keep my word.",
    "connection": "Isaiah Booker brought in the man who killed her father, alive, when he could have collected either way.",
    "attrs": {
     "Body": 12,
     "Agility": 13,
-    "Intellect": 9,
-    "Presence": 11,
+    "Intellect": 10,
+    "Presence": 9,
     "Will": 11
    },
    "skills": {
@@ -1324,24 +1830,23 @@
     "Brawling": "T",
     "Athletics": "T",
     "Tracking": "T",
-    "Leadership": "T",
+    "Occult": "T",
     "Read People": "T",
     "Survival": "T",
-    "Animal Handling": "T",
+    "Leadership": "T",
     "Law": "T"
    },
    "adv": {
-    "id": "quickdraw"
+    "id": ""
    },
    "sadv": {
-    "id": ""
+    "id": "si-eye"
    },
    "comp": {
     "id": "lawful",
     "trigger": "The town wants a hanging without a trial"
    },
    "edges": {
-    "attr": 1,
     "adv2": 1,
     "grit": 1
    },
@@ -1426,17 +1931,17 @@
    "rank": "Horse breaker",
    "dept": "Wrangler",
    "path": "rounded",
-   "speciesId": "immigrant",
-   "species": "Immigrant",
-   "role": "Came from County Clare with nothing, and can ride anything with four legs.",
+   "speciesId": "werewolf",
+   "species": "Werewolf",
+   "role": "Came from County Clare with nothing but a curse, and chains himself in the root cellar every full moon.",
    "reason": "Everything I do is for my family.",
    "connection": "Plays cards with Lucinda Marsh every Saturday, and loses.",
    "attrs": {
-    "Body": 12,
-    "Agility": 12,
-    "Intellect": 10,
-    "Presence": 10,
-    "Will": 11
+    "Body": 13,
+    "Agility": 13,
+    "Intellect": 9,
+    "Presence": 11,
+    "Will": 9
    },
    "skills": {
     "Riding": "S",
@@ -1455,23 +1960,20 @@
     "id": ""
    },
    "sadv": {
-    "id": "im-grit"
+    "id": "ww-nose"
    },
    "comp": {
     "id": "temper",
     "trigger": "Someone insults you or yours"
    },
    "edges": {
-    "skill": 1,
-    "grit": 1,
-    "gear": 1
+    "skill": 1
    },
    "gear": {
-    "item": "Bramble, a mustang who'll run all day",
-    "skill": "Riding"
+    "item": "",
+    "skill": ""
    },
    "play": {
-    "duty": 3,
     "gun": {
      "type": "rifle",
      "rounds": 15,
@@ -1490,24 +1992,24 @@
    "rank": "Professional gambler",
    "dept": "Gambler",
    "path": "hand",
-   "speciesId": "drifter",
-   "species": "Drifter",
-   "role": "Has dealt faro in every boomtown from Deadwood to Tombstone, and remembers every face.",
+   "speciesId": "practitioner",
+   "species": "Practitioner",
+   "role": "Deals faro by night and reads the cards for anyone who'll pay, and the cards are never wrong.",
    "reason": "There's money out here for anyone with nerve enough to take it.",
    "connection": "Owes Ruth Calloway a favor for a warrant that went missing.",
    "attrs": {
-    "Body": 10,
-    "Agility": 11,
+    "Body": 9,
+    "Agility": 10,
     "Intellect": 13,
     "Presence": 12,
-    "Will": 10
+    "Will": 11
    },
    "skills": {
     "Gambling": "S",
     "Read People": "T",
     "Deception": "T",
     "Persuasion": "T",
-    "Shooting": "T",
+    "Occult": "T",
     "Stealth": "T",
     "Investigation": "T",
     "Riding": "T"
@@ -1516,19 +2018,17 @@
     "id": ""
    },
    "sadv": {
-    "id": "dr-read"
+    "id": "pr-folk"
    },
    "comp": {
     "id": "debt",
     "trigger": "A collector arrives"
    },
    "edges": {
-    "attr": 1,
-    "adv2": 1,
     "contact": 1
    },
    "adv2": {
-    "id": "sharp"
+    "id": ""
    },
    "contact": "Mae Lin, a faro dealer who hears everything said at her table",
    "play": {
@@ -1547,16 +2047,16 @@
    "rank": "Bounty hunter",
    "dept": "Bounty Hunter",
    "path": "rounded",
-   "speciesId": "veteran",
-   "species": "War Veteran",
-   "role": "Fought with the colored troops in the war, and has brought in more wanted men than any hunter in the territory.",
-   "reason": "Somebody has to stand up for the people who can't.",
+   "speciesId": "revenant",
+   "species": "Revenant",
+   "role": "Shot in the back in '69 by the gang he was hunting. He got up again, and he's still hunting them.",
+   "reason": "Someone did me wrong, and I mean to settle it.",
    "connection": "Taught Tom Feeney to shoot straight, and still reminds him of it.",
    "attrs": {
     "Body": 12,
     "Agility": 13,
     "Intellect": 11,
-    "Presence": 9,
+    "Presence": 8,
     "Will": 11
    },
    "skills": {
@@ -1569,22 +2069,19 @@
     "Stealth": "T",
     "Read People": "T",
     "Investigation": "T",
-    "Melee": "T",
-    "Law": "T"
+    "Melee": "T"
    },
    "adv": {
     "id": ""
    },
    "sadv": {
-    "id": "ve-fire"
+    "id": "re-numb"
    },
    "comp": {
     "id": "code",
     "trigger": "The easy shot is in someone's back"
    },
    "edges": {
-    "attr": 1,
-    "skill": 1,
     "gear": 1
    },
    "gear": {
@@ -1670,17 +2167,25 @@
   }
  ],
  "docxColors": [
-  "4A2A12",
-  "F1E6D2"
+  "2A2F33",
+  "E6E8E6"
  ],
  "quickRef": [
   [
    "Damage",
-   "Fists, clubs, knives, arrows: 1 box. Guns, heavy blades: 2. Close-range shotgun or buffalo rifle: 3 and Dying."
+   "Fists, clubs, knives, arrows: 1 box. Guns, heavy blades, claws: 2. Close-range shotgun or buffalo rifle: 3 and Dying."
   ],
   [
    "Guns",
    "Derringer 2, revolver 6, shotgun 2, rifle 15. Fan the hammer 3 (−2), both barrels 2 (+2 close), covering fire 3. Reload: one action. Natural 18 jams."
+  ],
+  [
+   "Monsters",
+   "Silver: werewolves. Stake, fire, sunlight, beheading: vampires. Headshot or fire: zombies. Holy water: undead and demons."
+  ],
+  [
+   "Rituals",
+   "Describe the effect; fill a 2-, 4- or 6-segment clock with Occult rolls at your tradition's pace. Charms: Trained 2, Specialty 3, Expert 4."
   ]
  ]
 }
