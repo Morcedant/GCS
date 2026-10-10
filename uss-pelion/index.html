@@ -443,7 +443,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">3</span><h2>Choose trained skills</h2>
-            <p class="muted small">One <b>Specialty</b> at attribute +3 and nine <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling.</p></div>
+            <p class="muted small" id="skills-intro">One <b>Specialty</b> at attribute +3 and nine <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling.</p></div>
           <div class="tally" id="skill-tally"></div>
           <div class="table-wrap skills">
             <table>
@@ -517,6 +517,7 @@ tr.lvl-U td.target { color: var(--muted); }
             </div>
             <div class="field wide"><div class="trait-desc" id="comp-desc"></div></div>
             <div class="field wide"><label for="f-comptrigger">Trigger, agreed with the GM</label>
+              <select id="f-trigpick" aria-label="Quick pick a trigger" hidden></select>
               <input type="text" id="f-comptrigger" placeholder="e.g. An unexplained reading while the team is ordered to withdraw"></div>
           </div>
 
@@ -690,7 +691,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tbody>
 </table>
 <h3 id="g-officers-and-enlisted-crew">Officers and enlisted crew</h3>
-<p>Officers hold ranks from Ensign through Captain. <strong>General Services</strong> is the division for enlisted crew: Crewman 3rd, 2nd, and 1st Class, Crewman, and Yeoman 3rd, 2nd, and 1st Class, and Yeoman. A character with a Crewman or Yeoman rank belongs to General Services. Enlisted crew use exactly the same creation rules as officers.</p>
+<p>Officers hold ranks from Ensign through Captain. <strong>General Services</strong> is the division for enlisted crew: Crewman 3rd, 2nd, and 1st Class, Crewman, and Yeoman 3rd, 2nd, and 1st Class, and Yeoman. A character with a Crewman or Yeoman rank belongs to General Services. Enlisted crew use the same creation rules as officers, except for their skills (see Step 3): they are specialists rather than generalists.</p>
 <h2 id="g-step-2-choose-a-species-and-assign-attributes">Step 2: Choose a species and assign attributes</h2>
 <h3 id="g-attributes">Attributes</h3>
 <table>
@@ -811,6 +812,10 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Agree on a species with the GM and give it adjustments from −2 to +2 per attribute that total zero. The normal starting maximum and species base rules apply.</p>
 <h2 id="g-step-3-choose-trained-skills">Step 3: Choose trained skills</h2>
 <p>Choose ten different skills: one <strong>Specialty</strong> at its governing attribute +3 and nine <strong>Trained</strong> skills at attribute +1. All other skills are <strong>Untrained</strong> at attribute −4 when an attempt is plausible. Use these same three training levels for every skill. Each skill has its own final target number; do not add the attribute again when rolling.</p>
+<h3 id="g-general-services-specialists">General Services: specialists</h3>
+<p>Enlisted crew in General Services trade breadth for depth. Instead of a Specialty and nine Trained skills, they choose <strong>one Expert skill at its attribute +5</strong> and <strong>seven Trained skills at attribute +1</strong>. Everything else is Untrained at attribute −4, as usual.</p>
+<p>The extra bonus matters most when the work is hard. With Intellect 13, an Expert transporter chief has a target of 18, which only natural 17–18 can fail; under a −4 “very difficult” penalty the target is still 14, a 91% chance, where an officer’s Specialty would be at 12, a 74% chance. If Athletics is the Expert skill, Dodge adds +2, the same as a Specialty.</p>
+<p><strong>Earning a commission.</strong> If a General Services character is commissioned (the GM’s call, usually after distinguished service), they move to the officer package: the Expert skill becomes a Specialty at +3, and they can raise two more skills to Trained to reach nine. Rank and department change to match.</p>
 <h2 id="g-step-4-describe-your-character">Step 4: Describe your character</h2>
 <p>Choose your name, rank, department, and a short reason you serve in Starfleet. Then choose <strong>one advantage</strong> and <strong>one complication</strong>.</p>
 <h3 id="g-top-10-reasons-for-joining-starfleet">Top 10 reasons for joining Starfleet</h3>
@@ -1268,7 +1273,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-ship-encounters">Ship encounters</h2>
 <p>Ship encounters use descriptive consequences. The GM states what is at stake before rolls and describes changes to shields, hull, systems, and position afterward. Numerical ship damage is outside this guide’s scope.</p>
 <h2 id="g-advancement">Advancement</h2>
-<p>After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement.</p>
+<p>After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement. General Services characters advance the same way, but only their starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they are commissioned (see Step 3).</p>
 <h1 id="g-advantages">Advantages</h1>
 <p>Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances; describe how it helps before rolling. An advantage does not grant training, authorize an otherwise impossible action, or replace essential equipment. If more than one advantage could apply, use only one advantage bonus. Assistance and circumstance modifiers still apply, without counting the same benefit twice.</p>
 <table>
@@ -1712,6 +1717,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </table>
 <h1 id="g-complications">Complications</h1>
 <p>Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Duty point if you accept it. You may decline without penalty. A personality description, harmless habit, or repeated inconvenience earns no point by itself. Agree on boundaries before a complication affects another player’s character.</p>
+<p>Every complication needs a trigger: the concrete situation that brings it into play. The creator suggests three for each complication below; pick one, combine them, or write your own with the GM.</p>
 <table>
 <colgroup>
 <col style="width: 50%" />
@@ -1806,8 +1812,8 @@ tr.lvl-U td.target { color: var(--muted); }
 <li>Apply the result and describe what changes.</li>
 </ol>
 <h2 id="g-summary">Summary</h2>
-<p><strong>Creation:</strong> attributes start at 10, adjusted by species (always totaling zero), plus 5 points; maximum 13 plus any species bonus. One Specialty and nine Trained skills. One advantage (general or species) and one complication; a species advantage brings its companion complication.</p>
-<p><strong>Skills:</strong> Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3.</p>
+<p><strong>Creation:</strong> attributes start at 10, adjusted by species (always totaling zero), plus 5 points; maximum 13 plus any species bonus. One Specialty and nine Trained skills (General Services: one Expert at +5 and seven Trained). One advantage (general or species) and one complication; a species advantage brings its companion complication.</p>
+<p><strong>Skills:</strong> Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (General Services only) = attribute +5.</p>
 <p><strong>Modifiers:</strong> favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails. Margin = adjusted skill − roll.</p>
 <p><strong>Assistance:</strong> success +1; success by 5 or more +2; failure no bonus; 18 causes a complication. One assistant per roll.</p>
 <p><strong>Combat:</strong> short movement plus one action. Successful attack → optional Dodge → weapon effect. Dodge = Agility −2, plus Athletics training (+0 Untrained, +1 Trained, +2 Specialty), once per round. One injury box gives −1 to physical actions; two give −2; three incapacitate.</p>
@@ -2001,6 +2007,89 @@ tr.lvl-U td.target { color: var(--muted); }
     ["Unfinished business", "They blame me for something that went wrong on a past mission."],
   ];
   const CONNECTION_TEXTS = new Set(CONNECTIONS.map((r) => r[1]));
+  // Suggested triggers for each general complication, offered as quick picks.
+  const TRIGGERS = {
+      "mystery": [
+          "An unexplained reading appears while the team is ordered to withdraw",
+          "A derelict ship or ruin no one has catalogued",
+          "Sensor data that contradicts known science"
+      ],
+      "protects": [
+          "A crewmate is pinned down or injured under fire",
+          "Civilians are caught in the danger",
+          "Someone volunteers for a deadly task in your place"
+      ],
+      "duty": [
+          "You're hurt or exhausted, but your station needs you",
+          "A personal message arrives in the middle of a crisis",
+          "Your relief is late and the work can't wait"
+      ],
+      "conscience": [
+          "An order would harm civilians or prisoners",
+          "You're ordered to leave someone behind",
+          "Command hides the truth from the people it affects"
+      ],
+      "book": [
+          "A shortcut skips a safety protocol",
+          "An improvised plan breaks regulations",
+          "A superior asks you to bend a rule just this once"
+      ],
+      "distrust": [
+          "An order comes with no explanation",
+          "A visiting or new officer takes command",
+          "Orders from Starfleet Command ignore what's happening on the ground"
+      ],
+      "reputation": [
+          "Someone questions your competence in front of others",
+          "A task in your field is beyond what you're ready for",
+          "Getting help means admitting a mistake"
+      ],
+      "haunted": [
+          "Sights or sounds like the old disaster",
+          "Meeting a survivor or relative from that mission",
+          "Facing the same enemy or hazard again"
+      ],
+      "telepathy": [
+          "A mind meld or telepathic scan is proposed",
+          "A telepath joins the away team",
+          "A mental intrusion affects the crew"
+      ],
+      "culture": [
+          "A local custom clashes with your own",
+          "A formal ceremony where every gesture matters",
+          "Negotiating with a people your own distrust"
+      ],
+      "rival": [
+          "Your rival is assigned to the same mission",
+          "Your rival takes credit for your work",
+          "Your rival needs your help"
+      ],
+      "home": [
+          "A message from home arrives",
+          "The mission passes near your homeworld",
+          "Someone you love is in danger"
+      ],
+      "medical": [
+          "Your treatment runs out away from the ship",
+          "An environmental hazard aggravates your condition",
+          "A mission requires a full medical scan"
+      ],
+      "experimental": [
+          "An untested device or technique could solve the problem",
+          "Engineering says it's probably safe",
+          "A colleague dares you to try it"
+      ],
+      "secret": [
+          "Someone starts asking the wrong questions",
+          "Evidence that could expose you turns up",
+          "Keeping the secret means lying to a friend"
+      ],
+      "nonlethal": [
+          "A hostile refuses to surrender",
+          "Phasers on kill are ordered",
+          "The only fast solution would kill someone"
+      ]
+  };
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
   // Species advantages, each paired with a companion complication that comes with it.
   // [id, name, effect, roll, gives +2?, companion name, companion text]
@@ -2168,7 +2257,7 @@ tr.lvl-U td.target { color: var(--muted); }
       connection: "Owes the chief engineer a favor for rebuilding her tricorder after Deneb.",
       attrs: { Body: 10, Agility: 10, Intellect: 13, Presence: 11, Will: 11 },
       adv: { id: "subspace", name: "", text: "", detail: "" },
-      comp: { id: "mystery", name: "", text: "", trigger: "An unexplained reading while the away team is ordered to withdraw" },
+      comp: { id: "mystery", name: "", text: "", trigger: "An unexplained reading appears while the team is ordered to withdraw" },
       equipment: { communicator: true, tricorder: true, phaser: true, medkit: false, engkit: false },
     });
     c.skills.Sensors = "S";
@@ -2233,7 +2322,12 @@ tr.lvl-U td.target { color: var(--muted); }
       ch.attrs[n] = Math.max(baseOf(n), Math.min(maxOf(n), v));
     });
   }
-  const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + LEVELS[ch.skills[name]].mod; };
+  // General Services: one Expert skill (+5) and seven Trained; officers: one Specialty (+3) and nine Trained.
+  const isGS = () => ch.dept === "General Services";
+  const trainedMax = () => (isGS() ? 7 : 9);
+  const levelMod = (l) => (l === "S" && isGS() ? 5 : LEVELS[l].mod);
+  const levelName = (l) => (l === "S" && isGS() ? "Expert" : LEVELS[l].name);
+  const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name]); };
   const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
   const count = (lvl) => Object.values(ch.skills).filter((v) => v === lvl).length;
   function odds(t) {
@@ -2261,8 +2355,8 @@ tr.lvl-U td.target { color: var(--muted); }
       [!!ch.dept, "Department chosen"],
       [!!speciesOk, speciesOk ? `Species: ${ch.species || "—"}` : !ch.species.trim() ? "Name your custom species" : `Custom adjustments total ${signed(adjTotal())}; they must total 0`],
       [sp === POOL && !overMax.length, sp === POOL ? (overMax.length ? `Check ${overMax.join(", ")}: outside the species range` : "5 attribute points spent") : `Attribute points spent: ${sp} of ${POOL}`],
-      [nS === 1, nS === 1 ? "One Specialty" : `Specialty skills: ${nS} of 1`],
-      [nT === 9, nT === 9 ? "Nine Trained skills" : `Trained skills: ${nT} of 9`],
+      [nS === 1, nS === 1 ? `One ${levelName("S")}` : `${levelName("S")} skills: ${nS} of 1`],
+      [nT === trainedMax(), nT === trainedMax() ? `${trainedMax() === 9 ? "Nine" : "Seven"} Trained skills` : `Trained skills: ${nT} of ${trainedMax()}`],
       [!!advOk, advOk ? (ch.sadv.id ? `Species advantage: ${sAdvName()} (companion: ${sCompName()})` : "Advantage chosen")
         : ch.sadv.id ? "Finish the custom species advantage and its companion" : ch.adv.id ? "Finish the advantage details" : "Choose an advantage"],
       [!!compOk, compOk ? "Complication chosen" : ch.comp.id ? "Finish the complication details" : "Choose a complication"],
@@ -2392,14 +2486,18 @@ tr.lvl-U td.target { color: var(--muted); }
     // skills
     const nS = count("S"), nT = count("T");
     $("skill-tally").innerHTML =
-      `<span class="chip ${nS === 1 ? "ok" : "no"}">Specialty ${nS}/1</span><span class="chip ${nT === 9 ? "ok" : "no"}">Trained ${nT}/9</span>`;
+      `<span class="chip ${nS === 1 ? "ok" : "no"}">${levelName("S")} ${nS}/1</span><span class="chip ${nT === trainedMax() ? "ok" : "no"}">Trained ${nT}/${trainedMax()}</span>`;
+    $("skills-intro").innerHTML = isGS()
+      ? "General Services crew are specialists: one <b>Expert</b> skill at attribute +5 and seven <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling."
+      : "One <b>Specialty</b> at attribute +3 and nine <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling.";
     SKILLS.forEach(([n]) => {
       const key = n.replace(/\s+/g, "-"), lvl = ch.skills[n], t = skillTarget(n);
       $("sr-" + key).className = "lvl-" + lvl;
       ["U", "T", "S"].forEach((l) => {
         const r = $(`sk-${key}-${l}`);
         r.checked = lvl === l;
-        r.disabled = l === "T" && lvl !== "T" && nT >= 9;
+        r.disabled = l === "T" && lvl !== "T" && nT >= trainedMax();
+        if (l === "S") r.nextElementSibling.textContent = levelName("S");
       });
       $("st-" + key).textContent = t;
       $("sp-" + key).textContent = pct(t);
@@ -2416,6 +2514,12 @@ tr.lvl-U td.target { color: var(--muted); }
       : "An advantage gives +2 to one narrow kind of task when the GM agrees it applies. It grants no training and never replaces essential equipment.";
     $("comp-custom").hidden = ch.comp.id !== "custom";
     const cd = compDef();
+    const trig = TRIGGERS[ch.comp.id] || [];
+    $("f-trigpick").hidden = !trig.length;
+    if ($("f-trigpick").dataset.for !== ch.comp.id) {
+      $("f-trigpick").innerHTML = `<option value="">Suggested triggers: quick pick…</option>` + trig.map((x, i) => `<option value="${i}">${esc(x)}</option>`).join("");
+      $("f-trigpick").dataset.for = ch.comp.id;
+    }
     $("comp-desc").innerHTML = cd ? esc(cd[2]) : ch.comp.id === "custom"
       ? "Custom complications need a clear trigger and a meaningful, accepted consequence."
       : "A complication creates choices and problems. When it causes a meaningful problem you accept, you gain a Duty point.";
@@ -2428,7 +2532,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("ms-text").className = $("ready-status").className;
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
-    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${LEVELS[ch.skills.Athletics].name} Athletics)`;
+    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics)} Athletics)`;
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
@@ -2465,7 +2569,7 @@ tr.lvl-U td.target { color: var(--muted); }
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
       <div class="attr-strip">${ATTRS.map(([n]) => `<div><span class="label">${n}</span><b>${ch.attrs[n]}</b></div>`).join("")}</div>
       <div><h3 style="margin-bottom:6px">Skills</h3>
-        <div class="skill-cols">${sorted.map((s) => `<div class="skill-line ${s.l}"><span>${s.n}<span class="lv">${s.l === "U" ? "untrained" : LEVELS[s.l].name}</span></span><b>${s.t}</b></div>`).join("")}</div></div>
+        <div class="skill-cols">${sorted.map((s) => `<div class="skill-line ${s.l}"><span>${s.n}<span class="lv">${s.l === "U" ? "untrained" : levelName(s.l)}</span></span><b>${s.t}</b></div>`).join("")}</div></div>
       <div class="fields">
         ${ch.sadv.id ? `<div class="field"><span class="label">Species advantage</span><b>${esc(sAdvName())}</b><span class="small muted">${esc(sAdvText())}</span></div>`
           : `<div class="field"><span class="label">Advantage</span><b>${esc(advName() || "—")}${ch.adv.detail && advDef()?.[4] ? ": " + esc(ch.adv.detail) : ""}</b><span class="small muted">${esc(advText)}</span></div>`}
@@ -2610,7 +2714,12 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   document.addEventListener("change", (e) => {
     const t = e.target;
-    if (t.id === "f-dept") { setDept(t.value); touch(); render(); }
+    if (t.id === "f-dept") {
+      const wasGS = isGS();
+      setDept(t.value); touch(); render();
+      if (wasGS && !isGS()) toast("Commissioned: the Expert skill becomes a Specialty (+3), and you can train two more skills.");
+      else if (!wasGS && isGS() && count("T") > 7) toast(`General Services has seven Trained skills; untrain ${count("T") - 7} and your Specialty becomes Expert (+5).`);
+    }
     else if (t.id === "f-reasonpick" && t.value !== "") {
       // Replace an empty box or another quick pick; add to anything the player wrote themselves.
       const text = REASONS[+t.value][1], cur = ch.reason.trim();
@@ -2644,7 +2753,17 @@ tr.lvl-U td.target { color: var(--muted); }
       else { ch.adv.id = t.value; ch.sadv.id = ""; }
       touch(); render();
     }
-    else if (t.id === "f-comp") { ch.comp.id = t.value; touch(); render(); }
+    else if (t.id === "f-comp") {
+      // A suggested trigger belongs to the old complication; the player's own wording stays.
+      if (Object.values(TRIGGERS).flat().includes(ch.comp.trigger.trim())) { ch.comp.trigger = ""; $("f-comptrigger").value = ""; }
+      ch.comp.id = t.value; touch(); render();
+    }
+    else if (t.id === "f-trigpick" && t.value !== "") {
+      const text = (TRIGGERS[ch.comp.id] || [])[+t.value], cur = ch.comp.trigger.trim();
+      const presets = new Set(Object.values(TRIGGERS).flat());
+      ch.comp.trigger = !cur || presets.has(cur) ? text : `${cur}; ${text.charAt(0).toLowerCase()}${text.slice(1)}`;
+      $("f-comptrigger").value = ch.comp.trigger; t.value = ""; touch(); render();
+    }
     else if (t.dataset.eq) { ch.equipment[t.dataset.eq] = t.checked; touch(); render(); }
     else if (t.dataset.skill) {
       const n = t.dataset.skill, v = t.value;

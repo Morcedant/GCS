@@ -48,7 +48,7 @@ Choose a department and describe what you contribute to the crew. Rank and assig
 
 ### Officers and enlisted crew
 
-Officers hold ranks from Ensign through Captain. **General Services** is the division for enlisted crew: Crewman 3rd, 2nd, and 1st Class, Crewman, and Yeoman 3rd, 2nd, and 1st Class, and Yeoman. A character with a Crewman or Yeoman rank belongs to General Services. Enlisted crew use exactly the same creation rules as officers.
+Officers hold ranks from Ensign through Captain. **General Services** is the division for enlisted crew: Crewman 3rd, 2nd, and 1st Class, Crewman, and Yeoman 3rd, 2nd, and 1st Class, and Yeoman. A character with a Crewman or Yeoman rank belongs to General Services. Enlisted crew use the same creation rules as officers, except for their skills (see Step 3): they are specialists rather than generalists.
 
 ## Step 2: Choose a species and assign attributes
 
@@ -124,6 +124,14 @@ Agree on a species with the GM and give it adjustments from −2 to +2 per attri
 ## Step 3: Choose trained skills
 
 Choose ten different skills: one **Specialty** at its governing attribute +3 and nine **Trained** skills at attribute +1. All other skills are **Untrained** at attribute −4 when an attempt is plausible. Use these same three training levels for every skill. Each skill has its own final target number; do not add the attribute again when rolling.
+
+### General Services: specialists
+
+Enlisted crew in General Services trade breadth for depth. Instead of a Specialty and nine Trained skills, they choose **one Expert skill at its attribute +5** and **seven Trained skills at attribute +1**. Everything else is Untrained at attribute −4, as usual.
+
+The extra bonus matters most when the work is hard. With Intellect 13, an Expert transporter chief has a target of 18, which only natural 17–18 can fail; under a −4 "very difficult" penalty the target is still 14, a 91% chance, where an officer's Specialty would be at 12, a 74% chance. If Athletics is the Expert skill, Dodge adds +2, the same as a Specialty.
+
+**Earning a commission.** If a General Services character is commissioned (the GM's call, usually after distinguished service), they move to the officer package: the Expert skill becomes a Specialty at +3, and they can raise two more skills to Trained to reach nine. Rank and department change to match.
 
 ## Step 4: Describe your character
 
@@ -397,7 +405,7 @@ Ship encounters use descriptive consequences. The GM states what is at stake bef
 
 ## Advancement
 
-After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement.
+After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement. General Services characters advance the same way, but only their starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they are commissioned (see Step 3).
 
 # Advantages
 
@@ -528,6 +536,8 @@ Both Trill advantages require a joined character; agree with the GM before play 
 
 Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Duty point if you accept it. You may decline without penalty. A personality description, harmless habit, or repeated inconvenience earns no point by itself. Agree on boundaries before a complication affects another player's character.
 
+Every complication needs a trigger: the concrete situation that brings it into play. The creator suggests three for each complication below; pick one, combine them, or write your own with the GM.
+
 | Complication | What it does |
 |---|---|
 | Cannot Leave a Mystery Alone | An unexplained reading or strange discovery tempts you to delay departure, spend a scarce resource, or pursue a risky investigation. Accept a specific cost rather than receiving points merely for asking questions. |
@@ -571,9 +581,9 @@ Will protects your resolve; Presence influences others. Leadership and Diplomacy
 
 ## Summary
 
-**Creation:** attributes start at 10, adjusted by species (always totaling zero), plus 5 points; maximum 13 plus any species bonus. One Specialty and nine Trained skills. One advantage (general or species) and one complication; a species advantage brings its companion complication.
+**Creation:** attributes start at 10, adjusted by species (always totaling zero), plus 5 points; maximum 13 plus any species bonus. One Specialty and nine Trained skills (General Services: one Expert at +5 and seven Trained). One advantage (general or species) and one complication; a species advantage brings its companion complication.
 
-**Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3.
+**Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (General Services only) = attribute +5.
 
 **Modifiers:** favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails. Margin = adjusted skill − roll.
 
