@@ -132,3 +132,30 @@ test("/clock creates, ticks, shows and removes clocks; near misses are flagged",
   assert.ok(!describe(resolve([5, 5, 4], 11)).some((l) => /success at a cost/.test(l)), "miss by 3");
   assert.ok(!describe(resolve([6, 6, 5], 16)).some((l) => /success at a cost/.test(l)), "natural 17 never");
 });
+
+test("contest follows the guide's opposed rules, and assist adds the helper's bonus", async () => {
+  const { contestWinner, assistBonus } = await import("../src/worker.js");
+  const R = (d, t) => resolve(d, t);
+  assert.equal(contestWinner(R([3, 3, 3], 12), R([6, 6, 4], 12)), "me", "success beats failure");
+  assert.equal(contestWinner(R([2, 2, 3], 14), R([3, 3, 3], 14)), "me", "larger margin wins");
+  assert.equal(contestWinner(R([3, 3, 3], 12), R([3, 3, 3], 12)), "opponent", "tie favors the defender");
+  assert.equal(contestWinner(R([6, 6, 4], 10), R([6, 6, 4], 10), "me"), "me", "double failure favors the defender (me)");
+  assert.equal(contestWinner(R([1, 1, 2], 2), R([3, 3, 3], 12)), "opponent", "automatic success counts as margin 0");
+  assert.equal(assistBonus(R([3, 3, 3], 14)), 2);
+  assert.equal(assistBonus(R([4, 4, 4], 14)), 1);
+  assert.equal(assistBonus(R([6, 5, 5], 14)), 0);
+
+  const call = async (name, options) => {
+    const payload = { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name, options } };
+    const body = JSON.stringify(payload), ts = "1700000000";
+    const sig = Buffer.from(await crypto.subtle.sign("Ed25519", keys.privateKey, new TextEncoder().encode(ts + body))).toString("hex");
+    return (await (await worker.fetch(new Request("https://bot.example/", { method: "POST", body, headers: { "X-Signature-Ed25519": sig, "X-Signature-Timestamp": ts } }), env)).json()).data;
+  };
+  const c = await call("contest", [{ name: "target", value: 13 }, { name: "opponent", value: 12 }, { name: "opponent_name", value: "Klingon warrior" }, { name: "label", value: "Grapple" }]);
+  assert.match(c.embeds[0].title, /^Grapple: (you win|Klingon warrior wins)$/);
+  assert.match(c.embeds[0].description, /Defender: Klingon warrior/);
+  const a = await call("assist", [{ name: "target", value: 14 }, { name: "helper_target", value: 14 }, { name: "helper", value: "7" }]);
+  assert.match(a.embeds[0].description, /<@7> rolls under/);
+  assert.match(a.embeds[0].title, /target 1[456]$/);
+  assert.match(a.components[0].components[0].custom_id, /^reroll\|42\|14\|[012]\|$/);
+});

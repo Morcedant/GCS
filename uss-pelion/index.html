@@ -267,7 +267,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .mobile-status { display: none; }
 #toc-details > summary { cursor: pointer; list-style: none; }
 #toc-details > summary::-webkit-details-marker { display: none; }
-#app[data-view="sheet"] .example-banner, #app[data-view="guide"] .example-banner { display: none !important; }
+#app[data-view="sheet"] .example-banner, #app[data-view="guide"] .example-banner, #app[data-view="gm"] .example-banner { display: none !important; }
 @media (max-width: 900px) {
   /* Duty station: condition and roller first, the full sheet after them. */
   .sheet { display: flex; flex-direction: column; }
@@ -339,6 +339,39 @@ tr.lvl-U td.target { color: var(--muted); }
 .ship-row .eff { font-size: .8rem; color: var(--muted); }
 .ship-row.hit .eff { color: var(--warn); } .ship-row.out .eff { color: var(--bad); font-weight: 600; }
 
+/* GM view */
+.gm-top { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
+@media (max-width: 900px) { .gm-top { grid-template-columns: minmax(0, 1fr); } }
+.turns { margin: 0; padding-left: 1.6em; display: grid; gap: 4px; font-size: .95rem; }
+.turns .num { color: var(--chrome); margin-left: 6px; }
+.turns .tie { color: var(--warn); font: .7rem var(--mono); letter-spacing: .08em; margin-left: 6px; }
+.gm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; margin-top: 22px; }
+.gm-card { padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.gm-card.down { border-color: var(--bad); }
+.gm-head { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.gm-head .delta { width: 34px; height: 48px; flex: none; }
+.gm-head .avatar { width: 48px; height: 48px; }
+.gm-head .avatar.portrait { width: 40px; height: 54px; }
+.gm-head b { font-family: var(--display); letter-spacing: .06em; text-transform: uppercase; font-size: 1.05rem; overflow-wrap: anywhere; }
+.gm-head .small { display: block; }
+.gm-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.gm-stats div { border: 1px solid var(--line); border-radius: 6px; padding: 4px 2px; background: var(--well); }
+.gm-stats span { display: block; font: .56rem var(--mono); letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+.gm-stats b { font: 400 1.15rem var(--mono); color: var(--chrome); }
+.gm-stats .dodge b { color: var(--accent); }
+.gm-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.gm-row .boxes { gap: 4px; }
+.gm-row .box { width: 40px; height: 24px; }
+.gm-duty { display: flex; align-items: center; gap: 6px; }
+.gm-duty b { font: 400 1.3rem var(--mono); color: var(--accent); min-width: 1.5ch; text-align: center; }
+.gm-duty button { width: 34px; height: 30px; border: 1px solid var(--chrome-dim); background: transparent; color: var(--chrome); border-radius: 999px; font: 600 1rem var(--mono); }
+.gm-skills { font-size: .84rem; color: #c9d8ec; }
+.gm-skills b { color: var(--accent); }
+.gm-traits { font-size: .82rem; color: var(--muted); display: grid; gap: 2px; }
+.gm-traits strong { color: var(--fg); }
+.gm-cond { font-size: .82rem; }
+.gm-cond.hurt { color: var(--warn); } .gm-cond.out { color: var(--bad); font-weight: 600; }
+
 /* Players' Guide */
 .guide-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 @media (max-width: 900px) { .guide-layout { grid-template-columns: minmax(0, 1fr); } }
@@ -379,6 +412,8 @@ tr.lvl-U td.target { color: var(--muted); }
   #app:not([data-view="guide"]) #view-sheet { display: block !important; }
   #app[data-view="guide"] #view-guide { display: block !important; }
   #app[data-view="guide"] #view-sheet { display: none !important; }
+  #app[data-view="gm"] #view-sheet { display: none !important; }
+  #app[data-view="gm"] #view-gm { display: block !important; }
   .guide-layout { display: block; }
   .guide { padding: 0; border: 0; font-size: 10pt; line-height: 1.45; }
   .guide h2 { margin-top: 1.2em; }
@@ -421,6 +456,7 @@ tr.lvl-U td.target { color: var(--muted); }
       <button class="tab" role="tab" id="tab-create" aria-selected="true" aria-controls="view-create">Create</button>
       <button class="tab" role="tab" id="tab-sheet" aria-selected="false" aria-controls="view-sheet">Duty station</button>
       <button class="tab" role="tab" id="tab-guide" aria-selected="false" aria-controls="view-guide">Players' Guide</button>
+      <button class="tab" role="tab" id="tab-gm" aria-selected="false" aria-controls="view-gm">GM view</button>
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
@@ -612,6 +648,36 @@ tr.lvl-U td.target { color: var(--muted); }
         </div>
       </aside>
     </div>
+  </section>
+
+  <!-- GM VIEW -->
+  <section id="view-gm" role="tabpanel" aria-labelledby="tab-gm" hidden>
+    <div class="gm-top">
+      <div class="card hud no-print">
+        <h3>Crew</h3>
+        <p class="small muted">Open the players' character files to see the whole crew. Changes here (injuries, Duty points) are the GM's copies; save the crew to a file to keep them.</p>
+        <div class="btn-row">
+          <label class="btn primary" for="gm-files" id="gm-open" tabindex="0">Open character or crew files</label>
+          <input type="file" id="gm-files" accept=".json,application/json,text/plain" multiple class="visually-hidden">
+          <button class="btn" id="gm-save">Save crew to file</button>
+        </div>
+        <div class="fields">
+          <div class="field"><label for="gm-add-saved">Add from this browser</label><select id="gm-add-saved"></select></div>
+          <div class="field"><label for="gm-add-pregen">Add ready-made crew</label><select id="gm-add-pregen"></select></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="gm-newsession">New session: everyone back to 2 Duty</button>
+          <button class="linkish danger" id="gm-clear">Remove everyone</button>
+        </div>
+        <div class="toast" id="gm-msg" role="status" aria-live="polite"></div>
+      </div>
+      <div class="card hud">
+        <h3>Turn order</h3>
+        <p class="small muted">Highest Agility first. Players choose the order among tied crew; the GM places opponents.</p>
+        <ol class="turns" id="gm-turns"></ol>
+      </div>
+    </div>
+    <div class="gm-grid" id="gm-grid"></div>
   </section>
 
   <!-- Phone-only readiness bar for the Create tab -->
@@ -3104,6 +3170,106 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   renderShip(); renderClocks();
 
+  // ---- GM view: the whole crew at a glance ----
+  const STORE_GM = "pelion.gmcrew.v1";
+  let gmCrew = (store.get(STORE_GM, []) || []).filter((c) => c && typeof c === "object").map(normalize);
+  const gmSay = (m, err) => { const el = $("gm-msg"); el.textContent = m; el.className = "toast" + (err ? " err" : ""); };
+  const saveGM = () => { if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the crew. Save the crew to a file.", true); };
+  // Work out a crew member's numbers with the same rules as the sheet, by briefly treating them as the current character.
+  function gmCalc(c) {
+    const saved = ch; ch = c;
+    try {
+      const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n) })).filter((x) => x.l !== "U")
+        .sort((a, b) => (b.l === "S") - (a.l === "S") || b.t - a.t);
+      return { skills, dodge: dodge(), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
+    } finally { ch = saved; }
+  }
+  function gmAdd(list) {
+    let added = 0, updated = 0;
+    for (const raw of list) {
+      if (!raw || typeof raw !== "object" || !raw.attrs || !raw.skills) continue;
+      const c = normalize({ ...raw, example: false });
+      const i = gmCrew.findIndex((x) => x.id === c.id);
+      if (i >= 0) { gmCrew[i] = c; updated++; } else { gmCrew.push(c); added++; }
+    }
+    saveGM(); renderGM();
+    return { added, updated };
+  }
+  function renderGM() {
+    $("gm-add-saved").innerHTML = `<option value="">${roster.length ? "Choose a saved officer…" : "No officers saved in this browser"}</option>` +
+      roster.map((c, i) => `<option value="${i}">${esc(c.name || "Unnamed officer")}</option>`).join("");
+    $("gm-add-pregen").innerHTML = `<option value="">Choose a ready-made crew member…</option>` +
+      PREGENS.map((c, i) => `<option value="${i}">${esc(c.name)}: ${esc(c.dept)}</option>`).join("");
+    // Turn order: Agility, highest first; ties flagged for the players to settle.
+    const order = gmCrew.map((c) => ({ c, a: c.attrs.Agility })).sort((x, y) => y.a - x.a || x.c.name.localeCompare(y.c.name));
+    $("gm-turns").innerHTML = order.length ? order.map(({ c, a }, i) => {
+      const tied = order.some((o, j) => j !== i && o.a === a);
+      return `<li>${esc(c.name || "Unnamed")}<span class="num">Agility ${a}</span>${tied ? '<span class="tie">tie</span>' : ""}${c.play.injury >= 3 ? ' <span class="tie">down</span>' : ""}</li>`;
+    }).join("") : `<li class="muted" style="list-style:none;margin-left:-1.6em">Add crew to see the turn order.</li>`;
+    $("gm-grid").innerHTML = gmCrew.length ? gmCrew.map((c) => {
+      const k = gmCalc(c), inj = c.play.injury;
+      const cond = INJURY[inj][0] + (INJURY[inj][2] ? ` (${INJURY[inj][2]} physical)` : "");
+      const art = c.portrait ? `<img class="avatar ${c.portraitShape === "portrait" ? "portrait" : ""}" src="${c.portrait}" alt="">`
+        : DELTA_SVG.replace('data-emblem d=""', `d="${EMBLEMS[k.div].d}"`).replace('class="emblem"', `class="emblem${EMBLEMS[k.div].stroke ? " stroke" : ""}"`);
+      return `<article class="gm-card hud ${inj >= 3 ? "down" : ""}" data-div="${k.div}">
+        <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed officer")}</b>
+          <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span></div></div>
+        <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b>${c.attrs[n]}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div></div>
+        <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
+          <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a Duty point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a Duty point">+</button><span class="small muted">Duty</span></span></div>
+        <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
+        <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${k.top})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
+        <div class="gm-traits"><span><strong>Advantage:</strong> ${esc(k.adv || "—")}</span>
+          <span><strong>Complication:</strong> ${esc(k.comp || "—")}${c.comp.trigger ? ` (trigger: ${esc(c.comp.trigger)})` : ""}${k.scomp ? `; ${esc(k.scomp)}` : ""}</span></div>
+        <button class="linkish danger" data-gm="${c.id}" data-gmrm>Remove from view</button>
+      </article>`;
+    }).join("") : `<div class="card hud"><p class="muted">No crew yet. Ask each player to <b>Save to file</b> and send you the file, then open them all at once above. You can also add officers saved in this browser, or the ready-made crew for a quick game.</p></div>`;
+  }
+  $("gm-grid").addEventListener("click", (e) => {
+    const el = e.target.closest("[data-gm]"); if (!el || el.matches("input")) return;
+    const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
+    if (el.dataset.gmbox) { const i = +el.dataset.gmbox; c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; }
+    else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
+    else if ("gmrm" in el.dataset) gmCrew = gmCrew.filter((x) => x !== c);
+    saveGM(); renderGM();
+  });
+  $("gm-grid").addEventListener("change", (e) => {
+    const el = e.target.closest("[data-gmdying]"); if (!el) return;
+    const c = gmCrew.find((x) => x.id === el.dataset.gm); if (c) { c.play.dying = el.checked; saveGM(); renderGM(); }
+  });
+  $("gm-files").addEventListener("change", async (e) => {
+    const files = [...e.target.files]; e.target.value = "";
+    let found = [], bad = 0;
+    for (const f of files) {
+      try {
+        const data = JSON.parse(await f.text());
+        const list = Array.isArray(data) ? data : Array.isArray(data.crew) ? data.crew : [data];
+        const ok = list.filter((x) => x && x.attrs && x.skills);
+        if (!ok.length) bad++;
+        found = found.concat(ok);
+      } catch { bad++; }
+    }
+    const { added, updated } = gmAdd(found);
+    gmSay(`${added} added${updated ? `, ${updated} updated` : ""}${bad ? `; ${bad} file${bad > 1 ? "s weren't" : " wasn't"} a USS Pelion character file` : ""}.`, !!bad && !added && !updated);
+  });
+  $("gm-open").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("gm-files").click(); } });
+  $("gm-add-saved").addEventListener("change", (e) => { const c = roster[+e.target.value]; if (e.target.value !== "" && c) { gmAdd([c]); gmSay(`Added ${c.name || "officer"}.`); } e.target.value = ""; });
+  $("gm-add-pregen").addEventListener("change", (e) => {
+    const c = PREGENS[+e.target.value];
+    if (e.target.value !== "" && c) { gmAdd([{ ...JSON.parse(JSON.stringify(c)), id: uid() }]); gmSay(`Added ${c.name}.`); }
+    e.target.value = "";
+  });
+  $("gm-save").onclick = () => {
+    if (!gmCrew.length) { gmSay("Add some crew first.", true); return; }
+    saveText(JSON.stringify({ format: "uss-pelion-crew", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })) }, null, 2), "pelion-crew.json", gmSay);
+  };
+  $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = 2)); saveGM(); renderGM(); gmSay("New session: everyone has 2 Duty points."); };
+  let gmClearArmed = false;
+  $("gm-clear").onclick = () => {
+    if (!gmClearArmed) { gmClearArmed = true; $("gm-clear").textContent = "Tap again to remove everyone"; setTimeout(() => { gmClearArmed = false; $("gm-clear").textContent = "Remove everyone"; }, 4000); return; }
+    gmClearArmed = false; gmCrew = []; saveGM(); renderGM(); $("gm-clear").textContent = "Remove everyone"; gmSay("Crew view cleared. Players' own files are untouched.");
+  };
+
   // ---- portrait ----
   // Images are scaled down in the browser so a character stays small enough to save and share as JSON.
   const MAX_SIDE = 480;
@@ -3158,7 +3324,7 @@ tr.lvl-U td.target { color: var(--muted); }
   $("r-roll").onclick = () => doRoll(false);
 
   function selectTab(which) {
-    for (const v of ["create", "sheet", "guide"]) {
+    for (const v of ["create", "sheet", "guide", "gm"]) {
       $("tab-" + v).setAttribute("aria-selected", v === which);
       $("view-" + v).hidden = v !== which;
     }
@@ -3173,6 +3339,7 @@ tr.lvl-U td.target { color: var(--muted); }
   $("tab-create").onclick = () => selectTab("create");
   $("tab-sheet").onclick = () => selectTab("sheet");
   $("tab-guide").onclick = () => selectTab("guide");
+  $("tab-gm").onclick = () => { renderGM(); selectTab("gm"); };
   $("ms-go").onclick = () => $("checklist").scrollIntoView({ behavior: "smooth", block: "center" });
   // On narrow screens the guide's contents list starts folded and folds again after a jump.
   const narrow = window.matchMedia && matchMedia("(max-width: 900px)");
@@ -3220,29 +3387,32 @@ tr.lvl-U td.target { color: var(--muted); }
   const downloadsReady = window.claude?.use ? window.claude.use("downloads").catch(() => null) : Promise.resolve(null);
   downloadsReady.then((dl) => {
     if (dl || !framed) return;
-    $("btn-save-file").hidden = true; $("ms-save").hidden = true;
+    $("btn-save-file").hidden = true; $("ms-save").hidden = true; $("gm-save").hidden = true;
     $("file-note").hidden = false;
     $("file-note").textContent = "Saving files isn't available in this view. Use Share as text below, or open the creator's HTML file directly.";
   });
-  async function saveFile() {
-    const txt = exportText(), name = fileName();
+  // Saves text as a file; reports through `say(message, isError)`. Resolves true when saved.
+  async function saveText(txt, name, say) {
     const dl = await downloadsReady;
     if (dl) {
-      try { await dl.save({ filename: name, data: txt }); ch.example = false; render(); toast(`Saved ${name}. Find it in your Downloads.`); }
+      try { await dl.save({ filename: name, data: txt }); say(`Saved ${name}. Find it in your Downloads.`); return true; }
       catch (e) {
         const code = e && e.code;
-        if (code === "declined") toast("Save cancelled.");
-        else if (code === "rate_limited") toast("A save prompt is already open.");
-        else toast("This view couldn't save the file. Use Share as text instead.", true);
+        if (code === "declined") say("Save cancelled.");
+        else if (code === "rate_limited") say("A save prompt is already open.");
+        else say("This view couldn't save the file.", true);
+        return false;
       }
-      return;
     }
     const url = URL.createObjectURL(new Blob([txt], { type: "application/json" }));
     const a = document.createElement("a");
     a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
-    ch.example = false; render();
-    toast(`Saved ${name}. Find it in your Downloads.`);
+    say(`Saved ${name}. Find it in your Downloads.`);
+    return true;
+  }
+  async function saveFile() {
+    if (await saveText(exportText(), fileName(), toast)) { ch.example = false; render(); }
   }
   $("btn-save-file").onclick = saveFile;
   $("ms-save").onclick = saveFile;
@@ -3308,6 +3478,6 @@ tr.lvl-U td.target { color: var(--muted); }
   render();
   $("r-phys").checked = PHYSICAL.has($("r-skill").value);
   updateTarget();
-  try { const t = sessionStorage.getItem("pelion.tab"); if (t === "sheet" || t === "guide") selectTab(t); } catch {}
+  try { const t = sessionStorage.getItem("pelion.tab"); if (t === "sheet" || t === "guide" || t === "gm") selectTab(t); } catch {}
 })();
 </script>

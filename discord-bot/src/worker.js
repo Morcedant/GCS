@@ -62,6 +62,23 @@ export function describe(r) {
   return lines;
 }
 
+/**
+ * Opposed contest, as the guide states: one success beats one failure; if both succeed the larger
+ * margin wins (an automatic success above its target counts as margin 0); a tie or two failures
+ * favors the defender. Returns "me" or "opponent".
+ */
+export function contestWinner(me, opp, defender = "opponent") {
+  if (me.success && !opp.success) return "me";
+  if (opp.success && !me.success) return "opponent";
+  if (me.success && opp.success && me.contestMargin !== opp.contestMargin) return me.contestMargin > opp.contestMargin ? "me" : "opponent";
+  return defender;
+}
+
+/** Assistance bonus from the helper's roll: success +1, success by 5 or more +2, failure +0. */
+export function assistBonus(r) {
+  return r.success ? (r.contestMargin >= 5 ? 2 : 1) : 0;
+}
+
 export function targetLine(base, modifier) {
   return modifier ? `${base} ${signed(modifier)} → **${base + modifier}**` : `**${base}**`;
 }
@@ -89,6 +106,32 @@ export const COMMANDS = [
       { type: 1, name: "set", description: "GM: set a player's Duty points",
         options: [{ type: 6, name: "player", description: "Player", required: true }, { type: 4, name: "points", description: "New total", required: true, min_value: 0, max_value: 20 }] },
       { type: 1, name: "newsession", description: "GM: start a new session; everyone goes back to 2" },
+    ],
+  },
+  {
+    name: "contest",
+    description: "Opposed roll: you against an opponent (USS Pelion rules)",
+    options: [
+      { type: 4, name: "target", description: "Your skill or attribute target", required: true, min_value: 1, max_value: 30 },
+      { type: 4, name: "opponent", description: "The opponent's skill target", required: true, min_value: 1, max_value: 30 },
+      { type: 4, name: "modifier", description: "Your total modifier, e.g. -2", required: false, min_value: -12, max_value: 12 },
+      { type: 4, name: "opponent_modifier", description: "The opponent's total modifier", required: false, min_value: -12, max_value: 12 },
+      { type: 3, name: "defender", description: "Who wins ties and double failures (default: the opponent)", required: false,
+        choices: [{ name: "opponent", value: "opponent" }, { name: "me", value: "me" }] },
+      { type: 3, name: "label", description: "What the contest is, e.g. Grapple or Bluff the guard", required: false, max_length: 40 },
+      { type: 3, name: "opponent_name", description: "Who you're up against, e.g. Klingon warrior", required: false, max_length: 40 },
+    ],
+  },
+  {
+    name: "assist",
+    description: "A helper rolls first, then you roll with their bonus",
+    options: [
+      { type: 4, name: "target", description: "Your (lead) skill target", required: true, min_value: 1, max_value: 30 },
+      { type: 4, name: "helper_target", description: "The helper's relevant skill target", required: true, min_value: 1, max_value: 30 },
+      { type: 6, name: "helper", description: "Who is helping", required: false },
+      { type: 4, name: "modifier", description: "Your total modifier, e.g. -2", required: false, min_value: -12, max_value: 12 },
+      { type: 4, name: "helper_modifier", description: "The helper's modifier", required: false, min_value: -12, max_value: 12 },
+      { type: 3, name: "label", description: "What you're doing, e.g. Repair the overload", required: false, max_length: 40 },
     ],
   },
   {
@@ -131,6 +174,8 @@ export default {
     if (interaction.type === PING) return json({ type: PONG });
     if (interaction.type === COMMAND && interaction.data?.name === "pelion") return json(rollCommand(interaction));
     if (interaction.type === COMMAND && interaction.data?.name === "duty") return json(await dutyCommand(interaction, env));
+    if (interaction.type === COMMAND && interaction.data?.name === "contest") return json(contestCommand(interaction));
+    if (interaction.type === COMMAND && interaction.data?.name === "assist") return json(assistCommand(interaction));
     if (interaction.type === COMMAND && interaction.data?.name === "clock") return json(await clockCommand(interaction, env));
     if (interaction.type === COMPONENT && interaction.data?.custom_id?.startsWith("reroll|")) return json(await reroll(interaction, env));
     return json({ type: MESSAGE, data: { content: "Unknown command.", flags: EPHEMERAL } });
@@ -202,6 +247,63 @@ function rollCommand(interaction) {
         type: 1,
         components: [{ type: 2, style: 2, label: "Spend a Duty point to reroll", custom_id: `reroll|${user.id}|${base}|${modifier}|${label}` }],
       }],
+    },
+  };
+}
+
+const rollLine = (r) => `🎲 ${r.dice.join(" + ")} = **${r.total}** vs ${r.target}  ·  **${r.success ? "SUCCESS" : "FAILURE"}**` +
+  (r.auto ? ` (natural ${r.total})` : r.success ? `, margin ${r.contestMargin}` : `, missed by ${-r.margin}`);
+const optsOf = (interaction) => Object.fromEntries((interaction.data.options || []).map((o) => [o.name, o.value]));
+const intOr0 = (v) => (Number.isInteger(v) ? v : 0);
+const cleanLabel = (v) => String(v || "").replace(/\|/g, "/").trim().slice(0, 40);
+
+function contestCommand(interaction) {
+  const o = optsOf(interaction), user = userOf(interaction);
+  const mine = resolve(rollDice(), clampInt(o.target) + intOr0(o.modifier));
+  const theirs = resolve(rollDice(), clampInt(o.opponent) + intOr0(o.opponent_modifier));
+  const defender = o.defender === "me" ? "me" : "opponent";
+  const winner = contestWinner(mine, theirs, defender);
+  const foe = cleanLabel(o.opponent_name) || "The opponent";
+  const why = mine.success !== theirs.success ? "one success beats one failure"
+    : mine.success ? (mine.contestMargin === theirs.contestMargin ? "equal margins: the defender wins" : "the larger margin wins")
+    : "both failed: the defender holds";
+  return {
+    type: MESSAGE,
+    data: {
+      allowed_mentions: { parse: [] },
+      embeds: [{
+        title: `${cleanLabel(o.label) || "Contest"}: ${winner === "me" ? "you win" : `${foe.toLowerCase() === "the opponent" ? "the opponent" : foe} wins`}`,
+        color: winner === "me" ? GREEN : RED,
+        description: `<@${user.id}>: ${targetLine(clampInt(o.target), intOr0(o.modifier))}\n${rollLine(mine)}\n\n` +
+          `${foe}: ${targetLine(clampInt(o.opponent), intOr0(o.opponent_modifier))}\n${rollLine(theirs)}\n\n` +
+          `**${winner === "me" ? `<@${user.id}> wins` : `${foe} wins`}** (${why}). Defender: ${defender === "me" ? `<@${user.id}>` : foe}.`,
+        footer: { text: "Opposed contest · USS Pelion NCC-1750" },
+      }],
+    },
+  };
+}
+
+function assistCommand(interaction) {
+  const o = optsOf(interaction), user = userOf(interaction);
+  const base = clampInt(o.target), mod = intOr0(o.modifier), label = cleanLabel(o.label);
+  const help = resolve(rollDice(), clampInt(o.helper_target) + intOr0(o.helper_modifier));
+  const bonus = assistBonus(help);
+  const lead = resolve(rollDice(), base + mod + bonus);
+  const helper = o.helper ? `<@${o.helper}>` : "The helper";
+  const helpNote = help.total === 18 ? "A natural 18: no bonus, and the GM introduces a complication."
+    : bonus === 2 ? "Success by 5 or more: +2 to the lead roll." : bonus === 1 ? "Success: +1 to the lead roll." : "Failure: no bonus.";
+  return {
+    type: MESSAGE,
+    data: {
+      allowed_mentions: { parse: [] },
+      embeds: [{
+        title: `${label || "Assisted roll"}: target ${base + mod + bonus}`,
+        color: lead.success ? GREEN : RED,
+        description: `**Assist.** ${helper} rolls under ${targetLine(clampInt(o.helper_target), intOr0(o.helper_modifier))}\n${rollLine(help)}\n${helpNote}\n\n` +
+          `**Lead.** <@${user.id}> rolls under ${targetLine(base, mod + bonus)}\n🎲 ${lead.dice.join(" + ")} = **${lead.total}**  ·  **${lead.success ? "SUCCESS" : "FAILURE"}**\n` + describe(lead).join("\n"),
+        footer: { text: "One assistant per roll · USS Pelion NCC-1750" },
+      }],
+      components: [{ type: 1, components: [{ type: 2, style: 2, label: "Spend a Duty point to reroll", custom_id: `reroll|${user.id}|${base}|${mod + bonus}|${label}` }] }],
     },
   };
 }
@@ -360,7 +462,7 @@ async function registerCommands(env) {
       res = await put();
     }
   }
-  if (res.ok) return new Response("Registered /pelion, /duty and /clock. They can take a minute to appear in Discord.");
+  if (res.ok) return new Response("Registered /pelion, /contest, /assist, /duty and /clock. They can take a minute to appear in Discord.");
   const detail = await res.text();
   const hint = res.status === 429 ? "\n\nDiscord is rate-limiting registration. Wait a minute or two, then reload this page once."
     : res.status === 401 ? "\n\nThe bot token is wrong or was reset. Reset it on the Bot page and update DISCORD_BOT_TOKEN." : "";

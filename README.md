@@ -44,3 +44,10 @@ guide's rules and offers a Duty point reroll. It runs on Cloudflare Workers; set
 The Duty station tab also has **Clocks** (danger and progress clocks you tap to fill) and **USS Pelion status**
 (Shields, Hull and six systems with damage boxes). Both are kept in the browser for the table, not in a character
 file. The guide covers success at a cost, clocks, the ship's tracks, and a Threats chapter of ready opponents.
+
+### GM view
+
+The **GM view** tab shows the whole crew: open every player's character file at once (or a saved crew file), add
+officers saved in the browser or the ready-made crew, and track each one's injuries and Duty points from a card that
+also shows attributes, Dodge, skills, advantage and complication. A turn-order list sorts the crew by Agility.
+**Save crew to file** keeps the GM's copies.

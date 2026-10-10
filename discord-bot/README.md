@@ -46,6 +46,13 @@ command to the Worker's web address, so there is no server to keep running.
 
 Type `/pelion` in your server to roll. New commands can take a minute to appear.
 
+## Contests and assistance
+
+| Command | What it does |
+|---|---|
+| `/contest target:13 opponent:12 opponent_name:"Klingon warrior" label:Grapple` | Rolls both sides and names the winner by the guide's rules: one success beats a failure; if both succeed the larger margin wins; ties and double failures go to the defender (the opponent unless you set `defender:me`). Add `modifier` / `opponent_modifier` for penalties. |
+| `/assist target:12 helper_target:14 helper:@Sevek label:"Stop the overload"` | Rolls the helper first: success +1, success by 5 or more +2, failure +0, a natural 18 adds a complication. Then rolls your lead roll with that bonus, with the usual Duty point reroll button. |
+
 ## Track Duty points (optional)
 
 With storage connected, the bot keeps each player's Duty points per server:
@@ -83,7 +90,7 @@ The Worker's home page shows "DUTY storage is connected" when it's working.
 | `/clock remove name:"Warp core breach"` | Removes a clock |
 
 After updating the Worker code, add `DISCORD_BOT_TOKEN` back for a moment and open `/register` once more
-("Registered /pelion, /duty and /clock"), then delete the token again.
+("Registered /pelion, /contest, /assist, /duty and /clock"), then delete the token again.
 
 Rolls that fail by 1 or 2 now say "the GM may offer success at a cost", following the guide.
 
