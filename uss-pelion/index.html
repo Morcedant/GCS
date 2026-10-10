@@ -38,6 +38,7 @@
 [data-div="command"] { --accent: var(--gold); }
 [data-div="sciences"] { --accent: var(--blue); }
 [data-div="operations"] { --accent: var(--red); }
+[data-div="services"] { --accent: var(--red); }
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -297,7 +298,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <select id="f-dept"></select></div>
             <div class="field"><label for="f-rank">Rank</label>
               <input type="text" id="f-rank" list="ranks" placeholder="e.g. Lieutenant">
-              <datalist id="ranks"><option>Ensign</option><option>Lieutenant (j.g.)</option><option>Lieutenant</option><option>Lieutenant Commander</option><option>Commander</option><option>Captain</option><option>Chief Petty Officer</option><option>Yeoman</option><option>Crewman</option></datalist></div>
+              <datalist id="ranks"></datalist></div>
             <div class="field wide"><label for="f-role">What you contribute</label>
               <textarea id="f-role" rows="2"></textarea>
               <span class="small muted" id="role-hint"></span></div>
@@ -521,6 +522,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["Command", "command"], ["Helm", "command"], ["Navigation", "command"],
     ["Science", "sciences"], ["Medical", "sciences"],
     ["Engineering", "operations"], ["Security", "operations"], ["Communications", "operations"],
+    ["General Services", "services"],
   ];
   // Starting text for "What you contribute"; replaced on department change unless the player has written their own.
   const ROLE_SUGGESTIONS = {
@@ -532,14 +534,19 @@ tr.lvl-U td.target { color: var(--muted); }
     Engineering: "Engineer: keeps the Pelion's machinery and power running, and improvises repairs when the parts run out.",
     Security: "Security officer: protects the away team, secures the ship, and decides when a phaser stays on stun.",
     Communications: "Communications officer: establishes contact, cuts through interference, and hears what a signal is really saying.",
+    "General Services": "Enlisted crew: keeps the records, carries orders and reports, and handles the ship's daily business so every department can do its job.",
   };
-  // Division emblems on the delta: command star, sciences planet and orbit, operations spiral.
+  // Division emblems on the delta: command star, sciences planet and orbit, operations spiral, general services dot.
   const EMBLEMS = {
     command: { d: "M50.0 68.0 L53.8 78.7 L65.2 79.1 L56.2 86.0 L59.4 96.9 L50.0 90.5 L40.6 96.9 L43.8 86.0 L34.8 79.1 L46.2 78.7 Z", stroke: false },
     sciences: { d: "M50 78 a6 6 0 1 0 0.01 0 Z M35 90 C32 78 60 68 65 76 C69 86 44 100 35 90 Z", stroke: true },
+    services: { d: "M50 74 a10 10 0 1 0 0.01 0 Z", stroke: false },
     operations: { d: "M50.0 86.0 L49.6 86.1 L49.2 86.2 L48.8 86.2 L48.4 86.1 L47.9 85.9 L47.5 85.6 L47.1 85.3 L46.8 84.8 L46.6 84.3 L46.4 83.7 L46.3 83.1 L46.4 82.4 L46.5 81.8 L46.8 81.1 L47.3 80.5 L47.8 80.0 L48.4 79.5 L49.2 79.1 L50.0 78.9 L50.8 78.8 L51.7 78.9 L52.6 79.1 L53.5 79.4 L54.3 80.0 L55.0 80.6 L55.7 81.4 L56.2 82.4 L56.5 83.4 L56.7 84.5 L56.7 85.6 L56.5 86.7 L56.1 87.9 L55.5 88.9 L54.7 89.9 L53.8 90.7 L52.7 91.4 L51.4 91.9 L50.1 92.2 L48.8 92.2 L47.4 92.1 L46.0 91.7 L44.7 91.1 L43.5 90.2 L42.4 89.1 L41.5 87.9 L40.9 86.5 L40.4 85.0 L40.2 83.4 L40.3 81.8 L40.6 80.1 L41.3 78.6 L42.2 77.1 L43.3 75.8 L44.7 74.6 L46.2 73.7 L47.9 73.1 L49.7 72.7 L51.6 72.7 L53.5 73.0 L55.3 73.5 L57.1 74.4 L58.7 75.6 L60.1 77.0 L61.2 78.7 L62.1 80.6 L62.6 82.6 L62.9 84.7 L62.7 86.8 L62.2 89.0 L61.4 91.0 L60.2 92.9 L58.7 94.6 L57.0 96.0 L55.0 97.1 L52.8 97.9 L50.5 98.3 L48.1 98.4 L45.7 98.0 L43.4 97.3 L41.2 96.1", stroke: true },
   };
   const DELTA_SVG = `<svg class="delta" viewBox="0 0 100 140" aria-hidden="true"><path class="outer" d="M50 2 C63 36 80 95 85 138 C72 124 60 115 50 113 C40 115 28 124 15 138 C20 95 37 36 50 2 Z"/><path class="emblem" data-emblem d=""/></svg>`;
+  const OFFICER_RANKS = ["Ensign", "Lieutenant (j.g.)", "Lieutenant", "Lieutenant Commander", "Commander", "Captain"];
+  const ENLISTED_RANKS = ["Crewman 3rd Class", "Crewman 2nd Class", "Crewman 1st Class", "Crewman", "Yeoman 3rd Class", "Yeoman 2nd Class", "Yeoman 1st Class", "Yeoman"];
+  const isEnlisted = (rank) => /^\s*(crewman|yeoman)\b/i.test(rank || "");
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
   const ADVANTAGES = [
     ["steady", "Steady Hands", "+2 to Medicine for delicate surgery or removing a dangerous embedded object. It does not improve diagnosis or all medical treatment.", "Medicine"],
@@ -666,7 +673,7 @@ tr.lvl-U td.target { color: var(--muted); }
       (!(advDef()?.[4]) || ch.adv.detail.trim());
     const compOk = ch.comp.id && (ch.comp.id !== "custom" || (ch.comp.name.trim() && ch.comp.text.trim()));
     return [
-      [!!ch.name.trim(), ch.name.trim() ? "Officer named" : "Name your officer"],
+      [!!ch.name.trim(), ch.name.trim() ? "Name entered" : "Enter a name"],
       [!!ch.dept, "Department chosen"],
       [sp === POOL && !overMax.length, sp === POOL ? (overMax.length ? `Lower ${overMax.join(", ")} to 13 or less` : "5 attribute points spent") : `Attribute points spent: ${sp} of ${POOL}`],
       [nS === 1, nS === 1 ? "One Specialty" : `Specialty skills: ${nS} of 1`],
@@ -727,6 +734,9 @@ tr.lvl-U td.target { color: var(--muted); }
     $("hdr-sub").textContent = [ch.rank, ch.species, ch.dept && ch.dept + " department"].filter(Boolean).join(" · ") || "—";
     $("example-banner").hidden = !ch.example;
     $("f-role").placeholder = ROLE_SUGGESTIONS[ch.dept] || "";
+    const ranks = ch.dept === "General Services" ? ENLISTED_RANKS : OFFICER_RANKS;
+    if ($("ranks").dataset.for !== ch.dept) { $("ranks").innerHTML = ranks.map((r) => `<option>${r}</option>`).join(""); $("ranks").dataset.for = ch.dept; }
+    $("f-rank").placeholder = ch.dept === "General Services" ? "e.g. Yeoman 3rd Class" : "e.g. Lieutenant";
     $("role-hint").textContent = ROLE_TEXTS.has(ch.role)
       ? `Suggested text for ${ch.dept}. It follows the department until you write your own.` : "";
 
@@ -802,7 +812,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const advText = ch.adv.id === "custom" ? ch.adv.text : advDef()?.[2] || "";
     const compText = ch.comp.id === "custom" ? ch.comp.text : compDef()?.[2] || "";
     $("sheet-main").innerHTML = `
-      <div class="sheet-title">${DELTA_SVG}<div><span class="eyebrow">Starfleet officer · U.S.S. Pelion NCC-1750</span>
+      <div class="sheet-title">${DELTA_SVG}<div><span class="eyebrow">${ch.dept === "General Services" ? "Starfleet enlisted crew" : "Starfleet officer"} · U.S.S. Pelion NCC-1750</span>
         <h2 style="font-size:1.7rem">${esc(ch.name || "Unnamed officer")}</h2></div></div>
       <div class="idgrid">
         <div><span class="label">Rank</span><b>${esc(ch.rank || "—")}</b></div>
@@ -921,6 +931,10 @@ tr.lvl-U td.target { color: var(--muted); }
   function save() { store.set(STORE_CURRENT, ch); }
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
   function load(c) { ch = normalize(c); last = null; $("r-result").hidden = true; bindFields(); render(); }
+  function setDept(d) {
+    ch.dept = d;
+    if (!ch.role.trim() || ROLE_TEXTS.has(ch.role)) { ch.role = ROLE_SUGGESTIONS[ch.dept] || ""; $("f-role").value = ch.role; }
+  }
   function touch() { if (ch.example) ch.example = false; }
 
   // ---- events ----
@@ -935,10 +949,10 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   document.addEventListener("change", (e) => {
     const t = e.target;
-    if (t.id === "f-dept") {
-      ch.dept = t.value;
-      if (!ch.role.trim() || ROLE_TEXTS.has(ch.role)) { ch.role = ROLE_SUGGESTIONS[ch.dept] || ""; $("f-role").value = ch.role; }
-      touch(); render();
+    if (t.id === "f-dept") { setDept(t.value); touch(); render(); }
+    else if (t.id === "f-rank" && isEnlisted(t.value) && ch.dept !== "General Services") {
+      setDept("General Services"); $("f-dept").value = ch.dept; touch(); render();
+      toast("Crewmen and yeomen serve in General Services, so the department was changed.");
     }
     else if (t.id === "f-adv") { ch.adv.id = t.value; touch(); render(); }
     else if (t.id === "f-comp") { ch.comp.id = t.value; touch(); render(); }
