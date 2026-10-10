@@ -168,6 +168,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .trait-desc.comp { border-left-color: var(--warn); }
 .checks { display: flex; flex-wrap: wrap; gap: 8px 18px; }
 .checks label.injured { color: var(--warn); }
+.checks label.dying { color: var(--bad); font-weight: 600; }
 .checks label.applied { color: var(--bad); font-weight: 600; }
 .checks label { text-transform: none; letter-spacing: 0; font: 400 .92rem/1.4 var(--body); color: var(--fg); display: flex; gap: 8px; align-items: center; }
 
@@ -943,9 +944,17 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<p>A normal damaging hit marks one box. A powerful attack can mark two. Injury penalties replace each other rather than stacking. They apply to movement, attacks, Dodge, and other tasks the injury physically hinders. The GM announces especially lethal hazards before resolution where possible. Disintegration and comparable hazards can bypass the track; further injury at three boxes may be fatal.</p>
+<p>A normal damaging hit marks one box. A powerful attack can mark two, and a killing weapon marks three (see Weapons and damage). Injury penalties replace each other rather than stacking. They apply to movement, attacks, Dodge, and other tasks the injury physically hinders. The GM announces especially lethal hazards before resolution where possible.</p>
+<h3 id="g-dying-and-death">Dying and death</h3>
+<p>Two boxes hurt; they don’t kill. Death comes from three things:</p>
+<ul>
+<li><strong>Dying.</strong> A hit from a killing weapon (a phaser or disruptor on kill) that takes you to three boxes leaves you Incapacitated and <strong>Dying</strong>. A Dying character dies at the end of the scene unless someone stabilizes them: one action and a successful Medicine roll with a medical kit. Once stabilized, you are still Incapacitated but no longer Dying.</li>
+<li><strong>A further lethal hit.</strong> While you are at three boxes, any hit from a weapon that marks two or more boxes (a heavy blade, a phaser or disruptor on kill, an explosion’s centre) kills you. Fists, clubs and knives just keep you down.</li>
+<li><strong>Disintegration</strong> and comparable hazards bypass the track entirely.</li>
+</ul>
+<p>Your protection is avoiding the hit: Dodge, cover, and a Duty point, which reduces a kill shot from three boxes to two, leaving you Seriously wounded but on your feet.</p>
 <h2 id="g-weapons-and-damage">Weapons and damage</h2>
-<p>How many boxes a hit marks depends on the <strong>weapon</strong>, not on how well the attack roll succeeded. Apply it only after the hit survives any Dodge. This list sorts common weapons into the one-box and two-box categories above; the GM places anything else by comparison.</p>
+<p>How many boxes a hit marks depends on the <strong>weapon</strong>, not on how well the attack roll succeeded. Apply it only after the hit survives any Dodge. This list sorts common weapons into one-box, two-box and killing (three-box) categories; the GM places anything else by comparison.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -991,18 +1000,18 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>No wound; the target makes the stun roll (see Phaser settings)</td>
 </tr>
 <tr class="odd">
-<td>Phaser on a lethal setting</td>
-<td>2</td>
+<td>Phaser on kill</td>
+<td>3, and Dying</td>
 <td>Severe burns and energy trauma</td>
 </tr>
 <tr class="even">
 <td>Klingon disruptor</td>
-<td>2</td>
+<td>3, and Dying</td>
 <td>Severe burns and tissue disruption</td>
 </tr>
 <tr class="odd">
 <td>Phaser rifle, or a ship’s weapon fired at a person</td>
-<td>2, or disintegration if the GM rules it</td>
+<td>3 and Dying, or disintegration if the GM rules it</td>
 <td>Massive energy trauma</td>
 </tr>
 <tr class="even">
@@ -1017,7 +1026,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<p><em>Example:</em> a Klingon’s punch leaves Ensign Reyes Wounded (−1). On the next round a d’k tahg slash marks a second box: Seriously wounded (−2). Had that second hit been a disruptor shot, it would have marked two boxes and taken Reyes to three: Incapacitated. Spending a Duty point when the disruptor hits would reduce it to one box, leaving Reyes Seriously wounded but still standing.</p>
+<p><em>Example:</em> a Klingon’s punch leaves Ensign Reyes Wounded (−1). On the next round a d’k tahg slash marks a second box: Seriously wounded (−2). A disruptor shot instead, on an unhurt Reyes, would mark all three boxes: Incapacitated and Dying, with the end of the scene as the deadline for a medic. Spending a Duty point when the disruptor hits reduces it to two boxes, leaving Reyes Seriously wounded but still standing. If Reyes is already down at three boxes, another disruptor shot or a lirpa blow kills; a punch does not.</p>
 <p>To take someone down without hurting them, use a phaser on stun, a grapple, or the Vulcan nerve pinch rather than a weapon from this list.</p>
 <h2 id="g-phaser-settings">Phaser settings</h2>
 <table>
@@ -1041,8 +1050,8 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Controlled tool use. Material, time, and the task determine the skill and difficulty.</td>
 </tr>
 <tr class="odd">
-<td>Lethal</td>
-<td>Marks two injury boxes. Disintegration requires a deliberate setting and an exposed target; the GM determines whether it is possible.</td>
+<td>Kill</td>
+<td>Marks three injury boxes: the target is Incapacitated and Dying. Disintegration requires a deliberate setting and an exposed target; the GM determines whether it is possible.</td>
 </tr>
 </tbody>
 </table>
@@ -1051,7 +1060,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Starfleet physicians in 2268 have advanced diagnostic scanners, potent pharmaceuticals, portable emergency equipment, and sophisticated sickbay facilities. Familiar injuries often respond quickly to treatment. Severe trauma, incompatible biology, missing supplies, and unidentified conditions still challenge an experienced doctor. The treatment values below are campaign rules inspired by the series, rather than numerical rules stated in canon.</p>
 <h2 id="g-diagnosis-and-stabilization">Diagnosis and stabilization</h2>
 <p>A medical scanner identifies ordinary injuries automatically. Roll Medicine when the diagnosis is uncertain, physiology is unfamiliar, or an urgent treatment decision has meaningful consequences. Routine established treatments also succeed automatically when qualified staff have sufficient time and facilities.</p>
-<p>Emergency stabilization takes one action and a successful Medicine roll with a medical kit. It prevents deterioration from the treated injury while the patient is protected from further harm. Stabilization alone removes no injury boxes. A patient at three boxes remains incapacitated until treatment clears a box.</p>
+<p>Emergency stabilization takes one action and a successful Medicine roll with a medical kit. It prevents deterioration from the treated injury while the patient is protected from further harm, and it ends Dying. Stabilization alone removes no injury boxes. A patient at three boxes remains incapacitated until treatment clears a box.</p>
 <h2 id="g-field-treatment">Field treatment</h2>
 <p>With a medical kit and several uninterrupted minutes, successful Medicine removes one injury box. Success by 5 or more removes two. Each injury receives one field-treatment attempt, even if that attempt fails; further attempts require changed circumstances such as better equipment, new diagnostic information, or access to sickbay. New injuries can receive their own treatment, but cannot justify treating an old injury repeatedly.</p>
 <h2 id="g-sickbay-treatment">Sickbay treatment</h2>
@@ -1630,7 +1639,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Modifiers:</strong> favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails. Margin = adjusted skill − roll.</p>
 <p><strong>Assistance:</strong> success +1; success by 5 or more +2; failure no bonus; 18 causes a complication. One assistant per roll.</p>
 <p><strong>Combat:</strong> short movement plus one action. Successful attack → optional Dodge → weapon effect. Dodge = Agility −2, plus Athletics training (+0 Untrained, +1 Trained, +2 Specialty), once per round. One injury box gives −1 to physical actions; two give −2; three incapacitate.</p>
-<p><strong>Damage:</strong> the weapon decides. Fists, clubs, knives, arrows and primitive firearms mark 1 box; heavy blades, phasers on a lethal setting and disruptors mark 2; stun marks none.</p>
+<p><strong>Damage:</strong> the weapon decides. Fists, clubs, knives, arrows and primitive firearms mark 1 box; heavy blades mark 2; a phaser or disruptor on kill marks 3 and leaves the target Dying (dead at the end of the scene unless stabilized); stun marks none. At three boxes, another hit from a 2-box or killing weapon is fatal.</p>
 <p><strong>Medicine:</strong> one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery.</p>
 <p><strong>Will:</strong> resist overwhelming fear or mental intrusion and maintain concentration. Ordinary danger needs no roll. Fear or distraction failure normally causes hesitation or −2 on your next action.</p>
 <p><strong>Duty points:</strong> start each session with two. Spend one to reroll, reduce an injury by one box, or establish a plausible preparation. Earn one when an accepted complication, including a companion complication, creates a meaningful problem.</p>
@@ -1663,7 +1672,8 @@ tr.lvl-U td.target { color: var(--muted); }
               <button class="linkish" id="duty-reset">New session (reset to 2)</button>
             </div>
             <span class="muted small">Max one point per roll or injury event. Earn one when you accept a meaningful problem from your complication.</span></div>
-          <div class="checks"><label><input type="checkbox" id="f-stunned"> Stunned: −2 on next action roll</label></div>
+          <div class="checks"><label><input type="checkbox" id="f-stunned"> Stunned: −2 on next action roll</label>
+            <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label></div>
         </div>
 
         <div class="card hud no-print">
@@ -1702,8 +1712,9 @@ tr.lvl-U td.target { color: var(--muted); }
             <dt>Resolution</dt><dd>3d6 at or below adjusted skill. Natural 3–4 always succeeds; 17–18 always fails. Margin = target − roll.</dd>
             <dt>Opposed</dt><dd>Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender.</dd>
             <dt>Combat</dt><dd>Move a short distance and take one action. Hit → target may Dodge once per round → weapon effect. Partial cover −2.</dd>
-            <dt>Damage</dt><dd>Fists, clubs, knives, arrows: 1 box. Heavy blades, phaser on kill, disruptors: 2 boxes. Phaser on stun: Body −2 roll, no box.</dd>
-            <dt>Phasers</dt><dd>Stun: target rolls Body −2, fail = out for the scene, success = −2 next action. Lethal: two boxes.</dd>
+            <dt>Damage</dt><dd>Fists, clubs, knives, arrows: 1 box. Heavy blades: 2. Phaser or disruptor on kill: 3 boxes and Dying. Stun: Body −2 roll, no box.</dd>
+            <dt>Dying</dt><dd>Dies at the end of the scene unless stabilized (one action, Medicine roll, medical kit). At 3 boxes, a hit from a 2-box or killing weapon is fatal.</dd>
+            <dt>Phasers</dt><dd>Stun: target rolls Body −2, fail = out for the scene, success = −2 next action. Kill: three boxes and Dying.</dd>
             <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). Sickbay +2, clears 2 (3 on margin 5+).</dd>
             <dt>Duty points</dt><dd>Reroll (keep second), reduce an injury by one box, or establish a small preparation.</dd>
           </dl>
@@ -2247,7 +2258,10 @@ tr.lvl-U td.target { color: var(--muted); }
     const inj = ch.play.injury;
     $("boxes").innerHTML = [1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-box="${i}" aria-label="Injury box ${i}${i <= inj ? ", marked" : ""}"></button>`).join("");
     $("cond").textContent = INJURY[inj][0] + ".";
-    $("cond-effect").textContent = INJURY[inj][1];
+    $("cond-effect").textContent = inj === 3 && ch.play.dying ? "Dying: needs stabilizing (one action, Medicine roll, medical kit) before the scene ends." : INJURY[inj][1];
+    if (inj < 3) ch.play.dying = false; // clearing a box ends Dying
+    $("dying-wrap").hidden = inj < 3;
+    $("f-dying").checked = !!ch.play.dying;
     $("duty-count").textContent = ch.play.duty;
     $("duty-minus").disabled = ch.play.duty <= 0;
     $("r-stun").checked = !!ch.play.stunned;
@@ -2389,6 +2403,7 @@ tr.lvl-U td.target { color: var(--muted); }
       if (v === "S") for (const k of Object.keys(ch.skills)) if (ch.skills[k] === "S" && k !== n) ch.skills[k] = "U";
       ch.skills[n] = v; touch(); render();
     }
+    else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value); updateTarget(); }
