@@ -706,6 +706,10 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Denobulan</td>
 <td>Intellect +1, Presence +1, Body −1, Agility −1</td>
 </tr>
+<tr class="even">
+<td>Trill</td>
+<td>Intellect +1, Body −1</td>
+</tr>
 </tbody>
 </table>
 <h3 id="g-spending-points">Spending points</h3>
@@ -726,6 +730,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Aurelian.</strong> A winged, avian people known as scholars and historians, like Aleek-Om. Capable of flight, but light-boned and physically frail.</p>
 <p><strong>Orion.</strong> Green-skinned people whose homeworld is better known for the Orion Syndicate’s smugglers and pirates than for Starfleet service. Orions in uniform are rare in this era and often have to prove themselves.</p>
 <p><strong>Denobulan.</strong> Cheerful, sociable people with large extended families. They need little sleep most of the year, then hibernate for several days. Dr. Phlox served aboard Enterprise NX-01 a century earlier.</p>
+<p><strong>Trill.</strong> A spotted humanoid people, some of whom are joined with a long-lived symbiont that carries the memories of its earlier hosts. In this era the Trill keep joining a closely guarded secret from outsiders, Starfleet included. An unjoined Trill uses the same adjustments; the species advantages below need a symbiont.</p>
 <h3 id="g-custom-species">Custom species</h3>
 <p>Agree on a species with the GM and give it adjustments from −2 to +2 per attribute that total zero. The normal starting maximum and species base rules apply.</p>
 <h2 id="g-step-3-choose-trained-skills">Step 3: Choose trained skills</h2>
@@ -1546,6 +1551,34 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
+<h2 id="g-trill">Trill</h2>
+<p>Both Trill advantages require a joined character; agree with the GM before play that your Trill carries a symbiont.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Effect</th>
+<th>Companion complication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Memories of Past Hosts</td>
+<td>+2 to Intellect rolls to recall something a previous host of your symbiont knew or lived through: a place, a person, an old technique.</td>
+<td><strong>The Secret of Joining.</strong> Joining is a secret your people guard from outsiders. When a medical scan, a transporter reading, or a curious crewmate could reveal your symbiont, accept the lie, the risk, or a revealing choice.</td>
+</tr>
+<tr class="even">
+<td>A Past Life’s Trade</td>
+<td>Agree with the GM on one previous host’s profession. +2 to the matching skill for tasks that profession knew well, such as a former freighter pilot’s Helm in hazardous atmospheric flight.</td>
+<td><strong>Conflicting Memories.</strong> A past host’s habit, loyalty, or old grudge surfaces at a bad moment. Accept the distraction or the trouble it brings.</td>
+</tr>
+</tbody>
+</table>
 <h1 id="g-complications">Complications</h1>
 <p>Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Duty point if you accept it. You may decline without penalty. A personality description, harmless habit, or repeated inconvenience earns no point by itself. Agree on boundaries before a complication affects another player’s character.</p>
 <table>
@@ -1806,6 +1839,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["aurelian", "Aurelian", { Agility: 1, Intellect: 1, Body: -2 }, "A winged, avian people known as scholars and historians, like Aleek-Om. Capable of flight, but light-boned and physically frail."],
     ["orion", "Orion", { Body: 1, Presence: 1, Intellect: -1, Will: -1 }, "Green-skinned people whose homeworld is better known for the Orion Syndicate's smugglers and pirates than for Starfleet service. Orions in uniform are rare in this era and often have to prove themselves."],
     ["denobulan", "Denobulan", { Intellect: 1, Presence: 1, Body: -1, Agility: -1 }, "Cheerful, sociable people with large extended families. They need little sleep most of the year, then hibernate for several days. Dr. Phlox served aboard Enterprise NX-01 a century earlier."],
+    ["trill", "Trill", { Intellect: 1, Body: -1 }, "A spotted humanoid people, some of whom are joined with a long-lived symbiont that carries the memories of its earlier hosts. In this era the Trill keep joining a closely guarded secret from outsiders, Starfleet included."],
   ];
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
   // Species advantages, each paired with a companion complication that comes with it.
@@ -1878,6 +1912,12 @@ tr.lvl-U td.target { color: var(--muted); }
         "Unorthodox Methods", "Patients and crewmates balk at your strange remedies. Accept a refusal, a delay, or a complaint to the captain."],
       ["d-wakeful", "Wakeful", "+2 to Body when resisting fatigue or going without sleep for days.", "Body", true,
         "Hibernation Cycle", "Once a year you must hibernate for several days. When the cycle comes due at a bad moment, accept your absence or −2 on Intellect rolls until you rest."],
+    ],
+    trill: [
+      ["tr-memories", "Memories of Past Hosts", "Joined Trill only. +2 to Intellect rolls to recall something a previous host of your symbiont knew or lived through: a place, a person, an old technique.", "Intellect", true,
+        "The Secret of Joining", "Joining is a secret your people guard from outsiders. When a medical scan, a transporter reading, or a curious crewmate could reveal your symbiont, accept the lie, the risk, or a revealing choice."],
+      ["tr-pastlife", "A Past Life's Trade", "Joined Trill only. Agree with the GM on one previous host's profession. +2 to the matching skill for tasks that profession knew well, such as a former freighter pilot's Helm in hazardous atmospheric flight.", "", true,
+        "Conflicting Memories", "A past host's habit, loyalty, or old grudge surfaces at a bad moment. Accept the distraction or the trouble it brings."],
     ],
   };
   const sTraitList = () => SPECIES_TRAITS[ch.speciesId] || [];

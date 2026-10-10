@@ -79,6 +79,7 @@ Every attribute starts at 10. Your species then adjusts some of them; the result
 | Aurelian | Agility +1, Intellect +1, Body −2 |
 | Orion | Body +1, Presence +1, Intellect −1, Will −1 |
 | Denobulan | Intellect +1, Presence +1, Body −1, Agility −1 |
+| Trill | Intellect +1, Body −1 |
 
 ### Spending points
 
@@ -110,6 +111,8 @@ After applying your species, distribute **five additional points** among the att
 **Orion.** Green-skinned people whose homeworld is better known for the Orion Syndicate's smugglers and pirates than for Starfleet service. Orions in uniform are rare in this era and often have to prove themselves.
 
 **Denobulan.** Cheerful, sociable people with large extended families. They need little sleep most of the year, then hibernate for several days. Dr. Phlox served aboard Enterprise NX-01 a century earlier.
+
+**Trill.** A spotted humanoid people, some of whom are joined with a long-lived symbiont that carries the memories of its earlier hosts. In this era the Trill keep joining a closely guarded secret from outsiders, Starfleet included. An unjoined Trill uses the same adjustments; the species advantages below need a symbiont.
 
 ### Custom species
 
@@ -471,6 +474,15 @@ A custom species advantage follows the same pattern: a narrow +2 or an ability w
 |---|---|---|
 | Denobulan Pharmacopoeia | +2 to Medicine when treating a patient with an unconventional remedy, including medicinal organisms kept in sickbay. | **Unorthodox Methods.** Patients and crewmates balk at your strange remedies. Accept a refusal, a delay, or a complaint to the captain. |
 | Wakeful | +2 to Body when resisting fatigue or going without sleep for days. | **Hibernation Cycle.** Once a year you must hibernate for several days. When the cycle comes due at a bad moment, accept your absence or −2 on Intellect rolls until you rest. |
+
+## Trill
+
+Both Trill advantages require a joined character; agree with the GM before play that your Trill carries a symbiont.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Memories of Past Hosts | +2 to Intellect rolls to recall something a previous host of your symbiont knew or lived through: a place, a person, an old technique. | **The Secret of Joining.** Joining is a secret your people guard from outsiders. When a medical scan, a transporter reading, or a curious crewmate could reveal your symbiont, accept the lie, the risk, or a revealing choice. |
+| A Past Life's Trade | Agree with the GM on one previous host's profession. +2 to the matching skill for tasks that profession knew well, such as a former freighter pilot's Helm in hazardous atmospheric flight. | **Conflicting Memories.** A past host's habit, loyalty, or old grudge surfaces at a bad moment. Accept the distraction or the trouble it brings. |
 
 # Complications
 
