@@ -218,7 +218,23 @@ A plausible untrained attempt uses attribute −4. Specialized procedures such a
 
 ## Standard equipment
 
-A communicator provides contact when range and interference permit. A tricorder gathers readings using Sensors; interpreting unusual results may need a science skill. An engineering kit or medical kit enables appropriate work. Ordinary equipment grants no blanket bonus; exceptional tools or preparation may justify +2. Missing essential tools can make a task impossible.
+Equipment makes tasks possible rather than easier. Ordinary equipment grants no blanket bonus; exceptional tools or preparation may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible. Every crew member carries a communicator; the rest is issued for the mission.
+
+| Item | What it does |
+|---|---|
+| Communicator | Talks to the ship and the away team within range, and gives the transporter a lock. Interference, shielding or distance can cut it off. |
+| Tricorder | Scans life signs, energy, materials and atmosphere at short range and records the data. Field Sensors rolls need one; without it most scans are impossible. |
+| Medical scanner | Identifies ordinary injuries automatically. Diagnosing unfamiliar physiology or disease without one is very difficult (−4) or impossible. |
+| Medical kit | Hyposprays, drugs and dressings. Needed for emergency stabilization and field treatment. |
+| Engineering kit | Hand tools, spare parts and test gear. Needed for most Engineering and Electronics repairs in the field. |
+| Hand phaser | Type 1 (8 power) or Type 2 (16). Settings and power costs are under Phaser power. |
+| Universal translator | Lets you talk with speakers of known languages. A new language takes time to learn; a Communications roll can speed it up. |
+| Environmental suit | Several hours in vacuum, toxic air, cold or radiation. −2 to Agility-based actions and Stealth while worn. |
+| Field kit | Rations, water, light, rope and climbing gear for a few days. Turns impossible survival and climbing tasks into ordinary ones; no bonus beyond that. |
+| Emergency transponder | Broadcasts your position to the ship and helps a transporter lock through light interference. |
+| Anti-grav sled | Carries heavy loads or a casualty at walking pace. Hard to move quietly (−2 Stealth). |
+
+A tricorder finds readings; interpreting unusual results may still need a science skill. Spare power cells for phasers are listed under Phaser power.
 
 Transporters, computers, and scanners have limits set by the situation. State the information or destination you need. A successful scan reveals useful evidence, not necessarily the complete explanation.
 

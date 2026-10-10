@@ -315,6 +315,13 @@ tr.lvl-U td.target { color: var(--muted); }
   .linkish { padding: 8px 6px; }
 }
 
+/* Equipment */
+#equip { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px 16px; }
+#equip .eq-item { align-items: flex-start; }
+#equip .eq-item input { margin-top: 3px; flex: none; }
+#equip .eq-item > span { display: grid; gap: 1px; }
+#equip .eq-item b { font-weight: 600; }
+
 /* Phaser power */
 .ph-meter { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; height: 14px; }
 .ph-meter span { border-radius: 2px; background: rgba(92, 200, 255, .12); border: 1px solid var(--line); }
@@ -1131,7 +1138,66 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-untrained-actions">Untrained actions</h2>
 <p>A plausible untrained attempt uses attribute −4. Specialized procedures such as surgery or warp-core repair require relevant training or direct guidance. Guidance permits an attempt only when the GM finds it credible; it does not automatically grant the expert’s skill.</p>
 <h2 id="g-standard-equipment">Standard equipment</h2>
-<p>A communicator provides contact when range and interference permit. A tricorder gathers readings using Sensors; interpreting unusual results may need a science skill. An engineering kit or medical kit enables appropriate work. Ordinary equipment grants no blanket bonus; exceptional tools or preparation may justify +2. Missing essential tools can make a task impossible.</p>
+<p>Equipment makes tasks possible rather than easier. Ordinary equipment grants no blanket bonus; exceptional tools or preparation may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible. Every crew member carries a communicator; the rest is issued for the mission.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Item</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Communicator</td>
+<td>Talks to the ship and the away team within range, and gives the transporter a lock. Interference, shielding or distance can cut it off.</td>
+</tr>
+<tr class="even">
+<td>Tricorder</td>
+<td>Scans life signs, energy, materials and atmosphere at short range and records the data. Field Sensors rolls need one; without it most scans are impossible.</td>
+</tr>
+<tr class="odd">
+<td>Medical scanner</td>
+<td>Identifies ordinary injuries automatically. Diagnosing unfamiliar physiology or disease without one is very difficult (−4) or impossible.</td>
+</tr>
+<tr class="even">
+<td>Medical kit</td>
+<td>Hyposprays, drugs and dressings. Needed for emergency stabilization and field treatment.</td>
+</tr>
+<tr class="odd">
+<td>Engineering kit</td>
+<td>Hand tools, spare parts and test gear. Needed for most Engineering and Electronics repairs in the field.</td>
+</tr>
+<tr class="even">
+<td>Hand phaser</td>
+<td>Type 1 (8 power) or Type 2 (16). Settings and power costs are under Phaser power.</td>
+</tr>
+<tr class="odd">
+<td>Universal translator</td>
+<td>Lets you talk with speakers of known languages. A new language takes time to learn; a Communications roll can speed it up.</td>
+</tr>
+<tr class="even">
+<td>Environmental suit</td>
+<td>Several hours in vacuum, toxic air, cold or radiation. −2 to Agility-based actions and Stealth while worn.</td>
+</tr>
+<tr class="odd">
+<td>Field kit</td>
+<td>Rations, water, light, rope and climbing gear for a few days. Turns impossible survival and climbing tasks into ordinary ones; no bonus beyond that.</td>
+</tr>
+<tr class="even">
+<td>Emergency transponder</td>
+<td>Broadcasts your position to the ship and helps a transporter lock through light interference.</td>
+</tr>
+<tr class="odd">
+<td>Anti-grav sled</td>
+<td>Carries heavy loads or a casualty at walking pace. Hard to move quietly (−2 Stealth).</td>
+</tr>
+</tbody>
+</table>
+<p>A tricorder finds readings; interpreting unusual results may still need a science skill. Spare power cells for phasers are listed under Phaser power.</p>
 <p>Transporters, computers, and scanners have limits set by the situation. State the information or destination you need. A successful scan reveals useful evidence, not necessarily the complete explanation.</p>
 <h1 id="g-actions-and-teamwork">Actions and teamwork</h1>
 <h2 id="g-when-to-roll">When to roll</h2>
@@ -2519,6 +2585,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <select id="clk-kind" aria-label="Clock type"><option value="danger">Danger</option><option value="progress">Progress</option></select>
             <button class="btn" id="clk-add">Add</button>
           </div>
+          <div class="btn-row"><button class="linkish" id="clk-copy">Copy clocks for Discord</button><span class="small muted" id="clk-msg"></span></div>
           <div class="clocks" id="clocks"></div>
         </div>
         <div class="card hud no-print" id="card-ship">
@@ -2735,7 +2802,7 @@ tr.lvl-U td.target { color: var(--muted); }
       ]
   };
   // Six ready-to-play crew members; their connections point at each other.
-  const PREGENS = [{"name": "Thelan sh'Vari", "rank": "Lieutenant Commander", "dept": "Command", "species": "Andorian", "speciesId": "andorian", "role": "First officer: keeps the crew moving when the captain's plan meets reality, and keeps the captain honest.", "reason": "Starfleet runs in my family, and I mean to live up to the name.", "connection": "Took Yeoman Rrinn under their wing when Rrinn first came aboard.", "attrs": {"Body": 10, "Agility": 12, "Intellect": 10, "Presence": 13, "Will": 10}, "skills": {"Leadership": "S", "Diplomacy": "T", "Psychology": "T", "Sensors": "T", "Physical Sciences": "U", "Life Sciences": "U", "Medicine": "U", "Engineering": "U", "Electronics": "U", "Computers": "U", "Helm": "T", "Navigation": "T", "Communications": "T", "Phasers": "T", "Unarmed Combat": "T", "Athletics": "T", "Stealth": "U", "Survival": "U"}, "adv": {"id": "crisis"}, "sadv": {"id": ""}, "comp": {"id": "reputation", "trigger": "Someone questions your competence in front of others"}, "equipment": {"communicator": true, "tricorder": false, "phaser": true, "medkit": false, "engkit": false}}, {"name": "Sevek", "rank": "Lieutenant", "dept": "Science", "species": "Vulcan", "speciesId": "vulcan", "role": "Ship's sciences officer: reads the anomaly, names the risk, and calculates the odds no one asked for.", "reason": "The best laboratory in the galaxy is a starship on the frontier.", "connection": "Friendly rivals with Lt. Grath: they argue every engineering theory, and both enjoy it.", "attrs": {"Body": 11, "Agility": 11, "Intellect": 13, "Presence": 8, "Will": 12}, "skills": {"Leadership": "U", "Diplomacy": "U", "Psychology": "T", "Sensors": "T", "Physical Sciences": "S", "Life Sciences": "T", "Medicine": "U", "Engineering": "T", "Electronics": "T", "Computers": "T", "Helm": "U", "Navigation": "T", "Communications": "U", "Phasers": "U", "Unarmed Combat": "T", "Athletics": "T", "Stealth": "U", "Survival": "U"}, "adv": {"id": ""}, "sadv": {"id": "v-recall"}, "comp": {"id": "mystery", "trigger": "Sensor data that contradicts known science"}, "equipment": {"communicator": true, "tricorder": true, "phaser": true, "medkit": false, "engkit": false}}, {"name": "Dr. Vessik", "rank": "Lieutenant Commander", "dept": "Medical", "species": "Denobulan", "speciesId": "denobulan", "role": "Chief medical officer: patches up the crew, argues with the captain, and keeps an alarming menagerie of medicinal creatures in sickbay.", "reason": "To protect the Federation and the people who can't protect themselves.", "connection": "Pulled Lt. Reyes out of a burning shuttle on a survey mission; Reyes has never let the doctor pay for a drink since.", "attrs": {"Body": 9, "Agility": 9, "Intellect": 13, "Presence": 12, "Will": 12}, "skills": {"Leadership": "T", "Diplomacy": "T", "Psychology": "T", "Sensors": "T", "Physical Sciences": "U", "Life Sciences": "T", "Medicine": "S", "Engineering": "U", "Electronics": "T", "Computers": "T", "Helm": "U", "Navigation": "U", "Communications": "T", "Phasers": "U", "Unarmed Combat": "U", "Athletics": "U", "Stealth": "U", "Survival": "T"}, "adv": {"id": ""}, "sadv": {"id": "d-remedies"}, "comp": {"id": "protects", "trigger": "Civilians are caught in the danger"}, "equipment": {"communicator": true, "tricorder": true, "phaser": false, "medkit": true, "engkit": false}}, {"name": "Grath", "rank": "Lieutenant", "dept": "Engineering", "species": "Tellarite", "speciesId": "tellarite", "role": "Engineer: keeps the Pelion's power flowing and will tell you, at length, exactly why your idea won't work.", "reason": "To prove I'm good enough, to everyone who doubted me and to myself.", "connection": "Off-duty friends with Commander sh'Vari: a weekly game of Andorian chess in which both of them cheat.", "attrs": {"Body": 12, "Agility": 10, "Intellect": 13, "Presence": 9, "Will": 11}, "skills": {"Leadership": "U", "Diplomacy": "U", "Psychology": "U", "Sensors": "T", "Physical Sciences": "T", "Life Sciences": "U", "Medicine": "U", "Engineering": "S", "Electronics": "T", "Computers": "T", "Helm": "T", "Navigation": "U", "Communications": "T", "Phasers": "U", "Unarmed Combat": "T", "Athletics": "T", "Stealth": "U", "Survival": "T"}, "adv": {"id": "improv"}, "sadv": {"id": ""}, "comp": {"id": "experimental", "trigger": "An untested device or technique could solve the problem"}, "equipment": {"communicator": true, "tricorder": false, "phaser": true, "medkit": false, "engkit": true}}, {"name": "Marisol Reyes", "rank": "Lieutenant (j.g.)", "dept": "Security", "species": "Human", "speciesId": "human", "role": "Security officer: first through the door on every away mission, and the last to set a phaser to kill.", "reason": "A Starfleet officer once saved my home, and I want to be that person for someone else.", "connection": "Owes Dr. Vessik their life after a shuttle crash, and never lets the doctor forget it.", "attrs": {"Body": 12, "Agility": 13, "Intellect": 10, "Presence": 10, "Will": 10}, "skills": {"Leadership": "T", "Diplomacy": "U", "Psychology": "U", "Sensors": "T", "Physical Sciences": "U", "Life Sciences": "U", "Medicine": "T", "Engineering": "U", "Electronics": "U", "Computers": "U", "Helm": "T", "Navigation": "U", "Communications": "T", "Phasers": "S", "Unarmed Combat": "T", "Athletics": "T", "Stealth": "T", "Survival": "T"}, "adv": {"id": "marksman"}, "sadv": {"id": ""}, "comp": {"id": "nonlethal", "trigger": "A hostile refuses to surrender"}, "equipment": {"communicator": true, "tricorder": false, "phaser": true, "medkit": false, "engkit": false}}, {"name": "Rrinn", "rank": "Yeoman 2nd Class", "dept": "General Services", "species": "Caitian", "speciesId": "caitian", "role": "Captain's yeoman: keeps the records, carries the orders, and hears everything said on the bridge.", "reason": "To leave behind a past, a world, or a life that was too small for me.", "connection": "Shares a secret with Lt. Sevek from a mission neither of them talks about.", "attrs": {"Body": 9, "Agility": 12, "Intellect": 13, "Presence": 11, "Will": 10}, "skills": {"Leadership": "U", "Diplomacy": "T", "Psychology": "T", "Sensors": "T", "Physical Sciences": "U", "Life Sciences": "U", "Medicine": "U", "Engineering": "U", "Electronics": "T", "Computers": "S", "Helm": "U", "Navigation": "U", "Communications": "T", "Phasers": "U", "Unarmed Combat": "U", "Athletics": "T", "Stealth": "T", "Survival": "U"}, "adv": {"id": ""}, "sadv": {"id": "c-hearing"}, "comp": {"id": "home", "trigger": "A message from home arrives"}, "equipment": {"communicator": true, "tricorder": true, "phaser": false, "medkit": false, "engkit": false}}];
+  const PREGENS = [{"name": "Thelan sh'Vari", "rank": "Lieutenant Commander", "dept": "Command", "species": "Andorian", "speciesId": "andorian", "role": "First officer: keeps the crew moving when the captain's plan meets reality, and keeps the captain honest.", "reason": "Starfleet runs in my family, and I mean to live up to the name.", "connection": "Took Yeoman Rrinn under their wing when Rrinn first came aboard.", "attrs": {"Body": 10, "Agility": 12, "Intellect": 10, "Presence": 13, "Will": 10}, "skills": {"Leadership": "S", "Diplomacy": "T", "Psychology": "T", "Sensors": "T", "Physical Sciences": "U", "Life Sciences": "U", "Medicine": "U", "Engineering": "U", "Electronics": "U", "Computers": "U", "Helm": "T", "Navigation": "T", "Communications": "T", "Phasers": "T", "Unarmed Combat": "T", "Athletics": "T", "Stealth": "U", "Survival": "U"}, "adv": {"id": "crisis"}, "sadv": {"id": ""}, "comp": {"id": "reputation", "trigger": "Someone questions your competence in front of others"}, "equipment": {"communicator": true, "tricorder": false, "phaser": true, "medkit": false, "engkit": false}}, {"name": "Sevek", "rank": "Lieutenant", "dept": "Science", "species": "Vulcan", "speciesId": "vulcan", "role": "Ship's sciences officer: reads the anomaly, names the risk, and calculates the odds no one asked for.", "reason": "The best laboratory in the galaxy is a starship on the frontier.", "connection": "Friendly rivals with Lt. Grath: they argue every engineering theory, and both enjoy it.", "attrs": {"Body": 11, "Agility": 11, "Intellect": 13, "Presence": 8, "Will": 12}, "skills": {"Leadership": "U", "Diplomacy": "U", "Psychology": "T", "Sensors": "T", "Physical Sciences": "S", "Life Sciences": "T", "Medicine": "U", "Engineering": "T", "Electronics": "T", "Computers": "T", "Helm": "U", "Navigation": "T", "Communications": "U", "Phasers": "U", "Unarmed Combat": "T", "Athletics": "T", "Stealth": "U", "Survival": "U"}, "adv": {"id": ""}, "sadv": {"id": "v-recall"}, "comp": {"id": "mystery", "trigger": "Sensor data that contradicts known science"}, "equipment": {"communicator": true, "tricorder": true, "phaser": true, "medkit": false, "engkit": false}}, {"name": "Dr. Vessik", "rank": "Lieutenant Commander", "dept": "Medical", "species": "Denobulan", "speciesId": "denobulan", "role": "Chief medical officer: patches up the crew, argues with the captain, and keeps an alarming menagerie of medicinal creatures in sickbay.", "reason": "To protect the Federation and the people who can't protect themselves.", "connection": "Pulled Lt. Reyes out of a burning shuttle on a survey mission; Reyes has never let the doctor pay for a drink since.", "attrs": {"Body": 9, "Agility": 9, "Intellect": 13, "Presence": 12, "Will": 12}, "skills": {"Leadership": "T", "Diplomacy": "T", "Psychology": "T", "Sensors": "T", "Physical Sciences": "U", "Life Sciences": "T", "Medicine": "S", "Engineering": "U", "Electronics": "T", "Computers": "T", "Helm": "U", "Navigation": "U", "Communications": "T", "Phasers": "U", "Unarmed Combat": "U", "Athletics": "U", "Stealth": "U", "Survival": "T"}, "adv": {"id": ""}, "sadv": {"id": "d-remedies"}, "comp": {"id": "protects", "trigger": "Civilians are caught in the danger"}, "equipment": {"communicator": true, "tricorder": true, "medscanner": true, "phaser": false, "medkit": true, "engkit": false}}, {"name": "Grath", "rank": "Lieutenant", "dept": "Engineering", "species": "Tellarite", "speciesId": "tellarite", "role": "Engineer: keeps the Pelion's power flowing and will tell you, at length, exactly why your idea won't work.", "reason": "To prove I'm good enough, to everyone who doubted me and to myself.", "connection": "Off-duty friends with Commander sh'Vari: a weekly game of Andorian chess in which both of them cheat.", "attrs": {"Body": 12, "Agility": 10, "Intellect": 13, "Presence": 9, "Will": 11}, "skills": {"Leadership": "U", "Diplomacy": "U", "Psychology": "U", "Sensors": "T", "Physical Sciences": "T", "Life Sciences": "U", "Medicine": "U", "Engineering": "S", "Electronics": "T", "Computers": "T", "Helm": "T", "Navigation": "U", "Communications": "T", "Phasers": "U", "Unarmed Combat": "T", "Athletics": "T", "Stealth": "U", "Survival": "T"}, "adv": {"id": "improv"}, "sadv": {"id": ""}, "comp": {"id": "experimental", "trigger": "An untested device or technique could solve the problem"}, "equipment": {"communicator": true, "tricorder": false, "phaser": true, "medkit": false, "engkit": true}}, {"name": "Marisol Reyes", "rank": "Lieutenant (j.g.)", "dept": "Security", "species": "Human", "speciesId": "human", "role": "Security officer: first through the door on every away mission, and the last to set a phaser to kill.", "reason": "A Starfleet officer once saved my home, and I want to be that person for someone else.", "connection": "Owes Dr. Vessik their life after a shuttle crash, and never lets the doctor forget it.", "attrs": {"Body": 12, "Agility": 13, "Intellect": 10, "Presence": 10, "Will": 10}, "skills": {"Leadership": "T", "Diplomacy": "U", "Psychology": "U", "Sensors": "T", "Physical Sciences": "U", "Life Sciences": "U", "Medicine": "T", "Engineering": "U", "Electronics": "U", "Computers": "U", "Helm": "T", "Navigation": "U", "Communications": "T", "Phasers": "S", "Unarmed Combat": "T", "Athletics": "T", "Stealth": "T", "Survival": "T"}, "adv": {"id": "marksman"}, "sadv": {"id": ""}, "comp": {"id": "nonlethal", "trigger": "A hostile refuses to surrender"}, "equipment": {"communicator": true, "tricorder": false, "phaser": true, "medkit": false, "engkit": false}}, {"name": "Rrinn", "rank": "Yeoman 2nd Class", "dept": "General Services", "species": "Caitian", "speciesId": "caitian", "role": "Captain's yeoman: keeps the records, carries the orders, and hears everything said on the bridge.", "reason": "To leave behind a past, a world, or a life that was too small for me.", "connection": "Shares a secret with Lt. Sevek from a mission neither of them talks about.", "attrs": {"Body": 9, "Agility": 12, "Intellect": 13, "Presence": 11, "Will": 10}, "skills": {"Leadership": "U", "Diplomacy": "T", "Psychology": "T", "Sensors": "T", "Physical Sciences": "U", "Life Sciences": "U", "Medicine": "U", "Engineering": "U", "Electronics": "T", "Computers": "S", "Helm": "U", "Navigation": "U", "Communications": "T", "Phasers": "U", "Unarmed Combat": "U", "Athletics": "T", "Stealth": "T", "Survival": "U"}, "adv": {"id": ""}, "sadv": {"id": "c-hearing"}, "comp": {"id": "home", "trigger": "A message from home arrives"}, "equipment": {"communicator": true, "tricorder": true, "phaser": false, "medkit": false, "engkit": false}}];
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
   // Species advantages, each paired with a companion complication that comes with it.
   // [id, name, effect, roll, gives +2?, companion name, companion text]
@@ -2864,7 +2931,8 @@ tr.lvl-U td.target { color: var(--muted); }
     ["secret", "Keeps a Dangerous Secret", "An agreed secret threatens trust, reputation, or an assignment. Earn a point when protecting or revealing it creates an actual consequence. Establish the secret with the GM rather than inventing it to avoid a problem."],
     ["nonlethal", "Reluctant to Use Lethal Force", "You seek a nonlethal approach even when it costs time or tactical position. Ordinary Starfleet restraint earns no point; there must be a meaningful additional difficulty."],
   ];
-  const EQUIPMENT = [["communicator", "Communicator"], ["tricorder", "Tricorder"], ["phaser", "Hand phaser"], ["medkit", "Medical kit"], ["engkit", "Engineering kit"]];
+  // Standard equipment with its effect (same text as the guide's Standard equipment table).
+  const EQUIPMENT = [["communicator", "Communicator", "Talks to the ship and the away team within range, and gives the transporter a lock. Interference, shielding or distance can cut it off."], ["tricorder", "Tricorder", "Scans life signs, energy, materials and atmosphere at short range and records the data. Field Sensors rolls need one; without it most scans are impossible."], ["medscanner", "Medical scanner", "Identifies ordinary injuries automatically. Diagnosing unfamiliar physiology or disease without one is very difficult (−4) or impossible."], ["medkit", "Medical kit", "Hyposprays, drugs and dressings. Needed for emergency stabilization and field treatment."], ["engkit", "Engineering kit", "Hand tools, spare parts and test gear. Needed for most Engineering and Electronics repairs in the field."], ["phaser", "Hand phaser", "Type 1 (8 power) or Type 2 (16). Settings and power costs are under Phaser power."], ["translator", "Universal translator", "Lets you talk with speakers of known languages. A new language takes time to learn; a Communications roll can speed it up."], ["envsuit", "Environmental suit", "Several hours in vacuum, toxic air, cold or radiation. −2 to Agility-based actions and Stealth while worn."], ["fieldkit", "Field kit", "Rations, water, light, rope and climbing gear for a few days. Turns impossible survival and climbing tasks into ordinary ones; no bonus beyond that."], ["beacon", "Emergency transponder", "Broadcasts your position to the ship and helps a transporter lock through light interference."], ["sled", "Anti-grav sled", "Carries heavy loads or a casualty at walking pace. Hard to move quietly (−2 Stealth)."]];
   const INJURY = [
     ["Uninjured", "No injury penalty", 0],
     ["Wounded", "−1 to physical actions", -1],
@@ -2889,7 +2957,7 @@ tr.lvl-U td.target { color: var(--muted); }
       adv: { id: "", name: "", text: "", detail: "" },
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
-      equipment: { communicator: true, tricorder: false, phaser: true, medkit: false, engkit: false },
+      equipment: { communicator: true, tricorder: false, medscanner: false, medkit: false, engkit: false, phaser: true, translator: false, envsuit: false, fieldkit: false, beacon: false, sled: false },
       portrait: "", portraitShape: "token",
       play: { injury: 0, duty: 2, stunned: false, log: [] },
     };
@@ -3031,7 +3099,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("") + `<option value="custom">Custom advantage…</option></optgroup>`;
   $("f-comp").innerHTML = `<option value="">Choose a complication…</option>` +
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
-  $("equip").innerHTML = EQUIPMENT.map(([k, n]) => `<label><input type="checkbox" id="eq-${k}" data-eq="${k}"> ${n}</label>`).join("");
+  $("equip").innerHTML = EQUIPMENT.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="eq-${k}" data-eq="${k}"><span><b>${n}</b><span class="small muted">${eff}</span></span></label>`).join("");
 
   $("f-reasonpick").innerHTML = `<option value="">Top 10 reasons: quick pick…</option>` +
     REASONS.map(([label], i) => `<option value="${i}">${i + 1}. ${label}</option>`).join("");
@@ -3592,6 +3660,13 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!name) { $("clk-name").focus(); return; }
     clocks.push({ id: uid(), name: name.slice(0, 60), size: +$("clk-size").value, kind: $("clk-kind").value, filled: 0 });
     $("clk-name").value = ""; store.set(STORE_CLOCKS, clocks); renderClocks();
+  };
+  $("clk-copy").onclick = () => {
+    if (!clocks.length) { $("clk-msg").textContent = "No clocks to copy."; return; }
+    const txt = clocks.map((c) => `**${c.name}** (${c.kind}) ${"●".repeat(c.filled)}${"○".repeat(c.size - c.filled)} ${c.filled}/${c.size}${c.filled >= c.size ? (c.kind === "danger" ? "  **It happens.**" : "  **Done.**") : ""}`).join("\n");
+    const p = navigator.clipboard?.writeText(txt);
+    const done = (ok) => ($("clk-msg").textContent = ok ? "Copied. Paste it into your Discord channel." : "Copying is blocked here; use /clock show in Discord instead.");
+    if (p) p.then(() => done(true), () => done(false)); else done(false);
   };
   $("clk-name").addEventListener("keydown", (e) => { if (e.key === "Enter") $("clk-add").click(); });
   $("clocks").addEventListener("click", (e) => {
