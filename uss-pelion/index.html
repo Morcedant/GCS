@@ -362,7 +362,20 @@ tr.lvl-U td.target { color: var(--muted); }
               </div>
             </div>
             <div class="field wide" id="adv-detail-wrap" hidden><label for="f-advdetail" id="adv-detail-label">Detail</label><input type="text" id="f-advdetail"></div>
-            <div class="field wide"><div class="trait-desc" id="adv-desc"></div></div>
+            <div class="field wide" id="sadv-custom" hidden>
+              <div class="fields">
+                <div class="field"><label for="f-sadvname">Species advantage name</label><input type="text" id="f-sadvname"></div>
+                <div class="field wide"><label for="f-sadvtext">What it does</label><textarea id="f-sadvtext" rows="2" placeholder="A narrow +2, or an ability with agreed limits."></textarea></div>
+                <div class="field"><label for="f-scompname">Companion complication</label><input type="text" id="f-scompname"></div>
+                <div class="field wide"><label for="f-scomptext">What problem it creates</label><textarea id="f-scomptext" rows="2"></textarea></div>
+              </div>
+            </div>
+            <div class="field wide" id="adv-desc-wrap"><div class="trait-desc" id="adv-desc"></div></div>
+            <div class="field wide" id="sadv-desc-wrap" hidden><div class="pair">
+              <div class="trait-desc"><span class="label">Species advantage</span><div id="sadv-desc"></div></div>
+              <div class="trait-desc comp"><span class="label" id="scomp-name"></span><div id="scomp-desc"></div></div>
+            </div>
+            <span class="small muted">A species advantage replaces the regular advantage and always brings its companion complication, which earns Duty points like any other. Your regular complication still applies.</span></div>
           </div>
 
           <div class="fields">
@@ -378,22 +391,6 @@ tr.lvl-U td.target { color: var(--muted); }
               <input type="text" id="f-comptrigger" placeholder="e.g. An unexplained reading while the team is ordered to withdraw"></div>
           </div>
 
-          <div class="fields">
-            <div class="field wide"><label for="f-sadv">Species advantage (optional)</label><select id="f-sadv"></select>
-              <span class="small muted">Taken in addition to your advantage and complication. It always comes with its companion complication, which earns Duty points like any other.</span></div>
-            <div class="field wide" id="sadv-custom" hidden>
-              <div class="fields">
-                <div class="field"><label for="f-sadvname">Species advantage name</label><input type="text" id="f-sadvname"></div>
-                <div class="field wide"><label for="f-sadvtext">What it does</label><textarea id="f-sadvtext" rows="2" placeholder="A narrow +2, or an ability with agreed limits."></textarea></div>
-                <div class="field"><label for="f-scompname">Companion complication</label><input type="text" id="f-scompname"></div>
-                <div class="field wide"><label for="f-scomptext">What problem it creates</label><textarea id="f-scomptext" rows="2"></textarea></div>
-              </div>
-            </div>
-            <div class="field wide" id="sadv-desc-wrap" hidden><div class="pair">
-              <div class="trait-desc"><span class="label">Advantage</span><div id="sadv-desc"></div></div>
-              <div class="trait-desc comp"><span class="label" id="scomp-name"></span><div id="scomp-desc"></div></div>
-            </div></div>
-          </div>
         </section>
 
         <section class="step hud">
@@ -496,7 +493,6 @@ tr.lvl-U td.target { color: var(--muted); }
           </div>
           <div class="checks">
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
-            <label id="r-sadv-wrap"><input type="checkbox" id="r-sadv"> <span id="r-sadv-label">Species advantage applies +2</span></label>
             <label><input type="checkbox" id="r-phys"> Physical action (injury penalty)</label>
             <label><input type="checkbox" id="r-stun"> Stun penalty −2</label>
           </div>
@@ -757,6 +753,7 @@ tr.lvl-U td.target { color: var(--muted); }
       equipment: { ...b.equipment, ...(c.equipment || {}) }, play: { ...b.play, ...(c.play || {}) } };
     if (!out.id) out.id = uid();
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
+    if (out.sadv.id && out.adv.id) out.adv.id = ""; // a species advantage replaces the regular one
     if (!SPECIES.some((x) => x[0] === c.speciesId) && c.speciesId !== "custom") {
       // Older saves stored species as free text.
       const hit = SPECIES.find((x) => x[1].toLowerCase() === String(c.species || "").trim().toLowerCase());
@@ -819,7 +816,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const overMax = ATTRS.filter(([n]) => ch.attrs[n] > maxOf(n) || ch.attrs[n] < baseOf(n)).map(([n]) => n);
     const sAdvOk = ch.sadv.id !== "custom" || (ch.sadv.name.trim() && ch.sadv.text.trim() && ch.sadv.compName.trim() && ch.sadv.compText.trim());
     const speciesOk = ch.speciesId !== "custom" || (ch.species.trim() && adjTotal() === 0);
-    const advOk = ch.adv.id && (ch.adv.id !== "custom" || (ch.adv.name.trim() && ch.adv.text.trim())) &&
+    const advOk = ch.sadv.id ? sAdvOk : ch.adv.id && (ch.adv.id !== "custom" || (ch.adv.name.trim() && ch.adv.text.trim())) &&
       (!(advDef()?.[4]) || ch.adv.detail.trim());
     const compOk = ch.comp.id && (ch.comp.id !== "custom" || (ch.comp.name.trim() && ch.comp.text.trim()));
     return [
@@ -829,18 +826,18 @@ tr.lvl-U td.target { color: var(--muted); }
       [sp === POOL && !overMax.length, sp === POOL ? (overMax.length ? `Check ${overMax.join(", ")}: outside the species range` : "5 attribute points spent") : `Attribute points spent: ${sp} of ${POOL}`],
       [nS === 1, nS === 1 ? "One Specialty" : `Specialty skills: ${nS} of 1`],
       [nT === 9, nT === 9 ? "Nine Trained skills" : `Trained skills: ${nT} of 9`],
-      [!!advOk, advOk ? "Advantage chosen" : ch.adv.id ? "Finish the advantage details" : "Choose an advantage"],
+      [!!advOk, advOk ? (ch.sadv.id ? `Species advantage: ${sAdvName()} (companion: ${sCompName()})` : "Advantage chosen")
+        : ch.sadv.id ? "Finish the custom species advantage and its companion" : ch.adv.id ? "Finish the advantage details" : "Choose an advantage"],
       [!!compOk, compOk ? "Complication chosen" : ch.comp.id ? "Finish the complication details" : "Choose a complication"],
       [!!ch.comp.trigger.trim(), "Complication trigger agreed with the GM"],
       [!!ch.connection.trim(), "Connection to a crewmate"],
-      ...(ch.sadv.id ? [[!!sAdvOk, sAdvOk ? `Species advantage: ${sAdvName()} (with ${sCompName()})` : "Finish the custom species advantage and its companion"]] : []),
     ];
   }
 
   // ---- static UI ----
   $("f-dept").innerHTML = DEPTS.map(([d]) => `<option>${d}</option>`).join("");
-  $("f-adv").innerHTML = `<option value="">Choose an advantage…</option>` +
-    ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("") + `<option value="custom">Custom advantage…</option>`;
+  const generalAdvOpts = `<optgroup label="General advantages">` +
+    ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("") + `<option value="custom">Custom advantage…</option></optgroup>`;
   $("f-comp").innerHTML = `<option value="">Choose a complication…</option>` +
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
   $("equip").innerHTML = EQUIPMENT.map(([k, n]) => `<label><input type="checkbox" id="eq-${k}" data-eq="${k}"> ${n}</label>`).join("");
@@ -899,11 +896,16 @@ tr.lvl-U td.target { color: var(--muted); }
     const adjNow = adjOf();
     $("species-desc").innerHTML = (custom ? "Record a species agreed with your GM. Adjustments must total 0, from −2 to +2 each." : esc(sd[3])) +
       `<div class="adj-chips">${ATTRS.filter(([n]) => adjNow[n]).map(([n]) => `<span class="adj-chip ${adjNow[n] > 0 ? "up" : "down"}">${n} ${signed(adjNow[n])}</span>`).join("") || `<span class="adj-chip">No adjustments</span>`}</div>`;
-    const sOpts = `<option value="">None</option>` + sTraitList().map((t) => `<option value="${t[0]}">${t[1]} (companion: ${t[5]})</option>`).join("") + `<option value="custom">Custom species advantage…</option>`;
-    if ($("f-sadv").dataset.for !== ch.speciesId) { $("f-sadv").innerHTML = sOpts; $("f-sadv").dataset.for = ch.speciesId; }
-    $("f-sadv").value = ch.sadv.id;
+    if ($("f-adv").dataset.for !== ch.speciesId + "|" + ch.species) {
+      $("f-adv").innerHTML = `<option value="">Choose an advantage…</option>` +
+        `<optgroup label="${esc(ch.species || "Species")} advantages (with companion complication)">` +
+        sTraitList().map((t) => `<option value="s:${t[0]}">${t[1]} (companion: ${t[5]})</option>`).join("") +
+        `<option value="s:custom">Custom species advantage…</option></optgroup>` + generalAdvOpts;
+      $("f-adv").dataset.for = ch.speciesId + "|" + ch.species;
+    }
+    $("f-adv").value = ch.sadv.id ? "s:" + ch.sadv.id : ch.adv.id;
     $("sadv-custom").hidden = ch.sadv.id !== "custom";
-    $("sadv-desc-wrap").hidden = !ch.sadv.id || (ch.sadv.id === "custom" && !ch.sadv.text && !ch.sadv.compText);
+    $("sadv-desc-wrap").hidden = !ch.sadv.id;
     $("sadv-desc").textContent = sAdvText();
     $("scomp-name").textContent = "Companion: " + sCompName();
     $("scomp-desc").textContent = sCompText();
@@ -945,6 +947,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
     // traits
     $("adv-custom").hidden = ch.adv.id !== "custom";
+    $("adv-desc-wrap").hidden = !!ch.sadv.id;
     const ad = advDef();
     $("adv-detail-wrap").hidden = !(ad && ad[4]);
     if (ad && ad[4]) $("adv-detail-label").textContent = ad[4];
@@ -1002,12 +1005,12 @@ tr.lvl-U td.target { color: var(--muted); }
       <div><h3 style="margin-bottom:6px">Skills</h3>
         <div class="skill-cols">${sorted.map((s) => `<div class="skill-line ${s.l}"><span>${s.n}<span class="lv">${s.l === "U" ? "untrained" : LEVELS[s.l].name}</span></span><b>${s.t}</b></div>`).join("")}</div></div>
       <div class="fields">
-        <div class="field"><span class="label">Advantage</span><b>${esc(advName() || "—")}${ch.adv.detail && advDef()?.[4] ? ": " + esc(ch.adv.detail) : ""}</b><span class="small muted">${esc(advText)}</span></div>
+        ${ch.sadv.id ? `<div class="field"><span class="label">Species advantage</span><b>${esc(sAdvName())}</b><span class="small muted">${esc(sAdvText())}</span></div>`
+          : `<div class="field"><span class="label">Advantage</span><b>${esc(advName() || "—")}${ch.adv.detail && advDef()?.[4] ? ": " + esc(ch.adv.detail) : ""}</b><span class="small muted">${esc(advText)}</span></div>`}
         <div class="field"><span class="label">Complication</span><b>${esc(compName() || "—")}</b><span class="small muted">${esc(compText)}</span>
           ${ch.comp.trigger ? `<span class="small"><b>Trigger:</b> ${esc(ch.comp.trigger)}</span>` : ""}</div>
       </div>
       ${ch.sadv.id ? `<div class="fields">
-        <div class="field"><span class="label">Species advantage</span><b>${esc(sAdvName())}</b><span class="small muted">${esc(sAdvText())}</span></div>
         <div class="field"><span class="label">Companion complication</span><b>${esc(sCompName())}</b><span class="small muted">${esc(sCompText())}</span></div>
       </div>` : ""}
       <div class="fields">
@@ -1033,13 +1036,11 @@ tr.lvl-U td.target { color: var(--muted); }
       <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}</optgroup>
       <optgroup label="Attributes">${ATTRS.map(([n]) => `<option value="${n}">${n} (${ch.attrs[n]})</option>`).join("")}</optgroup>`;
     if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
-    const an = advName();
-    $("r-adv-label").textContent = an ? `${an} applies +2` : "Advantage applies +2";
-    const showS = !!ch.sadv.id && sAdvBonus();
-    $("r-sadv-wrap").hidden = !showS;
-    if (!showS) $("r-sadv").checked = false;
-    $("r-sadv-label").textContent = `${sAdvName()} applies +2`;
+    // Abilities without a +2 (mind meld, telepathy, flight) leave the box disabled.
+    const an = ch.sadv.id ? (sAdvBonus() ? sAdvName() : "") : advName();
+    $("r-adv-label").textContent = an ? `${an} applies +2` : ch.sadv.id ? `${sAdvName()} gives no roll bonus` : "Advantage applies +2";
     $("r-adv").disabled = !an;
+    if (!an) $("r-adv").checked = false;
     updateTarget();
     renderLog();
   }
@@ -1054,7 +1055,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const parts = [];
     const mod = +$("r-mod").value; if (mod) parts.push(mod);
     const asst = +$("r-assist").value; if (asst) parts.push(asst);
-    if (($("r-adv").checked && !$("r-adv").disabled) || $("r-sadv").checked) parts.push(2); // only one advantage bonus per roll
+    if ($("r-adv").checked && !$("r-adv").disabled) parts.push(2);
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
@@ -1136,14 +1137,22 @@ tr.lvl-U td.target { color: var(--muted); }
   document.addEventListener("change", (e) => {
     const t = e.target;
     if (t.id === "f-dept") { setDept(t.value); touch(); render(); }
-    else if (t.id === "f-speciesid") { setSpecies(t.value); $("f-species").value = ch.species; touch(); render(); }
+    else if (t.id === "f-speciesid") {
+      const had = ch.sadv.id && sAdvName();
+      setSpecies(t.value); $("f-species").value = ch.species; touch(); render();
+      if (had && !ch.sadv.id) toast(`${had} belongs to another species, so your advantage was cleared. Choose a new one in step 4.`);
+    }
     else if (t.id === "f-rank" && isEnlisted(t.value) && ch.dept !== "General Services") {
       setDept("General Services"); $("f-dept").value = ch.dept; touch(); render();
       toast("Crewmen and yeomen serve in General Services, so the department was changed.");
     }
-    else if (t.id === "f-adv") { ch.adv.id = t.value; touch(); render(); }
+    else if (t.id === "f-adv") {
+      // One advantage: picking a species advantage clears the regular one, and vice versa.
+      if (t.value.startsWith("s:")) { ch.sadv.id = t.value.slice(2); ch.adv.id = ""; }
+      else { ch.adv.id = t.value; ch.sadv.id = ""; }
+      touch(); render();
+    }
     else if (t.id === "f-comp") { ch.comp.id = t.value; touch(); render(); }
-    else if (t.id === "f-sadv") { ch.sadv.id = t.value; touch(); render(); }
     else if (t.dataset.eq) { ch.equipment[t.dataset.eq] = t.checked; touch(); render(); }
     else if (t.dataset.skill) {
       const n = t.dataset.skill, v = t.value;
@@ -1153,12 +1162,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value); updateTarget(); }
-    else if (t.id === "r-adv" || t.id === "r-sadv") {
-      // The guide allows only one advantage bonus on a roll.
-      if (t.checked) $(t.id === "r-adv" ? "r-sadv" : "r-adv").checked = false;
-      updateTarget();
-    }
-    else if (["r-mod", "r-assist", "r-phys"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
