@@ -31,3 +31,9 @@ creator's **Players' Guide** tab and as `uss-pelion/USS_Pelion_Players_Guide.doc
 
 After editing the Markdown, rebuild both with `python3 tools/build-guide.py --docx`
 (needs pandoc; python-docx adds table borders to the Word file).
+
+## Discord dice bot
+
+`discord-bot/` is a free `/pelion` slash command for Discord that rolls 3d6 under a target with the
+guide's rules and offers a Duty point reroll. It runs on Cloudflare Workers; setup steps are in
+[`discord-bot/README.md`](discord-bot/README.md).
