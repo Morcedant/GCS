@@ -1,9 +1,9 @@
 ---
-title: "Hard Light Players' Guide"
+title: "Beyond the Light Players' Guide"
 subtitle: "A space opera setting for the Legend Dynamics RPG system"
 ---
 
-The Concord holds a hundred worlds together with treaties, trade and a navy stretched too thin. Beyond its borders lie uncharted systems, ancient ruins that still hum with power, and the Hegemony, an empire that wants everything the Concord has. *Hard Light* is a space opera setting for the Legend Dynamics RPG system: a starship crew of many species, exploring, trading, fighting and talking their way across the Reach.
+The Concord holds a hundred worlds together with treaties, trade and a navy stretched too thin. Beyond its borders lie uncharted systems, ancient ruins that still hum with power, and the Hegemony, an empire that wants everything the Concord has. *Beyond the Light* is a space opera setting for the Legend Dynamics RPG system: a starship crew of many species, exploring, trading, fighting and talking their way across the Reach.
 
 ## The rule to remember
 
@@ -13,7 +13,7 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Hard Light** setting: its roles, species, skills, equipment, weapons and dangers. In this setting, the core rules' Legend points are called **Resolve points**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Beyond the Light** setting: its roles, species, skills, equipment, weapons and dangers. In this setting, the core rules' Legend points are called **Resolve points**.
 
 # Create your character
 
@@ -891,7 +891,7 @@ GM commands need the **Manage Server** permission on the Discord server. Everyon
 
 | Command | What it does |
 |---|---|
-| `/game set game:Hard Light` | Choose this server's game. Do it once; `/game show` checks it. |
+| `/game set game:Beyond the Light` | Choose this server's game. Do it once; `/game show` checks it. |
 | `/points newsession` | Start a session: everyone goes back to two Resolve points, and unused points are gone. |
 | `/points gain player:@name` | Award a Resolve point, e.g. for an accepted complication. |
 | `/points set player:@name points:3` | Correct a player's total. |

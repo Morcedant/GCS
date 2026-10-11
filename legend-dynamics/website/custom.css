@@ -8,7 +8,7 @@
    2. A theme per game, switched on for a page by one line of page header
       code injection (see website/README.md):
         html.ld-western    Dust & Damnation   (Gothic Western)
-        html.ld-spaceopera Hard Light         (space opera)
+        html.ld-spaceopera Beyond the Light   (science fiction)
         html.ld-fantasy    The Shattered Crown (sword and sorcery)
    Components (hero, game cards, callouts, odds table, steps, rules text) use
    ld- classes and live in Code Blocks; their HTML is in website/blocks/.
