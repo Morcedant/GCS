@@ -1937,7 +1937,10 @@
     [
      "Class I attack; effective at Short range, like a pistol.",
      "Class II attack; effective at Long range, like a rifle.",
-     "Class III attack, effective at Extreme range; or Class II against everyone in a small area."
+     "Class III attack, effective at Extreme range; or Class II against everyone in a small area.",
+     "Class IV attack, effective for miles; or Class III across a small area.",
+     "Class V attack that can level a building; or Class IV across a city block.",
+     "Class VI attack; or Class V across a district."
     ],
     {},
     "fire, ice, light, plasma, electricity or force"
@@ -1949,7 +1952,10 @@
     [
      "Shape a little of your element nearby: a gust, a mud patch, grasping vines.",
      "Shape a room's worth: walls of earth, a waterspout, a thicket; Class II attacks.",
-     "Shape a city block's worth: a tremor, a flood surge, a forest overnight."
+     "Shape a city block's worth: a tremor, a flood surge, a forest overnight.",
+     "Shape a neighborhood's worth: a sinkhole, a river turned aside, a forest in an hour.",
+     "Shape a city's worth: an earthquake, a flood, a storm surge.",
+     "Shape a region: raise hills, redraw a coastline."
     ],
     {},
     "choose air, earth, water or plants"
@@ -1961,7 +1967,10 @@
     [
      "Fog, wind or rain around you for a scene.",
      "A storm over a neighborhood; lightning as a Class II attack.",
-     "A storm over a city: grounded aircraft, Class III lightning."
+     "A storm over a city: grounded aircraft, Class III lightning.",
+     "A storm over a region: tornadoes, Class IV lightning.",
+     "A hurricane, and you steer it.",
+     "Change a continent's weather for a season."
     ],
     {},
     ""
@@ -1973,7 +1982,10 @@
     [
      "Darken a room; +2 to Stealth in shadow.",
      "Total darkness only you see through; step between shadows within sight.",
-     "Solid shadow constructs (Class II attacks or barriers); swallow a block in night."
+     "Solid shadow constructs (Class II attacks or barriers); swallow a block in night.",
+     "Plunge a neighborhood into night; constructs make Class III attacks.",
+     "Night over a city; step through shadows anywhere in it.",
+     "Open a road through shadow to anywhere, even Shadow Earth."
     ],
     {},
     ""
@@ -1985,7 +1997,10 @@
     [
      "Make one object or person heavy (−2 to move) or light enough to throw.",
      "Pin a group to the ground (Body resists); become dense (Defense II) or light enough to float.",
-     "Crush a vehicle; Defense III; hurl a car as a Class III attack."
+     "Crush a vehicle; Defense III; hurl a car as a Class III attack.",
+     "Crush a building's frame; Defense IV; hurl a truck as a Class IV attack.",
+     "Pull an aircraft out of the sky; Defense V.",
+     "Bend gravity over a city; Defense VI."
     ],
     {},
     ""
@@ -1997,7 +2012,10 @@
     [
      "Attacks of your energy type are one Class lower against you.",
      "Ignore your energy type up to Class II; spend what you absorb on a Class II Blast.",
-     "Ignore your type up to Class III; once a scene, absorbed energy fuels a Class III Blast or a push without Strain."
+     "Ignore your type up to Class III; once a scene, absorbed energy fuels a Class III Blast or a push without Strain.",
+     "Ignore your type up to Class IV; absorbed energy fuels a Class IV Blast.",
+     "Ignore your type up to Class V.",
+     "Drink anything of your type, even a nuclear blast."
     ],
     {},
     "choose a type: sunlight, electricity, kinetic, radiation…"
@@ -2009,7 +2027,10 @@
     [
      "Unarmed hits are Class I.",
      "Unarmed hits are Class II; you can climb with them.",
-     "Unarmed hits are Class III; they cut through steel doors."
+     "Unarmed hits are Class III; they cut through steel doors.",
+     "Unarmed hits are Class IV; they carve through tank armor.",
+     "Class V; they cut through a bank vault.",
+     "Class VI; nothing made can stop them."
     ],
     {},
     "claws, fangs, horns or spikes"
@@ -2021,7 +2042,10 @@
     [
      "Any hand weapon or simple tool, lasting a scene.",
      "Any personal firearm or complex tool; Class II attacks.",
-     "Heavy weapons or a vehicle's worth of matter; Class III attacks."
+     "Heavy weapons or a vehicle's worth of matter; Class III attacks.",
+     "Military hardware, a tank's main gun: Class IV attacks.",
+     "A warship's worth of matter; Class V attacks.",
+     "Raise a fortress from nothing."
     ],
     {},
     "weapons or objects from nothing"
@@ -2033,7 +2057,10 @@
     [
      "Lift a motorcycle; unarmed hits are Class I.",
      "Lift a car; unarmed hits are Class II; tear doors off.",
-     "Lift a truck or a small plane; unarmed hits are Class III."
+     "Lift a truck or a small plane; unarmed hits are Class III.",
+     "Lift a tank or a jet; unarmed hits are Class IV.",
+     "Lift a ship or a building's floor; Class V.",
+     "Move a mountain's worth; Class VI."
     ],
     {},
     ""
@@ -2045,7 +2072,10 @@
     [
      "Defense I against physical harm.",
      "Defense II.",
-     "Defense III."
+     "Defense III.",
+     "Defense IV.",
+     "Defense V.",
+     "Defense VI."
     ],
     {},
     ""
@@ -2057,7 +2087,10 @@
     [
      "Defense I for you, for a scene.",
      "Defense II for you, or Defense I around a small group.",
-     "Defense III, or Defense II around a group; seal a doorway."
+     "Defense III, or Defense II around a group; seal a doorway.",
+     "Defense IV, or Defense III around a building.",
+     "Defense V, or Defense IV around a city block.",
+     "Defense VI, or shield a city."
     ],
     {},
     ""
@@ -2114,7 +2147,10 @@
     [
      "Climb any wall as easily as walking.",
      "Run up walls and across ceilings.",
-     "Cling upside down under a moving vehicle or aircraft."
+     "Cling upside down under a moving vehicle or aircraft.",
+     "Cling to anything, even glass in a hurricane or a spaceship's hull.",
+     "Walk on water, smoke or any surface.",
+     "Stand on the air as if it were ground."
     ],
     {},
     ""
@@ -2126,7 +2162,10 @@
     [
      "Clear one injury box after a scene's rest.",
      "Clear one box at the end of each scene; a single hit never leaves you Dying.",
-     "Clear a box every few rounds; regrow lost limbs."
+     "Clear a box every few rounds; regrow lost limbs.",
+     "Clear one box at the start of each of your turns. A hit that would leave you Dying leaves you Incapacitated instead, and you're back up in a round.",
+     "Clear one box each turn, two after a hit that marks 3 or more. Only certain death stops you, and even then you recover within the hour unless your body is destroyed outright.",
+     "Nothing short of total annihilation keeps you down."
     ],
     {},
     ""
@@ -2138,7 +2177,10 @@
     [
      "Ignore one hazard: heat, cold, poison or thin air.",
      "Breathe water and ignore all ordinary hazards.",
-     "Survive vacuum, the deep ocean and fire."
+     "Survive vacuum, the deep ocean and fire.",
+     "Survive vacuum, lava or the ocean floor indefinitely.",
+     "Survive on other worlds and in other dimensions.",
+     "Survive anything that doesn't destroy you outright, even a star's surface for a while."
     ],
     {},
     ""
@@ -2150,7 +2192,10 @@
     [
      "Shrink to a cat (+2 Stealth) or grow to 10 feet (+2 to Body feats).",
      "Insect-sized, or 20 feet tall with Strength I and Toughness I while big.",
-     "Microscopic, or 50 feet tall with Strength II and Toughness II while big."
+     "Microscopic, or 50 feet tall with Strength II and Toughness II while big.",
+     "Grow to 100 feet (Strength III and Toughness III while big), or shrink to dust.",
+     "300 feet (Strength IV and Toughness IV), or subatomic.",
+     "Kaiju-sized (Strength V and Toughness V), or small enough to slip between worlds."
     ],
     {},
     ""
@@ -2162,7 +2207,10 @@
     [
      "Reach across a room.",
      "Wrap a group, squeeze under doors; Class I attacks at range.",
-     "Stretch a block; bounce Class II hits back at the attacker."
+     "Stretch a block; bounce Class II hits back at the attacker.",
+     "Stretch a quarter mile; wrap a building; bounce Class III hits back.",
+     "Stretch a mile; bounce Class IV hits back.",
+     "Bounce Class V hits back; force can barely harm you."
     ],
     {},
     ""
@@ -2174,7 +2222,10 @@
     [
      "Fade from notice: +4 to Stealth if you stay still.",
      "Invisible while moving.",
-     "You and those you touch, to cameras and sensors too."
+     "You and those you touch, to cameras and sensors too.",
+     "Invisible to every sense, and to powers below Class IV, with a group.",
+     "Make a building vanish.",
+     "Slip from notice entirely: people forget you were there."
     ],
     {},
     ""
@@ -2186,7 +2237,10 @@
     [
      "Pass slowly through a wall (one action).",
      "Walk through walls; physical attacks below Class II pass through you.",
-     "Phase as a reaction: attacks below Class III pass through; wreck a machine by passing through it."
+     "Phase as a reaction: attacks below Class III pass through; wreck a machine by passing through it.",
+     "Attacks below Class IV pass through you; carry others through walls.",
+     "Phase a vehicle or a crowd through anything.",
+     "Untouchable; phase through realities into Otherworld."
     ],
     {},
     ""
@@ -2198,7 +2252,10 @@
     [
      "One copy for a scene that helps (+2 assistance).",
      "Three copies that act on their own (minor characters).",
-     "A crowd of copies; you know what all of them know."
+     "A crowd of copies; you know what all of them know.",
+     "A hundred copies.",
+     "An army of copies across a city.",
+     "Copies anywhere you've ever been."
     ],
     {},
     ""
@@ -2210,7 +2267,10 @@
     [
      "Change in one action; the form has two Class I powers of its own.",
      "The form's powers rise to Class II.",
-     "The form's powers rise to Class III. If the form has a will of its own, each change marks Strain."
+     "The form's powers rise to Class III. If the form has a will of its own, each change marks Strain.",
+     "The form's powers rise to Class IV.",
+     "The form's powers rise to Class V.",
+     "The form's powers rise to Class VI."
     ],
     {},
     "an alternate form; you design its powers"
@@ -2222,7 +2282,10 @@
     [
      "You don't age.",
      "You can't die of age, disease or poison.",
-     "Even death doesn't hold: you return within days, as the GM decides."
+     "Even death doesn't hold: you return within days, as the GM decides.",
+     "You return within a day, even if your body was destroyed.",
+     "You return within an hour, in a body remade.",
+     "You can't be destroyed, only bound or banished."
     ],
     {
      "gm": true,
@@ -2237,7 +2300,10 @@
     [
      "Hear surface thoughts by touch; speak mind to mind within a room.",
      "Read thoughts within sight; link a team's minds for a scene.",
-     "Search memories; link minds across a city."
+     "Search memories; link minds across a city.",
+     "Read a crowd's thoughts; link minds across a country.",
+     "Link minds across the world.",
+     "Reach minds across dimensions; read a mind against its will (Will at −4)."
     ],
     {},
     ""
@@ -2249,7 +2315,10 @@
     [
      "One simple command that doesn't endanger them (Will resists).",
      "Control a person's actions for a scene (Will resists each round).",
-     "Control a small group, or plant a lasting command."
+     "Control a small group, or plant a lasting command.",
+     "Control a crowd for a scene.",
+     "Control everyone in a city block.",
+     "Rule a city's minds."
     ],
     {
      "gm": true
@@ -2263,7 +2332,10 @@
     [
      "Push one person toward fear, calm, rage or trust (Will resists).",
      "Sway a crowd; fear makes them flee.",
-     "Terror or rapture that paralyzes a crowd for a scene."
+     "Terror or rapture that paralyzes a crowd for a scene.",
+     "Sway a city's mood for a day.",
+     "Hold a city's emotions for a week.",
+     "Panic or peace across a nation."
     ],
     {},
     ""
@@ -2275,7 +2347,10 @@
     [
      "Blur the last minute in one person's memory.",
      "Erase or alter a day; read memories by touch.",
-     "Rewrite years; plant a false life."
+     "Rewrite years; plant a false life.",
+     "Rewrite a crowd's memory of an event.",
+     "Make a city forget.",
+     "Erase a person from the world's memory."
     ],
     {
      "gm": true
@@ -2289,7 +2364,10 @@
     [
      "A sound or small image at a distance.",
      "A convincing person or scene that fools sight and hearing (Will or Intellect sees through).",
-     "Illusions every sense believes; they can frighten someone into collapse."
+     "Illusions every sense believes; they can frighten someone into collapse.",
+     "Illusions over a city block that even cameras record.",
+     "A whole false district.",
+     "Illusions that become real for those who believe them."
     ],
     {},
     ""
@@ -2301,7 +2379,10 @@
     [
      "Feel what one person feels; +2 to Read People.",
      "Sense lies and intentions in a room; share or ease pain by touch.",
-     "Feel a crowd's mood across a block; find a person by their emotions."
+     "Feel a crowd's mood across a block; find a person by their emotions.",
+     "Feel every emotion in a city; find anyone by what they feel.",
+     "Ease or share a crowd's pain.",
+     "Feel the mood of a nation."
     ],
     {},
     ""
@@ -2313,7 +2394,10 @@
     [
      "+2 to one roll a scene; you're never surprised.",
      "Once a scene, reroll a failed roll without spending Spark.",
-     "Visions of a scene's future: the GM answers one question about what's coming."
+     "Visions of a scene's future: the GM answers one question about what's coming.",
+     "Twice a scene, reroll a failed roll without spending Spark; you're never ambushed.",
+     "Once a scene, know the outcome of a choice before you make it.",
+     "See the shape of days to come: the GM answers three questions a session."
     ],
     {},
     ""
@@ -2325,7 +2409,10 @@
     [
      "+2 to perception; see in the dark.",
      "Track by scent; hear heartbeats through walls.",
-     "See through walls; hear a whisper across a block."
+     "See through walls; hear a whisper across a block.",
+     "Hear a conversation across a city; read a license plate a mile away.",
+     "Sense through walls for a mile.",
+     "Perceive anything happening across a city."
     ],
     {},
     ""
@@ -2337,7 +2424,10 @@
     [
      "See spirits and active magic.",
      "See auras: possession, curses, lies, Shadow Earth duplicates.",
-     "See into Otherworld and Shadow Earth; read who made a spell."
+     "See into Otherworld and Shadow Earth; read who made a spell.",
+     "See through any magical disguise; read spells as they're cast.",
+     "See across Otherworld; find any spirit by name.",
+     "See the threads of fate and magic over a whole city."
     ],
     {},
     ""
@@ -2349,7 +2439,10 @@
     [
      "Touch an object and feel its last owner's emotions.",
      "See a key moment in its past.",
-     "Follow its whole history, and find its owner now."
+     "Follow its whole history, and find its owner now.",
+     "Read the history of a building or a street.",
+     "Read a city's history; find anyone who ever touched an object.",
+     "Read the past of a place across centuries."
     ],
     {},
     ""
@@ -2361,7 +2454,10 @@
     [
      "Leave your body to scout a building (your body is helpless).",
      "Travel across a city as a spirit; speak to spirits.",
-     "Cross into Otherworld or Shadow Earth in spirit; fight spirits there."
+     "Cross into Otherworld or Shadow Earth in spirit; fight spirits there.",
+     "Travel anywhere on Earth in spirit within moments.",
+     "Act physically as a spirit, with Class III attacks.",
+     "Walk between worlds in body as well as spirit."
     ],
     {},
     ""
@@ -2373,7 +2469,10 @@
     [
      "+2 to Intellect skills; learn any skill in days.",
      "Invent a working device in a week; solve the unsolvable in a scene.",
-     "Understand any technology, alien or arcane; invent in hours."
+     "Understand any technology, alien or arcane; invent in hours.",
+     "Out-think supercomputers; invent the impossible in an hour.",
+     "Understand any science, alien or arcane, at a glance.",
+     "Tesla's level: build doors between worlds."
     ],
     {},
     ""
@@ -2385,7 +2484,10 @@
     [
      "Move a small object you can see; disarm.",
      "Lift a car; Class II attacks; hold a person still (Body resists).",
-     "Lift a truck; stop a falling plane; Class III attacks."
+     "Lift a truck; stop a falling plane; Class III attacks.",
+     "Lift a jet or a building's floor; Class IV attacks.",
+     "Lift a ship; Class V attacks.",
+     "Move a mountain; Class VI attacks."
     ],
     {},
     ""
@@ -2427,7 +2529,10 @@
     [
      "Open a door between two places you can see.",
      "Open a door to anywhere you've been.",
-     "Open a door into Otherworld, a haven or Shadow Earth."
+     "Open a door into Otherworld, a haven or Shadow Earth.",
+     "Hold a door open for an army or a convoy.",
+     "Open many doors at once across a city.",
+     "Tear a breach between worlds that stays open."
     ],
     {
      "gm": true
@@ -2441,7 +2546,10 @@
     [
      "Call a minor spirit or creature that helps for a scene (+2 assistance).",
      "Call a creature that fights beside you (a minor character with Class II attacks).",
-     "Call something powerful; it serves, at a price."
+     "Call something powerful; it serves, at a price.",
+     "Call something that fights with Class IV attacks.",
+     "Call a legion.",
+     "Call one of Otherworld's powers itself."
     ],
     {},
     ""
@@ -2453,7 +2561,10 @@
     [
      "Seal a door or circle against spirits and magic.",
      "Protect a building; banish a minor spirit or creature (Will resists).",
-     "Protect a block; banish powerful beings back to Otherworld."
+     "Protect a block; banish powerful beings back to Otherworld.",
+     "Protect a district; banish Class IV beings.",
+     "Protect a city; banish Class V beings.",
+     "Seal an Earth Gate or a breach for good."
     ],
     {},
     ""
@@ -2465,7 +2576,10 @@
     [
      "Stabilize the Dying by touch; clear one box once a scene.",
      "Clear two boxes; cure ordinary disease and poison.",
-     "Clear any injury; cure the incurable; even curses yield (with the GM's approval)."
+     "Clear any injury; cure the incurable; even curses yield (with the GM's approval).",
+     "Heal a crowd's ordinary wounds at once; restore lost limbs.",
+     "Bring back the newly dead, within minutes (GM's approval).",
+     "Undo death itself (GM's approval)."
     ],
     {},
     ""
@@ -2477,7 +2591,10 @@
     [
      "Suppress one Operant's Class I powers within reach for a round (Will resists).",
      "Suppress Class II powers within a room for a scene.",
-     "Suppress Class III powers in an area; the labs would kill for you."
+     "Suppress Class III powers in an area; the labs would kill for you.",
+     "Suppress Class IV powers across a building.",
+     "Suppress Class V powers across a city block.",
+     "Shut off powers across a city."
     ],
     {},
     ""
@@ -2489,7 +2606,10 @@
     [
      "Copy one Class I power from an Operant you touch, for a scene.",
      "Copy at Class II, or two powers at Class I.",
-     "Copy at Class III, and keep a copied power until you take another."
+     "Copy at Class III, and keep a copied power until you take another.",
+     "Copy a power at Class IV.",
+     "Copy several powers at Class IV, or one at Class V.",
+     "Copy any power at full strength."
     ],
     {},
     ""
@@ -2501,7 +2621,10 @@
     [
      "Sense and talk to machines; +2 to Computers and Engineering.",
      "Command electronics in a room: locks, cameras, guns, drones.",
-     "Command a building's systems or a fleet of drones; take over an Aegis suit (the pilot's Will resists)."
+     "Command a building's systems or a fleet of drones; take over an Aegis suit (the pilot's Will resists).",
+     "Command a city's power grid or a military network.",
+     "Command every machine in a region.",
+     "Speak to every machine on Earth."
     ],
     {},
     ""
@@ -2513,7 +2636,10 @@
     [
      "Speak with animals.",
      "Command a pack or a flock for a scene.",
-     "Command every animal across a block."
+     "Command every animal across a block.",
+     "Command every animal in a city.",
+     "Command a region's wildlife.",
+     "Command every creature that answers to instinct."
     ],
     {},
     ""
@@ -2525,7 +2651,10 @@
     [
      "Once a scene, +2 or −2 to any roll you can see.",
      "Once a scene, turn a near miss into a success, or a success into a failure.",
-     "Once a session, choose the result of any roll you can see."
+     "Once a session, choose the result of any roll you can see.",
+     "Twice a scene, choose the result of a roll you can see.",
+     "Once a scene, choose the result of any roll.",
+     "Rewrite luck itself: a disaster simply doesn't happen."
     ],
     {},
     ""
@@ -2537,7 +2666,10 @@
     [
      "Once a scene, take an extra action.",
      "Freeze time around you for a moment: two extra actions.",
-     "Rewind the last round, once a session."
+     "Rewind the last round, once a session.",
+     "Stop time for a round for everyone but you.",
+     "Rewind a whole scene, once a session.",
+     "Travel in time (GM's approval)."
     ],
     {
      "gm": true
@@ -2551,7 +2683,10 @@
     [
      "Ride along in one person's senses (Will resists).",
      "Take control of a body for a scene; your own body is helpless.",
-     "Possess and keep a body; switch bodies by touch."
+     "Possess and keep a body; switch bodies by touch.",
+     "Possess and switch bodies at a distance.",
+     "Possess several bodies at once.",
+     "Possess anyone, even another Operant, against their will."
     ],
     {
      "gm": true
@@ -2565,7 +2700,10 @@
     [
      "Carry three gadgets, each a Class I effect from another power.",
      "Build gadgets with Class II effects; repair anything.",
-     "Build devices with Class III effects, or an Aegis suit of your own."
+     "Build devices with Class III effects, or an Aegis suit of your own.",
+     "Build Class IV devices: a better suit than ExLAW's Aegis.",
+     "Class V devices: an orbital platform.",
+     "Tesla-class inventions: doors between worlds."
     ],
     {},
     ""

@@ -761,15 +761,61 @@ After a significant case, the GM may allow one of these **instead of a skill ste
 
 ## Escalated Classes
 
-Most powers simply go further at Classes IV to VI. Speed, Flight, Super Leaping, Cantrips and Teleport have set limits at every Class: speeds in multiples of the speed of sound (Mach 1 is about 760 mph), and distances in feet and miles. Player characters reach these Classes only by pushing (one action, one box of Strain); the GM's characters may have them outright.
+Every power keeps going at Classes IV to VI. Player characters reach Class IV only by pushing (one action, one box of Strain), with the Stronger Power Edge and the GM's approval, or at a campaign milestone; Class V is an end-of-campaign capstone, and Class VI belongs to the GM's characters. Speeds are in multiples of the speed of sound (Mach 1 is about 760 mph).
 
 | Power | Class IV | Class V | Class VI |
 |---|---|---|---|
+| **Blast** | Class IV attack, effective for miles; or Class III across a small area. | Class V attack that can level a building; or Class IV across a city block. | Class VI attack; or Class V across a district. |
+| **Elemental Control** | Shape a neighborhood's worth: a sinkhole, a river turned aside, a forest in an hour. | Shape a city's worth: an earthquake, a flood, a storm surge. | Shape a region: raise hills, redraw a coastline. |
+| **Weather Control** | A storm over a region: tornadoes, Class IV lightning. | A hurricane, and you steer it. | Change a continent's weather for a season. |
+| **Darkness / Shadow** | Plunge a neighborhood into night; constructs make Class III attacks. | Night over a city; step through shadows anywhere in it. | Open a road through shadow to anywhere, even Shadow Earth. |
+| **Gravity / Density** | Crush a building's frame; Defense IV; hurl a truck as a Class IV attack. | Pull an aircraft out of the sky; Defense V. | Bend gravity over a city; Defense VI. |
+| **Energy Absorption** | Ignore your type up to Class IV; absorbed energy fuels a Class IV Blast. | Ignore your type up to Class V. | Drink anything of your type, even a nuclear blast. |
+| **Natural Weapons** | Unarmed hits are Class IV; they carve through tank armor. | Class V; they cut through a bank vault. | Class VI; nothing made can stop them. |
+| **Manifest** | Military hardware, a tank's main gun: Class IV attacks. | A warship's worth of matter; Class V attacks. | Raise a fortress from nothing. |
+| **Strength** | Lift a tank or a jet; unarmed hits are Class IV. | Lift a ship or a building's floor; Class V. | Move a mountain's worth; Class VI. |
+| **Toughness** | Defense IV. | Defense V. | Defense VI. |
+| **Force Field** | Defense IV, or Defense III around a building. | Defense V, or Defense IV around a city block. | Defense VI, or shield a city. |
 | **Speed** | Mach 3: cross a city in seconds; two actions every round. | Mach 10: cross a continent in minutes; three actions a round. | Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still. |
 | **Flight** | Mach 5: outfly any jet; cross an ocean in an hour or two. | Mach 10: anywhere on Earth within a couple of hours. | Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it). |
 | **Super Leaping** | Leap a mile up or 5 miles across. | Leap 5 miles up or 25 miles across. | Leap into the stratosphere, or 100 miles and more across. |
+| **Wall-Crawling** | Cling to anything, even glass in a hurricane or a spaceship's hull. | Walk on water, smoke or any surface. | Stand on the air as if it were ground. |
+| **Regeneration** | Clear one box at the start of each of your turns. A hit that would leave you Dying leaves you Incapacitated instead, and you're back up in a round. | Clear one box each turn, two after a hit that marks 3 or more. Only certain death stops you, and even then you recover within the hour unless your body is destroyed outright. | Nothing short of total annihilation keeps you down. |
+| **Adaptation** | Survive vacuum, lava or the ocean floor indefinitely. | Survive on other worlds and in other dimensions. | Survive anything that doesn't destroy you outright, even a star's surface for a while. |
+| **Size Change** | Grow to 100 feet (Strength III and Toughness III while big), or shrink to dust. | 300 feet (Strength IV and Toughness IV), or subatomic. | Kaiju-sized (Strength V and Toughness V), or small enough to slip between worlds. |
+| **Stretching** | Stretch a quarter mile; wrap a building; bounce Class III hits back. | Stretch a mile; bounce Class IV hits back. | Bounce Class V hits back; force can barely harm you. |
+| **Invisibility** | Invisible to every sense, and to powers below Class IV, with a group. | Make a building vanish. | Slip from notice entirely: people forget you were there. |
+| **Phasing** | Attacks below Class IV pass through you; carry others through walls. | Phase a vehicle or a crowd through anything. | Untouchable; phase through realities into Otherworld. |
+| **Duplication** | A hundred copies. | An army of copies across a city. | Copies anywhere you've ever been. |
+| **Transformation** | The form's powers rise to Class IV. | The form's powers rise to Class V. | The form's powers rise to Class VI. |
+| **Immortality** | You return within a day, even if your body was destroyed. | You return within an hour, in a body remade. | You can't be destroyed, only bound or banished. |
+| **Telepathy** | Read a crowd's thoughts; link minds across a country. | Link minds across the world. | Reach minds across dimensions; read a mind against its will (Will at −4). |
+| **Mind Control** | Control a crowd for a scene. | Control everyone in a city block. | Rule a city's minds. |
+| **Emotion Control** | Sway a city's mood for a day. | Hold a city's emotions for a week. | Panic or peace across a nation. |
+| **Memory Manipulation** | Rewrite a crowd's memory of an event. | Make a city forget. | Erase a person from the world's memory. |
+| **Illusion** | Illusions over a city block that even cameras record. | A whole false district. | Illusions that become real for those who believe them. |
+| **Empathy** | Feel every emotion in a city; find anyone by what they feel. | Ease or share a crowd's pain. | Feel the mood of a nation. |
+| **Precognition** | Twice a scene, reroll a failed roll without spending Spark; you're never ambushed. | Once a scene, know the outcome of a choice before you make it. | See the shape of days to come: the GM answers three questions a session. |
+| **Enhanced Senses** | Hear a conversation across a city; read a license plate a mile away. | Sense through walls for a mile. | Perceive anything happening across a city. |
+| **Mystic Sight** | See through any magical disguise; read spells as they're cast. | See across Otherworld; find any spirit by name. | See the threads of fate and magic over a whole city. |
+| **Psychometry** | Read the history of a building or a street. | Read a city's history; find anyone who ever touched an object. | Read the past of a place across centuries. |
+| **Astral Projection** | Travel anywhere on Earth in spirit within moments. | Act physically as a spirit, with Class III attacks. | Walk between worlds in body as well as spirit. |
+| **Super Intellect** | Out-think supercomputers; invent the impossible in an hour. | Understand any science, alien or arcane, at a glance. | Tesla's level: build doors between worlds. |
+| **Telekinesis** | Lift a jet or a building's floor; Class IV attacks. | Lift a ship; Class V attacks. | Move a mountain; Class VI attacks. |
 | **Cantrips** | Know 5 cantrips, each working at Class IV. | Know 6 cantrips, each working at Class V. | Know 7 cantrips, each working at Class VI. |
 | **Teleport** | Anywhere on Earth, even places you've only seen in photos; up to 20 passengers or a vehicle. | Low orbit or the Moon; a building's worth of people and things. | Another world or dimension, without a door. |
+| **Portals** | Hold a door open for an army or a convoy. | Open many doors at once across a city. | Tear a breach between worlds that stays open. |
+| **Summoning** | Call something that fights with Class IV attacks. | Call a legion. | Call one of Otherworld's powers itself. |
+| **Warding** | Protect a district; banish Class IV beings. | Protect a city; banish Class V beings. | Seal an Earth Gate or a breach for good. |
+| **Healing** | Heal a crowd's ordinary wounds at once; restore lost limbs. | Bring back the newly dead, within minutes (GM's approval). | Undo death itself (GM's approval). |
+| **Power Negation** | Suppress Class IV powers across a building. | Suppress Class V powers across a city block. | Shut off powers across a city. |
+| **Power Mimicry** | Copy a power at Class IV. | Copy several powers at Class IV, or one at Class V. | Copy any power at full strength. |
+| **Technopathy** | Command a city's power grid or a military network. | Command every machine in a region. | Speak to every machine on Earth. |
+| **Animal Control** | Command every animal in a city. | Command a region's wildlife. | Command every creature that answers to instinct. |
+| **Probability Control** | Twice a scene, choose the result of a roll you can see. | Once a scene, choose the result of any roll. | Rewrite luck itself: a disaster simply doesn't happen. |
+| **Time Manipulation** | Stop time for a round for everyone but you. | Rewind a whole scene, once a session. | Travel in time (GM's approval). |
+| **Possession** | Possess and switch bodies at a distance. | Possess several bodies at once. | Possess anyone, even another Operant, against their will. |
+| **Gadgeteering** | Build Class IV devices: a better suit than ExLAW's Aegis. | Class V devices: an orbital platform. | Tesla-class inventions: doors between worlds. |
 
 ## Leaping and teleporting
 
