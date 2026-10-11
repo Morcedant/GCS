@@ -1382,6 +1382,50 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-attacking-and-defending">Attacking and defending</h2>
 <p>Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.</p>
 <p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.</p>
+<h2 id="g-range">Range</h2>
+<p>Distances fall into five bands:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Band</th>
+<th>Distance</th>
+<th>For example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Close</td>
+<td>Up to 10 yards</td>
+<td>Across a room or a saloon; one move covers it</td>
+</tr>
+<tr class="even">
+<td>Short</td>
+<td>Up to 50 yards</td>
+<td>Across a street or a corral</td>
+</tr>
+<tr class="odd">
+<td>Medium</td>
+<td>Up to 150 yards</td>
+<td>Down the length of a town</td>
+</tr>
+<tr class="even">
+<td>Long</td>
+<td>Up to 500 yards</td>
+<td>Across a valley or a river crossing</td>
+</tr>
+<tr class="odd">
+<td>Extreme</td>
+<td>Up to a mile, in line of sight</td>
+<td>Ridge to ridge</td>
+</tr>
+</tbody>
+</table>
+<p>Every ranged weapon has an <strong>effective band</strong>, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand, claws and fists reach only someone next to you. Your move each turn covers the Close band; give up your action to run and you cover Short.</p>
 <h2 id="g-injury">Injury</h2>
 <table>
 <thead>
@@ -1426,13 +1470,15 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>How many boxes a hit marks depends on the <strong>weapon</strong>, not on how well the attack succeeded.</p>
 <table>
 <colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Weapon</th>
+<th>Range</th>
 <th>Boxes on a hit</th>
 <th>What the injury looks like</th>
 </tr>
@@ -1440,66 +1486,97 @@ tr.lvl-U td.target { color: var(--muted); }
 <tbody>
 <tr class="odd">
 <td>Punch, kick, headbutt</td>
+<td>Melee</td>
 <td>1</td>
 <td>Bruises, a split lip, cracked ribs</td>
 </tr>
 <tr class="even">
 <td>Club, bottle, pistol-whip</td>
+<td>Melee</td>
 <td>1</td>
 <td>A concussion or a broken finger</td>
 </tr>
 <tr class="odd">
-<td>Knife, hatchet, arrow</td>
+<td>Knife or hatchet</td>
+<td>Melee; Close thrown</td>
 <td>1</td>
 <td>A cut or stab wound that bleeds</td>
 </tr>
 <tr class="even">
+<td>Arrow</td>
+<td>Medium</td>
+<td>1</td>
+<td>A cut or stab wound that bleeds</td>
+</tr>
+<tr class="odd">
 <td>Axe, saber, or an old Grimm weapon</td>
+<td>Melee</td>
 <td>2</td>
 <td>A deep wound or a broken bone</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Crossbow</td>
+<td>Medium</td>
 <td>2</td>
 <td>A bolt deep in the flesh</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Claws and fangs of a predator Wesen in full woge</td>
+<td>Melee</td>
 <td>2</td>
 <td>Torn flesh</td>
 </tr>
+<tr class="even">
+<td>Derringer</td>
+<td>Close</td>
+<td>2</td>
+<td>A gunshot wound</td>
+</tr>
 <tr class="odd">
-<td>Derringer, revolver or rifle</td>
+<td>Revolver</td>
+<td>Short</td>
 <td>2</td>
 <td>A gunshot wound</td>
 </tr>
 <tr class="even">
-<td>Shotgun, within a few paces</td>
+<td>Rifle</td>
+<td>Long</td>
+<td>2</td>
+<td>A gunshot wound</td>
+</tr>
+<tr class="odd">
+<td>Shotgun, at Close range</td>
+<td>Close</td>
 <td>3, and Dying</td>
 <td>A ruinous wound</td>
 </tr>
-<tr class="odd">
-<td>Shotgun, farther away</td>
+<tr class="even">
+<td>Shotgun, at Short range</td>
+<td>Short (no effect beyond)</td>
 <td>1</td>
 <td>Scattered pellets</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Buffalo rifle</td>
+<td>Extreme</td>
 <td>3, and Dying</td>
 <td>A ruinous wound</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Dynamite</td>
+<td>Close (thrown)</td>
 <td>1 to everyone nearby, 3 and Dying at the centre</td>
 <td>Blast and burns; Dodge means diving clear</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Fall</td>
+<td>—</td>
 <td>1 for a bad fall, 2 for a long one</td>
 <td>A sprain or a fracture</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Fire</td>
+<td>—</td>
 <td>1 each round in the flames</td>
 <td>Burns</td>
 </tr>
@@ -1561,7 +1638,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="odd">
 <td>Both barrels (shotgun)</td>
 <td>2</td>
-<td>+2 to hit at close range</td>
+<td>+2 to hit at Close range</td>
 </tr>
 <tr class="even">
 <td>Covering fire</td>
