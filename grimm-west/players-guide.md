@@ -336,6 +336,20 @@ Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for f
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
 
+## Range
+
+Distances fall into five bands:
+
+| Band | Distance | For example |
+|---|---|---|
+| Close | Up to 10 yards | Across a room or a saloon; one move covers it |
+| Short | Up to 50 yards | Across a street or a corral |
+| Medium | Up to 150 yards | Down the length of a town |
+| Long | Up to 500 yards | Across a valley or a river crossing |
+| Extreme | Up to a mile, in line of sight | Ridge to ridge |
+
+Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand, claws and fists reach only someone next to you. Your move each turn covers the Close band; give up your action to run and you cover Short.
+
 ## Injury
 
 | Boxes marked | Condition | Effect |
@@ -359,21 +373,24 @@ Your protection is avoiding the hit: Dodge, cover, and a Grit point, which reduc
 
 How many boxes a hit marks depends on the **weapon**, not on how well the attack succeeded.
 
-| Weapon | Boxes on a hit | What the injury looks like |
-|---|---|---|
-| Punch, kick, headbutt | 1 | Bruises, a split lip, cracked ribs |
-| Club, bottle, pistol-whip | 1 | A concussion or a broken finger |
-| Knife, hatchet, arrow | 1 | A cut or stab wound that bleeds |
-| Axe, saber, or an old Grimm weapon | 2 | A deep wound or a broken bone |
-| Crossbow | 2 | A bolt deep in the flesh |
-| Claws and fangs of a predator Wesen in full woge | 2 | Torn flesh |
-| Derringer, revolver or rifle | 2 | A gunshot wound |
-| Shotgun, within a few paces | 3, and Dying | A ruinous wound |
-| Shotgun, farther away | 1 | Scattered pellets |
-| Buffalo rifle | 3, and Dying | A ruinous wound |
-| Dynamite | 1 to everyone nearby, 3 and Dying at the centre | Blast and burns; Dodge means diving clear |
-| Fall | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
-| Fire | 1 each round in the flames | Burns |
+| Weapon | Range | Boxes on a hit | What the injury looks like |
+|---|---|---|---|
+| Punch, kick, headbutt | Melee | 1 | Bruises, a split lip, cracked ribs |
+| Club, bottle, pistol-whip | Melee | 1 | A concussion or a broken finger |
+| Knife or hatchet | Melee; Close thrown | 1 | A cut or stab wound that bleeds |
+| Arrow | Medium | 1 | A cut or stab wound that bleeds |
+| Axe, saber, or an old Grimm weapon | Melee | 2 | A deep wound or a broken bone |
+| Crossbow | Medium | 2 | A bolt deep in the flesh |
+| Claws and fangs of a predator Wesen in full woge | Melee | 2 | Torn flesh |
+| Derringer | Close | 2 | A gunshot wound |
+| Revolver | Short | 2 | A gunshot wound |
+| Rifle | Long | 2 | A gunshot wound |
+| Shotgun, at Close range | Close | 3, and Dying | A ruinous wound |
+| Shotgun, at Short range | Short (no effect beyond) | 1 | Scattered pellets |
+| Buffalo rifle | Extreme | 3, and Dying | A ruinous wound |
+| Dynamite | Close (thrown) | 1 to everyone nearby, 3 and Dying at the centre | Blast and burns; Dodge means diving clear |
+| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fire | — | 1 each round in the flames | Burns |
 
 *Example:* a Blutbad's claws leave Deputy Ames Seriously wounded (two boxes). A revolver shot that gets through marks two more, but the track stops at three: Ames is Incapacitated and Dying, and a further 2-box hit would kill. Spending a Grit point on that revolver shot reduces it to one box, leaving Ames at three boxes but, because the hit only marked one, not Dying.
 
@@ -392,7 +409,7 @@ Guns run out of rounds, and every shot counts.
 |---|---|---|
 | Single shot | 1 | A normal attack |
 | Fan the hammer (revolver) | 3 | One attack at −2; a hit marks one extra box |
-| Both barrels (shotgun) | 2 | +2 to hit at close range |
+| Both barrels (shotgun) | 2 | +2 to hit at Close range |
 | Covering fire | 3 | No attack roll. Until your next turn, anyone who breaks cover in your line of fire takes −2 on their action |
 
 - **Firing spends rounds whether the shot hits or misses.** A Grit reroll repeats the same shot and costs nothing extra.
