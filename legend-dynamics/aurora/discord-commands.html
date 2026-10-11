@@ -1,4 +1,4 @@
-<title>ExLAW Discord Commands</title>
+<title>Aurora Discord Commands</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&amp;family=Saira+Extra+Condensed:wght@700&amp;family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
@@ -65,7 +65,7 @@ summary { cursor: pointer; font: 600 1.05rem/1.3 var(--display); color: var(--go
 </style>
 <div class="wrap">
   <header>
-    <span class="eyebrow">ExLAW</span>
+    <span class="eyebrow">Aurora</span>
     <h1>Discord commands</h1>
     <p class="lede">The table's Discord bot rolls the dice and keeps the shared Spark points, clocks and Collateral, Scrutiny and Backlash tracks.
     The bot doesn't know your sheet, so you give it the target number.</p>
@@ -103,7 +103,7 @@ summary { cursor: pointer; font: 600 1.05rem/1.3 var(--display); color: var(--go
     <p class="note">GM commands need the <strong>Manage Server</strong> permission on the Discord server. Everyone can see clocks, tracks and points.
     No bot yet? See <a href="#setup">Setting up the bot</a>.</p>
     <ul class="cmds">
-      <li class="cmd"><div class="cmd-line"><code class="cmd-code">/game set game:ExLAW</code><button type="button" class="copy" data-cmd="/game set game:ExLAW" aria-label="Copy /game set">Copy</button></div><p>Choose this server's game. Do it once; <code>/game show</code> checks it.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points newsession</code><button type="button" class="copy" data-cmd="/points newsession" aria-label="Copy /points newsession">Copy</button></div><p>Start a session: everyone goes back to two Spark points, and unused points are gone.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points gain player:@name</code><button type="button" class="copy" data-cmd="/points gain player:@name" aria-label="Copy /points gain">Copy</button></div><p>Award a Spark point, e.g. for an accepted complication.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points set player:@name points:3</code><button type="button" class="copy" data-cmd="/points set player:@name points:3" aria-label="Copy /points set">Copy</button></div><p>Correct a player's total.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/track mark name:collateral</code><button type="button" class="copy" data-cmd="/track mark name:collateral" aria-label="Copy /track mark">Copy</button></div><p>Mark a box on a track; a partial name works ("collateral" finds Collateral). <code>/track clear</code> clears one, and <code>/track reset</code> clears them all.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/seed</code><button type="button" class="copy" data-cmd="/seed" aria-label="Copy /seed ">Copy</button></div><p>Roll an adventure seed: one line from each seed table, and the command to start its ticking clock.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/contest ... defender:me</code><button type="button" class="copy" data-cmd="/contest ... defender:me" aria-label="Copy /contest ...">Copy</button></div><p>When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them.</p></li>
+      <li class="cmd"><div class="cmd-line"><code class="cmd-code">/game set game:Aurora</code><button type="button" class="copy" data-cmd="/game set game:Aurora" aria-label="Copy /game set">Copy</button></div><p>Choose this server's game. Do it once; <code>/game show</code> checks it.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points newsession</code><button type="button" class="copy" data-cmd="/points newsession" aria-label="Copy /points newsession">Copy</button></div><p>Start a session: everyone goes back to two Spark points, and unused points are gone.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points gain player:@name</code><button type="button" class="copy" data-cmd="/points gain player:@name" aria-label="Copy /points gain">Copy</button></div><p>Award a Spark point, e.g. for an accepted complication.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points set player:@name points:3</code><button type="button" class="copy" data-cmd="/points set player:@name points:3" aria-label="Copy /points set">Copy</button></div><p>Correct a player's total.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/track mark name:collateral</code><button type="button" class="copy" data-cmd="/track mark name:collateral" aria-label="Copy /track mark">Copy</button></div><p>Mark a box on a track; a partial name works ("collateral" finds Collateral). <code>/track clear</code> clears one, and <code>/track reset</code> clears them all.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/seed</code><button type="button" class="copy" data-cmd="/seed" aria-label="Copy /seed ">Copy</button></div><p>Roll an adventure seed: one line from each seed table, and the command to start its ticking clock.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/contest ... defender:me</code><button type="button" class="copy" data-cmd="/contest ... defender:me" aria-label="Copy /contest ...">Copy</button></div><p>When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them.</p></li>
     </ul>
     <p class="note">Each server keeps its own points, clocks and tracks. If a command is missing from Discord's list, open the bot's <code>/register</code> page once, then press Ctrl+R in Discord.</p>
   </section>
@@ -114,7 +114,7 @@ summary { cursor: pointer; font: 600 1.05rem/1.3 var(--display); color: var(--go
     One bot serves every game; each Discord server picks its own with <code>/game set</code>.</p>
     
     <ol class="setup">
-      <li><h3>Create the Discord application</h3><ol class="sub"><li>Go to <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">https://discord.com/developers/applications</a> and choose <strong>New Application</strong>. Name it, e.g. <em>ExLAW Dice</em>.</li><li>On <strong>General Information</strong>, copy the <strong>Application ID</strong> and the <strong>Public Key</strong>.</li><li>On <strong>Bot</strong>, choose <strong>Reset Token</strong> and copy the token. Keep it private; you only need it once, to register the commands.</li></ol></li><li><h3>Create the Worker</h3><ol class="sub"><li>Sign up at <a href="https://dash.cloudflare.com" target="_blank" rel="noopener">https://dash.cloudflare.com</a>. It's free, and Workers need no card.</li><li>Open <strong>Workers &amp; Pages → Create</strong>. Choose <strong>Start with Hello World!</strong>, name it <code>legend-dice</code>, and <strong>Deploy</strong> the starter. Skip the GitHub and static-file options.</li><li>Choose <strong>Edit code</strong> (top right). Replace everything in the open file with the <strong>bot code</strong> below, then <strong>Deploy</strong>.</li><li>In the Worker's <strong>Settings → Variables and Secrets</strong>, add:<ul class="vars"><li><code>DISCORD_PUBLIC_KEY</code> = the Public Key</li><li><code>DISCORD_APPLICATION_ID</code> = the Application ID</li><li><code>DISCORD_BOT_TOKEN</code> = the bot token (type <strong>Secret</strong>)</li><li><code>DEFAULT_GAME</code> = <code>exlaw</code>, so new servers start on ExLAW</li></ul></li><li>Note the Worker's address, like <code>https://legend-dice.YOUR-NAME.workers.dev</code>.</li></ol></li><li><h3>Connect storage</h3><ol class="sub"><li>Points, clocks, tracks and <code>/game set</code> need it. In Cloudflare, open <strong>Storage &amp; databases → Workers KV → Create</strong> and name it <code>legend-store</code>.</li><li>Open the <code>legend-dice</code> Worker, then <strong>Settings → Bindings → Add → KV namespace</strong>. Set <strong>Variable name</strong> to <code>STORE</code>, pick <code>legend-store</code> and save.</li><li>The free plan allows 1,000 storage changes a day, which is plenty for a table.</li></ol></li><li><h3>Connect Discord</h3><ol class="sub"><li>On the Discord app's <strong>General Information</strong> page, paste the Worker address into <strong>Interactions Endpoint URL</strong> and save. If it saves, the connection works.</li><li>Open <code>https://legend-dice.YOUR-NAME.workers.dev/register</code> in your browser. It should say “Registered /roll, /contest, /assist, /points, /clock, /track, /seed and /game.” Then delete <code>DISCORD_BOT_TOKEN</code> from the Worker settings.</li><li>On the app's <strong>Installation</strong> page, make sure <strong>Guild Install</strong> includes the <code>applications.commands</code> scope. Open the install link and pick your server. The bot needs no other permissions.</li><li>In Discord, run <code>/game set game:ExLAW</code>. New commands can take a minute to appear.</li></ol></li>
+      <li><h3>Create the Discord application</h3><ol class="sub"><li>Go to <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">https://discord.com/developers/applications</a> and choose <strong>New Application</strong>. Name it, e.g. <em>Aurora Dice</em>.</li><li>On <strong>General Information</strong>, copy the <strong>Application ID</strong> and the <strong>Public Key</strong>.</li><li>On <strong>Bot</strong>, choose <strong>Reset Token</strong> and copy the token. Keep it private; you only need it once, to register the commands.</li></ol></li><li><h3>Create the Worker</h3><ol class="sub"><li>Sign up at <a href="https://dash.cloudflare.com" target="_blank" rel="noopener">https://dash.cloudflare.com</a>. It's free, and Workers need no card.</li><li>Open <strong>Workers &amp; Pages → Create</strong>. Choose <strong>Start with Hello World!</strong>, name it <code>legend-dice</code>, and <strong>Deploy</strong> the starter. Skip the GitHub and static-file options.</li><li>Choose <strong>Edit code</strong> (top right). Replace everything in the open file with the <strong>bot code</strong> below, then <strong>Deploy</strong>.</li><li>In the Worker's <strong>Settings → Variables and Secrets</strong>, add:<ul class="vars"><li><code>DISCORD_PUBLIC_KEY</code> = the Public Key</li><li><code>DISCORD_APPLICATION_ID</code> = the Application ID</li><li><code>DISCORD_BOT_TOKEN</code> = the bot token (type <strong>Secret</strong>)</li><li><code>DEFAULT_GAME</code> = <code>aurora</code>, so new servers start on Aurora</li></ul></li><li>Note the Worker's address, like <code>https://legend-dice.YOUR-NAME.workers.dev</code>.</li></ol></li><li><h3>Connect storage</h3><ol class="sub"><li>Points, clocks, tracks and <code>/game set</code> need it. In Cloudflare, open <strong>Storage &amp; databases → Workers KV → Create</strong> and name it <code>legend-store</code>.</li><li>Open the <code>legend-dice</code> Worker, then <strong>Settings → Bindings → Add → KV namespace</strong>. Set <strong>Variable name</strong> to <code>STORE</code>, pick <code>legend-store</code> and save.</li><li>The free plan allows 1,000 storage changes a day, which is plenty for a table.</li></ol></li><li><h3>Connect Discord</h3><ol class="sub"><li>On the Discord app's <strong>General Information</strong> page, paste the Worker address into <strong>Interactions Endpoint URL</strong> and save. If it saves, the connection works.</li><li>Open <code>https://legend-dice.YOUR-NAME.workers.dev/register</code> in your browser. It should say “Registered /roll, /contest, /assist, /points, /clock, /track, /seed and /game.” Then delete <code>DISCORD_BOT_TOKEN</code> from the Worker settings.</li><li>On the app's <strong>Installation</strong> page, make sure <strong>Guild Install</strong> includes the <code>applications.commands</code> scope. Open the install link and pick your server. The bot needs no other permissions.</li><li>In Discord, run <code>/game set game:Aurora</code>. New commands can take a minute to appear.</li></ol></li>
     </ol>
     <div class="code-box">
       <div class="cmd-line"><strong class="code-label">Bot code <span class="muted">(worker.js, 66 KB)</span></strong>
@@ -127,7 +127,7 @@ summary { cursor: pointer; font: 600 1.05rem/1.3 var(--display); color: var(--go
 // Settings (Cloudflare → Worker → Settings → Variables and Secrets):
 //   DISCORD_PUBLIC_KEY       required, from the Discord Developer Portal
 //   DISCORD_APPLICATION_ID   and DISCORD_BOT_TOKEN: only needed to register commands by visiting /register
-//   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, fantasy, exlaw, grimm or pelion); default western
+//   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, fantasy, aurora, grimm or pelion); default western
 // Binding (Settings → Bindings → KV namespace):
 //   STORE                    optional; turns on /game, /points, /clock and /track, and makes rerolls spend real points
 //                            (a USS Pelion or Grimm Worker's DUTY or GRIT binding works too)
@@ -137,9 +137,9 @@ summary { cursor: pointer; font: 600 1.05rem/1.3 var(--display); color: var(--go
 
 /* PACKS:START */
 export const PACKS = {
- "exlaw": {
-  "id": "exlaw",
-  "title": "ExLAW",
+ "aurora": {
+  "id": "aurora",
+  "title": "Aurora",
   "point": "Spark",
   "mission": "Case",
   "trackTitle": "Collateral, Scrutiny and Backlash",
@@ -1597,9 +1597,12 @@ export function targetLine(base, modifier) {
 
 const GAME_IDS = () =&gt; Object.keys(PACKS);
 const pickGame = (id) =&gt; PACKS[id] || PACKS[GAME_IDS()[0]] || { id: "core", title: "Legend Dynamics", point: "Legend", tracks: [], seeds: {} };
-const defaultGameId = (env) =&gt; (PACKS[String(env.DEFAULT_GAME || "").trim()] ? String(env.DEFAULT_GAME).trim() : PACKS.western ? "western" : GAME_IDS()[0]);
+// Games that were renamed: a server that chose the old id keeps its game.
+const GAME_ALIASES = { exlaw: "aurora" };
+const unalias = (id) =&gt; GAME_ALIASES[id] || id;
+const defaultGameId = (env) =&gt; (PACKS[unalias(String(env.DEFAULT_GAME || "").trim())] ? unalias(String(env.DEFAULT_GAME).trim()) : PACKS.western ? "western" : GAME_IDS()[0]);
 async function gameOf(env, guild) {
-  const stored = env.STORE ? await env.STORE.get(`game:${guild}`) : null;
+  const stored = unalias(env.STORE ? await env.STORE.get(`game:${guild}`) : null);
   return pickGame(PACKS[stored] ? stored : defaultGameId(env));
 }
 
@@ -2159,7 +2162,7 @@ async function registerCommands(env) {
     </details>
   </section>
 
-  <footer>ExLAW. Commands work the same in every game the bot runs; the examples use this game's names.</footer>
+  <footer>Aurora. Commands work the same in every game the bot runs; the examples use this game's names.</footer>
 </div>
 <script>
 document.addEventListener("click", (e) => {

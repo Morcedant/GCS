@@ -1,10 +1,10 @@
 {
- "id": "exlaw",
+ "id": "aurora",
  "terms": {
-  "title": "ExLAW",
+  "title": "Aurora",
   "eyebrow": "Legend Dynamics · Superheroes",
-  "guideTitle": "ExLAW Players' Guide",
-  "guideSubtitle": "Operants, the law and the powers behind them, for the Legend Dynamics RPG system",
+  "guideTitle": "Aurora Players' Guide",
+  "guideSubtitle": "Operants, ExLAW and the powers behind them, for the Legend Dynamics RPG system",
   "point": "Spark",
   "role": "Calling",
   "roleLower": "calling",
@@ -131,7 +131,7 @@
   {
    "name": "ExLAW Agent",
    "group": "badge",
-   "text": "ExLAW agent: enforces the Extraordinary Powers Act as a full-time federal agent, with a badge that opens doors and an EPAOC file that never closes.",
+   "text": "ExLAW agent: a full-time federal agent of the Extraordinary Law Enforcement Agency (ExLAW), enforcing the Extraordinary Powers Act with a badge that opens doors and an EPAOC file that never closes.",
    "skills": [
     "Law",
     "Investigation",

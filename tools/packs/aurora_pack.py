@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Writes legend-dynamics/packs/exlaw/pack.json: the ExLAW setting's data, and checks every
+"""Writes legend-dynamics/packs/aurora/pack.json: the Aurora setting's data, and checks every
 ready-made character against the creation rules. Run it after editing, then tools/build-legend.py."""
 import json, pathlib
 
-OUT = pathlib.Path(__file__).resolve().parents[2] / "legend-dynamics" / "packs" / "exlaw" / "pack.json"
+OUT = pathlib.Path(__file__).resolve().parents[2] / "legend-dynamics" / "packs" / "aurora" / "pack.json"
 
 FONTS = ("https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Saira+Extra+Condensed:wght@700"
          "&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap")
 
 terms = {
-    "title": "ExLAW", "eyebrow": "Legend Dynamics · Superheroes",
-    "guideTitle": "ExLAW Players' Guide", "guideSubtitle": "Operants, the law and the powers behind them, for the Legend Dynamics RPG system",
+    "title": "Aurora", "eyebrow": "Legend Dynamics · Superheroes",
+    "guideTitle": "Aurora Players' Guide", "guideSubtitle": "Operants, ExLAW and the powers behind them, for the Legend Dynamics RPG system",
     "point": "Spark", "role": "Calling", "roleLower": "calling",
     "origin": "Origin", "originLower": "origin", "originPlural": "Origins", "originPluralLower": "origins",
     "pathRounded": "Generalist", "pathExpert": "Specialist", "pathExpertPlural": "Specialists",
@@ -60,7 +60,7 @@ groups = [
 ]
 
 roles = [
-    ("ExLAW Agent", "badge", "ExLAW agent: enforces the Extraordinary Powers Act as a full-time federal agent, with a badge that opens doors and an EPAOC file that never closes.", ["Law", "Investigation", "Firearms", "Read People"]),
+    ("ExLAW Agent", "badge", "ExLAW agent: a full-time federal agent of the Extraordinary Law Enforcement Agency (ExLAW), enforcing the Extraordinary Powers Act with a badge that opens doors and an EPAOC file that never closes.", ["Law", "Investigation", "Firearms", "Read People"]),
     ("Federal Agent", "badge", "Federal agent: FBI, US Marshals, ATF or Homeland Security, working alongside ExLAW, or around it.", ["Investigation", "Law", "Computers", "Persuasion"]),
     ("Sheriff", "badge", "Sheriff: an elected county lawman who answers to the voters, not to Washington; maybe on the edge of the Mad Forest.", ["Leadership", "Firearms", "Law", "Persuasion"]),
     ("Police Officer", "badge", "Police officer: city patrol, first on the scene when an Operant fight breaks out, and last to get the credit.", ["Firearms", "Piloting", "Brawling", "Read People"]),
@@ -545,7 +545,7 @@ pregens = [
 for c in pregens:
     c.pop("skills_extra", None)
 
-pack = {"id": "exlaw", "terms": terms, "theme": theme, "docxColors": ["14213D", "E8EEF8"], "groups": groups,
+pack = {"id": "aurora", "terms": terms, "theme": theme, "docxColors": ["14213D", "E8EEF8"], "groups": groups,
         "roles": [{"name": n, "group": g, "text": tx, "skills": s} for n, g, tx, s in roles], "skills": skills, "physical": physical,
         "edgePoints": 3, "formCore": [], "formPenalties": {}, "origins": origins, "allegiances": allegiances, "reasons": reasons,
         "connections": connections, "advantages": advantages, "complications": complications, "triggers": triggers,

@@ -240,7 +240,7 @@ test("USS Pelion and Grimm are games too, and their old storage bindings still w
   assert.match((await signedCall(shared, sub("track", "show"))).content, /Suspicion.*Exposure.*Attention/s);
   const { COMMANDS } = await import("../src/worker.js");
   const choices = COMMANDS.find((c) => c.name === "game").options[1].options[0].choices.map((c) => c.name);
-  assert.deepEqual([...choices].sort(), ["Dust & Damnation", "ExLAW", "Fracture Lines", "Grimm", "The Shattered Crown", "USS Pelion"]);
+  assert.deepEqual([...choices].sort(), ["Aurora", "Dust & Damnation", "Fracture Lines", "Grimm", "The Shattered Crown", "USS Pelion"]);
 });
 
 test("the old /duty, /grit, /pelion and /grimm names still work, and register on their own Workers", async () => {
@@ -277,4 +277,11 @@ test("every command, option and choice fits Discord's 100-character limits", () 
     (o.choices || []).forEach((c) => assert.ok(c.name.length <= 100, `${path}: choice ${c.name} too long`));
   };
   for (const legacy of [undefined, "no"]) commandsFor({ LEGACY_COMMANDS: legacy }).forEach((c) => check(c, "/" + c.name));
+});
+
+test("a server that chose ExLAW before the rename plays Aurora", async () => {
+  const STORE = new MemoryKV();
+  await STORE.put("game:G1", "exlaw");
+  assert.match((await signedCall({ ...env, STORE }, sub("game", "show"))).content, /Aurora.*Spark points/);
+  assert.match((await signedCall({ ...env, STORE: new MemoryKV(), DEFAULT_GAME: "exlaw" }, sub("game", "show"))).content, /Aurora/);
 });

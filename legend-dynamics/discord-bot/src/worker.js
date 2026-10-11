@@ -6,7 +6,7 @@
 // Settings (Cloudflare → Worker → Settings → Variables and Secrets):
 //   DISCORD_PUBLIC_KEY       required, from the Discord Developer Portal
 //   DISCORD_APPLICATION_ID   and DISCORD_BOT_TOKEN: only needed to register commands by visiting /register
-//   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, fantasy, exlaw, grimm or pelion); default western
+//   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, fantasy, aurora, grimm or pelion); default western
 // Binding (Settings → Bindings → KV namespace):
 //   STORE                    optional; turns on /game, /points, /clock and /track, and makes rerolls spend real points
 //                            (a USS Pelion or Grimm Worker's DUTY or GRIT binding works too)
@@ -16,9 +16,9 @@
 
 /* PACKS:START */
 export const PACKS = {
- "exlaw": {
-  "id": "exlaw",
-  "title": "ExLAW",
+ "aurora": {
+  "id": "aurora",
+  "title": "Aurora",
   "point": "Spark",
   "mission": "Case",
   "trackTitle": "Collateral, Scrutiny and Backlash",
@@ -1476,9 +1476,12 @@ export function targetLine(base, modifier) {
 
 const GAME_IDS = () => Object.keys(PACKS);
 const pickGame = (id) => PACKS[id] || PACKS[GAME_IDS()[0]] || { id: "core", title: "Legend Dynamics", point: "Legend", tracks: [], seeds: {} };
-const defaultGameId = (env) => (PACKS[String(env.DEFAULT_GAME || "").trim()] ? String(env.DEFAULT_GAME).trim() : PACKS.western ? "western" : GAME_IDS()[0]);
+// Games that were renamed: a server that chose the old id keeps its game.
+const GAME_ALIASES = { exlaw: "aurora" };
+const unalias = (id) => GAME_ALIASES[id] || id;
+const defaultGameId = (env) => (PACKS[unalias(String(env.DEFAULT_GAME || "").trim())] ? unalias(String(env.DEFAULT_GAME).trim()) : PACKS.western ? "western" : GAME_IDS()[0]);
 async function gameOf(env, guild) {
-  const stored = env.STORE ? await env.STORE.get(`game:${guild}`) : null;
+  const stored = unalias(env.STORE ? await env.STORE.get(`game:${guild}`) : null);
   return pickGame(PACKS[stored] ? stored : defaultGameId(env));
 }
 

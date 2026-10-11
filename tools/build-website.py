@@ -13,17 +13,17 @@ import discord_handout
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LD = ROOT / "legend-dynamics"
 WEB = LD / "website"
-GAMES = ["western", "spaceopera", "fantasy", "exlaw"]
+GAMES = ["western", "spaceopera", "fantasy", "aurora"]
 # Where each game's creator is published (share it publicly from its Share menu first).
 CREATORS = {
     "western": "https://claude.ai/artifact/UjmEHKxZzVJG4yhupZkoXo",
     "spaceopera": "https://claude.ai/artifact/AdxunyoqKyErJ6cTz5ujtL",
     "fantasy": "https://claude.ai/artifact/8XnPkroZN3TsAzhsLaZCLM",
-    "exlaw": "https://claude.ai/artifact/12nhXbM26KpVjHk68yvFLh",
+    "aurora": "https://claude.ai/artifact/12nhXbM26KpVjHk68yvFLh",
 }
 # Suggested Squarespace page URLs (set in each page's settings).
-SLUGS = {"western": "/dust-and-damnation", "spaceopera": "/fracture-lines", "fantasy": "/the-shattered-crown", "exlaw": "/exlaw"}
-GENRE = {"western": "Gothic Western", "spaceopera": "Science fiction", "fantasy": "Sword and sorcery", "exlaw": "Superheroes"}
+SLUGS = {"western": "/dust-and-damnation", "spaceopera": "/fracture-lines", "fantasy": "/the-shattered-crown", "aurora": "/aurora"}
+GENRE = {"western": "Gothic Western", "spaceopera": "Science fiction", "fantasy": "Sword and sorcery", "aurora": "Superheroes"}
 CORE_SLUG = "/core-rules"
 DISCORD_SLUG = "/discord"
 
@@ -304,7 +304,7 @@ const show = (k) => {{ document.querySelectorAll(".pv").forEach((m) => (m.hidden
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${{k}}"]`).dataset.c; scrollTo(0, 0); }};
 document.querySelector(".pv-bar").onclick = (ev) => {{ const b = ev.target.closest("button"); if (b) show(b.dataset.p); }};
 document.addEventListener("click", (ev) => {{ const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{SLUGS['exlaw']}": "exlaw", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord" }}[a.getAttribute("href")]; if (k) show(k); }});
+  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{SLUGS['aurora']}": "aurora", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord" }}[a.getAttribute("href")]; if (k) show(k); }});
 show(location.hash.slice(1) || "home");
 </script></body></html>
 """)

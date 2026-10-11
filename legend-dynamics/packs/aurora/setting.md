@@ -1,10 +1,10 @@
 <!-- SECTION:intro -->
 
-In April 1938 the sky burned green for four weeks. The auroras killed five million people and left behind the first **Operants**: men and women with powers no science could explain. For decades the world pretended they were myths. Then, in 1952, a battle at Fort Knox made pretending impossible, and the law has been trying to catch up ever since.
+In April 1938 the sky burned green for four weeks. The auroras killed five million people and left behind the first **Operants**: men and women with powers no science could explain. For decades the world pretended they were myths. Then, in 1952, a battle at Fort Knox made pretending impossible, and the law has been trying to catch up ever since, through the **Extraordinary Law Enforcement Agency (ExLAW)**.
 
-It is 2025. The **Extraordinary Law Enforcement Agency (ExLAW)** enforces the Extraordinary Powers Act with Operant agents and armored Aegis pilots. Masked heroes work beside it, or around it. Labs nobody admits to are making new Operants, a breach in 2012 let an invasion through, a forest has swallowed southern Indiana, and the walls between worlds are thinning.
+It is 2025. ExLAW enforces the Extraordinary Powers Act with Operant agents and armored Aegis pilots. Masked heroes work beside it, or around it. Labs nobody admits to are making new Operants, a breach in 2012 let an invasion through, a forest has swallowed southern Indiana, and the walls between worlds are thinning.
 
-*ExLAW* is a superhero setting for the Legend Dynamics RPG system. Play agents, cops, sheriffs and Aegis pilots; masked vigilantes and televised heroes; scholars, reporters and relic hunters; fugitives from the labs; or thieves and fixers on the wrong side of the law. Every story is a **case**: a crime, a crisis or a secret, and the question of who has the right to deal with it.
+*Aurora* is a superhero setting for the Legend Dynamics RPG system. Play agents, cops, sheriffs and Aegis pilots; masked vigilantes and televised heroes; scholars, reporters and relic hunters; fugitives from the labs; or thieves and fixers on the wrong side of the law. Every story is a **case**: a crime, a crisis or a secret, and the question of who has the right to deal with it.
 
 <!-- SECTION:weapons -->
 

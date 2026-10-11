@@ -1,14 +1,14 @@
 ---
-title: "ExLAW Players' Guide"
-subtitle: "Operants, the law and the powers behind them, for the Legend Dynamics RPG system"
+title: "Aurora Players' Guide"
+subtitle: "Operants, ExLAW and the powers behind them, for the Legend Dynamics RPG system"
 author: "Don Smallwood"
 ---
 
-In April 1938 the sky burned green for four weeks. The auroras killed five million people and left behind the first **Operants**: men and women with powers no science could explain. For decades the world pretended they were myths. Then, in 1952, a battle at Fort Knox made pretending impossible, and the law has been trying to catch up ever since.
+In April 1938 the sky burned green for four weeks. The auroras killed five million people and left behind the first **Operants**: men and women with powers no science could explain. For decades the world pretended they were myths. Then, in 1952, a battle at Fort Knox made pretending impossible, and the law has been trying to catch up ever since, through the **Extraordinary Law Enforcement Agency (ExLAW)**.
 
-It is 2025. The **Extraordinary Law Enforcement Agency (ExLAW)** enforces the Extraordinary Powers Act with Operant agents and armored Aegis pilots. Masked heroes work beside it, or around it. Labs nobody admits to are making new Operants, a breach in 2012 let an invasion through, a forest has swallowed southern Indiana, and the walls between worlds are thinning.
+It is 2025. ExLAW enforces the Extraordinary Powers Act with Operant agents and armored Aegis pilots. Masked heroes work beside it, or around it. Labs nobody admits to are making new Operants, a breach in 2012 let an invasion through, a forest has swallowed southern Indiana, and the walls between worlds are thinning.
 
-*ExLAW* is a superhero setting for the Legend Dynamics RPG system. Play agents, cops, sheriffs and Aegis pilots; masked vigilantes and televised heroes; scholars, reporters and relic hunters; fugitives from the labs; or thieves and fixers on the wrong side of the law. Every story is a **case**: a crime, a crisis or a secret, and the question of who has the right to deal with it.
+*Aurora* is a superhero setting for the Legend Dynamics RPG system. Play agents, cops, sheriffs and Aegis pilots; masked vigilantes and televised heroes; scholars, reporters and relic hunters; fugitives from the labs; or thieves and fixers on the wrong side of the law. Every story is a **case**: a crime, a crisis or a secret, and the question of who has the right to deal with it.
 
 ## The rule to remember
 
@@ -18,7 +18,7 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **ExLAW** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Spark points**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Aurora** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Spark points**.
 
 # Create your character
 
@@ -30,7 +30,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 
 | Calling | Group | Typical contribution | Core skills |
 |---|---|---|---|
-| ExLAW Agent | The Badge | enforces the Extraordinary Powers Act as a full-time federal agent, with a badge that opens doors and an EPAOC file that never closes. | Law, Investigation, Firearms, Read People |
+| ExLAW Agent | The Badge | a full-time federal agent of the Extraordinary Law Enforcement Agency (ExLAW), enforcing the Extraordinary Powers Act with a badge that opens doors and an EPAOC file that never closes. | Law, Investigation, Firearms, Read People |
 | Federal Agent | The Badge | FBI, US Marshals, ATF or Homeland Security, working alongside ExLAW, or around it. | Investigation, Law, Computers, Persuasion |
 | Sheriff | The Badge | an elected county lawman who answers to the voters, not to Washington; maybe on the edge of the Mad Forest. | Leadership, Firearms, Law, Persuasion |
 | Police Officer | The Badge | city patrol, first on the scene when an Operant fight breaks out, and last to get the credit. | Firearms, Piloting, Brawling, Read People |
