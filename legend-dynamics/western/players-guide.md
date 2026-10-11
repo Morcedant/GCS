@@ -36,6 +36,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 | Lawyer | The Learned | knows the law better than the men who wear the badges, and isn't afraid to say so. | Law, Persuasion, Read People, Investigation |
 | Journalist | The Learned | asks the questions no one wants asked, and prints the answers. | Investigation, Persuasion, Read People, Stealth |
 | Preacher | The Learned | comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun. | Persuasion, Leadership, Occult, Shooting |
+| Monster Hunter | The Frontier | hunts what the law can't hang, and knows which things fear silver, salt or fire (take the Monster Hunter advantage). | Occult, Tracking, Shooting, Melee |
 | Gunslinger | The Frontier | the fastest and steadiest gun in the room, and the one who decides when it's time to draw. | Shooting, Athletics, Read People, Riding |
 | Scout | The Frontier | finds the trail, reads the land, and keeps everyone alive out in it. | Tracking, Survival, Riding, Stealth |
 | Gambler | The Frontier | reads people, bluffs, and hears everything the saloon hears. | Gambling, Read People, Deception, Shooting |

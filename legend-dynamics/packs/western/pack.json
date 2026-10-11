@@ -212,6 +212,17 @@
    ]
   },
   {
+   "name": "Monster Hunter",
+   "group": "frontier",
+   "text": "Monster hunter: hunts what the law can't hang, and knows which things fear silver, salt or fire (take the Monster Hunter advantage).",
+   "skills": [
+    "Occult",
+    "Tracking",
+    "Shooting",
+    "Melee"
+   ]
+  },
+  {
    "name": "Gunslinger",
    "group": "frontier",
    "text": "Gunslinger: the fastest and steadiest gun in the room, and the one who decides when it's time to draw.",
