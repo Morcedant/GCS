@@ -25,6 +25,7 @@
   "medkit": "medkit",
   "facility": "A clinic with a biotech suite",
   "restText": "full day",
+  "titlePlaceholder": "e.g. Free trader",
   "mission": "Job",
   "missionLower": "job",
   "missionsChapter": "Running jobs and missions",
@@ -59,8 +60,7 @@
   "meleeSkill": "Close Combat",
   "unarmedSkill": "Close Combat",
   "chaseSkill": "Piloting",
-  "fontsHref": "https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600&family=Exo+2:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap",
-  "titlePlaceholder": "e.g. Free trader"
+  "fontsHref": "https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600&family=Exo+2:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap"
  },
  "theme": {
   "comment": "A starship console: dark glass panels with cyan rules over a slow starfield.",
@@ -954,7 +954,7 @@
     "Body": -1,
     "Agility": -1
    },
-   "desc": "Small, six-limbed scholars with soft scales and brains built for associative memory. Their neutral archives hold lost corridor data and ancient claims, which is why empires, corporations and zealots keep trying to seize them.",
+   "desc": "Small bipedal scholars with long, delicate fingers, soft scales and brains built for associative memory. Their neutral archives hold lost corridor data and ancient claims, which is why empires, corporations and zealots keep trying to seize them.",
    "core": [
     "Associative memory: recall anything you have experienced in detail."
    ],
@@ -1516,7 +1516,7 @@
     "Agility": 1,
     "Body": -1
    },
-   "desc": "Slender quadrupeds with two manipulator limbs and delicate sensory filaments, who reached the corridors only 24 years ago. Their governments struggle to stay independent while learning from civilizations thousands of years older, and humans recognize the struggle.",
+   "desc": "Slender quadrupeds who handle tools with prehensile sensory tendrils, and who reached the corridors only 24 years ago. Their governments struggle to stay independent while learning from civilizations thousands of years older, and humans recognize the struggle.",
    "core": [],
    "form": null,
    "skills": [
@@ -1537,7 +1537,7 @@
     ],
     [
      "vs-filament",
-     "Sensory Filaments",
+     "Sensory Tendrils",
      "+2 to Sensors to feel air currents and nearby movement.",
      "Sensors",
      true,
@@ -1616,7 +1616,7 @@
     "Body": -1,
     "Will": -1
    },
-   "desc": "Elongated, six-limbed beings with flexible skeletons and electromagnetic senses, from a world of wild magnetic fields. Their cartographic guilds keep the best corridor charts in known space, and have sold them to both sides of more than one war.",
+   "desc": "Long, serpentine beings with two long arms and no legs, who sense electromagnetic fields, from a world of wild magnetic fields. Their cartographic guilds keep the best corridor charts in known space, and have sold them to both sides of more than one war.",
    "core": [
     "Field sense: feel electromagnetic fields, live wiring and active machinery nearby.",
     "Navigation is Trained for free."
@@ -1649,8 +1649,8 @@
     ],
     [
      "da-flex",
-     "Flexible Frame",
-     "+2 to Athletics to squeeze through narrow spaces.",
+     "Serpentine",
+     "+2 to Athletics to squeeze, coil and climb where legs can't.",
      "Athletics",
      true,
      "Magnetic Storms",
@@ -1667,7 +1667,7 @@
     "Agility": 1,
     "Body": -1
    },
-   "desc": "Small, agile, six-limbed beings with broad reflective eyes adapted to dim light. A corridor collapse isolated their colonies for centuries; reconnected, they found strangers who share their name, and now work at reunification.",
+   "desc": "Small, agile beings with four limbs, a prehensile tail and broad reflective eyes adapted to dim light. A corridor collapse isolated their colonies for centuries; reconnected, they found strangers who share their name, and now work at reunification.",
    "core": [
     "Dim-adapted: see in near-darkness; −1 to Agility-based rolls in bright light."
    ],
@@ -1689,6 +1689,15 @@
      "Bright light blinds you at the worst moment. Accept the stumble."
     ],
     [
+     "ze-tail",
+     "Prehensile Tail",
+     "+2 to Athletics to climb, hang or hold on in zero-g.",
+     "Athletics",
+     true,
+     "Reconnected Strangers",
+     "Other Zethri colonies see you as a foreigner. Accept the mistrust."
+    ],
+    [
      "ze-self",
      "Built to Last",
      "+2 to Engineering or Survival to make a place self-sufficient.",
@@ -1696,15 +1705,6 @@
      true,
      "Many Zethri",
      "Your cluster's factions disagree about you. Accept the dispute."
-    ],
-    [
-     "ze-reunite",
-     "Reunifier",
-     "+2 to Diplomacy to bridge strangers who share a history.",
-     "Diplomacy",
-     true,
-     "Distrust of Chokepoints",
-     "You won't rely on one route. Accept the detour."
     ]
    ]
   }
@@ -2640,6 +2640,10 @@
   [
    "Psionics",
    "Powers: an action and a Psionics roll; known: Trained 2, Specialty 3, Expert 4. Failure or natural 18 marks Heat. Mandate scanners detect active powers."
+  ],
+  [
+   "Corridors",
+   "Transit: Navigation (old charts −2, years old or unstable −4). Each step deeper halves the time, −2. Fail by 3+ deep: Body roll or 1 box. Natural 18: misjump."
   ],
   [
    "Tracks",

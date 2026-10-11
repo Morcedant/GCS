@@ -89,13 +89,72 @@ For characters in *Fracture Lines*, that contradiction is part of what it means 
 
 The **Concord** is humanity's Earth-centered civilization: the oldest and largest of the human governments, and the one that signed the Accord. It is not the only one. Three centuries of expansion have produced independent colonies, corporate holdings, merchant leagues and political movements that answer to no one on Earth. Other peoples have their own polities, under their own names.
 
-# The galaxy
+# The corridors
 
-## The gravimetric corridors
+Everything in known space (trade, war, news, debt) moves along the **gravimetric corridors**.
 
-Ships cross interstellar space through **gravimetric corridors**: natural channels through which a ship can travel between systems in days instead of centuries. The corridors are not fixed. They drift, collapse and reconnect over years or centuries. A journey between two nearby systems can require a lengthy detour, while a deep corridor can connect civilizations thousands of light-years apart. A new connection can turn an isolated world into a strategic prize overnight, and a collapse can strand a fleet, or a whole province, for generations.
+## What the corridors are
 
-Navigation in the corridors is a skill, a science and a business. The Draelin guilds sell the best charts; the Sen keep the oldest records; the Thrum heard the first patterns in corridor fluctuations; Mirrun instruments detect resonance no one else can.
+Spacetime has a hidden geometry. Where the combined gravity of stars, dark-matter filaments and the galaxy's own structure folds it, distant points lie close together, and a **corridor** is a stable channel through that fold. Ships do not outrun light. A corridor drive detects a corridor, builds the field needed to enter it at its **mouth**, and protects the ship against its stresses while the fold carries the ship across light-years in hours or days. Outside the corridors, ships are bound to sublight speeds: crossing a system takes days, and crossing between stars without a corridor takes generations, which is how the Vael fleets began.
+
+Corridor mouths sit at gravitational balance points, often far out from the star. That is where the stations, toll gates, fortresses and Mandate checkpoints are built.
+
+## Depth
+
+Corridors are not uniform tunnels: they have **depth**. As a ship descends, spacetime becomes more compressed and gravimetric stress rises sharply. Ships normally travel the upper, navigable layers. Running deeper can cut a transit dramatically, but eventually the pressure exceeds anything a ship and its fields can withstand. Below the navigable layers lies what physicists call the **deep metric**, where two points hundreds or thousands of light-years apart in ordinary space may be very close indeed.
+
+## Drift, collapse and junctions
+
+The corridors move. As stars drift relative to one another, the folds shift over centuries; some break suddenly when the balance that held them fails, and new ones open. The Thrum first heard structure in corridor fluctuations, the Sen keep the longest records, and Draelin guilds sell the most current charts, but forecasting a collapse is still an imperfect science. Most scholars say the network is natural; a few find it suspiciously convenient.
+
+Where several corridors meet, at a **junction**, power gathers: every ship and every message between those regions must pass through.
+
+## Deep-metric communication
+
+The civilizations of known space do not rely on conventional radio for interstellar communication. Instead, advanced societies exploit a phenomenon associated with the same hidden geometry that makes corridor travel possible.
+
+### Quantum-gravimetric communication
+
+Quantum entanglement alone cannot transmit information. This remains true even for civilizations thousands of years more technologically advanced than humanity. The breakthrough comes from combining quantum systems with the deep metric.
+
+Specialized transmitters generate precisely controlled quantum states coupled to minute gravimetric disturbances. Under the correct conditions, these disturbances enter a propagating mode within the deep metric. The entangled quantum systems provide synchronization, discrimination and extreme sensitivity. The **gravimetric disturbance actually carries the information**.
+
+Consequently, quantum-gravimetric communication does not depend upon instantaneous communication through entanglement. The signal physically travels between transmitter and receiver, but through a region of spacetime in which the effective distance between the two points is enormously reduced. To observers limited to normal space, the result can appear to be faster-than-light communication.
+
+### Why humanity didn't discover it
+
+Humanity discovered corridor travel through comparatively large-scale manipulation of spacetime. Human drives could detect corridors, create the fields necessary to enter them and protect spacecraft against their stresses. None of this required access to the deep metric.
+
+Human scientists improved radio, laser, quantum and gravimetric communications for centuries. They even detected minute fluctuations originating within corridors, but those fluctuations appeared natural: background gravimetric noise, turbulence from stellar masses, corridor interactions and poorly understood processes below navigable depths. Human physics also correctly showed that entanglement could not, by itself, transmit information faster than light, so there was little reason to read random-seeming quantum-scale fluctuations as communication.
+
+Humanity wasn't failing to build the right radio. **Humanity didn't know the communications medium existed.**
+
+### The antenna
+
+The mystery became apparent after humanity met its first extraterrestrial spacecraft. The Kel explorers, a people economically subordinate to the Tessan, were clearly coordinating with parties who were not present. Human sensors detected no radio, laser or neutrino signals, or any other recognizable carrier. Yet the Kel were communicating with someone.
+
+Examination of their technology revealed sophisticated quantum apparatus tied to extremely small distortions of the local gravitational field. Human scientists variously identified it as navigation hardware, exotic computing machinery, or part of the corridor drive. The critical realization came later: **it was an antenna.** The random gravimetric background of the corridors contained structured information.
+
+Humanity had spent centuries listening for voices among the stars. The galaxy had never been silent. Humanity had simply been listening to the wrong part of the universe.
+
+### The network is the map
+
+Deep-metric signals do not propagate equally well everywhere. They follow the underlying geometry of the corridors and converge on major junctions, so the transportation map of known space is also, broadly, its communications map. A junction has three kinds of strategic value:
+
+- **Transportation.** Ships and commerce must pass through it.
+- **Communication.** Deep-metric traffic naturally converges on it.
+- **Information.** Whoever controls it can relay, restrict, monitor or disrupt enormous quantities of interstellar communication.
+
+Control of corridor intersections is one of the fundamental sources of political and economic power in known space. For civilizations such as the Tessan, power does not require conquest: control over contracts, debt, corridor access and communications can bind entire worlds without a Tessan soldier ever setting foot on them.
+
+## Corridors in play
+
+- **Plotting a transit.** The navigator rolls **Navigation**. Fresh guild charts are ordinary; charts a few months old give −2; charts years old, or an unstable corridor, give −4. Failure costs time, delivers the ship to the wrong mouth, or ticks a danger clock; a natural 18 is a misjump into the unknown.
+- **Running deep.** Each step below the usual layers halves the transit time and gives −2 to the Navigation roll. Failing by 3 or more while deep means gravimetric stress: everyone aboard rolls Body or marks a box, and the ship needs repairs (Engineering) before its next transit.
+- **Travel times.** Between neighboring systems: hours. Across a region: one to three days. A long haul through several junctions: one to two weeks.
+- **Collapse.** An unstable corridor is a danger clock (usually 6 segments) that ticks with time and every failed transit; when it fills, the corridor closes, with whoever is inside.
+- **Messages.** A deep-metric transceiver reaches anywhere on the network: within a junction's region in minutes, across several junctions in hours. Worlds behind collapsed corridors can't be reached at all. Every message passes through junctions, and their owners listen: sending something sensitive through a hostile junction takes a **Computers** roll to hide it, and a failure marks **Heat**.
+- **Mouths and junctions.** Expect papers, tolls (which can mark **Debt**) and Mandate screenings.
 
 # Peoples of the corridors
 
@@ -251,7 +310,7 @@ Their continuing resistance has become a symbol for separatist movements through
 
 Interstellar history: 11,000 years · Sagittarius archival worlds · Scholarly enclaves
 
-Small, six-limbed beings with soft protective scales and unusually developed sensory organs. Veyari brains possess specialized structures for organizing long-term associative memory, allowing individuals to retain remarkable quantities of experiential information.
+Small bipeds with long, delicate fingers, soft protective scales, large dark eyes and unusually developed sensory organs. Veyari brains possess specialized structures for organizing long-term associative memory, allowing individuals to retain remarkable quantities of experiential information.
 
 Their civilization has preserved historical records spanning thousands of years, including accounts of corridor collapses, vanished civilizations, and wars whose causes have been forgotten by most participants.
 
@@ -421,7 +480,7 @@ Ommek defensive systems have made direct conquest prohibitively expensive.
 
 Interstellar history: 24 years · Outer Orion Spur · Emerging planetary government
 
-Vesh are slender, quadrupedal beings with two additional manipulator limbs and delicate sensory filaments extending from their heads.
+Vesh are slender quadrupeds who handle tools with the delicate, prehensile sensory tendrils that extend from their heads.
 
 Their civilization achieved corridor travel only recently.
 
@@ -457,7 +516,7 @@ Uth activists are prominent in anti-Hegemony movements, although many Uth reject
 
 Interstellar history: 3,900 years · Interarm systems · Independent navigation guilds
 
-Draelin are elongated, six-limbed organisms with specialized electromagnetic sensory structures and unusually flexible skeletal systems.
+Draelin are long, serpentine beings with no legs and two long arms, who move by undulating their flexible bodies; specialized structures along their length sense electromagnetic fields.
 
 Their ancestors evolved in a world with a powerful and highly variable magnetic field.
 
@@ -477,7 +536,7 @@ Their internal politics are shaped by a central question: whether knowledge of s
 
 Interstellar history: 420 years · Isolated corridor clusters · Reconstruction states
 
-Zethri are small, agile organisms with six limbs, broad reflective eyes, and fine sensory structures adapted to dim environments.
+Zethri are small, agile organisms with four limbs, a prehensile tail, broad reflective eyes, and fine sensory structures adapted to dim environments.
 
 Their civilization developed in a cluster of systems whose principal gravimetric connections collapsed shortly after their ancestors achieved interstellar travel.
 
