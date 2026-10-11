@@ -1990,19 +1990,20 @@ tr.lvl-U td.target { color: var(--muted); }
   const SEEDS = PACK.seeds;
   const SEED_KEYS = ["mission", "place", "strange", "twist", "clock", "who"];
   const STORE_SEED = PACK.id + ".seed.v1";
-  const d12 = () => Math.floor(Math.random() * 12);
+  // Seed tables have 16 entries, read by the 3d6 total (3-18): middle results come up most.
+  const roll3d6 = () => [0, 0, 0].reduce((a) => a + 1 + Math.floor(Math.random() * 6), 0) - 3;
   let seed = store.get(STORE_SEED, null);
-  if (!seed || SEED_KEYS.some((k) => !Number.isInteger(seed[k]))) seed = null;
+  if (!seed || SEED_KEYS.some((k) => !Number.isInteger(seed[k]) || seed[k] < 0 || seed[k] >= SEEDS[k][1].length)) seed = null;
   const seedText = (k) => (k === "clock" ? `${SEEDS.clock[1][seed.clock][0]} (${SEEDS.clock[1][seed.clock][1]})` : SEEDS[k][1][seed[k]]);
   function renderSeed() {
-    $("seed").innerHTML = seed ? SEED_KEYS.map((k) => `<div><dt>${SEEDS[k][0]}</dt><dd>${esc(seedText(k))}</dd><button data-reseed="${k}" aria-label="Re-roll ${SEEDS[k][0]}" title="Re-roll">↻</button></div>`).join("")
+    $("seed").innerHTML = seed ? SEED_KEYS.map((k) => `<div><dt>${SEEDS[k][0]} <span class="muted">${seed[k] + 3}</span></dt><dd>${esc(seedText(k))}</dd><button data-reseed="${k}" aria-label="Re-roll ${SEEDS[k][0]}" title="Re-roll">↻</button></div>`).join("")
       : `<p class="small muted">No ${T.missionLower} rolled yet.</p>`;
     $("seed-clock").disabled = $("seed-copy").disabled = !seed;
   }
-  $("seed-roll").onclick = () => { seed = Object.fromEntries(SEED_KEYS.map((k) => [k, d12()])); store.set(STORE_SEED, seed); renderSeed(); $("seed-msg").textContent = ""; };
+  $("seed-roll").onclick = () => { seed = Object.fromEntries(SEED_KEYS.map((k) => [k, roll3d6()])); store.set(STORE_SEED, seed); renderSeed(); $("seed-msg").textContent = ""; };
   $("seed").addEventListener("click", (e) => {
     const b = e.target.closest("[data-reseed]"); if (!b) return;
-    let n; do { n = d12(); } while (n === seed[b.dataset.reseed]);
+    let n; do { n = roll3d6(); } while (n === seed[b.dataset.reseed]);
     seed[b.dataset.reseed] = n; store.set(STORE_SEED, seed); renderSeed();
   });
   $("seed-clock").onclick = () => {

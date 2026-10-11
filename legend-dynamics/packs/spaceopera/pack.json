@@ -1349,122 +1349,154 @@
  ],
  "seeds": {
   "mission": [
-   "Mission",
+   "Job or mission",
    [
-    "Answer a distress call",
-    "Survey an uncharted system",
-    "Make first contact",
-    "Escort a diplomatic envoy",
+    "Recover an imperial fleet stranded for centuries",
+    "Broker a peace inside the Hegemony",
+    "Deliver cargo through a contested corridor",
+    "Collect, or escape, a debt",
     "Find a missing ship",
-    "Deliver urgent medicine",
-    "Evacuate a colony",
-    "Patrol the Hegemony border",
-    "Recover a lost artifact",
-    "Run a blockade",
-    "Test an experimental drive",
-    "Shore leave that goes wrong"
+    "Escort a refugee convoy",
+    "Recover a stolen archive",
+    "Smuggle a psionic past the Mandates",
+    "Survey a newly opened corridor",
+    "Negotiate a contract between peoples",
+    "Rescue hostages",
+    "Salvage a war wreck",
+    "Expose a corporate crime",
+    "Protect a witness",
+    "Open a corridor no one has crossed",
+    "Steal an Ozhvek house's seal"
    ]
   ],
   "place": [
    "Place",
    [
-    "A storm-wracked ocean world",
-    "A dead world of ancient ruins",
-    "A struggling frontier colony",
-    "An asteroid mining station",
-    "A drifting derelict",
-    "An ice moon of a gas giant",
-    "A world that hasn't left its planet",
-    "A nebula that blinds sensors",
-    "A space station in crisis",
-    "A world that seems too perfect",
-    "A jungle world thick with life",
-    "The deep dark between the stars"
+    "A province isolated for six centuries, newly reopened",
+    "The Hegemony's throne world",
+    "A Tessan exchange station",
+    "A Concord colony on the frontier",
+    "A Vael flotilla",
+    "A Brulvek shipyard rusting in orbit",
+    "A Veyari library world",
+    "A Khaum cavern city",
+    "A dead Hegemony fortress",
+    "A Zhaq free city",
+    "A derelict generation ship",
+    "A Corvani restoration world",
+    "The Vesh homeworld, newly opened",
+    "A Draelin navigation guild-house",
+    "The heart of a corridor collapse",
+    "A Sen observatory older than the Hegemony"
    ]
   ],
   "strange": [
-   "Something strange",
+   "The trouble",
    [
-    "A rift that bends time",
-    "A creature made of energy",
-    "An ancient machine that still works",
-    "Duplicates of the crew",
-    "A signal repeating a crew member's name",
-    "A planet-wide illusion",
-    "A door to another universe",
-    "A plague no one recognizes",
-    "A gravity well that traps ships",
-    "A godlike being with a test",
-    "A probe draining every power source",
-    "Memories that aren't the crew's own"
+    "The corridor network shifts across a whole region",
+    "An imperial fleet stranded for 300 years emerges",
+    "A corridor is collapsing",
+    "A Hegemony fleet emerges from a reopened corridor",
+    "Mandate inquisitors are screening everyone",
+    "A rogue AI has taken over the systems",
+    "A Kel radical cell plans an attack",
+    "A plague engineered with biotech",
+    "Two corporations at war by proxy",
+    "An Ozhvek house's succession war",
+    "Stolen corridor charts",
+    "An unpayable debt changes hands",
+    "Something old wakes in the ruins",
+    "A cybernetic augment goes haywire",
+    "An emperor dies without an heir",
+    "A psionic awakening across a whole world"
    ]
   ],
   "twist": [
    "Twist",
    [
-    "The Hegemony arrives with its own claim",
-    "The people asking for help are lying",
+    "The corridors aren't natural",
+    "A character is heir to an Ozhvek house",
+    "The client is the target",
+    "The cargo is a person",
     "A character's complication comes into play",
-    "Orders conflict with doing the right thing",
-    "Interfering would break the law of first contact",
-    "A cloaked ship is watching",
-    "Syndicate pirates want the same prize",
-    "The ship's systems start failing",
-    "A respected visitor has a hidden agenda",
-    "The threat is only defending itself",
-    "Contact with home is cut off",
-    "A civilian is trapped out of reach"
+    "Both sides hired you",
+    "The debt is forgeable",
+    "The psionic is a child",
+    "The Hegemony was right, this time",
+    "The rescue isn't wanted",
+    "The map is wrong",
+    "The ally is a Mandate informant",
+    "The ship is alive",
+    "The wreck isn't empty",
+    "The Tessan planned the war",
+    "The AI is older than the Hegemony"
    ]
   ],
   "clock": [
    "Ticking clock",
    [
     [
-     "Orbit decays",
-     6
-    ],
-    [
-     "Core breach",
-     4
-    ],
-    [
-     "The Hegemony cruiser arrives",
-     6
-    ],
-    [
-     "The plague reaches the ship",
+     "The corridor network shifts",
      8
     ],
     [
-     "The storm closes the window",
+     "The imperial ultimatum",
      4
     ],
     [
-     "Life support fails",
+     "The corridor closes",
      6
     ],
     [
-     "The rift collapses",
+     "The debt comes due",
+     4
+    ],
+    [
+     "The fleet arrives",
      6
     ],
     [
-     "Talks break down",
-     8
-    ],
-    [
-     "The hostages' air runs out",
+     "The inquisitor's scan finishes",
      4
     ],
     [
-     "The star goes nova",
-     8
+     "The station's life support fails",
+     6
     ],
     [
-     "Shields fail under fire",
+     "The AI copies itself out",
      4
     ],
     [
-     "The landing party is discovered",
+     "The evidence is erased",
+     4
+    ],
+    [
+     "The convoy is discovered",
+     6
+    ],
+    [
+     "The plague spreads",
+     8
+    ],
+    [
+     "The buyer walks away",
+     4
+    ],
+    [
+     "The corporation's lawyers arrive",
+     6
+    ],
+    [
+     "The corridor reopens",
+     8
+    ],
+    [
+     "The succession is decided",
+     8
+    ],
+    [
+     "The Mandate purge begins",
      6
     ]
    ]
@@ -1472,18 +1504,22 @@
   "who": [
    "Key character",
    [
-    "An idealistic envoy",
-    "A Hegemony captain with a grudge",
-    "A stranded trader",
-    "A brilliant, reckless scientist",
-    "A colony leader hiding a secret",
-    "A former officer gone rogue",
-    "A local child who has seen too much",
-    "A disapproving observer",
-    "An old friend of one of the crew",
-    "A Hegemony officer who wants to defect",
-    "An admiral with sealed orders",
-    "A Synth who wants to be free"
+    "The Emperor's exiled heir",
+    "A Sen who remembers the Foundation",
+    "A Tessan reformer",
+    "A Kel radical",
+    "A Dresh deserter",
+    "A Veyari archivist",
+    "A human entrepreneur",
+    "A Shivar heretic",
+    "A Draelin chart-seller",
+    "A Vael flotilla elder",
+    "An Ozhvek exile",
+    "A Zhaq resistance cell",
+    "A Vesh delegate",
+    "An AI that wants to be free",
+    "The first human to meet the Kel",
+    "A psionic with no limits"
    ]
   ]
  },

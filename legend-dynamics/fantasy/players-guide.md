@@ -422,37 +422,45 @@ After a significant venture, the GM may authorize one relevant skill to advance 
 
 ## Venture seeds
 
-Roll 1d12 on each table, or pick what you like. The GM view in the creator rolls these for you and can start the clock.
+Roll 3d6 on each table and read the total, or pick what you like. Middle results come up most often; the strangest sit at 3, 4, 17 and 18. The GM view in the creator rolls these for you and can start the clock.
 
-| d12 | Venture | Place | The darkness |
+| 3d6 | Venture | Place | The darkness |
 |---|---|---|---|
-| 1 | Rob a merchant prince's vault | A decadent city of the Gilded Coast | A sorcerer-prince who holds a Crown shard |
-| 2 | Loot a tomb of the serpent kings | A clan hall in the Frozen North | A demon summoned and not dismissed |
-| 3 | Rescue a captive from a sorcerer's tower | A buried city in the Burning Sands | A cult that feeds its god with the living |
-| 4 | Escort a caravan across the Burning Sands | A corsair haven in the Shattered Isles | Serpent-priests rising from the deep temples |
-| 5 | Steal a shard of the Crown | A Deepkin city under the mountains | A tomb whose dead will not stay dead |
-| 6 | Hunt a beast that's eating a village | The blasted Ashlands where the Crown broke | A thing from the Deep that dreams of the surface |
-| 7 | Guard a prince who hired you to die for him | A sorcerer's tower above a swamp | A curse on a royal bloodline |
-| 8 | Find a lost city in the jungle | An arena and its slave pits | A lotus that makes slaves of those who dream |
-| 9 | Break a friend out of the arena pits | A jungle temple strangled by vines | A god's corpse leaking power |
-| 10 | Deliver a cursed idol before the moon is full | A plague-struck port | An Undying sorcerer and their phylactery |
-| 11 | Win a war for a warlord who can't pay | A ship becalmed on a black sea | A beast-cult of skinchangers |
-| 12 | Recover a stolen god | A monastery of a dying god | A shard that whispers to whoever holds it |
+| 3 | Steal from a god | The palace of a sorcerer-prince | Two shards in one place |
+| 4 | Carry a shard back to the Ashlands | Inside a dead god | A god returning |
+| 5 | Rob a merchant prince's vault | A decadent city of the Gilded Coast | A sorcerer-prince who holds a Crown shard |
+| 6 | Loot a tomb of the serpent kings | A clan hall in the Frozen North | A demon summoned and not dismissed |
+| 7 | Rescue a captive from a sorcerer's tower | A buried city in the Burning Sands | A cult that feeds its god with the living |
+| 8 | Escort a caravan across the Burning Sands | A corsair haven in the Shattered Isles | Serpent-priests rising from the deep temples |
+| 9 | Steal a shard of the Crown | A Deepkin city under the mountains | A tomb whose dead will not stay dead |
+| 10 | Hunt a beast that's eating a village | The blasted Ashlands where the Crown broke | A thing from the Deep that dreams of the surface |
+| 11 | Guard a prince who hired you to die for him | A sorcerer's tower above a swamp | A curse on a royal bloodline |
+| 12 | Find a lost city in the jungle | An arena and its slave pits | A lotus that makes slaves of those who dream |
+| 13 | Break a friend out of the arena pits | A jungle temple strangled by vines | A god's corpse leaking power |
+| 14 | Deliver a cursed idol before the moon is full | A plague-struck port | An Undying sorcerer and their phylactery |
+| 15 | Win a war for a warlord who can't pay | A ship becalmed on a black sea | A beast-cult of skinchangers |
+| 16 | Recover a stolen god | A monastery of a dying god | A shard that whispers to whoever holds it |
+| 17 | Kill a sorcerer-prince | A city on the back of a great beast | The last emperor, Undying |
+| 18 | Crown a new king | The edge of the known world | A demon prince walking free |
 
-| d12 | Twist | Ticking clock (segments) | Key character |
+| 3d6 | Twist | Ticking clock (segments) | Key character |
 |---|---|---|---|
-| 1 | The employer plans to betray you | The guards change watch (4) | A merchant prince with a hidden debt |
-| 2 | The treasure is a living thing | The ritual completes at moonrise (6) | A sorcerer who needs one more sacrifice |
-| 3 | A rival band wants the same prize | The tomb floods (4) | A slave who knows the way in |
-| 4 | The monster is protecting something | The mob storms the palace (6) | A corsair queen |
-| 5 | The victim was the villain | The ship sails at dawn (4) | A priest of a dead god |
-| 6 | A character's complication comes into play | The demon breaks its binding (6) | A Northland jarl's runaway heir |
-| 7 | The shard is a fake, or the real one is somewhere else | The sands bury the city again (8) | A Deepkin smith who forged something terrible |
-| 8 | The guards are already dead | The plague reaches the port (8) | A serpent-kin scholar |
-| 9 | Someone in the party is marked by the darkness | The rival band arrives (6) | A mercenary captain with a grudge |
-| 10 | The sorcerer wants to be stopped | The sorcerer finishes the scrying (4) | A child who hears the Crown |
-| 11 | The city is about to fall | The tower collapses (4) | A demon in a human skin |
-| 12 | The god is listening | The water runs out (6) | An old thief's last apprentice |
+| 3 | A character holds a shard and didn't know it | The eclipse (6) | An emperor's ghost |
+| 4 | The prize is a god's trap | The god awakens (8) | A god in mortal form |
+| 5 | The employer plans to betray you | The guards change watch (4) | A merchant prince with a hidden debt |
+| 6 | The treasure is a living thing | The ritual completes at moonrise (6) | A sorcerer who needs one more sacrifice |
+| 7 | A rival band wants the same prize | The tomb floods (4) | A slave who knows the way in |
+| 8 | The monster is protecting something | The mob storms the palace (6) | A corsair queen |
+| 9 | The victim was the villain | The ship sails at dawn (4) | A priest of a dead god |
+| 10 | A character's complication comes into play | The demon breaks its binding (6) | A Northland jarl's runaway heir |
+| 11 | The shard is a fake, or the real one is somewhere else | The sands bury the city again (8) | A Deepkin smith who forged something terrible |
+| 12 | The guards are already dead | The plague reaches the port (8) | A serpent-kin scholar |
+| 13 | Someone in the party is marked by the darkness | The rival band arrives (6) | A mercenary captain with a grudge |
+| 14 | The sorcerer wants to be stopped | The sorcerer finishes the scrying (4) | A child who hears the Crown |
+| 15 | The city is about to fall | The tower collapses (4) | A demon in a human skin |
+| 16 | The god is listening | The water runs out (6) | An old thief's last apprentice |
+| 17 | The villain is a character's parent | The shard claims its bearer (6) | The Crown's last keeper |
+| 18 | It's all a sorcerer's dream | The city sinks (8) | A child who is a shard reborn |
 
 ## The chronicle
 
@@ -1054,8 +1062,8 @@ GM commands need the **Manage Server** permission on the Discord server. Everyon
 | `/points newsession` | Start a session: everyone goes back to two Fortune points, and unused points are gone. |
 | `/points gain player:@name` | Award a Fortune point, e.g. for an accepted complication. |
 | `/points set player:@name points:3` | Correct a player's total. |
-| `/clock new name:"The guards change watch" segments:4 kind:danger` | Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use `kind:progress` for one that fills on successes. |
-| `/clock tick name:"The guards change watch"` | Fill one segment. Add `segments:2` for two, or `segments:-1` to undo. `/clock remove` deletes a clock. |
+| `/clock new name:"The eclipse" segments:6 kind:danger` | Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use `kind:progress` for one that fills on successes. |
+| `/clock tick name:"The eclipse"` | Fill one segment. Add `segments:2` for two, or `segments:-1` to undo. `/clock remove` deletes a clock. |
 | `/track mark name:doom` | Mark a box on a track; a partial name works ("doom" finds Doom). `/track clear` clears one, and `/track reset` clears them all. |
 | `/seed` | Roll an adventure seed: one line from each seed table, and the command to start its ticking clock. |
 | `/contest ... defender:me` | When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them. |

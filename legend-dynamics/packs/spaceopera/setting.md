@@ -30,7 +30,7 @@ Medicine in the Concord is powerful: dermal regenerators, synthetic blood and su
 
 The ship has its own sheet, tracked like an injury track. Encounters stay descriptive: the GM states what's at stake before rolls and narrates what each box means.
 
-- **Taking hits.** A normal hit (a blaster cannon, a missile) marks 1 box; a heavy hit (a torpedo, ramming) marks 2. Once Shields are down, each hit marks the Hull and a system: the GM chooses, or roll 1d6: 1 Weapons, 2 Engines, 3 Sensors, 4 Comms, 5 Life support, 6 GM's choice.
+- **Taking hits.** A normal hit (a blaster cannon, a missile) marks 1 box; a heavy hit (a torpedo, ramming) marks 2. Once Shields are down, each hit marks the Hull and a system: the GM chooses, or roll 3d6: 3–6 Weapons, 7–8 Engines, 9–10 Sensors, 11–12 Comms, 13–15 Life support, 16–18 GM's choice.
 - **Evading.** When an enemy ship hits, the pilot may roll **Piloting** once per exchange, like Dodge: success cancels the hit. Engine damage applies its penalty.
 - **Repairs.** Mid-crisis, a successful **Engineering** roll clears one box from Shields or a system (two on success by 5). The Hull can be patched by one box per scene, and fully repaired only in dock.
 - **Firing.** Gunners roll **Blasters** for the ship's guns, against the enemy ship's own tracks.

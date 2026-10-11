@@ -297,7 +297,7 @@ A Grimm's core gifts come with the heritage: the Sight, Grimm eyes, an uneasy se
 ### Grimm blood
 
 - **Against a Hexenbiest or Zauberbiest.** A Hexenbiest or Zauberbiest who drinks a Grimm's blood under a full moon loses their powers. It happens whether the Grimm intends it or not, and it lasts until the *Contaminatio Ritualis* restores them.
-- **The Chymiater's draught.** A Chymiater (alchemist) Incantare can brew a Grimm's fresh blood into a draught in a major ritual (6 segments). Injected or drunk, it neutralizes the target's magical gifts for **1d6 days**: an Incantare's Lens, a Hexenbiest's telekinesis and spells, or a Wesen's magical signature power. It does not stop a woge.
+- **The Chymiater's draught.** A Chymiater (alchemist) Incantare can brew a Grimm's fresh blood into a draught in a major ritual (6 segments). Injected or drunk, it neutralizes the target's magical gifts for **3d6 ÷ 3 days** (round down: one to six days): an Incantare's Lens, a Hexenbiest's telekinesis and spells, or a Wesen's magical signature power. It does not stop a woge.
 - **A dangerous commodity.** Everyone in the hidden world knows what Grimm blood can do. Who gets it, and how, is always a serious matter.
 
 ## Incantare and rituals
@@ -459,37 +459,45 @@ After a significant case, the GM may authorize one relevant skill to advance fro
 
 ## Case seeds
 
-Roll 1d12 on each table, or pick what you like: a *case* at a *place*, caused by *the hidden world*, turned by a *twist*, against a *ticking clock*, with a *key character* at its heart. The GM view in the creator rolls these for you.
+Roll 3d6 on each table and read the total; middle results come up most often, the strangest sit at 3, 4, 17 and 18, or pick what you like: a *case* at a *place*, caused by *the hidden world*, turned by a *twist*, against a *ticking clock*, with a *key character* at its heart. The GM view in the creator rolls these for you.
 
-| d12 | Case | Place | The hidden world |
+| 3d6 | Case | Place | The hidden world |
 |---|---|---|---|
-| 1 | A body torn apart at the edge of town | A silver boomtown | A Wendigo that has acquired the taste |
-| 2 | A stagecoach that never arrived | A logging camp in the deep woods | A Blutbad pack that's gone back to the hunt |
-| 3 | Livestock slaughtered in the night | A river steamboat | A Siegbarste whom bullets barely trouble |
-| 4 | A child gone missing | The railroad's end-of-track camp | A Mauvais Dentes, sent by a Royal Family |
-| 5 | A miner raving about monsters | A lonely homestead | A Spinnetod keeping herself young |
-| 6 | A bounty on a man who isn't a man | A ghost town | Geier selling organs to the highest bidder |
-| 7 | Travelers vanishing on the trail | A mission church | A Hexenbiest's curse |
-| 8 | A traveling medicine show | A saloon and gambling hall | A Ziegevolk swindler with half the town in thrall |
-| 9 | A new preacher packs the church | A frontier fort | A Löwen fight ring |
-| 10 | A cattle drive spooked by something | A fog-bound waterfront | A Hässlich demanding tolls at a bridge |
-| 11 | A hanging that went wrong | A canyon ranch | A Brotherhood of the Holy Earth rite against the railroad |
-| 12 | A Wesen asks for help | A snowbound mountain pass | A Golden Dawn magician's working gone wrong |
+| 3 | A Grimm's grave robbed | A Royal Family's estate | A Hexenbiest queen |
+| 4 | The Wesen Council summons you | A Wesen fight ring under a church | The Wesen Council itself |
+| 5 | A body torn apart at the edge of town | A silver boomtown | A Wendigo that has acquired the taste |
+| 6 | A stagecoach that never arrived | A logging camp in the deep woods | A Blutbad pack that's gone back to the hunt |
+| 7 | Livestock slaughtered in the night | A river steamboat | A Siegbarste whom bullets barely trouble |
+| 8 | A child gone missing | The railroad's end-of-track camp | A Mauvais Dentes, sent by a Royal Family |
+| 9 | A miner raving about monsters | A lonely homestead | A Spinnetod keeping herself young |
+| 10 | A bounty on a man who isn't a man | A ghost town | Geier selling organs to the highest bidder |
+| 11 | Travelers vanishing on the trail | A mission church | A Hexenbiest's curse |
+| 12 | A traveling medicine show | A saloon and gambling hall | A Ziegevolk swindler with half the town in thrall |
+| 13 | A new preacher packs the church | A frontier fort | A Löwen fight ring |
+| 14 | A cattle drive spooked by something | A fog-bound waterfront | A Hässlich demanding tolls at a bridge |
+| 15 | A hanging that went wrong | A canyon ranch | A Brotherhood of the Holy Earth rite against the railroad |
+| 16 | A Wesen asks for help | A snowbound mountain pass | A Golden Dawn magician's working gone wrong |
+| 17 | A Royal's child goes missing | A Grimm's hidden library | A Grimm gone bad |
+| 18 | A town where everyone is Wesen | An abandoned asylum | A Zauberbiest's working |
 
-| d12 | Twist | Ticking clock (segments) | Key character |
+| 3d6 | Twist | Ticking clock (segments) | Key character |
 |---|---|---|---|
-| 1 | The victim was the monster | The mob forms (6) | A sheriff who wants it simple |
-| 2 | The law is in on it | Nightfall (4) | A widow who knows more than she says |
-| 3 | Two Wesen clans are feuding | The next victim (6) | A traveling doctor |
-| 4 | The Wesen Council wants it hushed up | The stage leaves town (4) | A Pinkerton detective |
-| 5 | A Royal Family's agent is behind it | The Reapers arrive (6) | A railroad baron |
-| 6 | A character's complication comes into play | The river floods (8) | A frightened Eisbiber family |
-| 7 | The Wesen is protecting its family | The trail goes cold (4) | A Blutbad trying to stay clean |
-| 8 | A human is using the Wesen | The hanging at dawn (4) | A child who saw the woge |
-| 9 | The town wants a hanging, any hanging | The newspaper prints the story (8) | A preacher with a past |
-| 10 | The Order of the Holy Knife arrives to cleanse | The fire spreads (4) | A newspaperman who's close to the truth |
-| 11 | Another Grimm hunts the same quarry | The Wesen flees the territory (6) | An Incantare who needs protection |
-| 12 | The trail leads to someone a character loves | The snows close the pass (8) | A dying Grimm with a last request |
+| 3 | A character has Wesen blood | The Royals arrive (6) | A Royal heir in hiding |
+| 4 | The Grimm is the target | The full moon (4) | A Grimm's long-lost sibling |
+| 5 | The victim was the monster | The mob forms (6) | A sheriff who wants it simple |
+| 6 | The law is in on it | Nightfall (4) | A widow who knows more than she says |
+| 7 | Two Wesen clans are feuding | The next victim (6) | A traveling doctor |
+| 8 | The Wesen Council wants it hushed up | The stage leaves town (4) | A Pinkerton detective |
+| 9 | A Royal Family's agent is behind it | The Reapers arrive (6) | A railroad baron |
+| 10 | A character's complication comes into play | The river floods (8) | A frightened Eisbiber family |
+| 11 | The Wesen is protecting its family | The trail goes cold (4) | A Blutbad trying to stay clean |
+| 12 | A human is using the Wesen | The hanging at dawn (4) | A child who saw the woge |
+| 13 | The town wants a hanging, any hanging | The newspaper prints the story (8) | A preacher with a past |
+| 14 | The Order of the Holy Knife arrives to cleanse | The fire spreads (4) | A newspaperman who's close to the truth |
+| 15 | Another Grimm hunts the same quarry | The Wesen flees the territory (6) | An Incantare who needs protection |
+| 16 | The trail leads to someone a character loves | The snows close the pass (8) | A dying Grimm with a last request |
+| 17 | The Royals want it to happen | The Reapers' deadline (4) | A Wesen Council judge |
+| 18 | The Council wanted the Grimm to find it | The Council's verdict (6) | A Hexenbiest who wants out |
 
 ## The case journal
 

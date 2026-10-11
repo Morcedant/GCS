@@ -1682,6 +1682,8 @@
   "mission": [
    "Job",
    [
+    "A whole town gone overnight",
+    "A dead man hires you",
     "A body found drained of blood",
     "A stagecoach that never arrived",
     "Livestock torn apart in the night",
@@ -1693,12 +1695,16 @@
     "A new preacher packs the church",
     "A town where no one sleeps",
     "A hanging that went wrong",
-    "A monster asks for help"
+    "A monster asks for help",
+    "A train arrives with no one aboard",
+    "A child asks you to kill their father, the monster"
    ]
   ],
   "place": [
    "Place",
    [
+    "A town that isn't on any map",
+    "A sanitarium in the hills",
     "A silver boomtown",
     "A logging camp in the deep woods",
     "A river steamboat",
@@ -1710,12 +1716,16 @@
     "A frontier fort",
     "A fog-bound waterfront",
     "A canyon cemetery",
-    "A snowbound mountain pass"
+    "A snowbound mountain pass",
+    "A circus wintering in the badlands",
+    "A mine sealed since the cave-in"
    ]
   ],
   "strange": [
    "The darkness",
    [
+    "Something older than any of them, waking",
+    "A hunter turned monster",
     "A werewolf that has acquired the taste",
     "A vampire who owns the town",
     "The dead rising from a flooded graveyard",
@@ -1727,12 +1737,16 @@
     "A revenant gunslinger",
     "A hellhound on someone's trail",
     "A cult in the church cellar",
-    "A sorcerer's working gone wrong"
+    "A sorcerer's working gone wrong",
+    "A town that made a pact",
+    "A creature no one has a name for"
    ]
   ],
   "twist": [
    "Twist",
    [
+    "A character is already cursed",
+    "The monster is a character's kin",
     "The victim was the monster",
     "The law is in on it",
     "Two monsters are at war",
@@ -1744,12 +1758,22 @@
     "The town wants a hanging, any hanging",
     "The Order of the Iron Cross arrives to burn everything",
     "Another hunter is after the same prey",
-    "The trail leads to someone a character loves"
+    "The trail leads to someone a character loves",
+    "The hunter is the monster",
+    "It happened before, thirty years ago"
    ]
   ],
   "clock": [
    "Ticking clock",
    [
+    [
+     "The eclipse",
+     4
+    ],
+    [
+     "The last train out",
+     6
+    ],
     [
      "The mob forms",
      6
@@ -1797,12 +1821,22 @@
     [
      "The snows close the pass",
      8
+    ],
+    [
+     "The body count doubles",
+     6
+    ],
+    [
+     "The pact comes due",
+     8
     ]
    ]
   ],
   "who": [
    "Key character",
    [
+    "A ghost who wants to help",
+    "A monster who once saved a character's life",
     "A sheriff who wants it simple",
     "A widow who knows more than she says",
     "A traveling doctor",
@@ -1814,7 +1848,9 @@
     "A preacher with a past",
     "A newspaperman who's close to the truth",
     "A witch who needs protection",
-    "A dying hunter with a last request"
+    "A dying hunter with a last request",
+    "A senator with a secret",
+    "The last of a hunter bloodline"
    ]
   ]
  },

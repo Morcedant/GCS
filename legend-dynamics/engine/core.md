@@ -275,7 +275,7 @@ After a significant {{missionLower}}, the GM may authorize one relevant skill to
 
 ## {{mission}} seeds
 
-Roll 1d12 on each table, or pick what you like. The GM view in the creator rolls these for you and can start the clock.
+Roll 3d6 on each table and read the total, or pick what you like. Middle results come up most often; the strangest sit at 3, 4, 17 and 18. The GM view in the creator rolls these for you and can start the clock.
 
 {{GEN:seeds}}
 

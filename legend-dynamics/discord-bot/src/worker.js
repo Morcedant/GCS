@@ -72,6 +72,8 @@ export const PACKS = {
    "mission": [
     "Venture",
     [
+     "Steal from a god",
+     "Carry a shard back to the Ashlands",
      "Rob a merchant prince's vault",
      "Loot a tomb of the serpent kings",
      "Rescue a captive from a sorcerer's tower",
@@ -83,12 +85,16 @@ export const PACKS = {
      "Break a friend out of the arena pits",
      "Deliver a cursed idol before the moon is full",
      "Win a war for a warlord who can't pay",
-     "Recover a stolen god"
+     "Recover a stolen god",
+     "Kill a sorcerer-prince",
+     "Crown a new king"
     ]
    ],
    "place": [
     "Place",
     [
+     "The palace of a sorcerer-prince",
+     "Inside a dead god",
      "A decadent city of the Gilded Coast",
      "A clan hall in the Frozen North",
      "A buried city in the Burning Sands",
@@ -100,12 +106,16 @@ export const PACKS = {
      "A jungle temple strangled by vines",
      "A plague-struck port",
      "A ship becalmed on a black sea",
-     "A monastery of a dying god"
+     "A monastery of a dying god",
+     "A city on the back of a great beast",
+     "The edge of the known world"
     ]
    ],
    "strange": [
     "The darkness",
     [
+     "Two shards in one place",
+     "A god returning",
      "A sorcerer-prince who holds a Crown shard",
      "A demon summoned and not dismissed",
      "A cult that feeds its god with the living",
@@ -117,12 +127,16 @@ export const PACKS = {
      "A god's corpse leaking power",
      "An Undying sorcerer and their phylactery",
      "A beast-cult of skinchangers",
-     "A shard that whispers to whoever holds it"
+     "A shard that whispers to whoever holds it",
+     "The last emperor, Undying",
+     "A demon prince walking free"
     ]
    ],
    "twist": [
     "Twist",
     [
+     "A character holds a shard and didn't know it",
+     "The prize is a god's trap",
      "The employer plans to betray you",
      "The treasure is a living thing",
      "A rival band wants the same prize",
@@ -134,12 +148,22 @@ export const PACKS = {
      "Someone in the party is marked by the darkness",
      "The sorcerer wants to be stopped",
      "The city is about to fall",
-     "The god is listening"
+     "The god is listening",
+     "The villain is a character's parent",
+     "It's all a sorcerer's dream"
     ]
    ],
    "clock": [
     "Ticking clock",
     [
+     [
+      "The eclipse",
+      6
+     ],
+     [
+      "The god awakens",
+      8
+     ],
      [
       "The guards change watch",
       4
@@ -187,12 +211,22 @@ export const PACKS = {
      [
       "The water runs out",
       6
+     ],
+     [
+      "The shard claims its bearer",
+      6
+     ],
+     [
+      "The city sinks",
+      8
      ]
     ]
    ],
    "who": [
     "Key character",
     [
+     "An emperor's ghost",
+     "A god in mortal form",
      "A merchant prince with a hidden debt",
      "A sorcerer who needs one more sacrifice",
      "A slave who knows the way in",
@@ -204,7 +238,9 @@ export const PACKS = {
      "A mercenary captain with a grudge",
      "A child who hears the Crown",
      "A demon in a human skin",
-     "An old thief's last apprentice"
+     "An old thief's last apprentice",
+     "The Crown's last keeper",
+     "A child who is a shard reborn"
     ]
    ]
   }
@@ -290,122 +326,154 @@ export const PACKS = {
   ],
   "seeds": {
    "mission": [
-    "Mission",
+    "Job or mission",
     [
-     "Answer a distress call",
-     "Survey an uncharted system",
-     "Make first contact",
-     "Escort a diplomatic envoy",
+     "Recover an imperial fleet stranded for centuries",
+     "Broker a peace inside the Hegemony",
+     "Deliver cargo through a contested corridor",
+     "Collect, or escape, a debt",
      "Find a missing ship",
-     "Deliver urgent medicine",
-     "Evacuate a colony",
-     "Patrol the Hegemony border",
-     "Recover a lost artifact",
-     "Run a blockade",
-     "Test an experimental drive",
-     "Shore leave that goes wrong"
+     "Escort a refugee convoy",
+     "Recover a stolen archive",
+     "Smuggle a psionic past the Mandates",
+     "Survey a newly opened corridor",
+     "Negotiate a contract between peoples",
+     "Rescue hostages",
+     "Salvage a war wreck",
+     "Expose a corporate crime",
+     "Protect a witness",
+     "Open a corridor no one has crossed",
+     "Steal an Ozhvek house's seal"
     ]
    ],
    "place": [
     "Place",
     [
-     "A storm-wracked ocean world",
-     "A dead world of ancient ruins",
-     "A struggling frontier colony",
-     "An asteroid mining station",
-     "A drifting derelict",
-     "An ice moon of a gas giant",
-     "A world that hasn't left its planet",
-     "A nebula that blinds sensors",
-     "A space station in crisis",
-     "A world that seems too perfect",
-     "A jungle world thick with life",
-     "The deep dark between the stars"
+     "A province isolated for six centuries, newly reopened",
+     "The Hegemony's throne world",
+     "A Tessan exchange station",
+     "A Concord colony on the frontier",
+     "A Vael flotilla",
+     "A Brulvek shipyard rusting in orbit",
+     "A Veyari library world",
+     "A Khaum cavern city",
+     "A dead Hegemony fortress",
+     "A Zhaq free city",
+     "A derelict generation ship",
+     "A Corvani restoration world",
+     "The Vesh homeworld, newly opened",
+     "A Draelin navigation guild-house",
+     "The heart of a corridor collapse",
+     "A Sen observatory older than the Hegemony"
     ]
    ],
    "strange": [
-    "Something strange",
+    "The trouble",
     [
-     "A rift that bends time",
-     "A creature made of energy",
-     "An ancient machine that still works",
-     "Duplicates of the crew",
-     "A signal repeating a crew member's name",
-     "A planet-wide illusion",
-     "A door to another universe",
-     "A plague no one recognizes",
-     "A gravity well that traps ships",
-     "A godlike being with a test",
-     "A probe draining every power source",
-     "Memories that aren't the crew's own"
+     "The corridor network shifts across a whole region",
+     "An imperial fleet stranded for 300 years emerges",
+     "A corridor is collapsing",
+     "A Hegemony fleet emerges from a reopened corridor",
+     "Mandate inquisitors are screening everyone",
+     "A rogue AI has taken over the systems",
+     "A Kel radical cell plans an attack",
+     "A plague engineered with biotech",
+     "Two corporations at war by proxy",
+     "An Ozhvek house's succession war",
+     "Stolen corridor charts",
+     "An unpayable debt changes hands",
+     "Something old wakes in the ruins",
+     "A cybernetic augment goes haywire",
+     "An emperor dies without an heir",
+     "A psionic awakening across a whole world"
     ]
    ],
    "twist": [
     "Twist",
     [
-     "The Hegemony arrives with its own claim",
-     "The people asking for help are lying",
+     "The corridors aren't natural",
+     "A character is heir to an Ozhvek house",
+     "The client is the target",
+     "The cargo is a person",
      "A character's complication comes into play",
-     "Orders conflict with doing the right thing",
-     "Interfering would break the law of first contact",
-     "A cloaked ship is watching",
-     "Syndicate pirates want the same prize",
-     "The ship's systems start failing",
-     "A respected visitor has a hidden agenda",
-     "The threat is only defending itself",
-     "Contact with home is cut off",
-     "A civilian is trapped out of reach"
+     "Both sides hired you",
+     "The debt is forgeable",
+     "The psionic is a child",
+     "The Hegemony was right, this time",
+     "The rescue isn't wanted",
+     "The map is wrong",
+     "The ally is a Mandate informant",
+     "The ship is alive",
+     "The wreck isn't empty",
+     "The Tessan planned the war",
+     "The AI is older than the Hegemony"
     ]
    ],
    "clock": [
     "Ticking clock",
     [
      [
-      "Orbit decays",
-      6
-     ],
-     [
-      "Core breach",
-      4
-     ],
-     [
-      "The Hegemony cruiser arrives",
-      6
-     ],
-     [
-      "The plague reaches the ship",
+      "The corridor network shifts",
       8
      ],
      [
-      "The storm closes the window",
+      "The imperial ultimatum",
       4
      ],
      [
-      "Life support fails",
+      "The corridor closes",
       6
      ],
      [
-      "The rift collapses",
+      "The debt comes due",
+      4
+     ],
+     [
+      "The fleet arrives",
       6
      ],
      [
-      "Talks break down",
-      8
-     ],
-     [
-      "The hostages' air runs out",
+      "The inquisitor's scan finishes",
       4
      ],
      [
-      "The star goes nova",
-      8
+      "The station's life support fails",
+      6
      ],
      [
-      "Shields fail under fire",
+      "The AI copies itself out",
       4
      ],
      [
-      "The landing party is discovered",
+      "The evidence is erased",
+      4
+     ],
+     [
+      "The convoy is discovered",
+      6
+     ],
+     [
+      "The plague spreads",
+      8
+     ],
+     [
+      "The buyer walks away",
+      4
+     ],
+     [
+      "The corporation's lawyers arrive",
+      6
+     ],
+     [
+      "The corridor reopens",
+      8
+     ],
+     [
+      "The succession is decided",
+      8
+     ],
+     [
+      "The Mandate purge begins",
       6
      ]
     ]
@@ -413,18 +481,22 @@ export const PACKS = {
    "who": [
     "Key character",
     [
-     "An idealistic envoy",
-     "A Hegemony captain with a grudge",
-     "A stranded trader",
-     "A brilliant, reckless scientist",
-     "A colony leader hiding a secret",
-     "A former officer gone rogue",
-     "A local child who has seen too much",
-     "A disapproving observer",
-     "An old friend of one of the crew",
-     "A Hegemony officer who wants to defect",
-     "An admiral with sealed orders",
-     "A Synth who wants to be free"
+     "The Emperor's exiled heir",
+     "A Sen who remembers the Foundation",
+     "A Tessan reformer",
+     "A Kel radical",
+     "A Dresh deserter",
+     "A Veyari archivist",
+     "A human entrepreneur",
+     "A Shivar heretic",
+     "A Draelin chart-seller",
+     "A Vael flotilla elder",
+     "An Ozhvek exile",
+     "A Zhaq resistance cell",
+     "A Vesh delegate",
+     "An AI that wants to be free",
+     "The first human to meet the Kel",
+     "A psionic with no limits"
     ]
    ]
   }
@@ -474,6 +546,8 @@ export const PACKS = {
    "mission": [
     "Job",
     [
+     "A whole town gone overnight",
+     "A dead man hires you",
      "A body found drained of blood",
      "A stagecoach that never arrived",
      "Livestock torn apart in the night",
@@ -485,12 +559,16 @@ export const PACKS = {
      "A new preacher packs the church",
      "A town where no one sleeps",
      "A hanging that went wrong",
-     "A monster asks for help"
+     "A monster asks for help",
+     "A train arrives with no one aboard",
+     "A child asks you to kill their father, the monster"
     ]
    ],
    "place": [
     "Place",
     [
+     "A town that isn't on any map",
+     "A sanitarium in the hills",
      "A silver boomtown",
      "A logging camp in the deep woods",
      "A river steamboat",
@@ -502,12 +580,16 @@ export const PACKS = {
      "A frontier fort",
      "A fog-bound waterfront",
      "A canyon cemetery",
-     "A snowbound mountain pass"
+     "A snowbound mountain pass",
+     "A circus wintering in the badlands",
+     "A mine sealed since the cave-in"
     ]
    ],
    "strange": [
     "The darkness",
     [
+     "Something older than any of them, waking",
+     "A hunter turned monster",
      "A werewolf that has acquired the taste",
      "A vampire who owns the town",
      "The dead rising from a flooded graveyard",
@@ -519,12 +601,16 @@ export const PACKS = {
      "A revenant gunslinger",
      "A hellhound on someone's trail",
      "A cult in the church cellar",
-     "A sorcerer's working gone wrong"
+     "A sorcerer's working gone wrong",
+     "A town that made a pact",
+     "A creature no one has a name for"
     ]
    ],
    "twist": [
     "Twist",
     [
+     "A character is already cursed",
+     "The monster is a character's kin",
      "The victim was the monster",
      "The law is in on it",
      "Two monsters are at war",
@@ -536,12 +622,22 @@ export const PACKS = {
      "The town wants a hanging, any hanging",
      "The Order of the Iron Cross arrives to burn everything",
      "Another hunter is after the same prey",
-     "The trail leads to someone a character loves"
+     "The trail leads to someone a character loves",
+     "The hunter is the monster",
+     "It happened before, thirty years ago"
     ]
    ],
    "clock": [
     "Ticking clock",
     [
+     [
+      "The eclipse",
+      4
+     ],
+     [
+      "The last train out",
+      6
+     ],
      [
       "The mob forms",
       6
@@ -589,12 +685,22 @@ export const PACKS = {
      [
       "The snows close the pass",
       8
+     ],
+     [
+      "The body count doubles",
+      6
+     ],
+     [
+      "The pact comes due",
+      8
      ]
     ]
    ],
    "who": [
     "Key character",
     [
+     "A ghost who wants to help",
+     "A monster who once saved a character's life",
      "A sheriff who wants it simple",
      "A widow who knows more than she says",
      "A traveling doctor",
@@ -606,7 +712,9 @@ export const PACKS = {
      "A preacher with a past",
      "A newspaperman who's close to the truth",
      "A witch who needs protection",
-     "A dying hunter with a last request"
+     "A dying hunter with a last request",
+     "A senator with a secret",
+     "The last of a hunter bloodline"
     ]
    ]
   }
@@ -656,6 +764,8 @@ export const PACKS = {
    "mission": [
     "Case",
     [
+     "A Grimm's grave robbed",
+     "The Wesen Council summons you",
      "A body torn apart at the edge of town",
      "A stagecoach that never arrived",
      "Livestock slaughtered in the night",
@@ -667,12 +777,16 @@ export const PACKS = {
      "A new preacher packs the church",
      "A cattle drive spooked by something",
      "A hanging that went wrong",
-     "A Wesen asks for help"
+     "A Wesen asks for help",
+     "A Royal's child goes missing",
+     "A town where everyone is Wesen"
     ]
    ],
    "place": [
     "Place",
     [
+     "A Royal Family's estate",
+     "A Wesen fight ring under a church",
      "A silver boomtown",
      "A logging camp in the deep woods",
      "A river steamboat",
@@ -684,12 +798,16 @@ export const PACKS = {
      "A frontier fort",
      "A fog-bound waterfront",
      "A canyon ranch",
-     "A snowbound mountain pass"
+     "A snowbound mountain pass",
+     "A Grimm's hidden library",
+     "An abandoned asylum"
     ]
    ],
    "strange": [
     "The hidden world",
     [
+     "A Hexenbiest queen",
+     "The Wesen Council itself",
      "A Wendigo that has acquired the taste",
      "A Blutbad pack that's gone back to the hunt",
      "A Siegbarste whom bullets barely trouble",
@@ -701,12 +819,16 @@ export const PACKS = {
      "A Löwen fight ring",
      "A Hässlich demanding tolls at a bridge",
      "A Brotherhood of the Holy Earth rite against the railroad",
-     "A Golden Dawn magician's working gone wrong"
+     "A Golden Dawn magician's working gone wrong",
+     "A Grimm gone bad",
+     "A Zauberbiest's working"
     ]
    ],
    "twist": [
     "Twist",
     [
+     "A character has Wesen blood",
+     "The Grimm is the target",
      "The victim was the monster",
      "The law is in on it",
      "Two Wesen clans are feuding",
@@ -718,12 +840,22 @@ export const PACKS = {
      "The town wants a hanging, any hanging",
      "The Order of the Holy Knife arrives to cleanse",
      "Another Grimm hunts the same quarry",
-     "The trail leads to someone a character loves"
+     "The trail leads to someone a character loves",
+     "The Royals want it to happen",
+     "The Council wanted the Grimm to find it"
     ]
    ],
    "clock": [
     "Ticking clock",
     [
+     [
+      "The Royals arrive",
+      6
+     ],
+     [
+      "The full moon",
+      4
+     ],
      [
       "The mob forms",
       6
@@ -771,12 +903,22 @@ export const PACKS = {
      [
       "The snows close the pass",
       8
+     ],
+     [
+      "The Reapers' deadline",
+      4
+     ],
+     [
+      "The Council's verdict",
+      6
      ]
     ]
    ],
    "who": [
     "Key character",
     [
+     "A Royal heir in hiding",
+     "A Grimm's long-lost sibling",
      "A sheriff who wants it simple",
      "A widow who knows more than she says",
      "A traveling doctor",
@@ -788,7 +930,9 @@ export const PACKS = {
      "A preacher with a past",
      "A newspaperman who's close to the truth",
      "An Incantare who needs protection",
-     "A dying Grimm with a last request"
+     "A dying Grimm with a last request",
+     "A Wesen Council judge",
+     "A Hexenbiest who wants out"
     ]
    ]
   }
@@ -886,6 +1030,8 @@ export const PACKS = {
    "mission": [
     "Mission",
     [
+     "Answer a call from a ship lost a century ago",
+     "Ferry a delegation to a world that left the Federation",
      "Answer a distress call",
      "Survey an uncharted system",
      "Make first contact",
@@ -897,12 +1043,16 @@ export const PACKS = {
      "Recover a lost probe or artifact",
      "Mediate a dispute between two worlds",
      "Test experimental technology",
-     "Shore leave that goes wrong"
+     "Shore leave that goes wrong",
+     "Carry a message across the Neutral Zone",
+     "Host a first contact aboard the Pelion"
     ]
    ],
    "place": [
     "Place",
     [
+     "The edge of the galaxy",
+     "Inside a living starship",
      "A storm-wracked ocean world",
      "A dead world with ancient ruins",
      "A struggling frontier colony",
@@ -914,12 +1064,16 @@ export const PACKS = {
      "A starbase in crisis",
      "A world that seems too perfect",
      "A jungle planet thick with life",
-     "Deep space between the stars"
+     "Deep space between the stars",
+     "A Klingon prison world",
+     "A Romulan listening post"
     ]
    ],
    "strange": [
     "Something strange",
     [
+     "The crew's past selves",
+     "A dead star that sings",
      "A subspace anomaly that distorts time",
      "A non-corporeal life form",
      "An ancient machine that still works",
@@ -931,12 +1085,16 @@ export const PACKS = {
      "A gravity well that traps ships",
      "A godlike being testing the crew",
      "An alien probe draining power",
-     "Memories that aren't the crew's own"
+     "Memories that aren't the crew's own",
+     "A crossing into a mirror universe",
+     "A machine that remembers the Pelion"
     ]
    ],
    "twist": [
     "Twist",
     [
+     "The captain has been replaced",
+     "The enemy is a Federation colony",
      "Klingons arrive with their own claim",
      "The people asking for help are lying",
      "A crew member's complication comes into play",
@@ -948,12 +1106,22 @@ export const PACKS = {
      "A respected visitor has a hidden agenda",
      "The 'threat' is only defending itself",
      "Contact with Starfleet is cut off",
-     "A civilian is trapped out of reach"
+     "A civilian is trapped out of reach",
+     "The mission was a test",
+     "History must not change"
     ]
    ],
    "clock": [
     "Ticking clock",
     [
+     [
+      "The time loop resets",
+      4
+     ],
+     [
+      "The ship's power drains",
+      6
+     ],
      [
       "Orbit decays",
       6
@@ -1001,12 +1169,22 @@ export const PACKS = {
      [
       "The away team is discovered",
       6
+     ],
+     [
+      "The duel at dawn",
+      4
+     ],
+     [
+      "The Klingon ultimatum",
+      6
      ]
     ]
    ],
    "who": [
     "Key character",
     [
+     "A crew member's future self",
+     "A legend thought dead",
      "An idealistic Federation ambassador",
      "A Klingon captain with a grudge",
      "A stranded Orion trader",
@@ -1018,7 +1196,9 @@ export const PACKS = {
      "An old friend of one of the crew",
      "A Romulan who wants to defect",
      "A Starfleet admiral with sealed orders",
-     "An android that wants to be free"
+     "An android that wants to be free",
+     "A godlike child",
+     "An admiral's spy aboard"
     ]
    ]
   }
@@ -1202,7 +1382,7 @@ export function commands() {
         { type: 1, name: "reset", description: "GM: clear every track" },
       ],
     },
-    { name: "seed", description: "Roll an adventure seed from the game's tables" },
+    { name: "seed", description: "Roll an adventure seed: 3d6 on each of the game's tables" },
     {
       name: "game",
       description: "Which game this server plays (Dust & Damnation, Fracture Lines, The Shattered Crown, Grimm, USS Pelion)",
@@ -1574,8 +1754,12 @@ async function trackCommand(interaction, env, game) {
 
 // ---- Seeds ----
 
+/** One 3d6 roll per table: 16 entries, read by the total (3-18). */
 export function rollSeed(game, random = Math.random) {
-  return Object.values(game.seeds).map(([label, items]) => [label, items[Math.floor(random() * items.length)]]);
+  return Object.values(game.seeds).map(([label, items]) => {
+    const total = [0, 0, 0].reduce((a) => a + 1 + Math.floor(random() * 6), 0);
+    return [label, items[Math.min(items.length - 1, total - 3)], total];
+  });
 }
 
 function seedCommand(interaction, env, game) {
@@ -1591,7 +1775,7 @@ function seedCommand(interaction, env, game) {
       embeds: [{
         title: `${game.mission || "Adventure"} seed`,
         color: NEUTRAL,
-        description: rows.map(([label, item]) => `**${label}:** ${text(item)}`).join("\n") +
+        description: rows.map(([label, item, total]) => `**${label}** (${total}): ${text(item)}`).join("\n") +
           (clock ? `\n\nStart the clock: \`/clock new name:${clock[0]} segments:${clock[1]}\`` : ""),
         footer: { text: `Roll again for another · ${game.title}` },
       }],

@@ -1689,6 +1689,8 @@
   "mission": [
    "Venture",
    [
+    "Steal from a god",
+    "Carry a shard back to the Ashlands",
     "Rob a merchant prince's vault",
     "Loot a tomb of the serpent kings",
     "Rescue a captive from a sorcerer's tower",
@@ -1700,12 +1702,16 @@
     "Break a friend out of the arena pits",
     "Deliver a cursed idol before the moon is full",
     "Win a war for a warlord who can't pay",
-    "Recover a stolen god"
+    "Recover a stolen god",
+    "Kill a sorcerer-prince",
+    "Crown a new king"
    ]
   ],
   "place": [
    "Place",
    [
+    "The palace of a sorcerer-prince",
+    "Inside a dead god",
     "A decadent city of the Gilded Coast",
     "A clan hall in the Frozen North",
     "A buried city in the Burning Sands",
@@ -1717,12 +1723,16 @@
     "A jungle temple strangled by vines",
     "A plague-struck port",
     "A ship becalmed on a black sea",
-    "A monastery of a dying god"
+    "A monastery of a dying god",
+    "A city on the back of a great beast",
+    "The edge of the known world"
    ]
   ],
   "strange": [
    "The darkness",
    [
+    "Two shards in one place",
+    "A god returning",
     "A sorcerer-prince who holds a Crown shard",
     "A demon summoned and not dismissed",
     "A cult that feeds its god with the living",
@@ -1734,12 +1744,16 @@
     "A god's corpse leaking power",
     "An Undying sorcerer and their phylactery",
     "A beast-cult of skinchangers",
-    "A shard that whispers to whoever holds it"
+    "A shard that whispers to whoever holds it",
+    "The last emperor, Undying",
+    "A demon prince walking free"
    ]
   ],
   "twist": [
    "Twist",
    [
+    "A character holds a shard and didn't know it",
+    "The prize is a god's trap",
     "The employer plans to betray you",
     "The treasure is a living thing",
     "A rival band wants the same prize",
@@ -1751,12 +1765,22 @@
     "Someone in the party is marked by the darkness",
     "The sorcerer wants to be stopped",
     "The city is about to fall",
-    "The god is listening"
+    "The god is listening",
+    "The villain is a character's parent",
+    "It's all a sorcerer's dream"
    ]
   ],
   "clock": [
    "Ticking clock",
    [
+    [
+     "The eclipse",
+     6
+    ],
+    [
+     "The god awakens",
+     8
+    ],
     [
      "The guards change watch",
      4
@@ -1804,12 +1828,22 @@
     [
      "The water runs out",
      6
+    ],
+    [
+     "The shard claims its bearer",
+     6
+    ],
+    [
+     "The city sinks",
+     8
     ]
    ]
   ],
   "who": [
    "Key character",
    [
+    "An emperor's ghost",
+    "A god in mortal form",
     "A merchant prince with a hidden debt",
     "A sorcerer who needs one more sacrifice",
     "A slave who knows the way in",
@@ -1821,7 +1855,9 @@
     "A mercenary captain with a grudge",
     "A child who hears the Crown",
     "A demon in a human skin",
-    "An old thief's last apprentice"
+    "An old thief's last apprentice",
+    "The Crown's last keeper",
+    "A child who is a shard reborn"
    ]
   ]
  },

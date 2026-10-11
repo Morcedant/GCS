@@ -198,11 +198,13 @@ test("/track marks, clears and resets the game's tracks, with each box's meaning
 test("/seed rolls one entry from each of the game's tables, without storage", async () => {
   const { PACKS, rollSeed } = await import("../src/worker.js");
   const rows = rollSeed(PACKS.western, () => 0);
-  assert.deepEqual(rows[0], ["Job", "A body found drained of blood"]);
+  assert.deepEqual(rows[0], ["Job", "A whole town gone overnight", 3], "all ones: total 3, the rarest entry");
+  assert.equal(rollSeed(PACKS.western, () => 0.999)[0][2], 18, "all sixes: total 18");
+  assert.ok(Object.values(PACKS).every((g) => Object.values(g.seeds).every(([, items]) => items.length === 16)), "every table has 16 entries");
   const seed = await signedCall(env, { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name: "seed" } });
   const lines = seed.embeds[0].description.split("\n");
   assert.equal(lines.filter((l) => l.startsWith("**")).length, Object.keys(PACKS.western.seeds).length);
-  assert.match(seed.embeds[0].description, /\*\*Ticking clock:\*\* .+ \([2468] segments\)/);
+  assert.match(seed.embeds[0].description, /\*\*Ticking clock\*\* \(\d+\): .+ \([2468] segments\)/);
   assert.match(seed.embeds[0].description, /Start the clock: `\/clock new name:.+ segments:[2468]`/);
   assert.ok(!/,\d/.test(seed.embeds[0].description), "no raw arrays");
   assert.match(seed.embeds[0].title, /Job seed/);
@@ -230,7 +232,7 @@ test("USS Pelion and Grimm are games too, and their old storage bindings still w
   assert.match((await signedCall(gr, sub("track", "mark", [{ name: "name", value: "exposure" }]))).content, /Exposure\*\* ■□□□ 1\/4: Odd stories/);
   const seed = await signedCall(gr, { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name: "seed" } });
   assert.match(seed.embeds[0].title, /Case seed/);
-  assert.match(seed.embeds[0].description, /\*\*The hidden world:\*\*/);
+  assert.match(seed.embeds[0].description, /\*\*The hidden world\*\* \(\d+\):/);
 
   // The GM can switch a server to Grimm on the shared bot.
   const shared = { ...env, STORE: new MemoryKV() };

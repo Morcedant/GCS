@@ -194,8 +194,9 @@ def gen(name, pack, t):
     if name == "seeds":
         s = p["seeds"]; k1 = ["mission", "place", "strange"]; k2 = ["twist", "clock", "who"]
         col = lambda k, i: f"{s[k][1][i][0]} ({s[k][1][i][1]})" if k == "clock" else s[k][1][i]
-        return (table(["d12"] + [s[k][0] for k in k1], [[i + 1] + [col(k, i) for k in k1] for i in range(12)]) + "\n\n" +
-                table(["d12"] + [s[k][0] + (" (segments)" if k == "clock" else "") for k in k2], [[i + 1] + [col(k, i) for k in k2] for i in range(12)]))
+        n = len(s["mission"][1])  # 16 entries, read by the 3d6 total
+        return (table(["3d6"] + [s[k][0] for k in k1], [[i + 3] + [col(k, i) for k in k1] for i in range(n)]) + "\n\n" +
+                table(["3d6"] + [s[k][0] + (" (segments)" if k == "clock" else "") for k in k2], [[i + 3] + [col(k, i) for k in k2] for i in range(n)]))
     if name == "pregens":
         return "\n".join(char_block(c, p, t, True) for c in p["pregens"]) if p["pregens"] else "*None yet.*"
     if name == "advantages":

@@ -416,37 +416,45 @@ After a significant job, the GM may authorize one relevant skill to advance from
 
 ## Job seeds
 
-Roll 1d12 on each table, or pick what you like. The GM view in the creator rolls these for you and can start the clock.
+Roll 3d6 on each table and read the total, or pick what you like. Middle results come up most often; the strangest sit at 3, 4, 17 and 18. The GM view in the creator rolls these for you and can start the clock.
 
-| d12 | Job | Place | The darkness |
+| 3d6 | Job | Place | The darkness |
 |---|---|---|---|
-| 1 | A body found drained of blood | A silver boomtown | A werewolf that has acquired the taste |
-| 2 | A stagecoach that never arrived | A logging camp in the deep woods | A vampire who owns the town |
-| 3 | Livestock torn apart in the night | A river steamboat | The dead rising from a flooded graveyard |
-| 4 | A child gone missing | The railroad's end-of-track camp | A witch's curse on a family |
-| 5 | A miner raving about the dead walking | A lonely homestead | A ghost that wants justice |
-| 6 | A bounty on a man who died last year | A ghost town | Ghouls in the mine |
-| 7 | Travelers vanishing on the trail | A burned mission church | A demon summoned by a desperate man |
-| 8 | A traveling medicine show | A saloon and gambling hall | A necromancer raising an army |
-| 9 | A new preacher packs the church | A frontier fort | A revenant gunslinger |
-| 10 | A town where no one sleeps | A fog-bound waterfront | A hellhound on someone's trail |
-| 11 | A hanging that went wrong | A canyon cemetery | A cult in the church cellar |
-| 12 | A monster asks for help | A snowbound mountain pass | A sorcerer's working gone wrong |
+| 3 | A whole town gone overnight | A town that isn't on any map | Something older than any of them, waking |
+| 4 | A dead man hires you | A sanitarium in the hills | A hunter turned monster |
+| 5 | A body found drained of blood | A silver boomtown | A werewolf that has acquired the taste |
+| 6 | A stagecoach that never arrived | A logging camp in the deep woods | A vampire who owns the town |
+| 7 | Livestock torn apart in the night | A river steamboat | The dead rising from a flooded graveyard |
+| 8 | A child gone missing | The railroad's end-of-track camp | A witch's curse on a family |
+| 9 | A miner raving about the dead walking | A lonely homestead | A ghost that wants justice |
+| 10 | A bounty on a man who died last year | A ghost town | Ghouls in the mine |
+| 11 | Travelers vanishing on the trail | A burned mission church | A demon summoned by a desperate man |
+| 12 | A traveling medicine show | A saloon and gambling hall | A necromancer raising an army |
+| 13 | A new preacher packs the church | A frontier fort | A revenant gunslinger |
+| 14 | A town where no one sleeps | A fog-bound waterfront | A hellhound on someone's trail |
+| 15 | A hanging that went wrong | A canyon cemetery | A cult in the church cellar |
+| 16 | A monster asks for help | A snowbound mountain pass | A sorcerer's working gone wrong |
+| 17 | A train arrives with no one aboard | A circus wintering in the badlands | A town that made a pact |
+| 18 | A child asks you to kill their father, the monster | A mine sealed since the cave-in | A creature no one has a name for |
 
-| d12 | Twist | Ticking clock (segments) | Key character |
+| 3d6 | Twist | Ticking clock (segments) | Key character |
 |---|---|---|---|
-| 1 | The victim was the monster | The mob forms (6) | A sheriff who wants it simple |
-| 2 | The law is in on it | Nightfall (4) | A widow who knows more than she says |
-| 3 | Two monsters are at war | The full moon rises (4) | A traveling doctor |
-| 4 | The client lied about everything | The next victim (6) | A Pinkerton detective |
-| 5 | A rich man pays for silence | The dead finish rising (6) | A railroad baron |
-| 6 | A character's complication comes into play | The river floods (8) | A frightened homesteader family |
-| 7 | The monster is protecting its family | The trail goes cold (4) | A werewolf trying to stay human |
-| 8 | Someone is using the monster | The hanging at dawn (4) | A child who saw it happen |
-| 9 | The town wants a hanging, any hanging | The ritual completes (6) | A preacher with a past |
-| 10 | The Order of the Iron Cross arrives to burn everything | The fire spreads (4) | A newspaperman who's close to the truth |
-| 11 | Another hunter is after the same prey | The curse takes hold (8) | A witch who needs protection |
-| 12 | The trail leads to someone a character loves | The snows close the pass (8) | A dying hunter with a last request |
+| 3 | A character is already cursed | The eclipse (4) | A ghost who wants to help |
+| 4 | The monster is a character's kin | The last train out (6) | A monster who once saved a character's life |
+| 5 | The victim was the monster | The mob forms (6) | A sheriff who wants it simple |
+| 6 | The law is in on it | Nightfall (4) | A widow who knows more than she says |
+| 7 | Two monsters are at war | The full moon rises (4) | A traveling doctor |
+| 8 | The client lied about everything | The next victim (6) | A Pinkerton detective |
+| 9 | A rich man pays for silence | The dead finish rising (6) | A railroad baron |
+| 10 | A character's complication comes into play | The river floods (8) | A frightened homesteader family |
+| 11 | The monster is protecting its family | The trail goes cold (4) | A werewolf trying to stay human |
+| 12 | Someone is using the monster | The hanging at dawn (4) | A child who saw it happen |
+| 13 | The town wants a hanging, any hanging | The ritual completes (6) | A preacher with a past |
+| 14 | The Order of the Iron Cross arrives to burn everything | The fire spreads (4) | A newspaperman who's close to the truth |
+| 15 | Another hunter is after the same prey | The curse takes hold (8) | A witch who needs protection |
+| 16 | The trail leads to someone a character loves | The snows close the pass (8) | A dying hunter with a last request |
+| 17 | The hunter is the monster | The body count doubles (6) | A senator with a secret |
+| 18 | It happened before, thirty years ago | The pact comes due (8) | The last of a hunter bloodline |
 
 ## The trail journal
 
@@ -1013,8 +1021,8 @@ GM commands need the **Manage Server** permission on the Discord server. Everyon
 | `/points newsession` | Start a session: everyone goes back to two Grit points, and unused points are gone. |
 | `/points gain player:@name` | Award a Grit point, e.g. for an accepted complication. |
 | `/points set player:@name points:3` | Correct a player's total. |
-| `/clock new name:"The mob forms" segments:6 kind:danger` | Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use `kind:progress` for one that fills on successes. |
-| `/clock tick name:"The mob forms"` | Fill one segment. Add `segments:2` for two, or `segments:-1` to undo. `/clock remove` deletes a clock. |
+| `/clock new name:"The eclipse" segments:4 kind:danger` | Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use `kind:progress` for one that fills on successes. |
+| `/clock tick name:"The eclipse"` | Fill one segment. Add `segments:2` for two, or `segments:-1` to undo. `/clock remove` deletes a clock. |
 | `/track mark name:dark` | Mark a box on a track; a partial name works ("dark" finds The Dark). `/track clear` clears one, and `/track reset` clears them all. |
 | `/seed` | Roll an adventure seed: one line from each seed table, and the command to start its ticking clock. |
 | `/contest ... defender:me` | When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them. |

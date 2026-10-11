@@ -467,7 +467,7 @@ The ship has its own sheet, tracked like an injury track. Encounters stay descri
 | Hull | 4 | 1–2: scarred, minor breaches sealed. 3: serious breaches, decks lost. 4: the ship is breaking up; start an *Abandon ship* clock. |
 | Weapons, Engines, Sensors, Communications, Transporters, Life support | 3 each | 1 **Damaged**: −2 to rolls using it. 2 **Crippled**: −4, and it can do only its most basic job. 3 **Offline**: it doesn't work until repaired. |
 
-**Taking hits.** A normal hit (a phaser bank, a disruptor) marks 1 box; a heavy hit (photon torpedo, ramming, a disruptor volley) marks 2. Once Shields are down, each hit marks the Hull and the system the GM chooses, or roll 1d6: 1 Weapons, 2 Engines, 3 Sensors, 4 Communications, 5 Transporters, 6 Life support.
+**Taking hits.** A normal hit (a phaser bank, a disruptor) marks 1 box; a heavy hit (photon torpedo, ramming, a disruptor volley) marks 2. Once Shields are down, each hit marks the Hull and the system the GM chooses, or roll 3d6: 3–6 Weapons, 7–8 Engines, 9–10 Sensors, 11–12 Communications, 13–14 Transporters, 15–18 Life support.
 
 **Defending.** When an enemy ship hits, Helm may roll **Helm** to evade, once per exchange, like Dodge: success cancels the hit. Engines damage applies its penalty.
 
@@ -483,37 +483,45 @@ After a significant mission, the GM may authorize one relevant skill to advance 
 
 ## Mission seeds
 
-Short of a plot? Roll 1d12 on each table, or pick what you like. Read the results together: a *mission* in a *place*, made strange by *something strange*, turned by a *twist*, against a *ticking clock*, with a *key character* at its heart. The GM view in the creator rolls these for you and can start the clock.
+Short of a plot? Roll 3d6 on each table and read the total; middle results come up most often, the strangest sit at 3, 4, 17 and 18, or pick what you like. Read the results together: a *mission* in a *place*, made strange by *something strange*, turned by a *twist*, against a *ticking clock*, with a *key character* at its heart. The GM view in the creator rolls these for you and can start the clock.
 
-| d12 | Mission | Place | Something strange |
+| 3d6 | Mission | Place | Something strange |
 |---|---|---|---|
-| 1 | Answer a distress call | A storm-wracked ocean world | A subspace anomaly that distorts time |
-| 2 | Survey an uncharted system | A dead world with ancient ruins | A non-corporeal life form |
-| 3 | Make first contact | A struggling frontier colony | An ancient machine that still works |
-| 4 | Escort a diplomatic delegation | An asteroid mining station | Duplicates of the crew |
-| 5 | Find a missing ship or outpost | A drifting derelict starship | A signal repeating a crew member's name |
-| 6 | Deliver urgent medical supplies | An ice-covered moon of a gas giant | A planet-wide illusion |
-| 7 | Evacuate a colony | A pre-warp civilization's world | A rift into another universe |
-| 8 | Patrol the Neutral Zone border | A nebula that blinds the sensors | A disease no one recognizes |
-| 9 | Recover a lost probe or artifact | A starbase in crisis | A gravity well that traps ships |
-| 10 | Mediate a dispute between two worlds | A world that seems too perfect | A godlike being testing the crew |
-| 11 | Test experimental technology | A jungle planet thick with life | An alien probe draining power |
-| 12 | Shore leave that goes wrong | Deep space between the stars | Memories that aren't the crew's own |
+| 3 | Answer a call from a ship lost a century ago | The edge of the galaxy | The crew's past selves |
+| 4 | Ferry a delegation to a world that left the Federation | Inside a living starship | A dead star that sings |
+| 5 | Answer a distress call | A storm-wracked ocean world | A subspace anomaly that distorts time |
+| 6 | Survey an uncharted system | A dead world with ancient ruins | A non-corporeal life form |
+| 7 | Make first contact | A struggling frontier colony | An ancient machine that still works |
+| 8 | Escort a diplomatic delegation | An asteroid mining station | Duplicates of the crew |
+| 9 | Find a missing ship or outpost | A drifting derelict starship | A signal repeating a crew member's name |
+| 10 | Deliver urgent medical supplies | An ice-covered moon of a gas giant | A planet-wide illusion |
+| 11 | Evacuate a colony | A pre-warp civilization's world | A rift into another universe |
+| 12 | Patrol the Neutral Zone border | A nebula that blinds the sensors | A disease no one recognizes |
+| 13 | Recover a lost probe or artifact | A starbase in crisis | A gravity well that traps ships |
+| 14 | Mediate a dispute between two worlds | A world that seems too perfect | A godlike being testing the crew |
+| 15 | Test experimental technology | A jungle planet thick with life | An alien probe draining power |
+| 16 | Shore leave that goes wrong | Deep space between the stars | Memories that aren't the crew's own |
+| 17 | Carry a message across the Neutral Zone | A Klingon prison world | A crossing into a mirror universe |
+| 18 | Host a first contact aboard the Pelion | A Romulan listening post | A machine that remembers the Pelion |
 
-| d12 | Twist | Ticking clock (segments) | Key character |
+| 3d6 | Twist | Ticking clock (segments) | Key character |
 |---|---|---|---|
-| 1 | Klingons arrive with their own claim | Orbit decays (6) | An idealistic Federation ambassador |
-| 2 | The people asking for help are lying | Warp core breach (4) | A Klingon captain with a grudge |
-| 3 | A crew member's complication comes into play | Klingon battle cruiser arrives (6) | A stranded Orion trader |
-| 4 | Orders conflict with doing the right thing | The disease reaches the ship (8) | A brilliant, reckless scientist |
-| 5 | The Prime Directive forbids interfering | The storm closes the beam-out window (4) | A colony leader hiding a secret |
-| 6 | A cloaked Romulan ship is watching | Life support fails on the station (6) | A former Starfleet officer gone rogue |
-| 7 | Orion pirates want the same prize | The anomaly collapses (6) | A local child who has seen too much |
-| 8 | The Pelion's systems start failing | Peace talks break down (8) | A disapproving Vulcan observer |
-| 9 | A respected visitor has a hidden agenda | The hostages' air runs out (4) | An old friend of one of the crew |
-| 10 | The 'threat' is only defending itself | The star goes nova (8) | A Romulan who wants to defect |
-| 11 | Contact with Starfleet is cut off | Shields fail under bombardment (4) | A Starfleet admiral with sealed orders |
-| 12 | A civilian is trapped out of reach | The away team is discovered (6) | An android that wants to be free |
+| 3 | The captain has been replaced | The time loop resets (4) | A crew member's future self |
+| 4 | The enemy is a Federation colony | The ship's power drains (6) | A legend thought dead |
+| 5 | Klingons arrive with their own claim | Orbit decays (6) | An idealistic Federation ambassador |
+| 6 | The people asking for help are lying | Warp core breach (4) | A Klingon captain with a grudge |
+| 7 | A crew member's complication comes into play | Klingon battle cruiser arrives (6) | A stranded Orion trader |
+| 8 | Orders conflict with doing the right thing | The disease reaches the ship (8) | A brilliant, reckless scientist |
+| 9 | The Prime Directive forbids interfering | The storm closes the beam-out window (4) | A colony leader hiding a secret |
+| 10 | A cloaked Romulan ship is watching | Life support fails on the station (6) | A former Starfleet officer gone rogue |
+| 11 | Orion pirates want the same prize | The anomaly collapses (6) | A local child who has seen too much |
+| 12 | The Pelion's systems start failing | Peace talks break down (8) | A disapproving Vulcan observer |
+| 13 | A respected visitor has a hidden agenda | The hostages' air runs out (4) | An old friend of one of the crew |
+| 14 | The 'threat' is only defending itself | The star goes nova (8) | A Romulan who wants to defect |
+| 15 | Contact with Starfleet is cut off | Shields fail under bombardment (4) | A Starfleet admiral with sealed orders |
+| 16 | A civilian is trapped out of reach | The away team is discovered (6) | An android that wants to be free |
+| 17 | The mission was a test | The duel at dawn (4) | A godlike child |
+| 18 | History must not change | The Klingon ultimatum (6) | An admiral's spy aboard |
 
 *Example:* 3, 9, 5, 10, 2, 4 gives **first contact** at **a starbase in crisis**, where **a signal repeats a crew member's name**; **the "threat" is only defending itself**, a **warp core breach** clock (4) is ticking, and **a brilliant, reckless scientist** is in the middle of it.
 

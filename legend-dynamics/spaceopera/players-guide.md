@@ -380,7 +380,7 @@ Gain one point when one of your complications creates a meaningful problem you a
 
 The ship has its own sheet, tracked like an injury track. Encounters stay descriptive: the GM states what's at stake before rolls and narrates what each box means.
 
-- **Taking hits.** A normal hit (a blaster cannon, a missile) marks 1 box; a heavy hit (a torpedo, ramming) marks 2. Once Shields are down, each hit marks the Hull and a system: the GM chooses, or roll 1d6: 1 Weapons, 2 Engines, 3 Sensors, 4 Comms, 5 Life support, 6 GM's choice.
+- **Taking hits.** A normal hit (a blaster cannon, a missile) marks 1 box; a heavy hit (a torpedo, ramming) marks 2. Once Shields are down, each hit marks the Hull and a system: the GM chooses, or roll 3d6: 3–6 Weapons, 7–8 Engines, 9–10 Sensors, 11–12 Comms, 13–15 Life support, 16–18 GM's choice.
 - **Evading.** When an enemy ship hits, the pilot may roll **Piloting** once per exchange, like Dodge: success cancels the hit. Engine damage applies its penalty.
 - **Repairs.** Mid-crisis, a successful **Engineering** roll clears one box from Shields or a system (two on success by 5). The Hull can be patched by one box per scene, and fully repaired only in dock.
 - **Firing.** Gunners roll **Blasters** for the ship's guns, against the enemy ship's own tracks.
@@ -403,37 +403,45 @@ After a significant mission, the GM may authorize one relevant skill to advance 
 
 ## Mission seeds
 
-Roll 1d12 on each table, or pick what you like. The GM view in the creator rolls these for you and can start the clock.
+Roll 3d6 on each table and read the total, or pick what you like. Middle results come up most often; the strangest sit at 3, 4, 17 and 18. The GM view in the creator rolls these for you and can start the clock.
 
-| d12 | Mission | Place | Something strange |
+| 3d6 | Job or mission | Place | The trouble |
 |---|---|---|---|
-| 1 | Answer a distress call | A storm-wracked ocean world | A rift that bends time |
-| 2 | Survey an uncharted system | A dead world of ancient ruins | A creature made of energy |
-| 3 | Make first contact | A struggling frontier colony | An ancient machine that still works |
-| 4 | Escort a diplomatic envoy | An asteroid mining station | Duplicates of the crew |
-| 5 | Find a missing ship | A drifting derelict | A signal repeating a crew member's name |
-| 6 | Deliver urgent medicine | An ice moon of a gas giant | A planet-wide illusion |
-| 7 | Evacuate a colony | A world that hasn't left its planet | A door to another universe |
-| 8 | Patrol the Hegemony border | A nebula that blinds sensors | A plague no one recognizes |
-| 9 | Recover a lost artifact | A space station in crisis | A gravity well that traps ships |
-| 10 | Run a blockade | A world that seems too perfect | A godlike being with a test |
-| 11 | Test an experimental drive | A jungle world thick with life | A probe draining every power source |
-| 12 | Shore leave that goes wrong | The deep dark between the stars | Memories that aren't the crew's own |
+| 3 | Recover an imperial fleet stranded for centuries | A province isolated for six centuries, newly reopened | The corridor network shifts across a whole region |
+| 4 | Broker a peace inside the Hegemony | The Hegemony's throne world | An imperial fleet stranded for 300 years emerges |
+| 5 | Deliver cargo through a contested corridor | A Tessan exchange station | A corridor is collapsing |
+| 6 | Collect, or escape, a debt | A Concord colony on the frontier | A Hegemony fleet emerges from a reopened corridor |
+| 7 | Find a missing ship | A Vael flotilla | Mandate inquisitors are screening everyone |
+| 8 | Escort a refugee convoy | A Brulvek shipyard rusting in orbit | A rogue AI has taken over the systems |
+| 9 | Recover a stolen archive | A Veyari library world | A Kel radical cell plans an attack |
+| 10 | Smuggle a psionic past the Mandates | A Khaum cavern city | A plague engineered with biotech |
+| 11 | Survey a newly opened corridor | A dead Hegemony fortress | Two corporations at war by proxy |
+| 12 | Negotiate a contract between peoples | A Zhaq free city | An Ozhvek house's succession war |
+| 13 | Rescue hostages | A derelict generation ship | Stolen corridor charts |
+| 14 | Salvage a war wreck | A Corvani restoration world | An unpayable debt changes hands |
+| 15 | Expose a corporate crime | The Vesh homeworld, newly opened | Something old wakes in the ruins |
+| 16 | Protect a witness | A Draelin navigation guild-house | A cybernetic augment goes haywire |
+| 17 | Open a corridor no one has crossed | The heart of a corridor collapse | An emperor dies without an heir |
+| 18 | Steal an Ozhvek house's seal | A Sen observatory older than the Hegemony | A psionic awakening across a whole world |
 
-| d12 | Twist | Ticking clock (segments) | Key character |
+| 3d6 | Twist | Ticking clock (segments) | Key character |
 |---|---|---|---|
-| 1 | The Hegemony arrives with its own claim | Orbit decays (6) | An idealistic envoy |
-| 2 | The people asking for help are lying | Core breach (4) | A Hegemony captain with a grudge |
-| 3 | A character's complication comes into play | The Hegemony cruiser arrives (6) | A stranded trader |
-| 4 | Orders conflict with doing the right thing | The plague reaches the ship (8) | A brilliant, reckless scientist |
-| 5 | Interfering would break the law of first contact | The storm closes the window (4) | A colony leader hiding a secret |
-| 6 | A cloaked ship is watching | Life support fails (6) | A former officer gone rogue |
-| 7 | Syndicate pirates want the same prize | The rift collapses (6) | A local child who has seen too much |
-| 8 | The ship's systems start failing | Talks break down (8) | A disapproving observer |
-| 9 | A respected visitor has a hidden agenda | The hostages' air runs out (4) | An old friend of one of the crew |
-| 10 | The threat is only defending itself | The star goes nova (8) | A Hegemony officer who wants to defect |
-| 11 | Contact with home is cut off | Shields fail under fire (4) | An admiral with sealed orders |
-| 12 | A civilian is trapped out of reach | The landing party is discovered (6) | A Synth who wants to be free |
+| 3 | The corridors aren't natural | The corridor network shifts (8) | The Emperor's exiled heir |
+| 4 | A character is heir to an Ozhvek house | The imperial ultimatum (4) | A Sen who remembers the Foundation |
+| 5 | The client is the target | The corridor closes (6) | A Tessan reformer |
+| 6 | The cargo is a person | The debt comes due (4) | A Kel radical |
+| 7 | A character's complication comes into play | The fleet arrives (6) | A Dresh deserter |
+| 8 | Both sides hired you | The inquisitor's scan finishes (4) | A Veyari archivist |
+| 9 | The debt is forgeable | The station's life support fails (6) | A human entrepreneur |
+| 10 | The psionic is a child | The AI copies itself out (4) | A Shivar heretic |
+| 11 | The Hegemony was right, this time | The evidence is erased (4) | A Draelin chart-seller |
+| 12 | The rescue isn't wanted | The convoy is discovered (6) | A Vael flotilla elder |
+| 13 | The map is wrong | The plague spreads (8) | An Ozhvek exile |
+| 14 | The ally is a Mandate informant | The buyer walks away (4) | A Zhaq resistance cell |
+| 15 | The ship is alive | The corporation's lawyers arrive (6) | A Vesh delegate |
+| 16 | The wreck isn't empty | The corridor reopens (8) | An AI that wants to be free |
+| 17 | The Tessan planned the war | The succession is decided (8) | The first human to meet the Kel |
+| 18 | The AI is older than the Hegemony | The Mandate purge begins (6) | A psionic with no limits |
 
 ## The ship's log
 
@@ -895,8 +903,8 @@ GM commands need the **Manage Server** permission on the Discord server. Everyon
 | `/points newsession` | Start a session: everyone goes back to two Resolve points, and unused points are gone. |
 | `/points gain player:@name` | Award a Resolve point, e.g. for an accepted complication. |
 | `/points set player:@name points:3` | Correct a player's total. |
-| `/clock new name:"Orbit decays" segments:6 kind:danger` | Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use `kind:progress` for one that fills on successes. |
-| `/clock tick name:"Orbit decays"` | Fill one segment. Add `segments:2` for two, or `segments:-1` to undo. `/clock remove` deletes a clock. |
+| `/clock new name:"The corridor network shifts" segments:8 kind:danger` | Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use `kind:progress` for one that fills on successes. |
+| `/clock tick name:"The corridor network shifts"` | Fill one segment. Add `segments:2` for two, or `segments:-1` to undo. `/clock remove` deletes a clock. |
 | `/track mark name:shields` | Mark a box on a track; a partial name works ("shields" finds Shields). `/track clear` clears one, and `/track reset` clears them all. |
 | `/seed` | Roll an adventure seed: one line from each seed table, and the command to start its ticking clock. |
 | `/contest ... defender:me` | When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them. |
