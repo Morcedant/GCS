@@ -3775,7 +3775,9 @@ tr.lvl-U td.target { color: var(--muted); }
   };
   let roster = store.get(STORE_ROSTER, []);
   if (!Array.isArray(roster)) roster = [];
-  let ch = normalize(store.get(STORE_CURRENT, null) || example());
+  // A first visit opens on a new, blank character; the example is one click away in the ready-made list.
+  const freshStart = !store.get(STORE_CURRENT, null);
+  let ch = normalize(store.get(STORE_CURRENT, null) || blank());
 
   // ---- rules ----
   const speciesDef = () => SPECIES.find((x) => x[0] === ch.speciesId);
@@ -4978,6 +4980,7 @@ tr.lvl-U td.target { color: var(--muted); }
     window.addEventListener("resize", () => { size(); if (still) draw(0); });
   })();
 
+  if (freshStart) applyRoleSkills();
   bindFields();
   render();
   renderGM();
