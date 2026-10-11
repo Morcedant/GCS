@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Each game's Discord commands handout: <game folder>/discord-commands.html, a page to give players
-(players' commands first, then the GM's), in the look of that game's creator.
+(players' commands first, then the GM's, then how to set up the bot, with the bot's code to copy),
+in the look of that game's creator.
 
 The guides don't mention the bot at all. build-legend.py writes the handout for the Legend Dynamics
 packs; run this file to write the handouts for USS Pelion and Grimm.
@@ -8,7 +9,8 @@ packs; run this file to write the handouts for USS Pelion and Grimm.
 import html, json, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-GAMES_DIR = ROOT / "legend-dynamics" / "discord-bot" / "games"
+BOT = ROOT / "legend-dynamics" / "discord-bot"
+GAMES_DIR = BOT / "games"
 
 # Per game: the bot's /game choice, example names for the tables, and the old command names it keeps.
 EXAMPLES = {
@@ -100,6 +102,92 @@ def card(cmd, text):
             f"<p>{inline(text)}</p></li>")
 
 
+def li(items):
+    return "".join(f"<li>{x}</li>" for x in items)
+
+
+def link(url, text=None):
+    return f'<a href="{url}" target="_blank" rel="noopener">{text or url}</a>'
+
+
+def setup(g):
+    """How to make the bot: the README's steps, for this game, as HTML."""
+    gid, title = g["id"], html.escape(g["title"])
+    W = "<code>https://legend-dice.YOUR-NAME.workers.dev</code>"
+    upgrade = ""
+    if g.get("old"):
+        name, pts = g["old"]
+        upgrade = f"""
+    <h3>Already running the {title} bot?</h3>
+    <p>You don't need a new bot. Open your existing Worker (<code>{name}-dice</code>), choose <strong>Edit code</strong>,
+    paste in the new bot code and <strong>Deploy</strong>. Then add <code>DISCORD_BOT_TOKEN</code> back for a moment, open <code>/register</code> once,
+    and delete the token again. Your <code>{pts.upper()}</code> storage and clocks carry over, your servers stay on {title},
+    and <code>/{name}</code> and <code>/{pts}</code> keep working alongside the new names.</p>"""
+    steps = [
+        ("Create the Discord application", [
+            f"Go to {link('https://discord.com/developers/applications')} and choose <strong>New Application</strong>. Name it, e.g. <em>{title} Dice</em>.",
+            "On <strong>General Information</strong>, copy the <strong>Application ID</strong> and the <strong>Public Key</strong>.",
+            "On <strong>Bot</strong>, choose <strong>Reset Token</strong> and copy the token. Keep it private; you only need it once, to register the commands.",
+        ]),
+        ("Create the Worker", [
+            f"Sign up at {link('https://dash.cloudflare.com')}. It's free, and Workers need no card.",
+            "Open <strong>Workers &amp; Pages → Create</strong>. Choose <strong>Start with Hello World!</strong>, name it <code>legend-dice</code>, and <strong>Deploy</strong> the starter. Skip the GitHub and static-file options.",
+            "Choose <strong>Edit code</strong> (top right). Replace everything in the open file with the <strong>bot code</strong> below, then <strong>Deploy</strong>.",
+            "In the Worker's <strong>Settings → Variables and Secrets</strong>, add:"
+            "<ul class=\"vars\">"
+            "<li><code>DISCORD_PUBLIC_KEY</code> = the Public Key</li>"
+            "<li><code>DISCORD_APPLICATION_ID</code> = the Application ID</li>"
+            "<li><code>DISCORD_BOT_TOKEN</code> = the bot token (type <strong>Secret</strong>)</li>"
+            f"<li><code>DEFAULT_GAME</code> = <code>{gid}</code>, so new servers start on {title}</li></ul>",
+            f"Note the Worker's address, like {W}.",
+        ]),
+        ("Connect storage", [
+            "Points, clocks, tracks and <code>/game set</code> need it. In Cloudflare, open <strong>Storage &amp; databases → Workers KV → Create</strong> and name it <code>legend-store</code>.",
+            "Open the <code>legend-dice</code> Worker, then <strong>Settings → Bindings → Add → KV namespace</strong>. Set <strong>Variable name</strong> to <code>STORE</code>, pick <code>legend-store</code> and save.",
+            "The free plan allows 1,000 storage changes a day, which is plenty for a table.",
+        ]),
+        ("Connect Discord", [
+            "On the Discord app's <strong>General Information</strong> page, paste the Worker address into <strong>Interactions Endpoint URL</strong> and save. If it saves, the connection works.",
+            f"Open {W.replace('</code>', '/register</code>')} in your browser. It should say “Registered /roll, /contest, /assist, /points, /clock, /track, /seed and /game.” Then delete <code>DISCORD_BOT_TOKEN</code> from the Worker settings.",
+            "On the app's <strong>Installation</strong> page, make sure <strong>Guild Install</strong> includes the <code>applications.commands</code> scope. Open the install link and pick your server. The bot needs no other permissions.",
+            f"In Discord, run <code>/game set game:{title}</code>. New commands can take a minute to appear.",
+        ]),
+    ]
+    trouble = [
+        ("Opening the Worker address shows “Hello World!”", "The bot code wasn't deployed. Paste it again in <strong>Edit code</strong> and <strong>Deploy</strong>."),
+        ("An error page (e.g. 1101)", "Only part of the code was pasted. Copy it again and paste the whole thing."),
+        ("“Legend Dynamics dice bot is running.” with <code>!!</code> lines", "A setting is missing or mistyped; the line says which."),
+        ("“Interactions endpoint URL could not be verified”", "The Public Key in Cloudflare doesn't match the app, or the URL is wrong. Use the exact <code>https://…workers.dev</code> address with nothing after it."),
+        ("<code>/register</code> says “Discord refused the command (401)”", "The bot token is wrong or was reset. Reset it on the <strong>Bot</strong> page and update <code>DISCORD_BOT_TOKEN</code>."),
+        ("The commands don't appear in Discord", "The app isn't installed on that server, or Discord hasn't refreshed. Press Ctrl+R (Cmd+R on a Mac)."),
+        ("“The application did not respond”", "The Interactions Endpoint URL points somewhere else, or the Worker code is out of date."),
+        ("“…need the bot's storage”", "Bind the KV namespace as <code>STORE</code> (step 3)."),
+        ("“Only the GM can change the game”", "<code>/game set</code> needs the <strong>Manage Server</strong> permission."),
+    ]
+    code = html.escape((BOT / "src" / "worker.js").read_text(), quote=False)
+    kb = len(code.encode()) // 1024
+    return f"""
+  <section class="gm" id="setup">
+    <h2>Setting up the bot</h2>
+    <p class="note">For the GM, once per group: about 15 minutes, no installs, free. The bot runs on Cloudflare Workers, so there's no server to keep running.
+    One bot serves every game; each Discord server picks its own with <code>/game set</code>.</p>
+    {upgrade}
+    <ol class="setup">
+      {"".join(f'<li><h3>{h}</h3><ol class="sub">{li(items)}</ol></li>' for h, items in steps)}
+    </ol>
+    <div class="code-box">
+      <div class="cmd-line"><strong class="code-label">Bot code <span class="muted">(worker.js, {kb} KB)</span></strong>
+        <button type="button" class="copy" id="copy-code" data-target="bot-code">Copy bot code</button></div>
+      <textarea id="bot-code" readonly spellcheck="false" aria-label="Bot code">{code}</textarea>
+    </div>
+    <details>
+      <summary>If it isn't working</summary>
+      <p class="note">Open the Worker's address in a browser first; what it shows tells you which side to look at.</p>
+      <dl class="trouble">{"".join(f"<dt>{a}</dt><dd>{b}</dd>" for a, b in trouble)}</dl>
+    </details>
+  </section>"""
+
+
 def handout(g, creator):
     fonts, tok = theme_of(creator)
     P, old = g["point"], g.get("old")
@@ -143,6 +231,24 @@ code {{ font-family: var(--code); font-size: .9em; color: var(--chrome); }}
 .note {{ margin: 0; color: var(--muted); }}
 .gm {{ border-top: 1px solid var(--line); padding-top: 24px; }}
 footer {{ color: var(--muted); font-size: .9rem; }}
+h3 {{ font: 600 1.05rem/1.25 var(--display); margin: 0 0 6px; color: var(--fg); }}
+a {{ color: var(--chrome); }}
+a:focus-visible, summary:focus-visible {{ outline: 2px solid var(--fg); outline-offset: 2px; }}
+.setup {{ margin: 0; padding-left: 1.4em; display: grid; gap: 18px; }}
+.setup > li::marker {{ font: 600 1.05rem var(--display); color: var(--gold); }}
+.sub {{ margin: 0; padding-left: 1.2em; display: grid; gap: 6px; list-style: lower-alpha; }}
+.vars {{ margin: 6px 0 0; padding-left: 1.1em; display: grid; gap: 2px; }}
+.sub li, .vars li {{ overflow-wrap: anywhere; }}
+.code-box {{ background: var(--glass); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 10px; min-width: 0; }}
+.code-label {{ flex: 1; font: 600 1rem/1.3 var(--display); }}
+.muted {{ color: var(--muted); font-weight: 400; }}
+textarea {{ width: 100%; height: 11rem; resize: vertical; background: var(--space); color: var(--muted); border: 1px solid var(--line);
+  border-radius: 6px; padding: 10px; font: .78rem/1.4 var(--code); white-space: pre; }}
+details {{ display: grid; gap: 10px; }}
+summary {{ cursor: pointer; font: 600 1.05rem/1.3 var(--display); color: var(--gold); }}
+.trouble {{ margin: 10px 0 0; display: grid; gap: 4px 0; }}
+.trouble dt {{ font-weight: 600; margin-top: 8px; }}
+.trouble dd {{ margin: 0; color: var(--muted); }}
 </style>
 <div class="wrap">
   <header>
@@ -172,12 +278,14 @@ footer {{ color: var(--muted); font-size: .9rem; }}
 
   <section class="gm">
     <h2>For the GM</h2>
-    <p class="note">GM commands need the <strong>Manage Server</strong> permission on the Discord server. Everyone can see clocks, tracks and points.</p>
+    <p class="note">GM commands need the <strong>Manage Server</strong> permission on the Discord server. Everyone can see clocks, tracks and points.
+    No bot yet? See <a href="#setup">Setting up the bot</a>.</p>
     <ul class="cmds">
       {"".join(card(c, t) for c, t in rows_gm)}
     </ul>
     <p class="note">Each server keeps its own points, clocks and tracks. If a command is missing from Discord's list, open the bot's <code>/register</code> page once, then press Ctrl+R in Discord.</p>
   </section>
+{setup(g)}
 
   <footer>{title}. Commands work the same in every game the bot runs; the examples use this game's names.</footer>
 </div>
@@ -185,9 +293,14 @@ footer {{ color: var(--muted); font-size: .9rem; }}
 document.addEventListener("click", (e) => {{
   const b = e.target.closest(".copy");
   if (!b) return;
-  const done = (ok) => {{ b.textContent = ok ? "Copied" : "Select it"; b.classList.toggle("done", ok); setTimeout(() => {{ b.textContent = "Copy"; b.classList.remove("done"); }}, 1600); }};
-  const pick = () => {{ const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }};
-  try {{ navigator.clipboard.writeText(b.dataset.cmd).then(() => done(true), () => {{ pick(); done(false); }}); }}
+  const box = b.dataset.target && document.getElementById(b.dataset.target);
+  const label = b.textContent, text = box ? box.value : b.dataset.cmd;
+  const done = (ok) => {{ b.textContent = ok ? "Copied" : "Selected: copy it"; b.classList.toggle("done", ok); setTimeout(() => {{ b.textContent = label; b.classList.remove("done"); }}, 2000); }};
+  const pick = () => {{
+    if (box) {{ box.focus(); box.select(); return; }}
+    const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  }};
+  try {{ navigator.clipboard.writeText(text).then(() => done(true), () => {{ pick(); done(false); }}); }}
   catch (_) {{ pick(); done(false); }}
 }});
 </script>

@@ -246,6 +246,9 @@ def quickref(pack, t):
     return "".join(f"\n            <dt>{html.escape(a)}</dt><dd>{html.escape(b)}</dd>" for a, b in core + pack.get("quickRef", [])) + "\n          "
 
 
+HANDOUTS = []  # (game info, folder) for each pack built; the handouts are written after the bot code, which they carry.
+
+
 def build(pid, docx):
     pdir = LD / "packs" / pid
     pack = json.loads((pdir / "pack.json").read_text())
@@ -273,8 +276,8 @@ def build(pid, docx):
     tpl = re.sub(r"<!-- GUIDE:START -->.*?<!-- GUIDE:END -->", lambda _: "<!-- GUIDE:START -->\n" + guide_html + "<!-- GUIDE:END -->", tpl, flags=re.S)
     (out / "index.html").write_text(tpl)
     g = discord_handout.game_info(pid, t["title"], t["point"], pack.get("tracks", []), pack.get("seeds", {}), t["tracksTitle"])
-    discord_handout.write_handout(g, out)
-    print(f"built {out.relative_to(ROOT)}/index.html, players-guide.md and discord-commands.html")
+    HANDOUTS.append((g, out))
+    print(f"built {out.relative_to(ROOT)}/index.html and players-guide.md")
     if docx:
         name = re.sub(r"[^A-Za-z0-9]+", "_", t["guideTitle"]).strip("_") + ".docx"
         subprocess.run(["pandoc", "-f", "markdown", "-o", str(out / name)], input=md, text=True, check=True)
@@ -341,6 +344,10 @@ def main():
         build(pid, a.docx)
     core_rules(a.docx)
     bot_packs()
+    for g, out in HANDOUTS:
+        discord_handout.write_handout(g, out)
+        print(f"wrote {(out / 'discord-commands.html').relative_to(ROOT)}")
+    discord_handout.main()  # USS Pelion and Grimm carry the same bot code
 
 
 if __name__ == "__main__":
