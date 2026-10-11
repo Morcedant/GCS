@@ -20,7 +20,7 @@ CREATORS = {
     "fantasy": "https://claude.ai/artifact/8XnPkroZN3TsAzhsLaZCLM",
 }
 # Suggested Squarespace page URLs (set in each page's settings).
-SLUGS = {"western": "/dust-and-damnation", "spaceopera": "/beyond-the-light", "fantasy": "/the-shattered-crown"}
+SLUGS = {"western": "/dust-and-damnation", "spaceopera": "/fracture-lines", "fantasy": "/the-shattered-crown"}
 GENRE = {"western": "Gothic Western", "spaceopera": "Space opera", "fantasy": "Sword and sorcery"}
 CORE_SLUG = "/core-rules"
 

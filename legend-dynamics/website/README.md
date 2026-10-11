@@ -2,7 +2,7 @@
 
 A custom design for a Squarespace 7.1 site:
 - **The brand:** ink, parchment and brass, for the whole site.
-- **Game themes:** Dust & Damnation, Beyond the Light and The Shattered Crown, each switched on for that game's own page.
+- **Game themes:** Dust & Damnation, Fracture Lines and The Shattered Crown, each switched on for that game's own page.
 
 Open [`preview.html`](preview.html) in a browser to see the home page, the three game pages and the core rules before you start.
 
@@ -28,7 +28,7 @@ Custom CSS works on every Squarespace plan. **Code Injection** (the fonts and th
    |---|---|
    | Home | `/` |
    | Dust & Damnation | `/dust-and-damnation` |
-   | Beyond the Light | `/beyond-the-light` |
+   | Fracture Lines | `/fracture-lines` |
    | The Shattered Crown | `/the-shattered-crown` |
    | Core Rules | `/core-rules` |
 

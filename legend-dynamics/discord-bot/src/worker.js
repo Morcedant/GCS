@@ -211,7 +211,7 @@ export const PACKS = {
  },
  "spaceopera": {
   "id": "spaceopera",
-  "title": "Beyond the Light",
+  "title": "Fracture Lines",
   "point": "Resolve",
   "mission": "Mission",
   "trackTitle": "Ship status",
@@ -1205,7 +1205,7 @@ export function commands() {
     { name: "seed", description: "Roll an adventure seed from the game's tables" },
     {
       name: "game",
-      description: "Which game this server plays (Dust & Damnation, Beyond the Light, The Shattered Crown, Grimm, USS Pelion)",
+      description: "Which game this server plays (Dust & Damnation, Fracture Lines, The Shattered Crown, Grimm, USS Pelion)",
       options: [
         { type: 1, name: "show", description: "Show this server's game" },
         { type: 1, name: "set", description: "GM: choose this server's game",
