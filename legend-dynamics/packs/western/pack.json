@@ -1510,17 +1510,17 @@
   [
    "revolver",
    "Revolver",
-   "Six shots; reloading takes an action. Hits mark 2 boxes."
+   "Six shots; reloading takes an action. Hits mark 2 boxes. Short range."
   ],
   [
    "rifle",
    "Rifle",
-   "A lever-action repeater with fifteen shots and long range. Hits mark 2 boxes."
+   "A lever-action repeater with fifteen shots. Hits mark 2 boxes. Long range."
   ],
   [
    "shotgun",
    "Shotgun",
-   "Two barrels. Devastating close up (3 boxes and Dying), weak beyond a few paces (1 box)."
+   "Two barrels. Devastating close up (3 boxes and Dying), weak beyond a few paces (1 box). Close range (Short for 1 box)."
   ],
   [
    "knife",
@@ -1565,7 +1565,7 @@
   [
    "dynamite",
    "Dynamite",
-   "Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre."
+   "Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre. Close range (thrown)."
   ],
   [
    "silver",
@@ -1575,7 +1575,7 @@
   [
    "holywater",
    "Holy water",
-   "Three flasks. Thrown or splashed, it burns undead and demons (1 box) and breaks minor hexes."
+   "Three flasks. Thrown or splashed, it burns undead and demons (1 box) and breaks minor hexes. Close range (thrown)."
   ],
   [
    "stakes",

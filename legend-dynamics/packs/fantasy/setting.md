@@ -8,20 +8,22 @@ The years are counted **After the Shattering (AS)**. The story begins in the yea
 
 <!-- SECTION:weapons -->
 
-| Weapon | Boxes on a hit | What the injury looks like |
-|---|---|---|
-| Fists, kicks, dirty tricks | 1 | Bruises, a split lip, cracked ribs |
-| Dagger, club, sling | 1 | A cut, a stab or a crack on the skull |
-| Sword, axe, mace, spear | 2 | A deep wound or a broken bone |
-| Greatsword, greataxe, polearm | 2; a hit by 5 or more leaves the target Dying | A ruinous wound |
-| Bow, crossbow | 2 | An arrow or bolt buried deep |
-| Wheel-lock pistol | 2 | A gunshot wound |
-| Arquebus or hand-cannon | 3, and Dying | A ruinous wound |
-| Powder bomb | 1 to everyone nearby, 3 and Dying at the center | Blast and burns; Dodge means diving clear |
-| Claws, fangs, venom | 2 (venom: Body roll or Reeling) | Torn flesh, poison in the blood |
-| Shadow Bolt | 2 | Black frost in the wound |
-| Fall | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
-| Fire | 1 each round in the flames | Burns |
+| Weapon | Range | Boxes on a hit | What the injury looks like |
+|---|---|---|---|
+| Fists, kicks, dirty tricks | Melee | 1 | Bruises, a split lip, cracked ribs |
+| Dagger or club | Melee; dagger Close thrown | 1 | A cut, a stab or a crack on the skull |
+| Sling | Short | 1 | A crack on the skull |
+| Sword, axe, mace, spear | Melee | 2 | A deep wound or a broken bone |
+| Greatsword, greataxe, polearm | Melee | 2; a hit by 5 or more leaves the target Dying | A ruinous wound |
+| Bow | Long | 2 | An arrow buried deep |
+| Crossbow | Medium | 2 | A bolt buried deep |
+| Wheel-lock pistol | Close | 2 | A gunshot wound |
+| Arquebus or hand-cannon | Short | 3, and Dying | A ruinous wound |
+| Powder bomb | Close (thrown) | 1 to everyone nearby, 3 and Dying at the center | Blast and burns; Dodge means diving clear |
+| Claws, fangs, venom | Melee | 2 (venom: Body roll or Reeling) | Torn flesh, poison in the blood |
+| Shadow Bolt | Short | 2 | Black frost in the wound |
+| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fire | — | 1 each round in the flames | Burns |
 
 **Gunpowder** is common but slow. Anyone can carry a pistol or an arquebus, but reloading takes a **full round** (a crossbow takes one action), and rain or seawater ruins the powder until it's dried. An arquebus misfires on a natural 17 or 18; any missile weapon fails on a natural 18 (a string snaps, a bolt jams, the powder fizzles).
 

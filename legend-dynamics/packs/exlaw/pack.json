@@ -1934,9 +1934,9 @@
     "Blast",
     "energy",
     [
-     "Class I attack at pistol range.",
-     "Class II attack at rifle range.",
-     "Class III attack; or Class II against everyone in a small area."
+     "Class I attack; effective at Short range, like a pistol.",
+     "Class II attack; effective at Long range, like a rifle.",
+     "Class III attack, effective at Extreme range; or Class II against everyone in a small area."
     ],
     {},
     "fire, ice, light, plasma, electricity or force"
@@ -2096,9 +2096,12 @@
     "Super Leaping",
     "body",
     [
-     "Leap onto a rooftop.",
-     "Leap a city block.",
-     "Leap a mile."
+     "Leap 30 ft up or 100 ft across: onto a three-story roof.",
+     "Leap 100 ft up or a city block (300 ft) across.",
+     "Leap a quarter mile up or a mile across.",
+     "Leap a mile up or 5 miles across.",
+     "Leap 5 miles up or 25 miles across.",
+     "Leap into the stratosphere, or 100 miles and more across."
     ],
     {},
     ""
@@ -2391,9 +2394,12 @@
     "Teleport",
     "control",
     [
-     "Jump to a place you can see.",
-     "Jump to a place you know within a city, with one passenger.",
-     "Jump across the world with a small group."
+     "Jump to a place in line of sight, up to about 100 yards; just you.",
+     "Jump anywhere you know within 50 miles, with one passenger.",
+     "Jump anywhere on Earth you know, with up to 4 passengers.",
+     "Anywhere on Earth, even places you've only seen in photos; up to 20 passengers or a vehicle.",
+     "Low orbit or the Moon; a building's worth of people and things.",
+     "Another world or dimension, without a door."
     ],
     {},
     ""
@@ -2612,6 +2618,10 @@
   [
    "Speed and Flight",
    "Speed I 70 mph, II 200 mph, III Mach 1, IV Mach 3, V Mach 10, VI Mach 25+. Flight I 70 mph, II 300 mph, III Mach 2, IV Mach 5, V Mach 10, VI Mach 25+ (orbit). Pushing reaches the next Class for one action."
+  ],
+  [
+   "Leap and Teleport",
+   "Leap (up/across): I 30/100 ft, II 100/300 ft, III ¼ mile/1 mile, IV 1/5 mi, V 5/25 mi, VI 100+ mi. Teleport: I line of sight 100 yd, II 50 mi (+1), III anywhere known on Earth (+4), IV seen in photos (+20), V orbit/Moon, VI other worlds."
   ],
   [
    "Damage",

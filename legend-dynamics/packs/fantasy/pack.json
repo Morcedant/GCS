@@ -1520,27 +1520,27 @@
   [
    "bow",
    "Bow and quiver",
-   "Twenty arrows. Hits mark 2 boxes."
+   "Twenty arrows. Hits mark 2 boxes. Long range."
   ],
   [
    "crossbow",
    "Crossbow and bolts",
-   "Twelve bolts; reloading takes an action. +2 to hit at short range. Hits mark 2 boxes."
+   "Twelve bolts; reloading takes an action. +2 to hit at Close range. Hits mark 2 boxes. Medium range."
   ],
   [
    "pistol",
    "Wheel-lock pistol",
-   "One shot; reloading takes a full round. Hits mark 2 boxes. Rain ruins the powder."
+   "One shot; reloading takes a full round. Hits mark 2 boxes. Rain ruins the powder. Close range."
   ],
   [
    "arquebus",
    "Arquebus",
-   "One shot; reloading takes a full round. Hits mark 3 boxes and leave the target Dying; misfires on a natural 17–18. Rain ruins the powder."
+   "One shot; reloading takes a full round. Hits mark 3 boxes and leave the target Dying; misfires on a natural 17–18. Rain ruins the powder. Short range."
   ],
   [
    "bombs",
    "Powder bombs",
-   "Three, thrown with Athletics: 1 box to everyone nearby, 3 and Dying at the center."
+   "Three, thrown with Athletics: 1 box to everyone nearby, 3 and Dying at the center. Close range (thrown)."
   ],
   [
    "mail",

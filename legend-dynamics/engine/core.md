@@ -193,13 +193,29 @@ Run a chase as a progress clock for the pursuers against a danger clock for the 
 
 ## Turn order and actions
 
-Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
+Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance (up to 10 yards: the Close band below) and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
 
 ## Attacking and defending
 
 Roll {{rangedSkill}} for a ranged attack, {{meleeSkill}} for a weapon in hand, or {{unarmedSkill}} for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
+
+## Range
+
+Distances fall into five bands:
+
+| Band | Distance | For example |
+|---|---|---|
+| Close | Up to 10 yards | Across a room; one move covers it |
+| Short | Up to 50 yards | Across a street or a courtyard |
+| Medium | Up to 150 yards | A city block, a long field |
+| Long | Up to 500 yards | Across a valley, a park or a harbor |
+| Extreme | Up to a mile, in line of sight | Rooftop to rooftop across a town |
+
+Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand and fists reach only someone next to you; move into reach as part of your turn. A thrown weapon's effective band is Close.
+
+Moving: your move each turn covers the Close band. Give up your action to run and you cover Short instead.
 
 ## Injury
 

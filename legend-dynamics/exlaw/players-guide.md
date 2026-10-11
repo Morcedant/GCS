@@ -311,13 +311,29 @@ Run a chase as a progress clock for the pursuers against a danger clock for the 
 
 ## Turn order and actions
 
-Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
+Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance (up to 10 yards: the Close band below) and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
 
 ## Attacking and defending
 
 Roll Firearms for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
+
+## Range
+
+Distances fall into five bands:
+
+| Band | Distance | For example |
+|---|---|---|
+| Close | Up to 10 yards | Across a room; one move covers it |
+| Short | Up to 50 yards | Across a street or a courtyard |
+| Medium | Up to 150 yards | A city block, a long field |
+| Long | Up to 500 yards | Across a valley, a park or a harbor |
+| Extreme | Up to a mile, in line of sight | Rooftop to rooftop across a town |
+
+Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand and fists reach only someone next to you; move into reach as part of your turn. A thrown weapon's effective band is Close.
+
+Moving: your move each turn covers the Close band. Give up your action to run and you cover Short instead.
 
 ## Injury
 
@@ -344,19 +360,21 @@ How many boxes a hit marks depends on the **weapon**, not on how well the attack
 
 Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every attack also has a **Class**, which matters against an Operant's **Defense** (see below). **Powers** mark boxes by their Class: **Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3** (see *Powers*).
 
-| Weapon | Class | Boxes on a hit | What the injury looks like |
-|---|---|---|---|
-| Fists, kicks, a baton | I | 1 | Bruises, a cracked rib, a concussion |
-| Knife | I | 1 | A cut or stab wound |
-| Pistol, submachine gun or rifle | I | 2 | A gunshot wound |
-| Shotgun, within a few paces | I | 3, and Dying | A ruinous wound |
-| Shotgun, farther away | I | 1 | Scattered pellets |
-| Sniper or heavy rifle | II | 3, and Dying | A ruinous wound |
-| Taser | — | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
-| Heavy machine gun, Aegis arm cannon | II | 2 | |
-| Anti-tank rocket, explosives | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
-| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
-| Fire | — | 1 each round in the flames | Burns |
+| Weapon | Range | Class | Boxes on a hit | What the injury looks like |
+|---|---|---|---|---|
+| Fists, kicks, a baton | Melee | I | 1 | Bruises, a cracked rib, a concussion |
+| Knife | Melee; Close thrown | I | 1 | A cut or stab wound |
+| Pistol or submachine gun | Short | I | 2 | A gunshot wound |
+| Rifle | Long | I | 2 | A gunshot wound |
+| Shotgun, at Close range | Close | I | 3, and Dying | A ruinous wound |
+| Shotgun, at Short range | Short (no effect beyond) | I | 1 | Scattered pellets |
+| Sniper or heavy rifle | Extreme (−2 at Close) | II | 3, and Dying | A ruinous wound |
+| Taser | Close | — | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
+| Heavy machine gun, Aegis arm cannon | Long | II | 2 | Torn apart |
+| Anti-tank rocket | Long | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
+| Grenade or explosive charge | Close (thrown) | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
+| Fall | — | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fire | — | — | 1 each round in the flames | Burns |
 
 **Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack whose Class is **above** your Defense hits in full; one **equal** to it marks one box fewer; one **below** it does nothing. A bulletproof Operant (Defense II) ignores pistols and rifles, and an Aegis cannon still marks a box.
 
@@ -616,6 +634,7 @@ Every Operant has powers, and every power has a **Class** from I to VI. Player c
 - **Rolling.** Roll **Powers** to aim a power at someone, or to use it with skill: precisely, at a distance, around bystanders. Passive powers (Toughness, Regeneration, Speed and the like) just work. Targets resist with **Dodge** (things you can dodge), **Body** (things that work on the body) or **Will** (things that work on the mind).
 - **Damage.** A power marks boxes by its Class: Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3. Ordinary weapons mark the boxes in their table (see *Personal combat*).
 - **Defense.** An attack above your Defense hits in full; an equal one marks a box fewer; a lower one does nothing.
+- **Range.** Unless a power says otherwise, a ranged power's effective band (see *Range* in Personal combat) is **Short at Class I, Long at Class II, Extreme at Class III**, and miles at Class IV and above, out to the horizon. Mind powers keep the reach their descriptions give: touch, a room, sight or a city.
 - **Pushing.** For one action, use a power one Class higher than you have it, and mark a box of **Strain**.
 
 **Strain** is your personal track:
@@ -662,7 +681,7 @@ After a significant case, the GM may allow one of these **instead of a skill ste
 
 | Power | Class I | Class II | Class III |
 |---|---|---|---|
-| **Blast** (fire, ice, light, plasma, electricity or force) | Class I attack at pistol range. | Class II attack at rifle range. | Class III attack; or Class II against everyone in a small area. |
+| **Blast** (fire, ice, light, plasma, electricity or force) | Class I attack; effective at Short range, like a pistol. | Class II attack; effective at Long range, like a rifle. | Class III attack, effective at Extreme range; or Class II against everyone in a small area. |
 | **Elemental Control** (choose air, earth, water or plants) | Shape a little of your element nearby: a gust, a mud patch, grasping vines. | Shape a room's worth: walls of earth, a waterspout, a thicket; Class II attacks. | Shape a city block's worth: a tremor, a flood surge, a forest overnight. |
 | **Weather Control** | Fog, wind or rain around you for a scene. | A storm over a neighborhood; lightning as a Class II attack. | A storm over a city: grounded aircraft, Class III lightning. |
 | **Darkness / Shadow** | Darken a room; +2 to Stealth in shadow. | Total darkness only you see through; step between shadows within sight. | Solid shadow constructs (Class II attacks or barriers); swallow a block in night. |
@@ -680,7 +699,7 @@ After a significant case, the GM may allow one of these **instead of a skill ste
 | **Force Field** | Defense I for you, for a scene. | Defense II for you, or Defense I around a small group. | Defense III, or Defense II around a group; seal a doorway. |
 | **Speed** | Up to 70 mph, as fast as a car; act first in any round. | Up to 200 mph; run across water and up walls; two moves a round. | Mach 1 (about 760 mph); once a scene, two actions in a round. |
 | **Flight** | Fly up to 70 mph, as fast as a car. | Fly up to 300 mph, as fast as a light plane. | Mach 2 (about 1,500 mph): keep up with fighter jets. |
-| **Super Leaping** | Leap onto a rooftop. | Leap a city block. | Leap a mile. |
+| **Super Leaping** | Leap 30 ft up or 100 ft across: onto a three-story roof. | Leap 100 ft up or a city block (300 ft) across. | Leap a quarter mile up or a mile across. |
 | **Wall-Crawling** | Climb any wall as easily as walking. | Run up walls and across ceilings. | Cling upside down under a moving vehicle or aircraft. |
 | **Regeneration** | Clear one injury box after a scene's rest. | Clear one box at the end of each scene; a single hit never leaves you Dying. | Clear a box every few rounds; regrow lost limbs. |
 | **Adaptation** | Ignore one hazard: heat, cold, poison or thin air. | Breathe water and ignore all ordinary hazards. | Survive vacuum, the deep ocean and fire. |
@@ -714,7 +733,7 @@ After a significant case, the GM may allow one of these **instead of a skill ste
 | Power | Class I | Class II | Class III |
 |---|---|---|---|
 | **Telekinesis** | Move a small object you can see; disarm. | Lift a car; Class II attacks; hold a person still (Body resists). | Lift a truck; stop a falling plane; Class III attacks. |
-| **Teleport** | Jump to a place you can see. | Jump to a place you know within a city, with one passenger. | Jump across the world with a small group. |
+| **Teleport** | Jump to a place in line of sight, up to about 100 yards; just you. | Jump anywhere you know within 50 miles, with one passenger. | Jump anywhere on Earth you know, with up to 4 passengers. |
 | **Portals** *(GM)* | Open a door between two places you can see. | Open a door to anywhere you've been. | Open a door into Otherworld, a haven or Shadow Earth. |
 | **Summoning** | Call a minor spirit or creature that helps for a scene (+2 assistance). | Call a creature that fights beside you (a minor character with Class II attacks). | Call something powerful; it serves, at a price. |
 | **Warding** | Seal a door or circle against spirits and magic. | Protect a building; banish a minor spirit or creature (Will resists). | Protect a block; banish powerful beings back to Otherworld. |
@@ -730,12 +749,19 @@ After a significant case, the GM may allow one of these **instead of a skill ste
 
 ## Escalated Classes
 
-Most powers simply go further at Classes IV to VI. Speed and Flight have set top speeds at every Class, measured in multiples of the speed of sound (Mach 1 is about 760 mph). Player characters reach these Classes only by pushing (one action, one box of Strain); the GM's characters may have them outright.
+Most powers simply go further at Classes IV to VI. Speed, Flight, Super Leaping and Teleport have set limits at every Class: speeds in multiples of the speed of sound (Mach 1 is about 760 mph), and distances in feet and miles. Player characters reach these Classes only by pushing (one action, one box of Strain); the GM's characters may have them outright.
 
 | Power | Class IV | Class V | Class VI |
 |---|---|---|---|
 | **Speed** | Mach 3: cross a city in seconds; two actions every round. | Mach 10: cross a continent in minutes; three actions a round. | Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still. |
 | **Flight** | Mach 5: outfly any jet; cross an ocean in an hour or two. | Mach 10: anywhere on Earth within a couple of hours. | Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it). |
+| **Super Leaping** | Leap a mile up or 5 miles across. | Leap 5 miles up or 25 miles across. | Leap into the stratosphere, or 100 miles and more across. |
+| **Teleport** | Anywhere on Earth, even places you've only seen in photos; up to 20 passengers or a vehicle. | Low orbit or the Moon; a building's worth of people and things. | Another world or dimension, without a door. |
+
+## Leaping and teleporting
+
+- **Super Leaping:** one leap is your move for the turn. You land safely from any height your Class can leap; falling from higher marks boxes like any fall.
+- **Teleport:** one action. You can't arrive inside solid matter. A place you've never been is −2 to the Powers roll. On a natural 18 you arrive off target, as the GM decides: the wrong room, the wrong street, or somewhere much worse.
 
 ## Rituals
 

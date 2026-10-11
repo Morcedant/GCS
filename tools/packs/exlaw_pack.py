@@ -203,7 +203,7 @@ def P(i, n, g, a, b, c, note="", escalated=None, **f):
     return [i, n, g, [a, b, c] + (escalated or []), f, note]
 power_groups = [["energy", "Energy and attack"], ["body", "Body and movement"], ["mind", "Mind and senses"], ["control", "Control and the strange"]]
 power_list = [
-    P("blast", "Blast", "energy", "Class I attack at pistol range.", "Class II attack at rifle range.", "Class III attack; or Class II against everyone in a small area.", "fire, ice, light, plasma, electricity or force"),
+    P("blast", "Blast", "energy", "Class I attack; effective at Short range, like a pistol.", "Class II attack; effective at Long range, like a rifle.", "Class III attack, effective at Extreme range; or Class II against everyone in a small area.", "fire, ice, light, plasma, electricity or force"),
     P("elemental", "Elemental Control", "energy", "Shape a little of your element nearby: a gust, a mud patch, grasping vines.", "Shape a room's worth: walls of earth, a waterspout, a thicket; Class II attacks.", "Shape a city block's worth: a tremor, a flood surge, a forest overnight.", "choose air, earth, water or plants"),
     P("weather", "Weather Control", "energy", "Fog, wind or rain around you for a scene.", "A storm over a neighborhood; lightning as a Class II attack.", "A storm over a city: grounded aircraft, Class III lightning."),
     P("shadow", "Darkness / Shadow", "energy", "Darken a room; +2 to Stealth in shadow.", "Total darkness only you see through; step between shadows within sight.", "Solid shadow constructs (Class II attacks or barriers); swallow a block in night."),
@@ -218,7 +218,8 @@ power_list = [
       escalated=["Mach 3: cross a city in seconds; two actions every round.", "Mach 10: cross a continent in minutes; three actions a round.", "Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still."]),
     P("flight", "Flight", "body", "Fly up to 70 mph, as fast as a car.", "Fly up to 300 mph, as fast as a light plane.", "Mach 2 (about 1,500 mph): keep up with fighter jets.", "",
       escalated=["Mach 5: outfly any jet; cross an ocean in an hour or two.", "Mach 10: anywhere on Earth within a couple of hours.", "Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it)."]),
-    P("leaping", "Super Leaping", "body", "Leap onto a rooftop.", "Leap a city block.", "Leap a mile."),
+    P("leaping", "Super Leaping", "body", "Leap 30 ft up or 100 ft across: onto a three-story roof.", "Leap 100 ft up or a city block (300 ft) across.", "Leap a quarter mile up or a mile across.", "",
+      escalated=["Leap a mile up or 5 miles across.", "Leap 5 miles up or 25 miles across.", "Leap into the stratosphere, or 100 miles and more across."]),
     P("wallcrawl", "Wall-Crawling", "body", "Climb any wall as easily as walking.", "Run up walls and across ceilings.", "Cling upside down under a moving vehicle or aircraft."),
     P("regen", "Regeneration", "body", "Clear one injury box after a scene's rest.", "Clear one box at the end of each scene; a single hit never leaves you Dying.", "Clear a box every few rounds; regrow lost limbs."),
     P("adaptation", "Adaptation", "body", "Ignore one hazard: heat, cold, poison or thin air.", "Breathe water and ignore all ordinary hazards.", "Survive vacuum, the deep ocean and fire."),
@@ -242,7 +243,8 @@ power_list = [
     P("astral", "Astral Projection", "mind", "Leave your body to scout a building (your body is helpless).", "Travel across a city as a spirit; speak to spirits.", "Cross into Otherworld or Shadow Earth in spirit; fight spirits there."),
     P("intellect", "Super Intellect", "mind", "+2 to Intellect skills; learn any skill in days.", "Invent a working device in a week; solve the unsolvable in a scene.", "Understand any technology, alien or arcane; invent in hours."),
     P("telekinesis", "Telekinesis", "control", "Move a small object you can see; disarm.", "Lift a car; Class II attacks; hold a person still (Body resists).", "Lift a truck; stop a falling plane; Class III attacks."),
-    P("teleport", "Teleport", "control", "Jump to a place you can see.", "Jump to a place you know within a city, with one passenger.", "Jump across the world with a small group."),
+    P("teleport", "Teleport", "control", "Jump to a place in line of sight, up to about 100 yards; just you.", "Jump anywhere you know within 50 miles, with one passenger.", "Jump anywhere on Earth you know, with up to 4 passengers.", "",
+      escalated=["Anywhere on Earth, even places you've only seen in photos; up to 20 passengers or a vehicle.", "Low orbit or the Moon; a building's worth of people and things.", "Another world or dimension, without a door."]),
     P("portals", "Portals", "control", "Open a door between two places you can see.", "Open a door to anywhere you've been.", "Open a door into Otherworld, a haven or Shadow Earth.", gm=True),
     P("summoning", "Summoning", "control", "Call a minor spirit or creature that helps for a scene (+2 assistance).", "Call a creature that fights beside you (a minor character with Class II attacks).", "Call something powerful; it serves, at a price."),
     P("warding", "Warding", "control", "Seal a door or circle against spirits and magic.", "Protect a building; banish a minor spirit or creature (Will resists).", "Protect a block; banish powerful beings back to Otherworld."),
@@ -444,6 +446,7 @@ seeds = {
 }
 
 quick = [["Speed and Flight", "Speed I 70 mph, II 200 mph, III Mach 1, IV Mach 3, V Mach 10, VI Mach 25+. Flight I 70 mph, II 300 mph, III Mach 2, IV Mach 5, V Mach 10, VI Mach 25+ (orbit). Pushing reaches the next Class for one action."],
+         ["Leap and Teleport", "Leap (up/across): I 30/100 ft, II 100/300 ft, III ¼ mile/1 mile, IV 1/5 mi, V 5/25 mi, VI 100+ mi. Teleport: I line of sight 100 yd, II 50 mi (+1), III anywhere known on Earth (+4), IV seen in photos (+20), V orbit/Moon, VI other worlds."],
          ["Damage", "Fists, batons, knives: 1 box. Pistols, SMGs, rifles: 2. Shotgun close up, sniper rifle: 3 and Dying. Powers by Class: I = 1, II = 2, III = 2 and knocked down, IV+ = 3."],
          ["Defense", "Roll Powers to aim a power. An attack above your Defense hits in full; equal marks one box fewer; lower does nothing. Guns are Class I, sniper rifles, heavy weapons and Aegis cannons II, anti-tank and explosives III."],
          ["Strain", "Push: use a power one Class higher for one action and mark Strain. Strain 1: −1 to Powers, 2: −2, 3: wild on 16–18, 4: burned out until a full day's rest."],

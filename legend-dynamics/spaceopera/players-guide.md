@@ -243,11 +243,11 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 
 | Item | What it does |
 |---|---|
-| Slug pistol | Twelve rounds. Hits mark 2 boxes. |
-| Laser pistol | Twenty shots per cell; silent, no recoil. Hits mark 2 boxes. |
-| Slug carbine | Thirty rounds; can fire bursts. Hits mark 2 boxes. |
-| Plasma rifle | Ten shots per cell. Hits mark 3 boxes and leave the target Dying. |
-| Stunner | The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. |
+| Slug pistol | Twelve rounds. Hits mark 2 boxes. Short range. |
+| Laser pistol | Twenty shots per cell; silent, no recoil. Hits mark 2 boxes. Short range. |
+| Slug carbine | Thirty rounds; can fire bursts. Hits mark 2 boxes. Medium range. |
+| Plasma rifle | Ten shots per cell. Hits mark 3 boxes and leave the target Dying. Medium range. |
+| Stunner | The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. Close range. |
 | Vibroblade | A humming blade. Hits mark 2 boxes. |
 | Body armor | Once per fight, a hit that marks 2 or more boxes marks one fewer. Shows under scans. |
 | Vac suit | Air for six hours in vacuum or poison atmosphere. |
@@ -316,13 +316,29 @@ Run a chase as a progress clock for the pursuers against a danger clock for the 
 
 ## Turn order and actions
 
-Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
+Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance (up to 10 yards: the Close band below) and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
 
 ## Attacking and defending
 
 Roll Firearms for a ranged attack, Close Combat for a weapon in hand, or Close Combat for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
+
+## Range
+
+Distances fall into five bands:
+
+| Band | Distance | For example |
+|---|---|---|
+| Close | Up to 10 yards | Across a room; one move covers it |
+| Short | Up to 50 yards | Across a street or a courtyard |
+| Medium | Up to 150 yards | A city block, a long field |
+| Long | Up to 500 yards | Across a valley, a park or a harbor |
+| Extreme | Up to a mile, in line of sight | Rooftop to rooftop across a town |
+
+Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand and fists reach only someone next to you; move into reach as part of your turn. A thrown weapon's effective band is Close.
+
+Moving: your move each turn covers the Close band. Give up your action to run and you cover Short instead.
 
 ## Injury
 
@@ -347,19 +363,21 @@ Your protection is avoiding the hit: Dodge, cover, and a Resolve point, which re
 
 How many boxes a hit marks depends on the **weapon**, not on how well the attack succeeded.
 
-| Weapon | Boxes on a hit | What the injury looks like |
-|---|---|---|
-| Fists, kicks, a baton | 1 | Bruises, a cracked rib, a concussion |
-| Knife | 1 | A cut or stab wound |
-| Vibroblade, implant blades, claws | 2 | A deep wound |
-| Slug pistol or carbine | 2 | A gunshot wound |
-| Laser pistol | 2 | A cauterized burn through flesh |
-| Plasma rifle, coilgun or needle rifle | 3, and Dying | A ruinous wound |
-| Stunner | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
-| Grenade | 1 to everyone nearby, 3 and Dying at the center | Blast and shrapnel; Dodge means diving clear |
-| Vacuum or poison air without a suit | 1 each round | Burst vessels, choking |
-| Fall | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
-| Fire | 1 each round in the flames | Burns |
+| Weapon | Range | Boxes on a hit | What the injury looks like |
+|---|---|---|---|
+| Fists, kicks, a baton | Melee | 1 | Bruises, a cracked rib, a concussion |
+| Knife | Melee; Close thrown | 1 | A cut or stab wound |
+| Vibroblade, implant blades, claws | Melee | 2 | A deep wound |
+| Slug pistol | Short | 2 | A gunshot wound |
+| Slug carbine | Medium | 2 | A gunshot wound |
+| Laser pistol | Short | 2 | A cauterized burn through flesh |
+| Plasma rifle | Medium | 3, and Dying | A ruinous wound |
+| Coilgun or needle rifle | Long | 3, and Dying | A ruinous wound |
+| Stunner | Close | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
+| Grenade | Close (thrown) | 1 to everyone nearby, 3 and Dying at the center | Blast and shrapnel; Dodge means diving clear |
+| Vacuum or poison air without a suit | — | 1 each round | Burst vessels, choking |
+| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fire | — | 1 each round in the flames | Burns |
 
 **Slug or energy.** Slug-throwers are cheap, reliable and loud; lasers are silent and recoilless but need charged cells; plasma is devastating and expensive. A carbine can fire a **burst** (three shots, +1 to hit). Any firearm jams or faults on a natural 18.
 

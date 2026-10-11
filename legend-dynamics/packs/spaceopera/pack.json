@@ -2193,27 +2193,27 @@
   [
    "pistol",
    "Slug pistol",
-   "Twelve rounds. Hits mark 2 boxes."
+   "Twelve rounds. Hits mark 2 boxes. Short range."
   ],
   [
    "laser",
    "Laser pistol",
-   "Twenty shots per cell; silent, no recoil. Hits mark 2 boxes."
+   "Twenty shots per cell; silent, no recoil. Hits mark 2 boxes. Short range."
   ],
   [
    "carbine",
    "Slug carbine",
-   "Thirty rounds; can fire bursts. Hits mark 2 boxes."
+   "Thirty rounds; can fire bursts. Hits mark 2 boxes. Medium range."
   ],
   [
    "plasma",
    "Plasma rifle",
-   "Ten shots per cell. Hits mark 3 boxes and leave the target Dying."
+   "Ten shots per cell. Hits mark 3 boxes and leave the target Dying. Medium range."
   ],
   [
    "stunner",
    "Stunner",
-   "The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box."
+   "The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. Close range."
   ],
   [
    "blade",

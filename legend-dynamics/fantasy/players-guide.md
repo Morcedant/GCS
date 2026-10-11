@@ -223,11 +223,11 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Greatsword or greataxe | Two hands. Hits mark 2 boxes, and a hit by 5 or more leaves the target Dying. |
 | Spear | Reach in a crowd or a shield-wall. Hits mark 2 boxes. |
 | Dagger | Hidden in a boot or a sleeve. Hits mark 1 box. |
-| Bow and quiver | Twenty arrows. Hits mark 2 boxes. |
-| Crossbow and bolts | Twelve bolts; reloading takes an action. +2 to hit at short range. Hits mark 2 boxes. |
-| Wheel-lock pistol | One shot; reloading takes a full round. Hits mark 2 boxes. Rain ruins the powder. |
-| Arquebus | One shot; reloading takes a full round. Hits mark 3 boxes and leave the target Dying; misfires on a natural 17–18. Rain ruins the powder. |
-| Powder bombs | Three, thrown with Athletics: 1 box to everyone nearby, 3 and Dying at the center. |
+| Bow and quiver | Twenty arrows. Hits mark 2 boxes. Long range. |
+| Crossbow and bolts | Twelve bolts; reloading takes an action. +2 to hit at Close range. Hits mark 2 boxes. Medium range. |
+| Wheel-lock pistol | One shot; reloading takes a full round. Hits mark 2 boxes. Rain ruins the powder. Close range. |
+| Arquebus | One shot; reloading takes a full round. Hits mark 3 boxes and leave the target Dying; misfires on a natural 17–18. Rain ruins the powder. Short range. |
+| Powder bombs | Three, thrown with Athletics: 1 box to everyone nearby, 3 and Dying at the center. Close range (thrown). |
 | Mail shirt | Hits of 2 or more boxes mark one fewer, once per fight. −1 to Stealth and Athletics for swimming. |
 | Shield | +1 Dodge against attacks you can see. |
 | Torches and oil | Light in the tombs, and fire when you need it. |
@@ -295,13 +295,29 @@ Run a chase as a progress clock for the pursuers against a danger clock for the 
 
 ## Turn order and actions
 
-Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
+Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance (up to 10 yards: the Close band below) and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
 
 ## Attacking and defending
 
 Roll Marksmanship for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
+
+## Range
+
+Distances fall into five bands:
+
+| Band | Distance | For example |
+|---|---|---|
+| Close | Up to 10 yards | Across a room; one move covers it |
+| Short | Up to 50 yards | Across a street or a courtyard |
+| Medium | Up to 150 yards | A city block, a long field |
+| Long | Up to 500 yards | Across a valley, a park or a harbor |
+| Extreme | Up to a mile, in line of sight | Rooftop to rooftop across a town |
+
+Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand and fists reach only someone next to you; move into reach as part of your turn. A thrown weapon's effective band is Close.
+
+Moving: your move each turn covers the Close band. Give up your action to run and you cover Short instead.
 
 ## Injury
 
@@ -326,20 +342,22 @@ Your protection is avoiding the hit: Dodge, cover, and a Fortune point, which re
 
 How many boxes a hit marks depends on the **weapon**, not on how well the attack succeeded.
 
-| Weapon | Boxes on a hit | What the injury looks like |
-|---|---|---|
-| Fists, kicks, dirty tricks | 1 | Bruises, a split lip, cracked ribs |
-| Dagger, club, sling | 1 | A cut, a stab or a crack on the skull |
-| Sword, axe, mace, spear | 2 | A deep wound or a broken bone |
-| Greatsword, greataxe, polearm | 2; a hit by 5 or more leaves the target Dying | A ruinous wound |
-| Bow, crossbow | 2 | An arrow or bolt buried deep |
-| Wheel-lock pistol | 2 | A gunshot wound |
-| Arquebus or hand-cannon | 3, and Dying | A ruinous wound |
-| Powder bomb | 1 to everyone nearby, 3 and Dying at the center | Blast and burns; Dodge means diving clear |
-| Claws, fangs, venom | 2 (venom: Body roll or Reeling) | Torn flesh, poison in the blood |
-| Shadow Bolt | 2 | Black frost in the wound |
-| Fall | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
-| Fire | 1 each round in the flames | Burns |
+| Weapon | Range | Boxes on a hit | What the injury looks like |
+|---|---|---|---|
+| Fists, kicks, dirty tricks | Melee | 1 | Bruises, a split lip, cracked ribs |
+| Dagger or club | Melee; dagger Close thrown | 1 | A cut, a stab or a crack on the skull |
+| Sling | Short | 1 | A crack on the skull |
+| Sword, axe, mace, spear | Melee | 2 | A deep wound or a broken bone |
+| Greatsword, greataxe, polearm | Melee | 2; a hit by 5 or more leaves the target Dying | A ruinous wound |
+| Bow | Long | 2 | An arrow buried deep |
+| Crossbow | Medium | 2 | A bolt buried deep |
+| Wheel-lock pistol | Close | 2 | A gunshot wound |
+| Arquebus or hand-cannon | Short | 3, and Dying | A ruinous wound |
+| Powder bomb | Close (thrown) | 1 to everyone nearby, 3 and Dying at the center | Blast and burns; Dodge means diving clear |
+| Claws, fangs, venom | Melee | 2 (venom: Body roll or Reeling) | Torn flesh, poison in the blood |
+| Shadow Bolt | Short | 2 | Black frost in the wound |
+| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fire | — | 1 each round in the flames | Burns |
 
 **Gunpowder** is common but slow. Anyone can carry a pistol or an arquebus, but reloading takes a **full round** (a crossbow takes one action), and rain or seawater ruins the powder until it's dried. An arquebus misfires on a natural 17 or 18; any missile weapon fails on a natural 18 (a string snaps, a bolt jams, the powder fizzles).
 

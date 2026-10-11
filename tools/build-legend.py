@@ -176,7 +176,7 @@ def gen(name, pack, t):
                     [[f"**{x[1]}**" + (f" ({x[5]})" if len(x) > 5 and x[5] else "") + (" *(GM)*" if x[4].get("gm") else "") + (" *(Mythic only)*" if x[4].get("mythicOnly") else ""), *x[3][:3]] for x in pw["list"] if x[2] == g]), ""]
         esc = [x for x in pw["list"] if len(x[3]) > 3]
         if esc:
-            out += ["## Escalated Classes", "", f"Most powers simply go further at Classes IV to VI. {' and '.join([', '.join(x[1] for x in esc[:-1]), esc[-1][1]] if len(esc) > 1 else [esc[0][1]])} {'have' if len(esc) > 1 else 'has'} set top speeds at every Class, measured in multiples of the speed of sound (Mach 1 is about 760 mph). Player characters reach these Classes only by pushing (one action, one box of Strain); the GM's characters may have them outright.", "",
+            out += ["## Escalated Classes", "", f"Most powers simply go further at Classes IV to VI. {' and '.join([', '.join(x[1] for x in esc[:-1]), esc[-1][1]] if len(esc) > 1 else [esc[0][1]])} {'have' if len(esc) > 1 else 'has'} set limits at every Class: speeds in multiples of the speed of sound (Mach 1 is about 760 mph), and distances in feet and miles. Player characters reach these Classes only by pushing (one action, one box of Strain); the GM's characters may have them outright.", "",
                     table(["Power", "Class IV", "Class V", "Class VI"], [[f"**{x[1]}**", *x[3][3:6]] for x in esc]), ""]
         return "\n".join(out)
     if name == "statuses":
@@ -265,6 +265,7 @@ def quickref(pack, t):
     core = [["Resolution", "3d6 at or below adjusted skill. Natural 3–4 always succeeds; 17–18 always fails. Margin = target − roll."],
             ["Opposed", "Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender."],
             ["Combat", "Move a short distance and take one action. Hit → target may Dodge once per round → weapon effect. Partial cover −2."],
+            ["Range", "Close 10 yd, Short 50 yd, Medium 150 yd, Long 500 yd, Extreme 1 mile. Within a weapon's effective band: no penalty; one band beyond −2, two −4, farther out of range. Move: Close; run (no action): Short."],
             ["Dying", f"A 2-box weapon that brings you to 3 boxes: Dying; dead at the end of the scene unless stabilized (one action, Medicine, {t['medkit']}). At 3 boxes, another 2-box hit kills."],
             ["Medicine", "Stabilize: one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2, clears 2 (3 on margin 5+)."],
             ["Rest", f"One box per {t['restText']} of rest. Not from 3 boxes: treatment must clear the first."],

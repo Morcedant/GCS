@@ -10,19 +10,21 @@ It is 2025. The **Extraordinary Law Enforcement Agency (ExLAW)** enforces the Ex
 
 Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every attack also has a **Class**, which matters against an Operant's **Defense** (see below). **Powers** mark boxes by their Class: **Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3** (see *Powers*).
 
-| Weapon | Class | Boxes on a hit | What the injury looks like |
-|---|---|---|---|
-| Fists, kicks, a baton | I | 1 | Bruises, a cracked rib, a concussion |
-| Knife | I | 1 | A cut or stab wound |
-| Pistol, submachine gun or rifle | I | 2 | A gunshot wound |
-| Shotgun, within a few paces | I | 3, and Dying | A ruinous wound |
-| Shotgun, farther away | I | 1 | Scattered pellets |
-| Sniper or heavy rifle | II | 3, and Dying | A ruinous wound |
-| Taser | — | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
-| Heavy machine gun, Aegis arm cannon | II | 2 | |
-| Anti-tank rocket, explosives | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
-| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
-| Fire | — | 1 each round in the flames | Burns |
+| Weapon | Range | Class | Boxes on a hit | What the injury looks like |
+|---|---|---|---|---|
+| Fists, kicks, a baton | Melee | I | 1 | Bruises, a cracked rib, a concussion |
+| Knife | Melee; Close thrown | I | 1 | A cut or stab wound |
+| Pistol or submachine gun | Short | I | 2 | A gunshot wound |
+| Rifle | Long | I | 2 | A gunshot wound |
+| Shotgun, at Close range | Close | I | 3, and Dying | A ruinous wound |
+| Shotgun, at Short range | Short (no effect beyond) | I | 1 | Scattered pellets |
+| Sniper or heavy rifle | Extreme (−2 at Close) | II | 3, and Dying | A ruinous wound |
+| Taser | Close | — | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
+| Heavy machine gun, Aegis arm cannon | Long | II | 2 | Torn apart |
+| Anti-tank rocket | Long | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
+| Grenade or explosive charge | Close (thrown) | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
+| Fall | — | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fire | — | — | 1 each round in the flames | Burns |
 
 **Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack whose Class is **above** your Defense hits in full; one **equal** to it marks one box fewer; one **below** it does nothing. A bulletproof Operant (Defense II) ignores pistols and rifles, and an Aegis cannon still marks a box.
 
@@ -164,6 +166,7 @@ Every Operant has powers, and every power has a **Class** from I to VI. Player c
 - **Rolling.** Roll **Powers** to aim a power at someone, or to use it with skill: precisely, at a distance, around bystanders. Passive powers (Toughness, Regeneration, Speed and the like) just work. Targets resist with **Dodge** (things you can dodge), **Body** (things that work on the body) or **Will** (things that work on the mind).
 - **Damage.** A power marks boxes by its Class: Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3. Ordinary weapons mark the boxes in their table (see *Personal combat*).
 - **Defense.** An attack above your Defense hits in full; an equal one marks a box fewer; a lower one does nothing.
+- **Range.** Unless a power says otherwise, a ranged power's effective band (see *Range* in Personal combat) is **Short at Class I, Long at Class II, Extreme at Class III**, and miles at Class IV and above, out to the horizon. Mind powers keep the reach their descriptions give: touch, a room, sight or a city.
 - **Pushing.** For one action, use a power one Class higher than you have it, and mark a box of **Strain**.
 
 **Strain** is your personal track:
@@ -207,6 +210,11 @@ After a significant case, the GM may allow one of these **instead of a skill ste
 ## The powers
 
 {{GEN:powers}}
+
+## Leaping and teleporting
+
+- **Super Leaping:** one leap is your move for the turn. You land safely from any height your Class can leap; falling from higher marks boxes like any fall.
+- **Teleport:** one action. You can't arrive inside solid matter. A place you've never been is −2 to the Powers roll. On a natural 18 you arrive off target, as the GM decides: the wrong room, the wrong street, or somewhere much worse.
 
 ## Rituals
 

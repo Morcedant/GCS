@@ -6,19 +6,21 @@ Humanity has three centuries of interstellar history: young enough to challenge 
 
 <!-- SECTION:weapons -->
 
-| Weapon | Boxes on a hit | What the injury looks like |
-|---|---|---|
-| Fists, kicks, a baton | 1 | Bruises, a cracked rib, a concussion |
-| Knife | 1 | A cut or stab wound |
-| Vibroblade, implant blades, claws | 2 | A deep wound |
-| Slug pistol or carbine | 2 | A gunshot wound |
-| Laser pistol | 2 | A cauterized burn through flesh |
-| Plasma rifle, coilgun or needle rifle | 3, and Dying | A ruinous wound |
-| Stunner | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
-| Grenade | 1 to everyone nearby, 3 and Dying at the center | Blast and shrapnel; Dodge means diving clear |
-| Vacuum or poison air without a suit | 1 each round | Burst vessels, choking |
-| Fall | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
-| Fire | 1 each round in the flames | Burns |
+| Weapon | Range | Boxes on a hit | What the injury looks like |
+|---|---|---|---|
+| Fists, kicks, a baton | Melee | 1 | Bruises, a cracked rib, a concussion |
+| Knife | Melee; Close thrown | 1 | A cut or stab wound |
+| Vibroblade, implant blades, claws | Melee | 2 | A deep wound |
+| Slug pistol | Short | 2 | A gunshot wound |
+| Slug carbine | Medium | 2 | A gunshot wound |
+| Laser pistol | Short | 2 | A cauterized burn through flesh |
+| Plasma rifle | Medium | 3, and Dying | A ruinous wound |
+| Coilgun or needle rifle | Long | 3, and Dying | A ruinous wound |
+| Stunner | Close | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
+| Grenade | Close (thrown) | 1 to everyone nearby, 3 and Dying at the center | Blast and shrapnel; Dodge means diving clear |
+| Vacuum or poison air without a suit | — | 1 each round | Burst vessels, choking |
+| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fire | — | 1 each round in the flames | Burns |
 
 **Slug or energy.** Slug-throwers are cheap, reliable and loud; lasers are silent and recoilless but need charged cells; plasma is devastating and expensive. A carbine can fire a **burst** (three shots, +1 to hit). Any firearm jams or faults on a natural 18.
 

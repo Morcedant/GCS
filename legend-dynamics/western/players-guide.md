@@ -222,9 +222,9 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 
 | Item | What it does |
 |---|---|
-| Revolver | Six shots; reloading takes an action. Hits mark 2 boxes. |
-| Rifle | A lever-action repeater with fifteen shots and long range. Hits mark 2 boxes. |
-| Shotgun | Two barrels. Devastating close up (3 boxes and Dying), weak beyond a few paces (1 box). |
+| Revolver | Six shots; reloading takes an action. Hits mark 2 boxes. Short range. |
+| Rifle | A lever-action repeater with fifteen shots. Hits mark 2 boxes. Long range. |
+| Shotgun | Two barrels. Devastating close up (3 boxes and Dying), weak beyond a few paces (1 box). Close range (Short for 1 box). |
 | Knife | A tool and a weapon; hits mark 1 box. |
 | Doctor's bag | Instruments, laudanum, carbolic and bandages. Needed to stabilize a patient and give field treatment. |
 | Tool roll | Gunsmith's and carpenter's tools. Needed for most Tinkering in the field. |
@@ -233,9 +233,9 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Lantern and matches | Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible. |
 | Field glasses | See detail at a distance. Spotting something far off without them is very difficult (−4) or impossible. |
 | Law books and blank warrants | Needed to draw up papers, check a statute or argue a point of law away from a courthouse. |
-| Dynamite | Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre. |
+| Dynamite | Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre. Close range (thrown). |
 | Silver bullets | One reload of silver rounds. Silver marks an extra box on werewolves and similar creatures, and ignores their toughness. |
-| Holy water | Three flasks. Thrown or splashed, it burns undead and demons (1 box) and breaks minor hexes. |
+| Holy water | Three flasks. Thrown or splashed, it burns undead and demons (1 box) and breaks minor hexes. Close range (thrown). |
 | Stakes and mallet | A wooden stake through a helpless vampire's heart incapacitates it. |
 | Ritual kit | Chalk, candles, herbs, bones and old books. Needed for rituals away from a prepared place. |
 | Holy symbol | Held up against undead and demons: −2 to their actions against you, if your faith is real. |
@@ -296,13 +296,29 @@ Run a chase as a progress clock for the pursuers against a danger clock for the 
 
 ## Turn order and actions
 
-Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
+Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance (up to 10 yards: the Close band below) and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
 
 ## Attacking and defending
 
 Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
+
+## Range
+
+Distances fall into five bands:
+
+| Band | Distance | For example |
+|---|---|---|
+| Close | Up to 10 yards | Across a room; one move covers it |
+| Short | Up to 50 yards | Across a street or a courtyard |
+| Medium | Up to 150 yards | A city block, a long field |
+| Long | Up to 500 yards | Across a valley, a park or a harbor |
+| Extreme | Up to a mile, in line of sight | Rooftop to rooftop across a town |
+
+Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand and fists reach only someone next to you; move into reach as part of your turn. A thrown weapon's effective band is Close.
+
+Moving: your move each turn covers the Close band. Give up your action to run and you cover Short instead.
 
 ## Injury
 
@@ -327,20 +343,23 @@ Your protection is avoiding the hit: Dodge, cover, and a Grit point, which reduc
 
 How many boxes a hit marks depends on the **weapon**, not on how well the attack succeeded.
 
-| Weapon | Boxes on a hit | What the injury looks like |
-|---|---|---|
-| Punch, kick, headbutt | 1 | Bruises, a split lip, cracked ribs |
-| Club, bottle, pistol-whip | 1 | A concussion or a broken finger |
-| Knife, hatchet, arrow | 1 | A cut or stab wound that bleeds |
-| Axe, saber or bowie knife used to kill | 2 | A deep wound or a broken bone |
-| Claws and fangs of a monster | 2 | Torn flesh |
-| Derringer, revolver or rifle | 2 | A gunshot wound |
-| Shotgun, within a few paces | 3, and Dying | A ruinous wound |
-| Shotgun, farther away | 1 | Scattered pellets |
-| Buffalo rifle | 3, and Dying | A ruinous wound |
-| Dynamite | 1 to everyone nearby, 3 and Dying at the centre | Blast and burns; Dodge means diving clear |
-| Fall | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
-| Fire | 1 each round in the flames | Burns |
+| Weapon | Range | Boxes on a hit | What the injury looks like |
+|---|---|---|---|
+| Punch, kick, headbutt | Melee | 1 | Bruises, a split lip, cracked ribs |
+| Club, bottle, pistol-whip | Melee | 1 | A concussion or a broken finger |
+| Knife or hatchet | Melee; Close thrown | 1 | A cut or stab wound that bleeds |
+| Arrow | Medium | 1 | A cut or stab wound that bleeds |
+| Axe, saber or bowie knife used to kill | Melee | 2 | A deep wound or a broken bone |
+| Claws and fangs of a monster | Melee | 2 | Torn flesh |
+| Derringer | Close | 2 | A gunshot wound |
+| Revolver | Short | 2 | A gunshot wound |
+| Rifle | Long | 2 | A gunshot wound |
+| Shotgun, at Close range | Close | 3, and Dying | A ruinous wound |
+| Shotgun, at Short range | Short (no effect beyond) | 1 | Scattered pellets |
+| Buffalo rifle | Extreme | 3, and Dying | A ruinous wound |
+| Dynamite | Close (thrown) | 1 to everyone nearby, 3 and Dying at the centre | Blast and burns; Dodge means diving clear |
+| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fire | — | 1 each round in the flames | Burns |
 
 *Example:* an outlaw's knife leaves Deputy Ames Wounded (one box). A revolver shot that gets through marks two more: Ames is at three boxes, Incapacitated and Dying, and a further 2-box hit would kill. Spending a Grit point on that revolver shot reduces it to one box, leaving Ames Seriously wounded and still standing.
 
