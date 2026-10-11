@@ -1,6 +1,7 @@
 ---
 title: "Legend Dynamics Core Rules"
 subtitle: "The setting-neutral rules of the Legend Dynamics RPG system"
+author: "Don Smallwood"
 ---
 
 Legend Dynamics is a roleplaying system for heroic stories in any genre: concrete skills, a 3d6 roll-under core, and a small pool of Legend points that reward characters for their flaws. These core rules are setting-neutral. A **setting pack** supplies the roles, origins, skills, gear, weapons, tracks and dangers of one genre, and renames a few terms to suit it.
@@ -388,4 +389,4 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Legend:** start each session with two. Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.
 
-*Legend Dynamics RPG system.* This RPG is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.
+*Legend Dynamics RPG system, created by Don Smallwood.* This RPG is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.

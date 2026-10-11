@@ -1,6 +1,7 @@
 ---
 title: "The Shattered Crown Players' Guide"
 subtitle: "Sword and sorcery for the Legend Dynamics RPG system"
+author: "Don Smallwood"
 ---
 
 A thousand years ago the **Crown of Aeon** bound a sorcerer-empire together. When the last emperor died, the Crown shattered into nine shards, and the empire with it. Each shard gives power to whoever holds it, and each slowly devours them. Now warlords, sorcerer-princes and merchant-kings fight over the empire's corpse, and the old things beneath its cities are waking.
@@ -1039,4 +1040,4 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Fortune:** start each session with two. Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.
 
-*Legend Dynamics RPG system.* This RPG is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.
+*Legend Dynamics RPG system, created by Don Smallwood.* This RPG is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.

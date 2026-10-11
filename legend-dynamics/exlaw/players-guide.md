@@ -1,6 +1,7 @@
 ---
 title: "ExLAW Players' Guide"
 subtitle: "Operants, the law and the powers behind them, for the Legend Dynamics RPG system"
+author: "Don Smallwood"
 ---
 
 In April 1938 the sky burned green for four weeks. The auroras killed five million people and left behind the first **Operants**: men and women with powers no science could explain. For decades the world pretended they were myths. Then, in 1952, a battle at Fort Knox made pretending impossible, and the law has been trying to catch up ever since.
@@ -1320,4 +1321,4 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Spark:** start each session with two. Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.
 
-*Legend Dynamics RPG system.* This RPG is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.
+*Legend Dynamics RPG system, created by Don Smallwood.* This RPG is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.

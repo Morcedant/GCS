@@ -100,7 +100,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None):
 <main id="main">
 {sections}
 </main>
-<footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system. This RPG is released under the <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener" target="_blank">Creative Commons Attribution 4.0 International License</a>. You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.</span>
+<footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. This RPG is released under the <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener" target="_blank">Creative Commons Attribution 4.0 International License</a>. You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.</span>
 <a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.DISCORD_SLUG}">Discord bot</a></div></footer>
 </body>
 </html>

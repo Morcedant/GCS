@@ -1,6 +1,7 @@
 ---
 title: "{{guideTitle}}"
 subtitle: "{{guideSubtitle}}"
+author: "Don Smallwood"
 ---
 
 {{PACK:intro}}
@@ -400,4 +401,4 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 {{PACK:quickref}}
 
-*Legend Dynamics RPG system.* This RPG is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.
+*Legend Dynamics RPG system, created by Don Smallwood.* This RPG is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.
