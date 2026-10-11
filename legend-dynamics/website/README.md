@@ -1,5 +1,7 @@
 # Legend Dynamics website: Squarespace kit
 
+> **Not on Squarespace?** The same site, ready for free hosting on Cloudflare Pages, is built by `tools/build-site.py` into `legend-dynamics/site/`. See [`../CLOUDFLARE-PAGES.md`](../CLOUDFLARE-PAGES.md).
+
 A custom design for a Squarespace 7.1 site:
 - **The brand:** ink, parchment and brass, for the whole site.
 - **Game themes:** Dust & Damnation, Fracture Lines and The Shattered Crown, each switched on for that game's own page.

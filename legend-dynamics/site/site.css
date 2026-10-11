@@ -1,0 +1,297 @@
+/* =========================================================================
+   Legend Dynamics RPG — Squarespace 7.1 custom CSS
+   Paste all of this into: Website → Pages → Website Tools → Custom CSS
+   (older menus: Design → Custom CSS).
+
+   Two layers:
+   1. The Legend Dynamics brand (ink, parchment, brass) for the whole site.
+   2. A theme per game, switched on for a page by one line of page header
+      code injection (see website/README.md):
+        html.ld-western    Dust & Damnation   (Gothic Western)
+        html.ld-spaceopera Fracture Lines     (science fiction)
+        html.ld-fantasy    The Shattered Crown (sword and sorcery)
+   Components (hero, game cards, callouts, odds table, steps, rules text) use
+   ld- classes and live in Code Blocks; their HTML is in website/blocks/.
+   ========================================================================= */
+
+/* ---------- 1. Brand tokens ---------- */
+html {
+  --ld-bg: #f3ecdc;            /* parchment */
+  --ld-bg-2: #e9dfc8;          /* deeper parchment for bands */
+  --ld-panel: #fbf7ee;         /* cards */
+  --ld-ink: #1b1d22;           /* text */
+  --ld-ink-2: #4a4c52;         /* secondary text */
+  --ld-line: rgba(27, 29, 34, .16);
+  --ld-accent: #9b6b1f;        /* brass */
+  --ld-accent-2: #7a1f1f;      /* oxblood, for emphasis */
+  --ld-on-accent: #fbf7ee;
+  --ld-header-bg: #15171c;     /* ink header and footer */
+  --ld-header-fg: #efe6d2;
+  --ld-display: "Fraunces", Georgia, serif;
+  --ld-body: "Source Serif 4", Georgia, serif;
+  --ld-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --ld-label: var(--ld-display);  /* small headings, buttons, labels: a readable cut of the display face */
+  --ld-radius: 6px;
+  --ld-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset, 0 10px 30px rgba(27, 29, 34, .08);
+}
+
+/* ---------- 2. Game themes (dark) ---------- */
+html.ld-western {
+  --ld-bg: #0b0d0f; --ld-bg-2: #12161a; --ld-panel: #161b1f;
+  --ld-ink: #e4e2da; --ld-ink-2: #9aa19b; --ld-line: rgba(160, 172, 166, .22);
+  --ld-accent: #b9c2bd; --ld-accent-2: #b8383a; --ld-on-accent: #0b0d0f;
+  --ld-header-bg: #070809; --ld-header-fg: #e4e2da;
+  --ld-display: "Pirata One", "IM Fell English SC", Georgia, serif;
+  --ld-body: "EB Garamond", Georgia, serif; --ld-mono: "IM Fell DW Pica SC", Georgia, serif;
+  --ld-label: "IM Fell English SC", Georgia, serif;
+  --ld-shadow: 0 0 0 1px rgba(160, 172, 166, .12), 0 18px 40px rgba(0, 0, 0, .45);
+}
+html.ld-spaceopera {
+  --ld-bg: #03060d; --ld-bg-2: #071224; --ld-panel: #0a1628;
+  --ld-ink: #e4eefb; --ld-ink-2: #8aa2c2; --ld-line: rgba(92, 170, 255, .22);
+  --ld-accent: #5cc8ff; --ld-accent-2: #f2b84b; --ld-on-accent: #03060d;
+  --ld-header-bg: #02040a; --ld-header-fg: #e4eefb;
+  --ld-display: "Oxanium", "Arial Narrow", sans-serif;
+  --ld-body: "Exo 2", system-ui, sans-serif; --ld-mono: "Share Tech Mono", ui-monospace, monospace;
+  --ld-radius: 10px;
+  --ld-shadow: 0 0 0 1px rgba(92, 200, 255, .14), 0 18px 40px rgba(0, 0, 0, .5);
+}
+html.ld-fantasy {
+  --ld-bg: #0c0806; --ld-bg-2: #160f0a; --ld-panel: #1c130d;
+  --ld-ink: #eee2cf; --ld-ink-2: #a39079; --ld-line: rgba(205, 152, 88, .22);
+  --ld-accent: #d6a660; --ld-accent-2: #c0392b; --ld-on-accent: #120b07;
+  --ld-header-bg: #080504; --ld-header-fg: #eee2cf;
+  --ld-display: "Cinzel Decorative", "Cinzel", Georgia, serif;
+  --ld-body: "Cormorant Garamond", Georgia, serif; --ld-mono: "Cinzel", Georgia, serif;
+  --ld-label: "Cinzel", Georgia, serif;
+  --ld-radius: 4px;
+  --ld-shadow: 0 0 0 1px rgba(214, 166, 96, .14), 0 18px 40px rgba(0, 0, 0, .5);
+}
+
+/* ---------- 3. Squarespace site styles, mapped to the tokens ---------- */
+/* Squarespace 7.1 colors come from section themes; these variables win over
+   whichever color theme a section uses, so every section follows the brand. */
+html body,
+html [data-section-theme] {
+  --siteBackgroundColor: var(--ld-bg) !important;
+  --sectionBackgroundColor: var(--ld-bg) !important;
+  --headingExtraLargeColor: var(--ld-ink) !important;
+  --headingLargeColor: var(--ld-ink) !important;
+  --headingMediumColor: var(--ld-ink) !important;
+  --headingSmallColor: var(--ld-ink) !important;
+  --paragraphLargeColor: var(--ld-ink) !important;
+  --paragraphMediumColor: var(--ld-ink) !important;
+  --paragraphSmallColor: var(--ld-ink-2) !important;
+  --paragraphLinkColor: var(--ld-accent) !important;
+  --primaryButtonBackgroundColor: var(--ld-accent) !important;
+  --primaryButtonTextColor: var(--ld-on-accent) !important;
+  --secondaryButtonBackgroundColor: transparent !important;
+  --secondaryButtonTextColor: var(--ld-ink) !important;
+}
+
+body {
+  background: var(--ld-bg);
+  color: var(--ld-ink);
+  font-family: var(--ld-body);
+  -webkit-font-smoothing: antialiased;
+}
+.page-section .section-background { background: var(--ld-bg) !important; }
+.page-section:nth-of-type(even) .section-background { background: var(--ld-bg-2) !important; }
+
+h1, h2, h3, h4,
+.sqs-html-content h1, .sqs-html-content h2, .sqs-html-content h3, .sqs-html-content h4 {
+  font-family: var(--ld-display) !important;
+  color: var(--ld-ink);
+  letter-spacing: .01em;
+  line-height: 1.1;
+}
+h1, .sqs-html-content h1 { font-weight: 600; }
+h2, .sqs-html-content h2 { font-weight: 600; }
+h3, .sqs-html-content h3, h4, .sqs-html-content h4 { font-family: var(--ld-label) !important; font-weight: 600; letter-spacing: .02em; }
+p, li, .sqs-html-content p, .sqs-html-content li {
+  font-family: var(--ld-body) !important;
+  color: var(--ld-ink);
+  line-height: 1.65;
+}
+.sqs-html-content a, p a {
+  color: var(--ld-accent) !important;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.sqs-html-content a:hover { color: var(--ld-accent-2) !important; }
+::selection { background: var(--ld-accent); color: var(--ld-on-accent); }
+
+/* Header and navigation */
+.header, .header .header-announcement-bar-wrapper {
+  background: var(--ld-header-bg) !important;
+}
+.header .header-background-solid, .header .header-background { background: var(--ld-header-bg) !important; }
+.header-title-text a, .header-title-text,
+.header-nav-item a, .header-menu-nav-item a, .header-burger-btn {
+  color: var(--ld-header-fg) !important;
+  font-family: var(--ld-label) !important;
+}
+.header-nav-item a { letter-spacing: .08em; text-transform: uppercase; font-size: .82rem; }
+.header-nav-item--active a, .header-nav-item a:hover {
+  background-image: linear-gradient(var(--ld-accent), var(--ld-accent)) !important;
+  background-size: 100% 2px !important; background-position: 0 100% !important; background-repeat: no-repeat !important;
+}
+.header-burger-btn .burger-inner > div { background: var(--ld-header-fg) !important; }
+.header-menu-bg { background: var(--ld-header-bg) !important; }
+
+/* Footer */
+#footer-sections .page-section .section-background { background: var(--ld-header-bg) !important; }
+#footer-sections p, #footer-sections a, #footer-sections h1, #footer-sections h2, #footer-sections h3 { color: var(--ld-header-fg) !important; }
+
+/* Squarespace buttons */
+.sqs-block-button-element, .sqs-button-element--primary, .btn, .sqs-editable-button {
+  font-family: var(--ld-label) !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+  border-radius: var(--ld-radius) !important;
+}
+
+/* ---------- 4. Components (used in Code Blocks) ---------- */
+.ld { font-family: var(--ld-body); color: var(--ld-ink); min-width: 0; max-width: 100%; }
+.ld *, .ld *::before, .ld *::after { box-sizing: border-box; }
+.ld a { color: var(--ld-accent); }
+
+.ld-eyebrow {
+  font: 600 .74rem/1.2 var(--ld-mono); letter-spacing: .22em; text-transform: uppercase;
+  color: var(--ld-accent); margin: 0 0 .9rem;
+}
+
+/* Hero */
+.ld-hero { padding: clamp(2.5rem, 6vw, 5rem) 0 clamp(2rem, 4vw, 3.5rem); max-width: 54rem; }
+.ld-hero h1 { font-family: var(--ld-display); font-size: clamp(2.6rem, 7vw, 5rem); margin: 0 0 1rem; line-height: 1.02; }
+.ld-hero .ld-lede { font-size: clamp(1.1rem, 2.2vw, 1.35rem); color: var(--ld-ink-2); max-width: 40rem; margin: 0 0 1.8rem; }
+.ld-hero .ld-rule { width: 4.5rem; height: 3px; background: var(--ld-accent); border: 0; margin: 0 0 1.6rem; }
+
+/* Buttons inside code blocks */
+.ld-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+.ld-button {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font: 600 .82rem/1 var(--ld-label); letter-spacing: .1em; text-transform: uppercase;
+  padding: .95rem 1.4rem; border-radius: var(--ld-radius); text-decoration: none !important;
+  background: var(--ld-accent); color: var(--ld-on-accent) !important; border: 1px solid var(--ld-accent);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.ld-button:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0, 0, 0, .18); }
+.ld-button--ghost { background: transparent; color: var(--ld-ink) !important; border-color: var(--ld-line); }
+.ld-button--ghost:hover { border-color: var(--ld-accent); color: var(--ld-accent) !important; }
+
+/* Pillars: three short points under the hero */
+.ld-pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.25rem; margin: 0; padding: 0; list-style: none; }
+.ld-pillars li { border-top: 2px solid var(--ld-accent); padding-top: 1rem; margin: 0; }
+.ld-pillars b { display: block; font: 600 1.15rem/1.2 var(--ld-label); margin-bottom: .35rem; color: var(--ld-ink); }
+.ld-pillars span { color: var(--ld-ink-2); }
+
+/* Game cards: each card carries its own game's colors, even on the brand pages */
+.ld-games { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1.25rem; }
+.ld-game {
+  --c-bg: #15171c; --c-fg: #efe6d2; --c-mute: #b9b2a2; --c-acc: #c8a252; --c-font: var(--ld-display);
+  position: relative; display: flex; flex-direction: column; min-height: 22rem;
+  padding: 1.6rem; border-radius: var(--ld-radius); overflow: hidden;
+  background: var(--c-bg); color: var(--c-fg); text-decoration: none !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .22); isolation: isolate;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.ld-game::before { /* the game's glow */
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(120% 70% at 100% 0%, var(--c-glow, rgba(200, 162, 82, .28)), transparent 60%);
+}
+.ld-game:hover { transform: translateY(-3px); box-shadow: 0 26px 50px rgba(0, 0, 0, .3); }
+.ld-game .ld-eyebrow { color: var(--c-acc); }
+.ld-game h3 { font-family: var(--c-font) !important; color: var(--c-fg) !important; font-size: 2rem; margin: 0 0 .6rem; line-height: 1.05; }
+.ld-game p { color: var(--c-mute) !important; font-family: var(--c-body, var(--ld-body)) !important; margin: 0 0 1.2rem; }
+.ld-game .ld-game-meta { margin-top: auto; display: flex; flex-wrap: wrap; gap: .4rem; }
+.ld-game .ld-tag { font: .72rem/1 var(--ld-mono); letter-spacing: .08em; padding: .4rem .6rem; border: 1px solid currentColor; border-radius: 999px; color: var(--c-acc); }
+.ld-game .ld-go { margin-top: 1.1rem; font: 600 .8rem/1 var(--ld-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--c-acc); }
+.ld-game--western { --c-bg: #0d1012; --c-fg: #e4e2da; --c-mute: #9aa19b; --c-acc: #c8cfca; --c-glow: rgba(184, 56, 58, .35); --c-font: "Pirata One", Georgia, serif; --c-body: "EB Garamond", Georgia, serif; }
+.ld-game--spaceopera { --c-bg: #050b17; --c-fg: #e4eefb; --c-mute: #8aa2c2; --c-acc: #5cc8ff; --c-glow: rgba(92, 200, 255, .3); --c-font: "Oxanium", sans-serif; --c-body: "Exo 2", sans-serif; }
+.ld-game--fantasy { --c-bg: #120c08; --c-fg: #eee2cf; --c-mute: #a39079; --c-acc: #d6a660; --c-glow: rgba(192, 57, 43, .35); --c-font: "Cinzel Decorative", "Cinzel", serif; --c-body: "Cormorant Garamond", serif; }
+
+/* Callout: a rule worth remembering */
+.ld-callout {
+  border-left: 3px solid var(--ld-accent); background: var(--ld-panel);
+  padding: 1.2rem 1.4rem; border-radius: 0 var(--ld-radius) var(--ld-radius) 0; box-shadow: var(--ld-shadow);
+}
+.ld-callout > b:first-child { display: block; font: 600 .76rem/1 var(--ld-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--ld-accent); margin-bottom: .6rem; }
+.ld-callout p { margin: 0; }
+
+/* Dice: the odds of 3d6 roll-under */
+.ld-odds { display: grid; grid-template-columns: repeat(auto-fit, minmax(4.4rem, 1fr)); gap: .5rem; margin: 1rem 0 0; }
+.ld-odds > div { background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: .7rem .4rem; text-align: center; }
+.ld-odds b { display: block; font: 600 1.4rem/1 var(--ld-display); color: var(--ld-ink); }
+.ld-odds span { display: block; margin-top: .35rem; font: .78rem/1 var(--ld-mono); color: var(--ld-ink-2); }
+.ld-odds .ld-bar { height: 4px; margin-top: .55rem; border-radius: 2px; background: linear-gradient(90deg, var(--ld-accent) var(--p), var(--ld-line) var(--p)); }
+
+/* Steps: numbered how-to */
+.ld-steps { counter-reset: ld-step; list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+.ld-steps li { counter-increment: ld-step; position: relative; padding: 0 0 0 3.2rem; margin: 0; }
+.ld-steps li::before {
+  content: counter(ld-step); position: absolute; left: 0; top: -.1rem;
+  width: 2.2rem; height: 2.2rem; display: grid; place-items: center; border-radius: 50%;
+  font: 600 1rem/1 var(--ld-label); color: var(--ld-on-accent); background: var(--ld-accent);
+}
+.ld-steps b { font-family: var(--ld-label); }
+
+/* Facts strip on game pages */
+.ld-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 1px; background: var(--ld-line); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); overflow: hidden; margin: 0; }
+.ld-facts div { background: var(--ld-panel); padding: 1rem 1.1rem; }
+.ld-facts dt { font: .72rem/1 var(--ld-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ld-ink-2); margin: 0 0 .45rem; }
+.ld-facts dd { margin: 0; font: 600 1.05rem/1.3 var(--ld-label); color: var(--ld-ink); }
+
+/* Long-form rules text (core rules page) */
+.ld-rules { width: 100%; max-width: 46rem; margin: 0 auto; font-size: 1.06rem; }
+.ld-rules h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 3rem 0 1rem; padding-bottom: .6rem; border-bottom: 1px solid var(--ld-line); }
+.ld-rules h2 { font-size: 1.45rem; margin: 2.2rem 0 .7rem; color: var(--ld-accent); }
+.ld-rules h3 { font-family: var(--ld-label) !important; font-size: 1.15rem; margin: 1.6rem 0 .5rem; }
+.ld-rules p, .ld-rules li { line-height: 1.7; }
+.ld-rules strong { color: var(--ld-ink); }
+.ld-rules em { color: var(--ld-ink-2); }
+.ld-rules table { width: 100%; max-width: 100%; border-collapse: collapse; margin: 1.2rem 0 1.6rem; font-size: .95rem; display: block; overflow-x: auto; }
+.ld-rules th { text-align: left; font: 600 .74rem/1.2 var(--ld-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ld-ink-2); border-bottom: 2px solid var(--ld-accent); padding: .6rem .7rem; }
+.ld-rules td { border-bottom: 1px solid var(--ld-line); padding: .6rem .7rem; vertical-align: top; }
+.ld-rules tr:nth-child(even) td { background: color-mix(in srgb, var(--ld-panel) 70%, transparent); }
+.ld-rules blockquote { margin: 1.4rem 0; padding: 1rem 1.3rem; border-left: 3px solid var(--ld-accent); background: var(--ld-panel); border-radius: 0 var(--ld-radius) var(--ld-radius) 0; }
+.ld code { font: .88em/1.4 var(--ld-mono); color: var(--ld-accent); background: color-mix(in srgb, var(--ld-panel) 80%, transparent);
+  padding: .1em .35em; border-radius: 3px; overflow-wrap: anywhere; }
+.ld-rules td:first-child code { white-space: normal; }
+.ld-toc { columns: 2 14rem; column-gap: 2rem; padding: 1.2rem 1.4rem; background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); margin: 0 0 2rem; }
+.ld-toc a { display: block; padding: .25rem 0; break-inside: avoid; text-decoration: none !important; font-family: var(--ld-label); }
+
+/* Small screens */
+@media (max-width: 640px) {
+  .ld-game { min-height: 0; }
+  .ld-steps li { padding-left: 2.8rem; }
+  .ld-rules { font-size: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ld-game, .ld-button { transition: none; }
+  .ld-game:hover, .ld-button:hover { transform: none; }
+}
+
+/* ---------- 5. Site frame (Cloudflare Pages build; Squarespace supplies its own) ---------- */
+html, body { margin: 0; }
+body { min-height: 100vh; display: flex; flex-direction: column; }
+.ld-skip { position: absolute; left: -999px; top: 0; padding: .6rem 1rem; background: var(--ld-accent); color: var(--ld-on-accent); z-index: 10; }
+.ld-skip:focus { left: 16px; }
+.ld-header { background: var(--ld-header-bg); color: var(--ld-header-fg); padding-top: env(safe-area-inset-top, 0px); }
+.ld-header-in { max-width: 72rem; margin: 0 auto; padding: .9rem 16px; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.4rem; }
+.ld-brand { font: 600 1.15rem/1 var(--ld-display); color: var(--ld-header-fg); text-decoration: none; letter-spacing: .02em; margin-right: auto; }
+.ld-nav { display: flex; flex-wrap: wrap; gap: .2rem .9rem; }
+.ld-nav a { font: 600 .78rem/1 var(--ld-label); letter-spacing: .08em; text-transform: uppercase; color: var(--ld-header-fg);
+  text-decoration: none; padding: .45rem 0; border-bottom: 2px solid transparent; opacity: .85; }
+.ld-nav a:hover, .ld-nav a[aria-current="page"] { opacity: 1; border-bottom-color: var(--ld-accent); }
+.ld-nav a:focus-visible, .ld-brand:focus-visible, .ld-button:focus-visible { outline: 2px solid var(--ld-accent); outline-offset: 3px; }
+main { flex: 1; }
+.page-section { position: relative; isolation: isolate; }
+.page-section .section-background { position: absolute; inset: 0; z-index: -1; }
+.page-section .content { max-width: 72rem; margin: 0 auto; padding: clamp(2rem, 5vw, 3.5rem) 16px; }
+.ld-footer { background: var(--ld-header-bg); color: var(--ld-header-fg); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.ld-footer-in { max-width: 72rem; margin: 0 auto; padding: 1.6rem 16px; display: flex; flex-wrap: wrap; gap: .6rem 1.4rem; font-size: .92rem; }
+.ld-footer-in span { margin-right: auto; opacity: .8; }
+.ld-footer a { color: var(--ld-header-fg); }
+.ld-downloads { display: flex; flex-wrap: wrap; gap: .75rem; margin: 0; padding: 0; list-style: none; }
+@media (prefers-reduced-motion: reduce) { .ld-button, .ld-game { transition: none !important; } }
