@@ -656,6 +656,9 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide"><span class="label" id="powers-label"></span>
               <div class="fields" id="power-slots"></div>
               <span class="muted small" id="powers-note"></span></div>
+            <details class="field wide" id="powers-adv"><summary class="label">Powers grown in play (with the GM's approval)</summary>
+              <div class="fields" id="powers-adv-list"></div>
+              <div class="btn-row"><button type="button" class="linkish" id="plearn-add">Add a power learned in play</button></div></details>
           </div>
         </section>
 
@@ -4348,7 +4351,7 @@ tr.lvl-U td.target { color: var(--muted); }
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" },
       allegiance: "", customTier: 1,
       portrait: "", portraitShape: "token",
-      spells: [], powers: [], status: "",
+      spells: [], powers: [], powerRaise: {}, powersLearned: [], status: "",
       play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [] },
     };
   }
@@ -4366,6 +4369,8 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!Array.isArray(out.spells)) out.spells = [];
     out.powers = Array.isArray(out.powers) ? out.powers.map((x) => (POWERS && POWERS.list.some((p) => p[0] === x) ? x : "")) : [];
     if (!STATUSES || !STATUSES.some((x) => x[0] === out.status)) out.status = "";
+    out.powerRaise = Object.fromEntries(Object.entries(out.powerRaise && typeof out.powerRaise === "object" ? out.powerRaise : {}).filter(([k, v]) => POWERS && POWERS.list.some((p) => p[0] === k) && CLASS_NAMES.includes(v)));
+    out.powersLearned = (Array.isArray(out.powersLearned) ? out.powersLearned : []).filter((x) => x && typeof x === "object").map((x) => ({ id: POWERS && POWERS.list.some((p) => p[0] === x.id) ? x.id : "", cl: CLASS_NAMES.includes(x.cl) ? x.cl : "I" }));
     if (typeof out.portrait !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(out.portrait)) out.portrait = "";
     if (out.portraitShape !== "portrait") out.portraitShape = "token";
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
@@ -4473,7 +4478,14 @@ tr.lvl-U td.target { color: var(--muted); }
   };
   const powerDef = (id) => POWERS && POWERS.list.find((p) => p[0] === id);
   const classIndex = (cl) => CLASS_NAMES.indexOf(cl);
-  const powerEffect = (id, cl) => { const p = powerDef(id); return p ? p[3][Math.min(classIndex(cl), p[3].length - 1)] : ""; };
+  const powerEffect = (id, cl) => { const p = powerDef(id); if (!p) return ""; const i = classIndex(cl);
+    return p[3][Math.min(i, p[3].length - 1)] + (i >= p[3].length ? ` (That's Class ${CLASS_NAMES[p[3].length - 1]}; at Class ${cl} it goes a step further, as the GM describes.)` : ""); };
+  // Every power a character has now: the creation slots (raised in play, never lowered) and powers learned in play.
+  const PLAY_CLASSES = CLASS_NAMES.slice(0, 5); // Class VI is for the GM's characters
+  const allPowers = (c = ch) => [
+    ...powerSlots(c).map((base, i) => ({ id: c.powers[i] || "", base, cl: CLASS_NAMES[Math.max(classIndex(base), classIndex(c.powerRaise?.[c.powers[i]] || base))] })),
+    ...(c.powersLearned || []).map((x) => ({ id: x.id, base: "I", cl: x.cl, learned: true })),
+  ].filter((x) => x.id);
   const levelName = (l, name) => (l === "S" && isGS() && !(name && advancedToS(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
@@ -4818,7 +4830,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ed.length ? `<div class="field"><span class="label">Edges</span><span>${esc(ed.join(", "))}</span></div>` : ""}
         ${a2 && edgeN("adv2") ? `<div class="field"><span class="label">Second advantage</span><b>${esc(a2[1])}${ch.adv2.detail ? ": " + esc(ch.adv2.detail) : ""}</b><span class="small muted">${esc(a2[2])}</span></div>` : ""}
         ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">A friend</span><span>${esc(ch.contact)}</span></div>` : ""}
-        ${powerSlots().length && ch.powers.some(Boolean) ? `<div class="field wide"><span class="label">${POWERS.plural}</span><span>${powerSlots().map((cl, i) => ch.powers[i] ? `<b>${esc(powerDef(ch.powers[i])[1])} (Class ${cl}):</b> ${esc(powerEffect(ch.powers[i], cl))}` : "").filter(Boolean).join("<br>")}</span></div>` : ""}
+        ${POWERS && allPowers().length ? `<div class="field wide"><span class="label">${POWERS.plural}</span><span>${allPowers().map((x) => `<b>${esc(powerDef(x.id)[1])} (Class ${x.cl}):</b> ${esc(powerEffect(x.id, x.cl))}`).join("<br>")}</span></div>` : ""}
         ${STATUSES && ch.status ? (() => { const st = STATUSES.find((x) => x[0] === ch.status); return `<div class="field"><span class="label">${esc(PACK.statusLabel || "Status")}: ${esc(st[1])}</span><span class="small">${esc(st[2])}</span><span class="small muted">${esc(st[3])}</span></div>`; })() : ""}
         ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([, n, eff]) => `<b>${esc(n)}:</b> ${esc(eff)}`).join("<br>")}</span></div>` : ""}
         ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 ${esc(ch.gear.skill)})` : ""}</span></div>` : ""}
@@ -4873,6 +4885,20 @@ tr.lvl-U td.target { color: var(--muted); }
         $("powers-label").textContent = `${POWERS.plural} (${n} of ${sl.length})`;
         $("powers-note").textContent = POWERS.note || "";
       }
+      $("powers-adv").hidden = !sl.length && !ch.powersLearned.length;
+      const advSig = sl.map((_, i) => ch.powers[i] || "").join(",") + "|" + ch.powersLearned.length;
+      if ($("powers-adv-list").dataset.sig !== advSig) {
+        $("powers-adv-list").dataset.sig = advSig;
+        const clOpts = (from) => PLAY_CLASSES.slice(classIndex(from)).map((c) => `<option value="${c}">Class ${c}</option>`).join("");
+        $("powers-adv-list").innerHTML = sl.map((base, i) => ch.powers[i] ? `<div class="field"><label for="f-praise-${i}">${esc(powerDef(ch.powers[i])[1])} now at</label>
+            <select id="f-praise-${i}" data-praise="${ch.powers[i]}" data-base="${base}">${clOpts(base)}</select></div>` : "").join("")
+          + ch.powersLearned.map((x, i) => `<div class="field wide"><label for="f-plearn-${i}">Learned in play</label>
+            <div class="btn-row"><select id="f-plearn-${i}" data-plearn="${i}"><option value="">Choose a power…</option>${POWERS.list.map((p) => `<option value="${p[0]}">${esc(p[1])}${p[4]?.gm ? " (GM)" : ""}</option>`).join("")}</select>
+            <select id="f-plearncl-${i}" data-plearncl="${i}" aria-label="Its Class">${clOpts("I")}</select>
+            <button type="button" class="linkish" data-plearndel="${i}">Remove</button></div></div>`).join("");
+      }
+      sl.forEach((base, i) => { const s = $("f-praise-" + i); if (s) s.value = CLASS_NAMES[Math.max(classIndex(base), classIndex(ch.powerRaise[ch.powers[i]] || base))]; });
+      ch.powersLearned.forEach((x, i) => { $("f-plearn-" + i).value = x.id; $("f-plearncl-" + i).value = x.cl; });
     }
     if (PTRACK) {
       const pt = Math.min(PTRACK.boxes, ch.play.ptrack || 0);
@@ -5052,6 +5078,9 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-adv2") { ch.adv2.id = t.value; touch(); render(); }
     else if (t.id === "f-allegiance") { ch.allegiance = t.value; touch(); render(); }
     else if (t.id === "f-status") { ch.status = t.value; touch(); render(); }
+    else if (t.dataset.praise) { if (t.value === t.dataset.base) delete ch.powerRaise[t.dataset.praise]; else ch.powerRaise[t.dataset.praise] = t.value; touch(); render(); }
+    else if (t.dataset.plearn !== undefined) { ch.powersLearned[+t.dataset.plearn].id = t.value; touch(); render(); }
+    else if (t.dataset.plearncl !== undefined) { ch.powersLearned[+t.dataset.plearncl].cl = t.value; touch(); render(); }
     else if (t.dataset.pslot !== undefined) { const i = +t.dataset.pslot; while (ch.powers.length <= i) ch.powers.push(""); ch.powers[i] = t.value; touch(); render(); }
     else if (t.id === "f-gearskill") { ch.gear.skill = t.value; touch(); render(); }
     else if (t.id === "f-reasonpick" && t.value !== "") {
@@ -5590,6 +5619,8 @@ tr.lvl-U td.target { color: var(--muted); }
   function newOfficer() { load(blank()); applyRoleSkills(); render(); selectTab("create"); toast("New character started."); }
   $("btn-new").onclick = newOfficer;
   $("banner-new").onclick = newOfficer;
+  $("plearn-add").onclick = () => { ch.powersLearned.push({ id: "", cl: "I" }); touch(); render(); };
+  $("powers-adv-list").addEventListener("click", (e) => { const b = e.target.closest("[data-plearndel]"); if (!b) return; ch.powersLearned.splice(+b.dataset.plearndel, 1); touch(); render(); });
   $("btn-example").onclick = () => { load(example()); toast(`Example loaded: ${ch.name}.`); };
   $("btn-save").onclick = () => {
     const copy = JSON.parse(JSON.stringify(ch));

@@ -643,6 +643,19 @@ Your origin's tier sets your powers:
 
 Choose them in the creator's step 4. Powers marked **(GM)** need the GM's approval, and so does every power a **Mythic** character takes.
 
+## Growing your powers
+
+After a significant case, the GM may allow one of these **instead of a skill step**:
+
+| Advancement | Limit |
+|---|---|
+| Raise one power by one Class | Up to Class III |
+| Learn a new power at Class I | Needs a story reason: a ritual, an exposure, Ambrosia, a bond that deepens |
+| Raise a Class III power to **Class IV** | Once per campaign, at a major story turning point, with the GM's approval; costs two advancements |
+| **Class V** | Only at the end of a long campaign, as the climax of a character's story |
+
+**Class VI** stays with the GM's characters. Until then, pushing (one action, one box of Strain) is how a character briefly reaches the Class above their own. Record grown and newly learned powers in the creator's step 4, under *Powers grown in play*.
+
 ## The powers
 
 ## Energy and attack
