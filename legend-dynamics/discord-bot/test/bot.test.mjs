@@ -1,7 +1,7 @@
 // Run with: npm test
 import assert from "node:assert/strict";
 import test from "node:test";
-import worker, { odds, resolve } from "../src/worker.js";
+import worker, { odds, resolve, commandsFor } from "../src/worker.js";
 
 test("roll-under with automatic results", () => {
   assert.equal(resolve([3, 3, 3], 11).success, true);
@@ -267,4 +267,14 @@ test("the old /duty, /grit, /pelion and /grimm names still work, and register on
   assert.match((await signedCall(env, sub("game", "set", [{ name: "game", value: "grimm" }], { gm: true }))).content, /needs the bot's storage/);
   const duty = commandsFor({ DUTY: {} }).find((c) => c.name === "duty");
   assert.match(duty.description, /Duty points/); assert.equal(duty.options.length, 5);
+});
+
+test("every command, option and choice fits Discord's 100-character limits", () => {
+  const check = (o, path) => {
+    assert.ok(!o.description || o.description.length <= 100, `${path}: description is ${o.description?.length} characters`);
+    assert.ok(o.name.length <= 32, `${path}: name too long`);
+    (o.options || []).forEach((x) => check(x, `${path} ${x.name}`));
+    (o.choices || []).forEach((c) => assert.ok(c.name.length <= 100, `${path}: choice ${c.name} too long`));
+  };
+  for (const legacy of [undefined, "no"]) commandsFor({ LEGACY_COMMANDS: legacy }).forEach((c) => check(c, "/" + c.name));
 });
