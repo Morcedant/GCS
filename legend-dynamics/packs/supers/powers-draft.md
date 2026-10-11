@@ -82,6 +82,13 @@ How to read the effects:
 
 ## Notes
 
-- **Origins limit some choices.** Immortality is Mythic only; Adepts take their powers from the mystic list (Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing).
+- **Mythic powers need the GM's approval.** Every power a Mythic character takes, Immortality included, is agreed with the GM: a curse or a god's gift has to fit the campaign.
+- **Adepts and rituals.** An Adept's own powers come from the mystic list (Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing). Beyond those, an Adept can **emulate any power by ritual**:
+  - **Time:** Class I takes ten minutes, Class II an hour, Class III a night. A ritual can't be done in the middle of a fight.
+  - **Need:** a quiet place and the right materials, which the GM may make the first problem to solve.
+  - **Roll:** Powers, at −2 for Class II and −4 for Class III. A ritual can't exceed the Adept's highest Class.
+  - **Effect:** the power works once, or for one scene, as the GM judges. It can be cast on someone else.
+  - **Cost:** a failed ritual marks a box of Strain; a natural 18 means something answered that shouldn't have.
+  - Rituals for (GM) powers still need the GM's approval.
 - **Aegis Pilots** have no powers: their suit gives Strength II, Toughness II, Flight I and a Class II weapon while they wear it.
 - **The labs want you.** A Class III power, or any (GM) power, draws interest from the Foundation and Raster Zero. That interest is a story hook, not a rule.
