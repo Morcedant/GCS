@@ -48,7 +48,7 @@
   "restockDone": "Restocked at a port: full load.",
   "emptyNote": "Empty: it won't fire until you reload or recharge.",
   "otherWeapon": "Another weapon (nothing spent)",
-  "tracksTitle": "Debt, Heat and Reputation",
+  "tracksTitle": "Debt, Heat, Reputation and Hull",
   "tracksIntro": "Shared by the whole crew. Borrowing, breaking the law, psionic slips and fame can mark a box; paying up, lying low and quiet work can clear one between jobs.",
   "tracksReset": "Clear every track",
   "exampleName": "example broker",
@@ -96,6 +96,13 @@
    "name": "Service",
    "color": "--good",
    "emblem": "M43 24 L57 24 L57 43 L76 43 L76 57 L57 57 L57 76 L43 76 L43 57 L24 57 L24 43 L43 43 Z",
+   "stroke": false
+  },
+  {
+   "id": "crew",
+   "name": "Ship Crew",
+   "color": "--warn",
+   "emblem": "M50 18 L68 46 L60 46 L60 74 L50 82 L40 74 L40 46 L32 46 Z M26 60 L40 52 L40 66 Z M74 60 L60 52 L60 66 Z",
    "stroke": false
   },
   {
@@ -163,14 +170,80 @@
    ]
   },
   {
+   "name": "Captain",
+   "group": "crew",
+   "text": "Captain: commands a ship and its crew, finds the work, makes the deals and makes the hard calls when the shooting starts.",
+   "skills": [
+    "Leadership",
+    "Psychology",
+    "Diplomacy",
+    "Commerce"
+   ]
+  },
+  {
    "name": "Pilot",
-   "group": "frontier",
+   "group": "crew",
    "text": "Pilot: flies anything, through anything, and gets paid for the impossible run.",
    "skills": [
     "Piloting",
     "Navigation",
     "Engineering",
     "Sensors"
+   ]
+  },
+  {
+   "name": "Gunner",
+   "group": "crew",
+   "text": "Gunner: runs the ship's weapons and point defense, and keeps them working when everything else is failing.",
+   "skills": [
+    "Firearms",
+    "Sensors",
+    "Engineering",
+    "Athletics"
+   ]
+  },
+  {
+   "name": "Navigator",
+   "group": "crew",
+   "text": "Navigator: plots corridor transits, reads gravimetric drift and finds the way when the charts are wrong.",
+   "skills": [
+    "Navigation",
+    "Sensors",
+    "Science",
+    "Computers"
+   ]
+  },
+  {
+   "name": "Engineer",
+   "group": "crew",
+   "text": "Engineer: keeps the drive, the hull and everything else running, often with parts that don't fit.",
+   "skills": [
+    "Engineering",
+    "Computers",
+    "Science",
+    "Sensors"
+   ]
+  },
+  {
+   "name": "Medtech",
+   "group": "crew",
+   "text": "Medtech: the ship's medic and biotech operator, patching the crew between jobs and in the middle of them.",
+   "skills": [
+    "Medicine",
+    "Science",
+    "Engineering",
+    "Psychology"
+   ]
+  },
+  {
+   "name": "Crew",
+   "group": "crew",
+   "text": "Crew: a general hand who stands watch, moves cargo, patches the hull and holds the airlock when someone tries to board.",
+   "skills": [
+    "Athletics",
+    "Engineering",
+    "Close Combat",
+    "Firearms"
    ]
   },
   {
@@ -2358,6 +2431,17 @@
     "Famous: everyone wants something from you",
     "Legend: someone powerful comes calling; start a clock"
    ]
+  },
+  {
+   "name": "Hull",
+   "boxes": 4,
+   "effects": [
+    "Sound",
+    "Scarred: breaches sealed, no penalty yet",
+    "A system hit: −2 to the drive, the weapons or the sensors",
+    "Crippled: −2 to every ship roll; the corridor drive won't engage",
+    "Breaking up: start an Abandon ship clock"
+   ]
   }
  ],
  "seeds": {
@@ -2650,8 +2734,16 @@
    "Up to 3× light speed (civilian 1–2×). In-system: hours. Between stars: light-years ÷ 3 in years. Not in corridors, near mouths or deep in gravity wells."
   ],
   [
+   "Ship combat",
+   "Space bands: Close <10 km, Short 1,000 km, Medium 10,000 km, Long 100,000 km, Extreme a light-second. Opposed Piloting each exchange shifts range one band. Point defense Close 1, lasers Medium 1, missiles Long 2, coilgun Extreme 3 Hull boxes."
+  ],
+  [
+   "Captain",
+   "One order an exchange: Command (Leadership, +2 to a station), Read the enemy (Psychology), Hail (Diplomacy or Deception vs Will), Rally (Leadership)."
+  ],
+  [
    "Tracks",
-   "Debt (what you owe), Heat (who's after you), Reputation (who knows you). 4 boxes each; clear by paying up, lying low or quiet work between jobs."
+   "Debt (what you owe), Heat (who's after you), Reputation (who knows you), Hull (your ship). 4 boxes each; clear by paying up, lying low, quiet work or a dock between jobs."
   ]
  ],
  "example": {

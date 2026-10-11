@@ -33,7 +33,13 @@ Choose a calling and describe what you bring. Your calling places you in a group
 | Corporate Agent | Commerce | represents a company's interests far from head office, with its money and its orders. | Commerce, Leadership, Diplomacy, Firearms |
 | Smuggler | Commerce | moves what the Accord taxes, forbids or would rather not know about. | Piloting, Deception, Streetwise, Stealth |
 | Explorer | Frontier | goes first into uncharted corridors and unclaimed worlds. | Navigation, Survival, Science, Sensors |
-| Pilot | Frontier | flies anything, through anything, and gets paid for the impossible run. | Piloting, Navigation, Engineering, Sensors |
+| Captain | Ship Crew | commands a ship and its crew, finds the work, makes the deals and makes the hard calls when the shooting starts. | Leadership, Psychology, Diplomacy, Commerce |
+| Pilot | Ship Crew | flies anything, through anything, and gets paid for the impossible run. | Piloting, Navigation, Engineering, Sensors |
+| Gunner | Ship Crew | runs the ship's weapons and point defense, and keeps them working when everything else is failing. | Firearms, Sensors, Engineering, Athletics |
+| Navigator | Ship Crew | plots corridor transits, reads gravimetric drift and finds the way when the charts are wrong. | Navigation, Sensors, Science, Computers |
+| Engineer | Ship Crew | keeps the drive, the hull and everything else running, often with parts that don't fit. | Engineering, Computers, Science, Sensors |
+| Medtech | Ship Crew | the ship's medic and biotech operator, patching the crew between jobs and in the middle of them. | Medicine, Science, Engineering, Psychology |
+| Crew | Ship Crew | a general hand who stands watch, moves cargo, patches the hull and holds the airlock when someone tries to board. | Athletics, Engineering, Close Combat, Firearms |
 | Prospector | Frontier | finds the ore, the ruins or the claim that makes a fortune, then has to keep it. | Science, Sensors, Survival, Engineering |
 | Salvager | Frontier | strips wrecks and dead stations, and knows which ones should have stayed dead. | Engineering, Sensors, Athletics, Computers |
 | AI Minder | Frontier | bonded to a personal AI with a mind of its own, and trained to handle other AIs, from corporate systems to rogue minds. | Computers, Psychology, Sensors, Engineering |
@@ -438,9 +444,9 @@ Begin each session with two Resolve points (three with Extra Resolve); unused po
 
 Gain one point when one of your complications creates a meaningful problem you accept, including a companion complication. You can decline the proposed complication without penalty.
 
-## Debt, Heat and Reputation
+## Debt, Heat, Reputation and Hull
 
-The crew shares three tracks. **Debt** is what you owe (to a Tessan dynasty, a bank, a syndicate or each other). **Heat** is who's after you: the law, a corporation, the Hegemony or the Mandate inquisitors. **Reputation** is who knows your name, which opens doors and makes it hard to hide. They fill as your deeds catch up with you; the GM narrates what each box means.
+The crew shares four tracks; **Hull**, the ship's own damage, is explained under *Ships in a fight*. **Debt** is what you owe (to a Tessan dynasty, a bank, a syndicate or each other). **Heat** is who's after you: the law, a corporation, the Hegemony or the Mandate inquisitors. **Reputation** is who knows your name, which opens doors and makes it hard to hide. They fill as your deeds catch up with you; the GM narrates what each box means.
 
 - **Marking:** borrowing or buying on credit (Debt); crimes, firefights in public, or a psionic slip (Heat); a famous success or a public scandal (Reputation). A success at a cost can mark any of them.
 - **Clearing:** paying up between jobs (Debt); lying low or a good set of forged papers (Heat); quiet work and time (Reputation).
@@ -450,6 +456,7 @@ The crew shares three tracks. **Debt** is what you owe (to a Tessan dynasty, a b
 | Debt | 4 | 1: A payment comes due; 2: Collectors call: −2 to Commerce with lenders; 3: Liens: your ship or gear can be seized; 4: Default: a creditor names the price, a job you can't refuse |
 | Heat | 4 | 1: Questions asked at the last port; 2: Flagged: −2 at checkpoints and screenings; 3: Hunted: a bounty, a warrant or an inquisitor; 4: Cornered: start a Manhunt clock |
 | Reputation | 4 | 1: Talked about in the ports; 2: Recognized: +2 to Diplomacy with admirers, −2 to Stealth; 3: Famous: everyone wants something from you; 4: Legend: someone powerful comes calling; start a clock |
+| Hull | 4 | 1: Scarred: breaches sealed, no penalty yet; 2: A system hit: −2 to the drive, the weapons or the sensors; 3: Crippled: −2 to every ship roll; the corridor drive won't engage; 4: Breaking up: start an Abandon ship clock |
 
 ## Advancement
 
@@ -636,6 +643,80 @@ Control of corridor intersections is one of the fundamental sources of political
 - **Collapse.** An unstable corridor is a danger clock (usually 6 segments) that ticks with time and every failed transit; when it fills, the corridor closes, with whoever is inside.
 - **Messages.** A quantum-gravimetric transceiver reaches anywhere on the network: within a junction's region in minutes, across several junctions in hours. Worlds behind collapsed corridors can't be reached at all. Every message passes through junctions, and their owners listen: sending something sensitive through a hostile junction takes a **Computers** roll to hide it, and a failure marks **Heat**.
 - **Mouths and junctions.** Expect papers, tolls (which can mark **Debt**) and Mandate screenings.
+
+# Ships in a fight
+
+Most crews would rather run than fight, and most fights between ships are short. These rules keep them fast: one roll per station, each exchange.
+
+## Range in space
+
+| Band | Distance | For example |
+|---|---|---|
+| Close | Under 10 km | Docking, boarding, a knife fight between hulls |
+| Short | Up to 1,000 km | Formation flying; a ship is a visible point of light |
+| Medium | Up to 10,000 km | A planet's near orbit |
+| Long | Up to 100,000 km | Across a planet's moon system |
+| Extreme | About a light-second (300,000 km) | The limit of targeting; light lag makes beyond it guesswork |
+
+As in personal combat, a weapon fires without penalty within its effective band, at −2 one band beyond and −4 two bands beyond; farther is out of range.
+
+**Closing and opening.** At the start of each exchange the pilots roll an opposed **Piloting** contest. The winner may shift the range one band, in or out. A ship that wins at Extreme range by 5 or more can break contact and run for a corridor mouth or a metric jump.
+
+## Ship weapons
+
+| Weapon | Range | Hull boxes | Notes |
+|---|---|---|---|
+| Point-defense guns | Close | 1 | A gunner can instead roll **Firearms** to shoot down an incoming missile; success cancels it. |
+| Laser battery | Medium | 1 | Silent, fast, no ammunition. |
+| Missiles | Long | 2 | Four to a rack. Point defense or a successful evade stops them. |
+| Coilgun spinal mount | Extreme | 3 | Warships only. Aim takes an action; a hit by 5 or more also knocks out a system. |
+| Boarding | Close | — | Grapple and breach; the fight moves to personal combat. |
+
+## The exchange
+
+Each exchange, every crewed station acts once, in any order the crew likes:
+
+| Station | Roll | What it does |
+|---|---|---|
+| Pilot | Piloting | The range contest, and **evade**: once per exchange, like Dodge, cancel a hit that would land. |
+| Gunner | Firearms | Fire one weapon, with range penalties. Every hit marks the target's Hull. |
+| Sensors | Sensors | **Lock on**: +2 to the gunner's next shot; or **jam**: −2 to the enemy's next shot. |
+| Engineer | Engineering | Keep a damaged system running (ignore its penalty this exchange), or patch one Hull box, once per fight. |
+
+**The captain's orders.** Whoever commands the ship (the captain, or whoever is in the chair) takes one of these each exchange:
+
+| Order | Roll | Effect |
+|---|---|---|
+| Command | Leadership | Success: one station gets +2 to its roll this exchange; success by 5, two stations. |
+| Read the enemy | Psychology | Success: you predict their next move. +2 to the pilot's evade or range contest this exchange, or the gunner ignores one band of range penalty. |
+| Hail | Diplomacy (or Deception to bluff) | Opposed by the enemy captain's Will. Success: they pause to talk, hold fire for an exchange, or consider surrender; a bluff can make them believe what you say about your ship. |
+| Rally | Leadership | After a hit to the hull, steady the crew: everyone Stunned recovers, and the next failed station roll this scene may be rerolled. |
+
+A captain who takes an order doesn't also work a station that exchange. Commanding well is the job.
+
+## Hull
+
+Your crew's ship has a **Hull** track (in the creator's tracks, with Debt, Heat and Reputation): four boxes, and each one costs you something.
+
+| Hull | Effect |
+|---|---|
+| 1 | Scarred: breaches sealed, no penalty yet. |
+| 2 | A system is hit: −2 to rolls using the drive, the weapons or the sensors (the GM chooses, or roll 3d6: 3–8 drive, 9–12 weapons, 13–18 sensors). |
+| 3 | Crippled: −2 to every ship roll, and the corridor drive won't engage. |
+| 4 | Breaking up: start an *Abandon ship* clock. |
+
+**Armor.** A warship's armor ignores one hit that would mark only 1 box each exchange. **Repairs:** a dock clears the whole track; in the field an engineer patches one box a fight, and a full day's work clears one more.
+
+## Enemy ships
+
+| Ship | Pilot / Gunner | Hull | Weapons | Trait |
+|---|---|---|---|---|
+| Pirate raider | 12 / 12 | 3 | Laser battery, missiles (2) | **Boarders.** Wants your cargo, not your ship; tries to close to Close. |
+| Customs cutter | 13 / 12 | 4 | Laser battery | **Papers.** Demands an inspection first; resisting marks Heat. |
+| Corporate frigate | 13 / 14 | 5 | Lasers, missiles (4) | **Armor.** Ignores one 1-box hit each exchange. |
+| Syndicate gunrunner | 14 / 13 | 4 | Lasers, point defense | **Fast.** +2 to the range contest. |
+| Hegemony warship | 14 / 15 | 8 | Coilgun spinal mount, lasers, missiles, point defense | **Armor.** A legion of marines ready to board. |
+| Drone swarm | — / 12 | 1 each | Lasers | **Swarm.** Kill the controller ship and they go dead. |
 
 # Peoples of the corridors
 
@@ -1752,7 +1833,7 @@ The callings and species in this book are a starting point, not a limit. With th
 A calling is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
 
 1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the callings above: *"Courier: carries what can't be sent by signal, through corridors no one else will fly."*
-2. **Choose a group.** Pick the one it belongs with: Commerce, Frontier, Service or Trouble. The group only sets your sheet's colors and emblem.
+2. **Choose a group.** Pick the one it belongs with: Commerce, Frontier, Service, Ship Crew or Trouble. The group only sets your sheet's colors and emblem.
 3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in callings do this for you); they count toward your normal Trained skills.
 4. **Check it with the GM.** It should fit the setting and overlap the existing callings as little as possible.
 

@@ -468,7 +468,7 @@ export const PACKS = {
   "title": "Fracture Lines",
   "point": "Resolve",
   "mission": "Job",
-  "trackTitle": "Debt, Heat and Reputation",
+  "trackTitle": "Debt, Heat, Reputation and Hull",
   "tracks": [
    {
     "name": "Debt",
@@ -501,6 +501,17 @@ export const PACKS = {
      "Recognized: +2 to Diplomacy with admirers, −2 to Stealth",
      "Famous: everyone wants something from you",
      "Legend: someone powerful comes calling; start a clock"
+    ]
+   },
+   {
+    "name": "Hull",
+    "boxes": 4,
+    "effects": [
+     "Sound",
+     "Scarred: breaches sealed, no penalty yet",
+     "A system hit: −2 to the drive, the weapons or the sensors",
+     "Crippled: −2 to every ship roll; the corridor drive won't engage",
+     "Breaking up: start an Abandon ship clock"
     ]
    }
   ],
