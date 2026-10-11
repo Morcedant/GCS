@@ -522,11 +522,13 @@ tr.lvl-U td.target { color: var(--muted); }
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">1</span><h2>Choose your calling</h2>
-            <p class="muted small">Pick a calling and describe what your character brings. A title is agreed with the GM and gives no bonus.</p></div>
+            <p class="muted small">Pick a calling and describe what your character brings. A title is agreed with the GM and gives no bonus. Or make your own: choose <b>Custom calling…</b> at the end of the list (see <i>Making your own</i> in the Players' Guide).</p></div>
           <div class="fields">
             <div class="field"><label for="f-dept">Calling</label>
               <select id="f-dept"></select>
               <span class="small muted" id="role-skills"></span></div>
+            <div class="field" id="custom-role-wrap" hidden><label for="f-customrole">Custom calling name</label><input type="text" id="f-customrole" placeholder="e.g. Smuggler"></div>
+            <div class="field" id="custom-group-wrap" hidden><label for="f-customgroup">Group (sets your colors and emblem)</label><select id="f-customgroup"></select></div>
             <div class="field"><label for="f-rank">Title (optional)</label>
               <input type="text" id="f-rank" placeholder="e.g. Deputy U.S. Marshal"></div>
             <div class="field wide"><label for="f-path">Training</label>
@@ -539,7 +541,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">2</span><h2>Heritage, Edges and attributes</h2>
-            <p class="muted small">All five attributes start at 10, then your heritage adjusts them. Your heritage's tier sets how many Edges you get (3 points split between them). Spend 5 attribute points on top, plus any from Edges. The starting maximum is 13, plus any heritage bonus to that attribute.</p></div>
+            <p class="muted small">All five attributes start at 10, then your heritage adjusts them. Your heritage's tier sets how many Edges you get (3 points split between them). Spend 5 attribute points on top, plus any from Edges. The starting maximum is 13, plus any heritage bonus to that attribute. You can also build your own heritage with the GM: choose <b>Custom heritage…</b> at the end of the list (see <i>Making your own</i>).</p></div>
           <div class="fields">
             <div class="field"><label for="f-speciesid">Heritage</label><select id="f-speciesid"></select></div>
             <div class="field" id="species-name-wrap" hidden><label for="f-species">Heritage name</label><input type="text" id="f-species" placeholder="e.g. Seltenvogel"></div>
@@ -1013,7 +1015,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li>You cannot lower an attribute below its heritage base to gain points.</li>
 </ul>
 <h3 id="g-custom-heritage">Custom heritage</h3>
-<p>Agree on a heritage with the GM, give it adjustments from −2 to +2 per attribute that total zero, and agree its tier. The normal starting maximum and heritage base rules apply.</p>
+<p>You can build your own heritage with the GM. See <em>Making your own</em> for the steps.</p>
 <h2 id="g-step-3-choose-trained-skills">Step 3: Choose trained skills</h2>
 <p>A <strong>Well-rounded</strong> character chooses ten different skills: one <strong>Specialty</strong> at its governing attribute +3 and nine <strong>Trained</strong> skills at attribute +1. An <strong>Old hand</strong> chooses <strong>one Expert skill at +5</strong> and <strong>seven Trained skills at +1</strong>. All other skills are <strong>Untrained</strong> at attribute −4 when an attempt is plausible. Each skill has its own final target number; do not add the attribute again when rolling.</p>
 <p>The Expert’s extra bonus matters most when the work is hard. With Intellect 13, an Expert gambler has a target of 18, which only natural 17–18 can fail; under a −4 “very difficult” penalty the target is still 14. If Athletics is the Expert skill, Dodge adds +2, the same as a Specialty.</p>
@@ -3059,6 +3061,77 @@ tr.lvl-U td.target { color: var(--muted); }
 </table>
 <p><em>Source: Murcielago template: no human-form changes; Sonic Scream 6, Sonar. About 283 points.</em></p>
 <!-- HERITAGES:END -->
+<h1 id="g-making-your-own">Making your own</h1>
+<p>The callings and heritages in this book are a starting point, not a limit. With the GM’s agreement, any player can create their own calling or heritage. The creator has a <strong>Custom</strong> option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.</p>
+<h2 id="g-a-custom-calling">A custom calling</h2>
+<p>A calling is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.</p>
+<ol type="1">
+<li><strong>Name it and describe it.</strong> One sentence for what your character does that no one else does, in the style of the callings above: <em>“Undertaker: buries the dead, and makes sure they stay buried.”</em></li>
+<li><strong>Choose a group.</strong> Pick the one it belongs with: The Law, The Learned or The Frontier. The group only sets your sheet’s colors and emblem.</li>
+<li><strong>Pick four core skills.</strong> The skills it can’t do without. Mark them Trained yourself in step 3 (the built-in callings do this for you); they count toward your normal Trained skills.</li>
+<li><strong>Check it with the GM.</strong> It should fit the setting and overlap the existing callings as little as possible.</li>
+</ol>
+<p><strong>In the creator:</strong> in step 1, choose <strong>Custom calling…</strong> at the end of the Calling list, then enter its name and group. Write the description in <em>What you bring</em>.</p>
+<h2 id="g-a-custom-heritage">A custom heritage</h2>
+<p>Build it with the GM, one step at a time.</p>
+<h3 id="g-the-concept">1. The concept</h3>
+<p>Two or three sentences: where they come from, what sets them apart, and how others see them. It should be something the heritages in this book don’t already cover.</p>
+<h3 id="g-the-tier">2. The tier</h3>
+<p>The tier measures how much the heritage gives on its own. Each tier costs one of your 3 Edge points, so stronger heritages start with fewer Edges.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Tier</th>
+<th>Edges</th>
+<th>Use it for</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>3</td>
+<td>Ordinary people: a homeland, upbringing or culture, with no special abilities</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>2</td>
+<td>One small, constant edge: keen senses, a tough hide, a free Trained skill, resistance to one hazard</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>1</td>
+<td>Clear inhuman or supernatural gifts: venom, a second form, strong resistances</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>0</td>
+<td>Remarkable beings: several strong abilities, and serious weaknesses to match</td>
+</tr>
+</tbody>
+</table>
+<p>When in doubt, choose the higher tier.</p>
+<h3 id="g-attribute-adjustments">3. Attribute adjustments</h3>
+<p>Give adjustments from <strong>−2 to +2</strong> per attribute that <strong>total zero</strong>: a +2 needs a −2 or two −1s. The adjustments move the attribute’s base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most heritages change two to four attributes.</p>
+<h3 id="g-core-rules-tier-1-and-up">4. Core rules (tier 1 and up)</h3>
+<p>One to three short rules that always apply: what they can do (see in the dark, resist cold, a free Trained skill) and what it costs (a weakness, a people’s distrust, a hazard they can’t abide). A strength with no drawback is worth more than it looks, so price it a tier higher.</p>
+<h3 id="g-heritage-advantages">5. Heritage advantages</h3>
+<p>Write one to three. Each works like a general advantage: <strong>+2 to one skill in a narrow situation</strong>, or a small, limited permission (“once per scene…”). Each comes with a <strong>companion complication</strong>: a problem the trait causes, with a clear trigger and a real consequence, which earns a Grit point when it bites, like any complication. A character takes one advantage, general or heritage, so make them distinct choices.</p>
+<h3 id="g-a-woge-optional-tier-2-or-3">6. A woge (optional, tier 2 or 3)</h3>
+<p>If the heritage changes shape, give the form attribute bonuses (usually +2 to one attribute and +1 to another), two or three traits, and its drawbacks. The shared rules for forms in <em>The woge and the hidden world</em> apply.</p>
+<h3 id="g-in-the-creator">In the creator</h3>
+<ol type="1">
+<li>In step 2, choose <strong>Custom heritage…</strong> at the end of the Heritage list.</li>
+<li>Name it, choose the tier you agreed, and set its adjustments. The checklist confirms they total zero.</li>
+<li>Write its core rules in <strong>Other ability (GM approval required)</strong> in step 4.</li>
+<li>In step 4, choose <strong>Custom heritage advantage…</strong> and enter the advantage and its companion complication.</li>
+</ol>
+<h3 id="g-example">Example</h3>
+<p><strong>Hundjäger-blooded (tier 1).</strong> A human family with a little Wesen blood: no woge, but the instincts. <em>Adjustments:</em> Body +1, Presence −1. <em>Core rule:</em> keen nose: you smell fear and blood on anyone close by. <em>Heritage advantage:</em> <strong>Bloodhound’s Nose</strong>: +2 to Tracking by scent. <em>Companion:</em> <strong>Wesen Kin</strong>: Wesen recognize their own, and some want you back in the fold; accept the visit at the worst time.</p>
 <h1 id="g-complications">Complications</h1>
 <p>Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Grit point if you accept it. Every complication needs a trigger agreed with the GM; the creator suggests three for each.</p>
 <table>
@@ -3728,7 +3801,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     if (!Array.isArray(out.advances)) out.advances = [];
     if (out.path !== "hand") out.path = "rounded";
-    if (!DEPTS.some((d) => d[0] === out.dept)) out.dept = "Detective";
+    if (!out.customRole && !DEPTS.some((d) => d[0] === out.dept)) out.dept = "Detective";
     // The gun being tracked: its rounds and spare reloads. A character with a gun but no record starts loaded.
     const g = c.play && c.play.gun;
     out.play.gun = g && typeof g === "object" && (g.type === "" || GUNS[g.type])
@@ -3822,7 +3895,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const compDef = () => COMPLICATIONS.find((a) => a[0] === ch.comp.id);
   const advName = () => ch.adv.id === "custom" ? (ch.adv.name || "Custom advantage") : advDef()?.[1] || "";
   const compName = () => ch.comp.id === "custom" ? (ch.comp.name || "Custom complication") : compDef()?.[1] || "";
-  const division = () => (DEPTS.find((d) => d[0] === ch.dept) || DEPTS[2])[1];
+  const division = () => (ch.customRole ? ch.customGroup || "law" : (DEPTS.find((d) => d[0] === ch.dept) || DEPTS[2])[1]);
 
   function checks() {
     const sp = spent(), nS = count("S"), nT = count("T");
@@ -3856,6 +3929,8 @@ tr.lvl-U td.target { color: var(--muted); }
 
   // ---- static UI ----
   $("f-dept").innerHTML = Object.entries(GROUP_NAMES).map(([g, gn]) => `<optgroup label="${gn}">${DEPTS.filter((d) => d[1] === g).map(([d]) => `<option>${d}</option>`).join("")}</optgroup>`).join("");
+  $("f-dept").insertAdjacentHTML("beforeend", `<option value="__custom">Custom calling…</option>`);
+  $("f-customgroup").innerHTML = Object.entries(GROUP_NAMES).map(([g, gn]) => `<option value="${g}">${gn}</option>`).join("");
   const generalAdvOpts = `<optgroup label="General advantages">` +
     ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("") + `<option value="custom">Custom advantage…</option></optgroup>`;
   $("f-comp").innerHTML = `<option value="">Choose a complication…</option>` +
@@ -3918,7 +3993,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const map = { "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
       "f-speciesnotes": "speciesNotes", "f-connection": "connection", "f-notes": "notes", "f-otherequip": "otherEquip" };
     for (const [id, k] of Object.entries(map)) $(id).value = ch[k];
-    $("f-dept").value = ch.dept;
+    $("f-dept").value = ch.customRole ? "__custom" : ch.dept;
     $("f-path").value = ch.path;
     $("f-woge").checked = !!ch.play.woge;
     $("f-adv").value = ch.adv.id; $("f-advname").value = ch.adv.name; $("f-advtext").value = ch.adv.text; $("f-advdetail").value = ch.adv.detail;
@@ -3930,6 +4005,8 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   function render() {
+    $("custom-role-wrap").hidden = $("custom-group-wrap").hidden = !ch.customRole;
+    if (ch.customRole) { if ($("f-customrole").value !== ch.dept) $("f-customrole").value = ch.dept; $("f-customgroup").value = ch.customGroup || "law"; }
     $("role-skills").textContent = (ROLE_SKILLS[ch.dept] || []).length ? `Core skills: ${ROLE_SKILLS[ch.dept].join(", ")} (marked Trained for you)` : "";
     $("app").dataset.div = division();
     $("hdr-name").textContent = ch.name.trim() || "Unnamed character";
@@ -4290,7 +4367,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function touch() { if (ch.example) ch.example = false; }
 
   // ---- events ----
-  const textMap = { "f-contact": "contact", "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
+  const textMap = { "f-customrole": "dept", "f-contact": "contact", "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
     "f-speciesnotes": "speciesNotes", "f-connection": "connection", "f-notes": "notes", "f-otherequip": "otherEquip" };
   document.addEventListener("input", (e) => {
     const id = e.target.id;
@@ -4303,7 +4380,11 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   document.addEventListener("change", (e) => {
     const t = e.target;
-    if (t.id === "f-dept") { setDept(t.value); touch(); render(); }
+    if (t.id === "f-dept" && t.value === "__custom") {
+      ch.customRole = true; ch.customGroup = ch.customGroup || "law"; setDept(""); touch(); render(); $("f-customrole").focus();
+    }
+    else if (t.id === "f-customgroup") { ch.customGroup = t.value; touch(); render(); }
+    else if (t.id === "f-dept") { ch.customRole = false; setDept(t.value); touch(); render(); }
     else if (t.id === "f-path") {
       ch.path = t.value; touch(); render();
       if (!isGS()) toast("Broadened: the Expert skill becomes a Specialty (+3), and you can train two more skills.");

@@ -155,6 +155,9 @@ def char_block(c, pack, t, heading):
 
 def gen(name, pack, t):
     p = pack
+    if name == "group-names":
+        names = [g["name"] for g in p["groups"]]
+        return ", ".join(names[:-1]) + " or " + names[-1]
     if name == "discord":
         return discord_chapter.chapter(discord_chapter.game_info(p["id"], t["title"], t["point"], p.get("tracks", []), p.get("seeds", {}), t["tracksTitle"]))
     if name == "roles":
@@ -285,6 +288,10 @@ def core_rules(docx=False):
     core = (ENGINE / "core.md").read_text()
     core = core.replace("{{PACK:intro}}", "Legend Dynamics is a roleplaying system for heroic stories in any genre: concrete skills, a 3d6 roll-under core, and a small pool of Legend points that reward characters for their flaws. These core rules are setting-neutral. A **setting pack** supplies the roles, origins, skills, gear, weapons, tracks and dangers of one genre, and renames a few terms to suit it.")
     core = core.replace("# Discord commands\n\n{{GEN:discord}}\n\n", "")
+    # Neutral stand-ins for the pack-specific parts of "Making your own".
+    core = core.replace("{{PACK:customrole}}", '"Smuggler: knows every back door, bribe and hidden hold."')
+    core = core.replace("{{GEN:group-names}}", "one of your setting's groups")
+    core = core.replace("{{PACK:customorigin}}", "**Hill-folk (tier 1).** Stocky herders from high, cold country. *Adjustments:* Body +1, Presence −1. *Core rule:* at home in the heights: no penalty for thin air or cold. *Origin advantage:* **Sure-Footed**: +2 to Athletics to climb and keep your footing. *Companion:* **Clannish**: you trust your own people first; when it matters, accept the cost of that loyalty.")
     core = re.sub(r"\{\{PACK:(\w+)\}\}", "", core)
     core = re.sub(r"\{\{GEN:([\w-]+)\}\}", lambda m: f"*Your setting pack supplies this ({m.group(1).replace('-', ' ')}).*", core)
     core = fill(core, t).replace("This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Legend Dynamics** setting: its roles, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Legend points**.",

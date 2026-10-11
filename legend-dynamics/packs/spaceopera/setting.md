@@ -69,3 +69,11 @@ Opponents use the same rules as the characters. **Minor opponents** (guards, thu
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Enemy ships use the ship tracks: a Hegemony cruiser has Shields 3, Hull 4, and gunners at Blasters 12.
 
 <!-- SECTION:advantages -->
+
+<!-- SECTION:customrole -->
+
+"Salvager: strips wrecks for parts, and knows which ones should have stayed dead."
+
+<!-- SECTION:customorigin -->
+
+**Lumari (tier 1).** Small, luminous people from a world of endless night, who glow when they feel strongly. *Adjustments:* Agility +1, Body −1. *Core rule:* dark-adapted: you see in near-darkness, but bright light dazzles you (−1 to Agility-based rolls). *Species advantage:* **Night Eyes**: +2 to Sensors with passive scans and your own eyes in darkness. *Companion:* **Heart on Your Skin**: your glow shows what you feel; when it matters, accept the lie that fails or the hiding place that lights up.

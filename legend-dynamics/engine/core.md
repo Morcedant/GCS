@@ -76,7 +76,7 @@ After applying your {{originLower}}, distribute **five additional points** among
 
 ### Custom {{originLower}}
 
-Agree on {{a:originLower}} with the GM, give it adjustments from −2 to +2 per attribute that total zero, and agree its tier. The normal starting maximum and base rules apply.
+You can build your own {{originLower}} with the GM. See *Making your own* for the steps.
 
 ## Step 3: Choose trained skills
 
@@ -308,6 +308,69 @@ Choose one advantage at character creation: a general advantage from this chapte
 # {{originPlural}}
 
 {{GEN:origins}}
+
+# Making your own
+
+The {{rolePluralLower}} and {{originPluralLower}} in this book are a starting point, not a limit. With the GM's agreement, any player can create their own {{roleLower}} or {{originLower}}. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
+
+## A custom {{roleLower}}
+
+A {{roleLower}} is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
+
+1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the {{rolePluralLower}} above: *{{PACK:customrole}}*
+2. **Choose a group.** Pick the one it belongs with: {{GEN:group-names}}. The group only sets your sheet's colors and emblem.
+3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in {{rolePluralLower}} do this for you); they count toward your normal Trained skills.
+4. **Check it with the GM.** It should fit the setting and overlap the existing {{rolePluralLower}} as little as possible.
+
+**In the creator:** in step 1, choose **Custom {{roleLower}}…** at the end of the {{role}} list, then enter its name and group. Write the description in *What you bring*.
+
+## A custom {{originLower}}
+
+Build it with the GM, one step at a time.
+
+### 1. The concept
+
+Two or three sentences: where they come from, what sets them apart, and how others see them. It should be something the {{originPluralLower}} in this book don't already cover.
+
+### 2. The tier
+
+The tier measures how much the {{originLower}} gives on its own. Each tier costs one of your {{edgePoints}} Edge points, so stronger {{originPluralLower}} start with fewer Edges.
+
+| Tier | Edges | Use it for |
+|---|---|---|
+| 0 | 3 | Ordinary people: a homeland, upbringing or culture, with no special abilities |
+| 1 | 2 | One small, constant edge: keen senses, a tough hide, a free Trained skill, resistance to one hazard |
+| 2 | 1 | Clear inhuman or supernatural gifts: venom, a second form, strong resistances |
+| 3 | 0 | Remarkable beings: several strong abilities, and serious weaknesses to match |
+
+When in doubt, choose the higher tier.
+
+### 3. Attribute adjustments
+
+Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most {{originPluralLower}} change two to four attributes.
+
+### 4. Core rules (tier 1 and up)
+
+One to three short rules that always apply: what they can do (see in the dark, resist cold, a free Trained skill) and what it costs (a weakness, a people's distrust, a hazard they can't abide). A strength with no drawback is worth more than it looks, so price it a tier higher.
+
+### 5. {{origin}} advantages
+
+Write one to three. Each works like a general advantage: **+2 to one skill in a narrow situation**, or a small, limited permission ("once per scene…"). Each comes with a **companion complication**: a problem the trait causes, with a clear trigger and a real consequence, which earns a {{point}} point when it bites, like any complication. A character takes one advantage, general or {{originLower}}, so make them distinct choices.
+
+### 6. An alternate form (optional, tier 2 or 3)
+
+If the {{originLower}} changes shape, give the form attribute bonuses (usually +2 to one attribute and +1 to another), two or three traits, and its drawbacks. The shared rules for forms in *{{originPlural}}* apply.
+
+### In the creator
+
+1. In step 2, choose **Custom {{originLower}}…** at the end of the {{origin}} list.
+2. Name it, choose the tier you agreed, and set its adjustments. The checklist confirms they total zero.
+3. Write its core rules in **Other ability (GM approval required)** in step 4.
+4. In step 4, choose **Custom {{originLower}} advantage…** and enter the advantage and its companion complication.
+
+### Example
+
+{{PACK:customorigin}}
 
 # Complications
 

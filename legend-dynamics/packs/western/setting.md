@@ -100,3 +100,11 @@ Opponents use the same rules as the characters. **Minor opponents** (hired guns,
 <!-- SECTION:advantages -->
 
 **Badges.** A badge is legal authority, not a magic word: outlaws and the powerful don't always care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency's reach and files, but no badge.
+
+<!-- SECTION:customrole -->
+
+"Gravedigger: digs the holes, reads the stones, and knows which of the dead are restless."
+
+<!-- SECTION:customorigin -->
+
+**Ghost-touched (tier 1).** You died once, for a minute, and came back with something following you. *Adjustments:* Will +1, Body −1. *Core rule:* the dead notice you: you can sense a ghost nearby, but ghosts can sense you too. *Origin advantage:* **Speaks with the Dead**: +2 to Occult to call up and question a ghost. *Companion:* **Cold Company**: something from the other side follows you; when it matters, accept the chill, the stopped clock or the panicked horse.

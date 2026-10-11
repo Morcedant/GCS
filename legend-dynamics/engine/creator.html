@@ -495,11 +495,13 @@ tr.lvl-U td.target { color: var(--muted); }
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">1</span><h2>Choose your {{roleLower}}</h2>
-            <p class="muted small">Pick a {{roleLower}} and describe what your character brings. A title is agreed with the GM and gives no bonus.</p></div>
+            <p class="muted small">Pick a {{roleLower}} and describe what your character brings. A title is agreed with the GM and gives no bonus. Or make your own: choose <b>Custom {{roleLower}}…</b> at the end of the list (see <i>Making your own</i> in the Players' Guide).</p></div>
           <div class="fields">
             <div class="field"><label for="f-dept">{{role}}</label>
               <select id="f-dept"></select>
               <span class="small muted" id="role-skills"></span></div>
+            <div class="field" id="custom-role-wrap" hidden><label for="f-customrole">Custom {{roleLower}} name</label><input type="text" id="f-customrole" placeholder="e.g. Smuggler"></div>
+            <div class="field" id="custom-group-wrap" hidden><label for="f-customgroup">Group (sets your colors and emblem)</label><select id="f-customgroup"></select></div>
             <div class="field"><label for="f-rank">Title (optional)</label>
               <input type="text" id="f-rank" placeholder="e.g. Deputy U.S. Marshal"></div>
             <div class="field wide"><label for="f-path">Training</label>
@@ -512,7 +514,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">2</span><h2>{{origin}}, Edges and attributes</h2>
-            <p class="muted small">All five attributes start at 10, then your {{originLower}} adjusts them. Your {{originLower}}'s tier sets how many Edges you get (3 points split between them). Spend 5 attribute points on top, plus any from Edges. The starting maximum is 13, plus any {{originLower}} bonus to that attribute.</p></div>
+            <p class="muted small">All five attributes start at 10, then your {{originLower}} adjusts them. Your {{originLower}}'s tier sets how many Edges you get (3 points split between them). Spend 5 attribute points on top, plus any from Edges. The starting maximum is 13, plus any {{originLower}} bonus to that attribute. You can also build your own {{originLower}} with the GM: choose <b>Custom {{originLower}}…</b> at the end of the list (see <i>Making your own</i>).</p></div>
           <div class="fields">
             <div class="field"><label for="f-speciesid">{{origin}}</label><select id="f-speciesid"></select></div>
             <div class="field" id="species-name-wrap" hidden><label for="f-species">{{origin}} name</label><input type="text" id="f-species" placeholder="Name it"></div>
@@ -1012,7 +1014,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     if (!Array.isArray(out.advances)) out.advances = [];
     if (out.path !== "hand") out.path = "rounded";
-    if (!DEPTS.some((d) => d[0] === out.dept)) out.dept = DEPTS[0][0];
+    if (!out.customRole && !DEPTS.some((d) => d[0] === out.dept)) out.dept = DEPTS[0][0];
     // The gun being tracked: its rounds and spare reloads. A character with a gun but no record starts loaded.
     const g = c.play && c.play.gun;
     out.play.gun = g && typeof g === "object" && (g.type === "" || GUNS[g.type])
@@ -1112,7 +1114,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const compDef = () => COMPLICATIONS.find((a) => a[0] === ch.comp.id);
   const advName = () => ch.adv.id === "custom" ? (ch.adv.name || "Custom advantage") : advDef()?.[1] || "";
   const compName = () => ch.comp.id === "custom" ? (ch.comp.name || "Custom complication") : compDef()?.[1] || "";
-  const division = () => (DEPTS.find((d) => d[0] === ch.dept) || DEPTS[0])[1];
+  const division = () => (ch.customRole ? ch.customGroup || PACK.groups[0].id : (DEPTS.find((d) => d[0] === ch.dept) || DEPTS[0])[1]);
 
   function checks() {
     const sp = spent(), nS = count("S"), nT = count("T");
@@ -1148,6 +1150,8 @@ tr.lvl-U td.target { color: var(--muted); }
 
   // ---- static UI ----
   $("f-dept").innerHTML = Object.entries(GROUP_NAMES).map(([g, gn]) => `<optgroup label="${gn}">${DEPTS.filter((d) => d[1] === g).map(([d]) => `<option>${d}</option>`).join("")}</optgroup>`).join("");
+  $("f-dept").insertAdjacentHTML("beforeend", `<option value="__custom">Custom ${T.roleLower}…</option>`);
+  $("f-customgroup").innerHTML = Object.entries(GROUP_NAMES).map(([g, gn]) => `<option value="${g}">${gn}</option>`).join("");
   const generalAdvOpts = `<optgroup label="General advantages">` +
     ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("") + `<option value="custom">Custom advantage…</option></optgroup>`;
   $("f-comp").innerHTML = `<option value="">Choose a complication…</option>` +
@@ -1180,7 +1184,7 @@ tr.lvl-U td.target { color: var(--muted); }
   $("ph-type").innerHTML = `<option value="">None carried</option>` + Object.entries(GUNS).map(([id, [n, cap]]) => `<option value="${id}">${esc(n)} (${cap})</option>`).join("");
   $("horror-wrap").hidden = !HERITAGES.some((h) => h.restricted);
   $("log-books-wrap").hidden = !T.journalExtraLabel;
-  $("f-speciesid").innerHTML = SPECIES.map(([id, n, adj]) => `<option value="${id}">${n}${Object.keys(adj).length ? "" : ""}</option>`).join("") + `<option value="custom">Custom heritage…</option>`;
+  $("f-speciesid").innerHTML = SPECIES.map(([id, n, adj]) => `<option value="${id}">${n}${Object.keys(adj).length ? "" : ""}</option>`).join("") + `<option value="custom">Custom ${T.originLower}…</option>`;
   $("species-adj").innerHTML = ATTRS.map(([n]) => `<div class="adj"><span class="label">${n}</span>
     <span class="stepper"><button type="button" data-adj="${n}" data-d="-1" aria-label="Lower ${n} adjustment">−</button>
     <span class="num" id="adj-${n}"></span>
@@ -1214,7 +1218,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const map = { "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
       "f-speciesnotes": "speciesNotes", "f-connection": "connection", "f-notes": "notes", "f-otherequip": "otherEquip" };
     for (const [id, k] of Object.entries(map)) $(id).value = ch[k];
-    $("f-dept").value = ch.dept;
+    $("f-dept").value = ch.customRole ? "__custom" : ch.dept;
     $("f-path").value = ch.path;
     $("f-form").checked = !!ch.play.form;
     $("f-adv").value = ch.adv.id; $("f-advname").value = ch.adv.name; $("f-advtext").value = ch.adv.text; $("f-advdetail").value = ch.adv.detail;
@@ -1226,6 +1230,8 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   function render() {
+    $("custom-role-wrap").hidden = $("custom-group-wrap").hidden = !ch.customRole;
+    if (ch.customRole) { if ($("f-customrole").value !== ch.dept) $("f-customrole").value = ch.dept; $("f-customgroup").value = ch.customGroup || PACK.groups[0].id; }
     $("role-skills").textContent = (ROLE_SKILLS[ch.dept] || []).length ? `Core skills: ${ROLE_SKILLS[ch.dept].join(", ")} (marked Trained for you)` : "";
     $("app").dataset.div = division();
     $("hdr-name").textContent = ch.name.trim() || "Unnamed character";
@@ -1602,7 +1608,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function touch() { if (ch.example) ch.example = false; }
 
   // ---- events ----
-  const textMap = { "f-contact": "contact", "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
+  const textMap = { "f-customrole": "dept", "f-contact": "contact", "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
     "f-speciesnotes": "speciesNotes", "f-connection": "connection", "f-notes": "notes", "f-otherequip": "otherEquip" };
   document.addEventListener("input", (e) => {
     const id = e.target.id;
@@ -1615,7 +1621,11 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   document.addEventListener("change", (e) => {
     const t = e.target;
-    if (t.id === "f-dept") { setDept(t.value); touch(); render(); }
+    if (t.id === "f-dept" && t.value === "__custom") {
+      ch.customRole = true; ch.customGroup = ch.customGroup || PACK.groups[0].id; setDept(""); touch(); render(); $("f-customrole").focus();
+    }
+    else if (t.id === "f-customgroup") { ch.customGroup = t.value; touch(); render(); }
+    else if (t.id === "f-dept") { ch.customRole = false; setDept(t.value); touch(); render(); }
     else if (t.id === "f-path") {
       ch.path = t.value; touch(); render();
       if (!isGS()) toast("Broadened: the Expert skill becomes a Specialty (+3), and you can train two more skills.");

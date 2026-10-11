@@ -509,11 +509,13 @@ tr.lvl-U td.target { color: var(--muted); }
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">1</span><h2>Choose your role</h2>
-            <p class="muted small">Pick a department and describe what you bring to the crew. Rank and assignment are agreed with the GM; rank gives no mechanical bonus.</p></div>
+            <p class="muted small">Pick a department and describe what you bring to the crew. Rank and assignment are agreed with the GM; rank gives no mechanical bonus. Or make your own: choose <b>Custom department…</b> at the end of the list (see <i>Making your own</i> in the Players' Guide).</p></div>
           <div class="fields">
             <div class="field"><label for="f-dept">Department</label>
               <select id="f-dept"></select>
               <span class="small muted" id="role-skills"></span></div>
+            <div class="field" id="custom-role-wrap" hidden><label for="f-customrole">Custom department name</label><input type="text" id="f-customrole" placeholder="e.g. Smuggler"></div>
+            <div class="field" id="custom-group-wrap" hidden><label for="f-customgroup">Group (sets your colors and emblem)</label><select id="f-customgroup"></select></div>
             <div class="field"><label for="f-rankselect">Rank</label>
               <select id="f-rankselect"></select>
               <input type="text" id="f-rank" aria-label="Other rank" placeholder="Type the rank" hidden></div>
@@ -525,7 +527,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">2</span><h2>Species and attributes</h2>
-            <p class="muted small">All five attributes start at 10, then your species adjusts them. Spend 5 more points on top. The starting maximum is 13, plus any species bonus to that attribute. You can't lower an attribute to gain points.</p></div>
+            <p class="muted small">All five attributes start at 10, then your species adjusts them. Spend 5 more points on top. The starting maximum is 13, plus any species bonus to that attribute. You can't lower an attribute to gain points. You can also build your own species with the GM: choose <b>Custom species…</b> at the end of the list (see <i>Making your own</i>).</p></div>
           <div class="fields">
             <div class="field"><label for="f-speciesid">Species</label><select id="f-speciesid"></select></div>
             <div class="field" id="species-name-wrap" hidden><label for="f-species">Species name</label><input type="text" id="f-species" placeholder="e.g. Orion"></div>
@@ -988,7 +990,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Trill.</strong> A spotted humanoid people, some of whom are joined with a long-lived symbiont that carries the memories of its earlier hosts. In this era the Trill keep joining a closely guarded secret from outsiders, Starfleet included. An unjoined Trill uses the same adjustments; the species advantages below need a symbiont.</p>
 <p><strong>Saurian.</strong> A reptilian people with tough scaled skin and large, dark eyes, known across the quadrant for Saurian brandy. Lt. Linus served aboard USS Discovery in the 2250s.</p>
 <h3 id="g-custom-species">Custom species</h3>
-<p>Agree on a species with the GM and give it adjustments from −2 to +2 per attribute that total zero. The normal starting maximum and species base rules apply.</p>
+<p>You can build your own species with the GM. See <em>Making your own</em> for the steps.</p>
 <h2 id="g-step-3-choose-trained-skills">Step 3: Choose trained skills</h2>
 <p>Choose ten different skills: one <strong>Specialty</strong> at its governing attribute +3 and nine <strong>Trained</strong> skills at attribute +1. All other skills are <strong>Untrained</strong> at attribute −4 when an attempt is plausible. Use these same three training levels for every skill. Each skill has its own final target number; do not add the attribute again when rolling.</p>
 <h3 id="g-general-services-specialists">General Services: specialists</h3>
@@ -2397,6 +2399,36 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
+<h1 id="g-making-your-own">Making your own</h1>
+<p>The departments and species in this book are a starting point, not a limit. With the GM’s agreement, any player can create their own department or species. The creator has a <strong>Custom</strong> option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.</p>
+<h2 id="g-a-custom-department">A custom department</h2>
+<p>A department is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.</p>
+<ol type="1">
+<li><strong>Name it and describe it.</strong> One sentence for what your character does that no one else does, in the style of the departments above: <em>“Stellar Cartography: maps the unmapped, and knows which charts are lies.”</em></li>
+<li><strong>Choose a group.</strong> Pick the one it belongs with: Command (gold), Sciences (blue) or Operations (red). The group only sets your sheet’s colors and emblem.</li>
+<li><strong>Pick four core skills.</strong> The skills it can’t do without. Mark them Trained yourself in step 3 (the built-in departments do this for you); they count toward your normal Trained skills.</li>
+<li><strong>Check it with the GM.</strong> It should fit the setting and overlap the existing departments as little as possible. A custom department uses the officer training (a Specialty and nine Trained); enlisted crew belong to General Services.</li>
+</ol>
+<p><strong>In the creator:</strong> in step 1, choose <strong>Custom department…</strong> at the end of the Department list, then enter its name and group. Write the description in <em>What you bring</em>.</p>
+<h2 id="g-a-custom-species">A custom species</h2>
+<p>Build it with the GM, one step at a time.</p>
+<h3 id="g-the-concept">1. The concept</h3>
+<p>Two or three sentences: where they come from, what sets them apart, and how others see them. It should be something the species in this book don’t already cover.</p>
+<h3 id="g-attribute-adjustments">2. Attribute adjustments</h3>
+<p>Give adjustments from <strong>−2 to +2</strong> per attribute that <strong>total zero</strong>: a +2 needs a −2 or two −1s. The adjustments move the attribute’s base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most species change two to four attributes.</p>
+<h3 id="g-core-rules">3. Core rules</h3>
+<p>One to three short rules that always apply: what they can do (see in the dark, resist cold, a free Trained skill) and what it costs (a weakness, a people’s distrust, a hazard they can’t abide). A strength with no drawback is worth more than it looks.</p>
+<h3 id="g-species-advantages-1">4. Species advantages</h3>
+<p>Write one to three. Each works like a general advantage: <strong>+2 to one skill in a narrow situation</strong>, or a small, limited permission (“once per scene…”). Each comes with a <strong>companion complication</strong>: a problem the trait causes, with a clear trigger and a real consequence, which earns a Duty point when it bites, like any complication. A character takes one advantage, general or species, so make them distinct choices.</p>
+<h3 id="g-in-the-creator">In the creator</h3>
+<ol type="1">
+<li>In step 2, choose <strong>Custom species…</strong> at the end of the Species list.</li>
+<li>Name it and set its adjustments. The checklist confirms they total zero.</li>
+<li>Write its core rules in <strong>Species ability (GM approval required)</strong> in step 4.</li>
+<li>In step 4, choose <strong>Custom species advantage…</strong> and enter the advantage and its companion complication.</li>
+</ol>
+<h3 id="g-example">Example</h3>
+<p><strong>Kethari.</strong> Tall, silver-scaled people from a high-gravity ocean world, newly allied with the Federation. <em>Adjustments:</em> Body +1, Agility −1. <em>Core rule:</em> high-gravity muscles: +1 to Athletics in normal gravity, but cold slows them (−1 to all rolls in freezing conditions). <em>Species advantage:</em> <strong>Deep-Diver</strong>: +2 to Athletics to swim and hold your breath. <em>Companion:</em> <strong>Homesick for the Sea</strong>: dry, cramped ships wear on you; when it matters, accept the short temper or the mistake.</p>
 <h1 id="g-complications">Complications</h1>
 <p>Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Duty point if you accept it. You may decline without penalty. A personality description, harmless habit, or repeated inconvenience earns no point by itself. Agree on boundaries before a complication affects another player’s character.</p>
 <p>Every complication needs a trigger: the concrete situation that brings it into play. The creator suggests three for each complication below; pick one, combine them, or write your own with the GM.</p>
@@ -3189,7 +3221,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const compDef = () => COMPLICATIONS.find((a) => a[0] === ch.comp.id);
   const advName = () => ch.adv.id === "custom" ? (ch.adv.name || "Custom advantage") : advDef()?.[1] || "";
   const compName = () => ch.comp.id === "custom" ? (ch.comp.name || "Custom complication") : compDef()?.[1] || "";
-  const division = () => (DEPTS.find((d) => d[0] === ch.dept) || DEPTS[3])[1];
+  const division = () => (ch.customRole ? ch.customGroup || "command" : (DEPTS.find((d) => d[0] === ch.dept) || DEPTS[3])[1]);
 
   function checks() {
     const sp = spent(), nS = count("S"), nT = count("T");
@@ -3216,6 +3248,8 @@ tr.lvl-U td.target { color: var(--muted); }
 
   // ---- static UI ----
   $("f-dept").innerHTML = DEPTS.map(([d]) => `<option>${d}</option>`).join("");
+  $("f-dept").insertAdjacentHTML("beforeend", `<option value="__custom">Custom department…</option>`);
+  $("f-customgroup").innerHTML = [["command", "Command division (gold)"], ["sciences", "Sciences division (blue)"], ["operations", "Operations division (red)"]].map(([g, gn]) => `<option value="${g}">${gn}</option>`).join("");
   const generalAdvOpts = `<optgroup label="General advantages">` +
     ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("") + `<option value="custom">Custom advantage…</option></optgroup>`;
   $("f-comp").innerHTML = `<option value="">Choose a complication…</option>` +
@@ -3262,7 +3296,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const map = { "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
       "f-speciesnotes": "speciesNotes", "f-connection": "connection", "f-notes": "notes", "f-otherequip": "otherEquip" };
     for (const [id, k] of Object.entries(map)) $(id).value = ch[k];
-    $("f-dept").value = ch.dept;
+    $("f-dept").value = ch.customRole ? "__custom" : ch.dept;
     $("f-adv").value = ch.adv.id; $("f-advname").value = ch.adv.name; $("f-advtext").value = ch.adv.text; $("f-advdetail").value = ch.adv.detail;
     $("f-sadvname").value = ch.sadv.name; $("f-sadvtext").value = ch.sadv.text; $("f-scompname").value = ch.sadv.compName; $("f-scomptext").value = ch.sadv.compText;
     $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
@@ -3271,6 +3305,8 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   function render() {
+    $("custom-role-wrap").hidden = $("custom-group-wrap").hidden = !ch.customRole;
+    if (ch.customRole) { if ($("f-customrole").value !== ch.dept) $("f-customrole").value = ch.dept; $("f-customgroup").value = ch.customGroup || "command"; }
     $("role-skills").textContent = (ROLE_SKILLS[ch.dept] || []).length ? `Core skills: ${ROLE_SKILLS[ch.dept].join(", ")} (marked Trained for you)` : "";
     $("app").dataset.div = division();
     $("hdr-name").textContent = ch.name.trim() || "Unnamed officer";
@@ -3578,7 +3614,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function touch() { if (ch.example) ch.example = false; }
 
   // ---- events ----
-  const textMap = { "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
+  const textMap = { "f-customrole": "dept", "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
     "f-speciesnotes": "speciesNotes", "f-connection": "connection", "f-notes": "notes", "f-otherequip": "otherEquip" };
   document.addEventListener("input", (e) => {
     const id = e.target.id;
@@ -3590,8 +3626,12 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   document.addEventListener("change", (e) => {
     const t = e.target;
-    if (t.id === "f-dept") {
-      const wasGS = isGS();
+    if (t.id === "f-dept" && t.value === "__custom") {
+      ch.customRole = true; ch.customGroup = ch.customGroup || "command"; setDept(""); touch(); render(); $("f-customrole").focus();
+    }
+    else if (t.id === "f-customgroup") { ch.customGroup = t.value; touch(); render(); }
+    else if (t.id === "f-dept") {
+      ch.customRole = false; const wasGS = isGS();
       setDept(t.value); touch(); render();
       if (wasGS && !isGS()) toast("Commissioned: the Expert skill becomes a Specialty (+3), and you can train two more skills.");
       else if (!wasGS && isGS() && count("T") > 7) toast(`General Services has seven Trained skills; untrain ${count("T") - 7} and your Specialty becomes Expert (+5).`);
@@ -3624,7 +3664,7 @@ tr.lvl-U td.target { color: var(--muted); }
       else { ch.rank = t.value; touch(); render(); }
     }
     else if (t.id === "f-rank" && isEnlisted(t.value) && ch.dept !== "General Services") {
-      setDept("General Services"); $("f-dept").value = ch.dept;
+      ch.customRole = false; setDept("General Services"); $("f-dept").value = ch.dept;
       if (ENLISTED_RANKS.includes(ch.rank)) rankOther = false; // now a listed rank: show it in the dropdown
       touch(); render();
       toast("Crewmen and yeomen serve in General Services, so the department was changed.");
