@@ -123,7 +123,7 @@ def og(i, name, tier, adj, desc, core, skills_, traits, **extra):
     return o
 
 
-MYSTIC = ["warding", "summoning", "mysticsight", "illusion", "blast", "portals", "astral", "elemental", "teleport", "healing"]
+MYSTIC = ["cantrips", "warding", "summoning", "mysticsight", "illusion", "blast", "portals", "astral", "elemental", "teleport", "healing"]
 
 origins = [
     og("nonoperant", "Non-Operant", 0, {}, "No powers at all: training, nerve, gear and the law. Most of ExLAW's agents, every Aegis pilot and nearly everyone else on Earth. In a fight between Operants you are the one who has to be clever.",
@@ -159,7 +159,7 @@ origins = [
         t("bo-bound", "Bound Together", "Your bond resists for you: +2 to Will against mind powers and possession.", "Will", "The Artifact", "Your power lives in something that can be taken. Accept the theft or the trade."),
         t("bo-old", "Ancient Ally", "+2 to Powers with the power your bond knows best.", "Powers", "Old Enemies", "Your bond had enemies long before you. Accept them as yours.")]),
     og("adept", "Adept", 1, {"Intellect": 1, "Body": -1}, "A student of metatropic manipulation, the science everyone else calls magic. Learned rather than born, and growing with study: an Adept's own powers are few, but with time, materials and fuel a ritual can do almost anything.",
-       ["Mystic powers: your own powers come from the mystic list (Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing).",
+       ["Mystic powers: your own powers come from the mystic list (Cantrips, Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing).",
         "Rituals: you can emulate any power by ritual, with time, specialized materials and fuel (see Rituals).",
         "Your second power is Class II once Powers is your top skill."],
        ["Powers", "Occult", "Investigation", "Science"],
@@ -243,6 +243,8 @@ power_list = [
     P("astral", "Astral Projection", "mind", "Leave your body to scout a building (your body is helpless).", "Travel across a city as a spirit; speak to spirits.", "Cross into Otherworld or Shadow Earth in spirit; fight spirits there."),
     P("intellect", "Super Intellect", "mind", "+2 to Intellect skills; learn any skill in days.", "Invent a working device in a week; solve the unsolvable in a scene.", "Understand any technology, alien or arcane; invent in hours."),
     P("telekinesis", "Telekinesis", "control", "Move a small object you can see; disarm.", "Lift a car; Class II attacks; hold a person still (Body resists).", "Lift a truck; stop a falling plane; Class III attacks."),
+    P("cantrips", "Cantrips", "control", "Know 2 cantrips: quick spells cast in one action, each working at Class I.", "Know 3 cantrips, each working at Class II.", "Know 4 cantrips, each working at Class III.", "quick spells; a failed cast marks Strain",
+      escalated=["Know 5 cantrips, each working at Class IV.", "Know 6 cantrips, each working at Class V.", "Know 7 cantrips, each working at Class VI."]),
     P("teleport", "Teleport", "control", "Jump to a place in line of sight, up to about 100 yards; just you.", "Jump anywhere you know within 50 miles, with one passenger.", "Jump anywhere on Earth you know, with up to 4 passengers.", "",
       escalated=["Anywhere on Earth, even places you've only seen in photos; up to 20 passengers or a vehicle.", "Low orbit or the Moon; a building's worth of people and things.", "Another world or dimension, without a door."]),
     P("portals", "Portals", "control", "Open a door between two places you can see.", "Open a door to anywhere you've been.", "Open a door into Otherworld, a haven or Shadow Earth.", gm=True),
@@ -258,6 +260,20 @@ power_list = [
     P("possession", "Possession", "control", "Ride along in one person's senses (Will resists).", "Take control of a body for a scene; your own body is helpless.", "Possess and keep a body; switch bodies by touch.", gm=True),
     P("gadgeteering", "Gadgeteering", "control", "Carry three gadgets, each a Class I effect from another power.", "Build gadgets with Class II effects; repair anything.", "Build devices with Class III effects, or an Aegis suit of your own."),
 ]
+spells = {"skill": "Powers", "plural": "Cantrips", "power": "cantrips", "knownByClass": [2, 3, 4, 5, 6, 7], "known": [0, 0, 0], "roles": [], "advantages": [], "originAdvantages": [],
+          "note": "Each cantrip works at your Cantrips power's Class. Casting takes one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense. A failed cast marks a box of Strain. Swap one cantrip between cases with a week of study.",
+          "list": [["bolt", "Bolt", "A mystic blast: an attack at the power's Class, effective at Short range."],
+                   ["shield", "Shield", "A barrier: Defense at the power's Class until your next turn."],
+                   ["bind", "Bind", "Bands of force hold a target in place (Body resists)."],
+                   ["dispel", "Dispel", "Cancel a spell, ward or magical effect of equal or lower Class."],
+                   ["veil", "Veil", "Hide yourself or an object from sight for the scene."],
+                   ["glamour", "Glamour", "A quick illusion that fools the eye (Will or Intellect sees through it)."],
+                   ["sight", "Sight", "See magic, spirits, curses and disguises."],
+                   ["hex", "Hex", "−2 to all of a target's rolls for the scene (Will resists)."],
+                   ["charm", "Charm", "The target treats you as a friend for the scene (Will resists)."],
+                   ["levitate", "Levitate", "Float yourself or an object; at higher Classes, a car or a group."],
+                   ["step", "Step", "Vanish and reappear within Close range; farther at higher Classes."],
+                   ["mend", "Mend", "Clear one injury box, once per wound."]]}
 powers = {"skill": "Powers", "plural": "Powers", "groups": power_groups, "list": power_list,
           "tierSlots": {"0": [], "1": ["I", "I"], "2": ["II", "I", "I"], "3": ["III", "II", "I"]},
           "note": "Roll Powers to aim a power or use it with skill; passive powers just work. Push a power one Class higher for one action by marking Strain. Powers marked (GM) need the GM's approval; so does every Mythic power."}
@@ -550,7 +566,7 @@ pack = {"id": "aurora", "terms": terms, "theme": theme, "docxColors": ["14213D",
         "edgePoints": 4, "formCore": [], "formPenalties": {}, "origins": origins, "allegiances": allegiances, "reasons": reasons,
         "connections": connections, "advantages": advantages, "complications": complications, "triggers": triggers,
         "equipment": equipment, "weapons": weapons, "tracks": tracks, "personalTrack": personal_track, "seeds": seeds, "journal": journal,
-        "powers": powers, "statuses": statuses,
+        "powers": powers, "spells": spells, "statuses": statuses,
         "extraEdges": [["power", "Stronger Power", "Raise one of your powers by one Class. Class III is the limit at creation, unless the GM approves one power at Class IV.", 3], ["xpower", "Extra Power", "One more power, at Class I.", 1]], "statusLabel": "Legal status",
         "restricted": None, "quickRef": quick, "example": example, "pregens": pregens}
 
@@ -558,7 +574,7 @@ pack = {"id": "aurora", "terms": terms, "theme": theme, "docxColors": ["14213D",
 SK = {s[0] for s in skills}
 O = {o["id"]: o for o in origins}
 PW = {p[0]: p for p in power_list}
-assert len(roles) == 26 and len(SK) == 20 and len(power_list) == 50, (len(roles), len(SK), len(power_list))
+assert len(roles) == 26 and len(SK) == 20 and len(power_list) == 51, (len(roles), len(SK), len(power_list))
 assert all(len(v[1]) == 16 for v in seeds.values())
 for o in origins:
     assert sum(o["adj"].values()) == 0 and all(-2 <= v <= 2 for v in o["adj"].values()), o["id"]

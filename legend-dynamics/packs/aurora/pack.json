@@ -787,7 +787,7 @@
    },
    "desc": "A student of metatropic manipulation, the science everyone else calls magic. Learned rather than born, and growing with study: an Adept's own powers are few, but with time, materials and fuel a ritual can do almost anything.",
    "core": [
-    "Mystic powers: your own powers come from the mystic list (Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing).",
+    "Mystic powers: your own powers come from the mystic list (Cantrips, Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing).",
     "Rituals: you can emulate any power by ritual, with time, specialized materials and fuel (see Rituals).",
     "Your second power is Class II once Powers is your top skill."
    ],
@@ -832,6 +832,7 @@
     "I"
    ],
    "powerList": [
+    "cantrips",
     "warding",
     "summoning",
     "mysticsight",
@@ -2390,6 +2391,21 @@
     ""
    ],
    [
+    "cantrips",
+    "Cantrips",
+    "control",
+    [
+     "Know 2 cantrips: quick spells cast in one action, each working at Class I.",
+     "Know 3 cantrips, each working at Class II.",
+     "Know 4 cantrips, each working at Class III.",
+     "Know 5 cantrips, each working at Class IV.",
+     "Know 6 cantrips, each working at Class V.",
+     "Know 7 cantrips, each working at Class VI."
+    ],
+    {},
+    "quick spells; a failed cast marks Strain"
+   ],
+   [
     "teleport",
     "Teleport",
     "control",
@@ -2573,6 +2589,90 @@
    ]
   },
   "note": "Roll Powers to aim a power or use it with skill; passive powers just work. Push a power one Class higher for one action by marking Strain. Powers marked (GM) need the GM's approval; so does every Mythic power."
+ },
+ "spells": {
+  "skill": "Powers",
+  "plural": "Cantrips",
+  "power": "cantrips",
+  "knownByClass": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "known": [
+   0,
+   0,
+   0
+  ],
+  "roles": [],
+  "advantages": [],
+  "originAdvantages": [],
+  "note": "Each cantrip works at your Cantrips power's Class. Casting takes one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense. A failed cast marks a box of Strain. Swap one cantrip between cases with a week of study.",
+  "list": [
+   [
+    "bolt",
+    "Bolt",
+    "A mystic blast: an attack at the power's Class, effective at Short range."
+   ],
+   [
+    "shield",
+    "Shield",
+    "A barrier: Defense at the power's Class until your next turn."
+   ],
+   [
+    "bind",
+    "Bind",
+    "Bands of force hold a target in place (Body resists)."
+   ],
+   [
+    "dispel",
+    "Dispel",
+    "Cancel a spell, ward or magical effect of equal or lower Class."
+   ],
+   [
+    "veil",
+    "Veil",
+    "Hide yourself or an object from sight for the scene."
+   ],
+   [
+    "glamour",
+    "Glamour",
+    "A quick illusion that fools the eye (Will or Intellect sees through it)."
+   ],
+   [
+    "sight",
+    "Sight",
+    "See magic, spirits, curses and disguises."
+   ],
+   [
+    "hex",
+    "Hex",
+    "−2 to all of a target's rolls for the scene (Will resists)."
+   ],
+   [
+    "charm",
+    "Charm",
+    "The target treats you as a friend for the scene (Will resists)."
+   ],
+   [
+    "levitate",
+    "Levitate",
+    "Float yourself or an object; at higher Classes, a car or a group."
+   ],
+   [
+    "step",
+    "Step",
+    "Vanish and reappear within Close range; farther at higher Classes."
+   ],
+   [
+    "mend",
+    "Mend",
+    "Clear one injury box, once per wound."
+   ]
+  ]
  },
  "statuses": [
   [

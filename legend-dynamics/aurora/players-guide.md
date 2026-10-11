@@ -744,6 +744,7 @@ After a significant case, the GM may allow one of these **instead of a skill ste
 | Power | Class I | Class II | Class III |
 |---|---|---|---|
 | **Telekinesis** | Move a small object you can see; disarm. | Lift a car; Class II attacks; hold a person still (Body resists). | Lift a truck; stop a falling plane; Class III attacks. |
+| **Cantrips** (quick spells; a failed cast marks Strain) | Know 2 cantrips: quick spells cast in one action, each working at Class I. | Know 3 cantrips, each working at Class II. | Know 4 cantrips, each working at Class III. |
 | **Teleport** | Jump to a place in line of sight, up to about 100 yards; just you. | Jump anywhere you know within 50 miles, with one passenger. | Jump anywhere on Earth you know, with up to 4 passengers. |
 | **Portals** *(GM)* | Open a door between two places you can see. | Open a door to anywhere you've been. | Open a door into Otherworld, a haven or Shadow Earth. |
 | **Summoning** | Call a minor spirit or creature that helps for a scene (+2 assistance). | Call a creature that fights beside you (a minor character with Class II attacks). | Call something powerful; it serves, at a price. |
@@ -760,19 +761,54 @@ After a significant case, the GM may allow one of these **instead of a skill ste
 
 ## Escalated Classes
 
-Most powers simply go further at Classes IV to VI. Speed, Flight, Super Leaping and Teleport have set limits at every Class: speeds in multiples of the speed of sound (Mach 1 is about 760 mph), and distances in feet and miles. Player characters reach these Classes only by pushing (one action, one box of Strain); the GM's characters may have them outright.
+Most powers simply go further at Classes IV to VI. Speed, Flight, Super Leaping, Cantrips and Teleport have set limits at every Class: speeds in multiples of the speed of sound (Mach 1 is about 760 mph), and distances in feet and miles. Player characters reach these Classes only by pushing (one action, one box of Strain); the GM's characters may have them outright.
 
 | Power | Class IV | Class V | Class VI |
 |---|---|---|---|
 | **Speed** | Mach 3: cross a city in seconds; two actions every round. | Mach 10: cross a continent in minutes; three actions a round. | Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still. |
 | **Flight** | Mach 5: outfly any jet; cross an ocean in an hour or two. | Mach 10: anywhere on Earth within a couple of hours. | Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it). |
 | **Super Leaping** | Leap a mile up or 5 miles across. | Leap 5 miles up or 25 miles across. | Leap into the stratosphere, or 100 miles and more across. |
+| **Cantrips** | Know 5 cantrips, each working at Class IV. | Know 6 cantrips, each working at Class V. | Know 7 cantrips, each working at Class VI. |
 | **Teleport** | Anywhere on Earth, even places you've only seen in photos; up to 20 passengers or a vehicle. | Low orbit or the Moon; a building's worth of people and things. | Another world or dimension, without a door. |
 
 ## Leaping and teleporting
 
 - **Super Leaping:** one leap is your move for the turn. You land safely from any height your Class can leap; falling from higher marks boxes like any fall.
 - **Teleport:** one action. You can't arrive inside solid matter. A place you've never been is −2 to the Powers roll. On a natural 18 you arrive off target, as the GM decides: the wrong room, the wrong street, or somewhere much worse.
+
+## Cantrips
+
+Comic-book magic is fast: a bolt, a shield, a binding, in a single panel. **Cantrips** is a power for that. Instead of one effect, it gives you a few quick spells, and each one works at the power's Class.
+
+| Cantrips Class | Cantrips known |
+|---|---|
+| I | 2 |
+| II | 3 |
+| III | 4 |
+| IV (GM's approval) | 5 |
+
+- **Casting:** one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense.
+- **The price of versatility:** a failed cast marks a box of **Strain**, which other powers don't.
+- **Growing:** pushing, Stronger Power and growth in play all work as usual; each Class higher teaches you another cantrip and strengthens them all.
+- **Who:** Cantrips is on the Adept's mystic list. Other origins can take it with a magical reason: a Bonded artifact, a Mythic heritage, a Touched vision.
+- **Changing:** between cases, swap one cantrip for another with a week of study.
+
+| Cantrip | Effect |
+|---|---|
+| Bolt | A mystic blast: an attack at the power's Class, effective at Short range. |
+| Shield | A barrier: Defense at the power's Class until your next turn. |
+| Bind | Bands of force hold a target in place (Body resists). |
+| Dispel | Cancel a spell, ward or magical effect of equal or lower Class. |
+| Veil | Hide yourself or an object from sight for the scene. |
+| Glamour | A quick illusion that fools the eye (Will or Intellect sees through it). |
+| Sight | See magic, spirits, curses and disguises. |
+| Hex | −2 to all of a target's rolls for the scene (Will resists). |
+| Charm | The target treats you as a friend for the scene (Will resists). |
+| Levitate | Float yourself or an object; at higher Classes, a car or a group. |
+| Step | Vanish and reappear within Close range; farther at higher Classes. |
+| Mend | Clear one injury box, once per wound. |
+
+Rituals are still the way to do *anything*, given time and fuel. Cantrips are the way to do a few things *now*.
 
 ## Rituals
 
@@ -1104,7 +1140,7 @@ A student of metatropic manipulation, the science everyone else calls magic. Lea
 
 **Origin rules:**
 
-- Mystic powers: your own powers come from the mystic list (Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing).
+- Mystic powers: your own powers come from the mystic list (Cantrips, Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing).
 - Rituals: you can emulate any power by ritual, with time, specialized materials and fuel (see Rituals).
 - Your second power is Class II once Powers is your top skill.
 

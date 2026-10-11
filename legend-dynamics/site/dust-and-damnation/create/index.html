@@ -3544,9 +3544,11 @@ tr.lvl-U td.target { color: var(--muted); }
   const isExpert = (name) => isGS() && ch.skills[name] === "S" && !advancedToS(name);
   const levelMod = (l, name) => (l === "S" && isGS() && !(name && advancedToS(name)) ? 5 : LEVELS[l].mod);
   // Who can cast: the pack's casting roles, or a general or origin advantage that grants it.
-  const canCast = (c = ch) => !!SPELLS && ((SPELLS.roles || []).includes(c.dept) || (SPELLS.advantages || []).some((a) => a === c.adv.id || (edgeN("adv2", c) && a === c.adv2.id))
+  // Spells come from a calling, an advantage, or (when the pack says so) a power such as Cantrips.
+  const canCast = (c = ch) => !!SPELLS && ((SPELLS.power && allPowers(c).some((p) => p.id === SPELLS.power)) || (SPELLS.roles || []).includes(c.dept) || (SPELLS.advantages || []).some((a) => a === c.adv.id || (edgeN("adv2", c) && a === c.adv2.id))
     || (SPELLS.originAdvantages || []).includes(c.sadv.id));
-  const spellsKnown = (c = ch) => { const l = c.skills[SPELLS.skill]; return !canCast(c) || !l || l === "U" ? 0 : l === "T" ? SPELLS.known[0] : c.path === "hand" ? SPELLS.known[2] : SPELLS.known[1]; };
+  const spellsKnown = (c = ch) => { if (SPELLS.power) { const p = allPowers(c).find((x) => x.id === SPELLS.power); if (p) return SPELLS.knownByClass[CLASS_NAMES.indexOf(p.cl)] || 0; }
+    const l = c.skills[SPELLS.skill]; return !canCast(c) || !l || l === "U" ? 0 : l === "T" ? SPELLS.known[0] : c.path === "hand" ? SPELLS.known[2] : SPELLS.known[1]; };
   // The origin's slots, plus one Class I slot for the Extra Power Edge.
   const baseSlots = (c = ch) => {
     if (!POWERS) return [];
