@@ -85,7 +85,15 @@ How to read the effects:
 - **Mythic powers need the GM's approval.** Every power a Mythic character takes, Immortality included, is agreed with the GM: a curse or a god's gift has to fit the campaign.
 - **Adepts and rituals.** An Adept's own powers come from the mystic list (Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing). Beyond those, an Adept can **emulate any power by ritual**:
   - **Time:** Class I takes ten minutes, Class II an hour, Class III a night. A ritual can't be done in the middle of a fight.
-  - **Need:** a quiet place and the right materials, which the GM may make the first problem to solve.
+  - **Need:** a quiet place and **specialized materials**, matched to the power being emulated (a hawk's feather and storm-water for Flight, a mirror silvered with mercury for Illusion, grave dirt for Summoning). They are separate from the fuel below:
+
+    | Class | Materials | Getting them |
+    |---|---|---|
+    | I | Common occult supplies: chalk, salt, candles, herbs, incense | An Adept's **ritual kit** holds enough for a few workings; restocking takes a day and a shop that knows what you're asking for |
+    | II | Rare, specific components, used up in the working: meteorite iron, a saint's relic dust, water from a spring that never freezes | A lead to follow: a dealer, a collector, an Earth Wardens contact, a Morcain fence; usually a roll (Streetwise, Occult or Persuasion) and a price |
+    | III | Unique components: one of a kind, often guarded, sometimes alive | An adventure of its own |
+
+    Missing materials can sometimes be improvised at −2, and the GM may say a ritual simply can't be done without the real thing.
   - **Fuel:** every ritual must be fueled, and the bigger the Class, the bigger the price. Choose one source:
 
     | Fuel | Class I | Class II | Class III |
