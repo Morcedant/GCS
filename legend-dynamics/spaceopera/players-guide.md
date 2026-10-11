@@ -552,7 +552,7 @@ Corridor mouths sit at gravitational balance points, often far out from the star
 
 ## Off the corridors: the metric drive
 
-Between corridors, and between the stars where no corridor runs, ships use the **metric drive**: a warp-style drive that bends the spacetime around the ship instead of pushing it through space. Its hard limit is **three times the speed of light**. Most civilian drives manage one to two; only military ships and fast couriers reach three.
+Between corridors, and between the stars where no corridor runs, ships use the **metric drive**. It warps the space immediately around the ship, compressing it ahead and expanding it behind, so the ship rides a bubble of undisturbed spacetime instead of being pushed through space. Its hard limit is **three times the speed of light**. Most civilian drives manage one to two; only military ships and fast couriers reach three.
 
 - **Within a star system, it is fast.** Crossing a system, or reaching a corridor mouth far out from the star, takes hours rather than days.
 - **Between the stars, it is slow.** Even at full speed, a crossing takes about a year for every three light-years: the nearest neighboring star is well over a year away. The metric drive is how ships reach worlds off the network or behind a collapsed corridor, how expeditions go out and cut-off colonies are reached, and how stranded imperial fleets limp home over decades.
