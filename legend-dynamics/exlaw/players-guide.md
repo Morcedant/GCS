@@ -665,8 +665,8 @@ Choose them in the creator's step 4. Powers marked **(GM)** need the GM's approv
 | **Strength** | Lift a motorcycle; unarmed hits are Class I. | Lift a car; unarmed hits are Class II; tear doors off. | Lift a truck or a small plane; unarmed hits are Class III. |
 | **Toughness** | Defense I against physical harm. | Defense II. | Defense III. |
 | **Force Field** | Defense I for you, for a scene. | Defense II for you, or Defense I around a small group. | Defense III, or Defense II around a group; seal a doorway. |
-| **Speed** | Run as fast as a car; act first in any round. | Highway speeds and across water; two moves a round. | Near the speed of sound; once a scene, two actions in a round. |
-| **Flight** | Fly at running speed. | Fly at car speed. | Fly beside jets. |
+| **Speed** | Up to 70 mph, as fast as a car; act first in any round. | Up to 200 mph; run across water and up walls; two moves a round. | Mach 1 (about 760 mph); once a scene, two actions in a round. |
+| **Flight** | Fly up to 70 mph, as fast as a car. | Fly up to 300 mph, as fast as a light plane. | Mach 2 (about 1,500 mph): keep up with fighter jets. |
 | **Super Leaping** | Leap onto a rooftop. | Leap a city block. | Leap a mile. |
 | **Wall-Crawling** | Climb any wall as easily as walking. | Run up walls and across ceilings. | Cling upside down under a moving vehicle or aircraft. |
 | **Regeneration** | Clear one injury box after a scene's rest. | Clear one box at the end of each scene; a single hit never leaves you Dying. | Clear a box every few rounds; regrow lost limbs. |
@@ -714,6 +714,15 @@ Choose them in the creator's step 4. Powers marked **(GM)** need the GM's approv
 | **Time Manipulation** *(GM)* | Once a scene, take an extra action. | Freeze time around you for a moment: two extra actions. | Rewind the last round, once a session. |
 | **Possession** *(GM)* | Ride along in one person's senses (Will resists). | Take control of a body for a scene; your own body is helpless. | Possess and keep a body; switch bodies by touch. |
 | **Gadgeteering** | Carry three gadgets, each a Class I effect from another power. | Build gadgets with Class II effects; repair anything. | Build devices with Class III effects, or an Aegis suit of your own. |
+
+## Escalated Classes
+
+Most powers simply go further at Classes IV to VI. Speed and Flight have set top speeds at every Class, measured in multiples of the speed of sound (Mach 1 is about 760 mph). Player characters reach these Classes only by pushing (one action, one box of Strain); the GM's characters may have them outright.
+
+| Power | Class IV | Class V | Class VI |
+|---|---|---|---|
+| **Speed** | Mach 3: cross a city in seconds; two actions every round. | Mach 10: cross a continent in minutes; three actions a round. | Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still. |
+| **Flight** | Mach 5: outfly any jet; cross an ocean in an hour or two. | Mach 10: anywhere on Earth within a couple of hours. | Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it). |
 
 ## Rituals
 

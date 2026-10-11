@@ -198,7 +198,9 @@ origins = [
 ]
 
 # Powers: [id, name, group, [Class I, Class II, Class III], flags, note]
-P = lambda i, n, g, a, b, c, note="", **f: [i, n, g, [a, b, c], f, note]
+def P(i, n, g, a, b, c, note="", escalated=None, **f):
+    """A power: its Class I-III effects, and for some (movement) its escalated Class IV-VI effects too."""
+    return [i, n, g, [a, b, c] + (escalated or []), f, note]
 power_groups = [["energy", "Energy and attack"], ["body", "Body and movement"], ["mind", "Mind and senses"], ["control", "Control and the strange"]]
 power_list = [
     P("blast", "Blast", "energy", "Class I attack at pistol range.", "Class II attack at rifle range.", "Class III attack; or Class II against everyone in a small area.", "fire, ice, light, plasma, electricity or force"),
@@ -212,8 +214,10 @@ power_list = [
     P("strength", "Strength", "body", "Lift a motorcycle; unarmed hits are Class I.", "Lift a car; unarmed hits are Class II; tear doors off.", "Lift a truck or a small plane; unarmed hits are Class III."),
     P("toughness", "Toughness", "body", "Defense I against physical harm.", "Defense II.", "Defense III."),
     P("forcefield", "Force Field", "body", "Defense I for you, for a scene.", "Defense II for you, or Defense I around a small group.", "Defense III, or Defense II around a group; seal a doorway."),
-    P("speed", "Speed", "body", "Run as fast as a car; act first in any round.", "Highway speeds and across water; two moves a round.", "Near the speed of sound; once a scene, two actions in a round."),
-    P("flight", "Flight", "body", "Fly at running speed.", "Fly at car speed.", "Fly beside jets."),
+    P("speed", "Speed", "body", "Up to 70 mph, as fast as a car; act first in any round.", "Up to 200 mph; run across water and up walls; two moves a round.", "Mach 1 (about 760 mph); once a scene, two actions in a round.", "",
+      escalated=["Mach 3: cross a city in seconds; two actions every round.", "Mach 10: cross a continent in minutes; three actions a round.", "Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still."]),
+    P("flight", "Flight", "body", "Fly up to 70 mph, as fast as a car.", "Fly up to 300 mph, as fast as a light plane.", "Mach 2 (about 1,500 mph): keep up with fighter jets.", "",
+      escalated=["Mach 5: outfly any jet; cross an ocean in an hour or two.", "Mach 10: anywhere on Earth within a couple of hours.", "Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it)."]),
     P("leaping", "Super Leaping", "body", "Leap onto a rooftop.", "Leap a city block.", "Leap a mile."),
     P("wallcrawl", "Wall-Crawling", "body", "Climb any wall as easily as walking.", "Run up walls and across ceilings.", "Cling upside down under a moving vehicle or aircraft."),
     P("regen", "Regeneration", "body", "Clear one injury box after a scene's rest.", "Clear one box at the end of each scene; a single hit never leaves you Dying.", "Clear a box every few rounds; regrow lost limbs."),
@@ -439,7 +443,8 @@ seeds = {
         "Steel Hawk, offering a deal", "Your own Shadow Earth duplicate"]),
 }
 
-quick = [["Damage", "Fists, batons, knives: 1 box. Pistols, SMGs, rifles: 2. Shotgun close up, sniper rifle: 3 and Dying. Powers by Class: I = 1, II = 2, III = 2 and knocked down, IV+ = 3."],
+quick = [["Speed and Flight", "Speed I 70 mph, II 200 mph, III Mach 1, IV Mach 3, V Mach 10, VI Mach 25+. Flight I 70 mph, II 300 mph, III Mach 2, IV Mach 5, V Mach 10, VI Mach 25+ (orbit). Pushing reaches the next Class for one action."],
+         ["Damage", "Fists, batons, knives: 1 box. Pistols, SMGs, rifles: 2. Shotgun close up, sniper rifle: 3 and Dying. Powers by Class: I = 1, II = 2, III = 2 and knocked down, IV+ = 3."],
          ["Defense", "Roll Powers to aim a power. An attack above your Defense hits in full; equal marks one box fewer; lower does nothing. Guns are Class I, sniper rifles, heavy weapons and Aegis cannons II, anti-tank and explosives III."],
          ["Strain", "Push: use a power one Class higher for one action and mark Strain. Strain 1: −1 to Powers, 2: −2, 3: wild on 16–18, 4: burned out until a full day's rest."],
          ["Rituals", "Adepts only. Class I: 10 minutes, II: an hour (−2), III: a night (−4). Needs materials and fuel; failure marks Strain; natural 18: something answers."],

@@ -174,6 +174,10 @@ def gen(name, pack, t):
         for g, gn in pw["groups"]:
             out += [f"## {gn}", "", table(["Power", "Class I", "Class II", "Class III"],
                     [[f"**{x[1]}**" + (f" ({x[5]})" if len(x) > 5 and x[5] else "") + (" *(GM)*" if x[4].get("gm") else "") + (" *(Mythic only)*" if x[4].get("mythicOnly") else ""), *x[3][:3]] for x in pw["list"] if x[2] == g]), ""]
+        esc = [x for x in pw["list"] if len(x[3]) > 3]
+        if esc:
+            out += ["## Escalated Classes", "", f"Most powers simply go further at Classes IV to VI. {' and '.join([', '.join(x[1] for x in esc[:-1]), esc[-1][1]] if len(esc) > 1 else [esc[0][1]])} {'have' if len(esc) > 1 else 'has'} set top speeds at every Class, measured in multiples of the speed of sound (Mach 1 is about 760 mph). Player characters reach these Classes only by pushing (one action, one box of Strain); the GM's characters may have them outright.", "",
+                    table(["Power", "Class IV", "Class V", "Class VI"], [[f"**{x[1]}**", *x[3][3:6]] for x in esc]), ""]
         return "\n".join(out)
     if name == "statuses":
         return table([p.get("statusLabel", "Status"), "Benefit", "Cost"], [[f"**{x[1]}**", x[2], x[3]] for x in p["statuses"]])

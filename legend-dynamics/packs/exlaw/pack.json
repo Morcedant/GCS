@@ -2066,9 +2066,12 @@
     "Speed",
     "body",
     [
-     "Run as fast as a car; act first in any round.",
-     "Highway speeds and across water; two moves a round.",
-     "Near the speed of sound; once a scene, two actions in a round."
+     "Up to 70 mph, as fast as a car; act first in any round.",
+     "Up to 200 mph; run across water and up walls; two moves a round.",
+     "Mach 1 (about 760 mph); once a scene, two actions in a round.",
+     "Mach 3: cross a city in seconds; two actions every round.",
+     "Mach 10: cross a continent in minutes; three actions a round.",
+     "Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still."
     ],
     {},
     ""
@@ -2078,9 +2081,12 @@
     "Flight",
     "body",
     [
-     "Fly at running speed.",
-     "Fly at car speed.",
-     "Fly beside jets."
+     "Fly up to 70 mph, as fast as a car.",
+     "Fly up to 300 mph, as fast as a light plane.",
+     "Mach 2 (about 1,500 mph): keep up with fighter jets.",
+     "Mach 5: outfly any jet; cross an ocean in an hour or two.",
+     "Mach 10: anywhere on Earth within a couple of hours.",
+     "Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it)."
     ],
     {},
     ""
@@ -2603,6 +2609,10 @@
  "statusLabel": "Legal status",
  "restricted": null,
  "quickRef": [
+  [
+   "Speed and Flight",
+   "Speed I 70 mph, II 200 mph, III Mach 1, IV Mach 3, V Mach 10, VI Mach 25+. Flight I 70 mph, II 300 mph, III Mach 2, IV Mach 5, V Mach 10, VI Mach 25+ (orbit). Pushing reaches the next Class for one action."
+  ],
   [
    "Damage",
    "Fists, batons, knives: 1 box. Pistols, SMGs, rifles: 2. Shotgun close up, sniper rifle: 3 and Dying. Powers by Class: I = 1, II = 2, III = 2 and knocked down, IV+ = 3."
