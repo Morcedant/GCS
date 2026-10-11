@@ -1510,12 +1510,12 @@
   [
    "revolver",
    "Revolver",
-   "Six shots; reloading takes an action. Hits mark 2 boxes. Short range."
+   "Six shots; reloading takes an action. Hits mark 2 boxes. Close range."
   ],
   [
    "rifle",
    "Rifle",
-   "A lever-action repeater with fifteen shots. Hits mark 2 boxes. Long range."
+   "A lever-action repeater with fifteen shots. Hits mark 2 boxes. Medium range."
   ],
   [
    "shotgun",

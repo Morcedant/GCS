@@ -11,18 +11,20 @@ Dust & Damnation is not tied to a single place or year. Set your game in any ter
 | Punch, kick, headbutt | Melee | 1 | Bruises, a split lip, cracked ribs |
 | Club, bottle, pistol-whip | Melee | 1 | A concussion or a broken finger |
 | Knife or hatchet | Melee; Close thrown | 1 | A cut or stab wound that bleeds |
-| Arrow | Medium | 1 | A cut or stab wound that bleeds |
+| Arrow | Short | 1 | A cut or stab wound that bleeds |
 | Axe, saber or bowie knife used to kill | Melee | 2 | A deep wound or a broken bone |
 | Claws and fangs of a monster | Melee | 2 | Torn flesh |
-| Derringer | Close | 2 | A gunshot wound |
-| Revolver | Short | 2 | A gunshot wound |
-| Rifle | Long | 2 | A gunshot wound |
+| Derringer | Close (out of range beyond Short) | 2 | A gunshot wound |
+| Revolver | Close | 2 | A gunshot wound |
+| Rifle | Medium | 2 | A gunshot wound |
 | Shotgun, at Close range | Close | 3, and Dying | A ruinous wound |
 | Shotgun, at Short range | Short (no effect beyond) | 1 | Scattered pellets |
-| Buffalo rifle | Extreme | 3, and Dying | A ruinous wound |
+| Buffalo rifle | Long | 3, and Dying | A ruinous wound |
 | Dynamite | Close (thrown) | 1 to everyone nearby, 3 and Dying at the centre | Blast and burns; Dodge means diving clear |
 | Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
 | Fire | — | 1 each round in the flames | Burns |
+
+**Period ranges.** These are 1870s guns: a revolver is a close-quarters weapon, and most gunfights happen across a room or a street. A derringer is useless beyond Short range, and a shotgun beyond it does nothing.
 
 *Example:* an outlaw's knife leaves Deputy Ames Wounded (one box). A revolver shot that gets through marks two more: Ames is at three boxes, Incapacitated and Dying, and a further 2-box hit would kill. Spending a Grit point on that revolver shot reduces it to one box, leaving Ames Seriously wounded and still standing.
 
