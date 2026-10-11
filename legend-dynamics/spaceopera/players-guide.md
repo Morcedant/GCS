@@ -546,9 +546,19 @@ Everything in known space (trade, war, news, debt) moves along the **gravimetric
 
 ## What the corridors are
 
-Spacetime has a hidden geometry. Where the combined gravity of stars, dark-matter filaments and the galaxy's own structure folds it, distant points lie close together, and a **corridor** is a stable channel through that fold. Ships do not outrun light. A corridor drive detects a corridor, builds the field needed to enter it at its **mouth**, and protects the ship against its stresses while the fold carries the ship across light-years in hours or days. Outside the corridors, ships are bound to sublight speeds: crossing a system takes days, and crossing between stars without a corridor takes generations, which is how the Vael fleets began.
+Spacetime has a hidden geometry. Where the combined gravity of stars, dark-matter filaments and the galaxy's own structure folds it, distant points lie close together, and a **corridor** is a stable channel through that fold. Ships do not outrun light. A corridor drive detects a corridor, builds the field needed to enter it at its **mouth**, and protects the ship against its stresses while the fold carries the ship across light-years in hours or days. Off the corridors, ships rely on the much slower **metric drive** (below): fast within a star system, but years between the stars.
 
 Corridor mouths sit at gravitational balance points, often far out from the star. That is where the stations, toll gates, fortresses and Mandate checkpoints are built.
+
+## Off the corridors: the metric drive
+
+Between corridors, and between the stars where no corridor runs, ships use the **metric drive**: a warp-style drive that bends the spacetime around the ship instead of pushing it through space. Its hard limit is **three times the speed of light**. Most civilian drives manage one to two; only military ships and fast couriers reach three.
+
+- **Within a star system, it is fast.** Crossing a system, or reaching a corridor mouth far out from the star, takes hours rather than days.
+- **Between the stars, it is slow.** Even at full speed, a crossing takes about a year for every three light-years: the nearest neighboring star is well over a year away. The metric drive is how ships reach worlds off the network or behind a collapsed corridor, how expeditions go out and cut-off colonies are reached, and how stranded imperial fleets limp home over decades.
+- **It won't run everywhere.** A metric field collapses inside a corridor, near a corridor mouth, and deep in a planet's gravity well. Ships drop to sublight to approach a mouth or a world, which is why checkpoints can be enforced and why chases near planets are won by pilots, not drives.
+
+The Vael know the drive's limits better than anyone: their homeworld's catastrophe struck hundreds of light-years from the nearest corridor, and even at three times light speed their escape took generations.
 
 ## Depth
 
@@ -602,7 +612,8 @@ Control of corridor intersections is one of the fundamental sources of political
 
 - **Plotting a transit.** The navigator rolls **Navigation**. Fresh guild charts are ordinary; charts a few months old give −2; charts years old, or an unstable corridor, give −4. Failure costs time, delivers the ship to the wrong mouth, or ticks a danger clock; a natural 18 is a misjump into the unknown.
 - **Running deep.** Each step below the usual layers halves the transit time and gives −2 to the Navigation roll. Failing by 3 or more while deep means gravimetric stress: everyone aboard rolls Body or marks a box, and the ship needs repairs (Engineering) before its next transit.
-- **Travel times.** Between neighboring systems: hours. Across a region: one to three days. A long haul through several junctions: one to two weeks.
+- **Travel times.** By corridor: between neighboring systems, hours; across a region, one to three days; a long haul through several junctions, one to two weeks. By metric drive: within a system, hours; between stars, light-years ÷ 3 in years at best (÷ 2 or ÷ 1 for slower civilian drives).
+- **Metric drive.** Engaging or dropping out takes a few minutes; it can't run inside a corridor, near a mouth or deep in a gravity well. Near planets and mouths, chases are Piloting at sublight.
 - **Collapse.** An unstable corridor is a danger clock (usually 6 segments) that ticks with time and every failed transit; when it fills, the corridor closes, with whoever is inside.
 - **Messages.** A deep-metric transceiver reaches anywhere on the network: within a junction's region in minutes, across several junctions in hours. Worlds behind collapsed corridors can't be reached at all. Every message passes through junctions, and their owners listen: sending something sensitive through a hostile junction takes a **Computers** roll to hide it, and a failure marks **Heat**.
 - **Mouths and junctions.** Expect papers, tolls (which can mark **Debt**) and Mandate screenings.
