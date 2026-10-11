@@ -78,3 +78,7 @@ show **Ready** in the checklist, which means they follow the creation rules exac
 `/points`, `/clock`, `/track`, `/seed` and `/game`. Each server picks its game with `/game set`. The point name,
 shared tracks and seed tables come from the packs: the builder writes them into `discord-bot/src/worker.js`
 on every run, so redeploy the bot after changing a pack.
+
+## Website
+
+[`website/`](website/README.md) is a Squarespace kit for a Legend Dynamics site. It has a brand stylesheet with a theme for each game, ready-made Code Block HTML for the home page, each game page and the core rules, and `preview.html` to see it. Rebuild it with `python3 tools/build-website.py`.
