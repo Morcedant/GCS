@@ -100,7 +100,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None):
 <main id="main">
 {sections}
 </main>
-<footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system. The core rules and settings are original works.</span>
+<footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system. This RPG is released under the <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener" target="_blank">Creative Commons Attribution 4.0 International License</a>. You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.</span>
 <a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.DISCORD_SLUG}">Discord bot</a></div></footer>
 </body>
 </html>
@@ -137,7 +137,7 @@ def main():
           '<text x="32" y="41" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="700" fill="#efe6d2">LD</text></svg>')
 
     write("index.html", page("/", "Legend Dynamics RPG", "A tabletop roleplaying system on 3d6 roll-under: Gothic Westerns, science fiction, swords against sorcery and superheroes.",
-                             blocks(bw.home()), fonts=font_links(fonts_all)))
+                             [b for b in blocks(bw.home()) if "rel=\"license" not in b], fonts=font_links(fonts_all)))
 
     for g in GAMES:
         t = bw.pack(g)["terms"]
