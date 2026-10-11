@@ -159,7 +159,7 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 }
 
 /* ---------- 4. Components (used in Code Blocks) ---------- */
-.ld { font-family: var(--ld-body); color: var(--ld-ink); }
+.ld { font-family: var(--ld-body); color: var(--ld-ink); min-width: 0; max-width: 100%; }
 .ld *, .ld *::before, .ld *::after { box-sizing: border-box; }
 .ld a { color: var(--ld-accent); }
 
@@ -250,18 +250,21 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 .ld-facts dd { margin: 0; font: 600 1.05rem/1.3 var(--ld-label); color: var(--ld-ink); }
 
 /* Long-form rules text (core rules page) */
-.ld-rules { max-width: 46rem; margin: 0 auto; font-size: 1.06rem; }
+.ld-rules { width: 100%; max-width: 46rem; margin: 0 auto; font-size: 1.06rem; }
 .ld-rules h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 3rem 0 1rem; padding-bottom: .6rem; border-bottom: 1px solid var(--ld-line); }
 .ld-rules h2 { font-size: 1.45rem; margin: 2.2rem 0 .7rem; color: var(--ld-accent); }
 .ld-rules h3 { font-family: var(--ld-label) !important; font-size: 1.15rem; margin: 1.6rem 0 .5rem; }
 .ld-rules p, .ld-rules li { line-height: 1.7; }
 .ld-rules strong { color: var(--ld-ink); }
 .ld-rules em { color: var(--ld-ink-2); }
-.ld-rules table { width: 100%; border-collapse: collapse; margin: 1.2rem 0 1.6rem; font-size: .95rem; display: block; overflow-x: auto; }
+.ld-rules table { width: 100%; max-width: 100%; border-collapse: collapse; margin: 1.2rem 0 1.6rem; font-size: .95rem; display: block; overflow-x: auto; }
 .ld-rules th { text-align: left; font: 600 .74rem/1.2 var(--ld-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ld-ink-2); border-bottom: 2px solid var(--ld-accent); padding: .6rem .7rem; }
 .ld-rules td { border-bottom: 1px solid var(--ld-line); padding: .6rem .7rem; vertical-align: top; }
 .ld-rules tr:nth-child(even) td { background: color-mix(in srgb, var(--ld-panel) 70%, transparent); }
 .ld-rules blockquote { margin: 1.4rem 0; padding: 1rem 1.3rem; border-left: 3px solid var(--ld-accent); background: var(--ld-panel); border-radius: 0 var(--ld-radius) var(--ld-radius) 0; }
+.ld code { font: .88em/1.4 var(--ld-mono); color: var(--ld-accent); background: color-mix(in srgb, var(--ld-panel) 80%, transparent);
+  padding: .1em .35em; border-radius: 3px; overflow-wrap: anywhere; }
+.ld-rules td:first-child code { white-space: normal; }
 .ld-toc { columns: 2 14rem; column-gap: 2rem; padding: 1.2rem 1.4rem; background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); margin: 0 0 2rem; }
 .ld-toc a { display: block; padding: .25rem 0; break-inside: avoid; text-decoration: none !important; font-family: var(--ld-label); }
 
@@ -286,7 +289,7 @@ body { margin: 0; }
 .page-section .section-background { position: absolute; inset: 0; z-index: -1; }
 .content { max-width: 72rem; margin: 0 auto; padding: 0 16px 4rem; display: grid; gap: 3rem; }
 </style></head>
-<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Dust &amp; Damnation</button><button data-p="spaceopera" data-c="ld-spaceopera">Fracture Lines</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="rules" data-c="">Core rules</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Dust &amp; Damnation</button><button data-p="spaceopera" data-c="ld-spaceopera">Fracture Lines</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="rules" data-c="">Core rules</button><button data-p="discord" data-c="">Discord</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
 <div class="ld ld-hero">
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Heroes are made of skill, nerve and a little luck.</h1>
@@ -355,6 +358,7 @@ body { margin: 0; }
   <div class="ld-actions">
     <a class="ld-button" href="https://claude.ai/artifact/UjmEHKxZzVJG4yhupZkoXo" target="_blank" rel="noopener">Create a character</a>
     <a class="ld-button ld-button--ghost" href="/core-rules">Core rules</a>
+    <a class="ld-button ld-button--ghost" href="/discord">Play on Discord</a>
   </div>
 </div>
 
@@ -390,6 +394,7 @@ body { margin: 0; }
   <div class="ld-actions">
     <a class="ld-button" href="https://claude.ai/artifact/AdxunyoqKyErJ6cTz5ujtL" target="_blank" rel="noopener">Create a character</a>
     <a class="ld-button ld-button--ghost" href="/core-rules">Core rules</a>
+    <a class="ld-button ld-button--ghost" href="/discord">Play on Discord</a>
   </div>
 </div>
 
@@ -425,6 +430,7 @@ body { margin: 0; }
   <div class="ld-actions">
     <a class="ld-button" href="https://claude.ai/artifact/8XnPkroZN3TsAzhsLaZCLM" target="_blank" rel="noopener">Create a character</a>
     <a class="ld-button ld-button--ghost" href="/core-rules">Core rules</a>
+    <a class="ld-button ld-button--ghost" href="/discord">Play on Discord</a>
   </div>
 </div>
 
@@ -1093,6 +1099,41 @@ accepted complication.</p>
 original works.</em></p>
 
 </div>
+</div></section></main><main class="pv" id="pv-discord" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Legend Dynamics · Every setting</div>
+  <h1>Play on Discord</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">One dice bot runs every Legend Dynamics setting. It rolls 3d6 under your target and keeps your table's points, clocks and tracks.
+  The commands are the same everywhere; only a few names change with the setting.</p>
+</div>
+
+<div class="ld">
+  <div class="ld-eyebrow">Getting started</div>
+  <ol class="ld-steps">
+    <li><b>The GM picks the setting.</b> Run <code>/game set</code> once per Discord server; <code>/game show</code> checks it.</li>
+    <li><b>Type <code>/</code> in the game channel.</b> Discord lists every command and shows each option as you fill it in.</li>
+    <li><b>Bring your sheet.</b> The bot doesn't know your character: read your target number off your sheet and add up every modifier yourself.</li>
+  </ol>
+</div>
+
+<div class="ld ld-rules">
+<h2>For players</h2>
+<p>The examples use Dust &amp; Damnation names; swap in your own skill, foe and track. “Legend points” are your setting's points: Grit, Resolve or Fortune.</p>
+<table><thead><tr><th>Command</th><th>What it does</th></tr></thead><tbody><tr><td><code>/roll target:13 modifier:-2 label:Shooting</code></td><td>Roll 3d6 under your target. Use the number from your sheet, and add up every modifier yourself: circumstance, injury, assistance. The bot shows the result, the margin and your chance. <strong>Spend a Legend point to reroll</strong> lets you reroll once, and the second result stands.</td></tr><tr><td><code>/contest target:13 opponent:14 opponent_name:&quot;Bandit&quot; label:Grapple</code></td><td>An opposed roll. The bot rolls both sides and names the winner. Ties and double failures go to the defender, which is the opponent unless you add <code>defender:me</code>.</td></tr><tr><td><code>/assist target:12 helper_target:14 helper:@name label:&quot;Hold the door&quot;</code></td><td>Someone helps you. They roll first (Athletics, say): success gives +1, success by 5 or more +2, and a natural 18 brings a complication. Then you roll with their bonus.</td></tr><tr><td><code>/points show</code></td><td>Your Legend points this session. Add <code>player:@name</code> to see someone else's.</td></tr><tr><td><code>/points spend</code></td><td>Spend a Legend point without rolling, e.g. to reduce an injury by one box or to establish a small preparation.</td></tr><tr><td><code>/points gain</code></td><td>Gain a Legend point, e.g. when you accept a complication the GM offers. With Extra Legend, use it once at the start of a session.</td></tr><tr><td><code>/clock show</code></td><td>Every clock the GM is running.</td></tr><tr><td><code>/track show</code></td><td>The shared setting's tracks (listed under Differences by setting) and what each one means right now.</td></tr></tbody></table>
+<p>Only the player who rolled can press the reroll button. Rolls that miss by 1 or 2 remind the GM that success at a cost is on offer.</p>
+<h2>For the GM</h2>
+<p>GM commands need the <strong>Manage Server</strong> permission on the Discord server. Everyone can see clocks, tracks and points.</p>
+<table><thead><tr><th>Command</th><th>What it does</th></tr></thead><tbody><tr><td><code>/game set game:Dust &amp; Damnation</code></td><td>Choose this server's game. Do it once; <code>/game show</code> checks it.</td></tr><tr><td><code>/points newsession</code></td><td>Start a session: everyone goes back to two Legend points, and unused points are gone.</td></tr><tr><td><code>/points gain player:@name</code></td><td>Award a Legend point, e.g. for an accepted complication.</td></tr><tr><td><code>/points set player:@name points:3</code></td><td>Correct a player's total.</td></tr><tr><td><code>/clock new name:&quot;The mob forms&quot; segments:4 kind:danger</code></td><td>Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use <code>kind:progress</code> for one that fills on successes.</td></tr><tr><td><code>/clock tick name:&quot;The mob forms&quot;</code></td><td>Fill one segment. Add <code>segments:2</code> for two, or <code>segments:-1</code> to undo. <code>/clock remove</code> deletes a clock.</td></tr><tr><td><code>/track mark name:heat</code></td><td>Mark a box on a track; a partial name works ("heat" finds Heat). <code>/track clear</code> clears one, and <code>/track reset</code> clears them all.</td></tr><tr><td><code>/seed</code></td><td>Roll an adventure seed: one line from each seed table, and the command to start its ticking clock.</td></tr><tr><td><code>/contest ... defender:me</code></td><td>When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them.</td></tr></tbody></table>
+<p>Each server keeps its own points, clocks and tracks, and tracks are kept separately per setting, so switching settings doesn't lose them.</p>
+</div>
+
+<div class="ld ld-rules" id="differences">
+<h2>Differences by setting</h2>
+<p>Everything not listed here works the same in every setting. A partial track name works: <code>heat</code> finds Heat, <code>dark</code> finds The Dark.</p>
+<table><thead><tr><th>Setting</th><th>Choose it with</th><th>Points</th><th>Shared tracks</th><th><code>/seed</code> tables</th></tr></thead>
+<tbody><tr><td><a href="/dust-and-damnation"><strong>Dust &amp; Damnation</strong></a></td><td><code>/game set game:Dust &amp; Damnation</code></td><td><strong>Grit</strong> points; the reroll button reads “Spend a Grit point to reroll”</td><td>Heat, Whispers, The Dark<br><code>/track mark name:heat</code></td><td>Job, Place, The darkness, Twist, Ticking clock, Key character</td></tr><tr><td><a href="/fracture-lines"><strong>Fracture Lines</strong></a></td><td><code>/game set game:Fracture Lines</code></td><td><strong>Resolve</strong> points; the reroll button reads “Spend a Resolve point to reroll”</td><td>Debt, Heat, Reputation<br><code>/track mark name:debt</code></td><td>Job or mission, Place, The trouble, Twist, Ticking clock, Key character</td></tr><tr><td><a href="/the-shattered-crown"><strong>The Shattered Crown</strong></a></td><td><code>/game set game:The Shattered Crown</code></td><td><strong>Fortune</strong> points; the reroll button reads “Spend a Fortune point to reroll”</td><td>Infamy, Doom, Debt, Hunger<br><code>/track mark name:infamy</code></td><td>Venture, Place, The darkness, Twist, Ticking clock, Key character</td></tr></tbody></table>
+</div>
 </div></section></main>
 <script>
 const show = (k) => { document.querySelectorAll(".pv").forEach((m) => (m.hidden = m.id !== "pv-" + k));
@@ -1100,6 +1141,6 @@ const show = (k) => { document.querySelectorAll(".pv").forEach((m) => (m.hidden 
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${k}"]`).dataset.c; scrollTo(0, 0); };
 document.querySelector(".pv-bar").onclick = (ev) => { const b = ev.target.closest("button"); if (b) show(b.dataset.p); };
 document.addEventListener("click", (ev) => { const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = { "/dust-and-damnation": "western", "/fracture-lines": "spaceopera", "/the-shattered-crown": "fantasy", "/core-rules": "rules" }[a.getAttribute("href")]; if (k) show(k); });
+  const k = { "/dust-and-damnation": "western", "/fracture-lines": "spaceopera", "/the-shattered-crown": "fantasy", "/core-rules": "rules", "/discord": "discord" }[a.getAttribute("href")]; if (k) show(k); });
 show(location.hash.slice(1) || "home");
 </script></body></html>

@@ -14,6 +14,7 @@ Open [`preview.html`](preview.html) in a browser to see the home page, the three
 | `blocks/home.html` | Code Blocks on the home page |
 | `blocks/game-<game>.html` | Code Blocks on each game page |
 | `blocks/core-rules.html` | One or more Code Blocks on the Core Rules page |
+| `blocks/discord.html` | Code Blocks on the Discord page: the bot's commands for every setting, and what differs between them |
 
 Custom CSS works on every Squarespace plan. **Code Injection** (the fonts and the page themes) needs a plan that includes it. Without it, the site still gets the colors and layout, but in Squarespace's own fonts, and the game pages use the brand colors.
 
@@ -22,7 +23,7 @@ Custom CSS works on every Squarespace plan. **Code Injection** (the fonts and th
 1. **Base colors.** In **Site Styles → Colors**, pick any light theme. The CSS overrides its colors, but a light base keeps Squarespace's editor readable.
 2. **Fonts.** Paste `header-injection.html` into **Code Injection → Header** and save.
 3. **The design.** Paste all of `custom.css` into **Custom CSS** and save.
-4. **Pages.** Create five pages and set their URL slugs in each page's settings:
+4. **Pages.** Create six pages and set their URL slugs in each page's settings:
 
    | Page | URL slug |
    |---|---|
@@ -31,6 +32,7 @@ Custom CSS works on every Squarespace plan. **Code Injection** (the fonts and th
    | Fracture Lines | `/fracture-lines` |
    | The Shattered Crown | `/the-shattered-crown` |
    | Core Rules | `/core-rules` |
+   | Discord | `/discord` |
 
    The links inside the blocks expect these slugs.
 5. **Content.** On each page, add a **Code Block** for each `<!-- Block … -->` section of its file, paste the HTML, and turn **Display Source** off. Put blocks that sit side by side in the same section, or give each its own section.

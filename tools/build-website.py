@@ -2,12 +2,13 @@
 """Build the Squarespace kit for the Legend Dynamics website: legend-dynamics/website/.
 
 Writes the font snippet, the per-page theme snippets, ready-to-paste Code Block HTML for the
-home page, one page per game and the core rules, and preview.html to see it all locally.
+home page, one page per game, the core rules and the Discord bot page, and preview.html to see it all locally.
 custom.css is written by hand. Run after build-legend.py:
 
   python3 tools/build-website.py
 """
 import html, json, pathlib, re, subprocess
+import discord_handout
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LD = ROOT / "legend-dynamics"
@@ -23,6 +24,7 @@ CREATORS = {
 SLUGS = {"western": "/dust-and-damnation", "spaceopera": "/fracture-lines", "fantasy": "/the-shattered-crown"}
 GENRE = {"western": "Gothic Western", "spaceopera": "Science fiction", "fantasy": "Sword and sorcery"}
 CORE_SLUG = "/core-rules"
+DISCORD_SLUG = "/discord"
 
 BRAND_FONTS = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
 
@@ -129,6 +131,7 @@ def game_page(pid):
   <div class="ld-actions">
     <a class="ld-button" href="{CREATORS[pid]}" target="_blank" rel="noopener">Create a character</a>
     <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">Core rules</a>
+    <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}">Play on Discord</a>
   </div>
 </div>
 
@@ -176,6 +179,68 @@ def core_rules():
 """
 
 
+def discord_page():
+    """One page for the bot: the commands every setting shares, then what changes from one setting to the next."""
+    generic = {"title": "Dust & Damnation", "point": "Legend", "target": 13, "skill": "Shooting", "foe": "Bandit", "foeTarget": 14, "contest": "Grapple",
+               "assist": "Hold the door", "helperSkill": "Athletics", "track": "heat", "trackFull": "Heat",
+               "tracks": ["listed under Differences by setting"], "trackTitle": "setting's", "clock": "The mob forms", "clockSize": 4}
+    rows_p, rows_gm = discord_handout.rows(generic)
+    table = lambda rows: ("<table><thead><tr><th>Command</th><th>What it does</th></tr></thead><tbody>"
+                          + "".join(f"<tr><td><code>{e(c.strip('`'))}</code></td><td>{discord_handout.inline(t)}</td></tr>" for c, t in rows)
+                          + "</tbody></table>")
+    diff = []
+    for g in GAMES:
+        p = pack(g); t = p["terms"]
+        tr = p.get("tracks", [])
+        diff.append(f"<tr><td><a href=\"{SLUGS[g]}\"><strong>{e(t['title'])}</strong></a></td>"
+                    f"<td><code>/game set game:{e(t['title'])}</code></td>"
+                    f"<td><strong>{e(t['point'])}</strong> points; the reroll button reads “Spend a {e(t['point'])} point to reroll”</td>"
+                    f"<td>{e(', '.join(x['name'] for x in tr))}<br><code>/track mark name:{e(tr[0]['name'].lower().replace('the ', ''))}</code></td>"
+                    f"<td>{e(', '.join(v[0] for v in p['seeds'].values()))}</td></tr>")
+    return f"""<!-- Discord page (suggested URL {DISCORD_SLUG}). No theme injection: it uses the Legend Dynamics brand.
+     Paste each block below into its own Code Block (Display Source off). -->
+
+<!-- Block 1: hero -->
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Legend Dynamics · Every setting</div>
+  <h1>Play on Discord</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">One dice bot runs every Legend Dynamics setting. It rolls 3d6 under your target and keeps your table's points, clocks and tracks.
+  The commands are the same everywhere; only a few names change with the setting.</p>
+</div>
+
+<!-- Block 2: getting started -->
+<div class="ld">
+  <div class="ld-eyebrow">Getting started</div>
+  <ol class="ld-steps">
+    <li><b>The GM picks the setting.</b> Run <code>/game set</code> once per Discord server; <code>/game show</code> checks it.</li>
+    <li><b>Type <code>/</code> in the game channel.</b> Discord lists every command and shows each option as you fill it in.</li>
+    <li><b>Bring your sheet.</b> The bot doesn't know your character: read your target number off your sheet and add up every modifier yourself.</li>
+  </ol>
+</div>
+
+<!-- Block 3: commands -->
+<div class="ld ld-rules">
+<h2>For players</h2>
+<p>The examples use Dust &amp; Damnation names; swap in your own skill, foe and track. “Legend points” are your setting's points: Grit, Resolve or Fortune.</p>
+{table(rows_p)}
+<p>Only the player who rolled can press the reroll button. Rolls that miss by 1 or 2 remind the GM that success at a cost is on offer.</p>
+<h2>For the GM</h2>
+<p>GM commands need the <strong>Manage Server</strong> permission on the Discord server. Everyone can see clocks, tracks and points.</p>
+{table(rows_gm)}
+<p>Each server keeps its own points, clocks and tracks, and tracks are kept separately per setting, so switching settings doesn't lose them.</p>
+</div>
+
+<!-- Block 4: differences by setting -->
+<div class="ld ld-rules" id="differences">
+<h2>Differences by setting</h2>
+<p>Everything not listed here works the same in every setting. A partial track name works: <code>heat</code> finds Heat, <code>dark</code> finds The Dark.</p>
+<table><thead><tr><th>Setting</th><th>Choose it with</th><th>Points</th><th>Shared tracks</th><th><code>/seed</code> tables</th></tr></thead>
+<tbody>{"".join(diff)}</tbody></table>
+</div>
+"""
+
+
 def write(path, text):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text)
@@ -196,6 +261,7 @@ def main():
     for g in GAMES:
         write(WEB / "blocks" / f"game-{g}.html", game_page(g))
     write(WEB / "blocks" / "core-rules.html", core_rules())
+    write(WEB / "blocks" / "discord.html", discord_page())
 
     # preview.html: the three kinds of page in a plain wrapper, using custom.css, with a tab per theme.
     css = (WEB / "custom.css").read_text()
@@ -204,6 +270,7 @@ def main():
     for g in GAMES:
         pages[g] = (pack(g)["terms"]["title"], f"ld-{g}", strip(game_page(g)))
     pages["rules"] = ("Core rules", "", strip(core_rules()))
+    pages["discord"] = ("Discord", "", strip(discord_page()))
     tabs = "".join(f'<button data-p="{k}" data-c="{c}">{e(n)}</button>' for k, (n, c, _) in pages.items())
     sections = "".join(f'<main class="pv" id="pv-{k}" hidden><section class="page-section"><div class="section-background"></div><div class="content">{body}</div></section></main>' for k, (_, _, body) in pages.items())
     write(WEB / "preview.html", f"""<!doctype html>
@@ -228,7 +295,7 @@ const show = (k) => {{ document.querySelectorAll(".pv").forEach((m) => (m.hidden
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${{k}}"]`).dataset.c; scrollTo(0, 0); }};
 document.querySelector(".pv-bar").onclick = (ev) => {{ const b = ev.target.closest("button"); if (b) show(b.dataset.p); }};
 document.addEventListener("click", (ev) => {{ const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{CORE_SLUG}": "rules" }}[a.getAttribute("href")]; if (k) show(k); }});
+  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord" }}[a.getAttribute("href")]; if (k) show(k); }});
 show(location.hash.slice(1) || "home");
 </script></body></html>
 """)

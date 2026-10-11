@@ -152,7 +152,7 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 }
 
 /* ---------- 4. Components (used in Code Blocks) ---------- */
-.ld { font-family: var(--ld-body); color: var(--ld-ink); }
+.ld { font-family: var(--ld-body); color: var(--ld-ink); min-width: 0; max-width: 100%; }
 .ld *, .ld *::before, .ld *::after { box-sizing: border-box; }
 .ld a { color: var(--ld-accent); }
 
@@ -243,18 +243,21 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 .ld-facts dd { margin: 0; font: 600 1.05rem/1.3 var(--ld-label); color: var(--ld-ink); }
 
 /* Long-form rules text (core rules page) */
-.ld-rules { max-width: 46rem; margin: 0 auto; font-size: 1.06rem; }
+.ld-rules { width: 100%; max-width: 46rem; margin: 0 auto; font-size: 1.06rem; }
 .ld-rules h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 3rem 0 1rem; padding-bottom: .6rem; border-bottom: 1px solid var(--ld-line); }
 .ld-rules h2 { font-size: 1.45rem; margin: 2.2rem 0 .7rem; color: var(--ld-accent); }
 .ld-rules h3 { font-family: var(--ld-label) !important; font-size: 1.15rem; margin: 1.6rem 0 .5rem; }
 .ld-rules p, .ld-rules li { line-height: 1.7; }
 .ld-rules strong { color: var(--ld-ink); }
 .ld-rules em { color: var(--ld-ink-2); }
-.ld-rules table { width: 100%; border-collapse: collapse; margin: 1.2rem 0 1.6rem; font-size: .95rem; display: block; overflow-x: auto; }
+.ld-rules table { width: 100%; max-width: 100%; border-collapse: collapse; margin: 1.2rem 0 1.6rem; font-size: .95rem; display: block; overflow-x: auto; }
 .ld-rules th { text-align: left; font: 600 .74rem/1.2 var(--ld-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ld-ink-2); border-bottom: 2px solid var(--ld-accent); padding: .6rem .7rem; }
 .ld-rules td { border-bottom: 1px solid var(--ld-line); padding: .6rem .7rem; vertical-align: top; }
 .ld-rules tr:nth-child(even) td { background: color-mix(in srgb, var(--ld-panel) 70%, transparent); }
 .ld-rules blockquote { margin: 1.4rem 0; padding: 1rem 1.3rem; border-left: 3px solid var(--ld-accent); background: var(--ld-panel); border-radius: 0 var(--ld-radius) var(--ld-radius) 0; }
+.ld code { font: .88em/1.4 var(--ld-mono); color: var(--ld-accent); background: color-mix(in srgb, var(--ld-panel) 80%, transparent);
+  padding: .1em .35em; border-radius: 3px; overflow-wrap: anywhere; }
+.ld-rules td:first-child code { white-space: normal; }
 .ld-toc { columns: 2 14rem; column-gap: 2rem; padding: 1.2rem 1.4rem; background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); margin: 0 0 2rem; }
 .ld-toc a { display: block; padding: .25rem 0; break-inside: avoid; text-decoration: none !important; font-family: var(--ld-label); }
 
