@@ -57,7 +57,6 @@ def rows(g):
         (f"`{pts} show`", f"Your {P} points this session. Add `player:@name` to see someone else's."),
         (f"`{pts} spend`", f"Spend {a(P)} point without rolling, e.g. to reduce an injury by one box or to establish a small preparation."),
         (f"`{pts} gain`", f"Gain {a(P)} point, e.g. when you accept a complication the GM offers. With Extra {P}, use it once at the start of a session."),
-        ("`/clock show`", "Every clock the GM is running."),
         (f"`/track show`", f"The shared {g['trackTitle']} tracks ({tracks}) and what each one means right now."),
     ]
     rows_gm = [
@@ -65,15 +64,33 @@ def rows(g):
         (f"`{pts} newsession`", f"Start a session: everyone goes back to two {P} points, and unused points are gone."),
         (f"`{pts} gain player:@name`", f"Award {a(P)} point, e.g. for an accepted complication."),
         (f"`{pts} set player:@name points:3`", "Correct a player's total."),
-        (f"`/clock new name:\"{g['clock']}\" segments:{g['clockSize']} kind:danger`",
-         "Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use `kind:progress` for one that fills on successes."),
-        (f"`/clock tick name:\"{g['clock']}\"`", "Fill one segment. Add `segments:2` for two, or `segments:-1` to undo. `/clock remove` deletes a clock."),
         (f"`/track mark name:{g['track']}`", f"Mark a box on a track; a partial name works (\"{g['track']}\" finds {g['trackFull']}). "
          f"`/track clear` clears one, and `/track reset` clears them all."),
         ("`/seed`", "Roll an adventure seed: one line from each seed table, and the command to start its ticking clock."),
         (f"`/contest ... defender:me`", "When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them."),
     ]
     return rows_p, rows_gm
+
+
+CLOCK_INTRO = ("A **clock** is a circle cut into 2, 4, 6 or 8 segments: 2 for something quick, 4 for urgent or simple, "
+               "6 for substantial, 8 for long or complex. A **danger clock** fills when things go wrong (a failed roll, a success at a cost, "
+               "time passing), and when it fills the danger happens. A **progress clock** fills as the characters succeed: one segment for a success, "
+               "two for success by 5 or more. A chase is a progress clock for the pursuers racing a danger clock for the quarry's escape.")
+CLOCK_NOTE = ("Anyone can start, tick or remove a clock, so players can tick a progress clock after a success; usually the GM runs them. "
+              "Ticking or removing a clock needs its full name, though capitals don't matter. A server can run up to 20 clocks at once.")
+
+
+def clock_rows(g):
+    """The /clock commands, with this game's example clock."""
+    c, n = g["clock"], g["clockSize"]
+    return [
+        ("`/clock show`", "Every clock running on this server, with how full each one is."),
+        (f"`/clock new name:\"{c}\" segments:{n} kind:danger`",
+         "Start a clock. Use `kind:progress` for one that fills on successes."),
+        (f"`/clock tick name:\"{c}\"`", "Fill one segment. Add `segments:2` for two (success by 5 on a progress clock), or `segments:-1` to undo a tick."),
+        (f"`/clock remove name:\"{c}\"`", "Delete a clock once it has filled or no longer matters."),
+        ("`/seed`", "The adventure seed's last line is a ticking clock, with the `/clock new` command to start it."),
+    ]
 
 
 THEME_KEYS = ("space", "glass", "fg", "muted", "line", "chrome", "gold", "red", "on-accent", "display", "title", "body")
@@ -274,6 +291,15 @@ summary {{ cursor: pointer; font: 600 1.05rem/1.3 var(--display); color: var(--g
     </ul>
     {alias}
     <p class="note">Only the player who rolled can press the reroll button. Rolls that miss by 1 or 2 remind the GM that success at a cost is on offer.</p>
+  </section>
+
+  <section>
+    <h2>Clocks</h2>
+    <p class="note">{inline(CLOCK_INTRO)}</p>
+    <ul class="cmds">
+      {"".join(card(c, t) for c, t in clock_rows(g))}
+    </ul>
+    <p class="note">{inline(CLOCK_NOTE)}</p>
   </section>
 
   <section class="gm">

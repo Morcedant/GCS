@@ -196,7 +196,8 @@ def discord_page():
                     f"<td><code>/game set game:{e(t['title'])}</code></td>"
                     f"<td><strong>{e(t['point'])}</strong> points; the reroll button reads “Spend a {e(t['point'])} point to reroll”</td>"
                     f"<td>{e(', '.join(x['name'] for x in tr))}<br><code>/track mark name:{e(tr[0]['name'].lower().replace('the ', ''))}</code></td>"
-                    f"<td>{e(', '.join(v[0] for v in p['seeds'].values()))}</td></tr>")
+                    f"<td>{e(', '.join(v[0] for v in p['seeds'].values()))}</td>"
+                    f"<td>{'<br>'.join(f'{e(n)} ({k})' for n, k in p['seeds']['clock'][1][:3])}</td></tr>")
     return f"""<!-- Discord page (suggested URL {DISCORD_SLUG}). No theme injection: it uses the Legend Dynamics brand.
      Paste each block below into its own Code Block (Display Source off). -->
 
@@ -225,6 +226,10 @@ def discord_page():
 <p>The examples use Dust &amp; Damnation names; swap in your own skill, foe and track. “Legend points” are your setting's points: Grit, Resolve or Fortune.</p>
 {table(rows_p)}
 <p>Only the player who rolled can press the reroll button. Rolls that miss by 1 or 2 remind the GM that success at a cost is on offer.</p>
+<h2>Clocks</h2>
+<p>{discord_handout.inline(discord_handout.CLOCK_INTRO)}</p>
+{table(discord_handout.clock_rows(generic))}
+<p>{discord_handout.inline(discord_handout.CLOCK_NOTE)}</p>
 <h2>For the GM</h2>
 <p>GM commands need the <strong>Manage Server</strong> permission on the Discord server. Everyone can see clocks, tracks and points.</p>
 {table(rows_gm)}
@@ -234,8 +239,8 @@ def discord_page():
 <!-- Block 4: differences by setting -->
 <div class="ld ld-rules" id="differences">
 <h2>Differences by setting</h2>
-<p>Everything not listed here works the same in every setting. A partial track name works: <code>heat</code> finds Heat, <code>dark</code> finds The Dark.</p>
-<table><thead><tr><th>Setting</th><th>Choose it with</th><th>Points</th><th>Shared tracks</th><th><code>/seed</code> tables</th></tr></thead>
+<p>Everything not listed here works the same in every setting, clocks included: the commands, sizes and rules don't change, only the dangers they count down to. A partial track name works: <code>heat</code> finds Heat, <code>dark</code> finds The Dark.</p>
+<table><thead><tr><th>Setting</th><th>Choose it with</th><th>Points</th><th>Shared tracks</th><th><code>/seed</code> tables</th><th>Example ticking clocks</th></tr></thead>
 <tbody>{"".join(diff)}</tbody></table>
 </div>
 """
