@@ -1,8 +1,8 @@
 # Legend Dynamics dice bot
 
-One Discord bot for all five games: the Legend Dynamics settings **Dust & Damnation**, **Starward** and **The Shattered Crown**, plus
+One Discord bot for all five games: the Legend Dynamics settings **Dust & Damnation**, **Hard Light** and **The Shattered Crown**, plus
 **USS Pelion** and **Grimm**. Each server picks its game with `/game`. The bot then names points correctly
-(**Grit** in Dust & Damnation and Grimm, **Resolve** in Starward, **Fortune** in The Shattered Crown, **Duty** in USS Pelion) and shows that game's
+(**Grit** in Dust & Damnation and Grimm, **Resolve** in Hard Light, **Fortune** in The Shattered Crown, **Duty** in USS Pelion) and shows that game's
 tracks and seed tables. Here's how you roll:
 
 ```
@@ -30,7 +30,7 @@ command to the Worker's web address, so there is no server to keep running.
 | `/contest target:13 opponent:14 opponent_name:Werewolf label:Grapple` | Rolls both sides and names the winner by the core rules. One success beats a failure. If both succeed, the larger margin wins. Ties and double failures go to the defender: the opponent, unless you set `defender:me`. |
 | `/assist target:12 helper_target:14 helper:@Ruth label:"Hold the door"` | The helper rolls first: success gives +1, success by 5 or more +2, and a natural 18 adds a complication. Then you roll with that bonus. |
 | `/seed` | Rolls an adventure seed: one line from each of the game's tables (job, place, the darkness, twist, ticking clock, key character) |
-| `/game show` · `/game set game:Starward` | Shows or sets this server's game (GM): Dust & Damnation, Starward, The Shattered Crown, Grimm or USS Pelion |
+| `/game show` · `/game set game:Hard Light` | Shows or sets this server's game (GM): Dust & Damnation, Hard Light, The Shattered Crown, Grimm or USS Pelion |
 
 ### With storage connected
 

@@ -15,7 +15,7 @@
    2. A theme per game, switched on for a page by one line of page header
       code injection (see website/README.md):
         html.ld-western    Dust & Damnation   (Gothic Western)
-        html.ld-spaceopera Starward           (space opera)
+        html.ld-spaceopera Hard Light         (space opera)
         html.ld-fantasy    The Shattered Crown (sword and sorcery)
    Components (hero, game cards, callouts, odds table, steps, rules text) use
    ld- classes and live in Code Blocks; their HTML is in website/blocks/.
@@ -286,7 +286,7 @@ body { margin: 0; }
 .page-section .section-background { position: absolute; inset: 0; z-index: -1; }
 .content { max-width: 72rem; margin: 0 auto; padding: 0 16px 4rem; display: grid; gap: 3rem; }
 </style></head>
-<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Dust &amp; Damnation</button><button data-p="spaceopera" data-c="ld-spaceopera">Starward</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="rules" data-c="">Core rules</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Dust &amp; Damnation</button><button data-p="spaceopera" data-c="ld-spaceopera">Hard Light</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="rules" data-c="">Core rules</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
 <div class="ld ld-hero">
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Heroes are made of skill, nerve and a little luck.</h1>
@@ -314,10 +314,10 @@ body { margin: 0; }
     <div class="ld-game-meta"><span class="ld-tag">14 callings</span><span class="ld-tag">13 origins</span><span class="ld-tag">Grit points</span></div>
     <div class="ld-go">Enter →</div>
   </a>
-  <a class="ld-game ld-game--spaceopera" href="/starward">
+  <a class="ld-game ld-game--spaceopera" href="/hard-light">
     <div class="ld-eyebrow">Space opera</div>
-    <h3>Starward</h3>
-    <p>The Concord holds a hundred worlds together with treaties, trade and a navy stretched too thin. Beyond its borders lie uncharted systems, ancient ruins that still hum with power, and the Hegemony, an empire that wants everything the Concord has. <i>Starward</i> is a space opera setting for the Legend Dynamics RPG system: a starship crew of many species, exploring, trading, fighting and talking their way across the Reach.</p>
+    <h3>Hard Light</h3>
+    <p>The Concord holds a hundred worlds together with treaties, trade and a navy stretched too thin. Beyond its borders lie uncharted systems, ancient ruins that still hum with power, and the Hegemony, an empire that wants everything the Concord has. <i>Hard Light</i> is a space opera setting for the Legend Dynamics RPG system: a starship crew of many species, exploring, trading, fighting and talking their way across the Reach.</p>
     <div class="ld-game-meta"><span class="ld-tag">9 roles</span><span class="ld-tag">11 species</span><span class="ld-tag">Resolve points</span></div>
     <div class="ld-go">Enter →</div>
   </a>
@@ -384,9 +384,9 @@ body { margin: 0; }
 </div></section></main><main class="pv" id="pv-spaceopera" hidden><section class="page-section"><div class="section-background"></div><div class="content">
 <div class="ld ld-hero">
   <div class="ld-eyebrow">Legend Dynamics · Space opera</div>
-  <h1>Starward</h1>
+  <h1>Hard Light</h1>
   <hr class="ld-rule">
-  <p class="ld-lede">The Concord holds a hundred worlds together with treaties, trade and a navy stretched too thin. Beyond its borders lie uncharted systems, ancient ruins that still hum with power, and the Hegemony, an empire that wants everything the Concord has. <i>Starward</i> is a space opera setting for the Legend Dynamics RPG system: a starship crew of many species, exploring, trading, fighting and talking their way across the Reach.</p>
+  <p class="ld-lede">The Concord holds a hundred worlds together with treaties, trade and a navy stretched too thin. Beyond its borders lie uncharted systems, ancient ruins that still hum with power, and the Hegemony, an empire that wants everything the Concord has. <i>Hard Light</i> is a space opera setting for the Legend Dynamics RPG system: a starship crew of many species, exploring, trading, fighting and talking their way across the Reach.</p>
   <div class="ld-actions">
     <a class="ld-button" href="https://claude.ai/artifact/AdxunyoqKyErJ6cTz5ujtL" target="_blank" rel="noopener">Create a character</a>
     <a class="ld-button ld-button--ghost" href="/core-rules">Core rules</a>
@@ -1098,6 +1098,6 @@ const show = (k) => { document.querySelectorAll(".pv").forEach((m) => (m.hidden 
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${k}"]`).dataset.c; scrollTo(0, 0); };
 document.querySelector(".pv-bar").onclick = (ev) => { const b = ev.target.closest("button"); if (b) show(b.dataset.p); };
 document.addEventListener("click", (ev) => { const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = { "/dust-and-damnation": "western", "/starward": "spaceopera", "/the-shattered-crown": "fantasy", "/core-rules": "rules" }[a.getAttribute("href")]; if (k) show(k); });
+  const k = { "/dust-and-damnation": "western", "/hard-light": "spaceopera", "/the-shattered-crown": "fantasy", "/core-rules": "rules" }[a.getAttribute("href")]; if (k) show(k); });
 show(location.hash.slice(1) || "home");
 </script></body></html>

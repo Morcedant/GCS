@@ -1,6 +1,6 @@
 <!-- SECTION:intro -->
 
-The Concord holds a hundred worlds together with treaties, trade and a navy stretched too thin. Beyond its borders lie uncharted systems, ancient ruins that still hum with power, and the Hegemony, an empire that wants everything the Concord has. *Starward* is a space opera setting for the Legend Dynamics RPG system: a starship crew of many species, exploring, trading, fighting and talking their way across the Reach.
+The Concord holds a hundred worlds together with treaties, trade and a navy stretched too thin. Beyond its borders lie uncharted systems, ancient ruins that still hum with power, and the Hegemony, an empire that wants everything the Concord has. *Hard Light* is a space opera setting for the Legend Dynamics RPG system: a starship crew of many species, exploring, trading, fighting and talking their way across the Reach.
 
 <!-- SECTION:weapons -->
 

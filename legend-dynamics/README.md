@@ -8,7 +8,7 @@ Legend points that reward characters for accepting trouble from their flaws. The
 |---|---|
 | `Legend_Dynamics_Core_Rules.md` (and `.docx`) | The setting-neutral core rules |
 | `western/` | **Dust & Damnation**, a Gothic Western: creator (`index.html`), Players' Guide (`players-guide.md`, `.docx`) |
-| `spaceopera/` | **Starward**, space opera: creator, Players' Guide |
+| `spaceopera/` | **Hard Light**, space opera: creator, Players' Guide |
 | `fantasy/` | **The Shattered Crown**, sword and sorcery: creator, Players' Guide (with cantrips and a Corruption track) |
 | `packs/<id>/` | Each pack's source: `pack.json` (data) and `setting.md` (setting chapters) |
 | `engine/` | The creator template (`creator.html`) and the core rules text (`core.md`) shared by every pack |

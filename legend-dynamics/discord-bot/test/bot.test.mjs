@@ -172,14 +172,14 @@ test("/game switches the server's setting: point names, tracks and seeds follow"
   const env2 = { ...env, STORE: new MemoryKV() };
   assert.match((await signedCall(env2, sub("game", "show"))).content, /Dust & Damnation.*Grit points.*Heat, Whispers, The Dark/);
   assert.equal((await signedCall(env2, sub("game", "set", [{ name: "game", value: "spaceopera" }]))).flags, 64, "only the GM");
-  assert.match((await signedCall(env2, sub("game", "set", [{ name: "game", value: "spaceopera" }], { gm: true }))).content, /Starward/);
+  assert.match((await signedCall(env2, sub("game", "set", [{ name: "game", value: "spaceopera" }], { gm: true }))).content, /Hard Light/);
   assert.match((await signedCall(env2, sub("points", "show"))).content, /2 Resolve points/);
   const roll = await signedCall(env2, { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name: "roll", options: [{ name: "target", value: 12 }] } });
   assert.equal(roll.components[0].components[0].label, "Spend a Resolve point to reroll");
-  assert.match(roll.embeds[0].footer.text, /Starward/);
+  assert.match(roll.embeds[0].footer.text, /Hard Light/);
   assert.match((await signedCall(env2, sub("track", "show"))).content, /Shields.*Hull/s);
   const other = await signedCall({ ...env2, STORE: new MemoryKV(), DEFAULT_GAME: "spaceopera" }, sub("game", "show"));
-  assert.match(other.content, /Starward/, "DEFAULT_GAME picks the starting game");
+  assert.match(other.content, /Hard Light/, "DEFAULT_GAME picks the starting game");
 });
 
 test("/track marks, clears and resets the game's tracks, with each box's meaning", async () => {
@@ -238,7 +238,7 @@ test("USS Pelion and Grimm are games too, and their old storage bindings still w
   assert.match((await signedCall(shared, sub("track", "show"))).content, /Suspicion.*Exposure.*Attention/s);
   const { COMMANDS } = await import("../src/worker.js");
   const choices = COMMANDS.find((c) => c.name === "game").options[1].options[0].choices.map((c) => c.name);
-  assert.deepEqual([...choices].sort(), ["Dust & Damnation", "Grimm", "Starward", "The Shattered Crown", "USS Pelion"]);
+  assert.deepEqual([...choices].sort(), ["Dust & Damnation", "Grimm", "Hard Light", "The Shattered Crown", "USS Pelion"]);
 });
 
 test("the old /duty, /grit, /pelion and /grimm names still work, and register on their own Workers", async () => {
