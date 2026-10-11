@@ -562,7 +562,7 @@ The Vael know the drive's limits better than anyone: their homeworld's catastrop
 
 ## Depth
 
-Corridors are not uniform tunnels: they have **depth**. As a ship descends, spacetime becomes more compressed and gravimetric stress rises sharply. Ships normally travel the upper, navigable layers. Running deeper can cut a transit dramatically, but eventually the pressure exceeds anything a ship and its fields can withstand. Below the navigable layers lies what physicists call the **deep metric**, where two points hundreds or thousands of light-years apart in ordinary space may be very close indeed.
+Corridors are not uniform tunnels: they have **depth**. As a ship descends, spacetime becomes more compressed and gravimetric stress rises sharply. Ships normally travel the upper, navigable layers. Running deeper can cut a transit dramatically, but eventually the pressure exceeds anything a ship and its fields can withstand. Below the navigable layers lies what physicists call the **deep fold**, where two points hundreds or thousands of light-years apart in ordinary space may be very close indeed.
 
 ## Drift, collapse and junctions
 
@@ -570,21 +570,21 @@ The corridors move. As stars drift relative to one another, the folds shift over
 
 Where several corridors meet, at a **junction**, power gathers: every ship and every message between those regions must pass through.
 
-## Deep-metric communication
+## Communication through the deep fold
 
 The civilizations of known space do not rely on conventional radio for interstellar communication. Instead, advanced societies exploit a phenomenon associated with the same hidden geometry that makes corridor travel possible.
 
 ### Quantum-gravimetric communication
 
-Quantum entanglement alone cannot transmit information. This remains true even for civilizations thousands of years more technologically advanced than humanity. The breakthrough comes from combining quantum systems with the deep metric.
+Quantum entanglement alone cannot transmit information. This remains true even for civilizations thousands of years more technologically advanced than humanity. The breakthrough comes from combining quantum systems with the deep fold.
 
-Specialized transmitters generate precisely controlled quantum states coupled to minute gravimetric disturbances. Under the correct conditions, these disturbances enter a propagating mode within the deep metric. The entangled quantum systems provide synchronization, discrimination and extreme sensitivity. The **gravimetric disturbance actually carries the information**.
+Specialized transmitters generate precisely controlled quantum states coupled to minute gravimetric disturbances. Under the correct conditions, these disturbances enter a propagating mode within the deep fold. The entangled quantum systems provide synchronization, discrimination and extreme sensitivity. The **gravimetric disturbance actually carries the information**.
 
 Consequently, quantum-gravimetric communication does not depend upon instantaneous communication through entanglement. The signal physically travels between transmitter and receiver, but through a region of spacetime in which the effective distance between the two points is enormously reduced. To observers limited to normal space, the result can appear to be faster-than-light communication.
 
 ### Why humanity didn't discover it
 
-Humanity discovered corridor travel through comparatively large-scale manipulation of spacetime. Human drives could detect corridors, create the fields necessary to enter them and protect spacecraft against their stresses. None of this required access to the deep metric.
+Humanity discovered corridor travel through comparatively large-scale manipulation of spacetime. Human drives could detect corridors, create the fields necessary to enter them and protect spacecraft against their stresses. None of this required access to the deep fold.
 
 Human scientists improved radio, laser, quantum and gravimetric communications for centuries. They even detected minute fluctuations originating within corridors, but those fluctuations appeared natural: background gravimetric noise, turbulence from stellar masses, corridor interactions and poorly understood processes below navigable depths. Human physics also correctly showed that entanglement could not, by itself, transmit information faster than light, so there was little reason to read random-seeming quantum-scale fluctuations as communication.
 
@@ -600,10 +600,10 @@ Humanity had spent centuries listening for voices among the stars. The galaxy ha
 
 ### The network is the map
 
-Deep-metric signals do not propagate equally well everywhere. They follow the underlying geometry of the corridors and converge on major junctions, so the transportation map of known space is also, broadly, its communications map. A junction has three kinds of strategic value:
+Quantum-gravimetric signals do not propagate equally well everywhere. They follow the underlying geometry of the corridors and converge on major junctions, so the transportation map of known space is also, broadly, its communications map. A junction has three kinds of strategic value:
 
 - **Transportation.** Ships and commerce must pass through it.
-- **Communication.** Deep-metric traffic naturally converges on it.
+- **Communication.** Message traffic naturally converges on it.
 - **Information.** Whoever controls it can relay, restrict, monitor or disrupt enormous quantities of interstellar communication.
 
 Control of corridor intersections is one of the fundamental sources of political and economic power in known space. For civilizations such as the Tessan, power does not require conquest: control over contracts, debt, corridor access and communications can bind entire worlds without a Tessan soldier ever setting foot on them.
@@ -615,7 +615,7 @@ Control of corridor intersections is one of the fundamental sources of political
 - **Travel times.** By corridor: between neighboring systems, hours; across a region, one to three days; a long haul through several junctions, one to two weeks. By metric drive: within a system, hours; between stars, light-years ÷ 3 in years at best (÷ 2 or ÷ 1 for slower civilian drives).
 - **Metric drive.** Engaging or dropping out takes a few minutes; it can't run inside a corridor, near a mouth or deep in a gravity well. Near planets and mouths, chases are Piloting at sublight.
 - **Collapse.** An unstable corridor is a danger clock (usually 6 segments) that ticks with time and every failed transit; when it fills, the corridor closes, with whoever is inside.
-- **Messages.** A deep-metric transceiver reaches anywhere on the network: within a junction's region in minutes, across several junctions in hours. Worlds behind collapsed corridors can't be reached at all. Every message passes through junctions, and their owners listen: sending something sensitive through a hostile junction takes a **Computers** roll to hide it, and a failure marks **Heat**.
+- **Messages.** A quantum-gravimetric transceiver reaches anywhere on the network: within a junction's region in minutes, across several junctions in hours. Worlds behind collapsed corridors can't be reached at all. Every message passes through junctions, and their owners listen: sending something sensitive through a hostile junction takes a **Computers** roll to hide it, and a failure marks **Heat**.
 - **Mouths and junctions.** Expect papers, tolls (which can mark **Debt**) and Mandate screenings.
 
 # Peoples of the corridors
