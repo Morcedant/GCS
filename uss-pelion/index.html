@@ -1278,6 +1278,50 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-attacking-and-defending">Attacking and defending</h2>
 <p>Roll Phasers for a ranged attack or Unarmed Combat for a melee attack. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty. Untrained Athletics adds nothing. Use the training level, not the final Athletics score. Each target gets one Dodge attempt per round, refreshed at the start of the round. A successful Dodge cancels the hit. Apply physical injury penalties to Dodge.</p>
 <p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Other difficult conditions use the normal modifier scale. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage under these rules.</p>
+<h2 id="g-range">Range</h2>
+<p>Distances fall into five bands:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Band</th>
+<th>Distance</th>
+<th>For example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Close</td>
+<td>Up to 10 yards</td>
+<td>Across a room or a corridor junction; one move covers it</td>
+</tr>
+<tr class="even">
+<td>Short</td>
+<td>Up to 50 yards</td>
+<td>Across a shuttle bay or a village square</td>
+</tr>
+<tr class="odd">
+<td>Medium</td>
+<td>Up to 150 yards</td>
+<td>Across a cargo hold or a city block</td>
+</tr>
+<tr class="even">
+<td>Long</td>
+<td>Up to 500 yards</td>
+<td>Across a canyon or a landing field</td>
+</tr>
+<tr class="odd">
+<td>Extreme</td>
+<td>Up to a mile, in line of sight</td>
+<td>Ridge to ridge</td>
+</tr>
+</tbody>
+</table>
+<p>Every ranged weapon has an <strong>effective band</strong>, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Melee weapons and fists reach only someone next to you. Your move each turn covers the Close band; give up your action to run and you cover Short.</p>
 <h2 id="g-injury">Injury</h2>
 <table>
 <thead>
@@ -1323,13 +1367,15 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>How many boxes a hit marks depends on the <strong>weapon</strong>, not on how well the attack roll succeeded. Apply it only after the hit survives any Dodge. This list sorts common weapons into one-box, two-box and killing (three-box) categories; the GM places anything else by comparison.</p>
 <table>
 <colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Weapon</th>
+<th>Range</th>
 <th>Boxes on a hit</th>
 <th>What the injury looks like</th>
 </tr>
@@ -1337,56 +1383,67 @@ tr.lvl-U td.target { color: var(--muted); }
 <tbody>
 <tr class="odd">
 <td>Punch, kick, headbutt</td>
+<td>Melee</td>
 <td>1</td>
 <td>Bruising, a split lip, cracked ribs</td>
 </tr>
 <tr class="even">
 <td>Club, rifle butt, thrown rock</td>
+<td>Melee; rock Close thrown</td>
 <td>1</td>
 <td>A concussion, a broken finger, heavy bruising</td>
 </tr>
 <tr class="odd">
 <td>Knife or dagger, such as a Klingon d’k tahg</td>
+<td>Melee; Close thrown</td>
 <td>1</td>
 <td>A cut or stab wound that bleeds</td>
 </tr>
 <tr class="even">
 <td>Arrow, spear, or primitive firearm</td>
+<td>Medium; spear Close thrown</td>
 <td>1</td>
 <td>A puncture or gunshot wound</td>
 </tr>
 <tr class="odd">
 <td>Heavy melee weapon, such as a Vulcan lirpa, a sword, or an axe</td>
+<td>Melee</td>
 <td>2</td>
 <td>A deep wound or a broken bone</td>
 </tr>
 <tr class="even">
 <td>Phaser on stun</td>
+<td>Short (type 1), Medium (type 2)</td>
 <td>0</td>
 <td>No wound; the target makes the stun roll (see Phaser settings)</td>
 </tr>
 <tr class="odd">
 <td>Phaser on kill</td>
+<td>Short (type 1), Medium (type 2)</td>
 <td>3, and Dying</td>
 <td>Severe burns and energy trauma</td>
 </tr>
 <tr class="even">
 <td>Klingon disruptor</td>
+<td>Medium</td>
 <td>3, and Dying</td>
 <td>Severe burns and tissue disruption</td>
 </tr>
 <tr class="odd">
 <td>Phaser rifle, or a ship’s weapon fired at a person</td>
+<td>Long; ship’s weapon Extreme</td>
 <td>3 and Dying, or disintegration if the GM rules it</td>
 <td>Massive energy trauma</td>
 </tr>
 <tr class="even">
 <td>Explosion</td>
+<td>Close (thrown grenade)</td>
 <td>1 to everyone nearby, 2 at the centre</td>
 <td>Blast, shrapnel, and burns; Dodge means diving clear, so you need somewhere to go</td>
 </tr>
 <tr class="odd">
 <td>Fall</td>
+<td>—</td>
 <td>1 for a bad fall, 2 for a long one</td>
 <td>A sprain or a fracture</td>
 </tr>
@@ -1556,7 +1613,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <tbody>
 <tr class="odd">
 <td>Captain</td>
-<td>Leadership to coordinate; Diplomacy to negotiate</td>
+<td>Orders each exchange: Command, Read the enemy, Hail or Rally (see The captain’s orders)</td>
 </tr>
 <tr class="even">
 <td>Helm</td>
@@ -1584,7 +1641,45 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<p>Leadership can assist another officer when orders or coordination meaningfully help. It uses the normal assistance rule and does not provide an automatic bonus to every station.</p>
+<h3 id="g-the-captains-orders">The captain’s orders</h3>
+<p>The captain, or whoever has the conn, takes one of these each exchange:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Order</th>
+<th>Roll</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Command</td>
+<td>Leadership</td>
+<td>Success: one station gets +2 to its roll this exchange; success by 5, two stations.</td>
+</tr>
+<tr class="even">
+<td>Read the enemy</td>
+<td>Psychology</td>
+<td>Success: you predict their next move. +2 to the pilot’s evade or range contest this exchange, or the gunner ignores one band of range penalty.</td>
+</tr>
+<tr class="odd">
+<td>Hail</td>
+<td>Diplomacy (a bluff included)</td>
+<td>Opposed by the enemy captain’s Will. Success: they pause to talk, hold fire for an exchange, or consider surrender; a bluff can make them believe what you say about your ship.</td>
+</tr>
+<tr class="even">
+<td>Rally</td>
+<td>Leadership</td>
+<td>After a hit to the hull, steady the crew: anyone stunned or shaken by the hit acts normally again, and the next failed station roll this scene may be rerolled.</td>
+</tr>
+</tbody>
+</table>
+<p>A captain who takes an order doesn’t also work a station that exchange. Commanding well is the job.</p>
 <h2 id="g-the-uss-pelion">The USS Pelion</h2>
 <p>The ship has its own sheet, tracked like an injury track. Encounters stay descriptive: the GM states what is at stake before rolls and narrates what each box means. This light structure is a campaign rule; detailed starship combat stays outside this guide.</p>
 <table>
@@ -1622,6 +1717,110 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Defending.</strong> When an enemy ship hits, Helm may roll <strong>Helm</strong> to evade, once per exchange, like Dodge: success cancels the hit. Engines damage applies its penalty.</p>
 <p><strong>Repairs.</strong> In the middle of a crisis, a successful <strong>Engineering</strong> roll clears one box from Shields or a system (two on success by 5); it takes the engineer’s action that exchange. The Hull can only be patched by one box per scene, and fully repaired at a starbase. Between encounters, the crew can clear the rest of the systems with time.</p>
 <p><strong>Firing.</strong> Tactical rolls <strong>Phasers</strong> for ship weapons, against the enemy ship’s own tracks, which the GM keeps the same way.</p>
+<h3 id="g-range-in-space">Range in space</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Band</th>
+<th>Distance</th>
+<th>For example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Close</td>
+<td>Under 10 km</td>
+<td>Docking, boarding, a knife fight between hulls</td>
+</tr>
+<tr class="even">
+<td>Short</td>
+<td>Up to 1,000 km</td>
+<td>Formation flying; a ship is a visible point of light</td>
+</tr>
+<tr class="odd">
+<td>Medium</td>
+<td>Up to 10,000 km</td>
+<td>A planet’s near orbit</td>
+</tr>
+<tr class="even">
+<td>Long</td>
+<td>Up to 100,000 km</td>
+<td>Across a planet’s moon system</td>
+</tr>
+<tr class="odd">
+<td>Extreme</td>
+<td>About a light-second (300,000 km)</td>
+<td>The limit of targeting; light lag makes beyond it guesswork</td>
+</tr>
+</tbody>
+</table>
+<p>As in personal combat, a weapon fires without penalty within its effective band, at −2 one band beyond and −4 two bands beyond; farther is out of range.</p>
+<p><strong>Closing and opening.</strong> At the start of each exchange, Helm rolls an opposed <strong>Helm</strong> contest with the enemy’s helm. The winner may shift the range one band, in or out. Winning at Extreme range by 5 or more lets the ship break away and go to warp.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Ship system</th>
+<th>Range</th>
+<th>Hit</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Phaser banks</td>
+<td>Long</td>
+<td>Normal (1 box)</td>
+<td>The ship’s main weapon.</td>
+</tr>
+<tr class="even">
+<td>Photon torpedoes</td>
+<td>Extreme</td>
+<td>Heavy (2 boxes)</td>
+<td>A volley of two counts as one heavy hit with +1 to hit.</td>
+</tr>
+<tr class="odd">
+<td>Klingon disruptors</td>
+<td>Medium</td>
+<td>Normal; a volley is heavy</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Romulan plasma torpedo</td>
+<td>Long</td>
+<td>Heavy, and a system goes Offline</td>
+<td>Slow: Helm’s evade gets +2 against it.</td>
+</tr>
+<tr class="odd">
+<td>Tractor beam</td>
+<td>Short</td>
+<td>—</td>
+<td>Holds a smaller ship; Helm contest to break free.</td>
+</tr>
+<tr class="even">
+<td>Transporter</td>
+<td>Medium</td>
+<td>—</td>
+<td>Only when the target’s shields are down.</td>
+</tr>
+<tr class="odd">
+<td>Ramming</td>
+<td>Close</td>
+<td>Heavy to both ships</td>
+<td>A desperate measure.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="g-advancement">Advancement</h2>
 <p>After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement. General Services characters advance the same way, but only their starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they are commissioned (see Step 3).</p>
 <h1 id="g-running-missions">Running missions</h1>

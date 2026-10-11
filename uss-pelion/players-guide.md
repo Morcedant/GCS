@@ -308,6 +308,20 @@ Roll Phasers for a ranged attack or Unarmed Combat for a melee attack. If the at
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Other difficult conditions use the normal modifier scale. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage under these rules.
 
+## Range
+
+Distances fall into five bands:
+
+| Band | Distance | For example |
+|---|---|---|
+| Close | Up to 10 yards | Across a room or a corridor junction; one move covers it |
+| Short | Up to 50 yards | Across a shuttle bay or a village square |
+| Medium | Up to 150 yards | Across a cargo hold or a city block |
+| Long | Up to 500 yards | Across a canyon or a landing field |
+| Extreme | Up to a mile, in line of sight | Ridge to ridge |
+
+Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Melee weapons and fists reach only someone next to you. Your move each turn covers the Close band; give up your action to run and you cover Short.
+
 ## Injury
 
 | Boxes marked | Condition | Effect |
@@ -333,19 +347,19 @@ Your protection is avoiding the hit: Dodge, cover, and a Duty point, which reduc
 
 How many boxes a hit marks depends on the **weapon**, not on how well the attack roll succeeded. Apply it only after the hit survives any Dodge. This list sorts common weapons into one-box, two-box and killing (three-box) categories; the GM places anything else by comparison.
 
-| Weapon | Boxes on a hit | What the injury looks like |
-|---|---|---|
-| Punch, kick, headbutt | 1 | Bruising, a split lip, cracked ribs |
-| Club, rifle butt, thrown rock | 1 | A concussion, a broken finger, heavy bruising |
-| Knife or dagger, such as a Klingon d'k tahg | 1 | A cut or stab wound that bleeds |
-| Arrow, spear, or primitive firearm | 1 | A puncture or gunshot wound |
-| Heavy melee weapon, such as a Vulcan lirpa, a sword, or an axe | 2 | A deep wound or a broken bone |
-| Phaser on stun | 0 | No wound; the target makes the stun roll (see Phaser settings) |
-| Phaser on kill | 3, and Dying | Severe burns and energy trauma |
-| Klingon disruptor | 3, and Dying | Severe burns and tissue disruption |
-| Phaser rifle, or a ship's weapon fired at a person | 3 and Dying, or disintegration if the GM rules it | Massive energy trauma |
-| Explosion | 1 to everyone nearby, 2 at the centre | Blast, shrapnel, and burns; Dodge means diving clear, so you need somewhere to go |
-| Fall | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Weapon | Range | Boxes on a hit | What the injury looks like |
+|---|---|---|---|
+| Punch, kick, headbutt | Melee | 1 | Bruising, a split lip, cracked ribs |
+| Club, rifle butt, thrown rock | Melee; rock Close thrown | 1 | A concussion, a broken finger, heavy bruising |
+| Knife or dagger, such as a Klingon d'k tahg | Melee; Close thrown | 1 | A cut or stab wound that bleeds |
+| Arrow, spear, or primitive firearm | Medium; spear Close thrown | 1 | A puncture or gunshot wound |
+| Heavy melee weapon, such as a Vulcan lirpa, a sword, or an axe | Melee | 2 | A deep wound or a broken bone |
+| Phaser on stun | Short (type 1), Medium (type 2) | 0 | No wound; the target makes the stun roll (see Phaser settings) |
+| Phaser on kill | Short (type 1), Medium (type 2) | 3, and Dying | Severe burns and energy trauma |
+| Klingon disruptor | Medium | 3, and Dying | Severe burns and tissue disruption |
+| Phaser rifle, or a ship's weapon fired at a person | Long; ship's weapon Extreme | 3 and Dying, or disintegration if the GM rules it | Massive energy trauma |
+| Explosion | Close (thrown grenade) | 1 to everyone nearby, 2 at the centre | Blast, shrapnel, and burns; Dodge means diving clear, so you need somewhere to go |
+| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
 
 *Example:* a Klingon's punch leaves Ensign Reyes Wounded (−1). On the next round a d'k tahg slash marks a second box: Seriously wounded (−2). A disruptor shot instead, on an unhurt Reyes, would mark all three boxes: Incapacitated and Dying, with the end of the scene as the deadline for a medic. Spending a Duty point when the disruptor hits reduces it to two boxes, leaving Reyes Seriously wounded but still standing. If Reyes is already down at three boxes, another disruptor shot or a lirpa blow kills; a punch does not.
 
@@ -447,7 +461,7 @@ Describe the effect you want before selecting a skill. Each exchange gives occup
 
 | Station | Skill and contribution |
 |---|---|
-| Captain | Leadership to coordinate; Diplomacy to negotiate |
+| Captain | Orders each exchange: Command, Read the enemy, Hail or Rally (see The captain's orders) |
 | Helm | Helm to evade, pursue, or gain position |
 | Navigation | Navigation to plot a safe course or escape |
 | Science | Sensors to identify threats, weaknesses, or anomalies |
@@ -455,7 +469,18 @@ Describe the effect you want before selecting a skill. Each exchange gives occup
 | Communications | Communications to establish contact or overcome interference |
 | Tactical | Phasers to fire ship weapons |
 
-Leadership can assist another officer when orders or coordination meaningfully help. It uses the normal assistance rule and does not provide an automatic bonus to every station.
+### The captain's orders
+
+The captain, or whoever has the conn, takes one of these each exchange:
+
+| Order | Roll | Effect |
+|---|---|---|
+| Command | Leadership | Success: one station gets +2 to its roll this exchange; success by 5, two stations. |
+| Read the enemy | Psychology | Success: you predict their next move. +2 to the pilot's evade or range contest this exchange, or the gunner ignores one band of range penalty. |
+| Hail | Diplomacy (a bluff included) | Opposed by the enemy captain's Will. Success: they pause to talk, hold fire for an exchange, or consider surrender; a bluff can make them believe what you say about your ship. |
+| Rally | Leadership | After a hit to the hull, steady the crew: anyone stunned or shaken by the hit acts normally again, and the next failed station roll this scene may be rerolled. |
+
+A captain who takes an order doesn't also work a station that exchange. Commanding well is the job.
 
 ## The USS Pelion
 
@@ -474,6 +499,30 @@ The ship has its own sheet, tracked like an injury track. Encounters stay descri
 **Repairs.** In the middle of a crisis, a successful **Engineering** roll clears one box from Shields or a system (two on success by 5); it takes the engineer's action that exchange. The Hull can only be patched by one box per scene, and fully repaired at a starbase. Between encounters, the crew can clear the rest of the systems with time.
 
 **Firing.** Tactical rolls **Phasers** for ship weapons, against the enemy ship's own tracks, which the GM keeps the same way.
+
+### Range in space
+
+| Band | Distance | For example |
+|---|---|---|
+| Close | Under 10 km | Docking, boarding, a knife fight between hulls |
+| Short | Up to 1,000 km | Formation flying; a ship is a visible point of light |
+| Medium | Up to 10,000 km | A planet's near orbit |
+| Long | Up to 100,000 km | Across a planet's moon system |
+| Extreme | About a light-second (300,000 km) | The limit of targeting; light lag makes beyond it guesswork |
+
+As in personal combat, a weapon fires without penalty within its effective band, at −2 one band beyond and −4 two bands beyond; farther is out of range.
+
+**Closing and opening.** At the start of each exchange, Helm rolls an opposed **Helm** contest with the enemy's helm. The winner may shift the range one band, in or out. Winning at Extreme range by 5 or more lets the ship break away and go to warp.
+
+| Ship system | Range | Hit | Notes |
+|---|---|---|---|
+| Phaser banks | Long | Normal (1 box) | The ship's main weapon. |
+| Photon torpedoes | Extreme | Heavy (2 boxes) | A volley of two counts as one heavy hit with +1 to hit. |
+| Klingon disruptors | Medium | Normal; a volley is heavy | |
+| Romulan plasma torpedo | Long | Heavy, and a system goes Offline | Slow: Helm's evade gets +2 against it. |
+| Tractor beam | Short | — | Holds a smaller ship; Helm contest to break free. |
+| Transporter | Medium | — | Only when the target's shields are down. |
+| Ramming | Close | Heavy to both ships | A desperate measure. |
 
 ## Advancement
 
