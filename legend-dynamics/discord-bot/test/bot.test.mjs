@@ -170,7 +170,7 @@ const sub = (name, s, options = [], { gm = false, id = "42" } = {}) =>
 
 test("/game switches the server's setting: point names, tracks and seeds follow", async () => {
   const env2 = { ...env, STORE: new MemoryKV() };
-  assert.match((await signedCall(env2, sub("game", "show"))).content, /Iron Roads.*Grit points.*Heat, Whispers, The Dark/);
+  assert.match((await signedCall(env2, sub("game", "show"))).content, /Dust & Damnation.*Grit points.*Heat, Whispers, The Dark/);
   assert.equal((await signedCall(env2, sub("game", "set", [{ name: "game", value: "spaceopera" }]))).flags, 64, "only the GM");
   assert.match((await signedCall(env2, sub("game", "set", [{ name: "game", value: "spaceopera" }], { gm: true }))).content, /Starward/);
   assert.match((await signedCall(env2, sub("points", "show"))).content, /2 Resolve points/);
@@ -238,7 +238,7 @@ test("USS Pelion and Grimm are games too, and their old storage bindings still w
   assert.match((await signedCall(shared, sub("track", "show"))).content, /Suspicion.*Exposure.*Attention/s);
   const { COMMANDS } = await import("../src/worker.js");
   const choices = COMMANDS.find((c) => c.name === "game").options[1].options[0].choices.map((c) => c.name);
-  assert.deepEqual([...choices].sort(), ["Grimm", "Iron Roads", "Starward", "The Shattered Crown", "USS Pelion"]);
+  assert.deepEqual([...choices].sort(), ["Dust & Damnation", "Grimm", "Starward", "The Shattered Crown", "USS Pelion"]);
 });
 
 test("the old /duty, /grit, /pelion and /grimm names still work, and register on their own Workers", async () => {

@@ -431,7 +431,7 @@ export const PACKS = {
  },
  "western": {
   "id": "western",
-  "title": "Iron Roads",
+  "title": "Dust & Damnation",
   "point": "Grit",
   "mission": "Job",
   "trackTitle": "Trouble",
@@ -1205,7 +1205,7 @@ export function commands() {
     { name: "seed", description: "Roll an adventure seed from the game's tables" },
     {
       name: "game",
-      description: "Which game this server plays (Iron Roads, Starward, The Shattered Crown, Grimm, USS Pelion)",
+      description: "Which game this server plays (Dust & Damnation, Starward, The Shattered Crown, Grimm, USS Pelion)",
       options: [
         { type: 1, name: "show", description: "Show this server's game" },
         { type: 1, name: "set", description: "GM: choose this server's game",

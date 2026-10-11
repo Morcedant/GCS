@@ -1,11 +1,11 @@
 ---
-title: "Iron Roads Players' Guide"
+title: "Dust & Damnation Players' Guide"
 subtitle: "A Gothic Western for the Legend Dynamics RPG system"
 ---
 
-The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. *Iron Roads* is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.
+The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. *Dust & Damnation* is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.
 
-Iron Roads is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.
+Dust & Damnation is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.
 
 ## The rule to remember
 
@@ -15,7 +15,7 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Iron Roads** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Dust & Damnation** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**.
 
 # Create your character
 
@@ -946,7 +946,7 @@ GM commands need the **Manage Server** permission on the Discord server. Everyon
 
 | Command | What it does |
 |---|---|
-| `/game set game:Iron Roads` | Choose this server's game. Do it once; `/game show` checks it. |
+| `/game set game:Dust & Damnation` | Choose this server's game. Do it once; `/game show` checks it. |
 | `/points newsession` | Start a session: everyone goes back to two Grit points, and unused points are gone. |
 | `/points gain player:@name` | Award a Grit point, e.g. for an accepted complication. |
 | `/points set player:@name points:3` | Correct a player's total. |
