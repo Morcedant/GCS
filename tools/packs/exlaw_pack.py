@@ -372,13 +372,13 @@ triggers = {
 }
 
 equipment = [
-    ["pistol", "Pistol", "Fifteen rounds. Class I: hits mark 1 box."],
-    ["shotgun", "Shotgun", "Six shells. Class I; at close range a hit marks 2 boxes."],
-    ["smg", "Submachine gun", "Thirty rounds; can fire bursts. Class I."],
-    ["rifle", "Rifle", "Twenty rounds; long range. Class I; a hit by 5 or more marks 2 boxes."],
+    ["pistol", "Pistol", "Fifteen rounds. Class I; hits mark 2 boxes."],
+    ["shotgun", "Shotgun", "Six shells. Class I. Within a few paces a hit marks 3 boxes and leaves the target Dying; farther away, 1 box."],
+    ["smg", "Submachine gun", "Thirty rounds; can fire bursts. Class I; hits mark 2 boxes."],
+    ["rifle", "Rifle", "Twenty rounds; long range. Class I; hits mark 2 boxes."],
     ["taser", "Taser", "Two shots. The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box."],
     ["baton", "Baton or knife", "Class I melee: hits mark 1 box."],
-    ["vest", "Body armor", "Once per fight, a Class I hit marks no box."],
+    ["vest", "Body armor", "Once per fight, a Class I hit marks one box fewer."],
     ["cuffs", "Dampening cuffs", "ExLAW issue: a cuffed Operant's powers drop one Class (two with a successful Engineering roll to tune them)."],
     ["badge", "Badge and ID", "Federal, police or press credentials: open doors and get you past cordons."],
     ["radio", "Radio and phone", "Stay in touch with your team and dispatch."],
@@ -439,8 +439,8 @@ seeds = {
         "Steel Hawk, offering a deal", "Your own Shadow Earth duplicate"]),
 }
 
-quick = [["Powers", "Roll Powers to aim or control a power. Class damage: I = 1 box, II = 2, III = 2 and knocked down, IV+ = 3."],
-         ["Defense", "An attack above your Defense hits in full; equal marks one box fewer; lower does nothing. Guns are Class I, heavy weapons and Aegis cannons II, anti-tank and explosives III."],
+quick = [["Damage", "Fists, batons, knives: 1 box. Pistols, SMGs, rifles: 2. Shotgun close up, sniper rifle: 3 and Dying. Powers by Class: I = 1, II = 2, III = 2 and knocked down, IV+ = 3."],
+         ["Defense", "Roll Powers to aim a power. An attack above your Defense hits in full; equal marks one box fewer; lower does nothing. Guns are Class I, sniper rifles, heavy weapons and Aegis cannons II, anti-tank and explosives III."],
          ["Strain", "Push: use a power one Class higher for one action and mark Strain. Strain 1: −1 to Powers, 2: −2, 3: wild on 16–18, 4: burned out until a full day's rest."],
          ["Rituals", "Adepts only. Class I: 10 minutes, II: an hour (−2), III: a night (−4). Needs materials and fuel; failure marks Strain; natural 18: something answers."],
          ["Firearms", "Pistol 15, shotgun 6, SMG 30 (burst: 3 rounds, +1), rifle 20. Covering fire: 3. Reload: one action. Natural 18 jams."],

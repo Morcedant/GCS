@@ -1080,7 +1080,7 @@ Psionic potential is rare, but it is not unique to any people. It appears in sub
 
 Most of the older civilizations treat psionics as a danger to be **controlled**: registered, suppressed, or wiped out. Their **Mandates** require travelers to be tested at corridor gates and checkpoints, and in many jurisdictions a traveler who tests positive is **killed on the spot**. The Hegemony's Shivar inquisitors enforce the strictest Mandates; others are lax, corrupt or merely brutal.
 
-- **Psionic characters** take the **Psionic** advantage and learn **psionic powers** with the **Psionics** skill: 2 at Trained, 3 at Specialty, 4 at Expert. Using a power takes an action and a Psionics roll; the target resists with Will where it makes sense.
+- **Psionic characters** take the **Psionic** advantage and learn **psionic powers** with the **Psionics** skill: 2 at Trained, 3 at Specialty, 4 at Expert. Using a power takes an action and a Psionics roll; the target resists with Will where it makes sense. **Psionic powers can't be swapped:** a power, once learned, is yours for good, and new ones come only when Psionics advances.
 - **Every slip is noticed.** A failed use or a natural 18 marks a box of **Heat**. Mandate scanners detect active powers nearby.
 - **Unregistered.** A psionic who has never been tested, or carries a forged result, takes the **Unregistered** complication. Screenings, scans and witnesses are life-or-death moments: hide, forge, bluff or run.
 - **The Quiet Network** smuggles psionics past the Mandates with false papers, safe routes and new names.

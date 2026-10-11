@@ -235,13 +235,13 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 
 | Item | What it does |
 |---|---|
-| Pistol | Fifteen rounds. Class I: hits mark 1 box. |
-| Shotgun | Six shells. Class I; at close range a hit marks 2 boxes. |
-| Submachine gun | Thirty rounds; can fire bursts. Class I. |
-| Rifle | Twenty rounds; long range. Class I; a hit by 5 or more marks 2 boxes. |
+| Pistol | Fifteen rounds. Class I; hits mark 2 boxes. |
+| Shotgun | Six shells. Class I. Within a few paces a hit marks 3 boxes and leaves the target Dying; farther away, 1 box. |
+| Submachine gun | Thirty rounds; can fire bursts. Class I; hits mark 2 boxes. |
+| Rifle | Twenty rounds; long range. Class I; hits mark 2 boxes. |
 | Taser | Two shots. The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. |
 | Baton or knife | Class I melee: hits mark 1 box. |
-| Body armor | Once per fight, a Class I hit marks no box. |
+| Body armor | Once per fight, a Class I hit marks one box fewer. |
 | Dampening cuffs | ExLAW issue: a cuffed Operant's powers drop one Class (two with a successful Engineering roll to tune them). |
 | Badge and ID | Federal, police or press credentials: open doors and get you past cordons. |
 | Radio and phone | Stay in touch with your team and dispatch. |
@@ -341,25 +341,27 @@ Your protection is avoiding the hit: Dodge, cover, and a Spark point, which redu
 
 How many boxes a hit marks depends on the **weapon**, not on how well the attack succeeded.
 
-In ExLAW every attack has a **Class**, and the Class sets the damage: **Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3.** Ordinary weapons are Class I; powers and heavy weapons go higher (see *Powers*).
+Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every attack also has a **Class**, which matters against an Operant's **Defense** (see below). **Powers** mark boxes by their Class: **Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3** (see *Powers*).
 
-| Weapon | Class | Boxes on a hit | Notes |
+| Weapon | Class | Boxes on a hit | What the injury looks like |
 |---|---|---|---|
-| Fists, kicks, a baton or knife | I | 1 | Powers such as Strength and Natural Weapons raise the Class |
-| Pistol, submachine gun | I | 1 | A burst (SMG, three rounds) gives +1 to hit |
-| Shotgun | I | 1, or 2 at close range | |
-| Rifle | I | 1, or 2 on a hit by 5 or more | Long range |
-| Taser | — | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Two shots |
+| Fists, kicks, a baton | I | 1 | Bruises, a cracked rib, a concussion |
+| Knife | I | 1 | A cut or stab wound |
+| Pistol, submachine gun or rifle | I | 2 | A gunshot wound |
+| Shotgun, within a few paces | I | 3, and Dying | A ruinous wound |
+| Shotgun, farther away | I | 1 | Scattered pellets |
+| Sniper or heavy rifle | II | 3, and Dying | A ruinous wound |
+| Taser | — | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
 | Heavy machine gun, Aegis arm cannon | II | 2 | |
-| Anti-tank rocket, explosives | III | 2 and knocked down | Everyone nearby takes 1 box |
-| Fall | — | 1 for a bad fall, 2 for a long one | Toughness doesn't help with falls from orbit |
-| Fire | — | 1 each round in the flames | |
+| Anti-tank rocket, explosives | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
+| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fire | — | 1 each round in the flames | Burns |
 
-**Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack **above** your Defense hits in full; an attack **equal** to it marks one box fewer; an attack **below** it does nothing. A bulletproof Operant (Defense II) ignores pistols, and an Aegis cannon still bruises them.
+**Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack whose Class is **above** your Defense hits in full; one **equal** to it marks one box fewer; one **below** it does nothing. A bulletproof Operant (Defense II) ignores pistols and rifles, and an Aegis cannon still marks a box.
 
-*Example:* a gang member's pistol shot hits Sheriff Wade Collier. It's Class I against his Toughness II: it does nothing, and the gang member starts to run. A White Hand soldier's Class II Blast is equal to his Defense, so it marks one box instead of two.
+*Example:* a gang member's pistol shot hits Sheriff Wade Collier. It's Class I against his Toughness II: it does nothing, and the gang member starts to run. The same shot would have marked two boxes on his deputy. A White Hand soldier's Class II Blast is equal to his Defense, so it marks one box instead of two.
 
-Firearms jam on a natural 18. To take someone down without killing them, use fists, a taser, dampening cuffs, or a power used with care.
+A submachine gun can fire a **burst** (three rounds, +1 to hit). Firearms jam on a natural 18. To take someone down without killing them, use fists, a taser, dampening cuffs, or a power used with care.
 
 ## Weapon and ammunition
 
@@ -521,7 +523,7 @@ Local police were slow to trust ExLAW until its agents captured **General Markum
 
 Reserve status had a price. Reserve Agents were held to police procedure and liable for any damage they caused. In **1973** **Warlord I** fought the criminal **Armageddon** in an apartment block; Armageddon's charges brought the building down and killed hundreds. Warlord was convicted of reckless endangerment and died in a prison riot. Some heroes refused Hamilton's offer and stayed unsanctioned; Hamilton kept his agents focused on the Operants who endangered the public, and let the rest be.
 
-In **1977** Hamilton's protégé **Johnny Vanroy**, Wonder Man, was arrested for the murder of heiress Lita Weston. He was cleared, but left ExLAW in 1978, and the EPAOC never stopped accusing Hamilton of favoritism. By **1982** ExLAW had more than thirty full-time Operant agents and fifty AS-III pilots. That year a cell of terrorist Operants led by **Autuarch** attacked the **US Capitol**. ExLAW tracked them to Los Angeles and captured all but a few; Autuarch escaped to Argentina and founded the **White Hand**.
+In **1977** Hamilton's protégé **Johnny Vanroy**, Mr. Power, was arrested for the murder of heiress Lita Weston. He was cleared, but left ExLAW in 1978, and the EPAOC never stopped accusing Hamilton of favoritism. By **1982** ExLAW had more than thirty full-time Operant agents and fifty AS-III pilots. That year a cell of terrorist Operants led by **Autuarch** attacked the **US Capitol**. ExLAW tracked them to Los Angeles and captured all but a few; Autuarch escaped to Argentina and founded the **White Hand**.
 
 ## The Second Wave
 
@@ -611,7 +613,7 @@ Every Operant has powers, and every power has a **Class** from I to VI. Player c
 ## Using powers
 
 - **Rolling.** Roll **Powers** to aim a power at someone, or to use it with skill: precisely, at a distance, around bystanders. Passive powers (Toughness, Regeneration, Speed and the like) just work. Targets resist with **Dodge** (things you can dodge), **Body** (things that work on the body) or **Will** (things that work on the mind).
-- **Damage.** Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3.
+- **Damage.** A power marks boxes by its Class: Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3. Ordinary weapons mark the boxes in their table (see *Personal combat*).
 - **Defense.** An attack above your Defense hits in full; an equal one marks a box fewer; a lower one does nothing.
 - **Pushing.** For one action, use a power one Class higher than you have it, and mark a box of **Strain**.
 
@@ -817,7 +819,7 @@ Ages are as of 2025.
 
 **The Ice Reaper (Hyun Wang).** A South Korean gangster who found an artifact that bonded an *aleum sasin*, an Ice Reaper, to him. He can become the bloodthirsty spirit at will, and used it to become the *Sangsanim*, boss of his country's underworld. He sits on the 12.
 
-**Helios (David Marcus Mars), 44.** A former Army major recruited into DIRE and given a heavily modified Ambrosia. The transformation was agonizing, and made him one of the most powerful Operants alive: he absorbs and redirects sunlight as energy blasts or flight, and is nearly invulnerable and remarkably strong. His weakness: eight hours without sunlight (the moon and stars don't count) leave him near human.
+**Helios (David Carlysle Jones), 44.** A former Army major recruited into DIRE and given a heavily modified Ambrosia. The transformation was agonizing, and made him one of the most powerful Operants alive: he absorbs and redirects sunlight as energy blasts or flight, and is nearly invulnerable and remarkably strong. His weakness: eight hours without sunlight (the moon and stars don't count) leave him near human.
 
 **Zephyr (Dr. Alemayehu Okafor).** A famed Ethiopian archaeologist who pursues cryptozoological artifacts with militant zeal. A native Operant with heightened strength and resilience and the power to control the air, he is an avowed environmentalist, wanted in several countries for alleged attacks on industrial and mining concerns in Africa.
 

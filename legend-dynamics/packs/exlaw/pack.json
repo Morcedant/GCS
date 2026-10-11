@@ -1529,22 +1529,22 @@
   [
    "pistol",
    "Pistol",
-   "Fifteen rounds. Class I: hits mark 1 box."
+   "Fifteen rounds. Class I; hits mark 2 boxes."
   ],
   [
    "shotgun",
    "Shotgun",
-   "Six shells. Class I; at close range a hit marks 2 boxes."
+   "Six shells. Class I. Within a few paces a hit marks 3 boxes and leaves the target Dying; farther away, 1 box."
   ],
   [
    "smg",
    "Submachine gun",
-   "Thirty rounds; can fire bursts. Class I."
+   "Thirty rounds; can fire bursts. Class I; hits mark 2 boxes."
   ],
   [
    "rifle",
    "Rifle",
-   "Twenty rounds; long range. Class I; a hit by 5 or more marks 2 boxes."
+   "Twenty rounds; long range. Class I; hits mark 2 boxes."
   ],
   [
    "taser",
@@ -1559,7 +1559,7 @@
   [
    "vest",
    "Body armor",
-   "Once per fight, a Class I hit marks no box."
+   "Once per fight, a Class I hit marks one box fewer."
   ],
   [
    "cuffs",
@@ -2604,12 +2604,12 @@
  "restricted": null,
  "quickRef": [
   [
-   "Powers",
-   "Roll Powers to aim or control a power. Class damage: I = 1 box, II = 2, III = 2 and knocked down, IV+ = 3."
+   "Damage",
+   "Fists, batons, knives: 1 box. Pistols, SMGs, rifles: 2. Shotgun close up, sniper rifle: 3 and Dying. Powers by Class: I = 1, II = 2, III = 2 and knocked down, IV+ = 3."
   ],
   [
    "Defense",
-   "An attack above your Defense hits in full; equal marks one box fewer; lower does nothing. Guns are Class I, heavy weapons and Aegis cannons II, anti-tank and explosives III."
+   "Roll Powers to aim a power. An attack above your Defense hits in full; equal marks one box fewer; lower does nothing. Guns are Class I, sniper rifles, heavy weapons and Aegis cannons II, anti-tank and explosives III."
   ],
   [
    "Strain",
