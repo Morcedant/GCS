@@ -314,7 +314,7 @@ for p_ in power_list:
         p_[3] += ESCALATED[p_[0]]
 assert all(len(p_[3]) == 6 for p_ in power_list), [p_[0] for p_ in power_list if len(p_[3]) != 6]
 
-spells = {"skill": "Powers", "plural": "Cantrips", "power": "cantrips", "knownByClass": [2, 3, 4, 5, 6, 7], "known": [0, 0, 0], "roles": [], "advantages": [], "originAdvantages": [],
+spells = {"skill": "Powers", "plural": "Cantrips", "power": "cantrips", "knownByClass": [2, 3, 4, 5, 6, 7], "pureBonus": 2, "known": [0, 0, 0], "roles": [], "advantages": [], "originAdvantages": [],
           "note": "Each cantrip works at your Cantrips power's Class. Casting takes one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense. A failed cast marks a box of Strain. Swap one cantrip between cases with a week of study.",
           "list": [["bolt", "Bolt", "A mystic blast: an attack at the power's Class, effective at Short range."],
                    ["shield", "Shield", "A barrier: Defense at the power's Class until your next turn."],

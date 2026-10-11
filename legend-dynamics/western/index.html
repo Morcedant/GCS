@@ -655,6 +655,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide"><span class="label" id="powers-label"></span>
               <div class="fields" id="power-slots"></div>
               <span class="muted small" id="powers-note"></span></div>
+            <div class="field wide" id="pure-wrap" hidden><div class="checks"><label><input type="checkbox" id="f-pure"> <span id="pure-label"></span></label></div></div>
             <div class="field wide" id="pboost-wrap" hidden><span class="small muted" id="pboost-note"></span>
               <div class="checks"><label><input type="checkbox" id="f-gm4"> GM's approval for Class IV</label></div></div>
             <details class="field wide" id="powers-adv"><summary class="label">Powers grown in play (with the GM's approval)</summary>
@@ -3431,7 +3432,7 @@ tr.lvl-U td.target { color: var(--muted); }
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" },
       allegiance: "", customTier: 1,
       portrait: "", portraitShape: "token",
-      spells: [], powers: [], powerBoost: [], gmClass4: false, powerRaise: {}, powersLearned: [], status: "",
+      spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, powerRaise: {}, powersLearned: [], status: "",
       play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [] },
     };
   }
@@ -3451,6 +3452,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!STATUSES || !STATUSES.some((x) => x[0] === out.status)) out.status = "";
     out.powerBoost = (Array.isArray(out.powerBoost) ? out.powerBoost : []).map((n) => Math.max(0, Math.min(3, parseInt(n, 10) || 0)));
     out.gmClass4 = out.gmClass4 === true;
+    out.pureSorcery = out.pureSorcery === true;
     out.powerRaise = Object.fromEntries(Object.entries(out.powerRaise && typeof out.powerRaise === "object" ? out.powerRaise : {}).filter(([k, v]) => POWERS && POWERS.list.some((p) => p[0] === k) && CLASS_NAMES.includes(v)));
     out.powersLearned = (Array.isArray(out.powersLearned) ? out.powersLearned : []).filter((x) => x && typeof x === "object").map((x) => ({ id: POWERS && POWERS.list.some((p) => p[0] === x.id) ? x.id : "", cl: CLASS_NAMES.includes(x.cl) ? x.cl : "I" }));
     if (typeof out.portrait !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(out.portrait)) out.portrait = "";
@@ -3547,7 +3549,7 @@ tr.lvl-U td.target { color: var(--muted); }
   // Spells come from a calling, an advantage, or (when the pack says so) a power such as Cantrips.
   const canCast = (c = ch) => !!SPELLS && ((SPELLS.power && allPowers(c).some((p) => p.id === SPELLS.power)) || (SPELLS.roles || []).includes(c.dept) || (SPELLS.advantages || []).some((a) => a === c.adv.id || (edgeN("adv2", c) && a === c.adv2.id))
     || (SPELLS.originAdvantages || []).includes(c.sadv.id));
-  const spellsKnown = (c = ch) => { if (SPELLS.power) { const p = allPowers(c).find((x) => x.id === SPELLS.power); if (p) return SPELLS.knownByClass[CLASS_NAMES.indexOf(p.cl)] || 0; }
+  const spellsKnown = (c = ch) => { if (SPELLS.power) { const p = allPowers(c).find((x) => x.id === SPELLS.power); if (p) return (SPELLS.knownByClass[CLASS_NAMES.indexOf(p.cl)] || 0) + (isPure(c) ? (SPELLS.pureBonus || 2) * (powerSlots(c).length - 1) : 0); }
     const l = c.skills[SPELLS.skill]; return !canCast(c) || !l || l === "U" ? 0 : l === "T" ? SPELLS.known[0] : c.path === "hand" ? SPELLS.known[2] : SPELLS.known[1]; };
   // The origin's slots, plus one Class I slot for the Extra Power Edge.
   const baseSlots = (c = ch) => {
@@ -3570,7 +3572,12 @@ tr.lvl-U td.target { color: var(--muted); }
     return p[3][Math.min(i, p[3].length - 1)] + (i >= p[3].length ? ` (That's Class ${CLASS_NAMES[p[3].length - 1]}; at Class ${cl} it goes a step further, as the GM describes.)` : ""); };
   // Every power a character has now: the creation slots (raised in play, never lowered) and powers learned in play.
   const PLAY_CLASSES = CLASS_NAMES.slice(0, 5); // Class VI is for the GM's characters
-  const allPowers = (c = ch) => [
+  // Pure sorcery: the spell power (Cantrips) takes every slot, at the best slot's Class; each other slot adds spells instead.
+  const isPure = (c = ch) => !!(SPELLS && SPELLS.power && c.pureSorcery && powerSlots(c).some((_, i) => c.powers[i] === SPELLS.power));
+  const allPowers = (c = ch) => isPure(c) ? [
+    { id: SPELLS.power, base: "I", cl: CLASS_NAMES[Math.max(...powerSlots(c).map((cl) => classIndex(cl)), classIndex(c.powerRaise?.[SPELLS.power] || "I"))] },
+    ...(c.powersLearned || []).map((x) => ({ id: x.id, base: "I", cl: x.cl, learned: true })),
+  ].filter((x) => x.id) : [
     ...powerSlots(c).map((base, i) => ({ id: c.powers[i] || "", base, cl: CLASS_NAMES[Math.max(classIndex(base), classIndex(c.powerRaise?.[c.powers[i]] || base))] })),
     ...(c.powersLearned || []).map((x) => ({ id: x.id, base: "I", cl: x.cl, learned: true })),
   ].filter((x) => x.id);
@@ -3618,6 +3625,7 @@ tr.lvl-U td.target { color: var(--muted); }
       ...(canCast() ? [[ch.spells.length === spellsKnown(), spellsKnown() ? (ch.spells.length === spellsKnown() ? `${spellsKnown()} ${SPELLS.plural} chosen` : `${SPELLS.plural}: ${ch.spells.length} of ${spellsKnown()} chosen`)
         : `Train ${SPELLS.skill} to learn ${SPELLS.plural.toLowerCase()}`]] : []),
       ...(powerSlots().length ? (() => { const sl = powerSlots(), picked = sl.map((_, i) => ch.powers[i] || "").filter(Boolean);
+        if (isPure()) return [[true, `${POWERS.plural}: ${powerDef(SPELLS.power)[1]} ${allPowers()[0].cl} (pure sorcery)`]];
         const ok = picked.length === sl.length && new Set(picked).size === picked.length;
         return [[ok, ok ? `${POWERS.plural}: ${sl.map((cl, i) => `${powerDef(ch.powers[i])[1]} ${cl}`).join(", ")}` : `${POWERS.plural}: ${picked.length} of ${sl.length} chosen`]]; })() : []),
       ...(edgeN("power") ? (() => { const n = boostsSpent(), want = edgeN("power"), sl = powerSlots(), iv = sl.filter((c) => classIndex(c) >= 3).length;
@@ -3921,7 +3929,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ed.length ? `<div class="field"><span class="label">Edges</span><span>${esc(ed.join(", "))}</span></div>` : ""}
         ${a2 && edgeN("adv2") ? `<div class="field"><span class="label">Second advantage</span><b>${esc(a2[1])}${ch.adv2.detail ? ": " + esc(ch.adv2.detail) : ""}</b><span class="small muted">${esc(a2[2])}</span></div>` : ""}
         ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">A friend</span><span>${esc(ch.contact)}</span></div>` : ""}
-        ${POWERS && allPowers().length ? `<div class="field wide"><span class="label">${POWERS.plural}</span><span>${allPowers().map((x) => `<b>${esc(powerDef(x.id)[1])} (Class ${x.cl}):</b> ${esc(powerEffect(x.id, x.cl))}`).join("<br>")}</span></div>` : ""}
+        ${POWERS && allPowers().length ? `<div class="field wide"><span class="label">${POWERS.plural}</span><span>${allPowers().map((x) => `<b>${esc(powerDef(x.id)[1])} (Class ${x.cl}${isPure() && x.id === SPELLS.power ? ", pure sorcery" : ""}):</b> ${esc(isPure() && x.id === SPELLS.power ? `Know ${spellsKnown()} ${SPELLS.plural.toLowerCase()}, each working at Class ${x.cl}.` : powerEffect(x.id, x.cl))}`).join("<br>")}</span></div>` : ""}
         ${STATUSES && ch.status ? (() => { const st = STATUSES.find((x) => x[0] === ch.status); return `<div class="field"><span class="label">${esc(PACK.statusLabel || "Status")}: ${esc(st[1])}</span><span class="small">${esc(st[2])}</span><span class="small muted">${esc(st[3])}</span></div>`; })() : ""}
         ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([, n, eff]) => `<b>${esc(n)}:</b> ${esc(eff)}`).join("<br>")}</span></div>` : ""}
         ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 ${esc(ch.gear.skill)})` : ""}</span></div>` : ""}
@@ -3971,7 +3979,9 @@ tr.lvl-U td.target { color: var(--muted); }
           const s = $("f-pw-" + i), id = ch.powers[i] || "";
           s.value = opts.some((p) => p[0] === id) ? id : "";
           [...s.options].forEach((o) => { if (o.value) o.disabled = o.value !== id && ch.powers.some((x, j) => j !== i && j < sl.length && x === o.value); });
-          $("pw-desc-" + i).textContent = id ? powerEffect(id, cl) : "";
+          const givenUp = isPure() && id !== SPELLS.power;
+          s.disabled = givenUp;
+          $("pw-desc-" + i).textContent = givenUp ? "Given up for pure sorcery: +" + (SPELLS.pureBonus || 2) + " cantrips." : id ? powerEffect(id, cl) : "";
           if ($("f-pb-" + i)) $("f-pb-" + i).value = String(ch.powerBoost[i] || 0);
         });
         const n = sl.filter((_, i) => ch.powers[i]).length;
@@ -3980,6 +3990,12 @@ tr.lvl-U td.target { color: var(--muted); }
       }
       $("powers-adv").hidden = !sl.length && !ch.powersLearned.length;
       $("pboost-wrap").hidden = !edgeN("power") || !sl.length;
+      const hasSpellPower = SPELLS && SPELLS.power && sl.some((_, i) => ch.powers[i] === SPELLS.power);
+      $("pure-wrap").hidden = !hasSpellPower || sl.length < 2;
+      if (hasSpellPower) {
+        $("pure-label").textContent = `Pure sorcery: ${powerDef(SPELLS.power)[1]} takes all your power slots, at your best slot's Class, and each slot you give up adds ${SPELLS.pureBonus || 2} more ${SPELLS.plural.toLowerCase()}.`;
+        $("f-pure").checked = !!ch.pureSorcery;
+      }
       $("pboost-note").textContent = `Stronger Power: put your ${edgeN("power")} Edge${edgeN("power") === 1 ? "" : "s"} on the powers above (${boostsSpent()} assigned). Class III is the limit, unless the GM approves one power at Class IV.`;
       $("f-gm4").checked = !!ch.gmClass4;
       const advSig = sl.map((_, i) => ch.powers[i] || "").join(",") + "|" + ch.powersLearned.length;
@@ -4175,6 +4191,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-allegiance") { ch.allegiance = t.value; touch(); render(); }
     else if (t.id === "f-status") { ch.status = t.value; touch(); render(); }
     else if (t.dataset.pboost !== undefined) { const i = +t.dataset.pboost; while (ch.powerBoost.length <= i) ch.powerBoost.push(0); ch.powerBoost[i] = +t.value; touch(); render(); }
+    else if (t.id === "f-pure") { ch.pureSorcery = t.checked; touch(); render(); }
     else if (t.id === "f-gm4") { ch.gmClass4 = t.checked; touch(); render(); }
     else if (t.dataset.praise) { if (t.value === t.dataset.base) delete ch.powerRaise[t.dataset.praise]; else ch.powerRaise[t.dataset.praise] = t.value; touch(); render(); }
     else if (t.dataset.plearn !== undefined) { ch.powersLearned[+t.dataset.plearn].id = t.value; touch(); render(); }

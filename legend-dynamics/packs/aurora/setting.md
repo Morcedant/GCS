@@ -241,6 +241,7 @@ Comic-book magic is fast: a bolt, a shield, a binding, in a single panel. **Cant
 - **Growing:** pushing, Stronger Power and growth in play all work as usual; each Class higher teaches you another cantrip and strengthens them all.
 - **Who:** Cantrips is on the Adept's mystic list. Other origins can take it with a magical reason: a Bonded artifact, a Mythic heritage, a Touched vision.
 - **Changing:** between cases, swap one cantrip for another with a week of study.
+- **Pure sorcery (optional):** a character who is nothing but a spellcaster can let Cantrips take **all** their power slots. It works at the best slot's Class, and each slot given up adds **2 more cantrips**. A tier 2 character (Class II, I and I) becomes Cantrips II with 3 + 2 + 2 = **7 cantrips** and no other powers. Tick *Pure sorcery* in the creator's step 4.
 
 | Cantrip | Effect |
 |---|---|
