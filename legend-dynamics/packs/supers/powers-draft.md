@@ -86,6 +86,18 @@ How to read the effects:
 - **Adepts and rituals.** An Adept's own powers come from the mystic list (Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing). Beyond those, an Adept can **emulate any power by ritual**:
   - **Time:** Class I takes ten minutes, Class II an hour, Class III a night. A ritual can't be done in the middle of a fight.
   - **Need:** a quiet place and the right materials, which the GM may make the first problem to solve.
+  - **Fuel:** every ritual must be fueled, and the bigger the Class, the bigger the price. Choose one source:
+
+    | Fuel | Class I | Class II | Class III |
+    |---|---|---|---|
+    | **Your own vitality** | 1 box of Strain | 2 boxes of Strain | 1 injury box and 2 of Strain |
+    | **A sacrifice:** something of value destroyed in the working | Money or a personal keepsake | A rare reagent or an artifact's charge | Something irreplaceable: a relic, a bond, a memory |
+    | **Willing helpers:** each marks 1 box of Strain | 1 helper | 2 helpers | 4 helpers |
+    | **A place of power:** a ley-line crossing, an Earth Gate, a haven's edge | Fuels Class I by itself | Fuels Class II by itself | Fuels Class III by itself, but opening it draws attention from the other side |
+    | **A Hephaestus Key:** the crystal energy source the Wardens guard | One charge | One charge | Two charges; each Key has a handful, and everyone wants them |
+    | **A bargain:** an Otherworld power supplies it | A small favor owed | A real favor owed | A debt the GM can call in at the worst moment |
+
+    Without fuel, the ritual fails before it begins. Taking fuel from an unwilling person is possible, and it is exactly what the Foundation and Raster Zero do; for player characters it's a crime under the Extraordinary Powers Act and a black mark on any Adept.
   - **Roll:** Powers, at −2 for Class II and −4 for Class III. A ritual can't exceed the Adept's highest Class.
   - **Effect:** the power works once, or for one scene, as the GM judges. It can be cast on someone else.
   - **Cost:** a failed ritual marks a box of Strain; a natural 18 means something answered that shouldn't have.
