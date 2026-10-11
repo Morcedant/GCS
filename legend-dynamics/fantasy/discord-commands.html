@@ -1,0 +1,94 @@
+<title>The Shattered Crown Discord Commands</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&amp;family=Cinzel:wght@500;600&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;display=swap">
+<style>
+/* Layout: one reading column, like a card handed across the table. Commands sit in monospace wells
+   with a copy button; players' commands first, the GM's after a rule. Dark only, in the creator's colours. */
+:root {
+  --space: #0c0806;
+  --glass: rgba(26, 17, 12, .9);
+  --fg: #eee2cf;
+  --muted: #a39079;
+  --line: rgba(205, 152, 88, .22);
+  --chrome: #d6a660;
+  --gold: #dcb26a;
+  --red: #c0392b;
+  --on-accent: #120b07;
+  --display: "Cinzel", Georgia, serif;
+  --title: "Cinzel Decorative", "Cinzel", Georgia, serif;
+  --body: "Cormorant Garamond", Garamond, Georgia, serif;
+  --code: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--space); color: var(--fg); font: 1.05rem/1.55 var(--body); }
+.wrap { max-width: 46rem; margin: 0 auto; padding: 40px 16px 64px; display: grid; gap: 28px; }
+header { display: grid; gap: 6px; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+.eyebrow { font: 600 .8rem/1.2 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--chrome); }
+h1 { font: 400 clamp(2rem, 7vw, 3rem)/1.05 var(--title); margin: 0; text-wrap: balance; }
+h2 { font: 600 1.35rem/1.2 var(--display); margin: 0; color: var(--gold); letter-spacing: .03em; }
+.lede { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
+section { display: grid; gap: 14px; }
+.steps { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+.cmds { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.cmd { background: var(--glass); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 8px; min-width: 0; }
+.cmd p { margin: 0; }
+.cmd-line { display: flex; gap: 10px; align-items: flex-start; min-width: 0; }
+.cmd-code { flex: 1; min-width: 0; overflow-wrap: anywhere; font: .92rem/1.45 var(--code); color: var(--chrome); }
+code { font-family: var(--code); font-size: .9em; color: var(--chrome); }
+.copy { flex: none; font: 600 .78rem/1 var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--on-accent);
+  background: var(--gold); border: 0; border-radius: 4px; padding: 7px 10px; cursor: pointer; }
+.copy:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.copy.done { background: var(--chrome); }
+.note { margin: 0; color: var(--muted); }
+.gm { border-top: 1px solid var(--line); padding-top: 24px; }
+footer { color: var(--muted); font-size: .9rem; }
+</style>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">The Shattered Crown</span>
+    <h1>Discord commands</h1>
+    <p class="lede">The table's Discord bot rolls the dice and keeps the shared Fortune points, clocks and Troubles tracks.
+    The bot doesn't know your sheet, so you give it the target number.</p>
+  </header>
+
+  <section>
+    <h2>Getting started</h2>
+    <ol class="steps">
+      <li>Type <code>/</code> in the game channel to see every command.</li>
+      <li>Pick one; Discord shows each option as you fill it in.</li>
+      <li>Read your target number off your sheet and add up every modifier yourself.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>For players</h2>
+    <ul class="cmds">
+      <li class="cmd"><div class="cmd-line"><code class="cmd-code">/roll target:14 modifier:-2 label:Melee</code><button type="button" class="copy" data-cmd="/roll target:14 modifier:-2 label:Melee" aria-label="Copy /roll target:14">Copy</button></div><p>Roll 3d6 under your target. Use the number from your sheet, and add up every modifier yourself: circumstance, injury, assistance. The bot shows the result, the margin and your chance. <strong>Spend a Fortune point to reroll</strong> lets you reroll once, and the second result stands.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/contest target:14 opponent:13 opponent_name:&quot;Serpent-priest&quot; label:Grapple</code><button type="button" class="copy" data-cmd="/contest target:14 opponent:13 opponent_name:&quot;Serpent-priest&quot; label:Grapple" aria-label="Copy /contest target:14">Copy</button></div><p>An opposed roll. The bot rolls both sides and names the winner. Ties and double failures go to the defender, which is the opponent unless you add <code>defender:me</code>.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/assist target:12 helper_target:14 helper:@name label:&quot;Force the tomb door&quot;</code><button type="button" class="copy" data-cmd="/assist target:12 helper_target:14 helper:@name label:&quot;Force the tomb door&quot;" aria-label="Copy /assist target:12">Copy</button></div><p>Someone helps you. They roll first (Athletics, say): success gives +1, success by 5 or more +2, and a natural 18 brings a complication. Then you roll with their bonus.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points show</code><button type="button" class="copy" data-cmd="/points show" aria-label="Copy /points show">Copy</button></div><p>Your Fortune points this session. Add <code>player:@name</code> to see someone else's.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points spend</code><button type="button" class="copy" data-cmd="/points spend" aria-label="Copy /points spend">Copy</button></div><p>Spend a Fortune point without rolling, e.g. to reduce an injury by one box or to establish a small preparation.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points gain</code><button type="button" class="copy" data-cmd="/points gain" aria-label="Copy /points gain">Copy</button></div><p>Gain a Fortune point, e.g. when you accept a complication the GM offers. With Extra Fortune, use it once at the start of a session.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/clock show</code><button type="button" class="copy" data-cmd="/clock show" aria-label="Copy /clock show">Copy</button></div><p>Every clock the GM is running.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/track show</code><button type="button" class="copy" data-cmd="/track show" aria-label="Copy /track show">Copy</button></div><p>The shared Troubles tracks (Infamy, Doom, Debt, Hunger) and what each one means right now.</p></li>
+    </ul>
+    
+    <p class="note">Only the player who rolled can press the reroll button. Rolls that miss by 1 or 2 remind the GM that success at a cost is on offer.</p>
+  </section>
+
+  <section class="gm">
+    <h2>For the GM</h2>
+    <p class="note">GM commands need the <strong>Manage Server</strong> permission on the Discord server. Everyone can see clocks, tracks and points.</p>
+    <ul class="cmds">
+      <li class="cmd"><div class="cmd-line"><code class="cmd-code">/game set game:The Shattered Crown</code><button type="button" class="copy" data-cmd="/game set game:The Shattered Crown" aria-label="Copy /game set">Copy</button></div><p>Choose this server's game. Do it once; <code>/game show</code> checks it.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points newsession</code><button type="button" class="copy" data-cmd="/points newsession" aria-label="Copy /points newsession">Copy</button></div><p>Start a session: everyone goes back to two Fortune points, and unused points are gone.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points gain player:@name</code><button type="button" class="copy" data-cmd="/points gain player:@name" aria-label="Copy /points gain">Copy</button></div><p>Award a Fortune point, e.g. for an accepted complication.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/points set player:@name points:3</code><button type="button" class="copy" data-cmd="/points set player:@name points:3" aria-label="Copy /points set">Copy</button></div><p>Correct a player's total.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/clock new name:&quot;The eclipse&quot; segments:6 kind:danger</code><button type="button" class="copy" data-cmd="/clock new name:&quot;The eclipse&quot; segments:6 kind:danger" aria-label="Copy /clock new">Copy</button></div><p>Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use <code>kind:progress</code> for one that fills on successes.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/clock tick name:&quot;The eclipse&quot;</code><button type="button" class="copy" data-cmd="/clock tick name:&quot;The eclipse&quot;" aria-label="Copy /clock tick">Copy</button></div><p>Fill one segment. Add <code>segments:2</code> for two, or <code>segments:-1</code> to undo. <code>/clock remove</code> deletes a clock.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/track mark name:doom</code><button type="button" class="copy" data-cmd="/track mark name:doom" aria-label="Copy /track mark">Copy</button></div><p>Mark a box on a track; a partial name works ("doom" finds Doom). <code>/track clear</code> clears one, and <code>/track reset</code> clears them all.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/seed</code><button type="button" class="copy" data-cmd="/seed" aria-label="Copy /seed ">Copy</button></div><p>Roll an adventure seed: one line from each seed table, and the command to start its ticking clock.</p></li><li class="cmd"><div class="cmd-line"><code class="cmd-code">/contest ... defender:me</code><button type="button" class="copy" data-cmd="/contest ... defender:me" aria-label="Copy /contest ...">Copy</button></div><p>When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them.</p></li>
+    </ul>
+    <p class="note">Each server keeps its own points, clocks and tracks. If a command is missing from Discord's list, open the bot's <code>/register</code> page once, then press Ctrl+R in Discord.</p>
+  </section>
+
+  <footer>The Shattered Crown. Commands work the same in every game the bot runs; the examples use this game's names.</footer>
+</div>
+<script>
+document.addEventListener("click", (e) => {
+  const b = e.target.closest(".copy");
+  if (!b) return;
+  const done = (ok) => { b.textContent = ok ? "Copied" : "Select it"; b.classList.toggle("done", ok); setTimeout(() => { b.textContent = "Copy"; b.classList.remove("done"); }, 1600); };
+  const pick = () => { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+  try { navigator.clipboard.writeText(b.dataset.cmd).then(() => done(true), () => { pick(); done(false); }); }
+  catch (_) { pick(); done(false); }
+});
+</script>

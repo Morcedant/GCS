@@ -3099,109 +3099,6 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Combat:</strong> move plus one action. Hit → optional Dodge → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.</p>
 <p><strong>Medicine:</strong> stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Rest: one box per two full days, not from three.</p>
 <p><strong>Grit:</strong> start each session with two. Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.</p>
-<h1 id="g-discord-commands">Discord commands</h1>
-<p>The table’s Discord bot rolls the dice and keeps the shared Grit points, clocks and Trouble tracks for the server. Type <code>/</code> in a channel to see the commands; Discord shows each option as you fill it in. The bot doesn’t know your sheet, so you give it the target number.</p>
-<h2 id="g-for-players">For players</h2>
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Command</th>
-<th>What it does</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>/roll target:13 modifier:-2 label:Shooting</code></td>
-<td>Roll 3d6 under your target. Use the number from your sheet, and add up every modifier yourself: circumstance, injury, assistance. The bot shows the result, the margin and your chance. <strong>Spend a Grit point to reroll</strong> lets you reroll once, and the second result stands.</td>
-</tr>
-<tr class="even">
-<td><code>/contest target:13 opponent:14 opponent_name:"Werewolf" label:Grapple</code></td>
-<td>An opposed roll. The bot rolls both sides and names the winner. Ties and double failures go to the defender, which is the opponent unless you add <code>defender:me</code>.</td>
-</tr>
-<tr class="odd">
-<td><code>/assist target:12 helper_target:14 helper:@name label:"Hold the door"</code></td>
-<td>Someone helps you. They roll first (Athletics, say): success gives +1, success by 5 or more +2, and a natural 18 brings a complication. Then you roll with their bonus.</td>
-</tr>
-<tr class="even">
-<td><code>/points show</code></td>
-<td>Your Grit points this session. Add <code>player:@name</code> to see someone else’s.</td>
-</tr>
-<tr class="odd">
-<td><code>/points spend</code></td>
-<td>Spend a Grit point without rolling, e.g. to reduce an injury by one box or to establish a small preparation.</td>
-</tr>
-<tr class="even">
-<td><code>/points gain</code></td>
-<td>Gain a Grit point, e.g. when you accept a complication the GM offers. With Extra Grit, use it once at the start of a session.</td>
-</tr>
-<tr class="odd">
-<td><code>/clock show</code></td>
-<td>Every clock the GM is running.</td>
-</tr>
-<tr class="even">
-<td><code>/track show</code></td>
-<td>The shared Trouble tracks (Heat, Whispers, The Dark) and what each one means right now.</td>
-</tr>
-</tbody>
-</table>
-<p>Only the player who rolled can press the reroll button. Rolls that miss by 1 or 2 remind the GM that success at a cost is on offer.</p>
-<h2 id="g-for-the-gm">For the GM</h2>
-<p>GM commands need the <strong>Manage Server</strong> permission on the Discord server. Everyone can see clocks, tracks and points.</p>
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Command</th>
-<th>What it does</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>/game set game:Dust &amp; Damnation</code></td>
-<td>Choose this server’s game. Do it once; <code>/game show</code> checks it.</td>
-</tr>
-<tr class="even">
-<td><code>/points newsession</code></td>
-<td>Start a session: everyone goes back to two Grit points, and unused points are gone.</td>
-</tr>
-<tr class="odd">
-<td><code>/points gain player:@name</code></td>
-<td>Award a Grit point, e.g. for an accepted complication.</td>
-</tr>
-<tr class="even">
-<td><code>/points set player:@name points:3</code></td>
-<td>Correct a player’s total.</td>
-</tr>
-<tr class="odd">
-<td><code>/clock new name:"The eclipse" segments:4 kind:danger</code></td>
-<td>Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use <code>kind:progress</code> for one that fills on successes.</td>
-</tr>
-<tr class="even">
-<td><code>/clock tick name:"The eclipse"</code></td>
-<td>Fill one segment. Add <code>segments:2</code> for two, or <code>segments:-1</code> to undo. <code>/clock remove</code> deletes a clock.</td>
-</tr>
-<tr class="odd">
-<td><code>/track mark name:dark</code></td>
-<td>Mark a box on a track; a partial name works (“dark” finds The Dark). <code>/track clear</code> clears one, and <code>/track reset</code> clears them all.</td>
-</tr>
-<tr class="even">
-<td><code>/seed</code></td>
-<td>Roll an adventure seed: one line from each seed table, and the command to start its ticking clock.</td>
-</tr>
-<tr class="odd">
-<td><code>/contest ... defender:me</code></td>
-<td>When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them.</td>
-</tr>
-</tbody>
-</table>
-<p>Each server keeps its own points, clocks and tracks. If a command is missing from Discord’s list, open the bot’s <code>/register</code> page once (see the bot’s README), then press Ctrl+R in Discord.</p>
 <p><em>Legend Dynamics RPG system. The core rules and this setting are original works.</em></p>
 <!-- GUIDE:END -->
       </article>
@@ -3299,7 +3196,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <select id="clk-kind" aria-label="Clock type"><option value="danger">Danger</option><option value="progress">Progress</option></select>
             <button class="btn" id="clk-add">Add</button>
           </div>
-          <div class="btn-row"><button class="linkish" id="clk-copy">Copy clocks for Discord</button><span class="small muted" id="clk-msg"></span></div>
+          <div class="btn-row"><button class="linkish" id="clk-copy">Copy clocks</button><span class="small muted" id="clk-msg"></span></div>
           <div class="clocks" id="clocks"></div>
         </div>
         <div class="card hud no-print" id="card-ship">
@@ -4267,7 +4164,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!clocks.length) { $("clk-msg").textContent = "No clocks to copy."; return; }
     const txt = clocks.map((c) => `**${c.name}** (${c.kind}) ${"●".repeat(c.filled)}${"○".repeat(c.size - c.filled)} ${c.filled}/${c.size}${c.filled >= c.size ? (c.kind === "danger" ? "  **It happens.**" : "  **Done.**") : ""}`).join("\n");
     const p = navigator.clipboard?.writeText(txt);
-    const done = (ok) => ($("clk-msg").textContent = ok ? "Copied. Paste it into your Discord channel." : "Copying is blocked here; use /clock show in Discord instead.");
+    const done = (ok) => ($("clk-msg").textContent = ok ? "Copied." : "Copying is blocked here; select the clocks and copy them by hand.");
     if (p) p.then(() => done(true), () => done(false)); else done(false);
   };
   $("clk-name").addEventListener("keydown", (e) => { if (e.key === "Enter") $("clk-add").click(); });

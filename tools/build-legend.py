@@ -12,7 +12,7 @@ It also writes legend-dynamics/Legend_Dynamics_Core_Rules.md, the setting-neutra
 import argparse, html, importlib.util, json, pathlib, re, subprocess, sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import discord_chapter
+import discord_handout
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LD = ROOT / "legend-dynamics"
@@ -158,8 +158,6 @@ def gen(name, pack, t):
     if name == "group-names":
         names = [g["name"] for g in p["groups"]]
         return ", ".join(names[:-1]) + " or " + names[-1]
-    if name == "discord":
-        return discord_chapter.chapter(discord_chapter.game_info(p["id"], t["title"], t["point"], p.get("tracks", []), p.get("seeds", {}), t["tracksTitle"]))
     if name == "roles":
         g = {x["id"]: x["name"] for x in p["groups"]}
         return table([t["role"], "Group", "Typical contribution", "Core skills"], [[r["name"], g[r["group"]], r["text"].split(": ", 1)[-1], ", ".join(r.get("skills", []))] for r in p["roles"]])
@@ -274,7 +272,9 @@ def build(pid, docx):
     tpl = tpl.replace("/* PACK:START *//* PACK:END */", "/* PACK:START */" + js + "/* PACK:END */")
     tpl = re.sub(r"<!-- GUIDE:START -->.*?<!-- GUIDE:END -->", lambda _: "<!-- GUIDE:START -->\n" + guide_html + "<!-- GUIDE:END -->", tpl, flags=re.S)
     (out / "index.html").write_text(tpl)
-    print(f"built {out.relative_to(ROOT)}/index.html and players-guide.md")
+    g = discord_handout.game_info(pid, t["title"], t["point"], pack.get("tracks", []), pack.get("seeds", {}), t["tracksTitle"])
+    discord_handout.write_handout(g, out)
+    print(f"built {out.relative_to(ROOT)}/index.html, players-guide.md and discord-commands.html")
     if docx:
         name = re.sub(r"[^A-Za-z0-9]+", "_", t["guideTitle"]).strip("_") + ".docx"
         subprocess.run(["pandoc", "-f", "markdown", "-o", str(out / name)], input=md, text=True, check=True)
@@ -288,7 +288,6 @@ def core_rules(docx=False):
     t = terms_of({"terms": {}})
     core = (ENGINE / "core.md").read_text()
     core = core.replace("{{PACK:intro}}", "Legend Dynamics is a roleplaying system for heroic stories in any genre: concrete skills, a 3d6 roll-under core, and a small pool of Legend points that reward characters for their flaws. These core rules are setting-neutral. A **setting pack** supplies the roles, origins, skills, gear, weapons, tracks and dangers of one genre, and renames a few terms to suit it.")
-    core = core.replace("# Discord commands\n\n{{GEN:discord}}\n\n", "")
     # Neutral stand-ins for the pack-specific parts of "Making your own".
     core = core.replace("{{PACK:customrole}}", '"Smuggler: knows every back door, bribe and hidden hold."')
     core = core.replace("{{GEN:group-names}}", "one of your setting's groups")

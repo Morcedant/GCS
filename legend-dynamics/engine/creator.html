@@ -880,7 +880,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <select id="clk-kind" aria-label="Clock type"><option value="danger">Danger</option><option value="progress">Progress</option></select>
             <button class="btn" id="clk-add">Add</button>
           </div>
-          <div class="btn-row"><button class="linkish" id="clk-copy">Copy clocks for Discord</button><span class="small muted" id="clk-msg"></span></div>
+          <div class="btn-row"><button class="linkish" id="clk-copy">Copy clocks</button><span class="small muted" id="clk-msg"></span></div>
           <div class="clocks" id="clocks"></div>
         </div>
         <div class="card hud no-print" id="card-ship">
@@ -1836,7 +1836,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!clocks.length) { $("clk-msg").textContent = "No clocks to copy."; return; }
     const txt = clocks.map((c) => `**${c.name}** (${c.kind}) ${"●".repeat(c.filled)}${"○".repeat(c.size - c.filled)} ${c.filled}/${c.size}${c.filled >= c.size ? (c.kind === "danger" ? "  **It happens.**" : "  **Done.**") : ""}`).join("\n");
     const p = navigator.clipboard?.writeText(txt);
-    const done = (ok) => ($("clk-msg").textContent = ok ? "Copied. Paste it into your Discord channel." : "Copying is blocked here; use /clock show in Discord instead.");
+    const done = (ok) => ($("clk-msg").textContent = ok ? "Copied." : "Copying is blocked here; select the clocks and copy them by hand.");
     if (p) p.then(() => done(true), () => done(false)); else done(false);
   };
   $("clk-name").addEventListener("keydown", (e) => { if (e.key === "Enter") $("clk-add").click(); });
