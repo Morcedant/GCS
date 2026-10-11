@@ -107,6 +107,7 @@ def char_block(c, pack, t, heading):
     tier = o["tier"] if o else c.get("customTier", 1)
     edge_names = {"attr": "+1 attribute point", "skill": "Extra Trained skill", "adv2": "Second advantage",
                   "grit": f"Extra {t['point']}", "contact": "A friend", "gear": "A fine weapon or tool"}
+    edge_names.update({e[0]: e[1] for e in pack.get("extraEdges", [])})
     edges = [edge_names[k] + (f" ×{v}" if v > 1 else "") for k, v in c.get("edges", {}).items() if v]
     top = [n for n in skills if skills[n] == "S"]
     free = o.get("freeSkill") if o else None
@@ -163,7 +164,10 @@ def power_slots(pack, c):
     """The Classes of a character's power slots, as the creator works them out."""
     o = next((x for x in pack["origins"] if x["id"] == c.get("speciesId")), None)
     slots = (o or {}).get("powerSlots") or pack["powers"]["tierSlots"].get(str((o or {}).get("tier", 0)), [])
-    return ["II" if x == "I+" and c.get("skills", {}).get(pack["powers"]["skill"]) == "S" else "I" if x == "I+" else x for x in slots]
+    base = ["II" if x == "I+" and c.get("skills", {}).get(pack["powers"]["skill"]) == "S" else "I" if x == "I+" else x for x in slots]
+    base += ["I"] if c.get("edges", {}).get("xpower") else []
+    names = ["I", "II", "III", "IV", "V", "VI"]
+    return [names[names.index(x) + ((c.get("powerBoost") or [])[i] if i < len(c.get("powerBoost") or []) else 0)] for i, x in enumerate(base)]
 
 
 def gen(name, pack, t):
@@ -179,6 +183,8 @@ def gen(name, pack, t):
             out += ["## Escalated Classes", "", f"Most powers simply go further at Classes IV to VI. {' and '.join([', '.join(x[1] for x in esc[:-1]), esc[-1][1]] if len(esc) > 1 else [esc[0][1]])} {'have' if len(esc) > 1 else 'has'} set limits at every Class: speeds in multiples of the speed of sound (Mach 1 is about 760 mph), and distances in feet and miles. Player characters reach these Classes only by pushing (one action, one box of Strain); the GM's characters may have them outright.", "",
                     table(["Power", "Class IV", "Class V", "Class VI"], [[f"**{x[1]}**", *x[3][3:6]] for x in esc]), ""]
         return "\n".join(out)
+    if name == "extra-edges":
+        return "\n".join(f"| {e[1]} | {e[2]} | {e[3]} |" for e in p.get("extraEdges", []))
     if name == "statuses":
         return table([p.get("statusLabel", "Status"), "Benefit", "Cost"], [[f"**{x[1]}**", x[2], x[3]] for x in p["statuses"]])
     if name == "group-names":
@@ -319,6 +325,7 @@ def core_rules(docx=False):
     core = (ENGINE / "core.md").read_text()
     core = core.replace("{{PACK:intro}}", "Legend Dynamics is a roleplaying system for heroic stories in any genre: concrete skills, a 3d6 roll-under core, and a small pool of Legend points that reward characters for their flaws. These core rules are setting-neutral. A **setting pack** supplies the roles, origins, skills, gear, weapons, tracks and dangers of one genre, and renames a few terms to suit it.")
     # Neutral stand-ins for the pack-specific parts of "Making your own".
+    core = core.replace("{{GEN:extra-edges}}\n", "")
     core = core.replace("{{PACK:customrole}}", '"Smuggler: knows every back door, bribe and hidden hold."')
     core = core.replace("{{GEN:group-names}}", "one of your setting's groups")
     core = core.replace("{{PACK:customorigin}}", "**Hill-folk (tier 1).** Stocky herders from high, cold country. *Adjustments:* Body +1, Presence −1. *Core rule:* at home in the heights: no penalty for thin air or cold. *Origin advantage:* **Sure-Footed**: +2 to Athletics to climb and keep your footing. *Companion:* **Clannish**: you trust your own people first; when it matters, accept the cost of that loyalty.")

@@ -82,20 +82,20 @@ Choose how your character trained (see Step 3):
 
 Choose your origin from the **Origins** chapter. Every attribute starts at 10, and your origin adjusts some of them; the result is your **base**. Adjustments always total zero.
 
-Origins can differ in power, so each has a **tier** from 0 to 3. Every character has **3 points** to split between origin power and **Edges**: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.
+Origins can differ in power, so each has a **tier** from 0 to 3. Every character has **4 points** to split between origin power and **Edges**: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.
 
 | Origin | Tier | Edges | Adjustments |
 |---|---|---|---|
-| Non-Operant | 0 | 3 | None |
-| Adept | 1 | 2 | Body −1, Intellect +1 |
-| Aurora-born | 2 | 1 | None |
-| Bonded | 2 | 1 | Presence −1, Will +1 |
-| Lab-made | 2 | 1 | Body +1, Presence −1 |
-| Otherworlder | 2 | 1 | Agility +1, Will −1 |
-| Shadow Earth Defector (GM's permission) | 2 | 1 | Agility +1, Presence −1 |
-| Touched | 2 | 1 | Intellect −1, Will +1 |
-| Ambrosia | 3 | 0 | Body +1, Agility −1, Intellect −1, Presence +1 |
-| Mythic | 3 | 0 | Body +1, Intellect −1, Presence −1, Will +1 |
+| Non-Operant | 0 | 4 | None |
+| Adept | 1 | 3 | Body −1, Intellect +1 |
+| Aurora-born | 2 | 2 | None |
+| Bonded | 2 | 2 | Presence −1, Will +1 |
+| Lab-made | 2 | 2 | Body +1, Presence −1 |
+| Otherworlder | 2 | 2 | Agility +1, Will −1 |
+| Shadow Earth Defector (GM's permission) | 2 | 2 | Agility +1, Presence −1 |
+| Touched | 2 | 2 | Intellect −1, Will +1 |
+| Ambrosia | 3 | 1 | Body +1, Agility −1, Intellect −1, Presence +1 |
+| Mythic | 3 | 1 | Body +1, Intellect −1, Presence −1, Will +1 |
 
 ### Edges
 
@@ -109,6 +109,8 @@ Spend all your Edges. Each one buys:
 | Extra Spark | Start every session with 3 Spark points instead of 2 | 1 |
 | A friend | A named contact who helps once per case | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
+| Stronger Power | Raise one of your powers by one Class. Class III is the limit at creation, unless the GM approves one power at Class IV. | 3 |
+| Extra Power | One more power, at Class I. | 1 |
 
 ### Spending points
 
@@ -190,13 +192,13 @@ Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained,
 
 ## Example character
 
-Aurora-born (tier 2, 1 Edges): Extra Spark. Body 12, Agility 10, Intellect 10, Presence 12, Will 11.
+Aurora-born (tier 2, 2 Edges): Extra Spark, Stronger Power. Body 12, Agility 10, Intellect 10, Presence 12, Will 11.
 
 - **Specialty:** Leadership 15.
 - **Trained:** Athletics 13, Brawling 13, Persuasion 13, Powers 12, Read People 12, Firearms 11, Investigation 11, Law 11, Piloting 11.
 - **Dodge:** 9.
 - **Advantage:** Natural Leader. **Complication:** Protects the Innocent; trigger: a civilian in the crossfire.
-- **Powers:** Toughness II, Strength I, Enhanced Senses I.
+- **Powers:** Toughness III, Strength I, Enhanced Senses I.
 - **Legal status:** Registered.
 
 # Skills and gear
@@ -508,7 +510,7 @@ End each case with a short entry, written together:
 4. **What changed?** New allies or enemies, damage, open threads for next time.
 5. **Advancement.** After a significant case, the GM may authorize one skill step for each character.
 
-# The world of ExLAW
+# The world of Aurora
 
 ## The First Wave
 
@@ -661,6 +663,15 @@ Your origin's tier sets your powers:
 | 3: Ambrosia and Mythic | Three powers: one at Class III, one at Class II, one at Class I. |
 
 Choose them in the creator's step 4. Powers marked **(GM)** need the GM's approval, and so does every power a **Mythic** character takes.
+
+**Aurora characters have 4 Edge points** (one more than other Legend Dynamics settings), and two Edges of their own:
+
+| Edge | Effect | Limit |
+|---|---|---|
+| **Stronger Power** | Raise one of your powers by one Class | Up to three; Class III is the limit at creation, unless the GM approves **one power at Class IV** (tick *GM's approval for Class IV* in the creator) |
+| **Extra Power** | One more power, at Class I | Once |
+
+So an Ambrosia or Mythic character can start with a Class IV power by spending their one Edge, if the GM agrees; a tier 2 Operant can trade their Edges for a stronger power or a fourth one.
 
 ## Growing your powers
 
@@ -943,7 +954,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 - **Attributes:** Body 10, Agility 10, Intellect 13, Presence 9, Will 13. **Dodge** 9.
 - **Skills:** Investigation 16 (Specialty). Trained: Computers 14, Law 14, Occult 14, Powers 14, Read People 14, Athletics 11, Brawling 11, Firearms 11, Persuasion 10.
-- **Edges:** Extra Spark.
+- **Edges:** Extra Spark, A friend; a friend: her missing partner's last informant, who only talks to her.
 - **Advantage:** The Voice Within (origin; companion: Two Minds). **Complication:** Can't Leave It Alone; trigger: a file that shouldn't exist.
 - **Powers:** Force Field II, Mystic Sight I, Telepathy I.
 - **Legal status:** Full Agent.
@@ -955,7 +966,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 - **Attributes:** Body 12, Agility 13, Intellect 11, Presence 10, Will 10. **Dodge** 12.
 - **Skills:** Piloting 18 (Expert). Trained: Firearms 14, Athletics 13, Brawling 13, Computers 12, Engineering 12, Law 12, Leadership 11, Read People 11.
-- **Edges:** +1 attribute point, Extra Trained skill, A friend; a friend: a DIRE engineer who still owes him for Basra.
+- **Edges:** +1 attribute point, Extra Trained skill, A friend, Extra Spark; a friend: a DIRE engineer who still owes him for Basra.
 - **Advantage:** Nerves of Steel (origin; companion: Ordinary Body). **Complication:** Orders; trigger: orders to stand down.
 - **Legal status:** Full Agent.
 - **Why I do this:** Someone has to stand between ordinary people and what's out there. **Connection:** He flew cover for Rachel Kwan the night her partner vanished, and saw something he never put in the report.
@@ -966,8 +977,9 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 - **Attributes:** Body 13, Agility 9, Intellect 9, Presence 14, Will 10. **Dodge** 8.
 - **Skills:** Media 17 (Specialty). Trained: Deception 15, Leadership 15, Persuasion 15, Athletics 14, Brawling 14, Powers 11, Read People 11, Law 10, Piloting 10.
+- **Edges:** Stronger Power.
 - **Advantage:** Golden Ideal (origin; companion: The Anger). **Complication:** Media Darling; trigger: a crowd with phones out.
-- **Powers:** Strength III, Flight II, Toughness I.
+- **Powers:** Strength IV, Flight II, Toughness I.
 - **Legal status:** Registered.
 - **Why I do this:** The cameras love an Operant, and I love the cameras. **Connection:** Static saved her from a Foundation snatch team on live TV, and vanished before the cameras turned.
 
@@ -977,9 +989,9 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 - **Attributes:** Body 9, Agility 10, Intellect 14, Presence 10, Will 13. **Dodge** 8.
 - **Skills:** Powers 18 (Expert). Trained: Investigation 15, Law 15, Medicine 15, Occult 15, Science 15, Read People 14, Persuasion 11.
-- **Edges:** +1 attribute point, A fine weapon or tool; a fine tool: the Lammas Grimoire, annotated in four hands (+2 Occult).
+- **Edges:** +1 attribute point, A fine weapon or tool, Stronger Power; a fine tool: the Lammas Grimoire, annotated in four hands (+2 Occult).
 - **Advantage:** Ritualist (origin; companion: Obsessed). **Complication:** Haunted; trigger: your bond demands something.
-- **Powers:** Warding II, Mystic Sight I.
+- **Powers:** Warding III, Mystic Sight I.
 - **Legal status:** Registered.
 - **Why I do this:** Someone has to stand between ordinary people and what's out there. **Connection:** He taught Maeve Ashgrove's handler, and was the one who recognized what Maeve really is.
 
@@ -989,9 +1001,9 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 - **Attributes:** Body 10, Agility 11, Intellect 11, Presence 12, Will 12. **Dodge** 9.
 - **Skills:** Investigation 14 (Specialty). Trained: Deception 13, Media 13, Persuasion 13, Powers 13, Read People 13, Streetwise 13, Computers 12, Law 12, Stealth 12.
-- **Edges:** +1 attribute point.
+- **Edges:** +1 attribute point, Extra Power.
 - **Advantage:** The Glimpse (origin; companion: Cracked). **Complication:** Secret Identity; trigger: someone close asks where you were.
-- **Powers:** Psychometry II, Precognition I, Empathy I.
+- **Powers:** Psychometry II, Precognition I, Empathy I, Enhanced Senses I.
 - **Legal status:** Non-registered.
 - **Why I do this:** There's a story nobody's telling. I'm going to tell it. **Connection:** Rachel Kwan's missing partner was her source. She hasn't told Kwan yet.
 
@@ -1001,9 +1013,9 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 - **Attributes:** Body 12, Agility 13, Intellect 11, Presence 9, Will 10. **Dodge** 12.
 - **Skills:** Powers 13 (Specialty). Trained: Piloting 14, Stealth 14, Athletics 13, Brawling 13, Computers 12, Engineering 12, Read People 11, Deception 10, Streetwise 10.
-- **Edges:** Extra Spark.
+- **Edges:** Extra Spark, Stronger Power.
 - **Advantage:** Lab Instincts (origin; companion: Test Subject). **Complication:** Hunted by a Lab; trigger: a van with no plates outside.
-- **Powers:** Blast II, Speed I, Technopathy I.
+- **Powers:** Blast III, Speed I, Technopathy I.
 - **Legal status:** Non-registered.
 - **Why I do this:** No lab, no registry and no government owns me. **Connection:** Saved Daybreak from a Foundation snatch team on live TV, and ran before the cameras turned.
 
@@ -1013,7 +1025,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 - **Attributes:** Body 10, Agility 14, Intellect 11, Presence 11, Will 9. **Dodge** 13.
 - **Skills:** Stealth 17 (Specialty). Trained: Melee 15, Deception 12, Engineering 12, Occult 12, Persuasion 12, Streetwise 12, Athletics 11, Powers 10, Read People 10.
-- **Edges:** A friend; a friend: her ExLAW handler, Agent Dorsey, who covers for her more than he should.
+- **Edges:** A friend, Extra Spark; a friend: her ExLAW handler, Agent Dorsey, who covers for her more than he should.
 - **Advantage:** Inhuman Grace (origin; companion: Exile). **Complication:** Outsider; trigger: a form that asks for papers you don't have.
 - **Powers:** Invisibility II, Phasing I, Illusion I.
 - **Legal status:** Convict.
@@ -1054,20 +1066,20 @@ Choose one advantage at character creation: a general advantage from this chapte
 
 | Origin | Tier | Edges | Adjustments |
 |---|---|---|---|
-| Non-Operant | 0 | 3 | None |
-| Adept | 1 | 2 | Body −1, Intellect +1 |
-| Aurora-born | 2 | 1 | None |
-| Bonded | 2 | 1 | Presence −1, Will +1 |
-| Lab-made | 2 | 1 | Body +1, Presence −1 |
-| Otherworlder | 2 | 1 | Agility +1, Will −1 |
-| Shadow Earth Defector (GM's permission) | 2 | 1 | Agility +1, Presence −1 |
-| Touched | 2 | 1 | Intellect −1, Will +1 |
-| Ambrosia | 3 | 0 | Body +1, Agility −1, Intellect −1, Presence +1 |
-| Mythic | 3 | 0 | Body +1, Intellect −1, Presence −1, Will +1 |
+| Non-Operant | 0 | 4 | None |
+| Adept | 1 | 3 | Body −1, Intellect +1 |
+| Aurora-born | 2 | 2 | None |
+| Bonded | 2 | 2 | Presence −1, Will +1 |
+| Lab-made | 2 | 2 | Body +1, Presence −1 |
+| Otherworlder | 2 | 2 | Agility +1, Will −1 |
+| Shadow Earth Defector (GM's permission) | 2 | 2 | Agility +1, Presence −1 |
+| Touched | 2 | 2 | Intellect −1, Will +1 |
+| Ambrosia | 3 | 1 | Body +1, Agility −1, Intellect −1, Presence +1 |
+| Mythic | 3 | 1 | Body +1, Intellect −1, Presence −1, Will +1 |
 
 ## Non-Operant
 
-*Tier 0 · 3 Edges · None*
+*Tier 0 · 4 Edges · None*
 
 No powers at all: training, nerve, gear and the law. Most of ExLAW's agents, every Aegis pilot and nearly everyone else on Earth. In a fight between Operants you are the one who has to be clever.
 
@@ -1086,7 +1098,7 @@ No powers at all: training, nerve, gear and the law. Most of ExLAW's agents, eve
 
 ## Adept
 
-*Tier 1 · 2 Edges · Body −1, Intellect +1*
+*Tier 1 · 3 Edges · Body −1, Intellect +1*
 
 A student of metatropic manipulation, the science everyone else calls magic. Learned rather than born, and growing with study: an Adept's own powers are few, but with time, materials and fuel a ritual can do almost anything.
 
@@ -1106,7 +1118,7 @@ A student of metatropic manipulation, the science everyone else calls magic. Lea
 
 ## Aurora-born
 
-*Tier 2 · 1 Edge · None*
+*Tier 2 · 2 Edges · None*
 
 Powers that woke on their own: in the First Wave of April 1938, in the Second Wave of 1985, or inherited from a parent who was touched by either. The most common kind of Operant, and the one the EMD understands best.
 
@@ -1125,7 +1137,7 @@ Powers that woke on their own: in the First Wave of April 1938, in the Second Wa
 
 ## Bonded
 
-*Tier 2 · 1 Edge · Presence −1, Will +1*
+*Tier 2 · 2 Edges · Presence −1, Will +1*
 
 Joined to something else: an artifact, a spirit, a god or an entity from beyond. It shares its power, and sometimes its mind. Michael Lance's amulet, Uathach's litany, the Ice Reaper and the Atomic Man are all bonds.
 
@@ -1145,7 +1157,7 @@ Joined to something else: an artifact, a spirit, a god or an entity from beyond.
 
 ## Lab-made
 
-*Tier 2 · 1 Edge · Body +1, Presence −1*
+*Tier 2 · 2 Edges · Body +1, Presence −1*
 
 Made in a Foundation black lab, a DIRE program or somewhere worse. The powers are strong and unstable, the memories are patchy, and someone still has your file and wants their property back.
 
@@ -1164,7 +1176,7 @@ Made in a Foundation black lab, a DIRE program or somewhere worse. The powers ar
 
 ## Otherworlder
 
-*Tier 2 · 1 Edge · Agility +1, Will −1*
+*Tier 2 · 2 Edges · Agility +1, Will −1*
 
 Born outside this Earth: in a haven of Otherworld such as Avalon, or on a parallel Earth like Chat Roux's. Under the Extraordinary Powers Act you aren't a person at all, which makes you hard to register and easy to disappear.
 
@@ -1183,7 +1195,7 @@ Born outside this Earth: in a haven of Otherworld such as Avalon, or on a parall
 
 ## Shadow Earth Defector
 
-*Tier 2 · 1 Edge · Agility +1, Presence −1 · GM's permission*
+*Tier 2 · 2 Edges · Agility +1, Presence −1 · GM's permission*
 
 A duplicate from Shadow Earth, the dark reflection of our world, who turned on its rulers and stayed. Somewhere on this Earth lives your original, who may not know you exist; Shadow Earth wants you back, and everyone else wants to know whose side you're on.
 
@@ -1203,7 +1215,7 @@ A duplicate from Shadow Earth, the dark reflection of our world, who turned on i
 
 ## Touched
 
-*Tier 2 · 1 Edge · Intellect −1, Will +1*
+*Tier 2 · 2 Edges · Intellect −1, Will +1*
 
 Changed by an exposure to something nobody can name: a peyote vision in the desert, a ritual read aloud, a breach in the sky. Touched powers are strange, hard to classify and harder to control; the EMD files them under 'Other'.
 
@@ -1222,7 +1234,7 @@ Changed by an exposure to something nobody can name: a peyote vision in the dese
 
 ## Ambrosia
 
-*Tier 3 · 0 Edges · Body +1, Agility −1, Intellect −1, Presence +1*
+*Tier 3 · 1 Edge · Body +1, Agility −1, Intellect −1, Presence +1*
 
 Dosed with Ambrosia, the elixir Tesla's circle first refined: an idealized body, slowed aging and raw power. Rare, coveted and hunted; DIRE and the Foundation have both tried to make more.
 
@@ -1242,7 +1254,7 @@ Dosed with Ambrosia, the elixir Tesla's circle first refined: an idealized body,
 
 ## Mythic
 
-*Tier 3 · 0 Edges · Body +1, Intellect −1, Presence −1, Will +1*
+*Tier 3 · 1 Edge · Body +1, Intellect −1, Presence −1, Will +1*
 
 An ancient curse, blessing or bloodline: immortals, werewolves, the children of gods, warriors cursed by Jupiter. Mythic Operants are the oldest kind, and the hardest to classify.
 
@@ -1285,7 +1297,7 @@ Two or three sentences: where they come from, what sets them apart, and how othe
 
 ### 2. The tier
 
-The tier measures how much the origin gives on its own. Each tier costs one of your 3 Edge points, so stronger origins start with fewer Edges.
+The tier measures how much the origin gives on its own. Each tier costs one of your 4 Edge points, so stronger origins start with fewer Edges.
 
 | Tier | Edges | Use it for |
 |---|---|---|
@@ -1351,7 +1363,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 # Quick reference
 
-**Creation:** attributes start at 10, adjusted by origin (always totaling zero), plus 5 points; maximum 13 plus any origin bonus. 3 points split between origin tier and Edges. Generalist: one Specialty and nine Trained. Specialist: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
+**Creation:** attributes start at 10, adjusted by origin (always totaling zero), plus 5 points; maximum 13 plus any origin bonus. 4 points split between origin tier and Edges. Generalist: one Specialty and nine Trained. Specialist: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Specialist) = attribute +5.
 

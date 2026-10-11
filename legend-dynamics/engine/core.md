@@ -67,6 +67,7 @@ Spend all your Edges. Each one buys:
 | Extra {{point}} | Start every session with 3 {{point}} points instead of 2 | 1 |
 | A friend | A named contact who helps once per {{missionLower}} | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
+{{GEN:extra-edges}}
 
 ### Spending points
 

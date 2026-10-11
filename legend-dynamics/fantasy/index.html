@@ -655,6 +655,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide"><span class="label" id="powers-label"></span>
               <div class="fields" id="power-slots"></div>
               <span class="muted small" id="powers-note"></span></div>
+            <div class="field wide" id="pboost-wrap" hidden><span class="small muted" id="pboost-note"></span>
+              <div class="checks"><label><input type="checkbox" id="f-gm4"> GM's approval for Class IV</label></div></div>
             <details class="field wide" id="powers-adv"><summary class="label">Powers grown in play (with the GM's approval)</summary>
               <div class="fields" id="powers-adv-list"></div>
               <div class="btn-row"><button type="button" class="linkish" id="plearn-add">Add a power learned in play</button></div></details>
@@ -3441,6 +3443,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["grit", `Extra ${T.point}`, `Start every session with 3 ${T.point} points instead of 2.`, 1],
     ["contact", "A friend", "A named contact who helps once per " + T.missionLower + ".", 1],
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a fine kit: +2 to one skill when it's used.", 1],
+    ...(PACK.extraEdges || []), // a setting's own Edges, e.g. Stronger Power
   ];
   const ALLEGIANCES = [["", "None", "", ""], ...PACK.allegiances];
   // Optional: spells a caster picks (how many depends on their training in the spell skill), and a
@@ -3502,7 +3505,7 @@ tr.lvl-U td.target { color: var(--muted); }
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" },
       allegiance: "", customTier: 1,
       portrait: "", portraitShape: "token",
-      spells: [], powers: [], powerRaise: {}, powersLearned: [], status: "",
+      spells: [], powers: [], powerBoost: [], gmClass4: false, powerRaise: {}, powersLearned: [], status: "",
       play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [] },
     };
   }
@@ -3520,6 +3523,8 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!Array.isArray(out.spells)) out.spells = [];
     out.powers = Array.isArray(out.powers) ? out.powers.map((x) => (POWERS && POWERS.list.some((p) => p[0] === x) ? x : "")) : [];
     if (!STATUSES || !STATUSES.some((x) => x[0] === out.status)) out.status = "";
+    out.powerBoost = (Array.isArray(out.powerBoost) ? out.powerBoost : []).map((n) => Math.max(0, Math.min(3, parseInt(n, 10) || 0)));
+    out.gmClass4 = out.gmClass4 === true;
     out.powerRaise = Object.fromEntries(Object.entries(out.powerRaise && typeof out.powerRaise === "object" ? out.powerRaise : {}).filter(([k, v]) => POWERS && POWERS.list.some((p) => p[0] === k) && CLASS_NAMES.includes(v)));
     out.powersLearned = (Array.isArray(out.powersLearned) ? out.powersLearned : []).filter((x) => x && typeof x === "object").map((x) => ({ id: POWERS && POWERS.list.some((p) => p[0] === x.id) ? x.id : "", cl: CLASS_NAMES.includes(x.cl) ? x.cl : "I" }));
     if (typeof out.portrait !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(out.portrait)) out.portrait = "";
@@ -3616,12 +3621,16 @@ tr.lvl-U td.target { color: var(--muted); }
   const canCast = (c = ch) => !!SPELLS && ((SPELLS.roles || []).includes(c.dept) || (SPELLS.advantages || []).some((a) => a === c.adv.id || (edgeN("adv2", c) && a === c.adv2.id))
     || (SPELLS.originAdvantages || []).includes(c.sadv.id));
   const spellsKnown = (c = ch) => { const l = c.skills[SPELLS.skill]; return !canCast(c) || !l || l === "U" ? 0 : l === "T" ? SPELLS.known[0] : c.path === "hand" ? SPELLS.known[2] : SPELLS.known[1]; };
-  const powerSlots = (c = ch) => {
+  // The origin's slots, plus one Class I slot for the Extra Power Edge.
+  const baseSlots = (c = ch) => {
     if (!POWERS) return [];
     const h = heritageOf(c);
     const slots = (c.speciesId !== "custom" && h && h.powerSlots) || POWERS.tierSlots[String(tierOf(c))] || [];
-    return slots.map((x) => (x === "I+" ? (c.skills[POWERS.skill] === "S" ? "II" : "I") : x));
+    return [...slots.map((x) => (x === "I+" ? (c.skills[POWERS.skill] === "S" ? "II" : "I") : x)), ...(edgeN("xpower", c) ? ["I"] : [])];
   };
+  // Each slot's Class after the Stronger Power Edges the player put on it.
+  const powerSlots = (c = ch) => baseSlots(c).map((cl, i) => CLASS_NAMES[Math.min(CLASS_NAMES.length - 1, CLASS_NAMES.indexOf(cl) + ((c.powerBoost || [])[i] || 0))]);
+  const boostsSpent = (c = ch) => baseSlots(c).reduce((a, _, i) => a + ((c.powerBoost || [])[i] || 0), 0);
   // Which powers an origin may take: its own list if it has one; mythic-only powers need a mythic origin.
   const powerOptions = (c = ch) => {
     const h = c.speciesId === "custom" ? null : heritageOf(c);
@@ -3683,6 +3692,9 @@ tr.lvl-U td.target { color: var(--muted); }
       ...(powerSlots().length ? (() => { const sl = powerSlots(), picked = sl.map((_, i) => ch.powers[i] || "").filter(Boolean);
         const ok = picked.length === sl.length && new Set(picked).size === picked.length;
         return [[ok, ok ? `${POWERS.plural}: ${sl.map((cl, i) => `${powerDef(ch.powers[i])[1]} ${cl}`).join(", ")}` : `${POWERS.plural}: ${picked.length} of ${sl.length} chosen`]]; })() : []),
+      ...(edgeN("power") ? (() => { const n = boostsSpent(), want = edgeN("power"), sl = powerSlots(), iv = sl.filter((c) => classIndex(c) >= 3).length;
+        return [[n === want, n === want ? `Stronger Power: ${want} assigned` : `Stronger Power: assign ${n} of ${want} in step 4`],
+          ...(iv ? [[!!ch.gmClass4 && iv === 1 && sl.every((c) => classIndex(c) <= 3), iv > 1 ? "Only one Class IV power at creation" : sl.some((c) => classIndex(c) > 3) ? "Nothing above Class IV at creation" : ch.gmClass4 ? "Class IV approved by the GM" : "Class IV needs the GM's approval: tick the box in step 4"]] : [])]; })() : []),
       ...(STATUSES ? [[!!ch.status, ch.status ? `${PACK.statusLabel || "Status"}: ${STATUSES.find((x) => x[0] === ch.status)[1]}` : `Choose your ${(PACK.statusLabel || "status").toLowerCase()}`]] : []),
       [!!ch.comp.trigger.trim(), "Complication trigger agreed with the GM"],
       [!!ch.connection.trim(), "Connection to another character"],
@@ -4017,13 +4029,14 @@ tr.lvl-U td.target { color: var(--muted); }
       const sl = powerSlots();
       $("powers-wrap").hidden = !sl.length;
       if (sl.length) {
-        const opts = powerOptions(), sig = sl.join(",") + "|" + opts.map((p) => p[0]).join(",");
+        const opts = powerOptions(), boosts = edgeN("power"), sig = sl.join(",") + "|" + opts.map((p) => p[0]).join(",") + "|" + boosts;
         if ($("power-slots").dataset.sig !== sig) {
           $("power-slots").dataset.sig = sig;
           $("power-slots").innerHTML = sl.map((cl, i) => `<div class="field wide"><label for="f-pw-${i}">Class ${cl} power</label>
             <select id="f-pw-${i}" data-pslot="${i}"><option value="">Choose a Class ${cl} power…</option>${(POWERS.groups || [["", ""]]).map(([g, gn]) => {
               const inG = opts.filter((p) => !g || p[2] === g); return inG.length ? `<optgroup label="${esc(gn || POWERS.plural)}">${inG.map((p) => `<option value="${p[0]}">${esc(p[1])}${p[4]?.gm ? " (GM)" : ""}</option>`).join("")}</optgroup>` : "";
             }).join("")}</select>
+            ${boosts ? `<label class="small" for="f-pb-${i}">Stronger Power Edges on this power</label><select id="f-pb-${i}" data-pboost="${i}">${Array.from({ length: boosts + 1 }, (_, n) => `<option value="${n}">+${n} Class${n === 1 ? "" : "es"}</option>`).join("")}</select>` : ""}
             <div class="trait-desc" id="pw-desc-${i}"></div></div>`).join("");
         }
         sl.forEach((cl, i) => {
@@ -4031,12 +4044,16 @@ tr.lvl-U td.target { color: var(--muted); }
           s.value = opts.some((p) => p[0] === id) ? id : "";
           [...s.options].forEach((o) => { if (o.value) o.disabled = o.value !== id && ch.powers.some((x, j) => j !== i && j < sl.length && x === o.value); });
           $("pw-desc-" + i).textContent = id ? powerEffect(id, cl) : "";
+          if ($("f-pb-" + i)) $("f-pb-" + i).value = String(ch.powerBoost[i] || 0);
         });
         const n = sl.filter((_, i) => ch.powers[i]).length;
         $("powers-label").textContent = `${POWERS.plural} (${n} of ${sl.length})`;
         $("powers-note").textContent = POWERS.note || "";
       }
       $("powers-adv").hidden = !sl.length && !ch.powersLearned.length;
+      $("pboost-wrap").hidden = !edgeN("power") || !sl.length;
+      $("pboost-note").textContent = `Stronger Power: put your ${edgeN("power")} Edge${edgeN("power") === 1 ? "" : "s"} on the powers above (${boostsSpent()} assigned). Class III is the limit, unless the GM approves one power at Class IV.`;
+      $("f-gm4").checked = !!ch.gmClass4;
       const advSig = sl.map((_, i) => ch.powers[i] || "").join(",") + "|" + ch.powersLearned.length;
       if ($("powers-adv-list").dataset.sig !== advSig) {
         $("powers-adv-list").dataset.sig = advSig;
@@ -4229,6 +4246,8 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-adv2") { ch.adv2.id = t.value; touch(); render(); }
     else if (t.id === "f-allegiance") { ch.allegiance = t.value; touch(); render(); }
     else if (t.id === "f-status") { ch.status = t.value; touch(); render(); }
+    else if (t.dataset.pboost !== undefined) { const i = +t.dataset.pboost; while (ch.powerBoost.length <= i) ch.powerBoost.push(0); ch.powerBoost[i] = +t.value; touch(); render(); }
+    else if (t.id === "f-gm4") { ch.gmClass4 = t.checked; touch(); render(); }
     else if (t.dataset.praise) { if (t.value === t.dataset.base) delete ch.powerRaise[t.dataset.praise]; else ch.powerRaise[t.dataset.praise] = t.value; touch(); render(); }
     else if (t.dataset.plearn !== undefined) { ch.powersLearned[+t.dataset.plearn].id = t.value; touch(); render(); }
     else if (t.dataset.plearncl !== undefined) { ch.powersLearned[+t.dataset.plearncl].cl = t.value; touch(); render(); }

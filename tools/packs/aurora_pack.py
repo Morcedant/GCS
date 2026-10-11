@@ -470,7 +470,7 @@ example = ch(name="Wade Collier", rank="Sheriff, Brown County, Indiana", dept="S
              attrs={"Body": 12, "Agility": 10, "Intellect": 10, "Presence": 12, "Will": 11},
              skills={"Leadership": "S", "Firearms": "T", "Law": "T", "Persuasion": "T", "Read People": "T", "Investigation": "T", "Piloting": "T", "Brawling": "T", "Athletics": "T", "Powers": "T"},
              adv={"id": "command"}, comp={"id": "protects", "trigger": "A civilian in the crossfire"},
-             edges={"grit": 1}, powers=["toughness", "strength", "senses"], status="registered",
+             edges={"grit": 1, "power": 1}, powerBoost=[1, 0, 0], powers=["toughness", "strength", "senses"], status="registered",
              equipment={"pistol": True, "radio": True, "badge": True, "firstaid": True}, allegiance="",
              play={"gun": {"type": "pistol", "rounds": 15, "spares": 2}})
 
@@ -482,7 +482,7 @@ pregens = [
        attrs={"Body": 10, "Agility": 10, "Intellect": 13, "Presence": 9, "Will": 13},
        skills={"Investigation": "S", "Law": "T", "Firearms": "T", "Read People": "T", "Occult": "T", "Powers": "T", "Computers": "T", "Persuasion": "T", "Athletics": "T", "Brawling": "T"},
        sadv={"id": "bo-voice"}, adv={"id": ""}, comp={"id": "mystery", "trigger": "A file that shouldn't exist"},
-       edges={"grit": 1}, powers=["forcefield", "mysticsight", "telepathy"], status="agent", allegiance="exlaw",
+       edges={"grit": 1, "contact": 1}, contact="Her missing partner's last informant, who only talks to her", powers=["forcefield", "mysticsight", "telepathy"], status="agent", allegiance="exlaw",
        equipment={"pistol": True, "badge": True, "cuffs": True, "vest": True}, play={"gun": {"type": "pistol", "rounds": 15, "spares": 2}}),
     ch(name="Luis \"Bulldog\" Ortega", rank="Aegis pilot, Chicago wing", dept="Aegis Pilot", path="hand", speciesId="nonoperant",
        role="Twelve years in the suit, three of them in Iraq. The AS-6's new firmware came from a contractor nobody can trace, and lately the suit hesitates when he doesn't.",
@@ -491,7 +491,7 @@ pregens = [
        attrs={"Body": 12, "Agility": 13, "Intellect": 11, "Presence": 10, "Will": 10},
        skills={"Piloting": "S", "Engineering": "T", "Firearms": "T", "Athletics": "T", "Brawling": "T", "Computers": "T", "Leadership": "T", "Law": "T", "Read People": "T"},
        sadv={"id": "no-nerve"}, adv={"id": ""}, comp={"id": "duty", "trigger": "Orders to stand down"},
-       edges={"attr": 1, "skill": 1, "contact": 1}, contact="A DIRE engineer who still owes him for Basra",
+       edges={"attr": 1, "skill": 1, "contact": 1, "grit": 1}, contact="A DIRE engineer who still owes him for Basra",
        skills_extra=None, powers=[], status="agent", allegiance="exlaw",
        equipment={"aegis": True, "pistol": True, "tools": True, "radio": True}, play={"gun": {"type": "pistol", "rounds": 15, "spares": 2}}),
     ch(name="Naomi Price", rank="Daybreak, New Power Legion", dept="Public Hero", path="rounded", speciesId="ambrosia",
@@ -501,7 +501,7 @@ pregens = [
        attrs={"Body": 13, "Agility": 9, "Intellect": 9, "Presence": 14, "Will": 10},
        skills={"Media": "S", "Leadership": "T", "Persuasion": "T", "Powers": "T", "Athletics": "T", "Brawling": "T", "Read People": "T", "Piloting": "T", "Deception": "T", "Law": "T"},
        sadv={"id": "am-ideal"}, adv={"id": ""}, comp={"id": "cameras", "trigger": "A crowd with phones out"},
-       edges={}, powers=["strength", "flight", "toughness"], status="registered", allegiance="legion",
+       edges={"power": 1}, powerBoost=[1, 0, 0], gmClass4=True, powers=["strength", "flight", "toughness"], status="registered", allegiance="legion",
        equipment={"radio": True, "camera": True}),
     ch(name="Dr. Tobias Wren", rank="Professor of comparative religion; Earth Warden", dept="Occultist", path="hand", speciesId="adept",
        role="A collector of forbidden books who once traded a year of his life to something in Avalon for a translation. The year is coming due.",
@@ -510,7 +510,7 @@ pregens = [
        attrs={"Body": 9, "Agility": 10, "Intellect": 14, "Presence": 10, "Will": 13},
        skills={"Powers": "S", "Occult": "T", "Investigation": "T", "Persuasion": "T", "Science": "T", "Read People": "T", "Medicine": "T", "Law": "T"},
        sadv={"id": "ad-ritualist"}, adv={"id": ""}, comp={"id": "haunted", "trigger": "Your bond demands something"},
-       edges={"attr": 1, "gear": 1}, gear={"item": "The Lammas Grimoire, annotated in four hands", "skill": "Occult"},
+       edges={"attr": 1, "gear": 1, "power": 1}, powerBoost=[1, 0], gear={"item": "The Lammas Grimoire, annotated in four hands", "skill": "Occult"},
        powers=["warding", "mysticsight"], status="registered", allegiance="wardens",
        equipment={"ritualkit": True, "firstaid": True}),
     ch(name="Jess Calloway", rank="Freelance investigative reporter", dept="Journalist", path="rounded", speciesId="touched",
@@ -520,7 +520,7 @@ pregens = [
        attrs={"Body": 10, "Agility": 11, "Intellect": 11, "Presence": 12, "Will": 12},
        skills={"Investigation": "S", "Media": "T", "Persuasion": "T", "Read People": "T", "Powers": "T", "Computers": "T", "Stealth": "T", "Deception": "T", "Law": "T", "Streetwise": "T"},
        sadv={"id": "to-glimpse"}, adv={"id": ""}, comp={"id": "secretid", "trigger": "Someone close asks where you were"},
-       edges={"attr": 1}, powers=["psychometry", "precog", "empathy"], status="nonreg",
+       edges={"attr": 1, "xpower": 1}, powers=["psychometry", "precog", "empathy", "senses"], status="nonreg",
        equipment={"camera": True, "laptop": True, "radio": True}),
     ch(name="Subject 19", rank="\"Static\", escaped Foundation subject", dept="Fugitive", path="rounded", speciesId="labmade",
        role="Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking.",
@@ -529,7 +529,7 @@ pregens = [
        attrs={"Body": 12, "Agility": 13, "Intellect": 11, "Presence": 9, "Will": 10},
        skills={"Powers": "S", "Stealth": "T", "Deception": "T", "Athletics": "T", "Computers": "T", "Streetwise": "T", "Brawling": "T", "Engineering": "T", "Piloting": "T", "Read People": "T"},
        sadv={"id": "lm-wary"}, adv={"id": ""}, comp={"id": "hunted", "trigger": "A van with no plates outside"},
-       edges={"grit": 1}, powers=["blast", "speed", "technopathy"], status="nonreg",
+       edges={"grit": 1, "power": 1}, powerBoost=[1, 0, 0], powers=["blast", "speed", "technopathy"], status="nonreg",
        equipment={"picks": True, "laptop": True}),
     ch(name="Maeve Ashgrove", rank="Cat burglar, on an ExLAW deal", dept="Thief", path="rounded", speciesId="otherworlder",
        role="A fey-born thief from Avalon, caught stealing from a Morcain vault and handed to ExLAW. She works off her sentence; her handler is the only one who knows where she came from.",
@@ -538,7 +538,7 @@ pregens = [
        attrs={"Body": 10, "Agility": 14, "Intellect": 11, "Presence": 11, "Will": 9},
        skills={"Stealth": "S", "Athletics": "T", "Engineering": "T", "Streetwise": "T", "Deception": "T", "Powers": "T", "Occult": "T", "Persuasion": "T", "Read People": "T", "Melee": "T"},
        sadv={"id": "ot-grace"}, adv={"id": ""}, comp={"id": "outsider", "trigger": "A form that asks for papers you don't have"},
-       edges={"contact": 1}, contact="Her ExLAW handler, Agent Dorsey, who covers for her more than he should",
+       edges={"contact": 1, "grit": 1}, contact="Her ExLAW handler, Agent Dorsey, who covers for her more than he should",
        powers=["invisibility", "phasing", "illusion"], status="convict",
        equipment={"picks": True, "baton": True, "radio": True}),
 ]
@@ -547,10 +547,11 @@ for c in pregens:
 
 pack = {"id": "aurora", "terms": terms, "theme": theme, "docxColors": ["14213D", "E8EEF8"], "groups": groups,
         "roles": [{"name": n, "group": g, "text": tx, "skills": s} for n, g, tx, s in roles], "skills": skills, "physical": physical,
-        "edgePoints": 3, "formCore": [], "formPenalties": {}, "origins": origins, "allegiances": allegiances, "reasons": reasons,
+        "edgePoints": 4, "formCore": [], "formPenalties": {}, "origins": origins, "allegiances": allegiances, "reasons": reasons,
         "connections": connections, "advantages": advantages, "complications": complications, "triggers": triggers,
         "equipment": equipment, "weapons": weapons, "tracks": tracks, "personalTrack": personal_track, "seeds": seeds, "journal": journal,
-        "powers": powers, "statuses": statuses, "statusLabel": "Legal status",
+        "powers": powers, "statuses": statuses,
+        "extraEdges": [["power", "Stronger Power", "Raise one of your powers by one Class. Class III is the limit at creation, unless the GM approves one power at Class IV.", 3], ["xpower", "Extra Power", "One more power, at Class I.", 1]], "statusLabel": "Legal status",
         "restricted": None, "quickRef": quick, "example": example, "pregens": pregens}
 
 # ---- checks: the creation rules ----
@@ -571,7 +572,13 @@ assert all(a[3] in SK | {"Will"} for a in advantages)
 def slots(c):
     o = O[c["speciesId"]]
     s = o.get("powerSlots") or powers["tierSlots"][str(o["tier"])]
-    return ["II" if x == "I+" and c["skills"].get("Powers") == "S" else "I" if x == "I+" else x for x in s]
+    base = ["II" if x == "I+" and c["skills"].get("Powers") == "S" else "I" if x == "I+" else x for x in s] + (["I"] if c["edges"].get("xpower") else [])
+    boost = c.get("powerBoost", [])
+    assert sum(boost) == c["edges"].get("power", 0), (c["name"], "boosts")
+    names = ["I", "II", "III", "IV", "V", "VI"]
+    out = [names[names.index(x) + (boost[i] if i < len(boost) else 0)] for i, x in enumerate(base)]
+    assert out.count("IV") <= 1 and all(names.index(x) <= 3 for x in out) and ("IV" not in out or c.get("gmClass4")), (c["name"], "class IV")
+    return out
 
 
 for c in [example] + pregens:
@@ -580,7 +587,7 @@ for c in [example] + pregens:
     pool = 5 + c["edges"].get("attr", 0)
     assert all(base[a] <= c["attrs"][a] <= 13 + max(0, o["adj"].get(a, 0)) for a in base), (c["name"], "range")
     assert sum(c["attrs"][a] - base[a] for a in base) == pool, (c["name"], "spent", sum(c["attrs"][a] - base[a] for a in base), pool)
-    assert sum(c["edges"].values()) == 3 - o["tier"], (c["name"], "edges")
+    assert sum(c["edges"].values()) == 4 - o["tier"], (c["name"], "edges")
     nS = sum(v == "S" for v in c["skills"].values())
     nT = sum(v == "T" for v in c["skills"].values())
     want = (7 if c["path"] == "hand" else 9) + c["edges"].get("skill", 0)

@@ -525,7 +525,7 @@
   "Athletics",
   "Stealth"
  ],
- "edgePoints": 3,
+ "edgePoints": 4,
  "formCore": [],
  "formPenalties": {},
  "origins": [
@@ -2612,6 +2612,20 @@
    "A parole officer, a tracking device and no second chances."
   ]
  ],
+ "extraEdges": [
+  [
+   "power",
+   "Stronger Power",
+   "Raise one of your powers by one Class. Class III is the limit at creation, unless the GM approves one power at Class IV.",
+   3
+  ],
+  [
+   "xpower",
+   "Extra Power",
+   "One more power, at Class I.",
+   1
+  ]
+ ],
  "statusLabel": "Legal status",
  "restricted": null,
  "quickRef": [
@@ -2685,8 +2699,14 @@
    "trigger": "A civilian in the crossfire"
   },
   "edges": {
-   "grit": 1
+   "grit": 1,
+   "power": 1
   },
+  "powerBoost": [
+   1,
+   0,
+   0
+  ],
   "powers": [
    "toughness",
    "strength",
@@ -2749,8 +2769,10 @@
     "trigger": "A file that shouldn't exist"
    },
    "edges": {
-    "grit": 1
+    "grit": 1,
+    "contact": 1
    },
+   "contact": "Her missing partner's last informant, who only talks to her",
    "powers": [
     "forcefield",
     "mysticsight",
@@ -2813,7 +2835,8 @@
    "edges": {
     "attr": 1,
     "skill": 1,
-    "contact": 1
+    "contact": 1,
+    "grit": 1
    },
    "contact": "A DIRE engineer who still owes him for Basra",
    "powers": [],
@@ -2872,7 +2895,15 @@
     "id": "cameras",
     "trigger": "A crowd with phones out"
    },
-   "edges": {},
+   "edges": {
+    "power": 1
+   },
+   "powerBoost": [
+    1,
+    0,
+    0
+   ],
+   "gmClass4": true,
    "powers": [
     "strength",
     "flight",
@@ -2924,8 +2955,13 @@
    },
    "edges": {
     "attr": 1,
-    "gear": 1
+    "gear": 1,
+    "power": 1
    },
+   "powerBoost": [
+    1,
+    0
+   ],
    "gear": {
     "item": "The Lammas Grimoire, annotated in four hands",
     "skill": "Occult"
@@ -2981,12 +3017,14 @@
     "trigger": "Someone close asks where you were"
    },
    "edges": {
-    "attr": 1
+    "attr": 1,
+    "xpower": 1
    },
    "powers": [
     "psychometry",
     "precog",
-    "empathy"
+    "empathy",
+    "senses"
    ],
    "status": "nonreg",
    "equipment": {
@@ -3035,8 +3073,14 @@
     "trigger": "A van with no plates outside"
    },
    "edges": {
-    "grit": 1
+    "grit": 1,
+    "power": 1
    },
+   "powerBoost": [
+    1,
+    0,
+    0
+   ],
    "powers": [
     "blast",
     "speed",
@@ -3088,7 +3132,8 @@
     "trigger": "A form that asks for papers you don't have"
    },
    "edges": {
-    "contact": 1
+    "contact": 1,
+    "grit": 1
    },
    "contact": "Her ExLAW handler, Agent Dorsey, who covers for her more than he should",
    "powers": [

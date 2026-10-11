@@ -47,7 +47,7 @@ Each character also has **Strain**, their own track for pushing powers and fueli
 
 <!-- SECTION:setting -->
 
-# The world of ExLAW
+# The world of Aurora
 
 ## The First Wave
 
@@ -193,6 +193,15 @@ Your origin's tier sets your powers:
 | 3: Ambrosia and Mythic | Three powers: one at Class III, one at Class II, one at Class I. |
 
 Choose them in the creator's step 4. Powers marked **(GM)** need the GM's approval, and so does every power a **Mythic** character takes.
+
+**Aurora characters have 4 Edge points** (one more than other Legend Dynamics settings), and two Edges of their own:
+
+| Edge | Effect | Limit |
+|---|---|---|
+| **Stronger Power** | Raise one of your powers by one Class | Up to three; Class III is the limit at creation, unless the GM approves **one power at Class IV** (tick *GM's approval for Class IV* in the creator) |
+| **Extra Power** | One more power, at Class I | Once |
+
+So an Ambrosia or Mythic character can start with a Class IV power by spending their one Edge, if the GM agrees; a tier 2 Operant can trade their Edges for a stronger power or a fourth one.
 
 ## Growing your powers
 
