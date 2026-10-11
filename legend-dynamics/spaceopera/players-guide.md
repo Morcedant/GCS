@@ -1,9 +1,11 @@
 ---
 title: "Fracture Lines Players' Guide"
-subtitle: "A space opera setting for the Legend Dynamics RPG system"
+subtitle: "Science fiction for the Legend Dynamics RPG system"
 ---
 
-The Concord holds a hundred worlds together with treaties, trade and a navy stretched too thin. Beyond its borders lie uncharted systems, ancient ruins that still hum with power, and the Hegemony, an empire that wants everything the Concord has. *Fracture Lines* is a space opera setting for the Legend Dynamics RPG system: a starship crew of many species, exploring, trading, fighting and talking their way across the Reach.
+The inhabited regions of the Orion Spur and the Sagittarius Arm are home to civilizations separated by thousands of years of technological development, radically different biological origins, and competing ideas about government, freedom, commerce and survival. Ancient empires are collapsing, but their armies remain dangerous. Commercial powers grow more influential every year. Entire worlds wait behind collapsed corridors to be rediscovered.
+
+Humanity has three centuries of interstellar history: young enough to challenge ancient assumptions, established enough to change what comes next. *Fracture Lines* is a science fiction setting for the Legend Dynamics RPG system, about the people who live along the faults between empires, corridors and peoples: traders, explorers, medics, mercenaries, hackers and everyone in between. Crews take **jobs** (contracts, runs, ventures) or, when a government, a cause or a faith stands behind them, **missions**. The rules treat the two the same; call yours whichever fits.
 
 ## The rule to remember
 
@@ -13,35 +15,46 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Fracture Lines** setting: its roles, species, skills, equipment, weapons and dangers. In this setting, the core rules' Legend points are called **Resolve points**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Fracture Lines** setting: its callings, species, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Resolve points**.
 
 # Create your character
 
 Work through the five steps in order. The character creator follows the same steps and checks the rules for you.
 
-## Step 1: Choose your role
+## Step 1: Choose your calling
 
-Choose a role and describe what you bring. Your role places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
+Choose a calling and describe what you bring. Your calling places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
 
-| Role | Group | Typical contribution | Core skills |
+| Calling | Group | Typical contribution | Core skills |
 |---|---|---|---|
-| Captain | Command | commands the ship and crew, and makes the decisions no one else wants to. | Leadership, Diplomacy, Piloting, Blasters |
-| Pilot | Command | flies the ship and its shuttles through anything, at any speed, on a dare. | Piloting, Navigation, Sensors, Engineering |
-| Diplomat | Command | speaks for the crew to governments, warlords and strangers, and keeps the peace when it can be kept. | Diplomacy, Psychology, Deception, Communications |
-| Scientist | Science | reads the anomaly, explains it to the captain, and wants to get closer. | Sensors, Physical Sciences, Life Sciences, Computers |
-| Medic | Science | patches up the crew, from a medkit on a hostile world to surgery in sickbay. | Medicine, Life Sciences, Psychology, Sensors |
-| Navigator | Science | plots the jump, finds the way through, and knows where the ship is when no one else does. | Navigation, Sensors, Piloting, Computers |
-| Engineer | Operations | keeps the engines running and the lights on, and improvises when the parts run out. | Engineering, Computers, Physical Sciences, Sensors |
-| Security | Operations | first through the airlock, last to leave, and the one who decides when the blaster stays on stun. | Blasters, Close Combat, Athletics, Stealth |
-| Comms | Operations | opens the channel, breaks the code, and hears what a signal is really saying. | Communications, Computers, Diplomacy, Sensors |
+| Trader | Commerce | buys low and sells across a dozen systems; knows what everything is worth, and to whom. | Commerce, Diplomacy, Psychology, Piloting |
+| Broker | Commerce | finances ventures, buys and restructures debt, and writes the contracts everyone else signs. | Commerce, Psychology, Deception, Computers |
+| Corporate Agent | Commerce | represents a company's interests far from head office, with its money and its orders. | Commerce, Leadership, Diplomacy, Firearms |
+| Smuggler | Commerce | moves what the Accord taxes, forbids or would rather not know about. | Piloting, Deception, Streetwise, Stealth |
+| Explorer | Frontier | goes first into uncharted corridors and unclaimed worlds. | Navigation, Survival, Science, Sensors |
+| Pilot | Frontier | flies anything, through anything, and gets paid for the impossible run. | Piloting, Navigation, Engineering, Sensors |
+| Prospector | Frontier | finds the ore, the ruins or the claim that makes a fortune, then has to keep it. | Science, Sensors, Survival, Engineering |
+| Salvager | Frontier | strips wrecks and dead stations, and knows which ones should have stayed dead. | Engineering, Sensors, Athletics, Computers |
+| AI Minder | Frontier | bonded to a personal AI with a mind of its own, and trained to handle other AIs, from corporate systems to rogue minds. | Computers, Psychology, Sensors, Engineering |
+| Scientist | Frontier | studies what no one understands yet (alien biology, corridor physics, Hegemony ruins) for whoever funds it. | Science, Sensors, Computers, Investigation |
+| Medic | Service | relief and field medicine, from refugee camps to the war's back lines. | Medicine, Science, Psychology, Survival |
+| Liaison | Service | speaks for the Accord, a world or a company between peoples who misunderstand each other. | Diplomacy, Psychology, Commerce, Leadership |
+| Missionary | Service | carries a faith, a cause or a charity to people who didn't ask, and sometimes needed it. | Diplomacy, Leadership, Medicine, Survival |
+| Journalist | Service | asks the questions, follows the money, and broadcasts what the powerful wanted hidden. | Investigation, Psychology, Computers, Stealth |
+| Cyberneticist | Service | designs, installs and repairs implants; part surgeon, part engineer, often working where the law can't see. | Medicine, Engineering, Computers, Science |
+| Mercenary | Trouble | a professional soldier for the war's endless contracts, or anyone else who pays. | Firearms, Close Combat, Athletics, Leadership |
+| Investigator | Trouble | finds people, solves crimes and recovers stolen assets, for the law or for hire. | Investigation, Psychology, Streetwise, Firearms |
+| Fixer | Trouble | knows who can get anything done, and takes a cut of every introduction. | Streetwise, Commerce, Deception, Diplomacy |
+| Hacker | Trouble | breaks into systems, ledgers and AIs; every network is a door. | Computers, Stealth, Investigation, Engineering |
+| Augment | Trouble | rebuilt with implants (soldier, laborer or thrill-seeker); the body is the tool, and its upkeep and stigma are the problem. | Athletics, Close Combat, Firearms, Engineering |
 
-The creator marks your role's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing role swaps the core skills you haven't changed.
+The creator marks your calling's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven't changed.
 
-### Officer or Specialist
+### Generalist or Specialist
 
 Choose how your character trained (see Step 3):
 
-- **Officer:** one Specialty at +3 and nine Trained skills.
+- **Generalist:** one Specialty at +3 and nine Trained skills.
 - **Specialist:** one Expert skill at +5 and seven Trained skills: a lifetime spent at one thing.
 
 ## Step 2: Choose your species, spend Edges, assign attributes
@@ -65,16 +78,30 @@ Species can differ in power, so each has a **tier** from 0 to 3. Every character
 | Species | Tier | Edges | Adjustments |
 |---|---|---|---|
 | Human | 0 | 3 | None |
+| Vesh | 0 | 3 | Body −1, Agility +1 |
+| Brulvek | 1 | 2 | Body +1, Agility −1, Presence −1, Will +1 |
+| Corvani | 1 | 2 | Agility −1, Intellect +1, Presence −1, Will +1 |
+| Draelin | 1 | 2 | Body −1, Agility +1, Intellect +1, Will −1 |
+| Joruun | 1 | 2 | Body +1, Agility −1, Intellect −1, Will +1 |
 | Kel | 1 | 2 | Intellect +1, Presence −2, Will +1 |
-| Korrin | 1 | 2 | Body +2, Agility −1, Intellect −1 |
 | Mirrun | 1 | 2 | Body −1, Agility +1 |
-| Tessan | 1 | 2 | Body +1, Agility −1, Presence −1, Will +1 |
-| Vashari | 1 | 2 | Body −1, Agility −1, Presence +1, Will +1 |
+| Ommek | 1 | 2 | Body −2, Agility +1, Intellect +1 |
+| Shivar | 1 | 2 | Body −2, Intellect +1, Will +1 |
+| Tessan | 1 | 2 | Body +1, Agility −2, Will +1 |
+| Thrum | 1 | 2 | Body −1, Agility −1, Presence +1, Will +1 |
+| Uth | 1 | 2 | Body +1, Agility −1, Presence −1, Will +1 |
+| Uxarra | 1 | 2 | Agility +1, Presence −1 |
+| Vael | 1 | 2 | Body −2, Agility +1, Intellect +1 |
+| Veyari | 1 | 2 | Body −1, Agility −1, Intellect +2 |
 | Ylith | 1 | 2 | Body −2, Agility +1, Intellect +1 |
-| Drennari | 2 | 1 | Body −2, Agility −1, Intellect +1, Will +2 |
-| Synth | 2 | 1 | Body +1, Intellect +2, Presence −2, Will −1 |
-| Vorr | 2 | 1 | Body −1, Agility +1, Presence +1, Will −1 |
-| Aethari | 3 | 0 | Body −2, Agility −1, Presence +1, Will +2 |
+| Zethri | 1 | 2 | Body −1, Agility +1 |
+| Zhaq | 1 | 2 | Body −1, Agility +1, Presence −1, Will +1 |
+| Dresh | 2 | 1 | Body +2, Agility −1, Intellect −1 |
+| Eshuum | 2 | 1 | Body −1, Intellect +1, Presence −1, Will +1 |
+| Khaum | 2 | 1 | Body +2, Agility −2, Presence −1, Will +1 |
+| Ozhvek | 2 | 1 | Body +2, Agility −2, Presence −1, Will +1 |
+| Qor | 2 | 1 | Body +2, Agility −2, Intellect +1, Presence −1 |
+| Sen | 2 | 1 | Agility −2, Intellect +1, Presence −1, Will +2 |
 
 ### Edges
 
@@ -86,7 +113,7 @@ Spend all your Edges. Each one buys:
 | Extra Trained skill | One more Trained skill in Step 3 | 3 |
 | Second advantage | A second general advantage, with no extra complication | 1 |
 | Extra Resolve | Start every session with 3 Resolve points instead of 2 | 1 |
-| A friend | A named contact who helps once per mission | 1 |
+| A friend | A named contact who helps once per job | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
 
 ### Spending points
@@ -102,13 +129,13 @@ You can build your own species with the GM. See *Making your own* for the steps.
 
 ## Step 3: Choose trained skills
 
-**An Officer** character chooses ten different skills: one **Specialty** at its governing attribute +3 and nine **Trained** skills at attribute +1. **A Specialist** chooses **one Expert skill at +5** and **seven Trained skills at +1**. Each Extra Trained skill Edge adds one more Trained skill. All other skills are **Untrained** at attribute −4 when an attempt is plausible. Each skill has its own final target number; do not add the attribute again when rolling.
+**A Generalist** character chooses ten different skills: one **Specialty** at its governing attribute +3 and nine **Trained** skills at attribute +1. **A Specialist** chooses **one Expert skill at +5** and **seven Trained skills at +1**. Each Extra Trained skill Edge adds one more Trained skill. All other skills are **Untrained** at attribute −4 when an attempt is plausible. Each skill has its own final target number; do not add the attribute again when rolling.
 
 The Expert's extra bonus matters most when the work is hard. With an attribute of 13, an Expert has a target of 18, which only natural 17–18 can fail; under a −4 "very difficult" penalty the target is still 14. If Athletics is the Expert skill, Dodge adds +2, the same as a Specialty.
 
 Some species give one skill Trained for free; it doesn't use one of your Trained picks.
 
-**Broadening.** A Specialist can broaden later (the GM's call, usually after a significant mission): the Expert skill becomes a Specialty at +3, and two more skills become Trained.
+**Broadening.** A Specialist can broaden later (the GM's call, usually after a significant job): the Expert skill becomes a Specialty at +3, and two more skills become Trained.
 
 ## Step 4: Describe your character
 
@@ -116,16 +143,16 @@ Choose your name, title if any, and a short reason for what you do. Then choose 
 
 ### Top 10 reasons
 
-1. **Explore.** To see what's out there: worlds and wonders no one has charted yet.
-2. **Family tradition.** My family has always flown, and I mean to live up to the name.
-3. **Discovery.** The best laboratory in the galaxy is a ship on the frontier.
-4. **Protect others.** To protect the people who can't protect themselves.
-5. **A hero's example.** A starship crew once saved my world, and I want to be that crew for someone else.
-6. **Freedom.** No planet can hold me, and no one gives me orders I don't choose.
-7. **Prove myself.** To prove I'm good enough, to everyone who doubted me and to myself.
-8. **Leave the past behind.** To leave behind a past, a world, or a life that was too small for me.
-9. **Make amends.** To make up for a mistake I can't undo.
-10. **Fortune.** There's a fortune out there, and I mean to find it.
+1. **Fortune.** There's money out here for anyone with nerve, and I intend to make mine.
+2. **Knowledge.** The galaxy is full of things no one understands yet. I want to be first.
+3. **New worlds.** Somewhere past the next corridor there's a place to build something new.
+4. **Helping.** People out here need help, and I can give it.
+5. **Freedom.** No empire, no creditor, no one owns me.
+6. **Debt.** I owe more than I can ever repay, unless I take every job.
+7. **Vengeance.** Someone took everything from me. I'll find them.
+8. **Faith.** I carry a truth worth sharing, even with those who don't want it.
+9. **Exile.** I can't go home. The crew is home now.
+10. **The thrill.** Nothing feels like a corridor jump into the unknown.
 
 - **Advantage.** Choose either a general advantage or one of your species's advantages. A species advantage replaces the general advantage and always brings its companion complication.
 - **Complication.** Choose one complication. You keep it even if you take a species advantage, so a character with a species advantage has two complications.
@@ -139,91 +166,104 @@ Anyone can owe allegiance to one of the setting's powers. It's a benefit paired 
 
 | Allegiance | Benefit | Burden |
 |---|---|---|
-| The Concord Navy | Once per mission, help from a navy ship or station: supplies, repairs or an escort. | Duty: navy orders, and the navy's enemies. |
-| A merchant house | Once per mission, money, a cargo, or a door opened. | Duty: the house's interests come first, and its rivals are yours. |
-| The Syndicate | Once per mission, a fence, a forger or a safe berth. | Duty: the Syndicate calls in favors, and the law knows your face. |
-| The Archive | Once per mission, records, star charts or a scholar's help. | Duty and Vow: share what you find, and keep the Archive's secrets. |
-| A people in exile | Contacts among your scattered people. | Duty: your people's cause, and the Hegemony's attention. |
+| The Concord | Once per job, consular help, credentials or a Concord navy contact. | Duty: Concord interests come first, even when they're wrong. |
+| A Tessan Dynasty | Once per job, credit, insurance or priority corridor access. | Duty: protect the dynasty's contracts, and collect what's owed. |
+| A Corporation | Once per job, transport, gear or an expense account. | Duty: the company's profits, and its secrets. |
+| A Hegemony House | Once per job, imperial passes, an audience or house soldiers. | Duty: the house's ambitions in the succession wars. |
+| The Zhaq Free Republics | Once per job, a safehouse, weapons or a resistance cell. | Duty: the cause; smuggle, sabotage, shelter fugitives. |
+| The Veyari Archives | Once per job, records, lost corridor data or an archivist's research. | Duty: recover and preserve knowledge, whoever wants it buried. |
+| A Draelin Cartographic Guild | Once per job, current corridor charts or a navigator. | Duty: guild fees and guild secrets; never sell charts outside the guild. |
+| A Vael Flotilla | Once per job, passage, repairs or a berth anywhere the fleet goes. | Duty: the flotilla's neutrality, and its needs. |
+| A Relief Mission | Once per job, medical supplies, shelter or refugee contacts. | Duty: aid comes first, even in the middle of a job. |
+| A Syndicate | Once per job, fences, smuggling routes or forged papers. | Duty: the syndicate's cut, and its jobs. |
+| The Quiet Network | Once per job, false test results, a safe route or a new identity for a psionic. | Duty: shelter other psionics, at any risk. |
 
 ## Step 5: Prepare
 
-Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Resolve points (three with Extra Resolve) and your equipment. Name your friend or your fine weapon or tool, if you took those Edges. Describe one connection to another player's character.
+Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Resolve points (three with Extra Resolve) and your gear. Name your friend or your fine weapon or tool, if you took those Edges. Describe one connection to another player's character.
 
 ### Top 10 connections to another character
 
-1. **Academy classmates.** We trained together, and we still look out for each other.
-2. **They saved my life.** They pulled me out of a burning shuttle, and I owe them my life.
-3. **I saved theirs.** I saved their life on a past voyage, and they haven't forgotten it.
-4. **Mentor.** They took me under their wing when I first came aboard.
-5. **Friendly rivals.** We competed for the same berth, and the rivalry is still mostly friendly.
-6. **Same homeworld.** We grew up on the same world and know each other's families.
-7. **An unpaid favor.** I owe them a favor I haven't repaid yet.
-8. **A shared secret.** We share a secret from a mission neither of us talks about.
-9. **Off-duty friends.** We meet every week in the galley for cards, music or bad stories.
-10. **Unfinished business.** They blame me for something that went wrong on a past mission.
+1. **Shipmates.** We've flown together for years and trust each other with our lives.
+2. **They saved my life.** They pulled me out of a wreck, a riot or a Mandate screening.
+3. **I saved theirs.** I got them off a dying station, and they haven't forgotten.
+4. **Business partners.** We split everything, the profits and the debts.
+5. **Rivals.** We want the same contract, the same charts or the same discovery.
+6. **Same homeworld.** We grew up in the same place and know each other's families.
+7. **An unpaid debt.** I owe them money or a favor, and I haven't paid yet.
+8. **A shared secret.** We know what really happened on that job. No one else does.
+9. **Mentor.** They taught me everything I know about the job.
+10. **Strange friends.** Our peoples were enemies; we found out we aren't.
 
 ## Example character
 
-Human (tier 0, 3 Edges): +1 attribute point, Extra Trained skill, A friend. Body 10, Agility 11, Intellect 13, Presence 11, Will 11.
+Human (tier 0, 3 Edges): +1 attribute point, Extra Resolve, A friend. Body 10, Agility 10, Intellect 13, Presence 13, Will 10.
 
-- **Specialty:** Sensors 16.
-- **Trained:** Communications 14, Computers 14, Engineering 14, Life Sciences 14, Medicine 14, Navigation 14, Physical Sciences 14, Survival 14, Blasters 12, Diplomacy 12.
-- **Dodge:** 9.
-- **Edges:** a friend: a researcher at the Archive who'll check a theory, quietly.
-- **Advantage:** Hyperspace Theorist. **Complication:** Cannot Leave a Mystery Alone; trigger: an unexplained reading while the crew is ordered to leave.
+- **Specialty:** Commerce 16.
+- **Trained:** Computers 14, Deception 14, Diplomacy 14, Investigation 14, Leadership 14, Navigation 14, Streetwise 14, Firearms 11, Psychology 11.
+- **Dodge:** 8.
+- **Edges:** a friend: a Tessan reformer on a dynasty's board, who leaks her the terms.
+- **Advantage:** Dealmaker. **Complication:** Idealist; trigger: a bribe would solve everything.
 
-# Skills and equipment
+# Skills and gear
 
 Choose the skill that matches your method. The GM chooses one primary skill for each distinct task.
 
 | Skill | Attribute | Typical use |
 |---|---|---|
-| Leadership | Presence | Coordinate people and give clear orders |
-| Diplomacy | Presence | Negotiate, persuade and resolve disputes |
-| Deception | Presence | Lie, bluff, disguise and talk your way past |
-| Psychology | Intellect | Read behavior, motives and emotional state |
-| Sensors | Intellect | Operate ship sensors or a hand scanner |
-| Physical Sciences | Intellect | Analyze energy, matter, space and hyperspace |
-| Life Sciences | Intellect | Analyze organisms and ecosystems |
-| Medicine | Intellect | Diagnose, treat and perform surgery |
-| Engineering | Intellect | Repair and modify engines, power, machines and electronics |
-| Computers | Intellect | Program, retrieve data and break into systems |
-| Piloting | Agility | Fly a starship, shuttle or skimmer |
-| Navigation | Intellect | Plot jumps and courses and fix position |
-| Communications | Intellect | Operate signals, codes and translators |
-| Blasters | Agility | Hand blasters and ship's guns |
-| Close Combat | Agility | Fists, blades, batons and grappling |
-| Athletics | Body | Climb, swim, jump, run and move in zero-g |
-| Stealth | Agility | Move quietly and avoid notice |
-| Survival | Intellect | Shelter, water and hazards on a hostile world |
+| Leadership | Presence | Command, rally, coordinate a crew |
+| Diplomacy | Presence | Negotiate, persuade, preach, calm a crowd |
+| Commerce | Intellect | Markets, contracts, appraisal, finance and debt |
+| Deception | Presence | Lie, bluff, disguise, forge |
+| Psychology | Will | Read people and other species, spot a lie, counsel |
+| Streetwise | Presence | Underworld contacts, black markets, rumors |
+| Investigation | Intellect | Search, examine evidence, follow the money |
+| Science | Intellect | Physics, biology, xenology, corridor theory |
+| Medicine | Intellect | Diagnose, treat, biotech and surgery |
+| Engineering | Intellect | Build, repair, jury-rig, ship systems |
+| Computers | Intellect | Systems, data, hacking and communications |
+| Sensors | Intellect | Scanners, sensor sweeps, drones, detection |
+| Piloting | Agility | Fly ships and vehicles, chases, docking |
+| Navigation | Intellect | Plot corridors, read gravimetric drift, find the way |
+| Firearms | Agility | Slug-throwers, lasers, plasma and coilguns |
+| Close Combat | Body | Fists, grapples, blades and batons |
+| Athletics | Body | Climb, run, zero-g movement, Dodge |
+| Stealth | Agility | Sneak, hide, shadow someone |
+| Survival | Will | Hostile worlds, vacuum, hard living |
+| Psionics | Will | Psionic powers (Psionic advantage only) |
 
 ## Untrained actions
 
 A plausible untrained attempt uses attribute −4. Specialized work such as surgery requires relevant training or direct guidance. Guidance permits an attempt only when the GM finds it credible; it does not grant the expert's skill.
 
-## Equipment
+## Gear
 
-Equipment makes tasks possible rather than easier. Ordinary equipment grants no blanket bonus; exceptional tools may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
+Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bonus; exceptional tools may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
 
 | Item | What it does |
 |---|---|
-| Comm | Talks to the ship and the landing party within range. Interference, shielding or distance can cut it off. |
-| Scanner | Reads life signs, energy, materials and air at short range. Field Sensors rolls need one. |
-| Med scanner | Identifies ordinary injuries automatically. Diagnosing unfamiliar biology without one is very difficult (−4). |
-| Medkit | Drugs, dressings and injectors. Needed for emergency stabilization and field treatment. |
-| Tool kit | Hand tools, spare parts and test gear. Needed for most Engineering in the field. |
-| Blaster pistol | 12 charge. Settings and costs are under Blaster charge. |
-| Translator | Lets you talk with speakers of known languages. A new language takes time and a Communications roll. |
-| Vac suit | Hours of air in vacuum or poison atmosphere. −2 to Agility-based actions and Stealth while worn. |
-| Survival pack | Rations, water, light, rope and shelter for a few days. Makes impossible survival tasks ordinary. |
-| Emergency beacon | Broadcasts your position to the ship. |
-| Grav sled | Carries heavy loads or a casualty at walking pace. Hard to move quietly (−2 Stealth). |
+| Slug pistol | Twelve rounds. Hits mark 2 boxes. |
+| Laser pistol | Twenty shots per cell; silent, no recoil. Hits mark 2 boxes. |
+| Slug carbine | Thirty rounds; can fire bursts. Hits mark 2 boxes. |
+| Plasma rifle | Ten shots per cell. Hits mark 3 boxes and leave the target Dying. |
+| Stunner | The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. |
+| Vibroblade | A humming blade. Hits mark 2 boxes. |
+| Body armor | Once per fight, a hit that marks 2 or more boxes marks one fewer. Shows under scans. |
+| Vac suit | Air for six hours in vacuum or poison atmosphere. |
+| Medkit | Biotech dressings, stims and a scanner. Needed to stabilize a patient and give field treatment. |
+| Toolkit | Needed for most Engineering in the field. |
+| Intrusion deck | A hacking rig. Needed for most Computers work against secured systems. |
+| Scanner | Handheld sensor. Needed for most Sensors work away from a ship. |
+| Scout drone | A small flying drone that can scout and relay what it sees. |
+| Translator | Translates most known languages, slowly. Thrum and Qor need one to talk with most peoples. |
+| Exo-frame | A light powered frame: no gravity penalty for Vael and others built for low gravity. |
+| Travel papers | Accord transit permits and a clean (or convincing) Mandate record. |
 
 # Actions and teamwork
 
 ## When to roll
 
-Routine work succeeds automatically when you have appropriate training, equipment and time. Roll when failure could change the situation. Before rolling, establish your goal, the relevant skill, any modifiers, and what is at stake.
+Routine work succeeds automatically when you have appropriate training, gear and time. Roll when failure could change the situation. Before rolling, establish your goal, the relevant skill, any modifiers, and what is at stake.
 
 | Circumstances | Modifier |
 |---|---|
@@ -253,7 +293,7 @@ Failure changes the situation: time passes, the trail goes cold, supplies run ou
 
 ## Success at a cost
 
-When a roll fails by only **1 or 2**, the GM may offer **success at a cost**: you get what you were after, but something else goes wrong. Typical costs are an injury box, broken equipment, lost time (tick a clock), a box on a track, or someone noticing. The GM names the cost before you accept; you can always take the plain failure instead. A natural 17 or 18 is never a success at a cost.
+When a roll fails by only **1 or 2**, the GM may offer **success at a cost**: you get what you were after, but something else goes wrong. Typical costs are an injury box, broken gear, lost time (tick a clock), a box on a track, or someone noticing. The GM names the cost before you accept; you can always take the plain failure instead. A natural 17 or 18 is never a success at a cost.
 
 ## Progress clocks
 
@@ -279,7 +319,7 @@ Act in descending Agility order. Players choose the order of tied characters; th
 
 ## Attacking and defending
 
-Roll Blasters for a ranged attack, Close Combat for a weapon in hand, or Close Combat for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
+Roll Firearms for a ranged attack, Close Combat for a weapon in hand, or Close Combat for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
 
@@ -308,43 +348,46 @@ How many boxes a hit marks depends on the **weapon**, not on how well the attack
 
 | Weapon | Boxes on a hit | What the injury looks like |
 |---|---|---|
-| Punch, kick, headbutt | 1 | Bruising, a split lip, cracked ribs |
-| Baton, club, thrown object | 1 | A concussion or a broken finger |
-| Knife | 1 | A cut that bleeds |
-| Vibroblade | 2 | A deep, cauterized wound |
-| Blaster on stun | 0 | No wound; the target makes the stun roll (below) |
-| Blaster bolt | 2 | A burn through flesh |
-| Overcharged bolt | 3, and Dying | A ruinous burn |
-| Ship's guns fired at a person | Certain death | Nothing left |
-| Grenade | 1 to everyone nearby, 3 and Dying at the centre | Blast and shrapnel; Dodge means diving clear |
+| Fists, kicks, a baton | 1 | Bruises, a cracked rib, a concussion |
+| Knife | 1 | A cut or stab wound |
+| Vibroblade, implant blades, claws | 2 | A deep wound |
+| Slug pistol or carbine | 2 | A gunshot wound |
+| Laser pistol | 2 | A cauterized burn through flesh |
+| Plasma rifle, coilgun or needle rifle | 3, and Dying | A ruinous wound |
+| Stunner | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
+| Grenade | 1 to everyone nearby, 3 and Dying at the center | Blast and shrapnel; Dodge means diving clear |
+| Vacuum or poison air without a suit | 1 each round | Burst vessels, choking |
 | Fall | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
-| Vacuum | 1 each round without a suit | Burst vessels and cold |
+| Fire | 1 each round in the flames | Burns |
 
-**Stun.** A stun hit marks no box. The target rolls Body at −2: on a failure they're out for the scene; on a success they're Stunned (−2 on their next action roll). Wide stun hits everyone in a small area, and each rolls.
+**Slug or energy.** Slug-throwers are cheap, reliable and loud; lasers are silent and recoilless but need charged cells; plasma is devastating and expensive. A carbine can fire a **burst** (three shots, +1 to hit). Any firearm jams or faults on a natural 18.
 
-*Example:* a Syndicate thug's baton leaves Ensign Kade Wounded (one box). A blaster bolt that gets through marks two more: Kade is at three boxes, Incapacitated and Dying. Spending a Resolve point on the bolt reduces it to one box, leaving Kade Seriously wounded and still standing.
+*Example:* a thug's baton leaves Mara Okonkwo Wounded (one box). A slug pistol shot that gets through marks two more: Mara is at three boxes, Incapacitated and Dying, and a further 2-box hit would kill. Spending a Resolve point on that shot reduces it to one box, leaving her Seriously wounded and still on her feet.
 
-## Blaster charge
+To take someone down without killing them, use fists, a baton, a grapple or a stunner.
 
-| Weapon | Charge |
+## Weapon and ammunition
+
+| Weapon | Shots |
 |---|---|
-| Holdout blaster | 6 |
-| Blaster pistol | 12 |
-| Blaster carbine | 24 |
+| Slug pistol | 12 |
+| Laser pistol | 20 |
+| Slug carbine | 30 |
+| Plasma rifle | 10 |
 
-| Setting | Charge | Roll |
+| Fire | Shots | Roll |
 |---|---|---|
-| Stun | 1 | — |
-| Bolt | 1 | — |
-| Overcharged bolt (Blaster pistol, Blaster carbine only) | 3 | — |
-| Wide stun (Blaster carbine only) | 3 | — |
+| Single shot | 1 | — |
+| Burst (Slug carbine only) | 3 | +1 |
+| Covering fire | 3 | — |
 
-- **Every setting spends charge, hit or miss.** A Resolve reroll repeats the same setting and costs nothing extra.
-- **Empty means it won't work.** Swap in a spare cell: refills it from a spare. Recharge aboard ship: refills it fully between missions. Packing a spare is a good use of a Resolve point's small preparation.
+- **Every fire spends shots, hit or miss.** A Resolve reroll repeats the same fire and costs nothing extra.
+- **Empty means it won't work.** Reload (one action): refills it from a spare. Restock at a port: refills it fully between jobs. Packing a spare is a good use of a Resolve point's small preparation.
+- **Jams.** A natural 18 with this weapon also jams it: clearing it takes an action.
 
 # Medical care
 
-Medicine in the Concord is powerful: dermal regenerators, synthetic blood and surgical drones. Its limits are unfamiliar biology, missing supplies, and time. A Synth is repaired with Engineering instead of Medicine, by the same rules.
+Medicine in the corridors runs from field dressings to miracles. **Biotech** can grow a new organ, rebuild a limb or rewrite a disease, for those who can pay; a clinic with a biotech suite counts as proper care. Those who can't pay get stims, staples and whatever the Relief Missions carry.
 
 ## Diagnosis and stabilization
 
@@ -356,7 +399,7 @@ With a medkit and several uninterrupted minutes, successful Medicine removes one
 
 ## Proper care
 
-An equipped sickbay grants +2 to Medicine. A successful treatment removes two boxes; success by 5 or more removes three. Allow the time the treatment requires.
+A clinic with a biotech suite grants +2 to Medicine. A successful treatment removes two boxes; success by 5 or more removes three. Allow the time the treatment requires.
 
 ## Natural recovery
 
@@ -376,32 +419,26 @@ Begin each session with two Resolve points (three with Extra Resolve); unused po
 
 Gain one point when one of your complications creates a meaningful problem you accept, including a companion complication. You can decline the proposed complication without penalty.
 
-## Ship status
+## Debt, Heat and Reputation
 
-The ship has its own sheet, tracked like an injury track. Encounters stay descriptive: the GM states what's at stake before rolls and narrates what each box means.
+The crew shares three tracks. **Debt** is what you owe (to a Tessan dynasty, a bank, a syndicate or each other). **Heat** is who's after you: the law, a corporation, the Hegemony or the Mandate inquisitors. **Reputation** is who knows your name, which opens doors and makes it hard to hide. They fill as your deeds catch up with you; the GM narrates what each box means.
 
-- **Taking hits.** A normal hit (a blaster cannon, a missile) marks 1 box; a heavy hit (a torpedo, ramming) marks 2. Once Shields are down, each hit marks the Hull and a system: the GM chooses, or roll 3d6: 3–6 Weapons, 7–8 Engines, 9–10 Sensors, 11–12 Comms, 13–15 Life support, 16–18 GM's choice.
-- **Evading.** When an enemy ship hits, the pilot may roll **Piloting** once per exchange, like Dodge: success cancels the hit. Engine damage applies its penalty.
-- **Repairs.** Mid-crisis, a successful **Engineering** roll clears one box from Shields or a system (two on success by 5). The Hull can be patched by one box per scene, and fully repaired only in dock.
-- **Firing.** Gunners roll **Blasters** for the ship's guns, against the enemy ship's own tracks.
+- **Marking:** borrowing or buying on credit (Debt); crimes, firefights in public, or a psionic slip (Heat); a famous success or a public scandal (Reputation). A success at a cost can mark any of them.
+- **Clearing:** paying up between jobs (Debt); lying low or a good set of forged papers (Heat); quiet work and time (Reputation).
 
 | Track | Boxes | As boxes fill |
 |---|---|---|
-| Shields | 3 | 1: Weakened; 2: Failing; 3: Down: hits go to the Hull and a system |
-| Hull | 4 | 1: Scarred; 2: Minor breaches; 3: Serious breaches, decks lost; 4: Breaking up: start an Abandon ship clock |
-| Weapons | 3 | 1: Damaged: −2; 2: Crippled: −4, basic function only; 3: Offline |
-| Engines | 3 | 1: Damaged: −2; 2: Crippled: −4, basic function only; 3: Offline |
-| Sensors | 3 | 1: Damaged: −2; 2: Crippled: −4, basic function only; 3: Offline |
-| Comms | 3 | 1: Damaged: −2; 2: Crippled: −4, basic function only; 3: Offline |
-| Life support | 3 | 1: Damaged: −2; 2: Crippled: −4, basic function only; 3: Offline |
+| Debt | 4 | 1: A payment comes due; 2: Collectors call: −2 to Commerce with lenders; 3: Liens: your ship or gear can be seized; 4: Default: a creditor names the price, a job you can't refuse |
+| Heat | 4 | 1: Questions asked at the last port; 2: Flagged: −2 at checkpoints and screenings; 3: Hunted: a bounty, a warrant or an inquisitor; 4: Cornered: start a Manhunt clock |
+| Reputation | 4 | 1: Talked about in the ports; 2: Recognized: +2 to Diplomacy with admirers, −2 to Stealth; 3: Famous: everyone wants something from you; 4: Legend: someone powerful comes calling; start a clock |
 
 ## Advancement
 
-After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication. Only a Specialist's starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they broaden (see Step 3).
+After a significant job, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication. Only a Specialist's starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they broaden (see Step 3).
 
-# Running missions
+# Running jobs and missions
 
-## Mission seeds
+## Job seeds
 
 Roll 3d6 on each table and read the total, or pick what you like. Middle results come up most often; the strangest sit at 3, 4, 17 and 18. The GM view in the creator rolls these for you and can start the clock.
 
@@ -443,345 +480,1194 @@ Roll 3d6 on each table and read the total, or pick what you like. Middle results
 | 17 | The Tessan planned the war | The succession is decided (8) | The first human to meet the Kel |
 | 18 | The AI is older than the Hegemony | The Mandate purge begins (6) | A psionic with no limits |
 
-## The ship's log
+## The crew log
 
-End each mission with a short entry, written together:
+End each job with a short entry, written together:
 
-1. **The mission.** What happened, and did we succeed: fully, partly, or not at all?
+1. **The job.** What happened, and did we succeed: fully, partly, or not at all?
 2. **Who stood out?** A moment worth remembering.
 3. **Complications.** Which ones came into play, and what did they cost?
 4. **What changed?** New allies or enemies, damage, open threads for next time.
-5. **Advancement.** After a significant mission, the GM may authorize one skill step for each character.
+5. **Advancement.** After a significant job, the GM may authorize one skill step for each character.
 
-# The Reach
+# A galaxy of obligations
 
-## Powers of the Reach
+## Humanity's first contact
 
-- **The Concord.** A union of a hundred worlds and a dozen peoples, governed by an argumentative council. Its navy patrols the borders, its law of first contact forbids meddling with worlds that haven't reached the stars, and its ideals are better than its politics.
-- **The Hegemony.** An empire ruled by a single species that considers the others its subjects. It hunts shapeshifting Vorr, conquers where it can, and probes the Concord's border constantly.
-- **The merchant houses.** Old trading families, many of them Tessan, whose contracts span generations and whose fleets go where navies don't.
-- **The Syndicate.** Smugglers, fences and pirates, sometimes useful, always dangerous.
-- **The Archive.** Scholars who collect the knowledge of dead civilizations, and keep some of it to themselves.
+The survey ship *Meridian Reach* was charting a dim red star eleven light-years from Earth when its sensors found something that should not have been there: a vessel already in orbit, older than any human ship and patched in a dozen styles.
 
-## Shapeshifting
+It belonged to the **Kel**, explorers from a civilization far older than humanity's, and far deeper in debt. The Kel crew greeted the humans with courtesy, curiosity and gifts: star charts, medicine, repairs to a failing reactor. The humans accepted gratefully. They did not know that, among the Kel, every gift is the first line of a contract.
 
-The Vorr and the Aethari have an **alternate form**: the Vorr's war shape and the Aethari's unsuited true form. These rules apply to both.
+The Kel saw humanity as an extraordinary commercial opportunity, and a possible way to improve their own civilization's position. When they came to collect, the humans did not understand what they owed, and the Kel did not understand why anyone would accept help they never meant to repay. Talks broke down. Kel crews detained the survey team as surety against the debt, and Earth answered with an armed rescue. People died on both sides.
+
+Humans call it the **First Contact Crisis**. The Kel call it a default.
+
+## The Tessan arrival
+
+The crisis brought humanity to the attention of the **Tessan**, one of the oldest and most influential commercial powers in known space.
+
+Rather than threaten humanity, the Tessan negotiated a settlement. Human captives were returned, losses were compensated, and the Tessan established themselves as cautious intermediaries between humanity and the wider interstellar community. It was humanity's first introduction to the political and economic order beyond human space.
+
+## The Human–Tessan Accord
+
+Human governments soon sought a formal agreement with clear rules for dealing with other civilizations. The **Human–Tessan Accord on Recognition, Transit and Commerce** established territorial recognition, corridor transit procedures, commercial standards, dispute resolution, and protections against unknowingly assuming obligations by accepting assistance.
+
+The Accord opened the wider interstellar economy to humanity.
+
+## Humanity enters the interstellar economy
+
+Human merchants, explorers, corporations and colonies expanded rapidly into newly accessible space. Tessan institutions supplied financing, insurance, navigation information and access to markets that had existed for centuries before humanity arrived.
+
+Humans eagerly embraced these opportunities. Some sought wealth. Some sought knowledge. Some wanted new worlds. Some wanted to improve the lives of people they had never met. Frequently, all of those people traveled aboard the same ship.
+
+## What humanity brought
+
+Humanity proved to be more than another emerging market. Humans brought an unusual willingness to experiment, challenge established assumptions, tolerate failure, forgive unsustainable debts, reorganize failing enterprises, and invest heavily in uncertain ideas.
+
+Some human ventures ended disastrously. Others transformed entire industries. Human economic ideas (restructuring, bankruptcy, venture investment and debt forgiveness) began influencing Tessan institutions that had operated by centuries of precedent.
+
+The Tessan opened the galaxy to humanity. Humanity, in turn, began changing the galaxy.
+
+## The human reputation
+
+Within the wider interstellar community, humans have a reputation for **restless energy**. Humans establish companies, charities, colonies, research stations, trading houses, exploration expeditions, religious missions, criminal enterprises, relief organizations and political movements with remarkable speed.
+
+They can be breathtakingly acquisitive and astonishingly generous. The same civilization that produces ruthless speculators also produces people willing to cross a dozen star systems to help strangers. Human expansion carries both sides of humanity into the stars: **the greedy and the altruistic, the ambitious and the compassionate, the exploiters and the reformers.**
+
+For characters in *Fracture Lines*, that contradiction is part of what it means to be human in a galaxy that is still deciding what to make of us.
+
+## The Concord
+
+The **Concord** is humanity's Earth-centered civilization: the oldest and largest of the human governments, and the one that signed the Accord. It is not the only one. Three centuries of expansion have produced independent colonies, corporate holdings, merchant leagues and political movements that answer to no one on Earth. Other peoples have their own polities, under their own names.
+
+# The galaxy
+
+## The gravimetric corridors
+
+Ships cross interstellar space through **gravimetric corridors**: natural channels through which a ship can travel between systems in days instead of centuries. The corridors are not fixed. They drift, collapse and reconnect over years or centuries. A journey between two nearby systems can require a lengthy detour, while a deep corridor can connect civilizations thousands of light-years apart. A new connection can turn an isolated world into a strategic prize overnight, and a collapse can strand a fleet, or a whole province, for generations.
+
+Navigation in the corridors is a skill, a science and a business. The Draelin guilds sell the best charts; the Sen keep the oldest records; the Thrum heard the first patterns in corridor fluctuations; Mirrun instruments detect resonance no one else can.
+
+# Peoples of the corridors
+
+The species below are the principal peoples encountered in *Fracture Lines*. They are not necessarily the only intelligent species in existence, nor does each species possess a unified government. Species names are standardized human approximations: many native names contain sounds, vibrations, chemical signals or other elements that human anatomy cannot reproduce. Their game rules are in the *Species* chapter.
+
+## The political landscape
+
+The great powers of known space are not organized into a simple conflict between good and evil.
+
+The Hegemony, an ancient imperial civilization, remains the most feared military power in the region. It is also a decaying institution, consumed by internal succession struggles, regional rebellions, religious movements, and competition for dwindling resources.
+
+For centuries, its borders have expanded and contracted as gravimetric corridors have drifted, collapsed, or reconnected. Entire imperial fleets have been stranded by sudden corridor failures. Provinces have been isolated for generations, only to reconnect with an empire that no longer recognizes their governments.
+
+Other civilizations have prospered in the spaces left behind.
+
+The Tessan commercial networks connect hundreds of worlds without requiring direct political control. Younger powers have emerged around stable corridor intersections. Independent colonies, merchant leagues, religious states, nomadic fleets, and military republics compete for influence.
+
+No power controls the entire corridor network, and no species has a monopoly on intelligence, technological innovation, or ambition.
+
+## The established and emerging powers
+
+### Humans
+
+Interstellar history: 300 years · Orion Spur · Fragmented colonial powers
+
+Humans are adaptable, socially restless, and remarkably willing to challenge established institutions. Three centuries of corridor travel have produced dozens of colonies, independent governments, commercial alliances, and competing political movements.
+
+Human civilization is characterized by contradictions: extraordinary generosity alongside ruthless exploitation, institutional ambition alongside individual rebellion, and a willingness to risk enormous resources on uncertain ideas.
+
+Humanity's economic innovations have begun influencing Tessan institutions, while its explorers and entrepreneurs push into regions older civilizations consider unprofitable or dangerous.
+
+### Tessan
+
+Interstellar history: 6,000 years · Sagittarius trade networks · Commercial dynasties
+
+Large, scaled, exceptionally long-lived beings whose society regards contractual obligation as the foundation of civilization. Tessan family institutions maintain financial and political relationships across centuries.
+
+Tessan power comes primarily through lending, insurance, corridor access, commercial arbitration, and long-term investment rather than military conquest. Their extensive client system includes entire worlds bound by inherited obligations.
+
+Contact with humanity has introduced new economic thinking into Tessan society, creating a growing division between traditional creditors and reformers who question the profitability of perpetual debt.
+
+### Kel
+
+Interstellar history: 1,400 years · Tessan client worlds · Hive-city assemblies
+
+Chitin-plated social beings raised in immense hive-cities. Kel thought is highly analytical and cooperative, while prolonged isolation causes severe psychological distress. Their emotional states are expressed through subtle postures, vibrations, and chemical signals that other species struggle to interpret.
+
+The Kel homeworld remains burdened by inherited Tessan debt. Their desperate effort to discover new markets brought them into humanity's first extraterrestrial encounter, triggering the First Contact Crisis.
+
+Today, Kel society is divided between contractual loyalists, reformers seeking negotiated emancipation, and radicals who believe their world's debts can only be ended through force.
+
+### Mirrun
+
+Interstellar history: 800 years · Oceanic systems · Pelagic commonwealths
+
+Smooth-skinned amphibians originating on a deep-ocean world. Mirrun possess exceptionally sensitive skin capable of detecting minute pressure variations and vibrations. They are agile swimmers, intensely social, and famous for their humor.
+
+Their cities extend through ocean trenches and submerged reef structures. Mirrun political institutions favor deliberation, shared resources, and decentralized authority.
+
+Mirrun researchers are among the leading specialists in gravimetric resonance detection. Their biological sensitivity inspired several important improvements in corridor instrumentation. Their principal strategic concern is the protection of ocean worlds from extractive industries.
+
+### Ylith
+
+Interstellar history: 2,200 years · High-atmosphere worlds · Aerial city-states
+
+Hollow-boned, feathered gliders with elongated wing fingers supporting broad membranes. Their extraordinary vision allows them to identify distant objects and subtle movement far beyond human capabilities.
+
+Ylith civilization developed in towering settlements suspended above the turbulent lower atmosphere of their homeworld. Their architecture favors open space, vertical movement, and enormous communal chambers. Confined environments are profoundly uncomfortable for them.
+
+Their independent city-states are renowned for navigation, long-range observation, and exploratory cartography. Ylith navigators have discovered corridors that conventional instruments initially failed to identify.
+
+## The Hegemony and its fractured inheritance
+
+The Hegemony is not a single-species empire. Its ruling institutions were established by the Ozhvek, but centuries of conquest, settlement, assimilation, and political upheaval have made it a multispecies imperial structure.
+
+The Hegemony's official ideology maintains that its authority is necessary to preserve civilization against fragmentation and chaos. Its critics describe it as a system of hereditary privilege, military coercion, religious intolerance, and resource extraction.
+
+Both its internal factions and external enemies have exploited the shifting gravimetric corridors. An imperial province isolated for centuries can become an independent civilization. When its corridor reopens, the Hegemony may return to reclaim it.
+
+### Ozhvek — The Imperial Founders
+
+Interstellar history: 18,000 years · Ancient Sagittarius territories · Imperial dynasties
+
+Massive, radially symmetrical beings supported by six powerful limbs, with mineralized skeletal plates and clusters of sensory organs distributed around their upper bodies. Ozhvek perceive their surroundings in nearly every direction and possess lifespans approaching five centuries.
+
+Their ancestors founded the Hegemony through a combination of military conquest, infrastructure development, and promises of security. Ozhvek society developed an elaborate hierarchy in which authority flows through ancient houses, military offices, and inherited ceremonial positions.
+
+Today, the Ozhvek are divided. Some houses seek to restore centralized imperial power. Others control independent territories while maintaining a nominal allegiance to the imperial throne.
+
+The greatest threat to Ozhvek dominance is not necessarily another species. It is the inability of their ruling houses to agree on what the Hegemony should become.
+
+### Dresh — The Imperial Soldiers
+
+Interstellar history: 7,500 years · Hegemony borderlands · Military protectorates
+
+Dense-bodied, four-armed beings with thick dermal armor and powerful musculature, evolved on a high-gravity world. Their short, broad bodies make them formidable in confined combat environments but poorly suited to low-gravity conditions without assistance.
+
+The Dresh were incorporated into the Hegemony thousands of years ago. Their military traditions became central to imperial ground forces, and Dresh officers eventually rose to command entire frontier sectors.
+
+They are not universally loyal to the Ozhvek. Several Dresh protectorates have declared independence, while others maintain powerful imperial garrisons.
+
+Dresh military society prizes competence and mutual obligation. Their greatest political dispute concerns whether soldiers owe allegiance to the imperial throne, their commanders, or the populations they protect.
+
+### Shivar — The Keepers of Orthodoxy
+
+Interstellar history: 9,000 years · Hegemony religious territories · Theocratic councils
+
+Tall, narrow-bodied organisms with translucent external tissues surrounding dense internal organs. Their nervous systems produce synchronized electrical pulses that communicate emotional and physiological states to nearby members of their species.
+
+Shivar civilization developed a religious tradition interpreting the gravimetric corridors as evidence of a universal order. When their ancestors entered the Hegemony, their theology gradually merged with imperial claims of cosmic legitimacy.
+
+Today, the most radical Shivar orders insist that the Hegemony possesses a sacred duty to reunify every territory it once controlled.
+
+Moderate Shivar theologians reject that interpretation, arguing that the corridors reveal a universe defined by change rather than permanent authority.
+
+The resulting religious schism has fueled uprisings, political assassinations, and wars within the Hegemony.
+
+### Brulvek — The Industrial Survivors
+
+Interstellar history: 4,300 years · Imperial manufacturing systems · Industrial syndicates
+
+Low, broad-bodied hexapods with powerful manipulator limbs and thick insulating hides. Brulvek evolved in volcanic environments with extreme atmospheric temperatures and concentrations of corrosive gases.
+
+Their homeworld became one of the Hegemony's most important industrial centers. Generations of Brulvek built shipyards, fusion facilities, and heavy manufacturing complexes that supplied imperial expansion.
+
+The decline of imperial infrastructure has left many Brulvek systems economically devastated. Industrial syndicates now compete for dwindling resources and maintenance contracts.
+
+Some remain loyal to the Hegemony because imperial contracts sustain their economies. Others secretly manufacture ships and weapons for separatist movements.
+
+Brulvek engineers are highly sought after throughout known space, particularly for their ability to restore machinery that has operated for centuries without replacement parts.
+
+### Zhaq — The Lost Province
+
+Interstellar history: 5,800 years · Former Hegemony frontier · Independent republics
+
+Flexible-bodied, tripedal beings with segmented limbs and three independently focusing eyes. Their homeworld's extreme seasonal variations produced a species capable of entering long periods of reduced metabolic activity.
+
+The Zhaq were incorporated into the Hegemony during its greatest expansion. Their systems became strategically important because they controlled several corridor intersections connecting the imperial core to the outer frontier.
+
+A major corridor collapse isolated their territories for nearly six centuries.
+
+During that period, the Zhaq established independent governments, developed new technologies, and abandoned imperial institutions.
+
+When the corridors reopened, the Hegemony demanded their return.
+
+The Zhaq refused.
+
+Their continuing resistance has become a symbol for separatist movements throughout imperial space.
+
+## Independent civilizations and regional powers
+
+### Veyari — The Memory Keepers
+
+Interstellar history: 11,000 years · Sagittarius archival worlds · Scholarly enclaves
+
+Small, six-limbed beings with soft protective scales and unusually developed sensory organs. Veyari brains possess specialized structures for organizing long-term associative memory, allowing individuals to retain remarkable quantities of experiential information.
+
+Their civilization has preserved historical records spanning thousands of years, including accounts of corridor collapses, vanished civilizations, and wars whose causes have been forgotten by most participants.
+
+Veyari archival institutions maintain strict political neutrality. Their libraries contain information valuable to virtually every government, including lost navigation data and records of ancient territorial claims.
+
+Neutrality has not protected them from conflict. Imperial forces, private corporations, and religious extremists have repeatedly attempted to seize or destroy Veyari archives.
+
+Their greatest strength is knowledge. Their greatest vulnerability is the assumption that knowledge should be preserved even when powerful civilizations would prefer it forgotten.
+
+### Eshuum — The Distributed Minds
+
+Interstellar history: 3,600 years · Low-gravity systems · Consensus networks
+
+Eshuum are colonial organisms composed of numerous semi-independent biological units. Individual units possess limited intelligence, but coordinated colonies develop complex personalities and sophisticated reasoning.
+
+An Eshuum person is therefore a living community. Its constituent organisms communicate through biochemical signals and electrical connections, forming a unified consciousness.
+
+Their civilization organizes itself through negotiated consensus between individuals and larger social networks.
+
+Eshuum ships are unusual because their crews can temporarily redistribute biological components to perform specialized tasks.
+
+Their political institutions strongly oppose forced separation, biological experimentation without consent, and the ownership of intelligent organisms. These positions have brought them into direct conflict with several Hegemony research authorities.
+
+### Khaum — The Deep Dwellers
+
+Interstellar history: 12,000 years · Subterranean worlds · Independent cavern nations
+
+Massive, eyeless burrowing organisms with dense sensory whiskers and powerful digging appendages. Khaum evolved beneath the surface of a geologically active world, navigating through pressure waves and seismic vibrations.
+
+Their underground cities extend for hundreds of kilometers through interconnected chambers.
+
+Khaum civilization developed sophisticated geology, materials science, and subterranean engineering long before achieving spaceflight.
+
+Their knowledge of pressure gradients has made them valuable contributors to gravimetric shielding research.
+
+Khaum political culture emphasizes physical security and long-term planning. They are cautious about unfamiliar environments and deeply suspicious of governments that promise protection in exchange for permanent obedience.
+
+Their underground refuges have sheltered refugees from multiple Hegemony campaigns.
+
+### Vael — The Living Fleets
+
+Interstellar history: 4,700 years · Mobile corridor networks · Nomadic flotillas
+
+Long-bodied, lightly built beings with four manipulator limbs and flexible skeletal structures. Vael evolved in a low-gravity environment and are uncomfortable under the gravitational conditions favored by most other species.
+
+Their original homeworld was destroyed during an ancient stellar catastrophe. Surviving populations escaped aboard generation ships and eventually developed a civilization centered on mobile habitats.
+
+The Vael no longer regard planetary settlement as desirable.
+
+Their enormous fleets move through the corridor network, trading specialized manufactured goods, performing repairs, and transporting populations between distant systems.
+
+Vael flotillas have repeatedly been caught between Hegemony forces and separatist territories. Their determination to remain politically independent has made them both valuable intermediaries and frequent targets of suspicion.
+
+### Thrum — The Resonant People
+
+Interstellar history: 1,900 years · Dense-atmosphere worlds · Resonance assemblies
+
+Broad, soft-bodied beings whose internal cavities generate complex low-frequency vibrations. Thrum communicate through sound, pressure, and ground-transmitted resonance.
+
+Their language carries information through overlapping harmonics that conventional human speech cannot reproduce.
+
+Thrum civilization developed sophisticated acoustic technology and environmental sensing systems. Their expertise in resonance analysis eventually led to important advances in corridor navigation.
+
+Thrum scientists were among the first to recognize that some apparently random gravimetric fluctuations contained structured patterns.
+
+Their communities place great importance on collective discussion. Political decisions are conducted through synchronized vocal assemblies in which multiple participants contribute simultaneously.
+
+Their technology is widely respected, although their reluctance to permit military applications has strained relations with several governments.
+
+### Corvani — The Ecological Architects
+
+Interstellar history: 3,200 years · Temperate biosphere worlds · Ecological stewardship councils
+
+Corvani are radially arranged, five-limbed organisms with broad photosensitive skin structures and intricate respiratory systems. Their ancestors evolved in dense forests where cooperation between unrelated organisms was essential for survival.
+
+Their civilization approaches technology as an extension of ecology. Corvani settlements incorporate living structures, engineered biological systems, and carefully managed planetary environments.
+
+Corvani scientists are among the galaxy's foremost specialists in ecological restoration and planetary engineering.
+
+Their political influence has increased as older civilizations struggle with environmental damage accumulated over millennia.
+
+Corvani restoration teams operate on worlds devastated by Hegemony industrial extraction, although their insistence on ecological safeguards frequently brings them into conflict with mining corporations and colonial governments.
+
+### Uxarra — The Shifting Ones
+
+Interstellar history: 900 years · Variable-climate worlds · Territorial communes
+
+Uxarra possess flexible, partially hydrostatic bodies supported by internal cartilage structures. Their skin can alter texture, coloration, and reflective properties, providing camouflage and protection against environmental extremes.
+
+Their homeworld experiences dramatic atmospheric and climatic variations. Uxarra settlements are consequently designed for relocation and rapid adaptation.
+
+Uxarra society emphasizes practical cooperation and personal autonomy. Their governments are small, flexible institutions that reorganize as circumstances change.
+
+Their natural camouflage has created an unfortunate reputation for secrecy and deception among other species.
+
+Uxarra explorers and rescue specialists are highly valued for operations in unstable environments, particularly worlds affected by corridor disruptions or natural disasters.
+
+### Sen — The Patient Observers
+
+Interstellar history: 15,000 years · Isolated Sagittarius systems · Contemplative enclaves
+
+Sen are compact, slow-moving organisms protected by layered mineralized shells. Their metabolism operates at a considerably slower rate than that of humans, and individual Sen routinely live for more than a thousand years.
+
+Their civilization developed an extraordinary tradition of long-term observation.
+
+Sen research institutions maintain experiments that have operated continuously for centuries. Their scientific culture values reproducibility, precision, and caution.
+
+They possess some of the oldest surviving records of gravimetric corridor behavior.
+
+The Sen have witnessed the rise and decline of multiple empires, including the Hegemony.
+
+Their governments rarely intervene in external affairs, but their warnings concerning corridor instability carry considerable weight among navigators and scientists.
+
+### Joruun — The Borderland Confederates
+
+Interstellar history: 2,600 years · Sagittarius frontier · Confederated defense leagues
+
+Joruun are tall, powerful bipeds with thick insulating skin, broad sensory ridges, and highly developed auditory organs. They evolved on a cold world with severe seasonal storms.
+
+Their civilization emerged from competing territorial nations that eventually united against Hegemony expansion.
+
+Joruun society places considerable emphasis on local autonomy, military preparedness, and collective defense.
+
+Their confederation has fought repeated wars against the Hegemony, losing and recovering territory as corridor access changed.
+
+Joruun military doctrine emphasizes fortified corridor junctions, distributed command structures, and the ability to continue resistance after central authority has been disrupted.
+
+Their greatest political challenge is maintaining unity during periods when the imperial threat appears to recede.
+
+### Qor — The Silicon Minds
+
+Interstellar history: 8,000 years · Mineral-rich systems · Crystalline polities
+
+Qor are silicon-based organisms with slowly growing crystalline structures and distributed electrochemical nervous systems.
+
+Their bodies resemble irregular mineral formations rather than conventional animal anatomy.
+
+Qor communicate through electromagnetic and mechanical oscillations. Their natural perception of time differs significantly from that of faster-metabolizing species.
+
+Qor civilization developed advanced materials science and computation, particularly technologies that remain stable under extreme environmental conditions.
+
+Their manufacturing capabilities make them valuable commercial partners and strategic suppliers.
+
+Qor governments resist external interference, especially attempts to exploit their homeworld's mineral resources.
+
+Their relationship with the Tessan is complex: Tessan capital has helped expand Qor industry, but Qor political leaders refuse to permit debt arrangements that threaten planetary sovereignty.
+
+### Ommek — The Makers of Machines
+
+Interstellar history: 5,100 years · Industrialized independent systems · Technocratic republics
+
+Ommek are small, heavily articulated beings with multiple fine manipulator appendages and exceptional tactile sensitivity.
+
+Their homeworld's rugged terrain encouraged the development of mechanical assistance and automated manufacturing.
+
+Ommek civilization eventually became one of the most technologically sophisticated industrial societies in the region.
+
+They specialize in robotics, precision engineering, artificial intelligence, and automated spacecraft production.
+
+Ommek society regards technical competence as a public responsibility. Their political institutions require independent review of major technological decisions.
+
+Their relationship with the Hegemony has been turbulent. Imperial authorities repeatedly attempted to acquire Ommek manufacturing technology through coercion, espionage, and military intervention.
+
+Ommek defensive systems have made direct conquest prohibitively expensive.
+
+### Vesh — The Newcomers
+
+Interstellar history: 24 years · Outer Orion Spur · Emerging planetary government
+
+Vesh are slender, quadrupedal beings with two additional manipulator limbs and delicate sensory filaments extending from their heads.
+
+Their civilization achieved corridor travel only recently.
+
+Unlike humanity, the Vesh entered interstellar space already aware that extraterrestrial civilizations existed. Their astronomical observations had detected artificial activity in nearby systems.
+
+Nevertheless, direct contact with established interstellar powers has transformed their society.
+
+Vesh governments struggle to regulate alien technology, commercial investment, cultural influence, and political interference.
+
+Their greatest challenge is preserving meaningful independence while benefiting from knowledge and technology accumulated by civilizations thousands of years older than their own.
+
+Human diplomats have developed a particularly strong interest in Vesh affairs, recognizing many of the difficulties humanity experienced during its own early expansion.
+
+### Uth — The Refugees of Empire
+
+Interstellar history: 6,400 years · Dispersed Hegemony frontier · Diaspora communities
+
+Uth are compact, thick-skinned beings with broad manipulator appendages and complex chemical sensory organs.
+
+Their original civilization was destroyed during an ancient Hegemony campaign intended to suppress a regional rebellion.
+
+Surviving Uth populations dispersed across neighboring systems, establishing communities within other civilizations.
+
+Over thousands of years, Uth culture developed around the preservation of family history, language, and collective memory.
+
+Today, Uth communities exist throughout known space.
+
+Some have assimilated into their adopted societies. Others maintain strong political organizations dedicated to recovering their ancestral worlds.
+
+Uth activists are prominent in anti-Hegemony movements, although many Uth reject the idea that their people should be defined exclusively by historical suffering.
+
+### Draelin — The Corridor Cartographers
+
+Interstellar history: 3,900 years · Interarm systems · Independent navigation guilds
+
+Draelin are elongated, six-limbed organisms with specialized electromagnetic sensory structures and unusually flexible skeletal systems.
+
+Their ancestors evolved in a world with a powerful and highly variable magnetic field.
+
+Draelin science developed sophisticated methods of detecting electromagnetic disturbances and modeling complex field interactions.
+
+These traditions eventually contributed to advanced gravimetric navigation.
+
+Draelin cartographic guilds maintain some of the most accurate commercial corridor charts in known space.
+
+Their services are indispensable to traders, explorers, and military fleets.
+
+The guilds officially maintain neutrality, but competing Draelin institutions have repeatedly sold navigation information to opposing sides during major conflicts.
+
+Their internal politics are shaped by a central question: whether knowledge of safe passage should be treated as a public good or a commercial asset.
+
+### Zethri — The Children of the Collapse
+
+Interstellar history: 420 years · Isolated corridor clusters · Reconstruction states
+
+Zethri are small, agile organisms with six limbs, broad reflective eyes, and fine sensory structures adapted to dim environments.
+
+Their civilization developed in a cluster of systems whose principal gravimetric connections collapsed shortly after their ancestors achieved interstellar travel.
+
+For centuries, Zethri settlements remained isolated from one another.
+
+Some colonies prospered. Others experienced technological decline, political fragmentation, or ecological disaster.
+
+When new corridors eventually reconnected the cluster, the surviving Zethri populations discovered that their societies had developed dramatically different languages, governments, and cultural traditions.
+
+Modern Zethri civilization is engaged in a difficult process of reunification.
+
+Their experience has made them deeply suspicious of political systems dependent upon a small number of corridor connections.
+
+Zethri engineers and planners specialize in building settlements capable of surviving prolonged isolation.
+
+# The Hegemony: An empire at war with itself
+
+The Hegemony deserves particular attention because its decline influences nearly every civilization in Fracture Lines.
+
+## The five eras
+
+1. **The Foundation — 18,000 years ago.** Ozhvek dynasties establish a regional political and military alliance that develops into the Hegemony.
+
+2. **The Imperial Ascendancy — 12,000–6,000 years ago.** Military expansion, corridor control, and the absorption of other civilizations create a vast multispecies empire.
+
+3. **The Long Fracture — 6,000–2,000 years ago.** Imperial institutions become increasingly hereditary and inefficient. Corridor collapses isolate provinces, while military commanders and local rulers accumulate independent power.
+
+4. **The Wars of Reclamation — 2,000–300 years ago.** The reopening of long-dormant corridors triggers repeated imperial campaigns to recover territories that have been independent for centuries.
+
+5. **The Present Era.** The Hegemony remains powerful but divided. Rival imperial houses, military protectorates, religious authorities, and separatist governments fight over territory, resources, and the legitimacy of imperial rule.
+
+The Hegemony's greatest military weakness is the same phenomenon that once made its expansion possible: the gravimetric corridor network.
+
+A powerful fleet is of little use if the corridor connecting it to its supply bases collapses. A heavily defended frontier can become strategically irrelevant when a new corridor opens behind it. An isolated province can develop into a powerful independent state before the empire regains access.
+
+The result is a frontier that shifts over centuries, interrupted by sudden strategic disasters.
+
+The Hegemony also contains genuine ideological differences. Imperial restorationists seek to rebuild centralized authority. Military governors demand regional autonomy. Religious zealots seek to purify the empire. Reformers argue that only fundamental political change can preserve what remains.
+
+These factions fight one another even as they wage wars against external enemies.
+
+For the peoples living near its borders, the Hegemony is both a real military threat and a source of persistent uncertainty.
+
+A corridor that has been closed for three hundred years can reopen tomorrow.
+
+And an imperial fleet may emerge to announce that the worlds beyond it still belong to the Emperor.
+
+## Species and political affiliations
+
+Species identity does not determine political loyalty. The following table describes broad historical associations, not universal allegiances.
+
+| Political sphere | Principal species |
+|---|---|
+| Human colonial states | Humans, with growing alien populations |
+| Tessan commercial networks | Tessan, Kel, Qor, many independent trading communities |
+| Hegemony core and imperial institutions | Ozhvek, Dresh, Shivar, Brulvek |
+| Former imperial territories and resistance movements | Zhaq, Joruun, Uth |
+| Independent scientific and technological powers | Mirrun, Veyari, Thrum, Sen, Ommek, Khaum |
+| Mobile and frontier civilizations | Ylith, Vael, Uxarra, Draelin, Zethri |
+| Ecological and emerging powers | Corvani, Eshuum, Vesh |
+
+## The galaxy as a setting for adventure
+
+The peoples of Fracture Lines inhabit a region of space where history, geography, and politics are inseparable.
+
+Ancient empires are collapsing, but their armies remain dangerous. Commercial powers are becoming increasingly influential, but their own institutions are changing. Younger civilizations are discovering opportunities that older powers have overlooked. Entire worlds remain isolated behind collapsed corridors, waiting to be rediscovered.
+
+The corridor network makes exploration unpredictable. A journey between two nearby systems can require a lengthy detour, while a deep corridor can connect civilizations separated by thousands of light-years. New connections can transform isolated worlds into strategic prizes overnight.
+
+A crew operating in this environment can encounter independent merchants, imperial patrols, scientific expeditions, religious missionaries, refugees, pirates, explorers, and representatives of civilizations whose histories stretch back thousands of years.
+
+The setting does not assume that any one species is destined to dominate the others.
+
+The central conflict of Fracture Lines is not simply the struggle between civilizations. It is the struggle between established power and an interstellar order that refuses to remain static.
+
+# Psionics and the Mandates
+
+Psionic potential is rare, but it is not unique to any people. It appears in subspecies and bloodlines among all the larger species. The **Shivar** are empaths by nature (their nervous systems share emotions), but true psionics (reading minds, pushing thoughts, moving objects) is something else.
+
+Most of the older civilizations treat psionics as a danger to be **controlled**: registered, suppressed, or wiped out. Their **Mandates** require travelers to be tested at corridor gates and checkpoints, and in many jurisdictions a traveler who tests positive is **killed on the spot**. The Hegemony's Shivar inquisitors enforce the strictest Mandates; others are lax, corrupt or merely brutal.
+
+- **Psionic characters** take the **Psionic** advantage and learn **psionic powers** with the **Psionics** skill: 2 at Trained, 3 at Specialty, 4 at Expert. Using a power takes an action and a Psionics roll; the target resists with Will where it makes sense.
+- **Every slip is noticed.** A failed use or a natural 18 marks a box of **Heat**. Mandate scanners detect active powers nearby.
+- **Unregistered.** A psionic who has never been tested, or carries a forged result, takes the **Unregistered** complication. Screenings, scans and witnesses are life-or-death moments: hide, forge, bluff or run.
+- **The Quiet Network** smuggles psionics past the Mandates with false papers, safe routes and new names.
+
+| Power | Effect |
+|---|---|
+| Sense Minds | Feel the minds within a room or two: how many, and their strongest emotions |
+| Mask | Hide your own mind: +3 against psionic detection and Mandate scanners for a scene |
+| Mind Shield | You or an ally get +2 to resist psionics, fear and suggestion for a scene |
+| Push | A short suggestion the target follows unless they resist with Will |
+| Surface Thoughts | By touch, read what the target is thinking right now (Will resists) |
+| Mind Link | Speak mind to mind with one ally for a scene, anywhere in the same system |
+| Calm | Soothe fear or rage in one person, or a small group at −2 |
+| Kinetic Shove | Push a person or object with force: knock down, disarm, slam a door |
+| Kinetic Lift | Move a small object you can see, delicately, for a scene |
+| Static | Disrupt nearby electronics: a lock, a camera, a weapon's targeting |
+| Precognitive Flash | Once per scene, +2 to one roll as you glimpse what's coming |
+| Healing Trance | Clear one injury box on yourself, once per wound |
+
+# Technology
+
+- **Cybernetics.** Implants replace limbs, sharpen senses and rewire reflexes. They show, they show up on scans, and they need parts, power and care: implant advantages say what they do, and the *Implant Upkeep* complication says what they cost. **Augments** live with many; **Cyberneticists** install and repair them.
+- **AI.** Artificial minds run ships, stations and corporations, and some want to be free. An **AI partner** has a name and a personality, played by its partner or the GM; it can **assist** Computers, Sensors and Investigation rolls (success +1, success by 5 or more +2), and acts in the world only through a drone or a ship. **AI Minders** are bonded to one and trained to handle others, from corporate systems to rogue minds.
+- **Drones.** Scout, repair and combat drones are everywhere. A drone relays what it senses; jamming its link or taking out its controller stops it.
+- **Biotech.** Gene-tailoring, cloned organs, engineered diseases and medical miracles, for those who can pay. *Gene-Tailored* characters resist disease and toxins.
+- **Ships.** Crews fly everything from patched freighters to corporate couriers. A ship is a home, a business and a **Debt**: the *A Ship of Your Own* advantage starts the crew with a ship and a box of Debt. Ship fights and chases run as clocks, with Piloting, Engineering, Sensors and Firearms rolls.
 
 # Threats
 
-Opponents use the same rules as the characters. **Minor opponents** (guards, thugs, drones) have **one box**: any hit that gets through takes them out of the fight.
+Opponents use the same rules as the characters. **Minor opponents** have **one box**: any hit that gets through takes them out of the fight.
 
 | Threat | Attack (target) | Dodge | Boxes | Weapon | Trait |
 |---|---|---|---|---|---|
-| Station guard (minor) | Blasters 11 | 7 | 1 | Blaster pistol | **Numbers.** Two or three; they surrender or flee when half are down. |
-| Hegemony trooper | Blasters 12, Close Combat 12 | 9 | 3 | Blaster carbine | **Disciplined.** Ignores the Wounded penalty. |
-| Hegemony officer | Blasters 12, Leadership 13 | 9 | 3 | Blaster pistol | **Command.** Once per round, gives one ally +1 on an attack. |
-| Syndicate pirate | Blasters 11, Close Combat 12, Stealth 12 | 9 | 3 | Blaster, vibroblade | **Dirty fighter.** Winning a grapple also disarms the target. |
-| Security drone | Blasters 13 | 6 | 2 | Built-in blaster | **Machine.** Immune to stun; Computers can shut it down (contest). |
-| Bounty hunter | Blasters 14, Survival 13 | 10 | 3 | Blaster rifle, net | **Ambush.** +2 on the first attack from hiding. |
-| Ruin guardian | Close Combat 14 | 6 | 4 | Crushing grip (2) | **Ancient.** Blasters mark 1 box at most; it must be outthought. |
-| Void beast | Close Combat 13 | 8 | 4 | Jaws (2) | **Vacuum-born.** Moves freely in space and ignores vacuum. |
+| Station security or thug (minor) | Firearms 11 | 7 | 1 | Stunner or pistol | **Numbers.** Three or four of them; they back off when half are down. |
+| Combat drone (minor, swarms) | Firearms 12 | 9 | 1 each | Light laser (2) | **Swarm.** Kill its controller or jam its link, and the swarm drops. |
+| Pirate raider | Firearms 12, Close Combat 12 | 9 | 2 | Slug carbine | **Boarders.** Hit fast, grab what they can, run. |
+| Tessan debt collector | Commerce 15, Firearms 12 | 8 | 3 | Bonded-agent contract | **Lien.** Can lawfully seize your ship or gear; in Tessan space, resisting marks Debt and Heat. |
+| Syndicate enforcer (Augment) | Close Combat 15, Firearms 13 | 10 | 4 | Implant blades (2), shotgun | **Chromed.** Hits marking 2 or more boxes mark one fewer. |
+| Corporate assassin | Firearms 15, Stealth 15 | 11 | 3 | Needle rifle, toxin | **First strike.** +2 from hiding; the toxin makes the target roll Body or be Stunned. |
+| Bounty hunter | Investigation 14, Firearms 14 | 10 | 3 | Coilgun (3), restraints | **Relentless.** Always finds the trail again; wants you alive. |
+| Hegemony legionary (Dresh) | Firearms 14, Close Combat 15 | 9 | 4 | Plasma rifle (3), four arms | **Armored.** Hits marking 1 box mark nothing. |
+| Hegemony inquisitor (Shivar zealot) | Psionics 14, Diplomacy 13 | 9 | 3 | Mandate scanner, sidearm | **Mandate.** Detects psionics nearby; a psionic must roll Will or be revealed. |
+| Mandate screening post | Sensors 15 | — | — | Scanners, guards | **The test.** Everyone passing through is scanned; a positive result means execution. |
+| Rogue AI | Computers 16 | — | — | Station systems, drones | **Everywhere.** Lives in the network; must be talked down, isolated or erased. |
+| Alien predator | Close Combat 15 | 10 | 5 | Claws (2), spines | **Huge.** Hits marking 1 box mark nothing. |
 
-**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Enemy ships use the ship tracks: a Hegemony cruiser has Shields 3, Hull 4, and gunners at Blasters 12.
+**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
 
 # Ready-made characters
 
 Characters ready to play, for one-shots, new players, or a group in a hurry. Each follows the creation rules exactly, and their connections tie them together. In the creator, choose one from the ready-made list to open it and make it your own.
 
-## Ilsa Varga
+## Thessk Varo-Hun
 
-*Captain, Captain. Human (tier 0).* Commands the ship, keeps the crew alive, and takes the jobs that need doing.
+*Trader, disowned, Trader. Tessan (tier 1).* A young reformer cut off by her dynasty's old creditors for writing off a client world's debt. She trades on her own now, and keeps her word.
 
-- **Attributes:** Body 10, Agility 12, Intellect 10, Presence 13, Will 11. **Dodge** 11.
-- **Skills:** Leadership 16 (Specialty). Trained: Deception 14, Diplomacy 14, Blasters 13, Close Combat 13, Piloting 13, Athletics 11, Navigation 11, Psychology 11, Sensors 11.
-- **Edges:** +1 attribute point, Second advantage, Extra Resolve; second advantage: Careful Marksman.
-- **Advantage:** Crisis Leader. **Complication:** Duty Before Self; trigger: you're hurt or exhausted, but your station needs you.
-- **Why I fly:** To protect the people who can't protect themselves. **Connection:** Rhen Valo once wore her face to get her out of a Hegemony prison.
+- **Attributes:** Body 11, Agility 8, Intellect 12, Presence 13, Will 11. **Dodge** 6.
+- **Skills:** Commerce 15 (Specialty). Trained: Deception 14, Diplomacy 14, Leadership 14, Streetwise 14, Computers 13, Investigation 13, Navigation 13, Science 13, Psychology 12, Piloting 9.
+- **Edges:** Extra Trained skill, A friend; a friend: her grandfather's old clerk, who still sends her the family's secrets.
+- **Advantage:** Ledger Memory (species; companion: Bound by Contract). **Complication:** Exile; trigger: your people on the same station.
+- **Why I'm out here:** No empire, no creditor, no one owns me. **Connection:** She sold Mara Okonkwo the first debt Mara forgave. Neither regrets it.
 
-## Kesh
+## Kesh of the Seventh Hive
 
-*Pilot, Pilot. Ylith (tier 1).* Flies anything, through anything, and gets bored in a straight line.
+*Market scout, Explorer. Kel (tier 1).* Scouts new markets to pay down her homeworld's debt, and wonders more each year whether the radicals are right.
 
-- **Attributes:** Body 8, Agility 14, Intellect 13, Presence 10, Will 10. **Dodge** 13.
-- **Skills:** Piloting 17 (Specialty). Trained: Blasters 15, Stealth 15, Communications 14, Computers 14, Engineering 14, Navigation 14, Sensors 14, Survival 14, Deception 11, Athletics 9.
-- **Edges:** Extra Trained skill, A fine weapon or tool; a fine tool: a custom flight harness (+2 Piloting).
-- **Advantage:** Keen Eyes (species; companion: Claustrophobic). **Complication:** Old Rival; trigger: your rival is after the same prize.
-- **Why I fly:** No planet can hold me, and no one gives me orders I don't choose. **Connection:** Brakka keeps rebuilding the flight controls Kesh keeps breaking.
+- **Attributes:** Body 10, Agility 11, Intellect 13, Presence 8, Will 13. **Dodge** 10.
+- **Skills:** Navigation 16 (Specialty). Trained: Commerce 14, Computers 14, Engineering 14, Investigation 14, Science 14, Sensors 14, Survival 14, Piloting 12, Athletics 11.
+- **Edges:** Extra Resolve, A fine weapon or tool; a fine tool: a hive-made survey kit (+2 Sensors).
+- **Advantage:** Debt-Born (species; companion: The Homeworld's Debt). **Complication:** Debt-Bound; trigger: a creditor offers to forgive it for a favor.
+- **Why I'm out here:** I owe more than I can ever repay, unless I take every job. **Connection:** Ilvi Saradh's AI found the corridor Kesh's hive needed; Kesh owes them both.
 
-## Dr. Oru Tamsin
+## Rook
 
-*Ship's doctor, Medic. Vashari (tier 1).* Feels every patient's pain, and treats it anyway.
+*Former Concord marine, Augment. Human (tier 0); Specialist.* Rebuilt after the Zhaq border war with a cyber-arm and reflex wiring. The implant payments are overdue, and the company that made them knows where Rook drinks.
 
-- **Attributes:** Body 9, Agility 9, Intellect 13, Presence 13, Will 11. **Dodge** 7.
-- **Skills:** Medicine 16 (Specialty). Trained: Communications 14, Computers 14, Diplomacy 14, Leadership 14, Life Sciences 14, Psychology 14, Sensors 14, Survival 14, Close Combat 10.
-- **Edges:** Second advantage, A fine weapon or tool; second advantage: Emergency Medic; a fine tool: a field surgeon's kit (+2 Medicine).
-- **Advantage:** Empathic Read (species; companion: Feels Too Much). **Complication:** Protects Others at Personal Risk; trigger: civilians are caught in the danger.
-- **Why I fly:** To make up for a mistake I can't undo. **Connection:** Sable is the only patient Oru can't feel, and Oru finds that restful.
+- **Attributes:** Body 13, Agility 13, Intellect 10, Presence 10, Will 10. **Dodge** 12.
+- **Skills:** Close Combat 18 (Expert). Trained: Athletics 14, Firearms 14, Stealth 14, Engineering 11, Medicine 11, Streetwise 11, Survival 11.
+- **Edges:** +1 attribute point, Extra Resolve, Second advantage; second advantage: Implant: Reflex Wiring.
+- **Advantage:** Implant: Cyber-Limb. **Complication:** Implant Upkeep; trigger: your supplier wants more.
+- **Why I'm out here:** I can't go home. The crew is home now. **Connection:** Brakka was on the other side of that border war. They found out over a drink, and stayed friends.
+
+## Ilvi Saradh
+
+*Guild navigator, AI Minder. Draelin (tier 1).* A guild navigator whose AI partner, Quill, remembers a corridor the guild says doesn't exist.
+
+- **Attributes:** Body 9, Agility 12, Intellect 13, Presence 11, Will 10. **Dodge** 11.
+- **Skills:** Computers 16 (Specialty). Trained: Commerce 14, Engineering 14, Investigation 14, Science 14, Sensors 14, Piloting 13, Stealth 13, Diplomacy 12, Psychology 11, Athletics 10; Navigation 14 (free).
+- **Edges:** Extra Trained skill, A fine weapon or tool; a fine tool: Quill's core, a guild-grade AI (+2 Computers).
+- **Advantage:** Corridor Sense. **Complication:** Dangerous Knowledge; trigger: someone close to the truth.
+- **Why I'm out here:** The galaxy is full of things no one understands yet. I want to be first. **Connection:** Quill found the corridor Kesh's hive needed. Ilvi never told the guild.
+
+## Dr. Anwe Tal
+
+*Restoration ecologist, Scientist. Corvani (tier 1).* Rebuilding a world the Hegemony strip-mined, against a mining corporation's lawyers and, lately, its guns.
+
+- **Attributes:** Body 11, Agility 9, Intellect 13, Presence 10, Will 13. **Dodge** 8.
+- **Skills:** Science 16 (Specialty). Trained: Computers 14, Engineering 14, Investigation 14, Medicine 14, Psychology 14, Sensors 14, Survival 14, Athletics 12, Diplomacy 11.
+- **Edges:** +1 attribute point, A friend; a friend: a Veyari archivist who keeps the old survey records of her world.
+- **Advantage:** Restorer (species; companion: Ecological Safeguards). **Complication:** Protects Others; trigger: a civilian in the crossfire.
+- **Why I'm out here:** People out here need help, and I can give it. **Connection:** Sable cleaned up the corporation's files that proved Anwe's case, and asked nothing for it.
 
 ## Brakka
 
-*Chief engineer, Engineer. Korrin (tier 1).* Keeps the engines running on spit and stubbornness, and tells you exactly why your idea won't work.
+*Deserter, Ninth Legion, Mercenary. Dresh (tier 2).* A legionary who deserted rather than burn a Zhaq city. The Hegemony wants him back, or dead.
 
-- **Attributes:** Body 13, Agility 9, Intellect 13, Presence 10, Will 11. **Dodge** 8.
-- **Skills:** Engineering 16 (Specialty). Trained: Athletics 14, Communications 14, Computers 14, Medicine 14, Navigation 14, Physical Sciences 14, Sensors 14, Survival 14, Close Combat 10, Piloting 10.
-- **Edges:** +1 attribute point, Extra Trained skill.
-- **Advantage:** Jury-Rigger. **Complication:** Distrusts Authority; trigger: orders from far away ignore what's happening here.
-- **Why I fly:** To prove I'm good enough, to everyone who doubted me and to myself. **Connection:** Brakka and Kesh have a standing bet on whether the ship survives Kesh's next maneuver.
+- **Attributes:** Body 15, Agility 11, Intellect 9, Presence 10, Will 10. **Dodge** 10.
+- **Skills:** Firearms 14 (Specialty). Trained: Athletics 16, Close Combat 16, Piloting 12, Stealth 12, Leadership 11, Survival 11, Engineering 10, Medicine 10, Sensors 10.
+- **Edges:** Extra Resolve.
+- **Advantage:** Legion Drill (species; companion: Whose Soldier?). **Complication:** Hegemony Bounty; trigger: a hunter in the next berth.
+- **Why I'm out here:** Someone took everything from me. I'll find them. **Connection:** Rook fought him across the Zhaq border once. Now Rook watches his back.
 
 ## Sable
 
-*Science officer, Scientist. Synth (tier 2).* Reads the anomaly, names the risk, and calculates the odds no one asked for.
+*Freelance intrusion specialist, Hacker. Human (tier 0).* Breaks into any system for the right price. Secretly psionic, hidden by the Quiet Network; every checkpoint is a gamble.
 
-- **Attributes:** Body 11, Agility 12, Intellect 15, Presence 8, Will 9. **Dodge** 11.
-- **Skills:** Physical Sciences 18 (Specialty). Trained: Communications 16, Engineering 16, Life Sciences 16, Medicine 16, Navigation 16, Psychology 16, Sensors 16, Blasters 13, Piloting 13, Athletics 12; Computers 16 (free).
-- **Edges:** Extra Trained skill.
-- **Advantage:** Perfect Recall (species; companion: Uncanny). **Complication:** Cannot Leave a Mystery Alone; trigger: data that contradicts known science.
-- **Why I fly:** To see what's out there: worlds and wonders no one has charted yet. **Connection:** Captain Varga signed Sable's papers of personhood when no one else would.
-
-## Rhen Valo
-
-*Security chief, Security. Vorr (tier 2).* First through the airlock, wearing whatever face gets the crew home.
-
-- **Attributes:** Body 11, Agility 14, Intellect 10, Presence 11, Will 9. **Dodge** 13. **In alternate form:** Body 13, Agility 15, Dodge 14.
-- **Skills:** Blasters 17 (Specialty). Trained: Close Combat 15, Piloting 15, Stealth 15, Athletics 12, Deception 12, Leadership 12, Psychology 11, Sensors 11, Survival 11.
-- **Edges:** Extra Resolve.
-- **Advantage:** Mimic (species; companion: Identity Drift). **Complication:** Wanted; trigger: customs scans your papers twice.
-- **Why I fly:** To leave behind a past, a world, or a life that was too small for me. **Connection:** Dr. Tamsin is the only one who's seen Rhen's true face.
+- **Attributes:** Body 10, Agility 12, Intellect 13, Presence 10, Will 11. **Dodge** 11.
+- **Skills:** Computers 16 (Specialty). Trained: Engineering 14, Investigation 14, Sensors 14, Firearms 13, Stealth 13, Psionics 12, Psychology 12, Athletics 11, Deception 11, Streetwise 11.
+- **Edges:** Extra Trained skill, +1 attribute point, A friend; a friend: a Quiet Network forger who keeps Sable's test results clean.
+- **Advantage:** Psionic. **Complication:** Unregistered; trigger: a Mandate screening at the corridor gate.
+- **Why I'm out here:** No empire, no creditor, no one owns me. **Connection:** Sable cleaned up the files that proved Dr. Anwe Tal's case, for nothing. Anwe wonders why.
 
 # Advantages
 
-Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances. An advantage does not grant training, authorize an impossible action, or replace essential equipment. Use only one advantage bonus per roll.
+Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances. An advantage does not grant training, authorize an impossible action, or replace essential gear. Use only one advantage bonus per roll.
 
 | Advantage | Effect |
 |---|---|
-| Steady Hands | +2 to Medicine for delicate surgery or removing a dangerous embedded object. |
-| Emergency Medic | +2 to Medicine for emergency stabilization of a wounded patient. |
-| Xenobiology Specialist | Choose one species or narrow biological group. +2 to Medicine or Life Sciences with that group. |
-| Hyperspace Theorist | +2 to Physical Sciences when analyzing hyperspace and jump phenomena. |
-| Astute Observer | +2 to Intellect rolls to notice a concealed physical clue during a deliberate search. |
-| Signal Analyst | +2 to Communications when separating a real signal from noise or spotting a disguised one. |
-| Slicer | +2 to Computers when breaking into a system or tracing an intrusion. |
-| Jury-Rigger | +2 to Engineering for a temporary repair with inadequate but workable materials. |
-| Ace Pilot | +2 to Piloting for hazardous maneuvers in a small craft. |
-| Diplomatic Insight | +2 to Diplomacy when negotiating across a cultural misunderstanding you have identified. |
-| Crisis Leader | +2 to Leadership when coordinating an immediate response to a sudden emergency. |
-| Mental Discipline | +2 to Will to keep concentrating despite pain or severe distraction. |
-| Unshakable Courage | +2 to Will against overwhelming fear. |
-| Guarded Mind | +2 to Will to resist psionic intrusion or compulsion. |
-| Careful Marksman | +2 to Blasters after spending your preceding action aiming at the same visible target. |
-| Zero-G Training | +2 to Athletics and Close Combat in zero gravity. |
+| Dealmaker | +2 to Commerce when negotiating a price, a loan or a contract. |
+| Polyglot | No translator needed for common languages; +2 to Diplomacy in first meetings with a new species. |
+| Xenologist | +2 to Psychology or Science to understand an unfamiliar species. |
+| Contacts in Every Port | +2 to Streetwise to find goods, work or a person. |
+| Corridor Sense | +2 to Navigation to find a safe route through an unstable corridor. |
+| Hotshot Pilot | +2 to Piloting in a chase or a dangerous maneuver. |
+| Steady Aim | +2 to Firearms after spending an action aiming at the same target. |
+| Brawler | +2 to Close Combat when unarmed. |
+| Field Medic | +2 to Medicine to stabilize a patient in the field. |
+| Intrusion Specialist | +2 to Computers to break security or cover your tracks. |
+| Scientific Method | +2 to Science on a study you can repeat or take time over. |
+| Salvage Eye | +2 to Engineering or Commerce to judge what wreckage is worth. |
+| A Ship of Your Own | You own a small ship (crewed by the party), with a loan: start with one box of Debt. |
+| AI Partner | A personal AI that can assist Computers, Sensors and Investigation rolls (AI Minders have one already). |
+| Drone Operator | A personal drone; +2 to Sensors when scouting or Engineering when repairing with it. |
+| Gene-Tailored | Biotech modifications: +2 to Body rolls against disease, toxins and radiation. |
+| Implant: Cyber-Limb | +2 to Athletics or Close Combat where strength matters. It shows, and needs upkeep. |
+| Implant: Optics | +2 to Sensors or Investigation by sight; see in low light. It shows, and needs upkeep. |
+| Implant: Neural Jack | +2 to Computers when jacked in directly. A hostile system can strike back. |
+| Implant: Reflex Wiring | +1 Dodge, and +2 to act first in a fight. It shows on scans. |
+| Cool Under Fire | +2 to Will to keep acting under fire, fear or pressure. |
+| Psionic | You have psionic potential: you can learn psionic powers (see Psionics and the Mandates). Take the Unregistered complication unless the GM agrees otherwise. |
+
+**Implants** (the advantages marked *Implant*) are visible and show on scans; a character with several should consider the *Implant Upkeep* complication. **Psionic** comes with the *Unregistered* complication unless the GM agrees the character is registered (and watched). **A Ship of Your Own** belongs to the whole crew once it's taken.
 
 # Species
 
 | Species | Tier | Edges | Adjustments |
 |---|---|---|---|
 | Human | 0 | 3 | None |
+| Vesh | 0 | 3 | Body −1, Agility +1 |
+| Brulvek | 1 | 2 | Body +1, Agility −1, Presence −1, Will +1 |
+| Corvani | 1 | 2 | Agility −1, Intellect +1, Presence −1, Will +1 |
+| Draelin | 1 | 2 | Body −1, Agility +1, Intellect +1, Will −1 |
+| Joruun | 1 | 2 | Body +1, Agility −1, Intellect −1, Will +1 |
 | Kel | 1 | 2 | Intellect +1, Presence −2, Will +1 |
-| Korrin | 1 | 2 | Body +2, Agility −1, Intellect −1 |
 | Mirrun | 1 | 2 | Body −1, Agility +1 |
-| Tessan | 1 | 2 | Body +1, Agility −1, Presence −1, Will +1 |
-| Vashari | 1 | 2 | Body −1, Agility −1, Presence +1, Will +1 |
+| Ommek | 1 | 2 | Body −2, Agility +1, Intellect +1 |
+| Shivar | 1 | 2 | Body −2, Intellect +1, Will +1 |
+| Tessan | 1 | 2 | Body +1, Agility −2, Will +1 |
+| Thrum | 1 | 2 | Body −1, Agility −1, Presence +1, Will +1 |
+| Uth | 1 | 2 | Body +1, Agility −1, Presence −1, Will +1 |
+| Uxarra | 1 | 2 | Agility +1, Presence −1 |
+| Vael | 1 | 2 | Body −2, Agility +1, Intellect +1 |
+| Veyari | 1 | 2 | Body −1, Agility −1, Intellect +2 |
 | Ylith | 1 | 2 | Body −2, Agility +1, Intellect +1 |
-| Drennari | 2 | 1 | Body −2, Agility −1, Intellect +1, Will +2 |
-| Synth | 2 | 1 | Body +1, Intellect +2, Presence −2, Will −1 |
-| Vorr | 2 | 1 | Body −1, Agility +1, Presence +1, Will −1 |
-| Aethari | 3 | 0 | Body −2, Agility −1, Presence +1, Will +2 |
-
-## Shared rules
-
-| Rule | What it means |
-|---|---|
-| Changing | A free action, in or out. |
-| Losing control | Strong emotion or pain can force a change: when it matters, the GM calls for a Will roll. |
-| Alternate form | While changed, your alternate form's attribute bonuses apply to rolls on those attributes and their skills, even above the starting maximum, and its traits and drawbacks apply too. |
+| Zethri | 1 | 2 | Body −1, Agility +1 |
+| Zhaq | 1 | 2 | Body −1, Agility +1, Presence −1, Will +1 |
+| Dresh | 2 | 1 | Body +2, Agility −1, Intellect −1 |
+| Eshuum | 2 | 1 | Body −1, Intellect +1, Presence −1, Will +1 |
+| Khaum | 2 | 1 | Body +2, Agility −2, Presence −1, Will +1 |
+| Ozhvek | 2 | 1 | Body +2, Agility −2, Presence −1, Will +1 |
+| Qor | 2 | 1 | Body +2, Agility −2, Intellect +1, Presence −1 |
+| Sen | 2 | 1 | Agility −2, Intellect +1, Presence −1, Will +2 |
 
 ## Human
 
 *Tier 0 · 3 Edges · None*
 
-Adaptable, stubborn and everywhere. Humans built the Concord with the other peoples of the Reach, and argue about it constantly.
+Adaptable, socially restless, and remarkably willing to challenge established institutions. Three centuries of corridor travel have scattered humanity across dozens of colonies, governments and movements: generous and ruthless, often in the same crew.
+
+**Suggested skills:** Commerce, Diplomacy, Piloting, Firearms.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Indomitable Spirit | +2 to Will when refusing to abandon a crewmate or give up on a rescue. | **Reckless Hope.** You keep going after the odds have clearly turned. Accept the danger, delay or lost resource. |
-| Gut Instinct | +2 to Psychology when judging, face to face, whether someone is lying. | **Acts on Hunches.** You act on an unproven feeling when procedure says wait. Accept the cost when the hunch is wrong. |
+| Venture Spirit | +2 to Commerce to fund, pitch or rescue a risky enterprise. | **Overreach.** You bet bigger than you should. Accept the loss when the gamble turns. |
+| Restless | +2 to Survival or Navigation when going where older peoples won't. | **Impatient with Tradition.** Old customs bore you. Accept the offense you cause. |
+| Second Chances | +2 to Diplomacy to talk someone out of a ruinous debt, grudge or deal. | **Soft Touch.** You can't refuse someone in need. Accept the cost of helping. |
+
+## Vesh
+
+*Tier 0 · 3 Edges · Body −1, Agility +1*
+
+Slender quadrupeds with two manipulator limbs and delicate sensory filaments, who reached the corridors only 24 years ago. Their governments struggle to stay independent while learning from civilizations thousands of years older, and humans recognize the struggle.
+
+**Suggested skills:** Diplomacy, Science, Athletics, Sensors.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Fresh Eyes | +2 to Investigation to notice what old hands take for granted. | **Newcomer.** You don't know the rules everyone else knows. Accept the gaffe. |
+| Sensory Filaments | +2 to Sensors to feel air currents and nearby movement. | **Homeworld Politics.** Your government wants a favor. Accept the request. |
+| Fleet-Footed | +2 to Athletics to run or leap. | **Easily Exploited.** Everyone has a deal for you. Accept the bad bargain. |
+
+## Brulvek
+
+*Tier 1 · 2 Edges · Body +1, Agility −1, Presence −1, Will +1*
+
+Low, broad hexapods with powerful manipulator limbs and thick insulating hides, evolved among volcanoes and corrosive air. They built the Hegemony's shipyards; their engineers are sought everywhere for restoring machines centuries past replacement parts.
+
+**Species rules:**
+
+- Furnace hide: heat, smoke and corrosive air mark one fewer box and don't impair you.
+
+**Suggested skills:** Engineering, Science, Athletics, Commerce.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Old Machines | +2 to Engineering to repair or restore ancient or unfamiliar machinery. | **Syndicate Ties.** Your syndicate calls in a favor. Accept the job. |
+| Forge-Born | +2 to Survival in heat, fire and toxic environments. | **Imperial Contract.** Someone still pays your people to serve the empire. Accept the conflict. |
+| Six Strong Limbs | +2 to Athletics to lift, haul or brace. | **Dying Industry.** Home is failing. Accept the plea for money or help. |
+
+## Corvani
+
+*Tier 1 · 2 Edges · Agility −1, Intellect +1, Presence −1, Will +1*
+
+Radially arranged, five-limbed beings with photosensitive skin, from forests where cooperation meant survival. They treat technology as ecology, and their restoration teams heal worlds the Hegemony stripped, often against mining corporations.
+
+**Species rules:**
+
+- Photosynthetic: after days without light you weaken (−1 to all rolls) until you rest under light.
+
+**Suggested skills:** Science, Medicine, Survival, Engineering.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Restorer | +2 to Science to heal or understand a damaged ecosystem. | **Ecological Safeguards.** You won't let a world be poisoned. Accept the fight. |
+| Living Tech | +2 to Engineering with biological or grown technology. | **Sunstarved.** Dark ships and stations drain you. Accept the weakness. |
+| Symbiosis | +2 to Medicine with biotech and alien biology. | **Corporate Enemies.** Mining companies know your face. Accept their lawyers or worse. |
+
+## Draelin
+
+*Tier 1 · 2 Edges · Body −1, Agility +1, Intellect +1, Will −1*
+
+Elongated, six-limbed beings with flexible skeletons and electromagnetic senses, from a world of wild magnetic fields. Their cartographic guilds keep the best corridor charts in known space, and have sold them to both sides of more than one war.
+
+**Species rules:**
+
+- Field sense: feel electromagnetic fields, live wiring and active machinery nearby.
+- Navigation is Trained for free.
+
+**Free skill:** Navigation is always at least Trained and doesn't use a Trained pick.
+
+**Suggested skills:** Navigation, Sensors, Commerce, Piloting.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Guild Charts | +2 to Navigation on charted corridors. | **Sold Out.** Your guild sells your secrets to the other side. Accept the betrayal. |
+| Field Reader | +2 to Sensors to find hidden machinery or follow a power line. | **Public or Private?.** You must decide who gets safe passage. Accept the guild's anger. |
+| Flexible Frame | +2 to Athletics to squeeze through narrow spaces. | **Magnetic Storms.** Strong fields disorient you. Accept the stumble. |
+
+## Joruun
+
+*Tier 1 · 2 Edges · Body +1, Agility −1, Intellect −1, Will +1*
+
+Tall, powerful bipeds with thick skin, sensory ridges and acute hearing, from a cold, storm-wracked world. Their confederation has fought the Hegemony for centuries, built to keep resisting after its leaders fall.
+
+**Species rules:**
+
+- Cold-hardy: cold and storms don't impair you.
+
+**Suggested skills:** Firearms, Leadership, Survival, Sensors.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Keen Hearing | +2 to Sensors by sound. | **The Confederation Calls.** Your league needs you. Accept the call to arms. |
+| Fight On | +2 to Leadership to rally others after a leader falls. | **Old Grudge.** You hate the Hegemony. Accept the reckless choice. |
+| Junction Defender | +2 to Firearms when holding a fortified position. | **Blunt.** You say what you think. Accept the offense. |
 
 ## Kel
 
 *Tier 1 · 2 Edges · Intellect +1, Presence −2, Will +1*
 
-Chitin-plated people raised in great hive-cities, logical, cooperative and unsettled by being alone. Other peoples find Kel hard to read.
+Chitin-plated social beings raised in immense hive-cities, analytical and cooperative. The Kel homeworld is burdened by inherited Tessan debt; their search for new markets triggered humanity's First Contact Crisis. Kel society is split between loyalists, reformers and radicals.
 
-**Suggested skills:** Leadership, Engineering, Computers, Navigation.
+**Species rules:**
 
-| Advantage | Effect | Companion complication |
-|---|---|---|
-| Hive Training | +2 to Leadership when coordinating a group on a single task. | **Alone Is Wrong.** Isolation distresses you. Accept −2 on Will rolls, or a rash choice, when cut off from the crew. |
-| Chitin Plates | +2 to Body to resist being knocked out or stunned. | **Unreadable.** Others can't read your expressions. Accept the misunderstanding when it matters. |
+- Hive-raised: after a day alone, −1 to all rolls until back among others.
+- Hard to read: others take −2 to Psychology to read a Kel's mood.
 
-## Korrin
-
-*Tier 1 · 2 Edges · Body +2, Agility −1, Intellect −1*
-
-Broad, dense people from a heavy-gravity world, enormously strong and nearly as stubborn. Korrin speak bluntly and work hard.
-
-**Suggested skills:** Athletics, Engineering, Close Combat, Survival.
+**Suggested skills:** Science, Commerce, Navigation, Computers.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Heavy-Worlder | +2 to Athletics for feats of raw strength: lifting, forcing, holding. | **Light-Gravity Clumsy.** Normal gravity feels like walking on ice. Accept the stumble or the broken fixture at a bad time. |
-| Thick Hide | +2 to Body to resist crushing, cold and toxins. | **Blunt to a Fault.** Your honesty offends someone who matters. Accept the lost goodwill. |
+| Hive Analysis | +2 to Investigation or Science when working with at least one ally. | **Isolation Dread.** Being cut off from others unnerves you. Accept the panic or the poor choice. |
+| Chemical Signals | +2 to Psychology to read another Kel, or to coordinate a group by scent and posture. | **Every Gift a Contract.** You expect every favor repaid. Accept the misunderstanding it causes. |
+| Debt-Born | +2 to Commerce to find who owes whom. | **The Homeworld's Debt.** Your world's creditors, or its radicals, want your help. Accept the call. |
 
 ## Mirrun
 
 *Tier 1 · 2 Edges · Body −1, Agility +1*
 
-Smooth-skinned amphibians from an ocean world, quick in water and quicker to laugh. Mirrun feel vibrations through their skin.
+Smooth-skinned amphibians from a deep-ocean world, agile swimmers famous for their humor. Their skin detects minute pressure changes; Mirrun researchers lead the field in gravimetric resonance detection.
 
 **Species rules:**
 
-- Amphibious: you breathe water as well as air, and swim as fast as you run.
+- Amphibious: breathe water and swim at running speed; your skin must stay moist (−1 to all rolls after a day dry).
 
-**Suggested skills:** Athletics, Sensors, Life Sciences, Stealth.
+**Suggested skills:** Sensors, Science, Athletics, Diplomacy.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Vibration Sense | +2 to Intellect rolls to sense movement nearby, in the dark or behind you. | **Must Stay Wet.** Dry air sickens you. Without water for a day, accept −2 on physical actions until you soak. |
-| Deep Diver | +2 to Athletics in water and in zero-g. | **Sensitive to Noise.** Loud noise and engine thrum disorient you. Accept −2 on your next action when it hits. |
+| Pressure Sense | +2 to Sensors to feel movement, engines or corridor resonance through a hull or floor. | **Ocean Guardian.** You can't stand by while a sea is poisoned. Accept the fight with the extractors. |
+| Deep Swimmer | +2 to Athletics in water and zero-g. | **Dry Air.** Arid worlds wear you down. Accept the misery. |
+| Disarming Laugh | +2 to Diplomacy to defuse a tense meeting with a joke. | **Can't Stay Serious.** The joke comes out at the wrong moment. Accept the offense. |
+
+## Ommek
+
+*Tier 1 · 2 Edges · Body −2, Agility +1, Intellect +1*
+
+Small, heavily articulated beings with many fine manipulators and exquisite touch, makers of robots, AI and automated ships. Their technocratic republics demand review of every major technology, and their defenses have made conquest too expensive.
+
+**Species rules:**
+
+- Fine manipulators: Engineering is Trained for free.
+
+**Free skill:** Engineering is always at least Trained and doesn't use a Trained pick.
+
+**Suggested skills:** Engineering, Computers, Sensors, Science.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Exquisite Touch | +2 to Engineering for precision work. | **Review Required.** You insist on checking first. Accept the delay. |
+| Robot Maker | +2 to Computers with robots, drones and AI. | **Imperial Interest.** The Hegemony wants your knowledge. Accept the spy or the kidnapper. |
+| Layered Defenses | +2 to Engineering or Computers to secure a position or system. | **Small Frame.** You're easily overpowered. Accept the danger. |
+
+## Shivar
+
+*Tier 1 · 2 Edges · Body −2, Intellect +1, Will +1*
+
+Tall, narrow beings of translucent tissue whose nervous systems share emotions in synchronized pulses. Their theology reads the corridors as cosmic order; their schism, between imperial zealots and moderates who see a universe of change, has fueled wars inside the Hegemony.
+
+**Species rules:**
+
+- Empath: you share emotions instantly with nearby Shivar, and feel the strong emotions of anyone close by. (Empathy, not psionics.)
+
+**Suggested skills:** Psychology, Diplomacy, Science, Leadership.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Deep Empathy | +2 to Psychology to read anyone's feelings nearby. | **Flooded.** Strong emotions around you overwhelm you. Accept the distraction. |
+| Corridor Theology | +2 to Science or Navigation to read meaning in corridor patterns. | **Schism.** Zealots or moderates want you on their side. Accept the pressure. |
+| Pulse of Calm | +2 to Diplomacy to calm a frightened or angry crowd. | **Translucent.** Your feelings show through your skin. Accept the lie that fails. |
 
 ## Tessan
 
-*Tier 1 · 2 Edges · Body +1, Agility −1, Presence −1, Will +1*
+*Tier 1 · 2 Edges · Body +1, Agility −2, Will +1*
 
-Scaled, long-lived traders who carry their families' debts and contracts for generations. A Tessan's word is a contract.
-
-**Suggested skills:** Diplomacy, Deception, Computers, Survival.
-
-| Advantage | Effect | Companion complication |
-|---|---|---|
-| Scaled Hide | +2 to Body to resist heat, radiation and toxic air. | **Cold-Blooded.** Cold slows you down. When it's a real factor, accept −2 on physical actions or stop to warm up. |
-| Shrewd Trader | +2 to Diplomacy when bargaining, buying or selling. | **Debt of Honor.** Your family owes, or is owed. Accept the obligation when it comes due. |
-
-## Vashari
-
-*Tier 1 · 2 Edges · Body −1, Agility −1, Presence +1, Will +1*
-
-Slender, violet-eyed empaths who feel the emotions of everyone nearby. Vashari make gifted diplomats and healers, and hate crowds.
+Large, scaled, exceptionally long-lived beings for whom contractual obligation is the foundation of civilization. Tessan dynasties lend, insure and arbitrate across hundreds of worlds; contact with humanity has split them between traditional creditors and reformers.
 
 **Species rules:**
 
-- Empathy: you feel the strong emotions of anyone within a few steps, without words. Shielded or alien minds may be closed to you.
+- Long-lived: a Tessan remembers deals made before most humans' grandparents were born.
+- Bond: a contract a Tessan swears to is binding in law throughout Tessan space.
 
-**Suggested skills:** Psychology, Diplomacy, Medicine, Life Sciences.
+**Suggested skills:** Commerce, Diplomacy, Psychology, Leadership.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Empathic Read | +2 to Psychology to read someone's feelings face to face. | **Feels Too Much.** Strong emotions nearby overwhelm you. Accept −2 on your next action when rage, terror or grief fill the room. |
-| Calming Presence | +2 to Diplomacy to calm a frightened or angry person. | **Can't Stand Cruelty.** You won't stand by while someone is hurt for sport. Accept the trouble when you intervene. |
+| Ledger Memory | +2 to Commerce to recall a debt, contract or precedent. | **Bound by Contract.** Your word binds you even when it hurts. Accept the cost of keeping it. |
+| Old Scales | Once per scene, a hit that would mark 1 box marks none. | **Slow to Move.** Your bulk and age make haste hard. Accept being left behind or late. |
+| Dynasty Name | +2 to Diplomacy with those who owe your family. | **Family Debts.** Your dynasty's obligations become yours. Accept the duty when it calls. |
+
+## Thrum
+
+*Tier 1 · 2 Edges · Body −1, Agility −1, Presence +1, Will +1*
+
+Broad, soft-bodied beings whose internal cavities make low-frequency resonance; they speak in overlapping harmonies humans can't reproduce. Their acoustic science found the patterns in corridor fluctuations; they refuse to let it become weapons.
+
+**Species rules:**
+
+- Resonance: speak and hear through walls and floors; you need a translator for most other languages.
+
+**Suggested skills:** Sensors, Science, Diplomacy, Navigation.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Echo Sense | +2 to Sensors to map a space or find a void by sound. | **Pacifist Science.** You won't let your work become a weapon. Accept the cost of refusing. |
+| Chorus Voice | +2 to Leadership or Diplomacy addressing a group. | **Lost in Translation.** Translators mangle you. Accept the misunderstanding. |
+| Pattern Listener | +2 to Navigation or Science reading corridor fluctuations. | **Soft Body.** You bruise easily. Accept the injury. |
+
+## Uth
+
+*Tier 1 · 2 Edges · Body +1, Agility −1, Presence −1, Will +1*
+
+Compact, thick-skinned beings with broad manipulators and complex chemical senses, whose civilization the Hegemony destroyed millennia ago. Uth communities live everywhere, keeping family history and memory; many work to reclaim their worlds, many refuse to be defined by loss.
+
+**Species rules:**
+
+- Chemical senses: identify people and substances by scent.
+
+**Suggested skills:** Investigation, Streetwise, Medicine, Diplomacy.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Scent Tracker | +2 to Investigation to track or identify by scent. | **Ancestral Worlds.** The reclamation movement asks your help. Accept the call. |
+| Diaspora Network | +2 to Streetwise to find an Uth community and its help in any port. | **Old Wound.** The Hegemony's name sets you off. Accept the reckless choice. |
+| Family Memory | +2 to Diplomacy using shared history or old obligations. | **Defined by Loss.** Others see only your people's history. Accept the frustration. |
+
+## Uxarra
+
+*Tier 1 · 2 Edges · Agility +1, Presence −1*
+
+Flexible, partly hydrostatic beings whose skin changes color, texture and sheen. Their homeworld's wild climates made them adaptable and self-reliant, and their camouflage has earned them an unfair reputation for deceit.
+
+**Species rules:**
+
+- Chromatic skin: change color and texture at will.
+
+**Suggested skills:** Stealth, Survival, Athletics, Medicine.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Camouflage | +2 to Stealth when still or moving slowly. | **Distrusted.** Others assume you're hiding something. Accept the suspicion. |
+| Adaptable Body | +2 to Survival in extreme or changing environments. | **Restless Home.** You can't settle. Accept the urge to move on. |
+| Rescue Specialist | +2 to Athletics or Medicine to reach and save someone in a disaster. | **Won't Leave Anyone.** You go back for the last one. Accept the risk. |
+
+## Vael
+
+*Tier 1 · 2 Edges · Body −2, Agility +1, Intellect +1*
+
+Long, light-boned beings with four manipulator limbs, born in low gravity. Their homeworld died in an ancient stellar catastrophe; their living fleets now roam the corridors trading, repairing and carrying peoples between systems.
+
+**Species rules:**
+
+- Zero-g native: no penalty in zero gravity.
+- Low-gravity body: −1 to physical rolls in standard gravity without an exo-frame.
+
+**Suggested skills:** Piloting, Engineering, Commerce, Navigation.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Void Dancer | +2 to Athletics and Firearms in zero-g. | **Fleet First.** The flotilla's needs come before yours. Accept the call. |
+| Fleet Trader | +2 to Commerce in flotilla markets and ports. | **Planetbound Misery.** Gravity wells exhaust you. Accept the strain. |
+| Generation Ship Wisdom | +2 to Engineering to keep a habitat or ship running on nothing. | **Suspect Neutrality.** Every side doubts the fleets. Accept the search or the suspicion. |
+
+## Veyari
+
+*Tier 1 · 2 Edges · Body −1, Agility −1, Intellect +2*
+
+Small, six-limbed scholars with soft scales and brains built for associative memory. Their neutral archives hold lost corridor data and ancient claims, which is why empires, corporations and zealots keep trying to seize them.
+
+**Species rules:**
+
+- Associative memory: recall anything you have experienced in detail.
+
+**Suggested skills:** Investigation, Science, Computers, Diplomacy.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Living Archive | +2 to Science or Investigation to recall history, precedent or old data. | **Knowledge Must Survive.** You won't let records be destroyed. Accept the risk to save them. |
+| Archivist's Neutrality | +2 to Diplomacy to be accepted as neutral by both sides. | **Wanted Records.** Someone wants what you remember. Accept the pursuit. |
+| Perfect Detail | +2 to Investigation to spot what changed in a place you've seen before. | **Small and Soft.** You're easy to overpower. Accept the danger. |
 
 ## Ylith
 
 *Tier 1 · 2 Edges · Body −2, Agility +1, Intellect +1*
 
-Feathered, hollow-boned people from a world of sky-cities. Ylith see farther than anyone, glide on their wings, and hate tight spaces.
+Hollow-boned, feathered gliders with broad wing-membranes and extraordinary vision. Their aerial city-states are renowned for navigation and cartography; confined spaces are profoundly uncomfortable for them.
 
 **Species rules:**
 
-- Wings: in standard gravity or less, you can glide down from any height and land safely.
+- Glide: in normal gravity, glide down any height safely.
+- Far sight: see detail at many times human range.
 
-**Suggested skills:** Piloting, Navigation, Sensors, Athletics.
+**Suggested skills:** Navigation, Sensors, Piloting, Athletics.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Keen Eyes | +2 to Intellect rolls to spot detail at a distance. | **Claustrophobic.** Cramped spaces make you panic. Accept −2 on your next action, or refuse to go in. |
-| Flight | Ability: in standard gravity or less and breathable air, fly short distances. Roll Athletics for hard flying. | **Fragile Bones.** Your light bones break easily. When a fall, crush or heavy blow hits you, accept one extra injury box. |
+| Hawk Eye | +2 to Sensors and Firearms at long range. | **Cramped.** Tight spaces unsettle you. Accept −2 or the detour. |
+| Corridor Spotter | +2 to Navigation to find a corridor instruments miss. | **Sky-Proud.** You look down on groundlings. Accept the resentment. |
+| Born Flier | +2 to Piloting in atmosphere. | **Fragile Bones.** Falls and crushes hurt you more. Accept the injury. |
 
-## Drennari
+## Zethri
 
-*Tier 2 · 1 Edge · Body −2, Agility −1, Intellect +1, Will +2*
+*Tier 1 · 2 Edges · Body −1, Agility +1*
 
-Long-lived, pale psionics who remember centuries. Drennari read minds by touch and sometimes glimpse what hasn't happened yet.
+Small, agile, six-limbed beings with broad reflective eyes adapted to dim light. A corridor collapse isolated their colonies for centuries; reconnected, they found strangers who share their name, and now work at reunification.
 
 **Species rules:**
 
-- Mind touch: by touch, roll Will to sense surface thoughts; a resisting mind uses an opposed Will contest. The GM sets the limits before the roll.
+- Dim-adapted: see in near-darkness; −1 to Agility-based rolls in bright light.
 
-**Suggested skills:** Psychology, Diplomacy, Life Sciences, Medicine.
+**Suggested skills:** Engineering, Survival, Stealth, Diplomacy.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Deep Touch | Ability: by touch, roll Will to share memories with a willing or restrained mind. You learn only what they know. | **Echoes.** Fragments of other minds linger. Accept −2 on your next Will roll, or an unfamiliar emotion, at a time that matters. |
-| Foresight | Ability: once per session, ask the GM one yes-or-no question about the next hour, and get a true answer. | **Visions.** Visions come unbidden. Accept losing your next action when one strikes at a bad time. |
+| Dark Eyes | +2 to Sensors and Stealth in darkness. | **Glare.** Bright light blinds you at the worst moment. Accept the stumble. |
+| Built to Last | +2 to Engineering or Survival to make a place self-sufficient. | **Many Zethri.** Your cluster's factions disagree about you. Accept the dispute. |
+| Reunifier | +2 to Diplomacy to bridge strangers who share a history. | **Distrust of Chokepoints.** You won't rely on one route. Accept the detour. |
 
-## Synth
+## Zhaq
 
-*Tier 2 · 1 Edge · Body +1, Intellect +2, Presence −2, Will −1*
+*Tier 1 · 2 Edges · Body −1, Agility +1, Presence −1, Will +1*
 
-Free artificial minds in synthetic bodies. The Concord recognized Synths as people only a generation ago, and not everyone agrees.
+Flexible, tripedal beings with segmented limbs and three independently focusing eyes. Isolated for six centuries by a corridor collapse, the Zhaq built free republics, and refused when the Hegemony came back. Their resistance inspires separatists everywhere.
 
 **Species rules:**
 
-- Synthetic: you don't breathe, eat or sleep, and disease and poison don't affect you. Medicine can't treat you; Engineering repairs you instead, by the same rules.
-- Computers is always at least Trained, free.
+- Three eyes: watch several directions at once.
+- Torpor: slow your metabolism to outlast cold, hunger or entombment for weeks.
 
-**Free skill:** Computers is always at least Trained and doesn't use a Trained pick.
-
-**Suggested skills:** Computers, Engineering, Physical Sciences, Sensors.
+**Suggested skills:** Sensors, Stealth, Survival, Firearms.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Perfect Recall | +2 to Intellect rolls to recall exactly something you have seen, heard or read. | **Uncanny.** People distrust a machine that thinks. Accept the suspicion or the refusal. |
-| Direct Interface | Ability: by touch, link to a computer and roll Computers without a console. | **Hackable.** Intrusion attacks can reach you. When a hostile system fights back, accept the glitch. |
+| Triple Watch | +2 to Sensors to keep watch or spot an ambush. | **Never Again.** You won't submit to an empire's demand. Accept the fight. |
+| Long Sleep | +2 to Survival to endure deprivation in torpor. | **Separatist Symbol.** Your face means rebellion to the Hegemony. Accept the attention. |
+| Segmented Limbs | +2 to Athletics to squeeze, climb or balance. | **Six Centuries Behind.** Imperial customs you never learned trip you up. Accept the gaffe. |
 
-## Vorr
+## Dresh
 
-*Tier 2 · 1 Edge · Body −1, Agility +1, Presence +1, Will −1*
+*Tier 2 · 1 Edge · Body +2, Agility −1, Intellect −1*
 
-Shapeshifters who can wear any face, and who have a war shape of claws and armored hide. The Hegemony hunts them; the Concord doesn't trust them.
-
-**Alternate form:** Body +2; Agility +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer. **Drawbacks:** Unmistakably alien: anyone who sees it knows what you are.
-
-**Suggested skills:** Deception, Stealth, Close Combat, Psychology.
-
-| Advantage | Effect | Companion complication |
-|---|---|---|
-| Mimic | Ability: after studying someone for a scene, take on their face and voice. Roll Deception to pass as them. | **Identity Drift.** Wear a face too long and you start to become them. Accept the slip when it matters. |
-| Fluid Body | +2 to Athletics to squeeze through gaps or slip bonds. | **Hunted by Purists.** Hegemony purists hunt your kind. Accept the danger when they find you. |
-
-## Aethari
-
-*Tier 3 · 0 Edges · Body −2, Agility −1, Presence +1, Will +2*
-
-Beings of living light who walk among others in sealed containment suits. Unsuited, an Aethari blazes like a star, and burns.
+Dense, four-armed soldiers from a high-gravity world, armored in thick hide. Dresh legions were the Hegemony's ground forces for millennia; now their protectorates argue whether soldiers owe the throne, their commanders, or the people they protect.
 
 **Species rules:**
 
-- Containment suit: you live in a sealed suit. Out of it you're in your alternate form, and mark a box each hour that rest can't clear until you return.
-- Light burst: in your alternate form, roll Will; everyone nearby rolls Body −2 or loses their next action, blinded.
+- Four arms: hold a weapon and still climb, carry or work.
+- Dermal armor: once per fight, a hit marks one fewer box.
+- Heavy-world: −1 to physical rolls in low gravity without boots or a frame.
 
-**Alternate form:** Agility +2; Dodge +1; Touch burns: marks 2 boxes; Tough: hits of 2+ boxes mark one fewer. **Drawbacks:** Blazing: no Stealth at all; Fading: a box an hour outside the suit.
-
-**Suggested skills:** Physical Sciences, Sensors, Diplomacy, Psychology.
+**Suggested skills:** Firearms, Close Combat, Athletics, Leadership.
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Starborn Senses | +2 to Sensors or Intellect rolls to sense energy, power sources and radiation. | **Alien Mind.** You think in ways others can't follow. Accept the misunderstanding when it matters. |
-| Light of Life | Ability: in your alternate form, roll Will to clear one injury box from someone you touch, once per scene. | **Fragile Suit.** Your suit can fail. When a hit or a hazard threatens it, accept the breach. |
+| Legion Drill | +2 to Firearms or Close Combat fighting beside an ally. | **Whose Soldier?.** Old loyalties pull at you. Accept the conflict of duty. |
+| Four-Armed Grip | +2 to Close Combat to grapple or hold. | **Imperial Habits.** Orders come easier than choices. Accept the mistake of obeying. |
+| Heavy-World Build | +2 to Body rolls to resist injury, fatigue or crushing force. | **Deserter's Mark.** The Hegemony keeps lists. Accept the bounty hunter. |
+
+## Eshuum
+
+*Tier 2 · 1 Edge · Body −1, Intellect +1, Presence −1, Will +1*
+
+Colonial organisms: an Eshuum person is a community of semi-independent biological units joined into one mind. They govern by consensus, and oppose forced separation and experiments on intelligent beings.
+
+**Species rules:**
+
+- Detachable units: send a small unit to scout a short distance; it reports what it senses.
+- Many bodies: once per fight, a hit that would mark 2 or more boxes marks one fewer as units are lost.
+
+**Suggested skills:** Science, Medicine, Diplomacy, Sensors.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Scout Units | +2 to Sensors or Stealth using a detached unit. | **Never Divided.** Forced separation is horror to you. Accept the risk to prevent it. |
+| Consensus Mind | +2 to Psychology to find what a group truly agrees on. | **Research Target.** Hegemony researchers want specimens. Accept the danger. |
+| Redistribute | +2 to Engineering or Medicine by reshaping units into fine tools. | **Slow to Decide.** You must reach inner consensus. Accept the delay. |
+
+## Khaum
+
+*Tier 2 · 1 Edge · Body +2, Agility −2, Presence −1, Will +1*
+
+Massive, eyeless burrowers with sensory whiskers and powerful digging limbs, whose cavern nations run for hundreds of kilometers underground. Cautious and long-planning, they have sheltered refugees from many Hegemony campaigns.
+
+**Species rules:**
+
+- Eyeless: perceive by pressure and vibration; darkness means nothing, but you can't read screens or print without aids.
+- Burrower: dig through earth and soft rock.
+- Massive: −2 to Stealth; most doors are too small.
+
+**Suggested skills:** Engineering, Science, Survival, Athletics.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Seismic Sense | +2 to Sensors to feel movement, footsteps or tunnels through the ground. | **Wary of the Open.** Open skies and unfamiliar places unsettle you. Accept the hesitation. |
+| Deep Digger | +2 to Athletics to dig, break or brace rock. | **Refuge Keeper.** You shelter the hunted. Accept the danger they bring. |
+| Long Planner | +2 to Engineering when you have time to plan. | **Distrusts Protectors.** You refuse protection that demands obedience. Accept the cost. |
+
+## Ozhvek
+
+*Tier 2 · 1 Edge · Body +2, Agility −2, Presence −1, Will +1*
+
+Massive, radially symmetrical founders of the Hegemony, on six powerful limbs, with sensory clusters all around their upper bodies and lifespans near five centuries. Their ancient houses are divided over what the empire should become.
+
+**Species rules:**
+
+- All-around senses: you can't be surprised from behind.
+- Massive: most ships, doors and furniture are too small; −2 to Stealth.
+
+**Suggested skills:** Leadership, Diplomacy, Firearms, Psychology.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Imperial House | +2 to Leadership with Hegemony subjects and soldiers. | **Hated Founders.** Every former subject remembers the empire. Accept the hostility. |
+| Living Bulwark | Once per fight, a hit that would mark 2 or more boxes marks one fewer. | **Too Big to Hide.** You are always noticed. Accept the attention. |
+| Hundred Eyes | +2 to Sensors and Investigation to notice anything in a room. | **House Politics.** Your house wants something of you. Accept the summons. |
+
+## Qor
+
+*Tier 2 · 1 Edge · Body +2, Agility −2, Intellect +1, Presence −1*
+
+Silicon-based beings of slowly growing crystal with distributed nervous systems, speaking by electromagnetic and mechanical oscillation. Masters of materials and computation, the Qor take Tessan capital but refuse debts that threaten sovereignty.
+
+**Species rules:**
+
+- Crystalline: immune to vacuum, toxins and disease; you need a translator to speak with most species.
+- Slow time sense: −1 to Psychology with fast-living peoples.
+
+**Suggested skills:** Engineering, Science, Computers, Commerce.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Materials Mastery | +2 to Engineering with materials, armor and hull structures. | **Sovereign.** You won't accept terms that bind your world. Accept the lost deal. |
+| Crystal Mind | +2 to Computers for long calculations. | **Alien Time.** You misjudge how quickly others act. Accept the delay. |
+| Unbreakable | +2 to Survival in vacuum and extreme environments. | **Mineral Wealth.** Prospectors eye your homeworld. Accept the confrontation. |
+
+## Sen
+
+*Tier 2 · 1 Edge · Agility −2, Intellect +1, Presence −1, Will +2*
+
+Compact, slow-moving beings in layered mineral shells who live more than a thousand years. Their experiments have run for centuries; they have watched empires rise and fall, and their warnings about corridor instability carry great weight.
+
+**Species rules:**
+
+- Shell: once per fight, a hit marks one fewer box.
+- Slow: you always act last in a fight.
+
+**Suggested skills:** Science, Investigation, Navigation, Psychology.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Patient Observer | +2 to Science or Investigation when you take your time. | **Out of Step.** You think in decades. Accept being too late. |
+| Ancient Records | +2 to Navigation to predict corridor behavior. | **Reluctant to Intervene.** You'd rather observe than act. Accept the cost of waiting. |
+| Unhurried | +2 to Will to stay calm under fear, pressure or torture. | **Shell-Slow.** You can't run. Accept being caught. |
 
 # Making your own
 
-The roles and species in this book are a starting point, not a limit. With the GM's agreement, any player can create their own role or species. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
+The callings and species in this book are a starting point, not a limit. With the GM's agreement, any player can create their own calling or species. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
 
-## A custom role
+## A custom calling
 
-A role is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
+A calling is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
 
-1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the roles above: *"Salvager: strips wrecks for parts, and knows which ones should have stayed dead."*
-2. **Choose a group.** Pick the one it belongs with: Command, Science or Operations. The group only sets your sheet's colors and emblem.
-3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in roles do this for you); they count toward your normal Trained skills.
-4. **Check it with the GM.** It should fit the setting and overlap the existing roles as little as possible.
+1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the callings above: *"Courier: carries what can't be sent by signal, through corridors no one else will fly."*
+2. **Choose a group.** Pick the one it belongs with: Commerce, Frontier, Service or Trouble. The group only sets your sheet's colors and emblem.
+3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in callings do this for you); they count toward your normal Trained skills.
+4. **Check it with the GM.** It should fit the setting and overlap the existing callings as little as possible.
 
-**In the creator:** in step 1, choose **Custom role…** at the end of the Role list, then enter its name and group. Write the description in *What you bring*.
+**In the creator:** in step 1, choose **Custom calling…** at the end of the Calling list, then enter its name and group. Write the description in *What you bring*.
 
 ## A custom species
 
@@ -829,7 +1715,7 @@ If the species changes shape, give the form attribute bonuses (usually +2 to one
 
 ### Example
 
-**Lumari (tier 1).** Small, luminous people from a world of endless night, who glow when they feel strongly. *Adjustments:* Agility +1, Body −1. *Core rule:* dark-adapted: you see in near-darkness, but bright light dazzles you (−1 to Agility-based rolls). *Species advantage:* **Night Eyes**: +2 to Sensors with passive scans and your own eyes in darkness. *Companion:* **Heart on Your Skin**: your glow shows what you feel; when it matters, accept the lie that fails or the hiding place that lights up.
+**Rhessk (tier 1).** Small, quick, burrow-dwelling traders from a moon of the Tessan core worlds, long-time clients of the dynasties. *Adjustments:* Agility +1, Presence +1, Body −2. *Core rule:* night-adapted: see in near-darkness, −1 in bright light. *Species advantage:* **Tunnel-Runner**: +2 to Athletics in tight spaces. *Companion:* **Client People**: your family's dynasty calls on you; accept the errand.
 
 # Complications
 
@@ -837,26 +1723,29 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 | Complication | What it does |
 |---|---|
-| Cannot Leave a Mystery Alone | A strange reading or discovery tempts you to linger, spend something scarce, or take a risky look. Accept a specific cost. |
-| Protects Others at Personal Risk | You shield someone or volunteer for a hazardous rescue at a real cost to yourself. |
-| Duty Before Self | You put the job ahead of exhaustion, injury or a personal need. Accept a concrete setback. |
-| Conscience Above Orders | An order conflicts with your ethics. Accept the delay, challenge or consequence of refusing it. |
-| By the Book | You insist on procedure when improvising would be faster. Accept the lost time or opportunity. |
-| Distrusts Authority | A troubling order makes you demand answers at a critical moment. Accept the delay or strain. |
-| Reputation to Uphold | Pride tempts you to refuse help or take on too much. Take a real consequence when it matters. |
-| Haunted by the War | A reminder of the war with the Hegemony causes hesitation or a hard choice. Define the reminder together. |
-| Uneasy Around Telepaths | You resist a mind touch or psionic help that could solve the problem. Accept the cost. |
-| Culture Shock | Your customs clash with a local practice. Accept the misunderstanding or lost opportunity. |
-| Old Rival | A recurring rival complicates your work with concrete problems. |
-| Someone Back Home | A family or a love pulls you away from the work. |
-| Wanted | There's a price on your head somewhere. Accept trouble when bounty hunters or the law come. |
-| Owes the Wrong People | A debt to dangerous people comes due. Accept their demand. |
-| Keeps a Dangerous Secret | An agreed secret threatens trust or safety. Earn a point when protecting or revealing it has a real consequence. |
-| Reluctant to Kill | You set the blaster to stun even when it costs you. Accept the extra danger. |
+| Debt-Bound | You owe a dynasty, a bank or a syndicate. Accept the collector's demand. |
+| Unregistered | You're a psionic who has never been tested, or has a forged result. Accept the danger at every screening and checkpoint. |
+| Wanted | A government, house or corporation wants you. Accept the hunters. |
+| Hegemony Bounty | An imperial house has put a price on you. Accept the bounty hunter. |
+| Implant Upkeep | Your implants need parts, power and care. Accept the cost or the malfunction. |
+| Idealist | You won't compromise your principles. Accept the cost of keeping them. |
+| Greedy | You can't walk away from profit. Accept the risk to grab it. |
+| Old Rival | Someone is always a step ahead or behind you. Accept their interference. |
+| Corporate Leash | Your employer owns your contract. Accept the order you don't like. |
+| Honor-Bound | You keep your word, your oaths and your people's customs. Accept the setback. |
+| Survivor's Guilt | You lived when others didn't. Accept the reckless choice to make it right. |
+| Can't Leave a Mystery Alone | A strange signal or ruin pulls you in. Accept the detour or the danger. |
+| Protects Others | You shield the weak at your own risk. Accept the cost. |
+| Stim Habit | You lean on combat stims or calm-patches. Accept the craving or the crash. |
+| Exile | You can't go home. Accept the scorn or the hunters of your own people. |
+| Dangerous Knowledge | You know a corridor, a crime or a name someone would kill to bury. Accept the danger. |
+| Reckless | You jump first and think later. Accept the danger. |
+| Distrusts AI | You won't trust a machine mind. Accept the cost of refusing its help. |
+| Culture Shock | You misread other peoples' customs. Accept the misunderstanding. |
 
 # Quick reference
 
-**Creation:** attributes start at 10, adjusted by species (always totaling zero), plus 5 points; maximum 13 plus any species bonus. 3 points split between species tier and Edges. Officer: one Specialty and nine Trained. Specialist: one Expert at +5 and seven Trained. One advantage (general or species) and one complication; an optional Allegiance.
+**Creation:** attributes start at 10, adjusted by species (always totaling zero), plus 5 points; maximum 13 plus any species bonus. 3 points split between species tier and Edges. Generalist: one Specialty and nine Trained. Specialist: one Expert at +5 and seven Trained. One advantage (general or species) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Specialist) = attribute +5.
 
@@ -876,20 +1765,20 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 # Discord commands
 
-The table's Discord bot rolls the dice and keeps the shared Resolve points, clocks and Ship status tracks for the server. Type `/` in a channel to see the commands; Discord shows each option as you fill it in. The bot doesn't know your sheet, so you give it the target number.
+The table's Discord bot rolls the dice and keeps the shared Resolve points, clocks and Debt, Heat and Reputation tracks for the server. Type `/` in a channel to see the commands; Discord shows each option as you fill it in. The bot doesn't know your sheet, so you give it the target number.
 
 ## For players
 
 | Command | What it does |
 |---|---|
 | `/roll target:14 modifier:-2 label:Piloting` | Roll 3d6 under your target. Use the number from your sheet, and add up every modifier yourself: circumstance, injury, assistance. The bot shows the result, the margin and your chance. **Spend a Resolve point to reroll** lets you reroll once, and the second result stands. |
-| `/contest target:14 opponent:12 opponent_name:"Hegemony trooper" label:Grapple` | An opposed roll. The bot rolls both sides and names the winner. Ties and double failures go to the defender, which is the opponent unless you add `defender:me`. |
-| `/assist target:12 helper_target:14 helper:@name label:"Reroute power"` | Someone helps you. They roll first (Engineering, say): success gives +1, success by 5 or more +2, and a natural 18 brings a complication. Then you roll with their bonus. |
+| `/contest target:14 opponent:14 opponent_name:"Hegemony legionary" label:Grapple` | An opposed roll. The bot rolls both sides and names the winner. Ties and double failures go to the defender, which is the opponent unless you add `defender:me`. |
+| `/assist target:12 helper_target:14 helper:@name label:"Crack the station lock"` | Someone helps you. They roll first (Computers, say): success gives +1, success by 5 or more +2, and a natural 18 brings a complication. Then you roll with their bonus. |
 | `/points show` | Your Resolve points this session. Add `player:@name` to see someone else's. |
 | `/points spend` | Spend a Resolve point without rolling, e.g. to reduce an injury by one box or to establish a small preparation. |
 | `/points gain` | Gain a Resolve point, e.g. when you accept a complication the GM offers. With Extra Resolve, use it once at the start of a session. |
 | `/clock show` | Every clock the GM is running. |
-| `/track show` | The shared Ship status tracks (Shields, Hull, Weapons, Engines, Sensors, Comms, Life support) and what each one means right now. |
+| `/track show` | The shared Debt, Heat and Reputation tracks (Debt, Heat, Reputation) and what each one means right now. |
 
 Only the player who rolled can press the reroll button. Rolls that miss by 1 or 2 remind the GM that success at a cost is on offer.
 
@@ -905,7 +1794,7 @@ GM commands need the **Manage Server** permission on the Discord server. Everyon
 | `/points set player:@name points:3` | Correct a player's total. |
 | `/clock new name:"The corridor network shifts" segments:8 kind:danger` | Start a clock of 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; use `kind:progress` for one that fills on successes. |
 | `/clock tick name:"The corridor network shifts"` | Fill one segment. Add `segments:2` for two, or `segments:-1` to undo. `/clock remove` deletes a clock. |
-| `/track mark name:shields` | Mark a box on a track; a partial name works ("shields" finds Shields). `/track clear` clears one, and `/track reset` clears them all. |
+| `/track mark name:heat` | Mark a box on a track; a partial name works ("heat" finds Heat). `/track clear` clears one, and `/track reset` clears them all. |
 | `/seed` | Roll an adventure seed: one line from each seed table, and the command to start its ticking clock. |
 | `/contest ... defender:me` | When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them. |
 

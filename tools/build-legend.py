@@ -21,7 +21,7 @@ ATTRS = ["Body", "Agility", "Intellect", "Presence", "Will"]
 LEVEL_MOD = {"U": -4, "T": 1, "S": 3}
 
 DEFAULT_TERMS = {
-    "title": "Legend Dynamics", "eyebrow": "Legend Dynamics RPG system", "prepareTitle": "Prepare", "guideTitle": "Legend Dynamics Core Rules",
+    "title": "Legend Dynamics", "eyebrow": "Legend Dynamics RPG system", "prepareTitle": "Prepare", "titlePlaceholder": "e.g. Captain", "guideTitle": "Legend Dynamics Core Rules",
     "guideSubtitle": "The setting-neutral rules of the Legend Dynamics RPG system", "point": "Legend",
     "role": "Role", "roleLower": "role", "origin": "Origin", "originLower": "origin", "originPlural": "Origins",
     "pathRounded": "Generalist", "pathExpert": "Specialist", "pathExpertPlural": "Specialists",

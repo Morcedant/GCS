@@ -2,62 +2,65 @@
  "id": "spaceopera",
  "terms": {
   "title": "Fracture Lines",
-  "eyebrow": "Legend Dynamics · Space opera",
+  "eyebrow": "Legend Dynamics · Science fiction",
   "guideTitle": "Fracture Lines Players' Guide",
-  "guideSubtitle": "A space opera setting for the Legend Dynamics RPG system",
+  "guideSubtitle": "Science fiction for the Legend Dynamics RPG system",
   "point": "Resolve",
-  "role": "Role",
-  "roleLower": "role",
+  "role": "Calling",
+  "roleLower": "calling",
   "origin": "Species",
   "originLower": "species",
   "originPlural": "Species",
   "originPluralLower": "species",
-  "pathRounded": "Officer",
+  "pathRounded": "Generalist",
   "pathExpert": "Specialist",
   "pathExpertPlural": "Specialists",
-  "reasonLabel": "Why you fly",
-  "reasonSheet": "Why I fly",
-  "gear": "Equipment",
-  "gearLower": "equipment",
-  "tabPlay": "Bridge",
-  "readyText": "Cleared for duty",
+  "reasonLabel": "Why you're out here",
+  "reasonSheet": "Why I'm out here",
+  "gear": "Gear",
+  "gearLower": "gear",
+  "tabPlay": "Play",
+  "readyText": "Ready to go",
   "stun": "Stunned",
   "medkit": "medkit",
-  "facility": "An equipped sickbay",
+  "facility": "A clinic with a biotech suite",
   "restText": "full day",
-  "mission": "Mission",
-  "missionLower": "mission",
-  "missionsChapter": "Running missions",
-  "journal": "Ship's log",
-  "journalIntro": "Write it together at the end of a mission. Advancements apply to the GM's copies; use each card's Save character file to send a player their update.",
-  "journalTitlePlaceholder": "e.g. The derelict at Kessa's Reach",
-  "journalDateLabel": "Log date",
-  "weaponsTitle": "Blaster charge",
-  "ammo": "charge",
-  "ammoOne": "charge",
-  "shot": "Setting",
-  "spent": "used",
-  "sparesLabel": "Spare power cells",
-  "reload": "Swap in a spare cell",
-  "reloadDone": "Fresh power cell in: full charge.",
-  "restock": "Recharge aboard ship",
-  "restockDone": "Recharged aboard ship: full charge.",
-  "emptyNote": "Drained: it won't fire until recharged or given a fresh cell.",
-  "otherWeapon": "Ship's guns or another weapon (no charge)",
-  "tracksTitle": "Ship status",
-  "tracksIntro": "Shields take hits first; then the Hull and a system (1d6: Weapons, Engines, Sensors, Comms, Life support, GM's choice). Tap a box to mark or clear it.",
-  "tracksReset": "Full repair (in dock)",
-  "exampleName": "example science officer",
+  "mission": "Job",
+  "missionLower": "job",
+  "missionsChapter": "Running jobs and missions",
+  "prepareTitle": "Gear up",
+  "journal": "Crew log",
+  "journalIntro": "Write it together at the end of a job or mission. Advancements apply to the GM's copies; use each card's Save character file to send a player their update.",
+  "journalTitlePlaceholder": "e.g. The Kessa Reach salvage",
+  "journalDateLabel": "Date (Concord calendar)",
+  "journalExtraLabel": "",
+  "journalExtraPlaceholder": "",
+  "weaponsTitle": "Weapon and ammunition",
+  "ammo": "shots",
+  "ammoOne": "shot",
+  "shot": "Fire",
+  "spent": "fired",
+  "sparesLabel": "Spare magazines or cells",
+  "reload": "Reload (one action)",
+  "reloadDone": "Reloaded. That took your action.",
+  "restock": "Restock at a port",
+  "restockDone": "Restocked at a port: full load.",
+  "emptyNote": "Empty: it won't fire until you reload or recharge.",
+  "otherWeapon": "Another weapon (nothing spent)",
+  "tracksTitle": "Debt, Heat and Reputation",
+  "tracksIntro": "Shared by the whole crew. Borrowing, breaking the law, psionic slips and fame can mark a box; paying up, lying low and quiet work can clear one between jobs.",
+  "tracksReset": "Clear every track",
+  "exampleName": "example broker",
   "formToggle": "In alternate form",
   "formName": "alternate form",
   "formProfile": "Alternate form",
-  "formCoreSummary": "Shapeshifting rules: changing is a free action; strong emotion can force it (Will roll); the alternate form's profile applies while changed",
-  "rangedSkill": "Blasters",
+  "formCoreSummary": "",
+  "rangedSkill": "Firearms",
   "meleeSkill": "Close Combat",
   "unarmedSkill": "Close Combat",
   "chaseSkill": "Piloting",
   "fontsHref": "https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600&family=Exo+2:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap",
-  "prepareTitle": "Prepare for the mission"
+  "titlePlaceholder": "e.g. Free trader"
  },
  "theme": {
   "comment": "A starship console: dark glass panels with cyan rules over a slow starfield.",
@@ -75,125 +78,253 @@
  ],
  "groups": [
   {
-   "id": "command",
-   "name": "Command",
+   "id": "commerce",
+   "name": "Commerce",
    "color": "--gold",
-   "emblem": "M50.0 23.0 L56.5 41.1 L75.7 41.7 L60.5 53.4 L65.9 71.8 L50.0 61.0 L34.1 71.8 L39.5 53.4 L24.3 41.7 L43.5 41.1 Z",
-   "stroke": false
-  },
-  {
-   "id": "science",
-   "name": "Science",
-   "color": "--blue",
-   "emblem": "M50 44 A6 6 0 1 0 50.01 44 Z M26 62 C22 46 64 30 73 44 C80 58 38 78 26 62 Z",
+   "emblem": "M50 22 L74 50 L50 78 L26 50 Z M50 36 L62 50 L50 64 L38 50 Z",
    "stroke": true
   },
   {
-   "id": "operations",
-   "name": "Operations",
-   "color": "--red",
-   "emblem": "M28 68 L50 26 L72 68 L50 56 Z",
+   "id": "frontier",
+   "name": "Frontier",
+   "color": "--blue",
+   "emblem": "M50 20 L58 50 L50 80 L42 50 Z M20 50 L50 42 L80 50 L50 58 Z",
    "stroke": false
+  },
+  {
+   "id": "service",
+   "name": "Service",
+   "color": "--good",
+   "emblem": "M43 24 L57 24 L57 43 L76 43 L76 57 L57 57 L57 76 L43 76 L43 57 L24 57 L24 43 L43 43 Z",
+   "stroke": false
+  },
+  {
+   "id": "trouble",
+   "name": "Trouble",
+   "color": "--red",
+   "emblem": "M50 26 A24 24 0 1 0 50.01 26 M50 18 L50 38 M50 62 L50 82 M18 50 L38 50 M62 50 L82 50",
+   "stroke": true
   }
  ],
  "roles": [
   {
-   "name": "Captain",
-   "group": "command",
-   "text": "Captain: commands the ship and crew, and makes the decisions no one else wants to.",
+   "name": "Trader",
+   "group": "commerce",
+   "text": "Trader: buys low and sells across a dozen systems; knows what everything is worth, and to whom.",
    "skills": [
+    "Commerce",
+    "Diplomacy",
+    "Psychology",
+    "Piloting"
+   ]
+  },
+  {
+   "name": "Broker",
+   "group": "commerce",
+   "text": "Broker: finances ventures, buys and restructures debt, and writes the contracts everyone else signs.",
+   "skills": [
+    "Commerce",
+    "Psychology",
+    "Deception",
+    "Computers"
+   ]
+  },
+  {
+   "name": "Corporate Agent",
+   "group": "commerce",
+   "text": "Corporate agent: represents a company's interests far from head office, with its money and its orders.",
+   "skills": [
+    "Commerce",
     "Leadership",
     "Diplomacy",
+    "Firearms"
+   ]
+  },
+  {
+   "name": "Smuggler",
+   "group": "commerce",
+   "text": "Smuggler: moves what the Accord taxes, forbids or would rather not know about.",
+   "skills": [
     "Piloting",
-    "Blasters"
+    "Deception",
+    "Streetwise",
+    "Stealth"
+   ]
+  },
+  {
+   "name": "Explorer",
+   "group": "frontier",
+   "text": "Explorer: goes first into uncharted corridors and unclaimed worlds.",
+   "skills": [
+    "Navigation",
+    "Survival",
+    "Science",
+    "Sensors"
    ]
   },
   {
    "name": "Pilot",
-   "group": "command",
-   "text": "Pilot: flies the ship and its shuttles through anything, at any speed, on a dare.",
+   "group": "frontier",
+   "text": "Pilot: flies anything, through anything, and gets paid for the impossible run.",
    "skills": [
     "Piloting",
     "Navigation",
+    "Engineering",
+    "Sensors"
+   ]
+  },
+  {
+   "name": "Prospector",
+   "group": "frontier",
+   "text": "Prospector: finds the ore, the ruins or the claim that makes a fortune, then has to keep it.",
+   "skills": [
+    "Science",
+    "Sensors",
+    "Survival",
+    "Engineering"
+   ]
+  },
+  {
+   "name": "Salvager",
+   "group": "frontier",
+   "text": "Salvager: strips wrecks and dead stations, and knows which ones should have stayed dead.",
+   "skills": [
+    "Engineering",
+    "Sensors",
+    "Athletics",
+    "Computers"
+   ]
+  },
+  {
+   "name": "AI Minder",
+   "group": "frontier",
+   "text": "AI minder: bonded to a personal AI with a mind of its own, and trained to handle other AIs, from corporate systems to rogue minds.",
+   "skills": [
+    "Computers",
+    "Psychology",
     "Sensors",
     "Engineering"
    ]
   },
   {
-   "name": "Diplomat",
-   "group": "command",
-   "text": "Diplomat: speaks for the crew to governments, warlords and strangers, and keeps the peace when it can be kept.",
-   "skills": [
-    "Diplomacy",
-    "Psychology",
-    "Deception",
-    "Communications"
-   ]
-  },
-  {
    "name": "Scientist",
-   "group": "science",
-   "text": "Scientist: reads the anomaly, explains it to the captain, and wants to get closer.",
+   "group": "frontier",
+   "text": "Scientist: studies what no one understands yet (alien biology, corridor physics, Hegemony ruins) for whoever funds it.",
    "skills": [
+    "Science",
     "Sensors",
-    "Physical Sciences",
-    "Life Sciences",
-    "Computers"
+    "Computers",
+    "Investigation"
    ]
   },
   {
    "name": "Medic",
-   "group": "science",
-   "text": "Medic: patches up the crew, from a medkit on a hostile world to surgery in sickbay.",
+   "group": "service",
+   "text": "Medic: relief and field medicine, from refugee camps to the war's back lines.",
    "skills": [
     "Medicine",
-    "Life Sciences",
+    "Science",
     "Psychology",
-    "Sensors"
+    "Survival"
    ]
   },
   {
-   "name": "Navigator",
-   "group": "science",
-   "text": "Navigator: plots the jump, finds the way through, and knows where the ship is when no one else does.",
+   "name": "Liaison",
+   "group": "service",
+   "text": "Liaison: speaks for the Accord, a world or a company between peoples who misunderstand each other.",
    "skills": [
-    "Navigation",
-    "Sensors",
-    "Piloting",
-    "Computers"
+    "Diplomacy",
+    "Psychology",
+    "Commerce",
+    "Leadership"
    ]
   },
   {
-   "name": "Engineer",
-   "group": "operations",
-   "text": "Engineer: keeps the engines running and the lights on, and improvises when the parts run out.",
+   "name": "Missionary",
+   "group": "service",
+   "text": "Missionary: carries a faith, a cause or a charity to people who didn't ask, and sometimes needed it.",
    "skills": [
-    "Engineering",
+    "Diplomacy",
+    "Leadership",
+    "Medicine",
+    "Survival"
+   ]
+  },
+  {
+   "name": "Journalist",
+   "group": "service",
+   "text": "Journalist: asks the questions, follows the money, and broadcasts what the powerful wanted hidden.",
+   "skills": [
+    "Investigation",
+    "Psychology",
     "Computers",
-    "Physical Sciences",
-    "Sensors"
-   ]
-  },
-  {
-   "name": "Security",
-   "group": "operations",
-   "text": "Security: first through the airlock, last to leave, and the one who decides when the blaster stays on stun.",
-   "skills": [
-    "Blasters",
-    "Close Combat",
-    "Athletics",
     "Stealth"
    ]
   },
   {
-   "name": "Comms",
-   "group": "operations",
-   "text": "Comms officer: opens the channel, breaks the code, and hears what a signal is really saying.",
+   "name": "Cyberneticist",
+   "group": "service",
+   "text": "Cyberneticist: designs, installs and repairs implants; part surgeon, part engineer, often working where the law can't see.",
    "skills": [
-    "Communications",
+    "Medicine",
+    "Engineering",
     "Computers",
-    "Diplomacy",
-    "Sensors"
+    "Science"
+   ]
+  },
+  {
+   "name": "Mercenary",
+   "group": "trouble",
+   "text": "Mercenary: a professional soldier for the war's endless contracts, or anyone else who pays.",
+   "skills": [
+    "Firearms",
+    "Close Combat",
+    "Athletics",
+    "Leadership"
+   ]
+  },
+  {
+   "name": "Investigator",
+   "group": "trouble",
+   "text": "Investigator: finds people, solves crimes and recovers stolen assets, for the law or for hire.",
+   "skills": [
+    "Investigation",
+    "Psychology",
+    "Streetwise",
+    "Firearms"
+   ]
+  },
+  {
+   "name": "Fixer",
+   "group": "trouble",
+   "text": "Fixer: knows who can get anything done, and takes a cut of every introduction.",
+   "skills": [
+    "Streetwise",
+    "Commerce",
+    "Deception",
+    "Diplomacy"
+   ]
+  },
+  {
+   "name": "Hacker",
+   "group": "trouble",
+   "text": "Hacker: breaks into systems, ledgers and AIs; every network is a door.",
+   "skills": [
+    "Computers",
+    "Stealth",
+    "Investigation",
+    "Engineering"
+   ]
+  },
+  {
+   "name": "Augment",
+   "group": "trouble",
+   "text": "Augment: rebuilt with implants (soldier, laborer or thrill-seeker); the body is the tool, and its upkeep and stigma are the problem.",
+   "skills": [
+    "Athletics",
+    "Close Combat",
+    "Firearms",
+    "Engineering"
    ]
   }
  ],
@@ -201,117 +332,114 @@
   [
    "Leadership",
    "Presence",
-   "Coordinate people and give clear orders"
+   "Command, rally, coordinate a crew"
   ],
   [
    "Diplomacy",
    "Presence",
-   "Negotiate, persuade and resolve disputes"
+   "Negotiate, persuade, preach, calm a crowd"
+  ],
+  [
+   "Commerce",
+   "Intellect",
+   "Markets, contracts, appraisal, finance and debt"
   ],
   [
    "Deception",
    "Presence",
-   "Lie, bluff, disguise and talk your way past"
+   "Lie, bluff, disguise, forge"
   ],
   [
    "Psychology",
-   "Intellect",
-   "Read behavior, motives and emotional state"
+   "Will",
+   "Read people and other species, spot a lie, counsel"
   ],
   [
-   "Sensors",
-   "Intellect",
-   "Operate ship sensors or a hand scanner"
+   "Streetwise",
+   "Presence",
+   "Underworld contacts, black markets, rumors"
   ],
   [
-   "Physical Sciences",
+   "Investigation",
    "Intellect",
-   "Analyze energy, matter, space and hyperspace"
+   "Search, examine evidence, follow the money"
   ],
   [
-   "Life Sciences",
+   "Science",
    "Intellect",
-   "Analyze organisms and ecosystems"
+   "Physics, biology, xenology, corridor theory"
   ],
   [
    "Medicine",
    "Intellect",
-   "Diagnose, treat and perform surgery"
+   "Diagnose, treat, biotech and surgery"
   ],
   [
    "Engineering",
    "Intellect",
-   "Repair and modify engines, power, machines and electronics"
+   "Build, repair, jury-rig, ship systems"
   ],
   [
    "Computers",
    "Intellect",
-   "Program, retrieve data and break into systems"
+   "Systems, data, hacking and communications"
+  ],
+  [
+   "Sensors",
+   "Intellect",
+   "Scanners, sensor sweeps, drones, detection"
   ],
   [
    "Piloting",
    "Agility",
-   "Fly a starship, shuttle or skimmer"
+   "Fly ships and vehicles, chases, docking"
   ],
   [
    "Navigation",
    "Intellect",
-   "Plot jumps and courses and fix position"
+   "Plot corridors, read gravimetric drift, find the way"
   ],
   [
-   "Communications",
-   "Intellect",
-   "Operate signals, codes and translators"
-  ],
-  [
-   "Blasters",
+   "Firearms",
    "Agility",
-   "Hand blasters and ship's guns"
+   "Slug-throwers, lasers, plasma and coilguns"
   ],
   [
    "Close Combat",
-   "Agility",
-   "Fists, blades, batons and grappling"
+   "Body",
+   "Fists, grapples, blades and batons"
   ],
   [
    "Athletics",
    "Body",
-   "Climb, swim, jump, run and move in zero-g"
+   "Climb, run, zero-g movement, Dodge"
   ],
   [
    "Stealth",
    "Agility",
-   "Move quietly and avoid notice"
+   "Sneak, hide, shadow someone"
   ],
   [
    "Survival",
-   "Intellect",
-   "Shelter, water and hazards on a hostile world"
+   "Will",
+   "Hostile worlds, vacuum, hard living"
+  ],
+  [
+   "Psionics",
+   "Will",
+   "Psionic powers (Psionic advantage only)"
   ]
  ],
  "physical": [
   "Piloting",
-  "Blasters",
+  "Firearms",
   "Close Combat",
   "Athletics",
   "Stealth",
   "Survival"
  ],
  "edgePoints": 3,
- "formCore": [
-  [
-   "Changing",
-   "A free action, in or out."
-  ],
-  [
-   "Losing control",
-   "Strong emotion or pain can force a change: when it matters, the GM calls for a Will roll."
-  ],
-  [
-   "Alternate form",
-   "While changed, your alternate form's attribute bonuses apply to rolls on those attributes and their skills, even above the starting maximum, and its traits and drawbacks apply too."
-  ]
- ],
+ "formCore": [],
  "formPenalties": {},
  "origins": [
   {
@@ -319,150 +447,42 @@
    "name": "Human",
    "tier": 0,
    "adj": {},
-   "desc": "Adaptable, stubborn and everywhere. Humans built the Concord with the other peoples of the Reach, and argue about it constantly.",
+   "desc": "Adaptable, socially restless, and remarkably willing to challenge established institutions. Three centuries of corridor travel have scattered humanity across dozens of colonies, governments and movements: generous and ruthless, often in the same crew.",
    "core": [],
    "form": null,
-   "skills": [],
-   "traits": [
-    [
-     "h-spirit",
-     "Indomitable Spirit",
-     "+2 to Will when refusing to abandon a crewmate or give up on a rescue.",
-     "Will",
-     true,
-     "Reckless Hope",
-     "You keep going after the odds have clearly turned. Accept the danger, delay or lost resource."
-    ],
-    [
-     "h-gut",
-     "Gut Instinct",
-     "+2 to Psychology when judging, face to face, whether someone is lying.",
-     "Psychology",
-     true,
-     "Acts on Hunches",
-     "You act on an unproven feeling when procedure says wait. Accept the cost when the hunch is wrong."
-    ]
-   ]
-  },
-  {
-   "id": "vashari",
-   "name": "Vashari",
-   "tier": 1,
-   "adj": {
-    "Presence": 1,
-    "Will": 1,
-    "Body": -1,
-    "Agility": -1
-   },
-   "desc": "Slender, violet-eyed empaths who feel the emotions of everyone nearby. Vashari make gifted diplomats and healers, and hate crowds.",
-   "core": [
-    "Empathy: you feel the strong emotions of anyone within a few steps, without words. Shielded or alien minds may be closed to you."
-   ],
-   "form": null,
    "skills": [
-    "Psychology",
+    "Commerce",
     "Diplomacy",
-    "Medicine",
-    "Life Sciences"
+    "Piloting",
+    "Firearms"
    ],
    "traits": [
     [
-     "va-sense",
-     "Empathic Read",
-     "+2 to Psychology to read someone's feelings face to face.",
-     "Psychology",
+     "hu-venture",
+     "Venture Spirit",
+     "+2 to Commerce to fund, pitch or rescue a risky enterprise.",
+     "Commerce",
      true,
-     "Feels Too Much",
-     "Strong emotions nearby overwhelm you. Accept −2 on your next action when rage, terror or grief fill the room."
+     "Overreach",
+     "You bet bigger than you should. Accept the loss when the gamble turns."
     ],
     [
-     "va-calm",
-     "Calming Presence",
-     "+2 to Diplomacy to calm a frightened or angry person.",
+     "hu-restless",
+     "Restless",
+     "+2 to Survival or Navigation when going where older peoples won't.",
+     "Navigation",
+     true,
+     "Impatient with Tradition",
+     "Old customs bore you. Accept the offense you cause."
+    ],
+    [
+     "hu-forgive",
+     "Second Chances",
+     "+2 to Diplomacy to talk someone out of a ruinous debt, grudge or deal.",
      "Diplomacy",
      true,
-     "Can't Stand Cruelty",
-     "You won't stand by while someone is hurt for sport. Accept the trouble when you intervene."
-    ]
-   ]
-  },
-  {
-   "id": "korrin",
-   "name": "Korrin",
-   "tier": 1,
-   "adj": {
-    "Body": 2,
-    "Agility": -1,
-    "Intellect": -1
-   },
-   "desc": "Broad, dense people from a heavy-gravity world, enormously strong and nearly as stubborn. Korrin speak bluntly and work hard.",
-   "core": [],
-   "form": null,
-   "skills": [
-    "Athletics",
-    "Engineering",
-    "Close Combat",
-    "Survival"
-   ],
-   "traits": [
-    [
-     "ko-strength",
-     "Heavy-Worlder",
-     "+2 to Athletics for feats of raw strength: lifting, forcing, holding.",
-     "Athletics",
-     true,
-     "Light-Gravity Clumsy",
-     "Normal gravity feels like walking on ice. Accept the stumble or the broken fixture at a bad time."
-    ],
-    [
-     "ko-tough",
-     "Thick Hide",
-     "+2 to Body to resist crushing, cold and toxins.",
-     "Body",
-     true,
-     "Blunt to a Fault",
-     "Your honesty offends someone who matters. Accept the lost goodwill."
-    ]
-   ]
-  },
-  {
-   "id": "ylith",
-   "name": "Ylith",
-   "tier": 1,
-   "adj": {
-    "Agility": 1,
-    "Intellect": 1,
-    "Body": -2
-   },
-   "desc": "Feathered, hollow-boned people from a world of sky-cities. Ylith see farther than anyone, glide on their wings, and hate tight spaces.",
-   "core": [
-    "Wings: in standard gravity or less, you can glide down from any height and land safely."
-   ],
-   "form": null,
-   "skills": [
-    "Piloting",
-    "Navigation",
-    "Sensors",
-    "Athletics"
-   ],
-   "traits": [
-    [
-     "yl-eyes",
-     "Keen Eyes",
-     "+2 to Intellect rolls to spot detail at a distance.",
-     "Intellect",
-     true,
-     "Claustrophobic",
-     "Cramped spaces make you panic. Accept −2 on your next action, or refuse to go in."
-    ],
-    [
-     "yl-flight",
-     "Flight",
-     "Ability: in standard gravity or less and breathable air, fly short distances. Roll Athletics for hard flying.",
-     "Athletics",
-     false,
-     "Fragile Bones",
-     "Your light bones break easily. When a fall, crush or heavy blow hits you, accept one extra injury box."
+     "Soft Touch",
+     "You can't refuse someone in need. Accept the cost of helping."
     ]
    ]
   },
@@ -473,76 +493,47 @@
    "adj": {
     "Body": 1,
     "Will": 1,
-    "Agility": -1,
-    "Presence": -1
+    "Agility": -2
    },
-   "desc": "Scaled, long-lived traders who carry their families' debts and contracts for generations. A Tessan's word is a contract.",
-   "core": [],
+   "desc": "Large, scaled, exceptionally long-lived beings for whom contractual obligation is the foundation of civilization. Tessan dynasties lend, insure and arbitrate across hundreds of worlds; contact with humanity has split them between traditional creditors and reformers.",
+   "core": [
+    "Long-lived: a Tessan remembers deals made before most humans' grandparents were born.",
+    "Bond: a contract a Tessan swears to is binding in law throughout Tessan space."
+   ],
    "form": null,
    "skills": [
+    "Commerce",
     "Diplomacy",
-    "Deception",
-    "Computers",
-    "Survival"
+    "Psychology",
+    "Leadership"
    ],
    "traits": [
     [
-     "te-hide",
-     "Scaled Hide",
-     "+2 to Body to resist heat, radiation and toxic air.",
+     "te-ledger",
+     "Ledger Memory",
+     "+2 to Commerce to recall a debt, contract or precedent.",
+     "Commerce",
+     true,
+     "Bound by Contract",
+     "Your word binds you even when it hurts. Accept the cost of keeping it."
+    ],
+    [
+     "te-scales",
+     "Old Scales",
+     "Once per scene, a hit that would mark 1 box marks none.",
      "Body",
      true,
-     "Cold-Blooded",
-     "Cold slows you down. When it's a real factor, accept −2 on physical actions or stop to warm up."
+     "Slow to Move",
+     "Your bulk and age make haste hard. Accept being left behind or late."
     ],
     [
-     "te-trade",
-     "Shrewd Trader",
-     "+2 to Diplomacy when bargaining, buying or selling.",
+     "te-dynasty",
+     "Dynasty Name",
+     "+2 to Diplomacy with those who owe your family.",
      "Diplomacy",
      true,
-     "Debt of Honor",
-     "Your family owes, or is owed. Accept the obligation when it comes due."
-    ]
-   ]
-  },
-  {
-   "id": "mirrun",
-   "name": "Mirrun",
-   "tier": 1,
-   "adj": {
-    "Agility": 1,
-    "Body": -1
-   },
-   "desc": "Smooth-skinned amphibians from an ocean world, quick in water and quicker to laugh. Mirrun feel vibrations through their skin.",
-   "core": [
-    "Amphibious: you breathe water as well as air, and swim as fast as you run."
-   ],
-   "form": null,
-   "skills": [
-    "Athletics",
-    "Sensors",
-    "Life Sciences",
-    "Stealth"
-   ],
-   "traits": [
-    [
-     "mi-sense",
-     "Vibration Sense",
-     "+2 to Intellect rolls to sense movement nearby, in the dark or behind you.",
-     "Intellect",
-     true,
-     "Must Stay Wet",
-     "Dry air sickens you. Without water for a day, accept −2 on physical actions until you soak."
-    ],
-    [
-     "mi-swim",
-     "Deep Diver",
-     "+2 to Athletics in water and in zero-g.",
-     "Athletics",
-     true,
-     "Sensitive to Noise",
-     "Loud noise and engine thrum disorient you. Accept −2 on your next action when it hits."
+     "Family Debts",
+     "Your dynasty's obligations become yours. Accept the duty when it calls."
     ]
    ]
   },
@@ -555,795 +546,1817 @@
     "Will": 1,
     "Presence": -2
    },
-   "desc": "Chitin-plated people raised in great hive-cities, logical, cooperative and unsettled by being alone. Other peoples find Kel hard to read.",
-   "core": [],
+   "desc": "Chitin-plated social beings raised in immense hive-cities, analytical and cooperative. The Kel homeworld is burdened by inherited Tessan debt; their search for new markets triggered humanity's First Contact Crisis. Kel society is split between loyalists, reformers and radicals.",
+   "core": [
+    "Hive-raised: after a day alone, −1 to all rolls until back among others.",
+    "Hard to read: others take −2 to Psychology to read a Kel's mood."
+   ],
+   "form": null,
+   "skills": [
+    "Science",
+    "Commerce",
+    "Navigation",
+    "Computers"
+   ],
+   "traits": [
+    [
+     "ke-analysis",
+     "Hive Analysis",
+     "+2 to Investigation or Science when working with at least one ally.",
+     "Investigation",
+     true,
+     "Isolation Dread",
+     "Being cut off from others unnerves you. Accept the panic or the poor choice."
+    ],
+    [
+     "ke-signal",
+     "Chemical Signals",
+     "+2 to Psychology to read another Kel, or to coordinate a group by scent and posture.",
+     "Psychology",
+     true,
+     "Every Gift a Contract",
+     "You expect every favor repaid. Accept the misunderstanding it causes."
+    ],
+    [
+     "ke-ledger",
+     "Debt-Born",
+     "+2 to Commerce to find who owes whom.",
+     "Commerce",
+     true,
+     "The Homeworld's Debt",
+     "Your world's creditors, or its radicals, want your help. Accept the call."
+    ]
+   ]
+  },
+  {
+   "id": "mirrun",
+   "name": "Mirrun",
+   "tier": 1,
+   "adj": {
+    "Agility": 1,
+    "Body": -1
+   },
+   "desc": "Smooth-skinned amphibians from a deep-ocean world, agile swimmers famous for their humor. Their skin detects minute pressure changes; Mirrun researchers lead the field in gravimetric resonance detection.",
+   "core": [
+    "Amphibious: breathe water and swim at running speed; your skin must stay moist (−1 to all rolls after a day dry)."
+   ],
+   "form": null,
+   "skills": [
+    "Sensors",
+    "Science",
+    "Athletics",
+    "Diplomacy"
+   ],
+   "traits": [
+    [
+     "mi-pressure",
+     "Pressure Sense",
+     "+2 to Sensors to feel movement, engines or corridor resonance through a hull or floor.",
+     "Sensors",
+     true,
+     "Ocean Guardian",
+     "You can't stand by while a sea is poisoned. Accept the fight with the extractors."
+    ],
+    [
+     "mi-swim",
+     "Deep Swimmer",
+     "+2 to Athletics in water and zero-g.",
+     "Athletics",
+     true,
+     "Dry Air",
+     "Arid worlds wear you down. Accept the misery."
+    ],
+    [
+     "mi-humor",
+     "Disarming Laugh",
+     "+2 to Diplomacy to defuse a tense meeting with a joke.",
+     "Diplomacy",
+     true,
+     "Can't Stay Serious",
+     "The joke comes out at the wrong moment. Accept the offense."
+    ]
+   ]
+  },
+  {
+   "id": "ylith",
+   "name": "Ylith",
+   "tier": 1,
+   "adj": {
+    "Agility": 1,
+    "Intellect": 1,
+    "Body": -2
+   },
+   "desc": "Hollow-boned, feathered gliders with broad wing-membranes and extraordinary vision. Their aerial city-states are renowned for navigation and cartography; confined spaces are profoundly uncomfortable for them.",
+   "core": [
+    "Glide: in normal gravity, glide down any height safely.",
+    "Far sight: see detail at many times human range."
+   ],
+   "form": null,
+   "skills": [
+    "Navigation",
+    "Sensors",
+    "Piloting",
+    "Athletics"
+   ],
+   "traits": [
+    [
+     "yl-eye",
+     "Hawk Eye",
+     "+2 to Sensors and Firearms at long range.",
+     "Sensors",
+     true,
+     "Cramped",
+     "Tight spaces unsettle you. Accept −2 or the detour."
+    ],
+    [
+     "yl-chart",
+     "Corridor Spotter",
+     "+2 to Navigation to find a corridor instruments miss.",
+     "Navigation",
+     true,
+     "Sky-Proud",
+     "You look down on groundlings. Accept the resentment."
+    ],
+    [
+     "yl-glide",
+     "Born Flier",
+     "+2 to Piloting in atmosphere.",
+     "Piloting",
+     true,
+     "Fragile Bones",
+     "Falls and crushes hurt you more. Accept the injury."
+    ]
+   ]
+  },
+  {
+   "id": "ozhvek",
+   "name": "Ozhvek",
+   "tier": 2,
+   "adj": {
+    "Body": 2,
+    "Will": 1,
+    "Agility": -2,
+    "Presence": -1
+   },
+   "desc": "Massive, radially symmetrical founders of the Hegemony, on six powerful limbs, with sensory clusters all around their upper bodies and lifespans near five centuries. Their ancient houses are divided over what the empire should become.",
+   "core": [
+    "All-around senses: you can't be surprised from behind.",
+    "Massive: most ships, doors and furniture are too small; −2 to Stealth."
+   ],
    "form": null,
    "skills": [
     "Leadership",
-    "Engineering",
-    "Computers",
-    "Navigation"
+    "Diplomacy",
+    "Firearms",
+    "Psychology"
    ],
    "traits": [
     [
-     "ke-hive",
-     "Hive Training",
-     "+2 to Leadership when coordinating a group on a single task.",
+     "oz-house",
+     "Imperial House",
+     "+2 to Leadership with Hegemony subjects and soldiers.",
      "Leadership",
      true,
-     "Alone Is Wrong",
-     "Isolation distresses you. Accept −2 on Will rolls, or a rash choice, when cut off from the crew."
+     "Hated Founders",
+     "Every former subject remembers the empire. Accept the hostility."
     ],
     [
-     "ke-chitin",
-     "Chitin Plates",
-     "+2 to Body to resist being knocked out or stunned.",
+     "oz-bulwark",
+     "Living Bulwark",
+     "Once per fight, a hit that would mark 2 or more boxes marks one fewer.",
      "Body",
      true,
-     "Unreadable",
-     "Others can't read your expressions. Accept the misunderstanding when it matters."
+     "Too Big to Hide",
+     "You are always noticed. Accept the attention."
+    ],
+    [
+     "oz-gaze",
+     "Hundred Eyes",
+     "+2 to Sensors and Investigation to notice anything in a room.",
+     "Sensors",
+     true,
+     "House Politics",
+     "Your house wants something of you. Accept the summons."
     ]
    ]
   },
   {
-   "id": "synth",
-   "name": "Synth",
+   "id": "dresh",
+   "name": "Dresh",
    "tier": 2,
    "adj": {
-    "Intellect": 2,
-    "Body": 1,
-    "Presence": -2,
-    "Will": -1
+    "Body": 2,
+    "Agility": -1,
+    "Intellect": -1
    },
-   "freeSkill": "Computers",
-   "desc": "Free artificial minds in synthetic bodies. The Concord recognized Synths as people only a generation ago, and not everyone agrees.",
+   "desc": "Dense, four-armed soldiers from a high-gravity world, armored in thick hide. Dresh legions were the Hegemony's ground forces for millennia; now their protectorates argue whether soldiers owe the throne, their commanders, or the people they protect.",
    "core": [
-    "Synthetic: you don't breathe, eat or sleep, and disease and poison don't affect you. Medicine can't treat you; Engineering repairs you instead, by the same rules.",
-    "Computers is always at least Trained, free."
+    "Four arms: hold a weapon and still climb, carry or work.",
+    "Dermal armor: once per fight, a hit marks one fewer box.",
+    "Heavy-world: −1 to physical rolls in low gravity without boots or a frame."
    ],
    "form": null,
    "skills": [
-    "Computers",
-    "Engineering",
-    "Physical Sciences",
-    "Sensors"
+    "Firearms",
+    "Close Combat",
+    "Athletics",
+    "Leadership"
    ],
    "traits": [
     [
-     "sy-recall",
-     "Perfect Recall",
-     "+2 to Intellect rolls to recall exactly something you have seen, heard or read.",
-     "Intellect",
+     "dr-legion",
+     "Legion Drill",
+     "+2 to Firearms or Close Combat fighting beside an ally.",
+     "Firearms",
      true,
-     "Uncanny",
-     "People distrust a machine that thinks. Accept the suspicion or the refusal."
+     "Whose Soldier?",
+     "Old loyalties pull at you. Accept the conflict of duty."
     ],
     [
-     "sy-link",
-     "Direct Interface",
-     "Ability: by touch, link to a computer and roll Computers without a console.",
-     "Computers",
-     false,
-     "Hackable",
-     "Intrusion attacks can reach you. When a hostile system fights back, accept the glitch."
+     "dr-grip",
+     "Four-Armed Grip",
+     "+2 to Close Combat to grapple or hold.",
+     "Close Combat",
+     true,
+     "Imperial Habits",
+     "Orders come easier than choices. Accept the mistake of obeying."
+    ],
+    [
+     "dr-endure",
+     "Heavy-World Build",
+     "+2 to Body rolls to resist injury, fatigue or crushing force.",
+     "Body",
+     true,
+     "Deserter's Mark",
+     "The Hegemony keeps lists. Accept the bounty hunter."
     ]
    ]
   },
   {
-   "id": "drennari",
-   "name": "Drennari",
-   "tier": 2,
+   "id": "shivar",
+   "name": "Shivar",
+   "tier": 1,
    "adj": {
-    "Will": 2,
+    "Will": 1,
     "Intellect": 1,
-    "Body": -2,
-    "Agility": -1
+    "Body": -2
    },
-   "desc": "Long-lived, pale psionics who remember centuries. Drennari read minds by touch and sometimes glimpse what hasn't happened yet.",
+   "desc": "Tall, narrow beings of translucent tissue whose nervous systems share emotions in synchronized pulses. Their theology reads the corridors as cosmic order; their schism, between imperial zealots and moderates who see a universe of change, has fueled wars inside the Hegemony.",
    "core": [
-    "Mind touch: by touch, roll Will to sense surface thoughts; a resisting mind uses an opposed Will contest. The GM sets the limits before the roll."
+    "Empath: you share emotions instantly with nearby Shivar, and feel the strong emotions of anyone close by. (Empathy, not psionics.)"
    ],
    "form": null,
    "skills": [
     "Psychology",
     "Diplomacy",
-    "Life Sciences",
+    "Science",
+    "Leadership"
+   ],
+   "traits": [
+    [
+     "sh-empath",
+     "Deep Empathy",
+     "+2 to Psychology to read anyone's feelings nearby.",
+     "Psychology",
+     true,
+     "Flooded",
+     "Strong emotions around you overwhelm you. Accept the distraction."
+    ],
+    [
+     "sh-order",
+     "Corridor Theology",
+     "+2 to Science or Navigation to read meaning in corridor patterns.",
+     "Science",
+     true,
+     "Schism",
+     "Zealots or moderates want you on their side. Accept the pressure."
+    ],
+    [
+     "sh-calm",
+     "Pulse of Calm",
+     "+2 to Diplomacy to calm a frightened or angry crowd.",
+     "Diplomacy",
+     true,
+     "Translucent",
+     "Your feelings show through your skin. Accept the lie that fails."
+    ]
+   ]
+  },
+  {
+   "id": "brulvek",
+   "name": "Brulvek",
+   "tier": 1,
+   "adj": {
+    "Body": 1,
+    "Will": 1,
+    "Agility": -1,
+    "Presence": -1
+   },
+   "desc": "Low, broad hexapods with powerful manipulator limbs and thick insulating hides, evolved among volcanoes and corrosive air. They built the Hegemony's shipyards; their engineers are sought everywhere for restoring machines centuries past replacement parts.",
+   "core": [
+    "Furnace hide: heat, smoke and corrosive air mark one fewer box and don't impair you."
+   ],
+   "form": null,
+   "skills": [
+    "Engineering",
+    "Science",
+    "Athletics",
+    "Commerce"
+   ],
+   "traits": [
+    [
+     "br-old",
+     "Old Machines",
+     "+2 to Engineering to repair or restore ancient or unfamiliar machinery.",
+     "Engineering",
+     true,
+     "Syndicate Ties",
+     "Your syndicate calls in a favor. Accept the job."
+    ],
+    [
+     "br-forge",
+     "Forge-Born",
+     "+2 to Survival in heat, fire and toxic environments.",
+     "Survival",
+     true,
+     "Imperial Contract",
+     "Someone still pays your people to serve the empire. Accept the conflict."
+    ],
+    [
+     "br-hands",
+     "Six Strong Limbs",
+     "+2 to Athletics to lift, haul or brace.",
+     "Athletics",
+     true,
+     "Dying Industry",
+     "Home is failing. Accept the plea for money or help."
+    ]
+   ]
+  },
+  {
+   "id": "zhaq",
+   "name": "Zhaq",
+   "tier": 1,
+   "adj": {
+    "Agility": 1,
+    "Will": 1,
+    "Body": -1,
+    "Presence": -1
+   },
+   "desc": "Flexible, tripedal beings with segmented limbs and three independently focusing eyes. Isolated for six centuries by a corridor collapse, the Zhaq built free republics, and refused when the Hegemony came back. Their resistance inspires separatists everywhere.",
+   "core": [
+    "Three eyes: watch several directions at once.",
+    "Torpor: slow your metabolism to outlast cold, hunger or entombment for weeks."
+   ],
+   "form": null,
+   "skills": [
+    "Sensors",
+    "Stealth",
+    "Survival",
+    "Firearms"
+   ],
+   "traits": [
+    [
+     "zh-watch",
+     "Triple Watch",
+     "+2 to Sensors to keep watch or spot an ambush.",
+     "Sensors",
+     true,
+     "Never Again",
+     "You won't submit to an empire's demand. Accept the fight."
+    ],
+    [
+     "zh-sleep",
+     "Long Sleep",
+     "+2 to Survival to endure deprivation in torpor.",
+     "Survival",
+     true,
+     "Separatist Symbol",
+     "Your face means rebellion to the Hegemony. Accept the attention."
+    ],
+    [
+     "zh-limbs",
+     "Segmented Limbs",
+     "+2 to Athletics to squeeze, climb or balance.",
+     "Athletics",
+     true,
+     "Six Centuries Behind",
+     "Imperial customs you never learned trip you up. Accept the gaffe."
+    ]
+   ]
+  },
+  {
+   "id": "veyari",
+   "name": "Veyari",
+   "tier": 1,
+   "adj": {
+    "Intellect": 2,
+    "Body": -1,
+    "Agility": -1
+   },
+   "desc": "Small, six-limbed scholars with soft scales and brains built for associative memory. Their neutral archives hold lost corridor data and ancient claims, which is why empires, corporations and zealots keep trying to seize them.",
+   "core": [
+    "Associative memory: recall anything you have experienced in detail."
+   ],
+   "form": null,
+   "skills": [
+    "Investigation",
+    "Science",
+    "Computers",
+    "Diplomacy"
+   ],
+   "traits": [
+    [
+     "ve-archive",
+     "Living Archive",
+     "+2 to Science or Investigation to recall history, precedent or old data.",
+     "Science",
+     true,
+     "Knowledge Must Survive",
+     "You won't let records be destroyed. Accept the risk to save them."
+    ],
+    [
+     "ve-neutral",
+     "Archivist's Neutrality",
+     "+2 to Diplomacy to be accepted as neutral by both sides.",
+     "Diplomacy",
+     true,
+     "Wanted Records",
+     "Someone wants what you remember. Accept the pursuit."
+    ],
+    [
+     "ve-detail",
+     "Perfect Detail",
+     "+2 to Investigation to spot what changed in a place you've seen before.",
+     "Investigation",
+     true,
+     "Small and Soft",
+     "You're easy to overpower. Accept the danger."
+    ]
+   ]
+  },
+  {
+   "id": "eshuum",
+   "name": "Eshuum",
+   "tier": 2,
+   "adj": {
+    "Intellect": 1,
+    "Will": 1,
+    "Body": -1,
+    "Presence": -1
+   },
+   "desc": "Colonial organisms: an Eshuum person is a community of semi-independent biological units joined into one mind. They govern by consensus, and oppose forced separation and experiments on intelligent beings.",
+   "core": [
+    "Detachable units: send a small unit to scout a short distance; it reports what it senses.",
+    "Many bodies: once per fight, a hit that would mark 2 or more boxes marks one fewer as units are lost."
+   ],
+   "form": null,
+   "skills": [
+    "Science",
+    "Medicine",
+    "Diplomacy",
+    "Sensors"
+   ],
+   "traits": [
+    [
+     "es-scout",
+     "Scout Units",
+     "+2 to Sensors or Stealth using a detached unit.",
+     "Sensors",
+     true,
+     "Never Divided",
+     "Forced separation is horror to you. Accept the risk to prevent it."
+    ],
+    [
+     "es-consensus",
+     "Consensus Mind",
+     "+2 to Psychology to find what a group truly agrees on.",
+     "Psychology",
+     true,
+     "Research Target",
+     "Hegemony researchers want specimens. Accept the danger."
+    ],
+    [
+     "es-reshape",
+     "Redistribute",
+     "+2 to Engineering or Medicine by reshaping units into fine tools.",
+     "Engineering",
+     true,
+     "Slow to Decide",
+     "You must reach inner consensus. Accept the delay."
+    ]
+   ]
+  },
+  {
+   "id": "khaum",
+   "name": "Khaum",
+   "tier": 2,
+   "adj": {
+    "Body": 2,
+    "Will": 1,
+    "Agility": -2,
+    "Presence": -1
+   },
+   "desc": "Massive, eyeless burrowers with sensory whiskers and powerful digging limbs, whose cavern nations run for hundreds of kilometers underground. Cautious and long-planning, they have sheltered refugees from many Hegemony campaigns.",
+   "core": [
+    "Eyeless: perceive by pressure and vibration; darkness means nothing, but you can't read screens or print without aids.",
+    "Burrower: dig through earth and soft rock.",
+    "Massive: −2 to Stealth; most doors are too small."
+   ],
+   "form": null,
+   "skills": [
+    "Engineering",
+    "Science",
+    "Survival",
+    "Athletics"
+   ],
+   "traits": [
+    [
+     "kh-seismic",
+     "Seismic Sense",
+     "+2 to Sensors to feel movement, footsteps or tunnels through the ground.",
+     "Sensors",
+     true,
+     "Wary of the Open",
+     "Open skies and unfamiliar places unsettle you. Accept the hesitation."
+    ],
+    [
+     "kh-dig",
+     "Deep Digger",
+     "+2 to Athletics to dig, break or brace rock.",
+     "Athletics",
+     true,
+     "Refuge Keeper",
+     "You shelter the hunted. Accept the danger they bring."
+    ],
+    [
+     "kh-plan",
+     "Long Planner",
+     "+2 to Engineering when you have time to plan.",
+     "Engineering",
+     true,
+     "Distrusts Protectors",
+     "You refuse protection that demands obedience. Accept the cost."
+    ]
+   ]
+  },
+  {
+   "id": "vael",
+   "name": "Vael",
+   "tier": 1,
+   "adj": {
+    "Agility": 1,
+    "Intellect": 1,
+    "Body": -2
+   },
+   "desc": "Long, light-boned beings with four manipulator limbs, born in low gravity. Their homeworld died in an ancient stellar catastrophe; their living fleets now roam the corridors trading, repairing and carrying peoples between systems.",
+   "core": [
+    "Zero-g native: no penalty in zero gravity.",
+    "Low-gravity body: −1 to physical rolls in standard gravity without an exo-frame."
+   ],
+   "form": null,
+   "skills": [
+    "Piloting",
+    "Engineering",
+    "Commerce",
+    "Navigation"
+   ],
+   "traits": [
+    [
+     "va-void",
+     "Void Dancer",
+     "+2 to Athletics and Firearms in zero-g.",
+     "Athletics",
+     true,
+     "Fleet First",
+     "The flotilla's needs come before yours. Accept the call."
+    ],
+    [
+     "va-fleet",
+     "Fleet Trader",
+     "+2 to Commerce in flotilla markets and ports.",
+     "Commerce",
+     true,
+     "Planetbound Misery",
+     "Gravity wells exhaust you. Accept the strain."
+    ],
+    [
+     "va-fix",
+     "Generation Ship Wisdom",
+     "+2 to Engineering to keep a habitat or ship running on nothing.",
+     "Engineering",
+     true,
+     "Suspect Neutrality",
+     "Every side doubts the fleets. Accept the search or the suspicion."
+    ]
+   ]
+  },
+  {
+   "id": "thrum",
+   "name": "Thrum",
+   "tier": 1,
+   "adj": {
+    "Presence": 1,
+    "Will": 1,
+    "Body": -1,
+    "Agility": -1
+   },
+   "desc": "Broad, soft-bodied beings whose internal cavities make low-frequency resonance; they speak in overlapping harmonies humans can't reproduce. Their acoustic science found the patterns in corridor fluctuations; they refuse to let it become weapons.",
+   "core": [
+    "Resonance: speak and hear through walls and floors; you need a translator for most other languages."
+   ],
+   "form": null,
+   "skills": [
+    "Sensors",
+    "Science",
+    "Diplomacy",
+    "Navigation"
+   ],
+   "traits": [
+    [
+     "th-echo",
+     "Echo Sense",
+     "+2 to Sensors to map a space or find a void by sound.",
+     "Sensors",
+     true,
+     "Pacifist Science",
+     "You won't let your work become a weapon. Accept the cost of refusing."
+    ],
+    [
+     "th-chorus",
+     "Chorus Voice",
+     "+2 to Leadership or Diplomacy addressing a group.",
+     "Leadership",
+     true,
+     "Lost in Translation",
+     "Translators mangle you. Accept the misunderstanding."
+    ],
+    [
+     "th-pattern",
+     "Pattern Listener",
+     "+2 to Navigation or Science reading corridor fluctuations.",
+     "Navigation",
+     true,
+     "Soft Body",
+     "You bruise easily. Accept the injury."
+    ]
+   ]
+  },
+  {
+   "id": "corvani",
+   "name": "Corvani",
+   "tier": 1,
+   "adj": {
+    "Intellect": 1,
+    "Will": 1,
+    "Agility": -1,
+    "Presence": -1
+   },
+   "desc": "Radially arranged, five-limbed beings with photosensitive skin, from forests where cooperation meant survival. They treat technology as ecology, and their restoration teams heal worlds the Hegemony stripped, often against mining corporations.",
+   "core": [
+    "Photosynthetic: after days without light you weaken (−1 to all rolls) until you rest under light."
+   ],
+   "form": null,
+   "skills": [
+    "Science",
+    "Medicine",
+    "Survival",
+    "Engineering"
+   ],
+   "traits": [
+    [
+     "co-restore",
+     "Restorer",
+     "+2 to Science to heal or understand a damaged ecosystem.",
+     "Science",
+     true,
+     "Ecological Safeguards",
+     "You won't let a world be poisoned. Accept the fight."
+    ],
+    [
+     "co-living",
+     "Living Tech",
+     "+2 to Engineering with biological or grown technology.",
+     "Engineering",
+     true,
+     "Sunstarved",
+     "Dark ships and stations drain you. Accept the weakness."
+    ],
+    [
+     "co-symbiosis",
+     "Symbiosis",
+     "+2 to Medicine with biotech and alien biology.",
+     "Medicine",
+     true,
+     "Corporate Enemies",
+     "Mining companies know your face. Accept their lawyers or worse."
+    ]
+   ]
+  },
+  {
+   "id": "uxarra",
+   "name": "Uxarra",
+   "tier": 1,
+   "adj": {
+    "Agility": 1,
+    "Presence": -1
+   },
+   "desc": "Flexible, partly hydrostatic beings whose skin changes color, texture and sheen. Their homeworld's wild climates made them adaptable and self-reliant, and their camouflage has earned them an unfair reputation for deceit.",
+   "core": [
+    "Chromatic skin: change color and texture at will."
+   ],
+   "form": null,
+   "skills": [
+    "Stealth",
+    "Survival",
+    "Athletics",
     "Medicine"
    ],
    "traits": [
     [
-     "dr-meld",
-     "Deep Touch",
-     "Ability: by touch, roll Will to share memories with a willing or restrained mind. You learn only what they know.",
-     "Will",
-     false,
-     "Echoes",
-     "Fragments of other minds linger. Accept −2 on your next Will roll, or an unfamiliar emotion, at a time that matters."
+     "ux-camo",
+     "Camouflage",
+     "+2 to Stealth when still or moving slowly.",
+     "Stealth",
+     true,
+     "Distrusted",
+     "Others assume you're hiding something. Accept the suspicion."
     ],
     [
-     "dr-fore",
-     "Foresight",
-     "Ability: once per session, ask the GM one yes-or-no question about the next hour, and get a true answer.",
-     "",
-     false,
-     "Visions",
-     "Visions come unbidden. Accept losing your next action when one strikes at a bad time."
+     "ux-adapt",
+     "Adaptable Body",
+     "+2 to Survival in extreme or changing environments.",
+     "Survival",
+     true,
+     "Restless Home",
+     "You can't settle. Accept the urge to move on."
+    ],
+    [
+     "ux-rescue",
+     "Rescue Specialist",
+     "+2 to Athletics or Medicine to reach and save someone in a disaster.",
+     "Athletics",
+     true,
+     "Won't Leave Anyone",
+     "You go back for the last one. Accept the risk."
     ]
    ]
   },
   {
-   "id": "vorr",
-   "name": "Vorr",
+   "id": "sen",
+   "name": "Sen",
    "tier": 2,
    "adj": {
+    "Will": 2,
+    "Intellect": 1,
+    "Agility": -2,
+    "Presence": -1
+   },
+   "desc": "Compact, slow-moving beings in layered mineral shells who live more than a thousand years. Their experiments have run for centuries; they have watched empires rise and fall, and their warnings about corridor instability carry great weight.",
+   "core": [
+    "Shell: once per fight, a hit marks one fewer box.",
+    "Slow: you always act last in a fight."
+   ],
+   "form": null,
+   "skills": [
+    "Science",
+    "Investigation",
+    "Navigation",
+    "Psychology"
+   ],
+   "traits": [
+    [
+     "se-patient",
+     "Patient Observer",
+     "+2 to Science or Investigation when you take your time.",
+     "Science",
+     true,
+     "Out of Step",
+     "You think in decades. Accept being too late."
+    ],
+    [
+     "se-record",
+     "Ancient Records",
+     "+2 to Navigation to predict corridor behavior.",
+     "Navigation",
+     true,
+     "Reluctant to Intervene",
+     "You'd rather observe than act. Accept the cost of waiting."
+    ],
+    [
+     "se-calm",
+     "Unhurried",
+     "+2 to Will to stay calm under fear, pressure or torture.",
+     "Will",
+     true,
+     "Shell-Slow",
+     "You can't run. Accept being caught."
+    ]
+   ]
+  },
+  {
+   "id": "joruun",
+   "name": "Joruun",
+   "tier": 1,
+   "adj": {
+    "Body": 1,
+    "Will": 1,
+    "Agility": -1,
+    "Intellect": -1
+   },
+   "desc": "Tall, powerful bipeds with thick skin, sensory ridges and acute hearing, from a cold, storm-wracked world. Their confederation has fought the Hegemony for centuries, built to keep resisting after its leaders fall.",
+   "core": [
+    "Cold-hardy: cold and storms don't impair you."
+   ],
+   "form": null,
+   "skills": [
+    "Firearms",
+    "Leadership",
+    "Survival",
+    "Sensors"
+   ],
+   "traits": [
+    [
+     "jo-hear",
+     "Keen Hearing",
+     "+2 to Sensors by sound.",
+     "Sensors",
+     true,
+     "The Confederation Calls",
+     "Your league needs you. Accept the call to arms."
+    ],
+    [
+     "jo-cell",
+     "Fight On",
+     "+2 to Leadership to rally others after a leader falls.",
+     "Leadership",
+     true,
+     "Old Grudge",
+     "You hate the Hegemony. Accept the reckless choice."
+    ],
+    [
+     "jo-fort",
+     "Junction Defender",
+     "+2 to Firearms when holding a fortified position.",
+     "Firearms",
+     true,
+     "Blunt",
+     "You say what you think. Accept the offense."
+    ]
+   ]
+  },
+  {
+   "id": "qor",
+   "name": "Qor",
+   "tier": 2,
+   "adj": {
+    "Body": 2,
+    "Intellect": 1,
+    "Agility": -2,
+    "Presence": -1
+   },
+   "desc": "Silicon-based beings of slowly growing crystal with distributed nervous systems, speaking by electromagnetic and mechanical oscillation. Masters of materials and computation, the Qor take Tessan capital but refuse debts that threaten sovereignty.",
+   "core": [
+    "Crystalline: immune to vacuum, toxins and disease; you need a translator to speak with most species.",
+    "Slow time sense: −1 to Psychology with fast-living peoples."
+   ],
+   "form": null,
+   "skills": [
+    "Engineering",
+    "Science",
+    "Computers",
+    "Commerce"
+   ],
+   "traits": [
+    [
+     "qo-materials",
+     "Materials Mastery",
+     "+2 to Engineering with materials, armor and hull structures.",
+     "Engineering",
+     true,
+     "Sovereign",
+     "You won't accept terms that bind your world. Accept the lost deal."
+    ],
+    [
+     "qo-compute",
+     "Crystal Mind",
+     "+2 to Computers for long calculations.",
+     "Computers",
+     true,
+     "Alien Time",
+     "You misjudge how quickly others act. Accept the delay."
+    ],
+    [
+     "qo-endure",
+     "Unbreakable",
+     "+2 to Survival in vacuum and extreme environments.",
+     "Survival",
+     true,
+     "Mineral Wealth",
+     "Prospectors eye your homeworld. Accept the confrontation."
+    ]
+   ]
+  },
+  {
+   "id": "ommek",
+   "name": "Ommek",
+   "tier": 1,
+   "adj": {
     "Agility": 1,
-    "Presence": 1,
+    "Intellect": 1,
+    "Body": -2
+   },
+   "desc": "Small, heavily articulated beings with many fine manipulators and exquisite touch, makers of robots, AI and automated ships. Their technocratic republics demand review of every major technology, and their defenses have made conquest too expensive.",
+   "core": [
+    "Fine manipulators: Engineering is Trained for free."
+   ],
+   "form": null,
+   "skills": [
+    "Engineering",
+    "Computers",
+    "Sensors",
+    "Science"
+   ],
+   "traits": [
+    [
+     "om-touch",
+     "Exquisite Touch",
+     "+2 to Engineering for precision work.",
+     "Engineering",
+     true,
+     "Review Required",
+     "You insist on checking first. Accept the delay."
+    ],
+    [
+     "om-robots",
+     "Robot Maker",
+     "+2 to Computers with robots, drones and AI.",
+     "Computers",
+     true,
+     "Imperial Interest",
+     "The Hegemony wants your knowledge. Accept the spy or the kidnapper."
+    ],
+    [
+     "om-defense",
+     "Layered Defenses",
+     "+2 to Engineering or Computers to secure a position or system.",
+     "Engineering",
+     true,
+     "Small Frame",
+     "You're easily overpowered. Accept the danger."
+    ]
+   ],
+   "freeSkill": "Engineering"
+  },
+  {
+   "id": "vesh",
+   "name": "Vesh",
+   "tier": 0,
+   "adj": {
+    "Agility": 1,
+    "Body": -1
+   },
+   "desc": "Slender quadrupeds with two manipulator limbs and delicate sensory filaments, who reached the corridors only 24 years ago. Their governments struggle to stay independent while learning from civilizations thousands of years older, and humans recognize the struggle.",
+   "core": [],
+   "form": null,
+   "skills": [
+    "Diplomacy",
+    "Science",
+    "Athletics",
+    "Sensors"
+   ],
+   "traits": [
+    [
+     "vs-fresh",
+     "Fresh Eyes",
+     "+2 to Investigation to notice what old hands take for granted.",
+     "Investigation",
+     true,
+     "Newcomer",
+     "You don't know the rules everyone else knows. Accept the gaffe."
+    ],
+    [
+     "vs-filament",
+     "Sensory Filaments",
+     "+2 to Sensors to feel air currents and nearby movement.",
+     "Sensors",
+     true,
+     "Homeworld Politics",
+     "Your government wants a favor. Accept the request."
+    ],
+    [
+     "vs-quick",
+     "Fleet-Footed",
+     "+2 to Athletics to run or leap.",
+     "Athletics",
+     true,
+     "Easily Exploited",
+     "Everyone has a deal for you. Accept the bad bargain."
+    ]
+   ]
+  },
+  {
+   "id": "uth",
+   "name": "Uth",
+   "tier": 1,
+   "adj": {
+    "Body": 1,
+    "Will": 1,
+    "Agility": -1,
+    "Presence": -1
+   },
+   "desc": "Compact, thick-skinned beings with broad manipulators and complex chemical senses, whose civilization the Hegemony destroyed millennia ago. Uth communities live everywhere, keeping family history and memory; many work to reclaim their worlds, many refuse to be defined by loss.",
+   "core": [
+    "Chemical senses: identify people and substances by scent."
+   ],
+   "form": null,
+   "skills": [
+    "Investigation",
+    "Streetwise",
+    "Medicine",
+    "Diplomacy"
+   ],
+   "traits": [
+    [
+     "ut-scent",
+     "Scent Tracker",
+     "+2 to Investigation to track or identify by scent.",
+     "Investigation",
+     true,
+     "Ancestral Worlds",
+     "The reclamation movement asks your help. Accept the call."
+    ],
+    [
+     "ut-diaspora",
+     "Diaspora Network",
+     "+2 to Streetwise to find an Uth community and its help in any port.",
+     "Streetwise",
+     true,
+     "Old Wound",
+     "The Hegemony's name sets you off. Accept the reckless choice."
+    ],
+    [
+     "ut-memory",
+     "Family Memory",
+     "+2 to Diplomacy using shared history or old obligations.",
+     "Diplomacy",
+     true,
+     "Defined by Loss",
+     "Others see only your people's history. Accept the frustration."
+    ]
+   ]
+  },
+  {
+   "id": "draelin",
+   "name": "Draelin",
+   "tier": 1,
+   "adj": {
+    "Intellect": 1,
+    "Agility": 1,
     "Body": -1,
     "Will": -1
    },
-   "desc": "Shapeshifters who can wear any face, and who have a war shape of claws and armored hide. The Hegemony hunts them; the Concord doesn't trust them.",
-   "core": [],
-   "skills": [
-    "Deception",
-    "Stealth",
-    "Close Combat",
-    "Psychology"
-   ],
-   "form": {
-    "attrs": {
-     "Body": 2,
-     "Agility": 1
-    },
-    "dodge": 0,
-    "traits": [
-     "Claws mark 2 boxes",
-     "Tough: hits of 2+ boxes mark one fewer"
-    ],
-    "drawbacks": [
-     "Unmistakably alien: anyone who sees it knows what you are"
-    ]
-   },
-   "traits": [
-    [
-     "vo-mimic",
-     "Mimic",
-     "Ability: after studying someone for a scene, take on their face and voice. Roll Deception to pass as them.",
-     "Deception",
-     false,
-     "Identity Drift",
-     "Wear a face too long and you start to become them. Accept the slip when it matters."
-    ],
-    [
-     "vo-fluid",
-     "Fluid Body",
-     "+2 to Athletics to squeeze through gaps or slip bonds.",
-     "Athletics",
-     true,
-     "Hunted by Purists",
-     "Hegemony purists hunt your kind. Accept the danger when they find you."
-    ]
-   ]
-  },
-  {
-   "id": "aethari",
-   "name": "Aethari",
-   "tier": 3,
-   "adj": {
-    "Will": 2,
-    "Presence": 1,
-    "Body": -2,
-    "Agility": -1
-   },
-   "desc": "Beings of living light who walk among others in sealed containment suits. Unsuited, an Aethari blazes like a star, and burns.",
+   "desc": "Elongated, six-limbed beings with flexible skeletons and electromagnetic senses, from a world of wild magnetic fields. Their cartographic guilds keep the best corridor charts in known space, and have sold them to both sides of more than one war.",
    "core": [
-    "Containment suit: you live in a sealed suit. Out of it you're in your alternate form, and mark a box each hour that rest can't clear until you return.",
-    "Light burst: in your alternate form, roll Will; everyone nearby rolls Body −2 or loses their next action, blinded."
+    "Field sense: feel electromagnetic fields, live wiring and active machinery nearby.",
+    "Navigation is Trained for free."
    ],
+   "form": null,
    "skills": [
-    "Physical Sciences",
+    "Navigation",
     "Sensors",
-    "Diplomacy",
-    "Psychology"
+    "Commerce",
+    "Piloting"
    ],
-   "form": {
-    "attrs": {
-     "Agility": 2
-    },
-    "dodge": 1,
-    "traits": [
-     "Touch burns: marks 2 boxes",
-     "Tough: hits of 2+ boxes mark one fewer"
-    ],
-    "drawbacks": [
-     "Blazing: no Stealth at all",
-     "Fading: a box an hour outside the suit"
-    ]
-   },
    "traits": [
     [
-     "ae-sense",
-     "Starborn Senses",
-     "+2 to Sensors or Intellect rolls to sense energy, power sources and radiation.",
+     "da-charts",
+     "Guild Charts",
+     "+2 to Navigation on charted corridors.",
+     "Navigation",
+     true,
+     "Sold Out",
+     "Your guild sells your secrets to the other side. Accept the betrayal."
+    ],
+    [
+     "da-field",
+     "Field Reader",
+     "+2 to Sensors to find hidden machinery or follow a power line.",
      "Sensors",
      true,
-     "Alien Mind",
-     "You think in ways others can't follow. Accept the misunderstanding when it matters."
+     "Public or Private?",
+     "You must decide who gets safe passage. Accept the guild's anger."
     ],
     [
-     "ae-heal",
-     "Light of Life",
-     "Ability: in your alternate form, roll Will to clear one injury box from someone you touch, once per scene.",
-     "Will",
-     false,
-     "Fragile Suit",
-     "Your suit can fail. When a hit or a hazard threatens it, accept the breach."
+     "da-flex",
+     "Flexible Frame",
+     "+2 to Athletics to squeeze through narrow spaces.",
+     "Athletics",
+     true,
+     "Magnetic Storms",
+     "Strong fields disorient you. Accept the stumble."
+    ]
+   ],
+   "freeSkill": "Navigation"
+  },
+  {
+   "id": "zethri",
+   "name": "Zethri",
+   "tier": 1,
+   "adj": {
+    "Agility": 1,
+    "Body": -1
+   },
+   "desc": "Small, agile, six-limbed beings with broad reflective eyes adapted to dim light. A corridor collapse isolated their colonies for centuries; reconnected, they found strangers who share their name, and now work at reunification.",
+   "core": [
+    "Dim-adapted: see in near-darkness; −1 to Agility-based rolls in bright light."
+   ],
+   "form": null,
+   "skills": [
+    "Engineering",
+    "Survival",
+    "Stealth",
+    "Diplomacy"
+   ],
+   "traits": [
+    [
+     "ze-dark",
+     "Dark Eyes",
+     "+2 to Sensors and Stealth in darkness.",
+     "Stealth",
+     true,
+     "Glare",
+     "Bright light blinds you at the worst moment. Accept the stumble."
+    ],
+    [
+     "ze-self",
+     "Built to Last",
+     "+2 to Engineering or Survival to make a place self-sufficient.",
+     "Survival",
+     true,
+     "Many Zethri",
+     "Your cluster's factions disagree about you. Accept the dispute."
+    ],
+    [
+     "ze-reunite",
+     "Reunifier",
+     "+2 to Diplomacy to bridge strangers who share a history.",
+     "Diplomacy",
+     true,
+     "Distrust of Chokepoints",
+     "You won't rely on one route. Accept the detour."
     ]
    ]
   }
  ],
  "allegiances": [
   [
-   "navy",
-   "The Concord Navy",
-   "Once per mission, help from a navy ship or station: supplies, repairs or an escort.",
-   "Duty: navy orders, and the navy's enemies."
+   "concord",
+   "The Concord",
+   "Once per job, consular help, credentials or a Concord navy contact.",
+   "Duty: Concord interests come first, even when they're wrong."
+  ],
+  [
+   "dynasty",
+   "A Tessan Dynasty",
+   "Once per job, credit, insurance or priority corridor access.",
+   "Duty: protect the dynasty's contracts, and collect what's owed."
+  ],
+  [
+   "corp",
+   "A Corporation",
+   "Once per job, transport, gear or an expense account.",
+   "Duty: the company's profits, and its secrets."
   ],
   [
    "house",
-   "A merchant house",
-   "Once per mission, money, a cargo, or a door opened.",
-   "Duty: the house's interests come first, and its rivals are yours."
+   "A Hegemony House",
+   "Once per job, imperial passes, an audience or house soldiers.",
+   "Duty: the house's ambitions in the succession wars."
+  ],
+  [
+   "zhaq",
+   "The Zhaq Free Republics",
+   "Once per job, a safehouse, weapons or a resistance cell.",
+   "Duty: the cause; smuggle, sabotage, shelter fugitives."
+  ],
+  [
+   "archives",
+   "The Veyari Archives",
+   "Once per job, records, lost corridor data or an archivist's research.",
+   "Duty: recover and preserve knowledge, whoever wants it buried."
+  ],
+  [
+   "guild",
+   "A Draelin Cartographic Guild",
+   "Once per job, current corridor charts or a navigator.",
+   "Duty: guild fees and guild secrets; never sell charts outside the guild."
+  ],
+  [
+   "flotilla",
+   "A Vael Flotilla",
+   "Once per job, passage, repairs or a berth anywhere the fleet goes.",
+   "Duty: the flotilla's neutrality, and its needs."
+  ],
+  [
+   "relief",
+   "A Relief Mission",
+   "Once per job, medical supplies, shelter or refugee contacts.",
+   "Duty: aid comes first, even in the middle of a job."
   ],
   [
    "syndicate",
-   "The Syndicate",
-   "Once per mission, a fence, a forger or a safe berth.",
-   "Duty: the Syndicate calls in favors, and the law knows your face."
+   "A Syndicate",
+   "Once per job, fences, smuggling routes or forged papers.",
+   "Duty: the syndicate's cut, and its jobs."
   ],
   [
-   "archive",
-   "The Archive",
-   "Once per mission, records, star charts or a scholar's help.",
-   "Duty and Vow: share what you find, and keep the Archive's secrets."
-  ],
-  [
-   "exiles",
-   "A people in exile",
-   "Contacts among your scattered people.",
-   "Duty: your people's cause, and the Hegemony's attention."
+   "quiet",
+   "The Quiet Network",
+   "Once per job, false test results, a safe route or a new identity for a psionic.",
+   "Duty: shelter other psionics, at any risk."
   ]
  ],
  "reasons": [
   [
-   "Explore",
-   "To see what's out there: worlds and wonders no one has charted yet."
+   "Fortune",
+   "There's money out here for anyone with nerve, and I intend to make mine."
   ],
   [
-   "Family tradition",
-   "My family has always flown, and I mean to live up to the name."
+   "Knowledge",
+   "The galaxy is full of things no one understands yet. I want to be first."
   ],
   [
-   "Discovery",
-   "The best laboratory in the galaxy is a ship on the frontier."
+   "New worlds",
+   "Somewhere past the next corridor there's a place to build something new."
   ],
   [
-   "Protect others",
-   "To protect the people who can't protect themselves."
-  ],
-  [
-   "A hero's example",
-   "A starship crew once saved my world, and I want to be that crew for someone else."
+   "Helping",
+   "People out here need help, and I can give it."
   ],
   [
    "Freedom",
-   "No planet can hold me, and no one gives me orders I don't choose."
+   "No empire, no creditor, no one owns me."
   ],
   [
-   "Prove myself",
-   "To prove I'm good enough, to everyone who doubted me and to myself."
+   "Debt",
+   "I owe more than I can ever repay, unless I take every job."
   ],
   [
-   "Leave the past behind",
-   "To leave behind a past, a world, or a life that was too small for me."
+   "Vengeance",
+   "Someone took everything from me. I'll find them."
   ],
   [
-   "Make amends",
-   "To make up for a mistake I can't undo."
+   "Faith",
+   "I carry a truth worth sharing, even with those who don't want it."
   ],
   [
-   "Fortune",
-   "There's a fortune out there, and I mean to find it."
+   "Exile",
+   "I can't go home. The crew is home now."
+  ],
+  [
+   "The thrill",
+   "Nothing feels like a corridor jump into the unknown."
   ]
  ],
  "connections": [
   [
-   "Academy classmates",
-   "We trained together, and we still look out for each other."
+   "Shipmates",
+   "We've flown together for years and trust each other with our lives."
   ],
   [
    "They saved my life",
-   "They pulled me out of a burning shuttle, and I owe them my life."
+   "They pulled me out of a wreck, a riot or a Mandate screening."
   ],
   [
    "I saved theirs",
-   "I saved their life on a past voyage, and they haven't forgotten it."
+   "I got them off a dying station, and they haven't forgotten."
   ],
   [
-   "Mentor",
-   "They took me under their wing when I first came aboard."
+   "Business partners",
+   "We split everything, the profits and the debts."
   ],
   [
-   "Friendly rivals",
-   "We competed for the same berth, and the rivalry is still mostly friendly."
+   "Rivals",
+   "We want the same contract, the same charts or the same discovery."
   ],
   [
    "Same homeworld",
-   "We grew up on the same world and know each other's families."
+   "We grew up in the same place and know each other's families."
   ],
   [
-   "An unpaid favor",
-   "I owe them a favor I haven't repaid yet."
+   "An unpaid debt",
+   "I owe them money or a favor, and I haven't paid yet."
   ],
   [
    "A shared secret",
-   "We share a secret from a mission neither of us talks about."
+   "We know what really happened on that job. No one else does."
   ],
   [
-   "Off-duty friends",
-   "We meet every week in the galley for cards, music or bad stories."
+   "Mentor",
+   "They taught me everything I know about the job."
   ],
   [
-   "Unfinished business",
-   "They blame me for something that went wrong on a past mission."
+   "Strange friends",
+   "Our peoples were enemies; we found out we aren't."
   ]
  ],
  "advantages": [
   [
-   "steady",
-   "Steady Hands",
-   "+2 to Medicine for delicate surgery or removing a dangerous embedded object.",
-   "Medicine"
+   "dealmaker",
+   "Dealmaker",
+   "+2 to Commerce when negotiating a price, a loan or a contract.",
+   "Commerce"
   ],
   [
-   "emergency",
-   "Emergency Medic",
-   "+2 to Medicine for emergency stabilization of a wounded patient.",
-   "Medicine"
-  ],
-  [
-   "xeno",
-   "Xenobiology Specialist",
-   "Choose one species or narrow biological group. +2 to Medicine or Life Sciences with that group.",
-   "Medicine",
-   "Species or group"
-  ],
-  [
-   "hyper",
-   "Hyperspace Theorist",
-   "+2 to Physical Sciences when analyzing hyperspace and jump phenomena.",
-   "Physical Sciences"
-  ],
-  [
-   "observer",
-   "Astute Observer",
-   "+2 to Intellect rolls to notice a concealed physical clue during a deliberate search.",
-   "Intellect"
-  ],
-  [
-   "signal",
-   "Signal Analyst",
-   "+2 to Communications when separating a real signal from noise or spotting a disguised one.",
-   "Communications"
-  ],
-  [
-   "slicer",
-   "Slicer",
-   "+2 to Computers when breaking into a system or tracing an intrusion.",
-   "Computers"
-  ],
-  [
-   "jury",
-   "Jury-Rigger",
-   "+2 to Engineering for a temporary repair with inadequate but workable materials.",
-   "Engineering"
-  ],
-  [
-   "ace",
-   "Ace Pilot",
-   "+2 to Piloting for hazardous maneuvers in a small craft.",
-   "Piloting"
-  ],
-  [
-   "diplo",
-   "Diplomatic Insight",
-   "+2 to Diplomacy when negotiating across a cultural misunderstanding you have identified.",
+   "polyglot",
+   "Polyglot",
+   "No translator needed for common languages; +2 to Diplomacy in first meetings with a new species.",
    "Diplomacy"
   ],
   [
-   "crisis",
-   "Crisis Leader",
-   "+2 to Leadership when coordinating an immediate response to a sudden emergency.",
-   "Leadership"
+   "xeno",
+   "Xenologist",
+   "+2 to Psychology or Science to understand an unfamiliar species.",
+   "Psychology"
   ],
   [
-   "discipline",
-   "Mental Discipline",
-   "+2 to Will to keep concentrating despite pain or severe distraction.",
+   "ports",
+   "Contacts in Every Port",
+   "+2 to Streetwise to find goods, work or a person.",
+   "Streetwise"
+  ],
+  [
+   "corridor",
+   "Corridor Sense",
+   "+2 to Navigation to find a safe route through an unstable corridor.",
+   "Navigation"
+  ],
+  [
+   "hotshot",
+   "Hotshot Pilot",
+   "+2 to Piloting in a chase or a dangerous maneuver.",
+   "Piloting"
+  ],
+  [
+   "steady",
+   "Steady Aim",
+   "+2 to Firearms after spending an action aiming at the same target.",
+   "Firearms"
+  ],
+  [
+   "brawler",
+   "Brawler",
+   "+2 to Close Combat when unarmed.",
+   "Close Combat"
+  ],
+  [
+   "fieldmedic",
+   "Field Medic",
+   "+2 to Medicine to stabilize a patient in the field.",
+   "Medicine"
+  ],
+  [
+   "intrusion",
+   "Intrusion Specialist",
+   "+2 to Computers to break security or cover your tracks.",
+   "Computers"
+  ],
+  [
+   "method",
+   "Scientific Method",
+   "+2 to Science on a study you can repeat or take time over.",
+   "Science"
+  ],
+  [
+   "salvage",
+   "Salvage Eye",
+   "+2 to Engineering or Commerce to judge what wreckage is worth.",
+   "Engineering"
+  ],
+  [
+   "ship",
+   "A Ship of Your Own",
+   "You own a small ship (crewed by the party), with a loan: start with one box of Debt.",
+   "Piloting"
+  ],
+  [
+   "aipartner",
+   "AI Partner",
+   "A personal AI that can assist Computers, Sensors and Investigation rolls (AI Minders have one already).",
+   "Computers"
+  ],
+  [
+   "drone",
+   "Drone Operator",
+   "A personal drone; +2 to Sensors when scouting or Engineering when repairing with it.",
+   "Sensors"
+  ],
+  [
+   "geneopt",
+   "Gene-Tailored",
+   "Biotech modifications: +2 to Body rolls against disease, toxins and radiation.",
+   "Body"
+  ],
+  [
+   "imp-arm",
+   "Implant: Cyber-Limb",
+   "+2 to Athletics or Close Combat where strength matters. It shows, and needs upkeep.",
+   "Close Combat"
+  ],
+  [
+   "imp-eyes",
+   "Implant: Optics",
+   "+2 to Sensors or Investigation by sight; see in low light. It shows, and needs upkeep.",
+   "Sensors"
+  ],
+  [
+   "imp-jack",
+   "Implant: Neural Jack",
+   "+2 to Computers when jacked in directly. A hostile system can strike back.",
+   "Computers"
+  ],
+  [
+   "imp-reflex",
+   "Implant: Reflex Wiring",
+   "+1 Dodge, and +2 to act first in a fight. It shows on scans.",
+   "Agility"
+  ],
+  [
+   "coolhead",
+   "Cool Under Fire",
+   "+2 to Will to keep acting under fire, fear or pressure.",
    "Will"
   ],
   [
-   "courage",
-   "Unshakable Courage",
-   "+2 to Will against overwhelming fear.",
-   "Will"
-  ],
-  [
-   "guarded",
-   "Guarded Mind",
-   "+2 to Will to resist psionic intrusion or compulsion.",
-   "Will"
-  ],
-  [
-   "marksman",
-   "Careful Marksman",
-   "+2 to Blasters after spending your preceding action aiming at the same visible target.",
-   "Blasters"
-  ],
-  [
-   "zerog",
-   "Zero-G Training",
-   "+2 to Athletics and Close Combat in zero gravity.",
-   "Athletics"
+   "psionic",
+   "Psionic",
+   "You have psionic potential: you can learn psionic powers (see Psionics and the Mandates). Take the Unregistered complication unless the GM agrees otherwise.",
+   "Psionics"
   ]
  ],
  "complications": [
   [
-   "mystery",
-   "Cannot Leave a Mystery Alone",
-   "A strange reading or discovery tempts you to linger, spend something scarce, or take a risky look. Accept a specific cost."
+   "debtbound",
+   "Debt-Bound",
+   "You owe a dynasty, a bank or a syndicate. Accept the collector's demand."
   ],
   [
-   "protects",
-   "Protects Others at Personal Risk",
-   "You shield someone or volunteer for a hazardous rescue at a real cost to yourself."
-  ],
-  [
-   "duty",
-   "Duty Before Self",
-   "You put the job ahead of exhaustion, injury or a personal need. Accept a concrete setback."
-  ],
-  [
-   "conscience",
-   "Conscience Above Orders",
-   "An order conflicts with your ethics. Accept the delay, challenge or consequence of refusing it."
-  ],
-  [
-   "book",
-   "By the Book",
-   "You insist on procedure when improvising would be faster. Accept the lost time or opportunity."
-  ],
-  [
-   "distrust",
-   "Distrusts Authority",
-   "A troubling order makes you demand answers at a critical moment. Accept the delay or strain."
-  ],
-  [
-   "reputation",
-   "Reputation to Uphold",
-   "Pride tempts you to refuse help or take on too much. Take a real consequence when it matters."
-  ],
-  [
-   "war",
-   "Haunted by the War",
-   "A reminder of the war with the Hegemony causes hesitation or a hard choice. Define the reminder together."
-  ],
-  [
-   "telepaths",
-   "Uneasy Around Telepaths",
-   "You resist a mind touch or psionic help that could solve the problem. Accept the cost."
-  ],
-  [
-   "culture",
-   "Culture Shock",
-   "Your customs clash with a local practice. Accept the misunderstanding or lost opportunity."
-  ],
-  [
-   "rival",
-   "Old Rival",
-   "A recurring rival complicates your work with concrete problems."
-  ],
-  [
-   "home",
-   "Someone Back Home",
-   "A family or a love pulls you away from the work."
+   "unregistered",
+   "Unregistered",
+   "You're a psionic who has never been tested, or has a forged result. Accept the danger at every screening and checkpoint."
   ],
   [
    "wanted",
    "Wanted",
-   "There's a price on your head somewhere. Accept trouble when bounty hunters or the law come."
+   "A government, house or corporation wants you. Accept the hunters."
   ],
   [
-   "debt",
-   "Owes the Wrong People",
-   "A debt to dangerous people comes due. Accept their demand."
+   "bounty",
+   "Hegemony Bounty",
+   "An imperial house has put a price on you. Accept the bounty hunter."
+  ],
+  [
+   "upkeep",
+   "Implant Upkeep",
+   "Your implants need parts, power and care. Accept the cost or the malfunction."
+  ],
+  [
+   "idealist",
+   "Idealist",
+   "You won't compromise your principles. Accept the cost of keeping them."
+  ],
+  [
+   "greedy",
+   "Greedy",
+   "You can't walk away from profit. Accept the risk to grab it."
+  ],
+  [
+   "rival",
+   "Old Rival",
+   "Someone is always a step ahead or behind you. Accept their interference."
+  ],
+  [
+   "leash",
+   "Corporate Leash",
+   "Your employer owns your contract. Accept the order you don't like."
+  ],
+  [
+   "honor",
+   "Honor-Bound",
+   "You keep your word, your oaths and your people's customs. Accept the setback."
+  ],
+  [
+   "guilt",
+   "Survivor's Guilt",
+   "You lived when others didn't. Accept the reckless choice to make it right."
+  ],
+  [
+   "mystery",
+   "Can't Leave a Mystery Alone",
+   "A strange signal or ruin pulls you in. Accept the detour or the danger."
+  ],
+  [
+   "protects",
+   "Protects Others",
+   "You shield the weak at your own risk. Accept the cost."
+  ],
+  [
+   "stims",
+   "Stim Habit",
+   "You lean on combat stims or calm-patches. Accept the craving or the crash."
+  ],
+  [
+   "exile",
+   "Exile",
+   "You can't go home. Accept the scorn or the hunters of your own people."
   ],
   [
    "secret",
-   "Keeps a Dangerous Secret",
-   "An agreed secret threatens trust or safety. Earn a point when protecting or revealing it has a real consequence."
+   "Dangerous Knowledge",
+   "You know a corridor, a crime or a name someone would kill to bury. Accept the danger."
   ],
   [
-   "nonlethal",
-   "Reluctant to Kill",
-   "You set the blaster to stun even when it costs you. Accept the extra danger."
+   "reckless",
+   "Reckless",
+   "You jump first and think later. Accept the danger."
+  ],
+  [
+   "distrustai",
+   "Distrusts AI",
+   "You won't trust a machine mind. Accept the cost of refusing its help."
+  ],
+  [
+   "culture",
+   "Culture Shock",
+   "You misread other peoples' customs. Accept the misunderstanding."
   ]
  ],
  "triggers": {
-  "mystery": [
-   "An unexplained reading while the crew is ordered to leave",
-   "A derelict no one has catalogued",
-   "Data that contradicts known science"
+  "debtbound": [
+   "A collector waits at the dock",
+   "The payment is due mid-job",
+   "A creditor offers to forgive it for a favor"
   ],
-  "protects": [
-   "A crewmate is pinned down or hurt",
-   "Civilians are caught in the danger",
-   "Someone volunteers for a deadly job in your place"
-  ],
-  "duty": [
-   "You're hurt or exhausted, but your station needs you",
-   "A personal message arrives in the middle of a crisis",
-   "Your relief is late and the work can't wait"
-  ],
-  "conscience": [
-   "An order would harm civilians or prisoners",
-   "You're ordered to leave someone behind",
-   "Your superiors hide the truth from the people it affects"
-  ],
-  "book": [
-   "A shortcut skips a safety check",
-   "An improvised plan breaks regulations",
-   "Someone asks you to bend a rule just this once"
-  ],
-  "distrust": [
-   "An order comes with no explanation",
-   "A new officer takes command",
-   "Orders from far away ignore what's happening here"
-  ],
-  "reputation": [
-   "Someone questions your competence in front of others",
-   "A task in your field is beyond you",
-   "Getting help means admitting a mistake"
-  ],
-  "war": [
-   "Hegemony ships on the sensors",
-   "Meeting someone who fought on the other side",
-   "A world that looks like the one you lost"
-  ],
-  "telepaths": [
-   "A mind touch is proposed",
-   "A telepath joins the landing party",
-   "A psionic intrusion affects the crew"
-  ],
-  "culture": [
-   "A local custom clashes with your own",
-   "A formal ceremony where every gesture matters",
-   "Negotiating with a people your own distrust"
-  ],
-  "rival": [
-   "Your rival is after the same prize",
-   "Your rival takes credit for your work",
-   "Your rival needs your help"
-  ],
-  "home": [
-   "A message from home arrives",
-   "The mission passes near your homeworld",
-   "Someone you love is in danger"
+  "unregistered": [
+   "A Mandate screening at the corridor gate",
+   "A scanner sweeps the room",
+   "Someone saw your power and knows what it means"
   ],
   "wanted": [
-   "A bounty hunter docks at the same station",
-   "Your face on a wanted list",
-   "Customs scans your papers twice"
+   "Your face on a station's watch list",
+   "A familiar uniform in the crowd",
+   "An old associate sells you out"
   ],
-  "debt": [
-   "A collector comes aboard",
-   "Your creditor wants a favor instead",
-   "The interest comes due"
+  "bounty": [
+   "A hunter in the next berth",
+   "An imperial patrol checks papers",
+   "The bounty doubles"
+  ],
+  "upkeep": [
+   "A part fails at the worst moment",
+   "Your supplier wants more",
+   "A scanner flags your implants"
+  ],
+  "idealist": [
+   "The easy way means hurting innocents",
+   "Your employer asks you to look away",
+   "A bribe would solve everything"
+  ],
+  "greedy": [
+   "A fortune on the table, and a trap around it",
+   "A partner's share could be yours",
+   "The cargo is worth more than the job"
+  ],
+  "rival": [
+   "Your rival arrives first",
+   "Your rival needs your help",
+   "A prize you both want"
+  ],
+  "leash": [
+   "Head office changes the plan",
+   "The company wants the cargo, not the people",
+   "A recall order arrives"
+  ],
+  "honor": [
+   "Keeping your word means losing",
+   "An insult to your people",
+   "A promise to an enemy"
+  ],
+  "guilt": [
+   "Someone in the same danger as before",
+   "A memorial or a name",
+   "The chance to go back"
+  ],
+  "mystery": [
+   "An impossible sensor reading",
+   "A ruin that shouldn't exist",
+   "A signal on a dead channel"
+  ],
+  "protects": [
+   "A civilian in the crossfire",
+   "A friend about to be left behind",
+   "Someone volunteers for a deadly task in your place"
+  ],
+  "stims": [
+   "A long fight ahead",
+   "A dealer at the bar",
+   "The supply runs out"
+  ],
+  "exile": [
+   "Your people on the same station",
+   "A message from home",
+   "Someone recognizes your exile mark"
   ],
   "secret": [
-   "Someone starts asking the wrong questions",
-   "Evidence that could expose you turns up",
-   "Keeping the secret means lying to a friend"
+   "Someone close to the truth",
+   "A powerful figure asks what you know",
+   "Telling would save a friend"
   ],
-  "nonlethal": [
-   "A hostile refuses to surrender",
-   "Kill settings are ordered",
-   "The only fast solution would kill someone"
+  "reckless": [
+   "A closed door in a dangerous place",
+   "A fight you could avoid",
+   "The careful plan takes too long"
+  ],
+  "distrustai": [
+   "The AI offers the only way through",
+   "An AI joins the crew",
+   "A system you can't check"
+  ],
+  "culture": [
+   "A ceremony you don't understand",
+   "A gift you shouldn't accept",
+   "A joke that isn't funny to them"
   ]
  },
  "equipment": [
   [
-   "comm",
-   "Comm",
-   "Talks to the ship and the landing party within range. Interference, shielding or distance can cut it off."
-  ],
-  [
-   "scanner",
-   "Scanner",
-   "Reads life signs, energy, materials and air at short range. Field Sensors rolls need one."
-  ],
-  [
-   "medscanner",
-   "Med scanner",
-   "Identifies ordinary injuries automatically. Diagnosing unfamiliar biology without one is very difficult (−4)."
-  ],
-  [
-   "medkit",
-   "Medkit",
-   "Drugs, dressings and injectors. Needed for emergency stabilization and field treatment."
-  ],
-  [
-   "toolkit",
-   "Tool kit",
-   "Hand tools, spare parts and test gear. Needed for most Engineering in the field."
-  ],
-  [
    "pistol",
-   "Blaster pistol",
-   "12 charge. Settings and costs are under Blaster charge."
+   "Slug pistol",
+   "Twelve rounds. Hits mark 2 boxes."
   ],
   [
-   "translator",
-   "Translator",
-   "Lets you talk with speakers of known languages. A new language takes time and a Communications roll."
+   "laser",
+   "Laser pistol",
+   "Twenty shots per cell; silent, no recoil. Hits mark 2 boxes."
+  ],
+  [
+   "carbine",
+   "Slug carbine",
+   "Thirty rounds; can fire bursts. Hits mark 2 boxes."
+  ],
+  [
+   "plasma",
+   "Plasma rifle",
+   "Ten shots per cell. Hits mark 3 boxes and leave the target Dying."
+  ],
+  [
+   "stunner",
+   "Stunner",
+   "The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box."
+  ],
+  [
+   "blade",
+   "Vibroblade",
+   "A humming blade. Hits mark 2 boxes."
+  ],
+  [
+   "armor",
+   "Body armor",
+   "Once per fight, a hit that marks 2 or more boxes marks one fewer. Shows under scans."
   ],
   [
    "vacsuit",
    "Vac suit",
-   "Hours of air in vacuum or poison atmosphere. −2 to Agility-based actions and Stealth while worn."
+   "Air for six hours in vacuum or poison atmosphere."
   ],
   [
-   "survival",
-   "Survival pack",
-   "Rations, water, light, rope and shelter for a few days. Makes impossible survival tasks ordinary."
+   "medkit",
+   "Medkit",
+   "Biotech dressings, stims and a scanner. Needed to stabilize a patient and give field treatment."
   ],
   [
-   "beacon",
-   "Emergency beacon",
-   "Broadcasts your position to the ship."
+   "toolkit",
+   "Toolkit",
+   "Needed for most Engineering in the field."
   ],
   [
-   "sled",
-   "Grav sled",
-   "Carries heavy loads or a casualty at walking pace. Hard to move quietly (−2 Stealth)."
+   "deck",
+   "Intrusion deck",
+   "A hacking rig. Needed for most Computers work against secured systems."
+  ],
+  [
+   "scanner",
+   "Scanner",
+   "Handheld sensor. Needed for most Sensors work away from a ship."
+  ],
+  [
+   "drone",
+   "Scout drone",
+   "A small flying drone that can scout and relay what it sees."
+  ],
+  [
+   "translator",
+   "Translator",
+   "Translates most known languages, slowly. Thrum and Qor need one to talk with most peoples."
+  ],
+  [
+   "exoframe",
+   "Exo-frame",
+   "A light powered frame: no gravity penalty for Vael and others built for low gravity."
+  ],
+  [
+   "papers",
+   "Travel papers",
+   "Accord transit permits and a clean (or convincing) Mandate record."
   ]
  ],
  "weapons": {
-  "skill": "Blasters",
-  "jamOn18": false,
-  "defaultSpares": 1,
+  "skill": "Firearms",
+  "jamOn18": true,
+  "defaultSpares": 2,
   "items": {
-   "holdout": [
-    "Holdout blaster",
-    6
-   ],
    "pistol": [
-    "Blaster pistol",
+    "Slug pistol",
     12
    ],
+   "laser": [
+    "Laser pistol",
+    20
+   ],
    "carbine": [
-    "Blaster carbine",
-    24
+    "Slug carbine",
+    30
+   ],
+   "plasma": [
+    "Plasma rifle",
+    10
    ]
   },
   "equipLinked": [
-   "pistol"
+   "pistol",
+   "laser",
+   "carbine",
+   "plasma"
   ],
   "modes": [
    [
-    "stun",
-    "Stun",
+    "single",
+    "Single shot",
     1,
     null,
     0
    ],
    [
-    "bolt",
-    "Bolt",
-    1,
+    "burst",
+    "Burst",
+    3,
+    [
+     "carbine"
+    ],
+    1
+   ],
+   [
+    "cover",
+    "Covering fire",
+    3,
     null,
-    0
-   ],
-   [
-    "overcharge",
-    "Overcharged bolt",
-    3,
-    [
-     "pistol",
-     "carbine"
-    ],
-    0
-   ],
-   [
-    "wide",
-    "Wide stun",
-    3,
-    [
-     "carbine"
-    ],
     0
    ]
   ]
  },
  "tracks": [
   {
-   "name": "Shields",
-   "boxes": 3,
-   "effects": [
-    "Up",
-    "Weakened",
-    "Failing",
-    "Down: hits go to the Hull and a system"
-   ]
-  },
-  {
-   "name": "Hull",
+   "name": "Debt",
    "boxes": 4,
    "effects": [
-    "Intact",
-    "Scarred",
-    "Minor breaches",
-    "Serious breaches, decks lost",
-    "Breaking up: start an Abandon ship clock"
+    "No debts worth mentioning",
+    "A payment comes due",
+    "Collectors call: −2 to Commerce with lenders",
+    "Liens: your ship or gear can be seized",
+    "Default: a creditor names the price, a job you can't refuse"
    ]
   },
   {
-   "name": "Weapons",
-   "boxes": 3,
+   "name": "Heat",
+   "boxes": 4,
    "effects": [
-    "Working",
-    "Damaged: −2",
-    "Crippled: −4, basic function only",
-    "Offline"
+    "Nobody's looking",
+    "Questions asked at the last port",
+    "Flagged: −2 at checkpoints and screenings",
+    "Hunted: a bounty, a warrant or an inquisitor",
+    "Cornered: start a Manhunt clock"
    ]
   },
   {
-   "name": "Engines",
-   "boxes": 3,
+   "name": "Reputation",
+   "boxes": 4,
    "effects": [
-    "Working",
-    "Damaged: −2",
-    "Crippled: −4, basic function only",
-    "Offline"
-   ]
-  },
-  {
-   "name": "Sensors",
-   "boxes": 3,
-   "effects": [
-    "Working",
-    "Damaged: −2",
-    "Crippled: −4, basic function only",
-    "Offline"
-   ]
-  },
-  {
-   "name": "Comms",
-   "boxes": 3,
-   "effects": [
-    "Working",
-    "Damaged: −2",
-    "Crippled: −4, basic function only",
-    "Offline"
-   ]
-  },
-  {
-   "name": "Life support",
-   "boxes": 3,
-   "effects": [
-    "Working",
-    "Damaged: −2",
-    "Crippled: −4, basic function only",
-    "Offline"
+    "Unknown",
+    "Talked about in the ports",
+    "Recognized: +2 to Diplomacy with admirers, −2 to Stealth",
+    "Famous: everyone wants something from you",
+    "Legend: someone powerful comes calling; start a clock"
    ]
   }
  ],
@@ -1524,429 +2537,563 @@
   ]
  },
  "journal": {
-  "mode": "stardate",
-  "start": 3200,
+  "mode": "calendar",
+  "start": [
+   2341,
+   2,
+   14
+  ],
   "outcomes": [
-   "Completed",
-   "Partly completed",
+   "Done",
+   "Partly done",
    "Failed",
    "Ongoing"
+  ]
+ },
+ "spells": {
+  "skill": "Psionics",
+  "plural": "Psionic powers",
+  "known": [
+   2,
+   3,
+   4
+  ],
+  "roles": [],
+  "advantages": [
+   "psionic"
+  ],
+  "originAdvantages": [],
+  "note": "Using a power takes an action and a Psionics roll; the target resists with Will where it makes sense. A failed use or a natural 18 marks a box of Heat: someone noticed. Mandate scanners detect active powers nearby.",
+  "list": [
+   [
+    "sense",
+    "Sense Minds",
+    "Feel the minds within a room or two: how many, and their strongest emotions."
+   ],
+   [
+    "mask",
+    "Mask",
+    "Hide your own mind: +3 against psionic detection and Mandate scanners for a scene."
+   ],
+   [
+    "shield",
+    "Mind Shield",
+    "You or an ally get +2 to resist psionics, fear and suggestion for a scene."
+   ],
+   [
+    "push",
+    "Push",
+    "A short suggestion the target follows unless they resist with Will."
+   ],
+   [
+    "read",
+    "Surface Thoughts",
+    "By touch, read what the target is thinking right now (Will resists)."
+   ],
+   [
+    "link",
+    "Mind Link",
+    "Speak mind to mind with one ally for a scene, at any distance in the same system."
+   ],
+   [
+    "calm",
+    "Calm",
+    "Soothe fear or rage in one person (or a small group at −2)."
+   ],
+   [
+    "shove",
+    "Kinetic Shove",
+    "Push a person or object with force: knock down, disarm, slam a door."
+   ],
+   [
+    "lift",
+    "Kinetic Lift",
+    "Move a small object you can see, delicately, for a scene."
+   ],
+   [
+    "static",
+    "Static",
+    "Disrupt nearby electronics: a lock, a camera, a weapon's targeting."
+   ],
+   [
+    "flash",
+    "Precognitive Flash",
+    "Once per scene, +2 to one roll as you glimpse what's coming."
+   ],
+   [
+    "trance",
+    "Healing Trance",
+    "Clear one injury box on yourself, once per wound."
+   ]
   ]
  },
  "restricted": null,
  "quickRef": [
   [
    "Damage",
-   "Fists, batons, knives: 1 box. Vibroblades, blaster bolts: 2. Overcharged bolt: 3 and Dying. Stun: Body −2 roll, no box."
+   "Fists, batons: 1 box. Pistols, lasers, carbines, blades, claws: 2. Plasma rifle, coilgun: 3 and Dying. Stunner: Body −2 roll, no box."
   ],
   [
-   "Stun",
-   "Target rolls Body −2: failure, out for the scene; success, −2 on their next action."
+   "Firearms",
+   "Slug pistol 12, laser pistol 20, carbine 30, plasma rifle 10. Burst: 3 shots, +1 (carbine). Covering fire: 3. Reload: one action. Natural 18 jams."
   ],
   [
-   "Blasters",
-   "Holdout 6, pistol 12, carbine 24. Stun 1, bolt 1, overcharged 3, wide stun 3. A spare cell refills it."
+   "Psionics",
+   "Powers: an action and a Psionics roll; known: Trained 2, Specialty 3, Expert 4. Failure or natural 18 marks Heat. Mandate scanners detect active powers."
   ],
   [
-   "Ship",
-   "Shields (3) take hits first; then Hull (4) and a system (3: −2, −4, offline). Piloting evades once per exchange; Engineering clears a box."
+   "Tracks",
+   "Debt (what you owe), Heat (who's after you), Reputation (who knows you). 4 boxes each; clear by paying up, lying low or quiet work between jobs."
   ]
  ],
  "example": {
+  "species": "Human",
   "name": "Mara Okonkwo",
-  "rank": "Lieutenant",
-  "dept": "Scientist",
+  "rank": "Concord debt restructurer",
+  "dept": "Broker",
   "path": "rounded",
   "speciesId": "human",
-  "role": "Scientist: reads the anomaly, explains it to the captain, and wants to get closer.",
-  "reason": "The best laboratory in the galaxy is a ship on the frontier.",
-  "connection": "Owes the chief engineer for rebuilding her scanner after the Kessa incident.",
+  "role": "Buys worlds' loans from Tessan dynasties at a discount, and forgives them, which the old creditors call madness and the reformers call the future.",
+  "reason": "People out here need help, and I can give it.",
+  "connection": "Thessk Varo-Hun sold her the first debt she ever forgave, and was disowned for it.",
   "attrs": {
    "Body": 10,
-   "Agility": 11,
+   "Agility": 10,
    "Intellect": 13,
-   "Presence": 11,
-   "Will": 11
+   "Presence": 13,
+   "Will": 10
   },
   "skills": {
-   "Sensors": "S",
-   "Physical Sciences": "T",
+   "Commerce": "S",
+   "Psychology": "T",
+   "Deception": "T",
    "Computers": "T",
-   "Engineering": "T",
-   "Life Sciences": "T",
-   "Medicine": "T",
-   "Communications": "T",
    "Diplomacy": "T",
-   "Blasters": "T",
-   "Survival": "T",
-   "Navigation": "T"
+   "Investigation": "T",
+   "Leadership": "T",
+   "Streetwise": "T",
+   "Navigation": "T",
+   "Firearms": "T"
   },
   "adv": {
-   "id": "hyper"
+   "id": "dealmaker"
   },
   "comp": {
-   "id": "mystery",
-   "trigger": "An unexplained reading while the crew is ordered to leave"
+   "id": "idealist",
+   "trigger": "A bribe would solve everything"
   },
   "edges": {
    "attr": 1,
-   "skill": 1,
+   "grit": 1,
    "contact": 1
   },
-  "contact": "A researcher at the Archive who'll check a theory, quietly",
+  "contact": "A Tessan reformer on a dynasty's board, who leaks her the terms",
   "equipment": {
-   "comm": true,
-   "scanner": true,
-   "pistol": true
+   "pistol": true,
+   "deck": true,
+   "papers": true
   },
+  "allegiance": "concord",
   "play": {
    "gun": {
     "type": "pistol",
-    "power": 12,
     "rounds": 12,
-    "spares": 1
+    "spares": 2
    }
   }
  },
  "pregens": [
   {
-   "name": "Ilsa Varga",
-   "rank": "Captain",
-   "dept": "Captain",
+   "species": "Tessan",
+   "name": "Thessk Varo-Hun",
+   "rank": "Trader, disowned",
+   "dept": "Trader",
    "path": "rounded",
-   "speciesId": "human",
-   "species": "Human",
-   "role": "Commands the ship, keeps the crew alive, and takes the jobs that need doing.",
-   "reason": "To protect the people who can't protect themselves.",
-   "connection": "Rhen Valo once wore her face to get her out of a Hegemony prison.",
+   "speciesId": "tessan",
+   "role": "A young reformer cut off by her dynasty's old creditors for writing off a client world's debt. She trades on her own now, and keeps her word.",
+   "reason": "No empire, no creditor, no one owns me.",
+   "connection": "She sold Mara Okonkwo the first debt Mara forgave. Neither regrets it.",
    "attrs": {
-    "Body": 10,
-    "Agility": 12,
-    "Intellect": 10,
+    "Body": 11,
+    "Agility": 8,
+    "Intellect": 12,
     "Presence": 13,
     "Will": 11
    },
    "skills": {
-    "Leadership": "S",
+    "Commerce": "S",
     "Diplomacy": "T",
-    "Piloting": "T",
-    "Blasters": "T",
-    "Close Combat": "T",
     "Psychology": "T",
+    "Piloting": "T",
+    "Leadership": "T",
     "Navigation": "T",
-    "Sensors": "T",
-    "Athletics": "T",
-    "Deception": "T"
-   },
-   "adv": {
-    "id": "crisis"
+    "Computers": "T",
+    "Investigation": "T",
+    "Streetwise": "T",
+    "Deception": "T",
+    "Science": "T"
    },
    "sadv": {
+    "id": "te-ledger"
+   },
+   "adv": {
     "id": ""
    },
    "comp": {
-    "id": "duty",
-    "trigger": "You're hurt or exhausted, but your station needs you"
+    "id": "exile",
+    "trigger": "Your people on the same station"
    },
    "edges": {
-    "attr": 1,
-    "adv2": 1,
-    "grit": 1
+    "skill": 1,
+    "contact": 1
    },
-   "adv2": {
-    "id": "marksman"
+   "contact": "Her grandfather's old clerk, who still sends her the family's secrets",
+   "equipment": {
+    "laser": true,
+    "scanner": true,
+    "papers": true
    },
    "play": {
-    "duty": 3,
     "gun": {
-     "type": "pistol",
-     "power": 12,
-     "rounds": 12,
-     "spares": 1
+     "type": "laser",
+     "rounds": 20,
+     "spares": 2
     }
-   },
-   "equipment": {
-    "comm": true,
-    "pistol": true
    }
   },
   {
-   "name": "Kesh",
-   "rank": "Pilot",
-   "dept": "Pilot",
+   "species": "Kel",
+   "name": "Kesh of the Seventh Hive",
+   "rank": "Market scout",
+   "dept": "Explorer",
    "path": "rounded",
-   "speciesId": "ylith",
-   "species": "Ylith",
-   "role": "Flies anything, through anything, and gets bored in a straight line.",
-   "reason": "No planet can hold me, and no one gives me orders I don't choose.",
-   "connection": "Brakka keeps rebuilding the flight controls Kesh keeps breaking.",
+   "speciesId": "kel",
+   "role": "Scouts new markets to pay down her homeworld's debt, and wonders more each year whether the radicals are right.",
+   "reason": "I owe more than I can ever repay, unless I take every job.",
+   "connection": "Ilvi Saradh's AI found the corridor Kesh's hive needed; Kesh owes them both.",
    "attrs": {
-    "Body": 8,
-    "Agility": 14,
+    "Body": 10,
+    "Agility": 11,
     "Intellect": 13,
+    "Presence": 8,
+    "Will": 13
+   },
+   "skills": {
+    "Navigation": "S",
+    "Survival": "T",
+    "Science": "T",
+    "Sensors": "T",
+    "Piloting": "T",
+    "Computers": "T",
+    "Athletics": "T",
+    "Engineering": "T",
+    "Commerce": "T",
+    "Investigation": "T"
+   },
+   "sadv": {
+    "id": "ke-ledger"
+   },
+   "adv": {
+    "id": ""
+   },
+   "comp": {
+    "id": "debtbound",
+    "trigger": "A creditor offers to forgive it for a favor"
+   },
+   "edges": {
+    "grit": 1,
+    "gear": 1
+   },
+   "gear": {
+    "item": "A hive-made survey kit",
+    "skill": "Sensors"
+   },
+   "equipment": {
+    "scanner": true,
+    "vacsuit": true,
+    "stunner": true
+   }
+  },
+  {
+   "species": "Human",
+   "name": "Rook",
+   "rank": "Former Concord marine",
+   "dept": "Augment",
+   "path": "hand",
+   "speciesId": "human",
+   "role": "Rebuilt after the Zhaq border war with a cyber-arm and reflex wiring. The implant payments are overdue, and the company that made them knows where Rook drinks.",
+   "reason": "I can't go home. The crew is home now.",
+   "connection": "Brakka was on the other side of that border war. They found out over a drink, and stayed friends.",
+   "attrs": {
+    "Body": 13,
+    "Agility": 13,
+    "Intellect": 10,
     "Presence": 10,
     "Will": 10
    },
    "skills": {
-    "Piloting": "S",
-    "Navigation": "T",
-    "Sensors": "T",
-    "Engineering": "T",
-    "Computers": "T",
-    "Blasters": "T",
+    "Close Combat": "S",
     "Athletics": "T",
-    "Stealth": "T",
-    "Communications": "T",
+    "Firearms": "T",
+    "Engineering": "T",
+    "Streetwise": "T",
     "Survival": "T",
-    "Deception": "T"
+    "Stealth": "T",
+    "Medicine": "T"
    },
    "adv": {
-    "id": ""
-   },
-   "sadv": {
-    "id": "yl-eyes"
+    "id": "imp-arm"
    },
    "comp": {
-    "id": "rival",
-    "trigger": "Your rival is after the same prize"
+    "id": "upkeep",
+    "trigger": "Your supplier wants more"
+   },
+   "edges": {
+    "attr": 1,
+    "grit": 1,
+    "adv2": 1
+   },
+   "adv2": {
+    "id": "imp-reflex"
+   },
+   "equipment": {
+    "carbine": true,
+    "blade": true,
+    "armor": true
+   },
+   "play": {
+    "gun": {
+     "type": "carbine",
+     "rounds": 30,
+     "spares": 2
+    }
+   }
+  },
+  {
+   "species": "Draelin",
+   "name": "Ilvi Saradh",
+   "rank": "Guild navigator",
+   "dept": "AI Minder",
+   "path": "rounded",
+   "speciesId": "draelin",
+   "role": "A guild navigator whose AI partner, Quill, remembers a corridor the guild says doesn't exist.",
+   "reason": "The galaxy is full of things no one understands yet. I want to be first.",
+   "connection": "Quill found the corridor Kesh's hive needed. Ilvi never told the guild.",
+   "attrs": {
+    "Body": 9,
+    "Agility": 12,
+    "Intellect": 13,
+    "Presence": 11,
+    "Will": 10
+   },
+   "skills": {
+    "Computers": "S",
+    "Navigation": "T",
+    "Psychology": "T",
+    "Sensors": "T",
+    "Engineering": "T",
+    "Piloting": "T",
+    "Science": "T",
+    "Investigation": "T",
+    "Diplomacy": "T",
+    "Commerce": "T",
+    "Stealth": "T",
+    "Athletics": "T"
+   },
+   "adv": {
+    "id": "corridor"
+   },
+   "comp": {
+    "id": "secret",
+    "trigger": "Someone close to the truth"
    },
    "edges": {
     "skill": 1,
     "gear": 1
    },
    "gear": {
-    "item": "A custom flight harness",
-    "skill": "Piloting"
-   },
-   "play": {
-    "gun": {
-     "type": "holdout",
-     "power": 6,
-     "rounds": 6,
-     "spares": 1
-    }
+    "item": "Quill's core, a guild-grade AI",
+    "skill": "Computers"
    },
    "equipment": {
-    "comm": true
+    "laser": true,
+    "deck": true,
+    "scanner": true
+   },
+   "allegiance": "guild",
+   "play": {
+    "gun": {
+     "type": "laser",
+     "rounds": 20,
+     "spares": 2
+    }
    }
   },
   {
-   "name": "Dr. Oru Tamsin",
-   "rank": "Ship's doctor",
-   "dept": "Medic",
+   "species": "Corvani",
+   "name": "Dr. Anwe Tal",
+   "rank": "Restoration ecologist",
+   "dept": "Scientist",
    "path": "rounded",
-   "speciesId": "vashari",
-   "species": "Vashari",
-   "role": "Feels every patient's pain, and treats it anyway.",
-   "reason": "To make up for a mistake I can't undo.",
-   "connection": "Sable is the only patient Oru can't feel, and Oru finds that restful.",
+   "speciesId": "corvani",
+   "role": "Rebuilding a world the Hegemony strip-mined, against a mining corporation's lawyers and, lately, its guns.",
+   "reason": "People out here need help, and I can give it.",
+   "connection": "Sable cleaned up the corporation's files that proved Anwe's case, and asked nothing for it.",
    "attrs": {
-    "Body": 9,
+    "Body": 11,
     "Agility": 9,
     "Intellect": 13,
-    "Presence": 13,
-    "Will": 11
+    "Presence": 10,
+    "Will": 13
    },
    "skills": {
-    "Medicine": "S",
-    "Life Sciences": "T",
-    "Psychology": "T",
+    "Science": "S",
     "Sensors": "T",
     "Computers": "T",
-    "Diplomacy": "T",
-    "Leadership": "T",
+    "Investigation": "T",
+    "Medicine": "T",
     "Survival": "T",
-    "Communications": "T",
-    "Close Combat": "T"
+    "Diplomacy": "T",
+    "Engineering": "T",
+    "Psychology": "T",
+    "Athletics": "T"
+   },
+   "sadv": {
+    "id": "co-restore"
    },
    "adv": {
     "id": ""
    },
-   "sadv": {
-    "id": "va-sense"
-   },
    "comp": {
     "id": "protects",
-    "trigger": "Civilians are caught in the danger"
+    "trigger": "A civilian in the crossfire"
    },
    "edges": {
-    "adv2": 1,
-    "gear": 1
+    "attr": 1,
+    "contact": 1
    },
-   "adv2": {
-    "id": "emergency"
+   "contact": "A Veyari archivist who keeps the old survey records of her world",
+   "equipment": {
+    "scanner": true,
+    "medkit": true,
+    "stunner": true
    },
-   "gear": {
-    "item": "A field surgeon's kit",
-    "skill": "Medicine"
+   "allegiance": "relief"
+  },
+  {
+   "species": "Dresh",
+   "name": "Brakka",
+   "rank": "Deserter, Ninth Legion",
+   "dept": "Mercenary",
+   "path": "rounded",
+   "speciesId": "dresh",
+   "role": "A legionary who deserted rather than burn a Zhaq city. The Hegemony wants him back, or dead.",
+   "reason": "Someone took everything from me. I'll find them.",
+   "connection": "Rook fought him across the Zhaq border once. Now Rook watches his back.",
+   "attrs": {
+    "Body": 15,
+    "Agility": 11,
+    "Intellect": 9,
+    "Presence": 10,
+    "Will": 10
+   },
+   "skills": {
+    "Firearms": "S",
+    "Close Combat": "T",
+    "Athletics": "T",
+    "Leadership": "T",
+    "Survival": "T",
+    "Medicine": "T",
+    "Stealth": "T",
+    "Piloting": "T",
+    "Sensors": "T",
+    "Engineering": "T"
+   },
+   "sadv": {
+    "id": "dr-legion"
+   },
+   "adv": {
+    "id": ""
+   },
+   "comp": {
+    "id": "bounty",
+    "trigger": "A hunter in the next berth"
+   },
+   "edges": {
+    "grit": 1
    },
    "equipment": {
-    "comm": true,
-    "medscanner": true,
-    "medkit": true
+    "plasma": true,
+    "armor": true,
+    "blade": true
+   },
+   "play": {
+    "gun": {
+     "type": "plasma",
+     "rounds": 10,
+     "spares": 2
+    }
    }
   },
   {
-   "name": "Brakka",
-   "rank": "Chief engineer",
-   "dept": "Engineer",
+   "species": "Human",
+   "name": "Sable",
+   "rank": "Freelance intrusion specialist",
+   "dept": "Hacker",
    "path": "rounded",
-   "speciesId": "korrin",
-   "species": "Korrin",
-   "role": "Keeps the engines running on spit and stubbornness, and tells you exactly why your idea won't work.",
-   "reason": "To prove I'm good enough, to everyone who doubted me and to myself.",
-   "connection": "Brakka and Kesh have a standing bet on whether the ship survives Kesh's next maneuver.",
+   "speciesId": "human",
+   "role": "Breaks into any system for the right price. Secretly psionic, hidden by the Quiet Network; every checkpoint is a gamble.",
+   "reason": "No empire, no creditor, no one owns me.",
+   "connection": "Sable cleaned up the files that proved Dr. Anwe Tal's case, for nothing. Anwe wonders why.",
    "attrs": {
-    "Body": 13,
-    "Agility": 9,
+    "Body": 10,
+    "Agility": 12,
     "Intellect": 13,
     "Presence": 10,
     "Will": 11
    },
    "skills": {
-    "Engineering": "S",
-    "Computers": "T",
-    "Physical Sciences": "T",
-    "Sensors": "T",
-    "Piloting": "T",
-    "Athletics": "T",
-    "Close Combat": "T",
-    "Survival": "T",
-    "Communications": "T",
-    "Navigation": "T",
-    "Medicine": "T"
-   },
-   "adv": {
-    "id": "jury"
-   },
-   "sadv": {
-    "id": ""
-   },
-   "comp": {
-    "id": "distrust",
-    "trigger": "Orders from far away ignore what's happening here"
-   },
-   "edges": {
-    "attr": 1,
-    "skill": 1
-   },
-   "equipment": {
-    "comm": true,
-    "toolkit": true
-   }
-  },
-  {
-   "name": "Sable",
-   "rank": "Science officer",
-   "dept": "Scientist",
-   "path": "rounded",
-   "speciesId": "synth",
-   "species": "Synth",
-   "role": "Reads the anomaly, names the risk, and calculates the odds no one asked for.",
-   "reason": "To see what's out there: worlds and wonders no one has charted yet.",
-   "connection": "Captain Varga signed Sable's papers of personhood when no one else would.",
-   "attrs": {
-    "Body": 11,
-    "Agility": 12,
-    "Intellect": 15,
-    "Presence": 8,
-    "Will": 9
-   },
-   "skills": {
-    "Physical Sciences": "S",
-    "Computers": "T",
-    "Sensors": "T",
-    "Life Sciences": "T",
-    "Navigation": "T",
-    "Engineering": "T",
-    "Medicine": "T",
-    "Psychology": "T",
-    "Communications": "T",
-    "Blasters": "T",
-    "Athletics": "T",
-    "Piloting": "T"
-   },
-   "adv": {
-    "id": ""
-   },
-   "sadv": {
-    "id": "sy-recall"
-   },
-   "comp": {
-    "id": "mystery",
-    "trigger": "Data that contradicts known science"
-   },
-   "edges": {
-    "skill": 1
-   },
-   "play": {
-    "gun": {
-     "type": "pistol",
-     "power": 12,
-     "rounds": 12,
-     "spares": 1
-    }
-   },
-   "equipment": {
-    "comm": true,
-    "scanner": true,
-    "pistol": true
-   }
-  },
-  {
-   "name": "Rhen Valo",
-   "rank": "Security chief",
-   "dept": "Security",
-   "path": "rounded",
-   "speciesId": "vorr",
-   "species": "Vorr",
-   "role": "First through the airlock, wearing whatever face gets the crew home.",
-   "reason": "To leave behind a past, a world, or a life that was too small for me.",
-   "connection": "Dr. Tamsin is the only one who's seen Rhen's true face.",
-   "attrs": {
-    "Body": 11,
-    "Agility": 14,
-    "Intellect": 10,
-    "Presence": 11,
-    "Will": 9
-   },
-   "skills": {
-    "Blasters": "S",
-    "Close Combat": "T",
+    "Computers": "S",
     "Stealth": "T",
-    "Athletics": "T",
+    "Investigation": "T",
+    "Engineering": "T",
+    "Psionics": "T",
+    "Streetwise": "T",
     "Deception": "T",
-    "Psychology": "T",
     "Sensors": "T",
-    "Survival": "T",
-    "Piloting": "T",
-    "Leadership": "T"
+    "Athletics": "T",
+    "Firearms": "T",
+    "Psychology": "T"
    },
    "adv": {
-    "id": ""
-   },
-   "sadv": {
-    "id": "vo-mimic"
+    "id": "psionic"
    },
    "comp": {
-    "id": "wanted",
-    "trigger": "Customs scans your papers twice"
+    "id": "unregistered",
+    "trigger": "A Mandate screening at the corridor gate"
    },
    "edges": {
-    "grit": 1
+    "skill": 1,
+    "attr": 1,
+    "contact": 1
    },
+   "contact": "A Quiet Network forger who keeps Sable's test results clean",
+   "spells": [
+    "mask",
+    "sense"
+   ],
+   "equipment": {
+    "pistol": true,
+    "deck": true,
+    "papers": true
+   },
+   "allegiance": "quiet",
    "play": {
-    "duty": 3,
     "gun": {
      "type": "pistol",
-     "power": 12,
      "rounds": 12,
-     "spares": 1
+     "spares": 2
     }
-   },
-   "equipment": {
-    "comm": true,
-    "pistol": true
    }
   }
  ]

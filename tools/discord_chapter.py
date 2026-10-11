@@ -15,8 +15,8 @@ GAMES_DIR = ROOT / "legend-dynamics" / "discord-bot" / "games"
 EXAMPLES = {
     "western": {"skill": "Shooting", "target": 13, "foe": "Werewolf", "foeTarget": 14, "contest": "Grapple",
                 "assist": "Hold the door", "helperSkill": "Athletics", "track": "dark", "trackFull": "The Dark"},
-    "spaceopera": {"skill": "Piloting", "target": 14, "foe": "Hegemony trooper", "foeTarget": 12, "contest": "Grapple",
-                   "assist": "Reroute power", "helperSkill": "Engineering", "track": "shields", "trackFull": "Shields"},
+    "spaceopera": {"skill": "Piloting", "target": 14, "foe": "Hegemony legionary", "foeTarget": 14, "contest": "Grapple",
+                   "assist": "Crack the station lock", "helperSkill": "Computers", "track": "heat", "trackFull": "Heat"},
     "fantasy": {"skill": "Melee", "target": 14, "foe": "Serpent-priest", "foeTarget": 13, "contest": "Grapple",
                 "assist": "Force the tomb door", "helperSkill": "Athletics", "track": "doom", "trackFull": "Doom"},
     "grimm": {"skill": "Tracking", "target": 13, "foe": "Blutbad", "foeTarget": 14, "contest": "Grapple",

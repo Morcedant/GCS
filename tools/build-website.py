@@ -21,7 +21,7 @@ CREATORS = {
 }
 # Suggested Squarespace page URLs (set in each page's settings).
 SLUGS = {"western": "/dust-and-damnation", "spaceopera": "/fracture-lines", "fantasy": "/the-shattered-crown"}
-GENRE = {"western": "Gothic Western", "spaceopera": "Space opera", "fantasy": "Sword and sorcery"}
+GENRE = {"western": "Gothic Western", "spaceopera": "Science fiction", "fantasy": "Sword and sorcery"}
 CORE_SLUG = "/core-rules"
 
 BRAND_FONTS = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"

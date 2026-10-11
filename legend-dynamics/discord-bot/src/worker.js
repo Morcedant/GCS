@@ -249,78 +249,40 @@ export const PACKS = {
   "id": "spaceopera",
   "title": "Fracture Lines",
   "point": "Resolve",
-  "mission": "Mission",
-  "trackTitle": "Ship status",
+  "mission": "Job",
+  "trackTitle": "Debt, Heat and Reputation",
   "tracks": [
    {
-    "name": "Shields",
-    "boxes": 3,
-    "effects": [
-     "Up",
-     "Weakened",
-     "Failing",
-     "Down: hits go to the Hull and a system"
-    ]
-   },
-   {
-    "name": "Hull",
+    "name": "Debt",
     "boxes": 4,
     "effects": [
-     "Intact",
-     "Scarred",
-     "Minor breaches",
-     "Serious breaches, decks lost",
-     "Breaking up: start an Abandon ship clock"
+     "No debts worth mentioning",
+     "A payment comes due",
+     "Collectors call: −2 to Commerce with lenders",
+     "Liens: your ship or gear can be seized",
+     "Default: a creditor names the price, a job you can't refuse"
     ]
    },
    {
-    "name": "Weapons",
-    "boxes": 3,
+    "name": "Heat",
+    "boxes": 4,
     "effects": [
-     "Working",
-     "Damaged: −2",
-     "Crippled: −4, basic function only",
-     "Offline"
+     "Nobody's looking",
+     "Questions asked at the last port",
+     "Flagged: −2 at checkpoints and screenings",
+     "Hunted: a bounty, a warrant or an inquisitor",
+     "Cornered: start a Manhunt clock"
     ]
    },
    {
-    "name": "Engines",
-    "boxes": 3,
+    "name": "Reputation",
+    "boxes": 4,
     "effects": [
-     "Working",
-     "Damaged: −2",
-     "Crippled: −4, basic function only",
-     "Offline"
-    ]
-   },
-   {
-    "name": "Sensors",
-    "boxes": 3,
-    "effects": [
-     "Working",
-     "Damaged: −2",
-     "Crippled: −4, basic function only",
-     "Offline"
-    ]
-   },
-   {
-    "name": "Comms",
-    "boxes": 3,
-    "effects": [
-     "Working",
-     "Damaged: −2",
-     "Crippled: −4, basic function only",
-     "Offline"
-    ]
-   },
-   {
-    "name": "Life support",
-    "boxes": 3,
-    "effects": [
-     "Working",
-     "Damaged: −2",
-     "Crippled: −4, basic function only",
-     "Offline"
+     "Unknown",
+     "Talked about in the ports",
+     "Recognized: +2 to Diplomacy with admirers, −2 to Stealth",
+     "Famous: everyone wants something from you",
+     "Legend: someone powerful comes calling; start a clock"
     ]
    }
   ],

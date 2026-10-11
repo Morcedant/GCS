@@ -503,7 +503,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field" id="custom-role-wrap" hidden><label for="f-customrole">Custom {{roleLower}} name</label><input type="text" id="f-customrole" placeholder="e.g. Smuggler"></div>
             <div class="field" id="custom-group-wrap" hidden><label for="f-customgroup">Group (sets your colors and emblem)</label><select id="f-customgroup"></select></div>
             <div class="field"><label for="f-rank">Title (optional)</label>
-              <input type="text" id="f-rank" placeholder="e.g. Deputy U.S. Marshal"></div>
+              <input type="text" id="f-rank" placeholder="{{titlePlaceholder}}"></div>
             <div class="field wide"><label for="f-path">Training</label>
               <select id="f-path"><option value="rounded">{{pathRounded}}: Specialty +3, nine Trained</option><option value="hand">{{pathExpert}}: Expert +5, seven Trained</option></select></div>
             <div class="field wide"><label for="f-role">What you bring</label>
@@ -1142,7 +1142,7 @@ tr.lvl-U td.target { color: var(--muted); }
         : ch.sadv.id ? `Finish the custom ${T.originLower} advantage and its companion` : ch.adv.id ? "Finish the advantage details" : "Choose an advantage"],
       [!!compOk, compOk ? "Complication chosen" : ch.comp.id ? "Finish the complication details" : "Choose a complication"],
       ...(canCast() ? [[ch.spells.length === spellsKnown(), spellsKnown() ? (ch.spells.length === spellsKnown() ? `${spellsKnown()} ${SPELLS.plural} chosen` : `${SPELLS.plural}: ${ch.spells.length} of ${spellsKnown()} chosen`)
-        : `Train ${SPELLS.skill} to cast ${SPELLS.plural.toLowerCase()}`]] : []),
+        : `Train ${SPELLS.skill} to learn ${SPELLS.plural.toLowerCase()}`]] : []),
       [!!ch.comp.trigger.trim(), "Complication trigger agreed with the GM"],
       [!!ch.connection.trim(), "Connection to another character"],
     ];

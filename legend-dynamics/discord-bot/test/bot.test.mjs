@@ -177,7 +177,7 @@ test("/game switches the server's setting: point names, tracks and seeds follow"
   const roll = await signedCall(env2, { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name: "roll", options: [{ name: "target", value: 12 }] } });
   assert.equal(roll.components[0].components[0].label, "Spend a Resolve point to reroll");
   assert.match(roll.embeds[0].footer.text, /Fracture Lines/);
-  assert.match((await signedCall(env2, sub("track", "show"))).content, /Shields.*Hull/s);
+  assert.match((await signedCall(env2, sub("track", "show"))).content, /Debt.*Heat.*Reputation/s);
   const other = await signedCall({ ...env2, STORE: new MemoryKV(), DEFAULT_GAME: "spaceopera" }, sub("game", "show"));
   assert.match(other.content, /Fracture Lines/, "DEFAULT_GAME picks the starting game");
 });

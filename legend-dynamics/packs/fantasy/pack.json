@@ -62,7 +62,8 @@
   "formCoreSummary": "Beast form: changing takes an action; fury or the scent of blood can force it (Will roll); its profile applies while changed; you can't speak, cast or use tools",
   "restrictedToggle": "Dark campaign: show the Undying as player characters (they drain the living; only if the whole table agreed)",
   "restrictedTag": "dark",
-  "restrictedCheck": "for dark campaigns only: tick Dark campaign if your table agreed"
+  "restrictedCheck": "for dark campaigns only: tick Dark campaign if your table agreed",
+  "titlePlaceholder": "e.g. Reaver of the Ulfang clan"
  },
  "theme": {
   "comment": "A sorcerer's ledger by brazier light: soot-black panels, tarnished bronze rules, blood-red accents, embers rising.",

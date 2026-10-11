@@ -62,7 +62,8 @@
   "restrictedToggle": "Horror campaign: show vampires as player characters (they must drink human blood; only if the whole table agreed)",
   "restrictedTag": "horror",
   "restrictedCheck": "for horror campaigns only: tick Horror campaign if your table agreed",
-  "prepareTitle": "Prepare for the hunt"
+  "prepareTitle": "Prepare for the hunt",
+  "titlePlaceholder": "e.g. Deputy U.S. Marshal"
  },
  "theme": {
   "comment": "A gothic ledger by candlelight: slate panels, tarnished-silver rules, blood-red accents, ash falling.",
