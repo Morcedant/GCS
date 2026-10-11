@@ -121,7 +121,7 @@ After applying your species, distribute **five additional points** among the att
 
 ### Custom species
 
-Agree on a species with the GM and give it adjustments from −2 to +2 per attribute that total zero. The normal starting maximum and species base rules apply.
+You can build your own species with the GM. See *Making your own* for the steps.
 
 ## Step 3: Choose trained skills
 
@@ -731,6 +731,52 @@ Both Trill advantages require a joined character; agree with the GM before play 
 |---|---|---|
 | Scaled Hide | +2 to Body when resisting heat, harsh sunlight, or a toxic atmosphere. It does not protect against weapons, vacuum, or radiation. | **Cold-Blooded.** Cold slows you down. When cold is a real factor, accept −2 on physical actions for the scene or stop to warm up. |
 | Low-Light Eyes | +2 to Intellect rolls to notice movement or detail in dim light or near-darkness. | **Glare Sensitivity.** Sudden bright light dazzles you. When a flare, a phaser flash in the dark, or harsh sunlight hits, accept −2 on your next action. |
+
+# Making your own
+
+The departments and species in this book are a starting point, not a limit. With the GM's agreement, any player can create their own department or species. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
+
+## A custom department
+
+A department is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
+
+1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the departments above: *"Stellar Cartography: maps the unmapped, and knows which charts are lies."*
+2. **Choose a group.** Pick the one it belongs with: Command (gold), Sciences (blue) or Operations (red). The group only sets your sheet's colors and emblem.
+3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in departments do this for you); they count toward your normal Trained skills.
+4. **Check it with the GM.** It should fit the setting and overlap the existing departments as little as possible. A custom department uses the officer training (a Specialty and nine Trained); enlisted crew belong to General Services.
+
+**In the creator:** in step 1, choose **Custom department…** at the end of the Department list, then enter its name and group. Write the description in *What you bring*.
+
+## A custom species
+
+Build it with the GM, one step at a time.
+
+### 1. The concept
+
+Two or three sentences: where they come from, what sets them apart, and how others see them. It should be something the species in this book don't already cover.
+
+### 2. Attribute adjustments
+
+Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most species change two to four attributes.
+
+### 3. Core rules
+
+One to three short rules that always apply: what they can do (see in the dark, resist cold, a free Trained skill) and what it costs (a weakness, a people's distrust, a hazard they can't abide). A strength with no drawback is worth more than it looks.
+
+### 4. Species advantages
+
+Write one to three. Each works like a general advantage: **+2 to one skill in a narrow situation**, or a small, limited permission ("once per scene…"). Each comes with a **companion complication**: a problem the trait causes, with a clear trigger and a real consequence, which earns a Duty point when it bites, like any complication. A character takes one advantage, general or species, so make them distinct choices.
+
+### In the creator
+
+1. In step 2, choose **Custom species…** at the end of the Species list.
+2. Name it and set its adjustments. The checklist confirms they total zero.
+3. Write its core rules in **Species ability (GM approval required)** in step 4.
+4. In step 4, choose **Custom species advantage…** and enter the advantage and its companion complication.
+
+### Example
+
+**Kethari.** Tall, silver-scaled people from a high-gravity ocean world, newly allied with the Federation. *Adjustments:* Body +1, Agility −1. *Core rule:* high-gravity muscles: +1 to Athletics in normal gravity, but cold slows them (−1 to all rolls in freezing conditions). *Species advantage:* **Deep-Diver**: +2 to Athletics to swim and hold your breath. *Companion:* **Homesick for the Sea**: dry, cramped ships wear on you; when it matters, accept the short temper or the mistake.
 
 # Complications
 
