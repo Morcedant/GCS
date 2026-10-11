@@ -13,16 +13,17 @@ import discord_handout
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LD = ROOT / "legend-dynamics"
 WEB = LD / "website"
-GAMES = ["western", "spaceopera", "fantasy"]
+GAMES = ["western", "spaceopera", "fantasy", "exlaw"]
 # Where each game's creator is published (share it publicly from its Share menu first).
 CREATORS = {
     "western": "https://claude.ai/artifact/UjmEHKxZzVJG4yhupZkoXo",
     "spaceopera": "https://claude.ai/artifact/AdxunyoqKyErJ6cTz5ujtL",
     "fantasy": "https://claude.ai/artifact/8XnPkroZN3TsAzhsLaZCLM",
+    "exlaw": "https://claude.ai/artifact/12nhXbM26KpVjHk68yvFLh",
 }
 # Suggested Squarespace page URLs (set in each page's settings).
-SLUGS = {"western": "/dust-and-damnation", "spaceopera": "/fracture-lines", "fantasy": "/the-shattered-crown"}
-GENRE = {"western": "Gothic Western", "spaceopera": "Science fiction", "fantasy": "Sword and sorcery"}
+SLUGS = {"western": "/dust-and-damnation", "spaceopera": "/fracture-lines", "fantasy": "/the-shattered-crown", "exlaw": "/exlaw"}
+GENRE = {"western": "Gothic Western", "spaceopera": "Science fiction", "fantasy": "Sword and sorcery", "exlaw": "Superheroes"}
 CORE_SLUG = "/core-rules"
 DISCORD_SLUG = "/discord"
 
@@ -75,7 +76,7 @@ def home():
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Heroes are made of skill, nerve and a little luck.</h1>
   <hr class="ld-rule">
-  <p class="ld-lede">A tabletop roleplaying system built on three six-sided dice and concrete skills. One core, many worlds: Gothic Westerns, starships, and swords against sorcery.</p>
+  <p class="ld-lede">A tabletop roleplaying system built on three six-sided dice and concrete skills. One core, many worlds: Gothic Westerns, starships, swords against sorcery, and superheroes under the law.</p>
   <div class="ld-actions">
     <a class="ld-button" href="#games">Choose a game</a>
     <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">Read the core rules</a>
@@ -300,7 +301,7 @@ const show = (k) => {{ document.querySelectorAll(".pv").forEach((m) => (m.hidden
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${{k}}"]`).dataset.c; scrollTo(0, 0); }};
 document.querySelector(".pv-bar").onclick = (ev) => {{ const b = ev.target.closest("button"); if (b) show(b.dataset.p); }};
 document.addEventListener("click", (ev) => {{ const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord" }}[a.getAttribute("href")]; if (k) show(k); }});
+  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{SLUGS['exlaw']}": "exlaw", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord" }}[a.getAttribute("href")]; if (k) show(k); }});
 show(location.hash.slice(1) || "home");
 </script></body></html>
 """)

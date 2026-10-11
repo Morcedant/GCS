@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600&amp;family=Exo+2:ital,wght@0,400;0,600;1,400&amp;family=Share+Tech+Mono&amp;display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&amp;family=IM+Fell+English+SC&amp;family=IM+Fell+DW+Pica+SC&amp;family=EB+Garamond:ital,wght@0,400;0,600;1,400&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&amp;family=Saira+Extra+Condensed:wght@700&amp;family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap">
 <style>/* =========================================================================
    Legend Dynamics RPG — Squarespace 7.1 custom CSS
    Paste all of this into: Website → Pages → Website Tools → Custom CSS
@@ -17,6 +18,7 @@
         html.ld-western    Dust & Damnation   (Gothic Western)
         html.ld-spaceopera Fracture Lines     (science fiction)
         html.ld-fantasy    The Shattered Crown (sword and sorcery)
+        html.ld-exlaw      ExLAW               (superheroes)
    Components (hero, game cards, callouts, odds table, steps, rules text) use
    ld- classes and live in Code Blocks; their HTML is in website/blocks/.
    ========================================================================= */
@@ -73,6 +75,18 @@ html.ld-fantasy {
   --ld-label: "Cinzel", Georgia, serif;
   --ld-radius: 4px;
   --ld-shadow: 0 0 0 1px rgba(214, 166, 96, .14), 0 18px 40px rgba(0, 0, 0, .5);
+}
+
+html.ld-exlaw {
+  --ld-bg: #070a10; --ld-bg-2: #0c121c; --ld-panel: #101826;
+  --ld-ink: #e8ecf2; --ld-ink-2: #8f9bb0; --ld-line: rgba(120, 160, 220, .22);
+  --ld-accent: #ffc23d; --ld-accent-2: #7fb2ff; --ld-on-accent: #0a0d12;
+  --ld-header-bg: #04060a; --ld-header-fg: #e8ecf2;
+  --ld-display: "Saira Extra Condensed", "Saira Condensed", "Arial Narrow", sans-serif;
+  --ld-body: "IBM Plex Sans", system-ui, sans-serif; --ld-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --ld-label: "Saira Condensed", "Arial Narrow", sans-serif;
+  --ld-radius: 6px;
+  --ld-shadow: 0 0 0 1px rgba(127, 178, 255, .14), 0 18px 40px rgba(0, 0, 0, .5);
 }
 
 /* ---------- 3. Squarespace site styles, mapped to the tokens ---------- */
@@ -216,6 +230,7 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 .ld-game .ld-go { margin-top: 1.1rem; font: 600 .8rem/1 var(--ld-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--c-acc); }
 .ld-game--western { --c-bg: #0d1012; --c-fg: #e4e2da; --c-mute: #9aa19b; --c-acc: #c8cfca; --c-glow: rgba(184, 56, 58, .35); --c-font: "Pirata One", Georgia, serif; --c-body: "EB Garamond", Georgia, serif; }
 .ld-game--spaceopera { --c-bg: #050b17; --c-fg: #e4eefb; --c-mute: #8aa2c2; --c-acc: #5cc8ff; --c-glow: rgba(92, 200, 255, .3); --c-font: "Oxanium", sans-serif; --c-body: "Exo 2", sans-serif; }
+.ld-game--exlaw { --c-bg: #070a10; --c-fg: #e8ecf2; --c-mute: #8f9bb0; --c-acc: #ffc23d; --c-glow: rgba(120, 255, 200, .22); --c-font: "Saira Extra Condensed", "Saira Condensed", sans-serif; --c-body: "IBM Plex Sans", sans-serif; }
 .ld-game--fantasy { --c-bg: #120c08; --c-fg: #eee2cf; --c-mute: #a39079; --c-acc: #d6a660; --c-glow: rgba(192, 57, 43, .35); --c-font: "Cinzel Decorative", "Cinzel", serif; --c-body: "Cormorant Garamond", serif; }
 
 /* Callout: a rule worth remembering */
@@ -289,12 +304,12 @@ body { margin: 0; }
 .page-section .section-background { position: absolute; inset: 0; z-index: -1; }
 .content { max-width: 72rem; margin: 0 auto; padding: 0 16px 4rem; display: grid; gap: 3rem; }
 </style></head>
-<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Dust &amp; Damnation</button><button data-p="spaceopera" data-c="ld-spaceopera">Fracture Lines</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="rules" data-c="">Core rules</button><button data-p="discord" data-c="">Discord</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Dust &amp; Damnation</button><button data-p="spaceopera" data-c="ld-spaceopera">Fracture Lines</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="exlaw" data-c="ld-exlaw">ExLAW</button><button data-p="rules" data-c="">Core rules</button><button data-p="discord" data-c="">Discord</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
 <div class="ld ld-hero">
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Heroes are made of skill, nerve and a little luck.</h1>
   <hr class="ld-rule">
-  <p class="ld-lede">A tabletop roleplaying system built on three six-sided dice and concrete skills. One core, many worlds: Gothic Westerns, starships, and swords against sorcery.</p>
+  <p class="ld-lede">A tabletop roleplaying system built on three six-sided dice and concrete skills. One core, many worlds: Gothic Westerns, starships, swords against sorcery, and superheroes under the law.</p>
   <div class="ld-actions">
     <a class="ld-button" href="#games">Choose a game</a>
     <a class="ld-button ld-button--ghost" href="/core-rules">Read the core rules</a>
@@ -329,6 +344,13 @@ body { margin: 0; }
     <h3>The Shattered Crown</h3>
     <p>A thousand years ago the <b>Crown of Aeon</b> bound a sorcerer-empire together. When the last emperor died, the Crown shattered into nine shards, and the empire with it. Each shard gives power to whoever holds it, and each slowly devours them. Now warlords, sorcerer-princes and merchant-kings fight over the empire's corpse, and the old things beneath its cities are waking.</p>
     <div class="ld-game-meta"><span class="ld-tag">12 callings</span><span class="ld-tag">12 ancestries</span><span class="ld-tag">Fortune points</span></div>
+    <div class="ld-go">Enter →</div>
+  </a>
+  <a class="ld-game ld-game--exlaw" href="/exlaw">
+    <div class="ld-eyebrow">Superheroes</div>
+    <h3>ExLAW</h3>
+    <p>In April 1938 the sky burned green for four weeks. The auroras killed five million people and left behind the first <b>Operants</b>: men and women with powers no science could explain. For decades the world pretended they were myths. Then, in 1952, a battle at Fort Knox made pretending impossible, and the law has been trying to catch up ever since.</p>
+    <div class="ld-game-meta"><span class="ld-tag">26 callings</span><span class="ld-tag">9 origins</span><span class="ld-tag">Spark points</span></div>
     <div class="ld-go">Enter →</div>
   </a>
   </div>
@@ -453,6 +475,42 @@ body { margin: 0; }
   <ol class="ld-steps">
     <li><b>Open the creator.</b> It walks you through five steps and checks every rule as you go. Or load one of the ready-made characters.</li>
     <li><b>Choose a calling and ancestry.</b> Your calling's core skills are marked for you; your ancestry sets your attributes and Edges.</li>
+    <li><b>Save your character file.</b> Bring it to the table, print the sheet, or keep it in the browser.</li>
+    <li><b>Read the Players' Guide.</b> It's in the creator's guide tab: the full rules, the setting and its dangers.</li>
+  </ol>
+</div>
+</div></section></main><main class="pv" id="pv-exlaw" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Legend Dynamics · Superheroes</div>
+  <h1>ExLAW</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">In April 1938 the sky burned green for four weeks. The auroras killed five million people and left behind the first <b>Operants</b>: men and women with powers no science could explain. For decades the world pretended they were myths. Then, in 1952, a battle at Fort Knox made pretending impossible, and the law has been trying to catch up ever since.</p>
+  <div class="ld-actions">
+    <a class="ld-button" href="https://claude.ai/artifact/12nhXbM26KpVjHk68yvFLh" target="_blank" rel="noopener">Create a character</a>
+    <a class="ld-button ld-button--ghost" href="/core-rules">Core rules</a>
+    <a class="ld-button ld-button--ghost" href="/discord">Play on Discord</a>
+  </div>
+</div>
+
+<dl class="ld ld-facts">
+  <div><dt>Genre</dt><dd>Superheroes</dd></div>
+  <div><dt>Callings</dt><dd>26, in 5 groups</dd></div>
+  <div><dt>Origins</dt><dd>9 to choose from</dd></div>
+  <div><dt>Points</dt><dd>Spark</dd></div>
+  <div><dt>Shared tracks</dt><dd>Collateral, Scrutiny, Backlash</dd></div>
+</dl>
+
+<div class="ld">
+  <div class="ld-eyebrow">Who you can play</div>
+  <ul class="ld-pillars"><li><b>The Badge</b><span>ExLAW Agent, Federal Agent, Sheriff, Police Officer, Detective, Aegis Pilot, International Operative</span></li><li><b>The Masks</b><span>Vigilante, Public Hero, Guardian, Crusader, Avenger</span></li><li><b>The Learned</b><span>Scientist, Occultist, Doctor, Relic Hunter, Journalist</span></li><li><b>The Fringe</b><span>Mercenary, Fugitive, Activist</span></li><li><b>The Underworld</b><span>Thief, Con Artist, Enforcer, Smuggler, Hacker, Fixer</span></li></ul>
+  <p style="margin-top:1.4rem"><b>Origins:</b> Non-Operant, Adept, Aurora-born, Lab-made, Bonded, Otherworlder, Touched, Ambrosia, Mythic. Or build your own calling or origin with the GM: the Players' Guide shows how.</p>
+</div>
+
+<div class="ld">
+  <div class="ld-eyebrow">Start playing</div>
+  <ol class="ld-steps">
+    <li><b>Open the creator.</b> It walks you through five steps and checks every rule as you go. Or load one of the ready-made characters.</li>
+    <li><b>Choose a calling and origin.</b> Your calling's core skills are marked for you; your origin sets your attributes and Edges.</li>
     <li><b>Save your character file.</b> Bring it to the table, print the sheet, or keep it in the browser.</li>
     <li><b>Read the Players' Guide.</b> It's in the creator's guide tab: the full rules, the setting and its dangers.</li>
   </ol>
@@ -1136,7 +1194,7 @@ original works.</em></p>
 <h2>Differences by setting</h2>
 <p>Everything not listed here works the same in every setting, clocks included: the commands, sizes and rules don't change, only the dangers they count down to. A partial track name works: <code>heat</code> finds Heat, <code>dark</code> finds The Dark.</p>
 <table><thead><tr><th>Setting</th><th>Choose it with</th><th>Points</th><th>Shared tracks</th><th><code>/seed</code> tables</th><th>Example ticking clocks</th></tr></thead>
-<tbody><tr><td><a href="/dust-and-damnation"><strong>Dust &amp; Damnation</strong></a></td><td><code>/game set game:Dust &amp; Damnation</code></td><td><strong>Grit</strong> points; the reroll button reads “Spend a Grit point to reroll”</td><td>Heat, Whispers, The Dark<br><code>/track mark name:heat</code></td><td>Job, Place, The darkness, Twist, Ticking clock, Key character</td><td>The eclipse (4)<br>The last train out (6)<br>The mob forms (6)</td></tr><tr><td><a href="/fracture-lines"><strong>Fracture Lines</strong></a></td><td><code>/game set game:Fracture Lines</code></td><td><strong>Resolve</strong> points; the reroll button reads “Spend a Resolve point to reroll”</td><td>Debt, Heat, Reputation<br><code>/track mark name:debt</code></td><td>Job or mission, Place, The trouble, Twist, Ticking clock, Key character</td><td>The corridor network shifts (8)<br>The imperial ultimatum (4)<br>The corridor closes (6)</td></tr><tr><td><a href="/the-shattered-crown"><strong>The Shattered Crown</strong></a></td><td><code>/game set game:The Shattered Crown</code></td><td><strong>Fortune</strong> points; the reroll button reads “Spend a Fortune point to reroll”</td><td>Infamy, Doom, Debt, Hunger<br><code>/track mark name:infamy</code></td><td>Venture, Place, The darkness, Twist, Ticking clock, Key character</td><td>The eclipse (6)<br>The god awakens (8)<br>The guards change watch (4)</td></tr></tbody></table>
+<tbody><tr><td><a href="/dust-and-damnation"><strong>Dust &amp; Damnation</strong></a></td><td><code>/game set game:Dust &amp; Damnation</code></td><td><strong>Grit</strong> points; the reroll button reads “Spend a Grit point to reroll”</td><td>Heat, Whispers, The Dark<br><code>/track mark name:heat</code></td><td>Job, Place, The darkness, Twist, Ticking clock, Key character</td><td>The eclipse (4)<br>The last train out (6)<br>The mob forms (6)</td></tr><tr><td><a href="/fracture-lines"><strong>Fracture Lines</strong></a></td><td><code>/game set game:Fracture Lines</code></td><td><strong>Resolve</strong> points; the reroll button reads “Spend a Resolve point to reroll”</td><td>Debt, Heat, Reputation<br><code>/track mark name:debt</code></td><td>Job or mission, Place, The trouble, Twist, Ticking clock, Key character</td><td>The corridor network shifts (8)<br>The imperial ultimatum (4)<br>The corridor closes (6)</td></tr><tr><td><a href="/the-shattered-crown"><strong>The Shattered Crown</strong></a></td><td><code>/game set game:The Shattered Crown</code></td><td><strong>Fortune</strong> points; the reroll button reads “Spend a Fortune point to reroll”</td><td>Infamy, Doom, Debt, Hunger<br><code>/track mark name:infamy</code></td><td>Venture, Place, The darkness, Twist, Ticking clock, Key character</td><td>The eclipse (6)<br>The god awakens (8)<br>The guards change watch (4)</td></tr><tr><td><a href="/exlaw"><strong>ExLAW</strong></a></td><td><code>/game set game:ExLAW</code></td><td><strong>Spark</strong> points; the reroll button reads “Spend a Spark point to reroll”</td><td>Collateral, Scrutiny, Backlash<br><code>/track mark name:collateral</code></td><td>The case, Where, The Operant angle, The twist, Ticking clock, Key character</td><td>The breach widens (8)<br>The Atomic Man loses patience (6)<br>The escapee&#x27;s power destabilizes (6)</td></tr></tbody></table>
 </div>
 </div></section></main>
 <script>
@@ -1145,6 +1203,6 @@ const show = (k) => { document.querySelectorAll(".pv").forEach((m) => (m.hidden 
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${k}"]`).dataset.c; scrollTo(0, 0); };
 document.querySelector(".pv-bar").onclick = (ev) => { const b = ev.target.closest("button"); if (b) show(b.dataset.p); };
 document.addEventListener("click", (ev) => { const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = { "/dust-and-damnation": "western", "/fracture-lines": "spaceopera", "/the-shattered-crown": "fantasy", "/core-rules": "rules", "/discord": "discord" }[a.getAttribute("href")]; if (k) show(k); });
+  const k = { "/dust-and-damnation": "western", "/fracture-lines": "spaceopera", "/the-shattered-crown": "fantasy", "/exlaw": "exlaw", "/core-rules": "rules", "/discord": "discord" }[a.getAttribute("href")]; if (k) show(k); });
 show(location.hash.slice(1) || "home");
 </script></body></html>

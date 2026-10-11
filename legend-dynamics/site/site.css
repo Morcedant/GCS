@@ -10,6 +10,7 @@
         html.ld-western    Dust & Damnation   (Gothic Western)
         html.ld-spaceopera Fracture Lines     (science fiction)
         html.ld-fantasy    The Shattered Crown (sword and sorcery)
+        html.ld-exlaw      ExLAW               (superheroes)
    Components (hero, game cards, callouts, odds table, steps, rules text) use
    ld- classes and live in Code Blocks; their HTML is in website/blocks/.
    ========================================================================= */
@@ -66,6 +67,18 @@ html.ld-fantasy {
   --ld-label: "Cinzel", Georgia, serif;
   --ld-radius: 4px;
   --ld-shadow: 0 0 0 1px rgba(214, 166, 96, .14), 0 18px 40px rgba(0, 0, 0, .5);
+}
+
+html.ld-exlaw {
+  --ld-bg: #070a10; --ld-bg-2: #0c121c; --ld-panel: #101826;
+  --ld-ink: #e8ecf2; --ld-ink-2: #8f9bb0; --ld-line: rgba(120, 160, 220, .22);
+  --ld-accent: #ffc23d; --ld-accent-2: #7fb2ff; --ld-on-accent: #0a0d12;
+  --ld-header-bg: #04060a; --ld-header-fg: #e8ecf2;
+  --ld-display: "Saira Extra Condensed", "Saira Condensed", "Arial Narrow", sans-serif;
+  --ld-body: "IBM Plex Sans", system-ui, sans-serif; --ld-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --ld-label: "Saira Condensed", "Arial Narrow", sans-serif;
+  --ld-radius: 6px;
+  --ld-shadow: 0 0 0 1px rgba(127, 178, 255, .14), 0 18px 40px rgba(0, 0, 0, .5);
 }
 
 /* ---------- 3. Squarespace site styles, mapped to the tokens ---------- */
@@ -209,6 +222,7 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 .ld-game .ld-go { margin-top: 1.1rem; font: 600 .8rem/1 var(--ld-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--c-acc); }
 .ld-game--western { --c-bg: #0d1012; --c-fg: #e4e2da; --c-mute: #9aa19b; --c-acc: #c8cfca; --c-glow: rgba(184, 56, 58, .35); --c-font: "Pirata One", Georgia, serif; --c-body: "EB Garamond", Georgia, serif; }
 .ld-game--spaceopera { --c-bg: #050b17; --c-fg: #e4eefb; --c-mute: #8aa2c2; --c-acc: #5cc8ff; --c-glow: rgba(92, 200, 255, .3); --c-font: "Oxanium", sans-serif; --c-body: "Exo 2", sans-serif; }
+.ld-game--exlaw { --c-bg: #070a10; --c-fg: #e8ecf2; --c-mute: #8f9bb0; --c-acc: #ffc23d; --c-glow: rgba(120, 255, 200, .22); --c-font: "Saira Extra Condensed", "Saira Condensed", sans-serif; --c-body: "IBM Plex Sans", sans-serif; }
 .ld-game--fantasy { --c-bg: #120c08; --c-fg: #eee2cf; --c-mute: #a39079; --c-acc: #d6a660; --c-glow: rgba(192, 57, 43, .35); --c-font: "Cinzel Decorative", "Cinzel", serif; --c-body: "Cormorant Garamond", serif; }
 
 /* Callout: a rule worth remembering */

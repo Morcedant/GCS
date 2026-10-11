@@ -1,0 +1,592 @@
+#!/usr/bin/env python3
+"""Writes legend-dynamics/packs/exlaw/pack.json: the ExLAW setting's data, and checks every
+ready-made character against the creation rules. Run it after editing, then tools/build-legend.py."""
+import json, pathlib
+
+OUT = pathlib.Path(__file__).resolve().parents[2] / "legend-dynamics" / "packs" / "exlaw" / "pack.json"
+
+FONTS = ("https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Saira+Extra+Condensed:wght@700"
+         "&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap")
+
+terms = {
+    "title": "ExLAW", "eyebrow": "Legend Dynamics · Superheroes",
+    "guideTitle": "ExLAW Players' Guide", "guideSubtitle": "Operants, the law and the powers behind them, for the Legend Dynamics RPG system",
+    "point": "Spark", "role": "Calling", "roleLower": "calling",
+    "origin": "Origin", "originLower": "origin", "originPlural": "Origins", "originPluralLower": "origins",
+    "pathRounded": "Generalist", "pathExpert": "Specialist", "pathExpertPlural": "Specialists",
+    "reasonLabel": "Why you do this", "reasonSheet": "Why I do this",
+    "gear": "Gear", "gearLower": "gear", "tabPlay": "Play", "readyText": "Ready for the case", "stun": "Stunned",
+    "medkit": "first-aid kit", "facility": "A hospital with an Operant ward", "restText": "full day",
+    "titlePlaceholder": "e.g. Special Agent, Chicago office", "mission": "Case", "missionLower": "case",
+    "missionsChapter": "Running cases", "prepareTitle": "Suit up",
+    "journal": "Case files",
+    "journalIntro": "Write it together at the end of each case. Advancements apply to the GM's copies; use each card's Save character file to send a player their update.",
+    "journalTitlePlaceholder": "e.g. The Loop memorial bombing", "journalDateLabel": "Date",
+    "journalExtraLabel": "", "journalExtraPlaceholder": "",
+    "weaponsTitle": "Weapon and ammunition", "ammo": "rounds", "ammoOne": "round", "shot": "Fire", "spent": "fired",
+    "sparesLabel": "Spare magazines", "reload": "Reload (one action)", "reloadDone": "Reloaded. That took your action.",
+    "restock": "Resupply", "restockDone": "Resupplied: full load.",
+    "emptyNote": "Empty: it won't fire until you reload.", "otherWeapon": "Another weapon or a power (nothing spent)",
+    "tracksTitle": "Collateral, Scrutiny and Backlash",
+    "tracksIntro": "Shared by the whole team. Wrecked property and hurt bystanders, official attention and public anger each mark a box; clean arrests, good press and lying low clear one between cases.",
+    "tracksReset": "Clear every track", "exampleName": "example sheriff",
+    "formToggle": "In alternate form", "formName": "alternate form", "formProfile": "Alternate form", "formCoreSummary": "",
+    "restrictedToggle": "Show the Shadow Earth defector (only with the GM's permission)", "restrictedTag": "GM's permission",
+    "restrictedCheck": "needs the GM's permission: tick the box in step 2 if your GM agreed",
+    "rangedSkill": "Firearms", "meleeSkill": "Melee", "unarmedSkill": "Brawling", "chaseSkill": "Piloting",
+    "fontsHref": FONTS,
+}
+
+theme = {
+    "comment": "An ExLAW case terminal at night: blue-black glass, federal-blue rules, hazard-amber highlights, and the green of the 1938 auroras drifting up behind it.",
+    "css": ("--space: #070a10; --glass: rgba(14, 20, 32, .86); --glass-hi: rgba(22, 32, 50, .9); --well: rgba(4, 7, 12, .74); "
+            "--fg: #e8ecf2; --muted: #8f9bb0; --line: rgba(120, 160, 220, .22); --chrome: #7fb2ff; --chrome-dim: rgba(127, 178, 255, .55); "
+            "--gold: #ffc23d; --blue: #4d8dff; --red: #ff4d4d; --good: #4fd18b; --bad: #ff5c5c; --warn: #ffb02e; --on-accent: #0a0d12; "
+            "--display: \"Saira Condensed\", \"Arial Narrow\", sans-serif; --title: \"Saira Extra Condensed\", \"Saira Condensed\", \"Arial Narrow\", sans-serif; "
+            "--body: \"IBM Plex Sans\", \"Segoe UI\", system-ui, sans-serif; --mono: \"IBM Plex Mono\", ui-monospace, monospace; "
+            "--numbers: \"IBM Plex Mono\", ui-monospace, monospace; --radius: 6px;"),
+    "glow": "127, 178, 255", "line": "120, 160, 220", "highlight": "190, 215, 255",
+    "wash1": "40, 90, 200, .22", "wash2": "40, 200, 140, .14", "optionBg": "#0e1420", "barBg": "8, 12, 20, .95",
+    "text2": "#cfd7e4", "goodRgb": "79, 209, 139", "badRgb": "255, 92, 92", "placeholder": "rgba(143, 155, 176, .6)",
+    "particles": {"direction": "up", "rgb": "120, 255, 200", "density": 9000, "alpha": 0.5},
+}
+
+groups = [
+    {"id": "badge", "name": "The Badge", "color": "--blue", "emblem": "M50 18 L74 28 L74 52 Q74 72 50 84 Q26 72 26 52 L26 28 Z M50 34 L54 46 L66 46 L56 54 L60 66 L50 58 L40 66 L44 54 L34 46 L46 46 Z", "stroke": False},
+    {"id": "masks", "name": "The Masks", "color": "--gold", "emblem": "M16 44 Q30 30 50 40 Q70 30 84 44 Q80 62 64 62 Q54 62 50 54 Q46 62 36 62 Q20 62 16 44 Z M32 46 L42 48 L36 54 Z M68 46 L58 48 L64 54 Z", "stroke": False},
+    {"id": "learned", "name": "The Learned", "color": "--good", "emblem": "M22 35 Q35 29 48 35 L48 69 Q35 63 22 69 Z M52 35 Q65 29 78 35 L78 69 Q65 63 52 69 Z", "stroke": False},
+    {"id": "fringe", "name": "The Fringe", "color": "--warn", "emblem": "M60 22 A28 28 0 1 0 60 78 A22 22 0 1 1 60 22 Z", "stroke": False},
+    {"id": "underworld", "name": "The Underworld", "color": "--red", "emblem": "M50 20 L78 50 L50 80 L22 50 Z M50 34 L64 50 L50 66 L36 50 Z", "stroke": True},
+]
+
+roles = [
+    ("ExLAW Agent", "badge", "ExLAW agent: enforces the Extraordinary Powers Act as a full-time federal agent, with a badge that opens doors and an EPAOC file that never closes.", ["Law", "Investigation", "Firearms", "Read People"]),
+    ("Federal Agent", "badge", "Federal agent: FBI, US Marshals, ATF or Homeland Security, working alongside ExLAW, or around it.", ["Investigation", "Law", "Computers", "Persuasion"]),
+    ("Sheriff", "badge", "Sheriff: an elected county lawman who answers to the voters, not to Washington; maybe on the edge of the Mad Forest.", ["Leadership", "Firearms", "Law", "Persuasion"]),
+    ("Police Officer", "badge", "Police officer: city patrol, first on the scene when an Operant fight breaks out, and last to get the credit.", ["Firearms", "Piloting", "Brawling", "Read People"]),
+    ("Detective", "badge", "Detective: police or private eye, working the cases nobody else will take.", ["Investigation", "Streetwise", "Read People", "Firearms"]),
+    ("Aegis Pilot", "badge", "Aegis pilot: flies the armored power suit that is the government's answer to Operants, and knows exactly what it costs per hour.", ["Piloting", "Engineering", "Firearms", "Athletics"]),
+    ("International Operative", "badge", "International operative: UNILED, the French Affaires spéciales, MI5 or Interpol; the law has borders, Operants don't.", ["Law", "Deception", "Firearms", "Computers"]),
+    ("Vigilante", "masks", "Vigilante: fights crime on the streets, unsanctioned and masked, and hopes ExLAW keeps looking the other way.", ["Brawling", "Stealth", "Streetwise", "Athletics"]),
+    ("Public Hero", "masks", "Public hero: famous, sponsored and televised, like the New Power Legion; the cameras are part of the job.", ["Media", "Leadership", "Persuasion", "Powers"]),
+    ("Guardian", "masks", "Guardian: protects one place or one people (a neighborhood, a reservation, the Haven) and answers to them first.", ["Powers", "Leadership", "Read People", "Persuasion"]),
+    ("Crusader", "masks", "Crusader: sworn to an order or a cause, like the Shadow Knights; the vow comes before the law.", ["Melee", "Occult", "Leadership", "Athletics"]),
+    ("Avenger", "masks", "Avenger: answers one kind of wrong, whatever the law says, as Uathach does.", ["Brawling", "Investigation", "Stealth", "Powers"]),
+    ("Scientist", "learned", "Scientist: studies Operants, metatropic fields or the breaches, for a university, a corporation or a government that won't say why.", ["Science", "Engineering", "Computers", "Medicine"]),
+    ("Occultist", "learned", "Occultist: an Earth Warden or a scholar of the hidden world, who knows which doors should stay shut.", ["Occult", "Investigation", "Persuasion", "Science"]),
+    ("Doctor", "learned", "Doctor: treats what hospitals can't, Operant or not, and doesn't ask for a registration number.", ["Medicine", "Science", "Read People", "Persuasion"]),
+    ("Relic Hunter", "learned", "Relic hunter: tracks down artifacts before the Foundation does, and sometimes before their owners notice.", ["Occult", "Athletics", "Investigation", "Deception"]),
+    ("Journalist", "learned", "Journalist: reporter, blogger or documentary maker chasing the Operant story the public isn't being told.", ["Media", "Investigation", "Persuasion", "Read People"]),
+    ("Mercenary", "fringe", "Mercenary: powers or skills for hire, with a code or without one.", ["Firearms", "Brawling", "Piloting", "Streetwise"]),
+    ("Fugitive", "fringe", "Fugitive: escaped from a lab or a cell; staying free is a full-time job.", ["Stealth", "Deception", "Athletics", "Powers"]),
+    ("Activist", "fringe", "Activist: fights for a cause the law won't touch (the Haven, the environment, Operant rights) on the street and on camera.", ["Media", "Persuasion", "Leadership", "Law"]),
+    ("Thief", "underworld", "Thief: burglar, cat burglar or safecracker; powers make the impossible jobs possible.", ["Stealth", "Athletics", "Engineering", "Streetwise"]),
+    ("Con Artist", "underworld", "Con artist: grifter and impostor; illusions and telepathy are tools of the trade.", ["Deception", "Persuasion", "Read People", "Streetwise"]),
+    ("Enforcer", "underworld", "Enforcer: muscle for a gang, a cartel or the Morcain.", ["Brawling", "Firearms", "Read People", "Streetwise"]),
+    ("Smuggler", "underworld", "Smuggler: moves people and cargo (relics, Ambrosia, refugees for the Haven) where the law can't see.", ["Piloting", "Streetwise", "Deception", "Stealth"]),
+    ("Hacker", "underworld", "Hacker: breaks into systems: corporate, police, the EMD itself.", ["Computers", "Engineering", "Stealth", "Deception"]),
+    ("Fixer", "underworld", "Fixer: knows everyone, moves anything, owes and is owed.", ["Streetwise", "Persuasion", "Deception", "Computers"]),
+]
+
+skills = [
+    ["Leadership", "Presence", "Command, rally, coordinate a team"],
+    ["Persuasion", "Presence", "Convince, negotiate, calm a crowd"],
+    ["Deception", "Presence", "Lie, bluff, disguise, forge, keep a secret identity"],
+    ["Streetwise", "Presence", "Informants, the underworld, black markets, rumors"],
+    ["Media", "Presence", "Cameras, the press, social media, public image"],
+    ["Read People", "Will", "Judge motives, spot a lie, interrogate"],
+    ["Investigation", "Intellect", "Search a scene, forensics, follow the money"],
+    ["Law", "Intellect", "The Extraordinary Powers Act, warrants, procedure, courts"],
+    ["Computers", "Intellect", "Systems, data, hacking and surveillance"],
+    ["Science", "Intellect", "Physics, biology, metatropic theory"],
+    ["Engineering", "Intellect", "Build, repair and modify machines, locks, Aegis suits"],
+    ["Medicine", "Intellect", "First aid, surgery, Operant physiology"],
+    ["Occult", "Intellect", "Magic, spirits, rituals, Otherworld and its creatures"],
+    ["Piloting", "Agility", "Drive, fly, chase; pilot an Aegis suit"],
+    ["Firearms", "Agility", "Pistols, rifles, shotguns, suit weapons"],
+    ["Melee", "Agility", "Batons, blades, staves and swords"],
+    ["Brawling", "Body", "Fists, grapples, martial arts, restraint"],
+    ["Athletics", "Body", "Run, climb, jump, swim, Dodge"],
+    ["Stealth", "Agility", "Sneak, hide, tail someone"],
+    ["Powers", "Will", "Aim, control and push your powers; perform rituals"],
+]
+physical = ["Piloting", "Firearms", "Melee", "Brawling", "Athletics", "Stealth"]
+
+
+def t(i, n, eff, sk, cn, ct):
+    return [i, n, eff, sk, True, cn, ct]
+
+
+def og(i, name, tier, adj, desc, core, skills_, traits, **extra):
+    o = {"id": i, "name": name, "tier": tier, "adj": adj, "desc": desc, "core": core, "form": None, "skills": skills_, "traits": traits}
+    o.update(extra)
+    return o
+
+
+MYSTIC = ["warding", "summoning", "mysticsight", "illusion", "blast", "portals", "astral", "elemental", "teleport", "healing"]
+
+origins = [
+    og("nonoperant", "Non-Operant", 0, {}, "No powers at all: training, nerve, gear and the law. Most of ExLAW's agents, every Aegis pilot and nearly everyone else on Earth. In a fight between Operants you are the one who has to be clever.",
+       ["No powers: you need no registration (your legal status is usually Civilian, or Agent).", "Aegis suits, power-dampening cuffs and good planning are how you stand beside Operants."],
+       ["Firearms", "Investigation", "Piloting", "Read People"],
+       [t("no-training", "Hard-Won Training", "+2 to Firearms or Brawling against an Operant whose powers you have studied.", "Firearms", "Outclassed", "Sometimes you're simply out of your depth. Accept the danger of staying in."),
+        t("no-plan", "Always a Plan", "+2 to Investigation or Leadership to prepare for a known Operant's powers.", "Investigation", "Resentment", "You've seen what Operants get away with. Accept the friction your bitterness causes."),
+        t("no-nerve", "Nerves of Steel", "+2 to Will against fear, mind powers and intimidation.", "Will", "Ordinary Body", "One good hit can end you. Accept the injury when you take a risk.")]),
+    og("aurora", "Aurora-born", 2, {}, "Powers that woke on their own: in the First Wave of April 1938, in the Second Wave of 1985, or inherited from a parent who was touched by either. The most common kind of Operant, and the one the EMD understands best.",
+       ["Choose your wave: First Wave (awakened in 1938, or a direct descendant), Second Wave (1985) or a late bloomer whose powers woke without warning.", "Your powers are part of you: they can't be taken away, only suppressed."],
+       ["Powers", "Athletics", "Persuasion", "Read People"],
+       [t("au-natural", "Natural Talent", "+2 to Powers with your Class II power.", "Powers", "Family Legacy", "Your powers run in the family, and so do its enemies and debts. Accept the call."),
+        t("au-wave", "Wave-Sense", "+2 to Read People or Investigation to recognize another Operant and guess their power.", "Read People", "On the Register", "Your family has been in the EMD since 1952. Accept that ExLAW knows where you live."),
+        t("au-steady", "Steady Power", "Once per scene, push a power without marking Strain.", "Will", "Public Face", "Everyone in your town knows what you can do. Accept the requests, the fear and the cameras.")]),
+    og("ambrosia", "Ambrosia", 3, {"Body": 1, "Presence": 1, "Intellect": -1, "Agility": -1}, "Dosed with Ambrosia, the elixir Tesla's circle first refined: an idealized body, slowed aging and raw power. Rare, coveted and hunted; DIRE and the Foundation have both tried to make more.",
+       ["Idealized: you age a year for every ten.", "Ambrosia works on the body: Strength, Toughness, Flight, Speed, Regeneration and Transformation suit it best (the GM may allow others).",
+        "Coveted: every lab on Earth wants a sample of your blood."],
+       ["Powers", "Athletics", "Leadership", "Media"],
+       [t("am-ideal", "Golden Ideal", "+2 to Persuasion or Media to inspire a crowd or a frightened person.", "Persuasion", "The Anger", "The power wants to be used. In your powered form, accept the flash of temper and what it costs."),
+        t("am-endure", "Undying Vigor", "Once per scene, ignore your injury penalties for one action.", "Body", "Hunted for Your Blood", "Labs want what's in your veins. Accept the attempt."),
+        t("am-legend", "Living Legend", "+2 to Leadership with other heroes and with the public.", "Leadership", "Out of Time", "You've outlived friends and eras. Accept the grief and the gap.")]),
+    og("labmade", "Lab-made", 2, {"Body": 1, "Presence": -1}, "Made in a Foundation black lab, a DIRE program or somewhere worse. The powers are strong and unstable, the memories are patchy, and someone still has your file and wants their property back.",
+       ["Unstable: on a natural 17 or 18 with Powers, mark a box of Strain as well.", "Property: the lab that made you knows your powers better than you do."],
+       ["Powers", "Stealth", "Athletics", "Deception"],
+       [t("lm-surge", "Surge", "+2 to Powers when you push a power (you still mark Strain).", "Powers", "They Want You Back", "The lab hasn't given up. Accept the retrieval team."),
+        t("lm-tough", "Built Tough", "Once per scene, a hit that would mark 2 or more boxes marks one fewer.", "Body", "Missing Years", "There are gaps in your memory, and someone else fills them. Accept the flashback at the worst moment."),
+        t("lm-wary", "Lab Instincts", "+2 to Stealth or Read People to spot surveillance, restraints and traps.", "Stealth", "Test Subject", "Needles, labs and restraints break your nerve. Accept the panic.")]),
+    og("bonded", "Bonded", 2, {"Will": 1, "Presence": -1}, "Joined to something else: an artifact, a spirit, a god or an entity from beyond. It shares its power, and sometimes its mind. Michael Lance's amulet, Uathach's litany, the Ice Reaper and the Atomic Man are all bonds.",
+       ["Choose the bond: an artifact you carry, or a spirit or entity that shares your body.", "An artifact's powers go with the artifact; a spirit's come with its wants.",
+        "Bonded powers suit Transformation well: the bond is the alternate form."],
+       ["Powers", "Occult", "Read People", "Investigation"],
+       [t("bo-voice", "The Voice Within", "+2 to Occult or Investigation when your bond knows the answer (it remembers things you don't).", "Occult", "Two Minds", "Your bond wants something you don't. Accept the choice it pushes on you."),
+        t("bo-bound", "Bound Together", "Your bond resists for you: +2 to Will against mind powers and possession.", "Will", "The Artifact", "Your power lives in something that can be taken. Accept the theft or the trade."),
+        t("bo-old", "Ancient Ally", "+2 to Powers with the power your bond knows best.", "Powers", "Old Enemies", "Your bond had enemies long before you. Accept them as yours.")]),
+    og("adept", "Adept", 1, {"Intellect": 1, "Body": -1}, "A student of metatropic manipulation, the science everyone else calls magic. Learned rather than born, and growing with study: an Adept's own powers are few, but with time, materials and fuel a ritual can do almost anything.",
+       ["Mystic powers: your own powers come from the mystic list (Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing).",
+        "Rituals: you can emulate any power by ritual, with time, specialized materials and fuel (see Rituals).",
+        "Your second power is Class II once Powers is your top skill."],
+       ["Powers", "Occult", "Investigation", "Science"],
+       [t("ad-scholar", "Arcane Scholar", "+2 to Occult to identify a spell, a creature or a ritual's maker.", "Occult", "A Bargain Owed", "Something in Otherworld once helped you. Accept the favor it asks."),
+        t("ad-ritualist", "Ritualist", "+2 to Powers when performing a ritual.", "Powers", "Obsessed", "A forbidden text or a lost rite calls to you. Accept the detour."),
+        t("ad-warden", "Warden's Training", "+2 to Will against spirits, possession and fear.", "Will", "Watched", "The Earth Wardens, or older things, keep an eye on what you do. Accept the summons.")],
+       powerSlots=["I+", "I"], powerList=MYSTIC),
+    og("mythic", "Mythic", 3, {"Body": 1, "Will": 1, "Intellect": -1, "Presence": -1}, "An ancient curse, blessing or bloodline: immortals, werewolves, the children of gods, warriors cursed by Jupiter. Mythic Operants are the oldest kind, and the hardest to classify.",
+       ["GM's approval: every power a Mythic character takes, Immortality included, is agreed with the GM.", "Only Mythic characters can take Immortality.",
+        "An old rule binds you: a curse's condition, a god's taboo or a bloodline's weakness, agreed with the GM."],
+       ["Powers", "Melee", "Occult", "Athletics"],
+       [t("my-old", "Old as Legend", "+2 to Occult or Persuasion where your myth is remembered.", "Occult", "The Curse", "Your curse or your god's taboo comes due. Accept its price."),
+        t("my-war", "Ancient Warrior", "+2 to Melee or Brawling against something as old as you.", "Melee", "Out of Place", "The modern world baffles and offends you. Accept the misstep."),
+        t("my-hard", "Hard to Kill", "Once per scene, ignore your injury penalties for one action.", "Body", "Feels Everything", "You don't die, but every wound hurts. Accept the pain that slows you.")],
+       mythic=True),
+    og("otherworlder", "Otherworlder", 2, {"Agility": 1, "Will": -1}, "Born outside this Earth: in a haven of Otherworld such as Avalon, or on a parallel Earth like Chat Roux's. Under the Extraordinary Powers Act you aren't a person at all, which makes you hard to register and easy to disappear.",
+       ["Not a person under the Act: you can't register; you're Non-registered unless ExLAW makes you a deal.", "Choose your world: Avalon (fey, Olympian and Asgardian descent), another haven, or a parallel Earth."],
+       ["Powers", "Occult", "Deception", "Athletics"],
+       [t("ot-glamour", "Glamour", "+2 to Deception to pass as human or hide what you are.", "Deception", "Strange Customs", "You misread Earth's rules. Accept the misunderstanding."),
+        t("ot-sight", "Otherworld Eyes", "+2 to Occult or Read People to see through illusions and disguises.", "Occult", "Cold Iron", "Iron burns you (fey-born) or your technology needs parts this Earth can't make. Accept the weakness."),
+        t("ot-grace", "Inhuman Grace", "+2 to Athletics to climb, leap or keep your footing.", "Athletics", "Exile", "Your home world wants you back, or wants you dead. Accept the envoy.")]),
+    og("touched", "Touched", 2, {"Will": 1, "Intellect": -1}, "Changed by an exposure to something nobody can name: a peyote vision in the desert, a ritual read aloud, a breach in the sky. Touched powers are strange, hard to classify and harder to control; the EMD files them under 'Other'.",
+       ["Unclassifiable: the EMD can't tell what you are, and neither can you; the GM may give a power an odd limit or an odd extra.", "Visions: once per case, the GM may give you a strange, true glimpse."],
+       ["Powers", "Read People", "Occult", "Persuasion"],
+       [t("to-glimpse", "The Glimpse", "+2 to Read People or Investigation when a vision points the way.", "Read People", "Cracked", "Your mind was burned by what you saw. Accept the episode at the worst moment."),
+        t("to-odd", "Strange Gift", "+2 to Powers with your strangest power.", "Powers", "Uncanny", "People sense something wrong about you. Accept the fear."),
+        t("to-calm", "Eye of the Storm", "+2 to Will to keep calm when reality goes wrong.", "Will", "Calling", "Whatever touched you wants you back. Accept the pull.")]),
+    og("defector", "Shadow Earth Defector", 2, {"Agility": 1, "Presence": -1}, "A duplicate from Shadow Earth, the dark reflection of our world, who turned on its rulers and stayed. Somewhere on this Earth lives your original, who may not know you exist; Shadow Earth wants you back, and everyone else wants to know whose side you're on.",
+       ["Your original: you are a copy of a real person on this Earth (agreed with the GM), and you share their face and their early memories.",
+        "Mystic Sight and Warding reveal what you are.", "Needs the GM's permission."],
+       ["Deception", "Stealth", "Powers", "Read People"],
+       [t("de-mirror", "Mirror Knowledge", "+2 to Deception or Investigation about your original's life and contacts.", "Deception", "The Original", "Your original turns up, or someone mistakes you for them. Accept the trouble."),
+        t("de-shadow", "Shadow-Wise", "+2 to Occult to recognize Shadow Earth agents, duplicates and incursions.", "Occult", "Hunted Home", "Shadow Earth's rulers want their property back. Accept the duplicate sent for you."),
+        t("de-hide", "Between Worlds", "+2 to Stealth in darkness and shadow.", "Stealth", "Distrusted", "Nobody trusts a copy. Accept the suspicion.")],
+       restricted=True),
+]
+
+# Powers: [id, name, group, [Class I, Class II, Class III], flags, note]
+P = lambda i, n, g, a, b, c, note="", **f: [i, n, g, [a, b, c], f, note]
+power_groups = [["energy", "Energy and attack"], ["body", "Body and movement"], ["mind", "Mind and senses"], ["control", "Control and the strange"]]
+power_list = [
+    P("blast", "Blast", "energy", "Class I attack at pistol range.", "Class II attack at rifle range.", "Class III attack; or Class II against everyone in a small area.", "fire, ice, light, plasma, electricity or force"),
+    P("elemental", "Elemental Control", "energy", "Shape a little of your element nearby: a gust, a mud patch, grasping vines.", "Shape a room's worth: walls of earth, a waterspout, a thicket; Class II attacks.", "Shape a city block's worth: a tremor, a flood surge, a forest overnight.", "choose air, earth, water or plants"),
+    P("weather", "Weather Control", "energy", "Fog, wind or rain around you for a scene.", "A storm over a neighborhood; lightning as a Class II attack.", "A storm over a city: grounded aircraft, Class III lightning."),
+    P("shadow", "Darkness / Shadow", "energy", "Darken a room; +2 to Stealth in shadow.", "Total darkness only you see through; step between shadows within sight.", "Solid shadow constructs (Class II attacks or barriers); swallow a block in night."),
+    P("gravity", "Gravity / Density", "energy", "Make one object or person heavy (−2 to move) or light enough to throw.", "Pin a group to the ground (Body resists); become dense (Defense II) or light enough to float.", "Crush a vehicle; Defense III; hurl a car as a Class III attack."),
+    P("absorb", "Energy Absorption", "energy", "Attacks of your energy type are one Class lower against you.", "Ignore your energy type up to Class II; spend what you absorb on a Class II Blast.", "Ignore your type up to Class III; once a scene, absorbed energy fuels a Class III Blast or a push without Strain.", "choose a type: sunlight, electricity, kinetic, radiation…"),
+    P("natural", "Natural Weapons", "energy", "Unarmed hits are Class I.", "Unarmed hits are Class II; you can climb with them.", "Unarmed hits are Class III; they cut through steel doors.", "claws, fangs, horns or spikes"),
+    P("manifest", "Manifest", "energy", "Any hand weapon or simple tool, lasting a scene.", "Any personal firearm or complex tool; Class II attacks.", "Heavy weapons or a vehicle's worth of matter; Class III attacks.", "weapons or objects from nothing"),
+    P("strength", "Strength", "body", "Lift a motorcycle; unarmed hits are Class I.", "Lift a car; unarmed hits are Class II; tear doors off.", "Lift a truck or a small plane; unarmed hits are Class III."),
+    P("toughness", "Toughness", "body", "Defense I against physical harm.", "Defense II.", "Defense III."),
+    P("forcefield", "Force Field", "body", "Defense I for you, for a scene.", "Defense II for you, or Defense I around a small group.", "Defense III, or Defense II around a group; seal a doorway."),
+    P("speed", "Speed", "body", "Run as fast as a car; act first in any round.", "Highway speeds and across water; two moves a round.", "Near the speed of sound; once a scene, two actions in a round."),
+    P("flight", "Flight", "body", "Fly at running speed.", "Fly at car speed.", "Fly beside jets."),
+    P("leaping", "Super Leaping", "body", "Leap onto a rooftop.", "Leap a city block.", "Leap a mile."),
+    P("wallcrawl", "Wall-Crawling", "body", "Climb any wall as easily as walking.", "Run up walls and across ceilings.", "Cling upside down under a moving vehicle or aircraft."),
+    P("regen", "Regeneration", "body", "Clear one injury box after a scene's rest.", "Clear one box at the end of each scene; a single hit never leaves you Dying.", "Clear a box every few rounds; regrow lost limbs."),
+    P("adaptation", "Adaptation", "body", "Ignore one hazard: heat, cold, poison or thin air.", "Breathe water and ignore all ordinary hazards.", "Survive vacuum, the deep ocean and fire."),
+    P("size", "Size Change", "body", "Shrink to a cat (+2 Stealth) or grow to 10 feet (+2 to Body feats).", "Insect-sized, or 20 feet tall with Strength I and Toughness I while big.", "Microscopic, or 50 feet tall with Strength II and Toughness II while big."),
+    P("stretching", "Stretching", "body", "Reach across a room.", "Wrap a group, squeeze under doors; Class I attacks at range.", "Stretch a block; bounce Class II hits back at the attacker."),
+    P("invisibility", "Invisibility", "body", "Fade from notice: +4 to Stealth if you stay still.", "Invisible while moving.", "You and those you touch, to cameras and sensors too."),
+    P("phasing", "Phasing", "body", "Pass slowly through a wall (one action).", "Walk through walls; physical attacks below Class II pass through you.", "Phase as a reaction: attacks below Class III pass through; wreck a machine by passing through it."),
+    P("duplication", "Duplication", "body", "One copy for a scene that helps (+2 assistance).", "Three copies that act on their own (minor characters).", "A crowd of copies; you know what all of them know."),
+    P("transform", "Transformation", "body", "Change in one action; the form has two Class I powers of its own.", "The form's powers rise to Class II.", "The form's powers rise to Class III. If the form has a will of its own, each change marks Strain.", "an alternate form; you design its powers"),
+    P("immortality", "Immortality", "body", "You don't age.", "You can't die of age, disease or poison.", "Even death doesn't hold: you return within days, as the GM decides.", gm=True, mythicOnly=True),
+    P("telepathy", "Telepathy", "mind", "Hear surface thoughts by touch; speak mind to mind within a room.", "Read thoughts within sight; link a team's minds for a scene.", "Search memories; link minds across a city."),
+    P("mindcontrol", "Mind Control", "mind", "One simple command that doesn't endanger them (Will resists).", "Control a person's actions for a scene (Will resists each round).", "Control a small group, or plant a lasting command.", gm=True),
+    P("emotion", "Emotion Control", "mind", "Push one person toward fear, calm, rage or trust (Will resists).", "Sway a crowd; fear makes them flee.", "Terror or rapture that paralyzes a crowd for a scene."),
+    P("memory", "Memory Manipulation", "mind", "Blur the last minute in one person's memory.", "Erase or alter a day; read memories by touch.", "Rewrite years; plant a false life.", gm=True),
+    P("illusion", "Illusion", "mind", "A sound or small image at a distance.", "A convincing person or scene that fools sight and hearing (Will or Intellect sees through).", "Illusions every sense believes; they can frighten someone into collapse."),
+    P("empathy", "Empathy", "mind", "Feel what one person feels; +2 to Read People.", "Sense lies and intentions in a room; share or ease pain by touch.", "Feel a crowd's mood across a block; find a person by their emotions."),
+    P("precog", "Precognition", "mind", "+2 to one roll a scene; you're never surprised.", "Once a scene, reroll a failed roll without spending Spark.", "Visions of a scene's future: the GM answers one question about what's coming."),
+    P("senses", "Enhanced Senses", "mind", "+2 to perception; see in the dark.", "Track by scent; hear heartbeats through walls.", "See through walls; hear a whisper across a block."),
+    P("mysticsight", "Mystic Sight", "mind", "See spirits and active magic.", "See auras: possession, curses, lies, Shadow Earth duplicates.", "See into Otherworld and Shadow Earth; read who made a spell."),
+    P("psychometry", "Psychometry", "mind", "Touch an object and feel its last owner's emotions.", "See a key moment in its past.", "Follow its whole history, and find its owner now."),
+    P("astral", "Astral Projection", "mind", "Leave your body to scout a building (your body is helpless).", "Travel across a city as a spirit; speak to spirits.", "Cross into Otherworld or Shadow Earth in spirit; fight spirits there."),
+    P("intellect", "Super Intellect", "mind", "+2 to Intellect skills; learn any skill in days.", "Invent a working device in a week; solve the unsolvable in a scene.", "Understand any technology, alien or arcane; invent in hours."),
+    P("telekinesis", "Telekinesis", "control", "Move a small object you can see; disarm.", "Lift a car; Class II attacks; hold a person still (Body resists).", "Lift a truck; stop a falling plane; Class III attacks."),
+    P("teleport", "Teleport", "control", "Jump to a place you can see.", "Jump to a place you know within a city, with one passenger.", "Jump across the world with a small group."),
+    P("portals", "Portals", "control", "Open a door between two places you can see.", "Open a door to anywhere you've been.", "Open a door into Otherworld, a haven or Shadow Earth.", gm=True),
+    P("summoning", "Summoning", "control", "Call a minor spirit or creature that helps for a scene (+2 assistance).", "Call a creature that fights beside you (a minor character with Class II attacks).", "Call something powerful; it serves, at a price."),
+    P("warding", "Warding", "control", "Seal a door or circle against spirits and magic.", "Protect a building; banish a minor spirit or creature (Will resists).", "Protect a block; banish powerful beings back to Otherworld."),
+    P("healing", "Healing", "control", "Stabilize the Dying by touch; clear one box once a scene.", "Clear two boxes; cure ordinary disease and poison.", "Clear any injury; cure the incurable; even curses yield (with the GM's approval)."),
+    P("negation", "Power Negation", "control", "Suppress one Operant's Class I powers within reach for a round (Will resists).", "Suppress Class II powers within a room for a scene.", "Suppress Class III powers in an area; the labs would kill for you."),
+    P("mimicry", "Power Mimicry", "control", "Copy one Class I power from an Operant you touch, for a scene.", "Copy at Class II, or two powers at Class I.", "Copy at Class III, and keep a copied power until you take another."),
+    P("technopathy", "Technopathy", "control", "Sense and talk to machines; +2 to Computers and Engineering.", "Command electronics in a room: locks, cameras, guns, drones.", "Command a building's systems or a fleet of drones; take over an Aegis suit (the pilot's Will resists)."),
+    P("animals", "Animal Control", "control", "Speak with animals.", "Command a pack or a flock for a scene.", "Command every animal across a block."),
+    P("probability", "Probability Control", "control", "Once a scene, +2 or −2 to any roll you can see.", "Once a scene, turn a near miss into a success, or a success into a failure.", "Once a session, choose the result of any roll you can see."),
+    P("time", "Time Manipulation", "control", "Once a scene, take an extra action.", "Freeze time around you for a moment: two extra actions.", "Rewind the last round, once a session.", gm=True),
+    P("possession", "Possession", "control", "Ride along in one person's senses (Will resists).", "Take control of a body for a scene; your own body is helpless.", "Possess and keep a body; switch bodies by touch.", gm=True),
+    P("gadgeteering", "Gadgeteering", "control", "Carry three gadgets, each a Class I effect from another power.", "Build gadgets with Class II effects; repair anything.", "Build devices with Class III effects, or an Aegis suit of your own."),
+]
+powers = {"skill": "Powers", "plural": "Powers", "groups": power_groups, "list": power_list,
+          "tierSlots": {"0": [], "1": ["I", "I"], "2": ["II", "I", "I"], "3": ["III", "II", "I"]},
+          "note": "Roll Powers to aim a power or use it with skill; passive powers just work. Push a power one Class higher for one action by marking Strain. Powers marked (GM) need the GM's approval; so does every Mythic power."}
+
+statuses = [
+    ["civilian", "Civilian", "No registration needed: you have no powers to register.", "No federal protection when Operants come calling."],
+    ["registered", "Registered", "Legal to use your powers in self-defense and emergencies; protected under the Extraordinary Powers Act.", "Your identity and powers are in the EMD, and anyone with access can read them."],
+    ["reserve", "Reserve Agent", "You can make arrests, and the Director protects your secret identity.", "You're held to police procedure, and liable for the damage you cause."],
+    ["agent", "Full Agent", "Federal authority, backup and ExLAW resources.", "Orders, paperwork and EPAOC scrutiny."],
+    ["nonreg", "Non-registered", "You're not in the EMD; nobody can look you up.", "Using your powers in public is a federal crime."],
+    ["convict", "Convict", "ExLAW may offer a deal: work off your sentence.", "A parole officer, a tracking device and no second chances."],
+]
+
+allegiances = [
+    ["exlaw", "ExLAW", "Once per case, a database search, an Aegis wing or federal backup.", "Duty: the Director's orders, the EPAOC's questions and the paperwork."],
+    ["fbi", "A Federal Agency", "Once per case, records, a lab or a warrant.", "Duty: the agency's priorities, and its turf war with ExLAW."],
+    ["dire", "DIRE", "Once per case, military hardware, a medical team or a classified file.", "Duty: DIRE's research comes first, and you may be part of it."],
+    ["uniled", "UNILED", "Once per case, international reach: a foreign agency's help or a flight to anywhere.", "Duty: UN politics, and member states who want different things."],
+    ["as", "Affaires spéciales", "Once per case, French intelligence, a safehouse in Europe or a discreet extraction.", "Duty: France's interests, which aren't always yours."],
+    ["legion", "The New Power Legion", "Once per case, a famous ally, a sponsor's money or the press on your side.", "Duty: the sponsor's image, the schedule and the cameras."],
+    ["knights", "The Shadow Knights", "Once per case, a relic, a specialist or a safe house of the Ordo.", "Duty: the vow; bring light into the shadows, whatever the law says."],
+    ["wardens", "The Earth Wardens", "Once per case, an Adept's help, ritual materials or lore.", "Duty: guard the Earth Gates, and answer when the Wardens call."],
+    ["haven", "The Haven", "Once per case, sanctuary in the Mad Forest, or the Green Man's attention.", "Duty: protect the Earth and the Haven; and only vegetarian meals."],
+    ["morcain", "The Morcain", "Once per case, money, a fence, a smuggling route or muscle.", "Duty: the 12 take their cut, and send you their jobs."],
+]
+
+reasons = [
+    ["Justice", "The law should mean something, for Operants and everyone else."],
+    ["Protection", "Someone has to stand between ordinary people and what's out there."],
+    ["Redemption", "I've done things I'm not proud of. This is how I pay it back."],
+    ["Fame", "The cameras love an Operant, and I love the cameras."],
+    ["Money", "Powers pay. So does knowing who has them."],
+    ["Revenge", "Someone did this to me. I'm going to find them."],
+    ["Freedom", "No lab, no registry and no government owns me."],
+    ["Truth", "There's a story nobody's telling. I'm going to tell it."],
+    ["Duty", "I swore an oath, to a badge, an order or a god. I keep it."],
+    ["Belonging", "This team is the only place where I'm not a freak."],
+]
+connections = [
+    ["Partners", "We've worked cases together for years and trust each other with our lives."],
+    ["They saved my life", "They pulled me out of a burning building, a lab or a firefight."],
+    ["I saved theirs", "I got them out when no one else would, and they haven't forgotten."],
+    ["Same wave", "Our powers woke the same night, and we found each other afterward."],
+    ["I arrested them", "Once I put them in cuffs. Now we work together, uneasily."],
+    ["Rivals", "We want the same job, the same headline or the same collar."],
+    ["Family", "We're related, by blood, by marriage or by the same lab."],
+    ["A shared secret", "We know what really happened on that case. Nobody else does."],
+    ["Mentor", "They taught me how to use my powers, or how to survive without them."],
+    ["An unpaid debt", "I owe them money or a favor, and I haven't paid it yet."],
+]
+
+advantages = [
+    ["steadyaim", "Steady Aim", "+2 to Firearms after spending an action aiming at the same target.", "Firearms"],
+    ["brawler", "Street Fighter", "+2 to Brawling when unarmed against more than one opponent.", "Brawling"],
+    ["martial", "Martial Artist", "+2 to Brawling to disarm, throw or restrain.", "Brawling"],
+    ["blade", "Blade Master", "+2 to Melee with a chosen weapon.", "Melee"],
+    ["acrobat", "Acrobat", "+2 to Athletics to climb, leap or roll with a fall.", "Athletics"],
+    ["wheelman", "Wheelman", "+2 to Piloting in a chase.", "Piloting"],
+    ["aegiscert", "Aegis Certified", "You can pilot an Aegis suit (Aegis Pilots are already certified); +2 to Piloting in one.", "Piloting"],
+    ["forensics", "Forensics", "+2 to Investigation to read a crime scene or an Operant's traces.", "Investigation"],
+    ["intrusion", "Intrusion Specialist", "+2 to Computers to break security or cover your tracks.", "Computers"],
+    ["tinker", "Tinkerer", "+2 to Engineering to jury-rig, repair or modify on the spot.", "Engineering"],
+    ["fieldmedic", "Field Medic", "+2 to Medicine to stabilize a patient under fire.", "Medicine"],
+    ["lore", "Occult Lore", "+2 to Occult to recognize a creature, a curse or a ritual.", "Occult"],
+    ["procedure", "By the Book", "+2 to Law to make an arrest, a warrant or a confession stand up in court.", "Law"],
+    ["contacts", "Street Contacts", "+2 to Streetwise to find a person, a rumor or a fence.", "Streetwise"],
+    ["silver", "Silver Tongue", "+2 to Persuasion to talk someone down.", "Persuasion"],
+    ["disguise", "Master of Disguise", "+2 to Deception to pass as someone else.", "Deception"],
+    ["command", "Natural Leader", "+2 to Leadership to coordinate a team under fire.", "Leadership"],
+    ["coldread", "Cold Reader", "+2 to Read People to spot a lie or a hidden Operant.", "Read People"],
+    ["press", "Friend of the Press", "+2 to Media to spin a story or get one out.", "Media"],
+    ["control", "Fine Control", "+2 to Powers to use a power precisely: around bystanders, at a distance or delicately.", "Powers"],
+    ["secretid", "Secret Identity", "+2 to Deception to keep your two lives apart. Take the Secret Identity complication unless the GM agrees otherwise.", "Deception"],
+    ["coolhead", "Cool Under Fire", "+2 to Will to keep acting under fire, fear or mind powers.", "Will"],
+]
+
+complications = [
+    ["secretid", "Secret Identity", "You live two lives. Accept the danger when someone gets close to the truth."],
+    ["wanted", "Wanted", "A warrant has your name or your mask on it. Accept the arrest attempt."],
+    ["hunted", "Hunted by a Lab", "The Foundation, DIRE or someone worse wants you back. Accept the retrieval team."],
+    ["unstable", "Unstable Powers", "Your powers flare when you're afraid or angry. Accept the collateral damage."],
+    ["code", "Code Against Killing", "You don't kill, whatever they've done. Accept the cost of mercy."],
+    ["cameras", "Media Darling", "The cameras follow you everywhere. Accept the attention at the worst moment."],
+    ["oversight", "Under Oversight", "The EPAOC or Internal Affairs is watching you. Accept the hearing."],
+    ["debt", "In Debt to the Morcain", "You owe the 12, and they collect. Accept the job they send."],
+    ["vendetta", "Vendetta", "You have an enemy who won't stop. Accept their interference."],
+    ["protects", "Protects the Innocent", "You put bystanders first, always. Accept the cost."],
+    ["family", "Family at Risk", "Someone you love doesn't have powers. Accept the threat to them."],
+    ["temper", "Temper", "Your anger gets ahead of you. Accept the fight you should have avoided."],
+    ["ambrosia", "Craving", "You need something to keep going: Ambrosia, a lab's serum, a ritual's fuel. Accept the hunt for more."],
+    ["outsider", "Outsider", "You don't understand this world's rules, or it doesn't accept you. Accept the misunderstanding."],
+    ["haunted", "Haunted", "A spirit, a bond or a memory won't leave you alone. Accept the vision."],
+    ["guilt", "Survivor's Guilt", "You lived through Chicago, 2012 or a lab when others didn't. Accept the reckless choice to make it right."],
+    ["duty", "Orders", "Your badge, order or sponsor gives you orders you don't like. Accept them."],
+    ["mystery", "Can't Leave It Alone", "A loose thread pulls you in. Accept the detour or the danger."],
+    ["reckless", "Reckless", "You jump first and think later. Accept the danger."],
+]
+triggers = {
+    "secretid": ["Someone close asks where you were", "A camera catches you changing", "Your two lives need you at the same time"],
+    "wanted": ["Your face on the news", "A patrol car slows down beside you", "An old ally sells you out"],
+    "hunted": ["A van with no plates outside", "A doctor knows too much about your powers", "Someone from the lab is in the crowd"],
+    "unstable": ["You're cornered", "Someone you love is hurt", "A natural 18 on Powers"],
+    "code": ["Killing them would end it", "Your partner pulls a gun", "They'll kill again if they live"],
+    "cameras": ["A crowd with phones out", "A press conference you can't skip", "A reporter digs into your past"],
+    "oversight": ["A subpoena arrives", "Your report doesn't add up", "An EPAOC staffer turns up on the case"],
+    "debt": ["A Morcain fixer calls", "The interest doubles", "They ask for a favor instead"],
+    "vendetta": ["Your enemy strikes first", "Your enemy needs your help", "A clue with their name on it"],
+    "protects": ["A civilian in the crossfire", "A building with people still inside", "Someone volunteers to take your place"],
+    "family": ["A threatening message", "Your family is in the wrong place", "Someone follows them home"],
+    "temper": ["An insult in public", "A bully hurting someone weaker", "Being told to stand down"],
+    "ambrosia": ["Your supply runs low", "A dealer offers more", "The withdrawal hits mid-fight"],
+    "outsider": ["A custom you don't know", "A form that asks for papers you don't have", "Someone mocks where you're from"],
+    "haunted": ["A familiar voice in your head", "The place where it happened", "Your bond demands something"],
+    "guilt": ["Someone in the same danger as before", "An anniversary", "A chance to go back"],
+    "duty": ["Orders to stand down", "Orders to arrest a friend", "Your sponsor changes the plan"],
+    "mystery": ["A file that shouldn't exist", "A power nobody can explain", "A name that keeps coming up"],
+    "reckless": ["A locked door with something behind it", "A fight you could avoid", "The careful plan takes too long"],
+}
+
+equipment = [
+    ["pistol", "Pistol", "Fifteen rounds. Class I: hits mark 1 box."],
+    ["shotgun", "Shotgun", "Six shells. Class I; at close range a hit marks 2 boxes."],
+    ["smg", "Submachine gun", "Thirty rounds; can fire bursts. Class I."],
+    ["rifle", "Rifle", "Twenty rounds; long range. Class I; a hit by 5 or more marks 2 boxes."],
+    ["taser", "Taser", "Two shots. The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box."],
+    ["baton", "Baton or knife", "Class I melee: hits mark 1 box."],
+    ["vest", "Body armor", "Once per fight, a Class I hit marks no box."],
+    ["cuffs", "Dampening cuffs", "ExLAW issue: a cuffed Operant's powers drop one Class (two with a successful Engineering roll to tune them)."],
+    ["badge", "Badge and ID", "Federal, police or press credentials: open doors and get you past cordons."],
+    ["radio", "Radio and phone", "Stay in touch with your team and dispatch."],
+    ["firstaid", "First-aid kit", "Needed to stabilize a patient and give field treatment."],
+    ["forensics", "Forensics kit", "Needed for most Investigation at a crime scene."],
+    ["laptop", "Hacking rig", "Needed for most Computers work against secured systems."],
+    ["tools", "Toolkit", "Needed for most Engineering in the field, and for Aegis suit repairs."],
+    ["ritualkit", "Ritual kit", "Chalk, salt, candles, herbs: Class I ritual materials for a few workings."],
+    ["picks", "Lock picks", "Needed to pick locks with Engineering."],
+    ["camera", "Camera and press pass", "Record, broadcast, and get into press events."],
+    ["aegis", "Aegis AS-6 suit", "Aegis Pilots or Aegis Certified only. While suited: Strength II, Toughness II, Flight I and a Class II arm cannon (Firearms). Takes a minute to suit up; a hit to the power pack (−2 to aim) can shut it down."],
+]
+weapons = {"skill": "Firearms", "jamOn18": True, "defaultSpares": 2,
+           "items": {"pistol": ["Pistol", 15], "shotgun": ["Shotgun", 6], "smg": ["Submachine gun", 30], "rifle": ["Rifle", 20]},
+           "equipLinked": ["pistol", "shotgun", "smg", "rifle"],
+           "modes": [["single", "Single shot", 1, None, 0], ["burst", "Burst", 3, ["smg"], 1], ["cover", "Covering fire", 3, None, 0]]}
+
+tracks = [
+    {"name": "Collateral", "boxes": 4, "effects": ["Clean so far", "Property damage: insurance claims and angry owners", "Bystanders hurt: −2 to Media and Persuasion with the public", "Lawsuits and charges: someone is held liable", "An EPAOC hearing: start a clock; a team member may lose their status"]},
+    {"name": "Scrutiny", "boxes": 4, "effects": ["Nobody's looking", "Questions in a report", "Flagged: −2 at checkpoints, cordons and with federal agencies", "Investigated: ExLAW or the FBI opens a file on you", "Hunted: the Foundation or Raster Zero takes an interest; start a clock"]},
+    {"name": "Backlash", "boxes": 4, "effects": ["The public trusts you", "Talk shows ask hard questions", "Protests: −2 to Media and Leadership with crowds", "Anti-Operant laws proposed; Operant friends blame you", "Riots: the next case starts in a city that wants you gone"]},
+]
+personal_track = {"name": "Strain", "boxes": 4, "effects": ["Steady", "Strained: −1 to Powers", "Frayed: −2 to Powers; nosebleeds, sparks and flicker", "Breaking: on a natural 16–18 with Powers the power goes wild", "Burned out: your powers fail until you rest a full day"]}
+
+S = lambda name, entries: [name, entries]
+seeds = {
+    "mission": S("The case", [
+        "A breach opens where the Umkas came through", "Raster Zero's existence leaks", "Recover a Hephaestus Key before the Foundation",
+        "A Raster Seven transfer goes wrong", "Bring in an Operant who just woke up, before someone else does", "An Operant bank robbery",
+        "Protect an EPAOC witness", "Find a missing registration file", "Arrest a Non-registered vigilante", "Investigate a powers-related death",
+        "Stop a Morcain shipment of Ambrosia", "Escort an Operant to a hearing", "A hero's sponsor wants a scandal buried", "A White Hand cell on US soil",
+        "A Shadow Earth duplicate replaces someone important", "The Atomic Man asks for help"]),
+    "place": S("Where", [
+        "Raster Eight, in orbit", "Tesla's 1884 Paris, through a door", "A Foundation black lab, abandoned", "The Mad Forest's edge, south of Bloomington",
+        "The Chicago Loop memorial", "A Manhattan rooftop at night", "An ExLAW regional office", "A small town in the Midwest", "A Los Angeles studio lot",
+        "A Morcain casino in Macau", "The New Power Legion's tower", "A university archive", "A subway tunnel the city forgot", "Buenos Aires, White Hand territory",
+        "A haven in Otherworld", "Shadow Earth's mirror of your city"]),
+    "strange": S("The Operant angle", [
+        "Two people with the same power and the same face", "A power the EMD says can't exist", "Someone's powers woke tonight",
+        "A Shadow Earth duplicate", "An Operant who doesn't know they are one", "A stolen power: someone mimicked it", "A Lab-made escapee",
+        "A Non-registered Operant hiding in plain sight", "A ritual done badly", "A bonded artifact looking for a new host", "A power for sale",
+        "An Aegis suit that moves on its own", "A spirit riding someone", "A Class V power in an ordinary person", "The 1938 auroras, back for a night",
+        "A third wave beginning"]),
+    "twist": S("The twist", [
+        "The Director knew all along", "One of you is in the Raster Zero files", "The victim is the culprit", "ExLAW wants it buried",
+        "The Foundation is already there", "The villain is right", "A friend is being blackmailed", "The witness is lying for a good reason",
+        "The press arrives first", "It was an accident", "The real target is someone else", "The local police want it more than you do",
+        "A rival team is on the same case", "The Morcain want to help", "The culprit is a duplicate of someone on the team", "Shadow Earth planned this"]),
+    "clock": S("Ticking clock", [
+        ["The breach widens", 8], ["The Atomic Man loses patience", 6], ["The escapee's power destabilizes", 6], ["Raster Seven's transfer convoy leaves", 4],
+        ["The press arrives", 4], ["The witness disappears", 4], ["The bomb goes off", 6], ["The mob forms", 4], ["Federal agents take the case", 4],
+        ["The EPAOC subpoena", 6], ["The Morcain clean house", 6], ["The ritual completes at midnight", 6], ["The building comes down", 4],
+        ["The sponsor pulls out", 6], ["Shadow Earth's rulers notice", 8], ["The third wave", 8]]),
+    "who": S("Key character", [
+        "Director Steven Humbacht", "Nikola Tesla, visiting", "A Foundation scientist with a conscience", "Celerity, on the run",
+        "A frightened new Operant", "An EPAOC staffer", "A Morcain fixer who owes you", "A sheriff on the edge of the Mad Forest", "A reporter with a theory",
+        "An ExLAW agent who doesn't trust Operants", "A New Power Legion star", "A Shadow Knight", "An Earth Warden", "Michael Lance, out of his time",
+        "Steel Hawk, offering a deal", "Your own Shadow Earth duplicate"]),
+}
+
+quick = [["Powers", "Roll Powers to aim or control a power. Class damage: I = 1 box, II = 2, III = 2 and knocked down, IV+ = 3."],
+         ["Defense", "An attack above your Defense hits in full; equal marks one box fewer; lower does nothing. Guns are Class I, heavy weapons and Aegis cannons II, anti-tank and explosives III."],
+         ["Strain", "Push: use a power one Class higher for one action and mark Strain. Strain 1: −1 to Powers, 2: −2, 3: wild on 16–18, 4: burned out until a full day's rest."],
+         ["Rituals", "Adepts only. Class I: 10 minutes, II: an hour (−2), III: a night (−4). Needs materials and fuel; failure marks Strain; natural 18: something answers."],
+         ["Firearms", "Pistol 15, shotgun 6, SMG 30 (burst: 3 rounds, +1), rifle 20. Covering fire: 3. Reload: one action. Natural 18 jams."],
+         ["Tracks", "Collateral (damage), Scrutiny (official attention), Backlash (public anger). 4 boxes each; clean arrests, good press and lying low clear them between cases."]]
+
+journal = {"mode": "calendar", "start": [2025, 9, 15], "outcomes": ["Closed", "Partly closed", "Failed", "Open"]}
+
+
+def ch(**k):
+    base = {"species": next(o["name"] for o in origins if o["id"] == k["speciesId"])}
+    base.update(k)
+    return base
+
+
+example = ch(name="Wade Collier", rank="Sheriff, Brown County, Indiana", dept="Sheriff", path="rounded", speciesId="aurora",
+             role="Sheriff of a county whose southern line now ends at the Mad Forest. Awakened in the 1985 Second Wave at nine years old, and registered ever since.",
+             reason="Someone has to stand between ordinary people and what's out there.",
+             connection="Celerity asked him not to help the federal agents at the forest's edge. He's still deciding.",
+             attrs={"Body": 12, "Agility": 10, "Intellect": 10, "Presence": 12, "Will": 11},
+             skills={"Leadership": "S", "Firearms": "T", "Law": "T", "Persuasion": "T", "Read People": "T", "Investigation": "T", "Piloting": "T", "Brawling": "T", "Athletics": "T", "Powers": "T"},
+             adv={"id": "command"}, comp={"id": "protects", "trigger": "A civilian in the crossfire"},
+             edges={"grit": 1}, powers=["toughness", "strength", "senses"], status="registered",
+             equipment={"pistol": True, "radio": True, "badge": True, "firstaid": True}, allegiance="",
+             play={"gun": {"type": "pistol", "rounds": 15, "spares": 2}})
+
+pregens = [
+    ch(name="Rachel Kwan", rank="Special Agent, ExLAW Chicago", dept="ExLAW Agent", path="rounded", speciesId="bonded",
+       role="Carries a jade seal that holds a guardian spirit, inherited from her grandmother. Her partner vanished on a case Director Humbacht closed personally.",
+       reason="The law should mean something, for Operants and everyone else.",
+       connection="Jess Calloway is the only reporter who asked about her missing partner. Kwan hasn't decided whether to trust her.",
+       attrs={"Body": 10, "Agility": 10, "Intellect": 13, "Presence": 9, "Will": 13},
+       skills={"Investigation": "S", "Law": "T", "Firearms": "T", "Read People": "T", "Occult": "T", "Powers": "T", "Computers": "T", "Persuasion": "T", "Athletics": "T", "Brawling": "T"},
+       sadv={"id": "bo-voice"}, adv={"id": ""}, comp={"id": "mystery", "trigger": "A file that shouldn't exist"},
+       edges={"grit": 1}, powers=["forcefield", "mysticsight", "telepathy"], status="agent", allegiance="exlaw",
+       equipment={"pistol": True, "badge": True, "cuffs": True, "vest": True}, play={"gun": {"type": "pistol", "rounds": 15, "spares": 2}}),
+    ch(name="Luis \"Bulldog\" Ortega", rank="Aegis pilot, Chicago wing", dept="Aegis Pilot", path="hand", speciesId="nonoperant",
+       role="Twelve years in the suit, three of them in Iraq. The AS-6's new firmware came from a contractor nobody can trace, and lately the suit hesitates when he doesn't.",
+       reason="Someone has to stand between ordinary people and what's out there.",
+       connection="He flew cover for Rachel Kwan the night her partner vanished, and saw something he never put in the report.",
+       attrs={"Body": 12, "Agility": 13, "Intellect": 11, "Presence": 10, "Will": 10},
+       skills={"Piloting": "S", "Engineering": "T", "Firearms": "T", "Athletics": "T", "Brawling": "T", "Computers": "T", "Leadership": "T", "Law": "T", "Read People": "T"},
+       sadv={"id": "no-nerve"}, adv={"id": ""}, comp={"id": "duty", "trigger": "Orders to stand down"},
+       edges={"attr": 1, "skill": 1, "contact": 1}, contact="A DIRE engineer who still owes him for Basra",
+       skills_extra=None, powers=[], status="agent", allegiance="exlaw",
+       equipment={"aegis": True, "pistol": True, "tools": True, "radio": True}, play={"gun": {"type": "pistol", "rounds": 15, "spares": 2}}),
+    ch(name="Naomi Price", rank="Daybreak, New Power Legion", dept="Public Hero", path="rounded", speciesId="ambrosia",
+       role="The Legion's rising star, dosed with Ambrosia in a sponsor's clinic at nineteen. Her sponsor owns her image, her schedule and, she's starting to suspect, her secrets.",
+       reason="The cameras love an Operant, and I love the cameras.",
+       connection="Static saved her from a Foundation snatch team on live TV, and vanished before the cameras turned.",
+       attrs={"Body": 13, "Agility": 9, "Intellect": 9, "Presence": 14, "Will": 10},
+       skills={"Media": "S", "Leadership": "T", "Persuasion": "T", "Powers": "T", "Athletics": "T", "Brawling": "T", "Read People": "T", "Piloting": "T", "Deception": "T", "Law": "T"},
+       sadv={"id": "am-ideal"}, adv={"id": ""}, comp={"id": "cameras", "trigger": "A crowd with phones out"},
+       edges={}, powers=["strength", "flight", "toughness"], status="registered", allegiance="legion",
+       equipment={"radio": True, "camera": True}),
+    ch(name="Dr. Tobias Wren", rank="Professor of comparative religion; Earth Warden", dept="Occultist", path="hand", speciesId="adept",
+       role="A collector of forbidden books who once traded a year of his life to something in Avalon for a translation. The year is coming due.",
+       reason="Someone has to stand between ordinary people and what's out there.",
+       connection="He taught Maeve Ashgrove's handler, and was the one who recognized what Maeve really is.",
+       attrs={"Body": 9, "Agility": 10, "Intellect": 14, "Presence": 10, "Will": 13},
+       skills={"Powers": "S", "Occult": "T", "Investigation": "T", "Persuasion": "T", "Science": "T", "Read People": "T", "Medicine": "T", "Law": "T"},
+       sadv={"id": "ad-ritualist"}, adv={"id": ""}, comp={"id": "haunted", "trigger": "Your bond demands something"},
+       edges={"attr": 1, "gear": 1}, gear={"item": "The Lammas Grimoire, annotated in four hands", "skill": "Occult"},
+       powers=["warding", "mysticsight"], status="registered", allegiance="wardens",
+       equipment={"ritualkit": True, "firstaid": True}),
+    ch(name="Jess Calloway", rank="Freelance investigative reporter", dept="Journalist", path="rounded", speciesId="touched",
+       role="Touched a Raster Zero file in 2024 and saw the room it came from. Nobody knows she's an Operant; she's been pulling the thread ever since.",
+       reason="There's a story nobody's telling. I'm going to tell it.",
+       connection="Rachel Kwan's missing partner was her source. She hasn't told Kwan yet.",
+       attrs={"Body": 10, "Agility": 11, "Intellect": 11, "Presence": 12, "Will": 12},
+       skills={"Investigation": "S", "Media": "T", "Persuasion": "T", "Read People": "T", "Powers": "T", "Computers": "T", "Stealth": "T", "Deception": "T", "Law": "T", "Streetwise": "T"},
+       sadv={"id": "to-glimpse"}, adv={"id": ""}, comp={"id": "secretid", "trigger": "Someone close asks where you were"},
+       edges={"attr": 1}, powers=["psychometry", "precog", "empathy"], status="nonreg",
+       equipment={"camera": True, "laptop": True, "radio": True}),
+    ch(name="Subject 19", rank="\"Static\", escaped Foundation subject", dept="Fugitive", path="rounded", speciesId="labmade",
+       role="Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking.",
+       reason="No lab, no registry and no government owns me.",
+       connection="Saved Daybreak from a Foundation snatch team on live TV, and ran before the cameras turned.",
+       attrs={"Body": 12, "Agility": 13, "Intellect": 11, "Presence": 9, "Will": 10},
+       skills={"Powers": "S", "Stealth": "T", "Deception": "T", "Athletics": "T", "Computers": "T", "Streetwise": "T", "Brawling": "T", "Engineering": "T", "Piloting": "T", "Read People": "T"},
+       sadv={"id": "lm-wary"}, adv={"id": ""}, comp={"id": "hunted", "trigger": "A van with no plates outside"},
+       edges={"grit": 1}, powers=["blast", "speed", "technopathy"], status="nonreg",
+       equipment={"picks": True, "laptop": True}),
+    ch(name="Maeve Ashgrove", rank="Cat burglar, on an ExLAW deal", dept="Thief", path="rounded", speciesId="otherworlder",
+       role="A fey-born thief from Avalon, caught stealing from a Morcain vault and handed to ExLAW. She works off her sentence; her handler is the only one who knows where she came from.",
+       reason="No lab, no registry and no government owns me.",
+       connection="Dr. Tobias Wren saw through her glamour the first day. He's kept her secret; she wonders what it'll cost.",
+       attrs={"Body": 10, "Agility": 14, "Intellect": 11, "Presence": 11, "Will": 9},
+       skills={"Stealth": "S", "Athletics": "T", "Engineering": "T", "Streetwise": "T", "Deception": "T", "Powers": "T", "Occult": "T", "Persuasion": "T", "Read People": "T", "Melee": "T"},
+       sadv={"id": "ot-grace"}, adv={"id": ""}, comp={"id": "outsider", "trigger": "A form that asks for papers you don't have"},
+       edges={"contact": 1}, contact="Her ExLAW handler, Agent Dorsey, who covers for her more than he should",
+       powers=["invisibility", "phasing", "illusion"], status="convict",
+       equipment={"picks": True, "baton": True, "radio": True}),
+]
+for c in pregens:
+    c.pop("skills_extra", None)
+
+pack = {"id": "exlaw", "terms": terms, "theme": theme, "docxColors": ["14213D", "E8EEF8"], "groups": groups,
+        "roles": [{"name": n, "group": g, "text": tx, "skills": s} for n, g, tx, s in roles], "skills": skills, "physical": physical,
+        "edgePoints": 3, "formCore": [], "formPenalties": {}, "origins": origins, "allegiances": allegiances, "reasons": reasons,
+        "connections": connections, "advantages": advantages, "complications": complications, "triggers": triggers,
+        "equipment": equipment, "weapons": weapons, "tracks": tracks, "personalTrack": personal_track, "seeds": seeds, "journal": journal,
+        "powers": powers, "statuses": statuses, "statusLabel": "Legal status",
+        "restricted": None, "quickRef": quick, "example": example, "pregens": pregens}
+
+# ---- checks: the creation rules ----
+SK = {s[0] for s in skills}
+O = {o["id"]: o for o in origins}
+PW = {p[0]: p for p in power_list}
+assert len(roles) == 26 and len(SK) == 20 and len(power_list) == 50, (len(roles), len(SK), len(power_list))
+assert all(len(v[1]) == 16 for v in seeds.values())
+for o in origins:
+    assert sum(o["adj"].values()) == 0 and all(-2 <= v <= 2 for v in o["adj"].values()), o["id"]
+    assert set(o["skills"]) <= SK | {"Will"} and len(o["traits"]) == 3, o["id"]
+    assert all(x[3] in SK | {"Will", "Body", "Agility"} for x in o["traits"]), o["id"]
+for r in roles:
+    assert set(r[3]) <= SK, r[0]
+assert all(a[3] in SK | {"Will"} for a in advantages)
+
+
+def slots(c):
+    o = O[c["speciesId"]]
+    s = o.get("powerSlots") or powers["tierSlots"][str(o["tier"])]
+    return ["II" if x == "I+" and c["skills"].get("Powers") == "S" else "I" if x == "I+" else x for x in s]
+
+
+for c in [example] + pregens:
+    o = O[c["speciesId"]]
+    base = {a: 10 + o["adj"].get(a, 0) for a in ["Body", "Agility", "Intellect", "Presence", "Will"]}
+    pool = 5 + c["edges"].get("attr", 0)
+    assert all(base[a] <= c["attrs"][a] <= 13 + max(0, o["adj"].get(a, 0)) for a in base), (c["name"], "range")
+    assert sum(c["attrs"][a] - base[a] for a in base) == pool, (c["name"], "spent", sum(c["attrs"][a] - base[a] for a in base), pool)
+    assert sum(c["edges"].values()) == 3 - o["tier"], (c["name"], "edges")
+    nS = sum(v == "S" for v in c["skills"].values())
+    nT = sum(v == "T" for v in c["skills"].values())
+    want = (7 if c["path"] == "hand" else 9) + c["edges"].get("skill", 0)
+    assert nS == 1 and nT == want, (c["name"], "skills", nS, nT, want)
+    assert set(c["skills"]) <= SK and c["dept"] in [r[0] for r in roles], c["name"]
+    sl = slots(c)
+    assert len(c["powers"]) == len(sl) and len(set(c["powers"])) == len(sl), (c["name"], "powers", sl)
+    assert all(p in PW and (not o.get("powerList") or p in o["powerList"]) for p in c["powers"]), (c["name"], "power list")
+    assert c["status"] in {s[0] for s in statuses} and c["comp"]["id"] in triggers, c["name"]
+    if c.get("sadv", {}).get("id"):
+        assert any(x[0] == c["sadv"]["id"] for x in o["traits"]), c["name"]
+    else:
+        assert c["adv"]["id"] in {a[0] for a in advantages}, c["name"]
+    assert all(k in {e[0] for e in equipment} for k in c["equipment"]), c["name"]
+OUT.parent.mkdir(parents=True, exist_ok=True)
+OUT.write_text(json.dumps(pack, ensure_ascii=False, indent=1) + "\n")
+print("wrote", OUT)

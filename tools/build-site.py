@@ -136,7 +136,7 @@ def main():
           '<path d="M32 9 52 21v22L32 55 12 43V21Z" fill="none" stroke="#9b6b1f" stroke-width="4"/>'
           '<text x="32" y="41" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="700" fill="#efe6d2">LD</text></svg>')
 
-    write("index.html", page("/", "Legend Dynamics RPG", "A tabletop roleplaying system on 3d6 roll-under: Gothic Westerns, science fiction, and swords against sorcery.",
+    write("index.html", page("/", "Legend Dynamics RPG", "A tabletop roleplaying system on 3d6 roll-under: Gothic Westerns, science fiction, swords against sorcery and superheroes.",
                              blocks(bw.home()), fonts=font_links(fonts_all)))
 
     for g in GAMES:

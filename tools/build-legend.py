@@ -148,13 +148,35 @@ def char_block(c, pack, t, heading):
     elif extra:
         lines.append(f"- **Edges:** {'; '.join(extra)}.")
     lines.append(f"- **Advantage:** {adv}. **Complication:** {comp}{'; trigger: ' + trig[0].lower() + trig[1:] if trig else ''}.")
+    pw = pack.get("powers")
+    if pw and any(c.get("powers", [])):
+        names = {x[0]: x[1] for x in pw["list"]}
+        lines.append(f"- **{pw['plural']}:** {', '.join(f'{names[x]} {cl}' for x, cl in zip(c['powers'], power_slots(pack, c)) if x)}.")
+    if pack.get("statuses") and c.get("status"):
+        lines.append(f"- **{pack.get('statusLabel', 'Status')}:** {next(x[1] for x in pack['statuses'] if x[0] == c['status'])}.")
     if heading:
         lines.append(f"- **{t['reasonSheet']}:** {c.get('reason', '')} **Connection:** {c.get('connection', '')}")
     return "\n".join(lines) + "\n"
 
 
+def power_slots(pack, c):
+    """The Classes of a character's power slots, as the creator works them out."""
+    o = next((x for x in pack["origins"] if x["id"] == c.get("speciesId")), None)
+    slots = (o or {}).get("powerSlots") or pack["powers"]["tierSlots"].get(str((o or {}).get("tier", 0)), [])
+    return ["II" if x == "I+" and c.get("skills", {}).get(pack["powers"]["skill"]) == "S" else "I" if x == "I+" else x for x in slots]
+
+
 def gen(name, pack, t):
     p = pack
+    if name == "powers":
+        pw = p["powers"]
+        out = []
+        for g, gn in pw["groups"]:
+            out += [f"## {gn}", "", table(["Power", "Class I", "Class II", "Class III"],
+                    [[f"**{x[1]}**" + (f" ({x[5]})" if len(x) > 5 and x[5] else "") + (" *(GM)*" if x[4].get("gm") else "") + (" *(Mythic only)*" if x[4].get("mythicOnly") else ""), *x[3][:3]] for x in pw["list"] if x[2] == g]), ""]
+        return "\n".join(out)
+    if name == "statuses":
+        return table([p.get("statusLabel", "Status"), "Benefit", "Cost"], [[f"**{x[1]}**", x[2], x[3]] for x in p["statuses"]])
     if name == "group-names":
         names = [g["name"] for g in p["groups"]]
         return ", ".join(names[:-1]) + " or " + names[-1]

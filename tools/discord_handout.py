@@ -20,6 +20,8 @@ EXAMPLES = {
                    "assist": "Crack the station lock", "helperSkill": "Computers", "track": "heat", "trackFull": "Heat"},
     "fantasy": {"skill": "Melee", "target": 14, "foe": "Serpent-priest", "foeTarget": 13, "contest": "Grapple",
                 "assist": "Force the tomb door", "helperSkill": "Athletics", "track": "doom", "trackFull": "Doom"},
+    "exlaw": {"skill": "Powers", "target": 13, "foe": "White Hand soldier", "foeTarget": 13, "contest": "Grapple",
+              "assist": "Hold the door", "helperSkill": "Athletics", "track": "collateral", "trackFull": "Collateral"},
     "grimm": {"skill": "Tracking", "target": 13, "foe": "Blutbad", "foeTarget": 14, "contest": "Grapple",
               "assist": "Hold the door", "helperSkill": "Athletics", "track": "exposure", "trackFull": "Exposure",
               "old": ("grimm", "grit")},

@@ -6,7 +6,7 @@
 // Settings (Cloudflare → Worker → Settings → Variables and Secrets):
 //   DISCORD_PUBLIC_KEY       required, from the Discord Developer Portal
 //   DISCORD_APPLICATION_ID   and DISCORD_BOT_TOKEN: only needed to register commands by visiting /register
-//   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, fantasy, grimm or pelion); default western
+//   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, fantasy, exlaw, grimm or pelion); default western
 // Binding (Settings → Bindings → KV namespace):
 //   STORE                    optional; turns on /game, /points, /clock and /track, and makes rerolls spend real points
 //                            (a USS Pelion or Grimm Worker's DUTY or GRIT binding works too)
@@ -16,6 +16,224 @@
 
 /* PACKS:START */
 export const PACKS = {
+ "exlaw": {
+  "id": "exlaw",
+  "title": "ExLAW",
+  "point": "Spark",
+  "mission": "Case",
+  "trackTitle": "Collateral, Scrutiny and Backlash",
+  "tracks": [
+   {
+    "name": "Collateral",
+    "boxes": 4,
+    "effects": [
+     "Clean so far",
+     "Property damage: insurance claims and angry owners",
+     "Bystanders hurt: −2 to Media and Persuasion with the public",
+     "Lawsuits and charges: someone is held liable",
+     "An EPAOC hearing: start a clock; a team member may lose their status"
+    ]
+   },
+   {
+    "name": "Scrutiny",
+    "boxes": 4,
+    "effects": [
+     "Nobody's looking",
+     "Questions in a report",
+     "Flagged: −2 at checkpoints, cordons and with federal agencies",
+     "Investigated: ExLAW or the FBI opens a file on you",
+     "Hunted: the Foundation or Raster Zero takes an interest; start a clock"
+    ]
+   },
+   {
+    "name": "Backlash",
+    "boxes": 4,
+    "effects": [
+     "The public trusts you",
+     "Talk shows ask hard questions",
+     "Protests: −2 to Media and Leadership with crowds",
+     "Anti-Operant laws proposed; Operant friends blame you",
+     "Riots: the next case starts in a city that wants you gone"
+    ]
+   }
+  ],
+  "seeds": {
+   "mission": [
+    "The case",
+    [
+     "A breach opens where the Umkas came through",
+     "Raster Zero's existence leaks",
+     "Recover a Hephaestus Key before the Foundation",
+     "A Raster Seven transfer goes wrong",
+     "Bring in an Operant who just woke up, before someone else does",
+     "An Operant bank robbery",
+     "Protect an EPAOC witness",
+     "Find a missing registration file",
+     "Arrest a Non-registered vigilante",
+     "Investigate a powers-related death",
+     "Stop a Morcain shipment of Ambrosia",
+     "Escort an Operant to a hearing",
+     "A hero's sponsor wants a scandal buried",
+     "A White Hand cell on US soil",
+     "A Shadow Earth duplicate replaces someone important",
+     "The Atomic Man asks for help"
+    ]
+   ],
+   "place": [
+    "Where",
+    [
+     "Raster Eight, in orbit",
+     "Tesla's 1884 Paris, through a door",
+     "A Foundation black lab, abandoned",
+     "The Mad Forest's edge, south of Bloomington",
+     "The Chicago Loop memorial",
+     "A Manhattan rooftop at night",
+     "An ExLAW regional office",
+     "A small town in the Midwest",
+     "A Los Angeles studio lot",
+     "A Morcain casino in Macau",
+     "The New Power Legion's tower",
+     "A university archive",
+     "A subway tunnel the city forgot",
+     "Buenos Aires, White Hand territory",
+     "A haven in Otherworld",
+     "Shadow Earth's mirror of your city"
+    ]
+   ],
+   "strange": [
+    "The Operant angle",
+    [
+     "Two people with the same power and the same face",
+     "A power the EMD says can't exist",
+     "Someone's powers woke tonight",
+     "A Shadow Earth duplicate",
+     "An Operant who doesn't know they are one",
+     "A stolen power: someone mimicked it",
+     "A Lab-made escapee",
+     "A Non-registered Operant hiding in plain sight",
+     "A ritual done badly",
+     "A bonded artifact looking for a new host",
+     "A power for sale",
+     "An Aegis suit that moves on its own",
+     "A spirit riding someone",
+     "A Class V power in an ordinary person",
+     "The 1938 auroras, back for a night",
+     "A third wave beginning"
+    ]
+   ],
+   "twist": [
+    "The twist",
+    [
+     "The Director knew all along",
+     "One of you is in the Raster Zero files",
+     "The victim is the culprit",
+     "ExLAW wants it buried",
+     "The Foundation is already there",
+     "The villain is right",
+     "A friend is being blackmailed",
+     "The witness is lying for a good reason",
+     "The press arrives first",
+     "It was an accident",
+     "The real target is someone else",
+     "The local police want it more than you do",
+     "A rival team is on the same case",
+     "The Morcain want to help",
+     "The culprit is a duplicate of someone on the team",
+     "Shadow Earth planned this"
+    ]
+   ],
+   "clock": [
+    "Ticking clock",
+    [
+     [
+      "The breach widens",
+      8
+     ],
+     [
+      "The Atomic Man loses patience",
+      6
+     ],
+     [
+      "The escapee's power destabilizes",
+      6
+     ],
+     [
+      "Raster Seven's transfer convoy leaves",
+      4
+     ],
+     [
+      "The press arrives",
+      4
+     ],
+     [
+      "The witness disappears",
+      4
+     ],
+     [
+      "The bomb goes off",
+      6
+     ],
+     [
+      "The mob forms",
+      4
+     ],
+     [
+      "Federal agents take the case",
+      4
+     ],
+     [
+      "The EPAOC subpoena",
+      6
+     ],
+     [
+      "The Morcain clean house",
+      6
+     ],
+     [
+      "The ritual completes at midnight",
+      6
+     ],
+     [
+      "The building comes down",
+      4
+     ],
+     [
+      "The sponsor pulls out",
+      6
+     ],
+     [
+      "Shadow Earth's rulers notice",
+      8
+     ],
+     [
+      "The third wave",
+      8
+     ]
+    ]
+   ],
+   "who": [
+    "Key character",
+    [
+     "Director Steven Humbacht",
+     "Nikola Tesla, visiting",
+     "A Foundation scientist with a conscience",
+     "Celerity, on the run",
+     "A frightened new Operant",
+     "An EPAOC staffer",
+     "A Morcain fixer who owes you",
+     "A sheriff on the edge of the Mad Forest",
+     "A reporter with a theory",
+     "An ExLAW agent who doesn't trust Operants",
+     "A New Power Legion star",
+     "A Shadow Knight",
+     "An Earth Warden",
+     "Michael Lance, out of his time",
+     "Steel Hawk, offering a deal",
+     "Your own Shadow Earth duplicate"
+    ]
+   ]
+  }
+ },
  "fantasy": {
   "id": "fantasy",
   "title": "The Shattered Crown",

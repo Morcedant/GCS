@@ -495,6 +495,12 @@ A caster knows a few quick spells, **cantrips**: as many as their **Sorcery** tr
 | Shatter | Break a lock, chain, blade or door. |
 | Veil | +3 to Stealth for the scene; you're hard to notice. |
 
+**Changing cantrips.** Cantrips are learned, not prayed for each morning, so a caster keeps the ones they know:
+
+- **New cantrips.** When **Sorcery** advances (Untrained to Trained, or Trained to Specialty), choose the new cantrips at once.
+- **Swapping.** Between ventures, a caster can swap **one** cantrip for another with **a week of study** and a source to learn it from: a teacher, a grimoire, a captured sorcerer's notes or a Crown shard's memory. The GM may make finding the source part of the next venture.
+- **Never mid-venture.** No swapping during a venture, unless the GM offers it as the reward for something remarkable (a demon's bargain, a dying sorcerer's last lesson).
+
 ## Rituals
 
 Bigger workings are **rituals**. Describe the effect; the GM sets its weight and says what it can and can't do. Fill a clock of that size with **Sorcery** rolls (usually ten minutes a roll; an hour for great workings). Success fills one segment, success by 5 or more two; a failure costs time or ticks a danger clock. **Priests** perform *rites* the same way, using **Lore**.
