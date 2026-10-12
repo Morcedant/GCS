@@ -227,25 +227,27 @@ After a significant case, the GM may allow one of these **instead of a skill ste
 
 ## Cantrips
 
-Comic-book magic is fast: a bolt, a shield, a binding, in a single panel. **Cantrips** is a power for that. Instead of one effect, it gives you a few quick spells, and each one works at the power's Class.
+Comic-book magic is fast: a bolt, a shield, a binding, in a single panel. **Cantrips** is a power for that. Instead of one effect, it gives you a few quick spells. The power's Class is your **Circle**, and every cantrip you know works at it: a Class II caster is a sorcerer of the **Second Circle**.
 
-| Cantrips Class | Cantrips known |
-|---|---|
-| I | 2 |
-| II | 3 |
-| III | 4 |
-| IV (GM's approval) | 5 |
+| Circle | Cantrips Class | Cantrips known |
+|---|---|---|
+| First | I | 2 |
+| Second | II | 3 |
+| Third | III | 4 |
+| Fourth (GM's approval) | IV | 5 |
+| Fifth | V | 6 |
+| Sixth | VI | 7 |
 
 - **Casting:** one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense.
 - **The price of versatility:** a failed cast marks a box of **Strain**, which other powers don't.
-- **Growing:** pushing, Stronger Power and growth in play all work as usual; each Class higher teaches you another cantrip and strengthens them all.
+- **Growing:** pushing, Stronger Power and growth in play all work as usual; each Class higher raises you a Circle, teaches you another cantrip and strengthens them all.
 - **Who:** Cantrips is on the Adept's mystic list. Other origins can take it with a magical reason: a Bonded artifact, a Mythic heritage, a Touched vision.
 - **Changing:** between cases, swap one cantrip for another with a week of study.
 - **Pure sorcery (optional):** a character who is nothing but a spellcaster can let Cantrips take **all** their power slots. It works at the best slot's Class, and each slot given up adds **2 more cantrips**. A tier 2 character (Class II, I and I) becomes Cantrips II with 3 + 2 + 2 = **7 cantrips** and no other powers. Tick *Pure sorcery* in the creator's step 4.
 
 | Cantrip | Effect |
 |---|---|
-| Bolt | A mystic blast: an attack at the power's Class, effective at Short range. |
+| Bolt | A mystic blast: an attack at your Circle's Class, effective at Short range. |
 | Shield | A barrier: Defense at the power's Class until your next turn. |
 | Bind | Bands of force hold a target in place (Body resists). |
 | Dispel | Cancel a spell, ward or magical effect of equal or lower Class. |

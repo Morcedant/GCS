@@ -243,8 +243,8 @@ power_list = [
     P("astral", "Astral Projection", "mind", "Leave your body to scout a building (your body is helpless).", "Travel across a city as a spirit; speak to spirits.", "Cross into Otherworld or Shadow Earth in spirit; fight spirits there."),
     P("intellect", "Super Intellect", "mind", "+2 to Intellect skills; learn any skill in days.", "Invent a working device in a week; solve the unsolvable in a scene.", "Understand any technology, alien or arcane; invent in hours."),
     P("telekinesis", "Telekinesis", "control", "Move a small object you can see; disarm.", "Lift a car; Class II attacks; hold a person still (Body resists).", "Lift a truck; stop a falling plane; Class III attacks."),
-    P("cantrips", "Cantrips", "control", "Know 2 cantrips: quick spells cast in one action, each working at Class I.", "Know 3 cantrips, each working at Class II.", "Know 4 cantrips, each working at Class III.", "quick spells; a failed cast marks Strain",
-      escalated=["Know 5 cantrips, each working at Class IV.", "Know 6 cantrips, each working at Class V.", "Know 7 cantrips, each working at Class VI."]),
+    P("cantrips", "Cantrips", "control", "First Circle: know 2 cantrips, quick spells cast in one action, each working at Class I.", "Second Circle: know 3 cantrips, each working at Class II.", "Third Circle: know 4 cantrips, each working at Class III.", "quick spells; a failed cast marks Strain",
+      escalated=["Fourth Circle: know 5 cantrips, each working at Class IV.", "Fifth Circle: know 6 cantrips, each working at Class V.", "Sixth Circle: know 7 cantrips, each working at Class VI."]),
     P("teleport", "Teleport", "control", "Jump to a place in line of sight, up to about 100 yards; just you.", "Jump anywhere you know within 50 miles, with one passenger.", "Jump anywhere on Earth you know, with up to 4 passengers.", "",
       escalated=["Anywhere on Earth, even places you've only seen in photos; up to 20 passengers or a vehicle.", "Low orbit or the Moon; a building's worth of people and things.", "Another world or dimension, without a door."]),
     P("portals", "Portals", "control", "Open a door between two places you can see.", "Open a door to anywhere you've been.", "Open a door into Otherworld, a haven or Shadow Earth.", gm=True),
@@ -315,7 +315,8 @@ for p_ in power_list:
 assert all(len(p_[3]) == 6 for p_ in power_list), [p_[0] for p_ in power_list if len(p_[3]) != 6]
 
 spells = {"skill": "Powers", "plural": "Cantrips", "power": "cantrips", "knownByClass": [2, 3, 4, 5, 6, 7], "pureBonus": 2, "known": [0, 0, 0], "roles": [], "advantages": [], "originAdvantages": [],
-          "note": "Each cantrip works at your Cantrips power's Class. Casting takes one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense. A failed cast marks a box of Strain. Swap one cantrip between cases with a week of study.",
+          "tierName": "Circle", "tiers": ["First Circle", "Second Circle", "Third Circle", "Fourth Circle", "Fifth Circle", "Sixth Circle"],
+          "note": "Your Cantrips power's Class is your Circle, and every cantrip works at it: Class II is the Second Circle. Casting takes one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense. A failed cast marks a box of Strain. Swap one cantrip between cases with a week of study.",
           "list": [["bolt", "Bolt", "A mystic blast: an attack at the power's Class, effective at Short range."],
                    ["shield", "Shield", "A barrier: Defense at the power's Class until your next turn."],
                    ["bind", "Bind", "Bands of force hold a target in place (Body resists)."],

@@ -2497,12 +2497,12 @@
     "Cantrips",
     "control",
     [
-     "Know 2 cantrips: quick spells cast in one action, each working at Class I.",
-     "Know 3 cantrips, each working at Class II.",
-     "Know 4 cantrips, each working at Class III.",
-     "Know 5 cantrips, each working at Class IV.",
-     "Know 6 cantrips, each working at Class V.",
-     "Know 7 cantrips, each working at Class VI."
+     "First Circle: know 2 cantrips, quick spells cast in one action, each working at Class I.",
+     "Second Circle: know 3 cantrips, each working at Class II.",
+     "Third Circle: know 4 cantrips, each working at Class III.",
+     "Fourth Circle: know 5 cantrips, each working at Class IV.",
+     "Fifth Circle: know 6 cantrips, each working at Class V.",
+     "Sixth Circle: know 7 cantrips, each working at Class VI."
     ],
     {},
     "quick spells; a failed cast marks Strain"
@@ -2749,7 +2749,16 @@
   "roles": [],
   "advantages": [],
   "originAdvantages": [],
-  "note": "Each cantrip works at your Cantrips power's Class. Casting takes one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense. A failed cast marks a box of Strain. Swap one cantrip between cases with a week of study.",
+  "tierName": "Circle",
+  "tiers": [
+   "First Circle",
+   "Second Circle",
+   "Third Circle",
+   "Fourth Circle",
+   "Fifth Circle",
+   "Sixth Circle"
+  ],
+  "note": "Your Cantrips power's Class is your Circle, and every cantrip works at it: Class II is the Second Circle. Casting takes one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense. A failed cast marks a box of Strain. Swap one cantrip between cases with a week of study.",
   "list": [
    [
     "bolt",

@@ -304,10 +304,10 @@ tr.lvl-U td.target { color: var(--muted); }
 
 /* Equipment */
 #equip { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px 16px; }
-#equip .eq-item { align-items: flex-start; }
-#equip .eq-item input { margin-top: 3px; flex: none; }
-#equip .eq-item > span { display: grid; gap: 1px; }
-#equip .eq-item b { font-weight: 600; }
+#equip .eq-item, #spell-list .eq-item { align-items: flex-start; }
+#equip .eq-item input, #spell-list .eq-item input { margin-top: 3px; flex: none; }
+#equip .eq-item > span, #spell-list .eq-item > span { display: grid; gap: 1px; }
+#equip .eq-item b, #spell-list .eq-item b { font-weight: 600; }
 
 /* Weapon charge */
 .ph-meter { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; height: 14px; }
@@ -4747,7 +4747,7 @@ tr.lvl-U td.target { color: var(--muted); }
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" },
       allegiance: "", customTier: 1,
       portrait: "", portraitShape: "token",
-      spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "",
+      spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "",
       play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [] },
     };
   }
@@ -4770,6 +4770,7 @@ tr.lvl-U td.target { color: var(--muted); }
     out.pureSorcery = out.pureSorcery === true;
     { const m = out.magic && typeof out.magic === "object" ? out.magic : {}, MA = PACK.magicAdvance || {};
       out.magic = { extraSpells: Math.max(0, Math.min(MA.extraSpells || 0, parseInt(m.extraSpells, 10) || 0)), mastered: Array.isArray(m.mastered) ? m.mastered.filter((x) => SPELLS && SPELLS.list.some((s) => s[0] === x)) : [],
+        deeper: MA.deeper && Array.isArray(m.deeper) ? m.deeper.filter((x) => SPELLS && SPELLS.list.some((s) => s[0] === x)) : [],
         extraCharms: Math.max(0, Math.min(MA.charms?.extra || 0, parseInt(m.extraCharms, 10) || 0)), heart: typeof m.heart === "string" ? m.heart : "", quicker: typeof m.quicker === "string" ? m.quicker : "", master: m.master === true }; }
     out.powerRaise = Object.fromEntries(Object.entries(out.powerRaise && typeof out.powerRaise === "object" ? out.powerRaise : {}).filter(([k, v]) => POWERS && POWERS.list.some((p) => p[0] === k) && CLASS_NAMES.includes(v)));
     out.powersLearned = (Array.isArray(out.powersLearned) ? out.powersLearned : []).filter((x) => x && typeof x === "object").map((x) => ({ id: POWERS && POWERS.list.some((p) => p[0] === x.id) ? x.id : "", cl: CLASS_NAMES.includes(x.cl) ? x.cl : "I" }));
@@ -4873,6 +4874,13 @@ tr.lvl-U td.target { color: var(--muted); }
   const spellsKnown = (c = ch) => { if (SPELLS.power) { const p = allPowers(c).find((x) => x.id === SPELLS.power); if (p) return (SPELLS.knownByClass[CLASS_NAMES.indexOf(p.cl)] || 0) + (isPure(c) ? (SPELLS.pureBonus || 2) * (powerSlots(c).length - 1) : 0); }
     const l = c.skills[SPELLS.skill], extra = (c.magic?.extraSpells || 0), expert = c.path === "hand" || (MAGIC && c.magic?.master && MAGIC.skill === SPELLS.skill);
     return !canCast(c) || !l || l === "U" ? 0 : (l === "T" ? SPELLS.known[0] : expert ? SPELLS.known[2] : SPELLS.known[1]) + extra; };
+  // Spell tiers (Seals, Circles): the caster's tier comes from the magic skill's level, or from the spell power's Class.
+  const casterTier = (c = ch) => { if (!SPELLS || !SPELLS.tiers) return -1;
+    if (SPELLS.power) { const p = allPowers(c).find((x) => x.id === SPELLS.power); return p ? CLASS_NAMES.indexOf(p.cl) : -1; }
+    const l = c.skills[SPELLS.skill]; if (!l || l === "U") return -1;
+    return l === "T" ? 0 : (c.path === "hand" || (MAGIC && c.magic?.master && MAGIC.skill === SPELLS.skill)) ? 2 : 1; };
+  const spellTier = (k, c = ch) => { const t = casterTier(c); return t < 0 ? t : Math.min(SPELLS.tiers.length - 1, t + (c.magic?.deeper?.includes(k) ? 1 : 0)); };
+  const spellEffect = (row, t) => (row[3] && t >= 0 ? row[3][Math.min(t, row[3].length - 1)] : row[2]);
   // The origin's slots, plus one Class I slot for the Extra Power Edge.
   const baseSlots = (c = ch) => {
     if (!POWERS) return [];
@@ -4969,7 +4977,7 @@ tr.lvl-U td.target { color: var(--muted); }
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
   $("equip").innerHTML = EQUIPMENT.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="eq-${k}" data-eq="${k}"><span><b>${n}</b><span class="small muted">${eff}</span></span></label>`).join("");
 
-  if (SPELLS) $("spell-list").innerHTML = SPELLS.list.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="sp-${k}" data-spell="${k}"><span><b>${n}</b><span class="small muted">${eff}</span></span></label>`).join("");
+  if (SPELLS) $("spell-list").innerHTML = SPELLS.list.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="sp-${k}" data-spell="${k}"><span><b>${n}</b><span class="small muted" id="sp-eff-${k}">${eff}</span></span></label>`).join("");
   $("edge-list").innerHTML = EDGE_DEFS.map(([k, n, d]) => `<div class="edge"><b>${n}</b>
     <span class="gm-duty"><button type="button" id="edge-m-${k}" data-edge="${k}" data-d="-1" aria-label="One fewer: ${n}">−</button><b id="edge-n-${k}">0</b><button type="button" id="edge-p-${k}" data-edge="${k}" data-d="1" aria-label="One more: ${n}">+</button></span>
     <span class="small muted">${d}</span></div>`).join("");
@@ -5251,9 +5259,9 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ed.length ? `<div class="field"><span class="label">Edges</span><span>${esc(ed.join(", "))}</span></div>` : ""}
         ${a2 && edgeN("adv2") ? `<div class="field"><span class="label">Second advantage</span><b>${esc(a2[1])}${ch.adv2.detail ? ": " + esc(ch.adv2.detail) : ""}</b><span class="small muted">${esc(a2[2])}</span></div>` : ""}
         ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">A friend</span><span>${esc(ch.contact)}</span></div>` : ""}
-        ${POWERS && allPowers().length ? `<div class="field wide"><span class="label">${POWERS.plural}</span><span>${allPowers().map((x) => `<b>${esc(powerDef(x.id)[1])} (Class ${x.cl}${isPure() && x.id === SPELLS.power ? ", pure sorcery" : ""}):</b> ${esc(isPure() && x.id === SPELLS.power ? `Know ${spellsKnown()} ${SPELLS.plural.toLowerCase()}, each working at Class ${x.cl}.` : powerEffect(x.id, x.cl))}`).join("<br>")}</span></div>` : ""}
+        ${POWERS && allPowers().length ? `<div class="field wide"><span class="label">${POWERS.plural}</span><span>${allPowers().map((x) => `<b>${esc(powerDef(x.id)[1])} (Class ${x.cl}${isPure() && x.id === SPELLS.power ? ", pure sorcery" : ""}):</b> ${esc(isPure() && x.id === SPELLS.power ? `Know ${spellsKnown()} ${SPELLS.plural.toLowerCase()}, each working at ${SPELLS.tiers ? "the " + SPELLS.tiers[casterTier()] + " (Class " + x.cl + ")" : "Class " + x.cl}.` : powerEffect(x.id, x.cl))}`).join("<br>")}</span></div>` : ""}
         ${STATUSES && ch.status ? (() => { const st = STATUSES.find((x) => x[0] === ch.status); return `<div class="field"><span class="label">${esc(PACK.statusLabel || "Status")}: ${esc(st[1])}</span><span class="small">${esc(st[2])}</span><span class="small muted">${esc(st[3])}</span></div>`; })() : ""}
-        ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([k, n, eff]) => `<b>${esc(n)}${ch.magic.mastered.includes(k) ? " (mastered: +2, no " + (PTRACK ? PTRACK.name : "cost") + " on a failure)" : ""}:</b> ${esc(eff)}`).join("<br>")}</span></div>` : ""}
+        ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map((row) => { const [k, n] = row, t = spellTier(k); return `<b>${esc(n)}${t >= 0 ? " (" + SPELLS.tiers[t] + ")" : ""}${ch.magic.mastered.includes(k) ? " (mastered: +2, no " + (PTRACK ? PTRACK.name : "cost") + " on a failure)" : ""}:</b> ${esc(spellEffect(row, t))}`; }).join("<br>")}</span></div>` : ""}
         ${MAGIC && MAGIC.charms && ch.skills[MAGIC.skill] && ch.skills[MAGIC.skill] !== "U" ? `<div class="field"><span class="label">Ready charms</span><span>${(ch.skills[MAGIC.skill] === "T" ? MAGIC.charms.base[0] : levelName("S", MAGIC.skill) === "Expert" ? MAGIC.charms.base[2] : MAGIC.charms.base[1]) + ch.magic.extraCharms}</span></div>` : ""}
         ${MAGIC && (ch.magic.heart || ch.magic.quicker) ? `<div class="field wide"><span class="label">Ritual mastery</span><span>${ch.magic.heart ? "<b>By heart:</b> " + esc(ch.magic.heart) : ""}${ch.magic.heart && ch.magic.quicker ? "<br>" : ""}${ch.magic.quicker ? "<b>Quicker hand:</b> " + esc(ch.magic.quicker) : ""}</span></div>` : ""}
         ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 ${esc(ch.gear.skill)})` : ""}</span></div>` : ""}
@@ -5281,7 +5289,9 @@ tr.lvl-U td.target { color: var(--muted); }
     $("spells-wrap").hidden = !canCast();
     if (SPELLS && canCast()) {
       const known = spellsKnown(), full = ch.spells.length >= known;
-      $("spells-label").textContent = `${SPELLS.plural} (${ch.spells.length} of ${known})`;
+      const tier = casterTier();
+      $("spells-label").textContent = `${SPELLS.plural} (${ch.spells.length} of ${known})${tier >= 0 ? " · " + SPELLS.tiers[tier] : ""}`;
+      SPELLS.list.forEach((row) => { const t = spellTier(row[0]); $("sp-eff-" + row[0]).textContent = (row[3] && t >= 0 ? `${SPELLS.tiers[t]}: ` : "") + spellEffect(row, t); });
       $("spells-note").textContent = known ? SPELLS.note : `Train ${SPELLS.skill} to know ${SPELLS.plural.toLowerCase()}: ${SPELLS.known[0]} at Trained, ${SPELLS.known[1]} at Specialty, ${SPELLS.known[2]} at Expert.`;
       SPELLS.list.forEach(([k]) => { const b = $("sp-" + k); b.checked = ch.spells.includes(k); b.disabled = !b.checked && full; });
     }
@@ -5294,8 +5304,14 @@ tr.lvl-U td.target { color: var(--muted); }
         if (MAGIC.extraSpells && SPELLS) { $("ma-spells-label").textContent = `Extra ${SPELLS.plural.toLowerCase()} learned`; $("f-ma-spells").innerHTML = Array.from({ length: MAGIC.extraSpells + 1 }, (_, n) => `<option value="${n}">+${n}</option>`).join(""); $("f-ma-spells").value = String(m.extraSpells); }
         $("ma-charms-wrap").hidden = !MAGIC.charms;
         if (MAGIC.charms) { $("f-ma-charms").innerHTML = Array.from({ length: MAGIC.charms.extra + 1 }, (_, n) => `<option value="${n}">+${n}</option>`).join(""); $("f-ma-charms").value = String(m.extraCharms); }
-        $("ma-mastery-wrap").hidden = !MAGIC.mastery || !SPELLS || !ch.spells.length;
-        if (MAGIC.mastery && SPELLS) {
+        $("ma-mastery-wrap").hidden = !(MAGIC.mastery || MAGIC.deeper) || !SPELLS || !ch.spells.length;
+        if (MAGIC.deeper && SPELLS) {
+          const top = SPELLS.tiers.length - 1;
+          $("ma-mastery-label").textContent = `Opened one ${SPELLS.tierName} deeper (once per ${SPELLS.plural.toLowerCase().replace(/s$/, "")})`;
+          $("ma-mastery").innerHTML = SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([k, n]) => { const on = m.deeper.includes(k), cap = !on && casterTier() >= top;
+            return `<label><input type="checkbox" data-deeper="${k}"${on ? " checked" : ""}${cap ? " disabled" : ""}> ${esc(n)}</label>`; }).join("");
+        }
+        else if (MAGIC.mastery && SPELLS) {
           $("ma-mastery-label").textContent = `Mastered ${SPELLS.plural.toLowerCase()} (+2 to cast; a failure marks no ${PTRACK ? PTRACK.name : "cost"})`;
           $("ma-mastery").innerHTML = SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([k, n]) => `<label><input type="checkbox" data-master="${k}"${m.mastered.includes(k) ? " checked" : ""}> ${esc(n)}</label>`).join("");
         }
@@ -5543,6 +5559,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-ma-spells") { ch.magic.extraSpells = +t.value; touch(); render(); }
     else if (t.id === "f-ma-charms") { ch.magic.extraCharms = +t.value; touch(); render(); }
     else if (t.id === "f-ma-master") { ch.magic.master = t.checked; touch(); render(); }
+    else if (t.dataset.deeper) { const k = t.dataset.deeper; ch.magic.deeper = t.checked ? [...new Set([...ch.magic.deeper, k])] : ch.magic.deeper.filter((x) => x !== k); touch(); render(); }
     else if (t.dataset.master) { const k = t.dataset.master; ch.magic.mastered = t.checked ? [...new Set([...ch.magic.mastered, k])] : ch.magic.mastered.filter((x) => x !== k); touch(); render(); }
     else if (t.id === "f-gm4") { ch.gmClass4 = t.checked; touch(); render(); }
     else if (t.dataset.praise) { if (t.value === t.dataset.base) delete ch.powerRaise[t.dataset.praise]; else ch.powerRaise[t.dataset.praise] = t.value; touch(); render(); }

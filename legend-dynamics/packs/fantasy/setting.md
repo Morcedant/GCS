@@ -52,26 +52,36 @@ Sorcery is real, rare and expensive. It is worked by **Sorcerers** and **Witches
 
 ## Cantrips
 
-A caster knows a few quick spells, **cantrips**: as many as their **Sorcery** training allows, **2 at Trained, 3 at Specialty, 4 at Expert**. Choose them in the creator. Casting takes **one action and a Sorcery roll**; where it makes sense, the target resists with **Will** (an opposed roll, or the target's roll against the spell). Advancing Sorcery lets you learn another cantrip between ventures.
+A caster knows a few quick spells, **cantrips**. Every cantrip holds three **Seals**, each hiding a deeper power, and your **Sorcery** breaks them: the deeper your training, the more each cantrip can do. Choose your cantrips in the creator; it shows each one at your Seal.
 
-| Cantrip | Effect |
-|---|---|
-| Shadow Bolt | A ranged attack with Sorcery; marks 2 boxes. Dodge applies. |
-| Witchfire | Light, or set something burning: 1 box a round in the flames. |
-| Ward | Attacks against one ally are at −2 for the scene. |
-| Hex | The target is at −2 on all rolls for the scene (Will resists). |
-| Charm | Presence contest: the target treats you as a friend for the scene. |
-| Dread | The target rolls Will or flees or freezes. |
-| Sleep | The target rolls Will or sleeps; minor opponents just drop. |
-| Mend | Clear one injury box, once per wound. |
-| Beast-tongue | Speak with an animal, and command it for a scene. |
-| Sorcerer's Sight | See magic, curses, spirits and disguised monsters. |
-| Shatter | Break a lock, chain, blade or door. |
-| Veil | +3 to Stealth for the scene; you're hard to notice. |
+| Sorcery | Cantrips known | Seals broken |
+|---|---|---|
+| Trained | 2 | the First Seal |
+| Specialty | 3 | the Second Seal |
+| Expert | 4 | the Third Seal |
+
+- **Casting:** one action and a Sorcery roll; where it makes sense, the target resists with **Will** (an opposed roll, or the target's roll against the spell).
+- **Holding back:** you can always cast a cantrip at a shallower Seal than you've broken.
+- **The price:** a failed cast marks a box of Corruption, or two at the Third Seal. A natural 18 marks two.
+
+| Cantrip | First Seal | Second Seal | Third Seal |
+|---|---|---|---|
+| Shadow Bolt | A ranged attack with Sorcery; marks 2 boxes. Dodge applies. | A ranged attack with Sorcery; marks 3 boxes, or 2 each on two targets. Dodge applies. | A ranged attack with Sorcery; marks 4 boxes, or 2 on everyone in a small area. Dodge applies. |
+| Witchfire | Light, or set something burning: 1 box a round in the flames. | A gout of flame at Short range: marks 2 boxes, and it catches. | A wall or ring of fire for the scene; crossing it marks 3 boxes. |
+| Ward | Attacks against one ally are at −2 for the scene. | Attacks against everyone near you are at −2 for the scene. | Attacks against everyone near you are at −2 for the scene, and each ally's first hit glances off. |
+| Hex | The target is at −2 on all rolls for the scene (Will resists). | The target is at −2 on all rolls for the scene and can't spend Fortune (Will resists). | The target is at −4 on all rolls for the scene, or −2 until a rite lifts it (Will resists). |
+| Charm | Presence contest: the target treats you as a friend for the scene. | A small group for the scene, or one target for a day. | One target for a moon; they'll take risks for you, but not throw their life away. |
+| Dread | The target rolls Will or flees or freezes. | A handful roll Will; minor opponents just run. | A whole warband rolls Will; those who fail won't return this scene. |
+| Sleep | The target rolls Will or sleeps; minor opponents just drop. | A handful roll Will or sleep. | A crowd rolls Will or sleeps until sunrise, or until magic wakes them. |
+| Mend | Clear one injury box, once per wound. | Clear two injury boxes, or draw out a poison or sickness. | Pull back someone who fell this scene, with one box cleared. |
+| Beast-tongue | Speak with an animal, and command it for a scene. | Command a pack or flock for a scene, or see through one beast's eyes. | Call the beasts of the land; they come within the hour, and one great beast obeys for a day. |
+| Sorcerer's Sight | See magic, curses, spirits and disguised monsters. | See magic, curses, spirits and disguised monsters, through Veil and illusions, and who made a spell or curse and why. | See all the Second Seal shows, and a place's recent past, or follow a Crown shard's trail. |
+| Shatter | Break a lock, chain, blade or door. | Break a wall or gate, or ruin a foe's shield or armor until it's mended. | Bring down a bridge or a tower's door, or break a magical binding or ward. |
+| Veil | +3 to Stealth for the scene; you're hard to notice. | Unseen while you keep still, and the Veil can cover one ally. | Truly unseen for the scene, or +3 to Stealth for a small group. |
 
 **Changing cantrips.** Cantrips are learned, not prayed for each morning, so a caster keeps the ones they know:
 
-- **New cantrips.** When **Sorcery** advances (Untrained to Trained, or Trained to Specialty), choose the new cantrips at once.
+- **New cantrips.** When **Sorcery** advances (Untrained to Trained, or Trained to Specialty), choose the new cantrips at once, and the cantrips you know break their next Seal.
 - **Swapping.** Between ventures, a caster can swap **one** cantrip for another with **a week of study** and a source to learn it from: a teacher, a grimoire, a captured sorcerer's notes or a Crown shard's memory. The GM may make finding the source part of the next venture.
 - **Never mid-venture.** No swapping during a venture, unless the GM offers it as the reward for something remarkable (a demon's bargain, a dying sorcerer's last lesson).
 
@@ -108,12 +118,11 @@ A caster's magic grows in play. After a significant venture, a caster can take o
 
 | Option | Effect | Limit |
 |---|---|---|
-| New cantrip | Learn one cantrip beyond your Sorcery limit | Up to 2 extra |
-| Cantrip mastery | +2 to cast one cantrip, and a failed cast with it marks no Corruption (a natural 18 still marks 2) | Each cantrip once |
+| Deeper Seal | One cantrip you know breaks one Seal deeper than your Sorcery allows | Each cantrip once |
 | Ritual by heart | One kind of ritual (wards, curses, questions of the dead) takes one fewer segment, to a minimum of 1 | Each kind once |
-| Archmage | Sorcery becomes Expert (+5), and you know 4 cantrips before extras | Once, at the end of a long campaign, with the GM's approval |
+| Archmage | Sorcery becomes Expert (+5): you know 4 cantrips and break the Third Seal | Once, at the end of a long campaign, with the GM's approval |
 
-Record these in the creator under **Magic grown in play**: extra cantrips raise your limit, mastered cantrips show on the sheet, and your rituals by heart are listed with them.
+Record these in the creator under **Magic grown in play**: each cantrip shows its Seal on the sheet, and your rituals by heart are listed with them.
 
 # The world
 

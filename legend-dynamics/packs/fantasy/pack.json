@@ -1913,68 +1913,134 @@
    "gb-gift",
    "ud-gift"
   ],
-  "note": "Casting takes an action and a Sorcery roll; the target resists with Will where it makes sense. A failed cast marks a box of Corruption, a natural 18 marks two.",
+  "note": "Your Sorcery breaks the Seals: Trained the First, Specialty the Second, Expert the Third. Casting takes an action and a Sorcery roll; the target resists with Will where it makes sense. A failed cast marks a box of Corruption, two at the Third Seal; a natural 18 marks two.",
   "list": [
    [
     "bolt",
     "Shadow Bolt",
-    "A ranged attack with Sorcery; marks 2 boxes. Dodge applies."
+    "A ranged attack with Sorcery; marks 2 boxes. Dodge applies.",
+    [
+     "A ranged attack with Sorcery; marks 2 boxes. Dodge applies.",
+     "A ranged attack with Sorcery; marks 3 boxes, or 2 each on two targets. Dodge applies.",
+     "A ranged attack with Sorcery; marks 4 boxes, or 2 on everyone in a small area. Dodge applies."
+    ]
    ],
    [
     "witchfire",
     "Witchfire",
-    "Light, or set something burning: 1 box a round in the flames."
+    "Light, or set something burning: 1 box a round in the flames.",
+    [
+     "Light, or set something burning: 1 box a round in the flames.",
+     "A gout of flame at Short range: marks 2 boxes, and it catches.",
+     "A wall or ring of fire for the scene; crossing it marks 3 boxes."
+    ]
    ],
    [
     "ward",
     "Ward",
-    "Attacks against one ally are at −2 for the scene."
+    "Attacks against one ally are at −2 for the scene.",
+    [
+     "Attacks against one ally are at −2 for the scene.",
+     "Attacks against everyone near you are at −2 for the scene.",
+     "Attacks against everyone near you are at −2 for the scene, and each ally's first hit glances off."
+    ]
    ],
    [
     "hex",
     "Hex",
-    "The target is at −2 on all rolls for the scene (Will resists)."
+    "The target is at −2 on all rolls for the scene (Will resists).",
+    [
+     "The target is at −2 on all rolls for the scene (Will resists).",
+     "The target is at −2 on all rolls for the scene and can't spend Fortune (Will resists).",
+     "The target is at −4 on all rolls for the scene, or −2 until a rite lifts it (Will resists)."
+    ]
    ],
    [
     "charm",
     "Charm",
-    "Presence contest: the target treats you as a friend for the scene."
+    "Presence contest: the target treats you as a friend for the scene.",
+    [
+     "Presence contest: the target treats you as a friend for the scene.",
+     "A small group for the scene, or one target for a day.",
+     "One target for a moon; they'll take risks for you, but not throw their life away."
+    ]
    ],
    [
     "dread",
     "Dread",
-    "The target rolls Will or flees or freezes."
+    "The target rolls Will or flees or freezes.",
+    [
+     "The target rolls Will or flees or freezes.",
+     "A handful roll Will; minor opponents just run.",
+     "A whole warband rolls Will; those who fail won't return this scene."
+    ]
    ],
    [
     "sleep",
     "Sleep",
-    "The target rolls Will or sleeps; minor opponents just drop."
+    "The target rolls Will or sleeps; minor opponents just drop.",
+    [
+     "The target rolls Will or sleeps; minor opponents just drop.",
+     "A handful roll Will or sleep.",
+     "A crowd rolls Will or sleeps until sunrise, or until magic wakes them."
+    ]
    ],
    [
     "mend",
     "Mend",
-    "Clear one injury box, once per wound."
+    "Clear one injury box, once per wound.",
+    [
+     "Clear one injury box, once per wound.",
+     "Clear two injury boxes, or draw out a poison or sickness.",
+     "Pull back someone who fell this scene, with one box cleared."
+    ]
    ],
    [
     "beast",
     "Beast-tongue",
-    "Speak with an animal, and command it for a scene."
+    "Speak with an animal, and command it for a scene.",
+    [
+     "Speak with an animal, and command it for a scene.",
+     "Command a pack or flock for a scene, or see through one beast's eyes.",
+     "Call the beasts of the land; they come within the hour, and one great beast obeys for a day."
+    ]
    ],
    [
     "sight",
     "Sorcerer's Sight",
-    "See magic, curses, spirits and disguised monsters."
+    "See magic, curses, spirits and disguised monsters.",
+    [
+     "See magic, curses, spirits and disguised monsters.",
+     "See magic, curses, spirits and disguised monsters, through Veil and illusions, and who made a spell or curse and why.",
+     "See all the Second Seal shows, and a place's recent past, or follow a Crown shard's trail."
+    ]
    ],
    [
     "shatter",
     "Shatter",
-    "Break a lock, chain, blade or door."
+    "Break a lock, chain, blade or door.",
+    [
+     "Break a lock, chain, blade or door.",
+     "Break a wall or gate, or ruin a foe's shield or armor until it's mended.",
+     "Bring down a bridge or a tower's door, or break a magical binding or ward."
+    ]
    ],
    [
     "veil",
     "Veil",
-    "+3 to Stealth for the scene; you're hard to notice."
+    "+3 to Stealth for the scene; you're hard to notice.",
+    [
+     "+3 to Stealth for the scene; you're hard to notice.",
+     "Unseen while you keep still, and the Veil can cover one ally.",
+     "Truly unseen for the scene, or +3 to Stealth for a small group."
+    ]
    ]
+  ],
+  "tierName": "Seal",
+  "tiers": [
+   "First Seal",
+   "Second Seal",
+   "Third Seal"
   ]
  },
  "personalTrack": {
@@ -2431,8 +2497,7 @@
  ],
  "magicAdvance": {
   "skill": "Sorcery",
-  "extraSpells": 2,
-  "mastery": true,
+  "deeper": true,
   "masterName": "Archmage"
  }
 }

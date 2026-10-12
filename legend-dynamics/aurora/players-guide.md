@@ -744,7 +744,7 @@ After a significant case, the GM may allow one of these **instead of a skill ste
 | Power | Class I | Class II | Class III |
 |---|---|---|---|
 | **Telekinesis** | Move a small object you can see; disarm. | Lift a car; Class II attacks; hold a person still (Body resists). | Lift a truck; stop a falling plane; Class III attacks. |
-| **Cantrips** (quick spells; a failed cast marks Strain) | Know 2 cantrips: quick spells cast in one action, each working at Class I. | Know 3 cantrips, each working at Class II. | Know 4 cantrips, each working at Class III. |
+| **Cantrips** (quick spells; a failed cast marks Strain) | First Circle: know 2 cantrips, quick spells cast in one action, each working at Class I. | Second Circle: know 3 cantrips, each working at Class II. | Third Circle: know 4 cantrips, each working at Class III. |
 | **Teleport** | Jump to a place in line of sight, up to about 100 yards; just you. | Jump anywhere you know within 50 miles, with one passenger. | Jump anywhere on Earth you know, with up to 4 passengers. |
 | **Portals** *(GM)* | Open a door between two places you can see. | Open a door to anywhere you've been. | Open a door into Otherworld, a haven or Shadow Earth. |
 | **Summoning** | Call a minor spirit or creature that helps for a scene (+2 assistance). | Call a creature that fights beside you (a minor character with Class II attacks). | Call something powerful; it serves, at a price. |
@@ -802,7 +802,7 @@ Every power keeps going at Classes IV to VI. Player characters reach Class IV on
 | **Astral Projection** | Travel anywhere on Earth in spirit within moments. | Act physically as a spirit, with Class III attacks. | Walk between worlds in body as well as spirit. |
 | **Super Intellect** | Out-think supercomputers; invent the impossible in an hour. | Understand any science, alien or arcane, at a glance. | Tesla's level: build doors between worlds. |
 | **Telekinesis** | Lift a jet or a building's floor; Class IV attacks. | Lift a ship; Class V attacks. | Move a mountain; Class VI attacks. |
-| **Cantrips** | Know 5 cantrips, each working at Class IV. | Know 6 cantrips, each working at Class V. | Know 7 cantrips, each working at Class VI. |
+| **Cantrips** | Fourth Circle: know 5 cantrips, each working at Class IV. | Fifth Circle: know 6 cantrips, each working at Class V. | Sixth Circle: know 7 cantrips, each working at Class VI. |
 | **Teleport** | Anywhere on Earth, even places you've only seen in photos; up to 20 passengers or a vehicle. | Low orbit or the Moon; a building's worth of people and things. | Another world or dimension, without a door. |
 | **Portals** | Hold a door open for an army or a convoy. | Open many doors at once across a city. | Tear a breach between worlds that stays open. |
 | **Summoning** | Call something that fights with Class IV attacks. | Call a legion. | Call one of Otherworld's powers itself. |
@@ -824,25 +824,27 @@ Every power keeps going at Classes IV to VI. Player characters reach Class IV on
 
 ## Cantrips
 
-Comic-book magic is fast: a bolt, a shield, a binding, in a single panel. **Cantrips** is a power for that. Instead of one effect, it gives you a few quick spells, and each one works at the power's Class.
+Comic-book magic is fast: a bolt, a shield, a binding, in a single panel. **Cantrips** is a power for that. Instead of one effect, it gives you a few quick spells. The power's Class is your **Circle**, and every cantrip you know works at it: a Class II caster is a sorcerer of the **Second Circle**.
 
-| Cantrips Class | Cantrips known |
-|---|---|
-| I | 2 |
-| II | 3 |
-| III | 4 |
-| IV (GM's approval) | 5 |
+| Circle | Cantrips Class | Cantrips known |
+|---|---|---|
+| First | I | 2 |
+| Second | II | 3 |
+| Third | III | 4 |
+| Fourth (GM's approval) | IV | 5 |
+| Fifth | V | 6 |
+| Sixth | VI | 7 |
 
 - **Casting:** one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense.
 - **The price of versatility:** a failed cast marks a box of **Strain**, which other powers don't.
-- **Growing:** pushing, Stronger Power and growth in play all work as usual; each Class higher teaches you another cantrip and strengthens them all.
+- **Growing:** pushing, Stronger Power and growth in play all work as usual; each Class higher raises you a Circle, teaches you another cantrip and strengthens them all.
 - **Who:** Cantrips is on the Adept's mystic list. Other origins can take it with a magical reason: a Bonded artifact, a Mythic heritage, a Touched vision.
 - **Changing:** between cases, swap one cantrip for another with a week of study.
 - **Pure sorcery (optional):** a character who is nothing but a spellcaster can let Cantrips take **all** their power slots. It works at the best slot's Class, and each slot given up adds **2 more cantrips**. A tier 2 character (Class II, I and I) becomes Cantrips II with 3 + 2 + 2 = **7 cantrips** and no other powers. Tick *Pure sorcery* in the creator's step 4.
 
 | Cantrip | Effect |
 |---|---|
-| Bolt | A mystic blast: an attack at the power's Class, effective at Short range. |
+| Bolt | A mystic blast: an attack at your Circle's Class, effective at Short range. |
 | Shield | A barrier: Defense at the power's Class until your next turn. |
 | Bind | Bands of force hold a target in place (Body resists). |
 | Dispel | Cancel a spell, ward or magical effect of equal or lower Class. |
