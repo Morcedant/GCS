@@ -170,8 +170,59 @@ def power_slots(pack, c):
     return [names[names.index(x) + ((c.get("powerBoost") or [])[i] if i < len(c.get("powerBoost") or []) else 0)] for i, x in enumerate(base)]
 
 
+MAGIC_DEFAULT = {"skill": "your magic skill", "burst": "burst", "bursts": "bursts", "step": "step", "steps": "Trained, Specialty, Expert",
+                 "price": "a box of your setting's price track", "charm": "charm", "charms": "charms", "working": "working", "workings": "workings"}
+
+
+def magic_chapter(m, title=None):
+    """The shared Magic chapter: bursts, workings, charms, Boosts and magic advancement. m names a setting's terms."""
+    m = {**MAGIC_DEFAULT, **m}
+    B, Bs, W, Ws, C, Cs = m["burst"], m["bursts"], m["working"], m["workings"], m["charm"], m["charms"]
+    cap = lambda x: x[:1].upper() + x[1:]
+    train = m["skill"].replace("your ", "")
+    out = ["# Magic", "",
+           f"Magic works at two speeds, with a third tool that turns one into the other. Every magical character uses the same three tools; {'this setting' if title else 'each setting'} decides who gets which, what they're called and what they cost.", "",
+           table(["Tool", "Speed", "How it works"], [
+               [f"**{cap(Bs)}**", "One action", f"A quick spell you know. Roll {m['skill']}; on a success it happens."],
+               [f"**{cap(Ws)}**", "Minutes to nights", "Anything else. Describe the effect; the GM sets its weight; fill a progress clock."],
+               [f"**{cap(Cs)}**", "One action, no roll", f"A finished {W} stored in an object, released by breaking it."]]), "",
+           f"## {cap(Bs)}", "",
+           f"Each {B} has a short **base effect**: one target, for one scene, at Close or Short range. Harm marks 2 boxes; a penalty is −2; the target resists with an attribute where it makes sense.", "",
+           f"**Boosts.** Your {m['step']} sets your power ({m['steps']}). Each {m['step']} above the first gives **one Boost**, chosen **as you cast**. Each Boost you spend is **−1 to the roll**, so you can always hold back.", "",
+           table(["Boost", "One Boost", "Two Boosts"], [
+               ["**Harder**", "+1 box, or the penalty becomes −3", "+2 boxes, or −4"],
+               ["**Wider**", "A handful of targets", "A crowd, or an area"],
+               ["**Longer**", "A day", "Until it's lifted"],
+               ["**Farther**", "One range band farther", "Two bands farther"]]), "",
+           f"**The price.** A failed {B} marks {m['price']}; a natural 18 marks two, or something answers that shouldn't.", "",
+           f"## {cap(Ws)}", "",
+           "1. **Describe the effect.** The GM sets its weight and says what it can and can't do before you start.",
+           f"2. **Fill the clock** with {train} rolls at your pace (usually ten minutes a roll). Success fills one segment, success by 5 or more two. A failure costs time or ticks a danger clock.",
+           f"3. **It happens** when the clock is full. A {W} interrupted with energy gathered may go wrong.", "",
+           table(["Weight", "Segments", "Scale"], [["Minor", "2", "One person, one night, one small thing"], ["Significant", "4", "A household, a building, a question answered"], ["Major", "6", "A bloodline, a town, a demon bound"]]), "",
+           "**Trappings.** The right materials, hour or place remove one segment.", "",
+           f"## {cap(Cs)}", "",
+           f"Work a {W} in advance and store it in an object; break it (one action, no roll) to release it. " + m.get("charmLimit", f"Carry as many ready {Cs} as your {train} training allows: **Trained 2, Specialty 3, Expert 4**.") + " Preparation is how slow magic wins a fast fight.", ""]
+    if m.get("advance") != []:
+        out += ["## Magic advancement", "",
+           f"After a significant {{{{missionLower}}}}, a magical character can take one of these **instead of a skill step**, with the GM's approval and a reason from the story. {'' if title else 'Each setting says which it uses.'}", "",
+           table(["Option", "Effect", "Limit"], [row for key, row in [
+               ("new", [f"New {B}", f"Learn one {B} beyond your limit", "Up to 2 extra"]),
+               ("deeper", [f"Deeper {m['step']}", f"One {B} you know works one {m['step']} deeper: one more Boost", f"Each {B} once"]),
+               ("charm", [f"Another {C}", f"Carry one more ready {C}", "Up to 2 extra"]),
+               ("heart", ["By heart", f"One kind of {W} takes one fewer segment (minimum 1)", "Each kind once"]),
+               ("quicker", ["Quicker hand", f"One {W} you know goes one pace faster: an hour becomes ten minutes, ten minutes one action", f"Each {W} once"]),
+               ("mastery", [m.get("masterName", "Mastery"), f"{cap(m['skill'])} becomes Expert (+5)", "Once, at the end of a long campaign"])]
+               if key in m.get("advance", ["new", "deeper", "charm", "heart", "quicker", "mastery"])]), ""]
+    if m.get("dials"):
+        out += [f"## Magic in {title}", "", table(["", "How it works here"], m["dials"]), ""]
+    return "\n".join(out)
+
+
 def gen(name, pack, t):
     p = pack
+    if name == "magic":
+        return magic_chapter(p["magic"], t["title"]) if p.get("magic") else ""
     if name == "powers":
         pw = p["powers"]
         out = []
@@ -326,6 +377,7 @@ def core_rules(docx=False):
     core = core.replace("{{PACK:intro}}", "Legend Dynamics is a roleplaying system for heroic stories in any genre: concrete skills, a 3d6 roll-under core, and a small pool of Legend points that reward characters for their flaws. These core rules are setting-neutral. A **setting pack** supplies the roles, origins, skills, gear, weapons, tracks and dangers of one genre, and renames a few terms to suit it.")
     # Neutral stand-ins for the pack-specific parts of "Making your own".
     core = core.replace("{{GEN:extra-edges}}\n", "")
+    core = core.replace("{{GEN:magic}}", magic_chapter({}))
     core = core.replace("{{PACK:customrole}}", '"Smuggler: knows every back door, bribe and hidden hold."')
     core = core.replace("{{GEN:group-names}}", "one of your setting's groups")
     core = core.replace("{{PACK:customorigin}}", "**Hill-folk (tier 1).** Stocky herders from high, cold country. *Adjustments:* Body +1, Presence −1. *Core rule:* at home in the heights: no penalty for thin air or cold. *Origin advantage:* **Sure-Footed**: +2 to Athletics to climb and keep your footing. *Companion:* **Clannish**: you trust your own people first; when it matters, accept the cost of that loyalty.")

@@ -266,8 +266,7 @@ Rituals are still the way to do *anything*, given time and fuel. Cantrips are th
 
 Adepts can **emulate any power by ritual**, at any Class up to their own highest.
 
-- **Time:** Class I takes ten minutes, Class II an hour, Class III a night. A ritual can't be done in the middle of a fight.
-- **The roll:** Powers, at −2 for Class II and −4 for Class III.
+- **The clock:** a ritual is a working (see *Magic*). Class I is **Minor** (2 segments), Class II **Significant** (4), Class III **Major** (6). Fill it with Powers rolls, ten minutes each; a Class III ritual runs through the night. It can't be done in the middle of a fight.
 - **Effect:** the power works once, or for one scene, as the GM judges, and can be cast on someone else.
 - **Cost:** a failed ritual marks a box of Strain. A natural 18 means something answered that shouldn't have.
 - Rituals for (GM) powers still need the GM's approval.

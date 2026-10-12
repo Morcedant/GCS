@@ -300,25 +300,59 @@ A Grimm's core gifts come with the heritage: the Sight, Grimm eyes, an uneasy se
 - **The Chymiater's draught.** A Chymiater (alchemist) Incantare can brew a Grimm's fresh blood into a draught in a major ritual (6 segments). Injected or drunk, it neutralizes the target's magical gifts for **3d6 ÷ 3 days** (round down: one to six days): an Incantare's Lens, a Hexenbiest's telekinesis and spells, or a Wesen's magical signature power. It does not stop a woge.
 - **A dangerous commodity.** Everyone in the hidden world knows what Grimm blood can do. Who gets it, and how, is always a serious matter.
 
-## Incantare and rituals
+## Magic
 
-An Incantare's **Lens** is their heritage advantage. The Lens decides *how* magic is worked: how long it takes, what it needs, what it costs and what it's best at. Any Lens can attempt any effect.
+Magic works at two speeds, with a third tool that turns one into the other. An Incantare's **Lens** decides which they use and how; any Lens can attempt any effect.
 
-**Working a ritual.**
+| Tool | Speed | How it works |
+|---|---|---|
+| **Spells** | One action | A quick spell you know. Roll Occult; on a success it happens. Veneficare only. |
+| **Rituals** | Minutes to nights | Anything else. Describe the effect; the GM sets its weight; fill a progress clock. |
+| **Charms** | One action, no roll | A finished ritual stored in an object, released by breaking it. |
+
+### Rituals
 
 1. **Describe the effect.** The GM sets its weight: **minor** (2 segments), **significant** (4) or **major** (6), and says what it can and can't do before you start.
-2. **Gather the energy.** Fill a progress clock of that size with **Occult** rolls. Each roll takes your Lens's casting time (usually ten minutes; an hour for a Magi, one action for a Veneficare). Success fills one segment; success by 5 or more fills two. A failure costs time or ticks a danger clock.
+2. **Gather the energy.** Fill a progress clock of that size with **Occult** rolls. Each roll takes your Lens's casting time (usually ten minutes; an hour for a Magi). Success fills one segment; success by 5 or more fills two. A failure costs time or ticks a danger clock.
 3. **The effect happens** when the clock is full. A ritual interrupted with energy gathered may go wrong.
 
 **Trappings.** The right materials and correspondences (stones, herbs, stars, places) remove one segment from the clock.
 
-**Charms.** A finished ritual can be stored in an object and released by breaking it: a bottle thrown, a pendant snapped, a bullet-charm fired. You can carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4.
+### Charms, elixirs and potions
+
+**Charms.** A finished ritual can be stored in an object and released by breaking it: a bottle thrown, a pendant snapped, a bullet-charm fired. You can carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Scaenarfex carries one more; a Veneficare only one. Preparation is how slow magic wins a fast fight.
 
 **Elixirs and potions** spoil. They stay good until the end of the day, or a week on a success by 5 or more.
 
-**Magic draws attention.** Using it openly can mark a box of **Exposure**, the Order of the Holy Knife hunts known Incantare, and a Grimm gets +1 to sense your magic for each charm or potion you carry.
+### Spells (Veneficare)
 
-**Hexenbiests and Zauberbiests** work rituals the same way, through their innate magic, in their own style (curses, potions and sendings).
+A **Veneficare** trades preparation for speed: they know **spells**, cast with **one action and an Occult roll**, shaped by one or two Paths agreed with the GM. Spells known: **Trained 2, Specialty 3, Expert 4**.
+
+Each spell has a short **base effect**: one target, for one scene, at Close or Short range. Occult as a Specialty gives **1 Boost**, as Expert **2**, chosen **as you cast**; each Boost spent is **−1 to the roll**.
+
+| Boost | One Boost | Two Boosts |
+|---|---|---|
+| **Harder** | +1 box, or the penalty becomes −3 | +2 boxes, or −4 |
+| **Wider** | A handful of targets | A crowd, or an area |
+| **Longer** | A day | Until it's lifted |
+| **Farther** | One range band farther | Two bands farther |
+
+| Spell | Base effect |
+|---|---|
+| Flame | A lash of fire at Short range; marks 2 boxes. Dodge applies. |
+| Force | Unseen force hurls the target down: 1 box, and they lose their next move (Body resists). |
+| Ward | Attacks against one ally are at −2 for the scene. |
+| Fluch | The target is at −2 on all rolls for the scene (Will resists). |
+| Bind | The target is held where they stand for the scene, or until they break free (Body resists). |
+| Snuff | Every lamp in a room goes out, or one gun jams; clearing a jam takes an action. |
+| Unmask | A Wesen in sight rolls Will or woges, there and then. |
+| Stanch | Stop the bleeding: clear one injury box, once per wound. |
+
+A failed spell flares where people can see it: mark a box of **Exposure**. A natural 18 marks two, or something answers that shouldn't.
+
+**Hexenbiests and Zauberbiests** work rituals the same way, through their innate magic, in their own style (curses, potions and sendings). Their **telekinesis** is their quick magic.
+
+**Magic draws attention.** Using it openly can mark a box of **Exposure**, the Order of the Holy Knife hunts known Incantare, and a Grimm gets +1 to sense your magic for each charm or potion you carry.
 
 ## The Code of Swabia
 
@@ -473,6 +507,19 @@ The characters share three Trouble tracks. They fill as the hidden world strains
 ## Advancement
 
 After a significant case, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication. Only an Old hand's starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they broaden (see Step 3).
+
+### Magic advancement
+
+After a significant case, an Incantare, Hexenbiest or Zauberbiest can take one of these **instead of a skill step**, with the GM's approval and a reason from the story.
+
+| Option | Effect | Limit |
+|---|---|---|
+| New spell | A Veneficare learns one spell beyond their limit | Up to 2 extra |
+| Deeper spell | One spell you know gets one more Boost | Each spell once |
+| Another charm | Carry one more ready charm | Up to 2 extra |
+| By heart | One kind of ritual takes one fewer segment (minimum 1) | Each kind once |
+| Quicker hand | One ritual you know goes one pace faster: an hour becomes ten minutes, ten minutes one action | Each ritual once |
+| Master of the Lens | Occult becomes Expert (+5) | Once, at the end of a long campaign |
 
 # Running cases
 
@@ -914,7 +961,7 @@ A human who works real magic through a Lens: a tradition and a way of seeing. Th
 | Malifica Lens (Witch or Warlock) | Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link. | **Wicked Reputation.** People whisper that you're a witch, and the Order of the Holy Knife listens. Accept the suspicion. |
 | Phitonissa Lens (Pagan) | Cunning-folk rites of the seasons, nature and the old gods, worked outdoors. +2 to Occult for nature and folk magic. | **Disciplines of Faith.** The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them. |
 | Scaenarfex Lens (Artistic Enchanter) | Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm. | **Artist's Temperament.** Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you. |
-| Veneficare Lens (Sorcerer) | Quick casting along one or two Paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it when it clashes with your friends' needs. |
+| Veneficare Lens (Sorcerer) | Casts spells: quick magic in one action and an Occult roll, shaped by one or two Paths agreed with the GM (fire and force, say). Known: Trained 2, Specialty 3, Expert 4. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it when it clashes with your friends' needs. |
 
 *Source: Incantare template: seven Lenses (Ritual Path Magic).*
 

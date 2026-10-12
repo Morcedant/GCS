@@ -314,6 +314,15 @@ for p_ in power_list:
         p_[3] += ESCALATED[p_[0]]
 assert all(len(p_[3]) == 6 for p_ in power_list), [p_[0] for p_ in power_list if len(p_[3]) != 6]
 
+MAGIC = {"skill": "Powers", "burst": "cantrip", "bursts": "cantrips", "step": "Circle", "steps": "your Cantrips power's Class: the First Circle at Class I, the Second at Class II, and on up",
+         "price": "a box of Strain", "charm": "fetish", "charms": "fetishes", "working": "ritual", "workings": "rituals", "advance": [], "charmLimit": "An Adept can keep **one** ready fetish, two with Powers as an Expert skill.",
+         "dials": [["**Feel**", "Comic-book magic: flashy, fast and plentiful."],
+                   ["**Cantrips**", "The Cantrips power (see Cantrips). Each Circle above the First gives a Boost, so a Fourth Circle sorcerer has three. From the Fourth Circle, a Wider Boost can take a city block and a Longer one can make an effect permanent, with the GM's approval. Bolt, Shield and Dispel already work at your Class, so they take Wider, Longer and Farther Boosts, not Harder."],
+                   ["**Rituals**", "Adepts copy any power by ritual (see Rituals): Class I is a Minor working, Class II Significant, Class III Major."],
+                   ["**Fetishes**", "Rare. An Adept can keep one ready fetish, two with Powers as an Expert skill."],
+                   ["**Price**", "Strain. A failed cantrip or ritual marks a box."],
+                   ["**Growing**", "Cantrips grow with the power's Class: pushing, Stronger Power and growth in play."]]}
+
 spells = {"skill": "Powers", "plural": "Cantrips", "power": "cantrips", "knownByClass": [2, 3, 4, 5, 6, 7], "pureBonus": 2, "known": [0, 0, 0], "roles": [], "advantages": [], "originAdvantages": [],
           "tierName": "Circle", "tiers": ["First Circle", "Second Circle", "Third Circle", "Fourth Circle", "Fifth Circle", "Sixth Circle"],
           "note": "Your Cantrips power's Class is your Circle, and every cantrip works at it: Class II is the Second Circle. Casting takes one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense. A failed cast marks a box of Strain. Swap one cantrip between cases with a week of study.",
@@ -521,7 +530,7 @@ quick = [["Speed and Flight", "Speed I 70 mph, II 200 mph, III Mach 1, IV Mach 3
          ["Damage", "Fists, batons, knives: 1 box. Pistols, SMGs, rifles: 2. Shotgun close up, sniper rifle: 3 and Dying. Powers by Class: I = 1, II = 2, III = 2 and knocked down, IV+ = 3."],
          ["Defense", "Roll Powers to aim a power. An attack above your Defense hits in full; equal marks one box fewer; lower does nothing. Guns are Class I, sniper rifles, heavy weapons and Aegis cannons II, anti-tank and explosives III."],
          ["Strain", "Push: use a power one Class higher for one action and mark Strain. Strain 1: −1 to Powers, 2: −2, 3: wild on 16–18, 4: burned out until a full day's rest."],
-         ["Rituals", "Adepts only. Class I: 10 minutes, II: an hour (−2), III: a night (−4). Needs materials and fuel; failure marks Strain; natural 18: something answers."],
+         ["Rituals", "Adepts only: copy a power. Class I is Minor (2 segments), II Significant (4), III Major (6); Powers rolls, ten minutes each. Needs materials and fuel; failure marks Strain; natural 18: something answers."],
          ["Firearms", "Pistol 15, shotgun 6, SMG 30 (burst: 3 rounds, +1), rifle 20. Covering fire: 3. Reload: one action. Natural 18 jams."],
          ["Tracks", "Collateral (damage), Scrutiny (official attention), Backlash (public anger). 4 boxes each; clean arrests, good press and lying low clear them between cases."]]
 
@@ -621,7 +630,7 @@ pack = {"id": "aurora", "terms": terms, "theme": theme, "docxColors": ["14213D",
         "edgePoints": 4, "formCore": [], "formPenalties": {}, "origins": origins, "allegiances": allegiances, "reasons": reasons,
         "connections": connections, "advantages": advantages, "complications": complications, "triggers": triggers,
         "equipment": equipment, "weapons": weapons, "tracks": tracks, "personalTrack": personal_track, "seeds": seeds, "journal": journal,
-        "powers": powers, "spells": spells, "statuses": statuses,
+        "powers": powers, "spells": spells, "magic": MAGIC, "statuses": statuses,
         "extraEdges": [["power", "Stronger Power", "Raise one of your powers by one Class. Class III is the limit at creation, unless the GM approves one power at Class IV.", 3], ["xpower", "Extra Power", "One more power, at Class I.", 1]], "statusLabel": "Legal status",
         "restricted": None, "quickRef": quick, "example": example, "pregens": pregens}
 

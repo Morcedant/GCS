@@ -260,6 +260,62 @@ A proper infirmary grants +2 to Medicine. A successful treatment removes two box
 
 Each **full day** of rest clears one injury box. Rest means nothing strenuous. At three boxes, rest alone clears nothing: treatment must clear the first box.
 
+# Magic
+
+Magic works at two speeds, with a third tool that turns one into the other. Every magical character uses the same three tools; each setting decides who gets which, what they're called and what they cost.
+
+| Tool | Speed | How it works |
+|---|---|---|
+| **Bursts** | One action | A quick spell you know. Roll your magic skill; on a success it happens. |
+| **Workings** | Minutes to nights | Anything else. Describe the effect; the GM sets its weight; fill a progress clock. |
+| **Charms** | One action, no roll | A finished working stored in an object, released by breaking it. |
+
+## Bursts
+
+Each burst has a short **base effect**: one target, for one scene, at Close or Short range. Harm marks 2 boxes; a penalty is −2; the target resists with an attribute where it makes sense.
+
+**Boosts.** Your step sets your power (Trained, Specialty, Expert). Each step above the first gives **one Boost**, chosen **as you cast**. Each Boost you spend is **−1 to the roll**, so you can always hold back.
+
+| Boost | One Boost | Two Boosts |
+|---|---|---|
+| **Harder** | +1 box, or the penalty becomes −3 | +2 boxes, or −4 |
+| **Wider** | A handful of targets | A crowd, or an area |
+| **Longer** | A day | Until it's lifted |
+| **Farther** | One range band farther | Two bands farther |
+
+**The price.** A failed burst marks a box of your setting's price track; a natural 18 marks two, or something answers that shouldn't.
+
+## Workings
+
+1. **Describe the effect.** The GM sets its weight and says what it can and can't do before you start.
+2. **Fill the clock** with magic skill rolls at your pace (usually ten minutes a roll). Success fills one segment, success by 5 or more two. A failure costs time or ticks a danger clock.
+3. **It happens** when the clock is full. A working interrupted with energy gathered may go wrong.
+
+| Weight | Segments | Scale |
+|---|---|---|
+| Minor | 2 | One person, one night, one small thing |
+| Significant | 4 | A household, a building, a question answered |
+| Major | 6 | A bloodline, a town, a demon bound |
+
+**Trappings.** The right materials, hour or place remove one segment.
+
+## Charms
+
+Work a working in advance and store it in an object; break it (one action, no roll) to release it. Carry as many ready charms as your magic skill training allows: **Trained 2, Specialty 3, Expert 4**. Preparation is how slow magic wins a fast fight.
+
+## Magic advancement
+
+After a significant mission, a magical character can take one of these **instead of a skill step**, with the GM's approval and a reason from the story. Each setting says which it uses.
+
+| Option | Effect | Limit |
+|---|---|---|
+| New burst | Learn one burst beyond your limit | Up to 2 extra |
+| Deeper step | One burst you know works one step deeper: one more Boost | Each burst once |
+| Another charm | Carry one more ready charm | Up to 2 extra |
+| By heart | One kind of working takes one fewer segment (minimum 1) | Each kind once |
+| Quicker hand | One working you know goes one pace faster: an hour becomes ten minutes, ten minutes one action | Each working once |
+| Mastery | Your magic skill becomes Expert (+5) | Once, at the end of a long campaign |
+
 # Legend points and tracks
 
 ## Using Legend points

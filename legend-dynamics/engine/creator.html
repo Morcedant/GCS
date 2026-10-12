@@ -652,7 +652,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <details class="fields" id="magic-adv" hidden><summary class="label" id="magic-adv-label">Magic grown in play (with the GM's approval)</summary>
             <div class="fields">
               <div class="field" id="ma-spells-wrap" hidden><label for="f-ma-spells" id="ma-spells-label"></label><select id="f-ma-spells"></select></div>
-              <div class="field" id="ma-charms-wrap" hidden><label for="f-ma-charms">Extra ready charms</label><select id="f-ma-charms"></select></div>
+              <div class="field" id="ma-charms-wrap" hidden><label for="f-ma-charms" id="ma-charms-label">Extra ready charms</label><select id="f-ma-charms"></select></div>
               <div class="field wide" id="ma-mastery-wrap" hidden><span class="label" id="ma-mastery-label"></span><div class="checks" id="ma-mastery"></div></div>
               <div class="field wide"><label for="f-ma-heart">Rituals by heart (one fewer segment each)</label><input type="text" id="f-ma-heart" placeholder="e.g. Wards, Curses"></div>
               <div class="field wide" id="ma-quick-wrap" hidden><label for="f-ma-quick">Quicker hand (rituals worked at a faster pace)</label><input type="text" id="f-ma-quick" placeholder="e.g. Ward against the dead: ten minutes"></div>
@@ -1162,7 +1162,10 @@ tr.lvl-U td.target { color: var(--muted); }
     const l = c.skills[SPELLS.skill]; if (!l || l === "U") return -1;
     return l === "T" ? 0 : (c.path === "hand" || (MAGIC && c.magic?.master && MAGIC.skill === SPELLS.skill)) ? 2 : 1; };
   const spellTier = (k, c = ch) => { const t = casterTier(c); return t < 0 ? t : Math.min(SPELLS.tiers.length - 1, t + (c.magic?.deeper?.includes(k) ? 1 : 0)); };
-  const spellEffect = (row, t) => (row[3] && t >= 0 ? row[3][Math.min(t, row[3].length - 1)] : row[2]);
+  const boostText = (t) => (t > 0 ? `${t} Boost${t > 1 ? "s" : ""}` : "no Boosts");
+  const charmsOK = (c = ch) => !MAGIC.charms.who || canCast(c) || [c.sadv.id, c.dept, c.speciesId].some((x) => MAGIC.charms.who.includes(x));
+  const readyCharms = (c = ch) => (MAGIC.charms.one || []).includes(c.sadv.id) ? 1 : (c.skills[MAGIC.skill] === "T" ? MAGIC.charms.base[0] : levelName("S", MAGIC.skill) === "Expert" ? MAGIC.charms.base[2] : MAGIC.charms.base[1]) + c.magic.extraCharms;
+  const charmWord = () => (MAGIC && MAGIC.charms && MAGIC.charms.plural) || "charms";
   // The origin's slots, plus one Class I slot for the Extra Power Edge.
   const baseSlots = (c = ch) => {
     if (!POWERS) return [];
@@ -1543,8 +1546,8 @@ tr.lvl-U td.target { color: var(--muted); }
         ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">A friend</span><span>${esc(ch.contact)}</span></div>` : ""}
         ${POWERS && allPowers().length ? `<div class="field wide"><span class="label">${POWERS.plural}</span><span>${allPowers().map((x) => `<b>${esc(powerDef(x.id)[1])} (Class ${x.cl}${isPure() && x.id === SPELLS.power ? ", pure sorcery" : ""}):</b> ${esc(isPure() && x.id === SPELLS.power ? `Know ${spellsKnown()} ${SPELLS.plural.toLowerCase()}, each working at ${SPELLS.tiers ? "the " + SPELLS.tiers[casterTier()] + " (Class " + x.cl + ")" : "Class " + x.cl}.` : powerEffect(x.id, x.cl))}`).join("<br>")}</span></div>` : ""}
         ${STATUSES && ch.status ? (() => { const st = STATUSES.find((x) => x[0] === ch.status); return `<div class="field"><span class="label">${esc(PACK.statusLabel || "Status")}: ${esc(st[1])}</span><span class="small">${esc(st[2])}</span><span class="small muted">${esc(st[3])}</span></div>`; })() : ""}
-        ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map((row) => { const [k, n] = row, t = spellTier(k); return `<b>${esc(n)}${t >= 0 ? " (" + SPELLS.tiers[t] + ")" : ""}${ch.magic.mastered.includes(k) ? " (mastered: +2, no " + (PTRACK ? PTRACK.name : "cost") + " on a failure)" : ""}:</b> ${esc(spellEffect(row, t))}`; }).join("<br>")}</span></div>` : ""}
-        ${MAGIC && MAGIC.charms && ch.skills[MAGIC.skill] && ch.skills[MAGIC.skill] !== "U" ? `<div class="field"><span class="label">Ready charms</span><span>${(ch.skills[MAGIC.skill] === "T" ? MAGIC.charms.base[0] : levelName("S", MAGIC.skill) === "Expert" ? MAGIC.charms.base[2] : MAGIC.charms.base[1]) + ch.magic.extraCharms}</span></div>` : ""}
+        ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([k, n, eff]) => { const t = spellTier(k); return `<b>${esc(n)}${t >= 0 ? ` (${SPELLS.tiers[t]}, ${boostText(t)})` : ""}:</b> ${esc(eff)}`; }).join("<br>")}${SPELLS.tiers ? `<br><span class="small muted">Boosts, chosen as you cast, each −1 to the roll: Harder (+1 box or −1 more), Wider (a handful, then a crowd), Longer (a day, then until lifted), Farther (one range band).</span>` : ""}</span></div>` : ""}
+        ${MAGIC && MAGIC.charms && ch.skills[MAGIC.skill] && ch.skills[MAGIC.skill] !== "U" && charmsOK() ? `<div class="field"><span class="label">Ready ${charmWord()}</span><span>${readyCharms()}</span></div>` : ""}
         ${MAGIC && (ch.magic.heart || ch.magic.quicker) ? `<div class="field wide"><span class="label">Ritual mastery</span><span>${ch.magic.heart ? "<b>By heart:</b> " + esc(ch.magic.heart) : ""}${ch.magic.heart && ch.magic.quicker ? "<br>" : ""}${ch.magic.quicker ? "<b>Quicker hand:</b> " + esc(ch.magic.quicker) : ""}</span></div>` : ""}
         ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 ${esc(ch.gear.skill)})` : ""}</span></div>` : ""}
         ${al ? `<div class="field"><span class="label">Allegiance: ${esc(al[1])}</span><span class="small">${esc(al[2])}</span><span class="small muted">${esc(al[3])}</span></div>` : ""}
@@ -1572,19 +1575,19 @@ tr.lvl-U td.target { color: var(--muted); }
     if (SPELLS && canCast()) {
       const known = spellsKnown(), full = ch.spells.length >= known;
       const tier = casterTier();
-      $("spells-label").textContent = `${SPELLS.plural} (${ch.spells.length} of ${known})${tier >= 0 ? " · " + SPELLS.tiers[tier] : ""}`;
-      SPELLS.list.forEach((row) => { const t = spellTier(row[0]); $("sp-eff-" + row[0]).textContent = (row[3] && t >= 0 ? `${SPELLS.tiers[t]}: ` : "") + spellEffect(row, t); });
+      $("spells-label").textContent = `${SPELLS.plural} (${ch.spells.length} of ${known})${tier >= 0 ? ` · ${SPELLS.tiers[tier]}: ${boostText(tier)}` : ""}`;
       $("spells-note").textContent = known ? SPELLS.note : `Train ${SPELLS.skill} to know ${SPELLS.plural.toLowerCase()}: ${SPELLS.known[0]} at Trained, ${SPELLS.known[1]} at Specialty, ${SPELLS.known[2]} at Expert.`;
       SPELLS.list.forEach(([k]) => { const b = $("sp-" + k); b.checked = ch.spells.includes(k); b.disabled = !b.checked && full; });
     }
     if (MAGIC) {
-      const lvl = ch.skills[MAGIC.skill], show = (SPELLS && !SPELLS.power && canCast()) || (MAGIC.charms && lvl && lvl !== "U");
+      const lvl = ch.skills[MAGIC.skill], show = (SPELLS && !SPELLS.power && canCast()) || (MAGIC.charms && lvl && lvl !== "U" && charmsOK());
       $("magic-adv").hidden = !show;
       if (show) {
         const m = ch.magic;
-        $("ma-spells-wrap").hidden = !MAGIC.extraSpells || !SPELLS;
+        $("ma-spells-wrap").hidden = !MAGIC.extraSpells || !SPELLS || !canCast();
         if (MAGIC.extraSpells && SPELLS) { $("ma-spells-label").textContent = `Extra ${SPELLS.plural.toLowerCase()} learned`; $("f-ma-spells").innerHTML = Array.from({ length: MAGIC.extraSpells + 1 }, (_, n) => `<option value="${n}">+${n}</option>`).join(""); $("f-ma-spells").value = String(m.extraSpells); }
         $("ma-charms-wrap").hidden = !MAGIC.charms;
+        $("ma-charms-label").textContent = `Extra ready ${charmWord()}`;
         if (MAGIC.charms) { $("f-ma-charms").innerHTML = Array.from({ length: MAGIC.charms.extra + 1 }, (_, n) => `<option value="${n}">+${n}</option>`).join(""); $("f-ma-charms").value = String(m.extraCharms); }
         $("ma-mastery-wrap").hidden = !(MAGIC.mastery || MAGIC.deeper) || !SPELLS || !ch.spells.length;
         if (MAGIC.deeper && SPELLS) {

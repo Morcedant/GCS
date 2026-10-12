@@ -52,7 +52,7 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 ## Magic
 
-**Practitioners** work rituals in a tradition. Describe the effect; the GM sets its weight and says what it can and can't do. Fill a clock of that size with **Occult** rolls at your tradition's pace (usually ten minutes a roll; an hour for a Hermeticist; one action for a Sorcerer). Success fills one segment, success by 5 or more two; a failure costs time or ticks a danger clock.
+**Practitioners** work **rituals** in a tradition (see *Magic*): fill a clock with **Occult** rolls at your tradition's pace, usually ten minutes a roll, an hour for a Hermeticist. Most western magic is slow, so practitioners prepare: a finished ritual stored as a **charm** is how a practitioner keeps up in a gunfight.
 
 | Weight | Segments | For example |
 |---|---|---|
@@ -61,21 +61,24 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 | Major | 6 | Binding a demon, raising the dead, lifting a werewolf's curse for a month |
 
 - **Trappings.** The right materials (grave dirt, silver, a lock of hair, the hour of midnight) remove one segment.
-- **Charms.** A finished ritual can be stored in an object and released by breaking it. Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4.
+- **Charms.** Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Sorcerer carries only one.
 - **Attention.** Magic worked openly can mark a box of **The Dark**, and the Order of the Iron Cross hunts known practitioners.
 
-### Magic advancement
+### Hexes
 
-A practitioner's craft grows in play. After a significant job, a practitioner can take one of these **instead of a skill step**, with the GM's approval and a reason from the story: a grimoire taken off a dead man, a teacher who owes you, a ritual worked so often the words come without thinking. The Dark and the Order still apply to everything below.
+A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells cast with **one action and an Occult roll**. Hexes known: **Trained 2, Specialty 3, Expert 4**. Occult as a Specialty gives **1 Boost**, as Expert **2**; each Boost spent is −1 to the roll. A failed hex marks a box of The Dark.
 
-| Option | Effect | Limit |
-|---|---|---|
-| Another charm | Carry one more ready charm than your Occult training allows | Up to 2 extra |
-| Ritual by heart | One kind of ritual (wards, curses, questions of the dead) takes one fewer segment, to a minimum of 1 | Each kind once |
-| Quicker hand | One ritual you know is worked at a faster pace: an hour a roll becomes ten minutes, ten minutes becomes one action | Each ritual once |
-| Master of the tradition | Occult becomes Expert (+5), with 4 ready charms before extras | Once, at the end of a long campaign, with the GM's approval |
-
-Record these in the creator under **Magic grown in play**: the sheet shows your ready charms and the rituals you know by heart or work quickly.
+| Hex | Base effect |
+|---|---|
+| Hellfire | A lash of flame at Short range; marks 2 boxes. Dodge applies. |
+| Devil's Shove | Unseen force hurls the target down: 1 box, and they lose their next move (Body resists). |
+| Evil Eye | The target is at −2 on all rolls for the scene (Will resists). |
+| Grave Chill | The target rolls Will or flees or freezes. |
+| Hold | The target is held where they stand for the scene, or until they break free (Body resists). |
+| Misfire | One gun jams or one lamp gutters out; clearing a jam takes an action. |
+| Shroud | +3 to Stealth for the scene; eyes slide off you. |
+| Witch-sight | See spirits, curses, charms and things wearing human skin. |
+| Stanch | Stop the bleeding: clear one injury box, once per wound. |
 
 ## Weaknesses
 

@@ -1913,127 +1913,67 @@
    "gb-gift",
    "ud-gift"
   ],
-  "note": "Your Sorcery breaks the Seals: Trained the First, Specialty the Second, Expert the Third. Casting takes an action and a Sorcery roll; the target resists with Will where it makes sense. A failed cast marks a box of Corruption, two at the Third Seal; a natural 18 marks two.",
+  "note": "Your Sorcery sets your Seal: the First at Trained (no Boosts), the Second at Specialty (1 Boost), the Third at Expert (2 Boosts). Casting takes an action and a Sorcery roll, −1 for each Boost you spend; the target resists with Will where it makes sense. A failed cast marks a box of Corruption; a natural 18 marks two.",
   "list": [
    [
     "bolt",
     "Shadow Bolt",
-    "A ranged attack with Sorcery; marks 2 boxes. Dodge applies.",
-    [
-     "A ranged attack with Sorcery; marks 2 boxes. Dodge applies.",
-     "A ranged attack with Sorcery; marks 3 boxes, or 2 each on two targets. Dodge applies.",
-     "A ranged attack with Sorcery; marks 4 boxes, or 2 on everyone in a small area. Dodge applies."
-    ]
+    "A ranged attack with Sorcery; marks 2 boxes. Dodge applies."
    ],
    [
     "witchfire",
     "Witchfire",
-    "Light, or set something burning: 1 box a round in the flames.",
-    [
-     "Light, or set something burning: 1 box a round in the flames.",
-     "A gout of flame at Short range: marks 2 boxes, and it catches.",
-     "A wall or ring of fire for the scene; crossing it marks 3 boxes."
-    ]
+    "Light, or set something burning: 1 box a round in the flames."
    ],
    [
     "ward",
     "Ward",
-    "Attacks against one ally are at −2 for the scene.",
-    [
-     "Attacks against one ally are at −2 for the scene.",
-     "Attacks against everyone near you are at −2 for the scene.",
-     "Attacks against everyone near you are at −2 for the scene, and each ally's first hit glances off."
-    ]
+    "Attacks against one ally are at −2 for the scene."
    ],
    [
     "hex",
     "Hex",
-    "The target is at −2 on all rolls for the scene (Will resists).",
-    [
-     "The target is at −2 on all rolls for the scene (Will resists).",
-     "The target is at −2 on all rolls for the scene and can't spend Fortune (Will resists).",
-     "The target is at −4 on all rolls for the scene, or −2 until a rite lifts it (Will resists)."
-    ]
+    "The target is at −2 on all rolls for the scene (Will resists)."
    ],
    [
     "charm",
     "Charm",
-    "Presence contest: the target treats you as a friend for the scene.",
-    [
-     "Presence contest: the target treats you as a friend for the scene.",
-     "A small group for the scene, or one target for a day.",
-     "One target for a moon; they'll take risks for you, but not throw their life away."
-    ]
+    "Presence contest: the target treats you as a friend for the scene."
    ],
    [
     "dread",
     "Dread",
-    "The target rolls Will or flees or freezes.",
-    [
-     "The target rolls Will or flees or freezes.",
-     "A handful roll Will; minor opponents just run.",
-     "A whole warband rolls Will; those who fail won't return this scene."
-    ]
+    "The target rolls Will or flees or freezes."
    ],
    [
     "sleep",
     "Sleep",
-    "The target rolls Will or sleeps; minor opponents just drop.",
-    [
-     "The target rolls Will or sleeps; minor opponents just drop.",
-     "A handful roll Will or sleep.",
-     "A crowd rolls Will or sleeps until sunrise, or until magic wakes them."
-    ]
+    "The target rolls Will or sleeps; minor opponents just drop."
    ],
    [
     "mend",
     "Mend",
-    "Clear one injury box, once per wound.",
-    [
-     "Clear one injury box, once per wound.",
-     "Clear two injury boxes, or draw out a poison or sickness.",
-     "Pull back someone who fell this scene, with one box cleared."
-    ]
+    "Clear one injury box, once per wound."
    ],
    [
     "beast",
     "Beast-tongue",
-    "Speak with an animal, and command it for a scene.",
-    [
-     "Speak with an animal, and command it for a scene.",
-     "Command a pack or flock for a scene, or see through one beast's eyes.",
-     "Call the beasts of the land; they come within the hour, and one great beast obeys for a day."
-    ]
+    "Speak with an animal, and command it for a scene."
    ],
    [
     "sight",
     "Sorcerer's Sight",
-    "See magic, curses, spirits and disguised monsters.",
-    [
-     "See magic, curses, spirits and disguised monsters.",
-     "See magic, curses, spirits and disguised monsters, through Veil and illusions, and who made a spell or curse and why.",
-     "See all the Second Seal shows, and a place's recent past, or follow a Crown shard's trail."
-    ]
+    "See magic, curses, spirits and disguised monsters."
    ],
    [
     "shatter",
     "Shatter",
-    "Break a lock, chain, blade or door.",
-    [
-     "Break a lock, chain, blade or door.",
-     "Break a wall or gate, or ruin a foe's shield or armor until it's mended.",
-     "Bring down a bridge or a tower's door, or break a magical binding or ward."
-    ]
+    "Break a lock, chain, blade or door."
    ],
    [
     "veil",
     "Veil",
-    "+3 to Stealth for the scene; you're hard to notice.",
-    [
-     "+3 to Stealth for the scene; you're hard to notice.",
-     "Unseen while you keep still, and the Veil can cover one ally.",
-     "Truly unseen for the scene, or +3 to Stealth for a small group."
-    ]
+    "+3 to Stealth for the scene; you're hard to notice."
    ]
   ],
   "tierName": "Seal",
@@ -2066,7 +2006,7 @@
   ],
   [
    "Sorcery",
-   "Cantrips: an action and a Sorcery roll; known: Trained 2, Specialty 3, Expert 4. Rituals: fill a 2-, 4- or 6-segment clock with Sorcery rolls."
+   "Cantrips: an action and a Sorcery roll; known Trained 2, Specialty 3, Expert 4. Seals: Specialty 1 Boost, Expert 2 (−1 each to the roll). Rituals: 2-, 4- or 6-segment clock. Talismans: 2, 3, 4."
   ],
   [
    "Corruption",
@@ -2497,7 +2437,57 @@
  ],
  "magicAdvance": {
   "skill": "Sorcery",
+  "extraSpells": 2,
   "deeper": true,
+  "charms": {
+   "base": [
+    2,
+    3,
+    4
+   ],
+   "extra": 2,
+   "plural": "talismans"
+  },
+  "quicker": true,
   "masterName": "Archmage"
+ },
+ "magic": {
+  "skill": "Sorcery",
+  "burst": "cantrip",
+  "bursts": "cantrips",
+  "step": "Seal",
+  "steps": "the First Seal at Trained, the Second at Specialty, the Third at Expert",
+  "price": "a box of Corruption",
+  "charm": "talisman",
+  "charms": "talismans",
+  "working": "ritual",
+  "workings": "rituals",
+  "masterName": "Archmage",
+  "dials": [
+   [
+    "**Feel**",
+    "Sword and sorcery: magic is power, and power has a price."
+   ],
+   [
+    "**Cantrips**",
+    "Sorcerers, Witches, the Gifted and the gifted origins. Known: Trained 2, Specialty 3, Expert 4."
+   ],
+   [
+    "**Seals**",
+    "Every cantrip holds three Seals, each hiding a deeper power. Sorcery breaks them: the First at Trained, the Second (1 Boost) at Specialty, the Third (2 Boosts) at Expert."
+   ],
+   [
+    "**Rituals**",
+    "Anyone with Sorcery: ten minutes a roll, an hour for great workings. Priests work rites the same way with Lore."
+   ],
+   [
+    "**Talismans**",
+    "A ritual bound into a bone, a ring or a knotted cord, released by breaking it."
+   ],
+   [
+    "**Price**",
+    "Corruption: a failed cantrip marks 1, a natural 18 marks 2, and finishing a Major ritual marks 1, whatever the roll."
+   ]
+  ]
  }
 }

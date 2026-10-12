@@ -423,6 +423,60 @@ A hospital with an Operant ward grants +2 to Medicine. A successful treatment re
 
 Each **full day** of rest clears one injury box. Rest means nothing strenuous. At three boxes, rest alone clears nothing: treatment must clear the first box.
 
+# Magic
+
+Magic works at two speeds, with a third tool that turns one into the other. Every magical character uses the same three tools; this setting decides who gets which, what they're called and what they cost.
+
+| Tool | Speed | How it works |
+|---|---|---|
+| **Cantrips** | One action | A quick spell you know. Roll Powers; on a success it happens. |
+| **Rituals** | Minutes to nights | Anything else. Describe the effect; the GM sets its weight; fill a progress clock. |
+| **Fetishes** | One action, no roll | A finished ritual stored in an object, released by breaking it. |
+
+## Cantrips
+
+Each cantrip has a short **base effect**: one target, for one scene, at Close or Short range. Harm marks 2 boxes; a penalty is −2; the target resists with an attribute where it makes sense.
+
+**Boosts.** Your Circle sets your power (your Cantrips power's Class: the First Circle at Class I, the Second at Class II, and on up). Each Circle above the first gives **one Boost**, chosen **as you cast**. Each Boost you spend is **−1 to the roll**, so you can always hold back.
+
+| Boost | One Boost | Two Boosts |
+|---|---|---|
+| **Harder** | +1 box, or the penalty becomes −3 | +2 boxes, or −4 |
+| **Wider** | A handful of targets | A crowd, or an area |
+| **Longer** | A day | Until it's lifted |
+| **Farther** | One range band farther | Two bands farther |
+
+**The price.** A failed cantrip marks a box of Strain; a natural 18 marks two, or something answers that shouldn't.
+
+## Rituals
+
+1. **Describe the effect.** The GM sets its weight and says what it can and can't do before you start.
+2. **Fill the clock** with Powers rolls at your pace (usually ten minutes a roll). Success fills one segment, success by 5 or more two. A failure costs time or ticks a danger clock.
+3. **It happens** when the clock is full. A ritual interrupted with energy gathered may go wrong.
+
+| Weight | Segments | Scale |
+|---|---|---|
+| Minor | 2 | One person, one night, one small thing |
+| Significant | 4 | A household, a building, a question answered |
+| Major | 6 | A bloodline, a town, a demon bound |
+
+**Trappings.** The right materials, hour or place remove one segment.
+
+## Fetishes
+
+Work a ritual in advance and store it in an object; break it (one action, no roll) to release it. An Adept can keep **one** ready fetish, two with Powers as an Expert skill. Preparation is how slow magic wins a fast fight.
+
+## Magic in Aurora
+
+|  | How it works here |
+|---|---|
+| **Feel** | Comic-book magic: flashy, fast and plentiful. |
+| **Cantrips** | The Cantrips power (see Cantrips). Each Circle above the First gives a Boost, so a Fourth Circle sorcerer has three. From the Fourth Circle, a Wider Boost can take a city block and a Longer one can make an effect permanent, with the GM's approval. Bolt, Shield and Dispel already work at your Class, so they take Wider, Longer and Farther Boosts, not Harder. |
+| **Rituals** | Adepts copy any power by ritual (see Rituals): Class I is a Minor working, Class II Significant, Class III Major. |
+| **Fetishes** | Rare. An Adept can keep one ready fetish, two with Powers as an Expert skill. |
+| **Price** | Strain. A failed cantrip or ritual marks a box. |
+| **Growing** | Cantrips grow with the power's Class: pushing, Stronger Power and growth in play. |
+
 # Spark points and tracks
 
 ## Using Spark points
@@ -863,8 +917,7 @@ Rituals are still the way to do *anything*, given time and fuel. Cantrips are th
 
 Adepts can **emulate any power by ritual**, at any Class up to their own highest.
 
-- **Time:** Class I takes ten minutes, Class II an hour, Class III a night. A ritual can't be done in the middle of a fight.
-- **The roll:** Powers, at −2 for Class II and −4 for Class III.
+- **The clock:** a ritual is a working (see *Magic*). Class I is **Minor** (2 segments), Class II **Significant** (4), Class III **Major** (6). Fill it with Powers rolls, ten minutes each; a Class III ritual runs through the night. It can't be done in the middle of a fight.
 - **Effect:** the power works once, or for one scene, as the GM judges, and can be cast on someone else.
 - **Cost:** a failed ritual marks a box of Strain. A natural 18 means something answered that shouldn't have.
 - Rituals for (GM) powers still need the GM's approval.

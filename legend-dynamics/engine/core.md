@@ -265,6 +265,8 @@ With {{a:medkit}} and several uninterrupted minutes, successful Medicine removes
 
 Each **{{restText}}** of rest clears one injury box. Rest means nothing strenuous. At three boxes, rest alone clears nothing: treatment must clear the first box.
 
+{{GEN:magic}}
+
 # {{point}} points and tracks
 
 ## Using {{point}} points

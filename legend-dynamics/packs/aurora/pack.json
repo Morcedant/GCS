@@ -2822,6 +2822,46 @@
    ]
   ]
  },
+ "magic": {
+  "skill": "Powers",
+  "burst": "cantrip",
+  "bursts": "cantrips",
+  "step": "Circle",
+  "steps": "your Cantrips power's Class: the First Circle at Class I, the Second at Class II, and on up",
+  "price": "a box of Strain",
+  "charm": "fetish",
+  "charms": "fetishes",
+  "working": "ritual",
+  "workings": "rituals",
+  "advance": [],
+  "charmLimit": "An Adept can keep **one** ready fetish, two with Powers as an Expert skill.",
+  "dials": [
+   [
+    "**Feel**",
+    "Comic-book magic: flashy, fast and plentiful."
+   ],
+   [
+    "**Cantrips**",
+    "The Cantrips power (see Cantrips). Each Circle above the First gives a Boost, so a Fourth Circle sorcerer has three. From the Fourth Circle, a Wider Boost can take a city block and a Longer one can make an effect permanent, with the GM's approval. Bolt, Shield and Dispel already work at your Class, so they take Wider, Longer and Farther Boosts, not Harder."
+   ],
+   [
+    "**Rituals**",
+    "Adepts copy any power by ritual (see Rituals): Class I is a Minor working, Class II Significant, Class III Major."
+   ],
+   [
+    "**Fetishes**",
+    "Rare. An Adept can keep one ready fetish, two with Powers as an Expert skill."
+   ],
+   [
+    "**Price**",
+    "Strain. A failed cantrip or ritual marks a box."
+   ],
+   [
+    "**Growing**",
+    "Cantrips grow with the power's Class: pushing, Stronger Power and growth in play."
+   ]
+  ]
+ },
  "statuses": [
   [
    "civilian",
@@ -2899,7 +2939,7 @@
   ],
   [
    "Rituals",
-   "Adepts only. Class I: 10 minutes, II: an hour (−2), III: a night (−4). Needs materials and fuel; failure marks Strain; natural 18: something answers."
+   "Adepts only: copy a power. Class I is Minor (2 segments), II Significant (4), III Major (6); Powers rolls, ten minutes each. Needs materials and fuel; failure marks Strain; natural 18: something answers."
   ],
   [
    "Firearms",

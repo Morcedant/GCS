@@ -937,7 +937,7 @@
     [
      "pr-sorc",
      "Sorcerer",
-     "Quick casting along one or two paths agreed with the GM (fire and force, say): one roll per action, and each success fills two segments. You can carry only one charm.",
+     "Casts hexes: quick spells in one action and an Occult roll, shaped by one or two paths agreed with the GM (fire and force, say). Known: Trained 2, Specialty 3, Expert 4. You can carry only one charm.",
      "Occult",
      false,
      "Bound Purpose",
@@ -2317,21 +2317,132 @@
    "Silver: werewolves. Stake, fire, sunlight, beheading: vampires. Headshot or fire: zombies. Holy water: undead and demons."
   ],
   [
-   "Rituals",
-   "Describe the effect; fill a 2-, 4- or 6-segment clock with Occult rolls at your tradition's pace. Charms: Trained 2, Specialty 3, Expert 4."
+   "Magic",
+   "Rituals: 2-, 4- or 6-segment clock, Occult rolls at your tradition's pace. Charms: Trained 2, Specialty 3, Expert 4 (Sorcerer 1). Hexes (Sorcerer): one action; Specialty 1 Boost, Expert 2, −1 each."
   ]
  ],
  "magicAdvance": {
   "skill": "Occult",
+  "extraSpells": 2,
+  "deeper": true,
   "charms": {
    "base": [
     2,
     3,
     4
    ],
-   "extra": 2
+   "extra": 2,
+   "one": [
+    "pr-sorc"
+   ],
+   "who": [
+    "practitioner"
+   ]
   },
   "quicker": true,
   "masterName": "Master of the tradition"
+ },
+ "spells": {
+  "skill": "Occult",
+  "plural": "Hexes",
+  "known": [
+   2,
+   3,
+   4
+  ],
+  "roles": [],
+  "advantages": [],
+  "originAdvantages": [
+   "pr-sorc"
+  ],
+  "tierName": "step",
+  "tiers": [
+   "Trained",
+   "Specialty",
+   "Expert"
+  ],
+  "list": [
+   [
+    "hellfire",
+    "Hellfire",
+    "A lash of flame at Short range; marks 2 boxes. Dodge applies."
+   ],
+   [
+    "shove",
+    "Devil's Shove",
+    "Unseen force hurls the target down: 1 box, and they lose their next move (Body resists)."
+   ],
+   [
+    "evileye",
+    "Evil Eye",
+    "The target is at −2 on all rolls for the scene (Will resists)."
+   ],
+   [
+    "chill",
+    "Grave Chill",
+    "The target rolls Will or flees or freezes."
+   ],
+   [
+    "hold",
+    "Hold",
+    "The target is held where they stand for the scene, or until they break free (Body resists)."
+   ],
+   [
+    "misfire",
+    "Misfire",
+    "One gun jams or one lamp gutters out; clearing a jam takes an action."
+   ],
+   [
+    "shroud",
+    "Shroud",
+    "+3 to Stealth for the scene; eyes slide off you."
+   ],
+   [
+    "sight",
+    "Witch-sight",
+    "See spirits, curses, charms and things wearing human skin."
+   ],
+   [
+    "stanch",
+    "Stanch",
+    "Stop the bleeding: clear one injury box, once per wound."
+   ]
+  ],
+  "note": "Only a Sorcerer casts hexes. One action and an Occult roll, −1 for each Boost you spend (Specialty 1 Boost, Expert 2); the target resists where it makes sense. A failed hex marks a box of The Dark; a natural 18 marks two, or something answers."
+ },
+ "magic": {
+  "skill": "Occult",
+  "burst": "hex",
+  "bursts": "hexes",
+  "step": "step",
+  "steps": "your Occult training: Trained, Specialty, Expert",
+  "price": "a box of The Dark",
+  "charm": "charm",
+  "charms": "charms",
+  "working": "ritual",
+  "workings": "rituals",
+  "masterName": "Master of the tradition",
+  "dials": [
+   [
+    "**Feel**",
+    "Gothic western: magic is slow, folk and feared. A gunfight is won by the charm you made last night, not the spell you cast now."
+   ],
+   [
+    "**Hexes**",
+    "Sorcerers only: known Trained 2, Specialty 3, Expert 4."
+   ],
+   [
+    "**Rituals**",
+    "Every Practitioner, at their tradition's pace: ten minutes a roll; an hour for a Hermeticist."
+   ],
+   [
+    "**Charms**",
+    "The heart of western magic. Practitioners carry Trained 2, Specialty 3, Expert 4; a Sorcerer, only one."
+   ],
+   [
+    "**Price**",
+    "The Dark: a failed hex marks a box, and magic worked openly can mark one too. The Order of the Iron Cross hunts known practitioners."
+   ]
+  ]
  }
 }
