@@ -446,7 +446,25 @@ tr.lvl-U td.target { color: var(--muted); }
 .guide-title { display: grid; gap: 4px; margin-bottom: 1.4em; }
 .guide-title .h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.4rem); color: var(--fg); letter-spacing: .06em; }
 
+/* Help: a small "?" that opens a short card; works by tap, click or keyboard. */
+.help { display: inline-grid; place-items: center; width: 1.35em; height: 1.35em; margin-left: .35em; padding: 0; vertical-align: .1em;
+  border: 1px solid var(--chrome-dim); border-radius: 50%; background: transparent; color: var(--accent);
+  font: 600 .72rem/1 var(--body); letter-spacing: 0; text-transform: none; cursor: pointer; }
+.help:hover, .help[aria-expanded="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.help:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.help::before { content: ""; position: absolute; inset: -10px; }
+.help { position: relative; }
+#help-pop { position: absolute; z-index: 50; width: min(22rem, calc(100vw - 32px)); padding: 12px 14px 10px; border: 1px solid var(--accent);
+  border-radius: var(--radius); background: #141a20; color: var(--fg); box-shadow: 0 10px 30px rgba(0, 0, 0, .55);
+  font: .9rem/1.45 var(--body); text-transform: none; letter-spacing: 0; }
+#help-pop h3 { margin: 0 1.6em .35em 0; font: 600 .95rem var(--display); color: var(--accent); letter-spacing: .03em; }
+#help-pop p { margin: 0 0 .45em; }
+#help-pop ul { margin: 0 0 .45em; padding-left: 1.1em; }
+#help-pop .help-close { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border: 0; background: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; }
+#help-pop .help-more { font-size: .82rem; color: var(--accent); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
+
 @media print {
+  .help, #help-pop { display: none !important; }
   /* Paper version of the sheet: same layout, ink-friendly colors, no glow. */
   :root { --fg: #1d140c; --muted: #5a4a36; --line: #c9b89c; --chrome: #6a4210; --chrome-dim: #7a5a30;
     --glass: #fff; --well: #fff; --gold: #8a6100; --blue: #2a6b5e; --red: #8f2f1a; --good: #1f7a46; --bad: #b3261e; color-scheme: light; }
@@ -612,7 +630,7 @@ tr.lvl-U td.target { color: var(--muted); }
           </div>
 
           <div class="fields">
-            <div class="field wide"><label for="f-adv">Advantage</label><select id="f-adv"></select></div>
+            <div class="field wide"><span><label for="f-adv">Advantage</label><button type="button" class="help" data-help="magic" id="adv-help" hidden></button></span><select id="f-adv"></select></div>
             <div class="field wide" id="adv-custom" hidden>
               <div class="fields">
                 <div class="field"><label for="f-advname">Custom advantage name</label><input type="text" id="f-advname"></div>
@@ -3935,6 +3953,14 @@ tr.lvl-U td.target { color: var(--muted); }
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  // ---- help card for magic: Incantare Lenses and the Hexenbiest's innate magic ----
+  const MAGIC_HERITAGES = ["incantare", "hexenbiest"];
+  const HELP = {
+    magic: () => ["How magic works", ch.speciesId === "hexenbiest"
+      ? `<p>You work <b>rituals</b> with Occult like an Incantare, in your own style: curses, potions and sendings. Describe the effect; the GM sets its weight (minor 2, significant 4 or major 6 segments); fill that clock with Occult rolls.</p><p>Your <b>telekinesis</b> is your quick magic. A finished ritual can be stored as a <b>charm</b>: Trained 2, Specialty 3, Expert 4.</p><p>Grimm blood, drunk under a full moon, strips your powers.</p>`
+      : `<p>Your <b>Lens</b> decides how you work magic: its pace, what it needs and what it's best at.</p><ul><li><b>Rituals:</b> describe the effect; the GM sets its weight (minor 2, significant 4 or major 6 segments); fill the clock with Occult rolls at your Lens's pace.</li><li><b>Charms:</b> a ritual stored in an object, released by breaking it (one action, no roll). Trained 2, Specialty 3, Expert 4; a Scaenarfex carries one more, a Veneficare only one.</li><li><b>Spells (Veneficare only):</b> one action and an Occult roll. Specialty gives 1 Boost, Expert 2, each −1 to the roll: Harder, Wider, Longer or Farther.</li></ul><p>A failed spell, or magic worked openly, can mark <b>Exposure</b>.</p>`],
+  };
+  const helpBtn = (key) => `<button type="button" class="help" data-help="${key}" aria-label="About ${esc(HELP[key]()[0])}" aria-expanded="false">?</button>`;
   const uid = () => Math.random().toString(36).slice(2, 10);
   const signed = (n) => (n > 0 ? "+" + n : n < 0 ? "−" + Math.abs(n) : "0");
 
@@ -4257,6 +4283,7 @@ tr.lvl-U td.target { color: var(--muted); }
       $("f-adv").dataset.for = ch.speciesId + "|" + ch.species;
     }
     $("f-adv").value = ch.sadv.id ? "s:" + ch.sadv.id : ch.adv.id;
+    $("adv-help").hidden = !MAGIC_HERITAGES.includes(ch.speciesId);
     $("sadv-custom").hidden = ch.sadv.id !== "custom";
     $("sadv-desc-wrap").hidden = !ch.sadv.id;
     $("sadv-desc").textContent = sAdvText();
@@ -4373,7 +4400,7 @@ tr.lvl-U td.target { color: var(--muted); }
       <div><h3 style="margin-bottom:6px">Skills</h3>
         <div class="skill-cols">${sorted.map((s) => `<div class="skill-line ${s.l}"><span>${s.n}<span class="lv">${s.l === "U" ? "untrained" : levelName(s.l, s.n)}</span></span><b>${s.t}</b></div>`).join("")}</div></div>
       <div class="fields">
-        ${ch.sadv.id ? `<div class="field"><span class="label">${ch.speciesId === "incantare" ? "Lens" : "Heritage advantage"}</span><b>${esc(sAdvName())}</b><span class="small muted">${esc(sAdvText())}</span></div>`
+        ${ch.sadv.id ? `<div class="field"><span class="label">${ch.speciesId === "incantare" ? "Lens" : "Heritage advantage"}${MAGIC_HERITAGES.includes(ch.speciesId) ? helpBtn("magic") : ""}</span><b>${esc(sAdvName())}</b><span class="small muted">${esc(sAdvText())}</span></div>`
           : `<div class="field"><span class="label">Advantage</span><b>${esc(advName() || "—")}${ch.adv.detail && advDef()?.[4] ? ": " + esc(ch.adv.detail) : ""}</b><span class="small muted">${esc(advText)}</span></div>`}
         <div class="field"><span class="label">Complication</span><b>${esc(compName() || "—")}</b><span class="small muted">${esc(compText)}</span>
           ${ch.comp.trigger ? `<span class="small"><b>Trigger:</b> ${esc(ch.comp.trigger)}</span>` : ""}</div>
@@ -5084,6 +5111,36 @@ tr.lvl-U td.target { color: var(--muted); }
   $("tab-create").onclick = () => selectTab("create");
   $("tab-sheet").onclick = () => selectTab("sheet");
   $("tab-guide").onclick = () => selectTab("guide");
+  // Help cards: one floating card, opened by any "?" button; Escape, the close button or a click elsewhere shuts it.
+  const pop = document.createElement("div");
+  pop.id = "help-pop"; pop.setAttribute("role", "dialog"); pop.hidden = true; document.body.appendChild(pop);
+  let opener = null;
+  const closeHelp = (refocus) => { if (pop.hidden) return; pop.hidden = true; if (opener) { opener.setAttribute("aria-expanded", "false"); if (refocus) opener.focus(); } opener = null; };
+  const openHelp = (btn) => {
+    const [title, body] = HELP[btn.dataset.help]();
+    pop.innerHTML = `<button type="button" class="help-close" aria-label="Close">×</button><h3 id="help-title">${esc(title)}</h3>${body}` +
+      (document.getElementById("g-magic") ? `<button type="button" class="help-more">More in the Players' Guide</button>` : "");
+    pop.setAttribute("aria-labelledby", "help-title");
+    if (opener) opener.setAttribute("aria-expanded", "false");
+    opener = btn; btn.setAttribute("aria-expanded", "true"); pop.hidden = false;
+    const r = btn.getBoundingClientRect(), w = pop.offsetWidth, vw = document.documentElement.clientWidth;
+    pop.style.left = Math.max(16, Math.min(r.left + window.scrollX - 12, window.scrollX + vw - w - 16)) + "px";
+    pop.style.top = (r.bottom + window.scrollY + 8) + "px";
+    pop.querySelector(".help-close").focus({ preventScroll: true });
+  };
+  const initHelp = (root = document) => root.querySelectorAll(".help:not([aria-label])").forEach((b) => {
+    if (!HELP[b.dataset.help]) return; b.textContent = "?"; b.setAttribute("aria-label", "About " + HELP[b.dataset.help]()[0]); b.setAttribute("aria-expanded", "false"); });
+  initHelp();
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest(".help");
+    if (b && HELP[b.dataset.help]) { e.preventDefault(); e.stopPropagation(); if (opener === b) closeHelp(false); else openHelp(b); return; }
+    if (e.target.closest(".help-close")) { closeHelp(true); return; }
+    if (e.target.closest(".help-more")) { closeHelp(false); selectTab("guide"); document.getElementById("g-magic").scrollIntoView({ block: "start" }); return; }
+    if (!e.target.closest("#help-pop")) closeHelp(false);
+  }, true);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) closeHelp(true); });
+  window.addEventListener("resize", () => closeHelp(false));
+
   $("tab-gm").onclick = () => { renderGM(); selectTab("gm"); };
   $("ms-go").onclick = () => $("checklist").scrollIntoView({ behavior: "smooth", block: "center" });
   // On narrow screens the guide's contents list starts folded and folds again after a jump.
