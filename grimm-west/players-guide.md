@@ -46,11 +46,14 @@ Choose a calling and describe what your character brings. Your calling places yo
 | Doctor | The Learned | Patch up the wounded and read what a body tells you | Medicine, Investigation, Read People, Apothecary |
 | Apothecary | The Learned | Brew remedies, antidotes and stranger things | Apothecary, Medicine, Occult, Wesen Lore |
 | Scholar | The Learned | Know the old books, the old languages and the occult | Wesen Lore, Occult, Investigation, Persuasion |
+| Occultist | The Learned | Work the old arts, and know what's out there | Occult, Wesen Lore, Apothecary, Read People |
 | Preacher | The Learned | Comfort, counsel, and stand against the dark | Persuasion, Leadership, Occult, Shooting |
 | Gunslinger | The Frontier | Be the fastest and steadiest gun in the room | Shooting, Athletics, Read People, Riding |
 | Scout | The Frontier | Find the trail, read the land, keep everyone alive in it | Tracking, Survival, Riding, Stealth |
 | Gambler | The Frontier | Read people, bluff, and hear what the saloon hears | Gambling, Read People, Deception, Shooting |
 | Tinker | The Frontier | Fix guns, build traps, and make the impossible gadget | Tinkering, Shooting, Investigation, Athletics |
+
+**Occultists and magic.** Magic comes from your heritage, not your calling: an Occultist who is an **Incantare** works real magic through their Lens. With any other heritage, an Occultist knows the lore but can't work the art: a scholar of the occult, a charlatan, or someone still searching for a teacher.
 
 The creator marks your calling's four **core skills** (in the table above) Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven't changed.
 
@@ -223,6 +226,7 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Horse and tack | Carries you across the territory. Riding in a chase needs one. |
 | Trail kit | Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones; no bonus beyond that. |
 | Lantern and matches | Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible. |
+| Himmelsbrief | A "letter from Heaven", folded small and carried on the body. Once per case, when a bullet hits you, mark one box fewer. Whether it's the letter or the faith, nobody can say. |
 | Grimm's journals | Copied pages from a Grimm family's books. With an hour to consult them, +2 to Wesen Lore to identify a Wesen or find its weakness. Irreplaceable, and coveted. |
 | Dynamite | Three sticks. Throw with Athletics; the fuse burns for a round. See Weapons and damage. |
 
@@ -351,6 +355,18 @@ Each spell has a short **base effect**: one target, for one scene, at Close or S
 A failed spell flares where people can see it: mark a box of **Exposure**. A natural 18 marks two, or something answers that shouldn't.
 
 **Hexenbiests and Zauberbiests** work rituals the same way, through their innate magic, in their own style (curses, potions and sendings). Their **telekinesis** is their quick magic.
+
+### Old-country magic in America
+
+The old traditions crossed the ocean with the people who kept them, and many of the Lenses wear American clothes:
+
+- **Braucherei**, or *pow-wow*: the Pennsylvania Dutch healing craft of spoken charms, prayers and blessed objects, from Hohman's *The Long Lost Friend* (1820). A Braucher heals, protects and breaks hexes, takes no money for it, and passes the craft man to woman and woman to man. It is a Christian craft, and its practitioners would be insulted to be called witches.
+- **Hexerei**: Braucherei's dark mirror. A *Hexenmeister* lays curses, or is hired to find and break someone else's, which makes them both feared and needed. The Malifica Lens.
+- **The Himmelsbrief**, a "letter from Heaven": a protective letter carried on the body. Union and Confederate soldiers of German stock carried them against bullets.
+- **Grimoires**: the *Sixth and Seventh Books of Moses* and the *Egyptian Secrets of Albertus Magnus* pass from hand to hand in German print. A Magi would kill for a good copy; some have.
+- **The Pennsylvania mystics**: the Hermits of the Wissahickon and the Ephrata Cloister kept astrology, alchemy and stranger things alive in the last century. A Magi or Chymiater may claim their teacher's teacher studied there.
+- **The Druid lodges**: the United Ancient Order of Druids keeps lodges across the West, California most of all. Most members are only there for the fellowship. Not all.
+- **New arrivals**: German colonists from Russia have been settling Kansas and Nebraska since 1874, and brought their own healers and charm-workers with them.
 
 **Magic draws attention.** Using it openly can mark a box of **Exposure**, the Order of the Holy Knife hunts known Incantare, and a Grimm gets +1 to sense your magic for each charm or potion you carry.
 
@@ -957,13 +973,14 @@ A human who works real magic through a Lens: a tradition and a way of seeing. Th
 |---|---|---|
 | Chymiater Lens (Alchemist) | Brews elixirs, potions and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing. Only a Chymiater can brew the Grimm-blood draught. | **Price of the Work.** Your craft feeds a vice: greed, drink, lechery or gluttony (agree which). Accept it when it bites. |
 | Figmatarum Lens (Illusionist) | Glamours, illusions and mesmerism worked through performance, music or art, in minutes. +2 to Occult for illusion and mesmerism. | **Artist's Vanity.** You need an audience and can't bear an insult to your art. Accept the trouble your vanity causes. |
-| Magi Lens (Wizard) | Scholarly ritual from grimoires: any kind of effect, but an hour per roll, and it needs books. +2 to Occult for divination and wards. | **Obsession: Magical Knowledge.** A grimoire, a ritual or a secret tempts you beyond sense. Accept the risk to get it. |
-| Malifica Lens (Witch or Warlock) | Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link. | **Wicked Reputation.** People whisper that you're a witch, and the Order of the Holy Knife listens. Accept the suspicion. |
-| Phitonissa Lens (Pagan) | Cunning-folk rites of the seasons, nature and the old gods, worked outdoors. +2 to Occult for nature and folk magic. | **Disciplines of Faith.** The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them. |
+| Magi Lens (Scholar-Mage) | Scholarly ritual from grimoires, the Sixth and Seventh Books of Moses among them: any kind of effect, but an hour per roll, and it needs books. +2 to Occult for divination and wards. | **Obsession: Magical Knowledge.** A grimoire, a ritual or a secret tempts you beyond sense. Accept the risk to get it. |
+| Malifica Lens (Hexenmeister) | Hexerei: curses and hexes, and the breaking of them, worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link. | **Wicked Reputation.** People whisper that you're a hexer, and the Order of the Holy Knife listens. Accept the suspicion. |
+| Phitonissa Lens (Druid) | Rites of the seasons, nature and the old gods, worked outdoors; in America, often behind the doors of a Druid lodge. +2 to Occult for nature and folk magic. | **Disciplines of Faith.** The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them. |
+| Braucher Lens (Pow-wow Doctor) | Braucherei, the Pennsylvania Dutch healing craft: spoken charms, prayers and blessed objects, from The Long Lost Friend. +2 to Occult to heal, protect, or break a hex. | **No Payment.** A Braucher takes no money for healing, only gifts. Accept the cost when the need is great and the purse is empty. |
 | Scaenarfex Lens (Artistic Enchanter) | Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm. | **Artist's Temperament.** Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you. |
 | Veneficare Lens (Sorcerer) | Casts spells: quick magic in one action and an Occult roll, shaped by one or two Paths agreed with the GM (fire and force, say). Known: Trained 2, Specialty 3, Expert 4. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it when it clashes with your friends' needs. |
 
-*Source: Incantare template: seven Lenses (Ritual Path Magic).*
+*Source: Incantare template: seven Lenses (Ritual Path Magic), plus the Braucher.*
 
 ## Jägerbär
 
