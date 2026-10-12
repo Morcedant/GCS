@@ -2428,5 +2428,11 @@
     "focus": true
    }
   }
- ]
+ ],
+ "magicAdvance": {
+  "skill": "Sorcery",
+  "extraSpells": 2,
+  "mastery": true,
+  "masterName": "Archmage"
+ }
 }

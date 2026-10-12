@@ -513,6 +513,19 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 - **Charms.** A finished ritual can be stored in an object and released by breaking it. Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4.
 - **Attention.** Magic worked openly can mark a box of **The Dark**, and the Order of the Iron Cross hunts known practitioners.
 
+### Magic advancement
+
+A practitioner's craft grows in play. After a significant job, a practitioner can take one of these **instead of a skill step**, with the GM's approval and a reason from the story: a grimoire taken off a dead man, a teacher who owes you, a ritual worked so often the words come without thinking. The Dark and the Order still apply to everything below.
+
+| Option | Effect | Limit |
+|---|---|---|
+| Another charm | Carry one more ready charm than your Occult training allows | Up to 2 extra |
+| Ritual by heart | One kind of ritual (wards, curses, questions of the dead) takes one fewer segment, to a minimum of 1 | Each kind once |
+| Quicker hand | One ritual you know is worked at a faster pace: an hour a roll becomes ten minutes, ten minutes becomes one action | Each ritual once |
+| Master of the tradition | Occult becomes Expert (+5), with 4 ready charms before extras | Once, at the end of a long campaign, with the GM's approval |
+
+Record these in the creator under **Magic grown in play**: the sheet shows your ready charms and the rituals you know by heart or work quickly.
+
 ## Weaknesses
 
 Every monster has a weakness, and finding it is often the whole job. **Occult** identifies a creature and its weakness; the Monster Hunter advantage and the Sighted's Monster's Eye help.

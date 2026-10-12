@@ -102,6 +102,19 @@ Power has a price. Every character keeps a **Corruption** track of four boxes on
 
 A **failed cast** marks 1 box; a **natural 18** marks 2; finishing a **Major ritual** marks 1, whatever the roll. Holding a **Crown shard** marks 1 each venture. A **cleansing rite** or a **pilgrimage** between ventures clears one box.
 
+## Magic advancement
+
+A caster's magic grows in play. After a significant venture, a caster can take one of these **instead of a skill step**, with the GM's approval and a reason from the story: a grimoire recovered, a teacher found, a spell cast a hundred times under pressure. Corruption still applies to everything below.
+
+| Option | Effect | Limit |
+|---|---|---|
+| New cantrip | Learn one cantrip beyond your Sorcery limit | Up to 2 extra |
+| Cantrip mastery | +2 to cast one cantrip, and a failed cast with it marks no Corruption (a natural 18 still marks 2) | Each cantrip once |
+| Ritual by heart | One kind of ritual (wards, curses, questions of the dead) takes one fewer segment, to a minimum of 1 | Each kind once |
+| Archmage | Sorcery becomes Expert (+5), and you know 4 cantrips before extras | Once, at the end of a long campaign, with the GM's approval |
+
+Record these in the creator under **Magic grown in play**: extra cantrips raise your limit, mastered cantrips show on the sheet, and your rituals by heart are listed with them.
+
 # The world
 
 The empire is gone, but its bones are everywhere: roads no one repairs, aqueducts that feed dead cities, sorcerer-towers that still glow at night. Its heirs quarrel over the pieces.

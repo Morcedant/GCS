@@ -2320,5 +2320,18 @@
    "Rituals",
    "Describe the effect; fill a 2-, 4- or 6-segment clock with Occult rolls at your tradition's pace. Charms: Trained 2, Specialty 3, Expert 4."
   ]
- ]
+ ],
+ "magicAdvance": {
+  "skill": "Occult",
+  "charms": {
+   "base": [
+    2,
+    3,
+    4
+   ],
+   "extra": 2
+  },
+  "quicker": true,
+  "masterName": "Master of the tradition"
+ }
 }
