@@ -593,7 +593,7 @@ End each case with a short journal entry, written together, as the Grimms have a
 
 # Ready-made characters
 
-Six characters ready to play. Each follows the creation rules exactly, Edges included, and their connections tie them together.
+Seven characters ready to play. Each follows the creation rules exactly, Edges included, and their connections tie them together.
 
 ## Eliza Kessler
 
@@ -649,6 +649,16 @@ Six characters ready to play. Each follows the creation rules exactly, Edges inc
 - **Edges:** Second advantage: Poker Face; a friend in town: Mae Lin, a faro dealer who hears everything said at her table. **Advantage:** Ziegevolk Pheromones (companion: Pheromone Suspicion). **Complication:** Owes the Wrong People; trigger: a debt collector arrives.
 - **Why I stand against the dark:** The pay's good, and nobody else will take these jobs. **Connection:** Plays cards with Cora every Saturday; she's the only one who can tell when he's bluffing.
 
+
+## Magdalena "Lena" Baer
+
+*Pow-wow doctor, Occultist. Incantare (Tier 2).* Came west from Lancaster County with a wagon, a Bible and her grandmother's *Long Lost Friend*. Heals for gifts, and breaks hexes for no one's money.
+
+- **Attributes:** Body 9, Agility 10, Intellect 13, Presence 11, Will 12. **Dodge** 8.
+- **Skills:** Occult 16 (Specialty). Trained: Wesen Lore 14, Apothecary 14, Read People 14, Medicine 14, Investigation 14, Survival 14, Persuasion 12, Riding 11, Shooting 11.
+- **Edge:** A friend in town: Pastor Jakob Unruh of the Volga German colony east of town, who brings her the cases his people won't take to a doctor. **Lens:** Braucher (companion: No Payment). **Complication:** Reluctant to Kill; trigger: an enemy lies wounded and helpless in front of her.
+- **Magic:** works rituals with Occult at ten minutes a roll, +2 to heal, protect or break a hex; carries 3 ready charms (Occult as her Specialty). Carries a Himmelsbrief, and writes them for others.
+- **Why I stand against the dark:** My grandmother taught me the words, and the words are for using. **Connection:** Dr. Whitlock calls her a superstitious old woman, and sends his hopeless cases to her door after dark.
 # Threats
 
 Opponents use the same rules as the characters. **Minor opponents** (hired guns, a mob, a Royal's footmen) have **one box**: any hit that gets through takes them out of the fight.
