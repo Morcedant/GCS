@@ -2174,7 +2174,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Advancement.</strong> After a significant case, the GM may authorize one skill step for each character.</li>
 </ol>
 <h1 id="g-ready-made-characters">Ready-made characters</h1>
-<p>Six characters ready to play. Each follows the creation rules exactly, Edges included, and their connections tie them together.</p>
+<p>Seven characters ready to play. Each follows the creation rules exactly, Edges included, and their connections tie them together.</p>
 <h2 id="g-eliza-kessler">Eliza Kessler</h2>
 <p><em>Deputy U.S. Marshal, Marshal. Grimm (Tier 2).</em> Wears the badge: the law, and the Code, in one person.</p>
 <ul>
@@ -2223,7 +2223,15 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Edges:</strong> Second advantage: Poker Face; a friend in town: Mae Lin, a faro dealer who hears everything said at her table. <strong>Advantage:</strong> Ziegevolk Pheromones (companion: Pheromone Suspicion). <strong>Complication:</strong> Owes the Wrong People; trigger: a debt collector arrives.</li>
 <li><strong>Why I stand against the dark:</strong> The pay’s good, and nobody else will take these jobs. <strong>Connection:</strong> Plays cards with Cora every Saturday; she’s the only one who can tell when he’s bluffing.</li>
 </ul>
-<h1 id="g-threats">Threats</h1>
+<h2 id="g-magdalena-lena-baer">Magdalena “Lena” Baer</h2>
+<p><em>Pow-wow doctor, Occultist. Incantare (Tier 2).</em> Came west from Lancaster County with a wagon, a Bible and her grandmother’s <em>Long Lost Friend</em>. Heals for gifts, and breaks hexes for no one’s money.</p>
+<ul>
+<li><strong>Attributes:</strong> Body 9, Agility 10, Intellect 13, Presence 11, Will 12. <strong>Dodge</strong> 8.</li>
+<li><strong>Skills:</strong> Occult 16 (Specialty). Trained: Wesen Lore 14, Apothecary 14, Read People 14, Medicine 14, Investigation 14, Survival 14, Persuasion 12, Riding 11, Shooting 11.</li>
+<li><strong>Edge:</strong> A friend in town: Pastor Jakob Unruh of the Volga German colony east of town, who brings her the cases his people won’t take to a doctor. <strong>Lens:</strong> Braucher (companion: No Payment). <strong>Complication:</strong> Reluctant to Kill; trigger: an enemy lies wounded and helpless in front of her.</li>
+<li><strong>Magic:</strong> works rituals with Occult at ten minutes a roll, +2 to heal, protect or break a hex; carries 3 ready charms (Occult as her Specialty). Carries a Himmelsbrief, and writes them for others.</li>
+<li><strong>Why I stand against the dark:</strong> My grandmother taught me the words, and the words are for using. <strong>Connection:</strong> Dr. Whitlock calls her a superstitious old woman, and sends his hopeless cases to her door after dark. # Threats</li>
+</ul>
 <p>Opponents use the same rules as the characters. <strong>Minor opponents</strong> (hired guns, a mob, a Royal’s footmen) have <strong>one box</strong>: any hit that gets through takes them out of the fight.</p>
 <table style="width:100%;">
 <colgroup>
@@ -3895,6 +3903,14 @@ tr.lvl-U td.target { color: var(--muted); }
       adv: { id: "" }, sadv: { id: "z-pheromones" }, comp: { id: "debt", trigger: "A debt collector arrives" },
       edges: { contact: 1, adv2: 1 }, adv2: { id: "poker" }, contact: "Mae Lin, a faro dealer who hears everything said at her table",
       equipment: { revolver: true, horse: true } },
+    { name: "Magdalena \"Lena\" Baer", rank: "Pow-wow doctor", dept: "Occultist", path: "rounded", species: "Incantare", speciesId: "incantare",
+      role: "Came west from Lancaster County with a wagon, a Bible and her grandmother's Long Lost Friend. Heals for gifts, and breaks hexes for no one's money.",
+      reason: "My grandmother taught me the words, and the words are for using.", connection: "Dr. Whitlock calls her a superstitious old woman, and sends his hopeless cases to her door after dark.",
+      attrs: { Body: 9, Agility: 10, Intellect: 13, Presence: 11, Will: 12 },
+      skills: { Occult: "S", "Wesen Lore": "T", Apothecary: "T", "Read People": "T", Medicine: "T", Investigation: "T", Survival: "T", Persuasion: "T", Riding: "T", Shooting: "T" },
+      edges: { contact: 1 }, contact: "Pastor Jakob Unruh of the Volga German colony east of town, who brings her the cases his people won't take to a doctor",
+      adv: { id: "" }, sadv: { id: "i-braucher" }, comp: { id: "nonlethal", trigger: "An enemy lies wounded and helpless in front of her" },
+      equipment: { shotgun: true, apothecary: true, lantern: true, himmelsbrief: true } },
   ];
   const ROLE_TEXTS = new Set(Object.values(ROLE_SUGGESTIONS));
   const sTraitList = () => SPECIES_TRAITS[ch.speciesId] || [];
