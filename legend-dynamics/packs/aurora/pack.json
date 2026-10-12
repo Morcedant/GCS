@@ -2834,6 +2834,11 @@
   "working": "ritual",
   "workings": "rituals",
   "advance": [],
+  "help": {
+   "step": "<p>Your Cantrips power's Class is your <b>Circle</b>: Class II is the Second Circle. Every cantrip you know works at it, and each Class higher teaches you another.</p>",
+   "boost": "<p>Bolt, Shield and Dispel already work at your Class, so they take Wider, Longer and Farther, not Harder. From the Fourth Circle, Wider can reach a city block and Longer can be permanent, with the GM's approval.</p>",
+   "charms": "An Adept can keep one ready fetish, two with Powers as an Expert skill."
+  },
   "charmLimit": "An Adept can keep **one** ready fetish, two with Powers as an Expert skill.",
   "dials": [
    [

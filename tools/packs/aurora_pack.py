@@ -315,7 +315,11 @@ for p_ in power_list:
 assert all(len(p_[3]) == 6 for p_ in power_list), [p_[0] for p_ in power_list if len(p_[3]) != 6]
 
 MAGIC = {"skill": "Powers", "burst": "cantrip", "bursts": "cantrips", "step": "Circle", "steps": "your Cantrips power's Class: the First Circle at Class I, the Second at Class II, and on up",
-         "price": "a box of Strain", "charm": "fetish", "charms": "fetishes", "working": "ritual", "workings": "rituals", "advance": [], "charmLimit": "An Adept can keep **one** ready fetish, two with Powers as an Expert skill.",
+         "price": "a box of Strain", "charm": "fetish", "charms": "fetishes", "working": "ritual", "workings": "rituals", "advance": [],
+         "help": {"step": "<p>Your Cantrips power's Class is your <b>Circle</b>: Class II is the Second Circle. Every cantrip you know works at it, and each Class higher teaches you another.</p>",
+                  "boost": "<p>Bolt, Shield and Dispel already work at your Class, so they take Wider, Longer and Farther, not Harder. From the Fourth Circle, Wider can reach a city block and Longer can be permanent, with the GM's approval.</p>",
+                  "charms": "An Adept can keep one ready fetish, two with Powers as an Expert skill."},
+         "charmLimit": "An Adept can keep **one** ready fetish, two with Powers as an Expert skill.",
          "dials": [["**Feel**", "Comic-book magic: flashy, fast and plentiful."],
                    ["**Cantrips**", "The Cantrips power (see Cantrips). Each Circle above the First gives a Boost, so a Fourth Circle sorcerer has three. From the Fourth Circle, a Wider Boost can take a city block and a Longer one can make an effect permanent, with the GM's approval. Bolt, Shield and Dispel already work at your Class, so they take Wider, Longer and Farther Boosts, not Harder."],
                    ["**Rituals**", "Adepts copy any power by ritual (see Rituals): Class I is a Minor working, Class II Significant, Class III Major."],

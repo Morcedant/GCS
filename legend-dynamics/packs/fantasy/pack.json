@@ -2488,6 +2488,10 @@
     "**Price**",
     "Corruption: a failed cantrip marks 1, a natural 18 marks 2, and finishing a Major ritual marks 1, whatever the roll."
    ]
-  ]
+  ],
+  "help": {
+   "step": "<p>Every cantrip holds three <b>Seals</b>, each hiding a deeper power. Your Sorcery breaks them: the <b>First Seal</b> at Trained, the <b>Second</b> at Specialty, the <b>Third</b> at Expert.</p>",
+   "price": "<p>Finishing a Major ritual marks 1 Corruption too, whatever the roll. A cleansing rite or a pilgrimage between ventures clears a box.</p>"
+  }
  }
 }

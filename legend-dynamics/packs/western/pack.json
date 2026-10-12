@@ -2443,6 +2443,11 @@
     "**Price**",
     "The Dark: a failed hex marks a box, and magic worked openly can mark one too. The Order of the Iron Cross hunts known practitioners."
    ]
-  ]
+  ],
+  "help": {
+   "step": "<p>Only a <b>Sorcerer</b> casts hexes; other practitioners rely on rituals and charms. Your Occult training sets a hex's power: Trained, Specialty or Expert.</p>",
+   "charms": "Practitioners carry as many ready charms as their Occult training allows: Trained 2, Specialty 3, Expert 4. A Sorcerer carries only one.",
+   "price": "<p>Magic worked openly can mark The Dark too, and the Order of the Iron Cross hunts known practitioners.</p>"
+  }
  }
 }
