@@ -57,6 +57,8 @@ export function summarize(enc) {
     overrides: ev.filter((/** @type {any} */ e) => e.type === "override").length,
     clockChanges: ev.filter((/** @type {any} */ e) => e.type === "clock").length,
     jams: attacks.filter((/** @type {any} */ e) => e.jam).length,
+    priceMarked: attacks.filter((/** @type {any} */ e) => e.price).reduce((/** @type {any} */ m, /** @type {any} */ e) => ((m[e.price.track] = (m[e.price.track] || 0) + e.price.boxes), m), {}),
+    boostsSpent: attacks.reduce((/** @type {number} */ n, /** @type {any} */ e) => n + (e.boosts || 0), 0),
     skippedOnRerun: enc.skipped || 0,
     byWeapon, byAttacker,
   };
@@ -66,10 +68,10 @@ export function summarize(enc) {
 export function attacksCsv(enc) {
   const cols = ["encounter", "config", "experiments", "round", "turn", "attacker", "defender", "weapon", "ammo", "mode", "band", "skill", "base", "aimMod", "weaponMod", "rangeMod",
     "coverMod", "injuryMod", "otherMod", "target", "attackTotal", "margin", "success", "dodgeBase", "attackQualityMod", "effectiveDodge", "dodgeTotal", "dodged", "hit",
-    "damage", "injuryBefore", "injuryAfter", "dying", "dead", "reroll", "overridden", "outcome"];
+    "damage", "injuryBefore", "injuryAfter", "dying", "dead", "boosts", "priceTrack", "priceBoxes", "jam", "reroll", "overridden", "outcome"];
   const cell = (/** @type {any} */ v) => { const s = v === null || v === undefined ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const rows = enc.events.filter((/** @type {any} */ e) => e.type === "attack" && !e.superseded).map((/** @type {any} */ e) => ({
     ...e, config: e.rules.config, experiments: e.rules.active.map((/** @type {any} */ a) => `${a.id}:${a.scope}`).join(" "),
-    attacker: e.attacker.name, defender: e.defender.name, weapon: e.weapon.name, reroll: e.reroll || "", overridden: e.overridden ? "yes" : "" }));
+    attacker: e.attacker.name, defender: e.defender.name, weapon: e.weapon.name, reroll: e.reroll || "", priceTrack: e.price ? e.price.track : "", priceBoxes: e.price ? e.price.boxes : "", overridden: e.overridden ? "yes" : "" }));
   return [cols.join(","), ...rows.map((/** @type {any} */ r) => cols.map((c) => cell(r[c])).join(","))].join("\n");
 }

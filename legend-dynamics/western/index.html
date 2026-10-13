@@ -933,6 +933,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <div class="field"><label for="lab-cover">Cover</label><select id="lab-cover"><option value="none">None</option><option value="partial">Partial (−2)</option><option value="solid">Solid (blocks)</option></select></div>
               <div class="field"><label for="lab-sit-label">Other modifier</label><input type="text" id="lab-sit-label" placeholder="e.g. Darkness"></div>
               <div class="field" style="flex:0 0 5em"><label for="lab-sit">±</label><input type="number" id="lab-sit" value="0" min="-10" max="10"></div>
+              <div class="field" style="flex:0 0 9em" id="lab-boost-wrap" hidden><label for="lab-boost">Harder Boosts</label><select id="lab-boost"><option value="0">None</option><option value="1">1 (−1, +1 box)</option><option value="2">2 (−2, +2 boxes)</option></select></div>
               <div class="field" style="flex:0 0 6.5em" id="lab-skill-wrap"><label for="lab-skill">Skill target</label><input type="number" id="lab-skill" min="1" max="30"></div>
               <label class="small"><input type="checkbox" id="lab-candodge" checked> Target can Dodge (aware, able to move)</label>
             </div>
@@ -3921,12 +3922,26 @@ const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ athletic
 /**
  * @typedef {{
  *   attacker: { id: string, name: string, skill: string, skillTarget: number, injury?: number },
- *   defender: { id: string, name: string, dodgeBase: number | null, injury?: number, canDodge: boolean, minor?: boolean, boxes?: number, dying?: boolean, dead?: boolean },
+ *   defender: { id: string, name: string, dodgeBase: number | null, injury?: number, canDodge: boolean, minor?: boolean, boxes?: number, dying?: boolean, dead?: boolean, traits?: any[] },
  *   weapon: any, band: string, mode?: { id: string, label: string, mod: number } | null, aimed?: number, ammo?: string,
- *   cover?: "none" | "partial" | "solid", situational?: Modifier[], jamOn18?: boolean
+ *   cover?: "none" | "partial" | "solid", situational?: Modifier[], jamOn18?: boolean, boosts?: number
  * }} AttackInput
  * @typedef {{ attackModifiers: ((ctx: any) => Modifier[])[], dodgeModifiers: ((ctx: any) => Modifier[])[] }} Hooks
  */
+
+/**
+ * The price some attacks carry on a failure (a setting's magic: Corruption, Strain, The Dark).
+ * Core capability; the setting's weapon data says which track and how much. @param {any} weapon @param {Roll} roll
+ * @returns {{ track: string, boxes: number } | null}
+ */
+function priceFor(weapon, roll) {
+  const p = weapon.price;
+  if (!p || roll.success) return null;
+  return { track: p.track, boxes: roll.total === 18 && p.natural18 ? p.natural18 : p.fail };
+}
+
+/** Defender traits that are switched on (a trait with toggle: true can be switched off, e.g. a Ward once broken). @param {any} defender */
+const liveTraits = (defender) => (defender.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false);
 
 /** Published core: no extra modifiers. */
 const NO_HOOKS = /** @type {Hooks} */ ({ attackModifiers: [], dodgeModifiers: [] });
@@ -3952,12 +3967,17 @@ function resolveAttack(input, hooks, roll) {
   const atkInj = INJURY_PENALTY[attacker.injury || 0] || 0;
   if (atkInj) mods.push({ source: "injury", label: "Attacker's injury", value: atkInj, scope: "core" });
   for (const m of input.situational || []) if (m.value) mods.push(m);
+  for (const t of liveTraits(defender)) if (t.type === "attackPenalty" && t.value) mods.push({ source: "defender", label: t.label || "Defender", value: t.value, scope: "setting" });
+  const boosts = weapon.spell ? Math.max(0, Math.min(2, input.boosts || 0)) : 0; // Harder Boosts: −1 to the roll and +1 box each (core magic)
+  if (boosts) mods.push({ source: "boost", label: `Harder Boost${boosts > 1 ? " ×" + boosts : ""}`, value: -boosts, scope: "core" });
   const ctx = { ...input, range, margin: 0 };
   for (const h of hooks.attackModifiers) for (const m of h(ctx)) if (m.value) mods.push(m);
   const target = attacker.skillTarget + sumMods(mods);
   const atk = resolve(roll("attack"), target);
   out.attackMods = mods; out.base = attacker.skillTarget; out.target = target; out.attack = atk;
-  out.jam = !!input.jamOn18 && atk.total === 18;
+  out.jam = (weapon.jamOn || (input.jamOn18 ? [18] : [])).includes(atk.total);
+  out.price = priceFor(weapon, atk);
+  out.boosts = boosts;
   if (!atk.success) return { ...out, outcome: "miss", hit: false, dodgeMods: [] };
 
   /** @type {Modifier[]} */
@@ -3973,12 +3993,17 @@ function resolveAttack(input, hooks, roll) {
     if (dg.success) return { ...out, dodgeMods: dmods, outcome: "dodged", hit: false };
   }
   out.dodgeMods = dmods;
-  const dmg = weaponDamage(weapon, band);
+  let dmg = weaponDamage(weapon, band);
+  // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
+  for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }
+  if (dmg && boosts) dmg = { ...dmg, boxes: dmg.boxes + boosts };
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
+  const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && dmg && dmg.boxes <= t.maxBoxes);
+  if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null };
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
 }
 
-return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, NO_HOOKS, resolveAttack };
+return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, priceFor, NO_HOOKS, resolveAttack };
 })();
   const LAB_DATA = {"label":"Dust & Damnation Test","notes":"Rules Lab test configuration. Nothing here is published: the creator's sheet and roller never read it. Setting experiments listed under 'experiments' can be switched on in the GM tab's Encounter panel. Weapon traits are added in the lab (or here) as { type: 'accuracy', value, bands: ['close'], requires: { aimed, ammo, mode }, label }; none are set until their values are decided.","experiments":["labWeaponTraits"],"ammo":{"shotgun":["Scattershot"]},"weaponTraits":{}};
   const LDX = (() => {
@@ -4089,7 +4114,8 @@ return { PUBLISHED, bandFor, EXPERIMENTS, newLabConfig, available, buildRules };
  *   pid: string, ref: string | null, kind: "pc" | "npc", name: string, side: "party" | "foe",
  *   agility: number, dodge: number | null, skills: Record<string, number>, weapons: string[],
  *   boxes: number, injury: number, dying: boolean, dead: boolean, minor: boolean, points: number,
- *   conditions: string[], aim: { target: string } | null, dodgedRound: number, ammo: Record<string, number>, note?: string
+ *   conditions: string[], aim: { target: string } | null, dodgedRound: number, ammo: Record<string, number>, note?: string,
+ *   traits: any[], tracks: Record<string, number>
  * }} Participant
  */
 
@@ -4125,7 +4151,7 @@ function addParticipant(enc, p) {
   const pid = "p" + enc.nextPid++;
   /** @type {Participant} */
   const q = { ref: null, side: p.kind === "pc" ? "party" : "foe", agility: 10, dodge: null, skills: {}, weapons: [], boxes: 3, injury: 0, dying: false, dead: false,
-    minor: false, points: 0, conditions: [], aim: null, dodgedRound: 0, ammo: {}, ...clone(p), pid };
+    minor: false, points: 0, conditions: [], aim: null, dodgedRound: 0, ammo: {}, traits: [], tracks: {}, ...clone(p), pid };
   enc.participants.push(q);
   if (enc.status === "combat") enc.order.push(pid);
   log(enc, "join", { pid, name: q.name, kind: q.kind, side: q.side });
@@ -4217,18 +4243,18 @@ function attack(enc, rules, core, cmd, opts = {}) {
   // A reroll starts from the moment before the original attack.
   if (prior) {
     const pd = find(enc, prior.defender.pid);
-    if (prior.pre) Object.assign(pd, prior.pre.defender);
+    if (prior.pre) { Object.assign(pd, prior.pre.defender); if (prior.pre.attackerTracks) a.tracks = clone(prior.pre.attackerTracks); }
     prior.superseded = true;
   }
   const n = prior ? prior.key : enc.events.filter((/** @type {any} */ e) => e.type === "attack" && !e.reroll && e.round === enc.round && e.attacker.pid === a.pid && e.defender.pid === d.pid).length;
   const key = (/** @type {string} */ kind) => `r${enc.round}|${a.pid}>${d.pid}|${n}|${kind}${opts.reroll === kind ? "|rr" : ""}`;
   const aimed = prior ? prior.aimed : (rules.actions.has("aim") && a.aim && a.aim.target === d.pid ? 1 : 0);
   const canDodge = cmd.canDodge !== false && d.dodge !== null && !isOut(d) && (prior ? prior.canDodge : d.dodgedRound !== enc.round);
-  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound } };
+  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound }, attackerTracks: clone(a.tracks || {}) };
   const res = core.resolveAttack({
     attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury },
-    defender: { id: d.pid, name: d.name, dodgeBase: d.dodge, injury: d.injury, canDodge, minor: d.minor, boxes: d.boxes, dying: d.dying, dead: d.dead },
-    weapon, band: cmd.band, mode: cmd.mode || null, aimed, ammo: cmd.ammo || null, cover: cmd.cover || "none",
+    defender: { id: d.pid, name: d.name, dodgeBase: d.dodge, injury: d.injury, canDodge, minor: d.minor, boxes: d.boxes, dying: d.dying, dead: d.dead, traits: d.traits || [] },
+    weapon, band: cmd.band, mode: cmd.mode || null, aimed, boosts: cmd.boosts || 0, ammo: cmd.ammo || null, cover: cmd.cover || "none",
     situational: (cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ source: "situation", label: m.label || "Situation", value: +m.value, scope: "situation" })),
     jamOn18: !!(weapon.firearm && rules.jamOn18),
   }, rules.hooks, (/** @type {"attack" | "dodge"} */ kind) => (prior && opts.reroll !== kind && prior[kind + "Dice"] ? prior[kind + "Dice"] : core.diceFor(enc.seed, key(kind))));
@@ -4238,6 +4264,7 @@ function attack(enc, rules, core, cmd, opts = {}) {
     if (a.aim) a.aim = null;
   }
   if (res.dodge) d.dodgedRound = enc.round;
+  if (res.price) { a.tracks = a.tracks || {}; a.tracks[res.price.track] = (a.tracks[res.price.track] || 0) + res.price.boxes; }
   if (res.hit && res.injury) Object.assign(d, { injury: res.injury.injury, dying: res.injury.dying, dead: res.injury.dead });
 
   const am = res.attackMods || [], dm = res.dodgeMods || [];
@@ -4251,7 +4278,8 @@ function attack(enc, rules, core, cmd, opts = {}) {
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: res.outcome === "dodged",
-    hit: !!res.hit, outcome: res.outcome, jam: !!res.jam,
+    hit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null,
+    defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying),
     injuryBefore: pre.defender.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead, injuryResult: res.injury ? res.injury.change : null,
   });
@@ -4284,6 +4312,13 @@ function spendPoint(enc, rules, core, pid, use, o = {}) {
   return { event: log(enc, "point", { pid, name: p.name, use, note: o.note || "" }) };
 }
 
+/** Switch a participant's trait on or off (e.g. a Ward that has been broken). @param {any} enc @param {string} pid @param {number} i @param {boolean} on */
+function setTrait(enc, pid, i, on) {
+  const p = find(enc, pid); if (!p || !p.traits[i]) return { error: "No such trait." };
+  p.traits[i].on = on;
+  return { event: log(enc, "trait", { pid, name: p.name, trait: p.traits[i].label || p.traits[i].type, on }) };
+}
+
 /** A complication comes into play; accepting it earns a Legend point. @param {any} enc @param {string} pid @param {string} note */
 function invokeComplication(enc, pid, note) {
   const p = find(enc, pid); if (!p) return { error: "Whose complication?" };
@@ -4312,6 +4347,11 @@ function override(enc, rules, core, what, o) {
     else p.ammo[o.ammo] = Math.max(0, +o.rounds);
     const to = what === "injury" ? { injury: p.injury, dying: p.dying, dead: p.dead } : what === "points" ? p.points : p.ammo[o.ammo];
     return { event: log(enc, "override", { what, pid: p.pid, name: p.name, from, to, reason: o.reason || "" }) };
+  }
+  if (what === "track") {
+    const p = find(enc, o.pid); if (!p) return { error: "Who?" };
+    const from = (p.tracks || {})[o.track] || 0; p.tracks = { ...(p.tracks || {}), [o.track]: Math.max(0, +o.value) };
+    return { event: log(enc, "override", { what, pid: p.pid, name: p.name, track: o.track, from, to: p.tracks[o.track], reason: o.reason || "" }) };
   }
   if (what === "skill") {
     const p = find(enc, o.pid); if (!p) return { error: "Who?" };
@@ -4374,7 +4414,7 @@ function replay(enc, rules, core, config) {
   return { encounter: r };
 }
 
-return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, attack, spendPoint, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
+return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, attack, spendPoint, setTrait, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
 })();
   const LAB_STATS = (() => {
 /**
@@ -4435,6 +4475,8 @@ function summarize(enc) {
     overrides: ev.filter((/** @type {any} */ e) => e.type === "override").length,
     clockChanges: ev.filter((/** @type {any} */ e) => e.type === "clock").length,
     jams: attacks.filter((/** @type {any} */ e) => e.jam).length,
+    priceMarked: attacks.filter((/** @type {any} */ e) => e.price).reduce((/** @type {any} */ m, /** @type {any} */ e) => ((m[e.price.track] = (m[e.price.track] || 0) + e.price.boxes), m), {}),
+    boostsSpent: attacks.reduce((/** @type {number} */ n, /** @type {any} */ e) => n + (e.boosts || 0), 0),
     skippedOnRerun: enc.skipped || 0,
     byWeapon, byAttacker,
   };
@@ -4444,11 +4486,11 @@ function summarize(enc) {
 function attacksCsv(enc) {
   const cols = ["encounter", "config", "experiments", "round", "turn", "attacker", "defender", "weapon", "ammo", "mode", "band", "skill", "base", "aimMod", "weaponMod", "rangeMod",
     "coverMod", "injuryMod", "otherMod", "target", "attackTotal", "margin", "success", "dodgeBase", "attackQualityMod", "effectiveDodge", "dodgeTotal", "dodged", "hit",
-    "damage", "injuryBefore", "injuryAfter", "dying", "dead", "reroll", "overridden", "outcome"];
+    "damage", "injuryBefore", "injuryAfter", "dying", "dead", "boosts", "priceTrack", "priceBoxes", "jam", "reroll", "overridden", "outcome"];
   const cell = (/** @type {any} */ v) => { const s = v === null || v === undefined ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const rows = enc.events.filter((/** @type {any} */ e) => e.type === "attack" && !e.superseded).map((/** @type {any} */ e) => ({
     ...e, config: e.rules.config, experiments: e.rules.active.map((/** @type {any} */ a) => `${a.id}:${a.scope}`).join(" "),
-    attacker: e.attacker.name, defender: e.defender.name, weapon: e.weapon.name, reroll: e.reroll || "", overridden: e.overridden ? "yes" : "" }));
+    attacker: e.attacker.name, defender: e.defender.name, weapon: e.weapon.name, reroll: e.reroll || "", priceTrack: e.price ? e.price.track : "", priceBoxes: e.price ? e.price.boxes : "", overridden: e.overridden ? "yes" : "" }));
   return [cols.join(","), ...rows.map((/** @type {any} */ r) => cols.map((c) => cell(r[c])).join(","))].join("\n");
 }
 
@@ -4478,6 +4520,7 @@ function mountLab(api) {
   const KEY = PACK.id + ".lab.v1";
   const WEAPONS = Object.fromEntries(PACK.arms.filter((/** @type {any} */ a) => !a.hazard).map((/** @type {any} */ a) => [a.id, a]));
   const MODES = PACK.weapons.modes || []; // [id, name, rounds, only these ammo types or null, roll modifier]
+  const PTRACK = PACK.personalTrack || null; // a setting's personal price track (Corruption, Strain), kept on the character
   const BAND_NAMES = { melee: "In reach", close: "Close", short: "Short", medium: "Medium", long: "Long", extreme: "Extreme" };
 
   /** @type {{ mode: "published" | "lab", cfg: any, enc: any, history: any[], compare: any }} */
@@ -4568,17 +4611,18 @@ function mountLab(api) {
   /** A character from the GM's cards, as a participant. @param {any} c */
   function fromCharacter(c) {
     const k = api.calc(c), gun = c.play && c.play.gun;
-    const weapons = ["fists", ...Object.values(WEAPONS).filter((/** @type {any} */ a) => a.id !== "fists" && (c.equipment[a.id] || (gun && a.ammo && a.ammo === gun.type))).map((/** @type {any} */ a) => a.id)];
+    const weapons = ["fists", ...Object.values(WEAPONS).filter((/** @type {any} */ a) => a.id !== "fists" && (c.equipment[a.id] || (a.equip || []).some((/** @type {string} */ k) => c.equipment[k]) || (gun && a.ammo && a.ammo === gun.type) || (a.cantrip && (c.spells || []).includes(a.cantrip)))).map((/** @type {any} */ a) => a.id)];
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
-      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo };
+      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A threat from the setting's data. @param {any} t @param {string} name */
   function fromThreat(t, name) {
     const skills = Object.fromEntries(t.attacks.map((/** @type {any} */ a) => [a.skill, a.target]));
     const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
     return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, dodge: t.dodge, skills, weapons: t.weapons,
-      boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}` };
+      boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}`,
+      traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
   function ensureEnc() {
     if (enc() && enc().status !== "ended") return enc();
@@ -4623,6 +4667,7 @@ function mountLab(api) {
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
       if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
+      if (PTRACK && (c.play.ptrack || 0) !== ((p.tracks || {})[PTRACK.name] || 0)) E.override(en, rules(), LD, "track", { pid: p.pid, track: PTRACK.name, value: c.play.ptrack || 0, reason: "changed on the character card" });
     }
   }
   // And the encounter writes its results back to the cards.
@@ -4634,6 +4679,7 @@ function mountLab(api) {
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       c.play.injury = Math.min(3, p.injury); c.play.dying = p.dying; c.play.duty = p.points;
       if (c.play.gun && p.ammo[c.play.gun.type] !== undefined) c.play.gun.rounds = p.ammo[c.play.gun.type];
+      if (PTRACK && p.tracks) c.play.ptrack = Math.min(PTRACK.boxes, p.tracks[PTRACK.name] || 0);
       changed = true;
     }
     if (changed) { api.saveCrew(); api.renderCrew(); }
@@ -4654,13 +4700,15 @@ function mountLab(api) {
       return `<div class="lab-p ${act && act.pid === p.pid ? "active" : ""} ${out ? "out" : ""}">
         <span class="lab-side">${p.side === "party" ? "Party" : "Foe"}</span>
         <span class="who"><b>${esc(p.name)}${p.minor ? " <span class='small muted'>(minor)</span>" : ""}</b>
-          <span class="small muted">Dodge ${p.dodge ?? "—"} · Agility ${p.agilityEstimated ? "~" : ""}${p.agility}${Object.keys(p.skills).length ? " · " + Object.entries(p.skills).filter(([k]) => p.kind === "npc" || /Shooting|Melee|Brawling|Athletics/.test(k)).map(([k, v]) => `${k} ${v}`).join(", ") : ""}</span></span>
+          <span class="small muted">Dodge ${p.dodge ?? "—"} · Agility ${p.agilityEstimated ? "~" : ""}${p.agility}${Object.keys(p.skills).length ? " · " + Object.entries(p.skills).filter(([k]) => p.kind === "npc" || p.weapons.some((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].skill === k)).map(([k, v]) => `${k} ${v}`).join(", ") : ""}</span></span>
         <span class="btn-row">${en.status === "combat" ? `<button class="linkish" data-up="${p.pid}" aria-label="Move ${esc(p.name)} up the turn order">▲</button><button class="linkish" data-down="${p.pid}" aria-label="Move ${esc(p.name)} down">▼</button>` : ""}
           <button class="linkish danger" data-rm="${p.pid}" aria-label="Remove ${esc(p.name)}">×</button></span>
         <span class="meta small"><span class="boxes">${Array.from({ length: p.boxes }, (_, i) => `<button class="box ${i < p.injury ? "on" : ""}" data-inj="${p.pid}" data-i="${i + 1}" aria-label="${esc(p.name)} box ${i + 1}"></button>`).join("")}</span>
           ${p.dead ? "<b style='color:var(--bad)'>Dead</b>" : p.dying ? "<b style='color:var(--bad)'>Dying</b>" : out ? "<b>Down</b>" : esc(api.injuryNames[inj] || "")}
           ${p.kind === "pc" ? ` · ${esc(T.point)} <button class="linkish" data-pt="${p.pid}" data-d="-1" aria-label="${esc(p.name)}: one ${esc(T.point)} point fewer">−</button><b>${p.points}</b><button class="linkish" data-pt="${p.pid}" data-d="1" aria-label="${esc(p.name)}: one ${esc(T.point)} point more">+</button>` : ""}
           ${Object.entries(p.ammo).map(([k, v]) => ` · ${esc(PACK.weapons.items[k] ? PACK.weapons.items[k][0] : k)} ${v}/${PACK.weapons.items[k] ? PACK.weapons.items[k][1] : "?"}`).join("")}
+          ${Object.entries(p.tracks || {}).filter(([, v]) => v).map(([k, v]) => ` · <b>${esc(k)} ${v}</b>`).join("")}
+          ${(p.traits || []).map((/** @type {any} */ t, /** @type {number} */ i) => t.toggle ? ` · <button class="linkish" data-trait="${p.pid}" data-i="${i}" title="Switch on or off">${esc(t.label)}: ${t.on === false ? "off" : "on"}</button>` : ` · ${esc(t.label || t.type)}`).join("")}
           ${p.aim ? ` · <b>aiming at ${esc((E.find(en, p.aim.target) || {}).name || "?")}</b>` : ""}
           ${p.conditions.map((/** @type {string} */ c) => ` · <button class="linkish" data-cond-rm="${p.pid}" data-c="${esc(c)}" title="Remove">${esc(c)} ×</button>`).join("")}
           ${p.note ? `<br><span class="muted">${esc(p.note)}</span>` : ""}</span></div>`;
@@ -4677,6 +4725,7 @@ function mountLab(api) {
     else if (d.inj) { const p = E.find(en, d.inj), i = +d.i; E.override(en, rules(), LD, "injury", { pid: p.pid, injury: p.injury === i ? i - 1 : i, dying: false, dead: false, reason: "GM set injury" }); }
     else if (d.pt) { const p = E.find(en, d.pt); E.override(en, rules(), LD, "points", { pid: p.pid, points: p.points + +d.d, reason: "GM adjusted points" }); }
     else if (d.condRm) E.setCondition(en, d.condRm, d.c, false);
+    else if (d.trait) { const p = E.find(en, d.trait); E.setTrait(en, d.trait, +d.i, p.traits[+d.i].on === false); }
     else return;
     pushToCards(); save(); renderAll();
   });
@@ -4734,6 +4783,8 @@ function mountLab(api) {
       const ammoList = (w && LAB.ammo && LAB.ammo[w.id]) || [];
       $("lab-ammo-wrap").hidden = !ammoList.length;
       $("lab-ammo").innerHTML = ammoList.map((/** @type {string} */ x) => `<option>${esc(x)}</option>`).join("");
+      $("lab-boost-wrap").hidden = !(w && w.spell);
+      if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
       const base = w ? a.skills[w.skill] : undefined;
       if ($("lab-skill").dataset.for !== `${a.pid}|${w && w.id}`) { $("lab-skill").value = base ?? ""; $("lab-skill").dataset.for = `${a.pid}|${w && w.id}`; }
       $("lab-skill").previousElementSibling.textContent = w ? `${w.skill} target` : "Skill target";
@@ -4753,7 +4804,7 @@ function mountLab(api) {
       res = E.attack(en, r, LD, {
         attacker: a.pid, defender: $("lab-target").value, weapon: w && w.id, band: $("lab-band").value,
         mode: mode ? { id: mode[0], label: mode[1], mod: mode[4] || 0, cost: mode[2] } : null, ammo: $("lab-ammo-wrap").hidden ? null : $("lab-ammo").value,
-        cover: $("lab-cover").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
+        cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
         canDodge: $("lab-candodge").checked && !$("lab-candodge").disabled, skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
     } else if (action === "aim") res = E.aim(en, r, a.pid, $("lab-target").value);
@@ -4790,10 +4841,12 @@ function mountLab(api) {
       } else L.push(`No Dodge (${ev.canDodge ? "none possible" : "the target can't Dodge now"})`, `<span class="ok">Hit</span>`);
     }
     if (ev.hit) {
-      L.push("", ev.damage ? `${esc(ev.weapon.name)} at ${BAND_NAMES[ev.band] || ev.band}: ${ev.damage} box${ev.damage > 1 ? "es" : ""}${ev.dyingWeapon ? ", and Dying" : ""}${ev.reduced ? ` (−1, a ${esc(T.point)} point)` : ""}` : "No effect at this range");
+      L.push("", !ev.damage && /marks nothing/.test(ev.outcome) ? esc(ev.outcome[0].toUpperCase() + ev.outcome.slice(1)) : ev.damage ? `${esc(ev.weapon.name)} at ${BAND_NAMES[ev.band] || ev.band}: ${ev.damage} box${ev.damage > 1 ? "es" : ""}${ev.dyingWeapon ? ", and Dying" : ""}${ev.reduced ? ` (−1, a ${esc(T.point)} point)` : ""}` : "No effect at this range");
       if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
     }
-    if (ev.jam) L.push(`<span class="bad">Natural 18: the gun jams. Clearing it takes an action.</span>`);
+    if (ev.marginTrait) L.push(`<span class="x">${esc(ev.marginTrait)}.</span>`);
+    if (ev.price) L.push(`<span class="bad">Failed cast: ${esc(ev.attacker.name)} marks ${ev.price.boxes} ${esc(ev.price.track)}.</span>`);
+    if (ev.jam) L.push(`<span class="bad">Natural ${ev.attackTotal}: ${ev.weapon && WEAPONS[ev.weapon.id] && WEAPONS[ev.weapon.id].ammo ? "the weapon jams or misfires" : "the weapon fails"}. Clearing it takes an action.</span>`);
     if (ev.overridden) L.push(`<span class="x">GM override applied.</span>`);
     return L.join("\n");
   }
@@ -4848,9 +4901,10 @@ function mountLab(api) {
       case "turn": return `${esc(e.name || "")}'s turn.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; Dodge ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : "hit, no effect") : e.outcome)}</b>${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}`;
+      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; Dodge ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}`;
       case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation" }[e.use] || e.use)}${e.note ? ` (${esc(e.note)})` : ""}.`;
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
+      case "trait": return `${esc(e.name)}: ${esc(e.trait)} ${e.on ? "on" : "off"}.`;
       case "condition": return `${esc(e.name)}: ${e.on ? "+" : "−"} ${esc(e.condition)}.`;
       case "override": return `<span style="color:var(--warn)">GM override</span>: ${esc(e.what)}${e.name ? " for " + esc(e.name) : ""} ${esc(JSON.stringify(e.from))} → ${esc(JSON.stringify(e.to))}${e.reason ? ` (${esc(e.reason)})` : ""}.`;
       case "clock": return e.from < 0 ? `Clock “${esc(e.name)}” started (${e.kind}, ${e.size} segments).` : `Clock “${esc(e.name)}”: ${e.from} → ${e.to} of ${e.size}.`;
@@ -4868,7 +4922,8 @@ function mountLab(api) {
   const pct = (/** @type {number | null} */ v) => (v === null ? "—" : v + "%");
   const TILES = [["rounds", "Rounds"], ["attacks", "Attacks"], ["attackSuccessRate", "Attack success", pct], ["dodgeNegatedRate", "Successes dodged", pct], ["finalHitRate", "Final hit rate", pct],
     ["averageMargin", "Average margin"], ["dodgeSuccessRate", "Dodge success", pct], ["averageEffectiveDodge", "Average effective Dodge"], ["damageFrequency", "Damage frequency", pct],
-    ["injuryFrequency", "Injury frequency", pct], ["boxesMarked", "Boxes marked"], ["incapacitated", "Down"], ["dead", "Dead"], ["pointsSpent", "Points spent"], ["complications", "Complications"], ["overrides", "GM overrides"], ["jams", "Jams"]];
+    ["injuryFrequency", "Injury frequency", pct], ["boxesMarked", "Boxes marked"], ["incapacitated", "Down"], ["dead", "Dead"], ["pointsSpent", "Points spent"], ["complications", "Complications"], ["overrides", "GM overrides"], ["jams", "Jams"], ["boostsSpent", "Boosts"],
+    ["priceMarked", PTRACK ? PTRACK.name + " marked" : "Price marked", (/** @type {any} */ v) => Object.values(v || {}).reduce((/** @type {number} */ a, /** @type {any} */ b) => a + b, 0)]];
   /** @param {any} s */
   const tiles = (s) => `<div class="lab-sum">${TILES.map(([k, n, f]) => `<div><span>${n}</span><b>${f ? f(s[k]) : s[k] ?? "—"}</b></div>`).join("")}</div>`;
   function renderSummary() {

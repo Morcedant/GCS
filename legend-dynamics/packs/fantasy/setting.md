@@ -8,22 +8,7 @@ The years are counted **After the Shattering (AS)**. The story begins in the yea
 
 <!-- SECTION:weapons -->
 
-| Weapon | Range | Boxes on a hit | What the injury looks like |
-|---|---|---|---|
-| Fists, kicks, dirty tricks | Melee | 1 | Bruises, a split lip, cracked ribs |
-| Dagger or club | Melee; dagger Close thrown | 1 | A cut, a stab or a crack on the skull |
-| Sling | Short | 1 | A crack on the skull |
-| Sword, axe, mace, spear | Melee | 2 | A deep wound or a broken bone |
-| Greatsword, greataxe, polearm | Melee | 2; a hit by 5 or more leaves the target Dying | A ruinous wound |
-| Bow | Long | 2 | An arrow buried deep |
-| Crossbow | Medium | 2 | A bolt buried deep |
-| Wheel-lock pistol | Close | 2 | A gunshot wound |
-| Arquebus or hand-cannon | Short | 3, and Dying | A ruinous wound |
-| Powder bomb | Close (thrown) | 1 to everyone nearby, 3 and Dying at the center | Blast and burns; Dodge means diving clear |
-| Claws, fangs, venom | Melee | 2 (venom: Body roll or Reeling) | Torn flesh, poison in the blood |
-| Shadow Bolt | Short | 2 | Black frost in the wound |
-| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
-| Fire | — | 1 each round in the flames | Burns |
+{{GEN:arms-table}}
 
 **Gunpowder** is common but slow. Anyone can carry a pistol or an arquebus, but reloading takes a **full round** (a crossbow takes one action), and rain or seawater ruins the powder until it's dried. An arquebus misfires on a natural 17 or 18; any missile weapon fails on a natural 18 (a string snaps, a bolt jams, the powder fizzles).
 
@@ -135,19 +120,7 @@ The empire is gone, but its bones are everywhere: roads no one repairs, aqueduct
 
 Opponents use the same rules as the characters. **Minor opponents** (guards, bandits, cultists) have **one box**: any hit that gets through takes them out of the fight.
 
-| Threat | Attack (target) | Dodge | Boxes | Weapon | Trait |
-|---|---|---|---|---|---|
-| Guardsman or bandit (minor) | Melee 11 | 7 | 1 | Spear or club | **Numbers.** Three or four of them; they flee when half are down. |
-| Cultist (minor, many) | Melee 10 | 6 | 1 | Dagger | **Fanatics.** One in each group carries a blessing: Ward on the others. |
-| Sellsword captain | Melee 14, Leadership 12 | 10 | 3 | Sword, pistol | **Command.** Their band gets +1 while the captain stands. |
-| Assassin | Melee 14, Stealth 15 | 11 | 3 | Poisoned dagger | **First strike.** Attacks from hiding at +2; poison: Body roll or Reeling. |
-| Sorcerer | Sorcery 14 | 9 | 3 | Shadow Bolt, Hex | **Warded.** Attacks against them are at −2 until the Ward is broken (Shatter or a hit by 5+). |
-| Serpent-priest | Sorcery 13, Persuasion 14 | 10 | 3 | Venom, Charm | **Serpent-lord.** Commands snakes; its bite poisons. |
-| Ghoul or tomb-dead | Brawling 12 | 7 | 2 | Claws | **Hunger.** Fire and daylight drive them back; they never stop coming. |
-| Giant ape or great beast | Brawling 15 | 9 | 5 | Claws and jaws (2) | **Huge.** Hits of 1 box mark nothing. |
-| Demon | Melee 15, Sorcery 14 | 11 | 4 | Claws (2), Witchfire | **Bound.** Holy rites and its true name mark an extra box; it must keep a bargain to the letter. |
-| Shard-bearer | Melee 15 or Sorcery 15 | 11 | 5 | As the bearer | **Crown shard.** One great power: command, fire, flight, terror. Breaking the bearer's will ends it. |
-| Thing from the Deep | Brawling 16 | 8 | 6 | Tentacles (2) | **Horror.** Once per scene, everyone who sees it rolls Will or flees in terror. |
+{{GEN:threats-table}}
 
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
 

@@ -1,0 +1,7 @@
+{
+ "label": "The Shattered Crown Test",
+ "notes": "Rules Lab test configuration. Nothing here is published: the creator's sheet and roller never read it. Weapon traits can be added in the lab (or here) as { type: 'accuracy', value, bands, requires: { aimed, ammo, mode }, label }; none are set until their values are decided.",
+ "experiments": ["labWeaponTraits"],
+ "ammo": {},
+ "weaponTraits": {}
+}

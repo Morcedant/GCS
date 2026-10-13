@@ -64,3 +64,24 @@ test("resolveAttack with no experiments follows the published sequence", () => {
   assert.equal(r2.outcome, "hit");
   assert.equal(r2.injury.injury, 2);
 });
+
+test("Crown capabilities: margin damage, per-weapon jams, price, Boosts, defender traits", () => {
+  const roll = (...seq) => () => seq.shift();
+  const atk = { id: "a", name: "A", skill: "Melee", skillTarget: 14 }, def = (x = {}) => ({ id: "d", name: "D", dodgeBase: 3, canDodge: false, ...x });
+  const great = { id: "great", reach: "melee", damage: { melee: { boxes: 2 } }, traits: [{ type: "marginDamage", margin: 5, damage: { boxes: 3, dying: true } }] };
+  assert.deepEqual(LD.resolveAttack({ attacker: atk, defender: def(), weapon: great, band: "melee" }, LD.NO_HOOKS, roll([3, 3, 3])).damage, { boxes: 3, dying: true }, "hit by 5");
+  assert.deepEqual(LD.resolveAttack({ attacker: atk, defender: def(), weapon: great, band: "melee" }, LD.NO_HOOKS, roll([4, 4, 4])).damage, { boxes: 2 }, "hit by 2");
+  const arq = { id: "arq", band: "short", damage: { any: { boxes: 3, dying: true } }, jamOn: [17, 18] };
+  assert.equal(LD.resolveAttack({ attacker: atk, defender: def(), weapon: arq, band: "short" }, LD.NO_HOOKS, roll([6, 6, 5])).jam, true, "arquebus misfires on 17");
+  const bolt = { id: "bolt", band: "short", spell: true, damage: { any: { boxes: 2 } }, price: { track: "Corruption", fail: 1, natural18: 2 } };
+  assert.deepEqual(LD.resolveAttack({ attacker: atk, defender: def(), weapon: bolt, band: "short" }, LD.NO_HOOKS, roll([6, 6, 6])).price, { track: "Corruption", boxes: 2 });
+  assert.equal(LD.resolveAttack({ attacker: atk, defender: def(), weapon: bolt, band: "short" }, LD.NO_HOOKS, roll([1, 2, 3])).price, null);
+  const b = LD.resolveAttack({ attacker: atk, defender: def(), weapon: bolt, band: "short", boosts: 1 }, LD.NO_HOOKS, roll([2, 3, 3]));
+  assert.equal(b.target, 13, "Harder Boost: −1 to the roll"); assert.equal(b.damage.boxes, 3, "and +1 box");
+  const ward = [{ type: "attackPenalty", value: -2, label: "Ward", toggle: true }];
+  assert.equal(LD.resolveAttack({ attacker: atk, defender: def({ traits: ward }), weapon: bolt, band: "short" }, LD.NO_HOOKS, roll([3, 3, 3])).target, 12);
+  assert.equal(LD.resolveAttack({ attacker: atk, defender: def({ traits: [{ ...ward[0], on: false }] }), weapon: bolt, band: "short" }, LD.NO_HOOKS, roll([3, 3, 3])).target, 14, "a broken Ward");
+  const fist = { id: "fist", reach: "melee", damage: { melee: { boxes: 1 } } };
+  const huge = LD.resolveAttack({ attacker: atk, defender: def({ traits: [{ type: "ignoreHits", maxBoxes: 1, label: "Huge" }] }), weapon: fist, band: "melee" }, LD.NO_HOOKS, roll([3, 3, 3]));
+  assert.equal(huge.outcome, "hit, marks nothing (Huge)"); assert.equal(huge.damage, null);
+});

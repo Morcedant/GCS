@@ -111,3 +111,33 @@ test("rerun under other rules replays the declared actions with the same dice", 
   const pa = pick(enc), pb = pick(other);
   for (let i = 0; i < Math.min(pa.length, pb.length); i++) assert.equal(pb[i][0], pa[i][0], "attack dice line up");
 });
+
+test("The Shattered Crown: Corruption on a failed cast, undone by a reroll; Ward on and off", () => {
+  const crown = JSON.parse(readFileSync(new URL("../../../packs/fantasy/pack.json", import.meta.url)));
+  const clab = JSON.parse(readFileSync(new URL("../../../packs/fantasy/lab.json", import.meta.url)));
+  const W = Object.fromEntries(crown.arms.filter((a) => !a.hazard).map((a) => [a.id, a]));
+  const r = { ...X.buildRules(X.PUBLISHED, W, clab), jamOn18: crown.weapons.jamOn18 };
+  assert.equal(crown.threats.length, 11);
+  assert.ok(crown.threats.every((t) => t.weapons.every((w) => W[w])));
+  let failed = null;
+  for (let seed = 1; seed < 400 && !failed; seed++) {
+    const enc = E.newEncounter({ setting: "fantasy", baseline: LD.CORE_BASELINE, config: X.PUBLISHED, seed });
+    E.addParticipant(enc, { kind: "pc", name: "Ithrann", agility: 12, dodge: 11, skills: { Sorcery: 9 }, weapons: ["shadowbolt"], points: 2, tracks: { Corruption: 0 } });
+    const sorc = crown.threats.find((t) => t.id === "sorcerer");
+    E.addParticipant(enc, { kind: "npc", name: "Sorcerer", agility: 10, dodge: sorc.dodge, skills: { Sorcery: 14 }, weapons: sorc.weapons, boxes: sorc.boxes, traits: sorc.traits.map((x) => ({ ...x, on: true })) });
+    E.startCombat(enc, r);
+    const ev = E.attack(enc, r, LD, { attacker: "p1", defender: "p2", weapon: "shadowbolt", band: "short" }).event;
+    assert.equal(ev.attackMods.find((m) => m.source === "defender").value, -2, "the Ward");
+    if (!ev.success) failed = { enc, ev };
+  }
+  assert.ok(failed, "found a failed cast");
+  const { enc, ev } = failed, ith = E.find(enc, "p1");
+  assert.deepEqual(ev.price, { track: "Corruption", boxes: ev.attackTotal === 18 ? 2 : 1 });
+  assert.equal(ith.tracks.Corruption, ev.price.boxes);
+  const rr = E.spendPoint(enc, r, LD, "p1", "reroll-attack", { event: ev.n }).event;
+  assert.equal(ith.tracks.Corruption, rr.price ? rr.price.boxes : 0, "the reroll replaces the first cast's Corruption");
+  E.setTrait(enc, "p2", 0, false);
+  const again = E.attack(enc, r, LD, { attacker: "p1", defender: "p2", weapon: "shadowbolt", band: "short" }).event;
+  assert.ok(!again.attackMods.some((m) => m.source === "defender"), "a broken Ward");
+  assert.ok(S.attacksCsv(enc).split("\n")[0].includes("priceTrack"));
+});

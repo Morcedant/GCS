@@ -13,7 +13,8 @@
  *   pid: string, ref: string | null, kind: "pc" | "npc", name: string, side: "party" | "foe",
  *   agility: number, dodge: number | null, skills: Record<string, number>, weapons: string[],
  *   boxes: number, injury: number, dying: boolean, dead: boolean, minor: boolean, points: number,
- *   conditions: string[], aim: { target: string } | null, dodgedRound: number, ammo: Record<string, number>, note?: string
+ *   conditions: string[], aim: { target: string } | null, dodgedRound: number, ammo: Record<string, number>, note?: string,
+ *   traits: any[], tracks: Record<string, number>
  * }} Participant
  */
 
@@ -49,7 +50,7 @@ export function addParticipant(enc, p) {
   const pid = "p" + enc.nextPid++;
   /** @type {Participant} */
   const q = { ref: null, side: p.kind === "pc" ? "party" : "foe", agility: 10, dodge: null, skills: {}, weapons: [], boxes: 3, injury: 0, dying: false, dead: false,
-    minor: false, points: 0, conditions: [], aim: null, dodgedRound: 0, ammo: {}, ...clone(p), pid };
+    minor: false, points: 0, conditions: [], aim: null, dodgedRound: 0, ammo: {}, traits: [], tracks: {}, ...clone(p), pid };
   enc.participants.push(q);
   if (enc.status === "combat") enc.order.push(pid);
   log(enc, "join", { pid, name: q.name, kind: q.kind, side: q.side });
@@ -141,18 +142,18 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   // A reroll starts from the moment before the original attack.
   if (prior) {
     const pd = find(enc, prior.defender.pid);
-    if (prior.pre) Object.assign(pd, prior.pre.defender);
+    if (prior.pre) { Object.assign(pd, prior.pre.defender); if (prior.pre.attackerTracks) a.tracks = clone(prior.pre.attackerTracks); }
     prior.superseded = true;
   }
   const n = prior ? prior.key : enc.events.filter((/** @type {any} */ e) => e.type === "attack" && !e.reroll && e.round === enc.round && e.attacker.pid === a.pid && e.defender.pid === d.pid).length;
   const key = (/** @type {string} */ kind) => `r${enc.round}|${a.pid}>${d.pid}|${n}|${kind}${opts.reroll === kind ? "|rr" : ""}`;
   const aimed = prior ? prior.aimed : (rules.actions.has("aim") && a.aim && a.aim.target === d.pid ? 1 : 0);
   const canDodge = cmd.canDodge !== false && d.dodge !== null && !isOut(d) && (prior ? prior.canDodge : d.dodgedRound !== enc.round);
-  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound } };
+  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound }, attackerTracks: clone(a.tracks || {}) };
   const res = core.resolveAttack({
     attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury },
-    defender: { id: d.pid, name: d.name, dodgeBase: d.dodge, injury: d.injury, canDodge, minor: d.minor, boxes: d.boxes, dying: d.dying, dead: d.dead },
-    weapon, band: cmd.band, mode: cmd.mode || null, aimed, ammo: cmd.ammo || null, cover: cmd.cover || "none",
+    defender: { id: d.pid, name: d.name, dodgeBase: d.dodge, injury: d.injury, canDodge, minor: d.minor, boxes: d.boxes, dying: d.dying, dead: d.dead, traits: d.traits || [] },
+    weapon, band: cmd.band, mode: cmd.mode || null, aimed, boosts: cmd.boosts || 0, ammo: cmd.ammo || null, cover: cmd.cover || "none",
     situational: (cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ source: "situation", label: m.label || "Situation", value: +m.value, scope: "situation" })),
     jamOn18: !!(weapon.firearm && rules.jamOn18),
   }, rules.hooks, (/** @type {"attack" | "dodge"} */ kind) => (prior && opts.reroll !== kind && prior[kind + "Dice"] ? prior[kind + "Dice"] : core.diceFor(enc.seed, key(kind))));
@@ -162,6 +163,7 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     if (a.aim) a.aim = null;
   }
   if (res.dodge) d.dodgedRound = enc.round;
+  if (res.price) { a.tracks = a.tracks || {}; a.tracks[res.price.track] = (a.tracks[res.price.track] || 0) + res.price.boxes; }
   if (res.hit && res.injury) Object.assign(d, { injury: res.injury.injury, dying: res.injury.dying, dead: res.injury.dead });
 
   const am = res.attackMods || [], dm = res.dodgeMods || [];
@@ -175,7 +177,8 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: res.outcome === "dodged",
-    hit: !!res.hit, outcome: res.outcome, jam: !!res.jam,
+    hit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null,
+    defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying),
     injuryBefore: pre.defender.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead, injuryResult: res.injury ? res.injury.change : null,
   });
@@ -208,6 +211,13 @@ export function spendPoint(enc, rules, core, pid, use, o = {}) {
   return { event: log(enc, "point", { pid, name: p.name, use, note: o.note || "" }) };
 }
 
+/** Switch a participant's trait on or off (e.g. a Ward that has been broken). @param {any} enc @param {string} pid @param {number} i @param {boolean} on */
+export function setTrait(enc, pid, i, on) {
+  const p = find(enc, pid); if (!p || !p.traits[i]) return { error: "No such trait." };
+  p.traits[i].on = on;
+  return { event: log(enc, "trait", { pid, name: p.name, trait: p.traits[i].label || p.traits[i].type, on }) };
+}
+
 /** A complication comes into play; accepting it earns a Legend point. @param {any} enc @param {string} pid @param {string} note */
 export function invokeComplication(enc, pid, note) {
   const p = find(enc, pid); if (!p) return { error: "Whose complication?" };
@@ -236,6 +246,11 @@ export function override(enc, rules, core, what, o) {
     else p.ammo[o.ammo] = Math.max(0, +o.rounds);
     const to = what === "injury" ? { injury: p.injury, dying: p.dying, dead: p.dead } : what === "points" ? p.points : p.ammo[o.ammo];
     return { event: log(enc, "override", { what, pid: p.pid, name: p.name, from, to, reason: o.reason || "" }) };
+  }
+  if (what === "track") {
+    const p = find(enc, o.pid); if (!p) return { error: "Who?" };
+    const from = (p.tracks || {})[o.track] || 0; p.tracks = { ...(p.tracks || {}), [o.track]: Math.max(0, +o.value) };
+    return { event: log(enc, "override", { what, pid: p.pid, name: p.name, track: o.track, from, to: p.tracks[o.track], reason: o.reason || "" }) };
   }
   if (what === "skill") {
     const p = find(enc, o.pid); if (!p) return { error: "Who?" };

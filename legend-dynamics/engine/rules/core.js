@@ -167,12 +167,26 @@ export const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ a
 /**
  * @typedef {{
  *   attacker: { id: string, name: string, skill: string, skillTarget: number, injury?: number },
- *   defender: { id: string, name: string, dodgeBase: number | null, injury?: number, canDodge: boolean, minor?: boolean, boxes?: number, dying?: boolean, dead?: boolean },
+ *   defender: { id: string, name: string, dodgeBase: number | null, injury?: number, canDodge: boolean, minor?: boolean, boxes?: number, dying?: boolean, dead?: boolean, traits?: any[] },
  *   weapon: any, band: string, mode?: { id: string, label: string, mod: number } | null, aimed?: number, ammo?: string,
- *   cover?: "none" | "partial" | "solid", situational?: Modifier[], jamOn18?: boolean
+ *   cover?: "none" | "partial" | "solid", situational?: Modifier[], jamOn18?: boolean, boosts?: number
  * }} AttackInput
  * @typedef {{ attackModifiers: ((ctx: any) => Modifier[])[], dodgeModifiers: ((ctx: any) => Modifier[])[] }} Hooks
  */
+
+/**
+ * The price some attacks carry on a failure (a setting's magic: Corruption, Strain, The Dark).
+ * Core capability; the setting's weapon data says which track and how much. @param {any} weapon @param {Roll} roll
+ * @returns {{ track: string, boxes: number } | null}
+ */
+export function priceFor(weapon, roll) {
+  const p = weapon.price;
+  if (!p || roll.success) return null;
+  return { track: p.track, boxes: roll.total === 18 && p.natural18 ? p.natural18 : p.fail };
+}
+
+/** Defender traits that are switched on (a trait with toggle: true can be switched off, e.g. a Ward once broken). @param {any} defender */
+const liveTraits = (defender) => (defender.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false);
 
 /** Published core: no extra modifiers. */
 export const NO_HOOKS = /** @type {Hooks} */ ({ attackModifiers: [], dodgeModifiers: [] });
@@ -198,12 +212,17 @@ export function resolveAttack(input, hooks, roll) {
   const atkInj = INJURY_PENALTY[attacker.injury || 0] || 0;
   if (atkInj) mods.push({ source: "injury", label: "Attacker's injury", value: atkInj, scope: "core" });
   for (const m of input.situational || []) if (m.value) mods.push(m);
+  for (const t of liveTraits(defender)) if (t.type === "attackPenalty" && t.value) mods.push({ source: "defender", label: t.label || "Defender", value: t.value, scope: "setting" });
+  const boosts = weapon.spell ? Math.max(0, Math.min(2, input.boosts || 0)) : 0; // Harder Boosts: −1 to the roll and +1 box each (core magic)
+  if (boosts) mods.push({ source: "boost", label: `Harder Boost${boosts > 1 ? " ×" + boosts : ""}`, value: -boosts, scope: "core" });
   const ctx = { ...input, range, margin: 0 };
   for (const h of hooks.attackModifiers) for (const m of h(ctx)) if (m.value) mods.push(m);
   const target = attacker.skillTarget + sumMods(mods);
   const atk = resolve(roll("attack"), target);
   out.attackMods = mods; out.base = attacker.skillTarget; out.target = target; out.attack = atk;
-  out.jam = !!input.jamOn18 && atk.total === 18;
+  out.jam = (weapon.jamOn || (input.jamOn18 ? [18] : [])).includes(atk.total);
+  out.price = priceFor(weapon, atk);
+  out.boosts = boosts;
   if (!atk.success) return { ...out, outcome: "miss", hit: false, dodgeMods: [] };
 
   /** @type {Modifier[]} */
@@ -219,7 +238,12 @@ export function resolveAttack(input, hooks, roll) {
     if (dg.success) return { ...out, dodgeMods: dmods, outcome: "dodged", hit: false };
   }
   out.dodgeMods = dmods;
-  const dmg = weaponDamage(weapon, band);
+  let dmg = weaponDamage(weapon, band);
+  // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
+  for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }
+  if (dmg && boosts) dmg = { ...dmg, boxes: dmg.boxes + boosts };
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
+  const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && dmg && dmg.boxes <= t.maxBoxes);
+  if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null };
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
 }

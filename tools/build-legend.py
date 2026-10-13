@@ -225,7 +225,7 @@ def gen(name, pack, t):
         return table(["Weapon", "Range", "Boxes on a hit", "What the injury looks like"], [r for a in p["arms"] for r in a["rows"]])
     if name == "threats-table":
         return table(["Threat", "Attack (target)", "Dodge", "Boxes", "Weapon", "Trait"],
-                     [[x["label"], ", ".join(f"{a['skill']} {a['target']}" for a in x["attacks"]), "—" if x["dodge"] is None else x["dodge"],
+                     [[x["label"], x.get("attackJoin", ", ").join(f"{a['skill']} {a['target']}" for a in x["attacks"]), "—" if x["dodge"] is None else x["dodge"],
                        x["boxesText"], x["weaponText"], f"**{x['trait']}.** {x['traitText']}"] for x in p["threats"]])
     if name == "magic":
         return magic_chapter(p["magic"], t["title"]) if p.get("magic") else ""
