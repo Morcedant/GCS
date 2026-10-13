@@ -109,6 +109,28 @@ export function weaponDamage(weapon, band) {
   return weapon.damage.any ?? null;
 }
 
+/**
+ * Core capability: accuracy traits on a weapon. The core knows how to read them; settings (or their test
+ * configurations) supply the values. Published weapons carry none.
+ * A trait: { type: "accuracy", value, bands?: string[], requires?: { aimed?: boolean, ammo?: string, mode?: string }, label? }
+ * @param {{ name?: string, traits?: any[] }} weapon @param {{ band: string, aimed?: number | boolean, ammo?: string, mode?: { id: string } | null }} ctx
+ * @returns {Modifier[]}
+ */
+export function weaponAccuracy(weapon, ctx) {
+  /** @type {Modifier[]} */
+  const out = [];
+  for (const t of weapon.traits || []) {
+    if (t.type !== "accuracy" || !t.value) continue;
+    if (t.bands && t.bands.length && !t.bands.includes(ctx.band === "melee" ? "close" : ctx.band)) continue;
+    const r = t.requires || {};
+    if (r.aimed && !ctx.aimed) continue;
+    if (r.ammo && r.ammo !== ctx.ammo) continue;
+    if (r.mode && r.mode !== ctx.mode?.id) continue;
+    out.push({ source: "weapon", label: t.label || `${weapon.name || "Weapon"} accuracy`, value: t.value, scope: "setting" });
+  }
+  return out;
+}
+
 // ---- injury ----
 
 export const INJURY_MAX = 3;
@@ -171,6 +193,7 @@ export function resolveAttack(input, hooks, roll) {
   const mods = [];
   if (range) mods.push({ source: "range", label: `Range (${band})`, value: range, scope: "core" });
   if (input.mode && input.mode.mod) mods.push({ source: "mode", label: input.mode.label, value: input.mode.mod, scope: "setting" });
+  for (const m of weaponAccuracy(weapon, input)) mods.push(m);
   if (input.cover === "partial") mods.push({ source: "cover", label: "Partial cover", value: -2, scope: "core" });
   const atkInj = INJURY_PENALTY[attacker.injury || 0] || 0;
   if (atkInj) mods.push({ source: "injury", label: "Attacker's injury", value: atkInj, scope: "core" });

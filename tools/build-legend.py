@@ -221,6 +221,12 @@ def magic_chapter(m, title=None):
 
 def gen(name, pack, t):
     p = pack
+    if name == "arms-table":
+        return table(["Weapon", "Range", "Boxes on a hit", "What the injury looks like"], [r for a in p["arms"] for r in a["rows"]])
+    if name == "threats-table":
+        return table(["Threat", "Attack (target)", "Dodge", "Boxes", "Weapon", "Trait"],
+                     [[x["label"], ", ".join(f"{a['skill']} {a['target']}" for a in x["attacks"]), "—" if x["dodge"] is None else x["dodge"],
+                       x["boxesText"], x["weaponText"], f"**{x['trait']}.** {x['traitText']}"] for x in p["threats"]])
     if name == "magic":
         return magic_chapter(p["magic"], t["title"]) if p.get("magic") else ""
     if name == "powers":
@@ -320,6 +326,8 @@ def inline_module(path, name):
     for line in imports:
         src = src.replace(line + "\n", "")
     src = re.sub(r"^export (async )?(function|const|let) ", r"\1\2 ", src, flags=re.M)
+    if re.search(r"^\s*export\b", src, flags=re.M):
+        sys.exit(f"{path}: only `export function/const/let` declarations can be inlined")
     return f"const {name} = (() => {{\n{src}\nreturn {{ {', '.join(names)} }};\n}})();"
 
 
@@ -374,6 +382,15 @@ def build(pid, docx):
     js = "const PACK = " + json.dumps({**pack, "terms": t, "theme": theme}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";"
     tpl = tpl.replace("/* PACK:START *//* PACK:END */", "/* PACK:START */" + js + "/* PACK:END */")
     tpl = tpl.replace("/* RULES:CORE */", rules_js())
+    # The Rules Lab: only for settings with a test configuration (packs/<id>/lab.json). It is never part of PACK.
+    lab = pdir / "lab.json"
+    if lab.exists():
+        mods = [inline_module(ENGINE / "rules" / "experiments.js", "LDX")] + [inline_module(f, "LAB_" + f.stem.upper()) for f in sorted((ENGINE / "lab").glob("*.js"))]
+        tpl = tpl.replace("/* RULES:LAB */", "const LAB_DATA = " + json.dumps(json.loads(lab.read_text()), ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";\n  " + "\n  ".join(mods))
+        panel = ENGINE / "lab" / "panel.html"
+        tpl = tpl.replace("<!-- RULES:LAB-PANEL -->", panel.read_text() if panel.exists() else "")
+    else:
+        tpl = tpl.replace("/* RULES:LAB */", "const LAB_DATA = null;").replace("<!-- RULES:LAB-PANEL -->", "")
     tpl = re.sub(r"<!-- GUIDE:START -->.*?<!-- GUIDE:END -->", lambda _: "<!-- GUIDE:START -->\n" + guide_html + "<!-- GUIDE:END -->", tpl, flags=re.S)
     (out / "index.html").write_text(tpl)
     g = discord_handout.game_info(pid, t["title"], t["point"], pack.get("tracks", []), pack.get("seeds", {}), t["tracksTitle"])
