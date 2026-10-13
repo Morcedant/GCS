@@ -823,6 +823,7 @@ tr.lvl-U td.target { color: var(--muted); }
       </div>
     </div>
     <div class="gm-grid" id="gm-grid"></div>
+    
   </section>
 
   <!-- Phone-only readiness bar for the Create tab -->
@@ -4777,6 +4778,28 @@ function weaponDamage(weapon, band) {
   return weapon.damage.any ?? null;
 }
 
+/**
+ * Core capability: accuracy traits on a weapon. The core knows how to read them; settings (or their test
+ * configurations) supply the values. Published weapons carry none.
+ * A trait: { type: "accuracy", value, bands?: string[], requires?: { aimed?: boolean, ammo?: string, mode?: string }, label? }
+ * @param {{ name?: string, traits?: any[] }} weapon @param {{ band: string, aimed?: number | boolean, ammo?: string, mode?: { id: string } | null }} ctx
+ * @returns {Modifier[]}
+ */
+function weaponAccuracy(weapon, ctx) {
+  /** @type {Modifier[]} */
+  const out = [];
+  for (const t of weapon.traits || []) {
+    if (t.type !== "accuracy" || !t.value) continue;
+    if (t.bands && t.bands.length && !t.bands.includes(ctx.band === "melee" ? "close" : ctx.band)) continue;
+    const r = t.requires || {};
+    if (r.aimed && !ctx.aimed) continue;
+    if (r.ammo && r.ammo !== ctx.ammo) continue;
+    if (r.mode && r.mode !== ctx.mode?.id) continue;
+    out.push({ source: "weapon", label: t.label || `${weapon.name || "Weapon"} accuracy`, value: t.value, scope: "setting" });
+  }
+  return out;
+}
+
 // ---- injury ----
 
 const INJURY_MAX = 3;
@@ -4839,6 +4862,7 @@ function resolveAttack(input, hooks, roll) {
   const mods = [];
   if (range) mods.push({ source: "range", label: `Range (${band})`, value: range, scope: "core" });
   if (input.mode && input.mode.mod) mods.push({ source: "mode", label: input.mode.label, value: input.mode.mod, scope: "setting" });
+  for (const m of weaponAccuracy(weapon, input)) mods.push(m);
   if (input.cover === "partial") mods.push({ source: "cover", label: "Partial cover", value: -2, scope: "core" });
   const atkInj = INJURY_PENALTY[attacker.injury || 0] || 0;
   if (atkInj) mods.push({ source: "injury", label: "Attacker's injury", value: atkInj, scope: "core" });
@@ -4869,8 +4893,9 @@ function resolveAttack(input, hooks, roll) {
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
 }
 
-return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, NO_HOOKS, resolveAttack };
+return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, NO_HOOKS, resolveAttack };
 })();
+  const LAB_DATA = null;
   const T = PACK.terms;
   const ATTRS = [
     ["Body", "Strength, endurance, resisting injury"],
@@ -5918,6 +5943,8 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   const STORE_CLOCKS = PACK.id + ".clocks.v1", STORE_SHIP = PACK.id + ".tracks.v1";
   let clocks = store.get(STORE_CLOCKS, []);
   if (!Array.isArray(clocks)) clocks = [];
+  const clockListeners = []; // the Rules Lab listens, to log clock changes during an encounter
+  const clockNotify = (c, from, to) => clockListeners.forEach((f) => f(c, from, to));
   const gunOf = () => ch.play.gun;
   function renderGun() {
     const g = gunOf(), def = GUNS[g.type];
@@ -6009,8 +6036,9 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   $("clk-add").onclick = () => {
     const name = $("clk-name").value.trim();
     if (!name) { $("clk-name").focus(); return; }
-    clocks.push({ id: uid(), name: name.slice(0, 60), size: +$("clk-size").value, kind: $("clk-kind").value, filled: 0 });
-    $("clk-name").value = ""; store.set(STORE_CLOCKS, clocks); renderClocks();
+    const nc = { id: uid(), name: name.slice(0, 60), size: +$("clk-size").value, kind: $("clk-kind").value, filled: 0 };
+    clocks.push(nc);
+    $("clk-name").value = ""; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0);
   };
   $("clk-copy").onclick = () => {
     if (!clocks.length) { $("clk-msg").textContent = "No clocks to copy."; return; }
@@ -6022,10 +6050,12 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   $("clk-name").addEventListener("keydown", (e) => { if (e.key === "Enter") $("clk-add").click(); });
   $("clocks").addEventListener("click", (e) => {
     const seg = e.target.closest("[data-seg]"), rm = e.target.closest("[data-rmclock]");
-    if (seg) { const c = clocks.find((x) => x.id === seg.dataset.clock); const i = +seg.dataset.seg; c.filled = c.filled === i ? i - 1 : i; }
+    let changed = null;
+    if (seg) { const c = clocks.find((x) => x.id === seg.dataset.clock); const i = +seg.dataset.seg; changed = [c, c.filled]; c.filled = c.filled === i ? i - 1 : i; }
     else if (rm) clocks = clocks.filter((x) => x.id !== rm.dataset.rmclock);
     else return;
     store.set(STORE_CLOCKS, clocks); renderClocks();
+    if (changed) clockNotify(changed[0], changed[1], changed[0].filled); else clockNotify({ id: "", name: "", kind: "", size: 0 }, 0, 0);
   });
   renderShip(); renderClocks();
 
@@ -6083,7 +6113,9 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     saveGM(); renderGM();
     return { added, updated };
   }
+  let labPanel = null; // the Rules Lab's Encounter panel, in settings that have one
   function renderGM() {
+    if (labPanel) setTimeout(labPanel.refresh, 0);
     if (gmReady) { renderLogForm(); renderSeed(); renderLogBook(); } // the log and seed panels exist once their data has loaded
     $("gm-add-saved").innerHTML = `<option value="">${roster.length ? "Choose a saved character…" : "No characters saved in this browser"}</option>` +
       roster.map((c, i) => `<option value="${i}">${esc(c.name || "Unnamed character")}</option>`).join("");
@@ -6159,6 +6191,16 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     if (!gmCrew.length) { gmSay("Add some characters first.", true); return; }
     saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog }, null, 2), PACK.id + "-characters.json", gmSay);
   };
+  // ---- Rules Lab: the Encounter panel (settings with a test configuration only; never used by the sheet) ----
+  if (LAB_DATA) {
+    labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText,
+      crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
+      calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n)])), dodge: dodge(), agility: c.attrs.Agility }; } finally { ch = saved; } },
+      clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
+        set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
+        add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
+      injuryNames: INJURY.map((x) => x[0]) });
+  }
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
   let gmClearArmed = false;
   $("gm-clear").onclick = () => {

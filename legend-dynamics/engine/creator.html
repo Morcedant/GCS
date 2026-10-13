@@ -819,6 +819,7 @@ tr.lvl-U td.target { color: var(--muted); }
       </div>
     </div>
     <div class="gm-grid" id="gm-grid"></div>
+    <!-- RULES:LAB-PANEL -->
   </section>
 
   <!-- Phone-only readiness bar for the Create tab -->
@@ -949,6 +950,7 @@ tr.lvl-U td.target { color: var(--muted); }
 (() => {
   /* PACK:START *//* PACK:END */
   /* RULES:CORE */
+  /* RULES:LAB */
   const T = PACK.terms;
   const ATTRS = [
     ["Body", "Strength, endurance, resisting injury"],
@@ -1996,6 +1998,8 @@ tr.lvl-U td.target { color: var(--muted); }
   const STORE_CLOCKS = PACK.id + ".clocks.v1", STORE_SHIP = PACK.id + ".tracks.v1";
   let clocks = store.get(STORE_CLOCKS, []);
   if (!Array.isArray(clocks)) clocks = [];
+  const clockListeners = []; // the Rules Lab listens, to log clock changes during an encounter
+  const clockNotify = (c, from, to) => clockListeners.forEach((f) => f(c, from, to));
   const gunOf = () => ch.play.gun;
   function renderGun() {
     const g = gunOf(), def = GUNS[g.type];
@@ -2087,8 +2091,9 @@ tr.lvl-U td.target { color: var(--muted); }
   $("clk-add").onclick = () => {
     const name = $("clk-name").value.trim();
     if (!name) { $("clk-name").focus(); return; }
-    clocks.push({ id: uid(), name: name.slice(0, 60), size: +$("clk-size").value, kind: $("clk-kind").value, filled: 0 });
-    $("clk-name").value = ""; store.set(STORE_CLOCKS, clocks); renderClocks();
+    const nc = { id: uid(), name: name.slice(0, 60), size: +$("clk-size").value, kind: $("clk-kind").value, filled: 0 };
+    clocks.push(nc);
+    $("clk-name").value = ""; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0);
   };
   $("clk-copy").onclick = () => {
     if (!clocks.length) { $("clk-msg").textContent = "No clocks to copy."; return; }
@@ -2100,10 +2105,12 @@ tr.lvl-U td.target { color: var(--muted); }
   $("clk-name").addEventListener("keydown", (e) => { if (e.key === "Enter") $("clk-add").click(); });
   $("clocks").addEventListener("click", (e) => {
     const seg = e.target.closest("[data-seg]"), rm = e.target.closest("[data-rmclock]");
-    if (seg) { const c = clocks.find((x) => x.id === seg.dataset.clock); const i = +seg.dataset.seg; c.filled = c.filled === i ? i - 1 : i; }
+    let changed = null;
+    if (seg) { const c = clocks.find((x) => x.id === seg.dataset.clock); const i = +seg.dataset.seg; changed = [c, c.filled]; c.filled = c.filled === i ? i - 1 : i; }
     else if (rm) clocks = clocks.filter((x) => x.id !== rm.dataset.rmclock);
     else return;
     store.set(STORE_CLOCKS, clocks); renderClocks();
+    if (changed) clockNotify(changed[0], changed[1], changed[0].filled); else clockNotify({ id: "", name: "", kind: "", size: 0 }, 0, 0);
   });
   renderShip(); renderClocks();
 
@@ -2161,7 +2168,9 @@ tr.lvl-U td.target { color: var(--muted); }
     saveGM(); renderGM();
     return { added, updated };
   }
+  let labPanel = null; // the Rules Lab's Encounter panel, in settings that have one
   function renderGM() {
+    if (labPanel) setTimeout(labPanel.refresh, 0);
     if (gmReady) { renderLogForm(); renderSeed(); renderLogBook(); } // the log and seed panels exist once their data has loaded
     $("gm-add-saved").innerHTML = `<option value="">${roster.length ? "Choose a saved character…" : "No characters saved in this browser"}</option>` +
       roster.map((c, i) => `<option value="${i}">${esc(c.name || "Unnamed character")}</option>`).join("");
@@ -2237,6 +2246,16 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!gmCrew.length) { gmSay("Add some characters first.", true); return; }
     saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog }, null, 2), PACK.id + "-characters.json", gmSay);
   };
+  // ---- Rules Lab: the Encounter panel (settings with a test configuration only; never used by the sheet) ----
+  if (LAB_DATA) {
+    labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText,
+      crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
+      calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n)])), dodge: dodge(), agility: c.attrs.Agility }; } finally { ch = saved; } },
+      clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
+        set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
+        add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
+      injuryNames: INJURY.map((x) => x[0]) });
+  }
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
   let gmClearArmed = false;
   $("gm-clear").onclick = () => {

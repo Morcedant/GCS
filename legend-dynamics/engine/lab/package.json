@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Rules Lab modules (pure); tests live in ../rules/test"
+}

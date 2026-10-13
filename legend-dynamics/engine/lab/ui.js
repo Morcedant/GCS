@@ -1,0 +1,455 @@
+// @ts-check
+/**
+ * Rules Lab: the Encounter panel in the GM tab.
+ *
+ * A thin layer over encounter.js and stats.js: it reads the form, calls the encounter functions, and draws
+ * the results. Rules live in the core (LD) and the experiments (LDX); state changes live in the encounter
+ * module; this file only connects them to the page it's mounted in (characters, clocks, storage).
+ */
+
+/**
+ * @param {{
+ *   PACK: any, T: any, LD: any, LDX: any, E: any, S: any, LAB: any, store: any, esc: (s: any) => string, signed: (n: number) => string,
+ *   saveText: (text: string, name: string, say: (m: string, err?: boolean) => void) => void,
+ *   crew: () => any[], saveCrew: () => void, renderCrew: () => void, calc: (c: any) => { skills: Record<string, number>, dodge: number, agility: number },
+ *   clocks: { list: () => any[], set: (id: string, filled: number) => void, add: (name: string, size: number, kind: string) => void, listen: (fn: (c: any, from: number, to: number) => void) => void },
+ *   injuryNames: string[]
+ * }} api
+ */
+export function mountLab(api) {
+  const { PACK, T, LD, LDX, E, S, LAB, store, esc, signed } = api;
+  const $ = (/** @type {string} */ id) => /** @type {any} */ (document.getElementById(id));
+  const KEY = PACK.id + ".lab.v1";
+  const WEAPONS = Object.fromEntries(PACK.arms.filter((/** @type {any} */ a) => !a.hazard).map((/** @type {any} */ a) => [a.id, a]));
+  const MODES = PACK.weapons.modes || []; // [id, name, rounds, only these ammo types or null, roll modifier]
+  const BAND_NAMES = { melee: "In reach", close: "Close", short: "Short", medium: "Medium", long: "Long", extreme: "Extreme" };
+
+  /** @type {{ mode: "published" | "lab", cfg: any, enc: any, history: any[], compare: any }} */
+  let lab = store.get(KEY, null) || { mode: "published", cfg: null, enc: null, history: [], compare: null };
+  const fresh = LDX.newLabConfig(PACK.id, LAB);
+  if (!lab.cfg) lab.cfg = fresh;
+  for (const [id, st] of Object.entries(fresh.experiments)) if (!lab.cfg.experiments[id]) lab.cfg.experiments[id] = st; // new experiments appear switched off
+  lab.cfg.label = LAB.label || lab.cfg.label;
+  const save = () => store.set(KEY, lab);
+  const say = (/** @type {string} */ m, /** @type {boolean} */ err = false) => { $("lab-msg").textContent = m; $("lab-msg").className = "toast" + (err ? " err" : ""); };
+
+  const rulesOf = (/** @type {any} */ cfg) => ({ ...LDX.buildRules(cfg && cfg.kind === "lab" ? cfg : LDX.PUBLISHED, WEAPONS, LAB), jamOn18: !!PACK.weapons.jamOn18 });
+  const enc = () => lab.enc;
+  // A running encounter keeps the rules it started with; otherwise the configuration chosen for the next one.
+  const rules = () => rulesOf(enc() && enc().status !== "ended" ? enc().config : lab.mode === "lab" ? lab.cfg : LDX.PUBLISHED);
+  const rulesLine = (/** @type {any} */ r) => r.kind === "lab" ? `${r.label}${r.active.length ? ": " + r.active.map((/** @type {any} */ a) => `${a.label} (${a.scope.toUpperCase()})`).join(", ") : ": no experiments on"}` : "Published rules";
+
+  // ---- rules configuration ----
+  function renderRules() {
+    document.querySelectorAll('input[name="lab-mode"]').forEach((/** @type {any} */ r) => { r.checked = r.value === lab.mode; });
+    $("lab-cfg-label").textContent = lab.cfg.label;
+    const r = rules();
+    const banner = $("lab-banner");
+    banner.className = "lab-banner " + (r.kind === "lab" ? "lab" : "published");
+    banner.textContent = r.kind === "lab" ? `Rules: LAB · ${r.active.length} experiment${r.active.length === 1 ? "" : "s"} on` : "Rules: Published";
+    banner.title = rulesLine(r);
+    $("lab-cfg-note").textContent = enc() && enc().status !== "ended"
+      ? `This encounter runs under: ${rulesLine(r)}. Changes here apply to the next encounter.`
+      : lab.mode === "lab" ? "New encounters use the test configuration." : "New encounters use the published rules. Choose the test configuration to switch experiments on.";
+    const on = lab.mode === "lab";
+    $("lab-exps").innerHTML = LDX.available(PACK.id, LAB).map((/** @type {any} */ x) => {
+      const st = lab.cfg.experiments[x.id];
+      return `<div class="exp ${st.on && on ? "on" : ""}"><label><input type="checkbox" data-exp="${x.id}" ${st.on ? "checked" : ""} ${on ? "" : "disabled"}> <b>${esc(x.label)}</b></label>
+        <span class="lab-scope ${x.scope}">${x.scope.toUpperCase()}</span><div class="small muted">${esc(x.summary)}</div>${on ? paramsEditor(x, st.params) : ""}</div>`;
+    }).join("");
+  }
+  /** @param {any} x @param {any} p */
+  function paramsEditor(x, p) {
+    if (x.id === "attackQualityDodge") {
+      return `<div class="small" style="margin-top:6px">${p.bands.map((/** @type {any} */ b, /** @type {number} */ i) => `<div class="lab-row">Succeeded by <input class="lab-mini" type="number" min="0" max="20" data-band="${i}" data-k="from" value="${b.from}" aria-label="From margin"> or more: Dodge
+        <input class="lab-mini" type="number" min="-10" max="5" data-band="${i}" data-k="mod" value="${b.mod}" aria-label="Dodge modifier"> <button type="button" class="linkish danger" data-band-rm="${i}">Remove</button></div>`).join("")}
+        <button type="button" class="linkish" data-band-add>Add a band</button></div>`;
+    }
+    if (x.id === "aim") return `<div class="small lab-row" style="margin-top:6px">Aim bonus <input class="lab-mini" type="number" min="0" max="6" data-aim value="${p.bonus}" aria-label="Aim bonus"></div>`;
+    if (x.id === "labWeaponTraits") {
+      const rows = Object.entries(p.weaponTraits || {}).flatMap(([w, ts]) => /** @type {any[]} */ (ts).map((t, i) => ({ w, i, t })));
+      return `<div class="small" style="margin-top:6px">${rows.length ? rows.map(({ w, i, t }) => `<div class="lab-row">${esc(WEAPONS[w] ? WEAPONS[w].name : w)}: <b>${signed(t.value)}</b> ${esc(t.label || "")}
+          <span class="muted">${t.bands && t.bands.length ? "at " + t.bands.join(", ") : "any range"}${t.requires && t.requires.aimed ? ", after aiming" : ""}${t.requires && t.requires.ammo ? ", with " + esc(t.requires.ammo) : ""}${t.requires && t.requires.mode ? ", " + esc(t.requires.mode) : ""}</span>
+          <button type="button" class="linkish danger" data-trait-rm="${w}|${i}">Remove</button></div>`).join("") : `<p class="muted">No traits yet: none have published values.</p>`}
+        <div class="lab-row" style="margin-top:6px">
+          <select data-tr="w" aria-label="Weapon">${Object.values(WEAPONS).map((/** @type {any} */ a) => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select>
+          <input data-tr="label" placeholder="Label, e.g. Scattershot" aria-label="Trait label" style="width:12em">
+          <input data-tr="value" type="number" class="lab-mini" value="1" min="-6" max="6" aria-label="Accuracy modifier">
+          <select data-tr="band" aria-label="At range"><option value="">any range</option>${LD.BANDS.filter((/** @type {string} */ b) => b !== "melee").map((/** @type {string} */ b) => `<option value="${b}">${BAND_NAMES[b]}</option>`).join("")}</select>
+          <label><input type="checkbox" data-tr="aimed"> after aiming</label>
+          <input data-tr="ammo" placeholder="ammunition (optional)" aria-label="Only with this ammunition" style="width:10em">
+          <button type="button" class="linkish" data-tr-add>Add trait</button></div></div>`;
+    }
+    return "";
+  }
+  document.addEventListener("change", (e) => {
+    const t = /** @type {any} */ (e.target);
+    if (!t.closest || !t.closest("#lab-rules")) return;
+    if (t.name === "lab-mode") lab.mode = t.value;
+    else if (t.dataset.exp) lab.cfg.experiments[t.dataset.exp].on = t.checked;
+    else if (t.dataset.band !== undefined) lab.cfg.experiments.attackQualityDodge.params.bands[+t.dataset.band][t.dataset.k] = +t.value;
+    else if ("aim" in t.dataset) lab.cfg.experiments.aim.params.bonus = +t.value;
+    else return;
+    save(); renderRules(); renderAll();
+  });
+  $("lab-rules").addEventListener("click", (/** @type {any} */ e) => {
+    const t = e.target, P = lab.cfg.experiments;
+    if ("bandAdd" in t.dataset) P.attackQualityDodge.params.bands.push({ from: 9, mod: -4 });
+    else if (t.dataset.bandRm !== undefined) P.attackQualityDodge.params.bands.splice(+t.dataset.bandRm, 1);
+    else if (t.dataset.traitRm) { const [w, i] = t.dataset.traitRm.split("|"); P.labWeaponTraits.params.weaponTraits[w].splice(+i, 1); if (!P.labWeaponTraits.params.weaponTraits[w].length) delete P.labWeaponTraits.params.weaponTraits[w]; }
+    else if ("trAdd" in t.dataset) {
+      const box = t.closest(".lab-row"), v = (/** @type {string} */ k) => box.querySelector(`[data-tr="${k}"]`);
+      const trait = { type: "accuracy", value: +v("value").value, label: v("label").value.trim() || "Accuracy", bands: v("band").value ? [v("band").value] : [], requires: {} };
+      if (v("aimed").checked) trait.requires.aimed = true;
+      if (v("ammo").value.trim()) trait.requires.ammo = v("ammo").value.trim();
+      if (!trait.value) return;
+      (P.labWeaponTraits.params.weaponTraits[v("w").value] ||= []).push(trait);
+    } else return;
+    save(); renderRules();
+  });
+
+  // ---- encounter setup ----
+  /** A character from the GM's cards, as a participant. @param {any} c */
+  function fromCharacter(c) {
+    const k = api.calc(c), gun = c.play && c.play.gun;
+    const weapons = ["fists", ...Object.values(WEAPONS).filter((/** @type {any} */ a) => a.id !== "fists" && (c.equipment[a.id] || (gun && a.ammo && a.ammo === gun.type))).map((/** @type {any} */ a) => a.id)];
+    const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo };
+  }
+  /** A threat from the setting's data. @param {any} t @param {string} name */
+  function fromThreat(t, name) {
+    const skills = Object.fromEntries(t.attacks.map((/** @type {any} */ a) => [a.skill, a.target]));
+    const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
+    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, dodge: t.dodge, skills, weapons: t.weapons,
+      boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}` };
+  }
+  function ensureEnc() {
+    if (enc() && enc().status !== "ended") return enc();
+    lab.enc = E.newEncounter({ name: $("lab-name").value.trim(), setting: PACK.id, baseline: LD.CORE_BASELINE,
+      config: lab.mode === "lab" ? lab.cfg : LDX.PUBLISHED, seed: $("lab-seed").value.trim() || null });
+    lab.compare = null;
+    return lab.enc;
+  }
+  $("lab-new").onclick = () => {
+    if (enc() && enc().status === "combat" && !confirm("Start a new encounter? The current one is kept in this browser's lab history.")) return;
+    if (enc() && enc().status !== "setup") lab.history = [enc(), ...lab.history].slice(0, 20);
+    lab.enc = null; ensureEnc(); save(); renderAll(); say("New encounter. Add characters and opponents.");
+  };
+  $("lab-add-pc").onchange = (/** @type {any} */ e) => {
+    const c = api.crew().find((x) => x.id === e.target.value); e.target.value = "";
+    if (!c) return;
+    const en = ensureEnc();
+    if (en.participants.some((/** @type {any} */ p) => p.ref === c.id)) { say(`${c.name} is already in the encounter.`, true); return; }
+    E.addParticipant(en, fromCharacter(c)); save(); renderAll();
+  };
+  $("lab-add-threat").onchange = (/** @type {any} */ e) => {
+    const t = PACK.threats.find((/** @type {any} */ x) => x.id === e.target.value); e.target.value = "";
+    if (!t) return;
+    const en = ensureEnc(), n = Math.max(1, Math.min(12, +$("lab-add-n").value || 1));
+    const have = en.participants.filter((/** @type {any} */ p) => p.name.startsWith(t.name)).length;
+    for (let i = 0; i < n; i++) E.addParticipant(en, fromThreat(t, n > 1 || have ? `${t.name} ${have + i + 1}` : t.name));
+    save(); renderAll();
+  };
+  $("lab-ah-add").onclick = () => {
+    const name = $("lab-ah-name").value.trim(); if (!name) { $("lab-ah-name").focus(); return; }
+    const w = WEAPONS[$("lab-ah-weapon").value], minor = $("lab-ah-minor").checked;
+    E.addParticipant(ensureEnc(), { kind: "npc", name, side: "foe", agility: +$("lab-ah-agi").value, dodge: +$("lab-ah-dodge").value, skills: { [w.skill]: +$("lab-ah-skill").value },
+      weapons: [w.id], boxes: minor ? 1 : +$("lab-ah-boxes").value, minor, ammo: w.ammo ? { [w.ammo]: PACK.weapons.items[w.ammo][1] } : {} });
+    $("lab-ah-name").value = ""; save(); renderAll();
+  };
+
+  // A character card edited above (injury, points) wins over the encounter's copy; the change is logged.
+  function pullFromCards() {
+    const en = enc(); if (!en || en.status === "ended") return;
+    for (const p of en.participants) {
+      if (p.kind !== "pc" || !p.ref) continue;
+      const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
+      if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
+      if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
+    }
+  }
+  // And the encounter writes its results back to the cards.
+  function pushToCards() {
+    const en = enc(); if (!en) return;
+    let changed = false;
+    for (const p of en.participants) {
+      if (p.kind !== "pc" || !p.ref) continue;
+      const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
+      c.play.injury = Math.min(3, p.injury); c.play.dying = p.dying; c.play.duty = p.points;
+      if (c.play.gun && p.ammo[c.play.gun.type] !== undefined) c.play.gun.rounds = p.ammo[c.play.gun.type];
+      changed = true;
+    }
+    if (changed) { api.saveCrew(); api.renderCrew(); }
+  }
+
+  // ---- people ----
+  function renderPeople() {
+    const en = enc(), crew = api.crew();
+    $("lab-add-pc").innerHTML = `<option value="">${crew.length ? "Choose…" : "Add characters to the GM view first"}</option>` + crew.map((c) => `<option value="${esc(c.id)}">${esc(c.name || "Unnamed")}</option>`).join("");
+    $("lab-add-threat").innerHTML = `<option value="">Choose…</option>` + PACK.threats.map((/** @type {any} */ t) => `<option value="${t.id}">${esc(t.label)}</option>`).join("");
+    $("lab-ah-weapon").innerHTML = Object.values(WEAPONS).map((/** @type {any} */ a) => `<option value="${a.id}">${esc(a.name)} (${esc(a.skill)})</option>`).join("");
+    if (!en) { $("lab-people").innerHTML = `<p class="small muted">No encounter yet.</p>`; return; }
+    if (document.activeElement !== $("lab-name")) $("lab-name").value = en.name;
+    if (document.activeElement !== $("lab-seed")) $("lab-seed").value = en.seed ?? "";
+    const act = E.active(en), list = en.status === "setup" ? en.participants : en.order.map((/** @type {string} */ pid) => E.find(en, pid));
+    $("lab-people").innerHTML = list.length ? list.map((/** @type {any} */ p) => {
+      const out = E.isOut(p), inj = Math.min(p.injury, 3);
+      return `<div class="lab-p ${act && act.pid === p.pid ? "active" : ""} ${out ? "out" : ""}">
+        <span class="lab-side">${p.side === "party" ? "Party" : "Foe"}</span>
+        <span class="who"><b>${esc(p.name)}${p.minor ? " <span class='small muted'>(minor)</span>" : ""}</b>
+          <span class="small muted">Dodge ${p.dodge ?? "—"} · Agility ${p.agilityEstimated ? "~" : ""}${p.agility}${Object.keys(p.skills).length ? " · " + Object.entries(p.skills).filter(([k]) => p.kind === "npc" || /Shooting|Melee|Brawling|Athletics/.test(k)).map(([k, v]) => `${k} ${v}`).join(", ") : ""}</span></span>
+        <span class="btn-row">${en.status === "combat" ? `<button class="linkish" data-up="${p.pid}" aria-label="Move ${esc(p.name)} up the turn order">▲</button><button class="linkish" data-down="${p.pid}" aria-label="Move ${esc(p.name)} down">▼</button>` : ""}
+          <button class="linkish danger" data-rm="${p.pid}" aria-label="Remove ${esc(p.name)}">×</button></span>
+        <span class="meta small"><span class="boxes">${Array.from({ length: p.boxes }, (_, i) => `<button class="box ${i < p.injury ? "on" : ""}" data-inj="${p.pid}" data-i="${i + 1}" aria-label="${esc(p.name)} box ${i + 1}"></button>`).join("")}</span>
+          ${p.dead ? "<b style='color:var(--bad)'>Dead</b>" : p.dying ? "<b style='color:var(--bad)'>Dying</b>" : out ? "<b>Down</b>" : esc(api.injuryNames[inj] || "")}
+          ${p.kind === "pc" ? ` · ${esc(T.point)} <button class="linkish" data-pt="${p.pid}" data-d="-1" aria-label="${esc(p.name)}: one ${esc(T.point)} point fewer">−</button><b>${p.points}</b><button class="linkish" data-pt="${p.pid}" data-d="1" aria-label="${esc(p.name)}: one ${esc(T.point)} point more">+</button>` : ""}
+          ${Object.entries(p.ammo).map(([k, v]) => ` · ${esc(PACK.weapons.items[k] ? PACK.weapons.items[k][0] : k)} ${v}/${PACK.weapons.items[k] ? PACK.weapons.items[k][1] : "?"}`).join("")}
+          ${p.aim ? ` · <b>aiming at ${esc((E.find(en, p.aim.target) || {}).name || "?")}</b>` : ""}
+          ${p.conditions.map((/** @type {string} */ c) => ` · <button class="linkish" data-cond-rm="${p.pid}" data-c="${esc(c)}" title="Remove">${esc(c)} ×</button>`).join("")}
+          ${p.note ? `<br><span class="muted">${esc(p.note)}</span>` : ""}</span></div>`;
+    }).join("") : `<p class="small muted">Add characters and opponents.</p>`;
+    $("lab-start").hidden = en.status !== "setup";
+    $("lab-next").hidden = $("lab-end").hidden = en.status !== "combat";
+    $("lab-round").textContent = en.status === "combat" ? `Round ${en.round} · ${act ? act.name + "'s turn" : ""}` : en.status === "ended" ? "Encounter ended." : `${en.participants.length} in the encounter`;
+  }
+  $("lab-people").addEventListener("click", (/** @type {any} */ e) => {
+    const t = e.target.closest("button"); const en = enc(); if (!t || !en) return;
+    const d = t.dataset;
+    if (d.rm) E.removeParticipant(en, d.rm);
+    else if (d.up || d.down) E.moveInOrder(en, d.up || d.down, d.up ? -1 : 1);
+    else if (d.inj) { const p = E.find(en, d.inj), i = +d.i; E.override(en, rules(), LD, "injury", { pid: p.pid, injury: p.injury === i ? i - 1 : i, dying: false, dead: false, reason: "GM set injury" }); }
+    else if (d.pt) { const p = E.find(en, d.pt); E.override(en, rules(), LD, "points", { pid: p.pid, points: p.points + +d.d, reason: "GM adjusted points" }); }
+    else if (d.condRm) E.setCondition(en, d.condRm, d.c, false);
+    else return;
+    pushToCards(); save(); renderAll();
+  });
+  $("lab-start").onclick = () => {
+    const en = enc(); if (!en || en.participants.length < 2) { say("Add at least two participants.", true); return; }
+    en.name = $("lab-name").value.trim() || en.name;
+    E.startCombat(en, rules()); save(); renderAll(); say(`Combat started under: ${rulesLine(rules())}.`);
+  };
+  $("lab-next").onclick = () => { E.nextTurn(enc()); save(); renderAll(); };
+  $("lab-end").onclick = () => {
+    const en = enc(); E.endEncounter(en, S.summarize(en));
+    lab.history = [en, ...lab.history.filter((/** @type {any} */ h) => h.id !== en.id)].slice(0, 20);
+    pushToCards(); save(); renderAll(); say("Encounter ended. Its summary is below, and it's kept in this browser's lab history.");
+  };
+
+  // ---- actions ----
+  const pickActor = () => { const en = enc(); return en ? E.find(en, $("lab-actor").value) : null; };
+  function renderAction() {
+    const en = enc(), wrap = $("lab-act-wrap");
+    wrap.hidden = !en || en.status !== "combat";
+    if (wrap.hidden) return;
+    const r = rules(), act = E.active(en);
+    const turnKey = `${en.id}.${en.round}.${en.turn}`; // a new turn (or encounter) starts with whoever's turn it is
+    const prevActor = $("lab-actor").dataset.turn === turnKey ? $("lab-actor").value : act && act.pid;
+    $("lab-actor").innerHTML = en.order.map((/** @type {string} */ pid) => { const p = E.find(en, pid); return `<option value="${pid}">${esc(p.name)}${act && act.pid === pid ? " (turn)" : ""}</option>`; }).join("");
+    $("lab-actor").value = prevActor; $("lab-actor").dataset.turn = turnKey;
+    const a = pickActor();
+    const actions = [["attack", "Attack"], ...(r.actions.has("aim") ? [["aim", "Aim"]] : []), ["point", `Spend a ${T.point} point`], ["complication", "Complication comes into play"], ["condition", "Add a condition"], ["note", "Note"]];
+    const pa = $("lab-action").value;
+    $("lab-action").innerHTML = actions.map(([v, n]) => `<option value="${v}">${esc(n)}</option>`).join("");
+    $("lab-action").value = actions.some(([v]) => v === pa) ? pa : "attack";
+    const action = $("lab-action").value, pt = $("lab-target").dataset.actor === (a && a.pid) ? $("lab-target").value : null;
+    const targets = en.participants.filter((/** @type {any} */ p) => a && p.pid !== a.pid && !p.dead);
+    $("lab-target").innerHTML = targets.map((/** @type {any} */ p) => `<option value="${p.pid}">${esc(p.name)}${E.isOut(p) ? " (down)" : ""}</option>`).join("");
+    if (targets.some((/** @type {any} */ p) => p.pid === pt)) $("lab-target").value = pt;
+    else { const foe = targets.find((/** @type {any} */ p) => a && p.side !== a.side && !E.isOut(p)); if (foe) $("lab-target").value = foe.pid; }
+    $("lab-target").dataset.actor = a ? a.pid : "";
+    $("lab-target").closest(".field").hidden = !["attack", "aim"].includes(action);
+    $("lab-atk-row").hidden = action !== "attack";
+    $("lab-text-row").hidden = !["point", "complication", "condition", "note"].includes(action);
+    $("lab-text-label").textContent = { point: "What for (a small preparation, or other)", complication: "What happens", condition: "Condition", note: "Note" }[action] || "";
+    if (action === "attack" && a) {
+      const pw = $("lab-weapon").value;
+      $("lab-weapon").innerHTML = a.weapons.filter((/** @type {string} */ w) => r.weapons[w]).map((/** @type {string} */ w) => `<option value="${w}">${esc(r.weapons[w].name)}</option>`).join("");
+      if (a.weapons.includes(pw)) $("lab-weapon").value = pw;
+      const w = r.weapons[$("lab-weapon").value];
+      const bands = w && w.reach === "melee" ? ["melee"] : LD.BANDS;
+      const pb = $("lab-band").dataset.weapon === (w && w.id) ? $("lab-band").value : null; // a new weapon starts at its natural range
+      $("lab-band").dataset.weapon = w ? w.id : "";
+      $("lab-band").innerHTML = bands.map((/** @type {string} */ b) => { const m = w ? LD.rangeModifier(w, b) : 0; return `<option value="${b}" ${m === null ? "disabled" : ""}>${BAND_NAMES[b]}${m ? " (" + signed(m) + ")" : m === null ? " (out of range)" : ""}</option>`; }).join("");
+      $("lab-band").value = pb && bands.includes(pb) && (!w || LD.rangeModifier(w, pb) !== null) ? pb : bands.includes("close") ? "close" : bands[0];
+      const modes = w && w.ammo ? MODES.filter((/** @type {any} */ m) => !m[3] || m[3].includes(w.ammo)) : [];
+      $("lab-mode-wrap").hidden = !modes.length;
+      $("lab-fmode").innerHTML = modes.map((/** @type {any} */ m) => `<option value="${m[0]}">${esc(m[1])} (${m[2]} ${m[2] > 1 ? esc(T.ammo || "rounds") : esc(T.ammoOne || "round")}${m[4] ? ", " + signed(m[4]) : ""})</option>`).join("");
+      const ammoList = (w && LAB.ammo && LAB.ammo[w.id]) || [];
+      $("lab-ammo-wrap").hidden = !ammoList.length;
+      $("lab-ammo").innerHTML = ammoList.map((/** @type {string} */ x) => `<option>${esc(x)}</option>`).join("");
+      const base = w ? a.skills[w.skill] : undefined;
+      if ($("lab-skill").dataset.for !== `${a.pid}|${w && w.id}`) { $("lab-skill").value = base ?? ""; $("lab-skill").dataset.for = `${a.pid}|${w && w.id}`; }
+      $("lab-skill").previousElementSibling.textContent = w ? `${w.skill} target` : "Skill target";
+      const d = E.find(en, $("lab-target").value);
+      $("lab-candodge").disabled = !d || d.dodge === null || d.dodgedRound === en.round;
+      $("lab-candodge").parentElement.title = d && d.dodgedRound === en.round ? "Already tried to Dodge this round" : "";
+    }
+  }
+  $("lab-act-wrap").addEventListener("change", (/** @type {any} */ e) => { if (["lab-actor", "lab-action", "lab-target", "lab-weapon"].includes(e.target.id)) renderAction(); });
+  $("lab-go").onclick = () => {
+    const en = enc(), r = rules(), a = pickActor(), action = $("lab-action").value, text = $("lab-text").value.trim();
+    if (!en || !a) return;
+    let res;
+    if (action === "attack") {
+      const w = r.weapons[$("lab-weapon").value], mode = MODES.find((/** @type {any} */ m) => m[0] === $("lab-fmode").value && !$("lab-mode-wrap").hidden);
+      const skill = $("lab-skill").value === "" ? undefined : +$("lab-skill").value;
+      res = E.attack(en, r, LD, {
+        attacker: a.pid, defender: $("lab-target").value, weapon: w && w.id, band: $("lab-band").value,
+        mode: mode ? { id: mode[0], label: mode[1], mod: mode[4] || 0, cost: mode[2] } : null, ammo: $("lab-ammo-wrap").hidden ? null : $("lab-ammo").value,
+        cover: $("lab-cover").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
+        canDodge: $("lab-candodge").checked && !$("lab-candodge").disabled, skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
+      if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
+    } else if (action === "aim") res = E.aim(en, r, a.pid, $("lab-target").value);
+    else if (action === "point") res = E.spendPoint(en, r, LD, a.pid, "prep", { note: text });
+    else if (action === "complication") res = E.invokeComplication(en, a.pid, text);
+    else if (action === "condition") res = E.setCondition(en, a.pid, text, true);
+    else if (action === "note") res = E.note(en, text);
+    if (res.error) { say(res.error, true); return; }
+    if (action !== "attack") $("lab-text").value = "";
+    $("lab-sit").value = 0; $("lab-sit-label").value = "";
+    pushToCards(); save(); renderAll();
+    if (res.event && res.event.type === "attack") showResult(res.event.n); else { $("lab-result").innerHTML = ""; say(logText(res.event)); }
+  };
+
+  // ---- the calculation, shown in full ----
+  const diceText = (/** @type {number[]} */ d) => `(${d.join(" + ")})`;
+  /** @param {any} ev */
+  function calcText(ev) {
+    const L = [], r = ev.rules;
+    L.push(`<span class="${r.kind === "lab" ? "x" : ""}">Rules: ${esc(r.kind === "lab" ? r.label + (r.active.length ? ": " + r.active.map((/** @type {any} */ a) => `${a.id} (${a.scope.toUpperCase()})`).join(", ") : ": no experiments") : "Published")}</span>`);
+    L.push(`${esc(ev.attacker.name)} → ${esc(ev.defender.name)} · ${esc(ev.weapon.name)}${ev.ammo ? ", " + esc(ev.ammo) : ""} · ${BAND_NAMES[ev.band] || ev.band}${ev.reroll ? ` · <span class="x">${esc(T.point)} reroll of the ${ev.reroll}</span>` : ""}`);
+    if (!ev.attackDice) { L.push(`<span class="bad">${esc(ev.outcome)}</span>`); return L.join("\n"); }
+    L.push("", `${esc(ev.skill)}: ${ev.base}`);
+    for (const m of ev.attackMods) L.push(`${esc(m.label)}: ${signed(m.value)}${m.scope === "experiment" ? ' <span class="x">[experiment]</span>' : ""}`);
+    L.push(`Final attack target: <b>${ev.target}</b>`, "", `Attack roll: <b>${ev.attackTotal}</b> ${diceText(ev.attackDice)}${ev.auto ? ` · natural ${ev.attackTotal}: automatic ${ev.auto}` : ""}`);
+    if (!ev.success) { L.push(`Failed by ${-ev.margin}`, `<span class="bad">Miss</span>`); }
+    else {
+      L.push(`Succeeded by ${ev.margin}`);
+      if (ev.dodgeDice) {
+        L.push("");
+        for (const m of ev.dodgeMods) L.push(`${esc(m.label)}: ${signed(m.value)}${m.scope === "experiment" ? ' <span class="x">[experiment]</span>' : ""}`);
+        L.push(`Defender Dodge: ${ev.dodgeBase}`, `Effective Dodge: <b>${ev.effectiveDodge}</b>`, "", `Dodge roll: <b>${ev.dodgeTotal}</b> ${diceText(ev.dodgeDice)}`);
+        L.push(ev.dodged ? `<span class="bad">Dodged: no hit</span>` : `<span class="ok">Dodge failed: Hit</span>`);
+      } else L.push(`No Dodge (${ev.canDodge ? "none possible" : "the target can't Dodge now"})`, `<span class="ok">Hit</span>`);
+    }
+    if (ev.hit) {
+      L.push("", ev.damage ? `${esc(ev.weapon.name)} at ${BAND_NAMES[ev.band] || ev.band}: ${ev.damage} box${ev.damage > 1 ? "es" : ""}${ev.dyingWeapon ? ", and Dying" : ""}${ev.reduced ? ` (−1, a ${esc(T.point)} point)` : ""}` : "No effect at this range");
+      if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
+    }
+    if (ev.jam) L.push(`<span class="bad">Natural 18: the gun jams. Clearing it takes an action.</span>`);
+    if (ev.overridden) L.push(`<span class="x">GM override applied.</span>`);
+    return L.join("\n");
+  }
+  /** @param {number} n */
+  function showResult(n) {
+    const en = enc(), ev = en && en.events.find((/** @type {any} */ e) => e.n === n);
+    if (!ev) { $("lab-result").innerHTML = ""; return; }
+    const a = E.find(en, ev.attacker.pid), d = E.find(en, ev.defender.pid), live = !ev.superseded && en.status === "combat";
+    const btns = [];
+    if (live && !ev.reroll && a && a.kind === "pc" && a.points > 0 && ev.attackDice) btns.push(`<button class="btn" data-fx="reroll-attack">${esc(a.name)}: reroll the attack (${esc(T.point)})</button>`);
+    if (live && !ev.reroll && d && d.kind === "pc" && d.points > 0 && ev.dodgeDice) btns.push(`<button class="btn" data-fx="reroll-dodge">${esc(d.name)}: reroll the Dodge (${esc(T.point)})</button>`);
+    if (live && d && d.kind === "pc" && d.points > 0 && ev.hit && ev.damage && !ev.reduced) btns.push(`<button class="btn" data-fx="reduce">${esc(d.name)}: one box fewer (${esc(T.point)})</button>`);
+    if (live && ev.attackDice) btns.push(`<button class="btn" data-fx="${ev.hit ? "miss" : "hit"}">GM: make it a ${ev.hit ? "miss" : "hit"}</button>`);
+    $("lab-result").innerHTML = `<div class="lab-calc" data-ev="${ev.n}">${calcText(ev)}</div>${btns.length ? `<div class="btn-row" style="margin-top:8px">${btns.join("")}</div>` : ""}`;
+  }
+  $("lab-result").addEventListener("click", (/** @type {any} */ e) => {
+    const b = e.target.closest("[data-fx]"), en = enc(); if (!b || !en) return;
+    const n = +$("lab-result").querySelector("[data-ev]").dataset.ev, ev = en.events.find((/** @type {any} */ x) => x.n === n), fx = b.dataset.fx;
+    let res;
+    if (fx === "hit" || fx === "miss") res = E.override(en, rules(), LD, "outcome", { event: n, hit: fx === "hit", reason: "GM ruling" });
+    else res = E.spendPoint(en, rules(), LD, fx === "reroll-dodge" || fx === "reduce" ? ev.defender.pid : ev.attacker.pid, fx, { event: n });
+    if (res.error) { say(res.error, true); return; }
+    pushToCards(); save(); renderAll();
+    showResult(res.event && res.event.type === "attack" ? res.event.n : n);
+  });
+
+  // ---- clocks: the page's own clocks ----
+  function renderClocksHere() {
+    const list = api.clocks.list();
+    $("lab-clocks").innerHTML = list.length ? list.map((c) => `<span class="lab-clock"><b>${esc(c.name)}</b> <span class="small muted">${c.kind}</span>
+      <button class="btn" data-clk="${c.id}" data-d="-1" aria-label="${esc(c.name)}: one segment less">−</button><span class="num">${c.filled}/${c.size}</span><button class="btn" data-clk="${c.id}" data-d="1" aria-label="${esc(c.name)}: one segment more">+</button></span>`).join("")
+      : `<p class="small muted">No clocks running.</p>`;
+  }
+  $("lab-clocks").addEventListener("click", (/** @type {any} */ e) => {
+    const b = e.target.closest("[data-clk]"); if (!b) return;
+    const c = api.clocks.list().find((x) => x.id === b.dataset.clk); if (!c) return;
+    api.clocks.set(c.id, Math.max(0, Math.min(c.size, c.filled + +b.dataset.d)));
+  });
+  $("lab-clk-add").onclick = () => { const n = $("lab-clk-name").value.trim(); if (!n) { $("lab-clk-name").focus(); return; } api.clocks.add(n, +$("lab-clk-size").value, $("lab-clk-kind").value); $("lab-clk-name").value = ""; };
+  api.clocks.listen((c, from, to) => { const en = enc(); if (en && en.status !== "ended" && from !== to) { E.clockChange(en, c, from, to); save(); renderLog(); renderSummary(); } renderClocksHere(); });
+
+  // ---- log, summary, export, rerun ----
+  /** @param {any} e */
+  function logText(e) {
+    if (!e) return "";
+    const pt = esc(T.point);
+    switch (e.type) {
+      case "join": return `${esc(e.name)} joins (${e.side === "party" ? "party" : "foe"}).`;
+      case "leave": return `${esc(e.name)} leaves.`;
+      case "start": return `Combat starts. Rules: ${esc(e.rules.kind === "lab" ? e.rules.label + " (" + (e.rules.active.map((/** @type {any} */ a) => `${a.id}, ${a.scope}`).join("; ") || "no experiments") + ")" : "Published")}${e.seed !== null && e.seed !== undefined ? ` · seed ${esc(e.seed)}` : ""}. Order: ${esc(e.order.join(", "))}.`;
+      case "round": return `<b>Round ${e.round}.</b>`;
+      case "turn": return `${esc(e.name || "")}'s turn.`;
+      case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
+      case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
+      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; Dodge ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : "hit, no effect") : e.outcome)}</b>${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}`;
+      case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation" }[e.use] || e.use)}${e.note ? ` (${esc(e.note)})` : ""}.`;
+      case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
+      case "condition": return `${esc(e.name)}: ${e.on ? "+" : "−"} ${esc(e.condition)}.`;
+      case "override": return `<span style="color:var(--warn)">GM override</span>: ${esc(e.what)}${e.name ? " for " + esc(e.name) : ""} ${esc(JSON.stringify(e.from))} → ${esc(JSON.stringify(e.to))}${e.reason ? ` (${esc(e.reason)})` : ""}.`;
+      case "clock": return e.from < 0 ? `Clock “${esc(e.name)}” started (${e.kind}, ${e.size} segments).` : `Clock “${esc(e.name)}”: ${e.from} → ${e.to} of ${e.size}.`;
+      case "note": return `Note: ${esc(e.text)}`;
+      case "end": return `<b>Encounter ends.</b>`;
+      default: return esc(e.type);
+    }
+  }
+  function renderLog() {
+    const en = enc();
+    $("lab-log").innerHTML = en && en.events.length ? [...en.events].reverse().map((/** @type {any} */ e) => `<li${e.type === "attack" ? ` data-show="${e.n}" style="cursor:pointer" title="Show the calculation"` : ""}><span class="t">R${e.round}</span> ${logText(e)}</li>`).join("") : `<li class="muted" style="list-style:none">Nothing yet.</li>`;
+  }
+  $("lab-log").addEventListener("click", (/** @type {any} */ e) => { const li = e.target.closest("[data-show]"); if (li) { showResult(+li.dataset.show); $("lab-result").scrollIntoView({ block: "nearest" }); } });
+
+  const pct = (/** @type {number | null} */ v) => (v === null ? "—" : v + "%");
+  const TILES = [["rounds", "Rounds"], ["attacks", "Attacks"], ["attackSuccessRate", "Attack success", pct], ["dodgeNegatedRate", "Successes dodged", pct], ["finalHitRate", "Final hit rate", pct],
+    ["averageMargin", "Average margin"], ["dodgeSuccessRate", "Dodge success", pct], ["averageEffectiveDodge", "Average effective Dodge"], ["damageFrequency", "Damage frequency", pct],
+    ["injuryFrequency", "Injury frequency", pct], ["boxesMarked", "Boxes marked"], ["incapacitated", "Down"], ["dead", "Dead"], ["pointsSpent", "Points spent"], ["complications", "Complications"], ["overrides", "GM overrides"], ["jams", "Jams"]];
+  /** @param {any} s */
+  const tiles = (s) => `<div class="lab-sum">${TILES.map(([k, n, f]) => `<div><span>${n}</span><b>${f ? f(s[k]) : s[k] ?? "—"}</b></div>`).join("")}</div>`;
+  function renderSummary() {
+    const en = enc();
+    if (!en || !en.events.some((/** @type {any} */ e) => e.type === "start")) { $("lab-summary").innerHTML = `<p class="small muted">Start an encounter to see its numbers.</p>`; $("lab-compare").innerHTML = ""; return; }
+    const s = S.summarize(en);
+    $("lab-summary").innerHTML = `<p class="small"><b>${esc(s.name)}</b> · ${esc(s.rules.kind === "lab" ? `${s.rules.label}: ${s.rules.experiments.join(", ") || "no experiments"}` : "Published rules")}${s.seed !== null && s.seed !== undefined ? ` · seed ${esc(s.seed)}` : " · random dice"}${en.status === "ended" ? "" : " · so far"}</p>${tiles(s)}
+      ${Object.keys(s.byWeapon).length ? `<div class="lab-scroll"><table class="lab-cmp" style="margin-top:8px"><tr><th>Weapon</th><th>Attacks</th><th>Succeeded</th><th>Dodged</th><th>Hits</th><th>Boxes</th></tr>${Object.values(s.byWeapon).map((/** @type {any} */ w) => `<tr><td>${esc(w.name)}</td><td>${w.attacks}</td><td>${w.successes}</td><td>${w.dodged}</td><td>${w.hits}</td><td>${w.boxes}</td></tr>`).join("")}</table></div>` : ""}`;
+    renderCompare();
+  }
+  function renderCompare() {
+    const c = lab.compare, en = enc();
+    if (!c || !en || c.of !== en.id) { $("lab-compare").innerHTML = ""; return; }
+    const a = S.summarize(en), b = c.summary;
+    const row = (/** @type {string} */ k, /** @type {string} */ n) => { const x = a[k], y = b[k], d = typeof x === "number" && typeof y === "number" ? Math.round((y - x) * 100) / 100 : null; return `<tr><td>${n}</td><td>${x ?? "—"}</td><td>${y ?? "—"}</td><td>${d === null ? "" : d > 0 ? "+" + d : d}</td></tr>`; };
+    $("lab-compare").innerHTML = `<p class="small" style="margin:8px 0 4px"><b>Rerun under:</b> ${esc(c.label)}</p><div class="lab-scroll"><table class="lab-cmp"><tr><th></th><th>This run</th><th>Rerun</th><th>Change</th></tr>
+      ${TILES.map(([k, n]) => row(k, n)).join("")}</table></div><p class="small muted">Same seed, same declared actions; ${c.skipped} action${c.skipped === 1 ? "" : "s"} couldn't happen in the rerun. ${a.seed === null || a.seed === undefined ? "<b>This encounter used random dice, so the rerun's dice differ: set a seed for a fair comparison.</b>" : ""} Point spends and overrides aren't replayed.</p>`;
+  }
+  $("lab-rerun").onclick = () => {
+    const en = enc(); if (!en) return;
+    const cfg = $("lab-rerun-cfg").value === "lab" ? lab.cfg : LDX.PUBLISHED;
+    const res = E.replay(en, rulesOf(cfg), LD, cfg);
+    if (res.error) { say(res.error, true); return; }
+    lab.compare = { of: en.id, label: cfg.kind === "lab" ? rulesLine(rulesOf(cfg)) : "Published rules", summary: S.summarize(res.encounter), skipped: res.encounter.skipped, encounter: res.encounter };
+    save(); renderCompare();
+  };
+  const slug = (/** @type {string} */ s) => s.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLowerCase() || "encounter";
+  $("lab-export").onclick = () => {
+    const en = enc(); if (!en) { say("Nothing to save yet.", true); return; }
+    api.saveText(JSON.stringify({ format: PACK.id + "-lab-session", version: 1, baseline: LD.CORE_BASELINE, setting: PACK.id, testConfiguration: LAB.label,
+      encounter: en, summary: S.summarize(en), comparison: lab.compare && lab.compare.of === en.id ? lab.compare : null, history: lab.history.map((h) => S.summarize(h)) }, null, 2), slug(en.name) + "-lab.json", say);
+  };
+  $("lab-csv").onclick = () => { const en = enc(); if (!en) { say("Nothing to save yet.", true); return; } api.saveText(S.attacksCsv(en), slug(en.name) + "-attacks.csv", say); };
+  $("lab-name").addEventListener("change", () => { const en = enc(); if (en) { en.name = $("lab-name").value.trim() || en.name; save(); renderSummary(); } });
+  $("lab-seed").addEventListener("change", () => { const en = enc(); if (en && en.status === "setup") { en.seed = $("lab-seed").value.trim() || null; save(); } else if (en) { $("lab-seed").value = en.seed ?? ""; say("The seed is fixed once combat starts. Start a new encounter to change it.", true); } });
+
+  function renderAll() { pullFromCards(); renderRules(); renderPeople(); renderAction(); renderClocksHere(); renderLog(); renderSummary(); }
+  renderAll();
+  return { refresh: renderAll };
+}
