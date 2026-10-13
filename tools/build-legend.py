@@ -311,6 +311,22 @@ def pack_sections(md):
     return {parts[i]: parts[i + 1].strip() for i in range(1, len(parts), 2)}
 
 
+def inline_module(path, name):
+    """An ES module from engine/rules or engine/lab as a plain script constant: `const name = (() => { ...; return {exports} })();`.
+    The pages stay single files; the same module files are imported directly by the tests."""
+    src = path.read_text().replace("// @ts-check\n", "")
+    names = re.findall(r"^export (?:async )?(?:function|const|let) (\w+)", src, flags=re.M)
+    imports = re.findall(r"^import .*$", src, flags=re.M)
+    for line in imports:
+        src = src.replace(line + "\n", "")
+    src = re.sub(r"^export (async )?(function|const|let) ", r"\1\2 ", src, flags=re.M)
+    return f"const {name} = (() => {{\n{src}\nreturn {{ {', '.join(names)} }};\n}})();"
+
+
+def rules_js():
+    return inline_module(ENGINE / "rules" / "core.js", "LD")
+
+
 def guide_md(pack, t, sections):
     core = (ENGINE / "core.md").read_text()
     core = re.sub(r"\{\{PACK:(\w+)\}\}", lambda m: sections.get(m.group(1), ""), core)
@@ -357,6 +373,7 @@ def build(pid, docx):
         sys.exit(f"{pid}: unfilled tokens {left}")
     js = "const PACK = " + json.dumps({**pack, "terms": t, "theme": theme}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";"
     tpl = tpl.replace("/* PACK:START *//* PACK:END */", "/* PACK:START */" + js + "/* PACK:END */")
+    tpl = tpl.replace("/* RULES:CORE */", rules_js())
     tpl = re.sub(r"<!-- GUIDE:START -->.*?<!-- GUIDE:END -->", lambda _: "<!-- GUIDE:START -->\n" + guide_html + "<!-- GUIDE:END -->", tpl, flags=re.S)
     (out / "index.html").write_text(tpl)
     g = discord_handout.game_info(pid, t["title"], t["point"], pack.get("tracks", []), pack.get("seeds", {}), t["tracksTitle"])

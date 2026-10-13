@@ -1,0 +1,7 @@
+{
+  "name": "legend-dynamics-rules",
+  "private": true,
+  "type": "module",
+  "description": "Legend Dynamics core rules, experiments and the rules lab: pure modules, inlined into each creator page by tools/build-legend.py",
+  "scripts": { "test": "node --test test/*.test.mjs" }
+}
