@@ -6,23 +6,7 @@ Dust & Damnation is not tied to a single place or year. Set your game in any ter
 
 <!-- SECTION:weapons -->
 
-| Weapon | Range | Boxes on a hit | What the injury looks like |
-|---|---|---|---|
-| Punch, kick, headbutt | Melee | 1 | Bruises, a split lip, cracked ribs |
-| Club, bottle, pistol-whip | Melee | 1 | A concussion or a broken finger |
-| Knife or hatchet | Melee; Close thrown | 1 | A cut or stab wound that bleeds |
-| Arrow | Short | 1 | A cut or stab wound that bleeds |
-| Axe, saber or bowie knife used to kill | Melee | 2 | A deep wound or a broken bone |
-| Claws and fangs of a monster | Melee | 2 | Torn flesh |
-| Derringer | Close (out of range beyond Short) | 2 | A gunshot wound |
-| Revolver | Close | 2 | A gunshot wound |
-| Rifle | Medium | 2 | A gunshot wound |
-| Shotgun, at Close range | Close | 3, and Dying | A ruinous wound |
-| Shotgun, at Short range | Short (no effect beyond) | 1 | Scattered pellets |
-| Buffalo rifle | Long | 3, and Dying | A ruinous wound |
-| Dynamite | Close (thrown) | 1 to everyone nearby, 3 and Dying at the centre | Blast and burns; Dodge means diving clear |
-| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
-| Fire | — | 1 each round in the flames | Burns |
+{{GEN:arms-table}}
 
 **Period ranges.** These are 1870s guns: a revolver is a close-quarters weapon, and most gunfights happen across a room or a street. A derringer is useless beyond Short range, and a shotgun beyond it does nothing.
 
@@ -103,18 +87,7 @@ Every monster has a weakness, and finding it is often the whole job. **Occult** 
 
 Opponents use the same rules as the characters. **Minor opponents** (hired guns, a mob, shambling dead) have **one box**: any hit that gets through takes them out of the fight.
 
-| Threat | Attack (target) | Dodge | Boxes | Weapon | Trait |
-|---|---|---|---|---|---|
-| Hired gun (minor) | Shooting 11 | 7 | 1 | Revolver | **Numbers.** Two or three of them; they flee when half are down. |
-| Outlaw | Shooting 13, Brawling 11 | 9 | 3 | Revolver, rifle | **Quick draw.** +2 on the first shot of a fight. |
-| Zombie (minor, many) | Brawling 10 | 4 | 1 each | Bite (1) | **Horde.** Only a headshot (−2) or fire puts one down; other hits just knock it over. Its bite infects. |
-| Ghoul | Brawling 12, Stealth 13 | 8 | 3 | Claws (2) | **Corpse-eater.** Drags the fallen away; flees daylight and fire. |
-| Werewolf | Brawling 14, Tracking 14 | 10 | 4 | Claws and fangs (2) | **Relentless.** Ignores the Wounded penalty; only silver marks more than 1 box at a time. |
-| Vampire | Brawling 13, Persuasion 15 | 10 | 4 | Fangs (2) | **Mesmerize.** Once per scene, a Presence contest makes one victim obey a simple command. |
-| Ghost | Will 14 | — | — | Terror, cold | **Haunting.** Can't be hurt; once per scene, everyone present rolls Will or flees in terror. |
-| Witch | Occult 14, Deception 13 | 8 | 3 | Curses | **Hex.** Once per round, a target with a link to her rolls Will or marks a box. |
-| Hellhound | Brawling 14 | 10 | 3 | Burning jaws (2) | **Hunter.** Always finds its quarry; holy water drives it off. |
-| Revenant gunslinger | Shooting 15 | 11 | 4 | Two revolvers | **Undying.** Rises at the next midnight unless its grave is salted and burned. |
+{{GEN:threats-table}}
 
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
 

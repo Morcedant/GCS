@@ -2449,5 +2449,584 @@
    "charms": "Practitioners carry as many ready charms as their Occult training allows: Trained 2, Specialty 3, Expert 4. A Sorcerer carries only one.",
    "price": "<p>Magic worked openly can mark The Dark too, and the Order of the Iron Cross hunts known practitioners.</p>"
   }
- }
+ },
+ "arms": [
+  {
+   "id": "fists",
+   "name": "Fists",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "rows": [
+    [
+     "Punch, kick, headbutt",
+     "Melee",
+     "1",
+     "Bruises, a split lip, cracked ribs"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "club",
+   "name": "Club",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "rows": [
+    [
+     "Club, bottle, pistol-whip",
+     "Melee",
+     "1",
+     "A concussion or a broken finger"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "knife",
+   "name": "Knife or hatchet",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "rows": [
+    [
+     "Knife or hatchet",
+     "Melee; Close thrown",
+     "1",
+     "A cut or stab wound that bleeds"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "knife-thrown",
+   "name": "Knife or hatchet, thrown",
+   "skill": "Athletics",
+   "band": "close",
+   "maxBand": "close",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "rows": [],
+   "traits": []
+  },
+  {
+   "id": "bow",
+   "name": "Bow",
+   "skill": "Shooting",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "rows": [
+    [
+     "Arrow",
+     "Short",
+     "1",
+     "A cut or stab wound that bleeds"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "blade",
+   "name": "Axe, saber or bowie knife",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "rows": [
+    [
+     "Axe, saber or bowie knife used to kill",
+     "Melee",
+     "2",
+     "A deep wound or a broken bone"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "claws",
+   "name": "Claws and fangs",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "rows": [
+    [
+     "Claws and fangs of a monster",
+     "Melee",
+     "2",
+     "Torn flesh"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "derringer",
+   "name": "Derringer",
+   "skill": "Shooting",
+   "band": "close",
+   "maxBand": "short",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "derringer",
+   "firearm": true,
+   "rows": [
+    [
+     "Derringer",
+     "Close (out of range beyond Short)",
+     "2",
+     "A gunshot wound"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "revolver",
+   "name": "Revolver",
+   "skill": "Shooting",
+   "band": "close",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "revolver",
+   "firearm": true,
+   "rows": [
+    [
+     "Revolver",
+     "Close",
+     "2",
+     "A gunshot wound"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "rifle",
+   "name": "Rifle",
+   "skill": "Shooting",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "rifle",
+   "firearm": true,
+   "rows": [
+    [
+     "Rifle",
+     "Medium",
+     "2",
+     "A gunshot wound"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "shotgun",
+   "name": "Shotgun",
+   "skill": "Shooting",
+   "band": "short",
+   "maxBand": "short",
+   "damage": {
+    "close": {
+     "boxes": 3,
+     "dying": true
+    },
+    "short": {
+     "boxes": 1
+    }
+   },
+   "ammo": "shotgun",
+   "firearm": true,
+   "rows": [
+    [
+     "Shotgun, at Close range",
+     "Close",
+     "3, and Dying",
+     "A ruinous wound"
+    ],
+    [
+     "Shotgun, at Short range",
+     "Short (no effect beyond)",
+     "1",
+     "Scattered pellets"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "buffalo",
+   "name": "Buffalo rifle",
+   "skill": "Shooting",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "firearm": true,
+   "rows": [
+    [
+     "Buffalo rifle",
+     "Long",
+     "3, and Dying",
+     "A ruinous wound"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "dynamite",
+   "name": "Dynamite",
+   "skill": "Athletics",
+   "band": "close",
+   "maxBand": "close",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "traits": [
+    {
+     "type": "area",
+     "note": "1 box to everyone nearby; 3 and Dying at the centre. Dodge means diving clear."
+    }
+   ],
+   "rows": [
+    [
+     "Dynamite",
+     "Close (thrown)",
+     "1 to everyone nearby, 3 and Dying at the centre",
+     "Blast and burns; Dodge means diving clear"
+    ]
+   ]
+  },
+  {
+   "id": "fall",
+   "hazard": true,
+   "rows": [
+    [
+     "Fall",
+     "—",
+     "1 for a bad fall, 2 for a long one",
+     "A sprain or a fracture"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "fire",
+   "hazard": true,
+   "rows": [
+    [
+     "Fire",
+     "—",
+     "1 each round in the flames",
+     "Burns"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "bite",
+   "name": "Bite",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "rows": [],
+   "traits": []
+  },
+  {
+   "id": "fangs",
+   "name": "Fangs",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "rows": [],
+   "traits": []
+  },
+  {
+   "id": "jaws",
+   "name": "Burning jaws",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "rows": [],
+   "traits": []
+  }
+ ],
+ "threats": [
+  {
+   "id": "hired-gun",
+   "name": "Hired gun",
+   "label": "Hired gun (minor)",
+   "minor": true,
+   "attacks": [
+    {
+     "skill": "Shooting",
+     "target": 11
+    }
+   ],
+   "dodge": 7,
+   "boxes": 1,
+   "boxesText": "1",
+   "weaponText": "Revolver",
+   "weapons": [
+    "revolver"
+   ],
+   "trait": "Numbers",
+   "traitText": "Two or three of them; they flee when half are down."
+  },
+  {
+   "id": "outlaw",
+   "name": "Outlaw",
+   "label": "Outlaw",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Shooting",
+     "target": 13
+    },
+    {
+     "skill": "Brawling",
+     "target": 11
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Revolver, rifle",
+   "weapons": [
+    "revolver",
+    "rifle"
+   ],
+   "trait": "Quick draw",
+   "traitText": "+2 on the first shot of a fight."
+  },
+  {
+   "id": "zombie",
+   "name": "Zombie",
+   "label": "Zombie (minor, many)",
+   "minor": true,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 10
+    }
+   ],
+   "dodge": 4,
+   "boxes": 1,
+   "boxesText": "1 each",
+   "weaponText": "Bite (1)",
+   "weapons": [
+    "bite"
+   ],
+   "trait": "Horde",
+   "traitText": "Only a headshot (−2) or fire puts one down; other hits just knock it over. Its bite infects."
+  },
+  {
+   "id": "ghoul",
+   "name": "Ghoul",
+   "label": "Ghoul",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 12
+    },
+    {
+     "skill": "Stealth",
+     "target": 13
+    }
+   ],
+   "dodge": 8,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Claws (2)",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Corpse-eater",
+   "traitText": "Drags the fallen away; flees daylight and fire."
+  },
+  {
+   "id": "werewolf",
+   "name": "Werewolf",
+   "label": "Werewolf",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 14
+    },
+    {
+     "skill": "Tracking",
+     "target": 14
+    }
+   ],
+   "dodge": 10,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Claws and fangs (2)",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Relentless",
+   "traitText": "Ignores the Wounded penalty; only silver marks more than 1 box at a time."
+  },
+  {
+   "id": "vampire",
+   "name": "Vampire",
+   "label": "Vampire",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 13
+    },
+    {
+     "skill": "Persuasion",
+     "target": 15
+    }
+   ],
+   "dodge": 10,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Fangs (2)",
+   "weapons": [
+    "fangs"
+   ],
+   "trait": "Mesmerize",
+   "traitText": "Once per scene, a Presence contest makes one victim obey a simple command."
+  },
+  {
+   "id": "ghost",
+   "name": "Ghost",
+   "label": "Ghost",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Will",
+     "target": 14
+    }
+   ],
+   "dodge": null,
+   "boxes": null,
+   "boxesText": "—",
+   "weaponText": "Terror, cold",
+   "weapons": [],
+   "trait": "Haunting",
+   "traitText": "Can't be hurt; once per scene, everyone present rolls Will or flees in terror."
+  },
+  {
+   "id": "witch",
+   "name": "Witch",
+   "label": "Witch",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Occult",
+     "target": 14
+    },
+    {
+     "skill": "Deception",
+     "target": 13
+    }
+   ],
+   "dodge": 8,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Curses",
+   "weapons": [],
+   "trait": "Hex",
+   "traitText": "Once per round, a target with a link to her rolls Will or marks a box."
+  },
+  {
+   "id": "hellhound",
+   "name": "Hellhound",
+   "label": "Hellhound",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 14
+    }
+   ],
+   "dodge": 10,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Burning jaws (2)",
+   "weapons": [
+    "jaws"
+   ],
+   "trait": "Hunter",
+   "traitText": "Always finds its quarry; holy water drives it off."
+  },
+  {
+   "id": "revenant-gunslinger",
+   "name": "Revenant gunslinger",
+   "label": "Revenant gunslinger",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Shooting",
+     "target": 15
+    }
+   ],
+   "dodge": 11,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Two revolvers",
+   "weapons": [
+    "revolver"
+   ],
+   "trait": "Undying",
+   "traitText": "Rises at the next midnight unless its grave is salted and burned."
+  }
+ ]
 }
