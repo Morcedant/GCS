@@ -5107,7 +5107,9 @@ tr.lvl-U td.target { color: var(--muted); }
         const ok = picked.length === sl.length && new Set(picked).size === picked.length;
         return [[ok, ok ? `${POWERS.plural}: ${sl.map((cl, i) => `${powerDef(ch.powers[i])[1]} ${cl}`).join(", ")}` : `${POWERS.plural}: ${picked.length} of ${sl.length} chosen`]]; })() : []),
       ...(edgeN("power") ? (() => { const n = boostsSpent(), want = edgeN("power"), sl = powerSlots(), iv = sl.filter((c) => classIndex(c) >= 3).length;
-        return [[n === want, n === want ? `Stronger Power: ${want} assigned` : `Stronger Power: assign ${n} of ${want} in step 4`],
+        return [[n === want, n === want ? `Stronger Power: ${want} Edge${want === 1 ? "" : "s"} placed on your powers`
+          : n < want ? `Stronger Power: ${n} of ${want} Edges placed; put the other ${want - n} on a power in step 4`
+          : `Stronger Power: ${n} Classes placed, but you bought ${want} Edge${want === 1 ? "" : "s"}; take ${n - want} off in step 4, or buy more in step 2`],
           ...(iv ? [[!!ch.gmClass4 && iv === 1 && sl.every((c) => classIndex(c) <= 3), iv > 1 ? "Only one Class IV power at creation" : sl.some((c) => classIndex(c) > 3) ? "Nothing above Class IV at creation" : ch.gmClass4 ? "Class IV approved by the GM" : "Class IV needs the GM's approval: tick the box in step 4"]] : [])]; })() : []),
       ...(STATUSES ? [[!!ch.status, ch.status ? `${PACK.statusLabel || "Status"}: ${STATUSES.find((x) => x[0] === ch.status)[1]}` : `Choose your ${(PACK.statusLabel || "status").toLowerCase()}`]] : []),
       [!!ch.comp.trigger.trim(), "Complication trigger agreed with the GM"],
@@ -5202,6 +5204,10 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   function render() {
+    // A slot given up for pure sorcery can't carry Stronger Power: clear it, and move one Edge to the Cantrips slot if there's room.
+    if (POWERS && SPELLS && isPure()) { const sl = powerSlots(), k = sl.findIndex((_, j) => ch.powers[j] === SPELLS.power); let moved = false;
+      sl.forEach((_, i) => { if (i !== k && (ch.powerBoost[i] || 0) > 0) { ch.powerBoost[i] = 0; moved = true; } });
+      if (moved && k >= 0) { ch.powerBoost[k] = Math.min(edgeN("power"), Math.max(ch.powerBoost[k] || 0, 1)); save(); } }
     $("custom-role-wrap").hidden = $("custom-group-wrap").hidden = !ch.customRole;
     if (ch.customRole) { if ($("f-customrole").value !== ch.dept) $("f-customrole").value = ch.dept; $("f-customgroup").value = ch.customGroup || PACK.groups[0].id; }
     $("role-skills").textContent = (ROLE_SKILLS[ch.dept] || []).length ? `Core skills: ${ROLE_SKILLS[ch.dept].join(", ")} (marked Trained for you)` : "";
@@ -5492,8 +5498,12 @@ tr.lvl-U td.target { color: var(--muted); }
           [...s.options].forEach((o) => { if (o.value) o.disabled = o.value !== id && ch.powers.some((x, j) => j !== i && j < sl.length && x === o.value); });
           const givenUp = isPure() && id !== SPELLS.power;
           s.disabled = givenUp;
-          $("pw-desc-" + i).textContent = givenUp ? "Given up for pure sorcery: +" + (SPELLS.pureBonus || 2) + " cantrips." : id ? powerEffect(id, cl) : "";
-          if ($("f-pb-" + i)) $("f-pb-" + i).value = String(ch.powerBoost[i] || 0);
+          $("pw-desc-" + i).textContent = givenUp ? "Given up for pure sorcery: +" + (SPELLS.pureBonus || 2) + " cantrips."
+            : isPure() && id === SPELLS.power ? `Pure sorcery: know ${spellsKnown()} cantrips, each working at the ${SPELLS.tiers[casterTier()]} (Class ${allPowers()[0].cl}).`
+            : id ? powerEffect(id, cl) : "";
+          if ($("f-pb-" + i)) { $("f-pb-" + i).hidden = givenUp; $("f-pb-" + i).previousElementSibling.hidden = givenUp; }
+          if ($("f-pb-" + i)) { const own = ch.powerBoost[i] || 0, room = edgeN("power") - (boostsSpent() - own);
+            $("f-pb-" + i).value = String(own); [...$("f-pb-" + i).options].forEach((o) => { o.disabled = +o.value > Math.max(room, own); }); }
         });
         const n = sl.filter((_, i) => ch.powers[i]).length;
         $("powers-label").textContent = `${POWERS.plural} (${n} of ${sl.length})`;
@@ -5507,7 +5517,7 @@ tr.lvl-U td.target { color: var(--muted); }
         $("pure-label").textContent = `Pure sorcery: ${powerDef(SPELLS.power)[1]} takes all your power slots, at your best slot's Class, and each slot you give up adds ${SPELLS.pureBonus || 2} more ${SPELLS.plural.toLowerCase()}.`;
         $("f-pure").checked = !!ch.pureSorcery;
       }
-      $("pboost-note").textContent = `Stronger Power: put your ${edgeN("power")} Edge${edgeN("power") === 1 ? "" : "s"} on the powers above (${boostsSpent()} assigned). Class III is the limit, unless the GM approves one power at Class IV.`;
+      $("pboost-note").textContent = `Stronger Power: put your ${edgeN("power")} Edge${edgeN("power") === 1 ? "" : "s"} on the powers above (${boostsSpent()} of ${edgeN("power")} placed). Class III is the limit, unless the GM approves one power at Class IV.`;
       $("f-gm4").checked = !!ch.gmClass4;
       const advSig = sl.map((_, i) => ch.powers[i] || "").join(",") + "|" + ch.powersLearned.length;
       if ($("powers-adv-list").dataset.sig !== advSig) {
