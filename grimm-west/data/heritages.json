@@ -10,7 +10,6 @@
   "heritages": [
     {"id": "human", "name": "Human", "tier": 0, "adj": {},
      "desc": "Most people are human. You know the truth about the hidden world, which already sets you apart.",
-     "source": "No template",
      "core": [], "woge": null, "skills": [],
      "traits": [
        ["h-grit", "Frontier Grit", "+2 to Will against fear when facing something that shouldn't exist.", "Will", true, "Nobody Believes You", "When you tell ordinary folk what you've seen, accept being called mad, drunk or a liar."],
@@ -18,7 +17,6 @@
      ]},
     {"id": "fuchsbau", "name": "Fuchsbau", "tier": 1, "wesen": true, "adj": {"Intellect": 2, "Body": -1, "Will": -1},
      "desc": "Fox-like Wesen, clever and quick, with a long tradition of trade in herbs, remedies and harder-to-find ingredients. Other Wesen call them disreputable, and not always unfairly.",
-     "source": "Fuchsbau template: IQ +2; Bad Reputation (disreputable among Wesen). About 132 points.",
      "core": [], "skills": ["Tracking", "Riding", "Melee", "Shooting", "Gambling", "Wesen Lore"],
      "woge": {"attrs": {"Body": 1, "Agility": 1}, "dodge": 0, "traits": ["Claws mark 2 boxes", "Keen senses: track by scent and hearing"], "drawbacks": []},
      "traits": [
@@ -28,7 +26,6 @@
      ]},
     {"id": "coyotl", "name": "Coyotl", "tier": 1, "wesen": true, "adj": {"Body": 1, "Agility": 1, "Intellect": -1, "Will": -1},
      "desc": "Coyote-like Wesen of the plains and desert country who live in clans bound by old customs, and fight together like a pack.",
-     "source": "Coyotl template: DX +2, HT +1, ST +2. About 141 points.",
      "core": [], "skills": ["Brawling", "Shooting", "Tracking", "Survival"],
      "woge": {"attrs": {"Body": 1, "Agility": 1}, "dodge": 1, "traits": ["Claws mark 2 boxes", "Keen senses: track by scent and hearing", "Swift: +2 to Athletics when running"], "drawbacks": []},
      "traits": [
@@ -37,7 +34,6 @@
      ]},
     {"id": "eisbiber", "name": "Eisbiber", "tier": 1, "wesen": true, "adj": {"Intellect": 1, "Will": -1},
      "desc": "Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, and easily frightened by violence. Bullies like the Hässlich prey on them.",
-     "source": "No template; adapted from the show.",
      "core": [], "skills": ["Tinkering", "Athletics", "Persuasion", "Investigation"],
      "woge": {"attrs": {"Body": 1}, "dodge": 0, "traits": ["Teeth gnaw through wood and rope (a bite marks 1 box)", "Swimmer: holds breath for minutes; +2 to Athletics when swimming"], "drawbacks": []},
      "traits": [
@@ -46,7 +42,6 @@
      ]},
     {"id": "bauerschwein", "name": "Bauerschwein", "tier": 1, "wesen": true, "adj": {"Body": 1, "Will": 1, "Agility": -1, "Presence": -1},
      "desc": "Pig-like Wesen: stubborn, hard-working, with senses sharp even in human form, and old enemies of the Blutbaden. Their feud is settled, when it must be, by the Ehrenkampf, a ritual duel.",
-     "source": "No template; adapted from the show.",
      "core": ["Sharp senses even unwoged: you can identify people and things by smell in either form."], "skills": ["Athletics", "Brawling", "Investigation", "Survival"],
      "woge": {"attrs": {"Body": 1}, "dodge": 0, "traits": ["Tusks: a gore marks 1 box"], "drawbacks": []},
      "traits": [
@@ -55,7 +50,6 @@
      ]},
     {"id": "mauzhertz", "name": "Mauzhertz", "tier": 1, "wesen": true, "adj": {"Agility": 1, "Body": -1},
      "desc": "Mouse-like Wesen, small, quick and wary, with excellent hearing. Gentle by nature, but one pushed too far can snap.",
-     "source": "No template; adapted from the show.",
      "core": [], "skills": ["Stealth", "Athletics", "Read People", "Investigation"],
      "woge": {"attrs": {"Agility": 1}, "dodge": 1, "traits": ["Keen hearing: hear whispers through walls"], "drawbacks": []},
      "traits": [
@@ -64,7 +58,6 @@
      ]},
     {"id": "ziegevolk", "name": "Ziegevolk", "tier": 1, "wesen": true, "adj": {"Presence": 2, "Intellect": -1, "Will": -1},
      "desc": "Goat-like Wesen whose pheromones, working even in human form, make them unnaturally persuasive and unnaturally popular. A Fuchsbau remedy can protect against them.",
-     "source": "No template; adapted from the show.",
      "core": [], "skills": ["Persuasion", "Deception", "Read People", "Gambling"],
      "woge": {"attrs": {"Body": 1}, "dodge": 0, "traits": ["Horns: a butt marks 1 box"], "drawbacks": []},
      "traits": [
@@ -73,7 +66,6 @@
      ]},
     {"id": "steinadler", "name": "Steinadler", "tier": 1, "wesen": true, "adj": {"Agility": 1, "Intellect": 1, "Body": -1, "Will": -1},
      "desc": "Eagle-like Wesen with remarkable eyesight, a hunter's pride, and a taste for working alone, sometimes for hire.",
-     "source": "No template; adapted from the show.",
      "core": [], "skills": ["Shooting", "Tracking", "Stealth", "Survival"],
      "woge": {"attrs": {"Agility": 1}, "dodge": 0, "traits": ["Talons mark 2 boxes", "Eagle sight: see detail a mile away"], "drawbacks": []},
      "traits": [
@@ -82,7 +74,6 @@
      ]},
     {"id": "taniwha", "name": "Taniwha", "tier": 1, "wesen": true, "horror": true, "adj": {"Body": 1, "Presence": -1},
      "desc": "Water-dwelling Wesen from New Zealand: guardians of rivers and the people they claim, reptile-like in woge, and dangerous to anyone else. Horror campaigns only.",
-     "source": "Taniwha template (150-point): poison resistance; Dependency (human flesh, seasonal). About 157 points.",
      "core": ["Resists poison: +4 to Body against any poison.", "Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can't clear, every three days."],
      "skills": ["Athletics", "Brawling", "Survival", "Stealth"],
      "woge": {"attrs": {"Body": 1}, "dodge": 0, "traits": ["Claws mark 2 boxes", "Tough: hits of 2+ boxes mark one fewer", "Amphibious: breathes water, swims as fast as a horse runs", "Burrows through earth", "Dark sight"], "drawbacks": ["Must be submerged in water daily, or mark a box that rest can't clear, each hour", "Pounamu (greenstone) wounds mark one extra box"]},
@@ -92,7 +83,6 @@
      ]},
     {"id": "blutbad", "name": "Blutbad", "tier": 2, "wesen": true, "adj": {"Body": 1, "Agility": 1, "Intellect": -1, "Will": -1},
      "desc": "Wolf-like Wesen with keen senses and a predator's appetite; the root of the werewolf legend. Wesen who know your kind assume you hunt humans. You don't, or not anymore.",
-     "source": "Blutbaad template: DX +3, HT +2, ST +2; Loner; Enemy (Bauerschwein). About 208 points.",
      "core": ["Reputation: Eats Humans. Wesen who know your kind assume the worst."], "skills": ["Brawling", "Shooting", "Survival", "Tracking"],
      "woge": {"attrs": {"Body": 2, "Agility": 1}, "dodge": 0, "traits": ["Claws and fangs mark 2 boxes", "Keen senses: track by scent and hearing", "Dark sight", "Leaper: +2 to Athletics to jump", "Shrugs off cold"], "drawbacks": []},
      "traits": [
@@ -102,7 +92,6 @@
      ]},
     {"id": "mauvaisdentes", "name": "Mauvais Dentes", "tier": 2, "wesen": true, "adj": {"Body": 1, "Agility": 1, "Intellect": -1, "Presence": -1},
      "desc": "Sabre-toothed, panther-like Wesen, so deadly that the Royal Families have kept them as assassins. Rare, solitary, and feared even by other Wesen.",
-     "source": "Mauvais Dentes template: DX +2, HT +3, ST +3; Loner. About 213 points.",
      "core": ["Reputation: Eats Humans. Wesen who know your kind assume the worst."], "skills": ["Brawling", "Shooting", "Survival", "Tracking"],
      "woge": {"attrs": {"Body": 2, "Agility": 1}, "dodge": 0, "traits": ["Sabre teeth and claws mark 2 boxes", "Keen senses: track by scent and hearing", "Dark sight", "Leaper: +2 to Athletics to jump", "Shrugs off cold"], "drawbacks": []},
      "traits": [
@@ -111,7 +100,6 @@
      ]},
     {"id": "skalengeck", "name": "Skalengeck", "tier": 2, "wesen": true, "adj": {"Agility": 1, "Presence": -1},
      "desc": "Lizard-like Wesen, cold-eyed and hard to kill, with a poisonous bite. Common among outlaws and hired guns.",
-     "source": "Skalengeck template: no human-form changes. About 189 points.",
      "core": [], "skills": ["Shooting", "Brawling", "Wesen Lore", "Stealth"],
      "woge": {"attrs": {"Body": 2, "Agility": 1}, "dodge": 0, "traits": ["Claws mark 2 boxes", "Tough: hits of 2+ boxes mark one fewer", "Immune to poison", "Keen smell"], "drawbacks": []},
      "traits": [
@@ -120,7 +108,6 @@
      ]},
     {"id": "jagerbar", "name": "Jägerbär", "tier": 2, "wesen": true, "adj": {"Body": 2, "Agility": -1, "Intellect": -1},
      "desc": "Bear-like Wesen, enormously strong and durable. Traditional families still keep the Roh-Hatz, a coming-of-age hunt, and fight with an old Germanic weapon whose claw-like scoop disembowels.",
-     "source": "No template; adapted from the show.",
      "core": [], "skills": ["Athletics", "Brawling", "Melee", "Survival"],
      "woge": {"attrs": {"Body": 2}, "dodge": 0, "traits": ["Claws mark 2 boxes", "Tough: hits of 2+ boxes mark one fewer", "Keen smell"], "drawbacks": []},
      "traits": [
@@ -129,7 +116,6 @@
      ]},
     {"id": "naschazer", "name": "Naschazer", "tier": 2, "wesen": true, "horror": true, "adj": {"Body": 2, "Intellect": -1, "Presence": -1},
      "desc": "Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror campaigns only.",
-     "source": "Naschazer template: HT +4; Dependency and Uncontrollable Appetite (human flesh); Greed; Proud. About 197 points.",
      "core": ["Hunger (horror): each month you must eat human flesh; until you do, mark a box that rest can't clear, every day."],
      "skills": ["Brawling", "Melee", "Athletics", "Shooting"],
      "woge": {"attrs": {"Body": 2}, "dodge": 0, "traits": ["Huge strength: fists and fangs mark 2 boxes", "Tough: hits of 2+ boxes mark one fewer", "Feels no pain: ignore the Wounded penalty", "Heals fast: rest clears a box every day", "Dark sight"], "drawbacks": []},
@@ -139,7 +125,6 @@
      ]},
     {"id": "vallachi", "name": "Vallachi", "tier": 2, "wesen": true, "horror": true, "adj": {"Presence": 1, "Body": 1, "Will": -1, "Agility": -1},
      "desc": "Long-lived, handsome, vampire-like Wesen who feed on the lifeforce of others and shun the sun. Horror campaigns only.",
-     "source": "Vallachi template: Attractive; Extended Lifespan; HT +2; Dependency and Uncontrollable Appetite (lifeforce); Weakness (sunlight); Lifebane. About 223 points.",
      "core": ["Lifedrain (horror): by touch, roll Will against the victim's Body; on a success they mark a box and you clear one.", "Hunger (horror): each week you must drain lifeforce; until you do, mark a box that rest can't clear, every six hours.", "Sunlight: −2 to all rolls in direct sun, and you tire quickly.", "Lifebane: plants wilt and animals shy around you."],
      "skills": ["Persuasion", "Deception", "Stealth", "Read People"],
      "woge": {"attrs": {"Body": 2, "Agility": 1}, "dodge": 0, "traits": ["Tough: hits of 2+ boxes mark one fewer, except from a pointed wooden stake", "Keen senses", "Dark sight"], "drawbacks": []},
@@ -149,7 +134,6 @@
      ]},
     {"id": "grimm", "name": "Grimm", "tier": 2, "adj": {"Body": 1, "Agility": 1, "Presence": -2},
      "desc": "A descendant of the old hunters, the Decapitare: stronger and faster than ordinary people, able to see the Wesen hidden among us, and feared by them.",
-     "source": "Decapitare template: ST, DX, HT +1; Combat Reflexes; Detect (Wesen, Magic); Magic Resistance 7; Talent (Grimm); Reputation (Frightening Decapitare).",
      "core": ["The Sight: you see a Wesen's face when it's stirred by strong emotion.", "Grimm eyes: woged Wesen and other Grimms see them; humans don't.", "Uneasy sense: you feel when a Wesen or magic is near, with no details.", "Never freeze: you're never surprised, and +2 to Will against fear.", "Hard to bewitch: +2 to Will against magic.", "Raised on the books: Wesen Lore is always at least Trained, free.", "Grimm blood: a Hexenbiest or Zauberbiest who drinks it under a full moon loses their powers (see Grimm blood)."],
      "skills": ["Wesen Lore", "Melee", "Shooting", "Investigation", "Tracking"],
      "woge": null,
@@ -168,7 +152,6 @@
      ]},
     {"id": "incantare", "name": "Incantare", "tier": 2, "adj": {"Intellect": 1, "Will": 1, "Body": -1, "Presence": -1},
      "desc": "A human who works real magic through a Lens: a tradition and a way of seeing. The Wesen Council, the Royals and the Order of the Holy Knife all watch for people like you.",
-     "source": "Incantare template: seven Lenses (Ritual Path Magic), plus the Braucher.",
      "core": ["Rituals: roll Occult to fill a ritual clock (minor 2, significant 4, major 6 segments). Your Lens sets how.", "Charms: you can carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).", "Grimms sense your magic: +1 to notice it for each charm or potion you carry."],
      "skills": ["Occult", "Wesen Lore", "Apothecary", "Read People"],
      "woge": null,
@@ -184,7 +167,6 @@
      ]},
     {"id": "hexenbiest", "name": "Hexenbiest or Zauberbiest", "tier": 3, "wesen": true, "adj": {"Will": 1, "Presence": 1, "Body": -1, "Agility": -1},
      "desc": "Witch-like Wesen (Zauberbiest for the men), beautiful in human form and horrific in woge, with innate magic that lives in their Wesen spirit. Coven traditions bind them; Grimm blood can strip them.",
-     "source": "Hexenbiest and Zauberbiest template: Beautiful/Handsome; Sorcery 5; Ritual Adept 2; Vow (coven traditions). About 279 points.",
      "core": ["Telekinesis: in full or partial woge, roll Will to throw a person or object with your mind (1 box), seize something out of reach, or turn aside one attack (+2 Dodge).", "Innate magic: you can work rituals with Occult like an Incantare, in the Hexenbiest style: curses, potions and sendings.", "Grimm blood: drunk under a full moon, it strips your powers until the Contaminatio Ritualis restores them."],
      "skills": ["Occult", "Apothecary", "Deception", "Persuasion"],
      "woge": {"attrs": {"Body": 2, "Agility": 1}, "dodge": 0, "traits": ["Claws mark 2 boxes", "Tough: hits of 2+ boxes mark one fewer"], "drawbacks": ["Horrific: even other Wesen recoil"]},
@@ -195,7 +177,6 @@
      ]},
     {"id": "murcielago", "name": "Murcielago", "tier": 3, "wesen": true, "adj": {},
      "desc": "Bat-like Wesen with uncanny hearing and a sonic scream that drops a room full of people to their knees.",
-     "source": "Murcielago template: no human-form changes; Sonic Scream 6, Sonar. About 283 points.",
      "core": ["Sonic scream: in full woge, roll Will. Everyone nearby you choose who can hear rolls Body −2; a failure loses their next action and takes −2 for the scene. Earplugs protect. Heard in town, it marks Exposure."],
      "skills": ["Stealth", "Athletics", "Brawling", "Investigation"],
      "woge": {"attrs": {"Body": 1, "Agility": 1}, "dodge": 0, "traits": ["Claws and fangs mark 2 boxes", "Sonar: no penalty for darkness; sense the shape of a room by sound", "Keen hearing: hear heartbeats", "Swift"], "drawbacks": []},
@@ -205,7 +186,6 @@
      ]},
     {"id": "fuchsteufelwild", "name": "Fuchsteufelwild", "tier": 3, "wesen": true, "adj": {"Intellect": 2, "Body": 1, "Presence": -2, "Will": -1},
      "desc": "Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; the root of Rumpelstiltskin. Clever, spiteful, and bound by an old obsession with names and bargains.",
-     "source": "Fuchsteurfelwild template: ST +1, HT +2, IQ +3, Super Jump 5; Obsession (Guess My Name); Bully; Callous; Sadism (now a companion). About 424 points; trimmed to Tier 3.",
      "core": ["Acid talons: in full woge, claw hits mark 2 boxes and ignore Tough and armor.", "Leaper, in either form: jumps of many yards; +2 to Athletics to jump."],
      "skills": ["Brawling", "Athletics", "Deception", "Investigation"],
      "woge": {"attrs": {"Agility": 1}, "dodge": 1, "traits": ["Keen senses: track by scent and hearing", "Swift"], "drawbacks": ["Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged", "Disturbing voice"]},
