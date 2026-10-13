@@ -291,8 +291,12 @@ export function mountLab(api) {
       if ($("lab-skill").dataset.for !== `${a.pid}|${w && w.id}`) { $("lab-skill").value = base ?? ""; $("lab-skill").dataset.for = `${a.pid}|${w && w.id}`; }
       $("lab-skill").previousElementSibling.textContent = w ? `${w.skill} target` : "Skill target";
       const d = E.find(en, $("lab-target").value);
-      $("lab-candodge").disabled = !d || d.dodge === null || d.dodgedRound === en.round;
-      $("lab-candodge").parentElement.title = d && d.dodgedRound === en.round ? "Already tried to Dodge this round" : "";
+      // Never blocked: the published rule (one Dodge a round) sets the default, and the GM can allow another (logged).
+      const already = !!d && d.dodgedRound === en.round && !r.flags.has("dodgeEveryAttack");
+      const key = `${en.id}|${d && d.pid}|${en.round}|${already}`;
+      if ($("lab-candodge").dataset.key !== key) { $("lab-candodge").checked = !!d && d.dodge !== null && !already; $("lab-candodge").dataset.key = key; }
+      $("lab-candodge").disabled = !d || d.dodge === null;
+      $("lab-dodge-note").textContent = already ? `${d.name} already tried to Dodge this round (one Dodge a round in the published rules). Tick to allow another: it's logged as a GM override.` : "";
     }
   }
   $("lab-act-wrap").addEventListener("change", (/** @type {any} */ e) => { if (["lab-actor", "lab-action", "lab-target", "lab-weapon"].includes(e.target.id)) renderAction(); });
@@ -307,7 +311,7 @@ export function mountLab(api) {
         attacker: a.pid, defender: $("lab-target").value, weapon: w && w.id, band: $("lab-band").value,
         mode: mode ? { id: mode[0], label: mode[1], mod: mode[4] || 0, cost: mode[2] } : null, ammo: $("lab-ammo-wrap").hidden ? null : $("lab-ammo").value,
         cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
-        canDodge: $("lab-candodge").checked && !$("lab-candodge").disabled, skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
+        canDodge: $("lab-candodge").checked && !$("lab-candodge").disabled, allowExtraDodge: $("lab-candodge").checked, skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
     } else if (action === "aim") res = E.aim(en, r, a.pid, $("lab-target").value);
     else if (action === "point") res = E.spendPoint(en, r, LD, a.pid, "prep", { note: text });
@@ -342,14 +346,14 @@ export function mountLab(api) {
         L.push(ev.dodged ? `<span class="bad">Dodged: no hit</span>` : `<span class="ok">Dodge failed: Hit</span>`);
       } else L.push(`No Dodge (${ev.canDodge ? "none possible" : "the target can't Dodge now"})`, `<span class="ok">Hit</span>`);
     }
-    if (ev.hit) {
+    if (ev.hit && !(ev.overridden && !ev.rolledHit && !ev.damage)) {
       L.push("", !ev.damage && /marks nothing/.test(ev.outcome) ? esc(ev.outcome[0].toUpperCase() + ev.outcome.slice(1)) : ev.damage ? `${esc(ev.weapon.name)} at ${BAND_NAMES[ev.band] || ev.band}: ${ev.damage} box${ev.damage > 1 ? "es" : ""}${ev.dyingWeapon ? ", and Dying" : ""}${ev.reduced ? ` (−1, a ${esc(T.point)} point)` : ""}` : "No effect at this range");
       if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
     }
     if (ev.marginTrait) L.push(`<span class="x">${esc(ev.marginTrait)}.</span>`);
     if (ev.price) L.push(`<span class="bad">Failed cast: ${esc(ev.attacker.name)} marks ${ev.price.boxes} ${esc(ev.price.track)}.</span>`);
     if (ev.jam) L.push(`<span class="bad">Natural ${ev.attackTotal}: ${ev.weapon && WEAPONS[ev.weapon.id] && WEAPONS[ev.weapon.id].ammo ? "the weapon jams or misfires" : "the weapon fails"}. Clearing it takes an action.</span>`);
-    if (ev.overridden) L.push(`<span class="x">GM override applied.</span>`);
+    if (ev.overridden) L.push("", `<b class="x">GM ruling: ${ev.hit ? "HIT" : "MISS"}</b> (the dice said ${ev.rolledHit ? "hit" : "miss"}). ${esc(ev.defender.name)}: ${ev.injuryAfter} box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", dead" : ev.dying ? ", Dying" : ""}.`);
     return L.join("\n");
   }
   /** @param {number} n */
@@ -358,9 +362,10 @@ export function mountLab(api) {
     if (!ev) { $("lab-result").innerHTML = ""; return; }
     const a = E.find(en, ev.attacker.pid), d = E.find(en, ev.defender.pid), live = !ev.superseded && en.status === "combat";
     const btns = [];
-    if (live && !ev.reroll && a && a.kind === "pc" && a.points > 0 && ev.attackDice) btns.push(`<button class="btn" data-fx="reroll-attack">${esc(a.name)}: reroll the attack (${esc(T.point)})</button>`);
-    if (live && !ev.reroll && d && d.kind === "pc" && d.points > 0 && ev.dodgeDice) btns.push(`<button class="btn" data-fx="reroll-dodge">${esc(d.name)}: reroll the Dodge (${esc(T.point)})</button>`);
-    if (live && d && d.kind === "pc" && d.points > 0 && ev.hit && ev.damage && !ev.reduced) btns.push(`<button class="btn" data-fx="reduce">${esc(d.name)}: one box fewer (${esc(T.point)})</button>`);
+    const ruled = !!ev.overridden;
+    if (live && !ruled && !ev.reroll && a && a.kind === "pc" && a.points > 0 && ev.attackDice) btns.push(`<button class="btn" data-fx="reroll-attack">${esc(a.name)}: reroll the attack (${esc(T.point)})</button>`);
+    if (live && !ruled && !ev.reroll && d && d.kind === "pc" && d.points > 0 && ev.dodgeDice) btns.push(`<button class="btn" data-fx="reroll-dodge">${esc(d.name)}: reroll the Dodge (${esc(T.point)})</button>`);
+    if (live && !ruled && d && d.kind === "pc" && d.points > 0 && ev.hit && ev.damage && !ev.reduced) btns.push(`<button class="btn" data-fx="reduce">${esc(d.name)}: one box fewer (${esc(T.point)})</button>`);
     if (live && ev.attackDice) btns.push(`<button class="btn" data-fx="${ev.hit ? "miss" : "hit"}">GM: make it a ${ev.hit ? "miss" : "hit"}</button>`);
     $("lab-result").innerHTML = `<div class="lab-calc" data-ev="${ev.n}">${calcText(ev)}</div>${btns.length ? `<div class="btn-row" style="margin-top:8px">${btns.join("")}</div>` : ""}`;
   }
@@ -403,12 +408,21 @@ export function mountLab(api) {
       case "turn": return `${esc(e.name || "")}'s turn.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; Dodge ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}`;
+      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; Dodge ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}`;
       case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation" }[e.use] || e.use)}${e.note ? ` (${esc(e.note)})` : ""}.`;
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
       case "trait": return `${esc(e.name)}: ${esc(e.trait)} ${e.on ? "on" : "off"}.`;
       case "condition": return `${esc(e.name)}: ${e.on ? "+" : "−"} ${esc(e.condition)}.`;
-      case "override": return `<span style="color:var(--warn)">GM override</span>: ${esc(e.what)}${e.name ? " for " + esc(e.name) : ""} ${esc(JSON.stringify(e.from))} → ${esc(JSON.stringify(e.to))}${e.reason ? ` (${esc(e.reason)})` : ""}.`;
+      case "override": {
+        const gm = `<span style="color:var(--warn)">GM</span>`;
+        if (e.what === "outcome") return `${gm}: ${esc(e.attacker || "")}'s attack on ${esc(e.name || "")} is a <b>${e.to.hit ? "hit" : "miss"}</b> (the dice said ${e.from.hit ? "hit" : "miss"}); injury ${e.from.injury} → ${e.to.injury}.`;
+        if (e.what === "dodge") return `${gm}: ${esc(e.name)} may Dodge again this round.`;
+        if (e.what === "injury") return `${gm}: ${esc(e.name)}'s injury ${e.from.injury} → ${e.to.injury}${e.to.dead ? ", dead" : e.to.dying ? ", Dying" : ""}${e.reason ? ` (${esc(e.reason)})` : ""}.`;
+        if (e.what === "points") return `${gm}: ${esc(e.name)}'s ${pt} ${e.from} → ${e.to}${e.reason ? ` (${esc(e.reason)})` : ""}.`;
+        if (e.what === "track") return `${gm}: ${esc(e.name)}'s ${esc(e.track)} ${e.from} → ${e.to}${e.reason ? ` (${esc(e.reason)})` : ""}.`;
+        if (e.what === "skill") return `${gm}: ${esc(e.name)}'s ${esc(e.skill)} target set to ${e.to} for an attack (sheet: ${e.from ?? "—"}).`;
+        return `${gm} override: ${esc(e.what)}${e.name ? " for " + esc(e.name) : ""}${e.reason ? ` (${esc(e.reason)})` : ""}.`;
+      }
       case "clock": return e.from < 0 ? `Clock “${esc(e.name)}” started (${e.kind}, ${e.size} segments).` : `Clock “${esc(e.name)}”: ${e.from} → ${e.to} of ${e.size}.`;
       case "note": return `Note: ${esc(e.text)}`;
       case "end": return `<b>Encounter ends.</b>`;

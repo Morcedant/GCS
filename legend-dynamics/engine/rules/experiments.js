@@ -39,6 +39,12 @@ export const EXPERIMENTS = [
     attackModifiers: (/** @type {any} */ ctx, /** @type {any} */ p) => (ctx.aimed ? [{ source: "aim", label: "Aim", value: p.bonus, scope: "experiment" }] : []),
   },
   {
+    id: "dodgeEveryAttack", scope: "core", label: "Dodge every attack",
+    summary: "A target may try to Dodge every attack against it, not just once a round.",
+    params: {},
+    flags: ["dodgeEveryAttack"],
+  },
+  {
     id: "labWeaponTraits", scope: "setting", label: "Test weapon traits",
     summary: "Apply the accuracy traits in this setting's test configuration (by range, ammunition, fire mode, or after aiming).",
     params: { weaponTraits: {} }, // filled from the setting's test configuration; edited in the lab and logged with every attack
@@ -74,7 +80,7 @@ export function available(setting, lab) {
  * @param {any} config @param {Record<string, any>} weapons @param {any} [lab]
  */
 export function buildRules(config, weapons, lab) {
-  const rules = { config: config.id, label: config.label, kind: config.kind, hooks: { attackModifiers: [], dodgeModifiers: [] }, actions: new Set(), weapons, active: [] };
+  const rules = { config: config.id, label: config.label, kind: config.kind, hooks: { attackModifiers: [], dodgeModifiers: [] }, actions: new Set(), flags: new Set(), weapons, active: [] };
   if (config.kind !== "lab") return rules;
   for (const x of available(config.setting, lab)) {
     const st = config.experiments[x.id];
@@ -83,6 +89,7 @@ export function buildRules(config, weapons, lab) {
     if (x.attackModifiers) rules.hooks.attackModifiers.push((/** @type {any} */ ctx) => x.attackModifiers(ctx, p));
     if (x.dodgeModifiers) rules.hooks.dodgeModifiers.push((/** @type {any} */ ctx) => x.dodgeModifiers(ctx, p));
     for (const a of x.actions || []) rules.actions.add(a);
+    for (const f of x.flags || []) rules.flags.add(f);
     if (x.weapons) rules.weapons = x.weapons(rules.weapons, lab, p);
     rules.active.push({ id: x.id, scope: x.scope, label: x.label, params: p });
   }

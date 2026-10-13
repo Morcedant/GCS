@@ -141,3 +141,37 @@ test("The Shattered Crown: Corruption on a failed cast, undone by a reroll; Ward
   assert.ok(!again.attackMods.some((m) => m.source === "defender"), "a broken Ward");
   assert.ok(S.attacksCsv(enc).split("\n")[0].includes("priceTrack"));
 });
+
+test("Dodge: one a round by default; the GM may allow another (logged); the experiment allows every attack", () => {
+  const twice = (rules, cmdExtra) => {
+    const enc = setup(rules === published ? X.PUBLISHED : labCfg, 11);
+    E.startCombat(enc, rules);
+    const res = [];
+    for (let i = 0; i < 8 && res.filter((e) => e.success).length < 2; i++) res.push(E.attack(enc, rules, LD, { attacker: "p2", defender: "p1", weapon: "revolver", band: "close", ...cmdExtra }).event);
+    return { enc, ok: res.filter((e) => e.success) };
+  };
+  let t = twice(published, {});
+  assert.ok(t.ok[0].dodgeDice); assert.equal(t.ok[1].dodgeDice, null, "published: one Dodge a round");
+  t = twice(published, { allowExtraDodge: true });
+  assert.ok(t.ok[1].dodgeDice, "the GM allowed another");
+  assert.ok(t.enc.events.some((e) => e.type === "override" && e.what === "dodge"));
+  const cfg = X.newLabConfig("western", lab); cfg.experiments.dodgeEveryAttack.on = true;
+  const every = rulesFor(cfg);
+  const enc = setup(cfg, 11); E.startCombat(enc, every);
+  const ok = [];
+  for (let i = 0; i < 8 && ok.length < 2; i++) { const e = E.attack(enc, every, LD, { attacker: "p2", defender: "p1", weapon: "revolver", band: "close" }).event; if (e.success) ok.push(e); }
+  assert.ok(ok[1].dodgeDice, "experiment: Dodge every attack");
+  assert.ok(!enc.events.some((e) => e.type === "override"), "no override needed under the experiment");
+});
+
+test("a GM ruling of miss undoes the injury and is shown as the ruling", () => {
+  const enc = setup(X.PUBLISHED, 3); E.startCombat(enc, published);
+  let ev;
+  for (let i = 0; i < 12; i++) { ev = E.attack(enc, published, LD, { attacker: "p2", defender: "p1", weapon: "revolver", band: "close", canDodge: false }).event; if (ev.hit) break; }
+  assert.ok(ev.hit);
+  E.override(enc, published, LD, "outcome", { event: ev.n, hit: false });
+  assert.equal(ev.hit, false); assert.equal(ev.rolledHit, true); assert.equal(ev.overridden, true);
+  assert.equal(E.find(enc, "p1").injury, ev.injuryBefore);
+  E.override(enc, published, LD, "outcome", { event: ev.n, hit: true });
+  assert.equal(ev.overridden, false, "ruling it back to what the dice said clears the override");
+});

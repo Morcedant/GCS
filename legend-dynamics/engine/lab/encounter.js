@@ -148,7 +148,10 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   const n = prior ? prior.key : enc.events.filter((/** @type {any} */ e) => e.type === "attack" && !e.reroll && e.round === enc.round && e.attacker.pid === a.pid && e.defender.pid === d.pid).length;
   const key = (/** @type {string} */ kind) => `r${enc.round}|${a.pid}>${d.pid}|${n}|${kind}${opts.reroll === kind ? "|rr" : ""}`;
   const aimed = prior ? prior.aimed : (rules.actions.has("aim") && a.aim && a.aim.target === d.pid ? 1 : 0);
-  const canDodge = cmd.canDodge !== false && d.dodge !== null && !isOut(d) && (prior ? prior.canDodge : d.dodgedRound !== enc.round);
+  // Published rule: one Dodge attempt per round. An experiment can lift it, and the GM can allow an extra one (logged).
+  const dodgedAlready = d.dodgedRound === enc.round && !(rules.flags && rules.flags.has("dodgeEveryAttack"));
+  const extraDodge = !prior && dodgedAlready && !!cmd.allowExtraDodge && cmd.canDodge !== false;
+  const canDodge = cmd.canDodge !== false && d.dodge !== null && !isOut(d) && (prior ? prior.canDodge : !dodgedAlready || extraDodge);
   const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound }, attackerTracks: clone(a.tracks || {}) };
   const res = core.resolveAttack({
     attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury },
@@ -177,11 +180,12 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: res.outcome === "dodged",
-    hit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null,
+    hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
-    damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying),
+    damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
     injuryBefore: pre.defender.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead, injuryResult: res.injury ? res.injury.change : null,
   });
+  if (extraDodge) log(enc, "override", { what: "dodge", about: ev.n, pid: d.pid, name: d.name, from: "already dodged this round", to: "Dodge allowed", reason: "GM allowed another Dodge" });
   if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
   return { event: ev };
 }
@@ -261,7 +265,7 @@ export function override(enc, rules, core, what, o) {
     if (!ev || ev.superseded) return { error: "Choose an attack to override." };
     const d = find(enc, ev.defender.pid), from = { hit: ev.hit, injury: d.injury };
     if (o.hit && !ev.hit) {
-      const dmg = core.weaponDamage(rules.weapons[ev.weapon.id], ev.band) || { boxes: 0 };
+      const dmg = ev.rolledDamage || core.weaponDamage(rules.weapons[ev.weapon.id], ev.band) || { boxes: 0 }; // the damage the dice gave, if they gave a hit
       const r = dmg.boxes ? core.applyHit({ ...ev.pre.defender, minor: d.minor, boxes: d.boxes }, dmg) : null;
       if (r) Object.assign(d, { injury: r.injury, dying: r.dying, dead: r.dead });
       Object.assign(ev, { hit: true, damage: dmg.boxes, dyingWeapon: !!dmg.dying, injuryAfter: d.injury, injuryResult: r ? r.change : "no effect at this range" });
@@ -269,8 +273,8 @@ export function override(enc, rules, core, what, o) {
       Object.assign(d, ev.pre.defender);
       Object.assign(ev, { hit: false, damage: 0, injuryAfter: d.injury, injuryResult: null });
     }
-    ev.overridden = true;
-    return { event: log(enc, "override", { what, about: ev.n, from, to: { hit: ev.hit, injury: d.injury }, reason: o.reason || "" }) };
+    ev.overridden = ev.hit === ev.rolledHit ? false : true;
+    return { event: log(enc, "override", { what, about: ev.n, name: d.name, attacker: ev.attacker.name, from, to: { hit: ev.hit, injury: d.injury }, reason: o.reason || "" }) };
   }
   return { error: "Unknown override." };
 }
