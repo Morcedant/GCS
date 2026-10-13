@@ -69,7 +69,6 @@ def guide_chapter():
         out += [f"| {label} | Effect | Companion complication |", "|---|---|---|"]
         for t in h["traits"]:
             out.append(f"| {t[1]} | {t[2]} | **{t[5]}.** {t[6]} |")
-        out += ["", f"*Source: {h['source']}*", ""]
     return "\n".join(out) + "\n"
 
 
