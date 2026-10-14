@@ -1296,22 +1296,26 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Carries you across the territory. Riding in a chase needs one.</td>
 </tr>
 <tr class="odd">
+<td>Shield</td>
+<td>A hide shield or an iron-bound buckler, rare in the West; some Grimm families keep one with the old weapons. You Block at +1.</td>
+</tr>
+<tr class="even">
 <td>Trail kit</td>
 <td>Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones; no bonus beyond that.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Lantern and matches</td>
 <td>Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Himmelsbrief</td>
 <td>A “letter from Heaven”, folded small and carried on the body. Once per case, when a bullet hits you, mark one box fewer. Whether it’s the letter or the faith, nobody can say.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Grimm’s journals</td>
 <td>Copied pages from a Grimm family’s books. With an hour to consult them, +2 to Wesen Lore to identify a Wesen or find its weakness. Irreplaceable, and coveted.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Dynamite</td>
 <td>Three sticks. Throw with Athletics; the fuse burns for a round. See Weapons and damage.</td>
 </tr>
@@ -1535,6 +1539,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-attacking-and-defending">Attacking and defending</h2>
 <p>Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.</p>
 <p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.</p>
+<p><strong>Block.</strong> With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fangs, fists or an arrow instead of Dodging: roll Melee −2, or Melee −1 with a real shield. You can Block once a round, as well as your one Dodge. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes: a chair stops one swipe of a Blutbad’s claws, and then it’s kindling.</p>
 <h2 id="g-range">Range</h2>
 <p>Distances fall into five bands:</p>
 <table>
@@ -1618,7 +1623,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>A further hit.</strong> While you are at three boxes, any hit from a weapon that marks 2 or more boxes kills you. Fists, clubs and knives just keep you down.</li>
 <li><strong>Beheading</strong> and comparable fates bypass the track entirely.</li>
 </ul>
-<p>Your protection is avoiding the hit: Dodge, cover, and a Grit point, which reduces a hit by one box.</p>
+<p>Your protection is avoiding the hit: Dodge, a Block, cover, and a Grit point, which reduces a hit by one box.</p>
 <h2 id="g-weapons-and-damage">Weapons and damage</h2>
 <p>How many boxes a hit marks depends on the <strong>weapon</strong>, not on how well the attack succeeded.</p>
 <table>
@@ -3675,6 +3680,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <dt>Resolution</dt><dd>3d6 at or below adjusted skill. Natural 3–4 always succeeds; 17–18 always fails. Margin = target − roll.</dd>
             <dt>Opposed</dt><dd>Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender.</dd>
             <dt>Combat</dt><dd>Move a short distance and take one action. Hit → target may Dodge once per round → weapon effect. Partial cover −2.</dd>
+            <dt>Block</dt><dd>Once a round, instead of Dodge: Melee −2 with a chair or slat, −1 with a shield, against blades, claws, fists and arrows (never bullets). An improvised shield breaks on a 2+ box hit.</dd>
             <dt>Damage</dt><dd>Fists, clubs, knives, arrows: 1 box. Guns, heavy blades, Wesen claws: 2. Close-range shotgun or buffalo rifle: 3 and Dying.</dd>
             <dt>Dying</dt><dd>A 2-box weapon that brings you to 3 boxes: Dying; dead at the end of the scene unless stabilized (one action, Medicine, doctor's bag). At 3 boxes, another 2-box hit kills.</dd>
             <dt>Guns</dt><dd>Derringer 2, revolver 6, shotgun 2, rifle 15. Fan the hammer 3 (−2, +1 box), both barrels 2 (+2 close), covering fire 3. Reload: one action. Natural 18 jams.</dd>
@@ -3956,6 +3962,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["apothecary", "Apothecary kit", "Dried herbs, powders, Wesen ingredients, mortar and scales. Needed for remedies, antidotes and potions away from a shop."],
     ["tools", "Tool roll", "Gunsmith's and carpenter's tools. Needed for most Tinkering in the field."],
     ["horse", "Horse and tack", "Carries you across the territory. Riding in a chase needs one."],
+    ["shield", "Shield", "A hide shield or an iron-bound buckler, rare in the West; some Grimm families keep one with the old weapons. You Block at +1."],
     ["trailkit", "Trail kit", "Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones."],
     ["lantern", "Lantern and matches", "Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible."],
     ["himmelsbrief", "Himmelsbrief", "A \"letter from Heaven\", folded small and carried on the body. Once per case, when a bullet hits you, mark one box fewer. Whether it's the letter or the faith, nobody can say."],
@@ -4119,6 +4126,12 @@ tr.lvl-U td.target { color: var(--muted); }
   const levelName = (l, name) => (l === "S" && isGS() && !(name && advancedToS(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
+  // Block: Melee −2 with anything that stands in for a shield (a chair, a slat), Melee −1 with a real one.
+  const BLOCKS = [["shield", "shield", 1], ["improvised", "chair or slat", 0]];
+  const blocks = () => BLOCKS.filter(([id]) => id !== "shield" || ch.equipment.shield);
+  const isBlock = (name) => name.startsWith("Block:");
+  const blockOf = (id) => skillTarget("Melee") - 2 + BLOCKS.find((b) => b[0] === id)[2];
+  const rollLabel = (name) => (isBlock(name) ? `Block (${BLOCKS.find((b) => b[0] === name.slice(6))[1]})` : name);
   const count = (lvl) => Object.entries(ch.skills).filter(([k, v]) => v === lvl && !freeSkill(k)).length;
   function odds(t) {
     let w = 0;
@@ -4469,7 +4482,7 @@ tr.lvl-U td.target { color: var(--muted); }
     // roller options
     const sel = $("r-skill"), prev = sel.value;
     sel.innerHTML = `<optgroup label="Skills">${sorted.map((s) => `<option value="${esc(s.n)}">${s.n} (${s.t})</option>`).join("")}</optgroup>
-      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}</optgroup>
+      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}${blocks().map(([id, n, b]) => `<option value="Block:${id}">Block, ${n}: Melee ${signed(b - 2)} (${blockOf(id)})</option>`).join("")}</optgroup>
       <optgroup label="Attributes">${ATTRS.map(([n]) => `<option value="${n}">${n} (${ch.attrs[n]})</option>`).join("")}</optgroup>`;
     if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
     // Abilities without a +2 (Lenses, spells, claws) leave the box disabled.
@@ -4483,6 +4496,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   function rollBase(name) {
     if (name === "Dodge") return dodge();
+    if (isBlock(name)) return blockOf(name.slice(6));
     if (ch.attrs[name] != null) return ch.attrs[name];
     return skillTarget(name);
   }
@@ -4498,14 +4512,15 @@ tr.lvl-U td.target { color: var(--muted); }
     // In full woge, the woge profile's bonuses apply to rolls on those attributes and their skills; horses balk.
     const w = ch.play.woge && WESEN.has(ch.speciesId) && heritageOf()?.woge;
     if (w) {
-      const attr = name === "Dodge" ? null : ch.attrs[name] != null ? name : SKILLS.find((x) => x[0] === name)?.[1];
+      const sk = isBlock(name) ? "Melee" : name;
+      const attr = name === "Dodge" ? null : ch.attrs[sk] != null ? sk : SKILLS.find((x) => x[0] === sk)?.[1];
       const wb = name === "Dodge" ? (w.dodge || 0) + (w.attrs.Agility || 0) : w.attrs[attr] || 0;
       if (wb) parts.push(wb);
       if (name === "Riding") parts.push(-2);
     }
     // Fanning the hammer is −2, both barrels +2.
     const shot = !$("r-setting-wrap").hidden ? { fan: -2, both: 2 }[$("r-setting").value] || 0 : 0;
-    return { name, base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) + shot, shot };
+    return { name: rollLabel(name), base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) + shot, shot };
   }
   function updateInjuryToggle() {
     const pen = INJURY[ch.play.injury][2];
@@ -4690,7 +4705,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
-    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value); updateTarget(); renderGun(); }
+    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
     else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();

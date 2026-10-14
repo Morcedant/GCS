@@ -224,6 +224,7 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Apothecary kit | Dried herbs, powders, Wesen ingredients, mortar and scales. Needed for remedies, antidotes and potions away from a shop. |
 | Tool roll | Gunsmith's and carpenter's tools. Needed for most Tinkering in the field. |
 | Horse and tack | Carries you across the territory. Riding in a chase needs one. |
+| Shield | A hide shield or an iron-bound buckler, rare in the West; some Grimm families keep one with the old weapons. You Block at +1. |
 | Trail kit | Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones; no bonus beyond that. |
 | Lantern and matches | Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible. |
 | Himmelsbrief | A "letter from Heaven", folded small and carried on the body. Once per case, when a bullet hits you, mark one box fewer. Whether it's the letter or the faith, nobody can say. |
@@ -386,6 +387,8 @@ Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for f
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
 
+**Block.** With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fangs, fists or an arrow instead of Dodging: roll Melee −2, or Melee −1 with a real shield. You can Block once a round, as well as your one Dodge. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes: a chair stops one swipe of a Blutbad's claws, and then it's kindling.
+
 ## Range
 
 Distances fall into five bands:
@@ -417,7 +420,7 @@ Injury penalties replace each other rather than stacking. They apply to movement
 - **A further hit.** While you are at three boxes, any hit from a weapon that marks 2 or more boxes kills you. Fists, clubs and knives just keep you down.
 - **Beheading** and comparable fates bypass the track entirely.
 
-Your protection is avoiding the hit: Dodge, cover, and a Grit point, which reduces a hit by one box.
+Your protection is avoiding the hit: Dodge, a Block, cover, and a Grit point, which reduces a hit by one box.
 
 ## Weapons and damage
 
