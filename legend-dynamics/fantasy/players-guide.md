@@ -460,16 +460,16 @@ Work a ritual in advance and store it in an object; break it (one action, no rol
 
 ## Magic advancement
 
-After a significant venture, a magical character can take one of these **instead of a skill step**, with the GM's approval and a reason from the story. 
+A magical character can spend advancement points (see *Advancement*) on these, with the GM's approval and a reason from the story. 
 
-| Option | Effect | Limit |
-|---|---|---|
-| New cantrip | Learn one cantrip beyond your limit | Up to 2 extra |
-| Deeper Seal | One cantrip you know works one Seal deeper: one more Boost | Each cantrip once |
-| Another talisman | Carry one more ready talisman | Up to 2 extra |
-| By heart | One kind of ritual takes one fewer segment (minimum 1) | Each kind once |
-| Quicker hand | One ritual you know goes one pace faster: an hour becomes ten minutes, ten minutes one action | Each ritual once |
-| Archmage | Sorcery becomes Expert (+5) | Once, at the end of a long campaign |
+| Option | Effect | Cost | Limit |
+|---|---|---|---|
+| New cantrip | Learn one cantrip beyond your limit | 1 | Up to 2 extra |
+| Deeper Seal | One cantrip you know works one Seal deeper: one more Boost | 2 | Each cantrip once |
+| Another talisman | Carry one more ready talisman | 1 | Up to 2 extra |
+| By heart | One kind of ritual takes one fewer segment (minimum 1) | 1 | Each kind once |
+| Quicker hand | One ritual you know goes one pace faster: an hour becomes ten minutes, ten minutes one action | 1 | Each ritual once |
+| Archmage | Sorcery becomes Expert (+5) | 4 | Once, at the end of a long campaign |
 
 ## Magic in The Shattered Crown
 
@@ -515,7 +515,20 @@ Each character also keeps a personal **Corruption** track on their sheet (see *S
 
 ## Advancement
 
-After a significant venture, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication. Only a Master's starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they broaden (see Step 3).
+Characters grow by earning **advancement points** and spending them.
+
+- **Earning.** After a significant venture, the GM awards each character **1 point**. At a **milestone**, the end of a story arc, everyone earns **2 more**.
+- **Spending.** Spend points when you earn them, or bank them for something bigger. Each purchase needs the GM's approval and a reason from the story: training with someone, something you lived through, a debt paid.
+
+| Purchase | Cost | Limit |
+|---|---|---|
+| A skill from Untrained to Trained | 1 | — |
+| A skill from Trained to Specialty | 2 | Specialty (+3) is the ceiling: only a Master's starting skill is Expert, unless they broaden (see Step 3) |
+| Revise an advantage or complication | 1 | — |
+| A new Edge | 3 | Any Edge except the attribute and Trained-skill Edges, within its own limit |
+| +1 to an attribute | 4 | Once per attribute; no higher than one above the starting maximum (14, plus any ancestry bonus) |
+
+Magic and powers grow the same way, at the costs their chapters give.
 
 # Running ventures
 
@@ -569,7 +582,7 @@ End each venture with a short entry, written together:
 2. **Who stood out?** A moment worth remembering.
 3. **Complications.** Which ones came into play, and what did they cost?
 4. **What changed?** New allies or enemies, damage, open threads for next time.
-5. **Advancement.** After a significant venture, the GM may authorize one skill step for each character.
+5. **Advancement.** After a significant venture, each character earns 1 advancement point; at a milestone, 2 more.
 
 # Sorcery
 

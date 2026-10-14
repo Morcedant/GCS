@@ -301,7 +301,20 @@ Gain one point when one of your complications creates a meaningful problem you a
 
 ## Advancement
 
-After a significant {{missionLower}}, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication. Only {{a:pathExpert}}'s starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they broaden (see Step 3).
+Characters grow by earning **advancement points** and spending them.
+
+- **Earning.** After a significant {{missionLower}}, the GM awards each character **1 point**. At a **milestone**, the end of a story arc, everyone earns **2 more**.
+- **Spending.** Spend points when you earn them, or bank them for something bigger. Each purchase needs the GM's approval and a reason from the story: training with someone, something you lived through, a debt paid.
+
+| Purchase | Cost | Limit |
+|---|---|---|
+| A skill from Untrained to Trained | 1 | — |
+| A skill from Trained to Specialty | 2 | Specialty (+3) is the ceiling: only {{a:pathExpert}}'s starting skill is Expert, unless they broaden (see Step 3) |
+| Revise an advantage or complication | 1 | — |
+| A new Edge | 3 | Any Edge except the attribute and Trained-skill Edges, within its own limit |
+| +1 to an attribute | 4 | Once per attribute; no higher than one above the starting maximum (14, plus any {{originLower}} bonus) |
+
+Magic and powers grow the same way, at the costs their chapters give.
 
 # {{missionsChapter}}
 
@@ -319,7 +332,7 @@ End each {{missionLower}} with a short entry, written together:
 2. **Who stood out?** A moment worth remembering.
 3. **Complications.** Which ones came into play, and what did they cost?
 4. **What changed?** New allies or enemies, damage, open threads for next time.
-5. **Advancement.** After a significant {{missionLower}}, the GM may authorize one skill step for each character.
+5. **Advancement.** After a significant {{missionLower}}, each character earns 1 advancement point; at a milestone, 2 more.
 
 {{PACK:setting}}
 

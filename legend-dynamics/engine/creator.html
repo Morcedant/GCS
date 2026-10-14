@@ -569,10 +569,17 @@ tr.lvl-U td.target { color: var(--muted); }
             </table>
           </div>
           <div class="advance-box">
-            <span class="label">Advancement (after a significant {{missionLower}}, with the GM's approval)</span>
+            <span class="label">Advancement points <span id="xp-tally" class="chip"></span></span>
+            <p class="small muted" style="margin:0">1 point after a significant {{missionLower}}, 2 more at a milestone. Spend them or bank them, with the GM's approval.</p>
             <div class="btn-row">
-              <select id="f-advance" aria-label="Skill to advance"></select>
-              <button class="btn" id="btn-advance">Record advancement</button>
+              <button class="btn" id="btn-earn1">+1: significant {{missionLower}}</button>
+              <button class="btn" id="btn-earn2">+2: milestone</button>
+              <button class="linkish" id="btn-unearn" hidden>Undo last award</button>
+            </div>
+            <div class="btn-row">
+              <select id="f-advance" aria-label="What to spend points on"></select>
+              <input id="f-advance-note" aria-label="Story reason" placeholder="Why, from the story (optional)" style="flex:1 1 180px">
+              <button class="btn" id="btn-advance">Spend</button>
               <button class="linkish" id="btn-unadvance" hidden>Undo last</button>
             </div>
             <ul class="small muted adv-list" id="adv-list"></ul>
@@ -976,6 +983,8 @@ tr.lvl-U td.target { color: var(--muted); }
 (() => {
   /* PACK:START *//* PACK:END */
   const T = PACK.terms;
+  // Advancement point costs (core rules, Advancement). Magic and powers use the costs their chapters give.
+  const COSTS = { UT: 1, TS: 2, revise: 1, edge: 3, attr: 4 };
   const ATTRS = [
     ["Body", "Strength, endurance, resisting injury"],
     ["Agility", "Coordination, reflexes, movement"],
@@ -1086,7 +1095,7 @@ tr.lvl-U td.target { color: var(--muted); }
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" }, edgeNotes: {},
-      allegiance: "", allegianceDef: null, customTier: 1,
+      allegiance: "", allegianceDef: null, customTier: 1, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "",
       play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [] },
@@ -1127,7 +1136,17 @@ tr.lvl-U td.target { color: var(--muted); }
     out.play.gun = g && typeof g === "object" && (g.type === "" || GUNS[g.type])
       ? { type: g.type, rounds: Math.max(0, Math.min(GUNS[g.type] ? GUNS[g.type][1] : 0, parseInt(g.rounds, 10) || 0)), spares: Math.max(0, parseInt(g.spares, 10) || 0) }
       : (() => { const t = (PACK.weapons.equipLinked || []).find((k) => out.equipment[k]); return t ? { type: t, rounds: GUNS[t][1], spares: PACK.weapons.defaultSpares ?? 2 } : { type: "", rounds: 0, spares: 0 }; })();
-    out.advances = out.advances.filter((a) => a && SKILLS.some(([n]) => n === a.skill) && ["UT", "TS"].includes(a.from + a.to));
+    // Purchases: skill steps (older files: one point each), Edges, attributes and revisions.
+    out.advances = out.advances.filter((a) => a && (
+      (!a.type || a.type === "skill") ? SKILLS.some(([n]) => n === a.skill) && ["UT", "TS"].includes(a.from + a.to)
+      : a.type === "edge" ? EDGE_DEFS.some(([k]) => k === a.edge) : a.type === "attr" ? ATTRS.some(([n]) => n === a.attr) : a.type === "revise"))
+      .map((a) => ({ ...a, type: a.type || "skill", cost: Number.isFinite(a.cost) ? a.cost : a.type ? COSTS[a.type] : 1 }));
+    out.edgesBought = {}; out.attrBought = {};
+    for (const a of out.advances) { if (a.type === "edge") out.edgesBought[a.edge] = (out.edgesBought[a.edge] || 0) + 1; if (a.type === "attr") out.attrBought[a.attr] = 1; }
+    // Points earned. A file from before advancement points has none recorded: it starts balanced (see pointsAvail).
+    const xp = c.xp && typeof c.xp === "object" ? c.xp : null;
+    out.xp = xp ? { earned: Math.max(0, parseInt(xp.earned, 10) || 0), log: Array.isArray(xp.log) ? xp.log.filter((e) => e && Number.isFinite(+e.n)).map((e) => ({ n: +e.n, note: String(e.note || ""), date: String(e.date || "") })) : [] }
+      : { earned: null, log: [] };
     if (out.sadv.id && out.adv.id) out.adv.id = ""; // a heritage advantage replaces the regular one
     out.edges = Object.fromEntries(EDGE_DEFS.map(([k, , , max]) => [k, Math.max(0, Math.min(max, parseInt((c.edges || {})[k], 10) || 0))]));
     out.adv2 = { id: "", detail: "", ...(c.adv2 || {}) };
@@ -1171,8 +1190,10 @@ tr.lvl-U td.target { color: var(--muted); }
   // ---- rules ----
   const speciesDef = () => SPECIES.find((x) => x[0] === ch.speciesId);
   const adjOf = (c = ch) => (c.speciesId === "custom" ? c.speciesAdj : (SPECIES.find((x) => x[0] === c.speciesId) || [, , {}])[2]) || {};
-  const baseOf = (n, c = ch) => BASE + (adjOf(c)[n] || 0);
-  const maxOf = (n, c = ch) => MAX_START + Math.max(0, adjOf(c)[n] || 0);
+  // An attribute bought with advancement points raises both its floor and its ceiling by one.
+  const boughtAttr = (n, c = ch) => ((c.attrBought || {})[n] || 0);
+  const baseOf = (n, c = ch) => BASE + (adjOf(c)[n] || 0) + boughtAttr(n, c);
+  const maxOf = (n, c = ch) => MAX_START + Math.max(0, adjOf(c)[n] || 0) + boughtAttr(n, c);
   const adjTotal = () => ATTRS.reduce((a, [n]) => a + (ch.speciesAdj[n] || 0), 0);
   const spent = () => ATTRS.reduce((a, [n]) => a + Math.max(0, ch.attrs[n] - baseOf(n)), 0);
   const adjText = (adj) => ATTRS.filter(([n]) => adj[n]).map(([n]) => `${n} ${signed(adj[n])}`).join(", ") || "No adjustments";
@@ -1201,9 +1222,11 @@ tr.lvl-U td.target { color: var(--muted); }
   }
   // Old hands: one Expert skill (+5) and seven Trained; everyone else: one Specialty (+3) and nine Trained.
   const isGS = () => ch.path === "hand";
-  const edgeN = (k, c = ch) => (c.edges || {})[k] || 0;
+  // Edges: those chosen at creation (the tier's budget) plus those bought later with advancement points.
+  const edgeRaw = (k, c = ch) => (c.edges || {})[k] || 0;
+  const edgeN = (k, c = ch) => edgeRaw(k, c) + ((c.edgesBought || {})[k] || 0);
   const edgesAvail = (c = ch) => EDGE_POINTS - tierOf(c);
-  const edgesSpent = (c = ch) => EDGE_DEFS.reduce((a, [k]) => a + edgeN(k, c), 0);
+  const edgesSpent = (c = ch) => EDGE_DEFS.reduce((a, [k]) => a + edgeRaw(k, c), 0);
   const pool = () => 5 + edgeN("attr");
   const gritStart = (c = ch) => 2 + edgeN("grit", c);
   // Some origins get one skill Trained for free.
@@ -1509,7 +1532,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("edge-intro").textContent = ea ? `Tier ${tierOf()} leaves ${ea} Edge${ea > 1 ? "s" : ""}. Spend ${ea > 1 ? "them" : "it"} below.` : `This tier has no Edges: its power is the ${T.originLower} itself.`;
     EDGE_DEFS.forEach(([k, , , max]) => {
       $("edge-n-" + k).textContent = edgeN(k);
-      $("edge-m-" + k).disabled = edgeN(k) <= 0;
+      $("edge-m-" + k).disabled = edgeRaw(k) <= 0;
       $("edge-p-" + k).disabled = edgeN(k) >= max || es >= ea;
     });
     $("adv2-wrap").hidden = !edgeN("adv2");
@@ -1576,7 +1599,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const nS = count("S"), nT = count("T");
     $("skill-tally").innerHTML =
       `<span class="chip ${nS === specialtyMax() ? "ok" : "no"}">${levelName("S")} ${nS}/${specialtyMax()}</span><span class="chip ${nT === trainedAllowed() ? "ok" : "no"}">Trained ${nT}/${trainedAllowed()}</span>` +
-      (ch.advances.length ? `<span class="chip">${ch.advances.length} advancement${ch.advances.length > 1 ? "s" : ""}</span>` : "");
+      (ch.advances.some((a) => a.type === "skill") ? `<span class="chip">${ch.advances.filter((a) => a.type === "skill").length} from advancement</span>` : "");
     $("skills-intro").innerHTML = isGS()
       ? T.pathExpertPlural + " are specialists: one <b>Expert</b> skill at attribute +5 and seven <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling."
       : "One <b>Specialty</b> at attribute +3 and nine <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling.";
@@ -1699,7 +1722,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ch.reason ? `<div class="field"><span class="label">${T.reasonSheet}</span><span>${esc(ch.reason)}</span></div>` : ""}
         ${ch.speciesNotes ? `<div class="field"><span class="label">Other ability (GM approved)</span><span>${esc(ch.speciesNotes)}</span></div>` : ""}
         ${ch.notes ? `<div class="field wide"><span class="label">Notes</span><span>${esc(ch.notes)}</span></div>` : ""}
-        ${ch.advances.length ? `<div class="field wide"><span class="label">Advancement</span><span>${ch.advances.map((a) => `${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ")}</span></div>` : ""}
+        ${ch.xp.earned || ch.advances.length ? `<div class="field wide"><span class="label">Advancement: ${pointsAvail()} point${pointsAvail() === 1 ? "" : "s"} to spend, ${ch.xp.earned} earned</span><span>${ch.advances.map((a) => `${esc(purchaseText(a))}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ") || "Nothing bought yet."}</span></div>` : ""}
       </div>`;
 
     // condition
@@ -2088,8 +2111,8 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   $("edge-list").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-edge]"); if (!b || b.disabled) return;
-    const k = b.dataset.edge, max = EDGE_DEFS.find((x) => x[0] === k)[3], v = edgeN(k) + +b.dataset.d;
-    if (v < 0 || v > max || (+b.dataset.d > 0 && edgesSpent() >= edgesAvail())) return;
+    const k = b.dataset.edge, max = EDGE_DEFS.find((x) => x[0] === k)[3], v = edgeRaw(k) + +b.dataset.d;
+    if (v < 0 || v + ((ch.edgesBought || {})[k] || 0) > max || (+b.dataset.d > 0 && edgesSpent() >= edgesAvail())) return;
     ch.edges = { ...ch.edges, [k]: v };
     // Taking back an attribute Edge returns points from the highest attribute above its base.
     while (spent() > pool()) { const n = ATTRS.map(([a]) => a).filter((a) => ch.attrs[a] > baseOf(a)).sort((x, y) => ch.attrs[y] - ch.attrs[x])[0]; if (!n) break; ch.attrs[n]--; }
@@ -2227,34 +2250,88 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   renderShip(); renderClocks();
 
-  // ---- advancement: one skill step at a time, recorded so the limits stay right ----
-  function advanceOptionsFor(c) {
-    return SKILLS.filter(([n]) => c.skills[n] !== "S").map(([n]) => [n, c.skills[n] === "U" ? `${n}: Untrained → Trained` : `${n}: Trained → Specialty`]);
+  // ---- advancement: points earned and spent, each purchase recorded so the limits stay right ----
+  // Magic and powers are grown in their own steps; their points are counted from what the character has.
+  const listN = (s) => String(s || "").split(/[,;\n]/).filter((x) => x.trim()).length;
+  const classStep = (i) => (i <= 2 ? 2 : i === 3 ? 4 : 0); // to Class II or III: 2; to IV: 4; V is granted
+  const raiseCost = (from, to) => { let n = 0; for (let i = from + 1; i <= to; i++) n += classStep(i); return n; };
+  function magicPoints(c = ch) {
+    let n = 0;
+    if (MAGIC && c.magic) { const m = c.magic; n += (m.extraSpells || 0) + (m.extraCharms || 0) + 2 * ((m.deeper || []).length + (m.mastered || []).length) + listN(m.heart) + listN(m.quicker) + (m.master ? 4 : 0); }
+    if (POWERS) for (const p of allPowers(c)) n += p.learned ? 2 + raiseCost(0, classIndex(p.cl)) : raiseCost(classIndex(p.base), classIndex(p.cl));
+    return n;
   }
-  function applyAdvance(c, skill, note) {
-    const from = c.skills[skill];
-    if (!from || from === "S") return false;
-    const to = from === "U" ? "T" : "S";
-    c.skills[skill] = to;
-    c.advances = [...(c.advances || []), { skill, from, to, note: note || "", date: new Date().toISOString().slice(0, 10) }];
+  const pointsSpent = (c = ch) => (c.advances || []).reduce((a, x) => a + (x.cost || 0), 0) + magicPoints(c);
+  function pointsAvail(c = ch) {
+    if (c.xp.earned == null) c.xp.earned = pointsSpent(c);
+    return c.xp.earned - pointsSpent(c);
+  }
+  function advanceOptionsFor(c) {
+    const avail = pointsAvail(c), tag = (cost) => (cost > avail ? ` (${cost}: needs ${cost - avail} more)` : ` (${cost})`);
+    const opts = SKILLS.filter(([n]) => c.skills[n] !== "S").map(([n]) => { const cost = c.skills[n] === "U" ? COSTS.UT : COSTS.TS;
+      return [`skill:${n}`, `${n}: ${c.skills[n] === "U" ? "Untrained → Trained" : "Trained → Specialty"}${tag(cost)}`, cost, "Skills"]; });
+    for (const [k, n, , max] of EDGE_DEFS) if (!["attr", "skill"].includes(k) && edgeN(k, c) < max) opts.push([`edge:${k}`, `${n}${tag(COSTS.edge)}`, COSTS.edge, "Edges"]);
+    for (const [n] of ATTRS) if (!boughtAttr(n, c)) opts.push([`attr:${n}`, `+1 ${n} (to ${c.attrs[n] + 1})${tag(COSTS.attr)}`, COSTS.attr, "Attributes"]);
+    opts.push(["revise", `Revise an advantage or complication${tag(COSTS.revise)}`, COSTS.revise, "Other"]);
+    return opts;
+  }
+  function applyAdvance(c, key, note) {
+    const i = key.indexOf(":"), kind = i < 0 ? key : key.slice(0, i), id = i < 0 ? "" : key.slice(i + 1);
+    const rec = { note: note || "", date: new Date().toISOString().slice(0, 10) };
+    if (kind === "skill") {
+      const from = c.skills[id]; if (!from || from === "S") return false;
+      const to = from === "U" ? "T" : "S"; c.skills[id] = to;
+      c.advances = [...(c.advances || []), { type: "skill", skill: id, from, to, cost: from === "U" ? COSTS.UT : COSTS.TS, ...rec }];
+    } else if (kind === "edge") {
+      const d = EDGE_DEFS.find(([k]) => k === id); if (!d || ["attr", "skill"].includes(id) || edgeN(id, c) >= d[3]) return false;
+      c.edgesBought = { ...(c.edgesBought || {}), [id]: ((c.edgesBought || {})[id] || 0) + 1 };
+      c.advances = [...(c.advances || []), { type: "edge", edge: id, cost: COSTS.edge, ...rec }];
+    } else if (kind === "attr") {
+      if (!ATTRS.some(([n]) => n === id) || boughtAttr(id, c)) return false;
+      c.attrBought = { ...(c.attrBought || {}), [id]: 1 }; c.attrs[id] += 1;
+      c.advances = [...(c.advances || []), { type: "attr", attr: id, cost: COSTS.attr, ...rec }];
+    } else if (kind === "revise") c.advances = [...(c.advances || []), { type: "revise", cost: COSTS.revise, ...rec }];
+    else return false;
     return true;
   }
   function undoAdvance(c) {
     const a = (c.advances || []).pop();
-    if (a && c.skills[a.skill] === a.to) c.skills[a.skill] = a.from;
+    if (!a) return a;
+    if (a.type === "skill" && c.skills[a.skill] === a.to) c.skills[a.skill] = a.from;
+    if (a.type === "edge") { const n = ((c.edgesBought || {})[a.edge] || 1) - 1; c.edgesBought = { ...c.edgesBought, [a.edge]: n }; if (!n) delete c.edgesBought[a.edge]; }
+    if (a.type === "attr") { delete c.attrBought[a.attr]; c.attrs[a.attr] = Math.max(baseOf(a.attr, c), c.attrs[a.attr] - 1); }
     return a;
   }
+  const purchaseText = (a) => a.type === "edge" ? `Edge: ${(EDGE_DEFS.find(([k]) => k === a.edge) || [0, a.edge])[1]}` : a.type === "attr" ? `+1 ${a.attr}`
+    : a.type === "revise" ? "Revised an advantage or complication" : `${a.skill}: ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`;
   function renderAdvance() {
-    $("f-advance").innerHTML = `<option value="">Choose a skill to advance…</option>` + advanceOptionsFor(ch).map(([n, t]) => `<option value="${esc(n)}">${esc(t)}</option>`).join("");
-    $("adv-list").innerHTML = ch.advances.map((a) => `<li>${esc(a.skill)}: ${LEVELS[a.from].name} → ${LEVELS[a.to].name}${a.note ? ` (${esc(a.note)})` : ""}${a.date ? ` · ${a.date}` : ""}</li>`).join("");
+    const avail = pointsAvail(), groups = {};
+    for (const o of advanceOptionsFor(ch)) (groups[o[3]] ||= []).push(o);
+    const prev = $("f-advance").value;
+    $("f-advance").innerHTML = `<option value="">Spend points on…</option>` + Object.entries(groups).map(([g, os]) => `<optgroup label="${g}">${os.map(([v, t, cost]) => `<option value="${esc(v)}"${cost > avail ? " disabled" : ""}>${esc(t)}</option>`).join("")}</optgroup>`).join("");
+    if ([...$("f-advance").options].some((o) => o.value === prev && !o.disabled)) $("f-advance").value = prev;
+    $("xp-tally").textContent = `${avail} to spend · ${ch.xp.earned} earned`;
+    $("xp-tally").className = "chip" + (avail < 0 ? " no" : avail > 0 ? " ok" : "");
+    const mp = magicPoints();
+    $("adv-list").innerHTML = ch.advances.map((a) => `<li>${esc(purchaseText(a))} <span class="muted">(${a.cost})</span>${a.note ? ` · ${esc(a.note)}` : ""}${a.date ? ` · ${a.date}` : ""}</li>`).join("")
+      + (mp ? `<li>${MAGIC ? "Magic" : "Powers"} grown in play <span class="muted">(${mp})</span></li>` : "");
     $("btn-unadvance").hidden = !ch.advances.length;
+    $("btn-unearn").hidden = !ch.xp.log.length;
   }
+  const earn = (n, note) => { pointsAvail(); ch.xp.earned += n; ch.xp.log = [...ch.xp.log, { n, note, date: new Date().toISOString().slice(0, 10) }]; touch(); render(); toast(`+${n} advancement point${n > 1 ? "s" : ""}. Save to file to keep it.`); };
+  $("btn-earn1").onclick = () => earn(1, `significant ${T.missionLower}`);
+  $("btn-earn2").onclick = () => earn(2, "milestone");
+  $("btn-unearn").onclick = () => { const e = ch.xp.log.pop(); if (e) { ch.xp.earned = Math.max(0, ch.xp.earned - e.n); touch(); render(); toast(`Took back the last award (+${e.n}).`); } };
   $("btn-advance").onclick = () => {
-    const n = $("f-advance").value;
-    if (!n) { toast("Choose the skill your GM approved first.", true); return; }
-    applyAdvance(ch, n, ""); touch(); render(); toast(`Advanced ${n}. Save to file to keep it.`);
+    const v = $("f-advance").value;
+    if (!v) { toast("Choose what your GM approved first.", true); return; }
+    const o = advanceOptionsFor(ch).find((x) => x[0] === v);
+    if (!o) { toast("That can't be bought now.", true); return; }
+    if (o[2] > pointsAvail()) { toast(`That costs ${o[2]}; you have ${pointsAvail()}.`, true); return; }
+    if (!applyAdvance(ch, v, $("f-advance-note").value.trim())) { toast("That can't be bought now.", true); return; }
+    $("f-advance-note").value = ""; touch(); render(); toast(`Spent ${o[2]} point${o[2] === 1 ? "" : "s"}: ${purchaseText(ch.advances[ch.advances.length - 1])}. Save to file to keep it.`);
   };
-  $("btn-unadvance").onclick = () => { const a = undoAdvance(ch); render(); if (a) toast(`Undid the ${a.skill} advancement.`); };
+  $("btn-unadvance").onclick = () => { const a = undoAdvance(ch); touch(); render(); if (a) toast(`Undid: ${purchaseText(a)}.`); };
 
   // ---- GM view: the whole crew at a glance ----
   const STORE_GM = PACK.id + ".gm.v1";
@@ -2452,14 +2529,14 @@ tr.lvl-U td.target { color: var(--muted); }
   function renderLogForm() {
     if (!$("log-stardate").value) $("log-stardate").value = freshStardate();
     $("log-adv-wrap").hidden = !gmCrew.length;
-    $("log-adv").innerHTML = gmCrew.map((c) => `<label>${esc(c.name || "Unnamed")}<select data-logadv="${c.id}"><option value="">No advancement</option>${advanceOptionsFor(c).map(([n, t]) => `<option value="${esc(n)}">${esc(t)}</option>`).join("")}</select></label>`).join("");
+    $("log-adv").innerHTML = gmCrew.map((c) => `<label>${esc(c.name || "Unnamed")}<select data-logadv="${c.id}"><option value="0">No points</option><option value="1" selected>+1 (significant ${esc(T.missionLower)})</option><option value="2">+2 (milestone)</option><option value="3">+3 (both)</option></select></label>`).join("");
   }
   const logEntryText = (e) => [`${T.journal}, ${e.stardate}. ${e.title || T.mission}: ${e.outcome}.`, e.notes, e.books ? `${T.journalExtraLabel}: ${e.books}` : "", e.commend ? `Who stood out: ${e.commend}` : "",
-    e.advances.length ? `Advancement: ${e.advances.map((a) => `${a.name}, ${a.skill} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}` : ""].filter(Boolean).join("\n");
+    e.advances.length ? `Advancement: ${e.advances.map((a) => a.points ? `${a.name} +${a.points}` : `${a.name}, ${a.skill} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}` : ""].filter(Boolean).join("\n");
   function renderLogBook() {
     $("log-entries").innerHTML = missionLog.slice().reverse().map((e) => `<li><span class="meta">${esc(e.stardate)} · ${esc(e.outcome)}</span>
       <p><b>${esc(e.title || T.mission)}</b></p>${e.notes ? `<p>${esc(e.notes)}</p>` : ""}${e.books ? `<p class="small"><i>${esc(T.journalExtraLabel)}:</i> ${esc(e.books)}</p>` : ""}${e.commend ? `<p class="small">Who stood out: ${esc(e.commend)}</p>` : ""}
-      ${e.advances.length ? `<p class="small muted">Advancement: ${e.advances.map((a) => `${esc(a.name)}, ${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}</p>` : ""}
+      ${e.advances.length ? `<p class="small muted">Advancement: ${e.advances.map((a) => a.points ? `${esc(a.name)} +${a.points} point${a.points > 1 ? "s" : ""}` : `${esc(a.name)}, ${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}</p>` : ""}
       <button class="linkish danger" data-rmlog="${e.id}">Remove entry</button></li>`).join("");
     $("log-copy").disabled = !missionLog.length;
   }
@@ -2469,15 +2546,15 @@ tr.lvl-U td.target { color: var(--muted); }
     const advances = [];
     document.querySelectorAll("[data-logadv]").forEach((sel) => {
       const c = gmCrew.find((x) => x.id === sel.dataset.logadv);
-      if (!c || !sel.value) return;
-      const from = c.skills[sel.value];
-      if (applyAdvance(c, sel.value, title || $("log-stardate").value)) advances.push({ name: c.name, skill: sel.value, from, to: c.skills[sel.value] });
+      const n = +sel.value; if (!c || !n) return;
+      pointsAvail(c); c.xp.earned += n; c.xp.log = [...c.xp.log, { n, note: title || $("log-stardate").value, date: new Date().toISOString().slice(0, 10) }];
+      advances.push({ name: c.name, points: n });
     });
     missionLog.push({ id: uid(), stardate: $("log-stardate").value.trim(), title, outcome: $("log-outcome").value, notes, books: $("log-books").value.trim(), commend: $("log-commend").value.trim(), advances, date: new Date().toISOString().slice(0, 10) });
     store.set(STORE_LOG, missionLog); saveGM();
     ["log-title", "log-notes", "log-books", "log-commend", "log-stardate"].forEach((id) => ($(id).value = ""));
     renderGM(); renderLogBook();
-    logSay(advances.length ? `Logged. ${advances.length} advancement${advances.length > 1 ? "s" : ""} applied: save each character's file for their player.` : "Logged.");
+    logSay(advances.length ? `Logged. Advancement points awarded to ${advances.length}: save each character's file for their player, who spends them in the creator.` : "Logged.");
   };
   $("log-entries").addEventListener("click", (e) => {
     const b = e.target.closest("[data-rmlog]"); if (!b) return;

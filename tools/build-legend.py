@@ -205,14 +205,14 @@ def magic_chapter(m, title=None):
            f"Work a {W} in advance and store it in an object; break it (one action, no roll) to release it. " + m.get("charmLimit", f"Carry as many ready {Cs} as your {train} training allows: **Trained 2, Specialty 3, Expert 4**.") + " Preparation is how slow magic wins a fast fight.", ""]
     if m.get("advance") != []:
         out += ["## Magic advancement", "",
-           f"After a significant {{{{missionLower}}}}, a magical character can take one of these **instead of a skill step**, with the GM's approval and a reason from the story. {'' if title else 'Each setting says which it uses.'}", "",
-           table(["Option", "Effect", "Limit"], [row for key, row in [
-               ("new", [f"New {B}", f"Learn one {B} beyond your limit", "Up to 2 extra"]),
-               ("deeper", [f"Deeper {m['step']}", f"One {B} you know works one {m['step']} deeper: one more Boost", f"Each {B} once"]),
-               ("charm", [f"Another {C}", f"Carry one more ready {C}", "Up to 2 extra"]),
-               ("heart", ["By heart", f"One kind of {W} takes one fewer segment (minimum 1)", "Each kind once"]),
-               ("quicker", ["Quicker hand", f"One {W} you know goes one pace faster: an hour becomes ten minutes, ten minutes one action", f"Each {W} once"]),
-               ("mastery", [m.get("masterName", "Mastery"), f"{cap(m['skill'])} becomes Expert (+5)", "Once, at the end of a long campaign"])]
+           f"A magical character can spend advancement points (see *Advancement*) on these, with the GM's approval and a reason from the story. {'' if title else 'Each setting says which it uses.'}", "",
+           table(["Option", "Effect", "Cost", "Limit"], [row for key, row in [
+               ("new", [f"New {B}", f"Learn one {B} beyond your limit", "1", "Up to 2 extra"]),
+               ("deeper", [f"Deeper {m['step']}", f"One {B} you know works one {m['step']} deeper: one more Boost", "2", f"Each {B} once"]),
+               ("charm", [f"Another {C}", f"Carry one more ready {C}", "1", "Up to 2 extra"]),
+               ("heart", ["By heart", f"One kind of {W} takes one fewer segment (minimum 1)", "1", "Each kind once"]),
+               ("quicker", ["Quicker hand", f"One {W} you know goes one pace faster: an hour becomes ten minutes, ten minutes one action", "1", f"Each {W} once"]),
+               ("mastery", [m.get("masterName", "Mastery"), f"{cap(m['skill'])} becomes Expert (+5)", "4", "Once, at the end of a long campaign"])]
                if key in m.get("advance", ["new", "deeper", "charm", "heart", "quicker", "mastery"])]), ""]
     if m.get("dials"):
         out += [f"## Magic in {title}", "", table(["", "How it works here"], m["dials"]), ""]
