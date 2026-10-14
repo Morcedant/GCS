@@ -151,10 +151,16 @@ An advantage gives +2 to one narrowly defined kind of task when the GM agrees it
 
 Anyone can owe allegiance to one of the setting's powers. It's a benefit paired with a burden; the burden works like a complication and earns Grit when it causes you a real problem.
 
+The GM can add others met in play (the creator's GM view has a **Campaign allegiances** list), and a player can write one with the GM: choose *Another allegiance* and give it a name, a benefit and a burden.
+
 | Allegiance | Benefit | Burden |
 |---|---|---|
 | The Railroad | Once per job, a free ticket, a telegraph message on the company wire, or a word with a division boss. | Duty: the company expects you to protect its interests, even when they aren't right. |
 | A Cattle Baron | Once per job, money, horses or hired hands. | Duty: the baron's range wars become your fights. |
+| The U.S. Marshals | Once per job, a federal warrant, a posse sworn in on the spot, or a telegram to the district marshal. | Duty: the marshal sends you after federal fugitives, and the men you've jailed have friends. |
+| A County Sheriff's Office | Once per job, a deputy's help, the county jail, or the county records and wanted posters. | Duty: the sheriff calls on you, and the county's feuds and elections become yours. |
+| A City Police Department | Once per job, a patrolman's help, a night in the cells for someone, or the station's files. | Duty: the captain gives the orders, and the department's graft follows you. |
+| The Pinkerton National Detective Agency | Once per job, an agency file on someone, an operative's help, or a client's money for the work. | Duty: the client comes first, even a railroad or a mine owner breaking a strike, and working folk hate the name. |
 | The Army | Once per job, help from a fort: supplies, an escort or a doctor. | Duty: orders from a commanding officer, and old soldiers' quarrels. |
 | The Church | Once per job, shelter, records or a favor from the clergy. | Duty: the Church gives you orders, and its enemies are yours. |
 | An Outlaw Gang | Once per job, a hideout, a fence or a gun at your side. | Duty: the gang calls in favors, and the law knows your face. |

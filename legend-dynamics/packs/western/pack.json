@@ -1073,6 +1073,30 @@
    "Duty: the baron's range wars become your fights."
   ],
   [
+   "marshals",
+   "The U.S. Marshals",
+   "Once per job, a federal warrant, a posse sworn in on the spot, or a telegram to the district marshal.",
+   "Duty: the marshal sends you after federal fugitives, and the men you've jailed have friends."
+  ],
+  [
+   "sheriff",
+   "A County Sheriff's Office",
+   "Once per job, a deputy's help, the county jail, or the county records and wanted posters.",
+   "Duty: the sheriff calls on you, and the county's feuds and elections become yours."
+  ],
+  [
+   "police",
+   "A City Police Department",
+   "Once per job, a patrolman's help, a night in the cells for someone, or the station's files.",
+   "Duty: the captain gives the orders, and the department's graft follows you."
+  ],
+  [
+   "pinkerton",
+   "The Pinkerton National Detective Agency",
+   "Once per job, an agency file on someone, an operative's help, or a client's money for the work.",
+   "Duty: the client comes first, even a railroad or a mine owner breaking a strike, and working folk hate the name."
+  ],
+  [
    "army",
    "The Army",
    "Once per job, help from a fort: supplies, an escort or a doctor.",
