@@ -2299,6 +2299,11 @@
    "Once per fight, a hit that marks 2 or more boxes marks one fewer. Shows under scans."
   ],
   [
+   "riotshield",
+   "Riot shield",
+   "A hardened security shield: +1 to Block against blades, fists and thrown objects. It won't stop a slug or a beam. −2 to Stealth while you carry it."
+  ],
+  [
    "vacsuit",
    "Vac suit",
    "Air for six hours in vacuum or poison atmosphere."
@@ -3195,6 +3200,35 @@
      "spares": 2
     }
    }
+  }
+ ],
+ "protection": [
+  {
+   "id": "armor",
+   "equipment": "armor",
+   "name": "Body armor",
+   "text": "Once per fight, a hit that marks 2 or more boxes marks one fewer. Shows under scans.",
+   "traits": [
+    {
+     "type": "armor",
+     "minBoxes": 2,
+     "reduce": 1,
+     "label": "Body armor"
+    }
+   ]
+  },
+  {
+   "id": "riotshield",
+   "equipment": "riotshield",
+   "name": "Riot shield",
+   "text": "A hardened security shield: +1 to Block against blades, fists and thrown objects. It won't stop a slug or a beam. −2 to Stealth while you carry it.",
+   "traits": [
+    {
+     "type": "shield",
+     "value": 1,
+     "label": "Riot shield"
+    }
+   ]
   }
  ]
 }
