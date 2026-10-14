@@ -2,7 +2,6 @@
  "label": "Dust & Damnation Test",
  "notes": "Rules Lab test configuration. Nothing here is published: the creator's sheet and roller never read it. Setting experiments listed under 'experiments' can be switched on in the GM tab's Encounter panel. Weapon traits are added in the lab (or here) as { type: 'accuracy', value, bands: ['close'], requires: { aimed, ammo, mode }, label }; none are set until their values are decided.",
  "experiments": [
-  "labProtection",
   "labWeaponTraits"
  ],
  "ammo": {
@@ -10,24 +9,5 @@
    "Scattershot"
   ]
  },
- "weaponTraits": {},
- "protection": [
-  {
-   "id": "coat",
-   "name": "Heavy coat",
-   "text": "A buffalo coat or a canvas duster: it turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer.",
-   "traits": [
-    {
-     "type": "armor",
-     "minBoxes": 2,
-     "reduce": 1,
-     "against": [
-      "melee",
-      "missile"
-     ],
-     "label": "Heavy coat"
-    }
-   ]
-  }
- ]
+ "weaponTraits": {}
 }

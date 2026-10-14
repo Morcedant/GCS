@@ -4591,11 +4591,15 @@ tr.lvl-U td.target { color: var(--muted); }
                 <option value="1">Assist succeeded +1</option>
                 <option value="2">Assist by 5+ +2</option>
               </select></div>
+            <div class="field" id="r-quality-wrap" hidden><label for="r-quality">Attack succeeded by</label><select id="r-quality"></select></div>
+            <div class="field" id="r-parries-wrap" hidden><label for="r-parries">Parries already this round</label>
+              <select id="r-parries"><option value="0">None</option><option value="1">One</option><option value="2">Two</option><option value="3">Three</option></select></div>
           </div>
           <div class="checks">
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
             <label id="r-phys-wrap"><input type="checkbox" id="r-phys"> <span id="r-phys-label">Physical action (injury penalty)</span></label>
             <label><input type="checkbox" id="r-stun"> Stunned −2</label>
+            <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> <span id="r-aim-label">Aimed at this target</span></label>
           </div>
           <div class="btn-row"><button class="btn primary" id="r-roll">Roll</button>
             <span class="muted small" id="r-target"></span></div>
@@ -5235,6 +5239,13 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   const levelName = (l, name) => ((l === "S" && isGS() && !(name && advancedToS(name))) || (l === "S" && masterSkill(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge);
+  // A setting's own combat rules (Dust & Damnation: defend every attack, attack quality, Parry, Aim).
+  const CR = PACK.combatRules || {};
+  const PARRY = CR.parry ? [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]] : [];
+  const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
+  const isParry = (name) => name.startsWith("Parry:");
+  const isDefense = (name) => name === "Dodge" || isParry(name);
+  const rollLabel = (name) => (isParry(name) ? `Parry (${name.slice(6)})` : name);
   const count = (lvl) => Object.entries(ch.skills).filter(([k, v]) => v === lvl && !freeSkill(k)).length;
   const odds = LD.odds; // the core rules module
   const pct = (t) => Math.round(odds(t) * 100) + "%";
@@ -5296,6 +5307,12 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   $("f-comp").innerHTML = `<option value="">Choose a complication…</option>` +
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
   $("equip").innerHTML = EQUIPMENT.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="eq-${k}" data-eq="${k}"><span><b>${n}</b><span class="small muted">${eff}</span></span></label>`).join("");
+  if (CR.attackQualityDodge) {
+    const b = [...CR.attackQualityDodge.bands].sort((x, y) => x.from - y.from);
+    $("r-quality").innerHTML = b.map((x, i) => `<option value="${x.mod}">${x.from}${b[i + 1] ? "–" + (b[i + 1].from - 1) : "+"}${x.mod ? " " + signed(x.mod) : " (no penalty)"}</option>`).join("");
+  }
+  if (CR.parry) [...$("r-parries").options].forEach((o) => { if (+o.value) o.textContent += " " + signed(o.value * CR.parry.repeatPenalty); });
+  if (CR.aim) $("r-aim-label").textContent = `Aimed at this target last action ${signed(CR.aim.bonus)}`;
 
   if (SPELLS) $("spell-list").innerHTML = SPELLS.list.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="sp-${k}" data-spell="${k}"><span><b>${n}</b><span class="small muted" id="sp-eff-${k}">${eff}</span></span></label>`).join("");
   $("edge-list").innerHTML = EDGE_DEFS.map(([k, n, d]) => `<div class="edge"><b>${n}</b>
@@ -5534,7 +5551,9 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
     $("st-grit").textContent = gritStart();
-    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`;
+    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`
+      + (CR.parry ? `. Parry = ${PARRY.map(([s]) => `${s} ${skillTarget(s)} ${signed(CR.parry.mod)} = ${parryOf(s)}`).join(", or ")}` : "")
+      + (CR.dodgeEveryAttack ? ". You may defend against every attack." : "");
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
@@ -5569,6 +5588,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
         <div><span class="label">${T.role}</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">${T.origin}</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge()}</b></div>
+        ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}; ${parryOf(T.unarmedSkill)} bare-handed</span></div>` : ""}
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
       <div class="attr-strip">${ATTRS.map(([n]) => `<div><span class="label">${n}</span><b>${ch.attrs[n]}</b></div>`).join("")}</div>
@@ -5725,7 +5745,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     // roller options
     const sel = $("r-skill"), prev = sel.value;
     sel.innerHTML = `<optgroup label="Skills">${sorted.map((s) => `<option value="${esc(s.n)}">${s.n} (${s.t})</option>`).join("")}</optgroup>
-      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}</optgroup>
+      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}${PARRY.map(([s, how]) => `<option value="Parry:${s}">Parry ${how}: ${s} ${signed(CR.parry.mod)} (${parryOf(s)})</option>`).join("")}</optgroup>
       <optgroup label="Attributes">${ATTRS.map(([n]) => `<option value="${n}">${n} (${ch.attrs[n]})</option>`).join("")}</optgroup>`;
     if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
     // Abilities without a +2 leave the box disabled.
@@ -5739,6 +5759,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
 
   function rollBase(name) {
     if (name === "Dodge") return dodge();
+    if (isParry(name)) return parryOf(name.slice(6));
     if (ch.attrs[name] != null) return ch.attrs[name];
     return skillTarget(name);
   }
@@ -5751,17 +5772,21 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
+    if (CR.attackQualityDodge && isDefense(name)) parts.push(+$("r-quality").value || 0);
+    if (CR.parry && isParry(name)) parts.push((+$("r-parries").value || 0) * CR.parry.repeatPenalty);
+    if (CR.aim && !$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(CR.aim.bonus);
     // In an alternate form, the form profile's bonuses apply to rolls on those attributes and their skills.
     const w = ch.play.form && FORMED.has(ch.speciesId) && heritageOf()?.form;
     if (w) {
-      const attr = name === "Dodge" ? null : ch.attrs[name] != null ? name : SKILLS.find((x) => x[0] === name)?.[1];
+      const sk = isParry(name) ? name.slice(6) : name;
+      const attr = name === "Dodge" ? null : ch.attrs[sk] != null ? sk : SKILLS.find((x) => x[0] === sk)?.[1];
       const wb = name === "Dodge" ? (w.dodge || 0) + (w.attrs.Agility || 0) : w.attrs[attr] || 0;
       if (wb) parts.push(wb);
       if (PACK.formPenalties?.[name]) parts.push(PACK.formPenalties[name]);
     }
     // Fanning the hammer is −2, both barrels +2.
     const shot = !$("r-setting-wrap").hidden ? { fan: -2, both: 2 }[$("r-setting").value] || 0 : 0;
-    return { name, base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) + shot, shot };
+    return { name: rollLabel(name), base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) + shot, shot };
   }
   function updateInjuryToggle() {
     const pen = INJURY[ch.play.injury][2];
@@ -5772,6 +5797,10 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   }
   function updateTarget() {
     updateInjuryToggle();
+    const sk = $("r-skill").value || "";
+    $("r-quality-wrap").hidden = !(CR.attackQualityDodge && isDefense(sk));
+    $("r-parries-wrap").hidden = !(CR.parry && isParry(sk));
+    $("r-aim-wrap").hidden = !(CR.aim && [T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk));
     const { name, base, total } = rollMods();
     const t = base + total;
     const incap = ch.play.injury >= 3;
@@ -5964,8 +5993,8 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
-    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting"].includes(t.id)) updateTarget();
+    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isParry(t.value); updateTarget(); renderGun(); }
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);

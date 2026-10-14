@@ -144,8 +144,8 @@ export function defenseOptions(enc, rules, d, w) {
     const best = cands.sort((x, y) => y.t - x.t)[0];
     if (best) {
       const n = d.parryRound === enc.round ? d.parries || 0 : 0;
-      const mods = [{ source: "parry", label: "Parry", value: D.parry.mod, scope: "experiment" }];
-      if (n && D.parry.repeatPenalty) mods.push({ source: "parry", label: `Parry ${n + 1} this round`, value: D.parry.repeatPenalty * n, scope: "experiment" });
+      const mods = [{ source: "parry", label: "Parry", value: D.parry.mod, scope: D.parry.scope || "experiment" }];
+      if (n && D.parry.repeatPenalty) mods.push({ source: "parry", label: `Parry ${n + 1} this round`, value: D.parry.repeatPenalty * n, scope: D.parry.scope || "experiment" });
       opt({ kind: "parry", label: `Parry (${best.name}, ${best.skill})`, base: best.t, mods, used: false });
     }
   }

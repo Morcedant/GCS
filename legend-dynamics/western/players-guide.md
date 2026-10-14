@@ -231,6 +231,7 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Tool roll | Gunsmith's and carpenter's tools. Needed for most Tinkering in the field. |
 | Horse and tack | Carries you across the territory. Riding in a chase needs one. |
 | Trail kit | Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones. |
+| Heavy coat | A buffalo coat or a canvas duster: it turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer. |
 | Lantern and matches | Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible. |
 | Field glasses | See detail at a distance. Spotting something far off without them is very difficult (−4) or impossible. |
 | Law books and blank warrants | Needed to draw up papers, check a statute or argue a point of law away from a courthouse. |
@@ -304,6 +305,18 @@ Act in descending Agility order. Players choose the order of tied characters; th
 Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
+
+### Fighting in Dust & Damnation
+
+Dust & Damnation adds these rules to the ones above.
+
+- **Defend against every attack.** A target may defend against every attack, not just one a round.
+- **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
+- **Parry.** Against a blade, a club, claws or fists, you can parry instead of Dodge: roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists, claws and fangs. Each parry after your first in a round is a further −2. Nobody parries a bullet or an arrow.
+- **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. With **Careful Marksman**, the advantage's +2 adds to this.
+- **A heavy coat.** A buffalo coat or a canvas duster turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer.
+
+*Example:* a werewolf's claws succeed by 5 against Deputy Ames. Ames already dodged a knife this round, but may still defend: Dodge 11, −2 for the clean hit, needs a 9 or less. A parry with the saber would be Melee 14 −3 −2 = 9, no better, so Ames dodges.
 
 ## Range
 
@@ -578,10 +591,10 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 - **Trappings.** The right materials (grave dirt, silver, a lock of hair, the hour of midnight) remove one segment.
 - **Charms.** Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Sorcerer carries only one.
-- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a Himmelsbrief (heaven's letter) from a Pennsylvania German powwow doctor, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual, is renewed between jobs, and doesn't count against a charm limit.
+- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a Himmelsbrief (heaven's letter) from a Pennsylvania German Braucher, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual, is renewed between jobs, and doesn't count against a charm limit.
 - **Attention.** Magic worked openly can mark a box of **The Dark**, and the Order of the Iron Cross hunts known practitioners.
 
-**The old country's magic.** German settlers brought theirs west with the wagons. **Braucher**, the powwow doctors of the Pennsylvania settlements, the Ohio valley and the Texas Hill Country, heal with charms whispered from Hohman's *Long Lost Friend* and never take pay. Soldiers sew **heaven's letters** into their coats against bullets. The *Sixth and Seventh Books of Moses*, a German grimoire, passes from hand to hand, prized by Hermeticists and hoodoo root doctors alike. And where there is a Braucher, there is a **Hexenmeister** who will curse for money.
+**The old country's magic.** German settlers brought theirs west with the wagons. **Braucher**, the folk healers of the Pennsylvania settlements, the Ohio valley and the Texas Hill Country, heal with charms whispered from Hohman's *Long Lost Friend* and never take pay. Soldiers sew **heaven's letters** into their coats against bullets. The *Sixth and Seventh Books of Moses*, a German grimoire, passes from hand to hand, prized by Hermeticists and hoodoo root doctors alike. And where there is a Braucher, there is a **Hexenmeister** who will curse for money.
 
 ### Hexes
 
@@ -891,7 +904,7 @@ Child of a vampire and a living mother. You walk in daylight, you heal fast, and
 
 *Tier 2 · 1 Edge · Body −1, Intellect +1, Presence −1, Will +1*
 
-A human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania German powwow, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.
+A human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania German Braucherei, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.
 
 **Origin rules:**
 
@@ -907,7 +920,7 @@ A human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania G
 | Hermeticist | Ritual magic from grimoires, circles and sigils (the Key of Solomon, the German Sixth and Seventh Books of Moses): wards, bindings, divination. An hour per roll, and it needs books. +2 to Occult for wards and bindings. | **Obsession: Forbidden Knowledge.** A grimoire or a secret tempts you beyond sense. Accept the risk to get it. |
 | Witch | Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link. | **Witch's Name.** People whisper, and the righteous listen. Accept the suspicion, or the mob. |
 | Cunning Folk | Charms, cards, tokens and folk remedies: small, quick magic. +2 to Occult for charms and fortune-telling. | **Old Superstitions.** Your charms demand their rituals. Accept the delay or the odd behavior they require. |
-| Braucher | Pennsylvania German powwow (Brauche): healing and protection by whispered charms, the sign of the cross and Hohman's Long Lost Friend. A minute a roll, not ten, for a charm spoken over a wound, a burn or a sick child. +2 to Occult to heal, and to ward a person, house or barn against fire, theft, bullets and hexes. | **Never for Pay.** The gift fails if you ask for money, and the old rule says to teach it only to someone of the other sex. Accept the gift you can't refuse or the debt you can't collect. |
+| Braucher | Braucherei, the Pennsylvania German healing craft: healing and protection by whispered charms, the sign of the cross and Hohman's Long Lost Friend. A minute a roll, not ten, for a charm spoken over a wound, a burn or a sick child. +2 to Occult to heal, and to ward a person, house or barn against fire, theft, bullets and hexes. | **Never for Pay.** The gift fails if you ask for money, and the old rule says to teach it only to someone of the other sex. Accept the gift you can't refuse or the debt you can't collect. |
 | Spiritualist | Séances and trances that speak with the dead. +2 to Occult to call or question a spirit. | **The Dead Follow You.** Restless spirits find you. Accept the haunting at a bad moment. |
 | Necromancer | Commands the dead: wake a corpse to answer questions, or to fight for a scene (a minor zombie). +2 to Occult over corpses and the undead. | **Grave-Robber.** Your work needs bodies, and people notice. Accept the Heat, the Whispers or the grieving family. |
 | Sorcerer | Casts hexes: quick spells in one action and an Occult roll, shaped by one or two paths agreed with the GM (fire and force, say). Known: Trained 2, Specialty 3, Expert 4. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it. |

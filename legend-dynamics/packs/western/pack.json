@@ -866,7 +866,7 @@
     "Body": -1,
     "Presence": -1
    },
-   "desc": "A human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania German powwow, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.",
+   "desc": "A human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania German Braucherei, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.",
    "core": [
     "Rituals: describe the effect; the GM sets its weight (minor 2, significant 4, major 6 segments); fill that clock with Occult rolls at your tradition's pace.",
     "Charms: carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).",
@@ -919,7 +919,7 @@
     [
      "pr-brauch",
      "Braucher",
-     "Pennsylvania German powwow (Brauche): healing and protection by whispered charms, the sign of the cross and Hohman's Long Lost Friend. A minute a roll, not ten, for a charm spoken over a wound, a burn or a sick child. +2 to Occult to heal, and to ward a person, house or barn against fire, theft, bullets and hexes.",
+     "Braucherei, the Pennsylvania German healing craft: healing and protection by whispered charms, the sign of the cross and Hohman's Long Lost Friend. A minute a roll, not ten, for a charm spoken over a wound, a burn or a sick child. +2 to Occult to heal, and to ward a person, house or barn against fire, theft, bullets and hexes.",
      "Occult",
      true,
      "Never for Pay",
@@ -1555,6 +1555,11 @@
    "trailkit",
    "Trail kit",
    "Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones."
+  ],
+  [
+   "coat",
+   "Heavy coat",
+   "A buffalo coat or a canvas duster: it turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer."
   ],
   [
    "lantern",
@@ -2318,6 +2323,10 @@
    "Fists, clubs, knives, arrows: 1 box. Guns, heavy blades, claws: 2. Close-range shotgun or buffalo rifle: 3 and Dying."
   ],
   [
+   "Defense",
+   "Defend against every attack: Dodge, or Parry a blade, claw or fist (Melee or Brawling −3; −2 more for each extra parry in a round). Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target. Heavy coat: once a fight, a 2+ box hit from a blade, claw, fang or missile marks one fewer."
+  ],
+  [
    "Guns",
    "Derringer 2, revolver 6, shotgun 2, rifle 15. Fan the hammer 3 (−2), both barrels 2 (+2 close), covering fire 3. Reload: one action. Natural 18 jams."
   ],
@@ -3051,5 +3060,55 @@
     "sheetNote": "renewed each job"
    }
   ]
+ ],
+ "combatRules": {
+  "dodgeEveryAttack": {},
+  "attackQualityDodge": {
+   "bands": [
+    {
+     "from": 0,
+     "mod": 0
+    },
+    {
+     "from": 3,
+     "mod": -1
+    },
+    {
+     "from": 5,
+     "mod": -2
+    },
+    {
+     "from": 7,
+     "mod": -3
+    }
+   ]
+  },
+  "parry": {
+   "mod": -3,
+   "repeatPenalty": -2
+  },
+  "aim": {
+   "bonus": 1
+  }
+ },
+ "protection": [
+  {
+   "id": "coat",
+   "equipment": "coat",
+   "name": "Heavy coat",
+   "text": "A buffalo coat or a canvas duster: it turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer.",
+   "traits": [
+    {
+     "type": "armor",
+     "minBoxes": 2,
+     "reduce": 1,
+     "against": [
+      "melee",
+      "missile"
+     ],
+     "label": "Heavy coat"
+    }
+   ]
+  }
  ]
 }

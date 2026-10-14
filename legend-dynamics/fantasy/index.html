@@ -3825,11 +3825,15 @@ tr.lvl-U td.target { color: var(--muted); }
                 <option value="1">Assist succeeded +1</option>
                 <option value="2">Assist by 5+ +2</option>
               </select></div>
+            <div class="field" id="r-quality-wrap" hidden><label for="r-quality">Attack succeeded by</label><select id="r-quality"></select></div>
+            <div class="field" id="r-parries-wrap" hidden><label for="r-parries">Parries already this round</label>
+              <select id="r-parries"><option value="0">None</option><option value="1">One</option><option value="2">Two</option><option value="3">Three</option></select></div>
           </div>
           <div class="checks">
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
             <label id="r-phys-wrap"><input type="checkbox" id="r-phys"> <span id="r-phys-label">Physical action (injury penalty)</span></label>
             <label><input type="checkbox" id="r-stun"> Reeling −2</label>
+            <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> <span id="r-aim-label">Aimed at this target</span></label>
           </div>
           <div class="btn-row"><button class="btn primary" id="r-roll">Roll</button>
             <span class="muted small" id="r-target"></span></div>
@@ -4179,6 +4183,10 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
  * Each experiment says whether it changes the CORE (every setting) or one SETTING, and plugs into the core
  * attack pipeline only through its hook lists. Nothing here runs in normal play: the creator's roller and
  * sheet always use the published core, and the lab must be given a lab configuration explicitly.
+ *
+ * A setting can publish one of these rules for itself (pack.json "combatRules": { id: params }, as Dust &
+ * Damnation does). Then it is part of that setting's published rules, in every configuration, with the
+ * published parameters, and it is no longer offered as an experiment there.
  */
 
 /** @typedef {{ source: string, label: string, value: number, scope: string }} Modifier */
@@ -4201,7 +4209,7 @@ const EXPERIMENTS = [
     /** @returns {Modifier[]} */
     dodgeModifiers: (/** @type {any} */ ctx, /** @type {any} */ p) => {
       const value = bandFor(ctx.margin, p.bands);
-      return value ? [{ source: "attackQuality", label: `Attack quality (succeeded by ${ctx.margin})`, value, scope: "experiment" }] : [];
+      return value ? [{ source: "attackQuality", label: `Attack quality (succeeded by ${ctx.margin})`, value, scope: p.scope || "experiment" }] : [];
     },
   },
   {
@@ -4210,7 +4218,7 @@ const EXPERIMENTS = [
     params: { bonus: 1 },
     actions: ["aim"],
     /** @returns {Modifier[]} */
-    attackModifiers: (/** @type {any} */ ctx, /** @type {any} */ p) => (ctx.aimed ? [{ source: "aim", label: "Aim", value: p.bonus, scope: "experiment" }] : []),
+    attackModifiers: (/** @type {any} */ ctx, /** @type {any} */ p) => (ctx.aimed ? [{ source: "aim", label: "Aim", value: p.bonus, scope: p.scope || "experiment" }] : []),
   },
   {
     id: "parry", scope: "core", label: "Parry",
@@ -4251,9 +4259,9 @@ const EXPERIMENTS = [
 ];
 
 /** A fresh lab configuration for a setting, every experiment off, parameters at their defaults. @param {string} setting @param {any} [lab] */
-function newLabConfig(setting, lab) {
+function newLabConfig(setting, lab, published) {
   const experiments = {};
-  for (const x of available(setting, lab)) {
+  for (const x of available(setting, lab, published)) {
     const params = JSON.parse(JSON.stringify(x.params));
     if (x.id === "labWeaponTraits") params.weaponTraits = JSON.parse(JSON.stringify((lab && lab.weaponTraits) || {}));
     experiments[x.id] = { on: false, params };
@@ -4261,25 +4269,25 @@ function newLabConfig(setting, lab) {
   return { id: "lab-" + Date.now().toString(36), label: (lab && lab.label) || "Test configuration", kind: "lab", setting, experiments };
 }
 
-/** Experiments that apply to a setting: every core one, and setting ones the setting's test configuration offers. @param {string} setting @param {any} [lab] */
-function available(setting, lab) {
-  return EXPERIMENTS.filter((x) => x.scope === "core" || ((lab && lab.experiments) || []).includes(x.id));
+/**
+ * Experiments that apply to a setting: every core one, and setting ones the setting's test configuration offers,
+ * less any the setting has published. @param {string} setting @param {any} [lab] @param {Record<string, any>} [published]
+ */
+function available(setting, lab, published) {
+  return EXPERIMENTS.filter((x) => (x.scope === "core" || ((lab && lab.experiments) || []).includes(x.id)) && !(published && x.id in published));
 }
 
 /**
  * Turn a configuration into what the core needs: hook lists, extra actions, the weapons in force, and a
  * record of exactly which experiments were active (with their scope and parameters) for the log.
- * The published configuration always yields empty hooks and the published weapons.
- * @param {any} config @param {Record<string, any>} weapons @param {any} [lab]
+ * The published configuration yields the setting's published rules (`published`, from pack.json "combatRules";
+ * none for most settings) and the published weapons. `settingRules` lists those, `active` the experiments.
+ * @param {any} config @param {Record<string, any>} weapons @param {any} [lab] @param {Record<string, any>} [published]
  */
-function buildRules(config, weapons, lab) {
+function buildRules(config, weapons, lab, published) {
   const rules = { config: config.id, label: config.label, kind: config.kind, hooks: { attackModifiers: [], dodgeModifiers: [] }, actions: new Set(), flags: new Set(),
-    defenses: /** @type {Record<string, any>} */ ({}), protection: /** @type {any[]} */ ([]), weapons, active: [] };
-  if (config.kind !== "lab") return rules;
-  for (const x of available(config.setting, lab)) {
-    const st = config.experiments[x.id];
-    if (!st || !st.on) continue;
-    const p = { ...x.params, ...(st.params || {}) };
+    defenses: /** @type {Record<string, any>} */ ({}), protection: /** @type {any[]} */ ([]), weapons, active: /** @type {any[]} */ ([]), settingRules: /** @type {any[]} */ ([]) };
+  const apply = (/** @type {any} */ x, /** @type {any} */ p) => {
     if (x.attackModifiers) rules.hooks.attackModifiers.push((/** @type {any} */ ctx) => x.attackModifiers(ctx, p));
     if (x.dodgeModifiers) rules.hooks.dodgeModifiers.push((/** @type {any} */ ctx) => x.dodgeModifiers(ctx, p));
     for (const a of x.actions || []) rules.actions.add(a);
@@ -4287,6 +4295,20 @@ function buildRules(config, weapons, lab) {
     if (x.defense) rules.defenses[x.defense] = p;
     if (x.protection) rules.protection = x.protection(lab);
     if (x.weapons) rules.weapons = x.weapons(rules.weapons, lab, p);
+  };
+  for (const [id, params] of Object.entries(published || {})) {
+    const x = EXPERIMENTS.find((e) => e.id === id);
+    if (!x) continue;
+    const p = { ...x.params, ...(params || {}), scope: "setting" };
+    apply(x, p);
+    rules.settingRules.push({ id: x.id, label: x.label, params: p });
+  }
+  if (config.kind !== "lab") return rules;
+  for (const x of available(config.setting, lab, published)) {
+    const st = config.experiments[x.id];
+    if (!st || !st.on) continue;
+    const p = { ...x.params, ...(st.params || {}) };
+    apply(x, p);
     rules.active.push({ id: x.id, scope: x.scope, label: x.label, params: p });
   }
   return rules;
@@ -4440,8 +4462,8 @@ function defenseOptions(enc, rules, d, w) {
     const best = cands.sort((x, y) => y.t - x.t)[0];
     if (best) {
       const n = d.parryRound === enc.round ? d.parries || 0 : 0;
-      const mods = [{ source: "parry", label: "Parry", value: D.parry.mod, scope: "experiment" }];
-      if (n && D.parry.repeatPenalty) mods.push({ source: "parry", label: `Parry ${n + 1} this round`, value: D.parry.repeatPenalty * n, scope: "experiment" });
+      const mods = [{ source: "parry", label: "Parry", value: D.parry.mod, scope: D.parry.scope || "experiment" }];
+      if (n && D.parry.repeatPenalty) mods.push({ source: "parry", label: `Parry ${n + 1} this round`, value: D.parry.repeatPenalty * n, scope: D.parry.scope || "experiment" });
       opt({ kind: "parry", label: `Parry (${best.name}, ${best.skill})`, base: best.t, mods, used: false });
     }
   }
@@ -4794,18 +4816,20 @@ function mountLab(api) {
 
   /** @type {{ mode: "published" | "lab", cfg: any, enc: any, history: any[], compare: any }} */
   let lab = store.get(KEY, null) || { mode: "published", cfg: null, enc: null, history: [], compare: null };
-  const fresh = LDX.newLabConfig(PACK.id, LAB);
+  const PUB = PACK.combatRules || null; // rules this setting has published from the lab (Dust & Damnation)
+  const fresh = LDX.newLabConfig(PACK.id, LAB, PUB);
   if (!lab.cfg) lab.cfg = fresh;
   for (const [id, st] of Object.entries(fresh.experiments)) if (!lab.cfg.experiments[id]) lab.cfg.experiments[id] = st; // new experiments appear switched off
   lab.cfg.label = LAB.label || lab.cfg.label;
   const save = () => store.set(KEY, lab);
   const say = (/** @type {string} */ m, /** @type {boolean} */ err = false) => { $("lab-msg").textContent = m; $("lab-msg").className = "toast" + (err ? " err" : ""); };
 
-  const rulesOf = (/** @type {any} */ cfg) => ({ ...LDX.buildRules(cfg && cfg.kind === "lab" ? cfg : LDX.PUBLISHED, WEAPONS, LAB), jamOn18: !!PACK.weapons.jamOn18 });
+  const rulesOf = (/** @type {any} */ cfg) => ({ ...LDX.buildRules(cfg && cfg.kind === "lab" ? cfg : LDX.PUBLISHED, WEAPONS, LAB, PUB), jamOn18: !!PACK.weapons.jamOn18 });
   const enc = () => lab.enc;
   // A running encounter keeps the rules it started with; otherwise the configuration chosen for the next one.
   const rules = () => rulesOf(enc() && enc().status !== "ended" ? enc().config : lab.mode === "lab" ? lab.cfg : LDX.PUBLISHED);
-  const rulesLine = (/** @type {any} */ r) => r.kind === "lab" ? `${r.label}${r.active.length ? ": " + r.active.map((/** @type {any} */ a) => `${a.label} (${a.scope.toUpperCase()})`).join(", ") : ": no experiments on"}` : "Published rules";
+  const settingLine = (/** @type {any} */ r) => (r.settingRules.length ? ` (with ${T.title}'s ${r.settingRules.map((/** @type {any} */ a) => a.label).join(", ")})` : "");
+  const rulesLine = (/** @type {any} */ r) => r.kind === "lab" ? `${r.label}${r.active.length ? ": " + r.active.map((/** @type {any} */ a) => `${a.label} (${a.scope.toUpperCase()})`).join(", ") : ": no experiments on"}${settingLine(r)}` : "Published rules" + settingLine(r);
 
   // ---- rules configuration ----
   function renderRules() {
@@ -4820,7 +4844,9 @@ function mountLab(api) {
       ? `This encounter runs under: ${rulesLine(r)}. Changes here apply to the next encounter.`
       : lab.mode === "lab" ? "New encounters use the test configuration." : "New encounters use the published rules. Choose the test configuration to switch experiments on.";
     const on = lab.mode === "lab";
-    $("lab-exps").innerHTML = LDX.available(PACK.id, LAB).map((/** @type {any} */ x) => {
+    const pubRows = rules().settingRules.map((/** @type {any} */ x) => `<div class="exp"><label><input type="checkbox" checked disabled> <b>${esc(x.label)}</b></label>
+        <span class="lab-scope setting">PUBLISHED</span><div class="small muted">Part of ${esc(T.title)}'s published rules, in every configuration.</div></div>`).join("");
+    $("lab-exps").innerHTML = pubRows + LDX.available(PACK.id, LAB, PUB).map((/** @type {any} */ x) => {
       const st = lab.cfg.experiments[x.id];
       return `<div class="exp ${st.on && on ? "on" : ""}"><label><input type="checkbox" data-exp="${x.id}" ${st.on ? "checked" : ""} ${on ? "" : "disabled"}> <b>${esc(x.label)}</b></label>
         <span class="lab-scope ${x.scope}">${x.scope.toUpperCase()}</span><div class="small muted">${esc(x.summary)}</div>${on ? paramsEditor(x, st.params) : ""}</div>`;
@@ -5576,6 +5602,13 @@ return { mountLab };
   const levelName = (l, name) => ((l === "S" && isGS() && !(name && advancedToS(name))) || (l === "S" && masterSkill(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge);
+  // A setting's own combat rules (Dust & Damnation: defend every attack, attack quality, Parry, Aim).
+  const CR = PACK.combatRules || {};
+  const PARRY = CR.parry ? [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]] : [];
+  const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
+  const isParry = (name) => name.startsWith("Parry:");
+  const isDefense = (name) => name === "Dodge" || isParry(name);
+  const rollLabel = (name) => (isParry(name) ? `Parry (${name.slice(6)})` : name);
   const count = (lvl) => Object.entries(ch.skills).filter(([k, v]) => v === lvl && !freeSkill(k)).length;
   const odds = LD.odds; // the core rules module
   const pct = (t) => Math.round(odds(t) * 100) + "%";
@@ -5637,6 +5670,12 @@ return { mountLab };
   $("f-comp").innerHTML = `<option value="">Choose a complication…</option>` +
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
   $("equip").innerHTML = EQUIPMENT.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="eq-${k}" data-eq="${k}"><span><b>${n}</b><span class="small muted">${eff}</span></span></label>`).join("");
+  if (CR.attackQualityDodge) {
+    const b = [...CR.attackQualityDodge.bands].sort((x, y) => x.from - y.from);
+    $("r-quality").innerHTML = b.map((x, i) => `<option value="${x.mod}">${x.from}${b[i + 1] ? "–" + (b[i + 1].from - 1) : "+"}${x.mod ? " " + signed(x.mod) : " (no penalty)"}</option>`).join("");
+  }
+  if (CR.parry) [...$("r-parries").options].forEach((o) => { if (+o.value) o.textContent += " " + signed(o.value * CR.parry.repeatPenalty); });
+  if (CR.aim) $("r-aim-label").textContent = `Aimed at this target last action ${signed(CR.aim.bonus)}`;
 
   if (SPELLS) $("spell-list").innerHTML = SPELLS.list.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="sp-${k}" data-spell="${k}"><span><b>${n}</b><span class="small muted" id="sp-eff-${k}">${eff}</span></span></label>`).join("");
   $("edge-list").innerHTML = EDGE_DEFS.map(([k, n, d]) => `<div class="edge"><b>${n}</b>
@@ -5875,7 +5914,9 @@ return { mountLab };
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
     $("st-grit").textContent = gritStart();
-    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`;
+    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`
+      + (CR.parry ? `. Parry = ${PARRY.map(([s]) => `${s} ${skillTarget(s)} ${signed(CR.parry.mod)} = ${parryOf(s)}`).join(", or ")}` : "")
+      + (CR.dodgeEveryAttack ? ". You may defend against every attack." : "");
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
@@ -5910,6 +5951,7 @@ return { mountLab };
         <div><span class="label">${T.role}</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">${T.origin}</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge()}</b></div>
+        ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}; ${parryOf(T.unarmedSkill)} bare-handed</span></div>` : ""}
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
       <div class="attr-strip">${ATTRS.map(([n]) => `<div><span class="label">${n}</span><b>${ch.attrs[n]}</b></div>`).join("")}</div>
@@ -6066,7 +6108,7 @@ return { mountLab };
     // roller options
     const sel = $("r-skill"), prev = sel.value;
     sel.innerHTML = `<optgroup label="Skills">${sorted.map((s) => `<option value="${esc(s.n)}">${s.n} (${s.t})</option>`).join("")}</optgroup>
-      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}</optgroup>
+      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}${PARRY.map(([s, how]) => `<option value="Parry:${s}">Parry ${how}: ${s} ${signed(CR.parry.mod)} (${parryOf(s)})</option>`).join("")}</optgroup>
       <optgroup label="Attributes">${ATTRS.map(([n]) => `<option value="${n}">${n} (${ch.attrs[n]})</option>`).join("")}</optgroup>`;
     if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
     // Abilities without a +2 leave the box disabled.
@@ -6080,6 +6122,7 @@ return { mountLab };
 
   function rollBase(name) {
     if (name === "Dodge") return dodge();
+    if (isParry(name)) return parryOf(name.slice(6));
     if (ch.attrs[name] != null) return ch.attrs[name];
     return skillTarget(name);
   }
@@ -6092,17 +6135,21 @@ return { mountLab };
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
+    if (CR.attackQualityDodge && isDefense(name)) parts.push(+$("r-quality").value || 0);
+    if (CR.parry && isParry(name)) parts.push((+$("r-parries").value || 0) * CR.parry.repeatPenalty);
+    if (CR.aim && !$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(CR.aim.bonus);
     // In an alternate form, the form profile's bonuses apply to rolls on those attributes and their skills.
     const w = ch.play.form && FORMED.has(ch.speciesId) && heritageOf()?.form;
     if (w) {
-      const attr = name === "Dodge" ? null : ch.attrs[name] != null ? name : SKILLS.find((x) => x[0] === name)?.[1];
+      const sk = isParry(name) ? name.slice(6) : name;
+      const attr = name === "Dodge" ? null : ch.attrs[sk] != null ? sk : SKILLS.find((x) => x[0] === sk)?.[1];
       const wb = name === "Dodge" ? (w.dodge || 0) + (w.attrs.Agility || 0) : w.attrs[attr] || 0;
       if (wb) parts.push(wb);
       if (PACK.formPenalties?.[name]) parts.push(PACK.formPenalties[name]);
     }
     // Fanning the hammer is −2, both barrels +2.
     const shot = !$("r-setting-wrap").hidden ? { fan: -2, both: 2 }[$("r-setting").value] || 0 : 0;
-    return { name, base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) + shot, shot };
+    return { name: rollLabel(name), base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) + shot, shot };
   }
   function updateInjuryToggle() {
     const pen = INJURY[ch.play.injury][2];
@@ -6113,6 +6160,10 @@ return { mountLab };
   }
   function updateTarget() {
     updateInjuryToggle();
+    const sk = $("r-skill").value || "";
+    $("r-quality-wrap").hidden = !(CR.attackQualityDodge && isDefense(sk));
+    $("r-parries-wrap").hidden = !(CR.parry && isParry(sk));
+    $("r-aim-wrap").hidden = !(CR.aim && [T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk));
     const { name, base, total } = rollMods();
     const t = base + total;
     const incap = ch.play.injury >= 3;
@@ -6305,8 +6356,8 @@ return { mountLab };
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
-    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting"].includes(t.id)) updateTarget();
+    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isParry(t.value); updateTarget(); renderGun(); }
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);

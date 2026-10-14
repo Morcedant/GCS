@@ -221,14 +221,14 @@ test("Parry, Block, shield and mail", () => {
   assert.equal(S.summarize(enc2).armorStops, 1);
 });
 
-test("Heavy coat (D&D test gear): turns blades and claws, not bullets, once a fight; mail still stops everything", () => {
-  const cfg = X.newLabConfig("western", lab); cfg.experiments.labProtection.on = true;
-  const r = rulesFor(cfg);
-  assert.equal(r.protection[0].id, "coat");
-  assert.equal(rulesFor(X.PUBLISHED).protection.length, 0, "no test gear under the published rules");
+test("Heavy coat (published D&D gear): turns blades and claws, not bullets, once a fight; mail still stops everything", () => {
+  const coat = pack.protection.find((g) => g.id === "coat");
+  assert.equal(coat.equipment, "coat"); assert.ok(pack.equipment.some((e) => e[0] === "coat"), "the creator offers it as gear");
+  assert.ok(!lab.protection && !lab.experiments.includes("labProtection"), "no longer test gear");
+  const r = published;
   const one = (weapon) => {
-    const enc = setup(cfg, 21); E.startCombat(enc, r);
-    E.addGear(enc, "p1", r.protection[0]);
+    const enc = setup(X.PUBLISHED, 21); E.startCombat(enc, r);
+    E.addGear(enc, "p1", coat);
     for (let i = 0; i < 40; i++) { const ev = E.attack(enc, r, LD, { attacker: "p2", defender: "p1", weapon, band: weapon === "revolver" ? "close" : "melee", canDodge: false }).event; if (ev.hit && ev.damage !== undefined) return ev; }
   };
   const claw = one("claws"), gun = one("revolver");
@@ -236,6 +236,32 @@ test("Heavy coat (D&D test gear): turns blades and claws, not bullets, once a fi
   assert.equal(gun.armorUsed, null, "a coat doesn't stop a bullet"); assert.equal(gun.damage, 2);
   assert.equal(LD.resolveAttack({ attacker: { id: "a", name: "A", skillTarget: 14 }, defender: { id: "d", name: "D", dodgeBase: null, canDodge: false, traits: [{ type: "armor", minBoxes: 2, reduce: 1, label: "Mail" }] },
     weapon: { id: "g", firearm: true, band: "close", damage: { any: { boxes: 2 } } }, band: "close" }, LD.NO_HOOKS, () => [3, 3, 3]).armorUsed, "Mail", "no 'against': everything");
+});
+
+test("D&D's published combat rules: in force under Published and Lab alike, not offered as experiments", () => {
+  const C = pack.combatRules;
+  assert.deepEqual(Object.keys(C).sort(), ["aim", "attackQualityDodge", "dodgeEveryAttack", "parry"]);
+  for (const cfg of [X.PUBLISHED, X.newLabConfig("western", lab, C)]) {
+    const r = X.buildRules(cfg, weapons, lab, C);
+    assert.deepEqual(r.settingRules.map((x) => x.id).sort(), Object.keys(C).sort());
+    assert.ok(r.flags.has("dodgeEveryAttack") && r.actions.has("aim"));
+    assert.equal(r.defenses.parry.mod, -3); assert.equal(r.defenses.parry.repeatPenalty, -2); assert.equal(r.defenses.parry.scope, "setting");
+    assert.equal(r.hooks.dodgeModifiers.length, 1); assert.equal(r.hooks.attackModifiers.length, 1);
+    assert.equal(r.active.length, 0, "no experiments on");
+  }
+  const ids = X.available("western", lab, C).map((x) => x.id);
+  assert.ok(!ids.includes("parry") && !ids.includes("aim") && ids.includes("block") && ids.includes("labWeaponTraits"));
+  // A clean hit (margin 5) puts the Dodge at -2, logged as a setting rule; a parry is Brawling -3.
+  const r = { ...X.buildRules(X.PUBLISHED, weapons, lab, C), jamOn18: true };
+  const [mod] = r.hooks.dodgeModifiers[0]({ margin: 5 });
+  assert.equal(mod.value, -2); assert.equal(mod.scope, "setting");
+  const enc = setup(X.PUBLISHED, 8); E.startCombat(enc, r);
+  const opts = E.defenseOptions(enc, r, E.find(enc, "p1"), weapons.fists);
+  assert.deepEqual(opts.map((o) => [o.kind, o.preview]), [["dodge", 11], ["parry", 9]]);
+  // Other settings publish none of this.
+  const crown = JSON.parse(readFileSync(new URL("../../../packs/fantasy/pack.json", import.meta.url)));
+  assert.equal(crown.combatRules, undefined);
+  assert.equal(X.buildRules(X.PUBLISHED, weapons, lab, crown.combatRules).settingRules.length, 0);
 });
 
 test("Enchanted weapons: +2 to hit or +1 box with that weapon only", () => {

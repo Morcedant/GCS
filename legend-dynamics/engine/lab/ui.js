@@ -29,18 +29,20 @@ export function mountLab(api) {
 
   /** @type {{ mode: "published" | "lab", cfg: any, enc: any, history: any[], compare: any }} */
   let lab = store.get(KEY, null) || { mode: "published", cfg: null, enc: null, history: [], compare: null };
-  const fresh = LDX.newLabConfig(PACK.id, LAB);
+  const PUB = PACK.combatRules || null; // rules this setting has published from the lab (Dust & Damnation)
+  const fresh = LDX.newLabConfig(PACK.id, LAB, PUB);
   if (!lab.cfg) lab.cfg = fresh;
   for (const [id, st] of Object.entries(fresh.experiments)) if (!lab.cfg.experiments[id]) lab.cfg.experiments[id] = st; // new experiments appear switched off
   lab.cfg.label = LAB.label || lab.cfg.label;
   const save = () => store.set(KEY, lab);
   const say = (/** @type {string} */ m, /** @type {boolean} */ err = false) => { $("lab-msg").textContent = m; $("lab-msg").className = "toast" + (err ? " err" : ""); };
 
-  const rulesOf = (/** @type {any} */ cfg) => ({ ...LDX.buildRules(cfg && cfg.kind === "lab" ? cfg : LDX.PUBLISHED, WEAPONS, LAB), jamOn18: !!PACK.weapons.jamOn18 });
+  const rulesOf = (/** @type {any} */ cfg) => ({ ...LDX.buildRules(cfg && cfg.kind === "lab" ? cfg : LDX.PUBLISHED, WEAPONS, LAB, PUB), jamOn18: !!PACK.weapons.jamOn18 });
   const enc = () => lab.enc;
   // A running encounter keeps the rules it started with; otherwise the configuration chosen for the next one.
   const rules = () => rulesOf(enc() && enc().status !== "ended" ? enc().config : lab.mode === "lab" ? lab.cfg : LDX.PUBLISHED);
-  const rulesLine = (/** @type {any} */ r) => r.kind === "lab" ? `${r.label}${r.active.length ? ": " + r.active.map((/** @type {any} */ a) => `${a.label} (${a.scope.toUpperCase()})`).join(", ") : ": no experiments on"}` : "Published rules";
+  const settingLine = (/** @type {any} */ r) => (r.settingRules.length ? ` (with ${T.title}'s ${r.settingRules.map((/** @type {any} */ a) => a.label).join(", ")})` : "");
+  const rulesLine = (/** @type {any} */ r) => r.kind === "lab" ? `${r.label}${r.active.length ? ": " + r.active.map((/** @type {any} */ a) => `${a.label} (${a.scope.toUpperCase()})`).join(", ") : ": no experiments on"}${settingLine(r)}` : "Published rules" + settingLine(r);
 
   // ---- rules configuration ----
   function renderRules() {
@@ -55,7 +57,9 @@ export function mountLab(api) {
       ? `This encounter runs under: ${rulesLine(r)}. Changes here apply to the next encounter.`
       : lab.mode === "lab" ? "New encounters use the test configuration." : "New encounters use the published rules. Choose the test configuration to switch experiments on.";
     const on = lab.mode === "lab";
-    $("lab-exps").innerHTML = LDX.available(PACK.id, LAB).map((/** @type {any} */ x) => {
+    const pubRows = rules().settingRules.map((/** @type {any} */ x) => `<div class="exp"><label><input type="checkbox" checked disabled> <b>${esc(x.label)}</b></label>
+        <span class="lab-scope setting">PUBLISHED</span><div class="small muted">Part of ${esc(T.title)}'s published rules, in every configuration.</div></div>`).join("");
+    $("lab-exps").innerHTML = pubRows + LDX.available(PACK.id, LAB, PUB).map((/** @type {any} */ x) => {
       const st = lab.cfg.experiments[x.id];
       return `<div class="exp ${st.on && on ? "on" : ""}"><label><input type="checkbox" data-exp="${x.id}" ${st.on ? "checked" : ""} ${on ? "" : "disabled"}> <b>${esc(x.label)}</b></label>
         <span class="lab-scope ${x.scope}">${x.scope.toUpperCase()}</span><div class="small muted">${esc(x.summary)}</div>${on ? paramsEditor(x, st.params) : ""}</div>`;
