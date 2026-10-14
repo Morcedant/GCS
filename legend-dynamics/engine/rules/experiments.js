@@ -67,6 +67,14 @@ export const EXPERIMENTS = [
     flags: ["dodgeEveryAttack"],
   },
   {
+    id: "grievousWounds", scope: "setting", label: "Grievous wounds",
+    summary: "A hit of 2+ boxes that succeeds by 7 or more, rolls a natural 3–4, or leaves the target Dying is grievous. A character rolls 3d6 on the setting's table (a Legend point downgrades it one step); an opponent is simply taken out.",
+    params: { margin: 7, natural: true, onDying: true, minBoxes: 2 },
+    flags: ["grievous"],
+    /** The setting's table and its descriptions of opponents taken out. */
+    data: (/** @type {any} */ lab) => (lab && lab.grievous) || null,
+  },
+  {
     id: "labProtection", scope: "setting", label: "Test protection",
     summary: "Protective gear from this setting's test configuration (a heavy coat, say), which the GM can put on anyone in the encounter.",
     params: {},
@@ -114,7 +122,7 @@ export function available(setting, lab, published) {
  */
 export function buildRules(config, weapons, lab, published) {
   const rules = { config: config.id, label: config.label, kind: config.kind, hooks: { attackModifiers: [], dodgeModifiers: [] }, actions: new Set(), flags: new Set(),
-    defenses: /** @type {Record<string, any>} */ ({}), params: /** @type {Record<string, any>} */ ({}), protection: /** @type {any[]} */ ([]), weapons, active: /** @type {any[]} */ ([]), settingRules: /** @type {any[]} */ ([]) };
+    defenses: /** @type {Record<string, any>} */ ({}), params: /** @type {Record<string, any>} */ ({}), data: /** @type {Record<string, any>} */ ({}), protection: /** @type {any[]} */ ([]), weapons, active: /** @type {any[]} */ ([]), settingRules: /** @type {any[]} */ ([]) };
   const apply = (/** @type {any} */ x, /** @type {any} */ p) => {
     if (x.attackModifiers) rules.hooks.attackModifiers.push((/** @type {any} */ ctx) => x.attackModifiers(ctx, p));
     if (x.dodgeModifiers) rules.hooks.dodgeModifiers.push((/** @type {any} */ ctx) => x.dodgeModifiers(ctx, p));
@@ -122,6 +130,7 @@ export function buildRules(config, weapons, lab, published) {
     for (const f of x.flags || []) rules.flags.add(f);
     if (x.defense) rules.defenses[x.defense] = p;
     rules.params[x.id] = p;
+    if (x.data) rules.data[x.id] = x.data(lab);
     if (x.protection) rules.protection = x.protection(lab);
     if (x.weapons) rules.weapons = x.weapons(rules.weapons, lab, p);
   };

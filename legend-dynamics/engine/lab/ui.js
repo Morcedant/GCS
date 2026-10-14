@@ -72,6 +72,10 @@ export function mountLab(api) {
         <input class="lab-mini" type="number" min="-10" max="5" data-band="${i}" data-k="mod" value="${b.mod}" aria-label="Dodge modifier"> <button type="button" class="linkish danger" data-band-rm="${i}">Remove</button></div>`).join("")}
         <button type="button" class="linkish" data-band-add>Add a band</button></div>`;
     }
+    if (x.id === "grievousWounds") return `<div class="small" style="margin-top:6px"><div class="lab-row">A hit of <input class="lab-mini" type="number" min="1" max="4" data-gw="minBoxes" value="${p.minBoxes}" aria-label="Minimum boxes"> or more boxes is grievous when it</div>
+      <div class="lab-row">succeeds by <input class="lab-mini" type="number" min="1" max="20" data-gw="margin" value="${p.margin}" aria-label="Margin"> or more,</div>
+      <div class="lab-row"><label><input type="checkbox" data-gw="natural" ${p.natural ? "checked" : ""}> rolls a natural 3–4,</label> <label><input type="checkbox" data-gw="onDying" ${p.onDying ? "checked" : ""}> or leaves the target Dying.</label></div>
+      <div class="muted">Characters roll 3d6 on the table; opponents are taken out. Set the margin to 20 to leave clean hits out.</div></div>`;
     if (x.id === "aim") return `<div class="small lab-row" style="margin-top:6px">Aim bonus <input class="lab-mini" type="number" min="0" max="6" data-aim value="${p.bonus}" aria-label="Aim bonus"></div>`;
     if (x.id === "labWeaponTraits") {
       const rows = Object.entries(p.weaponTraits || {}).flatMap(([w, ts]) => /** @type {any[]} */ (ts).map((t, i) => ({ w, i, t })));
@@ -96,6 +100,7 @@ export function mountLab(api) {
     else if (t.dataset.exp) lab.cfg.experiments[t.dataset.exp].on = t.checked;
     else if (t.dataset.band !== undefined) lab.cfg.experiments.attackQualityDodge.params.bands[+t.dataset.band][t.dataset.k] = +t.value;
     else if ("aim" in t.dataset) lab.cfg.experiments.aim.params.bonus = +t.value;
+    else if (t.dataset.gw) { const gp = lab.cfg.experiments.grievousWounds.params; gp[t.dataset.gw] = t.type === "checkbox" ? t.checked : +t.value; }
     else return;
     save(); renderRules(); renderAll();
   });
@@ -226,11 +231,12 @@ export function mountLab(api) {
         <span class="btn-row">${en.status === "combat" ? `<button class="linkish" data-up="${p.pid}" aria-label="Move ${esc(p.name)} up the turn order">▲</button><button class="linkish" data-down="${p.pid}" aria-label="Move ${esc(p.name)} down">▼</button>` : ""}
           <button class="linkish danger" data-rm="${p.pid}" aria-label="Remove ${esc(p.name)}">×</button></span>
         <span class="meta small"><span class="boxes">${Array.from({ length: p.boxes }, (_, i) => `<button class="box ${i < p.injury ? "on" : ""}" data-inj="${p.pid}" data-i="${i + 1}" aria-label="${esc(p.name)} box ${i + 1}"></button>`).join("")}</span>
-          ${p.dead ? "<b style='color:var(--bad)'>Dead</b>" : p.dying ? "<b style='color:var(--bad)'>Dying</b>" : out ? "<b>Down</b>" : esc(api.injuryNames[inj] || "")}
+          ${p.dead ? "<b style='color:var(--bad)'>Dead</b>" : p.dying ? "<b style='color:var(--bad)'>Dying</b>" : p.takenOut ? "<b style='color:var(--bad)'>Taken out</b>" : out ? "<b>Down</b>" : esc(api.injuryNames[inj] || "")}
           ${p.kind === "pc" ? ` · ${esc(T.point)} <button class="linkish" data-pt="${p.pid}" data-d="-1" aria-label="${esc(p.name)}: one ${esc(T.point)} point fewer">−</button><b>${p.points}</b><button class="linkish" data-pt="${p.pid}" data-d="1" aria-label="${esc(p.name)}: one ${esc(T.point)} point more">+</button>` : ""}
           ${Object.entries(p.ammo).map(([k, v]) => ` · ${esc(PACK.weapons.items[k] ? PACK.weapons.items[k][0] : k)} ${v}/${PACK.weapons.items[k] ? PACK.weapons.items[k][1] : "?"}`).join("")}
           ${Object.entries(p.tracks || {}).filter(([, v]) => v).map(([k, v]) => ` · <b>${esc(k)} ${v}</b>`).join("")}
           ${(p.traits || []).map((/** @type {any} */ t, /** @type {number} */ i) => t.type === "shield" ? "" : t.type === "armor" ? ` · ${esc(t.label)}${t.used ? " (used)" : ""}` : t.toggle ? ` · <button class="linkish" data-trait="${p.pid}" data-i="${i}" title="Switch on or off">${esc(t.label)}: ${t.on === false ? "off" : "on"}</button>` : ` · ${esc(t.label || t.type)}`).join("")}
+          ${(p.lasting || []).map((/** @type {any} */ w) => ` · <b style='color:var(--bad)'>${esc(w.name)}</b>`).join("")}
           ${p.aim ? ` · <b>aiming at ${esc((E.find(en, p.aim.target) || {}).name || "?")}</b>` : ""}
           ${p.conditions.map((/** @type {string} */ c) => ` · <button class="linkish" data-cond-rm="${p.pid}" data-c="${esc(c)}" title="Remove">${esc(c)} ×</button>`).join("")}
           ${(() => { const can = [...gearList, ...enchFor(p)].filter((/** @type {any} */ g) => !(p.gear || []).includes(g.id)); return can.length && en.status !== "ended" ? ` · <select class="lab-mini" style="width:auto" data-gear="${p.pid}" aria-label="Give ${esc(p.name)} protective gear"><option value="">+ Gear</option>${can.map((/** @type {any} */ g) => `<option value="${g.id}" title="${esc(g.text || "")}">${esc(g.name)}</option>`).join("")}</select>` : ""; })()}
@@ -394,6 +400,12 @@ export function mountLab(api) {
     if (ev.marginTrait) L.push(`<span class="x">${esc(ev.marginTrait)}.</span>`);
     if (ev.price) L.push(`<span class="bad">Failed cast: ${esc(ev.attacker.name)} marks ${ev.price.boxes} ${esc(ev.price.track)}.</span>`);
     if (ev.jam) L.push(`<span class="bad">Natural ${ev.attackTotal}: ${ev.weapon && WEAPONS[ev.weapon.id] && WEAPONS[ev.weapon.id].ammo ? "the weapon jams or misfires" : "the weapon fails"}. Clearing it takes an action.</span>`);
+    if (ev.grievous) {
+      const g = ev.grievous;
+      L.push("", g.pc ? `<b class="bad">Grievous wound (${esc(g.why)}): 3d6 = ${g.total} (${g.dice.join(" + ")}) → ${esc(g.name)}.</b> ${esc(g.text)}`
+        : `<b class="bad">Taken out (${esc(g.why)}).</b> ${esc(g.text)}`);
+      if (g.downgradedTo !== undefined) L.push(`<span class="x">${esc(T.point)} point: downgraded to ${esc(g.downgradedTo || "no lasting wound")}.</span>`);
+    }
     if (ev.overridden) L.push("", `<b class="x">GM ruling: ${ev.hit ? "HIT" : "MISS"}</b> (the dice said ${ev.rolledHit ? "hit" : "miss"}). ${esc(ev.defender.name)}: ${ev.injuryAfter} box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", dead" : ev.dying ? ", Dying" : ""}.`);
     return L.join("\n");
   }
@@ -407,6 +419,7 @@ export function mountLab(api) {
     if (live && !ruled && !ev.reroll && a && a.kind === "pc" && a.points > 0 && ev.attackDice) btns.push(`<button class="btn" data-fx="reroll-attack">${esc(a.name)}: reroll the attack (${esc(T.point)})</button>`);
     if (live && !ruled && !ev.reroll && d && d.kind === "pc" && d.points > 0 && ev.dodgeDice) btns.push(`<button class="btn" data-fx="reroll-dodge">${esc(d.name)}: reroll the Dodge (${esc(T.point)})</button>`);
     if (live && !ruled && d && d.kind === "pc" && d.points > 0 && ev.hit && ev.damage && !ev.reduced) btns.push(`<button class="btn" data-fx="reduce">${esc(d.name)}: one box fewer (${esc(T.point)})</button>`);
+    if (live && ev.grievous && ev.grievous.pc && ev.grievous.downgradedTo === undefined && d && d.points > 0) btns.push(`<button class="btn" data-fx="downgrade">${esc(d.name)}: downgrade the grievous wound (${esc(T.point)})</button>`);
     if (live && ev.attackDice) btns.push(`<button class="btn" data-fx="${ev.hit ? "miss" : "hit"}">GM: make it a ${ev.hit ? "miss" : "hit"}</button>`);
     $("lab-result").innerHTML = `<div class="lab-calc" data-ev="${ev.n}">${calcText(ev)}</div>${btns.length ? `<div class="btn-row" style="margin-top:8px">${btns.join("")}</div>` : ""}`;
   }
@@ -415,7 +428,7 @@ export function mountLab(api) {
     const n = +$("lab-result").querySelector("[data-ev]").dataset.ev, ev = en.events.find((/** @type {any} */ x) => x.n === n), fx = b.dataset.fx;
     let res;
     if (fx === "hit" || fx === "miss") res = E.override(en, rules(), LD, "outcome", { event: n, hit: fx === "hit", reason: "GM ruling" });
-    else res = E.spendPoint(en, rules(), LD, fx === "reroll-dodge" || fx === "reduce" ? ev.defender.pid : ev.attacker.pid, fx, { event: n });
+    else res = E.spendPoint(en, rules(), LD, fx === "reroll-dodge" || fx === "reduce" || fx === "downgrade" ? ev.defender.pid : ev.attacker.pid, fx, { event: n });
     if (res.error) { say(res.error, true); return; }
     pushToCards(); save(); renderAll();
     showResult(res.event && res.event.type === "attack" ? res.event.n : n);
@@ -449,8 +462,8 @@ export function mountLab(api) {
       case "turn": return `${esc(e.name || "")}'s turn.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}`;
-      case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation" }[e.use] || e.use)}${e.note ? ` (${esc(e.note)})` : ""}.`;
+      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}`;
+      case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation", downgrade: "downgrade a grievous wound" }[e.use] || e.use)}${e.from ? ` (${esc(e.from)} → ${esc(e.to)})` : ""}${e.note ? ` (${esc(e.note)})` : ""}.`;
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
       case "gear": return `${esc(e.name)} puts on ${esc(e.item)}.`;
       case "trait": return `${esc(e.name)}: ${esc(e.trait)} ${e.on ? "on" : "off"}.`;
@@ -481,7 +494,7 @@ export function mountLab(api) {
   const TILES = [["rounds", "Rounds"], ["attacks", "Attacks"], ["attackSuccessRate", "Attack success", pct], ["dodgeNegatedRate", "Successes dodged", pct], ["finalHitRate", "Final hit rate", pct],
     ["averageMargin", "Average margin"], ["dodgeSuccessRate", "Dodge success", pct], ["averageEffectiveDodge", "Average effective Dodge"], ["damageFrequency", "Damage frequency", pct],
     ["injuryFrequency", "Injury frequency", pct], ["boxesMarked", "Boxes marked"], ["incapacitated", "Down"], ["dead", "Dead"], ["pointsSpent", "Points spent"], ["complications", "Complications"], ["overrides", "GM overrides"], ["jams", "Jams"], ["boostsSpent", "Boosts"],
-    ["armorStops", "Armour stops"], ["priceMarked", PTRACK ? PTRACK.name + " marked" : "Price marked", (/** @type {any} */ v) => Object.values(v || {}).reduce((/** @type {number} */ a, /** @type {any} */ b) => a + b, 0)]];
+    ["armorStops", "Armour stops"], ["grievous", "Grievous wounds"], ["takenOut", "Foes taken out"], ["priceMarked", PTRACK ? PTRACK.name + " marked" : "Price marked", (/** @type {any} */ v) => Object.values(v || {}).reduce((/** @type {number} */ a, /** @type {any} */ b) => a + b, 0)]];
   /** @param {any} s */
   const tiles = (s) => `<div class="lab-sum">${TILES.map(([k, n, f]) => `<div><span>${n}</span><b>${f ? f(s[k]) : s[k] ?? "—"}</b></div>`).join("")}</div>`;
   function renderSummary() {

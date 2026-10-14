@@ -207,7 +207,8 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   const chosen = prior ? prior.defenseChoice : chooseDefense(defenseOptions(enc, rules, d, weapon), choice, !!cmd.allowExtraDodge);
   const extraDodge = !prior && !!chosen && chosen.used;
   const canDodge = !!chosen;
-  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound, parryRound: d.parryRound, parries: d.parries, blockedRound: d.blockedRound, defRound: d.defRound, defCount: d.defCount, traits: clone(d.traits || []) },
+  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound, parryRound: d.parryRound, parries: d.parries, blockedRound: d.blockedRound, defRound: d.defRound, defCount: d.defCount, traits: clone(d.traits || []),
+    lasting: clone(d.lasting || []), conditions: clone(d.conditions || []), takenOut: !!d.takenOut },
     attackerTracks: clone(a.tracks || {}) };
   const res = core.resolveAttack({
     attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury, traits: a.traits || [] },
@@ -239,6 +240,14 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   if (res.armorUsed) { const t = (d.traits || []).find((/** @type {any} */ x) => x.type === "armor" && !x.used && (x.label || "Armour") === res.armorUsed); if (t) t.used = true; }
   if (res.price) { a.tracks = a.tracks || {}; a.tracks[res.price.track] = (a.tracks[res.price.track] || 0) + res.price.boxes; }
   if (res.hit && res.injury) Object.assign(d, { injury: res.injury.injury, dying: res.injury.dying, dead: res.injury.dead });
+  // Grievous wounds (experiment): a heavy, clean or crippling hit maims a character, or takes an opponent out.
+  let grievous = null;
+  const G = rules.flags.has("grievous") ? rules.params.grievousWounds : null, GT = rules.data && rules.data.grievousWounds;
+  if (G && GT && res.hit && res.damage && res.damage.boxes >= (G.minBoxes || 2) && !d.dead) {
+    const why = res.attack && res.attack.margin >= G.margin ? `succeeded by ${res.attack.margin}` : G.natural && res.attack && res.attack.auto === "success" ? `natural ${res.attack.total}`
+      : G.onDying && d.dying && !pre.defender.dying ? "left Dying" : null;
+    if (why) grievous = woundFor(d, weapon, GT, why, core.diceFor(enc.seed, key("grievous")));
+  }
 
   const am = res.attackMods || [], dm = res.dodgeMods || [];
   const ev = log(enc, "attack", {
@@ -251,15 +260,43 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
-    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, shieldBroke,
+    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, shieldBroke, grievous,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
     injuryBefore: pre.defender.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead, injuryResult: res.injury ? res.injury.change : null,
   });
+  if (grievous && grievous.pc) d.lasting[d.lasting.length - 1].about = ev.n;
   if (extraDodge) log(enc, "override", { what: "dodge", about: ev.n, pid: d.pid, name: d.name, defense: chosen.kind, from: `already used ${chosen.kind} this round`, to: `${chosen.kind} allowed`, reason: "GM allowed it again" });
   if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
   return { event: ev };
+}
+
+/** What kind of wound a weapon deals, for an opponent's description. @param {any} w */
+const woundKind = (w) => (w.firearm ? "gun" : w.reach === "melee" ? (w.id === "fists" || w.id === "club" ? "blunt" : w.skill === "Brawling" ? "claw" : "blade") : "missile");
+
+/**
+ * A grievous wound. A character rolls 3d6 on the table and suffers it (Dying, a condition, a lasting wound);
+ * an opponent is taken out, with a description picked by the same dice.
+ * @param {any} d @param {any} w @param {any} GT @param {string} why @param {number[]} dice
+ */
+function woundFor(d, w, GT, why, dice) {
+  const total = dice[0] + dice[1] + dice[2];
+  if (d.kind !== "pc") {
+    const list = GT.enemy[woundKind(w)] || GT.enemy.gun || ["{name} is taken out."];
+    d.injury = d.boxes; d.takenOut = true;
+    return { pc: false, why, dice, total, text: list[total % list.length].replaceAll("{name}", d.name) };
+  }
+  const entry = GT.table.find((/** @type {any} */ x) => total >= x.from && total <= x.to);
+  return { pc: true, why, dice, total, ...applyWound(d, entry) };
+}
+/** @param {any} d @param {any} entry */
+function applyWound(d, entry) {
+  const dyingBefore = !!d.dying, condAdded = entry.condition && !(d.conditions || []).includes(entry.condition) ? entry.condition : null;
+  if (entry.dying) d.dying = true;
+  if (condAdded) d.conditions = [...(d.conditions || []), condAdded];
+  d.lasting = [...(d.lasting || []), { id: entry.id, name: entry.name }];
+  return { id: entry.id, name: entry.name, text: entry.text, dyingBefore, condAdded };
 }
 
 /** Spend a Legend point. use: "reroll-attack" | "reroll-dodge" | "reduce" (a hit by one box) | "prep" | "other". @param {any} enc @param {any} rules @param {any} core @param {string} pid @param {string} use @param {{ event?: number, note?: string }} [o] */
@@ -273,6 +310,21 @@ export function spendPoint(enc, rules, core, pid, use, o = {}) {
     if (p.kind === "pc") p.points--;
     log(enc, "point", { pid, name: p.name, use, about: ev.n });
     return attack(enc, rules, core, ev.cmd, { reroll: use === "reroll-attack" ? "attack" : "dodge", replaces: ev.n });
+  }
+  if (use === "downgrade") {
+    const g = ev && ev.grievous;
+    if (!g || !g.pc || g.downgradedTo !== undefined || ev.superseded) return { error: "Downgrade a character's grievous wound, once." };
+    const d = find(enc, ev.defender.pid), GT = rules.data && rules.data.grievousWounds;
+    if (!d || !GT) return { error: "Grievous wounds aren't part of these rules." };
+    if (p.kind === "pc") p.points--;
+    const from = GT.table.find((/** @type {any} */ x) => x.id === g.id), to = from && from.down ? GT.table.find((/** @type {any} */ x) => x.id === from.down) : null;
+    d.dying = g.dyingBefore; // undo this wound's own effects…
+    if (g.condAdded) d.conditions = d.conditions.filter((/** @type {string} */ c) => c !== g.condAdded);
+    d.lasting = (d.lasting || []).filter((/** @type {any} */ w) => w.about !== ev.n);
+    let now = null;
+    if (to) { now = applyWound(d, to); d.lasting[d.lasting.length - 1].about = ev.n; } // …and suffer the milder one instead
+    g.downgradedTo = to ? to.name : null; g.downgraded = now;
+    return { event: log(enc, "point", { pid, name: p.name, use, about: ev.n, from: g.name, to: to ? to.name : "no lasting wound" }) };
   }
   if (use === "reduce") {
     if (!ev || !ev.hit || !ev.damage || ev.reduced || ev.superseded) return { error: "Reduce a hit that marked boxes, once." };

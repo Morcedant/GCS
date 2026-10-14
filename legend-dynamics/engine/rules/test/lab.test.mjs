@@ -353,3 +353,37 @@ test("Ignoring 1-box hits once per fight (Fracture Lines' commercial powered arm
   assert.deepEqual(hits(leg), [0, 0, 0], "legion-grade: every 1-box hit marks nothing");
   assert.deepEqual(hits(com), [0, 1, 1], "commercial: only the first");
 });
+
+test("Grievous wounds (Trails experiment): characters roll the table and can downgrade; opponents are taken out", () => {
+  const cfg = X.newLabConfig("western", lab, combatOf(pack)); cfg.experiments.grievousWounds.on = true;
+  const r = { ...X.buildRules(cfg, weapons, lab, combatOf(pack)), jamOn18: true };
+  assert.ok(r.flags.has("grievous") && r.data.grievousWounds.table.length === 6);
+  const off = { ...X.buildRules(X.newLabConfig("western", lab, combatOf(pack)), weapons, lab, combatOf(pack)), jamOn18: true };
+  // An opponent hit cleanly by a 2-box weapon is taken out, described by weapon.
+  let found = null;
+  for (let seed = 1; seed < 400 && !found; seed++) {
+    const enc = setup(cfg, seed); E.startCombat(enc, r);
+    const ev = E.attack(enc, r, LD, { attacker: "p1", defender: "p2", weapon: "revolver", band: "close", canDodge: false }).event;
+    if (ev.grievous) found = { ev, out: E.find(enc, "p2") };
+  }
+  assert.ok(found, "a grievous hit happens");
+  assert.equal(found.ev.grievous.pc, false); assert.ok(found.out.takenOut && E.isOut(found.out)); assert.match(found.ev.grievous.text, /Outlaw/);
+  // A character who takes one rolls the table; a point downgrades it one step.
+  let pcEv = null, enc2 = null;
+  for (let seed = 1; seed < 600 && !pcEv; seed++) {
+    enc2 = setup(cfg, seed); E.startCombat(enc2, r); E.find(enc2, "p2").weapons.push("blade"); E.find(enc2, "p2").skills.Melee = 16;
+    const ev = E.attack(enc2, r, LD, { attacker: "p2", defender: "p1", weapon: "blade", band: "melee", canDodge: false }).event;
+    if (ev.grievous && ev.grievous.pc && r.data.grievousWounds.table.find((x) => x.id === ev.grievous.id).down) pcEv = ev;
+  }
+  assert.ok(pcEv, "a character's grievous wound with a milder step");
+  const ames = E.find(enc2, "p1"), before = ames.points, entry = r.data.grievousWounds.table.find((x) => x.id === pcEv.grievous.id);
+  assert.equal(ames.lasting[0].id, entry.id);
+  const res = E.spendPoint(enc2, r, LD, "p1", "downgrade", { event: pcEv.n });
+  assert.ok(!res.error, res.error); assert.equal(ames.points, before - 1);
+  assert.equal(ames.lasting.length, 1); assert.equal(ames.lasting[0].id, entry.down);
+  assert.ok(E.spendPoint(enc2, r, LD, "p1", "downgrade", { event: pcEv.n }).error, "once");
+  assert.equal(S.summarize(enc2).grievous, 1);
+  // Off: no grievous wounds at all.
+  const enc3 = setup(X.newLabConfig("western", lab, combatOf(pack)), found.ev.key ?? 1); E.startCombat(enc3, off);
+  assert.ok(!E.attack(enc3, off, LD, { attacker: "p1", defender: "p2", weapon: "revolver", band: "close", canDodge: false }).event.grievous);
+});
