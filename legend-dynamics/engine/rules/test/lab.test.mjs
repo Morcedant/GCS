@@ -237,3 +237,16 @@ test("Heavy coat (D&D test gear): turns blades and claws, not bullets, once a fi
   assert.equal(LD.resolveAttack({ attacker: { id: "a", name: "A", skillTarget: 14 }, defender: { id: "d", name: "D", dodgeBase: null, canDodge: false, traits: [{ type: "armor", minBoxes: 2, reduce: 1, label: "Mail" }] },
     weapon: { id: "g", firearm: true, band: "close", damage: { any: { boxes: 2 } } }, band: "close" }, LD.NO_HOOKS, () => [3, 3, 3]).armorUsed, "Mail", "no 'against': everything");
 });
+
+test("Enchanted weapons: +2 to hit or +1 box with that weapon only", () => {
+  const roll = (...q) => () => q.shift();
+  const w = { id: "sword", name: "Sword", reach: "melee", damage: { melee: { boxes: 2 } } }, other = { ...w, id: "dagger" };
+  const att = (traits) => ({ id: "a", name: "A", skillTarget: 12, traits });
+  const def = { id: "d", name: "D", dodgeBase: null, canDodge: false };
+  const acc = LD.resolveAttack({ attacker: att([{ type: "weaponBonus", weapon: "sword", accuracy: 2, label: "Enchanted Sword" }]), defender: def, weapon: w, band: "melee" }, LD.NO_HOOKS, roll([4, 4, 4]));
+  assert.equal(acc.target, 14); assert.deepEqual(acc.attackMods.map((m) => m.label), ["Enchanted Sword"]);
+  const bite = LD.resolveAttack({ attacker: att([{ type: "weaponBonus", weapon: "sword", extraBox: 1 }]), defender: def, weapon: w, band: "melee" }, LD.NO_HOOKS, roll([3, 3, 3]));
+  assert.equal(bite.damage.boxes, 3); assert.equal(bite.enchanted, 1);
+  const no = LD.resolveAttack({ attacker: att([{ type: "weaponBonus", weapon: "sword", extraBox: 1 }]), defender: def, weapon: other, band: "melee" }, LD.NO_HOOKS, roll([3, 3, 3]));
+  assert.equal(no.damage.boxes, 2, "only the enchanted weapon");
+});

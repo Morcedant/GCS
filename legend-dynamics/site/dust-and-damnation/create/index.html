@@ -701,6 +701,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide" id="contact-wrap" hidden><label for="f-contact">A friend (Edge)</label><input type="text" id="f-contact" placeholder="Who, and what they can do for you"></div>
             <div class="field" id="gear-wrap" hidden><label for="f-gearitem">Fine weapon or tool (Edge)</label><input type="text" id="f-gearitem" placeholder="e.g. An heirloom weapon"></div>
             <div class="field" id="gearskill-wrap" hidden><label for="f-gearskill">+2 to</label><select id="f-gearskill"></select></div>
+            <div id="xedge-fields" style="display:contents"></div>
             <div class="field wide"><label for="f-otherequip">Other gear</label><input type="text" id="f-otherequip" placeholder="Anything else you carry"></div>
             <div class="field wide"><label for="f-connection">Connection to another character</label>
               <select id="f-connpick" aria-label="Quick pick a connection"></select>
@@ -3923,7 +3924,7 @@ const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ athletic
 
 /**
  * @typedef {{
- *   attacker: { id: string, name: string, skill: string, skillTarget: number, injury?: number },
+ *   attacker: { id: string, name: string, skill: string, skillTarget: number, injury?: number, traits?: any[] },
  *   defender: { id: string, name: string, dodgeBase: number | null, injury?: number, canDodge: boolean, minor?: boolean, boxes?: number, dying?: boolean, dead?: boolean, traits?: any[] },
  *   weapon: any, band: string, mode?: { id: string, label: string, mod: number } | null, aimed?: number, ammo?: string,
  *   cover?: "none" | "partial" | "solid", situational?: Modifier[], jamOn18?: boolean, boosts?: number,
@@ -3968,6 +3969,9 @@ function resolveAttack(input, hooks, roll) {
   if (range) mods.push({ source: "range", label: `Range (${band})`, value: range, scope: "core" });
   if (input.mode && input.mode.mod) mods.push({ source: "mode", label: input.mode.label, value: input.mode.mod, scope: "setting" });
   for (const m of weaponAccuracy(weapon, input)) mods.push(m);
+  // An enchanted weapon (setting data on the attacker): +N to hit with that weapon.
+  const ench = (attacker.traits || []).filter((/** @type {any} */ t) => t.type === "weaponBonus" && (!t.weapon || t.weapon === weapon.id));
+  for (const t of ench) if (t.accuracy) mods.push({ source: "enchantment", label: t.label || "Enchantment", value: t.accuracy, scope: "setting" });
   if (input.cover === "partial") mods.push({ source: "cover", label: "Partial cover", value: -2, scope: "core" });
   const atkInj = INJURY_PENALTY[attacker.injury || 0] || 0;
   if (atkInj) mods.push({ source: "injury", label: "Attacker's injury", value: atkInj, scope: "core" });
@@ -4009,6 +4013,8 @@ function resolveAttack(input, hooks, roll) {
   // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
   for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }
   if (dmg && boosts) dmg = { ...dmg, boxes: dmg.boxes + boosts };
+  const bite = ench.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extraBox || 0), 0);
+  if (dmg && dmg.boxes && bite) { dmg = { ...dmg, boxes: dmg.boxes + bite }; out.enchanted = bite; }
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
   const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && dmg && dmg.boxes <= t.maxBoxes);
   if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null };
@@ -4351,7 +4357,7 @@ function attack(enc, rules, core, cmd, opts = {}) {
   const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound, parryRound: d.parryRound, parries: d.parries, blockedRound: d.blockedRound, traits: clone(d.traits || []) },
     attackerTracks: clone(a.tracks || {}) };
   const res = core.resolveAttack({
-    attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury },
+    attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury, traits: a.traits || [] },
     defender: { id: d.pid, name: d.name, dodgeBase: d.dodge, injury: d.injury, canDodge, minor: d.minor, boxes: d.boxes, dying: d.dying, dead: d.dead, traits: d.traits || [] },
     defense: chosen ? { kind: chosen.kind, label: chosen.label, base: chosen.base, mods: chosen.mods.filter((/** @type {any} */ m) => !m.preview) } : null,
     weapon, band: cmd.band, mode: cmd.mode || null, aimed, boosts: cmd.boosts || 0, ammo: cmd.ammo || null, cover: cmd.cover || "none",
@@ -4383,7 +4389,7 @@ function attack(enc, rules, core, cmd, opts = {}) {
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
-    defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null,
+    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
@@ -4736,6 +4742,7 @@ function mountLab(api) {
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       traits: protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
+      gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A threat from the setting's data. @param {any} t @param {string} name */
@@ -4778,7 +4785,8 @@ function mountLab(api) {
     const w = WEAPONS[$("lab-ah-weapon").value], minor = $("lab-ah-minor").checked;
     E.addParticipant(ensureEnc(), { kind: "npc", name, side: "foe", agility: +$("lab-ah-agi").value, dodge: +$("lab-ah-dodge").value, skills: { [w.skill]: +$("lab-ah-skill").value },
       weapons: [w.id], boxes: minor ? 1 : +$("lab-ah-boxes").value, minor, ammo: w.ammo ? { [w.ammo]: PACK.weapons.items[w.ammo][1] } : {},
-      traits: protTraits([...document.querySelectorAll("[data-ahprot]:checked")].map((/** @type {any} */ x) => x.dataset.ahprot)) });
+      traits: protTraits([...document.querySelectorAll("[data-ahprot]:checked")].map((/** @type {any} */ x) => x.dataset.ahprot)),
+      gear: [...document.querySelectorAll("[data-ahprot]:checked")].map((/** @type {any} */ x) => x.dataset.ahprot) });
     $("lab-ah-name").value = ""; save(); renderAll();
   };
 
@@ -4820,6 +4828,13 @@ function mountLab(api) {
     if (document.activeElement !== $("lab-seed")) $("lab-seed").value = en.seed ?? "";
     const act = E.active(en), list = en.status === "setup" ? en.participants : en.order.map((/** @type {string} */ pid) => E.find(en, pid));
     const gearList = [...PROT, ...(rules().protection || [])]; // published gear, plus test gear when its experiment is on
+    // Enchantments (a setting's Significant enchantments as data): on a weapon the participant carries, or one that turns a hit.
+    const EN = PACK.enchantments || null;
+    const enchFor = (/** @type {any} */ p) => !EN ? [] : [
+      ...(EN.ward ? [EN.ward] : []),
+      ...p.weapons.filter((/** @type {string} */ w) => WEAPONS[w] && w !== "fists" && !(p.gear || []).some((/** @type {string} */ g) => g.startsWith(`ench-${w}-`)))
+        .flatMap((/** @type {string} */ w) => EN.weapon.map((/** @type {any} */ x) => ({ id: `ench-${w}-${x.id}`, name: `Enchanted ${WEAPONS[w].name}: ${x.name}`,
+          traits: [{ ...x.trait, weapon: w, label: `Enchanted ${WEAPONS[w].name}` }] })))];
     $("lab-people").innerHTML = list.length ? list.map((/** @type {any} */ p) => {
       const out = E.isOut(p), inj = Math.min(p.injury, 3);
       return `<div class="lab-p ${act && act.pid === p.pid ? "active" : ""} ${out ? "out" : ""}">
@@ -4836,7 +4851,7 @@ function mountLab(api) {
           ${(p.traits || []).map((/** @type {any} */ t, /** @type {number} */ i) => t.type === "shield" ? "" : t.type === "armor" ? ` · ${esc(t.label)}${t.used ? " (used)" : ""}` : t.toggle ? ` · <button class="linkish" data-trait="${p.pid}" data-i="${i}" title="Switch on or off">${esc(t.label)}: ${t.on === false ? "off" : "on"}</button>` : ` · ${esc(t.label || t.type)}`).join("")}
           ${p.aim ? ` · <b>aiming at ${esc((E.find(en, p.aim.target) || {}).name || "?")}</b>` : ""}
           ${p.conditions.map((/** @type {string} */ c) => ` · <button class="linkish" data-cond-rm="${p.pid}" data-c="${esc(c)}" title="Remove">${esc(c)} ×</button>`).join("")}
-          ${(() => { const can = gearList.filter((/** @type {any} */ g) => !(p.gear || []).includes(g.id) && true); return can.length && en.status !== "ended" ? ` · <select class="lab-mini" style="width:auto" data-gear="${p.pid}" aria-label="Give ${esc(p.name)} protective gear"><option value="">+ Gear</option>${can.map((/** @type {any} */ g) => `<option value="${g.id}" title="${esc(g.text || "")}">${esc(g.name)}</option>`).join("")}</select>` : ""; })()}
+          ${(() => { const can = [...gearList, ...enchFor(p)].filter((/** @type {any} */ g) => !(p.gear || []).includes(g.id)); return can.length && en.status !== "ended" ? ` · <select class="lab-mini" style="width:auto" data-gear="${p.pid}" aria-label="Give ${esc(p.name)} protective gear"><option value="">+ Gear</option>${can.map((/** @type {any} */ g) => `<option value="${g.id}" title="${esc(g.text || "")}">${esc(g.name)}</option>`).join("")}</select>` : ""; })()}
           ${p.note ? `<br><span class="muted">${esc(p.note)}</span>` : ""}</span></div>`;
     }).join("") : `<p class="small muted">Add characters and opponents.</p>`;
     $("lab-start").hidden = en.status !== "setup";
@@ -4857,7 +4872,9 @@ function mountLab(api) {
   });
   $("lab-people").addEventListener("change", (/** @type {any} */ e) => {
     const sel = e.target.closest("[data-gear]"), en = enc(); if (!sel || !en || !sel.value) return;
-    const item = [...PROT, ...(rules().protection || [])].find((/** @type {any} */ g) => g.id === sel.value);
+    const p = E.find(en, sel.dataset.gear), EN = PACK.enchantments || null;
+    const ench = !EN ? [] : [...(EN.ward ? [EN.ward] : []), ...p.weapons.filter((/** @type {string} */ w) => WEAPONS[w]).flatMap((/** @type {string} */ w) => EN.weapon.map((/** @type {any} */ x) => ({ id: `ench-${w}-${x.id}`, name: `Enchanted ${WEAPONS[w].name}: ${x.name}`, traits: [{ ...x.trait, weapon: w, label: `Enchanted ${WEAPONS[w].name}` }] })))];
+    const item = [...PROT, ...(rules().protection || []), ...ench].find((/** @type {any} */ g) => g.id === sel.value);
     const res = E.addGear(en, sel.dataset.gear, item);
     if (res.error) { say(res.error, true); return; }
     save(); renderAll();
@@ -4987,6 +5004,7 @@ function mountLab(api) {
       L.push("", !ev.damage && /marks nothing/.test(ev.outcome) ? esc(ev.outcome[0].toUpperCase() + ev.outcome.slice(1)) : ev.damage ? `${esc(ev.weapon.name)} at ${BAND_NAMES[ev.band] || ev.band}: ${ev.damage} box${ev.damage > 1 ? "es" : ""}${ev.dyingWeapon ? ", and Dying" : ""}${ev.reduced ? ` (−1, a ${esc(T.point)} point)` : ""}` : "No effect at this range");
       if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
     }
+    if (ev.enchanted) L.push(`<span class="x">Enchanted weapon: +${ev.enchanted} box.</span>`);
     if (ev.armorUsed) L.push(`<span class="x">${esc(ev.armorUsed)}: one box fewer (once per fight).</span>`);
     if (ev.marginTrait) L.push(`<span class="x">${esc(ev.marginTrait)}.</span>`);
     if (ev.price) L.push(`<span class="bad">Failed cast: ${esc(ev.attacker.name)} marks ${ev.price.boxes} ${esc(ev.price.track)}.</span>`);
@@ -5162,6 +5180,8 @@ return { mountLab };
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a fine kit: +2 to one skill when it's used.", 1],
     ...(PACK.extraEdges || []), // a setting's own Edges, e.g. Stronger Power
   ];
+  // A setting's Edges whose fifth entry asks for a description: { label, placeholder, missing, sheetNote }.
+  const XEDGE_NOTES = (PACK.extraEdges || []).filter((x) => x[4] && x[4].label);
   const ALLEGIANCES = [["", "None", "", ""], ...PACK.allegiances];
   // Optional: spells a caster picks (how many depends on their training in the spell skill), and a
   // personal track every character keeps on their sheet (e.g. Corruption).
@@ -5218,7 +5238,7 @@ return { mountLab };
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
-      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" },
+      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" }, edgeNotes: {},
       allegiance: "", customTier: 1,
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "",
@@ -5268,6 +5288,8 @@ return { mountLab };
     if (!ALLEGIANCES.some((a) => a[0] === out.allegiance)) out.allegiance = "";
     out.customTier = [0, 1, 2, 3].includes(+out.customTier) ? +out.customTier : 1;
     if (typeof out.contact !== "string") out.contact = "";
+    // A setting's own Edges can ask for a short description (which talisman, which heirloom): kept per Edge.
+    out.edgeNotes = Object.fromEntries(Object.entries(out.edgeNotes && typeof out.edgeNotes === "object" ? out.edgeNotes : {}).filter(([, v]) => typeof v === "string"));
     if (!SPECIES.some((x) => x[0] === out.speciesId) && out.speciesId !== "custom") out.speciesId = SPECIES[0][0];
     // Heritage advantages that no longer exist for this heritage are cleared, so the checklist asks again.
     if (out.sadv.id && out.sadv.id !== "custom" && !(SPECIES_TRAITS[out.speciesId] || []).some((t) => t[0] === out.sadv.id)) out.sadv.id = "";
@@ -5431,7 +5453,8 @@ return { mountLab };
     const compOk = ch.comp.id && (ch.comp.id !== "custom" || (ch.comp.name.trim() && ch.comp.text.trim()));
     const POOL = pool(), ea = edgesAvail(), es = edgesSpent();
     const edgeNeeds = [edgeN("adv2") && !ch.adv2.id ? "choose the second advantage" : "", edgeN("adv2") && ADVANTAGES.find((a) => a[0] === ch.adv2.id)?.[4] && !ch.adv2.detail.trim() ? "finish the second advantage" : "",
-      edgeN("contact") && !ch.contact.trim() ? "name your friend" : "", edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill) ? "describe the fine weapon or tool and its skill" : ""].filter(Boolean);
+      edgeN("contact") && !ch.contact.trim() ? "name your friend" : "",
+      ...XEDGE_NOTES.filter(([k]) => edgeN(k) && !(ch.edgeNotes[k] || "").trim()).map(([, , , , d]) => d.missing || "describe " + d.label.toLowerCase()), edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill) ? "describe the fine weapon or tool and its skill" : ""].filter(Boolean);
     const horrorOff = heritageOf()?.restricted && !horrorOn();
     return [
       [!!ch.name.trim(), ch.name.trim() ? "Name entered" : "Enter a name"],
@@ -5607,6 +5630,13 @@ return { mountLab };
     if (a2 && a2[4]) $("adv2-detail-label").textContent = a2[4];
     $("adv2-desc").textContent = a2 ? a2[2] : "Any general advantage. It brings no extra complication.";
     $("contact-wrap").hidden = !edgeN("contact");
+    // Fields for a setting's own Edges that need a description.
+    const xf = XEDGE_NOTES.filter(([k]) => edgeN(k)), xsig = xf.map(([k]) => k).join();
+    if ($("xedge-fields").dataset.sig !== xsig) {
+      $("xedge-fields").dataset.sig = xsig;
+      $("xedge-fields").innerHTML = xf.map(([k, , , , d]) => `<div class="field wide"><label for="f-xedge-${k}">${esc(d.label)} (Edge)</label><input type="text" id="f-xedge-${k}" data-xedge="${k}" placeholder="${esc(d.placeholder || "")}"></div>`).join("");
+    }
+    xf.forEach(([k]) => { const el = $("f-xedge-" + k); if (el && document.activeElement !== el) el.value = ch.edgeNotes[k] || ""; });
     $("gear-wrap").hidden = $("gearskill-wrap").hidden = !edgeN("gear");
     $("f-gearskill").value = ch.gear.skill;
     const al = ALLEGIANCES.find((a) => a[0] === ch.allegiance) || ALLEGIANCES[0];
@@ -5759,6 +5789,7 @@ return { mountLab };
         ${ed.length ? `<div class="field"><span class="label">Edges</span><span>${esc(ed.join(", "))}</span></div>` : ""}
         ${a2 && edgeN("adv2") ? `<div class="field"><span class="label">Second advantage</span><b>${esc(a2[1])}${ch.adv2.detail ? ": " + esc(ch.adv2.detail) : ""}</b><span class="small muted">${esc(a2[2])}</span></div>` : ""}
         ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">A friend</span><span>${esc(ch.contact)}</span></div>` : ""}
+        ${XEDGE_NOTES.filter(([k]) => edgeN(k) && ch.edgeNotes[k]).map(([k, n, , , d]) => `<div class="field wide"><span class="label">${esc(n)}</span><span>${esc(ch.edgeNotes[k])}${d.sheetNote ? ` <span class="small muted">(${esc(d.sheetNote)})</span>` : ""}</span></div>`).join("")}
         ${POWERS && allPowers().length ? `<div class="field wide"><span class="label">${POWERS.plural}</span><span>${allPowers().map((x) => `<b>${esc(powerDef(x.id)[1])} (Class ${x.cl}${isPure() && x.id === SPELLS.power ? ", pure sorcery" : ""}):</b> ${esc(isPure() && x.id === SPELLS.power ? `Know ${spellsKnown()} ${SPELLS.plural.toLowerCase()}, each working at ${SPELLS.tiers ? "the " + SPELLS.tiers[casterTier()] + " (Class " + x.cl + ")" : "Class " + x.cl}.` : powerEffect(x.id, x.cl))}`).join("<br>")}</span></div>` : ""}
         ${STATUSES && ch.status ? (() => { const st = STATUSES.find((x) => x[0] === ch.status); return `<div class="field"><span class="label">${esc(PACK.statusLabel || "Status")}: ${esc(st[1])}</span><span class="small">${esc(st[2])}</span><span class="small muted">${esc(st[3])}</span></div>`; })() : ""}
         ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([k, n, eff]) => { const t = spellTier(k); return `<b>${esc(n)}${t >= 0 ? ` (${SPELLS.tiers[t]}, ${boostText(t)})` : ""}:</b> ${esc(eff)}`; }).join("<br>")}${SPELLS.tiers ? `<br><span class="small muted">${helpBtn("boost")} Boosts, chosen as you cast, each −1 to the roll: Harder (+1 box or −1 more), Wider (a handful, then a crowd), Longer (a day, then until lifted), Farther (one range band).</span>` : ""}</span></div>` : ""}
@@ -6036,6 +6067,7 @@ return { mountLab };
       "f-gearitem": ["gear", "item"], "f-adv2detail": ["adv2", "detail"],
       "f-sadvname": ["sadv", "name"], "f-sadvtext": ["sadv", "text"], "f-scompname": ["sadv", "compName"], "f-scomptext": ["sadv", "compText"] }[id];
     if (sub) { ch[sub[0]][sub[1]] = e.target.value; touch(); render(); return; }
+    if (e.target.dataset && e.target.dataset.xedge) { ch.edgeNotes[e.target.dataset.xedge] = e.target.value; touch(); render(); return; }
     if (id === "f-ma-heart" || id === "f-ma-quick") { ch.magic[id === "f-ma-heart" ? "heart" : "quicker"] = e.target.value; touch(); render(); }
   });
   document.addEventListener("change", (e) => {

@@ -3166,5 +3166,64 @@
     }
    ]
   }
+ ],
+ "enchantments": {
+  "weapon": [
+   {
+    "id": "accuracy",
+    "name": "+2 to hit",
+    "trait": {
+     "type": "weaponBonus",
+     "accuracy": 2
+    }
+   },
+   {
+    "id": "bite",
+    "name": "hits mark one more box",
+    "trait": {
+     "type": "weaponBonus",
+     "extraBox": 1
+    }
+   }
+  ],
+  "ward": {
+   "id": "ench-ward",
+   "name": "Enchantment: turns one hit a fight",
+   "text": "A lasting Significant enchantment: once per fight, a hit of 2 or more boxes marks one fewer.",
+   "traits": [
+    {
+     "type": "armor",
+     "minBoxes": 2,
+     "reduce": 1,
+     "label": "Enchantment"
+    }
+   ]
+  }
+ },
+ "extraEdges": [
+  [
+   "talisman",
+   "Talisman",
+   "Start each venture with one ready talisman holding a Minor ritual agreed with the GM. Anyone can break it; it's renewed between ventures and doesn't count against a talisman limit.",
+   1,
+   {
+    "label": "Your talisman",
+    "placeholder": "e.g. A knotted cord against poison, from my grandmother",
+    "missing": "describe your talisman and its ritual",
+    "sheetNote": "renewed each venture"
+   }
+  ],
+  [
+   "heirloom",
+   "Enchanted heirloom",
+   "One item carries a lasting Significant enchantment: +2 to one use, or its hits mark one more box, or it turns one hit a fight. Sight sees it; Shatter's Third Seal or a rite of unbinding can break it.",
+   1,
+   {
+    "label": "Your enchanted heirloom",
+    "placeholder": "e.g. Grandfather's war-axe: its hits mark one more box",
+    "missing": "describe your heirloom and its enchantment",
+    "sheetNote": "a lasting Significant enchantment"
+   }
+  ]
  ]
 }

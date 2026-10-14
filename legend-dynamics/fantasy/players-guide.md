@@ -98,6 +98,8 @@ Spend all your Edges. Each one buys:
 | Extra Fortune | Start every session with 3 Fortune points instead of 2 | 1 |
 | A friend | A named contact who helps once per venture | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
+| Talisman | Start each venture with one ready talisman holding a Minor ritual agreed with the GM. Anyone can break it; it's renewed between ventures and doesn't count against a talisman limit. | 1 |
+| Enchanted heirloom | One item carries a lasting Significant enchantment: +2 to one use, or its hits mark one more box, or it turns one hit a fight. Sight sees it; Shatter's Third Seal or a rite of unbinding can break it. | 1 |
 
 ### Spending points
 
@@ -631,6 +633,7 @@ An **enchantment** is a ritual worked into an object: a blade that bites deeper,
 - **Your limit.** Your ready talismans and your enchantments still holding together can't exceed your talisman limit: **Trained 2, Specialty 3, Expert 4**. When an enchantment ends, its place is free again.
 - **The price.** Finishing a Major enchantment marks a box of Corruption, as any Major ritual does.
 - **Seeing and breaking.** Sorcerer's Sight shows an enchantment and who made it. Shatter at its Third Seal breaks one, and so does a rite of unbinding (Significant).
+- **Born with one.** Two Edges bring enchantment to any character, sorcerer or not: **Talisman** (a ready talisman, renewed every venture) and **Enchanted heirloom** (an item with a lasting Significant enchantment).
 
 ## Corruption
 

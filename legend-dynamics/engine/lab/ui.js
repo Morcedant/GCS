@@ -119,6 +119,7 @@ export function mountLab(api) {
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       traits: protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
+      gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A threat from the setting's data. @param {any} t @param {string} name */
@@ -161,7 +162,8 @@ export function mountLab(api) {
     const w = WEAPONS[$("lab-ah-weapon").value], minor = $("lab-ah-minor").checked;
     E.addParticipant(ensureEnc(), { kind: "npc", name, side: "foe", agility: +$("lab-ah-agi").value, dodge: +$("lab-ah-dodge").value, skills: { [w.skill]: +$("lab-ah-skill").value },
       weapons: [w.id], boxes: minor ? 1 : +$("lab-ah-boxes").value, minor, ammo: w.ammo ? { [w.ammo]: PACK.weapons.items[w.ammo][1] } : {},
-      traits: protTraits([...document.querySelectorAll("[data-ahprot]:checked")].map((/** @type {any} */ x) => x.dataset.ahprot)) });
+      traits: protTraits([...document.querySelectorAll("[data-ahprot]:checked")].map((/** @type {any} */ x) => x.dataset.ahprot)),
+      gear: [...document.querySelectorAll("[data-ahprot]:checked")].map((/** @type {any} */ x) => x.dataset.ahprot) });
     $("lab-ah-name").value = ""; save(); renderAll();
   };
 
@@ -203,6 +205,13 @@ export function mountLab(api) {
     if (document.activeElement !== $("lab-seed")) $("lab-seed").value = en.seed ?? "";
     const act = E.active(en), list = en.status === "setup" ? en.participants : en.order.map((/** @type {string} */ pid) => E.find(en, pid));
     const gearList = [...PROT, ...(rules().protection || [])]; // published gear, plus test gear when its experiment is on
+    // Enchantments (a setting's Significant enchantments as data): on a weapon the participant carries, or one that turns a hit.
+    const EN = PACK.enchantments || null;
+    const enchFor = (/** @type {any} */ p) => !EN ? [] : [
+      ...(EN.ward ? [EN.ward] : []),
+      ...p.weapons.filter((/** @type {string} */ w) => WEAPONS[w] && w !== "fists" && !(p.gear || []).some((/** @type {string} */ g) => g.startsWith(`ench-${w}-`)))
+        .flatMap((/** @type {string} */ w) => EN.weapon.map((/** @type {any} */ x) => ({ id: `ench-${w}-${x.id}`, name: `Enchanted ${WEAPONS[w].name}: ${x.name}`,
+          traits: [{ ...x.trait, weapon: w, label: `Enchanted ${WEAPONS[w].name}` }] })))];
     $("lab-people").innerHTML = list.length ? list.map((/** @type {any} */ p) => {
       const out = E.isOut(p), inj = Math.min(p.injury, 3);
       return `<div class="lab-p ${act && act.pid === p.pid ? "active" : ""} ${out ? "out" : ""}">
@@ -219,7 +228,7 @@ export function mountLab(api) {
           ${(p.traits || []).map((/** @type {any} */ t, /** @type {number} */ i) => t.type === "shield" ? "" : t.type === "armor" ? ` · ${esc(t.label)}${t.used ? " (used)" : ""}` : t.toggle ? ` · <button class="linkish" data-trait="${p.pid}" data-i="${i}" title="Switch on or off">${esc(t.label)}: ${t.on === false ? "off" : "on"}</button>` : ` · ${esc(t.label || t.type)}`).join("")}
           ${p.aim ? ` · <b>aiming at ${esc((E.find(en, p.aim.target) || {}).name || "?")}</b>` : ""}
           ${p.conditions.map((/** @type {string} */ c) => ` · <button class="linkish" data-cond-rm="${p.pid}" data-c="${esc(c)}" title="Remove">${esc(c)} ×</button>`).join("")}
-          ${(() => { const can = gearList.filter((/** @type {any} */ g) => !(p.gear || []).includes(g.id) && true); return can.length && en.status !== "ended" ? ` · <select class="lab-mini" style="width:auto" data-gear="${p.pid}" aria-label="Give ${esc(p.name)} protective gear"><option value="">+ Gear</option>${can.map((/** @type {any} */ g) => `<option value="${g.id}" title="${esc(g.text || "")}">${esc(g.name)}</option>`).join("")}</select>` : ""; })()}
+          ${(() => { const can = [...gearList, ...enchFor(p)].filter((/** @type {any} */ g) => !(p.gear || []).includes(g.id)); return can.length && en.status !== "ended" ? ` · <select class="lab-mini" style="width:auto" data-gear="${p.pid}" aria-label="Give ${esc(p.name)} protective gear"><option value="">+ Gear</option>${can.map((/** @type {any} */ g) => `<option value="${g.id}" title="${esc(g.text || "")}">${esc(g.name)}</option>`).join("")}</select>` : ""; })()}
           ${p.note ? `<br><span class="muted">${esc(p.note)}</span>` : ""}</span></div>`;
     }).join("") : `<p class="small muted">Add characters and opponents.</p>`;
     $("lab-start").hidden = en.status !== "setup";
@@ -240,7 +249,9 @@ export function mountLab(api) {
   });
   $("lab-people").addEventListener("change", (/** @type {any} */ e) => {
     const sel = e.target.closest("[data-gear]"), en = enc(); if (!sel || !en || !sel.value) return;
-    const item = [...PROT, ...(rules().protection || [])].find((/** @type {any} */ g) => g.id === sel.value);
+    const p = E.find(en, sel.dataset.gear), EN = PACK.enchantments || null;
+    const ench = !EN ? [] : [...(EN.ward ? [EN.ward] : []), ...p.weapons.filter((/** @type {string} */ w) => WEAPONS[w]).flatMap((/** @type {string} */ w) => EN.weapon.map((/** @type {any} */ x) => ({ id: `ench-${w}-${x.id}`, name: `Enchanted ${WEAPONS[w].name}: ${x.name}`, traits: [{ ...x.trait, weapon: w, label: `Enchanted ${WEAPONS[w].name}` }] })))];
+    const item = [...PROT, ...(rules().protection || []), ...ench].find((/** @type {any} */ g) => g.id === sel.value);
     const res = E.addGear(en, sel.dataset.gear, item);
     if (res.error) { say(res.error, true); return; }
     save(); renderAll();
@@ -370,6 +381,7 @@ export function mountLab(api) {
       L.push("", !ev.damage && /marks nothing/.test(ev.outcome) ? esc(ev.outcome[0].toUpperCase() + ev.outcome.slice(1)) : ev.damage ? `${esc(ev.weapon.name)} at ${BAND_NAMES[ev.band] || ev.band}: ${ev.damage} box${ev.damage > 1 ? "es" : ""}${ev.dyingWeapon ? ", and Dying" : ""}${ev.reduced ? ` (−1, a ${esc(T.point)} point)` : ""}` : "No effect at this range");
       if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
     }
+    if (ev.enchanted) L.push(`<span class="x">Enchanted weapon: +${ev.enchanted} box.</span>`);
     if (ev.armorUsed) L.push(`<span class="x">${esc(ev.armorUsed)}: one box fewer (once per fight).</span>`);
     if (ev.marginTrait) L.push(`<span class="x">${esc(ev.marginTrait)}.</span>`);
     if (ev.price) L.push(`<span class="bad">Failed cast: ${esc(ev.attacker.name)} marks ${ev.price.boxes} ${esc(ev.price.track)}.</span>`);

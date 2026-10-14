@@ -166,7 +166,7 @@ export const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ a
 
 /**
  * @typedef {{
- *   attacker: { id: string, name: string, skill: string, skillTarget: number, injury?: number },
+ *   attacker: { id: string, name: string, skill: string, skillTarget: number, injury?: number, traits?: any[] },
  *   defender: { id: string, name: string, dodgeBase: number | null, injury?: number, canDodge: boolean, minor?: boolean, boxes?: number, dying?: boolean, dead?: boolean, traits?: any[] },
  *   weapon: any, band: string, mode?: { id: string, label: string, mod: number } | null, aimed?: number, ammo?: string,
  *   cover?: "none" | "partial" | "solid", situational?: Modifier[], jamOn18?: boolean, boosts?: number,
@@ -211,6 +211,9 @@ export function resolveAttack(input, hooks, roll) {
   if (range) mods.push({ source: "range", label: `Range (${band})`, value: range, scope: "core" });
   if (input.mode && input.mode.mod) mods.push({ source: "mode", label: input.mode.label, value: input.mode.mod, scope: "setting" });
   for (const m of weaponAccuracy(weapon, input)) mods.push(m);
+  // An enchanted weapon (setting data on the attacker): +N to hit with that weapon.
+  const ench = (attacker.traits || []).filter((/** @type {any} */ t) => t.type === "weaponBonus" && (!t.weapon || t.weapon === weapon.id));
+  for (const t of ench) if (t.accuracy) mods.push({ source: "enchantment", label: t.label || "Enchantment", value: t.accuracy, scope: "setting" });
   if (input.cover === "partial") mods.push({ source: "cover", label: "Partial cover", value: -2, scope: "core" });
   const atkInj = INJURY_PENALTY[attacker.injury || 0] || 0;
   if (atkInj) mods.push({ source: "injury", label: "Attacker's injury", value: atkInj, scope: "core" });
@@ -252,6 +255,8 @@ export function resolveAttack(input, hooks, roll) {
   // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
   for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }
   if (dmg && boosts) dmg = { ...dmg, boxes: dmg.boxes + boosts };
+  const bite = ench.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extraBox || 0), 0);
+  if (dmg && dmg.boxes && bite) { dmg = { ...dmg, boxes: dmg.boxes + bite }; out.enchanted = bite; }
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
   const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && dmg && dmg.boxes <= t.maxBoxes);
   if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null };
