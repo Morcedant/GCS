@@ -23,6 +23,17 @@ export function bandFor(margin, bands) {
   return mod;
 }
 
+/** Telling hit effects (core rules, Telling hits): [id, name, what happens]. */
+export const TELLING_EFFECTS = [
+  ["disarm", "Disarm", "the weapon or held item drops, or flies a few yards away"],
+  ["knockdown", "Knock down", "the target falls prone, or is driven back a few steps"],
+  ["pin", "Pin", "the target is held, tangled or pinned down: their next action goes to getting free"],
+  ["rattle", "Rattle", "−2 to the target's next roll"],
+  ["break", "Break gear", "a shield, weapon or tool breaks; armor loses 1 protection until repaired"],
+  ["open", "Open them up", "the next attack on this target this round gets +2"],
+  ["precise", "Precise", "it hits exactly what was aimed at"],
+];
+
 export const EXPERIMENTS = [
   {
     id: "attackQualityDodge", scope: "core", label: "Attack quality modifies defense",
@@ -41,6 +52,14 @@ export const EXPERIMENTS = [
     actions: ["aim"],
     /** @returns {Modifier[]} */
     attackModifiers: (/** @type {any} */ ctx, /** @type {any} */ p) => (ctx.aimed ? [{ source: "aim", label: "Aim", value: p.bonus, scope: p.scope || "experiment" }] : []),
+  },
+  {
+    id: "tellingHits", scope: "core", label: "Telling hits and called shots",
+    summary: "An attack that succeeds by 5 or more, or on a natural 3–4, and isn't defended lets the attacker pick one effect (disarm, knock down, pin, rattle, break gear, open them up, precise); no extra boxes. A called shot names the effect first at −2 (−4 for a small target) and gets it on any hit. A character shrugs one off with Hard to put down (once a fight) or a point.",
+    params: { margin: 5, natural: true, called: -2, small: -4 },
+    flags: ["telling"],
+    /** @returns {Modifier[]} */
+    attackModifiers: (/** @type {any} */ ctx, /** @type {any} */ p) => (ctx.called ? [{ source: "called", label: ctx.called.small ? "Called shot (small target)" : "Called shot", value: ctx.called.small ? p.small : p.called, scope: p.scope || "experiment" }] : []),
   },
   {
     id: "parry", scope: "core", label: "Parry",

@@ -243,13 +243,13 @@ test("Heavy coat (published Trails of Blood & Dust gear): turns blades and claws
 
 test("Trails of Blood & Dust's published combat rules: in force under Published and Lab alike, not offered as experiments", () => {
   const C = combatOf(pack);
-  assert.deepEqual(Object.keys(C).sort(), ["aim", "attackQualityDodge", "block", "oneDefense", "parry"]);
+  assert.deepEqual(Object.keys(C).sort(), ["aim", "attackQualityDodge", "block", "oneDefense", "parry", "tellingHits"]);
   for (const cfg of [X.PUBLISHED, X.newLabConfig("western", lab, C)]) {
     const r = X.buildRules(cfg, weapons, lab, C);
     assert.deepEqual(r.settingRules.map((x) => x.id).sort(), Object.keys(C).sort());
     assert.ok(r.flags.has("oneDefense") && !r.flags.has("dodgeEveryAttack") && r.actions.has("aim"));
     assert.equal(r.defenses.parry.mod, -3); assert.equal(r.defenses.parry.repeatPenalty, -2); assert.equal(r.defenses.parry.scope, "core");
-    assert.equal(r.hooks.dodgeModifiers.length, 1); assert.equal(r.hooks.attackModifiers.length, 1);
+    assert.equal(r.hooks.dodgeModifiers.length, 1); assert.equal(r.hooks.attackModifiers.length, 2, "Aim and called shots");
     assert.equal(r.active.length, 0, "no experiments on");
   }
   const ids = X.available("western", lab, C).map((x) => x.id);
@@ -408,4 +408,43 @@ test("Grievous wounds: a character left Dying or killed may trade a limb, once a
   assert.equal(S.summarize(enc).limbTrades, 1);
   const off = { ...X.buildRules(X.newLabConfig("western", lab, combatOf(pack)), weapons, lab, combatOf(pack)), jamOn18: true };
   assert.ok(E.tradeLimb(enc, off, ev.n, "lost").error, "not without the experiment");
+});
+
+test("Telling hits (core): by 5+ or a natural 3-4 past the defense; called shots at -2/-4; shrug off with the Edge or a point", () => {
+  const C = combatOf(pack), r = { ...X.buildRules(X.PUBLISHED, weapons, lab, C), jamOn18: true };
+  assert.ok(r.flags.has("telling")); assert.equal(r.params.tellingHits.margin, 5);
+  let enc, big, small;
+  for (let seed = 1; seed < 400 && !(big && small); seed++) {
+    enc = setup(X.PUBLISHED, seed); E.startCombat(enc, r);
+    const ev = E.attack(enc, r, LD, { attacker: "p1", defender: "p2", weapon: "revolver", band: "close", canDodge: false }).event;
+    if (ev.hit && ev.margin >= 5 && !big) big = ev;
+    if (ev.hit && ev.margin < 5 && ev.auto !== "success" && !small) small = ev;
+  }
+  assert.ok(big.telling && big.telling.effect === null, "the attacker picks"); assert.equal(small.telling, null, "an ordinary hit isn't telling");
+  // A called shot: -2 (or -4) on the roll, and any hit gets the effect.
+  let called;
+  for (let seed = 1; seed < 400 && !called; seed++) {
+    enc = setup(X.PUBLISHED, seed); E.startCombat(enc, r);
+    E.find(enc, "p1").traits = [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }];
+    const ev = E.attack(enc, r, LD, { attacker: "p2", defender: "p1", weapon: "revolver", band: "close", canDodge: false, called: { effect: "disarm", small: true } }).event;
+    assert.equal(ev.attackMods.find((m) => m.source === "called").value, -4);
+    if (ev.hit) called = ev;
+  }
+  assert.deepEqual([called.telling.called, called.telling.effect], [true, "disarm"]);
+  assert.ok(E.tellingEffect(enc, called.n, "pin").event, "the attacker can change it");
+  // The defender shrugs it off once with the Edge; the boxes stand.
+  const boxes = E.find(enc, "p1").injury;
+  assert.ok(!E.shrugTelling(enc, called.n, "edge").error);
+  assert.equal(called.telling.shrugged, "edge"); assert.equal(E.find(enc, "p1").injury, boxes);
+  assert.ok(E.shrugTelling(enc, called.n, "point").error, "once per hit");
+  assert.ok(E.tellingEffect(enc, called.n, "rattle").error, "nothing to change once shrugged off");
+  const s = S.summarize(enc); assert.equal(s.tellingHits, 1); assert.equal(s.shrugged, 1);
+  // A point works too, and only a character shrugs one off.
+  let again;
+  for (let i = 0; i < 60 && !again; i++) { const ev = E.attack(enc, r, LD, { attacker: "p2", defender: "p1", weapon: "revolver", band: "close", canDodge: false, called: { effect: "rattle" } }).event; if (ev.hit) again = ev; }
+  if (again && !E.find(enc, "p1").dead) {
+    assert.ok(E.shrugTelling(enc, again.n, "edge").error, "Hard to put down: once a fight");
+    const pts = E.find(enc, "p1").points; assert.ok(!E.shrugTelling(enc, again.n, "point").error); assert.equal(E.find(enc, "p1").points, pts - 1);
+  }
+  assert.ok(E.shrugTelling(enc, big.n, "point").error, "an opponent doesn't");
 });

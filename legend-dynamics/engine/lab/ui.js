@@ -134,7 +134,8 @@ export function mountLab(api) {
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
-        ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : [])],
+        ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
+        ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : [])],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
@@ -328,6 +329,11 @@ export function mountLab(api) {
       $("lab-ammo-wrap").hidden = !ammoList.length;
       $("lab-ammo").innerHTML = ammoList.map((/** @type {string} */ x) => `<option>${esc(x)}</option>`).join("");
       $("lab-boost-wrap").hidden = !(w && w.spell);
+      // Called shots (telling hits): name the effect first, at −2 (−4 for a small target).
+      const TH = r.flags.has("telling") && r.params.tellingHits;
+      $("lab-called-wrap").hidden = !TH;
+      if (TH && !$("lab-called").options.length) $("lab-called").innerHTML = `<option value="">None</option>` + LDX.TELLING_EFFECTS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join("");
+      if (!TH) $("lab-called").value = "";
       if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
       const base = w ? a.skills[w.skill] : undefined;
       if ($("lab-skill").dataset.for !== `${a.pid}|${w && w.id}`) { $("lab-skill").value = base ?? ""; $("lab-skill").dataset.for = `${a.pid}|${w && w.id}`; }
@@ -359,6 +365,7 @@ export function mountLab(api) {
       res = E.attack(en, r, LD, {
         attacker: a.pid, defender: $("lab-target").value, weapon: w && w.id, band: $("lab-band").value,
         mode: mode ? { id: mode[0], label: mode[1], mod: mode[4] || 0, cost: mode[2] } : null, ammo: $("lab-ammo-wrap").hidden ? null : $("lab-ammo").value,
+        called: $("lab-called-wrap").hidden || !$("lab-called").value ? null : { effect: $("lab-called").value.split("|")[0], small: $("lab-called").value.endsWith("|small") },
         cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
@@ -411,6 +418,11 @@ export function mountLab(api) {
       L.push("", g.pc ? `<b class="bad">Grievous wound (${esc(g.why)}): 3d6 = ${g.total} (${g.dice.join(" + ")}) → ${esc(g.name)}.</b> ${esc(g.text)}`
         : `<b class="bad">Taken out (${esc(g.why)}).</b> ${esc(g.text)}`);
     }
+    if (ev.telling) {
+      const t = ev.telling, fx = LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === t.effect);
+      L.push("", `<b class="x">Telling hit (${esc(t.why)}):</b> ${fx ? `${esc(fx[1])}: ${esc(fx[2])}.` : `${esc(ev.attacker.name)} picks one effect below.`} No extra boxes.${ev.grievous ? " With a grievous wound, the attacker can choose which limb." : ""}`);
+      if (t.shrugged) L.push(`<span class="x">${esc(ev.defender.name)} shrugs it off (${t.shrugged === "edge" ? "Hard to put down" : esc(T.point) + " point"}): the boxes stand, the effect doesn't.</span>`);
+    }
     if (ev.grievous && ev.grievous.downgradedTo !== undefined) L.push(`<span class="x">${esc(T.point)} point: downgraded to ${esc(ev.grievous.downgradedTo || "no lasting wound")}.</span>`);
     if (ev.traded) L.push("", `<b class="x">Traded for a limb${ev.grievous && ev.grievous.pc ? " (instead of the grievous wound)" : ""}:</b> ${esc(ev.defender.name)} lives, Incapacitated but stable, and ${ev.traded === "crippled" ? "loses the use of a limb" : "loses a limb"} (the player says which). It's a complication now: when it causes real trouble, accept it and earn ${esc(T.point)}.`);
     if (ev.overridden) L.push("", `<b class="x">GM ruling: ${ev.hit ? "HIT" : "MISS"}</b> (the dice said ${ev.rolledHit ? "hit" : "miss"}). ${esc(ev.defender.name)}: ${ev.injuryAfter} box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", dead" : ev.dying ? ", Dying" : ""}.`);
@@ -430,14 +442,26 @@ export function mountLab(api) {
     if (live && GW && GW.limbTrade && d && d.kind === "pc" && !ev.traded && d.limbTradedRound === undefined && ((ev.dying && !ev.pre.defender.dying) || ev.dead))
       btns.push(`<button class="btn" data-fx="trade-lost">${esc(d.name)}: lose a limb instead (complication)</button><button class="btn" data-fx="trade-crippled">${esc(d.name)}: lose a limb's use instead (complication)</button>`);
     if (live && ev.grievous && ev.grievous.pc && !ev.traded && ev.grievous.downgradedTo === undefined && d && d.points > 0) btns.push(`<button class="btn" data-fx="downgrade">${esc(d.name)}: downgrade the grievous wound (${esc(T.point)})</button>`);
+    if (live && ev.telling && !ev.telling.shrugged) {
+      if (!ev.telling.called) btns.push(`<label class="small">Effect <select data-telling>${[["", "Pick…"], ...LDX.TELLING_EFFECTS].map((/** @type {any} */ [id, n]) => `<option value="${id}"${id === (ev.telling.effect || "") ? " selected" : ""}>${esc(n)}</option>`).join("")}</select></label>`);
+      if (d && d.kind === "pc" && (d.traits || []).some((/** @type {any} */ t) => t.type === "shrugTelling" && !t.used)) btns.push(`<button class="btn" data-fx="shrug-edge">${esc(d.name)}: shrug it off (Hard to put down)</button>`);
+      if (d && d.kind === "pc" && d.points > 0) btns.push(`<button class="btn" data-fx="shrug-point">${esc(d.name)}: shrug it off (${esc(T.point)})</button>`);
+    }
     if (live && ev.attackDice) btns.push(`<button class="btn" data-fx="${ev.hit ? "miss" : "hit"}">GM: make it a ${ev.hit ? "miss" : "hit"}</button>`);
     $("lab-result").innerHTML = `<div class="lab-calc" data-ev="${ev.n}">${calcText(ev)}</div>${btns.length ? `<div class="btn-row" style="margin-top:8px">${btns.join("")}</div>` : ""}`;
   }
+  $("lab-result").addEventListener("change", (/** @type {any} */ e) => {
+    const sel = e.target.closest("[data-telling]"), en = enc(); if (!sel || !en || !sel.value) return;
+    const n = +$("lab-result").querySelector("[data-ev]").dataset.ev, res = E.tellingEffect(en, n, sel.value);
+    if (res.error) { say(res.error, true); return; }
+    save(); renderAll(); showResult(n);
+  });
   $("lab-result").addEventListener("click", (/** @type {any} */ e) => {
     const b = e.target.closest("[data-fx]"), en = enc(); if (!b || !en) return;
     const n = +$("lab-result").querySelector("[data-ev]").dataset.ev, ev = en.events.find((/** @type {any} */ x) => x.n === n), fx = b.dataset.fx;
     let res;
-    if (fx === "trade-lost" || fx === "trade-crippled") res = E.tradeLimb(en, rules(), n, fx === "trade-lost" ? "lost" : "crippled");
+    if (fx === "shrug-edge" || fx === "shrug-point") res = E.shrugTelling(en, n, fx === "shrug-edge" ? "edge" : "point");
+    else if (fx === "trade-lost" || fx === "trade-crippled") res = E.tradeLimb(en, rules(), n, fx === "trade-lost" ? "lost" : "crippled");
     else if (fx === "hit" || fx === "miss") res = E.override(en, rules(), LD, "outcome", { event: n, hit: fx === "hit", reason: "GM ruling" });
     else res = E.spendPoint(en, rules(), LD, fx === "reroll-dodge" || fx === "reduce" || fx === "downgrade" ? ev.defender.pid : ev.attacker.pid, fx, { event: n });
     if (res.error) { say(res.error, true); return; }
@@ -475,7 +499,9 @@ export function mountLab(api) {
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
       case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}`;
       case "trade": return `<b>${esc(e.name)} trades a limb for their life:</b> ${esc(e.wound)}.`;
-      case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation", downgrade: "downgrade a grievous wound" }[e.use] || e.use)}${e.from ? ` (${esc(e.from)} → ${esc(e.to)})` : ""}${e.note ? ` (${esc(e.note)})` : ""}.`;
+      case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.`;
+      case "shrug": return `${esc(e.name)} shrugs off a telling hit (${esc(e.label)}).`;
+      case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation", downgrade: "downgrade a grievous wound", shrug: "shrug off a telling hit" }[e.use] || e.use)}${e.from ? ` (${esc(e.from)} → ${esc(e.to)})` : ""}${e.note ? ` (${esc(e.note)})` : ""}.`;
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
       case "gear": return `${esc(e.name)} puts on ${esc(e.item)}.`;
       case "trait": return `${esc(e.name)}: ${esc(e.trait)} ${e.on ? "on" : "off"}.`;
@@ -506,7 +532,7 @@ export function mountLab(api) {
   const TILES = [["rounds", "Rounds"], ["attacks", "Attacks"], ["attackSuccessRate", "Attack success", pct], ["dodgeNegatedRate", "Successes dodged", pct], ["finalHitRate", "Final hit rate", pct],
     ["averageMargin", "Average margin"], ["dodgeSuccessRate", "Dodge success", pct], ["averageEffectiveDodge", "Average effective Dodge"], ["damageFrequency", "Damage frequency", pct],
     ["injuryFrequency", "Injury frequency", pct], ["boxesMarked", "Boxes marked"], ["incapacitated", "Down"], ["dead", "Dead"], ["pointsSpent", "Points spent"], ["complications", "Complications"], ["overrides", "GM overrides"], ["jams", "Jams"], ["boostsSpent", "Boosts"],
-    ["armorStops", "Armour stops"], ["grievous", "Grievous wounds"], ["takenOut", "Foes taken out"], ["limbTrades", "Limbs traded"], ["priceMarked", PTRACK ? PTRACK.name + " marked" : "Price marked", (/** @type {any} */ v) => Object.values(v || {}).reduce((/** @type {number} */ a, /** @type {any} */ b) => a + b, 0)]];
+    ["armorStops", "Armour stops"], ["grievous", "Grievous wounds"], ["takenOut", "Foes taken out"], ["limbTrades", "Limbs traded"], ["tellingHits", "Telling hits"], ["shrugged", "Shrugged off"], ["priceMarked", PTRACK ? PTRACK.name + " marked" : "Price marked", (/** @type {any} */ v) => Object.values(v || {}).reduce((/** @type {number} */ a, /** @type {any} */ b) => a + b, 0)]];
   /** @param {any} s */
   const tiles = (s) => `<div class="lab-sum">${TILES.map(([k, n, f]) => `<div><span>${n}</span><b>${f ? f(s[k]) : s[k] ?? "—"}</b></div>`).join("")}</div>`;
   function renderSummary() {

@@ -217,6 +217,7 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     weapon, band: cmd.band, mode: cmd.mode || null, aimed, boosts: cmd.boosts || 0, ammo: cmd.ammo || null, cover: cmd.cover || "none",
     situational: (cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ source: "situation", label: m.label || "Situation", value: +m.value, scope: "situation" })),
     jamOn18: !!(weapon.firearm && rules.jamOn18),
+    called: rules.flags.has("telling") && cmd.called ? { effect: cmd.called.effect || "", small: !!cmd.called.small } : null,
   }, rules.hooks, (/** @type {"attack" | "dodge"} */ kind) => (prior && opts.reroll !== kind && prior[kind + "Dice"] ? prior[kind + "Dice"] : core.diceFor(enc.seed, key(kind))));
 
   if (!prior) {
@@ -249,6 +250,16 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     if (why) grievous = woundFor(d, weapon, GT, why, core.diceFor(enc.seed, key("grievous")));
   }
 
+  // Telling hits: a hit by the margin (or a natural 3–4) that got past any defense, or any hit from a called shot,
+  // lets the attacker pick one effect. A character can shrug it off (Hard to put down, or a point).
+  let telling = null;
+  const TH = rules.flags.has("telling") ? rules.params.tellingHits : null;
+  if (TH && res.hit && res.attack) {
+    if (cmd.called) telling = { why: "called shot", effect: cmd.called.effect || null, called: true, small: !!cmd.called.small };
+    else if (res.attack.margin >= TH.margin) telling = { why: `succeeded by ${res.attack.margin}`, effect: null };
+    else if (TH.natural && res.attack.auto === "success") telling = { why: `natural ${res.attack.total}`, effect: null };
+  }
+
   const am = res.attackMods || [], dm = res.dodgeMods || [];
   const ev = log(enc, "attack", {
     rules: rulesTag(rules), cmd: clone(cmd), key: n, reroll: opts.reroll || null, replaces: prior ? prior.n : null, pre,
@@ -260,7 +271,7 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
-    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, shieldBroke, grievous,
+    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, shieldBroke, grievous, telling,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
@@ -270,6 +281,37 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   if (extraDodge) log(enc, "override", { what: "dodge", about: ev.n, pid: d.pid, name: d.name, defense: chosen.kind, from: `already used ${chosen.kind} this round`, to: `${chosen.kind} allowed`, reason: "GM allowed it again" });
   if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
   return { event: ev };
+}
+
+/**
+ * The attacker picks a telling hit's effect (or changes it). @param {any} enc @param {number} n @param {string} effect
+ */
+export function tellingEffect(enc, n, effect) {
+  const ev = enc.events.find((/** @type {any} */ e) => e.n === n && e.type === "attack");
+  if (!ev || !ev.telling || ev.superseded) return { error: "Only a telling hit has an effect to pick." };
+  if (ev.telling.shrugged) return { error: `${ev.defender.name} already shrugged it off.` };
+  const from = ev.telling.effect; ev.telling.effect = effect;
+  return { event: log(enc, "telling", { about: n, pid: ev.attacker.pid, name: ev.attacker.name, target: ev.defender.name, effect, from }) };
+}
+
+/**
+ * A character shrugs off a telling hit's effect, keeping the boxes: with Hard to put down (once a fight) or a point.
+ * @param {any} enc @param {number} n @param {"edge" | "point"} via
+ */
+export function shrugTelling(enc, n, via) {
+  const ev = enc.events.find((/** @type {any} */ e) => e.n === n && e.type === "attack");
+  if (!ev || !ev.telling || ev.superseded || ev.telling.shrugged) return { error: "Shrug off a telling hit once." };
+  const d = find(enc, ev.defender.pid);
+  if (!d || d.kind !== "pc") return { error: "Only a character shrugs off a telling hit." };
+  if (via === "edge") {
+    const t = (d.traits || []).find((/** @type {any} */ x) => x.type === "shrugTelling" && !x.used);
+    if (!t) return { error: `${d.name} has no Hard to put down left this fight.` };
+    t.used = true; ev.telling.shrugged = "edge";
+    return { event: log(enc, "shrug", { about: n, pid: d.pid, name: d.name, via, label: t.label || "Hard to put down" }) };
+  }
+  if (d.points <= 0) return { error: `${d.name} has no points left.` };
+  d.points--; ev.telling.shrugged = "point";
+  return { event: log(enc, "point", { pid: d.pid, name: d.name, use: "shrug", about: n }) };
 }
 
 /** What kind of wound a weapon deals, for an opponent's description. @param {any} w */
