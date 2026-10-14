@@ -346,11 +346,12 @@ def quickref(pack, t):
             ["Opposed", "Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender."],
             ["Combat", "Move a short distance and take one action. Hit → target may defend once per round: Dodge, Parry or Block → weapon effect. Partial cover −2."],
             ["Defending", "One defense a round (two with Additional Defense). Dodge: Agility −2 + Athletics. Parry a weapon in hand or fists: " + t["meleeSkill"] + " or " + t["unarmedSkill"] + " −3; a second parry −2 more. Block a weapon in hand, fists or a missile with a shield or anything that stands in for one: " + t["meleeSkill"] + " −2 + the shield's bonus (never a gunshot or blast); an improvised one breaks on a 2+ box hit. Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target."],
+            ["Telling hit", "Hit by 5+ or a natural 3–4, not defended: the attacker picks one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, precise). Called shot: −2 (small target −4), and any hit gets the effect. No extra boxes. Shrug it off: Hard to put down (once a fight) or a point."],
             ["Range", "Close 10 yd, Short 50 yd, Medium 150 yd, Long 500 yd, Extreme 1 mile. Within a weapon's effective band: no penalty; one band beyond −2, two −4, farther out of range. Move: Close; run (no action): Short."],
             ["Dying", f"A 2-box weapon that brings you to 3 boxes: Dying; dead at the end of the scene unless stabilized (one action, Medicine, {t['medkit']}). At 3 boxes, another 2-box hit kills."],
             ["Medicine", "Stabilize: one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2, clears 2 (3 on margin 5+)."],
             ["Rest", f"One box per {t['restText']} of rest. Not from 3 boxes: treatment must clear the first."],
-            [t["point"], "Reroll (keep second), reduce an injury by one box, or establish a small preparation."]]
+            [t["point"], "Reroll (keep second), reduce an injury by one box, shrug off a telling hit, or establish a small preparation."]]
     return "".join(f"\n            <dt>{html.escape(a)}</dt><dd>{html.escape(b)}</dd>" for a, b in core + pack.get("quickRef", [])) + "\n          "
 
 

@@ -919,6 +919,8 @@ tr.lvl-U td.target { color: var(--muted); }
                 <option value="2">Assist by 5+ +2</option>
               </select></div>
             <div class="field" id="r-quality-wrap" hidden><label for="r-quality">Attack succeeded by</label><select id="r-quality"></select></div>
+            <div class="field" id="r-called-wrap" hidden><label for="r-called">Called shot</label>
+              <select id="r-called"><option value="0">None</option><option value="-2">Name the effect −2</option><option value="-4">Small target −4</option></select></div>
             <div class="field" id="r-parries-wrap" hidden><label for="r-parries">Parries already this round</label>
               <select id="r-parries"><option value="0">None</option><option value="1">One</option></select></div>
           </div>
@@ -1022,6 +1024,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["contact", "A friend", "A named contact who helps once per " + T.missionLower + ".", 1],
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a fine kit: +2 to one skill when it's used.", 1],
     ["extradefense", "Additional Defense", "A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2.", 1],
+    ["survivor", "Hard to put down", "Once per fight, shrug off a telling hit's effect. You still take its boxes.", 1],
     ...(PACK.extraEdges || []), // a setting's own Edges, e.g. Stronger Power
   ];
   // A setting's Edges whose fifth entry asks for a description: { label, placeholder, missing, sheetNote }.
@@ -1874,6 +1877,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (CR.attackQualityDodge && isDefense(name)) parts.push(+$("r-quality").value || 0);
     if (CR.parry && isParry(name)) parts.push((+$("r-parries").value || 0) * CR.parry.repeatPenalty);
     if (CR.aim && !$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(CR.aim.bonus);
+    if (!$("r-called-wrap").hidden && +$("r-called").value) parts.push(+$("r-called").value);
     // In an alternate form, the form profile's bonuses apply to rolls on those attributes and their skills.
     const w = ch.play.form && FORMED.has(ch.speciesId) && heritageOf()?.form;
     if (w) {
@@ -1900,6 +1904,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("r-quality-wrap").hidden = !(CR.attackQualityDodge && isDefense(sk));
     $("r-parries-wrap").hidden = !(CR.parry && isParry(sk) && defensesPerRound() > 1);
     $("r-aim-wrap").hidden = !(CR.aim && [T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk));
+    $("r-called-wrap").hidden = ![T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk);
     const { name, base, total } = rollMods();
     const t = base + total;
     const incap = ch.play.injury >= 3;
@@ -1927,7 +1932,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const ok = auto === "auto-s" || (auto !== "auto-f" && sum <= t);
     const margin = t - sum;
     const jam = PACK.weapons.jamOn18 && sum === 18 && (weaponNote || (isReroll && last && last.weaponNote));
-    last = { name, t, dice, sum, ok, margin, auto, jam, rerolled: !!isReroll, fireMod, weaponNote: weaponNote || (isReroll && last ? last.weaponNote : "") };
+    const attackRoll = !$("r-called-wrap").hidden, called = attackRoll ? (isReroll && last ? last.called : +$("r-called").value) : 0;
+    last = { name, t, dice, sum, ok, margin, auto, jam, attackRoll, called, rerolled: !!isReroll, fireMod, weaponNote: weaponNote || (isReroll && last ? last.weaponNote : "") };
     ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
     ch.play.log = ch.play.log.slice(0, 12);
     if ($("r-stun").checked) { ch.play.stunned = false; $("f-stunned").checked = false; }
@@ -1944,7 +1950,9 @@ tr.lvl-U td.target { color: var(--muted); }
     if (r.auto === "auto-s") note = r.margin < 0 ? "Natural " + r.sum + ": automatic success. Counts as margin 0 in a contest." : "Natural " + r.sum + ": automatic success.";
     else if (r.auto === "auto-f") note = "Natural " + r.sum + ": automatic failure.";
     else note = r.ok ? `Succeeded by ${r.margin}.` : `Failed by ${-r.margin}.`;
-    if (r.ok && r.margin >= 5) note += " Margin 5+: assistance gives +2; medical care clears an extra box; a progress clock gets 2 segments.";
+    if (r.attackRoll && r.ok && r.called) note += " Called shot: if it isn't defended, the effect you named happens. No extra boxes.";
+    else if (r.attackRoll && r.ok && (r.margin >= 5 || r.auto === "auto-s")) note += " <b>Telling hit</b> if it isn't defended: pick one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, or precise). No extra boxes.";
+    if (r.ok && r.margin >= 5 && !r.attackRoll) note += " Margin 5+: assistance gives +2; medical care clears an extra box; a progress clock gets 2 segments.";
     if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
     if (!r.ok && !r.auto && r.margin >= -2) note += ` Missed by ${-r.margin}: the GM may offer success at a cost.`;
     if (r.weaponNote) note += ` ${r.weaponNote}`;
@@ -2101,7 +2109,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);

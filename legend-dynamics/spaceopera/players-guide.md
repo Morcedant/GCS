@@ -123,6 +123,7 @@ Spend all your Edges. Each one buys:
 | A friend | A named contact who helps once per job | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
 | Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix | 1 |
+| Hard to put down | Once per fight, shrug off a telling hit's effect: you still take its boxes (see *Telling hits*) | 1 |
 | Powered Armor | Powered armor, yours by right: legion-grade from a military or a Hegemony House, a commercial security suit, or a colony-built rig from an illicit armorer. Say which, and where it came from (take its Allegiance if it's issued). The GM approves it, and someone always wants it back. | 1 |
 
 ### Spending points
@@ -345,7 +346,29 @@ Roll Firearms for a ranged attack, Close Combat for a weapon in hand, or Close C
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
 - **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. An advantage that rewards aiming adds its bonus to this.
 
-Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage.
+Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage: a great hit decides *what* happens instead.
+
+## Telling hits
+
+A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.
+
+- **A telling hit** is an attack that succeeds by **5 or more**, or on a natural 3 or 4, and isn't stopped by a defense. The attacker picks **one effect** below and describes it. The weapon still marks its usual boxes.
+- **A called shot.** Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, an eye, a rope, a lock). If the attack hits at all, the effect happens, whatever the margin. An advantage that rewards aiming cuts this penalty by 1.
+- **Both ways.** Opponents land telling hits on characters too.
+
+| Effect | What happens |
+|---|---|
+| Disarm | The weapon or held item drops, or flies a few yards away |
+| Knock down | The target falls prone, or is driven back a few steps |
+| Pin | The target is held, tangled or pinned down: their next action goes to getting free |
+| Rattle | −2 to the target's next roll |
+| Break gear | A shield, weapon or tool breaks; armor loses 1 protection until it's repaired |
+| Open them up | The next attack on this target this round gets +2 |
+| Precise | You hit exactly what you aimed at: the lantern, the rope, the tire, the hand on the trigger |
+
+**Limits.** A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a bear or knocks down a train, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next, like sending one crashing into another.
+
+**Staying alive.** A character on the receiving end can shrug off a telling hit's effect with **Hard to put down** (once per fight) or by spending a Resolve point. Either way, they still take the boxes.
 
 ## Range
 
@@ -457,6 +480,7 @@ Begin each session with two Resolve points (three with Extra Resolve); unused po
 |---|---|
 | Reroll your own roll | Declare after seeing the result but before its consequences. Keep the second result, even if worse. |
 | Reduce an injury by one box | Declare when a hit would mark boxes, before applying them. Does not prevent certain death. |
+| Shrug off a telling hit | Cancel the effect an attacker picked against you; you still take the boxes. |
 | Establish a small preparation | Propose a plausible detail, such as having packed something useful. GM approval is required. |
 
 Gain one point when one of your complications creates a meaningful problem you accept, including a companion complication. You can decline the proposed complication without penalty.
@@ -1971,10 +1995,10 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Clocks:** 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).
 
-**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
+**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural 3–4): the attacker picks an effect; called shot −2 (small target −4). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
 
 **Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Rest: one box per full day, not from three.
 
-**Resolve:** start each session with two. Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.
+**Resolve:** start each session with two. Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.
 
 *Legend Dynamics RPG system, created by Don Smallwood.* This RPG is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.
