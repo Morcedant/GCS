@@ -221,7 +221,7 @@ test("Parry, Block, shield and mail", () => {
   assert.equal(S.summarize(enc2).armorStops, 1);
 });
 
-test("Heavy coat (published D&D gear): turns blades and claws, not bullets, once a fight; mail still stops everything", () => {
+test("Heavy coat (published Pact of Bones gear): turns blades and claws, not bullets, once a fight; mail still stops everything", () => {
   const coat = pack.protection.find((g) => g.id === "coat");
   assert.equal(coat.equipment, "coat"); assert.ok(pack.equipment.some((e) => e[0] === "coat"), "the creator offers it as gear");
   assert.ok(!lab.protection && !lab.experiments.includes("labProtection"), "no longer test gear");
@@ -238,7 +238,7 @@ test("Heavy coat (published D&D gear): turns blades and claws, not bullets, once
     weapon: { id: "g", firearm: true, band: "close", damage: { any: { boxes: 2 } } }, band: "close" }, LD.NO_HOOKS, () => [3, 3, 3]).armorUsed, "Mail", "no 'against': everything");
 });
 
-test("D&D's published combat rules: in force under Published and Lab alike, not offered as experiments", () => {
+test("Pact of Bones' published combat rules: in force under Published and Lab alike, not offered as experiments", () => {
   const C = pack.combatRules;
   assert.deepEqual(Object.keys(C).sort(), ["aim", "attackQualityDodge", "block", "oneDefense", "parry"]);
   for (const cfg of [X.PUBLISHED, X.newLabConfig("western", lab, C)]) {
@@ -277,7 +277,7 @@ test("Enchanted weapons: +2 to hit or +1 box with that weapon only", () => {
   assert.equal(no.damage.boxes, 2, "only the enchanted weapon");
 });
 
-test("D&D Block: a real shield +1, an improvised one breaks on a 2-box hit, never against bullets", () => {
+test("Pact of Bones Block: a real shield +1, an improvised one breaks on a 2-box hit, never against bullets", () => {
   const C = pack.combatRules, r = { ...X.buildRules(X.PUBLISHED, weapons, lab, C), jamOn18: true };
   assert.equal(r.defenses.block.mod, -2);
   const shield = pack.protection.find((g) => g.id === "shield"), chair = pack.protection.find((g) => g.id === "improvised");
@@ -300,7 +300,7 @@ test("D&D Block: a real shield +1, an improvised one breaks on a 2-box hit, neve
   for (let i = 0; i < 10; i++) { a2.blockedRound = null; const e = E.attack(enc2, r, LD, { attacker: "p2", defender: "p1", weapon: "club", band: "melee", defense: "block" }).event; assert.equal(e.shieldBroke, null); }
 });
 
-test("D&D: one defense a round across Dodge, Parry and Block; Additional Defense gives a second", () => {
+test("Pact of Bones: one defense a round across Dodge, Parry and Block; Additional Defense gives a second", () => {
   const r = { ...X.buildRules(X.PUBLISHED, weapons, lab, pack.combatRules), jamOn18: true };
   assert.ok(pack.extraEdges.some((e) => e[0] === "extradefense"));
   const run = (extra) => {

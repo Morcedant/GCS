@@ -1,5 +1,5 @@
 {
- "label": "Dust & Damnation Test",
+ "label": "Pact of Bones Test",
  "notes": "Rules Lab test configuration. Nothing here is published: the creator's sheet and roller never read it. Setting experiments listed under 'experiments' can be switched on in the GM tab's Encounter panel. Weapon traits are added in the lab (or here) as { type: 'accuracy', value, bands: ['close'], requires: { aimed, ammo, mode }, label }; none are set until their values are decided.",
  "experiments": [
   "labWeaponTraits"

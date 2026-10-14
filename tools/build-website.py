@@ -22,7 +22,7 @@ CREATORS = {
     "aurora": "https://claude.ai/artifact/12nhXbM26KpVjHk68yvFLh",
 }
 # Suggested Squarespace page URLs (set in each page's settings).
-SLUGS = {"western": "/dust-and-damnation", "spaceopera": "/fracture-lines", "fantasy": "/the-shattered-crown", "aurora": "/aurora"}
+SLUGS = {"western": "/pact-of-bones", "spaceopera": "/fracture-lines", "fantasy": "/the-shattered-crown", "aurora": "/aurora"}
 GENRE = {"western": "Gothic Western", "spaceopera": "Science fiction", "fantasy": "Sword and sorcery", "aurora": "Superheroes"}
 CORE_SLUG = "/core-rules"
 DISCORD_SLUG = "/discord"
@@ -185,7 +185,7 @@ def core_rules():
 
 def discord_page():
     """One page for the bot: the commands every setting shares, then what changes from one setting to the next."""
-    generic = {"title": "Dust & Damnation", "point": "Legend", "target": 13, "skill": "Shooting", "foe": "Bandit", "foeTarget": 14, "contest": "Grapple",
+    generic = {"title": "Pact of Bones", "point": "Legend", "target": 13, "skill": "Shooting", "foe": "Bandit", "foeTarget": 14, "contest": "Grapple",
                "assist": "Hold the door", "helperSkill": "Athletics", "track": "heat", "trackFull": "Heat",
                "tracks": ["listed under Differences by setting"], "trackTitle": "setting's", "clock": "The mob forms", "clockSize": 4}
     rows_p, rows_gm = discord_handout.rows(generic)
@@ -227,7 +227,7 @@ def discord_page():
 <!-- Block 3: commands -->
 <div class="ld ld-rules">
 <h2>For players</h2>
-<p>The examples use Dust &amp; Damnation names; swap in your own skill, foe and track. “Legend points” are your setting's points: Grit, Resolve or Fortune.</p>
+<p>The examples use Pact of Bones names; swap in your own skill, foe and track. “Legend points” are your setting's points: Grit, Resolve or Fortune.</p>
 {table(rows_p)}
 <p>Only the player who rolled can press the reroll button. Rolls that miss by 1 or 2 remind the GM that success at a cost is on offer.</p>
 <h2>Clocks</h2>

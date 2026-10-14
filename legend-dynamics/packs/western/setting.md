@@ -1,8 +1,8 @@
 <!-- SECTION:intro -->
 
-The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. *Dust & Damnation* is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.
+The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. *Pact of Bones* is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.
 
-Dust & Damnation is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.
+Pact of Bones is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.
 
 <!-- SECTION:weapons -->
 
@@ -16,9 +16,9 @@ To take someone down without killing them, use fists, a club, a grapple, or a la
 
 <!-- SECTION:combat -->
 
-### Fighting in Dust & Damnation
+### Fighting in Pact of Bones
 
-Dust & Damnation adds these rules to the ones above.
+Pact of Bones adds these rules to the ones above.
 
 - **One defense a round.** Dodge, Parry and Block are all defenses, and you get one a round, between your turns: choose which when an attack hits. The **Additional Defense** Edge gives you a second.
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.

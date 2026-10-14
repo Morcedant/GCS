@@ -6,8 +6,8 @@
  * attack pipeline only through its hook lists. Nothing here runs in normal play: the creator's roller and
  * sheet always use the published core, and the lab must be given a lab configuration explicitly.
  *
- * A setting can publish one of these rules for itself (pack.json "combatRules": { id: params }, as Dust &
- * Damnation does). Then it is part of that setting's published rules, in every configuration, with the
+ * A setting can publish one of these rules for itself (pack.json "combatRules": { id: params }, as Pact of
+ * Bones does). Then it is part of that setting's published rules, in every configuration, with the
  * published parameters, and it is no longer offered as an experiment there.
  */
 

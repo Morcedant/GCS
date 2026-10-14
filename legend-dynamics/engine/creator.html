@@ -1249,7 +1249,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const levelName = (l, name) => ((l === "S" && isGS() && !(name && advancedToS(name))) || (l === "S" && masterSkill(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge);
-  // A setting's own combat rules (Dust & Damnation: defend every attack, attack quality, Parry, Aim).
+  // A setting's own combat rules (Pact of Bones: one defense a round, attack quality, Parry, Block, Aim).
   const CR = PACK.combatRules || {};
   const PARRY = CR.parry ? [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]] : [];
   const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
