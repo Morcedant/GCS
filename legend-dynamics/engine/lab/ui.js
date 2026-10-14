@@ -29,7 +29,7 @@ export function mountLab(api) {
 
   /** @type {{ mode: "published" | "lab", cfg: any, enc: any, history: any[], compare: any }} */
   let lab = store.get(KEY, null) || { mode: "published", cfg: null, enc: null, history: [], compare: null };
-  const PUB = PACK.combatRules || null; // rules this setting has published from the lab (Pact of Bones)
+  const PUB = PACK.combatRules || null; // the published combat rules: the core's (engine/combat.json) with the setting's overrides
   const fresh = LDX.newLabConfig(PACK.id, LAB, PUB);
   if (!lab.cfg) lab.cfg = fresh;
   for (const [id, st] of Object.entries(fresh.experiments)) if (!lab.cfg.experiments[id]) lab.cfg.experiments[id] = st; // new experiments appear switched off
@@ -41,7 +41,7 @@ export function mountLab(api) {
   const enc = () => lab.enc;
   // A running encounter keeps the rules it started with; otherwise the configuration chosen for the next one.
   const rules = () => rulesOf(enc() && enc().status !== "ended" ? enc().config : lab.mode === "lab" ? lab.cfg : LDX.PUBLISHED);
-  const settingLine = (/** @type {any} */ r) => (r.settingRules.length ? ` (with the ${T.title} rules: ${r.settingRules.map((/** @type {any} */ a) => a.label).join(", ")})` : "");
+  const settingLine = (/** @type {any} */ r) => (r.settingRules.length ? ` (with the published combat rules: ${r.settingRules.map((/** @type {any} */ a) => a.label).join(", ")})` : "");
   const rulesLine = (/** @type {any} */ r) => r.kind === "lab" ? `${r.label}${r.active.length ? ": " + r.active.map((/** @type {any} */ a) => `${a.label} (${a.scope.toUpperCase()})`).join(", ") : ": no experiments on"}${settingLine(r)}` : "Published rules" + settingLine(r);
 
   // ---- rules configuration ----
@@ -58,7 +58,7 @@ export function mountLab(api) {
       : lab.mode === "lab" ? "New encounters use the test configuration." : "New encounters use the published rules. Choose the test configuration to switch experiments on.";
     const on = lab.mode === "lab";
     const pubRows = rules().settingRules.map((/** @type {any} */ x) => `<div class="exp"><label><input type="checkbox" checked disabled> <b>${esc(x.label)}</b></label>
-        <span class="lab-scope setting">PUBLISHED</span><div class="small muted">Part of the published ${esc(T.title)} rules, in every configuration.</div></div>`).join("");
+        <span class="lab-scope setting">PUBLISHED</span><div class="small muted">Part of the published combat rules${(PACK.coreCombat || []).includes(x.id) ? " (core)" : ` (${esc(T.title)})`}, in every configuration.</div></div>`).join("");
     $("lab-exps").innerHTML = pubRows + LDX.available(PACK.id, LAB, PUB).map((/** @type {any} */ x) => {
       const st = lab.cfg.experiments[x.id];
       return `<div class="exp ${st.on && on ? "on" : ""}"><label><input type="checkbox" data-exp="${x.id}" ${st.on ? "checked" : ""} ${on ? "" : "disabled"}> <b>${esc(x.label)}</b></label>

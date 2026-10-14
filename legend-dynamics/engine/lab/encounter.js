@@ -144,7 +144,9 @@ export function defenseOptions(enc, rules, d, w) {
   if (D.parry && melee) {
     const own = (d.weapons || []).map((id) => rules.weapons[id]).filter((/** @type {any} */ x) => x && x.reach === "melee" && x.skill !== "Brawling");
     const cands = own.map((/** @type {any} */ x) => ({ name: x.name, skill: x.skill, t: d.skills[x.skill] })).filter((c) => c.t !== undefined);
-    if (w.skill === "Brawling" && d.skills.Brawling !== undefined) cands.push({ name: "bare hands", skill: "Brawling", t: d.skills.Brawling });
+    // Bare hands parry fists (core), or claws and fangs too where the setting allows it (bareHanded: "natural").
+    const unarmedAttack = w.unarmed || w.id === "fists" || (D.parry.bareHanded === "natural" && w.skill === "Brawling");
+    if (unarmedAttack && d.skills.Brawling !== undefined) cands.push({ name: "bare hands", skill: "Brawling", t: d.skills.Brawling });
     const best = cands.sort((x, y) => y.t - x.t)[0];
     if (best) {
       const n = d.parryRound === enc.round ? d.parries || 0 : 0;
@@ -157,7 +159,7 @@ export function defenseOptions(enc, rules, d, w) {
   const shield = live.filter((/** @type {any} */ t) => t.type === "shield" && !t.used).sort((/** @type {any} */ x, /** @type {any} */ y) => (y.value || 0) - (x.value || 0))[0];
   if (D.block && shield && w && (melee || (!w.firearm && !w.spell)) && d.skills.Melee !== undefined) {
     opt({ kind: "block", label: `Block (${(shield.label || "shield").toLowerCase()})`, shield: shield.label || "Shield", base: d.skills.Melee, used: d.blockedRound === enc.round,
-      mods: [{ source: "block", label: "Block", value: D.block.mod, scope: "experiment" }, { source: "gear", label: shield.label || "Shield", value: shield.value || 0, scope: "setting" }] });
+      mods: [{ source: "block", label: "Block", value: D.block.mod, scope: D.block.scope || "experiment" }, { source: "gear", label: shield.label || "Shield", value: shield.value || 0, scope: "setting" }] });
   }
   return out;
 }

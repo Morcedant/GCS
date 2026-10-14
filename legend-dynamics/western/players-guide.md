@@ -100,8 +100,8 @@ Spend all your Edges. Each one buys:
 | Extra Grit | Start every session with 3 Grit points instead of 2 | 1 |
 | A friend | A named contact who helps once per job | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
+| Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix | 1 |
 | Talisman | A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a Himmelsbrief (a German heaven's letter) sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one. It's renewed between jobs and doesn't count against a charm limit. | 1 |
-| Additional Defense | Defend twice a round instead of once: Dodge, Parry or Block, in any mix. A second parry is still −2. | 1 |
 
 ### Spending points
 
@@ -304,19 +304,24 @@ Act in descending Agility order. Players choose the order of tied characters; th
 
 ## Attacking and defending
 
-Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
+Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may **defend**: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.
 
-Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
+- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits. The **Additional Defense** Edge gives a second.
+- **Dodge** is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert.
+- **Parry.** Against a weapon in hand or fists, roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a shot or a missile.
+- **Block.** With a shield, or anything that can stand in for one (a chair, a plank, a crate lid), you can block a weapon in hand, fists, or a thrown or loosed missile: roll Melee −2, plus the shield's bonus. Nothing you can lift blocks a gunshot or a blast. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.
+- **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
+- **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. An advantage that rewards aiming adds its bonus to this.
+
+Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage.
 
 ### Fighting in Pact of Bones
 
-Pact of Bones adds these rules to the ones above.
+Pact of Bones adds these to the attack and defense rules above.
 
-- **One defense a round.** Dodge, Parry and Block are all defenses, and you get one a round, between your turns: choose which when an attack hits. The **Additional Defense** Edge gives you a second.
-- **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
-- **Parry.** Against a blade, a club, claws or fists, you can parry instead of Dodge: roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists, claws and fangs. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a bullet or an arrow.
-- **Block.** With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fists or an arrow instead of Dodge: roll Melee −2, or Melee −1 with a real shield. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.
-- **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. With **Careful Marksman**, the advantage's +2 adds to this.
+- **Bare hands against claws.** Out West you can parry claws and fangs bare-handed too, not just fists: Brawling −3.
+- **Shields.** A real shield is rare out West: a hide shield or an iron-bound buckler gives +1 to Block. Anything at hand stands in: a chair, a wooden slat, a crate lid, a saddle.
+- **Careful Marksman.** Aiming with the advantage gives +3 in all: Aim's +1 and the advantage's +2.
 - **A heavy coat.** A buffalo coat or a canvas duster turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer.
 
 *Example:* a werewolf's claws succeed by 5 against Deputy Ames, who hasn't defended yet this round. Dodge is 11, −2 for the clean hit: Ames needs a 9 or less. A parry with the saber would be Melee 14 −3 −2 = 9, no better, so Ames dodges. When the second wolf lunges before Ames's next turn, there's no defense left, unless Ames has Additional Defense.
@@ -354,7 +359,7 @@ Injury penalties replace each other rather than stacking. They apply to movement
 - **A further hit.** While you are at three boxes, any hit from a weapon that marks 2 or more boxes kills you. Fists, clubs and knives just keep you down.
 - **Certain death.** Some fates (a fall into a furnace, a beheading, disintegration) bypass the track entirely.
 
-Your protection is avoiding the hit: Dodge, cover, and a Grit point, which reduces a hit by one box.
+Your protection is avoiding the hit: a defense (Dodge, Parry or Block), cover, and a Grit point, which reduces a hit by one box.
 
 ## Weapons and damage
 
@@ -1112,7 +1117,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Clocks:** 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).
 
-**Combat:** move plus one action. Hit → optional Dodge → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
+**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
 
 **Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Rest: one box per two full days, not from three.
 

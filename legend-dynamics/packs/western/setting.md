@@ -18,13 +18,11 @@ To take someone down without killing them, use fists, a club, a grapple, or a la
 
 ### Fighting in Pact of Bones
 
-Pact of Bones adds these rules to the ones above.
+Pact of Bones adds these to the attack and defense rules above.
 
-- **One defense a round.** Dodge, Parry and Block are all defenses, and you get one a round, between your turns: choose which when an attack hits. The **Additional Defense** Edge gives you a second.
-- **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
-- **Parry.** Against a blade, a club, claws or fists, you can parry instead of Dodge: roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists, claws and fangs. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a bullet or an arrow.
-- **Block.** With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fists or an arrow instead of Dodge: roll Melee −2, or Melee −1 with a real shield. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.
-- **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. With **Careful Marksman**, the advantage's +2 adds to this.
+- **Bare hands against claws.** Out West you can parry claws and fangs bare-handed too, not just fists: {{unarmedSkill}} −3.
+- **Shields.** A real shield is rare out West: a hide shield or an iron-bound buckler gives +1 to Block. Anything at hand stands in: a chair, a wooden slat, a crate lid, a saddle.
+- **Careful Marksman.** Aiming with the advantage gives +3 in all: Aim's +1 and the advantage's +2.
 - **A heavy coat.** A buffalo coat or a canvas duster turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer.
 
 *Example:* a werewolf's claws succeed by 5 against Deputy Ames, who hasn't defended yet this round. Dodge is 11, −2 for the clean hit: Ames needs a 9 or less. A parry with the saber would be Melee 14 −3 −2 = 9, no better, so Ames dodges. When the second wolf lunges before Ames's next turn, there's no defense left, unless Ames has Additional Defense.

@@ -8,6 +8,9 @@ import * as S from "../../lab/stats.js";
 
 const pack = JSON.parse(readFileSync(new URL("../../../packs/western/pack.json", import.meta.url)));
 const lab = JSON.parse(readFileSync(new URL("../../../packs/western/lab.json", import.meta.url)));
+// The published combat rules, merged as tools/build-legend.py does: the core's (engine/combat.json) with the pack's overrides.
+const CORE = JSON.parse(readFileSync(new URL("../../combat.json", import.meta.url)));
+const combatOf = (p) => { const r = JSON.parse(JSON.stringify(CORE.rules)); for (const [k, v] of Object.entries(p.combatRules || {})) r[k] = { ...(r[k] || {}), ...v }; return r; };
 const weapons = Object.fromEntries(pack.arms.filter((a) => !a.hazard).map((a) => [a.id, a]));
 const rulesFor = (cfg) => ({ ...X.buildRules(cfg, weapons, lab), jamOn18: pack.weapons.jamOn18 });
 const published = rulesFor(X.PUBLISHED);
@@ -239,13 +242,13 @@ test("Heavy coat (published Pact of Bones gear): turns blades and claws, not bul
 });
 
 test("Pact of Bones' published combat rules: in force under Published and Lab alike, not offered as experiments", () => {
-  const C = pack.combatRules;
+  const C = combatOf(pack);
   assert.deepEqual(Object.keys(C).sort(), ["aim", "attackQualityDodge", "block", "oneDefense", "parry"]);
   for (const cfg of [X.PUBLISHED, X.newLabConfig("western", lab, C)]) {
     const r = X.buildRules(cfg, weapons, lab, C);
     assert.deepEqual(r.settingRules.map((x) => x.id).sort(), Object.keys(C).sort());
     assert.ok(r.flags.has("oneDefense") && !r.flags.has("dodgeEveryAttack") && r.actions.has("aim"));
-    assert.equal(r.defenses.parry.mod, -3); assert.equal(r.defenses.parry.repeatPenalty, -2); assert.equal(r.defenses.parry.scope, "setting");
+    assert.equal(r.defenses.parry.mod, -3); assert.equal(r.defenses.parry.repeatPenalty, -2); assert.equal(r.defenses.parry.scope, "core");
     assert.equal(r.hooks.dodgeModifiers.length, 1); assert.equal(r.hooks.attackModifiers.length, 1);
     assert.equal(r.active.length, 0, "no experiments on");
   }
@@ -254,14 +257,20 @@ test("Pact of Bones' published combat rules: in force under Published and Lab al
   // A clean hit (margin 5) puts the Dodge at -2, logged as a setting rule; a parry is Brawling -3.
   const r = { ...X.buildRules(X.PUBLISHED, weapons, lab, C), jamOn18: true };
   const [mod] = r.hooks.dodgeModifiers[0]({ margin: 5 });
-  assert.equal(mod.value, -2); assert.equal(mod.scope, "setting");
+  assert.equal(mod.value, -2); assert.equal(mod.scope, "core");
   const enc = setup(X.PUBLISHED, 8); E.startCombat(enc, r);
   const opts = E.defenseOptions(enc, r, E.find(enc, "p1"), weapons.fists);
   assert.deepEqual(opts.map((o) => [o.kind, o.preview]), [["dodge", 11], ["parry", 9]]);
   // Other settings publish none of this.
   const crown = JSON.parse(readFileSync(new URL("../../../packs/fantasy/pack.json", import.meta.url)));
+  // Every setting publishes the core rules; Pact of Bones adds bare-handed parries against claws.
   assert.equal(crown.combatRules, undefined);
-  assert.equal(X.buildRules(X.PUBLISHED, weapons, lab, crown.combatRules).settingRules.length, 0);
+  const cr = combatOf(crown);
+  assert.deepEqual(Object.keys(cr).sort(), Object.keys(C).sort());
+  assert.equal(cr.parry.bareHanded, "unarmed"); assert.equal(C.parry.bareHanded, "natural");
+  const rc = { ...X.buildRules(X.PUBLISHED, weapons, lab, cr), jamOn18: true }, ec = setup(X.PUBLISHED, 8); E.startCombat(ec, rc);
+  assert.deepEqual(E.defenseOptions(ec, rc, E.find(ec, "p1"), weapons.claws).map((o) => o.kind), ["dodge"], "core: no bare-handed parry against claws");
+  assert.deepEqual(E.defenseOptions(ec, rc, E.find(ec, "p1"), weapons.fists).map((o) => o.kind), ["dodge", "parry"], "core: bare hands parry fists");
 });
 
 test("Enchanted weapons: +2 to hit or +1 box with that weapon only", () => {
@@ -278,7 +287,7 @@ test("Enchanted weapons: +2 to hit or +1 box with that weapon only", () => {
 });
 
 test("Pact of Bones Block: a real shield +1, an improvised one breaks on a 2-box hit, never against bullets", () => {
-  const C = pack.combatRules, r = { ...X.buildRules(X.PUBLISHED, weapons, lab, C), jamOn18: true };
+  const C = combatOf(pack), r = { ...X.buildRules(X.PUBLISHED, weapons, lab, C), jamOn18: true };
   assert.equal(r.defenses.block.mod, -2);
   const shield = pack.protection.find((g) => g.id === "shield"), chair = pack.protection.find((g) => g.id === "improvised");
   const enc = setup(X.PUBLISHED, 5); E.startCombat(enc, r);
@@ -301,8 +310,8 @@ test("Pact of Bones Block: a real shield +1, an improvised one breaks on a 2-box
 });
 
 test("Pact of Bones: one defense a round across Dodge, Parry and Block; Additional Defense gives a second", () => {
-  const r = { ...X.buildRules(X.PUBLISHED, weapons, lab, pack.combatRules), jamOn18: true };
-  assert.ok(pack.extraEdges.some((e) => e[0] === "extradefense"));
+  const r = { ...X.buildRules(X.PUBLISHED, weapons, lab, combatOf(pack)), jamOn18: true };
+  assert.equal(CORE.rules.oneDefense.edge, "extradefense", "a core Edge");
   const run = (extra) => {
     const enc = setup(X.PUBLISHED, 31); E.startCombat(enc, r);
     const ames = E.find(enc, "p1"); if (extra) ames.traits.push({ type: "extraDefense", value: 1, label: "Additional Defense" });

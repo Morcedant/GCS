@@ -128,7 +128,7 @@ export function buildRules(config, weapons, lab, published) {
   for (const [id, params] of Object.entries(published || {})) {
     const x = EXPERIMENTS.find((e) => e.id === id);
     if (!x) continue;
-    const p = { ...x.params, ...(params || {}), scope: "setting" };
+    const p = { ...x.params, ...(params || {}), scope: x.scope };
     apply(x, p);
     rules.settingRules.push({ id: x.id, label: x.label, params: p });
   }

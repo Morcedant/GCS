@@ -1550,7 +1550,7 @@
   [
    "shield",
    "Shield",
-   "+1 Dodge against attacks you can see."
+   "+1 Dodge against attacks you can see, and +1 to Block."
   ],
   [
    "torches",
@@ -3138,7 +3138,7 @@
    "id": "shield",
    "equipment": "shield",
    "name": "Shield",
-   "text": "+1 Dodge against attacks you can see.",
+   "text": "+1 Dodge against attacks you can see, and +1 to Block.",
    "traits": [
     {
      "type": "dodgeBonus",
