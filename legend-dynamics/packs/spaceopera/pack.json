@@ -2266,105 +2266,181 @@
   [
    "pistol",
    "Slug pistol",
-   "Twelve rounds. Hits mark 2 boxes. Short range."
+   "Twelve rounds. Hits mark 2 boxes. Short range.",
+   {
+    "control": "Licensed"
+   }
   ],
   [
    "laser",
    "Laser pistol",
-   "Twenty shots per cell; silent, no recoil. Hits mark 2 boxes. Short range."
+   "Twenty shots per cell; silent, no recoil. Hits mark 2 boxes. Short range.",
+   {
+    "control": "Licensed"
+   }
   ],
   [
    "carbine",
    "Slug carbine",
-   "Thirty rounds; can fire bursts. Hits mark 2 boxes. Medium range."
+   "Thirty rounds; can fire bursts. Hits mark 2 boxes. Medium range.",
+   {
+    "control": "Restricted"
+   }
   ],
   [
    "plasma",
    "Plasma rifle",
-   "Ten shots per cell. Hits mark 3 boxes and leave the target Dying. Medium range."
+   "Ten shots per cell. Hits mark 3 boxes and leave the target Dying. Medium range.",
+   {
+    "control": "Military"
+   }
   ],
   [
    "stunner",
    "Stunner",
-   "The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. Close range."
+   "The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. Close range.",
+   {
+    "control": "Open"
+   }
   ],
   [
    "blade",
    "Vibroblade",
-   "A humming blade. Hits mark 2 boxes."
+   "A humming blade. Hits mark 2 boxes.",
+   {
+    "control": "Licensed"
+   }
   ],
   [
    "armor",
    "Body armor",
-   "Once per fight, a hit that marks 2 or more boxes marks one fewer. Shows under scans."
+   "Once per fight, a hit that marks 2 or more boxes marks one fewer. Shows under scans.",
+   {
+    "control": "Licensed"
+   }
   ],
   [
    "riotshield",
    "Riot shield",
-   "A hardened security shield: +1 to Block against blades, fists and thrown objects. It won't stop a slug or a beam. −2 to Stealth while you carry it."
+   "A hardened security shield: +1 to Block against blades, fists and thrown objects. It won't stop a slug or a beam. −2 to Stealth while you carry it.",
+   {
+    "control": "Licensed"
+   }
   ],
   [
    "vacsuit",
    "Vac suit",
-   "Air for six hours in vacuum or poison atmosphere."
+   "Air for six hours in vacuum or poison atmosphere.",
+   {
+    "control": "Open"
+   }
   ],
   [
    "medkit",
    "Medkit",
-   "Biotech dressings, stims and a scanner. Needed to stabilize a patient and give field treatment."
+   "Biotech dressings, stims and a scanner. Needed to stabilize a patient and give field treatment.",
+   {
+    "control": "Open"
+   }
   ],
   [
    "toolkit",
    "Toolkit",
-   "Needed for most Engineering in the field."
+   "Needed for most Engineering in the field.",
+   {
+    "control": "Open"
+   }
   ],
   [
    "deck",
    "Intrusion deck",
-   "A hacking rig. Needed for most Computers work against secured systems."
+   "A hacking rig. Needed for most Computers work against secured systems.",
+   {
+    "control": "Restricted"
+   }
   ],
   [
    "scanner",
    "Scanner",
-   "Handheld sensor. Needed for most Sensors work away from a ship."
+   "Handheld sensor. Needed for most Sensors work away from a ship.",
+   {
+    "control": "Open"
+   }
   ],
   [
    "drone",
    "Scout drone",
-   "A small flying drone that can scout and relay what it sees."
+   "A small flying drone that can scout and relay what it sees.",
+   {
+    "control": "Licensed"
+   }
   ],
   [
    "translator",
    "Translator",
-   "Translates most known languages, slowly. Thrum and Qor need one to talk with most peoples."
+   "Translates most known languages, slowly. Thrum and Qor need one to talk with most peoples.",
+   {
+    "control": "Open"
+   }
   ],
   [
    "exoframe",
    "Exo-frame",
-   "A light powered frame: no gravity penalty for Vael and others built for low gravity."
+   "A light powered frame: no gravity penalty for Vael and others built for low gravity.",
+   {
+    "control": "Open"
+   }
   ],
   [
    "hardsuit",
    "Hardsuit",
-   "An armored vac suit: air for six hours in vacuum or poison atmosphere, and once per fight a hit that marks 2 or more boxes marks one fewer. −1 to Athletics and Stealth while you wear it; a breach is the GM's call. Not with other armor."
+   "An armored vac suit: air for six hours in vacuum or poison atmosphere, and once per fight a hit that marks 2 or more boxes marks one fewer. −1 to Athletics and Stealth while you wear it; a breach is the GM's call. Not with other armor.",
+   {
+    "control": "Licensed"
+   }
   ],
   [
    "combatexo",
    "Combat exoskeleton",
-   "A powered military frame: +2 to Athletics to lift, carry, climb or break things, your unarmed blows mark 2 boxes, and you carry a heavy weapon one-handed. Its plating works as body armor: once per fight, a 2+ box hit marks one fewer. −2 to Stealth; needs a fresh power cell each day. Not with other armor."
+   "A powered military frame: +2 to Athletics to lift, carry, climb or break things, your unarmed blows mark 2 boxes, and you carry a heavy weapon one-handed. Its plating works as body armor: once per fight, a 2+ box hit marks one fewer. −2 to Stealth; needs a fresh power cell each day. Not with other armor.",
+   {
+    "control": "Restricted"
+   }
   ],
   [
    "powerarmor",
-   "Powered armor",
+   "Powered armor, legion-grade",
    "Legion-grade, sealed and powered: hits that would mark 1 box mark nothing, and once per fight a hit that marks 2 or more boxes marks one fewer. Air for six hours, and the strength of a combat exoskeleton. −2 to Stealth, any scanner picks it up, and it needs a fresh power cell each day. A shot at the power pack (−2 to hit) can lock it up until someone spends an action freeing you. Needs the Powered Armor Edge. Not with other armor.",
    {
-    "edge": "powerarmor"
+    "edge": "powerarmor",
+    "control": "Military"
+   }
+  ],
+  [
+   "powercom",
+   "Powered armor, commercial",
+   "A security or industrial suit, sold where the law allows it: once per fight a hit that would mark 1 box marks nothing, and once per fight a 2+ box hit marks one fewer. Air for six hours, and the strength of a combat exoskeleton. −2 to Stealth and a power cell each day. Registered: any scanner reads its owner. Needs the Powered Armor Edge. Not with other armor.",
+   {
+    "edge": "powerarmor",
+    "control": "Restricted"
+   }
+  ],
+  [
+   "powercol",
+   "Powered armor, colony-built",
+   "Built by an illicit armorer in some remote colony: protects like a commercial suit, but it's Temperamental: on a natural 17 or 18 on any physical roll, the suit seizes until someone spends an action freeing you. It drinks a power cell twice a day, and it's contraband everywhere but where it was made. Needs the Powered Armor Edge. Not with other armor.",
+   {
+    "edge": "powerarmor",
+    "control": "Military"
    }
   ],
   [
    "papers",
    "Travel papers",
-   "Accord transit permits and a clean (or convincing) Mandate record."
+   "Accord transit permits and a clean (or convincing) Mandate record.",
+   {
+    "control": "Open"
+   }
   ]
  ],
  "weapons": {
@@ -3279,19 +3355,59 @@
   {
    "id": "powerarmor",
    "equipment": "powerarmor",
-   "name": "Powered armor",
+   "name": "Powered armor, legion-grade",
    "text": "Legion-grade, sealed and powered: hits that would mark 1 box mark nothing, and once per fight a hit that marks 2 or more boxes marks one fewer. Air for six hours, and the strength of a combat exoskeleton. −2 to Stealth, any scanner picks it up, and it needs a fresh power cell each day. A shot at the power pack (−2 to hit) can lock it up until someone spends an action freeing you. Needs the Powered Armor Edge. Not with other armor.",
    "traits": [
     {
      "type": "ignoreHits",
      "maxBoxes": 1,
-     "label": "Powered armor"
+     "label": "Legion-grade armor"
     },
     {
      "type": "armor",
      "minBoxes": 2,
      "reduce": 1,
-     "label": "Powered armor"
+     "label": "Legion-grade armor"
+    }
+   ]
+  },
+  {
+   "id": "powercom",
+   "equipment": "powercom",
+   "name": "Powered armor, commercial",
+   "text": "A security or industrial suit, sold where the law allows it: once per fight a hit that would mark 1 box marks nothing, and once per fight a 2+ box hit marks one fewer. Air for six hours, and the strength of a combat exoskeleton. −2 to Stealth and a power cell each day. Registered: any scanner reads its owner. Needs the Powered Armor Edge. Not with other armor.",
+   "traits": [
+    {
+     "type": "ignoreHits",
+     "maxBoxes": 1,
+     "oncePerFight": true,
+     "label": "Commercial suit"
+    },
+    {
+     "type": "armor",
+     "minBoxes": 2,
+     "reduce": 1,
+     "label": "Commercial suit"
+    }
+   ]
+  },
+  {
+   "id": "powercol",
+   "equipment": "powercol",
+   "name": "Powered armor, colony-built",
+   "text": "Built by an illicit armorer in some remote colony: protects like a commercial suit, but it's Temperamental: on a natural 17 or 18 on any physical roll, the suit seizes until someone spends an action freeing you. It drinks a power cell twice a day, and it's contraband everywhere but where it was made. Needs the Powered Armor Edge. Not with other armor.",
+   "traits": [
+    {
+     "type": "ignoreHits",
+     "maxBoxes": 1,
+     "oncePerFight": true,
+     "label": "Colony-built suit"
+    },
+    {
+     "type": "armor",
+     "minBoxes": 2,
+     "reduce": 1,
+     "label": "Colony-built suit"
     }
    ]
   }
@@ -3300,11 +3416,11 @@
   [
    "powerarmor",
    "Powered Armor",
-   "Legion-grade powered armor, yours by right: issued by a military, a Hegemony House or a mercenary company (take its Allegiance), or salvaged and licensed. The GM approves it, and someone always wants it back.",
+   "Powered armor, yours by right: legion-grade from a military or a Hegemony House, a commercial security suit, or a colony-built rig from an illicit armorer. Say which, and where it came from (take its Allegiance if it's issued). The GM approves it, and someone always wants it back.",
    1,
    {
     "label": "Your powered armor",
-    "placeholder": "e.g. A decommissioned Hegemony legion suit, re-keyed to me",
+    "placeholder": "e.g. A colony-built rig from an armorer on Halvard's Reach, still owed for",
     "missing": "say where your powered armor came from",
     "sheetNote": "powered armor"
    }

@@ -338,3 +338,18 @@ test("Trails of Blood & Dust: one defense a round across Dodge, Parry and Block;
   // Next round, it's back.
   d.defRound = enc.round - 1; assert.ok(E.defenseOptions(enc, r, d, weapons.fists).every((o) => !o.used));
 });
+
+test("Ignoring 1-box hits once per fight (Fracture Lines' commercial powered armor)", () => {
+  const fl = JSON.parse(readFileSync(new URL("../../../packs/spaceopera/pack.json", import.meta.url)));
+  const com = fl.protection.find((g) => g.id === "powercom"), leg = fl.protection.find((g) => g.id === "powerarmor");
+  assert.ok(com.traits.find((t) => t.type === "ignoreHits").oncePerFight);
+  const r = { ...X.buildRules(X.PUBLISHED, weapons, lab, combatOf(fl)), jamOn18: true };
+  const hits = (suit) => {
+    const enc = setup(X.PUBLISHED, 41); E.startCombat(enc, r); E.addGear(enc, "p1", suit);
+    const out = [];
+    for (let i = 0; i < 80 && out.length < 3; i++) { const ev = E.attack(enc, r, LD, { attacker: "p2", defender: "p1", weapon: "fists", band: "melee", canDodge: false }).event; if (ev.hit) { out.push(ev.damage || 0); const a = E.find(enc, "p1"); a.injury = 0; } }
+    return out;
+  };
+  assert.deepEqual(hits(leg), [0, 0, 0], "legion-grade: every 1-box hit marks nothing");
+  assert.deepEqual(hits(com), [0, 1, 1], "commercial: only the first");
+});

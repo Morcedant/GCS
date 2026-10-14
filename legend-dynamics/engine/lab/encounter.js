@@ -235,6 +235,7 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     const dmg = core.weaponDamage(weapon, cmd.band);
     if (t && t.breaksOn && dmg && dmg.boxes >= t.breaksOn) { t.used = true; shieldBroke = t.label || "Shield"; }
   }
+  if (res.shrugged) { const t = (d.traits || []).find((/** @type {any} */ x) => x.type === "ignoreHits" && x.oncePerFight && !x.used && (x.label || "ignoreHits") === res.shrugged); if (t) t.used = true; }
   if (res.armorUsed) { const t = (d.traits || []).find((/** @type {any} */ x) => x.type === "armor" && !x.used && (x.label || "Armour") === res.armorUsed); if (t) t.used = true; }
   if (res.price) { a.tracks = a.tracks || {}; a.tracks[res.price.track] = (a.tracks[res.price.track] || 0) + res.price.boxes; }
   if (res.hit && res.injury) Object.assign(d, { injury: res.injury.injury, dying: res.injury.dying, dead: res.injury.dead });

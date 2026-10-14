@@ -123,7 +123,7 @@ Spend all your Edges. Each one buys:
 | A friend | A named contact who helps once per job | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
 | Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix | 1 |
-| Powered Armor | Legion-grade powered armor, yours by right: issued by a military, a Hegemony House or a mercenary company (take its Allegiance), or salvaged and licensed. The GM approves it, and someone always wants it back. | 1 |
+| Powered Armor | Powered armor, yours by right: legion-grade from a military or a Hegemony House, a commercial security suit, or a colony-built rig from an illicit armorer. Say which, and where it came from (take its Allegiance if it's issued). The GM approves it, and someone always wants it back. | 1 |
 
 ### Spending points
 
@@ -251,28 +251,30 @@ A plausible untrained attempt uses attribute −4. Specialized work such as surg
 
 Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bonus; exceptional tools may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
 
-| Item | What it does |
-|---|---|
-| Slug pistol | Twelve rounds. Hits mark 2 boxes. Short range. |
-| Laser pistol | Twenty shots per cell; silent, no recoil. Hits mark 2 boxes. Short range. |
-| Slug carbine | Thirty rounds; can fire bursts. Hits mark 2 boxes. Medium range. |
-| Plasma rifle | Ten shots per cell. Hits mark 3 boxes and leave the target Dying. Medium range. |
-| Stunner | The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. Close range. |
-| Vibroblade | A humming blade. Hits mark 2 boxes. |
-| Body armor | Once per fight, a hit that marks 2 or more boxes marks one fewer. Shows under scans. |
-| Riot shield | A hardened security shield: +1 to Block against blades, fists and thrown objects. It won't stop a slug or a beam. −2 to Stealth while you carry it. |
-| Vac suit | Air for six hours in vacuum or poison atmosphere. |
-| Medkit | Biotech dressings, stims and a scanner. Needed to stabilize a patient and give field treatment. |
-| Toolkit | Needed for most Engineering in the field. |
-| Intrusion deck | A hacking rig. Needed for most Computers work against secured systems. |
-| Scanner | Handheld sensor. Needed for most Sensors work away from a ship. |
-| Scout drone | A small flying drone that can scout and relay what it sees. |
-| Translator | Translates most known languages, slowly. Thrum and Qor need one to talk with most peoples. |
-| Exo-frame | A light powered frame: no gravity penalty for Vael and others built for low gravity. |
-| Hardsuit | An armored vac suit: air for six hours in vacuum or poison atmosphere, and once per fight a hit that marks 2 or more boxes marks one fewer. −1 to Athletics and Stealth while you wear it; a breach is the GM's call. Not with other armor. |
-| Combat exoskeleton | A powered military frame: +2 to Athletics to lift, carry, climb or break things, your unarmed blows mark 2 boxes, and you carry a heavy weapon one-handed. Its plating works as body armor: once per fight, a 2+ box hit marks one fewer. −2 to Stealth; needs a fresh power cell each day. Not with other armor. |
-| Powered armor | Legion-grade, sealed and powered: hits that would mark 1 box mark nothing, and once per fight a hit that marks 2 or more boxes marks one fewer. Air for six hours, and the strength of a combat exoskeleton. −2 to Stealth, any scanner picks it up, and it needs a fresh power cell each day. A shot at the power pack (−2 to hit) can lock it up until someone spends an action freeing you. Needs the Powered Armor Edge. Not with other armor. |
-| Travel papers | Accord transit permits and a clean (or convincing) Mandate record. |
+| Item | Control | What it does |
+|---|---|---|
+| Slug pistol | Licensed | Twelve rounds. Hits mark 2 boxes. Short range. |
+| Laser pistol | Licensed | Twenty shots per cell; silent, no recoil. Hits mark 2 boxes. Short range. |
+| Slug carbine | Restricted | Thirty rounds; can fire bursts. Hits mark 2 boxes. Medium range. |
+| Plasma rifle | Military | Ten shots per cell. Hits mark 3 boxes and leave the target Dying. Medium range. |
+| Stunner | Open | The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. Close range. |
+| Vibroblade | Licensed | A humming blade. Hits mark 2 boxes. |
+| Body armor | Licensed | Once per fight, a hit that marks 2 or more boxes marks one fewer. Shows under scans. |
+| Riot shield | Licensed | A hardened security shield: +1 to Block against blades, fists and thrown objects. It won't stop a slug or a beam. −2 to Stealth while you carry it. |
+| Vac suit | Open | Air for six hours in vacuum or poison atmosphere. |
+| Medkit | Open | Biotech dressings, stims and a scanner. Needed to stabilize a patient and give field treatment. |
+| Toolkit | Open | Needed for most Engineering in the field. |
+| Intrusion deck | Restricted | A hacking rig. Needed for most Computers work against secured systems. |
+| Scanner | Open | Handheld sensor. Needed for most Sensors work away from a ship. |
+| Scout drone | Licensed | A small flying drone that can scout and relay what it sees. |
+| Translator | Open | Translates most known languages, slowly. Thrum and Qor need one to talk with most peoples. |
+| Exo-frame | Open | A light powered frame: no gravity penalty for Vael and others built for low gravity. |
+| Hardsuit | Licensed | An armored vac suit: air for six hours in vacuum or poison atmosphere, and once per fight a hit that marks 2 or more boxes marks one fewer. −1 to Athletics and Stealth while you wear it; a breach is the GM's call. Not with other armor. |
+| Combat exoskeleton | Restricted | A powered military frame: +2 to Athletics to lift, carry, climb or break things, your unarmed blows mark 2 boxes, and you carry a heavy weapon one-handed. Its plating works as body armor: once per fight, a 2+ box hit marks one fewer. −2 to Stealth; needs a fresh power cell each day. Not with other armor. |
+| Powered armor, legion-grade | Military | Legion-grade, sealed and powered: hits that would mark 1 box mark nothing, and once per fight a hit that marks 2 or more boxes marks one fewer. Air for six hours, and the strength of a combat exoskeleton. −2 to Stealth, any scanner picks it up, and it needs a fresh power cell each day. A shot at the power pack (−2 to hit) can lock it up until someone spends an action freeing you. Needs the Powered Armor Edge. Not with other armor. |
+| Powered armor, commercial | Restricted | A security or industrial suit, sold where the law allows it: once per fight a hit that would mark 1 box marks nothing, and once per fight a 2+ box hit marks one fewer. Air for six hours, and the strength of a combat exoskeleton. −2 to Stealth and a power cell each day. Registered: any scanner reads its owner. Needs the Powered Armor Edge. Not with other armor. |
+| Powered armor, colony-built | Military | Built by an illicit armorer in some remote colony: protects like a commercial suit, but it's Temperamental: on a natural 17 or 18 on any physical roll, the suit seizes until someone spends an action freeing you. It drinks a power cell twice a day, and it's contraband everywhere but where it was made. Needs the Powered Armor Edge. Not with other armor. |
+| Travel papers | Open | Accord transit permits and a clean (or convincing) Mandate record. |
 
 # Actions and teamwork
 
@@ -658,6 +660,20 @@ Control of corridor intersections is one of the fundamental sources of political
 - **Collapse.** An unstable corridor is a danger clock (usually 6 segments) that ticks with time and every failed transit; when it fills, the corridor closes, with whoever is inside.
 - **Messages.** A quantum-gravimetric transceiver reaches anywhere on the network: within a junction's region in minutes, across several junctions in hours. Worlds behind collapsed corridors can't be reached at all. Every message passes through junctions, and their owners listen: sending something sensitive through a hostile junction takes a **Computers** roll to hide it, and a failure marks **Heat**.
 - **Mouths and junctions.** Expect papers, tolls (which can mark **Debt**) and Mandate screenings.
+
+## Controlled gear
+
+Every power controls equipment differently. The GM gives each port, station or world a **control level**, and every piece of gear carries a **control tag** (see Gear).
+
+| Control level | Typical places | Open gear | Licensed gear | Restricted gear | Military gear |
+|---|---|---|---|---|---|
+| **Open** | Frontier colonies, the Zhaq Free Republics, salvage yards, deep space | Yes | Yes | Yes | Yes |
+| **Licensed** | Concord core worlds, most corporate stations | Yes | With a permit (your Travel papers) | Only with a special permit, the GM's call | Contraband |
+| **Restricted** | Tessan dynasty worlds | Yes | With a permit: civilian armor and sidearms | Contraband | Contraband |
+| **Military** | Hegemony House worlds | Yes | Contraband | Contraband | Only for the House's own soldiers |
+
+- **Getting it past customs.** Contraband passes an inspection with **Deception**, **Streetwise** or a bribe (**Commerce**, and a box of **Debt** if it's a big one). If it's found, mark **Heat**, and the gear is likely confiscated.
+- **Grades of powered armor.** Legion-grade suits come from militaries and the Hegemony Houses; **commercial** security and industrial suits are sold where the law allows them, and registered to their owners; **colony-built** rigs come from illicit armorers on remote worlds, cheaper and Temperamental. Each needs the **Powered Armor** Edge.
 
 # Ships in a fight
 

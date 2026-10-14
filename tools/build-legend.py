@@ -264,6 +264,9 @@ def gen(name, pack, t):
     if name == "skills":
         return table(["Skill", "Attribute", "Typical use"], p["skills"])
     if name == "gear":
+        ctl = lambda e: (e[3].get("control", "") if len(e) > 3 and isinstance(e[3], dict) else "")
+        if any(ctl(e) for e in p["equipment"]):  # a setting with controlled gear (Fracture Lines) shows each item's tag
+            return table(["Item", "Control", "What it does"], [[e[1], ctl(e) or "Open", e[2]] for e in p["equipment"]])
         return table(["Item", "What it does"], [[e[1], e[2]] for e in p["equipment"]])
     if name == "ammo":
         w = p.get("weapons")
