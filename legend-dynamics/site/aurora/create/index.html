@@ -4698,7 +4698,7 @@ tr.lvl-U td.target { color: var(--muted); }
               </select></div>
             <div class="field" id="r-quality-wrap" hidden><label for="r-quality">Attack succeeded by</label><select id="r-quality"></select></div>
             <div class="field" id="r-parries-wrap" hidden><label for="r-parries">Parries already this round</label>
-              <select id="r-parries"><option value="0">None</option><option value="1">One</option><option value="2">Two</option><option value="3">Three</option></select></div>
+              <select id="r-parries"><option value="0">None</option><option value="1">One</option></select></div>
           </div>
           <div class="checks">
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
@@ -5076,6 +5076,8 @@ tr.lvl-U td.target { color: var(--muted); }
   const PARRY = CR.parry ? [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]] : [];
   const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
   const isParry = (name) => name.startsWith("Parry:");
+  // One defense a round, more with the setting's Edge (Additional Defense).
+  const defensesPerRound = () => CR.oneDefense ? (CR.oneDefense.perRound || 1) + edgeN(CR.oneDefense.edge || "") : Infinity;
   // Block: with a real shield (gear, +its bonus) or anything picked up in the fight (no bonus).
   const SHIELDS = CR.block ? (PACK.protection || []).filter((g) => g.traits.some((t) => t.type === "shield")) : [];
   const shieldBonus = (g) => g.traits.find((t) => t.type === "shield").value || 0;
@@ -5395,7 +5397,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("st-grit").textContent = gritStart();
     $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`
       + (CR.parry ? `. Parry = ${PARRY.map(([s]) => `${s} ${skillTarget(s)} ${signed(CR.parry.mod)} = ${parryOf(s)}`).join(", or ")}` : "")
-      + (CR.dodgeEveryAttack ? ". You may defend against every attack." : "");
+      + (CR.oneDefense ? `. ${defensesPerRound() > 1 ? `${["", "One", "Two", "Three"][defensesPerRound()] || defensesPerRound()} defenses a round (Additional Defense)` : "One defense a round"}: Dodge${CR.parry ? ", Parry" : ""}${CR.block ? " or Block" : ""}.` : "");
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
@@ -5642,7 +5644,7 @@ tr.lvl-U td.target { color: var(--muted); }
     updateInjuryToggle();
     const sk = $("r-skill").value || "";
     $("r-quality-wrap").hidden = !(CR.attackQualityDodge && isDefense(sk));
-    $("r-parries-wrap").hidden = !(CR.parry && isParry(sk));
+    $("r-parries-wrap").hidden = !(CR.parry && isParry(sk) && defensesPerRound() > 1);
     $("r-aim-wrap").hidden = !(CR.aim && [T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk));
     const { name, base, total } = rollMods();
     const t = base + total;
