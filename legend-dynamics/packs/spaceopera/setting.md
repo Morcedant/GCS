@@ -169,6 +169,20 @@ Control of corridor intersections is one of the fundamental sources of political
 - **Messages.** A quantum-gravimetric transceiver reaches anywhere on the network: within a junction's region in minutes, across several junctions in hours. Worlds behind collapsed corridors can't be reached at all. Every message passes through junctions, and their owners listen: sending something sensitive through a hostile junction takes a **Computers** roll to hide it, and a failure marks **Heat**.
 - **Mouths and junctions.** Expect papers, tolls (which can mark **Debt**) and Mandate screenings.
 
+## Controlled gear
+
+Every power controls equipment differently. The GM gives each port, station or world a **control level**, and every piece of gear carries a **control tag** (see Gear).
+
+| Control level | Typical places | Open gear | Licensed gear | Restricted gear | Military gear |
+|---|---|---|---|---|---|
+| **Open** | Frontier colonies, the Zhaq Free Republics, salvage yards, deep space | Yes | Yes | Yes | Yes |
+| **Licensed** | Concord core worlds, most corporate stations | Yes | With a permit (your Travel papers) | Only with a special permit, the GM's call | Contraband |
+| **Restricted** | Tessan dynasty worlds | Yes | With a permit: civilian armor and sidearms | Contraband | Contraband |
+| **Military** | Hegemony House worlds | Yes | Contraband | Contraband | Only for the House's own soldiers |
+
+- **Getting it past customs.** Contraband passes an inspection with **Deception**, **Streetwise** or a bribe (**Commerce**, and a box of **Debt** if it's a big one). If it's found, mark **Heat**, and the gear is likely confiscated.
+- **Grades of powered armor.** Legion-grade suits come from militaries and the Hegemony Houses; **commercial** security and industrial suits are sold where the law allows them, and registered to their owners; **colony-built** rigs come from illicit armorers on remote worlds, cheaper and Temperamental. Each needs the **Powered Armor** Edge.
+
 # Ships in a fight
 
 Most crews would rather run than fight, and most fights between ships are short. These rules keep them fast: one roll per station, each exchange.
