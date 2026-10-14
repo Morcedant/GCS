@@ -4467,9 +4467,10 @@ function defenseOptions(enc, rules, d, w) {
       opt({ kind: "parry", label: `Parry (${best.name}, ${best.skill})`, base: best.t, mods, used: false });
     }
   }
-  const shield = live.find((/** @type {any} */ t) => t.type === "shield");
+  // The best shield still whole: a real one before an improvised one, which breaks when it stops a heavy hit.
+  const shield = live.filter((/** @type {any} */ t) => t.type === "shield" && !t.used).sort((/** @type {any} */ x, /** @type {any} */ y) => (y.value || 0) - (x.value || 0))[0];
   if (D.block && shield && w && (melee || (!w.firearm && !w.spell)) && d.skills.Melee !== undefined) {
-    opt({ kind: "block", label: "Block (shield)", base: d.skills.Melee, used: d.blockedRound === enc.round,
+    opt({ kind: "block", label: `Block (${(shield.label || "shield").toLowerCase()})`, shield: shield.label || "Shield", base: d.skills.Melee, used: d.blockedRound === enc.round,
       mods: [{ source: "block", label: "Block", value: D.block.mod, scope: "experiment" }, { source: "gear", label: shield.label || "Shield", value: shield.value || 0, scope: "setting" }] });
   }
   return out;
@@ -4538,6 +4539,13 @@ function attack(enc, rules, core, cmd, opts = {}) {
     else if (chosen.kind === "parry") { d.parries = d.parryRound === enc.round ? (d.parries || 0) + 1 : 1; d.parryRound = enc.round; }
     else if (chosen.kind === "block") d.blockedRound = enc.round;
   }
+  // An improvised shield (a chair, a slat) breaks the first time it blocks a hit of its breaking size.
+  let shieldBroke = null;
+  if (res.dodge && res.dodge.success && chosen && chosen.kind === "block") {
+    const t = (d.traits || []).find((/** @type {any} */ x) => x.type === "shield" && !x.used && (x.label || "Shield") === chosen.shield);
+    const dmg = core.weaponDamage(weapon, cmd.band);
+    if (t && t.breaksOn && dmg && dmg.boxes >= t.breaksOn) { t.used = true; shieldBroke = t.label || "Shield"; }
+  }
   if (res.armorUsed) { const t = (d.traits || []).find((/** @type {any} */ x) => x.type === "armor" && !x.used && (x.label || "Armour") === res.armorUsed); if (t) t.used = true; }
   if (res.price) { a.tracks = a.tracks || {}; a.tracks[res.price.track] = (a.tracks[res.price.track] || 0) + res.price.boxes; }
   if (res.hit && res.injury) Object.assign(d, { injury: res.injury.injury, dying: res.injury.dying, dead: res.injury.dead });
@@ -4553,7 +4561,7 @@ function attack(enc, rules, core, cmd, opts = {}) {
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
-    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null,
+    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, shieldBroke,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
@@ -5174,6 +5182,7 @@ function mountLab(api) {
     }
     if (ev.enchanted) L.push(`<span class="x">Enchanted weapon: +${ev.enchanted} box.</span>`);
     if (ev.armorUsed) L.push(`<span class="x">${esc(ev.armorUsed)}: one box fewer (once per fight).</span>`);
+    if (ev.shieldBroke) L.push(`<span class="x">${esc(ev.shieldBroke)} breaks: it took a hit of 2 or more boxes.</span>`);
     if (ev.marginTrait) L.push(`<span class="x">${esc(ev.marginTrait)}.</span>`);
     if (ev.price) L.push(`<span class="bad">Failed cast: ${esc(ev.attacker.name)} marks ${ev.price.boxes} ${esc(ev.price.track)}.</span>`);
     if (ev.jam) L.push(`<span class="bad">Natural ${ev.attackTotal}: ${ev.weapon && WEAPONS[ev.weapon.id] && WEAPONS[ev.weapon.id].ammo ? "the weapon jams or misfires" : "the weapon fails"}. Clearing it takes an action.</span>`);
@@ -5607,8 +5616,14 @@ return { mountLab };
   const PARRY = CR.parry ? [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]] : [];
   const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
   const isParry = (name) => name.startsWith("Parry:");
-  const isDefense = (name) => name === "Dodge" || isParry(name);
-  const rollLabel = (name) => (isParry(name) ? `Parry (${name.slice(6)})` : name);
+  // Block: with a real shield (gear, +its bonus) or anything picked up in the fight (no bonus).
+  const SHIELDS = CR.block ? (PACK.protection || []).filter((g) => g.traits.some((t) => t.type === "shield")) : [];
+  const shieldBonus = (g) => g.traits.find((t) => t.type === "shield").value || 0;
+  const blocks = () => SHIELDS.filter((g) => !g.equipment || ch.equipment[g.equipment]);
+  const isBlock = (name) => name.startsWith("Block:");
+  const blockOf = (id) => skillTarget(T.meleeSkill) + CR.block.mod + shieldBonus(SHIELDS.find((g) => g.id === id));
+  const isDefense = (name) => name === "Dodge" || isParry(name) || isBlock(name);
+  const rollLabel = (name) => (isParry(name) ? `Parry (${name.slice(6)})` : isBlock(name) ? `Block (${SHIELDS.find((g) => g.id === name.slice(6))?.name.toLowerCase() || "shield"})` : name);
   const count = (lvl) => Object.entries(ch.skills).filter(([k, v]) => v === lvl && !freeSkill(k)).length;
   const odds = LD.odds; // the core rules module
   const pct = (t) => Math.round(odds(t) * 100) + "%";
@@ -6108,7 +6123,7 @@ return { mountLab };
     // roller options
     const sel = $("r-skill"), prev = sel.value;
     sel.innerHTML = `<optgroup label="Skills">${sorted.map((s) => `<option value="${esc(s.n)}">${s.n} (${s.t})</option>`).join("")}</optgroup>
-      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}${PARRY.map(([s, how]) => `<option value="Parry:${s}">Parry ${how}: ${s} ${signed(CR.parry.mod)} (${parryOf(s)})</option>`).join("")}</optgroup>
+      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}${PARRY.map(([s, how]) => `<option value="Parry:${s}">Parry ${how}: ${s} ${signed(CR.parry.mod)} (${parryOf(s)})</option>`).join("")}${blocks().map((g) => `<option value="Block:${g.id}">Block, ${esc(g.name.toLowerCase())}: ${T.meleeSkill} ${signed(CR.block.mod + shieldBonus(g))} (${blockOf(g.id)})</option>`).join("")}</optgroup>
       <optgroup label="Attributes">${ATTRS.map(([n]) => `<option value="${n}">${n} (${ch.attrs[n]})</option>`).join("")}</optgroup>`;
     if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
     // Abilities without a +2 leave the box disabled.
@@ -6123,6 +6138,7 @@ return { mountLab };
   function rollBase(name) {
     if (name === "Dodge") return dodge();
     if (isParry(name)) return parryOf(name.slice(6));
+    if (isBlock(name)) return blockOf(name.slice(6));
     if (ch.attrs[name] != null) return ch.attrs[name];
     return skillTarget(name);
   }
@@ -6141,7 +6157,7 @@ return { mountLab };
     // In an alternate form, the form profile's bonuses apply to rolls on those attributes and their skills.
     const w = ch.play.form && FORMED.has(ch.speciesId) && heritageOf()?.form;
     if (w) {
-      const sk = isParry(name) ? name.slice(6) : name;
+      const sk = isParry(name) ? name.slice(6) : isBlock(name) ? T.meleeSkill : name;
       const attr = name === "Dodge" ? null : ch.attrs[sk] != null ? sk : SKILLS.find((x) => x[0] === sk)?.[1];
       const wb = name === "Dodge" ? (w.dodge || 0) + (w.attrs.Agility || 0) : w.attrs[attr] || 0;
       if (wb) parts.push(wb);
@@ -6356,7 +6372,7 @@ return { mountLab };
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
-    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isParry(t.value); updateTarget(); renderGun(); }
+    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
     else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();

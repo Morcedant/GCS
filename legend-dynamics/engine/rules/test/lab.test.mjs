@@ -240,7 +240,7 @@ test("Heavy coat (published D&D gear): turns blades and claws, not bullets, once
 
 test("D&D's published combat rules: in force under Published and Lab alike, not offered as experiments", () => {
   const C = pack.combatRules;
-  assert.deepEqual(Object.keys(C).sort(), ["aim", "attackQualityDodge", "dodgeEveryAttack", "parry"]);
+  assert.deepEqual(Object.keys(C).sort(), ["aim", "attackQualityDodge", "block", "dodgeEveryAttack", "parry"]);
   for (const cfg of [X.PUBLISHED, X.newLabConfig("western", lab, C)]) {
     const r = X.buildRules(cfg, weapons, lab, C);
     assert.deepEqual(r.settingRules.map((x) => x.id).sort(), Object.keys(C).sort());
@@ -250,7 +250,7 @@ test("D&D's published combat rules: in force under Published and Lab alike, not 
     assert.equal(r.active.length, 0, "no experiments on");
   }
   const ids = X.available("western", lab, C).map((x) => x.id);
-  assert.ok(!ids.includes("parry") && !ids.includes("aim") && ids.includes("block") && ids.includes("labWeaponTraits"));
+  assert.ok(!ids.includes("parry") && !ids.includes("aim") && !ids.includes("block") && ids.includes("labWeaponTraits"));
   // A clean hit (margin 5) puts the Dodge at -2, logged as a setting rule; a parry is Brawling -3.
   const r = { ...X.buildRules(X.PUBLISHED, weapons, lab, C), jamOn18: true };
   const [mod] = r.hooks.dodgeModifiers[0]({ margin: 5 });
@@ -275,4 +275,27 @@ test("Enchanted weapons: +2 to hit or +1 box with that weapon only", () => {
   assert.equal(bite.damage.boxes, 3); assert.equal(bite.enchanted, 1);
   const no = LD.resolveAttack({ attacker: att([{ type: "weaponBonus", weapon: "sword", extraBox: 1 }]), defender: def, weapon: other, band: "melee" }, LD.NO_HOOKS, roll([3, 3, 3]));
   assert.equal(no.damage.boxes, 2, "only the enchanted weapon");
+});
+
+test("D&D Block: a real shield +1, an improvised one breaks on a 2-box hit, never against bullets", () => {
+  const C = pack.combatRules, r = { ...X.buildRules(X.PUBLISHED, weapons, lab, C), jamOn18: true };
+  assert.equal(r.defenses.block.mod, -2);
+  const shield = pack.protection.find((g) => g.id === "shield"), chair = pack.protection.find((g) => g.id === "improvised");
+  const enc = setup(X.PUBLISHED, 5); E.startCombat(enc, r);
+  const ames = E.find(enc, "p1"); ames.skills.Melee = 13; E.find(enc, "p2").weapons.push("blade", "club"); E.find(enc, "p2").skills.Melee = 14;
+  E.addGear(enc, "p1", chair);
+  assert.deepEqual(E.defenseOptions(enc, r, ames, weapons.revolver).map((o) => o.kind), ["dodge"], "no block against a bullet");
+  const blk = E.defenseOptions(enc, r, ames, weapons.blade).find((o) => o.kind === "block");
+  assert.equal(blk.preview, 11, "Melee 13 -2, no bonus");
+  E.addGear(enc, "p1", shield);
+  assert.equal(E.defenseOptions(enc, r, ames, weapons.blade).find((o) => o.kind === "block").preview, 12, "the real shield is preferred: +1");
+  // The chair alone, against a 2-box blade: block until one succeeds, and it breaks.
+  ames.traits = ames.traits.filter((t) => t.label !== "Shield");
+  let ev;
+  for (let i = 0; i < 60 && !(ev && ev.shieldBroke); i++) { ames.blockedRound = null; ames.injury = 0; ames.dying = false; ames.dead = false; ev = E.attack(enc, r, LD, { attacker: "p2", defender: "p1", weapon: "blade", band: "melee", defense: "block" }).event; }
+  assert.equal(ev.shieldBroke, "Improvised shield"); assert.equal(ev.dodged, true);
+  assert.ok(!E.defenseOptions(enc, r, ames, weapons.blade).some((o) => o.kind === "block"), "broken: nothing left to block with");
+  // A 1-box club doesn't break it.
+  const enc2 = setup(X.PUBLISHED, 6); E.startCombat(enc2, r); const a2 = E.find(enc2, "p1"); a2.skills.Melee = 18; E.find(enc2, "p2").weapons.push("club"); E.find(enc2, "p2").skills.Melee = 14; E.addGear(enc2, "p1", chair);
+  for (let i = 0; i < 10; i++) { a2.blockedRound = null; const e = E.attack(enc2, r, LD, { attacker: "p2", defender: "p1", weapon: "club", band: "melee", defense: "block" }).event; assert.equal(e.shieldBroke, null); }
 });

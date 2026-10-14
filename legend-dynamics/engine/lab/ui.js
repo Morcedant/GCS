@@ -387,6 +387,7 @@ export function mountLab(api) {
     }
     if (ev.enchanted) L.push(`<span class="x">Enchanted weapon: +${ev.enchanted} box.</span>`);
     if (ev.armorUsed) L.push(`<span class="x">${esc(ev.armorUsed)}: one box fewer (once per fight).</span>`);
+    if (ev.shieldBroke) L.push(`<span class="x">${esc(ev.shieldBroke)} breaks: it took a hit of 2 or more boxes.</span>`);
     if (ev.marginTrait) L.push(`<span class="x">${esc(ev.marginTrait)}.</span>`);
     if (ev.price) L.push(`<span class="bad">Failed cast: ${esc(ev.attacker.name)} marks ${ev.price.boxes} ${esc(ev.price.track)}.</span>`);
     if (ev.jam) L.push(`<span class="bad">Natural ${ev.attackTotal}: ${ev.weapon && WEAPONS[ev.weapon.id] && WEAPONS[ev.weapon.id].ammo ? "the weapon jams or misfires" : "the weapon fails"}. Clearing it takes an action.</span>`);

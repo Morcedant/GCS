@@ -1562,6 +1562,11 @@
    "A buffalo coat or a canvas duster: it turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer."
   ],
   [
+   "shield",
+   "Shield",
+   "A hide shield or an iron-bound buckler, rare out West: you Block at +1."
+  ],
+  [
    "lantern",
    "Lantern and matches",
    "Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible."
@@ -2324,7 +2329,7 @@
   ],
   [
    "Defense",
-   "Defend against every attack: Dodge, or Parry a blade, claw or fist (Melee or Brawling −3; −2 more for each extra parry in a round). Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target. Heavy coat: once a fight, a 2+ box hit from a blade, claw, fang or missile marks one fewer."
+   "Defend against every attack: Dodge, or Parry a blade, claw or fist (Melee or Brawling −3; −2 more for each extra parry in a round). Block a blade, claw, fist or arrow with a shield or a chair (Melee −2, +1 with a real shield; once a round; an improvised one breaks on a 2+ box hit). Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target. Heavy coat: once a fight, a 2+ box hit from a blade, claw, fang or missile marks one fewer."
   ],
   [
    "Guns",
@@ -3089,6 +3094,9 @@
   },
   "aim": {
    "bonus": 1
+  },
+  "block": {
+   "mod": -2
   }
  },
  "protection": [
@@ -3107,6 +3115,32 @@
       "missile"
      ],
      "label": "Heavy coat"
+    }
+   ]
+  },
+  {
+   "id": "shield",
+   "equipment": "shield",
+   "name": "Shield",
+   "text": "A hide shield or an iron-bound buckler, rare out West: you Block at +1.",
+   "traits": [
+    {
+     "type": "shield",
+     "value": 1,
+     "label": "Shield"
+    }
+   ]
+  },
+  {
+   "id": "improvised",
+   "name": "Improvised shield",
+   "text": "A chair, a wooden slat, a crate lid or a saddle, snatched up in the fight: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.",
+   "traits": [
+    {
+     "type": "shield",
+     "value": 0,
+     "breaksOn": 2,
+     "label": "Improvised shield"
     }
    ]
   }

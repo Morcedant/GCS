@@ -149,9 +149,10 @@ export function defenseOptions(enc, rules, d, w) {
       opt({ kind: "parry", label: `Parry (${best.name}, ${best.skill})`, base: best.t, mods, used: false });
     }
   }
-  const shield = live.find((/** @type {any} */ t) => t.type === "shield");
+  // The best shield still whole: a real one before an improvised one, which breaks when it stops a heavy hit.
+  const shield = live.filter((/** @type {any} */ t) => t.type === "shield" && !t.used).sort((/** @type {any} */ x, /** @type {any} */ y) => (y.value || 0) - (x.value || 0))[0];
   if (D.block && shield && w && (melee || (!w.firearm && !w.spell)) && d.skills.Melee !== undefined) {
-    opt({ kind: "block", label: "Block (shield)", base: d.skills.Melee, used: d.blockedRound === enc.round,
+    opt({ kind: "block", label: `Block (${(shield.label || "shield").toLowerCase()})`, shield: shield.label || "Shield", base: d.skills.Melee, used: d.blockedRound === enc.round,
       mods: [{ source: "block", label: "Block", value: D.block.mod, scope: "experiment" }, { source: "gear", label: shield.label || "Shield", value: shield.value || 0, scope: "setting" }] });
   }
   return out;
@@ -220,6 +221,13 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     else if (chosen.kind === "parry") { d.parries = d.parryRound === enc.round ? (d.parries || 0) + 1 : 1; d.parryRound = enc.round; }
     else if (chosen.kind === "block") d.blockedRound = enc.round;
   }
+  // An improvised shield (a chair, a slat) breaks the first time it blocks a hit of its breaking size.
+  let shieldBroke = null;
+  if (res.dodge && res.dodge.success && chosen && chosen.kind === "block") {
+    const t = (d.traits || []).find((/** @type {any} */ x) => x.type === "shield" && !x.used && (x.label || "Shield") === chosen.shield);
+    const dmg = core.weaponDamage(weapon, cmd.band);
+    if (t && t.breaksOn && dmg && dmg.boxes >= t.breaksOn) { t.used = true; shieldBroke = t.label || "Shield"; }
+  }
   if (res.armorUsed) { const t = (d.traits || []).find((/** @type {any} */ x) => x.type === "armor" && !x.used && (x.label || "Armour") === res.armorUsed); if (t) t.used = true; }
   if (res.price) { a.tracks = a.tracks || {}; a.tracks[res.price.track] = (a.tracks[res.price.track] || 0) + res.price.boxes; }
   if (res.hit && res.injury) Object.assign(d, { injury: res.injury.injury, dying: res.injury.dying, dead: res.injury.dead });
@@ -235,7 +243,7 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
-    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null,
+    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, shieldBroke,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
