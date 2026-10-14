@@ -161,6 +161,8 @@ An advantage gives +2 to one narrowly defined kind of task when the GM agrees it
 
 Anyone can owe allegiance to one of the setting's powers. It's a benefit paired with a burden; the burden works like a complication and earns Spark when it causes you a real problem.
 
+The GM can add others met in play (the creator's GM view has a **Campaign allegiances** list), and a player can write one with the GM: choose *Another allegiance* and give it a name, a benefit and a burden.
+
 | Allegiance | Benefit | Burden |
 |---|---|---|
 | ExLAW | Once per case, a database search, an Aegis wing or federal backup. | Duty: the Director's orders, the EPAOC's questions and the paperwork. |
