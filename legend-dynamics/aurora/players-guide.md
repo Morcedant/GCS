@@ -247,6 +247,7 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Taser | Two shots. The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. |
 | Baton or knife | Class I melee: hits mark 1 box. |
 | Body armor | Once per fight, a Class I hit marks one box fewer. |
+| Riot shield | A clear polycarbonate shield: +1 to Block against blows, thrown objects and missiles. It won't stop a bullet. −2 to Stealth while you carry it. |
 | Dampening cuffs | ExLAW issue: a cuffed Operant's powers drop one Class (two with a successful Engineering roll to tune them). |
 | Badge and ID | Federal, police or press credentials: open doors and get you past cordons. |
 | Radio and phone | Stay in touch with your team and dispatch. |

@@ -259,6 +259,7 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Stunner | The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. Close range. |
 | Vibroblade | A humming blade. Hits mark 2 boxes. |
 | Body armor | Once per fight, a hit that marks 2 or more boxes marks one fewer. Shows under scans. |
+| Riot shield | A hardened security shield: +1 to Block against blades, fists and thrown objects. It won't stop a slug or a beam. −2 to Stealth while you carry it. |
 | Vac suit | Air for six hours in vacuum or poison atmosphere. |
 | Medkit | Biotech dressings, stims and a scanner. Needed to stabilize a patient and give field treatment. |
 | Toolkit | Needed for most Engineering in the field. |

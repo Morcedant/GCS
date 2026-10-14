@@ -1542,6 +1542,11 @@
    "Once per fight, a Class I hit marks one box fewer."
   ],
   [
+   "riotshield",
+   "Riot shield",
+   "A clear polycarbonate shield: +1 to Block against blows, thrown objects and missiles. It won't stop a bullet. −2 to Stealth while you carry it."
+  ],
+  [
    "cuffs",
    "Dampening cuffs",
    "ExLAW issue: a cuffed Operant's powers drop one Class (two with a successful Engineering roll to tune them)."
@@ -3426,5 +3431,35 @@
   "Sheriff": "Officer",
   "Police Officer": "Officer",
   "Detective": "Officer"
- }
+ },
+ "protection": [
+  {
+   "id": "vest",
+   "equipment": "vest",
+   "name": "Body armor",
+   "text": "Once per fight, a Class I hit marks one box fewer.",
+   "traits": [
+    {
+     "type": "armor",
+     "minBoxes": 1,
+     "reduce": 1,
+     "maxClass": 1,
+     "label": "Body armor"
+    }
+   ]
+  },
+  {
+   "id": "riotshield",
+   "equipment": "riotshield",
+   "name": "Riot shield",
+   "text": "A clear polycarbonate shield: +1 to Block against blows, thrown objects and missiles. It won't stop a bullet. −2 to Stealth while you carry it.",
+   "traits": [
+    {
+     "type": "shield",
+     "value": 1,
+     "label": "Riot shield"
+    }
+   ]
+  }
+ ]
 }
