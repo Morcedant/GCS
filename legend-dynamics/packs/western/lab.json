@@ -18,7 +18,7 @@
     "to": 4,
     "id": "limb",
     "name": "Lost limb",
-    "text": "A hand, an arm or a leg is gone; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding.",
+    "text": "A hand, an arm or a leg is gone for good; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding.",
     "dying": true,
     "down": "bone"
    },
@@ -35,7 +35,7 @@
     "to": 9,
     "id": "bone",
     "name": "Broken bone",
-    "text": "The limb is useless until proper care, and heals over weeks.",
+    "text": "The limb is useless until it's set with proper care, then heals over several weeks.",
     "down": "muscle"
    },
    {
@@ -43,7 +43,7 @@
     "to": 12,
     "id": "muscle",
     "name": "Torn muscle",
-    "text": "−1 to physical tasks until a week of proper care.",
+    "text": "−1 to physical tasks; it heals over several weeks.",
     "down": null
    },
    {
@@ -60,7 +60,7 @@
     "to": 18,
     "id": "internal",
     "name": "Internal injury",
-    "text": "Dying even with boxes to spare; it needs a surgeon.",
+    "text": "Dying even with boxes to spare; it needs a surgeon, then several weeks to heal.",
     "dying": true,
     "down": "muscle"
    }

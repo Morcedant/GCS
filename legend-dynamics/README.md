@@ -40,7 +40,7 @@ file are produced from them; nothing in the engine needs to change.
 | Key | What it is |
 |---|---|
 | `id` | Short name; also the browser storage prefix and the output folder |
-| `terms` | Words the creator and guide use. Points (`point`: Grit, Resolve), role and origin names (`role`, `origin`, `originPlural`), training paths (`pathRounded`, `pathExpert`), tab and readiness text, `mission` and `journal` names, weapon-tracker words (`ammo`, `reload`, `restock`…), track-panel words, combat skill names for the rules text (`rangedSkill`, `meleeSkill`, `unarmedSkill`, `chaseSkill`), medicine (`medkit`, `facility`, `restText`), and the Google Fonts link (`fontsHref`). Anything left out uses the defaults in `tools/build-legend.py`. |
+| `terms` | Words the creator and guide use. Points (`point`: Grit, Resolve), role and origin names (`role`, `origin`, `originPlural`), training paths (`pathRounded`, `pathExpert`), tab and readiness text, `mission` and `journal` names, weapon-tracker words (`ammo`, `reload`, `restock`…), track-panel words, combat skill names for the rules text (`rangedSkill`, `meleeSkill`, `unarmedSkill`, `chaseSkill`), medicine (`medkit`, `facility`), and the Google Fonts link (`fontsHref`). Anything left out uses the defaults in `tools/build-legend.py`. |
 | `theme` | `css` (the colour and font variables), a few glow colours, and `particles` (stars drifting `left`, embers rising `up`, or ash falling `down`) |
 | `groups` | Role groups: `id`, `name`, accent `color` variable and the seal's `emblem` (an SVG path in a 100×100 box) |
 | `roles` | Each role's `name`, `group` and suggested `text` |

@@ -53,7 +53,6 @@
   "unarmedSkill": "Brawling",
   "chaseSkill": "Riding",
   "facility": "A doctor's surgery with instruments, chloroform and a clean table",
-  "restText": "two full days",
   "originPluralLower": "origins",
   "formToggle": "In monstrous form",
   "formName": "monstrous form",
@@ -760,7 +759,7 @@
    "desc": "Child of a vampire and a living mother. You walk in daylight, you heal fast, and the undead fear you, and want you.",
    "core": [
     "Undead sense: you feel a vampire or other undead within a short distance, with no details.",
-    "Fast healing: rest clears a box every day.",
+    "Fast healing: each day of rest clears a box, however hurt you are (at three boxes, once someone has stabilized or treated you).",
     "Garlic and holy ground make you queasy: −2 to Will rolls there."
    ],
    "form": null,

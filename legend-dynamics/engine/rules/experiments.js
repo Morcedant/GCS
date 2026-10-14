@@ -87,7 +87,7 @@ export const EXPERIMENTS = [
   },
   {
     id: "grievousWounds", scope: "setting", label: "Grievous wounds",
-    summary: "A hit of 2+ boxes that succeeds by 7 or more, rolls a natural 3–4, or leaves the target Dying is grievous. A character rolls 3d6 on the setting's table (a Legend point downgrades it one step); an opponent is simply taken out. A character who would be left Dying or killed may lose a limb, or its use, instead: a complication, once a fight, and in place of any grievous wound from that hit.",
+    summary: "A hit of 2+ boxes that succeeds by 7 or more, rolls a natural 3–4, or leaves the target Dying is grievous. A character rolls 3d6 on the setting's table (a Legend point downgrades it one step); an opponent is simply taken out. A character who would be left Dying or killed may lose a limb, or its use, instead: a complication, once a fight, and in place of any grievous wound from that hit. Broken bones, torn muscles and internal injuries take several weeks to heal, whatever the boxes say; lost limbs, lost eyes and disfigurements never heal.",
     params: { margin: 7, natural: true, onDying: true, minBoxes: 2, limbTrade: true },
     flags: ["grievous"],
     /** The setting's table and its descriptions of opponents taken out. */
