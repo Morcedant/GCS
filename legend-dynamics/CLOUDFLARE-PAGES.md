@@ -38,7 +38,7 @@ Cloudflare, it is connected for you. If not, Cloudflare shows the DNS record to 
 | Address | Page |
 |---|---|
 | `/` | Home |
-| `/dust-and-damnation/`, `/fracture-lines/`, `/the-shattered-crown/` | Game pages |
+| `/pact-of-bones/`, `/fracture-lines/`, `/the-shattered-crown/` | Game pages |
 | `/<game>/create/` | That game's character creator |
 | `/core-rules/` | Core rules, with the Word version |
 | `/discord/` | The Discord bot's commands for every setting |

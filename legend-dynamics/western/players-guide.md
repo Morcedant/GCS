@@ -1,12 +1,12 @@
 ---
-title: "Dust & Damnation Players' Guide"
+title: "Pact of Bones Players' Guide"
 subtitle: "A Gothic Western for the Legend Dynamics RPG system"
 author: "Don Smallwood"
 ---
 
-The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. *Dust & Damnation* is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.
+The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. *Pact of Bones* is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.
 
-Dust & Damnation is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.
+Pact of Bones is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.
 
 ## The rule to remember
 
@@ -16,7 +16,7 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Dust & Damnation** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Pact of Bones** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**.
 
 # Create your character
 
@@ -308,9 +308,9 @@ Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for f
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
 
-### Fighting in Dust & Damnation
+### Fighting in Pact of Bones
 
-Dust & Damnation adds these rules to the ones above.
+Pact of Bones adds these rules to the ones above.
 
 - **One defense a round.** Dodge, Parry and Block are all defenses, and you get one a round, between your turns: choose which when an attack hits. The **Additional Defense** Edge gives you a second.
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
@@ -480,7 +480,7 @@ After a significant job, a magical character can take one of these **instead of 
 | Quicker hand | One ritual you know goes one pace faster: an hour becomes ten minutes, ten minutes one action | Each ritual once |
 | Master of the tradition | Occult becomes Expert (+5) | Once, at the end of a long campaign |
 
-## Magic in Dust & Damnation
+## Magic in Pact of Bones
 
 |  | How it works here |
 |---|---|
