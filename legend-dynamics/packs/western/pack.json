@@ -866,7 +866,7 @@
     "Body": -1,
     "Presence": -1
    },
-   "desc": "A human who works real magic in a tradition: alchemy, witchcraft, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.",
+   "desc": "A human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania German powwow, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.",
    "core": [
     "Rituals: describe the effect; the GM sets its weight (minor 2, significant 4, major 6 segments); fill that clock with Occult rolls at your tradition's pace.",
     "Charms: carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).",
@@ -892,7 +892,7 @@
     [
      "pr-herm",
      "Hermeticist",
-     "Ritual magic from grimoires, circles and sigils: wards, bindings, divination. An hour per roll, and it needs books. +2 to Occult for wards and bindings.",
+     "Ritual magic from grimoires, circles and sigils (the Key of Solomon, the German Sixth and Seventh Books of Moses): wards, bindings, divination. An hour per roll, and it needs books. +2 to Occult for wards and bindings.",
      "Occult",
      true,
      "Obsession: Forbidden Knowledge",
@@ -915,6 +915,15 @@
      true,
      "Old Superstitions",
      "Your charms demand their rituals. Accept the delay or the odd behavior they require."
+    ],
+    [
+     "pr-brauch",
+     "Braucher",
+     "Pennsylvania German powwow (Brauche): healing and protection by whispered charms, the sign of the cross and Hohman's Long Lost Friend. A minute a roll, not ten, for a charm spoken over a wound, a burn or a sick child. +2 to Occult to heal, and to ward a person, house or barn against fire, theft, bullets and hexes.",
+     "Occult",
+     true,
+     "Never for Pay",
+     "The gift fails if you ask for money, and the old rule says to teach it only to someone of the other sex. Accept the gift you can't refuse or the debt you can't collect."
     ],
     [
      "pr-medium",
@@ -2433,7 +2442,7 @@
    ],
    [
     "**Rituals**",
-    "Every Practitioner, at their tradition's pace: ten minutes a roll; an hour for a Hermeticist."
+    "Every Practitioner, at their tradition's pace: ten minutes a roll; an hour for a Hermeticist; a minute for a Braucher's healing charm."
    ],
    [
     "**Charms**",
@@ -3033,7 +3042,7 @@
   [
    "talisman",
    "Talisman",
-   "A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a hex letter sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one. It's renewed between jobs and doesn't count against a charm limit.",
+   "A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a Himmelsbrief (a German heaven's letter) sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one. It's renewed between jobs and doesn't count against a charm limit.",
    1,
    {
     "label": "Your talisman",
