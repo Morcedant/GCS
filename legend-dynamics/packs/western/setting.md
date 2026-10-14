@@ -14,6 +14,20 @@ Dust & Damnation is not tied to a single place or year. Set your game in any ter
 
 To take someone down without killing them, use fists, a club, a grapple, or a lasso.
 
+<!-- SECTION:combat -->
+
+### Fighting in Dust & Damnation
+
+Dust & Damnation adds these rules to the ones above.
+
+- **Defend against every attack.** A target may defend against every attack, not just one a round.
+- **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
+- **Parry.** Against a blade, a club, claws or fists, you can parry instead of Dodge: roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists, claws and fangs. Each parry after your first in a round is a further −2. Nobody parries a bullet or an arrow.
+- **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. With **Careful Marksman**, the advantage's +2 adds to this.
+- **A heavy coat.** A buffalo coat or a canvas duster turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer.
+
+*Example:* a werewolf's claws succeed by 5 against Deputy Ames. Ames already dodged a knife this round, but may still defend: Dodge 11, −2 for the clean hit, needs a 9 or less. A parry with the saber would be Melee 14 −3 −2 = 9, no better, so Ames dodges.
+
 <!-- SECTION:medicine -->
 
 Frontier medicine has chloroform, carbolic acid, laudanum and steady hands, and not much else. Infection kills more men than bullets do, and no doctor's bag holds a cure for a bite from something that should be dead. See *Bites and curses* below.
@@ -46,10 +60,10 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 - **Trappings.** The right materials (grave dirt, silver, a lock of hair, the hour of midnight) remove one segment.
 - **Charms.** Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Sorcerer carries only one.
-- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a Himmelsbrief (heaven's letter) from a Pennsylvania German powwow doctor, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual, is renewed between jobs, and doesn't count against a charm limit.
+- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a Himmelsbrief (heaven's letter) from a Pennsylvania German Braucher, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual, is renewed between jobs, and doesn't count against a charm limit.
 - **Attention.** Magic worked openly can mark a box of **The Dark**, and the Order of the Iron Cross hunts known practitioners.
 
-**The old country's magic.** German settlers brought theirs west with the wagons. **Braucher**, the powwow doctors of the Pennsylvania settlements, the Ohio valley and the Texas Hill Country, heal with charms whispered from Hohman's *Long Lost Friend* and never take pay. Soldiers sew **heaven's letters** into their coats against bullets. The *Sixth and Seventh Books of Moses*, a German grimoire, passes from hand to hand, prized by Hermeticists and hoodoo root doctors alike. And where there is a Braucher, there is a **Hexenmeister** who will curse for money.
+**The old country's magic.** German settlers brought theirs west with the wagons. **Braucher**, the folk healers of the Pennsylvania settlements, the Ohio valley and the Texas Hill Country, heal with charms whispered from Hohman's *Long Lost Friend* and never take pay. Soldiers sew **heaven's letters** into their coats against bullets. The *Sixth and Seventh Books of Moses*, a German grimoire, passes from hand to hand, prized by Hermeticists and hoodoo root doctors alike. And where there is a Braucher, there is a **Hexenmeister** who will curse for money.
 
 ### Hexes
 

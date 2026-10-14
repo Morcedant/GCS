@@ -202,6 +202,8 @@ Roll {{rangedSkill}} for a ranged attack, {{meleeSkill}} for a weapon in hand, o
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
 
+{{PACK:combat}}
+
 ## Range
 
 Distances fall into five bands:
