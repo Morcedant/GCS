@@ -31,10 +31,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 | Calling | Group | Typical contribution | Core skills |
 |---|---|---|---|
 | ExLAW Agent | The Badge | a full-time federal agent of the Extraordinary Law Enforcement Agency (ExLAW), enforcing the Extraordinary Powers Act with a badge that opens doors and an EPAOC file that never closes. | Law, Investigation, Firearms, Read People |
-| Federal Agent | The Badge | FBI, US Marshals, ATF or Homeland Security, working alongside ExLAW, or around it. | Investigation, Law, Computers, Persuasion |
-| Sheriff | The Badge | an elected county lawman who answers to the voters, not to Washington; maybe on the edge of the Mad Forest. | Leadership, Firearms, Law, Persuasion |
-| Police Officer | The Badge | city patrol, first on the scene when an Operant fight breaks out, and last to get the credit. | Firearms, Piloting, Brawling, Read People |
-| Detective | The Badge | police or private eye, working the cases nobody else will take. | Investigation, Streetwise, Read People, Firearms |
+| Officer | The Badge | carries a badge and the law's authority, working alongside ExLAW or around it: an FBI agent or U.S. marshal, an elected county sheriff (maybe on the edge of the Mad Fringe), a city cop first on the scene of an Operant fight, a detective, or a licensed private eye. Your Allegiance says which force you serve. | Investigation, Firearms, Law, Read People |
 | Aegis Pilot | The Badge | flies the armored power suit that is the government's answer to Operants, and knows exactly what it costs per hour. | Piloting, Engineering, Firearms, Athletics |
 | International Operative | The Badge | UNILED, the French Affaires spéciales, MI5 or Interpol; the law has borders, Operants don't. | Law, Deception, Firearms, Computers |
 | Vigilante | The Masks | fights crime on the streets, unsanctioned and masked, and hopes ExLAW keeps looking the other way. | Brawling, Stealth, Streetwise, Athletics |
@@ -167,6 +164,8 @@ The GM can add others met in play (the creator's GM view has a **Campaign allegi
 |---|---|---|
 | ExLAW | Once per case, a database search, an Aegis wing or federal backup. | Duty: the Director's orders, the EPAOC's questions and the paperwork. |
 | A Federal Agency | Once per case, records, a lab or a warrant. | Duty: the agency's priorities, and its turf war with ExLAW. |
+| A County Sheriff's Office | Once per case, a deputy's help, the county jail, or the county's records and a word with the judge. | Duty: the sheriff answers to the voters, and the county's feuds and elections become yours. |
+| A City Police Department | Once per case, patrol backup, a holding cell, or the department's files and crime lab. | Duty: the chain of command, the union's politics, and a department that resents Operants and ExLAW alike. |
 | DIRE | Once per case, military hardware, a medical team or a classified file. | Duty: DIRE's research comes first, and you may be part of it. |
 | UNILED | Once per case, international reach: a foreign agency's help or a flight to anywhere. | Duty: UN politics, and member states who want different things. |
 | Affaires spéciales | Once per case, French intelligence, a safehouse in Europe or a discreet extraction. | Duty: France's interests, which aren't always yours. |
@@ -389,6 +388,8 @@ Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every a
 | Fire | — | — | 1 each round in the flames | Burns |
 
 **Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack whose Class is **above** your Defense hits in full; one **equal** to it marks one box fewer; one **below** it does nothing. A bulletproof Operant (Defense II) ignores pistols and rifles, and an Aegis cannon still marks a box.
+
+*Defense is not a defense roll.* Your **defense** (Dodge, Parry or Block, one a round) decides whether an attack hits at all. Your **Defense** Class is armor: it applies to whatever hits, every time, at no cost. A Force Field doesn't use up your Dodge.
 
 *Example:* a gang member's pistol shot hits Sheriff Wade Collier. It's Class I against his Toughness II: it does nothing, and the gang member starts to run. The same shot would have marked two boxes on his deputy. A White Hand soldier's Class II Blast is equal to his Defense, so it marks one box instead of two.
 
@@ -699,7 +700,7 @@ Every Operant has powers, and every power has a **Class** from I to VI. Player c
 
 - **Rolling.** Roll **Powers** to aim a power at someone, or to use it with skill: precisely, at a distance, around bystanders. Passive powers (Toughness, Regeneration, Speed and the like) just work. Targets resist with **Dodge** (things you can dodge), **Body** (things that work on the body) or **Will** (things that work on the mind).
 - **Damage.** A power marks boxes by its Class: Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3. Ordinary weapons mark the boxes in their table (see *Personal combat*).
-- **Defense.** An attack above your Defense hits in full; an equal one marks a box fewer; a lower one does nothing.
+- **Defense.** Armor, not a defense roll: an attack above your Defense hits in full; an equal one marks a box fewer; a lower one does nothing. It applies after your Dodge, Parry or Block.
 - **Range.** Unless a power says otherwise, a ranged power's effective band (see *Range* in Personal combat) is **Short at Class I, Long at Class II, Extreme at Class III**, and miles at Class IV and above, out to the horizon. Mind powers keep the reach their descriptions give: touch, a room, sight or a city.
 - **Pushing.** For one action, use a power one Class higher than you have it, and mark a box of **Strain**.
 
