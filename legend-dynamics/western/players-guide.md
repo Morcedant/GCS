@@ -100,6 +100,7 @@ Spend all your Edges. Each one buys:
 | Extra Grit | Start every session with 3 Grit points instead of 2 | 1 |
 | A friend | A named contact who helps once per job | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
+| Talisman | A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a hex letter sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one. It's renewed between jobs and doesn't count against a charm limit. | 1 |
 
 ### Spending points
 
@@ -577,6 +578,7 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 - **Trappings.** The right materials (grave dirt, silver, a lock of hair, the hour of midnight) remove one segment.
 - **Charms.** Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Sorcerer carries only one.
+- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a hex letter from a Pennsylvania Dutch powwow doctor, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual, is renewed between jobs, and doesn't count against a charm limit.
 - **Attention.** Magic worked openly can mark a box of **The Dark**, and the Order of the Iron Cross hunts known practitioners.
 
 ### Hexes
