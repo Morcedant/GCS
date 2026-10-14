@@ -5,7 +5,8 @@
   "attackQualityDodge": { "bands": [ { "from": 0, "mod": 0 }, { "from": 3, "mod": -1 }, { "from": 5, "mod": -2 }, { "from": 7, "mod": -3 } ] },
   "parry": { "mod": -3, "repeatPenalty": -2, "bareHanded": "unarmed" },
   "block": { "mod": -2 },
-  "aim": { "bonus": 1 }
+  "aim": { "bonus": 1 },
+  "tellingHits": { "margin": 5, "natural": true, "called": -2, "small": -4 }
  },
  "protection": [
   { "id": "improvised", "name": "Improvised shield", "text": "Anything that can stand in for a shield, snatched up in the fight: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.",
