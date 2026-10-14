@@ -93,7 +93,7 @@ President Ronald Reagan appointed **Dr. Allison Manchester**, the architect of *
 
 On **December 15th, 1996**, Raster Seven was breached for the first time. Fifteen of America's most dangerous Operants escaped and nineteen died. Nine were recaptured; six reached Argentina and the White Hand.
 
-From 1998 to 2000 the UN built **Raster Eight** in low Earth orbit, and revealed the **United Nations International Law Enforcement Directorate (UNILED)**, pooling the resources of the US, the Commonwealth of Independent States, Britain, China and many others against terrorism and Operant crime.
+From 1998 to 2000 the UN built **Raster Eight** in low Earth orbit, and **Interpol** opened its Operant division, pooling the police of the US, the Commonwealth of Independent States, Britain, China and many others against terrorism and Operant crime.
 
 ## A new century
 
@@ -103,7 +103,7 @@ President **John McCain** (2001–2009) wanted a director who could bridge the g
 
 That same year **Iran's Islamic Republic fell**. Months of strikes and street protests became a revolution led by a coalition of communist and socialist parties, which proclaimed the secular **People's Republic of Iran**. Washington, unsure whether to welcome or fear it, has kept it at arm's length ever since.
 
-- **2002–2004.** Under Cane, ExLAW became a publicity engine: televised rescues and recruiting drives. Operant and AS-6 units spearheaded the UN-led **invasion of Iraq**, which had sheltered White Hand training camps. ExLAW and UNILED turned on the White Hand and the **Morcain**.
+- **2002–2004.** Under Cane, ExLAW became a publicity engine: televised rescues and recruiting drives. Operant and AS-6 units spearheaded the UN-led **invasion of Iraq**, which had sheltered White Hand training camps. ExLAW and Interpol turned on the White Hand and the **Morcain**.
 - **2006.** Congress approved ExLAW's **regional commands** over police objections: six regional offices, each with its own Operant team and Aegis wing.
 - **2007.** The Foundation's enforcer **Sergei Grachyov** fought the Atomic Man in Washington, and the **Washington Monument** fell. Both walked away.
 - **2009.** President **Margaret Hale** took office.
@@ -156,7 +156,7 @@ A status can change in play: a Non-registered vigilante caught by ExLAW may be o
 ## The Rasters
 
 - **Raster Seven**, "Tartarus": ExLAW's underground prison for Operants, built in the 1980s and breached once, in 1996.
-- **Raster Eight**: the UN's prison in low Earth orbit, run by UNILED.
+- **Raster Eight**: the UN's prison in low Earth orbit, where Interpol sends the Operants it catches.
 - **Raster Zero**: doesn't exist. *(GM: Director Humbacht's DARPA cabal runs it in a pocket dimension, as a prison and a lab: a rival to the Foundation. ExLAW doesn't know.)*
 
 # Powers
@@ -311,7 +311,7 @@ A character with a Class III power, or any (GM) power, draws interest from the F
 - **ExLAW.** The federal Operant agency, under Director Steven Humbacht: six regional commands, Operant agents, Reserve Agents and Aegis wings, and a public-relations office as busy as any of them.
 - **The EPAOC.** The congressional watchdog, always looking for a scandal; a hearing can end a career.
 - **DIRE.** The Army's Defense Intelligence and Research Enterprise, founded after 2012. It made Helios with a modified Ambrosia, and wants more like him.
-- **UNILED.** The UN's international enforcement directorate, which runs Raster Eight.
+- **Interpol.** The international police organization, whose Operant division hunts fugitives across borders and fills Raster Eight.
 - **Affaires spéciales.** France's special affairs branch, home to Chat Roux.
 
 **Heroes and orders**

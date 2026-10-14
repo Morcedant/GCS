@@ -164,7 +164,7 @@
   {
    "name": "International Operative",
    "group": "badge",
-   "text": "International operative: UNILED, the French Affaires spéciales, MI5 or Interpol; the law has borders, Operants don't.",
+   "text": "International operative: Interpol, the French Affaires spéciales or MI5; the law has borders, Operants don't.",
    "skills": [
     "Law",
     "Deception",
@@ -1052,9 +1052,9 @@
   ],
   [
    "uniled",
-   "UNILED",
-   "Once per case, international reach: a foreign agency's help or a flight to anywhere.",
-   "Duty: UN politics, and member states who want different things."
+   "Interpol",
+   "Once per case, international reach: a Red Notice, a foreign police force's help, or a flight to anywhere.",
+   "Duty: member countries who want different things, and fugitives who know your face."
   ],
   [
    "as",

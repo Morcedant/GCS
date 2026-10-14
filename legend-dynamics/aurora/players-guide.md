@@ -33,7 +33,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 | ExLAW Agent | The Badge | a full-time federal agent of the Extraordinary Law Enforcement Agency (ExLAW), enforcing the Extraordinary Powers Act with a badge that opens doors and an EPAOC file that never closes. | Law, Investigation, Firearms, Read People |
 | Officer | The Badge | carries a badge and the law's authority, working alongside ExLAW or around it: an FBI agent or U.S. marshal, an elected county sheriff (maybe on the edge of the Mad Fringe), a city cop first on the scene of an Operant fight, a detective, or a licensed private eye. Your Allegiance says which force you serve. | Investigation, Firearms, Law, Read People |
 | Aegis Pilot | The Badge | flies the armored power suit that is the government's answer to Operants, and knows exactly what it costs per hour. | Piloting, Engineering, Firearms, Athletics |
-| International Operative | The Badge | UNILED, the French Affaires spéciales, MI5 or Interpol; the law has borders, Operants don't. | Law, Deception, Firearms, Computers |
+| International Operative | The Badge | Interpol, the French Affaires spéciales or MI5; the law has borders, Operants don't. | Law, Deception, Firearms, Computers |
 | Vigilante | The Masks | fights crime on the streets, unsanctioned and masked, and hopes ExLAW keeps looking the other way. | Brawling, Stealth, Streetwise, Athletics |
 | Public Hero | The Masks | famous, sponsored and televised, like the New Power Legion; the cameras are part of the job. | Media, Leadership, Persuasion, Powers |
 | Guardian | The Masks | protects one place or one people (a neighborhood, a reservation, the Haven) and answers to them first. | Powers, Leadership, Read People, Persuasion |
@@ -167,7 +167,7 @@ The GM can add others met in play (the creator's GM view has a **Campaign allegi
 | A County Sheriff's Office | Once per case, a deputy's help, the county jail, or the county's records and a word with the judge. | Duty: the sheriff answers to the voters, and the county's feuds and elections become yours. |
 | A City Police Department | Once per case, patrol backup, a holding cell, or the department's files and crime lab. | Duty: the chain of command, the union's politics, and a department that resents Operants and ExLAW alike. |
 | DIRE | Once per case, military hardware, a medical team or a classified file. | Duty: DIRE's research comes first, and you may be part of it. |
-| UNILED | Once per case, international reach: a foreign agency's help or a flight to anywhere. | Duty: UN politics, and member states who want different things. |
+| Interpol | Once per case, international reach: a Red Notice, a foreign police force's help, or a flight to anywhere. | Duty: member countries who want different things, and fugitives who know your face. |
 | Affaires spéciales | Once per case, French intelligence, a safehouse in Europe or a discreet extraction. | Duty: France's interests, which aren't always yours. |
 | The New Power Legion | Once per case, a famous ally, a sponsor's money or the press on your side. | Duty: the sponsor's image, the schedule and the cameras. |
 | The Shadow Knights | Once per case, a relic, a specialist or a safe house of the Ordo. | Duty: the vow; bring light into the shadows, whatever the law says. |
@@ -619,7 +619,7 @@ President Ronald Reagan appointed **Dr. Allison Manchester**, the architect of *
 
 On **December 15th, 1996**, Raster Seven was breached for the first time. Fifteen of America's most dangerous Operants escaped and nineteen died. Nine were recaptured; six reached Argentina and the White Hand.
 
-From 1998 to 2000 the UN built **Raster Eight** in low Earth orbit, and revealed the **United Nations International Law Enforcement Directorate (UNILED)**, pooling the resources of the US, the Commonwealth of Independent States, Britain, China and many others against terrorism and Operant crime.
+From 1998 to 2000 the UN built **Raster Eight** in low Earth orbit, and **Interpol** opened its Operant division, pooling the police of the US, the Commonwealth of Independent States, Britain, China and many others against terrorism and Operant crime.
 
 ## A new century
 
@@ -629,7 +629,7 @@ President **John McCain** (2001–2009) wanted a director who could bridge the g
 
 That same year **Iran's Islamic Republic fell**. Months of strikes and street protests became a revolution led by a coalition of communist and socialist parties, which proclaimed the secular **People's Republic of Iran**. Washington, unsure whether to welcome or fear it, has kept it at arm's length ever since.
 
-- **2002–2004.** Under Cane, ExLAW became a publicity engine: televised rescues and recruiting drives. Operant and AS-6 units spearheaded the UN-led **invasion of Iraq**, which had sheltered White Hand training camps. ExLAW and UNILED turned on the White Hand and the **Morcain**.
+- **2002–2004.** Under Cane, ExLAW became a publicity engine: televised rescues and recruiting drives. Operant and AS-6 units spearheaded the UN-led **invasion of Iraq**, which had sheltered White Hand training camps. ExLAW and Interpol turned on the White Hand and the **Morcain**.
 - **2006.** Congress approved ExLAW's **regional commands** over police objections: six regional offices, each with its own Operant team and Aegis wing.
 - **2007.** The Foundation's enforcer **Sergei Grachyov** fought the Atomic Man in Washington, and the **Washington Monument** fell. Both walked away.
 - **2009.** President **Margaret Hale** took office.
@@ -689,7 +689,7 @@ A status can change in play: a Non-registered vigilante caught by ExLAW may be o
 ## The Rasters
 
 - **Raster Seven**, "Tartarus": ExLAW's underground prison for Operants, built in the 1980s and breached once, in 1996.
-- **Raster Eight**: the UN's prison in low Earth orbit, run by UNILED.
+- **Raster Eight**: the UN's prison in low Earth orbit, where Interpol sends the Operants it catches.
 - **Raster Zero**: doesn't exist. *(GM: Director Humbacht's DARPA cabal runs it in a pocket dimension, as a prison and a lab: a rival to the Foundation. ExLAW doesn't know.)*
 
 # Powers
@@ -971,7 +971,7 @@ A character with a Class III power, or any (GM) power, draws interest from the F
 - **ExLAW.** The federal Operant agency, under Director Steven Humbacht: six regional commands, Operant agents, Reserve Agents and Aegis wings, and a public-relations office as busy as any of them.
 - **The EPAOC.** The congressional watchdog, always looking for a scandal; a hearing can end a career.
 - **DIRE.** The Army's Defense Intelligence and Research Enterprise, founded after 2012. It made Helios with a modified Ambrosia, and wants more like him.
-- **UNILED.** The UN's international enforcement directorate, which runs Raster Eight.
+- **Interpol.** The international police organization, whose Operant division hunts fugitives across borders and fills Raster Eight.
 - **Affaires spéciales.** France's special affairs branch, home to Chat Roux.
 
 **Heroes and orders**
