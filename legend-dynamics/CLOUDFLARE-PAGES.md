@@ -14,8 +14,8 @@ Cloudflare Pages hosts it for free. You can use the same Cloudflare account as t
 5. Drag in the `site` folder, or `legend-dynamics-site.zip`, and choose **Deploy site**.
 
    A zip must have `index.html` at its top level, not inside a `site/` folder; otherwise the home page is
-   at `/site/` and your address shows nothing. Make it from inside the folder:
-   `cd legend-dynamics/site && zip -r ../../legend-dynamics-site.zip .`
+   at `/site/` and your address shows nothing. `python3 tools/build-site.py --zip legend-dynamics-site.zip`
+   makes it that way.
 
 The site is live at that address a minute later.
 
