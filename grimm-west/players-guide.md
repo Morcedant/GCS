@@ -144,12 +144,18 @@ An advantage gives +2 to one narrowly defined kind of task when the GM agrees it
 
 ### Allegiance
 
-Anyone can owe allegiance to one of the powers of the hidden world. It's a benefit paired with a burden; the burden works like a complication and earns Grit when it causes you a real problem.
+Anyone can owe allegiance to one of the powers of the hidden world, or of the law. It's a benefit paired with a burden; the burden works like a complication and earns Grit when it causes you a real problem.
+
+The GM can add others met in play (the creator's GM view has a **Campaign allegiances** list), and a player can write one with the GM: choose *Another allegiance* and give it a name, a benefit and a burden.
 
 | Allegiance | Benefit | Burden |
 |---|---|---|
 | The Church | Once per case, shelter, records or a favor from the clergy | Duty: the Church gives you orders. Sicarii discipline ties you to the Order of the Holy Knife. |
 | A Royal Family | Once per case, money, papers or a door opened | Duty: an involuntary call to serve, and the family's rivals hunt you |
+| The U.S. Marshals | Once per case, a federal warrant, a posse sworn in on the spot, or a telegram to the district marshal | Duty: the marshal sends you after federal fugitives, and the men you've jailed have friends |
+| A County Sheriff's Office | Once per case, a deputy's help, the county jail, or the county records and wanted posters | Duty: the sheriff calls on you, and the county's feuds and elections become yours |
+| A City Police Department | Once per case, a patrolman's help, a night in the cells for someone, or the station's files | Duty: the captain gives the orders, and some of your fellow officers are Wesen with loyalties of their own |
+| The Pinkerton National Detective Agency | Once per case, an agency file on someone, an operative's help, or a client's money for the work | Duty: the client comes first, even a railroad or a mine owner breaking a strike, and working folk hate the name |
 | A secret society | Once per case, lore, a meeting place or a fellow initiate (the Golden Dawn, the Brotherhood of the Holy Earth) | Duty and Vow: keep its secrets and follow its traditions |
 | The Wesen Council | Contacts in the local Wesen community | Duty: the Council calls on you, and others know you're its operative |
 | A Grimm family | Access to the family books and kin | Duty to the family name, and to fight its enemies |

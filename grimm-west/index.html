@@ -395,6 +395,9 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-duty button { width: 34px; height: 30px; border: 1px solid var(--chrome-dim); background: transparent; color: var(--chrome); border-radius: 999px; font: 600 1rem var(--mono); }
 .gm-skills { font-size: .84rem; color: #cfd3cd; }
 .gm-skills b { color: var(--accent); }
+.gm-al-list { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 8px; }
+.gm-al-list li { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: grid; gap: 2px; font-size: .9rem; }
+.gm-al-list li .row { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 .gm-traits { font-size: .82rem; color: var(--muted); display: grid; gap: 2px; }
 .gm-traits strong { color: var(--fg); }
 .gm-cond { font-size: .82rem; }
@@ -662,6 +665,10 @@ tr.lvl-U td.target { color: var(--muted); }
 
           <div class="fields">
             <div class="field wide"><label for="f-allegiance">Allegiance (optional)</label><select id="f-allegiance"></select></div>
+            <div class="field wide" id="allegiance-custom-wrap" hidden><div class="fields">
+              <div class="field wide"><label for="f-al-name">Allegiance</label><input id="f-al-name" data-al="1" placeholder="e.g. The county sheriff's office"></div>
+              <div class="field wide"><label for="f-al-benefit">Benefit</label><input id="f-al-benefit" data-al="2" placeholder="e.g. Once per case, a deputy's help, the jail or the county records"></div>
+              <div class="field wide"><label for="f-al-burden">Burden (earns Grit)</label><input id="f-al-burden" data-al="3" placeholder="e.g. Duty: the sheriff calls on you, and the county's enemies are yours"></div></div></div>
             <div class="field wide" id="allegiance-desc-wrap" hidden><div class="pair">
               <div class="trait-desc"><span class="label">Benefit</span><div id="allegiance-benefit"></div></div>
               <div class="trait-desc comp"><span class="label">Burden (earns Grit)</span><div id="allegiance-burden"></div></div></div></div>
@@ -773,6 +780,18 @@ tr.lvl-U td.target { color: var(--muted); }
           <button class="linkish danger" id="gm-clear">Remove everyone</button>
         </div>
         <div class="toast" id="gm-msg" role="status" aria-live="polite"></div>
+      </div>
+      <div class="card hud no-print" id="gm-al-card">
+        <h3>Campaign allegiances</h3>
+        <p class="small muted">Add a power your table meets in play: a marshal's office, a county sheriff, a city police department, a detective agency, a Wesen clan. It joins the Allegiance list in this browser, and goes in the file from <b>Save all to file</b>. Send players <b>Save allegiances to file</b>; opening it in their creator adds them there too.</p>
+        <ul class="gm-al-list" id="gm-al-list"></ul>
+        <div class="fields">
+          <div class="field wide"><label for="gm-al-name">Name</label><input id="gm-al-name" placeholder="e.g. The Portland police, Second Precinct"></div>
+          <div class="field wide"><label for="gm-al-benefit">Benefit</label><input id="gm-al-benefit" placeholder="e.g. Once per case, a patrolman's help or the precinct's files"></div>
+          <div class="field wide"><label for="gm-al-burden">Burden (earns Grit)</label><input id="gm-al-burden" placeholder="e.g. Duty: the captain calls on you, and the precinct's secrets are yours"></div>
+        </div>
+        <div class="btn-row"><button class="btn primary" id="gm-al-add">Add allegiance</button><button class="btn" id="gm-al-save">Save allegiances to file</button></div>
+        <div class="toast" id="gm-al-msg" role="status" aria-live="polite"></div>
       </div>
       <div class="card hud">
         <h3>Turn order</h3>
@@ -1073,7 +1092,8 @@ tr.lvl-U td.target { color: var(--muted); }
 </ul>
 <p>An advantage gives +2 to one narrowly defined kind of task when the GM agrees it applies. It cannot improve every use of a broad skill. A complication creates choices and problems; it is not a permanent penalty.</p>
 <h3 id="g-allegiance">Allegiance</h3>
-<p>Anyone can owe allegiance to one of the powers of the hidden world. It’s a benefit paired with a burden; the burden works like a complication and earns Grit when it causes you a real problem.</p>
+<p>Anyone can owe allegiance to one of the powers of the hidden world, or of the law. It’s a benefit paired with a burden; the burden works like a complication and earns Grit when it causes you a real problem.</p>
+<p>The GM can add others met in play (the creator’s GM view has a <strong>Campaign allegiances</strong> list), and a player can write one with the GM: choose <em>Another allegiance</em> and give it a name, a benefit and a burden.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -1097,6 +1117,26 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>A Royal Family</td>
 <td>Once per case, money, papers or a door opened</td>
 <td>Duty: an involuntary call to serve, and the family’s rivals hunt you</td>
+</tr>
+<tr class="odd">
+<td>The U.S. Marshals</td>
+<td>Once per case, a federal warrant, a posse sworn in on the spot, or a telegram to the district marshal</td>
+<td>Duty: the marshal sends you after federal fugitives, and the men you’ve jailed have friends</td>
+</tr>
+<tr class="even">
+<td>A County Sheriff’s Office</td>
+<td>Once per case, a deputy’s help, the county jail, or the county records and wanted posters</td>
+<td>Duty: the sheriff calls on you, and the county’s feuds and elections become yours</td>
+</tr>
+<tr class="odd">
+<td>A City Police Department</td>
+<td>Once per case, a patrolman’s help, a night in the cells for someone, or the station’s files</td>
+<td>Duty: the captain gives the orders, and some of your fellow officers are Wesen with loyalties of their own</td>
+</tr>
+<tr class="even">
+<td>The Pinkerton National Detective Agency</td>
+<td>Once per case, an agency file on someone, an operative’s help, or a client’s money for the work</td>
+<td>Duty: the client comes first, even a railroad or a mine owner breaking a strike, and working folk hate the name</td>
 </tr>
 <tr class="odd">
 <td>A secret society</td>
@@ -3799,14 +3839,29 @@ tr.lvl-U td.target { color: var(--muted); }
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one skill when it's used.", 1],
     ["extradefense", "Additional Defense", "A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2.", 1],
   ];
-  const ALLEGIANCES = [
-    ["", "None", "", ""],
+  const SET_ALLEGIANCES = [
     ["church", "The Church", "Once per case, shelter, records or a favor from the clergy.", "Duty: the Church gives you orders. Sicarii discipline ties you to the Order of the Holy Knife."],
     ["royal", "A Royal Family", "Once per case, money, papers or a door opened.", "Duty: an involuntary call to serve, and the family's rivals hunt you."],
+    ["marshals", "The U.S. Marshals", "Once per case, a federal warrant, a posse sworn in on the spot, or a telegram to the district marshal.", "Duty: the marshal sends you after federal fugitives, and the men you've jailed have friends."],
+    ["sheriff", "A County Sheriff's Office", "Once per case, a deputy's help, the county jail, or the county records and wanted posters.", "Duty: the sheriff calls on you, and the county's feuds and elections become yours."],
+    ["police", "A City Police Department", "Once per case, a patrolman's help, a night in the cells for someone, or the station's files.", "Duty: the captain gives the orders, and some of your fellow officers are Wesen with loyalties of their own."],
+    ["pinkerton", "The Pinkerton National Detective Agency", "Once per case, an agency file on someone, an operative's help, or a client's money for the work.", "Duty: the client comes first, even a railroad or a mine owner breaking a strike, and working folk hate the name."],
     ["society", "A secret society", "Once per case, lore, a meeting place or a fellow initiate (the Golden Dawn, the Brotherhood of the Holy Earth).", "Duty and Vow: keep its secrets and follow its traditions."],
     ["council", "The Wesen Council", "Contacts in the local Wesen community.", "Duty: the Council calls on you, and others know you're its operative."],
     ["family", "A Grimm family", "Access to the family books and kin.", "Duty to the family name, and to fight its enemies."],
   ];
+  // Allegiances: the game's, any the GM adds for the campaign (kept in this browser, in the posse file and in an
+  // allegiances file the GM can send), and one a player writes with the GM ("custom"). A character keeps a copy
+  // of a campaign or custom allegiance (allegianceDef), so it travels with the character file.
+  const CAMPAIGN_AL_KEY = "grimm.allegiances.v1";
+  let campaignAllegiances = [];
+  const allegiances = (c = ch) => {
+    const base = [["", "None", "", ""], ...SET_ALLEGIANCES, ...campaignAllegiances];
+    const def = c && c.allegianceDef;
+    const own = def && def[0] === c.allegiance && def[0] !== "custom" && !base.some((a) => a[0] === def[0]) ? [def] : [];
+    return [...base, ...own, ["custom", "Another allegiance (write it with the GM)…", "", ""]];
+  };
+  const allegianceOf = (c = ch) => (c.allegiance === "custom" ? c.allegianceDef || ["custom", "", "", ""] : allegiances(c).find((a) => a[0] === c.allegiance) || allegiances(c)[0]);
   const STORE_HORROR = "grimm.horror.v1";
   const REASONS = [
     ["The family gift", "The Grimm blood woke in me, and it came with a duty."],
@@ -4026,7 +4081,7 @@ tr.lvl-U td.target { color: var(--muted); }
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" },
-      allegiance: "", customTier: 1,
+      allegiance: "", allegianceDef: null, customTier: 1,
       portrait: "", portraitShape: "token",
       play: { injury: 0, duty: 2, stunned: false, woge: false, log: [] },
     };
@@ -4072,7 +4127,8 @@ tr.lvl-U td.target { color: var(--muted); }
     out.adv2 = { id: "", detail: "", ...(c.adv2 || {}) };
     if (!ADVANTAGES.some((a) => a[0] === out.adv2.id)) out.adv2.id = "";
     out.gear = { item: "", skill: "", ...(c.gear || {}) };
-    if (!ALLEGIANCES.some((a) => a[0] === out.allegiance)) out.allegiance = "";
+    out.allegianceDef = Array.isArray(c.allegianceDef) && c.allegianceDef.length === 4 ? c.allegianceDef.map((x) => String(x ?? "")) : null;
+    if (!allegiances(out).some((a) => a[0] === out.allegiance)) out.allegiance = "";
     out.customTier = [0, 1, 2, 3].includes(+out.customTier) ? +out.customTier : 1;
     if (typeof out.contact !== "string") out.contact = "";
     if (!SPECIES.some((x) => x[0] === out.speciesId) && out.speciesId !== "custom") out.speciesId = "human";
@@ -4089,6 +4145,15 @@ tr.lvl-U td.target { color: var(--muted); }
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
   };
+  const validAl = (a) => Array.isArray(a) && a.length === 4 && a.every((x) => typeof x === "string") && /^c-/.test(a[0]) && a[1].trim();
+  campaignAllegiances = (store.get(CAMPAIGN_AL_KEY, []) || []).filter(validAl);
+  // Campaign allegiances from a file (the GM's allegiances file or posse file, or a character carrying one): added once each.
+  function mergeAllegiances(list) {
+    let n = 0;
+    for (const a of (list || []).filter(validAl)) if (!campaignAllegiances.some((b) => b[0] === a[0])) { campaignAllegiances.push(a.map(String)); n++; }
+    if (n) store.set(CAMPAIGN_AL_KEY, campaignAllegiances);
+    return n;
+  }
   let roster = store.get(STORE_ROSTER, []);
   if (!Array.isArray(roster)) roster = [];
   // A first visit opens on a new, blank character; the example is one click away in the ready-made list.
@@ -4187,6 +4252,7 @@ tr.lvl-U td.target { color: var(--muted); }
       [!!ch.dept, "Calling chosen"],
       [!!speciesOk, speciesOk ? `Heritage: ${ch.species || "—"}` : !ch.species.trim() ? "Name your custom heritage" : `Custom adjustments total ${signed(adjTotal())}; they must total 0`],
       ...(horrorOff ? [[false, `${ch.species} is for horror campaigns only: tick Horror campaign if your table agreed`]] : []),
+      ...(ch.allegiance === "custom" && !(ch.allegianceDef || []).slice(1).every((x) => x.trim()) ? [[false, "Allegiance: give it a name, a benefit and a burden (agree them with the GM)"]] : []),
       [es === ea && !edgeNeeds.length, es !== ea ? `Edges: ${es} of ${ea} spent` : edgeNeeds.length ? `Edges: ${edgeNeeds.join(", ")}` : ea ? `${ea} Edge${ea > 1 ? "s" : ""} spent` : "No Edges at this tier"],
       [sp === POOL && !overMax.length, sp === POOL ? (overMax.length ? `Check ${overMax.join(", ")}: outside the heritage range` : `${POOL} attribute points spent`) : `Attribute points spent: ${sp} of ${POOL}`],
       ...(ch.speciesId === "grimm" ? [[ch.skills["Wesen Lore"] !== "U", "Grimm: Wesen Lore at least Trained"]] : []),
@@ -4214,7 +4280,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <span class="gm-duty"><button type="button" id="edge-m-${k}" data-edge="${k}" data-d="-1" aria-label="One fewer: ${n}">−</button><b id="edge-n-${k}">0</b><button type="button" id="edge-p-${k}" data-edge="${k}" data-d="1" aria-label="One more: ${n}">+</button></span>
     <span class="small muted">${d}</span></div>`).join("");
   $("f-adv2").innerHTML = `<option value="">Choose a second advantage…</option>` + ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("");
-  $("f-allegiance").innerHTML = ALLEGIANCES.map(([id, n]) => `<option value="${id}">${n}</option>`).join("");
+
   $("f-gearskill").innerHTML = `<option value="">Choose the skill…</option>` + SKILLS.map(([n]) => `<option>${n}</option>`).join("");
   const horrorOn = () => store.get(STORE_HORROR, false) === true;
   // The heritage's own rules, woge profile and suggested skills, shown under its description.
@@ -4334,9 +4400,12 @@ tr.lvl-U td.target { color: var(--muted); }
     $("contact-wrap").hidden = !edgeN("contact");
     $("gear-wrap").hidden = $("gearskill-wrap").hidden = !edgeN("gear");
     $("f-gearskill").value = ch.gear.skill;
-    const al = ALLEGIANCES.find((a) => a[0] === ch.allegiance) || ALLEGIANCES[0];
-    $("f-allegiance").value = al[0];
-    $("allegiance-desc-wrap").hidden = !al[0];
+    const al = allegianceOf();
+    $("f-allegiance").innerHTML = allegiances().map(([id, n]) => `<option value="${esc(id)}">${esc(n)}</option>`).join("");
+    $("f-allegiance").value = ch.allegiance;
+    $("allegiance-custom-wrap").hidden = ch.allegiance !== "custom";
+    if (ch.allegiance === "custom") [1, 2, 3].forEach((i) => { const el = $(["", "f-al-name", "f-al-benefit", "f-al-burden"][i]); if (document.activeElement !== el) el.value = al[i]; });
+    $("allegiance-desc-wrap").hidden = !al[0] || ch.allegiance === "custom";
     $("allegiance-benefit").textContent = al[2];
     $("allegiance-burden").textContent = al[3];
     if ($("f-adv").dataset.for !== ch.speciesId + "|" + ch.species) {
@@ -4474,7 +4543,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="field"><span class="label">Companion complication</span><b>${esc(sCompName())}</b><span class="small muted">${esc(sCompText())}</span></div>
       </div>` : ""}
       ${heritageOf() && (heritageOf().core.length || heritageOf().woge || heritageOf().wesen) ? `<div><h3 style="margin-bottom:6px">Heritage</h3>${heritageInfo()}</div>` : ""}
-      ${(() => { const a2 = ADVANTAGES.find((a) => a[0] === ch.adv2.id), al = ALLEGIANCES.find((a) => a[0] === ch.allegiance && a[0]);
+      ${(() => { const a2 = ADVANTAGES.find((a) => a[0] === ch.adv2.id), al = ch.allegiance && allegianceOf()[1].trim() ? allegianceOf() : null;
         const ed = EDGE_DEFS.filter(([k]) => edgeN(k)).map(([k, n]) => n + (edgeN(k) > 1 ? ` ×${edgeN(k)}` : ""));
         return `<div class="fields">
         ${ed.length ? `<div class="field"><span class="label">Edges</span><span>${esc(ed.join(", "))}</span></div>` : ""}
@@ -4662,7 +4731,8 @@ tr.lvl-U td.target { color: var(--muted); }
       "f-compname": ["comp", "name"], "f-comptext": ["comp", "text"], "f-comptrigger": ["comp", "trigger"],
       "f-gearitem": ["gear", "item"], "f-adv2detail": ["adv2", "detail"],
       "f-sadvname": ["sadv", "name"], "f-sadvtext": ["sadv", "text"], "f-scompname": ["sadv", "compName"], "f-scomptext": ["sadv", "compText"] }[id];
-    if (sub) { ch[sub[0]][sub[1]] = e.target.value; touch(); render(); }
+    if (sub) { ch[sub[0]][sub[1]] = e.target.value; touch(); render(); return; }
+    if (e.target.dataset && e.target.dataset.al && ch.allegiance === "custom") { ch.allegianceDef[+e.target.dataset.al] = e.target.value; touch(); render(); return; }
   });
   document.addEventListener("change", (e) => {
     const t = e.target;
@@ -4680,7 +4750,12 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-horror") { store.set(STORE_HORROR, t.checked); render(); }
     else if (t.id === "f-customtier") { ch.customTier = +t.value; touch(); render(); }
     else if (t.id === "f-adv2") { ch.adv2.id = t.value; touch(); render(); }
-    else if (t.id === "f-allegiance") { ch.allegiance = t.value; touch(); render(); }
+    else if (t.id === "f-allegiance") {
+      ch.allegiance = t.value;
+      const camp = campaignAllegiances.find((a) => a[0] === t.value);
+      ch.allegianceDef = t.value === "custom" ? (ch.allegianceDef && ch.allegianceDef[0] === "custom" ? ch.allegianceDef : ["custom", "", "", ""]) : camp ? [...camp] : ch.allegianceDef && ch.allegianceDef[0] === t.value ? ch.allegianceDef : null;
+      touch(); render();
+    }
     else if (t.id === "f-gearskill") { ch.gear.skill = t.value; touch(); render(); }
     else if (t.id === "f-reasonpick" && t.value !== "") {
       // Replace an empty box or another quick pick; add to anything the player wrote themselves.
@@ -4998,19 +5073,23 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   $("gm-files").addEventListener("change", async (e) => {
     const files = [...e.target.files]; e.target.value = "";
-    let found = [], bad = 0;
+    let found = [], bad = 0, alAdded = 0;
     for (const f of files) {
       try {
         const data = JSON.parse(await f.text());
         if (Array.isArray(data.log)) mergeLog(data.log);
+        if (Array.isArray(data.allegiances)) alAdded += mergeAllegiances(data.allegiances);
         const list = Array.isArray(data) ? data : Array.isArray(data.crew) ? data.crew : [data];
+        if (!list.some((x) => x && x.attrs) && Array.isArray(data.allegiances)) continue; // an allegiances file
         const ok = list.filter((x) => x && x.attrs && x.skills);
         if (!ok.length) bad++;
         found = found.concat(ok);
       } catch { bad++; }
     }
+    alAdded += mergeAllegiances(found.map((c) => c.allegianceDef));
+    if (alAdded) renderAllegianceList();
     const { added, updated } = gmAdd(found);
-    gmSay(`${added} added${updated ? `, ${updated} updated` : ""}${bad ? `; ${bad} file${bad > 1 ? "s weren't" : " wasn't"} a Grimm character file` : ""}.`, !!bad && !added && !updated);
+    gmSay(`${alAdded ? `${alAdded} campaign allegiance${alAdded > 1 ? "s" : ""} added. ` : ""}${added} added${updated ? `, ${updated} updated` : ""}${bad ? `; ${bad} file${bad > 1 ? "s weren't" : " wasn't"} a Grimm character file` : ""}.`, !!bad && !added && !updated);
   });
   $("gm-open").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("gm-files").click(); } });
   $("gm-add-saved").addEventListener("change", (e) => { const c = roster[+e.target.value]; if (e.target.value !== "" && c) { gmAdd([c]); gmSay(`Added ${c.name || "character"}.`); } e.target.value = ""; });
@@ -5019,9 +5098,34 @@ tr.lvl-U td.target { color: var(--muted); }
     if (e.target.value !== "" && c) { gmAdd([{ ...JSON.parse(JSON.stringify(c)), id: uid() }]); gmSay(`Added ${c.name}.`); }
     e.target.value = "";
   });
+  // Campaign allegiances the GM adds on the fly.
+  function renderAllegianceList() {
+    $("gm-al-list").innerHTML = campaignAllegiances.length ? campaignAllegiances.map(([id, n, b, d]) => `<li><div class="row"><b>${esc(n)}</b><button class="linkish danger" data-al-rm="${esc(id)}">Remove</button></div>${b ? `<span class="small">${esc(b)}</span>` : ""}${d ? `<span class="small muted">${esc(d)}</span>` : ""}</li>`).join("")
+      : `<li class="small muted">None yet. The game's own allegiances are always in the list.</li>`;
+  }
+  const alSay = (m, err) => { $("gm-al-msg").textContent = m; $("gm-al-msg").className = "toast" + (err ? " err" : ""); };
+  $("gm-al-add").onclick = () => {
+    const [n, b, d] = ["gm-al-name", "gm-al-benefit", "gm-al-burden"].map((k) => $(k).value.trim());
+    if (!n || !b || !d) { alSay("Give it a name, a benefit and a burden.", true); return; }
+    if ([...SET_ALLEGIANCES, ...campaignAllegiances].some((a) => a[1].toLowerCase() === n.toLowerCase())) { alSay(`${n} is already in the list.`, true); return; }
+    campaignAllegiances.push(["c-" + uid(), n, b, d]); store.set(CAMPAIGN_AL_KEY, campaignAllegiances);
+    ["gm-al-name", "gm-al-benefit", "gm-al-burden"].forEach((k) => ($(k).value = ""));
+    renderAllegianceList(); render(); alSay(`Added ${n}. It's in the Allegiance list now.`);
+  };
+  $("gm-al-list").addEventListener("click", (e) => {
+    const id = e.target.dataset && e.target.dataset.alRm; if (!id) return;
+    const a = campaignAllegiances.find((x) => x[0] === id);
+    campaignAllegiances = campaignAllegiances.filter((x) => x[0] !== id); store.set(CAMPAIGN_AL_KEY, campaignAllegiances);
+    renderAllegianceList(); render(); alSay(`Removed ${a ? a[1] : "it"}. Characters who already chose it keep their copy.`);
+  });
+  $("gm-al-save").onclick = () => {
+    if (!campaignAllegiances.length) { alSay("Add an allegiance first.", true); return; }
+    saveText(JSON.stringify({ format: "grimm-west-allegiances", version: 1, allegiances: campaignAllegiances }, null, 2), "grimm-allegiances.json", alSay);
+  };
+  renderAllegianceList();
   $("gm-save").onclick = () => {
     if (!gmCrew.length) { gmSay("Add some characters first.", true); return; }
-    saveText(JSON.stringify({ format: "grimm-west-posse", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog }, null, 2), "grimm-posse.json", gmSay);
+    saveText(JSON.stringify({ format: "grimm-west-posse", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog, allegiances: campaignAllegiances }, null, 2), "grimm-posse.json", gmSay);
   };
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay("New session: everyone is back to their starting Grit."); };
   let gmClearArmed = false;
@@ -5305,7 +5409,13 @@ tr.lvl-U td.target { color: var(--muted); }
   function importText(txt) {
     try {
       const data = JSON.parse(txt);
+      if (data && Array.isArray(data.allegiances) && !data.attrs) {
+        const n = mergeAllegiances(data.allegiances); render(); renderAllegianceList();
+        toast(n ? `Added ${n} campaign allegiance${n > 1 ? "s" : ""} from the GM. Choose one under Allegiance.` : "Those allegiances are already in your list.");
+        return;
+      }
       if (!data || typeof data !== "object" || !data.attrs || !data.skills) throw new Error("missing fields");
+      mergeAllegiances([data.allegianceDef]);
       data.id = roster.some((c) => c.id === data.id) ? data.id : data.id || uid();
       data.example = false;
       load(data);
