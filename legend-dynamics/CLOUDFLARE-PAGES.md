@@ -44,4 +44,6 @@ Cloudflare, it is connected for you. If not, Cloudflare shows the DNS record to 
 | `/discord/` | The Discord bot's commands for every setting |
 | `/discord/<game>/` | Each game's handout, with the bot setup steps and code |
 
+**Old addresses.** The site's `_redirects` file sends the old Dust & Damnation addresses (`/dust-and-damnation/…`, its Word guide and its Discord handout) to Pact of Bones, so old links and bookmarks keep working. Cloudflare Pages reads the file automatically; there is nothing to set up.
+
 Free plan limits are far above what this site needs: 500 uploads a month, 20,000 files, and 25 MB per file.

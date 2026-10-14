@@ -179,6 +179,14 @@ def main():
                             '<p class="ld-lede">That page isn\'t here. Try the home page or the core rules.</p>'
                             f'<div class="ld-actions"><a class="ld-button" href="/">Home</a><a class="ld-button ld-button--ghost" href="{bw.CORE_SLUG}">Core rules</a></div></div>'],
                            fonts=font_links({bw.BRAND_FONTS})))
+    # Cloudflare Pages redirects: old addresses keep working after a rename (first match wins).
+    write("_redirects", "".join(f"{old} {new} 301\n" for old, new in [
+        ("/dust-and-damnation/Dust_Damnation_Players_Guide.docx", "/pact-of-bones/Pact_of_Bones_Players_Guide.docx"),
+        ("/dust-and-damnation", "/pact-of-bones/"),
+        ("/dust-and-damnation/*", "/pact-of-bones/:splat"),
+        ("/discord/dust-and-damnation", "/discord/pact-of-bones/"),
+        ("/discord/dust-and-damnation/*", "/discord/pact-of-bones/:splat"),
+    ]))
     n = sum(1 for p in SITE.rglob("*") if p.is_file())
     print(f"wrote {n} files into {SITE.relative_to(ROOT)}/")
 
