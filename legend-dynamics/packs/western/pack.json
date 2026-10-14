@@ -46,7 +46,7 @@
   "tracksTitle": "Trouble",
   "tracksIntro": "Shared by all the characters. A killing in the street, a monster seen by townsfolk, or magic worked in the open can mark a box. Lying low between jobs can clear one.",
   "tracksReset": "Clear all Trouble",
-  "exampleName": "example detective",
+  "exampleName": "example lawman",
   "fontsHref": "https://fonts.googleapis.com/css2?family=Pirata+One&family=IM+Fell+English+SC&family=IM+Fell+DW+Pica+SC&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap",
   "rangedSkill": "Shooting",
   "meleeSkill": "Melee",
@@ -113,36 +113,14 @@
  ],
  "roles": [
   {
-   "name": "Marshal",
+   "name": "Lawman",
    "group": "law",
-   "text": "Marshal: carries what authority there is (take a Badge advantage), with Leadership and a steady gun.",
-   "skills": [
-    "Leadership",
-    "Shooting",
-    "Law",
-    "Riding"
-   ]
-  },
-  {
-   "name": "Deputy",
-   "group": "law",
-   "text": "Deputy: keeps order, guards prisoners, and backs up the marshal when it comes to shooting.",
+   "text": "Lawman: wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority.",
    "skills": [
     "Shooting",
-    "Brawling",
-    "Riding",
-    "Read People"
-   ]
-  },
-  {
-   "name": "Detective",
-   "group": "law",
-   "text": "Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads.",
-   "skills": [
     "Investigation",
     "Read People",
-    "Deception",
-    "Stealth"
+    "Riding"
    ]
   },
   {
@@ -1936,10 +1914,10 @@
  "example": {
   "name": "Josephine Hale",
   "rank": "Pinkerton operative",
-  "dept": "Detective",
+  "dept": "Lawman",
   "path": "rounded",
   "speciesId": "city",
-  "role": "Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads.",
+  "role": "Lawman: wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority.",
   "reason": "Somebody has to stand up for the people who can't.",
   "connection": "Owes the town doctor for keeping quiet about how her last client really died.",
   "attrs": {
@@ -1986,13 +1964,14 @@
     "rounds": 6,
     "spares": 2
    }
-  }
+  },
+  "allegiance": "pinkerton"
  },
  "pregens": [
   {
    "name": "Ruth Calloway",
    "rank": "Deputy U.S. Marshal",
-   "dept": "Marshal",
+   "dept": "Lawman",
    "path": "rounded",
    "speciesId": "sighted",
    "species": "Sighted",
@@ -2048,7 +2027,8 @@
     "rifle": true,
     "horse": true,
     "trailkit": true
-   }
+   },
+   "allegiance": "marshals"
   },
   {
    "name": "Dr. Elias Webb",
@@ -3146,5 +3126,10 @@
     }
    ]
   }
- ]
+ ],
+ "roleAliases": {
+  "Marshal": "Lawman",
+  "Deputy": "Lawman",
+  "Detective": "Lawman"
+ }
 }

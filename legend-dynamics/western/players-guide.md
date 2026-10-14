@@ -28,9 +28,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 
 | Calling | Group | Typical contribution | Core skills |
 |---|---|---|---|
-| Marshal | The Law | carries what authority there is (take a Badge advantage), with Leadership and a steady gun. | Leadership, Shooting, Law, Riding |
-| Deputy | The Law | keeps order, guards prisoners, and backs up the marshal when it comes to shooting. | Shooting, Brawling, Riding, Read People |
-| Detective | The Law | investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads. | Investigation, Read People, Deception, Stealth |
+| Lawman | The Law | wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority. | Shooting, Investigation, Read People, Riding |
 | Bounty Hunter | The Law | tracks wanted men across three territories and brings them in, upright or across a saddle. | Tracking, Shooting, Riding, Survival |
 | Doctor | The Learned | digs out bullets, sets bones, and reads what a body says about how it died. | Medicine, Investigation, Read People, Persuasion |
 | Occultist | The Learned | knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears. | Occult, Investigation, Persuasion, Read People |
@@ -671,7 +669,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 ## Ruth Calloway
 
-*Deputy U.S. Marshal, Marshal. Sighted (tier 1).* Wears the badge in three counties, and sees what's under the faces of the men she arrests.
+*Deputy U.S. Marshal, Lawman. Sighted (tier 1).* Wears the badge in three counties, and sees what's under the faces of the men she arrests.
 
 - **Attributes:** Body 12, Agility 13, Intellect 10, Presence 9, Will 11. **Dodge** 12.
 - **Skills:** Shooting 16 (Specialty). Trained: Brawling 14, Riding 14, Athletics 13, Law 11, Occult 11, Read People 11, Survival 11, Tracking 11, Leadership 10.
