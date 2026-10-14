@@ -1119,6 +1119,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     if (!Array.isArray(out.advances)) out.advances = [];
     if (out.path !== "hand") out.path = "rounded";
+    if (PACK.roleAliases && PACK.roleAliases[out.dept]) out.dept = PACK.roleAliases[out.dept]; // a calling merged into another (Marshal → Lawman)
     if (!out.customRole && !DEPTS.some((d) => d[0] === out.dept)) out.dept = DEPTS[0][0];
     // The gun being tracked: its rounds and spare reloads. A character with a gun but no record starts loaded.
     const g = c.play && c.play.gun;
