@@ -96,6 +96,7 @@ Spend all your Edges. Each one buys:
 | True grit | Start every session with 3 Grit instead of 2 | 1 |
 | A friend in town | A named contact who helps once per case | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one named skill when it's used | 1 |
+| Additional Defense | Defend twice a round instead of once: Dodge or Block, in any mix. | 1 |
 
 ### Spending points
 
@@ -383,11 +384,11 @@ Act in descending Agility order. Players choose the order of tied characters; th
 
 ## Attacking and defending
 
-Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
+Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one defense per round: a Dodge, or a Block (below). The Additional Defense Edge gives a second. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
 
-**Block.** With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fangs, fists or an arrow instead of Dodging: roll Melee −2, or Melee −1 with a real shield. You can Block once a round, as well as your one Dodge. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes: a chair stops one swipe of a Blutbad's claws, and then it's kindling.
+**Block.** With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fangs, fists or an arrow instead of Dodging: roll Melee −2, or Melee −1 with a real shield. A Block is your one defense for the round. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes: a chair stops one swipe of a Blutbad's claws, and then it's kindling.
 
 ## Range
 

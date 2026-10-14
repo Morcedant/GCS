@@ -1031,6 +1031,11 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>An heirloom weapon, a master’s instruments or a charm-maker’s kit: +2 to one named skill when it’s used</td>
 <td>1</td>
 </tr>
+<tr class="odd">
+<td>Additional Defense</td>
+<td>Defend twice a round instead of once: Dodge or Block, in any mix.</td>
+<td>1</td>
+</tr>
 </tbody>
 </table>
 <h3 id="g-spending-points">Spending points</h3>
@@ -1537,9 +1542,9 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-turn-order-and-actions">Turn order and actions</h2>
 <p>Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as shooting, reloading, helping, or attempting a task.</p>
 <h2 id="g-attacking-and-defending">Attacking and defending</h2>
-<p>Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one Dodge attempt per round. A successful Dodge cancels the hit. Apply injury penalties to Dodge.</p>
+<p>Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one defense per round: a Dodge, or a Block (below). The Additional Defense Edge gives a second. A successful Dodge cancels the hit. Apply injury penalties to Dodge.</p>
 <p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.</p>
-<p><strong>Block.</strong> With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fangs, fists or an arrow instead of Dodging: roll Melee −2, or Melee −1 with a real shield. You can Block once a round, as well as your one Dodge. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes: a chair stops one swipe of a Blutbad’s claws, and then it’s kindling.</p>
+<p><strong>Block.</strong> With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fangs, fists or an arrow instead of Dodging: roll Melee −2, or Melee −1 with a real shield. A Block is your one defense for the round. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes: a chair stops one swipe of a Blutbad’s claws, and then it’s kindling.</p>
 <h2 id="g-range">Range</h2>
 <p>Distances fall into five bands:</p>
 <table>
@@ -3679,8 +3684,8 @@ tr.lvl-U td.target { color: var(--muted); }
           <dl class="ref">
             <dt>Resolution</dt><dd>3d6 at or below adjusted skill. Natural 3–4 always succeeds; 17–18 always fails. Margin = target − roll.</dd>
             <dt>Opposed</dt><dd>Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender.</dd>
-            <dt>Combat</dt><dd>Move a short distance and take one action. Hit → target may Dodge once per round → weapon effect. Partial cover −2.</dd>
-            <dt>Block</dt><dd>Once a round, instead of Dodge: Melee −2 with a chair or slat, −1 with a shield, against blades, claws, fists and arrows (never bullets). An improvised shield breaks on a 2+ box hit.</dd>
+            <dt>Combat</dt><dd>Move a short distance and take one action. Hit → target may defend once per round (Dodge or Block; two with Additional Defense) → weapon effect. Partial cover −2.</dd>
+            <dt>Block</dt><dd>Your defense for the round, instead of Dodge: Melee −2 with a chair or slat, −1 with a shield, against blades, claws, fists and arrows (never bullets). An improvised shield breaks on a 2+ box hit.</dd>
             <dt>Damage</dt><dd>Fists, clubs, knives, arrows: 1 box. Guns, heavy blades, Wesen claws: 2. Close-range shotgun or buffalo rifle: 3 and Dying.</dd>
             <dt>Dying</dt><dd>A 2-box weapon that brings you to 3 boxes: Dying; dead at the end of the scene unless stabilized (one action, Medicine, doctor's bag). At 3 boxes, another 2-box hit kills.</dd>
             <dt>Guns</dt><dd>Derringer 2, revolver 6, shotgun 2, rifle 15. Fan the hammer 3 (−2, +1 box), both barrels 2 (+2 close), covering fire 3. Reload: one action. Natural 18 jams.</dd>
@@ -3779,6 +3784,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["grit", "True grit", "Start every session with 3 Grit instead of 2.", 1],
     ["contact", "A friend in town", "A named contact who helps once per case.", 1],
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one skill when it's used.", 1],
+    ["extradefense", "Additional Defense", "Defend twice a round instead of once: Dodge or Block, in any mix.", 1],
   ];
   const ALLEGIANCES = [
     ["", "None", "", ""],
@@ -4398,7 +4404,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
     $("st-grit").textContent = gritStart();
-    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`;
+    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics). ${edgeN("extradefense") ? "Two defenses a round (Additional Defense)" : "One defense a round"}: Dodge or Block.`;
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
