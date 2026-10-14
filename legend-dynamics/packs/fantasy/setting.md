@@ -82,6 +82,28 @@ Bigger workings are **rituals** (see *Magic*), worked with **Sorcery**: ten minu
 - **Rites.** A cleansing rite (Significant) clears a box of Corruption or Doom.
 - **Talismans.** A finished ritual can be bound into a bone, a ring or a knotted cord and released by breaking it: Trained 2, Specialty 3, Expert 4 ready at once.
 
+### Enchantments
+
+An **enchantment** is a ritual worked into an object: a blade that bites deeper, a cloak that hides its wearer, a ring that turns a blow. Where a talisman is spent when it breaks, an enchantment **lasts**, and anyone can carry the item. Work it like any ritual, with the item in your hands: describe the empowerment, the GM sets its weight, and you fill the clock with Sorcery rolls.
+
+| Weight | What the item gains | For example |
+|---|---|---|
+| Minor (2) | +1 to one use of the item, or one small wonder | A sword +1 to hit; boots +1 to Athletics; a lantern that shows the hidden |
+| Significant (4) | +2 to one use, or its hits mark one more box, or it turns one hit a fight (a hit of 2 or more boxes marks one fewer) | A war-axe that bites deep; a cloak +2 to Stealth; a coat that turns a blade |
+| Major (6) | A cantrip bound into it, at its First Seal, cast once a scene by whoever holds it (with their Sorcery, or at 10 without it), or one great property | A ring of Ward; a staff of Witchfire; a blade that wounds what nothing else can |
+
+| How long it lasts | Clock |
+|---|---|
+| A scene | As its weight |
+| A day | +1 segment |
+| A moon | +2 segments |
+| Until broken | Major only: it needs a rare trapping (a true name, a Crown shard's light, the blood of a king) and marks **another box of Corruption** |
+
+- **One enchantment to an item.** A second working on the same item fails, or breaks the first (the GM's choice).
+- **Your limit.** Your ready talismans and your enchantments still holding together can't exceed your talisman limit: **Trained 2, Specialty 3, Expert 4**. When an enchantment ends, its place is free again.
+- **The price.** Finishing a Major enchantment marks a box of Corruption, as any Major ritual does.
+- **Seeing and breaking.** Sorcerer's Sight shows an enchantment and who made it. Shatter at its Third Seal breaks one, and so does a rite of unbinding (Significant).
+
 ## Corruption
 
 Power has a price. Every character keeps a **Corruption** track of four boxes on their sheet:

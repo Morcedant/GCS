@@ -2006,7 +2006,7 @@
   ],
   [
    "Sorcery",
-   "Cantrips: an action and a Sorcery roll; known Trained 2, Specialty 3, Expert 4. Seals: Specialty 1 Boost, Expert 2 (−1 each to the roll). Rituals: 2-, 4- or 6-segment clock. Talismans: 2, 3, 4."
+   "Cantrips: an action and a Sorcery roll; known Trained 2, Specialty 3, Expert 4. Seals: Specialty 1 Boost, Expert 2 (−1 each to the roll). Rituals: 2-, 4- or 6-segment clock. Talismans: 2, 3, 4. Enchantments: a ritual worked into an item, +1 segment to last a day, +2 a moon; they share the talisman limit."
   ],
   [
    "Corruption",
@@ -2485,13 +2485,18 @@
     "A ritual bound into a bone, a ring or a knotted cord, released by breaking it."
    ],
    [
+    "**Enchantments**",
+    "A ritual worked into an object, lasting a scene, a day (+1 segment), a moon (+2) or until broken (Major only). Talismans and enchantments share one limit: Trained 2, Specialty 3, Expert 4."
+   ],
+   [
     "**Price**",
     "Corruption: a failed cantrip marks 1, a natural 18 marks 2, and finishing a Major ritual marks 1, whatever the roll."
    ]
   ],
   "help": {
    "step": "<p>Every cantrip holds three <b>Seals</b>, each hiding a deeper power. Your Sorcery breaks them: the <b>First Seal</b> at Trained, the <b>Second</b> at Specialty, the <b>Third</b> at Expert.</p>",
-   "price": "<p>Finishing a Major ritual marks 1 Corruption too, whatever the roll. A cleansing rite or a pilgrimage between ventures clears a box.</p>"
+   "price": "<p>Finishing a Major ritual marks 1 Corruption too, whatever the roll. A cleansing rite or a pilgrimage between ventures clears a box.</p>",
+   "charms": "Talismans and enchantments share one limit: as many as your Sorcery training allows, Trained 2, Specialty 3, Expert 4. An enchantment is a ritual worked into an object that lasts (a scene, a day, a moon, or until broken) rather than being spent."
   }
  },
  "arms": [
