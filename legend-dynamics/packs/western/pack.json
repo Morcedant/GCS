@@ -3028,5 +3028,19 @@
    "trait": "Undying",
    "traitText": "Rises at the next midnight unless its grave is salted and burned."
   }
+ ],
+ "extraEdges": [
+  [
+   "talisman",
+   "Talisman",
+   "A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a hex letter sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one. It's renewed between jobs and doesn't count against a charm limit.",
+   1,
+   {
+    "label": "Your talisman",
+    "placeholder": "e.g. A mojo hand against hexes, from a root doctor in New Orleans",
+    "missing": "describe your talisman, who made it, and its ritual",
+    "sheetNote": "renewed each job"
+   }
+  ]
  ]
 }
