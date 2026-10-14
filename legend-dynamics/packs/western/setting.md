@@ -36,7 +36,7 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 ## Magic
 
-**Practitioners** work **rituals** in a tradition (see *Magic*): fill a clock with **Occult** rolls at your tradition's pace, usually ten minutes a roll, an hour for a Hermeticist. Most western magic is slow, so practitioners prepare: a finished ritual stored as a **charm** is how a practitioner keeps up in a gunfight.
+**Practitioners** work **rituals** in a tradition (see *Magic*): fill a clock with **Occult** rolls at your tradition's pace, usually ten minutes a roll, an hour for a Hermeticist, a minute for a Braucher's healing charm. Most western magic is slow, so practitioners prepare: a finished ritual stored as a **charm** is how a practitioner keeps up in a gunfight.
 
 | Weight | Segments | For example |
 |---|---|---|
@@ -46,8 +46,10 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 - **Trappings.** The right materials (grave dirt, silver, a lock of hair, the hour of midnight) remove one segment.
 - **Charms.** Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Sorcerer carries only one.
-- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a hex letter from a Pennsylvania Dutch powwow doctor, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual, is renewed between jobs, and doesn't count against a charm limit.
+- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a Himmelsbrief (heaven's letter) from a Pennsylvania German powwow doctor, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual, is renewed between jobs, and doesn't count against a charm limit.
 - **Attention.** Magic worked openly can mark a box of **The Dark**, and the Order of the Iron Cross hunts known practitioners.
+
+**The old country's magic.** German settlers brought theirs west with the wagons. **Braucher**, the powwow doctors of the Pennsylvania settlements, the Ohio valley and the Texas Hill Country, heal with charms whispered from Hohman's *Long Lost Friend* and never take pay. Soldiers sew **heaven's letters** into their coats against bullets. The *Sixth and Seventh Books of Moses*, a German grimoire, passes from hand to hand, prized by Hermeticists and hoodoo root doctors alike. And where there is a Braucher, there is a **Hexenmeister** who will curse for money.
 
 ### Hexes
 

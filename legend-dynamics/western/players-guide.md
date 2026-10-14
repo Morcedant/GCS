@@ -100,7 +100,7 @@ Spend all your Edges. Each one buys:
 | Extra Grit | Start every session with 3 Grit points instead of 2 | 1 |
 | A friend | A named contact who helps once per job | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
-| Talisman | A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a hex letter sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one. It's renewed between jobs and doesn't count against a charm limit. | 1 |
+| Talisman | A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a Himmelsbrief (a German heaven's letter) sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one. It's renewed between jobs and doesn't count against a charm limit. | 1 |
 
 ### Spending points
 
@@ -470,7 +470,7 @@ After a significant job, a magical character can take one of these **instead of 
 |---|---|
 | **Feel** | Gothic western: magic is slow, folk and feared. A gunfight is won by the charm you made last night, not the spell you cast now. |
 | **Hexes** | Sorcerers only: known Trained 2, Specialty 3, Expert 4. |
-| **Rituals** | Every Practitioner, at their tradition's pace: ten minutes a roll; an hour for a Hermeticist. |
+| **Rituals** | Every Practitioner, at their tradition's pace: ten minutes a roll; an hour for a Hermeticist; a minute for a Braucher's healing charm. |
 | **Charms** | The heart of western magic. Practitioners carry Trained 2, Specialty 3, Expert 4; a Sorcerer, only one. |
 | **Price** | The Dark: a failed hex marks a box, and magic worked openly can mark one too. The Order of the Iron Cross hunts known practitioners. |
 
@@ -568,7 +568,7 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 ## Magic
 
-**Practitioners** work **rituals** in a tradition (see *Magic*): fill a clock with **Occult** rolls at your tradition's pace, usually ten minutes a roll, an hour for a Hermeticist. Most western magic is slow, so practitioners prepare: a finished ritual stored as a **charm** is how a practitioner keeps up in a gunfight.
+**Practitioners** work **rituals** in a tradition (see *Magic*): fill a clock with **Occult** rolls at your tradition's pace, usually ten minutes a roll, an hour for a Hermeticist, a minute for a Braucher's healing charm. Most western magic is slow, so practitioners prepare: a finished ritual stored as a **charm** is how a practitioner keeps up in a gunfight.
 
 | Weight | Segments | For example |
 |---|---|---|
@@ -578,8 +578,10 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 - **Trappings.** The right materials (grave dirt, silver, a lock of hair, the hour of midnight) remove one segment.
 - **Charms.** Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Sorcerer carries only one.
-- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a hex letter from a Pennsylvania Dutch powwow doctor, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual, is renewed between jobs, and doesn't count against a charm limit.
+- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a Himmelsbrief (heaven's letter) from a Pennsylvania German powwow doctor, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual, is renewed between jobs, and doesn't count against a charm limit.
 - **Attention.** Magic worked openly can mark a box of **The Dark**, and the Order of the Iron Cross hunts known practitioners.
+
+**The old country's magic.** German settlers brought theirs west with the wagons. **Braucher**, the powwow doctors of the Pennsylvania settlements, the Ohio valley and the Texas Hill Country, heal with charms whispered from Hohman's *Long Lost Friend* and never take pay. Soldiers sew **heaven's letters** into their coats against bullets. The *Sixth and Seventh Books of Moses*, a German grimoire, passes from hand to hand, prized by Hermeticists and hoodoo root doctors alike. And where there is a Braucher, there is a **Hexenmeister** who will curse for money.
 
 ### Hexes
 
@@ -889,7 +891,7 @@ Child of a vampire and a living mother. You walk in daylight, you heal fast, and
 
 *Tier 2 · 1 Edge · Body −1, Intellect +1, Presence −1, Will +1*
 
-A human who works real magic in a tradition: alchemy, witchcraft, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.
+A human who works real magic in a tradition: alchemy, witchcraft, Pennsylvania German powwow, the old hermetic arts or worse. Preachers call it devilry, and monster hunters keep a list.
 
 **Origin rules:**
 
@@ -902,9 +904,10 @@ A human who works real magic in a tradition: alchemy, witchcraft, the old hermet
 | Advantage | Effect | Companion complication |
 |---|---|---|
 | Alchemist | Brews elixirs, poisons and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing; elixirs keep until the end of the day (a week on success by 5+). | **Price of the Work.** Your craft feeds a vice: greed, drink or worse. Accept it when it bites. |
-| Hermeticist | Ritual magic from grimoires, circles and sigils: wards, bindings, divination. An hour per roll, and it needs books. +2 to Occult for wards and bindings. | **Obsession: Forbidden Knowledge.** A grimoire or a secret tempts you beyond sense. Accept the risk to get it. |
+| Hermeticist | Ritual magic from grimoires, circles and sigils (the Key of Solomon, the German Sixth and Seventh Books of Moses): wards, bindings, divination. An hour per roll, and it needs books. +2 to Occult for wards and bindings. | **Obsession: Forbidden Knowledge.** A grimoire or a secret tempts you beyond sense. Accept the risk to get it. |
 | Witch | Curses and hexes worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link. | **Witch's Name.** People whisper, and the righteous listen. Accept the suspicion, or the mob. |
 | Cunning Folk | Charms, cards, tokens and folk remedies: small, quick magic. +2 to Occult for charms and fortune-telling. | **Old Superstitions.** Your charms demand their rituals. Accept the delay or the odd behavior they require. |
+| Braucher | Pennsylvania German powwow (Brauche): healing and protection by whispered charms, the sign of the cross and Hohman's Long Lost Friend. A minute a roll, not ten, for a charm spoken over a wound, a burn or a sick child. +2 to Occult to heal, and to ward a person, house or barn against fire, theft, bullets and hexes. | **Never for Pay.** The gift fails if you ask for money, and the old rule says to teach it only to someone of the other sex. Accept the gift you can't refuse or the debt you can't collect. |
 | Spiritualist | Séances and trances that speak with the dead. +2 to Occult to call or question a spirit. | **The Dead Follow You.** Restless spirits find you. Accept the haunting at a bad moment. |
 | Necromancer | Commands the dead: wake a corpse to answer questions, or to fight for a scene (a minor zombie). +2 to Occult over corpses and the undead. | **Grave-Robber.** Your work needs bodies, and people notice. Accept the Heat, the Whispers or the grieving family. |
 | Sorcerer | Casts hexes: quick spells in one action and an Occult roll, shaped by one or two paths agreed with the GM (fire and force, say). Known: Trained 2, Specialty 3, Expert 4. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it. |
