@@ -4071,7 +4071,9 @@ function resolveAttack(input, hooks, roll) {
   const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && dmg && dmg.boxes <= t.maxBoxes);
   if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null };
   // Published armour (setting data): e.g. a mail shirt, "hits of 2 or more boxes mark one fewer, once per fight".
-  const armour = liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1));
+  // Armour can say what it works against: "melee", "missile" (bows, slings, thrown) or "firearm". No list: everything.
+  const kind = weapon.firearm ? "firearm" : weapon.reach === "melee" ? "melee" : "missile";
+  const armour = liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1) && (!t.against || t.against.includes(kind)));
   if (armour) { dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - (armour.reduce || 1)) }; out.armorUsed = armour.label || "Armour"; }
   if (!dmg.boxes) return { ...out, outcome: `hit, stopped by ${out.armorUsed}`, hit: true, damage: null };
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
@@ -4139,6 +4141,13 @@ const EXPERIMENTS = [
     flags: ["dodgeEveryAttack"],
   },
   {
+    id: "labProtection", scope: "setting", label: "Test protection",
+    summary: "Protective gear from this setting's test configuration (a heavy coat, say), which the GM can put on anyone in the encounter.",
+    params: {},
+    /** The test configuration's protection items. */
+    protection: (/** @type {any} */ lab) => (lab && lab.protection) || [],
+  },
+  {
     id: "labWeaponTraits", scope: "setting", label: "Test weapon traits",
     summary: "Apply the accuracy traits in this setting's test configuration (by range, ammunition, fire mode, or after aiming).",
     params: { weaponTraits: {} }, // filled from the setting's test configuration; edited in the lab and logged with every attack
@@ -4175,7 +4184,7 @@ function available(setting, lab) {
  */
 function buildRules(config, weapons, lab) {
   const rules = { config: config.id, label: config.label, kind: config.kind, hooks: { attackModifiers: [], dodgeModifiers: [] }, actions: new Set(), flags: new Set(),
-    defenses: /** @type {Record<string, any>} */ ({}), weapons, active: [] };
+    defenses: /** @type {Record<string, any>} */ ({}), protection: /** @type {any[]} */ ([]), weapons, active: [] };
   if (config.kind !== "lab") return rules;
   for (const x of available(config.setting, lab)) {
     const st = config.experiments[x.id];
@@ -4186,6 +4195,7 @@ function buildRules(config, weapons, lab) {
     for (const a of x.actions || []) rules.actions.add(a);
     for (const f of x.flags || []) rules.flags.add(f);
     if (x.defense) rules.defenses[x.defense] = p;
+    if (x.protection) rules.protection = x.protection(lab);
     if (x.weapons) rules.weapons = x.weapons(rules.weapons, lab, p);
     rules.active.push({ id: x.id, scope: x.scope, label: x.label, params: p });
   }
@@ -4474,6 +4484,15 @@ function setTrait(enc, pid, i, on) {
   return { event: log(enc, "trait", { pid, name: p.name, trait: p.traits[i].label || p.traits[i].type, on }) };
 }
 
+/** Put protective gear on a participant (its traits join theirs). @param {any} enc @param {string} pid @param {{ id: string, name: string, traits: any[] }} item */
+function addGear(enc, pid, item) {
+  const p = find(enc, pid); if (!p || !item) return { error: "Choose the gear." };
+  if ((p.gear || []).includes(item.id)) return { error: `${p.name} already has ${item.name}.` };
+  p.gear = [...(p.gear || []), item.id];
+  p.traits = [...(p.traits || []), ...clone(item.traits)];
+  return { event: log(enc, "gear", { pid, name: p.name, item: item.name, on: true }) };
+}
+
 /** A complication comes into play; accepting it earns a Legend point. @param {any} enc @param {string} pid @param {string} note */
 function invokeComplication(enc, pid, note) {
   const p = find(enc, pid); if (!p) return { error: "Whose complication?" };
@@ -4569,7 +4588,7 @@ function replay(enc, rules, core, config) {
   return { encounter: r };
 }
 
-return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, defenseOptions, chooseDefense, attack, spendPoint, setTrait, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
+return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, defenseOptions, chooseDefense, attack, spendPoint, setTrait, addGear, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
 })();
   const LAB_STATS = (() => {
 /**
@@ -4858,6 +4877,7 @@ function mountLab(api) {
     if (document.activeElement !== $("lab-name")) $("lab-name").value = en.name;
     if (document.activeElement !== $("lab-seed")) $("lab-seed").value = en.seed ?? "";
     const act = E.active(en), list = en.status === "setup" ? en.participants : en.order.map((/** @type {string} */ pid) => E.find(en, pid));
+    const gearList = [...PROT, ...(rules().protection || [])]; // published gear, plus test gear when its experiment is on
     $("lab-people").innerHTML = list.length ? list.map((/** @type {any} */ p) => {
       const out = E.isOut(p), inj = Math.min(p.injury, 3);
       return `<div class="lab-p ${act && act.pid === p.pid ? "active" : ""} ${out ? "out" : ""}">
@@ -4874,6 +4894,7 @@ function mountLab(api) {
           ${(p.traits || []).map((/** @type {any} */ t, /** @type {number} */ i) => t.type === "shield" ? "" : t.type === "armor" ? ` · ${esc(t.label)}${t.used ? " (used)" : ""}` : t.toggle ? ` · <button class="linkish" data-trait="${p.pid}" data-i="${i}" title="Switch on or off">${esc(t.label)}: ${t.on === false ? "off" : "on"}</button>` : ` · ${esc(t.label || t.type)}`).join("")}
           ${p.aim ? ` · <b>aiming at ${esc((E.find(en, p.aim.target) || {}).name || "?")}</b>` : ""}
           ${p.conditions.map((/** @type {string} */ c) => ` · <button class="linkish" data-cond-rm="${p.pid}" data-c="${esc(c)}" title="Remove">${esc(c)} ×</button>`).join("")}
+          ${(() => { const can = gearList.filter((/** @type {any} */ g) => !(p.gear || []).includes(g.id) && true); return can.length && en.status !== "ended" ? ` · <select class="lab-mini" style="width:auto" data-gear="${p.pid}" aria-label="Give ${esc(p.name)} protective gear"><option value="">+ Gear</option>${can.map((/** @type {any} */ g) => `<option value="${g.id}" title="${esc(g.text || "")}">${esc(g.name)}</option>`).join("")}</select>` : ""; })()}
           ${p.note ? `<br><span class="muted">${esc(p.note)}</span>` : ""}</span></div>`;
     }).join("") : `<p class="small muted">Add characters and opponents.</p>`;
     $("lab-start").hidden = en.status !== "setup";
@@ -4891,6 +4912,13 @@ function mountLab(api) {
     else if (d.trait) { const p = E.find(en, d.trait); E.setTrait(en, d.trait, +d.i, p.traits[+d.i].on === false); }
     else return;
     pushToCards(); save(); renderAll();
+  });
+  $("lab-people").addEventListener("change", (/** @type {any} */ e) => {
+    const sel = e.target.closest("[data-gear]"), en = enc(); if (!sel || !en || !sel.value) return;
+    const item = [...PROT, ...(rules().protection || [])].find((/** @type {any} */ g) => g.id === sel.value);
+    const res = E.addGear(en, sel.dataset.gear, item);
+    if (res.error) { say(res.error, true); return; }
+    save(); renderAll();
   });
   $("lab-start").onclick = () => {
     const en = enc(); if (!en || en.participants.length < 2) { say("Add at least two participants.", true); return; }
@@ -5079,6 +5107,7 @@ function mountLab(api) {
       case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}`;
       case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation" }[e.use] || e.use)}${e.note ? ` (${esc(e.note)})` : ""}.`;
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
+      case "gear": return `${esc(e.name)} puts on ${esc(e.item)}.`;
       case "trait": return `${esc(e.name)}: ${esc(e.trait)} ${e.on ? "on" : "off"}.`;
       case "condition": return `${esc(e.name)}: ${e.on ? "+" : "−"} ${esc(e.condition)}.`;
       case "override": {

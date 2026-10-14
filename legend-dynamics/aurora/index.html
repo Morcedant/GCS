@@ -5031,7 +5031,9 @@ function resolveAttack(input, hooks, roll) {
   const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && dmg && dmg.boxes <= t.maxBoxes);
   if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null };
   // Published armour (setting data): e.g. a mail shirt, "hits of 2 or more boxes mark one fewer, once per fight".
-  const armour = liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1));
+  // Armour can say what it works against: "melee", "missile" (bows, slings, thrown) or "firearm". No list: everything.
+  const kind = weapon.firearm ? "firearm" : weapon.reach === "melee" ? "melee" : "missile";
+  const armour = liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1) && (!t.against || t.against.includes(kind)));
   if (armour) { dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - (armour.reduce || 1)) }; out.armorUsed = armour.label || "Armour"; }
   if (!dmg.boxes) return { ...out, outcome: `hit, stopped by ${out.armorUsed}`, hit: true, damage: null };
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };

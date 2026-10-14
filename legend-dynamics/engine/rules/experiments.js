@@ -57,6 +57,13 @@ export const EXPERIMENTS = [
     flags: ["dodgeEveryAttack"],
   },
   {
+    id: "labProtection", scope: "setting", label: "Test protection",
+    summary: "Protective gear from this setting's test configuration (a heavy coat, say), which the GM can put on anyone in the encounter.",
+    params: {},
+    /** The test configuration's protection items. */
+    protection: (/** @type {any} */ lab) => (lab && lab.protection) || [],
+  },
+  {
     id: "labWeaponTraits", scope: "setting", label: "Test weapon traits",
     summary: "Apply the accuracy traits in this setting's test configuration (by range, ammunition, fire mode, or after aiming).",
     params: { weaponTraits: {} }, // filled from the setting's test configuration; edited in the lab and logged with every attack
@@ -93,7 +100,7 @@ export function available(setting, lab) {
  */
 export function buildRules(config, weapons, lab) {
   const rules = { config: config.id, label: config.label, kind: config.kind, hooks: { attackModifiers: [], dodgeModifiers: [] }, actions: new Set(), flags: new Set(),
-    defenses: /** @type {Record<string, any>} */ ({}), weapons, active: [] };
+    defenses: /** @type {Record<string, any>} */ ({}), protection: /** @type {any[]} */ ([]), weapons, active: [] };
   if (config.kind !== "lab") return rules;
   for (const x of available(config.setting, lab)) {
     const st = config.experiments[x.id];
@@ -104,6 +111,7 @@ export function buildRules(config, weapons, lab) {
     for (const a of x.actions || []) rules.actions.add(a);
     for (const f of x.flags || []) rules.flags.add(f);
     if (x.defense) rules.defenses[x.defense] = p;
+    if (x.protection) rules.protection = x.protection(lab);
     if (x.weapons) rules.weapons = x.weapons(rules.weapons, lab, p);
     rules.active.push({ id: x.id, scope: x.scope, label: x.label, params: p });
   }

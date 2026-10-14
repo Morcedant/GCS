@@ -278,6 +278,15 @@ export function setTrait(enc, pid, i, on) {
   return { event: log(enc, "trait", { pid, name: p.name, trait: p.traits[i].label || p.traits[i].type, on }) };
 }
 
+/** Put protective gear on a participant (its traits join theirs). @param {any} enc @param {string} pid @param {{ id: string, name: string, traits: any[] }} item */
+export function addGear(enc, pid, item) {
+  const p = find(enc, pid); if (!p || !item) return { error: "Choose the gear." };
+  if ((p.gear || []).includes(item.id)) return { error: `${p.name} already has ${item.name}.` };
+  p.gear = [...(p.gear || []), item.id];
+  p.traits = [...(p.traits || []), ...clone(item.traits)];
+  return { event: log(enc, "gear", { pid, name: p.name, item: item.name, on: true }) };
+}
+
 /** A complication comes into play; accepting it earns a Legend point. @param {any} enc @param {string} pid @param {string} note */
 export function invokeComplication(enc, pid, note) {
   const p = find(enc, pid); if (!p) return { error: "Whose complication?" };

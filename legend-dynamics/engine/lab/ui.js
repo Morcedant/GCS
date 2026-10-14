@@ -202,6 +202,7 @@ export function mountLab(api) {
     if (document.activeElement !== $("lab-name")) $("lab-name").value = en.name;
     if (document.activeElement !== $("lab-seed")) $("lab-seed").value = en.seed ?? "";
     const act = E.active(en), list = en.status === "setup" ? en.participants : en.order.map((/** @type {string} */ pid) => E.find(en, pid));
+    const gearList = [...PROT, ...(rules().protection || [])]; // published gear, plus test gear when its experiment is on
     $("lab-people").innerHTML = list.length ? list.map((/** @type {any} */ p) => {
       const out = E.isOut(p), inj = Math.min(p.injury, 3);
       return `<div class="lab-p ${act && act.pid === p.pid ? "active" : ""} ${out ? "out" : ""}">
@@ -218,6 +219,7 @@ export function mountLab(api) {
           ${(p.traits || []).map((/** @type {any} */ t, /** @type {number} */ i) => t.type === "shield" ? "" : t.type === "armor" ? ` · ${esc(t.label)}${t.used ? " (used)" : ""}` : t.toggle ? ` · <button class="linkish" data-trait="${p.pid}" data-i="${i}" title="Switch on or off">${esc(t.label)}: ${t.on === false ? "off" : "on"}</button>` : ` · ${esc(t.label || t.type)}`).join("")}
           ${p.aim ? ` · <b>aiming at ${esc((E.find(en, p.aim.target) || {}).name || "?")}</b>` : ""}
           ${p.conditions.map((/** @type {string} */ c) => ` · <button class="linkish" data-cond-rm="${p.pid}" data-c="${esc(c)}" title="Remove">${esc(c)} ×</button>`).join("")}
+          ${(() => { const can = gearList.filter((/** @type {any} */ g) => !(p.gear || []).includes(g.id) && true); return can.length && en.status !== "ended" ? ` · <select class="lab-mini" style="width:auto" data-gear="${p.pid}" aria-label="Give ${esc(p.name)} protective gear"><option value="">+ Gear</option>${can.map((/** @type {any} */ g) => `<option value="${g.id}" title="${esc(g.text || "")}">${esc(g.name)}</option>`).join("")}</select>` : ""; })()}
           ${p.note ? `<br><span class="muted">${esc(p.note)}</span>` : ""}</span></div>`;
     }).join("") : `<p class="small muted">Add characters and opponents.</p>`;
     $("lab-start").hidden = en.status !== "setup";
@@ -235,6 +237,13 @@ export function mountLab(api) {
     else if (d.trait) { const p = E.find(en, d.trait); E.setTrait(en, d.trait, +d.i, p.traits[+d.i].on === false); }
     else return;
     pushToCards(); save(); renderAll();
+  });
+  $("lab-people").addEventListener("change", (/** @type {any} */ e) => {
+    const sel = e.target.closest("[data-gear]"), en = enc(); if (!sel || !en || !sel.value) return;
+    const item = [...PROT, ...(rules().protection || [])].find((/** @type {any} */ g) => g.id === sel.value);
+    const res = E.addGear(en, sel.dataset.gear, item);
+    if (res.error) { say(res.error, true); return; }
+    save(); renderAll();
   });
   $("lab-start").onclick = () => {
     const en = enc(); if (!en || en.participants.length < 2) { say("Add at least two participants.", true); return; }
@@ -423,6 +432,7 @@ export function mountLab(api) {
       case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}`;
       case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation" }[e.use] || e.use)}${e.note ? ` (${esc(e.note)})` : ""}.`;
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
+      case "gear": return `${esc(e.name)} puts on ${esc(e.item)}.`;
       case "trait": return `${esc(e.name)}: ${esc(e.trait)} ${e.on ? "on" : "off"}.`;
       case "condition": return `${esc(e.name)}: ${e.on ? "+" : "−"} ${esc(e.condition)}.`;
       case "override": {

@@ -220,3 +220,20 @@ test("Parry, Block, shield and mail", () => {
   assert.equal(hits[1].armorUsed, null, "once per fight"); assert.equal(hits[1].damage, 2);
   assert.equal(S.summarize(enc2).armorStops, 1);
 });
+
+test("Heavy coat (D&D test gear): turns blades and claws, not bullets, once a fight; mail still stops everything", () => {
+  const cfg = X.newLabConfig("western", lab); cfg.experiments.labProtection.on = true;
+  const r = rulesFor(cfg);
+  assert.equal(r.protection[0].id, "coat");
+  assert.equal(rulesFor(X.PUBLISHED).protection.length, 0, "no test gear under the published rules");
+  const one = (weapon) => {
+    const enc = setup(cfg, 21); E.startCombat(enc, r);
+    E.addGear(enc, "p1", r.protection[0]);
+    for (let i = 0; i < 40; i++) { const ev = E.attack(enc, r, LD, { attacker: "p2", defender: "p1", weapon, band: weapon === "revolver" ? "close" : "melee", canDodge: false }).event; if (ev.hit && ev.damage !== undefined) return ev; }
+  };
+  const claw = one("claws"), gun = one("revolver");
+  assert.equal(claw.armorUsed, "Heavy coat"); assert.equal(claw.damage, 1);
+  assert.equal(gun.armorUsed, null, "a coat doesn't stop a bullet"); assert.equal(gun.damage, 2);
+  assert.equal(LD.resolveAttack({ attacker: { id: "a", name: "A", skillTarget: 14 }, defender: { id: "d", name: "D", dodgeBase: null, canDodge: false, traits: [{ type: "armor", minBoxes: 2, reduce: 1, label: "Mail" }] },
+    weapon: { id: "g", firearm: true, band: "close", damage: { any: { boxes: 2 } } }, band: "close" }, LD.NO_HOOKS, () => [3, 3, 3]).armorUsed, "Mail", "no 'against': everything");
+});
