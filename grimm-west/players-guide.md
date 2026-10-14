@@ -532,7 +532,15 @@ Apothecary treats what Medicine can't: Wesen poisons, curses, magical sickness a
 
 ## Natural recovery
 
-Each **two full days of rest** clear one injury box. Rest means no riding, no fighting, nothing strenuous. At three boxes, rest alone clears nothing: treatment must clear the first box.
+Rest clears injury one box at a time, and the worse you're hurt, the longer each box takes. Rest means no riding, no fighting, nothing strenuous.
+
+| Boxes marked | Rest to clear one box |
+|---|---|
+| 1 | A full day |
+| 2 | At least three days |
+| 3 | A week, and only in someone's care |
+
+At three boxes, rest alone does nothing until someone has stabilized or treated you; after that, a week of rest in their care clears the first box. A doctor's treatment is faster. The times add up: from three boxes, rest alone takes about a week and a half to heal completely (a week, then three days, then a day).
 
 # Grit points and Trouble
 
@@ -977,7 +985,7 @@ A descendant of the old hunters, the Decapitare: stronger and faster than ordina
 |---|---|---|
 | Danger Sense | Ability: when an ambush or trap threatens you, the GM secretly rolls your Intellect; success warns you in time to act. | **Nightmares.** The dead you've seen come back at night. Accept the lost sleep at a bad time. |
 | Iron Bones | Ability: each hit that marks 2 or more boxes marks one fewer (never below 1). | **Fanaticism.** Wesen must die. Accept the trouble when mercy would be wiser. |
-| Quick to Heal | Ability: rest clears a box every day, not every two, and works even at three boxes. | **Workaholic.** You won't rest when there's a case. Accept the strain. |
+| Quick to Heal | Ability: each day of rest clears a box, however hurt you are, and rest works at three boxes even with nobody tending you. | **Workaholic.** You won't rest when there's a case. Accept the strain. |
 | Hardy | +2 to Body to resist poison, disease and exhaustion. | **Stubbornness.** You won't back down. Accept the cost. |
 | Gunslinger | +2 to Shooting with a pistol at close range, with no need to aim. | **Bad Temper.** Accept the fight you start. |
 | Perfect Balance | +2 to Athletics and Melee to keep your feet or fight on bad ground. | **Curious.** Accept the risk your curiosity brings. |
@@ -1052,7 +1060,7 @@ Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror camp
 
 - Hunger (horror): each month you must eat human flesh; until you do, mark a box that rest can't clear, every day.
 
-**Woge profile:** Body +2; Huge strength: fists and fangs mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Feels no pain: ignore the Wounded penalty; Heals fast: rest clears a box every day; Dark sight.
+**Woge profile:** Body +2; Huge strength: fists and fangs mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Feels no pain: ignore the Wounded penalty; Heals fast: each day of rest clears a box, however hurt you are; Dark sight.
 
 **Suggested skills:** Brawling, Melee, Athletics, Shooting.
 
@@ -1263,7 +1271,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Guns:** derringer 2, revolver 6, shotgun 2, rifle 15. Reload: one action. Natural 18 jams.
 
-**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). A surgery gives +2 and clears 2 (3 on margin 5+). Rest: one box per two days, not from three.
+**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). A surgery gives +2 and clears 2 (3 on margin 5+). Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone's care).
 
 **Woge:** free action for a Wesen; a forced woge on a failed Will roll. The woge profile's bonuses apply while woged. Grimms see woge under strong emotion. A full woge before townsfolk marks Exposure (2 boxes at Tier 3).
 

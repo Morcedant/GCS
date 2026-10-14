@@ -118,7 +118,7 @@
      "desc": "Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror campaigns only.",
      "core": ["Hunger (horror): each month you must eat human flesh; until you do, mark a box that rest can't clear, every day."],
      "skills": ["Brawling", "Melee", "Athletics", "Shooting"],
-     "woge": {"attrs": {"Body": 2}, "dodge": 0, "traits": ["Huge strength: fists and fangs mark 2 boxes", "Tough: hits of 2+ boxes mark one fewer", "Feels no pain: ignore the Wounded penalty", "Heals fast: rest clears a box every day", "Dark sight"], "drawbacks": []},
+     "woge": {"attrs": {"Body": 2}, "dodge": 0, "traits": ["Huge strength: fists and fangs mark 2 boxes", "Tough: hits of 2+ boxes mark one fewer", "Feels no pain: ignore the Wounded penalty", "Heals fast: each day of rest clears a box, however hurt you are", "Dark sight"], "drawbacks": []},
      "traits": [
        ["n-brute", "Brute Strength", "+2 to Athletics to lift, break or hold.", "Athletics", true, "Greed", "Riches are hard to refuse. Accept the bribe's strings or the risk of taking more."],
        ["n-cook", "Butcher's Hands", "+2 to Melee with a cleaver, axe or knife.", "Melee", true, "Proud", "You won't be slighted. Accept the fight your pride starts."]
@@ -140,7 +140,7 @@
      "traits": [
        ["g-danger", "Danger Sense", "Ability: when an ambush or trap threatens you, the GM secretly rolls your Intellect; success warns you in time to act.", "Intellect", false, "Nightmares", "The dead you've seen come back at night. Accept the lost sleep at a bad time."],
        ["g-iron", "Iron Bones", "Ability: each hit that marks 2 or more boxes marks one fewer (never below 1).", "", false, "Fanaticism", "Wesen must die. Accept the trouble when mercy would be wiser."],
-       ["g-heal", "Quick to Heal", "Ability: rest clears a box every day, not every two, and works even at three boxes.", "", false, "Workaholic", "You won't rest when there's a case. Accept the strain."],
+       ["g-heal", "Quick to Heal", "Ability: each day of rest clears a box, however hurt you are, and rest works at three boxes even with nobody tending you.", "", false, "Workaholic", "You won't rest when there's a case. Accept the strain."],
        ["g-hardy", "Hardy", "+2 to Body to resist poison, disease and exhaustion.", "Body", true, "Stubbornness", "You won't back down. Accept the cost."],
        ["g-gun", "Gunslinger", "+2 to Shooting with a pistol at close range, with no need to aim.", "Shooting", true, "Bad Temper", "Accept the fight you start."],
        ["g-balance", "Perfect Balance", "+2 to Athletics and Melee to keep your feet or fight on bad ground.", "Athletics", true, "Curious", "Accept the risk your curiosity brings."],
