@@ -5,7 +5,7 @@ import * as X from "../experiments.js";
 
 const weapons = { revolver: { id: "revolver", name: "Revolver", band: "close", damage: { any: { boxes: 2 } }, traits: [] },
   shotgun: { id: "shotgun", name: "Shotgun", band: "short", maxBand: "short", damage: { close: { boxes: 3, dying: true }, short: { boxes: 1 } }, traits: [] } };
-const lab = { label: "Pact of Bones Test", experiments: ["labWeaponTraits"], weaponTraits: { shotgun: [{ type: "accuracy", value: 1, bands: ["close"], requires: { ammo: "shot" }, label: "Scattershot" }] } };
+const lab = { label: "Trails of Blood & Dust Test", experiments: ["labWeaponTraits"], weaponTraits: { shotgun: [{ type: "accuracy", value: 1, bands: ["close"], requires: { ammo: "shot" }, label: "Scattershot" }] } };
 const allDice = [];
 for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) for (let c = 1; c <= 6; c++) allDice.push([a, b, c]);
 const att = (t) => ({ id: "a", name: "A", skill: "Shooting", skillTarget: t });

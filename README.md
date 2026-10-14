@@ -5,7 +5,7 @@ GCS Templates: character creators, players' guides and Discord dice bots for 3d6
 |---|---|---|
 | USS Pelion | `uss-pelion/`, `discord-bot/` | Star Trek, campaign year 2268 |
 | Grimm | `grimm-west/` | Gothic horror in the Grimm-verse, the late 1800s |
-| **Legend Dynamics** | `legend-dynamics/`, `legend-dynamics/discord-bot/` | The original, setting-neutral system: core rules plus the Pact of Bones (Gothic Western), Fracture Lines (space opera) and The Shattered Crown (sword and sorcery) packs, and one dice bot for every game here |
+| **Legend Dynamics** | `legend-dynamics/`, `legend-dynamics/discord-bot/` | The original, setting-neutral system: core rules plus the Trails of Blood & Dust (Gothic Western), Fracture Lines (space opera) and The Shattered Crown (sword and sorcery) packs, and one dice bot for every game here |
 
 All of them share the same rules engine. **Legend Dynamics** (`legend-dynamics/README.md`) is that engine made original and
 setting-neutral, with setting packs built from data: start new genres there. To start another variant, copy one game's folder and change its data

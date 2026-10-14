@@ -1,12 +1,12 @@
 ---
-title: "Pact of Bones Players' Guide"
+title: "Trails of Blood & Dust Players' Guide"
 subtitle: "A Gothic Western for the Legend Dynamics RPG system"
 author: "Don Smallwood"
 ---
 
-The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. *Pact of Bones* is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.
+The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. *Trails of Blood & Dust* is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.
 
-Pact of Bones is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.
+Trails of Blood & Dust is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.
 
 ## The rule to remember
 
@@ -16,7 +16,7 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Pact of Bones** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Trails of Blood & Dust** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**.
 
 # Create your character
 
@@ -315,9 +315,9 @@ Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for f
 
 Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage.
 
-### Fighting in Pact of Bones
+### Fighting in Trails of Blood & Dust
 
-Pact of Bones adds these to the attack and defense rules above.
+Trails of Blood & Dust adds these to the attack and defense rules above.
 
 - **Bare hands against claws.** Out West you can parry claws and fangs bare-handed too, not just fists: Brawling −3.
 - **Shields.** A real shield is rare out West: a hide shield or an iron-bound buckler gives +1 to Block. Anything at hand stands in: a chair, a wooden slat, a crate lid, a saddle.
@@ -485,7 +485,7 @@ After a significant job, a magical character can take one of these **instead of 
 | Quicker hand | One ritual you know goes one pace faster: an hour becomes ten minutes, ten minutes one action | Each ritual once |
 | Master of the tradition | Occult becomes Expert (+5) | Once, at the end of a long campaign |
 
-## Magic in Pact of Bones
+## Magic in Trails of Blood & Dust
 
 |  | How it works here |
 |---|---|
