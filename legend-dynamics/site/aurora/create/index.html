@@ -703,6 +703,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide" id="contact-wrap" hidden><label for="f-contact">A friend (Edge)</label><input type="text" id="f-contact" placeholder="Who, and what they can do for you"></div>
             <div class="field" id="gear-wrap" hidden><label for="f-gearitem">Fine weapon or tool (Edge)</label><input type="text" id="f-gearitem" placeholder="e.g. An heirloom weapon"></div>
             <div class="field" id="gearskill-wrap" hidden><label for="f-gearskill">+2 to</label><select id="f-gearskill"></select></div>
+            <div id="xedge-fields" style="display:contents"></div>
             <div class="field wide"><label for="f-otherequip">Other gear</label><input type="text" id="f-otherequip" placeholder="Anything else you carry"></div>
             <div class="field wide"><label for="f-connection">Connection to another character</label>
               <select id="f-connpick" aria-label="Quick pick a connection"></select>
@@ -4811,6 +4812,8 @@ tr.lvl-U td.target { color: var(--muted); }
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a fine kit: +2 to one skill when it's used.", 1],
     ...(PACK.extraEdges || []), // a setting's own Edges, e.g. Stronger Power
   ];
+  // A setting's Edges whose fifth entry asks for a description: { label, placeholder, missing, sheetNote }.
+  const XEDGE_NOTES = (PACK.extraEdges || []).filter((x) => x[4] && x[4].label);
   const ALLEGIANCES = [["", "None", "", ""], ...PACK.allegiances];
   // Optional: spells a caster picks (how many depends on their training in the spell skill), and a
   // personal track every character keeps on their sheet (e.g. Corruption).
@@ -4868,7 +4871,7 @@ tr.lvl-U td.target { color: var(--muted); }
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
-      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" },
+      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" }, edgeNotes: {},
       allegiance: "", customTier: 1,
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "",
@@ -4918,6 +4921,8 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!ALLEGIANCES.some((a) => a[0] === out.allegiance)) out.allegiance = "";
     out.customTier = [0, 1, 2, 3].includes(+out.customTier) ? +out.customTier : 1;
     if (typeof out.contact !== "string") out.contact = "";
+    // A setting's own Edges can ask for a short description (which talisman, which heirloom): kept per Edge.
+    out.edgeNotes = Object.fromEntries(Object.entries(out.edgeNotes && typeof out.edgeNotes === "object" ? out.edgeNotes : {}).filter(([, v]) => typeof v === "string"));
     if (!SPECIES.some((x) => x[0] === out.speciesId) && out.speciesId !== "custom") out.speciesId = SPECIES[0][0];
     // Heritage advantages that no longer exist for this heritage are cleared, so the checklist asks again.
     if (out.sadv.id && out.sadv.id !== "custom" && !(SPECIES_TRAITS[out.speciesId] || []).some((t) => t[0] === out.sadv.id)) out.sadv.id = "";
@@ -5085,7 +5090,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const compOk = ch.comp.id && (ch.comp.id !== "custom" || (ch.comp.name.trim() && ch.comp.text.trim()));
     const POOL = pool(), ea = edgesAvail(), es = edgesSpent();
     const edgeNeeds = [edgeN("adv2") && !ch.adv2.id ? "choose the second advantage" : "", edgeN("adv2") && ADVANTAGES.find((a) => a[0] === ch.adv2.id)?.[4] && !ch.adv2.detail.trim() ? "finish the second advantage" : "",
-      edgeN("contact") && !ch.contact.trim() ? "name your friend" : "", edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill) ? "describe the fine weapon or tool and its skill" : ""].filter(Boolean);
+      edgeN("contact") && !ch.contact.trim() ? "name your friend" : "",
+      ...XEDGE_NOTES.filter(([k]) => edgeN(k) && !(ch.edgeNotes[k] || "").trim()).map(([, , , , d]) => d.missing || "describe " + d.label.toLowerCase()), edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill) ? "describe the fine weapon or tool and its skill" : ""].filter(Boolean);
     const horrorOff = heritageOf()?.restricted && !horrorOn();
     return [
       [!!ch.name.trim(), ch.name.trim() ? "Name entered" : "Enter a name"],
@@ -5261,6 +5267,13 @@ tr.lvl-U td.target { color: var(--muted); }
     if (a2 && a2[4]) $("adv2-detail-label").textContent = a2[4];
     $("adv2-desc").textContent = a2 ? a2[2] : "Any general advantage. It brings no extra complication.";
     $("contact-wrap").hidden = !edgeN("contact");
+    // Fields for a setting's own Edges that need a description.
+    const xf = XEDGE_NOTES.filter(([k]) => edgeN(k)), xsig = xf.map(([k]) => k).join();
+    if ($("xedge-fields").dataset.sig !== xsig) {
+      $("xedge-fields").dataset.sig = xsig;
+      $("xedge-fields").innerHTML = xf.map(([k, , , , d]) => `<div class="field wide"><label for="f-xedge-${k}">${esc(d.label)} (Edge)</label><input type="text" id="f-xedge-${k}" data-xedge="${k}" placeholder="${esc(d.placeholder || "")}"></div>`).join("");
+    }
+    xf.forEach(([k]) => { const el = $("f-xedge-" + k); if (el && document.activeElement !== el) el.value = ch.edgeNotes[k] || ""; });
     $("gear-wrap").hidden = $("gearskill-wrap").hidden = !edgeN("gear");
     $("f-gearskill").value = ch.gear.skill;
     const al = ALLEGIANCES.find((a) => a[0] === ch.allegiance) || ALLEGIANCES[0];
@@ -5413,6 +5426,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ed.length ? `<div class="field"><span class="label">Edges</span><span>${esc(ed.join(", "))}</span></div>` : ""}
         ${a2 && edgeN("adv2") ? `<div class="field"><span class="label">Second advantage</span><b>${esc(a2[1])}${ch.adv2.detail ? ": " + esc(ch.adv2.detail) : ""}</b><span class="small muted">${esc(a2[2])}</span></div>` : ""}
         ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">A friend</span><span>${esc(ch.contact)}</span></div>` : ""}
+        ${XEDGE_NOTES.filter(([k]) => edgeN(k) && ch.edgeNotes[k]).map(([k, n, , , d]) => `<div class="field wide"><span class="label">${esc(n)}</span><span>${esc(ch.edgeNotes[k])}${d.sheetNote ? ` <span class="small muted">(${esc(d.sheetNote)})</span>` : ""}</span></div>`).join("")}
         ${POWERS && allPowers().length ? `<div class="field wide"><span class="label">${POWERS.plural}</span><span>${allPowers().map((x) => `<b>${esc(powerDef(x.id)[1])} (Class ${x.cl}${isPure() && x.id === SPELLS.power ? ", pure sorcery" : ""}):</b> ${esc(isPure() && x.id === SPELLS.power ? `Know ${spellsKnown()} ${SPELLS.plural.toLowerCase()}, each working at ${SPELLS.tiers ? "the " + SPELLS.tiers[casterTier()] + " (Class " + x.cl + ")" : "Class " + x.cl}.` : powerEffect(x.id, x.cl))}`).join("<br>")}</span></div>` : ""}
         ${STATUSES && ch.status ? (() => { const st = STATUSES.find((x) => x[0] === ch.status); return `<div class="field"><span class="label">${esc(PACK.statusLabel || "Status")}: ${esc(st[1])}</span><span class="small">${esc(st[2])}</span><span class="small muted">${esc(st[3])}</span></div>`; })() : ""}
         ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([k, n, eff]) => { const t = spellTier(k); return `<b>${esc(n)}${t >= 0 ? ` (${SPELLS.tiers[t]}, ${boostText(t)})` : ""}:</b> ${esc(eff)}`; }).join("<br>")}${SPELLS.tiers ? `<br><span class="small muted">${helpBtn("boost")} Boosts, chosen as you cast, each −1 to the roll: Harder (+1 box or −1 more), Wider (a handful, then a crowd), Longer (a day, then until lifted), Farther (one range band).</span>` : ""}</span></div>` : ""}
@@ -5692,6 +5706,7 @@ tr.lvl-U td.target { color: var(--muted); }
       "f-gearitem": ["gear", "item"], "f-adv2detail": ["adv2", "detail"],
       "f-sadvname": ["sadv", "name"], "f-sadvtext": ["sadv", "text"], "f-scompname": ["sadv", "compName"], "f-scomptext": ["sadv", "compText"] }[id];
     if (sub) { ch[sub[0]][sub[1]] = e.target.value; touch(); render(); return; }
+    if (e.target.dataset && e.target.dataset.xedge) { ch.edgeNotes[e.target.dataset.xedge] = e.target.value; touch(); render(); return; }
     if (id === "f-ma-heart" || id === "f-ma-quick") { ch.magic[id === "f-ma-heart" ? "heart" : "quicker"] = e.target.value; touch(); render(); }
   });
   document.addEventListener("change", (e) => {
