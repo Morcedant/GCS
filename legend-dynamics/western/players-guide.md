@@ -158,6 +158,7 @@ The GM can add others met in play (the creator's GM view has a **Campaign allegi
 | The Railroad | Once per job, a free ticket, a telegraph message on the company wire, or a word with a division boss. | Duty: the company expects you to protect its interests, even when they aren't right. |
 | A Cattle Baron | Once per job, money, horses or hired hands. | Duty: the baron's range wars become your fights. |
 | The U.S. Marshals | Once per job, a federal warrant, a posse sworn in on the spot, or a telegram to the district marshal. | Duty: the marshal sends you after federal fugitives, and the men you've jailed have friends. |
+| The Texas Rangers | Once per job, a Ranger company riding with you, a warrant good anywhere in Texas, or word from a frontier post. | Duty: the Captain sends you wherever Texas is in trouble, and the Rangers' hard reputation rides with you. |
 | A County Sheriff's Office | Once per job, a deputy's help, the county jail, or the county records and wanted posters. | Duty: the sheriff calls on you, and the county's feuds and elections become yours. |
 | A City Police Department | Once per job, a patrolman's help, a night in the cells for someone, or the station's files. | Duty: the captain gives the orders, and the department's graft follows you. |
 | The Pinkerton National Detective Agency | Once per job, an agency file on someone, an operative's help, or a client's money for the work. | Duty: the client comes first, even a railroad or a mine owner breaking a strike, and working folk hate the name. |
