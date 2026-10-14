@@ -95,6 +95,7 @@ Spend all your Edges. Each one buys:
 | A friend in town | A named contact who helps once per case | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one named skill when it's used | 1 |
 | Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2. | 1 |
+| Hard to put down | Once per fight, shrug off a telling hit's effect: you still take its boxes (see *Telling hits*) | 1 |
 
 ### Spending points
 
@@ -399,7 +400,29 @@ Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for f
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3. A Wesen in full woge often strikes that cleanly.
 - **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. **Careful Marksman** and **Hunter's Eye** add their +2 to this; a **Gunslinger** doesn't need to aim.
 
-Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage.
+Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage: a great hit decides *what* happens instead.
+
+## Telling hits
+
+A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.
+
+- **A telling hit** is an attack that succeeds by **5 or more**, or on a natural 3 or 4, and isn't stopped by a defense. The attacker picks **one effect** below and describes it. The weapon still marks its usual boxes.
+- **A called shot.** Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, an eye, a rope, a lock). If the attack hits at all, the effect happens, whatever the margin. **Careful Marksman** and **Hunter's Eye** cut this penalty by 1.
+- **Both ways.** Wesen, outlaws and worse land telling hits on characters too.
+
+| Effect | What happens |
+|---|---|
+| Disarm | The weapon or held item drops, or flies a few yards away |
+| Knock down | The target falls prone, or is driven back a few steps |
+| Pin | The target is held, tangled or pinned down: their next action goes to getting free |
+| Rattle | −2 to the target's next roll |
+| Break gear | A shield, weapon or tool breaks |
+| Open them up | The next attack on this target this round gets +2 |
+| Precise | You hit exactly what you aimed at: the lantern, the rope, the hand on the trigger |
+
+**Limits.** A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a Blutbad of its claws or knocks down a stagecoach, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.
+
+**Staying alive.** A character on the receiving end can shrug off a telling hit's effect with **Hard to put down** (once per fight) or by spending a Grit point. Either way, they still take the boxes.
 
 *Example:* a Blutbad in full woge claws at Deputy Ames and succeeds by 5. Ames hasn't defended yet this round: Dodge 11, −2 for the clean hit, needs a 9 or less. Ames has a saber in hand, so a parry is possible too: Melee 14 −3 −2 = 9, no better. Ames dodges. When the second Blutbad lunges before Ames's next turn, there's no defense left, unless Ames has Additional Defense.
 
@@ -521,6 +544,7 @@ Begin each session with two Grit points (three with True grit); unused points do
 |---|---|
 | Reroll your own roll | Declare after seeing the result but before its consequences. Keep the second result, even if worse. |
 | Reduce an injury by one box | Declare when a hit would mark boxes, before applying them. Does not prevent beheading or similar fates. |
+| Shrug off a telling hit | Cancel the effect an attacker picked against you; you still take the boxes. |
 | Establish a small preparation | Propose a plausible detail, such as having packed an extra reload. GM approval is required. |
 
 Gain one point when one of your complications creates a meaningful problem you accept, including a companion complication from a heritage advantage. You can decline the proposed complication without penalty.
@@ -1233,7 +1257,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Assistance:** success +1; success by 5 or more +2; 18 causes a complication. One assistant per roll.
 
-**Combat:** move plus one action. Hit → optional Dodge → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2).
+**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Telling hit (by 5+ or natural 3–4): the attacker picks an effect; called shot −2 (small target −4).
 
 **Damage:** fists, clubs, knives and arrows 1 box; guns, heavy blades and Wesen claws 2; a close-range shotgun or buffalo rifle 3 and Dying. A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
 
@@ -1245,4 +1269,4 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Rituals:** describe the effect; fill a clock of 2, 4 or 6 segments with Occult rolls at your Lens's pace. Trappings remove a segment. Charms: Trained 2, Specialty 3, Expert 4.
 
-**Grit:** start each session with two (three with True grit). Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.
+**Grit:** start each session with two (three with True grit). Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.

@@ -1050,6 +1050,11 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2.</td>
 <td>1</td>
 </tr>
+<tr class="even">
+<td>Hard to put down</td>
+<td>Once per fight, shrug off a telling hit’s effect: you still take its boxes (see <em>Telling hits</em>)</td>
+<td>1</td>
+</tr>
 </tbody>
 </table>
 <h3 id="g-spending-points">Spending points</h3>
@@ -1592,7 +1597,58 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Attack quality.</strong> A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3. A Wesen in full woge often strikes that cleanly.</li>
 <li><strong>Aim.</strong> Spend your action aiming at a target you can see: +1 to your next attack against it. <strong>Careful Marksman</strong> and <strong>Hunter’s Eye</strong> add their +2 to this; a <strong>Gunslinger</strong> doesn’t need to aim.</li>
 </ul>
-<p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage.</p>
+<p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage: a great hit decides <em>what</em> happens instead.</p>
+<h2 id="g-telling-hits">Telling hits</h2>
+<p>A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.</p>
+<ul>
+<li><strong>A telling hit</strong> is an attack that succeeds by <strong>5 or more</strong>, or on a natural 3 or 4, and isn’t stopped by a defense. The attacker picks <strong>one effect</strong> below and describes it. The weapon still marks its usual boxes.</li>
+<li><strong>A called shot.</strong> Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, an eye, a rope, a lock). If the attack hits at all, the effect happens, whatever the margin. <strong>Careful Marksman</strong> and <strong>Hunter’s Eye</strong> cut this penalty by 1.</li>
+<li><strong>Both ways.</strong> Wesen, outlaws and worse land telling hits on characters too.</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Effect</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Disarm</td>
+<td>The weapon or held item drops, or flies a few yards away</td>
+</tr>
+<tr class="even">
+<td>Knock down</td>
+<td>The target falls prone, or is driven back a few steps</td>
+</tr>
+<tr class="odd">
+<td>Pin</td>
+<td>The target is held, tangled or pinned down: their next action goes to getting free</td>
+</tr>
+<tr class="even">
+<td>Rattle</td>
+<td>−2 to the target’s next roll</td>
+</tr>
+<tr class="odd">
+<td>Break gear</td>
+<td>A shield, weapon or tool breaks</td>
+</tr>
+<tr class="even">
+<td>Open them up</td>
+<td>The next attack on this target this round gets +2</td>
+</tr>
+<tr class="odd">
+<td>Precise</td>
+<td>You hit exactly what you aimed at: the lantern, the rope, the hand on the trigger</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Limits.</strong> A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a Blutbad of its claws or knocks down a stagecoach, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.</p>
+<p><strong>Staying alive.</strong> A character on the receiving end can shrug off a telling hit’s effect with <strong>Hard to put down</strong> (once per fight) or by spending a Grit point. Either way, they still take the boxes.</p>
 <p><em>Example:</em> a Blutbad in full woge claws at Deputy Ames and succeeds by 5. Ames hasn’t defended yet this round: Dodge 11, −2 for the clean hit, needs a 9 or less. Ames has a saber in hand, so a parry is possible too: Melee 14 −3 −2 = 9, no better. Ames dodges. When the second Blutbad lunges before Ames’s next turn, there’s no defense left, unless Ames has Additional Defense.</p>
 <h2 id="g-range">Range</h2>
 <p>Distances fall into five bands:</p>
@@ -1902,6 +1958,10 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Declare when a hit would mark boxes, before applying them. Does not prevent beheading or similar fates.</td>
 </tr>
 <tr class="odd">
+<td>Shrug off a telling hit</td>
+<td>Cancel the effect an attacker picked against you; you still take the boxes.</td>
+</tr>
+<tr class="even">
 <td>Establish a small preparation</td>
 <td>Propose a plausible detail, such as having packed an extra reload. GM approval is required.</td>
 </tr>
@@ -3674,13 +3734,13 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Skills:</strong> Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Old hand) = attribute +5.</p>
 <p><strong>Modifiers:</strong> favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails.</p>
 <p><strong>Assistance:</strong> success +1; success by 5 or more +2; 18 causes a complication. One assistant per roll.</p>
-<p><strong>Combat:</strong> move plus one action. Hit → optional Dodge → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2).</p>
+<p><strong>Combat:</strong> move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Telling hit (by 5+ or natural 3–4): the attacker picks an effect; called shot −2 (small target −4).</p>
 <p><strong>Damage:</strong> fists, clubs, knives and arrows 1 box; guns, heavy blades and Wesen claws 2; a close-range shotgun or buffalo rifle 3 and Dying. A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.</p>
 <p><strong>Guns:</strong> derringer 2, revolver 6, shotgun 2, rifle 15. Reload: one action. Natural 18 jams.</p>
 <p><strong>Medicine:</strong> stabilize in one action. Field care clears 1 box (2 on margin 5+). A surgery gives +2 and clears 2 (3 on margin 5+). Rest: one box per two days, not from three.</p>
 <p><strong>Woge:</strong> free action for a Wesen; a forced woge on a failed Will roll. The woge profile’s bonuses apply while woged. Grimms see woge under strong emotion. A full woge before townsfolk marks Exposure (2 boxes at Tier 3).</p>
 <p><strong>Rituals:</strong> describe the effect; fill a clock of 2, 4 or 6 segments with Occult rolls at your Lens’s pace. Trappings remove a segment. Charms: Trained 2, Specialty 3, Expert 4.</p>
-<p><strong>Grit:</strong> start each session with two (three with True grit). Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.</p>
+<p><strong>Grit:</strong> start each session with two (three with True grit). Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.</p>
 <!-- GUIDE:END -->
       </article>
     </div>
@@ -3736,6 +3796,8 @@ tr.lvl-U td.target { color: var(--muted); }
               </select></div>
             <div class="field" id="r-quality-wrap" hidden><label for="r-quality">Attack succeeded by</label>
               <select id="r-quality"><option value="0">0–2 (no penalty)</option><option value="-1">3–4 −1</option><option value="-2">5–6 −2</option><option value="-3">7+ −3</option></select></div>
+            <div class="field" id="r-called-wrap" hidden><label for="r-called">Called shot</label>
+              <select id="r-called"><option value="0">None</option><option value="-2">Name the effect −2</option><option value="-4">Small target −4</option></select></div>
             <div class="field" id="r-parries-wrap" hidden><label for="r-parries">Parries already this round</label>
               <select id="r-parries"><option value="0">None</option><option value="1">One −2</option></select></div>
           </div>
@@ -3794,13 +3856,14 @@ tr.lvl-U td.target { color: var(--muted); }
             <dt>Opposed</dt><dd>Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender.</dd>
             <dt>Combat</dt><dd>Move a short distance and take one action. Hit → target may defend once per round (Dodge, Parry or Block; two with Additional Defense) → weapon effect. Partial cover −2.</dd>
             <dt>Defending</dt><dd>One defense a round (two with Additional Defense). Parry: Melee −3 with a weapon (fists, claws, fangs, blades); Brawling −3 bare-handed against fists only; a second parry −2 more. Block: Melee −2 with a chair or slat, −1 with a shield, against blades, claws, fists and arrows (never bullets); an improvised shield breaks on a 2+ box hit. Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target.</dd>
+            <dt>Telling hit</dt><dd>Hit by 5+ or a natural 3–4, not defended: the attacker picks one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, precise). Called shot: −2 (small target −4), and any hit gets the effect. No extra boxes. Shrug it off: Hard to put down (once a fight) or a Grit point.</dd>
             <dt>Damage</dt><dd>Fists, clubs, knives, arrows: 1 box. Guns, heavy blades, Wesen claws: 2. Close-range shotgun or buffalo rifle: 3 and Dying.</dd>
             <dt>Dying</dt><dd>A 2-box weapon that brings you to 3 boxes: Dying; dead at the end of the scene unless stabilized (one action, Medicine, doctor's bag). At 3 boxes, another 2-box hit kills.</dd>
             <dt>Guns</dt><dd>Derringer 2, revolver 6, shotgun 2, rifle 15. Fan the hammer 3 (−2, +1 box), both barrels 2 (+2 close), covering fire 3. Reload: one action. Natural 18 jams.</dd>
             <dt>Woge</dt><dd>Free action for Wesen; strong emotion may force one (Will roll). Grimms see it. A full woge before townsfolk marks Exposure.</dd>
             <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). A surgery gives +2, clears 2 (3 on margin 5+).</dd>
             <dt>Rest</dt><dd>One box per two full days of rest. Not from 3 boxes: treatment must clear the first.</dd>
-            <dt>Grit</dt><dd>Reroll (keep second), reduce an injury by one box, or establish a small preparation.</dd>
+            <dt>Grit</dt><dd>Reroll (keep second), reduce an injury by one box, shrug off a telling hit, or establish a small preparation.</dd>
           </dl>
         </div>
       </div>
@@ -3894,6 +3957,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["contact", "A friend in town", "A named contact who helps once per case.", 1],
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one skill when it's used.", 1],
     ["extradefense", "Additional Defense", "A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2.", 1],
+    ["survivor", "Hard to put down", "Once per fight, shrug off a telling hit's effect. You still take its boxes.", 1],
   ];
   const SET_ALLEGIANCES = [
     ["church", "The Church", "Once per case, shelter, records or a favor from the clergy.", "Duty: the Church gives you orders. Sicarii discipline ties you to the Order of the Holy Knife."],
@@ -4680,6 +4744,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (isDefense(name)) parts.push(+$("r-quality").value || 0);
     if (isParry(name)) parts.push(-2 * (+$("r-parries").value || 0));
     if (!$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(1);
+    if (!$("r-called-wrap").hidden && +$("r-called").value) parts.push(+$("r-called").value);
     // In full woge, the woge profile's bonuses apply to rolls on those attributes and their skills; horses balk.
     const w = ch.play.woge && WESEN.has(ch.speciesId) && heritageOf()?.woge;
     if (w) {
@@ -4706,6 +4771,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("r-quality-wrap").hidden = !isDefense(sk);
     $("r-parries-wrap").hidden = !(isParry(sk) && defensesPerRound() > 1);
     $("r-aim-wrap").hidden = !["Shooting", "Melee", "Brawling"].includes(sk);
+    $("r-called-wrap").hidden = !["Shooting", "Melee", "Brawling"].includes(sk);
     const { name, base, total } = rollMods();
     const t = base + total;
     const incap = ch.play.injury >= 3;
@@ -4733,7 +4799,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const ok = auto === "auto-s" || (auto !== "auto-f" && sum <= t);
     const margin = t - sum;
     const jam = sum === 18 && (phaserNote || (isReroll && last && last.phaserNote));
-    last = { name, t, dice, sum, ok, margin, auto, jam, rerolled: !!isReroll, fireMod, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
+    const attackRoll = !$("r-called-wrap").hidden, called = attackRoll ? (isReroll && last ? last.called : +$("r-called").value) : 0;
+    last = { name, t, dice, sum, ok, margin, auto, jam, attackRoll, called, rerolled: !!isReroll, fireMod, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
     ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
     ch.play.log = ch.play.log.slice(0, 12);
     if ($("r-stun").checked) { ch.play.stunned = false; $("f-stunned").checked = false; }
@@ -4750,7 +4817,9 @@ tr.lvl-U td.target { color: var(--muted); }
     if (r.auto === "auto-s") note = r.margin < 0 ? "Natural " + r.sum + ": automatic success. Counts as margin 0 in a contest." : "Natural " + r.sum + ": automatic success.";
     else if (r.auto === "auto-f") note = "Natural " + r.sum + ": automatic failure.";
     else note = r.ok ? `Succeeded by ${r.margin}.` : `Failed by ${-r.margin}.`;
-    if (r.ok && r.margin >= 5) note += " Margin 5+: assistance gives +2; medical care clears an extra box; a progress clock gets 2 segments.";
+    if (r.attackRoll && r.ok && r.called) note += " Called shot: if it isn't defended, the effect you named happens. No extra boxes.";
+    else if (r.attackRoll && r.ok && (r.margin >= 5 || r.auto === "auto-s")) note += " <b>Telling hit</b> if it isn't defended: pick one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, or precise). No extra boxes.";
+    if (r.ok && r.margin >= 5 && !r.attackRoll) note += " Margin 5+: assistance gives +2; medical care clears an extra box; a progress clock gets 2 segments.";
     if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
     if (!r.ok && !r.auto && r.margin >= -2) note += ` Missed by ${-r.margin}: the GM may offer success at a cost.`;
     if (r.phaserNote) note += ` ${r.phaserNote}`;
@@ -4887,7 +4956,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isBlock(t.value) || isParry(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
