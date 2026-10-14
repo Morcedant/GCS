@@ -1,5 +1,10 @@
-/dust-and-damnation/Dust_Damnation_Players_Guide.docx /pact-of-bones/Pact_of_Bones_Players_Guide.docx 301
-/dust-and-damnation /pact-of-bones/ 301
-/dust-and-damnation/* /pact-of-bones/:splat 301
-/discord/dust-and-damnation /discord/pact-of-bones/ 301
-/discord/dust-and-damnation/* /discord/pact-of-bones/:splat 301
+/dust-and-damnation/Dust_Damnation_Players_Guide.docx /trails-of-blood-and-dust/Trails_of_Blood_Dust_Players_Guide.docx 301
+/dust-and-damnation /trails-of-blood-and-dust/ 301
+/dust-and-damnation/* /trails-of-blood-and-dust/:splat 301
+/discord/dust-and-damnation /discord/trails-of-blood-and-dust/ 301
+/discord/dust-and-damnation/* /discord/trails-of-blood-and-dust/:splat 301
+/pact-of-bones/Pact_of_Bones_Players_Guide.docx /trails-of-blood-and-dust/Trails_of_Blood_Dust_Players_Guide.docx 301
+/pact-of-bones /trails-of-blood-and-dust/ 301
+/pact-of-bones/* /trails-of-blood-and-dust/:splat 301
+/discord/pact-of-bones /discord/trails-of-blood-and-dust/ 301
+/discord/pact-of-bones/* /discord/trails-of-blood-and-dust/:splat 301

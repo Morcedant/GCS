@@ -694,7 +694,7 @@ export const PACKS = {
  },
  "western": {
   "id": "western",
-  "title": "Pact of Bones",
+  "title": "Trails of Blood & Dust",
   "point": "Grit",
   "mission": "Job",
   "trackTitle": "Trouble",

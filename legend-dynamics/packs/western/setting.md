@@ -1,8 +1,8 @@
 <!-- SECTION:intro -->
 
-The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. *Pact of Bones* is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.
+The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. *Trails of Blood & Dust* is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.
 
-Pact of Bones is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.
+Trails of Blood & Dust is not tied to a single place or year. Set your game in any territory, from the 1860s to the 1890s.
 
 <!-- SECTION:weapons -->
 
@@ -16,9 +16,9 @@ To take someone down without killing them, use fists, a club, a grapple, or a la
 
 <!-- SECTION:combat -->
 
-### Fighting in Pact of Bones
+### Fighting in Trails of Blood & Dust
 
-Pact of Bones adds these to the attack and defense rules above.
+Trails of Blood & Dust adds these to the attack and defense rules above.
 
 - **Bare hands against claws.** Out West you can parry claws and fangs bare-handed too, not just fists: {{unarmedSkill}} −3.
 - **Shields.** A real shield is rare out West: a hide shield or an iron-bound buckler gives +1 to Block. Anything at hand stands in: a chair, a wooden slat, a crate lid, a saddle.
