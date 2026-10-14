@@ -96,7 +96,7 @@ Spend all your Edges. Each one buys:
 | True grit | Start every session with 3 Grit instead of 2 | 1 |
 | A friend in town | A named contact who helps once per case | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one named skill when it's used | 1 |
-| Additional Defense | Defend twice a round instead of once: Dodge or Block, in any mix. | 1 |
+| Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2. | 1 |
 
 ### Spending points
 
@@ -384,11 +384,18 @@ Act in descending Agility order. Players choose the order of tied characters; th
 
 ## Attacking and defending
 
-Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Each target gets one defense per round: a Dodge, or a Block (below). The Additional Defense Edge gives a second. A successful Dodge cancels the hit. Apply injury penalties to Dodge.
+Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may **defend**: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.
 
-Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage.
+- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits. The **Additional Defense** Edge gives a second.
+- **Dodge** is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert.
+- **Parry.** Against a weapon in hand, fists, claws or fangs, roll Melee −3 with a weapon in hand. Bare-handed, Brawling −3 parries fists only: nobody turns a Blutbad's claws with an open hand. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a bullet or an arrow.
+- **Block.** With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fangs, fists or an arrow: roll Melee −2, or Melee −1 with a real shield. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes: a chair stops one swipe of a Blutbad's claws, and then it's kindling.
+- **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3. A Wesen in full woge often strikes that cleanly.
+- **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. **Careful Marksman** and **Hunter's Eye** add their +2 to this; a **Gunslinger** doesn't need to aim.
 
-**Block.** With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fangs, fists or an arrow instead of Dodging: roll Melee −2, or Melee −1 with a real shield. A Block is your one defense for the round. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes: a chair stops one swipe of a Blutbad's claws, and then it's kindling.
+Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage.
+
+*Example:* a Blutbad in full woge claws at Deputy Ames and succeeds by 5. Ames hasn't defended yet this round: Dodge 11, −2 for the clean hit, needs a 9 or less. Ames has a saber in hand, so a parry is possible too: Melee 14 −3 −2 = 9, no better. Ames dodges. When the second Blutbad lunges before Ames's next turn, there's no defense left, unless Ames has Additional Defense.
 
 ## Range
 
@@ -421,7 +428,7 @@ Injury penalties replace each other rather than stacking. They apply to movement
 - **A further hit.** While you are at three boxes, any hit from a weapon that marks 2 or more boxes kills you. Fists, clubs and knives just keep you down.
 - **Beheading** and comparable fates bypass the track entirely.
 
-Your protection is avoiding the hit: Dodge, a Block, cover, and a Grit point, which reduces a hit by one box.
+Your protection is avoiding the hit: a defense (Dodge, Parry or Block), cover, and a Grit point, which reduces a hit by one box.
 
 ## Weapons and damage
 
