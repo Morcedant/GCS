@@ -191,5 +191,19 @@ def main():
     print(f"wrote {n} files into {SITE.relative_to(ROOT)}/")
 
 
+def make_zip(dest):
+    """The upload for Cloudflare Pages: the site's files at the zip's top level (index.html first), never inside a folder."""
+    import zipfile
+    dest = pathlib.Path(dest)
+    with zipfile.ZipFile(dest, "w", zipfile.ZIP_DEFLATED) as z:
+        for p in sorted(SITE.rglob("*"), key=lambda p: (p.name != "index.html" or p.parent != SITE, str(p))):
+            if p.is_file():
+                z.write(p, p.relative_to(SITE).as_posix())
+    print(f"wrote {dest} (index.html at the top level)")
+
+
 if __name__ == "__main__":
+    import sys
     main()
+    if "--zip" in sys.argv:
+        make_zip(sys.argv[sys.argv.index("--zip") + 1])
