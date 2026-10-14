@@ -27,7 +27,7 @@ DEFAULT_TERMS = {
     "pathRounded": "Generalist", "pathExpert": "Specialist", "pathExpertPlural": "Specialists",
     "reasonLabel": "Why you do what you do", "reasonSheet": "Why I do it", "gear": "Gear", "gearLower": "gear",
     "tabPlay": "Play", "readyText": "Ready to play", "stun": "Dazed", "medkit": "medical kit",
-    "facility": "A proper infirmary", "restText": "full day", "mission": "Mission", "missionLower": "mission",
+    "facility": "A proper infirmary", "mission": "Mission", "missionLower": "mission",
     "missionsChapter": "Running missions", "journal": "Journal", "journalIntro": "Write it together at the end of each session.",
     "journalTitlePlaceholder": "Name it", "journalDateLabel": "Date", "journalExtraLabel": "", "journalExtraPlaceholder": "",
     "weaponsTitle": "Weapon", "ammo": "shots", "ammoOne": "shot", "shot": "Shot", "spent": "used", "sparesLabel": "Spares",
@@ -350,7 +350,7 @@ def quickref(pack, t):
             ["Range", "Close 10 yd, Short 50 yd, Medium 150 yd, Long 500 yd, Extreme 1 mile. Within a weapon's effective band: no penalty; one band beyond −2, two −4, farther out of range. Move: Close; run (no action): Short."],
             ["Dying", f"A 2-box weapon that brings you to 3 boxes: Dying; dead at the end of the scene unless stabilized (one action, Medicine, {t['medkit']}). At 3 boxes, another 2-box hit kills."],
             ["Medicine", "Stabilize: one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2, clears 2 (3 on margin 5+)."],
-            ["Rest", f"One box per {t['restText']} of rest. Not from 3 boxes: treatment must clear the first."],
+            ["Rest", "Clearing one box: a full day at 1 box, at least three days at 2, a week at 3 (and only once someone has stabilized or treated you)."],
             [t["point"], "Reroll (keep second), reduce an injury by one box, shrug off a telling hit, or establish a small preparation."]]
     return "".join(f"\n            <dt>{html.escape(a)}</dt><dd>{html.escape(b)}</dd>" for a, b in core + pack.get("quickRef", [])) + "\n          "
 

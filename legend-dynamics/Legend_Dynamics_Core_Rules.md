@@ -291,7 +291,15 @@ A proper infirmary grants +2 to Medicine. A successful treatment removes two box
 
 ## Natural recovery
 
-Each **full day** of rest clears one injury box. Rest means nothing strenuous. At three boxes, rest alone clears nothing: treatment must clear the first box.
+Rest clears injury one box at a time, and the worse you're hurt, the longer each box takes. Rest means nothing strenuous: no fighting, no hard travel, no long days of work.
+
+| Boxes marked | Rest to clear one box |
+|---|---|
+| 1 | A full day |
+| 2 | At least three days |
+| 3 | A week, and only in someone's care |
+
+At three boxes, rest alone does nothing until someone has stabilized or treated you; after that, a week of rest in their care clears the first box. A successful treatment is faster. The times add up: from three boxes, rest alone takes about a week and a half to heal completely (a week, then three days, then a day).
 
 # Magic
 
@@ -504,7 +512,7 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural 3–4): the attacker picks an effect; called shot −2 (small target −4). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
 
-**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Rest: one box per full day, not from three.
+**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone's care).
 
 **Legend:** start each session with two. Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.
 

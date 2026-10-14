@@ -16,7 +16,7 @@ terms = {
     "pathRounded": "Generalist", "pathExpert": "Specialist", "pathExpertPlural": "Specialists",
     "reasonLabel": "Why you do this", "reasonSheet": "Why I do this",
     "gear": "Gear", "gearLower": "gear", "tabPlay": "Play", "readyText": "Ready for the case", "stun": "Stunned",
-    "medkit": "first-aid kit", "facility": "A hospital with an Operant ward", "restText": "full day",
+    "medkit": "first-aid kit", "facility": "A hospital with an Operant ward",
     "titlePlaceholder": "e.g. Special Agent, Chicago office", "mission": "Case", "missionLower": "case",
     "missionsChapter": "Running cases", "prepareTitle": "Suit up",
     "journal": "Case files",
