@@ -532,7 +532,7 @@ tr.lvl-U td.target { color: var(--muted); }
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
-    <span>This is the guide's <b>example detective</b>, loaded so you can see a finished build. Start your own when you're ready.</span>
+    <span>This is the guide's <b>example lawman</b>, loaded so you can see a finished build. Start your own when you're ready.</span>
     <button class="btn primary" id="banner-new">Start a new character</button>
   </div>
 
@@ -881,22 +881,10 @@ tr.lvl-U td.target { color: var(--muted); }
 </thead>
 <tbody>
 <tr class="odd">
-<td>Marshal</td>
+<td>Lawman</td>
 <td>The Law</td>
-<td>Lead others and carry what authority there is</td>
-<td>Leadership, Shooting, Riding, Read People</td>
-</tr>
-<tr class="even">
-<td>Deputy</td>
-<td>The Law</td>
-<td>Keep order, guard prisoners, back up the marshal</td>
-<td>Shooting, Brawling, Riding, Read People</td>
-</tr>
-<tr class="odd">
-<td>Detective</td>
-<td>The Law</td>
-<td>Investigate crimes for the Pinkertons or a private client</td>
-<td>Investigation, Read People, Deception, Stealth</td>
+<td>Wear a badge or carry credentials and bring the guilty in: a marshal, a Ranger, a sheriff or deputy, a city policeman, a Pinkerton. Your Allegiance says which force; a Badge or Pinkerton Credentials advantage gives its authority</td>
+<td>Shooting, Investigation, Read People, Riding</td>
 </tr>
 <tr class="even">
 <td>Bounty Hunter</td>
@@ -1175,7 +1163,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Saloon regulars.</strong> We meet every Saturday night for cards, whiskey and lies.</li>
 <li><strong>Bad blood.</strong> They blame me for something that went wrong on a past job.</li>
 </ol>
-<h2 id="g-example-detective">Example detective</h2>
+<h2 id="g-example-lawman">Example lawman</h2>
 <p>Human (Tier 0, 3 Edges: +1 attribute point, Extra Trained skill, A friend in town). Body 10, Agility 11, Intellect 13, Presence 11, Will 11.</p>
 <ul>
 <li><strong>Specialty:</strong> Investigation 16.</li>
@@ -1183,6 +1171,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Dodge:</strong> Athletics is Untrained, so Dodge is 9.</li>
 <li><strong>Advantage:</strong> Astute Observer. <strong>Complication:</strong> Cannot Leave a Mystery Alone.</li>
 <li><strong>Friend in town:</strong> a clerk in the Pinkertons’ regional office who’ll pull a file, quietly.</li>
+<li><strong>Allegiance:</strong> The Pinkerton National Detective Agency.</li>
 </ul>
 <h1 id="g-skills-and-gear">Skills and gear</h1>
 <p>Choose the skill that matches your method. Investigation finds the clues; Wesen Lore says what kind of creature left them. Medicine treats the body; Apothecary brews the remedy. The GM chooses one primary skill for each distinct task.</p>
@@ -2239,11 +2228,11 @@ tr.lvl-U td.target { color: var(--muted); }
 <h1 id="g-ready-made-characters">Ready-made characters</h1>
 <p>Seven characters ready to play. Each follows the creation rules exactly, Edges included, and their connections tie them together.</p>
 <h2 id="g-eliza-kessler">Eliza Kessler</h2>
-<p><em>Deputy U.S. Marshal, Marshal. Grimm (Tier 2).</em> Wears the badge: the law, and the Code, in one person.</p>
+<p><em>Deputy U.S. Marshal, Lawman. Grimm (Tier 2).</em> Wears the badge: the law, and the Code, in one person.</p>
 <ul>
 <li><strong>Attributes:</strong> Body 12, Agility 13, Intellect 10, Presence 8, Will 12. <strong>Dodge</strong> 12.</li>
 <li><strong>Skills:</strong> Shooting 16 (Specialty). Trained: Riding 14, Melee 14, Brawling 14, Athletics 13, Investigation 11, Tracking 11, Read People 11, Survival 11, Leadership 9; Wesen Lore 11 (free).</li>
-<li><strong>Edge:</strong> Second advantage: Badge: Deputy U.S. Marshal. <strong>Grimm gift:</strong> Keeper of the Books (companion: The Books Must Be Kept). <strong>Complication:</strong> Law and Order; trigger: a Wesen suspect could be killed instead of arrested.</li>
+<li><strong>Edge:</strong> Second advantage: Badge: Deputy U.S. Marshal. <strong>Grimm gift:</strong> Keeper of the Books (companion: The Books Must Be Kept). <strong>Complication:</strong> Law and Order; trigger: a Wesen suspect could be killed instead of arrested. <strong>Allegiance:</strong> The U.S. Marshals.</li>
 <li><strong>Why I stand against the dark:</strong> The Grimm blood woke in me, and it came with a duty. <strong>Connection:</strong> Gus Brandt cut her down from a lynch mob’s rope before anyone knew what she was.</li>
 </ul>
 <h2 id="g-gus-brandt">Gus Brandt</h2>
@@ -3791,18 +3780,16 @@ tr.lvl-U td.target { color: var(--muted); }
   const PHYSICAL = new Set(["Riding", "Shooting", "Melee", "Brawling", "Athletics", "Stealth", "Survival", "Body", "Agility", "Dodge"]);
   const LEVELS = { U: { name: "Untrained", mod: -4, dodge: 0 }, T: { name: "Trained", mod: 1, dodge: 1 }, S: { name: "Specialty", mod: 3, dodge: 2 } };
   const DEPTS = [
-    ["Marshal", "law"], ["Deputy", "law"], ["Detective", "law"], ["Bounty Hunter", "law"],
+    ["Lawman", "law"], ["Bounty Hunter", "law"],
     ["Doctor", "learned"], ["Apothecary", "learned"], ["Scholar", "learned"], ["Occultist", "learned"], ["Preacher", "learned"],
     ["Gunslinger", "frontier"], ["Scout", "frontier"], ["Gambler", "frontier"], ["Tinker", "frontier"],
   ];
   const GROUP_NAMES = { law: "The Law", learned: "The Learned", frontier: "The Frontier" };
   // Core skills for each role: marked Trained when the role is picked.
-  const ROLE_SKILLS = {"Marshal": ["Leadership", "Shooting", "Riding", "Read People"], "Deputy": ["Shooting", "Brawling", "Riding", "Read People"], "Detective": ["Investigation", "Read People", "Deception", "Stealth"], "Bounty Hunter": ["Tracking", "Shooting", "Riding", "Wesen Lore"], "Doctor": ["Medicine", "Investigation", "Read People", "Apothecary"], "Apothecary": ["Apothecary", "Medicine", "Occult", "Wesen Lore"], "Scholar": ["Wesen Lore", "Occult", "Investigation", "Persuasion"], "Occultist": ["Occult", "Wesen Lore", "Apothecary", "Read People"], "Preacher": ["Persuasion", "Leadership", "Occult", "Shooting"], "Gunslinger": ["Shooting", "Athletics", "Read People", "Riding"], "Scout": ["Tracking", "Survival", "Riding", "Stealth"], "Gambler": ["Gambling", "Read People", "Deception", "Shooting"], "Tinker": ["Tinkering", "Shooting", "Investigation", "Athletics"]};
+  const ROLE_SKILLS = {"Lawman": ["Shooting", "Investigation", "Read People", "Riding"], "Bounty Hunter": ["Tracking", "Shooting", "Riding", "Wesen Lore"], "Doctor": ["Medicine", "Investigation", "Read People", "Apothecary"], "Apothecary": ["Apothecary", "Medicine", "Occult", "Wesen Lore"], "Scholar": ["Wesen Lore", "Occult", "Investigation", "Persuasion"], "Occultist": ["Occult", "Wesen Lore", "Apothecary", "Read People"], "Preacher": ["Persuasion", "Leadership", "Occult", "Shooting"], "Gunslinger": ["Shooting", "Athletics", "Read People", "Riding"], "Scout": ["Tracking", "Survival", "Riding", "Stealth"], "Gambler": ["Gambling", "Read People", "Deception", "Shooting"], "Tinker": ["Tinkering", "Shooting", "Investigation", "Athletics"]};
   // Starting text for "What you bring"; replaced on calling change unless the player has written their own.
   const ROLE_SUGGESTIONS = {
-    Marshal: "Marshal: carries what authority there is (take a Badge advantage), with Leadership and a steady gun.",
-    Deputy: "Deputy: keeps order, guards prisoners, and backs up the marshal when it comes to shooting.",
-    Detective: "Detective: investigates crimes for the Pinkertons (take Pinkerton Credentials) or a private client, and follows the paper trail nobody else reads.",
+    Lawman: "Lawman: wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority.",
     "Bounty Hunter": "Bounty hunter: tracks and brings in wanted men, and the things that only look like men.",
     Doctor: "Doctor: patches up the wounded and reads what a body says about what killed it.",
     Apothecary: "Apothecary: brews remedies, antidotes and stranger things, and knows which ingredients come from where.",
@@ -3921,7 +3908,7 @@ tr.lvl-U td.target { color: var(--muted); }
   };
   // Six ready-to-play characters; their connections point at each other.
   const PREGENS = [
-    { name: "Eliza Kessler", rank: "Deputy U.S. Marshal", dept: "Marshal", path: "rounded", species: "Grimm", speciesId: "grimm",
+    { name: "Eliza Kessler", rank: "Deputy U.S. Marshal", dept: "Lawman", allegiance: "marshals", path: "rounded", species: "Grimm", speciesId: "grimm",
       role: "Wears the badge: the law, and the Code, in one person.",
       reason: "The Grimm blood woke in me, and it came with a duty.", connection: "Gus Brandt cut her down from a lynch mob's rope before anyone knew what she was.",
       attrs: { Body: 12, Agility: 13, Intellect: 10, Presence: 8, Will: 12 },
@@ -4078,7 +4065,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   function blank() {
     return {
-      id: uid(), example: false, name: "", species: "Human", speciesId: "human", speciesAdj: {}, rank: "", dept: "Detective", path: "rounded", role: ROLE_SUGGESTIONS.Detective, reason: "",
+      id: uid(), example: false, name: "", species: "Human", speciesId: "human", speciesAdj: {}, rank: "", dept: "Lawman", path: "rounded", role: ROLE_SUGGESTIONS.Lawman, reason: "",
       speciesNotes: "", connection: "", notes: "", otherEquip: "",
       attrs: { Body: 10, Agility: 10, Intellect: 10, Presence: 10, Will: 10 },
       skills: Object.fromEntries(SKILLS.map(([n]) => [n, "U"])),
@@ -4095,8 +4082,8 @@ tr.lvl-U td.target { color: var(--muted); }
   function example() {
     const c = blank();
     Object.assign(c, {
-      example: true, name: "Josephine Hale", species: "Human", speciesId: "human", rank: "Pinkerton operative", dept: "Detective",
-      role: ROLE_SUGGESTIONS.Detective,
+      example: true, name: "Josephine Hale", species: "Human", speciesId: "human", rank: "Pinkerton operative", dept: "Lawman", allegiance: "pinkerton",
+      role: ROLE_SUGGESTIONS.Lawman,
       reason: "Took a case in Kansas that ended with a man's face changing in front of her, and has been chasing the truth ever since.",
       connection: "Owes the town doctor for keeping quiet about what really killed her last client.",
       attrs: { Body: 10, Agility: 11, Intellect: 13, Presence: 11, Will: 11 },
@@ -4121,7 +4108,8 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     if (!Array.isArray(out.advances)) out.advances = [];
     if (out.path !== "hand") out.path = "rounded";
-    if (!out.customRole && !DEPTS.some((d) => d[0] === out.dept)) out.dept = "Detective";
+    if (["Marshal", "Deputy", "Detective"].includes(out.dept)) out.dept = "Lawman"; // merged into Lawman
+    if (!out.customRole && !DEPTS.some((d) => d[0] === out.dept)) out.dept = "Lawman";
     // The gun being tracked: its rounds and spare reloads. A character with a gun but no record starts loaded.
     const g = c.play && c.play.gun;
     out.play.gun = g && typeof g === "object" && (g.type === "" || GUNS[g.type])
@@ -5342,7 +5330,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function newOfficer() { load(blank()); applyRoleSkills(); render(); selectTab("create"); toast("New character started."); }
   $("btn-new").onclick = newOfficer;
   $("banner-new").onclick = newOfficer;
-  $("btn-example").onclick = () => { load(example()); toast("Example detective loaded."); };
+  $("btn-example").onclick = () => { load(example()); toast("Example lawman loaded."); };
   $("btn-save").onclick = () => {
     const copy = JSON.parse(JSON.stringify(ch));
     copy.example = false;

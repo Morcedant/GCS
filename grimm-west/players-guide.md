@@ -39,9 +39,7 @@ Choose a calling and describe what your character brings. Your calling places yo
 
 | Calling | Group | Typical contribution | Core skills |
 |---|---|---|---|
-| Marshal | The Law | Lead others and carry what authority there is | Leadership, Shooting, Riding, Read People |
-| Deputy | The Law | Keep order, guard prisoners, back up the marshal | Shooting, Brawling, Riding, Read People |
-| Detective | The Law | Investigate crimes for the Pinkertons or a private client | Investigation, Read People, Deception, Stealth |
+| Lawman | The Law | Wear a badge or carry credentials and bring the guilty in: a marshal, a Ranger, a sheriff or deputy, a city policeman, a Pinkerton. Your Allegiance says which force; a Badge or Pinkerton Credentials advantage gives its authority | Shooting, Investigation, Read People, Riding |
 | Bounty Hunter | The Law | Track and bring in wanted men, and things that aren't men | Tracking, Shooting, Riding, Wesen Lore |
 | Doctor | The Learned | Patch up the wounded and read what a body tells you | Medicine, Investigation, Read People, Apothecary |
 | Apothecary | The Learned | Brew remedies, antidotes and stranger things | Apothecary, Medicine, Occult, Wesen Lore |
@@ -178,7 +176,7 @@ Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained,
 9. **Saloon regulars.** We meet every Saturday night for cards, whiskey and lies.
 10. **Bad blood.** They blame me for something that went wrong on a past job.
 
-## Example detective
+## Example lawman
 
 Human (Tier 0, 3 Edges: +1 attribute point, Extra Trained skill, A friend in town). Body 10, Agility 11, Intellect 13, Presence 11, Will 11.
 
@@ -187,6 +185,7 @@ Human (Tier 0, 3 Edges: +1 attribute point, Extra Trained skill, A friend in tow
 - **Dodge:** Athletics is Untrained, so Dodge is 9.
 - **Advantage:** Astute Observer. **Complication:** Cannot Leave a Mystery Alone.
 - **Friend in town:** a clerk in the Pinkertons' regional office who'll pull a file, quietly.
+- **Allegiance:** The Pinkerton National Detective Agency.
 
 # Skills and gear
 
@@ -615,11 +614,11 @@ Seven characters ready to play. Each follows the creation rules exactly, Edges i
 
 ## Eliza Kessler
 
-*Deputy U.S. Marshal, Marshal. Grimm (Tier 2).* Wears the badge: the law, and the Code, in one person.
+*Deputy U.S. Marshal, Lawman. Grimm (Tier 2).* Wears the badge: the law, and the Code, in one person.
 
 - **Attributes:** Body 12, Agility 13, Intellect 10, Presence 8, Will 12. **Dodge** 12.
 - **Skills:** Shooting 16 (Specialty). Trained: Riding 14, Melee 14, Brawling 14, Athletics 13, Investigation 11, Tracking 11, Read People 11, Survival 11, Leadership 9; Wesen Lore 11 (free).
-- **Edge:** Second advantage: Badge: Deputy U.S. Marshal. **Grimm gift:** Keeper of the Books (companion: The Books Must Be Kept). **Complication:** Law and Order; trigger: a Wesen suspect could be killed instead of arrested.
+- **Edge:** Second advantage: Badge: Deputy U.S. Marshal. **Grimm gift:** Keeper of the Books (companion: The Books Must Be Kept). **Complication:** Law and Order; trigger: a Wesen suspect could be killed instead of arrested. **Allegiance:** The U.S. Marshals.
 - **Why I stand against the dark:** The Grimm blood woke in me, and it came with a duty. **Connection:** Gus Brandt cut her down from a lynch mob's rope before anyone knew what she was.
 
 ## Gus Brandt
