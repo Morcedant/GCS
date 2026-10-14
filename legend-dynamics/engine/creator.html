@@ -1252,8 +1252,14 @@ tr.lvl-U td.target { color: var(--muted); }
   const PARRY = CR.parry ? [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]] : [];
   const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
   const isParry = (name) => name.startsWith("Parry:");
-  const isDefense = (name) => name === "Dodge" || isParry(name);
-  const rollLabel = (name) => (isParry(name) ? `Parry (${name.slice(6)})` : name);
+  // Block: with a real shield (gear, +its bonus) or anything picked up in the fight (no bonus).
+  const SHIELDS = CR.block ? (PACK.protection || []).filter((g) => g.traits.some((t) => t.type === "shield")) : [];
+  const shieldBonus = (g) => g.traits.find((t) => t.type === "shield").value || 0;
+  const blocks = () => SHIELDS.filter((g) => !g.equipment || ch.equipment[g.equipment]);
+  const isBlock = (name) => name.startsWith("Block:");
+  const blockOf = (id) => skillTarget(T.meleeSkill) + CR.block.mod + shieldBonus(SHIELDS.find((g) => g.id === id));
+  const isDefense = (name) => name === "Dodge" || isParry(name) || isBlock(name);
+  const rollLabel = (name) => (isParry(name) ? `Parry (${name.slice(6)})` : isBlock(name) ? `Block (${SHIELDS.find((g) => g.id === name.slice(6))?.name.toLowerCase() || "shield"})` : name);
   const count = (lvl) => Object.entries(ch.skills).filter(([k, v]) => v === lvl && !freeSkill(k)).length;
   function odds(t) {
     let w = 0;
@@ -1757,7 +1763,7 @@ tr.lvl-U td.target { color: var(--muted); }
     // roller options
     const sel = $("r-skill"), prev = sel.value;
     sel.innerHTML = `<optgroup label="Skills">${sorted.map((s) => `<option value="${esc(s.n)}">${s.n} (${s.t})</option>`).join("")}</optgroup>
-      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}${PARRY.map(([s, how]) => `<option value="Parry:${s}">Parry ${how}: ${s} ${signed(CR.parry.mod)} (${parryOf(s)})</option>`).join("")}</optgroup>
+      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}${PARRY.map(([s, how]) => `<option value="Parry:${s}">Parry ${how}: ${s} ${signed(CR.parry.mod)} (${parryOf(s)})</option>`).join("")}${blocks().map((g) => `<option value="Block:${g.id}">Block, ${esc(g.name.toLowerCase())}: ${T.meleeSkill} ${signed(CR.block.mod + shieldBonus(g))} (${blockOf(g.id)})</option>`).join("")}</optgroup>
       <optgroup label="Attributes">${ATTRS.map(([n]) => `<option value="${n}">${n} (${ch.attrs[n]})</option>`).join("")}</optgroup>`;
     if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
     // Abilities without a +2 leave the box disabled.
@@ -1772,6 +1778,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function rollBase(name) {
     if (name === "Dodge") return dodge();
     if (isParry(name)) return parryOf(name.slice(6));
+    if (isBlock(name)) return blockOf(name.slice(6));
     if (ch.attrs[name] != null) return ch.attrs[name];
     return skillTarget(name);
   }
@@ -1790,7 +1797,7 @@ tr.lvl-U td.target { color: var(--muted); }
     // In an alternate form, the form profile's bonuses apply to rolls on those attributes and their skills.
     const w = ch.play.form && FORMED.has(ch.speciesId) && heritageOf()?.form;
     if (w) {
-      const sk = isParry(name) ? name.slice(6) : name;
+      const sk = isParry(name) ? name.slice(6) : isBlock(name) ? T.meleeSkill : name;
       const attr = name === "Dodge" ? null : ch.attrs[sk] != null ? sk : SKILLS.find((x) => x[0] === sk)?.[1];
       const wb = name === "Dodge" ? (w.dodge || 0) + (w.attrs.Agility || 0) : w.attrs[attr] || 0;
       if (wb) parts.push(wb);
@@ -2007,7 +2014,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
-    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isParry(t.value); updateTarget(); renderGun(); }
+    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
     else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();

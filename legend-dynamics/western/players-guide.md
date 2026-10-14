@@ -232,6 +232,7 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Horse and tack | Carries you across the territory. Riding in a chase needs one. |
 | Trail kit | Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones. |
 | Heavy coat | A buffalo coat or a canvas duster: it turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer. |
+| Shield | A hide shield or an iron-bound buckler, rare out West: you Block at +1. |
 | Lantern and matches | Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible. |
 | Field glasses | See detail at a distance. Spotting something far off without them is very difficult (−4) or impossible. |
 | Law books and blank warrants | Needed to draw up papers, check a statute or argue a point of law away from a courthouse. |
@@ -313,6 +314,7 @@ Dust & Damnation adds these rules to the ones above.
 - **Defend against every attack.** A target may defend against every attack, not just one a round.
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
 - **Parry.** Against a blade, a club, claws or fists, you can parry instead of Dodge: roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists, claws and fangs. Each parry after your first in a round is a further −2. Nobody parries a bullet or an arrow.
+- **Block.** With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fists or an arrow instead of Dodge: roll Melee −2, or Melee −1 with a real shield. Once a round. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.
 - **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. With **Careful Marksman**, the advantage's +2 adds to this.
 - **A heavy coat.** A buffalo coat or a canvas duster turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer.
 
