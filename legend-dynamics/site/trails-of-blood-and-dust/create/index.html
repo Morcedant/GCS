@@ -4048,6 +4048,8 @@ tr.lvl-U td.target { color: var(--muted); }
       [!!speciesOk, speciesOk ? `${T.origin}: ${ch.species || "—"}` : !ch.species.trim() ? `Name your custom ${T.originLower}` : `Custom adjustments total ${signed(adjTotal())}; they must total 0`],
       ...(horrorOff ? [[false, `${ch.species}: ${T.restrictedCheck}`]] : []),
       ...(ch.allegiance === "custom" && !(ch.allegianceDef || []).slice(1).every((x) => x.trim()) ? [[false, "Allegiance: give it a name, a benefit and a burden (agree them with the GM)"]] : []),
+      // Gear that needs an Edge (Fracture Lines' powered armor).
+      ...EQUIPMENT.filter((e) => e[3] && e[3].edge && ch.equipment[e[0]] && !edgeN(e[3].edge)).map((e) => [false, `${e[1]} needs the ${(EDGE_DEFS.find((d) => d[0] === e[3].edge) || [, "matching"])[1]} Edge`]),
       [es === ea && !edgeNeeds.length, es !== ea ? `Edges: ${es} of ${ea} spent` : edgeNeeds.length ? `Edges: ${edgeNeeds.join(", ")}` : ea ? `${ea} Edge${ea > 1 ? "s" : ""} spent` : "No Edges at this tier"],
       [sp === POOL && !overMax.length, sp === POOL ? (overMax.length ? `Check ${overMax.join(", ")}: outside the ${T.originLower} range` : `${POOL} attribute points spent`) : `Attribute points spent: ${sp} of ${POOL}`],
       ...(freeSkillOf() ? [[ch.skills[freeSkillOf()] !== "U", `${ch.species}: ${freeSkillOf()} at least Trained`]] : []),

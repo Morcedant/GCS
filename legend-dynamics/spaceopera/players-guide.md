@@ -123,6 +123,7 @@ Spend all your Edges. Each one buys:
 | A friend | A named contact who helps once per job | 1 |
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
 | Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix | 1 |
+| Powered Armor | Legion-grade powered armor, yours by right: issued by a military, a Hegemony House or a mercenary company (take its Allegiance), or salvaged and licensed. The GM approves it, and someone always wants it back. | 1 |
 
 ### Spending points
 
@@ -268,6 +269,9 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Scout drone | A small flying drone that can scout and relay what it sees. |
 | Translator | Translates most known languages, slowly. Thrum and Qor need one to talk with most peoples. |
 | Exo-frame | A light powered frame: no gravity penalty for Vael and others built for low gravity. |
+| Hardsuit | An armored vac suit: air for six hours in vacuum or poison atmosphere, and once per fight a hit that marks 2 or more boxes marks one fewer. −1 to Athletics and Stealth while you wear it; a breach is the GM's call. Not with other armor. |
+| Combat exoskeleton | A powered military frame: +2 to Athletics to lift, carry, climb or break things, your unarmed blows mark 2 boxes, and you carry a heavy weapon one-handed. Its plating works as body armor: once per fight, a 2+ box hit marks one fewer. −2 to Stealth; needs a fresh power cell each day. Not with other armor. |
+| Powered armor | Legion-grade, sealed and powered: hits that would mark 1 box mark nothing, and once per fight a hit that marks 2 or more boxes marks one fewer. Air for six hours, and the strength of a combat exoskeleton. −2 to Stealth, any scanner picks it up, and it needs a fresh power cell each day. A shot at the power pack (−2 to hit) can lock it up until someone spends an action freeing you. Needs the Powered Armor Edge. Not with other armor. |
 | Travel papers | Accord transit permits and a clean (or convincing) Mandate record. |
 
 # Actions and teamwork
