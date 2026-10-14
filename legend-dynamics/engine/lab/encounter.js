@@ -208,7 +208,7 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   const extraDodge = !prior && !!chosen && chosen.used;
   const canDodge = !!chosen;
   const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound, parryRound: d.parryRound, parries: d.parries, blockedRound: d.blockedRound, defRound: d.defRound, defCount: d.defCount, traits: clone(d.traits || []),
-    lasting: clone(d.lasting || []), conditions: clone(d.conditions || []), takenOut: !!d.takenOut },
+    lasting: clone(d.lasting || []), conditions: clone(d.conditions || []), takenOut: !!d.takenOut, limbTradedRound: d.limbTradedRound },
     attackerTracks: clone(a.tracks || {}) };
   const res = core.resolveAttack({
     attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury, traits: a.traits || [] },
@@ -297,6 +297,35 @@ function applyWound(d, entry) {
   if (condAdded) d.conditions = [...(d.conditions || []), condAdded];
   d.lasting = [...(d.lasting || []), { id: entry.id, name: entry.name }];
   return { id: entry.id, name: entry.name, text: entry.text, dyingBefore, condAdded };
+}
+
+/**
+ * Trade death for a limb (grievous wounds): a character just left Dying or killed by this hit lives instead,
+ * Incapacitated but stable, and loses a limb ("lost") or its use ("crippled"), which becomes a complication.
+ * Once a fight. @param {any} enc @param {any} rules @param {number} n the attack event @param {"lost" | "crippled"} kind
+ */
+export function tradeLimb(enc, rules, n, kind) {
+  const G = rules.flags.has("grievous") ? rules.params.grievousWounds : null;
+  if (!G || !G.limbTrade) return { error: "Trading a limb isn't part of these rules." };
+  const ev = enc.events.find((/** @type {any} */ e) => e.n === n && e.type === "attack");
+  if (!ev || ev.superseded || ev.traded) return { error: "Choose the hit to trade, once." };
+  const d = find(enc, ev.defender.pid);
+  if (!d || d.kind !== "pc") return { error: "Only a character can trade a limb for their life." };
+  if (!((ev.dying && !ev.pre.defender.dying) || ev.dead)) return { error: "Only a hit that left them Dying or dead can be traded." };
+  if (d.limbTradedRound !== undefined) return { error: `${d.name} has already traded a limb this fight.` };
+  const name = kind === "crippled" ? "Crippled limb (complication)" : "Lost limb (complication)";
+  // If the same hit was grievous, the trade replaces its table result: one wound for one hit.
+  const g = ev.grievous && ev.grievous.pc ? ev.grievous : null;
+  if (g) {
+    d.lasting = (d.lasting || []).filter((/** @type {any} */ w) => w.about !== ev.n);
+    const cond = g.downgraded ? g.downgraded.condAdded : g.condAdded;
+    if (cond) d.conditions = (d.conditions || []).filter((/** @type {string} */ c) => c !== cond);
+    g.replacedByTrade = true;
+  }
+  Object.assign(d, { dying: false, dead: false, injury: Math.min(d.injury, d.boxes), limbTradedRound: enc.round });
+  d.lasting = [...(d.lasting || []), { id: "limb-" + kind, name, complication: true, about: ev.n }];
+  ev.traded = kind; ev.dying = false; ev.dead = false;
+  return { event: log(enc, "trade", { pid: d.pid, name: d.name, about: ev.n, kind, wound: name }) };
 }
 
 /** Spend a Legend point. use: "reroll-attack" | "reroll-dodge" | "reduce" (a hit by one box) | "prep" | "other". @param {any} enc @param {any} rules @param {any} core @param {string} pid @param {string} use @param {{ event?: number, note?: string }} [o] */

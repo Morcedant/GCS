@@ -387,3 +387,25 @@ test("Grievous wounds (Trails experiment): characters roll the table and can dow
   const enc3 = setup(X.newLabConfig("western", lab, combatOf(pack)), found.ev.key ?? 1); E.startCombat(enc3, off);
   assert.ok(!E.attack(enc3, off, LD, { attacker: "p1", defender: "p2", weapon: "revolver", band: "close", canDodge: false }).event.grievous);
 });
+
+test("Grievous wounds: a character left Dying or killed may trade a limb, once a fight", () => {
+  const cfg = X.newLabConfig("western", lab, combatOf(pack)); cfg.experiments.grievousWounds.on = true;
+  const r = { ...X.buildRules(cfg, weapons, lab, combatOf(pack)), jamOn18: true };
+  let enc, ev;
+  for (let seed = 1; seed < 300 && !ev; seed++) {
+    enc = setup(cfg, seed); E.startCombat(enc, r); const a = E.find(enc, "p1"); a.injury = 2;
+    const e = E.attack(enc, r, LD, { attacker: "p2", defender: "p1", weapon: "revolver", band: "close", canDodge: false }).event;
+    if (e.dying) ev = e;
+  }
+  assert.ok(ev, "a hit that leaves Ames Dying");
+  const ames = E.find(enc, "p1");
+  const res = E.tradeLimb(enc, r, ev.n, "crippled");
+  assert.ok(!res.error, res.error);
+  assert.equal(ames.dying, false); assert.equal(ames.injury, 3);
+  assert.ok(ames.lasting.some((w) => w.id === "limb-crippled" && w.complication));
+  assert.equal(ames.lasting.filter((w) => w.about === ev.n).length, 1, "one wound for one hit, even if it was grievous");
+  assert.ok(E.tradeLimb(enc, r, ev.n, "lost").error, "once");
+  assert.equal(S.summarize(enc).limbTrades, 1);
+  const off = { ...X.buildRules(X.newLabConfig("western", lab, combatOf(pack)), weapons, lab, combatOf(pack)), jamOn18: true };
+  assert.ok(E.tradeLimb(enc, off, ev.n, "lost").error, "not without the experiment");
+});

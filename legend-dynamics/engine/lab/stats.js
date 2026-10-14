@@ -65,6 +65,7 @@ export function summarize(enc) {
     byWeapon, byAttacker, byDefense,
     armorStops: attacks.filter((/** @type {any} */ e) => e.armorUsed).length,
     grievous: attacks.filter((/** @type {any} */ e) => e.grievous && e.grievous.pc).length,
+    limbTrades: ev.filter((/** @type {any} */ e) => e.type === "trade").length,
     takenOut: attacks.filter((/** @type {any} */ e) => e.grievous && !e.grievous.pc).length,
     grievousByResult: attacks.filter((/** @type {any} */ e) => e.grievous && e.grievous.pc).reduce((/** @type {any} */ m, /** @type {any} */ e) => { const k = e.grievous.downgradedTo !== undefined ? `${e.grievous.name} → ${e.grievous.downgradedTo || "none"}` : e.grievous.name; m[k] = (m[k] || 0) + 1; return m; }, {}),
   };
