@@ -3827,7 +3827,7 @@ tr.lvl-U td.target { color: var(--muted); }
               </select></div>
             <div class="field" id="r-quality-wrap" hidden><label for="r-quality">Attack succeeded by</label><select id="r-quality"></select></div>
             <div class="field" id="r-parries-wrap" hidden><label for="r-parries">Parries already this round</label>
-              <select id="r-parries"><option value="0">None</option><option value="1">One</option><option value="2">Two</option><option value="3">Three</option></select></div>
+              <select id="r-parries"><option value="0">None</option><option value="1">One</option></select></div>
           </div>
           <div class="checks">
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
@@ -4233,6 +4233,12 @@ const EXPERIMENTS = [
     defense: "block",
   },
   {
+    id: "oneDefense", scope: "core", label: "One defense a round",
+    summary: "Dodge, Parry and Block share one defense a round; an Edge (Additional Defense) or trait adds more.",
+    params: { perRound: 1 },
+    flags: ["oneDefense"],
+  },
+  {
     id: "dodgeEveryAttack", scope: "core", label: "Dodge every attack",
     summary: "A target may try to Dodge every attack against it, not just once a round.",
     params: {},
@@ -4286,13 +4292,14 @@ function available(setting, lab, published) {
  */
 function buildRules(config, weapons, lab, published) {
   const rules = { config: config.id, label: config.label, kind: config.kind, hooks: { attackModifiers: [], dodgeModifiers: [] }, actions: new Set(), flags: new Set(),
-    defenses: /** @type {Record<string, any>} */ ({}), protection: /** @type {any[]} */ ([]), weapons, active: /** @type {any[]} */ ([]), settingRules: /** @type {any[]} */ ([]) };
+    defenses: /** @type {Record<string, any>} */ ({}), params: /** @type {Record<string, any>} */ ({}), protection: /** @type {any[]} */ ([]), weapons, active: /** @type {any[]} */ ([]), settingRules: /** @type {any[]} */ ([]) };
   const apply = (/** @type {any} */ x, /** @type {any} */ p) => {
     if (x.attackModifiers) rules.hooks.attackModifiers.push((/** @type {any} */ ctx) => x.attackModifiers(ctx, p));
     if (x.dodgeModifiers) rules.hooks.dodgeModifiers.push((/** @type {any} */ ctx) => x.dodgeModifiers(ctx, p));
     for (const a of x.actions || []) rules.actions.add(a);
     for (const f of x.flags || []) rules.flags.add(f);
     if (x.defense) rules.defenses[x.defense] = p;
+    rules.params[x.id] = p;
     if (x.protection) rules.protection = x.protection(lab);
     if (x.weapons) rules.weapons = x.weapons(rules.weapons, lab, p);
   };
@@ -4449,7 +4456,11 @@ function defenseOptions(enc, rules, d, w) {
   if (!d || isOut(d)) return out;
   const live = (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false);
   const flags = rules.flags || new Set(), D = rules.defenses || {};
-  const opt = (/** @type {any} */ o) => { o.preview = o.base + o.mods.reduce((/** @type {number} */ x, /** @type {any} */ m) => x + m.value, 0); out.push(o); };
+  // One defense a round shared by Dodge, Parry and Block (with the rule on), more with extraDefense traits (an Edge).
+  const shared = flags.has("oneDefense") && !flags.has("dodgeEveryAttack");
+  const allowed = shared ? (rules.params.oneDefense.perRound || 1) + live.filter((/** @type {any} */ t) => t.type === "extraDefense").reduce((n, /** @type {any} */ t) => n + (t.value || 1), 0) : 0;
+  const spent = shared && d.defRound === enc.round ? d.defCount || 0 : 0;
+  const opt = (/** @type {any} */ o) => { o.preview = o.base + o.mods.reduce((/** @type {number} */ x, /** @type {any} */ m) => x + m.value, 0); if (shared) o.used = spent >= allowed; out.push(o); };
   if (d.dodge !== null) {
     const gear = live.filter((/** @type {any} */ t) => t.type === "dodgeBonus").map((/** @type {any} */ t) => ({ source: "gear", label: t.label || "Gear", value: t.value, scope: "setting", preview: true }));
     opt({ kind: "dodge", label: "Dodge", base: d.dodge, mods: gear, used: d.dodgedRound === enc.round && !flags.has("dodgeEveryAttack") });
@@ -4519,7 +4530,7 @@ function attack(enc, rules, core, cmd, opts = {}) {
   const chosen = prior ? prior.defenseChoice : chooseDefense(defenseOptions(enc, rules, d, weapon), choice, !!cmd.allowExtraDodge);
   const extraDodge = !prior && !!chosen && chosen.used;
   const canDodge = !!chosen;
-  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound, parryRound: d.parryRound, parries: d.parries, blockedRound: d.blockedRound, traits: clone(d.traits || []) },
+  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound, parryRound: d.parryRound, parries: d.parries, blockedRound: d.blockedRound, defRound: d.defRound, defCount: d.defCount, traits: clone(d.traits || []) },
     attackerTracks: clone(a.tracks || {}) };
   const res = core.resolveAttack({
     attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury, traits: a.traits || [] },
@@ -4535,6 +4546,7 @@ function attack(enc, rules, core, cmd, opts = {}) {
     if (a.aim) a.aim = null;
   }
   if (res.dodge && chosen) {
+    d.defCount = d.defRound === enc.round ? (d.defCount || 0) + 1 : 1; d.defRound = enc.round;
     if (chosen.kind === "dodge") d.dodgedRound = enc.round;
     else if (chosen.kind === "parry") { d.parries = d.parryRound === enc.round ? (d.parries || 0) + 1 : 1; d.parryRound = enc.round; }
     else if (chosen.kind === "block") d.blockedRound = enc.round;
@@ -4917,7 +4929,8 @@ function mountLab(api) {
     const weapons = ["fists", ...Object.values(WEAPONS).filter((/** @type {any} */ a) => a.id !== "fists" && (c.equipment[a.id] || (a.equip || []).some((/** @type {string} */ k) => c.equipment[k]) || (gun && a.ammo && a.ammo === gun.type) || (a.cantrip && (c.spells || []).includes(a.cantrip)))).map((/** @type {any} */ a) => a.id)];
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
-      traits: protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
+      traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
+        ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : [])],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
@@ -5125,7 +5138,9 @@ function mountLab(api) {
       $("lab-defense").value = $("lab-defense").dataset.key === key && [...$("lab-defense").options].some((o) => o.value === prevDef) ? prevDef : "auto";
       $("lab-defense").dataset.key = key;
       const used = opts.filter((o) => o.used).map((o) => o.kind);
-      $("lab-dodge-note").textContent = used.length ? `${d.name} has already used ${used.join(" and ")} this round${used.includes("dodge") ? " (one Dodge a round in the published rules)" : ""}. Choose it anyway to allow it: it's logged as a GM override.` : "";
+      const sharedOut = r.flags.has("oneDefense") && !r.flags.has("dodgeEveryAttack") && opts.length > 0 && used.length === opts.length;
+      $("lab-dodge-note").textContent = sharedOut ? `${d.name} has no defense left this round (one a round${d.traits && d.traits.some((/** @type {any} */ t) => t.type === "extraDefense") ? ", plus Additional Defense" : ""}). Choose one anyway to allow it: it's logged as a GM override.`
+        : used.length ? `${d.name} has already used ${used.join(" and ")} this round${used.includes("dodge") ? " (one Dodge a round in the published rules)" : ""}. Choose it anyway to allow it: it's logged as a GM override.` : "";
     }
   }
   $("lab-act-wrap").addEventListener("change", (/** @type {any} */ e) => { if (["lab-actor", "lab-action", "lab-target", "lab-weapon"].includes(e.target.id)) renderAction(); });
@@ -5616,6 +5631,8 @@ return { mountLab };
   const PARRY = CR.parry ? [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]] : [];
   const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
   const isParry = (name) => name.startsWith("Parry:");
+  // One defense a round, more with the setting's Edge (Additional Defense).
+  const defensesPerRound = () => CR.oneDefense ? (CR.oneDefense.perRound || 1) + edgeN(CR.oneDefense.edge || "") : Infinity;
   // Block: with a real shield (gear, +its bonus) or anything picked up in the fight (no bonus).
   const SHIELDS = CR.block ? (PACK.protection || []).filter((g) => g.traits.some((t) => t.type === "shield")) : [];
   const shieldBonus = (g) => g.traits.find((t) => t.type === "shield").value || 0;
@@ -5931,7 +5948,7 @@ return { mountLab };
     $("st-grit").textContent = gritStart();
     $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`
       + (CR.parry ? `. Parry = ${PARRY.map(([s]) => `${s} ${skillTarget(s)} ${signed(CR.parry.mod)} = ${parryOf(s)}`).join(", or ")}` : "")
-      + (CR.dodgeEveryAttack ? ". You may defend against every attack." : "");
+      + (CR.oneDefense ? `. ${defensesPerRound() > 1 ? `${["", "One", "Two", "Three"][defensesPerRound()] || defensesPerRound()} defenses a round (Additional Defense)` : "One defense a round"}: Dodge${CR.parry ? ", Parry" : ""}${CR.block ? " or Block" : ""}.` : "");
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
@@ -6178,7 +6195,7 @@ return { mountLab };
     updateInjuryToggle();
     const sk = $("r-skill").value || "";
     $("r-quality-wrap").hidden = !(CR.attackQualityDodge && isDefense(sk));
-    $("r-parries-wrap").hidden = !(CR.parry && isParry(sk));
+    $("r-parries-wrap").hidden = !(CR.parry && isParry(sk) && defensesPerRound() > 1);
     $("r-aim-wrap").hidden = !(CR.aim && [T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk));
     const { name, base, total } = rollMods();
     const t = base + total;

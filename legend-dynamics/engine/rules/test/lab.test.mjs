@@ -240,11 +240,11 @@ test("Heavy coat (published D&D gear): turns blades and claws, not bullets, once
 
 test("D&D's published combat rules: in force under Published and Lab alike, not offered as experiments", () => {
   const C = pack.combatRules;
-  assert.deepEqual(Object.keys(C).sort(), ["aim", "attackQualityDodge", "block", "dodgeEveryAttack", "parry"]);
+  assert.deepEqual(Object.keys(C).sort(), ["aim", "attackQualityDodge", "block", "oneDefense", "parry"]);
   for (const cfg of [X.PUBLISHED, X.newLabConfig("western", lab, C)]) {
     const r = X.buildRules(cfg, weapons, lab, C);
     assert.deepEqual(r.settingRules.map((x) => x.id).sort(), Object.keys(C).sort());
-    assert.ok(r.flags.has("dodgeEveryAttack") && r.actions.has("aim"));
+    assert.ok(r.flags.has("oneDefense") && !r.flags.has("dodgeEveryAttack") && r.actions.has("aim"));
     assert.equal(r.defenses.parry.mod, -3); assert.equal(r.defenses.parry.repeatPenalty, -2); assert.equal(r.defenses.parry.scope, "setting");
     assert.equal(r.hooks.dodgeModifiers.length, 1); assert.equal(r.hooks.attackModifiers.length, 1);
     assert.equal(r.active.length, 0, "no experiments on");
@@ -298,4 +298,34 @@ test("D&D Block: a real shield +1, an improvised one breaks on a 2-box hit, neve
   // A 1-box club doesn't break it.
   const enc2 = setup(X.PUBLISHED, 6); E.startCombat(enc2, r); const a2 = E.find(enc2, "p1"); a2.skills.Melee = 18; E.find(enc2, "p2").weapons.push("club"); E.find(enc2, "p2").skills.Melee = 14; E.addGear(enc2, "p1", chair);
   for (let i = 0; i < 10; i++) { a2.blockedRound = null; const e = E.attack(enc2, r, LD, { attacker: "p2", defender: "p1", weapon: "club", band: "melee", defense: "block" }).event; assert.equal(e.shieldBroke, null); }
+});
+
+test("D&D: one defense a round across Dodge, Parry and Block; Additional Defense gives a second", () => {
+  const r = { ...X.buildRules(X.PUBLISHED, weapons, lab, pack.combatRules), jamOn18: true };
+  assert.ok(pack.extraEdges.some((e) => e[0] === "extradefense"));
+  const run = (extra) => {
+    const enc = setup(X.PUBLISHED, 31); E.startCombat(enc, r);
+    const ames = E.find(enc, "p1"); if (extra) ames.traits.push({ type: "extraDefense", value: 1, label: "Additional Defense" });
+    const out = [];
+    for (let i = 0; i < 3; i++) {
+      const ev = E.attack(enc, r, LD, { attacker: "p2", defender: "p1", weapon: "fists", band: "melee" }).event;
+      out.push(ev.success ? (ev.defenseChoice ? ev.defenseChoice.kind : "none") : "missed");
+      ames.injury = 0; ames.dying = false;
+    }
+    return { out, opts: E.defenseOptions(enc, r, ames, weapons.fists) };
+  };
+  const one = run(false), two = run(true);
+  const defended = (o) => o.out.filter((k) => k === "dodge" || k === "parry").length;
+  assert.ok(defended(one) <= 1, "one defense: " + one.out);
+  assert.ok(one.opts.every((o) => o.used) || defended(one) === 0);
+  assert.ok(defended(two) <= 2, "two defenses: " + two.out);
+  // Directly: after one defense, all options are used; with the Edge, not until two.
+  const enc = setup(X.PUBLISHED, 2); E.startCombat(enc, r); const d = E.find(enc, "p1");
+  d.defRound = enc.round; d.defCount = 1;
+  assert.ok(E.defenseOptions(enc, r, d, weapons.fists).every((o) => o.used));
+  d.traits.push({ type: "extraDefense", value: 1 });
+  assert.ok(E.defenseOptions(enc, r, d, weapons.fists).every((o) => !o.used));
+  d.defCount = 2; assert.ok(E.defenseOptions(enc, r, d, weapons.fists).every((o) => o.used));
+  // Next round, it's back.
+  d.defRound = enc.round - 1; assert.ok(E.defenseOptions(enc, r, d, weapons.fists).every((o) => !o.used));
 });

@@ -2329,7 +2329,7 @@
   ],
   [
    "Defense",
-   "Defend against every attack: Dodge, or Parry a blade, claw or fist (Melee or Brawling −3; −2 more for each extra parry in a round). Block a blade, claw, fist or arrow with a shield or a chair (Melee −2, +1 with a real shield; once a round; an improvised one breaks on a 2+ box hit). Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target. Heavy coat: once a fight, a 2+ box hit from a blade, claw, fang or missile marks one fewer."
+   "One defense a round (two with Additional Defense): Dodge, Parry a blade, claw or fist (Melee or Brawling −3; a second parry −2 more), or Block a blade, claw, fist or arrow with a shield or a chair (Melee −2, +1 with a real shield; an improvised one breaks on a 2+ box hit). Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target. Heavy coat: once a fight, a 2+ box hit from a blade, claw, fang or missile marks one fewer."
   ],
   [
    "Guns",
@@ -3064,10 +3064,19 @@
     "missing": "describe your talisman, who made it, and its ritual",
     "sheetNote": "renewed each job"
    }
+  ],
+  [
+   "extradefense",
+   "Additional Defense",
+   "Defend twice a round instead of once: Dodge, Parry or Block, in any mix. A second parry is still −2.",
+   1
   ]
  ],
  "combatRules": {
-  "dodgeEveryAttack": {},
+  "oneDefense": {
+   "perRound": 1,
+   "edge": "extradefense"
+  },
   "attackQualityDodge": {
    "bands": [
     {

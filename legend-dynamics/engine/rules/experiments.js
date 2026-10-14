@@ -55,6 +55,12 @@ export const EXPERIMENTS = [
     defense: "block",
   },
   {
+    id: "oneDefense", scope: "core", label: "One defense a round",
+    summary: "Dodge, Parry and Block share one defense a round; an Edge (Additional Defense) or trait adds more.",
+    params: { perRound: 1 },
+    flags: ["oneDefense"],
+  },
+  {
     id: "dodgeEveryAttack", scope: "core", label: "Dodge every attack",
     summary: "A target may try to Dodge every attack against it, not just once a round.",
     params: {},
@@ -108,13 +114,14 @@ export function available(setting, lab, published) {
  */
 export function buildRules(config, weapons, lab, published) {
   const rules = { config: config.id, label: config.label, kind: config.kind, hooks: { attackModifiers: [], dodgeModifiers: [] }, actions: new Set(), flags: new Set(),
-    defenses: /** @type {Record<string, any>} */ ({}), protection: /** @type {any[]} */ ([]), weapons, active: /** @type {any[]} */ ([]), settingRules: /** @type {any[]} */ ([]) };
+    defenses: /** @type {Record<string, any>} */ ({}), params: /** @type {Record<string, any>} */ ({}), protection: /** @type {any[]} */ ([]), weapons, active: /** @type {any[]} */ ([]), settingRules: /** @type {any[]} */ ([]) };
   const apply = (/** @type {any} */ x, /** @type {any} */ p) => {
     if (x.attackModifiers) rules.hooks.attackModifiers.push((/** @type {any} */ ctx) => x.attackModifiers(ctx, p));
     if (x.dodgeModifiers) rules.hooks.dodgeModifiers.push((/** @type {any} */ ctx) => x.dodgeModifiers(ctx, p));
     for (const a of x.actions || []) rules.actions.add(a);
     for (const f of x.flags || []) rules.flags.add(f);
     if (x.defense) rules.defenses[x.defense] = p;
+    rules.params[x.id] = p;
     if (x.protection) rules.protection = x.protection(lab);
     if (x.weapons) rules.weapons = x.weapons(rules.weapons, lab, p);
   };

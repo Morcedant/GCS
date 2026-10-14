@@ -131,7 +131,11 @@ export function defenseOptions(enc, rules, d, w) {
   if (!d || isOut(d)) return out;
   const live = (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false);
   const flags = rules.flags || new Set(), D = rules.defenses || {};
-  const opt = (/** @type {any} */ o) => { o.preview = o.base + o.mods.reduce((/** @type {number} */ x, /** @type {any} */ m) => x + m.value, 0); out.push(o); };
+  // One defense a round shared by Dodge, Parry and Block (with the rule on), more with extraDefense traits (an Edge).
+  const shared = flags.has("oneDefense") && !flags.has("dodgeEveryAttack");
+  const allowed = shared ? (rules.params.oneDefense.perRound || 1) + live.filter((/** @type {any} */ t) => t.type === "extraDefense").reduce((n, /** @type {any} */ t) => n + (t.value || 1), 0) : 0;
+  const spent = shared && d.defRound === enc.round ? d.defCount || 0 : 0;
+  const opt = (/** @type {any} */ o) => { o.preview = o.base + o.mods.reduce((/** @type {number} */ x, /** @type {any} */ m) => x + m.value, 0); if (shared) o.used = spent >= allowed; out.push(o); };
   if (d.dodge !== null) {
     const gear = live.filter((/** @type {any} */ t) => t.type === "dodgeBonus").map((/** @type {any} */ t) => ({ source: "gear", label: t.label || "Gear", value: t.value, scope: "setting", preview: true }));
     opt({ kind: "dodge", label: "Dodge", base: d.dodge, mods: gear, used: d.dodgedRound === enc.round && !flags.has("dodgeEveryAttack") });
@@ -201,7 +205,7 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   const chosen = prior ? prior.defenseChoice : chooseDefense(defenseOptions(enc, rules, d, weapon), choice, !!cmd.allowExtraDodge);
   const extraDodge = !prior && !!chosen && chosen.used;
   const canDodge = !!chosen;
-  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound, parryRound: d.parryRound, parries: d.parries, blockedRound: d.blockedRound, traits: clone(d.traits || []) },
+  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound, parryRound: d.parryRound, parries: d.parries, blockedRound: d.blockedRound, defRound: d.defRound, defCount: d.defCount, traits: clone(d.traits || []) },
     attackerTracks: clone(a.tracks || {}) };
   const res = core.resolveAttack({
     attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury, traits: a.traits || [] },
@@ -217,6 +221,7 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     if (a.aim) a.aim = null;
   }
   if (res.dodge && chosen) {
+    d.defCount = d.defRound === enc.round ? (d.defCount || 0) + 1 : 1; d.defRound = enc.round;
     if (chosen.kind === "dodge") d.dodgedRound = enc.round;
     else if (chosen.kind === "parry") { d.parries = d.parryRound === enc.round ? (d.parries || 0) + 1 : 1; d.parryRound = enc.round; }
     else if (chosen.kind === "block") d.blockedRound = enc.round;
