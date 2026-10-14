@@ -315,16 +315,16 @@ Work a working in advance and store it in an object; break it (one action, no ro
 
 ## Magic advancement
 
-After a significant mission, a magical character can take one of these **instead of a skill step**, with the GM's approval and a reason from the story. Each setting says which it uses.
+A magical character can spend advancement points (see *Advancement*) on these, with the GM's approval and a reason from the story. Each setting says which it uses.
 
-| Option | Effect | Limit |
-|---|---|---|
-| New burst | Learn one burst beyond your limit | Up to 2 extra |
-| Deeper step | One burst you know works one step deeper: one more Boost | Each burst once |
-| Another charm | Carry one more ready charm | Up to 2 extra |
-| By heart | One kind of working takes one fewer segment (minimum 1) | Each kind once |
-| Quicker hand | One working you know goes one pace faster: an hour becomes ten minutes, ten minutes one action | Each working once |
-| Mastery | Your magic skill becomes Expert (+5) | Once, at the end of a long campaign |
+| Option | Effect | Cost | Limit |
+|---|---|---|---|
+| New burst | Learn one burst beyond your limit | 1 | Up to 2 extra |
+| Deeper step | One burst you know works one step deeper: one more Boost | 2 | Each burst once |
+| Another charm | Carry one more ready charm | 1 | Up to 2 extra |
+| By heart | One kind of working takes one fewer segment (minimum 1) | 1 | Each kind once |
+| Quicker hand | One working you know goes one pace faster: an hour becomes ten minutes, ten minutes one action | 1 | Each working once |
+| Mastery | Your magic skill becomes Expert (+5) | 4 | Once, at the end of a long campaign |
 
 # Legend points and tracks
 
@@ -346,7 +346,20 @@ Gain one point when one of your complications creates a meaningful problem you a
 
 ## Advancement
 
-After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication. Only a Specialist's starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they broaden (see Step 3).
+Characters grow by earning **advancement points** and spending them.
+
+- **Earning.** After a significant mission, the GM awards each character **1 point**. At a **milestone**, the end of a story arc, everyone earns **2 more**.
+- **Spending.** Spend points when you earn them, or bank them for something bigger. Each purchase needs the GM's approval and a reason from the story: training with someone, something you lived through, a debt paid.
+
+| Purchase | Cost | Limit |
+|---|---|---|
+| A skill from Untrained to Trained | 1 | — |
+| A skill from Trained to Specialty | 2 | Specialty (+3) is the ceiling: only a Specialist's starting skill is Expert, unless they broaden (see Step 3) |
+| Revise an advantage or complication | 1 | — |
+| A new Edge | 3 | Any Edge except the attribute and Trained-skill Edges, within its own limit |
+| +1 to an attribute | 4 | Once per attribute; no higher than one above the starting maximum (14, plus any origin bonus) |
+
+Magic and powers grow the same way, at the costs their chapters give.
 
 # Running missions
 
@@ -364,7 +377,7 @@ End each mission with a short entry, written together:
 2. **Who stood out?** A moment worth remembering.
 3. **Complications.** Which ones came into play, and what did they cost?
 4. **What changed?** New allies or enemies, damage, open threads for next time.
-5. **Advancement.** After a significant mission, the GM may authorize one skill step for each character.
+5. **Advancement.** After a significant mission, each character earns 1 advancement point; at a milestone, 2 more.
 
 # Ready-made characters
 
