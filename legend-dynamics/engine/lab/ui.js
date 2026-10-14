@@ -32,7 +32,10 @@ export function mountLab(api) {
   const PUB = PACK.combatRules || null; // the published combat rules: the core's (engine/combat.json) with the setting's overrides
   const fresh = LDX.newLabConfig(PACK.id, LAB, PUB);
   if (!lab.cfg) lab.cfg = fresh;
-  for (const [id, st] of Object.entries(fresh.experiments)) if (!lab.cfg.experiments[id]) lab.cfg.experiments[id] = st; // new experiments appear switched off
+  for (const [id, st] of Object.entries(fresh.experiments)) {
+    if (!lab.cfg.experiments[id]) lab.cfg.experiments[id] = st; // new experiments appear switched off
+    else for (const [k, v] of Object.entries(st.params)) if (!(k in lab.cfg.experiments[id].params)) lab.cfg.experiments[id].params[k] = v; // and new settings at their defaults
+  }
   lab.cfg.label = LAB.label || lab.cfg.label;
   const save = () => store.set(KEY, lab);
   const say = (/** @type {string} */ m, /** @type {boolean} */ err = false) => { $("lab-msg").textContent = m; $("lab-msg").className = "toast" + (err ? " err" : ""); };
@@ -57,6 +60,8 @@ export function mountLab(api) {
       ? `This encounter runs under: ${rulesLine(r)}. Changes here apply to the next encounter.`
       : lab.mode === "lab" ? "New encounters use the test configuration." : "New encounters use the published rules. Choose the test configuration to switch experiments on.";
     const on = lab.mode === "lab";
+    const offered = LDX.available(PACK.id, LAB, PUB);
+    $("lab-rules-hint").textContent = offered.length ? `${on ? "Testing" : "To test"}: ${offered.map((/** @type {any} */ x) => x.label).join(", ")}` : "";
     const pubRows = rules().settingRules.map((/** @type {any} */ x) => `<div class="exp"><label><input type="checkbox" checked disabled> <b>${esc(x.label)}</b></label>
         <span class="lab-scope setting">PUBLISHED</span><div class="small muted">Part of the published combat rules${(PACK.coreCombat || []).includes(x.id) ? " (core)" : ` (${esc(T.title)})`}, in every configuration.</div></div>`).join("");
     $("lab-exps").innerHTML = pubRows + LDX.available(PACK.id, LAB, PUB).map((/** @type {any} */ x) => {

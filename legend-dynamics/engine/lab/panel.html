@@ -1,5 +1,8 @@
     <!-- Rules Lab: Encounter modeler (only in settings with a test configuration, packs/<id>/lab.json) -->
     <style>
+  .lab-rules-sum { cursor: pointer; padding: 8px 10px; border: 1px dashed var(--accent); border-radius: 8px; margin: 4px 0 8px; }
+  .lab-rules-sum b { text-transform: uppercase; letter-spacing: .06em; font-size: .85rem; }
+  #lab-rules[open] > .lab-rules-sum { border-style: solid; }
       .lab { margin-top: 18px; }
       .lab-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; justify-content: space-between; }
       .lab-head h3 { margin: 0; }
@@ -52,7 +55,7 @@
       </div>
       <p class="small muted">Run a fight with every calculation shown, and test rule changes without touching the published game. Normal play (the sheet and its roller) always uses the published rules.</p>
 
-      <details id="lab-rules"><summary class="label">Rules configuration</summary>
+      <details id="lab-rules"><summary class="lab-rules-sum"><b>Rules configuration</b> <span class="small muted">· switch on experiments here: choose the test configuration, then tick one</span><br><span class="small" id="lab-rules-hint"></span></summary>
         <div class="lab-row" style="margin:8px 0">
           <label><input type="radio" name="lab-mode" value="published" checked> Published rules</label>
           <label><input type="radio" name="lab-mode" value="lab"> <span id="lab-cfg-label">Test configuration</span></label>
