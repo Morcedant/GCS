@@ -1309,11 +1309,16 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>1</td>
 </tr>
 <tr class="even">
+<td>Hard to put down</td>
+<td>Once per fight, shrug off a telling hit’s effect: you still take its boxes (see <em>Telling hits</em>)</td>
+<td>1</td>
+</tr>
+<tr class="odd">
 <td>Talisman</td>
 <td>Start each venture with one ready talisman holding a Minor ritual agreed with the GM. Anyone can break it; it’s renewed between ventures and doesn’t count against a talisman limit.</td>
 <td>1</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Enchanted heirloom</td>
 <td>One item carries a lasting Significant enchantment: +2 to one use, or its hits mark one more box, or it turns one hit a fight. Sight sees it; Shatter’s Third Seal or a rite of unbinding can break it.</td>
 <td>1</td>
@@ -1702,7 +1707,58 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Attack quality.</strong> A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.</li>
 <li><strong>Aim.</strong> Spend your action aiming at a target you can see: +1 to your next attack against it. An advantage that rewards aiming adds its bonus to this.</li>
 </ul>
-<p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage.</p>
+<p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage: a great hit decides <em>what</em> happens instead.</p>
+<h2 id="g-telling-hits">Telling hits</h2>
+<p>A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.</p>
+<ul>
+<li><strong>A telling hit</strong> is an attack that succeeds by <strong>5 or more</strong>, or on a natural 3 or 4, and isn’t stopped by a defense. The attacker picks <strong>one effect</strong> below and describes it. The weapon still marks its usual boxes.</li>
+<li><strong>A called shot.</strong> Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, an eye, a rope, a lock). If the attack hits at all, the effect happens, whatever the margin. An advantage that rewards aiming cuts this penalty by 1.</li>
+<li><strong>Both ways.</strong> Opponents land telling hits on characters too.</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Effect</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Disarm</td>
+<td>The weapon or held item drops, or flies a few yards away</td>
+</tr>
+<tr class="even">
+<td>Knock down</td>
+<td>The target falls prone, or is driven back a few steps</td>
+</tr>
+<tr class="odd">
+<td>Pin</td>
+<td>The target is held, tangled or pinned down: their next action goes to getting free</td>
+</tr>
+<tr class="even">
+<td>Rattle</td>
+<td>−2 to the target’s next roll</td>
+</tr>
+<tr class="odd">
+<td>Break gear</td>
+<td>A shield, weapon or tool breaks; armor loses 1 protection until it’s repaired</td>
+</tr>
+<tr class="even">
+<td>Open them up</td>
+<td>The next attack on this target this round gets +2</td>
+</tr>
+<tr class="odd">
+<td>Precise</td>
+<td>You hit exactly what you aimed at: the lantern, the rope, the tire, the hand on the trigger</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Limits.</strong> A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a bear or knocks down a train, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next, like sending one crashing into another.</p>
+<p><strong>Staying alive.</strong> A character on the receiving end can shrug off a telling hit’s effect with <strong>Hard to put down</strong> (once per fight) or by spending a Fortune point. Either way, they still take the boxes.</p>
 <h2 id="g-range">Range</h2>
 <p>Distances fall into five bands:</p>
 <table>
@@ -2184,6 +2240,10 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Declare when a hit would mark boxes, before applying them. Does not prevent certain death.</td>
 </tr>
 <tr class="odd">
+<td>Shrug off a telling hit</td>
+<td>Cancel the effect an attacker picked against you; you still take the boxes.</td>
+</tr>
+<tr class="even">
 <td>Establish a small preparation</td>
 <td>Propose a plausible detail, such as having packed something useful. GM approval is required.</td>
 </tr>
@@ -3864,9 +3924,9 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Assistance:</strong> success +1; success by 5 or more +2; 18 causes a complication. One assistant per roll.</p>
 <p><strong>Near misses:</strong> fail by 1–2 and the GM may offer success at a cost; never on a natural 17–18.</p>
 <p><strong>Clocks:</strong> 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).</p>
-<p><strong>Combat:</strong> move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.</p>
+<p><strong>Combat:</strong> move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural 3–4): the attacker picks an effect; called shot −2 (small target −4). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.</p>
 <p><strong>Medicine:</strong> stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Rest: one box per two full days, not from three.</p>
-<p><strong>Fortune:</strong> start each session with two. Reroll, reduce an injury by one box, or establish a small preparation. Earn one from an accepted complication.</p>
+<p><strong>Fortune:</strong> start each session with two. Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.</p>
 <p><em>Legend Dynamics RPG system, created by Don Smallwood.</em> This RPG is released under the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>. You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.</p>
 <!-- GUIDE:END -->
       </article>
@@ -3926,6 +3986,8 @@ tr.lvl-U td.target { color: var(--muted); }
                 <option value="2">Assist by 5+ +2</option>
               </select></div>
             <div class="field" id="r-quality-wrap" hidden><label for="r-quality">Attack succeeded by</label><select id="r-quality"></select></div>
+            <div class="field" id="r-called-wrap" hidden><label for="r-called">Called shot</label>
+              <select id="r-called"><option value="0">None</option><option value="-2">Name the effect −2</option><option value="-4">Small target −4</option></select></div>
             <div class="field" id="r-parries-wrap" hidden><label for="r-parries">Parries already this round</label>
               <select id="r-parries"><option value="0">None</option><option value="1">One</option></select></div>
           </div>
@@ -3984,11 +4046,12 @@ tr.lvl-U td.target { color: var(--muted); }
             <dt>Opposed</dt><dd>Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender.</dd>
             <dt>Combat</dt><dd>Move a short distance and take one action. Hit → target may defend once per round: Dodge, Parry or Block → weapon effect. Partial cover −2.</dd>
             <dt>Defending</dt><dd>One defense a round (two with Additional Defense). Dodge: Agility −2 + Athletics. Parry a weapon in hand or fists: Melee or Brawling −3; a second parry −2 more. Block a weapon in hand, fists or a missile with a shield or anything that stands in for one: Melee −2 + the shield&#x27;s bonus (never a gunshot or blast); an improvised one breaks on a 2+ box hit. Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target.</dd>
+            <dt>Telling hit</dt><dd>Hit by 5+ or a natural 3–4, not defended: the attacker picks one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, precise). Called shot: −2 (small target −4), and any hit gets the effect. No extra boxes. Shrug it off: Hard to put down (once a fight) or a point.</dd>
             <dt>Range</dt><dd>Close 10 yd, Short 50 yd, Medium 150 yd, Long 500 yd, Extreme 1 mile. Within a weapon&#x27;s effective band: no penalty; one band beyond −2, two −4, farther out of range. Move: Close; run (no action): Short.</dd>
             <dt>Dying</dt><dd>A 2-box weapon that brings you to 3 boxes: Dying; dead at the end of the scene unless stabilized (one action, Medicine, healer&#x27;s satchel). At 3 boxes, another 2-box hit kills.</dd>
             <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2, clears 2 (3 on margin 5+).</dd>
             <dt>Rest</dt><dd>One box per two full days of rest. Not from 3 boxes: treatment must clear the first.</dd>
-            <dt>Fortune</dt><dd>Reroll (keep second), reduce an injury by one box, or establish a small preparation.</dd>
+            <dt>Fortune</dt><dd>Reroll (keep second), reduce an injury by one box, shrug off a telling hit, or establish a small preparation.</dd>
             <dt>Damage</dt><dd>Fists, daggers, slings: 1 box. Swords, axes, bows, crossbows, pistols, claws: 2. Arquebus: 3 and Dying. Greatweapon hit by 5+: Dying.</dd>
             <dt>Missiles</dt><dd>Quiver 20, bolts 12, pistol and arquebus 1 shot. Crossbow reload: an action; firearms: a full round. Natural 18: string snaps or powder fails.</dd>
             <dt>Sorcery</dt><dd>Cantrips: an action and a Sorcery roll; known Trained 2, Specialty 3, Expert 4. Seals: Specialty 1 Boost, Expert 2 (−1 each to the roll). Rituals: 2-, 4- or 6-segment clock. Talismans: 2, 3, 4. Enchantments: a ritual worked into an item, +1 segment to last a day, +2 a moon; they share the talisman limit.</dd>
@@ -5597,6 +5660,7 @@ return { mountLab };
     ["contact", "A friend", "A named contact who helps once per " + T.missionLower + ".", 1],
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a fine kit: +2 to one skill when it's used.", 1],
     ["extradefense", "Additional Defense", "A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2.", 1],
+    ["survivor", "Hard to put down", "Once per fight, shrug off a telling hit's effect. You still take its boxes.", 1],
     ...(PACK.extraEdges || []), // a setting's own Edges, e.g. Stronger Power
   ];
   // A setting's Edges whose fifth entry asks for a description: { label, placeholder, missing, sheetNote }.
@@ -6444,6 +6508,7 @@ return { mountLab };
     if (CR.attackQualityDodge && isDefense(name)) parts.push(+$("r-quality").value || 0);
     if (CR.parry && isParry(name)) parts.push((+$("r-parries").value || 0) * CR.parry.repeatPenalty);
     if (CR.aim && !$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(CR.aim.bonus);
+    if (!$("r-called-wrap").hidden && +$("r-called").value) parts.push(+$("r-called").value);
     // In an alternate form, the form profile's bonuses apply to rolls on those attributes and their skills.
     const w = ch.play.form && FORMED.has(ch.speciesId) && heritageOf()?.form;
     if (w) {
@@ -6470,6 +6535,7 @@ return { mountLab };
     $("r-quality-wrap").hidden = !(CR.attackQualityDodge && isDefense(sk));
     $("r-parries-wrap").hidden = !(CR.parry && isParry(sk) && defensesPerRound() > 1);
     $("r-aim-wrap").hidden = !(CR.aim && [T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk));
+    $("r-called-wrap").hidden = ![T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk);
     const { name, base, total } = rollMods();
     const t = base + total;
     const incap = ch.play.injury >= 3;
@@ -6495,7 +6561,8 @@ return { mountLab };
     const { dice, total: sum, success: ok, margin } = roll;
     const auto = roll.auto === "success" ? "auto-s" : roll.auto === "failure" ? "auto-f" : "";
     const jam = PACK.weapons.jamOn18 && sum === 18 && (weaponNote || (isReroll && last && last.weaponNote));
-    last = { name, t, dice, sum, ok, margin, auto, jam, rerolled: !!isReroll, fireMod, weaponNote: weaponNote || (isReroll && last ? last.weaponNote : "") };
+    const attackRoll = !$("r-called-wrap").hidden, called = attackRoll ? (isReroll && last ? last.called : +$("r-called").value) : 0;
+    last = { name, t, dice, sum, ok, margin, auto, jam, attackRoll, called, rerolled: !!isReroll, fireMod, weaponNote: weaponNote || (isReroll && last ? last.weaponNote : "") };
     ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
     ch.play.log = ch.play.log.slice(0, 12);
     if ($("r-stun").checked) { ch.play.stunned = false; $("f-stunned").checked = false; }
@@ -6512,7 +6579,9 @@ return { mountLab };
     if (r.auto === "auto-s") note = r.margin < 0 ? "Natural " + r.sum + ": automatic success. Counts as margin 0 in a contest." : "Natural " + r.sum + ": automatic success.";
     else if (r.auto === "auto-f") note = "Natural " + r.sum + ": automatic failure.";
     else note = r.ok ? `Succeeded by ${r.margin}.` : `Failed by ${-r.margin}.`;
-    if (r.ok && r.margin >= 5) note += " Margin 5+: assistance gives +2; medical care clears an extra box; a progress clock gets 2 segments.";
+    if (r.attackRoll && r.ok && r.called) note += " Called shot: if it isn't defended, the effect you named happens. No extra boxes.";
+    else if (r.attackRoll && r.ok && (r.margin >= 5 || r.auto === "auto-s")) note += " <b>Telling hit</b> if it isn't defended: pick one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, or precise). No extra boxes.";
+    if (r.ok && r.margin >= 5 && !r.attackRoll) note += " Margin 5+: assistance gives +2; medical care clears an extra box; a progress clock gets 2 segments.";
     if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
     if (!r.ok && !r.auto && r.margin >= -2) note += ` Missed by ${-r.margin}: the GM may offer success at a cost.`;
     if (r.weaponNote) note += ` ${r.weaponNote}`;
@@ -6669,7 +6738,7 @@ return { mountLab };
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);

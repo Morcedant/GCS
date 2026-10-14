@@ -573,10 +573,17 @@ tr.lvl-U td.target { color: var(--muted); }
             </table>
           </div>
           <div class="advance-box">
-            <span class="label">Advancement (after a significant case, with the GM's approval)</span>
+            <span class="label">Advancement points <span id="xp-tally" class="chip"></span></span>
+            <p class="small muted" style="margin:0">1 point after a significant case, 2 more at a milestone. Spend them or bank them, with the GM's approval.</p>
             <div class="btn-row">
-              <select id="f-advance" aria-label="Skill to advance"></select>
-              <button class="btn" id="btn-advance">Record advancement</button>
+              <button class="btn" id="btn-earn1">+1: significant case</button>
+              <button class="btn" id="btn-earn2">+2: milestone</button>
+              <button class="linkish" id="btn-unearn" hidden>Undo last award</button>
+            </div>
+            <div class="btn-row">
+              <select id="f-advance" aria-label="What to spend points on"></select>
+              <input id="f-advance-note" aria-label="Story reason" placeholder="Why, from the story (optional)" style="flex:1 1 180px">
+              <button class="btn" id="btn-advance">Spend</button>
               <button class="linkish" id="btn-unadvance" hidden>Undo last</button>
             </div>
             <ul class="small muted adv-list" id="adv-list"></ul>
@@ -846,7 +853,6 @@ tr.lvl-U td.target { color: var(--muted); }
       </div>
     </div>
     <div class="gm-grid" id="gm-grid"></div>
-    
   </section>
 
   <!-- Phone-only readiness bar for the Create tab -->
@@ -2112,7 +2118,53 @@ tr.lvl-U td.target { color: var(--muted); }
 </tbody>
 </table>
 <h2 id="g-advancement">Advancement</h2>
-<p>After a significant case, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication. Only a Specialist’s starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they broaden (see Step 3).</p>
+<p>Characters grow by earning <strong>advancement points</strong> and spending them.</p>
+<ul>
+<li><strong>Earning.</strong> After a significant case, the GM awards each character <strong>1 point</strong>. At a <strong>milestone</strong>, the end of a story arc, everyone earns <strong>2 more</strong>.</li>
+<li><strong>Spending.</strong> Spend points when you earn them, or bank them for something bigger. Each purchase needs the GM’s approval and a reason from the story: training with someone, something you lived through, a debt paid.</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Purchase</th>
+<th>Cost</th>
+<th>Limit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A skill from Untrained to Trained</td>
+<td>1</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>A skill from Trained to Specialty</td>
+<td>2</td>
+<td>Specialty (+3) is the ceiling: only a Specialist’s starting skill is Expert, unless they broaden (see Step 3)</td>
+</tr>
+<tr class="odd">
+<td>Revise an advantage or complication</td>
+<td>1</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>A new Edge</td>
+<td>3</td>
+<td>Any Edge except the attribute and Trained-skill Edges, within its own limit</td>
+</tr>
+<tr class="odd">
+<td>+1 to an attribute</td>
+<td>4</td>
+<td>Once per attribute; no higher than one above the starting maximum (14, plus any origin bonus)</td>
+</tr>
+</tbody>
+</table>
+<p>Magic and powers grow the same way, at the costs their chapters give.</p>
 <h1 id="g-running-cases">Running cases</h1>
 <h2 id="g-case-seeds">Case seeds</h2>
 <p>Roll 3d6 on each table and read the total, or pick what you like. Middle results come up most often; the strangest sit at 3, 4, 17 and 18. The GM view in the creator rolls these for you and can start the clock.</p>
@@ -2351,7 +2403,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Who stood out?</strong> A moment worth remembering.</li>
 <li><strong>Complications.</strong> Which ones came into play, and what did they cost?</li>
 <li><strong>What changed?</strong> New allies or enemies, damage, open threads for next time.</li>
-<li><strong>Advancement.</strong> After a significant case, the GM may authorize one skill step for each character.</li>
+<li><strong>Advancement.</strong> After a significant case, each character earns 1 advancement point; at a milestone, 2 more.</li>
 </ol>
 <h1 id="g-the-world-of-aurora">The world of Aurora</h1>
 <h2 id="g-the-first-wave">The First Wave</h2>
@@ -2617,34 +2669,40 @@ tr.lvl-U td.target { color: var(--muted); }
 </table>
 <p>So an Ambrosia or Mythic character can start with a Class IV power by spending their one Edge, if the GM agrees; a tier 2 Operant can trade their Edges for a stronger power or a fourth one.</p>
 <h2 id="g-growing-your-powers">Growing your powers</h2>
-<p>After a significant case, the GM may allow one of these <strong>instead of a skill step</strong>:</p>
+<p>Powers grow with advancement points (see <em>Advancement</em>), with the GM’s approval:</p>
 <table>
 <colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Advancement</th>
+<th>Cost</th>
 <th>Limit</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>Raise one power by one Class</td>
+<td>2</td>
 <td>Up to Class III</td>
 </tr>
 <tr class="even">
 <td>Learn a new power at Class I</td>
+<td>2</td>
 <td>Needs a story reason: a ritual, an exposure, Ambrosia, a bond that deepens</td>
 </tr>
 <tr class="odd">
 <td>Raise a Class III power to <strong>Class IV</strong></td>
-<td>Once per campaign, at a major story turning point, with the GM’s approval; costs two advancements</td>
+<td>4</td>
+<td>Once per campaign, at a major story turning point, with the GM’s approval</td>
 </tr>
 <tr class="even">
 <td><strong>Class V</strong></td>
-<td>Only at the end of a long campaign, as the climax of a character’s story</td>
+<td>—</td>
+<td>Only at the end of a long campaign, as the climax of a character’s story; the GM grants it</td>
 </tr>
 </tbody>
 </table>
@@ -4812,282 +4870,9 @@ tr.lvl-U td.target { color: var(--muted); }
 <script>
 (() => {
   /* PACK:START */const PACK = {"id":"aurora","terms":{"title":"Aurora","eyebrow":"Legend Dynamics · Superheroes","prepareTitle":"Suit up","titlePlaceholder":"e.g. Special Agent, Chicago office","guideTitle":"Aurora Players' Guide","guideSubtitle":"Operants, ExLAW and the powers behind them, for the Legend Dynamics RPG system","point":"Spark","role":"Calling","roleLower":"calling","origin":"Origin","originLower":"origin","originPlural":"Origins","pathRounded":"Generalist","pathExpert":"Specialist","pathExpertPlural":"Specialists","reasonLabel":"Why you do this","reasonSheet":"Why I do this","gear":"Gear","gearLower":"gear","tabPlay":"Play","readyText":"Ready for the case","stun":"Stunned","medkit":"first-aid kit","facility":"A hospital with an Operant ward","restText":"full day","mission":"Case","missionLower":"case","missionsChapter":"Running cases","journal":"Case files","journalIntro":"Write it together at the end of each case. Advancements apply to the GM's copies; use each card's Save character file to send a player their update.","journalTitlePlaceholder":"e.g. The Loop memorial bombing","journalDateLabel":"Date","journalExtraLabel":"","journalExtraPlaceholder":"","weaponsTitle":"Weapon and ammunition","ammo":"rounds","ammoOne":"round","shot":"Fire","spent":"fired","sparesLabel":"Spare magazines","reload":"Reload (one action)","reloadDone":"Reloaded. That took your action.","restock":"Resupply","restockDone":"Resupplied: full load.","emptyNote":"Empty: it won't fire until you reload.","otherWeapon":"Another weapon or a power (nothing spent)","tracksTitle":"Collateral, Scrutiny and Backlash","tracksIntro":"Shared by the whole team. Wrecked property and hurt bystanders, official attention and public anger each mark a box; clean arrests, good press and lying low clear one between cases.","tracksReset":"Clear every track","exampleName":"example sheriff","formToggle":"In alternate form","formName":"alternate form","formProfile":"Alternate form","formCoreSummary":"","restrictedToggle":"Show the Shadow Earth defector (only with the GM's permission)","restrictedTag":"GM's permission","restrictedCheck":"needs the GM's permission: tick the box in step 2 if your GM agreed","chaseSkill":"Piloting","rangedSkill":"Firearms","meleeSkill":"Melee","unarmedSkill":"Brawling","fontsHref":"https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Saira+Extra+Condensed:wght@700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap","originPluralLower":"origins","rolePluralLower":"callings","journalLower":"case files","edgePoints":"4"},"theme":{"comment":"An ExLAW case terminal at night: blue-black glass, federal-blue rules, hazard-amber highlights, and the green of the 1938 auroras drifting up behind it.","glow":"127, 178, 255","line":"120, 160, 220","highlight":"190, 215, 255","wash1":"40, 90, 200, .22","wash2":"40, 200, 140, .14","optionBg":"#0e1420","barBg":"8, 12, 20, .95","text2":"#cfd7e4","goodRgb":"79, 209, 139","badRgb":"255, 92, 92","placeholder":"rgba(143, 155, 176, .6)","badgeStops":"<stop offset=\"0\" stop-color=\"#fff0b8\"/><stop offset=\".35\" stop-color=\"#e9bd55\"/><stop offset=\".7\" stop-color=\"#c38f2a\"/><stop offset=\"1\" stop-color=\"#8f6216\"/>","badgeEdge":"#5a3a10","css":"--space: #070a10; --glass: rgba(14, 20, 32, .86); --glass-hi: rgba(22, 32, 50, .9); --well: rgba(4, 7, 12, .74); --fg: #e8ecf2; --muted: #8f9bb0; --line: rgba(120, 160, 220, .22); --chrome: #7fb2ff; --chrome-dim: rgba(127, 178, 255, .55); --gold: #ffc23d; --blue: #4d8dff; --red: #ff4d4d; --good: #4fd18b; --bad: #ff5c5c; --warn: #ffb02e; --on-accent: #0a0d12; --display: \"Saira Condensed\", \"Arial Narrow\", sans-serif; --title: \"Saira Extra Condensed\", \"Saira Condensed\", \"Arial Narrow\", sans-serif; --body: \"IBM Plex Sans\", \"Segoe UI\", system-ui, sans-serif; --mono: \"IBM Plex Mono\", ui-monospace, monospace; --numbers: \"IBM Plex Mono\", ui-monospace, monospace; --radius: 6px;","particles":{"direction":"up","rgb":"120, 255, 200","density":9000,"alpha":0.5}},"docxColors":["14213D","E8EEF8"],"groups":[{"id":"badge","name":"The Badge","color":"--blue","emblem":"M50 18 L74 28 L74 52 Q74 72 50 84 Q26 72 26 52 L26 28 Z M50 34 L54 46 L66 46 L56 54 L60 66 L50 58 L40 66 L44 54 L34 46 L46 46 Z","stroke":false},{"id":"masks","name":"The Masks","color":"--gold","emblem":"M16 44 Q30 30 50 40 Q70 30 84 44 Q80 62 64 62 Q54 62 50 54 Q46 62 36 62 Q20 62 16 44 Z M32 46 L42 48 L36 54 Z M68 46 L58 48 L64 54 Z","stroke":false},{"id":"learned","name":"The Learned","color":"--good","emblem":"M22 35 Q35 29 48 35 L48 69 Q35 63 22 69 Z M52 35 Q65 29 78 35 L78 69 Q65 63 52 69 Z","stroke":false},{"id":"fringe","name":"The Fringe","color":"--warn","emblem":"M60 22 A28 28 0 1 0 60 78 A22 22 0 1 1 60 22 Z","stroke":false},{"id":"underworld","name":"The Underworld","color":"--red","emblem":"M50 20 L78 50 L50 80 L22 50 Z M50 34 L64 50 L50 66 L36 50 Z","stroke":true}],"roles":[{"name":"ExLAW Agent","group":"badge","text":"ExLAW agent: a full-time federal agent of the Extraordinary Law Enforcement Agency (ExLAW), enforcing the Extraordinary Powers Act with a badge that opens doors and an EPAOC file that never closes.","skills":["Law","Investigation","Firearms","Read People"]},{"name":"Officer","group":"badge","text":"Officer: carries a badge and the law's authority, working alongside ExLAW or around it: an FBI agent or U.S. marshal, an elected county sheriff (maybe on the edge of the Mad Fringe), a city cop first on the scene of an Operant fight, a detective, or a licensed private eye. Your Allegiance says which force you serve.","skills":["Investigation","Firearms","Law","Read People"]},{"name":"Aegis Pilot","group":"badge","text":"Aegis pilot: flies the armored power suit that is the government's answer to Operants, and knows exactly what it costs per hour.","skills":["Piloting","Engineering","Firearms","Athletics"]},{"name":"International Operative","group":"badge","text":"International operative: Interpol, the French Affaires spéciales or MI5; the law has borders, Operants don't.","skills":["Law","Deception","Firearms","Computers"]},{"name":"Vigilante","group":"masks","text":"Vigilante: fights crime on the streets, unsanctioned and masked, and hopes ExLAW keeps looking the other way.","skills":["Brawling","Stealth","Streetwise","Athletics"]},{"name":"Public Hero","group":"masks","text":"Public hero: famous, sponsored and televised, like the New Power Legion; the cameras are part of the job.","skills":["Media","Leadership","Persuasion","Powers"]},{"name":"Guardian","group":"masks","text":"Guardian: protects one place or one people (a neighborhood, a reservation, the Haven) and answers to them first.","skills":["Powers","Leadership","Read People","Persuasion"]},{"name":"Crusader","group":"masks","text":"Crusader: sworn to an order or a cause, like the Shadow Knights; the vow comes before the law.","skills":["Melee","Occult","Leadership","Athletics"]},{"name":"Avenger","group":"masks","text":"Avenger: answers one kind of wrong, whatever the law says, as Uathach does.","skills":["Brawling","Investigation","Stealth","Powers"]},{"name":"Scientist","group":"learned","text":"Scientist: studies Operants, metatropic fields or the breaches, for a university, a corporation or a government that won't say why.","skills":["Science","Engineering","Computers","Medicine"]},{"name":"Occultist","group":"learned","text":"Occultist: an Earth Warden or a scholar of the hidden world, who knows which doors should stay shut.","skills":["Occult","Investigation","Persuasion","Science"]},{"name":"Doctor","group":"learned","text":"Doctor: treats what hospitals can't, Operant or not, and doesn't ask for a registration number.","skills":["Medicine","Science","Read People","Persuasion"]},{"name":"Relic Hunter","group":"learned","text":"Relic hunter: tracks down artifacts before the Foundation does, and sometimes before their owners notice.","skills":["Occult","Athletics","Investigation","Deception"]},{"name":"Journalist","group":"learned","text":"Journalist: reporter, blogger or documentary maker chasing the Operant story the public isn't being told.","skills":["Media","Investigation","Persuasion","Read People"]},{"name":"Mercenary","group":"fringe","text":"Mercenary: powers or skills for hire, with a code or without one.","skills":["Firearms","Brawling","Piloting","Streetwise"]},{"name":"Fugitive","group":"fringe","text":"Fugitive: escaped from a lab or a cell; staying free is a full-time job.","skills":["Stealth","Deception","Athletics","Powers"]},{"name":"Activist","group":"fringe","text":"Activist: fights for a cause the law won't touch (the Haven, the environment, Operant rights) on the street and on camera.","skills":["Media","Persuasion","Leadership","Law"]},{"name":"Thief","group":"underworld","text":"Thief: burglar, cat burglar or safecracker; powers make the impossible jobs possible.","skills":["Stealth","Athletics","Engineering","Streetwise"]},{"name":"Con Artist","group":"underworld","text":"Con artist: grifter and impostor; illusions and telepathy are tools of the trade.","skills":["Deception","Persuasion","Read People","Streetwise"]},{"name":"Enforcer","group":"underworld","text":"Enforcer: muscle for a gang, a cartel or the Morcain.","skills":["Brawling","Firearms","Read People","Streetwise"]},{"name":"Smuggler","group":"underworld","text":"Smuggler: moves people and cargo (relics, Ambrosia, refugees for the Haven) where the law can't see.","skills":["Piloting","Streetwise","Deception","Stealth"]},{"name":"Hacker","group":"underworld","text":"Hacker: breaks into systems: corporate, police, the EMD itself.","skills":["Computers","Engineering","Stealth","Deception"]},{"name":"Fixer","group":"underworld","text":"Fixer: knows everyone, moves anything, owes and is owed.","skills":["Streetwise","Persuasion","Deception","Computers"]}],"skills":[["Leadership","Presence","Command, rally, coordinate a team"],["Persuasion","Presence","Convince, negotiate, calm a crowd"],["Deception","Presence","Lie, bluff, disguise, forge, keep a secret identity"],["Streetwise","Presence","Informants, the underworld, black markets, rumors"],["Media","Presence","Cameras, the press, social media, public image"],["Read People","Will","Judge motives, spot a lie, interrogate"],["Investigation","Intellect","Search a scene, forensics, follow the money"],["Law","Intellect","The Extraordinary Powers Act, warrants, procedure, courts"],["Computers","Intellect","Systems, data, hacking and surveillance"],["Science","Intellect","Physics, biology, metatropic theory"],["Engineering","Intellect","Build, repair and modify machines, locks, Aegis suits"],["Medicine","Intellect","First aid, surgery, Operant physiology"],["Occult","Intellect","Magic, spirits, rituals, Otherworld and its creatures"],["Piloting","Agility","Drive, fly, chase; pilot an Aegis suit"],["Firearms","Agility","Pistols, rifles, shotguns, suit weapons"],["Melee","Agility","Batons, blades, staves and swords"],["Brawling","Body","Fists, grapples, martial arts, restraint"],["Athletics","Body","Run, climb, jump, swim, Dodge"],["Stealth","Agility","Sneak, hide, tail someone"],["Powers","Will","Aim, control and push your powers; perform rituals"]],"physical":["Piloting","Firearms","Melee","Brawling","Athletics","Stealth"],"edgePoints":4,"formCore":[],"formPenalties":{},"origins":[{"id":"nonoperant","name":"Non-Operant","tier":0,"adj":{},"desc":"No powers at all: training, nerve, gear and the law. Most of ExLAW's agents, every Aegis pilot and nearly everyone else on Earth. In a fight between Operants you are the one who has to be clever.","core":["No powers: you need no registration (your legal status is usually Civilian, or Agent).","Aegis suits, power-dampening cuffs and good planning are how you stand beside Operants."],"form":null,"skills":["Firearms","Investigation","Piloting","Read People"],"traits":[["no-training","Hard-Won Training","+2 to Firearms or Brawling against an Operant whose powers you have studied.","Firearms",true,"Outclassed","Sometimes you're simply out of your depth. Accept the danger of staying in."],["no-plan","Always a Plan","+2 to Investigation or Leadership to prepare for a known Operant's powers.","Investigation",true,"Resentment","You've seen what Operants get away with. Accept the friction your bitterness causes."],["no-nerve","Nerves of Steel","+2 to Will against fear, mind powers and intimidation.","Will",true,"Ordinary Body","One good hit can end you. Accept the injury when you take a risk."]]},{"id":"aurora","name":"Aurora-born","tier":2,"adj":{},"desc":"Powers that woke on their own: in the First Wave of April 1938, in the Second Wave of 1985, or inherited from a parent who was touched by either. The most common kind of Operant, and the one the EMD understands best.","core":["Choose your wave: First Wave (awakened in 1938, or a direct descendant), Second Wave (1985) or a late bloomer whose powers woke without warning.","Your powers are part of you: they can't be taken away, only suppressed."],"form":null,"skills":["Powers","Athletics","Persuasion","Read People"],"traits":[["au-natural","Natural Talent","+2 to Powers with your Class II power.","Powers",true,"Family Legacy","Your powers run in the family, and so do its enemies and debts. Accept the call."],["au-wave","Wave-Sense","+2 to Read People or Investigation to recognize another Operant and guess their power.","Read People",true,"On the Register","Your family has been in the EMD since 1952. Accept that ExLAW knows where you live."],["au-steady","Steady Power","Once per scene, push a power without marking Strain.","Will",true,"Public Face","Everyone in your town knows what you can do. Accept the requests, the fear and the cameras."]]},{"id":"ambrosia","name":"Ambrosia","tier":3,"adj":{"Body":1,"Presence":1,"Intellect":-1,"Agility":-1},"desc":"Dosed with Ambrosia, the elixir Tesla's circle first refined: an idealized body, slowed aging and raw power. Rare, coveted and hunted; DIRE and the Foundation have both tried to make more.","core":["Idealized: you age a year for every ten.","Ambrosia works on the body: Strength, Toughness, Flight, Speed, Regeneration and Transformation suit it best (the GM may allow others).","Coveted: every lab on Earth wants a sample of your blood."],"form":null,"skills":["Powers","Athletics","Leadership","Media"],"traits":[["am-ideal","Golden Ideal","+2 to Persuasion or Media to inspire a crowd or a frightened person.","Persuasion",true,"The Anger","The power wants to be used. In your powered form, accept the flash of temper and what it costs."],["am-endure","Undying Vigor","Once per scene, ignore your injury penalties for one action.","Body",true,"Hunted for Your Blood","Labs want what's in your veins. Accept the attempt."],["am-legend","Living Legend","+2 to Leadership with other heroes and with the public.","Leadership",true,"Out of Time","You've outlived friends and eras. Accept the grief and the gap."]]},{"id":"labmade","name":"Lab-made","tier":2,"adj":{"Body":1,"Presence":-1},"desc":"Made in a Foundation black lab, a DIRE program or somewhere worse. The powers are strong and unstable, the memories are patchy, and someone still has your file and wants their property back.","core":["Unstable: on a natural 17 or 18 with Powers, mark a box of Strain as well.","Property: the lab that made you knows your powers better than you do."],"form":null,"skills":["Powers","Stealth","Athletics","Deception"],"traits":[["lm-surge","Surge","+2 to Powers when you push a power (you still mark Strain).","Powers",true,"They Want You Back","The lab hasn't given up. Accept the retrieval team."],["lm-tough","Built Tough","Once per scene, a hit that would mark 2 or more boxes marks one fewer.","Body",true,"Missing Years","There are gaps in your memory, and someone else fills them. Accept the flashback at the worst moment."],["lm-wary","Lab Instincts","+2 to Stealth or Read People to spot surveillance, restraints and traps.","Stealth",true,"Test Subject","Needles, labs and restraints break your nerve. Accept the panic."]]},{"id":"bonded","name":"Bonded","tier":2,"adj":{"Will":1,"Presence":-1},"desc":"Joined to something else: an artifact, a spirit, a god or an entity from beyond. It shares its power, and sometimes its mind. Michael Lance's amulet, Uathach's litany, the Ice Reaper and the Atomic Man are all bonds.","core":["Choose the bond: an artifact you carry, or a spirit or entity that shares your body.","An artifact's powers go with the artifact; a spirit's come with its wants.","Bonded powers suit Transformation well: the bond is the alternate form."],"form":null,"skills":["Powers","Occult","Read People","Investigation"],"traits":[["bo-voice","The Voice Within","+2 to Occult or Investigation when your bond knows the answer (it remembers things you don't).","Occult",true,"Two Minds","Your bond wants something you don't. Accept the choice it pushes on you."],["bo-bound","Bound Together","Your bond resists for you: +2 to Will against mind powers and possession.","Will",true,"The Artifact","Your power lives in something that can be taken. Accept the theft or the trade."],["bo-old","Ancient Ally","+2 to Powers with the power your bond knows best.","Powers",true,"Old Enemies","Your bond had enemies long before you. Accept them as yours."]]},{"id":"adept","name":"Adept","tier":1,"adj":{"Intellect":1,"Body":-1},"desc":"A student of metatropic manipulation, the science everyone else calls magic. Learned rather than born, and growing with study: an Adept's own powers are few, but with time, materials and fuel a ritual can do almost anything.","core":["Mystic powers: your own powers come from the mystic list (Cantrips, Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing).","Rituals: you can emulate any power by ritual, with time, specialized materials and fuel (see Rituals).","Your second power is Class II once Powers is your top skill."],"form":null,"skills":["Powers","Occult","Investigation","Science"],"traits":[["ad-scholar","Arcane Scholar","+2 to Occult to identify a spell, a creature or a ritual's maker.","Occult",true,"A Bargain Owed","Something in Otherworld once helped you. Accept the favor it asks."],["ad-ritualist","Ritualist","+2 to Powers when performing a ritual.","Powers",true,"Obsessed","A forbidden text or a lost rite calls to you. Accept the detour."],["ad-warden","Warden's Training","+2 to Will against spirits, possession and fear.","Will",true,"Watched","The Earth Wardens, or older things, keep an eye on what you do. Accept the summons."]],"powerSlots":["I+","I"],"powerList":["cantrips","warding","summoning","mysticsight","illusion","blast","portals","astral","elemental","teleport","healing"]},{"id":"mythic","name":"Mythic","tier":3,"adj":{"Body":1,"Will":1,"Intellect":-1,"Presence":-1},"desc":"An ancient curse, blessing or bloodline: immortals, werewolves, the children of gods, warriors cursed by Jupiter. Mythic Operants are the oldest kind, and the hardest to classify.","core":["GM's approval: every power a Mythic character takes, Immortality included, is agreed with the GM.","Only Mythic characters can take Immortality.","An old rule binds you: a curse's condition, a god's taboo or a bloodline's weakness, agreed with the GM."],"form":null,"skills":["Powers","Melee","Occult","Athletics"],"traits":[["my-old","Old as Legend","+2 to Occult or Persuasion where your myth is remembered.","Occult",true,"The Curse","Your curse or your god's taboo comes due. Accept its price."],["my-war","Ancient Warrior","+2 to Melee or Brawling against something as old as you.","Melee",true,"Out of Place","The modern world baffles and offends you. Accept the misstep."],["my-hard","Hard to Kill","Once per scene, ignore your injury penalties for one action.","Body",true,"Feels Everything","You don't die, but every wound hurts. Accept the pain that slows you."]],"mythic":true},{"id":"otherworlder","name":"Otherworlder","tier":2,"adj":{"Agility":1,"Will":-1},"desc":"Born outside this Earth: in a haven of Otherworld such as Avalon, or on a parallel Earth like Chat Roux's. Under the Extraordinary Powers Act you aren't a person at all, which makes you hard to register and easy to disappear.","core":["Not a person under the Act: you can't register; you're Non-registered unless ExLAW makes you a deal.","Choose your world: Avalon (fey, Olympian and Asgardian descent), another haven, or a parallel Earth."],"form":null,"skills":["Powers","Occult","Deception","Athletics"],"traits":[["ot-glamour","Glamour","+2 to Deception to pass as human or hide what you are.","Deception",true,"Strange Customs","You misread Earth's rules. Accept the misunderstanding."],["ot-sight","Otherworld Eyes","+2 to Occult or Read People to see through illusions and disguises.","Occult",true,"Cold Iron","Iron burns you (fey-born) or your technology needs parts this Earth can't make. Accept the weakness."],["ot-grace","Inhuman Grace","+2 to Athletics to climb, leap or keep your footing.","Athletics",true,"Exile","Your home world wants you back, or wants you dead. Accept the envoy."]]},{"id":"touched","name":"Touched","tier":2,"adj":{"Will":1,"Intellect":-1},"desc":"Changed by an exposure to something nobody can name: a peyote vision in the desert, a ritual read aloud, a breach in the sky. Touched powers are strange, hard to classify and harder to control; the EMD files them under 'Other'.","core":["Unclassifiable: the EMD can't tell what you are, and neither can you; the GM may give a power an odd limit or an odd extra.","Visions: once per case, the GM may give you a strange, true glimpse."],"form":null,"skills":["Powers","Read People","Occult","Persuasion"],"traits":[["to-glimpse","The Glimpse","+2 to Read People or Investigation when a vision points the way.","Read People",true,"Cracked","Your mind was burned by what you saw. Accept the episode at the worst moment."],["to-odd","Strange Gift","+2 to Powers with your strangest power.","Powers",true,"Uncanny","People sense something wrong about you. Accept the fear."],["to-calm","Eye of the Storm","+2 to Will to keep calm when reality goes wrong.","Will",true,"Calling","Whatever touched you wants you back. Accept the pull."]]},{"id":"defector","name":"Shadow Earth Defector","tier":2,"adj":{"Agility":1,"Presence":-1},"desc":"A duplicate from Shadow Earth, the dark reflection of our world, who turned on its rulers and stayed. Somewhere on this Earth lives your original, who may not know you exist; Shadow Earth wants you back, and everyone else wants to know whose side you're on.","core":["Your original: you are a copy of a real person on this Earth (agreed with the GM), and you share their face and their early memories.","Mystic Sight and Warding reveal what you are.","Needs the GM's permission."],"form":null,"skills":["Deception","Stealth","Powers","Read People"],"traits":[["de-mirror","Mirror Knowledge","+2 to Deception or Investigation about your original's life and contacts.","Deception",true,"The Original","Your original turns up, or someone mistakes you for them. Accept the trouble."],["de-shadow","Shadow-Wise","+2 to Occult to recognize Shadow Earth agents, duplicates and incursions.","Occult",true,"Hunted Home","Shadow Earth's rulers want their property back. Accept the duplicate sent for you."],["de-hide","Between Worlds","+2 to Stealth in darkness and shadow.","Stealth",true,"Distrusted","Nobody trusts a copy. Accept the suspicion."]],"restricted":true}],"allegiances":[["exlaw","ExLAW","Once per case, a database search, an Aegis wing or federal backup.","Duty: the Director's orders, the EPAOC's questions and the paperwork."],["fbi","A Federal Agency","Once per case, records, a lab or a warrant.","Duty: the agency's priorities, and its turf war with ExLAW."],["sheriff","A County Sheriff's Office","Once per case, a deputy's help, the county jail, or the county's records and a word with the judge.","Duty: the sheriff answers to the voters, and the county's feuds and elections become yours."],["police","A City Police Department","Once per case, patrol backup, a holding cell, or the department's files and crime lab.","Duty: the chain of command, the union's politics, and a department that resents Operants and ExLAW alike."],["dire","DIRE","Once per case, military hardware, a medical team or a classified file.","Duty: DIRE's research comes first, and you may be part of it."],["uniled","Interpol","Once per case, international reach: a Red Notice, a foreign police force's help, or a flight to anywhere.","Duty: member countries who want different things, and fugitives who know your face."],["as","Affaires spéciales","Once per case, French intelligence, a safehouse in Europe or a discreet extraction.","Duty: France's interests, which aren't always yours."],["legion","The New Power Legion","Once per case, a famous ally, a sponsor's money or the press on your side.","Duty: the sponsor's image, the schedule and the cameras."],["knights","The Shadow Knights","Once per case, a relic, a specialist or a safe house of the Ordo.","Duty: the vow; bring light into the shadows, whatever the law says."],["wardens","The Earth Wardens","Once per case, an Adept's help, ritual materials or lore.","Duty: guard the Earth Gates, and answer when the Wardens call."],["haven","The Haven","Once per case, sanctuary in the Mad Forest, or the Green Man's attention.","Duty: protect the Earth and the Haven; and only vegetarian meals."],["morcain","The Morcain","Once per case, money, a fence, a smuggling route or muscle.","Duty: the 12 take their cut, and send you their jobs."]],"reasons":[["Justice","The law should mean something, for Operants and everyone else."],["Protection","Someone has to stand between ordinary people and what's out there."],["Redemption","I've done things I'm not proud of. This is how I pay it back."],["Fame","The cameras love an Operant, and I love the cameras."],["Money","Powers pay. So does knowing who has them."],["Revenge","Someone did this to me. I'm going to find them."],["Freedom","No lab, no registry and no government owns me."],["Truth","There's a story nobody's telling. I'm going to tell it."],["Duty","I swore an oath, to a badge, an order or a god. I keep it."],["Belonging","This team is the only place where I'm not a freak."]],"connections":[["Partners","We've worked cases together for years and trust each other with our lives."],["They saved my life","They pulled me out of a burning building, a lab or a firefight."],["I saved theirs","I got them out when no one else would, and they haven't forgotten."],["Same wave","Our powers woke the same night, and we found each other afterward."],["I arrested them","Once I put them in cuffs. Now we work together, uneasily."],["Rivals","We want the same job, the same headline or the same collar."],["Family","We're related, by blood, by marriage or by the same lab."],["A shared secret","We know what really happened on that case. Nobody else does."],["Mentor","They taught me how to use my powers, or how to survive without them."],["An unpaid debt","I owe them money or a favor, and I haven't paid it yet."]],"advantages":[["steadyaim","Steady Aim","+2 to Firearms after spending an action aiming at the same target.","Firearms"],["brawler","Street Fighter","+2 to Brawling when unarmed against more than one opponent.","Brawling"],["martial","Martial Artist","+2 to Brawling to disarm, throw or restrain.","Brawling"],["blade","Blade Master","+2 to Melee with a chosen weapon.","Melee"],["acrobat","Acrobat","+2 to Athletics to climb, leap or roll with a fall.","Athletics"],["wheelman","Wheelman","+2 to Piloting in a chase.","Piloting"],["aegiscert","Aegis Certified","You can pilot an Aegis suit (Aegis Pilots are already certified); +2 to Piloting in one.","Piloting"],["forensics","Forensics","+2 to Investigation to read a crime scene or an Operant's traces.","Investigation"],["intrusion","Intrusion Specialist","+2 to Computers to break security or cover your tracks.","Computers"],["tinker","Tinkerer","+2 to Engineering to jury-rig, repair or modify on the spot.","Engineering"],["fieldmedic","Field Medic","+2 to Medicine to stabilize a patient under fire.","Medicine"],["lore","Occult Lore","+2 to Occult to recognize a creature, a curse or a ritual.","Occult"],["procedure","By the Book","+2 to Law to make an arrest, a warrant or a confession stand up in court.","Law"],["contacts","Street Contacts","+2 to Streetwise to find a person, a rumor or a fence.","Streetwise"],["silver","Silver Tongue","+2 to Persuasion to talk someone down.","Persuasion"],["disguise","Master of Disguise","+2 to Deception to pass as someone else.","Deception"],["command","Natural Leader","+2 to Leadership to coordinate a team under fire.","Leadership"],["coldread","Cold Reader","+2 to Read People to spot a lie or a hidden Operant.","Read People"],["press","Friend of the Press","+2 to Media to spin a story or get one out.","Media"],["control","Fine Control","+2 to Powers to use a power precisely: around bystanders, at a distance or delicately.","Powers"],["secretid","Secret Identity","+2 to Deception to keep your two lives apart. Take the Secret Identity complication unless the GM agrees otherwise.","Deception"],["coolhead","Cool Under Fire","+2 to Will to keep acting under fire, fear or mind powers.","Will"]],"complications":[["secretid","Secret Identity","You live two lives. Accept the danger when someone gets close to the truth."],["wanted","Wanted","A warrant has your name or your mask on it. Accept the arrest attempt."],["hunted","Hunted by a Lab","The Foundation, DIRE or someone worse wants you back. Accept the retrieval team."],["unstable","Unstable Powers","Your powers flare when you're afraid or angry. Accept the collateral damage."],["code","Code Against Killing","You don't kill, whatever they've done. Accept the cost of mercy."],["cameras","Media Darling","The cameras follow you everywhere. Accept the attention at the worst moment."],["oversight","Under Oversight","The EPAOC or Internal Affairs is watching you. Accept the hearing."],["debt","In Debt to the Morcain","You owe the 12, and they collect. Accept the job they send."],["vendetta","Vendetta","You have an enemy who won't stop. Accept their interference."],["protects","Protects the Innocent","You put bystanders first, always. Accept the cost."],["family","Family at Risk","Someone you love doesn't have powers. Accept the threat to them."],["temper","Temper","Your anger gets ahead of you. Accept the fight you should have avoided."],["ambrosia","Craving","You need something to keep going: Ambrosia, a lab's serum, a ritual's fuel. Accept the hunt for more."],["outsider","Outsider","You don't understand this world's rules, or it doesn't accept you. Accept the misunderstanding."],["haunted","Haunted","A spirit, a bond or a memory won't leave you alone. Accept the vision."],["guilt","Survivor's Guilt","You lived through Chicago, 2012 or a lab when others didn't. Accept the reckless choice to make it right."],["duty","Orders","Your badge, order or sponsor gives you orders you don't like. Accept them."],["mystery","Can't Leave It Alone","A loose thread pulls you in. Accept the detour or the danger."],["reckless","Reckless","You jump first and think later. Accept the danger."]],"triggers":{"secretid":["Someone close asks where you were","A camera catches you changing","Your two lives need you at the same time"],"wanted":["Your face on the news","A patrol car slows down beside you","An old ally sells you out"],"hunted":["A van with no plates outside","A doctor knows too much about your powers","Someone from the lab is in the crowd"],"unstable":["You're cornered","Someone you love is hurt","A natural 18 on Powers"],"code":["Killing them would end it","Your partner pulls a gun","They'll kill again if they live"],"cameras":["A crowd with phones out","A press conference you can't skip","A reporter digs into your past"],"oversight":["A subpoena arrives","Your report doesn't add up","An EPAOC staffer turns up on the case"],"debt":["A Morcain fixer calls","The interest doubles","They ask for a favor instead"],"vendetta":["Your enemy strikes first","Your enemy needs your help","A clue with their name on it"],"protects":["A civilian in the crossfire","A building with people still inside","Someone volunteers to take your place"],"family":["A threatening message","Your family is in the wrong place","Someone follows them home"],"temper":["An insult in public","A bully hurting someone weaker","Being told to stand down"],"ambrosia":["Your supply runs low","A dealer offers more","The withdrawal hits mid-fight"],"outsider":["A custom you don't know","A form that asks for papers you don't have","Someone mocks where you're from"],"haunted":["A familiar voice in your head","The place where it happened","Your bond demands something"],"guilt":["Someone in the same danger as before","An anniversary","A chance to go back"],"duty":["Orders to stand down","Orders to arrest a friend","Your sponsor changes the plan"],"mystery":["A file that shouldn't exist","A power nobody can explain","A name that keeps coming up"],"reckless":["A locked door with something behind it","A fight you could avoid","The careful plan takes too long"]},"equipment":[["pistol","Pistol","Fifteen rounds. Class I; hits mark 2 boxes."],["shotgun","Shotgun","Six shells. Class I. Within a few paces a hit marks 3 boxes and leaves the target Dying; farther away, 1 box."],["smg","Submachine gun","Thirty rounds; can fire bursts. Class I; hits mark 2 boxes."],["rifle","Rifle","Twenty rounds; long range. Class I; hits mark 2 boxes."],["taser","Taser","Two shots. The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box."],["baton","Baton or knife","Class I melee: hits mark 1 box."],["vest","Body armor","Once per fight, a Class I hit marks one box fewer."],["riotshield","Riot shield","A clear polycarbonate shield: +1 to Block against blows, thrown objects and missiles. It won't stop a bullet. −2 to Stealth while you carry it."],["cuffs","Dampening cuffs","ExLAW issue: a cuffed Operant's powers drop one Class (two with a successful Engineering roll to tune them)."],["badge","Badge and ID","Federal, police or press credentials: open doors and get you past cordons."],["radio","Radio and phone","Stay in touch with your team and dispatch."],["firstaid","First-aid kit","Needed to stabilize a patient and give field treatment."],["forensics","Forensics kit","Needed for most Investigation at a crime scene."],["laptop","Hacking rig","Needed for most Computers work against secured systems."],["tools","Toolkit","Needed for most Engineering in the field, and for Aegis suit repairs."],["ritualkit","Ritual kit","Chalk, salt, candles, herbs: Class I ritual materials for a few workings."],["picks","Lock picks","Needed to pick locks with Engineering."],["camera","Camera and press pass","Record, broadcast, and get into press events."],["aegis","Aegis AS-6 suit","Aegis Pilots or Aegis Certified only. While suited: Strength II, Toughness II, Flight I and a Class II arm cannon (Firearms). Takes a minute to suit up; a hit to the power pack (−2 to aim) can shut it down."]],"weapons":{"skill":"Firearms","jamOn18":true,"defaultSpares":2,"items":{"pistol":["Pistol",15],"shotgun":["Shotgun",6],"smg":["Submachine gun",30],"rifle":["Rifle",20]},"equipLinked":["pistol","shotgun","smg","rifle"],"modes":[["single","Single shot",1,null,0],["burst","Burst",3,["smg"],1],["cover","Covering fire",3,null,0]]},"tracks":[{"name":"Collateral","boxes":4,"effects":["Clean so far","Property damage: insurance claims and angry owners","Bystanders hurt: −2 to Media and Persuasion with the public","Lawsuits and charges: someone is held liable","An EPAOC hearing: start a clock; a team member may lose their status"]},{"name":"Scrutiny","boxes":4,"effects":["Nobody's looking","Questions in a report","Flagged: −2 at checkpoints, cordons and with federal agencies","Investigated: ExLAW or the FBI opens a file on you","Hunted: the Foundation or Raster Zero takes an interest; start a clock"]},{"name":"Backlash","boxes":4,"effects":["The public trusts you","Talk shows ask hard questions","Protests: −2 to Media and Leadership with crowds","Anti-Operant laws proposed; Operant friends blame you","Riots: the next case starts in a city that wants you gone"]}],"personalTrack":{"name":"Strain","boxes":4,"effects":["Steady","Strained: −1 to Powers","Frayed: −2 to Powers; nosebleeds, sparks and flicker","Breaking: on a natural 16–18 with Powers the power goes wild","Burned out: your powers fail until you rest a full day"]},"seeds":{"mission":["The case",["A breach opens where the Umkas came through","Raster Zero's existence leaks","Recover a Hephaestus Key before the Foundation","A Raster Seven transfer goes wrong","Bring in an Operant who just woke up, before someone else does","An Operant bank robbery","Protect an EPAOC witness","Find a missing registration file","Arrest a Non-registered vigilante","Investigate a powers-related death","Stop a Morcain shipment of Ambrosia","Escort an Operant to a hearing","A hero's sponsor wants a scandal buried","A White Hand cell on US soil","A Shadow Earth duplicate replaces someone important","The Atomic Man asks for help"]],"place":["Where",["Raster Eight, in orbit","Tesla's 1884 Paris, through a door","A Foundation black lab, abandoned","The Mad Forest's edge, south of Bloomington","The Chicago Loop memorial","A Manhattan rooftop at night","An ExLAW regional office","A small town in the Midwest","A Los Angeles studio lot","A Morcain casino in Macau","The New Power Legion's tower","A university archive","A subway tunnel the city forgot","Buenos Aires, White Hand territory","A haven in Otherworld","Shadow Earth's mirror of your city"]],"strange":["The Operant angle",["Two people with the same power and the same face","A power the EMD says can't exist","Someone's powers woke tonight","A Shadow Earth duplicate","An Operant who doesn't know they are one","A stolen power: someone mimicked it","A Lab-made escapee","A Non-registered Operant hiding in plain sight","A ritual done badly","A bonded artifact looking for a new host","A power for sale","An Aegis suit that moves on its own","A spirit riding someone","A Class V power in an ordinary person","The 1938 auroras, back for a night","A third wave beginning"]],"twist":["The twist",["The Director knew all along","One of you is in the Raster Zero files","The victim is the culprit","ExLAW wants it buried","The Foundation is already there","The villain is right","A friend is being blackmailed","The witness is lying for a good reason","The press arrives first","It was an accident","The real target is someone else","The local police want it more than you do","A rival team is on the same case","The Morcain want to help","The culprit is a duplicate of someone on the team","Shadow Earth planned this"]],"clock":["Ticking clock",[["The breach widens",8],["The Atomic Man loses patience",6],["The escapee's power destabilizes",6],["Raster Seven's transfer convoy leaves",4],["The press arrives",4],["The witness disappears",4],["The bomb goes off",6],["The mob forms",4],["Federal agents take the case",4],["The EPAOC subpoena",6],["The Morcain clean house",6],["The ritual completes at midnight",6],["The building comes down",4],["The sponsor pulls out",6],["Shadow Earth's rulers notice",8],["The third wave",8]]],"who":["Key character",["Director Steven Humbacht","Nikola Tesla, visiting","A Foundation scientist with a conscience","Celerity, on the run","A frightened new Operant","An EPAOC staffer","A Morcain fixer who owes you","A sheriff on the edge of the Mad Forest","A reporter with a theory","An ExLAW agent who doesn't trust Operants","A New Power Legion star","A Shadow Knight","An Earth Warden","Michael Lance, out of his time","Steel Hawk, offering a deal","Your own Shadow Earth duplicate"]]},"journal":{"mode":"calendar","start":[2025,9,15],"outcomes":["Closed","Partly closed","Failed","Open"]},"powers":{"skill":"Powers","plural":"Powers","groups":[["energy","Energy and attack"],["body","Body and movement"],["mind","Mind and senses"],["control","Control and the strange"]],"list":[["blast","Blast","energy",["Class I attack; effective at Short range, like a pistol.","Class II attack; effective at Long range, like a rifle.","Class III attack, effective at Extreme range; or Class II against everyone in a small area.","Class IV attack, effective for miles; or Class III across a small area.","Class V attack that can level a building; or Class IV across a city block.","Class VI attack; or Class V across a district."],{},"fire, ice, light, plasma, electricity or force"],["elemental","Elemental Control","energy",["Shape a little of your element nearby: a gust, a mud patch, grasping vines.","Shape a room's worth: walls of earth, a waterspout, a thicket; Class II attacks.","Shape a city block's worth: a tremor, a flood surge, a forest overnight.","Shape a neighborhood's worth: a sinkhole, a river turned aside, a forest in an hour.","Shape a city's worth: an earthquake, a flood, a storm surge.","Shape a region: raise hills, redraw a coastline."],{},"choose air, earth, water or plants"],["weather","Weather Control","energy",["Fog, wind or rain around you for a scene.","A storm over a neighborhood; lightning as a Class II attack.","A storm over a city: grounded aircraft, Class III lightning.","A storm over a region: tornadoes, Class IV lightning.","A hurricane, and you steer it.","Change a continent's weather for a season."],{},""],["shadow","Darkness / Shadow","energy",["Darken a room; +2 to Stealth in shadow.","Total darkness only you see through; step between shadows within sight.","Solid shadow constructs (Class II attacks or barriers); swallow a block in night.","Plunge a neighborhood into night; constructs make Class III attacks.","Night over a city; step through shadows anywhere in it.","Open a road through shadow to anywhere, even Shadow Earth."],{},""],["gravity","Gravity / Density","energy",["Make one object or person heavy (−2 to move) or light enough to throw.","Pin a group to the ground (Body resists); become dense (Defense II) or light enough to float.","Crush a vehicle; Defense III; hurl a car as a Class III attack.","Crush a building's frame; Defense IV; hurl a truck as a Class IV attack.","Pull an aircraft out of the sky; Defense V.","Bend gravity over a city; Defense VI."],{},""],["absorb","Energy Absorption","energy",["Attacks of your energy type are one Class lower against you.","Ignore your energy type up to Class II; spend what you absorb on a Class II Blast.","Ignore your type up to Class III; once a scene, absorbed energy fuels a Class III Blast or a push without Strain.","Ignore your type up to Class IV; absorbed energy fuels a Class IV Blast.","Ignore your type up to Class V.","Drink anything of your type, even a nuclear blast."],{},"choose a type: sunlight, electricity, kinetic, radiation…"],["natural","Natural Weapons","energy",["Unarmed hits are Class I.","Unarmed hits are Class II; you can climb with them.","Unarmed hits are Class III; they cut through steel doors.","Unarmed hits are Class IV; they carve through tank armor.","Class V; they cut through a bank vault.","Class VI; nothing made can stop them."],{},"claws, fangs, horns or spikes"],["manifest","Manifest","energy",["Any hand weapon or simple tool, lasting a scene.","Any personal firearm or complex tool; Class II attacks.","Heavy weapons or a vehicle's worth of matter; Class III attacks.","Military hardware, a tank's main gun: Class IV attacks.","A warship's worth of matter; Class V attacks.","Raise a fortress from nothing."],{},"weapons or objects from nothing"],["strength","Strength","body",["Lift a motorcycle; unarmed hits are Class I.","Lift a car; unarmed hits are Class II; tear doors off.","Lift a truck or a small plane; unarmed hits are Class III.","Lift a tank or a jet; unarmed hits are Class IV.","Lift a ship or a building's floor; Class V.","Move a mountain's worth; Class VI."],{},""],["toughness","Toughness","body",["Defense I against physical harm.","Defense II.","Defense III.","Defense IV.","Defense V.","Defense VI."],{},""],["forcefield","Force Field","body",["Defense I for you, for a scene.","Defense II for you, or Defense I around a small group.","Defense III, or Defense II around a group; seal a doorway.","Defense IV, or Defense III around a building.","Defense V, or Defense IV around a city block.","Defense VI, or shield a city."],{},""],["speed","Speed","body",["Up to 70 mph, as fast as a car; act first in any round.","Up to 200 mph; run across water and up walls; two moves a round.","Mach 1 (about 760 mph); once a scene, two actions in a round.","Mach 3: cross a city in seconds; two actions every round.","Mach 10: cross a continent in minutes; three actions a round.","Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still."],{},""],["flight","Flight","body",["Fly up to 70 mph, as fast as a car.","Fly up to 300 mph, as fast as a light plane.","Mach 2 (about 1,500 mph): keep up with fighter jets.","Mach 5: outfly any jet; cross an ocean in an hour or two.","Mach 10: anywhere on Earth within a couple of hours.","Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it)."],{},""],["leaping","Super Leaping","body",["Leap 30 ft up or 100 ft across: onto a three-story roof.","Leap 100 ft up or a city block (300 ft) across.","Leap a quarter mile up or a mile across.","Leap a mile up or 5 miles across.","Leap 5 miles up or 25 miles across.","Leap into the stratosphere, or 100 miles and more across."],{},""],["wallcrawl","Wall-Crawling","body",["Climb any wall as easily as walking.","Run up walls and across ceilings.","Cling upside down under a moving vehicle or aircraft.","Cling to anything, even glass in a hurricane or a spaceship's hull.","Walk on water, smoke or any surface.","Stand on the air as if it were ground."],{},""],["regen","Regeneration","body",["Clear one injury box after a scene's rest.","Clear one box at the end of each scene; a single hit never leaves you Dying.","Clear a box every few rounds; regrow lost limbs.","Clear one box at the start of each of your turns. A hit that would leave you Dying leaves you Incapacitated instead, and you're back up in a round.","Clear one box each turn, two after a hit that marks 3 or more. Only certain death stops you, and even then you recover within the hour unless your body is destroyed outright.","Nothing short of total annihilation keeps you down."],{},""],["adaptation","Adaptation","body",["Ignore one hazard: heat, cold, poison or thin air.","Breathe water and ignore all ordinary hazards.","Survive vacuum, the deep ocean and fire.","Survive vacuum, lava or the ocean floor indefinitely.","Survive on other worlds and in other dimensions.","Survive anything that doesn't destroy you outright, even a star's surface for a while."],{},""],["size","Size Change","body",["Shrink to a cat (+2 Stealth) or grow to 10 feet (+2 to Body feats).","Insect-sized, or 20 feet tall with Strength I and Toughness I while big.","Microscopic, or 50 feet tall with Strength II and Toughness II while big.","Grow to 100 feet (Strength III and Toughness III while big), or shrink to dust.","300 feet (Strength IV and Toughness IV), or subatomic.","Kaiju-sized (Strength V and Toughness V), or small enough to slip between worlds."],{},""],["stretching","Stretching","body",["Reach across a room.","Wrap a group, squeeze under doors; Class I attacks at range.","Stretch a block; bounce Class II hits back at the attacker.","Stretch a quarter mile; wrap a building; bounce Class III hits back.","Stretch a mile; bounce Class IV hits back.","Bounce Class V hits back; force can barely harm you."],{},""],["invisibility","Invisibility","body",["Fade from notice: +4 to Stealth if you stay still.","Invisible while moving.","You and those you touch, to cameras and sensors too.","Invisible to every sense, and to powers below Class IV, with a group.","Make a building vanish.","Slip from notice entirely: people forget you were there."],{},""],["phasing","Phasing","body",["Pass slowly through a wall (one action).","Walk through walls; physical attacks below Class II pass through you.","Phase as a reaction: attacks below Class III pass through; wreck a machine by passing through it.","Attacks below Class IV pass through you; carry others through walls.","Phase a vehicle or a crowd through anything.","Untouchable; phase through realities into Otherworld."],{},""],["duplication","Duplication","body",["One copy for a scene that helps (+2 assistance).","Three copies that act on their own (minor characters).","A crowd of copies; you know what all of them know.","A hundred copies.","An army of copies across a city.","Copies anywhere you've ever been."],{},""],["transform","Transformation","body",["Change in one action; the form has two Class I powers of its own.","The form's powers rise to Class II.","The form's powers rise to Class III. If the form has a will of its own, each change marks Strain.","The form's powers rise to Class IV.","The form's powers rise to Class V.","The form's powers rise to Class VI."],{},"an alternate form; you design its powers"],["immortality","Immortality","body",["You don't age.","You can't die of age, disease or poison.","Even death doesn't hold: you return within days, as the GM decides.","You return within a day, even if your body was destroyed.","You return within an hour, in a body remade.","You can't be destroyed, only bound or banished."],{"gm":true,"mythicOnly":true},""],["telepathy","Telepathy","mind",["Hear surface thoughts by touch; speak mind to mind within a room.","Read thoughts within sight; link a team's minds for a scene.","Search memories; link minds across a city.","Read a crowd's thoughts; link minds across a country.","Link minds across the world.","Reach minds across dimensions; read a mind against its will (Will at −4)."],{},""],["mindcontrol","Mind Control","mind",["One simple command that doesn't endanger them (Will resists).","Control a person's actions for a scene (Will resists each round).","Control a small group, or plant a lasting command.","Control a crowd for a scene.","Control everyone in a city block.","Rule a city's minds."],{"gm":true},""],["emotion","Emotion Control","mind",["Push one person toward fear, calm, rage or trust (Will resists).","Sway a crowd; fear makes them flee.","Terror or rapture that paralyzes a crowd for a scene.","Sway a city's mood for a day.","Hold a city's emotions for a week.","Panic or peace across a nation."],{},""],["memory","Memory Manipulation","mind",["Blur the last minute in one person's memory.","Erase or alter a day; read memories by touch.","Rewrite years; plant a false life.","Rewrite a crowd's memory of an event.","Make a city forget.","Erase a person from the world's memory."],{"gm":true},""],["illusion","Illusion","mind",["A sound or small image at a distance.","A convincing person or scene that fools sight and hearing (Will or Intellect sees through).","Illusions every sense believes; they can frighten someone into collapse.","Illusions over a city block that even cameras record.","A whole false district.","Illusions that become real for those who believe them."],{},""],["empathy","Empathy","mind",["Feel what one person feels; +2 to Read People.","Sense lies and intentions in a room; share or ease pain by touch.","Feel a crowd's mood across a block; find a person by their emotions.","Feel every emotion in a city; find anyone by what they feel.","Ease or share a crowd's pain.","Feel the mood of a nation."],{},""],["precog","Precognition","mind",["+2 to one roll a scene; you're never surprised.","Once a scene, reroll a failed roll without spending Spark.","Visions of a scene's future: the GM answers one question about what's coming.","Twice a scene, reroll a failed roll without spending Spark; you're never ambushed.","Once a scene, know the outcome of a choice before you make it.","See the shape of days to come: the GM answers three questions a session."],{},""],["senses","Enhanced Senses","mind",["+2 to perception; see in the dark.","Track by scent; hear heartbeats through walls.","See through walls; hear a whisper across a block.","Hear a conversation across a city; read a license plate a mile away.","Sense through walls for a mile.","Perceive anything happening across a city."],{},""],["mysticsight","Mystic Sight","mind",["See spirits and active magic.","See auras: possession, curses, lies, Shadow Earth duplicates.","See into Otherworld and Shadow Earth; read who made a spell.","See through any magical disguise; read spells as they're cast.","See across Otherworld; find any spirit by name.","See the threads of fate and magic over a whole city."],{},""],["psychometry","Psychometry","mind",["Touch an object and feel its last owner's emotions.","See a key moment in its past.","Follow its whole history, and find its owner now.","Read the history of a building or a street.","Read a city's history; find anyone who ever touched an object.","Read the past of a place across centuries."],{},""],["astral","Astral Projection","mind",["Leave your body to scout a building (your body is helpless).","Travel across a city as a spirit; speak to spirits.","Cross into Otherworld or Shadow Earth in spirit; fight spirits there.","Travel anywhere on Earth in spirit within moments.","Act physically as a spirit, with Class III attacks.","Walk between worlds in body as well as spirit."],{},""],["intellect","Super Intellect","mind",["+2 to Intellect skills; learn any skill in days.","Invent a working device in a week; solve the unsolvable in a scene.","Understand any technology, alien or arcane; invent in hours.","Out-think supercomputers; invent the impossible in an hour.","Understand any science, alien or arcane, at a glance.","Tesla's level: build doors between worlds."],{},""],["telekinesis","Telekinesis","control",["Move a small object you can see; disarm.","Lift a car; Class II attacks; hold a person still (Body resists).","Lift a truck; stop a falling plane; Class III attacks.","Lift a jet or a building's floor; Class IV attacks.","Lift a ship; Class V attacks.","Move a mountain; Class VI attacks."],{},""],["cantrips","Cantrips","control",["First Circle: know 2 cantrips, quick spells cast in one action, each working at Class I.","Second Circle: know 3 cantrips, each working at Class II.","Third Circle: know 4 cantrips, each working at Class III.","Fourth Circle: know 5 cantrips, each working at Class IV.","Fifth Circle: know 6 cantrips, each working at Class V.","Sixth Circle: know 7 cantrips, each working at Class VI."],{},"quick spells; a failed cast marks Strain"],["teleport","Teleport","control",["Jump to a place in line of sight, up to about 100 yards; just you.","Jump anywhere you know within 50 miles, with one passenger.","Jump anywhere on Earth you know, with up to 4 passengers.","Anywhere on Earth, even places you've only seen in photos; up to 20 passengers or a vehicle.","Low orbit or the Moon; a building's worth of people and things.","Another world or dimension, without a door."],{},""],["portals","Portals","control",["Open a door between two places you can see.","Open a door to anywhere you've been.","Open a door into Otherworld, a haven or Shadow Earth.","Hold a door open for an army or a convoy.","Open many doors at once across a city.","Tear a breach between worlds that stays open."],{"gm":true},""],["summoning","Summoning","control",["Call a minor spirit or creature that helps for a scene (+2 assistance).","Call a creature that fights beside you (a minor character with Class II attacks).","Call something powerful; it serves, at a price.","Call something that fights with Class IV attacks.","Call a legion.","Call one of Otherworld's powers itself."],{},""],["warding","Warding","control",["Seal a door or circle against spirits and magic.","Protect a building; banish a minor spirit or creature (Will resists).","Protect a block; banish powerful beings back to Otherworld.","Protect a district; banish Class IV beings.","Protect a city; banish Class V beings.","Seal an Earth Gate or a breach for good."],{},""],["healing","Healing","control",["Stabilize the Dying by touch; clear one box once a scene.","Clear two boxes; cure ordinary disease and poison.","Clear any injury; cure the incurable; even curses yield (with the GM's approval).","Heal a crowd's ordinary wounds at once; restore lost limbs.","Bring back the newly dead, within minutes (GM's approval).","Undo death itself (GM's approval)."],{},""],["negation","Power Negation","control",["Suppress one Operant's Class I powers within reach for a round (Will resists).","Suppress Class II powers within a room for a scene.","Suppress Class III powers in an area; the labs would kill for you.","Suppress Class IV powers across a building.","Suppress Class V powers across a city block.","Shut off powers across a city."],{},""],["mimicry","Power Mimicry","control",["Copy one Class I power from an Operant you touch, for a scene.","Copy at Class II, or two powers at Class I.","Copy at Class III, and keep a copied power until you take another.","Copy a power at Class IV.","Copy several powers at Class IV, or one at Class V.","Copy any power at full strength."],{},""],["technopathy","Technopathy","control",["Sense and talk to machines; +2 to Computers and Engineering.","Command electronics in a room: locks, cameras, guns, drones.","Command a building's systems or a fleet of drones; take over an Aegis suit (the pilot's Will resists).","Command a city's power grid or a military network.","Command every machine in a region.","Speak to every machine on Earth."],{},""],["animals","Animal Control","control",["Speak with animals.","Command a pack or a flock for a scene.","Command every animal across a block.","Command every animal in a city.","Command a region's wildlife.","Command every creature that answers to instinct."],{},""],["probability","Probability Control","control",["Once a scene, +2 or −2 to any roll you can see.","Once a scene, turn a near miss into a success, or a success into a failure.","Once a session, choose the result of any roll you can see.","Twice a scene, choose the result of a roll you can see.","Once a scene, choose the result of any roll.","Rewrite luck itself: a disaster simply doesn't happen."],{},""],["time","Time Manipulation","control",["Once a scene, take an extra action.","Freeze time around you for a moment: two extra actions.","Rewind the last round, once a session.","Stop time for a round for everyone but you.","Rewind a whole scene, once a session.","Travel in time (GM's approval)."],{"gm":true},""],["possession","Possession","control",["Ride along in one person's senses (Will resists).","Take control of a body for a scene; your own body is helpless.","Possess and keep a body; switch bodies by touch.","Possess and switch bodies at a distance.","Possess several bodies at once.","Possess anyone, even another Operant, against their will."],{"gm":true},""],["gadgeteering","Gadgeteering","control",["Carry three gadgets, each a Class I effect from another power.","Build gadgets with Class II effects; repair anything.","Build devices with Class III effects, or an Aegis suit of your own.","Build Class IV devices: a better suit than ExLAW's Aegis.","Class V devices: an orbital platform.","Tesla-class inventions: doors between worlds."],{},""]],"tierSlots":{"0":[],"1":["I","I"],"2":["II","I","I"],"3":["III","II","I"]},"note":"Roll Powers to aim a power or use it with skill; passive powers just work. Push a power one Class higher for one action by marking Strain. Powers marked (GM) need the GM's approval; so does every Mythic power."},"spells":{"skill":"Powers","plural":"Cantrips","power":"cantrips","knownByClass":[2,3,4,5,6,7],"pureBonus":2,"known":[0,0,0],"roles":[],"advantages":[],"originAdvantages":[],"tierName":"Circle","tiers":["First Circle","Second Circle","Third Circle","Fourth Circle","Fifth Circle","Sixth Circle"],"note":"Your Cantrips power's Class is your Circle, and every cantrip works at it: Class II is the Second Circle. Casting takes one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense. A failed cast marks a box of Strain. Swap one cantrip between cases with a week of study.","list":[["bolt","Bolt","A mystic blast: an attack at the power's Class, effective at Short range."],["shield","Shield","A barrier: Defense at the power's Class until your next turn."],["bind","Bind","Bands of force hold a target in place (Body resists)."],["dispel","Dispel","Cancel a spell, ward or magical effect of equal or lower Class."],["veil","Veil","Hide yourself or an object from sight for the scene."],["glamour","Glamour","A quick illusion that fools the eye (Will or Intellect sees through it)."],["sight","Sight","See magic, spirits, curses and disguises."],["hex","Hex","−2 to all of a target's rolls for the scene (Will resists)."],["charm","Charm","The target treats you as a friend for the scene (Will resists)."],["levitate","Levitate","Float yourself or an object; at higher Classes, a car or a group."],["step","Step","Vanish and reappear within Close range; farther at higher Classes."],["mend","Mend","Clear one injury box, once per wound."]]},"magic":{"skill":"Powers","burst":"cantrip","bursts":"cantrips","step":"Circle","steps":"your Cantrips power's Class: the First Circle at Class I, the Second at Class II, and on up","price":"a box of Strain","charm":"fetish","charms":"fetishes","working":"ritual","workings":"rituals","advance":[],"help":{"step":"<p>Your Cantrips power's Class is your <b>Circle<\/b>: Class II is the Second Circle. Every cantrip you know works at it, and each Class higher teaches you another.<\/p>","boost":"<p>Bolt, Shield and Dispel already work at your Class, so they take Wider, Longer and Farther, not Harder. From the Fourth Circle, Wider can reach a city block and Longer can be permanent, with the GM's approval.<\/p>","charms":"An Adept can keep one ready fetish, two with Powers as an Expert skill."},"charmLimit":"An Adept can keep **one** ready fetish, two with Powers as an Expert skill.","dials":[["**Feel**","Comic-book magic: flashy, fast and plentiful."],["**Cantrips**","The Cantrips power (see Cantrips). Each Circle above the First gives a Boost, so a Fourth Circle sorcerer has three. From the Fourth Circle, a Wider Boost can take a city block and a Longer one can make an effect permanent, with the GM's approval. Bolt, Shield and Dispel already work at your Class, so they take Wider, Longer and Farther Boosts, not Harder."],["**Rituals**","Adepts copy any power by ritual (see Rituals): Class I is a Minor working, Class II Significant, Class III Major."],["**Fetishes**","Rare. An Adept can keep one ready fetish, two with Powers as an Expert skill."],["**Price**","Strain. A failed cantrip or ritual marks a box."],["**Growing**","Cantrips grow with the power's Class: pushing, Stronger Power and growth in play."]]},"statuses":[["civilian","Civilian","No registration needed: you have no powers to register.","No federal protection when Operants come calling."],["registered","Registered","Legal to use your powers in self-defense and emergencies; protected under the Extraordinary Powers Act.","Your identity and powers are in the EMD, and anyone with access can read them."],["reserve","Reserve Agent","You can make arrests, and the Director protects your secret identity.","You're held to police procedure, and liable for the damage you cause."],["agent","Full Agent","Federal authority, backup and ExLAW resources.","Orders, paperwork and EPAOC scrutiny."],["nonreg","Non-registered","You're not in the EMD; nobody can look you up.","Using your powers in public is a federal crime."],["convict","Convict","ExLAW may offer a deal: work off your sentence.","A parole officer, a tracking device and no second chances."]],"extraEdges":[["power","Stronger Power","Raise one of your powers by one Class. Class III is the limit at creation, unless the GM approves one power at Class IV.",3],["xpower","Extra Power","One more power, at Class I.",1]],"statusLabel":"Legal status","restricted":null,"quickRef":[["Speed and Flight","Speed I 70 mph, II 200 mph, III Mach 1, IV Mach 3, V Mach 10, VI Mach 25+. Flight I 70 mph, II 300 mph, III Mach 2, IV Mach 5, V Mach 10, VI Mach 25+ (orbit). Pushing reaches the next Class for one action."],["Leap and Teleport","Leap (up/across): I 30/100 ft, II 100/300 ft, III ¼ mile/1 mile, IV 1/5 mi, V 5/25 mi, VI 100+ mi. Teleport: I line of sight 100 yd, II 50 mi (+1), III anywhere known on Earth (+4), IV seen in photos (+20), V orbit/Moon, VI other worlds."],["Damage","Fists, batons, knives: 1 box. Pistols, SMGs, rifles: 2. Shotgun close up, sniper rifle: 3 and Dying. Powers by Class: I = 1, II = 2, III = 2 and knocked down, IV+ = 3."],["Defense","Roll Powers to aim a power. An attack above your Defense hits in full; equal marks one box fewer; lower does nothing. Guns are Class I, sniper rifles, heavy weapons and Aegis cannons II, anti-tank and explosives III."],["Strain","Push: use a power one Class higher for one action and mark Strain. Strain 1: −1 to Powers, 2: −2, 3: wild on 16–18, 4: burned out until a full day's rest."],["Rituals","Adepts only: copy a power. Class I is Minor (2 segments), II Significant (4), III Major (6); Powers rolls, ten minutes each. Needs materials and fuel; failure marks Strain; natural 18: something answers."],["Firearms","Pistol 15, shotgun 6, SMG 30 (burst: 3 rounds, +1), rifle 20. Covering fire: 3. Reload: one action. Natural 18 jams."],["Tracks","Collateral (damage), Scrutiny (official attention), Backlash (public anger). 4 boxes each; clean arrests, good press and lying low clear them between cases."]],"example":{"species":"Aurora-born","name":"Wade Collier","rank":"Sheriff, Brown County, Indiana","dept":"Officer","path":"rounded","speciesId":"aurora","role":"Sheriff of a county whose southern line now ends at the Mad Forest. Awakened in the 1985 Second Wave at nine years old, and registered ever since.","reason":"Someone has to stand between ordinary people and what's out there.","connection":"Celerity asked him not to help the federal agents at the forest's edge. He's still deciding.","attrs":{"Body":12,"Agility":10,"Intellect":10,"Presence":12,"Will":11},"skills":{"Leadership":"S","Firearms":"T","Law":"T","Persuasion":"T","Read People":"T","Investigation":"T","Piloting":"T","Brawling":"T","Athletics":"T","Powers":"T"},"adv":{"id":"command"},"comp":{"id":"protects","trigger":"A civilian in the crossfire"},"edges":{"grit":1,"power":1},"powerBoost":[1,0,0],"powers":["toughness","strength","senses"],"status":"registered","equipment":{"pistol":true,"radio":true,"badge":true,"firstaid":true},"allegiance":"sheriff","play":{"gun":{"type":"pistol","rounds":15,"spares":2}}},"pregens":[{"species":"Bonded","name":"Rachel Kwan","rank":"Special Agent, ExLAW Chicago","dept":"ExLAW Agent","path":"rounded","speciesId":"bonded","role":"Carries a jade seal that holds a guardian spirit, inherited from her grandmother. Her partner vanished on a case Director Humbacht closed personally.","reason":"The law should mean something, for Operants and everyone else.","connection":"Jess Calloway is the only reporter who asked about her missing partner. Kwan hasn't decided whether to trust her.","attrs":{"Body":10,"Agility":10,"Intellect":13,"Presence":9,"Will":13},"skills":{"Investigation":"S","Law":"T","Firearms":"T","Read People":"T","Occult":"T","Powers":"T","Computers":"T","Persuasion":"T","Athletics":"T","Brawling":"T"},"sadv":{"id":"bo-voice"},"adv":{"id":""},"comp":{"id":"mystery","trigger":"A file that shouldn't exist"},"edges":{"grit":1,"contact":1},"contact":"Her missing partner's last informant, who only talks to her","powers":["forcefield","mysticsight","telepathy"],"status":"agent","allegiance":"exlaw","equipment":{"pistol":true,"badge":true,"cuffs":true,"vest":true},"play":{"gun":{"type":"pistol","rounds":15,"spares":2}}},{"species":"Non-Operant","name":"Luis \"Bulldog\" Ortega","rank":"Aegis pilot, Chicago wing","dept":"Aegis Pilot","path":"hand","speciesId":"nonoperant","role":"Twelve years in the suit, three of them in Iraq. The AS-6's new firmware came from a contractor nobody can trace, and lately the suit hesitates when he doesn't.","reason":"Someone has to stand between ordinary people and what's out there.","connection":"He flew cover for Rachel Kwan the night her partner vanished, and saw something he never put in the report.","attrs":{"Body":12,"Agility":13,"Intellect":11,"Presence":10,"Will":10},"skills":{"Piloting":"S","Engineering":"T","Firearms":"T","Athletics":"T","Brawling":"T","Computers":"T","Leadership":"T","Law":"T","Read People":"T"},"sadv":{"id":"no-nerve"},"adv":{"id":""},"comp":{"id":"duty","trigger":"Orders to stand down"},"edges":{"attr":1,"skill":1,"contact":1,"grit":1},"contact":"A DIRE engineer who still owes him for Basra","powers":[],"status":"agent","allegiance":"exlaw","equipment":{"aegis":true,"pistol":true,"tools":true,"radio":true},"play":{"gun":{"type":"pistol","rounds":15,"spares":2}}},{"species":"Ambrosia","name":"Naomi Price","rank":"Daybreak, New Power Legion","dept":"Public Hero","path":"rounded","speciesId":"ambrosia","role":"The Legion's rising star, dosed with Ambrosia in a sponsor's clinic at nineteen. Her sponsor owns her image, her schedule and, she's starting to suspect, her secrets.","reason":"The cameras love an Operant, and I love the cameras.","connection":"Static saved her from a Foundation snatch team on live TV, and vanished before the cameras turned.","attrs":{"Body":13,"Agility":9,"Intellect":9,"Presence":14,"Will":10},"skills":{"Media":"S","Leadership":"T","Persuasion":"T","Powers":"T","Athletics":"T","Brawling":"T","Read People":"T","Piloting":"T","Deception":"T","Law":"T"},"sadv":{"id":"am-ideal"},"adv":{"id":""},"comp":{"id":"cameras","trigger":"A crowd with phones out"},"edges":{"power":1},"powerBoost":[1,0,0],"gmClass4":true,"powers":["strength","flight","toughness"],"status":"registered","allegiance":"legion","equipment":{"radio":true,"camera":true}},{"species":"Adept","name":"Dr. Tobias Wren","rank":"Professor of comparative religion; Earth Warden","dept":"Occultist","path":"hand","speciesId":"adept","role":"A collector of forbidden books who once traded a year of his life to something in Avalon for a translation. The year is coming due.","reason":"Someone has to stand between ordinary people and what's out there.","connection":"He taught Maeve Ashgrove's handler, and was the one who recognized what Maeve really is.","attrs":{"Body":9,"Agility":10,"Intellect":14,"Presence":10,"Will":13},"skills":{"Powers":"S","Occult":"T","Investigation":"T","Persuasion":"T","Science":"T","Read People":"T","Medicine":"T","Law":"T"},"sadv":{"id":"ad-ritualist"},"adv":{"id":""},"comp":{"id":"haunted","trigger":"Your bond demands something"},"edges":{"attr":1,"gear":1,"power":1},"powerBoost":[1,0],"gear":{"item":"The Lammas Grimoire, annotated in four hands","skill":"Occult"},"powers":["warding","mysticsight"],"status":"registered","allegiance":"wardens","equipment":{"ritualkit":true,"firstaid":true}},{"species":"Touched","name":"Jess Calloway","rank":"Freelance investigative reporter","dept":"Journalist","path":"rounded","speciesId":"touched","role":"Touched a Raster Zero file in 2024 and saw the room it came from. Nobody knows she's an Operant; she's been pulling the thread ever since.","reason":"There's a story nobody's telling. I'm going to tell it.","connection":"Rachel Kwan's missing partner was her source. She hasn't told Kwan yet.","attrs":{"Body":10,"Agility":11,"Intellect":11,"Presence":12,"Will":12},"skills":{"Investigation":"S","Media":"T","Persuasion":"T","Read People":"T","Powers":"T","Computers":"T","Stealth":"T","Deception":"T","Law":"T","Streetwise":"T"},"sadv":{"id":"to-glimpse"},"adv":{"id":""},"comp":{"id":"secretid","trigger":"Someone close asks where you were"},"edges":{"attr":1,"xpower":1},"powers":["psychometry","precog","empathy","senses"],"status":"nonreg","equipment":{"camera":true,"laptop":true,"radio":true}},{"species":"Lab-made","name":"Subject 19","rank":"\"Static\", escaped Foundation subject","dept":"Fugitive","path":"rounded","speciesId":"labmade","role":"Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking.","reason":"No lab, no registry and no government owns me.","connection":"Saved Daybreak from a Foundation snatch team on live TV, and ran before the cameras turned.","attrs":{"Body":12,"Agility":13,"Intellect":11,"Presence":9,"Will":10},"skills":{"Powers":"S","Stealth":"T","Deception":"T","Athletics":"T","Computers":"T","Streetwise":"T","Brawling":"T","Engineering":"T","Piloting":"T","Read People":"T"},"sadv":{"id":"lm-wary"},"adv":{"id":""},"comp":{"id":"hunted","trigger":"A van with no plates outside"},"edges":{"grit":1,"power":1},"powerBoost":[1,0,0],"powers":["blast","speed","technopathy"],"status":"nonreg","equipment":{"picks":true,"laptop":true}},{"species":"Otherworlder","name":"Maeve Ashgrove","rank":"Cat burglar, on an ExLAW deal","dept":"Thief","path":"rounded","speciesId":"otherworlder","role":"A fey-born thief from Avalon, caught stealing from a Morcain vault and handed to ExLAW. She works off her sentence; her handler is the only one who knows where she came from.","reason":"No lab, no registry and no government owns me.","connection":"Dr. Tobias Wren saw through her glamour the first day. He's kept her secret; she wonders what it'll cost.","attrs":{"Body":10,"Agility":14,"Intellect":11,"Presence":11,"Will":9},"skills":{"Stealth":"S","Athletics":"T","Engineering":"T","Streetwise":"T","Deception":"T","Powers":"T","Occult":"T","Persuasion":"T","Read People":"T","Melee":"T"},"sadv":{"id":"ot-grace"},"adv":{"id":""},"comp":{"id":"outsider","trigger":"A form that asks for papers you don't have"},"edges":{"contact":1,"grit":1},"contact":"Her ExLAW handler, Agent Dorsey, who covers for her more than he should","powers":["invisibility","phasing","illusion"],"status":"convict","equipment":{"picks":true,"baton":true,"radio":true}}],"roleAliases":{"Federal Agent":"Officer","Sheriff":"Officer","Police Officer":"Officer","Detective":"Officer"},"protection":[{"id":"vest","equipment":"vest","name":"Body armor","text":"Once per fight, a Class I hit marks one box fewer.","traits":[{"type":"armor","minBoxes":1,"reduce":1,"maxClass":1,"label":"Body armor"}]},{"id":"riotshield","equipment":"riotshield","name":"Riot shield","text":"A clear polycarbonate shield: +1 to Block against blows, thrown objects and missiles. It won't stop a bullet. −2 to Stealth while you carry it.","traits":[{"type":"shield","value":1,"label":"Riot shield"}]},{"id":"improvised","name":"Improvised shield","text":"Anything that can stand in for a shield, snatched up in the fight: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.","traits":[{"type":"shield","value":0,"breaksOn":2,"label":"Improvised shield"}]}],"combatRules":{"oneDefense":{"perRound":1,"edge":"extradefense"},"attackQualityDodge":{"bands":[{"from":0,"mod":0},{"from":3,"mod":-1},{"from":5,"mod":-2},{"from":7,"mod":-3}]},"parry":{"mod":-3,"repeatPenalty":-2,"bareHanded":"unarmed"},"block":{"mod":-2},"aim":{"bonus":1}},"coreCombat":["aim","attackQualityDodge","block","oneDefense","parry"]};/* PACK:END */
-  const LD = (() => {
-/**
- * Legend Dynamics core rules: pure functions, no page code.
- *
- * Every rule here is the published core (engine/core.md). Settings supply data (weapons, NPCs, terms);
- * experiments plug into resolveAttack() through its hook lists and never change these functions.
- * The build inlines this file into each creator page as `LD`; tests import it directly.
- */
-
-const CORE_BASELINE = "Legend Dynamics core, published 2026-10";
-
-/** @typedef {[number, number, number]} Dice */
-/** @typedef {{ dice: Dice, total: number, target: number, success: boolean, auto: "success" | "failure" | null, margin: number, contestMargin: number }} Roll */
-/** @typedef {{ source: string, label: string, value: number, scope: "core" | "setting" | "experiment" | "situation" }} Modifier */
-
-// ---- 3d6 roll-under ----
-
-/** @param {() => number} [random] */
-function rollDice(random = Math.random) {
-  return /** @type {Dice} */ ([0, 0, 0].map(() => 1 + Math.floor(random() * 6)));
-}
-
-/**
- * Resolve a roll against an adjusted target. Natural 3–4 always succeeds; natural 17–18 always fails.
- * An automatic success above its target counts as margin 0 in a contest.
- * @param {Dice} dice @param {number} target @returns {Roll}
- */
-function resolve(dice, target) {
-  const total = dice[0] + dice[1] + dice[2];
-  const auto = total <= 4 ? "success" : total >= 17 ? "failure" : null;
-  const success = auto === "success" || (auto === null && total <= target);
-  const margin = target - total;
-  return { dice, total, target, success, auto, margin, contestMargin: success ? Math.max(0, margin) : margin };
-}
-
-// Ways to roll each total on 3d6, index 0 = total 3.
-const WAYS = [1, 3, 6, 10, 15, 21, 25, 27, 27, 25, 21, 15, 10, 6, 3, 1];
-
-/** Chance of success against a target, including the automatic results. @param {number} target */
-function odds(target) {
-  let ways = 0;
-  for (let t = 3; t <= 18; t++) if (t <= 4 || (t <= 16 && t <= target)) ways += WAYS[t - 3];
-  return ways / 216;
-}
-
-/** @param {Modifier[]} mods */
-const sumMods = (mods) => mods.reduce((a, m) => a + (m.value || 0), 0);
-
-// ---- dice sources ----
-
-/** A seeded generator (mulberry32). @param {number} seed */
-function mulberry32(seed) {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-/** A stable 32-bit hash of a string (FNV-1a). @param {string} s */
-function hash32(s) {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
-  return h >>> 0;
-}
-
-/**
- * Dice for one named roll. With a seed, the same seed and key always give the same dice, whatever else
- * happened in the encounter, so a rules change that adds or removes a roll doesn't shift every later one.
- * Without a seed, ordinary random dice.
- * @param {string | number | null | undefined} seed @param {string} key
- */
-function diceFor(seed, key) {
-  if (seed === null || seed === undefined || seed === "") return rollDice();
-  return rollDice(mulberry32(hash32(String(seed) + "|" + key)));
-}
-
-// ---- range ----
-
-/** Range bands, nearest first. "melee" is reach: someone next to you. */
-const BANDS = ["melee", "close", "short", "medium", "long", "extreme"];
-const bandIndex = (/** @type {string} */ b) => Math.max(1, BANDS.indexOf(b)); // a gun used at arm's length is at Close
-
-/**
- * The published range modifier for a weapon at a band: 0 within its effective band, −2 one band beyond,
- * −4 two beyond, null when out of range (farther, past a weapon's maximum band, or a melee weapon not in reach).
- * @param {{ reach?: string, band?: string, maxBand?: string }} weapon @param {string} band
- * @returns {number | null}
- */
-function rangeModifier(weapon, band) {
-  if (weapon.reach === "melee") return band === "melee" ? 0 : null;
-  const at = bandIndex(band), eff = bandIndex(weapon.band || "close");
-  if (weapon.maxBand && at > bandIndex(weapon.maxBand)) return null;
-  const over = at - eff;
-  return over <= 0 ? 0 : over === 1 ? -2 : over === 2 ? -4 : null;
-}
-
-/**
- * Boxes a hit marks at a band: the weapon's damage for that band, or its default.
- * @param {{ reach?: string, damage: Record<string, { boxes: number, dying?: boolean } | null> }} weapon @param {string} band
- * @returns {{ boxes: number, dying?: boolean } | null}
- */
-function weaponDamage(weapon, band) {
-  const b = weapon.reach === "melee" ? "melee" : BANDS[bandIndex(band)];
-  if (b in weapon.damage) return weapon.damage[b];
-  return weapon.damage.any ?? null;
-}
-
-/**
- * Core capability: accuracy traits on a weapon. The core knows how to read them; settings (or their test
- * configurations) supply the values. Published weapons carry none.
- * A trait: { type: "accuracy", value, bands?: string[], requires?: { aimed?: boolean, ammo?: string, mode?: string }, label? }
- * @param {{ name?: string, traits?: any[] }} weapon @param {{ band: string, aimed?: number | boolean, ammo?: string, mode?: { id: string } | null }} ctx
- * @returns {Modifier[]}
- */
-function weaponAccuracy(weapon, ctx) {
-  /** @type {Modifier[]} */
-  const out = [];
-  for (const t of weapon.traits || []) {
-    if (t.type !== "accuracy" || !t.value) continue;
-    if (t.bands && t.bands.length && !t.bands.includes(ctx.band === "melee" ? "close" : ctx.band)) continue;
-    const r = t.requires || {};
-    if (r.aimed && !ctx.aimed) continue;
-    if (r.ammo && r.ammo !== ctx.ammo) continue;
-    if (r.mode && r.mode !== ctx.mode?.id) continue;
-    out.push({ source: "weapon", label: t.label || `${weapon.name || "Weapon"} accuracy`, value: t.value, scope: "setting" });
-  }
-  return out;
-}
-
-// ---- injury ----
-
-const INJURY_MAX = 3;
-/** Physical-action penalty for each injury level; null means Incapacitated. */
-const INJURY_PENALTY = [0, -1, -2, null];
-
-/**
- * Apply a hit that got through, under the published injury and Dying rules.
- * Minor opponents go down to any hit. A hit marking 2+ boxes that brings you to three boxes leaves you Dying;
- * at three boxes, any further hit marking 2+ boxes kills.
- * @param {{ injury: number, dying?: boolean, dead?: boolean, minor?: boolean, boxes?: number }} who
- * @param {{ boxes: number, dying?: boolean }} hit
- */
-function applyHit(who, hit) {
-  const max = who.boxes || INJURY_MAX;
-  const before = who.injury || 0;
-  if (who.dead) return { injury: before, dying: !!who.dying, dead: true, out: true, change: "already dead" };
-  if (who.minor) return { injury: max, dying: false, dead: false, out: true, change: "minor opponent: out of the fight" };
-  if (before >= max) {
-    if (hit.boxes >= 2) return { injury: max, dying: false, dead: true, out: true, change: "killed: a 2+ box hit at three boxes" };
-    return { injury: max, dying: !!who.dying, dead: false, out: true, change: "already down" };
-  }
-  const injury = Math.min(max, before + hit.boxes);
-  const down = injury >= max;
-  const dying = !!who.dying || (down && (hit.boxes >= 2 || !!hit.dying));
-  return { injury, dying, dead: false, out: down, change: down ? (dying ? "incapacitated and Dying" : "incapacitated") : `${injury} box${injury > 1 ? "es" : ""}` };
-}
-
-/** Dodge: Agility −2, plus the Athletics bonus (+1 Trained, +2 Specialty or Expert). */
-const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ athleticsBonus) => agility - 2 + athleticsBonus;
-
-// ---- attack resolution ----
-
-/**
- * @typedef {{
- *   attacker: { id: string, name: string, skill: string, skillTarget: number, injury?: number, traits?: any[] },
- *   defender: { id: string, name: string, dodgeBase: number | null, injury?: number, canDodge: boolean, minor?: boolean, boxes?: number, dying?: boolean, dead?: boolean, traits?: any[] },
- *   weapon: any, band: string, mode?: { id: string, label: string, mod: number } | null, aimed?: number, ammo?: string,
- *   cover?: "none" | "partial" | "solid", situational?: Modifier[], jamOn18?: boolean, boosts?: number,
- *   defense?: { kind: string, label: string, base: number, mods?: Modifier[] } | null
- * }} AttackInput
- * @typedef {{ attackModifiers: ((ctx: any) => Modifier[])[], dodgeModifiers: ((ctx: any) => Modifier[])[] }} Hooks
- */
-
-/**
- * The price some attacks carry on a failure (a setting's magic: Corruption, Strain, The Dark).
- * Core capability; the setting's weapon data says which track and how much. @param {any} weapon @param {Roll} roll
- * @returns {{ track: string, boxes: number } | null}
- */
-function priceFor(weapon, roll) {
-  const p = weapon.price;
-  if (!p || roll.success) return null;
-  return { track: p.track, boxes: roll.total === 18 && p.natural18 ? p.natural18 : p.fail };
-}
-
-/** Defender traits that are switched on (a trait with toggle: true can be switched off, e.g. a Ward once broken). @param {any} defender */
-const liveTraits = (defender) => (defender.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false);
-
-const DEFENDED = /** @type {Record<string, string>} */ ({ dodge: "dodged", parry: "parried", block: "blocked", deflect: "deflected" });
-
-/** Published core: no extra modifiers. */
-const NO_HOOKS = /** @type {Hooks} */ ({ attackModifiers: [], dodgeModifiers: [] });
-
-/**
- * Resolve one attack, start to finish, and say how every number was reached.
- * Base skill → modifiers → final target → 3d6 → margin → Dodge modifiers → Dodge roll → damage.
- * @param {AttackInput} input @param {Hooks} hooks @param {(kind: "attack" | "dodge") => Dice} roll
- */
-function resolveAttack(input, hooks, roll) {
-  const { attacker, defender, weapon, band } = input;
-  const out = /** @type {any} */ ({ attacker: attacker.id, defender: defender.id, weapon: weapon.id, band, ammo: input.ammo || null, mode: input.mode?.id || null });
-  const range = rangeModifier(weapon, band);
-  if (range === null) return { ...out, outcome: "out of range", hit: false, attackMods: [], dodgeMods: [] };
-  if (input.cover === "solid") return { ...out, outcome: "blocked by solid cover", hit: false, attackMods: [], dodgeMods: [] };
-
-  /** @type {Modifier[]} */
-  const mods = [];
-  if (range) mods.push({ source: "range", label: `Range (${band})`, value: range, scope: "core" });
-  if (input.mode && input.mode.mod) mods.push({ source: "mode", label: input.mode.label, value: input.mode.mod, scope: "setting" });
-  for (const m of weaponAccuracy(weapon, input)) mods.push(m);
-  // An enchanted weapon (setting data on the attacker): +N to hit with that weapon.
-  const ench = (attacker.traits || []).filter((/** @type {any} */ t) => t.type === "weaponBonus" && (!t.weapon || t.weapon === weapon.id));
-  for (const t of ench) if (t.accuracy) mods.push({ source: "enchantment", label: t.label || "Enchantment", value: t.accuracy, scope: "setting" });
-  if (input.cover === "partial") mods.push({ source: "cover", label: "Partial cover", value: -2, scope: "core" });
-  const atkInj = INJURY_PENALTY[attacker.injury || 0] || 0;
-  if (atkInj) mods.push({ source: "injury", label: "Attacker's injury", value: atkInj, scope: "core" });
-  for (const m of input.situational || []) if (m.value) mods.push(m);
-  for (const t of liveTraits(defender)) if (t.type === "attackPenalty" && t.value) mods.push({ source: "defender", label: t.label || "Defender", value: t.value, scope: "setting" });
-  const boosts = weapon.spell ? Math.max(0, Math.min(2, input.boosts || 0)) : 0; // Harder Boosts: −1 to the roll and +1 box each (core magic)
-  if (boosts) mods.push({ source: "boost", label: `Harder Boost${boosts > 1 ? " ×" + boosts : ""}`, value: -boosts, scope: "core" });
-  const ctx = { ...input, range, margin: 0 };
-  for (const h of hooks.attackModifiers) for (const m of h(ctx)) if (m.value) mods.push(m);
-  const target = attacker.skillTarget + sumMods(mods);
-  const atk = resolve(roll("attack"), target);
-  out.attackMods = mods; out.base = attacker.skillTarget; out.target = target; out.attack = atk;
-  out.jam = (weapon.jamOn || (input.jamOn18 ? [18] : [])).includes(atk.total);
-  out.price = priceFor(weapon, atk);
-  out.boosts = boosts;
-  if (!atk.success) return { ...out, outcome: "miss", hit: false, dodgeMods: [] };
-
-  /** @type {Modifier[]} */
-  const dmods = [];
-  const dctx = { ...ctx, margin: atk.margin, attack: atk };
-  // The defense: published Dodge unless the caller chose another (Parry, Block: lab experiments). One roll, whichever it is.
-  const def = input.defense !== undefined ? input.defense
-    : defender.canDodge && defender.dodgeBase !== null ? { kind: "dodge", label: "Dodge", base: defender.dodgeBase, mods: [] } : null;
-  if (def) {
-    for (const m of def.mods || []) if (m.value) dmods.push(m);
-    // Published gear: a shield's +1 to Dodge against attacks you can see.
-    if (def.kind === "dodge") for (const t of liveTraits(defender)) if (t.type === "dodgeBonus" && t.value) dmods.push({ source: "gear", label: t.label || "Gear", value: t.value, scope: "setting" });
-    const defInj = INJURY_PENALTY[defender.injury || 0] || 0;
-    if (defInj) dmods.push({ source: "injury", label: "Defender's injury", value: defInj, scope: "core" });
-    for (const h of hooks.dodgeModifiers) for (const m of h({ ...dctx, defense: def.kind })) if (m.value) dmods.push(m);
-    const eff = def.base + sumMods(dmods);
-    const dg = resolve(roll("dodge"), eff);
-    out.defense = def.kind; out.defenseLabel = def.label;
-    out.dodgeBase = def.base; out.dodgeTarget = eff; out.dodge = dg;
-    if (dg.success) return { ...out, dodgeMods: dmods, outcome: DEFENDED[def.kind] || "defended", hit: false };
-  }
-  out.dodgeMods = dmods;
-  let dmg = weaponDamage(weapon, band);
-  // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
-  for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }
-  if (dmg && boosts) dmg = { ...dmg, boxes: dmg.boxes + boosts };
-  const bite = ench.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extraBox || 0), 0);
-  if (dmg && dmg.boxes && bite) { dmg = { ...dmg, boxes: dmg.boxes + bite }; out.enchanted = bite; }
-  if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
-  // A trait that ignores small hits: always, or once per fight (oncePerFight; the encounter marks it used).
-  const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && !t.used && dmg && dmg.boxes <= t.maxBoxes);
-  if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null, shrugged: shrug.label || "ignoreHits" };
-  // Published armour (setting data): e.g. a mail shirt, "hits of 2 or more boxes mark one fewer, once per fight".
-  // Armour can say what it works against: "melee", "missile" (bows, slings, thrown) or "firearm". No list: everything.
-  const kind = weapon.firearm ? "firearm" : weapon.reach === "melee" ? "melee" : "missile";
-  const armour = liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1) && (!t.against || t.against.includes(kind)));
-  if (armour) { dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - (armour.reduce || 1)) }; out.armorUsed = armour.label || "Armour"; }
-  if (!dmg.boxes) return { ...out, outcome: `hit, stopped by ${out.armorUsed}`, hit: true, damage: null };
-  return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
-}
-
-return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, priceFor, NO_HOOKS, resolveAttack };
-})();
-  const LAB_DATA = null;
   const T = PACK.terms;
+  // Advancement point costs (core rules, Advancement). Magic and powers use the costs their chapters give.
+  const COSTS = { UT: 1, TS: 2, revise: 1, edge: 3, attr: 4 };
   const ATTRS = [
     ["Body", "Strength, endurance, resisting injury"],
     ["Agility", "Coordination, reflexes, movement"],
@@ -5176,6 +4961,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     ["Incapacitated", "Unable to act; medical aid needed", null],
   ];
   // Ways to roll each total on 3d6, index 0 = total 3.
+  const WAYS = [1, 3, 6, 10, 15, 21, 25, 27, 27, 25, 21, 15, 10, 6, 3, 1];
   const STORE_ROSTER = PACK.id + ".roster.v1", STORE_CURRENT = PACK.id + ".current.v1", BASE = 10, MAX_START = 13;
   // Weapons that use up ammunition or power: capacity, and what each kind of shot costs and does to the roll.
   const GUNS = PACK.weapons.items;
@@ -5197,7 +4983,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" }, edgeNotes: {},
-      allegiance: "", allegianceDef: null, customTier: 1,
+      allegiance: "", allegianceDef: null, customTier: 1, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "",
       play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [] },
@@ -5238,7 +5024,17 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     out.play.gun = g && typeof g === "object" && (g.type === "" || GUNS[g.type])
       ? { type: g.type, rounds: Math.max(0, Math.min(GUNS[g.type] ? GUNS[g.type][1] : 0, parseInt(g.rounds, 10) || 0)), spares: Math.max(0, parseInt(g.spares, 10) || 0) }
       : (() => { const t = (PACK.weapons.equipLinked || []).find((k) => out.equipment[k]); return t ? { type: t, rounds: GUNS[t][1], spares: PACK.weapons.defaultSpares ?? 2 } : { type: "", rounds: 0, spares: 0 }; })();
-    out.advances = out.advances.filter((a) => a && SKILLS.some(([n]) => n === a.skill) && ["UT", "TS"].includes(a.from + a.to));
+    // Purchases: skill steps (older files: one point each), Edges, attributes and revisions.
+    out.advances = out.advances.filter((a) => a && (
+      (!a.type || a.type === "skill") ? SKILLS.some(([n]) => n === a.skill) && ["UT", "TS"].includes(a.from + a.to)
+      : a.type === "edge" ? EDGE_DEFS.some(([k]) => k === a.edge) : a.type === "attr" ? ATTRS.some(([n]) => n === a.attr) : a.type === "revise"))
+      .map((a) => ({ ...a, type: a.type || "skill", cost: Number.isFinite(a.cost) ? a.cost : a.type ? COSTS[a.type] : 1 }));
+    out.edgesBought = {}; out.attrBought = {};
+    for (const a of out.advances) { if (a.type === "edge") out.edgesBought[a.edge] = (out.edgesBought[a.edge] || 0) + 1; if (a.type === "attr") out.attrBought[a.attr] = 1; }
+    // Points earned. A file from before advancement points has none recorded: it starts balanced (see pointsAvail).
+    const xp = c.xp && typeof c.xp === "object" ? c.xp : null;
+    out.xp = xp ? { earned: Math.max(0, parseInt(xp.earned, 10) || 0), log: Array.isArray(xp.log) ? xp.log.filter((e) => e && Number.isFinite(+e.n)).map((e) => ({ n: +e.n, note: String(e.note || ""), date: String(e.date || "") })) : [] }
+      : { earned: null, log: [] };
     if (out.sadv.id && out.adv.id) out.adv.id = ""; // a heritage advantage replaces the regular one
     out.edges = Object.fromEntries(EDGE_DEFS.map(([k, , , max]) => [k, Math.max(0, Math.min(max, parseInt((c.edges || {})[k], 10) || 0))]));
     out.adv2 = { id: "", detail: "", ...(c.adv2 || {}) };
@@ -5282,8 +5078,10 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   // ---- rules ----
   const speciesDef = () => SPECIES.find((x) => x[0] === ch.speciesId);
   const adjOf = (c = ch) => (c.speciesId === "custom" ? c.speciesAdj : (SPECIES.find((x) => x[0] === c.speciesId) || [, , {}])[2]) || {};
-  const baseOf = (n, c = ch) => BASE + (adjOf(c)[n] || 0);
-  const maxOf = (n, c = ch) => MAX_START + Math.max(0, adjOf(c)[n] || 0);
+  // An attribute bought with advancement points raises both its floor and its ceiling by one.
+  const boughtAttr = (n, c = ch) => ((c.attrBought || {})[n] || 0);
+  const baseOf = (n, c = ch) => BASE + (adjOf(c)[n] || 0) + boughtAttr(n, c);
+  const maxOf = (n, c = ch) => MAX_START + Math.max(0, adjOf(c)[n] || 0) + boughtAttr(n, c);
   const adjTotal = () => ATTRS.reduce((a, [n]) => a + (ch.speciesAdj[n] || 0), 0);
   const spent = () => ATTRS.reduce((a, [n]) => a + Math.max(0, ch.attrs[n] - baseOf(n)), 0);
   const adjText = (adj) => ATTRS.filter(([n]) => adj[n]).map(([n]) => `${n} ${signed(adj[n])}`).join(", ") || "No adjustments";
@@ -5312,9 +5110,11 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   }
   // Old hands: one Expert skill (+5) and seven Trained; everyone else: one Specialty (+3) and nine Trained.
   const isGS = () => ch.path === "hand";
-  const edgeN = (k, c = ch) => (c.edges || {})[k] || 0;
+  // Edges: those chosen at creation (the tier's budget) plus those bought later with advancement points.
+  const edgeRaw = (k, c = ch) => (c.edges || {})[k] || 0;
+  const edgeN = (k, c = ch) => edgeRaw(k, c) + ((c.edgesBought || {})[k] || 0);
   const edgesAvail = (c = ch) => EDGE_POINTS - tierOf(c);
-  const edgesSpent = (c = ch) => EDGE_DEFS.reduce((a, [k]) => a + edgeN(k, c), 0);
+  const edgesSpent = (c = ch) => EDGE_DEFS.reduce((a, [k]) => a + edgeRaw(k, c), 0);
   const pool = () => 5 + edgeN("attr");
   const gritStart = (c = ch) => 2 + edgeN("grit", c);
   // Some origins get one skill Trained for free.
@@ -5402,7 +5202,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   ].filter((x) => x.id);
   const levelName = (l, name) => ((l === "S" && isGS() && !(name && advancedToS(name))) || (l === "S" && masterSkill(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
-  const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge);
+  const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
   // The core attack and defense rules (engine/combat.json), with the setting's own overrides.
   const CR = PACK.combatRules || {};
   const PARRY = !CR.parry ? [] : T.meleeSkill === T.unarmedSkill ? [[T.meleeSkill, "armed or bare-handed"]] : [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]];
@@ -5422,7 +5222,11 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   const isDefense = (name) => name === "Dodge" || name === "Dodge+" || isParry(name) || isBlock(name);
   const rollLabel = (name) => (isParry(name) ? `Parry (${name.slice(6)})` : isBlock(name) ? `Block (${SHIELDS.find((g) => g.id === name.slice(6))?.name.toLowerCase() || "shield"})` : name);
   const count = (lvl) => Object.entries(ch.skills).filter(([k, v]) => v === lvl && !freeSkill(k)).length;
-  const odds = LD.odds; // the core rules module
+  function odds(t) {
+    let w = 0;
+    for (let s = 3; s <= 18; s++) if (s <= 4 || (s <= 16 && s <= t)) w += WAYS[s - 3];
+    return w / 216;
+  }
   const pct = (t) => Math.round(odds(t) * 100) + "%";
   const advDef = () => ADVANTAGES.find((a) => a[0] === ch.adv.id);
   const compDef = () => COMPLICATIONS.find((a) => a[0] === ch.comp.id);
@@ -5616,7 +5420,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     $("edge-intro").textContent = ea ? `Tier ${tierOf()} leaves ${ea} Edge${ea > 1 ? "s" : ""}. Spend ${ea > 1 ? "them" : "it"} below.` : `This tier has no Edges: its power is the ${T.originLower} itself.`;
     EDGE_DEFS.forEach(([k, , , max]) => {
       $("edge-n-" + k).textContent = edgeN(k);
-      $("edge-m-" + k).disabled = edgeN(k) <= 0;
+      $("edge-m-" + k).disabled = edgeRaw(k) <= 0;
       $("edge-p-" + k).disabled = edgeN(k) >= max || es >= ea;
     });
     $("adv2-wrap").hidden = !edgeN("adv2");
@@ -5683,7 +5487,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     const nS = count("S"), nT = count("T");
     $("skill-tally").innerHTML =
       `<span class="chip ${nS === specialtyMax() ? "ok" : "no"}">${levelName("S")} ${nS}/${specialtyMax()}</span><span class="chip ${nT === trainedAllowed() ? "ok" : "no"}">Trained ${nT}/${trainedAllowed()}</span>` +
-      (ch.advances.length ? `<span class="chip">${ch.advances.length} advancement${ch.advances.length > 1 ? "s" : ""}</span>` : "");
+      (ch.advances.some((a) => a.type === "skill") ? `<span class="chip">${ch.advances.filter((a) => a.type === "skill").length} from advancement</span>` : "");
     $("skills-intro").innerHTML = isGS()
       ? T.pathExpertPlural + " are specialists: one <b>Expert</b> skill at attribute +5 and seven <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling."
       : "One <b>Specialty</b> at attribute +3 and nine <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling.";
@@ -5806,7 +5610,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
         ${ch.reason ? `<div class="field"><span class="label">${T.reasonSheet}</span><span>${esc(ch.reason)}</span></div>` : ""}
         ${ch.speciesNotes ? `<div class="field"><span class="label">Other ability (GM approved)</span><span>${esc(ch.speciesNotes)}</span></div>` : ""}
         ${ch.notes ? `<div class="field wide"><span class="label">Notes</span><span>${esc(ch.notes)}</span></div>` : ""}
-        ${ch.advances.length ? `<div class="field wide"><span class="label">Advancement</span><span>${ch.advances.map((a) => `${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ")}</span></div>` : ""}
+        ${ch.xp.earned || ch.advances.length ? `<div class="field wide"><span class="label">Advancement: ${pointsAvail()} point${pointsAvail() === 1 ? "" : "s"} to spend, ${ch.xp.earned} earned</span><span>${ch.advances.map((a) => `${esc(purchaseText(a))}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ") || "Nothing bought yet."}</span></div>` : ""}
       </div>`;
 
     // condition
@@ -6005,9 +5809,11 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     // A reroll repeats the same shot, whatever the shot menu shows now.
     const fireMod = isReroll && last ? last.fireMod || 0 : shot;
     const t = base + total - shot + fireMod;
-    const roll = LD.resolve(LD.rollDice(), t); // published core: 3d6 roll-under, natural 3–4 and 17–18 automatic
-    const { dice, total: sum, success: ok, margin } = roll;
-    const auto = roll.auto === "success" ? "auto-s" : roll.auto === "failure" ? "auto-f" : "";
+    const dice = [1, 2, 3].map(() => 1 + Math.floor(Math.random() * 6));
+    const sum = dice[0] + dice[1] + dice[2];
+    const auto = sum <= 4 ? "auto-s" : sum >= 17 ? "auto-f" : "";
+    const ok = auto === "auto-s" || (auto !== "auto-f" && sum <= t);
+    const margin = t - sum;
     const jam = PACK.weapons.jamOn18 && sum === 18 && (weaponNote || (isReroll && last && last.weaponNote));
     last = { name, t, dice, sum, ok, margin, auto, jam, rerolled: !!isReroll, fireMod, weaponNote: weaponNote || (isReroll && last ? last.weaponNote : "") };
     ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
@@ -6193,8 +5999,8 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   });
   $("edge-list").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-edge]"); if (!b || b.disabled) return;
-    const k = b.dataset.edge, max = EDGE_DEFS.find((x) => x[0] === k)[3], v = edgeN(k) + +b.dataset.d;
-    if (v < 0 || v > max || (+b.dataset.d > 0 && edgesSpent() >= edgesAvail())) return;
+    const k = b.dataset.edge, max = EDGE_DEFS.find((x) => x[0] === k)[3], v = edgeRaw(k) + +b.dataset.d;
+    if (v < 0 || v + ((ch.edgesBought || {})[k] || 0) > max || (+b.dataset.d > 0 && edgesSpent() >= edgesAvail())) return;
     ch.edges = { ...ch.edges, [k]: v };
     // Taking back an attribute Edge returns points from the highest attribute above its base.
     while (spent() > pool()) { const n = ATTRS.map(([a]) => a).filter((a) => ch.attrs[a] > baseOf(a)).sort((x, y) => ch.attrs[y] - ch.attrs[x])[0]; if (!n) break; ch.attrs[n]--; }
@@ -6221,8 +6027,6 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   const STORE_CLOCKS = PACK.id + ".clocks.v1", STORE_SHIP = PACK.id + ".tracks.v1";
   let clocks = store.get(STORE_CLOCKS, []);
   if (!Array.isArray(clocks)) clocks = [];
-  const clockListeners = []; // the Rules Lab listens, to log clock changes during an encounter
-  const clockNotify = (c, from, to) => clockListeners.forEach((f) => f(c, from, to));
   const gunOf = () => ch.play.gun;
   function renderGun() {
     const g = gunOf(), def = GUNS[g.type];
@@ -6314,9 +6118,8 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   $("clk-add").onclick = () => {
     const name = $("clk-name").value.trim();
     if (!name) { $("clk-name").focus(); return; }
-    const nc = { id: uid(), name: name.slice(0, 60), size: +$("clk-size").value, kind: $("clk-kind").value, filled: 0 };
-    clocks.push(nc);
-    $("clk-name").value = ""; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0);
+    clocks.push({ id: uid(), name: name.slice(0, 60), size: +$("clk-size").value, kind: $("clk-kind").value, filled: 0 });
+    $("clk-name").value = ""; store.set(STORE_CLOCKS, clocks); renderClocks();
   };
   $("clk-copy").onclick = () => {
     if (!clocks.length) { $("clk-msg").textContent = "No clocks to copy."; return; }
@@ -6328,43 +6131,95 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   $("clk-name").addEventListener("keydown", (e) => { if (e.key === "Enter") $("clk-add").click(); });
   $("clocks").addEventListener("click", (e) => {
     const seg = e.target.closest("[data-seg]"), rm = e.target.closest("[data-rmclock]");
-    let changed = null;
-    if (seg) { const c = clocks.find((x) => x.id === seg.dataset.clock); const i = +seg.dataset.seg; changed = [c, c.filled]; c.filled = c.filled === i ? i - 1 : i; }
+    if (seg) { const c = clocks.find((x) => x.id === seg.dataset.clock); const i = +seg.dataset.seg; c.filled = c.filled === i ? i - 1 : i; }
     else if (rm) clocks = clocks.filter((x) => x.id !== rm.dataset.rmclock);
     else return;
     store.set(STORE_CLOCKS, clocks); renderClocks();
-    if (changed) clockNotify(changed[0], changed[1], changed[0].filled); else clockNotify({ id: "", name: "", kind: "", size: 0 }, 0, 0);
   });
   renderShip(); renderClocks();
 
-  // ---- advancement: one skill step at a time, recorded so the limits stay right ----
-  function advanceOptionsFor(c) {
-    return SKILLS.filter(([n]) => c.skills[n] !== "S").map(([n]) => [n, c.skills[n] === "U" ? `${n}: Untrained → Trained` : `${n}: Trained → Specialty`]);
+  // ---- advancement: points earned and spent, each purchase recorded so the limits stay right ----
+  // Magic and powers are grown in their own steps; their points are counted from what the character has.
+  const listN = (s) => String(s || "").split(/[,;\n]/).filter((x) => x.trim()).length;
+  const classStep = (i) => (i <= 2 ? 2 : i === 3 ? 4 : 0); // to Class II or III: 2; to IV: 4; V is granted
+  const raiseCost = (from, to) => { let n = 0; for (let i = from + 1; i <= to; i++) n += classStep(i); return n; };
+  function magicPoints(c = ch) {
+    let n = 0;
+    if (MAGIC && c.magic) { const m = c.magic; n += (m.extraSpells || 0) + (m.extraCharms || 0) + 2 * ((m.deeper || []).length + (m.mastered || []).length) + listN(m.heart) + listN(m.quicker) + (m.master ? 4 : 0); }
+    if (POWERS) for (const p of allPowers(c)) n += p.learned ? 2 + raiseCost(0, classIndex(p.cl)) : raiseCost(classIndex(p.base), classIndex(p.cl));
+    return n;
   }
-  function applyAdvance(c, skill, note) {
-    const from = c.skills[skill];
-    if (!from || from === "S") return false;
-    const to = from === "U" ? "T" : "S";
-    c.skills[skill] = to;
-    c.advances = [...(c.advances || []), { skill, from, to, note: note || "", date: new Date().toISOString().slice(0, 10) }];
+  const pointsSpent = (c = ch) => (c.advances || []).reduce((a, x) => a + (x.cost || 0), 0) + magicPoints(c);
+  function pointsAvail(c = ch) {
+    if (c.xp.earned == null) c.xp.earned = pointsSpent(c);
+    return c.xp.earned - pointsSpent(c);
+  }
+  function advanceOptionsFor(c) {
+    const avail = pointsAvail(c), tag = (cost) => (cost > avail ? ` (${cost}: needs ${cost - avail} more)` : ` (${cost})`);
+    const opts = SKILLS.filter(([n]) => c.skills[n] !== "S").map(([n]) => { const cost = c.skills[n] === "U" ? COSTS.UT : COSTS.TS;
+      return [`skill:${n}`, `${n}: ${c.skills[n] === "U" ? "Untrained → Trained" : "Trained → Specialty"}${tag(cost)}`, cost, "Skills"]; });
+    for (const [k, n, , max] of EDGE_DEFS) if (!["attr", "skill"].includes(k) && edgeN(k, c) < max) opts.push([`edge:${k}`, `${n}${tag(COSTS.edge)}`, COSTS.edge, "Edges"]);
+    for (const [n] of ATTRS) if (!boughtAttr(n, c)) opts.push([`attr:${n}`, `+1 ${n} (to ${c.attrs[n] + 1})${tag(COSTS.attr)}`, COSTS.attr, "Attributes"]);
+    opts.push(["revise", `Revise an advantage or complication${tag(COSTS.revise)}`, COSTS.revise, "Other"]);
+    return opts;
+  }
+  function applyAdvance(c, key, note) {
+    const i = key.indexOf(":"), kind = i < 0 ? key : key.slice(0, i), id = i < 0 ? "" : key.slice(i + 1);
+    const rec = { note: note || "", date: new Date().toISOString().slice(0, 10) };
+    if (kind === "skill") {
+      const from = c.skills[id]; if (!from || from === "S") return false;
+      const to = from === "U" ? "T" : "S"; c.skills[id] = to;
+      c.advances = [...(c.advances || []), { type: "skill", skill: id, from, to, cost: from === "U" ? COSTS.UT : COSTS.TS, ...rec }];
+    } else if (kind === "edge") {
+      const d = EDGE_DEFS.find(([k]) => k === id); if (!d || ["attr", "skill"].includes(id) || edgeN(id, c) >= d[3]) return false;
+      c.edgesBought = { ...(c.edgesBought || {}), [id]: ((c.edgesBought || {})[id] || 0) + 1 };
+      c.advances = [...(c.advances || []), { type: "edge", edge: id, cost: COSTS.edge, ...rec }];
+    } else if (kind === "attr") {
+      if (!ATTRS.some(([n]) => n === id) || boughtAttr(id, c)) return false;
+      c.attrBought = { ...(c.attrBought || {}), [id]: 1 }; c.attrs[id] += 1;
+      c.advances = [...(c.advances || []), { type: "attr", attr: id, cost: COSTS.attr, ...rec }];
+    } else if (kind === "revise") c.advances = [...(c.advances || []), { type: "revise", cost: COSTS.revise, ...rec }];
+    else return false;
     return true;
   }
   function undoAdvance(c) {
     const a = (c.advances || []).pop();
-    if (a && c.skills[a.skill] === a.to) c.skills[a.skill] = a.from;
+    if (!a) return a;
+    if (a.type === "skill" && c.skills[a.skill] === a.to) c.skills[a.skill] = a.from;
+    if (a.type === "edge") { const n = ((c.edgesBought || {})[a.edge] || 1) - 1; c.edgesBought = { ...c.edgesBought, [a.edge]: n }; if (!n) delete c.edgesBought[a.edge]; }
+    if (a.type === "attr") { delete c.attrBought[a.attr]; c.attrs[a.attr] = Math.max(baseOf(a.attr, c), c.attrs[a.attr] - 1); }
     return a;
   }
+  const purchaseText = (a) => a.type === "edge" ? `Edge: ${(EDGE_DEFS.find(([k]) => k === a.edge) || [0, a.edge])[1]}` : a.type === "attr" ? `+1 ${a.attr}`
+    : a.type === "revise" ? "Revised an advantage or complication" : `${a.skill}: ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`;
   function renderAdvance() {
-    $("f-advance").innerHTML = `<option value="">Choose a skill to advance…</option>` + advanceOptionsFor(ch).map(([n, t]) => `<option value="${esc(n)}">${esc(t)}</option>`).join("");
-    $("adv-list").innerHTML = ch.advances.map((a) => `<li>${esc(a.skill)}: ${LEVELS[a.from].name} → ${LEVELS[a.to].name}${a.note ? ` (${esc(a.note)})` : ""}${a.date ? ` · ${a.date}` : ""}</li>`).join("");
+    const avail = pointsAvail(), groups = {};
+    for (const o of advanceOptionsFor(ch)) (groups[o[3]] ||= []).push(o);
+    const prev = $("f-advance").value;
+    $("f-advance").innerHTML = `<option value="">Spend points on…</option>` + Object.entries(groups).map(([g, os]) => `<optgroup label="${g}">${os.map(([v, t, cost]) => `<option value="${esc(v)}"${cost > avail ? " disabled" : ""}>${esc(t)}</option>`).join("")}</optgroup>`).join("");
+    if ([...$("f-advance").options].some((o) => o.value === prev && !o.disabled)) $("f-advance").value = prev;
+    $("xp-tally").textContent = `${avail} to spend · ${ch.xp.earned} earned`;
+    $("xp-tally").className = "chip" + (avail < 0 ? " no" : avail > 0 ? " ok" : "");
+    const mp = magicPoints();
+    $("adv-list").innerHTML = ch.advances.map((a) => `<li>${esc(purchaseText(a))} <span class="muted">(${a.cost})</span>${a.note ? ` · ${esc(a.note)}` : ""}${a.date ? ` · ${a.date}` : ""}</li>`).join("")
+      + (mp ? `<li>${MAGIC ? "Magic" : "Powers"} grown in play <span class="muted">(${mp})</span></li>` : "");
     $("btn-unadvance").hidden = !ch.advances.length;
+    $("btn-unearn").hidden = !ch.xp.log.length;
   }
+  const earn = (n, note) => { pointsAvail(); ch.xp.earned += n; ch.xp.log = [...ch.xp.log, { n, note, date: new Date().toISOString().slice(0, 10) }]; touch(); render(); toast(`+${n} advancement point${n > 1 ? "s" : ""}. Save to file to keep it.`); };
+  $("btn-earn1").onclick = () => earn(1, `significant ${T.missionLower}`);
+  $("btn-earn2").onclick = () => earn(2, "milestone");
+  $("btn-unearn").onclick = () => { const e = ch.xp.log.pop(); if (e) { ch.xp.earned = Math.max(0, ch.xp.earned - e.n); touch(); render(); toast(`Took back the last award (+${e.n}).`); } };
   $("btn-advance").onclick = () => {
-    const n = $("f-advance").value;
-    if (!n) { toast("Choose the skill your GM approved first.", true); return; }
-    applyAdvance(ch, n, ""); touch(); render(); toast(`Advanced ${n}. Save to file to keep it.`);
+    const v = $("f-advance").value;
+    if (!v) { toast("Choose what your GM approved first.", true); return; }
+    const o = advanceOptionsFor(ch).find((x) => x[0] === v);
+    if (!o) { toast("That can't be bought now.", true); return; }
+    if (o[2] > pointsAvail()) { toast(`That costs ${o[2]}; you have ${pointsAvail()}.`, true); return; }
+    if (!applyAdvance(ch, v, $("f-advance-note").value.trim())) { toast("That can't be bought now.", true); return; }
+    $("f-advance-note").value = ""; touch(); render(); toast(`Spent ${o[2]} point${o[2] === 1 ? "" : "s"}: ${purchaseText(ch.advances[ch.advances.length - 1])}. Save to file to keep it.`);
   };
-  $("btn-unadvance").onclick = () => { const a = undoAdvance(ch); render(); if (a) toast(`Undid the ${a.skill} advancement.`); };
+  $("btn-unadvance").onclick = () => { const a = undoAdvance(ch); touch(); render(); if (a) toast(`Undid: ${purchaseText(a)}.`); };
 
   // ---- GM view: the whole crew at a glance ----
   const STORE_GM = PACK.id + ".gm.v1";
@@ -6391,9 +6246,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     saveGM(); renderGM();
     return { added, updated };
   }
-  let labPanel = null; // the Rules Lab's Encounter panel, in settings that have one
   function renderGM() {
-    if (labPanel) setTimeout(labPanel.refresh, 0);
     if (gmReady) { renderLogForm(); renderSeed(); renderLogBook(); } // the log and seed panels exist once their data has loaded
     $("gm-add-saved").innerHTML = `<option value="">${roster.length ? "Choose a saved character…" : "No characters saved in this browser"}</option>` +
       roster.map((c, i) => `<option value="${i}">${esc(c.name || "Unnamed character")}</option>`).join("");
@@ -6498,16 +6351,6 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     if (!gmCrew.length) { gmSay("Add some characters first.", true); return; }
     saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog, allegiances: campaignAllegiances }, null, 2), PACK.id + "-characters.json", gmSay);
   };
-  // ---- Rules Lab: the Encounter panel (settings with a test configuration only; never used by the sheet) ----
-  if (LAB_DATA) {
-    labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText,
-      crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
-      calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n)])), dodge: dodge(), agility: c.attrs.Agility }; } finally { ch = saved; } },
-      clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
-        set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
-        add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
-      injuryNames: INJURY.map((x) => x[0]) });
-  }
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
   let gmClearArmed = false;
   $("gm-clear").onclick = () => {
@@ -6574,14 +6417,14 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   function renderLogForm() {
     if (!$("log-stardate").value) $("log-stardate").value = freshStardate();
     $("log-adv-wrap").hidden = !gmCrew.length;
-    $("log-adv").innerHTML = gmCrew.map((c) => `<label>${esc(c.name || "Unnamed")}<select data-logadv="${c.id}"><option value="">No advancement</option>${advanceOptionsFor(c).map(([n, t]) => `<option value="${esc(n)}">${esc(t)}</option>`).join("")}</select></label>`).join("");
+    $("log-adv").innerHTML = gmCrew.map((c) => `<label>${esc(c.name || "Unnamed")}<select data-logadv="${c.id}"><option value="0">No points</option><option value="1" selected>+1 (significant ${esc(T.missionLower)})</option><option value="2">+2 (milestone)</option><option value="3">+3 (both)</option></select></label>`).join("");
   }
   const logEntryText = (e) => [`${T.journal}, ${e.stardate}. ${e.title || T.mission}: ${e.outcome}.`, e.notes, e.books ? `${T.journalExtraLabel}: ${e.books}` : "", e.commend ? `Who stood out: ${e.commend}` : "",
-    e.advances.length ? `Advancement: ${e.advances.map((a) => `${a.name}, ${a.skill} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}` : ""].filter(Boolean).join("\n");
+    e.advances.length ? `Advancement: ${e.advances.map((a) => a.points ? `${a.name} +${a.points}` : `${a.name}, ${a.skill} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}` : ""].filter(Boolean).join("\n");
   function renderLogBook() {
     $("log-entries").innerHTML = missionLog.slice().reverse().map((e) => `<li><span class="meta">${esc(e.stardate)} · ${esc(e.outcome)}</span>
       <p><b>${esc(e.title || T.mission)}</b></p>${e.notes ? `<p>${esc(e.notes)}</p>` : ""}${e.books ? `<p class="small"><i>${esc(T.journalExtraLabel)}:</i> ${esc(e.books)}</p>` : ""}${e.commend ? `<p class="small">Who stood out: ${esc(e.commend)}</p>` : ""}
-      ${e.advances.length ? `<p class="small muted">Advancement: ${e.advances.map((a) => `${esc(a.name)}, ${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}</p>` : ""}
+      ${e.advances.length ? `<p class="small muted">Advancement: ${e.advances.map((a) => a.points ? `${esc(a.name)} +${a.points} point${a.points > 1 ? "s" : ""}` : `${esc(a.name)}, ${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}</p>` : ""}
       <button class="linkish danger" data-rmlog="${e.id}">Remove entry</button></li>`).join("");
     $("log-copy").disabled = !missionLog.length;
   }
@@ -6591,15 +6434,15 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     const advances = [];
     document.querySelectorAll("[data-logadv]").forEach((sel) => {
       const c = gmCrew.find((x) => x.id === sel.dataset.logadv);
-      if (!c || !sel.value) return;
-      const from = c.skills[sel.value];
-      if (applyAdvance(c, sel.value, title || $("log-stardate").value)) advances.push({ name: c.name, skill: sel.value, from, to: c.skills[sel.value] });
+      const n = +sel.value; if (!c || !n) return;
+      pointsAvail(c); c.xp.earned += n; c.xp.log = [...c.xp.log, { n, note: title || $("log-stardate").value, date: new Date().toISOString().slice(0, 10) }];
+      advances.push({ name: c.name, points: n });
     });
     missionLog.push({ id: uid(), stardate: $("log-stardate").value.trim(), title, outcome: $("log-outcome").value, notes, books: $("log-books").value.trim(), commend: $("log-commend").value.trim(), advances, date: new Date().toISOString().slice(0, 10) });
     store.set(STORE_LOG, missionLog); saveGM();
     ["log-title", "log-notes", "log-books", "log-commend", "log-stardate"].forEach((id) => ($(id).value = ""));
     renderGM(); renderLogBook();
-    logSay(advances.length ? `Logged. ${advances.length} advancement${advances.length > 1 ? "s" : ""} applied: save each character's file for their player.` : "Logged.");
+    logSay(advances.length ? `Logged. Advancement points awarded to ${advances.length}: save each character's file for their player, who spends them in the creator.` : "Logged.");
   };
   $("log-entries").addEventListener("click", (e) => {
     const b = e.target.closest("[data-rmlog]"); if (!b) return;
