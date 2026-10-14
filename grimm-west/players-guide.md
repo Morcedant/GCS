@@ -153,6 +153,7 @@ The GM can add others met in play (the creator's GM view has a **Campaign allegi
 | The Church | Once per case, shelter, records or a favor from the clergy | Duty: the Church gives you orders. Sicarii discipline ties you to the Order of the Holy Knife. |
 | A Royal Family | Once per case, money, papers or a door opened | Duty: an involuntary call to serve, and the family's rivals hunt you |
 | The U.S. Marshals | Once per case, a federal warrant, a posse sworn in on the spot, or a telegram to the district marshal | Duty: the marshal sends you after federal fugitives, and the men you've jailed have friends |
+| The Texas Rangers | Once per case, a Ranger company riding with you, a warrant good anywhere in Texas, or word from a frontier post | Duty: the Captain sends you wherever Texas is in trouble, and the Rangers' hard reputation rides with you |
 | A County Sheriff's Office | Once per case, a deputy's help, the county jail, or the county records and wanted posters | Duty: the sheriff calls on you, and the county's feuds and elections become yours |
 | A City Police Department | Once per case, a patrolman's help, a night in the cells for someone, or the station's files | Duty: the captain gives the orders, and some of your fellow officers are Wesen with loyalties of their own |
 | The Pinkerton National Detective Agency | Once per case, an agency file on someone, an operative's help, or a client's money for the work | Duty: the client comes first, even a railroad or a mine owner breaking a strike, and working folk hate the name |
