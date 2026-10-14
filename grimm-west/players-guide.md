@@ -368,7 +368,7 @@ A failed spell flares where people can see it: mark a box of **Exposure**. A nat
 
 The old traditions crossed the ocean with the people who kept them, and many of the Lenses wear American clothes:
 
-- **Braucherei**, or *pow-wow*: the Pennsylvania Dutch healing craft of spoken charms, prayers and blessed objects, from Hohman's *The Long Lost Friend* (1820). A Braucher heals, protects and breaks hexes, takes no money for it, and passes the craft man to woman and woman to man. It is a Christian craft, and its practitioners would be insulted to be called witches.
+- **Braucherei**: the Pennsylvania Dutch healing craft of spoken charms, prayers and blessed objects, from Hohman's *The Long Lost Friend* (1820). A Braucher heals, protects and breaks hexes, takes no money for it, and passes the craft man to woman and woman to man. It is a Christian craft, and its practitioners would be insulted to be called witches.
 - **Hexerei**: Braucherei's dark mirror. A *Hexenmeister* lays curses, or is hired to find and break someone else's, which makes them both feared and needed. The Malifica Lens.
 - **The Himmelsbrief**, a "letter from Heaven": a protective letter carried on the body. Union and Confederate soldiers of German stock carried them against bullets.
 - **Grimoires**: the *Sixth and Seventh Books of Moses* and the *Egyptian Secrets of Albertus Magnus* pass from hand to hand in German print. A Magi would kill for a good copy; some have.
@@ -669,7 +669,7 @@ Seven characters ready to play. Each follows the creation rules exactly, Edges i
 
 ## Magdalena "Lena" Baer
 
-*Pow-wow doctor, Occultist. Incantare (Tier 2).* Came west from Lancaster County with a wagon, a Bible and her grandmother's *Long Lost Friend*. Heals for gifts, and breaks hexes for no one's money.
+*Braucher, Occultist. Incantare (Tier 2).* Came west from Lancaster County with a wagon, a Bible and her grandmother's *Long Lost Friend*. Heals for gifts, and breaks hexes for no one's money.
 
 - **Attributes:** Body 9, Agility 10, Intellect 13, Presence 11, Will 12. **Dodge** 8.
 - **Skills:** Occult 16 (Specialty). Trained: Wesen Lore 14, Apothecary 14, Read People 14, Medicine 14, Investigation 14, Survival 14, Persuasion 12, Riding 11, Shooting 11.
@@ -970,7 +970,7 @@ A human who works real magic through a Lens: a tradition and a way of seeing. Th
 | Magi Lens (Scholar-Mage) | Scholarly ritual from grimoires, the Sixth and Seventh Books of Moses among them: any kind of effect, but an hour per roll, and it needs books. +2 to Occult for divination and wards. | **Obsession: Magical Knowledge.** A grimoire, a ritual or a secret tempts you beyond sense. Accept the risk to get it. |
 | Malifica Lens (Hexenmeister) | Hexerei: curses and hexes, and the breaking of them, worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link. | **Wicked Reputation.** People whisper that you're a hexer, and the Order of the Holy Knife listens. Accept the suspicion. |
 | Phitonissa Lens (Druid) | Rites of the seasons, nature and the old gods, worked outdoors; in America, often behind the doors of a Druid lodge. +2 to Occult for nature and folk magic. | **Disciplines of Faith.** The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them. |
-| Braucher Lens (Pow-wow Doctor) | Braucherei, the Pennsylvania Dutch healing craft: spoken charms, prayers and blessed objects, from The Long Lost Friend. +2 to Occult to heal, protect, or break a hex. | **No Payment.** A Braucher takes no money for healing, only gifts. Accept the cost when the need is great and the purse is empty. |
+| Braucher Lens | Braucherei, the Pennsylvania Dutch healing craft: spoken charms, prayers and blessed objects, from The Long Lost Friend. +2 to Occult to heal, protect, or break a hex. | **No Payment.** A Braucher takes no money for healing, only gifts. Accept the cost when the need is great and the purse is empty. |
 | Scaenarfex Lens (Artistic Enchanter) | Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm. | **Artist's Temperament.** Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you. |
 | Veneficare Lens (Sorcerer) | Casts spells: quick magic in one action and an Occult roll, shaped by one or two Paths agreed with the GM (fire and force, say). Known: Trained 2, Specialty 3, Expert 4. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it when it clashes with your friends' needs. |
 ## Jägerbär
