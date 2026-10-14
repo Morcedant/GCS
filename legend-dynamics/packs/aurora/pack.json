@@ -140,47 +140,14 @@
    ]
   },
   {
-   "name": "Federal Agent",
+   "name": "Officer",
    "group": "badge",
-   "text": "Federal agent: FBI, US Marshals, ATF or Homeland Security, working alongside ExLAW, or around it.",
+   "text": "Officer: carries a badge and the law's authority, working alongside ExLAW or around it: an FBI agent or U.S. marshal, an elected county sheriff (maybe on the edge of the Mad Fringe), a city cop first on the scene of an Operant fight, a detective, or a licensed private eye. Your Allegiance says which force you serve.",
    "skills": [
     "Investigation",
-    "Law",
-    "Computers",
-    "Persuasion"
-   ]
-  },
-  {
-   "name": "Sheriff",
-   "group": "badge",
-   "text": "Sheriff: an elected county lawman who answers to the voters, not to Washington; maybe on the edge of the Mad Forest.",
-   "skills": [
-    "Leadership",
     "Firearms",
     "Law",
-    "Persuasion"
-   ]
-  },
-  {
-   "name": "Police Officer",
-   "group": "badge",
-   "text": "Police officer: city patrol, first on the scene when an Operant fight breaks out, and last to get the credit.",
-   "skills": [
-    "Firearms",
-    "Piloting",
-    "Brawling",
     "Read People"
-   ]
-  },
-  {
-   "name": "Detective",
-   "group": "badge",
-   "text": "Detective: police or private eye, working the cases nobody else will take.",
-   "skills": [
-    "Investigation",
-    "Streetwise",
-    "Read People",
-    "Firearms"
    ]
   },
   {
@@ -1064,6 +1031,18 @@
    "A Federal Agency",
    "Once per case, records, a lab or a warrant.",
    "Duty: the agency's priorities, and its turf war with ExLAW."
+  ],
+  [
+   "sheriff",
+   "A County Sheriff's Office",
+   "Once per case, a deputy's help, the county jail, or the county's records and a word with the judge.",
+   "Duty: the sheriff answers to the voters, and the county's feuds and elections become yours."
+  ],
+  [
+   "police",
+   "A City Police Department",
+   "Once per case, patrol backup, a holding cell, or the department's files and crime lab.",
+   "Duty: the chain of command, the union's politics, and a department that resents Operants and ExLAW alike."
   ],
   [
    "dire",
@@ -2959,7 +2938,7 @@
   "species": "Aurora-born",
   "name": "Wade Collier",
   "rank": "Sheriff, Brown County, Indiana",
-  "dept": "Sheriff",
+  "dept": "Officer",
   "path": "rounded",
   "speciesId": "aurora",
   "role": "Sheriff of a county whose southern line now ends at the Mad Forest. Awakened in the 1985 Second Wave at nine years old, and registered ever since.",
@@ -3012,7 +2991,7 @@
    "badge": true,
    "firstaid": true
   },
-  "allegiance": "",
+  "allegiance": "sheriff",
   "play": {
    "gun": {
     "type": "pistol",
@@ -3441,5 +3420,11 @@
     "radio": true
    }
   }
- ]
+ ],
+ "roleAliases": {
+  "Federal Agent": "Officer",
+  "Sheriff": "Officer",
+  "Police Officer": "Officer",
+  "Detective": "Officer"
+ }
 }

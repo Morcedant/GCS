@@ -28,6 +28,8 @@ Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every a
 
 **Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack whose Class is **above** your Defense hits in full; one **equal** to it marks one box fewer; one **below** it does nothing. A bulletproof Operant (Defense II) ignores pistols and rifles, and an Aegis cannon still marks a box.
 
+*Defense is not a defense roll.* Your **defense** (Dodge, Parry or Block, one a round) decides whether an attack hits at all. Your **Defense** Class is armor: it applies to whatever hits, every time, at no cost. A Force Field doesn't use up your Dodge.
+
 *Example:* a gang member's pistol shot hits Sheriff Wade Collier. It's Class I against his Toughness II: it does nothing, and the gang member starts to run. The same shot would have marked two boxes on his deputy. A White Hand soldier's Class II Blast is equal to his Defense, so it marks one box instead of two.
 
 A submachine gun can fire a **burst** (three rounds, +1 to hit). Firearms jam on a natural 18. To take someone down without killing them, use fists, a taser, dampening cuffs, or a power used with care.
@@ -165,7 +167,7 @@ Every Operant has powers, and every power has a **Class** from I to VI. Player c
 
 - **Rolling.** Roll **Powers** to aim a power at someone, or to use it with skill: precisely, at a distance, around bystanders. Passive powers (Toughness, Regeneration, Speed and the like) just work. Targets resist with **Dodge** (things you can dodge), **Body** (things that work on the body) or **Will** (things that work on the mind).
 - **Damage.** A power marks boxes by its Class: Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3. Ordinary weapons mark the boxes in their table (see *Personal combat*).
-- **Defense.** An attack above your Defense hits in full; an equal one marks a box fewer; a lower one does nothing.
+- **Defense.** Armor, not a defense roll: an attack above your Defense hits in full; an equal one marks a box fewer; a lower one does nothing. It applies after your Dodge, Parry or Block.
 - **Range.** Unless a power says otherwise, a ranged power's effective band (see *Range* in Personal combat) is **Short at Class I, Long at Class II, Extreme at Class III**, and miles at Class IV and above, out to the horizon. Mind powers keep the reach their descriptions give: touch, a room, sight or a city.
 - **Pushing.** For one action, use a power one Class higher than you have it, and mark a box of **Strain**.
 

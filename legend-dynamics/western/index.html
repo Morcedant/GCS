@@ -4011,7 +4011,10 @@ tr.lvl-U td.target { color: var(--muted); }
   const blocks = () => SHIELDS.filter((g) => !g.equipment || ch.equipment[g.equipment]);
   const isBlock = (name) => name.startsWith("Block:");
   const blockOf = (id) => skillTarget(T.meleeSkill) + CR.block.mod + shieldBonus(SHIELDS.find((g) => g.id === id));
-  const isDefense = (name) => name === "Dodge" || isParry(name) || isBlock(name);
+  // Gear that adds to Dodge (a shield: +1 against attacks you can see), offered as its own Dodge in the roller.
+  const dodgeGear = () => (PACK.protection || []).filter((g) => g.equipment && ch.equipment[g.equipment]).flatMap((g) => g.traits.filter((t) => t.type === "dodgeBonus").map((t) => [g.name, t.value || 0]));
+  const dodgeGearBonus = () => dodgeGear().reduce((n, [, v]) => n + v, 0);
+  const isDefense = (name) => name === "Dodge" || name === "Dodge+" || isParry(name) || isBlock(name);
   const rollLabel = (name) => (isParry(name) ? `Parry (${name.slice(6)})` : isBlock(name) ? `Block (${SHIELDS.find((g) => g.id === name.slice(6))?.name.toLowerCase() || "shield"})` : name);
   const count = (lvl) => Object.entries(ch.skills).filter(([k, v]) => v === lvl && !freeSkill(k)).length;
   function odds(t) {
@@ -4362,7 +4365,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div><span class="label">Title</span><b>${esc(ch.rank || "—")}</b></div>
         <div><span class="label">${T.role}</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">${T.origin}</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
-        <div><span class="label">Dodge</span><b class="num">${dodge()}</b></div>
+        <div><span class="label">Dodge</span><b class="num">${dodge()}</b>${dodgeGearBonus() ? `<span class="small muted">${dodge() + dodgeGearBonus()} with ${esc(dodgeGear().map(([n]) => n.toLowerCase()).join(" and "))}</span>` : ""}</div>
         ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill)} bare-handed` : ""}</span></div>` : ""}
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
@@ -4520,7 +4523,7 @@ tr.lvl-U td.target { color: var(--muted); }
     // roller options
     const sel = $("r-skill"), prev = sel.value;
     sel.innerHTML = `<optgroup label="Skills">${sorted.map((s) => `<option value="${esc(s.n)}">${s.n} (${s.t})</option>`).join("")}</optgroup>
-      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}${PARRY.map(([s, how]) => `<option value="Parry:${s}">Parry ${how}: ${s} ${signed(CR.parry.mod)} (${parryOf(s)})</option>`).join("")}${blocks().map((g) => `<option value="Block:${g.id}">Block, ${esc(g.name.toLowerCase())}: ${T.meleeSkill} ${signed(CR.block.mod + shieldBonus(g))} (${blockOf(g.id)})</option>`).join("")}</optgroup>
+      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}${dodgeGearBonus() ? `<option value="Dodge+">Dodge with ${esc(dodgeGear().map(([n]) => n.toLowerCase()).join(" and "))} ${signed(dodgeGearBonus())} (${dodge() + dodgeGearBonus()})</option>` : ""}${PARRY.map(([s, how]) => `<option value="Parry:${s}">Parry ${how}: ${s} ${signed(CR.parry.mod)} (${parryOf(s)})</option>`).join("")}${blocks().map((g) => `<option value="Block:${g.id}">Block, ${esc(g.name.toLowerCase())}: ${T.meleeSkill} ${signed(CR.block.mod + shieldBonus(g))} (${blockOf(g.id)})</option>`).join("")}</optgroup>
       <optgroup label="Attributes">${ATTRS.map(([n]) => `<option value="${n}">${n} (${ch.attrs[n]})</option>`).join("")}</optgroup>`;
     if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
     // Abilities without a +2 leave the box disabled.
@@ -4534,6 +4537,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   function rollBase(name) {
     if (name === "Dodge") return dodge();
+    if (name === "Dodge+") return dodge() + dodgeGearBonus();
     if (isParry(name)) return parryOf(name.slice(6));
     if (isBlock(name)) return blockOf(name.slice(6));
     if (ch.attrs[name] != null) return ch.attrs[name];
@@ -4555,14 +4559,14 @@ tr.lvl-U td.target { color: var(--muted); }
     const w = ch.play.form && FORMED.has(ch.speciesId) && heritageOf()?.form;
     if (w) {
       const sk = isParry(name) ? name.slice(6) : isBlock(name) ? T.meleeSkill : name;
-      const attr = name === "Dodge" ? null : ch.attrs[sk] != null ? sk : SKILLS.find((x) => x[0] === sk)?.[1];
-      const wb = name === "Dodge" ? (w.dodge || 0) + (w.attrs.Agility || 0) : w.attrs[attr] || 0;
+      const attr = name === "Dodge" || name === "Dodge+" ? null : ch.attrs[sk] != null ? sk : SKILLS.find((x) => x[0] === sk)?.[1];
+      const wb = name === "Dodge" || name === "Dodge+" ? (w.dodge || 0) + (w.attrs.Agility || 0) : w.attrs[attr] || 0;
       if (wb) parts.push(wb);
       if (PACK.formPenalties?.[name]) parts.push(PACK.formPenalties[name]);
     }
     // Fanning the hammer is −2, both barrels +2.
     const shot = !$("r-setting-wrap").hidden ? { fan: -2, both: 2 }[$("r-setting").value] || 0 : 0;
-    return { name: rollLabel(name), base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) + shot, shot };
+    return { name: name === "Dodge+" ? "Dodge" : rollLabel(name), base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) + shot, shot };
   }
   function updateInjuryToggle() {
     const pen = INJURY[ch.play.injury][2];
@@ -4777,7 +4781,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
-    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
+    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
     else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
