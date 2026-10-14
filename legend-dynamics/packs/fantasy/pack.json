@@ -1550,7 +1550,7 @@
   [
    "shield",
    "Shield",
-   "+1 Dodge against attacks you can see."
+   "+1 Dodge against attacks you can see, and +1 to Block."
   ],
   [
    "torches",
@@ -2557,5 +2557,39 @@
     }
    ]
   }
- }
+ },
+ "protection": [
+  {
+   "id": "shield",
+   "equipment": "shield",
+   "name": "Shield",
+   "text": "+1 Dodge against attacks you can see, and +1 to Block.",
+   "traits": [
+    {
+     "type": "dodgeBonus",
+     "value": 1,
+     "label": "Shield"
+    },
+    {
+     "type": "shield",
+     "value": 1,
+     "label": "Shield"
+    }
+   ]
+  },
+  {
+   "id": "mail",
+   "equipment": "mail",
+   "name": "Mail shirt",
+   "text": "Hits of 2 or more boxes mark one fewer, once per fight. −1 to Stealth and Athletics for swimming.",
+   "traits": [
+    {
+     "type": "armor",
+     "minBoxes": 2,
+     "reduce": 1,
+     "label": "Mail shirt"
+    }
+   ]
+  }
+ ]
 }

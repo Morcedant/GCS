@@ -324,10 +324,25 @@ def guide_md(pack, t, sections):
     return re.sub(r"\n{3,}", "\n\n", fill(core, t))
 
 
+CORE_COMBAT = json.loads((ENGINE / "combat.json").read_text())
+
+
+def with_core_combat(pack):
+    """The core attack and defense rules every setting publishes, with the pack's own additions and overrides,
+    and the core's improvised shield beside the pack's protective gear."""
+    rules = {k: dict(v) for k, v in CORE_COMBAT["rules"].items()}
+    for k, v in pack.get("combatRules", {}).items():
+        rules[k] = {**rules.get(k, {}), **v}
+    have = {g["id"] for g in pack.get("protection", [])}
+    return {**pack, "combatRules": rules, "coreCombat": sorted(CORE_COMBAT["rules"]),
+            "protection": pack.get("protection", []) + [g for g in CORE_COMBAT["protection"] if g["id"] not in have]}
+
+
 def quickref(pack, t):
     core = [["Resolution", "3d6 at or below adjusted skill. Natural 3–4 always succeeds; 17–18 always fails. Margin = target − roll."],
             ["Opposed", "Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender."],
-            ["Combat", "Move a short distance and take one action. Hit → target may " + ("defend once per round: Dodge, Parry or Block (see Defense)" if "oneDefense" in pack.get("combatRules", {}) else "Dodge once per round") + " → weapon effect. Partial cover −2."],
+            ["Combat", "Move a short distance and take one action. Hit → target may defend once per round: Dodge, Parry or Block → weapon effect. Partial cover −2."],
+            ["Defending", "One defense a round (two with Additional Defense). Dodge: Agility −2 + Athletics. Parry a weapon in hand or fists: " + t["meleeSkill"] + " or " + t["unarmedSkill"] + " −3; a second parry −2 more. Block a weapon in hand, fists or a missile with a shield or anything that stands in for one: " + t["meleeSkill"] + " −2 + the shield's bonus (never a gunshot or blast); an improvised one breaks on a 2+ box hit. Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target."],
             ["Range", "Close 10 yd, Short 50 yd, Medium 150 yd, Long 500 yd, Extreme 1 mile. Within a weapon's effective band: no penalty; one band beyond −2, two −4, farther out of range. Move: Close; run (no action): Short."],
             ["Dying", f"A 2-box weapon that brings you to 3 boxes: Dying; dead at the end of the scene unless stabilized (one action, Medicine, {t['medkit']}). At 3 boxes, another 2-box hit kills."],
             ["Medicine", "Stabilize: one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2, clears 2 (3 on margin 5+)."],
@@ -361,7 +376,7 @@ def build(pid, docx):
     left = sorted(set(re.findall(r"\{\{[\w.:]+\}\}", tpl)))
     if left:
         sys.exit(f"{pid}: unfilled tokens {left}")
-    js = "const PACK = " + json.dumps({**pack, "terms": t, "theme": theme}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";"
+    js = "const PACK = " + json.dumps({**with_core_combat(pack), "terms": t, "theme": theme}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";"
     tpl = tpl.replace("/* PACK:START *//* PACK:END */", "/* PACK:START */" + js + "/* PACK:END */")
     tpl = re.sub(r"<!-- GUIDE:START -->.*?<!-- GUIDE:END -->", lambda _: "<!-- GUIDE:START -->\n" + guide_html + "<!-- GUIDE:END -->", tpl, flags=re.S)
     (out / "index.html").write_text(tpl)

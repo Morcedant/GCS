@@ -990,6 +990,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["grit", `Extra ${T.point}`, `Start every session with 3 ${T.point} points instead of 2.`, 1],
     ["contact", "A friend", "A named contact who helps once per " + T.missionLower + ".", 1],
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a fine kit: +2 to one skill when it's used.", 1],
+    ["extradefense", "Additional Defense", "A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2.", 1],
     ...(PACK.extraEdges || []), // a setting's own Edges, e.g. Stronger Power
   ];
   // A setting's Edges whose fifth entry asks for a description: { label, placeholder, missing, sheetNote }.
@@ -1247,9 +1248,9 @@ tr.lvl-U td.target { color: var(--muted); }
   const levelName = (l, name) => ((l === "S" && isGS() && !(name && advancedToS(name))) || (l === "S" && masterSkill(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
-  // A setting's own combat rules (Pact of Bones: one defense a round, attack quality, Parry, Block, Aim).
+  // The core attack and defense rules (engine/combat.json), with the setting's own overrides.
   const CR = PACK.combatRules || {};
-  const PARRY = CR.parry ? [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]] : [];
+  const PARRY = !CR.parry ? [] : T.meleeSkill === T.unarmedSkill ? [[T.meleeSkill, "armed or bare-handed"]] : [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]];
   const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
   const isParry = (name) => name.startsWith("Parry:");
   // One defense a round, more with the setting's Edge (Additional Defense).
@@ -1608,7 +1609,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div><span class="label">${T.role}</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">${T.origin}</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge()}</b></div>
-        ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}; ${parryOf(T.unarmedSkill)} bare-handed</span></div>` : ""}
+        ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill)} bare-handed` : ""}</span></div>` : ""}
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
       <div class="attr-strip">${ATTRS.map(([n]) => `<div><span class="label">${n}</span><b>${ch.attrs[n]}</b></div>`).join("")}</div>
