@@ -1079,6 +1079,12 @@
    "Duty: the marshal sends you after federal fugitives, and the men you've jailed have friends."
   ],
   [
+   "rangers",
+   "The Texas Rangers",
+   "Once per job, a Ranger company riding with you, a warrant good anywhere in Texas, or word from a frontier post.",
+   "Duty: the Captain sends you wherever Texas is in trouble, and the Rangers' hard reputation rides with you."
+  ],
+  [
    "sheriff",
    "A County Sheriff's Office",
    "Once per job, a deputy's help, the county jail, or the county records and wanted posters.",
