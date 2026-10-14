@@ -13,6 +13,10 @@ Cloudflare Pages hosts it for free. You can use the same Cloudflare account as t
 4. Name the project, e.g. `legend-dynamics`. This gives you the address `https://legend-dynamics.pages.dev`.
 5. Drag in the `site` folder, or `legend-dynamics-site.zip`, and choose **Deploy site**.
 
+   A zip must have `index.html` at its top level, not inside a `site/` folder; otherwise the home page is
+   at `/site/` and your address shows nothing. Make it from inside the folder:
+   `cd legend-dynamics/site && zip -r ../../legend-dynamics-site.zip .`
+
 The site is live at that address a minute later.
 
 ## Updating the site
