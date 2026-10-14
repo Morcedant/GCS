@@ -21,8 +21,8 @@ export function bandFor(margin, bands) {
 
 export const EXPERIMENTS = [
   {
-    id: "attackQualityDodge", scope: "core", label: "Attack quality modifies Dodge",
-    summary: "When an attack succeeds, its margin makes it harder to dodge.",
+    id: "attackQualityDodge", scope: "core", label: "Attack quality modifies defense",
+    summary: "When an attack succeeds, its margin makes it harder to Dodge (or Parry, or Block).",
     params: { bands: [{ from: 0, mod: 0 }, { from: 3, mod: -1 }, { from: 5, mod: -2 }, { from: 7, mod: -3 }] },
     /** @returns {Modifier[]} */
     dodgeModifiers: (/** @type {any} */ ctx, /** @type {any} */ p) => {
@@ -37,6 +37,18 @@ export const EXPERIMENTS = [
     actions: ["aim"],
     /** @returns {Modifier[]} */
     attackModifiers: (/** @type {any} */ ctx, /** @type {any} */ p) => (ctx.aimed ? [{ source: "aim", label: "Aim", value: p.bonus, scope: "experiment" }] : []),
+  },
+  {
+    id: "parry", scope: "core", label: "Parry",
+    summary: "Against a melee or unarmed attack, defend with your weapon skill (or Brawling against fists) instead of Dodge. Every attack, with a penalty for each extra parry in a round.",
+    params: { mod: -3, repeatPenalty: -2 },
+    defense: "parry",
+  },
+  {
+    id: "block", scope: "core", label: "Block",
+    summary: "With a shield, defend against melee attacks and missiles (not bullets) with Melee, plus the shield's bonus. Once a round.",
+    params: { mod: -2 },
+    defense: "block",
   },
   {
     id: "dodgeEveryAttack", scope: "core", label: "Dodge every attack",
@@ -80,7 +92,8 @@ export function available(setting, lab) {
  * @param {any} config @param {Record<string, any>} weapons @param {any} [lab]
  */
 export function buildRules(config, weapons, lab) {
-  const rules = { config: config.id, label: config.label, kind: config.kind, hooks: { attackModifiers: [], dodgeModifiers: [] }, actions: new Set(), flags: new Set(), weapons, active: [] };
+  const rules = { config: config.id, label: config.label, kind: config.kind, hooks: { attackModifiers: [], dodgeModifiers: [] }, actions: new Set(), flags: new Set(),
+    defenses: /** @type {Record<string, any>} */ ({}), weapons, active: [] };
   if (config.kind !== "lab") return rules;
   for (const x of available(config.setting, lab)) {
     const st = config.experiments[x.id];
@@ -90,6 +103,7 @@ export function buildRules(config, weapons, lab) {
     if (x.dodgeModifiers) rules.hooks.dodgeModifiers.push((/** @type {any} */ ctx) => x.dodgeModifiers(ctx, p));
     for (const a of x.actions || []) rules.actions.add(a);
     for (const f of x.flags || []) rules.flags.add(f);
+    if (x.defense) rules.defenses[x.defense] = p;
     if (x.weapons) rules.weapons = x.weapons(rules.weapons, lab, p);
     rules.active.push({ id: x.id, scope: x.scope, label: x.label, params: p });
   }

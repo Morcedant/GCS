@@ -2708,7 +2708,8 @@
      "A gunshot wound"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "firearm": true
   },
   {
    "id": "arquebus",
@@ -2734,7 +2735,8 @@
      "A ruinous wound"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "firearm": true
   },
   {
    "id": "bomb",
@@ -3124,6 +3126,40 @@
    "trait": "Horror",
    "traitText": "Once per scene, everyone who sees it rolls Will or flees in terror.",
    "traits": []
+  }
+ ],
+ "protection": [
+  {
+   "id": "shield",
+   "equipment": "shield",
+   "name": "Shield",
+   "text": "+1 Dodge against attacks you can see.",
+   "traits": [
+    {
+     "type": "dodgeBonus",
+     "value": 1,
+     "label": "Shield"
+    },
+    {
+     "type": "shield",
+     "value": 1,
+     "label": "Shield"
+    }
+   ]
+  },
+  {
+   "id": "mail",
+   "equipment": "mail",
+   "name": "Mail shirt",
+   "text": "Hits of 2 or more boxes mark one fewer, once per fight. −1 to Stealth and Athletics for swimming.",
+   "traits": [
+    {
+     "type": "armor",
+     "minBoxes": 2,
+     "reduce": 1,
+     "label": "Mail shirt"
+    }
+   ]
   }
  ]
 }

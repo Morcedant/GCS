@@ -83,6 +83,7 @@
                 <div class="field" style="flex:0 0 6em"><label for="lab-ah-agi">Agility</label><input type="number" id="lab-ah-agi" value="10" min="1" max="20"></div>
                 <div class="field" style="flex:0 0 6em"><label for="lab-ah-boxes">Boxes</label><input type="number" id="lab-ah-boxes" value="3" min="1" max="6"></div>
                 <label class="small"><input type="checkbox" id="lab-ah-minor"> Minor (one box)</label>
+                <span id="lab-ah-prot"></span>
                 <button type="button" class="btn" id="lab-ah-add">Add</button>
               </div>
             </details>
@@ -112,7 +113,7 @@
               <div class="field" style="flex:0 0 5em"><label for="lab-sit">±</label><input type="number" id="lab-sit" value="0" min="-10" max="10"></div>
               <div class="field" style="flex:0 0 9em" id="lab-boost-wrap" hidden><label for="lab-boost">Harder Boosts</label><select id="lab-boost"><option value="0">None</option><option value="1">1 (−1, +1 box)</option><option value="2">2 (−2, +2 boxes)</option></select></div>
               <div class="field" style="flex:0 0 6.5em" id="lab-skill-wrap"><label for="lab-skill">Skill target</label><input type="number" id="lab-skill" min="1" max="30"></div>
-              <div class="field" style="flex:1 1 100%"><label class="small"><input type="checkbox" id="lab-candodge" checked> Target can Dodge (aware, able to move)</label>
+              <div class="field" style="flex:1 1 16em"><label for="lab-defense">Target's defense</label><select id="lab-defense"></select>
                 <span class="small muted" id="lab-dodge-note" role="status"></span></div>
             </div>
             <div class="lab-row" id="lab-text-row" style="margin-top:8px" hidden>

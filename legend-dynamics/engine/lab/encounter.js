@@ -119,6 +119,53 @@ export function aim(enc, rules, pid, target) {
   return { event: log(enc, "aim", { rules: rulesTag(rules), pid, name: p.name, target, targetName: t.name }) };
 }
 
+/**
+ * The defenses open to a target against one attack, under these rules. Dodge is the published defense; Parry and
+ * Block come from experiments; each option says whether it's already been used this round.
+ * Each: { kind, label, base, mods, preview (base + its own modifiers), used }
+ * @param {any} enc @param {any} rules @param {Participant} d @param {any} w the attacking weapon
+ */
+export function defenseOptions(enc, rules, d, w) {
+  /** @type {any[]} */
+  const out = [];
+  if (!d || isOut(d)) return out;
+  const live = (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false);
+  const flags = rules.flags || new Set(), D = rules.defenses || {};
+  const opt = (/** @type {any} */ o) => { o.preview = o.base + o.mods.reduce((/** @type {number} */ x, /** @type {any} */ m) => x + m.value, 0); out.push(o); };
+  if (d.dodge !== null) {
+    const gear = live.filter((/** @type {any} */ t) => t.type === "dodgeBonus").map((/** @type {any} */ t) => ({ source: "gear", label: t.label || "Gear", value: t.value, scope: "setting", preview: true }));
+    opt({ kind: "dodge", label: "Dodge", base: d.dodge, mods: gear, used: d.dodgedRound === enc.round && !flags.has("dodgeEveryAttack") });
+  }
+  const melee = !!w && w.reach === "melee";
+  if (D.parry && melee) {
+    const own = (d.weapons || []).map((id) => rules.weapons[id]).filter((/** @type {any} */ x) => x && x.reach === "melee" && x.skill !== "Brawling");
+    const cands = own.map((/** @type {any} */ x) => ({ name: x.name, skill: x.skill, t: d.skills[x.skill] })).filter((c) => c.t !== undefined);
+    if (w.skill === "Brawling" && d.skills.Brawling !== undefined) cands.push({ name: "bare hands", skill: "Brawling", t: d.skills.Brawling });
+    const best = cands.sort((x, y) => y.t - x.t)[0];
+    if (best) {
+      const n = d.parryRound === enc.round ? d.parries || 0 : 0;
+      const mods = [{ source: "parry", label: "Parry", value: D.parry.mod, scope: "experiment" }];
+      if (n && D.parry.repeatPenalty) mods.push({ source: "parry", label: `Parry ${n + 1} this round`, value: D.parry.repeatPenalty * n, scope: "experiment" });
+      opt({ kind: "parry", label: `Parry (${best.name}, ${best.skill})`, base: best.t, mods, used: false });
+    }
+  }
+  const shield = live.find((/** @type {any} */ t) => t.type === "shield");
+  if (D.block && shield && w && (melee || (!w.firearm && !w.spell)) && d.skills.Melee !== undefined) {
+    opt({ kind: "block", label: "Block (shield)", base: d.skills.Melee, used: d.blockedRound === enc.round,
+      mods: [{ source: "block", label: "Block", value: D.block.mod, scope: "experiment" }, { source: "gear", label: shield.label || "Shield", value: shield.value || 0, scope: "setting" }] });
+  }
+  return out;
+}
+
+/** "auto" picks the best defense not yet used this round. @param {any[]} opts @param {string} choice @param {boolean} allowUsed */
+export function chooseDefense(opts, choice, allowUsed) {
+  if (choice === "none") return null;
+  const open = opts.filter((o) => !o.used), best = (/** @type {any[]} */ xs) => [...xs].sort((x, y) => y.preview - x.preview)[0] || null;
+  if (!choice || choice === "auto") return best(open) || (allowUsed ? best(opts) : null);
+  const o = opts.find((x) => x.kind === choice);
+  return o && (!o.used || allowUsed) ? o : best(open);
+}
+
 const sumBy = (/** @type {any[]} */ mods, /** @type {string[]} */ sources) => mods.filter((m) => sources.includes(m.source)).reduce((a, m) => a + m.value, 0);
 
 /**
@@ -148,14 +195,17 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   const n = prior ? prior.key : enc.events.filter((/** @type {any} */ e) => e.type === "attack" && !e.reroll && e.round === enc.round && e.attacker.pid === a.pid && e.defender.pid === d.pid).length;
   const key = (/** @type {string} */ kind) => `r${enc.round}|${a.pid}>${d.pid}|${n}|${kind}${opts.reroll === kind ? "|rr" : ""}`;
   const aimed = prior ? prior.aimed : (rules.actions.has("aim") && a.aim && a.aim.target === d.pid ? 1 : 0);
-  // Published rule: one Dodge attempt per round. An experiment can lift it, and the GM can allow an extra one (logged).
-  const dodgedAlready = d.dodgedRound === enc.round && !(rules.flags && rules.flags.has("dodgeEveryAttack"));
-  const extraDodge = !prior && dodgedAlready && !!cmd.allowExtraDodge && cmd.canDodge !== false;
-  const canDodge = cmd.canDodge !== false && d.dodge !== null && !isOut(d) && (prior ? prior.canDodge : !dodgedAlready || extraDodge);
-  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound }, attackerTracks: clone(a.tracks || {}) };
+  // The defense. Published: one Dodge a round. Experiments add Parry and Block; the GM can allow a used one again (logged).
+  const choice = cmd.canDodge === false ? "none" : cmd.defense || "auto";
+  const chosen = prior ? prior.defenseChoice : chooseDefense(defenseOptions(enc, rules, d, weapon), choice, !!cmd.allowExtraDodge);
+  const extraDodge = !prior && !!chosen && chosen.used;
+  const canDodge = !!chosen;
+  const pre = { defender: { injury: d.injury, dying: d.dying, dead: d.dead, dodgedRound: d.dodgedRound, parryRound: d.parryRound, parries: d.parries, blockedRound: d.blockedRound, traits: clone(d.traits || []) },
+    attackerTracks: clone(a.tracks || {}) };
   const res = core.resolveAttack({
     attacker: { id: a.pid, name: a.name, skill: weapon.skill, skillTarget: +skillTarget, injury: a.injury },
     defender: { id: d.pid, name: d.name, dodgeBase: d.dodge, injury: d.injury, canDodge, minor: d.minor, boxes: d.boxes, dying: d.dying, dead: d.dead, traits: d.traits || [] },
+    defense: chosen ? { kind: chosen.kind, label: chosen.label, base: chosen.base, mods: chosen.mods.filter((/** @type {any} */ m) => !m.preview) } : null,
     weapon, band: cmd.band, mode: cmd.mode || null, aimed, boosts: cmd.boosts || 0, ammo: cmd.ammo || null, cover: cmd.cover || "none",
     situational: (cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ source: "situation", label: m.label || "Situation", value: +m.value, scope: "situation" })),
     jamOn18: !!(weapon.firearm && rules.jamOn18),
@@ -165,7 +215,12 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     if (res.attack && weapon.ammo && a.ammo[weapon.ammo] !== undefined) a.ammo[weapon.ammo] -= cost;
     if (a.aim) a.aim = null;
   }
-  if (res.dodge) d.dodgedRound = enc.round;
+  if (res.dodge && chosen) {
+    if (chosen.kind === "dodge") d.dodgedRound = enc.round;
+    else if (chosen.kind === "parry") { d.parries = d.parryRound === enc.round ? (d.parries || 0) + 1 : 1; d.parryRound = enc.round; }
+    else if (chosen.kind === "block") d.blockedRound = enc.round;
+  }
+  if (res.armorUsed) { const t = (d.traits || []).find((/** @type {any} */ x) => x.type === "armor" && !x.used && (x.label || "Armour") === res.armorUsed); if (t) t.used = true; }
   if (res.price) { a.tracks = a.tracks || {}; a.tracks[res.price.track] = (a.tracks[res.price.track] || 0) + res.price.boxes; }
   if (res.hit && res.injury) Object.assign(d, { injury: res.injury.injury, dying: res.injury.dying, dead: res.injury.dead });
 
@@ -179,13 +234,14 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     attackMods: am, target: res.target ?? null, attackDice: res.attack ? res.attack.dice : null, attackTotal: res.attack ? res.attack.total : null,
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
-    dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: res.outcome === "dodged",
+    dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
+    defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
     injuryBefore: pre.defender.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead, injuryResult: res.injury ? res.injury.change : null,
   });
-  if (extraDodge) log(enc, "override", { what: "dodge", about: ev.n, pid: d.pid, name: d.name, from: "already dodged this round", to: "Dodge allowed", reason: "GM allowed another Dodge" });
+  if (extraDodge) log(enc, "override", { what: "dodge", about: ev.n, pid: d.pid, name: d.name, defense: chosen.kind, from: `already used ${chosen.kind} this round`, to: `${chosen.kind} allowed`, reason: "GM allowed it again" });
   if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
   return { event: ev };
 }

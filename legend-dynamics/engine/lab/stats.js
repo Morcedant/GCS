@@ -26,6 +26,8 @@ export function summarize(enc) {
       r.attacks++; if (e.success) r.successes++; if (e.dodged) r.dodged++; if (e.hit) { r.hits++; r.boxes += e.damage || 0; }
     }
   }
+  const byDefense = /** @type {Record<string, any>} */ ({});
+  for (const e of dodges) { const r = (byDefense[e.defense || "dodge"] ||= { attempts: 0, successes: 0 }); r.attempts++; if (e.dodged) r.successes++; }
   const startEv = ev.find((/** @type {any} */ e) => e.type === "start");
   const rules = startEv ? startEv.rules : null;
   const ps = enc.participants;
@@ -60,14 +62,15 @@ export function summarize(enc) {
     priceMarked: attacks.filter((/** @type {any} */ e) => e.price).reduce((/** @type {any} */ m, /** @type {any} */ e) => ((m[e.price.track] = (m[e.price.track] || 0) + e.price.boxes), m), {}),
     boostsSpent: attacks.reduce((/** @type {number} */ n, /** @type {any} */ e) => n + (e.boosts || 0), 0),
     skippedOnRerun: enc.skipped || 0,
-    byWeapon, byAttacker,
+    byWeapon, byAttacker, byDefense,
+    armorStops: attacks.filter((/** @type {any} */ e) => e.armorUsed).length,
   };
 }
 
 /** One row per attack, for a spreadsheet. @param {any} enc */
 export function attacksCsv(enc) {
   const cols = ["encounter", "config", "experiments", "round", "turn", "attacker", "defender", "weapon", "ammo", "mode", "band", "skill", "base", "aimMod", "weaponMod", "rangeMod",
-    "coverMod", "injuryMod", "otherMod", "target", "attackTotal", "margin", "success", "dodgeBase", "attackQualityMod", "effectiveDodge", "dodgeTotal", "dodged", "hit",
+    "coverMod", "injuryMod", "otherMod", "target", "attackTotal", "margin", "success", "defense", "dodgeBase", "attackQualityMod", "effectiveDodge", "dodgeTotal", "dodged", "armorUsed", "hit",
     "damage", "injuryBefore", "injuryAfter", "dying", "dead", "boosts", "priceTrack", "priceBoxes", "jam", "reroll", "overridden", "outcome"];
   const cell = (/** @type {any} */ v) => { const s = v === null || v === undefined ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const rows = enc.events.filter((/** @type {any} */ e) => e.type === "attack" && !e.superseded).map((/** @type {any} */ e) => ({

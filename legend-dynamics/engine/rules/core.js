@@ -169,7 +169,8 @@ export const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ a
  *   attacker: { id: string, name: string, skill: string, skillTarget: number, injury?: number },
  *   defender: { id: string, name: string, dodgeBase: number | null, injury?: number, canDodge: boolean, minor?: boolean, boxes?: number, dying?: boolean, dead?: boolean, traits?: any[] },
  *   weapon: any, band: string, mode?: { id: string, label: string, mod: number } | null, aimed?: number, ammo?: string,
- *   cover?: "none" | "partial" | "solid", situational?: Modifier[], jamOn18?: boolean, boosts?: number
+ *   cover?: "none" | "partial" | "solid", situational?: Modifier[], jamOn18?: boolean, boosts?: number,
+ *   defense?: { kind: string, label: string, base: number, mods?: Modifier[] } | null
  * }} AttackInput
  * @typedef {{ attackModifiers: ((ctx: any) => Modifier[])[], dodgeModifiers: ((ctx: any) => Modifier[])[] }} Hooks
  */
@@ -187,6 +188,8 @@ export function priceFor(weapon, roll) {
 
 /** Defender traits that are switched on (a trait with toggle: true can be switched off, e.g. a Ward once broken). @param {any} defender */
 const liveTraits = (defender) => (defender.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false);
+
+const DEFENDED = /** @type {Record<string, string>} */ ({ dodge: "dodged", parry: "parried", block: "blocked", deflect: "deflected" });
 
 /** Published core: no extra modifiers. */
 export const NO_HOOKS = /** @type {Hooks} */ ({ attackModifiers: [], dodgeModifiers: [] });
@@ -228,14 +231,21 @@ export function resolveAttack(input, hooks, roll) {
   /** @type {Modifier[]} */
   const dmods = [];
   const dctx = { ...ctx, margin: atk.margin, attack: atk };
-  if (defender.canDodge && defender.dodgeBase !== null) {
+  // The defense: published Dodge unless the caller chose another (Parry, Block: lab experiments). One roll, whichever it is.
+  const def = input.defense !== undefined ? input.defense
+    : defender.canDodge && defender.dodgeBase !== null ? { kind: "dodge", label: "Dodge", base: defender.dodgeBase, mods: [] } : null;
+  if (def) {
+    for (const m of def.mods || []) if (m.value) dmods.push(m);
+    // Published gear: a shield's +1 to Dodge against attacks you can see.
+    if (def.kind === "dodge") for (const t of liveTraits(defender)) if (t.type === "dodgeBonus" && t.value) dmods.push({ source: "gear", label: t.label || "Gear", value: t.value, scope: "setting" });
     const defInj = INJURY_PENALTY[defender.injury || 0] || 0;
     if (defInj) dmods.push({ source: "injury", label: "Defender's injury", value: defInj, scope: "core" });
-    for (const h of hooks.dodgeModifiers) for (const m of h(dctx)) if (m.value) dmods.push(m);
-    const eff = defender.dodgeBase + sumMods(dmods);
+    for (const h of hooks.dodgeModifiers) for (const m of h({ ...dctx, defense: def.kind })) if (m.value) dmods.push(m);
+    const eff = def.base + sumMods(dmods);
     const dg = resolve(roll("dodge"), eff);
-    out.dodgeBase = defender.dodgeBase; out.dodgeTarget = eff; out.dodge = dg;
-    if (dg.success) return { ...out, dodgeMods: dmods, outcome: "dodged", hit: false };
+    out.defense = def.kind; out.defenseLabel = def.label;
+    out.dodgeBase = def.base; out.dodgeTarget = eff; out.dodge = dg;
+    if (dg.success) return { ...out, dodgeMods: dmods, outcome: DEFENDED[def.kind] || "defended", hit: false };
   }
   out.dodgeMods = dmods;
   let dmg = weaponDamage(weapon, band);
@@ -245,5 +255,9 @@ export function resolveAttack(input, hooks, roll) {
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
   const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && dmg && dmg.boxes <= t.maxBoxes);
   if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null };
+  // Published armour (setting data): e.g. a mail shirt, "hits of 2 or more boxes mark one fewer, once per fight".
+  const armour = liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1));
+  if (armour) { dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - (armour.reduce || 1)) }; out.armorUsed = armour.label || "Armour"; }
+  if (!dmg.boxes) return { ...out, outcome: `hit, stopped by ${out.armorUsed}`, hit: true, damage: null };
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
 }

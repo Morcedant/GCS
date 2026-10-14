@@ -175,3 +175,48 @@ test("a GM ruling of miss undoes the injury and is shown as the ruling", () => {
   E.override(enc, published, LD, "outcome", { event: ev.n, hit: true });
   assert.equal(ev.overridden, false, "ruling it back to what the dice said clears the override");
 });
+
+test("Parry, Block, shield and mail", () => {
+  const crown = JSON.parse(readFileSync(new URL("../../../packs/fantasy/pack.json", import.meta.url)));
+  const clab = JSON.parse(readFileSync(new URL("../../../packs/fantasy/lab.json", import.meta.url)));
+  const W = Object.fromEntries(crown.arms.filter((a) => !a.hazard).map((a) => [a.id, a]));
+  const prot = Object.fromEntries((crown.protection || []).map((x) => [x.id, x]));
+  assert.ok(prot.shield && prot.mail, "published shield and mail are data");
+  const pub = { ...X.buildRules(X.PUBLISHED, W, clab), jamOn18: true };
+  const cfg = X.newLabConfig("fantasy", clab); cfg.experiments.parry.on = true; cfg.experiments.block.on = true;
+  const exp = { ...X.buildRules(cfg, W, clab), jamOn18: true };
+  const mk = (config) => {
+    const enc = E.newEncounter({ setting: "fantasy", baseline: LD.CORE_BASELINE, config, seed: 5 });
+    E.addParticipant(enc, { kind: "npc", name: "Bandit", agility: 10, dodge: 8, skills: { Melee: 12 }, weapons: ["sword"] });
+    E.addParticipant(enc, { kind: "pc", name: "Gorrum", agility: 10, dodge: 9, skills: { Melee: 16, Brawling: 14 }, weapons: ["sword", "fists"], points: 0,
+      traits: [...prot.shield.traits, ...prot.mail.traits].map((t) => ({ ...t })) });
+    return enc;
+  };
+  // Published: Dodge only, with the shield's +1.
+  let enc = mk(X.PUBLISHED); E.startCombat(enc, pub);
+  let o = E.defenseOptions(enc, pub, E.find(enc, "p2"), W.sword);
+  assert.deepEqual(o.map((x) => [x.kind, x.preview]), [["dodge", 10]], "Dodge 9 +1 shield");
+  // Lab: Parry (Melee 16 −3 = 13) and Block (16 −2 +1 shield = 15) join in; best available is Block.
+  enc = mk(cfg); E.startCombat(enc, exp);
+  o = E.defenseOptions(enc, exp, E.find(enc, "p2"), W.sword);
+  assert.deepEqual(o.map((x) => [x.kind, x.preview]), [["dodge", 10], ["parry", 13], ["block", 15]]);
+  assert.deepEqual(E.defenseOptions(enc, exp, E.find(enc, "p2"), W.pistol).map((x) => x.kind), ["dodge"], "no parrying or blocking bullets");
+  assert.deepEqual(E.defenseOptions(enc, exp, E.find(enc, "p2"), W.bow).map((x) => x.kind), ["dodge", "block"], "a shield blocks arrows");
+  // Repeated parries get harder; Block once a round.
+  let seen = { parry: [], block: 0 };
+  for (let i = 0; i < 30 && seen.parry.length < 2; i++) {
+    const ev = E.attack(enc, exp, LD, { attacker: "p1", defender: "p2", weapon: "sword", band: "melee", defense: "parry" }).event;
+    if (ev.defense === "parry") seen.parry.push(ev.dodgeBase + ev.dodgeMods.filter((m) => m.source === "parry").reduce((a, m) => a + m.value, 0));
+  }
+  assert.deepEqual(seen.parry, [13, 11], "second parry in a round at −2");
+  const b1 = E.attack(enc, exp, LD, { attacker: "p1", defender: "p2", weapon: "sword", band: "melee", defense: "block" }).event;
+  const b2 = E.attack(enc, exp, LD, { attacker: "p1", defender: "p2", weapon: "sword", band: "melee", defense: "block" }).event;
+  if (b1.defense === "block") assert.notEqual(b2.defense, "block", "Block once a round");
+  // Mail: a 2-box hit marks one fewer, once.
+  const enc2 = mk(X.PUBLISHED); E.startCombat(enc2, pub);
+  const hits = [];
+  for (let i = 0; i < 40 && hits.length < 2; i++) { const ev = E.attack(enc2, pub, LD, { attacker: "p1", defender: "p2", weapon: "sword", band: "melee", canDodge: false }).event; if (ev.hit) hits.push(ev); }
+  assert.equal(hits[0].armorUsed, "Mail shirt"); assert.equal(hits[0].damage, 1);
+  assert.equal(hits[1].armorUsed, null, "once per fight"); assert.equal(hits[1].damage, 2);
+  assert.equal(S.summarize(enc2).armorStops, 1);
+});
