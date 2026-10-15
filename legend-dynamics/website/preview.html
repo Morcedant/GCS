@@ -380,7 +380,7 @@ body { margin: 0; }
   <hr class="ld-rule">
   <p class="ld-lede">The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. <i>Trails of Blood &amp; Dust</i> is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.</p>
   <div class="ld-actions">
-    <a class="ld-button" href="https://claude.ai/artifact/UjmEHKxZzVJG4yhupZkoXo" target="_blank" rel="noopener">Create a character</a>
+    <a class="ld-button" href="/trails-of-blood-and-dust/create/" target="_blank" rel="noopener">Create a character</a>
     <a class="ld-button ld-button--ghost" href="/core-rules">Core rules</a>
     <a class="ld-button ld-button--ghost" href="/discord">Play on Discord</a>
   </div>
@@ -416,7 +416,7 @@ body { margin: 0; }
   <hr class="ld-rule">
   <p class="ld-lede">The inhabited regions of the Orion Spur and the Sagittarius Arm are home to civilizations separated by thousands of years of technological development, radically different biological origins, and competing ideas about government, freedom, commerce and survival. Ancient empires are collapsing, but their armies remain dangerous. Commercial powers grow more influential every year. Entire worlds wait behind collapsed corridors to be rediscovered.</p>
   <div class="ld-actions">
-    <a class="ld-button" href="https://claude.ai/artifact/AdxunyoqKyErJ6cTz5ujtL" target="_blank" rel="noopener">Create a character</a>
+    <a class="ld-button" href="/fracture-lines/create/" target="_blank" rel="noopener">Create a character</a>
     <a class="ld-button ld-button--ghost" href="/core-rules">Core rules</a>
     <a class="ld-button ld-button--ghost" href="/discord">Play on Discord</a>
   </div>
@@ -452,7 +452,7 @@ body { margin: 0; }
   <hr class="ld-rule">
   <p class="ld-lede">A thousand years ago the <b>Crown of Aeon</b> bound a sorcerer-empire together. When the last emperor died, the Crown shattered into nine shards, and the empire with it. Each shard gives power to whoever holds it, and each slowly devours them. Now warlords, sorcerer-princes and merchant-kings fight over the empire's corpse, and the old things beneath its cities are waking.</p>
   <div class="ld-actions">
-    <a class="ld-button" href="https://claude.ai/artifact/8XnPkroZN3TsAzhsLaZCLM" target="_blank" rel="noopener">Create a character</a>
+    <a class="ld-button" href="/the-shattered-crown/create/" target="_blank" rel="noopener">Create a character</a>
     <a class="ld-button ld-button--ghost" href="/core-rules">Core rules</a>
     <a class="ld-button ld-button--ghost" href="/discord">Play on Discord</a>
   </div>
@@ -488,7 +488,7 @@ body { margin: 0; }
   <hr class="ld-rule">
   <p class="ld-lede">In April 1938 the sky burned green for four weeks. The auroras killed five million people and left behind the first <b>Operants</b>: men and women with powers no science could explain. For decades the world pretended they were myths. Then, in 1952, a battle at Fort Knox made pretending impossible, and the law has been trying to catch up ever since, through the <b>Extraordinary Law Enforcement Agency (ExLAW)</b>.</p>
   <div class="ld-actions">
-    <a class="ld-button" href="https://claude.ai/artifact/12nhXbM26KpVjHk68yvFLh" target="_blank" rel="noopener">Create a character</a>
+    <a class="ld-button" href="/aurora/create/" target="_blank" rel="noopener">Create a character</a>
     <a class="ld-button ld-button--ghost" href="/core-rules">Core rules</a>
     <a class="ld-button ld-button--ghost" href="/discord">Play on Discord</a>
   </div>
@@ -652,6 +652,12 @@ named skill when it’s used</td>
 <tr class="odd">
 <td>Additional Defense</td>
 <td>A second defense each round: Dodge, Parry or Block, in any mix</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>Hard to put down</td>
+<td>Once per fight, shrug off a telling hit’s effect: you still take its
+boxes (see <em>Telling hits</em>)</td>
 <td>1</td>
 </tr>
 </tbody>
@@ -877,7 +883,78 @@ adds its bonus to this.</li>
 </ul>
 <p>Solid cover blocks a shot. Partial cover imposes −2 on the attack.
 Weapon effects apply after a hit survives any defense. Success margin
-does not increase damage.</p>
+does not increase damage: a great hit decides <em>what</em> happens
+instead.</p>
+<h2 id="ld-telling-hits">Telling hits</h2>
+<p>A really good shot, or a blow that lands exactly where it was meant
+to, lets the attacker say what it does.</p>
+<ul>
+<li><strong>A telling hit</strong> is an attack that succeeds by
+<strong>5 or more</strong>, or on a natural 3 or 4, and isn’t stopped by
+a defense. The attacker picks <strong>one effect</strong> below and
+describes it. The weapon still marks its usual boxes.</li>
+<li><strong>A called shot.</strong> Before rolling, name the effect you
+want and take −2 on the attack, or −4 for a small target (a hand, an
+eye, a rope, a lock). If the attack hits at all, the effect happens,
+whatever the margin. An advantage that rewards aiming cuts this penalty
+by 1.</li>
+<li><strong>Both ways.</strong> Opponents land telling hits on
+characters too.</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Effect</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Disarm</td>
+<td>The weapon or held item drops, or flies a few yards away</td>
+</tr>
+<tr class="even">
+<td>Knock down</td>
+<td>The target falls prone, or is driven back a few steps</td>
+</tr>
+<tr class="odd">
+<td>Pin</td>
+<td>The target is held, tangled or pinned down: their next action goes
+to getting free</td>
+</tr>
+<tr class="even">
+<td>Rattle</td>
+<td>−2 to the target’s next roll</td>
+</tr>
+<tr class="odd">
+<td>Break gear</td>
+<td>A shield, weapon or tool breaks; armor loses 1 protection until it’s
+repaired</td>
+</tr>
+<tr class="even">
+<td>Open them up</td>
+<td>The next attack on this target this round gets +2</td>
+</tr>
+<tr class="odd">
+<td>Precise</td>
+<td>You hit exactly what you aimed at: the lantern, the rope, the tire,
+the hand on the trigger</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Limits.</strong> A telling hit never adds boxes and never
+gets past a defense. The effect has to make sense: nobody disarms a bear
+or knocks down a train, and the GM can rule an effect out. Opponents who
+drop from one hit are already down, so a telling hit against them sets
+up what comes next, like sending one crashing into another.</p>
+<p><strong>Staying alive.</strong> A character on the receiving end can
+shrug off a telling hit’s effect with <strong>Hard to put down</strong>
+(once per fight) or by spending a Legend point. Either way, they still
+take the boxes.</p>
 <h2 id="ld-range">Range</h2>
 <p>Distances fall into five bands:</p>
 <table>
@@ -999,9 +1076,36 @@ changed circumstances.</p>
 removes two boxes; success by 5 or more removes three. Allow the time
 the treatment requires.</p>
 <h2 id="ld-natural-recovery">Natural recovery</h2>
-<p>Each <strong>full day</strong> of rest clears one injury box. Rest
-means nothing strenuous. At three boxes, rest alone clears nothing:
-treatment must clear the first box.</p>
+<p>Rest clears injury one box at a time, and the worse you’re hurt, the
+longer each box takes. Rest means nothing strenuous: no fighting, no
+hard travel, no long days of work.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Boxes marked</th>
+<th>Rest to clear one box</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>A full day</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>At least three days</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>A week, and only in someone’s care</td>
+</tr>
+</tbody>
+</table>
+<p>At three boxes, rest alone does nothing until someone has stabilized
+or treated you; after that, a week of rest in their care clears the
+first box. A successful treatment is faster. The times add up: from
+three boxes, rest alone takes about a week and a half to heal completely
+(a week, then three days, then a day).</p>
 <h1 id="ld-magic">Magic</h1>
 <p>Magic works at two speeds, with a third tool that turns one into the
 other. Every magical character uses the same three tools; each setting
@@ -1127,19 +1231,21 @@ action, no roll) to release it. Carry as many ready charms as your magic
 skill training allows: <strong>Trained 2, Specialty 3, Expert
 4</strong>. Preparation is how slow magic wins a fast fight.</p>
 <h2 id="ld-magic-advancement">Magic advancement</h2>
-<p>After a significant mission, a magical character can take one of
-these <strong>instead of a skill step</strong>, with the GM’s approval
-and a reason from the story. Each setting says which it uses.</p>
+<p>A magical character can spend advancement points (see
+<em>Advancement</em>) on these, with the GM’s approval and a reason from
+the story. Each setting says which it uses.</p>
 <table>
 <colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Option</th>
 <th>Effect</th>
+<th>Cost</th>
 <th>Limit</th>
 </tr>
 </thead>
@@ -1147,32 +1253,38 @@ and a reason from the story. Each setting says which it uses.</p>
 <tr class="odd">
 <td>New burst</td>
 <td>Learn one burst beyond your limit</td>
+<td>1</td>
 <td>Up to 2 extra</td>
 </tr>
 <tr class="even">
 <td>Deeper step</td>
 <td>One burst you know works one step deeper: one more Boost</td>
+<td>2</td>
 <td>Each burst once</td>
 </tr>
 <tr class="odd">
 <td>Another charm</td>
 <td>Carry one more ready charm</td>
+<td>1</td>
 <td>Up to 2 extra</td>
 </tr>
 <tr class="even">
 <td>By heart</td>
 <td>One kind of working takes one fewer segment (minimum 1)</td>
+<td>1</td>
 <td>Each kind once</td>
 </tr>
 <tr class="odd">
 <td>Quicker hand</td>
 <td>One working you know goes one pace faster: an hour becomes ten
 minutes, ten minutes one action</td>
+<td>1</td>
 <td>Each working once</td>
 </tr>
 <tr class="even">
 <td>Mastery</td>
 <td>Your magic skill becomes Expert (+5)</td>
+<td>4</td>
 <td>Once, at the end of a long campaign</td>
 </tr>
 </tbody>
@@ -1205,6 +1317,11 @@ the second result, even if worse.</td>
 prevent certain death.</td>
 </tr>
 <tr class="odd">
+<td>Shrug off a telling hit</td>
+<td>Cancel the effect an attacker picked against you; you still take the
+boxes.</td>
+</tr>
+<tr class="even">
 <td>Establish a small preparation</td>
 <td>Propose a plausible detail, such as having packed something useful.
 GM approval is required.</td>
@@ -1217,11 +1334,64 @@ the proposed complication without penalty.</p>
 <h2 id="ld-tracks">Tracks</h2>
 <p><em>Your setting pack supplies this (tracks).</em></p>
 <h2 id="ld-advancement">Advancement</h2>
-<p>After a significant mission, the GM may authorize one relevant skill
-to advance from Untrained to Trained or from Trained to Specialty, or
-allow revision of an advantage or complication. Only a Specialist’s
-starting skill is Expert; a skill raised later tops out at Specialty
-(+3) unless they broaden (see Step 3).</p>
+<p>Characters grow by earning <strong>advancement points</strong> and
+spending them.</p>
+<ul>
+<li><strong>Earning.</strong> After a significant mission, the GM awards
+each character <strong>1 point</strong>. At a
+<strong>milestone</strong>, the end of a story arc, everyone earns
+<strong>2 more</strong>.</li>
+<li><strong>Spending.</strong> Spend points when you earn them, or bank
+them for something bigger. Each purchase needs the GM’s approval and a
+reason from the story: training with someone, something you lived
+through, a debt paid.</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Purchase</th>
+<th>Cost</th>
+<th>Limit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A skill from Untrained to Trained</td>
+<td>1</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>A skill from Trained to Specialty</td>
+<td>2</td>
+<td>Specialty (+3) is the ceiling: only a Specialist’s starting skill is
+Expert, unless they broaden (see Step 3)</td>
+</tr>
+<tr class="odd">
+<td>Revise an advantage or complication</td>
+<td>1</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>A new Edge</td>
+<td>3</td>
+<td>Any Edge except the attribute and Trained-skill Edges, within its
+own limit</td>
+</tr>
+<tr class="odd">
+<td>+1 to an attribute</td>
+<td>4</td>
+<td>Once per attribute; no higher than one above the starting maximum
+(14, plus any origin bonus)</td>
+</tr>
+</tbody>
+</table>
+<p>Magic and powers grow the same way, at the costs their chapters
+give.</p>
 <h1 id="ld-running-missions">Running missions</h1>
 <h2 id="ld-mission-seeds">Mission seeds</h2>
 <p>Roll 3d6 on each table and read the total, or pick what you like.
@@ -1239,8 +1409,8 @@ fully, partly, or not at all?</li>
 did they cost?</li>
 <li><strong>What changed?</strong> New allies or enemies, damage, open
 threads for next time.</li>
-<li><strong>Advancement.</strong> After a significant mission, the GM
-may authorize one skill step for each character.</li>
+<li><strong>Advancement.</strong> After a significant mission, each
+character earns 1 advancement point; at a milestone, 2 more.</li>
 </ol>
 <h1 id="ld-ready-made-characters">Ready-made characters</h1>
 <p>Characters ready to play, for one-shots, new players, or a group in a
@@ -1406,15 +1576,17 @@ success by 5).</p>
 <p><strong>Combat:</strong> move plus one action. Hit → one defense a
 round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon
 effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry
-−3, Block −2 plus the shield. Aim: +1. A 2-box weapon that brings you to
-three boxes leaves you Dying; at three boxes, another 2-box hit
-kills.</p>
+−3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural
+3–4): the attacker picks an effect; called shot −2 (small target −4). A
+2-box weapon that brings you to three boxes leaves you Dying; at three
+boxes, another 2-box hit kills.</p>
 <p><strong>Medicine:</strong> stabilize in one action. Field care clears
 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin
-5+). Rest: one box per full day, not from three.</p>
+5+). Rest clears a box in a day at 1 box, three days at 2, a week at 3
+(in someone’s care).</p>
 <p><strong>Legend:</strong> start each session with two. Reroll, reduce
-an injury by one box, or establish a small preparation. Earn one from an
-accepted complication.</p>
+an injury by one box, shrug off a telling hit, or establish a small
+preparation. Earn one from an accepted complication.</p>
 <p><em>Legend Dynamics RPG system, created by Don Smallwood.</em> This
 RPG is released under the <a
 href="https://creativecommons.org/licenses/by/4.0/">Creative Commons

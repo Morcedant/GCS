@@ -204,6 +204,7 @@ def make_zip(dest):
 
 if __name__ == "__main__":
     import sys
+    bw.main()  # refresh the Squarespace kit from the same sources, so it never drifts from the site
     main()
     if "--zip" in sys.argv:
         make_zip(sys.argv[sys.argv.index("--zip") + 1])
