@@ -240,6 +240,24 @@ def gen(name, pack, t):
             out += ["## Escalated Classes", "", "Every power keeps going at Classes IV to VI. Player characters reach Class IV only by pushing (one action, one box of Strain), with the Stronger Power Edge and the GM's approval, or at a campaign milestone; Class V is an end-of-campaign capstone, and Class VI belongs to the GM's characters. Speeds are in multiples of the speed of sound (Mach 1 is about 760 mph).", "",
                     table(["Power", "Class IV", "Class V", "Class VI"], [[f"**{x[1]}**", *x[3][3:6]] for x in esc]), ""]
         return "\n".join(out)
+    if name == "gritty":
+        g = p.get("gritty")
+        if not g:
+            return ""
+        names = {x["id"]: x["name"].lower() for x in g["table"]}
+        downs = "; ".join(f"{x['name'].lower()} becomes {names[x['down']] if x.get('down') else 'nothing lasting'}" for x in g["table"])
+        heal = lambda x: "Never: a complication" if x.get("complication") else x["heal"][0].upper() + x["heal"][1:]
+        return "\n".join([
+            "", "### Optional rule: gritty combat", "",
+            "For a harder, bloodier game, the GM can turn on **gritty combat** for the campaign (the creator has a switch on the Condition card and in the GM view). The rest of the rules stay the same.", "",
+            "**Grievous hits.** A hit that marks **2 or more boxes** is **grievous** when the attack succeeded by **7 or more**, rolled a **natural 3 or 4**, or left the target **Dying**.", "",
+            "- **A character** rolls 3d6 on the table below and suffers the result on top of the boxes.",
+            "- **An opponent** is simply taken out: no roll, no boxes to count. Describe how, or let the GM view roll a description.",
+            "- **With a telling hit,** the attacker also chooses which limb.", "",
+            table(["3d6", "Grievous wound", "Effect", "Heals"], [[f"{x['from']}–{x['to']}", x["name"], x["text"], heal(x)] for x in g["table"]]), "",
+            f"- **{t['point']}.** Spend {'an' if t['point'][0].lower() in 'aeiou' else 'a'} {t['point']} point to **downgrade** a grievous wound one step: {downs}.",
+            "- **A limb for a life.** Once a fight, a character who would be left Dying or killed can **lose a limb, or the use of one**, instead. They live, Incapacitated but stable, and the limb becomes a complication. It replaces any grievous wound from the same hit.",
+            "- **Healing.** Grievous wounds heal on their own clock, whatever the boxes say. A lost limb, a lost eye or a disfigurement never heals.", ""])
     if name == "extra-edges":
         return "\n".join(f"| {e[1]} | {e[2]} | {e[3]} |" for e in p.get("extraEdges", []))
     if name == "statuses":
@@ -401,7 +419,7 @@ def core_rules(docx=False):
     core = (ENGINE / "core.md").read_text()
     core = core.replace("{{PACK:intro}}", "Legend Dynamics is a roleplaying system for heroic stories in any genre: concrete skills, a 3d6 roll-under core, and a small pool of Legend points that reward characters for their flaws. These core rules are setting-neutral. A **setting pack** supplies the roles, origins, skills, gear, weapons, tracks and dangers of one genre, and renames a few terms to suit it.")
     # Neutral stand-ins for the pack-specific parts of "Making your own".
-    core = core.replace("{{GEN:extra-edges}}\n", "")
+    core = core.replace("{{GEN:extra-edges}}\n", "").replace("{{GEN:gritty}}", "")
     core = core.replace("{{GEN:magic}}", magic_chapter({}))
     core = core.replace("{{PACK:customrole}}", '"Smuggler: knows every back door, bribe and hidden hold."')
     core = core.replace("{{GEN:group-names}}", "one of your setting's groups")
