@@ -412,6 +412,16 @@ tr.lvl-U td.target { color: var(--muted); }
 .bm-mdot { fill: var(--accent); }
 .bm-readout { position: absolute; left: 10px; bottom: 10px; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.72); color: #fff; font: .8rem var(--mono, monospace); pointer-events: none; }
 .bm-readout:empty { display: none; }
+.bm-pip { fill: rgba(0,0,0,.55); stroke: #fff; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.bm-pip.on { fill: var(--bad); }
+.bm-sel { flex-direction: column; align-items: flex-start; }
+.bm-tracks { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.bm-stats { flex-basis: 100%; color: var(--muted); }
+.bm-track { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; }
+.bm-boxes { display: inline-flex; gap: 4px; }
+.bm-box { width: 22px; height: 22px; padding: 0; border: 2px solid var(--line); border-radius: 4px; background: none; cursor: pointer; }
+.bm-box.on { background: var(--bad); border-color: var(--bad); }
+.bm-sel > label, .bm-sel .bm-tracks label { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; }
 .gm-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 @media (max-width: 900px) { .gm-tools { grid-template-columns: minmax(0, 1fr); } }
 .seed { margin: 0; display: grid; gap: 8px; }
@@ -7186,7 +7196,10 @@ return { mountLab };
 //
 // mountBattleMap({ root, key, esc, crew, bands, yardsPerHex, toast })
 //   root: an empty element to draw into; key: a storage prefix (one map per setting)
-//   crew(): [{ id, name, portrait, color, down, dying }] for "Add the posse" and live token state
+//   crew(): [{ id, name, portrait, color, down, dying, injury, boxes, stunned, points, ptrack, stats }] for "Add the posse",
+//     live token state and the tracks shown when a posse token is selected; setCrew(id, patch) writes a change back
+//     (patch: injury, dying, stunned, points, ptrack). Names for the tracks: pointName, stunName.
+//   threats: [{ id, name, boxes, dodge, attacks, trait }], the setting's opponents, to add with their stats
 //   bands: [[name, maxYards]] in order (the range bands), yardsPerHex: the map's scale
 // Returns { refresh() } to call when the characters change.
 function mountBattleMap(api) {
@@ -7242,7 +7255,9 @@ function mountBattleMap(api) {
       <span class="bm-zoom"><button class="btn" data-bm="out" aria-label="Zoom out">−<\/button><button class="btn" data-bm="fit">Fit<\/button><button class="btn" data-bm="in" aria-label="Zoom in">+<\/button><\/span>
     <\/div>
     <div class="bm-add" hidden>
+      ${(api.threats || []).length ? `<label>From the threats <select data-bmf="threat"><option value="">None (a plain token)<\/option>${api.threats.map((x) => `<option value="${esc(x.id)}">${esc(x.name)}<\/option>`).join("")}<\/select><\/label>` : ""}
       <label>Name <input type="text" data-bmf="name" placeholder="e.g. Outlaw 1"><\/label>
+      <label>Boxes <input type="number" min="1" max="12" value="1" data-bmf="boxes" style="width:4.5em"><\/label>
       <label>Color <input type="color" data-bmf="color" value="#a33b2b"><\/label>
       <label>Size <select data-bmf="tsize"><option value="1">1 hex<\/option><option value="2">2 hexes<\/option><option value="3">3 hexes<\/option><\/select><\/label>
       <label class="btn bm-file" tabindex="0">Image (optional)…<input type="file" accept="image/*" data-bmf="img" class="bm-hide"><\/label>
@@ -7289,11 +7304,15 @@ function mountBattleMap(api) {
     for (const t of st.tokens) {
       const c = live(t), p = toPx(t.q, t.r), rad = st.size * (0.8 + 0.95 * ((t.tsize || 1) - 1));
       const name = c ? c.name : t.name, color = c ? c.color : t.color, img = c ? c.portrait : t.img;
-      const g = el("g", { class: "bm-tok" + (sel === t.id ? " sel" : "") + (c && c.down ? " down" : "") + (c && c.dying ? " dying" : ""), "data-tok": t.id, transform: `translate(${p.x} ${p.y})`, tabindex: "0", role: "button", "aria-label": name || "Token" });
+      const boxes = c ? c.boxes || 3 : t.boxes || 0, inj = c ? c.injury || 0 : t.injury || 0, down = c ? c.down : boxes && inj >= boxes;
+      const g = el("g", { class: "bm-tok" + (sel === t.id ? " sel" : "") + (down ? " down" : "") + (c && c.dying ? " dying" : ""), "data-tok": t.id, transform: `translate(${p.x} ${p.y})`, tabindex: "0", role: "button", "aria-label": name || "Token" });
       g.appendChild(el("circle", { r: rad, class: "bm-disc", style: `fill:${color || "#777"}` }));
       if (img) g.appendChild(el("image", { href: img, x: -rad * 0.9, y: -rad * 0.9, width: rad * 1.8, height: rad * 1.8, "clip-path": "url(#bm-clip)", preserveAspectRatio: "xMidYMid slice" }));
       else { const tx = el("text", { class: "bm-init", "font-size": rad * 0.8, dy: "0.35em" }); tx.textContent = (name || "?").split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase(); g.appendChild(tx); }
       g.appendChild(el("circle", { r: rad, class: "bm-ring" }));
+      // Injury pips above the token: one per box, filled as they're marked.
+      if (boxes) { const pr = Math.max(2.5, st.size * 0.1), gap = pr * 2.6;
+        for (let i = 0; i < boxes; i++) g.appendChild(el("circle", { class: "bm-pip" + (i < inj ? " on" : ""), r: pr, cx: (i - (boxes - 1) / 2) * gap, cy: -rad - pr * 1.8 })); }
       const lb = el("text", { class: "bm-label", y: rad + Math.max(10, st.size * 0.38), "font-size": Math.max(9, st.size * 0.32) }); lb.textContent = name || ""; g.appendChild(lb);
       gTok.appendChild(g);
     }
@@ -7312,7 +7331,18 @@ function mountBattleMap(api) {
     box.hidden = !t;
     if (!t) return;
     const c = live(t);
-    box.innerHTML = `<b>${esc(c ? c.name : t.name || "Token")}<\/b>${c ? ` <span class="small muted">(from the posse${c.dying ? ", Dying" : c.down ? ", down" : ""})<\/span>` : ""}
+    const boxRow = (n, inj, attr) => `<span class="bm-boxes">${Array.from({ length: n }, (_, i) => `<button type="button" class="bm-box${i < inj ? " on" : ""}" ${attr}="${i + 1}" aria-label="Injury box ${i + 1}${i < inj ? ", marked" : ""}"><\/button>`).join("")}<\/span>`;
+    const tracks = c ? `<div class="bm-tracks"><span class="bm-stats small">${esc(c.stats || "")}<\/span>
+        <span class="bm-track">Injury ${boxRow(c.boxes || 3, c.injury || 0, "data-bmc-injury")}<\/span>
+        <label><input type="checkbox" data-bmc="dying"${c.dying ? " checked" : ""}> Dying<\/label>
+        <label><input type="checkbox" data-bmc="stunned"${c.stunned ? " checked" : ""}> ${esc(api.stunName || "Stunned")}<\/label>
+        <span class="bm-track">${esc(api.pointName || "Points")} <button type="button" class="btn" data-bmc-points="-1" aria-label="One point fewer">−<\/button><b>${c.points ?? 0}<\/b><button type="button" class="btn" data-bmc-points="1" aria-label="One point more">+<\/button><\/span>
+        ${c.ptrack ? `<span class="bm-track">${esc(c.ptrack.name)} ${boxRow(c.ptrack.max, c.ptrack.value || 0, "data-bmc-ptrack")}<\/span>` : ""}<\/div>`
+      : `<div class="bm-tracks">${t.stats ? `<span class="bm-stats small">${esc(t.stats)}<\/span>` : ""}
+        <span class="bm-track">Injury ${boxRow(t.boxes || 1, t.injury || 0, "data-bmt-injury")}<\/span>${(t.injury || 0) >= (t.boxes || 1) ? `<b class="small">Taken out<\/b>` : ""}
+        <label>Boxes <input type="number" min="1" max="12" data-bms="boxes" value="${t.boxes || 1}" style="width:4.5em"><\/label><\/div>`;
+    box.innerHTML = `<b>${esc(c ? c.name : t.name || "Token")}<\/b>${c ? ` <span class="small muted">(from the posse${c.dying ? ", Dying" : c.down ? ", down" : ""}: changes here change the character)<\/span>` : ""}
+      ${tracks}
       ${c ? "" : `<label>Name <input type="text" data-bms="name" value="${esc(t.name || "")}"><\/label><label>Color <input type="color" data-bms="color" value="${esc(t.color || "#777777")}"><\/label>`}
       <label>Size <select data-bms="tsize">${[1, 2, 3].map((n) => `<option value="${n}"${(t.tsize || 1) === n ? " selected" : ""}>${n} hex${n > 1 ? "es" : ""}<\/option>`).join("")}<\/select><\/label>
       <button class="btn" data-bm="dup">Copy<\/button><button class="btn" data-bm="del">Remove<\/button><button class="linkish" data-bm="desel">Done<\/button>`;
@@ -7330,17 +7360,27 @@ function mountBattleMap(api) {
     return { sx: x, sy: y, x: (x - st.view.x) / st.view.z, y: (y - st.view.y) / st.view.z };
   }
   function zoomAt(f, sx, sy) {
+    st.viewSet = true;
     const z = Math.max(0.15, Math.min(6, st.view.z * f)); f = z / st.view.z;
     st.view.x = sx - (sx - st.view.x) * f; st.view.y = sy - (sy - st.view.y) * f; st.view.z = z; drawWorld();
   }
   function fit() {
     viewBox();
     const w = svg.clientWidth || 800, h = svg.clientHeight || 500;
-    const last = toPx(pointy() ? st.cols : st.cols * 1, st.rows), mw = Math.max(st.bgW, last.x + st.size * 2), mh = Math.max(st.bgH, last.y + st.size * 2);
+    // The grid's real extent (offset rows or columns stagger by half a hex), or the picture's, whichever is larger.
+    const gw = pointy() ? st.ox + st.size * SQ3 * (st.cols + 0.5) : st.ox + st.size * (1.5 * st.cols + 0.5);
+    const gh = pointy() ? st.oy + st.size * (1.5 * st.rows + 0.5) : st.oy + st.size * SQ3 * (st.rows + 0.5);
+    const mw = Math.max(st.bgW, gw), mh = Math.max(st.bgH, gh);
     st.view.z = Math.max(0.15, Math.min(6, Math.min(w / mw, h / mh))); st.view.x = (w - mw * st.view.z) / 2; st.view.y = (h - mh * st.view.z) / 2;
     drawWorld(); save();
   }
-  const centerHex = () => { const w = svg.clientWidth || 800, h = svg.clientHeight || 500; return toHex((w / 2 - st.view.x) / st.view.z, (h / 2 - st.view.y) / st.view.z); };
+  // The hex in the middle of the view, kept inside the map's rectangle so new tokens land on the map.
+  const centerHex = () => {
+    const w = svg.clientWidth || 800, h = svg.clientHeight || 500, x = toHex((w / 2 - st.view.x) / st.view.z, (h / 2 - st.view.y) / st.view.z);
+    const row = pointy() ? x.r : x.q, col = pointy() ? x.q + Math.floor(x.r / 2) : x.r + Math.floor(x.q / 2);
+    const R = Math.max(0, Math.min(st.rows - 1, pointy() ? row : col)), C = Math.max(0, Math.min(st.cols - 1, pointy() ? col : row));
+    return pointy() ? { q: C - Math.floor(R / 2), r: R } : { q: C, r: R - Math.floor(C / 2) };
+  };
   function freeHexNear(h) {
     const used = new Set(st.tokens.map((t) => t.q + "," + t.r));
     for (let ring = 0; ring < 30; ring++) for (let dq = -ring; dq <= ring; dq++) for (let dr = Math.max(-ring, -dq - ring); dr <= Math.min(ring, -dq + ring); dr++) {
@@ -7365,7 +7405,7 @@ function mountBattleMap(api) {
     if (!drag) return;
     const p = mapPt(ev);
     if (drag.kind === "pinch" && pointers.size === 2) { const [a, b] = [...pointers.values()], d = Math.hypot(a.sx - b.sx, a.sy - b.sy); zoomAt(d / drag.d, (a.sx + b.sx) / 2, (a.sy + b.sy) / 2); drag.d = d; return; }
-    if (drag.kind === "pan") { st.view.x = drag.vx + p.sx - drag.sx; st.view.y = drag.vy + p.sy - drag.sy; drag.moved = drag.moved || Math.abs(p.sx - drag.sx) + Math.abs(p.sy - drag.sy) > 4; drawWorld(); return; }
+    if (drag.kind === "pan") { st.viewSet = true; st.view.x = drag.vx + p.sx - drag.sx; st.view.y = drag.vy + p.sy - drag.sy; drag.moved = drag.moved || Math.abs(p.sx - drag.sx) + Math.abs(p.sy - drag.sy) > 4; drawWorld(); return; }
     if (drag.kind === "measure") { measure.b = toHex(p.x, p.y); drawMeasure(); return; }
     if (drag.kind === "token") {
       const g = gTok.querySelector(`[data-tok="${drag.t.id}"]`); if (g) g.setAttribute("transform", `translate(${p.x - drag.off.x} ${p.y - drag.off.y})`);
@@ -7416,6 +7456,18 @@ function mountBattleMap(api) {
   // ---- controls ----
   let pendingImg = null;
   api.root.addEventListener("click", async (ev) => {
+    // Tracks in the selection panel: a posse token's go to the character; anyone else's stay on the token.
+    const tb = ev.target.closest("[data-bmc-injury],[data-bmc-ptrack],[data-bmc-points],[data-bmt-injury]");
+    if (tb) {
+      const t = st.tokens.find((x) => x.id === sel); if (!t) return;
+      const c = live(t), d = tb.dataset, toggle = (cur, v) => (cur === v ? v - 1 : v);
+      if (d.bmtInjury) { t.injury = toggle(t.injury || 0, +d.bmtInjury); save(); drawTokens(); drawSel(); return; }
+      if (!c || !api.setCrew) return;
+      if (d.bmcInjury) api.setCrew(t.ref, { injury: toggle(c.injury || 0, +d.bmcInjury) });
+      else if (d.bmcPtrack) api.setCrew(t.ref, { ptrack: toggle(c.ptrack.value || 0, +d.bmcPtrack) });
+      else if (d.bmcPoints) api.setCrew(t.ref, { points: Math.max(0, (c.points || 0) + +d.bmcPoints) });
+      return;
+    }
     const b = ev.target.closest("[data-bm]"); if (!b || b.tagName === "INPUT") return;
     const k = b.dataset.bm, t = st.tokens.find((x) => x.id === sel);
     if (k === "posse") {
@@ -7426,7 +7478,10 @@ function mountBattleMap(api) {
     } else if (k === "add") { const f = $(".bm-add"); f.hidden = !f.hidden; if (!f.hidden) $('[data-bmf="name"]').focus(); }
     else if (k === "addgo") {
       const name = $('[data-bmf="name"]').value.trim(), h = freeHexNear(centerHex());
-      st.tokens.push({ id: uid(), ref: null, name: name || "Token", color: $('[data-bmf="color"]').value, img: pendingImg, tsize: +$('[data-bmf="tsize"]').value, q: h.q, r: h.r });
+      const th = (api.threats || []).find((x) => x.id === ($('[data-bmf="threat"]') || {}).value);
+      st.tokens.push({ id: uid(), ref: null, name: name || (th ? th.name : "Token"), color: $('[data-bmf="color"]').value, img: pendingImg, tsize: +$('[data-bmf="tsize"]').value, q: h.q, r: h.r,
+        boxes: Math.max(1, +$('[data-bmf="boxes"]').value || 1), injury: 0, threat: th ? th.id : null,
+        stats: th ? [th.attacks, th.dodge != null ? `Dodge ${th.dodge}` : "", th.trait].filter(Boolean).join(" · ") : "" });
       // Numbered names count up, so "Outlaw 1" is followed by "Outlaw 2".
       const m = name.match(/^(.*?)(\d+)$/); $('[data-bmf="name"]').value = m ? m[1] + (+m[2] + 1) : name;
       save(); draw();
@@ -7440,7 +7495,7 @@ function mountBattleMap(api) {
       const blob = new Blob([JSON.stringify({ format: "legend-dynamics-battlemap", version: 1, map: st, background: bg })], { type: "application/json" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "battle-map.json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     } else if (k === "del" && t) { st.tokens = st.tokens.filter((x) => x !== t); sel = null; save(); draw(); }
-    else if (k === "dup" && t) { const h = freeHexNear({ q: t.q, r: t.r }); const n = { ...t, id: uid(), ref: null, q: h.q, r: h.r }; const c = live(t); if (c) Object.assign(n, { name: c.name, color: c.color, img: c.portrait }); st.tokens.push(n); sel = n.id; save(); draw(); }
+    else if (k === "dup" && t) { const h = freeHexNear({ q: t.q, r: t.r }); const n = { ...t, id: uid(), ref: null, q: h.q, r: h.r, injury: 0, name: (t.name || "").replace(/(\d+)$/, (d) => +d + 1) }; const c = live(t); if (c) Object.assign(n, { name: c.name, color: c.color, img: c.portrait }); st.tokens.push(n); sel = n.id; save(); draw(); }
     else if (k === "desel") { sel = null; draw(); }
   });
   api.root.addEventListener("change", async (ev) => {
@@ -7453,24 +7508,65 @@ function mountBattleMap(api) {
       } catch { say("That isn't a battle map file.", true); }
       i.value = "";
     } else if (i.dataset.bmg) { const k = i.dataset.bmg; st[k] = i.type === "checkbox" ? i.checked : i.tagName === "SELECT" ? i.value : +i.value; save(); draw(); }
-    else if (i.dataset.bms) { const t = st.tokens.find((x) => x.id === sel); if (!t) return; const k = i.dataset.bms; t[k] = k === "tsize" ? +i.value : i.value; save(); drawTokens(); }
+    else if (i.dataset.bms) { const t = st.tokens.find((x) => x.id === sel); if (!t) return; const k = i.dataset.bms; t[k] = k === "tsize" || k === "boxes" ? Math.max(1, +i.value || 1) : i.value; save(); drawTokens(); if (k === "boxes") drawSel(); }
+    else if (i.dataset.bmc) { const t = st.tokens.find((x) => x.id === sel); if (t && t.ref && api.setCrew) api.setCrew(t.ref, { [i.dataset.bmc]: i.checked }); }
+    else if (i.dataset.bmf === "threat") {
+      // Picking a threat fills in its name (numbered), boxes and a foe's color.
+      const th = (api.threats || []).find((x) => x.id === i.value); if (!th) return;
+      const n = st.tokens.filter((x) => x.threat === th.id).length + 1;
+      $('[data-bmf="name"]').value = `${th.name.replace(/\s*\(.*\)$/, "")} ${n}`; $('[data-bmf="boxes"]').value = th.boxes || 1; $('[data-bmf="color"]').value = "#a33b2b";
+    }
   });
   api.root.addEventListener("input", (ev) => { const i = ev.target; if (i.dataset.bmg && i.type === "range") { st[i.dataset.bmg] = +i.value; drawGrid(); drawTokens(); clearTimeout(i._t); i._t = setTimeout(save, 300); } });
   // The file buttons are labels around file pickers kept in the page (not hidden: some browsers, Safari
   // among them, won't open a picker that isn't); Enter or Space opens them from the keyboard.
   api.root.addEventListener("keydown", (ev) => { const l = ev.target.closest && ev.target.closest(".bm-file"); if (l && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); l.querySelector("input").click(); } });
-  if (window.ResizeObserver) new ResizeObserver(() => { viewBox(); }).observe(svg);
+  // The GM view starts hidden, so the map's real size is only known once it's shown: fit it then, unless the GM has moved the view.
+  if (window.ResizeObserver) new ResizeObserver(() => { viewBox(); if (svg.clientWidth && !st.viewSet) { fit(); st.viewSet = false; } }).observe(svg);
 
-  idb.get(KEY + ".bg").then((v) => { bg = v || null; draw(); if (!st.view || (st.view.z === 1 && st.view.x === 0 && st.view.y === 0)) fit(); });
+  idb.get(KEY + ".bg").then((v) => { bg = v || null; draw(); if (!st.viewSet && svg.clientWidth) fit(); });
   draw();
   return { refresh: () => { st.tokens = st.tokens.filter((t) => !t.ref || api.crew().some((c) => c.id === t.ref)); drawTokens(); drawSel(); viewBox(); } };
+}
+
+// The setting's opponents, read from the Players' Guide's Threats table on the page (for settings that keep them
+// only in the guide): columns found by their headings (Threat, Attack (target), Dodge, Boxes, Defense, Trait).
+function threatsFromGuide(guide) {
+  const h = guide && [...guide.querySelectorAll("h1, h2")].find((x) => x.textContent.trim() === "Threats");
+  let t = h && h.nextElementSibling;
+  while (t && t.tagName !== "TABLE" && !/^H[12]$/.test(t.tagName)) t = t.nextElementSibling;
+  if (!t || t.tagName !== "TABLE") return [];
+  const head = [...t.querySelectorAll("thead th, tr:first-child th")].map((x) => x.textContent.trim().toLowerCase());
+  const col = (re) => head.findIndex((x) => re.test(x));
+  const [cName, cAtk, cDodge, cBoxes, cDef, cTrait] = [/^threat|^name/, /^attack/, /^dodge/, /^boxes/, /^defen/, /^trait/].map(col);
+  return [...t.querySelectorAll("tbody tr")].map((tr, i) => {
+    const td = [...tr.children].map((x) => x.textContent.trim()), at = (c) => (c >= 0 ? td[c] : "");
+    const def = at(cDef) && at(cDef) !== "—" ? `Defense ${at(cDef)}` : "";
+    return { id: "guide-" + i, name: at(cName), attacks: [at(cAtk), def].filter(Boolean).join(" · "), dodge: at(cDodge) || null, boxes: parseInt(at(cBoxes), 10) || 1, trait: at(cTrait) };
+  }).filter((x) => x.name);
 }
 
   // The battle map: the GM's characters as tokens (portrait, group color, down or Dying), one hex a yard.
   const battleMap = mountBattleMap({ root: $("battlemap"), key: PACK.id, esc, toast: gmSay, yardsPerHex: 1,
     bands: [["Close", 10], ["Short", 50], ["Medium", 150], ["Long", 500], ["Extreme", 1760]],
-    crew: () => gmCrew.map((c) => ({ id: c.id, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
-      color: `var(${(PACK.groups.find((g) => g.id === gmCalc(c).div) || PACK.groups[0]).color})` })) });
+    pointName: T.point, stunName: T.stun,
+    // The setting's threats: its data where it has them, otherwise the Players' Guide's Threats table.
+    threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge,
+      attacks: (x.attacks || []).map((a) => `${a.skill} ${a.target}`).join(", "), trait: x.trait ? `${x.trait}: ${x.traitText || ""}`.replace(/: $/, "") : "" })),
+    crew: () => gmCrew.map((c) => { const k = gmCalc(c);
+      return { id: c.id, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
+        color: `var(${(PACK.groups.find((g) => g.id === k.div) || PACK.groups[0]).color})`,
+        injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty,
+        ptrack: PTRACK ? { name: PTRACK.name, max: PTRACK.boxes, value: c.play.ptrack || 0 } : null,
+        stats: [`Dodge ${k.dodge}`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
+    // A change made on the map is the GM's copy of the character, the same as a change on their card.
+    setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
+      if ("injury" in patch) { c.play.injury = Math.max(0, Math.min(3, patch.injury)); if (c.play.injury < 3 && !gritty) c.play.dying = false; }
+      if ("dying" in patch) c.play.dying = !!patch.dying;
+      if ("stunned" in patch) c.play.stunned = !!patch.stunned;
+      if ("points" in patch) c.play.duty = Math.max(0, patch.points);
+      if ("ptrack" in patch && PTRACK) c.play.ptrack = Math.max(0, Math.min(PTRACK.boxes, patch.ptrack));
+      saveGM(); renderGM(); } });
   const saveGM = () => { if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true); };
   // Work out a crew member's numbers with the same rules as the sheet, by briefly treating them as the current character.
   function gmCalc(c) {
