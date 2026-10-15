@@ -3224,5 +3224,96 @@
     "sheetNote": "a lasting Significant enchantment"
    }
   ]
- ]
+ ],
+ "gritty": {
+  "table": [
+   {
+    "from": 3,
+    "to": 4,
+    "id": "limb",
+    "name": "Lost limb",
+    "text": "A hand, an arm or a leg is gone for good; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding.",
+    "dying": true,
+    "down": "bone",
+    "heal": "never",
+    "complication": true
+   },
+   {
+    "from": 5,
+    "to": 6,
+    "id": "eye",
+    "name": "Lost eye or scarred face",
+    "text": "An eye is gone or the face is ruined: −2 to Marksmanship and spotting things, or to winning strangers over; the GM says which.",
+    "down": "concussion",
+    "heal": "never",
+    "complication": true
+   },
+   {
+    "from": 7,
+    "to": 9,
+    "id": "bone",
+    "name": "Broken bone",
+    "text": "The limb is useless until it's set with proper care.",
+    "down": "muscle",
+    "heal": "several weeks"
+   },
+   {
+    "from": 10,
+    "to": 12,
+    "id": "muscle",
+    "name": "Torn muscle",
+    "text": "−1 to physical tasks.",
+    "down": null,
+    "heal": "several weeks"
+   },
+   {
+    "from": 13,
+    "to": 15,
+    "id": "concussion",
+    "name": "Concussion",
+    "text": "Reeling, and −2 to thinking tasks for the scene.",
+    "condition": "Reeling",
+    "down": null,
+    "heal": "after the scene"
+   },
+   {
+    "from": 16,
+    "to": 18,
+    "id": "internal",
+    "name": "Internal injury",
+    "text": "Dying even with boxes to spare; it needs a master healer or a temple's surgeons.",
+    "dying": true,
+    "down": "muscle",
+    "heal": "several weeks after surgery"
+   }
+  ],
+  "enemy": {
+   "blade": [
+    "The blade takes {name}'s sword arm at the elbow.",
+    "{name} folds around the steel and doesn't get up.",
+    "A cut across the eyes sends {name} reeling away, blind.",
+    "{name}'s helm splits, and so does what's under it."
+   ],
+   "blunt": [
+    "The blow caves in {name}'s ribs.",
+    "{name}'s knee bends the wrong way with a crack.",
+    "{name} drops like a sack of grain."
+   ],
+   "missile": [
+    "An arrow pins {name}'s hand to the shield.",
+    "{name} takes a bolt through the throat and goes down choking.",
+    "The shaft takes {name} in the eye."
+   ],
+   "claw": [
+    "Claws open {name} from shoulder to hip.",
+    "{name} is dragged into the dark, screaming, and goes quiet.",
+    "Jaws close on {name}'s leg and shake."
+   ],
+   "spell": [
+    "Witchfire takes {name}, and what's left smokes.",
+    "{name}'s blood boils in their veins; they fall without a sound.",
+    "The spell turns {name} to ash from the hands up."
+   ]
+  }
+ }
 }

@@ -3424,5 +3424,98 @@
     "sheetNote": "powered armor"
    }
   ]
- ]
+ ],
+ "gritty": {
+  "table": [
+   {
+    "from": 3,
+    "to": 4,
+    "id": "limb",
+    "name": "Lost limb",
+    "text": "A hand, an arm or a leg is gone for good; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding. A prosthetic or cybernetic replacement can restore it, at a price.",
+    "dying": true,
+    "down": "bone",
+    "heal": "never",
+    "complication": true
+   },
+   {
+    "from": 5,
+    "to": 6,
+    "id": "eye",
+    "name": "Lost eye",
+    "text": "−2 to Firearms and to spotting things, until a cybernetic or cloned eye replaces it.",
+    "down": "concussion",
+    "heal": "never",
+    "complication": true
+   },
+   {
+    "from": 7,
+    "to": 9,
+    "id": "bone",
+    "name": "Broken bone",
+    "text": "The limb is useless until it's set with proper care.",
+    "down": "muscle",
+    "heal": "several weeks"
+   },
+   {
+    "from": 10,
+    "to": 12,
+    "id": "muscle",
+    "name": "Torn muscle",
+    "text": "−1 to physical tasks.",
+    "down": null,
+    "heal": "several weeks"
+   },
+   {
+    "from": 13,
+    "to": 15,
+    "id": "concussion",
+    "name": "Concussion",
+    "text": "Stunned, and −2 to thinking tasks for the scene.",
+    "condition": "Stunned",
+    "down": null,
+    "heal": "after the scene"
+   },
+   {
+    "from": 16,
+    "to": 18,
+    "id": "internal",
+    "name": "Internal injury",
+    "text": "Dying even with boxes to spare; it needs a med-bay or a clinic's surgeons.",
+    "dying": true,
+    "down": "muscle",
+    "heal": "several weeks after surgery"
+   }
+  ],
+  "enemy": {
+   "gun": [
+    "The slug shatters {name}'s knee; they won't stand again today.",
+    "{name} takes it center mass and slides down the bulkhead.",
+    "A round through the shoulder spins {name} to the deck, weapon gone."
+   ],
+   "energy": [
+    "The beam cuts {name}'s arm off at the shoulder, cauterized.",
+    "{name} goes down with a smoking hole through the armor.",
+    "The bolt blows {name} back through the hatch, burning."
+   ],
+   "blade": [
+    "The blade finds the gap in {name}'s armor.",
+    "{name} folds around the vibroblade and doesn't get up.",
+    "A cut across the visor blinds {name}, who stumbles off screaming."
+   ],
+   "blunt": [
+    "The blow caves in {name}'s ribs.",
+    "{name}'s helmet cracks, and so does the skull inside.",
+    "{name} hits the deck and doesn't get up."
+   ],
+   "claw": [
+    "Claws open {name} from collar to hip.",
+    "{name} is dragged into the vents and goes quiet."
+   ],
+   "missile": [
+    "The dart takes {name} in the neck; they're down in a heartbeat.",
+    "{name} catches the spike through the thigh and goes down."
+   ]
+  }
+ }
 }
