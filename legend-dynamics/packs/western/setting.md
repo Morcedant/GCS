@@ -108,14 +108,19 @@ Every monster has a weakness, and finding it is often the whole job. **Occult** 
 | Vampire | A wooden stake through the heart incapacitates; fire, sunlight and beheading destroy. Holy symbols hold it back; it can't enter a home uninvited. |
 | Zombie | A shot to the head (−2 to hit) or fire puts it down for good; anything else just slows it. |
 | Ghost | Can't be hurt. Lay it to rest by finishing its business, or bind it with a ritual. |
+| Wraith | Only silver, cold iron, salt and fire hurt it. It can't cross a line of salt or iron filings. Destroyed for good only when its bones are found and burned. |
+| Banshee | Weapons don't touch her. She leaves at dawn if the one she keens for is still alive. A hit with silver, or an iron bell rung at her, silences her for the scene. |
 | Ghoul | Fire and daylight. It flees from holy ground. |
 | Demon | Holy water burns it; a ritual banishes it. It must keep a bargain to the letter. |
+| Headless Rider | Its head, hidden near where it died: laid back in the grave, the rider rests for good. It can't cross running water, so a bridge over a creek is safety. |
 
 ## Bites and curses
 
 - **Zombie bite.** A bite that marks a box starts a 4-segment **Infection** clock, ticking each hour. A successful Medicine roll with an Occult remedy stops it; when it fills, you die, and rise.
 - **Werewolf bite.** A bite under the full moon can pass on the curse; the GM decides, and lifting it is a major ritual.
 - **Vampire bite.** A vampire who drains a victim to Dying can choose to turn them.
+- **A wraith's touch.** Someone killed by it rises as a wraith at the next new moon, unless they're buried with salt in the coffin.
+- **A banshee's keening.** She is tied to a family's blood, not a place: once she has keened for one of a line, she can follow that family from town to town.
 
 # Threats
 

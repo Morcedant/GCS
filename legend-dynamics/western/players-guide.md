@@ -739,14 +739,19 @@ Every monster has a weakness, and finding it is often the whole job. **Occult** 
 | Vampire | A wooden stake through the heart incapacitates; fire, sunlight and beheading destroy. Holy symbols hold it back; it can't enter a home uninvited. |
 | Zombie | A shot to the head (−2 to hit) or fire puts it down for good; anything else just slows it. |
 | Ghost | Can't be hurt. Lay it to rest by finishing its business, or bind it with a ritual. |
+| Wraith | Only silver, cold iron, salt and fire hurt it. It can't cross a line of salt or iron filings. Destroyed for good only when its bones are found and burned. |
+| Banshee | Weapons don't touch her. She leaves at dawn if the one she keens for is still alive. A hit with silver, or an iron bell rung at her, silences her for the scene. |
 | Ghoul | Fire and daylight. It flees from holy ground. |
 | Demon | Holy water burns it; a ritual banishes it. It must keep a bargain to the letter. |
+| Headless Rider | Its head, hidden near where it died: laid back in the grave, the rider rests for good. It can't cross running water, so a bridge over a creek is safety. |
 
 ## Bites and curses
 
 - **Zombie bite.** A bite that marks a box starts a 4-segment **Infection** clock, ticking each hour. A successful Medicine roll with an Occult remedy stops it; when it fills, you die, and rise.
 - **Werewolf bite.** A bite under the full moon can pass on the curse; the GM decides, and lifting it is a major ritual.
 - **Vampire bite.** A vampire who drains a victim to Dying can choose to turn them.
+- **A wraith's touch.** Someone killed by it rises as a wraith at the next new moon, unless they're buried with salt in the coffin.
+- **A banshee's keening.** She is tied to a family's blood, not a place: once she has keened for one of a line, she can follow that family from town to town.
 
 # Threats
 
@@ -761,9 +766,12 @@ Opponents use the same rules as the characters. **Minor opponents** (hired guns,
 | Werewolf | Brawling 14, Tracking 14 | 10 | 4 | Claws and fangs (2) | **Relentless.** Ignores the Wounded penalty; only silver marks more than 1 box at a time. |
 | Vampire | Brawling 13, Persuasion 15 | 10 | 4 | Fangs (2) | **Mesmerize.** Once per scene, a Presence contest makes one victim obey a simple command. |
 | Ghost | Will 14 | — | — | Terror, cold | **Haunting.** Can't be hurt; once per scene, everyone present rolls Will or flees in terror. |
+| Wraith | Brawling 13, Stealth 14 | 10 | 3 | Grave touch (1) | **Life-drinker.** Passes through walls; only silver, cold iron, salt or fire can hurt it. Each box its touch marks clears one of its own. |
+| Banshee | Will 15 | — | — | The keen | **Death-omen.** Can't be hurt. Once per scene her keen makes everyone in earshot roll Will or be Dazed for a round. Until dawn, the one she keens for can't shrug off a telling hit with Grit, and stabilizing them is at −2. |
 | Witch | Occult 14, Deception 13 | 8 | 3 | Curses | **Hex.** Once per round, a target with a link to her rolls Will or marks a box. |
 | Hellhound | Brawling 14 | 10 | 3 | Burning jaws (2) | **Hunter.** Always finds its quarry; holy water drives it off. |
 | Revenant gunslinger | Shooting 15 | 11 | 4 | Two revolvers | **Undying.** Rises at the next midnight unless its grave is salted and burned. |
+| Headless Rider | Melee 14, Shooting 13 | 10 | 4 | Saber (2), revolver | **Hell-ridden.** Its horse never tires: Riding 15 in a chase. No head to stun or aim at. Rises at the next midnight unless its head is laid back in its grave. |
 
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
 

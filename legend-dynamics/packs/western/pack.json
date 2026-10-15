@@ -3100,6 +3100,48 @@
    "traitText": "Can't be hurt; once per scene, everyone present rolls Will or flees in terror."
   },
   {
+   "id": "wraith",
+   "name": "Wraith",
+   "label": "Wraith",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 13
+    },
+    {
+     "skill": "Stealth",
+     "target": 14
+    }
+   ],
+   "dodge": 10,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Grave touch (1)",
+   "weapons": [],
+   "trait": "Life-drinker",
+   "traitText": "Passes through walls; only silver, cold iron, salt or fire can hurt it. Each box its touch marks clears one of its own."
+  },
+  {
+   "id": "banshee",
+   "name": "Banshee",
+   "label": "Banshee",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Will",
+     "target": 15
+    }
+   ],
+   "dodge": null,
+   "boxes": null,
+   "boxesText": "—",
+   "weaponText": "The keen",
+   "weapons": [],
+   "trait": "Death-omen",
+   "traitText": "Can't be hurt. Once per scene her keen makes everyone in earshot roll Will or be Dazed for a round. Until dawn, the one she keens for can't shrug off a telling hit with Grit, and stabilizing them is at −2."
+  },
+  {
    "id": "witch",
    "name": "Witch",
    "label": "Witch",
@@ -3163,6 +3205,32 @@
    ],
    "trait": "Undying",
    "traitText": "Rises at the next midnight unless its grave is salted and burned."
+  },
+  {
+   "id": "headless-rider",
+   "name": "Headless Rider",
+   "label": "Headless Rider",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 14
+    },
+    {
+     "skill": "Shooting",
+     "target": 13
+    }
+   ],
+   "dodge": 10,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Saber (2), revolver",
+   "weapons": [
+    "blade",
+    "revolver"
+   ],
+   "trait": "Hell-ridden",
+   "traitText": "Its horse never tires: Riding 15 in a chase. No head to stun or aim at. Rises at the next midnight unless its head is laid back in its grave."
   }
  ],
  "extraEdges": [
