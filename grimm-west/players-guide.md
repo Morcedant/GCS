@@ -755,6 +755,7 @@ Seven characters ready to play. Each follows the creation rules exactly, Edges i
 - **Edge:** A friend in town: Pastor Jakob Unruh of the Volga German colony east of town, who brings her the cases his people won't take to a doctor. **Lens:** Braucher (companion: No Payment). **Complication:** Reluctant to Kill; trigger: an enemy lies wounded and helpless in front of her.
 - **Magic:** works rituals with Occult at ten minutes a roll, +2 to heal, protect or break a hex; carries 3 ready charms (Occult as her Specialty). Carries a Himmelsbrief, and writes them for others.
 - **Why I stand against the dark:** My grandmother taught me the words, and the words are for using. **Connection:** Dr. Whitlock calls her a superstitious old woman, and sends his hopeless cases to her door after dark.
+
 # Threats
 
 Opponents use the same rules as the characters. **Minor opponents** (hired guns, a mob, a Royal's footmen) have **one box**: any hit that gets through takes them out of the fight.
@@ -804,6 +805,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 **Badges.** A badge is legal authority, not a magic word: Wesen, outlaws and the powers of the hidden world don't care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency's reach and files, but no badge.
 
 <!-- HERITAGES:START -->
+
 # Heritages
 
 Each heritage has a **tier**. A character has 3 points to split between heritage power and Edges: the higher the tier, the fewer Edges (see Step 2). Adjustments always total zero. Heritages marked *horror* are only available when the whole table has agreed to a horror-tinged campaign.
@@ -856,6 +858,7 @@ Most people are human. You know the truth about the hidden world, which already 
 |---|---|---|
 | Frontier Grit | +2 to Will against fear when facing something that shouldn't exist. | **Nobody Believes You.** When you tell ordinary folk what you've seen, accept being called mad, drunk or a liar. |
 | Gut Instinct | +2 to Read People when judging, face to face, whether someone is lying. | **Acts on Hunches.** You act on an unproven feeling. Accept the consequence when it costs time, trust or position. |
+
 ## Bauerschwein
 
 *Tier 1 (Minor) · 2 Edges · Body +1, Agility −1, Presence −1, Will +1*
@@ -874,6 +877,7 @@ Pig-like Wesen: stubborn, hard-working, with senses sharp even in human form, an
 |---|---|---|
 | Stubborn as Stone | +2 to Will to resist intimidation, especially from a Blutbad. | **Old Feud.** Blutbaden are your people's enemies. When one is near, accept the quarrel, or the challenge to Ehrenkampf. |
 | Keen Snout | +2 to Intellect rolls to notice or identify something by smell. | **Blunt to a Fault.** Your honesty offends someone who matters. Accept the lost goodwill. |
+
 ## Coyotl
 
 *Tier 1 (Minor) · 2 Edges · Body +1, Agility +1, Intellect −1, Will −1*
@@ -888,6 +892,7 @@ Coyote-like Wesen of the plains and desert country who live in clans bound by ol
 |---|---|---|
 | Pack Fighter | +2 to Brawling or Melee against a target an ally attacked this round. | **Clan Law.** The clan's customs bind you. Accept the clan's demand. |
 | Plains Wanderer | +2 to Survival in dry, open country: plains, desert and badlands. | **Restless.** You can't stay put for long. Accept leaving, or the strain of staying, at a bad time. |
+
 ## Eisbiber
 
 *Tier 1 (Minor) · 2 Edges · Intellect +1, Will −1*
@@ -902,6 +907,7 @@ Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, an
 |---|---|---|
 | Master Builder | +2 to Tinkering when building or shoring up structures, dams or mechanisms. | **Timid.** Violence makes you freeze. Accept losing your first action when a fight breaks out. |
 | The Lodge | +2 to Investigation when asking the local Wesen community for news. | **Lodge Obligations.** The lodge expects favors. Accept the call when it comes at a bad time. |
+
 ## Fuchsbau
 
 *Tier 1 (Minor) · 2 Edges · Body −1, Intellect +2, Will −1*
@@ -917,6 +923,7 @@ Fox-like Wesen, clever and quick, with a long tradition of trade in herbs, remed
 | Fuchsbau Remedies | +2 to Apothecary when brewing a remedy, antidote or potion from the old recipes. | **Criminal Kin.** Your family deals in the Wesen black market. Accept their demands or their trouble. |
 | Fox's Cunning | +2 to Deception when misleading a pursuer or covering your tracks. | **Too Clever by Half.** You overplay your hand. Accept the consequence when the trick backfires. |
 | Horse Archer | +2 to Shooting with a bow from the saddle. | **Disreputable.** Wesen assume a Fuchsbau is up to something. Accept the distrust when it costs you. |
+
 ## Mauzhertz
 
 *Tier 1 (Minor) · 2 Edges · Body −1, Agility +1*
@@ -931,6 +938,7 @@ Mouse-like Wesen, small, quick and wary, with excellent hearing. Gentle by natur
 |---|---|---|
 | Small and Quick | +2 to Stealth when hiding or slipping away. | **Easily Startled.** Sudden noise or danger makes you flinch. Accept −2 on your next action. |
 | Keen Hearing | +2 to Intellect rolls to hear faint or distant sounds. | **Breaking Point.** Pushed too far, you snap into violence. Accept what you do in that moment. |
+
 ## Steinadler
 
 *Tier 1 (Minor) · 2 Edges · Body −1, Agility +1, Intellect +1, Will −1*
@@ -945,6 +953,7 @@ Eagle-like Wesen with remarkable eyesight, a hunter's pride, and a taste for wor
 |---|---|---|
 | Eagle Eye | +2 to Intellect rolls to spot detail at a great distance. | **Proud as an Eagle.** You won't back down or beg. Accept the consequence of your pride. |
 | Hunter's Eye | +2 to Shooting at long range after aiming for an action. | **Hunter's Code.** You won't shoot an unarmed or fleeing foe. Accept the escape. |
+
 ## Taniwha
 
 *Tier 1 (Minor) · 2 Edges · Body +1, Presence −1 · horror campaigns only*
@@ -964,6 +973,7 @@ Water-dwelling Wesen from New Zealand: guardians of rivers and the people they c
 |---|---|---|
 | Paralyzing Bite | Ability, in full woge: a bite marks 1 box, and the target rolls Body or is paralyzed for the scene. | **Guardian's Duty.** You protect those you've claimed as yours. Accept the danger when they need you. |
 | River Guardian | +2 to Athletics and Survival in rivers, lakes and the sea. | **Peculiar Appetite.** Gluttony, and an odd craving (frogs, to start with). Accept the distraction at a bad time. |
+
 ## Ziegevolk
 
 *Tier 1 (Minor) · 2 Edges · Intellect −1, Presence +2, Will −1*
@@ -978,6 +988,7 @@ Goat-like Wesen whose pheromones, working even in human form, make them unnatura
 |---|---|---|
 | Ziegevolk Pheromones | +2 to Persuasion face to face at close quarters, in either form. Grimms and anyone dosed with the antidote are unaffected. | **Pheromone Suspicion.** Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust. |
 | Smooth Operator | +2 to Deception when talking your way past a guard or official. | **Scandal Follows You.** Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex. |
+
 ## Blutbad
 
 *Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Intellect −1, Will −1*
@@ -997,6 +1008,7 @@ Wolf-like Wesen with keen senses and a predator's appetite; the root of the were
 | Blutbad Nose | +2 to Tracking by scent, in either form. | **The Bloodlust.** When blood is spilled near you or something runs, roll Will or woge and give chase. Accept the cost of the urge. |
 | Night Hunter | +2 to Stealth when stalking at night. | **Loner.** You shun company. Accept the cost of going it alone. |
 | Old Enemy | +2 to Brawling against a Bauerschwein. | **Old Feud.** Bauerschwein are your enemies. When one is near, accept the quarrel. |
+
 ## Grimm
 
 *Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Presence −2*
@@ -1028,6 +1040,7 @@ A descendant of the old hunters, the Decapitare: stronger and faster than ordina
 | Hard to Kill | Ability: Dying lasts until the end of the next scene, not this one. | **Vow: Protect the Innocent.** You've sworn to protect the innocent from Wesen. Accept the danger. |
 | Pain Means Nothing | Ability: ignore the Wounded penalty (−1). | **Honesty.** You won't lie, even to Wesen. Accept the consequence. |
 | Keeper of the Books | +2 to Wesen Lore when you can consult your family's books. | **The Books Must Be Kept.** The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them. |
+
 ## Incantare
 
 *Tier 2 (Major) · 1 Edge · Body −1, Intellect +1, Presence −1, Will +1*
@@ -1052,6 +1065,7 @@ A human who works real magic through a Lens: a tradition and a way of seeing. Th
 | Braucher Lens | Braucherei, the Pennsylvania Dutch healing craft: spoken charms, prayers and blessed objects, from The Long Lost Friend. +2 to Occult to heal, protect, or break a hex. | **No Payment.** A Braucher takes no money for healing, only gifts. Accept the cost when the need is great and the purse is empty. |
 | Scaenarfex Lens (Artistic Enchanter) | Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm. | **Artist's Temperament.** Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you. |
 | Veneficare Lens (Sorcerer) | Casts spells: quick magic in one action and an Occult roll, shaped by one or two Paths agreed with the GM (fire and force, say). Known: Trained 2, Specialty 3, Expert 4. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it when it clashes with your friends' needs. |
+
 ## Jägerbär
 
 *Tier 2 (Major) · 1 Edge · Body +2, Agility −1, Intellect −1*
@@ -1066,6 +1080,7 @@ Bear-like Wesen, enormously strong and durable. Traditional families still keep 
 |---|---|---|
 | Bear's Strength | +2 to Athletics for feats of raw strength: lifting, breaking, holding. | **The Roh-Hatz.** Your family keeps the old hunting rite. Accept the obligation, or the shame of refusing it. |
 | Family Weapon | +2 to Melee with your family's claw-bladed hunting weapon. | **Slow to Calm.** Once angered, you're hard to stop. Accept the harm you do to something you shouldn't. |
+
 ## Mauvais Dentes
 
 *Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Intellect −1, Presence −1*
@@ -1084,6 +1099,7 @@ Sabre-toothed, panther-like Wesen, so deadly that the Royal Families have kept t
 |---|---|---|
 | Relentless Hunter | +2 to Tracking when hunting a single named quarry. | **Royal Debt.** The Royals bred your line as killers. When one of their agents calls on you, accept the demand or the danger of refusing. |
 | Pounce | +2 to Brawling on your first attack of a fight, leaping from hiding. | **Killer's Instinct.** In a fight you go for the throat. Accept the death you didn't intend. |
+
 ## Naschazer
 
 *Tier 2 (Major) · 1 Edge · Body +2, Intellect −1, Presence −1 · horror campaigns only*
@@ -1102,6 +1118,7 @@ Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror camp
 |---|---|---|
 | Brute Strength | +2 to Athletics to lift, break or hold. | **Greed.** Riches are hard to refuse. Accept the bribe's strings or the risk of taking more. |
 | Butcher's Hands | +2 to Melee with a cleaver, axe or knife. | **Proud.** You won't be slighted. Accept the fight your pride starts. |
+
 ## Skalengeck
 
 *Tier 2 (Major) · 1 Edge · Agility +1, Presence −1*
@@ -1116,6 +1133,7 @@ Lizard-like Wesen, cold-eyed and hard to kill, with a poisonous bite. Common amo
 |---|---|---|
 | Poison Bite | Ability, in full woge: a bite that marks a box also poisons. Each hour the victim rolls Body −3 or marks another box, until treated with Apothecary. | **Callous.** You don't much care who gets hurt. Accept the cost when that shows. |
 | Hard to Subdue | +2 to Body to resist being knocked out, stunned or restrained. | **Cornered Lizard.** When you're trapped, you woge and fight. Accept the Exposure and the damage. |
+
 ## Vallachi
 
 *Tier 2 (Major) · 1 Edge · Body +1, Agility −1, Presence +1, Will −1 · horror campaigns only*
@@ -1137,6 +1155,7 @@ Long-lived, handsome, vampire-like Wesen who feed on the lifeforce of others and
 |---|---|---|
 | Night Charm | +2 to Persuasion face to face, after dark. | **Old Grudges.** You've lived long enough to make enemies. Accept it when one of them turns up. |
 | Ageless | +2 to Intellect rolls to recall something you lived through decades ago. | **Secret Age.** You don't age as you should. Accept the lie or the slip when someone notices. |
+
 ## Fuchsteufelwild
 
 *Tier 3 (Apex) · 0 Edges · Body +1, Intellect +2, Presence −2, Will −1*
@@ -1156,6 +1175,7 @@ Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; th
 |---|---|---|
 | Tremor | Ability, in full woge: stomp, and everyone nearby rolls Athletics or falls and loses their next action. | **Cruel Streak.** When an enemy is helpless, you're tempted to make them suffer. Accept the lost allies, or the Suspicion it brings. |
 | Strike a Bargain | +2 to Persuasion or Deception when making a deal. | **Guess My Name.** Your true name holds power over you. When someone hunts for it, or speaks it, accept the consequence. |
+
 ## Hexenbiest or Zauberbiest
 
 *Tier 3 (Apex) · 0 Edges · Body −1, Agility −1, Presence +1, Will +1*
@@ -1177,6 +1197,7 @@ Witch-like Wesen (Zauberbiest for the men), beautiful in human form and horrific
 | Hexenbiest Spellcraft | +2 to Occult for curses, potions and sendings. | **The Price of Magic.** Every spell costs blood, pain or something precious. Accept the cost when it bites. |
 | Levitation | Ability, in woge: roll Will to lift yourself and float or fly a short way. | **Hexenbiest Pride.** You cannot abide being bested or slighted. Accept the feud you start. |
 | TK Crush | Ability, in full woge: roll Will against the target's Body; on a success they mark 1 box, which Dodge can't avoid. | **Coven Traditions.** Your family or coven has rules and expectations. Accept the demand. |
+
 ## Murcielago
 
 *Tier 3 (Apex) · 0 Edges · None*
