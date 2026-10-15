@@ -410,6 +410,16 @@ tr.lvl-U td.target { color: var(--muted); }
 .bm-mdot { fill: var(--accent); }
 .bm-readout { position: absolute; left: 10px; bottom: 10px; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.72); color: #fff; font: .8rem var(--mono, monospace); pointer-events: none; }
 .bm-readout:empty { display: none; }
+.bm-pip { fill: rgba(0,0,0,.55); stroke: #fff; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.bm-pip.on { fill: var(--bad); }
+.bm-sel { flex-direction: column; align-items: flex-start; }
+.bm-tracks { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.bm-stats { flex-basis: 100%; color: var(--muted); }
+.bm-track { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; }
+.bm-boxes { display: inline-flex; gap: 4px; }
+.bm-box { width: 22px; height: 22px; padding: 0; border: 2px solid var(--line); border-radius: 4px; background: none; cursor: pointer; }
+.bm-box.on { background: var(--bad); border-color: var(--bad); }
+.bm-sel > label, .bm-sel .bm-tracks label { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; }
 .gm-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 @media (max-width: 900px) { .gm-tools { grid-template-columns: minmax(0, 1fr); } }
 .seed { margin: 0; display: grid; gap: 8px; }
@@ -2432,8 +2442,24 @@ tr.lvl-U td.target { color: var(--muted); }
   // The battle map: the GM's characters as tokens (portrait, group color, down or Dying), one hex a yard.
   const battleMap = mountBattleMap({ root: $("battlemap"), key: PACK.id, esc, toast: gmSay, yardsPerHex: 1,
     bands: [["Close", 10], ["Short", 50], ["Medium", 150], ["Long", 500], ["Extreme", 1760]],
-    crew: () => gmCrew.map((c) => ({ id: c.id, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
-      color: `var(${(PACK.groups.find((g) => g.id === gmCalc(c).div) || PACK.groups[0]).color})` })) });
+    pointName: T.point, stunName: T.stun,
+    // The setting's threats: its data where it has them, otherwise the Players' Guide's Threats table.
+    threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge,
+      attacks: (x.attacks || []).map((a) => `${a.skill} ${a.target}`).join(", "), trait: x.trait ? `${x.trait}: ${x.traitText || ""}`.replace(/: $/, "") : "" })),
+    crew: () => gmCrew.map((c) => { const k = gmCalc(c);
+      return { id: c.id, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
+        color: `var(${(PACK.groups.find((g) => g.id === k.div) || PACK.groups[0]).color})`,
+        injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty,
+        ptrack: PTRACK ? { name: PTRACK.name, max: PTRACK.boxes, value: c.play.ptrack || 0 } : null,
+        stats: [`Dodge ${k.dodge}`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
+    // A change made on the map is the GM's copy of the character, the same as a change on their card.
+    setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
+      if ("injury" in patch) { c.play.injury = Math.max(0, Math.min(3, patch.injury)); if (c.play.injury < 3 && !gritty) c.play.dying = false; }
+      if ("dying" in patch) c.play.dying = !!patch.dying;
+      if ("stunned" in patch) c.play.stunned = !!patch.stunned;
+      if ("points" in patch) c.play.duty = Math.max(0, patch.points);
+      if ("ptrack" in patch && PTRACK) c.play.ptrack = Math.max(0, Math.min(PTRACK.boxes, patch.ptrack));
+      saveGM(); renderGM(); } });
   const saveGM = () => { if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true); };
   // Work out a crew member's numbers with the same rules as the sheet, by briefly treating them as the current character.
   function gmCalc(c) {
