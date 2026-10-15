@@ -258,6 +258,14 @@ def gen(name, pack, t):
             f"- **{t['point']}.** Spend {'an' if t['point'][0].lower() in 'aeiou' else 'a'} {t['point']} point to **downgrade** a grievous wound one step: {downs}.",
             "- **A limb for a life.** Once a fight, a character who would be left Dying or killed can **lose a limb, or the use of one**, instead. They live, Incapacitated but stable, and the limb becomes a complication. It replaces any grievous wound from the same hit.",
             "- **Healing.** Grievous wounds heal on their own clock, whatever the boxes say. A lost limb, a lost eye or a disfigurement never heals.", ""])
+    if name == "battlemap":
+        rt = p.get("rangeTrack")
+        if not rt:
+            return ""
+        bands = ", ".join(f"{b[0]} ({b[1]})" for b in rt["bands"])
+        return "\n".join(["", f"**{rt['title']}.** In this setting the range track is for {rt['title'].lower()}s, with the bands {bands}. "
+            f"**Add {rt['us'][0].lower() + rt['us'][1:]}** places a token linked to the crew's {rt['vehicleTrack']} track, so damage marked on the map is marked on the sheet. "
+            f"Enemy ships come from the {rt['threats']} table with their {rt['vehicleTrack']} boxes. {rt.get('note', '')}".rstrip(), ""])
     if name == "extra-edges":
         return "\n".join(f"| {e[1]} | {e[2]} | {e[3]} |" for e in p.get("extraEdges", []))
     if name == "statuses":
@@ -479,7 +487,7 @@ def core_rules(docx=False):
     core = (ENGINE / "core.md").read_text()
     core = core.replace("{{PACK:intro}}", "Legend Dynamics is a roleplaying system for heroic stories in any genre: concrete skills, a 3d6 roll-under core, and a small pool of Legend points that reward characters for their flaws. These core rules are setting-neutral. A **setting pack** supplies the roles, origins, skills, gear, weapons, tracks and dangers of one genre, and renames a few terms to suit it.")
     # Neutral stand-ins for the pack-specific parts of "Making your own".
-    core = core.replace("{{GEN:extra-edges}}\n", "").replace("{{GEN:gritty}}", "")
+    core = core.replace("{{GEN:extra-edges}}\n", "").replace("{{GEN:gritty}}", "").replace("{{GEN:battlemap}}", "")
     core = core.replace("{{GEN:magic}}", magic_chapter({}))
     core = core.replace("{{PACK:customrole}}", '"Smuggler: knows every back door, bribe and hidden hold."')
     core = core.replace("{{GEN:group-names}}", "one of your setting's groups")

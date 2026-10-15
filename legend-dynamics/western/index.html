@@ -428,6 +428,11 @@ tr.lvl-U td.target { color: var(--muted); }
 .bm-lane.us { fill: rgba(61,122,158,.12); }
 .bm-lname { fill: var(--fg); text-anchor: middle; font-weight: 700; font-size: 20px; paint-order: stroke; stroke: var(--well); stroke-width: 3px; }
 .bm-lsub { fill: var(--muted); text-anchor: middle; font-size: 13px; paint-order: stroke; stroke: var(--well); stroke-width: 3px; }
+.bm-help { border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; }
+.bm-help summary { cursor: pointer; font-weight: 600; }
+.bm-helpbody h4 { margin: 12px 0 4px; font-size: .95rem; }
+.bm-helpbody ul { margin: 0; padding-left: 1.2em; }
+.bm-helpbody li { margin: 2px 0; }
 .gm-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 @media (max-width: 900px) { .gm-tools { grid-template-columns: minmax(0, 1fr); } }
 .seed { margin: 0; display: grid; gap: 8px; }
@@ -869,7 +874,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <div class="card hud no-print bm-card">
       <h3>Battle map</h3>
-      <p class="small muted">A hex map for the fight: add a background picture, place the posse and anyone else, and drag tokens from hex to hex. Moving a token or using Measure shows the distance and range band. The map stays in this browser; save it to a file to keep it or send it to another GM.</p>
+      <p class="small muted">A hex map at any scale, or a range track of bands, for the fight. Tokens for the posse stay linked to the characters, so you can mark injuries and points from the map. Open <b>How to use the map</b> for the steps.</p>
       <div id="battlemap"></div>
     </div>
     <div class="gm-tools">
@@ -2233,6 +2238,15 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Empty means it won’t work.</strong> Reload (one action): refills it from a spare. Restock in town: refills it fully between jobs. Packing a spare is a good use of a Grit point’s small preparation.</li>
 <li><strong>Jams.</strong> A natural 18 with this weapon also jams it: clearing it takes an action.</li>
 </ul>
+<h2 id="g-the-battle-map">The battle map</h2>
+<p>The GM view of the character creator has a <strong>battle map</strong> for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in this chapter, and a fight without it works the same way. Open <strong>How to use the map</strong> on the map itself for the buttons, step by step.</p>
+<p><strong>Two kinds of map.</strong></p>
+<ul>
+<li><strong>A hex map</strong> for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a room, 5 or 10 yards for a street, 50 for open ground. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range table above.</li>
+<li><strong>A range track</strong> for fights where only distance matters: a chase, a running fight across open country. It has a lane for the party and one for each range band. Moving a token into the next lane moves it one band in or out.</li>
+</ul>
+<p><strong>Tokens.</strong> The GM places the party with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, the stunned condition or a Grit point on a token marks it on the character, and the other way round. Opponents come from the setting’s threats with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
+<p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
 <h1 id="g-medical-care">Medical care</h1>
 <p>Frontier medicine has chloroform, carbolic acid, laudanum and steady hands, and not much else. Infection kills more men than bullets do, and no doctor’s bag holds a cure for a bite from something that should be dead. See <em>Bites and curses</em> below.</p>
 <h2 id="g-diagnosis-and-stabilization">Diagnosis and stabilization</h2>
@@ -7286,9 +7300,47 @@ function mountBattleMap(api) {
   const posOf = (t) => (isRange() ? { x: laneX(t.lane || 0), y: t.y || HEAD + 50 } : toPx(t.q, t.r));
   const radOf = (t) => (isRange() ? 28 : st.size * 0.8) * (1 + (isRange() ? 0.45 : 1.19) * ((t.tsize || 1) - 1));
 
+  // ---- the help: how to use the map, written for this setting (its point name, its units, its ship) ----
+  function helpHtml() {
+    const pt = esc(api.pointName || "Legend"), km = !!UNITS.km, veh = !!RT.vehicleTrack, rt = esc(RT.title), us = esc(RT.us);
+    const sec = (h, items) => `<h4>${h}<\/h4><ul>${items.filter(Boolean).map((x) => `<li>${x}<\/li>`).join("")}<\/ul>`;
+    return `<div class="bm-helpbody small">
+      <p>Add characters to the GM view first: the map's tokens for the party come from there. The map is kept in this browser; save it to a file to keep a copy.<\/p>
+      ${sec("1. Choose the kind of map", [
+        `<b>Hex map<\/b> for a fight where position matters: who is behind cover, who can reach the door.`,
+        `<b>${rt}<\/b> for a fight where only distance matters: ${veh ? "ships closing or opening the range, " : ""}a chase, a running fight across open country. Each lane is a range band from ${veh ? "your ship" : "the party"}.`,
+        `The two keep their own tokens and pictures, so you can set up both and switch between them.`])}
+      ${sec("2. Set up the hex map", [
+        `<b>Background image…<\/b> puts a picture under the grid: a battle map, a sketch, a photo of a street. A new picture is covered with hexes at the current hex size.`,
+        `Open <b>Scale, grid and map<\/b> and set <b>One hex is<\/b> to what a hex means: 1 yard for a brawl in a room, 5 or 10 for a street, 50 for open ground${km ? ", or a number of km for a fight in space" : ""}. Distances and range bands follow the scale.`,
+        `If the picture has its own grid, set <b>Hex size on screen<\/b> until the hexes match it, choose pointy or flat tops, then use <b>Shift right<\/b> and <b>Shift down<\/b> to line them up. <b>Fit the grid to the picture<\/b> starts over at the top-left corner.`,
+        `Turn <b>Show grid<\/b> off, or lower its strength, when the picture has a grid of its own.`])}
+      ${sec("3. Place tokens", [
+        `<b>Add the posse<\/b> places every character in the GM view${veh ? "" : ", in the middle of the map"}. Their tokens show their portrait (or initials) and group color, and stay linked to the character.`,
+        veh ? `<b>Add ${us.replace(/^Our /, "our ")}<\/b> places your ship, linked to the crew's ${esc(RT.vehicleTrack)} track.` : "",
+        `<b>Add a token<\/b> opens a small form. Pick from <b>From the threats<\/b> to fill in the name, boxes and the threat's numbers${veh ? " (enemy ships are listed with the people)" : ""}, or leave it on <i>None<\/i> for a plain token. Names with a number count up, so pressing <b>Place it<\/b> again adds the next one.`,
+        `Give a token a <b>color<\/b>, a <b>size<\/b> (Large or Huge for a horse, a monster, a ship) and, if you like, an <b>image<\/b>.`])}
+      ${sec("4. Move, measure and look", [
+        `Drag a token to move it. While you drag, the corner shows how far it went and the range band${veh ? "; on the " + rt + ", which band it moved into" : ""}.`,
+        `<b>Measure<\/b> (hex map only): drag from one hex to another to read the distance. Press it again to go back to moving.`,
+        `Drag the empty map to pan. Scroll, pinch, or use <b>−<\/b>, <b>+<\/b> and <b>Fit<\/b> to zoom.`,
+        `From the keyboard: Tab to a token, Enter selects it, Delete removes it.`])}
+      ${sec("5. Track the fight from a token", [
+        `Click a token to open its panel underneath the map.`,
+        `<b>A party token<\/b> shows the character's Injury boxes, Dying, the stunned condition, ${pt} points and any personal track. Changes there change the character in the GM view, and the other way round.`,
+        veh ? `<b>Your ship<\/b> shows the ${esc(RT.vehicleTrack)} boxes and what the damage does; they are the crew's track, the same as on the sheet.` : "",
+        `<b>Any other token<\/b> keeps its own boxes, shown as pips above it. When they are all marked it is taken out${veh ? " (or destroyed, for a ship)" : ""} and fades.`,
+        `<b>Copy<\/b> makes another of the same, <b>Remove<\/b> takes it off the map, <b>Done<\/b> closes the panel.`])}
+      ${sec("6. Keep the map", [
+        `The map, its tokens and its pictures are kept in this browser for this setting, until you clear them.`,
+        `<b>Save map to file<\/b> keeps everything (both maps, their pictures and tokens) in one file; <b>Open a map file…<\/b> brings it back here or on another computer. Use it to prepare fights ahead of time or send one to another GM.`,
+        `<b>Remove the image<\/b> and <b>Remove all tokens<\/b> clear the map you are looking at.`])}
+    <\/div>`;
+  }
   // ---- markup ----
   const hasVehicle = () => !!(RT.vehicleTrack && api.groupTracks && api.groupTracks().some((x) => x.name === RT.vehicleTrack));
   api.root.innerHTML = `
+    <details class="bm-help"><summary>How to use the map<\/summary>${helpHtml()}<\/details>
     <div class="bm-bar bm-kinds" role="group" aria-label="Kind of map">
       <button class="btn" data-bm="kind" data-kind="hex">Hex map<\/button><button class="btn" data-bm="kind" data-kind="range">${esc(RT.title)}<\/button>
       <span class="small muted bm-kindnote"><\/span>

@@ -426,6 +426,11 @@ tr.lvl-U td.target { color: var(--muted); }
 .bm-lane.us { fill: rgba(61,122,158,.12); }
 .bm-lname { fill: var(--fg); text-anchor: middle; font-weight: 700; font-size: 20px; paint-order: stroke; stroke: var(--well); stroke-width: 3px; }
 .bm-lsub { fill: var(--muted); text-anchor: middle; font-size: 13px; paint-order: stroke; stroke: var(--well); stroke-width: 3px; }
+.bm-help { border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; }
+.bm-help summary { cursor: pointer; font-weight: 600; }
+.bm-helpbody h4 { margin: 12px 0 4px; font-size: .95rem; }
+.bm-helpbody ul { margin: 0; padding-left: 1.2em; }
+.bm-helpbody li { margin: 2px 0; }
 .gm-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 @media (max-width: 900px) { .gm-tools { grid-template-columns: minmax(0, 1fr); } }
 .seed { margin: 0; display: grid; gap: 8px; }
@@ -867,7 +872,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <div class="card hud no-print bm-card">
       <h3>Battle map</h3>
-      <p class="small muted">A hex map for the fight: add a background picture, place the posse and anyone else, and drag tokens from hex to hex. Moving a token or using Measure shows the distance and range band. The map stays in this browser; save it to a file to keep it or send it to another GM.</p>
+      <p class="small muted">A hex map at any scale, or a range track of bands, for the fight. Tokens for the posse stay linked to the characters, so you can mark injuries and points from the map. Open <b>How to use the map</b> for the steps.</p>
       <div id="battlemap"></div>
     </div>
     <div class="gm-tools">
