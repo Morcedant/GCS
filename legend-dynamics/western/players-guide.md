@@ -641,7 +641,7 @@ Roll 3d6 on each table and read the total, or pick what you like. Middle results
 | 3d6 | Job | Place | The darkness |
 |---|---|---|---|
 | 3 | A whole town gone overnight | A town that isn't on any map | Something older than any of them, waking |
-| 4 | A dead man hires you | A sanitarium in the hills | A hunter turned monster |
+| 4 | A dead man hires you | A sanitarium in the hills | A wraith feeding on a boarding house |
 | 5 | A body found drained of blood | A silver boomtown | A werewolf that has acquired the taste |
 | 6 | A stagecoach that never arrived | A logging camp in the deep woods | A vampire who owns the town |
 | 7 | Livestock torn apart in the night | A river steamboat | The dead rising from a flooded graveyard |
@@ -650,7 +650,7 @@ Roll 3d6 on each table and read the total, or pick what you like. Middle results
 | 10 | A bounty on a man who died last year | A ghost town | Ghouls in the mine |
 | 11 | Travelers vanishing on the trail | A burned mission church | A demon summoned by a desperate man |
 | 12 | A traveling medicine show | A saloon and gambling hall | A wendigo stalking a snowbound camp |
-| 13 | A new preacher packs the church | A frontier fort | A revenant gunslinger |
+| 13 | A new preacher packs the church | A frontier fort | A headless rider on the stage road |
 | 14 | A town where no one sleeps | A fog-bound waterfront | A hellhound on someone's trail |
 | 15 | A hanging that went wrong | A canyon cemetery | A cult in the church cellar |
 | 16 | A monster asks for help | A snowbound mountain pass | A skinwalker wearing a neighbor's face |
@@ -666,7 +666,7 @@ Roll 3d6 on each table and read the total, or pick what you like. Middle results
 | 7 | Two monsters are at war | The full moon rises (4) | A traveling doctor |
 | 8 | The client lied about everything | The next victim (6) | A Pinkerton detective |
 | 9 | A rich man pays for silence | The dead finish rising (6) | A railroad baron |
-| 10 | A character's complication comes into play | The river floods (8) | A frightened homesteader family |
+| 10 | A banshee keens for one of the characters | The river floods (8) | A frightened homesteader family |
 | 11 | The monster is protecting its family | The trail goes cold (4) | A werewolf trying to stay human |
 | 12 | Someone is using the monster | The hanging at dawn (4) | A child who saw it happen |
 | 13 | The town wants a hanging, any hanging | The ritual completes (6) | A preacher with a past |
