@@ -142,6 +142,36 @@
    ]
   },
   {
+   "name": "Lawyer",
+   "group": "law",
+   "text": "Lawyer: knows the law better than the men who wear the badges, and isn't afraid to say so.",
+   "skills": [
+    "Brawling",
+    "Athletics",
+    "Deception",
+    "Law"
+   ],
+   "ability": [
+    "Due process",
+    "Once per job, get someone out of jail, a warrant issued or quashed, or a deed or contract into your hands, wherever there's law to work."
+   ]
+  },
+  {
+   "name": "Circuit Judge",
+   "group": "law",
+   "text": "Circuit judge: rides from town to town holding court, and not every town wants one.",
+   "skills": [
+    "Brawling",
+    "Survival",
+    "Leadership",
+    "Law"
+   ],
+   "ability": [
+    "Heard it all before",
+    "+2 to Read People to catch a lie told to your face."
+   ]
+  },
+  {
    "name": "Doctor",
    "group": "learned",
    "text": "Doctor: digs out bullets, sets bones, and reads what a body says about how it died.",
@@ -169,21 +199,6 @@
    "ability": [
     "Forbidden lore",
     "Once per job, ask the GM one question about a supernatural thing you've seen, and get a true answer."
-   ]
-  },
-  {
-   "name": "Lawyer",
-   "group": "learned",
-   "text": "Lawyer: knows the law better than the men who wear the badges, and isn't afraid to say so.",
-   "skills": [
-    "Brawling",
-    "Athletics",
-    "Deception",
-    "Law"
-   ],
-   "ability": [
-    "Due process",
-    "Once per job, get someone out of jail, a warrant issued or quashed, or a deed or contract into your hands, wherever there's law to work."
    ]
   },
   {
@@ -310,6 +325,21 @@
    "ability": [
     "Ask the body",
     "Once per job, examine a corpse and learn how and when it died, and one thing about who did it."
+   ]
+  },
+  {
+   "name": "Shotgun Messenger",
+   "group": "frontier",
+   "text": "Shotgun messenger: rides beside the driver guarding the mail, the strongbox and the passengers.",
+   "skills": [
+    "Shooting",
+    "Animal Handling",
+    "Persuasion",
+    "Survival"
+   ],
+   "ability": [
+    "Riding shotgun",
+    "Once per fight, when someone next to you is hit, you take the hit instead."
    ]
   }
  ],
@@ -3298,7 +3328,7 @@
    "Leadership"
   ],
   "max": {
-   "Shooting": 6
+   "Shooting": 7
   },
   "maxOther": 4
  }
