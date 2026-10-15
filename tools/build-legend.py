@@ -267,6 +267,9 @@ def gen(name, pack, t):
         return ", ".join(names[:-1]) + " or " + names[-1]
     if name == "roles":
         g = {x["id"]: x["name"] for x in p["groups"]}
+        if any(r.get("ability") for r in p["roles"]):
+            return table([t["role"], "Group", "Typical contribution", "Core skills", "Ability"], [[r["name"], g[r["group"]], r["text"].split(": ", 1)[-1], ", ".join(r.get("skills", [])),
+                         f"**{r['ability'][0]}.** {r['ability'][1]}" if r.get("ability") else "—"] for r in p["roles"]])
         return table([t["role"], "Group", "Typical contribution", "Core skills"], [[r["name"], g[r["group"]], r["text"].split(": ", 1)[-1], ", ".join(r.get("skills", []))] for r in p["roles"]])
     if name == "origin-tiers":
         e = p.get("edgePoints", 3)
@@ -394,9 +397,30 @@ def quickref(pack, t):
 HANDOUTS = []  # (game info, folder) for each pack built; the handouts are written after the bot code, which they carry.
 
 
+def check_calling_recipe(pack):
+    """A setting with a calling recipe: every calling has four core skills, one fighting, one trail and one people
+    skill plus a signature skill, and every skill is core for at least one calling and no more than the cap."""
+    rec = pack.get("callingRecipe")
+    if not rec:
+        return
+    names = [s[0] for s in pack["skills"]]
+    use = {n: 0 for n in names}
+    for r in pack["roles"]:
+        sk = r.get("skills", [])
+        assert len(sk) == 4 and len(set(sk)) == 4 and set(sk) <= set(names), (r["name"], sk)
+        for g in ("fight", "trail", "people"):
+            assert sk[["fight", "trail", "people"].index(g)] in rec[g], (r["name"], g, sk)
+        assert r.get("ability") and len(r["ability"]) == 2, (r["name"], "needs an ability")
+        for s in sk:
+            use[s] += 1
+    for n, k in use.items():
+        assert 1 <= k <= rec.get("max", {}).get(n, rec.get("maxOther", 4)), (n, "is core for", k, "callings")
+
+
 def build(pid, docx):
     pdir = LD / "packs" / pid
     pack = json.loads((pdir / "pack.json").read_text())
+    check_calling_recipe(pack)
     t = terms_of(pack)
     sections = pack_sections((pdir / "setting.md").read_text())
     md = guide_md(pack, t, sections)

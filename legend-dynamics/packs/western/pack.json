@@ -117,9 +117,13 @@
    "text": "Lawman: wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority.",
    "skills": [
     "Shooting",
-    "Investigation",
-    "Read People",
-    "Riding"
+    "Riding",
+    "Leadership",
+    "Law"
+   ],
+   "ability": [
+    "The badge",
+    "+2 to Leadership when you give orders in the law's name: an arrest, raising a posse, clearing a street."
    ]
   },
   {
@@ -127,10 +131,14 @@
    "group": "law",
    "text": "Bounty hunter: tracks wanted men across three territories and brings them in, upright or across a saddle.",
    "skills": [
-    "Tracking",
     "Shooting",
-    "Riding",
-    "Survival"
+    "Tracking",
+    "Read People",
+    "Investigation"
+   ],
+   "ability": [
+    "Paper on them",
+    "+2 to Tracking and Investigation to find someone with a price on their head or a warrant out."
    ]
   },
   {
@@ -138,10 +146,14 @@
    "group": "learned",
    "text": "Doctor: digs out bullets, sets bones, and reads what a body says about how it died.",
    "skills": [
-    "Medicine",
-    "Investigation",
-    "Read People",
-    "Persuasion"
+    "Shooting",
+    "Riding",
+    "Persuasion",
+    "Medicine"
+   ],
+   "ability": [
+    "Steady hands",
+    "+2 to Medicine when stabilizing the Dying or working under fire."
    ]
   },
   {
@@ -149,10 +161,14 @@
    "group": "learned",
    "text": "Occultist: knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears.",
    "skills": [
-    "Occult",
-    "Investigation",
-    "Persuasion",
-    "Read People"
+    "Melee",
+    "Stealth",
+    "Deception",
+    "Occult"
+   ],
+   "ability": [
+    "Forbidden lore",
+    "Once per job, ask the GM one question about a supernatural thing you've seen, and get a true answer."
    ]
   },
   {
@@ -160,10 +176,14 @@
    "group": "learned",
    "text": "Lawyer: knows the law better than the men who wear the badges, and isn't afraid to say so.",
    "skills": [
-    "Law",
-    "Persuasion",
-    "Read People",
-    "Investigation"
+    "Brawling",
+    "Athletics",
+    "Deception",
+    "Law"
+   ],
+   "ability": [
+    "Due process",
+    "Once per job, get someone out of jail, a warrant issued or quashed, or a deed or contract into your hands, wherever there's law to work."
    ]
   },
   {
@@ -171,10 +191,14 @@
    "group": "learned",
    "text": "Journalist: asks the questions no one wants asked, and prints the answers.",
    "skills": [
-    "Investigation",
-    "Persuasion",
+    "Brawling",
+    "Stealth",
     "Read People",
-    "Stealth"
+    "Investigation"
+   ],
+   "ability": [
+    "The press",
+    "Once per job, print a story; the town believes it until someone proves it false."
    ]
   },
   {
@@ -182,10 +206,14 @@
    "group": "learned",
    "text": "Preacher: comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun.",
    "skills": [
-    "Persuasion",
+    "Shooting",
+    "Riding",
     "Leadership",
-    "Occult",
-    "Shooting"
+    "Occult"
+   ],
+   "ability": [
+    "Hold fast",
+    "+2 to Will against fear, possession and temptation, and to Leadership to steady others against them."
    ]
   },
   {
@@ -193,10 +221,14 @@
    "group": "frontier",
    "text": "Monster hunter: hunts what the law can't hang, and knows which things fear silver, salt or fire (take the Monster Hunter advantage).",
    "skills": [
-    "Occult",
+    "Melee",
     "Tracking",
-    "Shooting",
-    "Melee"
+    "Read People",
+    "Occult"
+   ],
+   "ability": [
+    "Know its weakness",
+    "Once you've identified a creature with an Occult roll, your called shots against it take no penalty."
    ]
   },
   {
@@ -205,9 +237,13 @@
    "text": "Gunslinger: the fastest and steadiest gun in the room, and the one who decides when it's time to draw.",
    "skills": [
     "Shooting",
-    "Athletics",
+    "Riding",
     "Read People",
-    "Riding"
+    "Athletics"
+   ],
+   "ability": [
+    "Quick draw",
+    "In the first round of a gunfight, you act first, whatever your Agility."
    ]
   },
   {
@@ -215,10 +251,14 @@
    "group": "frontier",
    "text": "Scout: finds the trail, reads the land, and keeps everyone alive out in it.",
    "skills": [
+    "Melee",
     "Tracking",
-    "Survival",
-    "Riding",
-    "Stealth"
+    "Persuasion",
+    "Survival"
+   ],
+   "ability": [
+    "Lay of the land",
+    "Once per job, you know a way: a hidden pass, a water hole, a shortcut that saves a day, or a place to make a stand."
    ]
   },
   {
@@ -226,10 +266,14 @@
    "group": "frontier",
    "text": "Gambler: reads people, bluffs, and hears everything the saloon hears.",
    "skills": [
-    "Gambling",
-    "Read People",
+    "Shooting",
+    "Stealth",
     "Deception",
-    "Shooting"
+    "Gambling"
+   ],
+   "ability": [
+    "Markers",
+    "Once per job, call in a debt: someone owes you a favor, a horse, a room or the truth."
    ]
   },
   {
@@ -237,10 +281,14 @@
    "group": "frontier",
    "text": "Wrangler: breaks horses, drives cattle, and can ride anything with four legs.",
    "skills": [
+    "Brawling",
     "Animal Handling",
-    "Riding",
-    "Survival",
-    "Brawling"
+    "Leadership",
+    "Tinkering"
+   ],
+   "ability": [
+    "Horse sense",
+    "+2 to Animal Handling, and to Riding to stay in the saddle in a stampede, a chase or a fall."
    ]
   },
   {
@@ -248,10 +296,14 @@
    "group": "frontier",
    "text": "Undertaker: buries the dead, and makes sure they stay buried.",
    "skills": [
-    "Occult",
-    "Medicine",
-    "Investigation",
-    "Melee"
+    "Melee",
+    "Stealth",
+    "Persuasion",
+    "Medicine"
+   ],
+   "ability": [
+    "Ask the body",
+    "Once per job, examine a corpse and learn how and when it died, and one thing about who did it."
    ]
   }
  ],
@@ -3218,5 +3270,30 @@
   "Marshal": "Lawman",
   "Deputy": "Lawman",
   "Detective": "Lawman"
+ },
+ "callingRecipe": {
+  "fight": [
+   "Shooting",
+   "Melee",
+   "Brawling"
+  ],
+  "trail": [
+   "Riding",
+   "Tracking",
+   "Survival",
+   "Animal Handling",
+   "Athletics",
+   "Stealth"
+  ],
+  "people": [
+   "Persuasion",
+   "Read People",
+   "Deception",
+   "Leadership"
+  ],
+  "max": {
+   "Shooting": 6
+  },
+  "maxOther": 4
  }
 }

@@ -1030,6 +1030,9 @@ tr.lvl-U td.target { color: var(--muted); }
   const ROLE_SUGGESTIONS = Object.fromEntries(PACK.roles.map((r) => [r.name, r.text]));
   // Core skills for each role: marked Trained when the role is picked.
   const ROLE_SKILLS = Object.fromEntries(PACK.roles.map((r) => [r.name, r.skills || []]));
+  // A calling's own ability (some settings): [name, text]. A custom calling has none.
+  const ROLE_ABILITY = Object.fromEntries(PACK.roles.filter((r) => r.ability).map((r) => [r.name, r.ability]));
+  const roleAbility = (c = ch) => (c.customRole ? null : ROLE_ABILITY[c.dept] || null);
   const EMBLEMS = Object.fromEntries(PACK.groups.map((g) => [g.id, { d: g.emblem, stroke: !!g.stroke }]));
   const DELTA_SVG = `<svg class="delta" viewBox="0 0 100 100" aria-hidden="true"><circle class="outer" cx="50" cy="50" r="47"/><circle class="ring" cx="50" cy="50" r="40"/><path class="emblem" data-emblem d=""/></svg>`;
   // A badge drawn with its group's emblem already in place (for the sheet and GM cards).
@@ -1523,7 +1526,9 @@ tr.lvl-U td.target { color: var(--muted); }
       if (moved && k >= 0) { ch.powerBoost[k] = Math.min(edgeN("power"), Math.max(ch.powerBoost[k] || 0, 1)); save(); } }
     $("custom-role-wrap").hidden = $("custom-group-wrap").hidden = !ch.customRole;
     if (ch.customRole) { if ($("f-customrole").value !== ch.dept) $("f-customrole").value = ch.dept; $("f-customgroup").value = ch.customGroup || PACK.groups[0].id; }
-    $("role-skills").textContent = (ROLE_SKILLS[ch.dept] || []).length ? `Core skills: ${ROLE_SKILLS[ch.dept].join(", ")} (marked Trained for you)` : "";
+    const ra = roleAbility();
+    $("role-skills").innerHTML = ((ROLE_SKILLS[ch.dept] || []).length && !ch.customRole ? `Core skills: ${esc(ROLE_SKILLS[ch.dept].join(", "))} (marked Trained for you)` : "")
+      + (ra ? `<br><b>${esc(ra[0])}.</b> ${esc(ra[1])}` : "");
     $("app").dataset.div = division();
     $("hdr-name").textContent = ch.name.trim() || "Unnamed character";
     const shapeCls = ch.portraitShape === "portrait" ? "portrait" : "";
@@ -1754,6 +1759,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ch.reason ? `<div class="field"><span class="label">${T.reasonSheet}</span><span>${esc(ch.reason)}</span></div>` : ""}
         ${ch.speciesNotes ? `<div class="field"><span class="label">Other ability (GM approved)</span><span>${esc(ch.speciesNotes)}</span></div>` : ""}
         ${ch.notes ? `<div class="field wide"><span class="label">Notes</span><span>${esc(ch.notes)}</span></div>` : ""}
+        ${roleAbility() ? `<div class="field wide"><span class="label">${esc(T.role)} ability</span><span><b>${esc(roleAbility()[0])}.</b> ${esc(roleAbility()[1])}</span></div>` : ""}
         ${ch.play.lasting.length ? `<div class="field wide"><span class="label">Lasting wounds</span><span>${ch.play.lasting.map((w) => `${esc(w.name)}${w.complication ? " (complication)" : w.heal ? ` (${esc(w.heal)})` : ""}`).join("; ")}</span></div>` : ""}
         ${ch.xp.earned || ch.advances.length ? `<div class="field wide"><span class="label">Advancement: ${pointsAvail()} point${pointsAvail() === 1 ? "" : "s"} to spend, ${ch.xp.earned} earned</span><span>${ch.advances.map((a) => `${esc(purchaseText(a))}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ") || "Nothing bought yet."}</span></div>` : ""}
       </div>`;
