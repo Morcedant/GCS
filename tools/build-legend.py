@@ -22,7 +22,7 @@ LEVEL_MOD = {"U": -4, "T": 1, "S": 3}
 
 DEFAULT_TERMS = {
     "title": "Legend Dynamics", "eyebrow": "Legend Dynamics RPG system", "prepareTitle": "Prepare", "titlePlaceholder": "e.g. Captain", "guideTitle": "Legend Dynamics Core Rules",
-    "guideSubtitle": "The setting-neutral rules of the Legend Dynamics RPG system", "point": "Legend",
+    "guideSubtitle": "The setting-neutral rules of the Legend Dynamics RPG system", "point": "Legend", "party": "party",
     "role": "Role", "roleLower": "role", "origin": "Origin", "originLower": "origin", "originPlural": "Origins",
     "pathRounded": "Generalist", "pathExpert": "Specialist", "pathExpertPlural": "Specialists",
     "reasonLabel": "Why you do what you do", "reasonSheet": "Why I do it", "gear": "Gear", "gearLower": "gear",

@@ -62,7 +62,8 @@
   "meleeSkill": "Melee",
   "unarmedSkill": "Brawling",
   "chaseSkill": "Piloting",
-  "fontsHref": "https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Saira+Extra+Condensed:wght@700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
+  "fontsHref": "https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Saira+Extra+Condensed:wght@700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap",
+  "party": "team"
  },
  "theme": {
   "comment": "An ExLAW case terminal at night: blue-black glass, federal-blue rules, hazard-amber highlights, and the green of the 1938 auroras drifting up behind it.",
