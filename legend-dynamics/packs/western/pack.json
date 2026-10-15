@@ -3352,5 +3352,52 @@
   "nonFighters": [
    "Politician"
   ]
- }
+ },
+ "rangeTracks": [
+  {},
+  {
+   "id": "stagecoach",
+   "title": "Stagecoach chase",
+   "us": "The stagecoach",
+   "startLane": 3,
+   "help": "for a chase on the road: the coach and everyone aboard against riders closing in. The coach has the first lane; each rider stands in a range band from it.",
+   "bands": [
+    [
+     "Close",
+     "alongside: board or grapple"
+    ],
+    [
+     "Short",
+     "up to 50 yd"
+    ],
+    [
+     "Medium",
+     "up to 150 yd"
+    ],
+    [
+     "Long",
+     "up to 500 yd"
+    ],
+    [
+     "Extreme",
+     "one band more and they're lost"
+    ]
+   ],
+   "note": "Each exchange the driver rolls Riding against each rider's Riding (11 for a threat without it). The winner moves that rider one lane: in if the rider won, out if the driver did; a tie stays put. A rider pushed past Extreme drops out. Shooting from the box, the roof or the saddle is at −2.",
+   "vehicle": {
+    "name": "The stagecoach",
+    "boxes": 4,
+    "label": "Coach",
+    "downText": "Wrecked",
+    "color": "#8a5a2b",
+    "effects": [
+     "Rolling: no damage",
+     "Holed: splinters and bullet holes; no penalty yet",
+     "A horse hit or a wheel cracked: −2 to the driver's Riding",
+     "Lamed: −4 to the driver's Riding, and riders close on a tie",
+     "Wrecked: the coach overturns or stops dead; everyone aboard rolls Athletics or marks a box of Injury"
+    ]
+   }
+  }
+ ]
 }
