@@ -294,6 +294,13 @@ p, li, .sqs-html-content p, .sqs-html-content li {
   .ld-game:hover, .ld-button:hover { transform: none; }
 }
 
+/* ---------- Why Legend Dynamics (the intro page) ---------- */
+.ld-why { margin: 0; }
+.ld-why p { margin: 0 0 1.2rem; }
+.ld-why p:first-child { font-size: clamp(1.15rem, 2.2vw, 1.3rem); color: var(--ld-ink); }
+.ld-why .ld-why-sign { font-family: var(--ld-display); font-style: italic; color: var(--ld-ink-2); margin-top: 1.8rem; }
+.ld-why .ld-why-sign::before { content: "— "; }
+
 /* preview only: a stand-in for Squarespace's page frame */
 body { margin: 0; }
 .pv-bar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 16px; background: var(--ld-header-bg); }
@@ -304,7 +311,7 @@ body { margin: 0; }
 .page-section .section-background { position: absolute; inset: 0; z-index: -1; }
 .content { max-width: 72rem; margin: 0 auto; padding: 0 16px 4rem; display: grid; gap: 3rem; }
 </style></head>
-<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Trails of Blood &amp; Dust</button><button data-p="spaceopera" data-c="ld-spaceopera">Fracture Lines</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="aurora" data-c="ld-aurora">Aurora</button><button data-p="rules" data-c="">Core rules</button><button data-p="discord" data-c="">Discord</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Trails of Blood &amp; Dust</button><button data-p="spaceopera" data-c="ld-spaceopera">Fracture Lines</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="aurora" data-c="ld-aurora">Aurora</button><button data-p="rules" data-c="">Core rules</button><button data-p="discord" data-c="">Discord</button><button data-p="why" data-c="">Why Legend Dynamics</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
 <div class="ld ld-hero">
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Heroes are made of skill, nerve and a little luck.</h1>
@@ -313,6 +320,7 @@ body { margin: 0; }
   <div class="ld-actions">
     <a class="ld-button" href="#games">Choose a game</a>
     <a class="ld-button ld-button--ghost" href="/core-rules">Read the core rules</a>
+    <a class="ld-button ld-button--ghost" href="/why-legend-dynamics">Why I made it</a>
   </div>
 </div>
 
@@ -1634,6 +1642,27 @@ appropriate credit to the author.</p>
 <table><thead><tr><th>Setting</th><th>Choose it with</th><th>Points</th><th>Shared tracks</th><th><code>/seed</code> tables</th><th>Example ticking clocks</th></tr></thead>
 <tbody><tr><td><a href="/trails-of-blood-and-dust"><strong>Trails of Blood &amp; Dust</strong></a></td><td><code>/game set game:Trails of Blood &amp; Dust</code></td><td><strong>Grit</strong> points; the reroll button reads “Spend a Grit point to reroll”</td><td>Heat, Whispers, The Dark<br><code>/track mark name:heat</code></td><td>Job, Place, The darkness, Twist, Ticking clock, Key character</td><td>The eclipse (4)<br>The last train out (6)<br>The mob forms (6)</td></tr><tr><td><a href="/fracture-lines"><strong>Fracture Lines</strong></a></td><td><code>/game set game:Fracture Lines</code></td><td><strong>Resolve</strong> points; the reroll button reads “Spend a Resolve point to reroll”</td><td>Debt, Heat, Reputation, Hull<br><code>/track mark name:debt</code></td><td>Job or mission, Place, The trouble, Twist, Ticking clock, Key character</td><td>The corridor network shifts (8)<br>The imperial ultimatum (4)<br>The corridor closes (6)</td></tr><tr><td><a href="/the-shattered-crown"><strong>The Shattered Crown</strong></a></td><td><code>/game set game:The Shattered Crown</code></td><td><strong>Fortune</strong> points; the reroll button reads “Spend a Fortune point to reroll”</td><td>Infamy, Doom, Debt, Hunger<br><code>/track mark name:infamy</code></td><td>Venture, Place, The darkness, Twist, Ticking clock, Key character</td><td>The eclipse (6)<br>The god awakens (8)<br>The guards change watch (4)</td></tr><tr><td><a href="/aurora"><strong>Aurora</strong></a></td><td><code>/game set game:Aurora</code></td><td><strong>Spark</strong> points; the reroll button reads “Spend a Spark point to reroll”</td><td>Collateral, Scrutiny, Backlash<br><code>/track mark name:collateral</code></td><td>The case, Where, The Operant angle, The twist, Ticking clock, Key character</td><td>The breach widens (8)<br>The Atomic Man loses patience (6)<br>The escapee&#x27;s power destabilizes (6)</td></tr></tbody></table>
 </div>
+</div></section></main><main class="pv" id="pv-why" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Why Legend Dynamics</div>
+  <h1>Why I Created the Legend Dynamics Roleplaying Game System</h1>
+  <hr class="ld-rule">
+</div>
+
+<div class="ld ld-rules ld-why">
+  <p>Honestly? I just wanted to play. I love sitting down with friends and getting lost in a good story, but too often we'd spend half the night flipping through a rulebook instead of actually playing. That always bugged me.</p>
+  <p>I've got a soft spot for 3d6 systems. There's something satisfying about that bell curve, where you have a real feel for your odds before the dice hit the table. And Fate? Fate nailed the storytelling side. I loved how it rewards your character's flaws instead of just punishing them. I kept thinking, why can't I have both?</p>
+  <p>Legend Dynamics grows out of the 3d6 roll-under tradition of games like GURPS and Hero System, but married to Fate's narrative heart. That combination is the whole point. You roll 3d6 under your skill, and that's the core of it. Your flaws earn you Legend points. A near miss can still succeed, at a cost. A failure moves the story along instead of stopping it cold.</p>
+  <p>So I built it. The Legend Dynamics RPG puts the rules to work for you. The character creator walks you through each step and checks the math, and the GM tools roll up mission seeds and start the clock. The core rules work in any genre, so whether you're riding a dusty trail or crewing a starship, you're playing the same game. That's the whole idea: less fussing with rules, more time around the table telling the story you came to tell.</p>
+  <p class="ld-why-sign">Don Smallwood</p>
+</div>
+
+<div class="ld">
+  <div class="ld-actions">
+    <a class="ld-button" href="/#games">Choose a game</a>
+    <a class="ld-button ld-button--ghost" href="/core-rules">Read the core rules</a>
+  </div>
+</div>
 </div></section></main>
 <script>
 const show = (k) => { document.querySelectorAll(".pv").forEach((m) => (m.hidden = m.id !== "pv-" + k));
@@ -1641,6 +1670,6 @@ const show = (k) => { document.querySelectorAll(".pv").forEach((m) => (m.hidden 
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${k}"]`).dataset.c; scrollTo(0, 0); };
 document.querySelector(".pv-bar").onclick = (ev) => { const b = ev.target.closest("button"); if (b) show(b.dataset.p); };
 document.addEventListener("click", (ev) => { const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = { "/trails-of-blood-and-dust": "western", "/fracture-lines": "spaceopera", "/the-shattered-crown": "fantasy", "/aurora": "aurora", "/core-rules": "rules", "/discord": "discord" }[a.getAttribute("href")]; if (k) show(k); });
+  const k = { "/trails-of-blood-and-dust": "western", "/fracture-lines": "spaceopera", "/the-shattered-crown": "fantasy", "/aurora": "aurora", "/core-rules": "rules", "/discord": "discord", "/why-legend-dynamics": "why" }[a.getAttribute("href")]; if (k) show(k); });
 show(location.hash.slice(1) || "home");
 </script></body></html>

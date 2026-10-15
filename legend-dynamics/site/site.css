@@ -286,6 +286,13 @@ p, li, .sqs-html-content p, .sqs-html-content li {
   .ld-game:hover, .ld-button:hover { transform: none; }
 }
 
+/* ---------- Why Legend Dynamics (the intro page) ---------- */
+.ld-why { margin: 0; }
+.ld-why p { margin: 0 0 1.2rem; }
+.ld-why p:first-child { font-size: clamp(1.15rem, 2.2vw, 1.3rem); color: var(--ld-ink); }
+.ld-why .ld-why-sign { font-family: var(--ld-display); font-style: italic; color: var(--ld-ink-2); margin-top: 1.8rem; }
+.ld-why .ld-why-sign::before { content: "— "; }
+
 /* ---------- 5. Site frame (Cloudflare Pages build; Squarespace supplies its own) ---------- */
 html, body { margin: 0; }
 body { min-height: 100vh; display: flex; flex-direction: column; }

@@ -26,6 +26,7 @@ SLUGS = {"western": "/trails-of-blood-and-dust", "spaceopera": "/fracture-lines"
 GENRE = {"western": "Gothic Western", "spaceopera": "Science fiction", "fantasy": "Sword and sorcery", "aurora": "Superheroes"}
 CORE_SLUG = "/core-rules"
 DISCORD_SLUG = "/discord"
+WHY_SLUG = "/why-legend-dynamics"
 
 BRAND_FONTS = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
 
@@ -47,6 +48,36 @@ def md_inline(t):
     t = e(t, quote=False)
     t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
     return re.sub(r"\*(.+?)\*", r"<i>\1</i>", t)
+
+
+def why_page():
+    """The intro page: why the system exists, in the creator's own words (website/why.md: a bold title line, then paragraphs)."""
+    paras = [p.strip() for p in (WEB / "why.md").read_text().strip().split("\n\n") if p.strip()]
+    title = paras[0].strip("*")
+    body = "\n".join(f"  <p>{md_inline(p)}</p>" for p in paras[1:])
+    return f"""<!-- Intro page ("Why Legend Dynamics"). Paste each block into its own Code Block (Display Source off). The text lives in website/why.md. -->
+
+<!-- Block 1: title -->
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Why Legend Dynamics</div>
+  <h1>{e(title)}</h1>
+  <hr class="ld-rule">
+</div>
+
+<!-- Block 2: the story -->
+<div class="ld ld-rules ld-why">
+{body}
+  <p class="ld-why-sign">Don Smallwood</p>
+</div>
+
+<!-- Block 3: where to go next -->
+<div class="ld">
+  <div class="ld-actions">
+    <a class="ld-button" href="/#games">Choose a game</a>
+    <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">Read the core rules</a>
+  </div>
+</div>
+"""
 
 
 def odds(target):
@@ -80,6 +111,7 @@ def home():
   <div class="ld-actions">
     <a class="ld-button" href="#games">Choose a game</a>
     <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">Read the core rules</a>
+    <a class="ld-button ld-button--ghost" href="{WHY_SLUG}">Why I made it</a>
   </div>
 </div>
 
@@ -271,6 +303,7 @@ def main():
         write(WEB / "blocks" / f"game-{g}.html", game_page(g))
     write(WEB / "blocks" / "core-rules.html", core_rules())
     write(WEB / "blocks" / "discord.html", discord_page())
+    write(WEB / "blocks" / "why.html", why_page())
 
     # preview.html: the three kinds of page in a plain wrapper, using custom.css, with a tab per theme.
     css = (WEB / "custom.css").read_text()
@@ -280,6 +313,7 @@ def main():
         pages[g] = (pack(g)["terms"]["title"], f"ld-{g}", strip(game_page(g)))
     pages["rules"] = ("Core rules", "", strip(core_rules()))
     pages["discord"] = ("Discord", "", strip(discord_page()))
+    pages["why"] = ("Why Legend Dynamics", "", strip(why_page()))
     tabs = "".join(f'<button data-p="{k}" data-c="{c}">{e(n)}</button>' for k, (n, c, _) in pages.items())
     sections = "".join(f'<main class="pv" id="pv-{k}" hidden><section class="page-section"><div class="section-background"></div><div class="content">{body}</div></section></main>' for k, (_, _, body) in pages.items())
     write(WEB / "preview.html", f"""<!doctype html>
@@ -304,7 +338,7 @@ const show = (k) => {{ document.querySelectorAll(".pv").forEach((m) => (m.hidden
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${{k}}"]`).dataset.c; scrollTo(0, 0); }};
 document.querySelector(".pv-bar").onclick = (ev) => {{ const b = ev.target.closest("button"); if (b) show(b.dataset.p); }};
 document.addEventListener("click", (ev) => {{ const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{SLUGS['aurora']}": "aurora", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord" }}[a.getAttribute("href")]; if (k) show(k); }});
+  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{SLUGS['aurora']}": "aurora", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord", "{WHY_SLUG}": "why" }}[a.getAttribute("href")]; if (k) show(k); }});
 show(location.hash.slice(1) || "home");
 </script></body></html>
 """)

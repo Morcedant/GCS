@@ -34,7 +34,7 @@ GAMES, SLUGS = bw.GAMES, bw.SLUGS
 # The creators live on the site now.
 bw.CREATORS = {g: f"{SLUGS[g]}/create/" for g in GAMES}
 
-NAV = [("/", "Home")] + [(SLUGS[g], bw.pack(g)["terms"]["title"]) for g in GAMES] + [(bw.CORE_SLUG, "Core rules"), (bw.DISCORD_SLUG, "Discord")]
+NAV = [("/", "Home"), (bw.WHY_SLUG, "About")] + [(SLUGS[g], bw.pack(g)["terms"]["title"]) for g in GAMES] + [(bw.CORE_SLUG, "Core rules"), (bw.DISCORD_SLUG, "Discord")]
 
 FRAME_CSS = """
 /* ---------- 5. Site frame (Cloudflare Pages build; Squarespace supplies its own) ---------- */
@@ -155,6 +155,9 @@ def main():
     write("core-rules/index.html", page(bw.CORE_SLUG, "Core rules · Legend Dynamics", "The Legend Dynamics core rules, shared by every setting.",
                                         [downloads([(f"{bw.CORE_SLUG}/{core_docx.name}", "Core rules (Word)")])] + blocks(bw.core_rules()),
                                         fonts=font_links({bw.BRAND_FONTS})))
+
+    write(bw.WHY_SLUG.strip("/") + "/index.html", page(bw.WHY_SLUG, "Why Legend Dynamics · Legend Dynamics", "Why the Legend Dynamics roleplaying game system was made: the 3d6 bell curve married to Fate's narrative heart.",
+                                                     blocks(bw.why_page()), fonts=font_links({bw.BRAND_FONTS})))
 
     d = blocks(bw.discord_page())
     rows = "".join(f'<li><a class="ld-button ld-button--ghost" href="{bw.DISCORD_SLUG}/{SLUGS[g].strip("/")}/">{e(bw.pack(g)["terms"]["title"])}</a></li>' for g in GAMES)
