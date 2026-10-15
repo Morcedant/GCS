@@ -28,7 +28,7 @@ function setup(config, seed = 1234) {
 }
 
 test("the threats and weapons in the published pack are usable data", () => {
-  assert.equal(pack.threats.length, 10);
+  assert.equal(pack.threats.length, 13);
   assert.deepEqual(weapons.shotgun.damage.close, { boxes: 3, dying: true });
   assert.equal(LD.rangeModifier(weapons.derringer, "medium"), null);
   assert.ok(pack.threats.every((t) => t.weapons.every((w) => weapons[w])));
