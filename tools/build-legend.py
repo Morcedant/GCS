@@ -398,8 +398,8 @@ HANDOUTS = []  # (game info, folder) for each pack built; the handouts are writt
 
 
 def check_calling_recipe(pack):
-    """A setting with a calling recipe: every calling has four core skills, one fighting, one trail and one people
-    skill plus a signature skill, and every skill is core for at least one calling and no more than the cap."""
+    """A setting with a calling recipe: every calling has four core skills, one fighting (or, for a calling that
+    isn't a fighter, a second signature), one trail and one people skill plus a signature skill, and every skill is core for at least one calling and no more than the cap."""
     rec = pack.get("callingRecipe")
     if not rec:
         return
@@ -408,7 +408,11 @@ def check_calling_recipe(pack):
     for r in pack["roles"]:
         sk = r.get("skills", [])
         assert len(sk) == 4 and len(set(sk)) == 4 and set(sk) <= set(names), (r["name"], sk)
+        # A calling that isn't a fighter (rec["nonFighters"]) takes a second signature skill in the fighting slot.
         for g in ("fight", "trail", "people"):
+            if g == "fight" and r["name"] in rec.get("nonFighters", []):
+                assert sk[0] not in rec["fight"], (r["name"], "is not a fighter", sk)
+                continue
             assert sk[["fight", "trail", "people"].index(g)] in rec[g], (r["name"], g, sk)
         assert r.get("ability") and len(r["ability"]) == 2, (r["name"], "needs an ability")
         for s in sk:

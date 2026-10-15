@@ -172,6 +172,21 @@
    ]
   },
   {
+   "name": "Politician",
+   "group": "law",
+   "text": "Politician: holds office or wants it: a mayor, an alderman, a territorial delegate, a governor's man, or a party boss with friends in the capital.",
+   "skills": [
+    "Investigation",
+    "Riding",
+    "Leadership",
+    "Law"
+   ],
+   "ability": [
+    "Friends in office",
+    "Once per job, the town or territory gives you what it can: rooms at the hotel, horses for a posse, the jail cells, the telegraph office, or the doctor's time."
+   ]
+  },
+  {
    "name": "Doctor",
    "group": "learned",
    "text": "Doctor: digs out bullets, sets bones, and reads what a body says about how it died.",
@@ -3328,8 +3343,13 @@
    "Leadership"
   ],
   "max": {
-   "Shooting": 7
+   "Shooting": 7,
+   "Riding": 5,
+   "Leadership": 5
   },
-  "maxOther": 4
+  "maxOther": 4,
+  "nonFighters": [
+   "Politician"
+  ]
  }
 }
