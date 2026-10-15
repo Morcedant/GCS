@@ -7,6 +7,7 @@ in <game>/index.html) and, with --docx, a Word version.
   python3 tools/build-guide.py [--game uss-pelion|grimm-west] [--docx [--reference-doc original.docx]]
 """
 import argparse, pathlib, re, subprocess, sys
+from stamp import stamp
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 # Per game: Word file name, heading color, table header fill.
@@ -42,6 +43,7 @@ def main():
     if "/* BATTLEMAP:START */" in app:
         bm = (ROOT / "legend-dynamics" / "engine" / "battlemap.js").read_text().replace("</", "<\\/")
         app = re.sub(r"/\* BATTLEMAP:START \*/.*?/\* BATTLEMAP:END \*/", lambda _: "/* BATTLEMAP:START */\n" + bm + "/* BATTLEMAP:END */", app, flags=re.S)
+    app = stamp(app, APP)  # the version footer: a fingerprint of the page, and the day it last changed
     APP.write_text(app)
     print(f"updated {APP.relative_to(ROOT)}")
 

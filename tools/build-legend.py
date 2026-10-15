@@ -10,6 +10,7 @@ It also writes legend-dynamics/Legend_Dynamics_Core_Rules.md, the setting-neutra
   python3 tools/build-legend.py [--docx] [pack ...]
 """
 import argparse, html, importlib.util, json, pathlib, re, subprocess, sys
+from stamp import stamp
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import discord_handout
@@ -474,6 +475,7 @@ def build(pid, docx):
     else:
         tpl = tpl.replace("/* RULES:LAB */", "const LAB_DATA = null;").replace("<!-- RULES:LAB-PANEL -->", "")
     tpl = re.sub(r"<!-- GUIDE:START -->.*?<!-- GUIDE:END -->", lambda _: "<!-- GUIDE:START -->\n" + guide_html + "<!-- GUIDE:END -->", tpl, flags=re.S)
+    tpl = stamp(tpl, out / "index.html")  # the version footer: a fingerprint of the page, and the day it last changed
     (out / "index.html").write_text(tpl)
     g = discord_handout.game_info(pid, t["title"], t["point"], pack.get("tracks", []), pack.get("seeds", {}), t["tracksTitle"])
     HANDOUTS.append((g, out))
