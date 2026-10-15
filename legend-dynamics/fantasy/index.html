@@ -17,7 +17,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html { background: var(--space); }
-.page-version { margin: 6px auto 26px; padding: 0 16px; text-align: center; font-size: .75rem; color: var(--muted); letter-spacing: .02em; }
+.page-version { width: 100%; margin-top: -12px; text-align: right; font-size: .74rem; color: var(--muted); letter-spacing: .02em; }
 body { background: radial-gradient(1200px 600px at 85% -10%, rgba(150, 30, 18, .26), transparent 60%),
   radial-gradient(900px 500px at -10% 110%, rgba(70, 40, 110, .22), transparent 60%), var(--space);
   background-attachment: fixed; color: var(--fg); font: 17px/1.5 var(--body); margin: 0; min-height: 100vh; }
@@ -256,8 +256,6 @@ tr.lvl-U td.target { color: var(--muted); }
   .mobile-status .status { font-size: .82rem; min-width: 0; }
   .mobile-status .btn-row { flex-wrap: nowrap; flex: none; }
   .mobile-status .btn { padding: 9px 12px; }
-  /* Keep the version line clear of the readiness bar. */
-  #app[data-view="create"] + .page-version, #app:not([data-view]) + .page-version { margin-bottom: 96px; }
   .wrap { padding-bottom: 96px; }
   .guide-toc summary::after { content: " ▾"; }
 }
@@ -563,6 +561,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="7010e3e" data-version-date="2026.10.15" title="The code changes whenever this page changes.">Version 2026.10.15 · 7010e3e</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -4246,7 +4245,6 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
   </section>
 </div>
-<footer class="page-version"><!-- VERSION:START --><span data-version-hash="501528b" data-version-date="2026.10.15" title="The code changes whenever this page changes.">Version 2026.10.15 · 501528b</span><!-- VERSION:END --></footer>
 
 <script>
 (() => {
