@@ -872,7 +872,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <div class="card hud no-print bm-card">
       <h3>Battle map</h3>
-      <p class="small muted">A hex map at any scale, or a range track of bands, for the fight. Tokens for the posse stay linked to the characters, so you can mark injuries and points from the map. Open <b>How to use the map</b> for the steps.</p>
+      <p class="small muted">A hex map at any scale, or a range track of bands, for the fight. Tokens for the {{party}} stay linked to the characters, so you can mark injuries and points from the map. Open <b>How to use the map</b> for the steps.</p>
       <div id="battlemap"></div>
     </div>
     <div class="gm-tools">
@@ -2460,7 +2460,7 @@ tr.lvl-U td.target { color: var(--muted); }
     vehicles: RTRACK.threats ? threatsFromGuide($("guide"), RTRACK.threats, "ship-") : [],
     groupTracks: () => PACK.tracks.map((t) => ({ name: t.name, boxes: t.boxes, value: Math.min(t.boxes, ship[t.name] || 0), effect: shipEffect(t.name, Math.min(t.boxes, ship[t.name] || 0)) })),
     setGroupTrack: (name, v) => { const t = PACK.tracks.find((x) => x.name === name); if (!t) return; ship[name] = Math.max(0, Math.min(t.boxes, v)); store.set(STORE_SHIP, ship); renderShip(); },
-    pointName: T.point, stunName: T.stun,
+    pointName: T.point, stunName: T.stun, partyName: T.party,
     // The setting's threats: its data where it has them, otherwise the Players' Guide's Threats table.
     threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge,
       attacks: (x.attacks || []).map((a) => `${a.skill} ${a.target}`).join(", "), trait: x.trait ? `${x.trait}: ${x.traitText || ""}`.replace(/: $/, "") : "" })),

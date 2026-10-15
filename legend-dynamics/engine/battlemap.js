@@ -10,7 +10,7 @@
 // mountBattleMap(api)
 //   root: an empty element to draw into; key: a storage prefix (one map per setting); esc; toast(msg, err)
 //   crew(): [{ id, name, portrait, color, down, dying, injury, boxes, stunned, points, ptrack, stats }]: the GM's
-//     characters, for "Add the posse", live token state and the tracks shown when a posse token is selected;
+//     characters, for "Add the posse" (partyName: posse, party, crew, team), live token state and the tracks shown when one is selected;
 //   setCrew(id, patch) writes a change back (patch: injury, dying, stunned, points, ptrack); pointName, stunName
 //   threats: [{ id, name, boxes, dodge, attacks, trait }], the setting's opponents; vehicles: the same for ships
 //   bands: [[name, maxYards]], the personal range bands; kmBands: [[name, maxKm]] where the setting has space
@@ -21,6 +21,7 @@ function mountBattleMap(api) {
   const SVGNS = "http://www.w3.org/2000/svg", SQ3 = Math.sqrt(3);
   const esc = api.esc, KEY = api.key + ".battlemap.v1";
   const say = (m, err) => (api.toast ? api.toast(m, err) : null);
+  const PARTY = api.partyName || "party", Party = PARTY[0].toUpperCase() + PARTY.slice(1);
   const RT = Object.assign({ title: "Range track", us: "Us", note: "", bands: [["Close", "up to 10 yd"], ["Short", "up to 50 yd"], ["Medium", "up to 150 yd"], ["Long", "up to 500 yd"], ["Extreme", "up to a mile"]] }, api.rangeTrack || {});
   const UNITS = { yd: { name: "yards", one: "yard", bands: api.bands || [], presets: [1, 2, 5, 10, 50] } };
   if ((api.kmBands || []).length) UNITS.km = { name: "km", one: "km", bands: api.kmBands, presets: [1, 10, 100, 1000, 10000] };
@@ -76,7 +77,7 @@ function mountBattleMap(api) {
 
   // ---- the range track: a lane for "us", then one per band ----
   const LW = 220, LH = 640, HEAD = 76;
-  const lanes = () => [[RT.us, RT.vehicleTrack ? "" : "where the party stands"], ...RT.bands];
+  const lanes = () => [[RT.us, RT.vehicleTrack ? "" : `where the ${PARTY} stands`], ...RT.bands];
   const laneX = (i) => i * LW + LW / 2;
   const laneOf = (x) => Math.max(0, Math.min(lanes().length - 1, Math.round((x - LW / 2) / LW)));
   const laneName = (i) => (i === 0 ? RT.us : lanes()[i][0]);
@@ -94,10 +95,10 @@ function mountBattleMap(api) {
     const pt = esc(api.pointName || "Legend"), km = !!UNITS.km, veh = !!RT.vehicleTrack, rt = esc(RT.title), us = esc(RT.us);
     const sec = (h, items) => `<h4>${h}</h4><ul>${items.filter(Boolean).map((x) => `<li>${x}</li>`).join("")}</ul>`;
     return `<div class="bm-helpbody small">
-      <p>Add characters to the GM view first: the map's tokens for the party come from there. The map is kept in this browser; save it to a file to keep a copy.</p>
+      <p>Add characters to the GM view first: the map's tokens for the ${esc(PARTY)} come from there. The map is kept in this browser; save it to a file to keep a copy.</p>
       ${sec("1. Choose the kind of map", [
         `<b>Hex map</b> for a fight where position matters: who is behind cover, who can reach the door.`,
-        `<b>${rt}</b> for a fight where only distance matters: ${veh ? "ships closing or opening the range, " : ""}a chase, a running fight across open country. Each lane is a range band from ${veh ? "your ship" : "the party"}.`,
+        `<b>${rt}</b> for a fight where only distance matters: ${veh ? "ships closing or opening the range, " : ""}a chase, a running fight across open country. Each lane is a range band from ${veh ? "your ship" : "the " + esc(PARTY)}.`,
         `The two keep their own tokens and pictures, so you can set up both and switch between them.`])}
       ${sec("2. Set up the hex map", [
         `<b>Background image…</b> puts a picture under the grid: a battle map, a sketch, a photo of a street. A new picture is covered with hexes at the current hex size.`,
@@ -105,7 +106,7 @@ function mountBattleMap(api) {
         `If the picture has its own grid, set <b>Hex size on screen</b> until the hexes match it, choose pointy or flat tops, then use <b>Shift right</b> and <b>Shift down</b> to line them up. <b>Fit the grid to the picture</b> starts over at the top-left corner.`,
         `Turn <b>Show grid</b> off, or lower its strength, when the picture has a grid of its own.`])}
       ${sec("3. Place tokens", [
-        `<b>Add the posse</b> places every character in the GM view${veh ? "" : ", in the middle of the map"}. Their tokens show their portrait (or initials) and group color, and stay linked to the character.`,
+        `<b>Add the ${esc(PARTY)}</b> places every character in the GM view${veh ? "" : ", in the middle of the map"}. Their tokens show their portrait (or initials) and group color, and stay linked to the character.`,
         veh ? `<b>Add ${us.replace(/^Our /, "our ")}</b> places your ship, linked to the crew's ${esc(RT.vehicleTrack)} track.` : "",
         `<b>Add a token</b> opens a small form. Pick from <b>From the threats</b> to fill in the name, boxes and the threat's numbers${veh ? " (enemy ships are listed with the people)" : ""}, or leave it on <i>None</i> for a plain token. Names with a number count up, so pressing <b>Place it</b> again adds the next one.`,
         `Give a token a <b>color</b>, a <b>size</b> (Large or Huge for a horse, a monster, a ship) and, if you like, an <b>image</b>.`])}
@@ -116,7 +117,7 @@ function mountBattleMap(api) {
         `From the keyboard: Tab to a token, Enter selects it, Delete removes it.`])}
       ${sec("5. Track the fight from a token", [
         `Click a token to open its panel underneath the map.`,
-        `<b>A party token</b> shows the character's Injury boxes, Dying, the stunned condition, ${pt} points and any personal track. Changes there change the character in the GM view, and the other way round.`,
+        `<b>A token from the ${esc(PARTY)}</b> shows the character's Injury boxes, Dying, the stunned condition, ${pt} points and any personal track. Changes there change the character in the GM view, and the other way round.`,
         veh ? `<b>Your ship</b> shows the ${esc(RT.vehicleTrack)} boxes and what the damage does; they are the crew's track, the same as on the sheet.` : "",
         `<b>Any other token</b> keeps its own boxes, shown as pips above it. When they are all marked it is taken out${veh ? " (or destroyed, for a ship)" : ""} and fades.`,
         `<b>Copy</b> makes another of the same, <b>Remove</b> takes it off the map, <b>Done</b> closes the panel.`])}
@@ -136,7 +137,7 @@ function mountBattleMap(api) {
     </div>
     <div class="bm-bar">
       <label class="btn bm-file" tabindex="0">Background image…<input type="file" accept="image/*" data-bm="bg" class="bm-hide"></label>
-      <button class="btn" data-bm="posse">Add the posse</button>
+      <button class="btn" data-bm="posse">Add the ${esc(PARTY)}</button>
       <button class="btn" data-bm="vehicle" hidden>Add ${esc(RT.us.replace(/^Our /, "our "))}</button>
       <button class="btn" data-bm="add">Add a token</button>
       <button class="btn" data-bm="measure" aria-pressed="false">Measure</button>
@@ -176,7 +177,7 @@ function mountBattleMap(api) {
         </div>
         <p class="small muted">The scale sets what a hex means: distances and range bands follow it. To line the grid up with a map that has its own grid, set the hex size on screen first, then shift it into place.</p>
       </div>
-      <p class="small muted bm-rangeonly">${esc(RT.note || "Each lane is a range band from the party. Drag a token into another lane to move it a band in or out.")}</p>
+      <p class="small muted bm-rangeonly">${esc(RT.note || `Each lane is a range band from the ${PARTY}. Drag a token into another lane to move it a band in or out.`)}</p>
       <div class="bm-bar"><button class="btn bm-hexonly" data-bm="align">Fit the grid to the picture</button><button class="btn" data-bm="bgoff">Remove the image</button><button class="btn" data-bm="clear">Remove all tokens</button>
         <button class="btn" data-bm="savefile">Save map to file</button><label class="btn bm-file" tabindex="0">Open a map file…<input type="file" accept=".json,application/json" data-bm="openfile" class="bm-hide"></label></div>
     </details>`;
@@ -274,7 +275,7 @@ function mountBattleMap(api) {
     else tracks = `<div class="bm-tracks">${t.stats ? `<span class="bm-stats small">${esc(t.stats)}</span>` : ""}
         <span class="bm-track">${esc(t.boxLabel || "Injury")} ${boxRow(t.boxes || 1, t.injury || 0, "data-bmt-injury", t.boxLabel || "Injury")}</span>${(t.injury || 0) >= (t.boxes || 1) ? `<b class="small">${t.boxLabel === "Hull" ? "Destroyed" : "Taken out"}</b>` : ""}
         <label>Boxes <input type="number" min="1" max="12" data-bms="boxes" value="${t.boxes || 1}" style="width:4.5em"></label></div>`;
-    const whose = c ? `(from the posse${c.dying ? ", Dying" : c.down ? ", down" : ""}: changes here change the character)` : tr ? `(the ${esc(tr.name)} track: changes here change the crew's track)` : "";
+    const whose = c ? `(from the ${esc(PARTY)}${c.dying ? ", Dying" : c.down ? ", down" : ""}: changes here change the character)` : tr ? `(the ${esc(tr.name)} track: changes here change the crew's track)` : "";
     box.innerHTML = `<b>${esc(k.name || "Token")}</b>${whose ? ` <span class="small muted">${whose}</span>` : ""}${isRange() ? ` <span class="small muted">· ${esc(laneName(t.lane || 0))}</span>` : ""}
       ${tracks}
       ${c ? "" : `<label>Name <input type="text" data-bms="name" value="${esc(t.name || "")}"></label><label>Color <input type="color" data-bms="color" value="${esc(t.color || "#777777")}"></label>`}
@@ -449,7 +450,7 @@ function mountBattleMap(api) {
       const crew = api.crew(), have = new Set(toks().map((x) => x.ref).filter(Boolean)), add = crew.filter((c) => !have.has(c.id));
       if (!crew.length) { say("Add characters to the GM view first.", true); return; }
       for (const c of add) toks().push({ id: uid(), ref: c.id, tsize: 1, ...spot(0) });
-      save(); draw(); say(add.length ? `Placed ${add.length} from the posse.` : "The whole posse is already on the map.");
+      save(); draw(); say(add.length ? `Placed ${add.length} from the ${PARTY}.` : `The whole ${PARTY} is already on the map.`);
     } else if (k === "vehicle") {
       if (toks().some((x) => x.track === RT.vehicleTrack)) { say(`${RT.us} is already on the map.`); return; }
       toks().push({ id: uid(), track: RT.vehicleTrack, name: RT.us, color: "#3d7a9e", tsize: 2, ...spot(0) }); save(); draw();
