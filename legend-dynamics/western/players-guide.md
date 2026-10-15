@@ -26,21 +26,21 @@ Work through the five steps in order. The character creator follows the same ste
 
 Choose a calling and describe what you bring. Your calling places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
 
-| Calling | Group | Typical contribution | Core skills |
-|---|---|---|---|
-| Lawman | The Law | wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority. | Shooting, Investigation, Read People, Riding |
-| Bounty Hunter | The Law | tracks wanted men across three territories and brings them in, upright or across a saddle. | Tracking, Shooting, Riding, Survival |
-| Doctor | The Learned | digs out bullets, sets bones, and reads what a body says about how it died. | Medicine, Investigation, Read People, Persuasion |
-| Occultist | The Learned | knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears. | Occult, Investigation, Persuasion, Read People |
-| Lawyer | The Learned | knows the law better than the men who wear the badges, and isn't afraid to say so. | Law, Persuasion, Read People, Investigation |
-| Journalist | The Learned | asks the questions no one wants asked, and prints the answers. | Investigation, Persuasion, Read People, Stealth |
-| Preacher | The Learned | comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun. | Persuasion, Leadership, Occult, Shooting |
-| Monster Hunter | The Frontier | hunts what the law can't hang, and knows which things fear silver, salt or fire (take the Monster Hunter advantage). | Occult, Tracking, Shooting, Melee |
-| Gunslinger | The Frontier | the fastest and steadiest gun in the room, and the one who decides when it's time to draw. | Shooting, Athletics, Read People, Riding |
-| Scout | The Frontier | finds the trail, reads the land, and keeps everyone alive out in it. | Tracking, Survival, Riding, Stealth |
-| Gambler | The Frontier | reads people, bluffs, and hears everything the saloon hears. | Gambling, Read People, Deception, Shooting |
-| Wrangler | The Frontier | breaks horses, drives cattle, and can ride anything with four legs. | Animal Handling, Riding, Survival, Brawling |
-| Undertaker | The Frontier | buries the dead, and makes sure they stay buried. | Occult, Medicine, Investigation, Melee |
+| Calling | Group | Typical contribution | Core skills | Ability |
+|---|---|---|---|---|
+| Lawman | The Law | wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority. | Shooting, Riding, Leadership, Law | **The badge.** +2 to Leadership when you give orders in the law's name: an arrest, raising a posse, clearing a street. |
+| Bounty Hunter | The Law | tracks wanted men across three territories and brings them in, upright or across a saddle. | Shooting, Tracking, Read People, Investigation | **Paper on them.** +2 to Tracking and Investigation to find someone with a price on their head or a warrant out. |
+| Doctor | The Learned | digs out bullets, sets bones, and reads what a body says about how it died. | Shooting, Riding, Persuasion, Medicine | **Steady hands.** +2 to Medicine when stabilizing the Dying or working under fire. |
+| Occultist | The Learned | knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears. | Melee, Stealth, Deception, Occult | **Forbidden lore.** Once per job, ask the GM one question about a supernatural thing you've seen, and get a true answer. |
+| Lawyer | The Learned | knows the law better than the men who wear the badges, and isn't afraid to say so. | Brawling, Athletics, Deception, Law | **Due process.** Once per job, get someone out of jail, a warrant issued or quashed, or a deed or contract into your hands, wherever there's law to work. |
+| Journalist | The Learned | asks the questions no one wants asked, and prints the answers. | Brawling, Stealth, Read People, Investigation | **The press.** Once per job, print a story; the town believes it until someone proves it false. |
+| Preacher | The Learned | comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun. | Shooting, Riding, Leadership, Occult | **Hold fast.** +2 to Will against fear, possession and temptation, and to Leadership to steady others against them. |
+| Monster Hunter | The Frontier | hunts what the law can't hang, and knows which things fear silver, salt or fire (take the Monster Hunter advantage). | Melee, Tracking, Read People, Occult | **Know its weakness.** Once you've identified a creature with an Occult roll, your called shots against it take no penalty. |
+| Gunslinger | The Frontier | the fastest and steadiest gun in the room, and the one who decides when it's time to draw. | Shooting, Riding, Read People, Athletics | **Quick draw.** In the first round of a gunfight, you act first, whatever your Agility. |
+| Scout | The Frontier | finds the trail, reads the land, and keeps everyone alive out in it. | Melee, Tracking, Persuasion, Survival | **Lay of the land.** Once per job, you know a way: a hidden pass, a water hole, a shortcut that saves a day, or a place to make a stand. |
+| Gambler | The Frontier | reads people, bluffs, and hears everything the saloon hears. | Shooting, Stealth, Deception, Gambling | **Markers.** Once per job, call in a debt: someone owes you a favor, a horse, a room or the truth. |
+| Wrangler | The Frontier | breaks horses, drives cattle, and can ride anything with four legs. | Brawling, Animal Handling, Leadership, Tinkering | **Horse sense.** +2 to Animal Handling, and to Riding to stay in the saddle in a stampede, a chase or a fall. |
+| Undertaker | The Frontier | buries the dead, and makes sure they stay buried. | Melee, Stealth, Persuasion, Medicine | **Ask the body.** Once per job, examine a corpse and learn how and when it died, and one thing about who did it. |
 
 The creator marks your calling's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven't changed.
 
