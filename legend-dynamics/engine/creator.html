@@ -817,6 +817,7 @@ tr.lvl-U td.target { color: var(--muted); }
       <div class="card hud">
         <h3>Turn order</h3>
         <p class="small muted">Highest Agility first. Players choose the order among tied characters; the GM places opponents.</p>
+        <label class="small" id="gm-gunfight-wrap" hidden><input type="checkbox" id="gm-gunfight"> <span id="gm-gunfight-label">First round of a gunfight</span></label>
         <ol class="turns" id="gm-turns"></ol>
       </div>
     </div>
@@ -945,7 +946,8 @@ tr.lvl-U td.target { color: var(--muted); }
               </select></div>
             <div class="field" id="r-quality-wrap" hidden><label for="r-quality">Attack succeeded by</label><select id="r-quality"></select></div>
             <div class="field" id="r-called-wrap" hidden><label for="r-called">Called shot</label>
-              <select id="r-called"><option value="0">None</option><option value="-2">Name the effect −2</option><option value="-4">Small target −4</option></select></div>
+              <select id="r-called"><option value="0">None</option><option value="-2">Name the effect −2</option><option value="-4">Small target −4</option></select>
+              <label class="small" id="r-weak-wrap" hidden><input type="checkbox" id="r-weak"> <span id="r-weak-label"></span></label></div>
             <div class="field" id="r-parries-wrap" hidden><label for="r-parries">Parries already this round</label>
               <select id="r-parries"><option value="0">None</option><option value="1">One</option></select></div>
           </div>
@@ -1033,6 +1035,11 @@ tr.lvl-U td.target { color: var(--muted); }
   // A calling's own ability (some settings): [name, text]. A custom calling has none.
   const ROLE_ABILITY = Object.fromEntries(PACK.roles.filter((r) => r.ability).map((r) => [r.name, r.ability]));
   const roleAbility = (c = ch) => (c.customRole ? null : ROLE_ABILITY[c.dept] || null);
+  // What the creator does for an ability: "firstInGunfight" (the turn order), "freeCalledShot" (the roller).
+  const ROLE_FX = Object.fromEntries(PACK.roles.filter((r) => r.abilityFx).map((r) => [r.name, r.abilityFx]));
+  const hasFx = (fx, c = ch) => !c.customRole && (ROLE_FX[c.dept] || []).includes(fx);
+  const anyFx = (fx) => Object.values(ROLE_FX).some((x) => x.includes(fx));
+  let gunfight = false; // GM view: the first round of a gunfight, when Quick draw acts first
   const EMBLEMS = Object.fromEntries(PACK.groups.map((g) => [g.id, { d: g.emblem, stroke: !!g.stroke }]));
   const DELTA_SVG = `<svg class="delta" viewBox="0 0 100 100" aria-hidden="true"><circle class="outer" cx="50" cy="50" r="47"/><circle class="ring" cx="50" cy="50" r="40"/><path class="emblem" data-emblem d=""/></svg>`;
   // A badge drawn with its group's emblem already in place (for the sheet and GM cards).
@@ -1914,7 +1921,8 @@ tr.lvl-U td.target { color: var(--muted); }
     if (CR.attackQualityDodge && isDefense(name)) parts.push(+$("r-quality").value || 0);
     if (CR.parry && isParry(name)) parts.push((+$("r-parries").value || 0) * CR.parry.repeatPenalty);
     if (CR.aim && !$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(CR.aim.bonus);
-    if (!$("r-called-wrap").hidden && +$("r-called").value) parts.push(+$("r-called").value);
+    // An ability like Know its weakness: no called-shot penalty against a creature the character has identified.
+    if (!$("r-called-wrap").hidden && +$("r-called").value && !($("r-weak").checked && !$("r-weak-wrap").hidden)) parts.push(+$("r-called").value);
     // In an alternate form, the form profile's bonuses apply to rolls on those attributes and their skills.
     const w = ch.play.form && FORMED.has(ch.speciesId) && heritageOf()?.form;
     if (w) {
@@ -1942,6 +1950,8 @@ tr.lvl-U td.target { color: var(--muted); }
     $("r-parries-wrap").hidden = !(CR.parry && isParry(sk) && defensesPerRound() > 1);
     $("r-aim-wrap").hidden = !(CR.aim && [T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk));
     $("r-called-wrap").hidden = ![T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk);
+    $("r-weak-wrap").hidden = $("r-called-wrap").hidden || !+$("r-called").value || !hasFx("freeCalledShot");
+    if (hasFx("freeCalledShot")) $("r-weak-label").textContent = `Against a creature I've identified (${roleAbility()[0]}): no penalty`;
     const { name, base, total } = rollMods();
     const t = base + total;
     const incap = ch.play.injury >= 3;
@@ -2145,7 +2155,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
@@ -2416,10 +2426,15 @@ tr.lvl-U td.target { color: var(--muted); }
     $("gm-add-pregen").innerHTML = `<option value="">Choose a ready-made character…</option>` +
       PREGENS.map((c, i) => `<option value="${i}">${esc(c.name)}: ${esc(c.dept)}</option>`).join("");
     // Turn order: Agility, highest first; ties flagged for the players to settle.
-    const order = gmCrew.map((c) => ({ c, a: c.attrs.Agility })).sort((x, y) => y.a - x.a || x.c.name.localeCompare(y.c.name));
-    $("gm-turns").innerHTML = order.length ? order.map(({ c, a }, i) => {
-      const tied = order.some((o, j) => j !== i && o.a === a);
-      return `<li>${esc(c.name || "Unnamed")}<span class="num">Agility ${a}</span>${tied ? '<span class="tie">tie</span>' : ""}${c.play.injury >= 3 ? ' <span class="tie">down</span>' : ""}</li>`;
+    // In the first round of a gunfight, a calling with Quick draw acts first, whatever its Agility.
+    const QD = anyFx("firstInGunfight") ? PACK.roles.find((r) => (r.abilityFx || []).includes("firstInGunfight")) : null;
+    $("gm-gunfight-wrap").hidden = !QD;
+    if (QD) $("gm-gunfight-label").textContent = `First round of a gunfight (${QD.ability[0]}: ${QD.name} acts first)`;
+    const first = (c) => (gunfight && hasFx("firstInGunfight", c) ? 1 : 0);
+    const order = gmCrew.map((c) => ({ c, a: c.attrs.Agility, q: first(c) })).sort((x, y) => y.q - x.q || y.a - x.a || x.c.name.localeCompare(y.c.name));
+    $("gm-turns").innerHTML = order.length ? order.map(({ c, a, q }, i) => {
+      const tied = order.some((o, j) => j !== i && o.a === a && o.q === q);
+      return `<li>${esc(c.name || "Unnamed")}<span class="num">Agility ${a}</span>${q ? `<span class="tie">${esc(roleAbility(c)[0])}</span>` : ""}${tied ? '<span class="tie">tie</span>' : ""}${c.play.injury >= 3 ? ' <span class="tie">down</span>' : ""}</li>`;
     }).join("") : `<li class="muted" style="list-style:none;margin-left:-1.6em">Add characters to see the turn order.</li>`;
     $("gm-grid").innerHTML = gmCrew.length ? gmCrew.map((c) => {
       const k = gmCalc(c), inj = c.play.injury;
@@ -2441,6 +2456,7 @@ tr.lvl-U td.target { color: var(--muted); }
       </article>`;
     }).join("") : `<div class="card hud"><p class="muted">No characters yet. Ask each player to <b>Save to file</b> and send you the file, then open them all at once above. You can also add characters saved in this browser, or the ready-made characters for a quick game.</p></div>`;
   }
+  $("gm-gunfight").addEventListener("change", (e) => { gunfight = e.target.checked; renderGM(); });
   $("gm-grid").addEventListener("click", (e) => {
     const el = e.target.closest("[data-gm]"); if (!el || el.matches("input")) return;
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
