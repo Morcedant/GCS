@@ -420,6 +420,12 @@ tr.lvl-U td.target { color: var(--muted); }
 .bm-box { width: 22px; height: 22px; padding: 0; border: 2px solid var(--line); border-radius: 4px; background: none; cursor: pointer; }
 .bm-box.on { background: var(--bad); border-color: var(--bad); }
 .bm-sel > label, .bm-sel .bm-tracks label { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; }
+.bm-kinds .btn[aria-pressed=true] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.bm-lane { fill: transparent; stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.bm-lane.odd { fill: rgba(127,127,127,.08); }
+.bm-lane.us { fill: rgba(61,122,158,.12); }
+.bm-lname { fill: var(--fg); text-anchor: middle; font-weight: 700; font-size: 20px; paint-order: stroke; stroke: var(--well); stroke-width: 3px; }
+.bm-lsub { fill: var(--muted); text-anchor: middle; font-size: 13px; paint-order: stroke; stroke: var(--well); stroke-width: 3px; }
 .gm-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 @media (max-width: 900px) { .gm-tools { grid-template-columns: minmax(0, 1fr); } }
 .seed { margin: 0; display: grid; gap: 8px; }
@@ -2304,12 +2310,12 @@ tr.lvl-U td.target { color: var(--muted); }
     const b = e.target.closest("[data-track]"); if (!b) return;
     const name = b.dataset.track, i = +b.dataset.i;
     ship[name] = (ship[name] || 0) === i ? i - 1 : i;
-    store.set(STORE_SHIP, ship); renderShip();
+    store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {}
   });
   let resetArmed = false;
   $("ship-reset").onclick = () => {
     if (!resetArmed) { resetArmed = true; $("ship-reset").textContent = "Tap again to clear every box"; setTimeout(() => { resetArmed = false; $("ship-reset").textContent = T.tracksReset; }, 4000); return; }
-    resetArmed = false; ship = {}; store.set(STORE_SHIP, ship); renderShip(); $("ship-reset").textContent = T.tracksReset;
+    resetArmed = false; ship = {}; store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {} $("ship-reset").textContent = T.tracksReset;
   };
   function clockSvg(c) {
     const r = 44, cx = 48, cy = 48, segs = [];
@@ -2440,9 +2446,15 @@ tr.lvl-U td.target { color: var(--muted); }
   let gmCrew = (store.get(STORE_GM, []) || []).filter((c) => c && typeof c === "object").map(normalize);
   const gmSay = (m, err) => { const el = $("gm-msg"); el.textContent = m; el.className = "toast" + (err ? " err" : ""); };
   /* BATTLEMAP */
-  // The battle map: the GM's characters as tokens (portrait, group color, down or Dying), one hex a yard.
-  const battleMap = mountBattleMap({ root: $("battlemap"), key: PACK.id, esc, toast: gmSay, yardsPerHex: 1,
-    bands: [["Close", 10], ["Short", 50], ["Medium", 150], ["Long", 500], ["Extreme", 1760]],
+  // The battle map: the GM's characters as tokens (portrait, group color, down or Dying) on a hex map at any scale,
+  // or on a range track of bands (a setting's pack can name its own, with ships and a crew track for the ship).
+  const RTRACK = PACK.rangeTrack || {};
+  const battleMap = mountBattleMap({ root: $("battlemap"), key: PACK.id, esc, toast: gmSay,
+    bands: [["Close", 10], ["Short", 50], ["Medium", 150], ["Long", 500], ["Extreme", 1760]], kmBands: RTRACK.kmBands || [],
+    rangeTrack: RTRACK.bands ? RTRACK : null,
+    vehicles: RTRACK.threats ? threatsFromGuide($("guide"), RTRACK.threats, "ship-") : [],
+    groupTracks: () => PACK.tracks.map((t) => ({ name: t.name, boxes: t.boxes, value: Math.min(t.boxes, ship[t.name] || 0), effect: shipEffect(t.name, Math.min(t.boxes, ship[t.name] || 0)) })),
+    setGroupTrack: (name, v) => { const t = PACK.tracks.find((x) => x.name === name); if (!t) return; ship[name] = Math.max(0, Math.min(t.boxes, v)); store.set(STORE_SHIP, ship); renderShip(); },
     pointName: T.point, stunName: T.stun,
     // The setting's threats: its data where it has them, otherwise the Players' Guide's Threats table.
     threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge,
