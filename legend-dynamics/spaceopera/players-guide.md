@@ -473,6 +473,21 @@ To take someone down without killing them, use fists, a baton, a grapple or a st
 - **Empty means it won't work.** Reload (one action): refills it from a spare. Restock at a port: refills it fully between jobs. Packing a spare is a good use of a Resolve point's small preparation.
 - **Jams.** A natural 18 with this weapon also jams it: clearing it takes an action.
 
+## The battle map
+
+The GM view of the character creator has a **battle map** for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in this chapter, and a fight without it works the same way. Open **How to use the map** on the map itself for the buttons, step by step.
+
+**Two kinds of map.**
+
+- **A hex map** for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a room, 5 or 10 yards for a street, 50 for open ground. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range table above.
+- **A range track** for fights where only distance matters: a chase, a running fight across open country. It has a lane for the party and one for each range band. Moving a token into the next lane moves it one band in or out.
+
+**Tokens.** The GM places the party with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, the stunned condition or a Resolve point on a token marks it on the character, and the other way round. Opponents come from the setting's threats with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.
+
+**Keeping a map.** The map stays in the GM's browser. **Save map to file** keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.
+
+**Ship fight.** In this setting the range track is for ship fights, with the bands Close (under 10 km), Short (up to 1,000 km), Medium (up to 10,000 km), Long (up to 100,000 km), Extreme (about a light-second). **Add our ship** places a token linked to the crew's Hull track, so damage marked on the map is marked on the sheet. Enemy ships come from the Enemy ships table with their Hull boxes. Each lane is a range band from our ship. When the pilots make their opposed Piloting roll, drag the enemy one lane in or out. Weapons take −2 one band beyond their range and −4 two bands beyond.
+
 # Medical care
 
 Medicine in the corridors runs from field dressings to miracles. **Biotech** can grow a new organ, rebuild a limb or rewrite a disease, for those who can pay; a clinic with a biotech suite counts as proper care. Those who can't pay get stims, staples and whatever the Relief Missions carry.

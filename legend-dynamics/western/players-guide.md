@@ -463,6 +463,19 @@ To take someone down without killing them, use fists, a club, a grapple, or a la
 - **Empty means it won't work.** Reload (one action): refills it from a spare. Restock in town: refills it fully between jobs. Packing a spare is a good use of a Grit point's small preparation.
 - **Jams.** A natural 18 with this weapon also jams it: clearing it takes an action.
 
+## The battle map
+
+The GM view of the character creator has a **battle map** for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in this chapter, and a fight without it works the same way. Open **How to use the map** on the map itself for the buttons, step by step.
+
+**Two kinds of map.**
+
+- **A hex map** for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a room, 5 or 10 yards for a street, 50 for open ground. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range table above.
+- **A range track** for fights where only distance matters: a chase, a running fight across open country. It has a lane for the party and one for each range band. Moving a token into the next lane moves it one band in or out.
+
+**Tokens.** The GM places the party with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, the stunned condition or a Grit point on a token marks it on the character, and the other way round. Opponents come from the setting's threats with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.
+
+**Keeping a map.** The map stays in the GM's browser. **Save map to file** keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.
+
 # Medical care
 
 Frontier medicine has chloroform, carbolic acid, laudanum and steady hands, and not much else. Infection kills more men than bullets do, and no doctor's bag holds a cure for a bite from something that should be dead. See *Bites and curses* below.
