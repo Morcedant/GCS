@@ -7,7 +7,8 @@ import * as E from "../../lab/encounter.js";
 import * as S from "../../lab/stats.js";
 
 const pack = JSON.parse(readFileSync(new URL("../../../packs/western/pack.json", import.meta.url)));
-const lab = JSON.parse(readFileSync(new URL("../../../packs/western/lab.json", import.meta.url)));
+const labFile = JSON.parse(readFileSync(new URL("../../../packs/western/lab.json", import.meta.url)));
+const lab = { ...labFile, grievous: labFile.grievous || pack.gritty }; // as tools/build-legend.py builds it: the pack's gritty combat table
 // The published combat rules, merged as tools/build-legend.py does: the core's (engine/combat.json) with the pack's overrides.
 const CORE = JSON.parse(readFileSync(new URL("../../combat.json", import.meta.url)));
 const combatOf = (p) => { const r = JSON.parse(JSON.stringify(CORE.rules)); for (const [k, v] of Object.entries(p.combatRules || {})) r[k] = { ...(r[k] || {}), ...v }; return r; };

@@ -340,6 +340,9 @@ tr.lvl-U td.target { color: var(--muted); }
 .ship-row .eff { font-size: .8rem; color: var(--muted); }
 .ship-row.hit .eff { color: var(--warn); } .ship-row.out .eff { color: var(--bad); font-weight: 600; }
 
+.gritty-box { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
+.gritty-box.on { border-color: var(--warn); }
+.gritty-toggle { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
 .advance-box { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
 .advance-box select { max-width: 100%; width: auto; flex: 1 1 220px; }
 .adv-list { margin: 0; padding-left: 1.2em; }
@@ -832,6 +835,17 @@ tr.lvl-U td.target { color: var(--muted); }
           <button class="btn" id="seed-copy">Copy</button>
         </div>
         <div class="toast" id="seed-msg" role="status" aria-live="polite"></div>
+      </div>
+      <div class="card hud no-print" id="gm-gritty-card" hidden>
+        <h3>Gritty combat</h3>
+        <label class="gritty-toggle"><input type="checkbox" id="gm-gritty"> <b>Gritty combat in this campaign</b></label>
+        <p class="small muted">Grievous hits maim characters and take opponents out (Players' Guide, Optional rule: gritty combat). Players switch it on in their own creator too; the group file carries it.</p>
+        <div class="fields" id="gm-out-wrap" hidden>
+          <div class="field"><label for="gm-out-name">Opponent</label><input type="text" id="gm-out-name" placeholder="e.g. the outlaw"></div>
+          <div class="field"><label for="gm-out-kind">Struck by</label><select id="gm-out-kind"></select></div>
+        </div>
+        <div class="btn-row" id="gm-out-row" hidden><button class="btn" id="gm-out-roll">Taken out: describe it</button></div>
+        <p class="small" id="gm-out-text"></p>
       </div>
       <div class="card hud no-print">
         <h3>Case files</h3>
@@ -4851,6 +4865,16 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="checks"><label><input type="checkbox" id="f-stunned"> Stunned: −2 on next action roll</label>
             <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label>
             <label id="form-wrap" hidden><input type="checkbox" id="f-form"> In alternate form</label></div>
+          <div class="gritty-box" id="gritty-box" hidden>
+            <label class="gritty-toggle"><input type="checkbox" id="f-gritty"> <b>Gritty combat</b> <span class="muted small">Optional rule: your GM decides. Grievous wounds, limbs lost.</span></label>
+            <div id="gritty-body" hidden>
+              <p class="small muted">A hit of 2+ boxes is <b>grievous</b> when the attack succeeded by 7+, rolled a natural 3–4, or left you Dying. Roll the table when it happens to you.</p>
+              <div class="btn-row"><button class="btn" id="gw-roll">Roll a grievous wound (3d6)</button><button class="btn" id="gw-down" hidden>Downgrade it (Spark point)</button></div>
+              <p class="small" id="gw-result"></p>
+              <div class="btn-row" id="gw-trade" hidden><button class="btn" id="gw-trade-lost">Lose a limb instead of dying</button><button class="btn" id="gw-trade-use">Lose a limb's use instead</button></div>
+              <ul class="small adv-list" id="gw-list"></ul>
+            </div>
+          </div>
         </div>
 
         <div class="card hud no-print" id="card-roll">
@@ -5348,7 +5372,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
       allegiance: "", allegianceDef: null, customTier: 1, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "",
-      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [] },
+      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [], lasting: [], gwLast: null },
     };
   }
   function example() {
@@ -5414,16 +5438,23 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     for (const k of Object.keys(out.skills)) if (!LEVELS[out.skills[k]]) out.skills[k] = "U";
     for (const k of Object.keys(out.attrs)) out.attrs[k] = Math.max(1, Math.min(20, parseInt(out.attrs[k], 10) || BASE));
     if (!Array.isArray(out.play.log)) out.play.log = [];
+    out.play.lasting = (Array.isArray(out.play.lasting) ? out.play.lasting : []).filter((w) => w && typeof w.name === "string")
+      .map((w) => ({ id: String(w.id || ""), name: w.name, text: String(w.text || ""), heal: String(w.heal || ""), complication: !!w.complication, date: String(w.date || ""), key: String(w.key || uid()) }));
+    if (!out.play.gwLast || typeof out.play.gwLast !== "object" || !out.play.lasting.some((w) => w.key === out.play.gwLast.key)) out.play.gwLast = null;
     return out;
   }
 
   // ---- storage (best effort) ----
+  // Gritty combat (optional rule, for settings whose pack has a grievous wound table): "down" is a point's downgrade.
+  const GRITTY = PACK.gritty || null, GRITTY_KEY = PACK.id + ".gritty.v1";
+  const GRIEVOUS = GRITTY ? GRITTY.table : [];
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
   };
   const validAl = (a) => Array.isArray(a) && a.length === 4 && a.every((x) => typeof x === "string") && /^c-/.test(a[0]) && a[1].trim();
   campaignAllegiances = (store.get(CAMPAIGN_AL_KEY, []) || []).filter(validAl);
+  let gritty = !!GRITTY && store.get(GRITTY_KEY, false) === true;
   // Campaign allegiances from a file (the GM's allegiances file or group file, or a character carrying one): added once each.
   function mergeAllegiances(list) {
     let n = 0;
@@ -5968,6 +5999,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
         ${ch.reason ? `<div class="field"><span class="label">${T.reasonSheet}</span><span>${esc(ch.reason)}</span></div>` : ""}
         ${ch.speciesNotes ? `<div class="field"><span class="label">Other ability (GM approved)</span><span>${esc(ch.speciesNotes)}</span></div>` : ""}
         ${ch.notes ? `<div class="field wide"><span class="label">Notes</span><span>${esc(ch.notes)}</span></div>` : ""}
+        ${ch.play.lasting.length ? `<div class="field wide"><span class="label">Lasting wounds</span><span>${ch.play.lasting.map((w) => `${esc(w.name)}${w.complication ? " (complication)" : w.heal ? ` (${esc(w.heal)})` : ""}`).join("; ")}</span></div>` : ""}
         ${ch.xp.earned || ch.advances.length ? `<div class="field wide"><span class="label">Advancement: ${pointsAvail()} point${pointsAvail() === 1 ? "" : "s"} to spend, ${ch.xp.earned} earned</span><span>${ch.advances.map((a) => `${esc(purchaseText(a))}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ") || "Nothing bought yet."}</span></div>` : ""}
       </div>`;
 
@@ -5975,9 +6007,10 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     const inj = ch.play.injury;
     $("boxes").innerHTML = [1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-box="${i}" aria-label="Injury box ${i}${i <= inj ? ", marked" : ""}"></button>`).join("");
     $("cond").textContent = INJURY[inj][0] + ".";
-    $("cond-effect").textContent = inj === 3 && ch.play.dying ? `Dying: needs stabilizing (one action, Medicine roll, ${T.medkit}) before the scene ends.` : INJURY[inj][1];
-    if (inj < 3) ch.play.dying = false; // clearing a box ends Dying
-    $("dying-wrap").hidden = inj < 3;
+    $("cond-effect").textContent = ch.play.dying ? `Dying: needs stabilizing (one action, Medicine roll, ${T.medkit}) before the scene ends.` : INJURY[inj][1];
+    if (inj < 3 && !gritty) ch.play.dying = false; // clearing a box ends Dying (a grievous wound can leave you Dying with boxes to spare)
+    $("dying-wrap").hidden = inj < 3 && !ch.play.dying;
+    renderGritty();
     $("form-wrap").hidden = !FORMED.has(ch.speciesId);
     $("f-dying").checked = !!ch.play.dying;
     $("duty-count").textContent = ch.play.duty;
@@ -6193,6 +6226,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     else note = r.ok ? `Succeeded by ${r.margin}.` : `Failed by ${-r.margin}.`;
     if (r.attackRoll && r.ok && r.called) note += " Called shot: if it isn't defended, the effect you named happens. No extra boxes.";
     else if (r.attackRoll && r.ok && (r.margin >= 5 || r.auto === "auto-s")) note += " <b>Telling hit</b> if it isn't defended: pick one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, or precise). No extra boxes.";
+    if (gritty && r.attackRoll && r.ok && (r.margin >= 7 || r.auto === "auto-s")) note += " <b>Gritty combat:</b> if it marks 2 or more boxes, it's grievous. A character rolls the grievous wound table; an opponent is taken out.";
     if (r.ok && r.margin >= 5 && !r.attackRoll) note += " Margin 5+: assistance gives +2; medical care clears an extra box; a progress clock gets 2 segments.";
     if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
     if (!r.ok && !r.auto && r.margin >= -2) note += ` Missed by ${-r.margin}: the GM may offer success at a cost.`;
@@ -6671,6 +6705,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
         const data = JSON.parse(await f.text());
         if (Array.isArray(data.log)) mergeLog(data.log);
         if (Array.isArray(data.allegiances)) alAdded += mergeAllegiances(data.allegiances);
+        if (GRITTY && typeof data.gritty === "boolean") setGritty(data.gritty);
         const list = Array.isArray(data) ? data : Array.isArray(data.crew) ? data.crew : [data];
         if (!list.some((x) => x && x.attrs) && Array.isArray(data.allegiances)) continue; // an allegiances file
         const ok = list.filter((x) => x && x.attrs && x.skills);
@@ -6717,7 +6752,7 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   renderAllegianceList();
   $("gm-save").onclick = () => {
     if (!gmCrew.length) { gmSay("Add some characters first.", true); return; }
-    saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog, allegiances: campaignAllegiances }, null, 2), PACK.id + "-characters.json", gmSay);
+    saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog, allegiances: campaignAllegiances, ...(GRITTY ? { gritty } : {}) }, null, 2), PACK.id + "-characters.json", gmSay);
   };
   // ---- Rules Lab: the Encounter panel (settings with a test configuration only; never used by the sheet) ----
   if (LAB_DATA) {
@@ -6875,7 +6910,9 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
   $("boxes").addEventListener("click", (e) => {
     const b = e.target.closest("[data-box]"); if (!b) return;
     const i = +b.dataset.box;
+    const before = ch.play.injury;
     ch.play.injury = ch.play.injury === i ? i - 1 : i;
+    if (ch.play.injury < before && ch.play.injury < 3) ch.play.dying = false; // clearing a box ends Dying
     // A new injury applies straight away to physical rolls; other rolls stay unticked unless the player ticks them.
     $("r-phys").checked = PHYSICAL.has($("r-skill").value);
     render();
@@ -6886,6 +6923,79 @@ return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, di
     ch.play.ptrack = (ch.play.ptrack || 0) === i ? i - 1 : i;
     render();
   });
+  // ---- gritty combat (optional rule): grievous wounds, a limb for a life, opponents taken out ----
+  function setGritty(on) { gritty = !!GRITTY && !!on; store.set(GRITTY_KEY, gritty); $("f-gritty").checked = $("gm-gritty").checked = gritty; }
+  const gwEntry = (id) => GRIEVOUS.find((g) => g.id === id);
+  function addWound(g) {
+    const w = { id: g.id, name: g.name, text: g.text, heal: g.heal || "", complication: !!g.complication, date: new Date().toISOString().slice(0, 10), key: uid() };
+    ch.play.lasting = [...ch.play.lasting, w];
+    return w;
+  }
+  function renderGritty() {
+    $("gritty-box").hidden = $("gm-gritty-card").hidden = !GRITTY;
+    if (!GRITTY) return;
+    $("gritty-box").classList.toggle("on", gritty);
+    $("f-gritty").checked = $("gm-gritty").checked = gritty;
+    $("f-stunned").checked = $("r-stun").checked = !!ch.play.stunned;
+    $("gritty-body").hidden = !gritty;
+    $("gm-out-wrap").hidden = $("gm-out-row").hidden = !gritty;
+    if (!gritty) return;
+    const last = ch.play.gwLast, lw = last && ch.play.lasting.find((w) => w.key === last.key);
+    $("gw-down").hidden = !(lw && !last.downgraded && ch.play.duty > 0);
+    $("gw-trade").hidden = !ch.play.dying;
+    $("gw-list").innerHTML = ch.play.lasting.map((w) => `<li><b>${esc(w.name)}</b>: ${esc(w.text)} <span class="muted">${w.complication ? "A complication now." : w.heal ? "Heals: " + esc(w.heal) + "." : ""}</span> <button class="linkish" data-gwheal="${w.key}">${w.complication || w.heal === "never" ? "Remove" : "Healed"}</button></li>`).join("");
+  }
+  if (GRITTY) $("gm-out-kind").innerHTML = Object.keys(GRITTY.enemy).map((k) => `<option value="${k}">${esc({ gun: "A gun", blade: "A blade", claw: "Claws or fangs", blunt: "Fists or a club", missile: "An arrow or a thrown weapon" }[k] || k)}</option>`).join("");
+  $("f-gritty").addEventListener("change", (e) => { setGritty(e.target.checked); render(); toast(gritty ? "Gritty combat is on, in this browser. Your GM decides whether the campaign uses it." : "Gritty combat is off."); });
+  $("gm-gritty").addEventListener("change", (e) => { setGritty(e.target.checked); render(); });
+  $("gw-roll").onclick = () => {
+    const dice = [1, 2, 3].map(() => 1 + Math.floor(Math.random() * 6)), total = dice[0] + dice[1] + dice[2];
+    const g = GRIEVOUS.find((x) => total >= x.from && total <= x.to);
+    const dyingBefore = !!ch.play.dying, stunnedBefore = !!ch.play.stunned;
+    if (g.dying) ch.play.dying = true;
+    if (g.condition) ch.play.stunned = true;
+    const w = addWound(g);
+    ch.play.gwLast = { key: w.key, total, dice, dyingBefore, stunnedBefore, downgraded: false };
+    $("gw-result").innerHTML = `3d6 = ${total} (${dice.join(" + ")}): <b>${esc(g.name)}.</b> ${esc(g.text)}${g.dying ? " <b class='bad'>Dying.</b>" : ""}`;
+    touch(); render(); save();
+  };
+  $("gw-down").onclick = () => {
+    const last = ch.play.gwLast, lw = last && ch.play.lasting.find((w) => w.key === last.key);
+    if (!lw || last.downgraded || ch.play.duty <= 0) return;
+    const from = gwEntry(lw.id), to = from && from.down ? gwEntry(from.down) : null;
+    ch.play.duty--;
+    ch.play.lasting = ch.play.lasting.filter((w) => w.key !== lw.key); // undo the wound's own effects…
+    ch.play.dying = last.dyingBefore; ch.play.stunned = last.stunnedBefore;
+    let now = null;
+    if (to) { now = addWound(to); if (to.dying) ch.play.dying = true; if (to.condition) ch.play.stunned = true; } // …and suffer the milder one instead
+    ch.play.gwLast = now ? { ...last, key: now.key, downgraded: true } : null;
+    $("gw-result").innerHTML = `${esc(T.point)} point: ${esc(lw.name)} becomes <b>${to ? esc(to.name) : "nothing lasting"}</b>.${to ? " " + esc(to.text) : ""}`;
+    touch(); render(); save();
+  };
+  const tradeLimb = (kind) => {
+    if (!ch.play.dying) return;
+    // The trade replaces any grievous wound from the same hit: one wound for one hit.
+    const last = ch.play.gwLast;
+    if (last && !last.dyingBefore) { ch.play.lasting = ch.play.lasting.filter((w) => w.key !== last.key); ch.play.stunned = last.stunnedBefore; }
+    ch.play.dying = false; ch.play.gwLast = null;
+    addWound({ id: "limb-" + kind, name: kind === "lost" ? "Lost limb" : "Crippled limb", text: kind === "lost" ? "A limb is gone: you say which, with the GM." : "A limb is useless: you say which, with the GM.", heal: "never", complication: true });
+    $("gw-result").innerHTML = `<b>A limb for a life.</b> You live, ${ch.play.injury >= 3 ? "Incapacitated but stable" : "stable"}, and ${kind === "lost" ? "lose a limb" : "lose the use of a limb"}. It's a complication now: when it causes real trouble, accept it and earn ${/^[aeiou]/i.test(T.point) ? "an" : "a"} ${esc(T.point)} point. Once a fight.`;
+    touch(); render(); save();
+  };
+  $("gw-trade-lost").onclick = () => tradeLimb("lost");
+  $("gw-trade-use").onclick = () => tradeLimb("use");
+  $("gw-list").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-gwheal]"); if (!b) return;
+    ch.play.lasting = ch.play.lasting.filter((w) => w.key !== b.dataset.gwheal);
+    if (ch.play.gwLast && ch.play.gwLast.key === b.dataset.gwheal) ch.play.gwLast = null;
+    touch(); render(); save();
+  });
+  $("gm-out-roll").onclick = () => {
+    const list = GRITTY.enemy[$("gm-out-kind").value] || Object.values(GRITTY.enemy)[0], name = $("gm-out-name").value.trim() || "The opponent";
+    const text = list[Math.floor(Math.random() * list.length)].replaceAll("{name}", name);
+    $("gm-out-text").textContent = text[0].toUpperCase() + text.slice(1);
+  };
+
   $("duty-minus").onclick = () => { if (ch.play.duty > 0) { ch.play.duty--; render(); } };
   $("duty-plus").onclick = () => { ch.play.duty++; render(); };
   $("duty-reset").onclick = () => { ch.play.duty = gritStart(); ch.play.log = []; render(); };

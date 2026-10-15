@@ -3075,6 +3075,94 @@
    }
   ]
  ],
+ "gritty": {
+  "table": [
+   {
+    "from": 3,
+    "to": 4,
+    "id": "limb",
+    "name": "Lost limb",
+    "text": "A hand, an arm or a leg is gone for good; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding.",
+    "dying": true,
+    "down": "bone",
+    "heal": "never",
+    "complication": true
+   },
+   {
+    "from": 5,
+    "to": 6,
+    "id": "eye",
+    "name": "Lost eye",
+    "text": "−2 to Shooting and to spotting things, for good.",
+    "down": "concussion",
+    "heal": "never",
+    "complication": true
+   },
+   {
+    "from": 7,
+    "to": 9,
+    "id": "bone",
+    "name": "Broken bone",
+    "text": "The limb is useless until it's set with proper care.",
+    "down": "muscle",
+    "heal": "several weeks"
+   },
+   {
+    "from": 10,
+    "to": 12,
+    "id": "muscle",
+    "name": "Torn muscle",
+    "text": "−1 to physical tasks.",
+    "down": null,
+    "heal": "several weeks"
+   },
+   {
+    "from": 13,
+    "to": 15,
+    "id": "concussion",
+    "name": "Concussion",
+    "text": "Dazed, and −2 to thinking tasks for the scene.",
+    "condition": "Dazed",
+    "down": null,
+    "heal": "after the scene"
+   },
+   {
+    "from": 16,
+    "to": 18,
+    "id": "internal",
+    "name": "Internal injury",
+    "text": "Dying even with boxes to spare; it needs a surgeon.",
+    "dying": true,
+    "down": "muscle",
+    "heal": "several weeks after surgery"
+   }
+  ],
+  "enemy": {
+   "gun": [
+    "The shot shatters {name}'s knee; they won't stand again today.",
+    "{name} takes it in the gut and sits down hard in the street.",
+    "A round through the shoulder spins {name} into the dirt, gun gone.",
+    "{name} goes back through the batwing doors and lies still."
+   ],
+   "blade": [
+    "The blade takes {name}'s gun hand off at the wrist.",
+    "{name} folds around the blade and doesn't get up.",
+    "A cut across the face blinds {name}, who stumbles off screaming."
+   ],
+   "claw": [
+    "Claws open {name} from collarbone to hip.",
+    "{name} is dragged down, screaming, and goes quiet."
+   ],
+   "blunt": [
+    "The blow caves in {name}'s ribs.",
+    "{name}'s jaw breaks with a crack heard across the room."
+   ],
+   "missile": [
+    "An arrow pins {name}'s thigh to the boards.",
+    "{name} catches it in the throat and goes down choking."
+   ]
+  }
+ },
  "combatRules": {
   "parry": {
    "bareHanded": "natural"

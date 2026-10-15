@@ -271,7 +271,7 @@ Injury penalties replace each other rather than stacking. They apply to movement
 - **Certain death.** Some fates (a fall into a furnace, a beheading, disintegration) bypass the track entirely.
 
 Your protection is avoiding the hit: a defense (Dodge, Parry or Block), cover, and {{a:point}} point, which reduces a hit by one box.
-
+{{GEN:gritty}}
 ## Weapons and damage
 
 How many boxes a hit marks depends on the **weapon**, not on how well the attack succeeded.

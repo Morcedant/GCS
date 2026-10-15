@@ -389,6 +389,29 @@ Injury penalties replace each other rather than stacking. They apply to movement
 
 Your protection is avoiding the hit: a defense (Dodge, Parry or Block), cover, and a Grit point, which reduces a hit by one box.
 
+### Optional rule: gritty combat
+
+For a harder, bloodier game, the GM can turn on **gritty combat** for the campaign (the creator has a switch on the Condition card and in the GM view). The rest of the rules stay the same.
+
+**Grievous hits.** A hit that marks **2 or more boxes** is **grievous** when the attack succeeded by **7 or more**, rolled a **natural 3 or 4**, or left the target **Dying**.
+
+- **A character** rolls 3d6 on the table below and suffers the result on top of the boxes.
+- **An opponent** is simply taken out: no roll, no boxes to count. Describe how, or let the GM view roll a description.
+- **With a telling hit,** the attacker also chooses which limb.
+
+| 3d6 | Grievous wound | Effect | Heals |
+|---|---|---|---|
+| 3–4 | Lost limb | A hand, an arm or a leg is gone for good; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding. | Never: a complication |
+| 5–6 | Lost eye | −2 to Shooting and to spotting things, for good. | Never: a complication |
+| 7–9 | Broken bone | The limb is useless until it's set with proper care. | Several weeks |
+| 10–12 | Torn muscle | −1 to physical tasks. | Several weeks |
+| 13–15 | Concussion | Dazed, and −2 to thinking tasks for the scene. | After the scene |
+| 16–18 | Internal injury | Dying even with boxes to spare; it needs a surgeon. | Several weeks after surgery |
+
+- **Grit.** Spend a Grit point to **downgrade** a grievous wound one step: lost limb becomes broken bone; lost eye becomes concussion; broken bone becomes torn muscle; torn muscle becomes nothing lasting; concussion becomes nothing lasting; internal injury becomes torn muscle.
+- **A limb for a life.** Once a fight, a character who would be left Dying or killed can **lose a limb, or the use of one**, instead. They live, Incapacitated but stable, and the limb becomes a complication. It replaces any grievous wound from the same hit.
+- **Healing.** Grievous wounds heal on their own clock, whatever the boxes say. A lost limb, a lost eye or a disfigurement never heals.
+
 ## Weapons and damage
 
 How many boxes a hit marks depends on the **weapon**, not on how well the attack succeeded.
