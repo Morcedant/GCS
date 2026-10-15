@@ -3460,5 +3460,99 @@
     }
    ]
   }
- ]
+ ],
+ "gritty": {
+  "table": [
+   {
+    "from": 3,
+    "to": 4,
+    "id": "limb",
+    "name": "Lost limb",
+    "text": "A hand, an arm or a leg is gone for good; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding.",
+    "dying": true,
+    "down": "bone",
+    "heal": "never",
+    "complication": true
+   },
+   {
+    "from": 5,
+    "to": 6,
+    "id": "eye",
+    "name": "Lost eye",
+    "text": "−2 to Firearms and to spotting things.",
+    "down": "concussion",
+    "heal": "never",
+    "complication": true
+   },
+   {
+    "from": 7,
+    "to": 9,
+    "id": "bone",
+    "name": "Broken bone",
+    "text": "The limb is useless until it's set with proper care.",
+    "down": "muscle",
+    "heal": "several weeks"
+   },
+   {
+    "from": 10,
+    "to": 12,
+    "id": "muscle",
+    "name": "Torn muscle",
+    "text": "−1 to physical tasks.",
+    "down": null,
+    "heal": "several weeks"
+   },
+   {
+    "from": 13,
+    "to": 15,
+    "id": "concussion",
+    "name": "Concussion",
+    "text": "Stunned, and −2 to thinking tasks for the scene.",
+    "condition": "Stunned",
+    "down": null,
+    "heal": "after the scene"
+   },
+   {
+    "from": 16,
+    "to": 18,
+    "id": "internal",
+    "name": "Internal injury",
+    "text": "Dying even with boxes to spare; it needs a hospital's trauma surgeons.",
+    "dying": true,
+    "down": "muscle",
+    "heal": "several weeks after surgery"
+   }
+  ],
+  "enemy": {
+   "gun": [
+    "The round shatters {name}'s knee; they won't stand again today.",
+    "{name} takes it center mass and slides down the wall.",
+    "A shot through the shoulder spins {name} to the pavement, gun gone.",
+    "{name} goes back through the plate-glass window and lies still."
+   ],
+   "blade": [
+    "The blade opens {name}'s forearm to the bone.",
+    "{name} folds around the knife and doesn't get up."
+   ],
+   "blunt": [
+    "The blow caves in {name}'s ribs.",
+    "{name}'s jaw breaks with a crack heard across the street.",
+    "{name} hits the asphalt and doesn't get up."
+   ],
+   "power": [
+    "The blast throws {name} through a parked car.",
+    "{name} is slammed into the wall hard enough to crack the concrete, and slides down limp.",
+    "Frost climbs {name}'s arm, and the arm doesn't move again.",
+    "{name}'s own power gutters out, and they drop."
+   ],
+   "claw": [
+    "Claws open {name} from collarbone to hip.",
+    "{name} is dragged down, screaming, and goes quiet."
+   ],
+   "missile": [
+    "The bolt pins {name}'s leg to the doorframe.",
+    "{name} catches it in the throat and goes down choking."
+   ]
+  }
+ }
 }
