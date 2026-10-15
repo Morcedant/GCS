@@ -352,6 +352,12 @@ tr.lvl-U td.target { color: var(--muted); }
 .ship-row .box { width: 34px; height: 22px; }
 .ship-row .eff { font-size: .8rem; color: var(--muted); }
 .ship-row.hit .eff { color: var(--warn); } .ship-row.out .eff { color: var(--bad); font-weight: 600; }
+.ship-res { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 8px; }
+.ship-res .res { display: inline-flex; gap: 6px; align-items: center; }
+.ship-res .res b { min-width: 2.2em; text-align: center; }
+.gritty-box { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
+.gritty-box.on { border-color: var(--warn); }
+.gritty-toggle { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
 
 .advance-box { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
 .advance-box select { max-width: 100%; width: auto; flex: 1 1 220px; }
@@ -390,6 +396,55 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-cond { font-size: .82rem; }
 .gm-cond.hurt { color: var(--warn); } .gm-cond.out { color: var(--bad); font-weight: 600; }
 
+/* Battle map (GM view) */
+.bm-card { margin-top: 22px; display: grid; gap: 10px; }
+.bm-bar, .bm-add, .bm-sel, .bm-gridrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bm-add, .bm-sel { padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; }
+.bm-add label, .bm-sel label, .bm-gridrow label { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; }
+.bm-add input[type=text], .bm-sel input[type=text] { width: 12em; }
+.bm-gridrow input[type=number] { width: 5.5em; }
+.bm-file { cursor: pointer; position: relative; }
+.bm-file:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bm-hide { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; opacity: 0; }
+.bm-zoom { display: inline-flex; gap: 4px; }
+.btn[aria-pressed="true"] { background: var(--accent); color: var(--bg, #111); }
+.bm-stage { position: relative; }
+.bm-svg { display: block; width: 100%; height: min(72vh, 760px); min-height: 360px; background: var(--well); border: 1px solid var(--line); border-radius: 10px; touch-action: none; cursor: grab; user-select: none; }
+.bm-svg:active { cursor: grabbing; }
+.bm-grid { fill: none; stroke: var(--fg); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.bm-tok { cursor: pointer; outline: none; }
+.bm-disc { stroke: none; }
+.bm-ring { fill: none; stroke: rgba(0,0,0,.65); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.bm-tok.sel .bm-ring, .bm-tok:focus-visible .bm-ring { stroke: var(--accent); stroke-width: 4; }
+.bm-tok.down { opacity: .45; }
+.bm-tok.dying .bm-ring { stroke: var(--bad); stroke-width: 4; stroke-dasharray: 6 4; }
+.bm-init { fill: #fff; text-anchor: middle; font-weight: 700; font-family: var(--mono, monospace); pointer-events: none; }
+.bm-label { fill: var(--fg); text-anchor: middle; paint-order: stroke; stroke: var(--well); stroke-width: 3px; font-weight: 600; pointer-events: none; }
+.bm-mline { stroke: var(--accent); stroke-width: 3; stroke-dasharray: 8 6; vector-effect: non-scaling-stroke; }
+.bm-mdot { fill: var(--accent); }
+.bm-readout { position: absolute; left: 10px; bottom: 10px; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.72); color: #fff; font: .8rem var(--mono, monospace); pointer-events: none; }
+.bm-readout:empty { display: none; }
+.bm-pip { fill: rgba(0,0,0,.55); stroke: #fff; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.bm-pip.on { fill: var(--bad); }
+.bm-sel { flex-direction: column; align-items: flex-start; }
+.bm-tracks { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.bm-stats { flex-basis: 100%; color: var(--muted); }
+.bm-track { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; }
+.bm-boxes { display: inline-flex; gap: 4px; }
+.bm-box { width: 22px; height: 22px; padding: 0; border: 2px solid var(--line); border-radius: 4px; background: none; cursor: pointer; }
+.bm-box.on { background: var(--bad); border-color: var(--bad); }
+.bm-sel > label, .bm-sel .bm-tracks label { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; }
+.bm-kinds .btn[aria-pressed=true] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.bm-lane { fill: transparent; stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.bm-lane.odd { fill: rgba(127,127,127,.08); }
+.bm-lane.us { fill: rgba(61,122,158,.12); }
+.bm-lname { fill: var(--fg); text-anchor: middle; font-weight: 700; font-size: 20px; paint-order: stroke; stroke: var(--well); stroke-width: 3px; }
+.bm-lsub { fill: var(--muted); text-anchor: middle; font-size: 13px; paint-order: stroke; stroke: var(--well); stroke-width: 3px; }
+.bm-help { border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; }
+.bm-help summary { cursor: pointer; font-weight: 600; }
+.bm-helpbody h4 { margin: 12px 0 4px; font-size: .95rem; }
+.bm-helpbody ul { margin: 0; padding-left: 1.2em; }
+.bm-helpbody li { margin: 2px 0; }
 .gm-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 @media (max-width: 900px) { .gm-tools { grid-template-columns: minmax(0, 1fr); } }
 .seed { margin: 0; display: grid; gap: 8px; }
@@ -550,10 +605,17 @@ tr.lvl-U td.target { color: var(--muted); }
             </table>
           </div>
           <div class="advance-box">
-            <span class="label">Advancement (after a significant mission, with the GM's approval)</span>
+            <span class="label">Advancement points <span id="xp-tally" class="chip"></span></span>
+            <p class="small muted" style="margin:0">1 point after a significant mission, 2 more at a milestone. Spend them or bank them, with the GM's approval and a reason from the story.</p>
             <div class="btn-row">
-              <select id="f-advance" aria-label="Skill to advance"></select>
-              <button class="btn" id="btn-advance">Record advancement</button>
+              <button class="btn" id="btn-earn1">+1: significant mission</button>
+              <button class="btn" id="btn-earn2">+2: milestone</button>
+              <button class="linkish" id="btn-unearn" hidden>Undo last award</button>
+            </div>
+            <div class="btn-row">
+              <select id="f-advance" aria-label="What to spend points on"></select>
+              <input id="f-advance-note" aria-label="Story reason" placeholder="Why, from the story (optional)" style="flex:1 1 180px">
+              <button class="btn" id="btn-advance">Spend</button>
               <button class="linkish" id="btn-unadvance" hidden>Undo last</button>
             </div>
             <ul class="small muted adv-list" id="adv-list"></ul>
@@ -724,6 +786,11 @@ tr.lvl-U td.target { color: var(--muted); }
         <ol class="turns" id="gm-turns"></ol>
       </div>
     </div>
+    <div class="card hud no-print bm-card">
+      <h3>Battle map</h3>
+      <p class="small muted">A hex map at any scale for an away team's fight, or a range track of bands for a ship fight or a chase. Tokens for the crew stay linked to the officers, and the Pelion's token to the ship's tracks, so you can mark damage from the map. Open <b>How to use the map</b> for the steps.</p>
+      <div id="battlemap"></div>
+    </div>
     <div class="gm-tools">
       <div class="card hud no-print">
         <h3>Mission seed</h3>
@@ -737,8 +804,19 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="toast" id="seed-msg" role="status" aria-live="polite"></div>
       </div>
       <div class="card hud no-print">
+        <h3>Gritty combat</h3>
+        <label class="gritty-toggle"><input type="checkbox" id="gm-gritty"> <b>Gritty combat in this campaign</b></label>
+        <p class="small muted">Grievous hits maim the crew and take opponents out (Players' Guide, Optional rule: gritty combat). Players switch it on in their own creator too; the crew file carries it.</p>
+        <div class="fields" id="gm-out-wrap" hidden>
+          <div class="field"><label for="gm-out-name">Opponent</label><input type="text" id="gm-out-name" placeholder="e.g. the Klingon"></div>
+          <div class="field"><label for="gm-out-kind">Struck by</label><select id="gm-out-kind"><option value="energy">A phaser or disruptor</option><option value="blade">A blade</option><option value="claw">Claws or fangs</option><option value="blunt">Fists or a club</option><option value="missile">A spear or a thrown weapon</option></select></div>
+        </div>
+        <div class="btn-row" id="gm-out-row" hidden><button class="btn" id="gm-out-roll">Taken out: describe it</button></div>
+        <p class="small" id="gm-out-text"></p>
+      </div>
+      <div class="card hud no-print">
         <h3>Captain's log</h3>
-        <p class="small muted">Write it together at the end of a mission. Advancements apply to the GM's copies; use each card's <b>Save officer file</b> to send a player their update.</p>
+        <p class="small muted">Write it together at the end of a mission. Advancement points go on the GM's copies; use each card's <b>Save officer file</b> to send a player their update.</p>
         <div class="fields">
           <div class="field"><label for="log-stardate">Stardate</label><input type="text" id="log-stardate"></div>
           <div class="field"><label for="log-outcome">Outcome</label>
@@ -774,15 +852,19 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes your training and attribute. Do not add the attribute again.</p>
 <p><em>Example:</em> Sensors 13, with a −2 penalty for interference, gives a target of 11. A roll of 9 succeeds by 2. A roll of 12 fails by 1.</p>
 <h2 id="g-what-this-edition-adds">What this edition adds</h2>
-<p>This revision keeps every rule from the original guide and adds four campaign rules:</p>
+<p>This revision keeps every rule from the original guide and adds these campaign rules:</p>
 <ul>
 <li><strong>General Services</strong>, a division for enlisted crew holding Crewman and Yeoman ranks.</li>
 <li><strong>Species attribute adjustments</strong>, which shift starting attributes and always total zero.</li>
 <li><strong>Species advantages</strong>, which can replace your regular advantage and always come with a companion complication.</li>
 <li><strong>Custom species</strong>, built with the GM under the same limits.</li>
+<li><strong>Defenses, telling hits and called shots:</strong> Parry and Block beside Dodge, and great hits that decide what happens.</li>
+<li><strong>Advancement points</strong>, earned after missions and spent on skills, advantages and attributes.</li>
+<li><strong>Gritty combat</strong>, an optional rule for grievous wounds.</li>
+<li><strong>A battle map</strong> in the GM view, for away teams and ship fights.</li>
 </ul>
 <h2 id="g-guide-scope">Guide scope</h2>
-<p>Personal actions and away-team encounters are covered here. Starship stations use the same skills. Species abilities beyond the adjustments and species advantages in this guide still require GM approval. Numerical ship combat is outside this guide’s scope.</p>
+<p>Personal actions and away-team encounters are covered here. Starship stations use the same skills. Species abilities beyond the adjustments and species advantages in this guide still require GM approval. Ship combat uses the light rules and the ship registry in <em>The USS Pelion</em>.</p>
 <h1 id="g-create-your-character">Create your character</h1>
 <p>Work through the five steps in order. The USS Pelion Officer Creator follows the same steps and checks the rules for you.</p>
 <h2 id="g-step-1-choose-your-role">Step 1: Choose your role</h2>
@@ -1020,7 +1102,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>An advantage gives +2 to one narrowly defined kind of task when the GM agrees it applies. It cannot improve every use of a broad skill. A complication creates choices and problems; it is not a permanent penalty.</p>
 <p><em>Examples:</em> Steady Hands gives +2 to delicate medical procedures. Subspace Specialist gives +2 when analyzing subspace phenomena. Complications might be Cannot Leave a Mystery Alone, Distrusts Command Decisions, or Protects Others at Personal Risk. Define their triggers with the GM.</p>
 <h2 id="g-step-5-prepare-for-duty">Step 5: Prepare for duty</h2>
-<p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.</p>
+<p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Your Parry is Unarmed Combat −3, and your Block Unarmed Combat −2. Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.</p>
 <h3 id="g-top-10-connections-to-a-crewmate">Top 10 connections to a crewmate</h3>
 <p>Pick one, name the crewmate with their player, and agree on the details together.</p>
 <ol type="1">
@@ -1276,8 +1358,69 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-turn-order-and-actions">Turn order and actions</h2>
 <p>Act in descending Agility order. Players choose the order of tied crew members; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as attacking, using equipment, helping, or attempting a task. The GM judges movement by the scene; there is no fixed grid scale.</p>
 <h2 id="g-attacking-and-defending">Attacking and defending</h2>
-<p>Roll Phasers for a ranged attack or Unarmed Combat for a melee attack. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty. Untrained Athletics adds nothing. Use the training level, not the final Athletics score. Each target gets one Dodge attempt per round, refreshed at the start of the round. A successful Dodge cancels the hit. Apply physical injury penalties to Dodge.</p>
-<p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Other difficult conditions use the normal modifier scale. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage under these rules.</p>
+<p>Roll Phasers for a ranged attack, or Unarmed Combat for fists, grappling and a weapon in hand. If the attack succeeds, an aware target able to move may <strong>defend</strong>: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.</p>
+<ul>
+<li><strong>One defense a round.</strong> A target gets one defense a round, between its turns, and chooses which when an attack hits. The <strong>Additional Defense</strong> advantage gives a second.</li>
+<li><strong>Dodge</strong> is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Untrained Athletics adds nothing; use the training level, not the final Athletics score.</li>
+<li><strong>Parry.</strong> Against a weapon in hand or fists, roll Unarmed Combat −3 with a weapon in hand: a d’k tahg, a lirpa, a length of pipe. Bare-handed, Unarmed Combat −3 parries fists only. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a phaser beam or a disruptor bolt.</li>
+<li><strong>Block.</strong> With anything that can stand in for a shield (a chair, a crate lid, a torn-off panel), you can block a weapon in hand, fists or a thrown weapon: roll Unarmed Combat −2. Nothing you can lift blocks an energy weapon. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.</li>
+<li><strong>Attack quality.</strong> A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.</li>
+<li><strong>Aim.</strong> Spend your action aiming at a target you can see: +1 to your next attack against it. <strong>Careful Marksman</strong> adds its +2 to this.</li>
+</ul>
+<p>Solid cover blocks a shot. Partial cover imposes −2 on the attack. Other difficult conditions use the normal modifier scale. Weapon effects apply after a hit survives any defense. Success margin does not increase damage: a great hit decides <em>what</em> happens instead.</p>
+<h2 id="g-telling-hits">Telling hits</h2>
+<p>A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.</p>
+<ul>
+<li><strong>A telling hit</strong> is an attack that succeeds by <strong>5 or more</strong>, or on a natural 3 or 4, and isn’t stopped by a defense. The attacker picks <strong>one effect</strong> below and describes it. The weapon still marks its usual boxes.</li>
+<li><strong>A called shot.</strong> Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, a phaser, a control panel, a power cell). If the attack hits at all, the effect happens, whatever the margin. <strong>Careful Marksman</strong> cuts this penalty by 1.</li>
+<li><strong>Phasers on stun</strong> land telling hits too. The effect happens whether or not the target resists the stun.</li>
+<li><strong>Both ways.</strong> Klingons, pirates and stranger things land telling hits on the crew too.</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Effect</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Disarm</td>
+<td>The weapon or held item drops, or flies a few yards away</td>
+</tr>
+<tr class="even">
+<td>Knock down</td>
+<td>The target falls prone, or is driven back a few steps</td>
+</tr>
+<tr class="odd">
+<td>Pin</td>
+<td>The target is held, tangled or pinned down: their next action goes to getting free</td>
+</tr>
+<tr class="even">
+<td>Rattle</td>
+<td>−2 to the target’s next roll</td>
+</tr>
+<tr class="odd">
+<td>Break gear</td>
+<td>A phaser, tricorder, communicator or improvised shield breaks</td>
+</tr>
+<tr class="even">
+<td>Open them up</td>
+<td>The next attack on this target this round gets +2</td>
+</tr>
+<tr class="odd">
+<td>Precise</td>
+<td>You hit exactly what you aimed at: the control panel, the power coupling, the hand on the trigger</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Limits.</strong> A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a Gorn of its claws, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.</p>
+<p><strong>Staying alive.</strong> A crew member on the receiving end can shrug off a telling hit’s effect with <strong>Hard to put down</strong> (once per fight) or by spending a Duty point. Either way, they still take the boxes.</p>
+<p><em>Example:</em> a Klingon warrior slashes at Lt. Reyes with a d’k tahg and succeeds by 5. Reyes hasn’t defended yet this round: Dodge 12, −2 for the clean hit, needs a 10 or less. Bare-handed, Reyes can’t parry a blade, so Reyes dodges. When the second Klingon swings before Reyes’s next turn, there’s no defense left, unless Reyes has Additional Defense.</p>
 <h2 id="g-range">Range</h2>
 <p>Distances fall into five bands:</p>
 <table>
@@ -1363,8 +1506,75 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Disintegration</strong> and comparable hazards bypass the track entirely.</li>
 </ul>
 <p>Your protection is avoiding the hit: Dodge, cover, and a Duty point, which reduces a kill shot from three boxes to two, leaving you Seriously wounded but on your feet.</p>
+<h3 id="g-optional-rule-gritty-combat">Optional rule: gritty combat</h3>
+<p>For a harder, bloodier game, the GM can turn on <strong>gritty combat</strong> for the campaign (the creator has a switch on the Condition card and in the GM view). The rest of the rules stay the same.</p>
+<p><strong>Grievous hits.</strong> A hit that marks <strong>2 or more boxes</strong> is <strong>grievous</strong> when the attack succeeded by <strong>7 or more</strong>, rolled a <strong>natural 3 or 4</strong>, or left the target <strong>Dying</strong>.</p>
+<ul>
+<li><strong>A crew member</strong> rolls 3d6 on the table below and suffers the result on top of the boxes.</li>
+<li><strong>An opponent</strong> is simply taken out: no roll, no boxes to count. Describe how, or let the GM view roll a description.</li>
+<li><strong>With a telling hit,</strong> the attacker also chooses which limb.</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>Grievous wound</th>
+<th>Effect</th>
+<th>Heals</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3–4</td>
+<td>Lost limb</td>
+<td>A hand, an arm or a leg is gone; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding.</td>
+<td>Never: a complication (a prosthetic, at a starbase)</td>
+</tr>
+<tr class="even">
+<td>5–6</td>
+<td>Lost eye</td>
+<td>−2 to Phasers and to spotting things.</td>
+<td>Never: a complication</td>
+</tr>
+<tr class="odd">
+<td>7–9</td>
+<td>Broken bone</td>
+<td>The limb is useless until a bone-knitter sets it in sickbay.</td>
+<td>A day in sickbay; several weeks without</td>
+</tr>
+<tr class="even">
+<td>10–12</td>
+<td>Torn muscle</td>
+<td>−1 to physical tasks.</td>
+<td>A few days with sickbay care; several weeks without</td>
+</tr>
+<tr class="odd">
+<td>13–15</td>
+<td>Concussion</td>
+<td>Stunned, and −2 to thinking tasks for the scene.</td>
+<td>After the scene</td>
+</tr>
+<tr class="even">
+<td>16–18</td>
+<td>Internal injury or severe burns</td>
+<td>Dying even with boxes to spare; it needs sickbay.</td>
+<td>A week after sickbay</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Duty points.</strong> Spend a Duty point to <strong>downgrade</strong> a grievous wound one step: a lost limb becomes a broken bone, a lost eye a concussion, a broken bone or an internal injury a torn muscle, and a torn muscle or a concussion nothing lasting.</li>
+<li><strong>A limb for a life.</strong> Once a fight, a crew member who would be left Dying or killed can <strong>lose a limb, or the use of one</strong>, instead. They live, Incapacitated but stable, and the limb becomes a complication. It replaces any grievous wound from the same hit.</li>
+<li><strong>Healing.</strong> Grievous wounds heal on their own clock, whatever the boxes say. A lost limb or a lost eye never heals on its own.</li>
+</ul>
 <h2 id="g-weapons-and-damage">Weapons and damage</h2>
-<p>How many boxes a hit marks depends on the <strong>weapon</strong>, not on how well the attack roll succeeded. Apply it only after the hit survives any Dodge. This list sorts common weapons into one-box, two-box and killing (three-box) categories; the GM places anything else by comparison.</p>
+<p>How many boxes a hit marks depends on the <strong>weapon</strong>, not on how well the attack roll succeeded. Apply it only after the hit survives any defense. This list sorts common weapons into one-box, two-box and killing (three-box) categories; the GM places anything else by comparison.</p>
 <table>
 <colgroup>
 <col style="width: 25%" />
@@ -1542,6 +1752,16 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>A drained phaser won’t fire.</strong> Swap in a spare power cell (one action) to refill it, or recharge it fully in the ship’s armory between missions. Having packed a spare cell is a good use of a Duty point’s <em>small preparation</em>.</li>
 <li><strong>Overload.</strong> A phaser with at least 4 power left can be set to overload: it whines for a round and explodes at the end of the next round, as an explosion (1 box to everyone nearby, 2 at the centre). The phaser is destroyed.</li>
 </ul>
+<h2 id="g-the-battle-map">The battle map</h2>
+<p>The GM view of the creator has a <strong>battle map</strong> for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in this guide, and a fight without it works the same way. Open <strong>How to use the map</strong> on the map itself for the buttons, step by step.</p>
+<p><strong>Three kinds of map.</strong></p>
+<ul>
+<li><strong>A hex map</strong> for an away team’s fight where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard inside a ship, 5 or 10 yards on a city street, 50 on open ground, or a number of kilometres for ships in space. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range tables.</li>
+<li><strong>A ship fight</strong> on a range track: a lane for the Pelion and one for each space range band, from under 10 km to a light-second. When the helms make their contest, the GM moves the enemy a lane in or out. <strong>Add the Pelion</strong> places the ship, linked to its Shields, Hull and systems: marking a box on the map marks it on the ship’s tracks, and the other way round. Enemy ships come from the <em>Enemy ships</em> table with their Hull boxes.</li>
+<li><strong>A range track</strong> for an away team’s chase or a running fight where only distance matters.</li>
+</ul>
+<p><strong>Tokens.</strong> The GM places the crew with one button. Their tokens stay linked to the officers in the GM view: marking Injury, Dying, Stunned or a Duty point on a token marks it on the officer, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
+<p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps every map, its picture and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
 <h1 id="g-medical-care">Medical care</h1>
 <p>Starfleet physicians in 2268 have advanced diagnostic scanners, potent pharmaceuticals, portable emergency equipment, and sophisticated sickbay facilities. Familiar injuries often respond quickly to treatment. Severe trauma, incompatible biology, missing supplies, and unidentified conditions still challenge an experienced doctor. The treatment values below are campaign rules inspired by the series, rather than numerical rules stated in canon.</p>
 <h2 id="g-diagnosis-and-stabilization">Diagnosis and stabilization</h2>
@@ -1553,13 +1773,36 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>A functioning, equipped sickbay grants +2 to Medicine for diagnosis and treatment. A successful treatment removes two injury boxes; success by 5 or more removes three. Allow the time the procedure requires rather than completing surgery in one combat action. Sickbay care can follow field treatment. Do not repeat an unsuccessful procedure without a meaningful change in the situation.</p>
 <p>Removing injury boxes removes their associated penalties, but major organ damage, severe burns, and complex internal trauma can still require a procedure and recovery period set by the GM. The physician determines whether the patient is fit for duty. Pain suppression does not itself heal an injury. Stun normally wears off at the end of the scene; prolonged unconsciousness requires assessment.</p>
 <h2 id="g-natural-recovery">Natural recovery</h2>
-<p>Injuries also heal with time. Each <strong>full day of rest</strong> clears one injury box. Rest means light duty at most: no combat, no away missions, nothing strenuous. A day spent working hard or fighting clears nothing.</p>
+<p>Injuries also heal with time. Rest clears injury one box at a time, and the worse you’re hurt, the longer each box takes. Rest means light duty at most: no combat, no away missions, nothing strenuous. A day spent working hard or fighting clears nothing.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Boxes marked</th>
+<th>Rest to clear one box</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>A full day</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>At least three days</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>A week, and only once treated</td>
+</tr>
+</tbody>
+</table>
 <ul>
-<li><strong>At three boxes, rest alone clears nothing.</strong> An Incapacitated patient needs treatment (field care or sickbay) to clear the first box; after that, rest takes over.</li>
-<li><strong>Rest and medicine combine.</strong> Treatment clears boxes immediately; rest clears what remains, one box a day.</li>
+<li><strong>At three boxes, rest alone clears nothing.</strong> An Incapacitated patient needs stabilizing or treatment (field care or sickbay) first; after that, a week of rest clears the first box.</li>
+<li><strong>The times add up.</strong> From three boxes, rest alone takes about a week and a half to heal completely: a week, then three days, then a day.</li>
+<li><strong>Rest and medicine combine.</strong> Treatment clears boxes immediately; rest clears what remains.</li>
 <li><strong>Serious trauma takes longer.</strong> For major organ damage, severe burns, or complex internal trauma, the GM can require a set recovery period before rest clears anything, and the ship’s physician decides when the patient is fit for duty.</li>
 </ul>
-<p><em>Example:</em> Ensign Reyes ends a mission Seriously wounded (two boxes). Sickbay is busy with worse cases, so Reyes rests in quarters: one box clears the first day and the second the next, and Reyes is back on duty on the third day.</p>
+<p><em>Example:</em> Ensign Reyes ends a mission Seriously wounded (two boxes). Sickbay is busy with worse cases, so Reyes rests in quarters: three days clear the first box and one more day the second, and Reyes is back on duty on the fifth day.</p>
 <h2 id="g-alien-medicine-and-limits">Alien medicine and limits</h2>
 <p>Unknown illness or physiology requires discovering the cause and a suitable treatment before boxes can be restored. Medicine can receive assistance from Life Sciences, Sensors, or Computers. Existing assistance limits apply. Missing essential equipment or incompatible supplies can prevent a procedure. Disintegration and other unsurvivable injuries cannot be reversed by an ordinary Medicine roll.</p>
 <p>Crew of other species may need care suited to their biology. An Alien Physiology Specialist, or a physician with access to the right species data, keeps that care from becoming guesswork.</p>
@@ -1590,6 +1833,10 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Declare when a hit would mark boxes, before applying them. Does not prevent disintegration or another hazard that bypasses the injury track.</td>
 </tr>
 <tr class="odd">
+<td>Shrug off a telling hit</td>
+<td>Cancel the effect an attacker picked against you; you still take the boxes.</td>
+</tr>
+<tr class="even">
 <td>Establish a small preparation</td>
 <td>Propose a plausible detail, such as having brought a field kit. GM approval is required; it cannot contradict established facts or solve the mission outright.</td>
 </tr>
@@ -1681,7 +1928,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </table>
 <p>A captain who takes an order doesn’t also work a station that exchange. Commanding well is the job.</p>
 <h2 id="g-the-uss-pelion">The USS Pelion</h2>
-<p>The ship has its own sheet, tracked like an injury track. Encounters stay descriptive: the GM states what is at stake before rolls and narrates what each box means. This light structure is a campaign rule; detailed starship combat stays outside this guide.</p>
+<p>The Pelion is a <strong>Heavy Cruiser</strong>, and it has its own sheet, tracked like an injury track. The GM states what is at stake before the rolls and narrates what each box means. Every Starfleet class, and the ships the Pelion meets, is in the <strong>Ship registry</strong> below, adapted from Tiny Trek.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -1698,13 +1945,13 @@ tr.lvl-U td.target { color: var(--muted); }
 <tbody>
 <tr class="odd">
 <td>Shields</td>
-<td>3</td>
-<td>Hits mark Shields first. At 3 boxes shields are down, and hits go to the Hull and a system.</td>
+<td>5</td>
+<td>While the shields are up, hits mark Shields first. With all 5 marked they’re down, and hits go to the Hull.</td>
 </tr>
 <tr class="even">
 <td>Hull</td>
-<td>4</td>
-<td>1–2: scarred, minor breaches sealed. 3: serious breaches, decks lost. 4: the ship is breaking up; start an <em>Abandon ship</em> clock.</td>
+<td>5</td>
+<td>1–2: scarred, minor breaches sealed. 3–4: serious breaches, decks lost. 5: the ship is breaking up; start an <em>Abandon ship</em> clock.</td>
 </tr>
 <tr class="odd">
 <td>Weapons, Engines, Sensors, Communications, Transporters, Life support</td>
@@ -1713,10 +1960,286 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<p><strong>Taking hits.</strong> A normal hit (a phaser bank, a disruptor) marks 1 box; a heavy hit (photon torpedo, ramming, a disruptor volley) marks 2. Once Shields are down, each hit marks the Hull and the system the GM chooses, or roll 3d6: 3–6 Weapons, 7–8 Engines, 9–10 Sensors, 11–12 Communications, 13–14 Transporters, 15–18 Life support.</p>
-<p><strong>Defending.</strong> When an enemy ship hits, Helm may roll <strong>Helm</strong> to evade, once per exchange, like Dodge: success cancels the hit. Engines damage applies its penalty.</p>
-<p><strong>Repairs.</strong> In the middle of a crisis, a successful <strong>Engineering</strong> roll clears one box from Shields or a system (two on success by 5); it takes the engineer’s action that exchange. The Hull can only be patched by one box per scene, and fully repaired at a starbase. Between encounters, the crew can clear the rest of the systems with time.</p>
+<p><strong>Power.</strong> Each exchange the ship has <strong>Power</strong> to spend (the Pelion has 5), and it refills at the start of the next. Raising the shields for the exchange costs 1, firing the phasers 1, a torpedo volley 1 (and one torpedo from the load), and a transporter use 1. Each Power left over can be diverted for +1 to one ship roll that exchange, up to +2. With the shields not raised, hits go straight to the Hull.</p>
+<p><strong>Taking hits.</strong> A hit marks the boxes its weapon deals (see the registry): Shields first while they’re up, then the Hull. <strong>Every hit that reaches the Hull</strong> also rolls on the <em>Concussive system damage</em> table below. A called shot or a telling hit can pick a system instead.</p>
+<p><strong>Defending.</strong> When an enemy ship fires, Helm may roll <strong>Helm</strong> to evade, once per exchange, like Dodge: success cancels the hit. Torpedoes can’t be evaded. Engines damage applies its penalty.</p>
+<p><strong>Maneuverability.</strong> Compare the ships’ Maneuverability: the most maneuverable ship adds the difference to its Helm contests and its evade rolls. If two ships tie for the highest, nobody gets the bonus.</p>
+<p><strong>Repairs.</strong> In the middle of a crisis, a successful <strong>Engineering</strong> roll clears one box from Shields or a system (two on success by 5), or undoes one concussive result; it takes the engineer’s action that exchange. The Hull can only be patched by one box per scene, and fully repaired at a starbase. Shields that went down take an hour per box to restore.</p>
 <p><strong>Firing.</strong> Tactical rolls <strong>Phasers</strong> for ship weapons, against the enemy ship’s own tracks, which the GM keeps the same way.</p>
+<h3 id="g-ship-registry">Ship registry</h3>
+<p>Starfleet’s classes, from the shuttlecraft up. For other powers’ ships, take the nearest class and add what makes them different (a cloak, a plasma torpedo).</p>
+<table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Class</th>
+<th>Shields</th>
+<th>Hull</th>
+<th>Power</th>
+<th>Maneuver</th>
+<th>Sensors</th>
+<th>Phasers</th>
+<th>Torpedoes</th>
+<th>Transporter</th>
+<th>Crew</th>
+<th>Chassis system</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Shuttle I</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>6</td>
+<td>1</td>
+<td>—</td>
+<td>—</td>
+<td>1 person</td>
+<td>2, and up to 4 passengers</td>
+<td>Agile dodge</td>
+</tr>
+<tr class="even">
+<td>Shuttle II</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>6</td>
+<td>2</td>
+<td>Light</td>
+<td>2 (light)</td>
+<td>1 person</td>
+<td>2, and up to 8 passengers</td>
+<td>Agile dodge</td>
+</tr>
+<tr class="odd">
+<td>Escort</td>
+<td>2</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td>2</td>
+<td>Standard</td>
+<td>10</td>
+<td>3 people</td>
+<td>25</td>
+<td>Buffered shielding</td>
+</tr>
+<tr class="even">
+<td>Science vessel</td>
+<td>2</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td>4</td>
+<td>Light</td>
+<td>10</td>
+<td>3 people</td>
+<td>25</td>
+<td>Science</td>
+</tr>
+<tr class="odd">
+<td>Light Cruiser</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td>2</td>
+<td>Light</td>
+<td>25</td>
+<td>5 people</td>
+<td>100</td>
+<td>Buffered shielding</td>
+</tr>
+<tr class="even">
+<td>Cruiser</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+<td>Standard</td>
+<td>30</td>
+<td>5 people</td>
+<td>250–300</td>
+<td>Buffered shielding</td>
+</tr>
+<tr class="odd">
+<td>Exploration Cruiser</td>
+<td>4–5</td>
+<td>4–5</td>
+<td>4–5</td>
+<td>4</td>
+<td>4</td>
+<td>Standard</td>
+<td>20</td>
+<td>5 people</td>
+<td>250–350</td>
+<td>Explorer</td>
+</tr>
+<tr class="even">
+<td><strong>Heavy Cruiser</strong> (the Pelion)</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>3</td>
+<td>3</td>
+<td>Heavy</td>
+<td>40 (heavy)</td>
+<td>5 people</td>
+<td>300–450 (the Pelion: 430)</td>
+<td>Ship class</td>
+</tr>
+<tr class="odd">
+<td>Assault Cruiser</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>3</td>
+<td>3</td>
+<td>Heavy, +1 to hit</td>
+<td>50 (heavy)</td>
+<td>5 people</td>
+<td>350–500</td>
+<td>Ship class; ablative armor</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Phasers.</strong> Light and Standard mark 1 box; Standard marks 2 on a telling hit. Heavy marks 2.</li>
+<li><strong>Torpedoes.</strong> A volley marks 2 boxes and can’t be evaded, and every other ship at Close range takes 1. A shuttle’s light torpedoes mark 1 and are fired at −2. Heavy torpedoes get +1 to hit.</li>
+<li><strong>Sensors.</strong> The rating adjusts Sensors rolls made with the ship’s sensors: 1 is −1, 2 is +0, 3 is +1, 4 is +2. Beyond Extreme range, only large things (ships, stars, nebulae) can be scanned.</li>
+<li><strong>Transporter.</strong> How many people one use sends. A failed transport rolls on a mishap the GM chooses; an officer trained in Sensors or Engineering at the console makes the roll with +2.</li>
+<li><strong>Warp core.</strong> Any ship but a shuttle can eject its core and detonate it (1 Power, one action): 3 boxes to every ship at Close range. On a planet, everything within 5 km is destroyed.</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Chassis system</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Agile dodge</td>
+<td>When a beam weapon hits, Helm may roll at −2 to slip it entirely. Not with an evade roll the same exchange.</td>
+</tr>
+<tr class="even">
+<td>Buffered shielding</td>
+<td>When the ship is hit, take one system Offline instead of the boxes. It stays Offline until repaired.</td>
+</tr>
+<tr class="odd">
+<td>Science, Explorer</td>
+<td>+2 to Sensors to locate something within sensor range.</td>
+</tr>
+<tr class="even">
+<td>Ship class</td>
+<td>+2 to intimidate a smaller ship’s crew.</td>
+</tr>
+<tr class="odd">
+<td>Ablative armor</td>
+<td>A 2-box track: once an exchange, mark it to absorb a hit entirely. Already counted in the Maneuverability.</td>
+</tr>
+<tr class="even">
+<td>Cloak (Klingon and Romulan ships)</td>
+<td>While cloaked, the ship can’t be targeted; finding it is a Sensors roll at −2. It must decloak to fire.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="g-concussive-system-damage">Concussive system damage</h3>
+<p>Roll 3d6 whenever a hit reaches the Hull. Results last until repaired, and they stack.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>Result</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>Warp core offline</td>
+<td>Emergency power only: Power 1 until repaired.</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Bridge station explodes</td>
+<td>A crew member at a station (an NPC, if there is one) dies; a character there marks 2 Injury boxes unless they Dodge.</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Impulse engine offline</td>
+<td>Mark Engines Offline: thrusters only, no evading and no range shifts.</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Computer offline</td>
+<td>Minimum flight controls: −2 to every ship roll.</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Deflector offline</td>
+<td>−2 to Helm, and the ship can’t go to warp.</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Warp drive offline</td>
+<td>Impulse only: the ship can’t break away to warp.</td>
+</tr>
+<tr class="odd">
+<td>9–10</td>
+<td>Hull breach</td>
+<td>Mark one more Hull box; 3d6 × 5 crew are lost or hurt.</td>
+</tr>
+<tr class="even">
+<td>11–12</td>
+<td>Shield emitter damaged</td>
+<td>Mark one Shields box.</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>Conduits damaged</td>
+<td>Power −1.</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>Impulse engine damaged</td>
+<td>Mark one Engines box, and Maneuverability −1.</td>
+</tr>
+<tr class="odd">
+<td>15–16</td>
+<td>Bridge station sparks</td>
+<td>A crew member at a station marks 1 Injury box unless they Dodge.</td>
+</tr>
+<tr class="even">
+<td>17–18</td>
+<td>Life support failure</td>
+<td>Mark Life support Offline: start a 4-segment <em>Air</em> clock, a segment every 15 minutes.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="g-range-in-space">Range in space</h3>
 <table>
 <colgroup>
@@ -1780,14 +2303,14 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="odd">
 <td>Phaser banks</td>
 <td>Long</td>
-<td>Normal (1 box)</td>
-<td>The ship’s main weapon.</td>
+<td>1 or 2 boxes, by class</td>
+<td>The ship’s main weapon. 1 Power.</td>
 </tr>
 <tr class="even">
 <td>Photon torpedoes</td>
 <td>Extreme</td>
-<td>Heavy (2 boxes)</td>
-<td>A volley of two counts as one heavy hit with +1 to hit.</td>
+<td>2 boxes; 1 to other ships at Close</td>
+<td>Can’t be evaded. 1 Power and one torpedo.</td>
 </tr>
 <tr class="odd">
 <td>Klingon disruptors</td>
@@ -1821,8 +2344,132 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
+<h3 id="g-enemy-ships">Enemy ships</h3>
+<p>The ships the Pelion meets most, built on the registry’s classes. The GM keeps their tracks the same way as the Pelion’s.</p>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Ship</th>
+<th>Class</th>
+<th>Helm / Gunner</th>
+<th>Maneuver</th>
+<th>Shields</th>
+<th>Hull</th>
+<th>Weapons</th>
+<th>Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Klingon battle cruiser</td>
+<td>Heavy Cruiser</td>
+<td>12 / 12</td>
+<td>3</td>
+<td>5</td>
+<td>5</td>
+<td>Disruptors (heavy), photon torpedoes</td>
+<td><strong>Cloak.</strong> <strong>Relentless:</strong> doesn’t break off until its Hull has 3 boxes.</td>
+</tr>
+<tr class="even">
+<td>Klingon bird-of-prey</td>
+<td>Escort</td>
+<td>13 / 12</td>
+<td>5</td>
+<td>2</td>
+<td>3</td>
+<td>Disruptors</td>
+<td><strong>Cloak.</strong> Its first volley from the cloak is at +2.</td>
+</tr>
+<tr class="odd">
+<td>Romulan bird-of-prey</td>
+<td>Light Cruiser</td>
+<td>11 / 12</td>
+<td>5</td>
+<td>3</td>
+<td>3</td>
+<td>Plasma torpedo</td>
+<td><strong>Cloak.</strong> Would rather self-destruct than be captured.</td>
+</tr>
+<tr class="even">
+<td>Orion raider</td>
+<td>Escort</td>
+<td>13 / 11</td>
+<td>6</td>
+<td>2</td>
+<td>3</td>
+<td>Disruptors, tractor beam</td>
+<td><strong>Fast.</strong> Runs once its Shields are down.</td>
+</tr>
+<tr class="odd">
+<td>Gorn cruiser</td>
+<td>Cruiser</td>
+<td>10 / 13</td>
+<td>3</td>
+<td>4</td>
+<td>4</td>
+<td>Disruptors, photon torpedoes</td>
+<td><strong>Ablative armor</strong> (2).</td>
+</tr>
+</tbody>
+</table>
 <h2 id="g-advancement">Advancement</h2>
-<p>After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement. General Services characters advance the same way, but only their starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they are commissioned (see Step 3).</p>
+<p>Crew members grow by earning <strong>advancement points</strong> and spending them.</p>
+<ul>
+<li><strong>Earning.</strong> After a significant mission, the GM awards each crew member <strong>1 point</strong>. At a <strong>milestone</strong>, the end of a story arc, everyone earns <strong>2 more</strong>.</li>
+<li><strong>Spending.</strong> Spend points when you earn them, or bank them for something bigger. Each purchase needs the GM’s approval and a reason from the story: training at a starbase, something you lived through, a mentor aboard.</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Purchase</th>
+<th>Cost</th>
+<th>Limit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A skill from Untrained to Trained</td>
+<td>1</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>A skill from Trained to Specialty</td>
+<td>2</td>
+<td>Specialty (+3) is the ceiling: only a General Services character’s starting skill is Expert, unless they are commissioned (see Step 3)</td>
+</tr>
+<tr class="odd">
+<td>Revise an advantage or complication</td>
+<td>1</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>A second advantage</td>
+<td>3</td>
+<td>Once; a general advantage you don’t have. Only one advantage’s +2 counts on a roll</td>
+</tr>
+<tr class="odd">
+<td>+1 to an attribute</td>
+<td>4</td>
+<td>Once per attribute; no higher than one above the starting maximum (14, plus any species bonus)</td>
+</tr>
+</tbody>
+</table>
+<p>Species changes still need a separate agreement with the GM. The creator keeps the ledger: award points in the advancement box under the skills (or from the Captain’s log), then spend them there.</p>
 <h1 id="g-running-missions">Running missions</h1>
 <h2 id="g-mission-seeds">Mission seeds</h2>
 <p>Short of a plot? Roll 3d6 on each table and read the total; middle results come up most often, the strangest sit at 3, 4, 17 and 18, or pick what you like. Read the results together: a <em>mission</em> in a <em>place</em>, made strange by <em>something strange</em>, turned by a <em>twist</em>, against a <em>ticking clock</em>, with a <em>key character</em> at its heart. The GM view in the creator rolls these for you and can start the clock.</p>
@@ -2204,9 +2851,9 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship tracks above: a Klingon battle cruiser has Shields 3, Hull 4, and Phasers 12 for its gunners.</p>
+<p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship registry in <em>The USS Pelion</em>; its <em>Enemy ships</em> table gives the common ones.</p>
 <h1 id="g-advantages">Advantages</h1>
-<p>Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances; describe how it helps before rolling. An advantage does not grant training, authorize an otherwise impossible action, or replace essential equipment. If more than one advantage could apply, use only one advantage bonus. Assistance and circumstance modifiers still apply, without counting the same benefit twice.</p>
+<p>Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances; describe how it helps before rolling. Two are different: <strong>Additional Defense</strong> and <strong>Hard to put down</strong> give no +2, and change what you can do in a fight instead. An advantage does not grant training, authorize an otherwise impossible action, or replace essential equipment. If more than one advantage could apply, use only one advantage bonus. Assistance and circumstance modifiers still apply, without counting the same benefit twice.</p>
 <table>
 <colgroup>
 <col style="width: 50%" />
@@ -2281,7 +2928,15 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="even">
 <td>Careful Marksman</td>
-<td>+2 to Phasers after spending your preceding action aiming at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it.</td>
+<td>+2 to Phasers when you aim (with Aim’s +1, +3 in all) at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it. A called shot is 1 easier for you.</td>
+</tr>
+<tr class="odd">
+<td>Additional Defense</td>
+<td>A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2. No +2 to rolls.</td>
+</tr>
+<tr class="even">
+<td>Hard to put down</td>
+<td>Once per fight, shrug off a telling hit’s effect. You still take its boxes. No +2 to rolls.</td>
 </tr>
 </tbody>
 </table>
@@ -2817,6 +3472,16 @@ tr.lvl-U td.target { color: var(--muted); }
             <span class="muted small">Max one point per roll or injury event. Earn one when you accept a meaningful problem from your complication.</span></div>
           <div class="checks"><label><input type="checkbox" id="f-stunned"> Stunned: −2 on next action roll</label>
             <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label></div>
+          <div class="gritty-box" id="gritty-box">
+            <label class="gritty-toggle"><input type="checkbox" id="f-gritty"> <b>Gritty combat</b> <span class="muted small">Optional rule: your GM decides. Grievous wounds, limbs lost.</span></label>
+            <div id="gritty-body" hidden>
+              <p class="small muted">A hit of 2+ boxes is <b>grievous</b> when the attack succeeded by 7+, rolled a natural 3–4, or left you Dying. Roll the table when it happens to you.</p>
+              <div class="btn-row"><button class="btn" id="gw-roll">Roll a grievous wound (3d6)</button><button class="btn" id="gw-down" hidden>Downgrade it (Duty point)</button></div>
+              <p class="small" id="gw-result"></p>
+              <div class="btn-row" id="gw-trade" hidden><button class="btn" id="gw-trade-lost">Lose a limb instead of dying</button><button class="btn" id="gw-trade-use">Lose a limb's use instead</button></div>
+              <ul class="small adv-list" id="gw-list"></ul>
+            </div>
+          </div>
         </div>
 
         <div class="card hud no-print" id="card-roll">
@@ -2838,11 +3503,18 @@ tr.lvl-U td.target { color: var(--muted); }
                 <option value="1">Assist succeeded +1</option>
                 <option value="2">Assist by 5+ +2</option>
               </select></div>
+            <div class="field" id="r-quality-wrap" hidden><label for="r-quality">Attack succeeded by</label>
+              <select id="r-quality"><option value="0">0–2 (no penalty)</option><option value="-1">3–4 −1</option><option value="-2">5–6 −2</option><option value="-3">7+ −3</option></select></div>
+            <div class="field" id="r-called-wrap" hidden><label for="r-called">Called shot</label>
+              <select id="r-called"><option value="0">None</option><option value="-2">Name the effect −2</option><option value="-4">Small target −4</option></select></div>
+            <div class="field" id="r-parries-wrap" hidden><label for="r-parries">Parries already this round</label>
+              <select id="r-parries"><option value="0">None</option><option value="1">One −2</option></select></div>
           </div>
           <div class="checks">
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
             <label id="r-phys-wrap"><input type="checkbox" id="r-phys"> <span id="r-phys-label">Physical action (injury penalty)</span></label>
             <label><input type="checkbox" id="r-stun"> Stun penalty −2</label>
+            <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> Aimed at this target last action +1</label>
           </div>
           <div class="btn-row"><button class="btn primary" id="r-roll">Roll</button>
             <span class="muted small" id="r-target"></span></div>
@@ -2883,8 +3555,11 @@ tr.lvl-U td.target { color: var(--muted); }
         </div>
         <div class="card hud no-print" id="card-ship">
           <h3>USS Pelion status</h3>
-          <p class="small muted">Shields take hits first. Then the Hull and a system (1d6: Weapons, Engines, Sensors, Comms, Transporters, Life support). Tap a box to mark or clear it.</p>
+          <p class="small muted">Heavy Cruiser: Maneuverability 3, Sensors 3, heavy phasers. While the shields are up, hits mark Shields first, then the Hull; every hit that reaches the Hull rolls concussive damage. Tap a box to mark or clear it.</p>
+          <div class="ship-res" id="ship-res"></div>
           <div class="ship" id="ship"></div>
+          <div class="btn-row"><button class="btn" id="ship-conc">Roll concussive damage (3d6)</button></div>
+          <p class="small" id="ship-conc-out"></p>
           <button class="linkish" id="ship-reset">Full repair (starbase)</button>
         </div>
         <div class="card hud" id="card-ref">
@@ -2892,14 +3567,17 @@ tr.lvl-U td.target { color: var(--muted); }
           <dl class="ref">
             <dt>Resolution</dt><dd>3d6 at or below adjusted skill. Natural 3–4 always succeeds; 17–18 always fails. Margin = target − roll.</dd>
             <dt>Opposed</dt><dd>Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender.</dd>
-            <dt>Combat</dt><dd>Move a short distance and take one action. Hit → target may Dodge once per round → weapon effect. Partial cover −2.</dd>
+            <dt>Combat</dt><dd>Move a short distance and take one action. Hit → target may defend once per round (Dodge, Parry or Block; two with Additional Defense) → weapon effect. Partial cover −2. Aim: +1 to your next attack.</dd>
+            <dt>Defending</dt><dd>Defense penalty by the attack's margin: 3–4 −1, 5–6 −2, 7+ −3. Parry: Unarmed Combat −3 with a weapon in hand (against weapons and fists), or bare-handed against fists only; a second parry −2 more. Block: Unarmed Combat −2 with a chair, a crate lid or a panel, against melee and thrown weapons, never energy weapons.</dd>
+            <dt>Telling hit</dt><dd>Hit by 5+ or a natural 3–4, not defended: the attacker picks one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, precise). Called shot: −2 (small target −4), and any hit gets the effect. No extra boxes. Shrug it off: Hard to put down (once a fight) or a Duty point.</dd>
             <dt>Damage</dt><dd>Fists, clubs, knives, arrows: 1 box. Heavy blades: 2. Phaser or disruptor on kill: 3 boxes and Dying. Stun: Body −2 roll, no box.</dd>
             <dt>Dying</dt><dd>Dies at the end of the scene unless stabilized (one action, Medicine roll, medical kit). At 3 boxes, a hit from a 2-box or killing weapon is fatal.</dd>
             <dt>Phasers</dt><dd>Stun: target rolls Body −2, fail = out for the scene, success = −2 next action. Kill: three boxes and Dying.</dd>
             <dt>Phaser power</dt><dd>Type 1: 8, Type 2: 16, rifle: 30. Stun 1, heat 1, kill 2, wide-beam 3, disintegrate 4. A spare cell refills it.</dd>
             <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). Sickbay +2, clears 2 (3 on margin 5+).</dd>
-            <dt>Rest</dt><dd>One box per full day of rest (light duty only). Not from 3 boxes: treatment must clear the first.</dd>
-            <dt>Duty points</dt><dd>Reroll (keep second), reduce an injury by one box, or establish a small preparation.</dd>
+            <dt>Rest</dt><dd>Clearing one box: a full day at 1 box, at least three days at 2, a week at 3 (and only once someone has stabilized or treated you). Light duty only.</dd>
+            <dt>Ship fight</dt><dd>Power each exchange (Pelion 5): shields up 1, phasers 1, torpedo volley 1, transporter 1, +1 to a ship roll per Power left (max +2). Helm evades once an exchange; torpedoes can't be evaded. The most maneuverable ship adds the difference to Helm. A hit on the Hull rolls concussive damage.</dd>
+            <dt>Duty points</dt><dd>Reroll (keep second), reduce an injury by one box, shrug off a telling hit, or establish a small preparation.</dd>
           </dl>
         </div>
       </div>
@@ -3206,7 +3884,10 @@ tr.lvl-U td.target { color: var(--muted); }
     ["discipline", "Mental Discipline", "+2 to Will to maintain concentration despite pain or severe distraction. It does not improve resistance to fear or mental intrusion.", "Will"],
     ["courage", "Unshakable Courage", "+2 to Will against overwhelming fear. It does not protect against alien compulsion or guarantee sensible decisions.", "Will"],
     ["guarded", "Guarded Mind", "+2 to Will when resisting an external mental intrusion or compulsion. It provides no telepathy or ability to detect the source.", "Will"],
-    ["marksman", "Careful Marksman", "+2 to Phasers after spending your preceding action aiming at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it.", "Phasers"],
+    ["marksman", "Careful Marksman", "+2 to Phasers when you aim (with Aim's +1, +3 in all) at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it. A called shot is 1 easier for you.", "Phasers"],
+    // Two that give no +2: they change what you can do in a fight.
+    ["extradefense", "Additional Defense", "A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2. No +2 to rolls.", ""],
+    ["survivor", "Hard to put down", "Once per fight, shrug off a telling hit's effect. You still take its boxes. No +2 to rolls.", ""],
   ];
   const COMPLICATIONS = [
     ["mystery", "Cannot Leave a Mystery Alone", "An unexplained reading or strange discovery tempts you to delay departure, spend a scarce resource, or pursue a risky investigation. Accept a specific cost rather than receiving points merely for asking questions."],
@@ -3254,7 +3935,7 @@ tr.lvl-U td.target { color: var(--muted); }
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: { communicator: true, tricorder: false, medscanner: false, medkit: false, engkit: false, phaser: true, translator: false, envsuit: false, fieldkit: false, beacon: false, sled: false },
       portrait: "", portraitShape: "token",
-      play: { injury: 0, duty: 2, stunned: false, log: [] },
+      play: { injury: 0, duty: 2, stunned: false, log: [], lasting: [], gwLast: null },
     };
   }
   function example() {
@@ -3288,7 +3969,17 @@ tr.lvl-U td.target { color: var(--muted); }
     out.play.phaser = ph && typeof ph === "object" && (ph.type === "" || ["type1", "type2", "rifle"].includes(ph.type))
       ? { type: ph.type, power: Math.max(0, Math.min(ph.type === "type2" ? 16 : ph.type === "rifle" ? 30 : 8, parseInt(ph.power, 10) || 0)), spares: Math.max(0, parseInt(ph.spares, 10) || 0) }
       : (out.equipment.phaser ? { type: "type1", power: 8, spares: 0 } : { type: "", power: 0, spares: 0 });
-    out.advances = out.advances.filter((a) => a && SKILLS.some(([n]) => n === a.skill) && ["UT", "TS"].includes(a.from + a.to));
+    // Purchases: skill steps (older files: one point each), advantages, attributes and revisions.
+    out.advances = out.advances.filter((a) => a && (
+      (!a.type || a.type === "skill") ? SKILLS.some(([n]) => n === a.skill) && ["UT", "TS"].includes(a.from + a.to)
+      : a.type === "adv" ? ADVANTAGES.some(([k]) => k === a.adv) : a.type === "attr" ? ATTRS.some(([n]) => n === a.attr) : a.type === "revise"))
+      .map((a) => ({ ...a, type: a.type || "skill", cost: Number.isFinite(a.cost) ? a.cost : a.type ? COSTS[a.type] : 1 }));
+    out.advBought = []; out.attrBought = {};
+    for (const a of out.advances) { if (a.type === "adv") out.advBought.push(a.adv); if (a.type === "attr") out.attrBought[a.attr] = 1; }
+    // Points earned. A file from before advancement points has none recorded: it starts balanced (see pointsAvail).
+    const xp = c.xp && typeof c.xp === "object" ? c.xp : null;
+    out.xp = xp ? { earned: Math.max(0, parseInt(xp.earned, 10) || 0), log: Array.isArray(xp.log) ? xp.log.filter((e) => e && Number.isFinite(+e.n)).map((e) => ({ n: +e.n, note: String(e.note || ""), date: String(e.date || "") })) : [] }
+      : { earned: null, log: [] };
     if (out.sadv.id && out.adv.id) out.adv.id = ""; // a species advantage replaces the regular one
     // Half-Vulcan was removed as a preset; keep such characters valid as a custom species.
     if (c.speciesId === "halfvulcan") {
@@ -3305,14 +3996,35 @@ tr.lvl-U td.target { color: var(--muted); }
     for (const k of Object.keys(out.skills)) if (!LEVELS[out.skills[k]]) out.skills[k] = "U";
     for (const k of Object.keys(out.attrs)) out.attrs[k] = Math.max(1, Math.min(20, parseInt(out.attrs[k], 10) || BASE));
     if (!Array.isArray(out.play.log)) out.play.log = [];
+    out.play.lasting = (Array.isArray(out.play.lasting) ? out.play.lasting : []).filter((w) => w && typeof w.name === "string")
+      .map((w) => ({ id: String(w.id || ""), name: w.name, text: String(w.text || ""), heal: String(w.heal || ""), complication: !!w.complication, date: String(w.date || ""), key: String(w.key || uid()) }));
+    if (!out.play.gwLast || typeof out.play.gwLast !== "object" || !out.play.lasting.some((w) => w.key === out.play.gwLast.key)) out.play.gwLast = null;
     return out;
   }
 
   // ---- storage (best effort) ----
+  // Gritty combat (optional rule): the grievous wound table and how opponents go down. "down" is a Duty point's downgrade.
+  const GRITTY_KEY = "uss-pelion.gritty.v1";
+  const GRIEVOUS = [
+    { from: 3, to: 4, id: "limb", name: "Lost limb", text: "A hand, an arm or a leg is gone; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding.", dying: true, heal: "never (a prosthetic, at a starbase)", complication: true, down: "bone" },
+    { from: 5, to: 6, id: "eye", name: "Lost eye", text: "−2 to Phasers and to spotting things.", heal: "never", complication: true, down: "concussion" },
+    { from: 7, to: 9, id: "bone", name: "Broken bone", text: "The limb is useless until a bone-knitter sets it in sickbay.", heal: "a day in sickbay; several weeks without", down: "muscle" },
+    { from: 10, to: 12, id: "muscle", name: "Torn muscle", text: "−1 to physical tasks.", heal: "a few days with sickbay care; several weeks without", down: null },
+    { from: 13, to: 15, id: "concussion", name: "Concussion", text: "Stunned, and −2 to thinking tasks for the scene.", dazed: true, heal: "after the scene", down: null },
+    { from: 16, to: 18, id: "internal", name: "Internal injury or severe burns", text: "Dying even with boxes to spare; it needs sickbay.", dying: true, heal: "a week after sickbay", down: "muscle" },
+  ];
+  const TAKEN_OUT = {
+    energy: ["The beam catches {name} full in the chest; they crumple and don't rise.", "{name} spins away from the console, uniform smoking.", "A disruptor bolt throws {name} across the deck, and they lie still.", "{name} takes the shot in the shoulder and goes down, weapon skittering away."],
+    blade: ["The d'k tahg finds the gap under {name}'s ribs.", "A lirpa's blade drops {name} where they stand.", "{name} folds around the blade and doesn't get up."],
+    claw: ["Claws open {name} from shoulder to hip.", "{name} is dragged down, screaming, and goes quiet.", "The creature's jaws close, and {name} goes limp."],
+    blunt: ["The blow caves in {name}'s ribs.", "{name}'s head cracks against a bulkhead; they slide down and stay down.", "{name} hits the deck and doesn't get up."],
+    missile: ["A spear pins {name} to the ground.", "{name} catches the thrown blade in the throat and goes down choking."],
+  };
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
   };
+  let gritty = store.get(GRITTY_KEY, false) === true;
   let roster = store.get(STORE_ROSTER, []);
   if (!Array.isArray(roster)) roster = [];
   // A first visit opens on a new, blank character; the example is one click away in the ready-made list.
@@ -3322,8 +4034,10 @@ tr.lvl-U td.target { color: var(--muted); }
   // ---- rules ----
   const speciesDef = () => SPECIES.find((x) => x[0] === ch.speciesId);
   const adjOf = (c = ch) => (c.speciesId === "custom" ? c.speciesAdj : (SPECIES.find((x) => x[0] === c.speciesId) || [, , {}])[2]) || {};
-  const baseOf = (n, c = ch) => BASE + (adjOf(c)[n] || 0);
-  const maxOf = (n, c = ch) => MAX_START + Math.max(0, adjOf(c)[n] || 0);
+  // An attribute bought with advancement points raises both its floor and its ceiling by one.
+  const boughtAttr = (n, c = ch) => ((c.attrBought || {})[n] || 0);
+  const baseOf = (n, c = ch) => BASE + (adjOf(c)[n] || 0) + boughtAttr(n, c);
+  const maxOf = (n, c = ch) => MAX_START + Math.max(0, adjOf(c)[n] || 0) + boughtAttr(n, c);
   const adjTotal = () => ATTRS.reduce((a, [n]) => a + (ch.speciesAdj[n] || 0), 0);
   const spent = () => ATTRS.reduce((a, [n]) => a + Math.max(0, ch.attrs[n] - baseOf(n)), 0);
   const adjText = (adj) => ATTRS.filter(([n]) => adj[n]).map(([n]) => `${n} ${signed(adj[n])}`).join(", ") || "No adjustments";
@@ -3354,6 +4068,16 @@ tr.lvl-U td.target { color: var(--muted); }
   const levelName = (l, name) => (l === "S" && isGS() && !(name && advancedToS(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
+  // Parry: Unarmed Combat −3, with a weapon in hand (against weapons and fists) or bare-handed (against fists only).
+  // Block: Unarmed Combat −2 with anything that stands in for a shield. Never against energy weapons.
+  const parryOf = () => skillTarget("Unarmed Combat") - 3;
+  const blockOf = () => skillTarget("Unarmed Combat") - 2;
+  const isParry = (name) => name === "Parry";
+  const isBlock = (name) => name === "Block";
+  const isDefense = (name) => name === "Dodge" || isParry(name) || isBlock(name);
+  const hasAdv = (id, c = ch) => (!c.sadv.id && c.adv.id === id) || (c.advBought || []).includes(id);
+  const defensesPerRound = () => 1 + (hasAdv("extradefense") ? 1 : 0);
+  const ATTACKS = ["Phasers", "Unarmed Combat"];
   const count = (lvl) => Object.values(ch.skills).filter((v) => v === lvl).length;
   function odds(t) {
     let w = 0;
@@ -3519,7 +4243,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const nS = count("S"), nT = count("T");
     $("skill-tally").innerHTML =
       `<span class="chip ${nS === specialtyMax() ? "ok" : "no"}">${levelName("S")} ${nS}/${specialtyMax()}</span><span class="chip ${nT === trainedAllowed() ? "ok" : "no"}">Trained ${nT}/${trainedAllowed()}</span>` +
-      (ch.advances.length ? `<span class="chip">${ch.advances.length} advancement${ch.advances.length > 1 ? "s" : ""}</span>` : "");
+      (ch.advances.some((a) => a.type === "skill") ? `<span class="chip">${ch.advances.filter((a) => a.type === "skill").length} from advancement</span>` : "");
     $("skills-intro").innerHTML = isGS()
       ? "General Services crew are specialists: one <b>Expert</b> skill at attribute +5 and seven <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling."
       : "One <b>Specialty</b> at attribute +3 and nine <b>Trained</b> skills at attribute +1. Everything else is <b>Untrained</b> at attribute −4. The target already includes the attribute, so never add it again when rolling.";
@@ -3565,7 +4289,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("ms-text").className = $("ready-status").className;
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
-    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`;
+    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics). Parry = Unarmed Combat −3 = ${parryOf()}; Block = Unarmed Combat −2 = ${blockOf()}. ${defensesPerRound() > 1 ? "Two defenses a round (Additional Defense)" : "One defense a round"}.`;
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
@@ -3600,6 +4324,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div><span class="label">Department</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">Species</span><b>${esc(ch.species || "—")}</b><span class="small muted">${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge()}</b></div>
+        <div><span class="label">Parry</span><b class="num">${parryOf()}</b><span class="small muted">Block ${blockOf()}</span></div>
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
       <div class="attr-strip">${ATTRS.map(([n]) => `<div><span class="label">${n}</span><b>${ch.attrs[n]}</b></div>`).join("")}</div>
@@ -3620,16 +4345,18 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ch.reason ? `<div class="field"><span class="label">Why I serve</span><span>${esc(ch.reason)}</span></div>` : ""}
         ${ch.speciesNotes ? `<div class="field"><span class="label">Species ability (GM approved)</span><span>${esc(ch.speciesNotes)}</span></div>` : ""}
         ${ch.notes ? `<div class="field wide"><span class="label">Notes</span><span>${esc(ch.notes)}</span></div>` : ""}
-        ${ch.advances.length ? `<div class="field wide"><span class="label">Advancement</span><span>${ch.advances.map((a) => `${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ")}</span></div>` : ""}
+        ${ch.play.lasting.length ? `<div class="field wide"><span class="label">Lasting wounds</span><span>${ch.play.lasting.map((w) => `${esc(w.name)}${w.complication ? " (complication)" : w.heal ? ` (${esc(w.heal)})` : ""}`).join("; ")}</span></div>` : ""}
+        ${ch.xp.earned || ch.advances.length ? `<div class="field wide"><span class="label">Advancement: ${pointsAvail()} point${pointsAvail() === 1 ? "" : "s"} to spend, ${ch.xp.earned} earned</span><span>${ch.advances.map((a) => `${esc(purchaseText(a))}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ") || "Nothing bought yet."}</span></div>` : ""}
       </div>`;
 
     // condition
     const inj = ch.play.injury;
     $("boxes").innerHTML = [1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-box="${i}" aria-label="Injury box ${i}${i <= inj ? ", marked" : ""}"></button>`).join("");
     $("cond").textContent = INJURY[inj][0] + ".";
-    $("cond-effect").textContent = inj === 3 && ch.play.dying ? "Dying: needs stabilizing (one action, Medicine roll, medical kit) before the scene ends." : INJURY[inj][1];
-    if (inj < 3) ch.play.dying = false; // clearing a box ends Dying
-    $("dying-wrap").hidden = inj < 3;
+    $("cond-effect").textContent = ch.play.dying ? "Dying: needs stabilizing (one action, Medicine roll, medical kit) before the scene ends." : INJURY[inj][1];
+    if (inj < 3 && !gritty) ch.play.dying = false; // clearing a box ends Dying (a grievous wound can leave you Dying with boxes to spare)
+    $("dying-wrap").hidden = inj < 3 && !ch.play.dying;
+    renderGritty();
     $("f-dying").checked = !!ch.play.dying;
     $("duty-count").textContent = ch.play.duty;
     $("duty-minus").disabled = ch.play.duty <= 0;
@@ -3638,12 +4365,14 @@ tr.lvl-U td.target { color: var(--muted); }
     // roller options
     const sel = $("r-skill"), prev = sel.value;
     sel.innerHTML = `<optgroup label="Skills">${sorted.map((s) => `<option value="${esc(s.n)}">${s.n} (${s.t})</option>`).join("")}</optgroup>
-      <optgroup label="Defense">${`<option value="Dodge">Dodge (${dodge()})</option>`}</optgroup>
+      <optgroup label="Defense"><option value="Dodge">Dodge (${dodge()})</option><option value="Parry">Parry: Unarmed Combat −3 (${parryOf()})</option><option value="Block">Block: Unarmed Combat −2 (${blockOf()})</option></optgroup>
       <optgroup label="Attributes">${ATTRS.map(([n]) => `<option value="${n}">${n} (${ch.attrs[n]})</option>`).join("")}</optgroup>`;
     if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
     // Abilities without a +2 (mind meld, telepathy, flight) leave the box disabled.
-    const an = ch.sadv.id ? (sAdvBonus() ? sAdvName() : "") : advName();
-    $("r-adv-label").textContent = an ? `${an} applies +2` : ch.sadv.id ? `${sAdvName()} gives no roll bonus` : "Advantage applies +2";
+    const bought = (ch.advBought || []).map((k) => ADVANTAGES.find((a) => a[0] === k)).filter((a) => a && a[3]).map((a) => a[1]);
+    const an = [ch.sadv.id ? (sAdvBonus() ? sAdvName() : "") : advDef() && advDef()[3] === "" ? "" : advName(), ...bought].filter(Boolean).join(" or ");
+    $("r-adv-label").textContent = an ? `${an} applies +2` : ch.sadv.id ? `${sAdvName()} gives no roll bonus` : advDef() && advDef()[3] === "" ? `${advName()} gives no roll bonus` : "Advantage applies +2";
+    $("r-adv").title = "Only one advantage's +2 counts on a roll.";
     $("r-adv").disabled = !an;
     if (!an) $("r-adv").checked = false;
     updateTarget();
@@ -3652,6 +4381,8 @@ tr.lvl-U td.target { color: var(--muted); }
 
   function rollBase(name) {
     if (name === "Dodge") return dodge();
+    if (isParry(name)) return parryOf();
+    if (isBlock(name)) return blockOf();
     if (ch.attrs[name] != null) return ch.attrs[name];
     return skillTarget(name);
   }
@@ -3664,6 +4395,12 @@ tr.lvl-U td.target { color: var(--muted); }
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
+    if (isDefense(name)) parts.push(+$("r-quality").value || 0);
+    if (isParry(name)) parts.push(-2 * (+$("r-parries").value || 0));
+    if (!$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(1);
+    // A called shot: −2, or −4 for a small target; Careful Marksman makes it 1 easier with Phasers.
+    const called = !$("r-called-wrap").hidden ? +$("r-called").value || 0 : 0;
+    if (called) parts.push(called + (hasAdv("marksman") && name === "Phasers" ? 1 : 0));
     return { name, base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) };
   }
   function updateInjuryToggle() {
@@ -3675,6 +4412,11 @@ tr.lvl-U td.target { color: var(--muted); }
   }
   function updateTarget() {
     updateInjuryToggle();
+    const sk = $("r-skill").value || "";
+    $("r-quality-wrap").hidden = !isDefense(sk);
+    $("r-parries-wrap").hidden = !(isParry(sk) && defensesPerRound() > 1);
+    $("r-aim-wrap").hidden = !ATTACKS.includes(sk);
+    $("r-called-wrap").hidden = !ATTACKS.includes(sk);
     const { name, base, total } = rollMods();
     const t = base + total;
     const incap = ch.play.injury >= 3;
@@ -3698,7 +4440,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const auto = sum <= 4 ? "auto-s" : sum >= 17 ? "auto-f" : "";
     const ok = auto === "auto-s" || (auto !== "auto-f" && sum <= t);
     const margin = t - sum;
-    last = { name, t, dice, sum, ok, margin, auto, rerolled: !!isReroll, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
+    const attackRoll = !$("r-called-wrap").hidden, called = attackRoll ? (isReroll && last ? last.called : +$("r-called").value) : 0;
+    last = { name, t, dice, sum, ok, margin, auto, attackRoll, called, rerolled: !!isReroll, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
     ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
     ch.play.log = ch.play.log.slice(0, 12);
     if ($("r-stun").checked) { ch.play.stunned = false; $("f-stunned").checked = false; }
@@ -3715,7 +4458,10 @@ tr.lvl-U td.target { color: var(--muted); }
     if (r.auto === "auto-s") note = r.margin < 0 ? "Natural " + r.sum + ": automatic success. Counts as margin 0 in a contest." : "Natural " + r.sum + ": automatic success.";
     else if (r.auto === "auto-f") note = "Natural " + r.sum + ": automatic failure.";
     else note = r.ok ? `Succeeded by ${r.margin}.` : `Failed by ${-r.margin}.`;
-    if (r.ok && r.margin >= 5) note += " Margin 5+: assistance gives +2; medical care clears an extra box.";
+    if (r.attackRoll && r.ok && r.called) note += " Called shot: if it isn't defended, the effect you named happens. No extra boxes.";
+    else if (r.attackRoll && r.ok && (r.margin >= 5 || r.auto === "auto-s")) note += " <b>Telling hit</b> if it isn't defended: pick one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, or precise). No extra boxes.";
+    if (gritty && r.attackRoll && r.ok && (r.margin >= 7 || r.auto === "auto-s")) note += " <b>Gritty combat:</b> if it marks 2 or more boxes, it's grievous. A crew member rolls the grievous wound table; an opponent is taken out.";
+    if (r.ok && r.margin >= 5 && !r.attackRoll) note += " Margin 5+: assistance gives +2; medical care clears an extra box.";
     if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
     if (!r.ok && !r.auto && r.margin >= -2) note += ` Missed by ${-r.margin}: the GM may offer success at a cost.`;
     if (r.phaserNote) note += ` Phaser ${r.phaserNote.charAt(0).toLowerCase()}${r.phaserNote.slice(1)}`;
@@ -3844,8 +4590,8 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
-    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value); updateTarget(); renderPhaser(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys"].includes(t.id)) updateTarget();
+    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isParry(t.value) || isBlock(t.value); updateTarget(); renderPhaser(); }
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-quality", "r-parries", "r-aim", "r-called"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
@@ -3930,15 +4676,36 @@ tr.lvl-U td.target { color: var(--muted); }
     toast("Overloading! It explodes at the end of the next round: 1 box to everyone nearby, 2 at the centre.");
   };
 
-  const SHIP_TRACKS = [["Shields", 3], ["Hull", 4], ["Weapons", 3], ["Engines", 3], ["Sensors", 3], ["Communications", 3], ["Transporters", 3], ["Life support", 3]];
+  // The Pelion is a Heavy Cruiser (Players' Guide, Ship registry): Shields 5, Hull 5, Power 5 an exchange, 40 torpedoes.
+  const SHIP_TRACKS = [["Shields", 5], ["Hull", 5], ["Weapons", 3], ["Engines", 3], ["Sensors", 3], ["Communications", 3], ["Transporters", 3], ["Life support", 3]];
+  const SHIP_POWER = 5, SHIP_TORPS = 40;
+  // Concussive system damage (3d6), rolled whenever a hit reaches the Hull.
+  const CONCUSSIVE = [
+    [3, 3, "Warp core offline", "Emergency power only: Power 1 until repaired."],
+    [4, 4, "Bridge station explodes", "A crew member at a station (an NPC, if there is one) dies; a character there marks 2 Injury boxes unless they Dodge."],
+    [5, 5, "Impulse engine offline", "Mark Engines Offline: thrusters only, no evading and no range shifts."],
+    [6, 6, "Computer offline", "Minimum flight controls: −2 to every ship roll."],
+    [7, 7, "Deflector offline", "−2 to Helm, and the ship can't go to warp."],
+    [8, 8, "Warp drive offline", "Impulse only: the ship can't break away to warp."],
+    [9, 10, "Hull breach", "Mark one more Hull box; 3d6 × 5 crew are lost or hurt."],
+    [11, 12, "Shield emitter damaged", "Mark one Shields box."],
+    [13, 13, "Conduits damaged", "Power −1."],
+    [14, 14, "Impulse engine damaged", "Mark one Engines box, and Maneuverability −1."],
+    [15, 16, "Bridge station sparks", "A crew member at a station marks 1 Injury box unless they Dodge."],
+    [17, 18, "Life support failure", "Mark Life support Offline: start a 4-segment Air clock, a segment every 15 minutes."],
+  ];
   let ship = store.get(STORE_SHIP, {});
   if (!ship || typeof ship !== "object") ship = {};
   function shipEffect(name, n) {
-    if (name === "Shields") return ["Up", "Weakened", "Failing", "Down: hits go to Hull and a system"][n];
-    if (name === "Hull") return ["Intact", "Scarred", "Minor breaches", "Serious breaches, decks lost", "Breaking up: start an Abandon ship clock"][n];
+    if (name === "Shields") return n >= 5 ? "Down: hits go to the Hull" : n ? `${5 - n} of 5 left` : "Full";
+    if (name === "Hull") return ["Intact", "Scarred", "Minor breaches, sealed", "Serious breaches, decks lost", "Serious breaches, decks lost", "Breaking up: start an Abandon ship clock"][n];
     return ["Working", "Damaged: −2", "Crippled: −4, basic function only", "Offline"][n];
   }
+  // Power refills each exchange; torpedoes come from the load until a starbase restocks them.
+  const shipPower = () => (Number.isFinite(ship.power) ? ship.power : SHIP_POWER), shipTorps = () => (Number.isFinite(ship.torps) ? ship.torps : SHIP_TORPS);
   function renderShip() {
+    $("ship-res").innerHTML = `<span class="res"><span class="label">Power</span><button class="btn" data-res="power" data-d="-1" aria-label="Spend 1 Power">−</button><b>${shipPower()}</b><button class="btn" data-res="power" data-d="1" aria-label="1 more Power">+</button><button class="linkish" data-res="exchange">New exchange (refill)</button></span>
+      <span class="res"><span class="label">Torpedoes</span><button class="btn" data-res="torps" data-d="-1" aria-label="Fire a torpedo">−</button><b>${shipTorps()}</b><button class="btn" data-res="torps" data-d="1" aria-label="One more torpedo">+</button></span>`;
     $("ship").innerHTML = SHIP_TRACKS.map(([name, max]) => {
       const n = Math.min(max, ship[name] || 0);
       return `<div class="ship-row ${n >= max ? "out" : n ? "hit" : ""}"><span class="label">${name}</span>
@@ -3950,12 +4717,24 @@ tr.lvl-U td.target { color: var(--muted); }
     const b = e.target.closest("[data-track]"); if (!b) return;
     const name = b.dataset.track, i = +b.dataset.i;
     ship[name] = (ship[name] || 0) === i ? i - 1 : i;
+    store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {}
+  });
+  $("ship-res").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-res]"); if (!b) return;
+    if (b.dataset.res === "exchange") ship.power = SHIP_POWER;
+    else if (b.dataset.res === "power") ship.power = Math.max(0, Math.min(SHIP_POWER + 2, shipPower() + +b.dataset.d));
+    else ship.torps = Math.max(0, Math.min(SHIP_TORPS, shipTorps() + +b.dataset.d));
     store.set(STORE_SHIP, ship); renderShip();
   });
+  $("ship-conc").onclick = () => {
+    const dice = [1, 2, 3].map(() => 1 + Math.floor(Math.random() * 6)), t = dice[0] + dice[1] + dice[2];
+    const r = CONCUSSIVE.find(([a, b]) => t >= a && t <= b);
+    $("ship-conc-out").innerHTML = `3d6 = ${t} (${dice.join(" + ")}): <b>${esc(r[2])}.</b> ${esc(r[3])}`;
+  };
   let resetArmed = false;
   $("ship-reset").onclick = () => {
     if (!resetArmed) { resetArmed = true; $("ship-reset").textContent = "Tap again to clear every box"; setTimeout(() => { resetArmed = false; $("ship-reset").textContent = "Full repair (starbase)"; }, 4000); return; }
-    resetArmed = false; ship = {}; store.set(STORE_SHIP, ship); renderShip(); $("ship-reset").textContent = "Full repair (starbase)";
+    resetArmed = false; ship = {}; store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {} $("ship-reset").textContent = "Full repair (starbase)";
   };
   function clockSvg(c) {
     const r = 44, cx = 48, cy = 48, segs = [];
@@ -3995,39 +4774,680 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   renderShip(); renderClocks();
 
-  // ---- advancement: one skill step at a time, recorded so the limits stay right ----
-  function advanceOptionsFor(c) {
-    return SKILLS.filter(([n]) => c.skills[n] !== "S").map(([n]) => [n, c.skills[n] === "U" ? `${n}: Untrained → Trained` : `${n}: Trained → Specialty`]);
+  // ---- advancement: points earned and spent, each purchase recorded so the limits stay right ----
+  // Costs (Players' Guide, Advancement): a skill step 1 or 2, a revision 1, a second advantage 3, +1 attribute 4.
+  const COSTS = { UT: 1, TS: 2, revise: 1, adv: 3, attr: 4 };
+  const pointsSpent = (c = ch) => (c.advances || []).reduce((a, x) => a + (x.cost || 0), 0);
+  function pointsAvail(c = ch) {
+    if (c.xp.earned == null) c.xp.earned = pointsSpent(c);
+    return c.xp.earned - pointsSpent(c);
   }
-  function applyAdvance(c, skill, note) {
-    const from = c.skills[skill];
-    if (!from || from === "S") return false;
-    const to = from === "U" ? "T" : "S";
-    c.skills[skill] = to;
-    c.advances = [...(c.advances || []), { skill, from, to, note: note || "", date: new Date().toISOString().slice(0, 10) }];
+  function advanceOptionsFor(c) {
+    const avail = pointsAvail(c), tag = (cost) => (cost > avail ? ` (${cost}: needs ${cost - avail} more)` : ` (${cost})`);
+    const opts = SKILLS.filter(([n]) => c.skills[n] !== "S").map(([n]) => { const cost = c.skills[n] === "U" ? COSTS.UT : COSTS.TS;
+      return [`skill:${n}`, `${n}: ${c.skills[n] === "U" ? "Untrained → Trained" : "Trained → Specialty"}${tag(cost)}`, cost, "Skills"]; });
+    if (!(c.advBought || []).length) for (const [k, n] of ADVANTAGES) if (!hasAdv(k, c)) opts.push([`adv:${k}`, `${n}${tag(COSTS.adv)}`, COSTS.adv, "A second advantage"]);
+    for (const [n] of ATTRS) if (!boughtAttr(n, c)) opts.push([`attr:${n}`, `+1 ${n} (to ${c.attrs[n] + 1})${tag(COSTS.attr)}`, COSTS.attr, "Attributes"]);
+    opts.push(["revise", `Revise an advantage or complication${tag(COSTS.revise)}`, COSTS.revise, "Other"]);
+    return opts;
+  }
+  function applyAdvance(c, key, note) {
+    const i = key.indexOf(":"), kind = i < 0 ? key : key.slice(0, i), id = i < 0 ? "" : key.slice(i + 1);
+    const rec = { note: note || "", date: new Date().toISOString().slice(0, 10) };
+    if (kind === "skill") {
+      const from = c.skills[id]; if (!from || from === "S") return false;
+      const to = from === "U" ? "T" : "S"; c.skills[id] = to;
+      c.advances = [...(c.advances || []), { type: "skill", skill: id, from, to, cost: from === "U" ? COSTS.UT : COSTS.TS, ...rec }];
+    } else if (kind === "adv") {
+      if (!ADVANTAGES.some(([k]) => k === id) || hasAdv(id, c) || (c.advBought || []).length) return false;
+      c.advBought = [...(c.advBought || []), id];
+      c.advances = [...(c.advances || []), { type: "adv", adv: id, cost: COSTS.adv, ...rec }];
+    } else if (kind === "attr") {
+      if (!ATTRS.some(([n]) => n === id) || boughtAttr(id, c)) return false;
+      c.attrBought = { ...(c.attrBought || {}), [id]: 1 }; c.attrs[id] += 1;
+      c.advances = [...(c.advances || []), { type: "attr", attr: id, cost: COSTS.attr, ...rec }];
+    } else if (kind === "revise") c.advances = [...(c.advances || []), { type: "revise", cost: COSTS.revise, ...rec }];
+    else return false;
     return true;
   }
   function undoAdvance(c) {
     const a = (c.advances || []).pop();
-    if (a && c.skills[a.skill] === a.to) c.skills[a.skill] = a.from;
+    if (!a) return a;
+    if (a.type === "skill" && c.skills[a.skill] === a.to) c.skills[a.skill] = a.from;
+    if (a.type === "adv") c.advBought = (c.advBought || []).filter((k) => k !== a.adv);
+    if (a.type === "attr") { delete c.attrBought[a.attr]; c.attrs[a.attr] = Math.max(baseOf(a.attr, c), c.attrs[a.attr] - 1); }
     return a;
   }
+  const purchaseText = (a) => a.type === "adv" ? `Advantage: ${(ADVANTAGES.find(([k]) => k === a.adv) || [0, a.adv])[1]}` : a.type === "attr" ? `+1 ${a.attr}`
+    : a.type === "revise" ? "Revised an advantage or complication" : `${a.skill}: ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`;
   function renderAdvance() {
-    $("f-advance").innerHTML = `<option value="">Choose a skill to advance…</option>` + advanceOptionsFor(ch).map(([n, t]) => `<option value="${esc(n)}">${esc(t)}</option>`).join("");
-    $("adv-list").innerHTML = ch.advances.map((a) => `<li>${esc(a.skill)}: ${LEVELS[a.from].name} → ${LEVELS[a.to].name}${a.note ? ` (${esc(a.note)})` : ""}${a.date ? ` · ${a.date}` : ""}</li>`).join("");
+    const avail = pointsAvail(), groups = {};
+    for (const o of advanceOptionsFor(ch)) (groups[o[3]] ||= []).push(o);
+    const prev = $("f-advance").value;
+    $("f-advance").innerHTML = `<option value="">Spend points on…</option>` + Object.entries(groups).map(([g, os]) => `<optgroup label="${g}">${os.map(([v, t, cost]) => `<option value="${esc(v)}"${cost > avail ? " disabled" : ""}>${esc(t)}</option>`).join("")}</optgroup>`).join("");
+    if ([...$("f-advance").options].some((o) => o.value === prev && !o.disabled)) $("f-advance").value = prev;
+    $("xp-tally").textContent = `${avail} to spend · ${ch.xp.earned} earned`;
+    $("xp-tally").className = "chip" + (avail < 0 ? " no" : avail > 0 ? " ok" : "");
+    $("adv-list").innerHTML = ch.advances.map((a) => `<li>${esc(purchaseText(a))} <span class="muted">(${a.cost})</span>${a.note ? ` · ${esc(a.note)}` : ""}${a.date ? ` · ${a.date}` : ""}</li>`).join("");
     $("btn-unadvance").hidden = !ch.advances.length;
+    $("btn-unearn").hidden = !ch.xp.log.length;
   }
+  const earn = (n, note) => { pointsAvail(); ch.xp.earned += n; ch.xp.log = [...ch.xp.log, { n, note, date: new Date().toISOString().slice(0, 10) }]; touch(); render(); toast(`+${n} advancement point${n > 1 ? "s" : ""}. Save to file to keep it.`); };
+  $("btn-earn1").onclick = () => earn(1, "significant mission");
+  $("btn-earn2").onclick = () => earn(2, "milestone");
+  $("btn-unearn").onclick = () => { const e = ch.xp.log.pop(); if (e) { ch.xp.earned = Math.max(0, ch.xp.earned - e.n); touch(); render(); toast(`Took back the last award (+${e.n}).`); } };
   $("btn-advance").onclick = () => {
-    const n = $("f-advance").value;
-    if (!n) { toast("Choose the skill your GM approved first.", true); return; }
-    applyAdvance(ch, n, ""); touch(); render(); toast(`Advanced ${n}. Save to file to keep it.`);
+    const v = $("f-advance").value;
+    if (!v) { toast("Choose what your GM approved first.", true); return; }
+    const o = advanceOptionsFor(ch).find((x) => x[0] === v);
+    if (!o) { toast("That can't be bought now.", true); return; }
+    if (o[2] > pointsAvail()) { toast(`That costs ${o[2]}; you have ${pointsAvail()}.`, true); return; }
+    if (!applyAdvance(ch, v, $("f-advance-note").value.trim())) { toast("That can't be bought now.", true); return; }
+    $("f-advance-note").value = ""; touch(); render(); toast(`Spent ${o[2]} point${o[2] === 1 ? "" : "s"}: ${purchaseText(ch.advances[ch.advances.length - 1])}. Save to file to keep it.`);
   };
-  $("btn-unadvance").onclick = () => { const a = undoAdvance(ch); render(); if (a) toast(`Undid the ${a.skill} advancement.`); };
+  $("btn-unadvance").onclick = () => { const a = undoAdvance(ch); touch(); render(); if (a) toast(`Undid: ${purchaseText(a)}.`); };
 
   // ---- GM view: the whole crew at a glance ----
   const STORE_GM = "pelion.gmcrew.v1";
   let gmCrew = (store.get(STORE_GM, []) || []).filter((c) => c && typeof c === "object").map(normalize);
   const gmSay = (m, err) => { const el = $("gm-msg"); el.textContent = m; el.className = "toast" + (err ? " err" : ""); };
+  /* BATTLEMAP:START */
+// Battle map for the GM view, with two kinds of map on one card:
+//  - a hex map: a hex grid at any scale (a yard a hex, ten yards, a thousand kilometres in space) over an
+//    optional background picture, with tokens dragged from hex to hex and distances read as range bands;
+//  - a range track: one lane per range band, for chases and ship fights where only the band matters
+//    (Fracture Lines' ship fights move the range a band at a time, from under 10 km to a light-second).
+// One module for every creator (Grimm keeps a copy). The page passes in its characters, threats, tracks and
+// bands; the map keeps its own state in this browser (pictures in IndexedDB, which holds large files; the
+// rest in localStorage) and in a map file the GM can save and open again.
+//
+// mountBattleMap(api)
+//   root: an empty element to draw into; key: a storage prefix (one map per setting); esc; toast(msg, err)
+//   crew(): [{ id, name, portrait, color, down, dying, injury, boxes, stunned, points, ptrack, stats }]: the GM's
+//     characters, for "Add the posse" (partyName: posse, party, crew, team), live token state and the tracks shown when one is selected;
+//   setCrew(id, patch) writes a change back (patch: injury, dying, stunned, points, ptrack); pointName, stunName
+//   threats: [{ id, name, boxes, dodge, attacks, trait }], the setting's opponents; vehicles: the same for ships
+//   bands: [[name, maxYards]], the personal range bands; kmBands: [[name, maxKm]] where the setting has space
+//   rangeTracks: [{ id, title, us, bands: [[name, distance text]], note, help, startLane, vehicleTrack (a crew track, e.g. Hull; vehicleTracks lists more to show, e.g. Shields and systems) or
+//     vehicle: { name, boxes, label, effects: [text per boxes marked], downText } (its own boxes, e.g. a stagecoach) }]; or rangeTrack: one
+//   groupTracks(): [{ name, boxes, value, effect }] and setGroupTrack(name, value): the crew's shared tracks (Hull)
+// Returns { refresh() } to call when the characters or tracks change.
+function mountBattleMap(api) {
+  const SVGNS = "http://www.w3.org/2000/svg", SQ3 = Math.sqrt(3);
+  const esc = api.esc, KEY = api.key + ".battlemap.v1";
+  const say = (m, err) => (api.toast ? api.toast(m, err) : null);
+  const PARTY = api.partyName || "party", Party = PARTY[0].toUpperCase() + PARTY.slice(1);
+  // The range tracks: the setting's own (a ship fight, a stagecoach chase), or one plain track. The first is "range".
+  const TRACKS = ((api.rangeTracks || []).length ? api.rangeTracks : [api.rangeTrack || {}]).map((r, i) => Object.assign({ title: "Range track", us: "Us", note: "",
+    bands: [["Close", "up to 10 yd"], ["Short", "up to 50 yd"], ["Medium", "up to 150 yd"], ["Long", "up to 500 yd"], ["Extreme", "up to a mile"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
+  const addName = (x) => x.replace(/^(Our|The) /, (m) => m.toLowerCase());
+  const UNITS = { yd: { name: "yards", one: "yard", bands: api.bands || [], presets: [1, 2, 5, 10, 50] } };
+  if ((api.kmBands || []).length) UNITS.km = { name: "km", one: "km", bands: api.kmBands, presets: [1, 10, 100, 1000, 10000] };
+  const fresh = () => ({ kind: "hex", scale: { n: 1, unit: "yd" }, size: 36, orient: "pointy", ox: 31.2, oy: 36, cols: 24, rows: 16, grid: true, gridAlpha: 0.45,
+    view: { x: 0, y: 0, z: 1 }, tokens: [], bgW: 0, bgH: 0, rts: {} });
+  // Each range track keeps its own tokens and view in st.rts (older maps kept one track in st.rt).
+  const normal = (v) => { const s = Object.assign(fresh(), v || {}); s.rts = Object.assign({}, s.rts || {}); if (s.rt) { s.rts.range = s.rts.range || s.rt; delete s.rt; }
+    for (const t of TRACKS) s.rts[t.id] = Object.assign({ tokens: [], view: { x: 0, y: 0, z: 1 } }, s.rts[t.id] || {});
+    if (!s.scale || !UNITS[s.scale.unit] || !(s.scale.n > 0)) s.scale = { n: 1, unit: "yd" }; if (!TRACKS.some((t) => t.id === s.kind)) s.kind = "hex"; return s; };
+  let st = normal(load());
+  const bgs = {}; // the pictures by map ("hex" or a track's id), as data URLs (kept in IndexedDB)
+  let sel = null, mode = "move", drag = null, measure = null, pointers = new Map();
+  const isRange = () => st.kind !== "hex";
+  let RT = TRACKS.find((t) => t.id === st.kind) || TRACKS[0];
+  const toks = () => (isRange() ? st.rts[st.kind].tokens : st.tokens);
+  const setToks = (l) => { if (isRange()) st.rts[st.kind].tokens = l; else st.tokens = l; };
+  const V = () => (isRange() ? st.rts[st.kind].view : st.view);
+  const bgKey = (k = st.kind) => KEY + (k === "hex" ? ".bg" : k === "range" ? ".bgr" : ".bgr-" + k);
+  const KINDS = ["hex", ...TRACKS.map((t) => t.id)];
+
+  // ---- storage ----
+  function load() { try { const v = JSON.parse(localStorage.getItem(KEY) || "null"); return v && typeof v === "object" ? v : {}; } catch { return {}; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { say("The map is too large to keep in this browser; save it to a file.", true); } }
+  const idb = (() => {
+    let db = null;
+    const open = () => new Promise((res, rej) => { if (db) return res(db); try { const r = indexedDB.open("legend-dynamics-maps", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("images"); r.onsuccess = () => res((db = r.result)); r.onerror = () => rej(r.error); } catch (e) { rej(e); } });
+    const tx = (mode, fn) => open().then((d) => new Promise((res, rej) => { const t = d.transaction("images", mode), s = t.objectStore("images"), q = fn(s); t.oncomplete = () => res(q && q.result); t.onerror = () => rej(t.error); }));
+    return { get: (k) => tx("readonly", (s) => s.get(k)).catch(() => null), set: (k, v) => tx("readwrite", (s) => s.put(v, k)).catch(() => null), del: (k) => tx("readwrite", (s) => s.delete(k)).catch(() => null) };
+  })();
+
+  // ---- hex math (axial q, r; offset rows/columns for the rectangle of the map) ----
+  const pointy = () => st.orient !== "flat";
+  const toPx = (q, r) => pointy() ? { x: st.ox + st.size * SQ3 * (q + r / 2), y: st.oy + st.size * 1.5 * r } : { x: st.ox + st.size * 1.5 * q, y: st.oy + st.size * SQ3 * (r + q / 2) };
+  function round(fq, fr) {
+    const fs = -fq - fr; let q = Math.round(fq), r = Math.round(fr), s = Math.round(fs);
+    const dq = Math.abs(q - fq), dr = Math.abs(r - fr), ds = Math.abs(s - fs);
+    if (dq > dr && dq > ds) q = -r - s; else if (dr > ds) r = -q - s;
+    return { q, r };
+  }
+  function toHex(x, y) {
+    x -= st.ox; y -= st.oy;
+    return pointy() ? round((SQ3 / 3 * x - y / 3) / st.size, (2 / 3 * y) / st.size) : round((2 / 3 * x) / st.size, (-x / 3 + SQ3 / 3 * y) / st.size);
+  }
+  const dist = (a, b) => (Math.abs(a.q - b.q) + Math.abs(a.q + a.r - b.q - b.r) + Math.abs(a.r - b.r)) / 2;
+  const cells = () => { const out = []; for (let row = 0; row < st.rows; row++) for (let col = 0; col < st.cols; col++)
+    out.push(pointy() ? { q: col - Math.floor(row / 2), r: row } : { q: col, r: row - Math.floor(col / 2) }); return out; };
+  const corners = (c) => Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 180 * (60 * i - (pointy() ? 30 : 0)); return [c.x + st.size * Math.cos(a), c.y + st.size * Math.sin(a)]; });
+  const fmt = (v) => (v >= 100 ? Math.round(v).toLocaleString("en-US") : String(Math.round(v * 10) / 10));
+  const scaleText = () => { const u = UNITS[st.scale.unit]; return `${fmt(st.scale.n)} ${st.scale.n === 1 ? u.one : u.name}`; };
+  // A distance in hexes, at the map's scale, as a range band.
+  function rangeText(n) {
+    const u = UNITS[st.scale.unit], d = n * st.scale.n;
+    const band = st.scale.unit === "yd" && n <= 1 && d <= 2 ? "in reach" : (u.bands.find(([, max]) => d <= max) || ["out of range"])[0];
+    return `${n} hex${n === 1 ? "" : "es"} · ${fmt(d)} ${d === 1 ? u.one : u.name} · ${band}`;
+  }
+
+  // ---- the range track: a lane for "us", then one per band ----
+  const LW = 220, LH = 640, HEAD = 76;
+  const lanes = () => [[RT.us, RT.vehicleTrack || RT.vehicle ? "" : `where the ${PARTY} stands`], ...RT.bands];
+  const laneX = (i) => i * LW + LW / 2;
+  const laneOf = (x) => Math.max(0, Math.min(lanes().length - 1, Math.round((x - LW / 2) / LW)));
+  const laneName = (i) => (i === 0 ? RT.us : lanes()[i][0]);
+  function moveText(name, a, b) {
+    if (a === b) return `${name}: ${laneName(b)}`;
+    if (a === 0 || b === 0) return `${name}: ${laneName(a)} → ${laneName(b)}`;
+    const n = Math.abs(b - a);
+    return `${name}: ${laneName(a)} → ${laneName(b)} · ${n} band${n > 1 ? "s" : ""} ${b > a ? "farther" : "closer"}`;
+  }
+  const posOf = (t) => (isRange() ? { x: laneX(t.lane || 0), y: t.y || HEAD + 50 } : toPx(t.q, t.r));
+  const radOf = (t) => (isRange() ? 28 : st.size * 0.8) * (1 + (isRange() ? 0.45 : 1.19) * ((t.tsize || 1) - 1));
+
+  // ---- the help: how to use the map, written for this setting (its point name, its units, its ship) ----
+  function helpHtml() {
+    const pt = esc(api.pointName || "Legend"), km = !!UNITS.km, veh = TRACKS.some((t) => t.vehicleTrack), anyVeh = TRACKS.filter((t) => t.vehicleTrack || t.vehicle);
+    const trackHelp = (t) => `<b>${esc(t.title)}<\/b> ${t.help ? esc(t.help) : `for a fight where only distance matters: a chase, a running fight across open country. Each lane is a range band from the ${esc(PARTY)}.`}`;
+    const vName = (t) => esc(t.vehicle ? t.vehicle.name || t.us : t.us), vLabel = (t) => esc(t.vehicle ? t.vehicle.label || "Damage" : (t.vehicleTracks || [t.vehicleTrack]).join(", ").replace(/, ([^,]*)$/, " and $1"));
+    const vAdd = (t) => `<b>Add ${esc(addName(t.us))}<\/b> (on the ${esc(t.title)}) places ${esc(addName(vName(t)))}, ${t.vehicle ? `with its own ${vLabel(t)} boxes` : `linked to the crew's ${vLabel(t)} track${t.vehicleTracks ? "s" : ""}`}.`;
+    const vPanel = (t) => `<b>${vName(t)}<\/b> shows its ${vLabel(t)} boxes and what the damage does${t.vehicle ? `. When they are all marked it is ${esc((t.vehicle.downText || "wrecked").toLowerCase())}` : `; ${t.vehicleTracks ? "they are the crew's tracks" : "they are the crew's track"}, the same as on the sheet`}.`;
+    const sec = (h, items) => `<h4>${h}<\/h4><ul>${items.filter(Boolean).map((x) => `<li>${x}<\/li>`).join("")}<\/ul>`;
+    return `<div class="bm-helpbody small">
+      <p>Add characters to the GM view first: the map's tokens for the ${esc(PARTY)} come from there. The map is kept in this browser; save it to a file to keep a copy.<\/p>
+      ${sec("1. Choose the kind of map", [
+        `<b>Hex map<\/b> for a fight where position matters: who is behind cover, who can reach the door.`,
+        ...TRACKS.map(trackHelp),
+        `Each map keeps its own tokens and picture, so you can set them all up and switch between them.`])}
+      ${sec("2. Set up the hex map", [
+        `<b>Background image…<\/b> puts a picture under the grid: a battle map, a sketch, a photo of a street. A new picture is covered with hexes at the current hex size.`,
+        `Open <b>Scale, grid and map<\/b> and set <b>One hex is<\/b> to what a hex means: 1 yard for a brawl in a room, 5 or 10 for a street, 50 for open ground${km ? ", or a number of km for a fight in space" : ""}. Distances and range bands follow the scale.`,
+        `If the picture has its own grid, set <b>Hex size on screen<\/b> until the hexes match it, choose pointy or flat tops, then use <b>Shift right<\/b> and <b>Shift down<\/b> to line them up. <b>Fit the grid to the picture<\/b> starts over at the top-left corner.`,
+        `Turn <b>Show grid<\/b> off, or lower its strength, when the picture has a grid of its own.`])}
+      ${sec("3. Place tokens", [
+        `<b>Add the ${esc(PARTY)}<\/b> places every character in the GM view${veh ? "" : ", in the middle of the map"}. Their tokens show their portrait (or initials) and group color, and stay linked to the character.`,
+        ...anyVeh.map(vAdd),
+        `<b>Add a token<\/b> opens a small form. Pick from <b>From the threats<\/b> to fill in the name, boxes and the threat's numbers${veh ? " (enemy ships are listed with the people)" : ""}, or leave it on <i>None<\/i> for a plain token. Names with a number count up, so pressing <b>Place it<\/b> again adds the next one.`,
+        `Give a token a <b>color<\/b>, a <b>size<\/b> (Large or Huge for a horse, a monster, a ship) and, if you like, an <b>image<\/b>.`])}
+      ${sec("4. Move, measure and look", [
+        `Drag a token to move it. While you drag, the corner shows how far it went and the range band; on a range track, which band it moved into.`,
+        `<b>Measure<\/b> (hex map only): drag from one hex to another to read the distance. Press it again to go back to moving.`,
+        `Drag the empty map to pan. Scroll, pinch, or use <b>−<\/b>, <b>+<\/b> and <b>Fit<\/b> to zoom.`,
+        `From the keyboard: Tab to a token, Enter selects it, Delete removes it.`])}
+      ${sec("5. Track the fight from a token", [
+        `Click a token to open its panel underneath the map.`,
+        `<b>A token from the ${esc(PARTY)}<\/b> shows the character's Injury boxes, Dying, the stunned condition, ${pt} points and any personal track. Changes there change the character in the GM view, and the other way round.`,
+        ...anyVeh.map(vPanel),
+        `<b>Any other token<\/b> keeps its own boxes, shown as pips above it. When they are all marked it is taken out${veh ? " (or destroyed, for a ship)" : ""} and fades.`,
+        `<b>Copy<\/b> makes another of the same, <b>Remove<\/b> takes it off the map, <b>Done<\/b> closes the panel.`])}
+      ${sec("6. Keep the map", [
+        `The map, its tokens and its pictures are kept in this browser for this setting, until you clear them.`,
+        `<b>Save map to file<\/b> keeps everything (every map, its picture and tokens) in one file; <b>Open a map file…<\/b> brings it back here or on another computer. Use it to prepare fights ahead of time or send one to another GM.`,
+        `<b>Remove the image<\/b> and <b>Remove all tokens<\/b> clear the map you are looking at.`])}
+    <\/div>`;
+  }
+  // ---- markup ----
+  const hasVehicle = () => isRange() && (!!RT.vehicle || !!(RT.vehicleTrack && api.groupTracks && api.groupTracks().some((x) => x.name === RT.vehicleTrack)));
+  api.root.innerHTML = `
+    <details class="bm-help"><summary>How to use the map<\/summary>${helpHtml()}<\/details>
+    <div class="bm-bar bm-kinds" role="group" aria-label="Kind of map">
+      <button class="btn" data-bm="kind" data-kind="hex">Hex map<\/button>${TRACKS.map((t) => `<button class="btn" data-bm="kind" data-kind="${esc(t.id)}">${esc(t.title)}<\/button>`).join("")}
+      <span class="small muted bm-kindnote"><\/span>
+    <\/div>
+    <div class="bm-bar">
+      <label class="btn bm-file" tabindex="0">Background image…<input type="file" accept="image/*" data-bm="bg" class="bm-hide"><\/label>
+      <button class="btn" data-bm="posse">Add the ${esc(PARTY)}<\/button>
+      <button class="btn" data-bm="vehicle" hidden><\/button>
+      <button class="btn" data-bm="add">Add a token<\/button>
+      <button class="btn" data-bm="measure" aria-pressed="false">Measure<\/button>
+      <span class="bm-zoom"><button class="btn" data-bm="out" aria-label="Zoom out">−<\/button><button class="btn" data-bm="fit">Fit<\/button><button class="btn" data-bm="in" aria-label="Zoom in">+<\/button><\/span>
+    <\/div>
+    <div class="bm-add" hidden>
+      <label class="bm-threatwrap">From the threats <select data-bmf="threat"><\/select><\/label>
+      <label>Name <input type="text" data-bmf="name" placeholder="e.g. Outlaw 1"><\/label>
+      <label>Boxes <input type="number" min="1" max="12" value="1" data-bmf="boxes" style="width:4.5em"><\/label>
+      <label>Color <input type="color" data-bmf="color" value="#a33b2b"><\/label>
+      <label>Size <select data-bmf="tsize"><option value="1">Normal<\/option><option value="2">Large<\/option><option value="3">Huge<\/option><\/select><\/label>
+      <label class="btn bm-file" tabindex="0">Image (optional)…<input type="file" accept="image/*" data-bmf="img" class="bm-hide"><\/label>
+      <button class="btn primary" data-bm="addgo">Place it<\/button>
+    <\/div>
+    <div class="bm-stage"><svg class="bm-svg" role="application" aria-label="Battle map. Drag the map to pan, scroll or pinch to zoom, drag a token to move it.">
+      <defs><clipPath id="bm-clip" clipPathUnits="objectBoundingBox"><circle cx=".5" cy=".5" r=".5"/><\/clipPath><\/defs>
+      <g class="bm-world"><image class="bm-bg"/><g class="bm-lanes"><\/g><path class="bm-grid"/><g class="bm-tokens"><\/g><g class="bm-measure"><\/g><\/g>
+    <\/svg><div class="bm-readout" aria-live="polite"><\/div><\/div>
+    <div class="bm-sel" hidden><\/div>
+    <details class="bm-gridset"><summary class="small">Scale, grid and map<\/summary>
+      <div class="bm-hexonly">
+        <div class="bm-gridrow">
+          <label>One hex is <input type="number" min="0.1" step="any" data-bmscale="n" style="width:6.5em" list="bm-presets"><\/label>
+          <select data-bmscale="unit" aria-label="Unit">${Object.entries(UNITS).map(([k, u]) => `<option value="${k}">${esc(u.name)}<\/option>`).join("")}<\/select>
+          <datalist id="bm-presets"><\/datalist>
+          <span class="small muted bm-presetbtns"><\/span>
+        <\/div>
+        <div class="bm-gridrow">
+          <label>Hex size on screen <input type="range" min="10" max="140" step="1" data-bmg="size"><\/label>
+          <label>Hexes <select data-bmg="orient"><option value="pointy">Pointy top<\/option><option value="flat">Flat top<\/option><\/select><\/label>
+          <label>Columns <input type="number" min="2" max="200" data-bmg="cols"><\/label>
+          <label>Rows <input type="number" min="2" max="200" data-bmg="rows"><\/label>
+          <label>Shift right <input type="number" step="1" data-bmg="ox"><\/label>
+          <label>Shift down <input type="number" step="1" data-bmg="oy"><\/label>
+          <label><input type="checkbox" data-bmg="grid"> Show grid<\/label>
+          <label>Grid strength <input type="range" min="0.1" max="1" step="0.05" data-bmg="gridAlpha"><\/label>
+        <\/div>
+        <p class="small muted">The scale sets what a hex means: distances and range bands follow it. To line the grid up with a map that has its own grid, set the hex size on screen first, then shift it into place.<\/p>
+      <\/div>
+      <p class="small muted bm-rangeonly bm-rtnote"><\/p>
+      <div class="bm-bar"><button class="btn bm-hexonly" data-bm="align">Fit the grid to the picture<\/button><button class="btn" data-bm="bgoff">Remove the image<\/button><button class="btn" data-bm="clear">Remove all tokens<\/button>
+        <button class="btn" data-bm="savefile">Save map to file<\/button><label class="btn bm-file" tabindex="0">Open a map file…<input type="file" accept=".json,application/json" data-bm="openfile" class="bm-hide"><\/label><\/div>
+    <\/details>`;
+  const $ = (s) => api.root.querySelector(s);
+  const svg = $(".bm-svg"), world = $(".bm-world"), gTok = $(".bm-tokens"), gMeas = $(".bm-measure"), gLanes = $(".bm-lanes"), readout = $(".bm-readout");
+  const el = (tag, attrs) => { const n = document.createElementNS(SVGNS, tag); for (const [k, v] of Object.entries(attrs || {})) n.setAttribute(k, v); return n; };
+
+  // ---- threats: people, and ships where the setting has them ----
+  const allThreats = () => [...(api.vehicles || []), ...(api.threats || [])];
+  function fillThreats() {
+    const sel = $('[data-bmf="threat"]'), ppl = api.threats || [], veh = api.vehicles || [];
+    $(".bm-threatwrap").hidden = !ppl.length && !veh.length;
+    const opts = (l) => l.map((x) => `<option value="${esc(x.id)}">${esc(x.name)}<\/option>`).join("");
+    // On the range track, ships come first; on the hex map, people do.
+    const groups = isRange() ? [["Ships", veh], ["People", ppl]] : [["People", ppl], ["Ships", veh]];
+    sel.innerHTML = `<option value="">None (a plain token)<\/option>` + (veh.length ? groups.filter(([, l]) => l.length).map(([g, l]) => `<optgroup label="${g}">${opts(l)}<\/optgroup>`).join("") : opts(ppl));
+  }
+
+  // ---- drawing ----
+  function viewBox() { const w = svg.clientWidth || 800, h = svg.clientHeight || 500; svg.setAttribute("viewBox", `0 0 ${w} ${h}`); }
+  function drawWorld() { const v = V(); world.setAttribute("transform", `translate(${v.x} ${v.y}) scale(${v.z})`); }
+  function drawGrid() {
+    const g = $(".bm-grid"), im = $(".bm-bg"), bg = bgs[st.kind];
+    gLanes.textContent = "";
+    if (isRange()) {
+      g.setAttribute("d", "");
+      lanes().forEach(([name, sub], i) => {
+        gLanes.appendChild(el("rect", { class: "bm-lane" + (i ? (i % 2 ? " odd" : "") : " us"), x: i * LW, y: 0, width: LW, height: LH }));
+        const t1 = el("text", { class: "bm-lname", x: laneX(i), y: 30 }); t1.textContent = name; gLanes.appendChild(t1);
+        if (sub) { const t2 = el("text", { class: "bm-lsub", x: laneX(i), y: 52 }); t2.textContent = sub; gLanes.appendChild(t2); }
+      });
+      if (bg) { im.setAttribute("href", bg); im.setAttribute("width", lanes().length * LW); im.setAttribute("height", LH); im.setAttribute("preserveAspectRatio", "xMidYMid slice"); im.removeAttribute("display"); }
+      else im.setAttribute("display", "none");
+      return;
+    }
+    g.setAttribute("d", st.grid ? cells().map((h) => "M" + corners(toPx(h.q, h.r)).map((p) => p.map((v) => v.toFixed(1)).join(" ")).join("L") + "Z").join("") : "");
+    g.style.opacity = st.gridAlpha;
+    if (bg) { im.setAttribute("href", bg); im.setAttribute("width", st.bgW); im.setAttribute("height", st.bgH); im.setAttribute("preserveAspectRatio", "none"); im.removeAttribute("display"); }
+    else im.setAttribute("display", "none");
+  }
+  const live = (t) => (t.ref && api.crew().find((c) => c.id === t.ref)) || null;
+  const trackOf = (t) => (t.track && api.groupTracks && api.groupTracks().find((x) => x.name === t.track)) || null;
+  // What a token shows: a character's own state, a shared track's (the crew's ship), or its own boxes.
+  function info(t) {
+    const c = live(t), tr = trackOf(t);
+    if (c) return { c, name: c.name, color: c.color, img: c.portrait, boxes: c.boxes || 3, inj: c.injury || 0, down: c.down, dying: c.dying };
+    if (tr) return { tr, name: t.name || RT.us, color: t.color || "#3d7a9e", img: t.img, boxes: tr.boxes, inj: tr.value || 0, down: (tr.value || 0) >= tr.boxes };
+    const boxes = t.boxes || 0, inj = t.injury || 0;
+    return { name: t.name, color: t.color, img: t.img, boxes, inj, down: boxes && inj >= boxes };
+  }
+  function drawTokens() {
+    gTok.textContent = "";
+    for (const t of toks()) {
+      const k = info(t), p = posOf(t), rad = radOf(t), unit = isRange() ? 36 : st.size;
+      const g = el("g", { class: "bm-tok" + (sel === t.id ? " sel" : "") + (k.down ? " down" : "") + (k.dying ? " dying" : ""), "data-tok": t.id, transform: `translate(${p.x} ${p.y})`, tabindex: "0", role: "button", "aria-label": k.name || "Token" });
+      g.appendChild(el("circle", { r: rad, class: "bm-disc", style: `fill:${k.color || "#777"}` }));
+      if (k.img) g.appendChild(el("image", { href: k.img, x: -rad * 0.9, y: -rad * 0.9, width: rad * 1.8, height: rad * 1.8, "clip-path": "url(#bm-clip)", preserveAspectRatio: "xMidYMid slice" }));
+      else { const tx = el("text", { class: "bm-init", "font-size": rad * 0.8, dy: "0.35em" }); tx.textContent = (k.name || "?").split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase(); g.appendChild(tx); }
+      g.appendChild(el("circle", { r: rad, class: "bm-ring" }));
+      // Injury (or Hull) pips above the token: one per box, filled as they're marked.
+      if (k.boxes) { const pr = Math.max(2.5, unit * 0.1), gap = pr * 2.6;
+        for (let i = 0; i < k.boxes; i++) g.appendChild(el("circle", { class: "bm-pip" + (i < k.inj ? " on" : ""), r: pr, cx: (i - (k.boxes - 1) / 2) * gap, cy: -rad - pr * 1.8 })); }
+      const lb = el("text", { class: "bm-label", y: rad + Math.max(10, unit * 0.38), "font-size": Math.max(9, unit * 0.32) }); lb.textContent = k.name || ""; g.appendChild(lb);
+      gTok.appendChild(g);
+    }
+  }
+  function drawMeasure() {
+    gMeas.textContent = "";
+    if (isRange()) {
+      readout.textContent = drag && drag.kind === "token" && drag.moved ? moveText(info(drag.t).name || "Token", drag.from.lane, drag.to.lane) : "";
+      return;
+    }
+    const m = drag && drag.kind === "token" && drag.moved ? { a: drag.from, b: drag.to } : measure;
+    if (!m || !m.b) { readout.textContent = ""; return; }
+    const a = toPx(m.a.q, m.a.r), b = toPx(m.b.q, m.b.r), n = dist(m.a, m.b);
+    gMeas.appendChild(el("line", { x1: a.x, y1: a.y, x2: b.x, y2: b.y, class: "bm-mline" }));
+    gMeas.appendChild(el("circle", { cx: b.x, cy: b.y, r: st.size * 0.25, class: "bm-mdot" }));
+    readout.textContent = rangeText(n);
+  }
+  function drawSel() {
+    const box = $(".bm-sel"), t = toks().find((x) => x.id === sel);
+    box.hidden = !t;
+    if (!t) return;
+    const k = info(t), c = k.c, tr = k.tr;
+    const boxRow = (n, inj, attr, what) => `<span class="bm-boxes">${Array.from({ length: n }, (_, i) => `<button type="button" class="bm-box${i < inj ? " on" : ""}" ${attr}="${i + 1}" aria-label="${what} box ${i + 1}${i < inj ? ", marked" : ""}"><\/button>`).join("")}<\/span>`;
+    let tracks;
+    if (c) tracks = `<div class="bm-tracks"><span class="bm-stats small">${esc(c.stats || "")}<\/span>
+        <span class="bm-track">Injury ${boxRow(c.boxes || 3, c.injury || 0, "data-bmc-injury", "Injury")}<\/span>
+        <label><input type="checkbox" data-bmc="dying"${c.dying ? " checked" : ""}> Dying<\/label>
+        <label><input type="checkbox" data-bmc="stunned"${c.stunned ? " checked" : ""}> ${esc(api.stunName || "Stunned")}<\/label>
+        <span class="bm-track">${esc(api.pointName || "Points")} <button type="button" class="btn" data-bmc-points="-1" aria-label="One point fewer">−<\/button><b>${c.points ?? 0}<\/b><button type="button" class="btn" data-bmc-points="1" aria-label="One point more">+<\/button><\/span>
+        ${c.ptrack ? `<span class="bm-track">${esc(c.ptrack.name)} ${boxRow(c.ptrack.max, c.ptrack.value || 0, "data-bmc-ptrack", c.ptrack.name)}<\/span>` : ""}<\/div>`;
+    else if (tr && t.tracks) {
+      // A ship with several crew tracks (Shields, Hull, systems): one row each, with what its damage does.
+      const all = t.tracks.map((n) => api.groupTracks().find((x) => x.name === n)).filter(Boolean);
+      tracks = `<div class="bm-tracks" style="flex-direction:column;align-items:flex-start">${all.map((g) => `<span class="bm-track"><b>${esc(g.name)}<\/b> ${boxRow(g.boxes, g.value || 0, `data-bmk-name="${esc(g.name)}" data-bmk-track`, g.name)}${g.effect ? ` <span class="small muted">${esc(g.effect)}<\/span>` : ""}<\/span>`).join("")}<\/div>`;
+    } else if (tr) tracks = `<div class="bm-tracks"><span class="bm-track">${esc(tr.name)} ${boxRow(tr.boxes, tr.value || 0, "data-bmk-track", tr.name)}<\/span>
+        ${tr.effect ? `<span class="bm-stats small">${esc(tr.effect)}<\/span>` : ""}<\/div>`;
+    else tracks = `<div class="bm-tracks">${t.stats ? `<span class="bm-stats small">${esc(t.stats)}<\/span>` : ""}${t.effects ? `<span class="bm-stats small">${esc(t.effects[Math.min(t.injury || 0, t.effects.length - 1)] || "")}<\/span>` : ""}
+        <span class="bm-track">${esc(t.boxLabel || "Injury")} ${boxRow(t.boxes || 1, t.injury || 0, "data-bmt-injury", t.boxLabel || "Injury")}<\/span>${(t.injury || 0) >= (t.boxes || 1) ? `<b class="small">${esc(t.downText || (t.boxLabel === "Hull" ? "Destroyed" : "Taken out"))}<\/b>` : ""}
+        <label>Boxes <input type="number" min="1" max="12" data-bms="boxes" value="${t.boxes || 1}" style="width:4.5em"><\/label><\/div>`;
+    const whose = c ? `(from the ${esc(PARTY)}${c.dying ? ", Dying" : c.down ? ", down" : ""}: changes here change the character)` : tr ? (t.tracks ? "(the ship's tracks: changes here change the crew's)" : `(the ${esc(tr.name)} track: changes here change the crew's track)`) : "";
+    box.innerHTML = `<b>${esc(k.name || "Token")}<\/b>${whose ? ` <span class="small muted">${whose}<\/span>` : ""}${isRange() && laneName(t.lane || 0) !== k.name ? ` <span class="small muted">· ${esc(laneName(t.lane || 0))}<\/span>` : ""}
+      ${tracks}
+      ${c ? "" : `<label>Name <input type="text" data-bms="name" value="${esc(t.name || "")}"><\/label><label>Color <input type="color" data-bms="color" value="${esc(t.color || "#777777")}"><\/label>`}
+      <label>Size <select data-bms="tsize">${[["1", "Normal"], ["2", "Large"], ["3", "Huge"]].map(([n, l]) => `<option value="${n}"${String(t.tsize || 1) === n ? " selected" : ""}>${l}<\/option>`).join("")}<\/select><\/label>
+      <button class="btn" data-bm="dup">Copy<\/button><button class="btn" data-bm="del">Remove<\/button><button class="linkish" data-bm="desel">Done<\/button>`;
+  }
+  function syncForm() {
+    api.root.querySelectorAll("[data-bmg]").forEach((i) => { const k = i.dataset.bmg; if (document.activeElement === i) return; if (i.type === "checkbox") i.checked = !!st[k]; else i.value = st[k]; });
+    const n = $('[data-bmscale="n"]'); if (document.activeElement !== n) n.value = st.scale.n;
+    $('[data-bmscale="unit"]').value = st.scale.unit;
+    const pre = UNITS[st.scale.unit].presets;
+    $("#bm-presets").innerHTML = pre.map((v) => `<option value="${v}">`).join("");
+    $(".bm-presetbtns").innerHTML = "Quick: " + pre.map((v) => `<button type="button" class="linkish" data-bmpre="${v}">${fmt(v)}<\/button>`).join(" · ");
+    $('[data-bm="measure"]').setAttribute("aria-pressed", mode === "measure");
+    $('[data-bm="measure"]').hidden = isRange();
+    $('[data-bm="vehicle"]').hidden = !hasVehicle(); $('[data-bm="vehicle"]').textContent = `Add ${addName(RT.us)}`;
+    $(".bm-rtnote").textContent = RT.note || `Each lane is a range band from the ${PARTY}. Drag a token into another lane to move it a band in or out.`;
+    api.root.querySelectorAll('[data-bm="kind"]').forEach((b) => b.setAttribute("aria-pressed", b.dataset.kind === st.kind));
+    api.root.querySelectorAll(".bm-hexonly").forEach((x) => (x.hidden = isRange()));
+    api.root.querySelectorAll(".bm-rangeonly").forEach((x) => (x.hidden = !isRange()));
+    $(".bm-kindnote").textContent = isRange() ? `Lanes are range bands: ${RT.bands.map((b) => b[0]).join(", ")}.` : `One hex is ${scaleText()}.`;
+  }
+  function draw() { viewBox(); drawWorld(); drawGrid(); drawTokens(); drawMeasure(); drawSel(); syncForm(); }
+
+  // ---- coordinates: screen → map ----
+  function mapPt(ev) {
+    const r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal, sx = vb.width / r.width, sy = vb.height / r.height, v = V();
+    const x = (ev.clientX - r.left) * sx, y = (ev.clientY - r.top) * sy;
+    return { sx: x, sy: y, x: (x - v.x) / v.z, y: (y - v.y) / v.z };
+  }
+  function zoomAt(f, sx, sy) {
+    const v = V(); v.set = true;
+    const z = Math.max(0.15, Math.min(6, v.z * f)); f = z / v.z;
+    v.x = sx - (sx - v.x) * f; v.y = sy - (sy - v.y) * f; v.z = z; drawWorld();
+  }
+  function fit() {
+    viewBox();
+    const w = svg.clientWidth || 800, h = svg.clientHeight || 500, v = V();
+    let mw, mh;
+    if (isRange()) { mw = lanes().length * LW; mh = LH; }
+    else {
+      // The grid's real extent (offset rows or columns stagger by half a hex), or the picture's, whichever is larger.
+      const gw = pointy() ? st.ox + st.size * SQ3 * (st.cols + 0.5) : st.ox + st.size * (1.5 * st.cols + 0.5);
+      const gh = pointy() ? st.oy + st.size * (1.5 * st.rows + 0.5) : st.oy + st.size * SQ3 * (st.rows + 0.5);
+      mw = Math.max(st.bgW, gw); mh = Math.max(st.bgH, gh);
+    }
+    v.z = Math.max(0.15, Math.min(6, Math.min(w / mw, h / mh))); v.x = (w - mw * v.z) / 2; v.y = (h - mh * v.z) / 2;
+    drawWorld(); save();
+  }
+  // The hex in the middle of the view, kept inside the map's rectangle so new tokens land on the map.
+  const centerHex = () => {
+    const w = svg.clientWidth || 800, h = svg.clientHeight || 500, v = V(), x = toHex((w / 2 - v.x) / v.z, (h / 2 - v.y) / v.z);
+    const row = pointy() ? x.r : x.q, col = pointy() ? x.q + Math.floor(x.r / 2) : x.r + Math.floor(x.q / 2);
+    const R = Math.max(0, Math.min(st.rows - 1, pointy() ? row : col)), C = Math.max(0, Math.min(st.cols - 1, pointy() ? col : row));
+    return pointy() ? { q: C - Math.floor(R / 2), r: R } : { q: C, r: R - Math.floor(C / 2) };
+  };
+  function freeHexNear(h) {
+    const used = new Set(st.tokens.map((t) => t.q + "," + t.r));
+    for (let ring = 0; ring < 30; ring++) for (let dq = -ring; dq <= ring; dq++) for (let dr = Math.max(-ring, -dq - ring); dr <= Math.min(ring, -dq + ring); dr++) {
+      const q = h.q + dq, r = h.r + dr; if (dist({ q, r }, h) === ring && !used.has(q + "," + r)) return { q, r };
+    }
+    return h;
+  }
+  // A new token's place: the middle of the hex map, or the next free spot down a lane of the range track.
+  function spot(lane) {
+    if (!isRange()) return freeHexNear(centerHex());
+    const n = toks().filter((t) => (t.lane || 0) === lane).length;
+    return { lane, y: HEAD + 60 + (n % 5) * 112 };
+  }
+  const uid = () => Math.random().toString(36).slice(2, 10);
+
+  // ---- pointer: pan, zoom, drag tokens, measure ----
+  svg.addEventListener("pointerdown", (ev) => {
+    svg.setPointerCapture(ev.pointerId); pointers.set(ev.pointerId, mapPt(ev));
+    if (pointers.size === 2) { const [a, b] = [...pointers.values()]; drag = { kind: "pinch", d: Math.hypot(a.sx - b.sx, a.sy - b.sy) }; return; }
+    const p = mapPt(ev), tg = ev.target.closest && ev.target.closest("[data-tok]");
+    if (mode === "measure" && !isRange()) { const h = toHex(p.x, p.y); measure = { a: h, b: h }; drag = { kind: "measure" }; drawMeasure(); return; }
+    if (tg) {
+      const t = toks().find((x) => x.id === tg.dataset.tok), o = posOf(t); sel = t.id;
+      const at = isRange() ? { lane: t.lane || 0, y: t.y } : { q: t.q, r: t.r };
+      drag = { kind: "token", t, from: at, to: { ...at }, moved: false, off: { x: p.x - o.x, y: p.y - o.y } }; drawTokens(); drawSel(); return;
+    }
+    const v = V(); drag = { kind: "pan", sx: p.sx, sy: p.sy, vx: v.x, vy: v.y, moved: false };
+  });
+  svg.addEventListener("pointermove", (ev) => {
+    if (!pointers.has(ev.pointerId)) return;
+    pointers.set(ev.pointerId, mapPt(ev));
+    if (!drag) return;
+    const p = mapPt(ev);
+    if (drag.kind === "pinch" && pointers.size === 2) { const [a, b] = [...pointers.values()], d = Math.hypot(a.sx - b.sx, a.sy - b.sy); zoomAt(d / drag.d, (a.sx + b.sx) / 2, (a.sy + b.sy) / 2); drag.d = d; return; }
+    if (drag.kind === "pan") { const v = V(); v.set = true; v.x = drag.vx + p.sx - drag.sx; v.y = drag.vy + p.sy - drag.sy; drag.moved = drag.moved || Math.abs(p.sx - drag.sx) + Math.abs(p.sy - drag.sy) > 4; drawWorld(); return; }
+    if (drag.kind === "measure") { measure.b = toHex(p.x, p.y); drawMeasure(); return; }
+    if (drag.kind === "token") {
+      const x = p.x - drag.off.x, y = p.y - drag.off.y, g = gTok.querySelector(`[data-tok="${drag.t.id}"]`);
+      if (g) g.setAttribute("transform", `translate(${x} ${y})`);
+      drag.moved = true;
+      drag.to = isRange() ? { lane: laneOf(x), y: Math.max(HEAD + 30, Math.min(LH - 30, y)) } : toHex(x, y);
+      drawMeasure();
+    }
+  });
+  const end = (ev) => {
+    pointers.delete(ev.pointerId);
+    if (!drag) return;
+    if (drag.kind === "token") {
+      const t = drag.t;
+      if (drag.moved) { if (isRange()) { t.lane = drag.to.lane; t.y = drag.to.y; } else { t.q = drag.to.q; t.r = drag.to.r; } }
+      drag = null; drawTokens(); drawMeasure(); readout.textContent = ""; save(); sel = t.id; drawSel(); return;
+    }
+    if (drag.kind === "pan" && !drag.moved && sel) { sel = null; drawTokens(); drawSel(); }
+    if (drag.kind === "pinch" && pointers.size) { drag = null; return; }
+    drag = null; save();
+  };
+  svg.addEventListener("pointerup", end); svg.addEventListener("pointercancel", end);
+  svg.addEventListener("wheel", (ev) => { ev.preventDefault(); const p = mapPt(ev); zoomAt(ev.deltaY < 0 ? 1.12 : 1 / 1.12, p.sx, p.sy); clearTimeout(svg._t); svg._t = setTimeout(save, 300); }, { passive: false });
+  svg.addEventListener("keydown", (ev) => {
+    const tg = ev.target.closest && ev.target.closest("[data-tok]"); if (!tg) return;
+    if (ev.key === "Delete" || ev.key === "Backspace") { setToks(toks().filter((t) => t.id !== tg.dataset.tok)); sel = null; save(); draw(); ev.preventDefault(); }
+    if (ev.key === "Enter" || ev.key === " ") { sel = tg.dataset.tok; drawTokens(); drawSel(); ev.preventDefault(); }
+  });
+
+  // ---- images ----
+  const readImage = (file, max) => new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = () => { const im = new Image(); im.onload = () => {
+      const k = Math.min(1, max / Math.max(im.width, im.height)); if (k === 1 && file.size < 4e6) return res({ url: fr.result, w: im.width, h: im.height });
+      const cv = document.createElement("canvas"); cv.width = Math.round(im.width * k); cv.height = Math.round(im.height * k);
+      cv.getContext("2d").drawImage(im, 0, 0, cv.width, cv.height); res({ url: cv.toDataURL("image/jpeg", 0.88), w: cv.width, h: cv.height }); };
+      im.onerror = () => rej(new Error("not an image")); im.src = fr.result; };
+    fr.onerror = () => rej(fr.error); fr.readAsDataURL(file);
+  });
+  function alignToPicture() {
+    const w = pointy() ? st.size * SQ3 : st.size * 1.5, h = pointy() ? st.size * 1.5 : st.size * SQ3;
+    st.ox = pointy() ? st.size * SQ3 / 2 : st.size; st.oy = pointy() ? st.size : st.size * SQ3 / 2;
+    if (st.bgW) { st.cols = Math.max(2, Math.ceil((st.bgW - st.ox) / w) + (pointy() ? 0 : 1)); st.rows = Math.max(2, Math.ceil((st.bgH - st.oy) / h) + 1); }
+  }
+  async function setBackground(file) {
+    try {
+      const im = await readImage(file, 4096);
+      bgs[st.kind] = im.url;
+      // A new picture on the hex map: cover it with hexes at the current size, the first hex tucked into its top-left corner.
+      if (!isRange()) { st.bgW = im.w; st.bgH = im.h; alignToPicture(); }
+      await idb.set(bgKey(), im.url); save(); draw(); fit();
+      say(isRange() ? "Background set behind the lanes." : "Background set. Line the grid up under Scale, grid and map if the picture has its own.");
+    } catch { say("That file isn't an image this browser can read.", true); }
+  }
+
+  // ---- controls ----
+  let pendingImg = null;
+  api.root.addEventListener("click", async (ev) => {
+    // Tracks in the selection panel: a posse token's go to the character, the crew's ship's to the crew's track,
+    // and anyone else's stay on the token.
+    const tb = ev.target.closest("[data-bmc-injury],[data-bmc-ptrack],[data-bmc-points],[data-bmt-injury],[data-bmk-track]");
+    if (tb) {
+      const t = toks().find((x) => x.id === sel); if (!t) return;
+      const c = live(t), tr = trackOf(t), d = tb.dataset, toggle = (cur, v) => (cur === v ? v - 1 : v);
+      if (d.bmtInjury) { t.injury = toggle(t.injury || 0, +d.bmtInjury); save(); drawTokens(); drawSel(); return; }
+      if (d.bmkTrack && tr && api.setGroupTrack) {
+        const g = d.bmkName ? api.groupTracks().find((x) => x.name === d.bmkName) : tr;
+        if (g) api.setGroupTrack(g.name, toggle(g.value || 0, +d.bmkTrack)); drawTokens(); drawSel(); return;
+      }
+      if (!c || !api.setCrew) return;
+      if (d.bmcInjury) api.setCrew(t.ref, { injury: toggle(c.injury || 0, +d.bmcInjury) });
+      else if (d.bmcPtrack) api.setCrew(t.ref, { ptrack: toggle(c.ptrack.value || 0, +d.bmcPtrack) });
+      else if (d.bmcPoints) api.setCrew(t.ref, { points: Math.max(0, (c.points || 0) + +d.bmcPoints) });
+      return;
+    }
+    const pre = ev.target.closest("[data-bmpre]");
+    if (pre) { st.scale.n = +pre.dataset.bmpre; save(); draw(); return; }
+    const b = ev.target.closest("[data-bm]"); if (!b || b.tagName === "INPUT") return;
+    const k = b.dataset.bm, t = toks().find((x) => x.id === sel);
+    if (k === "kind") {
+      if (st.kind === b.dataset.kind) return;
+      st.kind = b.dataset.kind; RT = TRACKS.find((t) => t.id === st.kind) || TRACKS[0]; sel = null; measure = null; mode = "move"; fillThreats(); save(); draw();
+      if (!V().set) fit();
+    } else if (k === "posse") {
+      const crew = api.crew(), have = new Set(toks().map((x) => x.ref).filter(Boolean)), add = crew.filter((c) => !have.has(c.id));
+      if (!crew.length) { say("Add characters to the GM view first.", true); return; }
+      for (const c of add) toks().push({ id: uid(), ref: c.id, tsize: 1, ...spot(0) });
+      save(); draw(); say(add.length ? `Placed ${add.length} from the ${PARTY}.` : `The whole ${PARTY} is already on the map.`);
+    } else if (k === "vehicle") {
+      if (toks().some((x) => (RT.vehicle ? x.vehicle === RT.id : x.track === RT.vehicleTrack))) { say(`${RT.us} is already on the map.`); return; }
+      // A setting's own vehicle (the stagecoach) keeps its boxes on the token; the crew's ship is linked to the crew's track.
+      const v = RT.vehicle;
+      toks().push(v ? { id: uid(), vehicle: RT.id, name: v.name || RT.us, color: v.color || "#8a5a2b", tsize: 2, boxes: v.boxes || 4, injury: 0, boxLabel: v.label || "Damage", effects: v.effects || null, downText: v.downText || "Wrecked", ...spot(0) }
+        : { id: uid(), track: RT.vehicleTrack, tracks: RT.vehicleTracks || null, name: RT.us, color: "#3d7a9e", tsize: 2, ...spot(0) });
+      save(); draw();
+    } else if (k === "add") { const f = $(".bm-add"); f.hidden = !f.hidden; if (!f.hidden) $('[data-bmf="name"]').focus(); }
+    else if (k === "addgo") {
+      const name = $('[data-bmf="name"]').value.trim(), th = allThreats().find((x) => x.id === $('[data-bmf="threat"]').value);
+      const ship = !!(th && (api.vehicles || []).includes(th));
+      toks().push({ id: uid(), ref: null, name: name || (th ? th.name : "Token"), color: $('[data-bmf="color"]').value, img: pendingImg, tsize: +$('[data-bmf="tsize"]').value,
+        ...spot(RT.startLane || Math.min(3, lanes().length - 1)), boxes: Math.max(1, +$('[data-bmf="boxes"]').value || 1), injury: 0, threat: th ? th.id : null, boxLabel: ship ? "Hull" : "Injury",
+        stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.trait].filter(Boolean).join(" · ") : "" });
+      // Numbered names count up, so "Outlaw 1" is followed by "Outlaw 2".
+      const m = name.match(/^(.*?)(\d+)$/); $('[data-bmf="name"]').value = m ? m[1] + (+m[2] + 1) : name;
+      save(); draw();
+    } else if (k === "measure") { mode = mode === "measure" ? "move" : "measure"; measure = null; drawMeasure(); syncForm(); say(mode === "measure" ? "Drag from one hex to another to measure." : ""); }
+    else if (k === "in" || k === "out") { viewBox(); zoomAt(k === "in" ? 1.25 : 0.8, (svg.clientWidth || 800) / 2, (svg.clientHeight || 500) / 2); save(); }
+    else if (k === "fit") fit();
+    else if (k === "align") { alignToPicture(); save(); draw(); }
+    else if (k === "bgoff") { bgs[st.kind] = null; if (!isRange()) st.bgW = st.bgH = 0; await idb.del(bgKey()); save(); draw(); }
+    else if (k === "clear") { if (!toks().length || confirm("Remove every token from this map?")) { setToks([]); sel = null; save(); draw(); } }
+    else if (k === "savefile") {
+      const blob = new Blob([JSON.stringify({ format: "legend-dynamics-battlemap", version: 3, map: st, backgrounds: bgs })], { type: "application/json" });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "battle-map.json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    } else if (k === "del" && t) { setToks(toks().filter((x) => x !== t)); sel = null; save(); draw(); }
+    else if (k === "dup" && t) {
+      const n = { ...t, id: uid(), ref: null, track: null, tracks: null, vehicle: null, injury: 0, name: (t.name || "").replace(/(\d+)$/, (d) => +d + 1), ...(isRange() ? spot(t.lane || 0) : freeHexNear({ q: t.q, r: t.r })) };
+      const i = info(t); if (live(t) || trackOf(t)) Object.assign(n, { name: i.name, color: i.color, img: i.img, boxes: i.boxes });
+      toks().push(n); sel = n.id; save(); draw();
+    } else if (k === "desel") { sel = null; draw(); }
+  });
+  api.root.addEventListener("change", async (ev) => {
+    const i = ev.target;
+    if (i.dataset.bm === "bg" && i.files[0]) { await setBackground(i.files[0]); i.value = ""; }
+    else if (i.dataset.bmf === "img" && i.files[0]) { try { pendingImg = (await readImage(i.files[0], 256)).url; say("Image ready for the next token."); } catch { say("That file isn't an image.", true); } i.value = ""; }
+    else if (i.dataset.bm === "openfile" && i.files[0]) {
+      try { const d = JSON.parse(await i.files[0].text()); if (d.format !== "legend-dynamics-battlemap") throw 0;
+        st = normal(d.map); RT = TRACKS.find((t) => t.id === st.kind) || TRACKS[0];
+        const pics = d.backgrounds || { hex: d.background, range: d.backgroundRange };
+        for (const kk of KINDS) { bgs[kk] = pics[kk] || null; if (bgs[kk]) await idb.set(bgKey(kk), bgs[kk]); else await idb.del(bgKey(kk)); }
+        sel = null; fillThreats(); save(); draw(); fit(); say("Map opened.");
+      } catch { say("That isn't a battle map file.", true); }
+      i.value = "";
+    } else if (i.dataset.bmscale) {
+      if (i.dataset.bmscale === "unit") { st.scale.unit = i.value; st.scale.n = UNITS[i.value].presets[0]; }
+      else if (+i.value > 0) st.scale.n = +i.value;
+      save(); draw();
+    } else if (i.dataset.bmg) { const k = i.dataset.bmg; st[k] = i.type === "checkbox" ? i.checked : i.tagName === "SELECT" ? i.value : +i.value; save(); draw(); }
+    else if (i.dataset.bms) { const t = toks().find((x) => x.id === sel); if (!t) return; const k = i.dataset.bms; t[k] = k === "tsize" || k === "boxes" ? Math.max(1, +i.value || 1) : i.value; save(); drawTokens(); if (k === "boxes") drawSel(); }
+    else if (i.dataset.bmc) { const t = toks().find((x) => x.id === sel); if (t && t.ref && api.setCrew) api.setCrew(t.ref, { [i.dataset.bmc]: i.checked }); }
+    else if (i.dataset.bmf === "threat") {
+      // Picking a threat fills in its name (numbered), boxes and a foe's color.
+      const th = allThreats().find((x) => x.id === i.value); if (!th) return;
+      const n = toks().filter((x) => x.threat === th.id).length + 1;
+      $('[data-bmf="name"]').value = `${th.name.replace(/\s*\(.*\)$/, "")} ${n}`; $('[data-bmf="boxes"]').value = th.boxes || 1; $('[data-bmf="color"]').value = "#a33b2b";
+    }
+  });
+  api.root.addEventListener("input", (ev) => { const i = ev.target; if (i.dataset.bmg && i.type === "range") { st[i.dataset.bmg] = +i.value; drawGrid(); drawTokens(); clearTimeout(i._t); i._t = setTimeout(save, 300); } });
+  // The file buttons are labels around file pickers kept in the page (not hidden: some browsers, Safari
+  // among them, won't open a picker that isn't); Enter or Space opens them from the keyboard.
+  api.root.addEventListener("keydown", (ev) => { const l = ev.target.closest && ev.target.closest(".bm-file"); if (l && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); l.querySelector("input").click(); } });
+  // The GM view starts hidden, so the map's real size is only known once it's shown: fit it then, unless the GM has moved the view.
+  if (window.ResizeObserver) new ResizeObserver(() => { viewBox(); if (svg.clientWidth && !V().set) { fit(); V().set = false; } }).observe(svg);
+
+  fillThreats();
+  Promise.all(KINDS.map((k) => idb.get(bgKey(k)))).then((l) => { KINDS.forEach((k, i) => (bgs[k] = l[i] || null)); draw(); if (!V().set && svg.clientWidth) fit(); });
+  draw();
+  return { refresh: () => {
+    const ids = new Set(api.crew().map((c) => c.id));
+    st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
+    drawTokens(); drawSel(); viewBox(); syncForm();
+  } };
+}
+
+// The setting's opponents, read from a table in the Players' Guide on the page (for settings that keep them only
+// in the guide): the table after the heading named (Threats, or Enemy ships), columns found by their headings.
+// People: Threat, Attack (target), Dodge, Boxes, Defense, Trait. Ships: Ship, Class, Pilot (or Helm) / Gunner, Maneuver, Shields, Hull, Weapons, Trait.
+function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
+  const h = guide && [...guide.querySelectorAll("h1, h2, h3")].find((x) => x.textContent.trim() === heading);
+  let t = h && h.nextElementSibling;
+  while (t && t.tagName !== "TABLE" && !/^H[123]$/.test(t.tagName)) t = t.nextElementSibling;
+  if (!t || t.tagName !== "TABLE") return [];
+  const raw = [...t.querySelectorAll("thead th, tr:first-child th")].map((x) => x.textContent.trim()), head = raw.map((x) => x.toLowerCase());
+  const col = (re) => head.findIndex((x) => re.test(x));
+  const [cName, cAtk, cPilot, cDodge, cBoxes, cDef, cWeap, cTrait, cShields, cClass, cMan] = [/^threat|^ship|^name/, /^attack/, /^pilot|^helm/, /^dodge/, /^boxes|^hull/, /^defen/, /^weapons$/, /^trait/, /^shields$/, /^class$/, /^maneuver/].map(col);
+  return [...t.querySelectorAll("tbody tr")].map((tr, i) => {
+    const td = [...tr.children].map((x) => x.textContent.trim()), at = (c) => (c >= 0 ? td[c] : "");
+    const def = at(cDef) && at(cDef) !== "—" ? `Defense ${at(cDef)}` : "";
+    const pilot = cPilot >= 0 ? `${raw[cPilot]} ${at(cPilot)}` : "", weap = cWeap >= 0 && at(cWeap) ? at(cWeap) : "", shields = cShields >= 0 && at(cShields) ? `Shields ${at(cShields)}` : "";
+    const cls = [cClass >= 0 ? at(cClass) : "", cMan >= 0 && at(cMan) ? `Maneuver ${at(cMan)}` : ""].filter(Boolean).join(", ");
+    return { id: prefix + i, name: at(cName), attacks: [cls, at(cAtk), pilot, shields, weap, def].filter(Boolean).join(" · "), dodge: at(cDodge) || null, boxes: parseInt(at(cBoxes), 10) || 1, trait: at(cTrait) };
+  }).filter((x) => x.name);
+}
+/* BATTLEMAP:END */
+  // The battle map: the crew as tokens (portrait, division color, down or Dying) on a hex map at any scale, or a ship fight
+  // on a range track, with the Pelion linked to the ship's tracks and enemy ships from the Players' Guide.
+  const DIV_COLOR = { command: "var(--gold)", sciences: "var(--blue)", operations: "var(--red)", services: "var(--red)" };
+  const battleMap = mountBattleMap({ root: $("battlemap"), key: "uss-pelion", esc, toast: gmSay,
+    bands: [["Close", 10], ["Short", 50], ["Medium", 150], ["Long", 500], ["Extreme", 1760]],
+    kmBands: [["Close", 10], ["Short", 1000], ["Medium", 10000], ["Long", 100000], ["Extreme", 300000]],
+    pointName: "Duty", stunName: "Stunned", partyName: "crew",
+    rangeTracks: [{ title: "Ship fight", us: "The Pelion", vehicleTrack: "Hull", vehicleTracks: SHIP_TRACKS.map(([n]) => n), startLane: 3,
+      help: "for starships closing or opening the range. Each lane is a range band from the Pelion.",
+      bands: [["Close", "under 10 km"], ["Short", "up to 1,000 km"], ["Medium", "up to 10,000 km"], ["Long", "up to 100,000 km"], ["Extreme", "about a light-second"]],
+      note: "Each lane is a range band from the Pelion. At the start of each exchange, Helm rolls against the enemy's helm; the winner may move the enemy one lane in or out. Weapons take −2 one band beyond their range and −4 two bands beyond. Winning at Extreme by 5 or more lets a ship go to warp." },
+      { help: "for an away team's chase or a running fight where only distance matters. Each lane is a range band from the crew." }],
+    threats: threatsFromGuide($("guide")),
+    vehicles: threatsFromGuide($("guide"), "Enemy ships", "ship-"),
+    groupTracks: () => SHIP_TRACKS.map(([name, boxes]) => { const v = Math.min(boxes, ship[name] || 0); return { name, boxes, value: v, effect: shipEffect(name, v) }; }),
+    setGroupTrack: (name, v) => { const t = SHIP_TRACKS.find(([n]) => n === name); if (!t) return; ship[name] = Math.max(0, Math.min(t[1], v)); store.set(STORE_SHIP, ship); renderShip(); },
+    crew: () => gmCrew.map((c) => { const k = gmCalc(c);
+      return { id: c.id, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
+        color: DIV_COLOR[k.div] || "var(--gold)", injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty, ptrack: null,
+        stats: [`Dodge ${k.dodge}`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
+    // A change made on the map is the GM's copy of the officer, the same as a change on their card.
+    setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
+      if ("injury" in patch) { c.play.injury = Math.max(0, Math.min(3, patch.injury)); if (c.play.injury < 3 && !gritty) c.play.dying = false; }
+      if ("dying" in patch) c.play.dying = !!patch.dying;
+      if ("stunned" in patch) c.play.stunned = !!patch.stunned;
+      if ("points" in patch) c.play.duty = Math.max(0, patch.points);
+      saveGM(); renderGM(); } });
   const saveGM = () => { if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the crew. Save the crew to a file.", true); };
   // Work out a crew member's numbers with the same rules as the sheet, by briefly treating them as the current character.
   function gmCalc(c) {
@@ -4050,6 +5470,7 @@ tr.lvl-U td.target { color: var(--muted); }
     return { added, updated };
   }
   function renderGM() {
+    try { battleMap.refresh(); } catch { /* the map mounts just after the GM view's first render */ }
     if (gmReady) { renderLogForm(); renderSeed(); renderLogBook(); } // the log and seed panels exist once their data has loaded
     $("gm-add-saved").innerHTML = `<option value="">${roster.length ? "Choose a saved officer…" : "No officers saved in this browser"}</option>` +
       roster.map((c, i) => `<option value="${i}">${esc(c.name || "Unnamed officer")}</option>`).join("");
@@ -4105,6 +5526,7 @@ tr.lvl-U td.target { color: var(--muted); }
       try {
         const data = JSON.parse(await f.text());
         if (Array.isArray(data.log)) mergeLog(data.log);
+        if (typeof data.gritty === "boolean") setGritty(data.gritty);
         const list = Array.isArray(data) ? data : Array.isArray(data.crew) ? data.crew : [data];
         const ok = list.filter((x) => x && x.attrs && x.skills);
         if (!ok.length) bad++;
@@ -4123,7 +5545,7 @@ tr.lvl-U td.target { color: var(--muted); }
   });
   $("gm-save").onclick = () => {
     if (!gmCrew.length) { gmSay("Add some crew first.", true); return; }
-    saveText(JSON.stringify({ format: "uss-pelion-crew", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog }, null, 2), "pelion-crew.json", gmSay);
+    saveText(JSON.stringify({ format: "uss-pelion-crew", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog, gritty }, null, 2), "pelion-crew.json", gmSay);
   };
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = 2)); saveGM(); renderGM(); gmSay("New session: everyone has 2 Duty points."); };
   let gmClearArmed = false;
@@ -4180,14 +5602,14 @@ tr.lvl-U td.target { color: var(--muted); }
   function renderLogForm() {
     if (!$("log-stardate").value) $("log-stardate").value = freshStardate();
     $("log-adv-wrap").hidden = !gmCrew.length;
-    $("log-adv").innerHTML = gmCrew.map((c) => `<label>${esc(c.name || "Unnamed")}<select data-logadv="${c.id}"><option value="">No advancement</option>${advanceOptionsFor(c).map(([n, t]) => `<option value="${esc(n)}">${esc(t)}</option>`).join("")}</select></label>`).join("");
+    $("log-adv").innerHTML = gmCrew.map((c) => `<label>${esc(c.name || "Unnamed")}<select data-logadv="${c.id}"><option value="0">No points</option><option value="1" selected>+1 (significant mission)</option><option value="2">+2 (milestone)</option><option value="3">+3 (both)</option></select></label>`).join("");
   }
   const logEntryText = (e) => [`Captain's log, stardate ${e.stardate}. ${e.title || "Mission"}: ${e.outcome}.`, e.notes, e.commend ? `Commendations: ${e.commend}` : "",
-    e.advances.length ? `Advancement: ${e.advances.map((a) => `${a.name}, ${a.skill} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}` : ""].filter(Boolean).join("\n");
+    e.advances.length ? `Advancement: ${e.advances.map((a) => a.points ? `${a.name} +${a.points}` : `${a.name}, ${a.skill} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}` : ""].filter(Boolean).join("\n");
   function renderLogBook() {
     $("log-entries").innerHTML = missionLog.slice().reverse().map((e) => `<li><span class="meta">Stardate ${esc(e.stardate)} · ${esc(e.outcome)}</span>
       <p><b>${esc(e.title || "Mission")}</b></p>${e.notes ? `<p>${esc(e.notes)}</p>` : ""}${e.commend ? `<p class="small">Commendations: ${esc(e.commend)}</p>` : ""}
-      ${e.advances.length ? `<p class="small muted">Advancement: ${e.advances.map((a) => `${esc(a.name)}, ${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}</p>` : ""}
+      ${e.advances.length ? `<p class="small muted">Advancement: ${e.advances.map((a) => a.points ? `${esc(a.name)} +${a.points} point${a.points > 1 ? "s" : ""}` : `${esc(a.name)}, ${esc(a.skill)} ${LEVELS[a.from].name} → ${LEVELS[a.to].name}`).join("; ")}</p>` : ""}
       <button class="linkish danger" data-rmlog="${e.id}">Remove entry</button></li>`).join("");
     $("log-copy").disabled = !missionLog.length;
   }
@@ -4197,15 +5619,15 @@ tr.lvl-U td.target { color: var(--muted); }
     const advances = [];
     document.querySelectorAll("[data-logadv]").forEach((sel) => {
       const c = gmCrew.find((x) => x.id === sel.dataset.logadv);
-      if (!c || !sel.value) return;
-      const from = c.skills[sel.value];
-      if (applyAdvance(c, sel.value, title || `Stardate ${$("log-stardate").value}`)) advances.push({ name: c.name, skill: sel.value, from, to: c.skills[sel.value] });
+      const n = +sel.value; if (!c || !n) return;
+      pointsAvail(c); c.xp.earned += n; c.xp.log = [...c.xp.log, { n, note: title || `Stardate ${$("log-stardate").value}`, date: new Date().toISOString().slice(0, 10) }];
+      advances.push({ name: c.name, points: n });
     });
     missionLog.push({ id: uid(), stardate: $("log-stardate").value.trim(), title, outcome: $("log-outcome").value, notes, commend: $("log-commend").value.trim(), advances, date: new Date().toISOString().slice(0, 10) });
     store.set(STORE_LOG, missionLog); saveGM();
     ["log-title", "log-notes", "log-commend", "log-stardate"].forEach((id) => ($(id).value = ""));
     renderGM(); renderLogBook();
-    logSay(advances.length ? `Logged. ${advances.length} advancement${advances.length > 1 ? "s" : ""} applied: save each officer's file for their player.` : "Logged.");
+    logSay(advances.length ? `Logged. Advancement points awarded to ${advances.length}: save each officer's file for their player, who spends them in the creator.` : "Logged.");
   };
   $("log-entries").addEventListener("click", (e) => {
     const b = e.target.closest("[data-rmlog]"); if (!b) return;
@@ -4260,11 +5682,83 @@ tr.lvl-U td.target { color: var(--muted); }
   $("boxes").addEventListener("click", (e) => {
     const b = e.target.closest("[data-box]"); if (!b) return;
     const i = +b.dataset.box;
+    const before = ch.play.injury;
     ch.play.injury = ch.play.injury === i ? i - 1 : i;
+    if (ch.play.injury < before && ch.play.injury < 3) ch.play.dying = false; // clearing a box ends Dying
     // A new injury applies straight away to physical rolls; other rolls stay unticked unless the player ticks them.
     $("r-phys").checked = PHYSICAL.has($("r-skill").value);
     render();
   });
+  // ---- gritty combat (optional rule): grievous wounds, a limb for a life, opponents taken out ----
+  function setGritty(on) { gritty = !!on; store.set(GRITTY_KEY, gritty); $("f-gritty").checked = $("gm-gritty").checked = gritty; }
+  const gwEntry = (id) => GRIEVOUS.find((g) => g.id === id);
+  const gwToday = () => new Date().toISOString().slice(0, 10);
+  function addWound(g, extra = {}) {
+    const w = { id: g.id, name: g.name, text: g.text, heal: g.heal, complication: !!g.complication, date: gwToday(), key: uid(), ...extra };
+    ch.play.lasting = [...ch.play.lasting, w];
+    return w;
+  }
+  function renderGritty() {
+    $("gritty-box").classList.toggle("on", gritty);
+    $("f-stunned").checked = $("r-stun").checked = !!ch.play.stunned;
+    $("f-gritty").checked = $("gm-gritty").checked = gritty;
+    $("gritty-body").hidden = !gritty;
+    $("gm-out-wrap").hidden = $("gm-out-row").hidden = !gritty;
+    if (!gritty) return;
+    const last = ch.play.gwLast, lw = last && ch.play.lasting.find((w) => w.key === last.key);
+    $("gw-down").hidden = !(lw && !last.downgraded && ch.play.duty > 0);
+    $("gw-trade").hidden = !ch.play.dying;
+    $("gw-list").innerHTML = ch.play.lasting.map((w) => `<li><b>${esc(w.name)}</b>: ${esc(w.text)} <span class="muted">${w.complication ? "A complication now." : w.heal ? "Heals: " + esc(w.heal) + "." : ""}</span> <button class="linkish" data-gwheal="${w.key}">${w.complication || w.heal.startsWith("never") ? "Remove" : "Healed"}</button></li>`).join("");
+  }
+  $("f-gritty").addEventListener("change", (e) => { setGritty(e.target.checked); render(); toast(gritty ? "Gritty combat is on, in this browser. Your GM decides whether the campaign uses it." : "Gritty combat is off."); });
+  $("gm-gritty").addEventListener("change", (e) => { setGritty(e.target.checked); render(); });
+  $("gw-roll").onclick = () => {
+    const dice = [1, 2, 3].map(() => 1 + Math.floor(Math.random() * 6)), total = dice[0] + dice[1] + dice[2];
+    const g = GRIEVOUS.find((x) => total >= x.from && total <= x.to);
+    const dyingBefore = !!ch.play.dying, stunnedBefore = !!ch.play.stunned;
+    if (g.dying) ch.play.dying = true;
+    if (g.dazed) ch.play.stunned = true;
+    const w = addWound(g);
+    ch.play.gwLast = { key: w.key, total, dice, dyingBefore, stunnedBefore, downgraded: false };
+    $("gw-result").innerHTML = `3d6 = ${total} (${dice.join(" + ")}): <b>${esc(g.name)}.</b> ${esc(g.text)}${g.dying ? " <b class='bad'>Dying.</b>" : ""}`;
+    touch(); render(); save();
+  };
+  $("gw-down").onclick = () => {
+    const last = ch.play.gwLast, lw = last && ch.play.lasting.find((w) => w.key === last.key);
+    if (!lw || last.downgraded || ch.play.duty <= 0) return;
+    const from = gwEntry(lw.id), to = from && from.down ? gwEntry(from.down) : null;
+    ch.play.duty--;
+    ch.play.lasting = ch.play.lasting.filter((w) => w.key !== lw.key); // undo the wound's own effects…
+    ch.play.dying = last.dyingBefore; ch.play.stunned = last.stunnedBefore;
+    let now = null;
+    if (to) { now = addWound(to); if (to.dying) ch.play.dying = true; if (to.dazed) ch.play.stunned = true; } // …and suffer the milder one instead
+    ch.play.gwLast = now ? { ...last, key: now.key, downgraded: true } : null;
+    $("gw-result").innerHTML = `Duty point: ${esc(lw.name)} becomes <b>${to ? esc(to.name) : "nothing lasting"}</b>.${to ? " " + esc(to.text) : ""}`;
+    touch(); render(); save();
+  };
+  const tradeLimb = (kind) => {
+    if (!ch.play.dying) return;
+    // The trade replaces any grievous wound from the same hit: one wound for one hit.
+    const last = ch.play.gwLast;
+    if (last && !last.dyingBefore) { ch.play.lasting = ch.play.lasting.filter((w) => w.key !== last.key); ch.play.stunned = last.stunnedBefore; }
+    ch.play.dying = false; ch.play.gwLast = null;
+    addWound({ id: "limb-" + kind, name: kind === "lost" ? "Lost limb" : "Crippled limb", text: kind === "lost" ? "A limb is gone: you say which, with the GM." : "A limb is useless: you say which, with the GM.", heal: "never", complication: true });
+    $("gw-result").innerHTML = `<b>A limb for a life.</b> You live, ${ch.play.injury >= 3 ? "Incapacitated but stable" : "stable"}, and ${kind === "lost" ? "lose a limb" : "lose the use of a limb"}. It's a complication now: when it causes real trouble, accept it and earn a Duty point. Once a fight.`;
+    touch(); render(); save();
+  };
+  $("gw-trade-lost").onclick = () => tradeLimb("lost");
+  $("gw-trade-use").onclick = () => tradeLimb("use");
+  $("gw-list").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-gwheal]"); if (!b) return;
+    ch.play.lasting = ch.play.lasting.filter((w) => w.key !== b.dataset.gwheal);
+    if (ch.play.gwLast && ch.play.gwLast.key === b.dataset.gwheal) ch.play.gwLast = null;
+    touch(); render(); save();
+  });
+  $("gm-out-roll").onclick = () => {
+    const list = TAKEN_OUT[$("gm-out-kind").value] || TAKEN_OUT.energy, name = $("gm-out-name").value.trim() || "The opponent";
+    const text = list[Math.floor(Math.random() * list.length)].replaceAll("{name}", name);
+    $("gm-out-text").textContent = text[0].toUpperCase() + text.slice(1);
+  };
   $("duty-minus").onclick = () => { if (ch.play.duty > 0) { ch.play.duty--; render(); } };
   $("duty-plus").onclick = () => { ch.play.duty++; render(); };
   $("duty-reset").onclick = () => { ch.play.duty = 2; ch.play.log = []; render(); };

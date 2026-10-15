@@ -38,6 +38,10 @@ def main():
     if START not in app or END not in app:
         sys.exit(f"GUIDE markers missing from {APP}")
     app = re.sub(re.escape(START) + r".*?" + re.escape(END), lambda _: f"{START}\n{html}{END}", app, flags=re.S)
+    # A page with BATTLEMAP markers gets the shared battle map module (legend-dynamics/engine/battlemap.js).
+    if "/* BATTLEMAP:START */" in app:
+        bm = (ROOT / "legend-dynamics" / "engine" / "battlemap.js").read_text().replace("</", "<\\/")
+        app = re.sub(r"/\* BATTLEMAP:START \*/.*?/\* BATTLEMAP:END \*/", lambda _: "/* BATTLEMAP:START */\n" + bm + "/* BATTLEMAP:END */", app, flags=re.S)
     APP.write_text(app)
     print(f"updated {APP.relative_to(ROOT)}")
 
