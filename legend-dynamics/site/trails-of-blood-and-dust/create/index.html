@@ -5601,7 +5601,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("gw-trade").hidden = !ch.play.dying;
     $("gw-list").innerHTML = ch.play.lasting.map((w) => `<li><b>${esc(w.name)}</b>: ${esc(w.text)} <span class="muted">${w.complication ? "A complication now." : w.heal ? "Heals: " + esc(w.heal) + "." : ""}</span> <button class="linkish" data-gwheal="${w.key}">${w.complication || w.heal === "never" ? "Remove" : "Healed"}</button></li>`).join("");
   }
-  if (GRITTY) $("gm-out-kind").innerHTML = Object.keys(GRITTY.enemy).map((k) => `<option value="${k}">${esc({ gun: "A gun", blade: "A blade", claw: "Claws or fangs", blunt: "Fists or a club", missile: "An arrow or a thrown weapon" }[k] || k)}</option>`).join("");
+  if (GRITTY) $("gm-out-kind").innerHTML = Object.keys(GRITTY.enemy).map((k) => `<option value="${k}">${esc({ gun: "A gun", blade: "A blade", claw: "Claws or fangs", blunt: "Fists or a club", missile: "An arrow or a thrown weapon", energy: "An energy weapon", spell: "A spell", power: "A power" }[k] || k)}</option>`).join("");
   $("f-gritty").addEventListener("change", (e) => { setGritty(e.target.checked); render(); toast(gritty ? "Gritty combat is on, in this browser. Your GM decides whether the campaign uses it." : "Gritty combat is off."); });
   $("gm-gritty").addEventListener("change", (e) => { setGritty(e.target.checked); render(); });
   $("gw-roll").onclick = () => {

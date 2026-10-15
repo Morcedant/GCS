@@ -18,6 +18,7 @@ Everything in `western/`, `spaceopera/` and the core rules files is generated. E
 ```
 python3 tools/build-legend.py --docx            # every pack, plus the core rules
 python3 tools/build-legend.py western           # one pack
+python3 tools/packs/check_aurora.py             # after editing Aurora: checks its data and ready-made characters
 ```
 
 (Needs pandoc; python-docx styles the Word files.)
@@ -81,4 +82,4 @@ on every run, so redeploy the bot after changing a pack.
 
 ## Website
 
-[`website/`](website/README.md) is a Squarespace kit for a Legend Dynamics site. It has a brand stylesheet with a theme for each game, ready-made Code Block HTML for the home page, each game page and the core rules, and `preview.html` to see it. Rebuild it with `python3 tools/build-website.py`.
+[`website/`](website/README.md) is a Squarespace kit for a Legend Dynamics site. It has a brand stylesheet with a theme for each game, ready-made Code Block HTML for the home page, each game page and the core rules, and `preview.html` to see it. Rebuild it with `python3 tools/build-website.py`; `tools/build-site.py` (the Cloudflare site) rebuilds it too.
