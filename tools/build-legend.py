@@ -419,6 +419,7 @@ def build(pid, docx):
     tpl = tpl.replace("{{THEMECSS}}", theme["css"])
     tpl = tpl.replace("{{GROUPCSS}}", "\n".join(f'[data-div="{g["id"]}"] {{ --accent: var({g["color"]}); }}' for g in pack["groups"]))
     tpl = tpl.replace("{{QUICKREF}}", quickref(pack, t))
+    tpl = tpl.replace("/* BATTLEMAP */", (ENGINE / "battlemap.js").read_text().replace("</", "<\\/"))
     tpl = tpl.replace("{{OUTCOMES}}", "".join(f"<option>{html.escape(o)}</option>" for o in pack["journal"]["outcomes"]))
     tpl = re.sub(r"\{\{theme\.(\w+)\}\}", lambda m: str(theme[m.group(1)]), tpl)
     tpl = tpl.replace("{{fontsHref}}", t["fontsHref"])

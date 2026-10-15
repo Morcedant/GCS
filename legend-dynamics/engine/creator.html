@@ -382,6 +382,32 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-cond { font-size: .82rem; }
 .gm-cond.hurt { color: var(--warn); } .gm-cond.out { color: var(--bad); font-weight: 600; }
 
+/* Battle map (GM view) */
+.bm-card { margin-top: 22px; display: grid; gap: 10px; }
+.bm-bar, .bm-add, .bm-sel, .bm-gridrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bm-add, .bm-sel { padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; }
+.bm-add label, .bm-sel label, .bm-gridrow label { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; }
+.bm-add input[type=text], .bm-sel input[type=text] { width: 12em; }
+.bm-gridrow input[type=number] { width: 5.5em; }
+.bm-file { cursor: pointer; }
+.bm-zoom { display: inline-flex; gap: 4px; }
+.btn[aria-pressed="true"] { background: var(--accent); color: var(--bg, #111); }
+.bm-stage { position: relative; }
+.bm-svg { display: block; width: 100%; height: min(72vh, 760px); min-height: 360px; background: var(--well); border: 1px solid var(--line); border-radius: 10px; touch-action: none; cursor: grab; user-select: none; }
+.bm-svg:active { cursor: grabbing; }
+.bm-grid { fill: none; stroke: var(--fg); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.bm-tok { cursor: pointer; outline: none; }
+.bm-disc { stroke: none; }
+.bm-ring { fill: none; stroke: rgba(0,0,0,.65); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.bm-tok.sel .bm-ring, .bm-tok:focus-visible .bm-ring { stroke: var(--accent); stroke-width: 4; }
+.bm-tok.down { opacity: .45; }
+.bm-tok.dying .bm-ring { stroke: var(--bad); stroke-width: 4; stroke-dasharray: 6 4; }
+.bm-init { fill: #fff; text-anchor: middle; font-weight: 700; font-family: var(--mono, monospace); pointer-events: none; }
+.bm-label { fill: var(--fg); text-anchor: middle; paint-order: stroke; stroke: var(--well); stroke-width: 3px; font-weight: 600; pointer-events: none; }
+.bm-mline { stroke: var(--accent); stroke-width: 3; stroke-dasharray: 8 6; vector-effect: non-scaling-stroke; }
+.bm-mdot { fill: var(--accent); }
+.bm-readout { position: absolute; left: 10px; bottom: 10px; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.72); color: #fff; font: .8rem var(--mono, monospace); pointer-events: none; }
+.bm-readout:empty { display: none; }
 .gm-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
 @media (max-width: 900px) { .gm-tools { grid-template-columns: minmax(0, 1fr); } }
 .seed { margin: 0; display: grid; gap: 8px; }
@@ -820,6 +846,11 @@ tr.lvl-U td.target { color: var(--muted); }
         <label class="small" id="gm-gunfight-wrap" hidden><input type="checkbox" id="gm-gunfight"> <span id="gm-gunfight-label">First round of a gunfight</span></label>
         <ol class="turns" id="gm-turns"></ol>
       </div>
+    </div>
+    <div class="card hud no-print bm-card">
+      <h3>Battle map</h3>
+      <p class="small muted">A hex map for the fight: add a background picture, place the posse and anyone else, and drag tokens from hex to hex. Moving a token or using Measure shows the distance and range band. The map stays in this browser; save it to a file to keep it or send it to another GM.</p>
+      <div id="battlemap"></div>
     </div>
     <div class="gm-tools">
       <div class="card hud no-print">
@@ -2395,6 +2426,12 @@ tr.lvl-U td.target { color: var(--muted); }
   const STORE_GM = PACK.id + ".gm.v1";
   let gmCrew = (store.get(STORE_GM, []) || []).filter((c) => c && typeof c === "object").map(normalize);
   const gmSay = (m, err) => { const el = $("gm-msg"); el.textContent = m; el.className = "toast" + (err ? " err" : ""); };
+  /* BATTLEMAP */
+  // The battle map: the GM's characters as tokens (portrait, group color, down or Dying), one hex a yard.
+  const battleMap = mountBattleMap({ root: $("battlemap"), key: PACK.id, esc, toast: gmSay, yardsPerHex: 1,
+    bands: [["Close", 10], ["Short", 50], ["Medium", 150], ["Long", 500], ["Extreme", 1760]],
+    crew: () => gmCrew.map((c) => ({ id: c.id, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
+      color: `var(${(PACK.groups.find((g) => g.id === gmCalc(c).div) || PACK.groups[0]).color})` })) });
   const saveGM = () => { if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true); };
   // Work out a crew member's numbers with the same rules as the sheet, by briefly treating them as the current character.
   function gmCalc(c) {
@@ -2417,6 +2454,7 @@ tr.lvl-U td.target { color: var(--muted); }
     return { added, updated };
   }
   function renderGM() {
+    try { battleMap.refresh(); } catch { /* the map mounts just after the GM view's first render */ }
     if (gmReady) { renderLogForm(); renderSeed(); renderLogBook(); } // the log and seed panels exist once their data has loaded
     $("gm-add-saved").innerHTML = `<option value="">${roster.length ? "Choose a saved character…" : "No characters saved in this browser"}</option>` +
       roster.map((c, i) => `<option value="${i}">${esc(c.name || "Unnamed character")}</option>`).join("");
