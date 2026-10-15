@@ -920,90 +920,97 @@ tr.lvl-U td.target { color: var(--muted); }
 <td><strong>Paper on them.</strong> +2 to Tracking and Investigation to find someone with a price on their head or a warrant out.</td>
 </tr>
 <tr class="odd">
+<td>Lawyer</td>
+<td>The Law</td>
+<td>Argues cases, draws up deeds and contracts, and knows which laws a town forgot it had.</td>
+<td>Brawling, Athletics, Deception, Law</td>
+<td><strong>Due process.</strong> Once per case, get someone out of jail, a warrant issued or quashed, or a deed or contract into your hands, wherever there’s law to work.</td>
+</tr>
+<tr class="even">
 <td>Circuit Judge</td>
 <td>The Law</td>
 <td>Rides from town to town holding court, and not every town wants one.</td>
 <td>Brawling, Survival, Persuasion, Law</td>
 <td><strong>Heard it all before.</strong> +2 to Read People to catch a lie told to your face.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Politician</td>
 <td>The Law</td>
 <td>Holds office or wants it: a mayor, an alderman, a territorial delegate, a governor’s man, or a party boss with friends in the capital.</td>
 <td>Investigation, Riding, Leadership, Law</td>
 <td><strong>Friends in office.</strong> Once per case, the town or territory gives you what it can: rooms at the hotel, horses for a posse, the jail cells, the telegraph office, or the doctor’s time.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Doctor</td>
 <td>The Learned</td>
 <td>Patches up the wounded and reads what a body says about what killed it.</td>
 <td>Investigation, Riding, Read People, Medicine</td>
 <td><strong>Steady hands.</strong> +2 to Medicine when stabilizing the Dying or working under fire.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Apothecary</td>
 <td>The Learned</td>
 <td>Brews remedies, antidotes and stranger things, and knows which ingredients come from where.</td>
 <td>Occult, Stealth, Persuasion, Apothecary</td>
 <td><strong>Already brewed.</strong> Once per case, you have the right remedy, poison or antidote already made.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Scholar</td>
 <td>The Learned</td>
 <td>Knows the old books, the old languages and the occult, and finds the answer in a footnote.</td>
 <td>Investigation, Stealth, Persuasion, Wesen Lore</td>
 <td><strong>The family books.</strong> Once per case, your books have a page on this creature: one true weakness or habit.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Occultist</td>
 <td>The Learned</td>
 <td>Works the old arts, knows what’s out there, and knows what it costs.</td>
 <td>Wesen Lore, Stealth, Deception, Occult</td>
 <td><strong>Forbidden lore.</strong> Once per case, ask the GM one question about a supernatural thing you’ve seen, and get a true answer.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Preacher</td>
 <td>The Learned</td>
 <td>Comforts the frightened, counsels the troubled, and stands against the dark with faith and a shotgun.</td>
 <td>Shooting, Riding, Leadership, Occult</td>
 <td><strong>Hold fast.</strong> +2 to Will against fear, possession and temptation, and to Leadership to steady others against them.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Monster Hunter</td>
 <td>The Frontier</td>
 <td>Hunts what walks at night by study, traps and patience, not a Grimm’s sight. A Grimm can be one, but needn’t be, and most monster hunters aren’t Grimms.</td>
 <td>Melee, Tracking, Read People, Wesen Lore</td>
 <td><strong>Know its weakness.</strong> Once you’ve identified a creature with Wesen Lore, your called shots against it take no penalty.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Gunslinger</td>
 <td>The Frontier</td>
 <td>The fastest and steadiest gun in the room, and the one who decides when it’s time to draw.</td>
 <td>Shooting, Riding, Read People, Athletics</td>
 <td><strong>Quick draw.</strong> In the first round of a gunfight, you act first, whatever your Agility.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Scout</td>
 <td>The Frontier</td>
 <td>Finds the trail, reads the land, and keeps everyone alive out in it.</td>
 <td>Melee, Tracking, Persuasion, Survival</td>
 <td><strong>Lay of the land.</strong> Once per case, you know a way: a hidden pass, a water hole, a shortcut that saves a day, or a place to make a stand.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Gambler</td>
 <td>The Frontier</td>
 <td>Reads people, bluffs, and hears everything the saloon hears.</td>
 <td>Shooting, Stealth, Deception, Gambling</td>
 <td><strong>Markers.</strong> Once per case, call in a debt: someone owes you a favor, a horse, a room or the truth.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Tinker</td>
 <td>The Frontier</td>
 <td>Fixes the guns, builds the traps, and makes the gadget nobody else thought possible.</td>
 <td>Brawling, Athletics, Deception, Tinkering</td>
 <td><strong>Jury-rig.</strong> Once per case, make the gadget, lock pick, silver-loaded shell or repair you need from whatever is to hand.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Shotgun Messenger</td>
 <td>The Frontier</td>
 <td>Rides beside the driver guarding the mail, the strongbox and the passengers.</td>
@@ -4086,6 +4093,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const DEPTS = [
     ["Lawman", "law"],
     ["Bounty Hunter", "law"],
+    ["Lawyer", "law"],
     ["Circuit Judge", "law"],
     ["Politician", "law"],
     ["Doctor", "learned"],
@@ -4105,9 +4113,9 @@ tr.lvl-U td.target { color: var(--muted); }
   let gunfight = false; // GM view: the first round of a gunfight, when Quick draw acts first
   const GROUP_NAMES = { law: "The Law", learned: "The Learned", frontier: "The Frontier" };
   // Core skills for each role: marked Trained when the role is picked.
-  const ROLE_SKILLS = {"Lawman": ["Shooting", "Riding", "Leadership", "Investigation"], "Bounty Hunter": ["Shooting", "Tracking", "Read People", "Wesen Lore"], "Circuit Judge": ["Brawling", "Survival", "Persuasion", "Law"], "Politician": ["Investigation", "Riding", "Leadership", "Law"], "Doctor": ["Investigation", "Riding", "Read People", "Medicine"], "Apothecary": ["Occult", "Stealth", "Persuasion", "Apothecary"], "Scholar": ["Investigation", "Stealth", "Persuasion", "Wesen Lore"], "Occultist": ["Wesen Lore", "Stealth", "Deception", "Occult"], "Preacher": ["Shooting", "Riding", "Leadership", "Occult"], "Monster Hunter": ["Melee", "Tracking", "Read People", "Wesen Lore"], "Gunslinger": ["Shooting", "Riding", "Read People", "Athletics"], "Scout": ["Melee", "Tracking", "Persuasion", "Survival"], "Gambler": ["Shooting", "Stealth", "Deception", "Gambling"], "Tinker": ["Brawling", "Athletics", "Deception", "Tinkering"], "Shotgun Messenger": ["Shooting", "Animal Handling", "Leadership", "Survival"]};
+  const ROLE_SKILLS = {"Lawman": ["Shooting", "Riding", "Leadership", "Investigation"], "Bounty Hunter": ["Shooting", "Tracking", "Read People", "Wesen Lore"], "Lawyer": ["Brawling", "Athletics", "Deception", "Law"], "Circuit Judge": ["Brawling", "Survival", "Persuasion", "Law"], "Politician": ["Investigation", "Riding", "Leadership", "Law"], "Doctor": ["Investigation", "Riding", "Read People", "Medicine"], "Apothecary": ["Occult", "Stealth", "Persuasion", "Apothecary"], "Scholar": ["Investigation", "Stealth", "Persuasion", "Wesen Lore"], "Occultist": ["Wesen Lore", "Stealth", "Deception", "Occult"], "Preacher": ["Shooting", "Riding", "Leadership", "Occult"], "Monster Hunter": ["Melee", "Tracking", "Read People", "Wesen Lore"], "Gunslinger": ["Shooting", "Riding", "Read People", "Athletics"], "Scout": ["Melee", "Tracking", "Persuasion", "Survival"], "Gambler": ["Shooting", "Stealth", "Deception", "Gambling"], "Tinker": ["Brawling", "Athletics", "Deception", "Tinkering"], "Shotgun Messenger": ["Shooting", "Animal Handling", "Leadership", "Survival"]};
   // Each calling's own ability [name, text], and what the creator does for it: "firstInGunfight" (the turn order), "freeCalledShot" (the roller).
-  const ROLE_ABILITY = {"Lawman": ["The badge", "+2 to Leadership when you give orders in the law's name: an arrest, raising a posse, clearing a street."], "Bounty Hunter": ["Paper on them", "+2 to Tracking and Investigation to find someone with a price on their head or a warrant out."], "Circuit Judge": ["Heard it all before", "+2 to Read People to catch a lie told to your face."], "Politician": ["Friends in office", "Once per case, the town or territory gives you what it can: rooms at the hotel, horses for a posse, the jail cells, the telegraph office, or the doctor's time."], "Doctor": ["Steady hands", "+2 to Medicine when stabilizing the Dying or working under fire."], "Apothecary": ["Already brewed", "Once per case, you have the right remedy, poison or antidote already made."], "Scholar": ["The family books", "Once per case, your books have a page on this creature: one true weakness or habit."], "Occultist": ["Forbidden lore", "Once per case, ask the GM one question about a supernatural thing you've seen, and get a true answer."], "Preacher": ["Hold fast", "+2 to Will against fear, possession and temptation, and to Leadership to steady others against them."], "Monster Hunter": ["Know its weakness", "Once you've identified a creature with Wesen Lore, your called shots against it take no penalty."], "Gunslinger": ["Quick draw", "In the first round of a gunfight, you act first, whatever your Agility."], "Scout": ["Lay of the land", "Once per case, you know a way: a hidden pass, a water hole, a shortcut that saves a day, or a place to make a stand."], "Gambler": ["Markers", "Once per case, call in a debt: someone owes you a favor, a horse, a room or the truth."], "Tinker": ["Jury-rig", "Once per case, make the gadget, lock pick, silver-loaded shell or repair you need from whatever is to hand."], "Shotgun Messenger": ["Riding shotgun", "Once per fight, when someone next to you is hit, you take the hit instead."]};
+  const ROLE_ABILITY = {"Lawman": ["The badge", "+2 to Leadership when you give orders in the law's name: an arrest, raising a posse, clearing a street."], "Bounty Hunter": ["Paper on them", "+2 to Tracking and Investigation to find someone with a price on their head or a warrant out."], "Lawyer": ["Due process", "Once per case, get someone out of jail, a warrant issued or quashed, or a deed or contract into your hands, wherever there's law to work."], "Circuit Judge": ["Heard it all before", "+2 to Read People to catch a lie told to your face."], "Politician": ["Friends in office", "Once per case, the town or territory gives you what it can: rooms at the hotel, horses for a posse, the jail cells, the telegraph office, or the doctor's time."], "Doctor": ["Steady hands", "+2 to Medicine when stabilizing the Dying or working under fire."], "Apothecary": ["Already brewed", "Once per case, you have the right remedy, poison or antidote already made."], "Scholar": ["The family books", "Once per case, your books have a page on this creature: one true weakness or habit."], "Occultist": ["Forbidden lore", "Once per case, ask the GM one question about a supernatural thing you've seen, and get a true answer."], "Preacher": ["Hold fast", "+2 to Will against fear, possession and temptation, and to Leadership to steady others against them."], "Monster Hunter": ["Know its weakness", "Once you've identified a creature with Wesen Lore, your called shots against it take no penalty."], "Gunslinger": ["Quick draw", "In the first round of a gunfight, you act first, whatever your Agility."], "Scout": ["Lay of the land", "Once per case, you know a way: a hidden pass, a water hole, a shortcut that saves a day, or a place to make a stand."], "Gambler": ["Markers", "Once per case, call in a debt: someone owes you a favor, a horse, a room or the truth."], "Tinker": ["Jury-rig", "Once per case, make the gadget, lock pick, silver-loaded shell or repair you need from whatever is to hand."], "Shotgun Messenger": ["Riding shotgun", "Once per fight, when someone next to you is hit, you take the hit instead."]};
   const ROLE_FX = {"Monster Hunter": ["freeCalledShot"], "Gunslinger": ["firstInGunfight"]};
   // The calling recipe (tools/check-callings.py checks it): fight (or, for a calling that isn't a fighter, a second signature), trail, people, signature.
   const CALLING_RECIPE = {"fight": ["Shooting", "Melee", "Brawling"], "trail": ["Riding", "Tracking", "Survival", "Animal Handling", "Athletics", "Stealth"], "people": ["Persuasion", "Read People", "Deception", "Leadership"], "nonFighters": ["Politician", "Doctor", "Apothecary", "Scholar", "Occultist"], "max": {"Shooting": 7, "Riding": 5}, "maxOther": 4};
@@ -4115,6 +4123,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const ROLE_SUGGESTIONS = {
     "Lawman": "Lawman: wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority.",
     "Bounty Hunter": "Bounty hunter: tracks and brings in wanted men, and the things that only look like men.",
+    "Lawyer": "Lawyer: argues cases, draws up deeds and contracts, and knows which laws a town forgot it had.",
     "Circuit Judge": "Circuit judge: rides from town to town holding court, and not every town wants one.",
     "Politician": "Politician: holds office or wants it: a mayor, an alderman, a territorial delegate, a governor's man, or a party boss with friends in the capital.",
     "Doctor": "Doctor: patches up the wounded and reads what a body says about what killed it.",
