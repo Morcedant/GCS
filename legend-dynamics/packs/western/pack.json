@@ -229,6 +229,9 @@
    "ability": [
     "Know its weakness",
     "Once you've identified a creature with an Occult roll, your called shots against it take no penalty."
+   ],
+   "abilityFx": [
+    "freeCalledShot"
    ]
   },
   {
@@ -244,6 +247,9 @@
    "ability": [
     "Quick draw",
     "In the first round of a gunfight, you act first, whatever your Agility."
+   ],
+   "abilityFx": [
+    "firstInGunfight"
    ]
   },
   {
