@@ -544,6 +544,19 @@ Guns run out of rounds, and every shot counts.
 
 To take someone down without killing them, use fists, a club, a grapple, or knock-out drops from an Apothecary.
 
+## The battle map
+
+The GM view of the character creator has a **battle map** for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in this chapter, and a fight without it works the same way. Open **How to use the map** on the map itself for the buttons, step by step.
+
+**Two kinds of map.**
+
+- **A hex map** for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a saloon, 5 or 10 yards for a street, 50 for open prairie. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range table above.
+- **A range track** for fights where only distance matters: a chase after a stagecoach, a running fight across open country. It has a lane for the posse and one for each range band. Moving a token into the next lane moves it one band in or out.
+
+**Tokens.** The GM places the posse with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, Dazed or Grit points on a token marks it on the character, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.
+
+**Keeping a map.** The map stays in the GM's browser. **Save map to file** keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.
+
 # Medical care
 
 Frontier medicine in 1889 has chloroform, carbolic acid, laudanum and steady hands, and not much else. Wesen heal like humans, and some injuries need remedies from older traditions.
