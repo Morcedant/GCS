@@ -6066,7 +6066,7 @@ function mountBattleMap(api) {
 
 // The setting's opponents, read from a table in the Players' Guide on the page (for settings that keep them only
 // in the guide): the table after the heading named (Threats, or Enemy ships), columns found by their headings.
-// People: Threat, Attack (target), Dodge, Boxes, Defense, Trait. Ships: Ship, Pilot (or Helm) / Gunner, Shields, Hull, Weapons, Trait.
+// People: Threat, Attack (target), Dodge, Boxes, Defense, Trait. Ships: Ship, Class, Pilot (or Helm) / Gunner, Maneuver, Shields, Hull, Weapons, Trait.
 function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   const h = guide && [...guide.querySelectorAll("h1, h2, h3")].find((x) => x.textContent.trim() === heading);
   let t = h && h.nextElementSibling;
@@ -6074,12 +6074,13 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   if (!t || t.tagName !== "TABLE") return [];
   const raw = [...t.querySelectorAll("thead th, tr:first-child th")].map((x) => x.textContent.trim()), head = raw.map((x) => x.toLowerCase());
   const col = (re) => head.findIndex((x) => re.test(x));
-  const [cName, cAtk, cPilot, cDodge, cBoxes, cDef, cWeap, cTrait, cShields] = [/^threat|^ship|^name/, /^attack/, /^pilot|^helm/, /^dodge/, /^boxes|^hull/, /^defen/, /^weapons$/, /^trait/, /^shields$/].map(col);
+  const [cName, cAtk, cPilot, cDodge, cBoxes, cDef, cWeap, cTrait, cShields, cClass, cMan] = [/^threat|^ship|^name/, /^attack/, /^pilot|^helm/, /^dodge/, /^boxes|^hull/, /^defen/, /^weapons$/, /^trait/, /^shields$/, /^class$/, /^maneuver/].map(col);
   return [...t.querySelectorAll("tbody tr")].map((tr, i) => {
     const td = [...tr.children].map((x) => x.textContent.trim()), at = (c) => (c >= 0 ? td[c] : "");
     const def = at(cDef) && at(cDef) !== "—" ? `Defense ${at(cDef)}` : "";
     const pilot = cPilot >= 0 ? `${raw[cPilot]} ${at(cPilot)}` : "", weap = cWeap >= 0 && at(cWeap) ? at(cWeap) : "", shields = cShields >= 0 && at(cShields) ? `Shields ${at(cShields)}` : "";
-    return { id: prefix + i, name: at(cName), attacks: [at(cAtk), pilot, shields, weap, def].filter(Boolean).join(" · "), dodge: at(cDodge) || null, boxes: parseInt(at(cBoxes), 10) || 1, trait: at(cTrait) };
+    const cls = [cClass >= 0 ? at(cClass) : "", cMan >= 0 && at(cMan) ? `Maneuver ${at(cMan)}` : ""].filter(Boolean).join(", ");
+    return { id: prefix + i, name: at(cName), attacks: [cls, at(cAtk), pilot, shields, weap, def].filter(Boolean).join(" · "), dodge: at(cDodge) || null, boxes: parseInt(at(cBoxes), 10) || 1, trait: at(cTrait) };
   }).filter((x) => x.name);
 }
 

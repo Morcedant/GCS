@@ -28,7 +28,7 @@ This revision keeps every rule from the original guide and adds these campaign r
 
 ## Guide scope
 
-Personal actions and away-team encounters are covered here. Starship stations use the same skills. Species abilities beyond the adjustments and species advantages in this guide still require GM approval. Numerical ship combat is outside this guide's scope.
+Personal actions and away-team encounters are covered here. Starship stations use the same skills. Species abilities beyond the adjustments and species advantages in this guide still require GM approval. Ship combat uses the light rules and the ship registry in *The USS Pelion*.
 
 # Create your character
 
@@ -565,21 +565,75 @@ A captain who takes an order doesn't also work a station that exchange. Commandi
 
 ## The USS Pelion
 
-The ship has its own sheet, tracked like an injury track. Encounters stay descriptive: the GM states what is at stake before rolls and narrates what each box means. This light structure is a campaign rule; detailed starship combat stays outside this guide.
+The Pelion is a **Heavy Cruiser**, and it has its own sheet, tracked like an injury track. The GM states what is at stake before the rolls and narrates what each box means. Every Starfleet class, and the ships the Pelion meets, is in the **Ship registry** below, adapted from Tiny Trek.
 
 | Track | Boxes | Effect as boxes fill |
 |---|---|---|
-| Shields | 3 | Hits mark Shields first. At 3 boxes shields are down, and hits go to the Hull and a system. |
-| Hull | 4 | 1–2: scarred, minor breaches sealed. 3: serious breaches, decks lost. 4: the ship is breaking up; start an *Abandon ship* clock. |
+| Shields | 5 | While the shields are up, hits mark Shields first. With all 5 marked they're down, and hits go to the Hull. |
+| Hull | 5 | 1–2: scarred, minor breaches sealed. 3–4: serious breaches, decks lost. 5: the ship is breaking up; start an *Abandon ship* clock. |
 | Weapons, Engines, Sensors, Communications, Transporters, Life support | 3 each | 1 **Damaged**: −2 to rolls using it. 2 **Crippled**: −4, and it can do only its most basic job. 3 **Offline**: it doesn't work until repaired. |
 
-**Taking hits.** A normal hit (a phaser bank, a disruptor) marks 1 box; a heavy hit (photon torpedo, ramming, a disruptor volley) marks 2. Once Shields are down, each hit marks the Hull and the system the GM chooses, or roll 3d6: 3–6 Weapons, 7–8 Engines, 9–10 Sensors, 11–12 Communications, 13–14 Transporters, 15–18 Life support.
+**Power.** Each exchange the ship has **Power** to spend (the Pelion has 5), and it refills at the start of the next. Raising the shields for the exchange costs 1, firing the phasers 1, a torpedo volley 1 (and one torpedo from the load), and a transporter use 1. Each Power left over can be diverted for +1 to one ship roll that exchange, up to +2. With the shields not raised, hits go straight to the Hull.
 
-**Defending.** When an enemy ship hits, Helm may roll **Helm** to evade, once per exchange, like Dodge: success cancels the hit. Engines damage applies its penalty.
+**Taking hits.** A hit marks the boxes its weapon deals (see the registry): Shields first while they're up, then the Hull. **Every hit that reaches the Hull** also rolls on the *Concussive system damage* table below. A called shot or a telling hit can pick a system instead.
 
-**Repairs.** In the middle of a crisis, a successful **Engineering** roll clears one box from Shields or a system (two on success by 5); it takes the engineer's action that exchange. The Hull can only be patched by one box per scene, and fully repaired at a starbase. Between encounters, the crew can clear the rest of the systems with time.
+**Defending.** When an enemy ship fires, Helm may roll **Helm** to evade, once per exchange, like Dodge: success cancels the hit. Torpedoes can't be evaded. Engines damage applies its penalty.
+
+**Maneuverability.** Compare the ships' Maneuverability: the most maneuverable ship adds the difference to its Helm contests and its evade rolls. If two ships tie for the highest, nobody gets the bonus.
+
+**Repairs.** In the middle of a crisis, a successful **Engineering** roll clears one box from Shields or a system (two on success by 5), or undoes one concussive result; it takes the engineer's action that exchange. The Hull can only be patched by one box per scene, and fully repaired at a starbase. Shields that went down take an hour per box to restore.
 
 **Firing.** Tactical rolls **Phasers** for ship weapons, against the enemy ship's own tracks, which the GM keeps the same way.
+
+### Ship registry
+
+Starfleet's classes, from the shuttlecraft up. For other powers' ships, take the nearest class and add what makes them different (a cloak, a plasma torpedo).
+
+| Class | Shields | Hull | Power | Maneuver | Sensors | Phasers | Torpedoes | Transporter | Crew | Chassis system |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Shuttle I | 1 | 1 | 2 | 6 | 1 | — | — | 1 person | 2, and up to 4 passengers | Agile dodge |
+| Shuttle II | 2 | 1 | 2 | 6 | 2 | Light | 2 (light) | 1 person | 2, and up to 8 passengers | Agile dodge |
+| Escort | 2 | 3 | 3 | 5 | 2 | Standard | 10 | 3 people | 25 | Buffered shielding |
+| Science vessel | 2 | 3 | 3 | 5 | 4 | Light | 10 | 3 people | 25 | Science |
+| Light Cruiser | 3 | 3 | 3 | 5 | 2 | Light | 25 | 5 people | 100 | Buffered shielding |
+| Cruiser | 4 | 4 | 4 | 4 | 2 | Standard | 30 | 5 people | 250–300 | Buffered shielding |
+| Exploration Cruiser | 4–5 | 4–5 | 4–5 | 4 | 4 | Standard | 20 | 5 people | 250–350 | Explorer |
+| **Heavy Cruiser** (the Pelion) | 5 | 5 | 5 | 3 | 3 | Heavy | 40 (heavy) | 5 people | 300–450 (the Pelion: 430) | Ship class |
+| Assault Cruiser | 6 | 6 | 6 | 3 | 3 | Heavy, +1 to hit | 50 (heavy) | 5 people | 350–500 | Ship class; ablative armor |
+
+- **Phasers.** Light and Standard mark 1 box; Standard marks 2 on a telling hit. Heavy marks 2.
+- **Torpedoes.** A volley marks 2 boxes and can't be evaded, and every other ship at Close range takes 1. A shuttle's light torpedoes mark 1 and are fired at −2. Heavy torpedoes get +1 to hit.
+- **Sensors.** The rating adjusts Sensors rolls made with the ship's sensors: 1 is −1, 2 is +0, 3 is +1, 4 is +2. Beyond Extreme range, only large things (ships, stars, nebulae) can be scanned.
+- **Transporter.** How many people one use sends. A failed transport rolls on a mishap the GM chooses; an officer trained in Sensors or Engineering at the console makes the roll with +2.
+- **Warp core.** Any ship but a shuttle can eject its core and detonate it (1 Power, one action): 3 boxes to every ship at Close range. On a planet, everything within 5 km is destroyed.
+
+| Chassis system | What it does |
+|---|---|
+| Agile dodge | When a beam weapon hits, Helm may roll at −2 to slip it entirely. Not with an evade roll the same exchange. |
+| Buffered shielding | When the ship is hit, take one system Offline instead of the boxes. It stays Offline until repaired. |
+| Science, Explorer | +2 to Sensors to locate something within sensor range. |
+| Ship class | +2 to intimidate a smaller ship's crew. |
+| Ablative armor | A 2-box track: once an exchange, mark it to absorb a hit entirely. Already counted in the Maneuverability. |
+| Cloak (Klingon and Romulan ships) | While cloaked, the ship can't be targeted; finding it is a Sensors roll at −2. It must decloak to fire. |
+
+### Concussive system damage
+
+Roll 3d6 whenever a hit reaches the Hull. Results last until repaired, and they stack.
+
+| 3d6 | Result | Effect |
+|---|---|---|
+| 3 | Warp core offline | Emergency power only: Power 1 until repaired. |
+| 4 | Bridge station explodes | A crew member at a station (an NPC, if there is one) dies; a character there marks 2 Injury boxes unless they Dodge. |
+| 5 | Impulse engine offline | Mark Engines Offline: thrusters only, no evading and no range shifts. |
+| 6 | Computer offline | Minimum flight controls: −2 to every ship roll. |
+| 7 | Deflector offline | −2 to Helm, and the ship can't go to warp. |
+| 8 | Warp drive offline | Impulse only: the ship can't break away to warp. |
+| 9–10 | Hull breach | Mark one more Hull box; 3d6 × 5 crew are lost or hurt. |
+| 11–12 | Shield emitter damaged | Mark one Shields box. |
+| 13 | Conduits damaged | Power −1. |
+| 14 | Impulse engine damaged | Mark one Engines box, and Maneuverability −1. |
+| 15–16 | Bridge station sparks | A crew member at a station marks 1 Injury box unless they Dodge. |
+| 17–18 | Life support failure | Mark Life support Offline: start a 4-segment *Air* clock, a segment every 15 minutes. |
 
 ### Range in space
 
@@ -597,8 +651,8 @@ As in personal combat, a weapon fires without penalty within its effective band,
 
 | Ship system | Range | Hit | Notes |
 |---|---|---|---|
-| Phaser banks | Long | Normal (1 box) | The ship's main weapon. |
-| Photon torpedoes | Extreme | Heavy (2 boxes) | A volley of two counts as one heavy hit with +1 to hit. |
+| Phaser banks | Long | 1 or 2 boxes, by class | The ship's main weapon. 1 Power. |
+| Photon torpedoes | Extreme | 2 boxes; 1 to other ships at Close | Can't be evaded. 1 Power and one torpedo. |
 | Klingon disruptors | Medium | Normal; a volley is heavy | |
 | Romulan plasma torpedo | Long | Heavy, and a system goes Offline | Slow: Helm's evade gets +2 against it. |
 | Tractor beam | Short | — | Holds a smaller ship; Helm contest to break free. |
@@ -607,15 +661,15 @@ As in personal combat, a weapon fires without penalty within its effective band,
 
 ### Enemy ships
 
-The GM keeps an enemy ship's tracks the same way as the Pelion's. Each line below is a ship's helm and gunner targets, its Shields and Hull, its weapons, and one trait. A ship whose Hull is full is crippled or breaking up.
+The ships the Pelion meets most, built on the registry's classes. The GM keeps their tracks the same way as the Pelion's.
 
-| Ship | Helm / Gunner | Shields | Hull | Weapons | Trait |
-|---|---|---|---|---|---|
-| Klingon battle cruiser | 12 / 12 | 3 | 4 | Disruptors, photon torpedoes | **Relentless.** Doesn't break off until its Hull has 3 boxes. |
-| Klingon bird-of-prey | 13 / 12 | 2 | 3 | Disruptors | **Cloak.** Starts hidden; its first volley from the cloak is at +2, and it must decloak to fire. |
-| Romulan bird-of-prey | 11 / 12 | 3 | 3 | Plasma torpedo | **Cloak.** As the Klingon ship, and it would rather self-destruct than be captured. |
-| Orion raider | 13 / 11 | 2 | 2 | Disruptors, tractor beam | **Fast.** +2 to Helm to break away; it runs once its Shields are down. |
-| Gorn cruiser | 10 / 13 | 3 | 5 | Disruptors, photon torpedoes | **Armored.** The first hit each exchange that reaches its Hull marks 1 box fewer. |
+| Ship | Class | Helm / Gunner | Maneuver | Shields | Hull | Weapons | Trait |
+|---|---|---|---|---|---|---|---|
+| Klingon battle cruiser | Heavy Cruiser | 12 / 12 | 3 | 5 | 5 | Disruptors (heavy), photon torpedoes | **Cloak.** **Relentless:** doesn't break off until its Hull has 3 boxes. |
+| Klingon bird-of-prey | Escort | 13 / 12 | 5 | 2 | 3 | Disruptors | **Cloak.** Its first volley from the cloak is at +2. |
+| Romulan bird-of-prey | Light Cruiser | 11 / 12 | 5 | 3 | 3 | Plasma torpedo | **Cloak.** Would rather self-destruct than be captured. |
+| Orion raider | Escort | 13 / 11 | 6 | 2 | 3 | Disruptors, tractor beam | **Fast.** Runs once its Shields are down. |
+| Gorn cruiser | Cruiser | 10 / 13 | 3 | 4 | 4 | Disruptors, photon torpedoes | **Ablative armor** (2). |
 
 ## Advancement
 
@@ -768,7 +822,7 @@ Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge
 | Mugato | Unarmed (bite and horn) 13 | 8 | 3 | Venomous bite | **Venom.** A bite that marks a box also poisons: without Medicine before the scene ends, mark another box. |
 | Rogue android | Unarmed 13, Computers 15 | 7 | 4 | Crushing grip | **Logic trap.** A Diplomacy or Psychology contest that presents a paradox stuns it for the scene. |
 
-**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship tracks above; the *Enemy ships* table gives the common ones.
+**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship registry in *The USS Pelion*; its *Enemy ships* table gives the common ones.
 
 # Advantages
 

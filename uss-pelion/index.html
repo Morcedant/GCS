@@ -352,6 +352,9 @@ tr.lvl-U td.target { color: var(--muted); }
 .ship-row .box { width: 34px; height: 22px; }
 .ship-row .eff { font-size: .8rem; color: var(--muted); }
 .ship-row.hit .eff { color: var(--warn); } .ship-row.out .eff { color: var(--bad); font-weight: 600; }
+.ship-res { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 8px; }
+.ship-res .res { display: inline-flex; gap: 6px; align-items: center; }
+.ship-res .res b { min-width: 2.2em; text-align: center; }
 .gritty-box { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
 .gritty-box.on { border-color: var(--warn); }
 .gritty-toggle { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
@@ -861,7 +864,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>A battle map</strong> in the GM view, for away teams and ship fights.</li>
 </ul>
 <h2 id="g-guide-scope">Guide scope</h2>
-<p>Personal actions and away-team encounters are covered here. Starship stations use the same skills. Species abilities beyond the adjustments and species advantages in this guide still require GM approval. Numerical ship combat is outside this guide’s scope.</p>
+<p>Personal actions and away-team encounters are covered here. Starship stations use the same skills. Species abilities beyond the adjustments and species advantages in this guide still require GM approval. Ship combat uses the light rules and the ship registry in <em>The USS Pelion</em>.</p>
 <h1 id="g-create-your-character">Create your character</h1>
 <p>Work through the five steps in order. The USS Pelion Officer Creator follows the same steps and checks the rules for you.</p>
 <h2 id="g-step-1-choose-your-role">Step 1: Choose your role</h2>
@@ -1925,7 +1928,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </table>
 <p>A captain who takes an order doesn’t also work a station that exchange. Commanding well is the job.</p>
 <h2 id="g-the-uss-pelion">The USS Pelion</h2>
-<p>The ship has its own sheet, tracked like an injury track. Encounters stay descriptive: the GM states what is at stake before rolls and narrates what each box means. This light structure is a campaign rule; detailed starship combat stays outside this guide.</p>
+<p>The Pelion is a <strong>Heavy Cruiser</strong>, and it has its own sheet, tracked like an injury track. The GM states what is at stake before the rolls and narrates what each box means. Every Starfleet class, and the ships the Pelion meets, is in the <strong>Ship registry</strong> below, adapted from Tiny Trek.</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -1942,13 +1945,13 @@ tr.lvl-U td.target { color: var(--muted); }
 <tbody>
 <tr class="odd">
 <td>Shields</td>
-<td>3</td>
-<td>Hits mark Shields first. At 3 boxes shields are down, and hits go to the Hull and a system.</td>
+<td>5</td>
+<td>While the shields are up, hits mark Shields first. With all 5 marked they’re down, and hits go to the Hull.</td>
 </tr>
 <tr class="even">
 <td>Hull</td>
-<td>4</td>
-<td>1–2: scarred, minor breaches sealed. 3: serious breaches, decks lost. 4: the ship is breaking up; start an <em>Abandon ship</em> clock.</td>
+<td>5</td>
+<td>1–2: scarred, minor breaches sealed. 3–4: serious breaches, decks lost. 5: the ship is breaking up; start an <em>Abandon ship</em> clock.</td>
 </tr>
 <tr class="odd">
 <td>Weapons, Engines, Sensors, Communications, Transporters, Life support</td>
@@ -1957,10 +1960,286 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<p><strong>Taking hits.</strong> A normal hit (a phaser bank, a disruptor) marks 1 box; a heavy hit (photon torpedo, ramming, a disruptor volley) marks 2. Once Shields are down, each hit marks the Hull and the system the GM chooses, or roll 3d6: 3–6 Weapons, 7–8 Engines, 9–10 Sensors, 11–12 Communications, 13–14 Transporters, 15–18 Life support.</p>
-<p><strong>Defending.</strong> When an enemy ship hits, Helm may roll <strong>Helm</strong> to evade, once per exchange, like Dodge: success cancels the hit. Engines damage applies its penalty.</p>
-<p><strong>Repairs.</strong> In the middle of a crisis, a successful <strong>Engineering</strong> roll clears one box from Shields or a system (two on success by 5); it takes the engineer’s action that exchange. The Hull can only be patched by one box per scene, and fully repaired at a starbase. Between encounters, the crew can clear the rest of the systems with time.</p>
+<p><strong>Power.</strong> Each exchange the ship has <strong>Power</strong> to spend (the Pelion has 5), and it refills at the start of the next. Raising the shields for the exchange costs 1, firing the phasers 1, a torpedo volley 1 (and one torpedo from the load), and a transporter use 1. Each Power left over can be diverted for +1 to one ship roll that exchange, up to +2. With the shields not raised, hits go straight to the Hull.</p>
+<p><strong>Taking hits.</strong> A hit marks the boxes its weapon deals (see the registry): Shields first while they’re up, then the Hull. <strong>Every hit that reaches the Hull</strong> also rolls on the <em>Concussive system damage</em> table below. A called shot or a telling hit can pick a system instead.</p>
+<p><strong>Defending.</strong> When an enemy ship fires, Helm may roll <strong>Helm</strong> to evade, once per exchange, like Dodge: success cancels the hit. Torpedoes can’t be evaded. Engines damage applies its penalty.</p>
+<p><strong>Maneuverability.</strong> Compare the ships’ Maneuverability: the most maneuverable ship adds the difference to its Helm contests and its evade rolls. If two ships tie for the highest, nobody gets the bonus.</p>
+<p><strong>Repairs.</strong> In the middle of a crisis, a successful <strong>Engineering</strong> roll clears one box from Shields or a system (two on success by 5), or undoes one concussive result; it takes the engineer’s action that exchange. The Hull can only be patched by one box per scene, and fully repaired at a starbase. Shields that went down take an hour per box to restore.</p>
 <p><strong>Firing.</strong> Tactical rolls <strong>Phasers</strong> for ship weapons, against the enemy ship’s own tracks, which the GM keeps the same way.</p>
+<h3 id="g-ship-registry">Ship registry</h3>
+<p>Starfleet’s classes, from the shuttlecraft up. For other powers’ ships, take the nearest class and add what makes them different (a cloak, a plasma torpedo).</p>
+<table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Class</th>
+<th>Shields</th>
+<th>Hull</th>
+<th>Power</th>
+<th>Maneuver</th>
+<th>Sensors</th>
+<th>Phasers</th>
+<th>Torpedoes</th>
+<th>Transporter</th>
+<th>Crew</th>
+<th>Chassis system</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Shuttle I</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>6</td>
+<td>1</td>
+<td>—</td>
+<td>—</td>
+<td>1 person</td>
+<td>2, and up to 4 passengers</td>
+<td>Agile dodge</td>
+</tr>
+<tr class="even">
+<td>Shuttle II</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>6</td>
+<td>2</td>
+<td>Light</td>
+<td>2 (light)</td>
+<td>1 person</td>
+<td>2, and up to 8 passengers</td>
+<td>Agile dodge</td>
+</tr>
+<tr class="odd">
+<td>Escort</td>
+<td>2</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td>2</td>
+<td>Standard</td>
+<td>10</td>
+<td>3 people</td>
+<td>25</td>
+<td>Buffered shielding</td>
+</tr>
+<tr class="even">
+<td>Science vessel</td>
+<td>2</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td>4</td>
+<td>Light</td>
+<td>10</td>
+<td>3 people</td>
+<td>25</td>
+<td>Science</td>
+</tr>
+<tr class="odd">
+<td>Light Cruiser</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td>2</td>
+<td>Light</td>
+<td>25</td>
+<td>5 people</td>
+<td>100</td>
+<td>Buffered shielding</td>
+</tr>
+<tr class="even">
+<td>Cruiser</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+<td>Standard</td>
+<td>30</td>
+<td>5 people</td>
+<td>250–300</td>
+<td>Buffered shielding</td>
+</tr>
+<tr class="odd">
+<td>Exploration Cruiser</td>
+<td>4–5</td>
+<td>4–5</td>
+<td>4–5</td>
+<td>4</td>
+<td>4</td>
+<td>Standard</td>
+<td>20</td>
+<td>5 people</td>
+<td>250–350</td>
+<td>Explorer</td>
+</tr>
+<tr class="even">
+<td><strong>Heavy Cruiser</strong> (the Pelion)</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>3</td>
+<td>3</td>
+<td>Heavy</td>
+<td>40 (heavy)</td>
+<td>5 people</td>
+<td>300–450 (the Pelion: 430)</td>
+<td>Ship class</td>
+</tr>
+<tr class="odd">
+<td>Assault Cruiser</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>3</td>
+<td>3</td>
+<td>Heavy, +1 to hit</td>
+<td>50 (heavy)</td>
+<td>5 people</td>
+<td>350–500</td>
+<td>Ship class; ablative armor</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Phasers.</strong> Light and Standard mark 1 box; Standard marks 2 on a telling hit. Heavy marks 2.</li>
+<li><strong>Torpedoes.</strong> A volley marks 2 boxes and can’t be evaded, and every other ship at Close range takes 1. A shuttle’s light torpedoes mark 1 and are fired at −2. Heavy torpedoes get +1 to hit.</li>
+<li><strong>Sensors.</strong> The rating adjusts Sensors rolls made with the ship’s sensors: 1 is −1, 2 is +0, 3 is +1, 4 is +2. Beyond Extreme range, only large things (ships, stars, nebulae) can be scanned.</li>
+<li><strong>Transporter.</strong> How many people one use sends. A failed transport rolls on a mishap the GM chooses; an officer trained in Sensors or Engineering at the console makes the roll with +2.</li>
+<li><strong>Warp core.</strong> Any ship but a shuttle can eject its core and detonate it (1 Power, one action): 3 boxes to every ship at Close range. On a planet, everything within 5 km is destroyed.</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Chassis system</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Agile dodge</td>
+<td>When a beam weapon hits, Helm may roll at −2 to slip it entirely. Not with an evade roll the same exchange.</td>
+</tr>
+<tr class="even">
+<td>Buffered shielding</td>
+<td>When the ship is hit, take one system Offline instead of the boxes. It stays Offline until repaired.</td>
+</tr>
+<tr class="odd">
+<td>Science, Explorer</td>
+<td>+2 to Sensors to locate something within sensor range.</td>
+</tr>
+<tr class="even">
+<td>Ship class</td>
+<td>+2 to intimidate a smaller ship’s crew.</td>
+</tr>
+<tr class="odd">
+<td>Ablative armor</td>
+<td>A 2-box track: once an exchange, mark it to absorb a hit entirely. Already counted in the Maneuverability.</td>
+</tr>
+<tr class="even">
+<td>Cloak (Klingon and Romulan ships)</td>
+<td>While cloaked, the ship can’t be targeted; finding it is a Sensors roll at −2. It must decloak to fire.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="g-concussive-system-damage">Concussive system damage</h3>
+<p>Roll 3d6 whenever a hit reaches the Hull. Results last until repaired, and they stack.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>Result</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>Warp core offline</td>
+<td>Emergency power only: Power 1 until repaired.</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Bridge station explodes</td>
+<td>A crew member at a station (an NPC, if there is one) dies; a character there marks 2 Injury boxes unless they Dodge.</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Impulse engine offline</td>
+<td>Mark Engines Offline: thrusters only, no evading and no range shifts.</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Computer offline</td>
+<td>Minimum flight controls: −2 to every ship roll.</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Deflector offline</td>
+<td>−2 to Helm, and the ship can’t go to warp.</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Warp drive offline</td>
+<td>Impulse only: the ship can’t break away to warp.</td>
+</tr>
+<tr class="odd">
+<td>9–10</td>
+<td>Hull breach</td>
+<td>Mark one more Hull box; 3d6 × 5 crew are lost or hurt.</td>
+</tr>
+<tr class="even">
+<td>11–12</td>
+<td>Shield emitter damaged</td>
+<td>Mark one Shields box.</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>Conduits damaged</td>
+<td>Power −1.</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>Impulse engine damaged</td>
+<td>Mark one Engines box, and Maneuverability −1.</td>
+</tr>
+<tr class="odd">
+<td>15–16</td>
+<td>Bridge station sparks</td>
+<td>A crew member at a station marks 1 Injury box unless they Dodge.</td>
+</tr>
+<tr class="even">
+<td>17–18</td>
+<td>Life support failure</td>
+<td>Mark Life support Offline: start a 4-segment <em>Air</em> clock, a segment every 15 minutes.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="g-range-in-space">Range in space</h3>
 <table>
 <colgroup>
@@ -2024,14 +2303,14 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="odd">
 <td>Phaser banks</td>
 <td>Long</td>
-<td>Normal (1 box)</td>
-<td>The ship’s main weapon.</td>
+<td>1 or 2 boxes, by class</td>
+<td>The ship’s main weapon. 1 Power.</td>
 </tr>
 <tr class="even">
 <td>Photon torpedoes</td>
 <td>Extreme</td>
-<td>Heavy (2 boxes)</td>
-<td>A volley of two counts as one heavy hit with +1 to hit.</td>
+<td>2 boxes; 1 to other ships at Close</td>
+<td>Can’t be evaded. 1 Power and one torpedo.</td>
 </tr>
 <tr class="odd">
 <td>Klingon disruptors</td>
@@ -2066,20 +2345,24 @@ tr.lvl-U td.target { color: var(--muted); }
 </tbody>
 </table>
 <h3 id="g-enemy-ships">Enemy ships</h3>
-<p>The GM keeps an enemy ship’s tracks the same way as the Pelion’s. Each line below is a ship’s helm and gunner targets, its Shields and Hull, its weapons, and one trait. A ship whose Hull is full is crippled or breaking up.</p>
-<table style="width:100%;">
+<p>The ships the Pelion meets most, built on the registry’s classes. The GM keeps their tracks the same way as the Pelion’s.</p>
+<table>
 <colgroup>
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Ship</th>
+<th>Class</th>
 <th>Helm / Gunner</th>
+<th>Maneuver</th>
 <th>Shields</th>
 <th>Hull</th>
 <th>Weapons</th>
@@ -2089,43 +2372,53 @@ tr.lvl-U td.target { color: var(--muted); }
 <tbody>
 <tr class="odd">
 <td>Klingon battle cruiser</td>
+<td>Heavy Cruiser</td>
 <td>12 / 12</td>
 <td>3</td>
-<td>4</td>
-<td>Disruptors, photon torpedoes</td>
-<td><strong>Relentless.</strong> Doesn’t break off until its Hull has 3 boxes.</td>
+<td>5</td>
+<td>5</td>
+<td>Disruptors (heavy), photon torpedoes</td>
+<td><strong>Cloak.</strong> <strong>Relentless:</strong> doesn’t break off until its Hull has 3 boxes.</td>
 </tr>
 <tr class="even">
 <td>Klingon bird-of-prey</td>
+<td>Escort</td>
 <td>13 / 12</td>
+<td>5</td>
 <td>2</td>
 <td>3</td>
 <td>Disruptors</td>
-<td><strong>Cloak.</strong> Starts hidden; its first volley from the cloak is at +2, and it must decloak to fire.</td>
+<td><strong>Cloak.</strong> Its first volley from the cloak is at +2.</td>
 </tr>
 <tr class="odd">
 <td>Romulan bird-of-prey</td>
+<td>Light Cruiser</td>
 <td>11 / 12</td>
+<td>5</td>
 <td>3</td>
 <td>3</td>
 <td>Plasma torpedo</td>
-<td><strong>Cloak.</strong> As the Klingon ship, and it would rather self-destruct than be captured.</td>
+<td><strong>Cloak.</strong> Would rather self-destruct than be captured.</td>
 </tr>
 <tr class="even">
 <td>Orion raider</td>
+<td>Escort</td>
 <td>13 / 11</td>
+<td>6</td>
 <td>2</td>
-<td>2</td>
+<td>3</td>
 <td>Disruptors, tractor beam</td>
-<td><strong>Fast.</strong> +2 to Helm to break away; it runs once its Shields are down.</td>
+<td><strong>Fast.</strong> Runs once its Shields are down.</td>
 </tr>
 <tr class="odd">
 <td>Gorn cruiser</td>
+<td>Cruiser</td>
 <td>10 / 13</td>
 <td>3</td>
-<td>5</td>
+<td>4</td>
+<td>4</td>
 <td>Disruptors, photon torpedoes</td>
-<td><strong>Armored.</strong> The first hit each exchange that reaches its Hull marks 1 box fewer.</td>
+<td><strong>Ablative armor</strong> (2).</td>
 </tr>
 </tbody>
 </table>
@@ -2558,7 +2851,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship tracks above; the <em>Enemy ships</em> table gives the common ones.</p>
+<p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship registry in <em>The USS Pelion</em>; its <em>Enemy ships</em> table gives the common ones.</p>
 <h1 id="g-advantages">Advantages</h1>
 <p>Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances; describe how it helps before rolling. Two are different: <strong>Additional Defense</strong> and <strong>Hard to put down</strong> give no +2, and change what you can do in a fight instead. An advantage does not grant training, authorize an otherwise impossible action, or replace essential equipment. If more than one advantage could apply, use only one advantage bonus. Assistance and circumstance modifiers still apply, without counting the same benefit twice.</p>
 <table>
@@ -3262,8 +3555,11 @@ tr.lvl-U td.target { color: var(--muted); }
         </div>
         <div class="card hud no-print" id="card-ship">
           <h3>USS Pelion status</h3>
-          <p class="small muted">Shields take hits first. Then the Hull and a system (1d6: Weapons, Engines, Sensors, Comms, Transporters, Life support). Tap a box to mark or clear it.</p>
+          <p class="small muted">Heavy Cruiser: Maneuverability 3, Sensors 3, heavy phasers. While the shields are up, hits mark Shields first, then the Hull; every hit that reaches the Hull rolls concussive damage. Tap a box to mark or clear it.</p>
+          <div class="ship-res" id="ship-res"></div>
           <div class="ship" id="ship"></div>
+          <div class="btn-row"><button class="btn" id="ship-conc">Roll concussive damage (3d6)</button></div>
+          <p class="small" id="ship-conc-out"></p>
           <button class="linkish" id="ship-reset">Full repair (starbase)</button>
         </div>
         <div class="card hud" id="card-ref">
@@ -3280,6 +3576,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <dt>Phaser power</dt><dd>Type 1: 8, Type 2: 16, rifle: 30. Stun 1, heat 1, kill 2, wide-beam 3, disintegrate 4. A spare cell refills it.</dd>
             <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). Sickbay +2, clears 2 (3 on margin 5+).</dd>
             <dt>Rest</dt><dd>Clearing one box: a full day at 1 box, at least three days at 2, a week at 3 (and only once someone has stabilized or treated you). Light duty only.</dd>
+            <dt>Ship fight</dt><dd>Power each exchange (Pelion 5): shields up 1, phasers 1, torpedo volley 1, transporter 1, +1 to a ship roll per Power left (max +2). Helm evades once an exchange; torpedoes can't be evaded. The most maneuverable ship adds the difference to Helm. A hit on the Hull rolls concussive damage.</dd>
             <dt>Duty points</dt><dd>Reroll (keep second), reduce an injury by one box, shrug off a telling hit, or establish a small preparation.</dd>
           </dl>
         </div>
@@ -4379,15 +4676,36 @@ tr.lvl-U td.target { color: var(--muted); }
     toast("Overloading! It explodes at the end of the next round: 1 box to everyone nearby, 2 at the centre.");
   };
 
-  const SHIP_TRACKS = [["Shields", 3], ["Hull", 4], ["Weapons", 3], ["Engines", 3], ["Sensors", 3], ["Communications", 3], ["Transporters", 3], ["Life support", 3]];
+  // The Pelion is a Heavy Cruiser (Players' Guide, Ship registry): Shields 5, Hull 5, Power 5 an exchange, 40 torpedoes.
+  const SHIP_TRACKS = [["Shields", 5], ["Hull", 5], ["Weapons", 3], ["Engines", 3], ["Sensors", 3], ["Communications", 3], ["Transporters", 3], ["Life support", 3]];
+  const SHIP_POWER = 5, SHIP_TORPS = 40;
+  // Concussive system damage (3d6), rolled whenever a hit reaches the Hull.
+  const CONCUSSIVE = [
+    [3, 3, "Warp core offline", "Emergency power only: Power 1 until repaired."],
+    [4, 4, "Bridge station explodes", "A crew member at a station (an NPC, if there is one) dies; a character there marks 2 Injury boxes unless they Dodge."],
+    [5, 5, "Impulse engine offline", "Mark Engines Offline: thrusters only, no evading and no range shifts."],
+    [6, 6, "Computer offline", "Minimum flight controls: −2 to every ship roll."],
+    [7, 7, "Deflector offline", "−2 to Helm, and the ship can't go to warp."],
+    [8, 8, "Warp drive offline", "Impulse only: the ship can't break away to warp."],
+    [9, 10, "Hull breach", "Mark one more Hull box; 3d6 × 5 crew are lost or hurt."],
+    [11, 12, "Shield emitter damaged", "Mark one Shields box."],
+    [13, 13, "Conduits damaged", "Power −1."],
+    [14, 14, "Impulse engine damaged", "Mark one Engines box, and Maneuverability −1."],
+    [15, 16, "Bridge station sparks", "A crew member at a station marks 1 Injury box unless they Dodge."],
+    [17, 18, "Life support failure", "Mark Life support Offline: start a 4-segment Air clock, a segment every 15 minutes."],
+  ];
   let ship = store.get(STORE_SHIP, {});
   if (!ship || typeof ship !== "object") ship = {};
   function shipEffect(name, n) {
-    if (name === "Shields") return ["Up", "Weakened", "Failing", "Down: hits go to Hull and a system"][n];
-    if (name === "Hull") return ["Intact", "Scarred", "Minor breaches", "Serious breaches, decks lost", "Breaking up: start an Abandon ship clock"][n];
+    if (name === "Shields") return n >= 5 ? "Down: hits go to the Hull" : n ? `${5 - n} of 5 left` : "Full";
+    if (name === "Hull") return ["Intact", "Scarred", "Minor breaches, sealed", "Serious breaches, decks lost", "Serious breaches, decks lost", "Breaking up: start an Abandon ship clock"][n];
     return ["Working", "Damaged: −2", "Crippled: −4, basic function only", "Offline"][n];
   }
+  // Power refills each exchange; torpedoes come from the load until a starbase restocks them.
+  const shipPower = () => (Number.isFinite(ship.power) ? ship.power : SHIP_POWER), shipTorps = () => (Number.isFinite(ship.torps) ? ship.torps : SHIP_TORPS);
   function renderShip() {
+    $("ship-res").innerHTML = `<span class="res"><span class="label">Power</span><button class="btn" data-res="power" data-d="-1" aria-label="Spend 1 Power">−</button><b>${shipPower()}</b><button class="btn" data-res="power" data-d="1" aria-label="1 more Power">+</button><button class="linkish" data-res="exchange">New exchange (refill)</button></span>
+      <span class="res"><span class="label">Torpedoes</span><button class="btn" data-res="torps" data-d="-1" aria-label="Fire a torpedo">−</button><b>${shipTorps()}</b><button class="btn" data-res="torps" data-d="1" aria-label="One more torpedo">+</button></span>`;
     $("ship").innerHTML = SHIP_TRACKS.map(([name, max]) => {
       const n = Math.min(max, ship[name] || 0);
       return `<div class="ship-row ${n >= max ? "out" : n ? "hit" : ""}"><span class="label">${name}</span>
@@ -4401,6 +4719,18 @@ tr.lvl-U td.target { color: var(--muted); }
     ship[name] = (ship[name] || 0) === i ? i - 1 : i;
     store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {}
   });
+  $("ship-res").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-res]"); if (!b) return;
+    if (b.dataset.res === "exchange") ship.power = SHIP_POWER;
+    else if (b.dataset.res === "power") ship.power = Math.max(0, Math.min(SHIP_POWER + 2, shipPower() + +b.dataset.d));
+    else ship.torps = Math.max(0, Math.min(SHIP_TORPS, shipTorps() + +b.dataset.d));
+    store.set(STORE_SHIP, ship); renderShip();
+  });
+  $("ship-conc").onclick = () => {
+    const dice = [1, 2, 3].map(() => 1 + Math.floor(Math.random() * 6)), t = dice[0] + dice[1] + dice[2];
+    const r = CONCUSSIVE.find(([a, b]) => t >= a && t <= b);
+    $("ship-conc-out").innerHTML = `3d6 = ${t} (${dice.join(" + ")}): <b>${esc(r[2])}.</b> ${esc(r[3])}`;
+  };
   let resetArmed = false;
   $("ship-reset").onclick = () => {
     if (!resetArmed) { resetArmed = true; $("ship-reset").textContent = "Tap again to clear every box"; setTimeout(() => { resetArmed = false; $("ship-reset").textContent = "Full repair (starbase)"; }, 4000); return; }
@@ -5073,7 +5403,7 @@ function mountBattleMap(api) {
 
 // The setting's opponents, read from a table in the Players' Guide on the page (for settings that keep them only
 // in the guide): the table after the heading named (Threats, or Enemy ships), columns found by their headings.
-// People: Threat, Attack (target), Dodge, Boxes, Defense, Trait. Ships: Ship, Pilot (or Helm) / Gunner, Shields, Hull, Weapons, Trait.
+// People: Threat, Attack (target), Dodge, Boxes, Defense, Trait. Ships: Ship, Class, Pilot (or Helm) / Gunner, Maneuver, Shields, Hull, Weapons, Trait.
 function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   const h = guide && [...guide.querySelectorAll("h1, h2, h3")].find((x) => x.textContent.trim() === heading);
   let t = h && h.nextElementSibling;
@@ -5081,12 +5411,13 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   if (!t || t.tagName !== "TABLE") return [];
   const raw = [...t.querySelectorAll("thead th, tr:first-child th")].map((x) => x.textContent.trim()), head = raw.map((x) => x.toLowerCase());
   const col = (re) => head.findIndex((x) => re.test(x));
-  const [cName, cAtk, cPilot, cDodge, cBoxes, cDef, cWeap, cTrait, cShields] = [/^threat|^ship|^name/, /^attack/, /^pilot|^helm/, /^dodge/, /^boxes|^hull/, /^defen/, /^weapons$/, /^trait/, /^shields$/].map(col);
+  const [cName, cAtk, cPilot, cDodge, cBoxes, cDef, cWeap, cTrait, cShields, cClass, cMan] = [/^threat|^ship|^name/, /^attack/, /^pilot|^helm/, /^dodge/, /^boxes|^hull/, /^defen/, /^weapons$/, /^trait/, /^shields$/, /^class$/, /^maneuver/].map(col);
   return [...t.querySelectorAll("tbody tr")].map((tr, i) => {
     const td = [...tr.children].map((x) => x.textContent.trim()), at = (c) => (c >= 0 ? td[c] : "");
     const def = at(cDef) && at(cDef) !== "—" ? `Defense ${at(cDef)}` : "";
     const pilot = cPilot >= 0 ? `${raw[cPilot]} ${at(cPilot)}` : "", weap = cWeap >= 0 && at(cWeap) ? at(cWeap) : "", shields = cShields >= 0 && at(cShields) ? `Shields ${at(cShields)}` : "";
-    return { id: prefix + i, name: at(cName), attacks: [at(cAtk), pilot, shields, weap, def].filter(Boolean).join(" · "), dodge: at(cDodge) || null, boxes: parseInt(at(cBoxes), 10) || 1, trait: at(cTrait) };
+    const cls = [cClass >= 0 ? at(cClass) : "", cMan >= 0 && at(cMan) ? `Maneuver ${at(cMan)}` : ""].filter(Boolean).join(", ");
+    return { id: prefix + i, name: at(cName), attacks: [cls, at(cAtk), pilot, shields, weap, def].filter(Boolean).join(" · "), dodge: at(cDodge) || null, boxes: parseInt(at(cBoxes), 10) || 1, trait: at(cTrait) };
   }).filter((x) => x.name);
 }
 /* BATTLEMAP:END */
