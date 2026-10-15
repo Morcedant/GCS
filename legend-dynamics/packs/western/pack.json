@@ -3165,6 +3165,35 @@
    "traitText": "Once per round, a target with a link to her rolls Will or marks a box."
   },
   {
+   "id": "skinwalker",
+   "name": "Skinwalker",
+   "label": "Skinwalker",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 14
+    },
+    {
+     "skill": "Deception",
+     "target": 14
+    },
+    {
+     "skill": "Stealth",
+     "target": 14
+    }
+   ],
+   "dodge": 11,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Claws (2)",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Stolen shapes",
+   "traitText": "Wears the shape of a coyote, a wolf, an owl or a person it has seen, and mimics voices. Once per scene, meeting its eyes means a Will roll or being Dazed for a round."
+  },
+  {
    "id": "hellhound",
    "name": "Hellhound",
    "label": "Hellhound",
@@ -3184,6 +3213,31 @@
    ],
    "trait": "Hunter",
    "traitText": "Always finds its quarry; holy water drives it off."
+  },
+  {
+   "id": "wendigo",
+   "name": "Wendigo",
+   "label": "Wendigo",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 15
+    },
+    {
+     "skill": "Tracking",
+     "target": 15
+    }
+   ],
+   "dodge": 11,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Claws and teeth (2)",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Endless hunger",
+   "traitText": "Calls out in the voices of the lost to lure prey; ignores the Wounded penalty. Only fire marks more than 1 box at a time, and it rises again unless its heart of ice is burned."
   },
   {
    "id": "revenant-gunslinger",
