@@ -393,7 +393,9 @@ tr.lvl-U td.target { color: var(--muted); }
 .bm-add label, .bm-sel label, .bm-gridrow label { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; }
 .bm-add input[type=text], .bm-sel input[type=text] { width: 12em; }
 .bm-gridrow input[type=number] { width: 5.5em; }
-.bm-file { cursor: pointer; }
+.bm-file { cursor: pointer; position: relative; }
+.bm-file:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bm-hide { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; opacity: 0; }
 .bm-zoom { display: inline-flex; gap: 4px; }
 .btn[aria-pressed="true"] { background: var(--accent); color: var(--bg, #111); }
 .bm-stage { position: relative; }
@@ -6799,7 +6801,7 @@ function mountBattleMap(api) {
   // ---- markup ----
   api.root.innerHTML = `
     <div class="bm-bar">
-      <label class="btn bm-file">Background image…<input type="file" accept="image/*" data-bm="bg" hidden><\/label>
+      <label class="btn bm-file" tabindex="0">Background image…<input type="file" accept="image/*" data-bm="bg" class="bm-hide"><\/label>
       <button class="btn" data-bm="posse">Add the posse<\/button>
       <button class="btn" data-bm="add">Add a token<\/button>
       <button class="btn" data-bm="measure" aria-pressed="false">Measure<\/button>
@@ -6809,7 +6811,7 @@ function mountBattleMap(api) {
       <label>Name <input type="text" data-bmf="name" placeholder="e.g. Outlaw 1"><\/label>
       <label>Color <input type="color" data-bmf="color" value="#a33b2b"><\/label>
       <label>Size <select data-bmf="tsize"><option value="1">1 hex<\/option><option value="2">2 hexes<\/option><option value="3">3 hexes<\/option><\/select><\/label>
-      <label class="btn bm-file">Image (optional)…<input type="file" accept="image/*" data-bmf="img" hidden><\/label>
+      <label class="btn bm-file" tabindex="0">Image (optional)…<input type="file" accept="image/*" data-bmf="img" class="bm-hide"><\/label>
       <button class="btn primary" data-bm="addgo">Place it<\/button>
     <\/div>
     <div class="bm-stage"><svg class="bm-svg" role="application" aria-label="Battle map. Drag the map to pan, scroll or pinch to zoom, drag a token to move it.">
@@ -6830,7 +6832,7 @@ function mountBattleMap(api) {
       <\/div>
       <p class="small muted">One hex is ${api.yardsPerHex || 1} yard${(api.yardsPerHex || 1) === 1 ? "" : "s"}. To line the grid up with a map that has its own grid, set the hex size first, then shift it into place.<\/p>
       <div class="bm-bar"><button class="btn" data-bm="align">Fit the grid to the picture<\/button><button class="btn" data-bm="bgoff">Remove the image<\/button><button class="btn" data-bm="clear">Remove all tokens<\/button>
-        <button class="btn" data-bm="savefile">Save map to file<\/button><label class="btn bm-file">Open a map file…<input type="file" accept=".json,application/json" data-bm="openfile" hidden><\/label><\/div>
+        <button class="btn" data-bm="savefile">Save map to file<\/button><label class="btn bm-file" tabindex="0">Open a map file…<input type="file" accept=".json,application/json" data-bm="openfile" class="bm-hide"><\/label><\/div>
     <\/details>`;
   const $ = (s) => api.root.querySelector(s);
   const svg = $(".bm-svg"), world = $(".bm-world"), gTok = $(".bm-tokens"), gMeas = $(".bm-measure"), readout = $(".bm-readout");
@@ -7020,6 +7022,9 @@ function mountBattleMap(api) {
     else if (i.dataset.bms) { const t = st.tokens.find((x) => x.id === sel); if (!t) return; const k = i.dataset.bms; t[k] = k === "tsize" ? +i.value : i.value; save(); drawTokens(); }
   });
   api.root.addEventListener("input", (ev) => { const i = ev.target; if (i.dataset.bmg && i.type === "range") { st[i.dataset.bmg] = +i.value; drawGrid(); drawTokens(); clearTimeout(i._t); i._t = setTimeout(save, 300); } });
+  // The file buttons are labels around file pickers kept in the page (not hidden: some browsers, Safari
+  // among them, won't open a picker that isn't); Enter or Space opens them from the keyboard.
+  api.root.addEventListener("keydown", (ev) => { const l = ev.target.closest && ev.target.closest(".bm-file"); if (l && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); l.querySelector("input").click(); } });
   if (window.ResizeObserver) new ResizeObserver(() => { viewBox(); }).observe(svg);
 
   idb.get(KEY + ".bg").then((v) => { bg = v || null; draw(); if (!st.view || (st.view.z === 1 && st.view.x === 0 && st.view.y === 0)) fit(); });
