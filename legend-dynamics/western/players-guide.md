@@ -649,11 +649,11 @@ Roll 3d6 on each table and read the total, or pick what you like. Middle results
 | 9 | A miner raving about the dead walking | A lonely homestead | A ghost that wants justice |
 | 10 | A bounty on a man who died last year | A ghost town | Ghouls in the mine |
 | 11 | Travelers vanishing on the trail | A burned mission church | A demon summoned by a desperate man |
-| 12 | A traveling medicine show | A saloon and gambling hall | A necromancer raising an army |
+| 12 | A traveling medicine show | A saloon and gambling hall | A wendigo stalking a snowbound camp |
 | 13 | A new preacher packs the church | A frontier fort | A revenant gunslinger |
 | 14 | A town where no one sleeps | A fog-bound waterfront | A hellhound on someone's trail |
 | 15 | A hanging that went wrong | A canyon cemetery | A cult in the church cellar |
-| 16 | A monster asks for help | A snowbound mountain pass | A sorcerer's working gone wrong |
+| 16 | A monster asks for help | A snowbound mountain pass | A skinwalker wearing a neighbor's face |
 | 17 | A train arrives with no one aboard | A circus wintering in the badlands | A town that made a pact |
 | 18 | A child asks you to kill their father, the monster | A mine sealed since the cave-in | A creature no one has a name for |
 
