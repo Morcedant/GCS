@@ -5,6 +5,8 @@ subtitle: "Campaign year 2268 · Revised edition with species and General Servic
 
 You are a member of Starfleet aboard USS Pelion, NCC-1750. Explore unfamiliar worlds, investigate strange phenomena, protect your crewmates, and make difficult decisions when orders and circumstances collide. Your training matters, and the crew succeeds by working together.
 
+This is an unofficial fan game inspired by *Star Trek*. It is not affiliated with or endorsed by Paramount or CBS Studios, who own Star Trek.
+
 This guide presents the Pelion rules in a form you can use at the table. It combines concrete skills and 3d6 roll-under resolution with a small pool of Duty points.
 
 ## The rule to remember
