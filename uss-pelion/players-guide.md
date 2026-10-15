@@ -15,12 +15,16 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## What this edition adds
 
-This revision keeps every rule from the original guide and adds four campaign rules:
+This revision keeps every rule from the original guide and adds these campaign rules:
 
 - **General Services**, a division for enlisted crew holding Crewman and Yeoman ranks.
 - **Species attribute adjustments**, which shift starting attributes and always total zero.
 - **Species advantages**, which can replace your regular advantage and always come with a companion complication.
 - **Custom species**, built with the GM under the same limits.
+- **Defenses, telling hits and called shots:** Parry and Block beside Dodge, and great hits that decide what happens.
+- **Advancement points**, earned after missions and spent on skills, advantages and attributes.
+- **Gritty combat**, an optional rule for grievous wounds.
+- **A battle map** in the GM view, for away teams and ship fights.
 
 ## Guide scope
 
@@ -163,7 +167,7 @@ An advantage gives +2 to one narrowly defined kind of task when the GM agrees it
 
 ## Step 5: Prepare for duty
 
-Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.
+Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Your Parry is Unarmed Combat −3, and your Block Unarmed Combat −2. Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.
 
 ### Top 10 connections to a crewmate
 
@@ -304,9 +308,41 @@ Act in descending Agility order. Players choose the order of tied crew members; 
 
 ## Attacking and defending
 
-Roll Phasers for a ranged attack or Unarmed Combat for a melee attack. If the attack succeeds, an aware target able to move may attempt Dodge. Dodge is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty. Untrained Athletics adds nothing. Use the training level, not the final Athletics score. Each target gets one Dodge attempt per round, refreshed at the start of the round. A successful Dodge cancels the hit. Apply physical injury penalties to Dodge.
+Roll Phasers for a ranged attack, or Unarmed Combat for fists, grappling and a weapon in hand. If the attack succeeds, an aware target able to move may **defend**: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.
 
-Solid cover blocks a shot. Partial cover imposes −2 on the attack. Other difficult conditions use the normal modifier scale. Weapon effects apply after a hit survives any Dodge. Success margin does not increase damage under these rules.
+- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits. The **Additional Defense** advantage gives a second.
+- **Dodge** is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Untrained Athletics adds nothing; use the training level, not the final Athletics score.
+- **Parry.** Against a weapon in hand or fists, roll Unarmed Combat −3 with a weapon in hand: a d'k tahg, a lirpa, a length of pipe. Bare-handed, Unarmed Combat −3 parries fists only. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a phaser beam or a disruptor bolt.
+- **Block.** With anything that can stand in for a shield (a chair, a crate lid, a torn-off panel), you can block a weapon in hand, fists or a thrown weapon: roll Unarmed Combat −2. Nothing you can lift blocks an energy weapon. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.
+- **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
+- **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. **Careful Marksman** adds its +2 to this.
+
+Solid cover blocks a shot. Partial cover imposes −2 on the attack. Other difficult conditions use the normal modifier scale. Weapon effects apply after a hit survives any defense. Success margin does not increase damage: a great hit decides *what* happens instead.
+
+## Telling hits
+
+A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.
+
+- **A telling hit** is an attack that succeeds by **5 or more**, or on a natural 3 or 4, and isn't stopped by a defense. The attacker picks **one effect** below and describes it. The weapon still marks its usual boxes.
+- **A called shot.** Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, a phaser, a control panel, a power cell). If the attack hits at all, the effect happens, whatever the margin. **Careful Marksman** cuts this penalty by 1.
+- **Phasers on stun** land telling hits too. The effect happens whether or not the target resists the stun.
+- **Both ways.** Klingons, pirates and stranger things land telling hits on the crew too.
+
+| Effect | What happens |
+|---|---|
+| Disarm | The weapon or held item drops, or flies a few yards away |
+| Knock down | The target falls prone, or is driven back a few steps |
+| Pin | The target is held, tangled or pinned down: their next action goes to getting free |
+| Rattle | −2 to the target's next roll |
+| Break gear | A phaser, tricorder, communicator or improvised shield breaks |
+| Open them up | The next attack on this target this round gets +2 |
+| Precise | You hit exactly what you aimed at: the control panel, the power coupling, the hand on the trigger |
+
+**Limits.** A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a Gorn of its claws, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.
+
+**Staying alive.** A crew member on the receiving end can shrug off a telling hit's effect with **Hard to put down** (once per fight) or by spending a Duty point. Either way, they still take the boxes.
+
+*Example:* a Klingon warrior slashes at Lt. Reyes with a d'k tahg and succeeds by 5. Reyes hasn't defended yet this round: Dodge 12, −2 for the clean hit, needs a 10 or less. Bare-handed, Reyes can't parry a blade, so Reyes dodges. When the second Klingon swings before Reyes's next turn, there's no defense left, unless Reyes has Additional Defense.
 
 ## Range
 
@@ -343,9 +379,32 @@ Two boxes hurt; they don't kill. Death comes from three things:
 
 Your protection is avoiding the hit: Dodge, cover, and a Duty point, which reduces a kill shot from three boxes to two, leaving you Seriously wounded but on your feet.
 
+### Optional rule: gritty combat
+
+For a harder, bloodier game, the GM can turn on **gritty combat** for the campaign (the creator has a switch on the Condition card and in the GM view). The rest of the rules stay the same.
+
+**Grievous hits.** A hit that marks **2 or more boxes** is **grievous** when the attack succeeded by **7 or more**, rolled a **natural 3 or 4**, or left the target **Dying**.
+
+- **A crew member** rolls 3d6 on the table below and suffers the result on top of the boxes.
+- **An opponent** is simply taken out: no roll, no boxes to count. Describe how, or let the GM view roll a description.
+- **With a telling hit,** the attacker also chooses which limb.
+
+| 3d6 | Grievous wound | Effect | Heals |
+|---|---|---|---|
+| 3–4 | Lost limb | A hand, an arm or a leg is gone; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding. | Never: a complication (a prosthetic, at a starbase) |
+| 5–6 | Lost eye | −2 to Phasers and to spotting things. | Never: a complication |
+| 7–9 | Broken bone | The limb is useless until a bone-knitter sets it in sickbay. | A day in sickbay; several weeks without |
+| 10–12 | Torn muscle | −1 to physical tasks. | A few days with sickbay care; several weeks without |
+| 13–15 | Concussion | Stunned, and −2 to thinking tasks for the scene. | After the scene |
+| 16–18 | Internal injury or severe burns | Dying even with boxes to spare; it needs sickbay. | A week after sickbay |
+
+- **Duty points.** Spend a Duty point to **downgrade** a grievous wound one step: a lost limb becomes a broken bone, a lost eye a concussion, a broken bone or an internal injury a torn muscle, and a torn muscle or a concussion nothing lasting.
+- **A limb for a life.** Once a fight, a crew member who would be left Dying or killed can **lose a limb, or the use of one**, instead. They live, Incapacitated but stable, and the limb becomes a complication. It replaces any grievous wound from the same hit.
+- **Healing.** Grievous wounds heal on their own clock, whatever the boxes say. A lost limb or a lost eye never heals on its own.
+
 ## Weapons and damage
 
-How many boxes a hit marks depends on the **weapon**, not on how well the attack roll succeeded. Apply it only after the hit survives any Dodge. This list sorts common weapons into one-box, two-box and killing (three-box) categories; the GM places anything else by comparison.
+How many boxes a hit marks depends on the **weapon**, not on how well the attack roll succeeded. Apply it only after the hit survives any defense. This list sorts common weapons into one-box, two-box and killing (three-box) categories; the GM places anything else by comparison.
 
 | Weapon | Range | Boxes on a hit | What the injury looks like |
 |---|---|---|---|
@@ -397,6 +456,20 @@ Hand phasers run on power cells, and every shot draws on them. This is a campaig
 - **A drained phaser won't fire.** Swap in a spare power cell (one action) to refill it, or recharge it fully in the ship's armory between missions. Having packed a spare cell is a good use of a Duty point's *small preparation*.
 - **Overload.** A phaser with at least 4 power left can be set to overload: it whines for a round and explodes at the end of the next round, as an explosion (1 box to everyone nearby, 2 at the centre). The phaser is destroyed.
 
+## The battle map
+
+The GM view of the creator has a **battle map** for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in this guide, and a fight without it works the same way. Open **How to use the map** on the map itself for the buttons, step by step.
+
+**Three kinds of map.**
+
+- **A hex map** for an away team's fight where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard inside a ship, 5 or 10 yards on a city street, 50 on open ground, or a number of kilometres for ships in space. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range tables.
+- **A ship fight** on a range track: a lane for the Pelion and one for each space range band, from under 10 km to a light-second. When the helms make their contest, the GM moves the enemy a lane in or out. **Add the Pelion** places the ship, linked to its Shields, Hull and systems: marking a box on the map marks it on the ship's tracks, and the other way round. Enemy ships come from the *Enemy ships* table with their Hull boxes.
+- **A range track** for an away team's chase or a running fight where only distance matters.
+
+**Tokens.** The GM places the crew with one button. Their tokens stay linked to the officers in the GM view: marking Injury, Dying, Stunned or a Duty point on a token marks it on the officer, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.
+
+**Keeping a map.** The map stays in the GM's browser. **Save map to file** keeps every map, its picture and tokens in one file, to prepare a fight ahead of time or share it with another GM.
+
 # Medical care
 
 Starfleet physicians in 2268 have advanced diagnostic scanners, potent pharmaceuticals, portable emergency equipment, and sophisticated sickbay facilities. Familiar injuries often respond quickly to treatment. Severe trauma, incompatible biology, missing supplies, and unidentified conditions still challenge an experienced doctor. The treatment values below are campaign rules inspired by the series, rather than numerical rules stated in canon.
@@ -419,13 +492,20 @@ Removing injury boxes removes their associated penalties, but major organ damage
 
 ## Natural recovery
 
-Injuries also heal with time. Each **full day of rest** clears one injury box. Rest means light duty at most: no combat, no away missions, nothing strenuous. A day spent working hard or fighting clears nothing.
+Injuries also heal with time. Rest clears injury one box at a time, and the worse you're hurt, the longer each box takes. Rest means light duty at most: no combat, no away missions, nothing strenuous. A day spent working hard or fighting clears nothing.
 
-- **At three boxes, rest alone clears nothing.** An Incapacitated patient needs treatment (field care or sickbay) to clear the first box; after that, rest takes over.
-- **Rest and medicine combine.** Treatment clears boxes immediately; rest clears what remains, one box a day.
+| Boxes marked | Rest to clear one box |
+|---|---|
+| 1 | A full day |
+| 2 | At least three days |
+| 3 | A week, and only once treated |
+
+- **At three boxes, rest alone clears nothing.** An Incapacitated patient needs stabilizing or treatment (field care or sickbay) first; after that, a week of rest clears the first box.
+- **The times add up.** From three boxes, rest alone takes about a week and a half to heal completely: a week, then three days, then a day.
+- **Rest and medicine combine.** Treatment clears boxes immediately; rest clears what remains.
 - **Serious trauma takes longer.** For major organ damage, severe burns, or complex internal trauma, the GM can require a set recovery period before rest clears anything, and the ship's physician decides when the patient is fit for duty.
 
-*Example:* Ensign Reyes ends a mission Seriously wounded (two boxes). Sickbay is busy with worse cases, so Reyes rests in quarters: one box clears the first day and the second the next, and Reyes is back on duty on the third day.
+*Example:* Ensign Reyes ends a mission Seriously wounded (two boxes). Sickbay is busy with worse cases, so Reyes rests in quarters: three days clear the first box and one more day the second, and Reyes is back on duty on the fifth day.
 
 ## Alien medicine and limits
 
@@ -449,6 +529,7 @@ Begin each session with two Duty points; unused points do not carry into the nex
 |---|---|
 | Reroll your own roll | Declare after seeing the result but before its consequences are resolved. Keep the second result, even if worse. |
 | Reduce an injury by one box | Declare when a hit would mark boxes, before applying them. Does not prevent disintegration or another hazard that bypasses the injury track. |
+| Shrug off a telling hit | Cancel the effect an attacker picked against you; you still take the boxes. |
 | Establish a small preparation | Propose a plausible detail, such as having brought a field kit. GM approval is required; it cannot contradict established facts or solve the mission outright. |
 
 Gain one point when one of your complications creates a meaningful problem you accept. This includes a companion complication from a species advantage. The GM offers or approves the award. You can decline the proposed complication without a penalty. Repeating a harmless habit does not earn points.
@@ -524,9 +605,34 @@ As in personal combat, a weapon fires without penalty within its effective band,
 | Transporter | Medium | — | Only when the target's shields are down. |
 | Ramming | Close | Heavy to both ships | A desperate measure. |
 
+### Enemy ships
+
+The GM keeps an enemy ship's tracks the same way as the Pelion's. Each line below is a ship's helm and gunner targets, its Shields and Hull, its weapons, and one trait. A ship whose Hull is full is crippled or breaking up.
+
+| Ship | Helm / Gunner | Shields | Hull | Weapons | Trait |
+|---|---|---|---|---|---|
+| Klingon battle cruiser | 12 / 12 | 3 | 4 | Disruptors, photon torpedoes | **Relentless.** Doesn't break off until its Hull has 3 boxes. |
+| Klingon bird-of-prey | 13 / 12 | 2 | 3 | Disruptors | **Cloak.** Starts hidden; its first volley from the cloak is at +2, and it must decloak to fire. |
+| Romulan bird-of-prey | 11 / 12 | 3 | 3 | Plasma torpedo | **Cloak.** As the Klingon ship, and it would rather self-destruct than be captured. |
+| Orion raider | 13 / 11 | 2 | 2 | Disruptors, tractor beam | **Fast.** +2 to Helm to break away; it runs once its Shields are down. |
+| Gorn cruiser | 10 / 13 | 3 | 5 | Disruptors, photon torpedoes | **Armored.** The first hit each exchange that reaches its Hull marks 1 box fewer. |
+
 ## Advancement
 
-After a significant mission, the GM may authorize one relevant skill to advance from Untrained to Trained or from Trained to Specialty, or allow revision of an advantage or complication to reflect events. Skills retain the same three training levels after advancement. Advancement follows mission milestones. Attribute and species changes require a separate agreement. General Services characters advance the same way, but only their starting skill is Expert; a skill raised later tops out at Specialty (+3) unless they are commissioned (see Step 3).
+Crew members grow by earning **advancement points** and spending them.
+
+- **Earning.** After a significant mission, the GM awards each crew member **1 point**. At a **milestone**, the end of a story arc, everyone earns **2 more**.
+- **Spending.** Spend points when you earn them, or bank them for something bigger. Each purchase needs the GM's approval and a reason from the story: training at a starbase, something you lived through, a mentor aboard.
+
+| Purchase | Cost | Limit |
+|---|---|---|
+| A skill from Untrained to Trained | 1 | — |
+| A skill from Trained to Specialty | 2 | Specialty (+3) is the ceiling: only a General Services character's starting skill is Expert, unless they are commissioned (see Step 3) |
+| Revise an advantage or complication | 1 | — |
+| A second advantage | 3 | Once; a general advantage you don't have. Only one advantage's +2 counts on a roll |
+| +1 to an attribute | 4 | Once per attribute; no higher than one above the starting maximum (14, plus any species bonus) |
+
+Species changes still need a separate agreement with the GM. The creator keeps the ledger: award points in the advancement box under the skills (or from the Captain's log), then spend them there.
 
 # Running missions
 
@@ -662,11 +768,11 @@ Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge
 | Mugato | Unarmed (bite and horn) 13 | 8 | 3 | Venomous bite | **Venom.** A bite that marks a box also poisons: without Medicine before the scene ends, mark another box. |
 | Rogue android | Unarmed 13, Computers 15 | 7 | 4 | Crushing grip | **Logic trap.** A Diplomacy or Psychology contest that presents a paradox stuns it for the scene. |
 
-**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship tracks above: a Klingon battle cruiser has Shields 3, Hull 4, and Phasers 12 for its gunners.
+**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship tracks above; the *Enemy ships* table gives the common ones.
 
 # Advantages
 
-Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances; describe how it helps before rolling. An advantage does not grant training, authorize an otherwise impossible action, or replace essential equipment. If more than one advantage could apply, use only one advantage bonus. Assistance and circumstance modifiers still apply, without counting the same benefit twice.
+Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances; describe how it helps before rolling. Two are different: **Additional Defense** and **Hard to put down** give no +2, and change what you can do in a fight instead. An advantage does not grant training, authorize an otherwise impossible action, or replace essential equipment. If more than one advantage could apply, use only one advantage bonus. Assistance and circumstance modifiers still apply, without counting the same benefit twice.
 
 | Advantage | Effect |
 |---|---|
@@ -685,7 +791,9 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Mental Discipline | +2 to Will to maintain concentration despite pain or severe distraction. It does not improve resistance to fear or mental intrusion. |
 | Unshakable Courage | +2 to Will against overwhelming fear. It does not protect against alien compulsion or guarantee sensible decisions. |
 | Guarded Mind | +2 to Will when resisting an external mental intrusion or compulsion. It provides no telepathy or ability to detect the source. |
-| Careful Marksman | +2 to Phasers after spending your preceding action aiming at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it. |
+| Careful Marksman | +2 to Phasers when you aim (with Aim's +1, +3 in all) at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it. A called shot is 1 easier for you. |
+| Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2. No +2 to rolls. |
+| Hard to put down | Once per fight, shrug off a telling hit's effect. You still take its boxes. No +2 to rolls. |
 
 # Species advantages
 
