@@ -37,21 +37,27 @@ Work through the five steps in order. The Grimm character creator follows the sa
 
 Choose a calling and describe what your character brings. Your calling places you in one of three groups, which only changes your sheet's colors and badge. A title such as "Deputy U.S. Marshal" or "Doc" is agreed with the GM and gives no bonus.
 
-| Calling | Group | Typical contribution | Core skills |
-|---|---|---|---|
-| Lawman | The Law | Wear a badge or carry credentials and bring the guilty in: a marshal, a Ranger, a sheriff or deputy, a city policeman, a Pinkerton. Your Allegiance says which force; a Badge or Pinkerton Credentials advantage gives its authority | Shooting, Investigation, Read People, Riding |
-| Bounty Hunter | The Law | Track and bring in wanted men, and things that aren't men | Tracking, Shooting, Riding, Wesen Lore |
-| Doctor | The Learned | Patch up the wounded and read what a body tells you | Medicine, Investigation, Read People, Apothecary |
-| Apothecary | The Learned | Brew remedies, antidotes and stranger things | Apothecary, Medicine, Occult, Wesen Lore |
-| Scholar | The Learned | Know the old books, the old languages and the occult | Wesen Lore, Occult, Investigation, Persuasion |
-| Occultist | The Learned | Work the old arts, and know what's out there | Occult, Wesen Lore, Apothecary, Read People |
-| Preacher | The Learned | Comfort, counsel, and stand against the dark | Persuasion, Leadership, Occult, Shooting |
-| Gunslinger | The Frontier | Be the fastest and steadiest gun in the room | Shooting, Athletics, Read People, Riding |
-| Scout | The Frontier | Find the trail, read the land, keep everyone alive in it | Tracking, Survival, Riding, Stealth |
-| Gambler | The Frontier | Read people, bluff, and hear what the saloon hears | Gambling, Read People, Deception, Shooting |
-| Tinker | The Frontier | Fix guns, build traps, and make the impossible gadget | Tinkering, Shooting, Investigation, Athletics |
+| Calling | Group | Typical contribution | Core skills | Ability |
+|---|---|---|---|---|
+| Lawman | The Law | Wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority. | Shooting, Riding, Leadership, Investigation | **The badge.** +2 to Leadership when you give orders in the law's name: an arrest, raising a posse, clearing a street. |
+| Bounty Hunter | The Law | Tracks and brings in wanted men, and the things that only look like men. | Shooting, Tracking, Read People, Wesen Lore | **Paper on them.** +2 to Tracking and Investigation to find someone with a price on their head or a warrant out. |
+| Circuit Judge | The Law | Rides from town to town holding court, and not every town wants one. | Brawling, Survival, Persuasion, Law | **Heard it all before.** +2 to Read People to catch a lie told to your face. |
+| Politician | The Law | Holds office or wants it: a mayor, an alderman, a territorial delegate, a governor's man, or a party boss with friends in the capital. | Investigation, Riding, Leadership, Law | **Friends in office.** Once per case, the town or territory gives you what it can: rooms at the hotel, horses for a posse, the jail cells, the telegraph office, or the doctor's time. |
+| Doctor | The Learned | Patches up the wounded and reads what a body says about what killed it. | Investigation, Riding, Read People, Medicine | **Steady hands.** +2 to Medicine when stabilizing the Dying or working under fire. |
+| Apothecary | The Learned | Brews remedies, antidotes and stranger things, and knows which ingredients come from where. | Occult, Stealth, Persuasion, Apothecary | **Already brewed.** Once per case, you have the right remedy, poison or antidote already made. |
+| Scholar | The Learned | Knows the old books, the old languages and the occult, and finds the answer in a footnote. | Investigation, Stealth, Persuasion, Wesen Lore | **The family books.** Once per case, your books have a page on this creature: one true weakness or habit. |
+| Occultist | The Learned | Works the old arts, knows what's out there, and knows what it costs. | Wesen Lore, Stealth, Deception, Occult | **Forbidden lore.** Once per case, ask the GM one question about a supernatural thing you've seen, and get a true answer. |
+| Preacher | The Learned | Comforts the frightened, counsels the troubled, and stands against the dark with faith and a shotgun. | Shooting, Riding, Leadership, Occult | **Hold fast.** +2 to Will against fear, possession and temptation, and to Leadership to steady others against them. |
+| Monster Hunter | The Frontier | Hunts what walks at night by study, traps and patience, not a Grimm's sight. A Grimm can be one, but needn't be, and most monster hunters aren't Grimms. | Melee, Tracking, Read People, Wesen Lore | **Know its weakness.** Once you've identified a creature with Wesen Lore, your called shots against it take no penalty. |
+| Gunslinger | The Frontier | The fastest and steadiest gun in the room, and the one who decides when it's time to draw. | Shooting, Riding, Read People, Athletics | **Quick draw.** In the first round of a gunfight, you act first, whatever your Agility. |
+| Scout | The Frontier | Finds the trail, reads the land, and keeps everyone alive out in it. | Melee, Tracking, Persuasion, Survival | **Lay of the land.** Once per case, you know a way: a hidden pass, a water hole, a shortcut that saves a day, or a place to make a stand. |
+| Gambler | The Frontier | Reads people, bluffs, and hears everything the saloon hears. | Shooting, Stealth, Deception, Gambling | **Markers.** Once per case, call in a debt: someone owes you a favor, a horse, a room or the truth. |
+| Tinker | The Frontier | Fixes the guns, builds the traps, and makes the gadget nobody else thought possible. | Brawling, Athletics, Deception, Tinkering | **Jury-rig.** Once per case, make the gadget, lock pick, silver-loaded shell or repair you need from whatever is to hand. |
+| Shotgun Messenger | The Frontier | Rides beside the driver guarding the mail, the strongbox and the passengers. | Shooting, Animal Handling, Leadership, Survival | **Riding shotgun.** Once per fight, when someone next to you is hit, you take the hit instead. |
 
 **Occultists and magic.** Magic comes from your heritage, not your calling: an Occultist who is an **Incantare** works real magic through their Lens. With any other heritage, an Occultist knows the lore but can't work the art: a scholar of the occult, a charlatan, or someone still searching for a teacher.
+
+Every calling has its own **ability** (in the table above), printed on your sheet. Callings follow one recipe: a fighting skill, a trail skill, a people skill and a signature skill. The Politician and the four scholars and healers of the Learned aren't fighters: they take a second signature skill instead, though anyone can still train a fighting skill.
 
 The creator marks your calling's four **core skills** (in the table above) Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven't changed.
 
@@ -96,6 +102,7 @@ Spend all your Edges. Each one buys:
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one named skill when it's used | 1 |
 | Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2. | 1 |
 | Hard to put down | Once per fight, shrug off a telling hit's effect: you still take its boxes (see *Telling hits*) | 1 |
+| Talisman | A ready charm made for you by a Braucher, a hexenbiest or a root doctor (a Himmelsbrief, a mojo hand, a blessed buckeye), holding a Minor ritual agreed with the GM; break it to release it. Renewed between cases; doesn't count against a charm limit | 1 |
 
 ### Spending points
 
@@ -197,8 +204,10 @@ Choose the skill that matches your method. Investigation finds the clues; Wesen 
 | Leadership | Presence | Command others, rally a crowd, give clear orders |
 | Persuasion | Presence | Convince, negotiate, calm a mob |
 | Deception | Presence | Lie, bluff, disguise and misdirect |
+| Animal Handling | Presence | Calm, train and handle horses, mules and dogs, and face down a beast |
 | Read People | Intellect | Judge motives, spot a lie, read a face |
 | Investigation | Intellect | Search a scene, examine clues, follow paper trails |
+| Law | Intellect | Statutes, warrants, courts, claims and contracts |
 | Wesen Lore | Intellect | Identify Wesen, their customs, strengths and weaknesses |
 | Occult | Intellect | Rituals, magical traditions, curses and secret orders |
 | Medicine | Intellect | Diagnose, treat and perform surgery |
@@ -235,6 +244,7 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Shield | A hide shield or an iron-bound buckler, rare in the West; some Grimm families keep one with the old weapons. You Block at +1. |
 | Trail kit | Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones; no bonus beyond that. |
 | Lantern and matches | Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible. |
+| Law books and blank warrants | Needed to draw up papers, check a statute or argue a point of law away from a courthouse. |
 | Himmelsbrief | A "letter from Heaven", folded small and carried on the body. Once per case, when a bullet hits you, mark one box fewer. Whether it's the letter or the faith, nobody can say. |
 | Grimm's journals | Copied pages from a Grimm family's books. With an hour to consult them, +2 to Wesen Lore to identify a Wesen or find its weakness. Irreplaceable, and coveted. |
 | Dynamite | Three sticks. Throw with Athletics; the fuse burns for a round. See Weapons and damage. |

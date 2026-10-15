@@ -707,6 +707,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="checks" id="equip"></div></div>
           <div class="fields">
             <div class="field wide" id="contact-wrap" hidden><label for="f-contact">A friend in town (Edge)</label><input type="text" id="f-contact" placeholder="Who, and what they can do for you"></div>
+            <div class="field wide" id="talisman-wrap" hidden><label for="f-talisman">Your talisman (Edge)</label><input type="text" id="f-talisman" placeholder="e.g. A Himmelsbrief from a Braucher in Lancaster County, against bullets"></div>
             <div class="field" id="gear-wrap" hidden><label for="f-gearitem">Fine weapon or tool (Edge)</label><input type="text" id="f-gearitem" placeholder="e.g. Grandfather's Grimm axe"></div>
             <div class="field" id="gearskill-wrap" hidden><label for="f-gearskill">+2 to</label><select id="f-gearskill"></select></div>
             <div class="field wide"><label for="f-otherequip">Other gear</label><input type="text" id="f-otherequip" placeholder="Anything else you carry"></div>
@@ -806,6 +807,7 @@ tr.lvl-U td.target { color: var(--muted); }
       <div class="card hud">
         <h3>Turn order</h3>
         <p class="small muted">Highest Agility first. Players choose the order among tied characters; the GM places opponents.</p>
+        <label class="small"><input type="checkbox" id="gm-gunfight"> First round of a gunfight (Quick draw: the Gunslinger acts first)</label>
         <ol class="turns" id="gm-turns"></ol>
       </div>
     </div>
@@ -887,10 +889,11 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Choose a calling and describe what your character brings. Your calling places you in one of three groups, which only changes your sheet’s colors and badge. A title such as “Deputy U.S. Marshal” or “Doc” is agreed with the GM and gives no bonus.</p>
 <table>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -898,78 +901,119 @@ tr.lvl-U td.target { color: var(--muted); }
 <th>Group</th>
 <th>Typical contribution</th>
 <th>Core skills</th>
+<th>Ability</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>Lawman</td>
 <td>The Law</td>
-<td>Wear a badge or carry credentials and bring the guilty in: a marshal, a Ranger, a sheriff or deputy, a city policeman, a Pinkerton. Your Allegiance says which force; a Badge or Pinkerton Credentials advantage gives its authority</td>
-<td>Shooting, Investigation, Read People, Riding</td>
+<td>Wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority.</td>
+<td>Shooting, Riding, Leadership, Investigation</td>
+<td><strong>The badge.</strong> +2 to Leadership when you give orders in the law’s name: an arrest, raising a posse, clearing a street.</td>
 </tr>
 <tr class="even">
 <td>Bounty Hunter</td>
 <td>The Law</td>
-<td>Track and bring in wanted men, and things that aren’t men</td>
-<td>Tracking, Shooting, Riding, Wesen Lore</td>
+<td>Tracks and brings in wanted men, and the things that only look like men.</td>
+<td>Shooting, Tracking, Read People, Wesen Lore</td>
+<td><strong>Paper on them.</strong> +2 to Tracking and Investigation to find someone with a price on their head or a warrant out.</td>
+</tr>
+<tr class="odd">
+<td>Circuit Judge</td>
+<td>The Law</td>
+<td>Rides from town to town holding court, and not every town wants one.</td>
+<td>Brawling, Survival, Persuasion, Law</td>
+<td><strong>Heard it all before.</strong> +2 to Read People to catch a lie told to your face.</td>
+</tr>
+<tr class="even">
+<td>Politician</td>
+<td>The Law</td>
+<td>Holds office or wants it: a mayor, an alderman, a territorial delegate, a governor’s man, or a party boss with friends in the capital.</td>
+<td>Investigation, Riding, Leadership, Law</td>
+<td><strong>Friends in office.</strong> Once per case, the town or territory gives you what it can: rooms at the hotel, horses for a posse, the jail cells, the telegraph office, or the doctor’s time.</td>
 </tr>
 <tr class="odd">
 <td>Doctor</td>
 <td>The Learned</td>
-<td>Patch up the wounded and read what a body tells you</td>
-<td>Medicine, Investigation, Read People, Apothecary</td>
+<td>Patches up the wounded and reads what a body says about what killed it.</td>
+<td>Investigation, Riding, Read People, Medicine</td>
+<td><strong>Steady hands.</strong> +2 to Medicine when stabilizing the Dying or working under fire.</td>
 </tr>
 <tr class="even">
 <td>Apothecary</td>
 <td>The Learned</td>
-<td>Brew remedies, antidotes and stranger things</td>
-<td>Apothecary, Medicine, Occult, Wesen Lore</td>
+<td>Brews remedies, antidotes and stranger things, and knows which ingredients come from where.</td>
+<td>Occult, Stealth, Persuasion, Apothecary</td>
+<td><strong>Already brewed.</strong> Once per case, you have the right remedy, poison or antidote already made.</td>
 </tr>
 <tr class="odd">
 <td>Scholar</td>
 <td>The Learned</td>
-<td>Know the old books, the old languages and the occult</td>
-<td>Wesen Lore, Occult, Investigation, Persuasion</td>
+<td>Knows the old books, the old languages and the occult, and finds the answer in a footnote.</td>
+<td>Investigation, Stealth, Persuasion, Wesen Lore</td>
+<td><strong>The family books.</strong> Once per case, your books have a page on this creature: one true weakness or habit.</td>
 </tr>
 <tr class="even">
 <td>Occultist</td>
 <td>The Learned</td>
-<td>Work the old arts, and know what’s out there</td>
-<td>Occult, Wesen Lore, Apothecary, Read People</td>
+<td>Works the old arts, knows what’s out there, and knows what it costs.</td>
+<td>Wesen Lore, Stealth, Deception, Occult</td>
+<td><strong>Forbidden lore.</strong> Once per case, ask the GM one question about a supernatural thing you’ve seen, and get a true answer.</td>
 </tr>
 <tr class="odd">
 <td>Preacher</td>
 <td>The Learned</td>
-<td>Comfort, counsel, and stand against the dark</td>
-<td>Persuasion, Leadership, Occult, Shooting</td>
+<td>Comforts the frightened, counsels the troubled, and stands against the dark with faith and a shotgun.</td>
+<td>Shooting, Riding, Leadership, Occult</td>
+<td><strong>Hold fast.</strong> +2 to Will against fear, possession and temptation, and to Leadership to steady others against them.</td>
 </tr>
 <tr class="even">
+<td>Monster Hunter</td>
+<td>The Frontier</td>
+<td>Hunts what walks at night by study, traps and patience, not a Grimm’s sight. A Grimm can be one, but needn’t be, and most monster hunters aren’t Grimms.</td>
+<td>Melee, Tracking, Read People, Wesen Lore</td>
+<td><strong>Know its weakness.</strong> Once you’ve identified a creature with Wesen Lore, your called shots against it take no penalty.</td>
+</tr>
+<tr class="odd">
 <td>Gunslinger</td>
 <td>The Frontier</td>
-<td>Be the fastest and steadiest gun in the room</td>
-<td>Shooting, Athletics, Read People, Riding</td>
-</tr>
-<tr class="odd">
-<td>Scout</td>
-<td>The Frontier</td>
-<td>Find the trail, read the land, keep everyone alive in it</td>
-<td>Tracking, Survival, Riding, Stealth</td>
+<td>The fastest and steadiest gun in the room, and the one who decides when it’s time to draw.</td>
+<td>Shooting, Riding, Read People, Athletics</td>
+<td><strong>Quick draw.</strong> In the first round of a gunfight, you act first, whatever your Agility.</td>
 </tr>
 <tr class="even">
-<td>Gambler</td>
+<td>Scout</td>
 <td>The Frontier</td>
-<td>Read people, bluff, and hear what the saloon hears</td>
-<td>Gambling, Read People, Deception, Shooting</td>
+<td>Finds the trail, reads the land, and keeps everyone alive out in it.</td>
+<td>Melee, Tracking, Persuasion, Survival</td>
+<td><strong>Lay of the land.</strong> Once per case, you know a way: a hidden pass, a water hole, a shortcut that saves a day, or a place to make a stand.</td>
 </tr>
 <tr class="odd">
+<td>Gambler</td>
+<td>The Frontier</td>
+<td>Reads people, bluffs, and hears everything the saloon hears.</td>
+<td>Shooting, Stealth, Deception, Gambling</td>
+<td><strong>Markers.</strong> Once per case, call in a debt: someone owes you a favor, a horse, a room or the truth.</td>
+</tr>
+<tr class="even">
 <td>Tinker</td>
 <td>The Frontier</td>
-<td>Fix guns, build traps, and make the impossible gadget</td>
-<td>Tinkering, Shooting, Investigation, Athletics</td>
+<td>Fixes the guns, builds the traps, and makes the gadget nobody else thought possible.</td>
+<td>Brawling, Athletics, Deception, Tinkering</td>
+<td><strong>Jury-rig.</strong> Once per case, make the gadget, lock pick, silver-loaded shell or repair you need from whatever is to hand.</td>
+</tr>
+<tr class="odd">
+<td>Shotgun Messenger</td>
+<td>The Frontier</td>
+<td>Rides beside the driver guarding the mail, the strongbox and the passengers.</td>
+<td>Shooting, Animal Handling, Leadership, Survival</td>
+<td><strong>Riding shotgun.</strong> Once per fight, when someone next to you is hit, you take the hit instead.</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Occultists and magic.</strong> Magic comes from your heritage, not your calling: an Occultist who is an <strong>Incantare</strong> works real magic through their Lens. With any other heritage, an Occultist knows the lore but can’t work the art: a scholar of the occult, a charlatan, or someone still searching for a teacher.</p>
+<p>Every calling has its own <strong>ability</strong> (in the table above), printed on your sheet. Callings follow one recipe: a fighting skill, a trail skill, a people skill and a signature skill. The Politician and the four scholars and healers of the Learned aren’t fighters: they take a second signature skill instead, though anyone can still train a fighting skill.</p>
 <p>The creator marks your calling’s four <strong>core skills</strong> (in the table above) Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven’t changed.</p>
 <h3 id="g-well-rounded-or-old-hand">Well-rounded or Old hand</h3>
 <p>Choose how your character trained (see Step 3):</p>
@@ -1067,6 +1111,11 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="even">
 <td>Hard to put down</td>
 <td>Once per fight, shrug off a telling hit’s effect: you still take its boxes (see <em>Telling hits</em>)</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>Talisman</td>
+<td>A ready charm made for you by a Braucher, a hexenbiest or a root doctor (a Himmelsbrief, a mojo hand, a blessed buckeye), holding a Minor ritual agreed with the GM; break it to release it. Renewed between cases; doesn’t count against a charm limit</td>
 <td>1</td>
 </tr>
 </tbody>
@@ -1231,14 +1280,24 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Lie, bluff, disguise and misdirect</td>
 </tr>
 <tr class="even">
+<td>Animal Handling</td>
+<td>Presence</td>
+<td>Calm, train and handle horses, mules and dogs, and face down a beast</td>
+</tr>
+<tr class="odd">
 <td>Read People</td>
 <td>Intellect</td>
 <td>Judge motives, spot a lie, read a face</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Investigation</td>
 <td>Intellect</td>
 <td>Search a scene, examine clues, follow paper trails</td>
+</tr>
+<tr class="odd">
+<td>Law</td>
+<td>Intellect</td>
+<td>Statutes, warrants, courts, claims and contracts</td>
 </tr>
 <tr class="even">
 <td>Wesen Lore</td>
@@ -1373,14 +1432,18 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible.</td>
 </tr>
 <tr class="even">
+<td>Law books and blank warrants</td>
+<td>Needed to draw up papers, check a statute or argue a point of law away from a courthouse.</td>
+</tr>
+<tr class="odd">
 <td>Himmelsbrief</td>
 <td>A “letter from Heaven”, folded small and carried on the body. Once per case, when a bullet hits you, mark one box fewer. Whether it’s the letter or the faith, nobody can say.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Grimm’s journals</td>
 <td>Copied pages from a Grimm family’s books. With an hour to consult them, +2 to Wesen Lore to identify a Wesen or find its weakness. Irreplaceable, and coveted.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Dynamite</td>
 <td>Three sticks. Throw with Athletics; the fuse burns for a round. See Weapons and damage.</td>
 </tr>
@@ -3911,7 +3974,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field" id="r-quality-wrap" hidden><label for="r-quality">Attack succeeded by</label>
               <select id="r-quality"><option value="0">0–2 (no penalty)</option><option value="-1">3–4 −1</option><option value="-2">5–6 −2</option><option value="-3">7+ −3</option></select></div>
             <div class="field" id="r-called-wrap" hidden><label for="r-called">Called shot</label>
-              <select id="r-called"><option value="0">None</option><option value="-2">Name the effect −2</option><option value="-4">Small target −4</option></select></div>
+              <select id="r-called"><option value="0">None</option><option value="-2">Name the effect −2</option><option value="-4">Small target −4</option></select>
+              <label class="small" id="r-weak-wrap" hidden><input type="checkbox" id="r-weak"> <span id="r-weak-label"></span></label></div>
             <div class="field" id="r-parries-wrap" hidden><label for="r-parries">Parries already this round</label>
               <select id="r-parries"><option value="0">None</option><option value="1">One −2</option></select></div>
           </div>
@@ -3998,8 +4062,10 @@ tr.lvl-U td.target { color: var(--muted); }
     ["Leadership", "Presence", "Command others, rally a crowd, give clear orders"],
     ["Persuasion", "Presence", "Convince, negotiate, calm a mob"],
     ["Deception", "Presence", "Lie, bluff, disguise and misdirect"],
+    ["Animal Handling", "Presence", "Calm, train and handle horses, mules and dogs, and face down a beast"],
     ["Read People", "Intellect", "Judge motives, spot a lie, read a face"],
     ["Investigation", "Intellect", "Search a scene, examine clues, follow paper trails"],
+    ["Law", "Intellect", "Statutes, warrants, courts, claims and contracts"],
     ["Wesen Lore", "Intellect", "Identify Wesen, their customs, strengths and weaknesses"],
     ["Occult", "Intellect", "Rituals, magical traditions, curses and secret orders"],
     ["Medicine", "Intellect", "Diagnose, treat and perform surgery"],
@@ -4018,26 +4084,50 @@ tr.lvl-U td.target { color: var(--muted); }
   const PHYSICAL = new Set(["Riding", "Shooting", "Melee", "Brawling", "Athletics", "Stealth", "Survival", "Body", "Agility", "Dodge"]);
   const LEVELS = { U: { name: "Untrained", mod: -4, dodge: 0 }, T: { name: "Trained", mod: 1, dodge: 1 }, S: { name: "Specialty", mod: 3, dodge: 2 } };
   const DEPTS = [
-    ["Lawman", "law"], ["Bounty Hunter", "law"],
-    ["Doctor", "learned"], ["Apothecary", "learned"], ["Scholar", "learned"], ["Occultist", "learned"], ["Preacher", "learned"],
-    ["Gunslinger", "frontier"], ["Scout", "frontier"], ["Gambler", "frontier"], ["Tinker", "frontier"],
+    ["Lawman", "law"],
+    ["Bounty Hunter", "law"],
+    ["Circuit Judge", "law"],
+    ["Politician", "law"],
+    ["Doctor", "learned"],
+    ["Apothecary", "learned"],
+    ["Scholar", "learned"],
+    ["Occultist", "learned"],
+    ["Preacher", "learned"],
+    ["Monster Hunter", "frontier"],
+    ["Gunslinger", "frontier"],
+    ["Scout", "frontier"],
+    ["Gambler", "frontier"],
+    ["Tinker", "frontier"],
+    ["Shotgun Messenger", "frontier"],
   ];
+  const roleAbility = (c = ch) => (c.customRole ? null : ROLE_ABILITY[c.dept] || null);
+  const hasFx = (fx, c = ch) => !c.customRole && (ROLE_FX[c.dept] || []).includes(fx);
+  let gunfight = false; // GM view: the first round of a gunfight, when Quick draw acts first
   const GROUP_NAMES = { law: "The Law", learned: "The Learned", frontier: "The Frontier" };
   // Core skills for each role: marked Trained when the role is picked.
-  const ROLE_SKILLS = {"Lawman": ["Shooting", "Investigation", "Read People", "Riding"], "Bounty Hunter": ["Tracking", "Shooting", "Riding", "Wesen Lore"], "Doctor": ["Medicine", "Investigation", "Read People", "Apothecary"], "Apothecary": ["Apothecary", "Medicine", "Occult", "Wesen Lore"], "Scholar": ["Wesen Lore", "Occult", "Investigation", "Persuasion"], "Occultist": ["Occult", "Wesen Lore", "Apothecary", "Read People"], "Preacher": ["Persuasion", "Leadership", "Occult", "Shooting"], "Gunslinger": ["Shooting", "Athletics", "Read People", "Riding"], "Scout": ["Tracking", "Survival", "Riding", "Stealth"], "Gambler": ["Gambling", "Read People", "Deception", "Shooting"], "Tinker": ["Tinkering", "Shooting", "Investigation", "Athletics"]};
+  const ROLE_SKILLS = {"Lawman": ["Shooting", "Riding", "Leadership", "Investigation"], "Bounty Hunter": ["Shooting", "Tracking", "Read People", "Wesen Lore"], "Circuit Judge": ["Brawling", "Survival", "Persuasion", "Law"], "Politician": ["Investigation", "Riding", "Leadership", "Law"], "Doctor": ["Investigation", "Riding", "Read People", "Medicine"], "Apothecary": ["Occult", "Stealth", "Persuasion", "Apothecary"], "Scholar": ["Investigation", "Stealth", "Persuasion", "Wesen Lore"], "Occultist": ["Wesen Lore", "Stealth", "Deception", "Occult"], "Preacher": ["Shooting", "Riding", "Leadership", "Occult"], "Monster Hunter": ["Melee", "Tracking", "Read People", "Wesen Lore"], "Gunslinger": ["Shooting", "Riding", "Read People", "Athletics"], "Scout": ["Melee", "Tracking", "Persuasion", "Survival"], "Gambler": ["Shooting", "Stealth", "Deception", "Gambling"], "Tinker": ["Brawling", "Athletics", "Deception", "Tinkering"], "Shotgun Messenger": ["Shooting", "Animal Handling", "Leadership", "Survival"]};
+  // Each calling's own ability [name, text], and what the creator does for it: "firstInGunfight" (the turn order), "freeCalledShot" (the roller).
+  const ROLE_ABILITY = {"Lawman": ["The badge", "+2 to Leadership when you give orders in the law's name: an arrest, raising a posse, clearing a street."], "Bounty Hunter": ["Paper on them", "+2 to Tracking and Investigation to find someone with a price on their head or a warrant out."], "Circuit Judge": ["Heard it all before", "+2 to Read People to catch a lie told to your face."], "Politician": ["Friends in office", "Once per case, the town or territory gives you what it can: rooms at the hotel, horses for a posse, the jail cells, the telegraph office, or the doctor's time."], "Doctor": ["Steady hands", "+2 to Medicine when stabilizing the Dying or working under fire."], "Apothecary": ["Already brewed", "Once per case, you have the right remedy, poison or antidote already made."], "Scholar": ["The family books", "Once per case, your books have a page on this creature: one true weakness or habit."], "Occultist": ["Forbidden lore", "Once per case, ask the GM one question about a supernatural thing you've seen, and get a true answer."], "Preacher": ["Hold fast", "+2 to Will against fear, possession and temptation, and to Leadership to steady others against them."], "Monster Hunter": ["Know its weakness", "Once you've identified a creature with Wesen Lore, your called shots against it take no penalty."], "Gunslinger": ["Quick draw", "In the first round of a gunfight, you act first, whatever your Agility."], "Scout": ["Lay of the land", "Once per case, you know a way: a hidden pass, a water hole, a shortcut that saves a day, or a place to make a stand."], "Gambler": ["Markers", "Once per case, call in a debt: someone owes you a favor, a horse, a room or the truth."], "Tinker": ["Jury-rig", "Once per case, make the gadget, lock pick, silver-loaded shell or repair you need from whatever is to hand."], "Shotgun Messenger": ["Riding shotgun", "Once per fight, when someone next to you is hit, you take the hit instead."]};
+  const ROLE_FX = {"Monster Hunter": ["freeCalledShot"], "Gunslinger": ["firstInGunfight"]};
+  // The calling recipe (tools/check-callings.py checks it): fight (or, for a calling that isn't a fighter, a second signature), trail, people, signature.
+  const CALLING_RECIPE = {"fight": ["Shooting", "Melee", "Brawling"], "trail": ["Riding", "Tracking", "Survival", "Animal Handling", "Athletics", "Stealth"], "people": ["Persuasion", "Read People", "Deception", "Leadership"], "nonFighters": ["Politician", "Doctor", "Apothecary", "Scholar", "Occultist"], "max": {"Shooting": 7, "Riding": 5}, "maxOther": 4};
   // Starting text for "What you bring"; replaced on calling change unless the player has written their own.
   const ROLE_SUGGESTIONS = {
-    Lawman: "Lawman: wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority.",
+    "Lawman": "Lawman: wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority.",
     "Bounty Hunter": "Bounty hunter: tracks and brings in wanted men, and the things that only look like men.",
-    Doctor: "Doctor: patches up the wounded and reads what a body says about what killed it.",
-    Apothecary: "Apothecary: brews remedies, antidotes and stranger things, and knows which ingredients come from where.",
-    Scholar: "Scholar: knows the old books, the old languages and the occult, and finds the answer in a footnote.",
-    Occultist: "Occultist: works the old arts, knows what's out there, and knows what it costs.",
-    Preacher: "Preacher: comforts the frightened, counsels the troubled, and stands against the dark with faith and a shotgun.",
-    Gunslinger: "Gunslinger: the fastest and steadiest gun in the room, and the one who decides when it's time to draw.",
-    Scout: "Scout: finds the trail, reads the land, and keeps everyone alive out in it.",
-    Gambler: "Gambler: reads people, bluffs, and hears everything the saloon hears.",
-    Tinker: "Tinker: fixes the guns, builds the traps, and makes the gadget nobody else thought possible.",
+    "Circuit Judge": "Circuit judge: rides from town to town holding court, and not every town wants one.",
+    "Politician": "Politician: holds office or wants it: a mayor, an alderman, a territorial delegate, a governor's man, or a party boss with friends in the capital.",
+    "Doctor": "Doctor: patches up the wounded and reads what a body says about what killed it.",
+    "Apothecary": "Apothecary: brews remedies, antidotes and stranger things, and knows which ingredients come from where.",
+    "Scholar": "Scholar: knows the old books, the old languages and the occult, and finds the answer in a footnote.",
+    "Occultist": "Occultist: works the old arts, knows what's out there, and knows what it costs.",
+    "Preacher": "Preacher: comforts the frightened, counsels the troubled, and stands against the dark with faith and a shotgun.",
+    "Monster Hunter": "Monster hunter: hunts what walks at night by study, traps and patience, not a Grimm's sight. A Grimm can be one, but needn't be, and most monster hunters aren't Grimms.",
+    "Gunslinger": "Gunslinger: the fastest and steadiest gun in the room, and the one who decides when it's time to draw.",
+    "Scout": "Scout: finds the trail, reads the land, and keeps everyone alive out in it.",
+    "Gambler": "Gambler: reads people, bluffs, and hears everything the saloon hears.",
+    "Tinker": "Tinker: fixes the guns, builds the traps, and makes the gadget nobody else thought possible.",
+    "Shotgun Messenger": "Shotgun messenger: rides beside the driver guarding the mail, the strongbox and the passengers.",
   };
   // Group seals: a Grimm's key for the Law, an open book for the Learned, a crescent moon for the Frontier.
   const starPath = (n, R, r) => Array.from({ length: n * 2 }, (_, i) => { const a = (i * Math.PI) / n - Math.PI / 2, d = i % 2 ? r : R; return `${i ? "L" : "M"}${(50 + d * Math.cos(a)).toFixed(1)} ${(50 + d * Math.sin(a)).toFixed(1)}`; }).join(" ") + " Z";
@@ -4072,6 +4162,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one skill when it's used.", 1],
     ["extradefense", "Additional Defense", "A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2.", 1],
     ["survivor", "Hard to put down", "Once per fight, shrug off a telling hit's effect. You still take its boxes.", 1],
+    ["talisman", "Talisman", "A ready charm from the folk traditions, made for you by a Braucher, a hexenbiest or a root doctor: a Himmelsbrief sewn in your coat, a mojo hand, a blessed buckeye. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one; it's renewed between cases and doesn't count against a charm limit.", 1],
   ];
   const SET_ALLEGIANCES = [
     ["church", "The Church", "Once per case, shelter, records or a favor from the clergy.", "Duty: the Church gives you orders. Sicarii discipline ties you to the Order of the Holy Knife."],
@@ -4274,6 +4365,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["shield", "Shield", "A hide shield or an iron-bound buckler, rare in the West; some Grimm families keep one with the old weapons. You Block at +1."],
     ["trailkit", "Trail kit", "Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones."],
     ["lantern", "Lantern and matches", "Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible."],
+    ["lawbooks", "Law books and blank warrants", "Needed to draw up papers, check a statute or argue a point of law away from a courthouse."],
     ["himmelsbrief", "Himmelsbrief", "A \"letter from Heaven\", folded small and carried on the body. Once per case, when a bullet hits you, mark one box fewer. Whether it's the letter or the faith, nobody can say."],
     ["journals", "Grimm's journals", "Copied pages from a Grimm family's books. With an hour to consult them, +2 to Wesen Lore to identify a Wesen or find its weakness. Irreplaceable."],
     ["dynamite", "Dynamite", "Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre."],
@@ -4315,7 +4407,7 @@ tr.lvl-U td.target { color: var(--muted); }
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
-      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" },
+      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", talisman: "", gear: { item: "", skill: "" },
       allegiance: "", allegianceDef: null, customTier: 1, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",
       play: { injury: 0, duty: 2, stunned: false, woge: false, log: [], lasting: [], gwLast: null },
@@ -4516,7 +4608,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const compOk = ch.comp.id && (ch.comp.id !== "custom" || (ch.comp.name.trim() && ch.comp.text.trim()));
     const POOL = pool(), ea = edgesAvail(), es = edgesSpent();
     const edgeNeeds = [edgeN("adv2") && !ch.adv2.id ? "choose the second advantage" : "", edgeN("adv2") && ADVANTAGES.find((a) => a[0] === ch.adv2.id)?.[4] && !ch.adv2.detail.trim() ? "finish the second advantage" : "",
-      edgeN("contact") && !ch.contact.trim() ? "name your friend in town" : "", edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill) ? "describe the fine weapon or tool and its skill" : ""].filter(Boolean);
+      edgeN("contact") && !ch.contact.trim() ? "name your friend in town" : "", edgeN("talisman") && !(ch.talisman || "").trim() ? "describe your talisman, who made it, and its ritual" : "", edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill) ? "describe the fine weapon or tool and its skill" : ""].filter(Boolean);
     const horrorOff = heritageOf()?.horror && !horrorOn();
     return [
       [!!ch.name.trim(), ch.name.trim() ? "Name entered" : "Enter a name"],
@@ -4611,14 +4703,15 @@ tr.lvl-U td.target { color: var(--muted); }
     $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
     EQUIPMENT.forEach(([k]) => ($("eq-" + k).checked = !!ch.equipment[k]));
     $("f-stunned").checked = !!ch.play.stunned;
-    $("f-contact").value = ch.contact; $("f-gearitem").value = ch.gear.item; $("f-adv2detail").value = ch.adv2.detail;
+    $("f-contact").value = ch.contact; $("f-talisman").value = ch.talisman || ""; $("f-gearitem").value = ch.gear.item; $("f-adv2detail").value = ch.adv2.detail;
   }
 
   function render() {
     $("custom-role-wrap").hidden = $("custom-group-wrap").hidden = !ch.customRole;
     if (ch.customRole) { if ($("f-customrole").value !== ch.dept) $("f-customrole").value = ch.dept; $("f-customgroup").value = ch.customGroup || "law"; }
-    $("role-skills").textContent = ((ROLE_SKILLS[ch.dept] || []).length ? `Core skills: ${ROLE_SKILLS[ch.dept].join(", ")} (marked Trained for you)` : "") +
-      (ch.dept === "Occultist" && !["incantare", "hexenbiest"].includes(ch.speciesId) ? ". Magic comes from your heritage: choose Incantare to work it. Without it, you know the lore but can't work the art: a scholar of the occult, a charlatan, or someone still searching." : "");
+    $("role-skills").innerHTML = esc(((ROLE_SKILLS[ch.dept] || []).length && !ch.customRole ? `Core skills: ${ROLE_SKILLS[ch.dept].join(", ")} (marked Trained for you)` : "") +
+      (ch.dept === "Occultist" && !["incantare", "hexenbiest"].includes(ch.speciesId) ? ". Magic comes from your heritage: choose Incantare to work it. Without it, you know the lore but can't work the art: a scholar of the occult, a charlatan, or someone still searching." : ""))
+      + (roleAbility() ? `<br><b>${esc(roleAbility()[0])}.</b> ${esc(roleAbility()[1])}` : "");
     $("app").dataset.div = division();
     $("hdr-name").textContent = ch.name.trim() || "Unnamed character";
     const shapeCls = ch.portraitShape === "portrait" ? "portrait" : "";
@@ -4669,6 +4762,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (a2 && a2[4]) $("adv2-detail-label").textContent = a2[4];
     $("adv2-desc").textContent = a2 ? a2[2] : "Any general advantage. It brings no extra complication.";
     $("contact-wrap").hidden = !edgeN("contact");
+    $("talisman-wrap").hidden = !edgeN("talisman");
     $("gear-wrap").hidden = $("gearskill-wrap").hidden = !edgeN("gear");
     $("f-gearskill").value = ch.gear.skill;
     const al = allegianceOf();
@@ -4820,6 +4914,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ed.length ? `<div class="field"><span class="label">Edges</span><span>${esc(ed.join(", "))}</span></div>` : ""}
         ${a2 && edgeN("adv2") ? `<div class="field"><span class="label">Second advantage</span><b>${esc(a2[1])}${ch.adv2.detail ? ": " + esc(ch.adv2.detail) : ""}</b><span class="small muted">${esc(a2[2])}</span></div>` : ""}
         ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">Friend in town</span><span>${esc(ch.contact)}</span></div>` : ""}
+        ${edgeN("talisman") && ch.talisman ? `<div class="field"><span class="label">Talisman (renewed each case)</span><span>${esc(ch.talisman)}</span></div>` : ""}
         ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 ${esc(ch.gear.skill)})` : ""}</span></div>` : ""}
         ${al ? `<div class="field"><span class="label">Allegiance: ${esc(al[1])}</span><span class="small">${esc(al[2])}</span><span class="small muted">${esc(al[3])}</span></div>` : ""}
       </div>`; })()}
@@ -4829,6 +4924,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ch.reason ? `<div class="field"><span class="label">Why I stand against the dark</span><span>${esc(ch.reason)}</span></div>` : ""}
         ${ch.speciesNotes ? `<div class="field"><span class="label">Other ability (GM approved)</span><span>${esc(ch.speciesNotes)}</span></div>` : ""}
         ${ch.notes ? `<div class="field wide"><span class="label">Notes</span><span>${esc(ch.notes)}</span></div>` : ""}
+        ${roleAbility() ? `<div class="field wide"><span class="label">Calling ability</span><span><b>${esc(roleAbility()[0])}.</b> ${esc(roleAbility()[1])}</span></div>` : ""}
         ${ch.play.lasting.length ? `<div class="field wide"><span class="label">Lasting wounds</span><span>${ch.play.lasting.map((w) => `${esc(w.name)}${w.complication ? " (complication)" : w.heal ? ` (${esc(w.heal)})` : ""}`).join("; ")}</span></div>` : ""}
         ${ch.xp.earned || ch.advances.length ? `<div class="field wide"><span class="label">Advancement: ${pointsAvail()} point${pointsAvail() === 1 ? "" : "s"} to spend, ${ch.xp.earned} earned</span><span>${ch.advances.map((a) => `${esc(purchaseText(a))}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ") || "Nothing bought yet."}</span></div>` : ""}
       </div>`;
@@ -4881,7 +4977,8 @@ tr.lvl-U td.target { color: var(--muted); }
     if (isDefense(name)) parts.push(+$("r-quality").value || 0);
     if (isParry(name)) parts.push(-2 * (+$("r-parries").value || 0));
     if (!$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(1);
-    if (!$("r-called-wrap").hidden && +$("r-called").value) parts.push(+$("r-called").value);
+    // Know its weakness: no called-shot penalty against a creature the character has identified.
+    if (!$("r-called-wrap").hidden && +$("r-called").value && !($("r-weak").checked && !$("r-weak-wrap").hidden)) parts.push(+$("r-called").value);
     // In full woge, the woge profile's bonuses apply to rolls on those attributes and their skills; horses balk.
     const w = ch.play.woge && WESEN.has(ch.speciesId) && heritageOf()?.woge;
     if (w) {
@@ -4909,6 +5006,8 @@ tr.lvl-U td.target { color: var(--muted); }
     $("r-parries-wrap").hidden = !(isParry(sk) && defensesPerRound() > 1);
     $("r-aim-wrap").hidden = !["Shooting", "Melee", "Brawling"].includes(sk);
     $("r-called-wrap").hidden = !["Shooting", "Melee", "Brawling"].includes(sk);
+    $("r-weak-wrap").hidden = $("r-called-wrap").hidden || !+$("r-called").value || !hasFx("freeCalledShot");
+    if (hasFx("freeCalledShot")) $("r-weak-label").textContent = `Against a creature I've identified (${roleAbility()[0]}): no penalty`;
     const { name, base, total } = rollMods();
     const t = base + total;
     const incap = ch.play.injury >= 3;
@@ -5001,7 +5100,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function touch() { if (ch.example) ch.example = false; }
 
   // ---- events ----
-  const textMap = { "f-customrole": "dept", "f-contact": "contact", "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
+  const textMap = { "f-customrole": "dept", "f-contact": "contact", "f-talisman": "talisman", "f-name": "name", "f-species": "species", "f-rank": "rank", "f-role": "role", "f-reason": "reason",
     "f-speciesnotes": "speciesNotes", "f-connection": "connection", "f-notes": "notes", "f-otherequip": "otherEquip" };
   document.addEventListener("input", (e) => {
     const id = e.target.id;
@@ -5094,7 +5193,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isBlock(t.value) || isParry(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
@@ -5356,10 +5455,12 @@ tr.lvl-U td.target { color: var(--muted); }
     $("gm-add-pregen").innerHTML = `<option value="">Choose a ready-made character…</option>` +
       PREGENS.map((c, i) => `<option value="${i}">${esc(c.name)}: ${esc(c.dept)}</option>`).join("");
     // Turn order: Agility, highest first; ties flagged for the players to settle.
-    const order = gmCrew.map((c) => ({ c, a: c.attrs.Agility })).sort((x, y) => y.a - x.a || x.c.name.localeCompare(y.c.name));
-    $("gm-turns").innerHTML = order.length ? order.map(({ c, a }, i) => {
-      const tied = order.some((o, j) => j !== i && o.a === a);
-      return `<li>${esc(c.name || "Unnamed")}<span class="num">Agility ${a}</span>${tied ? '<span class="tie">tie</span>' : ""}${c.play.injury >= 3 ? ' <span class="tie">down</span>' : ""}</li>`;
+    // In the first round of a gunfight, a calling with Quick draw acts first, whatever its Agility.
+    const first = (c) => (gunfight && hasFx("firstInGunfight", c) ? 1 : 0);
+    const order = gmCrew.map((c) => ({ c, a: c.attrs.Agility, q: first(c) })).sort((x, y) => y.q - x.q || y.a - x.a || x.c.name.localeCompare(y.c.name));
+    $("gm-turns").innerHTML = order.length ? order.map(({ c, a, q }, i) => {
+      const tied = order.some((o, j) => j !== i && o.a === a && o.q === q);
+      return `<li>${esc(c.name || "Unnamed")}<span class="num">Agility ${a}</span>${q ? `<span class="tie">${esc(roleAbility(c)[0])}</span>` : ""}${tied ? '<span class="tie">tie</span>' : ""}${c.play.injury >= 3 ? ' <span class="tie">down</span>' : ""}</li>`;
     }).join("") : `<li class="muted" style="list-style:none;margin-left:-1.6em">Add characters to see the turn order.</li>`;
     $("gm-grid").innerHTML = gmCrew.length ? gmCrew.map((c) => {
       const k = gmCalc(c), inj = c.play.injury;
@@ -5381,6 +5482,7 @@ tr.lvl-U td.target { color: var(--muted); }
       </article>`;
     }).join("") : `<div class="card hud"><p class="muted">No characters yet. Ask each player to <b>Save to file</b> and send you the file, then open them all at once above. You can also add characters saved in this browser, or the ready-made characters for a quick game.</p></div>`;
   }
+  $("gm-gunfight").addEventListener("change", (e) => { gunfight = e.target.checked; renderGM(); });
   $("gm-grid").addEventListener("click", (e) => {
     const el = e.target.closest("[data-gm]"); if (!el || el.matches("input")) return;
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
