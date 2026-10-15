@@ -259,13 +259,18 @@ def gen(name, pack, t):
             "- **A limb for a life.** Once a fight, a character who would be left Dying or killed can **lose a limb, or the use of one**, instead. They live, Incapacitated but stable, and the limb becomes a complication. It replaces any grievous wound from the same hit.",
             "- **Healing.** Grievous wounds heal on their own clock, whatever the boxes say. A lost limb, a lost eye or a disfigurement never heals.", ""])
     if name == "battlemap":
-        rt = p.get("rangeTrack")
-        if not rt:
-            return ""
-        bands = ", ".join(f"{b[0]} ({b[1]})" for b in rt["bands"])
-        return "\n".join(["", f"**{rt['title']}.** In this setting the range track is for {rt['title'].lower()}s, with the bands {bands}. "
-            f"**Add {rt['us'][0].lower() + rt['us'][1:]}** places a token linked to the crew's {rt['vehicleTrack']} track, so damage marked on the map is marked on the sheet. "
-            f"Enemy ships come from the {rt['threats']} table with their {rt['vehicleTrack']} boxes. {rt.get('note', '')}".rstrip(), ""])
+        out = []
+        for rt in p.get("rangeTracks") or ([p["rangeTrack"]] if p.get("rangeTrack") else []):
+            if rt.get("vehicleTrack"):
+                bands = ", ".join(f"{b[0]} ({b[1]})" for b in rt["bands"])
+                out.append(f"**{rt['title']}.** In this setting the range track is for {rt['title'].lower()}s, with the bands {bands}. "
+                    f"**Add {rt['us'][0].lower() + rt['us'][1:]}** places a token linked to the crew's {rt['vehicleTrack']} track, so damage marked on the map is marked on the sheet. "
+                    f"Enemy ships come from the {rt['threats']} table with their {rt['vehicleTrack']} boxes. {rt.get('note', '')}".rstrip())
+            elif rt.get("vehicle"):
+                v = rt["vehicle"]
+                out.append(f"**{rt['title']}.** Besides the plain range track, the map has a **{rt['title']}** track. **Add {rt['us'][0].lower() + rt['us'][1:]}** places {v['name'][0].lower() + v['name'][1:]} "
+                    f"in the first lane with its own {v['label']} boxes; its panel shows what the damage does. The rules are under *{rt['title'].split()[0]} chases*.")
+        return "\n".join(["", *[x + "\n" for x in out]]) if out else ""
     if name == "extra-edges":
         return "\n".join(f"| {e[1]} | {e[2]} | {e[3]} |" for e in p.get("extraEdges", []))
     if name == "statuses":

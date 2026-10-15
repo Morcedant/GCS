@@ -3569,6 +3569,7 @@
     "about a light-second"
    ]
   ],
-  "note": "Each lane is a range band from our ship. When the pilots make their opposed Piloting roll, drag the enemy one lane in or out. Weapons take −2 one band beyond their range and −4 two bands beyond."
+  "note": "Each lane is a range band from our ship. When the pilots make their opposed Piloting roll, drag the enemy one lane in or out. Weapons take −2 one band beyond their range and −4 two bands beyond.",
+  "help": "for ships closing or opening the range. Each lane is a range band from our ship."
  }
 }
