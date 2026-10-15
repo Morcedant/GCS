@@ -1565,6 +1565,49 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Ask concrete questions and explain your approach. Evidence may require several different tasks. Persuasion can secure cooperation, Read People offers insight into behavior, and Wesen Lore explains what the evidence means. A successful roll does not force someone to abandon a core belief or reveal what they do not know.</p>
 <h2 id="g-chases">Chases</h2>
 <p>Run a chase as a progress clock for the pursuers against a danger clock for the quarry’s escape. Each exchange, characters roll <strong>Riding</strong> (or Athletics on foot): success ticks the pursuers’ clock, failure ticks the escape. Terrain, a tired horse, or a shot fired from the saddle (Shooting at −2) adjust the rolls.</p>
+<h3 id="g-stagecoach-chases">Stagecoach chases</h3>
+<p>A coach on the road with riders closing in is a chase where distance is everything. Run it on the battle map’s <strong>Stagecoach chase</strong> track, in the GM view, instead of the chase clocks.</p>
+<ul>
+<li><strong>The lanes.</strong> The stagecoach has its own lane, and each rider stands in a range band from it: Close (alongside), Short, Medium, Long or Extreme. Riders usually start at Medium or Long.</li>
+<li><strong>Each exchange.</strong> The driver rolls Riding against each rider’s Riding (11 for a threat without it). The winner moves that rider one band: closer if the rider won, farther if the driver did. A tie leaves it where it is, and a rider pushed past Extreme drops out of the chase. A fresh horse or a good road gives +2; rough ground or a tired team gives −2.</li>
+<li><strong>Fighting on the move.</strong> Everyone else acts as usual. Shooting from the box, the roof or the saddle is at −2, on top of the range penalty. At Close, a rider can board with an Athletics roll, and then it is fists, knives and shotguns at arm’s length. A passenger can climb out to the box or onto the roof as their move.</li>
+<li><strong>Hurting the coach.</strong> A hit aimed at the team or a wheel (a called shot, −2) marks one box on the coach’s track. Dynamite, a crash, or a driver who fails by 5 or more on rough ground marks one more.</li>
+<li><strong>The driver goes down.</strong> If the driver is Incapacitated or knocked from the box, the team bolts. Someone must reach the box and take the reins (Riding −2) before the next exchange, or the coach marks a box.</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Boxes</th>
+<th>The coach</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>Rolling: no damage</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>Holed: splinters and bullet holes; no penalty yet</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>A horse hit or a wheel cracked: −2 to the driver’s Riding</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>Lamed: −4 to the driver’s Riding, and riders close on a tie</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>Wrecked: the coach overturns or stops dead; everyone aboard rolls Athletics or marks a box of Injury</td>
+</tr>
+</tbody>
+</table>
 <h1 id="g-the-woge-and-the-hidden-world">The woge and the hidden world</h1>
 <h2 id="g-wesen-and-the-woge">Wesen and the woge</h2>
 <p>Every Wesen heritage follows the <strong>core Wesen rules</strong> and has a <strong>woge profile</strong> (both in the Heritages chapter). In short:</p>
@@ -5517,7 +5560,8 @@ tr.lvl-U td.target { color: var(--muted); }
 //   setCrew(id, patch) writes a change back (patch: injury, dying, stunned, points, ptrack); pointName, stunName
 //   threats: [{ id, name, boxes, dodge, attacks, trait }], the setting's opponents; vehicles: the same for ships
 //   bands: [[name, maxYards]], the personal range bands; kmBands: [[name, maxKm]] where the setting has space
-//   rangeTrack: { title, us, bands: [[name, distance text]], note, vehicleTrack } for the range track
+//   rangeTracks: [{ id, title, us, bands: [[name, distance text]], note, help, startLane, vehicleTrack (a crew track, e.g. Hull) or
+//     vehicle: { name, boxes, label, effects: [text per boxes marked], downText } (its own boxes, e.g. a stagecoach) }]; or rangeTrack: one
 //   groupTracks(): [{ name, boxes, value, effect }] and setGroupTrack(name, value): the crew's shared tracks (Hull)
 // Returns { refresh() } to call when the characters or tracks change.
 function mountBattleMap(api) {
@@ -5525,21 +5569,28 @@ function mountBattleMap(api) {
   const esc = api.esc, KEY = api.key + ".battlemap.v1";
   const say = (m, err) => (api.toast ? api.toast(m, err) : null);
   const PARTY = api.partyName || "party", Party = PARTY[0].toUpperCase() + PARTY.slice(1);
-  const RT = Object.assign({ title: "Range track", us: "Us", note: "", bands: [["Close", "up to 10 yd"], ["Short", "up to 50 yd"], ["Medium", "up to 150 yd"], ["Long", "up to 500 yd"], ["Extreme", "up to a mile"]] }, api.rangeTrack || {});
+  // The range tracks: the setting's own (a ship fight, a stagecoach chase), or one plain track. The first is "range".
+  const TRACKS = ((api.rangeTracks || []).length ? api.rangeTracks : [api.rangeTrack || {}]).map((r, i) => Object.assign({ title: "Range track", us: "Us", note: "",
+    bands: [["Close", "up to 10 yd"], ["Short", "up to 50 yd"], ["Medium", "up to 150 yd"], ["Long", "up to 500 yd"], ["Extreme", "up to a mile"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
+  const addName = (x) => x.replace(/^(Our|The) /, (m) => m.toLowerCase());
   const UNITS = { yd: { name: "yards", one: "yard", bands: api.bands || [], presets: [1, 2, 5, 10, 50] } };
   if ((api.kmBands || []).length) UNITS.km = { name: "km", one: "km", bands: api.kmBands, presets: [1, 10, 100, 1000, 10000] };
   const fresh = () => ({ kind: "hex", scale: { n: 1, unit: "yd" }, size: 36, orient: "pointy", ox: 31.2, oy: 36, cols: 24, rows: 16, grid: true, gridAlpha: 0.45,
-    view: { x: 0, y: 0, z: 1 }, tokens: [], bgW: 0, bgH: 0, rt: { tokens: [], view: { x: 0, y: 0, z: 1 } } });
-  const normal = (v) => { const s = Object.assign(fresh(), v || {}); s.rt = Object.assign({ tokens: [], view: { x: 0, y: 0, z: 1 } }, s.rt || {});
-    if (!s.scale || !UNITS[s.scale.unit] || !(s.scale.n > 0)) s.scale = { n: 1, unit: "yd" }; if (s.kind !== "range") s.kind = "hex"; return s; };
+    view: { x: 0, y: 0, z: 1 }, tokens: [], bgW: 0, bgH: 0, rts: {} });
+  // Each range track keeps its own tokens and view in st.rts (older maps kept one track in st.rt).
+  const normal = (v) => { const s = Object.assign(fresh(), v || {}); s.rts = Object.assign({}, s.rts || {}); if (s.rt) { s.rts.range = s.rts.range || s.rt; delete s.rt; }
+    for (const t of TRACKS) s.rts[t.id] = Object.assign({ tokens: [], view: { x: 0, y: 0, z: 1 } }, s.rts[t.id] || {});
+    if (!s.scale || !UNITS[s.scale.unit] || !(s.scale.n > 0)) s.scale = { n: 1, unit: "yd" }; if (!TRACKS.some((t) => t.id === s.kind)) s.kind = "hex"; return s; };
   let st = normal(load());
-  const bgs = { hex: null, range: null }; // the pictures, as data URLs (kept in IndexedDB)
+  const bgs = {}; // the pictures by map ("hex" or a track's id), as data URLs (kept in IndexedDB)
   let sel = null, mode = "move", drag = null, measure = null, pointers = new Map();
-  const isRange = () => st.kind === "range";
-  const toks = () => (isRange() ? st.rt.tokens : st.tokens);
-  const setToks = (l) => { if (isRange()) st.rt.tokens = l; else st.tokens = l; };
-  const V = () => (isRange() ? st.rt.view : st.view);
-  const bgKey = (k = st.kind) => KEY + (k === "range" ? ".bgr" : ".bg");
+  const isRange = () => st.kind !== "hex";
+  let RT = TRACKS.find((t) => t.id === st.kind) || TRACKS[0];
+  const toks = () => (isRange() ? st.rts[st.kind].tokens : st.tokens);
+  const setToks = (l) => { if (isRange()) st.rts[st.kind].tokens = l; else st.tokens = l; };
+  const V = () => (isRange() ? st.rts[st.kind].view : st.view);
+  const bgKey = (k = st.kind) => KEY + (k === "hex" ? ".bg" : k === "range" ? ".bgr" : ".bgr-" + k);
+  const KINDS = ["hex", ...TRACKS.map((t) => t.id)];
 
   // ---- storage ----
   function load() { try { const v = JSON.parse(localStorage.getItem(KEY) || "null"); return v && typeof v === "object" ? v : {}; } catch { return {}; } }
@@ -5580,7 +5631,7 @@ function mountBattleMap(api) {
 
   // ---- the range track: a lane for "us", then one per band ----
   const LW = 220, LH = 640, HEAD = 76;
-  const lanes = () => [[RT.us, RT.vehicleTrack ? "" : `where the ${PARTY} stands`], ...RT.bands];
+  const lanes = () => [[RT.us, RT.vehicleTrack || RT.vehicle ? "" : `where the ${PARTY} stands`], ...RT.bands];
   const laneX = (i) => i * LW + LW / 2;
   const laneOf = (x) => Math.max(0, Math.min(lanes().length - 1, Math.round((x - LW / 2) / LW)));
   const laneName = (i) => (i === 0 ? RT.us : lanes()[i][0]);
@@ -5595,14 +5646,18 @@ function mountBattleMap(api) {
 
   // ---- the help: how to use the map, written for this setting (its point name, its units, its ship) ----
   function helpHtml() {
-    const pt = esc(api.pointName || "Legend"), km = !!UNITS.km, veh = !!RT.vehicleTrack, rt = esc(RT.title), us = esc(RT.us);
+    const pt = esc(api.pointName || "Legend"), km = !!UNITS.km, veh = TRACKS.some((t) => t.vehicleTrack), anyVeh = TRACKS.filter((t) => t.vehicleTrack || t.vehicle);
+    const trackHelp = (t) => `<b>${esc(t.title)}<\/b> ${t.help ? esc(t.help) : `for a fight where only distance matters: a chase, a running fight across open country. Each lane is a range band from the ${esc(PARTY)}.`}`;
+    const vName = (t) => esc(t.vehicle ? t.vehicle.name || t.us : t.us), vLabel = (t) => esc(t.vehicle ? t.vehicle.label || "Damage" : t.vehicleTrack);
+    const vAdd = (t) => `<b>Add ${esc(addName(t.us))}<\/b> (on the ${esc(t.title)}) places ${esc(addName(vName(t)))}, ${t.vehicle ? `with its own ${vLabel(t)} boxes` : `linked to the crew's ${vLabel(t)} track`}.`;
+    const vPanel = (t) => `<b>${vName(t)}<\/b> shows its ${vLabel(t)} boxes and what the damage does${t.vehicle ? `. When they are all marked it is ${esc((t.vehicle.downText || "wrecked").toLowerCase())}` : "; they are the crew's track, the same as on the sheet"}.`;
     const sec = (h, items) => `<h4>${h}<\/h4><ul>${items.filter(Boolean).map((x) => `<li>${x}<\/li>`).join("")}<\/ul>`;
     return `<div class="bm-helpbody small">
       <p>Add characters to the GM view first: the map's tokens for the ${esc(PARTY)} come from there. The map is kept in this browser; save it to a file to keep a copy.<\/p>
       ${sec("1. Choose the kind of map", [
         `<b>Hex map<\/b> for a fight where position matters: who is behind cover, who can reach the door.`,
-        `<b>${rt}<\/b> for a fight where only distance matters: ${veh ? "ships closing or opening the range, " : ""}a chase, a running fight across open country. Each lane is a range band from ${veh ? "your ship" : "the " + esc(PARTY)}.`,
-        `The two keep their own tokens and pictures, so you can set up both and switch between them.`])}
+        ...TRACKS.map(trackHelp),
+        `Each map keeps its own tokens and picture, so you can set them all up and switch between them.`])}
       ${sec("2. Set up the hex map", [
         `<b>Background image…<\/b> puts a picture under the grid: a battle map, a sketch, a photo of a street. A new picture is covered with hexes at the current hex size.`,
         `Open <b>Scale, grid and map<\/b> and set <b>One hex is<\/b> to what a hex means: 1 yard for a brawl in a room, 5 or 10 for a street, 50 for open ground${km ? ", or a number of km for a fight in space" : ""}. Distances and range bands follow the scale.`,
@@ -5610,38 +5665,38 @@ function mountBattleMap(api) {
         `Turn <b>Show grid<\/b> off, or lower its strength, when the picture has a grid of its own.`])}
       ${sec("3. Place tokens", [
         `<b>Add the ${esc(PARTY)}<\/b> places every character in the GM view${veh ? "" : ", in the middle of the map"}. Their tokens show their portrait (or initials) and group color, and stay linked to the character.`,
-        veh ? `<b>Add ${us.replace(/^Our /, "our ")}<\/b> places your ship, linked to the crew's ${esc(RT.vehicleTrack)} track.` : "",
+        ...anyVeh.map(vAdd),
         `<b>Add a token<\/b> opens a small form. Pick from <b>From the threats<\/b> to fill in the name, boxes and the threat's numbers${veh ? " (enemy ships are listed with the people)" : ""}, or leave it on <i>None<\/i> for a plain token. Names with a number count up, so pressing <b>Place it<\/b> again adds the next one.`,
         `Give a token a <b>color<\/b>, a <b>size<\/b> (Large or Huge for a horse, a monster, a ship) and, if you like, an <b>image<\/b>.`])}
       ${sec("4. Move, measure and look", [
-        `Drag a token to move it. While you drag, the corner shows how far it went and the range band${veh ? "; on the " + rt + ", which band it moved into" : ""}.`,
+        `Drag a token to move it. While you drag, the corner shows how far it went and the range band; on a range track, which band it moved into.`,
         `<b>Measure<\/b> (hex map only): drag from one hex to another to read the distance. Press it again to go back to moving.`,
         `Drag the empty map to pan. Scroll, pinch, or use <b>−<\/b>, <b>+<\/b> and <b>Fit<\/b> to zoom.`,
         `From the keyboard: Tab to a token, Enter selects it, Delete removes it.`])}
       ${sec("5. Track the fight from a token", [
         `Click a token to open its panel underneath the map.`,
         `<b>A token from the ${esc(PARTY)}<\/b> shows the character's Injury boxes, Dying, the stunned condition, ${pt} points and any personal track. Changes there change the character in the GM view, and the other way round.`,
-        veh ? `<b>Your ship<\/b> shows the ${esc(RT.vehicleTrack)} boxes and what the damage does; they are the crew's track, the same as on the sheet.` : "",
+        ...anyVeh.map(vPanel),
         `<b>Any other token<\/b> keeps its own boxes, shown as pips above it. When they are all marked it is taken out${veh ? " (or destroyed, for a ship)" : ""} and fades.`,
         `<b>Copy<\/b> makes another of the same, <b>Remove<\/b> takes it off the map, <b>Done<\/b> closes the panel.`])}
       ${sec("6. Keep the map", [
         `The map, its tokens and its pictures are kept in this browser for this setting, until you clear them.`,
-        `<b>Save map to file<\/b> keeps everything (both maps, their pictures and tokens) in one file; <b>Open a map file…<\/b> brings it back here or on another computer. Use it to prepare fights ahead of time or send one to another GM.`,
+        `<b>Save map to file<\/b> keeps everything (every map, its picture and tokens) in one file; <b>Open a map file…<\/b> brings it back here or on another computer. Use it to prepare fights ahead of time or send one to another GM.`,
         `<b>Remove the image<\/b> and <b>Remove all tokens<\/b> clear the map you are looking at.`])}
     <\/div>`;
   }
   // ---- markup ----
-  const hasVehicle = () => !!(RT.vehicleTrack && api.groupTracks && api.groupTracks().some((x) => x.name === RT.vehicleTrack));
+  const hasVehicle = () => isRange() && (!!RT.vehicle || !!(RT.vehicleTrack && api.groupTracks && api.groupTracks().some((x) => x.name === RT.vehicleTrack)));
   api.root.innerHTML = `
     <details class="bm-help"><summary>How to use the map<\/summary>${helpHtml()}<\/details>
     <div class="bm-bar bm-kinds" role="group" aria-label="Kind of map">
-      <button class="btn" data-bm="kind" data-kind="hex">Hex map<\/button><button class="btn" data-bm="kind" data-kind="range">${esc(RT.title)}<\/button>
+      <button class="btn" data-bm="kind" data-kind="hex">Hex map<\/button>${TRACKS.map((t) => `<button class="btn" data-bm="kind" data-kind="${esc(t.id)}">${esc(t.title)}<\/button>`).join("")}
       <span class="small muted bm-kindnote"><\/span>
     <\/div>
     <div class="bm-bar">
       <label class="btn bm-file" tabindex="0">Background image…<input type="file" accept="image/*" data-bm="bg" class="bm-hide"><\/label>
       <button class="btn" data-bm="posse">Add the ${esc(PARTY)}<\/button>
-      <button class="btn" data-bm="vehicle" hidden>Add ${esc(RT.us.replace(/^Our /, "our "))}<\/button>
+      <button class="btn" data-bm="vehicle" hidden><\/button>
       <button class="btn" data-bm="add">Add a token<\/button>
       <button class="btn" data-bm="measure" aria-pressed="false">Measure<\/button>
       <span class="bm-zoom"><button class="btn" data-bm="out" aria-label="Zoom out">−<\/button><button class="btn" data-bm="fit">Fit<\/button><button class="btn" data-bm="in" aria-label="Zoom in">+<\/button><\/span>
@@ -5680,7 +5735,7 @@ function mountBattleMap(api) {
         <\/div>
         <p class="small muted">The scale sets what a hex means: distances and range bands follow it. To line the grid up with a map that has its own grid, set the hex size on screen first, then shift it into place.<\/p>
       <\/div>
-      <p class="small muted bm-rangeonly">${esc(RT.note || `Each lane is a range band from the ${PARTY}. Drag a token into another lane to move it a band in or out.`)}<\/p>
+      <p class="small muted bm-rangeonly bm-rtnote"><\/p>
       <div class="bm-bar"><button class="btn bm-hexonly" data-bm="align">Fit the grid to the picture<\/button><button class="btn" data-bm="bgoff">Remove the image<\/button><button class="btn" data-bm="clear">Remove all tokens<\/button>
         <button class="btn" data-bm="savefile">Save map to file<\/button><label class="btn bm-file" tabindex="0">Open a map file…<input type="file" accept=".json,application/json" data-bm="openfile" class="bm-hide"><\/label><\/div>
     <\/details>`;
@@ -5775,11 +5830,11 @@ function mountBattleMap(api) {
         ${c.ptrack ? `<span class="bm-track">${esc(c.ptrack.name)} ${boxRow(c.ptrack.max, c.ptrack.value || 0, "data-bmc-ptrack", c.ptrack.name)}<\/span>` : ""}<\/div>`;
     else if (tr) tracks = `<div class="bm-tracks"><span class="bm-track">${esc(tr.name)} ${boxRow(tr.boxes, tr.value || 0, "data-bmk-track", tr.name)}<\/span>
         ${tr.effect ? `<span class="bm-stats small">${esc(tr.effect)}<\/span>` : ""}<\/div>`;
-    else tracks = `<div class="bm-tracks">${t.stats ? `<span class="bm-stats small">${esc(t.stats)}<\/span>` : ""}
-        <span class="bm-track">${esc(t.boxLabel || "Injury")} ${boxRow(t.boxes || 1, t.injury || 0, "data-bmt-injury", t.boxLabel || "Injury")}<\/span>${(t.injury || 0) >= (t.boxes || 1) ? `<b class="small">${t.boxLabel === "Hull" ? "Destroyed" : "Taken out"}<\/b>` : ""}
+    else tracks = `<div class="bm-tracks">${t.stats ? `<span class="bm-stats small">${esc(t.stats)}<\/span>` : ""}${t.effects ? `<span class="bm-stats small">${esc(t.effects[Math.min(t.injury || 0, t.effects.length - 1)] || "")}<\/span>` : ""}
+        <span class="bm-track">${esc(t.boxLabel || "Injury")} ${boxRow(t.boxes || 1, t.injury || 0, "data-bmt-injury", t.boxLabel || "Injury")}<\/span>${(t.injury || 0) >= (t.boxes || 1) ? `<b class="small">${esc(t.downText || (t.boxLabel === "Hull" ? "Destroyed" : "Taken out"))}<\/b>` : ""}
         <label>Boxes <input type="number" min="1" max="12" data-bms="boxes" value="${t.boxes || 1}" style="width:4.5em"><\/label><\/div>`;
     const whose = c ? `(from the ${esc(PARTY)}${c.dying ? ", Dying" : c.down ? ", down" : ""}: changes here change the character)` : tr ? `(the ${esc(tr.name)} track: changes here change the crew's track)` : "";
-    box.innerHTML = `<b>${esc(k.name || "Token")}<\/b>${whose ? ` <span class="small muted">${whose}<\/span>` : ""}${isRange() ? ` <span class="small muted">· ${esc(laneName(t.lane || 0))}<\/span>` : ""}
+    box.innerHTML = `<b>${esc(k.name || "Token")}<\/b>${whose ? ` <span class="small muted">${whose}<\/span>` : ""}${isRange() && laneName(t.lane || 0) !== k.name ? ` <span class="small muted">· ${esc(laneName(t.lane || 0))}<\/span>` : ""}
       ${tracks}
       ${c ? "" : `<label>Name <input type="text" data-bms="name" value="${esc(t.name || "")}"><\/label><label>Color <input type="color" data-bms="color" value="${esc(t.color || "#777777")}"><\/label>`}
       <label>Size <select data-bms="tsize">${[["1", "Normal"], ["2", "Large"], ["3", "Huge"]].map(([n, l]) => `<option value="${n}"${String(t.tsize || 1) === n ? " selected" : ""}>${l}<\/option>`).join("")}<\/select><\/label>
@@ -5794,7 +5849,8 @@ function mountBattleMap(api) {
     $(".bm-presetbtns").innerHTML = "Quick: " + pre.map((v) => `<button type="button" class="linkish" data-bmpre="${v}">${fmt(v)}<\/button>`).join(" · ");
     $('[data-bm="measure"]').setAttribute("aria-pressed", mode === "measure");
     $('[data-bm="measure"]').hidden = isRange();
-    $('[data-bm="vehicle"]').hidden = !hasVehicle();
+    $('[data-bm="vehicle"]').hidden = !hasVehicle(); $('[data-bm="vehicle"]').textContent = `Add ${addName(RT.us)}`;
+    $(".bm-rtnote").textContent = RT.note || `Each lane is a range band from the ${PARTY}. Drag a token into another lane to move it a band in or out.`;
     api.root.querySelectorAll('[data-bm="kind"]').forEach((b) => b.setAttribute("aria-pressed", b.dataset.kind === st.kind));
     api.root.querySelectorAll(".bm-hexonly").forEach((x) => (x.hidden = isRange()));
     api.root.querySelectorAll(".bm-rangeonly").forEach((x) => (x.hidden = !isRange()));
@@ -5844,8 +5900,8 @@ function mountBattleMap(api) {
   // A new token's place: the middle of the hex map, or the next free spot down a lane of the range track.
   function spot(lane) {
     if (!isRange()) return freeHexNear(centerHex());
-    const n = st.rt.tokens.filter((t) => (t.lane || 0) === lane).length;
-    return { lane, y: HEAD + 56 + (n % 6) * 96 };
+    const n = toks().filter((t) => (t.lane || 0) === lane).length;
+    return { lane, y: HEAD + 60 + (n % 5) * 112 };
   }
   const uid = () => Math.random().toString(36).slice(2, 10);
 
@@ -5947,7 +6003,7 @@ function mountBattleMap(api) {
     const k = b.dataset.bm, t = toks().find((x) => x.id === sel);
     if (k === "kind") {
       if (st.kind === b.dataset.kind) return;
-      st.kind = b.dataset.kind; sel = null; measure = null; mode = "move"; fillThreats(); save(); draw();
+      st.kind = b.dataset.kind; RT = TRACKS.find((t) => t.id === st.kind) || TRACKS[0]; sel = null; measure = null; mode = "move"; fillThreats(); save(); draw();
       if (!V().set) fit();
     } else if (k === "posse") {
       const crew = api.crew(), have = new Set(toks().map((x) => x.ref).filter(Boolean)), add = crew.filter((c) => !have.has(c.id));
@@ -5955,8 +6011,12 @@ function mountBattleMap(api) {
       for (const c of add) toks().push({ id: uid(), ref: c.id, tsize: 1, ...spot(0) });
       save(); draw(); say(add.length ? `Placed ${add.length} from the ${PARTY}.` : `The whole ${PARTY} is already on the map.`);
     } else if (k === "vehicle") {
-      if (toks().some((x) => x.track === RT.vehicleTrack)) { say(`${RT.us} is already on the map.`); return; }
-      toks().push({ id: uid(), track: RT.vehicleTrack, name: RT.us, color: "#3d7a9e", tsize: 2, ...spot(0) }); save(); draw();
+      if (toks().some((x) => (RT.vehicle ? x.vehicle === RT.id : x.track === RT.vehicleTrack))) { say(`${RT.us} is already on the map.`); return; }
+      // A setting's own vehicle (the stagecoach) keeps its boxes on the token; the crew's ship is linked to the crew's track.
+      const v = RT.vehicle;
+      toks().push(v ? { id: uid(), vehicle: RT.id, name: v.name || RT.us, color: v.color || "#8a5a2b", tsize: 2, boxes: v.boxes || 4, injury: 0, boxLabel: v.label || "Damage", effects: v.effects || null, downText: v.downText || "Wrecked", ...spot(0) }
+        : { id: uid(), track: RT.vehicleTrack, name: RT.us, color: "#3d7a9e", tsize: 2, ...spot(0) });
+      save(); draw();
     } else if (k === "add") { const f = $(".bm-add"); f.hidden = !f.hidden; if (!f.hidden) $('[data-bmf="name"]').focus(); }
     else if (k === "addgo") {
       const name = $('[data-bmf="name"]').value.trim(), th = allThreats().find((x) => x.id === $('[data-bmf="threat"]').value);
@@ -5974,11 +6034,11 @@ function mountBattleMap(api) {
     else if (k === "bgoff") { bgs[st.kind] = null; if (!isRange()) st.bgW = st.bgH = 0; await idb.del(bgKey()); save(); draw(); }
     else if (k === "clear") { if (!toks().length || confirm("Remove every token from this map?")) { setToks([]); sel = null; save(); draw(); } }
     else if (k === "savefile") {
-      const blob = new Blob([JSON.stringify({ format: "legend-dynamics-battlemap", version: 2, map: st, background: bgs.hex, backgroundRange: bgs.range })], { type: "application/json" });
+      const blob = new Blob([JSON.stringify({ format: "legend-dynamics-battlemap", version: 3, map: st, backgrounds: bgs })], { type: "application/json" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "battle-map.json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     } else if (k === "del" && t) { setToks(toks().filter((x) => x !== t)); sel = null; save(); draw(); }
     else if (k === "dup" && t) {
-      const n = { ...t, id: uid(), ref: null, track: null, injury: 0, name: (t.name || "").replace(/(\d+)$/, (d) => +d + 1), ...(isRange() ? spot(t.lane || 0) : freeHexNear({ q: t.q, r: t.r })) };
+      const n = { ...t, id: uid(), ref: null, track: null, vehicle: null, injury: 0, name: (t.name || "").replace(/(\d+)$/, (d) => +d + 1), ...(isRange() ? spot(t.lane || 0) : freeHexNear({ q: t.q, r: t.r })) };
       const i = info(t); if (live(t) || trackOf(t)) Object.assign(n, { name: i.name, color: i.color, img: i.img, boxes: i.boxes });
       toks().push(n); sel = n.id; save(); draw();
     } else if (k === "desel") { sel = null; draw(); }
@@ -5989,8 +6049,9 @@ function mountBattleMap(api) {
     else if (i.dataset.bmf === "img" && i.files[0]) { try { pendingImg = (await readImage(i.files[0], 256)).url; say("Image ready for the next token."); } catch { say("That file isn't an image.", true); } i.value = ""; }
     else if (i.dataset.bm === "openfile" && i.files[0]) {
       try { const d = JSON.parse(await i.files[0].text()); if (d.format !== "legend-dynamics-battlemap") throw 0;
-        st = normal(d.map); bgs.hex = d.background || null; bgs.range = d.backgroundRange || null;
-        for (const kk of ["hex", "range"]) { if (bgs[kk]) await idb.set(bgKey(kk), bgs[kk]); else await idb.del(bgKey(kk)); }
+        st = normal(d.map); RT = TRACKS.find((t) => t.id === st.kind) || TRACKS[0];
+        const pics = d.backgrounds || { hex: d.background, range: d.backgroundRange };
+        for (const kk of KINDS) { bgs[kk] = pics[kk] || null; if (bgs[kk]) await idb.set(bgKey(kk), bgs[kk]); else await idb.del(bgKey(kk)); }
         sel = null; fillThreats(); save(); draw(); fit(); say("Map opened.");
       } catch { say("That isn't a battle map file.", true); }
       i.value = "";
@@ -6016,11 +6077,11 @@ function mountBattleMap(api) {
   if (window.ResizeObserver) new ResizeObserver(() => { viewBox(); if (svg.clientWidth && !V().set) { fit(); V().set = false; } }).observe(svg);
 
   fillThreats();
-  Promise.all([idb.get(bgKey("hex")), idb.get(bgKey("range"))]).then(([h, r]) => { bgs.hex = h || null; bgs.range = r || null; draw(); if (!V().set && svg.clientWidth) fit(); });
+  Promise.all(KINDS.map((k) => idb.get(bgKey(k)))).then((l) => { KINDS.forEach((k, i) => (bgs[k] = l[i] || null)); draw(); if (!V().set && svg.clientWidth) fit(); });
   draw();
   return { refresh: () => {
     const ids = new Set(api.crew().map((c) => c.id));
-    st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); st.rt.tokens = st.rt.tokens.filter((t) => !t.ref || ids.has(t.ref));
+    st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();
   } };
 }
@@ -6049,6 +6110,8 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   const battleMap = mountBattleMap({ root: $("battlemap"), key: "grimm-west", esc, toast: gmSay,
     bands: [["Close", 10], ["Short", 50], ["Medium", 150], ["Long", 500], ["Extreme", 1760]],
     pointName: "Grit", stunName: "Dazed", partyName: "posse",
+    // The plain range track, and a stagecoach chase (the coach keeps its own boxes; see Stagecoach chases in the guide).
+    rangeTracks: [{}, {"id": "stagecoach", "title": "Stagecoach chase", "us": "The stagecoach", "startLane": 3, "help": "for a chase on the road: the coach and everyone aboard against riders closing in. The coach has the first lane; each rider stands in a range band from it.", "bands": [["Close", "alongside: board or grapple"], ["Short", "up to 50 yd"], ["Medium", "up to 150 yd"], ["Long", "up to 500 yd"], ["Extreme", "one band more and they're lost"]], "note": "Each exchange the driver rolls Riding against each rider's Riding (11 for a threat without it). The winner moves that rider one lane: in if the rider won, out if the driver did; a tie stays put. A rider pushed past Extreme drops out. Shooting from the box, the roof or the saddle is at −2.", "vehicle": {"name": "The stagecoach", "boxes": 4, "label": "Coach", "downText": "Wrecked", "color": "#8a5a2b", "effects": ["Rolling: no damage", "Holed: splinters and bullet holes; no penalty yet", "A horse hit or a wheel cracked: −2 to the driver's Riding", "Lamed: −4 to the driver's Riding, and riders close on a tie", "Wrecked: the coach overturns or stops dead; everyone aboard rolls Athletics or marks a box of Injury"]}}],
     // The threats come from the Players' Guide's Threats table on this page.
     threats: threatsFromGuide($("guide")),
     crew: () => gmCrew.map((c) => { const k = gmCalc(c);

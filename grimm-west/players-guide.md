@@ -302,6 +302,24 @@ Ask concrete questions and explain your approach. Evidence may require several d
 
 Run a chase as a progress clock for the pursuers against a danger clock for the quarry's escape. Each exchange, characters roll **Riding** (or Athletics on foot): success ticks the pursuers' clock, failure ticks the escape. Terrain, a tired horse, or a shot fired from the saddle (Shooting at −2) adjust the rolls.
 
+### Stagecoach chases
+
+A coach on the road with riders closing in is a chase where distance is everything. Run it on the battle map's **Stagecoach chase** track, in the GM view, instead of the chase clocks.
+
+- **The lanes.** The stagecoach has its own lane, and each rider stands in a range band from it: Close (alongside), Short, Medium, Long or Extreme. Riders usually start at Medium or Long.
+- **Each exchange.** The driver rolls Riding against each rider's Riding (11 for a threat without it). The winner moves that rider one band: closer if the rider won, farther if the driver did. A tie leaves it where it is, and a rider pushed past Extreme drops out of the chase. A fresh horse or a good road gives +2; rough ground or a tired team gives −2.
+- **Fighting on the move.** Everyone else acts as usual. Shooting from the box, the roof or the saddle is at −2, on top of the range penalty. At Close, a rider can board with an Athletics roll, and then it is fists, knives and shotguns at arm's length. A passenger can climb out to the box or onto the roof as their move.
+- **Hurting the coach.** A hit aimed at the team or a wheel (a called shot, −2) marks one box on the coach's track. Dynamite, a crash, or a driver who fails by 5 or more on rough ground marks one more.
+- **The driver goes down.** If the driver is Incapacitated or knocked from the box, the team bolts. Someone must reach the box and take the reins (Riding −2) before the next exchange, or the coach marks a box.
+
+| Boxes | The coach |
+|---|---|
+| 0 | Rolling: no damage |
+| 1 | Holed: splinters and bullet holes; no penalty yet |
+| 2 | A horse hit or a wheel cracked: −2 to the driver's Riding |
+| 3 | Lamed: −4 to the driver's Riding, and riders close on a tie |
+| 4 | Wrecked: the coach overturns or stops dead; everyone aboard rolls Athletics or marks a box of Injury |
+
 # The woge and the hidden world
 
 ## Wesen and the woge
