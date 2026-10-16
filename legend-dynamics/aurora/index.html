@@ -587,7 +587,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="1c8a83d" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · 1c8a83d</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="73909ee" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · 73909ee</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1088,6 +1088,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <div class="field" id="lab-mode-wrap"><label for="lab-fmode">Shot</label><select id="lab-fmode"></select></div>
               <div class="field" id="lab-ammo-wrap"><label for="lab-ammo">Ammunition</label><select id="lab-ammo"></select></div>
               <div class="field"><label for="lab-cover">Cover</label><select id="lab-cover"><option value="none">None</option><option value="partial">Partial (−2)</option><option value="solid">Solid (blocks)</option></select></div>
+              <div class="field" id="lab-material-wrap" hidden><label for="lab-material">Made of</label><select id="lab-material"></select></div>
               <div class="field" id="lab-called-wrap" hidden><label for="lab-called">Called shot</label><select id="lab-called"></select></div>
               <div class="field"><label for="lab-sit-label">Other modifier</label><input type="text" id="lab-sit-label" placeholder="e.g. Darkness"></div>
               <div class="field" style="flex:0 0 5em"><label for="lab-sit">±</label><input type="number" id="lab-sit" value="0" min="-10" max="10"></div>
@@ -5743,6 +5744,16 @@ function resolveAttack(input, hooks, roll) {
   const bite = ench.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extraBox || 0), 0);
   if (dmg && dmg.boxes && bite) { dmg = { ...dmg, boxes: dmg.boxes + bite }; out.enchanted = bite; }
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
+  // What the attack is made of (weapon.materials: silver, cold iron, a wooden stake, fire), against the defender's
+  // weaknesses and the protections those materials get past (setting data on traits).
+  const mats = weapon.materials || [], made = (/** @type {string[] | undefined} */ list) => (list || []).some((m) => mats.includes(m));
+  // A weakness: that material marks extra boxes (a werewolf and silver).
+  const weak = liveTraits(defender).filter((/** @type {any} */ t) => t.type === "weakness" && mats.includes(t.material));
+  if (weak.length) { dmg = { ...dmg, boxes: dmg.boxes + weak.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extra || 1), 0) }; out.weakness = weak.map((/** @type {any} */ t) => t.label || t.material).join(", "); }
+  // A cap: no hit marks more than so many boxes, except one of the right material ("only silver marks more than 1 box").
+  const cap = liveTraits(defender).find((/** @type {any} */ t) => t.type === "capBoxes" && !made(t.except) && dmg.boxes > t.max);
+  if (cap) { dmg = { ...dmg, boxes: cap.max }; out.capped = cap.label || "Only the right weapon"; }
+  if (!dmg.boxes) return { ...out, outcome: `hit, marks nothing (${out.capped})`, hit: true, damage: null, shrugged: out.capped };
   // A trait that ignores small hits: always, or once per fight (oncePerFight; the encounter marks it used).
   const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && !t.used && dmg && dmg.boxes <= t.maxBoxes);
   if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null, shrugged: shrug.label || "ignoreHits" };
@@ -5758,7 +5769,8 @@ function resolveAttack(input, hooks, roll) {
   // Published armour (setting data): e.g. a mail shirt, "hits of 2 or more boxes mark one fewer, once per fight".
   // Armour can say what it works against: "melee", "missile" (bows, slings, thrown) or "firearm". No list: everything.
   const kind = weapon.firearm ? "firearm" : weapon.reach === "melee" ? "melee" : "missile";
-  const armour = liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1) && (!t.against || t.against.includes(kind)) && (!t.maxClass || (weapon.class || 1) <= t.maxClass));
+  // Armour that a material gets past (except: Tough, "except silver") does nothing against it.
+  const armour = liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1) && (!t.against || t.against.includes(kind)) && (!t.maxClass || (weapon.class || 1) <= t.maxClass) && !made(t.except));
   if (armour) { dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - (armour.reduce || 1)) }; out.armorUsed = armour.label || "Armour"; }
   if (!dmg.boxes) return { ...out, outcome: `hit, stopped by ${out.armorUsed}`, hit: true, damage: null };
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
@@ -6130,7 +6142,9 @@ const sumBy = (/** @type {any[]} */ mods, /** @type {string[]} */ sources) => mo
  * @param {any} enc @param {any} rules @param {any} core @param {any} cmd @param {{ reroll?: "attack" | "dodge", replaces?: number }} [opts]
  */
 function attack(enc, rules, core, cmd, opts = {}) {
-  const a = find(enc, cmd.attacker), d = find(enc, cmd.defender), weapon = rules.weapons[cmd.weapon];
+  const a = find(enc, cmd.attacker), d = find(enc, cmd.defender), base = rules.weapons[cmd.weapon];
+  // A material the attack is made of, chosen for this attack (silver bullets, a wooden stake), joins the weapon's own.
+  const weapon = base && cmd.material ? { ...base, materials: [...new Set([...(base.materials || []), cmd.material])] } : base;
   if (!a || !d) return { error: "Choose an attacker and a target." };
   if (!weapon) return { error: "Choose a weapon." };
   if (!opts.reroll && isOut(a)) return { error: `${a.name} can't act.` };
@@ -6219,7 +6233,7 @@ function attack(enc, rules, core, cmd, opts = {}) {
     margin: res.attack ? res.attack.margin : null, success: res.attack ? res.attack.success : false, auto: res.attack ? res.attack.auto : null,
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
-    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, shieldBroke, grievous, telling,
+    enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null, defenseClass: res.defenseClass || null, stun: !!res.stun,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
@@ -6601,7 +6615,8 @@ function mountLab(api) {
   const KEY = PACK.id + (PROD ? ".encounter.v1" : ".lab.v1");
   const WEAPONS = Object.fromEntries(PACK.arms.filter((/** @type {any} */ a) => !a.hazard).map((/** @type {any} */ a) => [a.id, a]));
   const MODES = PACK.weapons.modes || []; // [id, name, rounds, only these ammo types or null, roll modifier]
-  const PROT = PACK.protection || []; // published protective gear (a shield, a mail shirt) as data
+  const PROT = PACK.protection || [];
+  const MATERIALS = PACK.materials || []; // [id, name]: what an attack can be made of, against weaknesses and Tough // published protective gear (a shield, a mail shirt) as data
   const protTraits = (/** @type {string[]} */ ids) => PROT.filter((/** @type {any} */ x) => ids.includes(x.id)).flatMap((/** @type {any} */ x) => x.traits.map((/** @type {any} */ t) => ({ ...t })));
   const PTRACK = PACK.personalTrack || null; // a setting's personal price track (Corruption, Strain), kept on the character
   const BAND_NAMES = { melee: "In reach", close: "Close", short: "Short", medium: "Medium", long: "Long", extreme: "Extreme" };
@@ -6723,6 +6738,26 @@ function mountLab(api) {
 
   // ---- encounter setup ----
   /** A character from the GM's cards, as a participant. @param {any} c */
+  /**
+   * A shapechanger's combat rules, read from its form's traits and its origin's weaknesses (page data, as text):
+   * "Tough: hits of 2+ boxes mark one fewer, except silver" → armour that silver gets past; "silver weapons mark one
+   * extra box" → a weakness. Tough counts only in the form; a weakness can count in both (unless it says "in … form").
+   * @param {any} fm @param {boolean} on
+   */
+  function shapeTraits(fm, on) {
+    const matIn = (/** @type {string} */ txt) => MATERIALS.filter((/** @type {any} */ [id, n]) => [id, n, ...(MAT_WORDS[id] || [])].some((w) => txt.toLowerCase().includes(String(w).toLowerCase()))).map((/** @type {any} */ m) => m[0]);
+    const out = [];
+    const tough = on ? (fm.traits || []).find((/** @type {string} */ t) => /^Tough\b/i.test(t)) : null;
+    if (tough) { const ex = /except (.+)$/i.exec(tough); out.push({ type: "armor", always: true, minBoxes: 2, reduce: 1, except: ex ? matIn(ex[1]) : [], label: "Tough" }); }
+    // "Silver: silver weapons mark one extra box on you…", "Cold iron: … one extra box on you in beast form."
+    for (const line of fm.originRules || []) {
+      const m = /^([^:]+):\s*(.+?)\bmarks? one extra box/i.exec(line); if (!m) continue;
+      if (/\bin [a-z ]*form\b/i.test(line) && !on) continue;
+      for (const id of matIn(m[1] + " " + m[2])) out.push({ type: "weakness", material: id, extra: 1, label: m[1].trim() });
+    }
+    return out;
+  }
+  const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"] });
   function fromCharacter(c) {
     const k = api.calc(c), gun = c.play && c.play.gun;
     // A shapechanger (api.formOf): in their form, its numbers (api.calc applies them), its claws, and its traits as a note.
@@ -6730,13 +6765,15 @@ function mountLab(api) {
     const weapons = ["fists", ...Object.values(WEAPONS).filter((/** @type {any} */ a) => a.id !== "fists" && (c.equipment[a.id] || (a.equip || []).some((/** @type {string} */ k) => c.equipment[k]) || (gun && a.ammo && a.ammo === gun.type) || (a.cantrip && (c.spells || []).includes(a.cantrip)))).map((/** @type {any} */ a) => a.id)];
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
+    const formRules = fm ? shapeTraits(fm, formOn) : [];
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
         ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : []),
-        ...(api.traitsFor ? api.traitsFor(c) : [])], // a page's own way of granting them (Pelion's advantages)
+        ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (Pelion's advantages)
+        ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
@@ -6952,6 +6989,9 @@ function mountLab(api) {
       // Called shots (telling hits): name the effect first, at −2 (−4 for a small target).
       const TH = r.flags.has("telling") && r.params.tellingHits;
       $("lab-called-wrap").hidden = !TH;
+      // What the attack is made of (the setting's materials): silver bullets, a wooden stake, cold iron.
+      $("lab-material-wrap").hidden = !MATERIALS.length;
+      if (MATERIALS.length && !$("lab-material").options.length) $("lab-material").innerHTML = `<option value="">Ordinary</option>` + MATERIALS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)}</option>`).join("");
       if (TH && !$("lab-called").options.length) $("lab-called").innerHTML = `<option value="">None</option>` + LDX.TELLING_EFFECTS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join("");
       if (!TH) $("lab-called").value = "";
       if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
@@ -6985,6 +7025,7 @@ function mountLab(api) {
       res = E.attack(en, r, LD, {
         attacker: a.pid, defender: $("lab-target").value, weapon: w && w.id, band: $("lab-band").value,
         mode: mode ? { id: mode[0], label: mode[1], mod: mode[4] || 0, cost: mode[2] } : null, ammo: $("lab-ammo-wrap").hidden ? null : $("lab-ammo").value,
+        material: $("lab-material-wrap").hidden || !$("lab-material").value ? null : $("lab-material").value,
         called: $("lab-called-wrap").hidden || !$("lab-called").value ? null : { effect: $("lab-called").value.split("|")[0], small: $("lab-called").value.endsWith("|small") },
         cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
@@ -7028,6 +7069,9 @@ function mountLab(api) {
       if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
     }
     if (ev.enchanted) L.push(`<span class="x">Enchanted weapon: +${ev.enchanted} box.</span>`);
+    if (ev.material) L.push(`<span class="x">Made of ${esc((MATERIALS.find((/** @type {any} */ m) => m[0] === ev.material) || [, ev.material])[1].toLowerCase())}.</span>`);
+    if (ev.weakness) L.push(`<span class="x">${esc(ev.weakness)}: one box more.</span>`);
+    if (ev.capped) L.push(`<span class="x">${esc(ev.capped)}: only the right weapon marks more.</span>`);
     if (ev.armorUsed) L.push(`<span class="x">${esc(ev.armorUsed)}: one box fewer.</span>`);
     if (ev.shieldBroke) L.push(`<span class="x">${esc(ev.shieldBroke)} breaks: it took a hit of 2 or more boxes.</span>`);
     if (ev.marginTrait) L.push(`<span class="x">${esc(ev.marginTrait)}.</span>`);
@@ -9533,7 +9577,7 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
         set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
         add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
       injuryNames: INJURY.map((x) => x[0]),
-      formOf: (c) => { const f = formOf(c); return f ? { name: T.formName, human: T.formHuman || "human form", on: inForm(c), weapon: formWeapon(f), traits: f.traits || [], drawbacks: f.drawbacks || [] } : null; } });
+      formOf: (c) => { const f = formOf(c); return f ? { name: T.formName, human: T.formHuman || "human form", on: inForm(c), weapon: formWeapon(f), traits: f.traits || [], drawbacks: f.drawbacks || [], originRules: heritageOf(c)?.core || [] } : null; } });
   } else $("lab").hidden = true;
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
   let gmClearArmed = false;

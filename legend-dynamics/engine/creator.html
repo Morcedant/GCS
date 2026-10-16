@@ -2887,7 +2887,7 @@ tr.lvl-U td.target { color: var(--muted); }
         set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
         add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
       injuryNames: INJURY.map((x) => x[0]),
-      formOf: (c) => { const f = formOf(c); return f ? { name: T.formName, human: T.formHuman || "human form", on: inForm(c), weapon: formWeapon(f), traits: f.traits || [], drawbacks: f.drawbacks || [] } : null; } });
+      formOf: (c) => { const f = formOf(c); return f ? { name: T.formName, human: T.formHuman || "human form", on: inForm(c), weapon: formWeapon(f), traits: f.traits || [], drawbacks: f.drawbacks || [], originRules: heritageOf(c)?.core || [] } : null; } });
   } else $("lab").hidden = true;
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
   let gmClearArmed = false;

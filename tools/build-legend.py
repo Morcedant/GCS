@@ -229,6 +229,13 @@ def gen(name, pack, t):
         return table(["Threat", "Attack (target)", "Dodge", "Boxes", "Weapon", "Trait"],
                      [[x["label"], x.get("attackJoin", ", ").join(f"{a['skill']} {a['target']}" for a in x["attacks"]), "—" if x["dodge"] is None else x["dodge"],
                        x["boxesText"], x["weaponText"], f"**{x['trait']}.** {x['traitText']}"] for x in p["threats"]])
+    if name == "materials-note":
+        m = p.get("materials")
+        if not m:
+            return ""
+        names = [x[1].split(" (")[0].lower() for x in m]
+        return (f" For each attack, choose what it's made of ({', '.join(names[:-1])} or {names[-1]}), and the panel applies the rules that turn on it: "
+                "a shapechanger's Tough in their form (and what gets past it), a weakness that marks one box more, and a creature only the right weapon can hurt.")
     if name == "discovery-panel":
         d = p.get("discovery")
         if not d:
@@ -620,7 +627,7 @@ def core_rules(docx=False):
     # Neutral stand-ins for the pack-specific parts of "Making your own".
     core = core.replace("{{GEN:extra-edges}}\n", "").replace("{{GEN:gritty}}", "").replace("{{GEN:battlemap}}", "")
     core = core.replace("{{GEN:magic}}", magic_chapter({}))
-    core = core.replace("{{GEN:discovery}}", discovery_md(NEUTRAL_DISCOVERY, t, neutral=True)).replace("{{GEN:discovery-panel}}\n", "")
+    core = core.replace("{{GEN:discovery}}", discovery_md(NEUTRAL_DISCOVERY, t, neutral=True)).replace("{{GEN:discovery-panel}}\n", "").replace("{{GEN:materials-note}}", "")
     core = core.replace("{{PACK:customrole}}", '"Smuggler: knows every back door, bribe and hidden hold."')
     core = core.replace("{{GEN:group-names}}", "one of your setting's groups")
     core = core.replace("{{PACK:customorigin}}", "**Hill-folk (tier 1).** Stocky herders from high, cold country. *Adjustments:* Body +1, Presence −1. *Core rule:* at home in the heights: no penalty for thin air or cold. *Origin advantage:* **Sure-Footed**: +2 to Athletics to climb and keep your footing. *Companion:* **Clannish**: you trust your own people first; when it matters, accept the cost of that loyalty.")

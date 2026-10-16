@@ -3989,5 +3989,19 @@
     "runs a fight by the *Personal combat* rules"
    ]
   ]
- }
+ },
+ "materials": [
+  [
+   "iron",
+   "Cold iron"
+  ],
+  [
+   "silver",
+   "Silver"
+  ],
+  [
+   "fire",
+   "Fire"
+  ]
+ ]
 }
