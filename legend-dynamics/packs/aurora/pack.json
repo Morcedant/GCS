@@ -3810,7 +3810,9 @@
    },
    "class": 1,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "wound": "power",
+   "natural": true
   },
   {
    "id": "blast2",
@@ -3824,7 +3826,8 @@
    },
    "class": 2,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "wound": "power"
   },
   {
    "id": "claws2",
@@ -3838,7 +3841,8 @@
    },
    "class": 2,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "natural": true
   },
   {
    "id": "elfshot",
@@ -3852,7 +3856,8 @@
    },
    "class": 2,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "wound": "power"
   },
   {
    "id": "breach",
@@ -3881,7 +3886,8 @@
    },
    "class": 2,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "wound": "power"
   },
   {
    "id": "roots",
@@ -3895,7 +3901,8 @@
    },
    "class": 2,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "natural": true
   }
  ],
  "threats": [
