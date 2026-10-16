@@ -27,7 +27,8 @@ export function mountLab(api) {
   const KEY = PACK.id + (PROD ? ".encounter.v1" : ".lab.v1");
   const WEAPONS = Object.fromEntries(PACK.arms.filter((/** @type {any} */ a) => !a.hazard).map((/** @type {any} */ a) => [a.id, a]));
   const MODES = PACK.weapons.modes || []; // [id, name, rounds, only these ammo types or null, roll modifier]
-  const PROT = PACK.protection || []; // published protective gear (a shield, a mail shirt) as data
+  const PROT = PACK.protection || [];
+  const MATERIALS = PACK.materials || []; // [id, name]: what an attack can be made of, against weaknesses and Tough // published protective gear (a shield, a mail shirt) as data
   const protTraits = (/** @type {string[]} */ ids) => PROT.filter((/** @type {any} */ x) => ids.includes(x.id)).flatMap((/** @type {any} */ x) => x.traits.map((/** @type {any} */ t) => ({ ...t })));
   const PTRACK = PACK.personalTrack || null; // a setting's personal price track (Corruption, Strain), kept on the character
   const BAND_NAMES = { melee: "In reach", close: "Close", short: "Short", medium: "Medium", long: "Long", extreme: "Extreme" };
@@ -149,6 +150,26 @@ export function mountLab(api) {
 
   // ---- encounter setup ----
   /** A character from the GM's cards, as a participant. @param {any} c */
+  /**
+   * A shapechanger's combat rules, read from its form's traits and its origin's weaknesses (page data, as text):
+   * "Tough: hits of 2+ boxes mark one fewer, except silver" → armour that silver gets past; "silver weapons mark one
+   * extra box" → a weakness. Tough counts only in the form; a weakness can count in both (unless it says "in … form").
+   * @param {any} fm @param {boolean} on
+   */
+  function shapeTraits(fm, on) {
+    const matIn = (/** @type {string} */ txt) => MATERIALS.filter((/** @type {any} */ [id, n]) => [id, n, ...(MAT_WORDS[id] || [])].some((w) => txt.toLowerCase().includes(String(w).toLowerCase()))).map((/** @type {any} */ m) => m[0]);
+    const out = [];
+    const tough = on ? (fm.traits || []).find((/** @type {string} */ t) => /^Tough\b/i.test(t)) : null;
+    if (tough) { const ex = /except (.+)$/i.exec(tough); out.push({ type: "armor", always: true, minBoxes: 2, reduce: 1, except: ex ? matIn(ex[1]) : [], label: "Tough" }); }
+    // "Silver: silver weapons mark one extra box on you…", "Cold iron: … one extra box on you in beast form."
+    for (const line of fm.originRules || []) {
+      const m = /^([^:]+):\s*(.+?)\bmarks? one extra box/i.exec(line); if (!m) continue;
+      if (/\bin [a-z ]*form\b/i.test(line) && !on) continue;
+      for (const id of matIn(m[1] + " " + m[2])) out.push({ type: "weakness", material: id, extra: 1, label: m[1].trim() });
+    }
+    return out;
+  }
+  const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"] });
   function fromCharacter(c) {
     const k = api.calc(c), gun = c.play && c.play.gun;
     // A shapechanger (api.formOf): in their form, its numbers (api.calc applies them), its claws, and its traits as a note.
@@ -156,13 +177,15 @@ export function mountLab(api) {
     const weapons = ["fists", ...Object.values(WEAPONS).filter((/** @type {any} */ a) => a.id !== "fists" && (c.equipment[a.id] || (a.equip || []).some((/** @type {string} */ k) => c.equipment[k]) || (gun && a.ammo && a.ammo === gun.type) || (a.cantrip && (c.spells || []).includes(a.cantrip)))).map((/** @type {any} */ a) => a.id)];
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
+    const formRules = fm ? shapeTraits(fm, formOn) : [];
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
         ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : []),
-        ...(api.traitsFor ? api.traitsFor(c) : [])], // a page's own way of granting them (Pelion's advantages)
+        ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (Pelion's advantages)
+        ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
@@ -378,6 +401,9 @@ export function mountLab(api) {
       // Called shots (telling hits): name the effect first, at −2 (−4 for a small target).
       const TH = r.flags.has("telling") && r.params.tellingHits;
       $("lab-called-wrap").hidden = !TH;
+      // What the attack is made of (the setting's materials): silver bullets, a wooden stake, cold iron.
+      $("lab-material-wrap").hidden = !MATERIALS.length;
+      if (MATERIALS.length && !$("lab-material").options.length) $("lab-material").innerHTML = `<option value="">Ordinary</option>` + MATERIALS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)}</option>`).join("");
       if (TH && !$("lab-called").options.length) $("lab-called").innerHTML = `<option value="">None</option>` + LDX.TELLING_EFFECTS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join("");
       if (!TH) $("lab-called").value = "";
       if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
@@ -411,6 +437,7 @@ export function mountLab(api) {
       res = E.attack(en, r, LD, {
         attacker: a.pid, defender: $("lab-target").value, weapon: w && w.id, band: $("lab-band").value,
         mode: mode ? { id: mode[0], label: mode[1], mod: mode[4] || 0, cost: mode[2] } : null, ammo: $("lab-ammo-wrap").hidden ? null : $("lab-ammo").value,
+        material: $("lab-material-wrap").hidden || !$("lab-material").value ? null : $("lab-material").value,
         called: $("lab-called-wrap").hidden || !$("lab-called").value ? null : { effect: $("lab-called").value.split("|")[0], small: $("lab-called").value.endsWith("|small") },
         cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
@@ -454,6 +481,9 @@ export function mountLab(api) {
       if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
     }
     if (ev.enchanted) L.push(`<span class="x">Enchanted weapon: +${ev.enchanted} box.</span>`);
+    if (ev.material) L.push(`<span class="x">Made of ${esc((MATERIALS.find((/** @type {any} */ m) => m[0] === ev.material) || [, ev.material])[1].toLowerCase())}.</span>`);
+    if (ev.weakness) L.push(`<span class="x">${esc(ev.weakness)}: one box more.</span>`);
+    if (ev.capped) L.push(`<span class="x">${esc(ev.capped)}: only the right weapon marks more.</span>`);
     if (ev.armorUsed) L.push(`<span class="x">${esc(ev.armorUsed)}: one box fewer.</span>`);
     if (ev.shieldBroke) L.push(`<span class="x">${esc(ev.shieldBroke)} breaks: it took a hit of 2 or more boxes.</span>`);
     if (ev.marginTrait) L.push(`<span class="x">${esc(ev.marginTrait)}.</span>`);

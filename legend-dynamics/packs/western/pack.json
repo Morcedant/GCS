@@ -3059,7 +3059,17 @@
     "claws"
    ],
    "trait": "Relentless",
-   "traitText": "Ignores the Wounded penalty; only silver marks more than 1 box at a time."
+   "traitText": "Ignores the Wounded penalty; only silver marks more than 1 box at a time.",
+   "traits": [
+    {
+     "type": "capBoxes",
+     "max": 1,
+     "except": [
+      "silver"
+     ],
+     "label": "Relentless (only silver marks more than 1 box)"
+    }
+   ]
   },
   {
    "id": "vampire",
@@ -3126,7 +3136,19 @@
    "weaponText": "Grave touch (1)",
    "weapons": [],
    "trait": "Life-drinker",
-   "traitText": "Passes through walls; only silver, cold iron, salt or fire can hurt it. Each box its touch marks clears one of its own."
+   "traitText": "Passes through walls; only silver, cold iron, salt or fire can hurt it. Each box its touch marks clears one of its own.",
+   "traits": [
+    {
+     "type": "capBoxes",
+     "max": 0,
+     "except": [
+      "silver",
+      "iron",
+      "fire"
+     ],
+     "label": "Life-drinker (only silver, cold iron or fire hurts it)"
+    }
+   ]
   },
   {
    "id": "banshee",
@@ -3243,7 +3265,17 @@
     "claws"
    ],
    "trait": "Endless hunger",
-   "traitText": "Calls out in the voices of the lost to lure prey; ignores the Wounded penalty. Only fire marks more than 1 box at a time, and it rises again unless its heart of ice is burned."
+   "traitText": "Calls out in the voices of the lost to lure prey; ignores the Wounded penalty. Only fire marks more than 1 box at a time, and it rises again unless its heart of ice is burned.",
+   "traits": [
+    {
+     "type": "capBoxes",
+     "max": 1,
+     "except": [
+      "fire"
+     ],
+     "label": "Endless hunger (only fire marks more than 1 box)"
+    }
+   ]
   },
   {
    "id": "revenant-gunslinger",
@@ -3747,5 +3779,23 @@
    ]
   ],
   "start": "**A hunter's almanac at creation.** A character who already knows the dark (a Monster Hunter, most often) can take the **Hunter's Almanac** advantage: three lore cards, for creatures they've faced or studied, chosen at creation. Pick them from the creatures in the GM's Guide; each says what you know and what it permits."
- }
+ },
+ "materials": [
+  [
+   "silver",
+   "Silver (bullets or a blade)"
+  ],
+  [
+   "iron",
+   "Cold iron"
+  ],
+  [
+   "wood",
+   "A wooden stake"
+  ],
+  [
+   "fire",
+   "Fire (a torch, burning oil)"
+  ]
+ ]
 }

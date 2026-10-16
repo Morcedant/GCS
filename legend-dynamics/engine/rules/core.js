@@ -260,6 +260,16 @@ export function resolveAttack(input, hooks, roll) {
   const bite = ench.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extraBox || 0), 0);
   if (dmg && dmg.boxes && bite) { dmg = { ...dmg, boxes: dmg.boxes + bite }; out.enchanted = bite; }
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
+  // What the attack is made of (weapon.materials: silver, cold iron, a wooden stake, fire), against the defender's
+  // weaknesses and the protections those materials get past (setting data on traits).
+  const mats = weapon.materials || [], made = (/** @type {string[] | undefined} */ list) => (list || []).some((m) => mats.includes(m));
+  // A weakness: that material marks extra boxes (a werewolf and silver).
+  const weak = liveTraits(defender).filter((/** @type {any} */ t) => t.type === "weakness" && mats.includes(t.material));
+  if (weak.length) { dmg = { ...dmg, boxes: dmg.boxes + weak.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extra || 1), 0) }; out.weakness = weak.map((/** @type {any} */ t) => t.label || t.material).join(", "); }
+  // A cap: no hit marks more than so many boxes, except one of the right material ("only silver marks more than 1 box").
+  const cap = liveTraits(defender).find((/** @type {any} */ t) => t.type === "capBoxes" && !made(t.except) && dmg.boxes > t.max);
+  if (cap) { dmg = { ...dmg, boxes: cap.max }; out.capped = cap.label || "Only the right weapon"; }
+  if (!dmg.boxes) return { ...out, outcome: `hit, marks nothing (${out.capped})`, hit: true, damage: null, shrugged: out.capped };
   // A trait that ignores small hits: always, or once per fight (oncePerFight; the encounter marks it used).
   const shrug = liveTraits(defender).find((/** @type {any} */ t) => t.type === "ignoreHits" && !t.used && dmg && dmg.boxes <= t.maxBoxes);
   if (shrug) return { ...out, outcome: `hit, marks nothing (${shrug.label || "too tough"})`, hit: true, damage: null, shrugged: shrug.label || "ignoreHits" };
@@ -275,7 +285,8 @@ export function resolveAttack(input, hooks, roll) {
   // Published armour (setting data): e.g. a mail shirt, "hits of 2 or more boxes mark one fewer, once per fight".
   // Armour can say what it works against: "melee", "missile" (bows, slings, thrown) or "firearm". No list: everything.
   const kind = weapon.firearm ? "firearm" : weapon.reach === "melee" ? "melee" : "missile";
-  const armour = liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1) && (!t.against || t.against.includes(kind)) && (!t.maxClass || (weapon.class || 1) <= t.maxClass));
+  // Armour that a material gets past (except: Tough, "except silver") does nothing against it.
+  const armour = liveTraits(defender).find((/** @type {any} */ t) => t.type === "armor" && !t.used && dmg && dmg.boxes >= (t.minBoxes || 1) && (!t.against || t.against.includes(kind)) && (!t.maxClass || (weapon.class || 1) <= t.maxClass) && !made(t.except));
   if (armour) { dmg = { ...dmg, boxes: Math.max(0, dmg.boxes - (armour.reduce || 1)) }; out.armorUsed = armour.label || "Armour"; }
   if (!dmg.boxes) return { ...out, outcome: `hit, stopped by ${out.armorUsed}`, hit: true, damage: null };
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };

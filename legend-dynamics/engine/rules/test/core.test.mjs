@@ -103,4 +103,21 @@ test("stun weapons, Defense Classes and always-on armor", () => {
   const chromed = [{ type: "armor", minBoxes: 2, reduce: 1, always: true, label: "Chromed" }];
   assert.equal(hit(claws2, chromed).damage.boxes, 1);
   assert.equal(hit(claws2, chromed).armorUsed, "Chromed");
+  // Materials: Tough that silver gets past, a weakness to silver, and "only silver marks more than 1 box".
+  const revolver = { id: "revolver", band: "close", firearm: true, damage: { any: { boxes: 2 } } }, silver = { ...revolver, materials: ["silver"] };
+  const tough = [{ type: "armor", minBoxes: 2, reduce: 1, always: true, except: ["silver"], label: "Tough" }];
+  assert.equal(hit(revolver, tough).damage.boxes, 1, "Tough: a 2-box hit marks one fewer");
+  assert.equal(hit(silver, tough).damage.boxes, 2, "silver gets past Tough");
+  assert.equal(hit(silver, tough).armorUsed, undefined);
+  const were = [...tough, { type: "weakness", material: "silver", extra: 1, label: "Silver" }];
+  assert.equal(hit(silver, were).damage.boxes, 3, "a weakness: one box more, and Tough doesn't help");
+  assert.equal(hit(silver, were).weakness, "Silver");
+  const relentless = [{ type: "capBoxes", max: 1, except: ["silver"], label: "Relentless" }];
+  assert.equal(hit(revolver, relentless).damage.boxes, 1, "only silver marks more than 1 box");
+  assert.equal(hit(revolver, relentless).capped, "Relentless");
+  assert.equal(hit(silver, relentless).damage.boxes, 2);
+  const wraith = [{ type: "capBoxes", max: 0, except: ["silver", "iron"], label: "Life-drinker" }];
+  assert.equal(hit(revolver, wraith).damage, null, "nothing else hurts it");
+  assert.match(hit(revolver, wraith).outcome, /marks nothing \(Life-drinker\)/);
+  assert.equal(hit({ ...revolver, materials: ["iron"] }, wraith).damage.boxes, 2);
 });
