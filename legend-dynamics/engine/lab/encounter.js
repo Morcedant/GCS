@@ -148,8 +148,8 @@ export function defenseOptions(enc, rules, d, w) {
   if (D.parry && melee) {
     const own = (d.weapons || []).map((id) => rules.weapons[id]).filter((/** @type {any} */ x) => x && x.reach === "melee" && !bareWeapon(x));
     const cands = own.map((/** @type {any} */ x) => ({ name: x.name, skill: x.skill, t: d.skills[x.skill] })).filter((c) => c.t !== undefined);
-    // Bare hands parry fists (core), or claws and fangs too where the setting allows it (bareHanded: "natural").
-    const unarmedAttack = w.unarmed || w.id === "fists" || (D.parry.bareHanded === "natural" && (w.natural || (!oneSkill && w.skill === SK.unarmed)));
+    // Bare hands parry only fists: an open hand can't parry a blade, claws or fangs.
+    const unarmedAttack = !w.natural && (w.unarmed || w.id === "fists");
     if (unarmedAttack && d.skills[SK.unarmed] !== undefined) cands.push({ name: "bare hands", skill: SK.unarmed, t: d.skills[SK.unarmed] });
     const best = cands.sort((x, y) => y.t - x.t)[0];
     if (best) {

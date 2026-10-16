@@ -264,11 +264,12 @@ test("Trails of Blood & Dust's published combat rules: in force under Published 
   assert.deepEqual(opts.map((o) => [o.kind, o.preview]), [["dodge", 11], ["parry", 9]]);
   // Other settings publish none of this.
   const crown = JSON.parse(readFileSync(new URL("../../../packs/fantasy/pack.json", import.meta.url)));
-  // Every setting publishes the core rules; Trails of Blood & Dust adds bare-handed parries against claws.
+  // Every setting publishes the core rules: bare hands parry fists only, never a blade, claws or fangs.
   assert.equal(crown.combatRules, undefined);
   const cr = combatOf(crown);
   assert.deepEqual(Object.keys(cr).sort(), Object.keys(C).sort());
-  assert.equal(cr.parry.bareHanded, "unarmed"); assert.equal(C.parry.bareHanded, "natural");
+  assert.equal(cr.parry.bareHanded, "unarmed"); assert.equal(C.parry.bareHanded, "unarmed");
+  assert.deepEqual(E.defenseOptions(enc, r, E.find(enc, "p1"), weapons.claws).map((o) => o.kind), ["dodge"], "Trails: no bare-handed parry against claws");
   const rc = { ...X.buildRules(X.PUBLISHED, weapons, lab, cr), jamOn18: true }, ec = setup(X.PUBLISHED, 8); E.startCombat(ec, rc);
   assert.deepEqual(E.defenseOptions(ec, rc, E.find(ec, "p1"), weapons.claws).map((o) => o.kind), ["dodge"], "core: no bare-handed parry against claws");
   assert.deepEqual(E.defenseOptions(ec, rc, E.find(ec, "p1"), weapons.fists).map((o) => o.kind), ["dodge", "parry"], "core: bare hands parry fists");

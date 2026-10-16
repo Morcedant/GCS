@@ -1420,7 +1420,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge);
   // The core attack and defense rules (engine/combat.json), with the setting's own overrides.
   const CR = PACK.combatRules || {};
-  const PARRY = !CR.parry ? [] : T.meleeSkill === T.unarmedSkill ? [[T.meleeSkill, "armed or bare-handed"]] : [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]];
+  const PARRY = !CR.parry ? [] : T.meleeSkill === T.unarmedSkill ? [[T.meleeSkill, "armed, or bare-handed against fists"]] : [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed, fists only"]];
   const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
   const isParry = (name) => name.startsWith("Parry:");
   // One defense a round, more with the setting's Edge (Additional Defense).
@@ -1786,7 +1786,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div><span class="label">${T.role}</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">${T.origin}</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge()}</b>${dodgeGearBonus() ? `<span class="small muted">${dodge() + dodgeGearBonus()} with ${esc(dodgeGear().map(([n]) => n.toLowerCase()).join(" and "))}</span>` : ""}</div>
-        ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill)} bare-handed` : ""}</span></div>` : ""}
+        ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill)} bare-handed, fists only` : ""}</span></div>` : ""}
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
       <div class="attr-strip">${ATTRS.map(([n]) => `<div><span class="label">${n}</span><b>${ch.attrs[n]}</b></div>`).join("")}</div>

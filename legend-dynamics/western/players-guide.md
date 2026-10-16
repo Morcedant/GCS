@@ -317,7 +317,7 @@ Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for f
 
 - **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits. The **Additional Defense** Edge gives a second.
 - **Dodge** is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert.
-- **Parry.** Against a weapon in hand or fists, roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a shot or a missile.
+- **Parry.** Against a weapon in hand or fists, roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists. An open hand can't parry a blade, claws or fangs. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a shot or a missile.
 - **Block.** With a shield, or anything that can stand in for one (a chair, a plank, a crate lid), you can block a weapon in hand, fists, or a thrown or loosed missile: roll Melee −2, plus the shield's bonus. Nothing you can lift blocks a gunshot or a blast. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
 - **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. An advantage that rewards aiming adds its bonus to this.
@@ -350,7 +350,6 @@ A really good shot, or a blow that lands exactly where it was meant to, lets the
 
 Trails of Blood & Dust adds these to the attack and defense rules above.
 
-- **Bare hands against claws.** Out West you can parry claws and fangs bare-handed too, not just fists: Brawling −3.
 - **Shields.** A real shield is rare out West: a hide shield or an iron-bound buckler gives +1 to Block. Anything at hand stands in: a chair, a wooden slat, a crate lid, a saddle.
 - **Careful Marksman.** Aiming with the advantage gives +3 in all: Aim's +1 and the advantage's +2.
 - **A heavy coat.** A buffalo coat or a canvas duster turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer.
