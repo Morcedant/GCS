@@ -37,7 +37,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 | Occultist | The Learned | knows the old books, the rituals and the names of things that shouldn't exist, and what each one fears. | Melee, Stealth, Deception, Occult | **Forbidden lore.** Once per job, ask the GM one question about a supernatural thing you've seen, and get a true answer. |
 | Journalist | The Learned | asks the questions no one wants asked, and prints the answers. | Brawling, Stealth, Read People, Investigation | **The press.** Once per job, print a story; the town believes it until someone proves it false. |
 | Preacher | The Learned | comforts the frightened, counsels the troubled, and stands up to bad men with faith and a shotgun. | Shooting, Riding, Leadership, Occult | **Hold fast.** +2 to Will against fear, possession and temptation, and to Leadership to steady others against them. |
-| Monster Hunter | The Frontier | hunts what the law can't hang, and knows which things fear silver, salt or fire (take the Monster Hunter advantage). | Melee, Tracking, Read People, Occult | **Know its weakness.** Once you've identified a creature with an Occult roll, your called shots against it take no penalty. |
+| Monster Hunter | The Frontier | hunts what the law can't hang, and knows which things fear silver, salt or fire (take the Hunter's Almanac advantage: three lore cards to start). | Melee, Tracking, Read People, Occult | **Know its weakness.** Once you've identified a creature with an Occult roll, your called shots against it take no penalty. |
 | Gunslinger | The Frontier | the fastest and steadiest gun in the room, and the one who decides when it's time to draw. | Shooting, Riding, Read People, Athletics | **Quick draw.** In the first round of a gunfight, you act first, whatever your Agility. |
 | Scout | The Frontier | finds the trail, reads the land, and keeps everyone alive out in it. | Melee, Tracking, Persuasion, Survival | **Lay of the land.** Once per job, you know a way: a hidden pass, a water hole, a shortcut that saves a day, or a place to make a stand. |
 | Gambler | The Frontier | reads people, bluffs, and hears everything the saloon hears. | Shooting, Stealth, Deception, Gambling | **Markers.** Once per job, call in a debt: someone owes you a favor, a horse, a room or the truth. |
@@ -300,6 +300,60 @@ A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something tha
 ## Investigation and social scenes
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. A successful roll does not force someone to abandon a core belief or reveal what they do not know.
+
+## Discovery clocks and lore cards
+
+When a job turns on an unknown subject (a supernatural creature and its weakness), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **lore card**: what the characters learned, kept for good. A character's lore cards are their **hunter's almanac**.
+
+| Phase | What it means |
+|---|---|
+| 1. Confront the unknown | Effects without a cause: a body drained white, cattle torn open, a town gone too quiet. You may suspect, but nothing is confirmed. |
+| 2. Identify | Name the creature. This is the gate: until its identity is confirmed, no lore card applies, and the GM treats your theories as suspicion only. |
+| 3. Uncover | Learn how it is beaten. Filling this phase fills the clock and mints a lore card. |
+
+- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
+- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
+- **The primary investigator.** One character leads and owns the lore card. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant lore card can assist with a method they couldn't otherwise bring (the lore card is why they're qualified); it adds nothing beyond the normal assistance.
+- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
+
+### The lore card
+
+A lore card grants **no bonus** to any roll. It is an earned permission: knowledge that makes possible an action otherwise forbidden or unavailable against that subject. Without it, the GM can rule that the action isn't possible: you can't aim for a heart you don't know is the weakness, or speak a name you never learned. A lore card can authorize a called shot or a telling-hit effect that would otherwise be unavailable.
+
+- A lore card never helps confirm its own subject: holding one doesn't prove this is that. It applies once the Identify phase has confirmed it.
+- **Shared copies.** Every character present when the lore card is minted (the climactic confrontation or the breakthrough) gets a shared copy; the primary investigator is recorded as its owner. An absent character doesn't, though a holder can teach it to them later with the GM's agreement.
+- **What it records.** The subject (its tag), what was learned, what it permits, the job where it was earned, its owner, and who was there. It's kept on the character sheet, under *Learned in play*.
+
+### The Harvest
+
+A discovery clock always races a threat clock. While you dig, the creature is still hunting. The Harvest clock (4 or 6 segments, one per job) ticks once for each scene spent investigating and once for each failed investigation roll. Each time it fills, the creature claims another victim, and the clock starts again. The dread is the race: learn its weakness before it takes someone you were protecting.
+
+### What investigating costs
+
+When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
+
+| Track | Ticks for | For example |
+|---|---|---|
+| **Heat** | provoking the law and authority | searching private property, leaning on officials, aggressive questioning |
+| **Whispers** | spreading word and alarming the town | asking around openly, interviewing many people, visibly poking at the uncanny |
+| **The Dark** | touching the supernatural directly | forbidden texts, cursed evidence, occult research, getting close to the threat |
+
+### Methods
+
+Which methods suit a character depends on their calling, origin and skills. The GM says which methods can advance each phase.
+
+| Method | Skills | Suits | Phases | For example |
+|---|---|---|---|---|
+| Examine the evidence | Investigation, Medicine | The Frontier, The Learned | Confront, Identify | A body, a wound, a scorched doorframe, what the creature left behind. |
+| Track it | Tracking, Survival | The Frontier | Confront, Identify | Prints, broken brush, where the dogs won't go. |
+| Question witnesses | Read People, Persuasion | The Law | Confront, Identify | Survivors, neighbors, the drunk who saw something. |
+| Consult the records | Law, Investigation | The Law, The Learned | Identify, Uncover | Court files, old newspapers, land deeds, the parish register. |
+| Research the lore | Occult | The Learned | Identify, Uncover | Grimoires, folk tales, a letter from a hunter long dead. |
+| Lean on someone | Persuasion, Leadership, Deception | The Law | Any | The man who knows more than he says. Always ticks Heat on a failure. |
+
+- **The Learned:** natural identifiers: Occult, Medicine and the archives; **The Frontier:** physical evidence and tracking; **The Law:** witnesses and records.
+- A **Sighted** character sees what others can't: looking with Occult can advance Confront or Identify where nothing else would. A **Practitioner** can work a ritual of seeing (Witch-sight, a question asked of the dead) as a method.
+- **A hunter's almanac at creation.** A character who already knows the dark (a Monster Hunter, most often) can take the **Hunter's Almanac** advantage: three lore cards, for creatures they've faced or studied, chosen at creation. Pick them from the creatures in the GM's Guide; each says what you know and what it permits.
 
 ## Chases
 
@@ -673,7 +727,7 @@ A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells c
 
 ## Weaknesses
 
-Every monster has a weakness, and finding it is often the whole job. **Occult** identifies a creature and its weakness; the Monster Hunter advantage and the Sighted's Monster's Eye help. Each monster's weakness, and what its bite or curse does, is in the *Monsters* chapter of the GM's Guide.
+Every monster has a weakness, and finding it is often the whole job: a discovery clock that ends in a lore card (see *Discovery clocks and lore cards*). The Monster Hunter advantage and the Sighted's Monster's Eye help with the Identify rolls. A weakness works whoever stumbles on it; a lore card is what lets a hunter use it on purpose. Each monster's weakness, what its lore card permits, and what its bite or curse does are in the *Monsters* chapter of the GM's Guide.
 
 # Ready-made characters
 
@@ -765,8 +819,9 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Badge: Sheriff | Authority across your county: everything a deputy can do, plus serving warrants, running the jail, and swearing in deputies and armed citizens. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. |
 | Badge: Deputy U.S. Marshal | Federal authority across states and territories: serving federal warrants, pursuing fugitives across county and state lines, swearing in deputies, and calling on local lawmen for help. +2 to Leadership or Persuasion when invoking that authority with people who respect the law. |
 | Pinkerton Credentials | A commission from the Pinkerton National Detective Agency: carry arms on the job, work a client's case across county and state lines, and draw on the agency's offices and files (records, photographs and descriptions of wanted men). +2 to Investigation when using the agency's records or contacts. You have no powers of arrest beyond any citizen's unless local law deputizes you, and you answer to the client and the agency. |
-| Monster Hunter | +2 to Occult to identify a creature from what it left behind: tracks, wounds, a body. |
+| Monster Hunter | +2 to Occult to identify a creature from what it left behind (tracks, wounds, a body): Identify rolls on a discovery clock. |
 | Unshaken Faith | +2 to Will against magic, possession and the undead's influence. |
+| Hunter's Almanac | You start play with a hunter's almanac of three lore cards, for creatures you've faced or studied, chosen at creation. They grant no bonus: they let you act on what you know. |
 
 **Badges.** A badge is legal authority, not a magic word: outlaws and the powerful don't always care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency's reach and files, but no badge.
 
@@ -903,7 +958,7 @@ Born with the second sight. You see ghosts, the true faces of monsters wearing h
 
 | Advantage | Effect | Companion complication |
 |---|---|---|
-| Monster's Eye | +2 to Occult to identify a creature and its weakness from what you've seen or what it left behind. | **Haunted.** The dead you've seen follow you. Accept the sleepless night or the ghost at a bad moment. |
+| Monster's Eye | +2 to Occult to identify a creature and its weakness from what you've seen or what it left behind: Identify and Uncover rolls on a discovery clock. | **Haunted.** The dead you've seen follow you. Accept the sleepless night or the ghost at a bad moment. |
 | Ghost Talker | Ability: speak with a ghost that will listen. Roll Will; the dead know only what they knew, and want something in return. | **The Dead Know You.** Spirits seek you out. Accept the haunting and its demands. |
 
 ## Dhampir

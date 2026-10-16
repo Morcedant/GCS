@@ -285,3 +285,43 @@ test("a server that chose ExLAW before the rename plays Aurora", async () => {
   assert.match((await signedCall({ ...env, STORE }, sub("game", "show"))).content, /Aurora.*Spark points/);
   assert.match((await signedCall({ ...env, STORE: new MemoryKV(), DEFAULT_GAME: "exlaw" }, sub("game", "show"))).content, /Aurora/);
 });
+
+test("/discovery: phases, the Identify gate, the Harvest, costs, minting; /cards loads character files and surfaces matches", async () => {
+  const files = { "https://cdn.example/ruth.json": JSON.stringify({ format: "western-character", version: 1, name: "Ruth Calloway", attrs: {}, skills: {},
+    cards: [{ tag: "werewolf", name: "Werewolf", permits: "Called shots with silver at its heart", owner: "Ruth Calloway", source: "almanac" }] }) };
+  const env2 = { ...env, STORE: new MemoryKV(), fetchFile: async (u) => new Response(files[u]) };
+  const D = (s, o = [], gm = false, id = "42") => signedCall(env2, sub("discovery", s, o, { gm, id }));
+  const attach = (id, url) => ({ ...sub("cards", "load", [{ name: "file", value: id }], { id: "7" }), data: { name: "cards", options: [{ type: 1, name: "load", options: [{ name: "file", value: id }] }], resolved: { attachments: { [id]: { url, size: 500 } } } } });
+  assert.match((await signedCall(env2, attach("a1", "https://cdn.example/ruth.json"))).content, /Ruth Calloway\*\*: 1 lore card/);
+  assert.match((await D("new", [{ name: "name", value: "Red Creek" }])).content, /○○ \| ○○ \| ○○ 0\/6 · Confront the unknown/);
+  for (let i = 0; i < 3; i++) await D("tick", [{ name: "name", value: "red creek" }, { name: "segments", value: 2 }]);
+  const gate = (await D("show")).content;
+  assert.match(gate, /4\/6 · Identify/, "segments stop at the gate");
+  assert.match(gate, /At the gate/);
+  assert.equal((await D("identify", [{ name: "name", value: "Red Creek" }, { name: "subject", value: "Werewolf" }])).flags, 64, "only the GM confirms");
+  const idd = (await D("identify", [{ name: "name", value: "Red Creek" }, { name: "subject", value: "Werewolf" }], true)).content;
+  assert.match(idd, /Identified: Werewolf/);
+  assert.match(idd, /Ruth Calloway: \*\*Werewolf\*\*: Called shots with silver/, "a held card surfaces");
+  assert.match((await D("tick", [{ name: "name", value: "Red Creek" }, { name: "segments", value: 2 }])).content, /6\/6 · done: mint the lore card[\s\S]*Full/);
+  const fail = (await D("fail", [{ name: "track", value: "dark" }])).content;
+  assert.match(fail, /The Dark\*\* ■□□□ 1\/4/);
+  assert.match(fail, /Harvest\*\* ●○○○○○ 1\/6/, "a failed roll ticks the Harvest too");
+  assert.match((await D("push", [{ name: "track", value: "heat" }])).content, /Heat\*\* ■□□□/);
+  assert.match((await D("threat", [{ name: "segments", value: 5 }])).content, /Harvest fills:\*\* the creature claims another victim[\s\S]*/);
+  assert.match((await D("show")).content, /victims claimed: 1/);
+  const mint = { ...sub("discovery", "mint", [{ name: "name", value: "Red Creek" }, { name: "owner", value: "42" }, { name: "permits", value: "Silver at the heart" }, { name: "present", value: "<@7> <@9>" }], { gm: true }) };
+  mint.data.resolved = { users: { 42: { username: "tom" }, 9: { username: "lena" } } };
+  assert.match((await signedCall(env2, mint)).content, /Lore card minted: Werewolf\.\*\* tom owns it; shared copies for Ruth Calloway, lena/);
+  assert.match((await signedCall(env2, sub("cards", "show", [], { id: "7" }))).content, /Ruth Calloway's hunter's almanac\*\* \(2\)[\s\S]*shared; owner tom/);
+  assert.match((await signedCall(env2, sub("cards", "subject", [{ name: "subject", value: "werewolf" }]))).content, /tom: \*\*Werewolf\*\*[\s\S]*lena/);
+  // Fracture Lines: the Countdown is a hard timer that doesn't repeat, and failures don't tick it.
+  await signedCall(env2, sub("game", "set", [{ name: "game", value: "spaceopera" }], { gm: true }));
+  assert.match((await D("fail", [{ name: "track", value: "hull" }])).content, /Hull\*\* ■□□□/);
+  assert.doesNotMatch((await D("fail", [{ name: "track", value: "hull" }])).content, /Countdown/);
+  assert.match((await D("threat", [{ name: "segments", value: 6 }])).content, /Countdown\*\* ●●●●●● 6\/6  \*\*It happens: the situation hits/);
+  assert.match((await D("new", [{ name: "name", value: "Fix the drive" }, { name: "plain", value: true }])).content, /progress clock[\s\S]*○○○○○○ 0\/6 · progress/);
+  assert.equal((await signedCall(env2, attach("a2", "https://cdn.example/ruth.json"))).flags, 64, "a Trails file on a Fracture Lines server is refused");
+  // Crown has no discovery clocks.
+  await signedCall(env2, sub("game", "set", [{ name: "game", value: "fantasy" }], { gm: true }));
+  assert.equal((await D("show")).flags, 64);
+});

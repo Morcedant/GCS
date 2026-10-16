@@ -45,6 +45,14 @@ command to the Worker's web address, so there is no server to keep running.
 | `/track show` | anyone | The game's shared tracks and what each one means right now, e.g. **The Dark** ■■□□ 2/4: Signs and warnings |
 | `/track mark name:dark` · `/track clear name:heat boxes:2` | anyone | Marks or clears boxes. A partial name works ("dark" finds The Dark). |
 | `/track reset` | GM | Clears every track |
+| `/discovery new name:"Red Creek" phases:2,2,2` | anyone | Starts a discovery clock (Trails of Blood & Dust, Aurora, Fracture Lines): segments for Confront, Identify and Uncover. `plain:true` makes a plain progress clock in the race. |
+| `/discovery tick name:"Red Creek"` · `/discovery show` · `/discovery remove` | anyone | Advances a clock (it stops at the Identify gate until the subject is confirmed), shows the threat clock, the discovery clocks and the matching cards, or removes a clock |
+| `/discovery identify name:"Red Creek" subject:Werewolf` | GM | Confirms the subject once Identify is full, and lists every card the table holds for it |
+| `/discovery fail track:dark` · `/discovery push track:heat` | anyone | A failed investigation roll ticks the track (and the Harvest or Escalation); a push ticks the track |
+| `/discovery threat` · `/discovery threat size:6` | anyone · GM | Ticks the threat clock (Harvest and Escalation start again when they fill; Countdown doesn't), or sets its size |
+| `/discovery mint name:"Red Creek" owner:@name permits:"…" present:@a @b` | GM | A full clock mints a card: the owner and a shared copy for everyone present |
+| `/discovery reset` | GM | Clears every discovery clock and the threat clock |
+| `/cards load file:` · `/cards show [player]` · `/cards subject subject:Werewolf` | anyone | Loads the cards from a character file (or the GM's group file), shows a player's cards, or every card held for a subject |
 
 "GM" means anyone with the **Manage Server** permission. Each server keeps its own points, clocks and tracks.
 Tracks are kept separately per game, so switching games doesn't lose them. With storage connected, the reroll

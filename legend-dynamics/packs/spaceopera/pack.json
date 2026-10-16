@@ -4067,7 +4067,8 @@
     "title": "The GM's tools",
     "take": [
      "## The battle map",
-     "## The Encounter panel"
+     "## The Encounter panel",
+     "## The Discovery panel"
     ]
    }
   ],
@@ -4085,5 +4086,113 @@
     "runs a fight by the *Personal combat* rules"
    ]
   ]
+ },
+ "discovery": {
+  "card": "data record",
+  "cards": "data records",
+  "collection": "codex",
+  "subject": "an alien species, a derelict technology, an uncharted world behind a collapsed corridor, or a faction's intentions",
+  "uncover": "how it is beaten, or how it is used",
+  "kinds": [
+   [
+    "weakness",
+    "How it is beaten: a predator's or a hostile system's weakness"
+   ],
+   [
+    "permission",
+    "How it is used: a species' customs that allow negotiation, a derelict's systems that allow operating it"
+   ]
+  ],
+  "phases": [
+   [
+    "Confront the unknown",
+    "Effects without a cause: a signal no one can read, a derelict that powers up, a crew that won't answer. You may suspect, but nothing is confirmed."
+   ],
+   [
+    "Identify",
+    "Name it: the species, the technology, the world, the faction's aim. This is the gate: until it's confirmed, no data record applies, and the GM treats your theories as suspicion only."
+   ],
+   [
+    "Uncover",
+    "Learn how it is beaten, or how it is used. Filling this phase fills the clock and mints a data record."
+   ]
+  ],
+  "threat": {
+   "name": "Countdown",
+   "repeat": false,
+   "onFill": "the situation hits",
+   "text": "The threat is often the situation itself: failing life support, a collapsing corridor, a reactor going critical, a first-contact window closing. A Countdown is a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.",
+   "count": ""
+  },
+  "costs": [
+   [
+    "Heat",
+    "intrusion and provocation",
+    "overt scanning of restricted space, slicing into a faction's systems, provoking their security"
+   ],
+   [
+    "Reputation",
+    "digging in the open",
+    "asking every port about the derelict, broadcasting on open channels, a first contact that gets noticed"
+   ],
+   [
+    "Hull",
+    "strain on ship and crew",
+    "close passes to the anomaly, pushing the sensors past their limits, docking with the unknown"
+   ]
+  ],
+  "methods": [
+   [
+    "Scan it",
+    "Sensors",
+    "Ship Crew, Frontier",
+    "Confront, Identify",
+    "Passive first, active if you must (active scanning of restricted space ticks Heat)."
+   ],
+   [
+    "Analyze it",
+    "Science, Medicine",
+    "Frontier",
+    "Identify, Uncover",
+    "Samples, spectra, biology, the physics of the drive."
+   ],
+   [
+    "Slice the systems",
+    "Computers, Engineering",
+    "Ship Crew, Trouble",
+    "Identify, Uncover",
+    "Logs, firmware, the derelict's own records, a faction's network."
+   ],
+   [
+    "Read the people",
+    "Psychology, Diplomacy",
+    "Service",
+    "Any",
+    "Their customs, their fears, what their silence means."
+   ],
+   [
+    "Buy or trade for it",
+    "Commerce, Streetwise",
+    "Commerce, Trouble",
+    "Confront, Identify",
+    "Brokers, archives, a captain who's been there."
+   ],
+   [
+    "Survey the ground",
+    "Survival, Navigation",
+    "Frontier",
+    "Confront, Identify",
+    "Walk the world, chart the collapsed corridor, map the derelict deck by deck."
+   ]
+  ],
+  "groups": {
+   "crew": "sensors and systems",
+   "frontier": "science, survey and the unknown itself",
+   "service": "people and customs",
+   "commerce": "what can be bought or traded",
+   "trouble": "what others would rather keep hidden"
+  },
+  "origins": "A character's species can suit a method: senses, memory, psionics or a people's own history with the subject. A species that touches minds can advance a phase with Psionics, at the GM's call.",
+  "subjects": []
  }
 }

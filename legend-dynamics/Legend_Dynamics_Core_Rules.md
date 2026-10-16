@@ -189,6 +189,39 @@ A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something tha
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. A successful roll does not force someone to abandon a core belief or reveal what they do not know.
 
+## Discovery clocks and cards
+
+When a mission turns on an unknown subject (a creature, a rival's power, a strange device), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **card**: what the characters learned, kept for good. A character's cards are their **collection**.
+
+| Phase | What it means |
+|---|---|
+| 1. Confront the unknown | Effects without a cause. You may suspect, but nothing is confirmed. |
+| 2. Identify | Name the subject. This is the gate: until its identity is confirmed, no card applies, and the GM treats your theories as suspicion only. |
+| 3. Uncover | Learn how it is beaten or used. Filling this phase fills the clock and mints a card. |
+
+- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
+- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
+- **The primary investigator.** One character leads and owns the card. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant card can assist with a method they couldn't otherwise bring (the card is why they're qualified); it adds nothing beyond the normal assistance.
+- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
+
+### The card
+
+A card grants **no bonus** to any roll. It is an earned permission: knowledge that makes possible an action otherwise forbidden or unavailable against that subject. Without it, the GM can rule that the action isn't possible: you can't aim for a heart you don't know is the weakness, or speak a name you never learned. A card can authorize a called shot or a telling-hit effect that would otherwise be unavailable.
+
+- A card never helps confirm its own subject: holding one doesn't prove this is that. It applies once the Identify phase has confirmed it.
+- **Shared copies.** Every character present when the card is minted (the climactic confrontation or the breakthrough) gets a shared copy; the primary investigator is recorded as its owner. An absent character doesn't, though a holder can teach it to them later with the GM's agreement.
+- **What it records.** The subject (its tag), what was learned, what it permits, the mission where it was earned, its owner, and who was there. It's kept on the character sheet, under *Learned in play*.
+
+### The threat clock
+
+A discovery clock always races a threat clock. The setting names the threat clock and what happens when it fills: a creature claiming another victim, a villain escalating, a reactor going critical.
+
+### What investigating costs
+
+When an investigation roll fails, or a player pushes, one of the setting's shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
+
+*Your setting pack names the card, the threat clock, the tracks investigating pushes, and the methods.*
+
 ## Chases
 
 Run a chase as a progress clock for the pursuers against a danger clock for the quarry's escape. Each exchange, the characters roll the skill that moves them (the chase skill, or Athletics on foot): success ticks the pursuers' clock, failure ticks the escape. Terrain, a tired mount or a damaged engine, and attacks made on the move (at −2) adjust the rolls.

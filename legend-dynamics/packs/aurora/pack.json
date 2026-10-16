@@ -4228,7 +4228,8 @@
     "title": "The GM's tools",
     "take": [
      "## The battle map",
-     "## The Encounter panel"
+     "## The Encounter panel",
+     "## The Discovery panel"
     ]
    }
   ],
@@ -4246,5 +4247,103 @@
     "runs a fight by the *Personal combat* rules"
    ]
   ]
+ },
+ "discovery": {
+  "card": "dossier",
+  "cards": "dossiers",
+  "collection": "case file",
+  "subject": "an Operant's power set and its limits",
+  "uncover": "the counter: the tell, the cost, the cooldown, what shuts the power down",
+  "phases": [
+   [
+    "Confront the unknown",
+    "Effects without a cause: a vault opened from the inside, a blackout that follows someone, witnesses who can't agree on what they saw. You may suspect, but nothing is confirmed."
+   ],
+   [
+    "Identify",
+    "Name the Operant and what they can do. This is the gate: until it's confirmed, no dossier applies, and the GM treats your theories as suspicion only."
+   ],
+   [
+    "Uncover",
+    "Find the counter: the tell before they act, what the power costs them, how long it takes to come back, what shuts it down. Filling this phase fills the clock and mints a dossier."
+   ]
+  ],
+  "threat": {
+   "name": "Escalation",
+   "repeat": true,
+   "onFill": "the Operant's next move is bigger",
+   "text": "The Operant forces the pace. The Escalation clock (4 or 6 segments) ticks once for each scene spent investigating and once for each failed investigation roll. Each time it fills, their next move is bigger: a heist becomes a hostage situation becomes a fight across a city block. This is comic-book rising action, not a slow timer.",
+   "count": "escalations"
+  },
+  "costs": [
+   [
+    "Scrutiny",
+    "digging publicly or drawing official attention",
+    "pulling federal files, flashing a badge you shouldn't, staking out in the open"
+   ],
+   [
+    "Backlash",
+    "provoking the Operant or their allies",
+    "leaning on their friends, taunting them on air, raiding their haunts"
+   ],
+   [
+    "Collateral",
+    "messy, public confrontations and property damage",
+    "forcing a test of the power in a crowd, a chase through traffic, breaking in"
+   ]
+  ],
+  "methods": [
+   [
+    "Profile the Operant",
+    "Read People, Investigation",
+    "The Badge, The Learned",
+    "Confront, Identify",
+    "Pattern of crimes, choice of targets, what they want."
+   ],
+   [
+    "Run the records",
+    "Computers, Law",
+    "The Badge",
+    "Identify, Uncover",
+    "EMD registry, ExLAW files, court records, hospital admissions."
+   ],
+   [
+    "Analyze the power",
+    "Science, Occult, Powers",
+    "The Learned",
+    "Identify, Uncover",
+    "Residue, readings, footage frame by frame, the physics or the magic of it."
+   ],
+   [
+    "Work the back channels",
+    "Streetwise, Deception",
+    "The Underworld",
+    "Confront, Identify",
+    "Fences, fixers, who hired whom, who's scared."
+   ],
+   [
+    "See it in the field",
+    "Investigation, Stealth, Athletics",
+    "The Masks",
+    "Any",
+    "Shadow them, test them, take the hit and watch what happens."
+   ],
+   [
+    "Work the media",
+    "Media, Persuasion",
+    "The Masks, The Fringe",
+    "Confront, Identify",
+    "Viewer footage, tips, a reporter's notes. Always ticks Scrutiny on a failure."
+   ]
+  ],
+  "groups": {
+   "badge": "natural profilers, with the records",
+   "learned": "natural profilers, through analysis",
+   "underworld": "intel through back channels",
+   "masks": "intel gathered in the field",
+   "fringe": "contacts on the edges"
+  },
+  "origins": "Some powers are methods in themselves: a telepath, a psychometrist or a power that senses energy can advance a phase with the Powers skill, at the GM's call.",
+  "subjects": []
  }
 }

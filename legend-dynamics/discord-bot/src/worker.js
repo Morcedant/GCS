@@ -232,6 +232,27 @@ export const PACKS = {
      "Your own Shadow Earth duplicate"
     ]
    ]
+  },
+  "discovery": {
+   "card": "dossier",
+   "cards": "dossiers",
+   "collection": "case file",
+   "phases": [
+    "Confront the unknown",
+    "Identify",
+    "Uncover"
+   ],
+   "threat": {
+    "name": "Escalation",
+    "repeat": true,
+    "onFill": "the Operant's next move is bigger",
+    "count": "escalations"
+   },
+   "costs": [
+    "Scrutiny",
+    "Backlash",
+    "Collateral"
+   ]
   }
  },
  "fantasy": {
@@ -690,6 +711,31 @@ export const PACKS = {
      "A psionic with no limits"
     ]
    ]
+  },
+  "discovery": {
+   "card": "data record",
+   "cards": "data records",
+   "collection": "codex",
+   "phases": [
+    "Confront the unknown",
+    "Identify",
+    "Uncover"
+   ],
+   "threat": {
+    "name": "Countdown",
+    "repeat": false,
+    "onFill": "the situation hits",
+    "count": ""
+   },
+   "costs": [
+    "Heat",
+    "Reputation",
+    "Hull"
+   ],
+   "kinds": [
+    "weakness",
+    "permission"
+   ]
   }
  },
  "western": {
@@ -907,6 +953,27 @@ export const PACKS = {
      "A senator with a secret",
      "The last of a hunter bloodline"
     ]
+   ]
+  },
+  "discovery": {
+   "card": "lore card",
+   "cards": "lore cards",
+   "collection": "hunter's almanac",
+   "phases": [
+    "Confront the unknown",
+    "Identify",
+    "Uncover"
+   ],
+   "threat": {
+    "name": "Harvest",
+    "repeat": true,
+    "onFill": "the creature claims another victim",
+    "count": "victims claimed"
+   },
+   "costs": [
+    "Heat",
+    "Whispers",
+    "The Dark"
    ]
   }
  },
@@ -1576,6 +1643,60 @@ export function commands() {
         { type: 1, name: "reset", description: "GM: clear every track" },
       ],
     },
+    {
+      name: "discovery",
+      description: "Discovery clocks, the threat clock they race, and what investigating costs",
+      options: [
+        { type: 1, name: "new", description: "Start a discovery clock (or a plain progress clock in the race)",
+          options: [
+            { type: 3, name: "name", description: "e.g. What's killing the cattle", required: true, max_length: 40 },
+            { type: 3, name: "phases", description: "Segments for Confront, Identify, Uncover", required: false,
+              choices: [{ name: "1 · 2 · 2 (quick)", value: "1,2,2" }, { name: "2 · 2 · 2", value: "2,2,2" }, { name: "2 · 3 · 3 (substantial)", value: "2,3,3" }] },
+            { type: 5, name: "plain", description: "A plain progress clock (a repair, a task): no phases, no card", required: false },
+          ] },
+        { type: 1, name: "tick", description: "Advance a clock (stops at the Identify gate until the subject is confirmed)",
+          options: [
+            { type: 3, name: "name", description: "Which clock", required: true },
+            { type: 4, name: "segments", description: "1 for a success, 2 for success by 5+ (default 1; -1 to undo)", required: false, min_value: -8, max_value: 8 },
+          ] },
+        { type: 1, name: "identify", description: "GM: confirm what the subject is, which passes the gate",
+          options: [
+            { type: 3, name: "name", description: "Which clock", required: true },
+            { type: 3, name: "subject", description: "What it is, e.g. Werewolf", required: true, max_length: 60 },
+          ] },
+        { type: 1, name: "fail", description: "A failed investigation roll: tick a track (and a repeating threat clock)",
+          options: [{ type: 3, name: "track", description: "Which track, by how the party was digging", required: true, max_length: 40 }] },
+        { type: 1, name: "push", description: "A push to dig faster or harder: tick a track",
+          options: [{ type: 3, name: "track", description: "Which track", required: true, max_length: 40 }] },
+        { type: 1, name: "threat", description: "Tick the threat clock, or set its size",
+          options: [
+            { type: 4, name: "segments", description: "How many (default 1; -1 to undo)", required: false, min_value: -8, max_value: 8 },
+            { type: 4, name: "size", description: "GM: its size", required: false, choices: [{ name: "4", value: 4 }, { name: "6", value: 6 }, { name: "8", value: 8 }] },
+          ] },
+        { type: 1, name: "mint", description: "GM: a full clock mints a card for the primary investigator and everyone present",
+          options: [
+            { type: 3, name: "name", description: "Which clock", required: true },
+            { type: 6, name: "owner", description: "The primary investigator", required: true },
+            { type: 3, name: "permits", description: "What the card permits", required: true, max_length: 200 },
+            { type: 3, name: "learned", description: "What was learned", required: false, max_length: 200 },
+            { type: 3, name: "present", description: "Everyone else present: @mentions", required: false, max_length: 300 },
+          ] },
+        { type: 1, name: "show", description: "Show the threat clock, the discovery clocks and the cards that match" },
+        { type: 1, name: "remove", description: "Remove a clock", options: [{ type: 3, name: "name", description: "Which clock", required: true }] },
+        { type: 1, name: "reset", description: "GM: clear every discovery clock and the threat clock" },
+      ],
+    },
+    {
+      name: "cards",
+      description: "Cards learned in play (lore cards, dossiers, data records), from your character files",
+      options: [
+        { type: 1, name: "load", description: "Load the cards from a character file (or the GM's group file)",
+          options: [{ type: 11, name: "file", description: "The character's .json file from the creator", required: true }] },
+        { type: 1, name: "show", description: "Show a player's cards", options: [{ type: 6, name: "player", description: "Whose (default: yours)", required: false }] },
+        { type: 1, name: "subject", description: "Every card the table holds for a subject",
+          options: [{ type: 3, name: "subject", description: "e.g. Werewolf", required: true, max_length: 60 }] },
+      ],
+    },
     { name: "seed", description: "Roll an adventure seed: 3d6 on each of the game's tables" },
     {
       name: "game",
@@ -1725,7 +1846,7 @@ const subOf = (interaction) => {
 };
 const intOr0 = (v) => (Number.isInteger(v) ? v : 0);
 const cleanLabel = (v) => String(v || "").replace(/\|/g, "/").trim().slice(0, 40);
-const reply = (content, priv = false) => ({ type: MESSAGE, data: { content, flags: priv ? EPHEMERAL : 0, allowed_mentions: { parse: [] } } });
+const reply = (content, priv = false) => ({ type: MESSAGE, data: { content: content.length > 2000 ? content.slice(0, 1990) + " …" : content, flags: priv ? EPHEMERAL : 0, allowed_mentions: { parse: [] } } });
 const needsStore = (what) => reply(`${what} need the bot's storage. Bind a KV namespace named STORE to the Worker (see the bot's README).`, true);
 const gmOnly = () => reply("Only the GM (someone with Manage Server) can do that.", true);
 
@@ -1996,9 +2117,194 @@ async function gameCommand(interaction, env, game) {
   return reply("Unknown /game option.", true);
 }
 
+// ---- Discovery clocks and cards learned in play ----
+// Cards come from character files (/cards load), stored per server and game: { [character key]: {name, user, cards} }.
+// Discovery state, per server and game: { threat: {size, filled, count}, clocks: { [lowercased name]: {...} }, active: tag }.
+
+export const tagOf = (x) => String(x || "").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const str = (v, n = 300) => (typeof v === "string" ? v : "").slice(0, n);
+
+/** The characters and their cards in a creator file: one character, or a GM's group file ({crew: [...]}). */
+export function cardsFromFile(data) {
+  const list = Array.isArray(data) ? data : Array.isArray(data?.crew) ? data.crew : [data];
+  return list.filter((c) => c && typeof c === "object" && c.attrs && typeof c.name === "string").map((c) => ({
+    name: str(c.name, 60).trim() || "Unnamed",
+    cards: (Array.isArray(c.cards) ? c.cards : []).filter((k) => k && typeof k === "object").slice(0, 60).map((k) => ({
+      tag: tagOf(k.tag || k.name), name: str(k.name, 80) || str(k.tag, 80), knowledge: str(k.knowledge), permits: str(k.permits), kind: str(k.kind, 20),
+      job: str(k.job, 120), owner: str(k.owner, 60), shared: !!k.shared, present: Array.isArray(k.present) ? k.present.map((p) => str(p, 60)).slice(0, 12) : [], source: str(k.source, 10) })),
+  }));
+}
+/** Every card held at the table for a subject tag. */
+export function cardsForTag(table, tag) {
+  return Object.values(table || {}).flatMap((ch) => (ch.cards || []).filter((k) => k.tag && k.tag === tag).map((k) => ({ holder: ch.name, user: ch.user, card: k })));
+}
+const cardText = (k, game) => `**${k.name || k.tag}**${k.kind ? ` (${k.kind})` : ""}${k.permits ? `: ${k.permits}` : ""}` +
+  `${k.shared ? ` · shared; owner ${k.owner || "?"}` : k.owner ? ` · owner ${k.owner}` : ""}${k.job ? ` · ${k.job}` : ""}`;
+const heldLines = (table, tag, game) => {
+  const d = game.discovery, held = cardsForTag(table, tag);
+  return held.length ? held.map((h) => `📇 ${h.holder}: ${cardText(h.card, game)}`).join("\n") : `No one at the table holds a ${d.card} for that yet.`;
+};
+const discBar = (k) => {
+  const segs = Array.from({ length: k.phases.reduce((a, b) => a + b, 0) }, (_, i) => (i < k.filled ? "●" : "○"));
+  if (k.plain) return segs.join("");
+  return [segs.slice(0, k.phases[0]), segs.slice(k.phases[0], k.phases[0] + k.phases[1]), segs.slice(k.phases[0] + k.phases[1])].map((x) => x.join("")).join(" | ");
+};
+function discLine(k, game) {
+  const d = game.discovery, size = k.phases.reduce((a, b) => a + b, 0), gate = k.plain ? Infinity : k.phases[0] + k.phases[1];
+  const phase = k.plain ? "progress" : k.filled >= size ? (k.minted ? `${d.card} minted` : `done: mint the ${d.card}`) : k.filled < k.phases[0] ? d.phases[0] : k.filled < gate || !k.tag ? d.phases[1] : d.phases[2];
+  return `**${k.name}** ${discBar(k)} ${k.filled}/${size} · ${phase}${k.subject ? ` · identified: **${k.subject}**` : ""}` +
+    (!k.plain && !k.tag && k.filled >= gate ? `\n   ⛔ At the gate: confirm the identity (/discovery identify). Until then it's suspicion, and no ${d.card} applies.` : "");
+}
+const threatLine = (th, game) => { const T = game.discovery.threat;
+  return `**${T.name}** ${"●".repeat(Math.min(th.filled, th.size))}${"○".repeat(Math.max(0, th.size - th.filled))} ${th.filled}/${th.size}` +
+    (T.repeat ? ` · ${T.count || "times filled"}: ${th.count}` : th.filled >= th.size ? `  **It happens: ${T.onFill}.**` : ""); };
+
+async function discoveryCommand(interaction, env, game) {
+  const d = game.discovery;
+  if (!d) return reply(`${game.title} has no discovery clocks.`, true);
+  if (!env.STORE) return needsStore("Discovery clocks");
+  const [sub, opt] = subOf(interaction);
+  const key = `discovery:${guildOf(interaction)}:${game.id}`, cardsKey = `cards:${guildOf(interaction)}:${game.id}`;
+  const st = (await env.STORE.get(key, "json")) || { threat: { size: 6, filled: 0, count: 0 }, clocks: {}, active: "" };
+  const save = () => env.STORE.put(key, JSON.stringify(st));
+  const id = String(opt.name || "").trim().toLowerCase();
+  const k = st.clocks[id];
+  const missing = () => reply(`No discovery clock called "${opt.name}". Use /discovery show to see them.`, true);
+  const tickThreat = (n) => {
+    const th = st.threat; th.filled = Math.max(0, th.filled + n); let fired = 0;
+    while (th.filled >= th.size) { fired++; if (d.threat.repeat) { th.filled -= th.size; th.count++; } else { th.filled = th.size; break; } }
+    return fired ? `\n⚠️ **${d.threat.name} fills:** ${d.threat.onFill}.` : "";
+  };
+  const trackTick = async (name) => {
+    const t = findTrack(game, name);
+    if (!t) return null;
+    const tk = `tracks:${guildOf(interaction)}:${game.id}`, ts = (await env.STORE.get(tk, "json")) || {};
+    ts[t.name] = Math.max(0, Math.min(t.boxes, (ts[t.name] || 0) + 1)); await env.STORE.put(tk, JSON.stringify(ts));
+    return trackLine(t, ts[t.name]);
+  };
+  switch (sub) {
+    case "new": {
+      if (Object.keys(st.clocks).length >= 10 && !k) return reply("This server already has 10 discovery clocks. Remove one first.", true);
+      const ph = String(opt.phases || "2,2,2").split(",").map(Number);
+      st.clocks[id] = { name: String(opt.name).trim().slice(0, 40), plain: !!opt.plain, phases: opt.plain ? [ph.reduce((a, b) => a + b, 0)] : ph, filled: 0, subject: "", tag: "", minted: false };
+      await save();
+      return reply(`New ${opt.plain ? "progress" : "discovery"} clock, racing the ${d.threat.name}: ${discLine(st.clocks[id], game)}`);
+    }
+    case "tick": {
+      if (!k) return missing();
+      const size = k.phases.reduce((a, b) => a + b, 0), gate = k.plain ? Infinity : k.phases[0] + k.phases[1];
+      let v = Math.max(0, Math.min(size, k.filled + (Number.isInteger(opt.segments) ? opt.segments : 1)));
+      if (!k.tag && v > gate) v = gate;
+      k.filled = v; await save();
+      return reply(discLine(k, game) + (k.filled >= size && !k.plain && !k.minted ? `\n✨ Full: the GM mints the ${d.card} (/discovery mint).` : ""));
+    }
+    case "identify": {
+      if (!isGM(interaction)) return gmOnly();
+      if (!k) return missing();
+      if (k.plain) return reply("A plain progress clock has no subject to identify.", true);
+      const gate = k.phases[0] + k.phases[1];
+      if (k.filled < gate) return reply(`Not yet: the Identify phase isn't full (${k.filled}/${gate}). Until it is, theories are suspicion only.`, true);
+      k.subject = String(opt.subject).trim().slice(0, 60); k.tag = tagOf(k.subject); st.active = k.tag; await save();
+      const table = (await env.STORE.get(cardsKey, "json")) || {};
+      return reply(`🔎 **Identified: ${k.subject}.** The gate is open.\n${discLine(k, game)}\n${heldLines(table, k.tag, game)}`);
+    }
+    case "fail":
+    case "push": {
+      const line = await trackTick(opt.track);
+      if (!line) return reply(`No track called "${opt.track}". Investigating pushes: ${(d.costs || []).join(", ")}.`, true);
+      const extra = sub === "fail" && d.threat.repeat ? tickThreat(1) : "";
+      await save();
+      return reply(`${sub === "fail" ? "Failed investigation roll" : "A push"}: ${line}${sub === "fail" && d.threat.repeat ? `\n${threatLine(st.threat, game)}` : ""}${extra}`);
+    }
+    case "threat": {
+      if (Number.isInteger(opt.size)) { if (!isGM(interaction)) return gmOnly(); st.threat.size = opt.size; st.threat.filled = Math.min(st.threat.filled, opt.size); }
+      const extra = Number.isInteger(opt.size) && !Number.isInteger(opt.segments) ? "" : tickThreat(Number.isInteger(opt.segments) ? opt.segments : 1);
+      await save();
+      return reply(threatLine(st.threat, game) + extra);
+    }
+    case "mint": {
+      if (!isGM(interaction)) return gmOnly();
+      if (!k) return missing();
+      const size = k.phases.reduce((a, b) => a + b, 0);
+      if (k.plain || k.filled < size || !k.tag) return reply(`Only a full discovery clock with a confirmed subject mints a ${d.card}.`, true);
+      const ids = [...new Set([opt.owner, ...String(opt.present || "").matchAll(/<@!?(\d+)>/g)].map((m) => (typeof m === "string" ? m : m[1])))];
+      const table = (await env.STORE.get(cardsKey, "json")) || {};
+      const names = interaction.data.resolved?.users || {};
+      const nameOf = (u) => Object.values(table).find((c) => c.user === u)?.name || names[u]?.global_name || names[u]?.username || `<@${u}>`;
+      const base = { tag: k.tag, name: k.subject, knowledge: String(opt.learned || "").slice(0, 200), permits: String(opt.permits).slice(0, 200), job: k.name, owner: nameOf(opt.owner), present: ids.map(nameOf), source: "play" };
+      for (const u of ids) {
+        const ck = Object.keys(table).find((x) => table[x].user === u) || `user-${u}`;
+        table[ck] = table[ck] || { name: nameOf(u), user: u, cards: [] };
+        table[ck].cards = table[ck].cards.filter((x) => !(x.tag === k.tag && x.job === k.name)).concat([{ ...base, shared: u !== opt.owner }]);
+      }
+      k.minted = true; await save(); await env.STORE.put(cardsKey, JSON.stringify(table));
+      return reply(`✨ **${d.card[0].toUpperCase() + d.card.slice(1)} minted: ${k.subject}.** ${base.owner} owns it; shared copies for ${ids.filter((u) => u !== opt.owner).map(nameOf).join(", ") || "no one else"}.\nPermits: ${base.permits}\nAdd it to each sheet under *Learned in play* (or the GM saves the group file), so it's there next time.`);
+    }
+    case "show": {
+      const table = (await env.STORE.get(cardsKey, "json")) || {};
+      const list = Object.values(st.clocks);
+      return reply([threatLine(st.threat, game), ...(list.length ? list.map((x) => discLine(x, game)) : ["No discovery clocks running. Start one with /discovery new."]),
+        ...(st.active ? [`**Active subject:** ${st.active}`, heldLines(table, st.active, game)] : [])].join("\n"));
+    }
+    case "remove": {
+      if (!k) return missing();
+      delete st.clocks[id]; if (st.active === k.tag && !Object.values(st.clocks).some((x) => x.tag === k.tag)) st.active = ""; await save();
+      return reply(`Removed **${k.name}**.`);
+    }
+    case "reset": {
+      if (!isGM(interaction)) return gmOnly();
+      await env.STORE.put(key, JSON.stringify({ threat: { size: st.threat.size, filled: 0, count: 0 }, clocks: {}, active: "" }));
+      return reply(`Every discovery clock is cleared, and the ${d.threat.name} is empty.`);
+    }
+  }
+  return reply("Unknown /discovery option.", true);
+}
+
+async function cardsCommand(interaction, env, game) {
+  const d = game.discovery;
+  if (!d) return reply(`${game.title} has no cards learned in play.`, true);
+  if (!env.STORE) return needsStore("Cards");
+  const [sub, opt] = subOf(interaction);
+  const key = `cards:${guildOf(interaction)}:${game.id}`;
+  const table = (await env.STORE.get(key, "json")) || {};
+  const me = userOf(interaction).id;
+  switch (sub) {
+    case "load": {
+      const att = interaction.data.resolved?.attachments?.[opt.file];
+      if (!att || !att.url) return reply("Attach the character's .json file.", true);
+      if ((att.size || 0) > 5_000_000) return reply("That file is too big for a character file.", true);
+      let data;
+      try { const r = await (env.fetchFile || fetch)(att.url); data = JSON.parse(await r.text()); }
+      catch { return reply("That isn't a character file from the creator (it isn't JSON).", true); }
+      if (data && typeof data.format === "string" && !data.format.startsWith(game.id + "-")) return reply(`That file is from a different game (${data.format}); this server plays ${game.title}.`, true);
+      const chars = cardsFromFile(data);
+      if (!chars.length) return reply("No characters in that file.", true);
+      const group = chars.length > 1 || Array.isArray(data?.crew);
+      for (const c of chars) {
+        const ck = tagOf(c.name) || "unnamed";
+        table[ck] = { name: c.name, user: group ? table[ck]?.user || "" : me, cards: c.cards };
+      }
+      if (Object.keys(table).length > 40) return reply("This server already has 40 characters' cards. That's the limit.", true);
+      await env.STORE.put(key, JSON.stringify(table));
+      return reply(`Loaded ${chars.map((c) => `**${c.name}**: ${c.cards.length} ${c.cards.length === 1 ? d.card : d.cards}`).join(", ")}.`);
+    }
+    case "show": {
+      const who = opt.player || me;
+      const mine = Object.values(table).filter((c) => c.user === who);
+      if (!mine.length) return reply(who === me ? `No cards loaded for you. Use /cards load with your character file.` : `No cards loaded for <@${who}>.`, true);
+      return reply(mine.map((c) => `**${c.name}'s ${d.collection}** (${c.cards.length})\n` + (c.cards.map((k) => `📇 ${cardText(k, game)}`).join("\n") || "Empty.")).join("\n\n"));
+    }
+    case "subject": {
+      const tag = tagOf(opt.subject);
+      return reply(`**${opt.subject}**\n${heldLines(table, tag, game)}`);
+    }
+  }
+  return reply("Unknown /cards option.", true);
+}
+
 const HANDLERS = {
   roll: rollCommand, contest: contestCommand, assist: assistCommand, points: pointsCommand,
-  clock: clockCommand, track: trackCommand, seed: seedCommand, game: gameCommand,
+  clock: clockCommand, track: trackCommand, seed: seedCommand, game: gameCommand, discovery: discoveryCommand, cards: cardsCommand,
 };
 
 const userOf = (interaction) => interaction.member?.user || interaction.user || { id: "0" };

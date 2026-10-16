@@ -319,6 +319,23 @@ tr.lvl-U td.target { color: var(--muted); }
 /* Clocks and ship */
 .clock-add { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; }
 .clock-add input { grid-column: 1 / -1; }
+.card-list { display: grid; gap: 10px; }
+.disc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 10px 0; }
+.disc-threat, .disc-costs, .dclock { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--well); display: grid; gap: 6px; align-content: start; }
+.disc-clocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.dsegs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.dseg { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--line); background: transparent; cursor: pointer; padding: 0; }
+.dseg.on { background: var(--accent); border-color: var(--accent); }
+.dseg.gate { margin-right: 10px; }
+.dsegs .ph { font-size: .7rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin: 0 2px; }
+.dclock.done { border-color: var(--accent); }
+.disc-match { font-size: .88rem; }
+.disc-mint { display: grid; gap: 6px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.lcard { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px; background: var(--well); }
+.lcard .fields { margin: 0; }
+.lcard-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; justify-content: space-between; }
+.cards-sheet { display: grid; gap: 6px; }
+.cards-sheet .small { display: block; }
 .clocks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .clock { display: grid; justify-items: center; gap: 4px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--well); text-align: center; }
 .clock svg { width: 96px; height: 96px; }
@@ -563,7 +580,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="9c7409a" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · 9c7409a</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="53e0aa9" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · 53e0aa9</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -764,6 +781,14 @@ tr.lvl-U td.target { color: var(--muted); }
               <div class="fields" id="powers-adv-list"></div>
               <div class="btn-row"><button type="button" class="linkish" id="plearn-add">Add a power learned in play</button></div></details>
           </div>
+
+          <details class="fields" id="cards-wrap" hidden><summary class="label"><span id="cards-label"></span></summary>
+            <p class="small muted field wide" id="cards-intro"></p>
+            <div class="field wide" id="almanac-wrap" hidden><span class="label" id="almanac-label"></span>
+              <div class="checks" id="almanac-list"></div><span class="small muted" id="almanac-note"></span></div>
+            <div class="field wide card-list" id="cards-list"></div>
+            <div class="btn-row field wide"><button type="button" class="linkish" id="card-add"></button></div>
+          </details>
         </section>
 
         <section class="step hud">
@@ -876,6 +901,23 @@ tr.lvl-U td.target { color: var(--muted); }
         <label class="small" id="gm-gunfight-wrap" hidden><input type="checkbox" id="gm-gunfight"> <span id="gm-gunfight-label">First round of a gunfight</span></label>
         <ol class="turns" id="gm-turns"></ol>
       </div>
+    </div>
+    <div class="card hud no-print" id="disc-card" hidden>
+      <h3 id="disc-title">Discovery</h3>
+      <p class="small muted" id="disc-intro"></p>
+      <div class="disc-grid">
+        <div class="disc-threat" id="disc-threat"></div>
+        <div class="disc-costs" id="disc-costs"></div>
+      </div>
+      <div class="disc-clocks" id="disc-clocks"></div>
+      <div class="fields">
+        <div class="field wide"><label for="disc-new-name">New clock</label><input type="text" id="disc-new-name" placeholder="e.g. What's killing the cattle at Red Creek"></div>
+        <div class="field"><label for="disc-new-kind">Kind</label><select id="disc-new-kind"></select></div>
+        <div class="field"><label for="disc-new-phases">Segments per phase</label><select id="disc-new-phases">
+          <option value="1,2,2">1 · 2 · 2 (quick)</option><option value="2,2,2" selected>2 · 2 · 2</option><option value="2,3,3">2 · 3 · 3 (substantial)</option><option value="2,3,3,x">8 in all (long)</option></select></div>
+      </div>
+      <div class="btn-row"><button class="btn primary" id="disc-add">Start the clock</button></div>
+      <div class="toast" id="disc-msg" role="status" aria-live="polite"></div>
     </div>
     <div class="card hud no-print bm-card">
       <h3>Battle map</h3>
@@ -6058,6 +6100,20 @@ return { mountLab };
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const uid = () => Math.random().toString(36).slice(2, 10);
+  // Discovery clocks and the cards they mint (pack discovery): lore cards, dossiers, data records. A card grants no bonus;
+  // it records what was learned and what it permits, kept in the character file under "cards".
+  const DISC = PACK.discovery || null;
+  const capFirst = (x) => x ? x[0].toUpperCase() + x.slice(1) : x;
+  const slugTag = (x) => String(x || "").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const cardStr = (v, n = 300) => (typeof v === "string" ? v : "").slice(0, n);
+  function normCard(x) {
+    const kinds = (DISC && DISC.kinds) || [];
+    const present = Array.isArray(x.present) ? x.present.map((p) => cardStr(p, 60)).filter(Boolean) : cardStr(x.present).split(",").map((p) => p.trim()).filter(Boolean);
+    const name = cardStr(x.name, 80) || cardStr(x.tag, 80);
+    return { id: cardStr(x.id, 20) || uid(), tag: slugTag(x.tag || name), name, knowledge: cardStr(x.knowledge), permits: cardStr(x.permits),
+      ...(kinds.length ? { kind: kinds.some((k) => k[0] === x.kind) ? x.kind : kinds[0][0] } : {}),
+      job: cardStr(x.job, 120), owner: cardStr(x.owner, 60), shared: !!x.shared, present, source: ["almanac", "play", "taught"].includes(x.source) ? x.source : "play" };
+  }
   const signed = (n) => (n > 0 ? "+" + n : n < 0 ? "−" + Math.abs(n) : "0");
 
   function blank() {
@@ -6073,7 +6129,7 @@ return { mountLab };
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" }, edgeNotes: {},
       allegiance: "", allegianceDef: null, customTier: 1, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",
-      spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "",
+      spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
       play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [], lasting: [], gwLast: null },
     };
   }
@@ -6099,6 +6155,7 @@ return { mountLab };
         deeper: MA.deeper && Array.isArray(m.deeper) ? m.deeper.filter((x) => SPELLS && SPELLS.list.some((s) => s[0] === x)) : [],
         extraCharms: Math.max(0, Math.min(MA.charms?.extra || 0, parseInt(m.extraCharms, 10) || 0)), heart: typeof m.heart === "string" ? m.heart : "", quicker: typeof m.quicker === "string" ? m.quicker : "", master: m.master === true }; }
     out.powerRaise = Object.fromEntries(Object.entries(out.powerRaise && typeof out.powerRaise === "object" ? out.powerRaise : {}).filter(([k, v]) => POWERS && POWERS.list.some((p) => p[0] === k) && CLASS_NAMES.includes(v)));
+    out.cards = (Array.isArray(out.cards) ? out.cards : []).filter((x) => x && typeof x === "object").map(normCard);
     out.powersLearned = (Array.isArray(out.powersLearned) ? out.powersLearned : []).filter((x) => x && typeof x === "object").map((x) => ({ id: POWERS && POWERS.list.some((p) => p[0] === x.id) ? x.id : "", cl: CLASS_NAMES.includes(x.cl) ? x.cl : "I" }));
     if (typeof out.portrait !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(out.portrait)) out.portrait = "";
     if (out.portraitShape !== "portrait") out.portraitShape = "token";
@@ -6354,6 +6411,8 @@ return { mountLab };
       [!!advOk, advOk ? (ch.sadv.id ? `${T.origin} advantage: ${sAdvName()} (companion: ${sCompName()})` : "Advantage chosen")
         : ch.sadv.id ? `Finish the custom ${T.originLower} advantage and its companion` : ch.adv.id ? "Finish the advantage details" : "Choose an advantage"],
       [!!compOk, compOk ? "Complication chosen" : ch.comp.id ? "Finish the complication details" : "Choose a complication"],
+      ...(hasAlmanac() ? (() => { const n = ch.cards.filter((k) => k.source === "almanac").length;
+        return [[n === ALMANAC_N, n === ALMANAC_N ? `Hunter's Almanac: ${ALMANAC_N} ${DISC.cards}` : `Hunter's Almanac: ${n} of ${ALMANAC_N} ${DISC.cards} chosen (step 4)`]]; })() : []),
       ...(canCast() ? [[ch.spells.length === spellsKnown(), spellsKnown() ? (ch.spells.length === spellsKnown() ? `${spellsKnown()} ${SPELLS.plural} chosen` : `${SPELLS.plural}: ${ch.spells.length} of ${spellsKnown()} chosen`)
         : `Train ${SPELLS.skill} to learn ${SPELLS.plural.toLowerCase()}`]] : []),
       ...(powerSlots().length ? (() => { const sl = powerSlots(), picked = sl.map((_, i) => ch.powers[i] || "").filter(Boolean);
@@ -6636,11 +6695,66 @@ return { mountLab };
     $("st-best").textContent = best;
     renderRoster();
     renderAdvance();
+    renderCards();
     renderSheet();
     renderGun();
     const em = EMBLEMS[division()];
     document.querySelectorAll("[data-emblem]").forEach((e) => { e.setAttribute("d", em.d); e.classList.toggle("stroke", em.stroke); });
     save();
+  }
+
+  // ---- cards learned in play (and a Hunter's Almanac's starting cards) ----
+  const hasAlmanac = (c = ch) => !!(DISC && (DISC.subjects || []).length && (c.adv.id === "almanac" || (edgeN("adv2", c) && c.adv2.id === "almanac")));
+  const ALMANAC_N = 3;
+  function almanacCard(sub) {
+    return normCard({ tag: sub[0], name: sub[1], knowledge: sub[2], permits: sub[3], job: "Before play (Hunter's Almanac)", owner: ch.name.trim(), source: "almanac" });
+  }
+  function cardLine(k) {
+    const kind = DISC.kinds && k.kind ? (DISC.kinds.find((x) => x[0] === k.kind) || [])[0] : "";
+    return `<b>${esc(k.name || k.tag || "Unnamed")}</b>${kind ? ` <span class="muted small">(${esc(kind)})</span>` : ""}`
+      + (k.knowledge ? `<span class="small">${esc(k.knowledge)}</span>` : "")
+      + (k.permits ? `<span class="small"><b>Permits:</b> ${esc(k.permits)}</span>` : "")
+      + `<span class="small muted">${[k.job && esc(k.job), k.shared ? `shared copy; owner ${esc(k.owner || "unknown")}` : k.owner ? `owner ${esc(k.owner)}` : "", k.present.length ? `present: ${esc(k.present.join(", "))}` : ""].filter(Boolean).join(" · ")}</span>`;
+  }
+  function renderCards() {
+    $("cards-wrap").hidden = !DISC;
+    if (!DISC) return;
+    // The almanac's cards come with the advantage, and go with it.
+    if (!hasAlmanac() && ch.cards.some((k) => k.source === "almanac")) ch.cards = ch.cards.filter((k) => k.source !== "almanac");
+    const own = ch.cards.filter((k) => k.source !== "almanac"), alm = ch.cards.filter((k) => k.source === "almanac");
+    $("cards-label").textContent = `${capFirst(DISC.cards)} learned in play: your ${DISC.collection}` + (ch.cards.length ? ` (${ch.cards.length})` : "");
+    $("cards-intro").textContent = `A ${DISC.card} is earned at the end of a discovery clock, by the primary investigator and everyone present. It grants no bonus: it records what you learned and what it permits. The GM can add one to everyone present from the GM view; write one here when you earn it or someone teaches you.`;
+    $("card-add").textContent = `Add a ${DISC.card}`;
+    $("almanac-wrap").hidden = !hasAlmanac();
+    if (hasAlmanac()) {
+      const have = new Set(alm.map((k) => k.tag));
+      $("almanac-label").textContent = `Hunter's Almanac: choose ${ALMANAC_N} ${DISC.cards} (${have.size} of ${ALMANAC_N})`;
+      $("almanac-list").innerHTML = DISC.subjects.map((x) => `<label title="${esc(x[2])}"><input type="checkbox" data-almanac="${esc(x[0])}"${have.has(x[0]) ? " checked" : have.size >= ALMANAC_N ? " disabled" : ""}> ${esc(x[1])}</label>`).join("");
+      $("almanac-note").innerHTML = alm.length ? alm.map((k) => `<b>${esc(k.name)}:</b> ${esc(k.permits)}`).join("<br>") : "Each card says what you know and what it permits; see the GM's Guide.";
+    }
+    const sig = own.map((k) => k.id).join(",") + "|" + (DISC.kinds ? "k" : "");
+    if ($("cards-list").dataset.sig !== sig) {
+      $("cards-list").dataset.sig = sig;
+      $("cards-list").innerHTML = own.map((k) => `<div class="lcard" data-cardid="${k.id}">
+        <div class="fields">
+          <div class="field"><label for="cd-name-${k.id}">Subject</label><input type="text" id="cd-name-${k.id}" data-cf="name" placeholder="${DISC.subjects && DISC.subjects[0] ? esc(DISC.subjects[0][1]) : "Who or what it's about"}"></div>
+          ${DISC.kinds ? `<div class="field"><label for="cd-kind-${k.id}">Kind</label><select id="cd-kind-${k.id}" data-cf="kind">${DISC.kinds.map((x) => `<option value="${x[0]}">${esc(capFirst(x[0]))}</option>`).join("")}</select></div>` : ""}
+          <div class="field"><label for="cd-job-${k.id}">Earned in</label><input type="text" id="cd-job-${k.id}" data-cf="job" placeholder="The ${esc(T.missionLower || "job")}"></div>
+          <div class="field wide"><label for="cd-know-${k.id}">What you learned</label><input type="text" id="cd-know-${k.id}" data-cf="knowledge"></div>
+          <div class="field wide"><label for="cd-perm-${k.id}">What it permits</label><input type="text" id="cd-perm-${k.id}" data-cf="permits"></div>
+          <div class="field"><label for="cd-owner-${k.id}">Owner</label><input type="text" id="cd-owner-${k.id}" data-cf="owner" placeholder="The primary investigator"></div>
+          <div class="field"><label for="cd-present-${k.id}">Who was there</label><input type="text" id="cd-present-${k.id}" data-cf="present" placeholder="Names, with commas"></div>
+          <div class="field wide"><div class="checks"><label><input type="checkbox" id="cd-shared-${k.id}" data-cf="shared"> A shared copy (someone else is the owner)</label>
+            <label><input type="checkbox" id="cd-taught-${k.id}" data-cf="taught"> Taught to me later</label></div></div>
+        </div>
+        <div class="btn-row"><button type="button" class="linkish" data-carddel="${k.id}">Remove</button></div></div>`).join("");
+    }
+    for (const k of own) {
+      const set = (id, v) => { const e = $(id); if (e && document.activeElement !== e) { if (e.type === "checkbox") e.checked = v; else e.value = v; } };
+      set("cd-name-" + k.id, k.name); set("cd-job-" + k.id, k.job); set("cd-know-" + k.id, k.knowledge); set("cd-perm-" + k.id, k.permits);
+      set("cd-owner-" + k.id, k.owner); set("cd-present-" + k.id, k.present.join(", ")); set("cd-shared-" + k.id, k.shared); set("cd-taught-" + k.id, k.source === "taught");
+      if (DISC.kinds) set("cd-kind-" + k.id, k.kind);
+    }
   }
 
   function renderRoster() {
@@ -6704,6 +6818,7 @@ return { mountLab };
         ${ch.speciesNotes ? `<div class="field"><span class="label">Other ability (GM approved)</span><span>${esc(ch.speciesNotes)}</span></div>` : ""}
         ${ch.notes ? `<div class="field wide"><span class="label">Notes</span><span>${esc(ch.notes)}</span></div>` : ""}
         ${roleAbility() ? `<div class="field wide"><span class="label">${esc(T.role)} ability</span><span><b>${esc(roleAbility()[0])}.</b> ${esc(roleAbility()[1])}</span></div>` : ""}
+        ${DISC && ch.cards.length ? `<div class="field wide"><span class="label">${esc(capFirst(DISC.collection))}: ${ch.cards.length} ${esc(ch.cards.length === 1 ? DISC.card : DISC.cards)}</span><div class="cards-sheet">${ch.cards.map((k) => `<div>${cardLine(k)}</div>`).join("")}</div></div>` : ""}
         ${ch.play.lasting.length ? `<div class="field wide"><span class="label">Lasting wounds</span><span>${ch.play.lasting.map((w) => `${esc(w.name)}${w.complication ? " (complication)" : w.heal ? ` (${esc(w.heal)})` : ""}`).join("; ")}</span></div>` : ""}
         ${ch.xp.earned || ch.advances.length ? `<div class="field wide"><span class="label">Advancement: ${pointsAvail()} point${pointsAvail() === 1 ? "" : "s"} to spend, ${ch.xp.earned} earned</span><span>${ch.advances.map((a) => `${esc(purchaseText(a))}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ") || "Nothing bought yet."}</span></div>` : ""}
       </div>`;
@@ -7951,7 +8066,123 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
     return { added, updated };
   }
   let labPanel = null; // the Encounter panel (and, with a test configuration, the Rules Lab)
+  // ---- discovery clocks, the threat clock they race, investigation costs, and minting cards (pack discovery) ----
+  const STORE_DISC = PACK.id + ".discovery.v1";
+  const discBlank = () => ({ threat: { size: 6, filled: 0, count: 0 }, clocks: [] });
+  let disc = (() => { const d = store.get(STORE_DISC, null); return d && typeof d === "object" && d.threat && Array.isArray(d.clocks) ? d : discBlank(); })();
+  const discSave = () => store.set(STORE_DISC, disc);
+  const discSay = (m, err) => { $("disc-msg").textContent = m; $("disc-msg").className = "toast" + (err ? " err" : ""); };
+  const PHASE_NAMES = () => (DISC.phases || []).map((p) => p[0]);
+  const gateAt = (k) => k.plain ? Infinity : k.phases[0] + k.phases[1];
+  const sizeOf = (k) => k.phases.reduce((a, b) => a + b, 0);
+  // Cards held across the table for a subject tag: one line per card, its holder and its owner.
+  const cardsFor = (tag) => gmCrew.flatMap((c) => (c.cards || []).filter((k) => k.tag && k.tag === tag).map((k) => ({ c, k })));
+  function setTrack(name, delta) {
+    const t = PACK.tracks.find((x) => x.name === name); if (!t) return;
+    ship[name] = Math.max(0, Math.min(t.boxes, (ship[name] || 0) + delta)); store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {}
+  }
+  function tickThreat(n) {
+    const th = disc.threat, T2 = DISC.threat;
+    th.filled = Math.max(0, th.filled + n);
+    let fired = 0;
+    while (th.filled >= th.size) { fired++; if (T2.repeat) { th.filled -= th.size; th.count++; } else { th.filled = th.size; break; } }
+    if (n < 0 && th.filled < 0) th.filled = 0;
+    discSave();
+    if (fired) discSay(`${T2.name} filled: ${T2.onFill}.` + (T2.repeat ? ` ${capFirst(T2.count || "times filled")}: ${th.count}.` : ""));
+  }
+  function renderDisc() {
+    $("disc-card").hidden = !DISC;
+    if (!DISC) return;
+    const T2 = DISC.threat, th = disc.threat;
+    $("disc-title").textContent = `Discovery: ${capFirst(DISC.cards)}`;
+    $("disc-intro").textContent = `Discovery clocks fill in three phases (${PHASE_NAMES().join(", ")}); filling one mints a ${DISC.card} for the primary investigator and a shared copy for everyone present. Each races the ${T2.name}.`;
+    $("disc-new-kind").innerHTML = `<option value="discovery">Discovery clock (mints a ${esc(DISC.card)})</option><option value="plain">Plain progress clock (no card: a repair, a task)</option>`;
+    $("disc-threat").innerHTML = `<b>${esc(T2.name)}</b><span class="small muted">${T2.repeat ? `Ticks once a scene of investigating and once a failed investigation roll. When it fills, ${esc(T2.onFill)}, and it starts again.` : `A hard timer: it ticks with time, whatever the crew does. When it fills, ${esc(T2.onFill)}.`}</span>
+      <div class="dsegs">${Array.from({ length: th.size }, (_, i) => `<button class="dseg ${i < th.filled ? "on" : ""}" data-tseg="${i + 1}" aria-label="${esc(T2.name)} segment ${i + 1}"></button>`).join("")}
+        <select data-tsize style="width:auto" aria-label="${esc(T2.name)} size">${[4, 6, 8].map((n) => `<option value="${n}"${n === th.size ? " selected" : ""}>${n}</option>`).join("")}</select></div>
+      ${T2.repeat ? `<span class="small">${esc(capFirst(T2.count || "times filled"))}: <b>${th.count}</b></span>` : th.filled >= th.size ? `<span class="small"><b>It has happened.</b></span>` : ""}
+      <div class="btn-row"><button class="btn" data-tick="1">${T2.repeat ? "A scene passes (+1)" : "Time passes (+1)"}</button><button class="linkish" data-tick="-1">Undo</button><button class="linkish" data-treset>Reset</button></div>`;
+    $("disc-costs").innerHTML = `<b>What investigating costs</b><span class="small muted">A failed investigation roll${T2.repeat ? ` (which also ticks the ${esc(T2.name)})` : ""} or a push ticks one track, chosen by how the ${esc(T.party || "party")} is digging.</span>`
+      + (DISC.costs || []).map(([name, why]) => { const t = PACK.tracks.find((x) => x.name === name); const v = Math.min(t ? t.boxes : 4, ship[name] || 0);
+        return `<div><b>${esc(name)}</b> <span class="small muted">${esc(why)} · ${v}/${t ? t.boxes : 4}: ${esc(shipEffect(name, v))}</span>
+          <div class="btn-row"><button class="btn" data-cost="${esc(name)}" data-fail="1">Failed roll</button><button class="btn" data-cost="${esc(name)}">Push</button></div></div>`; }).join("");
+    const crewOpts = (sel) => `<option value="">Primary investigator…</option>` + gmCrew.map((c) => `<option value="${c.id}"${c.id === sel ? " selected" : ""}>${esc(c.name || "Unnamed")}</option>`).join("");
+    $("disc-clocks").innerHTML = disc.clocks.length ? disc.clocks.map((k) => {
+      const size = sizeOf(k), gate = gateAt(k), full = k.filled >= size, held = k.tag ? cardsFor(k.tag) : [];
+      let phaseNow = "";
+      if (!k.plain) { const names = PHASE_NAMES(); phaseNow = full ? (k.minted ? `${capFirst(DISC.card)} minted` : "Done: mint the " + DISC.card) : k.filled < k.phases[0] ? names[0] : k.filled < gate || !k.tag ? names[1] : names[2]; }
+      let segs = "";
+      for (let i = 0; i < size; i++) segs += `<button class="dseg ${i < k.filled ? "on" : ""} ${!k.plain && (i + 1 === k.phases[0] || i + 1 === gate) ? "gate" : ""}" data-kseg="${k.id}" data-i="${i + 1}" aria-label="Segment ${i + 1}"></button>`;
+      return `<div class="dclock ${full ? "done" : ""}" data-kid="${k.id}"><b>${esc(k.name)}</b>
+        <span class="small muted">${k.plain ? `Progress clock, ${k.filled}/${size}` : `${esc(phaseNow)} · ${k.filled}/${size}`}</span>
+        <div class="dsegs">${segs}</div>
+        <div class="btn-row"><button class="btn" data-kadv="${k.id}" data-n="1">+1</button><button class="btn" data-kadv="${k.id}" data-n="2">+2 (by 5+)</button><button class="linkish" data-kadv="${k.id}" data-n="-1">Undo</button><button class="linkish danger" data-krm="${k.id}">Remove</button></div>
+        ${k.plain ? "" : `<div class="fields"><div class="field"><label for="dk-pi-${k.id}">Primary investigator</label><select id="dk-pi-${k.id}" data-kpi="${k.id}">${crewOpts(k.primary)}</select></div>
+          <div class="field"><label for="dk-sub-${k.id}">Identified as</label><input type="text" id="dk-sub-${k.id}" data-ksub="${k.id}" value="${esc(k.subject || "")}" placeholder="${k.filled >= gate ? "Name it to pass the gate" : "Not until Identify is full"}"${k.filled < gate && !k.subject ? " disabled" : ""}></div></div>
+          ${k.filled >= gate && !k.tag ? `<span class="small"><b>The gate:</b> confirm the identity above before the clock can go on. Until then, theories are suspicion only, and no ${esc(DISC.card)} applies.</span>` : ""}
+          ${k.tag ? `<div class="disc-match">${held.length ? `<b>Already held:</b> ${held.map(({ c, k: card }) => `${esc(c.name)} (${esc(card.name || card.tag)}${card.shared ? `, shared; owner ${esc(card.owner)}` : ""}): ${esc(card.permits || card.knowledge)}`).join("; ")}` : `<span class="muted small">No one holds a ${esc(DISC.card)} for ${esc(k.subject)} yet.</span>`}</div>` : ""}
+          ${full && !k.minted ? `<div class="disc-mint"><b>Mint the ${esc(DISC.card)}</b>
+            <div class="fields">${DISC.kinds ? `<div class="field"><label for="dk-kind-${k.id}">Kind</label><select id="dk-kind-${k.id}">${DISC.kinds.map((x) => `<option value="${x[0]}">${esc(capFirst(x[0]))}</option>`).join("")}</select></div>` : ""}
+              <div class="field wide"><label for="dk-know-${k.id}">What they learned</label><input type="text" id="dk-know-${k.id}" value="${esc((DISC.subjects || []).find((x) => x[0] === k.tag)?.[2] || "")}"></div>
+              <div class="field wide"><label for="dk-perm-${k.id}">What it permits</label><input type="text" id="dk-perm-${k.id}" value="${esc((DISC.subjects || []).find((x) => x[0] === k.tag)?.[3] || "")}"></div>
+              <div class="field wide"><label for="dk-job-${k.id}">Earned in</label><input type="text" id="dk-job-${k.id}" value="${esc(k.name)}"></div>
+              <div class="field wide"><span class="label">Present at the minting</span><div class="checks">${gmCrew.map((c) => `<label><input type="checkbox" data-kpresent="${k.id}" value="${c.id}" checked> ${esc(c.name || "Unnamed")}</label>`).join("") || `<span class="small muted">Add the characters above first.</span>`}</div></div></div>
+            <div class="btn-row"><button class="btn primary" data-kmint="${k.id}">Mint for everyone present</button></div></div>` : ""}`}
+      </div>`; }).join("") : `<p class="small muted">No discovery clocks running. Start one when a ${esc(T.missionLower || "job")} turns on something unknown.</p>`;
+  }
+  function mintCard(k) {
+    const present = [...document.querySelectorAll(`[data-kpresent="${k.id}"]:checked`)].map((x) => gmCrew.find((c) => c.id === x.value)).filter(Boolean);
+    const owner = gmCrew.find((c) => c.id === k.primary);
+    if (!owner) return discSay(`Choose the primary investigator first: they own the ${DISC.card}.`, true);
+    if (!present.includes(owner)) present.unshift(owner);
+    const base = { tag: k.tag, name: k.subject, knowledge: $("dk-know-" + k.id).value.trim(), permits: $("dk-perm-" + k.id).value.trim(), job: $("dk-job-" + k.id).value.trim(),
+      ...(DISC.kinds ? { kind: $("dk-kind-" + k.id).value } : {}), owner: owner.name || "", present: present.map((c) => c.name || "Unnamed"), source: "play" };
+    if (!base.permits) return discSay(`Say what the ${DISC.card} permits: that's what it's for.`, true);
+    for (const c of present) {
+      c.cards = (c.cards || []).filter((x) => !(x.tag === k.tag && x.source !== "almanac" && x.job === base.job));
+      c.cards.push(normCard({ ...base, shared: c !== owner }));
+    }
+    k.minted = true; discSave(); saveGM(); renderGM();
+    discSay(`${capFirst(DISC.card)} for ${k.subject} minted: ${owner.name} owns it, with shared copies for ${present.filter((c) => c !== owner).map((c) => c.name).join(", ") || "no one else"}. Save all to file so the players get it.`);
+  }
+  $("disc-add").onclick = () => {
+    const name = $("disc-new-name").value.trim(); if (!name) return discSay("Name the clock first.", true);
+    const plain = $("disc-new-kind").value === "plain", pv = $("disc-new-phases").value;
+    const phases = pv === "2,3,3,x" ? [2, 3, 3] : pv.split(",").map(Number);
+    disc.clocks.push({ id: uid(), name, plain, phases: plain ? [phases.reduce((a, b) => a + b, 0)] : phases, filled: 0, subject: "", tag: "", primary: "", minted: false });
+    $("disc-new-name").value = ""; discSave(); renderDisc(); discSay(`Started: ${name}.`);
+  };
+  function advance(k, n) {
+    const size = sizeOf(k), gate = gateAt(k);
+    let v = Math.max(0, Math.min(size, k.filled + n));
+    if (!k.plain && !k.tag && v > gate) v = gate; // segments never spill past the gate
+    k.filled = v;
+  }
+  $("disc-card").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const kOf = (id) => disc.clocks.find((x) => x.id === id);
+    if (b.dataset.tseg) { const i = +b.dataset.tseg; disc.threat.filled = disc.threat.filled === i ? i - 1 : i; discSave(); }
+    else if (b.dataset.tick) tickThreat(+b.dataset.tick);
+    else if (b.dataset.treset !== undefined) { disc.threat = { ...disc.threat, filled: 0, count: 0 }; discSave(); }
+    else if (b.dataset.cost) { setTrack(b.dataset.cost, 1); if (b.dataset.fail && DISC.threat.repeat) tickThreat(1); discSay(`${b.dataset.cost} +1${b.dataset.fail && DISC.threat.repeat ? `, and the ${DISC.threat.name} ticks` : ""}.`); }
+    else if (b.dataset.kseg) { const k = kOf(b.dataset.kseg), i = +b.dataset.i; if (k) advance(k, (k.filled === i ? i - 1 : i) - k.filled); discSave(); }
+    else if (b.dataset.kadv) { const k = kOf(b.dataset.kadv); if (k) { const before = k.filled; advance(k, +b.dataset.n); if (+b.dataset.n > 0 && k.filled === before && !k.tag && !k.plain) discSay("The clock is at the gate: confirm the identity first.", true); } discSave(); }
+    else if (b.dataset.krm) { disc.clocks = disc.clocks.filter((x) => x.id !== b.dataset.krm); discSave(); }
+    else if (b.dataset.kmint) { const k = kOf(b.dataset.kmint); if (k) mintCard(k); return; }
+    else return;
+    renderDisc();
+  });
+  $("disc-card").addEventListener("change", (e) => {
+    const t = e.target, kOf = (id) => disc.clocks.find((x) => x.id === id);
+    if (t.dataset.tsize !== undefined) { disc.threat.size = +t.value; disc.threat.filled = Math.min(disc.threat.filled, disc.threat.size); }
+    else if (t.dataset.kpi) { const k = kOf(t.dataset.kpi); if (k) k.primary = t.value; }
+    else if (t.dataset.ksub) { const k = kOf(t.dataset.ksub); if (k) { k.subject = t.value.trim(); k.tag = slugTag(k.subject); } }
+    else return;
+    discSave(); renderDisc();
+  });
+
   function renderGM() {
+    renderDisc();
     if (labPanel) setTimeout(labPanel.refresh, 0);
     try { battleMap.refresh(); } catch { /* the map mounts just after the GM view's first render */ }
     if (gmReady) { renderLogForm(); renderSeed(); renderLogBook(); } // the log and seed panels exist once their data has loaded
@@ -8017,6 +8248,7 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
         if (Array.isArray(data.log)) mergeLog(data.log);
         if (Array.isArray(data.allegiances)) alAdded += mergeAllegiances(data.allegiances);
         if (GRITTY && typeof data.gritty === "boolean") setGritty(data.gritty);
+        if (DISC && data.discovery && data.discovery.threat && Array.isArray(data.discovery.clocks)) { disc = data.discovery; discSave(); }
         const list = Array.isArray(data) ? data : Array.isArray(data.crew) ? data.crew : [data];
         if (!list.some((x) => x && x.attrs) && Array.isArray(data.allegiances)) continue; // an allegiances file
         const ok = list.filter((x) => x && x.attrs && x.skills);
@@ -8063,7 +8295,7 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   renderAllegianceList();
   $("gm-save").onclick = () => {
     if (!gmCrew.length) { gmSay("Add some characters first.", true); return; }
-    saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog, allegiances: campaignAllegiances, ...(GRITTY ? { gritty } : {}) }, null, 2), PACK.id + "-characters.json", gmSay);
+    saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog, allegiances: campaignAllegiances, ...(GRITTY ? { gritty } : {}), ...(DISC ? { discovery: disc } : {}) }, null, 2), PACK.id + "-characters.json", gmSay);
   };
   // ---- The Encounter panel: the published rules in every setting with weapons as data; the Rules Lab's experiments
   // where a test configuration exists. Never used by the sheet. ----
@@ -8396,6 +8628,28 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   $("btn-new").onclick = newOfficer;
   $("banner-new").onclick = newOfficer;
   $("plearn-add").onclick = () => { ch.powersLearned.push({ id: "", cl: "I" }); touch(); render(); };
+  $("card-add").onclick = () => { ch.cards.push(normCard({ owner: ch.name.trim(), present: ch.name.trim() ? [ch.name.trim()] : [] })); $("cards-wrap").open = true; touch(); render(); };
+  $("almanac-list").addEventListener("change", (e) => {
+    const t = e.target.closest("[data-almanac]"); if (!t) return;
+    const sub = DISC.subjects.find((x) => x[0] === t.dataset.almanac); if (!sub) return;
+    ch.cards = ch.cards.filter((k) => !(k.source === "almanac" && k.tag === sub[0]));
+    if (t.checked && ch.cards.filter((k) => k.source === "almanac").length < ALMANAC_N) ch.cards.push(almanacCard(sub));
+    touch(); render();
+  });
+  const cardEdit = (e) => {
+    const t = e.target.closest("[data-cf]"), box = e.target.closest("[data-cardid]"); if (!t || !box) return;
+    const k = ch.cards.find((x) => x.id === box.dataset.cardid); if (!k) return;
+    const f = t.dataset.cf;
+    if (f === "shared") k.shared = t.checked;
+    else if (f === "taught") k.source = t.checked ? "taught" : "play";
+    else if (f === "present") k.present = t.value.split(",").map((x) => x.trim()).filter(Boolean);
+    else if (f === "name") { k.name = t.value; k.tag = slugTag(t.value); }
+    else k[f] = t.value;
+    touch(); render();
+  };
+  $("cards-list").addEventListener("input", cardEdit);
+  $("cards-list").addEventListener("change", cardEdit);
+  $("cards-list").addEventListener("click", (e) => { const b = e.target.closest("[data-carddel]"); if (!b) return; ch.cards = ch.cards.filter((k) => k.id !== b.dataset.carddel); touch(); render(); });
   $("powers-adv-list").addEventListener("click", (e) => { const b = e.target.closest("[data-plearndel]"); if (!b) return; ch.powersLearned.splice(+b.dataset.plearndel, 1); touch(); render(); });
   $("btn-example").onclick = () => { load(example()); toast(`Example loaded: ${ch.name}.`); };
   $("btn-save").onclick = () => {

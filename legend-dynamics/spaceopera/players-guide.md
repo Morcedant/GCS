@@ -325,6 +325,61 @@ A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something tha
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. A successful roll does not force someone to abandon a core belief or reveal what they do not know.
 
+## Discovery clocks and data records
+
+When a job turns on an unknown subject (an alien species, a derelict technology, an uncharted world behind a collapsed corridor, or a faction's intentions), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **data record**: what the characters learned, kept for good. A character's data records are their **codex**.
+
+| Phase | What it means |
+|---|---|
+| 1. Confront the unknown | Effects without a cause: a signal no one can read, a derelict that powers up, a crew that won't answer. You may suspect, but nothing is confirmed. |
+| 2. Identify | Name it: the species, the technology, the world, the faction's aim. This is the gate: until it's confirmed, no data record applies, and the GM treats your theories as suspicion only. |
+| 3. Uncover | Learn how it is beaten, or how it is used. Filling this phase fills the clock and mints a data record. |
+
+- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
+- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
+- **The primary investigator.** One character leads and owns the data record. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant data record can assist with a method they couldn't otherwise bring (the data record is why they're qualified); it adds nothing beyond the normal assistance.
+- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
+
+### The data record
+
+A data record grants **no bonus** to any roll. It is an earned permission: knowledge that makes possible an action otherwise forbidden or unavailable against that subject. Without it, the GM can rule that the action isn't possible: you can't aim for a heart you don't know is the weakness, or speak a name you never learned. A data record can authorize a called shot or a telling-hit effect that would otherwise be unavailable.
+
+- A data record never helps confirm its own subject: holding one doesn't prove this is that. It applies once the Identify phase has confirmed it.
+- **Shared copies.** Every character present when the data record is minted (the climactic confrontation or the breakthrough) gets a shared copy; the primary investigator is recorded as its owner. An absent character doesn't, though a holder can teach it to them later with the GM's agreement.
+- **What it records.** The subject (its tag), what was learned, what it permits, the job where it was earned, its owner, and who was there. It's kept on the character sheet, under *Learned in play*.
+
+**Two kinds of data records.** **Weakness:** How it is beaten: a predator's or a hostile system's weakness. **Permission:** How it is used: a species' customs that allow negotiation, a derelict's systems that allow operating it.
+
+### The Countdown
+
+A discovery clock always races a threat clock. The threat is often the situation itself: failing life support, a collapsing corridor, a reactor going critical, a first-contact window closing. A Countdown is a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.
+
+### What investigating costs
+
+When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
+
+| Track | Ticks for | For example |
+|---|---|---|
+| **Heat** | intrusion and provocation | overt scanning of restricted space, slicing into a faction's systems, provoking their security |
+| **Reputation** | digging in the open | asking every port about the derelict, broadcasting on open channels, a first contact that gets noticed |
+| **Hull** | strain on ship and crew | close passes to the anomaly, pushing the sensors past their limits, docking with the unknown |
+
+### Methods
+
+Which methods suit a character depends on their calling, species and skills. The GM says which methods can advance each phase.
+
+| Method | Skills | Suits | Phases | For example |
+|---|---|---|---|---|
+| Scan it | Sensors | Ship Crew, Frontier | Confront, Identify | Passive first, active if you must (active scanning of restricted space ticks Heat). |
+| Analyze it | Science, Medicine | Frontier | Identify, Uncover | Samples, spectra, biology, the physics of the drive. |
+| Slice the systems | Computers, Engineering | Ship Crew, Trouble | Identify, Uncover | Logs, firmware, the derelict's own records, a faction's network. |
+| Read the people | Psychology, Diplomacy | Service | Any | Their customs, their fears, what their silence means. |
+| Buy or trade for it | Commerce, Streetwise | Commerce, Trouble | Confront, Identify | Brokers, archives, a captain who's been there. |
+| Survey the ground | Survival, Navigation | Frontier | Confront, Identify | Walk the world, chart the collapsed corridor, map the derelict deck by deck. |
+
+- **Ship Crew:** sensors and systems; **Frontier:** science, survey and the unknown itself; **Service:** people and customs; **Commerce:** what can be bought or traded; **Trouble:** what others would rather keep hidden.
+- A character's species can suit a method: senses, memory, psionics or a people's own history with the subject. A species that touches minds can advance a phase with Psionics, at the GM's call.
+
 ## Chases
 
 Run a chase as a progress clock for the pursuers against a danger clock for the quarry's escape. Each exchange, the characters roll the skill that moves them (Piloting, or Athletics on foot): success ticks the pursuers' clock, failure ticks the escape. Terrain, a tired mount or a damaged engine, and attacks made on the move (at −2) adjust the rolls.
