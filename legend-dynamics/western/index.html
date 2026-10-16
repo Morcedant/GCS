@@ -563,7 +563,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="c917d89" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · c917d89</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="794f1a0" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · 794f1a0</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -8414,12 +8414,13 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   if (narrow && narrow.matches) $("toc-details").open = false;
   $("guide-toc").addEventListener("click", (e) => { if (e.target.closest("a") && narrow && narrow.matches) $("toc-details").open = false; });
   // Guide contents: one entry per chapter heading. A setting with a GM's Guide has two books here, one shown at a time.
+  const bookHead = { title: $("guide-h").textContent, subtitle: $("guide-sub").textContent };
   const books = $("guide-gm") ? { players: $("guide-players"), gm: $("guide-gm") } : null;
   function showBook(which) {
     const root = books ? books[which] : $("guide");
     if (books) {
       for (const [k, el] of Object.entries(books)) el.hidden = k !== which;
-      $("guide-h").textContent = root.dataset.title; $("guide-sub").textContent = root.dataset.subtitle;
+      $("guide-h").textContent = root.dataset.title || bookHead.title; $("guide-sub").textContent = root.dataset.subtitle || bookHead.subtitle;
       $("guide-switch").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.book === which)));
       try { sessionStorage.setItem(PACK.id + ".guide", which); } catch {}
     }

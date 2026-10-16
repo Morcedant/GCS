@@ -491,6 +491,8 @@ tr.lvl-U td.target { color: var(--muted); }
 .guide td code { white-space: normal; overflow-wrap: anywhere; }
 @media (max-width: 640px) { .guide td:first-child { white-space: normal; } .guide table { font-size: .84rem; } }
 .guide-title { display: grid; gap: 4px; margin-bottom: 1.4em; }
+.guide-switch { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.guide-switch .btn[aria-pressed="true"] { border-color: var(--chrome); color: var(--fg); background: var(--well); }
 .guide-title .h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.4rem); color: var(--fg); letter-spacing: .06em; }
 
 @media print {
@@ -552,7 +554,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="bc68412" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · bc68412</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="f844eb5" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · f844eb5</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1007,12 +1009,15 @@ tr.lvl-U td.target { color: var(--muted); }
     <div class="guide-layout">
       <nav class="guide-toc hud no-print" aria-label="Guide contents"><details id="toc-details" open><summary class="eyebrow">Contents</summary><ol id="guide-toc"></ol></details></nav>
       <article class="guide hud" id="guide">
-        <header class="guide-title"><span class="eyebrow">U.S.S. Pelion · NCC-1750 · Campaign year 2268</span><h2 class="h1">USS Pelion Players' Guide</h2>
-          <span class="muted">Revised edition with species, species advantages, and General Services</span></header>
+        <header class="guide-title"><div class="guide-switch no-print" id="guide-switch" role="group" aria-label="Which guide" hidden>
+            <button type="button" class="btn" data-book="players" aria-pressed="true">Players' Guide</button><button type="button" class="btn" data-book="gm" aria-pressed="false">GM's Guide</button></div>
+          <span class="eyebrow">U.S.S. Pelion · NCC-1750 · Campaign year 2268</span><h2 class="h1" id="guide-h">USS Pelion Players' Guide</h2>
+          <span class="muted" id="guide-sub">Revised edition with species, species advantages, and General Services</span></header>
 <!-- GUIDE:START -->
+<div class="guide-book" id="guide-players">
 <p>You are a member of Starfleet aboard USS Pelion, NCC-1750. Explore unfamiliar worlds, investigate strange phenomena, protect your crewmates, and make difficult decisions when orders and circumstances collide. Your training matters, and the crew succeeds by working together.</p>
 <p>This is an unofficial fan game inspired by <em>Star Trek</em>. It is not affiliated with or endorsed by Paramount or CBS Studios, who own Star Trek.</p>
-<p>This guide presents the Pelion rules in a form you can use at the table. It combines concrete skills and 3d6 roll-under resolution with a small pool of Duty points.</p>
+<p>This guide presents the Pelion rules in a form you can use at the table. The material for running the game (mission seeds, the threats and enemy ships, and the GM’s tools) is in a companion book, the <strong>GM’s Guide</strong>. It combines concrete skills and 3d6 roll-under resolution with a small pool of Duty points.</p>
 <h2 id="g-the-rule-to-remember">The rule to remember</h2>
 <p>Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes your training and attribute. Do not add the attribute again.</p>
 <p><em>Example:</em> Sensors 13, with a −2 penalty for interference, gives a target of 11. A roll of 9 succeeds by 2. A roll of 12 fails by 1.</p>
@@ -1917,18 +1922,6 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>A drained phaser won’t fire.</strong> Swap in a spare power cell (one action) to refill it, or recharge it fully in the ship’s armory between missions. Having packed a spare cell is a good use of a Duty point’s <em>small preparation</em>.</li>
 <li><strong>Overload.</strong> A phaser with at least 4 power left can be set to overload: it whines for a round and explodes at the end of the next round, as an explosion (1 box to everyone nearby, 2 at the centre). The phaser is destroyed.</li>
 </ul>
-<h2 id="g-the-battle-map">The battle map</h2>
-<p>The GM view of the creator has a <strong>battle map</strong> for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in this guide, and a fight without it works the same way. Open <strong>How to use the map</strong> on the map itself for the buttons, step by step.</p>
-<p><strong>Three kinds of map.</strong></p>
-<ul>
-<li><strong>A hex map</strong> for an away team’s fight where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard inside a ship, 5 or 10 yards on a city street, 50 on open ground, or a number of kilometres for ships in space. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range tables.</li>
-<li><strong>A ship fight</strong> on a range track: a lane for the Pelion and one for each space range band, from under 10 km to a light-second. When the helms make their contest, the GM moves the enemy a lane in or out. <strong>Add the Pelion</strong> places the ship, linked to its Shields, Hull and systems: marking a box on the map marks it on the ship’s tracks, and the other way round. Enemy ships come from the <em>Enemy ships</em> table with their Hull boxes.</li>
-<li><strong>A range track</strong> for an away team’s chase or a running fight where only distance matters.</li>
-</ul>
-<p><strong>Tokens.</strong> The GM places the crew with one button. Their tokens stay linked to the officers in the GM view: marking Injury, Dying, Stunned or a Duty point on a token marks it on the officer, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
-<p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps every map, its picture and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
-<h2 id="g-the-encounter-panel">The Encounter panel</h2>
-<p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by these rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round), the boxes marked and any telling hit, offering a Duty point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so.</p>
 <h1 id="g-medical-care">Medical care</h1>
 <p>Starfleet physicians in 2268 have advanced diagnostic scanners, potent pharmaceuticals, portable emergency equipment, and sophisticated sickbay facilities. Familiar injuries often respond quickly to treatment. Severe trauma, incompatible biology, missing supplies, and unidentified conditions still challenge an experienced doctor. The treatment values below are campaign rules inspired by the series, rather than numerical rules stated in canon.</p>
 <h2 id="g-diagnosis-and-stabilization">Diagnosis and stabilization</h2>
@@ -2511,84 +2504,6 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 </tbody>
 </table>
-<h3 id="g-enemy-ships">Enemy ships</h3>
-<p>The ships the Pelion meets most, built on the registry’s classes. The GM keeps their tracks the same way as the Pelion’s.</p>
-<table>
-<colgroup>
-<col style="width: 12%" />
-<col style="width: 12%" />
-<col style="width: 12%" />
-<col style="width: 12%" />
-<col style="width: 12%" />
-<col style="width: 12%" />
-<col style="width: 12%" />
-<col style="width: 12%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Ship</th>
-<th>Class</th>
-<th>Helm / Gunner</th>
-<th>Maneuver</th>
-<th>Shields</th>
-<th>Hull</th>
-<th>Weapons</th>
-<th>Trait</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Klingon battle cruiser</td>
-<td>Heavy Cruiser</td>
-<td>12 / 12</td>
-<td>3</td>
-<td>5</td>
-<td>5</td>
-<td>Disruptors (heavy), photon torpedoes</td>
-<td><strong>Cloak.</strong> <strong>Relentless:</strong> doesn’t break off until its Hull has 3 boxes.</td>
-</tr>
-<tr class="even">
-<td>Klingon bird-of-prey</td>
-<td>Escort</td>
-<td>13 / 12</td>
-<td>5</td>
-<td>2</td>
-<td>3</td>
-<td>Disruptors</td>
-<td><strong>Cloak.</strong> Its first volley from the cloak is at +2.</td>
-</tr>
-<tr class="odd">
-<td>Romulan bird-of-prey</td>
-<td>Light Cruiser</td>
-<td>11 / 12</td>
-<td>5</td>
-<td>3</td>
-<td>3</td>
-<td>Plasma torpedo</td>
-<td><strong>Cloak.</strong> Would rather self-destruct than be captured.</td>
-</tr>
-<tr class="even">
-<td>Orion raider</td>
-<td>Escort</td>
-<td>13 / 11</td>
-<td>6</td>
-<td>2</td>
-<td>3</td>
-<td>Disruptors, tractor beam</td>
-<td><strong>Fast.</strong> Runs once its Shields are down.</td>
-</tr>
-<tr class="odd">
-<td>Gorn cruiser</td>
-<td>Cruiser</td>
-<td>10 / 13</td>
-<td>3</td>
-<td>4</td>
-<td>4</td>
-<td>Disruptors, photon torpedoes</td>
-<td><strong>Ablative armor</strong> (2).</td>
-</tr>
-</tbody>
-</table>
 <h2 id="g-advancement">Advancement</h2>
 <p>Crew members grow by earning <strong>advancement points</strong> and spending them.</p>
 <ul>
@@ -2638,237 +2553,6 @@ tr.lvl-U td.target { color: var(--muted); }
 </table>
 <p>Species changes still need a separate agreement with the GM. The creator keeps the ledger: award points in the advancement box under the skills (or from the Captain’s log), then spend them there.</p>
 <h1 id="g-running-missions">Running missions</h1>
-<h2 id="g-mission-seeds">Mission seeds</h2>
-<p>Short of a plot? Roll 3d6 on each table and read the total; middle results come up most often, the strangest sit at 3, 4, 17 and 18, or pick what you like. Read the results together: a <em>mission</em> in a <em>place</em>, made strange by <em>something strange</em>, turned by a <em>twist</em>, against a <em>ticking clock</em>, with a <em>key character</em> at its heart. The GM view in the creator rolls these for you and can start the clock.</p>
-<table>
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>3d6</th>
-<th>Mission</th>
-<th>Place</th>
-<th>Something strange</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>3</td>
-<td>Answer a call from a ship lost a century ago</td>
-<td>The edge of the galaxy</td>
-<td>The crew’s past selves</td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td>Ferry a delegation to a world that left the Federation</td>
-<td>Inside a living starship</td>
-<td>A dead star that sings</td>
-</tr>
-<tr class="odd">
-<td>5</td>
-<td>Answer a distress call</td>
-<td>A storm-wracked ocean world</td>
-<td>A subspace anomaly that distorts time</td>
-</tr>
-<tr class="even">
-<td>6</td>
-<td>Survey an uncharted system</td>
-<td>A dead world with ancient ruins</td>
-<td>A non-corporeal life form</td>
-</tr>
-<tr class="odd">
-<td>7</td>
-<td>Make first contact</td>
-<td>A struggling frontier colony</td>
-<td>An ancient machine that still works</td>
-</tr>
-<tr class="even">
-<td>8</td>
-<td>Escort a diplomatic delegation</td>
-<td>An asteroid mining station</td>
-<td>Duplicates of the crew</td>
-</tr>
-<tr class="odd">
-<td>9</td>
-<td>Find a missing ship or outpost</td>
-<td>A drifting derelict starship</td>
-<td>A signal repeating a crew member’s name</td>
-</tr>
-<tr class="even">
-<td>10</td>
-<td>Deliver urgent medical supplies</td>
-<td>An ice-covered moon of a gas giant</td>
-<td>A planet-wide illusion</td>
-</tr>
-<tr class="odd">
-<td>11</td>
-<td>Evacuate a colony</td>
-<td>A pre-warp civilization’s world</td>
-<td>A rift into another universe</td>
-</tr>
-<tr class="even">
-<td>12</td>
-<td>Patrol the Neutral Zone border</td>
-<td>A nebula that blinds the sensors</td>
-<td>A disease no one recognizes</td>
-</tr>
-<tr class="odd">
-<td>13</td>
-<td>Recover a lost probe or artifact</td>
-<td>A starbase in crisis</td>
-<td>A gravity well that traps ships</td>
-</tr>
-<tr class="even">
-<td>14</td>
-<td>Mediate a dispute between two worlds</td>
-<td>A world that seems too perfect</td>
-<td>A godlike being testing the crew</td>
-</tr>
-<tr class="odd">
-<td>15</td>
-<td>Test experimental technology</td>
-<td>A jungle planet thick with life</td>
-<td>An alien probe draining power</td>
-</tr>
-<tr class="even">
-<td>16</td>
-<td>Shore leave that goes wrong</td>
-<td>Deep space between the stars</td>
-<td>Memories that aren’t the crew’s own</td>
-</tr>
-<tr class="odd">
-<td>17</td>
-<td>Carry a message across the Neutral Zone</td>
-<td>A Klingon prison world</td>
-<td>A crossing into a mirror universe</td>
-</tr>
-<tr class="even">
-<td>18</td>
-<td>Host a first contact aboard the Pelion</td>
-<td>A Romulan listening post</td>
-<td>A machine that remembers the Pelion</td>
-</tr>
-</tbody>
-</table>
-<table>
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>3d6</th>
-<th>Twist</th>
-<th>Ticking clock (segments)</th>
-<th>Key character</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>3</td>
-<td>The captain has been replaced</td>
-<td>The time loop resets (4)</td>
-<td>A crew member’s future self</td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td>The enemy is a Federation colony</td>
-<td>The ship’s power drains (6)</td>
-<td>A legend thought dead</td>
-</tr>
-<tr class="odd">
-<td>5</td>
-<td>Klingons arrive with their own claim</td>
-<td>Orbit decays (6)</td>
-<td>An idealistic Federation ambassador</td>
-</tr>
-<tr class="even">
-<td>6</td>
-<td>The people asking for help are lying</td>
-<td>Warp core breach (4)</td>
-<td>A Klingon captain with a grudge</td>
-</tr>
-<tr class="odd">
-<td>7</td>
-<td>A crew member’s complication comes into play</td>
-<td>Klingon battle cruiser arrives (6)</td>
-<td>A stranded Orion trader</td>
-</tr>
-<tr class="even">
-<td>8</td>
-<td>Orders conflict with doing the right thing</td>
-<td>The disease reaches the ship (8)</td>
-<td>A brilliant, reckless scientist</td>
-</tr>
-<tr class="odd">
-<td>9</td>
-<td>The Prime Directive forbids interfering</td>
-<td>The storm closes the beam-out window (4)</td>
-<td>A colony leader hiding a secret</td>
-</tr>
-<tr class="even">
-<td>10</td>
-<td>A cloaked Romulan ship is watching</td>
-<td>Life support fails on the station (6)</td>
-<td>A former Starfleet officer gone rogue</td>
-</tr>
-<tr class="odd">
-<td>11</td>
-<td>Orion pirates want the same prize</td>
-<td>The anomaly collapses (6)</td>
-<td>A local child who has seen too much</td>
-</tr>
-<tr class="even">
-<td>12</td>
-<td>The Pelion’s systems start failing</td>
-<td>Peace talks break down (8)</td>
-<td>A disapproving Vulcan observer</td>
-</tr>
-<tr class="odd">
-<td>13</td>
-<td>A respected visitor has a hidden agenda</td>
-<td>The hostages’ air runs out (4)</td>
-<td>An old friend of one of the crew</td>
-</tr>
-<tr class="even">
-<td>14</td>
-<td>The ‘threat’ is only defending itself</td>
-<td>The star goes nova (8)</td>
-<td>A Romulan who wants to defect</td>
-</tr>
-<tr class="odd">
-<td>15</td>
-<td>Contact with Starfleet is cut off</td>
-<td>Shields fail under bombardment (4)</td>
-<td>A Starfleet admiral with sealed orders</td>
-</tr>
-<tr class="even">
-<td>16</td>
-<td>A civilian is trapped out of reach</td>
-<td>The away team is discovered (6)</td>
-<td>An android that wants to be free</td>
-</tr>
-<tr class="odd">
-<td>17</td>
-<td>The mission was a test</td>
-<td>The duel at dawn (4)</td>
-<td>A godlike child</td>
-</tr>
-<tr class="even">
-<td>18</td>
-<td>History must not change</td>
-<td>The Klingon ultimatum (6)</td>
-<td>An admiral’s spy aboard</td>
-</tr>
-</tbody>
-</table>
-<p><em>Example:</em> 3, 9, 5, 10, 2, 4 gives <strong>first contact</strong> at <strong>a starbase in crisis</strong>, where <strong>a signal repeats a crew member’s name</strong>; <strong>the “threat” is only defending itself</strong>, a <strong>warp core breach</strong> clock (4) is ticking, and <strong>a brilliant, reckless scientist</strong> is in the middle of it.</p>
 <h2 id="g-captains-log">Captain’s log</h2>
 <p>End each mission with a short log, written together:</p>
 <ol type="1">
@@ -2929,96 +2613,6 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Advantage:</strong> Keen Hearing (species; companion: Sensitive Ears). <strong>Complication:</strong> Someone Back Home; trigger: a message from home arrives.</li>
 <li><strong>Why I serve:</strong> To leave behind a past, a world, or a life that was too small for me. <strong>Connection:</strong> Shares a secret with Lt. Sevek from a mission neither of them talks about.</li>
 </ul>
-<h1 id="g-threats">Threats</h1>
-<p>Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge once per round, and mark injury boxes. Each threat below is one line of numbers and one special trait.</p>
-<p><strong>Minor opponents</strong> (guards, crewmen, a mob) have <strong>one box</strong>: any hit that gets through takes them out of the fight. Save full injury tracks for threats that matter.</p>
-<table style="width:100%;">
-<colgroup>
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Threat</th>
-<th>Attack (target)</th>
-<th>Dodge</th>
-<th>Boxes</th>
-<th>Weapon</th>
-<th>Trait</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Security guard (minor)</td>
-<td>Phasers or disruptor 11</td>
-<td>7</td>
-<td>1</td>
-<td>Hand weapon</td>
-<td><strong>Numbers.</strong> Usually two or three; they surrender or flee when half are down.</td>
-</tr>
-<tr class="even">
-<td>Klingon warrior</td>
-<td>Disruptor 12, Blade 13, Unarmed 12</td>
-<td>9</td>
-<td>3</td>
-<td>Disruptor (kill), d’k tahg</td>
-<td><strong>Relentless.</strong> Ignores the Wounded penalty; only Seriously wounded slows them.</td>
-</tr>
-<tr class="odd">
-<td>Klingon officer</td>
-<td>Disruptor 12, Leadership 13</td>
-<td>9</td>
-<td>3</td>
-<td>Disruptor (kill)</td>
-<td><strong>Battle commander.</strong> Once per round, gives one ally +1 on an attack.</td>
-</tr>
-<tr class="even">
-<td>Romulan centurion</td>
-<td>Disruptor 12, Stealth 13</td>
-<td>9</td>
-<td>3</td>
-<td>Disruptor (kill)</td>
-<td><strong>Ambush.</strong> +2 on the first attack from hiding; prefers to withdraw rather than be captured.</td>
-</tr>
-<tr class="odd">
-<td>Orion pirate</td>
-<td>Disruptor 11, Blade 12, Stealth 12</td>
-<td>9</td>
-<td>3</td>
-<td>Disruptor, knife</td>
-<td><strong>Dirty fighter.</strong> Winning a grapple also disarms the target.</td>
-</tr>
-<tr class="even">
-<td>Gorn warrior</td>
-<td>Unarmed 14</td>
-<td>6</td>
-<td>4</td>
-<td>Claws, thrown rocks</td>
-<td><strong>Immense strength.</strong> Unarmed hits mark 2 boxes; slow, so it acts last in a round.</td>
-</tr>
-<tr class="odd">
-<td>Mugato</td>
-<td>Unarmed (bite and horn) 13</td>
-<td>8</td>
-<td>3</td>
-<td>Venomous bite</td>
-<td><strong>Venom.</strong> A bite that marks a box also poisons: without Medicine before the scene ends, mark another box.</td>
-</tr>
-<tr class="even">
-<td>Rogue android</td>
-<td>Unarmed 13, Computers 15</td>
-<td>7</td>
-<td>4</td>
-<td>Crushing grip</td>
-<td><strong>Logic trap.</strong> A Diplomacy or Psychology contest that presents a paradox stuns it for the scene.</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship registry in <em>The USS Pelion</em>; its <em>Enemy ships</em> table gives the common ones.</p>
 <h1 id="g-advantages">Advantages</h1>
 <p>Choose one advantage at character creation: a general advantage from this chapter, or a species advantage from the next. Each grants +2 only in the listed circumstances; describe how it helps before rolling. Two are different: <strong>Additional Defense</strong> and <strong>Hard to put down</strong> give no +2, and change what you can do in a fight instead. An advantage does not grant training, authorize an otherwise impossible action, or replace essential equipment. If more than one advantage could apply, use only one advantage bonus. Assistance and circumstance modifiers still apply, without counting the same benefit twice.</p>
 <table>
@@ -3608,6 +3202,423 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Medicine:</strong> one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery. Rest clears one box per full day, but not from three boxes: treatment must clear the first one.</p>
 <p><strong>Will:</strong> resist overwhelming fear or mental intrusion and maintain concentration. Ordinary danger needs no roll. Fear or distraction failure normally causes hesitation or −2 on your next action.</p>
 <p><strong>Duty points:</strong> start each session with two. Spend one to reroll, reduce an injury by one box, or establish a plausible preparation. Earn one when an accepted complication, including a companion complication, creates a meaningful problem.</p>
+</div>
+<div class="guide-book" id="guide-gm" data-title="USS Pelion GM's Guide" data-subtitle="Running the campaign: missions, threats, enemy ships and the GM's tools" hidden>
+<p>This book is for whoever runs the game, and anyone can read it. It gathers what the GM reaches for at the table: mission seeds, the threats and enemy ships with their numbers, and how to use the GM view’s battle map and Encounter panel. The rules themselves are in the <strong>Players’ Guide</strong>; this book builds on them.</p>
+<h1 id="gm-running-missions">Running missions</h1>
+<h2 id="gm-mission-seeds">Mission seeds</h2>
+<p>Short of a plot? Roll 3d6 on each table and read the total; middle results come up most often, the strangest sit at 3, 4, 17 and 18, or pick what you like. Read the results together: a <em>mission</em> in a <em>place</em>, made strange by <em>something strange</em>, turned by a <em>twist</em>, against a <em>ticking clock</em>, with a <em>key character</em> at its heart. The GM view in the creator rolls these for you and can start the clock.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>Mission</th>
+<th>Place</th>
+<th>Something strange</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>Answer a call from a ship lost a century ago</td>
+<td>The edge of the galaxy</td>
+<td>The crew’s past selves</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Ferry a delegation to a world that left the Federation</td>
+<td>Inside a living starship</td>
+<td>A dead star that sings</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Answer a distress call</td>
+<td>A storm-wracked ocean world</td>
+<td>A subspace anomaly that distorts time</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Survey an uncharted system</td>
+<td>A dead world with ancient ruins</td>
+<td>A non-corporeal life form</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Make first contact</td>
+<td>A struggling frontier colony</td>
+<td>An ancient machine that still works</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Escort a diplomatic delegation</td>
+<td>An asteroid mining station</td>
+<td>Duplicates of the crew</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>Find a missing ship or outpost</td>
+<td>A drifting derelict starship</td>
+<td>A signal repeating a crew member’s name</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>Deliver urgent medical supplies</td>
+<td>An ice-covered moon of a gas giant</td>
+<td>A planet-wide illusion</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Evacuate a colony</td>
+<td>A pre-warp civilization’s world</td>
+<td>A rift into another universe</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>Patrol the Neutral Zone border</td>
+<td>A nebula that blinds the sensors</td>
+<td>A disease no one recognizes</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>Recover a lost probe or artifact</td>
+<td>A starbase in crisis</td>
+<td>A gravity well that traps ships</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>Mediate a dispute between two worlds</td>
+<td>A world that seems too perfect</td>
+<td>A godlike being testing the crew</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>Test experimental technology</td>
+<td>A jungle planet thick with life</td>
+<td>An alien probe draining power</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>Shore leave that goes wrong</td>
+<td>Deep space between the stars</td>
+<td>Memories that aren’t the crew’s own</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>Carry a message across the Neutral Zone</td>
+<td>A Klingon prison world</td>
+<td>A crossing into a mirror universe</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>Host a first contact aboard the Pelion</td>
+<td>A Romulan listening post</td>
+<td>A machine that remembers the Pelion</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>Twist</th>
+<th>Ticking clock (segments)</th>
+<th>Key character</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>The captain has been replaced</td>
+<td>The time loop resets (4)</td>
+<td>A crew member’s future self</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>The enemy is a Federation colony</td>
+<td>The ship’s power drains (6)</td>
+<td>A legend thought dead</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Klingons arrive with their own claim</td>
+<td>Orbit decays (6)</td>
+<td>An idealistic Federation ambassador</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>The people asking for help are lying</td>
+<td>Warp core breach (4)</td>
+<td>A Klingon captain with a grudge</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>A crew member’s complication comes into play</td>
+<td>Klingon battle cruiser arrives (6)</td>
+<td>A stranded Orion trader</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Orders conflict with doing the right thing</td>
+<td>The disease reaches the ship (8)</td>
+<td>A brilliant, reckless scientist</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>The Prime Directive forbids interfering</td>
+<td>The storm closes the beam-out window (4)</td>
+<td>A colony leader hiding a secret</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>A cloaked Romulan ship is watching</td>
+<td>Life support fails on the station (6)</td>
+<td>A former Starfleet officer gone rogue</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Orion pirates want the same prize</td>
+<td>The anomaly collapses (6)</td>
+<td>A local child who has seen too much</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>The Pelion’s systems start failing</td>
+<td>Peace talks break down (8)</td>
+<td>A disapproving Vulcan observer</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>A respected visitor has a hidden agenda</td>
+<td>The hostages’ air runs out (4)</td>
+<td>An old friend of one of the crew</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>The ‘threat’ is only defending itself</td>
+<td>The star goes nova (8)</td>
+<td>A Romulan who wants to defect</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>Contact with Starfleet is cut off</td>
+<td>Shields fail under bombardment (4)</td>
+<td>A Starfleet admiral with sealed orders</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>A civilian is trapped out of reach</td>
+<td>The away team is discovered (6)</td>
+<td>An android that wants to be free</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>The mission was a test</td>
+<td>The duel at dawn (4)</td>
+<td>A godlike child</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>History must not change</td>
+<td>The Klingon ultimatum (6)</td>
+<td>An admiral’s spy aboard</td>
+</tr>
+</tbody>
+</table>
+<p><em>Example:</em> 3, 9, 5, 10, 2, 4 gives <strong>first contact</strong> at <strong>a starbase in crisis</strong>, where <strong>a signal repeats a crew member’s name</strong>; <strong>the “threat” is only defending itself</strong>, a <strong>warp core breach</strong> clock (4) is ticking, and <strong>a brilliant, reckless scientist</strong> is in the middle of it.</p>
+<h1 id="gm-threats">Threats</h1>
+<p>Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge once per round, and mark injury boxes. Each threat below is one line of numbers and one special trait.</p>
+<p><strong>Minor opponents</strong> (guards, crewmen, a mob) have <strong>one box</strong>: any hit that gets through takes them out of the fight. Save full injury tracks for threats that matter.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Threat</th>
+<th>Attack (target)</th>
+<th>Dodge</th>
+<th>Boxes</th>
+<th>Weapon</th>
+<th>Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Security guard (minor)</td>
+<td>Phasers or disruptor 11</td>
+<td>7</td>
+<td>1</td>
+<td>Hand weapon</td>
+<td><strong>Numbers.</strong> Usually two or three; they surrender or flee when half are down.</td>
+</tr>
+<tr class="even">
+<td>Klingon warrior</td>
+<td>Disruptor 12, Blade 13, Unarmed 12</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor (kill), d’k tahg</td>
+<td><strong>Relentless.</strong> Ignores the Wounded penalty; only Seriously wounded slows them.</td>
+</tr>
+<tr class="odd">
+<td>Klingon officer</td>
+<td>Disruptor 12, Leadership 13</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor (kill)</td>
+<td><strong>Battle commander.</strong> Once per round, gives one ally +1 on an attack.</td>
+</tr>
+<tr class="even">
+<td>Romulan centurion</td>
+<td>Disruptor 12, Stealth 13</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor (kill)</td>
+<td><strong>Ambush.</strong> +2 on the first attack from hiding; prefers to withdraw rather than be captured.</td>
+</tr>
+<tr class="odd">
+<td>Orion pirate</td>
+<td>Disruptor 11, Blade 12, Stealth 12</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor, knife</td>
+<td><strong>Dirty fighter.</strong> Winning a grapple also disarms the target.</td>
+</tr>
+<tr class="even">
+<td>Gorn warrior</td>
+<td>Unarmed 14</td>
+<td>6</td>
+<td>4</td>
+<td>Claws, thrown rocks</td>
+<td><strong>Immense strength.</strong> Unarmed hits mark 2 boxes; slow, so it acts last in a round.</td>
+</tr>
+<tr class="odd">
+<td>Mugato</td>
+<td>Unarmed (bite and horn) 13</td>
+<td>8</td>
+<td>3</td>
+<td>Venomous bite</td>
+<td><strong>Venom.</strong> A bite that marks a box also poisons: without Medicine before the scene ends, mark another box.</td>
+</tr>
+<tr class="even">
+<td>Rogue android</td>
+<td>Unarmed 13, Computers 15</td>
+<td>7</td>
+<td>4</td>
+<td>Crushing grip</td>
+<td><strong>Logic trap.</strong> A Diplomacy or Psychology contest that presents a paradox stuns it for the scene.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship registry in <em>The USS Pelion</em>; its <em>Enemy ships</em> table gives the common ones.</p>
+<h2 id="gm-enemy-ships">Enemy ships</h2>
+<p>The ships the Pelion meets most, built on the registry’s classes. The GM keeps their tracks the same way as the Pelion’s.</p>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Ship</th>
+<th>Class</th>
+<th>Helm / Gunner</th>
+<th>Maneuver</th>
+<th>Shields</th>
+<th>Hull</th>
+<th>Weapons</th>
+<th>Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Klingon battle cruiser</td>
+<td>Heavy Cruiser</td>
+<td>12 / 12</td>
+<td>3</td>
+<td>5</td>
+<td>5</td>
+<td>Disruptors (heavy), photon torpedoes</td>
+<td><strong>Cloak.</strong> <strong>Relentless:</strong> doesn’t break off until its Hull has 3 boxes.</td>
+</tr>
+<tr class="even">
+<td>Klingon bird-of-prey</td>
+<td>Escort</td>
+<td>13 / 12</td>
+<td>5</td>
+<td>2</td>
+<td>3</td>
+<td>Disruptors</td>
+<td><strong>Cloak.</strong> Its first volley from the cloak is at +2.</td>
+</tr>
+<tr class="odd">
+<td>Romulan bird-of-prey</td>
+<td>Light Cruiser</td>
+<td>11 / 12</td>
+<td>5</td>
+<td>3</td>
+<td>3</td>
+<td>Plasma torpedo</td>
+<td><strong>Cloak.</strong> Would rather self-destruct than be captured.</td>
+</tr>
+<tr class="even">
+<td>Orion raider</td>
+<td>Escort</td>
+<td>13 / 11</td>
+<td>6</td>
+<td>2</td>
+<td>3</td>
+<td>Disruptors, tractor beam</td>
+<td><strong>Fast.</strong> Runs once its Shields are down.</td>
+</tr>
+<tr class="odd">
+<td>Gorn cruiser</td>
+<td>Cruiser</td>
+<td>10 / 13</td>
+<td>3</td>
+<td>4</td>
+<td>4</td>
+<td>Disruptors, photon torpedoes</td>
+<td><strong>Ablative armor</strong> (2).</td>
+</tr>
+</tbody>
+</table>
+<h1 id="gm-the-gms-tools">The GM’s tools</h1>
+<h2 id="gm-the-battle-map">The battle map</h2>
+<p>The GM view of the creator has a <strong>battle map</strong> for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in the Players’ Guide, and a fight without it works the same way. Open <strong>How to use the map</strong> on the map itself for the buttons, step by step.</p>
+<p><strong>Three kinds of map.</strong></p>
+<ul>
+<li><strong>A hex map</strong> for an away team’s fight where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard inside a ship, 5 or 10 yards on a city street, 50 on open ground, or a number of kilometres for ships in space. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range tables.</li>
+<li><strong>A ship fight</strong> on a range track: a lane for the Pelion and one for each space range band, from under 10 km to a light-second. When the helms make their contest, the GM moves the enemy a lane in or out. <strong>Add the Pelion</strong> places the ship, linked to its Shields, Hull and systems: marking a box on the map marks it on the ship’s tracks, and the other way round. Enemy ships come from the <em>Enemy ships</em> table with their Hull boxes.</li>
+<li><strong>A range track</strong> for an away team’s chase or a running fight where only distance matters.</li>
+</ul>
+<p><strong>Tokens.</strong> The GM places the crew with one button. Their tokens stay linked to the officers in the GM view: marking Injury, Dying, Stunned or a Duty point on a token marks it on the officer, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
+<p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps every map, its picture and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
+<h2 id="gm-the-encounter-panel">The Encounter panel</h2>
+<p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round), the boxes marked and any telling hit, offering a Duty point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so.</p>
+</div>
 <!-- GUIDE:END -->
       </article>
     </div>
@@ -7665,10 +7676,30 @@ return { mountLab };
   const narrow = window.matchMedia && matchMedia("(max-width: 900px)");
   if (narrow && narrow.matches) $("toc-details").open = false;
   $("guide-toc").addEventListener("click", (e) => { if (e.target.closest("a") && narrow && narrow.matches) $("toc-details").open = false; });
-  // Guide contents: one entry per chapter heading.
-  $("guide").id = "guide";
-  $("guide-toc").innerHTML = `<li><a href="#guide">Introduction</a></li>` +
-    [...$("guide").querySelectorAll("h1")].map((h) => `<li><a href="#${h.id}">${esc(h.textContent)}</a></li>`).join("");
+  // Guide contents: one entry per chapter heading. A setting with a GM's Guide has two books here, one shown at a time.
+  const bookHead = { title: $("guide-h").textContent, subtitle: $("guide-sub").textContent };
+  const books = $("guide-gm") ? { players: $("guide-players"), gm: $("guide-gm") } : null;
+  function showBook(which) {
+    const root = books ? books[which] : $("guide");
+    if (books) {
+      for (const [k, el] of Object.entries(books)) el.hidden = k !== which;
+      $("guide-h").textContent = root.dataset.title || bookHead.title; $("guide-sub").textContent = root.dataset.subtitle || bookHead.subtitle;
+      $("guide-switch").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.book === which)));
+      try { sessionStorage.setItem("uss-pelion.guide", which); } catch {}
+    }
+    $("guide-toc").innerHTML = `<li><a href="#guide">Introduction</a></li>` +
+      [...root.querySelectorAll("h1")].map((h) => `<li><a href="#${h.id}">${esc(h.textContent)}</a></li>`).join("");
+  }
+  if (books) {
+    $("guide-switch").hidden = false; $("tab-guide").textContent = "Guides";
+    $("guide-switch").addEventListener("click", (e) => { const b = e.target.closest("button[data-book]"); if (b) { showBook(b.dataset.book); $("guide").scrollIntoView({ block: "start" }); } });
+    // A link into the other book (or a help popup's "more") shows that book first.
+    document.addEventListener("click", (e) => { const a = e.target.closest('a[href^="#gm-"], a[href^="#g-"]'); if (a) showBook(a.getAttribute("href").startsWith("#gm-") ? "gm" : "players"); }, true);
+  }
+  let book = "players";
+  try { if (books && sessionStorage.getItem("uss-pelion.guide") === "gm") book = "gm"; } catch {}
+  showBook(book);
+  // Wide tables scroll inside their own box on narrow screens.
   // Wide tables scroll inside their own box on narrow screens.
   $("guide").querySelectorAll("table").forEach((t) => { const w = document.createElement("div"); w.className = "table-scroll"; t.before(w); w.append(t); });
 
