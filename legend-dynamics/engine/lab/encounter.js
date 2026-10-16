@@ -141,12 +141,16 @@ export function defenseOptions(enc, rules, d, w) {
     opt({ kind: "dodge", label: "Dodge", base: d.dodge, mods: gear, used: d.dodgedRound === enc.round && !flags.has("dodgeEveryAttack") });
   }
   const melee = !!w && w.reach === "melee";
+  // The setting's skills for a weapon in hand and for bare hands (rules.skills; Melee and Brawling unless it says otherwise).
+  // Where one skill covers both (Close Combat, Unarmed Combat), fists and natural weapons still don't count as a weapon in hand.
+  const SK = rules.skills || { melee: "Melee", unarmed: "Brawling" }, oneSkill = SK.melee === SK.unarmed;
+  const bareWeapon = (/** @type {any} */ x) => x.id === "fists" || x.unarmed || x.natural || (!oneSkill && x.skill === SK.unarmed);
   if (D.parry && melee) {
-    const own = (d.weapons || []).map((id) => rules.weapons[id]).filter((/** @type {any} */ x) => x && x.reach === "melee" && x.skill !== "Brawling");
+    const own = (d.weapons || []).map((id) => rules.weapons[id]).filter((/** @type {any} */ x) => x && x.reach === "melee" && !bareWeapon(x));
     const cands = own.map((/** @type {any} */ x) => ({ name: x.name, skill: x.skill, t: d.skills[x.skill] })).filter((c) => c.t !== undefined);
     // Bare hands parry fists (core), or claws and fangs too where the setting allows it (bareHanded: "natural").
-    const unarmedAttack = w.unarmed || w.id === "fists" || (D.parry.bareHanded === "natural" && w.skill === "Brawling");
-    if (unarmedAttack && d.skills.Brawling !== undefined) cands.push({ name: "bare hands", skill: "Brawling", t: d.skills.Brawling });
+    const unarmedAttack = w.unarmed || w.id === "fists" || (D.parry.bareHanded === "natural" && (w.natural || (!oneSkill && w.skill === SK.unarmed)));
+    if (unarmedAttack && d.skills[SK.unarmed] !== undefined) cands.push({ name: "bare hands", skill: SK.unarmed, t: d.skills[SK.unarmed] });
     const best = cands.sort((x, y) => y.t - x.t)[0];
     if (best) {
       const n = d.parryRound === enc.round ? d.parries || 0 : 0;
@@ -157,8 +161,8 @@ export function defenseOptions(enc, rules, d, w) {
   }
   // The best shield still whole: a real one before an improvised one, which breaks when it stops a heavy hit.
   const shield = live.filter((/** @type {any} */ t) => t.type === "shield" && !t.used).sort((/** @type {any} */ x, /** @type {any} */ y) => (y.value || 0) - (x.value || 0))[0];
-  if (D.block && shield && w && (melee || (!w.firearm && !w.spell)) && d.skills.Melee !== undefined) {
-    opt({ kind: "block", label: `Block (${(shield.label || "shield").toLowerCase()})`, shield: shield.label || "Shield", base: d.skills.Melee, used: d.blockedRound === enc.round,
+  if (D.block && shield && w && (melee || (!w.firearm && !w.spell)) && d.skills[SK.melee] !== undefined) {
+    opt({ kind: "block", label: `Block (${(shield.label || "shield").toLowerCase()})`, shield: shield.label || "Shield", base: d.skills[SK.melee], used: d.blockedRound === enc.round,
       mods: [{ source: "block", label: "Block", value: D.block.mod, scope: D.block.scope || "experiment" }, { source: "gear", label: shield.label || "Shield", value: shield.value || 0, scope: "setting" }] });
   }
   return out;
@@ -315,7 +319,8 @@ export function shrugTelling(enc, n, via) {
 }
 
 /** What kind of wound a weapon deals, for an opponent's description. @param {any} w */
-const woundKind = (w) => (w.firearm ? "gun" : w.reach === "melee" ? (w.id === "fists" || w.id === "club" ? "blunt" : w.skill === "Brawling" ? "claw" : "blade") : "missile");
+// How a hit wounds, for the gritty combat tables: a weapon can name it (wound: "energy", "power"), or it follows from the weapon.
+const woundKind = (w) => (w.wound || (w.firearm ? "gun" : w.reach === "melee" ? (w.id === "fists" || w.id === "club" || w.id === "baton" ? "blunt" : w.natural || w.skill === "Brawling" ? "claw" : "blade") : "missile"));
 
 /**
  * A grievous wound. A character rolls 3d6 on the table and suffers it (Dying, a condition, a lasting wound);

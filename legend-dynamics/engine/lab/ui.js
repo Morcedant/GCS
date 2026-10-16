@@ -59,7 +59,8 @@ export function mountLab(api) {
   const HISTORY = PROD ? "this browser's history" : "this browser's lab history";
   const say = (/** @type {string} */ m, /** @type {boolean} */ err = false) => { $("lab-msg").textContent = m; $("lab-msg").className = "toast" + (err ? " err" : ""); };
 
-  const rulesOf = (/** @type {any} */ cfg) => ({ ...LDX.buildRules(cfg && cfg.kind === "lab" ? cfg : LDX.PUBLISHED, WEAPONS, LAB, pubRules()), jamOn18: !!PACK.weapons.jamOn18 });
+  const rulesOf = (/** @type {any} */ cfg) => ({ ...LDX.buildRules(cfg && cfg.kind === "lab" ? cfg : LDX.PUBLISHED, WEAPONS, LAB, pubRules()), jamOn18: !!PACK.weapons.jamOn18,
+    skills: { melee: T.meleeSkill || "Melee", unarmed: T.unarmedSkill || "Brawling" } });
   const enc = () => lab.enc;
   // A running encounter keeps the rules it started with; otherwise the configuration chosen for the next one.
   const rules = () => rulesOf(enc() && enc().status !== "ended" ? enc().config : lab.mode === "lab" ? lab.cfg : LDX.PUBLISHED);

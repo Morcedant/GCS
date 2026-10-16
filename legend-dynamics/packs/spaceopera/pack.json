@@ -3623,7 +3623,8 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "natural": true
   },
   {
    "id": "pistol",
@@ -3668,7 +3669,8 @@
    "ammo": "laser",
    "firearm": true,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "wound": "energy"
   },
   {
    "id": "plasma",
@@ -3684,7 +3686,8 @@
    "ammo": "plasma",
    "firearm": true,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "wound": "energy"
   },
   {
    "id": "coilgun",
