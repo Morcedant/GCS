@@ -4201,5 +4201,50 @@
     }
    ]
   }
- ]
+ ],
+ "gmGuide": {
+  "title": "Aurora GM's Guide",
+  "subtitle": "Running the superhero setting: cases, notable Operants, threats and the GM's tools",
+  "intro": "This book is for whoever runs the game, and anyone can read it. It gathers what the GM reaches for at the table: case seeds, the notable Operants of the world, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.",
+  "playersNote": "The material for running the game (case seeds, the notable Operants, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.",
+  "chapters": [
+   {
+    "title": "Running cases",
+    "take": [
+     "## Case seeds"
+    ]
+   },
+   {
+    "take": [
+     "# Notable Operants"
+    ]
+   },
+   {
+    "take": [
+     "# Threats"
+    ]
+   },
+   {
+    "title": "The GM's tools",
+    "take": [
+     "## The battle map",
+     "## The Encounter panel"
+    ]
+   }
+  ],
+  "replace": [
+   [
+    "everything on it follows the rules in this chapter",
+    "everything on it follows the *Personal combat* rules in the Players' Guide"
+   ],
+   [
+    "read the penalty from the Range table above",
+    "read the penalty from the Range table in the Players' Guide"
+   ],
+   [
+    "runs a fight by these rules",
+    "runs a fight by the *Personal combat* rules"
+   ]
+  ]
+ }
 }

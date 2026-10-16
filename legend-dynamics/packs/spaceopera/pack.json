@@ -4044,5 +4044,46 @@
     }
    ]
   }
- ]
+ ],
+ "gmGuide": {
+  "title": "Fracture Lines GM's Guide",
+  "subtitle": "Running the space opera: jobs, threats, enemy ships and the GM's tools",
+  "intro": "This book is for whoever runs the game, and anyone can read it. It gathers what the GM reaches for at the table: job seeds, the threats and enemy ships with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.",
+  "playersNote": "The material for running the game (job seeds, the threats and enemy ships, and the GM's tools) is in a companion book, the **GM's Guide**.",
+  "chapters": [
+   {
+    "title": "Running jobs and missions",
+    "take": [
+     "## Job seeds"
+    ]
+   },
+   {
+    "take": [
+     "# Threats",
+     "## Enemy ships"
+    ]
+   },
+   {
+    "title": "The GM's tools",
+    "take": [
+     "## The battle map",
+     "## The Encounter panel"
+    ]
+   }
+  ],
+  "replace": [
+   [
+    "everything on it follows the rules in this chapter",
+    "everything on it follows the *Personal combat* rules in the Players' Guide"
+   ],
+   [
+    "read the penalty from the Range table above",
+    "read the penalty from the Range table in the Players' Guide"
+   ],
+   [
+    "runs a fight by these rules",
+    "runs a fight by the *Personal combat* rules"
+   ]
+  ]
+ }
 }

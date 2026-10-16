@@ -7,7 +7,7 @@ You are a member of Starfleet aboard USS Pelion, NCC-1750. Explore unfamiliar wo
 
 This is an unofficial fan game inspired by *Star Trek*. It is not affiliated with or endorsed by Paramount or CBS Studios, who own Star Trek.
 
-This guide presents the Pelion rules in a form you can use at the table. It combines concrete skills and 3d6 roll-under resolution with a small pool of Duty points.
+This guide presents the Pelion rules in a form you can use at the table. The material for running the game (mission seeds, the threats and enemy ships, and the GM's tools) is in a companion book, the **GM's Guide**. It combines concrete skills and 3d6 roll-under resolution with a small pool of Duty points.
 
 ## The rule to remember
 
@@ -458,24 +458,6 @@ Hand phasers run on power cells, and every shot draws on them. This is a campaig
 - **A drained phaser won't fire.** Swap in a spare power cell (one action) to refill it, or recharge it fully in the ship's armory between missions. Having packed a spare cell is a good use of a Duty point's *small preparation*.
 - **Overload.** A phaser with at least 4 power left can be set to overload: it whines for a round and explodes at the end of the next round, as an explosion (1 box to everyone nearby, 2 at the centre). The phaser is destroyed.
 
-## The battle map
-
-The GM view of the creator has a **battle map** for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in this guide, and a fight without it works the same way. Open **How to use the map** on the map itself for the buttons, step by step.
-
-**Three kinds of map.**
-
-- **A hex map** for an away team's fight where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard inside a ship, 5 or 10 yards on a city street, 50 on open ground, or a number of kilometres for ships in space. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range tables.
-- **A ship fight** on a range track: a lane for the Pelion and one for each space range band, from under 10 km to a light-second. When the helms make their contest, the GM moves the enemy a lane in or out. **Add the Pelion** places the ship, linked to its Shields, Hull and systems: marking a box on the map marks it on the ship's tracks, and the other way round. Enemy ships come from the *Enemy ships* table with their Hull boxes.
-- **A range track** for an away team's chase or a running fight where only distance matters.
-
-**Tokens.** The GM places the crew with one button. Their tokens stay linked to the officers in the GM view: marking Injury, Dying, Stunned or a Duty point on a token marks it on the officer, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.
-
-**Keeping a map.** The map stays in the GM's browser. **Save map to file** keeps every map, its picture and tokens in one file, to prepare a fight ahead of time or share it with another GM.
-
-## The Encounter panel
-
-The GM view also has an **Encounter** panel that runs a fight by these rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round), the boxes marked and any telling hit, offering a Duty point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so.
-
 # Medical care
 
 Starfleet physicians in 2268 have advanced diagnostic scanners, potent pharmaceuticals, portable emergency equipment, and sophisticated sickbay facilities. Familiar injuries often respond quickly to treatment. Severe trauma, incompatible biology, missing supplies, and unidentified conditions still challenge an experienced doctor. The treatment values below are campaign rules inspired by the series, rather than numerical rules stated in canon.
@@ -665,18 +647,6 @@ As in personal combat, a weapon fires without penalty within its effective band,
 | Transporter | Medium | — | Only when the target's shields are down. |
 | Ramming | Close | Heavy to both ships | A desperate measure. |
 
-### Enemy ships
-
-The ships the Pelion meets most, built on the registry's classes. The GM keeps their tracks the same way as the Pelion's.
-
-| Ship | Class | Helm / Gunner | Maneuver | Shields | Hull | Weapons | Trait |
-|---|---|---|---|---|---|---|---|
-| Klingon battle cruiser | Heavy Cruiser | 12 / 12 | 3 | 5 | 5 | Disruptors (heavy), photon torpedoes | **Cloak.** **Relentless:** doesn't break off until its Hull has 3 boxes. |
-| Klingon bird-of-prey | Escort | 13 / 12 | 5 | 2 | 3 | Disruptors | **Cloak.** Its first volley from the cloak is at +2. |
-| Romulan bird-of-prey | Light Cruiser | 11 / 12 | 5 | 3 | 3 | Plasma torpedo | **Cloak.** Would rather self-destruct than be captured. |
-| Orion raider | Escort | 13 / 11 | 6 | 2 | 3 | Disruptors, tractor beam | **Fast.** Runs once its Shields are down. |
-| Gorn cruiser | Cruiser | 10 / 13 | 3 | 4 | 4 | Disruptors, photon torpedoes | **Ablative armor** (2). |
-
 ## Advancement
 
 Crew members grow by earning **advancement points** and spending them.
@@ -696,50 +666,6 @@ Species changes still need a separate agreement with the GM. The creator keeps t
 
 # Running missions
 
-## Mission seeds
-
-Short of a plot? Roll 3d6 on each table and read the total; middle results come up most often, the strangest sit at 3, 4, 17 and 18, or pick what you like. Read the results together: a *mission* in a *place*, made strange by *something strange*, turned by a *twist*, against a *ticking clock*, with a *key character* at its heart. The GM view in the creator rolls these for you and can start the clock.
-
-| 3d6 | Mission | Place | Something strange |
-|---|---|---|---|
-| 3 | Answer a call from a ship lost a century ago | The edge of the galaxy | The crew's past selves |
-| 4 | Ferry a delegation to a world that left the Federation | Inside a living starship | A dead star that sings |
-| 5 | Answer a distress call | A storm-wracked ocean world | A subspace anomaly that distorts time |
-| 6 | Survey an uncharted system | A dead world with ancient ruins | A non-corporeal life form |
-| 7 | Make first contact | A struggling frontier colony | An ancient machine that still works |
-| 8 | Escort a diplomatic delegation | An asteroid mining station | Duplicates of the crew |
-| 9 | Find a missing ship or outpost | A drifting derelict starship | A signal repeating a crew member's name |
-| 10 | Deliver urgent medical supplies | An ice-covered moon of a gas giant | A planet-wide illusion |
-| 11 | Evacuate a colony | A pre-warp civilization's world | A rift into another universe |
-| 12 | Patrol the Neutral Zone border | A nebula that blinds the sensors | A disease no one recognizes |
-| 13 | Recover a lost probe or artifact | A starbase in crisis | A gravity well that traps ships |
-| 14 | Mediate a dispute between two worlds | A world that seems too perfect | A godlike being testing the crew |
-| 15 | Test experimental technology | A jungle planet thick with life | An alien probe draining power |
-| 16 | Shore leave that goes wrong | Deep space between the stars | Memories that aren't the crew's own |
-| 17 | Carry a message across the Neutral Zone | A Klingon prison world | A crossing into a mirror universe |
-| 18 | Host a first contact aboard the Pelion | A Romulan listening post | A machine that remembers the Pelion |
-
-| 3d6 | Twist | Ticking clock (segments) | Key character |
-|---|---|---|---|
-| 3 | The captain has been replaced | The time loop resets (4) | A crew member's future self |
-| 4 | The enemy is a Federation colony | The ship's power drains (6) | A legend thought dead |
-| 5 | Klingons arrive with their own claim | Orbit decays (6) | An idealistic Federation ambassador |
-| 6 | The people asking for help are lying | Warp core breach (4) | A Klingon captain with a grudge |
-| 7 | A crew member's complication comes into play | Klingon battle cruiser arrives (6) | A stranded Orion trader |
-| 8 | Orders conflict with doing the right thing | The disease reaches the ship (8) | A brilliant, reckless scientist |
-| 9 | The Prime Directive forbids interfering | The storm closes the beam-out window (4) | A colony leader hiding a secret |
-| 10 | A cloaked Romulan ship is watching | Life support fails on the station (6) | A former Starfleet officer gone rogue |
-| 11 | Orion pirates want the same prize | The anomaly collapses (6) | A local child who has seen too much |
-| 12 | The Pelion's systems start failing | Peace talks break down (8) | A disapproving Vulcan observer |
-| 13 | A respected visitor has a hidden agenda | The hostages' air runs out (4) | An old friend of one of the crew |
-| 14 | The 'threat' is only defending itself | The star goes nova (8) | A Romulan who wants to defect |
-| 15 | Contact with Starfleet is cut off | Shields fail under bombardment (4) | A Starfleet admiral with sealed orders |
-| 16 | A civilian is trapped out of reach | The away team is discovered (6) | An android that wants to be free |
-| 17 | The mission was a test | The duel at dawn (4) | A godlike child |
-| 18 | History must not change | The Klingon ultimatum (6) | An admiral's spy aboard |
-
-*Example:* 3, 9, 5, 10, 2, 4 gives **first contact** at **a starbase in crisis**, where **a signal repeats a crew member's name**; **the "threat" is only defending itself**, a **warp core breach** clock (4) is ticking, and **a brilliant, reckless scientist** is in the middle of it.
-
 ## Captain's log
 
 End each mission with a short log, written together:
@@ -751,7 +677,6 @@ End each mission with a short log, written together:
 5. **Advancement.** After a significant mission, the GM may authorize one skill step for each crew member (Untrained to Trained, or Trained to Specialty), or a revision of an advantage or complication.
 
 The creator's GM view keeps the log, applies each crew member's advancement to the GM's copy, and saves both with the crew file. Players record an approved advancement on their own sheet under Step 3, so their character still passes the checklist.
-
 
 # Ready-made crew
 
@@ -810,25 +735,6 @@ Six crew members ready to play, for one-shots, new players, or a crew in a hurry
 - **Skills:** Computers 18 (Expert). Trained: Communications 14, Psychology 14, Sensors 14, Electronics 14, Stealth 13, Diplomacy 12, Athletics 10.
 - **Advantage:** Keen Hearing (species; companion: Sensitive Ears). **Complication:** Someone Back Home; trigger: a message from home arrives.
 - **Why I serve:** To leave behind a past, a world, or a life that was too small for me. **Connection:** Shares a secret with Lt. Sevek from a mission neither of them talks about.
-
-# Threats
-
-Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge once per round, and mark injury boxes. Each threat below is one line of numbers and one special trait.
-
-**Minor opponents** (guards, crewmen, a mob) have **one box**: any hit that gets through takes them out of the fight. Save full injury tracks for threats that matter.
-
-| Threat | Attack (target) | Dodge | Boxes | Weapon | Trait |
-|---|---|---|---|---|---|
-| Security guard (minor) | Phasers or disruptor 11 | 7 | 1 | Hand weapon | **Numbers.** Usually two or three; they surrender or flee when half are down. |
-| Klingon warrior | Disruptor 12, Blade 13, Unarmed 12 | 9 | 3 | Disruptor (kill), d'k tahg | **Relentless.** Ignores the Wounded penalty; only Seriously wounded slows them. |
-| Klingon officer | Disruptor 12, Leadership 13 | 9 | 3 | Disruptor (kill) | **Battle commander.** Once per round, gives one ally +1 on an attack. |
-| Romulan centurion | Disruptor 12, Stealth 13 | 9 | 3 | Disruptor (kill) | **Ambush.** +2 on the first attack from hiding; prefers to withdraw rather than be captured. |
-| Orion pirate | Disruptor 11, Blade 12, Stealth 12 | 9 | 3 | Disruptor, knife | **Dirty fighter.** Winning a grapple also disarms the target. |
-| Gorn warrior | Unarmed 14 | 6 | 4 | Claws, thrown rocks | **Immense strength.** Unarmed hits mark 2 boxes; slow, so it acts last in a round. |
-| Mugato | Unarmed (bite and horn) 13 | 8 | 3 | Venomous bite | **Venom.** A bite that marks a box also poisons: without Medicine before the scene ends, mark another box. |
-| Rogue android | Unarmed 13, Computers 15 | 7 | 4 | Crushing grip | **Logic trap.** A Diplomacy or Psychology contest that presents a paradox stuns it for the scene. |
-
-**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship registry in *The USS Pelion*; its *Enemy ships* table gives the common ones.
 
 # Advantages
 

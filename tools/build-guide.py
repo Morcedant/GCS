@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a game's Players' Guide from <game>/players-guide.md.
+"""Build a game's Players' Guide from <game>/players-guide.md (and its GM's Guide from <game>/gm-guide.md, if it has one).
 
 Writes the guide into the creator's "Players' Guide" tab (between the GUIDE markers
 in <game>/index.html) and, with --docx, a Word version.
@@ -20,8 +20,13 @@ NAVY, GOLD_FILL = "1B2A4A", "E9EEF6"
 START, END = "<!-- GUIDE:START -->", "<!-- GUIDE:END -->"
 
 
-def pandoc(*args):
-    return subprocess.run(["pandoc", str(SRC), *args], check=True, capture_output=True, text=True).stdout
+def pandoc(*args, src=None):
+    return subprocess.run(["pandoc", str(src or SRC), *args], check=True, capture_output=True, text=True).stdout
+
+
+def front(path, key):
+    m = re.search(r"^" + key + r': "(.*)"$', path.read_text().split("\n---", 1)[0], flags=re.M)
+    return m.group(1) if m else ""
 
 
 def main():
@@ -35,6 +40,13 @@ def main():
     SRC, APP, DOCX = ROOT / a.game / "players-guide.md", ROOT / a.game / "index.html", ROOT / a.game / docx_name
 
     html = pandoc("-f", "markdown", "-t", "html", "--id-prefix=g-", "--wrap=none")
+    # A game with a GM's Guide (<game>/gm-guide.md): both books in the Guide tab, one shown at a time.
+    GM = ROOT / a.game / "gm-guide.md"
+    if GM.exists():
+        esc = lambda x: x.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;")
+        html = ('<div class="guide-book" id="guide-players">\n' + html + "</div>\n"
+                f'<div class="guide-book" id="guide-gm" data-title="{esc(front(GM, "title"))}" data-subtitle="{esc(front(GM, "subtitle"))}" hidden>\n'
+                + pandoc("-f", "markdown", "-t", "html", "--id-prefix=gm-", "--wrap=none", src=GM) + "</div>\n")
     app = APP.read_text()
     if START not in app or END not in app:
         sys.exit(f"GUIDE markers missing from {APP}")
@@ -62,6 +74,11 @@ def main():
         subprocess.run(["pandoc", str(SRC), "-o", str(DOCX), *extra], check=True)
         finish_docx(DOCX)
         print(f"wrote {DOCX.relative_to(ROOT)}")
+        if GM.exists():
+            gm_docx = DOCX.with_name(DOCX.name.replace("Players_Guide", "GM_Guide"))
+            subprocess.run(["pandoc", str(GM), "-o", str(gm_docx), *extra], check=True)
+            finish_docx(gm_docx)
+            print(f"wrote {gm_docx.relative_to(ROOT)}")
 
 
 def inline_module(path, name):
