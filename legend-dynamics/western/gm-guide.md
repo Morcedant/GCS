@@ -52,11 +52,11 @@ Roll 3d6 on each table and read the total, or pick what you like. Middle results
 
 # Monsters
 
-The details behind *Monsters and magic* in the Players' Guide: what each monster fears, and what its bite or curse does. In the story, hunters learn these the hard way: an Occult roll, a Sighted character's Monster's Eye, a survivor's tale, or a fight that goes wrong.
+The details behind *Monsters and magic* in the Players' Guide: what each monster fears, what a lore card for it permits, and what its bite or curse does. In the story, hunters learn these the hard way: a discovery clock, a survivor's tale, or a fight that goes wrong.
 
 ## Weaknesses
 
-Every monster has a weakness, and finding it is often the whole job. **Occult** identifies a creature and its weakness; the Monster Hunter advantage and the Sighted's Monster's Eye help.
+Every monster has a weakness, and finding it is often the whole job: a discovery clock that ends in a lore card (see *Discovery clocks and lore cards* in the Players' Guide). The Monster Hunter advantage and the Sighted's Monster's Eye help with the Identify rolls. A weakness works whoever stumbles on it: silver marks its extra box even fired by someone who has never heard of werewolves. A lore card is what lets a hunter use it on purpose: a called shot at the heart, a line of salt laid in time, the true name spoken.
 
 | Creature | Weakness |
 |---|---|
@@ -71,6 +71,24 @@ Every monster has a weakness, and finding it is often the whole job. **Occult** 
 | Wendigo | Fire: the only thing that truly hurts it. It is destroyed for good only when its heart of ice is cut out and burned. It is strongest in deep winter and weakest in summer heat. |
 | Skinwalker | Underneath, it is a person. In a stolen shape, ordinary wounds mark only 1 box at a time; in its own shape, it is as mortal as anyone. Speak its true name to its face and it is forced back into its own shape for the scene. |
 | Headless Rider | Its head, hidden near where it died: laid back in the grave, the rider rests for good. It can't cross running water, so a bridge over a creek is safety. |
+
+## Lore cards
+
+What a lore card for each creature knows, and what it permits. These are also the cards a Hunter's Almanac can start with.
+
+| Creature | What the lore card knows | What it permits |
+|---|---|---|
+| **Werewolf** | Silver hurts it (an extra box, and its toughness doesn't help); wolfsbane keeps it away; under the full moon it has no choice. | Called shots with silver at its heart; warding a door with wolfsbane; luring it out at moonrise. |
+| **Vampire** | A stake through the heart incapacitates it; fire, sunlight and beheading destroy it; holy symbols hold it back; it can't enter uninvited. | A called shot with a stake at the heart (a telling hit pins it); hunting it by day; refusing it entry. |
+| **Zombie** | Only a shot to the head or fire puts it down for good; its bite carries the Infection. | Called shots at the head; the Occult remedy that stops an Infection clock. |
+| **Ghost** | It can't be hurt, only laid to rest by finishing its business, or bound with a ritual. | Finding and finishing its business; the binding ritual. |
+| **Wraith** | Only silver, cold iron, salt and fire hurt it; it can't cross a line of salt or iron filings; burning its bones destroys it. | Holding a line of salt or iron; finding and burning its bones. |
+| **Banshee** | Weapons don't touch her; silver or an iron bell silences her for the scene; she leaves at dawn if the one she keens for lives. | Silencing her with silver or an iron bell; keeping her chosen alive until dawn. |
+| **Ghoul** | Fire and daylight hurt it; it flees from holy ground. | Driving it onto holy ground; burning out its warren by day. |
+| **Demon** | Holy water burns it; a ritual banishes it; it must keep a bargain to the letter. | The banishing ritual; holding it to the letter of a bargain. |
+| **Wendigo** | Fire alone truly hurts it; it is destroyed only when its heart of ice is cut out and burned; weakest in summer heat. | A called shot to cut out its heart; driving it into the heat. |
+| **Skinwalker** | In a stolen shape, ordinary wounds mark only 1 box; its true name, spoken to its face, forces it into its own mortal shape. | Speaking its true name to force it back into its own shape. |
+| **Headless Rider** | Its head, hidden near where it died, laid back in the grave lets it rest; it can't cross running water. | Finding its head; making a stand across running water. |
 
 ## Bites and curses
 
@@ -125,3 +143,7 @@ The GM view of the character creator has a **battle map** for fights where it he
 ## The Encounter panel
 
 The GM view also has an **Encounter** panel that runs a fight by the *Personal combat* rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round), the boxes marked and any telling hit, offering a Grit point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so.
+
+## The Discovery panel
+
+The GM view's **Discovery** panel runs discovery clocks and the Harvest they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every lore card the characters in the GM view already hold for it. The **Failed roll** and **Push** buttons tick the track for how they were digging, and a failed roll ticks the Harvest too. When a clock fills, **Mint** gives the primary investigator the lore card and everyone you tick as present a shared copy. Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.

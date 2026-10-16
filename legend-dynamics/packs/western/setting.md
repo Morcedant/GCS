@@ -99,7 +99,7 @@ A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells c
 
 ## Weaknesses
 
-Every monster has a weakness, and finding it is often the whole job. **Occult** identifies a creature and its weakness; the Monster Hunter advantage and the Sighted's Monster's Eye help.
+Every monster has a weakness, and finding it is often the whole job: a discovery clock that ends in a lore card (see *Discovery clocks and lore cards* in the Players' Guide). The Monster Hunter advantage and the Sighted's Monster's Eye help with the Identify rolls. A weakness works whoever stumbles on it: silver marks its extra box even fired by someone who has never heard of werewolves. A lore card is what lets a hunter use it on purpose: a called shot at the heart, a line of salt laid in time, the true name spoken.
 
 | Creature | Weakness |
 |---|---|
@@ -114,6 +114,12 @@ Every monster has a weakness, and finding it is often the whole job. **Occult** 
 | Wendigo | Fire: the only thing that truly hurts it. It is destroyed for good only when its heart of ice is cut out and burned. It is strongest in deep winter and weakest in summer heat. |
 | Skinwalker | Underneath, it is a person. In a stolen shape, ordinary wounds mark only 1 box at a time; in its own shape, it is as mortal as anyone. Speak its true name to its face and it is forced back into its own shape for the scene. |
 | Headless Rider | Its head, hidden near where it died: laid back in the grave, the rider rests for good. It can't cross running water, so a bridge over a creek is safety. |
+
+## Lore cards
+
+What a lore card for each creature knows, and what it permits. These are also the cards a Hunter's Almanac can start with.
+
+{{GEN:discovery-subjects}}
 
 ## Bites and curses
 

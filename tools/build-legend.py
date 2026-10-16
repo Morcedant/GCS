@@ -229,6 +229,20 @@ def gen(name, pack, t):
         return table(["Threat", "Attack (target)", "Dodge", "Boxes", "Weapon", "Trait"],
                      [[x["label"], x.get("attackJoin", ", ").join(f"{a['skill']} {a['target']}" for a in x["attacks"]), "—" if x["dodge"] is None else x["dodge"],
                        x["boxesText"], x["weaponText"], f"**{x['trait']}.** {x['traitText']}"] for x in p["threats"]])
+    if name == "discovery-panel":
+        d = p.get("discovery")
+        if not d:
+            return ""
+        th = d["threat"]
+        return "\n".join(["## The Discovery panel", "",
+            f"The GM view's **Discovery** panel runs discovery clocks and the {th['name']} they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every {d['card']} the characters in the GM view already hold for it. "
+            f"The **Failed roll** and **Push** buttons tick the track for how they were digging" + (f", and a failed roll ticks the {th['name']} too" if th.get("repeat") else "") + f". When a clock fills, **Mint** gives the primary investigator the {d['card']} and everyone you tick as present a shared copy. "
+            f"Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.", ""])
+    if name == "discovery-subjects":
+        d = p.get("discovery") or {}
+        return table(["Creature", "What the " + d.get("card", "card") + " knows", "What it permits"], [[f"**{x[1]}**", x[2], x[3]] for x in d.get("subjects", [])])
+    if name == "discovery":
+        return discovery_md(p.get("discovery"), t)
     if name == "magic":
         return magic_chapter(p["magic"], t["title"]) if p.get("magic") else ""
     if name == "powers":
@@ -349,6 +363,64 @@ def gen(name, pack, t):
             out += [table([o.get("traitLabel", "Advantage"), "Effect", "Companion complication"], [[x[1], x[2], f"**{x[5]}.** {x[6]}"] for x in o["traits"]]), ""]
         return "\n".join(out)
     sys.exit(f"unknown generated section {name}")
+
+
+NEUTRAL_DISCOVERY = {
+    "card": "card", "cards": "cards", "collection": "collection", "subject": "a creature, a rival's power, a strange device", "uncover": "how it is beaten or used",
+    "phases": [["Confront the unknown", "Effects without a cause. You may suspect, but nothing is confirmed."],
+               ["Identify", "Name the subject. This is the gate: until its identity is confirmed, no card applies, and the GM treats your theories as suspicion only."],
+               ["Uncover", "Learn how it is beaten or used. Filling this phase fills the clock and mints a card."]],
+    "threat": {"name": "threat clock", "text": "The setting names the threat clock and what happens when it fills: a creature claiming another victim, a villain escalating, a reactor going critical."},
+}
+
+
+def discovery_md(d, t, neutral=False):
+    """Discovery clocks and the cards they mint (a setting's pack discovery block): the shared rules, then the setting's
+    names, threat clock, investigation costs and methods."""
+    if not d:
+        return ""
+    card, cards, coll = d["card"], d["cards"], d["collection"]
+    Card, Cards = card[0].upper() + card[1:], cards[0].upper() + cards[1:]
+    th = d["threat"]
+    out = [f"## Discovery clocks and {cards}", "",
+           f"When a {t['missionLower']} turns on an unknown subject ({d['subject']}), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **{card}**: what the characters learned, kept for good. A character's {cards} are their **{coll}**.", ""]
+    out += [table(["Phase", "What it means"], [[f"{i + 1}. {n}", x] for i, (n, x) in enumerate(d["phases"])]), ""]
+    out += ["- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.",
+            "- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.",
+            f"- **The primary investigator.** One character leads and owns the {card}. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant {card} can assist with a method they couldn't otherwise bring (the {card} is why they're qualified); it adds nothing beyond the normal assistance.",
+            f"- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.", ""]
+    out += [f"### The {card}", "",
+            f"A {card} grants **no bonus** to any roll. It is an earned permission: knowledge that makes possible an action otherwise forbidden or unavailable against that subject. Without it, the GM can rule that the action isn't possible: you can't aim for a heart you don't know is the weakness, or speak a name you never learned. A {card} can authorize a called shot or a telling-hit effect that would otherwise be unavailable.", "",
+            f"- A {card} never helps confirm its own subject: holding one doesn't prove this is that. It applies once the Identify phase has confirmed it.",
+            f"- **Shared copies.** Every character present when the {card} is minted (the climactic confrontation or the breakthrough) gets a shared copy; the primary investigator is recorded as its owner. An absent character doesn't, though a holder can teach it to them later with the GM's agreement.",
+            f"- **What it records.** The subject (its tag), what was learned, what it permits, the {t['missionLower']} where it was earned, its owner, and who was there. It's kept on the character sheet, under *Learned in play*.", ""]
+    if d.get("kinds"):
+        out += [f"**Two kinds of {cards}.** " + " ".join(f"**{k[0].capitalize()}:** {k[1]}." for k in d["kinds"]), ""]
+    out += [f"### The {th['name']}" if not neutral else "### The threat clock", "",
+            "A discovery clock always races a threat clock. " + th["text"], ""]
+    if d.get("costs"):
+        out += ["### What investigating costs", "",
+                "When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.", "",
+                table(["Track", "Ticks for", "For example"], [[f"**{a}**", b, c] for a, b, c in d["costs"]]), ""]
+    else:
+        out += ["### What investigating costs", "",
+                "When an investigation roll fails, or a player pushes, one of the setting's shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.", ""]
+    if d.get("methods"):
+        out += ["### Methods", "",
+                f"Which methods suit a character depends on their {t['roleLower']}, {t['originLower']} and skills. The GM says which methods can advance each phase.", "",
+                table(["Method", "Skills", "Suits", "Phases", "For example"], d["methods"]), ""]
+        groups = d.get("groups", {})
+        if groups:
+            gn = {g["id"]: g["name"] for g in t.get("_groups", [])}
+            out += ["- " + "; ".join(f"**{gn.get(k, k)}:** {v}" for k, v in groups.items()) + "."]
+        if d.get("origins"):
+            out += ["- " + d["origins"]]
+        if d.get("start"):
+            out += ["- " + d["start"]]
+        out += [""]
+    if neutral:
+        out += [f"*Your setting pack names the {card}, the threat clock, the tracks investigating pushes, and the methods.*", ""]
+    return "\n".join(out)
 
 
 def pack_sections(md):
@@ -475,7 +547,9 @@ def build(pid, docx):
     check_calling_recipe(pack)
     t = terms_of(pack)
     sections = pack_sections((pdir / "setting.md").read_text())
+    t["_groups"] = pack["groups"]
     md = guide_md(pack, t, sections)
+    del t["_groups"]
     gm_md = None
     if pack.get("gmGuide"):
         md, gm_md = split_gm(md, pack["gmGuide"])
@@ -520,6 +594,9 @@ def build(pid, docx):
     tpl = stamp(tpl, out / "index.html")  # the version footer: a fingerprint of the page, and the day it last changed
     (out / "index.html").write_text(tpl)
     g = discord_handout.game_info(pid, t["title"], t["point"], pack.get("tracks", []), pack.get("seeds", {}), t["tracksTitle"])
+    if pack.get("discovery"):
+        d = pack["discovery"]
+        g["discovery"] = {**d, "example": (d.get("subjects") or [[None, {"aurora": "Lord Marrow", "spaceopera": "Vael"}.get(pid, "Werewolf")]])[0][1]}
     HANDOUTS.append((g, out))
     print(f"built {out.relative_to(ROOT)}/index.html and players-guide.md")
     if docx:
@@ -543,6 +620,7 @@ def core_rules(docx=False):
     # Neutral stand-ins for the pack-specific parts of "Making your own".
     core = core.replace("{{GEN:extra-edges}}\n", "").replace("{{GEN:gritty}}", "").replace("{{GEN:battlemap}}", "")
     core = core.replace("{{GEN:magic}}", magic_chapter({}))
+    core = core.replace("{{GEN:discovery}}", discovery_md(NEUTRAL_DISCOVERY, t, neutral=True)).replace("{{GEN:discovery-panel}}\n", "")
     core = core.replace("{{PACK:customrole}}", '"Smuggler: knows every back door, bribe and hidden hold."')
     core = core.replace("{{GEN:group-names}}", "one of your setting's groups")
     core = core.replace("{{PACK:customorigin}}", "**Hill-folk (tier 1).** Stocky herders from high, cold country. *Adjustments:* Body +1, Presence −1. *Core rule:* at home in the heights: no penalty for thin air or cold. *Origin advantage:* **Sure-Footed**: +2 to Athletics to climb and keep your footing. *Companion:* **Clannish**: you trust your own people first; when it matters, accept the cost of that loyalty.")
@@ -570,6 +648,11 @@ def bot_packs():
         t = terms_of(pack)
         data[pack["id"]] = {"id": pack["id"], "title": t["title"], "point": t["point"], "mission": t["mission"],
                             "trackTitle": t["tracksTitle"], "tracks": pack.get("tracks", []), "seeds": pack.get("seeds", {})}
+        if pack.get("discovery"):  # discovery clocks and cards: names, the threat clock, which tracks investigating pushes
+            d = pack["discovery"]
+            data[pack["id"]]["discovery"] = {"card": d["card"], "cards": d["cards"], "collection": d["collection"], "phases": [p[0] for p in d["phases"]],
+                                             "threat": {k: d["threat"].get(k) for k in ("name", "repeat", "onFill", "count")}, "costs": [c[0] for c in d.get("costs", [])],
+                                             **({"kinds": [k[0] for k in d["kinds"]]} if d.get("kinds") else {})}
     # Games outside Legend Dynamics (USS Pelion, Grimm): their own data, seed tables read from their creators.
     for f in sorted((LD / "discord-bot" / "games").glob("*.json")):
         game = json.loads(f.read_text())

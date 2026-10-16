@@ -71,6 +71,23 @@ def rows(g):
         ("`/seed`", "Roll an adventure seed: one line from each seed table, and the command to start its ticking clock."),
         (f"`/contest ... defender:me`", "When a player resists you (a grapple, a lie, a chase), they are the defender: ties and double failures go to them."),
     ]
+    d = g.get("discovery")
+    if d:  # discovery clocks and the cards they mint (lore cards, dossiers, data records)
+        th, ex, tr = d["threat"]["name"], d.get("example", "Werewolf"), (d.get("costs") or [["Heat"]])[0][0]
+        rows_p += [
+            ("`/cards load file:`", f"Attach your character file from the creator: the bot reads your {d['cards']} (your {d['collection']}). Load it again after you earn one."),
+            ("`/cards show`", f"Your {d['cards']}. Add `player:@name` for someone else's."),
+            (f"`/cards subject subject:\"{ex}\"`", f"Every {d['card']} the table holds for a subject: who holds it, who owns it, and what it permits."),
+            ("`/discovery show`", f"The {th}, every discovery clock and its phase, and the {d['cards']} that match the subject just identified."),
+            ("`/discovery tick name:\"Red Creek\"`", "Advance a discovery clock after a successful investigation roll (`segments:2` for success by 5 or more). It stops at the Identify gate until the GM confirms what the subject is."),
+        ]
+        rows_gm += [
+            ("`/discovery new name:\"Red Creek\" phases:2,2,2`", f"Start a discovery clock: segments for Confront, Identify and Uncover. Add `plain:true` for a plain progress clock in the race (a repair, a task)."),
+            (f"`/discovery identify name:\"Red Creek\" subject:\"{ex}\"`", f"Confirm the subject once Identify is full. That opens the gate, and the bot lists the {d['cards']} the table already holds for it."),
+            (f"`/discovery fail track:{tr}`", f"A failed investigation roll: tick the track for how they were digging{f', and the {th}' if d['threat'].get('repeat') else ''}. `/discovery push` ticks the track alone."),
+            ("`/discovery threat`", f"Tick the {th} (a scene passes); `size:` sets it. " + (f"When it fills, {d['threat']['onFill']}, and it starts again." if d["threat"].get("repeat") else f"When it fills, {d['threat']['onFill']}.")),
+            ("`/discovery mint name:\"Red Creek\" owner:@name permits:\"...\" present:@a @b`", f"A full clock mints a {d['card']}: the owner is the primary investigator, and everyone present gets a shared copy. Players add it to their sheets under *Learned in play*."),
+        ]
     return rows_p, rows_gm
 
 
@@ -167,7 +184,7 @@ def setup(g):
         ]),
         ("Connect Discord", [
             "On the Discord app's <strong>General Information</strong> page, paste the Worker address into <strong>Interactions Endpoint URL</strong> and save. If it saves, the connection works.",
-            f"Open {W.replace('</code>', '/register</code>')} in your browser. It should say “Registered /roll, /contest, /assist, /points, /clock, /track, /seed and /game.” Then delete <code>DISCORD_BOT_TOKEN</code> from the Worker settings.",
+            f"Open {W.replace('</code>', '/register</code>')} in your browser. It should say “Registered /roll, /contest, /assist, /points, /clock, /track, /discovery, /cards, /seed and /game.” Then delete <code>DISCORD_BOT_TOKEN</code> from the Worker settings.",
             "On the app's <strong>Installation</strong> page, make sure <strong>Guild Install</strong> includes the <code>applications.commands</code> scope. Open the install link and pick your server. The bot needs no other permissions.",
             f"In Discord, run <code>/game set game:{title}</code>. New commands can take a minute to appear.",
         ]),

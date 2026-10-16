@@ -309,6 +309,59 @@ A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something tha
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. A successful roll does not force someone to abandon a core belief or reveal what they do not know.
 
+## Discovery clocks and dossiers
+
+When a case turns on an unknown subject (an Operant's power set and its limits), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **dossier**: what the characters learned, kept for good. A character's dossiers are their **case file**.
+
+| Phase | What it means |
+|---|---|
+| 1. Confront the unknown | Effects without a cause: a vault opened from the inside, a blackout that follows someone, witnesses who can't agree on what they saw. You may suspect, but nothing is confirmed. |
+| 2. Identify | Name the Operant and what they can do. This is the gate: until it's confirmed, no dossier applies, and the GM treats your theories as suspicion only. |
+| 3. Uncover | Find the counter: the tell before they act, what the power costs them, how long it takes to come back, what shuts it down. Filling this phase fills the clock and mints a dossier. |
+
+- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
+- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
+- **The primary investigator.** One character leads and owns the dossier. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant dossier can assist with a method they couldn't otherwise bring (the dossier is why they're qualified); it adds nothing beyond the normal assistance.
+- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
+
+### The dossier
+
+A dossier grants **no bonus** to any roll. It is an earned permission: knowledge that makes possible an action otherwise forbidden or unavailable against that subject. Without it, the GM can rule that the action isn't possible: you can't aim for a heart you don't know is the weakness, or speak a name you never learned. A dossier can authorize a called shot or a telling-hit effect that would otherwise be unavailable.
+
+- A dossier never helps confirm its own subject: holding one doesn't prove this is that. It applies once the Identify phase has confirmed it.
+- **Shared copies.** Every character present when the dossier is minted (the climactic confrontation or the breakthrough) gets a shared copy; the primary investigator is recorded as its owner. An absent character doesn't, though a holder can teach it to them later with the GM's agreement.
+- **What it records.** The subject (its tag), what was learned, what it permits, the case where it was earned, its owner, and who was there. It's kept on the character sheet, under *Learned in play*.
+
+### The Escalation
+
+A discovery clock always races a threat clock. The Operant forces the pace. The Escalation clock (4 or 6 segments) ticks once for each scene spent investigating and once for each failed investigation roll. Each time it fills, their next move is bigger: a heist becomes a hostage situation becomes a fight across a city block. This is comic-book rising action, not a slow timer.
+
+### What investigating costs
+
+When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
+
+| Track | Ticks for | For example |
+|---|---|---|
+| **Scrutiny** | digging publicly or drawing official attention | pulling federal files, flashing a badge you shouldn't, staking out in the open |
+| **Backlash** | provoking the Operant or their allies | leaning on their friends, taunting them on air, raiding their haunts |
+| **Collateral** | messy, public confrontations and property damage | forcing a test of the power in a crowd, a chase through traffic, breaking in |
+
+### Methods
+
+Which methods suit a character depends on their calling, origin and skills. The GM says which methods can advance each phase.
+
+| Method | Skills | Suits | Phases | For example |
+|---|---|---|---|---|
+| Profile the Operant | Read People, Investigation | The Badge, The Learned | Confront, Identify | Pattern of crimes, choice of targets, what they want. |
+| Run the records | Computers, Law | The Badge | Identify, Uncover | EMD registry, ExLAW files, court records, hospital admissions. |
+| Analyze the power | Science, Occult, Powers | The Learned | Identify, Uncover | Residue, readings, footage frame by frame, the physics or the magic of it. |
+| Work the back channels | Streetwise, Deception | The Underworld | Confront, Identify | Fences, fixers, who hired whom, who's scared. |
+| See it in the field | Investigation, Stealth, Athletics | The Masks | Any | Shadow them, test them, take the hit and watch what happens. |
+| Work the media | Media, Persuasion | The Masks, The Fringe | Confront, Identify | Viewer footage, tips, a reporter's notes. Always ticks Scrutiny on a failure. |
+
+- **The Badge:** natural profilers, with the records; **The Learned:** natural profilers, through analysis; **The Underworld:** intel through back channels; **The Masks:** intel gathered in the field; **The Fringe:** contacts on the edges.
+- Some powers are methods in themselves: a telepath, a psychometrist or a power that senses energy can advance a phase with the Powers skill, at the GM's call.
+
 ## Chases
 
 Run a chase as a progress clock for the pursuers against a danger clock for the quarry's escape. Each exchange, the characters roll the skill that moves them (Piloting, or Athletics on foot): success ticks the pursuers' clock, failure ticks the escape. Terrain, a tired mount or a damaged engine, and attacks made on the move (at −2) adjust the rolls.
