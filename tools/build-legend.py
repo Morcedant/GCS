@@ -392,8 +392,8 @@ def heading_block(md, heading):
 
 
 def split_gm(md, cfg):
-    """A setting with a GM's Guide (pack gmGuide): the sections only the GM should read move out of the Players' Guide
-    into a book of their own, in the order its chapters list them. A section can leave a short note behind (leave), and
+    """A setting with a GM's Guide (pack gmGuide): the sections for running the game move out of the Players' Guide
+    into a companion book (open to everyone, organized by who uses it), in the order its chapters list them. A section can leave a short note behind (leave), and
     the moved text's pointers back into the Players' Guide are reworded (replace)."""
     gm = []
     for ch in cfg["chapters"]:
