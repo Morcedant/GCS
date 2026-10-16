@@ -1,0 +1,159 @@
+    <!-- The Encounter panel: the production Encounter manager, or the Rules Lab's modeler where a test configuration exists -->
+    <style>
+  .lab-rules-sum { cursor: pointer; padding: 8px 10px; border: 1px dashed var(--accent); border-radius: 8px; margin: 4px 0 8px; }
+  .lab-rules-sum b { text-transform: uppercase; letter-spacing: .06em; font-size: .85rem; }
+  #lab-rules[open] > .lab-rules-sum { border-style: solid; }
+      .lab { margin-top: 18px; }
+      .lab-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; justify-content: space-between; }
+      .lab-head h3 { margin: 0; }
+      .lab-banner { font: 600 .78rem var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--line); }
+      .lab-banner.published { color: var(--good); border-color: var(--good); }
+      .lab-banner.lab { color: var(--warn); border-color: var(--warn); background: rgba(255, 180, 60, .08); }
+      .lab-grid { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); margin-top: 12px; }
+      @media (min-width: 1000px) { .lab-grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); } }
+      .lab section { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; background: var(--well); min-width: 0; }
+      .lab h4 { margin: 0 0 8px; font: 600 .82rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--chrome); }
+      .lab .fields { margin: 0; }
+      .lab-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+      .lab-row > * { min-width: 0; }
+      .lab-row .field { flex: 1 1 130px; margin: 0; }
+      .lab-x { display: grid; gap: 8px; }
+      .lab-x .exp { border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; }
+      .lab-x .exp.on { border-color: var(--warn); }
+      .lab-scope { font: 600 .68rem var(--mono); letter-spacing: .08em; padding: 1px 6px; border-radius: 3px; border: 1px solid currentColor; margin-left: 6px; }
+      .lab-scope.core { color: var(--accent); } .lab-scope.setting { color: var(--warn); }
+      .lab-mini { width: 4.2em; }
+      .lab-people { display: grid; gap: 6px; }
+      .lab-p { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; }
+      .lab-p.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+      .lab-p.out { opacity: .55; }
+      .lab-p .who b { display: block; }
+      .lab-p .meta { grid-column: 2 / 4; }
+      .lab-side { font: 600 .66rem var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+      .lab-p .boxes .box { width: 18px; height: 18px; }
+      .lab-calc { font: .86rem/1.5 var(--mono); white-space: pre-wrap; margin: 8px 0 0; padding: 10px; border-radius: 4px; border: 1px solid var(--line); background: rgba(0, 0, 0, .25); overflow-wrap: anywhere; }
+      .lab-calc .ok { color: var(--good); } .lab-calc .bad { color: var(--bad); } .lab-calc .x { color: var(--warn); }
+      .lab-log { max-height: 340px; overflow: auto; margin: 0; padding-left: 1.4em; font-size: .86rem; }
+      .lab-log li { margin: 2px 0; }
+      .lab-log .t { color: var(--muted); font-family: var(--mono); font-size: .78rem; }
+      .lab-sum { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+      .lab-sum div { border: 1px solid var(--line); border-radius: 4px; padding: 6px 8px; }
+      .lab-sum span { display: block; font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+      .lab-sum b { font-family: var(--mono); }
+      .lab-scroll { max-width: 100%; overflow-x: auto; }
+      .lab-cmp { width: 100%; border-collapse: collapse; font-size: .86rem; }
+      .lab-cmp th, .lab-cmp td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: right; }
+      .lab-cmp th:first-child, .lab-cmp td:first-child { text-align: left; }
+      .lab-clocks { display: flex; flex-wrap: wrap; gap: 8px; }
+      .lab-clock { border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; display: flex; gap: 8px; align-items: center; }
+      .lab-clock button { min-width: 28px; }
+    </style>
+    <div class="card hud lab no-print" id="lab">
+      <div class="lab-head">
+        <h3>Encounter <span class="small muted" id="lab-sub">· Rules Lab</span></h3>
+        <span class="lab-banner published" id="lab-banner" role="status">Rules: Published</span>
+      </div>
+      <p class="small muted" id="lab-intro">Run a fight with every calculation shown, and test rule changes without touching the published game. Normal play (the sheet and its roller) always uses the published rules.</p>
+
+      <details id="lab-rules"><summary class="lab-rules-sum"><b>Rules configuration</b> <span class="small muted">· switch on experiments here: choose the test configuration, then tick one</span><br><span class="small" id="lab-rules-hint"></span></summary>
+        <div class="lab-row" style="margin:8px 0">
+          <label><input type="radio" name="lab-mode" value="published" checked> Published rules</label>
+          <label><input type="radio" name="lab-mode" value="lab"> <span id="lab-cfg-label">Test configuration</span></label>
+        </div>
+        <div class="lab-x" id="lab-exps"></div>
+        <p class="small muted" id="lab-cfg-note"></p>
+      </details>
+
+      <div class="lab-grid">
+        <div class="lab-x">
+          <section aria-labelledby="lab-h-setup"><h4 id="lab-h-setup">Encounter</h4>
+            <div class="lab-row">
+              <div class="field"><label for="lab-name">Name</label><input type="text" id="lab-name" placeholder="e.g. Shootout at the livery"></div>
+              <div class="field"><label for="lab-seed">Dice seed (blank: random dice)</label><input type="text" id="lab-seed" placeholder="e.g. 1234" inputmode="numeric"></div>
+              <button type="button" class="btn" id="lab-new">New encounter</button>
+            </div>
+            <div class="lab-row" style="margin-top:8px">
+              <div class="field"><label for="lab-add-pc">Add a character (from the cards above)</label><select id="lab-add-pc"></select></div>
+              <div class="field"><label for="lab-add-threat">Add a threat</label><select id="lab-add-threat"></select></div>
+              <div class="field" style="flex:0 0 5em"><label for="lab-add-n">How many</label><input type="number" id="lab-add-n" value="1" min="1" max="12"></div>
+            </div>
+            <details style="margin-top:8px"><summary class="small">Add an ad-hoc opponent</summary>
+              <div class="lab-row" style="margin-top:6px">
+                <div class="field"><label for="lab-ah-name">Name</label><input type="text" id="lab-ah-name" placeholder="e.g. Deputy Rourke"></div>
+                <div class="field"><label for="lab-ah-weapon">Weapon</label><select id="lab-ah-weapon"></select></div>
+                <div class="field" style="flex:0 0 6em"><label for="lab-ah-skill">Skill target</label><input type="number" id="lab-ah-skill" value="12" min="1" max="30"></div>
+                <div class="field" style="flex:0 0 6em"><label for="lab-ah-dodge">Dodge</label><input type="number" id="lab-ah-dodge" value="9" min="0" max="30"></div>
+                <div class="field" style="flex:0 0 6em"><label for="lab-ah-agi">Agility</label><input type="number" id="lab-ah-agi" value="10" min="1" max="20"></div>
+                <div class="field" style="flex:0 0 6em"><label for="lab-ah-boxes">Boxes</label><input type="number" id="lab-ah-boxes" value="3" min="1" max="6"></div>
+                <label class="small"><input type="checkbox" id="lab-ah-minor"> Minor (one box)</label>
+                <span id="lab-ah-prot"></span>
+                <button type="button" class="btn" id="lab-ah-add">Add</button>
+              </div>
+            </details>
+            <div class="lab-people" id="lab-people" style="margin-top:10px"></div>
+            <div class="btn-row" style="margin-top:10px">
+              <button type="button" class="btn primary" id="lab-start">Start combat</button>
+              <button type="button" class="btn primary" id="lab-next" hidden>Next turn</button>
+              <button type="button" class="btn" id="lab-end" hidden>End encounter</button>
+              <span class="small muted" id="lab-round" role="status"></span>
+            </div>
+            <p class="toast" id="lab-msg" role="status"></p>
+          </section>
+
+          <section aria-labelledby="lab-h-act" id="lab-act-wrap" hidden><h4 id="lab-h-act">Action</h4>
+            <div class="lab-row">
+              <div class="field"><label for="lab-actor">Who</label><select id="lab-actor"></select></div>
+              <div class="field"><label for="lab-action">Action</label><select id="lab-action"></select></div>
+              <div class="field"><label for="lab-target">Target</label><select id="lab-target"></select></div>
+            </div>
+            <div class="lab-row" id="lab-atk-row" style="margin-top:8px">
+              <div class="field"><label for="lab-weapon">Weapon</label><select id="lab-weapon"></select></div>
+              <div class="field"><label for="lab-band">Range</label><select id="lab-band"></select></div>
+              <div class="field" id="lab-mode-wrap"><label for="lab-fmode">Shot</label><select id="lab-fmode"></select></div>
+              <div class="field" id="lab-ammo-wrap"><label for="lab-ammo">Ammunition</label><select id="lab-ammo"></select></div>
+              <div class="field"><label for="lab-cover">Cover</label><select id="lab-cover"><option value="none">None</option><option value="partial">Partial (−2)</option><option value="solid">Solid (blocks)</option></select></div>
+              <div class="field" id="lab-called-wrap" hidden><label for="lab-called">Called shot</label><select id="lab-called"></select></div>
+              <div class="field"><label for="lab-sit-label">Other modifier</label><input type="text" id="lab-sit-label" placeholder="e.g. Darkness"></div>
+              <div class="field" style="flex:0 0 5em"><label for="lab-sit">±</label><input type="number" id="lab-sit" value="0" min="-10" max="10"></div>
+              <div class="field" style="flex:0 0 9em" id="lab-boost-wrap" hidden><label for="lab-boost">Harder Boosts</label><select id="lab-boost"><option value="0">None</option><option value="1">1 (−1, +1 box)</option><option value="2">2 (−2, +2 boxes)</option></select></div>
+              <div class="field" style="flex:0 0 6.5em" id="lab-skill-wrap"><label for="lab-skill">Skill target</label><input type="number" id="lab-skill" min="1" max="30"></div>
+              <div class="field" style="flex:1 1 16em"><label for="lab-defense">Target's defense</label><select id="lab-defense"></select>
+                <span class="small muted" id="lab-dodge-note" role="status"></span></div>
+            </div>
+            <div class="lab-row" id="lab-text-row" style="margin-top:8px" hidden>
+              <div class="field" style="flex:1 1 100%"><label for="lab-text" id="lab-text-label">Note</label><input type="text" id="lab-text"></div>
+            </div>
+            <div class="btn-row" style="margin-top:8px"><button type="button" class="btn primary" id="lab-go">Resolve</button></div>
+            <div id="lab-result"></div>
+          </section>
+        </div>
+
+        <div class="lab-x">
+          <section aria-labelledby="lab-h-clocks"><h4 id="lab-h-clocks">Clocks</h4>
+            <div class="lab-clocks" id="lab-clocks"></div>
+            <div class="lab-row" style="margin-top:8px">
+              <div class="field"><label for="lab-clk-name">New clock</label><input type="text" id="lab-clk-name" placeholder="e.g. Reinforcements arrive"></div>
+              <div class="field" style="flex:0 0 6em"><label for="lab-clk-size">Segments</label><select id="lab-clk-size"><option>4</option><option>6</option><option>8</option><option>2</option></select></div>
+              <div class="field" style="flex:0 0 8em"><label for="lab-clk-kind">Kind</label><select id="lab-clk-kind"><option value="danger">danger</option><option value="progress">progress</option></select></div>
+              <button type="button" class="btn" id="lab-clk-add">Add</button>
+            </div>
+            <p class="small muted">The same clocks as the sheet's Clocks panel.</p>
+          </section>
+          <section aria-labelledby="lab-h-log"><h4 id="lab-h-log">Log</h4>
+            <ol class="lab-log" id="lab-log" reversed></ol>
+            <div class="btn-row" style="margin-top:8px">
+              <button type="button" class="btn" id="lab-export">Save session (JSON)</button>
+              <button type="button" class="btn" id="lab-csv">Attacks (CSV)</button>
+            </div>
+          </section>
+          <section aria-labelledby="lab-h-sum"><h4 id="lab-h-sum">Playtest summary</h4>
+            <div id="lab-summary"><p class="small muted">Start an encounter to see its numbers.</p></div>
+            <div class="lab-row" style="margin-top:10px">
+              <div class="field"><label for="lab-rerun-cfg">Rerun the same actions and dice under</label><select id="lab-rerun-cfg"><option value="published">Published rules</option><option value="lab">Test configuration</option></select></div>
+              <button type="button" class="btn" id="lab-rerun">Rerun and compare</button>
+            </div>
+            <div id="lab-compare"></div>
+          </section>
+        </div>
+      </div>
+    </div>

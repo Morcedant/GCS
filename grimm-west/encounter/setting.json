@@ -1,0 +1,715 @@
+{
+ "id": "grimm-west",
+ "arms": [
+  {
+   "id": "fists",
+   "name": "Fists",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "rows": [
+    [
+     "Punch, kick, headbutt",
+     "Melee",
+     "1",
+     "Bruises, a split lip, cracked ribs"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "club",
+   "name": "Club",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "rows": [
+    [
+     "Club, bottle, pistol-whip",
+     "Melee",
+     "1",
+     "A concussion or a broken finger"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "knife",
+   "name": "Knife or hatchet",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "rows": [
+    [
+     "Knife or hatchet",
+     "Melee; Close thrown",
+     "1",
+     "A cut or stab wound that bleeds"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "knife-thrown",
+   "name": "Knife or hatchet, thrown",
+   "skill": "Athletics",
+   "band": "close",
+   "maxBand": "close",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "rows": [],
+   "traits": []
+  },
+  {
+   "id": "bow",
+   "name": "Bow and arrow",
+   "skill": "Shooting",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "rows": [
+    [
+     "Arrow",
+     "Short",
+     "1",
+     "A cut or stab wound that bleeds"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "blade",
+   "name": "Axe, saber or an old Grimm weapon",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "rows": [
+    [
+     "Axe, saber or bowie knife used to kill",
+     "Melee",
+     "2",
+     "A deep wound or a broken bone"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "claws",
+   "name": "Claws and fangs (Wesen in full woge)",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "rows": [
+    [
+     "Claws and fangs of a monster",
+     "Melee",
+     "2",
+     "Torn flesh"
+    ]
+   ],
+   "traits": [],
+   "natural": true
+  },
+  {
+   "id": "derringer",
+   "name": "Derringer",
+   "skill": "Shooting",
+   "band": "close",
+   "maxBand": "short",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "derringer",
+   "firearm": true,
+   "rows": [
+    [
+     "Derringer",
+     "Close (out of range beyond Short)",
+     "2",
+     "A gunshot wound"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "revolver",
+   "name": "Revolver",
+   "skill": "Shooting",
+   "band": "close",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "revolver",
+   "firearm": true,
+   "rows": [
+    [
+     "Revolver",
+     "Close",
+     "2",
+     "A gunshot wound"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "rifle",
+   "name": "Rifle",
+   "skill": "Shooting",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "rifle",
+   "firearm": true,
+   "rows": [
+    [
+     "Rifle",
+     "Medium",
+     "2",
+     "A gunshot wound"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "shotgun",
+   "name": "Shotgun",
+   "skill": "Shooting",
+   "band": "short",
+   "maxBand": "short",
+   "damage": {
+    "close": {
+     "boxes": 3,
+     "dying": true
+    },
+    "short": {
+     "boxes": 1
+    }
+   },
+   "ammo": "shotgun",
+   "firearm": true,
+   "rows": [
+    [
+     "Shotgun, at Close range",
+     "Close",
+     "3, and Dying",
+     "A ruinous wound"
+    ],
+    [
+     "Shotgun, at Short range",
+     "Short (no effect beyond)",
+     "1",
+     "Scattered pellets"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "buffalo",
+   "name": "Buffalo rifle",
+   "skill": "Shooting",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "firearm": true,
+   "rows": [
+    [
+     "Buffalo rifle",
+     "Long",
+     "3, and Dying",
+     "A ruinous wound"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "dynamite",
+   "name": "Dynamite",
+   "skill": "Athletics",
+   "band": "close",
+   "maxBand": "close",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "traits": [
+    {
+     "type": "area",
+     "note": "1 box to everyone nearby; 3 and Dying at the centre. Dodge means diving clear."
+    }
+   ],
+   "rows": [
+    [
+     "Dynamite",
+     "Close (thrown)",
+     "1 to everyone nearby, 3 and Dying at the centre",
+     "Blast and burns; Dodge means diving clear"
+    ]
+   ]
+  },
+  {
+   "id": "crossbow",
+   "name": "Crossbow",
+   "skill": "Shooting",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "teeth",
+   "name": "Sabre teeth",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "bigfists",
+   "name": "Fists of a Siegbarste",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "unarmed": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "throw",
+   "name": "Telekinetic throw",
+   "skill": "Occult",
+   "band": "close",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "wound": "blunt",
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "rites",
+   "name": "Nature rites (roots and thorns)",
+   "skill": "Occult",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "wound": "blunt",
+   "traits": [],
+   "rows": []
+  }
+ ],
+ "threats": [
+  {
+   "id": "hired-gun",
+   "name": "Hired gun",
+   "label": "Hired gun (minor)",
+   "minor": true,
+   "attacks": [
+    {
+     "skill": "Shooting",
+     "target": 11
+    }
+   ],
+   "dodge": 7,
+   "boxes": 1,
+   "boxesText": "1",
+   "weaponText": "Revolver",
+   "weapons": [
+    "revolver"
+   ],
+   "trait": "Numbers",
+   "traitText": "Two or three of them; they flee when half are down."
+  },
+  {
+   "id": "outlaw",
+   "name": "Outlaw",
+   "label": "Outlaw",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Shooting",
+     "target": 13
+    },
+    {
+     "skill": "Brawling",
+     "target": 11
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Revolver, rifle",
+   "weapons": [
+    "revolver",
+    "rifle",
+    "fists"
+   ],
+   "trait": "Quick draw",
+   "traitText": "+2 on the first shot of a fight."
+  },
+  {
+   "id": "blutbad",
+   "name": "Blutbad",
+   "label": "Blutbad in full woge",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 13
+    },
+    {
+     "skill": "Tracking",
+     "target": 14
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Claws and fangs (2)",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Relentless",
+   "traitText": "Ignores the Wounded penalty."
+  },
+  {
+   "id": "siegbarste",
+   "name": "Siegbarste",
+   "label": "Siegbarste",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 14
+    }
+   ],
+   "dodge": 6,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Fists (2), clubs",
+   "weapons": [
+    "bigfists",
+    "club"
+   ],
+   "trait": "Iron bones",
+   "traitText": "Bullets and blades mark 1 box at most; a Siegbarste's weakness must be learned."
+  },
+  {
+   "id": "mauvais",
+   "name": "Mauvais Dentes",
+   "label": "Mauvais Dentes",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 15
+    },
+    {
+     "skill": "Stealth",
+     "target": 13
+    }
+   ],
+   "dodge": 10,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Sabre teeth (2)",
+   "weapons": [
+    "teeth"
+   ],
+   "trait": "Royal hound",
+   "traitText": "Hunts one named target and doesn't stop."
+  },
+  {
+   "id": "hexenbiest",
+   "name": "Hexenbiest",
+   "label": "Hexenbiest",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Occult",
+     "target": 14
+    },
+    {
+     "skill": "Deception",
+     "target": 13
+    }
+   ],
+   "dodge": 8,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Spells, knives",
+   "weapons": [
+    "throw",
+    "knife"
+   ],
+   "trait": "Telekinesis",
+   "traitText": "Once per round, throws a person (1 box) instead of attacking. Grimm blood drunk under a full moon ends her power."
+  },
+  {
+   "id": "wendigo",
+   "name": "Wendigo",
+   "label": "Wendigo",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 13
+    },
+    {
+     "skill": "Stealth",
+     "target": 14
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Claws (2)",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Larder",
+   "traitText": "Drags victims away alive; a Survival roll finds the cache."
+  },
+  {
+   "id": "hundjager",
+   "name": "Hundjäger",
+   "label": "Hundjäger (Royal enforcer)",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 13
+    },
+    {
+     "skill": "Tracking",
+     "target": 14
+    },
+    {
+     "skill": "Shooting",
+     "target": 12
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Blade (2), crossbow",
+   "weapons": [
+    "blade",
+    "crossbow"
+   ],
+   "trait": "Pack",
+   "traitText": "Comes in threes; +1 to attack a target an ally hit this round."
+  },
+  {
+   "id": "holyknife",
+   "name": "Order of the Holy Knife assassin",
+   "label": "Order of the Holy Knife assassin",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 14
+    },
+    {
+     "skill": "Stealth",
+     "target": 14
+    }
+   ],
+   "dodge": 10,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Consecrated knife (1)",
+   "weapons": [
+    "knife"
+   ],
+   "trait": "Ambush",
+   "traitText": "+2 on the first attack from hiding; poisons blades (Body roll or 1 more box)."
+  },
+  {
+   "id": "druid",
+   "name": "Brotherhood druid",
+   "label": "Brotherhood druid",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Occult",
+     "target": 14
+    },
+    {
+     "skill": "Survival",
+     "target": 13
+    }
+   ],
+   "dodge": 8,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Staff, nature rites",
+   "weapons": [
+    "rites"
+   ],
+   "trait": "Living ground",
+   "traitText": "Commands roots, weather or beasts outdoors; powerless on rails and stone."
+  }
+ ],
+ "protection": [
+  {
+   "id": "shield",
+   "equipment": "shield",
+   "name": "Shield",
+   "text": "A hide shield or an iron-bound buckler: you Block at +1.",
+   "traits": [
+    {
+     "type": "shield",
+     "value": 1,
+     "label": "Shield"
+    }
+   ]
+  },
+  {
+   "id": "improvised",
+   "name": "Improvised shield",
+   "text": "A chair, a wooden slat, a crate lid or a saddle: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.",
+   "traits": [
+    {
+     "type": "shield",
+     "value": 0,
+     "breaksOn": 2,
+     "label": "Improvised shield"
+    }
+   ]
+  },
+  {
+   "id": "himmelsbrief",
+   "equipment": "himmelsbrief",
+   "name": "Himmelsbrief",
+   "text": "Once per case, when a bullet hits you, mark one box fewer.",
+   "traits": [
+    {
+     "type": "armor",
+     "minBoxes": 1,
+     "reduce": 1,
+     "against": [
+      "firearm"
+     ],
+     "label": "Himmelsbrief"
+    }
+   ]
+  }
+ ],
+ "combatRules": {
+  "oneDefense": {
+   "perRound": 1,
+   "edge": "extradefense"
+  },
+  "attackQualityDodge": {
+   "bands": [
+    {
+     "from": 0,
+     "mod": 0
+    },
+    {
+     "from": 3,
+     "mod": -1
+    },
+    {
+     "from": 5,
+     "mod": -2
+    },
+    {
+     "from": 7,
+     "mod": -3
+    }
+   ]
+  },
+  "parry": {
+   "mod": -3,
+   "repeatPenalty": -2,
+   "bareHanded": "unarmed"
+  },
+  "block": {
+   "mod": -2
+  },
+  "aim": {
+   "bonus": 1
+  },
+  "tellingHits": {
+   "margin": 5,
+   "natural": true,
+   "called": -2,
+   "small": -4
+  }
+ },
+ "coreCombat": [
+  "aim",
+  "attackQualityDodge",
+  "block",
+  "oneDefense",
+  "parry",
+  "tellingHits"
+ ],
+ "terms": {
+  "title": "Grimm",
+  "point": "Grit",
+  "meleeSkill": "Melee",
+  "unarmedSkill": "Brawling",
+  "ammo": "rounds",
+  "ammoOne": "round"
+ }
+}
