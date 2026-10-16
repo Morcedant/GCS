@@ -5,6 +5,7 @@ For each pack in legend-dynamics/packs/<id>/ (pack.json + setting.md) this write
   legend-dynamics/<id>/index.html        the character creator, with the pack's data, look and guide
   legend-dynamics/<id>/players-guide.md  the full Players' Guide (core rules + setting)
   legend-dynamics/<id>/<Title>_Players_Guide.docx   with --docx
+  legend-dynamics/<id>/gm-guide.md (and <Title>_GM_s_Guide.docx)  for a setting with a GM's Guide (pack gmGuide)
 It also writes legend-dynamics/Legend_Dynamics_Core_Rules.md, the setting-neutral core rules.
 
   python3 tools/build-legend.py [--docx] [pack ...]
@@ -380,6 +381,39 @@ def guide_md(pack, t, sections):
     return re.sub(r"\n{3,}", "\n\n", fill(core, t))
 
 
+def heading_block(md, heading):
+    """The block of the guide under a heading line (\"## Weaknesses\"), up to the next heading of the same or a higher level."""
+    level = len(heading) - len(heading.lstrip("#"))
+    m = re.search(r"^" + re.escape(heading) + r"[ \t]*$", md, flags=re.M)
+    if not m:
+        sys.exit(f"GM's Guide: no heading {heading!r} in the guide")
+    end = re.compile(r"^#{1,%d} " % level, flags=re.M).search(md, m.end())
+    return m.start(), end.start() if end else len(md)
+
+
+def split_gm(md, cfg):
+    """A setting with a GM's Guide (pack gmGuide): the sections only the GM should read move out of the Players' Guide
+    into a book of their own, in the order its chapters list them. A section can leave a short note behind (leave), and
+    the moved text's pointers back into the Players' Guide are reworded (replace)."""
+    gm = []
+    for ch in cfg["chapters"]:
+        if ch.get("title"):
+            gm += [f"# {ch['title']}", ""] + ([ch["intro"], ""] if ch.get("intro") else [])
+        for h in ch["take"]:
+            a, b = heading_block(md, h)
+            gm += [md[a:b].strip(), ""]
+            md = md[:a] + (cfg.get("leave", {}).get(h, "").strip() + "\n\n" if cfg.get("leave", {}).get(h) else "") + md[b:]
+    if cfg.get("playersNote"):
+        md = re.sub(r"(## How this book is organized\n\n[^\n]+)", lambda m: m.group(1) + " " + cfg["playersNote"], md, count=1)
+    body = "\n".join(gm).strip() + "\n"
+    for old, new in cfg.get("replace", []):
+        if old not in body:
+            sys.exit(f"GM's Guide: {old!r} is not in the moved sections")
+        body = body.replace(old, new)
+    head = f'---\ntitle: "{cfg["title"]}"\nsubtitle: "{cfg.get("subtitle", "")}"\nauthor: "Don Smallwood"\n---\n\n{cfg["intro"]}\n\n'
+    return re.sub(r"\n{3,}", "\n\n", md), re.sub(r"\n{3,}", "\n\n", head + body)
+
+
 CORE_COMBAT = json.loads((ENGINE / "combat.json").read_text())
 
 
@@ -442,10 +476,21 @@ def build(pid, docx):
     t = terms_of(pack)
     sections = pack_sections((pdir / "setting.md").read_text())
     md = guide_md(pack, t, sections)
+    gm_md = None
+    if pack.get("gmGuide"):
+        md, gm_md = split_gm(md, pack["gmGuide"])
     out = LD / pid
     out.mkdir(exist_ok=True)
     (out / "players-guide.md").write_text(md)
-    guide_html = subprocess.run(["pandoc", "-f", "markdown", "-t", "html", "--id-prefix=g-", "--wrap=none"], input=md, capture_output=True, text=True, check=True).stdout
+    to_html = lambda m, prefix: subprocess.run(["pandoc", "-f", "markdown", "-t", "html", f"--id-prefix={prefix}", "--wrap=none"], input=m, capture_output=True, text=True, check=True).stdout
+    guide_html = to_html(md, "g-")
+    if gm_md:
+        # Both books in the Guide tab, one shown at a time (a Players / GM switch in the page).
+        (out / "gm-guide.md").write_text(gm_md)
+        g = pack["gmGuide"]
+        guide_html = (f'<div class="guide-book" id="guide-players" data-title="{html.escape(t["guideTitle"])}" data-subtitle="{html.escape(t["guideSubtitle"])}">\n' + guide_html + "</div>\n"
+                      f'<div class="guide-book" id="guide-gm" data-title="{html.escape(g["title"])}" data-subtitle="{html.escape(g.get("subtitle", ""))}" hidden>\n'
+                      + to_html(gm_md, "gm-") + "</div>\n")
     theme = {**THEME_DEFAULTS, **pack.get("theme", {})}
     tpl = (ENGINE / "creator.html").read_text()
     tpl = tpl.replace("{{THEMECSS}}", theme["css"])
@@ -484,6 +529,11 @@ def build(pid, docx):
         bg.NAVY, bg.GOLD_FILL = pack.get("docxColors", ["1B2A4A", "E9EEF6"])
         bg.finish_docx(out / name)
         print(f"wrote {(out / name).relative_to(ROOT)}")
+        if gm_md:
+            name = re.sub(r"[^A-Za-z0-9]+", "_", pack["gmGuide"]["title"].replace("'s ", " ")).strip("_") + ".docx"
+            subprocess.run(["pandoc", "-f", "markdown", "-o", str(out / name)], input=gm_md, text=True, check=True)
+            bg.finish_docx(out / name)
+            print(f"wrote {(out / name).relative_to(ROOT)}")
 
 
 def core_rules(docx=False):
