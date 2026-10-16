@@ -322,6 +322,11 @@ tr.lvl-U td.target { color: var(--muted); }
 .clock-add { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; }
 .clock-add input { grid-column: 1 / -1; }
 .card-list { display: grid; gap: 10px; }
+.form-switch { display: grid; gap: 6px; margin: 4px 0 10px; }
+.seg-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg-btns .btn.on { border-color: var(--accent); color: var(--fg); background: var(--well); box-shadow: inset 0 0 0 1px var(--accent); }
+.attr-strip .formed b { color: var(--accent); }
+@media print { .form-switch .seg-btns { display: none; } }
 .disc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 10px 0; }
 .disc-threat, .disc-costs, .dclock { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--well); display: grid; gap: 6px; align-content: start; }
 .disc-clocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-bottom: 12px; }
@@ -582,7 +587,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="5f9700f" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · 5f9700f</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="a6364a0" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · a6364a0</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -4782,7 +4787,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h3 id="g-species-advantages">5. Species advantages</h3>
 <p>Write one to three. Each works like a general advantage: <strong>+2 to one skill in a narrow situation</strong>, or a small, limited permission (“once per scene…”). Each comes with a <strong>companion complication</strong>: a problem the trait causes, with a clear trigger and a real consequence, which earns a Resolve point when it bites, like any complication. A character takes one advantage, general or species, so make them distinct choices.</p>
 <h3 id="g-an-alternate-form-optional-tier-2-or-3">6. An alternate form (optional, tier 2 or 3)</h3>
-<p>If the species changes shape, give the form attribute bonuses (usually +2 to one attribute and +1 to another), two or three traits, and its drawbacks. The shared rules for forms in <em>Species</em> apply.</p>
+<p>If the species changes shape, give the form attribute bonuses (usually +2 to one attribute and +1 to another), two or three traits, and its drawbacks. The shared rules for forms in <em>Species</em> apply. The bonuses count only while the character is in that form: the sheet’s form switch shows both sets of numbers.</p>
 <h3 id="g-in-the-creator">In the creator</h3>
 <ol type="1">
 <li>In step 2, choose <strong>Custom species…</strong> at the end of the Species list.</li>
@@ -6367,6 +6372,17 @@ function setTrait(enc, pid, i, on) {
   return { event: log(enc, "trait", { pid, name: p.name, trait: p.traits[i].label || p.traits[i].type, on }) };
 }
 
+/**
+ * A shapechanger changes form: their numbers (from the page, as the sheet works them out) become the new form's.
+ * @param {any} enc @param {string} pid @param {boolean} on @param {{ dodge: number, agility: number, skills: any, weapons: string[], note?: string }} stats
+ */
+function setForm(enc, pid, on, stats) {
+  const p = find(enc, pid); if (!p || !p.form) return { error: "Only a shapechanger changes form." };
+  if (!!p.form.on === on) return { error: on ? `${p.name} is already in ${p.form.name}.` : `${p.name} is already in ${p.form.human}.` };
+  p.form = { ...p.form, on }; p.dodge = stats.dodge; p.agility = stats.agility; p.skills = stats.skills; p.weapons = stats.weapons; p.note = stats.note || "";
+  return { event: log(enc, "form", { pid, name: p.name, on, form: on ? p.form.name : p.form.human }) };
+}
+
 /** Put protective gear on a participant (its traits join theirs). @param {any} enc @param {string} pid @param {{ id: string, name: string, traits: any[] }} item */
 function addGear(enc, pid, item) {
   const p = find(enc, pid); if (!p || !item) return { error: "Choose the gear." };
@@ -6471,7 +6487,7 @@ function replay(enc, rules, core, config) {
   return { encounter: r };
 }
 
-return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, defenseOptions, chooseDefense, attack, tellingEffect, shrugTelling, tradeLimb, spendPoint, setTrait, addGear, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
+return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, defenseOptions, chooseDefense, attack, tellingEffect, shrugTelling, tradeLimb, spendPoint, setTrait, setForm, addGear, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
 })();
   const LAB_STATS = (() => {
 /**
@@ -6577,7 +6593,8 @@ return { summarize, attacksCsv };
  *   saveText: (text: string, name: string, say: (m: string, err?: boolean) => void) => void,
  *   crew: () => any[], saveCrew: () => void, renderCrew: () => void, calc: (c: any) => { skills: Record<string, number>, dodge: number, agility: number, defense?: number },
  *   clocks: { list: () => any[], set: (id: string, filled: number) => void, add: (name: string, size: number, kind: string) => void, listen: (fn: (c: any, from: number, to: number) => void) => void },
- *   injuryNames: string[], gritty?: () => boolean, traitsFor?: (c: any) => any[]
+ *   injuryNames: string[], gritty?: () => boolean, traitsFor?: (c: any) => any[],
+ *   formOf?: (c: any) => ({ name: string, human: string, on: boolean, weapon: string | null, traits: string[], drawbacks: string[] } | null), setForm?: (c: any, on: boolean) => void
  * }} api
  * With no test configuration (api.LAB null), the panel is the production Encounter manager: published rules only,
  * no experiments, and the setting's gritty combat option applied when the campaign has it switched on.
@@ -6714,9 +6731,13 @@ function mountLab(api) {
   /** A character from the GM's cards, as a participant. @param {any} c */
   function fromCharacter(c) {
     const k = api.calc(c), gun = c.play && c.play.gun;
+    // A shapechanger (api.formOf): in their form, its numbers (api.calc applies them), its claws, and its traits as a note.
+    const fm = api.formOf ? api.formOf(c) : null, formOn = !!(fm && fm.on);
     const weapons = ["fists", ...Object.values(WEAPONS).filter((/** @type {any} */ a) => a.id !== "fists" && (c.equipment[a.id] || (a.equip || []).some((/** @type {string} */ k) => c.equipment[k]) || (gun && a.ammo && a.ammo === gun.type) || (a.cantrip && (c.spells || []).includes(a.cantrip)))).map((/** @type {any} */ a) => a.id)];
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
+    if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+      ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
@@ -6778,6 +6799,9 @@ function mountLab(api) {
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
       if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
+      // A shapechanger who changed form on the card (the GM view, or the sheet's file) changes in the encounter too.
+      const fm = p.form && api.formOf ? api.formOf(c) : null;
+      if (fm && fm.on !== !!p.form.on) E.setForm(en, p.pid, fm.on, fromCharacter(c));
       if (PTRACK && (c.play.ptrack || 0) !== ((p.tracks || {})[PTRACK.name] || 0)) E.override(en, rules(), LD, "track", { pid: p.pid, track: PTRACK.name, value: c.play.ptrack || 0, reason: "changed on the character card" });
     }
   }
@@ -6831,6 +6855,7 @@ function mountLab(api) {
           <button class="linkish danger" data-rm="${p.pid}" aria-label="Remove ${esc(p.name)}">×</button></span>
         <span class="meta small"><span class="boxes">${Array.from({ length: p.boxes }, (_, i) => `<button class="box ${i < p.injury ? "on" : ""}" data-inj="${p.pid}" data-i="${i + 1}" aria-label="${esc(p.name)} box ${i + 1}"></button>`).join("")}</span>
           ${p.dead ? "<b style='color:var(--bad)'>Dead</b>" : p.dying ? "<b style='color:var(--bad)'>Dying</b>" : p.takenOut ? "<b style='color:var(--bad)'>Taken out</b>" : out ? "<b>Down</b>" : esc(api.injuryNames[inj] || "")}
+          ${p.form ? ` · <b>${esc(p.form.on ? p.form.name : p.form.human)}</b> <button class="linkish" data-form="${p.pid}" title="Change form: the numbers, weapons and traits switch">change to ${esc(p.form.on ? p.form.human : p.form.name)}</button>` : ""}
           ${p.kind === "pc" ? ` · ${esc(T.point)} <button class="linkish" data-pt="${p.pid}" data-d="-1" aria-label="${esc(p.name)}: one ${esc(T.point)} point fewer">−</button><b>${p.points}</b><button class="linkish" data-pt="${p.pid}" data-d="1" aria-label="${esc(p.name)}: one ${esc(T.point)} point more">+</button>` : ""}
           ${Object.entries(p.ammo).map(([k, v]) => ` · ${esc(PACK.weapons.items[k] ? PACK.weapons.items[k][0] : k)} ${v}/${PACK.weapons.items[k] ? PACK.weapons.items[k][1] : "?"}`).join("")}
           ${Object.entries(p.tracks || {}).filter(([, v]) => v).map(([k, v]) => ` · <b>${esc(k)} ${v}</b>`).join("")}
@@ -6854,6 +6879,15 @@ function mountLab(api) {
     else if (d.pt) { const p = E.find(en, d.pt); E.override(en, rules(), LD, "points", { pid: p.pid, points: p.points + +d.d, reason: "GM adjusted points" }); }
     else if (d.condRm) E.setCondition(en, d.condRm, d.c, false);
     else if (d.trait) { const p = E.find(en, d.trait); E.setTrait(en, d.trait, +d.i, p.traits[+d.i].on === false); }
+    else if (d.form) {
+      // The character's card changes form too, so the sheet, the GM view and the encounter agree.
+      const p = E.find(en, d.form), c = api.crew().find((x) => x.id === p.ref); if (!c) { say("That character isn't in the GM view any more.", true); return; }
+      const on = !(p.form && p.form.on);
+      if (api.setForm) api.setForm(c, on); else c.play.form = on; // the page's own flag (Grimm keeps the woge as play.woge)
+      const st = fromCharacter(c), res = E.setForm(en, p.pid, on, st);
+      if (res.error) { say(res.error, true); return; }
+      api.saveCrew(); api.renderCrew();
+    }
     else return;
     pushToCards(); save(); renderAll();
   });
@@ -7098,6 +7132,7 @@ function mountLab(api) {
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
       case "gear": return `${esc(e.name)} puts on ${esc(e.item)}.`;
       case "trait": return `${esc(e.name)}: ${esc(e.trait)} ${e.on ? "on" : "off"}.`;
+      case "form": return `${esc(e.name)} changes to ${esc(e.form)}.`;
       case "condition": return `${esc(e.name)}: ${e.on ? "+" : "−"} ${esc(e.condition)}.`;
       case "override": {
         const gm = `<span style="color:var(--warn)">GM</span>`;
@@ -7207,6 +7242,14 @@ return { mountLab };
   const FORMED = new Set(HERITAGES.filter((h) => h.form).map((h) => h.id)); // origins with an alternate form
   const SPECIES_TRAITS = Object.fromEntries(HERITAGES.map((h) => [h.id, h.traits]));
   const heritageOf = (c = ch) => HERITAGES.find((h) => h.id === c.speciesId);
+  // A shapechanger's form (its origin's form profile): its numbers apply only while the character is in it (play.form).
+  const formOf = (c = ch) => (FORMED.has(c.speciesId) ? heritageOf(c)?.form || null : null);
+  const inForm = (c = ch) => !!(c.play && c.play.form && formOf(c));
+  const formAttr = (a, c = ch) => (inForm(c) ? formOf(c).attrs[a] || 0 : 0);
+  const formDodge = (c = ch) => (inForm(c) ? (formOf(c).dodge || 0) + (formOf(c).attrs.Agility || 0) : 0);
+  const formSkill = (n, c = ch) => (inForm(c) ? formAttr((SKILLS.find((x) => x[0] === n) || [])[1], c) + (PACK.formPenalties?.[n] || 0) : 0);
+  // A form whose claws or fangs mark 2 boxes fights with the setting's claws.
+  const formWeapon = (f) => (f && (PACK.arms || []).some((a) => a.id === "claws") && (f.traits || []).some((x) => /marks? 2 boxes/i.test(x)) ? "claws" : null);
   const tierOf = (c = ch) => (c.speciesId === "custom" ? c.customTier : heritageOf(c)?.tier ?? 0);
   // Edges: every character has a few points shared between origin tier and Edges.
   const EDGE_POINTS = PACK.edgePoints ?? 3;
@@ -7944,7 +7987,7 @@ return { mountLab };
 
   function renderSheet() {
     const lvlOrder = { S: 0, T: 1, U: 2 };
-    const sorted = SKILLS.map(([n, a]) => ({ n, a, l: ch.skills[n], t: skillTarget(n) }))
+    const sorted = SKILLS.map(([n, a]) => ({ n, a, l: ch.skills[n], t: skillTarget(n) + formSkill(n) }))
       .sort((x, y) => lvlOrder[x.l] - lvlOrder[y.l] || y.t - x.t || x.n.localeCompare(y.n));
     const eq = EQUIPMENT.filter(([k]) => ch.equipment[k]).map(([, n]) => n);
     if (ch.otherEquip.trim()) eq.push(ch.otherEquip.trim());
@@ -7957,11 +8000,17 @@ return { mountLab };
         <div><span class="label">Title</span><b>${esc(ch.rank || "—")}</b></div>
         <div><span class="label">${T.role}</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">${T.origin}</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
-        <div><span class="label">Dodge</span><b class="num">${dodge()}</b>${dodgeGearBonus() ? `<span class="small muted">${dodge() + dodgeGearBonus()} with ${esc(dodgeGear().map(([n]) => n.toLowerCase()).join(" and "))}</span>` : ""}</div>
-        ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill)} bare-handed, fists only` : ""}</span></div>` : ""}
+        <div><span class="label">Dodge</span><b class="num">${dodge() + formDodge()}</b>${formDodge() ? `<span class="small muted">human ${dodge()}</span>` : ""}${dodgeGearBonus() ? `<span class="small muted">${dodge() + formDodge() + dodgeGearBonus()} with ${esc(dodgeGear().map(([n]) => n.toLowerCase()).join(" and "))}</span>` : ""}</div>
+        ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill) + formSkill(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill) + formSkill(T.unarmedSkill)} bare-handed, fists only` : ""}</span></div>` : ""}
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
-      <div class="attr-strip">${ATTRS.map(([n]) => `<div><span class="label">${n}</span><b>${ch.attrs[n]}</b></div>`).join("")}</div>
+      ${formOf() ? (() => { const f = formOf(), on = inForm(), human = capFirst(T.formHuman || "human form"), fname = capFirst(T.formName);
+        const bits = [...ATTRS.filter(([n]) => f.attrs[n]).map(([n]) => `${n} ${signed(f.attrs[n])}`), ...(f.dodge ? [`Dodge ${signed(f.dodge)}`] : [])];
+        return `<div class="form-switch no-print-btns"><span class="label">Form</span><div class="seg-btns" role="group" aria-label="Which form">
+          <button type="button" class="btn ${on ? "" : "on"}" data-sheetform="0" aria-pressed="${!on}">${esc(human)}</button><button type="button" class="btn ${on ? "on" : ""}" data-sheetform="1" aria-pressed="${on}">${esc(fname)}</button></div>
+          <span class="small muted">${on ? `<b>${esc(fname)}:</b> ${esc(bits.join(", "))} (included below); ${esc((f.traits || []).join("; "))}.${f.drawbacks?.length ? ` <b>Drawbacks:</b> ${esc(f.drawbacks.join("; "))}.` : ""}`
+            : `The numbers below are your human form. ${esc(fname)}: ${esc(bits.join(", "))}, and ${esc((f.traits || []).join("; ").toLowerCase())}.`}</span></div>`; })() : ""}
+      <div class="attr-strip">${ATTRS.map(([n]) => `<div class="${formAttr(n) ? "formed" : ""}"><span class="label">${n}</span><b>${ch.attrs[n] + formAttr(n)}</b>${formAttr(n) ? `<span class="small muted">human ${ch.attrs[n]}</span>` : ""}</div>`).join("")}</div>
       <div><h3 style="margin-bottom:6px">Skills</h3>
         <div class="skill-cols">${sorted.map((s) => `<div class="skill-line ${s.l}"><span>${s.n}<span class="lv">${s.l === "U" ? "untrained" : levelName(s.l, s.n)}</span></span><b>${s.t}</b></div>`).join("")}</div></div>
       <div class="fields">
@@ -8298,7 +8347,7 @@ return { mountLab };
       if (!isGS()) toast("Broadened: the Expert skill becomes a Specialty (+3), and you can train two more skills.");
       else if (count("T") > 7) toast(`${T.pathExpertPlural} have seven Trained skills; untrain ${count("T") - 7} and your Specialty becomes Expert (+5).`);
     }
-    else if (t.id === "f-form") { ch.play.form = t.checked; save(); updateTarget(); }
+    else if (t.id === "f-form") { ch.play.form = t.checked; save(); renderSheet(); updateTarget(); }
     else if (t.id === "f-horror") { store.set(STORE_HORROR, t.checked); render(); }
     else if (t.id === "f-customtier") { ch.customTier = +t.value; touch(); render(); }
     else if (t.id === "f-adv2") { ch.adv2.id = t.value; touch(); render(); }
@@ -9227,9 +9276,9 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   function gmCalc(c) {
     const saved = ch; ch = c;
     try {
-      const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n), lab: levelName(c.skills[n], n) })).filter((x) => x.l !== "U")
+      const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n) + formSkill(n, c), lab: levelName(c.skills[n], n) })).filter((x) => x.l !== "U")
         .sort((a, b) => (b.l === "S") - (a.l === "S") || b.t - a.t);
-      return { skills, dodge: dodge(), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
+      return { skills, dodge: dodge() + formDodge(c), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
     } finally { ch = saved; }
   }
   function gmAdd(list) {
@@ -9387,7 +9436,8 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
       return `<article class="gm-card hud ${inj >= 3 ? "down" : ""}" data-div="${k.div}">
         <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed character")}</b>
           <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span></div></div>
-        <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b>${c.attrs[n]}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div></div>
+        ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? T.formName : T.formHuman || "human form"))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (T.formHuman || "human form").toLowerCase() : T.formName)}</button></div>` : ""}
+        <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div></div>
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span></div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.form ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.form ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
@@ -9405,6 +9455,7 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
     if (el.dataset.gmbox) { const i = +el.dataset.gmbox; c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; }
     else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
+    else if ("gmform" in el.dataset) c.play.form = !inForm(c);
     else if ("gmrm" in el.dataset) gmCrew = gmCrew.filter((x) => x !== c);
     else if ("gmsave" in el.dataset) {
       const name = (c.name.trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLowerCase() || "character") + ".json";
@@ -9481,12 +9532,14 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
     labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText, gritty: () => gritty,
       crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
       // A character's numbers, as the sheet works them out; with powers, their Defense Class from Toughness or Force Field.
-      calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n)])), dodge: dodge(), agility: c.attrs.Agility,
+      // In a shapechanger's form (play.form), the form's numbers; otherwise the human form's.
+      calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n) + formSkill(n, c)])), dodge: dodge() + formDodge(c), agility: c.attrs.Agility + formAttr("Agility", c),
         defense: POWERS ? Math.max(0, ...allPowers(c).filter((x) => ["toughness", "forcefield"].includes(x.id)).map((x) => classIndex(x.cl) + 1)) : 0 }; } finally { ch = saved; } },
       clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
         set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
         add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
-      injuryNames: INJURY.map((x) => x[0]) });
+      injuryNames: INJURY.map((x) => x[0]),
+      formOf: (c) => { const f = formOf(c); return f ? { name: T.formName, human: T.formHuman || "human form", on: inForm(c), weapon: formWeapon(f), traits: f.traits || [], drawbacks: f.drawbacks || [] } : null; } });
   } else $("lab").hidden = true;
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
   let gmClearArmed = false;
@@ -9805,6 +9858,10 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   function newOfficer() { load(blank()); applyRoleSkills(); render(); selectTab("create"); toast("New character started."); }
   $("btn-new").onclick = newOfficer;
   $("banner-new").onclick = newOfficer;
+  $("sheet-main").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-sheetform]"); if (!b || !formOf()) return;
+    ch.play.form = b.dataset.sheetform === "1"; $("f-form").checked = ch.play.form; save(); renderSheet(); updateTarget();
+  });
   $("plearn-add").onclick = () => { ch.powersLearned.push({ id: "", cl: "I" }); touch(); render(); };
   $("card-add").onclick = () => { ch.cards.push(normCard({ owner: ch.name.trim(), present: ch.name.trim() ? [ch.name.trim()] : [] })); $("cards-wrap").open = true; touch(); render(); };
   $("almanac-list").addEventListener("change", (e) => {

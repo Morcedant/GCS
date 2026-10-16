@@ -62,7 +62,7 @@ A few people are born **Sighted**. They see ghosts, the true faces of monsters w
 
 ## Monstrous forms
 
-Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. Changing is a free action, but fury, terror or pain can force it (a Will roll), and a werewolf has no choice at moonrise under the full moon. While changed, the form's profile applies: the creator's **In monstrous form** box adds its bonuses to your rolls. Horses bolt (−2 to Riding), and a monstrous form seen by townsfolk marks a box of **Whispers**.
+Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. Changing is a free action, but fury, terror or pain can force it (a Will roll), and a werewolf has no choice at moonrise under the full moon. While changed, the form's profile applies, and only then. Your sheet has a **Human form / Monstrous form** switch: it shows the numbers of the form you're in (the human ones beside them), and the dice roller and the GM's Encounter panel follow it. Horses bolt (−2 to Riding), and a monstrous form seen by townsfolk marks a box of **Whispers**.
 
 ## Magic
 

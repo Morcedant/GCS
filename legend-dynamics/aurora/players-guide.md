@@ -1458,7 +1458,7 @@ Write one to three. Each works like a general advantage: **+2 to one skill in a 
 
 ### 6. An alternate form (optional, tier 2 or 3)
 
-If the origin changes shape, give the form attribute bonuses (usually +2 to one attribute and +1 to another), two or three traits, and its drawbacks. The shared rules for forms in *Origins* apply.
+If the origin changes shape, give the form attribute bonuses (usually +2 to one attribute and +1 to another), two or three traits, and its drawbacks. The shared rules for forms in *Origins* apply. The bonuses count only while the character is in that form: the sheet's form switch shows both sets of numbers.
 
 ### In the creator
 
