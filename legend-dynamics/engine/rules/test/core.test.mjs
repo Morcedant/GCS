@@ -85,3 +85,22 @@ test("Crown capabilities: margin damage, per-weapon jams, price, Boosts, defende
   const huge = LD.resolveAttack({ attacker: atk, defender: def({ traits: [{ type: "ignoreHits", maxBoxes: 1, label: "Huge" }] }), weapon: fist, band: "melee" }, LD.NO_HOOKS, roll([3, 3, 3]));
   assert.equal(huge.outcome, "hit, marks nothing (Huge)"); assert.equal(huge.damage, null);
 });
+
+test("stun weapons, Defense Classes and always-on armor", () => {
+  // Attack dice 3 (a natural success), defense dice 18 (a natural failure): every attack lands.
+  const roll = (/** @type {string} */ k) => (k === "attack" ? [1, 1, 1] : [6, 6, 6]);
+  const atk = { id: "a", skillTarget: 12, injury: 0 };
+  const def = (/** @type {any[]} */ traits) => ({ id: "d", canDodge: true, dodgeBase: 9, injury: 0, traits });
+  const hit = (/** @type {any} */ weapon, /** @type {any[]} */ traits = []) => LD.resolveAttack({ attacker: atk, defender: def(traits), weapon, band: weapon.reach === "melee" ? "melee" : "close" }, LD.NO_HOOKS, roll);
+  const stunner = { id: "stunner", band: "close", stun: true, damage: { any: { boxes: 0 } } };
+  const s = hit(stunner);
+  assert.equal(s.hit, true); assert.equal(s.stun, true); assert.equal(s.damage, null);
+  const claws2 = { id: "claws2", reach: "melee", class: 2, damage: { melee: { boxes: 2 } } }, pistol = { id: "pistol", band: "close", class: 1, damage: { any: { boxes: 2 } } };
+  const D2 = [{ type: "defenseClass", value: 2 }];
+  assert.equal(hit(pistol, D2).damage, null, "a Class I attack does nothing to Defense II");
+  assert.equal(hit(claws2, D2).damage.boxes, 1, "an equal Class marks one box fewer");
+  assert.equal(hit({ ...claws2, class: 3 }, D2).damage.boxes, 2, "a higher Class hits in full");
+  const chromed = [{ type: "armor", minBoxes: 2, reduce: 1, always: true, label: "Chromed" }];
+  assert.equal(hit(claws2, chromed).damage.boxes, 1);
+  assert.equal(hit(claws2, chromed).armorUsed, "Chromed");
+});

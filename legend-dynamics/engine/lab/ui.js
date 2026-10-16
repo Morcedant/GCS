@@ -11,15 +11,19 @@
  * @param {{
  *   PACK: any, T: any, LD: any, LDX: any, E: any, S: any, LAB: any, store: any, esc: (s: any) => string, signed: (n: number) => string,
  *   saveText: (text: string, name: string, say: (m: string, err?: boolean) => void) => void,
- *   crew: () => any[], saveCrew: () => void, renderCrew: () => void, calc: (c: any) => { skills: Record<string, number>, dodge: number, agility: number },
+ *   crew: () => any[], saveCrew: () => void, renderCrew: () => void, calc: (c: any) => { skills: Record<string, number>, dodge: number, agility: number, defense?: number },
  *   clocks: { list: () => any[], set: (id: string, filled: number) => void, add: (name: string, size: number, kind: string) => void, listen: (fn: (c: any, from: number, to: number) => void) => void },
- *   injuryNames: string[]
+ *   injuryNames: string[], gritty?: () => boolean
  * }} api
+ * With no test configuration (api.LAB null), the panel is the production Encounter manager: published rules only,
+ * no experiments, and the setting's gritty combat option applied when the campaign has it switched on.
  */
 export function mountLab(api) {
-  const { PACK, T, LD, LDX, E, S, LAB, store, esc, signed } = api;
+  const { PACK, T, LD, LDX, E, S, store, esc, signed } = api;
+  const PROD = !api.LAB; // the production Encounter manager: published rules only
+  const LAB = api.LAB || { label: "", experiments: ["grievousWounds"], ammo: {}, weaponTraits: {}, grievous: PACK.gritty || null };
   const $ = (/** @type {string} */ id) => /** @type {any} */ (document.getElementById(id));
-  const KEY = PACK.id + ".lab.v1";
+  const KEY = PACK.id + (PROD ? ".encounter.v1" : ".lab.v1");
   const WEAPONS = Object.fromEntries(PACK.arms.filter((/** @type {any} */ a) => !a.hazard).map((/** @type {any} */ a) => [a.id, a]));
   const MODES = PACK.weapons.modes || []; // [id, name, rounds, only these ammo types or null, roll modifier]
   const PROT = PACK.protection || []; // published protective gear (a shield, a mail shirt) as data
@@ -29,7 +33,12 @@ export function mountLab(api) {
 
   /** @type {{ mode: "published" | "lab", cfg: any, enc: any, history: any[], compare: any }} */
   let lab = store.get(KEY, null) || { mode: "published", cfg: null, enc: null, history: [], compare: null };
-  const PUB = PACK.combatRules || null; // the published combat rules: the core's (engine/combat.json) with the setting's overrides
+  if (PROD) lab.mode = "published";
+  // The published combat rules: the core's (engine/combat.json) with the setting's overrides. In production, the
+  // setting's gritty combat option joins them while the campaign has it switched on.
+  const PUB0 = PACK.combatRules || null;
+  const pubRules = () => (PROD && PACK.gritty && api.gritty && api.gritty() ? { ...(PUB0 || {}), grievousWounds: {} } : PUB0);
+  const PUB = PUB0;
   const fresh = LDX.newLabConfig(PACK.id, LAB, PUB);
   if (!lab.cfg) lab.cfg = fresh;
   for (const [id, st] of Object.entries(fresh.experiments)) {
@@ -38,9 +47,19 @@ export function mountLab(api) {
   }
   lab.cfg.label = LAB.label || lab.cfg.label;
   const save = () => store.set(KEY, lab);
+  if (PROD) {
+    for (const id of ["lab-rules", "lab-banner", "lab-compare"]) $(id).hidden = true;
+    $("lab-seed").closest(".field").hidden = true;
+    $("lab-rerun-cfg").closest(".lab-row").hidden = true;
+    $("lab-sub").hidden = true;
+    $("lab-intro").textContent = "Run a fight with every roll shown: turn order, attacks, defenses, damage and the log. Hits land on the character cards and the battle map too.";
+    $("lab-h-sum").textContent = "Fight summary";
+    $("lab-export").textContent = "Save the fight (JSON)";
+  }
+  const HISTORY = PROD ? "this browser's history" : "this browser's lab history";
   const say = (/** @type {string} */ m, /** @type {boolean} */ err = false) => { $("lab-msg").textContent = m; $("lab-msg").className = "toast" + (err ? " err" : ""); };
 
-  const rulesOf = (/** @type {any} */ cfg) => ({ ...LDX.buildRules(cfg && cfg.kind === "lab" ? cfg : LDX.PUBLISHED, WEAPONS, LAB, PUB), jamOn18: !!PACK.weapons.jamOn18 });
+  const rulesOf = (/** @type {any} */ cfg) => ({ ...LDX.buildRules(cfg && cfg.kind === "lab" ? cfg : LDX.PUBLISHED, WEAPONS, LAB, pubRules()), jamOn18: !!PACK.weapons.jamOn18 });
   const enc = () => lab.enc;
   // A running encounter keeps the rules it started with; otherwise the configuration chosen for the next one.
   const rules = () => rulesOf(enc() && enc().status !== "ended" ? enc().config : lab.mode === "lab" ? lab.cfg : LDX.PUBLISHED);
@@ -135,7 +154,8 @@ export function mountLab(api) {
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
-        ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : [])],
+        ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
+        ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : [])],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
@@ -155,7 +175,7 @@ export function mountLab(api) {
     return lab.enc;
   }
   $("lab-new").onclick = () => {
-    if (enc() && enc().status === "combat" && !confirm("Start a new encounter? The current one is kept in this browser's lab history.")) return;
+    if (enc() && enc().status === "combat" && !confirm(`Start a new encounter? The current one is kept in ${HISTORY}.`)) return;
     if (enc() && enc().status !== "setup") lab.history = [enc(), ...lab.history].slice(0, 20);
     lab.enc = null; ensureEnc(); save(); renderAll(); say("New encounter. Add characters and opponents.");
   };
@@ -205,6 +225,11 @@ export function mountLab(api) {
       c.play.injury = Math.min(3, p.injury); c.play.dying = p.dying; c.play.duty = p.points;
       if (c.play.gun && p.ammo[c.play.gun.type] !== undefined) c.play.gun.rounds = p.ammo[c.play.gun.type];
       if (PTRACK && p.tracks) c.play.ptrack = Math.min(PTRACK.boxes, p.tracks[PTRACK.name] || 0);
+      // Lasting wounds from gritty combat go on the card's list once each.
+      if (Array.isArray(c.play.lasting)) (p.lasting || []).forEach((/** @type {any} */ w, /** @type {number} */ i) => {
+        const key = `enc-${en.id}-${p.pid}-${w.about ?? i}`;
+        if (!c.play.lasting.some((/** @type {any} */ x) => x.key === key)) c.play.lasting.push({ id: w.id || "", name: w.name, text: w.text || "", heal: w.heal || "", complication: !!w.complication, date: new Date().toISOString().slice(0, 10), key });
+      });
       changed = true;
     }
     if (changed) { api.saveCrew(); api.renderCrew(); }
@@ -214,7 +239,8 @@ export function mountLab(api) {
   function renderPeople() {
     const en = enc(), crew = api.crew();
     $("lab-add-pc").innerHTML = `<option value="">${crew.length ? "Choose…" : "Add characters to the GM view first"}</option>` + crew.map((c) => `<option value="${esc(c.id)}">${esc(c.name || "Unnamed")}</option>`).join("");
-    $("lab-add-threat").innerHTML = `<option value="">Choose…</option>` + PACK.threats.map((/** @type {any} */ t) => `<option value="${t.id}">${esc(t.label)}</option>`).join("");
+    // Only threats that fight (a screening post or a ghost has nothing to attack with) are offered.
+    $("lab-add-threat").innerHTML = `<option value="">Choose…</option>` + PACK.threats.filter((/** @type {any} */ t) => (t.weapons || []).length).map((/** @type {any} */ t) => `<option value="${t.id}">${esc(t.label)}</option>`).join("");
     $("lab-ah-prot").innerHTML = PROT.map((/** @type {any} */ x) => `<label class="small"><input type="checkbox" data-ahprot="${x.id}"> ${esc(x.name)}</label>`).join(" ");
     $("lab-ah-weapon").innerHTML = Object.values(WEAPONS).map((/** @type {any} */ a) => `<option value="${a.id}">${esc(a.name)} (${esc(a.skill)})</option>`).join("");
     if (!en) { $("lab-people").innerHTML = `<p class="small muted">No encounter yet.</p>`; return; }
@@ -283,7 +309,7 @@ export function mountLab(api) {
   $("lab-end").onclick = () => {
     const en = enc(); E.endEncounter(en, S.summarize(en));
     lab.history = [en, ...lab.history.filter((/** @type {any} */ h) => h.id !== en.id)].slice(0, 20);
-    pushToCards(); save(); renderAll(); say("Encounter ended. Its summary is below, and it's kept in this browser's lab history.");
+    pushToCards(); save(); renderAll(); say(`Encounter ended. Its summary is below, and it's kept in ${HISTORY}.`);
   };
 
   // ---- actions ----
@@ -408,9 +434,10 @@ export function mountLab(api) {
       if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
     }
     if (ev.enchanted) L.push(`<span class="x">Enchanted weapon: +${ev.enchanted} box.</span>`);
-    if (ev.armorUsed) L.push(`<span class="x">${esc(ev.armorUsed)}: one box fewer (once per fight).</span>`);
+    if (ev.armorUsed) L.push(`<span class="x">${esc(ev.armorUsed)}: one box fewer.</span>`);
     if (ev.shieldBroke) L.push(`<span class="x">${esc(ev.shieldBroke)} breaks: it took a hit of 2 or more boxes.</span>`);
     if (ev.marginTrait) L.push(`<span class="x">${esc(ev.marginTrait)}.</span>`);
+    if (ev.defenseClass) L.push(`<span class="x">${esc(ev.defenseClass)}.</span>`);
     if (ev.price) L.push(`<span class="bad">Failed cast: ${esc(ev.attacker.name)} marks ${ev.price.boxes} ${esc(ev.price.track)}.</span>`);
     if (ev.jam) L.push(`<span class="bad">Natural ${ev.attackTotal}: ${ev.weapon && WEAPONS[ev.weapon.id] && WEAPONS[ev.weapon.id].ammo ? "the weapon jams or misfires" : "the weapon fails"}. Clearing it takes an action.</span>`);
     if (ev.grievous) {
@@ -497,7 +524,7 @@ export function mountLab(api) {
       case "turn": return `${esc(e.name || "")}'s turn.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}`;
+      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}`;
       case "trade": return `<b>${esc(e.name)} trades a limb for their life:</b> ${esc(e.wound)}.`;
       case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.`;
       case "shrug": return `${esc(e.name)} shrugs off a telling hit (${esc(e.label)}).`;
@@ -563,8 +590,8 @@ export function mountLab(api) {
   const slug = (/** @type {string} */ s) => s.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLowerCase() || "encounter";
   $("lab-export").onclick = () => {
     const en = enc(); if (!en) { say("Nothing to save yet.", true); return; }
-    api.saveText(JSON.stringify({ format: PACK.id + "-lab-session", version: 1, baseline: LD.CORE_BASELINE, setting: PACK.id, testConfiguration: LAB.label,
-      encounter: en, summary: S.summarize(en), comparison: lab.compare && lab.compare.of === en.id ? lab.compare : null, history: lab.history.map((h) => S.summarize(h)) }, null, 2), slug(en.name) + "-lab.json", say);
+    api.saveText(JSON.stringify({ format: PACK.id + (PROD ? "-encounter" : "-lab-session"), version: 1, baseline: LD.CORE_BASELINE, setting: PACK.id, testConfiguration: LAB.label,
+      encounter: en, summary: S.summarize(en), comparison: lab.compare && lab.compare.of === en.id ? lab.compare : null, history: lab.history.map((h) => S.summarize(h)) }, null, 2), slug(en.name) + (PROD ? "-encounter.json" : "-lab.json"), say);
   };
   $("lab-csv").onclick = () => { const en = enc(); if (!en) { say("Nothing to save yet.", true); return; } api.saveText(S.attacksCsv(en), slug(en.name) + "-attacks.csv", say); };
   $("lab-name").addEventListener("change", () => { const en = enc(); if (en) { en.name = $("lab-name").value.trim() || en.name; save(); renderSummary(); } });

@@ -1,4 +1,4 @@
-    <!-- Rules Lab: Encounter modeler (only in settings with a test configuration, packs/<id>/lab.json) -->
+    <!-- The Encounter panel: the production Encounter manager, or the Rules Lab's modeler where a test configuration exists -->
     <style>
   .lab-rules-sum { cursor: pointer; padding: 8px 10px; border: 1px dashed var(--accent); border-radius: 8px; margin: 4px 0 8px; }
   .lab-rules-sum b { text-transform: uppercase; letter-spacing: .06em; font-size: .85rem; }
@@ -50,10 +50,10 @@
     </style>
     <div class="card hud lab no-print" id="lab">
       <div class="lab-head">
-        <h3>Encounter <span class="small muted">· Rules Lab</span></h3>
+        <h3>Encounter <span class="small muted" id="lab-sub">· Rules Lab</span></h3>
         <span class="lab-banner published" id="lab-banner" role="status">Rules: Published</span>
       </div>
-      <p class="small muted">Run a fight with every calculation shown, and test rule changes without touching the published game. Normal play (the sheet and its roller) always uses the published rules.</p>
+      <p class="small muted" id="lab-intro">Run a fight with every calculation shown, and test rule changes without touching the published game. Normal play (the sheet and its roller) always uses the published rules.</p>
 
       <details id="lab-rules"><summary class="lab-rules-sum"><b>Rules configuration</b> <span class="small muted">· switch on experiments here: choose the test configuration, then tick one</span><br><span class="small" id="lab-rules-hint"></span></summary>
         <div class="lab-row" style="margin:8px 0">

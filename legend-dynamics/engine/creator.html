@@ -2502,7 +2502,7 @@ tr.lvl-U td.target { color: var(--muted); }
     saveGM(); renderGM();
     return { added, updated };
   }
-  let labPanel = null; // the Rules Lab's Encounter panel, in settings that have one
+  let labPanel = null; // the Encounter panel (and, with a test configuration, the Rules Lab)
   function renderGM() {
     if (labPanel) setTimeout(labPanel.refresh, 0);
     try { battleMap.refresh(); } catch { /* the map mounts just after the GM view's first render */ }
@@ -2617,16 +2617,19 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!gmCrew.length) { gmSay("Add some characters first.", true); return; }
     saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog, allegiances: campaignAllegiances, ...(GRITTY ? { gritty } : {}) }, null, 2), PACK.id + "-characters.json", gmSay);
   };
-  // ---- Rules Lab: the Encounter panel (settings with a test configuration only; never used by the sheet) ----
-  if (LAB_DATA) {
-    labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText,
+  // ---- The Encounter panel: the published rules in every setting with weapons as data; the Rules Lab's experiments
+  // where a test configuration exists. Never used by the sheet. ----
+  if ((PACK.arms || []).length) {
+    labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText, gritty: () => gritty,
       crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
-      calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n)])), dodge: dodge(), agility: c.attrs.Agility }; } finally { ch = saved; } },
+      // A character's numbers, as the sheet works them out; with powers, their Defense Class from Toughness or Force Field.
+      calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n)])), dodge: dodge(), agility: c.attrs.Agility,
+        defense: POWERS ? Math.max(0, ...allPowers(c).filter((x) => ["toughness", "forcefield"].includes(x.id)).map((x) => classIndex(x.cl) + 1)) : 0 }; } finally { ch = saved; } },
       clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
         set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
         add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
       injuryNames: INJURY.map((x) => x[0]) });
-  }
+  } else $("lab").hidden = true;
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
   let gmClearArmed = false;
   $("gm-clear").onclick = () => {

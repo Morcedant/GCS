@@ -462,18 +462,15 @@ def build(pid, docx):
     js = "const PACK = " + json.dumps({**with_core_combat(pack), "terms": t, "theme": theme}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";"
     tpl = tpl.replace("/* PACK:START *//* PACK:END */", "/* PACK:START */" + js + "/* PACK:END */")
     tpl = tpl.replace("/* RULES:CORE */", rules_js())
-    # The Rules Lab: only for settings with a test configuration (packs/<id>/lab.json). It is never part of PACK.
+    # The Encounter panel in the GM view: in every setting, running the published rules. A setting with a test
+    # configuration (packs/<id>/lab.json, on the rules-lab branch) also gets the Rules Lab's experiments.
+    mods = [inline_module(ENGINE / "rules" / "experiments.js", "LDX")] + [inline_module(f, "LAB_" + f.stem.upper()) for f in sorted((ENGINE / "lab").glob("*.js"))]
     lab = pdir / "lab.json"
-    if lab.exists():
-        mods = [inline_module(ENGINE / "rules" / "experiments.js", "LDX")] + [inline_module(f, "LAB_" + f.stem.upper()) for f in sorted((ENGINE / "lab").glob("*.js"))]
-        lab_data = json.loads(lab.read_text())
-        if "grievous" not in lab_data and pack.get("gritty"):
-            lab_data["grievous"] = pack["gritty"]  # the setting's own grievous wound table (its gritty combat option)
-        tpl = tpl.replace("/* RULES:LAB */", "const LAB_DATA = " + json.dumps(lab_data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";\n  " + "\n  ".join(mods))
-        panel = ENGINE / "lab" / "panel.html"
-        tpl = tpl.replace("<!-- RULES:LAB-PANEL -->", panel.read_text() if panel.exists() else "")
-    else:
-        tpl = tpl.replace("/* RULES:LAB */", "const LAB_DATA = null;").replace("<!-- RULES:LAB-PANEL -->", "")
+    lab_data = json.loads(lab.read_text()) if lab.exists() else None
+    if lab_data is not None and "grievous" not in lab_data and pack.get("gritty"):
+        lab_data["grievous"] = pack["gritty"]  # the setting's own grievous wound table (its gritty combat option)
+    tpl = tpl.replace("/* RULES:LAB */", "const LAB_DATA = " + json.dumps(lab_data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";\n  " + "\n  ".join(mods))
+    tpl = tpl.replace("<!-- RULES:LAB-PANEL -->", (ENGINE / "lab" / "panel.html").read_text())
     tpl = re.sub(r"<!-- GUIDE:START -->.*?<!-- GUIDE:END -->", lambda _: "<!-- GUIDE:START -->\n" + guide_html + "<!-- GUIDE:END -->", tpl, flags=re.S)
     tpl = stamp(tpl, out / "index.html")  # the version footer: a fingerprint of the page, and the day it last changed
     (out / "index.html").write_text(tpl)

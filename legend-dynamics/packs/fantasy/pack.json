@@ -3315,5 +3315,639 @@
     "The spell turns {name} to ash from the hands up."
    ]
   }
- }
+ },
+ "arms": [
+  {
+   "id": "fists",
+   "name": "Fists",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "rows": [
+    [
+     "Fists, kicks, dirty tricks",
+     "Melee",
+     "1",
+     "Bruises, a split lip, cracked ribs"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "dagger",
+   "name": "Dagger",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "rows": [
+    [
+     "Dagger or club",
+     "Melee; dagger Close thrown",
+     "1",
+     "A cut, a stab or a crack on the skull"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "club",
+   "name": "Club",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "rows": [],
+   "traits": []
+  },
+  {
+   "id": "dagger-thrown",
+   "name": "Dagger, thrown",
+   "skill": "Athletics",
+   "band": "close",
+   "maxBand": "close",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "rows": [],
+   "traits": []
+  },
+  {
+   "id": "sling",
+   "name": "Sling",
+   "skill": "Marksmanship",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "jamOn": [
+    18
+   ],
+   "rows": [
+    [
+     "Sling",
+     "Short",
+     "1",
+     "A crack on the skull"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "sword",
+   "name": "Sword, axe, mace or spear",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "rows": [
+    [
+     "Sword, axe, mace, spear",
+     "Melee",
+     "2",
+     "A deep wound or a broken bone"
+    ]
+   ],
+   "traits": [],
+   "equip": [
+    "spear"
+   ]
+  },
+  {
+   "id": "greatweapon",
+   "name": "Greatsword, greataxe or polearm",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "traits": [
+    {
+     "type": "marginDamage",
+     "margin": 5,
+     "damage": {
+      "boxes": 3,
+      "dying": true
+     },
+     "label": "A hit by 5 or more leaves the target Dying"
+    }
+   ],
+   "rows": [
+    [
+     "Greatsword, greataxe, polearm",
+     "Melee",
+     "2; a hit by 5 or more leaves the target Dying",
+     "A ruinous wound"
+    ]
+   ]
+  },
+  {
+   "id": "bow",
+   "name": "Bow",
+   "skill": "Marksmanship",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "bow",
+   "jamOn": [
+    18
+   ],
+   "rows": [
+    [
+     "Bow",
+     "Long",
+     "2",
+     "An arrow buried deep"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "crossbow",
+   "name": "Crossbow",
+   "skill": "Marksmanship",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "crossbow",
+   "jamOn": [
+    18
+   ],
+   "rows": [
+    [
+     "Crossbow",
+     "Medium",
+     "2",
+     "A bolt buried deep"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "pistol",
+   "name": "Wheel-lock pistol",
+   "skill": "Marksmanship",
+   "band": "close",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "pistol",
+   "jamOn": [
+    18
+   ],
+   "rows": [
+    [
+     "Wheel-lock pistol",
+     "Close",
+     "2",
+     "A gunshot wound"
+    ]
+   ],
+   "traits": [],
+   "firearm": true
+  },
+  {
+   "id": "arquebus",
+   "name": "Arquebus or hand-cannon",
+   "skill": "Marksmanship",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "ammo": "arquebus",
+   "jamOn": [
+    17,
+    18
+   ],
+   "rows": [
+    [
+     "Arquebus or hand-cannon",
+     "Short",
+     "3, and Dying",
+     "A ruinous wound"
+    ]
+   ],
+   "traits": [],
+   "firearm": true
+  },
+  {
+   "id": "bomb",
+   "name": "Powder bomb",
+   "skill": "Athletics",
+   "band": "close",
+   "maxBand": "close",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "traits": [
+    {
+     "type": "area",
+     "note": "1 box to everyone nearby; 3 and Dying at the center. Dodge means diving clear."
+    }
+   ],
+   "rows": [
+    [
+     "Powder bomb",
+     "Close (thrown)",
+     "1 to everyone nearby, 3 and Dying at the center",
+     "Blast and burns; Dodge means diving clear"
+    ]
+   ],
+   "equip": [
+    "bombs"
+   ]
+  },
+  {
+   "id": "claws",
+   "name": "Claws, fangs or venom",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "traits": [
+    {
+     "type": "note",
+     "note": "Venom: a Body roll or Reeling."
+    }
+   ],
+   "rows": [
+    [
+     "Claws, fangs, venom",
+     "Melee",
+     "2 (venom: Body roll or Reeling)",
+     "Torn flesh, poison in the blood"
+    ]
+   ]
+  },
+  {
+   "id": "shadowbolt",
+   "name": "Shadow Bolt",
+   "skill": "Sorcery",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "spell": true,
+   "price": {
+    "track": "Corruption",
+    "fail": 1,
+    "natural18": 2
+   },
+   "rows": [
+    [
+     "Shadow Bolt",
+     "Short",
+     "2",
+     "Black frost in the wound"
+    ]
+   ],
+   "traits": [],
+   "cantrip": "bolt"
+  },
+  {
+   "id": "fall",
+   "hazard": true,
+   "rows": [
+    [
+     "Fall",
+     "—",
+     "1 for a bad fall, 2 for a long one",
+     "A sprain or a fracture"
+    ]
+   ],
+   "traits": []
+  },
+  {
+   "id": "fire",
+   "hazard": true,
+   "rows": [
+    [
+     "Fire",
+     "—",
+     "1 each round in the flames",
+     "Burns"
+    ]
+   ],
+   "traits": []
+  }
+ ],
+ "threats": [
+  {
+   "id": "guardsman-or-bandit",
+   "name": "Guardsman or bandit",
+   "label": "Guardsman or bandit (minor)",
+   "minor": true,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 11
+    }
+   ],
+   "dodge": 7,
+   "boxes": 1,
+   "boxesText": "1",
+   "weaponText": "Spear or club",
+   "weapons": [
+    "sword",
+    "club"
+   ],
+   "trait": "Numbers",
+   "traitText": "Three or four of them; they flee when half are down.",
+   "traits": []
+  },
+  {
+   "id": "cultist",
+   "name": "Cultist",
+   "label": "Cultist (minor, many)",
+   "minor": true,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 10
+    }
+   ],
+   "dodge": 6,
+   "boxes": 1,
+   "boxesText": "1",
+   "weaponText": "Dagger",
+   "weapons": [
+    "dagger"
+   ],
+   "trait": "Fanatics",
+   "traitText": "One in each group carries a blessing: Ward on the others.",
+   "traits": []
+  },
+  {
+   "id": "sellsword-captain",
+   "name": "Sellsword captain",
+   "label": "Sellsword captain",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 14
+    },
+    {
+     "skill": "Leadership",
+     "target": 12
+    }
+   ],
+   "dodge": 10,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Sword, pistol",
+   "weapons": [
+    "sword",
+    "pistol"
+   ],
+   "trait": "Command",
+   "traitText": "Their band gets +1 while the captain stands.",
+   "traits": []
+  },
+  {
+   "id": "assassin",
+   "name": "Assassin",
+   "label": "Assassin",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 14
+    },
+    {
+     "skill": "Stealth",
+     "target": 15
+    }
+   ],
+   "dodge": 11,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Poisoned dagger",
+   "weapons": [
+    "dagger"
+   ],
+   "trait": "First strike",
+   "traitText": "Attacks from hiding at +2; poison: Body roll or Reeling.",
+   "traits": []
+  },
+  {
+   "id": "sorcerer",
+   "name": "Sorcerer",
+   "label": "Sorcerer",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Sorcery",
+     "target": 14
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Shadow Bolt, Hex",
+   "weapons": [
+    "shadowbolt"
+   ],
+   "trait": "Warded",
+   "traitText": "Attacks against them are at −2 until the Ward is broken (Shatter or a hit by 5+).",
+   "traits": [
+    {
+     "type": "attackPenalty",
+     "value": -2,
+     "label": "Ward",
+     "toggle": true
+    }
+   ]
+  },
+  {
+   "id": "serpent-priest",
+   "name": "Serpent-priest",
+   "label": "Serpent-priest",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Sorcery",
+     "target": 13
+    },
+    {
+     "skill": "Persuasion",
+     "target": 14
+    }
+   ],
+   "dodge": 10,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Venom, Charm",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Serpent-lord",
+   "traitText": "Commands snakes; its bite poisons.",
+   "traits": []
+  },
+  {
+   "id": "ghoul-or-tomb-dead",
+   "name": "Ghoul or tomb-dead",
+   "label": "Ghoul or tomb-dead",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 12
+    }
+   ],
+   "dodge": 7,
+   "boxes": 2,
+   "boxesText": "2",
+   "weaponText": "Claws",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Hunger",
+   "traitText": "Fire and daylight drive them back; they never stop coming.",
+   "traits": []
+  },
+  {
+   "id": "giant-ape-or-great-beast",
+   "name": "Giant ape or great beast",
+   "label": "Giant ape or great beast",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 15
+    }
+   ],
+   "dodge": 9,
+   "boxes": 5,
+   "boxesText": "5",
+   "weaponText": "Claws and jaws (2)",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Huge",
+   "traitText": "Hits of 1 box mark nothing.",
+   "traits": [
+    {
+     "type": "ignoreHits",
+     "maxBoxes": 1,
+     "label": "Huge"
+    }
+   ]
+  },
+  {
+   "id": "demon",
+   "name": "Demon",
+   "label": "Demon",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 15
+    },
+    {
+     "skill": "Sorcery",
+     "target": 14
+    }
+   ],
+   "dodge": 11,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Claws (2), Witchfire",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Bound",
+   "traitText": "Holy rites and its true name mark an extra box; it must keep a bargain to the letter.",
+   "traits": []
+  },
+  {
+   "id": "shard-bearer",
+   "name": "Shard-bearer",
+   "label": "Shard-bearer",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 15
+    },
+    {
+     "skill": "Sorcery",
+     "target": 15
+    }
+   ],
+   "dodge": 11,
+   "boxes": 5,
+   "boxesText": "5",
+   "weaponText": "As the bearer",
+   "weapons": [
+    "sword",
+    "shadowbolt"
+   ],
+   "trait": "Crown shard",
+   "traitText": "One great power: command, fire, flight, terror. Breaking the bearer's will ends it.",
+   "traits": [],
+   "attackJoin": " or "
+  },
+  {
+   "id": "thing-from-the-deep",
+   "name": "Thing from the Deep",
+   "label": "Thing from the Deep",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 16
+    }
+   ],
+   "dodge": 8,
+   "boxes": 6,
+   "boxesText": "6",
+   "weaponText": "Tentacles (2)",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Horror",
+   "traitText": "Once per scene, everyone who sees it rolls Will or flees in terror.",
+   "traits": []
+  }
+ ]
 }

@@ -3555,5 +3555,644 @@
     "{name} catches it in the throat and goes down choking."
    ]
   }
- }
+ },
+ "arms": [
+  {
+   "id": "fists",
+   "name": "Fists or kicks",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "class": 1,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "baton",
+   "name": "Baton",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "class": 1,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "knife",
+   "name": "Knife",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "class": 1,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "pistol",
+   "name": "Pistol",
+   "skill": "Firearms",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "pistol",
+   "firearm": true,
+   "class": 1,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "smg",
+   "name": "Submachine gun",
+   "skill": "Firearms",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "smg",
+   "firearm": true,
+   "class": 1,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "rifle",
+   "name": "Rifle",
+   "skill": "Firearms",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "rifle",
+   "firearm": true,
+   "class": 1,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "shotgun",
+   "name": "Shotgun",
+   "skill": "Firearms",
+   "band": "short",
+   "maxBand": "short",
+   "damage": {
+    "close": {
+     "boxes": 3,
+     "dying": true
+    },
+    "short": {
+     "boxes": 1
+    }
+   },
+   "ammo": "shotgun",
+   "firearm": true,
+   "class": 1,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "sniper",
+   "name": "Sniper or heavy rifle",
+   "skill": "Firearms",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "firearm": true,
+   "class": 2,
+   "traits": [
+    {
+     "type": "accuracy",
+     "value": -2,
+     "bands": [
+      "close"
+     ],
+     "label": "Unwieldy up close"
+    }
+   ],
+   "rows": []
+  },
+  {
+   "id": "taser",
+   "name": "Taser",
+   "skill": "Firearms",
+   "band": "close",
+   "damage": {
+    "any": {
+     "boxes": 0
+    }
+   },
+   "firearm": true,
+   "stun": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "tranq",
+   "name": "Tranquilizer rifle",
+   "skill": "Firearms",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 0
+    }
+   },
+   "firearm": true,
+   "stun": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "hmg",
+   "name": "Heavy machine gun",
+   "skill": "Firearms",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "firearm": true,
+   "class": 2,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "armcannon",
+   "name": "Aegis arm cannon",
+   "skill": "Piloting",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "firearm": true,
+   "class": 2,
+   "equip": [
+    "aegis"
+   ],
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "rocket",
+   "name": "Anti-tank rocket",
+   "skill": "Firearms",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "firearm": true,
+   "class": 3,
+   "traits": [
+    {
+     "type": "area",
+     "note": "1 box to everyone nearby; 3 and Dying at the centre. Dodge means diving clear."
+    }
+   ],
+   "rows": []
+  },
+  {
+   "id": "grenade",
+   "name": "Grenade or explosive charge",
+   "skill": "Athletics",
+   "band": "close",
+   "maxBand": "close",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "class": 3,
+   "traits": [
+    {
+     "type": "area",
+     "note": "1 box to everyone nearby; 3 and Dying at the centre. Dodge means diving clear."
+    }
+   ],
+   "rows": []
+  },
+  {
+   "id": "strength1",
+   "name": "Strength (Class I)",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "class": 1,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "blast2",
+   "name": "Blast (Class II)",
+   "skill": "Firearms",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "class": 2,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "claws2",
+   "name": "Claws (Class II)",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "class": 2,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "elfshot",
+   "name": "Elf-shot (Class II)",
+   "skill": "Melee",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "class": 2,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "breach",
+   "name": "Breach rifle (Class II)",
+   "skill": "Firearms",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "firearm": true,
+   "class": 2,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "wild",
+   "name": "Wild power (Class II)",
+   "skill": "Powers",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "class": 2,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "roots",
+   "name": "Grasping roots (Class II)",
+   "skill": "Brawling",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "class": 2,
+   "traits": [],
+   "rows": []
+  }
+ ],
+ "threats": [
+  {
+   "id": "gang",
+   "name": "Street gang",
+   "label": "Street gang (minor)",
+   "minor": true,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 11
+    }
+   ],
+   "dodge": 7,
+   "boxes": 1,
+   "boxesText": "1",
+   "weaponText": "Pistols (I)",
+   "weapons": [
+    "pistol"
+   ],
+   "trait": "Numbers",
+   "traitText": "Three or four of them; they scatter when half are down."
+  },
+  {
+   "id": "morcain",
+   "name": "Morcain enforcer",
+   "label": "Morcain enforcer (Operant)",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 14
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Strength I, SMG (I)",
+   "weapons": [
+    "strength1",
+    "smg"
+   ],
+   "trait": "Connected",
+   "traitText": "Arresting one makes the Morcain notice you (Scrutiny).",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 1,
+     "label": "Defense I"
+    }
+   ]
+  },
+  {
+   "id": "whitehand",
+   "name": "White Hand soldier",
+   "label": "White Hand soldier",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 13
+    }
+   ],
+   "dodge": 9,
+   "boxes": 2,
+   "boxesText": "2",
+   "weaponText": "Blast II",
+   "weapons": [
+    "blast2"
+   ],
+   "trait": "Fanatic",
+   "traitText": "Never surrenders, never talks."
+  },
+  {
+   "id": "retrieval",
+   "name": "Foundation retrieval team",
+   "label": "Foundation retrieval team (minor)",
+   "minor": true,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 13
+    }
+   ],
+   "dodge": 9,
+   "boxes": 1,
+   "boxesText": "1 each",
+   "weaponText": "Tranquilizer rifles; a dampening net (Power Negation II)",
+   "weapons": [
+    "tranq"
+   ],
+   "trait": "Recovery",
+   "traitText": "They want the target alive, and leave no witnesses."
+  },
+  {
+   "id": "aegis",
+   "name": "Rogue Aegis suit",
+   "label": "Rogue Aegis suit",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Piloting",
+     "target": 14
+    }
+   ],
+   "dodge": 8,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Arm cannon (II)",
+   "weapons": [
+    "armcannon"
+   ],
+   "trait": "Pilot",
+   "traitText": "Hit the pilot (−4) or the power pack (−2) to end it fast.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 2,
+     "label": "Defense II"
+    }
+   ]
+  },
+  {
+   "id": "escapee",
+   "name": "Lab escapee",
+   "label": "Lab escapee",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Powers",
+     "target": 13
+    }
+   ],
+   "dodge": 10,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "One wild power, Class II–III",
+   "weapons": [
+    "wild"
+   ],
+   "trait": "Unstable",
+   "traitText": "On a natural 17–18, the power hits everyone nearby.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 2,
+     "label": "Defense II"
+    }
+   ]
+  },
+  {
+   "id": "duplicate",
+   "name": "Shadow Earth duplicate",
+   "label": "Shadow Earth duplicate",
+   "minor": false,
+   "attacks": [],
+   "dodge": null,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "As the original",
+   "weapons": [],
+   "trait": "Mirror",
+   "traitText": "Knows what the original knows; Mystic Sight reveals it. Use the original's numbers."
+  },
+  {
+   "id": "werewolf",
+   "name": "Dubinsky werewolf",
+   "label": "Dubinsky werewolf",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 15
+    }
+   ],
+   "dodge": 11,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Claws (II)",
+   "weapons": [
+    "claws2"
+   ],
+   "trait": "Pack",
+   "traitText": "Comes in threes; silver ignores its Defense.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 1,
+     "label": "Defense I"
+    }
+   ]
+  },
+  {
+   "id": "fey",
+   "name": "Fey raider",
+   "label": "Fey raider (Avalon)",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 14
+    }
+   ],
+   "dodge": 12,
+   "boxes": 2,
+   "boxesText": "2",
+   "weaponText": "Elf-shot (II), glamour",
+   "weapons": [
+    "elfshot"
+   ],
+   "trait": "Cold iron",
+   "traitText": "Iron weapons count one Class higher against it."
+  },
+  {
+   "id": "umkas",
+   "name": "Umkas soldier",
+   "label": "Umkas soldier",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 14
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Breach rifle (II)",
+   "weapons": [
+    "breach"
+   ],
+   "trait": "Stranded",
+   "traitText": "Left behind in 2012; desperate and dangerous.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 2,
+     "label": "Defense II"
+    }
+   ]
+  },
+  {
+   "id": "raster",
+   "name": "Raster Zero hunter",
+   "label": "Raster Zero hunter",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 14
+    }
+   ],
+   "dodge": 10,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Rifle (I), Power Negation II",
+   "weapons": [
+    "rifle"
+   ],
+   "trait": "Unacknowledged",
+   "traitText": "No badge and no record; if caught, they never existed.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 1,
+     "label": "Defense I"
+    }
+   ]
+  },
+  {
+   "id": "wildwood",
+   "name": "Mad Forest wildwood",
+   "label": "Mad Forest wildwood",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 14
+    }
+   ],
+   "dodge": null,
+   "boxes": 6,
+   "boxesText": "6",
+   "weaponText": "Grasping roots (II)",
+   "weapons": [
+    "roots"
+   ],
+   "trait": "Rooted",
+   "traitText": "Fire hurts it, but burning it brings the forest down on you.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 2,
+     "label": "Defense II"
+    }
+   ]
+  }
+ ]
 }
