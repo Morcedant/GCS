@@ -422,6 +422,17 @@ export function setTrait(enc, pid, i, on) {
   return { event: log(enc, "trait", { pid, name: p.name, trait: p.traits[i].label || p.traits[i].type, on }) };
 }
 
+/**
+ * A shapechanger changes form: their numbers (from the page, as the sheet works them out) become the new form's.
+ * @param {any} enc @param {string} pid @param {boolean} on @param {{ dodge: number, agility: number, skills: any, weapons: string[], note?: string }} stats
+ */
+export function setForm(enc, pid, on, stats) {
+  const p = find(enc, pid); if (!p || !p.form) return { error: "Only a shapechanger changes form." };
+  if (!!p.form.on === on) return { error: on ? `${p.name} is already in ${p.form.name}.` : `${p.name} is already in ${p.form.human}.` };
+  p.form = { ...p.form, on }; p.dodge = stats.dodge; p.agility = stats.agility; p.skills = stats.skills; p.weapons = stats.weapons; p.note = stats.note || "";
+  return { event: log(enc, "form", { pid, name: p.name, on, form: on ? p.form.name : p.form.human }) };
+}
+
 /** Put protective gear on a participant (its traits join theirs). @param {any} enc @param {string} pid @param {{ id: string, name: string, traits: any[] }} item */
 export function addGear(enc, pid, item) {
   const p = find(enc, pid); if (!p || !item) return { error: "Choose the gear." };

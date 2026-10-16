@@ -690,7 +690,7 @@ A few people are born **Sighted**. They see ghosts, the true faces of monsters w
 
 ## Monstrous forms
 
-Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. Changing is a free action, but fury, terror or pain can force it (a Will roll), and a werewolf has no choice at moonrise under the full moon. While changed, the form's profile applies: the creator's **In monstrous form** box adds its bonuses to your rolls. Horses bolt (−2 to Riding), and a monstrous form seen by townsfolk marks a box of **Whispers**.
+Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. Changing is a free action, but fury, terror or pain can force it (a Will roll), and a werewolf has no choice at moonrise under the full moon. While changed, the form's profile applies, and only then. Your sheet has a **Human form / Monstrous form** switch: it shows the numbers of the form you're in (the human ones beside them), and the dice roller and the GM's Encounter panel follow it. Horses bolt (−2 to Riding), and a monstrous form seen by townsfolk marks a box of **Whispers**.
 
 ## Magic
 
@@ -850,7 +850,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 |---|---|
 | Changing | A free action, in or out, except when the moon or the hunger forces it. |
 | Losing control | Fury, terror or pain can force a change: when it matters, the GM calls for a Will roll. |
-| Monstrous form | While changed, your form's attribute bonuses apply to rolls on those attributes and their skills, even above the starting maximum; its traits and drawbacks apply too. |
+| Monstrous form | While changed, your form's attribute bonuses apply to rolls on those attributes and their skills, even above the starting maximum; its traits and drawbacks apply too. In human form, none of it does: the sheet's form switch shows both sets of numbers. |
 | Seen | A monstrous form seen by townsfolk marks a box of Whispers. |
 
 ## City-bred
@@ -1136,7 +1136,7 @@ Write one to three. Each works like a general advantage: **+2 to one skill in a 
 
 ### 6. An alternate form (optional, tier 2 or 3)
 
-If the origin changes shape, give the form attribute bonuses (usually +2 to one attribute and +1 to another), two or three traits, and its drawbacks. The shared rules for forms in *Origins* apply.
+If the origin changes shape, give the form attribute bonuses (usually +2 to one attribute and +1 to another), two or three traits, and its drawbacks. The shared rules for forms in *Origins* apply. The bonuses count only while the character is in that form: the sheet's form switch shows both sets of numbers.
 
 ### In the creator
 
