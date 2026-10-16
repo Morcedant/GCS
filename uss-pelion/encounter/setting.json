@@ -1,0 +1,469 @@
+{
+ "id": "uss-pelion",
+ "arms": [
+  {
+   "id": "fists",
+   "name": "Punch, kick, headbutt",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "club",
+   "name": "Club, rifle butt or thrown rock",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "knife",
+   "name": "Knife or dagger (a Klingon d'k tahg)",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "heavy",
+   "name": "Heavy melee weapon (a lirpa, a sword, an axe)",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "primitive",
+   "name": "Arrow, spear or primitive firearm",
+   "skill": "Phasers",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "wound": "missile",
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "phaser-stun",
+   "name": "Hand phaser on stun",
+   "skill": "Phasers",
+   "band": "short",
+   "stun": true,
+   "equip": [
+    "phaser"
+   ],
+   "damage": {
+    "any": {
+     "boxes": 0
+    }
+   },
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "phaser-kill",
+   "name": "Hand phaser on kill",
+   "skill": "Phasers",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "equip": [
+    "phaser"
+   ],
+   "wound": "energy",
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "phaser-rifle",
+   "name": "Phaser rifle",
+   "skill": "Phasers",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "wound": "energy",
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "disruptor",
+   "name": "Disruptor",
+   "skill": "Phasers",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "wound": "energy",
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "grenade",
+   "name": "Explosion (a thrown grenade)",
+   "skill": "Athletics",
+   "band": "close",
+   "maxBand": "close",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "traits": [
+    {
+     "type": "area",
+     "note": "1 box to everyone nearby; 2 at the centre. Dodge means diving clear."
+    }
+   ],
+   "rows": []
+  },
+  {
+   "id": "gorn",
+   "name": "Gorn's crushing blows",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "bite",
+   "name": "Venomous bite and horn",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "natural": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "grip",
+   "name": "Crushing grip",
+   "skill": "Unarmed Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "unarmed": true,
+   "traits": [],
+   "rows": []
+  }
+ ],
+ "threats": [
+  {
+   "id": "guard",
+   "name": "Security guard",
+   "label": "Security guard (minor)",
+   "minor": true,
+   "attacks": [
+    {
+     "skill": "Phasers",
+     "target": 11
+    }
+   ],
+   "dodge": 7,
+   "boxes": 1,
+   "boxesText": "1",
+   "weaponText": "Hand weapon",
+   "weapons": [
+    "phaser-stun",
+    "disruptor"
+   ],
+   "trait": "Numbers",
+   "traitText": "Usually two or three; they surrender or flee when half are down."
+  },
+  {
+   "id": "klingon",
+   "name": "Klingon warrior",
+   "label": "Klingon warrior",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Phasers",
+     "target": 12
+    },
+    {
+     "skill": "Unarmed Combat",
+     "target": 13
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Disruptor (kill), d'k tahg",
+   "weapons": [
+    "disruptor",
+    "knife"
+   ],
+   "trait": "Relentless",
+   "traitText": "Ignores the Wounded penalty; only Seriously wounded slows them."
+  },
+  {
+   "id": "klingon-officer",
+   "name": "Klingon officer",
+   "label": "Klingon officer",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Phasers",
+     "target": 12
+    },
+    {
+     "skill": "Leadership",
+     "target": 13
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Disruptor (kill)",
+   "weapons": [
+    "disruptor"
+   ],
+   "trait": "Battle commander",
+   "traitText": "Once per round, gives one ally +1 on an attack."
+  },
+  {
+   "id": "romulan",
+   "name": "Romulan centurion",
+   "label": "Romulan centurion",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Phasers",
+     "target": 12
+    },
+    {
+     "skill": "Stealth",
+     "target": 13
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Disruptor (kill)",
+   "weapons": [
+    "disruptor"
+   ],
+   "trait": "Ambush",
+   "traitText": "+2 on the first attack from hiding; prefers to withdraw rather than be captured."
+  },
+  {
+   "id": "orion",
+   "name": "Orion pirate",
+   "label": "Orion pirate",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Phasers",
+     "target": 11
+    },
+    {
+     "skill": "Unarmed Combat",
+     "target": 12
+    },
+    {
+     "skill": "Stealth",
+     "target": 12
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Disruptor, knife",
+   "weapons": [
+    "disruptor",
+    "knife"
+   ],
+   "trait": "Dirty fighter",
+   "traitText": "Winning a grapple also disarms the target."
+  },
+  {
+   "id": "gorn",
+   "name": "Gorn warrior",
+   "label": "Gorn warrior",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Unarmed Combat",
+     "target": 14
+    }
+   ],
+   "dodge": 6,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Claws, thrown rocks",
+   "weapons": [
+    "gorn",
+    "club"
+   ],
+   "trait": "Immense strength",
+   "traitText": "Unarmed hits mark 2 boxes; slow, so it acts last in a round."
+  },
+  {
+   "id": "mugato",
+   "name": "Mugato",
+   "label": "Mugato",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Unarmed Combat",
+     "target": 13
+    }
+   ],
+   "dodge": 8,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Venomous bite",
+   "weapons": [
+    "bite"
+   ],
+   "trait": "Venom",
+   "traitText": "A bite that marks a box also poisons: without Medicine before the scene ends, mark another box."
+  },
+  {
+   "id": "android",
+   "name": "Rogue android",
+   "label": "Rogue android",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Unarmed Combat",
+     "target": 13
+    },
+    {
+     "skill": "Computers",
+     "target": 15
+    }
+   ],
+   "dodge": 7,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Crushing grip",
+   "weapons": [
+    "grip"
+   ],
+   "trait": "Logic trap",
+   "traitText": "A Diplomacy or Psychology contest that presents a paradox stuns it for the scene."
+  }
+ ],
+ "protection": [
+  {
+   "id": "improvised",
+   "name": "Improvised shield",
+   "text": "A chair, a crate lid or a torn-off panel: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.",
+   "traits": [
+    {
+     "type": "shield",
+     "value": 0,
+     "breaksOn": 2,
+     "label": "Improvised shield"
+    }
+   ]
+  }
+ ],
+ "combatRules": {
+  "oneDefense": {
+   "perRound": 1,
+   "edge": "extradefense"
+  },
+  "attackQualityDodge": {
+   "bands": [
+    {
+     "from": 0,
+     "mod": 0
+    },
+    {
+     "from": 3,
+     "mod": -1
+    },
+    {
+     "from": 5,
+     "mod": -2
+    },
+    {
+     "from": 7,
+     "mod": -3
+    }
+   ]
+  },
+  "parry": {
+   "mod": -3,
+   "repeatPenalty": -2,
+   "bareHanded": "unarmed"
+  },
+  "block": {
+   "mod": -2
+  },
+  "aim": {
+   "bonus": 1
+  },
+  "tellingHits": {
+   "margin": 5,
+   "natural": true,
+   "called": -2,
+   "small": -4
+  }
+ },
+ "coreCombat": [
+  "aim",
+  "attackQualityDodge",
+  "block",
+  "oneDefense",
+  "parry",
+  "tellingHits"
+ ],
+ "terms": {
+  "title": "USS Pelion",
+  "point": "Duty",
+  "meleeSkill": "Unarmed Combat",
+  "unarmedSkill": "Unarmed Combat",
+  "ammo": "power",
+  "ammoOne": "power"
+ }
+}

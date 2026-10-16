@@ -561,7 +561,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="71e0054" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · 71e0054</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="a12dd33" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · a12dd33</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -2153,6 +2153,8 @@ tr.lvl-U td.target { color: var(--muted); }
 </ul>
 <p><strong>Tokens.</strong> The GM places the party with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, the stunned condition or a Fortune point on a token marks it on the character, and the other way round. Opponents come from the setting’s threats with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
 <p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
+<h2 id="g-the-encounter-panel">The Encounter panel</h2>
+<p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by these rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round), the boxes marked and any telling hit, offering a Fortune point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so.</p>
 <h1 id="g-medical-care">Medical care</h1>
 <p>Healers have herbs, needles, wine and prayers. Poison and fever kill more adventurers than swords do. The <strong>Mend</strong> cantrip clears one box once per wound; it does not replace a healer’s care.</p>
 <h2 id="g-diagnosis-and-stabilization">Diagnosis and stabilization</h2>
@@ -4966,11 +4968,11 @@ function attack(enc, rules, core, cmd, opts = {}) {
     if (why) grievous = woundFor(d, weapon, GT, why, core.diceFor(enc.seed, key("grievous")));
   }
 
-  // Telling hits: a hit by the margin (or a natural 3–4) that got past any defense, or any hit from a called shot,
+  // Telling hits: a hit by the margin (or a natural 3–4) that got past any defense (not a stun), or any hit from a called shot,
   // lets the attacker pick one effect. A character can shrug it off (Hard to put down, or a point).
   let telling = null;
   const TH = rules.flags.has("telling") ? rules.params.tellingHits : null;
-  if (TH && res.hit && res.attack) {
+  if (TH && res.hit && res.attack && !res.stun) {
     if (cmd.called) telling = { why: "called shot", effect: cmd.called.effect || null, called: true, small: !!cmd.called.small };
     else if (res.attack.margin >= TH.margin) telling = { why: `succeeded by ${res.attack.margin}`, effect: null };
     else if (TH.natural && res.attack.auto === "success") telling = { why: `natural ${res.attack.total}`, effect: null };
@@ -5344,7 +5346,7 @@ return { summarize, attacksCsv };
  *   saveText: (text: string, name: string, say: (m: string, err?: boolean) => void) => void,
  *   crew: () => any[], saveCrew: () => void, renderCrew: () => void, calc: (c: any) => { skills: Record<string, number>, dodge: number, agility: number, defense?: number },
  *   clocks: { list: () => any[], set: (id: string, filled: number) => void, add: (name: string, size: number, kind: string) => void, listen: (fn: (c: any, from: number, to: number) => void) => void },
- *   injuryNames: string[], gritty?: () => boolean
+ *   injuryNames: string[], gritty?: () => boolean, traitsFor?: (c: any) => any[]
  * }} api
  * With no test configuration (api.LAB null), the panel is the production Encounter manager: published rules only,
  * no experiments, and the setting's gritty combat option applied when the campaign has it switched on.
@@ -5487,7 +5489,8 @@ function mountLab(api) {
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
-        ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : [])],
+        ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : []),
+        ...(api.traitsFor ? api.traitsFor(c) : [])], // a page's own way of granting them (Pelion's advantages)
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
@@ -5762,7 +5765,7 @@ function mountLab(api) {
       } else L.push(`No defense (${ev.cmd && ev.cmd.defense === "none" ? "the target couldn't defend" : "none available"})`, `<span class="ok">Hit</span>`);
     }
     if (ev.hit && !(ev.overridden && !ev.rolledHit && !ev.damage)) {
-      L.push("", !ev.damage && /marks nothing/.test(ev.outcome) ? esc(ev.outcome[0].toUpperCase() + ev.outcome.slice(1)) : ev.damage ? `${esc(ev.weapon.name)} at ${BAND_NAMES[ev.band] || ev.band}: ${ev.damage} box${ev.damage > 1 ? "es" : ""}${ev.dyingWeapon ? ", and Dying" : ""}${ev.reduced ? ` (−1, a ${esc(T.point)} point)` : ""}` : "No effect at this range");
+      L.push("", ev.stun || (!ev.damage && /marks nothing/.test(ev.outcome)) ? esc(ev.outcome[0].toUpperCase() + ev.outcome.slice(1)) : ev.damage ? `${esc(ev.weapon.name)} at ${BAND_NAMES[ev.band] || ev.band}: ${ev.damage} box${ev.damage > 1 ? "es" : ""}${ev.dyingWeapon ? ", and Dying" : ""}${ev.reduced ? ` (−1, a ${esc(T.point)} point)` : ""}` : "No effect at this range");
       if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
     }
     if (ev.enchanted) L.push(`<span class="x">Enchanted weapon: +${ev.enchanted} box.</span>`);

@@ -254,11 +254,11 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     if (why) grievous = woundFor(d, weapon, GT, why, core.diceFor(enc.seed, key("grievous")));
   }
 
-  // Telling hits: a hit by the margin (or a natural 3–4) that got past any defense, or any hit from a called shot,
+  // Telling hits: a hit by the margin (or a natural 3–4) that got past any defense (not a stun), or any hit from a called shot,
   // lets the attacker pick one effect. A character can shrug it off (Hard to put down, or a point).
   let telling = null;
   const TH = rules.flags.has("telling") ? rules.params.tellingHits : null;
-  if (TH && res.hit && res.attack) {
+  if (TH && res.hit && res.attack && !res.stun) {
     if (cmd.called) telling = { why: "called shot", effect: cmd.called.effect || null, called: true, small: !!cmd.called.small };
     else if (res.attack.margin >= TH.margin) telling = { why: `succeeded by ${res.attack.margin}`, effect: null };
     else if (TH.natural && res.attack.auto === "success") telling = { why: `natural ${res.attack.total}`, effect: null };
