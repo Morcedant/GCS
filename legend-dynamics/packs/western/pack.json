@@ -2442,7 +2442,7 @@
   ],
   [
    "Out West",
-   "Parry claws and fangs bare-handed too (Brawling −3). A real shield: +1 to Block; a chair, slat, crate lid or saddle stands in. Heavy coat: once a fight, a 2+ box hit from a blade, claw, fang or missile marks one fewer."
+   "A real shield: +1 to Block; a chair, slat, crate lid or saddle stands in. Heavy coat: once a fight, a 2+ box hit from a blade, claw, fang or missile marks one fewer."
   ],
   [
    "Guns",
@@ -3387,11 +3387,6 @@
     "An arrow pins {name}'s thigh to the boards.",
     "{name} catches it in the throat and goes down choking."
    ]
-  }
- },
- "combatRules": {
-  "parry": {
-   "bareHanded": "natural"
   }
  },
  "protection": [

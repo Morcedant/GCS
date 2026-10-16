@@ -561,7 +561,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="a12dd33" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · a12dd33</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="d167eb6" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · d167eb6</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1775,7 +1775,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <ul>
 <li><strong>One defense a round.</strong> A target gets one defense a round, between its turns, and chooses which when an attack hits. The <strong>Additional Defense</strong> Edge gives a second.</li>
 <li><strong>Dodge</strong> is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert.</li>
-<li><strong>Parry.</strong> Against a weapon in hand or fists, roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a shot or a missile.</li>
+<li><strong>Parry.</strong> Against a weapon in hand or fists, roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists. An open hand can’t parry a blade, claws or fangs. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a shot or a missile.</li>
 <li><strong>Block.</strong> With a shield, or anything that can stand in for one (a chair, a plank, a crate lid), you can block a weapon in hand, fists, or a thrown or loosed missile: roll Melee −2, plus the shield’s bonus. Nothing you can lift blocks a gunshot or a blast. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.</li>
 <li><strong>Attack quality.</strong> A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.</li>
 <li><strong>Aim.</strong> Spend your action aiming at a target you can see: +1 to your next attack against it. An advantage that rewards aiming adds its bonus to this.</li>
@@ -4862,8 +4862,8 @@ function defenseOptions(enc, rules, d, w) {
   if (D.parry && melee) {
     const own = (d.weapons || []).map((id) => rules.weapons[id]).filter((/** @type {any} */ x) => x && x.reach === "melee" && !bareWeapon(x));
     const cands = own.map((/** @type {any} */ x) => ({ name: x.name, skill: x.skill, t: d.skills[x.skill] })).filter((c) => c.t !== undefined);
-    // Bare hands parry fists (core), or claws and fangs too where the setting allows it (bareHanded: "natural").
-    const unarmedAttack = w.unarmed || w.id === "fists" || (D.parry.bareHanded === "natural" && (w.natural || (!oneSkill && w.skill === SK.unarmed)));
+    // Bare hands parry only fists: an open hand can't parry a blade, claws or fangs.
+    const unarmedAttack = !w.natural && (w.unarmed || w.id === "fists");
     if (unarmedAttack && d.skills[SK.unarmed] !== undefined) cands.push({ name: "bare hands", skill: SK.unarmed, t: d.skills[SK.unarmed] });
     const best = cands.sort((x, y) => y.t - x.t)[0];
     if (best) {
@@ -6289,7 +6289,7 @@ return { mountLab };
   const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge);
   // The core attack and defense rules (engine/combat.json), with the setting's own overrides.
   const CR = PACK.combatRules || {};
-  const PARRY = !CR.parry ? [] : T.meleeSkill === T.unarmedSkill ? [[T.meleeSkill, "armed or bare-handed"]] : [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]];
+  const PARRY = !CR.parry ? [] : T.meleeSkill === T.unarmedSkill ? [[T.meleeSkill, "armed, or bare-handed against fists"]] : [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed, fists only"]];
   const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
   const isParry = (name) => name.startsWith("Parry:");
   // One defense a round, more with the setting's Edge (Additional Defense).
@@ -6655,7 +6655,7 @@ return { mountLab };
         <div><span class="label">${T.role}</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">${T.origin}</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge()}</b>${dodgeGearBonus() ? `<span class="small muted">${dodge() + dodgeGearBonus()} with ${esc(dodgeGear().map(([n]) => n.toLowerCase()).join(" and "))}</span>` : ""}</div>
-        ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill)} bare-handed` : ""}</span></div>` : ""}
+        ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill)} bare-handed, fists only` : ""}</span></div>` : ""}
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
       <div class="attr-strip">${ATTRS.map(([n]) => `<div><span class="label">${n}</span><b>${ch.attrs[n]}</b></div>`).join("")}</div>
