@@ -479,6 +479,8 @@ tr.lvl-U td.target { color: var(--muted); }
 .guide td code { white-space: normal; overflow-wrap: anywhere; }
 @media (max-width: 640px) { .guide td:first-child { white-space: normal; } .guide table { font-size: .84rem; } }
 .guide-title { display: grid; gap: 4px; margin-bottom: 1.4em; }
+.guide-switch { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.guide-switch .btn[aria-pressed="true"] { border-color: var(--chrome); color: var(--fg); background: var(--well); }
 .guide-title .h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.4rem); color: var(--fg); letter-spacing: .06em; }
 
 /* Help: a small "?" that opens a short card; works by tap, click or keyboard. */
@@ -561,7 +563,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="458aa00" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · 458aa00</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="644efb1" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · 644efb1</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1093,8 +1095,10 @@ tr.lvl-U td.target { color: var(--muted); }
     <div class="guide-layout">
       <nav class="guide-toc hud no-print" aria-label="Guide contents"><details id="toc-details" open><summary class="eyebrow">Contents</summary><ol id="guide-toc"></ol></details></nav>
       <article class="guide hud" id="guide">
-        <header class="guide-title"><span class="eyebrow">Legend Dynamics · Sword and Sorcery</span><h2 class="h1">The Shattered Crown Players' Guide</h2>
-          <span class="muted">Sword and sorcery for the Legend Dynamics RPG system</span><span class="muted small">By Don Smallwood</span></header>
+        <header class="guide-title"><div class="guide-switch no-print" id="guide-switch" role="group" aria-label="Which guide" hidden>
+            <button type="button" class="btn" data-book="players" aria-pressed="true">Players' Guide</button><button type="button" class="btn" data-book="gm" aria-pressed="false">GM's Guide</button></div>
+          <span class="eyebrow">Legend Dynamics · Sword and Sorcery</span><h2 class="h1" id="guide-h">The Shattered Crown Players' Guide</h2>
+          <span class="muted" id="guide-sub">Sword and sorcery for the Legend Dynamics RPG system</span><span class="muted small">By Don Smallwood</span></header>
 <!-- GUIDE:START -->
 <p>A thousand years ago the <strong>Crown of Aeon</strong> bound a sorcerer-empire together. When the last emperor died, the Crown shattered into nine shards, and the empire with it. Each shard gives power to whoever holds it, and each slowly devours them. Now warlords, sorcerer-princes and merchant-kings fight over the empire’s corpse, and the old things beneath its cities are waking.</p>
 <p><em>The Shattered Crown</em> is a sword-and-sorcery setting for the Legend Dynamics RPG system. You are not heroes. You are reavers, thieves, sellswords and sorcerers who live on steel, wits and luck in a world that has no heroes left.</p>
@@ -8344,7 +8348,7 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
     const b = e.target.closest(".help");
     if (b && HELP[b.dataset.help]) { e.preventDefault(); e.stopPropagation(); if (opener === b) closeHelp(false); else openHelp(b); return; }
     if (e.target.closest(".help-close")) { closeHelp(true); return; }
-    if (e.target.closest(".help-more")) { closeHelp(false); selectTab("guide"); document.getElementById("g-magic").scrollIntoView({ block: "start" }); return; }
+    if (e.target.closest(".help-more")) { closeHelp(false); selectTab("guide"); if ($("guide-gm")) showBook("players"); document.getElementById("g-magic").scrollIntoView({ block: "start" }); return; }
     if (!e.target.closest("#help-pop")) closeHelp(false);
   }, true);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) closeHelp(true); });
@@ -8355,10 +8359,28 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   const narrow = window.matchMedia && matchMedia("(max-width: 900px)");
   if (narrow && narrow.matches) $("toc-details").open = false;
   $("guide-toc").addEventListener("click", (e) => { if (e.target.closest("a") && narrow && narrow.matches) $("toc-details").open = false; });
-  // Guide contents: one entry per chapter heading.
-  $("guide").id = "guide";
-  $("guide-toc").innerHTML = `<li><a href="#guide">Introduction</a></li>` +
-    [...$("guide").querySelectorAll("h1")].map((h) => `<li><a href="#${h.id}">${esc(h.textContent)}</a></li>`).join("");
+  // Guide contents: one entry per chapter heading. A setting with a GM's Guide has two books here, one shown at a time.
+  const books = $("guide-gm") ? { players: $("guide-players"), gm: $("guide-gm") } : null;
+  function showBook(which) {
+    const root = books ? books[which] : $("guide");
+    if (books) {
+      for (const [k, el] of Object.entries(books)) el.hidden = k !== which;
+      $("guide-h").textContent = root.dataset.title; $("guide-sub").textContent = root.dataset.subtitle;
+      $("guide-switch").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.book === which)));
+      try { sessionStorage.setItem(PACK.id + ".guide", which); } catch {}
+    }
+    $("guide-toc").innerHTML = `<li><a href="#guide">Introduction</a></li>` +
+      [...root.querySelectorAll("h1")].map((h) => `<li><a href="#${h.id}">${esc(h.textContent)}</a></li>`).join("");
+  }
+  if (books) {
+    $("guide-switch").hidden = false; $("tab-guide").textContent = "Guides";
+    $("guide-switch").addEventListener("click", (e) => { const b = e.target.closest("button[data-book]"); if (b) { showBook(b.dataset.book); $("guide").scrollIntoView({ block: "start" }); } });
+    // A link into the other book (or a help popup's "more") shows that book first.
+    document.addEventListener("click", (e) => { const a = e.target.closest('a[href^="#gm-"], a[href^="#g-"]'); if (a) showBook(a.getAttribute("href").startsWith("#gm-") ? "gm" : "players"); }, true);
+  }
+  let book = "players";
+  try { if (books && sessionStorage.getItem(PACK.id + ".guide") === "gm") book = "gm"; } catch {}
+  showBook(book);
   // Wide tables scroll inside their own box on narrow screens.
   $("guide").querySelectorAll("table").forEach((t) => { const w = document.createElement("div"); w.className = "table-scroll"; t.before(w); w.append(t); });
 

@@ -8,7 +8,7 @@ links to beside it, so nothing points at claude.ai:
   /                                 home
   /<game>/                          each game's page
   /<game>/create/                   that game's character creator
-  /<game>/<Players_Guide>.docx      its Players' Guide in Word
+  /<game>/<Players_Guide>.docx      its Players' Guide in Word (and its GM's Guide, where it has one)
   /core-rules/                      the core rules (and the .docx)
   /discord/                         the Discord bot's commands for every setting
   /discord/<game>/                  each game's printable handout, with the bot's setup and code
@@ -142,11 +142,14 @@ def main():
     for g in GAMES:
         t = bw.pack(g)["terms"]
         slug = SLUGS[g].strip("/")
-        guide = next((LD / g).glob("*.docx"))
-        copy(guide, f"{slug}/{guide.name}")
+        guide = next((LD / g).glob("*_Players_Guide.docx"))
+        gm = next((LD / g).glob("*_GM_Guide.docx"), None)  # a setting with a GM's Guide (pack gmGuide)
+        links = [(f"{SLUGS[g]}/{guide.name}", f"{t['title']} Players' Guide (Word)")] + ([(f"{SLUGS[g]}/{gm.name}", f"{t['title']} GM's Guide (Word)")] if gm else [])
+        for d in [guide] + ([gm] if gm else []):
+            copy(d, f"{slug}/{d.name}")
         copy(LD / g / "index.html", f"{slug}/create/index.html")
         b = blocks(bw.game_page(g))
-        b.append(downloads([(f"{SLUGS[g]}/{guide.name}", f"{t['title']} Players' Guide (Word)")]))
+        b.append(downloads(links))
         write(f"{slug}/index.html", page(SLUGS[g], f"{t['title']} · Legend Dynamics", re.sub(r"<[^>]+>", "", bw.first_para(g))[:300],
                                           b, theme=g, fonts=font_links({bw.BRAND_FONTS, t["fontsHref"]})))
 

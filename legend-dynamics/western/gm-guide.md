@@ -1,0 +1,127 @@
+---
+title: "Trails of Blood & Dust GM's Guide"
+subtitle: "Running the Gothic Western: jobs, monsters, threats and the GM's tools"
+author: "Don Smallwood"
+---
+
+This book is for the GM. It holds what the players' characters don't know yet: where jobs come from, what every monster fears and what its bite or curse does, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are all in the **Players' Guide**; this book only adds to them.
+
+# Running jobs
+
+## Job seeds
+
+Roll 3d6 on each table and read the total, or pick what you like. Middle results come up most often; the strangest sit at 3, 4, 17 and 18. The GM view in the creator rolls these for you and can start the clock.
+
+| 3d6 | Job | Place | The darkness |
+|---|---|---|---|
+| 3 | A whole town gone overnight | A town that isn't on any map | Something older than any of them, waking |
+| 4 | A dead man hires you | A sanitarium in the hills | A wraith feeding on a boarding house |
+| 5 | A body found drained of blood | A silver boomtown | A werewolf that has acquired the taste |
+| 6 | A stagecoach that never arrived | A logging camp in the deep woods | A vampire who owns the town |
+| 7 | Livestock torn apart in the night | A river steamboat | The dead rising from a flooded graveyard |
+| 8 | A child gone missing | The railroad's end-of-track camp | A witch's curse on a family |
+| 9 | A miner raving about the dead walking | A lonely homestead | A ghost that wants justice |
+| 10 | A bounty on a man who died last year | A ghost town | Ghouls in the mine |
+| 11 | Travelers vanishing on the trail | A burned mission church | A demon summoned by a desperate man |
+| 12 | A traveling medicine show | A saloon and gambling hall | A wendigo stalking a snowbound camp |
+| 13 | A new preacher packs the church | A frontier fort | A headless rider on the stage road |
+| 14 | A town where no one sleeps | A fog-bound waterfront | A hellhound on someone's trail |
+| 15 | A hanging that went wrong | A canyon cemetery | A cult in the church cellar |
+| 16 | A monster asks for help | A snowbound mountain pass | A skinwalker wearing a neighbor's face |
+| 17 | A train arrives with no one aboard | A circus wintering in the badlands | A town that made a pact |
+| 18 | A child asks you to kill their father, the monster | A mine sealed since the cave-in | A creature no one has a name for |
+
+| 3d6 | Twist | Ticking clock (segments) | Key character |
+|---|---|---|---|
+| 3 | A character is already cursed | The eclipse (4) | A ghost who wants to help |
+| 4 | The monster is a character's kin | The last train out (6) | A monster who once saved a character's life |
+| 5 | The victim was the monster | The mob forms (6) | A sheriff who wants it simple |
+| 6 | The law is in on it | Nightfall (4) | A widow who knows more than she says |
+| 7 | Two monsters are at war | The full moon rises (4) | A traveling doctor |
+| 8 | The client lied about everything | The next victim (6) | A Pinkerton detective |
+| 9 | A rich man pays for silence | The dead finish rising (6) | A railroad baron |
+| 10 | A banshee keens for one of the characters | The river floods (8) | A frightened homesteader family |
+| 11 | The monster is protecting its family | The trail goes cold (4) | A werewolf trying to stay human |
+| 12 | Someone is using the monster | The hanging at dawn (4) | A child who saw it happen |
+| 13 | The town wants a hanging, any hanging | The ritual completes (6) | A preacher with a past |
+| 14 | The Order of the Iron Cross arrives to burn everything | The fire spreads (4) | A newspaperman who's close to the truth |
+| 15 | Another hunter is after the same prey | The curse takes hold (8) | A witch who needs protection |
+| 16 | The trail leads to someone a character loves | The snows close the pass (8) | A dying hunter with a last request |
+| 17 | The hunter is the monster | The body count doubles (6) | A senator with a secret |
+| 18 | It happened before, thirty years ago | The pact comes due (8) | The last of a hunter bloodline |
+
+# Monsters
+
+These are the secrets of the monsters in *Monsters and magic* in the Players' Guide. Hand them out as the characters learn them: an Occult roll, a Sighted character's Monster's Eye, a survivor's story, or the hard way.
+
+## Weaknesses
+
+Every monster has a weakness, and finding it is often the whole job. **Occult** identifies a creature and its weakness; the Monster Hunter advantage and the Sighted's Monster's Eye help.
+
+| Creature | Weakness |
+|---|---|
+| Werewolf | Silver: an extra box, and its toughness doesn't help. Wolfsbane keeps it away. |
+| Vampire | A wooden stake through the heart incapacitates; fire, sunlight and beheading destroy. Holy symbols hold it back; it can't enter a home uninvited. |
+| Zombie | A shot to the head (−2 to hit) or fire puts it down for good; anything else just slows it. |
+| Ghost | Can't be hurt. Lay it to rest by finishing its business, or bind it with a ritual. |
+| Wraith | Only silver, cold iron, salt and fire hurt it. It can't cross a line of salt or iron filings. Destroyed for good only when its bones are found and burned. |
+| Banshee | Weapons don't touch her. She leaves at dawn if the one she keens for is still alive. A hit with silver, or an iron bell rung at her, silences her for the scene. |
+| Ghoul | Fire and daylight. It flees from holy ground. |
+| Demon | Holy water burns it; a ritual banishes it. It must keep a bargain to the letter. |
+| Wendigo | Fire: the only thing that truly hurts it. It is destroyed for good only when its heart of ice is cut out and burned. It is strongest in deep winter and weakest in summer heat. |
+| Skinwalker | Underneath, it is a person. In a stolen shape, ordinary wounds mark only 1 box at a time; in its own shape, it is as mortal as anyone. Speak its true name to its face and it is forced back into its own shape for the scene. |
+| Headless Rider | Its head, hidden near where it died: laid back in the grave, the rider rests for good. It can't cross running water, so a bridge over a creek is safety. |
+
+## Bites and curses
+
+- **Zombie bite.** A bite that marks a box starts a 4-segment **Infection** clock, ticking each hour. A successful Medicine roll with an Occult remedy stops it; when it fills, you die, and rise.
+- **Werewolf bite.** A bite under the full moon can pass on the curse; the GM decides, and lifting it is a major ritual.
+- **Vampire bite.** A vampire who drains a victim to Dying can choose to turn them.
+- **The wendigo's hunger.** It begins with someone who ate human flesh to survive a starving winter in the high passes. A character who does starts a 4-segment **Hunger** clock, ticking each week they go without it again; when it fills, they belong to the wendigo. Only a major ritual lifts it.
+- **A wraith's touch.** Someone killed by it rises as a wraith at the next new moon, unless they're buried with salt in the coffin.
+- **A banshee's keening.** She is tied to a family's blood, not a place: once she has keened for one of a line, she can follow that family from town to town.
+
+# Threats
+
+Opponents use the same rules as the characters. **Minor opponents** (hired guns, a mob, shambling dead) have **one box**: any hit that gets through takes them out of the fight.
+
+| Threat | Attack (target) | Dodge | Boxes | Weapon | Trait |
+|---|---|---|---|---|---|
+| Hired gun (minor) | Shooting 11 | 7 | 1 | Revolver | **Numbers.** Two or three of them; they flee when half are down. |
+| Outlaw | Shooting 13, Brawling 11 | 9 | 3 | Revolver, rifle | **Quick draw.** +2 on the first shot of a fight. |
+| Zombie (minor, many) | Brawling 10 | 4 | 1 each | Bite (1) | **Horde.** Only a headshot (−2) or fire puts one down; other hits just knock it over. Its bite infects. |
+| Ghoul | Brawling 12, Stealth 13 | 8 | 3 | Claws (2) | **Corpse-eater.** Drags the fallen away; flees daylight and fire. |
+| Werewolf | Brawling 14, Tracking 14 | 10 | 4 | Claws and fangs (2) | **Relentless.** Ignores the Wounded penalty; only silver marks more than 1 box at a time. |
+| Vampire | Brawling 13, Persuasion 15 | 10 | 4 | Fangs (2) | **Mesmerize.** Once per scene, a Presence contest makes one victim obey a simple command. |
+| Ghost | Will 14 | — | — | Terror, cold | **Haunting.** Can't be hurt; once per scene, everyone present rolls Will or flees in terror. |
+| Wraith | Brawling 13, Stealth 14 | 10 | 3 | Grave touch (1) | **Life-drinker.** Passes through walls; only silver, cold iron, salt or fire can hurt it. Each box its touch marks clears one of its own. |
+| Banshee | Will 15 | — | — | The keen | **Death-omen.** Can't be hurt. Once per scene her keen makes everyone in earshot roll Will or be Dazed for a round. Until dawn, the one she keens for can't shrug off a telling hit with Grit, and stabilizing them is at −2. |
+| Witch | Occult 14, Deception 13 | 8 | 3 | Curses | **Hex.** Once per round, a target with a link to her rolls Will or marks a box. |
+| Skinwalker | Brawling 14, Deception 14, Stealth 14 | 11 | 3 | Claws (2) | **Stolen shapes.** Wears the shape of a coyote, a wolf, an owl or a person it has seen, and mimics voices. Once per scene, meeting its eyes means a Will roll or being Dazed for a round. |
+| Hellhound | Brawling 14 | 10 | 3 | Burning jaws (2) | **Hunter.** Always finds its quarry; holy water drives it off. |
+| Wendigo | Brawling 15, Tracking 15 | 11 | 4 | Claws and teeth (2) | **Endless hunger.** Calls out in the voices of the lost to lure prey; ignores the Wounded penalty. Only fire marks more than 1 box at a time, and it rises again unless its heart of ice is burned. |
+| Revenant gunslinger | Shooting 15 | 11 | 4 | Two revolvers | **Undying.** Rises at the next midnight unless its grave is salted and burned. |
+| Headless Rider | Melee 14, Shooting 13 | 10 | 4 | Saber (2), revolver | **Hell-ridden.** Its horse never tires: Riding 15 in a chase. No head to stun or aim at. Rises at the next midnight unless its head is laid back in its grave. |
+
+**Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
+
+# The GM's tools
+
+## The battle map
+
+The GM view of the character creator has a **battle map** for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the *Personal combat* rules in the Players' Guide, and a fight without it works the same way. Open **How to use the map** on the map itself for the buttons, step by step.
+
+**Two kinds of map.**
+
+- **A hex map** for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a room, 5 or 10 yards for a street, 50 for open ground. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range table in the Players' Guide.
+- **A range track** for fights where only distance matters: a chase, a running fight across open country. It has a lane for the posse and one for each range band. Moving a token into the next lane moves it one band in or out.
+
+**Tokens.** The GM places the posse with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, the stunned condition or a Grit point on a token marks it on the character, and the other way round. Opponents come from the setting's threats with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.
+
+**Keeping a map.** The map stays in the GM's browser. **Save map to file** keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.
+
+**Stagecoach chase.** Besides the plain range track, the map has a **Stagecoach chase** track. **Add the stagecoach** places the stagecoach in the first lane with its own Coach boxes; its panel shows what the damage does. The rules are under *Stagecoach chases* in the Players' Guide.
+
+## The Encounter panel
+
+The GM view also has an **Encounter** panel that runs a fight by the *Personal combat* rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round), the boxes marked and any telling hit, offering a Grit point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so.
