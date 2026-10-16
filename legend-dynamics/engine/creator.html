@@ -921,6 +921,7 @@ tr.lvl-U td.target { color: var(--muted); }
       </div>
     </div>
     <div class="gm-grid" id="gm-grid"></div>
+    <!-- RULES:LAB-PANEL -->
   </section>
 
   <!-- Phone-only readiness bar for the Create tab -->
@@ -1067,6 +1068,8 @@ tr.lvl-U td.target { color: var(--muted); }
 <script>
 (() => {
   /* PACK:START *//* PACK:END */
+  /* RULES:CORE */
+  /* RULES:LAB */
   const T = PACK.terms;
   // Advancement point costs (core rules, Advancement). Magic and powers use the costs their chapters give.
   const COSTS = { UT: 1, TS: 2, revise: 1, edge: 3, attr: 4 };
@@ -1167,7 +1170,6 @@ tr.lvl-U td.target { color: var(--muted); }
     ["Incapacitated", "Unable to act; medical aid needed", null],
   ];
   // Ways to roll each total on 3d6, index 0 = total 3.
-  const WAYS = [1, 3, 6, 10, 15, 21, 25, 27, 27, 25, 21, 15, 10, 6, 3, 1];
   const STORE_ROSTER = PACK.id + ".roster.v1", STORE_CURRENT = PACK.id + ".current.v1", BASE = 10, MAX_START = 13;
   // Weapons that use up ammunition or power: capacity, and what each kind of shot costs and does to the roll.
   const GUNS = PACK.weapons.items;
@@ -1415,7 +1417,7 @@ tr.lvl-U td.target { color: var(--muted); }
   ].filter((x) => x.id);
   const levelName = (l, name) => ((l === "S" && isGS() && !(name && advancedToS(name))) || (l === "S" && masterSkill(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
-  const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
+  const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge);
   // The core attack and defense rules (engine/combat.json), with the setting's own overrides.
   const CR = PACK.combatRules || {};
   const PARRY = !CR.parry ? [] : T.meleeSkill === T.unarmedSkill ? [[T.meleeSkill, "armed or bare-handed"]] : [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed"]];
@@ -1435,11 +1437,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const isDefense = (name) => name === "Dodge" || name === "Dodge+" || isParry(name) || isBlock(name);
   const rollLabel = (name) => (isParry(name) ? `Parry (${name.slice(6)})` : isBlock(name) ? `Block (${SHIELDS.find((g) => g.id === name.slice(6))?.name.toLowerCase() || "shield"})` : name);
   const count = (lvl) => Object.entries(ch.skills).filter(([k, v]) => v === lvl && !freeSkill(k)).length;
-  function odds(t) {
-    let w = 0;
-    for (let s = 3; s <= 18; s++) if (s <= 4 || (s <= 16 && s <= t)) w += WAYS[s - 3];
-    return w / 216;
-  }
+  const odds = LD.odds; // the core rules module
   const pct = (t) => Math.round(odds(t) * 100) + "%";
   const advDef = () => ADVANTAGES.find((a) => a[0] === ch.adv.id);
   const compDef = () => COMPLICATIONS.find((a) => a[0] === ch.comp.id);
@@ -2032,11 +2030,9 @@ tr.lvl-U td.target { color: var(--muted); }
     // A reroll repeats the same shot, whatever the shot menu shows now.
     const fireMod = isReroll && last ? last.fireMod || 0 : shot;
     const t = base + total - shot + fireMod;
-    const dice = [1, 2, 3].map(() => 1 + Math.floor(Math.random() * 6));
-    const sum = dice[0] + dice[1] + dice[2];
-    const auto = sum <= 4 ? "auto-s" : sum >= 17 ? "auto-f" : "";
-    const ok = auto === "auto-s" || (auto !== "auto-f" && sum <= t);
-    const margin = t - sum;
+    const roll = LD.resolve(LD.rollDice(), t); // published core: 3d6 roll-under, natural 3–4 and 17–18 automatic
+    const { dice, total: sum, success: ok, margin } = roll;
+    const auto = roll.auto === "success" ? "auto-s" : roll.auto === "failure" ? "auto-f" : "";
     const jam = PACK.weapons.jamOn18 && sum === 18 && (weaponNote || (isReroll && last && last.weaponNote));
     const attackRoll = !$("r-called-wrap").hidden, called = attackRoll ? (isReroll && last ? last.called : +$("r-called").value) : 0;
     last = { name, t, dice, sum, ok, margin, auto, jam, attackRoll, called, rerolled: !!isReroll, fireMod, weaponNote: weaponNote || (isReroll && last ? last.weaponNote : "") };
@@ -2254,6 +2250,8 @@ tr.lvl-U td.target { color: var(--muted); }
   const STORE_CLOCKS = PACK.id + ".clocks.v1", STORE_SHIP = PACK.id + ".tracks.v1";
   let clocks = store.get(STORE_CLOCKS, []);
   if (!Array.isArray(clocks)) clocks = [];
+  const clockListeners = []; // the Rules Lab listens, to log clock changes during an encounter
+  const clockNotify = (c, from, to) => clockListeners.forEach((f) => f(c, from, to));
   const gunOf = () => ch.play.gun;
   function renderGun() {
     const g = gunOf(), def = GUNS[g.type];
@@ -2345,8 +2343,9 @@ tr.lvl-U td.target { color: var(--muted); }
   $("clk-add").onclick = () => {
     const name = $("clk-name").value.trim();
     if (!name) { $("clk-name").focus(); return; }
-    clocks.push({ id: uid(), name: name.slice(0, 60), size: +$("clk-size").value, kind: $("clk-kind").value, filled: 0 });
-    $("clk-name").value = ""; store.set(STORE_CLOCKS, clocks); renderClocks();
+    const nc = { id: uid(), name: name.slice(0, 60), size: +$("clk-size").value, kind: $("clk-kind").value, filled: 0 };
+    clocks.push(nc);
+    $("clk-name").value = ""; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0);
   };
   $("clk-copy").onclick = () => {
     if (!clocks.length) { $("clk-msg").textContent = "No clocks to copy."; return; }
@@ -2358,10 +2357,12 @@ tr.lvl-U td.target { color: var(--muted); }
   $("clk-name").addEventListener("keydown", (e) => { if (e.key === "Enter") $("clk-add").click(); });
   $("clocks").addEventListener("click", (e) => {
     const seg = e.target.closest("[data-seg]"), rm = e.target.closest("[data-rmclock]");
-    if (seg) { const c = clocks.find((x) => x.id === seg.dataset.clock); const i = +seg.dataset.seg; c.filled = c.filled === i ? i - 1 : i; }
+    let changed = null;
+    if (seg) { const c = clocks.find((x) => x.id === seg.dataset.clock); const i = +seg.dataset.seg; changed = [c, c.filled]; c.filled = c.filled === i ? i - 1 : i; }
     else if (rm) clocks = clocks.filter((x) => x.id !== rm.dataset.rmclock);
     else return;
     store.set(STORE_CLOCKS, clocks); renderClocks();
+    if (changed) clockNotify(changed[0], changed[1], changed[0].filled); else clockNotify({ id: "", name: "", kind: "", size: 0 }, 0, 0);
   });
   renderShip(); renderClocks();
 
@@ -2501,7 +2502,9 @@ tr.lvl-U td.target { color: var(--muted); }
     saveGM(); renderGM();
     return { added, updated };
   }
+  let labPanel = null; // the Encounter panel (and, with a test configuration, the Rules Lab)
   function renderGM() {
+    if (labPanel) setTimeout(labPanel.refresh, 0);
     try { battleMap.refresh(); } catch { /* the map mounts just after the GM view's first render */ }
     if (gmReady) { renderLogForm(); renderSeed(); renderLogBook(); } // the log and seed panels exist once their data has loaded
     $("gm-add-saved").innerHTML = `<option value="">${roster.length ? "Choose a saved character…" : "No characters saved in this browser"}</option>` +
@@ -2614,6 +2617,19 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!gmCrew.length) { gmSay("Add some characters first.", true); return; }
     saveText(JSON.stringify({ format: PACK.id + "-group", version: 1, crew: gmCrew.map((c) => ({ ...c, play: { ...c.play, log: [] } })), log: missionLog, allegiances: campaignAllegiances, ...(GRITTY ? { gritty } : {}) }, null, 2), PACK.id + "-characters.json", gmSay);
   };
+  // ---- The Encounter panel: the published rules in every setting with weapons as data; the Rules Lab's experiments
+  // where a test configuration exists. Never used by the sheet. ----
+  if ((PACK.arms || []).length) {
+    labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText, gritty: () => gritty,
+      crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
+      // A character's numbers, as the sheet works them out; with powers, their Defense Class from Toughness or Force Field.
+      calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n)])), dodge: dodge(), agility: c.attrs.Agility,
+        defense: POWERS ? Math.max(0, ...allPowers(c).filter((x) => ["toughness", "forcefield"].includes(x.id)).map((x) => classIndex(x.cl) + 1)) : 0 }; } finally { ch = saved; } },
+      clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
+        set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
+        add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
+      injuryNames: INJURY.map((x) => x[0]) });
+  } else $("lab").hidden = true;
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay(`New session: everyone is back to their starting ${T.point}.`); };
   let gmClearArmed = false;
   $("gm-clear").onclick = () => {

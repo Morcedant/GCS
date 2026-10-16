@@ -3571,5 +3571,475 @@
   ],
   "note": "Each lane is a range band from our ship. When the pilots make their opposed Piloting roll, drag the enemy one lane in or out. Weapons take −2 one band beyond their range and −4 two bands beyond.",
   "help": "for ships closing or opening the range. Each lane is a range band from our ship."
- }
+ },
+ "arms": [
+  {
+   "id": "fists",
+   "name": "Fists, kicks, a baton",
+   "skill": "Close Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "knife",
+   "name": "Knife",
+   "skill": "Close Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "blade",
+   "name": "Vibroblade, implant blades or claws",
+   "skill": "Close Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "claws",
+   "name": "Claws and spines",
+   "skill": "Close Combat",
+   "reach": "melee",
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "pistol",
+   "name": "Slug pistol",
+   "skill": "Firearms",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "pistol",
+   "firearm": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "carbine",
+   "name": "Slug carbine",
+   "skill": "Firearms",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "carbine",
+   "firearm": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "laser",
+   "name": "Laser pistol",
+   "skill": "Firearms",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "ammo": "laser",
+   "firearm": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "plasma",
+   "name": "Plasma rifle",
+   "skill": "Firearms",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "ammo": "plasma",
+   "firearm": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "coilgun",
+   "name": "Coilgun or needle rifle",
+   "skill": "Firearms",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "firearm": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "stunner",
+   "name": "Stunner",
+   "skill": "Firearms",
+   "band": "close",
+   "damage": {
+    "any": {
+     "boxes": 0
+    }
+   },
+   "firearm": true,
+   "stun": true,
+   "traits": [],
+   "rows": []
+  },
+  {
+   "id": "grenade",
+   "name": "Grenade",
+   "skill": "Athletics",
+   "band": "close",
+   "maxBand": "close",
+   "damage": {
+    "any": {
+     "boxes": 3,
+     "dying": true
+    }
+   },
+   "traits": [
+    {
+     "type": "area",
+     "note": "1 box to everyone nearby; 3 and Dying at the centre. Dodge means diving clear."
+    }
+   ],
+   "rows": []
+  }
+ ],
+ "threats": [
+  {
+   "id": "security",
+   "name": "Station security or thug",
+   "label": "Station security or thug (minor)",
+   "minor": true,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 11
+    }
+   ],
+   "dodge": 7,
+   "boxes": 1,
+   "boxesText": "1",
+   "weaponText": "Stunner or pistol",
+   "weapons": [
+    "stunner",
+    "pistol"
+   ],
+   "trait": "Numbers",
+   "traitText": "Three or four of them; they back off when half are down."
+  },
+  {
+   "id": "drone",
+   "name": "Combat drone",
+   "label": "Combat drone (minor, swarms)",
+   "minor": true,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 12
+    }
+   ],
+   "dodge": 9,
+   "boxes": 1,
+   "boxesText": "1 each",
+   "weaponText": "Light laser (2)",
+   "weapons": [
+    "laser"
+   ],
+   "trait": "Swarm",
+   "traitText": "Kill its controller or jam its link, and the swarm drops."
+  },
+  {
+   "id": "raider",
+   "name": "Pirate raider",
+   "label": "Pirate raider",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 12
+    },
+    {
+     "skill": "Close Combat",
+     "target": 12
+    }
+   ],
+   "dodge": 9,
+   "boxes": 2,
+   "boxesText": "2",
+   "weaponText": "Slug carbine",
+   "weapons": [
+    "carbine",
+    "fists"
+   ],
+   "trait": "Boarders",
+   "traitText": "Hit fast, grab what they can, run."
+  },
+  {
+   "id": "collector",
+   "name": "Tessan debt collector",
+   "label": "Tessan debt collector",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Commerce",
+     "target": 15
+    },
+    {
+     "skill": "Firearms",
+     "target": 12
+    }
+   ],
+   "dodge": 8,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Bonded-agent contract",
+   "weapons": [
+    "pistol"
+   ],
+   "trait": "Lien",
+   "traitText": "Can lawfully seize your ship or gear; in Tessan space, resisting marks Debt and Heat."
+  },
+  {
+   "id": "enforcer",
+   "name": "Syndicate enforcer",
+   "label": "Syndicate enforcer (Augment)",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Close Combat",
+     "target": 15
+    },
+    {
+     "skill": "Firearms",
+     "target": 13
+    }
+   ],
+   "dodge": 10,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Implant blades (2), shotgun",
+   "weapons": [
+    "blade",
+    "pistol"
+   ],
+   "trait": "Chromed",
+   "traitText": "Hits marking 2 or more boxes mark one fewer.",
+   "traits": [
+    {
+     "type": "armor",
+     "minBoxes": 2,
+     "reduce": 1,
+     "always": true,
+     "label": "Chromed"
+    }
+   ]
+  },
+  {
+   "id": "assassin",
+   "name": "Corporate assassin",
+   "label": "Corporate assassin",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 15
+    },
+    {
+     "skill": "Stealth",
+     "target": 15
+    }
+   ],
+   "dodge": 11,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Needle rifle, toxin",
+   "weapons": [
+    "coilgun"
+   ],
+   "trait": "First strike",
+   "traitText": "+2 from hiding; the toxin makes the target roll Body or be Stunned."
+  },
+  {
+   "id": "hunter",
+   "name": "Bounty hunter",
+   "label": "Bounty hunter",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Investigation",
+     "target": 14
+    },
+    {
+     "skill": "Firearms",
+     "target": 14
+    }
+   ],
+   "dodge": 10,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Coilgun (3), restraints",
+   "weapons": [
+    "coilgun"
+   ],
+   "trait": "Relentless",
+   "traitText": "Always finds the trail again; wants you alive."
+  },
+  {
+   "id": "legionary",
+   "name": "Hegemony legionary",
+   "label": "Hegemony legionary (Dresh)",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 14
+    },
+    {
+     "skill": "Close Combat",
+     "target": 15
+    }
+   ],
+   "dodge": 9,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "Plasma rifle (3), four arms",
+   "weapons": [
+    "plasma",
+    "fists"
+   ],
+   "trait": "Armored",
+   "traitText": "Hits marking 1 box mark nothing.",
+   "traits": [
+    {
+     "type": "ignoreHits",
+     "maxBoxes": 1,
+     "label": "Armored"
+    }
+   ]
+  },
+  {
+   "id": "inquisitor",
+   "name": "Hegemony inquisitor",
+   "label": "Hegemony inquisitor (Shivar zealot)",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Psionics",
+     "target": 14
+    },
+    {
+     "skill": "Diplomacy",
+     "target": 13
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Mandate scanner, sidearm",
+   "weapons": [
+    "pistol"
+   ],
+   "trait": "Mandate",
+   "traitText": "Detects psionics nearby; a psionic must roll Will or be revealed."
+  },
+  {
+   "id": "screening",
+   "name": "Mandate screening post",
+   "label": "Mandate screening post",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Sensors",
+     "target": 15
+    }
+   ],
+   "dodge": null,
+   "boxes": null,
+   "boxesText": "—",
+   "weaponText": "Scanners, guards",
+   "weapons": [],
+   "trait": "The test",
+   "traitText": "Everyone passing through is scanned; a positive result means execution."
+  },
+  {
+   "id": "rogueai",
+   "name": "Rogue AI",
+   "label": "Rogue AI",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Computers",
+     "target": 16
+    }
+   ],
+   "dodge": null,
+   "boxes": null,
+   "boxesText": "—",
+   "weaponText": "Station systems, drones",
+   "weapons": [],
+   "trait": "Everywhere",
+   "traitText": "Lives in the network; must be talked down, isolated or erased."
+  },
+  {
+   "id": "predator",
+   "name": "Alien predator",
+   "label": "Alien predator",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Close Combat",
+     "target": 15
+    }
+   ],
+   "dodge": 10,
+   "boxes": 5,
+   "boxesText": "5",
+   "weaponText": "Claws (2), spines",
+   "weapons": [
+    "claws"
+   ],
+   "trait": "Huge",
+   "traitText": "Hits marking 1 box mark nothing.",
+   "traits": [
+    {
+     "type": "ignoreHits",
+     "maxBoxes": 1,
+     "label": "Huge"
+    }
+   ]
+  }
+ ]
 }

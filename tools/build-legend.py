@@ -226,7 +226,7 @@ def gen(name, pack, t):
         return table(["Weapon", "Range", "Boxes on a hit", "What the injury looks like"], [r for a in p["arms"] for r in a["rows"]])
     if name == "threats-table":
         return table(["Threat", "Attack (target)", "Dodge", "Boxes", "Weapon", "Trait"],
-                     [[x["label"], ", ".join(f"{a['skill']} {a['target']}" for a in x["attacks"]), "—" if x["dodge"] is None else x["dodge"],
+                     [[x["label"], x.get("attackJoin", ", ").join(f"{a['skill']} {a['target']}" for a in x["attacks"]), "—" if x["dodge"] is None else x["dodge"],
                        x["boxesText"], x["weaponText"], f"**{x['trait']}.** {x['traitText']}"] for x in p["threats"]])
     if name == "magic":
         return magic_chapter(p["magic"], t["title"]) if p.get("magic") else ""
@@ -355,6 +355,24 @@ def pack_sections(md):
     return {parts[i]: parts[i + 1].strip() for i in range(1, len(parts), 2)}
 
 
+def inline_module(path, name):
+    """An ES module from engine/rules or engine/lab as a plain script constant: `const name = (() => { ...; return {exports} })();`.
+    The pages stay single files; the same module files are imported directly by the tests."""
+    src = path.read_text().replace("// @ts-check\n", "")
+    names = re.findall(r"^export (?:async )?(?:function|const|let) (\w+)", src, flags=re.M)
+    imports = re.findall(r"^import .*$", src, flags=re.M)
+    for line in imports:
+        src = src.replace(line + "\n", "")
+    src = re.sub(r"^export (async )?(function|const|let) ", r"\1\2 ", src, flags=re.M)
+    if re.search(r"^\s*export\b", src, flags=re.M):
+        sys.exit(f"{path}: only `export function/const/let` declarations can be inlined")
+    return f"const {name} = (() => {{\n{src}\nreturn {{ {', '.join(names)} }};\n}})();"
+
+
+def rules_js():
+    return inline_module(ENGINE / "rules" / "core.js", "LD")
+
+
 def guide_md(pack, t, sections):
     core = (ENGINE / "core.md").read_text()
     core = re.sub(r"\{\{PACK:(\w+)\}\}", lambda m: sections.get(m.group(1), ""), core)
@@ -443,6 +461,16 @@ def build(pid, docx):
         sys.exit(f"{pid}: unfilled tokens {left}")
     js = "const PACK = " + json.dumps({**with_core_combat(pack), "terms": t, "theme": theme}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";"
     tpl = tpl.replace("/* PACK:START *//* PACK:END */", "/* PACK:START */" + js + "/* PACK:END */")
+    tpl = tpl.replace("/* RULES:CORE */", rules_js())
+    # The Encounter panel in the GM view: in every setting, running the published rules. A setting with a test
+    # configuration (packs/<id>/lab.json, on the rules-lab branch) also gets the Rules Lab's experiments.
+    mods = [inline_module(ENGINE / "rules" / "experiments.js", "LDX")] + [inline_module(f, "LAB_" + f.stem.upper()) for f in sorted((ENGINE / "lab").glob("*.js"))]
+    lab = pdir / "lab.json"
+    lab_data = json.loads(lab.read_text()) if lab.exists() else None
+    if lab_data is not None and "grievous" not in lab_data and pack.get("gritty"):
+        lab_data["grievous"] = pack["gritty"]  # the setting's own grievous wound table (its gritty combat option)
+    tpl = tpl.replace("/* RULES:LAB */", "const LAB_DATA = " + json.dumps(lab_data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";\n  " + "\n  ".join(mods))
+    tpl = tpl.replace("<!-- RULES:LAB-PANEL -->", (ENGINE / "lab" / "panel.html").read_text())
     tpl = re.sub(r"<!-- GUIDE:START -->.*?<!-- GUIDE:END -->", lambda _: "<!-- GUIDE:START -->\n" + guide_html + "<!-- GUIDE:END -->", tpl, flags=re.S)
     tpl = stamp(tpl, out / "index.html")  # the version footer: a fingerprint of the page, and the day it last changed
     (out / "index.html").write_text(tpl)
