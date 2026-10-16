@@ -449,7 +449,15 @@
     "club"
    ],
    "trait": "Iron bones",
-   "traitText": "Bullets and blades mark 1 box at most; a Siegbarste's weakness must be learned."
+   "traitText": "Bullets and blades mark 1 box at most; a Siegbarste's weakness must be learned.",
+   "traits": [
+    {
+     "type": "capBoxes",
+     "max": 1,
+     "except": [],
+     "label": "Iron bones (1 box at most)"
+    }
+   ]
   },
   {
    "id": "mauvais",
@@ -711,5 +719,19 @@
   "unarmedSkill": "Brawling",
   "ammo": "rounds",
   "ammoOne": "round"
- }
+ },
+ "materials": [
+  [
+   "silver",
+   "Silver"
+  ],
+  [
+   "wood",
+   "A wooden stake"
+  ],
+  [
+   "fire",
+   "Fire"
+  ]
+ ]
 }
