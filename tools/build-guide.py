@@ -6,7 +6,7 @@ in <game>/index.html) and, with --docx, a Word version.
 
   python3 tools/build-guide.py [--game uss-pelion|grimm-west] [--docx [--reference-doc original.docx]]
 """
-import argparse, pathlib, re, subprocess, sys
+import argparse, json, pathlib, re, subprocess, sys
 from stamp import stamp
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -43,6 +43,16 @@ def main():
     if "/* BATTLEMAP:START */" in app:
         bm = (ROOT / "legend-dynamics" / "engine" / "battlemap.js").read_text().replace("</", "<\\/")
         app = re.sub(r"/\* BATTLEMAP:START \*/.*?/\* BATTLEMAP:END \*/", lambda _: "/* BATTLEMAP:START */\n" + bm + "/* BATTLEMAP:END */", app, flags=re.S)
+    # A page with ENCOUNTER markers gets the Encounter panel: the shared modules (legend-dynamics/engine) and the
+    # game's own setting data (<game>/encounter/setting.json: weapons, threats, gear, combat rules, terms).
+    if "/* ENCOUNTER:START */" in app:
+        E = ROOT / "legend-dynamics" / "engine"
+        setting = (ROOT / a.game / "encounter" / "setting.json").read_text()
+        js = "\n".join(["const ENC_SETTING = " + json.dumps(json.loads(setting), ensure_ascii=False, separators=(",", ":")) + ";",
+            inline_module(E / "rules" / "core.js", "LD"), inline_module(E / "rules" / "experiments.js", "LDX"),
+            inline_module(E / "lab" / "encounter.js", "LAB_ENCOUNTER"), inline_module(E / "lab" / "stats.js", "LAB_STATS"), inline_module(E / "lab" / "ui.js", "LAB_UI")]).replace("</", "<\\/") + "\n"
+        app = re.sub(r"/\* ENCOUNTER:START \*/.*?/\* ENCOUNTER:END \*/", lambda _: "/* ENCOUNTER:START */\n" + js + "/* ENCOUNTER:END */", app, flags=re.S)
+        app = re.sub(r"<!-- ENCOUNTER-PANEL:START -->.*?<!-- ENCOUNTER-PANEL:END -->", lambda _: "<!-- ENCOUNTER-PANEL:START -->\n" + (E / "lab" / "panel.html").read_text() + "<!-- ENCOUNTER-PANEL:END -->", app, flags=re.S)
     app = stamp(app, APP)  # the version footer: a fingerprint of the page, and the day it last changed
     APP.write_text(app)
     print(f"updated {APP.relative_to(ROOT)}")
@@ -52,6 +62,16 @@ def main():
         subprocess.run(["pandoc", str(SRC), "-o", str(DOCX), *extra], check=True)
         finish_docx(DOCX)
         print(f"wrote {DOCX.relative_to(ROOT)}")
+
+
+def inline_module(path, name):
+    """An ES module as a plain script constant (as tools/build-legend.py does for the creators)."""
+    src = path.read_text().replace("// @ts-check\n", "")
+    names = re.findall(r"^export (?:async )?(?:function|const|let) (\w+)", src, flags=re.M)
+    for line in re.findall(r"^import .*$", src, flags=re.M):
+        src = src.replace(line + "\n", "")
+    src = re.sub(r"^export (async )?(function|const|let) ", r"\1\2 ", src, flags=re.M)
+    return f"const {name} = (() => {{\n{src}\nreturn {{ {', '.join(names)} }};\n}})();"
 
 
 def finish_docx(path):

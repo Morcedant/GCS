@@ -488,6 +488,10 @@ The GM view of the character creator has a **battle map** for fights where it he
 
 **Ship fight.** In this setting the range track is for ship fights, with the bands Close (under 10 km), Short (up to 1,000 km), Medium (up to 10,000 km), Long (up to 100,000 km), Extreme (about a light-second). **Add our ship** places a token linked to the crew's Hull track, so damage marked on the map is marked on the sheet. Enemy ships come from the Enemy ships table with their Hull boxes. Each lane is a range band from our ship. When the pilots make their opposed Piloting roll, drag the enemy one lane in or out. Weapons take −2 one band beyond their range and −4 two bands beyond.
 
+## The Encounter panel
+
+The GM view also has an **Encounter** panel that runs a fight by these rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round), the boxes marked and any telling hit, offering a Resolve point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so.
+
 # Medical care
 
 Medicine in the corridors runs from field dressings to miracles. **Biotech** can grow a new organ, rebuild a limb or rewrite a disease, for those who can pay; a clinic with a biotech suite counts as proper care. Those who can't pay get stims, staples and whatever the Relief Missions carry.

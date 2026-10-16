@@ -13,7 +13,7 @@
  *   saveText: (text: string, name: string, say: (m: string, err?: boolean) => void) => void,
  *   crew: () => any[], saveCrew: () => void, renderCrew: () => void, calc: (c: any) => { skills: Record<string, number>, dodge: number, agility: number, defense?: number },
  *   clocks: { list: () => any[], set: (id: string, filled: number) => void, add: (name: string, size: number, kind: string) => void, listen: (fn: (c: any, from: number, to: number) => void) => void },
- *   injuryNames: string[], gritty?: () => boolean
+ *   injuryNames: string[], gritty?: () => boolean, traitsFor?: (c: any) => any[]
  * }} api
  * With no test configuration (api.LAB null), the panel is the production Encounter manager: published rules only,
  * no experiments, and the setting's gritty combat option applied when the campaign has it switched on.
@@ -156,7 +156,8 @@ export function mountLab(api) {
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
-        ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : [])],
+        ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : []),
+        ...(api.traitsFor ? api.traitsFor(c) : [])], // a page's own way of granting them (Pelion's advantages)
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
@@ -431,7 +432,7 @@ export function mountLab(api) {
       } else L.push(`No defense (${ev.cmd && ev.cmd.defense === "none" ? "the target couldn't defend" : "none available"})`, `<span class="ok">Hit</span>`);
     }
     if (ev.hit && !(ev.overridden && !ev.rolledHit && !ev.damage)) {
-      L.push("", !ev.damage && /marks nothing/.test(ev.outcome) ? esc(ev.outcome[0].toUpperCase() + ev.outcome.slice(1)) : ev.damage ? `${esc(ev.weapon.name)} at ${BAND_NAMES[ev.band] || ev.band}: ${ev.damage} box${ev.damage > 1 ? "es" : ""}${ev.dyingWeapon ? ", and Dying" : ""}${ev.reduced ? ` (−1, a ${esc(T.point)} point)` : ""}` : "No effect at this range");
+      L.push("", ev.stun || (!ev.damage && /marks nothing/.test(ev.outcome)) ? esc(ev.outcome[0].toUpperCase() + ev.outcome.slice(1)) : ev.damage ? `${esc(ev.weapon.name)} at ${BAND_NAMES[ev.band] || ev.band}: ${ev.damage} box${ev.damage > 1 ? "es" : ""}${ev.dyingWeapon ? ", and Dying" : ""}${ev.reduced ? ` (−1, a ${esc(T.point)} point)` : ""}` : "No effect at this range");
       if (ev.damage) L.push(`${esc(ev.defender.name)}: ${ev.injuryBefore} → <b>${ev.injuryAfter}</b> box${ev.injuryAfter === 1 ? "" : "es"}${ev.dead ? ", <span class='bad'>dead</span>" : ev.dying ? ", <span class='bad'>Dying</span>" : ""}${ev.injuryResult ? " · " + esc(ev.injuryResult) : ""}`);
     }
     if (ev.enchanted) L.push(`<span class="x">Enchanted weapon: +${ev.enchanted} box.</span>`);
