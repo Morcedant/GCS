@@ -13,7 +13,8 @@
  *   saveText: (text: string, name: string, say: (m: string, err?: boolean) => void) => void,
  *   crew: () => any[], saveCrew: () => void, renderCrew: () => void, calc: (c: any) => { skills: Record<string, number>, dodge: number, agility: number, defense?: number },
  *   clocks: { list: () => any[], set: (id: string, filled: number) => void, add: (name: string, size: number, kind: string) => void, listen: (fn: (c: any, from: number, to: number) => void) => void },
- *   injuryNames: string[], gritty?: () => boolean, traitsFor?: (c: any) => any[]
+ *   injuryNames: string[], gritty?: () => boolean, traitsFor?: (c: any) => any[],
+ *   formOf?: (c: any) => ({ name: string, human: string, on: boolean, weapon: string | null, traits: string[], drawbacks: string[] } | null), setForm?: (c: any, on: boolean) => void
  * }} api
  * With no test configuration (api.LAB null), the panel is the production Encounter manager: published rules only,
  * no experiments, and the setting's gritty combat option applied when the campaign has it switched on.
@@ -150,9 +151,13 @@ export function mountLab(api) {
   /** A character from the GM's cards, as a participant. @param {any} c */
   function fromCharacter(c) {
     const k = api.calc(c), gun = c.play && c.play.gun;
+    // A shapechanger (api.formOf): in their form, its numbers (api.calc applies them), its claws, and its traits as a note.
+    const fm = api.formOf ? api.formOf(c) : null, formOn = !!(fm && fm.on);
     const weapons = ["fists", ...Object.values(WEAPONS).filter((/** @type {any} */ a) => a.id !== "fists" && (c.equipment[a.id] || (a.equip || []).some((/** @type {string} */ k) => c.equipment[k]) || (gun && a.ammo && a.ammo === gun.type) || (a.cantrip && (c.spells || []).includes(a.cantrip)))).map((/** @type {any} */ a) => a.id)];
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
+    if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+      ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
@@ -214,6 +219,9 @@ export function mountLab(api) {
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
       if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
+      // A shapechanger who changed form on the card (the GM view, or the sheet's file) changes in the encounter too.
+      const fm = p.form && api.formOf ? api.formOf(c) : null;
+      if (fm && fm.on !== !!p.form.on) E.setForm(en, p.pid, fm.on, fromCharacter(c));
       if (PTRACK && (c.play.ptrack || 0) !== ((p.tracks || {})[PTRACK.name] || 0)) E.override(en, rules(), LD, "track", { pid: p.pid, track: PTRACK.name, value: c.play.ptrack || 0, reason: "changed on the character card" });
     }
   }
@@ -267,6 +275,7 @@ export function mountLab(api) {
           <button class="linkish danger" data-rm="${p.pid}" aria-label="Remove ${esc(p.name)}">×</button></span>
         <span class="meta small"><span class="boxes">${Array.from({ length: p.boxes }, (_, i) => `<button class="box ${i < p.injury ? "on" : ""}" data-inj="${p.pid}" data-i="${i + 1}" aria-label="${esc(p.name)} box ${i + 1}"></button>`).join("")}</span>
           ${p.dead ? "<b style='color:var(--bad)'>Dead</b>" : p.dying ? "<b style='color:var(--bad)'>Dying</b>" : p.takenOut ? "<b style='color:var(--bad)'>Taken out</b>" : out ? "<b>Down</b>" : esc(api.injuryNames[inj] || "")}
+          ${p.form ? ` · <b>${esc(p.form.on ? p.form.name : p.form.human)}</b> <button class="linkish" data-form="${p.pid}" title="Change form: the numbers, weapons and traits switch">change to ${esc(p.form.on ? p.form.human : p.form.name)}</button>` : ""}
           ${p.kind === "pc" ? ` · ${esc(T.point)} <button class="linkish" data-pt="${p.pid}" data-d="-1" aria-label="${esc(p.name)}: one ${esc(T.point)} point fewer">−</button><b>${p.points}</b><button class="linkish" data-pt="${p.pid}" data-d="1" aria-label="${esc(p.name)}: one ${esc(T.point)} point more">+</button>` : ""}
           ${Object.entries(p.ammo).map(([k, v]) => ` · ${esc(PACK.weapons.items[k] ? PACK.weapons.items[k][0] : k)} ${v}/${PACK.weapons.items[k] ? PACK.weapons.items[k][1] : "?"}`).join("")}
           ${Object.entries(p.tracks || {}).filter(([, v]) => v).map(([k, v]) => ` · <b>${esc(k)} ${v}</b>`).join("")}
@@ -290,6 +299,15 @@ export function mountLab(api) {
     else if (d.pt) { const p = E.find(en, d.pt); E.override(en, rules(), LD, "points", { pid: p.pid, points: p.points + +d.d, reason: "GM adjusted points" }); }
     else if (d.condRm) E.setCondition(en, d.condRm, d.c, false);
     else if (d.trait) { const p = E.find(en, d.trait); E.setTrait(en, d.trait, +d.i, p.traits[+d.i].on === false); }
+    else if (d.form) {
+      // The character's card changes form too, so the sheet, the GM view and the encounter agree.
+      const p = E.find(en, d.form), c = api.crew().find((x) => x.id === p.ref); if (!c) { say("That character isn't in the GM view any more.", true); return; }
+      const on = !(p.form && p.form.on);
+      if (api.setForm) api.setForm(c, on); else c.play.form = on; // the page's own flag (Grimm keeps the woge as play.woge)
+      const st = fromCharacter(c), res = E.setForm(en, p.pid, on, st);
+      if (res.error) { say(res.error, true); return; }
+      api.saveCrew(); api.renderCrew();
+    }
     else return;
     pushToCards(); save(); renderAll();
   });
@@ -534,6 +552,7 @@ export function mountLab(api) {
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
       case "gear": return `${esc(e.name)} puts on ${esc(e.item)}.`;
       case "trait": return `${esc(e.name)}: ${esc(e.trait)} ${e.on ? "on" : "off"}.`;
+      case "form": return `${esc(e.name)} changes to ${esc(e.form)}.`;
       case "condition": return `${esc(e.name)}: ${e.on ? "+" : "−"} ${esc(e.condition)}.`;
       case "override": {
         const gm = `<span style="color:var(--warn)">GM</span>`;

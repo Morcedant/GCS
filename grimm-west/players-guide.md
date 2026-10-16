@@ -328,7 +328,7 @@ Every Wesen heritage follows the **core Wesen rules** and has a **woge profile**
 
 - **Woging** is a free action, in or out. Physical heritage advantages and the woge profile work only in **full woge**.
 - **Losing control.** When an enemy appears, you're frightened or you're attacked, the GM can call for a **Will** roll; on a failure you woge.
-- **Your profile.** While woged, the profile's attribute bonuses apply to rolls on those attributes and the skills based on them, even above the starting maximum; its other traits and drawbacks apply too. The creator's **In full woge** box adds them for you.
+- **Your profile.** While woged, the profile's attribute bonuses apply to rolls on those attributes and the skills based on them, even above the starting maximum; its other traits and drawbacks apply too. Your sheet has a **Human face / Full woge** switch: it shows the numbers of the face you're wearing (the human ones beside them), and the dice roller and the GM's Encounter panel follow it.
 - **Who sees it.** A full woge is visible to anyone. A **Grimm** sees a flash of the Wesen face whenever a Wesen is stirred by strong emotion. A Wesen who looks into the eyes of a Grimm in that moment knows the Grimm for what they are.
 - **Exposure.** A full woge in front of ordinary people breaks the Code of Swabia: mark a box of **Exposure** (two for a Tier 3 heritage).
 

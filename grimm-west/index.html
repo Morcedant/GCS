@@ -501,6 +501,11 @@ tr.lvl-U td.target { color: var(--muted); }
 .guide td code { white-space: normal; overflow-wrap: anywhere; }
 @media (max-width: 640px) { .guide td:first-child { white-space: normal; } .guide table { font-size: .84rem; } }
 .guide-title { display: grid; gap: 4px; margin-bottom: 1.4em; }
+.form-switch { display: grid; gap: 6px; margin: 4px 0 10px; }
+.seg-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg-btns .btn.on { border-color: var(--accent); color: var(--fg); background: var(--well); box-shadow: inset 0 0 0 1px var(--accent); }
+.attr-strip .formed b { color: var(--accent); }
+@media print { .form-switch .seg-btns { display: none; } }
 .guide-switch { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .guide-switch .btn[aria-pressed="true"] { border-color: var(--chrome); color: var(--fg); background: var(--well); }
 .guide-title .h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.4rem); color: var(--fg); letter-spacing: .06em; }
@@ -585,7 +590,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="4368871" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · 4368871</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="b76c9f3" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · b76c9f3</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1783,7 +1788,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <ul>
 <li><strong>Woging</strong> is a free action, in or out. Physical heritage advantages and the woge profile work only in <strong>full woge</strong>.</li>
 <li><strong>Losing control.</strong> When an enemy appears, you’re frightened or you’re attacked, the GM can call for a <strong>Will</strong> roll; on a failure you woge.</li>
-<li><strong>Your profile.</strong> While woged, the profile’s attribute bonuses apply to rolls on those attributes and the skills based on them, even above the starting maximum; its other traits and drawbacks apply too. The creator’s <strong>In full woge</strong> box adds them for you.</li>
+<li><strong>Your profile.</strong> While woged, the profile’s attribute bonuses apply to rolls on those attributes and the skills based on them, even above the starting maximum; its other traits and drawbacks apply too. Your sheet has a <strong>Human face / Full woge</strong> switch: it shows the numbers of the face you’re wearing (the human ones beside them), and the dice roller and the GM’s Encounter panel follow it.</li>
 <li><strong>Who sees it.</strong> A full woge is visible to anyone. A <strong>Grimm</strong> sees a flash of the Wesen face whenever a Wesen is stirred by strong emotion. A Wesen who looks into the eyes of a Grimm in that moment knows the Grimm for what they are.</li>
 <li><strong>Exposure.</strong> A full woge in front of ordinary people breaks the Code of Swabia: mark a box of <strong>Exposure</strong> (two for a Tier 3 heritage).</li>
 </ul>
@@ -4440,6 +4445,14 @@ tr.lvl-U td.target { color: var(--muted); }
   const WESEN = new Set(HERITAGES.filter((h) => h.wesen).map((h) => h.id));
   const SPECIES_TRAITS = Object.fromEntries(HERITAGES.map((h) => [h.id, h.traits]));
   const heritageOf = (c = ch) => HERITAGES.find((h) => h.id === c.speciesId);
+  // A Wesen's woge (its heritage's woge profile): its numbers apply only in full woge (play.woge); horses balk (Riding −2).
+  const formOf = (c = ch) => (WESEN.has(c.speciesId) ? heritageOf(c)?.woge || null : null);
+  const inForm = (c = ch) => !!(c.play && c.play.woge && formOf(c));
+  const formAttr = (a, c = ch) => (inForm(c) ? formOf(c).attrs[a] || 0 : 0);
+  const formDodge = (c = ch) => (inForm(c) ? (formOf(c).dodge || 0) + (formOf(c).attrs.Agility || 0) : 0);
+  const formSkill = (n, c = ch) => (inForm(c) ? formAttr((SKILLS.find((x) => x[0] === n) || [])[1], c) + (n === "Riding" ? -2 : 0) : 0);
+  const formWeapon = (f) => (f && (f.traits || []).some((x) => /marks? 2 boxes/i.test(x)) ? "claws" : null);
+  const FORM_T = { human: "human face", name: "full woge" };
   const tierOf = (c = ch) => (c.speciesId === "custom" ? c.customTier : heritageOf(c)?.tier ?? 0);
   // Edges: every character has 3 points shared between heritage tier and Edges.
   const EDGE_POINTS = 3;
@@ -5171,7 +5184,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   function renderSheet() {
     const lvlOrder = { S: 0, T: 1, U: 2 };
-    const sorted = SKILLS.map(([n, a]) => ({ n, a, l: ch.skills[n], t: skillTarget(n) }))
+    const sorted = SKILLS.map(([n, a]) => ({ n, a, l: ch.skills[n], t: skillTarget(n) + formSkill(n) }))
       .sort((x, y) => lvlOrder[x.l] - lvlOrder[y.l] || y.t - x.t || x.n.localeCompare(y.n));
     const eq = EQUIPMENT.filter(([k]) => ch.equipment[k]).map(([, n]) => n);
     if (ch.otherEquip.trim()) eq.push(ch.otherEquip.trim());
@@ -5184,11 +5197,17 @@ tr.lvl-U td.target { color: var(--muted); }
         <div><span class="label">Title</span><b>${esc(ch.rank || "—")}</b></div>
         <div><span class="label">Calling</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">Heritage</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
-        <div><span class="label">Dodge</span><b class="num">${dodge()}</b></div>
-        <div><span class="label">Parry</span><b class="num">${parryOf("Melee")}</b><span class="small muted">Melee; ${parryOf("Brawling")} bare-handed vs fists</span></div>
+        <div><span class="label">Dodge</span><b class="num">${dodge() + formDodge()}</b>${formDodge() ? `<span class="small muted">human face ${dodge()}</span>` : ""}</div>
+        <div><span class="label">Parry</span><b class="num">${parryOf("Melee") + formSkill("Melee")}</b><span class="small muted">Melee; ${parryOf("Brawling") + formSkill("Brawling")} bare-handed vs fists</span></div>
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
-      <div class="attr-strip">${ATTRS.map(([n]) => `<div><span class="label">${n}</span><b>${ch.attrs[n]}</b></div>`).join("")}</div>
+      ${formOf() ? (() => { const f = formOf(), on = inForm();
+        const bits = [...ATTRS.filter(([n]) => f.attrs[n]).map(([n]) => `${n} ${signed(f.attrs[n])}`), ...(f.dodge ? [`Dodge ${signed(f.dodge)}`] : [])];
+        return `<div class="form-switch"><span class="label">Woge</span><div class="seg-btns" role="group" aria-label="Human face or full woge">
+          <button type="button" class="btn ${on ? "" : "on"}" data-sheetform="0" aria-pressed="${!on}">Human face</button><button type="button" class="btn ${on ? "on" : ""}" data-sheetform="1" aria-pressed="${on}">Full woge</button></div>
+          <span class="small muted">${on ? `<b>Full woge:</b> ${esc(bits.join(", ") || "no attribute change")} (included below); ${esc((f.traits || []).join("; "))}.`
+            : `The numbers below are your human face. Full woge: ${esc(bits.join(", ") || "no attribute change")}, and ${esc((f.traits || []).join("; ").toLowerCase())}.`}</span></div>`; })() : ""}
+      <div class="attr-strip">${ATTRS.map(([n]) => `<div class="${formAttr(n) ? "formed" : ""}"><span class="label">${n}</span><b>${ch.attrs[n] + formAttr(n)}</b>${formAttr(n) ? `<span class="small muted">human face ${ch.attrs[n]}</span>` : ""}</div>`).join("")}</div>
       <div><h3 style="margin-bottom:6px">Skills</h3>
         <div class="skill-cols">${sorted.map((s) => `<div class="skill-line ${s.l}"><span>${s.n}<span class="lv">${s.l === "U" ? "untrained" : levelName(s.l, s.n)}</span></span><b>${s.t}</b></div>`).join("")}</div></div>
       <div class="fields">
@@ -5417,7 +5436,7 @@ tr.lvl-U td.target { color: var(--muted); }
       if (!isGS()) toast("Broadened: the Expert skill becomes a Specialty (+3), and you can train two more skills.");
       else if (count("T") > 7) toast(`Old hands have seven Trained skills; untrain ${count("T") - 7} and your Specialty becomes Expert (+5).`);
     }
-    else if (t.id === "f-woge") { ch.play.woge = t.checked; save(); updateTarget(); }
+    else if (t.id === "f-woge") { ch.play.woge = t.checked; save(); renderSheet(); updateTarget(); }
     else if (t.id === "f-horror") { store.set(STORE_HORROR, t.checked); render(); }
     else if (t.id === "f-customtier") { ch.customTier = +t.value; touch(); render(); }
     else if (t.id === "f-adv2") { ch.adv2.id = t.value; touch(); render(); }
@@ -7182,6 +7201,17 @@ function setTrait(enc, pid, i, on) {
   return { event: log(enc, "trait", { pid, name: p.name, trait: p.traits[i].label || p.traits[i].type, on }) };
 }
 
+/**
+ * A shapechanger changes form: their numbers (from the page, as the sheet works them out) become the new form's.
+ * @param {any} enc @param {string} pid @param {boolean} on @param {{ dodge: number, agility: number, skills: any, weapons: string[], note?: string }} stats
+ */
+function setForm(enc, pid, on, stats) {
+  const p = find(enc, pid); if (!p || !p.form) return { error: "Only a shapechanger changes form." };
+  if (!!p.form.on === on) return { error: on ? `${p.name} is already in ${p.form.name}.` : `${p.name} is already in ${p.form.human}.` };
+  p.form = { ...p.form, on }; p.dodge = stats.dodge; p.agility = stats.agility; p.skills = stats.skills; p.weapons = stats.weapons; p.note = stats.note || "";
+  return { event: log(enc, "form", { pid, name: p.name, on, form: on ? p.form.name : p.form.human }) };
+}
+
 /** Put protective gear on a participant (its traits join theirs). @param {any} enc @param {string} pid @param {{ id: string, name: string, traits: any[] }} item */
 function addGear(enc, pid, item) {
   const p = find(enc, pid); if (!p || !item) return { error: "Choose the gear." };
@@ -7286,7 +7316,7 @@ function replay(enc, rules, core, config) {
   return { encounter: r };
 }
 
-return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, defenseOptions, chooseDefense, attack, tellingEffect, shrugTelling, tradeLimb, spendPoint, setTrait, addGear, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
+return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, defenseOptions, chooseDefense, attack, tellingEffect, shrugTelling, tradeLimb, spendPoint, setTrait, setForm, addGear, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
 })();
 const LAB_STATS = (() => {
 /**
@@ -7392,7 +7422,8 @@ const LAB_UI = (() => {
  *   saveText: (text: string, name: string, say: (m: string, err?: boolean) => void) => void,
  *   crew: () => any[], saveCrew: () => void, renderCrew: () => void, calc: (c: any) => { skills: Record<string, number>, dodge: number, agility: number, defense?: number },
  *   clocks: { list: () => any[], set: (id: string, filled: number) => void, add: (name: string, size: number, kind: string) => void, listen: (fn: (c: any, from: number, to: number) => void) => void },
- *   injuryNames: string[], gritty?: () => boolean, traitsFor?: (c: any) => any[]
+ *   injuryNames: string[], gritty?: () => boolean, traitsFor?: (c: any) => any[],
+ *   formOf?: (c: any) => ({ name: string, human: string, on: boolean, weapon: string | null, traits: string[], drawbacks: string[] } | null), setForm?: (c: any, on: boolean) => void
  * }} api
  * With no test configuration (api.LAB null), the panel is the production Encounter manager: published rules only,
  * no experiments, and the setting's gritty combat option applied when the campaign has it switched on.
@@ -7529,9 +7560,13 @@ function mountLab(api) {
   /** A character from the GM's cards, as a participant. @param {any} c */
   function fromCharacter(c) {
     const k = api.calc(c), gun = c.play && c.play.gun;
+    // A shapechanger (api.formOf): in their form, its numbers (api.calc applies them), its claws, and its traits as a note.
+    const fm = api.formOf ? api.formOf(c) : null, formOn = !!(fm && fm.on);
     const weapons = ["fists", ...Object.values(WEAPONS).filter((/** @type {any} */ a) => a.id !== "fists" && (c.equipment[a.id] || (a.equip || []).some((/** @type {string} */ k) => c.equipment[k]) || (gun && a.ammo && a.ammo === gun.type) || (a.cantrip && (c.spells || []).includes(a.cantrip)))).map((/** @type {any} */ a) => a.id)];
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
+    if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+      ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
@@ -7593,6 +7628,9 @@ function mountLab(api) {
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
       if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
+      // A shapechanger who changed form on the card (the GM view, or the sheet's file) changes in the encounter too.
+      const fm = p.form && api.formOf ? api.formOf(c) : null;
+      if (fm && fm.on !== !!p.form.on) E.setForm(en, p.pid, fm.on, fromCharacter(c));
       if (PTRACK && (c.play.ptrack || 0) !== ((p.tracks || {})[PTRACK.name] || 0)) E.override(en, rules(), LD, "track", { pid: p.pid, track: PTRACK.name, value: c.play.ptrack || 0, reason: "changed on the character card" });
     }
   }
@@ -7646,6 +7684,7 @@ function mountLab(api) {
           <button class="linkish danger" data-rm="${p.pid}" aria-label="Remove ${esc(p.name)}">×<\/button><\/span>
         <span class="meta small"><span class="boxes">${Array.from({ length: p.boxes }, (_, i) => `<button class="box ${i < p.injury ? "on" : ""}" data-inj="${p.pid}" data-i="${i + 1}" aria-label="${esc(p.name)} box ${i + 1}"><\/button>`).join("")}<\/span>
           ${p.dead ? "<b style='color:var(--bad)'>Dead<\/b>" : p.dying ? "<b style='color:var(--bad)'>Dying<\/b>" : p.takenOut ? "<b style='color:var(--bad)'>Taken out<\/b>" : out ? "<b>Down<\/b>" : esc(api.injuryNames[inj] || "")}
+          ${p.form ? ` · <b>${esc(p.form.on ? p.form.name : p.form.human)}<\/b> <button class="linkish" data-form="${p.pid}" title="Change form: the numbers, weapons and traits switch">change to ${esc(p.form.on ? p.form.human : p.form.name)}<\/button>` : ""}
           ${p.kind === "pc" ? ` · ${esc(T.point)} <button class="linkish" data-pt="${p.pid}" data-d="-1" aria-label="${esc(p.name)}: one ${esc(T.point)} point fewer">−<\/button><b>${p.points}<\/b><button class="linkish" data-pt="${p.pid}" data-d="1" aria-label="${esc(p.name)}: one ${esc(T.point)} point more">+<\/button>` : ""}
           ${Object.entries(p.ammo).map(([k, v]) => ` · ${esc(PACK.weapons.items[k] ? PACK.weapons.items[k][0] : k)} ${v}/${PACK.weapons.items[k] ? PACK.weapons.items[k][1] : "?"}`).join("")}
           ${Object.entries(p.tracks || {}).filter(([, v]) => v).map(([k, v]) => ` · <b>${esc(k)} ${v}<\/b>`).join("")}
@@ -7669,6 +7708,15 @@ function mountLab(api) {
     else if (d.pt) { const p = E.find(en, d.pt); E.override(en, rules(), LD, "points", { pid: p.pid, points: p.points + +d.d, reason: "GM adjusted points" }); }
     else if (d.condRm) E.setCondition(en, d.condRm, d.c, false);
     else if (d.trait) { const p = E.find(en, d.trait); E.setTrait(en, d.trait, +d.i, p.traits[+d.i].on === false); }
+    else if (d.form) {
+      // The character's card changes form too, so the sheet, the GM view and the encounter agree.
+      const p = E.find(en, d.form), c = api.crew().find((x) => x.id === p.ref); if (!c) { say("That character isn't in the GM view any more.", true); return; }
+      const on = !(p.form && p.form.on);
+      if (api.setForm) api.setForm(c, on); else c.play.form = on; // the page's own flag (Grimm keeps the woge as play.woge)
+      const st = fromCharacter(c), res = E.setForm(en, p.pid, on, st);
+      if (res.error) { say(res.error, true); return; }
+      api.saveCrew(); api.renderCrew();
+    }
     else return;
     pushToCards(); save(); renderAll();
   });
@@ -7913,6 +7961,7 @@ function mountLab(api) {
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
       case "gear": return `${esc(e.name)} puts on ${esc(e.item)}.`;
       case "trait": return `${esc(e.name)}: ${esc(e.trait)} ${e.on ? "on" : "off"}.`;
+      case "form": return `${esc(e.name)} changes to ${esc(e.form)}.`;
       case "condition": return `${esc(e.name)}: ${e.on ? "+" : "−"} ${esc(e.condition)}.`;
       case "override": {
         const gm = `<span style="color:var(--warn)">GM<\/span>`;
@@ -8012,9 +8061,9 @@ return { mountLab };
   function gmCalc(c) {
     const saved = ch; ch = c;
     try {
-      const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n), lab: levelName(c.skills[n], n) })).filter((x) => x.l !== "U")
+      const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n) + formSkill(n, c), lab: levelName(c.skills[n], n) })).filter((x) => x.l !== "U")
         .sort((a, b) => (b.l === "S") - (a.l === "S") || b.t - a.t);
-      return { skills, dodge: dodge(), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
+      return { skills, dodge: dodge() + formDodge(c), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
     } finally { ch = saved; }
   }
   function gmAdd(list) {
@@ -8053,7 +8102,8 @@ return { mountLab };
       return `<article class="gm-card hud ${inj >= 3 ? "down" : ""}" data-div="${k.div}">
         <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed character")}</b>
           <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span></div></div>
-        <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b>${c.attrs[n]}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div></div>
+        ${formOf(c) ? `<div class="gm-form small"><b>${inForm(c) ? "Full woge" : "Human face"}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${inForm(c) ? "human face" : "full woge"}</button></div>` : ""}
+        <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div></div>
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a Grit point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a Grit point">+</button><span class="small muted">Grit</span></span></div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> rounds${c.play.gun.spares ? `, ${c.play.gun.spares} reload${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.woge ? " · <b style=\"color:var(--bad)\">in woge</b>" : ""}</div>` : c.play.woge ? `<div class="small"><b style="color:var(--bad)">In full woge</b></div>` : ""}
@@ -8071,6 +8121,7 @@ return { mountLab };
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
     if (el.dataset.gmbox) { const i = +el.dataset.gmbox; c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; }
     else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
+    else if ("gmform" in el.dataset) c.play.woge = !inForm(c);
     else if ("gmrm" in el.dataset) gmCrew = gmCrew.filter((x) => x !== c);
     else if ("gmsave" in el.dataset) {
       const name = (c.name.trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLowerCase() || "character") + ".json";
@@ -8147,11 +8198,14 @@ return { mountLab };
     gritty: { table: GRIEVOUS.map((g) => ({ ...g, condition: g.dazed ? "Dazed" : undefined })), enemy: TAKEN_OUT } };
   encPanel = LAB_UI.mountLab({ PACK: ENC_PACK, T: ENC_SETTING.terms, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: null, store, esc, signed, saveText, gritty: () => gritty,
     crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = encPanel; encPanel = null; renderGM(); encPanel = p; },
-    calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n)])), dodge: dodge(), agility: c.attrs.Agility }; } finally { ch = saved; } },
+    // In full woge (play.woge), the woge's numbers; otherwise the human face's.
+    calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n) + formSkill(n, c)])), dodge: dodge() + formDodge(c), agility: c.attrs.Agility + formAttr("Agility", c) }; } finally { ch = saved; } },
     clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
       set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
       add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },
-    injuryNames: INJURY.map((x) => x[0]) });
+    injuryNames: INJURY.map((x) => x[0]),
+    formOf: (c) => { const f = formOf(c); return f ? { name: FORM_T.name, human: FORM_T.human, on: inForm(c), weapon: formWeapon(f), traits: f.traits || [], drawbacks: f.drawbacks || [] } : null; },
+    setForm: (c, on) => { c.play.woge = on; } });
   $("gm-newsession").onclick = () => { gmCrew.forEach((c) => (c.play.duty = gritStart(c))); saveGM(); renderGM(); gmSay("New session: everyone is back to their starting Grit."); };
   let gmClearArmed = false;
   $("gm-clear").onclick = () => {
@@ -8453,6 +8507,10 @@ return { mountLab };
 
   function newOfficer() { load(blank()); applyRoleSkills(); render(); selectTab("create"); toast("New character started."); }
   $("btn-new").onclick = newOfficer;
+  $("sheet-main").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-sheetform]"); if (!b || !formOf()) return;
+    ch.play.woge = b.dataset.sheetform === "1"; $("f-woge").checked = ch.play.woge; save(); renderSheet(); updateTarget();
+  });
   $("banner-new").onclick = newOfficer;
   $("btn-example").onclick = () => { load(example()); toast("Example lawman loaded."); };
   $("btn-save").onclick = () => {
