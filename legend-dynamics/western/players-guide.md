@@ -16,7 +16,7 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Trails of Blood & Dust** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**. What the GM keeps to themselves (job seeds, the monsters' weaknesses and curses, the threats, and the GM's tools) is in a separate book, the **GM's Guide**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Trails of Blood & Dust** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**. The material for running the game (job seeds, the monsters' weaknesses and curses, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.
 
 # Create your character
 
@@ -673,7 +673,7 @@ A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells c
 
 ## Weaknesses
 
-Every monster has a weakness, and finding it is often the whole job. **Occult** identifies a creature and its weakness; the Monster Hunter advantage and the Sighted's Monster's Eye help. A bite or a curse can follow you off the trail, too. The GM knows what each one does; you find out by asking around, by an Occult roll, or the hard way.
+Every monster has a weakness, and finding it is often the whole job. **Occult** identifies a creature and its weakness; the Monster Hunter advantage and the Sighted's Monster's Eye help. Each monster's weakness, and what its bite or curse does, is in the *Monsters* chapter of the GM's Guide.
 
 # Ready-made characters
 

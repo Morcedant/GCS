@@ -3520,8 +3520,8 @@
  "gmGuide": {
   "title": "Trails of Blood & Dust GM's Guide",
   "subtitle": "Running the Gothic Western: jobs, monsters, threats and the GM's tools",
-  "intro": "This book is for the GM. It holds what the players' characters don't know yet: where jobs come from, what every monster fears and what its bite or curse does, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are all in the **Players' Guide**; this book only adds to them.",
-  "playersNote": "What the GM keeps to themselves (job seeds, the monsters' weaknesses and curses, the threats, and the GM's tools) is in a separate book, the **GM's Guide**.",
+  "intro": "This book is for whoever runs the game, and anyone can read it. It gathers what the GM reaches for at the table: job seeds, the monsters' weaknesses and what their bites and curses do, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.",
+  "playersNote": "The material for running the game (job seeds, the monsters' weaknesses and curses, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.",
   "chapters": [
    {
     "title": "Running jobs",
@@ -3531,7 +3531,7 @@
    },
    {
     "title": "Monsters",
-    "intro": "These are the secrets of the monsters in *Monsters and magic* in the Players' Guide. Hand them out as the characters learn them: an Occult roll, a Sighted character's Monster's Eye, a survivor's story, or the hard way.",
+    "intro": "The details behind *Monsters and magic* in the Players' Guide: what each monster fears, and what its bite or curse does. In the story, hunters learn these the hard way: an Occult roll, a Sighted character's Monster's Eye, a survivor's tale, or a fight that goes wrong.",
     "take": [
      "## Weaknesses",
      "## Bites and curses"
@@ -3551,7 +3551,7 @@
    }
   ],
   "leave": {
-   "## Weaknesses": "## Weaknesses\n\nEvery monster has a weakness, and finding it is often the whole job. **Occult** identifies a creature and its weakness; the Monster Hunter advantage and the Sighted's Monster's Eye help. A bite or a curse can follow you off the trail, too. The GM knows what each one does; you find out by asking around, by an Occult roll, or the hard way."
+   "## Weaknesses": "## Weaknesses\n\nEvery monster has a weakness, and finding it is often the whole job. **Occult** identifies a creature and its weakness; the Monster Hunter advantage and the Sighted's Monster's Eye help. Each monster's weakness, and what its bite or curse does, is in the *Monsters* chapter of the GM's Guide."
   },
   "replace": [
    [

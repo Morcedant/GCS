@@ -4,7 +4,7 @@ subtitle: "Running the Gothic Western: jobs, monsters, threats and the GM's tool
 author: "Don Smallwood"
 ---
 
-This book is for the GM. It holds what the players' characters don't know yet: where jobs come from, what every monster fears and what its bite or curse does, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are all in the **Players' Guide**; this book only adds to them.
+This book is for whoever runs the game, and anyone can read it. It gathers what the GM reaches for at the table: job seeds, the monsters' weaknesses and what their bites and curses do, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.
 
 # Running jobs
 
@@ -52,7 +52,7 @@ Roll 3d6 on each table and read the total, or pick what you like. Middle results
 
 # Monsters
 
-These are the secrets of the monsters in *Monsters and magic* in the Players' Guide. Hand them out as the characters learn them: an Occult roll, a Sighted character's Monster's Eye, a survivor's story, or the hard way.
+The details behind *Monsters and magic* in the Players' Guide: what each monster fears, and what its bite or curse does. In the story, hunters learn these the hard way: an Occult roll, a Sighted character's Monster's Eye, a survivor's tale, or a fight that goes wrong.
 
 ## Weaknesses
 
