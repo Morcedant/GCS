@@ -66,8 +66,8 @@ Spend all your Edges. Each one buys:
 | Second advantage | A second general advantage, with no extra complication | 1 |
 | Extra {{point}} | Start every session with 3 {{point}} points instead of 2 | 1 |
 | A friend | A named contact who helps once per {{missionLower}} | 1 |
-| A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
-| Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix | 1 |
+| A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one narrowly defined use of a named skill (see *{{gear}}*) | 1 |
+| Additional Defense | A second defense each round, at −2: Dodge, Parry or Block, in any mix (see *Attacking and defending*) | 1 |
 | Hard to put down | Once per fight, shrug off a telling hit's effect: you still take its boxes (see *Telling hits*) | 1 |
 {{GEN:extra-edges}}
 
@@ -116,7 +116,7 @@ The GM can add others met in play (the creator's GM view has a **Campaign allegi
 
 ## Step 5: Prepare
 
-Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two {{point}} points (three with Extra {{point}}) and your {{gearLower}}. Name your friend or your fine weapon or tool, if you took those Edges. Describe one connection to another player's character.
+Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two {{point}} points (three with Extra {{point}}) and your {{gearLower}}. Name your friend, or your fine weapon or tool and the one narrow use it improves, if you took those Edges. Describe one connection to another player's character.
 
 ### Top 10 connections to another character
 
@@ -138,7 +138,23 @@ A plausible untrained attempt uses attribute −4. Specialized work such as surg
 
 ## {{gear}}
 
-{{gear}} makes tasks possible rather than easier. Ordinary {{gearLower}} grants no blanket bonus; exceptional tools may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
+{{gear}} makes tasks possible rather than easier. Ordinary {{gearLower}} grants no blanket bonus. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
+
+### Fine weapons and tools
+
+A fine weapon or tool grants +2 to one narrowly defined use of a named skill, agreed when chosen. It does not stack with an advantage bonus on the same roll and never improves Dodge, Parry, or Block.
+
+The use is narrower than the skill: the item is fine *at something*. A use that would apply to almost every roll made with the item is too broad.
+
+| Fine item | Narrow use (+2) | Not covered |
+|---|---|---|
+| A rifle with a telescopic sight | Aimed shots at Long range or farther | Snap shots, anything at Close or Short |
+| A watchmaker's instruments | Delicate repairs: clockwork, locks, small mechanisms | Forcing, breaking or building anything large |
+| A surgeon's instruments | Field treatment of a wound: stitching, dressing, setting | Diagnosis, emergency stabilization |
+| A great axe of old make | Breaking a shield, a door or a weapon | Ordinary attacks |
+| **Too broad:** "my rifle: +2 to {{rangedSkill}}", "my kit: +2 to Medicine" | | |
+
+When a roll qualifies for both the fine item and an advantage, take +2 once.
 
 {{GEN:gear}}
 
@@ -206,9 +222,10 @@ Act in descending Agility order. Players choose the order of tied characters; th
 
 Roll {{rangedSkill}} for a ranged attack, {{meleeSkill}} for a weapon in hand, or {{unarmedSkill}} for fists and grappling. If the attack succeeds, an aware target able to move may **defend**: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.
 
-- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits. The **Additional Defense** Edge gives a second.
+- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits.
+- **Additional Defense.** With this Edge you may attempt a second defense each round at −2, in addition to attack-quality and injury penalties. You cannot defend twice against the same attack.
 - **Dodge** is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert.
-- **Parry.** Against a weapon in hand or fists, roll {{meleeSkill}} −3 with a weapon in hand, or {{unarmedSkill}} −3 bare-handed against fists. An open hand can't parry a blade, claws or fangs. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a shot or a missile.
+- **Parry.** Against a weapon in hand or fists, roll {{meleeSkill}} −3 with a weapon in hand, or {{unarmedSkill}} −3 bare-handed against fists. An open hand can't parry a blade, claws or fangs. Nobody parries a shot or a missile.
 - **Block.** With a shield, or anything that can stand in for one (a chair, a plank, a crate lid), you can block a weapon in hand, fists, or a thrown or loosed missile: roll {{meleeSkill}} −2, plus the shield's bonus. Nothing you can lift blocks a gunshot or a blast. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
 - **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. An advantage that rewards aiming adds its bonus to this.
@@ -226,14 +243,14 @@ A really good shot, or a blow that lands exactly where it was meant to, lets the
 | Effect | What happens |
 |---|---|
 | Disarm | The weapon or held item drops, or flies a few yards away |
-| Knock down | The target falls prone, or is driven back a few steps |
-| Pin | The target is held, tangled or pinned down: their next action goes to getting free |
+| Knock down | The target falls prone, or is driven back a few steps. Standing up uses the target's move on their next turn; they still take their action |
+| Pin | The target is held, tangled or pinned down. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack |
 | Rattle | −2 to the target's next roll |
-| Break gear | A shield, weapon or tool breaks; armor loses 1 protection until it's repaired |
+| Break gear | A weapon, shield or tool is knocked out of use (jammed, bent, unstrung, cracked) until its owner spends an action putting it right. It's destroyed for good only if it was already vulnerable (a rotten haft, an improvised shield) or the attacker has a weakness to exploit. Armor loses 1 protection until it's repaired |
 | Open them up | The next attack on this target this round gets +2 |
-| Precise | You hit exactly what you aimed at: the lantern, the rope, the tire, the hand on the trigger |
+| Precise | You hit exactly what you aimed at: the lantern, the rope, the tire, the hand on the trigger. It changes the situation, never the rules: no extra boxes, no getting past a defense, no instant death |
 
-**Limits.** A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a bear or knocks down a train, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next, like sending one crashing into another.
+**Limits.** A telling hit never adds boxes and never gets past a defense. It never kills outright, disables a character for good, or destroys exceptional equipment: those come only from injury, from the *Dying and death* rules, or from an established weakness. The effect has to make sense: nobody disarms a bear or knocks down a train, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next, like sending one crashing into another.
 
 **Staying alive.** A character on the receiving end can shrug off a telling hit's effect with **Hard to put down** (once per fight) or by spending {{a:point}} point. Either way, they still take the boxes.
 
@@ -298,7 +315,7 @@ The GM view of the character creator has a **battle map** for fights where it he
 
 ## The Encounter panel
 
-The GM view also has an **Encounter** panel that runs a fight by these rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round), the boxes marked and any telling hit, offering {{a:point}} point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so.{{GEN:materials-note}}
+The GM view also has an **Encounter** panel that runs a fight by these rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit, offering {{a:point}} point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so.{{GEN:materials-note}}
 
 {{GEN:discovery-panel}}
 
@@ -313,11 +330,20 @@ Roll Medicine when the diagnosis is uncertain or an urgent treatment decision ma
 
 ## Field treatment
 
-With {{a:medkit}} and several uninterrupted minutes, successful Medicine removes one injury box; success by 5 or more removes two. Each injury receives one field-treatment attempt; further attempts need changed circumstances.
+With {{a:medkit}} and several uninterrupted minutes, successful Medicine removes one injury box; success by 5 or more removes two.
 
 ## Proper care
 
 {{facility}} grants +2 to Medicine. A successful treatment removes two boxes; success by 5 or more removes three. Allow the time the treatment requires.
+
+## Treatment attempts
+
+Each set of injuries permits one field-treatment attempt and one proper-care attempt. Further rolls require a meaningful improvement in care, a new treatment, or recovery time. Simply waiting and trying again is insufficient.
+
+- **A set of injuries** is the injury boxes from one encounter or one harmful incident: a fight, a fall, a fire, a night of exposure.
+- **Later injuries start a new set.** Its attempts can remove only its own boxes. A fresh scratch doesn't reopen the wounds you already treated: those boxes stay until their own set allows another roll, or rest clears them.
+- **What allows another roll:** a meaningful improvement (moving from the field to {{facility}}, a better healer taking over), a new treatment (surgery, a remedy, healing magic), or recovery time (rest that has already cleared a box from that set). The GM decides whether a change is meaningful.
+- **Stabilization is separate.** Stopping someone Dying is never limited by these attempts and never removes boxes; a treatment roll that removes boxes also stabilizes.
 
 ## Natural recovery
 
@@ -480,6 +506,8 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 # Quick reference
 
+**Fine weapon or tool:** +2 to one narrow, agreed use of a skill; never with an advantage on the same roll; never to Dodge, Parry or Block.
+
 **Creation:** attributes start at 10, adjusted by {{originLower}} (always totaling zero), plus 5 points; maximum 13 plus any {{originLower}} bonus. {{edgePoints}} points split between {{originLower}} tier and Edges. {{pathRounded}}: one Specialty and nine Trained. {{pathExpert}}: one Expert at +5 and seven Trained. One advantage (general or {{originLower}}) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert ({{pathExpert}}) = attribute +5.
@@ -492,9 +520,9 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Clocks:** 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).
 
-**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural 3–4): the attacker picks an effect; called shot −2 (small target −4). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
+**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit; Additional Defense: a second, at −2) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural 3–4): the attacker picks an effect, which never adds boxes or kills outright; called shot −2 (small target −4). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
 
-**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone's care).
+**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Each set of injuries (one fight or incident) gets one field and one proper-care attempt; more need better care, a new treatment or recovery time. Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone's care).
 
 **{{point}}:** start each session with two. Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.
 

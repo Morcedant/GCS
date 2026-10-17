@@ -803,6 +803,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide" id="contact-wrap" hidden><label for="f-contact">A friend (Edge)</label><input type="text" id="f-contact" placeholder="Who, and what they can do for you"></div>
             <div class="field" id="gear-wrap" hidden><label for="f-gearitem">Fine weapon or tool (Edge)</label><input type="text" id="f-gearitem" placeholder="e.g. An heirloom weapon"></div>
             <div class="field" id="gearskill-wrap" hidden><label for="f-gearskill">+2 to</label><select id="f-gearskill"></select></div>
+            <div class="field wide" id="gearuse-wrap" hidden><label for="f-gearuse">Only for (one narrow use, agreed with the GM)</label><input type="text" id="f-gearuse" placeholder="e.g. Aimed shots at Long range or farther"></div>
             <div id="xedge-fields" style="display:contents"></div>
             <div class="field wide"><label for="f-otherequip">Other {{gearLower}}</label><input type="text" id="f-otherequip" placeholder="Anything else you carry"></div>
             <div class="field wide"><label for="f-connection">Connection to another character</label>
@@ -1064,6 +1065,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <label id="r-phys-wrap"><input type="checkbox" id="r-phys"> <span id="r-phys-label">Physical action (injury penalty)</span></label>
             <label><input type="checkbox" id="r-stun"> {{stun}} −2</label>
             <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> <span id="r-aim-label">Aimed at this target</span></label>
+            <label id="r-second-wrap" hidden><input type="checkbox" id="r-second"> <span id="r-second-label">Second defense this round</span></label>
+            <label id="r-fine-wrap" hidden><input type="checkbox" id="r-fine"> <span id="r-fine-label">Fine weapon or tool +2</span></label>
           </div>
           <div class="btn-row"><button class="btn primary" id="r-roll">Roll</button>
             <span class="muted small" id="r-target"></span></div>
@@ -1175,8 +1178,8 @@ tr.lvl-U td.target { color: var(--muted); }
     ["adv2", "Second advantage", "A second general advantage, with no extra complication.", 1],
     ["grit", `Extra ${T.point}`, `Start every session with 3 ${T.point} points instead of 2.`, 1],
     ["contact", "A friend", "A named contact who helps once per " + T.missionLower + ".", 1],
-    ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a fine kit: +2 to one skill when it's used.", 1],
-    ["extradefense", "Additional Defense", "A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2.", 1],
+    ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a fine kit: +2 to one narrowly defined use of a named skill, agreed with the GM. Not with an advantage on the same roll; never to Dodge, Parry or Block.", 1],
+    ["extradefense", "Additional Defense", "A second defense each round at −2 (Dodge, Parry or Block, in any mix), on top of attack-quality and injury penalties. Never twice against the same attack.", 1],
     ["survivor", "Hard to put down", "Once per fight, shrug off a telling hit's effect. You still take its boxes.", 1],
     ...(PACK.extraEdges || []), // a setting's own Edges, e.g. Stronger Power
   ];
@@ -1263,7 +1266,7 @@ tr.lvl-U td.target { color: var(--muted); }
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
-      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" }, edgeNotes: {},
+      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "", use: "" }, edgeNotes: {},
       allegiance: "", allegianceDef: null, customTier: 1, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
@@ -1321,7 +1324,7 @@ tr.lvl-U td.target { color: var(--muted); }
     out.edges = Object.fromEntries(EDGE_DEFS.map(([k, , , max]) => [k, Math.max(0, Math.min(max, parseInt((c.edges || {})[k], 10) || 0))]));
     out.adv2 = { id: "", detail: "", ...(c.adv2 || {}) };
     if (!ADVANTAGES.some((a) => a[0] === out.adv2.id)) out.adv2.id = "";
-    out.gear = { item: "", skill: "", ...(c.gear || {}) };
+    out.gear = { item: "", skill: "", use: "", ...(c.gear || {}) };
     out.allegianceDef = Array.isArray(c.allegianceDef) && c.allegianceDef.length === 4 ? c.allegianceDef.map((x) => String(x ?? "")) : null;
     if (!allegiances(out).some((a) => a[0] === out.allegiance)) out.allegiance = "";
     out.customTier = [0, 1, 2, 3].includes(+out.customTier) ? +out.customTier : 1;
@@ -1445,7 +1448,7 @@ tr.lvl-U td.target { color: var(--muted); }
     step: () => [`${cap1(MW.bursts)} and ${MW.step === "step" ? "Boosts" : cap1(MW.step) + "s"}`, (MW.help?.step || `<p>Your ${MW.step} comes from ${MW.steps || "your magic skill"}.</p>`) +
       `<p>Each ${MW.step} above the first gives <b>one Boost</b>, chosen when you cast: Harder, Wider, Longer or Farther. Each Boost you spend is <b>−1 to the roll</b>, so you can always hold back.</p>`],
     boost: () => ["Boosts", `<p>Choose when you cast; each one is <b>−1 to the roll</b>. You can spend fewer, or none.</p><ul>
-      <li><b>Harder:</b> +1 box, or the penalty goes −2 to −3 (two Boosts: +2 boxes, or −4)</li><li><b>Wider:</b> a handful of targets (two: a crowd or an area)</li>
+      <li><b>Harder:</b> +1 box, or the penalty goes −2 to −3 (two Boosts: +2 boxes, or −4). Never more than 3 boxes on one target.</li><li><b>Wider:</b> a handful of targets (two: a crowd or an area)</li>
       <li><b>Longer:</b> a day (two: until it's lifted)</li><li><b>Farther:</b> one range band farther (two: two bands)</li></ul>${MW.help?.boost || ""}`],
     price: () => ["The price", `<p>A failed ${MW.burst} marks <b>${MW.price}</b>. A natural 18 marks two, or something answers that shouldn't.</p>${MW.help?.price || ""}`],
     charms: () => [cap1(MW.charms), `<p>A ${MW.charm} is a ${MW.working} worked <b>in advance</b> and stored in an object. Break it to release it: <b>one action, no roll</b>.</p><p>${MW.help?.charms || `You can carry as many ready ${MW.charms} as your ${MW.skill} training allows: Trained 2, Specialty 3, Expert 4.`}</p>`],
@@ -1454,7 +1457,7 @@ tr.lvl-U td.target { color: var(--muted); }
     deeper: () => [`Deeper ${MW.step}`, `<p>One ${MW.burst} you know works one ${MW.step} deeper than your ${MW.skill} allows: <b>one more Boost</b> with it. Once per ${MW.burst}.</p>` + ADV_NOTE],
     charm: () => [`Another ${MW.charm}`, `<p>Carry one more ready ${MW.charm}. Up to 2 extra.</p>` + ADV_NOTE],
     heart: () => ["By heart", `<p>One kind of ${MW.working} (wards, curses, questions of the dead) takes <b>one fewer segment</b>, to a minimum of 1. Once per kind. Write the kinds you know by heart here.</p>` + ADV_NOTE],
-    quicker: () => ["Quicker hand", `<p>One ${MW.working} you know goes <b>one pace faster</b>: an hour a roll becomes ten minutes, ten minutes becomes one action. Once per ${MW.working}. Write each one and its new pace here.</p>` + ADV_NOTE],
+    quicker: () => ["Quicker hand", `<p>For one specific ${MW.working}, the time between rolls drops one step: an hour becomes ten minutes, ten minutes becomes one minute. Never faster than one minute a roll. The clock and the rolls it needs stay the same, and releasing it in a fight still needs a ${MW.charm}. Once per ${MW.working}. Write each one and its new pace here.</p>` + ADV_NOTE],
     mastery: () => [MW.masterName || "Mastery", `<p>${cap1(MW.skill)} becomes <b>Expert (+5)</b>: more ${MW.bursts} known, a deeper ${MW.step}, and more ready ${MW.charms}.</p><p><b>Once, at the end of a long campaign</b>, with the GM's approval. It needs ${MW.skill} as a Specialty first.</p>`],
   };
   const helpBtn = (key) => `<button type="button" class="help" data-help="${key}" aria-label="About ${esc(HELP[key]()[0])}" aria-expanded="false">?</button>`;
@@ -1530,7 +1533,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const POOL = pool(), ea = edgesAvail(), es = edgesSpent();
     const edgeNeeds = [edgeN("adv2") && !ch.adv2.id ? "choose the second advantage" : "", edgeN("adv2") && ADVANTAGES.find((a) => a[0] === ch.adv2.id)?.[4] && !ch.adv2.detail.trim() ? "finish the second advantage" : "",
       edgeN("contact") && !ch.contact.trim() ? "name your friend" : "",
-      ...XEDGE_NOTES.filter(([k]) => edgeN(k) && !(ch.edgeNotes[k] || "").trim()).map(([, , , , d]) => d.missing || "describe " + d.label.toLowerCase()), edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill) ? "describe the fine weapon or tool and its skill" : ""].filter(Boolean);
+      ...XEDGE_NOTES.filter(([k]) => edgeN(k) && !(ch.edgeNotes[k] || "").trim()).map(([, , , , d]) => d.missing || "describe " + d.label.toLowerCase()), edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill && (ch.gear.use || "").trim()) ? "describe the fine weapon or tool, its skill and its one narrow use" : ""].filter(Boolean);
     const horrorOff = heritageOf()?.restricted && !horrorOn();
     return [
       [!!ch.name.trim(), ch.name.trim() ? "Name entered" : "Enter a name"],
@@ -1656,7 +1659,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
     EQUIPMENT.forEach(([k]) => ($("eq-" + k).checked = !!ch.equipment[k]));
     $("f-stunned").checked = !!ch.play.stunned;
-    $("f-contact").value = ch.contact; $("f-gearitem").value = ch.gear.item; $("f-adv2detail").value = ch.adv2.detail;
+    $("f-contact").value = ch.contact; $("f-gearitem").value = ch.gear.item; $("f-gearuse").value = ch.gear.use || ""; $("f-adv2detail").value = ch.adv2.detail;
   }
 
   function render() {
@@ -1726,7 +1729,7 @@ tr.lvl-U td.target { color: var(--muted); }
       $("xedge-fields").innerHTML = xf.map(([k, , , , d]) => `<div class="field wide"><label for="f-xedge-${k}">${esc(d.label)} (Edge)</label><input type="text" id="f-xedge-${k}" data-xedge="${k}" placeholder="${esc(d.placeholder || "")}"></div>`).join("");
     }
     xf.forEach(([k]) => { const el = $("f-xedge-" + k); if (el && document.activeElement !== el) el.value = ch.edgeNotes[k] || ""; });
-    $("gear-wrap").hidden = $("gearskill-wrap").hidden = !edgeN("gear");
+    $("gear-wrap").hidden = $("gearskill-wrap").hidden = $("gearuse-wrap").hidden = !edgeN("gear");
     $("f-gearskill").value = ch.gear.skill;
     const al = allegianceOf();
     $("f-allegiance").innerHTML = allegiances().map(([id, n]) => `<option value="${esc(id)}">${esc(n)}</option>`).join("");
@@ -1827,7 +1830,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("st-grit").textContent = gritStart();
     $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`
       + (CR.parry ? `. Parry = ${PARRY.map(([s]) => `${s} ${skillTarget(s)} ${signed(CR.parry.mod)} = ${parryOf(s)}`).join(", or ")}` : "")
-      + (CR.oneDefense ? `. ${defensesPerRound() > 1 ? `${["", "One", "Two", "Three"][defensesPerRound()] || defensesPerRound()} defenses a round (Additional Defense)` : "One defense a round"}: Dodge${CR.parry ? ", Parry" : ""}${CR.block ? " or Block" : ""}.` : "");
+      + (CR.oneDefense ? `. ${defensesPerRound() > 1 ? `${["", "One", "Two", "Three"][defensesPerRound()] || defensesPerRound()} defenses a round (Additional Defense: the second at ${signed(CR.oneDefense.extraPenalty || 0)})` : "One defense a round"}: Dodge${CR.parry ? ", Parry" : ""}${CR.block ? " or Block" : ""}.` : "");
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
@@ -1951,7 +1954,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([k, n, eff]) => { const t = spellTier(k); return `<b>${esc(n)}${t >= 0 ? ` (${SPELLS.tiers[t]}, ${boostText(t)})` : ""}:</b> ${esc(eff)}`; }).join("<br>")}${SPELLS.tiers ? `<br><span class="small muted">${helpBtn("boost")} Boosts, chosen as you cast, each −1 to the roll: Harder (+1 box or −1 more), Wider (a handful, then a crowd), Longer (a day, then until lifted), Farther (one range band).</span>` : ""}</span></div>` : ""}
         ${MAGIC && MAGIC.charms && ch.skills[MAGIC.skill] && ch.skills[MAGIC.skill] !== "U" && charmsOK() ? `<div class="field"><span class="label">Ready ${charmWord()}${helpBtn("charms")}</span><span>${readyCharms()}</span></div>` : ""}
         ${MAGIC && (ch.magic.heart || ch.magic.quicker) ? `<div class="field wide"><span class="label">Ritual mastery</span><span>${ch.magic.heart ? "<b>By heart:</b> " + esc(ch.magic.heart) : ""}${ch.magic.heart && ch.magic.quicker ? "<br>" : ""}${ch.magic.quicker ? "<b>Quicker hand:</b> " + esc(ch.magic.quicker) : ""}</span></div>` : ""}
-        ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 ${esc(ch.gear.skill)})` : ""}</span></div>` : ""}
+        ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 to ${esc(ch.gear.skill)}${ch.gear.use ? ` for ${esc(ch.gear.use)}` : ""})` : ""}</span></div>` : ""}
         ${al ? `<div class="field"><span class="label">Allegiance: ${esc(al[1])}</span><span class="small">${esc(al[2])}</span><span class="small muted">${esc(al[3])}</span></div>` : ""}
       </div>`; })()}
       <div class="fields">
@@ -2109,12 +2112,15 @@ tr.lvl-U td.target { color: var(--muted); }
     const parts = [];
     const mod = +$("r-mod").value; if (mod) parts.push(mod);
     const asst = +$("r-assist").value; if (asst) parts.push(asst);
-    if ($("r-adv").checked && !$("r-adv").disabled) parts.push(2);
+    // An advantage and a fine weapon or tool don't stack: +2 once, whichever applies.
+    if (($("r-adv").checked && !$("r-adv").disabled) || ($("r-fine").checked && !$("r-fine-wrap").hidden)) parts.push(2);
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
     if (CR.attackQualityDodge && isDefense(name)) parts.push(+$("r-quality").value || 0);
-    if (CR.parry && isParry(name)) parts.push((+$("r-parries").value || 0) * CR.parry.repeatPenalty);
+    if (CR.parry && CR.parry.repeatPenalty && isParry(name)) parts.push((+$("r-parries").value || 0) * CR.parry.repeatPenalty);
+    // Additional Defense: a second defense in a round is at −2 (core), on top of attack quality and injury.
+    if (CR.oneDefense && CR.oneDefense.extraPenalty && isDefense(name) && !$("r-second-wrap").hidden && $("r-second").checked) parts.push(CR.oneDefense.extraPenalty);
     if (CR.aim && !$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(CR.aim.bonus);
     // An ability like Know its weakness: no called-shot penalty against a creature the character has identified.
     if (!$("r-called-wrap").hidden && +$("r-called").value && !($("r-weak").checked && !$("r-weak-wrap").hidden)) parts.push(+$("r-called").value);
@@ -2142,7 +2148,12 @@ tr.lvl-U td.target { color: var(--muted); }
     updateInjuryToggle();
     const sk = $("r-skill").value || "";
     $("r-quality-wrap").hidden = !(CR.attackQualityDodge && isDefense(sk));
-    $("r-parries-wrap").hidden = !(CR.parry && isParry(sk) && defensesPerRound() > 1);
+    $("r-parries-wrap").hidden = !(CR.parry && CR.parry.repeatPenalty && isParry(sk) && defensesPerRound() > 1);
+    $("r-second-wrap").hidden = !(CR.oneDefense && CR.oneDefense.extraPenalty && isDefense(sk) && defensesPerRound() > 1);
+    $("r-second-label").textContent = `Second defense this round ${signed(CR.oneDefense?.extraPenalty || 0)}`;
+    // A fine weapon or tool: only its named skill, only its narrow use (the player ticks it), never a defense.
+    $("r-fine-wrap").hidden = !(edgeN("gear") && ch.gear.skill && sk === ch.gear.skill && !isDefense(sk));
+    $("r-fine-label").textContent = `${ch.gear.item || "Fine weapon or tool"} +2${ch.gear.use ? `: only for ${ch.gear.use.toLowerCase()}` : ""} (not with an advantage)`;
     $("r-aim-wrap").hidden = !(CR.aim && [T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk));
     $("r-called-wrap").hidden = ![T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk);
     $("r-weak-wrap").hidden = $("r-called-wrap").hidden || !+$("r-called").value || !hasFx("freeCalledShot");
@@ -2244,7 +2255,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (textMap[id]) { ch[textMap[id]] = e.target.value; touch(); render(); return; }
     const sub = { "f-advname": ["adv", "name"], "f-advtext": ["adv", "text"], "f-advdetail": ["adv", "detail"],
       "f-compname": ["comp", "name"], "f-comptext": ["comp", "text"], "f-comptrigger": ["comp", "trigger"],
-      "f-gearitem": ["gear", "item"], "f-adv2detail": ["adv2", "detail"],
+      "f-gearitem": ["gear", "item"], "f-gearuse": ["gear", "use"], "f-adv2detail": ["adv2", "detail"],
       "f-sadvname": ["sadv", "name"], "f-sadvtext": ["sadv", "text"], "f-scompname": ["sadv", "compName"], "f-scomptext": ["sadv", "compText"] }[id];
     if (sub) { ch[sub[0]][sub[1]] = e.target.value; touch(); render(); return; }
     if (e.target.dataset && e.target.dataset.al && ch.allegiance === "custom") { ch.allegianceDef[+e.target.dataset.al] = e.target.value; touch(); render(); return; }
@@ -2350,7 +2361,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);

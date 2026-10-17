@@ -2188,7 +2188,8 @@
    },
    "gear": {
     "item": "His surgeon's instruments",
-    "skill": "Medicine"
+    "skill": "Medicine",
+    "use": "field treatment of a wound: stitching, dressing, setting a bone"
    },
    "contact": "The editor of the territorial newspaper, who owes him a life",
    "equipment": {
@@ -2357,7 +2358,8 @@
    },
    "gear": {
     "item": "A Sharps rifle with a telescopic sight",
-    "skill": "Shooting"
+    "skill": "Shooting",
+    "use": "aimed shots at Long range or farther"
    },
    "play": {
     "gun": {
@@ -2522,7 +2524,7 @@
    [
     "chill",
     "Grave Chill",
-    "The target rolls Will or flees or freezes."
+    "The target flees or freezes (Will resists)."
    ],
    [
     "hold",
@@ -2532,7 +2534,7 @@
    [
     "misfire",
     "Misfire",
-    "One gun jams or one lamp gutters out; clearing a jam takes an action."
+    "One gun jams or one lamp gutters out; clearing a jam takes an action. No defense or resistance: it works on the gun or the lamp, not the person."
    ],
    [
     "shroud",
@@ -2547,10 +2549,10 @@
    [
     "stanch",
     "Stanch",
-    "Stop the bleeding: clear one injury box, once per wound."
+    "Stop the bleeding: clear one injury box, once per set of injuries."
    ]
   ],
-  "note": "Only a Sorcerer casts hexes. One action and an Occult roll, −1 for each Boost you spend (Specialty 1 Boost, Expert 2); the target resists where it makes sense. A failed hex marks a box of The Dark; a natural 18 marks two, or something answers."
+  "note": "Only a Sorcerer casts hexes. One action and an Occult roll, −1 for each Boost you spend (Specialty 1 Boost, Expert 2); each hex says whether Dodge applies or which attribute resists. A failed hex marks a box of The Dark; a natural 18 marks two, or something answers."
  },
  "magic": {
   "skill": "Occult",
@@ -3721,7 +3723,7 @@
     "vampire",
     "Vampire",
     "A stake through the heart incapacitates it; fire, sunlight and beheading destroy it; holy symbols hold it back; it can't enter uninvited.",
-    "A called shot with a stake at the heart (a telling hit pins it); hunting it by day; refusing it entry."
+    "A called shot with a stake at the heart: its weakness, which incapacitates it (an established weakness, not a telling-hit pin); hunting it by day; refusing it entry."
    ],
    [
     "zombie",

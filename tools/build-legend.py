@@ -145,7 +145,7 @@ def char_block(c, pack, t, heading):
     if c.get("edges", {}).get("contact") and c.get("contact"):
         extra.append(f"a friend: {lc(c['contact'])}")
     if c.get("edges", {}).get("gear") and c.get("gear", {}).get("item"):
-        extra.append(f"a fine tool: {lc(c['gear']['item'])} (+2 {c['gear']['skill']})")
+        extra.append(f"a fine tool: {lc(c['gear']['item'])} (+2 to {c['gear']['skill']} for {c['gear'].get('use') or 'one narrow use'})")
     if heading and edges:
         lines.append(f"- **Edges:** {', '.join(edges)}{'; ' + '; '.join(extra) if extra else ''}.")
     elif extra:
@@ -189,10 +189,15 @@ def magic_chapter(m, title=None):
                [f"**{cap(Ws)}**", "Minutes to nights", "Anything else. Describe the effect; the GM sets its weight; fill a progress clock."],
                [f"**{cap(Cs)}**", "One action, no roll", f"A finished {W} stored in an object, released by breaking it."]]), "",
            f"## {cap(Bs)}", "",
-           f"Each {B} has a short **base effect**: one target, for one scene, at Close or Short range. Harm marks 2 boxes; a penalty is −2; the target resists with an attribute where it makes sense.", "",
+           f"Each {B} has a short **base effect**: one target, for one scene, at Close or Short range. Harm marks 2 boxes; a penalty is −2.", "",
+           f"**Defense or resistance.** A hostile {B} says in its description how its target avoids it: **a defense** or **a resistance**, never both, and never chosen at the moment of casting.", "",
+           f"- **A defense** (\"Dodge applies\"): the {B} is an attack, and the casting roll is the attack roll. If it succeeds, the target may defend as against any attack, using their one defense a round, and **attack quality applies** from the casting margin: succeeded by 3–4, the defense is at −1; by 5–6, −2; by 7 or more, −3.",
+           f"- **A resistance** (\"Will resists\", \"Body resists\"): a contest between the casting roll and the target's roll on that attribute, by the usual contest rules (a success beats a failure; if both succeed, the larger margin wins; ties go to the target). Attack quality doesn't apply: the casting margin already counts in the contest. The target's injury penalty applies only when the resistance is physical (Body).",
+           f"- **Neither** (a {B} on an object, or on a willing target): it simply works on a success.", "",
+           f"**Harm limit.** Magic at personal scale marks **at most 3 boxes** on any one target from one {B}, {W} or {C}, whatever its Boosts. Magical harm follows the *Injury* rules like a weapon's: a hit of 2 or more boxes that brings someone to three boxes leaves them Dying. Boosts beyond the limit go to the other dimensions: range, duration, or more targets.", "",
            f"**Boosts.** Your {m['step']} sets your power ({m['steps']}). Each {m['step']} above the first gives **one Boost**, chosen **as you cast**. Each Boost you spend is **−1 to the roll**, so you can always hold back.", "",
            table(["Boost", "One Boost", "Two Boosts"], [
-               ["**Harder**", "+1 box, or the penalty becomes −3", "+2 boxes, or −4"],
+               ["**Harder**", "+1 box (3 at most), or the penalty becomes −3", "+2 boxes (3 at most), or −4"],
                ["**Wider**", "A handful of targets", "A crowd, or an area"],
                ["**Longer**", "A day", "Until it's lifted"],
                ["**Farther**", "One range band farther", "Two bands farther"]]), "",
@@ -203,8 +208,10 @@ def magic_chapter(m, title=None):
            f"3. **It happens** when the clock is full. A {W} interrupted with energy gathered may go wrong.", "",
            table(["Weight", "Segments", "Scale"], [["Minor", "2", "One person, one night, one small thing"], ["Significant", "4", "A household, a building, a question answered"], ["Major", "6", "A bloodline, a town, a demon bound"]]), "",
            "**Trappings.** The right materials, hour or place remove one segment.", "",
+           f"**Too slow for a fight.** A {W} takes a minute a roll at the very fastest. To use one in combat, finish it beforehand and store it in a {C}.", "",
            f"## {cap(Cs)}", "",
-           f"Work a {W} in advance and store it in an object; break it (one action, no roll) to release it. " + m.get("charmLimit", f"Carry as many ready {Cs} as your {train} training allows: **Trained 2, Specialty 3, Expert 4**.") + " Preparation is how slow magic wins a fast fight.", ""]
+           f"Work a {W} in advance and store it in an object; break it (one action, no roll) to release it. " + m.get("charmLimit", f"Carry as many ready {Cs} as your {train} training allows: **Trained 2, Specialty 3, Expert 4**.") + " Preparation is how slow magic wins a fast fight.", "",
+           f"**A {C} skips the casting roll, not the target's chance.** Whatever a target could dodge or resist when the magic is cast, they can dodge or resist when it comes from a {C}. With no casting roll, a {C} counts as **a success by 0**: against a defense, the target defends with no attack-quality penalty; against a resistance, the target resists by succeeding on their roll (a tie goes to the target, as in any contest). A {C} never marks more than 3 boxes on one target.", ""]
     if m.get("advance") != []:
         out += ["## Magic advancement", "",
            f"A magical character can spend advancement points (see *Advancement*) on these, with the GM's approval and a reason from the story. {'' if title else 'Each setting says which it uses.'}", "",
@@ -213,7 +220,7 @@ def magic_chapter(m, title=None):
                ("deeper", [f"Deeper {m['step']}", f"One {B} you know works one {m['step']} deeper: one more Boost", "2", f"Each {B} once"]),
                ("charm", [f"Another {C}", f"Carry one more ready {C}", "1", "Up to 2 extra"]),
                ("heart", ["By heart", f"One kind of {W} takes one fewer segment (minimum 1)", "1", "Each kind once"]),
-               ("quicker", ["Quicker hand", f"One {W} you know goes one pace faster: an hour becomes ten minutes, ten minutes one action", "1", f"Each {W} once"]),
+               ("quicker", ["Quicker hand", f"Reduce the interval between rolls for one specific {W} by one step (an hour to ten minutes, ten minutes to one minute), to a minimum of one minute. Its clock and required rolls remain unchanged. Combat release requires a {C}.", "1", f"Each {W} once"]),
                ("mastery", [m.get("masterName", "Mastery"), f"{cap(m['skill'])} becomes Expert (+5)", "4", "Once, at the end of a long campaign"])]
                if key in m.get("advance", ["new", "deeper", "charm", "heart", "quicker", "mastery"])]), ""]
     if m.get("dials"):
@@ -511,11 +518,11 @@ def quickref(pack, t):
     core = [["Resolution", "3d6 at or below adjusted skill. Natural 3–4 always succeeds; 17–18 always fails. Margin = target − roll."],
             ["Opposed", "Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender."],
             ["Combat", "Move a short distance and take one action. Hit → target may defend once per round: Dodge, Parry or Block → weapon effect. Partial cover −2."],
-            ["Defending", "One defense a round (two with Additional Defense). Dodge: Agility −2 + Athletics. Parry a weapon in hand or fists: " + t["meleeSkill"] + " or " + t["unarmedSkill"] + " −3; a second parry −2 more. Block a weapon in hand, fists or a missile with a shield or anything that stands in for one: " + t["meleeSkill"] + " −2 + the shield's bonus (never a gunshot or blast); an improvised one breaks on a 2+ box hit. Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target."],
-            ["Telling hit", "Hit by 5+ or a natural 3–4, not defended: the attacker picks one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, precise). Called shot: −2 (small target −4), and any hit gets the effect. No extra boxes. Shrug it off: Hard to put down (once a fight) or a point."],
+            ["Defending", "One defense a round; Additional Defense: a second, at −2, never twice against one attack. Dodge: Agility −2 + Athletics. Parry a weapon in hand or fists: " + t["meleeSkill"] + " or " + t["unarmedSkill"] + " −3. Block a weapon in hand, fists or a missile with a shield or anything that stands in for one: " + t["meleeSkill"] + " −2 + the shield's bonus (never a gunshot or blast); an improvised one breaks on a 2+ box hit. Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target."],
+            ["Telling hit", "Hit by 5+ or a natural 3–4, not defended: the attacker picks one effect (disarm; knock down: standing uses their move; pin: their next action frees them; rattle −2; break gear: out of use until an action fixes it; open them up +2; precise). Called shot: −2 (small target −4), and any hit gets the effect. No extra boxes, never an outright kill. Shrug it off: Hard to put down (once a fight) or a point."],
             ["Range", "Close 10 yd, Short 50 yd, Medium 150 yd, Long 500 yd, Extreme 1 mile. Within a weapon's effective band: no penalty; one band beyond −2, two −4, farther out of range. Move: Close; run (no action): Short."],
             ["Dying", f"A 2-box weapon that brings you to 3 boxes: Dying; dead at the end of the scene unless stabilized (one action, Medicine, {t['medkit']}). At 3 boxes, another 2-box hit kills."],
-            ["Medicine", "Stabilize: one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2, clears 2 (3 on margin 5+)."],
+            ["Medicine", "Stabilize: one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2, clears 2 (3 on margin 5+). One field and one proper-care attempt per set of injuries (one fight or incident); more need better care, a new treatment or recovery time."],
             ["Rest", "Clearing one box: a full day at 1 box, at least three days at 2, a week at 3 (and only once someone has stabilized or treated you)."],
             [t["point"], "Reroll (keep second), reduce an injury by one box, shrug off a telling hit, or establish a small preparation."]]
     return "".join(f"\n            <dt>{html.escape(a)}</dt><dd>{html.escape(b)}</dd>" for a, b in core + pack.get("quickRef", [])) + "\n          "

@@ -2742,12 +2742,12 @@
    "Fifth Circle",
    "Sixth Circle"
   ],
-  "note": "Your Cantrips power's Class is your Circle, and every cantrip works at it: Class II is the Second Circle. Casting takes one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense. A failed cast marks a box of Strain. Swap one cantrip between cases with a week of study.",
+  "note": "Your Cantrips power's Class is your Circle, and every cantrip works at it: Class II is the Second Circle. Casting takes one action and a Powers roll; each cantrip says whether Dodge applies or which attribute resists. A failed cast marks a box of Strain. Swap one cantrip between cases with a week of study.",
   "list": [
    [
     "bolt",
     "Bolt",
-    "A mystic blast: an attack at the power's Class, effective at Short range."
+    "A mystic blast: an attack at the power's Class, effective at Short range. Dodge applies, and the target's Defense counts against its Class."
    ],
    [
     "shield",
@@ -2772,7 +2772,7 @@
    [
     "glamour",
     "Glamour",
-    "A quick illusion that fools the eye (Will or Intellect sees through it)."
+    "A quick illusion that fools the eye (Intellect resists: the target sees through it)."
    ],
    [
     "sight",
@@ -2802,7 +2802,7 @@
    [
     "mend",
     "Mend",
-    "Clear one injury box, once per wound."
+    "Clear one injury box, once per set of injuries."
    ]
   ]
  },
@@ -3241,7 +3241,8 @@
    ],
    "gear": {
     "item": "The Lammas Grimoire, annotated in four hands",
-    "skill": "Occult"
+    "skill": "Occult",
+    "use": "identifying a curse, a ritual or a summoning from its traces"
    },
    "powers": [
     "warding",

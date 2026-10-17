@@ -2746,7 +2746,7 @@
    "psionic"
   ],
   "originAdvantages": [],
-  "note": "Using a power takes an action and a Psionics roll; the target resists with Will where it makes sense. A failed use or a natural 18 marks a box of Heat: someone noticed. Mandate scanners detect active powers nearby.",
+  "note": "Using a power takes an action and a Psionics roll; each power says which attribute resists, if any. A failed use or a natural 18 marks a box of Heat: someone noticed. Mandate scanners detect active powers nearby.",
   "list": [
    [
     "sense",
@@ -2781,12 +2781,12 @@
    [
     "calm",
     "Calm",
-    "Soothe fear or rage in one person (or a small group at −2)."
+    "Soothe fear or rage in one person (or a small group at −2); an unwilling target's Will resists."
    ],
    [
     "shove",
     "Kinetic Shove",
-    "Push a person or object with force: knock down, disarm, slam a door."
+    "Push a person or object with force: knock down, disarm, slam a door (a person's Body resists)."
    ],
    [
     "lift",
@@ -2796,7 +2796,7 @@
    [
     "static",
     "Static",
-    "Disrupt nearby electronics: a lock, a camera, a weapon's targeting."
+    "Disrupt nearby electronics: a lock, a camera, a weapon's targeting. No defense or resistance: it works on the machine."
    ],
    [
     "flash",
@@ -2806,7 +2806,7 @@
    [
     "trance",
     "Healing Trance",
-    "Clear one injury box on yourself, once per wound."
+    "Clear one injury box on yourself, once per set of injuries."
    ]
   ]
  },
@@ -3005,7 +3005,8 @@
    },
    "gear": {
     "item": "A hive-made survey kit",
-    "skill": "Sensors"
+    "skill": "Sensors",
+    "use": "surveying a world: minerals, water and life signs"
    },
    "equipment": {
     "scanner": true,
@@ -3112,7 +3113,8 @@
    },
    "gear": {
     "item": "Quill's core, a guild-grade AI",
-    "skill": "Computers"
+    "skill": "Computers",
+    "use": "breaking old guild encryption and recovering lost navigation data"
    },
    "equipment": {
     "laser": true,

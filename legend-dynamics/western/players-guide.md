@@ -100,8 +100,8 @@ Spend all your Edges. Each one buys:
 | Second advantage | A second general advantage, with no extra complication | 1 |
 | Extra Grit | Start every session with 3 Grit points instead of 2 | 1 |
 | A friend | A named contact who helps once per job | 1 |
-| A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
-| Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix | 1 |
+| A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one narrowly defined use of a named skill (see *Gear*) | 1 |
+| Additional Defense | A second defense each round, at −2: Dodge, Parry or Block, in any mix (see *Attacking and defending*) | 1 |
 | Hard to put down | Once per fight, shrug off a telling hit's effect: you still take its boxes (see *Telling hits*) | 1 |
 | Talisman | A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a Himmelsbrief (a German heaven's letter) sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one. It's renewed between jobs and doesn't count against a charm limit. | 1 |
 
@@ -172,7 +172,7 @@ The GM can add others met in play (the creator's GM view has a **Campaign allegi
 
 ## Step 5: Prepare
 
-Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points (three with Extra Grit) and your gear. Name your friend or your fine weapon or tool, if you took those Edges. Describe one connection to another player's character.
+Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points (three with Extra Grit) and your gear. Name your friend, or your fine weapon or tool and the one narrow use it improves, if you took those Edges. Describe one connection to another player's character.
 
 ### Top 10 connections to another character
 
@@ -229,7 +229,23 @@ A plausible untrained attempt uses attribute −4. Specialized work such as surg
 
 ## Gear
 
-Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bonus; exceptional tools may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
+Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bonus. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
+
+### Fine weapons and tools
+
+A fine weapon or tool grants +2 to one narrowly defined use of a named skill, agreed when chosen. It does not stack with an advantage bonus on the same roll and never improves Dodge, Parry, or Block.
+
+The use is narrower than the skill: the item is fine *at something*. A use that would apply to almost every roll made with the item is too broad.
+
+| Fine item | Narrow use (+2) | Not covered |
+|---|---|---|
+| A rifle with a telescopic sight | Aimed shots at Long range or farther | Snap shots, anything at Close or Short |
+| A watchmaker's instruments | Delicate repairs: clockwork, locks, small mechanisms | Forcing, breaking or building anything large |
+| A surgeon's instruments | Field treatment of a wound: stitching, dressing, setting | Diagnosis, emergency stabilization |
+| A great axe of old make | Breaking a shield, a door or a weapon | Ordinary attacks |
+| **Too broad:** "my rifle: +2 to Shooting", "my kit: +2 to Medicine" | | |
+
+When a roll qualifies for both the fine item and an advantage, take +2 once.
 
 | Item | What it does |
 |---|---|
@@ -369,9 +385,10 @@ Act in descending Agility order. Players choose the order of tied characters; th
 
 Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may **defend**: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.
 
-- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits. The **Additional Defense** Edge gives a second.
+- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits.
+- **Additional Defense.** With this Edge you may attempt a second defense each round at −2, in addition to attack-quality and injury penalties. You cannot defend twice against the same attack.
 - **Dodge** is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert.
-- **Parry.** Against a weapon in hand or fists, roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists. An open hand can't parry a blade, claws or fangs. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a shot or a missile.
+- **Parry.** Against a weapon in hand or fists, roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists. An open hand can't parry a blade, claws or fangs. Nobody parries a shot or a missile.
 - **Block.** With a shield, or anything that can stand in for one (a chair, a plank, a crate lid), you can block a weapon in hand, fists, or a thrown or loosed missile: roll Melee −2, plus the shield's bonus. Nothing you can lift blocks a gunshot or a blast. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
 - **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. An advantage that rewards aiming adds its bonus to this.
@@ -389,14 +406,14 @@ A really good shot, or a blow that lands exactly where it was meant to, lets the
 | Effect | What happens |
 |---|---|
 | Disarm | The weapon or held item drops, or flies a few yards away |
-| Knock down | The target falls prone, or is driven back a few steps |
-| Pin | The target is held, tangled or pinned down: their next action goes to getting free |
+| Knock down | The target falls prone, or is driven back a few steps. Standing up uses the target's move on their next turn; they still take their action |
+| Pin | The target is held, tangled or pinned down. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack |
 | Rattle | −2 to the target's next roll |
-| Break gear | A shield, weapon or tool breaks; armor loses 1 protection until it's repaired |
+| Break gear | A weapon, shield or tool is knocked out of use (jammed, bent, unstrung, cracked) until its owner spends an action putting it right. It's destroyed for good only if it was already vulnerable (a rotten haft, an improvised shield) or the attacker has a weakness to exploit. Armor loses 1 protection until it's repaired |
 | Open them up | The next attack on this target this round gets +2 |
-| Precise | You hit exactly what you aimed at: the lantern, the rope, the tire, the hand on the trigger |
+| Precise | You hit exactly what you aimed at: the lantern, the rope, the tire, the hand on the trigger. It changes the situation, never the rules: no extra boxes, no getting past a defense, no instant death |
 
-**Limits.** A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a bear or knocks down a train, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next, like sending one crashing into another.
+**Limits.** A telling hit never adds boxes and never gets past a defense. It never kills outright, disables a character for good, or destroys exceptional equipment: those come only from injury, from the *Dying and death* rules, or from an established weakness. The effect has to make sense: nobody disarms a bear or knocks down a train, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next, like sending one crashing into another.
 
 **Staying alive.** A character on the receiving end can shrug off a telling hit's effect with **Hard to put down** (once per fight) or by spending a Grit point. Either way, they still take the boxes.
 
@@ -408,7 +425,7 @@ Trails of Blood & Dust adds these to the attack and defense rules above.
 - **Careful Marksman.** Aiming with the advantage gives +3 in all: Aim's +1 and the advantage's +2.
 - **A heavy coat.** A buffalo coat or a canvas duster turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer.
 
-*Example:* a werewolf's claws succeed by 5 against Deputy Ames, who hasn't defended yet this round. Dodge is 11, −2 for the clean hit: Ames needs a 9 or less. A parry with the saber would be Melee 14 −3 −2 = 9, no better, so Ames dodges. When the second wolf lunges before Ames's next turn, there's no defense left, unless Ames has Additional Defense.
+*Example:* a werewolf's claws succeed by 5 against Deputy Ames, who hasn't defended yet this round. Dodge is 11, −2 for the clean hit: Ames needs a 9 or less. A parry with the saber would be Melee 14 −3 −2 = 9, no better, so Ames dodges. When the second wolf lunges before Ames's next turn, there's no defense left, unless Ames has Additional Defense: a second defense at −2, on top of the attack-quality penalty.
 
 ### Stagecoach chases
 
@@ -544,11 +561,20 @@ Roll Medicine when the diagnosis is uncertain or an urgent treatment decision ma
 
 ## Field treatment
 
-With a doctor's bag and several uninterrupted minutes, successful Medicine removes one injury box; success by 5 or more removes two. Each injury receives one field-treatment attempt; further attempts need changed circumstances.
+With a doctor's bag and several uninterrupted minutes, successful Medicine removes one injury box; success by 5 or more removes two.
 
 ## Proper care
 
 A doctor's surgery with instruments, chloroform and a clean table grants +2 to Medicine. A successful treatment removes two boxes; success by 5 or more removes three. Allow the time the treatment requires.
+
+## Treatment attempts
+
+Each set of injuries permits one field-treatment attempt and one proper-care attempt. Further rolls require a meaningful improvement in care, a new treatment, or recovery time. Simply waiting and trying again is insufficient.
+
+- **A set of injuries** is the injury boxes from one encounter or one harmful incident: a fight, a fall, a fire, a night of exposure.
+- **Later injuries start a new set.** Its attempts can remove only its own boxes. A fresh scratch doesn't reopen the wounds you already treated: those boxes stay until their own set allows another roll, or rest clears them.
+- **What allows another roll:** a meaningful improvement (moving from the field to A doctor's surgery with instruments, chloroform and a clean table, a better healer taking over), a new treatment (surgery, a remedy, healing magic), or recovery time (rest that has already cleared a box from that set). The GM decides whether a change is meaningful.
+- **Stabilization is separate.** Stopping someone Dying is never limited by these attempts and never removes boxes; a treatment roll that removes boxes also stabilizes.
 
 ## Natural recovery
 
@@ -574,13 +600,21 @@ Magic works at two speeds, with a third tool that turns one into the other. Ever
 
 ## Hexes
 
-Each hex has a short **base effect**: one target, for one scene, at Close or Short range. Harm marks 2 boxes; a penalty is −2; the target resists with an attribute where it makes sense.
+Each hex has a short **base effect**: one target, for one scene, at Close or Short range. Harm marks 2 boxes; a penalty is −2.
+
+**Defense or resistance.** A hostile hex says in its description how its target avoids it: **a defense** or **a resistance**, never both, and never chosen at the moment of casting.
+
+- **A defense** ("Dodge applies"): the hex is an attack, and the casting roll is the attack roll. If it succeeds, the target may defend as against any attack, using their one defense a round, and **attack quality applies** from the casting margin: succeeded by 3–4, the defense is at −1; by 5–6, −2; by 7 or more, −3.
+- **A resistance** ("Will resists", "Body resists"): a contest between the casting roll and the target's roll on that attribute, by the usual contest rules (a success beats a failure; if both succeed, the larger margin wins; ties go to the target). Attack quality doesn't apply: the casting margin already counts in the contest. The target's injury penalty applies only when the resistance is physical (Body).
+- **Neither** (a hex on an object, or on a willing target): it simply works on a success.
+
+**Harm limit.** Magic at personal scale marks **at most 3 boxes** on any one target from one hex, ritual or charm, whatever its Boosts. Magical harm follows the *Injury* rules like a weapon's: a hit of 2 or more boxes that brings someone to three boxes leaves them Dying. Boosts beyond the limit go to the other dimensions: range, duration, or more targets.
 
 **Boosts.** Your step sets your power (your Occult training: Trained, Specialty, Expert). Each step above the first gives **one Boost**, chosen **as you cast**. Each Boost you spend is **−1 to the roll**, so you can always hold back.
 
 | Boost | One Boost | Two Boosts |
 |---|---|---|
-| **Harder** | +1 box, or the penalty becomes −3 | +2 boxes, or −4 |
+| **Harder** | +1 box (3 at most), or the penalty becomes −3 | +2 boxes (3 at most), or −4 |
 | **Wider** | A handful of targets | A crowd, or an area |
 | **Longer** | A day | Until it's lifted |
 | **Farther** | One range band farther | Two bands farther |
@@ -601,9 +635,13 @@ Each hex has a short **base effect**: one target, for one scene, at Close or Sho
 
 **Trappings.** The right materials, hour or place remove one segment.
 
+**Too slow for a fight.** A ritual takes a minute a roll at the very fastest. To use one in combat, finish it beforehand and store it in a charm.
+
 ## Charms
 
 Work a ritual in advance and store it in an object; break it (one action, no roll) to release it. Carry as many ready charms as your Occult training allows: **Trained 2, Specialty 3, Expert 4**. Preparation is how slow magic wins a fast fight.
+
+**A charm skips the casting roll, not the target's chance.** Whatever a target could dodge or resist when the magic is cast, they can dodge or resist when it comes from a charm. With no casting roll, a charm counts as **a success by 0**: against a defense, the target defends with no attack-quality penalty; against a resistance, the target resists by succeeding on their roll (a tie goes to the target, as in any contest). A charm never marks more than 3 boxes on one target.
 
 ## Magic advancement
 
@@ -615,7 +653,7 @@ A magical character can spend advancement points (see *Advancement*) on these, w
 | Deeper step | One hex you know works one step deeper: one more Boost | 2 | Each hex once |
 | Another charm | Carry one more ready charm | 1 | Up to 2 extra |
 | By heart | One kind of ritual takes one fewer segment (minimum 1) | 1 | Each kind once |
-| Quicker hand | One ritual you know goes one pace faster: an hour becomes ten minutes, ten minutes one action | 1 | Each ritual once |
+| Quicker hand | Reduce the interval between rolls for one specific ritual by one step (an hour to ten minutes, ten minutes to one minute), to a minimum of one minute. Its clock and required rolls remain unchanged. Combat release requires a charm. | 1 | Each ritual once |
 | Master of the tradition | Occult becomes Expert (+5) | 4 | Once, at the end of a long campaign |
 
 ## Magic in Trails of Blood & Dust
@@ -711,19 +749,19 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 ### Hexes
 
-A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells cast with **one action and an Occult roll**. Hexes known: **Trained 2, Specialty 3, Expert 4**. Occult as a Specialty gives **1 Boost**, as Expert **2**; each Boost spent is −1 to the roll. A failed hex marks a box of The Dark.
+A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells cast with **one action and an Occult roll**. Hexes known: **Trained 2, Specialty 3, Expert 4**. Occult as a Specialty gives **1 Boost**, as Expert **2**; each Boost spent is −1 to the roll. Each hex below says whether Dodge applies or which attribute resists, never both (see *Defense or resistance* in *Magic*). A failed hex marks a box of The Dark.
 
 | Hex | Base effect |
 |---|---|
 | Hellfire | A lash of flame at Short range; marks 2 boxes. Dodge applies. |
 | Devil's Shove | Unseen force hurls the target down: 1 box, and they lose their next move (Body resists). |
 | Evil Eye | The target is at −2 on all rolls for the scene (Will resists). |
-| Grave Chill | The target rolls Will or flees or freezes. |
+| Grave Chill | The target flees or freezes (Will resists). |
 | Hold | The target is held where they stand for the scene, or until they break free (Body resists). |
-| Misfire | One gun jams or one lamp gutters out; clearing a jam takes an action. |
+| Misfire | One gun jams or one lamp gutters out; clearing a jam takes an action. No defense or resistance: it works on the gun or the lamp, not the person. |
 | Shroud | +3 to Stealth for the scene; eyes slide off you. |
 | Witch-sight | See spirits, curses, charms and things wearing human skin. |
-| Stanch | Stop the bleeding: clear one injury box, once per wound. |
+| Stanch | Stop the bleeding: clear one injury box, once per set of injuries. |
 
 ## Weaknesses
 
@@ -749,7 +787,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 - **Attributes:** Body 9, Agility 10, Intellect 13, Presence 12, Will 11. **Dodge** 8.
 - **Skills:** Medicine 16 (Specialty). Trained: Gambling 14, Investigation 14, Law 14, Read People 14, Survival 14, Tinkering 14, Leadership 13, Persuasion 13, Riding 11.
-- **Edges:** Second advantage, A fine weapon or tool, A friend; second advantage: Battlefield Surgeon; a friend: the editor of the territorial newspaper, who owes him a life; a fine tool: his surgeon's instruments (+2 Medicine).
+- **Edges:** Second advantage, A fine weapon or tool, A friend; second advantage: Battlefield Surgeon; a friend: the editor of the territorial newspaper, who owes him a life; a fine tool: his surgeon's instruments (+2 to Medicine for field treatment of a wound: stitching, dressing, setting a bone).
 - **Advantage:** Steady Hands. **Complication:** The Bottle; trigger: pain that won't quit.
 - **Why I face the dark:** Nobody out here knows what I did back east. **Connection:** Reverend Stone is the only one who knows why he left Philadelphia.
 
@@ -779,7 +817,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 - **Attributes:** Body 12, Agility 13, Intellect 11, Presence 8, Will 11. **Dodge** 12.
 - **Skills:** Shooting 16 (Specialty). Trained: Brawling 14, Melee 14, Riding 14, Stealth 14, Athletics 13, Investigation 12, Read People 12, Survival 12, Tracking 12.
-- **Edges:** A fine weapon or tool; a fine tool: a Sharps rifle with a telescopic sight (+2 Shooting).
+- **Edges:** A fine weapon or tool; a fine tool: a Sharps rifle with a telescopic sight (+2 to Shooting for aimed shots at Long range or farther).
 - **Advantage:** Unfeeling (origin; companion: Unfinished Business). **Complication:** Code of the West; trigger: the easy shot is in someone's back.
 - **Why I face the dark:** Someone did me wrong, and I mean to settle it. **Connection:** Taught Tom Feeney to shoot straight, and still reminds him of it.
 
@@ -1177,6 +1215,8 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 # Quick reference
 
+**Fine weapon or tool:** +2 to one narrow, agreed use of a skill; never with an advantage on the same roll; never to Dodge, Parry or Block.
+
 **Creation:** attributes start at 10, adjusted by origin (always totaling zero), plus 5 points; maximum 13 plus any origin bonus. 3 points split between origin tier and Edges. Well-rounded: one Specialty and nine Trained. Old hand: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Old hand) = attribute +5.
@@ -1189,9 +1229,9 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Clocks:** 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).
 
-**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural 3–4): the attacker picks an effect; called shot −2 (small target −4). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
+**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit; Additional Defense: a second, at −2) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural 3–4): the attacker picks an effect, which never adds boxes or kills outright; called shot −2 (small target −4). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
 
-**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone's care).
+**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Each set of injuries (one fight or incident) gets one field and one proper-care attempt; more need better care, a new treatment or recovery time. Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone's care).
 
 **Grit:** start each session with two. Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.
 
