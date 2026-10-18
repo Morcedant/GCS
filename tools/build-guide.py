@@ -65,6 +65,15 @@ def main():
             inline_module(E / "lab" / "encounter.js", "LAB_ENCOUNTER"), inline_module(E / "lab" / "stats.js", "LAB_STATS"), inline_module(E / "lab" / "ui.js", "LAB_UI")]).replace("</", "<\\/") + "\n"
         app = re.sub(r"/\* ENCOUNTER:START \*/.*?/\* ENCOUNTER:END \*/", lambda _: "/* ENCOUNTER:START */\n" + js + "/* ENCOUNTER:END */", app, flags=re.S)
         app = re.sub(r"<!-- ENCOUNTER-PANEL:START -->.*?<!-- ENCOUNTER-PANEL:END -->", lambda _: "<!-- ENCOUNTER-PANEL:START -->\n" + (E / "lab" / "panel.html").read_text() + "<!-- ENCOUNTER-PANEL:END -->", app, flags=re.S)
+    # A page with TABLECLIENT markers gets the shared table's page side (legend-dynamics/engine/table-client.js) and the
+    # table server's address (legend-dynamics/table-server/server-url.txt, once it's deployed; otherwise players type it in).
+    if "/* TABLECLIENT:START */" in app:
+        tc = (ROOT / "legend-dynamics" / "engine" / "table-client.js").read_text().replace("</", "<\\/")
+        app = re.sub(r"/\* TABLECLIENT:START \*/.*?/\* TABLECLIENT:END \*/", lambda _: "/* TABLECLIENT:START */\n" + tc + "/* TABLECLIENT:END */", app, flags=re.S)
+        f = ROOT / "legend-dynamics" / "table-server" / "server-url.txt"
+        url = f.read_text().strip() if f.exists() else ""
+        url = url if re.fullmatch(r"https://[\w.-]+(:\d+)?", url) else ""
+        app = re.sub(r'const TABLE_SERVER = "[^"]*";', lambda _: f'const TABLE_SERVER = "{url}";', app, count=1)
     app = stamp(app, APP)  # the version footer: a fingerprint of the page, and the day it last changed
     APP.write_text(app)
     print(f"updated {APP.relative_to(ROOT)}")
