@@ -17,10 +17,14 @@
 //   rangeTracks: [{ id, title, us, bands: [[name, distance text]], note, help, startLane, vehicleTrack (a crew track, e.g. Hull; vehicleTracks lists more to show, e.g. Shields and systems) or
 //     vehicle: { name, boxes, label, effects: [text per boxes marked], downText } (its own boxes, e.g. a stagecoach) }]; or rangeTrack: one
 //   groupTracks(): [{ name, boxes, value, effect }] and setGroupTrack(name, value): the crew's shared tracks (Hull)
-// Returns { refresh() } to call when the characters or tracks change.
+//   onChange(): called after every change to the map (the shared table sends it on to the players)
+//   viewer: true for a player's copy of the GM's map (shared table): no editing; canMove(token) says which tokens the
+//     player may drag (their own), and onMove(token, to) sends the move to the GM
+// Returns { refresh() } to call when the characters or tracks change; snapshot() (the map as the players see it, without
+// pictures), setState(snapshot) for a viewer, and moveOwn(key, to) for the GM to apply a player's move.
 function mountBattleMap(api) {
   const SVGNS = "http://www.w3.org/2000/svg", SQ3 = Math.sqrt(3);
-  const esc = api.esc, KEY = api.key + ".battlemap.v1";
+  const esc = api.esc, KEY = api.key + (api.viewer ? ".battlemap.view.v1" : ".battlemap.v1");
   const say = (m, err) => (api.toast ? api.toast(m, err) : null);
   const PARTY = api.partyName || "party", Party = PARTY[0].toUpperCase() + PARTY.slice(1);
   // The range tracks: the setting's own (a ship fight, a stagecoach chase), or one plain track. The first is "range".
@@ -48,7 +52,7 @@ function mountBattleMap(api) {
 
   // ---- storage ----
   function load() { try { const v = JSON.parse(localStorage.getItem(KEY) || "null"); return v && typeof v === "object" ? v : {}; } catch { return {}; } }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { say("The map is too large to keep in this browser; save it to a file.", true); } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { say("The map is too large to keep in this browser; save it to a file.", true); } if (api.onChange) api.onChange(); }
   const idb = (() => {
     let db = null;
     const open = () => new Promise((res, rej) => { if (db) return res(db); try { const r = indexedDB.open("legend-dynamics-maps", 1);
@@ -198,6 +202,9 @@ function mountBattleMap(api) {
   const $ = (s) => api.root.querySelector(s);
   const svg = $(".bm-svg"), world = $(".bm-world"), gTok = $(".bm-tokens"), gMeas = $(".bm-measure"), gLanes = $(".bm-lanes"), readout = $(".bm-readout");
   const el = (tag, attrs) => { const n = document.createElementNS(SVGNS, tag); for (const [k, v] of Object.entries(attrs || {})) n.setAttribute(k, v); return n; };
+  // A player's copy shows the map and lets them pan, zoom, measure and move their own token; the GM edits everything else.
+  if (api.viewer) for (const q of [".bm-help", ".bm-kinds", ".bm-add", ".bm-gridset", ".bm-sel", '[data-bm="posse"]', '[data-bm="vehicle"]', '[data-bm="add"]', ".bm-bar .bm-file"])
+    api.root.querySelectorAll(q).forEach((x) => { x.hidden = true; x.style.display = "none"; });
 
   // ---- threats: people, and ships where the setting has them ----
   const allThreats = () => [...(api.vehicles || []), ...(api.threats || [])];
@@ -240,7 +247,7 @@ function mountBattleMap(api) {
     if (c) return { c, name: c.name, color: c.color, img: c.portrait, boxes: c.boxes || 3, inj: c.injury || 0, down: c.down, dying: c.dying };
     if (tr) return { tr, name: t.name || RT.us, color: t.color || "#3d7a9e", img: t.img, boxes: tr.boxes, inj: tr.value || 0, down: (tr.value || 0) >= tr.boxes };
     const boxes = t.boxes || 0, inj = t.injury || 0;
-    return { name: t.name, color: t.color, img: t.img, boxes, inj, down: boxes && inj >= boxes };
+    return { name: t.name, color: t.color, img: t.img, boxes, inj, down: boxes && inj >= boxes, dying: !!t.dying };
   }
   function drawTokens() {
     gTok.textContent = "";
@@ -272,6 +279,7 @@ function mountBattleMap(api) {
     readout.textContent = rangeText(n);
   }
   function drawSel() {
+    if (api.viewer) return;
     const box = $(".bm-sel"), t = toks().find((x) => x.id === sel);
     box.hidden = !t;
     if (!t) return;
@@ -371,7 +379,7 @@ function mountBattleMap(api) {
     if (pointers.size === 2) { const [a, b] = [...pointers.values()]; drag = { kind: "pinch", d: Math.hypot(a.sx - b.sx, a.sy - b.sy) }; return; }
     const p = mapPt(ev), tg = ev.target.closest && ev.target.closest("[data-tok]");
     if (mode === "measure" && !isRange()) { const h = toHex(p.x, p.y); measure = { a: h, b: h }; drag = { kind: "measure" }; drawMeasure(); return; }
-    if (tg) {
+    if (tg && (!api.viewer || (api.canMove && api.canMove(toks().find((x) => x.id === tg.dataset.tok))))) {
       const t = toks().find((x) => x.id === tg.dataset.tok), o = posOf(t); sel = t.id;
       const at = isRange() ? { lane: t.lane || 0, y: t.y } : { q: t.q, r: t.r };
       drag = { kind: "token", t, from: at, to: { ...at }, moved: false, off: { x: p.x - o.x, y: p.y - o.y } }; drawTokens(); drawSel(); return;
@@ -399,7 +407,7 @@ function mountBattleMap(api) {
     if (!drag) return;
     if (drag.kind === "token") {
       const t = drag.t;
-      if (drag.moved) { if (isRange()) { t.lane = drag.to.lane; t.y = drag.to.y; } else { t.q = drag.to.q; t.r = drag.to.r; } }
+      if (drag.moved) { if (isRange()) { t.lane = drag.to.lane; t.y = drag.to.y; } else { t.q = drag.to.q; t.r = drag.to.r; } if (api.viewer && api.onMove) api.onMove(t, { ...drag.to }); }
       drag = null; drawTokens(); drawMeasure(); readout.textContent = ""; save(); sel = t.id; drawSel(); return;
     }
     if (drag.kind === "pan" && !drag.moved && sel) { sel = null; drawTokens(); drawSel(); }
@@ -409,7 +417,7 @@ function mountBattleMap(api) {
   svg.addEventListener("pointerup", end); svg.addEventListener("pointercancel", end);
   svg.addEventListener("wheel", (ev) => { ev.preventDefault(); const p = mapPt(ev); zoomAt(ev.deltaY < 0 ? 1.12 : 1 / 1.12, p.sx, p.sy); clearTimeout(svg._t); svg._t = setTimeout(save, 300); }, { passive: false });
   svg.addEventListener("keydown", (ev) => {
-    const tg = ev.target.closest && ev.target.closest("[data-tok]"); if (!tg) return;
+    const tg = ev.target.closest && ev.target.closest("[data-tok]"); if (!tg || api.viewer) return;
     if (ev.key === "Delete" || ev.key === "Backspace") { setToks(toks().filter((t) => t.id !== tg.dataset.tok)); sel = null; save(); draw(); ev.preventDefault(); }
     if (ev.key === "Enter" || ev.key === " ") { sel = tg.dataset.tok; drawTokens(); drawSel(); ev.preventDefault(); }
   });
@@ -561,7 +569,34 @@ function mountBattleMap(api) {
     return { hexes, yards, scale: st.scale.n, band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
   }
 
-  return { distanceBetween, refresh: () => {
+  // ---- the shared table ----
+  // The map as players see it: positions and what each token shows, without pictures; "own" is the shared character's key.
+  function snapshot() {
+    const res = (l) => l.map((t) => { const k = info(t), c = k.c;
+      return { id: t.id, q: t.q, r: t.r, lane: t.lane, y: t.y, tsize: t.tsize, name: k.name || "", color: k.color || "#777", boxes: k.boxes || 0, injury: k.inj || 0, dying: !!k.dying, own: c ? c.tableKey || null : t.own || null }; });
+    return { kind: st.kind, scale: st.scale, size: st.size, orient: st.orient, ox: st.ox, oy: st.oy, cols: st.cols, rows: st.rows, grid: st.grid, gridAlpha: st.gridAlpha,
+      tokens: res(st.tokens), rts: Object.fromEntries(Object.entries(st.rts).map(([k, v]) => [k, { tokens: res(v.tokens) }])) };
+  }
+  // A viewer takes the GM's map, keeping its own pan and zoom.
+  function setState(s) {
+    const views = { hex: st.view, ...Object.fromEntries(Object.entries(st.rts).map(([k, v]) => [k, v.view])) };
+    if (drag) return; // not while the player is dragging; the next update brings it
+    st = normal({ ...s, view: views.hex });
+    for (const [k, v] of Object.entries(views)) if (k !== "hex" && st.rts[k] && v) st.rts[k].view = v;
+    RT = TRACKS.find((t) => t.id === st.kind) || TRACKS[0];
+    try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { /* the view works without it */ }
+    draw(); if (!V().set && svg.clientWidth) fit();
+  }
+  // The GM applies a player's move of their own token (key: their shared character).
+  function moveOwn(key, to) {
+    const c = api.crew().find((x) => x.tableKey === key), t = c && toks().find((x) => x.ref === c.id);
+    if (!t || !to) return false;
+    if (isRange()) { if (Number.isInteger(to.lane)) { t.lane = Math.max(0, Math.min(lanes().length - 1, to.lane)); t.y = +to.y || t.y; } }
+    else if (Number.isInteger(to.q) && Number.isInteger(to.r)) { t.q = to.q; t.r = to.r; }
+    save(); draw(); return true;
+  }
+
+  return { distanceBetween, snapshot, setState, moveOwn, refresh: () => {
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();

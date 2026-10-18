@@ -673,7 +673,33 @@ export function mountLab(api) {
   $("lab-name").addEventListener("change", () => { const en = enc(); if (en) { en.name = $("lab-name").value.trim() || en.name; save(); renderSummary(); } });
   $("lab-seed").addEventListener("change", () => { const en = enc(); if (en && en.status === "setup") { en.seed = $("lab-seed").value.trim() || null; save(); } else if (en) { $("lab-seed").value = en.seed ?? ""; say("The seed is fixed once combat starts. Start a new encounter to change it.", true); } });
 
-  function renderAll() { pullFromCards(); renderRules(); renderPeople(); renderAction(); renderClocksHere(); renderLog(); renderSummary(); }
+  function renderAll() { pullFromCards(); renderRules(); renderPeople(); renderAction(); renderClocksHere(); renderLog(); renderSummary(); if (api.onScene) api.onScene(); }
+
+  // ---- the shared table (phase 3) ----
+  const plain = (/** @type {string} */ h) => String(h || "").replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, "&");
+  // The fight as the players see it: turn order, whose turn, each side's injuries, and the latest log lines.
+  // "own" is a character's shared key, so a player knows their turn; their weapons let them ask for an attack.
+  function scene() {
+    const en = enc(); if (!en || en.status === "setup") return null;
+    const act = en.status === "combat" ? E.active(en) : null, r = rules();
+    const people = en.status === "combat" ? en.order.map((/** @type {string} */ pid) => E.find(en, pid)) : en.participants;
+    return { id: en.id, status: en.status, round: en.round, actor: act ? act.pid : null,
+      people: people.map((/** @type {any} */ p) => { const c = p.ref ? api.crew().find((x) => x.id === p.ref) : null;
+        return { pid: p.pid, name: p.name, side: p.side, kind: p.kind, own: (c && c.tableKey) || null, injury: p.injury || 0, boxes: p.boxes || 3, dying: !!p.dying, dead: !!p.dead, out: E.isOut(p),
+          weapons: c && c.tableKey ? p.weapons.filter((/** @type {string} */ w) => r.weapons[w]).map((/** @type {string} */ w) => [w, r.weapons[w].name]) : undefined }; }),
+      log: [...en.events].slice(-12).reverse().map((/** @type {any} */ e) => plain(logText(e))).filter(Boolean) };
+  }
+  // A player's request on their turn, put into the action form for the GM to check and run.
+  function fillRequest(/** @type {any} */ q) {
+    const en = enc(); if (!en || en.status !== "combat" || !E.find(en, q.pid)) return false;
+    $("lab-actor").value = q.pid; $("lab-action").value = q.action === "aim" ? "aim" : q.action === "attack" ? "attack" : "note";
+    $("lab-target").dataset.actor = q.pid; renderAction();
+    if (q.target) $("lab-target").value = q.target;
+    if (q.weapon && [...$("lab-weapon").options].some((/** @type {any} */ o) => o.value === q.weapon)) { $("lab-weapon").value = q.weapon; renderAction(); if (q.target) $("lab-target").value = q.target; }
+    if (q.action === "other" && q.note) $("lab-text").value = q.note;
+    $("lab-act-wrap").scrollIntoView({ block: "nearest" });
+    return true;
+  }
   renderAll();
-  return { refresh: renderAll };
+  return { refresh: renderAll, scene, fillRequest };
 }
