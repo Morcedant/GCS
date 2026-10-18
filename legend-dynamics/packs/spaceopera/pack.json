@@ -3586,7 +3586,8 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "knife",
@@ -3599,7 +3600,8 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "blade",
@@ -3612,7 +3614,9 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 2,
+   "reachNote": "implant blades and claws 1"
   },
   {
    "id": "claws",
@@ -3626,7 +3630,8 @@
    },
    "traits": [],
    "rows": [],
-   "natural": true
+   "natural": true,
+   "reachYards": 1
   },
   {
    "id": "pistol",
@@ -3719,7 +3724,12 @@
    "firearm": true,
    "stun": true,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "telling": {
+    "add": [
+     "knockdown"
+    ]
+   }
   },
   {
    "id": "grenade",

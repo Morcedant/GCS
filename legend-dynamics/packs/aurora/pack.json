@@ -3570,7 +3570,8 @@
    },
    "class": 1,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "baton",
@@ -3584,7 +3585,8 @@
    },
    "class": 1,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "knife",
@@ -3598,7 +3600,8 @@
    },
    "class": 1,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "pistol",
@@ -3707,7 +3710,12 @@
    "firearm": true,
    "stun": true,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "telling": {
+    "add": [
+     "knockdown"
+    ]
+   }
   },
   {
    "id": "tranq",
@@ -3813,7 +3821,8 @@
    "traits": [],
    "rows": [],
    "wound": "power",
-   "natural": true
+   "natural": true,
+   "reachYards": 1
   },
   {
    "id": "blast2",
@@ -3843,7 +3852,8 @@
    "class": 2,
    "traits": [],
    "rows": [],
-   "natural": true
+   "natural": true,
+   "reachYards": 1
   },
   {
    "id": "elfshot",
@@ -3858,7 +3868,8 @@
    "class": 2,
    "traits": [],
    "rows": [],
-   "wound": "power"
+   "wound": "power",
+   "reachYards": 1
   },
   {
    "id": "breach",
@@ -3903,7 +3914,8 @@
    "class": 2,
    "traits": [],
    "rows": [],
-   "natural": true
+   "natural": true,
+   "reachYards": 1
   }
  ],
  "threats": [

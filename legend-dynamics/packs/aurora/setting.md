@@ -12,8 +12,8 @@ Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every a
 
 | Weapon | Range | Class | Boxes on a hit | What the injury looks like |
 |---|---|---|---|---|
-| Fists, kicks, a baton | Melee | I | 1 | Bruises, a cracked rib, a concussion |
-| Knife | Melee; Close thrown | I | 1 | A cut or stab wound |
+| Fists, kicks, a baton | Melee, reach 1 yd | I | 1 | Bruises, a cracked rib, a concussion |
+| Knife | Melee, reach 1 yd; Close thrown | I | 1 | A cut or stab wound |
 | Pistol or submachine gun | Short | I | 2 | A gunshot wound |
 | Rifle | Long | I | 2 | A gunshot wound |
 | Shotgun, at Close range | Close | I | 3, and Dying | A ruinous wound |

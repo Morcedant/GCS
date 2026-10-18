@@ -8,9 +8,9 @@ Humanity has three centuries of interstellar history: young enough to challenge 
 
 | Weapon | Range | Boxes on a hit | What the injury looks like |
 |---|---|---|---|
-| Fists, kicks, a baton | Melee | 1 | Bruises, a cracked rib, a concussion |
-| Knife | Melee; Close thrown | 1 | A cut or stab wound |
-| Vibroblade, implant blades, claws | Melee | 2 | A deep wound |
+| Fists, kicks, a baton | Melee, reach 1 yd | 1 | Bruises, a cracked rib, a concussion |
+| Knife | Melee, reach 1 yd; Close thrown | 1 | A cut or stab wound |
+| Vibroblade, implant blades, claws | Melee, reach 2 yd (implant blades and claws 1) | 2 | A deep wound |
 | Slug pistol | Short | 2 | A gunshot wound |
 | Slug carbine | Medium | 2 | A gunshot wound |
 | Laser pistol | Short | 2 | A cauterized burn through flesh |

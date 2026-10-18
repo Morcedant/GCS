@@ -162,6 +162,14 @@ export function applyHit(who, hit) {
 /** Dodge: Agility −2, plus the Athletics bonus (+1 Trained, +2 Specialty or Expert). */
 export const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ athleticsBonus) => agility - 2 + athleticsBonus;
 
+/** Move in yards: 5, +1 per 2 points of Agility + Body above 20, plus the Athletics bonus (as for Dodge) and any origin speed adjustment. */
+export const moveYards = (/** @type {number} */ agility, /** @type {number} */ body, /** @type {number} */ athleticsBonus, speed = 0) =>
+  5 + Math.floor(Math.max(0, agility + body - 20) / 2) + athleticsBonus + speed;
+/** A threat's Move when its entry gives none. */
+export const THREAT_MOVE = 8;
+/** A weapon in hand's reach in yards (1 when the weapon doesn't say). */
+export const reachYards = (/** @type {{ reach?: string, reachYards?: number }} */ weapon) => (weapon.reach === "melee" ? weapon.reachYards || 1 : null);
+
 // ---- attack resolution ----
 
 /**

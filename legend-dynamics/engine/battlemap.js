@@ -79,7 +79,9 @@ function mountBattleMap(api) {
   // A distance in hexes, at the map's scale, as a range band.
   function rangeText(n) {
     const u = UNITS[st.scale.unit], d = n * st.scale.n;
-    const band = st.scale.unit === "yd" && n <= 1 && d <= 2 ? "in reach" : (u.bands.find(([, max]) => d <= max) || ["out of range"])[0];
+    // Up close, the reach of a weapon in hand: 1 yard for fists and knives, 2 for a sword, 3 for a spear.
+    const reach = st.scale.unit !== "yd" ? "" : n <= 1 && d <= 1 ? "in reach of any weapon in hand" : n && d <= 2 ? "in reach of a sword or axe (2 yd)" : n && d <= 3 ? "in reach of a spear or polearm (3 yd)" : "";
+    const band = reach || (u.bands.find(([, max]) => d <= max) || ["out of range"])[0];
     return `${n} hex${n === 1 ? "" : "es"} · ${fmt(d)} ${d === 1 ? u.one : u.name} · ${band}`;
   }
 
@@ -484,7 +486,7 @@ function mountBattleMap(api) {
       const ship = !!(th && (api.vehicles || []).includes(th));
       toks().push({ id: uid(), ref: null, name: name || (th ? th.name : "Token"), color: $('[data-bmf="color"]').value, img: pendingImg, tsize: +$('[data-bmf="tsize"]').value,
         ...spot(RT.startLane || Math.min(3, lanes().length - 1)), boxes: Math.max(1, +$('[data-bmf="boxes"]').value || 1), injury: 0, threat: th ? th.id : null, boxLabel: ship ? "Hull" : "Injury",
-        stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.trait].filter(Boolean).join(" · ") : "" });
+        stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.move ? `Move ${th.move} yd` : "", th.trait].filter(Boolean).join(" · ") : "" });
       // Numbered names count up, so "Outlaw 1" is followed by "Outlaw 2".
       const m = name.match(/^(.*?)(\d+)$/); $('[data-bmf="name"]').value = m ? m[1] + (+m[2] + 1) : name;
       save(); draw();

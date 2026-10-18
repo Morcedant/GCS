@@ -404,7 +404,8 @@ export function mountLab(api) {
       // What the attack is made of (the setting's materials): silver bullets, a wooden stake, cold iron.
       $("lab-material-wrap").hidden = !MATERIALS.length;
       if (MATERIALS.length && !$("lab-material").options.length) $("lab-material").innerHTML = `<option value="">Ordinary</option>` + MATERIALS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)}</option>`).join("");
-      if (TH && !$("lab-called").options.length) $("lab-called").innerHTML = `<option value="">None</option>` + LDX.TELLING_EFFECTS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join("");
+      // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
+      if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None</option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
       if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
       const base = w ? a.skills[w.skill] : undefined;
@@ -520,7 +521,7 @@ export function mountLab(api) {
       btns.push(`<button class="btn" data-fx="trade-lost">${esc(d.name)}: lose a limb instead (complication)</button><button class="btn" data-fx="trade-crippled">${esc(d.name)}: lose a limb's use instead (complication)</button>`);
     if (live && ev.grievous && ev.grievous.pc && !ev.traded && ev.grievous.downgradedTo === undefined && d && d.points > 0) btns.push(`<button class="btn" data-fx="downgrade">${esc(d.name)}: downgrade the grievous wound (${esc(T.point)})</button>`);
     if (live && ev.telling && !ev.telling.shrugged) {
-      if (!ev.telling.called) btns.push(`<label class="small">Effect <select data-telling>${[["", "Pick…"], ...LDX.TELLING_EFFECTS].map((/** @type {any} */ [id, n]) => `<option value="${id}"${id === (ev.telling.effect || "") ? " selected" : ""}>${esc(n)}</option>`).join("")}</select></label>`);
+      if (!ev.telling.called) btns.push(`<label class="small">Effect <select data-telling>${[["", "Pick…"], ...LDX.tellingEffectsFor(rules().weapons[ev.weapon && ev.weapon.id] || ev.weapon, rules().skills)].map((/** @type {any} */ [id, n]) => `<option value="${id}"${id === (ev.telling.effect || "") ? " selected" : ""}>${esc(n)}</option>`).join("")}</select></label>`);
       if (d && d.kind === "pc" && (d.traits || []).some((/** @type {any} */ t) => t.type === "shrugTelling" && !t.used)) btns.push(`<button class="btn" data-fx="shrug-edge">${esc(d.name)}: shrug it off (Hard to put down)</button>`);
       if (d && d.kind === "pc" && d.points > 0) btns.push(`<button class="btn" data-fx="shrug-point">${esc(d.name)}: shrug it off (${esc(T.point)})</button>`);
     }

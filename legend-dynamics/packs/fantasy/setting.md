@@ -10,17 +10,17 @@ The years are counted **After the Shattering (AS)**. The story begins in the yea
 
 | Weapon | Range | Boxes on a hit | What the injury looks like |
 |---|---|---|---|
-| Fists, kicks, dirty tricks | Melee | 1 | Bruises, a split lip, cracked ribs |
-| Dagger or club | Melee; dagger Close thrown | 1 | A cut, a stab or a crack on the skull |
+| Fists, kicks, dirty tricks | Melee, reach 1 yd | 1 | Bruises, a split lip, cracked ribs |
+| Dagger or club | Melee, reach 1 yd; dagger Close thrown | 1 | A cut, a stab or a crack on the skull |
 | Sling | Short | 1 | A crack on the skull |
-| Sword, axe, mace, spear | Melee | 2 | A deep wound or a broken bone |
-| Greatsword, greataxe, polearm | Melee | 2; a hit by 5 or more leaves the target Dying | A ruinous wound |
+| Sword, axe, mace, spear | Melee, reach 2 yd (spear 3) | 2 | A deep wound or a broken bone |
+| Greatsword, greataxe, polearm | Melee, reach 2 yd (polearm 3) | 2; a hit by 5 or more leaves the target Dying | A ruinous wound |
 | Bow | Long | 2 | An arrow buried deep |
 | Crossbow | Medium | 2 | A bolt buried deep |
 | Wheel-lock pistol | Close | 2 | A gunshot wound |
 | Arquebus or hand-cannon | Short | 3, and Dying | A ruinous wound |
 | Powder bomb | Close (thrown) | 1 to everyone nearby, 3 and Dying at the center | Blast and burns; Dodge means diving clear |
-| Claws, fangs, venom | Melee | 2 (venom: Body roll or Reeling) | Torn flesh, poison in the blood |
+| Claws, fangs, venom | Melee, reach 1 yd | 2 (venom: Body roll or Reeling) | Torn flesh, poison in the blood |
 | Shadow Bolt | Short | 2 | Black frost in the wound |
 | Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
 | Fire | — | 1 each round in the flames | Burns |

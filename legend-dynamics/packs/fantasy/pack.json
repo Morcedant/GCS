@@ -2698,12 +2698,13 @@
    "rows": [
     [
      "Fists, kicks, dirty tricks",
-     "Melee",
+     "Melee, reach 1 yd",
      "1",
      "Bruises, a split lip, cracked ribs"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "dagger",
@@ -2718,12 +2719,13 @@
    "rows": [
     [
      "Dagger or club",
-     "Melee; dagger Close thrown",
+     "Melee, reach 1 yd; dagger Close thrown",
      "1",
      "A cut, a stab or a crack on the skull"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "club",
@@ -2736,7 +2738,8 @@
     }
    },
    "rows": [],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "dagger-thrown",
@@ -2788,7 +2791,7 @@
    "rows": [
     [
      "Sword, axe, mace, spear",
-     "Melee",
+     "Melee, reach 2 yd (spear 3)",
      "2",
      "A deep wound or a broken bone"
     ]
@@ -2796,7 +2799,9 @@
    "traits": [],
    "equip": [
     "spear"
-   ]
+   ],
+   "reachYards": 2,
+   "reachNote": "spear 3"
   },
   {
    "id": "greatweapon",
@@ -2822,11 +2827,13 @@
    "rows": [
     [
      "Greatsword, greataxe, polearm",
-     "Melee",
+     "Melee, reach 2 yd (polearm 3)",
      "2; a hit by 5 or more leaves the target Dying",
      "A ruinous wound"
     ]
-   ]
+   ],
+   "reachYards": 2,
+   "reachNote": "polearm 3"
   },
   {
    "id": "bow",
@@ -2977,11 +2984,12 @@
    "rows": [
     [
      "Claws, fangs, venom",
-     "Melee",
+     "Melee, reach 1 yd",
      "2 (venom: Body roll or Reeling)",
      "Torn flesh, poison in the blood"
     ]
-   ]
+   ],
+   "reachYards": 1
   },
   {
    "id": "shadowbolt",
