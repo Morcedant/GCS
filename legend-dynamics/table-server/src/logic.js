@@ -6,7 +6,15 @@
  * The server rolls the dice, so a roll on the shared table is the same for everyone and nobody can fudge it.
  * The player's sheet works out the target (skill, circumstances, injury) and the server reports it with the roll.
  */
-import { resolve } from "../../engine/rules/core.js";
+// The core rules' roll (engine/rules/core.js resolve), copied so this folder deploys on its own;
+// test/logic.test.mjs checks the two agree whenever the engine is beside it.
+/** @param {[number, number, number]} dice @param {number} target */
+export function resolve(dice, target) {
+  const total = dice[0] + dice[1] + dice[2];
+  const auto = total <= 4 ? "success" : total >= 17 ? "failure" : null;
+  const success = auto === "success" || (auto === null && total <= target);
+  return { dice, total, target, success, auto, margin: target - total };
+}
 
 // No 0/O or 1/I/L: a code read out across a table shouldn't be misheard.
 export const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";

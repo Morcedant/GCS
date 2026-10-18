@@ -2,6 +2,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import * as L from "../src/logic.js";
+import { existsSync } from "node:fs";
 
 const table = () => L.newTable({ name: "Saturday", game: "western", gmKeyHash: "h", now: 1000 });
 const ruth = { role: "player", name: "Des", character: "Ruth Calloway" };
@@ -64,4 +65,14 @@ test("server dice are fair d6", () => {
 
 test("presence lists the GM first, then players", () => {
   assert.deepEqual(L.presence([ruth, { role: "gm", name: "Sam", character: "" }, null]).map((p) => p.role), ["gm", "player"]);
+});
+
+test("the table's roll matches the core rules' resolve (when the engine is beside this folder)", async (t) => {
+  const core = new URL("../../engine/rules/core.js", import.meta.url);
+  if (!existsSync(core)) { t.skip("the engine isn't in this checkout"); return; }
+  const { resolve } = await import(core.href);
+  for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) for (let c = 1; c <= 6; c++) for (const target of [-3, 4, 9, 10, 12, 16, 19, 25]) {
+    const x = L.resolve([a, b, c], target), y = resolve([a, b, c], target);
+    assert.deepEqual([x.total, x.success, x.auto, x.margin], [y.total, y.success, y.auto, y.margin]);
+  }
 });
