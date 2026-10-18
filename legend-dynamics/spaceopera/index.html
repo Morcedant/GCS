@@ -587,7 +587,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="83b8709" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 83b8709</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="5bd2c1a" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 5bd2c1a</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -9535,7 +9535,9 @@ function mountBattleMap(api) {
   // the token's name. On a hex map in yards: { yards, hexes, band }; on the plain range track: { band } from the lanes.
   // null when either isn't on the map (or a name fits more than one token), or on a ship or chase track.
   function distanceBetween(a, b) {
-    const find = (w) => { const l = toks().filter((t) => (w.ref && t.ref === w.ref) || (!t.ref && w.name && (info(t).name || "").toLowerCase() === w.name.toLowerCase())); return l.length === 1 ? l[0] : null; };
+    // Names match whatever the case, and without a note in brackets: "Security guard (minor)" is "Security guard".
+    const norm = (x) => String(x || "").toLowerCase().replace(/\s*\([^)]*\)/g, "").trim();
+    const find = (w) => { const l = toks().filter((t) => (w.ref && t.ref === w.ref) || (!t.ref && w.name && norm(info(t).name) === norm(w.name))); return l.length === 1 ? l[0] : null; };
     const ta = find(a), tb = find(b);
     if (!ta || !tb) return null;
     if (isRange()) {
