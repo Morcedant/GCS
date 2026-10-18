@@ -172,8 +172,8 @@ def main():
     rows = "".join(f'<li><a class="ld-button ld-button--ghost" href="{bw.DISCORD_SLUG}/{SLUGS[g].strip("/")}/">{e(bw.pack(g)["terms"]["title"])}</a></li>' for g in GAMES)
     d.append(f"""<div class="ld">
   <div class="ld-eyebrow">For the GM</div>
-  <h2 style="margin:.2rem 0 .8rem">Run the bot for your group</h2>
-  <p style="max-width:40rem">Each setting has a one-page handout for your table, with the steps to set the bot up (about 15 minutes, free) and the bot's code to copy.</p>
+  <h2 style="margin:.2rem 0 .8rem">Handouts and the bot code</h2>
+  <p style="max-width:40rem">Each setting has a one-page handout for your table: its commands, the setup steps above, the <b>bot code</b> to copy (the same for every game) and what to check if it isn't working.</p>
   <ul class="ld-downloads">{rows}</ul>
 </div>""")
     for g in GAMES:
