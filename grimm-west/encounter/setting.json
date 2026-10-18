@@ -14,12 +14,13 @@
    "rows": [
     [
      "Punch, kick, headbutt",
-     "Melee",
+     "Melee, reach 1 yd",
      "1",
      "Bruises, a split lip, cracked ribs"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "club",
@@ -34,12 +35,13 @@
    "rows": [
     [
      "Club, bottle, pistol-whip",
-     "Melee",
+     "Melee, reach 1 yd",
      "1",
      "A concussion or a broken finger"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "knife",
@@ -54,12 +56,13 @@
    "rows": [
     [
      "Knife or hatchet",
-     "Melee; Close thrown",
+     "Melee, reach 1 yd; Close thrown",
      "1",
      "A cut or stab wound that bleeds"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "knife-thrown",
@@ -108,12 +111,14 @@
    "rows": [
     [
      "Axe, saber or bowie knife used to kill",
-     "Melee",
+     "Melee, reach 2 yd (bowie knife 1)",
      "2",
      "A deep wound or a broken bone"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 2,
+   "reachNote": "bowie knife 1"
   },
   {
    "id": "claws",
@@ -128,13 +133,14 @@
    "rows": [
     [
      "Claws and fangs of a monster",
-     "Melee",
+     "Melee, reach 1 yd",
      "2",
      "Torn flesh"
     ]
    ],
    "traits": [],
-   "natural": true
+   "natural": true,
+   "reachYards": 1
   },
   {
    "id": "derringer",
@@ -310,7 +316,8 @@
    },
    "natural": true,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "bigfists",
@@ -324,7 +331,8 @@
    },
    "unarmed": true,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "throw",
@@ -664,7 +672,8 @@
  "combatRules": {
   "oneDefense": {
    "perRound": 1,
-   "edge": "extradefense"
+   "edge": "extradefense",
+   "extraPenalty": -2
   },
   "attackQualityDodge": {
    "bands": [
@@ -688,7 +697,7 @@
   },
   "parry": {
    "mod": -3,
-   "repeatPenalty": -2,
+   "repeatPenalty": 0,
    "bareHanded": "unarmed"
   },
   "block": {

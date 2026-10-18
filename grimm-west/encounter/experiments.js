@@ -26,13 +26,30 @@ export function bandFor(margin, bands) {
 /** Telling hit effects (core rules, Telling hits): [id, name, what happens]. */
 export const TELLING_EFFECTS = [
   ["disarm", "Disarm", "the weapon or held item drops, or flies a few yards away"],
-  ["knockdown", "Knock down", "the target falls prone, or is driven back a few steps"],
-  ["pin", "Pin", "the target is held, tangled or pinned down: their next action goes to getting free"],
+  ["knockdown", "Knock down", "the target falls prone, or is driven back a few steps; standing uses their next move, not their action"],
+  ["pin", "Pin", "the target is grabbed, held or pinned against something: their next action goes to getting free, then they're free; another hit keeps them pinned"],
   ["rattle", "Rattle", "−2 to the target's next roll"],
-  ["break", "Break gear", "a shield, weapon or tool breaks; armor loses 1 protection until repaired"],
+  ["break", "Break gear", "a weapon, shield or tool is out of use until its owner spends an action putting it right (destroyed only if it was already vulnerable); armor loses 1 protection until repaired"],
   ["open", "Open them up", "the next attack on this target this round gets +2"],
-  ["precise", "Precise", "it hits exactly what was aimed at"],
+  ["precise", "Precise", "it hits exactly what was aimed at: it changes the situation, never the injury, defense or death rules"],
 ];
+
+/**
+ * The telling-hit effects a weapon can deliver (core rules, Telling hits): TELLING_EFFECTS rows.
+ * Pin needs a weapon in hand, fists or a grapple; knock down needs one of those, or a shot or missile that marks 2 or more boxes;
+ * bare hands and natural weapons don't break gear. A weapon's own "telling": { add, not } adjusts the list (a taser knocks down).
+ * @param {any} weapon @param {{ melee?: string, unarmed?: string }} [skills] the setting's skills for a weapon in hand and for bare hands
+ */
+export function tellingEffectsFor(weapon, skills) {
+  if (!weapon) return TELLING_EFFECTS;
+  const SK = { melee: "Melee", unarmed: "Brawling", ...(skills || {}) };
+  const inHand = weapon.reach === "melee";
+  const bare = inHand && (weapon.id === "fists" || weapon.unarmed || weapon.natural || (SK.melee !== SK.unarmed && weapon.skill === SK.unarmed));
+  const heavy = Object.values(weapon.damage || {}).some((/** @type {any} */ d) => d && d.boxes >= 2);
+  const ok = { pin: inHand, knockdown: inHand || heavy, break: !bare };
+  const t = weapon.telling || {};
+  return TELLING_EFFECTS.filter(([id]) => !(t.not || []).includes(id) && ((t.add || []).includes(id) || (ok[/** @type {"pin"} */ (id)] ?? true)));
+}
 
 export const EXPERIMENTS = [
   {
@@ -75,8 +92,8 @@ export const EXPERIMENTS = [
   },
   {
     id: "oneDefense", scope: "core", label: "One defense a round",
-    summary: "Dodge, Parry and Block share one defense a round; an Edge (Additional Defense) or trait adds more.",
-    params: { perRound: 1 },
+    summary: "Dodge, Parry and Block share one defense a round; an Edge (Additional Defense) or trait adds more, each extra one at extraPenalty (−2 in the core rules), never twice against one attack.",
+    params: { perRound: 1, extraPenalty: 0 },
     flags: ["oneDefense"],
   },
   {

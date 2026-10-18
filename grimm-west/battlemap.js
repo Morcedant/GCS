@@ -25,7 +25,7 @@ function mountBattleMap(api) {
   const PARTY = api.partyName || "party", Party = PARTY[0].toUpperCase() + PARTY.slice(1);
   // The range tracks: the setting's own (a ship fight, a stagecoach chase), or one plain track. The first is "range".
   const TRACKS = ((api.rangeTracks || []).length ? api.rangeTracks : [api.rangeTrack || {}]).map((r, i) => Object.assign({ title: "Range track", us: "Us", note: "",
-    bands: [["Close", "up to 10 yd"], ["Short", "up to 50 yd"], ["Medium", "up to 150 yd"], ["Long", "up to 500 yd"], ["Extreme", "up to a mile"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
+    bands: [["Close", "up to 10 yd"], ["Short", "up to 25 yd"], ["Medium", "up to 100 yd"], ["Long", "up to 300 yd"], ["Extreme", "up to 1,000 yd"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
   const addName = (x) => x.replace(/^(Our|The) /, (m) => m.toLowerCase());
   const UNITS = { yd: { name: "yards", one: "yard", bands: api.bands || [], presets: [1, 2, 5, 10, 50] } };
   if ((api.kmBands || []).length) UNITS.km = { name: "km", one: "km", bands: api.kmBands, presets: [1, 10, 100, 1000, 10000] };
@@ -79,7 +79,9 @@ function mountBattleMap(api) {
   // A distance in hexes, at the map's scale, as a range band.
   function rangeText(n) {
     const u = UNITS[st.scale.unit], d = n * st.scale.n;
-    const band = st.scale.unit === "yd" && n <= 1 && d <= 2 ? "in reach" : (u.bands.find(([, max]) => d <= max) || ["out of range"])[0];
+    // Up close, the reach of a weapon in hand: 1 yard for fists and knives, 2 for a sword, 3 for a spear.
+    const reach = st.scale.unit !== "yd" ? "" : n <= 1 && d <= 1 ? "in reach of any weapon in hand" : n && d <= 2 ? "in reach of a sword or axe (2 yd)" : n && d <= 3 ? "in reach of a spear or polearm (3 yd)" : "";
+    const band = reach || (u.bands.find(([, max]) => d <= max) || ["out of range"])[0];
     return `${n} hex${n === 1 ? "" : "es"} · ${fmt(d)} ${d === 1 ? u.one : u.name} · ${band}`;
   }
 
@@ -484,7 +486,7 @@ function mountBattleMap(api) {
       const ship = !!(th && (api.vehicles || []).includes(th));
       toks().push({ id: uid(), ref: null, name: name || (th ? th.name : "Token"), color: $('[data-bmf="color"]').value, img: pendingImg, tsize: +$('[data-bmf="tsize"]').value,
         ...spot(RT.startLane || Math.min(3, lanes().length - 1)), boxes: Math.max(1, +$('[data-bmf="boxes"]').value || 1), injury: 0, threat: th ? th.id : null, boxLabel: ship ? "Hull" : "Injury",
-        stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.trait].filter(Boolean).join(" · ") : "" });
+        stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.move ? `Move ${th.move} yd` : "", th.trait].filter(Boolean).join(" · ") : "" });
       // Numbered names count up, so "Outlaw 1" is followed by "Outlaw 2".
       const m = name.match(/^(.*?)(\d+)$/); $('[data-bmf="name"]').value = m ? m[1] + (+m[2] + 1) : name;
       save(); draw();
@@ -540,7 +542,24 @@ function mountBattleMap(api) {
   fillThreats();
   Promise.all(KINDS.map((k) => idb.get(bgKey(k)))).then((l) => { KINDS.forEach((k, i) => (bgs[k] = l[i] || null)); draw(); if (!V().set && svg.clientWidth) fit(); });
   draw();
-  return { refresh: () => {
+  // Where two people stand from each other, for the encounter panel: a character by its card (ref), anyone else by
+  // the token's name. On a hex map in yards: { yards, hexes, band }; on the plain range track: { band } from the lanes.
+  // null when either isn't on the map (or a name fits more than one token), or on a ship or chase track.
+  function distanceBetween(a, b) {
+    const find = (w) => { const l = toks().filter((t) => (w.ref && t.ref === w.ref) || (!t.ref && w.name && (info(t).name || "").toLowerCase() === w.name.toLowerCase())); return l.length === 1 ? l[0] : null; };
+    const ta = find(a), tb = find(b);
+    if (!ta || !tb) return null;
+    if (isRange()) {
+      if (RT.id !== "range" || RT.vehicle || RT.vehicleTrack) return null;
+      const n = Math.abs((ta.lane || 0) - (tb.lane || 0)), band = n ? RT.bands[n - 1] : RT.bands[0];
+      return band ? { band: String(band[0]).toLowerCase(), lanes: n } : { band: null, lanes: n };
+    }
+    if (st.scale.unit !== "yd") return null;
+    const hexes = dist(ta, tb), yards = hexes * st.scale.n;
+    return { hexes, yards, scale: st.scale.n, band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
+  }
+
+  return { distanceBetween, refresh: () => {
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();

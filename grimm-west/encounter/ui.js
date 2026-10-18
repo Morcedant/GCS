@@ -170,6 +170,28 @@ export function mountLab(api) {
     return out;
   }
   const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"] });
+  // The battle map's distance between attacker and target, checked against the weapon: a weapon in hand's reach
+  // and the attacker's Move (as injury leaves it), or a ranged weapon's band, which it sets. Only a note: the GM rules.
+  function reachCheck(/** @type {any} */ a, /** @type {any} */ d, /** @type {any} */ w) {
+    const out = $("lab-reach"), at = a && d && w && api.mapDistance ? api.mapDistance({ ref: a.ref, name: a.name }, { ref: d.ref, name: d.name }) : null;
+    out.hidden = !at; if (!at) return;
+    const mv = LD.injuredMove(a.move || LD.THREAT_MOVE, a.injury || 0), run = (a.injury || 0) >= 2 ? 0 : mv * 2;
+    const where = at.yards !== undefined ? `${fmtYd(at.yards)} apart on the map` : `${at.lanes} lane${at.lanes === 1 ? "" : "s"} apart on the range track`;
+    let msg, bad = false;
+    if (w.reach === "melee") {
+      const reach = LD.reachYards(w) || 1;
+      if (at.yards === undefined) { msg = at.lanes <= 1 ? `${where}: close enough to move in and strike (reach ${reach} yd, Move ${mv} yd) if the GM agrees.` : `${where}: too far to strike with a weapon in hand this turn.`; bad = at.lanes > 1; }
+      else if (at.hexes <= 1 && (at.yards <= reach || at.scale <= 5)) msg = `${where}: in reach (${w.name}, ${reach} yd).`;
+      else if (at.yards <= reach + mv) msg = `${where}: out of reach (${reach} yd), but within Move (${mv} yd): move in and strike.`;
+      else { bad = true; msg = `${where}: too far to strike this turn. Reach ${reach} yd + Move ${mv} yd = ${reach + mv} yd${run ? `; running (${run} yd) closes in but takes the action` : "; seriously wounded, no running"}.`; }
+    } else if (at.band) {
+      const ok = LD.rangeModifier(w, at.band) !== null;
+      if (ok) $("lab-band").value = at.band;
+      bad = !ok; msg = `${where}: ${BAND_NAMES[at.band] || at.band}${ok ? ", set above" : `, out of range for the ${w.name.toLowerCase()}`}.`;
+    } else { bad = true; msg = `${where}: beyond Extreme range.`; }
+    out.className = "small " + (bad ? "bad" : "muted"); out.textContent = msg;
+  }
+  const fmtYd = (/** @type {number} */ y) => `${Math.round(y * 10) / 10} yd`;
   function fromCharacter(c) {
     const k = api.calc(c), gun = c.play && c.play.gun;
     // A shapechanger (api.formOf): in their form, its numbers (api.calc applies them), its claws, and its traits as a note.
@@ -178,7 +200,7 @@ export function mountLab(api) {
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
     const formRules = fm ? shapeTraits(fm, formOn) : [];
-    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
@@ -193,7 +215,7 @@ export function mountLab(api) {
   function fromThreat(t, name) {
     const skills = Object.fromEntries(t.attacks.map((/** @type {any} */ a) => [a.skill, a.target]));
     const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
-    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, dodge: t.dodge, skills, weapons: t.weapons,
+    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
       boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
@@ -379,6 +401,7 @@ export function mountLab(api) {
     $("lab-target").dataset.actor = a ? a.pid : "";
     $("lab-target").closest(".field").hidden = !["attack", "aim"].includes(action);
     $("lab-atk-row").hidden = action !== "attack";
+    $("lab-reach").hidden = true; // the map check below shows it again for an attack
     $("lab-text-row").hidden = !["point", "complication", "condition", "note"].includes(action);
     $("lab-text-label").textContent = { point: "What for (a small preparation, or other)", complication: "What happens", condition: "Condition", note: "Note" }[action] || "";
     if (action === "attack" && a) {
@@ -391,6 +414,7 @@ export function mountLab(api) {
       $("lab-band").dataset.weapon = w ? w.id : "";
       $("lab-band").innerHTML = bands.map((/** @type {string} */ b) => { const m = w ? LD.rangeModifier(w, b) : 0; return `<option value="${b}" ${m === null ? "disabled" : ""}>${BAND_NAMES[b]}${m ? " (" + signed(m) + ")" : m === null ? " (out of range)" : ""}</option>`; }).join("");
       $("lab-band").value = pb && bands.includes(pb) && (!w || LD.rangeModifier(w, pb) !== null) ? pb : bands.includes("close") ? "close" : bands[0];
+      reachCheck(a, E.find(en, $("lab-target").value), w);
       const modes = w && w.ammo ? MODES.filter((/** @type {any} */ m) => !m[3] || m[3].includes(w.ammo)) : [];
       $("lab-mode-wrap").hidden = !modes.length;
       $("lab-fmode").innerHTML = modes.map((/** @type {any} */ m) => `<option value="${m[0]}">${esc(m[1])} (${m[2]} ${m[2] > 1 ? esc(T.ammo || "rounds") : esc(T.ammoOne || "round")}${m[4] ? ", " + signed(m[4]) : ""})</option>`).join("");
@@ -404,7 +428,8 @@ export function mountLab(api) {
       // What the attack is made of (the setting's materials): silver bullets, a wooden stake, cold iron.
       $("lab-material-wrap").hidden = !MATERIALS.length;
       if (MATERIALS.length && !$("lab-material").options.length) $("lab-material").innerHTML = `<option value="">Ordinary</option>` + MATERIALS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)}</option>`).join("");
-      if (TH && !$("lab-called").options.length) $("lab-called").innerHTML = `<option value="">None</option>` + LDX.TELLING_EFFECTS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join("");
+      // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
+      if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None</option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
       if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
       const base = w ? a.skills[w.skill] : undefined;
@@ -520,7 +545,7 @@ export function mountLab(api) {
       btns.push(`<button class="btn" data-fx="trade-lost">${esc(d.name)}: lose a limb instead (complication)</button><button class="btn" data-fx="trade-crippled">${esc(d.name)}: lose a limb's use instead (complication)</button>`);
     if (live && ev.grievous && ev.grievous.pc && !ev.traded && ev.grievous.downgradedTo === undefined && d && d.points > 0) btns.push(`<button class="btn" data-fx="downgrade">${esc(d.name)}: downgrade the grievous wound (${esc(T.point)})</button>`);
     if (live && ev.telling && !ev.telling.shrugged) {
-      if (!ev.telling.called) btns.push(`<label class="small">Effect <select data-telling>${[["", "Pick…"], ...LDX.TELLING_EFFECTS].map((/** @type {any} */ [id, n]) => `<option value="${id}"${id === (ev.telling.effect || "") ? " selected" : ""}>${esc(n)}</option>`).join("")}</select></label>`);
+      if (!ev.telling.called) btns.push(`<label class="small">Effect <select data-telling>${[["", "Pick…"], ...LDX.tellingEffectsFor(rules().weapons[ev.weapon && ev.weapon.id] || ev.weapon, rules().skills)].map((/** @type {any} */ [id, n]) => `<option value="${id}"${id === (ev.telling.effect || "") ? " selected" : ""}>${esc(n)}</option>`).join("")}</select></label>`);
       if (d && d.kind === "pc" && (d.traits || []).some((/** @type {any} */ t) => t.type === "shrugTelling" && !t.used)) btns.push(`<button class="btn" data-fx="shrug-edge">${esc(d.name)}: shrug it off (Hard to put down)</button>`);
       if (d && d.kind === "pc" && d.points > 0) btns.push(`<button class="btn" data-fx="shrug-point">${esc(d.name)}: shrug it off (${esc(T.point)})</button>`);
     }
