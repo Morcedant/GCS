@@ -119,3 +119,20 @@ test("the GM removes a player: their browser is banned and their characters unsh
   assert.equal(t.banned.length, L.MAX_BANNED);
   assert.deepEqual(L.presence([{ cid: "abc", role: "player", name: "Des", character: "Ruth", owner: "h-des" }]), [{ cid: "abc", role: "player", name: "Des", character: "Ruth" }], "presence carries the handle, never the owner id");
 });
+
+test("phase 3: the GM shares the scene; a player moves only their own token and asks only for their own character", () => {
+  const sheets = {};
+  L.shareSheet(sheets, ruth, { key: "r1", sheet: { name: "Ruth" }, play: {} }, 1000);
+  const gm = { role: "gm", name: "Sam", owner: "" }, kim = { role: "player", name: "Kim", character: "Webb", owner: "h-kim" };
+  assert.match(L.checkScene(ruth, { map: {} }).error, /Only the GM/);
+  assert.deepEqual(L.checkScene(gm, { map: { kind: "hex" }, fight: null }).scene, { map: { kind: "hex" }, fight: null });
+  assert.match(L.checkScene(gm, { map: { x: "y".repeat(L.MAX_SCENE) } }).error, /too large/);
+  assert.deepEqual(L.checkMove(sheets, ruth, { key: "r1", to: { q: 3, r: -2 } }).move, { key: "r1", by: "Ruth", to: { q: 3, r: -2 } });
+  assert.deepEqual(L.checkMove(sheets, ruth, { key: "r1", to: { lane: 2, y: 140.6 } }).move.to, { lane: 2, y: 141 });
+  assert.match(L.checkMove(sheets, kim, { key: "r1", to: { q: 1, r: 1 } }).error, /only your own/);
+  assert.match(L.checkMove(sheets, ruth, { key: "r1", to: { q: "x" } }).error, /place on the map/);
+  const a = L.checkAsk(sheets, ruth, { key: "r1", pid: "p1", action: "attack", target: "p2", weapon: "revolver", note: "from cover\u0000" }).ask;
+  assert.deepEqual(a, { key: "r1", by: "Ruth", pid: "p1", action: "attack", target: "p2", weapon: "revolver", note: "from cover" });
+  assert.match(L.checkAsk(sheets, ruth, { key: "r1", action: "fireball" }).error, /Choose/);
+  assert.match(L.checkAsk(sheets, gm, { key: "r1", action: "aim" }).error, /only for your own/);
+});

@@ -197,3 +197,36 @@ export function removeOwner(table, sheets, owner) {
   for (const k of keys) delete sheets[k];
   return keys;
 }
+
+// ---- phase 3: the fight, shared ----
+// The GM's page runs the encounter and the battle map, as it always has; it sends the table a scene (the map without
+// pictures, and the fight's order, injuries and latest lines), which the table keeps and passes to every player.
+// Players can drag their own token (the move goes to the GM's map) and, on their turn, ask for an action; the GM runs it.
+export const MAX_SCENE = 65_536;
+
+/** The GM's scene: { map?, fight? }, kept as sent (it's only shown). @param {any} who @param {any} msg */
+export function checkScene(who, msg) {
+  if (who.role !== "gm") return { error: "Only the GM shares the map and the fight." };
+  const scene = { map: msg.map && typeof msg.map === "object" ? msg.map : null, fight: msg.fight && typeof msg.fight === "object" ? msg.fight : null };
+  if (JSON.stringify(scene).length > MAX_SCENE) return { error: "The map is too large to share." };
+  return { scene };
+}
+const ownsKey = (/** @type {Record<string, any>} */ sheets, /** @type {any} */ who, /** @type {any} */ key) => who.role === "player" && validKey(key) && sheets[key] && who.owner && sheets[key].owner.id === who.owner;
+
+/** A player moves their own token: { key, to: { q, r } | { lane, y } }. @param {Record<string, any>} sheets @param {any} who @param {any} msg */
+export function checkMove(sheets, who, msg) {
+  if (!ownsKey(sheets, who, msg.key)) return { error: "You can move only your own character." };
+  const t = msg.to || {}, n = (/** @type {any} */ v) => Number.isInteger(v) && Math.abs(v) <= 10_000;
+  const to = n(t.q) && n(t.r) ? { q: t.q, r: t.r } : n(t.lane) && t.lane >= 0 && t.lane <= 20 ? { lane: t.lane, y: Number.isFinite(t.y) ? Math.round(t.y) : 0 } : null;
+  if (!to) return { error: "That isn't a place on the map." };
+  return { move: { key: msg.key, by: sheets[msg.key].owner.character, to } };
+}
+
+/** A player asks for an action on their turn: { key, pid, action, target?, weapon?, note? }. @param {Record<string, any>} sheets @param {any} who @param {any} msg */
+export function checkAsk(sheets, who, msg) {
+  if (!ownsKey(sheets, who, msg.key)) return { error: "You can ask only for your own character." };
+  const action = ["attack", "aim", "other"].includes(msg.action) ? msg.action : null;
+  if (!action) return { error: "Choose what you want to do." };
+  const id = (/** @type {any} */ v) => (typeof v === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(v) ? v : null);
+  return { ask: { key: msg.key, by: sheets[msg.key].owner.character, pid: id(msg.pid), action, target: id(msg.target), weapon: id(msg.weapon), note: cleanText(msg.note, 200) } };
+}
