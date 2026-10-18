@@ -595,7 +595,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="e0d27c0" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · e0d27c0</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="784b41d" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 784b41d</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -9016,7 +9016,56 @@ function mountTable(api) {
           <div class="fields"><div class="field"><label for="tbl-tname">Table name<\/label><input type="text" id="tbl-tname" data-tbl="tname" maxlength="60" placeholder="Saturday's game"><\/div>${showServer ? serverField("tbl-gserver") : ""}<\/div>
           <div class="btn-row"><button class="btn primary" data-tbl="start">Start a table<\/button>${st.gmKeys[st.code] ? `<button class="btn" data-tbl="rejoin">Rejoin ${esc(st.code)} as GM<\/button>` : ""}${!showServer ? `<button class="linkish small" data-tbl="showserver">Another table server…<\/button>` : ""}<\/div>${statusP}`;
     }
+    for (const [root, who] of [[api.playRoot, "player"], [api.gmRoot, "gm"]]) if (root)
+      root.insertAdjacentHTML("beforeend", `<p class="small tbl-helpline"><button type="button" class="linkish" data-tbl="help" data-who="${who}">How a shared game works<\/button><\/p>`);
     renderPlayers(); renderLog(); renderAsks();
+  }
+
+  // ---- the tutorial: a pop-up for the GM and for players ----
+  function helpHtml(who) {
+    const P = esc(api.playTab || "play"), pt = esc(api.pointName || "point"), party = esc(api.partyName || "party");
+    const step = (h, body) => `<li><b>${h}<\/b> ${body}<\/li>`;
+    const gm = `<ol class="tbl-steps">
+      ${step("Start the table.", `Open the <b>GM view<\/b>. In <b>Shared table<\/b>, give the game a name and press <b>Start a table<\/b>. You get a six-character code.`)}
+      ${step("Invite the players.", `Press <b>Copy link<\/b> and send it to them (a message, a chat, an email), or read out the code. Keep this page open; if you close it, <b>Rejoin as GM<\/b> brings you back from this same browser.`)}
+      ${step("Watch them arrive.", `Each player's character appears under <b>Characters<\/b>, marked <i>at the table<\/i>. Their injuries, ${pt} points and ammunition stay in step both ways: mark a box on their card and it shows on their sheet, and the other way round.`)}
+      ${step("Roll.", `Every roll from a player's sheet is rolled by the table and lands in the log here, with the dice, the target and any telling hit. A ${pt} point reroll answers its roll once.`)}
+      ${step("Set up a fight.", `On the <b>Battle map<\/b>, press <b>Add the ${party}<\/b> and place the threats. In the <b>Encounter<\/b> panel, add the characters and threats and start. The players now see the map, the turn order and what happens.`)}
+      ${step("Run the turns.", `On a player's turn, what they want to do appears under <b>Players ask<\/b>. Press <b>Put it in the encounter panel<\/b>, check it, and run it as usual. Players move their own tokens; you move everyone else.`)}
+      ${step("If you need to.", `<b>Remove<\/b> takes a player off the table (that browser can't rejoin). <b>Change code<\/b> gives the table a new code: everyone at the table follows it, and the old one stops working.`)}
+    <\/ol>`;
+    const player = `<ol class="tbl-steps">
+      ${step("Open your character.", `Load your character in the creator and go to the <b>${P}<\/b> tab.`)}
+      ${step("Join.", `In <b>Shared table<\/b>, type the code your GM gave you and your name, and press <b>Join<\/b>. If the GM sent a link, opening it fills in the code.`)}
+      ${step("Play as usual.", `Roll from your sheet as always: the table rolls the dice, and everyone sees the result. Spend a ${pt} point to reroll from the result, as usual.`)}
+      ${step("Your sheet and the GM's card stay in step.", `When the GM marks an injury or gives you a ${pt} point, your sheet changes too; when you mark one, the GM sees it.`)}
+      ${step("In a fight.", `The <b>Map and fight<\/b> card shows the GM's map and whose turn it is. Drag <b>your own<\/b> token to move. On your turn, choose what you'll do (attack, aim or something else, the target, the weapon) and press <b>Send to the GM<\/b>; the GM runs it.`)}
+      ${step("Leaving.", `<b>Leave the table<\/b> goes back to rolling on your own. A reload or a dropped connection rejoins by itself.`)}
+    <\/ol>`;
+    return `<div class="tbl-help-head"><b>How a shared game works<\/b><button type="button" class="btn small" data-tblhelp="close" aria-label="Close">Close<\/button><\/div>
+      <div class="btn-row" role="tablist"><button type="button" class="btn${who === "gm" ? " primary" : ""}" role="tab" aria-selected="${who === "gm"}" data-tblhelp="gm">Running the game (GM)<\/button><button type="button" class="btn${who === "player" ? " primary" : ""}" role="tab" aria-selected="${who === "player"}" data-tblhelp="player">Playing (players)<\/button><\/div>
+      ${who === "gm" ? gm : player}
+      <p class="small muted">Everyone needs this game's creator open (a table takes characters only from its own game) and an internet connection. Anyone with the code can join, so share it only with your players. Without a table, everything works as before, on your own device.<\/p>`;
+  }
+  function openHelp(who) {
+    let d = document.getElementById("tbl-help");
+    if (!d) {
+      if (!document.getElementById("tbl-help-css")) document.head.insertAdjacentHTML("beforeend", `<style id="tbl-help-css">
+        #tbl-help { max-width: min(42rem, calc(100vw - 32px)); width: 100%; border: 1px solid var(--line, #888); border-radius: 12px; padding: 16px 18px; background: var(--space, #101318); color: var(--fg, #eee); box-shadow: 0 10px 40px rgba(0, 0, 0, .6); }
+        #tbl-help b { color: var(--chrome, inherit); } #tbl-help .muted { color: var(--muted, #999); }
+        #tbl-help::backdrop { background: rgba(0, 0, 0, .55); }
+        #tbl-help .tbl-help-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+        #tbl-help .tbl-steps { padding-left: 1.3em; line-height: 1.5; } #tbl-help .tbl-steps li { margin: 6px 0; }
+      <\/style>`);
+      d = document.createElement("dialog"); d.id = "tbl-help"; d.setAttribute("aria-label", "How a shared game works"); document.body.appendChild(d);
+      d.addEventListener("click", (e) => {
+        if (e.target === d) { d.close(); return; } // a click on the backdrop
+        const b = e.target.closest("[data-tblhelp]"); if (!b) return;
+        if (b.dataset.tblhelp === "close") d.close(); else { d.innerHTML = helpHtml(b.dataset.tblhelp); d.querySelector(`[data-tblhelp="${b.dataset.tblhelp}"]`).focus(); }
+      });
+    }
+    d.innerHTML = helpHtml(who);
+    if (d.showModal) d.showModal(); else d.setAttribute("open", "");
   }
   function onClick(e) {
     const b = e.target.closest("[data-tbl]"); if (!b || b.tagName === "INPUT") return;
@@ -9032,6 +9081,7 @@ function mountTable(api) {
     } else if (k === "start") start(val("tname"));
     else if (k === "rejoin") { st.role = "gm"; st.joined = true; save(); connect(); }
     else if (k === "leave") leave();
+    else if (k === "help") { openHelp(b.dataset.who); return; }
     else if (k === "fillask") { const a = asks[+b.dataset.i]; if (a && api.fillAsk && api.fillAsk(a)) { asks.splice(+b.dataset.i, 1); renderAsks(); } else say("Start the encounter with that character in it first.", true); }
     else if (k === "dropask") { asks.splice(+b.dataset.i, 1); renderAsks(); }
     else if (k === "kick") {
@@ -9063,7 +9113,7 @@ function mountTable(api) {
 }
 
   // The shared table: players join from their play tab, the GM starts one here, and every roll at the table shows on both.
-  sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay,
+  sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay, pointName: T.point, partyName: T.party,
     server: TABLE_SERVER, character: () => ch.name, esc, toast,
     // Phase 2: the player shares their character; the GM's cards follow the table's characters, and both follow each other's changes.
     onPlayers: () => renderGM(), // who's at the table, on the GM's cards
