@@ -30,10 +30,30 @@ WHY_SLUG = "/why-legend-dynamics"
 TABLE_SLUG = "/shared-table"
 CONTACT_SLUG = "/contact"
 CONTACT_EMAIL = "contact@legenddynamicsrpg.com"
+START_SLUG = "/start"
+CHANGELOG_SLUG = "/changelog"
 
 BRAND_FONTS = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
 
 e = html.escape
+
+
+def rules_version():
+    """The rules' version and change history: legend-dynamics/rules-version.json, the one place they're kept."""
+    return json.loads((LD / "rules-version.json").read_text())
+
+
+def long_date(iso):
+    y, m, d = iso.split("-")
+    months = "January February March April May June July August September October November December".split()
+    return f"{int(d)} {months[int(m) - 1]} {y}"
+
+
+def rules_stamp():
+    """'Rules version … · last updated …', or just the date while no version number has been set."""
+    v = rules_version()
+    when = f"last updated {long_date(v['rulesUpdated'])}"
+    return f"Rules version {e(v['rulesVersion'])} · {when}" if v.get("rulesVersion") else f"Rules {when}"
 
 
 def pack(pid):
@@ -82,8 +102,8 @@ def table_page():
   </div>
 </div>
 
-<!-- Block 2: running a game -->
-<div class="ld">
+<!-- Block 2: running a game (anchor id "run") -->
+<div class="ld" id="run">
   <div class="ld-eyebrow">Running a game</div>
   <ol class="ld-steps">
     <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
@@ -93,6 +113,7 @@ def table_page():
     <li><b>Keep it private.</b> Anyone with the code can join. The GM can <b>Remove</b> a player and <b>Change code</b> at any time.</li>
   </ol>
   <p style="margin-top:1rem">Each creator has a <b>How a shared game works</b> guide beside the table, for the GM and for players. The creators on this site already use a table server: nothing to set up. Read on only to host your own.</p>
+  <p style="font-size:.9rem;color:var(--ld-ink-2);margin-top:1rem">You can mix it with the <a href="{DISCORD_SLUG}">Discord dice bot</a>: stream the map to a group on Discord while players who have the creator open join the shared table, or roll with the bot while the GM keeps the encounter panel.</p>
 </div>
 
 <!-- Block 3: host your own (give this section the anchor id "host" in Squarespace, or keep the id below) -->
@@ -194,6 +215,82 @@ def why_page():
 """
 
 
+def start_page():
+    """Start here: choose a setting, create a character, join or run a game."""
+    games = "".join(f'<a class="ld-button ld-button--ghost" href="{SLUGS[g]}">{e(pack(g)["terms"]["title"])}</a>' for g in GAMES)
+    creators = "".join(f'<a class="ld-button ld-button--ghost" href="{CREATORS[g]}" target="_blank" rel="noopener">{e(pack(g)["terms"]["title"])} creator</a>' for g in GAMES)
+    genres = "; ".join(f"<i>{e(pack(g)['terms']['title'])}</i>, {e(GENRE[g].lower())}" for g in GAMES)
+    return f"""<!-- Start here page (suggested URL {START_SLUG}). No theme injection: it uses the Legend Dynamics brand.
+     Paste each block into its own Code Block (Display Source off). -->
+
+<!-- Block 1: hero -->
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Start here</div>
+  <h1>From first look to first roll</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">Three steps: pick a world, make a character, and play. You don't need to read the rules first: the character creator explains each choice as you make it, and the rules are there when you want them.</p>
+</div>
+
+<!-- Block 2: the three steps -->
+<div class="ld">
+  <ol class="ld-steps">
+    <li><b>Choose a setting.</b> Four games share one set of core rules: {genres}. Each page shows who you can play and the setting's guides.
+      <div class="ld-actions" style="margin-top:.8rem">{games}</div></li>
+    <li><b>Create a character.</b> Open the setting's character creator. It walks you through five steps and checks every rule as you go, or you can load a ready-made character. Save the file, print the sheet, or keep it in your browser.
+      <div class="ld-actions" style="margin-top:.8rem">{creators}</div></li>
+    <li><b>Join or run a game.</b> Round a table, bring your sheet and three six-sided dice (or use the sheet's roller). Online, play on the <a href="{TABLE_SLUG}">shared table</a> built into every creator, or <a href="{DISCORD_SLUG}#session">over Discord</a> with the GM sharing their screen and the dice bot in the channel.
+      <div class="ld-actions" style="margin-top:.8rem"><a class="ld-button ld-button--ghost" href="{TABLE_SLUG}#run">Use the shared table</a><a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}#session">Play over Discord</a></div></li>
+  </ol>
+</div>
+
+<!-- Block 3: what each person needs -->
+<div class="ld">
+  <div class="ld-eyebrow">Who needs what</div>
+  <ul class="ld-pillars">
+    <li><b>A player needs</b><span>A character from the creator, and three six-sided dice or the roller on its sheet. To play online: the code or link for the GM's shared table, or an invitation to the group's Discord server.</span></li>
+    <li><b>The GM needs</b><span>The setting's creator, open on its <strong>GM view</strong>: everyone's characters, the battle map, the encounter panel and the clocks. The setting's guides, from its page. To play online: start a <a href="{TABLE_SLUG}#run">shared table</a> there, or <a href="{DISCORD_SLUG}#load">add the dice bot</a> to your Discord server and share your screen.</span></li>
+  </ul>
+  <div class="ld-actions" style="margin-top:1.4rem">
+    <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">The core rules, when you want them</a>
+    <a class="ld-button ld-button--ghost" href="{CONTACT_SLUG}">Questions? Get in touch</a>
+  </div>
+</div>
+"""
+
+
+def changelog_page():
+    """The changelog, from rules-version.json: rules changes and website or wording updates, kept apart."""
+    v = rules_version()
+    kinds = {"rules": "Rules change", "site": "Website and wording"}
+    entries = []
+    for c in v["changes"]:
+        items = "".join(f"<li>{e(i)}</li>" for i in c.get("items", []))
+        summary = f"<p><b>{e(c['summary'])}</b></p>" if c.get("summary") else ""
+        entries.append(f'<h2 id="{c["date"]}-{c["kind"]}">{e(c["title"])}</h2>\n<p class="ld-eyebrow" style="margin:0">{long_date(c["date"])} · {kinds[c["kind"]]}</p>\n{summary}<ul>{items}</ul>')
+    body = "\n".join(entries)
+    return f"""<!-- Changelog page (suggested URL {CHANGELOG_SLUG}). Built from legend-dynamics/rules-version.json.
+     Paste each block into its own Code Block (Display Source off). -->
+
+<!-- Block 1: hero -->
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Legend Dynamics RPG system</div>
+  <h1>Changelog</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">{rules_stamp()}. A <b>rules change</b> changes how the game plays; a <b>website and wording</b> update fixes or improves the site and the text without changing the rules, and leaves the rules' date alone.</p>
+  <div class="ld-actions">
+    <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">Core rules</a>
+    <a class="ld-button ld-button--ghost" href="{CONTACT_SLUG}">Send feedback</a>
+  </div>
+</div>
+
+<!-- Block 2: the changes, newest first -->
+<div class="ld ld-rules">
+{body}
+<p style="font-size:.9rem;color:var(--ld-ink-2)">Changes before October 2026 aren't listed here.</p>
+</div>
+"""
+
+
 def odds(target):
     ways = [1, 3, 6, 10, 15, 21, 25, 27, 27, 25, 21, 15, 10, 6, 3, 1]
     return sum(w for t, w in zip(range(3, 19), ways) if t <= 4 or (t <= 16 and t <= target)) / 216
@@ -223,11 +320,13 @@ def home():
   <hr class="ld-rule">
   <p class="ld-lede">A tabletop roleplaying system built on three six-sided dice and concrete skills. One core, many worlds: Gothic Westerns, starships, swords against sorcery, and superheroes under the law.</p>
   <div class="ld-actions">
-    <a class="ld-button" href="#games">Choose a game</a>
+    <a class="ld-button" href="{START_SLUG}">Start here</a>
+    <a class="ld-button ld-button--ghost" href="#games">Choose a game</a>
     <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">Read the core rules</a>
     <a class="ld-button ld-button--ghost" href="#online">Play online</a>
     <a class="ld-button ld-button--ghost" href="{WHY_SLUG}">Why I made it</a>
   </div>
+  <p style="font-size:.92rem;color:var(--ld-ink-2);max-width:40rem;margin:1.4rem 0 0">Legend Dynamics RPG is a living game system. The rules and online tools are available now and continue to evolve through playtesting and player feedback. <a href="{CONTACT_SLUG}">Tell me how your game went</a>.</p>
 </div>
 
 <!-- Block 2: what makes it tick -->
@@ -248,17 +347,16 @@ def home():
 <!-- Block 3b: playing online (give this section the anchor id "online" in Squarespace, or keep the id below) -->
 <div class="ld" id="online">
   <div class="ld-eyebrow">Play online</div>
-  <p>Not round the same table? There are two ways to play together, and both work with every game.</p>
+  <p class="ld-lede" style="margin:0 0 1.2rem">Create characters, share dice rolls, and play together on a shared map.</p>
   <ul class="ld-pillars">
-    <li><b>The shared table</b><span>Built into every character creator. The GM opens the <strong>GM view</strong>, presses <strong>Start a table</strong> and sends the players the link; each player joins from their character's play tab. The table rolls everyone's dice where all can see them, keeps each character's injuries and points in step with the GM's cards, and shows the GM's battle map and fight on every player's screen, where they move their own token and send the GM what they do on their turn. Best when everyone has their own phone, tablet or computer. Each creator has a <strong>How a shared game works</strong> guide beside the table.</span></li>
-    <li><b>Screen share and the Discord dice bot</b><span>Rather run it all from your own screen? Stream it: share the GM view's battle map and encounter panel in a Discord call (or Zoom, Meet or any video call), and run the fight there as usual. Players roll with the Legend Dynamics dice bot in your Discord channel, which knows each game's points, clocks and tracks. Nobody else needs the creator open, only their character sheet.</span></li>
+    <li><b>The shared table</b><span>Built into every character creator. The GM starts a table and sends the players a code; each joins from their character sheet. Everyone sees the same dice, characters and battle map on their own phone, tablet or computer. Nothing to install.</span></li>
+    <li><b>Screen share and the Discord dice bot</b><span>Or the GM shares their screen in a Discord call (or any video call), and players roll with the Legend Dynamics dice bot in the channel.</span></li>
   </ul>
   <div class="ld-actions" style="margin-top:1.2rem">
-    <a class="ld-button" href="#games">Open a creator for the shared table</a>
-    <a class="ld-button ld-button--ghost" href="{TABLE_SLUG}">How the shared table works, and hosting your own</a>
-    <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}">Set up the Discord dice bot</a>
+    <a class="ld-button ld-button--ghost" href="{TABLE_SLUG}">Run a game on the shared table</a>
+    <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}#session">Run a game over Discord</a>
+    <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}#load">Add the dice bot to Discord</a>
   </div>
-  <p style="font-size:.9rem;color:var(--ld-ink-2);margin-top:1rem">You can mix them: stream the map to a group on Discord while players who have the creator open join the shared table, or roll with the bot while the GM keeps the encounter panel.</p>
 </div>
 
 <!-- Block 4: the odds -->
@@ -343,13 +441,22 @@ def core_rules():
     body = subprocess.run(["pandoc", "-f", "markdown", "-t", "html5", "--id-prefix=ld-"], input=md, text=True, capture_output=True, check=True).stdout
     heads = re.findall(r'<h1 id="([^"]+)">(.*?)</h1>', body)
     toc = "".join(f'<a href="#{i}">{t}</a>' for i, t in heads)
-    return f"""<!-- Core rules page. Paste into one Code Block (Display Source off). If Squarespace says the
+    # The notice at the end of the rules document is shown once, below the rules (or in the site footer).
+    body, n = re.subn(r"\s*<p><em>Legend Dynamics RPG system, created by Don Smallwood\.</em>.*?</p>\s*$", "\n", body, flags=re.S)
+    assert n == 1, "the core rules' closing notice has moved"
+    return f"""<!-- Core rules page. Paste Block 1 into one Code Block (Display Source off). If Squarespace says the
      block is too long, split it at any <h1> and use two or more Code Blocks. -->
+
+<!-- Block 1: the rules -->
 <div class="ld ld-rules">
 <div class="ld-eyebrow">Legend Dynamics RPG system</div>
+<p style="font-size:.92rem;color:var(--ld-ink-2)">New to Legend Dynamics? <a href="{START_SLUG}">Start here</a>: you can make a character without reading these rules first. · {rules_stamp()} · <a href="{CHANGELOG_SLUG}">Changelog</a></p>
 <nav class="ld-toc">{toc}</nav>
 {body}
 </div>
+
+<!-- Block 2: license (leave this out if your Squarespace footer carries the notice, as the home page suggests) -->
+<p class="ld" style="font-size:.9rem;color:var(--ld-ink-2)">Legend Dynamics RPG system, created by Don Smallwood. This RPG is released under the <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener" target="_blank">Creative Commons Attribution 4.0 International License</a>. You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.</p>
 """
 
 
@@ -477,6 +584,8 @@ def main():
     write(WEB / "blocks" / "why.html", why_page())
     write(WEB / "blocks" / "shared-table.html", table_page())
     write(WEB / "blocks" / "contact.html", contact_page())
+    write(WEB / "blocks" / "start.html", start_page())
+    write(WEB / "blocks" / "changelog.html", changelog_page())
 
     # preview.html: the three kinds of page in a plain wrapper, using custom.css, with a tab per theme.
     css = (WEB / "custom.css").read_text()
@@ -489,6 +598,8 @@ def main():
     pages["why"] = ("Why Legend Dynamics", "", strip(why_page()))
     pages["table"] = ("Shared table", "", strip(table_page()))
     pages["contact"] = ("Contact", "", strip(contact_page()))
+    pages["start"] = ("Start here", "", strip(start_page()))
+    pages["changelog"] = ("Changelog", "", strip(changelog_page()))
     tabs = "".join(f'<button data-p="{k}" data-c="{c}">{e(n)}</button>' for k, (n, c, _) in pages.items())
     sections = "".join(f'<main class="pv" id="pv-{k}" hidden><section class="page-section"><div class="section-background"></div><div class="content">{body}</div></section></main>' for k, (_, _, body) in pages.items())
     write(WEB / "preview.html", f"""<!doctype html>
@@ -513,7 +624,7 @@ const show = (k) => {{ document.querySelectorAll(".pv").forEach((m) => (m.hidden
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${{k}}"]`).dataset.c; scrollTo(0, 0); }};
 document.querySelector(".pv-bar").onclick = (ev) => {{ const b = ev.target.closest("button"); if (b) show(b.dataset.p); }};
 document.addEventListener("click", (ev) => {{ const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{SLUGS['aurora']}": "aurora", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord", "{WHY_SLUG}": "why", "{TABLE_SLUG}": "table", "{CONTACT_SLUG}": "contact" }}[a.getAttribute("href")]; if (k) show(k); }});
+  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{SLUGS['aurora']}": "aurora", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord", "{WHY_SLUG}": "why", "{TABLE_SLUG}": "table", "{CONTACT_SLUG}": "contact", "{START_SLUG}": "start", "{CHANGELOG_SLUG}": "changelog" }}[a.getAttribute("href")]; if (k) show(k); }});
 show(location.hash.slice(1) || "home");
 </script></body></html>
 """)

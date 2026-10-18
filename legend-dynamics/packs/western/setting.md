@@ -140,7 +140,7 @@ Opponents use the same rules as the characters. **Minor opponents** (hired guns,
 
 <!-- SECTION:advantages -->
 
-**Badges.** A badge is legal authority, not a magic word: outlaws and the powerful don't always care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency's reach and files, but no badge.
+**Badges.** A badge is legal authority, not a magic word: outlaws and the powerful don't always care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law roles (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency's reach and files, but no badge.
 
 <!-- SECTION:customrole -->
 

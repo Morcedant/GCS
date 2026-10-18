@@ -16,17 +16,17 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Fracture Lines** setting: its callings, species, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Resolve points**. The material for running the game (job seeds, the threats and enemy ships, and the GM's tools) is in a companion book, the **GM's Guide**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Fracture Lines** setting: its roles, species, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Resolve points**. The material for running the game (job seeds, the threats and enemy ships, and the GM's tools) is in a companion book, the **GM's Guide**.
 
 # Create your character
 
 Work through the five steps in order. The character creator follows the same steps and checks the rules for you.
 
-## Step 1: Choose your calling
+## Step 1: Choose your role
 
-Choose a calling and describe what you bring. Your calling places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
+Choose a role and describe what you bring. Your role places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
 
-| Calling | Group | Typical contribution | Core skills |
+| Role | Group | Typical contribution | Core skills |
 |---|---|---|---|
 | Trader | Commerce | buys low and sells across a dozen systems; knows what everything is worth, and to whom. | Commerce, Diplomacy, Psychology, Piloting |
 | Broker | Commerce | finances ventures, buys and restructures debt, and writes the contracts everyone else signs. | Commerce, Psychology, Deception, Computers |
@@ -55,7 +55,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 | Hacker | Trouble | breaks into systems, ledgers and AIs; every network is a door. | Computers, Stealth, Investigation, Engineering |
 | Augment | Trouble | rebuilt with implants (soldier, laborer or thrill-seeker); the body is the tool, and its upkeep and stigma are the problem. | Athletics, Close Combat, Firearms, Engineering |
 
-The creator marks your calling's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven't changed.
+The creator marks your role's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing role swaps the core skills you haven't changed.
 
 ### Generalist or Specialist
 
@@ -382,7 +382,7 @@ When an investigation roll fails, or a player pushes, one of the shared tracks t
 
 ### Methods
 
-Which methods suit a character depends on their calling, species and skills. The GM says which methods can advance each phase.
+Which methods suit a character depends on their role, species and skills. The GM says which methods can advance each phase.
 
 | Method | Skills | Suits | Phases | For example |
 |---|---|---|---|---|
@@ -1966,18 +1966,18 @@ Compact, slow-moving beings in layered mineral shells who live more than a thous
 
 # Making your own
 
-The callings and species in this book are a starting point, not a limit. With the GM's agreement, any player can create their own calling or species. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
+The roles and species in this book are a starting point, not a limit. With the GM's agreement, any player can create their own role or species. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
 
-## A custom calling
+## A custom role
 
-A calling is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
+A role is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
 
-1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the callings above: *"Courier: carries what can't be sent by signal, through corridors no one else will fly."*
+1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the roles above: *"Courier: carries what can't be sent by signal, through corridors no one else will fly."*
 2. **Choose a group.** Pick the one it belongs with: Commerce, Frontier, Service, Ship Crew or Trouble. The group only sets your sheet's colors and emblem.
-3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in callings do this for you); they count toward your normal Trained skills.
-4. **Check it with the GM.** It should fit the setting and overlap the existing callings as little as possible.
+3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in roles do this for you); they count toward your normal Trained skills.
+4. **Check it with the GM.** It should fit the setting and overlap the existing roles as little as possible.
 
-**In the creator:** in step 1, choose **Custom calling…** at the end of the Calling list, then enter its name and group. Write the description in *What you bring*.
+**In the creator:** in step 1, choose **Custom role…** at the end of the Role list, then enter its name and group. Write the description in *What you bring*.
 
 ## A custom species
 

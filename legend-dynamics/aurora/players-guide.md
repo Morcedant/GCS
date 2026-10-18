@@ -18,17 +18,17 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Aurora** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Spark points**. The material for running the game (case seeds, the notable Operants, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Aurora** setting: its roles, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Spark points**. The material for running the game (case seeds, the notable Operants, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.
 
 # Create your character
 
 Work through the five steps in order. The character creator follows the same steps and checks the rules for you.
 
-## Step 1: Choose your calling
+## Step 1: Choose your role
 
-Choose a calling and describe what you bring. Your calling places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
+Choose a role and describe what you bring. Your role places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
 
-| Calling | Group | Typical contribution | Core skills |
+| Role | Group | Typical contribution | Core skills |
 |---|---|---|---|
 | ExLAW Agent | The Badge | a full-time federal agent of the Extraordinary Law Enforcement Agency (ExLAW), enforcing the Extraordinary Powers Act with a badge that opens doors and an EPAOC file that never closes. | Law, Investigation, Firearms, Read People |
 | Officer | The Badge | carries a badge and the law's authority, working alongside ExLAW or around it: an FBI agent or U.S. marshal, an elected county sheriff (maybe on the edge of the Mad Fringe), a city cop first on the scene of an Operant fight, a detective, or a licensed private eye. Your Allegiance says which force you serve. | Investigation, Firearms, Law, Read People |
@@ -54,7 +54,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 | Hacker | The Underworld | breaks into systems: corporate, police, the EMD itself. | Computers, Engineering, Stealth, Deception |
 | Fixer | The Underworld | knows everyone, moves anything, owes and is owed. | Streetwise, Persuasion, Deception, Computers |
 
-The creator marks your calling's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven't changed.
+The creator marks your role's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing role swaps the core skills you haven't changed.
 
 ### Generalist or Specialist
 
@@ -364,7 +364,7 @@ When an investigation roll fails, or a player pushes, one of the shared tracks t
 
 ### Methods
 
-Which methods suit a character depends on their calling, origin and skills. The GM says which methods can advance each phase.
+Which methods suit a character depends on their role, origin and skills. The GM says which methods can advance each phase.
 
 | Method | Skills | Suits | Phases | For example |
 |---|---|---|---|---|
@@ -1477,18 +1477,18 @@ An ancient curse, blessing or bloodline: immortals, werewolves, the children of 
 
 # Making your own
 
-The callings and origins in this book are a starting point, not a limit. With the GM's agreement, any player can create their own calling or origin. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
+The roles and origins in this book are a starting point, not a limit. With the GM's agreement, any player can create their own role or origin. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
 
-## A custom calling
+## A custom role
 
-A calling is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
+A role is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
 
-1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the callings above: *"Bodyguard: keeps one Operant alive, whoever wants them dead, and wherever the law stands."*
+1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the roles above: *"Bodyguard: keeps one Operant alive, whoever wants them dead, and wherever the law stands."*
 2. **Choose a group.** Pick the one it belongs with: The Badge, The Masks, The Learned, The Fringe or The Underworld. The group only sets your sheet's colors and emblem.
-3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in callings do this for you); they count toward your normal Trained skills.
-4. **Check it with the GM.** It should fit the setting and overlap the existing callings as little as possible.
+3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in roles do this for you); they count toward your normal Trained skills.
+4. **Check it with the GM.** It should fit the setting and overlap the existing roles as little as possible.
 
-**In the creator:** in step 1, choose **Custom calling…** at the end of the Calling list, then enter its name and group. Write the description in *What you bring*.
+**In the creator:** in step 1, choose **Custom role…** at the end of the Role list, then enter its name and group. Write the description in *What you bring*.
 
 ## A custom origin
 
@@ -1515,7 +1515,7 @@ When in doubt, choose the higher tier.
 
 Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most origins change two to four attributes.
 
-A origin that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
+An origin that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
 
 ### 4. Core rules (tier 1 and up)
 

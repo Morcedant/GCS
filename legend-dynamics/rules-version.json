@@ -1,0 +1,45 @@
+{
+  "_about": "The one place for the core rules' version and change history. tools/build-website.py reads it for the core-rules page and the changelog. rulesVersion and rulesUpdated change only when the rules (mechanics) change; a website or wording update adds a 'site' entry and leaves them alone. rulesVersion is null until the author picks a numbering scheme.",
+  "rulesVersion": null,
+  "rulesUpdated": "2026-10-18",
+  "changes": [
+    {
+      "date": "2026-10-18",
+      "kind": "site",
+      "title": "Website and editorial improvements",
+      "summary": "No intended mechanics changes.",
+      "items": [
+        "A Start here page: choose a setting, create a character, join or run a game.",
+        "Shorter Play online section on the home page, linking to the shared-table and Discord pages for setup.",
+        "The four settings now call a character's role a role everywhere (the home page and creators said calling). Same choices, same saved characters.",
+        "Small wording fixes in the core rules (an origin, a role), and one copyright notice per page.",
+        "This changelog, and the rules' last-updated date on the core-rules page."
+      ]
+    },
+    {
+      "date": "2026-10-18",
+      "kind": "rules",
+      "title": "Movement, reach and range bands",
+      "items": [
+        "Tighter range bands: Short 25 yards, Medium 100, Long 300, Extreme 1,000; Close stays 10. Running covers 20 yards.",
+        "Move: each character has a Move in yards, worked out from their attributes, Athletics and origin; Run is twice Move.",
+        "Weapon reach: every weapon in hand has a reach of 1, 2 or 3 yards.",
+        "Injury and hard going slow Move; stepping away from a fight is free.",
+        "Telling-hit effects depend on the weapon: Pin needs a weapon in hand, fists or a grapple.",
+        "Origin speed adjustments, and mounts and vehicles."
+      ]
+    },
+    {
+      "date": "2026-10-17",
+      "kind": "rules",
+      "title": "Balance revision",
+      "items": [
+        "Fine weapons and tools: +2 to one narrowly defined use of a skill, never a defense.",
+        "Additional Defense: a second defense each round at −2.",
+        "Magic limits: Quicker hand, every hostile burst names a defense or a resistance, personal magic marks at most 3 boxes, and charms still face the target's defense.",
+        "Telling hits: Break gear, Pin, Precise and Knock down clarified, with firm limits.",
+        "Medical treatment: one field-treatment and one proper-care attempt per set of injuries."
+      ]
+    }
+  ]
+}

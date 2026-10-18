@@ -6,8 +6,8 @@
   "guideTitle": "The Shattered Crown Players' Guide",
   "guideSubtitle": "Sword and sorcery for the Legend Dynamics RPG system",
   "point": "Fortune",
-  "role": "Calling",
-  "roleLower": "calling",
+  "role": "Role",
+  "roleLower": "role",
   "origin": "Ancestry",
   "originLower": "ancestry",
   "originPlural": "Ancestries",
@@ -678,7 +678,7 @@
    "desc": "Human, with old sorcery in the veins: a witch grandmother, a sorcerer's bastard, or a pact made before you were born.",
    "core": [
     "Sorcery is Trained for free.",
-    "To cast cantrips you need a casting calling (Sorcerer or Witch), Gifted, or The Old Blood."
+    "To cast cantrips you need a casting role (Sorcerer or Witch), Gifted, or The Old Blood."
    ],
    "form": null,
    "skills": [
