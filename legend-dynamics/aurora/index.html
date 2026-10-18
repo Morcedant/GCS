@@ -587,7 +587,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="da3811a" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · da3811a</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="2998ed0" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 2998ed0</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1101,6 +1101,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <div class="field" style="flex:1 1 16em"><label for="lab-defense">Target's defense</label><select id="lab-defense"></select>
                 <span class="small muted" id="lab-dodge-note" role="status"></span></div>
             </div>
+            <p class="small" id="lab-reach" hidden style="margin:6px 0 0"></p>
             <div class="lab-row" id="lab-text-row" style="margin-top:8px" hidden>
               <div class="field" style="flex:1 1 100%"><label for="lab-text" id="lab-text-label">Note</label><input type="text" id="lab-text"></div>
             </div>
@@ -2226,6 +2227,11 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Every ranged weapon has an <strong>effective band</strong>, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. A thrown weapon’s effective band is Close.</p>
 <h2 id="g-move-and-reach">Move and reach</h2>
 <p><strong>Move</strong> is how far you go in a turn: <strong>5 yards, +1 for every 2 points of Agility + Body above 20</strong> (rounded down; nothing is taken off below 20), <strong>+1 for Trained Athletics or +2 for Athletics as a Specialty or Expert</strong>, plus your origin’s speed adjustment, if it has one. Most characters move 6 to 9 yards. Give up your action to <strong>run</strong> and you cover twice your Move. Threats move 8 yards unless their entry says otherwise.</p>
+<ul>
+<li><strong>Injury slows you.</strong> Wounded (1 box): Move −2 yards. Seriously wounded (2 boxes): half your Move, rounded down, and you can’t run. Incapacitated: you don’t move. Never less than 1 yard while you can act.</li>
+<li><strong>Hard going halves it.</strong> Climbing, swimming, wading, crawling, deep snow or sand, thick brush, rubble or a crowd: half your Move (and half a run), rounded down. Injury and hard going both apply, injury first.</li>
+<li><strong>Stepping away.</strong> You can move away from someone in reach freely; leaving a fight doesn’t give them a free attack.</li>
+</ul>
 <table>
 <thead>
 <tr class="header">
@@ -2280,6 +2286,11 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>A weapon in hand can’t reach past 3 yards; anything farther is a ranged attack.</p>
 <h2 id="g-injury">Injury</h2>
 <table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Boxes marked</th>
@@ -2296,12 +2307,12 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="even">
 <td>1</td>
 <td>Wounded</td>
-<td>−1 to physical actions</td>
+<td>−1 to physical actions; Move −2 yards</td>
 </tr>
 <tr class="odd">
 <td>2</td>
 <td>Seriously wounded</td>
-<td>−2 to physical actions</td>
+<td>−2 to physical actions; half Move, no running</td>
 </tr>
 <tr class="even">
 <td>3</td>
@@ -4988,7 +4999,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Assistance:</strong> success +1; success by 5 or more +2; 18 causes a complication. One assistant per roll.</p>
 <p><strong>Near misses:</strong> fail by 1–2 and the GM may offer success at a cost; never on a natural 17–18.</p>
 <p><strong>Clocks:</strong> 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).</p>
-<p><strong>Move:</strong> 5 yd, +1 per 2 points of Agility + Body above 20, +1 Trained Athletics or +2 Specialty/Expert, ± origin speed; run (no action) twice that. Threats 8 yd. Reach: 1 yd fists, knives, clubs; 2 yd swords, axes; 3 yd spears, polearms.</p>
+<p><strong>Move:</strong> 5 yd, +1 per 2 points of Agility + Body above 20, +1 Trained Athletics or +2 Specialty/Expert, ± origin speed; run (no action) twice that. Threats 8 yd. Wounded −2 yd; seriously wounded half, no run. Hard going: half. Stepping away is free. Reach: 1 yd fists, knives, clubs; 2 yd swords, axes; 3 yd spears, polearms.</p>
 <p><strong>Combat:</strong> move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit; Additional Defense: a second, at −2) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural 3–4): the attacker picks an effect the weapon can deliver (pin: weapon in hand or grapple only), which never adds boxes or kills outright; called shot −2 (small target −4). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.</p>
 <p><strong>Medicine:</strong> stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Each set of injuries (one fight or incident) gets one field and one proper-care attempt; more need better care, a new treatment or recovery time. Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone’s care).</p>
 <p><strong>Spark:</strong> start each session with two. Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.</p>
@@ -5599,7 +5610,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <dt>Defending</dt><dd>One defense a round; Additional Defense: a second, at −2, never twice against one attack. Dodge: Agility −2 + Athletics. Parry a weapon in hand or fists: Melee or Brawling −3. Block a weapon in hand, fists or a missile with a shield or anything that stands in for one: Melee −2 + the shield&#x27;s bonus (never a gunshot or blast); an improvised one breaks on a 2+ box hit. Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target.</dd>
             <dt>Telling hit</dt><dd>Hit by 5+ or a natural 3–4, not defended: the attacker picks one effect the weapon can deliver (disarm; knock down, in hand or a 2+ box shot: standing uses their move; pin, in hand or a grapple only: their next action frees them; rattle −2; break gear, not bare-handed: out of use until an action fixes it; open them up +2; precise). Called shot: −2 (small target −4), and any hit gets the effect. No extra boxes, never an outright kill. Shrug it off: Hard to put down (once a fight) or a point.</dd>
             <dt>Range</dt><dd>Close 10 yd, Short 25 yd, Medium 100 yd, Long 300 yd, Extreme 1,000 yd. Within a weapon&#x27;s effective band: no penalty; one band beyond −2, two −4, farther out of range.</dd>
-            <dt>Move</dt><dd>5 yd, +1 per 2 points of Agility + Body above 20, +1 Trained Athletics or +2 Specialty/Expert, ± origin speed. Run (no action): twice that. Threats: 8 yd.</dd>
+            <dt>Move</dt><dd>5 yd, +1 per 2 points of Agility + Body above 20, +1 Trained Athletics or +2 Specialty/Expert, ± origin speed. Run (no action): twice that. Threats: 8 yd. Wounded −2 yd; seriously wounded half, no running. Hard going (climbing, swimming, snow, rubble): half. Stepping away from a fight is free.</dd>
             <dt>Reach</dt><dd>1 yd: fists, knives, clubs, claws. 2 yd: swords, axes, maces. 3 yd: spears, polearms.</dd>
             <dt>Dying</dt><dd>A 2-box weapon that brings you to 3 boxes: Dying; dead at the end of the scene unless stabilized (one action, Medicine, first-aid kit). At 3 boxes, another 2-box hit kills.</dd>
             <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2, clears 2 (3 on margin 5+). One field and one proper-care attempt per set of injuries (one fight or incident); more need better care, a new treatment or recovery time.</dd>
@@ -5790,6 +5801,16 @@ const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ athletic
 /** Move in yards: 5, +1 per 2 points of Agility + Body above 20, plus the Athletics bonus (as for Dodge) and any origin speed adjustment. */
 const moveYards = (/** @type {number} */ agility, /** @type {number} */ body, /** @type {number} */ athleticsBonus, speed = 0) =>
   5 + Math.floor(Math.max(0, agility + body - 20) / 2) + athleticsBonus + speed;
+/**
+ * Move as injury leaves it: wounded (1 box) −2 yards, seriously wounded (2) half, rounded down, and no running;
+ * incapacitated (3) none. Never below 1 yard while able to act.
+ * @param {number} move @param {number} injury
+ */
+const injuredMove = (move, injury) => (injury >= 3 ? 0 : Math.max(1, injury === 2 ? Math.floor(move / 2) : injury === 1 ? move - 2 : move));
+/** The farthest yard of each range band (core rules, Range). */
+const BAND_YARDS = /** @type {Record<string, number>} */ ({ close: 10, short: 25, medium: 100, long: 300, extreme: 1000 });
+/** The range band a distance in yards falls in, or null past Extreme. @param {number} yards */
+const bandForYards = (yards) => Object.keys(BAND_YARDS).find((b) => yards <= BAND_YARDS[b]) || null;
 /** A threat's Move when its entry gives none. */
 const THREAT_MOVE = 8;
 /** A weapon in hand's reach in yards (1 when the weapon doesn't say). */
@@ -5929,7 +5950,7 @@ function resolveAttack(input, hooks, roll) {
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
 }
 
-return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, moveYards, THREAT_MOVE, reachYards, priceFor, MAGIC_HARM_CAP, NO_HOOKS, resolveAttack };
+return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, moveYards, injuredMove, BAND_YARDS, bandForYards, THREAT_MOVE, reachYards, priceFor, MAGIC_HARM_CAP, NO_HOOKS, resolveAttack };
 })();
   const LAB_DATA = null;
   const LDX = (() => {
@@ -6931,6 +6952,28 @@ function mountLab(api) {
     return out;
   }
   const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"] });
+  // The battle map's distance between attacker and target, checked against the weapon: a weapon in hand's reach
+  // and the attacker's Move (as injury leaves it), or a ranged weapon's band, which it sets. Only a note: the GM rules.
+  function reachCheck(/** @type {any} */ a, /** @type {any} */ d, /** @type {any} */ w) {
+    const out = $("lab-reach"), at = a && d && w && api.mapDistance ? api.mapDistance({ ref: a.ref, name: a.name }, { ref: d.ref, name: d.name }) : null;
+    out.hidden = !at; if (!at) return;
+    const mv = LD.injuredMove(a.move || LD.THREAT_MOVE, a.injury || 0), run = (a.injury || 0) >= 2 ? 0 : mv * 2;
+    const where = at.yards !== undefined ? `${fmtYd(at.yards)} apart on the map` : `${at.lanes} lane${at.lanes === 1 ? "" : "s"} apart on the range track`;
+    let msg, bad = false;
+    if (w.reach === "melee") {
+      const reach = LD.reachYards(w) || 1;
+      if (at.yards === undefined) { msg = at.lanes <= 1 ? `${where}: close enough to move in and strike (reach ${reach} yd, Move ${mv} yd) if the GM agrees.` : `${where}: too far to strike with a weapon in hand this turn.`; bad = at.lanes > 1; }
+      else if (at.hexes <= 1 && (at.yards <= reach || at.scale <= 5)) msg = `${where}: in reach (${w.name}, ${reach} yd).`;
+      else if (at.yards <= reach + mv) msg = `${where}: out of reach (${reach} yd), but within Move (${mv} yd): move in and strike.`;
+      else { bad = true; msg = `${where}: too far to strike this turn. Reach ${reach} yd + Move ${mv} yd = ${reach + mv} yd${run ? `; running (${run} yd) closes in but takes the action` : "; seriously wounded, no running"}.`; }
+    } else if (at.band) {
+      const ok = LD.rangeModifier(w, at.band) !== null;
+      if (ok) $("lab-band").value = at.band;
+      bad = !ok; msg = `${where}: ${BAND_NAMES[at.band] || at.band}${ok ? ", set above" : `, out of range for the ${w.name.toLowerCase()}`}.`;
+    } else { bad = true; msg = `${where}: beyond Extreme range.`; }
+    out.className = "small " + (bad ? "bad" : "muted"); out.textContent = msg;
+  }
+  const fmtYd = (/** @type {number} */ y) => `${Math.round(y * 10) / 10} yd`;
   function fromCharacter(c) {
     const k = api.calc(c), gun = c.play && c.play.gun;
     // A shapechanger (api.formOf): in their form, its numbers (api.calc applies them), its claws, and its traits as a note.
@@ -6939,7 +6982,7 @@ function mountLab(api) {
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
     const formRules = fm ? shapeTraits(fm, formOn) : [];
-    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
@@ -6954,7 +6997,7 @@ function mountLab(api) {
   function fromThreat(t, name) {
     const skills = Object.fromEntries(t.attacks.map((/** @type {any} */ a) => [a.skill, a.target]));
     const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
-    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, dodge: t.dodge, skills, weapons: t.weapons,
+    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
       boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
@@ -7140,6 +7183,7 @@ function mountLab(api) {
     $("lab-target").dataset.actor = a ? a.pid : "";
     $("lab-target").closest(".field").hidden = !["attack", "aim"].includes(action);
     $("lab-atk-row").hidden = action !== "attack";
+    $("lab-reach").hidden = true; // the map check below shows it again for an attack
     $("lab-text-row").hidden = !["point", "complication", "condition", "note"].includes(action);
     $("lab-text-label").textContent = { point: "What for (a small preparation, or other)", complication: "What happens", condition: "Condition", note: "Note" }[action] || "";
     if (action === "attack" && a) {
@@ -7152,6 +7196,7 @@ function mountLab(api) {
       $("lab-band").dataset.weapon = w ? w.id : "";
       $("lab-band").innerHTML = bands.map((/** @type {string} */ b) => { const m = w ? LD.rangeModifier(w, b) : 0; return `<option value="${b}" ${m === null ? "disabled" : ""}>${BAND_NAMES[b]}${m ? " (" + signed(m) + ")" : m === null ? " (out of range)" : ""}</option>`; }).join("");
       $("lab-band").value = pb && bands.includes(pb) && (!w || LD.rangeModifier(w, pb) !== null) ? pb : bands.includes("close") ? "close" : bands[0];
+      reachCheck(a, E.find(en, $("lab-target").value), w);
       const modes = w && w.ammo ? MODES.filter((/** @type {any} */ m) => !m[3] || m[3].includes(w.ammo)) : [];
       $("lab-mode-wrap").hidden = !modes.length;
       $("lab-fmode").innerHTML = modes.map((/** @type {any} */ m) => `<option value="${m[0]}">${esc(m[1])} (${m[2]} ${m[2] > 1 ? esc(T.ammo || "rounds") : esc(T.ammoOne || "round")}${m[4] ? ", " + signed(m[4]) : ""})</option>`).join("");
@@ -7793,6 +7838,9 @@ return { mountLab };
   const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge);
   // Move in yards, in the current form (a form's Agility and Body count while in it).
   const moveOf = (c = ch) => LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c));
+  // Move as the character's injuries leave it (wounded −2 yards, seriously wounded half and no running).
+  const moveNow = (c = ch) => LD.injuredMove(moveOf(c), (c.play && c.play.injury) || 0);
+  const runNow = (c = ch) => ((c.play && c.play.injury) >= 2 ? 0 : moveNow(c) * 2);
   // The core attack and defense rules (engine/combat.json), with the setting's own overrides.
   const CR = PACK.combatRules || {};
   const PARRY = !CR.parry ? [] : T.meleeSkill === T.unarmedSkill ? [[T.meleeSkill, "armed, or bare-handed against fists"]] : [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed, fists only"]];
@@ -8127,11 +8175,11 @@ return { mountLab };
     $("ms-text").className = $("ready-status").className;
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
-    $("st-move").textContent = `${moveOf()} yd`;
+    $("st-move").textContent = `${moveNow()} yd`;
     $("st-grit").textContent = gritStart();
     $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`
       + (CR.parry ? `. Parry = ${PARRY.map(([s]) => `${s} ${skillTarget(s)} ${signed(CR.parry.mod)} = ${parryOf(s)}`).join(", or ")}` : "")
-      + `. Move = 5 yd + ${Math.floor(Math.max(0, ch.attrs.Agility + ch.attrs.Body - 20) / 2)} (Agility + Body ${ch.attrs.Agility + ch.attrs.Body}) + ${LEVELS[ch.skills.Athletics].dodge} (Athletics)${speedOf() ? ` ${signed(speedOf())} (${T.originLower} speed)` : ""} = ${moveOf()} yd; run ${moveOf() * 2} yd`
+      + `. Move = 5 yd + ${Math.floor(Math.max(0, ch.attrs.Agility + ch.attrs.Body - 20) / 2)} (Agility + Body ${ch.attrs.Agility + ch.attrs.Body}) + ${LEVELS[ch.skills.Athletics].dodge} (Athletics)${speedOf() ? ` ${signed(speedOf())} (${T.originLower} speed)` : ""} = ${moveOf()} yd; run ${moveOf() * 2} yd${moveNow() !== moveOf() ? ` (wounded: ${moveNow()} yd${runNow() ? `, run ${runNow()}` : ", no running"})` : ""}`
       + (CR.oneDefense ? `. ${defensesPerRound() > 1 ? `${["", "One", "Two", "Three"][defensesPerRound()] || defensesPerRound()} defenses a round (Additional Defense: the second at ${signed(CR.oneDefense.extraPenalty || 0)})` : "One defense a round"}: Dodge${CR.parry ? ", Parry" : ""}${CR.block ? " or Block" : ""}.` : "");
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
@@ -8222,7 +8270,7 @@ return { mountLab };
         <div><span class="label">${T.role}</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">${T.origin}</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge() + formDodge()}</b>${formDodge() ? `<span class="small muted">human ${dodge()}</span>` : ""}${dodgeGearBonus() ? `<span class="small muted">${dodge() + formDodge() + dodgeGearBonus()} with ${esc(dodgeGear().map(([n]) => n.toLowerCase()).join(" and "))}</span>` : ""}</div>
-        <div><span class="label">Move</span><b class="num">${moveOf()} yd</b><span class="small muted">run ${moveOf() * 2} yd${inForm() ? ` · human ${LD.moveYards(ch.attrs.Agility, ch.attrs.Body, LEVELS[ch.skills.Athletics].dodge, speedOf() - (formOf().speed || 0))} yd` : ""}</span></div>
+        <div><span class="label">Move</span><b class="num">${moveNow()} yd</b><span class="small muted">${runNow() ? `run ${runNow()} yd` : "no running while seriously wounded"}${moveNow() !== moveOf() ? ` · ${moveOf()} yd unhurt` : ""}${inForm() ? ` · human ${LD.moveYards(ch.attrs.Agility, ch.attrs.Body, LEVELS[ch.skills.Athletics].dodge, speedOf() - (formOf().speed || 0))} yd` : ""}</span></div>
         ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill) + formSkill(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill) + formSkill(T.unarmedSkill)} bare-handed, fists only` : ""}</span></div>` : ""}
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
@@ -9454,7 +9502,24 @@ function mountBattleMap(api) {
   fillThreats();
   Promise.all(KINDS.map((k) => idb.get(bgKey(k)))).then((l) => { KINDS.forEach((k, i) => (bgs[k] = l[i] || null)); draw(); if (!V().set && svg.clientWidth) fit(); });
   draw();
-  return { refresh: () => {
+  // Where two people stand from each other, for the encounter panel: a character by its card (ref), anyone else by
+  // the token's name. On a hex map in yards: { yards, hexes, band }; on the plain range track: { band } from the lanes.
+  // null when either isn't on the map (or a name fits more than one token), or on a ship or chase track.
+  function distanceBetween(a, b) {
+    const find = (w) => { const l = toks().filter((t) => (w.ref && t.ref === w.ref) || (!t.ref && w.name && (info(t).name || "").toLowerCase() === w.name.toLowerCase())); return l.length === 1 ? l[0] : null; };
+    const ta = find(a), tb = find(b);
+    if (!ta || !tb) return null;
+    if (isRange()) {
+      if (RT.id !== "range" || RT.vehicle || RT.vehicleTrack) return null;
+      const n = Math.abs((ta.lane || 0) - (tb.lane || 0)), band = n ? RT.bands[n - 1] : RT.bands[0];
+      return band ? { band: String(band[0]).toLowerCase(), lanes: n } : { band: null, lanes: n };
+    }
+    if (st.scale.unit !== "yd") return null;
+    const hexes = dist(ta, tb), yards = hexes * st.scale.n;
+    return { hexes, yards, scale: st.scale.n, band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
+  }
+
+  return { distanceBetween, refresh: () => {
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();
@@ -9515,7 +9580,7 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
     try {
       const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n) + formSkill(n, c), lab: levelName(c.skills[n], n) })).filter((x) => x.l !== "U")
         .sort((a, b) => (b.l === "S") - (a.l === "S") || b.t - a.t);
-      return { skills, dodge: dodge() + formDodge(c), move: moveOf(c), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
+      return { skills, dodge: dodge() + formDodge(c), move: moveNow(c), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
     } finally { ch = saved; }
   }
   function gmAdd(list) {
@@ -9767,6 +9832,7 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   // where a test configuration exists. Never used by the sheet. ----
   if ((PACK.arms || []).length) {
     labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText, gritty: () => gritty,
+      mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
       crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
       // A character's numbers, as the sheet works them out; with powers, their Defense Class from Toughness or Force Field.
       // In a shapechanger's form (play.form), the form's numbers; otherwise the human form's.

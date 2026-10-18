@@ -165,6 +165,16 @@ export const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ a
 /** Move in yards: 5, +1 per 2 points of Agility + Body above 20, plus the Athletics bonus (as for Dodge) and any origin speed adjustment. */
 export const moveYards = (/** @type {number} */ agility, /** @type {number} */ body, /** @type {number} */ athleticsBonus, speed = 0) =>
   5 + Math.floor(Math.max(0, agility + body - 20) / 2) + athleticsBonus + speed;
+/**
+ * Move as injury leaves it: wounded (1 box) −2 yards, seriously wounded (2) half, rounded down, and no running;
+ * incapacitated (3) none. Never below 1 yard while able to act.
+ * @param {number} move @param {number} injury
+ */
+export const injuredMove = (move, injury) => (injury >= 3 ? 0 : Math.max(1, injury === 2 ? Math.floor(move / 2) : injury === 1 ? move - 2 : move));
+/** The farthest yard of each range band (core rules, Range). */
+export const BAND_YARDS = /** @type {Record<string, number>} */ ({ close: 10, short: 25, medium: 100, long: 300, extreme: 1000 });
+/** The range band a distance in yards falls in, or null past Extreme. @param {number} yards */
+export const bandForYards = (yards) => Object.keys(BAND_YARDS).find((b) => yards <= BAND_YARDS[b]) || null;
 /** A threat's Move when its entry gives none. */
 export const THREAT_MOVE = 8;
 /** A weapon in hand's reach in yards (1 when the weapon doesn't say). */

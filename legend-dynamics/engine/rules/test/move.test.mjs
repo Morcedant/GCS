@@ -44,3 +44,16 @@ test("telling-hit effects follow the weapon: a shot can't pin, bare hands don't 
   assert.ok(ids(S.knife, { melee: "Close Combat", unarmed: "Close Combat" }).includes("break"), "a knife, where one skill covers both");
   assert.equal(X.tellingEffectsFor(null).length, 7, "no weapon given: every effect");
 });
+
+test("injury slows Move: −2 yards wounded, half seriously wounded, none incapacitated, never below 1 while acting", () => {
+  assert.equal(LD.injuredMove(8, 0), 8);
+  assert.equal(LD.injuredMove(8, 1), 6);
+  assert.equal(LD.injuredMove(9, 2), 4, "half, rounded down");
+  assert.equal(LD.injuredMove(8, 3), 0);
+  assert.equal(LD.injuredMove(2, 1), 1, "never below 1 yard");
+});
+
+test("distances fall in the range bands", () => {
+  assert.deepEqual([1, 10, 11, 25, 26, 100, 300, 1000].map(LD.bandForYards), ["close", "close", "short", "short", "medium", "medium", "long", "extreme"]);
+  assert.equal(LD.bandForYards(1001), null);
+});
