@@ -100,8 +100,8 @@ Spend all your Edges. Each one buys:
 | Second advantage | A second general advantage, with no extra complication | 1 |
 | True grit | Start every session with 3 Grit instead of 2 | 1 |
 | A friend in town | A named contact who helps once per case | 1 |
-| A fine weapon or tool | An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one named skill when it's used | 1 |
-| Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2. | 1 |
+| A fine weapon or tool | An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one narrowly defined use of a named skill (see *Fine weapons and tools*) | 1 |
+| Additional Defense | A second defense each round, at −2: Dodge, Parry or Block, in any mix (see *Attacking and defending*) | 1 |
 | Hard to put down | Once per fight, shrug off a telling hit's effect: you still take its boxes (see *Telling hits*) | 1 |
 | Talisman | A ready charm made for you by a Braucher, a hexenbiest or a root doctor (a Himmelsbrief, a mojo hand, a blessed buckeye), holding a Minor ritual agreed with the GM; break it to release it. Renewed between cases; doesn't count against a charm limit | 1 |
 
@@ -170,7 +170,7 @@ The GM can add others met in play (the creator's GM view has a **Campaign allegi
 
 ## Step 5: Prepare for the hunt
 
-Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points (three with True grit) and your gear. Name your friend in town or your fine weapon or tool, if you took those Edges. Describe one connection to another player's character.
+Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Your Move is 5 yards, +1 for every 2 points of Agility + Body above 20, plus the same Athletics bonus and any heritage speed (see *Move and reach*). Begin uninjured, with two Grit points (three with True grit) and your gear. Name your friend in town, or your fine weapon or tool and the one narrow use it improves, if you took those Edges. Describe one connection to another player's character.
 
 ### Top 10 connections to another character
 
@@ -230,7 +230,7 @@ A plausible untrained attempt uses attribute −4. Specialized work such as surg
 
 ## Gear
 
-Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bonus; exceptional tools may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
+Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bonus; only the *fine weapon or tool* Edge gives one (below). Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
 
 | Item | What it does |
 |---|---|
@@ -243,6 +243,19 @@ Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bo
 | Tool roll | Gunsmith's and carpenter's tools. Needed for most Tinkering in the field. |
 | Horse and tack | Carries you across the territory. Riding in a chase needs one. |
 | Shield | A hide shield or an iron-bound buckler, rare in the West; some Grimm families keep one with the old weapons. You Block at +1. |
+
+### Fine weapons and tools
+
+A fine weapon or tool grants +2 to one narrowly defined use of a named skill, agreed when chosen. It does not stack with an advantage bonus on the same roll and never improves Dodge, Parry, or Block.
+
+| Fine weapon or tool | Skill | The narrow use | Not covered |
+|---|---|---|---|
+| A rifle with a telescopic sight | Shooting | Aimed shots at Long range or farther | Snap shots, anything at Close or Short, Dodge |
+| A master gunsmith's tools | Tinkering | Repairing, adjusting and modifying firearms | Locks, wagons, clockwork |
+| An army surgeon's instruments | Medicine | Field treatment of a wound: stitching, dressing, setting a bone | Diagnosis, remedies, a doctor's surgery |
+| Grandfather's Grimm axe | Melee | Breaking a shield, a door or a weapon | Ordinary attacks, Parry, Block |
+
+*Too broad:* "+2 to Shooting with my revolver" or "+2 to Occult with my grimoire". A Doctor with Steady Hands and fine instruments takes +2 once on a roll both cover.
 | Trail kit | Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones; no bonus beyond that. |
 | Lantern and matches | Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible. |
 | Law books and blank warrants | Needed to draw up papers, check a statute or argue a point of law away from a courthouse. |
@@ -362,7 +375,7 @@ Magic works at two speeds, with a third tool that turns one into the other. An I
 
 ### Charms, elixirs and potions
 
-**Charms.** A finished ritual can be stored in an object and released by breaking it: a bottle thrown, a pendant snapped, a bullet-charm fired. You can carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Scaenarfex carries one more; a Veneficare only one. Preparation is how slow magic wins a fast fight.
+**Charms.** A finished ritual can be stored in an object and released by breaking it: a bottle thrown, a pendant snapped, a bullet-charm fired. You can carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Scaenarfex carries one more; a Veneficare only one. Preparation is how slow magic wins a fast fight: a ritual itself is too slow for one. A charm skips the casting roll, not the target's chance: it counts as a success by 0, so the target defends with no attack-quality penalty, or resists on a successful roll. A charm never marks more than 3 boxes.
 
 **Elixirs and potions** spoil. They stay good until the end of the day, or a week on a success by 5 or more.
 
@@ -374,7 +387,7 @@ Each spell has a short **base effect**: one target, for one scene, at Close or S
 
 | Boost | One Boost | Two Boosts |
 |---|---|---|
-| **Harder** | +1 box, or the penalty becomes −3 | +2 boxes, or −4 |
+| **Harder** | +1 box, or the penalty becomes −3 | +2 boxes (3 at most), or −4 |
 | **Wider** | A handful of targets | A crowd, or an area |
 | **Longer** | A day | Until it's lifted |
 | **Farther** | One range band farther | Two bands farther |
@@ -382,17 +395,21 @@ Each spell has a short **base effect**: one target, for one scene, at Close or S
 | Spell | Base effect |
 |---|---|
 | Flame | A lash of fire at Short range; marks 2 boxes. Dodge applies. |
-| Force | Unseen force hurls the target down: 1 box, and they lose their next move (Body resists). |
+| Force | Unseen force hurls the target down: 1 box, and they're knocked down as by a telling hit: prone, or driven back a few steps, and standing up uses their next move (Body resists). |
 | Ward | Attacks against one ally are at −2 for the scene. |
 | Fluch | The target is at −2 on all rolls for the scene (Will resists). |
-| Bind | The target is held where they stand for the scene, or until they break free (Body resists). |
+| Bind | The target is held where they stand, as a pin: their next action goes to getting free, and then they're free. Holding them again takes another casting (Body resists). |
 | Snuff | Every lamp in a room goes out, or one gun jams; clearing a jam takes an action. |
 | Unmask | A Wesen in sight rolls Will or woges, there and then. |
-| Stanch | Stop the bleeding: clear one injury box, once per wound. |
+| Stanch | Stop the bleeding: clear one injury box, once per set of injuries. |
+
+**Defense or resistance.** Each hostile spell says which applies, never both. Where *Dodge applies*, the casting roll is the attack roll and attack quality applies to the Dodge from its margin. Where an attribute *resists*, it's a contest: the target rolls it, the better margin wins and ties go to the target, with no attack-quality penalty (the margin already counts). A spell that says neither (Ward, Snuff, Stanch) simply works.
+
+**Harm limit.** Magic marks at most 3 boxes on one target from one spell, ritual or charm, Dying included as for weapons. Further Harder Boosts go to range, duration or targets instead.
 
 A failed spell flares where people can see it: mark a box of **Exposure**. A natural 18 marks two, or something answers that shouldn't.
 
-**Hexenbiests and Zauberbiests** work rituals the same way, through their innate magic, in their own style (curses, potions and sendings). Their **telekinesis** is their quick magic.
+**Hexenbiests and Zauberbiests** work rituals the same way, through their innate magic, in their own style (curses, potions and sendings). Their **telekinesis** is their quick magic: a telekinetic throw is an attack with Occult at Close range, 1 box, and Dodge applies.
 
 ### Old-country magic in America
 
@@ -422,9 +439,10 @@ Act in descending Agility order. Players choose the order of tied characters; th
 
 Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may **defend**: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.
 
-- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits. The **Additional Defense** Edge gives a second.
+- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits.
+- **Additional Defense.** With this Edge you may attempt a second defense each round at −2, in addition to attack-quality and injury penalties. You cannot defend twice against the same attack.
 - **Dodge** is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert.
-- **Parry.** Against a weapon in hand, fists, claws or fangs, roll Melee −3 with a weapon in hand. Bare-handed, Brawling −3 parries fists only: nobody turns a Blutbad's claws with an open hand. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a bullet or an arrow.
+- **Parry.** Against a weapon in hand, fists, claws or fangs, roll Melee −3 with a weapon in hand. Bare-handed, Brawling −3 parries fists only: nobody turns a Blutbad's claws with an open hand. Nobody parries a bullet or an arrow.
 - **Block.** With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fangs, fists or an arrow: roll Melee −2, or Melee −1 with a real shield. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes: a chair stops one swipe of a Blutbad's claws, and then it's kindling.
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3. A Wesen in full woge often strikes that cleanly.
 - **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. **Careful Marksman** and **Hunter's Eye** add their +2 to this; a **Gunslinger** doesn't need to aim.
@@ -436,24 +454,24 @@ Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effe
 A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.
 
 - **A telling hit** is an attack that succeeds by **5 or more**, or on a natural 3 or 4, and isn't stopped by a defense. The attacker picks **one effect** below and describes it. The weapon still marks its usual boxes.
-- **A called shot.** Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, an eye, a rope, a lock). If the attack hits at all, the effect happens, whatever the margin. **Careful Marksman** and **Hunter's Eye** cut this penalty by 1.
+- **A called shot.** Before rolling, name an effect your weapon can deliver and take −2 on the attack, or −4 for a small target (a hand, an eye, a rope, a lock). If the attack hits at all, the effect happens, whatever the margin. **Careful Marksman** and **Hunter's Eye** cut this penalty by 1.
 - **Both ways.** Wesen, outlaws and worse land telling hits on characters too.
 
-| Effect | What happens |
-|---|---|
-| Disarm | The weapon or held item drops, or flies a few yards away |
-| Knock down | The target falls prone, or is driven back a few steps |
-| Pin | The target is held, tangled or pinned down: their next action goes to getting free |
-| Rattle | −2 to the target's next roll |
-| Break gear | A shield, weapon or tool breaks |
-| Open them up | The next attack on this target this round gets +2 |
-| Precise | You hit exactly what you aimed at: the lantern, the rope, the hand on the trigger |
+| Effect | With | What happens |
+|---|---|---|
+| Disarm | Any attack | The weapon or held item drops, or flies a few yards away |
+| Knock down | A weapon in hand, fists or claws, or a shot or missile that marks 2 or more boxes | The target falls prone, or is driven back a few steps. Standing up uses the target's move on their next turn; they still take their action |
+| Pin | A weapon in hand, fists, claws or a grapple | The target is grabbed, held, or pinned against a wall or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack |
+| Rattle | Any attack | −2 to the target's next roll |
+| Break gear | Any attack but bare hands, claws and fangs | A weapon, shield or tool is knocked out of use (jammed, bent, unstrung, cracked) until its owner spends an action putting it right. It's destroyed for good only if it was already vulnerable (a rotten haft, an improvised shield) or the attacker has a weakness to exploit. Armor loses 1 protection until it's repaired |
+| Open them up | Any attack | The next attack on this target this round gets +2 |
+| Precise | Any attack | You hit exactly what you aimed at: the lantern, the rope, the hand on the trigger. It changes the situation, never the rules: no extra boxes, no getting past a defense, no instant death |
 
-**Limits.** A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a Blutbad of its claws or knocks down a stagecoach, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.
+**Limits.** A telling hit never adds boxes and never gets past a defense. It never kills outright, disables a character for good, or destroys exceptional equipment: those come only from injury, from the *Dying and death* rules, or from an established weakness (a Wesen's bane, what the Grimm diaries say kills it). Only the effects a weapon can deliver are open to it (the *With* column). Keeping someone's head down with gunfire isn't a pin: that's cover and a threat. The effect still has to make sense: nobody disarms a Blutbad of its claws or knocks down a stagecoach, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.
 
 **Staying alive.** A character on the receiving end can shrug off a telling hit's effect with **Hard to put down** (once per fight) or by spending a Grit point. Either way, they still take the boxes.
 
-*Example:* a Blutbad in full woge claws at Deputy Ames and succeeds by 5. Ames hasn't defended yet this round: Dodge 11, −2 for the clean hit, needs a 9 or less. Ames has a saber in hand, so a parry is possible too: Melee 14 −3 −2 = 9, no better. Ames dodges. When the second Blutbad lunges before Ames's next turn, there's no defense left, unless Ames has Additional Defense.
+*Example:* a Blutbad in full woge claws at Deputy Ames and succeeds by 5. Ames hasn't defended yet this round: Dodge 11, −2 for the clean hit, needs a 9 or less. Ames has a saber in hand, so a parry is possible too: Melee 14 −3 −2 = 9, no better. Ames dodges. When the second Blutbad lunges before Ames's next turn, there's no defense left, unless Ames has Additional Defense: a second Dodge at 11 −2 = 9, before any clean-hit penalty.
 
 ## Range
 
@@ -462,20 +480,52 @@ Distances fall into five bands:
 | Band | Distance | For example |
 |---|---|---|
 | Close | Up to 10 yards | Across a room or a saloon; one move covers it |
-| Short | Up to 50 yards | Across a street or a corral |
-| Medium | Up to 150 yards | Down the length of a town |
-| Long | Up to 500 yards | Across a valley or a river crossing |
-| Extreme | Up to a mile, in line of sight | Ridge to ridge |
+| Short | Up to 25 yards | Across a street or a corral |
+| Medium | Up to 100 yards | Down the length of a town |
+| Long | Up to 300 yards | Across a river crossing or a small valley |
+| Extreme | Up to 1,000 yards, in line of sight | Ridge to ridge |
 
-Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand, claws and fists reach only someone next to you. Your move each turn covers the Close band; give up your action to run and you cover Short.
+Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. A thrown weapon's effective band is Close.
+
+## Move and reach
+
+**Move** is how far you go in a turn: **5 yards, +1 for every 2 points of Agility + Body above 20** (rounded down; nothing is taken off below 20), **+1 for Trained Athletics or +2 for Athletics as a Specialty or Expert**, plus your heritage's speed, if it has one. Most characters move 6 to 9 yards. Give up your action to **run** and you cover twice your Move. Threats move 8 yards unless their entry says otherwise. In full woge, the woge's Agility and Body bonuses count, and a **Swift** woge adds +1 (Coyotl, Murcielago, Fuchsteufelwild).
+
+| Agility + Body | 20 or less | 21–22 | 23–24 | 25–26 | 27–28 | 29–30 |
+|---|---|---|---|---|---|---|
+| Move before Athletics | 5 | 6 | 7 | 8 | 9 | 10 |
+
+- **Injury slows you.** Wounded (1 box): Move −2 yards. Seriously wounded (2 boxes): half your Move, rounded down, and you can't run. Incapacitated: you don't move. Never less than 1 yard while you can act.
+- **Hard going halves it.** Climbing, swimming, wading, crawling, deep snow or sand, thick brush, rubble or a crowd: half your Move (and half a run), rounded down. Injury and hard going both apply, injury first.
+- **Stepping away.** You can move away from someone in reach freely; leaving a fight doesn't give them a free attack.
+
+A weapon in hand strikes anyone within its **reach**, shown in the weapons table. Move into reach as part of your turn and attack in the same turn.
+
+| Reach | Weapons |
+|---|---|
+| 1 yard | Fists, kicks and grappling; knives, hatchets, bowie knives; clubs and bottles; claws, fangs and teeth |
+| 2 yards | Axes, sabers and an old Grimm weapon; a rifle butt or a bayonet held short |
+| 3 yards | Spears, pikes and other long-hafted weapons from a Grimm's trunk |
+
+A weapon in hand can't reach past 3 yards; anything farther is a ranged attack.
+
+### Horses and wagons
+
+A rider or driver moves at the horse's or wagon's Move, not their own, and running it (a gallop) takes their action. Shooting or striking from a moving horse or wagon is −2. A wounded horse slows down under the same injury rule as a person, and a horse won't carry a rider in full woge.
+
+| Mount or vehicle | Move | Gallop | Notes |
+|---|---|---|---|
+| Horse | 15 yd | 40 yd | Galloping over hard going takes a Riding roll; failing it means a fall |
+| Mule | 12 yd | 25 yd | Sure-footed: trails and slopes don't count as hard going |
+| Wagon or stagecoach | 10 yd | 25 yd | In a chase, it runs on the stagecoach track |
 
 ## Injury
 
 | Boxes marked | Condition | Effect |
 |---|---|---|
 | 0 | Uninjured | No injury penalty |
-| 1 | Wounded | −1 to physical actions |
-| 2 | Seriously wounded | −2 to physical actions |
+| 1 | Wounded | −1 to physical actions; Move −2 yards |
+| 2 | Seriously wounded | −2 to physical actions; half Move, no running |
 | 3 | Incapacitated | Unable to act; medical aid needed |
 
 Injury penalties replace each other rather than stacking. They apply to movement, attacks, Dodge, and other tasks the injury physically hinders.
@@ -517,13 +567,13 @@ How many boxes a hit marks depends on the **weapon**, not on how well the attack
 
 | Weapon | Range | Boxes on a hit | What the injury looks like |
 |---|---|---|---|
-| Punch, kick, headbutt | Melee | 1 | Bruises, a split lip, cracked ribs |
-| Club, bottle, pistol-whip | Melee | 1 | A concussion or a broken finger |
-| Knife or hatchet | Melee; Close thrown | 1 | A cut or stab wound that bleeds |
+| Punch, kick, headbutt | Melee, reach 1 yd | 1 | Bruises, a split lip, cracked ribs |
+| Club, bottle, pistol-whip | Melee, reach 1 yd | 1 | A concussion or a broken finger |
+| Knife or hatchet | Melee, reach 1 yd; Close thrown | 1 | A cut or stab wound that bleeds |
 | Arrow | Short | 1 | A cut or stab wound that bleeds |
-| Axe, saber, or an old Grimm weapon | Melee | 2 | A deep wound or a broken bone |
+| Axe, saber, or an old Grimm weapon | Melee, reach 2 yd (bowie knife 1, a Grimm's spear or pike 3) | 2 | A deep wound or a broken bone |
 | Crossbow | Short | 2 | A bolt deep in the flesh |
-| Claws and fangs of a predator Wesen in full woge | Melee | 2 | Torn flesh |
+| Claws and fangs of a predator Wesen in full woge | Melee, reach 1 yd | 2 | Torn flesh |
 | Derringer | Close (out of range beyond Short) | 2 | A gunshot wound |
 | Revolver | Close | 2 | A gunshot wound |
 | Rifle | Medium | 2 | A gunshot wound |
@@ -572,7 +622,16 @@ Roll Medicine when the diagnosis is uncertain or an urgent treatment decision ma
 
 ## Field treatment
 
-With a doctor's bag and several uninterrupted minutes, successful Medicine removes one injury box; success by 5 or more removes two. Each injury receives one field-treatment attempt; further attempts need changed circumstances.
+With a doctor's bag and several uninterrupted minutes, successful Medicine removes one injury box; success by 5 or more removes two.
+
+## Treatment attempts
+
+Each set of injuries permits one field-treatment attempt and one proper-care attempt. Further rolls require a meaningful improvement in care, a new treatment, or recovery time. Simply waiting and trying again is insufficient.
+
+- **A set of injuries** is the boxes from one fight or other harmful incident.
+- **Later injuries** start a new set, with its own attempts, which remove only that set's boxes. They don't reopen wounds already treated.
+- **Another roll** needs something new: a doctor's surgery after field treatment, an Apothecary remedy for the poison under the wound, or days of rest before trying again.
+- **Stabilization** is separate: never limited, and it never removes boxes.
 
 ## A doctor's surgery
 
@@ -648,7 +707,7 @@ An Incantare, Hexenbiest or Zauberbiest can also spend advancement points on the
 | Deeper spell | 2 | One spell you know gets one more Boost | Each spell once |
 | Another charm | 1 | Carry one more ready charm | Up to 2 extra |
 | By heart | 1 | One kind of ritual takes one fewer segment (minimum 1) | Each kind once |
-| Quicker hand | 1 | One ritual you know goes one pace faster: an hour becomes ten minutes, ten minutes one action | Each ritual once |
+| Quicker hand | 1 | Reduce the interval between rolls for one specific working by one step, to a minimum of one minute (an hour to ten minutes, ten minutes to one minute). Its clock and required rolls remain unchanged. Combat release requires a charm. | Each ritual once |
 | Master of the Lens | 4 | Occult becomes Expert (+5) | Once, at the end of a long campaign |
 
 # Running cases
@@ -761,7 +820,6 @@ Choose one advantage at character creation: a general advantage from this chapte
 **Badges.** A badge is legal authority, not a magic word: Wesen, outlaws and the powers of the hidden world don't care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency's reach and files, but no badge.
 
 <!-- HERITAGES:START -->
-
 # Heritages
 
 Each heritage has a **tier**. A character has 3 points to split between heritage power and Edges: the higher the tier, the fewer Edges (see Step 2). Adjustments always total zero. Heritages marked *horror* are only available when the whole table has agreed to a horror-tinged campaign.
@@ -814,7 +872,6 @@ Most people are human. You know the truth about the hidden world, which already 
 |---|---|---|
 | Frontier Grit | +2 to Will against fear when facing something that shouldn't exist. | **Nobody Believes You.** When you tell ordinary folk what you've seen, accept being called mad, drunk or a liar. |
 | Gut Instinct | +2 to Read People when judging, face to face, whether someone is lying. | **Acts on Hunches.** You act on an unproven feeling. Accept the consequence when it costs time, trust or position. |
-
 ## Bauerschwein
 
 *Tier 1 (Minor) · 2 Edges · Body +1, Agility −1, Presence −1, Will +1*
@@ -833,14 +890,13 @@ Pig-like Wesen: stubborn, hard-working, with senses sharp even in human form, an
 |---|---|---|
 | Stubborn as Stone | +2 to Will to resist intimidation, especially from a Blutbad. | **Old Feud.** Blutbaden are your people's enemies. When one is near, accept the quarrel, or the challenge to Ehrenkampf. |
 | Keen Snout | +2 to Intellect rolls to notice or identify something by smell. | **Blunt to a Fault.** Your honesty offends someone who matters. Accept the lost goodwill. |
-
 ## Coyotl
 
 *Tier 1 (Minor) · 2 Edges · Body +1, Agility +1, Intellect −1, Will −1*
 
 Coyote-like Wesen of the plains and desert country who live in clans bound by old customs, and fight together like a pack.
 
-**Woge profile:** Body +1; Agility +1; Dodge +1; Claws mark 2 boxes; Keen senses: track by scent and hearing; Swift: +2 to Athletics when running.
+**Woge profile:** Body +1; Agility +1; Dodge +1; Claws mark 2 boxes; Keen senses: track by scent and hearing; Swift: Move +1, and +2 to Athletics when running.
 
 **Suggested skills:** Brawling, Shooting, Tracking, Survival.
 
@@ -848,7 +904,6 @@ Coyote-like Wesen of the plains and desert country who live in clans bound by ol
 |---|---|---|
 | Pack Fighter | +2 to Brawling or Melee against a target an ally attacked this round. | **Clan Law.** The clan's customs bind you. Accept the clan's demand. |
 | Plains Wanderer | +2 to Survival in dry, open country: plains, desert and badlands. | **Restless.** You can't stay put for long. Accept leaving, or the strain of staying, at a bad time. |
-
 ## Eisbiber
 
 *Tier 1 (Minor) · 2 Edges · Intellect +1, Will −1*
@@ -863,7 +918,6 @@ Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, an
 |---|---|---|
 | Master Builder | +2 to Tinkering when building or shoring up structures, dams or mechanisms. | **Timid.** Violence makes you freeze. Accept losing your first action when a fight breaks out. |
 | The Lodge | +2 to Investigation when asking the local Wesen community for news. | **Lodge Obligations.** The lodge expects favors. Accept the call when it comes at a bad time. |
-
 ## Fuchsbau
 
 *Tier 1 (Minor) · 2 Edges · Body −1, Intellect +2, Will −1*
@@ -879,7 +933,6 @@ Fox-like Wesen, clever and quick, with a long tradition of trade in herbs, remed
 | Fuchsbau Remedies | +2 to Apothecary when brewing a remedy, antidote or potion from the old recipes. | **Criminal Kin.** Your family deals in the Wesen black market. Accept their demands or their trouble. |
 | Fox's Cunning | +2 to Deception when misleading a pursuer or covering your tracks. | **Too Clever by Half.** You overplay your hand. Accept the consequence when the trick backfires. |
 | Horse Archer | +2 to Shooting with a bow from the saddle. | **Disreputable.** Wesen assume a Fuchsbau is up to something. Accept the distrust when it costs you. |
-
 ## Mauzhertz
 
 *Tier 1 (Minor) · 2 Edges · Body −1, Agility +1*
@@ -894,7 +947,6 @@ Mouse-like Wesen, small, quick and wary, with excellent hearing. Gentle by natur
 |---|---|---|
 | Small and Quick | +2 to Stealth when hiding or slipping away. | **Easily Startled.** Sudden noise or danger makes you flinch. Accept −2 on your next action. |
 | Keen Hearing | +2 to Intellect rolls to hear faint or distant sounds. | **Breaking Point.** Pushed too far, you snap into violence. Accept what you do in that moment. |
-
 ## Steinadler
 
 *Tier 1 (Minor) · 2 Edges · Body −1, Agility +1, Intellect +1, Will −1*
@@ -909,7 +961,6 @@ Eagle-like Wesen with remarkable eyesight, a hunter's pride, and a taste for wor
 |---|---|---|
 | Eagle Eye | +2 to Intellect rolls to spot detail at a great distance. | **Proud as an Eagle.** You won't back down or beg. Accept the consequence of your pride. |
 | Hunter's Eye | +2 to Shooting at long range after aiming for an action. | **Hunter's Code.** You won't shoot an unarmed or fleeing foe. Accept the escape. |
-
 ## Taniwha
 
 *Tier 1 (Minor) · 2 Edges · Body +1, Presence −1 · horror campaigns only*
@@ -921,7 +972,7 @@ Water-dwelling Wesen from New Zealand: guardians of rivers and the people they c
 - Resists poison: +4 to Body against any poison.
 - Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can't clear, every three days.
 
-**Woge profile:** Body +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Amphibious: breathes water, swims as fast as a horse runs; Burrows through earth; Dark sight. **Drawbacks:** Must be submerged in water daily, or mark a box that rest can't clear, each hour; Pounamu (greenstone) wounds mark one extra box.
+**Woge profile:** Body +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Amphibious: breathes water and swims at full Move, fast as a dolphin (water isn't hard going for them; a strong current, a storm or choked water still halves it); Burrows through earth; Dark sight. **Drawbacks:** Must be submerged in water daily, or mark a box that rest can't clear, each hour; Pounamu (greenstone) wounds mark one extra box.
 
 **Suggested skills:** Athletics, Brawling, Survival, Stealth.
 
@@ -929,7 +980,6 @@ Water-dwelling Wesen from New Zealand: guardians of rivers and the people they c
 |---|---|---|
 | Paralyzing Bite | Ability, in full woge: a bite marks 1 box, and the target rolls Body or is paralyzed for the scene. | **Guardian's Duty.** You protect those you've claimed as yours. Accept the danger when they need you. |
 | River Guardian | +2 to Athletics and Survival in rivers, lakes and the sea. | **Peculiar Appetite.** Gluttony, and an odd craving (frogs, to start with). Accept the distraction at a bad time. |
-
 ## Ziegevolk
 
 *Tier 1 (Minor) · 2 Edges · Intellect −1, Presence +2, Will −1*
@@ -944,7 +994,6 @@ Goat-like Wesen whose pheromones, working even in human form, make them unnatura
 |---|---|---|
 | Ziegevolk Pheromones | +2 to Persuasion face to face at close quarters, in either form. Grimms and anyone dosed with the antidote are unaffected. | **Pheromone Suspicion.** Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust. |
 | Smooth Operator | +2 to Deception when talking your way past a guard or official. | **Scandal Follows You.** Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex. |
-
 ## Blutbad
 
 *Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Intellect −1, Will −1*
@@ -964,7 +1013,6 @@ Wolf-like Wesen with keen senses and a predator's appetite; the root of the were
 | Blutbad Nose | +2 to Tracking by scent, in either form. | **The Bloodlust.** When blood is spilled near you or something runs, roll Will or woge and give chase. Accept the cost of the urge. |
 | Night Hunter | +2 to Stealth when stalking at night. | **Loner.** You shun company. Accept the cost of going it alone. |
 | Old Enemy | +2 to Brawling against a Bauerschwein. | **Old Feud.** Bauerschwein are your enemies. When one is near, accept the quarrel. |
-
 ## Grimm
 
 *Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Presence −2*
@@ -996,7 +1044,6 @@ A descendant of the old hunters, the Decapitare: stronger and faster than ordina
 | Hard to Kill | Ability: Dying lasts until the end of the next scene, not this one. | **Vow: Protect the Innocent.** You've sworn to protect the innocent from Wesen. Accept the danger. |
 | Pain Means Nothing | Ability: ignore the Wounded penalty (−1). | **Honesty.** You won't lie, even to Wesen. Accept the consequence. |
 | Keeper of the Books | +2 to Wesen Lore when you can consult your family's books. | **The Books Must Be Kept.** The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them. |
-
 ## Incantare
 
 *Tier 2 (Major) · 1 Edge · Body −1, Intellect +1, Presence −1, Will +1*
@@ -1021,7 +1068,6 @@ A human who works real magic through a Lens: a tradition and a way of seeing. Th
 | Braucher Lens | Braucherei, the Pennsylvania Dutch healing craft: spoken charms, prayers and blessed objects, from The Long Lost Friend. +2 to Occult to heal, protect, or break a hex. | **No Payment.** A Braucher takes no money for healing, only gifts. Accept the cost when the need is great and the purse is empty. |
 | Scaenarfex Lens (Artistic Enchanter) | Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm. | **Artist's Temperament.** Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you. |
 | Veneficare Lens (Sorcerer) | Casts spells: quick magic in one action and an Occult roll, shaped by one or two Paths agreed with the GM (fire and force, say). Known: Trained 2, Specialty 3, Expert 4. You can carry only one charm. | **Bound Purpose.** Your power follows one narrow calling. Accept the cost of serving it when it clashes with your friends' needs. |
-
 ## Jägerbär
 
 *Tier 2 (Major) · 1 Edge · Body +2, Agility −1, Intellect −1*
@@ -1036,7 +1082,6 @@ Bear-like Wesen, enormously strong and durable. Traditional families still keep 
 |---|---|---|
 | Bear's Strength | +2 to Athletics for feats of raw strength: lifting, breaking, holding. | **The Roh-Hatz.** Your family keeps the old hunting rite. Accept the obligation, or the shame of refusing it. |
 | Family Weapon | +2 to Melee with your family's claw-bladed hunting weapon. | **Slow to Calm.** Once angered, you're hard to stop. Accept the harm you do to something you shouldn't. |
-
 ## Mauvais Dentes
 
 *Tier 2 (Major) · 1 Edge · Body +1, Agility +1, Intellect −1, Presence −1*
@@ -1055,7 +1100,6 @@ Sabre-toothed, panther-like Wesen, so deadly that the Royal Families have kept t
 |---|---|---|
 | Relentless Hunter | +2 to Tracking when hunting a single named quarry. | **Royal Debt.** The Royals bred your line as killers. When one of their agents calls on you, accept the demand or the danger of refusing. |
 | Pounce | +2 to Brawling on your first attack of a fight, leaping from hiding. | **Killer's Instinct.** In a fight you go for the throat. Accept the death you didn't intend. |
-
 ## Naschazer
 
 *Tier 2 (Major) · 1 Edge · Body +2, Intellect −1, Presence −1 · horror campaigns only*
@@ -1074,7 +1118,6 @@ Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror camp
 |---|---|---|
 | Brute Strength | +2 to Athletics to lift, break or hold. | **Greed.** Riches are hard to refuse. Accept the bribe's strings or the risk of taking more. |
 | Butcher's Hands | +2 to Melee with a cleaver, axe or knife. | **Proud.** You won't be slighted. Accept the fight your pride starts. |
-
 ## Skalengeck
 
 *Tier 2 (Major) · 1 Edge · Agility +1, Presence −1*
@@ -1089,7 +1132,6 @@ Lizard-like Wesen, cold-eyed and hard to kill, with a poisonous bite. Common amo
 |---|---|---|
 | Poison Bite | Ability, in full woge: a bite that marks a box also poisons. Each hour the victim rolls Body −3 or marks another box, until treated with Apothecary. | **Callous.** You don't much care who gets hurt. Accept the cost when that shows. |
 | Hard to Subdue | +2 to Body to resist being knocked out, stunned or restrained. | **Cornered Lizard.** When you're trapped, you woge and fight. Accept the Exposure and the damage. |
-
 ## Vallachi
 
 *Tier 2 (Major) · 1 Edge · Body +1, Agility −1, Presence +1, Will −1 · horror campaigns only*
@@ -1111,7 +1153,6 @@ Long-lived, handsome, vampire-like Wesen who feed on the lifeforce of others and
 |---|---|---|
 | Night Charm | +2 to Persuasion face to face, after dark. | **Old Grudges.** You've lived long enough to make enemies. Accept it when one of them turns up. |
 | Ageless | +2 to Intellect rolls to recall something you lived through decades ago. | **Secret Age.** You don't age as you should. Accept the lie or the slip when someone notices. |
-
 ## Fuchsteufelwild
 
 *Tier 3 (Apex) · 0 Edges · Body +1, Intellect +2, Presence −2, Will −1*
@@ -1123,7 +1164,7 @@ Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; th
 - Acid talons: in full woge, claw hits mark 2 boxes and ignore Tough and armor.
 - Leaper, in either form: jumps of many yards; +2 to Athletics to jump.
 
-**Woge profile:** Agility +1; Dodge +1; Keen senses: track by scent and hearing; Swift. **Drawbacks:** Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged; Disturbing voice.
+**Woge profile:** Agility +1; Dodge +1; Keen senses: track by scent and hearing; Swift: Move +1. **Drawbacks:** Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged; Disturbing voice.
 
 **Suggested skills:** Brawling, Athletics, Deception, Investigation.
 
@@ -1131,7 +1172,6 @@ Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; th
 |---|---|---|
 | Tremor | Ability, in full woge: stomp, and everyone nearby rolls Athletics or falls and loses their next action. | **Cruel Streak.** When an enemy is helpless, you're tempted to make them suffer. Accept the lost allies, or the Suspicion it brings. |
 | Strike a Bargain | +2 to Persuasion or Deception when making a deal. | **Guess My Name.** Your true name holds power over you. When someone hunts for it, or speaks it, accept the consequence. |
-
 ## Hexenbiest or Zauberbiest
 
 *Tier 3 (Apex) · 0 Edges · Body −1, Agility −1, Presence +1, Will +1*
@@ -1153,7 +1193,6 @@ Witch-like Wesen (Zauberbiest for the men), beautiful in human form and horrific
 | Hexenbiest Spellcraft | +2 to Occult for curses, potions and sendings. | **The Price of Magic.** Every spell costs blood, pain or something precious. Accept the cost when it bites. |
 | Levitation | Ability, in woge: roll Will to lift yourself and float or fly a short way. | **Hexenbiest Pride.** You cannot abide being bested or slighted. Accept the feud you start. |
 | TK Crush | Ability, in full woge: roll Will against the target's Body; on a success they mark 1 box, which Dodge can't avoid. | **Coven Traditions.** Your family or coven has rules and expectations. Accept the demand. |
-
 ## Murcielago
 
 *Tier 3 (Apex) · 0 Edges · None*
@@ -1164,7 +1203,7 @@ Bat-like Wesen with uncanny hearing and a sonic scream that drops a room full of
 
 - Sonic scream: in full woge, roll Will. Everyone nearby you choose who can hear rolls Body −2; a failure loses their next action and takes −2 for the scene. Earplugs protect. Heard in town, it marks Exposure.
 
-**Woge profile:** Body +1; Agility +1; Claws and fangs mark 2 boxes; Sonar: no penalty for darkness; sense the shape of a room by sound; Keen hearing: hear heartbeats; Swift.
+**Woge profile:** Body +1; Agility +1; Claws and fangs mark 2 boxes; Sonar: no penalty for darkness; sense the shape of a room by sound; Keen hearing: hear heartbeats; Swift: Move +1.
 
 **Suggested skills:** Stealth, Athletics, Brawling, Investigation.
 
@@ -1276,13 +1315,19 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Assistance:** success +1; success by 5 or more +2; 18 causes a complication. One assistant per roll.
 
-**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Telling hit (by 5+ or natural 3–4): the attacker picks an effect; called shot −2 (small target −4).
+**Move:** 5 yd, +1 per 2 points of Agility + Body above 20, +1 Trained Athletics or +2 Specialty/Expert, ± heritage speed; run (no action) twice that. Threats 8 yd. Wounded −2 yd; seriously wounded half, no run. Hard going: half. Stepping away is free. Reach: 1 yd fists, knives, claws; 2 yd axes, sabers; 3 yd spears. Horse 15 yd (gallop 40); −2 from a moving horse.
+
+**Range:** Close 10 yd, Short 25, Medium 100, Long 300, Extreme 1,000. One band beyond a weapon's −2, two −4, farther out of range.
+
+**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit; Additional Defense: a second, at −2) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Telling hit (by 5+ or natural 3–4): the attacker picks an effect the weapon can deliver (pin: weapon in hand, claws or grapple only), which never adds boxes or kills outright; called shot −2 (small target −4).
+
+**Fine weapon or tool:** +2 to one narrow, agreed use of a skill; never with an advantage on the same roll; never to Dodge, Parry or Block.
 
 **Damage:** fists, clubs, knives and arrows 1 box; guns, heavy blades and Wesen claws 2; a close-range shotgun or buffalo rifle 3 and Dying. A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
 
 **Guns:** derringer 2, revolver 6, shotgun 2, rifle 15. Reload: one action. Natural 18 jams.
 
-**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). A surgery gives +2 and clears 2 (3 on margin 5+). Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone's care).
+**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). A surgery gives +2 and clears 2 (3 on margin 5+). Each set of injuries (one fight or incident) gets one field and one proper-care attempt; another needs better care, a new treatment or time. Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone's care).
 
 **Woge:** free action for a Wesen; a forced woge on a failed Will roll. The woge profile's bonuses apply while woged. Grimms see woge under strong emotion. A full woge before townsfolk marks Exposure (2 boxes at Tier 3).
 

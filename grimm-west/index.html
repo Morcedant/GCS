@@ -387,7 +387,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-head .avatar.portrait { width: 40px; height: 54px; }
 .gm-head b { font-family: var(--display); letter-spacing: .06em; text-transform: uppercase; font-size: 1.05rem; overflow-wrap: anywhere; }
 .gm-head .small { display: block; }
-.gm-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.gm-stats { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
 .gm-stats div { border: 1px solid var(--line); border-radius: 6px; padding: 4px 2px; background: var(--well); }
 .gm-stats span { display: block; font: .56rem var(--mono); letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
 .gm-stats b { font: 400 1.15rem var(--mono); color: var(--chrome); }
@@ -590,7 +590,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="9ca38e0" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · 9ca38e0</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="47df697" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 47df697</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -630,6 +630,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field" id="species-name-wrap" hidden><label for="f-species">Heritage name</label><input type="text" id="f-species" placeholder="e.g. Seltenvogel"></div>
             <div class="field" id="custom-tier-wrap" hidden><label for="f-customtier">Tier (agreed with the GM)</label>
               <select id="f-customtier"><option value="0">Tier 0: 3 Edges</option><option value="1">Tier 1: 2 Edges</option><option value="2">Tier 2: 1 Edge</option><option value="3">Tier 3: no Edges</option></select></div>
+            <div class="field" id="custom-speed-wrap" hidden><label for="f-customspeed">Speed (agreed with the GM)</label>
+              <select id="f-customspeed"><option value="-1">Slower: Move −1</option><option value="0">Human pace</option><option value="1">Faster: Move +1</option></select></div>
             <div class="field wide"><div class="checks"><label><input type="checkbox" id="f-horror"> Horror campaign: show the man-eating heritages (only if the whole table has agreed)</label></div></div>
             <div class="field wide"><div class="trait-desc" id="species-desc"></div></div>
             <div class="field wide" id="species-adj-wrap" hidden><span class="label">Custom adjustments (must total 0, each −2 to +2)</span>
@@ -769,6 +771,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide" id="talisman-wrap" hidden><label for="f-talisman">Your talisman (Edge)</label><input type="text" id="f-talisman" placeholder="e.g. A Himmelsbrief from a Braucher in Lancaster County, against bullets"></div>
             <div class="field" id="gear-wrap" hidden><label for="f-gearitem">Fine weapon or tool (Edge)</label><input type="text" id="f-gearitem" placeholder="e.g. Grandfather's Grimm axe"></div>
             <div class="field" id="gearskill-wrap" hidden><label for="f-gearskill">+2 to</label><select id="f-gearskill"></select></div>
+            <div class="field wide" id="gearuse-wrap" hidden><label for="f-gearuse">Only for (one narrow use, agreed with the GM)</label><input type="text" id="f-gearuse" placeholder="e.g. Aimed shots at Long range or farther"></div>
             <div class="field wide"><label for="f-otherequip">Other gear</label><input type="text" id="f-otherequip" placeholder="Anything else you carry"></div>
             <div class="field wide"><label for="f-connection">Connection to another character</label>
               <select id="f-connpick" aria-label="Quick pick a connection"></select>
@@ -787,6 +790,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="panel hud">
           <div class="stats">
             <div class="stat"><span class="eyebrow">Dodge</span><b id="st-dodge"></b></div>
+            <div class="stat"><span class="eyebrow">Move</span><b id="st-move"></b></div>
             <div class="stat"><span class="eyebrow">Grit</span><b id="st-grit">2</b></div>
             <div class="stat"><span class="eyebrow">Best</span><b id="st-best"></b></div>
           </div>
@@ -1042,6 +1046,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <div class="field" style="flex:1 1 16em"><label for="lab-defense">Target's defense</label><select id="lab-defense"></select>
                 <span class="small muted" id="lab-dodge-note" role="status"></span></div>
             </div>
+            <p class="small" id="lab-reach" hidden style="margin:6px 0 0"></p>
             <div class="lab-row" id="lab-text-row" style="margin-top:8px" hidden>
               <div class="field" style="flex:1 1 100%"><label for="lab-text" id="lab-text-label">Note</label><input type="text" id="lab-text"></div>
             </div>
@@ -1336,12 +1341,12 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="even">
 <td>A fine weapon or tool</td>
-<td>An heirloom weapon, a master’s instruments or a charm-maker’s kit: +2 to one named skill when it’s used</td>
+<td>An heirloom weapon, a master’s instruments or a charm-maker’s kit: +2 to one narrowly defined use of a named skill (see <em>Fine weapons and tools</em>)</td>
 <td>1</td>
 </tr>
 <tr class="odd">
 <td>Additional Defense</td>
-<td>A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2.</td>
+<td>A second defense each round, at −2: Dodge, Parry or Block, in any mix (see <em>Attacking and defending</em>)</td>
 <td>1</td>
 </tr>
 <tr class="even">
@@ -1460,7 +1465,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tbody>
 </table>
 <h2 id="g-step-5-prepare-for-the-hunt">Step 5: Prepare for the hunt</h2>
-<p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Grit points (three with True grit) and your gear. Name your friend in town or your fine weapon or tool, if you took those Edges. Describe one connection to another player’s character.</p>
+<p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Your Move is 5 yards, +1 for every 2 points of Agility + Body above 20, plus the same Athletics bonus and any heritage speed (see <em>Move and reach</em>). Begin uninjured, with two Grit points (three with True grit) and your gear. Name your friend in town, or your fine weapon or tool and the one narrow use it improves, if you took those Edges. Describe one connection to another player’s character.</p>
 <h3 id="g-top-10-connections-to-another-character">Top 10 connections to another character</h3>
 <ol type="1">
 <li><strong>Rode together in the war.</strong> We served in the same company and still watch each other’s backs.</li>
@@ -1610,7 +1615,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-untrained-actions">Untrained actions</h2>
 <p>A plausible untrained attempt uses attribute −4. Specialized work such as surgery, a ritual, or brewing a Wesen remedy requires relevant training or direct guidance. Guidance permits an attempt only when the GM finds it credible; it does not grant the expert’s skill.</p>
 <h2 id="g-gear">Gear</h2>
-<p>Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bonus; exceptional tools may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.</p>
+<p>Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bonus; only the <em>fine weapon or tool</em> Edge gives one (below). Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.</p>
 <table>
 <colgroup>
 <col style="width: 50%" />
@@ -1659,32 +1664,53 @@ tr.lvl-U td.target { color: var(--muted); }
 <td>Shield</td>
 <td>A hide shield or an iron-bound buckler, rare in the West; some Grimm families keep one with the old weapons. You Block at +1.</td>
 </tr>
+</tbody>
+</table>
+<h3 id="g-fine-weapons-and-tools">Fine weapons and tools</h3>
+<p>A fine weapon or tool grants +2 to one narrowly defined use of a named skill, agreed when chosen. It does not stack with an advantage bonus on the same roll and never improves Dodge, Parry, or Block.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Fine weapon or tool</th>
+<th>Skill</th>
+<th>The narrow use</th>
+<th>Not covered</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A rifle with a telescopic sight</td>
+<td>Shooting</td>
+<td>Aimed shots at Long range or farther</td>
+<td>Snap shots, anything at Close or Short, Dodge</td>
+</tr>
 <tr class="even">
-<td>Trail kit</td>
-<td>Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones; no bonus beyond that.</td>
+<td>A master gunsmith’s tools</td>
+<td>Tinkering</td>
+<td>Repairing, adjusting and modifying firearms</td>
+<td>Locks, wagons, clockwork</td>
 </tr>
 <tr class="odd">
-<td>Lantern and matches</td>
-<td>Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible.</td>
+<td>An army surgeon’s instruments</td>
+<td>Medicine</td>
+<td>Field treatment of a wound: stitching, dressing, setting a bone</td>
+<td>Diagnosis, remedies, a doctor’s surgery</td>
 </tr>
 <tr class="even">
-<td>Law books and blank warrants</td>
-<td>Needed to draw up papers, check a statute or argue a point of law away from a courthouse.</td>
-</tr>
-<tr class="odd">
-<td>Himmelsbrief</td>
-<td>A “letter from Heaven”, folded small and carried on the body. Once per case, when a bullet hits you, mark one box fewer. Whether it’s the letter or the faith, nobody can say.</td>
-</tr>
-<tr class="even">
-<td>Grimm’s journals</td>
-<td>Copied pages from a Grimm family’s books. With an hour to consult them, +2 to Wesen Lore to identify a Wesen or find its weakness. Irreplaceable, and coveted.</td>
-</tr>
-<tr class="odd">
-<td>Dynamite</td>
-<td>Three sticks. Throw with Athletics; the fuse burns for a round. See Weapons and damage.</td>
+<td>Grandfather’s Grimm axe</td>
+<td>Melee</td>
+<td>Breaking a shield, a door or a weapon</td>
+<td>Ordinary attacks, Parry, Block</td>
 </tr>
 </tbody>
 </table>
+<p><em>Too broad:</em> “+2 to Shooting with my revolver” or “+2 to Occult with my grimoire”. A Doctor with Steady Hands and fine instruments takes +2 once on a roll both cover. | Trail kit | Bedroll, canteen, rations, rope and flint for a few days. Turns impossible survival and climbing tasks into ordinary ones; no bonus beyond that. | | Lantern and matches | Light for a few hours. Searching in the dark without light is very difficult (−4) or impossible. | | Law books and blank warrants | Needed to draw up papers, check a statute or argue a point of law away from a courthouse. | | Himmelsbrief | A “letter from Heaven”, folded small and carried on the body. Once per case, when a bullet hits you, mark one box fewer. Whether it’s the letter or the faith, nobody can say. | | Grimm’s journals | Copied pages from a Grimm family’s books. With an hour to consult them, +2 to Wesen Lore to identify a Wesen or find its weakness. Irreplaceable, and coveted. | | Dynamite | Three sticks. Throw with Athletics; the fuse burns for a round. See Weapons and damage. |</p>
 <h1 id="g-actions-and-teamwork">Actions and teamwork</h1>
 <h2 id="g-when-to-roll">When to roll</h2>
 <p>Routine work succeeds automatically when you have appropriate training, gear and time. Roll when failure could change the situation. Before rolling, establish your goal, the relevant skill, any modifiers, and what is at stake.</p>
@@ -1842,12 +1868,17 @@ tr.lvl-U td.target { color: var(--muted); }
 </ol>
 <p><strong>Trappings.</strong> The right materials and correspondences (stones, herbs, stars, places) remove one segment from the clock.</p>
 <h3 id="g-charms-elixirs-and-potions">Charms, elixirs and potions</h3>
-<p><strong>Charms.</strong> A finished ritual can be stored in an object and released by breaking it: a bottle thrown, a pendant snapped, a bullet-charm fired. You can carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Scaenarfex carries one more; a Veneficare only one. Preparation is how slow magic wins a fast fight.</p>
+<p><strong>Charms.</strong> A finished ritual can be stored in an object and released by breaking it: a bottle thrown, a pendant snapped, a bullet-charm fired. You can carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Scaenarfex carries one more; a Veneficare only one. Preparation is how slow magic wins a fast fight: a ritual itself is too slow for one. A charm skips the casting roll, not the target’s chance: it counts as a success by 0, so the target defends with no attack-quality penalty, or resists on a successful roll. A charm never marks more than 3 boxes.</p>
 <p><strong>Elixirs and potions</strong> spoil. They stay good until the end of the day, or a week on a success by 5 or more.</p>
 <h3 id="g-spells-veneficare">Spells (Veneficare)</h3>
 <p>A <strong>Veneficare</strong> trades preparation for speed: they know <strong>spells</strong>, cast with <strong>one action and an Occult roll</strong>, shaped by one or two Paths agreed with the GM. Spells known: <strong>Trained 2, Specialty 3, Expert 4</strong>.</p>
 <p>Each spell has a short <strong>base effect</strong>: one target, for one scene, at Close or Short range. Occult as a Specialty gives <strong>1 Boost</strong>, as Expert <strong>2</strong>, chosen <strong>as you cast</strong>; each Boost spent is <strong>−1 to the roll</strong>.</p>
 <table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Boost</th>
@@ -1859,7 +1890,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="odd">
 <td><strong>Harder</strong></td>
 <td>+1 box, or the penalty becomes −3</td>
-<td>+2 boxes, or −4</td>
+<td>+2 boxes (3 at most), or −4</td>
 </tr>
 <tr class="even">
 <td><strong>Wider</strong></td>
@@ -1896,7 +1927,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="even">
 <td>Force</td>
-<td>Unseen force hurls the target down: 1 box, and they lose their next move (Body resists).</td>
+<td>Unseen force hurls the target down: 1 box, and they’re knocked down as by a telling hit: prone, or driven back a few steps, and standing up uses their next move (Body resists).</td>
 </tr>
 <tr class="odd">
 <td>Ward</td>
@@ -1908,7 +1939,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="odd">
 <td>Bind</td>
-<td>The target is held where they stand for the scene, or until they break free (Body resists).</td>
+<td>The target is held where they stand, as a pin: their next action goes to getting free, and then they’re free. Holding them again takes another casting (Body resists).</td>
 </tr>
 <tr class="even">
 <td>Snuff</td>
@@ -1920,12 +1951,14 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="even">
 <td>Stanch</td>
-<td>Stop the bleeding: clear one injury box, once per wound.</td>
+<td>Stop the bleeding: clear one injury box, once per set of injuries.</td>
 </tr>
 </tbody>
 </table>
+<p><strong>Defense or resistance.</strong> Each hostile spell says which applies, never both. Where <em>Dodge applies</em>, the casting roll is the attack roll and attack quality applies to the Dodge from its margin. Where an attribute <em>resists</em>, it’s a contest: the target rolls it, the better margin wins and ties go to the target, with no attack-quality penalty (the margin already counts). A spell that says neither (Ward, Snuff, Stanch) simply works.</p>
+<p><strong>Harm limit.</strong> Magic marks at most 3 boxes on one target from one spell, ritual or charm, Dying included as for weapons. Further Harder Boosts go to range, duration or targets instead.</p>
 <p>A failed spell flares where people can see it: mark a box of <strong>Exposure</strong>. A natural 18 marks two, or something answers that shouldn’t.</p>
-<p><strong>Hexenbiests and Zauberbiests</strong> work rituals the same way, through their innate magic, in their own style (curses, potions and sendings). Their <strong>telekinesis</strong> is their quick magic.</p>
+<p><strong>Hexenbiests and Zauberbiests</strong> work rituals the same way, through their innate magic, in their own style (curses, potions and sendings). Their <strong>telekinesis</strong> is their quick magic: a telekinetic throw is an attack with Occult at Close range, 1 box, and Dodge applies.</p>
 <h3 id="g-old-country-magic-in-america">Old-country magic in America</h3>
 <p>The old traditions crossed the ocean with the people who kept them, and many of the Lenses wear American clothes:</p>
 <ul>
@@ -1946,9 +1979,10 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-attacking-and-defending">Attacking and defending</h2>
 <p>Roll Shooting for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may <strong>defend</strong>: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.</p>
 <ul>
-<li><strong>One defense a round.</strong> A target gets one defense a round, between its turns, and chooses which when an attack hits. The <strong>Additional Defense</strong> Edge gives a second.</li>
+<li><strong>One defense a round.</strong> A target gets one defense a round, between its turns, and chooses which when an attack hits.</li>
+<li><strong>Additional Defense.</strong> With this Edge you may attempt a second defense each round at −2, in addition to attack-quality and injury penalties. You cannot defend twice against the same attack.</li>
 <li><strong>Dodge</strong> is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert.</li>
-<li><strong>Parry.</strong> Against a weapon in hand, fists, claws or fangs, roll Melee −3 with a weapon in hand. Bare-handed, Brawling −3 parries fists only: nobody turns a Blutbad’s claws with an open hand. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a bullet or an arrow.</li>
+<li><strong>Parry.</strong> Against a weapon in hand, fists, claws or fangs, roll Melee −3 with a weapon in hand. Bare-handed, Brawling −3 parries fists only: nobody turns a Blutbad’s claws with an open hand. Nobody parries a bullet or an arrow.</li>
 <li><strong>Block.</strong> With a shield, or anything that can stand in for one (a chair, a wooden slat, a crate lid, a saddle), you can block a blade, a club, claws, fangs, fists or an arrow: roll Melee −2, or Melee −1 with a real shield. Nothing you can lift blocks a bullet. An improvised shield breaks the first time it blocks a hit of 2 or more boxes: a chair stops one swipe of a Blutbad’s claws, and then it’s kindling.</li>
 <li><strong>Attack quality.</strong> A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3. A Wesen in full woge often strikes that cleanly.</li>
 <li><strong>Aim.</strong> Spend your action aiming at a target you can see: +1 to your next attack against it. <strong>Careful Marksman</strong> and <strong>Hunter’s Eye</strong> add their +2 to this; a <strong>Gunslinger</strong> doesn’t need to aim.</li>
@@ -1958,54 +1992,63 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.</p>
 <ul>
 <li><strong>A telling hit</strong> is an attack that succeeds by <strong>5 or more</strong>, or on a natural 3 or 4, and isn’t stopped by a defense. The attacker picks <strong>one effect</strong> below and describes it. The weapon still marks its usual boxes.</li>
-<li><strong>A called shot.</strong> Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, an eye, a rope, a lock). If the attack hits at all, the effect happens, whatever the margin. <strong>Careful Marksman</strong> and <strong>Hunter’s Eye</strong> cut this penalty by 1.</li>
+<li><strong>A called shot.</strong> Before rolling, name an effect your weapon can deliver and take −2 on the attack, or −4 for a small target (a hand, an eye, a rope, a lock). If the attack hits at all, the effect happens, whatever the margin. <strong>Careful Marksman</strong> and <strong>Hunter’s Eye</strong> cut this penalty by 1.</li>
 <li><strong>Both ways.</strong> Wesen, outlaws and worse land telling hits on characters too.</li>
 </ul>
 <table>
 <colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Effect</th>
+<th>With</th>
 <th>What happens</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>Disarm</td>
+<td>Any attack</td>
 <td>The weapon or held item drops, or flies a few yards away</td>
 </tr>
 <tr class="even">
 <td>Knock down</td>
-<td>The target falls prone, or is driven back a few steps</td>
+<td>A weapon in hand, fists or claws, or a shot or missile that marks 2 or more boxes</td>
+<td>The target falls prone, or is driven back a few steps. Standing up uses the target’s move on their next turn; they still take their action</td>
 </tr>
 <tr class="odd">
 <td>Pin</td>
-<td>The target is held, tangled or pinned down: their next action goes to getting free</td>
+<td>A weapon in hand, fists, claws or a grapple</td>
+<td>The target is grabbed, held, or pinned against a wall or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack</td>
 </tr>
 <tr class="even">
 <td>Rattle</td>
+<td>Any attack</td>
 <td>−2 to the target’s next roll</td>
 </tr>
 <tr class="odd">
 <td>Break gear</td>
-<td>A shield, weapon or tool breaks</td>
+<td>Any attack but bare hands, claws and fangs</td>
+<td>A weapon, shield or tool is knocked out of use (jammed, bent, unstrung, cracked) until its owner spends an action putting it right. It’s destroyed for good only if it was already vulnerable (a rotten haft, an improvised shield) or the attacker has a weakness to exploit. Armor loses 1 protection until it’s repaired</td>
 </tr>
 <tr class="even">
 <td>Open them up</td>
+<td>Any attack</td>
 <td>The next attack on this target this round gets +2</td>
 </tr>
 <tr class="odd">
 <td>Precise</td>
-<td>You hit exactly what you aimed at: the lantern, the rope, the hand on the trigger</td>
+<td>Any attack</td>
+<td>You hit exactly what you aimed at: the lantern, the rope, the hand on the trigger. It changes the situation, never the rules: no extra boxes, no getting past a defense, no instant death</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Limits.</strong> A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a Blutbad of its claws or knocks down a stagecoach, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.</p>
+<p><strong>Limits.</strong> A telling hit never adds boxes and never gets past a defense. It never kills outright, disables a character for good, or destroys exceptional equipment: those come only from injury, from the <em>Dying and death</em> rules, or from an established weakness (a Wesen’s bane, what the Grimm diaries say kills it). Only the effects a weapon can deliver are open to it (the <em>With</em> column). Keeping someone’s head down with gunfire isn’t a pin: that’s cover and a threat. The effect still has to make sense: nobody disarms a Blutbad of its claws or knocks down a stagecoach, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.</p>
 <p><strong>Staying alive.</strong> A character on the receiving end can shrug off a telling hit’s effect with <strong>Hard to put down</strong> (once per fight) or by spending a Grit point. Either way, they still take the boxes.</p>
-<p><em>Example:</em> a Blutbad in full woge claws at Deputy Ames and succeeds by 5. Ames hasn’t defended yet this round: Dodge 11, −2 for the clean hit, needs a 9 or less. Ames has a saber in hand, so a parry is possible too: Melee 14 −3 −2 = 9, no better. Ames dodges. When the second Blutbad lunges before Ames’s next turn, there’s no defense left, unless Ames has Additional Defense.</p>
+<p><em>Example:</em> a Blutbad in full woge claws at Deputy Ames and succeeds by 5. Ames hasn’t defended yet this round: Dodge 11, −2 for the clean hit, needs a 9 or less. Ames has a saber in hand, so a parry is possible too: Melee 14 −3 −2 = 9, no better. Ames dodges. When the second Blutbad lunges before Ames’s next turn, there’s no defense left, unless Ames has Additional Defense: a second Dodge at 11 −2 = 9, before any clean-hit penalty.</p>
 <h2 id="g-range">Range</h2>
 <p>Distances fall into five bands:</p>
 <table>
@@ -2029,29 +2072,131 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="even">
 <td>Short</td>
-<td>Up to 50 yards</td>
+<td>Up to 25 yards</td>
 <td>Across a street or a corral</td>
 </tr>
 <tr class="odd">
 <td>Medium</td>
-<td>Up to 150 yards</td>
+<td>Up to 100 yards</td>
 <td>Down the length of a town</td>
 </tr>
 <tr class="even">
 <td>Long</td>
-<td>Up to 500 yards</td>
-<td>Across a valley or a river crossing</td>
+<td>Up to 300 yards</td>
+<td>Across a river crossing or a small valley</td>
 </tr>
 <tr class="odd">
 <td>Extreme</td>
-<td>Up to a mile, in line of sight</td>
+<td>Up to 1,000 yards, in line of sight</td>
 <td>Ridge to ridge</td>
 </tr>
 </tbody>
 </table>
-<p>Every ranged weapon has an <strong>effective band</strong>, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand, claws and fists reach only someone next to you. Your move each turn covers the Close band; give up your action to run and you cover Short.</p>
+<p>Every ranged weapon has an <strong>effective band</strong>, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. A thrown weapon’s effective band is Close.</p>
+<h2 id="g-move-and-reach">Move and reach</h2>
+<p><strong>Move</strong> is how far you go in a turn: <strong>5 yards, +1 for every 2 points of Agility + Body above 20</strong> (rounded down; nothing is taken off below 20), <strong>+1 for Trained Athletics or +2 for Athletics as a Specialty or Expert</strong>, plus your heritage’s speed, if it has one. Most characters move 6 to 9 yards. Give up your action to <strong>run</strong> and you cover twice your Move. Threats move 8 yards unless their entry says otherwise. In full woge, the woge’s Agility and Body bonuses count, and a <strong>Swift</strong> woge adds +1 (Coyotl, Murcielago, Fuchsteufelwild).</p>
+<table>
+<thead>
+<tr class="header">
+<th>Agility + Body</th>
+<th>20 or less</th>
+<th>21–22</th>
+<th>23–24</th>
+<th>25–26</th>
+<th>27–28</th>
+<th>29–30</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Move before Athletics</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Injury slows you.</strong> Wounded (1 box): Move −2 yards. Seriously wounded (2 boxes): half your Move, rounded down, and you can’t run. Incapacitated: you don’t move. Never less than 1 yard while you can act.</li>
+<li><strong>Hard going halves it.</strong> Climbing, swimming, wading, crawling, deep snow or sand, thick brush, rubble or a crowd: half your Move (and half a run), rounded down. Injury and hard going both apply, injury first.</li>
+<li><strong>Stepping away.</strong> You can move away from someone in reach freely; leaving a fight doesn’t give them a free attack.</li>
+</ul>
+<p>A weapon in hand strikes anyone within its <strong>reach</strong>, shown in the weapons table. Move into reach as part of your turn and attack in the same turn.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Reach</th>
+<th>Weapons</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1 yard</td>
+<td>Fists, kicks and grappling; knives, hatchets, bowie knives; clubs and bottles; claws, fangs and teeth</td>
+</tr>
+<tr class="even">
+<td>2 yards</td>
+<td>Axes, sabers and an old Grimm weapon; a rifle butt or a bayonet held short</td>
+</tr>
+<tr class="odd">
+<td>3 yards</td>
+<td>Spears, pikes and other long-hafted weapons from a Grimm’s trunk</td>
+</tr>
+</tbody>
+</table>
+<p>A weapon in hand can’t reach past 3 yards; anything farther is a ranged attack.</p>
+<h3 id="g-horses-and-wagons">Horses and wagons</h3>
+<p>A rider or driver moves at the horse’s or wagon’s Move, not their own, and running it (a gallop) takes their action. Shooting or striking from a moving horse or wagon is −2. A wounded horse slows down under the same injury rule as a person, and a horse won’t carry a rider in full woge.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Mount or vehicle</th>
+<th>Move</th>
+<th>Gallop</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Horse</td>
+<td>15 yd</td>
+<td>40 yd</td>
+<td>Galloping over hard going takes a Riding roll; failing it means a fall</td>
+</tr>
+<tr class="even">
+<td>Mule</td>
+<td>12 yd</td>
+<td>25 yd</td>
+<td>Sure-footed: trails and slopes don’t count as hard going</td>
+</tr>
+<tr class="odd">
+<td>Wagon or stagecoach</td>
+<td>10 yd</td>
+<td>25 yd</td>
+<td>In a chase, it runs on the stagecoach track</td>
+</tr>
+</tbody>
+</table>
 <h2 id="g-injury">Injury</h2>
 <table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Boxes marked</th>
@@ -2068,12 +2213,12 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="even">
 <td>1</td>
 <td>Wounded</td>
-<td>−1 to physical actions</td>
+<td>−1 to physical actions; Move −2 yards</td>
 </tr>
 <tr class="odd">
 <td>2</td>
 <td>Seriously wounded</td>
-<td>−2 to physical actions</td>
+<td>−2 to physical actions; half Move, no running</td>
 </tr>
 <tr class="even">
 <td>3</td>
@@ -2177,19 +2322,19 @@ tr.lvl-U td.target { color: var(--muted); }
 <tbody>
 <tr class="odd">
 <td>Punch, kick, headbutt</td>
-<td>Melee</td>
+<td>Melee, reach 1 yd</td>
 <td>1</td>
 <td>Bruises, a split lip, cracked ribs</td>
 </tr>
 <tr class="even">
 <td>Club, bottle, pistol-whip</td>
-<td>Melee</td>
+<td>Melee, reach 1 yd</td>
 <td>1</td>
 <td>A concussion or a broken finger</td>
 </tr>
 <tr class="odd">
 <td>Knife or hatchet</td>
-<td>Melee; Close thrown</td>
+<td>Melee, reach 1 yd; Close thrown</td>
 <td>1</td>
 <td>A cut or stab wound that bleeds</td>
 </tr>
@@ -2201,7 +2346,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="odd">
 <td>Axe, saber, or an old Grimm weapon</td>
-<td>Melee</td>
+<td>Melee, reach 2 yd (bowie knife 1, a Grimm’s spear or pike 3)</td>
 <td>2</td>
 <td>A deep wound or a broken bone</td>
 </tr>
@@ -2213,7 +2358,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="odd">
 <td>Claws and fangs of a predator Wesen in full woge</td>
-<td>Melee</td>
+<td>Melee, reach 1 yd</td>
 <td>2</td>
 <td>Torn flesh</td>
 </tr>
@@ -2350,7 +2495,15 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-diagnosis-and-stabilization">Diagnosis and stabilization</h2>
 <p>Roll Medicine when the diagnosis is uncertain or an urgent treatment decision matters. Emergency stabilization takes one action and a successful Medicine roll with a doctor’s bag. It ends Dying and stops deterioration, but removes no boxes.</p>
 <h2 id="g-field-treatment">Field treatment</h2>
-<p>With a doctor’s bag and several uninterrupted minutes, successful Medicine removes one injury box; success by 5 or more removes two. Each injury receives one field-treatment attempt; further attempts need changed circumstances.</p>
+<p>With a doctor’s bag and several uninterrupted minutes, successful Medicine removes one injury box; success by 5 or more removes two.</p>
+<h2 id="g-treatment-attempts">Treatment attempts</h2>
+<p>Each set of injuries permits one field-treatment attempt and one proper-care attempt. Further rolls require a meaningful improvement in care, a new treatment, or recovery time. Simply waiting and trying again is insufficient.</p>
+<ul>
+<li><strong>A set of injuries</strong> is the boxes from one fight or other harmful incident.</li>
+<li><strong>Later injuries</strong> start a new set, with its own attempts, which remove only that set’s boxes. They don’t reopen wounds already treated.</li>
+<li><strong>Another roll</strong> needs something new: a doctor’s surgery after field treatment, an Apothecary remedy for the poison under the wound, or days of rest before trying again.</li>
+<li><strong>Stabilization</strong> is separate: never limited, and it never removes boxes.</li>
+</ul>
 <h2 id="g-a-doctors-surgery">A doctor’s surgery</h2>
 <p>A proper surgery with instruments, chloroform and a clean table grants +2 to Medicine. A successful treatment removes two boxes; success by 5 or more removes three. Allow the time the operation requires.</p>
 <h2 id="g-remedies-and-poisons">Remedies and poisons</h2>
@@ -2541,7 +2694,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="odd">
 <td>Quicker hand</td>
 <td>1</td>
-<td>One ritual you know goes one pace faster: an hour becomes ten minutes, ten minutes one action</td>
+<td>Reduce the interval between rolls for one specific working by one step, to a minimum of one minute (an hour to ten minutes, ten minutes to one minute). Its clock and required rolls remain unchanged. Combat release requires a charm.</td>
 <td>Each ritual once</td>
 </tr>
 <tr class="even">
@@ -2967,7 +3120,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-coyotl">Coyotl</h2>
 <p><em>Tier 1 (Minor) · 2 Edges · Body +1, Agility +1, Intellect −1, Will −1</em></p>
 <p>Coyote-like Wesen of the plains and desert country who live in clans bound by old customs, and fight together like a pack.</p>
-<p><strong>Woge profile:</strong> Body +1; Agility +1; Dodge +1; Claws mark 2 boxes; Keen senses: track by scent and hearing; Swift: +2 to Athletics when running.</p>
+<p><strong>Woge profile:</strong> Body +1; Agility +1; Dodge +1; Claws mark 2 boxes; Keen senses: track by scent and hearing; Swift: Move +1, and +2 to Athletics when running.</p>
 <p><strong>Suggested skills:</strong> Brawling, Shooting, Tracking, Survival.</p>
 <table>
 <colgroup>
@@ -3132,7 +3285,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li>Resists poison: +4 to Body against any poison.</li>
 <li>Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can’t clear, every three days.</li>
 </ul>
-<p><strong>Woge profile:</strong> Body +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Amphibious: breathes water, swims as fast as a horse runs; Burrows through earth; Dark sight. <strong>Drawbacks:</strong> Must be submerged in water daily, or mark a box that rest can’t clear, each hour; Pounamu (greenstone) wounds mark one extra box.</p>
+<p><strong>Woge profile:</strong> Body +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Amphibious: breathes water and swims at full Move, fast as a dolphin (water isn’t hard going for them; a strong current, a storm or choked water still halves it); Burrows through earth; Dark sight. <strong>Drawbacks:</strong> Must be submerged in water daily, or mark a box that rest can’t clear, each hour; Pounamu (greenstone) wounds mark one extra box.</p>
 <p><strong>Suggested skills:</strong> Athletics, Brawling, Survival, Stealth.</p>
 <table>
 <colgroup>
@@ -3560,7 +3713,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li>Acid talons: in full woge, claw hits mark 2 boxes and ignore Tough and armor.</li>
 <li>Leaper, in either form: jumps of many yards; +2 to Athletics to jump.</li>
 </ul>
-<p><strong>Woge profile:</strong> Agility +1; Dodge +1; Keen senses: track by scent and hearing; Swift. <strong>Drawbacks:</strong> Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged; Disturbing voice.</p>
+<p><strong>Woge profile:</strong> Agility +1; Dodge +1; Keen senses: track by scent and hearing; Swift: Move +1. <strong>Drawbacks:</strong> Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged; Disturbing voice.</p>
 <p><strong>Suggested skills:</strong> Brawling, Athletics, Deception, Investigation.</p>
 <table>
 <colgroup>
@@ -3637,7 +3790,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <ul>
 <li>Sonic scream: in full woge, roll Will. Everyone nearby you choose who can hear rolls Body −2; a failure loses their next action and takes −2 for the scene. Earplugs protect. Heard in town, it marks Exposure.</li>
 </ul>
-<p><strong>Woge profile:</strong> Body +1; Agility +1; Claws and fangs mark 2 boxes; Sonar: no penalty for darkness; sense the shape of a room by sound; Keen hearing: hear heartbeats; Swift.</p>
+<p><strong>Woge profile:</strong> Body +1; Agility +1; Claws and fangs mark 2 boxes; Sonar: no penalty for darkness; sense the shape of a room by sound; Keen hearing: hear heartbeats; Swift: Move +1.</p>
 <p><strong>Suggested skills:</strong> Stealth, Athletics, Brawling, Investigation.</p>
 <table>
 <colgroup>
@@ -3846,10 +3999,13 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Skills:</strong> Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Old hand) = attribute +5.</p>
 <p><strong>Modifiers:</strong> favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails.</p>
 <p><strong>Assistance:</strong> success +1; success by 5 or more +2; 18 causes a complication. One assistant per roll.</p>
-<p><strong>Combat:</strong> move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Telling hit (by 5+ or natural 3–4): the attacker picks an effect; called shot −2 (small target −4).</p>
+<p><strong>Move:</strong> 5 yd, +1 per 2 points of Agility + Body above 20, +1 Trained Athletics or +2 Specialty/Expert, ± heritage speed; run (no action) twice that. Threats 8 yd. Wounded −2 yd; seriously wounded half, no run. Hard going: half. Stepping away is free. Reach: 1 yd fists, knives, claws; 2 yd axes, sabers; 3 yd spears. Horse 15 yd (gallop 40); −2 from a moving horse.</p>
+<p><strong>Range:</strong> Close 10 yd, Short 25, Medium 100, Long 300, Extreme 1,000. One band beyond a weapon’s −2, two −4, farther out of range.</p>
+<p><strong>Combat:</strong> move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit; Additional Defense: a second, at −2) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Telling hit (by 5+ or natural 3–4): the attacker picks an effect the weapon can deliver (pin: weapon in hand, claws or grapple only), which never adds boxes or kills outright; called shot −2 (small target −4).</p>
+<p><strong>Fine weapon or tool:</strong> +2 to one narrow, agreed use of a skill; never with an advantage on the same roll; never to Dodge, Parry or Block.</p>
 <p><strong>Damage:</strong> fists, clubs, knives and arrows 1 box; guns, heavy blades and Wesen claws 2; a close-range shotgun or buffalo rifle 3 and Dying. A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.</p>
 <p><strong>Guns:</strong> derringer 2, revolver 6, shotgun 2, rifle 15. Reload: one action. Natural 18 jams.</p>
-<p><strong>Medicine:</strong> stabilize in one action. Field care clears 1 box (2 on margin 5+). A surgery gives +2 and clears 2 (3 on margin 5+). Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone’s care).</p>
+<p><strong>Medicine:</strong> stabilize in one action. Field care clears 1 box (2 on margin 5+). A surgery gives +2 and clears 2 (3 on margin 5+). Each set of injuries (one fight or incident) gets one field and one proper-care attempt; another needs better care, a new treatment or time. Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone’s care).</p>
 <p><strong>Woge:</strong> free action for a Wesen; a forced woge on a failed Will roll. The woge profile’s bonuses apply while woged. Grimms see woge under strong emotion. A full woge before townsfolk marks Exposure (2 boxes at Tier 3).</p>
 <p><strong>Rituals:</strong> describe the effect; fill a clock of 2, 4 or 6 segments with Occult rolls at your Lens’s pace. Trappings remove a segment. Charms: Trained 2, Specialty 3, Expert 4.</p>
 <p><strong>Grit:</strong> start each session with two (three with True grit). Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.</p>
@@ -4197,13 +4353,13 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>The GM view of the character creator has a <strong>battle map</strong> for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the <em>Personal combat</em> rules in the Players’ Guide, and a fight without it works the same way. Open <strong>How to use the map</strong> on the map itself for the buttons, step by step.</p>
 <p><strong>Two kinds of map.</strong></p>
 <ul>
-<li><strong>A hex map</strong> for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a saloon, 5 or 10 yards for a street, 50 for open prairie. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range table in the Players’ Guide.</li>
+<li><strong>A hex map</strong> for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a saloon, 5 or 10 yards for a street, 50 for open prairie. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range table in the Players’ Guide. Up close it names the reach: a knife or claws at 1 yard, a saber at 2, a spear at 3. When both the attacker and the target have tokens on the map (a character by their card, anyone else by the same name as in the Encounter panel), the panel checks the distance against the weapon: in reach, close enough to move in and strike, too far this turn, or for a gun the range band, which it sets.</li>
 <li><strong>A range track</strong> for fights where only distance matters: a chase after a stagecoach, a running fight across open country. It has a lane for the posse and one for each range band. Moving a token into the next lane moves it one band in or out.</li>
 </ul>
 <p><strong>Tokens.</strong> The GM places the posse with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, Dazed or Grit points on a token marks it on the character, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
 <p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
 <h2 id="gm-the-encounter-panel">The Encounter panel</h2>
-<p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round), the boxes marked and any telling hit, offering a Grit point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so. For each attack, choose what it’s made of (silver, a wooden stake or fire), and the panel applies the rules that turn on it: a Wesen’s Tough in full woge (and what gets past it), and a creature only the right weapon can hurt, like a Siegbarste’s iron bones.</p>
+<p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit (offering only the effects the weapon can deliver), offering a Grit point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so. For each attack, choose what it’s made of (silver, a wooden stake or fire), and the panel applies the rules that turn on it: a Wesen’s Tough in full woge (and what gets past it), and a creature only the right weapon can hurt, like a Siegbarste’s iron bones.</p>
 </div>
 <!-- GUIDE:END -->
       </article>
@@ -4281,6 +4437,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <label id="r-phys-wrap"><input type="checkbox" id="r-phys"> <span id="r-phys-label">Physical action (injury penalty)</span></label>
             <label><input type="checkbox" id="r-stun"> Dazed −2</label>
             <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> Aimed at this target last action +1</label>
+            <label id="r-second-wrap" hidden><input type="checkbox" id="r-second"> Second defense this round −2</label>
+            <label id="r-fine-wrap" hidden><input type="checkbox" id="r-fine"> <span id="r-fine-label">Fine weapon or tool +2</span></label>
           </div>
           <div class="btn-row"><button class="btn primary" id="r-roll">Roll</button>
             <span class="muted small" id="r-target"></span></div>
@@ -4440,7 +4598,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const badgeSvg = (div) => DELTA_SVG.replace('class="emblem" data-emblem d=""', `class="emblem${EMBLEMS[div].stroke ? " stroke" : ""}" d="${EMBLEMS[div].d}"`);
   // Heritages adjust starting attributes; every set totals 0.
   // Heritages are generated from data/heritages.json by tools/gen-heritages.py.
-  /* HERITAGES:START */const HERITAGE_DATA = {"wesenCore":[["Hidden face","Humans see your Wesen face only when you choose a full woge."],["Wesen sight","You see other Wesen when they woge, and you see a Grimm's eyes."],["Woge","A free action, in or out. Anger, frustration or fright can force one: when an enemy appears, you're frightened or you're attacked, the GM can call for a Will roll; on a failure you woge."],["Monstrous while woged","Ordinary people panic or attack; Persuasion with them is impossible. A full woge seen by townsfolk marks Exposure (2 boxes for a Tier 3 heritage)."],["Animals bolt","−2 to Riding while woged; a horse won't carry a woged rider."],["The Code","Your secret is deadly. Wesen who expose themselves answer to the Council, and to Grimms."]],"heritages":[{"id":"human","name":"Human","tier":0,"adj":{},"desc":"Most people are human. You know the truth about the hidden world, which already sets you apart.","core":[],"woge":null,"skills":[],"traits":[["h-grit","Frontier Grit","+2 to Will against fear when facing something that shouldn't exist.","Will",true,"Nobody Believes You","When you tell ordinary folk what you've seen, accept being called mad, drunk or a liar."],["h-gut","Gut Instinct","+2 to Read People when judging, face to face, whether someone is lying.","Read People",true,"Acts on Hunches","You act on an unproven feeling. Accept the consequence when it costs time, trust or position."]]},{"id":"fuchsbau","name":"Fuchsbau","tier":1,"wesen":true,"adj":{"Intellect":2,"Body":-1,"Will":-1},"desc":"Fox-like Wesen, clever and quick, with a long tradition of trade in herbs, remedies and harder-to-find ingredients. Other Wesen call them disreputable, and not always unfairly.","core":[],"skills":["Tracking","Riding","Melee","Shooting","Gambling","Wesen Lore"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Keen senses: track by scent and hearing"],"drawbacks":[]},"traits":[["f-remedies","Fuchsbau Remedies","+2 to Apothecary when brewing a remedy, antidote or potion from the old recipes.","Apothecary",true,"Criminal Kin","Your family deals in the Wesen black market. Accept their demands or their trouble."],["f-cunning","Fox's Cunning","+2 to Deception when misleading a pursuer or covering your tracks.","Deception",true,"Too Clever by Half","You overplay your hand. Accept the consequence when the trick backfires."],["f-archer","Horse Archer","+2 to Shooting with a bow from the saddle.","Shooting",true,"Disreputable","Wesen assume a Fuchsbau is up to something. Accept the distrust when it costs you."]]},{"id":"coyotl","name":"Coyotl","tier":1,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Will":-1},"desc":"Coyote-like Wesen of the plains and desert country who live in clans bound by old customs, and fight together like a pack.","core":[],"skills":["Brawling","Shooting","Tracking","Survival"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":1,"traits":["Claws mark 2 boxes","Keen senses: track by scent and hearing","Swift: +2 to Athletics when running"],"drawbacks":[]},"traits":[["co-pack","Pack Fighter","+2 to Brawling or Melee against a target an ally attacked this round.","Brawling",true,"Clan Law","The clan's customs bind you. Accept the clan's demand."],["co-plains","Plains Wanderer","+2 to Survival in dry, open country: plains, desert and badlands.","Survival",true,"Restless","You can't stay put for long. Accept leaving, or the strain of staying, at a bad time."]]},{"id":"eisbiber","name":"Eisbiber","tier":1,"wesen":true,"adj":{"Intellect":1,"Will":-1},"desc":"Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, and easily frightened by violence. Bullies like the Hässlich prey on them.","core":[],"skills":["Tinkering","Athletics","Persuasion","Investigation"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Teeth gnaw through wood and rope (a bite marks 1 box)","Swimmer: holds breath for minutes; +2 to Athletics when swimming"],"drawbacks":[]},"traits":[["e-builder","Master Builder","+2 to Tinkering when building or shoring up structures, dams or mechanisms.","Tinkering",true,"Timid","Violence makes you freeze. Accept losing your first action when a fight breaks out."],["e-lodge","The Lodge","+2 to Investigation when asking the local Wesen community for news.","Investigation",true,"Lodge Obligations","The lodge expects favors. Accept the call when it comes at a bad time."]]},{"id":"bauerschwein","name":"Bauerschwein","tier":1,"wesen":true,"adj":{"Body":1,"Will":1,"Agility":-1,"Presence":-1},"desc":"Pig-like Wesen: stubborn, hard-working, with senses sharp even in human form, and old enemies of the Blutbaden. Their feud is settled, when it must be, by the Ehrenkampf, a ritual duel.","core":["Sharp senses even unwoged: you can identify people and things by smell in either form."],"skills":["Athletics","Brawling","Investigation","Survival"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Tusks: a gore marks 1 box"],"drawbacks":[]},"traits":[["bs-stubborn","Stubborn as Stone","+2 to Will to resist intimidation, especially from a Blutbad.","Will",true,"Old Feud","Blutbaden are your people's enemies. When one is near, accept the quarrel, or the challenge to Ehrenkampf."],["bs-snout","Keen Snout","+2 to Intellect rolls to notice or identify something by smell.","Intellect",true,"Blunt to a Fault","Your honesty offends someone who matters. Accept the lost goodwill."]]},{"id":"mauzhertz","name":"Mauzhertz","tier":1,"wesen":true,"adj":{"Agility":1,"Body":-1},"desc":"Mouse-like Wesen, small, quick and wary, with excellent hearing. Gentle by nature, but one pushed too far can snap.","core":[],"skills":["Stealth","Athletics","Read People","Investigation"],"woge":{"attrs":{"Agility":1},"dodge":1,"traits":["Keen hearing: hear whispers through walls"],"drawbacks":[]},"traits":[["m-quick","Small and Quick","+2 to Stealth when hiding or slipping away.","Stealth",true,"Easily Startled","Sudden noise or danger makes you flinch. Accept −2 on your next action."],["m-hearing","Keen Hearing","+2 to Intellect rolls to hear faint or distant sounds.","Intellect",true,"Breaking Point","Pushed too far, you snap into violence. Accept what you do in that moment."]]},{"id":"ziegevolk","name":"Ziegevolk","tier":1,"wesen":true,"adj":{"Presence":2,"Intellect":-1,"Will":-1},"desc":"Goat-like Wesen whose pheromones, working even in human form, make them unnaturally persuasive and unnaturally popular. A Fuchsbau remedy can protect against them.","core":[],"skills":["Persuasion","Deception","Read People","Gambling"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Horns: a butt marks 1 box"],"drawbacks":[]},"traits":[["z-pheromones","Ziegevolk Pheromones","+2 to Persuasion face to face at close quarters, in either form. Grimms and anyone dosed with the antidote are unaffected.","Persuasion",true,"Pheromone Suspicion","Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust."],["z-smooth","Smooth Operator","+2 to Deception when talking your way past a guard or official.","Deception",true,"Scandal Follows You","Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex."]]},{"id":"steinadler","name":"Steinadler","tier":1,"wesen":true,"adj":{"Agility":1,"Intellect":1,"Body":-1,"Will":-1},"desc":"Eagle-like Wesen with remarkable eyesight, a hunter's pride, and a taste for working alone, sometimes for hire.","core":[],"skills":["Shooting","Tracking","Stealth","Survival"],"woge":{"attrs":{"Agility":1},"dodge":0,"traits":["Talons mark 2 boxes","Eagle sight: see detail a mile away"],"drawbacks":[]},"traits":[["st-eye","Eagle Eye","+2 to Intellect rolls to spot detail at a great distance.","Intellect",true,"Proud as an Eagle","You won't back down or beg. Accept the consequence of your pride."],["st-hunter","Hunter's Eye","+2 to Shooting at long range after aiming for an action.","Shooting",true,"Hunter's Code","You won't shoot an unarmed or fleeing foe. Accept the escape."]]},{"id":"taniwha","name":"Taniwha","tier":1,"wesen":true,"horror":true,"adj":{"Body":1,"Presence":-1},"desc":"Water-dwelling Wesen from New Zealand: guardians of rivers and the people they claim, reptile-like in woge, and dangerous to anyone else. Horror campaigns only.","core":["Resists poison: +4 to Body against any poison.","Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can't clear, every three days."],"skills":["Athletics","Brawling","Survival","Stealth"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Amphibious: breathes water, swims as fast as a horse runs","Burrows through earth","Dark sight"],"drawbacks":["Must be submerged in water daily, or mark a box that rest can't clear, each hour","Pounamu (greenstone) wounds mark one extra box"]},"traits":[["ta-bite","Paralyzing Bite","Ability, in full woge: a bite marks 1 box, and the target rolls Body or is paralyzed for the scene.","Brawling",false,"Guardian's Duty","You protect those you've claimed as yours. Accept the danger when they need you."],["ta-river","River Guardian","+2 to Athletics and Survival in rivers, lakes and the sea.","Athletics",true,"Peculiar Appetite","Gluttony, and an odd craving (frogs, to start with). Accept the distraction at a bad time."]]},{"id":"blutbad","name":"Blutbad","tier":2,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Will":-1},"desc":"Wolf-like Wesen with keen senses and a predator's appetite; the root of the werewolf legend. Wesen who know your kind assume you hunt humans. You don't, or not anymore.","core":["Reputation: Eats Humans. Wesen who know your kind assume the worst."],"skills":["Brawling","Shooting","Survival","Tracking"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws and fangs mark 2 boxes","Keen senses: track by scent and hearing","Dark sight","Leaper: +2 to Athletics to jump","Shrugs off cold"],"drawbacks":[]},"traits":[["b-nose","Blutbad Nose","+2 to Tracking by scent, in either form.","Tracking",true,"The Bloodlust","When blood is spilled near you or something runs, roll Will or woge and give chase. Accept the cost of the urge."],["b-night","Night Hunter","+2 to Stealth when stalking at night.","Stealth",true,"Loner","You shun company. Accept the cost of going it alone."],["b-enemy","Old Enemy","+2 to Brawling against a Bauerschwein.","Brawling",true,"Old Feud","Bauerschwein are your enemies. When one is near, accept the quarrel."]]},{"id":"mauvaisdentes","name":"Mauvais Dentes","tier":2,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Presence":-1},"desc":"Sabre-toothed, panther-like Wesen, so deadly that the Royal Families have kept them as assassins. Rare, solitary, and feared even by other Wesen.","core":["Reputation: Eats Humans. Wesen who know your kind assume the worst."],"skills":["Brawling","Shooting","Survival","Tracking"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Sabre teeth and claws mark 2 boxes","Keen senses: track by scent and hearing","Dark sight","Leaper: +2 to Athletics to jump","Shrugs off cold"],"drawbacks":[]},"traits":[["md-hunter","Relentless Hunter","+2 to Tracking when hunting a single named quarry.","Tracking",true,"Royal Debt","The Royals bred your line as killers. When one of their agents calls on you, accept the demand or the danger of refusing."],["md-pounce","Pounce","+2 to Brawling on your first attack of a fight, leaping from hiding.","Brawling",true,"Killer's Instinct","In a fight you go for the throat. Accept the death you didn't intend."]]},{"id":"skalengeck","name":"Skalengeck","tier":2,"wesen":true,"adj":{"Agility":1,"Presence":-1},"desc":"Lizard-like Wesen, cold-eyed and hard to kill, with a poisonous bite. Common among outlaws and hired guns.","core":[],"skills":["Shooting","Brawling","Wesen Lore","Stealth"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Immune to poison","Keen smell"],"drawbacks":[]},"traits":[["sk-bite","Poison Bite","Ability, in full woge: a bite that marks a box also poisons. Each hour the victim rolls Body −3 or marks another box, until treated with Apothecary.","Brawling",false,"Callous","You don't much care who gets hurt. Accept the cost when that shows."],["sk-subdue","Hard to Subdue","+2 to Body to resist being knocked out, stunned or restrained.","Body",true,"Cornered Lizard","When you're trapped, you woge and fight. Accept the Exposure and the damage."]]},{"id":"jagerbar","name":"Jägerbär","tier":2,"wesen":true,"adj":{"Body":2,"Agility":-1,"Intellect":-1},"desc":"Bear-like Wesen, enormously strong and durable. Traditional families still keep the Roh-Hatz, a coming-of-age hunt, and fight with an old Germanic weapon whose claw-like scoop disembowels.","core":[],"skills":["Athletics","Brawling","Melee","Survival"],"woge":{"attrs":{"Body":2},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Keen smell"],"drawbacks":[]},"traits":[["j-strength","Bear's Strength","+2 to Athletics for feats of raw strength: lifting, breaking, holding.","Athletics",true,"The Roh-Hatz","Your family keeps the old hunting rite. Accept the obligation, or the shame of refusing it."],["j-weapon","Family Weapon","+2 to Melee with your family's claw-bladed hunting weapon.","Melee",true,"Slow to Calm","Once angered, you're hard to stop. Accept the harm you do to something you shouldn't."]]},{"id":"naschazer","name":"Naschazer","tier":2,"wesen":true,"horror":true,"adj":{"Body":2,"Intellect":-1,"Presence":-1},"desc":"Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror campaigns only.","core":["Hunger (horror): each month you must eat human flesh; until you do, mark a box that rest can't clear, every day."],"skills":["Brawling","Melee","Athletics","Shooting"],"woge":{"attrs":{"Body":2},"dodge":0,"traits":["Huge strength: fists and fangs mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Feels no pain: ignore the Wounded penalty","Heals fast: each day of rest clears a box, however hurt you are","Dark sight"],"drawbacks":[]},"traits":[["n-brute","Brute Strength","+2 to Athletics to lift, break or hold.","Athletics",true,"Greed","Riches are hard to refuse. Accept the bribe's strings or the risk of taking more."],["n-cook","Butcher's Hands","+2 to Melee with a cleaver, axe or knife.","Melee",true,"Proud","You won't be slighted. Accept the fight your pride starts."]]},{"id":"vallachi","name":"Vallachi","tier":2,"wesen":true,"horror":true,"adj":{"Presence":1,"Body":1,"Will":-1,"Agility":-1},"desc":"Long-lived, handsome, vampire-like Wesen who feed on the lifeforce of others and shun the sun. Horror campaigns only.","core":["Lifedrain (horror): by touch, roll Will against the victim's Body; on a success they mark a box and you clear one.","Hunger (horror): each week you must drain lifeforce; until you do, mark a box that rest can't clear, every six hours.","Sunlight: −2 to all rolls in direct sun, and you tire quickly.","Lifebane: plants wilt and animals shy around you."],"skills":["Persuasion","Deception","Stealth","Read People"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Tough: hits of 2+ boxes mark one fewer, except from a pointed wooden stake","Keen senses","Dark sight"],"drawbacks":[]},"traits":[["v-charm","Night Charm","+2 to Persuasion face to face, after dark.","Persuasion",true,"Old Grudges","You've lived long enough to make enemies. Accept it when one of them turns up."],["v-ageless","Ageless","+2 to Intellect rolls to recall something you lived through decades ago.","Intellect",true,"Secret Age","You don't age as you should. Accept the lie or the slip when someone notices."]]},{"id":"grimm","name":"Grimm","tier":2,"adj":{"Body":1,"Agility":1,"Presence":-2},"desc":"A descendant of the old hunters, the Decapitare: stronger and faster than ordinary people, able to see the Wesen hidden among us, and feared by them.","core":["The Sight: you see a Wesen's face when it's stirred by strong emotion.","Grimm eyes: woged Wesen and other Grimms see them; humans don't.","Uneasy sense: you feel when a Wesen or magic is near, with no details.","Never freeze: you're never surprised, and +2 to Will against fear.","Hard to bewitch: +2 to Will against magic.","Raised on the books: Wesen Lore is always at least Trained, free.","Grimm blood: a Hexenbiest or Zauberbiest who drinks it under a full moon loses their powers (see Grimm blood)."],"skills":["Wesen Lore","Melee","Shooting","Investigation","Tracking"],"woge":null,"traits":[["g-danger","Danger Sense","Ability: when an ambush or trap threatens you, the GM secretly rolls your Intellect; success warns you in time to act.","Intellect",false,"Nightmares","The dead you've seen come back at night. Accept the lost sleep at a bad time."],["g-iron","Iron Bones","Ability: each hit that marks 2 or more boxes marks one fewer (never below 1).","",false,"Fanaticism","Wesen must die. Accept the trouble when mercy would be wiser."],["g-heal","Quick to Heal","Ability: each day of rest clears a box, however hurt you are, and rest works at three boxes even with nobody tending you.","",false,"Workaholic","You won't rest when there's a case. Accept the strain."],["g-hardy","Hardy","+2 to Body to resist poison, disease and exhaustion.","Body",true,"Stubbornness","You won't back down. Accept the cost."],["g-gun","Gunslinger","+2 to Shooting with a pistol at close range, with no need to aim.","Shooting",true,"Bad Temper","Accept the fight you start."],["g-balance","Perfect Balance","+2 to Athletics and Melee to keep your feet or fight on bad ground.","Athletics",true,"Curious","Accept the risk your curiosity brings."],["g-heavy","Heavy Hand","Ability: your Brawling hits mark 2 boxes.","Brawling",false,"Bloodlust","You don't stop at the surrender. Accept the consequences."],["g-weapon","Bonded Weapon","+2 to Melee or Shooting with one named heirloom weapon.","Melee",true,"The Weapon Must Be Kept","When it's lost or taken, accept the risk to get it back."],["g-hard","Hard to Kill","Ability: Dying lasts until the end of the next scene, not this one.","",false,"Vow: Protect the Innocent","You've sworn to protect the innocent from Wesen. Accept the danger."],["g-pain","Pain Means Nothing","Ability: ignore the Wounded penalty (−1).","",false,"Honesty","You won't lie, even to Wesen. Accept the consequence."],["g-books","Keeper of the Books","+2 to Wesen Lore when you can consult your family's books.","Wesen Lore",true,"The Books Must Be Kept","The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them."]]},{"id":"incantare","name":"Incantare","tier":2,"adj":{"Intellect":1,"Will":1,"Body":-1,"Presence":-1},"desc":"A human who works real magic through a Lens: a tradition and a way of seeing. The Wesen Council, the Royals and the Order of the Holy Knife all watch for people like you.","core":["Rituals: roll Occult to fill a ritual clock (minor 2, significant 4, major 6 segments). Your Lens sets how.","Charms: you can carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).","Grimms sense your magic: +1 to notice it for each charm or potion you carry."],"skills":["Occult","Wesen Lore","Apothecary","Read People"],"woge":null,"traits":[["i-chymiater","Chymiater Lens (Alchemist)","Brews elixirs, potions and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing. Only a Chymiater can brew the Grimm-blood draught.","Occult",true,"Price of the Work","Your craft feeds a vice: greed, drink, lechery or gluttony (agree which). Accept it when it bites."],["i-figmatarum","Figmatarum Lens (Illusionist)","Glamours, illusions and mesmerism worked through performance, music or art, in minutes. +2 to Occult for illusion and mesmerism.","Occult",true,"Artist's Vanity","You need an audience and can't bear an insult to your art. Accept the trouble your vanity causes."],["i-magi","Magi Lens (Scholar-Mage)","Scholarly ritual from grimoires, the Sixth and Seventh Books of Moses among them: any kind of effect, but an hour per roll, and it needs books. +2 to Occult for divination and wards.","Occult",true,"Obsession: Magical Knowledge","A grimoire, a ritual or a secret tempts you beyond sense. Accept the risk to get it."],["i-malifica","Malifica Lens (Hexenmeister)","Hexerei: curses and hexes, and the breaking of them, worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link.","Occult",true,"Wicked Reputation","People whisper that you're a hexer, and the Order of the Holy Knife listens. Accept the suspicion."],["i-phitonissa","Phitonissa Lens (Druid)","Rites of the seasons, nature and the old gods, worked outdoors; in America, often behind the doors of a Druid lodge. +2 to Occult for nature and folk magic.","Occult",true,"Disciplines of Faith","The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them."],["i-braucher","Braucher Lens","Braucherei, the Pennsylvania Dutch healing craft: spoken charms, prayers and blessed objects, from The Long Lost Friend. +2 to Occult to heal, protect, or break a hex.","Occult",true,"No Payment","A Braucher takes no money for healing, only gifts. Accept the cost when the need is great and the purse is empty."],["i-scaenarfex","Scaenarfex Lens (Artistic Enchanter)","Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm.","Occult",true,"Artist's Temperament","Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you."],["i-veneficare","Veneficare Lens (Sorcerer)","Casts spells: quick magic in one action and an Occult roll, shaped by one or two Paths agreed with the GM (fire and force, say). Known: Trained 2, Specialty 3, Expert 4. You can carry only one charm.","Occult",false,"Bound Purpose","Your power follows one narrow calling. Accept the cost of serving it when it clashes with your friends' needs."]]},{"id":"hexenbiest","name":"Hexenbiest or Zauberbiest","tier":3,"wesen":true,"adj":{"Will":1,"Presence":1,"Body":-1,"Agility":-1},"desc":"Witch-like Wesen (Zauberbiest for the men), beautiful in human form and horrific in woge, with innate magic that lives in their Wesen spirit. Coven traditions bind them; Grimm blood can strip them.","core":["Telekinesis: in full or partial woge, roll Will to throw a person or object with your mind (1 box), seize something out of reach, or turn aside one attack (+2 Dodge).","Innate magic: you can work rituals with Occult like an Incantare, in the Hexenbiest style: curses, potions and sendings.","Grimm blood: drunk under a full moon, it strips your powers until the Contaminatio Ritualis restores them."],"skills":["Occult","Apothecary","Deception","Persuasion"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer"],"drawbacks":["Horrific: even other Wesen recoil"]},"traits":[["hx-spell","Hexenbiest Spellcraft","+2 to Occult for curses, potions and sendings.","Occult",true,"The Price of Magic","Every spell costs blood, pain or something precious. Accept the cost when it bites."],["hx-levitate","Levitation","Ability, in woge: roll Will to lift yourself and float or fly a short way.","Will",false,"Hexenbiest Pride","You cannot abide being bested or slighted. Accept the feud you start."],["hx-crush","TK Crush","Ability, in full woge: roll Will against the target's Body; on a success they mark 1 box, which Dodge can't avoid.","Will",false,"Coven Traditions","Your family or coven has rules and expectations. Accept the demand."]]},{"id":"murcielago","name":"Murcielago","tier":3,"wesen":true,"adj":{},"desc":"Bat-like Wesen with uncanny hearing and a sonic scream that drops a room full of people to their knees.","core":["Sonic scream: in full woge, roll Will. Everyone nearby you choose who can hear rolls Body −2; a failure loses their next action and takes −2 for the scene. Earplugs protect. Heard in town, it marks Exposure."],"skills":["Stealth","Athletics","Brawling","Investigation"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":0,"traits":["Claws and fangs mark 2 boxes","Sonar: no penalty for darkness; sense the shape of a room by sound","Keen hearing: hear heartbeats","Swift"],"drawbacks":[]},"traits":[["mu-echo","Echo Sight","+2 to Intellect rolls to find something hidden in the dark by sound.","Intellect",true,"Sensitive Ears","Loud noise disorients you. When a gun or explosion goes off nearby, accept −2 on your next action."],["mu-hear","Eavesdropper","+2 to Intellect rolls to hear faint or distant voices.","Intellect",true,"Can't Unhear","You hear secrets you shouldn't. Accept the trouble that knowing brings."]]},{"id":"fuchsteufelwild","name":"Fuchsteufelwild","tier":3,"wesen":true,"adj":{"Intellect":2,"Body":1,"Presence":-2,"Will":-1},"desc":"Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; the root of Rumpelstiltskin. Clever, spiteful, and bound by an old obsession with names and bargains.","core":["Acid talons: in full woge, claw hits mark 2 boxes and ignore Tough and armor.","Leaper, in either form: jumps of many yards; +2 to Athletics to jump."],"skills":["Brawling","Athletics","Deception","Investigation"],"woge":{"attrs":{"Agility":1},"dodge":1,"traits":["Keen senses: track by scent and hearing","Swift"],"drawbacks":["Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged","Disturbing voice"]},"traits":[["ft-tremor","Tremor","Ability, in full woge: stomp, and everyone nearby rolls Athletics or falls and loses their next action.","Athletics",false,"Cruel Streak","When an enemy is helpless, you're tempted to make them suffer. Accept the lost allies, or the Suspicion it brings."],["ft-bargain","Strike a Bargain","+2 to Persuasion or Deception when making a deal.","Persuasion",true,"Guess My Name","Your true name holds power over you. When someone hunts for it, or speaks it, accept the consequence."]]}]};/* HERITAGES:END */
+  /* HERITAGES:START */const HERITAGE_DATA = {"wesenCore":[["Hidden face","Humans see your Wesen face only when you choose a full woge."],["Wesen sight","You see other Wesen when they woge, and you see a Grimm's eyes."],["Woge","A free action, in or out. Anger, frustration or fright can force one: when an enemy appears, you're frightened or you're attacked, the GM can call for a Will roll; on a failure you woge."],["Monstrous while woged","Ordinary people panic or attack; Persuasion with them is impossible. A full woge seen by townsfolk marks Exposure (2 boxes for a Tier 3 heritage)."],["Animals bolt","−2 to Riding while woged; a horse won't carry a woged rider."],["The Code","Your secret is deadly. Wesen who expose themselves answer to the Council, and to Grimms."]],"heritages":[{"id":"human","name":"Human","tier":0,"adj":{},"desc":"Most people are human. You know the truth about the hidden world, which already sets you apart.","core":[],"woge":null,"skills":[],"traits":[["h-grit","Frontier Grit","+2 to Will against fear when facing something that shouldn't exist.","Will",true,"Nobody Believes You","When you tell ordinary folk what you've seen, accept being called mad, drunk or a liar."],["h-gut","Gut Instinct","+2 to Read People when judging, face to face, whether someone is lying.","Read People",true,"Acts on Hunches","You act on an unproven feeling. Accept the consequence when it costs time, trust or position."]]},{"id":"fuchsbau","name":"Fuchsbau","tier":1,"wesen":true,"adj":{"Intellect":2,"Body":-1,"Will":-1},"desc":"Fox-like Wesen, clever and quick, with a long tradition of trade in herbs, remedies and harder-to-find ingredients. Other Wesen call them disreputable, and not always unfairly.","core":[],"skills":["Tracking","Riding","Melee","Shooting","Gambling","Wesen Lore"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Keen senses: track by scent and hearing"],"drawbacks":[]},"traits":[["f-remedies","Fuchsbau Remedies","+2 to Apothecary when brewing a remedy, antidote or potion from the old recipes.","Apothecary",true,"Criminal Kin","Your family deals in the Wesen black market. Accept their demands or their trouble."],["f-cunning","Fox's Cunning","+2 to Deception when misleading a pursuer or covering your tracks.","Deception",true,"Too Clever by Half","You overplay your hand. Accept the consequence when the trick backfires."],["f-archer","Horse Archer","+2 to Shooting with a bow from the saddle.","Shooting",true,"Disreputable","Wesen assume a Fuchsbau is up to something. Accept the distrust when it costs you."]]},{"id":"coyotl","name":"Coyotl","tier":1,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Will":-1},"desc":"Coyote-like Wesen of the plains and desert country who live in clans bound by old customs, and fight together like a pack.","core":[],"skills":["Brawling","Shooting","Tracking","Survival"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":1,"speed":1,"traits":["Claws mark 2 boxes","Keen senses: track by scent and hearing","Swift: Move +1, and +2 to Athletics when running"],"drawbacks":[]},"traits":[["co-pack","Pack Fighter","+2 to Brawling or Melee against a target an ally attacked this round.","Brawling",true,"Clan Law","The clan's customs bind you. Accept the clan's demand."],["co-plains","Plains Wanderer","+2 to Survival in dry, open country: plains, desert and badlands.","Survival",true,"Restless","You can't stay put for long. Accept leaving, or the strain of staying, at a bad time."]]},{"id":"eisbiber","name":"Eisbiber","tier":1,"wesen":true,"adj":{"Intellect":1,"Will":-1},"desc":"Beaver-like Wesen: builders, neighbors and gossips, close-knit and peaceable, and easily frightened by violence. Bullies like the Hässlich prey on them.","core":[],"skills":["Tinkering","Athletics","Persuasion","Investigation"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Teeth gnaw through wood and rope (a bite marks 1 box)","Swimmer: holds breath for minutes; +2 to Athletics when swimming"],"drawbacks":[]},"traits":[["e-builder","Master Builder","+2 to Tinkering when building or shoring up structures, dams or mechanisms.","Tinkering",true,"Timid","Violence makes you freeze. Accept losing your first action when a fight breaks out."],["e-lodge","The Lodge","+2 to Investigation when asking the local Wesen community for news.","Investigation",true,"Lodge Obligations","The lodge expects favors. Accept the call when it comes at a bad time."]]},{"id":"bauerschwein","name":"Bauerschwein","tier":1,"wesen":true,"adj":{"Body":1,"Will":1,"Agility":-1,"Presence":-1},"desc":"Pig-like Wesen: stubborn, hard-working, with senses sharp even in human form, and old enemies of the Blutbaden. Their feud is settled, when it must be, by the Ehrenkampf, a ritual duel.","core":["Sharp senses even unwoged: you can identify people and things by smell in either form."],"skills":["Athletics","Brawling","Investigation","Survival"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Tusks: a gore marks 1 box"],"drawbacks":[]},"traits":[["bs-stubborn","Stubborn as Stone","+2 to Will to resist intimidation, especially from a Blutbad.","Will",true,"Old Feud","Blutbaden are your people's enemies. When one is near, accept the quarrel, or the challenge to Ehrenkampf."],["bs-snout","Keen Snout","+2 to Intellect rolls to notice or identify something by smell.","Intellect",true,"Blunt to a Fault","Your honesty offends someone who matters. Accept the lost goodwill."]]},{"id":"mauzhertz","name":"Mauzhertz","tier":1,"wesen":true,"adj":{"Agility":1,"Body":-1},"desc":"Mouse-like Wesen, small, quick and wary, with excellent hearing. Gentle by nature, but one pushed too far can snap.","core":[],"skills":["Stealth","Athletics","Read People","Investigation"],"woge":{"attrs":{"Agility":1},"dodge":1,"traits":["Keen hearing: hear whispers through walls"],"drawbacks":[]},"traits":[["m-quick","Small and Quick","+2 to Stealth when hiding or slipping away.","Stealth",true,"Easily Startled","Sudden noise or danger makes you flinch. Accept −2 on your next action."],["m-hearing","Keen Hearing","+2 to Intellect rolls to hear faint or distant sounds.","Intellect",true,"Breaking Point","Pushed too far, you snap into violence. Accept what you do in that moment."]]},{"id":"ziegevolk","name":"Ziegevolk","tier":1,"wesen":true,"adj":{"Presence":2,"Intellect":-1,"Will":-1},"desc":"Goat-like Wesen whose pheromones, working even in human form, make them unnaturally persuasive and unnaturally popular. A Fuchsbau remedy can protect against them.","core":[],"skills":["Persuasion","Deception","Read People","Gambling"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Horns: a butt marks 1 box"],"drawbacks":[]},"traits":[["z-pheromones","Ziegevolk Pheromones","+2 to Persuasion face to face at close quarters, in either form. Grimms and anyone dosed with the antidote are unaffected.","Persuasion",true,"Pheromone Suspicion","Those who know what you are wonder whether they were persuaded or drugged. Accept the distrust."],["z-smooth","Smooth Operator","+2 to Deception when talking your way past a guard or official.","Deception",true,"Scandal Follows You","Affairs and broken hearts trail behind you. Accept the jealous husband or the angry ex."]]},{"id":"steinadler","name":"Steinadler","tier":1,"wesen":true,"adj":{"Agility":1,"Intellect":1,"Body":-1,"Will":-1},"desc":"Eagle-like Wesen with remarkable eyesight, a hunter's pride, and a taste for working alone, sometimes for hire.","core":[],"skills":["Shooting","Tracking","Stealth","Survival"],"woge":{"attrs":{"Agility":1},"dodge":0,"traits":["Talons mark 2 boxes","Eagle sight: see detail a mile away"],"drawbacks":[]},"traits":[["st-eye","Eagle Eye","+2 to Intellect rolls to spot detail at a great distance.","Intellect",true,"Proud as an Eagle","You won't back down or beg. Accept the consequence of your pride."],["st-hunter","Hunter's Eye","+2 to Shooting at long range after aiming for an action.","Shooting",true,"Hunter's Code","You won't shoot an unarmed or fleeing foe. Accept the escape."]]},{"id":"taniwha","name":"Taniwha","tier":1,"wesen":true,"horror":true,"adj":{"Body":1,"Presence":-1},"desc":"Water-dwelling Wesen from New Zealand: guardians of rivers and the people they claim, reptile-like in woge, and dangerous to anyone else. Horror campaigns only.","core":["Resists poison: +4 to Body against any poison.","Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can't clear, every three days."],"skills":["Athletics","Brawling","Survival","Stealth"],"woge":{"attrs":{"Body":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Amphibious: breathes water and swims at full Move, fast as a dolphin (water isn't hard going for them; a strong current, a storm or choked water still halves it)","Burrows through earth","Dark sight"],"drawbacks":["Must be submerged in water daily, or mark a box that rest can't clear, each hour","Pounamu (greenstone) wounds mark one extra box"]},"traits":[["ta-bite","Paralyzing Bite","Ability, in full woge: a bite marks 1 box, and the target rolls Body or is paralyzed for the scene.","Brawling",false,"Guardian's Duty","You protect those you've claimed as yours. Accept the danger when they need you."],["ta-river","River Guardian","+2 to Athletics and Survival in rivers, lakes and the sea.","Athletics",true,"Peculiar Appetite","Gluttony, and an odd craving (frogs, to start with). Accept the distraction at a bad time."]]},{"id":"blutbad","name":"Blutbad","tier":2,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Will":-1},"desc":"Wolf-like Wesen with keen senses and a predator's appetite; the root of the werewolf legend. Wesen who know your kind assume you hunt humans. You don't, or not anymore.","core":["Reputation: Eats Humans. Wesen who know your kind assume the worst."],"skills":["Brawling","Shooting","Survival","Tracking"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws and fangs mark 2 boxes","Keen senses: track by scent and hearing","Dark sight","Leaper: +2 to Athletics to jump","Shrugs off cold"],"drawbacks":[]},"traits":[["b-nose","Blutbad Nose","+2 to Tracking by scent, in either form.","Tracking",true,"The Bloodlust","When blood is spilled near you or something runs, roll Will or woge and give chase. Accept the cost of the urge."],["b-night","Night Hunter","+2 to Stealth when stalking at night.","Stealth",true,"Loner","You shun company. Accept the cost of going it alone."],["b-enemy","Old Enemy","+2 to Brawling against a Bauerschwein.","Brawling",true,"Old Feud","Bauerschwein are your enemies. When one is near, accept the quarrel."]]},{"id":"mauvaisdentes","name":"Mauvais Dentes","tier":2,"wesen":true,"adj":{"Body":1,"Agility":1,"Intellect":-1,"Presence":-1},"desc":"Sabre-toothed, panther-like Wesen, so deadly that the Royal Families have kept them as assassins. Rare, solitary, and feared even by other Wesen.","core":["Reputation: Eats Humans. Wesen who know your kind assume the worst."],"skills":["Brawling","Shooting","Survival","Tracking"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Sabre teeth and claws mark 2 boxes","Keen senses: track by scent and hearing","Dark sight","Leaper: +2 to Athletics to jump","Shrugs off cold"],"drawbacks":[]},"traits":[["md-hunter","Relentless Hunter","+2 to Tracking when hunting a single named quarry.","Tracking",true,"Royal Debt","The Royals bred your line as killers. When one of their agents calls on you, accept the demand or the danger of refusing."],["md-pounce","Pounce","+2 to Brawling on your first attack of a fight, leaping from hiding.","Brawling",true,"Killer's Instinct","In a fight you go for the throat. Accept the death you didn't intend."]]},{"id":"skalengeck","name":"Skalengeck","tier":2,"wesen":true,"adj":{"Agility":1,"Presence":-1},"desc":"Lizard-like Wesen, cold-eyed and hard to kill, with a poisonous bite. Common among outlaws and hired guns.","core":[],"skills":["Shooting","Brawling","Wesen Lore","Stealth"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Immune to poison","Keen smell"],"drawbacks":[]},"traits":[["sk-bite","Poison Bite","Ability, in full woge: a bite that marks a box also poisons. Each hour the victim rolls Body −3 or marks another box, until treated with Apothecary.","Brawling",false,"Callous","You don't much care who gets hurt. Accept the cost when that shows."],["sk-subdue","Hard to Subdue","+2 to Body to resist being knocked out, stunned or restrained.","Body",true,"Cornered Lizard","When you're trapped, you woge and fight. Accept the Exposure and the damage."]]},{"id":"jagerbar","name":"Jägerbär","tier":2,"wesen":true,"adj":{"Body":2,"Agility":-1,"Intellect":-1},"desc":"Bear-like Wesen, enormously strong and durable. Traditional families still keep the Roh-Hatz, a coming-of-age hunt, and fight with an old Germanic weapon whose claw-like scoop disembowels.","core":[],"skills":["Athletics","Brawling","Melee","Survival"],"woge":{"attrs":{"Body":2},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Keen smell"],"drawbacks":[]},"traits":[["j-strength","Bear's Strength","+2 to Athletics for feats of raw strength: lifting, breaking, holding.","Athletics",true,"The Roh-Hatz","Your family keeps the old hunting rite. Accept the obligation, or the shame of refusing it."],["j-weapon","Family Weapon","+2 to Melee with your family's claw-bladed hunting weapon.","Melee",true,"Slow to Calm","Once angered, you're hard to stop. Accept the harm you do to something you shouldn't."]]},{"id":"naschazer","name":"Naschazer","tier":2,"wesen":true,"horror":true,"adj":{"Body":2,"Intellect":-1,"Presence":-1},"desc":"Brutish, ogre-like Wesen of enormous strength who crave human flesh. Horror campaigns only.","core":["Hunger (horror): each month you must eat human flesh; until you do, mark a box that rest can't clear, every day."],"skills":["Brawling","Melee","Athletics","Shooting"],"woge":{"attrs":{"Body":2},"dodge":0,"traits":["Huge strength: fists and fangs mark 2 boxes","Tough: hits of 2+ boxes mark one fewer","Feels no pain: ignore the Wounded penalty","Heals fast: each day of rest clears a box, however hurt you are","Dark sight"],"drawbacks":[]},"traits":[["n-brute","Brute Strength","+2 to Athletics to lift, break or hold.","Athletics",true,"Greed","Riches are hard to refuse. Accept the bribe's strings or the risk of taking more."],["n-cook","Butcher's Hands","+2 to Melee with a cleaver, axe or knife.","Melee",true,"Proud","You won't be slighted. Accept the fight your pride starts."]]},{"id":"vallachi","name":"Vallachi","tier":2,"wesen":true,"horror":true,"adj":{"Presence":1,"Body":1,"Will":-1,"Agility":-1},"desc":"Long-lived, handsome, vampire-like Wesen who feed on the lifeforce of others and shun the sun. Horror campaigns only.","core":["Lifedrain (horror): by touch, roll Will against the victim's Body; on a success they mark a box and you clear one.","Hunger (horror): each week you must drain lifeforce; until you do, mark a box that rest can't clear, every six hours.","Sunlight: −2 to all rolls in direct sun, and you tire quickly.","Lifebane: plants wilt and animals shy around you."],"skills":["Persuasion","Deception","Stealth","Read People"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Tough: hits of 2+ boxes mark one fewer, except from a pointed wooden stake","Keen senses","Dark sight"],"drawbacks":[]},"traits":[["v-charm","Night Charm","+2 to Persuasion face to face, after dark.","Persuasion",true,"Old Grudges","You've lived long enough to make enemies. Accept it when one of them turns up."],["v-ageless","Ageless","+2 to Intellect rolls to recall something you lived through decades ago.","Intellect",true,"Secret Age","You don't age as you should. Accept the lie or the slip when someone notices."]]},{"id":"grimm","name":"Grimm","tier":2,"adj":{"Body":1,"Agility":1,"Presence":-2},"desc":"A descendant of the old hunters, the Decapitare: stronger and faster than ordinary people, able to see the Wesen hidden among us, and feared by them.","core":["The Sight: you see a Wesen's face when it's stirred by strong emotion.","Grimm eyes: woged Wesen and other Grimms see them; humans don't.","Uneasy sense: you feel when a Wesen or magic is near, with no details.","Never freeze: you're never surprised, and +2 to Will against fear.","Hard to bewitch: +2 to Will against magic.","Raised on the books: Wesen Lore is always at least Trained, free.","Grimm blood: a Hexenbiest or Zauberbiest who drinks it under a full moon loses their powers (see Grimm blood)."],"skills":["Wesen Lore","Melee","Shooting","Investigation","Tracking"],"woge":null,"traits":[["g-danger","Danger Sense","Ability: when an ambush or trap threatens you, the GM secretly rolls your Intellect; success warns you in time to act.","Intellect",false,"Nightmares","The dead you've seen come back at night. Accept the lost sleep at a bad time."],["g-iron","Iron Bones","Ability: each hit that marks 2 or more boxes marks one fewer (never below 1).","",false,"Fanaticism","Wesen must die. Accept the trouble when mercy would be wiser."],["g-heal","Quick to Heal","Ability: each day of rest clears a box, however hurt you are, and rest works at three boxes even with nobody tending you.","",false,"Workaholic","You won't rest when there's a case. Accept the strain."],["g-hardy","Hardy","+2 to Body to resist poison, disease and exhaustion.","Body",true,"Stubbornness","You won't back down. Accept the cost."],["g-gun","Gunslinger","+2 to Shooting with a pistol at close range, with no need to aim.","Shooting",true,"Bad Temper","Accept the fight you start."],["g-balance","Perfect Balance","+2 to Athletics and Melee to keep your feet or fight on bad ground.","Athletics",true,"Curious","Accept the risk your curiosity brings."],["g-heavy","Heavy Hand","Ability: your Brawling hits mark 2 boxes.","Brawling",false,"Bloodlust","You don't stop at the surrender. Accept the consequences."],["g-weapon","Bonded Weapon","+2 to Melee or Shooting with one named heirloom weapon.","Melee",true,"The Weapon Must Be Kept","When it's lost or taken, accept the risk to get it back."],["g-hard","Hard to Kill","Ability: Dying lasts until the end of the next scene, not this one.","",false,"Vow: Protect the Innocent","You've sworn to protect the innocent from Wesen. Accept the danger."],["g-pain","Pain Means Nothing","Ability: ignore the Wounded penalty (−1).","",false,"Honesty","You won't lie, even to Wesen. Accept the consequence."],["g-books","Keeper of the Books","+2 to Wesen Lore when you can consult your family's books.","Wesen Lore",true,"The Books Must Be Kept","The books are irreplaceable and coveted. When they are threatened, accept the risk of protecting them."]]},{"id":"incantare","name":"Incantare","tier":2,"adj":{"Intellect":1,"Will":1,"Body":-1,"Presence":-1},"desc":"A human who works real magic through a Lens: a tradition and a way of seeing. The Wesen Council, the Royals and the Order of the Holy Knife all watch for people like you.","core":["Rituals: roll Occult to fill a ritual clock (minor 2, significant 4, major 6 segments). Your Lens sets how.","Charms: you can carry as many ready charms as your Occult training allows (Trained 2, Specialty 3, Expert 4).","Grimms sense your magic: +1 to notice it for each charm or potion you carry."],"skills":["Occult","Wesen Lore","Apothecary","Read People"],"woge":null,"traits":[["i-chymiater","Chymiater Lens (Alchemist)","Brews elixirs, potions and powders ahead of time: hours to make, an instant to use. +2 to Occult when brewing. Only a Chymiater can brew the Grimm-blood draught.","Occult",true,"Price of the Work","Your craft feeds a vice: greed, drink, lechery or gluttony (agree which). Accept it when it bites."],["i-figmatarum","Figmatarum Lens (Illusionist)","Glamours, illusions and mesmerism worked through performance, music or art, in minutes. +2 to Occult for illusion and mesmerism.","Occult",true,"Artist's Vanity","You need an audience and can't bear an insult to your art. Accept the trouble your vanity causes."],["i-magi","Magi Lens (Scholar-Mage)","Scholarly ritual from grimoires, the Sixth and Seventh Books of Moses among them: any kind of effect, but an hour per roll, and it needs books. +2 to Occult for divination and wards.","Occult",true,"Obsession: Magical Knowledge","A grimoire, a ritual or a secret tempts you beyond sense. Accept the risk to get it."],["i-malifica","Malifica Lens (Hexenmeister)","Hexerei: curses and hexes, and the breaking of them, worked through a link: blood, hair or a treasured object; −4 without one. +2 to Occult for curses with a link.","Occult",true,"Wicked Reputation","People whisper that you're a hexer, and the Order of the Holy Knife listens. Accept the suspicion."],["i-phitonissa","Phitonissa Lens (Druid)","Rites of the seasons, nature and the old gods, worked outdoors; in America, often behind the doors of a Druid lodge. +2 to Occult for nature and folk magic.","Occult",true,"Disciplines of Faith","The old observances bind you: festivals, offerings, taboos. Accept the delay or cost of keeping them."],["i-braucher","Braucher Lens","Braucherei, the Pennsylvania Dutch healing craft: spoken charms, prayers and blessed objects, from The Long Lost Friend. +2 to Occult to heal, protect, or break a hex.","Occult",true,"No Payment","A Braucher takes no money for healing, only gifts. Accept the cost when the need is great and the purse is empty."],["i-scaenarfex","Scaenarfex Lens (Artistic Enchanter)","Enchants objects and works of art; the best charm-maker. +2 to Occult when making charms or enchanting an object, and you can carry one extra charm.","Occult",true,"Artist's Temperament","Moods, jealousy and obsession with your work. Accept the cost when your temper or a rival gets to you."],["i-veneficare","Veneficare Lens (Sorcerer)","Casts spells: quick magic in one action and an Occult roll, shaped by one or two Paths agreed with the GM (fire and force, say). Known: Trained 2, Specialty 3, Expert 4. You can carry only one charm.","Occult",false,"Bound Purpose","Your power follows one narrow calling. Accept the cost of serving it when it clashes with your friends' needs."]]},{"id":"hexenbiest","name":"Hexenbiest or Zauberbiest","tier":3,"wesen":true,"adj":{"Will":1,"Presence":1,"Body":-1,"Agility":-1},"desc":"Witch-like Wesen (Zauberbiest for the men), beautiful in human form and horrific in woge, with innate magic that lives in their Wesen spirit. Coven traditions bind them; Grimm blood can strip them.","core":["Telekinesis: in full or partial woge, roll Will to throw a person or object with your mind (1 box), seize something out of reach, or turn aside one attack (+2 Dodge).","Innate magic: you can work rituals with Occult like an Incantare, in the Hexenbiest style: curses, potions and sendings.","Grimm blood: drunk under a full moon, it strips your powers until the Contaminatio Ritualis restores them."],"skills":["Occult","Apothecary","Deception","Persuasion"],"woge":{"attrs":{"Body":2,"Agility":1},"dodge":0,"traits":["Claws mark 2 boxes","Tough: hits of 2+ boxes mark one fewer"],"drawbacks":["Horrific: even other Wesen recoil"]},"traits":[["hx-spell","Hexenbiest Spellcraft","+2 to Occult for curses, potions and sendings.","Occult",true,"The Price of Magic","Every spell costs blood, pain or something precious. Accept the cost when it bites."],["hx-levitate","Levitation","Ability, in woge: roll Will to lift yourself and float or fly a short way.","Will",false,"Hexenbiest Pride","You cannot abide being bested or slighted. Accept the feud you start."],["hx-crush","TK Crush","Ability, in full woge: roll Will against the target's Body; on a success they mark 1 box, which Dodge can't avoid.","Will",false,"Coven Traditions","Your family or coven has rules and expectations. Accept the demand."]]},{"id":"murcielago","name":"Murcielago","tier":3,"wesen":true,"adj":{},"desc":"Bat-like Wesen with uncanny hearing and a sonic scream that drops a room full of people to their knees.","core":["Sonic scream: in full woge, roll Will. Everyone nearby you choose who can hear rolls Body −2; a failure loses their next action and takes −2 for the scene. Earplugs protect. Heard in town, it marks Exposure."],"skills":["Stealth","Athletics","Brawling","Investigation"],"woge":{"attrs":{"Body":1,"Agility":1},"dodge":0,"speed":1,"traits":["Claws and fangs mark 2 boxes","Sonar: no penalty for darkness; sense the shape of a room by sound","Keen hearing: hear heartbeats","Swift: Move +1"],"drawbacks":[]},"traits":[["mu-echo","Echo Sight","+2 to Intellect rolls to find something hidden in the dark by sound.","Intellect",true,"Sensitive Ears","Loud noise disorients you. When a gun or explosion goes off nearby, accept −2 on your next action."],["mu-hear","Eavesdropper","+2 to Intellect rolls to hear faint or distant voices.","Intellect",true,"Can't Unhear","You hear secrets you shouldn't. Accept the trouble that knowing brings."]]},{"id":"fuchsteufelwild","name":"Fuchsteufelwild","tier":3,"wesen":true,"adj":{"Intellect":2,"Body":1,"Presence":-2,"Will":-1},"desc":"Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; the root of Rumpelstiltskin. Clever, spiteful, and bound by an old obsession with names and bargains.","core":["Acid talons: in full woge, claw hits mark 2 boxes and ignore Tough and armor.","Leaper, in either form: jumps of many yards; +2 to Athletics to jump."],"skills":["Brawling","Athletics","Deception","Investigation"],"woge":{"attrs":{"Agility":1},"dodge":1,"speed":1,"traits":["Keen senses: track by scent and hearing","Swift: Move +1"],"drawbacks":["Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged","Disturbing voice"]},"traits":[["ft-tremor","Tremor","Ability, in full woge: stomp, and everyone nearby rolls Athletics or falls and loses their next action.","Athletics",false,"Cruel Streak","When an enemy is helpless, you're tempted to make them suffer. Accept the lost allies, or the Suspicion it brings."],["ft-bargain","Strike a Bargain","+2 to Persuasion or Deception when making a deal.","Persuasion",true,"Guess My Name","Your true name holds power over you. When someone hunts for it, or speaks it, accept the consequence."]]}]};/* HERITAGES:END */
   const HERITAGES = HERITAGE_DATA.heritages;
   const SPECIES = HERITAGES.map((h) => [h.id, h.name, h.adj, h.desc]);
   const WESEN = new Set(HERITAGES.filter((h) => h.wesen).map((h) => h.id));
@@ -4455,6 +4613,8 @@ tr.lvl-U td.target { color: var(--muted); }
   const formWeapon = (f) => (f && (f.traits || []).some((x) => /marks? 2 boxes/i.test(x)) ? "claws" : null);
   const FORM_T = { human: "human face", name: "full woge" };
   const tierOf = (c = ch) => (c.speciesId === "custom" ? c.customTier : heritageOf(c)?.tier ?? 0);
+  // Speed adjustment to Move: the heritage's (most have none), plus the woge's own while in full woge.
+  const speedOf = (c = ch) => (c.speciesId === "custom" ? c.customSpeed || 0 : heritageOf(c)?.speed || 0) + (inForm(c) ? formOf(c).speed || 0 : 0);
   // Edges: every character has 3 points shared between heritage tier and Edges.
   const EDGE_POINTS = 3;
   // Advancement point costs (Players' Guide, Advancement and Magic advancement).
@@ -4466,8 +4626,8 @@ tr.lvl-U td.target { color: var(--muted); }
     ["adv2", "Second advantage", "A second general advantage, with no extra complication.", 1],
     ["grit", "True grit", "Start every session with 3 Grit instead of 2.", 1],
     ["contact", "A friend in town", "A named contact who helps once per case.", 1],
-    ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one skill when it's used.", 1],
-    ["extradefense", "Additional Defense", "A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2.", 1],
+    ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one narrowly defined use of a named skill, agreed with the GM. Not with an advantage on the same roll; never to Dodge, Parry or Block.", 1],
+    ["extradefense", "Additional Defense", "A second defense each round at −2 (Dodge, Parry or Block, in any mix), on top of attack-quality and injury penalties. Never twice against the same attack.", 1],
     ["survivor", "Hard to put down", "Once per fight, shrug off a telling hit's effect. You still take its boxes.", 1],
     ["talisman", "Talisman", "A ready charm from the folk traditions, made for you by a Braucher, a hexenbiest or a root doctor: a Himmelsbrief sewn in your coat, a mojo hand, a blessed buckeye. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one; it's renewed between cases and doesn't count against a charm limit.", 1],
   ];
@@ -4562,7 +4722,7 @@ tr.lvl-U td.target { color: var(--muted); }
       attrs: { Body: 11, Agility: 11, Intellect: 13, Presence: 10, Will: 10 },
       skills: { Tinkering: "S", Tracking: "T", "Wesen Lore": "T", Investigation: "T", Survival: "T", "Read People": "T", Brawling: "T", Melee: "T", Athletics: "T", Persuasion: "T" },
       adv: { id: "" }, sadv: { id: "b-nose" }, comp: { id: "secret", trigger: "Someone from his old pack turns up" },
-      edges: { gear: 1 }, gear: { item: "A master gunsmith's tools", skill: "Tinkering" },
+      edges: { gear: 1 }, gear: { item: "A master gunsmith's tools", skill: "Tinkering", use: "repairing, adjusting and modifying firearms" },
       equipment: { shotgun: true, knife: true, tools: true, horse: true } },
     { name: "Roz Vey", rank: "Spice and tea merchant", dept: "Apothecary", path: "rounded", species: "Fuchsbau", speciesId: "fuchsbau",
       role: "Sells tea out front, and other things in the back.",
@@ -4576,7 +4736,7 @@ tr.lvl-U td.target { color: var(--muted); }
       role: "Army surgeon in the war; now he digs bullets out of his friends and asks too many questions about what made the other wounds.",
       reason: "I saw what I saw, and no one else believes me.", connection: "Rode with Silas Thorne's regiment in the war and has never trusted him since.",
       attrs: { Body: 10, Agility: 10, Intellect: 13, Presence: 12, Will: 11 },
-      edges: { attr: 1, adv2: 1, gear: 1 }, adv2: { id: "surgeon" }, gear: { item: "His army surgeon's instruments", skill: "Medicine" },
+      edges: { attr: 1, adv2: 1, gear: 1 }, adv2: { id: "surgeon" }, gear: { item: "His army surgeon's instruments", skill: "Medicine", use: "field treatment of a wound: stitching, dressing, setting a bone" },
       skills: { Medicine: "S", Apothecary: "T", "Read People": "T", Investigation: "T", "Wesen Lore": "T", Occult: "T", Persuasion: "T", Leadership: "T", Riding: "T", Shooting: "T" },
       adv: { id: "steady" }, sadv: { id: "" }, comp: { id: "war", trigger: "Gunfire in the dark" },
       equipment: { doctorbag: true, horse: true, lantern: true } },
@@ -4714,8 +4874,8 @@ tr.lvl-U td.target { color: var(--muted); }
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
-      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", talisman: "", gear: { item: "", skill: "" },
-      allegiance: "", allegianceDef: null, customTier: 1, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
+      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", talisman: "", gear: { item: "", skill: "", use: "" },
+      allegiance: "", allegianceDef: null, customTier: 1, customSpeed: 0, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",
       play: { injury: 0, duty: 2, stunned: false, woge: false, log: [], lasting: [], gwLast: null },
     };
@@ -4771,10 +4931,11 @@ tr.lvl-U td.target { color: var(--muted); }
     out.edges = Object.fromEntries(EDGE_DEFS.map(([k, , , max]) => [k, Math.max(0, Math.min(max, parseInt((c.edges || {})[k], 10) || 0))]));
     out.adv2 = { id: "", detail: "", ...(c.adv2 || {}) };
     if (!ADVANTAGES.some((a) => a[0] === out.adv2.id)) out.adv2.id = "";
-    out.gear = { item: "", skill: "", ...(c.gear || {}) };
+    out.gear = { item: "", skill: "", use: "", ...(c.gear || {}) };
     out.allegianceDef = Array.isArray(c.allegianceDef) && c.allegianceDef.length === 4 ? c.allegianceDef.map((x) => String(x ?? "")) : null;
     if (!allegiances(out).some((a) => a[0] === out.allegiance)) out.allegiance = "";
     out.customTier = [0, 1, 2, 3].includes(+out.customTier) ? +out.customTier : 1;
+    out.customSpeed = [-1, 0, 1].includes(+out.customSpeed) ? +out.customSpeed : 0;
     if (typeof out.contact !== "string") out.contact = "";
     if (!SPECIES.some((x) => x[0] === out.speciesId) && out.speciesId !== "custom") out.speciesId = "human";
     // Heritage advantages that no longer exist for this heritage are cleared, so the checklist asks again.
@@ -4880,6 +5041,12 @@ tr.lvl-U td.target { color: var(--muted); }
   const levelName = (l, name) => (l === "S" && isGS() && !(name && advancedToS(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
+  // Move in yards (core rules, Move and reach): 5, +1 per 2 points of Agility + Body above 20, the Athletics bonus (as for Dodge)
+  // and any heritage speed; in full woge, the woge's Agility, Body and speed count.
+  const moveOf = (c = ch) => 5 + Math.floor(Math.max(0, c.attrs.Agility + formAttr("Agility", c) + c.attrs.Body + formAttr("Body", c) - 20) / 2) + LEVELS[c.skills.Athletics].dodge + speedOf(c);
+  // As injury leaves it: wounded −2 yards, seriously wounded half (and no running), never below 1 while able to act.
+  const moveNow = (c = ch) => { const i = (c.play && c.play.injury) || 0, m = moveOf(c); return i >= 3 ? 0 : Math.max(1, i === 2 ? Math.floor(m / 2) : i === 1 ? m - 2 : m); };
+  const runNow = (c = ch) => ((c.play && c.play.injury) >= 2 ? 0 : moveNow(c) * 2);
   // Block: Melee −2 with anything that stands in for a shield (a chair, a slat), Melee −1 with a real one.
   const BLOCKS = [["shield", "shield", 1], ["improvised", "chair or slat", 0]];
   const blocks = () => BLOCKS.filter(([id]) => id !== "shield" || ch.equipment.shield);
@@ -4915,7 +5082,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const compOk = ch.comp.id && (ch.comp.id !== "custom" || (ch.comp.name.trim() && ch.comp.text.trim()));
     const POOL = pool(), ea = edgesAvail(), es = edgesSpent();
     const edgeNeeds = [edgeN("adv2") && !ch.adv2.id ? "choose the second advantage" : "", edgeN("adv2") && ADVANTAGES.find((a) => a[0] === ch.adv2.id)?.[4] && !ch.adv2.detail.trim() ? "finish the second advantage" : "",
-      edgeN("contact") && !ch.contact.trim() ? "name your friend in town" : "", edgeN("talisman") && !(ch.talisman || "").trim() ? "describe your talisman, who made it, and its ritual" : "", edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill) ? "describe the fine weapon or tool and its skill" : ""].filter(Boolean);
+      edgeN("contact") && !ch.contact.trim() ? "name your friend in town" : "", edgeN("talisman") && !(ch.talisman || "").trim() ? "describe your talisman, who made it, and its ritual" : "", edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill && (ch.gear.use || "").trim()) ? "describe the fine weapon or tool, its skill and its one narrow use" : ""].filter(Boolean);
     const horrorOff = heritageOf()?.horror && !horrorOn();
     return [
       [!!ch.name.trim(), ch.name.trim() ? "Name entered" : "Enter a name"],
@@ -5010,7 +5177,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
     EQUIPMENT.forEach(([k]) => ($("eq-" + k).checked = !!ch.equipment[k]));
     $("f-stunned").checked = !!ch.play.stunned;
-    $("f-contact").value = ch.contact; $("f-talisman").value = ch.talisman || ""; $("f-gearitem").value = ch.gear.item; $("f-adv2detail").value = ch.adv2.detail;
+    $("f-contact").value = ch.contact; $("f-talisman").value = ch.talisman || ""; $("f-gearitem").value = ch.gear.item; $("f-gearuse").value = ch.gear.use || ""; $("f-adv2detail").value = ch.adv2.detail;
   }
 
   function render() {
@@ -5045,6 +5212,8 @@ tr.lvl-U td.target { color: var(--muted); }
     $("f-speciesid").value = ch.speciesId;
     const custom = ch.speciesId === "custom", sd = speciesDef();
     $("custom-tier-wrap").hidden = !custom;
+    $("custom-speed-wrap").hidden = !custom;
+    $("f-customspeed").value = ch.customSpeed;
     $("f-customtier").value = ch.customTier;
     $("species-name-wrap").hidden = !custom;
     $("species-adj-wrap").hidden = !custom;
@@ -5070,7 +5239,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("adv2-desc").textContent = a2 ? a2[2] : "Any general advantage. It brings no extra complication.";
     $("contact-wrap").hidden = !edgeN("contact");
     $("talisman-wrap").hidden = !edgeN("talisman");
-    $("gear-wrap").hidden = $("gearskill-wrap").hidden = !edgeN("gear");
+    $("gear-wrap").hidden = $("gearskill-wrap").hidden = $("gearuse-wrap").hidden = !edgeN("gear");
     $("f-gearskill").value = ch.gear.skill;
     const al = allegianceOf();
     $("f-allegiance").innerHTML = allegiances().map(([id, n]) => `<option value="${esc(id)}">${esc(n)}</option>`).join("");
@@ -5163,8 +5332,9 @@ tr.lvl-U td.target { color: var(--muted); }
     $("ms-text").className = $("ready-status").className;
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
+    $("st-move").textContent = `${moveNow()} yd`;
     $("st-grit").textContent = gritStart();
-    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics). Parry = Melee ${skillTarget("Melee")} −3 = ${parryOf("Melee")}, or Brawling ${skillTarget("Brawling")} −3 = ${parryOf("Brawling")} against fists. ${edgeN("extradefense") ? "Two defenses a round (Additional Defense)" : "One defense a round"}: Dodge, Parry or Block.`;
+    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics). Parry = Melee ${skillTarget("Melee")} −3 = ${parryOf("Melee")}, or Brawling ${skillTarget("Brawling")} −3 = ${parryOf("Brawling")} against fists. ${edgeN("extradefense") ? "Two defenses a round (Additional Defense: the second at −2)" : "One defense a round"}: Dodge, Parry or Block. Move = 5 yd + ${Math.floor(Math.max(0, ch.attrs.Agility + ch.attrs.Body - 20) / 2)} (Agility + Body ${ch.attrs.Agility + ch.attrs.Body}) + ${LEVELS[ch.skills.Athletics].dodge} (Athletics)${speedOf() ? ` ${signed(speedOf())} (heritage speed)` : ""} = ${moveOf()} yd; run ${moveOf() * 2} yd${moveNow() !== moveOf() ? ` (wounded: ${moveNow()} yd${runNow() ? `, run ${runNow()}` : ", no running"})` : ""}.`;
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
@@ -5199,6 +5369,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div><span class="label">Calling</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">Heritage</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge() + formDodge()}</b>${formDodge() ? `<span class="small muted">human face ${dodge()}</span>` : ""}</div>
+        <div><span class="label">Move</span><b class="num">${moveNow()} yd</b><span class="small muted">${runNow() ? `run ${runNow()} yd` : "no running while seriously wounded"}${moveNow() !== moveOf() ? ` · ${moveOf()} yd unhurt` : ""}${inForm() ? ` · human face ${moveOf({ ...ch, play: { ...ch.play, woge: false } })} yd` : ""}</span></div>
         <div><span class="label">Parry</span><b class="num">${parryOf("Melee") + formSkill("Melee")}</b><span class="small muted">Melee; ${parryOf("Brawling") + formSkill("Brawling")} bare-handed vs fists</span></div>
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
@@ -5228,7 +5399,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${a2 && edgeN("adv2") ? `<div class="field"><span class="label">Second advantage</span><b>${esc(a2[1])}${ch.adv2.detail ? ": " + esc(ch.adv2.detail) : ""}</b><span class="small muted">${esc(a2[2])}</span></div>` : ""}
         ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">Friend in town</span><span>${esc(ch.contact)}</span></div>` : ""}
         ${edgeN("talisman") && ch.talisman ? `<div class="field"><span class="label">Talisman (renewed each case)</span><span>${esc(ch.talisman)}</span></div>` : ""}
-        ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 ${esc(ch.gear.skill)})` : ""}</span></div>` : ""}
+        ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 to ${esc(ch.gear.skill)}${ch.gear.use ? ` for ${esc(ch.gear.use)}` : ""})` : ""}</span></div>` : ""}
         ${al ? `<div class="field"><span class="label">Allegiance: ${esc(al[1])}</span><span class="small">${esc(al[2])}</span><span class="small muted">${esc(al[3])}</span></div>` : ""}
       </div>`; })()}
       <div class="fields">
@@ -5283,12 +5454,14 @@ tr.lvl-U td.target { color: var(--muted); }
     const parts = [];
     const mod = +$("r-mod").value; if (mod) parts.push(mod);
     const asst = +$("r-assist").value; if (asst) parts.push(asst);
-    if ($("r-adv").checked && !$("r-adv").disabled) parts.push(2);
+    // An advantage and a fine weapon or tool don't stack: +2 once, whichever applies.
+    if (($("r-adv").checked && !$("r-adv").disabled) || ($("r-fine").checked && !$("r-fine-wrap").hidden)) parts.push(2);
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
     if (isDefense(name)) parts.push(+$("r-quality").value || 0);
-    if (isParry(name)) parts.push(-2 * (+$("r-parries").value || 0));
+    // Additional Defense: a second defense in a round is at −2, whichever kind, on top of attack quality and injury.
+    if (isDefense(name) && !$("r-second-wrap").hidden && $("r-second").checked) parts.push(-2);
     if (!$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(1);
     // Know its weakness: no called-shot penalty against a creature the character has identified.
     if (!$("r-called-wrap").hidden && +$("r-called").value && !($("r-weak").checked && !$("r-weak-wrap").hidden)) parts.push(+$("r-called").value);
@@ -5316,7 +5489,11 @@ tr.lvl-U td.target { color: var(--muted); }
     updateInjuryToggle();
     const sk = $("r-skill").value || "";
     $("r-quality-wrap").hidden = !isDefense(sk);
-    $("r-parries-wrap").hidden = !(isParry(sk) && defensesPerRound() > 1);
+    $("r-parries-wrap").hidden = true; // no separate second-parry penalty: the second defense's −2 covers it
+    $("r-second-wrap").hidden = !(isDefense(sk) && defensesPerRound() > 1);
+    // A fine weapon or tool: only its named skill, only its narrow use (the player ticks it), never a defense.
+    $("r-fine-wrap").hidden = !(edgeN("gear") && ch.gear.skill && sk === ch.gear.skill && !isDefense(sk));
+    $("r-fine-label").textContent = `${ch.gear.item || "Fine weapon or tool"} +2${ch.gear.use ? `: only for ${ch.gear.use.toLowerCase()}` : ""} (not with an advantage)`;
     $("r-aim-wrap").hidden = !["Shooting", "Melee", "Brawling"].includes(sk);
     $("r-called-wrap").hidden = !["Shooting", "Melee", "Brawling"].includes(sk);
     $("r-weak-wrap").hidden = $("r-called-wrap").hidden || !+$("r-called").value || !hasFx("freeCalledShot");
@@ -5349,7 +5526,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const margin = t - sum;
     const jam = sum === 18 && (phaserNote || (isReroll && last && last.phaserNote));
     const attackRoll = !$("r-called-wrap").hidden, called = attackRoll ? (isReroll && last ? last.called : +$("r-called").value) : 0;
-    last = { name, t, dice, sum, ok, margin, auto, jam, attackRoll, called, rerolled: !!isReroll, fireMod, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
+    last = { name, t, dice, sum, ok, margin, auto, jam, attackRoll, called, sk: isReroll && last ? last.sk : $("r-skill").value, rerolled: !!isReroll, fireMod, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
     ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
     ch.play.log = ch.play.log.slice(0, 12);
     if ($("r-stun").checked) { ch.play.stunned = false; $("f-stunned").checked = false; }
@@ -5367,7 +5544,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (r.auto === "auto-f") note = "Natural " + r.sum + ": automatic failure.";
     else note = r.ok ? `Succeeded by ${r.margin}.` : `Failed by ${-r.margin}.`;
     if (r.attackRoll && r.ok && r.called) note += " Called shot: if it isn't defended, the effect you named happens. No extra boxes.";
-    else if (r.attackRoll && r.ok && (r.margin >= 5 || r.auto === "auto-s")) note += " <b>Telling hit</b> if it isn't defended: pick one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, or precise). No extra boxes.";
+    else if (r.attackRoll && r.ok && (r.margin >= 5 || r.auto === "auto-s")) note += ` <b>Telling hit</b> if it isn't defended: pick one effect (${tellingText(r.sk)}). No extra boxes.`;
     if (gritty && r.attackRoll && r.ok && (r.margin >= 7 || r.auto === "auto-s")) note += " <b>Gritty combat:</b> if it marks 2 or more boxes, it's grievous. A character rolls the grievous wound table; an opponent is taken out.";
     if (r.ok && r.margin >= 5 && !r.attackRoll) note += " Margin 5+: assistance gives +2; medical care clears an extra box; a progress clock gets 2 segments.";
     if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
@@ -5420,7 +5597,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (textMap[id]) { ch[textMap[id]] = e.target.value; touch(); render(); return; }
     const sub = { "f-advname": ["adv", "name"], "f-advtext": ["adv", "text"], "f-advdetail": ["adv", "detail"],
       "f-compname": ["comp", "name"], "f-comptext": ["comp", "text"], "f-comptrigger": ["comp", "trigger"],
-      "f-gearitem": ["gear", "item"], "f-adv2detail": ["adv2", "detail"],
+      "f-gearitem": ["gear", "item"], "f-gearuse": ["gear", "use"], "f-adv2detail": ["adv2", "detail"],
       "f-sadvname": ["sadv", "name"], "f-sadvtext": ["sadv", "text"], "f-scompname": ["sadv", "compName"], "f-scomptext": ["sadv", "compText"] }[id];
     if (sub) { ch[sub[0]][sub[1]] = e.target.value; touch(); render(); return; }
     if (e.target.dataset && e.target.dataset.al && ch.allegiance === "custom") { ch.allegianceDef[+e.target.dataset.al] = e.target.value; touch(); render(); return; }
@@ -5440,6 +5617,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-woge") { ch.play.woge = t.checked; save(); renderSheet(); updateTarget(); }
     else if (t.id === "f-horror") { store.set(STORE_HORROR, t.checked); render(); }
     else if (t.id === "f-customtier") { ch.customTier = +t.value; touch(); render(); }
+    else if (t.id === "f-customspeed") { ch.customSpeed = +t.value; touch(); render(); }
     else if (t.id === "f-adv2") { ch.adv2.id = t.value; touch(); render(); }
     else if (t.id === "f-allegiance") {
       ch.allegiance = t.value;
@@ -5506,7 +5684,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isBlock(t.value) || isParry(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
@@ -5547,6 +5725,10 @@ tr.lvl-U td.target { color: var(--muted); }
   const clockNotify = (c, from, to) => clockListeners.forEach((f) => f(c, from, to));
   if (!Array.isArray(clocks)) clocks = [];
   const gunOf = () => ch.play.gun;
+  // The telling-hit effects open to an attack with this skill (core rules: a pin needs a weapon in hand or a grapple).
+  const tellingText = (sk) => sk === "Shooting" ? "disarm, knock down if it marks 2 or more boxes, rattle −2, break gear, open them up +2, or precise; a shot can't pin"
+    : sk === "Brawling" ? "disarm, knock down, pin, rattle −2, open them up +2, or precise; bare hands and claws don't break gear"
+    : "disarm, knock down, pin, rattle −2, break gear, open them up +2, or precise";
   function renderGun() {
     const g = gunOf(), def = GUNS[g.type];
     $("ph-type").value = g.type;
@@ -5773,7 +5955,7 @@ function mountBattleMap(api) {
   const PARTY = api.partyName || "party", Party = PARTY[0].toUpperCase() + PARTY.slice(1);
   // The range tracks: the setting's own (a ship fight, a stagecoach chase), or one plain track. The first is "range".
   const TRACKS = ((api.rangeTracks || []).length ? api.rangeTracks : [api.rangeTrack || {}]).map((r, i) => Object.assign({ title: "Range track", us: "Us", note: "",
-    bands: [["Close", "up to 10 yd"], ["Short", "up to 50 yd"], ["Medium", "up to 150 yd"], ["Long", "up to 500 yd"], ["Extreme", "up to a mile"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
+    bands: [["Close", "up to 10 yd"], ["Short", "up to 25 yd"], ["Medium", "up to 100 yd"], ["Long", "up to 300 yd"], ["Extreme", "up to 1,000 yd"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
   const addName = (x) => x.replace(/^(Our|The) /, (m) => m.toLowerCase());
   const UNITS = { yd: { name: "yards", one: "yard", bands: api.bands || [], presets: [1, 2, 5, 10, 50] } };
   if ((api.kmBands || []).length) UNITS.km = { name: "km", one: "km", bands: api.kmBands, presets: [1, 10, 100, 1000, 10000] };
@@ -5827,7 +6009,9 @@ function mountBattleMap(api) {
   // A distance in hexes, at the map's scale, as a range band.
   function rangeText(n) {
     const u = UNITS[st.scale.unit], d = n * st.scale.n;
-    const band = st.scale.unit === "yd" && n <= 1 && d <= 2 ? "in reach" : (u.bands.find(([, max]) => d <= max) || ["out of range"])[0];
+    // Up close, the reach of a weapon in hand: 1 yard for fists and knives, 2 for a sword, 3 for a spear.
+    const reach = st.scale.unit !== "yd" ? "" : n <= 1 && d <= 1 ? "in reach of any weapon in hand" : n && d <= 2 ? "in reach of a sword or axe (2 yd)" : n && d <= 3 ? "in reach of a spear or polearm (3 yd)" : "";
+    const band = reach || (u.bands.find(([, max]) => d <= max) || ["out of range"])[0];
     return `${n} hex${n === 1 ? "" : "es"} · ${fmt(d)} ${d === 1 ? u.one : u.name} · ${band}`;
   }
 
@@ -6232,7 +6416,7 @@ function mountBattleMap(api) {
       const ship = !!(th && (api.vehicles || []).includes(th));
       toks().push({ id: uid(), ref: null, name: name || (th ? th.name : "Token"), color: $('[data-bmf="color"]').value, img: pendingImg, tsize: +$('[data-bmf="tsize"]').value,
         ...spot(RT.startLane || Math.min(3, lanes().length - 1)), boxes: Math.max(1, +$('[data-bmf="boxes"]').value || 1), injury: 0, threat: th ? th.id : null, boxLabel: ship ? "Hull" : "Injury",
-        stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.trait].filter(Boolean).join(" · ") : "" });
+        stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.move ? `Move ${th.move} yd` : "", th.trait].filter(Boolean).join(" · ") : "" });
       // Numbered names count up, so "Outlaw 1" is followed by "Outlaw 2".
       const m = name.match(/^(.*?)(\d+)$/); $('[data-bmf="name"]').value = m ? m[1] + (+m[2] + 1) : name;
       save(); draw();
@@ -6288,7 +6472,26 @@ function mountBattleMap(api) {
   fillThreats();
   Promise.all(KINDS.map((k) => idb.get(bgKey(k)))).then((l) => { KINDS.forEach((k, i) => (bgs[k] = l[i] || null)); draw(); if (!V().set && svg.clientWidth) fit(); });
   draw();
-  return { refresh: () => {
+  // Where two people stand from each other, for the encounter panel: a character by its card (ref), anyone else by
+  // the token's name. On a hex map in yards: { yards, hexes, band }; on the plain range track: { band } from the lanes.
+  // null when either isn't on the map (or a name fits more than one token), or on a ship or chase track.
+  function distanceBetween(a, b) {
+    // Names match whatever the case, and without a note in brackets: "Security guard (minor)" is "Security guard".
+    const norm = (x) => String(x || "").toLowerCase().replace(/\s*\([^)]*\)/g, "").trim();
+    const find = (w) => { const l = toks().filter((t) => (w.ref && t.ref === w.ref) || (!t.ref && w.name && norm(info(t).name) === norm(w.name))); return l.length === 1 ? l[0] : null; };
+    const ta = find(a), tb = find(b);
+    if (!ta || !tb) return null;
+    if (isRange()) {
+      if (RT.id !== "range" || RT.vehicle || RT.vehicleTrack) return null;
+      const n = Math.abs((ta.lane || 0) - (tb.lane || 0)), band = n ? RT.bands[n - 1] : RT.bands[0];
+      return band ? { band: String(band[0]).toLowerCase(), lanes: n } : { band: null, lanes: n };
+    }
+    if (st.scale.unit !== "yd") return null;
+    const hexes = dist(ta, tb), yards = hexes * st.scale.n;
+    return { hexes, yards, scale: st.scale.n, band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
+  }
+
+  return { distanceBetween, refresh: () => {
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();
@@ -6317,7 +6520,7 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
 /* BATTLEMAP:END */
   // The Encounter panel's modules and Grimm's setting data (tools/sync-encounter.py fills this in).
   /* ENCOUNTER:START */
-const ENC_SETTING = {"id":"grimm-west","arms":[{"id":"fists","name":"Fists","skill":"Brawling","reach":"melee","damage":{"melee":{"boxes":1}},"rows":[["Punch, kick, headbutt","Melee","1","Bruises, a split lip, cracked ribs"]],"traits":[]},{"id":"club","name":"Club","skill":"Melee","reach":"melee","damage":{"melee":{"boxes":1}},"rows":[["Club, bottle, pistol-whip","Melee","1","A concussion or a broken finger"]],"traits":[]},{"id":"knife","name":"Knife or hatchet","skill":"Melee","reach":"melee","damage":{"melee":{"boxes":1}},"rows":[["Knife or hatchet","Melee; Close thrown","1","A cut or stab wound that bleeds"]],"traits":[]},{"id":"knife-thrown","name":"Knife or hatchet, thrown","skill":"Athletics","band":"close","maxBand":"close","damage":{"any":{"boxes":1}},"rows":[],"traits":[]},{"id":"bow","name":"Bow and arrow","skill":"Shooting","band":"short","damage":{"any":{"boxes":1}},"rows":[["Arrow","Short","1","A cut or stab wound that bleeds"]],"traits":[]},{"id":"blade","name":"Axe, saber or an old Grimm weapon","skill":"Melee","reach":"melee","damage":{"melee":{"boxes":2}},"rows":[["Axe, saber or bowie knife used to kill","Melee","2","A deep wound or a broken bone"]],"traits":[]},{"id":"claws","name":"Claws and fangs (Wesen in full woge)","skill":"Brawling","reach":"melee","damage":{"melee":{"boxes":2}},"rows":[["Claws and fangs of a monster","Melee","2","Torn flesh"]],"traits":[],"natural":true},{"id":"derringer","name":"Derringer","skill":"Shooting","band":"close","maxBand":"short","damage":{"any":{"boxes":2}},"ammo":"derringer","firearm":true,"rows":[["Derringer","Close (out of range beyond Short)","2","A gunshot wound"]],"traits":[]},{"id":"revolver","name":"Revolver","skill":"Shooting","band":"close","damage":{"any":{"boxes":2}},"ammo":"revolver","firearm":true,"rows":[["Revolver","Close","2","A gunshot wound"]],"traits":[]},{"id":"rifle","name":"Rifle","skill":"Shooting","band":"medium","damage":{"any":{"boxes":2}},"ammo":"rifle","firearm":true,"rows":[["Rifle","Medium","2","A gunshot wound"]],"traits":[]},{"id":"shotgun","name":"Shotgun","skill":"Shooting","band":"short","maxBand":"short","damage":{"close":{"boxes":3,"dying":true},"short":{"boxes":1}},"ammo":"shotgun","firearm":true,"rows":[["Shotgun, at Close range","Close","3, and Dying","A ruinous wound"],["Shotgun, at Short range","Short (no effect beyond)","1","Scattered pellets"]],"traits":[]},{"id":"buffalo","name":"Buffalo rifle","skill":"Shooting","band":"long","damage":{"any":{"boxes":3,"dying":true}},"firearm":true,"rows":[["Buffalo rifle","Long","3, and Dying","A ruinous wound"]],"traits":[]},{"id":"dynamite","name":"Dynamite","skill":"Athletics","band":"close","maxBand":"close","damage":{"any":{"boxes":3,"dying":true}},"traits":[{"type":"area","note":"1 box to everyone nearby; 3 and Dying at the centre. Dodge means diving clear."}],"rows":[["Dynamite","Close (thrown)","1 to everyone nearby, 3 and Dying at the centre","Blast and burns; Dodge means diving clear"]]},{"id":"crossbow","name":"Crossbow","skill":"Shooting","band":"short","damage":{"any":{"boxes":2}},"traits":[],"rows":[]},{"id":"teeth","name":"Sabre teeth","skill":"Brawling","reach":"melee","damage":{"melee":{"boxes":2}},"natural":true,"traits":[],"rows":[]},{"id":"bigfists","name":"Fists of a Siegbarste","skill":"Brawling","reach":"melee","damage":{"melee":{"boxes":2}},"unarmed":true,"traits":[],"rows":[]},{"id":"throw","name":"Telekinetic throw","skill":"Occult","band":"close","damage":{"any":{"boxes":1}},"wound":"blunt","traits":[],"rows":[]},{"id":"rites","name":"Nature rites (roots and thorns)","skill":"Occult","band":"short","damage":{"any":{"boxes":1}},"wound":"blunt","traits":[],"rows":[]}],"threats":[{"id":"hired-gun","name":"Hired gun","label":"Hired gun (minor)","minor":true,"attacks":[{"skill":"Shooting","target":11}],"dodge":7,"boxes":1,"boxesText":"1","weaponText":"Revolver","weapons":["revolver"],"trait":"Numbers","traitText":"Two or three of them; they flee when half are down."},{"id":"outlaw","name":"Outlaw","label":"Outlaw","minor":false,"attacks":[{"skill":"Shooting","target":13},{"skill":"Brawling","target":11}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Revolver, rifle","weapons":["revolver","rifle","fists"],"trait":"Quick draw","traitText":"+2 on the first shot of a fight."},{"id":"blutbad","name":"Blutbad","label":"Blutbad in full woge","minor":false,"attacks":[{"skill":"Brawling","target":13},{"skill":"Tracking","target":14}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Claws and fangs (2)","weapons":["claws"],"trait":"Relentless","traitText":"Ignores the Wounded penalty."},{"id":"siegbarste","name":"Siegbarste","label":"Siegbarste","minor":false,"attacks":[{"skill":"Brawling","target":14}],"dodge":6,"boxes":4,"boxesText":"4","weaponText":"Fists (2), clubs","weapons":["bigfists","club"],"trait":"Iron bones","traitText":"Bullets and blades mark 1 box at most; a Siegbarste's weakness must be learned.","traits":[{"type":"capBoxes","max":1,"except":[],"label":"Iron bones (1 box at most)"}]},{"id":"mauvais","name":"Mauvais Dentes","label":"Mauvais Dentes","minor":false,"attacks":[{"skill":"Brawling","target":15},{"skill":"Stealth","target":13}],"dodge":10,"boxes":4,"boxesText":"4","weaponText":"Sabre teeth (2)","weapons":["teeth"],"trait":"Royal hound","traitText":"Hunts one named target and doesn't stop."},{"id":"hexenbiest","name":"Hexenbiest","label":"Hexenbiest","minor":false,"attacks":[{"skill":"Occult","target":14},{"skill":"Deception","target":13}],"dodge":8,"boxes":3,"boxesText":"3","weaponText":"Spells, knives","weapons":["throw","knife"],"trait":"Telekinesis","traitText":"Once per round, throws a person (1 box) instead of attacking. Grimm blood drunk under a full moon ends her power."},{"id":"wendigo","name":"Wendigo","label":"Wendigo","minor":false,"attacks":[{"skill":"Brawling","target":13},{"skill":"Stealth","target":14}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Claws (2)","weapons":["claws"],"trait":"Larder","traitText":"Drags victims away alive; a Survival roll finds the cache."},{"id":"hundjager","name":"Hundjäger","label":"Hundjäger (Royal enforcer)","minor":false,"attacks":[{"skill":"Melee","target":13},{"skill":"Tracking","target":14},{"skill":"Shooting","target":12}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Blade (2), crossbow","weapons":["blade","crossbow"],"trait":"Pack","traitText":"Comes in threes; +1 to attack a target an ally hit this round."},{"id":"holyknife","name":"Order of the Holy Knife assassin","label":"Order of the Holy Knife assassin","minor":false,"attacks":[{"skill":"Melee","target":14},{"skill":"Stealth","target":14}],"dodge":10,"boxes":3,"boxesText":"3","weaponText":"Consecrated knife (1)","weapons":["knife"],"trait":"Ambush","traitText":"+2 on the first attack from hiding; poisons blades (Body roll or 1 more box)."},{"id":"druid","name":"Brotherhood druid","label":"Brotherhood druid","minor":false,"attacks":[{"skill":"Occult","target":14},{"skill":"Survival","target":13}],"dodge":8,"boxes":3,"boxesText":"3","weaponText":"Staff, nature rites","weapons":["rites"],"trait":"Living ground","traitText":"Commands roots, weather or beasts outdoors; powerless on rails and stone."}],"protection":[{"id":"shield","equipment":"shield","name":"Shield","text":"A hide shield or an iron-bound buckler: you Block at +1.","traits":[{"type":"shield","value":1,"label":"Shield"}]},{"id":"improvised","name":"Improvised shield","text":"A chair, a wooden slat, a crate lid or a saddle: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.","traits":[{"type":"shield","value":0,"breaksOn":2,"label":"Improvised shield"}]},{"id":"himmelsbrief","equipment":"himmelsbrief","name":"Himmelsbrief","text":"Once per case, when a bullet hits you, mark one box fewer.","traits":[{"type":"armor","minBoxes":1,"reduce":1,"against":["firearm"],"label":"Himmelsbrief"}]}],"combatRules":{"oneDefense":{"perRound":1,"edge":"extradefense"},"attackQualityDodge":{"bands":[{"from":0,"mod":0},{"from":3,"mod":-1},{"from":5,"mod":-2},{"from":7,"mod":-3}]},"parry":{"mod":-3,"repeatPenalty":-2,"bareHanded":"unarmed"},"block":{"mod":-2},"aim":{"bonus":1},"tellingHits":{"margin":5,"natural":true,"called":-2,"small":-4}},"coreCombat":["aim","attackQualityDodge","block","oneDefense","parry","tellingHits"],"terms":{"title":"Grimm","point":"Grit","meleeSkill":"Melee","unarmedSkill":"Brawling","ammo":"rounds","ammoOne":"round"},"materials":[["silver","Silver"],["wood","A wooden stake"],["fire","Fire"]]};
+const ENC_SETTING = {"id":"grimm-west","arms":[{"id":"fists","name":"Fists","skill":"Brawling","reach":"melee","damage":{"melee":{"boxes":1}},"rows":[["Punch, kick, headbutt","Melee, reach 1 yd","1","Bruises, a split lip, cracked ribs"]],"traits":[],"reachYards":1},{"id":"club","name":"Club","skill":"Melee","reach":"melee","damage":{"melee":{"boxes":1}},"rows":[["Club, bottle, pistol-whip","Melee, reach 1 yd","1","A concussion or a broken finger"]],"traits":[],"reachYards":1},{"id":"knife","name":"Knife or hatchet","skill":"Melee","reach":"melee","damage":{"melee":{"boxes":1}},"rows":[["Knife or hatchet","Melee, reach 1 yd; Close thrown","1","A cut or stab wound that bleeds"]],"traits":[],"reachYards":1},{"id":"knife-thrown","name":"Knife or hatchet, thrown","skill":"Athletics","band":"close","maxBand":"close","damage":{"any":{"boxes":1}},"rows":[],"traits":[]},{"id":"bow","name":"Bow and arrow","skill":"Shooting","band":"short","damage":{"any":{"boxes":1}},"rows":[["Arrow","Short","1","A cut or stab wound that bleeds"]],"traits":[]},{"id":"blade","name":"Axe, saber or an old Grimm weapon","skill":"Melee","reach":"melee","damage":{"melee":{"boxes":2}},"rows":[["Axe, saber or bowie knife used to kill","Melee, reach 2 yd (bowie knife 1)","2","A deep wound or a broken bone"]],"traits":[],"reachYards":2,"reachNote":"bowie knife 1"},{"id":"claws","name":"Claws and fangs (Wesen in full woge)","skill":"Brawling","reach":"melee","damage":{"melee":{"boxes":2}},"rows":[["Claws and fangs of a monster","Melee, reach 1 yd","2","Torn flesh"]],"traits":[],"natural":true,"reachYards":1},{"id":"derringer","name":"Derringer","skill":"Shooting","band":"close","maxBand":"short","damage":{"any":{"boxes":2}},"ammo":"derringer","firearm":true,"rows":[["Derringer","Close (out of range beyond Short)","2","A gunshot wound"]],"traits":[]},{"id":"revolver","name":"Revolver","skill":"Shooting","band":"close","damage":{"any":{"boxes":2}},"ammo":"revolver","firearm":true,"rows":[["Revolver","Close","2","A gunshot wound"]],"traits":[]},{"id":"rifle","name":"Rifle","skill":"Shooting","band":"medium","damage":{"any":{"boxes":2}},"ammo":"rifle","firearm":true,"rows":[["Rifle","Medium","2","A gunshot wound"]],"traits":[]},{"id":"shotgun","name":"Shotgun","skill":"Shooting","band":"short","maxBand":"short","damage":{"close":{"boxes":3,"dying":true},"short":{"boxes":1}},"ammo":"shotgun","firearm":true,"rows":[["Shotgun, at Close range","Close","3, and Dying","A ruinous wound"],["Shotgun, at Short range","Short (no effect beyond)","1","Scattered pellets"]],"traits":[]},{"id":"buffalo","name":"Buffalo rifle","skill":"Shooting","band":"long","damage":{"any":{"boxes":3,"dying":true}},"firearm":true,"rows":[["Buffalo rifle","Long","3, and Dying","A ruinous wound"]],"traits":[]},{"id":"dynamite","name":"Dynamite","skill":"Athletics","band":"close","maxBand":"close","damage":{"any":{"boxes":3,"dying":true}},"traits":[{"type":"area","note":"1 box to everyone nearby; 3 and Dying at the centre. Dodge means diving clear."}],"rows":[["Dynamite","Close (thrown)","1 to everyone nearby, 3 and Dying at the centre","Blast and burns; Dodge means diving clear"]]},{"id":"crossbow","name":"Crossbow","skill":"Shooting","band":"short","damage":{"any":{"boxes":2}},"traits":[],"rows":[]},{"id":"teeth","name":"Sabre teeth","skill":"Brawling","reach":"melee","damage":{"melee":{"boxes":2}},"natural":true,"traits":[],"rows":[],"reachYards":1},{"id":"bigfists","name":"Fists of a Siegbarste","skill":"Brawling","reach":"melee","damage":{"melee":{"boxes":2}},"unarmed":true,"traits":[],"rows":[],"reachYards":1},{"id":"throw","name":"Telekinetic throw","skill":"Occult","band":"close","damage":{"any":{"boxes":1}},"wound":"blunt","traits":[],"rows":[]},{"id":"rites","name":"Nature rites (roots and thorns)","skill":"Occult","band":"short","damage":{"any":{"boxes":1}},"wound":"blunt","traits":[],"rows":[]}],"threats":[{"id":"hired-gun","name":"Hired gun","label":"Hired gun (minor)","minor":true,"attacks":[{"skill":"Shooting","target":11}],"dodge":7,"boxes":1,"boxesText":"1","weaponText":"Revolver","weapons":["revolver"],"trait":"Numbers","traitText":"Two or three of them; they flee when half are down."},{"id":"outlaw","name":"Outlaw","label":"Outlaw","minor":false,"attacks":[{"skill":"Shooting","target":13},{"skill":"Brawling","target":11}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Revolver, rifle","weapons":["revolver","rifle","fists"],"trait":"Quick draw","traitText":"+2 on the first shot of a fight."},{"id":"blutbad","name":"Blutbad","label":"Blutbad in full woge","minor":false,"attacks":[{"skill":"Brawling","target":13},{"skill":"Tracking","target":14}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Claws and fangs (2)","weapons":["claws"],"trait":"Relentless","traitText":"Ignores the Wounded penalty."},{"id":"siegbarste","name":"Siegbarste","label":"Siegbarste","minor":false,"attacks":[{"skill":"Brawling","target":14}],"dodge":6,"boxes":4,"boxesText":"4","weaponText":"Fists (2), clubs","weapons":["bigfists","club"],"trait":"Iron bones","traitText":"Bullets and blades mark 1 box at most; a Siegbarste's weakness must be learned.","traits":[{"type":"capBoxes","max":1,"except":[],"label":"Iron bones (1 box at most)"}]},{"id":"mauvais","name":"Mauvais Dentes","label":"Mauvais Dentes","minor":false,"attacks":[{"skill":"Brawling","target":15},{"skill":"Stealth","target":13}],"dodge":10,"boxes":4,"boxesText":"4","weaponText":"Sabre teeth (2)","weapons":["teeth"],"trait":"Royal hound","traitText":"Hunts one named target and doesn't stop."},{"id":"hexenbiest","name":"Hexenbiest","label":"Hexenbiest","minor":false,"attacks":[{"skill":"Occult","target":14},{"skill":"Deception","target":13}],"dodge":8,"boxes":3,"boxesText":"3","weaponText":"Spells, knives","weapons":["throw","knife"],"trait":"Telekinesis","traitText":"Once per round, throws a person (1 box) instead of attacking. Grimm blood drunk under a full moon ends her power."},{"id":"wendigo","name":"Wendigo","label":"Wendigo","minor":false,"attacks":[{"skill":"Brawling","target":13},{"skill":"Stealth","target":14}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Claws (2)","weapons":["claws"],"trait":"Larder","traitText":"Drags victims away alive; a Survival roll finds the cache."},{"id":"hundjager","name":"Hundjäger","label":"Hundjäger (Royal enforcer)","minor":false,"attacks":[{"skill":"Melee","target":13},{"skill":"Tracking","target":14},{"skill":"Shooting","target":12}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Blade (2), crossbow","weapons":["blade","crossbow"],"trait":"Pack","traitText":"Comes in threes; +1 to attack a target an ally hit this round."},{"id":"holyknife","name":"Order of the Holy Knife assassin","label":"Order of the Holy Knife assassin","minor":false,"attacks":[{"skill":"Melee","target":14},{"skill":"Stealth","target":14}],"dodge":10,"boxes":3,"boxesText":"3","weaponText":"Consecrated knife (1)","weapons":["knife"],"trait":"Ambush","traitText":"+2 on the first attack from hiding; poisons blades (Body roll or 1 more box)."},{"id":"druid","name":"Brotherhood druid","label":"Brotherhood druid","minor":false,"attacks":[{"skill":"Occult","target":14},{"skill":"Survival","target":13}],"dodge":8,"boxes":3,"boxesText":"3","weaponText":"Staff, nature rites","weapons":["rites"],"trait":"Living ground","traitText":"Commands roots, weather or beasts outdoors; powerless on rails and stone."}],"protection":[{"id":"shield","equipment":"shield","name":"Shield","text":"A hide shield or an iron-bound buckler: you Block at +1.","traits":[{"type":"shield","value":1,"label":"Shield"}]},{"id":"improvised","name":"Improvised shield","text":"A chair, a wooden slat, a crate lid or a saddle: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.","traits":[{"type":"shield","value":0,"breaksOn":2,"label":"Improvised shield"}]},{"id":"himmelsbrief","equipment":"himmelsbrief","name":"Himmelsbrief","text":"Once per case, when a bullet hits you, mark one box fewer.","traits":[{"type":"armor","minBoxes":1,"reduce":1,"against":["firearm"],"label":"Himmelsbrief"}]}],"combatRules":{"oneDefense":{"perRound":1,"edge":"extradefense","extraPenalty":-2},"attackQualityDodge":{"bands":[{"from":0,"mod":0},{"from":3,"mod":-1},{"from":5,"mod":-2},{"from":7,"mod":-3}]},"parry":{"mod":-3,"repeatPenalty":0,"bareHanded":"unarmed"},"block":{"mod":-2},"aim":{"bonus":1},"tellingHits":{"margin":5,"natural":true,"called":-2,"small":-4}},"coreCombat":["aim","attackQualityDodge","block","oneDefense","parry","tellingHits"],"terms":{"title":"Grimm","point":"Grit","meleeSkill":"Melee","unarmedSkill":"Brawling","ammo":"rounds","ammoOne":"round"},"materials":[["silver","Silver"],["wood","A wooden stake"],["fire","Fire"]]};
 const LD = (() => {
 /**
  * Legend Dynamics core rules: pure functions, no page code.
@@ -6482,6 +6685,24 @@ function applyHit(who, hit) {
 /** Dodge: Agility −2, plus the Athletics bonus (+1 Trained, +2 Specialty or Expert). */
 const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ athleticsBonus) => agility - 2 + athleticsBonus;
 
+/** Move in yards: 5, +1 per 2 points of Agility + Body above 20, plus the Athletics bonus (as for Dodge) and any origin speed adjustment. */
+const moveYards = (/** @type {number} */ agility, /** @type {number} */ body, /** @type {number} */ athleticsBonus, speed = 0) =>
+  5 + Math.floor(Math.max(0, agility + body - 20) / 2) + athleticsBonus + speed;
+/**
+ * Move as injury leaves it: wounded (1 box) −2 yards, seriously wounded (2) half, rounded down, and no running;
+ * incapacitated (3) none. Never below 1 yard while able to act.
+ * @param {number} move @param {number} injury
+ */
+const injuredMove = (move, injury) => (injury >= 3 ? 0 : Math.max(1, injury === 2 ? Math.floor(move / 2) : injury === 1 ? move - 2 : move));
+/** The farthest yard of each range band (core rules, Range). */
+const BAND_YARDS = /** @type {Record<string, number>} */ ({ close: 10, short: 25, medium: 100, long: 300, extreme: 1000 });
+/** The range band a distance in yards falls in, or null past Extreme. @param {number} yards */
+const bandForYards = (yards) => Object.keys(BAND_YARDS).find((b) => yards <= BAND_YARDS[b]) || null;
+/** A threat's Move when its entry gives none. */
+const THREAT_MOVE = 8;
+/** A weapon in hand's reach in yards (1 when the weapon doesn't say). */
+const reachYards = (/** @type {{ reach?: string, reachYards?: number }} */ weapon) => (weapon.reach === "melee" ? weapon.reachYards || 1 : null);
+
 // ---- attack resolution ----
 
 /**
@@ -6506,6 +6727,8 @@ function priceFor(weapon, roll) {
   return { track: p.track, boxes: roll.total === 18 && p.natural18 ? p.natural18 : p.fail };
 }
 
+/** The most boxes one target takes from one personal-scale spell, burst or charm. */
+const MAGIC_HARM_CAP = 3;
 /** Defender traits that are switched on (a trait with toggle: true can be switched off, e.g. a Ward once broken). @param {any} defender */
 const liveTraits = (defender) => (defender.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false);
 
@@ -6577,6 +6800,8 @@ function resolveAttack(input, hooks, roll) {
   // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
   for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }
   if (dmg && boosts) dmg = { ...dmg, boxes: dmg.boxes + boosts };
+  // Personal-scale magic marks at most 3 boxes on one target, whatever its Boosts (core magic's harm limit).
+  if (dmg && weapon.spell && dmg.boxes > MAGIC_HARM_CAP) { dmg = { ...dmg, boxes: MAGIC_HARM_CAP }; out.harmCapped = true; }
   const bite = ench.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extraBox || 0), 0);
   if (dmg && dmg.boxes && bite) { dmg = { ...dmg, boxes: dmg.boxes + bite }; out.enchanted = bite; }
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
@@ -6612,7 +6837,7 @@ function resolveAttack(input, hooks, roll) {
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
 }
 
-return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, priceFor, NO_HOOKS, resolveAttack };
+return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, moveYards, injuredMove, BAND_YARDS, bandForYards, THREAT_MOVE, reachYards, priceFor, MAGIC_HARM_CAP, NO_HOOKS, resolveAttack };
 })();
 const LDX = (() => {
 /**
@@ -6642,13 +6867,30 @@ function bandFor(margin, bands) {
 /** Telling hit effects (core rules, Telling hits): [id, name, what happens]. */
 const TELLING_EFFECTS = [
   ["disarm", "Disarm", "the weapon or held item drops, or flies a few yards away"],
-  ["knockdown", "Knock down", "the target falls prone, or is driven back a few steps"],
-  ["pin", "Pin", "the target is held, tangled or pinned down: their next action goes to getting free"],
+  ["knockdown", "Knock down", "the target falls prone, or is driven back a few steps; standing uses their next move, not their action"],
+  ["pin", "Pin", "the target is grabbed, held or pinned against something: their next action goes to getting free, then they're free; another hit keeps them pinned"],
   ["rattle", "Rattle", "−2 to the target's next roll"],
-  ["break", "Break gear", "a shield, weapon or tool breaks; armor loses 1 protection until repaired"],
+  ["break", "Break gear", "a weapon, shield or tool is out of use until its owner spends an action putting it right (destroyed only if it was already vulnerable); armor loses 1 protection until repaired"],
   ["open", "Open them up", "the next attack on this target this round gets +2"],
-  ["precise", "Precise", "it hits exactly what was aimed at"],
+  ["precise", "Precise", "it hits exactly what was aimed at: it changes the situation, never the injury, defense or death rules"],
 ];
+
+/**
+ * The telling-hit effects a weapon can deliver (core rules, Telling hits): TELLING_EFFECTS rows.
+ * Pin needs a weapon in hand, fists or a grapple; knock down needs one of those, or a shot or missile that marks 2 or more boxes;
+ * bare hands and natural weapons don't break gear. A weapon's own "telling": { add, not } adjusts the list (a taser knocks down).
+ * @param {any} weapon @param {{ melee?: string, unarmed?: string }} [skills] the setting's skills for a weapon in hand and for bare hands
+ */
+function tellingEffectsFor(weapon, skills) {
+  if (!weapon) return TELLING_EFFECTS;
+  const SK = { melee: "Melee", unarmed: "Brawling", ...(skills || {}) };
+  const inHand = weapon.reach === "melee";
+  const bare = inHand && (weapon.id === "fists" || weapon.unarmed || weapon.natural || (SK.melee !== SK.unarmed && weapon.skill === SK.unarmed));
+  const heavy = Object.values(weapon.damage || {}).some((/** @type {any} */ d) => d && d.boxes >= 2);
+  const ok = { pin: inHand, knockdown: inHand || heavy, break: !bare };
+  const t = weapon.telling || {};
+  return TELLING_EFFECTS.filter(([id]) => !(t.not || []).includes(id) && ((t.add || []).includes(id) || (ok[/** @type {"pin"} */ (id)] ?? true)));
+}
 
 const EXPERIMENTS = [
   {
@@ -6691,8 +6933,8 @@ const EXPERIMENTS = [
   },
   {
     id: "oneDefense", scope: "core", label: "One defense a round",
-    summary: "Dodge, Parry and Block share one defense a round; an Edge (Additional Defense) or trait adds more.",
-    params: { perRound: 1 },
+    summary: "Dodge, Parry and Block share one defense a round; an Edge (Additional Defense) or trait adds more, each extra one at extraPenalty (−2 in the core rules), never twice against one attack.",
+    params: { perRound: 1, extraPenalty: 0 },
     flags: ["oneDefense"],
   },
   {
@@ -6787,7 +7029,7 @@ function buildRules(config, weapons, lab, published) {
   return rules;
 }
 
-return { PUBLISHED, bandFor, TELLING_EFFECTS, EXPERIMENTS, newLabConfig, available, buildRules };
+return { PUBLISHED, bandFor, TELLING_EFFECTS, tellingEffectsFor, EXPERIMENTS, newLabConfig, available, buildRules };
 })();
 const LAB_ENCOUNTER = (() => {
 /**
@@ -6926,7 +7168,10 @@ function defenseOptions(enc, rules, d, w) {
   const shared = flags.has("oneDefense") && !flags.has("dodgeEveryAttack");
   const allowed = shared ? (rules.params.oneDefense.perRound || 1) + live.filter((/** @type {any} */ t) => t.type === "extraDefense").reduce((n, /** @type {any} */ t) => n + (t.value || 1), 0) : 0;
   const spent = shared && d.defRound === enc.round ? d.defCount || 0 : 0;
-  const opt = (/** @type {any} */ o) => { o.preview = o.base + o.mods.reduce((/** @type {number} */ x, /** @type {any} */ m) => x + m.value, 0); if (shared) o.used = spent >= allowed; out.push(o); };
+  // A defense beyond the first this round (Additional Defense) is at the rule's extraPenalty, whatever kind it is.
+  const extra = shared && spent >= (rules.params.oneDefense.perRound || 1) && rules.params.oneDefense.extraPenalty
+    ? [{ source: "oneDefense", label: "Second defense this round", value: rules.params.oneDefense.extraPenalty, scope: rules.params.oneDefense.scope || "core" }] : [];
+  const opt = (/** @type {any} */ o) => { o.mods = [...o.mods, ...extra]; o.preview = o.base + o.mods.reduce((/** @type {number} */ x, /** @type {any} */ m) => x + m.value, 0); if (shared) o.used = spent >= allowed; out.push(o); };
   if (d.dodge !== null) {
     const gear = live.filter((/** @type {any} */ t) => t.type === "dodgeBonus").map((/** @type {any} */ t) => ({ source: "gear", label: t.label || "Gear", value: t.value, scope: "setting", preview: true }));
     opt({ kind: "dodge", label: "Dodge", base: d.dodge, mods: gear, used: d.dodgedRound === enc.round && !flags.has("dodgeEveryAttack") });
@@ -7593,6 +7838,28 @@ function mountLab(api) {
     return out;
   }
   const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"] });
+  // The battle map's distance between attacker and target, checked against the weapon: a weapon in hand's reach
+  // and the attacker's Move (as injury leaves it), or a ranged weapon's band, which it sets. Only a note: the GM rules.
+  function reachCheck(/** @type {any} */ a, /** @type {any} */ d, /** @type {any} */ w) {
+    const out = $("lab-reach"), at = a && d && w && api.mapDistance ? api.mapDistance({ ref: a.ref, name: a.name }, { ref: d.ref, name: d.name }) : null;
+    out.hidden = !at; if (!at) return;
+    const mv = LD.injuredMove(a.move || LD.THREAT_MOVE, a.injury || 0), run = (a.injury || 0) >= 2 ? 0 : mv * 2;
+    const where = at.yards !== undefined ? `${fmtYd(at.yards)} apart on the map` : `${at.lanes} lane${at.lanes === 1 ? "" : "s"} apart on the range track`;
+    let msg, bad = false;
+    if (w.reach === "melee") {
+      const reach = LD.reachYards(w) || 1;
+      if (at.yards === undefined) { msg = at.lanes <= 1 ? `${where}: close enough to move in and strike (reach ${reach} yd, Move ${mv} yd) if the GM agrees.` : `${where}: too far to strike with a weapon in hand this turn.`; bad = at.lanes > 1; }
+      else if (at.hexes <= 1 && (at.yards <= reach || at.scale <= 5)) msg = `${where}: in reach (${w.name}, ${reach} yd).`;
+      else if (at.yards <= reach + mv) msg = `${where}: out of reach (${reach} yd), but within Move (${mv} yd): move in and strike.`;
+      else { bad = true; msg = `${where}: too far to strike this turn. Reach ${reach} yd + Move ${mv} yd = ${reach + mv} yd${run ? `; running (${run} yd) closes in but takes the action` : "; seriously wounded, no running"}.`; }
+    } else if (at.band) {
+      const ok = LD.rangeModifier(w, at.band) !== null;
+      if (ok) $("lab-band").value = at.band;
+      bad = !ok; msg = `${where}: ${BAND_NAMES[at.band] || at.band}${ok ? ", set above" : `, out of range for the ${w.name.toLowerCase()}`}.`;
+    } else { bad = true; msg = `${where}: beyond Extreme range.`; }
+    out.className = "small " + (bad ? "bad" : "muted"); out.textContent = msg;
+  }
+  const fmtYd = (/** @type {number} */ y) => `${Math.round(y * 10) / 10} yd`;
   function fromCharacter(c) {
     const k = api.calc(c), gun = c.play && c.play.gun;
     // A shapechanger (api.formOf): in their form, its numbers (api.calc applies them), its claws, and its traits as a note.
@@ -7601,7 +7868,7 @@ function mountLab(api) {
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
     const formRules = fm ? shapeTraits(fm, formOn) : [];
-    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
@@ -7616,7 +7883,7 @@ function mountLab(api) {
   function fromThreat(t, name) {
     const skills = Object.fromEntries(t.attacks.map((/** @type {any} */ a) => [a.skill, a.target]));
     const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
-    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, dodge: t.dodge, skills, weapons: t.weapons,
+    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
       boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
@@ -7802,6 +8069,7 @@ function mountLab(api) {
     $("lab-target").dataset.actor = a ? a.pid : "";
     $("lab-target").closest(".field").hidden = !["attack", "aim"].includes(action);
     $("lab-atk-row").hidden = action !== "attack";
+    $("lab-reach").hidden = true; // the map check below shows it again for an attack
     $("lab-text-row").hidden = !["point", "complication", "condition", "note"].includes(action);
     $("lab-text-label").textContent = { point: "What for (a small preparation, or other)", complication: "What happens", condition: "Condition", note: "Note" }[action] || "";
     if (action === "attack" && a) {
@@ -7814,6 +8082,7 @@ function mountLab(api) {
       $("lab-band").dataset.weapon = w ? w.id : "";
       $("lab-band").innerHTML = bands.map((/** @type {string} */ b) => { const m = w ? LD.rangeModifier(w, b) : 0; return `<option value="${b}" ${m === null ? "disabled" : ""}>${BAND_NAMES[b]}${m ? " (" + signed(m) + ")" : m === null ? " (out of range)" : ""}<\/option>`; }).join("");
       $("lab-band").value = pb && bands.includes(pb) && (!w || LD.rangeModifier(w, pb) !== null) ? pb : bands.includes("close") ? "close" : bands[0];
+      reachCheck(a, E.find(en, $("lab-target").value), w);
       const modes = w && w.ammo ? MODES.filter((/** @type {any} */ m) => !m[3] || m[3].includes(w.ammo)) : [];
       $("lab-mode-wrap").hidden = !modes.length;
       $("lab-fmode").innerHTML = modes.map((/** @type {any} */ m) => `<option value="${m[0]}">${esc(m[1])} (${m[2]} ${m[2] > 1 ? esc(T.ammo || "rounds") : esc(T.ammoOne || "round")}${m[4] ? ", " + signed(m[4]) : ""})<\/option>`).join("");
@@ -7827,7 +8096,8 @@ function mountLab(api) {
       // What the attack is made of (the setting's materials): silver bullets, a wooden stake, cold iron.
       $("lab-material-wrap").hidden = !MATERIALS.length;
       if (MATERIALS.length && !$("lab-material").options.length) $("lab-material").innerHTML = `<option value="">Ordinary<\/option>` + MATERIALS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)}<\/option>`).join("");
-      if (TH && !$("lab-called").options.length) $("lab-called").innerHTML = `<option value="">None<\/option>` + LDX.TELLING_EFFECTS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}<\/option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}<\/option>`).join("");
+      // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
+      if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None<\/option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}<\/option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}<\/option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
       if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
       const base = w ? a.skills[w.skill] : undefined;
@@ -7943,7 +8213,7 @@ function mountLab(api) {
       btns.push(`<button class="btn" data-fx="trade-lost">${esc(d.name)}: lose a limb instead (complication)<\/button><button class="btn" data-fx="trade-crippled">${esc(d.name)}: lose a limb's use instead (complication)<\/button>`);
     if (live && ev.grievous && ev.grievous.pc && !ev.traded && ev.grievous.downgradedTo === undefined && d && d.points > 0) btns.push(`<button class="btn" data-fx="downgrade">${esc(d.name)}: downgrade the grievous wound (${esc(T.point)})<\/button>`);
     if (live && ev.telling && !ev.telling.shrugged) {
-      if (!ev.telling.called) btns.push(`<label class="small">Effect <select data-telling>${[["", "Pick…"], ...LDX.TELLING_EFFECTS].map((/** @type {any} */ [id, n]) => `<option value="${id}"${id === (ev.telling.effect || "") ? " selected" : ""}>${esc(n)}<\/option>`).join("")}<\/select><\/label>`);
+      if (!ev.telling.called) btns.push(`<label class="small">Effect <select data-telling>${[["", "Pick…"], ...LDX.tellingEffectsFor(rules().weapons[ev.weapon && ev.weapon.id] || ev.weapon, rules().skills)].map((/** @type {any} */ [id, n]) => `<option value="${id}"${id === (ev.telling.effect || "") ? " selected" : ""}>${esc(n)}<\/option>`).join("")}<\/select><\/label>`);
       if (d && d.kind === "pc" && (d.traits || []).some((/** @type {any} */ t) => t.type === "shrugTelling" && !t.used)) btns.push(`<button class="btn" data-fx="shrug-edge">${esc(d.name)}: shrug it off (Hard to put down)<\/button>`);
       if (d && d.kind === "pc" && d.points > 0) btns.push(`<button class="btn" data-fx="shrug-point">${esc(d.name)}: shrug it off (${esc(T.point)})<\/button>`);
     }
@@ -8082,17 +8352,17 @@ return { mountLab };
   // The battle map: the posse as tokens (portrait, group color, down or Dying), one hex a yard.
   const GROUP_COLOR = { law: "var(--gold)", learned: "var(--blue)", frontier: "var(--red)" };
   const battleMap = mountBattleMap({ root: $("battlemap"), key: "grimm-west", esc, toast: gmSay,
-    bands: [["Close", 10], ["Short", 50], ["Medium", 150], ["Long", 500], ["Extreme", 1760]],
+    bands: [["Close", 10], ["Short", 25], ["Medium", 100], ["Long", 300], ["Extreme", 1000]],
     pointName: "Grit", stunName: "Dazed", partyName: "posse",
     // The plain range track, and a stagecoach chase (the coach keeps its own boxes; see Stagecoach chases in the guide).
-    rangeTracks: [{}, {"id": "stagecoach", "title": "Stagecoach chase", "us": "The stagecoach", "startLane": 3, "help": "for a chase on the road: the coach and everyone aboard against riders closing in. The coach has the first lane; each rider stands in a range band from it.", "bands": [["Close", "alongside: board or grapple"], ["Short", "up to 50 yd"], ["Medium", "up to 150 yd"], ["Long", "up to 500 yd"], ["Extreme", "one band more and they're lost"]], "note": "Each exchange the driver rolls Riding against each rider's Riding (11 for a threat without it). The winner moves that rider one lane: in if the rider won, out if the driver did; a tie stays put. A rider pushed past Extreme drops out. Shooting from the box, the roof or the saddle is at −2.", "vehicle": {"name": "The stagecoach", "boxes": 4, "label": "Coach", "downText": "Wrecked", "color": "#8a5a2b", "effects": ["Rolling: no damage", "Holed: splinters and bullet holes; no penalty yet", "A horse hit or a wheel cracked: −2 to the driver's Riding", "Lamed: −4 to the driver's Riding, and riders close on a tie", "Wrecked: the coach overturns or stops dead; everyone aboard rolls Athletics or marks a box of Injury"]}}],
+    rangeTracks: [{}, {"id": "stagecoach", "title": "Stagecoach chase", "us": "The stagecoach", "startLane": 3, "help": "for a chase on the road: the coach and everyone aboard against riders closing in. The coach has the first lane; each rider stands in a range band from it.", "bands": [["Close", "alongside: board or grapple"], ["Short", "up to 25 yd"], ["Medium", "up to 100 yd"], ["Long", "up to 300 yd"], ["Extreme", "one band more and they're lost"]], "note": "Each exchange the driver rolls Riding against each rider's Riding (11 for a threat without it). The winner moves that rider one lane: in if the rider won, out if the driver did; a tie stays put. A rider pushed past Extreme drops out. Shooting from the box, the roof or the saddle is at −2.", "vehicle": {"name": "The stagecoach", "boxes": 4, "label": "Coach", "downText": "Wrecked", "color": "#8a5a2b", "effects": ["Rolling: no damage", "Holed: splinters and bullet holes; no penalty yet", "A horse hit or a wheel cracked: −2 to the driver's Riding", "Lamed: −4 to the driver's Riding, and riders close on a tie", "Wrecked: the coach overturns or stops dead; everyone aboard rolls Athletics or marks a box of Injury"]}}],
     // The threats come from the Players' Guide's Threats table on this page.
-    threats: threatsFromGuide($("guide")),
+    threats: threatsFromGuide($("guide")).map((x) => ({ ...x, move: x.move || 8 })), // threats move 8 yards (core rules)
     crew: () => gmCrew.map((c) => { const k = gmCalc(c);
       return { id: c.id, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
         color: GROUP_COLOR[c.customRole ? c.customGroup || "law" : (DEPTS.find((d) => d[0] === c.dept) || [0, "law"])[1]] || "var(--gold)",
         injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty, ptrack: null,
-        stats: [`Dodge ${k.dodge}`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
+        stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
     // A change made on the map is the GM's copy of the character, the same as a change on their card.
     setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
       if ("injury" in patch) { c.play.injury = Math.max(0, Math.min(3, patch.injury)); if (c.play.injury < 3 && !gritty) c.play.dying = false; }
@@ -8107,7 +8377,7 @@ return { mountLab };
     try {
       const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n) + formSkill(n, c), lab: levelName(c.skills[n], n) })).filter((x) => x.l !== "U")
         .sort((a, b) => (b.l === "S") - (a.l === "S") || b.t - a.t);
-      return { skills, dodge: dodge() + formDodge(c), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
+      return { skills, dodge: dodge() + formDodge(c), move: moveNow(c), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
     } finally { ch = saved; }
   }
   function gmAdd(list) {
@@ -8147,7 +8417,7 @@ return { mountLab };
         <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed character")}</b>
           <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span></div></div>
         ${formOf(c) ? `<div class="gm-form small"><b>${inForm(c) ? "Full woge" : "Human face"}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${inForm(c) ? "human face" : "full woge"}</button></div>` : ""}
-        <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div></div>
+        <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a Grit point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a Grit point">+</button><span class="small muted">Grit</span></span></div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> rounds${c.play.gun.spares ? `, ${c.play.gun.spares} reload${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.woge ? " · <b style=\"color:var(--bad)\">in woge</b>" : ""}</div>` : c.play.woge ? `<div class="small"><b style="color:var(--bad)">In full woge</b></div>` : ""}
@@ -8241,9 +8511,10 @@ return { mountLab };
     weapons: { skill: "Shooting", jamOn18: true, items: GUNS, modes: FIRE.map((f) => [...f, { fan: -2, both: 2 }[f[0]] || 0]) },
     gritty: { table: GRIEVOUS.map((g) => ({ ...g, condition: g.dazed ? "Dazed" : undefined })), enemy: TAKEN_OUT } };
   encPanel = LAB_UI.mountLab({ PACK: ENC_PACK, T: ENC_SETTING.terms, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: null, store, esc, signed, saveText, gritty: () => gritty,
+    mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
     crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = encPanel; encPanel = null; renderGM(); encPanel = p; },
     // In full woge (play.woge), the woge's numbers; otherwise the human face's.
-    calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n) + formSkill(n, c)])), dodge: dodge() + formDodge(c), agility: c.attrs.Agility + formAttr("Agility", c) }; } finally { ch = saved; } },
+    calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n) + formSkill(n, c)])), dodge: dodge() + formDodge(c), move: moveOf(c), agility: c.attrs.Agility + formAttr("Agility", c) }; } finally { ch = saved; } },
     clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
       set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },
       add: (name, size, kind) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind, filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); } },

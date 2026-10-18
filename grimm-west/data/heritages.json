@@ -27,7 +27,7 @@
     {"id": "coyotl", "name": "Coyotl", "tier": 1, "wesen": true, "adj": {"Body": 1, "Agility": 1, "Intellect": -1, "Will": -1},
      "desc": "Coyote-like Wesen of the plains and desert country who live in clans bound by old customs, and fight together like a pack.",
      "core": [], "skills": ["Brawling", "Shooting", "Tracking", "Survival"],
-     "woge": {"attrs": {"Body": 1, "Agility": 1}, "dodge": 1, "traits": ["Claws mark 2 boxes", "Keen senses: track by scent and hearing", "Swift: +2 to Athletics when running"], "drawbacks": []},
+     "woge": {"attrs": {"Body": 1, "Agility": 1}, "dodge": 1, "speed": 1, "traits": ["Claws mark 2 boxes", "Keen senses: track by scent and hearing", "Swift: Move +1, and +2 to Athletics when running"], "drawbacks": []},
      "traits": [
        ["co-pack", "Pack Fighter", "+2 to Brawling or Melee against a target an ally attacked this round.", "Brawling", true, "Clan Law", "The clan's customs bind you. Accept the clan's demand."],
        ["co-plains", "Plains Wanderer", "+2 to Survival in dry, open country: plains, desert and badlands.", "Survival", true, "Restless", "You can't stay put for long. Accept leaving, or the strain of staying, at a bad time."]
@@ -76,7 +76,7 @@
      "desc": "Water-dwelling Wesen from New Zealand: guardians of rivers and the people they claim, reptile-like in woge, and dangerous to anyone else. Horror campaigns only.",
      "core": ["Resists poison: +4 to Body against any poison.", "Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can't clear, every three days."],
      "skills": ["Athletics", "Brawling", "Survival", "Stealth"],
-     "woge": {"attrs": {"Body": 1}, "dodge": 0, "traits": ["Claws mark 2 boxes", "Tough: hits of 2+ boxes mark one fewer", "Amphibious: breathes water, swims as fast as a horse runs", "Burrows through earth", "Dark sight"], "drawbacks": ["Must be submerged in water daily, or mark a box that rest can't clear, each hour", "Pounamu (greenstone) wounds mark one extra box"]},
+     "woge": {"attrs": {"Body": 1}, "dodge": 0, "traits": ["Claws mark 2 boxes", "Tough: hits of 2+ boxes mark one fewer", "Amphibious: breathes water and swims at full Move, fast as a dolphin (water isn't hard going for them; a strong current, a storm or choked water still halves it)", "Burrows through earth", "Dark sight"], "drawbacks": ["Must be submerged in water daily, or mark a box that rest can't clear, each hour", "Pounamu (greenstone) wounds mark one extra box"]},
      "traits": [
        ["ta-bite", "Paralyzing Bite", "Ability, in full woge: a bite marks 1 box, and the target rolls Body or is paralyzed for the scene.", "Brawling", false, "Guardian's Duty", "You protect those you've claimed as yours. Accept the danger when they need you."],
        ["ta-river", "River Guardian", "+2 to Athletics and Survival in rivers, lakes and the sea.", "Athletics", true, "Peculiar Appetite", "Gluttony, and an odd craving (frogs, to start with). Accept the distraction at a bad time."]
@@ -179,7 +179,7 @@
      "desc": "Bat-like Wesen with uncanny hearing and a sonic scream that drops a room full of people to their knees.",
      "core": ["Sonic scream: in full woge, roll Will. Everyone nearby you choose who can hear rolls Body −2; a failure loses their next action and takes −2 for the scene. Earplugs protect. Heard in town, it marks Exposure."],
      "skills": ["Stealth", "Athletics", "Brawling", "Investigation"],
-     "woge": {"attrs": {"Body": 1, "Agility": 1}, "dodge": 0, "traits": ["Claws and fangs mark 2 boxes", "Sonar: no penalty for darkness; sense the shape of a room by sound", "Keen hearing: hear heartbeats", "Swift"], "drawbacks": []},
+     "woge": {"attrs": {"Body": 1, "Agility": 1}, "dodge": 0, "speed": 1, "traits": ["Claws and fangs mark 2 boxes", "Sonar: no penalty for darkness; sense the shape of a room by sound", "Keen hearing: hear heartbeats", "Swift: Move +1"], "drawbacks": []},
      "traits": [
        ["mu-echo", "Echo Sight", "+2 to Intellect rolls to find something hidden in the dark by sound.", "Intellect", true, "Sensitive Ears", "Loud noise disorients you. When a gun or explosion goes off nearby, accept −2 on your next action."],
        ["mu-hear", "Eavesdropper", "+2 to Intellect rolls to hear faint or distant voices.", "Intellect", true, "Can't Unhear", "You hear secrets you shouldn't. Accept the trouble that knowing brings."]
@@ -188,7 +188,7 @@
      "desc": "Goblin-like Wesen, green-skinned in woge with fingers fused into acid talons; the root of Rumpelstiltskin. Clever, spiteful, and bound by an old obsession with names and bargains.",
      "core": ["Acid talons: in full woge, claw hits mark 2 boxes and ignore Tough and armor.", "Leaper, in either form: jumps of many yards; +2 to Athletics to jump."],
      "skills": ["Brawling", "Athletics", "Deception", "Investigation"],
-     "woge": {"attrs": {"Agility": 1}, "dodge": 1, "traits": ["Keen senses: track by scent and hearing", "Swift"], "drawbacks": ["Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged", "Disturbing voice"]},
+     "woge": {"attrs": {"Agility": 1}, "dodge": 1, "speed": 1, "traits": ["Keen senses: track by scent and hearing", "Swift: Move +1"], "drawbacks": ["Fused claws: −2 to Tinkering, Shooting and other fine handwork while woged", "Disturbing voice"]},
      "traits": [
        ["ft-tremor", "Tremor", "Ability, in full woge: stomp, and everyone nearby rolls Athletics or falls and loses their next action.", "Athletics", false, "Cruel Streak", "When an enemy is helpless, you're tempted to make them suffer. Accept the lost allies, or the Suspicion it brings."],
        ["ft-bargain", "Strike a Bargain", "+2 to Persuasion or Deception when making a deal.", "Persuasion", true, "Guess My Name", "Your true name holds power over you. When someone hunts for it, or speaks it, accept the consequence."]

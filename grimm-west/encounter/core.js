@@ -162,6 +162,24 @@ export function applyHit(who, hit) {
 /** Dodge: Agility −2, plus the Athletics bonus (+1 Trained, +2 Specialty or Expert). */
 export const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ athleticsBonus) => agility - 2 + athleticsBonus;
 
+/** Move in yards: 5, +1 per 2 points of Agility + Body above 20, plus the Athletics bonus (as for Dodge) and any origin speed adjustment. */
+export const moveYards = (/** @type {number} */ agility, /** @type {number} */ body, /** @type {number} */ athleticsBonus, speed = 0) =>
+  5 + Math.floor(Math.max(0, agility + body - 20) / 2) + athleticsBonus + speed;
+/**
+ * Move as injury leaves it: wounded (1 box) −2 yards, seriously wounded (2) half, rounded down, and no running;
+ * incapacitated (3) none. Never below 1 yard while able to act.
+ * @param {number} move @param {number} injury
+ */
+export const injuredMove = (move, injury) => (injury >= 3 ? 0 : Math.max(1, injury === 2 ? Math.floor(move / 2) : injury === 1 ? move - 2 : move));
+/** The farthest yard of each range band (core rules, Range). */
+export const BAND_YARDS = /** @type {Record<string, number>} */ ({ close: 10, short: 25, medium: 100, long: 300, extreme: 1000 });
+/** The range band a distance in yards falls in, or null past Extreme. @param {number} yards */
+export const bandForYards = (yards) => Object.keys(BAND_YARDS).find((b) => yards <= BAND_YARDS[b]) || null;
+/** A threat's Move when its entry gives none. */
+export const THREAT_MOVE = 8;
+/** A weapon in hand's reach in yards (1 when the weapon doesn't say). */
+export const reachYards = (/** @type {{ reach?: string, reachYards?: number }} */ weapon) => (weapon.reach === "melee" ? weapon.reachYards || 1 : null);
+
 // ---- attack resolution ----
 
 /**
@@ -186,6 +204,8 @@ export function priceFor(weapon, roll) {
   return { track: p.track, boxes: roll.total === 18 && p.natural18 ? p.natural18 : p.fail };
 }
 
+/** The most boxes one target takes from one personal-scale spell, burst or charm. */
+export const MAGIC_HARM_CAP = 3;
 /** Defender traits that are switched on (a trait with toggle: true can be switched off, e.g. a Ward once broken). @param {any} defender */
 const liveTraits = (defender) => (defender.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false);
 
@@ -257,6 +277,8 @@ export function resolveAttack(input, hooks, roll) {
   // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
   for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }
   if (dmg && boosts) dmg = { ...dmg, boxes: dmg.boxes + boosts };
+  // Personal-scale magic marks at most 3 boxes on one target, whatever its Boosts (core magic's harm limit).
+  if (dmg && weapon.spell && dmg.boxes > MAGIC_HARM_CAP) { dmg = { ...dmg, boxes: MAGIC_HARM_CAP }; out.harmCapped = true; }
   const bite = ench.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extraBox || 0), 0);
   if (dmg && dmg.boxes && bite) { dmg = { ...dmg, boxes: dmg.boxes + bite }; out.enchanted = bite; }
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
