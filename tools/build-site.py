@@ -34,7 +34,7 @@ GAMES, SLUGS = bw.GAMES, bw.SLUGS
 # The creators live on the site now.
 bw.CREATORS = {g: f"{SLUGS[g]}/create/" for g in GAMES}
 
-NAV = [("/", "Home"), (bw.WHY_SLUG, "About")] + [(SLUGS[g], bw.pack(g)["terms"]["title"]) for g in GAMES] + [(bw.CORE_SLUG, "Core rules"), (bw.DISCORD_SLUG, "Discord")]
+NAV = [("/", "Home"), (bw.WHY_SLUG, "About")] + [(SLUGS[g], bw.pack(g)["terms"]["title"]) for g in GAMES] + [(bw.CORE_SLUG, "Core rules"), (bw.TABLE_SLUG, "Shared table"), (bw.DISCORD_SLUG, "Discord")]
 
 FRAME_CSS = """
 /* ---------- 5. Site frame (Cloudflare Pages build; Squarespace supplies its own) ---------- */
@@ -101,7 +101,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None):
 {sections}
 </main>
 <footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. This RPG is released under the <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener" target="_blank">Creative Commons Attribution 4.0 International License</a>. You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.</span>
-<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.DISCORD_SLUG}">Discord bot</a></div></footer>
+<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a></div></footer>
 </body>
 </html>
 """
@@ -161,6 +161,9 @@ def main():
 
     write(bw.WHY_SLUG.strip("/") + "/index.html", page(bw.WHY_SLUG, "Why Legend Dynamics · Legend Dynamics", "Why the Legend Dynamics roleplaying game system was made: the 3d6 bell curve married to Fate's narrative heart.",
                                                      blocks(bw.why_page()), fonts=font_links({bw.BRAND_FONTS})))
+
+    write(bw.TABLE_SLUG.strip("/") + "/index.html", page(bw.TABLE_SLUG, "The shared table · Legend Dynamics", "Play Legend Dynamics online with the shared table, and host your own table server on Cloudflare.",
+                                                       blocks(bw.table_page()), fonts=font_links({bw.BRAND_FONTS})))
 
     d = blocks(bw.discord_page())
     rows = "".join(f'<li><a class="ld-button ld-button--ghost" href="{bw.DISCORD_SLUG}/{SLUGS[g].strip("/")}/">{e(bw.pack(g)["terms"]["title"])}</a></li>' for g in GAMES)

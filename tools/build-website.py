@@ -27,6 +27,7 @@ GENRE = {"western": "Gothic Western", "spaceopera": "Science fiction", "fantasy"
 CORE_SLUG = "/core-rules"
 DISCORD_SLUG = "/discord"
 WHY_SLUG = "/why-legend-dynamics"
+TABLE_SLUG = "/shared-table"
 
 BRAND_FONTS = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
 
@@ -48,6 +49,73 @@ def md_inline(t):
     t = e(t, quote=False)
     t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
     return re.sub(r"\*(.+?)\*", r"<i>\1</i>", t)
+
+
+def table_page():
+    """The shared table: how to run a game with it, and how to host your own table server on Cloudflare."""
+    code = lambda x: f"<code>{e(x)}</code>"
+    trouble = [
+        ("The address ends in <b>pages.dev</b>, or no deploy command was asked for", "It was made as a Pages project, which only serves files. Delete it (its <b>Settings</b>, at the bottom) and create it again from the <b>Workers</b> side, as in step 1."),
+        ("Build log: <b>root directory not found</b>", f"Check the root directory is spelled {code('legend-dynamics/table-server')} exactly, and that the branch being built has that folder (step 3)."),
+        (f"Build log: <b>/bin/sh: legend-dynamics/table-server: not found</b>", f"A command starts with the folder name. With the root directory set, the commands need no {code('cd')}: just {code('npx wrangler deploy')} and {code('npx wrangler versions upload')}."),
+        ("Build log: <b>pending Durable Object migration</b>", f"The first build must be a full deploy, which creates the table storage. Retry the build from your production branch, or set the preview command to {code('npx wrangler deploy')} for one build, then set it back."),
+        ("A failed <b>Workers Builds</b> check on other branches", f"Branches without the server folder can't build it. Set <b>Build watch paths</b> to {code('legend-dynamics/table-server/*')} (step 6) and they're skipped."),
+        ("The creator says <b>Couldn't reach the table server</b>", "Check the address you pasted (it starts with https:// and ends in workers.dev) and that opening it in a browser shows the greeting (step 4)."),
+        ("<b>This site isn't allowed to use the table server</b>", f"Your site isn't in {code('ALLOWED_ORIGINS')} (step 6). Add its address, or {code('null')} for creators opened as files, and redeploy."),
+    ]
+    rows = "".join(f"<tr><td>{a}</td><td>{b}</td></tr>" for a, b in trouble)
+    return f"""<!-- Shared table page (suggested URL {TABLE_SLUG}). No theme injection: it uses the Legend Dynamics brand.
+     Paste each block into its own Code Block (Display Source off). -->
+
+<!-- Block 1: hero -->
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Play online</div>
+  <h1>The shared table</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">Every character creator can join a shared table: the GM starts one, the players join with a code, and everyone sees the same dice, the same characters and the same fight, each on their own device.</p>
+  <div class="ld-actions">
+    <a class="ld-button" href="/#games">Open a creator</a>
+    <a class="ld-button ld-button--ghost" href="#host">Host your own table server</a>
+    <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}">Or play with the Discord bot</a>
+  </div>
+</div>
+
+<!-- Block 2: running a game -->
+<div class="ld">
+  <div class="ld-eyebrow">Running a game</div>
+  <ol class="ld-steps">
+    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
+    <li><b>Players join.</b> Each opens their character, goes to the play tab, types the code and their name, and presses <b>Join</b>.</li>
+    <li><b>Play.</b> Rolls from every sheet are rolled by the table and shown to all. Each character appears on the GM's cards, and injuries, points and ammunition stay in step both ways.</li>
+    <li><b>Fight.</b> The GM's battle map and encounter show on every player's play tab. Players move their own tokens and, on their turn, send the GM what they do; the GM puts it into the Encounter panel and runs it.</li>
+    <li><b>Keep it private.</b> Anyone with the code can join. The GM can <b>Remove</b> a player and <b>Change code</b> at any time.</li>
+  </ol>
+  <p style="margin-top:1rem">Each creator has a <b>How a shared game works</b> guide beside the table, for the GM and for players. The creators on this site already use a table server: nothing to set up. Read on only to host your own.</p>
+</div>
+
+<!-- Block 3: host your own (give this section the anchor id "host" in Squarespace, or keep the id below) -->
+<div class="ld" id="host">
+  <div class="ld-eyebrow">Host your own table server on Cloudflare</div>
+  <p>The table server is a small Cloudflare Worker with one Durable Object (a little database) per table. It runs on Cloudflare's free Workers plan, costs nothing while nobody is rolling, and deletes a table nobody has used for 30 days. Everything below works from a browser, an iPad included.</p>
+  <p><b>You need:</b> a free Cloudflare account; a GitHub account; and a copy of the Legend Dynamics repository on your GitHub account, with the server's folder, {code('legend-dynamics/table-server')}, on the branch Cloudflare will build (usually {code('main')}).</p>
+  <ol class="ld-steps">
+    <li><b>Create a Worker from your repository.</b> In the Cloudflare dashboard, open <b>Workers &amp; Pages</b> and press <b>Create</b>. On the <b>Workers</b> side (not Pages: Pages only serves files and can't run the server), choose <b>Continue with GitHub</b> or <b>Import a repository</b>. The first time, connect GitHub and let Cloudflare see the repository; then pick it.</li>
+    <li><b>Fill in the setup.</b> Project name {code('legend-table')} (it must match the name in the folder's {code('wrangler.toml')}). Build command: leave it empty. Deploy command: {code('npx wrangler deploy')}. Preview command, if shown: {code('npx wrangler versions upload')}. Root directory, often under <b>Advanced settings</b>: {code('legend-dynamics/table-server')}. No {code('cd')} in the commands: the root directory takes care of that. Press <b>Deploy</b>.</li>
+    <li><b>Check the branch.</b> Cloudflare builds the repository's production branch. If that branch doesn't have the server folder, the build stops with "root directory not found": open the Worker's <b>Settings → Build</b> and set the production branch (it may be called <b>Branch control</b>) to the branch that has it, then retry the build.</li>
+    <li><b>Check it's running.</b> The Worker's page shows its address, like {code('https://legend-table.yourname.workers.dev')}. Open it: it should say <i>Legend Dynamics table server.</i></li>
+    <li><b>Point the creators at it.</b> In any creator's <b>Shared table</b> box, press <b>Another table server…</b> and paste the address; each browser remembers it, so the GM and every player do this once. If you host your own copy of this site, put the address in {code('legend-dynamics/table-server/server-url.txt')} and rebuild: the creators then use it without asking.</li>
+    <li><b>Tidy up (recommended).</b> In {code('wrangler.toml')}, set {code('ALLOWED_ORIGINS')} to your site's address (add {code('null')} if people open the creators as files) so only your pages can use the server. In <b>Settings → Build</b>, set <b>Build watch paths</b> to {code('legend-dynamics/table-server/*')} so other changes don't rebuild it. In <b>Security → WAF → Rate limiting rules</b>, add one rule (the free plan allows one): about 20 requests a minute per visitor to paths starting with {code('/api/tables')}.</li>
+  </ol>
+  <p style="margin-top:1rem">From a computer instead: in the {code('legend-dynamics/table-server')} folder, run {code('npx wrangler login')} and then {code('npx wrangler deploy')}. The folder's README has the details.</p>
+</div>
+
+<!-- Block 4: if something goes wrong -->
+<div class="ld ld-rules">
+  <div class="ld-eyebrow">If something goes wrong</div>
+  <table><thead><tr><th>What you see</th><th>What to do</th></tr></thead><tbody>{rows}</tbody></table>
+  <p>Updates to the server reach Cloudflare by themselves: each change to the branch it builds deploys again. The creators keep working with an older server, so the site and the server can be updated in either order.</p>
+</div>
+"""
 
 
 def why_page():
@@ -141,6 +209,7 @@ def home():
   </ul>
   <div class="ld-actions" style="margin-top:1.2rem">
     <a class="ld-button" href="#games">Open a creator for the shared table</a>
+    <a class="ld-button ld-button--ghost" href="{TABLE_SLUG}">How the shared table works, and hosting your own</a>
     <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}">Set up the Discord dice bot</a>
   </div>
   <p style="font-size:.9rem;color:var(--ld-ink-2);margin-top:1rem">You can mix them: stream the map to a group on Discord while players who have the creator open join the shared table, or roll with the bot while the GM keeps the encounter panel.</p>
@@ -321,6 +390,7 @@ def main():
     write(WEB / "blocks" / "core-rules.html", core_rules())
     write(WEB / "blocks" / "discord.html", discord_page())
     write(WEB / "blocks" / "why.html", why_page())
+    write(WEB / "blocks" / "shared-table.html", table_page())
 
     # preview.html: the three kinds of page in a plain wrapper, using custom.css, with a tab per theme.
     css = (WEB / "custom.css").read_text()
@@ -331,6 +401,7 @@ def main():
     pages["rules"] = ("Core rules", "", strip(core_rules()))
     pages["discord"] = ("Discord", "", strip(discord_page()))
     pages["why"] = ("Why Legend Dynamics", "", strip(why_page()))
+    pages["table"] = ("Shared table", "", strip(table_page()))
     tabs = "".join(f'<button data-p="{k}" data-c="{c}">{e(n)}</button>' for k, (n, c, _) in pages.items())
     sections = "".join(f'<main class="pv" id="pv-{k}" hidden><section class="page-section"><div class="section-background"></div><div class="content">{body}</div></section></main>' for k, (_, _, body) in pages.items())
     write(WEB / "preview.html", f"""<!doctype html>
@@ -355,7 +426,7 @@ const show = (k) => {{ document.querySelectorAll(".pv").forEach((m) => (m.hidden
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${{k}}"]`).dataset.c; scrollTo(0, 0); }};
 document.querySelector(".pv-bar").onclick = (ev) => {{ const b = ev.target.closest("button"); if (b) show(b.dataset.p); }};
 document.addEventListener("click", (ev) => {{ const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{SLUGS['aurora']}": "aurora", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord", "{WHY_SLUG}": "why" }}[a.getAttribute("href")]; if (k) show(k); }});
+  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{SLUGS['aurora']}": "aurora", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord", "{WHY_SLUG}": "why", "{TABLE_SLUG}": "table" }}[a.getAttribute("href")]; if (k) show(k); }});
 show(location.hash.slice(1) || "home");
 </script></body></html>
 """)

@@ -311,7 +311,7 @@ body { margin: 0; }
 .page-section .section-background { position: absolute; inset: 0; z-index: -1; }
 .content { max-width: 72rem; margin: 0 auto; padding: 0 16px 4rem; display: grid; gap: 3rem; }
 </style></head>
-<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Trails of Blood &amp; Dust</button><button data-p="spaceopera" data-c="ld-spaceopera">Fracture Lines</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="aurora" data-c="ld-aurora">Aurora</button><button data-p="rules" data-c="">Core rules</button><button data-p="discord" data-c="">Discord</button><button data-p="why" data-c="">Why Legend Dynamics</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Trails of Blood &amp; Dust</button><button data-p="spaceopera" data-c="ld-spaceopera">Fracture Lines</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="aurora" data-c="ld-aurora">Aurora</button><button data-p="rules" data-c="">Core rules</button><button data-p="discord" data-c="">Discord</button><button data-p="why" data-c="">Why Legend Dynamics</button><button data-p="table" data-c="">Shared table</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
 <div class="ld ld-hero">
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Heroes are made of skill, nerve and a little luck.</h1>
@@ -374,6 +374,7 @@ body { margin: 0; }
   </ul>
   <div class="ld-actions" style="margin-top:1.2rem">
     <a class="ld-button" href="#games">Open a creator for the shared table</a>
+    <a class="ld-button ld-button--ghost" href="/shared-table">How the shared table works, and hosting your own</a>
     <a class="ld-button ld-button--ghost" href="/discord">Set up the Discord dice bot</a>
   </div>
   <p style="font-size:.9rem;color:var(--ld-ink-2);margin-top:1rem">You can mix them: stream the map to a group on Discord while players who have the creator open join the shared table, or roll with the bot while the GM keeps the encounter panel.</p>
@@ -2077,6 +2078,51 @@ appropriate credit to the author.</p>
     <a class="ld-button ld-button--ghost" href="/core-rules">Read the core rules</a>
   </div>
 </div>
+</div></section></main><main class="pv" id="pv-table" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Play online</div>
+  <h1>The shared table</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">Every character creator can join a shared table: the GM starts one, the players join with a code, and everyone sees the same dice, the same characters and the same fight, each on their own device.</p>
+  <div class="ld-actions">
+    <a class="ld-button" href="/#games">Open a creator</a>
+    <a class="ld-button ld-button--ghost" href="#host">Host your own table server</a>
+    <a class="ld-button ld-button--ghost" href="/discord">Or play with the Discord bot</a>
+  </div>
+</div>
+
+<div class="ld">
+  <div class="ld-eyebrow">Running a game</div>
+  <ol class="ld-steps">
+    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
+    <li><b>Players join.</b> Each opens their character, goes to the play tab, types the code and their name, and presses <b>Join</b>.</li>
+    <li><b>Play.</b> Rolls from every sheet are rolled by the table and shown to all. Each character appears on the GM's cards, and injuries, points and ammunition stay in step both ways.</li>
+    <li><b>Fight.</b> The GM's battle map and encounter show on every player's play tab. Players move their own tokens and, on their turn, send the GM what they do; the GM puts it into the Encounter panel and runs it.</li>
+    <li><b>Keep it private.</b> Anyone with the code can join. The GM can <b>Remove</b> a player and <b>Change code</b> at any time.</li>
+  </ol>
+  <p style="margin-top:1rem">Each creator has a <b>How a shared game works</b> guide beside the table, for the GM and for players. The creators on this site already use a table server: nothing to set up. Read on only to host your own.</p>
+</div>
+
+<div class="ld" id="host">
+  <div class="ld-eyebrow">Host your own table server on Cloudflare</div>
+  <p>The table server is a small Cloudflare Worker with one Durable Object (a little database) per table. It runs on Cloudflare's free Workers plan, costs nothing while nobody is rolling, and deletes a table nobody has used for 30 days. Everything below works from a browser, an iPad included.</p>
+  <p><b>You need:</b> a free Cloudflare account; a GitHub account; and a copy of the Legend Dynamics repository on your GitHub account, with the server's folder, <code>legend-dynamics/table-server</code>, on the branch Cloudflare will build (usually <code>main</code>).</p>
+  <ol class="ld-steps">
+    <li><b>Create a Worker from your repository.</b> In the Cloudflare dashboard, open <b>Workers &amp; Pages</b> and press <b>Create</b>. On the <b>Workers</b> side (not Pages: Pages only serves files and can't run the server), choose <b>Continue with GitHub</b> or <b>Import a repository</b>. The first time, connect GitHub and let Cloudflare see the repository; then pick it.</li>
+    <li><b>Fill in the setup.</b> Project name <code>legend-table</code> (it must match the name in the folder's <code>wrangler.toml</code>). Build command: leave it empty. Deploy command: <code>npx wrangler deploy</code>. Preview command, if shown: <code>npx wrangler versions upload</code>. Root directory, often under <b>Advanced settings</b>: <code>legend-dynamics/table-server</code>. No <code>cd</code> in the commands: the root directory takes care of that. Press <b>Deploy</b>.</li>
+    <li><b>Check the branch.</b> Cloudflare builds the repository's production branch. If that branch doesn't have the server folder, the build stops with "root directory not found": open the Worker's <b>Settings → Build</b> and set the production branch (it may be called <b>Branch control</b>) to the branch that has it, then retry the build.</li>
+    <li><b>Check it's running.</b> The Worker's page shows its address, like <code>https://legend-table.yourname.workers.dev</code>. Open it: it should say <i>Legend Dynamics table server.</i></li>
+    <li><b>Point the creators at it.</b> In any creator's <b>Shared table</b> box, press <b>Another table server…</b> and paste the address; each browser remembers it, so the GM and every player do this once. If you host your own copy of this site, put the address in <code>legend-dynamics/table-server/server-url.txt</code> and rebuild: the creators then use it without asking.</li>
+    <li><b>Tidy up (recommended).</b> In <code>wrangler.toml</code>, set <code>ALLOWED_ORIGINS</code> to your site's address (add <code>null</code> if people open the creators as files) so only your pages can use the server. In <b>Settings → Build</b>, set <b>Build watch paths</b> to <code>legend-dynamics/table-server/*</code> so other changes don't rebuild it. In <b>Security → WAF → Rate limiting rules</b>, add one rule (the free plan allows one): about 20 requests a minute per visitor to paths starting with <code>/api/tables</code>.</li>
+  </ol>
+  <p style="margin-top:1rem">From a computer instead: in the <code>legend-dynamics/table-server</code> folder, run <code>npx wrangler login</code> and then <code>npx wrangler deploy</code>. The folder's README has the details.</p>
+</div>
+
+<div class="ld ld-rules">
+  <div class="ld-eyebrow">If something goes wrong</div>
+  <table><thead><tr><th>What you see</th><th>What to do</th></tr></thead><tbody><tr><td>The address ends in <b>pages.dev</b>, or no deploy command was asked for</td><td>It was made as a Pages project, which only serves files. Delete it (its <b>Settings</b>, at the bottom) and create it again from the <b>Workers</b> side, as in step 1.</td></tr><tr><td>Build log: <b>root directory not found</b></td><td>Check the root directory is spelled <code>legend-dynamics/table-server</code> exactly, and that the branch being built has that folder (step 3).</td></tr><tr><td>Build log: <b>/bin/sh: legend-dynamics/table-server: not found</b></td><td>A command starts with the folder name. With the root directory set, the commands need no <code>cd</code>: just <code>npx wrangler deploy</code> and <code>npx wrangler versions upload</code>.</td></tr><tr><td>Build log: <b>pending Durable Object migration</b></td><td>The first build must be a full deploy, which creates the table storage. Retry the build from your production branch, or set the preview command to <code>npx wrangler deploy</code> for one build, then set it back.</td></tr><tr><td>A failed <b>Workers Builds</b> check on other branches</td><td>Branches without the server folder can't build it. Set <b>Build watch paths</b> to <code>legend-dynamics/table-server/*</code> (step 6) and they're skipped.</td></tr><tr><td>The creator says <b>Couldn't reach the table server</b></td><td>Check the address you pasted (it starts with https:// and ends in workers.dev) and that opening it in a browser shows the greeting (step 4).</td></tr><tr><td><b>This site isn't allowed to use the table server</b></td><td>Your site isn't in <code>ALLOWED_ORIGINS</code> (step 6). Add its address, or <code>null</code> for creators opened as files, and redeploy.</td></tr></tbody></table>
+  <p>Updates to the server reach Cloudflare by themselves: each change to the branch it builds deploys again. The creators keep working with an older server, so the site and the server can be updated in either order.</p>
+</div>
 </div></section></main>
 <script>
 const show = (k) => { document.querySelectorAll(".pv").forEach((m) => (m.hidden = m.id !== "pv-" + k));
@@ -2084,6 +2130,6 @@ const show = (k) => { document.querySelectorAll(".pv").forEach((m) => (m.hidden 
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${k}"]`).dataset.c; scrollTo(0, 0); };
 document.querySelector(".pv-bar").onclick = (ev) => { const b = ev.target.closest("button"); if (b) show(b.dataset.p); };
 document.addEventListener("click", (ev) => { const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = { "/trails-of-blood-and-dust": "western", "/fracture-lines": "spaceopera", "/the-shattered-crown": "fantasy", "/aurora": "aurora", "/core-rules": "rules", "/discord": "discord", "/why-legend-dynamics": "why" }[a.getAttribute("href")]; if (k) show(k); });
+  const k = { "/trails-of-blood-and-dust": "western", "/fracture-lines": "spaceopera", "/the-shattered-crown": "fantasy", "/aurora": "aurora", "/core-rules": "rules", "/discord": "discord", "/why-legend-dynamics": "why", "/shared-table": "table" }[a.getAttribute("href")]; if (k) show(k); });
 show(location.hash.slice(1) || "home");
 </script></body></html>
