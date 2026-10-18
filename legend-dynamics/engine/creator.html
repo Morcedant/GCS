@@ -214,6 +214,12 @@ tr.lvl-U td.target { color: var(--muted); }
 .log .f { color: var(--bad); }
 .tbl-log li { display: block; line-height: 1.45; }
 .tbl-badge { display: block; color: var(--accent); }
+.fight-order { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; padding: 0; list-style: none; }
+.fight-order li { border: 1px solid var(--line); border-radius: 8px; padding: 3px 8px; font-size: .9rem; }
+.fight-order li.now { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.fight-order li.foe { opacity: .9; } .fight-order li.out { opacity: .5; text-decoration: line-through; }
+.fight-order li.mine { font-weight: 600; }
+#fight-turn .fields { margin-top: 6px; }
 .tbl-log .tbl-old { opacity: .55; }
 #gm-table .tbl-log { max-height: 22rem; overflow-y: auto; }
 .ref { display: grid; gap: 6px; font-size: .88rem; margin: 0; }
@@ -1043,6 +1049,13 @@ tr.lvl-U td.target { color: var(--muted); }
         </div>
 
         <div class="card hud no-print" id="card-table"></div>
+        <div class="card hud no-print bm-card" id="card-fight" hidden>
+          <h3>Map and fight</h3>
+          <p class="small muted">The GM's battle map and fight, as they happen. Drag your own token to move; on your turn, tell the GM what you'll do.</p>
+          <div id="fight-strip"></div>
+          <div id="fight-turn"></div>
+          <div id="table-map"></div>
+        </div>
         <div class="card hud no-print" id="card-roll">
           <h3>Roll 3d6</h3>
           <div class="fields">
@@ -2655,7 +2668,11 @@ tr.lvl-U td.target { color: var(--muted); }
     server: TABLE_SERVER, character: () => ch.name, esc, toast,
     // Phase 2: the player shares their character; the GM's cards follow the table's characters, and both follow each other's changes.
     onPlayers: () => renderGM(), // who's at the table, on the GM's cards
-    onConnected: (role) => { if (role === "player") sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); renderGM(); },
+    // Phase 3: the GM's map and fight go to the players; their moves and requests come back to the GM.
+    onScene: (sc) => renderFight(sc),
+    onMove: (m) => { if (!battleMap.moveOwn(m.key, m.to)) gmSay(`${m.by} moved, but their token isn't on the map: add the ${T.party} to it.`, true); },
+    fillAsk: (a) => { if (!labPanel || !labPanel.fillRequest) return false; $("tab-gm").click(); return labPanel.fillRequest(a); },
+    onConnected: (role) => { if (role === "player") sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); else pushScene(); renderGM(); },
     onSheet: (e) => {
       if (e.key === ch.id && sharedTable.role() === "player") { applyPlay(ch, e.play); store.set(STORE_CURRENT, ch); render(); return; }
       if (sharedTable.role() !== "gm") return;
@@ -2676,9 +2693,10 @@ tr.lvl-U td.target { color: var(--muted); }
   // The battle map: the GM's characters as tokens (portrait, group color, down or Dying) on a hex map at any scale,
   // or on a range track of bands (a setting's pack can name its own, with ships and a crew track for the ship).
   const RTRACK = PACK.rangeTrack || {};
-  const battleMap = mountBattleMap({ root: $("battlemap"), key: PACK.id, esc, toast: gmSay,
-    bands: [["Close", 10], ["Short", 25], ["Medium", 100], ["Long", 300], ["Extreme", 1000]], kmBands: RTRACK.kmBands || [],
-    rangeTracks: PACK.rangeTracks || (RTRACK.bands ? [RTRACK] : []),
+  const MAP_BANDS = [["Close", 10], ["Short", 25], ["Medium", 100], ["Long", 300], ["Extreme", 1000]], MAP_TRACKS = PACK.rangeTracks || (RTRACK.bands ? [RTRACK] : []);
+  const battleMap = mountBattleMap({ root: $("battlemap"), key: PACK.id, esc, toast: gmSay, onChange: () => pushScene(),
+    bands: MAP_BANDS, kmBands: RTRACK.kmBands || [],
+    rangeTracks: MAP_TRACKS,
     vehicles: RTRACK.threats ? threatsFromGuide($("guide"), RTRACK.threats, "ship-") : [],
     groupTracks: () => PACK.tracks.map((t) => ({ name: t.name, boxes: t.boxes, value: Math.min(t.boxes, ship[t.name] || 0), effect: shipEffect(t.name, Math.min(t.boxes, ship[t.name] || 0)) })),
     setGroupTrack: (name, v) => { const t = PACK.tracks.find((x) => x.name === name); if (!t) return; ship[name] = Math.max(0, Math.min(t.boxes, v)); store.set(STORE_SHIP, ship); renderShip(); },
@@ -2687,7 +2705,7 @@ tr.lvl-U td.target { color: var(--muted); }
     threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge, move: x.move || LD.THREAT_MOVE,
       attacks: (x.attacks || []).map((a) => `${a.skill} ${a.target}`).join(", "), trait: x.trait ? `${x.trait}: ${x.traitText || ""}`.replace(/: $/, "") : "" })),
     crew: () => gmCrew.map((c) => { const k = gmCalc(c);
-      return { id: c.id, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
+      return { id: c.id, tableKey: c.tableKey || null, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
         color: `var(${(PACK.groups.find((g) => g.id === k.div) || PACK.groups[0]).color})`,
         injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty,
         ptrack: PTRACK ? { name: PTRACK.name, max: PTRACK.boxes, value: c.play.ptrack || 0 } : null,
@@ -2703,7 +2721,47 @@ tr.lvl-U td.target { color: var(--muted); }
   const saveGM = () => {
     if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true);
     if (sharedTable) for (const c of gmCrew) if (c.tableKey) sharedTable.pushPlay(c.tableKey, pickPlay(c)); // a change here reaches the player's sheet
+    pushScene();
   };
+  // Phase 3: the map and the fight as the players see them (sent a moment after the last change, and only by the GM).
+  function pushScene() {
+    if (!sharedTable || sharedTable.role() !== "gm") return;
+    try { battleMap; labPanel; } catch { return; } // not mounted yet (the page is still starting)
+    sharedTable.pushScene(() => ({ map: battleMap.snapshot(), fight: labPanel && labPanel.scene ? labPanel.scene() : null }));
+  }
+  // A player's view of the GM's map and fight, on their play tab.
+  let viewerMap = null;
+  function renderFight(sc) {
+    const card = $("card-fight"), me = sharedTable && sharedTable.role() === "player";
+    card.hidden = !me || !sc || (!sc.map && !sc.fight);
+    if (card.hidden) return;
+    if (sc.map) {
+      if (!viewerMap) viewerMap = mountBattleMap({ root: $("table-map"), key: PACK.id, esc, toast, viewer: true, bands: MAP_BANDS, kmBands: RTRACK.kmBands || [], rangeTracks: MAP_TRACKS,
+        pointName: T.point, stunName: T.stun, partyName: T.party, crew: () => [], threats: [],
+        canMove: (t) => !!t && t.own === ch.id, onMove: (t, to) => sharedTable.sendMove(ch.id, to) });
+      viewerMap.setState(sc.map);
+    }
+    $("table-map").hidden = !sc.map;
+    const f = sc.fight;
+    if (!f) { $("fight-strip").innerHTML = `<p class="small muted">No fight running.</p>`; $("fight-turn").innerHTML = ""; return; }
+    const now = f.people.find((p) => p.pid === f.actor), mine = f.people.find((p) => p.own === ch.id);
+    $("fight-strip").innerHTML = `<p class="small">${f.status === "ended" ? "The fight is over." : `Round ${f.round}${now ? ` · <b>${esc(now.name)}</b>'s turn` : ""}`}</p>
+      <ul class="fight-order">${f.people.map((p) => `<li class="${p.pid === f.actor ? "now " : ""}${p.side === "foe" ? "foe " : ""}${p.out || p.dead ? "out " : ""}${p.own === ch.id ? "mine" : ""}">${esc(p.name)} <span class="muted">${"●".repeat(Math.min(p.injury, p.boxes))}${"○".repeat(Math.max(0, p.boxes - p.injury))}${p.dying ? " Dying" : ""}</span></li>`).join("")}</ul>
+      ${f.log.length ? `<details><summary class="small">What just happened</summary><ul class="log tbl-log">${f.log.map((l) => `<li>${esc(l)}</li>`).join("")}</ul></details>` : ""}`;
+    const turn = f.status === "combat" && mine && f.actor === mine.pid && !mine.out;
+    const prev = $("fight-turn").dataset.turn, key = `${f.id}.${f.round}.${f.actor}`;
+    if (!turn) { $("fight-turn").innerHTML = ""; $("fight-turn").dataset.turn = ""; return; }
+    if (prev === key) return; // keep what the player is choosing
+    $("fight-turn").dataset.turn = key;
+    const others = f.people.filter((p) => p.pid !== mine.pid && !p.dead), foe = others.find((p) => p.side !== mine.side && !p.out);
+    $("fight-turn").innerHTML = `<p><b>Your turn.</b> Tell the GM what ${esc(mine.name)} does; they run it.</p>
+      <div class="fields"><div class="field"><label for="ft-action">Action</label><select id="ft-action"><option value="attack">Attack</option><option value="aim">Aim</option><option value="other">Something else</option></select></div>
+        <div class="field"><label for="ft-target">Target</label><select id="ft-target">${others.map((p) => `<option value="${esc(p.pid)}"${foe && p.pid === foe.pid ? " selected" : ""}>${esc(p.name)}</option>`).join("")}</select></div>
+        <div class="field"><label for="ft-weapon">Weapon</label><select id="ft-weapon">${(mine.weapons || []).map(([id, n]) => `<option value="${esc(id)}">${esc(n)}</option>`).join("")}</select></div>
+        <div class="field wide"><label for="ft-note">Anything else (moving first, a called shot…)</label><input type="text" id="ft-note" maxlength="200"></div></div>
+      <div class="btn-row"><button class="btn primary" id="ft-send">Send to the GM</button></div>`;
+    $("ft-send").onclick = () => { sharedTable.sendAsk({ key: ch.id, pid: mine.pid, action: $("ft-action").value, target: $("ft-target").value, weapon: $("ft-weapon").value, note: $("ft-note").value.trim() }); toast("Sent to the GM."); };
+  }
   // Work out a crew member's numbers with the same rules as the sheet, by briefly treating them as the current character.
   function gmCalc(c) {
     const saved = ch; ch = c;
@@ -2963,6 +3021,7 @@ tr.lvl-U td.target { color: var(--muted); }
   if ((PACK.arms || []).length) {
     labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText, gritty: () => gritty,
       mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
+      onScene: () => pushScene(), // the shared table's players see the fight
       crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
       // A character's numbers, as the sheet works them out; with powers, their Defense Class from Toughness or Force Field.
       // In a shapechanger's form (play.form), the form's numbers; otherwise the human form's.

@@ -7,7 +7,11 @@
 // Phase 2, shared characters: api.onSheet(entry) and api.onPlay(key, play) hear the table's characters; the page
 // calls shareMine(key, sheet, play) after a player's sheet changes and pushPlay(key, play) after the GM's cards change.
 // Only what changed is sent; what the table sends back is remembered, so it isn't sent again.
-// Returns { live(), roll(req) → Promise<entry>, setCharacter(name), shareMine, pushPlay, isHere(ownerName), role() }.
+// Phase 3, the fight: the GM's page calls pushScene({ map, fight }) when the battle map or the encounter changes; players
+// hear it through api.onScene(scene) and send sendMove(key, to) and sendAsk(request); the GM hears api.onMove(move), and
+// a player's requests wait in the GM's panel until fillAsk(ask) puts one into the encounter panel.
+// Returns { live(), roll(req) → Promise<entry>, setCharacter(name), shareMine, pushPlay, isHere(ownerName), role(),
+//   pushScene, sendMove, sendAsk, scene() }.
 function mountTable(api) {
   const esc = api.esc, KEY = api.key + ".table.v1";
   const say = (m, err) => (api.toast ? api.toast(m, err) : null);
@@ -19,6 +23,7 @@ function mountTable(api) {
   let ws = null, live = false, status = "", table = null, you = null, players = [], log = [], retry = 0, retryTimer = null, pingTimer = null, leaving = false, character = "", otherServer = false, moved = false;
   const pending = new Map(); // req → { resolve, reject, timer }
   const lastPlay = {}, lastSheet = {}; // key → the play state / sheet (JSON) the table last had
+  let scene = null, lastSceneJson = "", sceneTimer = null, asks = []; // phase 3
   let sheetTimer = null;
   const base = () => (st.server || api.server || "").trim().replace(/\/+$/, "");
   const wsUrl = () => `${base().replace(/^http/, "ws")}/api/tables/${encodeURIComponent(st.code)}/ws`;
@@ -46,9 +51,13 @@ function mountTable(api) {
         live = true; retry = 0; table = m.table; you = m.you; log = m.log || []; players = m.players || []; status = ""; st.joined = true; save(); render();
         for (const k in lastSheet) delete lastSheet[k];
         for (const e of m.sheets || []) { lastPlay[e.key] = e.play; if (api.onSheet) api.onSheet(e); }
+        scene = m.scene || null; lastSceneJson = JSON.stringify(scene); if (api.onScene) api.onScene(scene);
         if (api.onConnected) api.onConnected(you.role);
       }
       else if (m.type === "sheet") { lastPlay[m.entry.key] = m.entry.play; if (api.onSheet) api.onSheet(m.entry); }
+      else if (m.type === "scene") { scene = m.scene; if (api.onScene) api.onScene(scene); }
+      else if (m.type === "move") { if (api.onMove) api.onMove(m.move); }
+      else if (m.type === "ask") { asks = [m.ask, ...asks.filter((a) => a.key !== m.ask.key)].slice(0, 8); renderAsks(); say(`${m.ask.by} asks: ${askText(m.ask)}`); }
       else if (m.type === "play") { lastPlay[m.key] = m.play; if (api.onPlay) api.onPlay(m.key, m.play); }
       else if (m.type === "roll") {
         log.push(m.entry); if (log.length > 200) log.shift();
@@ -141,6 +150,24 @@ function mountTable(api) {
     const d = diff(key, play);
     if (Object.keys(d).length) { lastPlay[key] = { ...lastPlay[key], ...d }; sendJSON({ type: "play", key, play: d }); }
   }
+  // ---- phase 3: the fight ----
+  /** The GM's map and fight, sent a moment after the last change (and only when something the players see changed). */
+  function pushScene(next) {
+    if (!live || !you || you.role !== "gm") return;
+    clearTimeout(sceneTimer);
+    sceneTimer = setTimeout(() => { const s = next(), js = JSON.stringify(s); if (js === lastSceneJson) return; lastSceneJson = js; scene = s; sendJSON({ type: "scene", ...s }); }, 400);
+  }
+  const sendMove = (key, to) => { if (live && you && you.role === "player") sendJSON({ type: "move", key, to }); };
+  const sendAsk = (q) => { if (live && you && you.role === "player") sendJSON({ type: "ask", ...q }); };
+  const askText = (a) => { const f = scene && scene.fight, nm = (pid) => ((f && f.people.find((p) => p.pid === pid)) || {}).name || "";
+    const w = ((f && (f.people.find((p) => p.pid === a.pid) || {}).weapons) || []).find(([id]) => id === a.weapon);
+    return a.action === "attack" ? `attack ${nm(a.target) || "someone"}${w ? ` with the ${w[1].toLowerCase()}` : ""}` : a.action === "aim" ? `aim at ${nm(a.target) || "someone"}` : a.note || "something else"; };
+  function renderAsks() {
+    const el = api.gmRoot && api.gmRoot.querySelector(".tbl-asks"); if (!el) return;
+    el.innerHTML = asks.length ? `<div class="label">Players ask</div><ul class="log tbl-log">${asks.map((a, i) => `<li><b>${esc(a.by)}</b>: ${esc(askText(a))}${a.note && a.action !== "other" ? ` <span class="muted">(${esc(a.note)})</span>` : ""}
+      <button class="btn small" data-tbl="fillask" data-i="${i}">Put it in the encounter panel</button> <button class="linkish small" data-tbl="dropask" data-i="${i}">Dismiss</button></li>`).join("")}</ul>` : "";
+  }
+
   const isHere = (owner) => players.some((p) => p.role === "player" && p.name === owner);
 
   // A different character on the sheet joins under its own name.
@@ -195,14 +222,14 @@ function mountTable(api) {
           <p><b>${esc(table.name)}</b> · code <b class="num" style="font-size:1.25rem;letter-spacing:.12em">${esc(st.code)}</b></p>
           <p class="small muted">Players open their character, go to the ${esc(api.playTab || "play")} tab and join with this code, or use the link. Their characters appear under Characters below, marked <b>at the table</b>, and stay in step both ways: mark a box or a point here or in an encounter and the player's sheet changes too.</p>
           <div class="btn-row"><button class="btn" data-tbl="copycode">Copy code</button><button class="btn" data-tbl="copylink">Copy link</button><button class="btn" data-tbl="recode">Change code</button><button class="btn" data-tbl="leave">Leave</button></div>
-          <div class="btn-row tbl-remove"></div>
+          <div class="btn-row tbl-remove"></div><div class="tbl-asks"></div>
           <p class="small tbl-players"></p>${statusP}<ul class="log tbl-log"></ul>`
         : `<div class="eyebrow">Shared table</div>
           <p class="small muted">Start a table and give the players its code. Every roll they make from their sheet shows up here as it happens, rolled by the table so nobody can fudge it.</p>
           <div class="fields"><div class="field"><label for="tbl-tname">Table name</label><input type="text" id="tbl-tname" data-tbl="tname" maxlength="60" placeholder="Saturday's game"></div>${showServer ? serverField("tbl-gserver") : ""}</div>
           <div class="btn-row"><button class="btn primary" data-tbl="start">Start a table</button>${st.gmKeys[st.code] ? `<button class="btn" data-tbl="rejoin">Rejoin ${esc(st.code)} as GM</button>` : ""}${!showServer ? `<button class="linkish small" data-tbl="showserver">Another table server…</button>` : ""}</div>${statusP}`;
     }
-    renderPlayers(); renderLog();
+    renderPlayers(); renderLog(); renderAsks();
   }
   function onClick(e) {
     const b = e.target.closest("[data-tbl]"); if (!b || b.tagName === "INPUT") return;
@@ -218,6 +245,8 @@ function mountTable(api) {
     } else if (k === "start") start(val("tname"));
     else if (k === "rejoin") { st.role = "gm"; st.joined = true; save(); connect(); }
     else if (k === "leave") leave();
+    else if (k === "fillask") { const a = asks[+b.dataset.i]; if (a && api.fillAsk && api.fillAsk(a)) { asks.splice(+b.dataset.i, 1); renderAsks(); } else say("Start the encounter with that character in it first.", true); }
+    else if (k === "dropask") { asks.splice(+b.dataset.i, 1); renderAsks(); }
     else if (k === "kick") {
       if (!confirm(`Remove ${b.dataset.who} from the table? They're disconnected, their character stops being shared, and this browser of theirs can't rejoin. Change the code too if they might come back another way.`)) return;
       sendJSON({ type: "kick", cid: b.dataset.cid });
@@ -243,5 +272,5 @@ function mountTable(api) {
   character = String(api.character() || "").trim();
   render();
   if (st.joined && st.code && base()) connect(); // back at the table after a reload
-  return { live: () => live, roll, setCharacter, shareMine, pushPlay, isHere, role: () => (live && you ? you.role : null) };
+  return { live: () => live, roll, setCharacter, shareMine, pushPlay, isHere, role: () => (live && you ? you.role : null), pushScene, sendMove, sendAsk, scene: () => scene };
 }

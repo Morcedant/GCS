@@ -10,6 +10,9 @@
  *   { type: "play", key, play }            a change to a shared character's play state (GM: anyone's; player: their own)
  *   { type: "kick", cid }                  GM: remove a player (they can't rejoin from that browser; their characters stop being shared)
  *   { type: "recode" }                     GM: move the table to a new code; everyone connected follows, the old code stops working
+ *   { type: "scene", map?, fight? }        GM: the battle map (no pictures) and the fight, as the players see them
+ *   { type: "move", key, to }              player: drag your own token (sent on to the GM's map)
+ *   { type: "ask", key, pid, action, target?, weapon?, note? }   player: what you'd like to do on your turn (to the GM)
  *   { type: "ping" }
  * Server → client
  *   { type: "welcome", table: { name, game }, you, log, players, sheets }   sheets: every shared character
@@ -22,9 +25,11 @@
  *   { type: "unshared", keys }             characters no longer shared (their player was removed)
  *   { type: "kicked" }                     to a removed player, before their connection closes
  *   { type: "moved", code }                the table's new code: reconnect with it
+ *   { type: "scene", scene }               the latest map and fight (also in welcome)
+ *   { type: "move", move } · { type: "ask", ask }   to the GM only
  *   { type: "pong" }
  */
-import { newTable, hello, roll, rateCheck, presence, hashKey, serverDice, shareSheet, changePlay, publicSheet, publicEntry, removeOwner, isBanned, newCode, newCid, cryptoInt, MAX_MESSAGE, MAX_SHEET, IDLE_DAYS } from "./logic.js";
+import { newTable, hello, roll, rateCheck, presence, hashKey, serverDice, shareSheet, changePlay, publicSheet, publicEntry, removeOwner, isBanned, newCode, newCid, cryptoInt, checkScene, checkMove, checkAsk, MAX_SCENE, MAX_MESSAGE, MAX_SHEET, IDLE_DAYS } from "./logic.js";
 
 const DAY = 86_400_000;
 
@@ -87,7 +92,7 @@ export class Table {
   /** @param {any} ws @param {string | ArrayBuffer} data */
   async webSocketMessage(ws, data) {
     if (!this.table) { this.send(ws, { type: "error", error: "This table has closed." }); ws.close(1008, "no table"); return; }
-    if (typeof data !== "string" || data.length > MAX_SHEET + 1024 || (data.length > MAX_MESSAGE && !data.startsWith('{"type":"sheet"'))) { this.send(ws, { type: "error", error: "That message was too large." }); return; }
+    if (typeof data !== "string" || data.length > MAX_SCENE + 1024 || (data.length > MAX_SHEET + 1024 && !data.startsWith('{"type":"scene"')) || (data.length > MAX_MESSAGE && !/^\{"type":"(sheet|scene)"/.test(data))) { this.send(ws, { type: "error", error: "That message was too large." }); return; }
     /** @type {any} */ let msg;
     try { msg = JSON.parse(data); } catch { this.send(ws, { type: "error", error: "That wasn't a message the table understands." }); return; }
     const att = ws.deserializeAttachment() || { who: null, times: [] };
@@ -102,7 +107,7 @@ export class Table {
       if (r.who.role === "player" && isBanned(this.table, r.who.owner)) { this.send(ws, { type: "error", error: "The GM has removed you from this table." }); ws.close(1008, "removed"); return; }
       r.who.cid = newCid();
       att.who = r.who; ws.serializeAttachment(att);
-      this.send(ws, { type: "welcome", table: { name: this.table.name, game: this.table.game }, you: { role: r.who.role, name: r.who.name, character: r.who.character }, log: this.table.log.map(publicEntry), players: presence(this.whos()), sheets: Object.values(this.sheets).map(publicSheet) });
+      this.send(ws, { type: "welcome", table: { name: this.table.name, game: this.table.game }, you: { role: r.who.role, name: r.who.name, character: r.who.character }, log: this.table.log.map(publicEntry), players: presence(this.whos()), sheets: Object.values(this.sheets).map(publicSheet), scene: this.table.scene || null });
       this.broadcast({ type: "players", players: presence(this.whos()) }, ws);
       return;
     }
@@ -127,6 +132,14 @@ export class Table {
       this.table.active = now; await this.save();
       if (msg.type === "sheet") this.broadcast({ type: "sheet", entry: publicSheet(r.entry) });
       else this.broadcast({ type: "play", key: r.entry.key, play: r.entry.play, rev: r.entry.rev });
+      return;
+    }
+    if (msg.type === "scene" || msg.type === "move" || msg.type === "ask") {
+      const r = msg.type === "scene" ? checkScene(att.who, msg) : msg.type === "move" ? checkMove(this.sheets, att.who, msg) : checkAsk(this.sheets, att.who, msg);
+      if ("error" in r) { this.send(ws, { type: "error", req: msg.req, error: r.error }); return; }
+      if ("scene" in r) { this.table.scene = r.scene; this.table.active = Date.now(); await this.save(); this.broadcast({ type: "scene", scene: r.scene }, ws); return; }
+      const out = "move" in r ? { type: "move", move: r.move } : { type: "ask", ask: { ...r.ask, at: Date.now() } };
+      for (const s of this.ctx.getWebSockets()) if (((s.deserializeAttachment() || {}).who || {}).role === "gm") this.send(s, out);
       return;
     }
     if (msg.type === "kick" || msg.type === "recode") {

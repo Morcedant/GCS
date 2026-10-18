@@ -12,6 +12,8 @@ Without a table, or if the server can't be reached, the roller works exactly as 
 
 It runs on **Cloudflare Workers** with one **Durable Object** per table (SQLite storage, available on the Workers Free plan). Connections hibernate while nobody is rolling, so an idle table costs nothing. A table nobody has used for 30 days is deleted.
 
+- **the fight (phase 3):** the GM's battle map and encounter appear on every player's play tab, in a **Map and fight** card: the map (without its background picture) with everyone's tokens and injuries, the turn order with whose turn it is, and the latest lines of the fight. Players can pan, zoom and measure, and drag **their own** token: the move goes to the GM's map. On their turn they get a **Your turn** form (attack, aim or something else, the target, the weapon, a note) and **Send to the GM**; the request waits in the GM's Shared table panel, and **Put it in the encounter panel** fills in the action for the GM to check and run. The GM's page still runs every roll of the fight.
+
 ## Set it up
 
 You need a Cloudflare account (the same one as the site and the dice bot).
