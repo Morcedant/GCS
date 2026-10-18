@@ -239,6 +239,19 @@ tr.lvl-U td.target { color: var(--muted); }
 .log li { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid rgba(92, 170, 255, .12); padding: 3px 0; }
 .log .s { color: var(--good); }
 .log .f { color: var(--bad); }
+/* The shared table */
+.tbl-log li { display: block; line-height: 1.45; }
+.tbl-log .tbl-old { opacity: .55; }
+#gm-table .tbl-log { max-height: 22rem; overflow-y: auto; }
+#gm-table, #card-table { margin-bottom: 16px; }
+p.bad, .small.bad { color: var(--bad); }
+.tbl-badge { display: block; color: var(--accent); }
+.fight-order { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; padding: 0; list-style: none; }
+.fight-order li { border: 1px solid var(--line); border-radius: 8px; padding: 3px 8px; font-size: .9rem; }
+.fight-order li.now { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.fight-order li.foe { opacity: .9; } .fight-order li.out { opacity: .5; text-decoration: line-through; }
+.fight-order li.mine { font-weight: 600; }
+#fight-turn .fields { margin-top: 6px; }
 .ref { display: grid; gap: 6px; font-size: .88rem; margin: 0; }
 .ref dt { font: 600 .72rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--chrome); }
 .ref dd { margin: 0 0 6px; color: #c0cfe3; }
@@ -554,7 +567,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="243322b" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 243322b</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="ef64ca4" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · ef64ca4</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -769,6 +782,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   <!-- GM VIEW -->
   <section id="view-gm" role="tabpanel" aria-labelledby="tab-gm" hidden>
+    <div class="panel hud no-print" id="gm-table"></div>
     <div class="gm-top">
       <div class="card hud no-print">
         <h3>Crew</h3>
@@ -3750,6 +3764,14 @@ tr.lvl-U td.target { color: var(--muted); }
           </div>
         </div>
 
+        <div class="card hud no-print" id="card-table"></div>
+        <div class="card hud no-print bm-card" id="card-fight" hidden>
+          <h3>Map and fight</h3>
+          <p class="small muted">The GM's battle map and fight, as they happen. Drag your own token to move; on your turn, tell the GM what you'll do.</p>
+          <div id="fight-strip"></div>
+          <div id="fight-turn"></div>
+          <div id="table-map"></div>
+        </div>
         <div class="card hud no-print" id="card-roll">
           <h3>Roll 3d6</h3>
           <div class="fields">
@@ -4185,6 +4207,8 @@ tr.lvl-U td.target { color: var(--muted); }
   ];
   // Ways to roll each total on 3d6, index 0 = total 3.
   const WAYS = [1, 3, 6, 10, 15, 21, 25, 27, 27, 25, 21, 15, 10, 6, 3, 1];
+  const TABLE_SERVER = "https://legend-table.des0906.workers.dev"; // the shared table server (legend-dynamics/table-server), set by tools/build-guide.py
+  let sharedTable = null; // mounted with the GM view below
   const STORE_ROSTER = "pelion.roster.v1", STORE_CURRENT = "pelion.current.v1", POOL = 5, BASE = 10, MAX_START = 13;
 
   const $ = (id) => document.getElementById(id);
@@ -4449,6 +4473,7 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   function render() {
+    if (sharedTable) sharedTable.setCharacter(ch.name);
     $("custom-role-wrap").hidden = $("custom-group-wrap").hidden = !ch.customRole;
     if (ch.customRole) { if ($("f-customrole").value !== ch.dept) $("f-customrole").value = ch.dept; $("f-customgroup").value = ch.customGroup || "command"; }
     $("role-skills").textContent = (ROLE_SKILLS[ch.dept] || []).length ? `Core skills: ${ROLE_SKILLS[ch.dept].join(", ")} (marked Trained for you)` : "";
@@ -4706,7 +4731,7 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   let last = null;
-  function doRoll(isReroll) {
+  async function doRoll(isReroll) {
     let phaserNote = "";
     if (!isReroll && !$("r-setting-wrap").hidden && $("r-setting").value !== "ship") {
       const set = spendPhaser($("r-setting").value);
@@ -4715,13 +4740,21 @@ tr.lvl-U td.target { color: var(--muted); }
     }
     const { name, base, total } = rollMods();
     const t = base + total;
-    const dice = [1, 2, 3].map(() => 1 + Math.floor(Math.random() * 6));
+    const attackRoll = !$("r-called-wrap").hidden, called = attackRoll ? (isReroll && last ? last.called : +$("r-called").value) : 0;
+    // At a shared table, the table rolls the dice and everyone sees them; otherwise (or if it doesn't answer) they're rolled here.
+    let tableDice = null, sharedN = null;
+    if (sharedTable && sharedTable.live()) {
+      $("r-roll").disabled = true;
+      try { const e = await sharedTable.roll({ label: name, target: t, base, mod: t - base, attack: attackRoll, called: !!called, of: isReroll && last ? last.sharedN : undefined }); tableDice = e.dice; sharedN = e.n; }
+      catch (err) { toast(`The table didn't take that roll (${err.message}), so it was rolled here and only you see it.`, true); }
+      finally { $("r-roll").disabled = false; }
+    }
+    const dice = tableDice || [1, 2, 3].map(() => 1 + Math.floor(Math.random() * 6));
     const sum = dice[0] + dice[1] + dice[2];
     const auto = sum <= 4 ? "auto-s" : sum >= 17 ? "auto-f" : "";
     const ok = auto === "auto-s" || (auto !== "auto-f" && sum <= t);
     const margin = t - sum;
-    const attackRoll = !$("r-called-wrap").hidden, called = attackRoll ? (isReroll && last ? last.called : +$("r-called").value) : 0;
-    last = { name, t, dice, sum, ok, margin, auto, attackRoll, called, sk: isReroll && last ? last.sk : $("r-skill").value, rerolled: !!isReroll, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
+    last = { name, t, dice, sum, ok, margin, auto, attackRoll, called, sharedN, shared: !!tableDice, sk: isReroll && last ? last.sk : $("r-skill").value, rerolled: !!isReroll, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
     ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
     ch.play.log = ch.play.log.slice(0, 12);
     if ($("r-stun").checked) { ch.play.stunned = false; $("f-stunned").checked = false; }
@@ -4747,7 +4780,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (r.phaserNote) note += ` Phaser ${r.phaserNote.charAt(0).toLowerCase()}${r.phaserNote.slice(1)}`;
     el.innerHTML = `
       <div class="dice">${r.dice.map((d) => `<span class="die rolling">${d}</span>`).join("")}
-        <span class="num" style="font-size:1.3rem">= ${r.sum}</span><span class="muted">vs ${r.t}</span></div>
+        <span class="num" style="font-size:1.3rem">= ${r.sum}</span><span class="muted">vs ${r.t}</span>${r.shared ? `<span class="small muted">· rolled by the table</span>` : ""}</div>
       <div class="verdict">${r.ok ? "Success" : "Failure"}</div>
       <p class="small">${note}${r.rerolled ? " <i>Duty point reroll: this result stands.</i>" : ""}</p>
       ${!r.rerolled && ch.play.duty > 0 ? `<div><button class="btn" id="r-reroll">Spend a Duty point to reroll</button></div>` : ""}`;
@@ -4762,7 +4795,16 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   // ---- persistence ----
-  function save() { store.set(STORE_CURRENT, ch); }
+  function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
+  // The shared table's part of an officer (phase 2): its play state, as the table keeps it, and its sheet without that.
+  // Pelion's phaser power and spare cells travel as the table's rounds and spares.
+  const pickPlay = (c) => { const p = c.play || {}, ph = p.phaser || {};
+    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, lasting: p.lasting || [] };
+    if (Number.isInteger(ph.power)) o.rounds = ph.power; if (Number.isInteger(ph.spares)) o.spares = ph.spares;
+    return o; };
+  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "lasting"]) if (k in q) c.play[k] = q[k];
+    if (c.play.phaser) { if ("rounds" in q) c.play.phaser.power = q.rounds; if ("spares" in q) c.play.phaser.spares = q.spares; } };
+  const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
   function load(c) { ch = normalize(c); rankOther = false; last = null; $("r-result").hidden = true; bindFields(); render(); }
   let rankOther = false; // "Other rank…" chosen, even before anything is typed
@@ -5157,10 +5199,14 @@ tr.lvl-U td.target { color: var(--muted); }
 //   rangeTracks: [{ id, title, us, bands: [[name, distance text]], note, help, startLane, vehicleTrack (a crew track, e.g. Hull; vehicleTracks lists more to show, e.g. Shields and systems) or
 //     vehicle: { name, boxes, label, effects: [text per boxes marked], downText } (its own boxes, e.g. a stagecoach) }]; or rangeTrack: one
 //   groupTracks(): [{ name, boxes, value, effect }] and setGroupTrack(name, value): the crew's shared tracks (Hull)
-// Returns { refresh() } to call when the characters or tracks change.
+//   onChange(): called after every change to the map (the shared table sends it on to the players)
+//   viewer: true for a player's copy of the GM's map (shared table): no editing; canMove(token) says which tokens the
+//     player may drag (their own), and onMove(token, to) sends the move to the GM
+// Returns { refresh() } to call when the characters or tracks change; snapshot() (the map as the players see it, without
+// pictures), setState(snapshot) for a viewer, and moveOwn(key, to) for the GM to apply a player's move.
 function mountBattleMap(api) {
   const SVGNS = "http://www.w3.org/2000/svg", SQ3 = Math.sqrt(3);
-  const esc = api.esc, KEY = api.key + ".battlemap.v1";
+  const esc = api.esc, KEY = api.key + (api.viewer ? ".battlemap.view.v1" : ".battlemap.v1");
   const say = (m, err) => (api.toast ? api.toast(m, err) : null);
   const PARTY = api.partyName || "party", Party = PARTY[0].toUpperCase() + PARTY.slice(1);
   // The range tracks: the setting's own (a ship fight, a stagecoach chase), or one plain track. The first is "range".
@@ -5188,7 +5234,7 @@ function mountBattleMap(api) {
 
   // ---- storage ----
   function load() { try { const v = JSON.parse(localStorage.getItem(KEY) || "null"); return v && typeof v === "object" ? v : {}; } catch { return {}; } }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { say("The map is too large to keep in this browser; save it to a file.", true); } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { say("The map is too large to keep in this browser; save it to a file.", true); } if (api.onChange) api.onChange(); }
   const idb = (() => {
     let db = null;
     const open = () => new Promise((res, rej) => { if (db) return res(db); try { const r = indexedDB.open("legend-dynamics-maps", 1);
@@ -5338,6 +5384,9 @@ function mountBattleMap(api) {
   const $ = (s) => api.root.querySelector(s);
   const svg = $(".bm-svg"), world = $(".bm-world"), gTok = $(".bm-tokens"), gMeas = $(".bm-measure"), gLanes = $(".bm-lanes"), readout = $(".bm-readout");
   const el = (tag, attrs) => { const n = document.createElementNS(SVGNS, tag); for (const [k, v] of Object.entries(attrs || {})) n.setAttribute(k, v); return n; };
+  // A player's copy shows the map and lets them pan, zoom, measure and move their own token; the GM edits everything else.
+  if (api.viewer) for (const q of [".bm-help", ".bm-kinds", ".bm-add", ".bm-gridset", ".bm-sel", '[data-bm="posse"]', '[data-bm="vehicle"]', '[data-bm="add"]', ".bm-bar .bm-file"])
+    api.root.querySelectorAll(q).forEach((x) => { x.hidden = true; x.style.display = "none"; });
 
   // ---- threats: people, and ships where the setting has them ----
   const allThreats = () => [...(api.vehicles || []), ...(api.threats || [])];
@@ -5380,7 +5429,7 @@ function mountBattleMap(api) {
     if (c) return { c, name: c.name, color: c.color, img: c.portrait, boxes: c.boxes || 3, inj: c.injury || 0, down: c.down, dying: c.dying };
     if (tr) return { tr, name: t.name || RT.us, color: t.color || "#3d7a9e", img: t.img, boxes: tr.boxes, inj: tr.value || 0, down: (tr.value || 0) >= tr.boxes };
     const boxes = t.boxes || 0, inj = t.injury || 0;
-    return { name: t.name, color: t.color, img: t.img, boxes, inj, down: boxes && inj >= boxes };
+    return { name: t.name, color: t.color, img: t.img, boxes, inj, down: boxes && inj >= boxes, dying: !!t.dying };
   }
   function drawTokens() {
     gTok.textContent = "";
@@ -5412,6 +5461,7 @@ function mountBattleMap(api) {
     readout.textContent = rangeText(n);
   }
   function drawSel() {
+    if (api.viewer) return;
     const box = $(".bm-sel"), t = toks().find((x) => x.id === sel);
     box.hidden = !t;
     if (!t) return;
@@ -5511,7 +5561,7 @@ function mountBattleMap(api) {
     if (pointers.size === 2) { const [a, b] = [...pointers.values()]; drag = { kind: "pinch", d: Math.hypot(a.sx - b.sx, a.sy - b.sy) }; return; }
     const p = mapPt(ev), tg = ev.target.closest && ev.target.closest("[data-tok]");
     if (mode === "measure" && !isRange()) { const h = toHex(p.x, p.y); measure = { a: h, b: h }; drag = { kind: "measure" }; drawMeasure(); return; }
-    if (tg) {
+    if (tg && (!api.viewer || (api.canMove && api.canMove(toks().find((x) => x.id === tg.dataset.tok))))) {
       const t = toks().find((x) => x.id === tg.dataset.tok), o = posOf(t); sel = t.id;
       const at = isRange() ? { lane: t.lane || 0, y: t.y } : { q: t.q, r: t.r };
       drag = { kind: "token", t, from: at, to: { ...at }, moved: false, off: { x: p.x - o.x, y: p.y - o.y } }; drawTokens(); drawSel(); return;
@@ -5539,7 +5589,7 @@ function mountBattleMap(api) {
     if (!drag) return;
     if (drag.kind === "token") {
       const t = drag.t;
-      if (drag.moved) { if (isRange()) { t.lane = drag.to.lane; t.y = drag.to.y; } else { t.q = drag.to.q; t.r = drag.to.r; } }
+      if (drag.moved) { if (isRange()) { t.lane = drag.to.lane; t.y = drag.to.y; } else { t.q = drag.to.q; t.r = drag.to.r; } if (api.viewer && api.onMove) api.onMove(t, { ...drag.to }); }
       drag = null; drawTokens(); drawMeasure(); readout.textContent = ""; save(); sel = t.id; drawSel(); return;
     }
     if (drag.kind === "pan" && !drag.moved && sel) { sel = null; drawTokens(); drawSel(); }
@@ -5549,7 +5599,7 @@ function mountBattleMap(api) {
   svg.addEventListener("pointerup", end); svg.addEventListener("pointercancel", end);
   svg.addEventListener("wheel", (ev) => { ev.preventDefault(); const p = mapPt(ev); zoomAt(ev.deltaY < 0 ? 1.12 : 1 / 1.12, p.sx, p.sy); clearTimeout(svg._t); svg._t = setTimeout(save, 300); }, { passive: false });
   svg.addEventListener("keydown", (ev) => {
-    const tg = ev.target.closest && ev.target.closest("[data-tok]"); if (!tg) return;
+    const tg = ev.target.closest && ev.target.closest("[data-tok]"); if (!tg || api.viewer) return;
     if (ev.key === "Delete" || ev.key === "Backspace") { setToks(toks().filter((t) => t.id !== tg.dataset.tok)); sel = null; save(); draw(); ev.preventDefault(); }
     if (ev.key === "Enter" || ev.key === " ") { sel = tg.dataset.tok; drawTokens(); drawSel(); ev.preventDefault(); }
   });
@@ -5701,7 +5751,34 @@ function mountBattleMap(api) {
     return { hexes, yards, scale: st.scale.n, band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
   }
 
-  return { distanceBetween, refresh: () => {
+  // ---- the shared table ----
+  // The map as players see it: positions and what each token shows, without pictures; "own" is the shared character's key.
+  function snapshot() {
+    const res = (l) => l.map((t) => { const k = info(t), c = k.c;
+      return { id: t.id, q: t.q, r: t.r, lane: t.lane, y: t.y, tsize: t.tsize, name: k.name || "", color: k.color || "#777", boxes: k.boxes || 0, injury: k.inj || 0, dying: !!k.dying, own: c ? c.tableKey || null : t.own || null }; });
+    return { kind: st.kind, scale: st.scale, size: st.size, orient: st.orient, ox: st.ox, oy: st.oy, cols: st.cols, rows: st.rows, grid: st.grid, gridAlpha: st.gridAlpha,
+      tokens: res(st.tokens), rts: Object.fromEntries(Object.entries(st.rts).map(([k, v]) => [k, { tokens: res(v.tokens) }])) };
+  }
+  // A viewer takes the GM's map, keeping its own pan and zoom.
+  function setState(s) {
+    const views = { hex: st.view, ...Object.fromEntries(Object.entries(st.rts).map(([k, v]) => [k, v.view])) };
+    if (drag) return; // not while the player is dragging; the next update brings it
+    st = normal({ ...s, view: views.hex });
+    for (const [k, v] of Object.entries(views)) if (k !== "hex" && st.rts[k] && v) st.rts[k].view = v;
+    RT = TRACKS.find((t) => t.id === st.kind) || TRACKS[0];
+    try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { /* the view works without it */ }
+    draw(); if (!V().set && svg.clientWidth) fit();
+  }
+  // The GM applies a player's move of their own token (key: their shared character).
+  function moveOwn(key, to) {
+    const c = api.crew().find((x) => x.tableKey === key), t = c && toks().find((x) => x.ref === c.id);
+    if (!t || !to) return false;
+    if (isRange()) { if (Number.isInteger(to.lane)) { t.lane = Math.max(0, Math.min(lanes().length - 1, to.lane)); t.y = +to.y || t.y; } }
+    else if (Number.isInteger(to.q) && Number.isInteger(to.r)) { t.q = to.q; t.r = to.r; }
+    save(); draw(); return true;
+  }
+
+  return { distanceBetween, snapshot, setState, moveOwn, refresh: () => {
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();
@@ -5728,6 +5805,284 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   }).filter((x) => x.name);
 }
 /* BATTLEMAP:END */
+/* TABLECLIENT:START */
+// The shared table, in the page: join a table from the play tab, start one from the GM view, and see every
+// roll at the table as it happens. Rolls made while connected are rolled by the table server, so everyone sees
+// the same dice. Plain script, inlined by tools/build-legend.py (/* TABLECLIENT */); no modules, no page globals.
+//
+// mountTable(api) with api: { playRoot, gmRoot (elements), key (storage prefix), game (the setting's id), title,
+//   server (the default table server, may be ""), character() → the sheet's character name, esc, toast }
+// Phase 2, shared characters: api.onSheet(entry) and api.onPlay(key, play) hear the table's characters; the page
+// calls shareMine(key, sheet, play) after a player's sheet changes and pushPlay(key, play) after the GM's cards change.
+// Only what changed is sent; what the table sends back is remembered, so it isn't sent again.
+// Phase 3, the fight: the GM's page calls pushScene({ map, fight }) when the battle map or the encounter changes; players
+// hear it through api.onScene(scene) and send sendMove(key, to) and sendAsk(request); the GM hears api.onMove(move), and
+// a player's requests wait in the GM's panel until fillAsk(ask) puts one into the encounter panel.
+// Returns { live(), roll(req) → Promise<entry>, setCharacter(name), shareMine, pushPlay, isHere(ownerName), role(),
+//   pushScene, sendMove, sendAsk, scene() }.
+function mountTable(api) {
+  const esc = api.esc, KEY = api.key + ".table.v1";
+  const say = (m, err) => (api.toast ? api.toast(m, err) : null);
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
+  const st = Object.assign({ server: api.server || "", code: "", name: "", role: "player", gmKeys: {}, joined: false }, load());
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { /* private window: works for this visit */ } };
+  // This browser's private id: the table knows a player's characters by it, so nobody can change them by typing the same name.
+  if (!st.pid) { const b = new Uint8Array(18); crypto.getRandomValues(b); st.pid = btoa(String.fromCharCode(...b)).replace(/[+/=]/g, (c) => ({ "+": "-", "/": "_", "=": "" })[c]); save(); }
+  let ws = null, live = false, status = "", table = null, you = null, players = [], log = [], retry = 0, retryTimer = null, pingTimer = null, leaving = false, character = "", otherServer = false, moved = false;
+  const pending = new Map(); // req → { resolve, reject, timer }
+  const lastPlay = {}, lastSheet = {}; // key → the play state / sheet (JSON) the table last had
+  let scene = null, lastSceneJson = "", sceneTimer = null, asks = []; // phase 3
+  let sheetTimer = null;
+  const base = () => (st.server || api.server || "").trim().replace(/\/+$/, "");
+  const wsUrl = () => `${base().replace(/^http/, "ws")}/api/tables/${encodeURIComponent(st.code)}/ws`;
+  const shareLink = () => `${location.href.split("#")[0]}#table=${st.code}`;
+
+  // A share link (#table=CODE) fills in the code.
+  const fromHash = (location.hash.match(/table=([A-Za-z0-9]{6})/) || [])[1];
+  if (fromHash && fromHash.toUpperCase() !== st.code) { st.code = fromHash.toUpperCase(); st.joined = false; st.role = "player"; save(); }
+
+  function connect() {
+    clearTimeout(retryTimer);
+    if (!base()) { status = "Set the table server's address first."; render(); return; }
+    if (ws) { leaving = true; try { ws.close(); } catch { /* closed */ } }
+    leaving = false; status = "Connecting…"; render();
+    let sock;
+    try { sock = new WebSocket(wsUrl()); } catch { status = "That table server address doesn't work."; render(); return; }
+    ws = sock;
+    sock.onopen = () => {
+      sock.send(JSON.stringify({ type: "hello", role: st.role, name: st.name, character: st.role === "gm" ? "" : character, game: api.game, key: st.role === "gm" ? st.gmKeys[st.code] : undefined, pid: st.pid }));
+      clearInterval(pingTimer); pingTimer = setInterval(() => { if (sock.readyState === 1) sock.send('{"type":"ping"}'); }, 30000);
+    };
+    sock.onmessage = (e) => {
+      let m; try { m = JSON.parse(e.data); } catch { return; }
+      if (m.type === "welcome") {
+        live = true; retry = 0; table = m.table; you = m.you; log = m.log || []; players = m.players || []; status = ""; st.joined = true; save(); render();
+        for (const k in lastSheet) delete lastSheet[k];
+        for (const e of m.sheets || []) { lastPlay[e.key] = e.play; if (api.onSheet) api.onSheet(e); }
+        scene = m.scene || null; lastSceneJson = JSON.stringify(scene); if (api.onScene) api.onScene(scene);
+        if (api.onConnected) api.onConnected(you.role);
+      }
+      else if (m.type === "sheet") { lastPlay[m.entry.key] = m.entry.play; if (api.onSheet) api.onSheet(m.entry); }
+      else if (m.type === "scene") { scene = m.scene; if (api.onScene) api.onScene(scene); }
+      else if (m.type === "move") { if (api.onMove) api.onMove(m.move); }
+      else if (m.type === "ask") { asks = [m.ask, ...asks.filter((a) => a.key !== m.ask.key)].slice(0, 8); renderAsks(); say(`${m.ask.by} asks: ${askText(m.ask)}`); }
+      else if (m.type === "play") { lastPlay[m.key] = m.play; if (api.onPlay) api.onPlay(m.key, m.play); }
+      else if (m.type === "roll") {
+        log.push(m.entry); if (log.length > 200) log.shift();
+        const p = m.req && pending.get(m.req); if (p) { clearTimeout(p.timer); pending.delete(m.req); p.resolve(m.entry); }
+        renderLog();
+      } else if (m.type === "rerolled") { const x = log.find((l) => l.n === m.n); if (x) x.rerolled = true; renderLog(); }
+      else if (m.type === "players") { players = m.players || []; renderPlayers(); if (api.onPlayers) api.onPlayers(); }
+      else if (m.type === "unshared") { for (const k of m.keys || []) delete lastPlay[k]; if (api.onUnshared) api.onUnshared(m.keys || []); }
+      else if (m.type === "kicked") { st.joined = false; save(); status = "The GM removed you from this table."; leaving = true; }
+      else if (m.type === "moved") { // the GM changed the code: follow it
+        const old = st.code; st.code = m.code;
+        if (st.gmKeys[old]) { st.gmKeys[m.code] = st.gmKeys[old]; delete st.gmKeys[old]; }
+        save(); retry = 0; moved = true; status = `The table's code is now ${m.code}.`;
+        if (location.hash.includes("table=")) history.replaceState(null, "", location.href.split("#")[0]);
+      }
+      else if (m.type === "error") {
+        const p = m.req && pending.get(m.req);
+        if (p) { clearTimeout(p.timer); pending.delete(m.req); p.reject(new Error(m.error)); }
+        else { status = m.error; if (!live) { st.joined = false; save(); } render(); }
+      }
+    };
+    sock.onclose = () => {
+      if (ws !== sock) return;
+      const was = live; live = false; ws = null; clearInterval(pingTimer);
+      for (const [, p] of pending) { clearTimeout(p.timer); p.reject(new Error("the connection dropped")); }
+      pending.clear();
+      if (leaving || !st.joined) { if (!status || status === "Connecting…") status = was ? "" : "Couldn't reach the table."; render(); return; }
+      if (!was && retry >= 5) { st.joined = false; save(); status = "Couldn't reach the table. Try joining again in a moment."; render(); return; }
+      if (moved) { moved = false; connect(); return; } // the GM changed the code: straight back in with the new one
+      retry = Math.min(retry + 1, 5); status = `Connection lost. Reconnecting in ${[1, 2, 4, 8, 15][retry - 1]}s…`; render();
+      retryTimer = setTimeout(connect, [1, 2, 4, 8, 15][retry - 1] * 1000);
+    };
+  }
+  // Joining checks the table exists first, so a mistyped code says so instead of retrying.
+  async function join() {
+    if (!base()) { status = "Set the table server's address first."; render(); return; }
+    status = "Looking for the table…"; render();
+    try {
+      const r = await fetch(`${base()}/api/tables/${encodeURIComponent(st.code)}`), b = await r.json();
+      if (!r.ok) throw new Error(b.error || "the server refused");
+      if (b.game && b.game !== api.game) throw new Error(`that table plays a different game (${b.game}). Open that game's creator to join`);
+    } catch (e) { status = /fetch|network|load/i.test(e.message) ? "Couldn't reach the table server: check its address and your connection." : e.message; st.joined = false; save(); render(); return; }
+    st.joined = true; save(); connect();
+  }
+  function leave() { leaving = true; st.joined = false; save(); clearTimeout(retryTimer); if (ws) try { ws.close(); } catch { /* closed */ } live = false; table = null; status = ""; render(); }
+
+  async function start(name) {
+    if (!base()) { say("Set the table server's address first.", true); return; }
+    status = "Starting a table…"; render();
+    try {
+      const r = await fetch(base() + "/api/tables", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, game: api.game }) });
+      const b = await r.json();
+      if (!r.ok) throw new Error(b.error || "the server refused");
+      st.code = b.code; st.gmKeys[b.code] = b.gmKey; st.role = "gm"; st.name = st.name || "GM"; st.joined = true; save(); connect();
+    } catch (e) { status = `Couldn't start a table: ${e.message}.`; render(); }
+  }
+
+  /** A roll by the table's dice. req: { label, target, base?, mod?, attack?, called?, of? } */
+  function roll(req) {
+    return new Promise((resolve, reject) => {
+      if (!live || !ws) { reject(new Error("not connected")); return; }
+      const id = Math.random().toString(36).slice(2, 10);
+      const timer = setTimeout(() => { pending.delete(id); reject(new Error("no answer from the table")); }, 6000);
+      pending.set(id, { resolve, reject, timer });
+      ws.send(JSON.stringify({ type: "roll", req: id, ...req }));
+    });
+  }
+  // ---- shared characters ----
+  const diff = (key, play) => { const was = lastPlay[key] || {}, d = {};
+    for (const k of Object.keys(play)) if (JSON.stringify(play[k]) !== JSON.stringify(was[k])) d[k] = play[k];
+    return d; };
+  const sendJSON = (o) => { if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); };
+  /** A player's own character: the sheet when it changes (a moment after the last edit), the play state at once. */
+  function shareMine(key, sheet, play) {
+    if (!live || !you || you.role !== "player" || !key) return;
+    const js = JSON.stringify(sheet);
+    if (lastSheet[key] !== js) {
+      clearTimeout(sheetTimer);
+      const first = lastSheet[key] === undefined && !lastPlay[key];
+      sheetTimer = setTimeout(() => { lastSheet[key] = js; sendJSON({ type: "sheet", key, sheet, play: first ? play : undefined }); }, lastSheet[key] === undefined ? 0 : 700);
+      if (first) return; // the first share carries the play state
+    }
+    if (!lastPlay[key]) return;
+    const d = diff(key, play);
+    if (Object.keys(d).length) { lastPlay[key] = { ...lastPlay[key], ...d }; sendJSON({ type: "play", key, play: d }); }
+  }
+  /** The GM's copy of a shared character changed (a card, the encounter panel, the map). */
+  function pushPlay(key, play) {
+    if (!live || !you || you.role !== "gm" || !lastPlay[key]) return;
+    const d = diff(key, play);
+    if (Object.keys(d).length) { lastPlay[key] = { ...lastPlay[key], ...d }; sendJSON({ type: "play", key, play: d }); }
+  }
+  // ---- phase 3: the fight ----
+  /** The GM's map and fight, sent a moment after the last change (and only when something the players see changed). */
+  function pushScene(next) {
+    if (!live || !you || you.role !== "gm") return;
+    clearTimeout(sceneTimer);
+    sceneTimer = setTimeout(() => { const s = next(), js = JSON.stringify(s); if (js === lastSceneJson) return; lastSceneJson = js; scene = s; sendJSON({ type: "scene", ...s }); }, 400);
+  }
+  const sendMove = (key, to) => { if (live && you && you.role === "player") sendJSON({ type: "move", key, to }); };
+  const sendAsk = (q) => { if (live && you && you.role === "player") sendJSON({ type: "ask", ...q }); };
+  const askText = (a) => { const f = scene && scene.fight, nm = (pid) => ((f && f.people.find((p) => p.pid === pid)) || {}).name || "";
+    const w = ((f && (f.people.find((p) => p.pid === a.pid) || {}).weapons) || []).find(([id]) => id === a.weapon);
+    return a.action === "attack" ? `attack ${nm(a.target) || "someone"}${w ? ` with the ${w[1].toLowerCase()}` : ""}` : a.action === "aim" ? `aim at ${nm(a.target) || "someone"}` : a.note || "something else"; };
+  function renderAsks() {
+    const el = api.gmRoot && api.gmRoot.querySelector(".tbl-asks"); if (!el) return;
+    el.innerHTML = asks.length ? `<div class="label">Players ask<\/div><ul class="log tbl-log">${asks.map((a, i) => `<li><b>${esc(a.by)}<\/b>: ${esc(askText(a))}${a.note && a.action !== "other" ? ` <span class="muted">(${esc(a.note)})<\/span>` : ""}
+      <button class="btn small" data-tbl="fillask" data-i="${i}">Put it in the encounter panel<\/button> <button class="linkish small" data-tbl="dropask" data-i="${i}">Dismiss<\/button><\/li>`).join("")}<\/ul>` : "";
+  }
+
+  const isHere = (owner) => players.some((p) => p.role === "player" && p.name === owner);
+
+  // A different character on the sheet joins under its own name.
+  function setCharacter(name) {
+    const n = String(name || "").trim();
+    if (n === character) return;
+    character = n;
+    if (st.joined && st.role === "player" && live) connect();
+  }
+
+  // ---- what it looks like ----
+  const time = (t) => new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const who = (e) => esc(e.character || e.name || e.by || "GM");
+  function entryHtml(e) {
+    const res = e.auto === "success" ? `natural ${e.total}: success` : e.auto === "failure" ? `natural ${e.total}: failure` : e.success ? `success by ${e.margin}` : `failure by ${-e.margin}`;
+    const mods = e.base !== null && e.base !== undefined && e.mod ? ` <span class="muted">(${e.base} ${e.mod > 0 ? "+" : "−"} ${Math.abs(e.mod)})<\/span>` : "";
+    return `<li class="tbl-e${e.rerolled ? " tbl-old" : ""}"><span class="muted small">${time(e.at)}<\/span> <b>${who(e)}<\/b>${e.by && e.character ? ` <span class="muted small">(${esc(e.by)})<\/span>` : ""}: ${esc(e.label)} vs ${e.target}${mods}
+      → <span class="num">${e.dice.join(" ")} = ${e.total}<\/span> <span class="${e.success ? "s" : "f"}">${res}<\/span>${e.telling ? " · <b>telling hit<\/b>" : ""}${e.called && e.success ? " · called shot lands" : ""}${e.reroll ? ` · <i>point reroll of #${e.reroll}<\/i>` : ""}${e.rerolled ? " · <i>rerolled<\/i>" : ""}<\/li>`;
+  }
+  function renderLog() {
+    for (const [root, n] of [[api.playRoot, 12], [api.gmRoot, 60]]) {
+      const ul = root && root.querySelector(".tbl-log");
+      if (ul) ul.innerHTML = log.length ? log.slice(-n).reverse().map(entryHtml).join("") : `<li class="muted">No rolls at the table yet.<\/li>`;
+    }
+  }
+  function renderPlayers() {
+    const t = players.length ? players.map((p) => (p.role === "gm" ? `${esc(p.name || "GM")} (GM)` : `${esc(p.character || p.name)}${p.character && p.name ? ` <span class="muted">(${esc(p.name)})<\/span>` : ""}`)).join(", ") : "nobody yet";
+    for (const root of [api.playRoot, api.gmRoot]) { const el = root && root.querySelector(".tbl-players"); if (el) el.innerHTML = `At the table: ${t}`; }
+    // The GM can remove a player.
+    const gmList = api.gmRoot && api.gmRoot.querySelector(".tbl-remove");
+    if (gmList) { const ps = players.filter((p) => p.role === "player");
+      gmList.innerHTML = ps.length ? ps.map((p) => `<button class="btn small" data-tbl="kick" data-cid="${esc(p.cid || "")}" data-who="${esc(p.character || p.name)}">Remove ${esc(p.character || p.name)}<\/button>`).join(" ") : ""; }
+  }
+  const serverField = (id) => `<div class="field wide"><label for="${id}">Table server<\/label><input type="url" id="${id}" data-tbl="server" placeholder="https://legend-table.example.workers.dev" value="${esc(st.server || api.server || "")}"><\/div>`;
+  function render() {
+    const statusP = status ? `<p class="small ${/couldn|isn't|lost|doesn't|refus|different|first/i.test(status) ? "bad" : "muted"}" role="status">${esc(status)}<\/p>` : "";
+    const showServer = otherServer || !api.server || (!!st.server && st.server !== api.server);
+    if (api.playRoot) {
+      api.playRoot.innerHTML = live ? `<h3>Shared table<\/h3>
+          <p class="small">Connected to <b>${esc(table.name)}<\/b> (code <b class="num">${esc(st.code)}<\/b>)${you.role === "gm" ? " as the GM" : ` as ${esc(character || st.name)}`}. Your rolls are rolled by the table, and everyone sees them.${you.role === "gm" ? "" : " Your character is shared with the GM: injuries, points, ammo and form stay in step with the GM's card."}<\/p>
+          <p class="small muted tbl-players"><\/p><div class="btn-row"><button class="btn" data-tbl="leave">Leave the table<\/button><\/div>${statusP}
+          <div class="field"><span class="label">At the table<\/span><ul class="log tbl-log"><\/ul><\/div>`
+        : `<h3>Shared table<\/h3><p class="small muted">Join your GM's table to roll where everyone can see it. Without one, the roller works as usual.<\/p>
+          <div class="fields"><div class="field"><label for="tbl-code">Table code<\/label><input type="text" id="tbl-code" data-tbl="code" maxlength="6" autocomplete="off" spellcheck="false" style="text-transform:uppercase" value="${esc(st.role === "player" ? st.code : "")}"><\/div>
+            <div class="field"><label for="tbl-name">Your name<\/label><input type="text" id="tbl-name" data-tbl="name" maxlength="40" value="${esc(st.name)}"><\/div>
+            ${showServer ? serverField("tbl-server") : ""}<\/div>
+          <div class="btn-row"><button class="btn primary" data-tbl="join">Join<\/button>${!showServer ? `<button class="linkish small" data-tbl="showserver">Another table server…<\/button>` : ""}<\/div>${statusP}`;
+    }
+    if (api.gmRoot) {
+      const isGM = live && you && you.role === "gm";
+      api.gmRoot.innerHTML = isGM ? `<div class="eyebrow">Shared table<\/div>
+          <p><b>${esc(table.name)}<\/b> · code <b class="num" style="font-size:1.25rem;letter-spacing:.12em">${esc(st.code)}<\/b><\/p>
+          <p class="small muted">Players open their character, go to the ${esc(api.playTab || "play")} tab and join with this code, or use the link. Their characters appear under Characters below, marked <b>at the table<\/b>, and stay in step both ways: mark a box or a point here or in an encounter and the player's sheet changes too.<\/p>
+          <div class="btn-row"><button class="btn" data-tbl="copycode">Copy code<\/button><button class="btn" data-tbl="copylink">Copy link<\/button><button class="btn" data-tbl="recode">Change code<\/button><button class="btn" data-tbl="leave">Leave<\/button><\/div>
+          <div class="btn-row tbl-remove"><\/div><div class="tbl-asks"><\/div>
+          <p class="small tbl-players"><\/p>${statusP}<ul class="log tbl-log"><\/ul>`
+        : `<div class="eyebrow">Shared table<\/div>
+          <p class="small muted">Start a table and give the players its code. Every roll they make from their sheet shows up here as it happens, rolled by the table so nobody can fudge it.<\/p>
+          <div class="fields"><div class="field"><label for="tbl-tname">Table name<\/label><input type="text" id="tbl-tname" data-tbl="tname" maxlength="60" placeholder="Saturday's game"><\/div>${showServer ? serverField("tbl-gserver") : ""}<\/div>
+          <div class="btn-row"><button class="btn primary" data-tbl="start">Start a table<\/button>${st.gmKeys[st.code] ? `<button class="btn" data-tbl="rejoin">Rejoin ${esc(st.code)} as GM<\/button>` : ""}${!showServer ? `<button class="linkish small" data-tbl="showserver">Another table server…<\/button>` : ""}<\/div>${statusP}`;
+    }
+    renderPlayers(); renderLog(); renderAsks();
+  }
+  function onClick(e) {
+    const b = e.target.closest("[data-tbl]"); if (!b || b.tagName === "INPUT") return;
+    const root = b.closest("#" + (api.playRoot && api.playRoot.id) + ", #" + (api.gmRoot && api.gmRoot.id));
+    const val = (k) => { const i = root && root.querySelector(`[data-tbl="${k}"]`); return i ? i.value.trim() : ""; };
+    const k = b.dataset.tbl;
+    if (val("server")) { st.server = val("server"); }
+    if (k === "join") {
+      const code = val("code").toUpperCase(), name = val("name");
+      if (!/^[A-Z0-9]{6}$/.test(code)) { status = "A table code has six letters and numbers."; render(); return; }
+      if (!name && !character) { status = "Give your name (or name your character)."; render(); return; }
+      st.code = code; st.name = name; st.role = "player"; save(); join();
+    } else if (k === "start") start(val("tname"));
+    else if (k === "rejoin") { st.role = "gm"; st.joined = true; save(); connect(); }
+    else if (k === "leave") leave();
+    else if (k === "fillask") { const a = asks[+b.dataset.i]; if (a && api.fillAsk && api.fillAsk(a)) { asks.splice(+b.dataset.i, 1); renderAsks(); } else say("Start the encounter with that character in it first.", true); }
+    else if (k === "dropask") { asks.splice(+b.dataset.i, 1); renderAsks(); }
+    else if (k === "kick") {
+      if (!confirm(`Remove ${b.dataset.who} from the table? They're disconnected, their character stops being shared, and this browser of theirs can't rejoin. Change the code too if they might come back another way.`)) return;
+      sendJSON({ type: "kick", cid: b.dataset.cid });
+    } else if (k === "recode") {
+      if (!confirm("Give the table a new code? Everyone here now moves with it; anyone else needs the new code to join, and the old one stops working.")) return;
+      sendJSON({ type: "recode" });
+    }
+    else if (k === "copycode") copy(st.code, "Table code copied.");
+    else if (k === "copylink") copy(shareLink(), "Link copied: send it to the players.");
+    else if (k === "showserver") { // keep what was typed
+      if (val("code")) st.code = val("code").toUpperCase(); if (val("name")) st.name = val("name"); const tn = val("tname");
+      otherServer = true; render(); const t = api.gmRoot && api.gmRoot.querySelector('[data-tbl="tname"]'); if (t && tn) t.value = tn; }
+    save();
+  }
+  function copy(text, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => say(done), () => say(text));
+    else say(text);
+  }
+  for (const root of [api.playRoot, api.gmRoot]) if (root) {
+    root.addEventListener("click", onClick);
+    root.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches("input[data-tbl]")) { e.preventDefault(); const b = root.querySelector('[data-tbl="join"], [data-tbl="start"]'); if (b) b.click(); } });
+  }
+  character = String(api.character() || "").trim();
+  render();
+  if (st.joined && st.code && base()) connect(); // back at the table after a reload
+  return { live: () => live, roll, setCharacter, shareMine, pushPlay, isHere, role: () => (live && you ? you.role : null), pushScene, sendMove, sendAsk, scene: () => scene };
+}
+/* TABLECLIENT:END */
   // The Encounter panel's modules and Pelion's setting data (tools/build-guide.py fills this in).
   /* ENCOUNTER:START */
 const ENC_SETTING = {"id":"uss-pelion","arms":[{"id":"fists","name":"Punch, kick, headbutt","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1},{"id":"club","name":"Club, rifle butt or thrown rock","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1,"reachNote":"rifle butt 2"},{"id":"knife","name":"Knife or dagger (a Klingon d'k tahg)","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1},{"id":"heavy","name":"Heavy melee weapon (a lirpa, a sword, an axe)","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":2}},"traits":[],"rows":[],"reachYards":2,"reachNote":"lirpa 3"},{"id":"primitive","name":"Arrow, spear or primitive firearm","skill":"Phasers","band":"medium","damage":{"any":{"boxes":1}},"wound":"missile","traits":[],"rows":[]},{"id":"phaser-stun","name":"Hand phaser on stun","skill":"Phasers","band":"short","stun":true,"equip":["phaser"],"damage":{"any":{"boxes":0}},"traits":[],"rows":[],"telling":{"add":["knockdown"]}},{"id":"phaser-kill","name":"Hand phaser on kill","skill":"Phasers","band":"short","damage":{"any":{"boxes":3,"dying":true}},"equip":["phaser"],"wound":"energy","traits":[],"rows":[]},{"id":"phaser-rifle","name":"Phaser rifle","skill":"Phasers","band":"long","damage":{"any":{"boxes":3,"dying":true}},"wound":"energy","traits":[],"rows":[]},{"id":"disruptor","name":"Disruptor","skill":"Phasers","band":"medium","damage":{"any":{"boxes":3,"dying":true}},"wound":"energy","traits":[],"rows":[]},{"id":"grenade","name":"Explosion (a thrown grenade)","skill":"Athletics","band":"close","maxBand":"close","damage":{"any":{"boxes":2}},"traits":[{"type":"area","note":"1 box to everyone nearby; 2 at the centre. Dodge means diving clear."}],"rows":[]},{"id":"gorn","name":"Gorn's crushing blows","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":2}},"natural":true,"traits":[],"rows":[],"reachYards":1},{"id":"bite","name":"Venomous bite and horn","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"natural":true,"traits":[],"rows":[],"reachYards":1},{"id":"grip","name":"Crushing grip","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"unarmed":true,"traits":[],"rows":[],"reachYards":1}],"threats":[{"id":"guard","name":"Security guard","label":"Security guard (minor)","minor":true,"attacks":[{"skill":"Phasers","target":11}],"dodge":7,"boxes":1,"boxesText":"1","weaponText":"Hand weapon","weapons":["phaser-stun","disruptor"],"trait":"Numbers","traitText":"Usually two or three; they surrender or flee when half are down."},{"id":"klingon","name":"Klingon warrior","label":"Klingon warrior","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Unarmed Combat","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill), d'k tahg","weapons":["disruptor","knife"],"trait":"Relentless","traitText":"Ignores the Wounded penalty; only Seriously wounded slows them."},{"id":"klingon-officer","name":"Klingon officer","label":"Klingon officer","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Leadership","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill)","weapons":["disruptor"],"trait":"Battle commander","traitText":"Once per round, gives one ally +1 on an attack."},{"id":"romulan","name":"Romulan centurion","label":"Romulan centurion","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Stealth","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill)","weapons":["disruptor"],"trait":"Ambush","traitText":"+2 on the first attack from hiding; prefers to withdraw rather than be captured."},{"id":"orion","name":"Orion pirate","label":"Orion pirate","minor":false,"attacks":[{"skill":"Phasers","target":11},{"skill":"Unarmed Combat","target":12},{"skill":"Stealth","target":12}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor, knife","weapons":["disruptor","knife"],"trait":"Dirty fighter","traitText":"Winning a grapple also disarms the target."},{"id":"gorn","name":"Gorn warrior","label":"Gorn warrior","minor":false,"attacks":[{"skill":"Unarmed Combat","target":14}],"dodge":6,"boxes":4,"boxesText":"4","weaponText":"Claws, thrown rocks","weapons":["gorn","club"],"trait":"Immense strength","traitText":"Unarmed hits mark 2 boxes; slow, so it acts last in a round."},{"id":"mugato","name":"Mugato","label":"Mugato","minor":false,"attacks":[{"skill":"Unarmed Combat","target":13}],"dodge":8,"boxes":3,"boxesText":"3","weaponText":"Venomous bite","weapons":["bite"],"trait":"Venom","traitText":"A bite that marks a box also poisons: without Medicine before the scene ends, mark another box."},{"id":"android","name":"Rogue android","label":"Rogue android","minor":false,"attacks":[{"skill":"Unarmed Combat","target":13},{"skill":"Computers","target":15}],"dodge":7,"boxes":4,"boxesText":"4","weaponText":"Crushing grip","weapons":["grip"],"trait":"Logic trap","traitText":"A Diplomacy or Psychology contest that presents a paradox stuns it for the scene."}],"protection":[{"id":"improvised","name":"Improvised shield","text":"A chair, a crate lid or a torn-off panel: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.","traits":[{"type":"shield","value":0,"breaksOn":2,"label":"Improvised shield"}]}],"combatRules":{"oneDefense":{"perRound":1,"edge":"extradefense","extraPenalty":-2},"attackQualityDodge":{"bands":[{"from":0,"mod":0},{"from":3,"mod":-1},{"from":5,"mod":-2},{"from":7,"mod":-3}]},"parry":{"mod":-3,"repeatPenalty":0,"bareHanded":"unarmed"},"block":{"mod":-2},"aim":{"bonus":1},"tellingHits":{"margin":5,"natural":true,"called":-2,"small":-4}},"coreCombat":["aim","attackQualityDodge","block","oneDefense","parry","tellingHits"],"terms":{"title":"USS Pelion","point":"Duty","meleeSkill":"Unarmed Combat","unarmedSkill":"Unarmed Combat","ammo":"power","ammoOne":"power"}};
@@ -7551,9 +7906,35 @@ function mountLab(api) {
   $("lab-name").addEventListener("change", () => { const en = enc(); if (en) { en.name = $("lab-name").value.trim() || en.name; save(); renderSummary(); } });
   $("lab-seed").addEventListener("change", () => { const en = enc(); if (en && en.status === "setup") { en.seed = $("lab-seed").value.trim() || null; save(); } else if (en) { $("lab-seed").value = en.seed ?? ""; say("The seed is fixed once combat starts. Start a new encounter to change it.", true); } });
 
-  function renderAll() { pullFromCards(); renderRules(); renderPeople(); renderAction(); renderClocksHere(); renderLog(); renderSummary(); }
+  function renderAll() { pullFromCards(); renderRules(); renderPeople(); renderAction(); renderClocksHere(); renderLog(); renderSummary(); if (api.onScene) api.onScene(); }
+
+  // ---- the shared table (phase 3) ----
+  const plain = (/** @type {string} */ h) => String(h || "").replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, "&");
+  // The fight as the players see it: turn order, whose turn, each side's injuries, and the latest log lines.
+  // "own" is a character's shared key, so a player knows their turn; their weapons let them ask for an attack.
+  function scene() {
+    const en = enc(); if (!en || en.status === "setup") return null;
+    const act = en.status === "combat" ? E.active(en) : null, r = rules();
+    const people = en.status === "combat" ? en.order.map((/** @type {string} */ pid) => E.find(en, pid)) : en.participants;
+    return { id: en.id, status: en.status, round: en.round, actor: act ? act.pid : null,
+      people: people.map((/** @type {any} */ p) => { const c = p.ref ? api.crew().find((x) => x.id === p.ref) : null;
+        return { pid: p.pid, name: p.name, side: p.side, kind: p.kind, own: (c && c.tableKey) || null, injury: p.injury || 0, boxes: p.boxes || 3, dying: !!p.dying, dead: !!p.dead, out: E.isOut(p),
+          weapons: c && c.tableKey ? p.weapons.filter((/** @type {string} */ w) => r.weapons[w]).map((/** @type {string} */ w) => [w, r.weapons[w].name]) : undefined }; }),
+      log: [...en.events].slice(-12).reverse().map((/** @type {any} */ e) => plain(logText(e))).filter(Boolean) };
+  }
+  // A player's request on their turn, put into the action form for the GM to check and run.
+  function fillRequest(/** @type {any} */ q) {
+    const en = enc(); if (!en || en.status !== "combat" || !E.find(en, q.pid)) return false;
+    $("lab-actor").value = q.pid; $("lab-action").value = q.action === "aim" ? "aim" : q.action === "attack" ? "attack" : "note";
+    $("lab-target").dataset.actor = q.pid; renderAction();
+    if (q.target) $("lab-target").value = q.target;
+    if (q.weapon && [...$("lab-weapon").options].some((/** @type {any} */ o) => o.value === q.weapon)) { $("lab-weapon").value = q.weapon; renderAction(); if (q.target) $("lab-target").value = q.target; }
+    if (q.action === "other" && q.note) $("lab-text").value = q.note;
+    $("lab-act-wrap").scrollIntoView({ block: "nearest" });
+    return true;
+  }
   renderAll();
-  return { refresh: renderAll };
+  return { refresh: renderAll, scene, fillRequest };
 }
 
 return { mountLab };
@@ -7562,21 +7943,49 @@ return { mountLab };
   // The battle map: the crew as tokens (portrait, division color, down or Dying) on a hex map at any scale, or a ship fight
   // on a range track, with the Pelion linked to the ship's tracks and enemy ships from the Players' Guide.
   const DIV_COLOR = { command: "var(--gold)", sciences: "var(--blue)", operations: "var(--red)", services: "var(--red)" };
-  const battleMap = mountBattleMap({ root: $("battlemap"), key: "uss-pelion", esc, toast: gmSay,
-    bands: [["Close", 10], ["Short", 25], ["Medium", 100], ["Long", 300], ["Extreme", 1000]],
-    kmBands: [["Close", 10], ["Short", 1000], ["Medium", 10000], ["Long", 100000], ["Extreme", 300000]],
-    pointName: "Duty", stunName: "Stunned", partyName: "crew",
-    rangeTracks: [{ title: "Ship fight", us: "The Pelion", vehicleTrack: "Hull", vehicleTracks: SHIP_TRACKS.map(([n]) => n), startLane: 3,
+  // The shared table: players join from their Duty station tab, the GM starts one here, and every roll at the table shows on both.
+  sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: "uss-pelion", game: "uss-pelion", playTab: "Duty station",
+    server: TABLE_SERVER, character: () => ch.name, esc, toast,
+    onPlayers: () => renderGM(), // who's at the table, on the GM's cards
+    // Phase 3: the GM's map and fight go to the players; their moves and requests come back to the GM.
+    onScene: (sc) => renderFight(sc),
+    onMove: (m) => { if (!battleMap.moveOwn(m.key, m.to)) gmSay(`${m.by} moved, but their token isn't on the map: add the crew to it.`, true); },
+    fillAsk: (a) => { if (!encPanel || !encPanel.fillRequest) return false; $("tab-gm").click(); return encPanel.fillRequest(a); },
+    // Phase 2: the player shares their officer; the GM's cards follow the table's officers, and both follow each other's changes.
+    onConnected: (role) => { if (role === "player") sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); else pushScene(); renderGM(); },
+    onSheet: (e) => {
+      if (e.key === ch.id && sharedTable.role() === "player") { applyPlay(ch, e.play); store.set(STORE_CURRENT, ch); render(); return; }
+      if (sharedTable.role() !== "gm") return;
+      const i = gmCrew.findIndex((c) => c.tableKey === e.key || c.id === e.key), was = i >= 0 ? gmCrew[i] : null;
+      const c = normalize({ ...JSON.parse(JSON.stringify(e.sheet)), id: was ? was.id : e.key, portrait: was ? was.portrait : e.sheet.portrait, tableKey: e.key, tableOwner: e.owner.name, play: was ? was.play : {} });
+      applyPlay(c, e.play);
+      if (was) gmCrew[i] = c; else gmCrew.push(c);
+      store.set(STORE_GM, gmCrew); renderGM();
+    },
+    onUnshared: (keys) => { // a removed player's officer: the GM's card stays, as an ordinary copy
+      let n = 0; for (const c of gmCrew) if (keys.includes(c.tableKey)) { delete c.tableKey; delete c.tableOwner; n++; }
+      if (n) { store.set(STORE_GM, gmCrew); renderGM(); } },
+    onPlay: (key, play) => {
+      if (key === ch.id && sharedTable.role() === "player") { applyPlay(ch, play); store.set(STORE_CURRENT, ch); render(); return; }
+      const c = gmCrew.find((x) => x.tableKey === key); if (!c) return;
+      applyPlay(c, play); store.set(STORE_GM, gmCrew); renderGM();
+    } });
+  const MAP_BANDS = [["Close", 10], ["Short", 25], ["Medium", 100], ["Long", 300], ["Extreme", 1000]], MAP_KM = [["Close", 10], ["Short", 1000], ["Medium", 10000], ["Long", 100000], ["Extreme", 300000]];
+  const MAP_TRACKS = [{ title: "Ship fight", us: "The Pelion", vehicleTrack: "Hull", vehicleTracks: SHIP_TRACKS.map(([n]) => n), startLane: 3,
       help: "for starships closing or opening the range. Each lane is a range band from the Pelion.",
       bands: [["Close", "under 10 km"], ["Short", "up to 1,000 km"], ["Medium", "up to 10,000 km"], ["Long", "up to 100,000 km"], ["Extreme", "about a light-second"]],
       note: "Each lane is a range band from the Pelion. At the start of each exchange, Helm rolls against the enemy's helm; the winner may move the enemy one lane in or out. Weapons take −2 one band beyond their range and −4 two bands beyond. Winning at Extreme by 5 or more lets a ship go to warp." },
-      { help: "for an away team's chase or a running fight where only distance matters. Each lane is a range band from the crew." }],
+      { help: "for an away team's chase or a running fight where only distance matters. Each lane is a range band from the crew." }];
+  const battleMap = mountBattleMap({ root: $("battlemap"), key: "uss-pelion", esc, toast: gmSay, onChange: () => pushScene(),
+    bands: MAP_BANDS, kmBands: MAP_KM,
+    pointName: "Duty", stunName: "Stunned", partyName: "crew",
+    rangeTracks: MAP_TRACKS,
     threats: threatsFromGuide($("guide")),
     vehicles: threatsFromGuide($("guide"), "Enemy ships", "ship-"),
     groupTracks: () => SHIP_TRACKS.map(([name, boxes]) => { const v = Math.min(boxes, ship[name] || 0); return { name, boxes, value: v, effect: shipEffect(name, v) }; }),
     setGroupTrack: (name, v) => { const t = SHIP_TRACKS.find(([n]) => n === name); if (!t) return; ship[name] = Math.max(0, Math.min(t[1], v)); store.set(STORE_SHIP, ship); renderShip(); },
     crew: () => gmCrew.map((c) => { const k = gmCalc(c);
-      return { id: c.id, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
+      return { id: c.id, tableKey: c.tableKey || null, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
         color: DIV_COLOR[k.div] || "var(--gold)", injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty, ptrack: null,
         stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
     // A change made on the map is the GM's copy of the officer, the same as a change on their card.
@@ -7586,7 +7995,50 @@ return { mountLab };
       if ("stunned" in patch) c.play.stunned = !!patch.stunned;
       if ("points" in patch) c.play.duty = Math.max(0, patch.points);
       saveGM(); renderGM(); } });
-  const saveGM = () => { if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the crew. Save the crew to a file.", true); };
+  const saveGM = () => {
+    if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the crew. Save the crew to a file.", true);
+    if (sharedTable) for (const c of gmCrew) if (c.tableKey) sharedTable.pushPlay(c.tableKey, pickPlay(c)); // a change here reaches the player's sheet
+    pushScene();
+  };
+  // Phase 3: the map and the fight as the players see them (sent a moment after the last change, and only by the GM).
+  function pushScene() {
+    if (!sharedTable || sharedTable.role() !== "gm") return;
+    try { battleMap; encPanel; } catch { return; } // not mounted yet (the page is still starting)
+    sharedTable.pushScene(() => ({ map: battleMap.snapshot(), fight: encPanel && encPanel.scene ? encPanel.scene() : null }));
+  }
+  // A player's view of the GM's map and fight, on their Duty station tab.
+  let viewerMap = null;
+  function renderFight(sc) {
+    const card = $("card-fight"), me = sharedTable && sharedTable.role() === "player";
+    card.hidden = !me || !sc || (!sc.map && !sc.fight);
+    if (card.hidden) return;
+    if (sc.map) {
+      if (!viewerMap) viewerMap = mountBattleMap({ root: $("table-map"), key: "uss-pelion", esc, toast, viewer: true, bands: MAP_BANDS, kmBands: MAP_KM, rangeTracks: MAP_TRACKS,
+        pointName: "Duty", stunName: "Stunned", partyName: "crew", crew: () => [], threats: [],
+        canMove: (t) => !!t && t.own === ch.id, onMove: (t, to) => sharedTable.sendMove(ch.id, to) });
+      viewerMap.setState(sc.map);
+    }
+    $("table-map").hidden = !sc.map;
+    const f = sc.fight;
+    if (!f) { $("fight-strip").innerHTML = `<p class="small muted">No fight running.</p>`; $("fight-turn").innerHTML = ""; return; }
+    const now = f.people.find((p) => p.pid === f.actor), mine = f.people.find((p) => p.own === ch.id);
+    $("fight-strip").innerHTML = `<p class="small">${f.status === "ended" ? "The fight is over." : `Round ${f.round}${now ? ` · <b>${esc(now.name)}</b>'s turn` : ""}`}</p>
+      <ul class="fight-order">${f.people.map((p) => `<li class="${p.pid === f.actor ? "now " : ""}${p.side === "foe" ? "foe " : ""}${p.out || p.dead ? "out " : ""}${p.own === ch.id ? "mine" : ""}">${esc(p.name)} <span class="muted">${"●".repeat(Math.min(p.injury, p.boxes))}${"○".repeat(Math.max(0, p.boxes - p.injury))}${p.dying ? " Dying" : ""}</span></li>`).join("")}</ul>
+      ${f.log.length ? `<details><summary class="small">What just happened</summary><ul class="log tbl-log">${f.log.map((l) => `<li>${esc(l)}</li>`).join("")}</ul></details>` : ""}`;
+    const turn = f.status === "combat" && mine && f.actor === mine.pid && !mine.out;
+    const prev = $("fight-turn").dataset.turn, key = `${f.id}.${f.round}.${f.actor}`;
+    if (!turn) { $("fight-turn").innerHTML = ""; $("fight-turn").dataset.turn = ""; return; }
+    if (prev === key) return; // keep what the player is choosing
+    $("fight-turn").dataset.turn = key;
+    const others = f.people.filter((p) => p.pid !== mine.pid && !p.dead), foe = others.find((p) => p.side !== mine.side && !p.out);
+    $("fight-turn").innerHTML = `<p><b>Your turn.</b> Tell the GM what ${esc(mine.name)} does; they run it.</p>
+      <div class="fields"><div class="field"><label for="ft-action">Action</label><select id="ft-action"><option value="attack">Attack</option><option value="aim">Aim</option><option value="other">Something else</option></select></div>
+        <div class="field"><label for="ft-target">Target</label><select id="ft-target">${others.map((p) => `<option value="${esc(p.pid)}"${foe && p.pid === foe.pid ? " selected" : ""}>${esc(p.name)}</option>`).join("")}</select></div>
+        <div class="field"><label for="ft-weapon">Weapon</label><select id="ft-weapon">${(mine.weapons || []).map(([id, n]) => `<option value="${esc(id)}">${esc(n)}</option>`).join("")}</select></div>
+        <div class="field wide"><label for="ft-note">Anything else (moving first, a called shot…)</label><input type="text" id="ft-note" maxlength="200"></div></div>
+      <div class="btn-row"><button class="btn primary" id="ft-send">Send to the GM</button></div>`;
+    $("ft-send").onclick = () => { sharedTable.sendAsk({ key: ch.id, pid: mine.pid, action: $("ft-action").value, target: $("ft-target").value, weapon: $("ft-weapon").value, note: $("ft-note").value.trim() }); toast("Sent to the GM."); };
+  }
   // Work out a crew member's numbers with the same rules as the sheet, by briefly treating them as the current character.
   function gmCalc(c) {
     const saved = ch; ch = c;
@@ -7629,7 +8081,7 @@ return { mountLab };
         : DELTA_SVG.replace('data-emblem d=""', `d="${EMBLEMS[k.div].d}"`).replace('class="emblem"', `class="emblem${EMBLEMS[k.div].stroke ? " stroke" : ""}"`);
       return `<article class="gm-card hud ${inj >= 3 ? "down" : ""}" data-div="${k.div}">
         <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed officer")}</b>
-          <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span></div></div>
+          <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span>${c.tableKey ? `<span class="small tbl-badge">${sharedTable && sharedTable.isHere(c.tableOwner) ? "● at the table" : "○ away from the table"}${c.tableOwner ? ` · ${esc(c.tableOwner)}` : ""}</span>` : ""}</div></div>
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b>${c.attrs[n]}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a Duty point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a Duty point">+</button><span class="small muted">Duty</span></span></div>
@@ -7695,6 +8147,7 @@ return { mountLab };
     crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = encPanel; encPanel = null; renderGM(); encPanel = p; },
     calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n)])), dodge: dodge(), move: moveOf(c), agility: c.attrs.Agility }; } finally { ch = saved; } },
     mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
+    onScene: () => pushScene(), // the shared table's players see the fight
     // Pelion grants these as advantages (chosen or bought), not Edges.
     traitsFor: (c) => [...(hasAdv("extradefense", c) ? [{ type: "extraDefense", value: 1, label: "Additional Defense" }] : []),
       ...(hasAdv("survivor", c) ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : [])],
