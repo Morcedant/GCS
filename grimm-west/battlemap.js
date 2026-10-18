@@ -546,7 +546,9 @@ function mountBattleMap(api) {
   // the token's name. On a hex map in yards: { yards, hexes, band }; on the plain range track: { band } from the lanes.
   // null when either isn't on the map (or a name fits more than one token), or on a ship or chase track.
   function distanceBetween(a, b) {
-    const find = (w) => { const l = toks().filter((t) => (w.ref && t.ref === w.ref) || (!t.ref && w.name && (info(t).name || "").toLowerCase() === w.name.toLowerCase())); return l.length === 1 ? l[0] : null; };
+    // Names match whatever the case, and without a note in brackets: "Security guard (minor)" is "Security guard".
+    const norm = (x) => String(x || "").toLowerCase().replace(/\s*\([^)]*\)/g, "").trim();
+    const find = (w) => { const l = toks().filter((t) => (w.ref && t.ref === w.ref) || (!t.ref && w.name && norm(info(t).name) === norm(w.name))); return l.length === 1 ? l[0] : null; };
     const ta = find(a), tb = find(b);
     if (!ta || !tb) return null;
     if (isRange()) {
