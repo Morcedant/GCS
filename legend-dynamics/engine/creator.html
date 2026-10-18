@@ -2664,7 +2664,7 @@ tr.lvl-U td.target { color: var(--muted); }
   /* BATTLEMAP */
   /* TABLECLIENT */
   // The shared table: players join from their play tab, the GM starts one here, and every roll at the table shows on both.
-  sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay,
+  sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay, pointName: T.point, partyName: T.party,
     server: TABLE_SERVER, character: () => ch.name, esc, toast,
     // Phase 2: the player shares their character; the GM's cards follow the table's characters, and both follow each other's changes.
     onPlayers: () => renderGM(), // who's at the table, on the GM's cards
