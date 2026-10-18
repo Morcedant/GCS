@@ -2665,6 +2665,9 @@ tr.lvl-U td.target { color: var(--muted); }
       if (was) gmCrew[i] = c; else gmCrew.push(c);
       store.set(STORE_GM, gmCrew); renderGM();
     },
+    onUnshared: (keys) => { // a removed player's character: the GM's card stays, as an ordinary copy
+      let n = 0; for (const c of gmCrew) if (keys.includes(c.tableKey)) { delete c.tableKey; delete c.tableOwner; n++; }
+      if (n) { store.set(STORE_GM, gmCrew); renderGM(); } },
     onPlay: (key, play) => {
       if (key === ch.id && sharedTable.role() === "player") { applyPlay(ch, play); store.set(STORE_CURRENT, ch); render(); return; }
       const c = gmCrew.find((x) => x.tableKey === key); if (!c) return;

@@ -16,7 +16,7 @@ function mountTable(api) {
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { /* private window: works for this visit */ } };
   // This browser's private id: the table knows a player's characters by it, so nobody can change them by typing the same name.
   if (!st.pid) { const b = new Uint8Array(18); crypto.getRandomValues(b); st.pid = btoa(String.fromCharCode(...b)).replace(/[+/=]/g, (c) => ({ "+": "-", "/": "_", "=": "" })[c]); save(); }
-  let ws = null, live = false, status = "", table = null, you = null, players = [], log = [], retry = 0, retryTimer = null, pingTimer = null, leaving = false, character = "", otherServer = false;
+  let ws = null, live = false, status = "", table = null, you = null, players = [], log = [], retry = 0, retryTimer = null, pingTimer = null, leaving = false, character = "", otherServer = false, moved = false;
   const pending = new Map(); // req → { resolve, reject, timer }
   const lastPlay = {}, lastSheet = {}; // key → the play state / sheet (JSON) the table last had
   let sheetTimer = null;
@@ -56,6 +56,14 @@ function mountTable(api) {
         renderLog();
       } else if (m.type === "rerolled") { const x = log.find((l) => l.n === m.n); if (x) x.rerolled = true; renderLog(); }
       else if (m.type === "players") { players = m.players || []; renderPlayers(); if (api.onPlayers) api.onPlayers(); }
+      else if (m.type === "unshared") { for (const k of m.keys || []) delete lastPlay[k]; if (api.onUnshared) api.onUnshared(m.keys || []); }
+      else if (m.type === "kicked") { st.joined = false; save(); status = "The GM removed you from this table."; leaving = true; }
+      else if (m.type === "moved") { // the GM changed the code: follow it
+        const old = st.code; st.code = m.code;
+        if (st.gmKeys[old]) { st.gmKeys[m.code] = st.gmKeys[old]; delete st.gmKeys[old]; }
+        save(); retry = 0; moved = true; status = `The table's code is now ${m.code}.`;
+        if (location.hash.includes("table=")) history.replaceState(null, "", location.href.split("#")[0]);
+      }
       else if (m.type === "error") {
         const p = m.req && pending.get(m.req);
         if (p) { clearTimeout(p.timer); pending.delete(m.req); p.reject(new Error(m.error)); }
@@ -69,6 +77,7 @@ function mountTable(api) {
       pending.clear();
       if (leaving || !st.joined) { if (!status || status === "Connecting…") status = was ? "" : "Couldn't reach the table."; render(); return; }
       if (!was && retry >= 5) { st.joined = false; save(); status = "Couldn't reach the table. Try joining again in a moment."; render(); return; }
+      if (moved) { moved = false; connect(); return; } // the GM changed the code: straight back in with the new one
       retry = Math.min(retry + 1, 5); status = `Connection lost. Reconnecting in ${[1, 2, 4, 8, 15][retry - 1]}s…`; render();
       retryTimer = setTimeout(connect, [1, 2, 4, 8, 15][retry - 1] * 1000);
     };
@@ -160,6 +169,10 @@ function mountTable(api) {
   function renderPlayers() {
     const t = players.length ? players.map((p) => (p.role === "gm" ? `${esc(p.name || "GM")} (GM)` : `${esc(p.character || p.name)}${p.character && p.name ? ` <span class="muted">(${esc(p.name)})</span>` : ""}`)).join(", ") : "nobody yet";
     for (const root of [api.playRoot, api.gmRoot]) { const el = root && root.querySelector(".tbl-players"); if (el) el.innerHTML = `At the table: ${t}`; }
+    // The GM can remove a player.
+    const gmList = api.gmRoot && api.gmRoot.querySelector(".tbl-remove");
+    if (gmList) { const ps = players.filter((p) => p.role === "player");
+      gmList.innerHTML = ps.length ? ps.map((p) => `<button class="btn small" data-tbl="kick" data-cid="${esc(p.cid || "")}" data-who="${esc(p.character || p.name)}">Remove ${esc(p.character || p.name)}</button>`).join(" ") : ""; }
   }
   const serverField = (id) => `<div class="field wide"><label for="${id}">Table server</label><input type="url" id="${id}" data-tbl="server" placeholder="https://legend-table.example.workers.dev" value="${esc(st.server || api.server || "")}"></div>`;
   function render() {
@@ -181,7 +194,8 @@ function mountTable(api) {
       api.gmRoot.innerHTML = isGM ? `<div class="eyebrow">Shared table</div>
           <p><b>${esc(table.name)}</b> · code <b class="num" style="font-size:1.25rem;letter-spacing:.12em">${esc(st.code)}</b></p>
           <p class="small muted">Players open their character, go to the ${esc(api.playTab || "play")} tab and join with this code, or use the link. Their characters appear under Characters below, marked <b>at the table</b>, and stay in step both ways: mark a box or a point here or in an encounter and the player's sheet changes too.</p>
-          <div class="btn-row"><button class="btn" data-tbl="copycode">Copy code</button><button class="btn" data-tbl="copylink">Copy link</button><button class="btn" data-tbl="leave">Leave</button></div>
+          <div class="btn-row"><button class="btn" data-tbl="copycode">Copy code</button><button class="btn" data-tbl="copylink">Copy link</button><button class="btn" data-tbl="recode">Change code</button><button class="btn" data-tbl="leave">Leave</button></div>
+          <div class="btn-row tbl-remove"></div>
           <p class="small tbl-players"></p>${statusP}<ul class="log tbl-log"></ul>`
         : `<div class="eyebrow">Shared table</div>
           <p class="small muted">Start a table and give the players its code. Every roll they make from their sheet shows up here as it happens, rolled by the table so nobody can fudge it.</p>
@@ -204,6 +218,13 @@ function mountTable(api) {
     } else if (k === "start") start(val("tname"));
     else if (k === "rejoin") { st.role = "gm"; st.joined = true; save(); connect(); }
     else if (k === "leave") leave();
+    else if (k === "kick") {
+      if (!confirm(`Remove ${b.dataset.who} from the table? They're disconnected, their character stops being shared, and this browser of theirs can't rejoin. Change the code too if they might come back another way.`)) return;
+      sendJSON({ type: "kick", cid: b.dataset.cid });
+    } else if (k === "recode") {
+      if (!confirm("Give the table a new code? Everyone here now moves with it; anyone else needs the new code to join, and the old one stops working.")) return;
+      sendJSON({ type: "recode" });
+    }
     else if (k === "copycode") copy(st.code, "Table code copied.");
     else if (k === "copylink") copy(shareLink(), "Link copied: send it to the players.");
     else if (k === "showserver") { // keep what was typed

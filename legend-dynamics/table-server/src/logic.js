@@ -103,7 +103,7 @@ export function roll(table, who, msg, dice, now) {
 }
 
 /** Who is connected, for everyone's list: GMs first, then players by name. @param {any[]} whos */
-export const presence = (whos) => whos.filter(Boolean).map((w) => ({ role: w.role, name: w.name, character: w.character }))
+export const presence = (whos) => whos.filter(Boolean).map((w) => ({ cid: w.cid, role: w.role, name: w.name, character: w.character }))
   .sort((a, b) => (a.role === b.role ? (a.character || a.name).localeCompare(b.character || b.name) : a.role === "gm" ? -1 : 1));
 
 /** SHA-256 of a GM key, as hex: the table keeps only this. @param {string} key */
@@ -177,3 +177,23 @@ export function changePlay(sheets, who, msg, now) {
 export const publicSheet = (e) => ({ ...e, owner: { name: e.owner.name, character: e.owner.character } });
 /** A roll as everyone may see it: without its roller's private id. @param {any} e */
 export const publicEntry = (e) => { const { owner, ...rest } = e; void owner; return rest; };
+
+// ---- the GM's controls: remove a player, change the code ----
+export const MAX_BANNED = 50;
+/** A random integer below n, from the platform's cryptographic source. @param {number} n */
+export const cryptoInt = (n) => { const b = new Uint32Array(1); crypto.getRandomValues(b); return b[0] % n; };
+/** A connection's public handle, for the GM's Remove button. */
+export const newCid = () => newCode(cryptoInt).toLowerCase();
+/** Whether a browser was removed from this table. @param {any} table @param {string} owner */
+export const isBanned = (table, owner) => !!owner && (table.banned || []).includes(owner);
+/**
+ * Remove a player's browser: it can't rejoin (until it clears its storage, which the code change then covers),
+ * and the characters it shared stop being shared. Returns the keys unshared.
+ * @param {any} table @param {Record<string, any>} sheets @param {string} owner
+ */
+export function removeOwner(table, sheets, owner) {
+  if (owner && !isBanned(table, owner)) table.banned = [...(table.banned || []), owner].slice(-MAX_BANNED);
+  const keys = Object.keys(sheets).filter((k) => owner && sheets[k].owner.id === owner);
+  for (const k of keys) delete sheets[k];
+  return keys;
+}
