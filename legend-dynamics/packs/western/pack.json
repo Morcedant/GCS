@@ -815,13 +815,15 @@
     "dodge": 0,
     "traits": [
      "Claws and fangs mark 2 boxes",
+     "Fast on four legs: Move +1",
      "Tough: hits of 2+ boxes mark one fewer, except silver",
      "Keen senses: track by scent",
      "Dark sight"
     ],
     "drawbacks": [
      "Horses bolt; townsfolk panic"
-    ]
+    ],
+    "speed": 1
    },
    "skills": [
     "Brawling",
@@ -2188,7 +2190,8 @@
    },
    "gear": {
     "item": "His surgeon's instruments",
-    "skill": "Medicine"
+    "skill": "Medicine",
+    "use": "field treatment of a wound: stitching, dressing, setting a bone"
    },
    "contact": "The editor of the territorial newspaper, who owes him a life",
    "equipment": {
@@ -2357,7 +2360,8 @@
    },
    "gear": {
     "item": "A Sharps rifle with a telescopic sight",
-    "skill": "Shooting"
+    "skill": "Shooting",
+    "use": "aimed shots at Long range or farther"
    },
    "play": {
     "gun": {
@@ -2522,7 +2526,7 @@
    [
     "chill",
     "Grave Chill",
-    "The target rolls Will or flees or freezes."
+    "The target flees or freezes (Will resists)."
    ],
    [
     "hold",
@@ -2532,7 +2536,7 @@
    [
     "misfire",
     "Misfire",
-    "One gun jams or one lamp gutters out; clearing a jam takes an action."
+    "One gun jams or one lamp gutters out; clearing a jam takes an action. No defense or resistance: it works on the gun or the lamp, not the person."
    ],
    [
     "shroud",
@@ -2547,10 +2551,10 @@
    [
     "stanch",
     "Stanch",
-    "Stop the bleeding: clear one injury box, once per wound."
+    "Stop the bleeding: clear one injury box, once per set of injuries."
    ]
   ],
-  "note": "Only a Sorcerer casts hexes. One action and an Occult roll, −1 for each Boost you spend (Specialty 1 Boost, Expert 2); the target resists where it makes sense. A failed hex marks a box of The Dark; a natural 18 marks two, or something answers."
+  "note": "Only a Sorcerer casts hexes. One action and an Occult roll, −1 for each Boost you spend (Specialty 1 Boost, Expert 2); each hex says whether Dodge applies or which attribute resists. A failed hex marks a box of The Dark; a natural 18 marks two, or something answers."
  },
  "magic": {
   "skill": "Occult",
@@ -2606,12 +2610,13 @@
    "rows": [
     [
      "Punch, kick, headbutt",
-     "Melee",
+     "Melee, reach 1 yd",
      "1",
      "Bruises, a split lip, cracked ribs"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "club",
@@ -2626,12 +2631,13 @@
    "rows": [
     [
      "Club, bottle, pistol-whip",
-     "Melee",
+     "Melee, reach 1 yd",
      "1",
      "A concussion or a broken finger"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "knife",
@@ -2646,12 +2652,13 @@
    "rows": [
     [
      "Knife or hatchet",
-     "Melee; Close thrown",
+     "Melee, reach 1 yd; Close thrown",
      "1",
      "A cut or stab wound that bleeds"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "knife-thrown",
@@ -2700,12 +2707,14 @@
    "rows": [
     [
      "Axe, saber or bowie knife used to kill",
-     "Melee",
+     "Melee, reach 2 yd (bowie knife 1)",
      "2",
      "A deep wound or a broken bone"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 2,
+   "reachNote": "bowie knife 1"
   },
   {
    "id": "claws",
@@ -2720,12 +2729,13 @@
    "rows": [
     [
      "Claws and fangs of a monster",
-     "Melee",
+     "Melee, reach 1 yd",
      "2",
      "Torn flesh"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "derringer",
@@ -2913,7 +2923,8 @@
     }
    },
    "rows": [],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "fangs",
@@ -2926,7 +2937,8 @@
     }
    },
    "rows": [],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "jaws",
@@ -2939,7 +2951,8 @@
     }
    },
    "rows": [],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   }
  ],
  "threats": [
@@ -3523,15 +3536,15 @@
     ],
     [
      "Short",
-     "up to 50 yd"
+     "up to 25 yd"
     ],
     [
      "Medium",
-     "up to 150 yd"
+     "up to 100 yd"
     ],
     [
      "Long",
-     "up to 500 yd"
+     "up to 300 yd"
     ],
     [
      "Extreme",
@@ -3721,7 +3734,7 @@
     "vampire",
     "Vampire",
     "A stake through the heart incapacitates it; fire, sunlight and beheading destroy it; holy symbols hold it back; it can't enter uninvited.",
-    "A called shot with a stake at the heart (a telling hit pins it); hunting it by day; refusing it entry."
+    "A called shot with a stake at the heart: its weakness, which incapacitates it (an established weakness, not a telling-hit pin); hunting it by day; refusing it entry."
    ],
    [
     "zombie",
@@ -3796,6 +3809,26 @@
   [
    "fire",
    "Fire (a torch, burning oil)"
+  ]
+ ],
+ "mounts": [
+  [
+   "Horse",
+   "15 yd",
+   "40 yd",
+   "Galloping over hard going takes a Riding roll; failing it means a fall."
+  ],
+  [
+   "Mule",
+   "12 yd",
+   "25 yd",
+   "Sure-footed: trails and slopes don't count as hard going."
+  ],
+  [
+   "Wagon or stagecoach",
+   "10 yd",
+   "25 yd",
+   "In a chase, it runs on the stagecoach track."
   ]
  ]
 }

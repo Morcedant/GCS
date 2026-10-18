@@ -24,7 +24,7 @@ Trails of Blood & Dust adds these to the attack and defense rules above.
 - **Careful Marksman.** Aiming with the advantage gives +3 in all: Aim's +1 and the advantage's +2.
 - **A heavy coat.** A buffalo coat or a canvas duster turns a blade, a claw or an arrow, but not a bullet. Once per fight, a hit of 2 or more boxes from a blade, claw, fang or missile marks one fewer.
 
-*Example:* a werewolf's claws succeed by 5 against Deputy Ames, who hasn't defended yet this round. Dodge is 11, −2 for the clean hit: Ames needs a 9 or less. A parry with the saber would be Melee 14 −3 −2 = 9, no better, so Ames dodges. When the second wolf lunges before Ames's next turn, there's no defense left, unless Ames has Additional Defense.
+*Example:* a werewolf's claws succeed by 5 against Deputy Ames, who hasn't defended yet this round. Dodge is 11, −2 for the clean hit: Ames needs a 9 or less. A parry with the saber would be Melee 14 −3 −2 = 9, no better, so Ames dodges. When the second wolf lunges before Ames's next turn, there's no defense left, unless Ames has Additional Defense: a second defense at −2, on top of the attack-quality penalty.
 
 ### Stagecoach chases
 
@@ -83,19 +83,19 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 ### Hexes
 
-A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells cast with **one action and an Occult roll**. Hexes known: **Trained 2, Specialty 3, Expert 4**. Occult as a Specialty gives **1 Boost**, as Expert **2**; each Boost spent is −1 to the roll. A failed hex marks a box of The Dark.
+A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells cast with **one action and an Occult roll**. Hexes known: **Trained 2, Specialty 3, Expert 4**. Occult as a Specialty gives **1 Boost**, as Expert **2**; each Boost spent is −1 to the roll. Each hex below says whether Dodge applies or which attribute resists, never both (see *Defense or resistance* in *Magic*). A failed hex marks a box of The Dark.
 
 | Hex | Base effect |
 |---|---|
 | Hellfire | A lash of flame at Short range; marks 2 boxes. Dodge applies. |
 | Devil's Shove | Unseen force hurls the target down: 1 box, and they lose their next move (Body resists). |
 | Evil Eye | The target is at −2 on all rolls for the scene (Will resists). |
-| Grave Chill | The target rolls Will or flees or freezes. |
+| Grave Chill | The target flees or freezes (Will resists). |
 | Hold | The target is held where they stand for the scene, or until they break free (Body resists). |
-| Misfire | One gun jams or one lamp gutters out; clearing a jam takes an action. |
+| Misfire | One gun jams or one lamp gutters out; clearing a jam takes an action. No defense or resistance: it works on the gun or the lamp, not the person. |
 | Shroud | +3 to Stealth for the scene; eyes slide off you. |
 | Witch-sight | See spirits, curses, charms and things wearing human skin. |
-| Stanch | Stop the bleeding: clear one injury box, once per wound. |
+| Stanch | Stop the bleeding: clear one injury box, once per set of injuries. |
 
 ## Weaknesses
 

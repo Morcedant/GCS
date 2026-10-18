@@ -380,7 +380,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-head .avatar.portrait { width: 40px; height: 54px; }
 .gm-head b { font-family: var(--display); letter-spacing: .06em; text-transform: uppercase; font-size: 1.05rem; overflow-wrap: anywhere; }
 .gm-head .small { display: block; }
-.gm-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.gm-stats { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
 .gm-stats div { border: 1px solid var(--line); border-radius: 6px; padding: 4px 2px; background: var(--well); }
 .gm-stats span { display: block; font: .56rem var(--mono); letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
 .gm-stats b { font: 400 1.15rem var(--mono); color: var(--chrome); }
@@ -554,7 +554,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="a040603" data-version-date="2026.10.16" title="The code changes whenever this page changes.">Version 2026.10.16 · a040603</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="243322b" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 243322b</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -594,6 +594,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide"><div class="trait-desc" id="species-desc"></div></div>
             <div class="field wide" id="species-adj-wrap" hidden><span class="label">Custom adjustments (must total 0, each −2 to +2)</span>
               <div class="adj-grid" id="species-adj"></div></div>
+            <div class="field" id="custom-speed-wrap" hidden><label for="f-customspeed">Speed (agreed with the GM)</label>
+              <select id="f-customspeed"><option value="-1">Slower: Move −1</option><option value="0">Human pace</option><option value="1">Faster: Move +1</option></select></div>
           </div>
           <div class="pool"><span class="label">Points to spend</span><span id="pool-pips" class="pool"></span><span class="num" id="pool-left"></span></div>
           <div class="attrs" id="attrs"></div>
@@ -721,6 +723,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="panel hud">
           <div class="stats">
             <div class="stat"><span class="eyebrow">Dodge</span><b id="st-dodge"></b></div>
+            <div class="stat"><span class="eyebrow">Move</span><b id="st-move"></b></div>
             <div class="stat"><span class="eyebrow">Duty</span><b>2</b></div>
             <div class="stat"><span class="eyebrow">Best</span><b id="st-best"></b></div>
           </div>
@@ -962,6 +965,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <div class="field" style="flex:1 1 16em"><label for="lab-defense">Target's defense</label><select id="lab-defense"></select>
                 <span class="small muted" id="lab-dodge-note" role="status"></span></div>
             </div>
+            <p class="small" id="lab-reach" hidden style="margin:6px 0 0"></p>
             <div class="lab-row" id="lab-text-row" style="margin-top:8px" hidden>
               <div class="field" style="flex:1 1 100%"><label for="lab-text" id="lab-text-label">Note</label><input type="text" id="lab-text"></div>
             </div>
@@ -1032,6 +1036,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Defenses, telling hits and called shots:</strong> Parry and Block beside Dodge, and great hits that decide what happens.</li>
 <li><strong>Advancement points</strong>, earned after missions and spent on skills, advantages and attributes.</li>
 <li><strong>Gritty combat</strong>, an optional rule for grievous wounds.</li>
+<li><strong>Move and reach:</strong> how far you move in a turn, how injury and hard going slow you, and how far a weapon in hand reaches.</li>
 <li><strong>A battle map</strong> in the GM view, for away teams and ship fights.</li>
 </ul>
 <h2 id="g-guide-scope">Guide scope</h2>
@@ -1228,6 +1233,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li>The starting maximum is <strong>13</strong>, plus any species bonus to that attribute. A Vulcan can start with Body or Will at 14.</li>
 <li>You cannot lower an attribute below its species base to gain points.</li>
 </ul>
+<p>Your species can also change how fast you move. Only the Lanthanite does, at Move −1; see <em>Move and reach</em>.</p>
 <h3 id="g-species-descriptions">Species descriptions</h3>
 <p><strong>Human.</strong> Adaptable and widespread across Starfleet. No adjustments; spend your points wherever you like.</p>
 <p><strong>Vulcan.</strong> Physically stronger than humans and trained from childhood in logic and emotional control. Their reserve can read as cold to other species.</p>
@@ -1235,7 +1241,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Tellarite.</strong> Stocky, stubborn, and fond of argument as a form of respect. Hard to move once they have made up their minds.</p>
 <p><strong>Aenar.</strong> A blind, pale subspecies of Andorian with strong telepathic gifts and a pacifist culture. Hemmer served as the Enterprise’s chief engineer.</p>
 <p><strong>Illyrian.</strong> A people who reshape themselves through genetic modification. Federation law bars augmented officers, so Illyrians in Starfleet, like Una Chin-Riley, have faced suspicion and secrecy.</p>
-<p><strong>Lanthanite.</strong> Extremely long-lived people who look human and have quietly lived on Earth for millennia, like Pelia. Centuries of experience; a body that dislikes hurrying.</p>
+<p><strong>Lanthanite.</strong> Extremely long-lived people who look human and have quietly lived on Earth for millennia, like Pelia. Centuries of experience; a body that dislikes hurrying: Move −1.</p>
 <p><strong>Caitian.</strong> A feline species with keen senses and quick reflexes. Lt. M’Ress served aboard the Enterprise in this era.</p>
 <p><strong>Aurelian.</strong> A winged, avian people known as scholars and historians, like Aleek-Om. Capable of flight, but light-boned and physically frail.</p>
 <p><strong>Orion.</strong> Green-skinned people whose homeworld is better known for the Orion Syndicate’s smugglers and pirates than for Starfleet service. Orions in uniform are rare in this era and often have to prove themselves.</p>
@@ -1273,7 +1279,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>An advantage gives +2 to one narrowly defined kind of task when the GM agrees it applies. It cannot improve every use of a broad skill. A complication creates choices and problems; it is not a permanent penalty.</p>
 <p><em>Examples:</em> Steady Hands gives +2 to delicate medical procedures. Subspace Specialist gives +2 when analyzing subspace phenomena. Complications might be Cannot Leave a Mystery Alone, Distrusts Command Decisions, or Protects Others at Personal Risk. Define their triggers with the GM.</p>
 <h2 id="g-step-5-prepare-for-duty">Step 5: Prepare for duty</h2>
-<p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Your Parry is Unarmed Combat −3, and your Block Unarmed Combat −2. Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.</p>
+<p>Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Your Parry is Unarmed Combat −3, and your Block Unarmed Combat −2. Your <strong>Move</strong> is 5 yards, +1 for every 2 points of Agility + Body above 20, plus the same Athletics bonus and your species’ speed, if it has one (see <em>Move and reach</em>). Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.</p>
 <h3 id="g-top-10-connections-to-a-crewmate">Top 10 connections to a crewmate</h3>
 <p>Pick one, name the crewmate with their player, and agree on the details together.</p>
 <ol type="1">
@@ -1293,7 +1299,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <ul>
 <li><strong>Specialty:</strong> Sensors 16.</li>
 <li><strong>Trained:</strong> Physical Sciences 14, Computers 14, Electronics 14, Life Sciences 14, Medicine 14, Engineering 14, Communications 14, Diplomacy 12, Phasers 11.</li>
-<li><strong>Dodge:</strong> Athletics is Untrained, so Dodge is 8.</li>
+<li><strong>Dodge:</strong> Athletics is Untrained, so Dodge is 8. <strong>Move:</strong> Agility + Body is 20, so Move is 5 yards.</li>
 <li><strong>Advantage:</strong> Subspace Specialist. <strong>Complication:</strong> Cannot Leave a Mystery Alone.</li>
 </ul>
 <h1 id="g-skills-and-equipment">Skills and equipment</h1>
@@ -1407,7 +1413,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-untrained-actions">Untrained actions</h2>
 <p>A plausible untrained attempt uses attribute −4. Specialized procedures such as surgery or warp-core repair require relevant training or direct guidance. Guidance permits an attempt only when the GM finds it credible; it does not automatically grant the expert’s skill.</p>
 <h2 id="g-standard-equipment">Standard equipment</h2>
-<p>Equipment makes tasks possible rather than easier. Ordinary equipment grants no blanket bonus; exceptional tools or preparation may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible. Every crew member carries a communicator; the rest is issued for the mission.</p>
+<p>Equipment makes tasks possible rather than easier. Ordinary equipment grants no blanket bonus. A <strong>fine weapon or tool</strong> grants +2 to one narrowly defined use of a named skill, agreed when chosen. It does not stack with an advantage bonus on the same roll and never improves Dodge, Parry, or Block. A Vulcan resonator kit might give +2 to Electronics for tuning a sensor array, but not to every repair; a surgeon’s own laser scalpel set +2 to Medicine for field surgery, but not to diagnosis. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible. Every crew member carries a communicator; the rest is issued for the mission.</p>
 <table>
 <colgroup>
 <col style="width: 50%" />
@@ -1527,13 +1533,14 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Ask concrete questions and explain your approach. Evidence may require several different tasks. Diplomacy can secure cooperation or concessions, while Psychology offers insight into behavior. A successful roll does not force someone to abandon a core belief or provide information they do not possess.</p>
 <h1 id="g-personal-combat">Personal combat</h1>
 <h2 id="g-turn-order-and-actions">Turn order and actions</h2>
-<p>Act in descending Agility order. Players choose the order of tied crew members; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as attacking, using equipment, helping, or attempting a task. The GM judges movement by the scene; there is no fixed grid scale.</p>
+<p>Act in descending Agility order. Players choose the order of tied crew members; the GM resolves other ties. A round lasts a few seconds. On your turn, move up to your <strong>Move</strong> (see <em>Move and reach</em>) and take one meaningful action, such as attacking, using equipment, helping, or attempting a task.</p>
 <h2 id="g-attacking-and-defending">Attacking and defending</h2>
 <p>Roll Phasers for a ranged attack, or Unarmed Combat for fists, grappling and a weapon in hand. If the attack succeeds, an aware target able to move may <strong>defend</strong>: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.</p>
 <ul>
-<li><strong>One defense a round.</strong> A target gets one defense a round, between its turns, and chooses which when an attack hits. The <strong>Additional Defense</strong> advantage gives a second.</li>
+<li><strong>One defense a round.</strong> A target gets one defense a round, between its turns, and chooses which when an attack hits.</li>
+<li><strong>Additional Defense.</strong> With this advantage you may attempt a second defense each round at −2, in addition to attack-quality and injury penalties. You cannot defend twice against the same attack.</li>
 <li><strong>Dodge</strong> is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Untrained Athletics adds nothing; use the training level, not the final Athletics score.</li>
-<li><strong>Parry.</strong> Against a weapon in hand or fists, roll Unarmed Combat −3 with a weapon in hand: a d’k tahg, a lirpa, a length of pipe. Bare-handed, Unarmed Combat −3 parries fists only. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a phaser beam or a disruptor bolt.</li>
+<li><strong>Parry.</strong> Against a weapon in hand or fists, roll Unarmed Combat −3 with a weapon in hand: a d’k tahg, a lirpa, a length of pipe. Bare-handed, Unarmed Combat −3 parries fists only. Nobody parries a phaser beam or a disruptor bolt.</li>
 <li><strong>Block.</strong> With anything that can stand in for a shield (a chair, a crate lid, a torn-off panel), you can block a weapon in hand, fists or a thrown weapon: roll Unarmed Combat −2. Nothing you can lift blocks an energy weapon. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.</li>
 <li><strong>Attack quality.</strong> A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.</li>
 <li><strong>Aim.</strong> Spend your action aiming at a target you can see: +1 to your next attack against it. <strong>Careful Marksman</strong> adds its +2 to this.</li>
@@ -1543,63 +1550,67 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.</p>
 <ul>
 <li><strong>A telling hit</strong> is an attack that succeeds by <strong>5 or more</strong>, or on a natural 3 or 4, and isn’t stopped by a defense. The attacker picks <strong>one effect</strong> below and describes it. The weapon still marks its usual boxes.</li>
-<li><strong>A called shot.</strong> Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, a phaser, a control panel, a power cell). If the attack hits at all, the effect happens, whatever the margin. <strong>Careful Marksman</strong> cuts this penalty by 1.</li>
+<li><strong>A called shot.</strong> Before rolling, name an effect your weapon can deliver and take −2 on the attack, or −4 for a small target (a hand, a phaser, a control panel, a power cell). If the attack hits at all, the effect happens, whatever the margin. <strong>Careful Marksman</strong> cuts this penalty by 1.</li>
 <li><strong>Phasers on stun</strong> land telling hits too. The effect happens whether or not the target resists the stun.</li>
 <li><strong>Both ways.</strong> Klingons, pirates and stranger things land telling hits on the crew too.</li>
 </ul>
 <table>
 <colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Effect</th>
+<th>With</th>
 <th>What happens</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>Disarm</td>
+<td>Any attack</td>
 <td>The weapon or held item drops, or flies a few yards away</td>
 </tr>
 <tr class="even">
 <td>Knock down</td>
-<td>The target falls prone, or is driven back a few steps</td>
+<td>A weapon in hand or fists, a phaser on stun, or a shot that marks 2 or more boxes</td>
+<td>The target falls prone, or is driven back a few steps. Standing up uses the target’s move on their next turn; they still take their action</td>
 </tr>
 <tr class="odd">
 <td>Pin</td>
-<td>The target is held, tangled or pinned down: their next action goes to getting free</td>
+<td>A weapon in hand, fists or a grapple</td>
+<td>The target is grabbed, held, or pinned against a bulkhead or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack</td>
 </tr>
 <tr class="even">
 <td>Rattle</td>
+<td>Any attack</td>
 <td>−2 to the target’s next roll</td>
 </tr>
 <tr class="odd">
 <td>Break gear</td>
-<td>A phaser, tricorder, communicator or improvised shield breaks</td>
+<td>Any attack but bare hands and natural weapons</td>
+<td>A phaser, tricorder, communicator or shield is knocked out of use (jammed, cracked, shorted out) until its owner spends an action putting it right. It’s destroyed for good only if it was already vulnerable (a drained phaser, an improvised shield) or the attacker has a weakness to exploit</td>
 </tr>
 <tr class="even">
 <td>Open them up</td>
+<td>Any attack</td>
 <td>The next attack on this target this round gets +2</td>
 </tr>
 <tr class="odd">
 <td>Precise</td>
-<td>You hit exactly what you aimed at: the control panel, the power coupling, the hand on the trigger</td>
+<td>Any attack</td>
+<td>You hit exactly what you aimed at: the control panel, the power coupling, the hand on the trigger. It changes the situation, never the rules: no extra boxes, no getting past a defense, no instant death</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Limits.</strong> A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a Gorn of its claws, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.</p>
+<p><strong>Limits.</strong> A telling hit never adds boxes and never gets past a defense. It never kills outright, disables a crew member for good, or destroys exceptional equipment: those come only from injury, from <em>Dying and death</em>, or from an established weakness. Only the effects a weapon can deliver are open to it (the <em>With</em> column). Keeping someone’s head down with phaser fire isn’t a pin: that’s cover and a threat. The effect still has to make sense: nobody disarms a Gorn of its claws, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.</p>
 <p><strong>Staying alive.</strong> A crew member on the receiving end can shrug off a telling hit’s effect with <strong>Hard to put down</strong> (once per fight) or by spending a Duty point. Either way, they still take the boxes.</p>
-<p><em>Example:</em> a Klingon warrior slashes at Lt. Reyes with a d’k tahg and succeeds by 5. Reyes hasn’t defended yet this round: Dodge 12, −2 for the clean hit, needs a 10 or less. Bare-handed, Reyes can’t parry a blade, so Reyes dodges. When the second Klingon swings before Reyes’s next turn, there’s no defense left, unless Reyes has Additional Defense.</p>
+<p><em>Example:</em> a Klingon warrior slashes at Lt. Reyes with a d’k tahg and succeeds by 5. Reyes hasn’t defended yet this round: Dodge 12, −2 for the clean hit, needs a 10 or less. Bare-handed, Reyes can’t parry a blade, so Reyes dodges. When the second Klingon swings before Reyes’s next turn, there’s no defense left, unless Reyes has Additional Defense, which allows a second at −2.</p>
 <h2 id="g-range">Range</h2>
 <p>Distances fall into five bands:</p>
 <table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th>Band</th>
@@ -1611,33 +1622,98 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="odd">
 <td>Close</td>
 <td>Up to 10 yards</td>
-<td>Across a room or a corridor junction; one move covers it</td>
+<td>Across a room or a corridor junction</td>
 </tr>
 <tr class="even">
 <td>Short</td>
-<td>Up to 50 yards</td>
+<td>Up to 25 yards</td>
 <td>Across a shuttle bay or a village square</td>
 </tr>
 <tr class="odd">
 <td>Medium</td>
-<td>Up to 150 yards</td>
+<td>Up to 100 yards</td>
 <td>Across a cargo hold or a city block</td>
 </tr>
 <tr class="even">
 <td>Long</td>
-<td>Up to 500 yards</td>
+<td>Up to 300 yards</td>
 <td>Across a canyon or a landing field</td>
 </tr>
 <tr class="odd">
 <td>Extreme</td>
-<td>Up to a mile, in line of sight</td>
+<td>Up to 1,000 yards, in line of sight</td>
 <td>Ridge to ridge</td>
 </tr>
 </tbody>
 </table>
-<p>Every ranged weapon has an <strong>effective band</strong>, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Melee weapons and fists reach only someone next to you. Your move each turn covers the Close band; give up your action to run and you cover Short.</p>
+<p>Every ranged weapon has an <strong>effective band</strong>, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. A thrown weapon’s effective band is Close.</p>
+<h2 id="g-move-and-reach">Move and reach</h2>
+<p><strong>Move</strong> is how far you go in a turn: <strong>5 yards, +1 for every 2 points of Agility + Body above 20</strong> (rounded down; nothing is taken off below 20), <strong>+1 for Trained Athletics or +2 for Athletics as a Specialty or Expert</strong>, plus your species’ speed adjustment, if it has one (the Lanthanite’s −1). Most crew move 6 to 9 yards. Give up your action to <strong>run</strong> and you cover twice your Move. Opponents move 8 yards unless their entry says otherwise.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Agility + Body</th>
+<th>20 or less</th>
+<th>21–22</th>
+<th>23–24</th>
+<th>25–26</th>
+<th>27–28</th>
+<th>29–30</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Move before Athletics</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Injury slows you.</strong> Wounded (1 box): Move −2 yards. Seriously wounded (2 boxes): half your Move, rounded down, and you can’t run. Incapacitated: you don’t move. Never less than 1 yard while you can act.</li>
+<li><strong>Hard going halves it.</strong> Climbing, swimming, wading, crawling through a Jefferies tube, deep snow or sand, rubble or a crowd: half your Move (and half a run), rounded down. Injury and hard going both apply, injury first.</li>
+<li><strong>Stepping away.</strong> You can move away from someone in reach freely; leaving a fight doesn’t give them a free attack.</li>
+</ul>
+<p>A weapon in hand strikes anyone within its <strong>reach</strong>, shown in the weapons table. Move into reach as part of your turn and attack in the same turn.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Reach</th>
+<th>Weapons</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1 yard</td>
+<td>Fists, kicks and grappling; knives and d’k tahgs; clubs; claws, bites and crushing grips</td>
+</tr>
+<tr class="even">
+<td>2 yards</td>
+<td>Swords, axes and other heavy blades; a rifle butt</td>
+</tr>
+<tr class="odd">
+<td>3 yards</td>
+<td>A lirpa, a spear or another polearm</td>
+</tr>
+</tbody>
+</table>
+<p>A weapon in hand can’t reach past 3 yards; anything farther is a ranged attack.</p>
+<p><strong>Vehicles.</strong> A driver or pilot moves at the vehicle’s speed, not their own, and running it flat out takes their action; firing from a moving vehicle is −2. Shuttles and starships are too fast for yards: they use <em>Range in space</em> and the ship rules.</p>
 <h2 id="g-injury">Injury</h2>
 <table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Boxes marked</th>
@@ -1654,12 +1730,12 @@ tr.lvl-U td.target { color: var(--muted); }
 <tr class="even">
 <td>1</td>
 <td>Wounded</td>
-<td>−1 to physical actions</td>
+<td>−1 to physical actions; Move −2 yards</td>
 </tr>
 <tr class="odd">
 <td>2</td>
 <td>Seriously wounded</td>
-<td>−2 to physical actions</td>
+<td>−2 to physical actions; half Move, no running</td>
 </tr>
 <tr class="even">
 <td>3</td>
@@ -1764,19 +1840,19 @@ tr.lvl-U td.target { color: var(--muted); }
 <tbody>
 <tr class="odd">
 <td>Punch, kick, headbutt</td>
-<td>Melee</td>
+<td>Melee, reach 1 yd</td>
 <td>1</td>
 <td>Bruising, a split lip, cracked ribs</td>
 </tr>
 <tr class="even">
 <td>Club, rifle butt, thrown rock</td>
-<td>Melee; rock Close thrown</td>
+<td>Melee, reach 1 yd (rifle butt 2); rock Close thrown</td>
 <td>1</td>
 <td>A concussion, a broken finger, heavy bruising</td>
 </tr>
 <tr class="odd">
 <td>Knife or dagger, such as a Klingon d’k tahg</td>
-<td>Melee; Close thrown</td>
+<td>Melee, reach 1 yd; Close thrown</td>
 <td>1</td>
 <td>A cut or stab wound that bleeds</td>
 </tr>
@@ -1788,7 +1864,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="odd">
 <td>Heavy melee weapon, such as a Vulcan lirpa, a sword, or an axe</td>
-<td>Melee</td>
+<td>Melee, reach 2 yd (lirpa 3)</td>
 <td>2</td>
 <td>A deep wound or a broken bone</td>
 </tr>
@@ -1929,10 +2005,18 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>A medical scanner identifies ordinary injuries automatically. Roll Medicine when the diagnosis is uncertain, physiology is unfamiliar, or an urgent treatment decision has meaningful consequences. Routine established treatments also succeed automatically when qualified staff have sufficient time and facilities.</p>
 <p>Emergency stabilization takes one action and a successful Medicine roll with a medical kit. It prevents deterioration from the treated injury while the patient is protected from further harm, and it ends Dying. Stabilization alone removes no injury boxes. A patient at three boxes remains incapacitated until treatment clears a box.</p>
 <h2 id="g-field-treatment">Field treatment</h2>
-<p>With a medical kit and several uninterrupted minutes, successful Medicine removes one injury box. Success by 5 or more removes two. Each injury receives one field-treatment attempt, even if that attempt fails; further attempts require changed circumstances such as better equipment, new diagnostic information, or access to sickbay. New injuries can receive their own treatment, but cannot justify treating an old injury repeatedly.</p>
+<p>With a medical kit and several uninterrupted minutes, successful Medicine removes one injury box. Success by 5 or more removes two.</p>
 <h2 id="g-sickbay-treatment">Sickbay treatment</h2>
-<p>A functioning, equipped sickbay grants +2 to Medicine for diagnosis and treatment. A successful treatment removes two injury boxes; success by 5 or more removes three. Allow the time the procedure requires rather than completing surgery in one combat action. Sickbay care can follow field treatment. Do not repeat an unsuccessful procedure without a meaningful change in the situation.</p>
+<p>A functioning, equipped sickbay grants +2 to Medicine for diagnosis and treatment. A successful treatment removes two injury boxes; success by 5 or more removes three. Allow the time the procedure requires rather than completing surgery in one combat action. Sickbay care can follow field treatment.</p>
 <p>Removing injury boxes removes their associated penalties, but major organ damage, severe burns, and complex internal trauma can still require a procedure and recovery period set by the GM. The physician determines whether the patient is fit for duty. Pain suppression does not itself heal an injury. Stun normally wears off at the end of the scene; prolonged unconsciousness requires assessment.</p>
+<h2 id="g-treatment-attempts">Treatment attempts</h2>
+<p>Each set of injuries permits one field-treatment attempt and one proper-care attempt. Further rolls require a meaningful improvement in care, a new treatment, or recovery time. Simply waiting and trying again is insufficient.</p>
+<ul>
+<li><strong>A set of injuries</strong> is the boxes from one encounter or harmful incident: one fight, one fall, one console explosion. Sickbay treatment is the proper care.</li>
+<li><strong>Later injuries are a new set.</strong> Its attempts remove only its own boxes; they don’t reopen injuries already treated.</li>
+<li><strong>What allows another roll:</strong> sickbay after field care, a new diagnosis or a treatment that wasn’t tried, a specialist or the right species data, or recovery time (the next day’s rest).</li>
+<li><strong>Stabilization is separate.</strong> Stabilizing a Dying patient is never limited by these attempts and never removes boxes.</li>
+</ul>
 <h2 id="g-natural-recovery">Natural recovery</h2>
 <p>Injuries also heal with time. Rest clears injury one box at a time, and the worse you’re hurt, the longer each box takes. Rest means light duty at most: no combat, no away missions, nothing strenuous. A day spent working hard or fighting clears nothing.</p>
 <table>
@@ -2569,7 +2653,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-thelan-shvari">Thelan sh’Vari</h2>
 <p><em>Lieutenant Commander, Command. Andorian.</em> First officer: keeps the crew moving when the captain’s plan meets reality, and keeps the captain honest.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 10, Agility 12, Intellect 10, Presence 13, Will 10. <strong>Dodge</strong> 11.</li>
+<li><strong>Attributes:</strong> Body 10, Agility 12, Intellect 10, Presence 13, Will 10. <strong>Dodge</strong> 11, <strong>Move</strong> 7 yd.</li>
 <li><strong>Skills:</strong> Leadership 16 (Specialty). Trained: Diplomacy 14, Helm 13, Phasers 13, Unarmed Combat 13, Navigation 11, Psychology 11, Athletics 11, Sensors 11, Communications 11.</li>
 <li><strong>Advantage:</strong> Crisis Leader. <strong>Complication:</strong> Reputation to Uphold; trigger: someone questions your competence in front of others.</li>
 <li><strong>Why I serve:</strong> Starfleet runs in my family, and I mean to live up to the name. <strong>Connection:</strong> Took Yeoman Rrinn under their wing when Rrinn first came aboard.</li>
@@ -2577,7 +2661,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-sevek">Sevek</h2>
 <p><em>Lieutenant, Science. Vulcan.</em> Ship’s sciences officer: reads the anomaly, names the risk, and calculates the odds no one asked for.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 11, Agility 11, Intellect 13, Presence 8, Will 12. <strong>Dodge</strong> 10.</li>
+<li><strong>Attributes:</strong> Body 11, Agility 11, Intellect 13, Presence 8, Will 12. <strong>Dodge</strong> 10, <strong>Move</strong> 7 yd.</li>
 <li><strong>Skills:</strong> Physical Sciences 16 (Specialty). Trained: Sensors 14, Computers 14, Life Sciences 14, Navigation 14, Engineering 14, Electronics 14, Psychology 14, Unarmed Combat 12, Athletics 12.</li>
 <li><strong>Advantage:</strong> Eidetic Recall (species; companion: Suppressed Emotion). <strong>Complication:</strong> Cannot Leave a Mystery Alone; trigger: sensor data that contradicts known science.</li>
 <li><strong>Why I serve:</strong> The best laboratory in the galaxy is a starship on the frontier. <strong>Connection:</strong> Friendly rivals with Lt. Grath: they argue every engineering theory, and both enjoy it.</li>
@@ -2585,7 +2669,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-dr.-vessik">Dr. Vessik</h2>
 <p><em>Lieutenant Commander, Medical. Denobulan.</em> Chief medical officer: patches up the crew, argues with the captain, and keeps an alarming menagerie of medicinal creatures in sickbay.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 9, Agility 9, Intellect 13, Presence 12, Will 12. <strong>Dodge</strong> 7.</li>
+<li><strong>Attributes:</strong> Body 9, Agility 9, Intellect 13, Presence 12, Will 12. <strong>Dodge</strong> 7, <strong>Move</strong> 5 yd.</li>
 <li><strong>Skills:</strong> Medicine 16 (Specialty). Trained: Life Sciences 14, Psychology 14, Sensors 14, Computers 14, Electronics 14, Survival 14, Communications 14, Diplomacy 13, Leadership 13.</li>
 <li><strong>Advantage:</strong> Denobulan Pharmacopoeia (species; companion: Unorthodox Methods). <strong>Complication:</strong> Protects Others at Personal Risk; trigger: civilians are caught in the danger.</li>
 <li><strong>Why I serve:</strong> To protect the Federation and the people who can’t protect themselves. <strong>Connection:</strong> Pulled Lt. Reyes out of a burning shuttle on a survey mission; Reyes has never let the doctor pay for a drink since.</li>
@@ -2593,7 +2677,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-grath">Grath</h2>
 <p><em>Lieutenant, Engineering. Tellarite.</em> Engineer: keeps the Pelion’s power flowing and will tell you, at length, exactly why your idea won’t work.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 12, Agility 10, Intellect 13, Presence 9, Will 11. <strong>Dodge</strong> 9.</li>
+<li><strong>Attributes:</strong> Body 12, Agility 10, Intellect 13, Presence 9, Will 11. <strong>Dodge</strong> 9, <strong>Move</strong> 7 yd.</li>
 <li><strong>Skills:</strong> Engineering 16 (Specialty). Trained: Electronics 14, Computers 14, Physical Sciences 14, Sensors 14, Communications 14, Survival 14, Athletics 13, Helm 11, Unarmed Combat 11.</li>
 <li><strong>Advantage:</strong> Improvisational Engineer. <strong>Complication:</strong> Experimental Enthusiasm; trigger: an untested device or technique could solve the problem.</li>
 <li><strong>Why I serve:</strong> To prove I’m good enough, to everyone who doubted me and to myself. <strong>Connection:</strong> Off-duty friends with Commander sh’Vari: a weekly game of Andorian chess in which both of them cheat.</li>
@@ -2601,7 +2685,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-marisol-reyes">Marisol Reyes</h2>
 <p><em>Lieutenant (j.g.), Security. Human.</em> Security officer: first through the door on every away mission, and the last to set a phaser to kill.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 12, Agility 13, Intellect 10, Presence 10, Will 10. <strong>Dodge</strong> 12.</li>
+<li><strong>Attributes:</strong> Body 12, Agility 13, Intellect 10, Presence 10, Will 10. <strong>Dodge</strong> 12, <strong>Move</strong> 8 yd.</li>
 <li><strong>Skills:</strong> Phasers 16 (Specialty). Trained: Unarmed Combat 14, Stealth 14, Helm 14, Athletics 13, Survival 11, Sensors 11, Medicine 11, Leadership 11, Communications 11.</li>
 <li><strong>Advantage:</strong> Careful Marksman. <strong>Complication:</strong> Reluctant to Use Lethal Force; trigger: a hostile refuses to surrender.</li>
 <li><strong>Why I serve:</strong> A Starfleet officer once saved my home, and I want to be that person for someone else. <strong>Connection:</strong> Owes Dr. Vessik their life after a shuttle crash, and never lets the doctor forget it.</li>
@@ -2609,7 +2693,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <h2 id="g-rrinn">Rrinn</h2>
 <p><em>Yeoman 2nd Class, General Services. Caitian.</em> Captain’s yeoman: keeps the records, carries the orders, and hears everything said on the bridge.</p>
 <ul>
-<li><strong>Attributes:</strong> Body 9, Agility 12, Intellect 13, Presence 11, Will 10. <strong>Dodge</strong> 11.</li>
+<li><strong>Attributes:</strong> Body 9, Agility 12, Intellect 13, Presence 11, Will 10. <strong>Dodge</strong> 11, <strong>Move</strong> 6 yd.</li>
 <li><strong>Skills:</strong> Computers 18 (Expert). Trained: Communications 14, Psychology 14, Sensors 14, Electronics 14, Stealth 13, Diplomacy 12, Athletics 10.</li>
 <li><strong>Advantage:</strong> Keen Hearing (species; companion: Sensitive Ears). <strong>Complication:</strong> Someone Back Home; trigger: a message from home arrives.</li>
 <li><strong>Why I serve:</strong> To leave behind a past, a world, or a life that was too small for me. <strong>Connection:</strong> Shares a secret with Lt. Sevek from a mission neither of them talks about.</li>
@@ -2694,7 +2778,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="odd">
 <td>Additional Defense</td>
-<td>A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2. No +2 to rolls.</td>
+<td>A second defense each round at −2 (Dodge, Parry or Block, in any mix), on top of attack-quality and injury penalties. Never twice against the same attack. No +2 to rolls.</td>
 </tr>
 <tr class="even">
 <td>Hard to put down</td>
@@ -3080,6 +3164,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>Two or three sentences: where they come from, what sets them apart, and how others see them. It should be something the species in this book don’t already cover.</p>
 <h3 id="g-attribute-adjustments">2. Attribute adjustments</h3>
 <p>Give adjustments from <strong>−2 to +2</strong> per attribute that <strong>total zero</strong>: a +2 needs a −2 or two −1s. The adjustments move the attribute’s base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most species change two to four attributes.</p>
+<p>A species that is plainly faster or slower on its feet than a human may also take a <strong>speed adjustment</strong> of +1 or −1 to Move. Most have none. It isn’t an attribute adjustment and needn’t balance.</p>
 <h3 id="g-core-rules">3. Core rules</h3>
 <p>One to three short rules that always apply: what they can do (see in the dark, resist cold, a free Trained skill) and what it costs (a weakness, a people’s distrust, a hazard they can’t abide). A strength with no drawback is worth more than it looks.</p>
 <h3 id="g-species-advantages-1">4. Species advantages</h3>
@@ -3194,13 +3279,15 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Skills:</strong> Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (General Services only) = attribute +5.</p>
 <p><strong>Modifiers:</strong> favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails. Margin = adjusted skill − roll.</p>
 <p><strong>Assistance:</strong> success +1; success by 5 or more +2; failure no bonus; 18 causes a complication. One assistant per roll.</p>
-<p><strong>Combat:</strong> short movement plus one action. Successful attack → optional Dodge → weapon effect. Dodge = Agility −2, plus Athletics training (+0 Untrained, +1 Trained, +2 Specialty), once per round. One injury box gives −1 to physical actions; two give −2; three incapacitate.</p>
+<p><strong>Combat:</strong> Move plus one action. Successful attack → one defense a round (Dodge, Parry or Block; Additional Defense: a second, at −2) → weapon effect. Dodge = Agility −2, plus Athletics training (+0 Untrained, +1 Trained, +2 Specialty). Telling hit (by 5+ or a natural 3–4): an effect the weapon can deliver (pin: weapon in hand or grapple only), never extra boxes or an outright kill. One injury box gives −1 to physical actions; two give −2; three incapacitate.</p>
+<p><strong>Move:</strong> 5 yd, +1 per 2 points of Agility + Body above 20, +1 Trained Athletics or +2 Specialty/Expert, ± species speed; run (no action) twice that. Opponents 8 yd. Wounded −2 yd; seriously wounded half, no run. Hard going: half. Stepping away is free. Reach: 1 yd fists, knives, clubs; 2 yd heavy blades; 3 yd lirpa or spear.</p>
+<p><strong>Range:</strong> Close 10 yd, Short 25 yd, Medium 100 yd, Long 300 yd, Extreme 1,000 yd. One band beyond a weapon’s −2, two −4.</p>
 <p><strong>Damage:</strong> the weapon decides. Fists, clubs, knives, arrows and primitive firearms mark 1 box; heavy blades mark 2; a phaser or disruptor on kill marks 3 and leaves the target Dying (dead at the end of the scene unless stabilized); stun marks none. At three boxes, another hit from a 2-box or killing weapon is fatal.</p>
 <p><strong>Near misses:</strong> fail by 1–2 and the GM may offer success at a cost; never on a natural 17–18.</p>
 <p><strong>Clocks:</strong> 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).</p>
 <p><strong>Phaser power:</strong> Type 1 holds 8, Type 2 16, rifle 30. Stun 1, heat/cut 1, kill 2, wide-beam stun 3, disintegrate 4. Spare cell refills; overload needs 4+.</p>
 <p><strong>Ship:</strong> Shields (3) take hits first; then Hull (4) and a system (3 each: −2, −4, offline). Normal hit 1 box, heavy hit 2. Helm evades once per exchange; Engineering clears a box.</p>
-<p><strong>Medicine:</strong> one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery. Rest clears one box per full day, but not from three boxes: treatment must clear the first one.</p>
+<p><strong>Medicine:</strong> one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery. Each set of injuries (one fight or incident) gets one field and one sickbay attempt. Rest clears one box per full day, but not from three boxes: treatment must clear the first one.</p>
 <p><strong>Will:</strong> resist overwhelming fear or mental intrusion and maintain concentration. Ordinary danger needs no roll. Fear or distraction failure normally causes hesitation or −2 on your next action.</p>
 <p><strong>Duty points:</strong> start each session with two. Spend one to reroll, reduce an injury by one box, or establish a plausible preparation. Earn one when an accepted complication, including a companion complication, creates a meaningful problem.</p>
 </div>
@@ -3618,7 +3705,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Tokens.</strong> The GM places the crew with one button. Their tokens stay linked to the officers in the GM view: marking Injury, Dying, Stunned or a Duty point on a token marks it on the officer, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
 <p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps every map, its picture and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
 <h2 id="gm-the-encounter-panel">The Encounter panel</h2>
-<p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round), the boxes marked and any telling hit, offering a Duty point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so.</p>
+<p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), whether the attacker is in reach or in range on the battle map, the boxes marked and any telling hit, offering Duty point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so.</p>
 </div>
 <!-- GUIDE:END -->
       </article>
@@ -3686,13 +3773,13 @@ tr.lvl-U td.target { color: var(--muted); }
               <select id="r-quality"><option value="0">0–2 (no penalty)</option><option value="-1">3–4 −1</option><option value="-2">5–6 −2</option><option value="-3">7+ −3</option></select></div>
             <div class="field" id="r-called-wrap" hidden><label for="r-called">Called shot</label>
               <select id="r-called"><option value="0">None</option><option value="-2">Name the effect −2</option><option value="-4">Small target −4</option></select></div>
-            <div class="field" id="r-parries-wrap" hidden><label for="r-parries">Parries already this round</label>
-              <select id="r-parries"><option value="0">None</option><option value="1">One −2</option></select></div>
+
           </div>
           <div class="checks">
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
             <label id="r-phys-wrap"><input type="checkbox" id="r-phys"> <span id="r-phys-label">Physical action (injury penalty)</span></label>
             <label><input type="checkbox" id="r-stun"> Stun penalty −2</label>
+            <label id="r-second-wrap" hidden><input type="checkbox" id="r-second"> Second defense this round −2</label>
             <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> Aimed at this target last action +1</label>
           </div>
           <div class="btn-row"><button class="btn primary" id="r-roll">Roll</button>
@@ -3746,14 +3833,16 @@ tr.lvl-U td.target { color: var(--muted); }
           <dl class="ref">
             <dt>Resolution</dt><dd>3d6 at or below adjusted skill. Natural 3–4 always succeeds; 17–18 always fails. Margin = target − roll.</dd>
             <dt>Opposed</dt><dd>Success beats failure; both succeed → larger margin wins; ties and double failures favor the defender.</dd>
-            <dt>Combat</dt><dd>Move a short distance and take one action. Hit → target may defend once per round (Dodge, Parry or Block; two with Additional Defense) → weapon effect. Partial cover −2. Aim: +1 to your next attack.</dd>
-            <dt>Defending</dt><dd>Defense penalty by the attack's margin: 3–4 −1, 5–6 −2, 7+ −3. Parry: Unarmed Combat −3 with a weapon in hand (against weapons and fists), or bare-handed against fists only; a second parry −2 more. Block: Unarmed Combat −2 with a chair, a crate lid or a panel, against melee and thrown weapons, never energy weapons.</dd>
-            <dt>Telling hit</dt><dd>Hit by 5+ or a natural 3–4, not defended: the attacker picks one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, precise). Called shot: −2 (small target −4), and any hit gets the effect. No extra boxes. Shrug it off: Hard to put down (once a fight) or a Duty point.</dd>
+            <dt>Combat</dt><dd>Move up to your Move and take one action. Hit → target may defend once per round (Dodge, Parry or Block; Additional Defense: a second, at −2, never twice against one attack) → weapon effect. Partial cover −2. Aim: +1 to your next attack.</dd>
+            <dt>Move</dt><dd>5 yd, +1 per 2 points of Agility + Body above 20, +1 Trained Athletics or +2 Specialty/Expert (Lanthanite −1). Run (no action): twice that. Opponents: 8 yd. Wounded −2 yd; seriously wounded half, no running. Hard going: half. Stepping away from a fight is free.</dd>
+            <dt>Range</dt><dd>Close 10 yd, Short 25, Medium 100, Long 300, Extreme 1,000. One band beyond a weapon's −2, two −4, farther out of range. Reach: 1 yd fists, knives, clubs; 2 yd heavy blades; 3 yd lirpa or spear.</dd>
+            <dt>Defending</dt><dd>Defense penalty by the attack's margin: 3–4 −1, 5–6 −2, 7+ −3. Parry: Unarmed Combat −3 with a weapon in hand (against weapons and fists), or bare-handed against fists only. Block: Unarmed Combat −2 with a chair, a crate lid or a panel, against melee and thrown weapons, never energy weapons.</dd>
+            <dt>Telling hit</dt><dd>Hit by 5+ or a natural 3–4, not defended: the attacker picks one effect the weapon can deliver (disarm; knock down, in hand, on stun or a 2+ box shot: standing uses their move; pin, in hand or a grapple only: their next action frees them; rattle −2; break gear, not bare-handed: out of use until an action fixes it; open them up +2; precise). Called shot: −2 (small target −4), and any hit gets the effect. No extra boxes, never an outright kill. Shrug it off: Hard to put down (once a fight) or a Duty point.</dd>
             <dt>Damage</dt><dd>Fists, clubs, knives, arrows: 1 box. Heavy blades: 2. Phaser or disruptor on kill: 3 boxes and Dying. Stun: Body −2 roll, no box.</dd>
             <dt>Dying</dt><dd>Dies at the end of the scene unless stabilized (one action, Medicine roll, medical kit). At 3 boxes, a hit from a 2-box or killing weapon is fatal.</dd>
             <dt>Phasers</dt><dd>Stun: target rolls Body −2, fail = out for the scene, success = −2 next action. Kill: three boxes and Dying.</dd>
             <dt>Phaser power</dt><dd>Type 1: 8, Type 2: 16, rifle: 30. Stun 1, heat 1, kill 2, wide-beam 3, disintegrate 4. A spare cell refills it.</dd>
-            <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). Sickbay +2, clears 2 (3 on margin 5+).</dd>
+            <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). Sickbay +2, clears 2 (3 on margin 5+). One field and one sickbay attempt per set of injuries (one fight or incident); more need better care, a new treatment or rest.</dd>
             <dt>Rest</dt><dd>Clearing one box: a full day at 1 box, at least three days at 2, a week at 3 (and only once someone has stabilized or treated you). Light duty only.</dd>
             <dt>Ship fight</dt><dd>Power each exchange (Pelion 5): shields up 1, phasers 1, torpedo volley 1, transporter 1, +1 to a ship roll per Power left (max +2). Helm evades once an exchange; torpedoes can't be evaded. The most maneuverable ship adds the difference to Helm. A hit on the Hull rolls concussive damage.</dd>
             <dt>Duty points</dt><dd>Reroll (keep second), reduce an injury by one box, shrug off a telling hit, or establish a small preparation.</dd>
@@ -4065,7 +4154,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["guarded", "Guarded Mind", "+2 to Will when resisting an external mental intrusion or compulsion. It provides no telepathy or ability to detect the source.", "Will"],
     ["marksman", "Careful Marksman", "+2 to Phasers when you aim (with Aim's +1, +3 in all) at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it. A called shot is 1 easier for you.", "Phasers"],
     // Two that give no +2: they change what you can do in a fight.
-    ["extradefense", "Additional Defense", "A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2. No +2 to rolls.", ""],
+    ["extradefense", "Additional Defense", "A second defense each round at −2 (Dodge, Parry or Block, in any mix), on top of attack-quality and injury penalties. Never twice against the same attack. No +2 to rolls.", ""],
     ["survivor", "Hard to put down", "Once per fight, shrug off a telling hit's effect. You still take its boxes. No +2 to rolls.", ""],
   ];
   const COMPLICATIONS = [
@@ -4142,6 +4231,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (typeof out.portrait !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(out.portrait)) out.portrait = "";
     if (out.portraitShape !== "portrait") out.portraitShape = "token";
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
+    out.customSpeed = [-1, 0, 1].includes(+out.customSpeed) ? +out.customSpeed : 0;
     if (!Array.isArray(out.advances)) out.advances = [];
     // Phaser power: older characters with a hand phaser start with a full Type 1.
     const ph = c.play && c.play.phaser;
@@ -4247,6 +4337,13 @@ tr.lvl-U td.target { color: var(--muted); }
   const levelName = (l, name) => (l === "S" && isGS() && !(name && advancedToS(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => ch.attrs.Agility - 2 + LEVELS[ch.skills.Athletics].dodge;
+  // Move in yards: 5, +1 per 2 points of Agility + Body above 20, the Athletics bonus (as for Dodge) and the species' speed.
+  // Injury slows it: wounded −2 yards, seriously wounded half and no running, incapacitated none.
+  const SPECIES_SPEED = { lanthanite: -1 };
+  const speedOf = (c = ch) => (c.speciesId === "custom" ? c.customSpeed || 0 : SPECIES_SPEED[c.speciesId] || 0);
+  const moveOf = (c = ch) => 5 + Math.floor(Math.max(0, c.attrs.Agility + c.attrs.Body - 20) / 2) + LEVELS[c.skills.Athletics].dodge + speedOf(c);
+  const moveNow = (c = ch) => { const m = moveOf(c), i = (c.play && c.play.injury) || 0; return i >= 3 ? 0 : Math.max(1, i === 2 ? Math.floor(m / 2) : i === 1 ? m - 2 : m); };
+  const runNow = (c = ch) => ((c.play && c.play.injury) >= 2 ? 0 : moveNow(c) * 2);
   // Parry: Unarmed Combat −3, with a weapon in hand (against weapons and fists) or bare-handed (against fists only).
   // Block: Unarmed Combat −2 with anything that stands in for a shield. Never against energy weapons.
   const parryOf = () => skillTarget("Unarmed Combat") - 3;
@@ -4374,6 +4471,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const custom = ch.speciesId === "custom", sd = speciesDef();
     $("species-name-wrap").hidden = !custom;
     $("species-adj-wrap").hidden = !custom;
+    $("custom-speed-wrap").hidden = !custom;
+    $("f-customspeed").value = ch.customSpeed || 0;
     const adjNow = adjOf();
     $("species-desc").innerHTML = (custom ? "Record a species agreed with your GM. Adjustments must total 0, from −2 to +2 each." : esc(sd[3])) +
       `<div class="adj-chips">${ATTRS.filter(([n]) => adjNow[n]).map(([n]) => `<span class="adj-chip ${adjNow[n] > 0 ? "up" : "down"}">${n} ${signed(adjNow[n])}</span>`).join("") || `<span class="adj-chip">No adjustments</span>`}</div>`;
@@ -4468,7 +4567,8 @@ tr.lvl-U td.target { color: var(--muted); }
     $("ms-text").className = $("ready-status").className;
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
-    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics). Parry = Unarmed Combat −3 = ${parryOf()}; Block = Unarmed Combat −2 = ${blockOf()}. ${defensesPerRound() > 1 ? "Two defenses a round (Additional Defense)" : "One defense a round"}.`;
+    $("st-move").textContent = `${moveNow()} yd`;
+    $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics). Parry = Unarmed Combat −3 = ${parryOf()}; Block = Unarmed Combat −2 = ${blockOf()}. ${defensesPerRound() > 1 ? "Two defenses a round (Additional Defense: the second at −2)" : "One defense a round"}. Move = 5 yd + ${Math.floor(Math.max(0, ch.attrs.Agility + ch.attrs.Body - 20) / 2)} (Agility + Body ${ch.attrs.Agility + ch.attrs.Body}) + ${LEVELS[ch.skills.Athletics].dodge} (Athletics)${speedOf() ? ` ${signed(speedOf())} (species speed)` : ""} = ${moveOf()} yd; run ${moveOf() * 2} yd${moveNow() !== moveOf() ? ` (wounded: ${moveNow()} yd${runNow() ? `, run ${runNow()}` : ", no running"})` : ""}.`;
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
@@ -4503,6 +4603,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div><span class="label">Department</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">Species</span><b>${esc(ch.species || "—")}</b><span class="small muted">${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge()}</b></div>
+        <div><span class="label">Move</span><b class="num">${moveNow()} yd</b><span class="small muted">${runNow() ? `run ${runNow()} yd` : "no running while seriously wounded"}${moveNow() !== moveOf() ? ` · ${moveOf()} yd unhurt` : ""}</span></div>
         <div><span class="label">Parry</span><b class="num">${parryOf()}</b><span class="small muted">Block ${blockOf()}</span></div>
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
@@ -4575,7 +4676,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
     if (isDefense(name)) parts.push(+$("r-quality").value || 0);
-    if (isParry(name)) parts.push(-2 * (+$("r-parries").value || 0));
+    if (!$("r-second-wrap").hidden && $("r-second").checked) parts.push(-2); // Additional Defense: the second defense in a round
     if (!$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(1);
     // A called shot: −2, or −4 for a small target; Careful Marksman makes it 1 easier with Phasers.
     const called = !$("r-called-wrap").hidden ? +$("r-called").value || 0 : 0;
@@ -4593,7 +4694,7 @@ tr.lvl-U td.target { color: var(--muted); }
     updateInjuryToggle();
     const sk = $("r-skill").value || "";
     $("r-quality-wrap").hidden = !isDefense(sk);
-    $("r-parries-wrap").hidden = !(isParry(sk) && defensesPerRound() > 1);
+    $("r-second-wrap").hidden = !(isDefense(sk) && defensesPerRound() > 1);
     $("r-aim-wrap").hidden = !ATTACKS.includes(sk);
     $("r-called-wrap").hidden = !ATTACKS.includes(sk);
     const { name, base, total } = rollMods();
@@ -4620,7 +4721,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const ok = auto === "auto-s" || (auto !== "auto-f" && sum <= t);
     const margin = t - sum;
     const attackRoll = !$("r-called-wrap").hidden, called = attackRoll ? (isReroll && last ? last.called : +$("r-called").value) : 0;
-    last = { name, t, dice, sum, ok, margin, auto, attackRoll, called, rerolled: !!isReroll, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
+    last = { name, t, dice, sum, ok, margin, auto, attackRoll, called, sk: isReroll && last ? last.sk : $("r-skill").value, rerolled: !!isReroll, phaserNote: phaserNote || (isReroll && last ? last.phaserNote : "") };
     ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
     ch.play.log = ch.play.log.slice(0, 12);
     if ($("r-stun").checked) { ch.play.stunned = false; $("f-stunned").checked = false; }
@@ -4638,7 +4739,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (r.auto === "auto-f") note = "Natural " + r.sum + ": automatic failure.";
     else note = r.ok ? `Succeeded by ${r.margin}.` : `Failed by ${-r.margin}.`;
     if (r.attackRoll && r.ok && r.called) note += " Called shot: if it isn't defended, the effect you named happens. No extra boxes.";
-    else if (r.attackRoll && r.ok && (r.margin >= 5 || r.auto === "auto-s")) note += " <b>Telling hit</b> if it isn't defended: pick one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, or precise). No extra boxes.";
+    else if (r.attackRoll && r.ok && (r.margin >= 5 || r.auto === "auto-s")) note += ` <b>Telling hit</b> if it isn't defended: pick one effect (${r.sk === "Phasers" ? "disarm, knock down (on stun, or a shot that marks 2 or more boxes), rattle −2, break gear, open them up +2, or precise; a shot can't pin" : "disarm, knock down, pin, rattle −2, break gear (with a weapon in hand, not bare-handed), open them up +2, or precise"}). No extra boxes.`;
     if (gritty && r.attackRoll && r.ok && (r.margin >= 7 || r.auto === "auto-s")) note += " <b>Gritty combat:</b> if it marks 2 or more boxes, it's grievous. A crew member rolls the grievous wound table; an opponent is taken out.";
     if (r.ok && r.margin >= 5 && !r.attackRoll) note += " Margin 5+: assistance gives +2; medical care clears an extra box.";
     if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
@@ -4722,6 +4823,7 @@ tr.lvl-U td.target { color: var(--muted); }
       t.value = ""; selectTab("create");
       toast(`Loaded ${ch.name}. Save to file to keep your copy.`);
     }
+    else if (t.id === "f-customspeed") { ch.customSpeed = +t.value; touch(); render(); }
     else if (t.id === "f-speciesid") {
       const had = ch.sadv.id && sAdvName();
       setSpecies(t.value); $("f-species").value = ch.species; touch(); render();
@@ -4770,7 +4872,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isParry(t.value) || isBlock(t.value); updateTarget(); renderPhaser(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-quality", "r-parries", "r-aim", "r-called"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-quality", "r-second", "r-aim", "r-called"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
@@ -5063,7 +5165,7 @@ function mountBattleMap(api) {
   const PARTY = api.partyName || "party", Party = PARTY[0].toUpperCase() + PARTY.slice(1);
   // The range tracks: the setting's own (a ship fight, a stagecoach chase), or one plain track. The first is "range".
   const TRACKS = ((api.rangeTracks || []).length ? api.rangeTracks : [api.rangeTrack || {}]).map((r, i) => Object.assign({ title: "Range track", us: "Us", note: "",
-    bands: [["Close", "up to 10 yd"], ["Short", "up to 50 yd"], ["Medium", "up to 150 yd"], ["Long", "up to 500 yd"], ["Extreme", "up to a mile"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
+    bands: [["Close", "up to 10 yd"], ["Short", "up to 25 yd"], ["Medium", "up to 100 yd"], ["Long", "up to 300 yd"], ["Extreme", "up to 1,000 yd"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
   const addName = (x) => x.replace(/^(Our|The) /, (m) => m.toLowerCase());
   const UNITS = { yd: { name: "yards", one: "yard", bands: api.bands || [], presets: [1, 2, 5, 10, 50] } };
   if ((api.kmBands || []).length) UNITS.km = { name: "km", one: "km", bands: api.kmBands, presets: [1, 10, 100, 1000, 10000] };
@@ -5117,7 +5219,9 @@ function mountBattleMap(api) {
   // A distance in hexes, at the map's scale, as a range band.
   function rangeText(n) {
     const u = UNITS[st.scale.unit], d = n * st.scale.n;
-    const band = st.scale.unit === "yd" && n <= 1 && d <= 2 ? "in reach" : (u.bands.find(([, max]) => d <= max) || ["out of range"])[0];
+    // Up close, the reach of a weapon in hand: 1 yard for fists and knives, 2 for a sword, 3 for a spear.
+    const reach = st.scale.unit !== "yd" ? "" : n <= 1 && d <= 1 ? "in reach of any weapon in hand" : n && d <= 2 ? "in reach of a sword or axe (2 yd)" : n && d <= 3 ? "in reach of a spear or polearm (3 yd)" : "";
+    const band = reach || (u.bands.find(([, max]) => d <= max) || ["out of range"])[0];
     return `${n} hex${n === 1 ? "" : "es"} · ${fmt(d)} ${d === 1 ? u.one : u.name} · ${band}`;
   }
 
@@ -5522,7 +5626,7 @@ function mountBattleMap(api) {
       const ship = !!(th && (api.vehicles || []).includes(th));
       toks().push({ id: uid(), ref: null, name: name || (th ? th.name : "Token"), color: $('[data-bmf="color"]').value, img: pendingImg, tsize: +$('[data-bmf="tsize"]').value,
         ...spot(RT.startLane || Math.min(3, lanes().length - 1)), boxes: Math.max(1, +$('[data-bmf="boxes"]').value || 1), injury: 0, threat: th ? th.id : null, boxLabel: ship ? "Hull" : "Injury",
-        stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.trait].filter(Boolean).join(" · ") : "" });
+        stats: th ? [th.attacks, th.dodge != null && th.dodge !== "" ? `Dodge ${th.dodge}` : "", th.move ? `Move ${th.move} yd` : "", th.trait].filter(Boolean).join(" · ") : "" });
       // Numbered names count up, so "Outlaw 1" is followed by "Outlaw 2".
       const m = name.match(/^(.*?)(\d+)$/); $('[data-bmf="name"]').value = m ? m[1] + (+m[2] + 1) : name;
       save(); draw();
@@ -5578,7 +5682,26 @@ function mountBattleMap(api) {
   fillThreats();
   Promise.all(KINDS.map((k) => idb.get(bgKey(k)))).then((l) => { KINDS.forEach((k, i) => (bgs[k] = l[i] || null)); draw(); if (!V().set && svg.clientWidth) fit(); });
   draw();
-  return { refresh: () => {
+  // Where two people stand from each other, for the encounter panel: a character by its card (ref), anyone else by
+  // the token's name. On a hex map in yards: { yards, hexes, band }; on the plain range track: { band } from the lanes.
+  // null when either isn't on the map (or a name fits more than one token), or on a ship or chase track.
+  function distanceBetween(a, b) {
+    // Names match whatever the case, and without a note in brackets: "Security guard (minor)" is "Security guard".
+    const norm = (x) => String(x || "").toLowerCase().replace(/\s*\([^)]*\)/g, "").trim();
+    const find = (w) => { const l = toks().filter((t) => (w.ref && t.ref === w.ref) || (!t.ref && w.name && norm(info(t).name) === norm(w.name))); return l.length === 1 ? l[0] : null; };
+    const ta = find(a), tb = find(b);
+    if (!ta || !tb) return null;
+    if (isRange()) {
+      if (RT.id !== "range" || RT.vehicle || RT.vehicleTrack) return null;
+      const n = Math.abs((ta.lane || 0) - (tb.lane || 0)), band = n ? RT.bands[n - 1] : RT.bands[0];
+      return band ? { band: String(band[0]).toLowerCase(), lanes: n } : { band: null, lanes: n };
+    }
+    if (st.scale.unit !== "yd") return null;
+    const hexes = dist(ta, tb), yards = hexes * st.scale.n;
+    return { hexes, yards, scale: st.scale.n, band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
+  }
+
+  return { distanceBetween, refresh: () => {
     const ids = new Set(api.crew().map((c) => c.id));
     st.tokens = st.tokens.filter((t) => !t.ref || ids.has(t.ref)); for (const r of Object.values(st.rts)) r.tokens = r.tokens.filter((t) => !t.ref || ids.has(t.ref));
     drawTokens(); drawSel(); viewBox(); syncForm();
@@ -5607,7 +5730,7 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
 /* BATTLEMAP:END */
   // The Encounter panel's modules and Pelion's setting data (tools/build-guide.py fills this in).
   /* ENCOUNTER:START */
-const ENC_SETTING = {"id":"uss-pelion","arms":[{"id":"fists","name":"Punch, kick, headbutt","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[]},{"id":"club","name":"Club, rifle butt or thrown rock","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[]},{"id":"knife","name":"Knife or dagger (a Klingon d'k tahg)","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[]},{"id":"heavy","name":"Heavy melee weapon (a lirpa, a sword, an axe)","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":2}},"traits":[],"rows":[]},{"id":"primitive","name":"Arrow, spear or primitive firearm","skill":"Phasers","band":"medium","damage":{"any":{"boxes":1}},"wound":"missile","traits":[],"rows":[]},{"id":"phaser-stun","name":"Hand phaser on stun","skill":"Phasers","band":"short","stun":true,"equip":["phaser"],"damage":{"any":{"boxes":0}},"traits":[],"rows":[]},{"id":"phaser-kill","name":"Hand phaser on kill","skill":"Phasers","band":"short","damage":{"any":{"boxes":3,"dying":true}},"equip":["phaser"],"wound":"energy","traits":[],"rows":[]},{"id":"phaser-rifle","name":"Phaser rifle","skill":"Phasers","band":"long","damage":{"any":{"boxes":3,"dying":true}},"wound":"energy","traits":[],"rows":[]},{"id":"disruptor","name":"Disruptor","skill":"Phasers","band":"medium","damage":{"any":{"boxes":3,"dying":true}},"wound":"energy","traits":[],"rows":[]},{"id":"grenade","name":"Explosion (a thrown grenade)","skill":"Athletics","band":"close","maxBand":"close","damage":{"any":{"boxes":2}},"traits":[{"type":"area","note":"1 box to everyone nearby; 2 at the centre. Dodge means diving clear."}],"rows":[]},{"id":"gorn","name":"Gorn's crushing blows","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":2}},"natural":true,"traits":[],"rows":[]},{"id":"bite","name":"Venomous bite and horn","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"natural":true,"traits":[],"rows":[]},{"id":"grip","name":"Crushing grip","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"unarmed":true,"traits":[],"rows":[]}],"threats":[{"id":"guard","name":"Security guard","label":"Security guard (minor)","minor":true,"attacks":[{"skill":"Phasers","target":11}],"dodge":7,"boxes":1,"boxesText":"1","weaponText":"Hand weapon","weapons":["phaser-stun","disruptor"],"trait":"Numbers","traitText":"Usually two or three; they surrender or flee when half are down."},{"id":"klingon","name":"Klingon warrior","label":"Klingon warrior","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Unarmed Combat","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill), d'k tahg","weapons":["disruptor","knife"],"trait":"Relentless","traitText":"Ignores the Wounded penalty; only Seriously wounded slows them."},{"id":"klingon-officer","name":"Klingon officer","label":"Klingon officer","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Leadership","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill)","weapons":["disruptor"],"trait":"Battle commander","traitText":"Once per round, gives one ally +1 on an attack."},{"id":"romulan","name":"Romulan centurion","label":"Romulan centurion","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Stealth","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill)","weapons":["disruptor"],"trait":"Ambush","traitText":"+2 on the first attack from hiding; prefers to withdraw rather than be captured."},{"id":"orion","name":"Orion pirate","label":"Orion pirate","minor":false,"attacks":[{"skill":"Phasers","target":11},{"skill":"Unarmed Combat","target":12},{"skill":"Stealth","target":12}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor, knife","weapons":["disruptor","knife"],"trait":"Dirty fighter","traitText":"Winning a grapple also disarms the target."},{"id":"gorn","name":"Gorn warrior","label":"Gorn warrior","minor":false,"attacks":[{"skill":"Unarmed Combat","target":14}],"dodge":6,"boxes":4,"boxesText":"4","weaponText":"Claws, thrown rocks","weapons":["gorn","club"],"trait":"Immense strength","traitText":"Unarmed hits mark 2 boxes; slow, so it acts last in a round."},{"id":"mugato","name":"Mugato","label":"Mugato","minor":false,"attacks":[{"skill":"Unarmed Combat","target":13}],"dodge":8,"boxes":3,"boxesText":"3","weaponText":"Venomous bite","weapons":["bite"],"trait":"Venom","traitText":"A bite that marks a box also poisons: without Medicine before the scene ends, mark another box."},{"id":"android","name":"Rogue android","label":"Rogue android","minor":false,"attacks":[{"skill":"Unarmed Combat","target":13},{"skill":"Computers","target":15}],"dodge":7,"boxes":4,"boxesText":"4","weaponText":"Crushing grip","weapons":["grip"],"trait":"Logic trap","traitText":"A Diplomacy or Psychology contest that presents a paradox stuns it for the scene."}],"protection":[{"id":"improvised","name":"Improvised shield","text":"A chair, a crate lid or a torn-off panel: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.","traits":[{"type":"shield","value":0,"breaksOn":2,"label":"Improvised shield"}]}],"combatRules":{"oneDefense":{"perRound":1,"edge":"extradefense"},"attackQualityDodge":{"bands":[{"from":0,"mod":0},{"from":3,"mod":-1},{"from":5,"mod":-2},{"from":7,"mod":-3}]},"parry":{"mod":-3,"repeatPenalty":-2,"bareHanded":"unarmed"},"block":{"mod":-2},"aim":{"bonus":1},"tellingHits":{"margin":5,"natural":true,"called":-2,"small":-4}},"coreCombat":["aim","attackQualityDodge","block","oneDefense","parry","tellingHits"],"terms":{"title":"USS Pelion","point":"Duty","meleeSkill":"Unarmed Combat","unarmedSkill":"Unarmed Combat","ammo":"power","ammoOne":"power"}};
+const ENC_SETTING = {"id":"uss-pelion","arms":[{"id":"fists","name":"Punch, kick, headbutt","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1},{"id":"club","name":"Club, rifle butt or thrown rock","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1,"reachNote":"rifle butt 2"},{"id":"knife","name":"Knife or dagger (a Klingon d'k tahg)","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1},{"id":"heavy","name":"Heavy melee weapon (a lirpa, a sword, an axe)","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":2}},"traits":[],"rows":[],"reachYards":2,"reachNote":"lirpa 3"},{"id":"primitive","name":"Arrow, spear or primitive firearm","skill":"Phasers","band":"medium","damage":{"any":{"boxes":1}},"wound":"missile","traits":[],"rows":[]},{"id":"phaser-stun","name":"Hand phaser on stun","skill":"Phasers","band":"short","stun":true,"equip":["phaser"],"damage":{"any":{"boxes":0}},"traits":[],"rows":[],"telling":{"add":["knockdown"]}},{"id":"phaser-kill","name":"Hand phaser on kill","skill":"Phasers","band":"short","damage":{"any":{"boxes":3,"dying":true}},"equip":["phaser"],"wound":"energy","traits":[],"rows":[]},{"id":"phaser-rifle","name":"Phaser rifle","skill":"Phasers","band":"long","damage":{"any":{"boxes":3,"dying":true}},"wound":"energy","traits":[],"rows":[]},{"id":"disruptor","name":"Disruptor","skill":"Phasers","band":"medium","damage":{"any":{"boxes":3,"dying":true}},"wound":"energy","traits":[],"rows":[]},{"id":"grenade","name":"Explosion (a thrown grenade)","skill":"Athletics","band":"close","maxBand":"close","damage":{"any":{"boxes":2}},"traits":[{"type":"area","note":"1 box to everyone nearby; 2 at the centre. Dodge means diving clear."}],"rows":[]},{"id":"gorn","name":"Gorn's crushing blows","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":2}},"natural":true,"traits":[],"rows":[],"reachYards":1},{"id":"bite","name":"Venomous bite and horn","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"natural":true,"traits":[],"rows":[],"reachYards":1},{"id":"grip","name":"Crushing grip","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"unarmed":true,"traits":[],"rows":[],"reachYards":1}],"threats":[{"id":"guard","name":"Security guard","label":"Security guard (minor)","minor":true,"attacks":[{"skill":"Phasers","target":11}],"dodge":7,"boxes":1,"boxesText":"1","weaponText":"Hand weapon","weapons":["phaser-stun","disruptor"],"trait":"Numbers","traitText":"Usually two or three; they surrender or flee when half are down."},{"id":"klingon","name":"Klingon warrior","label":"Klingon warrior","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Unarmed Combat","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill), d'k tahg","weapons":["disruptor","knife"],"trait":"Relentless","traitText":"Ignores the Wounded penalty; only Seriously wounded slows them."},{"id":"klingon-officer","name":"Klingon officer","label":"Klingon officer","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Leadership","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill)","weapons":["disruptor"],"trait":"Battle commander","traitText":"Once per round, gives one ally +1 on an attack."},{"id":"romulan","name":"Romulan centurion","label":"Romulan centurion","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Stealth","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill)","weapons":["disruptor"],"trait":"Ambush","traitText":"+2 on the first attack from hiding; prefers to withdraw rather than be captured."},{"id":"orion","name":"Orion pirate","label":"Orion pirate","minor":false,"attacks":[{"skill":"Phasers","target":11},{"skill":"Unarmed Combat","target":12},{"skill":"Stealth","target":12}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor, knife","weapons":["disruptor","knife"],"trait":"Dirty fighter","traitText":"Winning a grapple also disarms the target."},{"id":"gorn","name":"Gorn warrior","label":"Gorn warrior","minor":false,"attacks":[{"skill":"Unarmed Combat","target":14}],"dodge":6,"boxes":4,"boxesText":"4","weaponText":"Claws, thrown rocks","weapons":["gorn","club"],"trait":"Immense strength","traitText":"Unarmed hits mark 2 boxes; slow, so it acts last in a round."},{"id":"mugato","name":"Mugato","label":"Mugato","minor":false,"attacks":[{"skill":"Unarmed Combat","target":13}],"dodge":8,"boxes":3,"boxesText":"3","weaponText":"Venomous bite","weapons":["bite"],"trait":"Venom","traitText":"A bite that marks a box also poisons: without Medicine before the scene ends, mark another box."},{"id":"android","name":"Rogue android","label":"Rogue android","minor":false,"attacks":[{"skill":"Unarmed Combat","target":13},{"skill":"Computers","target":15}],"dodge":7,"boxes":4,"boxesText":"4","weaponText":"Crushing grip","weapons":["grip"],"trait":"Logic trap","traitText":"A Diplomacy or Psychology contest that presents a paradox stuns it for the scene."}],"protection":[{"id":"improvised","name":"Improvised shield","text":"A chair, a crate lid or a torn-off panel: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.","traits":[{"type":"shield","value":0,"breaksOn":2,"label":"Improvised shield"}]}],"combatRules":{"oneDefense":{"perRound":1,"edge":"extradefense","extraPenalty":-2},"attackQualityDodge":{"bands":[{"from":0,"mod":0},{"from":3,"mod":-1},{"from":5,"mod":-2},{"from":7,"mod":-3}]},"parry":{"mod":-3,"repeatPenalty":0,"bareHanded":"unarmed"},"block":{"mod":-2},"aim":{"bonus":1},"tellingHits":{"margin":5,"natural":true,"called":-2,"small":-4}},"coreCombat":["aim","attackQualityDodge","block","oneDefense","parry","tellingHits"],"terms":{"title":"USS Pelion","point":"Duty","meleeSkill":"Unarmed Combat","unarmedSkill":"Unarmed Combat","ammo":"power","ammoOne":"power"}};
 const LD = (() => {
 /**
  * Legend Dynamics core rules: pure functions, no page code.
@@ -5772,6 +5895,24 @@ function applyHit(who, hit) {
 /** Dodge: Agility −2, plus the Athletics bonus (+1 Trained, +2 Specialty or Expert). */
 const dodgeBase = (/** @type {number} */ agility, /** @type {number} */ athleticsBonus) => agility - 2 + athleticsBonus;
 
+/** Move in yards: 5, +1 per 2 points of Agility + Body above 20, plus the Athletics bonus (as for Dodge) and any origin speed adjustment. */
+const moveYards = (/** @type {number} */ agility, /** @type {number} */ body, /** @type {number} */ athleticsBonus, speed = 0) =>
+  5 + Math.floor(Math.max(0, agility + body - 20) / 2) + athleticsBonus + speed;
+/**
+ * Move as injury leaves it: wounded (1 box) −2 yards, seriously wounded (2) half, rounded down, and no running;
+ * incapacitated (3) none. Never below 1 yard while able to act.
+ * @param {number} move @param {number} injury
+ */
+const injuredMove = (move, injury) => (injury >= 3 ? 0 : Math.max(1, injury === 2 ? Math.floor(move / 2) : injury === 1 ? move - 2 : move));
+/** The farthest yard of each range band (core rules, Range). */
+const BAND_YARDS = /** @type {Record<string, number>} */ ({ close: 10, short: 25, medium: 100, long: 300, extreme: 1000 });
+/** The range band a distance in yards falls in, or null past Extreme. @param {number} yards */
+const bandForYards = (yards) => Object.keys(BAND_YARDS).find((b) => yards <= BAND_YARDS[b]) || null;
+/** A threat's Move when its entry gives none. */
+const THREAT_MOVE = 8;
+/** A weapon in hand's reach in yards (1 when the weapon doesn't say). */
+const reachYards = (/** @type {{ reach?: string, reachYards?: number }} */ weapon) => (weapon.reach === "melee" ? weapon.reachYards || 1 : null);
+
 // ---- attack resolution ----
 
 /**
@@ -5796,6 +5937,8 @@ function priceFor(weapon, roll) {
   return { track: p.track, boxes: roll.total === 18 && p.natural18 ? p.natural18 : p.fail };
 }
 
+/** The most boxes one target takes from one personal-scale spell, burst or charm. */
+const MAGIC_HARM_CAP = 3;
 /** Defender traits that are switched on (a trait with toggle: true can be switched off, e.g. a Ward once broken). @param {any} defender */
 const liveTraits = (defender) => (defender.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false);
 
@@ -5867,6 +6010,8 @@ function resolveAttack(input, hooks, roll) {
   // A weapon's margin trait (setting data) can make a strong hit worse, e.g. "a hit by 5 or more leaves the target Dying".
   for (const t of weapon.traits || []) if (t.type === "marginDamage" && atk.margin >= t.margin && dmg && t.damage.boxes >= dmg.boxes) { dmg = { ...t.damage }; out.marginTrait = t.label || "Strong hit"; }
   if (dmg && boosts) dmg = { ...dmg, boxes: dmg.boxes + boosts };
+  // Personal-scale magic marks at most 3 boxes on one target, whatever its Boosts (core magic's harm limit).
+  if (dmg && weapon.spell && dmg.boxes > MAGIC_HARM_CAP) { dmg = { ...dmg, boxes: MAGIC_HARM_CAP }; out.harmCapped = true; }
   const bite = ench.reduce((/** @type {number} */ n, /** @type {any} */ t) => n + (t.extraBox || 0), 0);
   if (dmg && dmg.boxes && bite) { dmg = { ...dmg, boxes: dmg.boxes + bite }; out.enchanted = bite; }
   if (!dmg || !dmg.boxes) return { ...out, outcome: "hit, no effect at this range", hit: true, damage: null };
@@ -5902,7 +6047,7 @@ function resolveAttack(input, hooks, roll) {
   return { ...out, outcome: "hit", hit: true, damage: dmg, injury: applyHit(defender, dmg) };
 }
 
-return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, priceFor, NO_HOOKS, resolveAttack };
+return { CORE_BASELINE, rollDice, resolve, odds, sumMods, mulberry32, hash32, diceFor, BANDS, rangeModifier, weaponDamage, weaponAccuracy, INJURY_MAX, INJURY_PENALTY, applyHit, dodgeBase, moveYards, injuredMove, BAND_YARDS, bandForYards, THREAT_MOVE, reachYards, priceFor, MAGIC_HARM_CAP, NO_HOOKS, resolveAttack };
 })();
 const LDX = (() => {
 /**
@@ -5932,13 +6077,30 @@ function bandFor(margin, bands) {
 /** Telling hit effects (core rules, Telling hits): [id, name, what happens]. */
 const TELLING_EFFECTS = [
   ["disarm", "Disarm", "the weapon or held item drops, or flies a few yards away"],
-  ["knockdown", "Knock down", "the target falls prone, or is driven back a few steps"],
-  ["pin", "Pin", "the target is held, tangled or pinned down: their next action goes to getting free"],
+  ["knockdown", "Knock down", "the target falls prone, or is driven back a few steps; standing uses their next move, not their action"],
+  ["pin", "Pin", "the target is grabbed, held or pinned against something: their next action goes to getting free, then they're free; another hit keeps them pinned"],
   ["rattle", "Rattle", "−2 to the target's next roll"],
-  ["break", "Break gear", "a shield, weapon or tool breaks; armor loses 1 protection until repaired"],
+  ["break", "Break gear", "a weapon, shield or tool is out of use until its owner spends an action putting it right (destroyed only if it was already vulnerable); armor loses 1 protection until repaired"],
   ["open", "Open them up", "the next attack on this target this round gets +2"],
-  ["precise", "Precise", "it hits exactly what was aimed at"],
+  ["precise", "Precise", "it hits exactly what was aimed at: it changes the situation, never the injury, defense or death rules"],
 ];
+
+/**
+ * The telling-hit effects a weapon can deliver (core rules, Telling hits): TELLING_EFFECTS rows.
+ * Pin needs a weapon in hand, fists or a grapple; knock down needs one of those, or a shot or missile that marks 2 or more boxes;
+ * bare hands and natural weapons don't break gear. A weapon's own "telling": { add, not } adjusts the list (a taser knocks down).
+ * @param {any} weapon @param {{ melee?: string, unarmed?: string }} [skills] the setting's skills for a weapon in hand and for bare hands
+ */
+function tellingEffectsFor(weapon, skills) {
+  if (!weapon) return TELLING_EFFECTS;
+  const SK = { melee: "Melee", unarmed: "Brawling", ...(skills || {}) };
+  const inHand = weapon.reach === "melee";
+  const bare = inHand && (weapon.id === "fists" || weapon.unarmed || weapon.natural || (SK.melee !== SK.unarmed && weapon.skill === SK.unarmed));
+  const heavy = Object.values(weapon.damage || {}).some((/** @type {any} */ d) => d && d.boxes >= 2);
+  const ok = { pin: inHand, knockdown: inHand || heavy, break: !bare };
+  const t = weapon.telling || {};
+  return TELLING_EFFECTS.filter(([id]) => !(t.not || []).includes(id) && ((t.add || []).includes(id) || (ok[/** @type {"pin"} */ (id)] ?? true)));
+}
 
 const EXPERIMENTS = [
   {
@@ -5981,8 +6143,8 @@ const EXPERIMENTS = [
   },
   {
     id: "oneDefense", scope: "core", label: "One defense a round",
-    summary: "Dodge, Parry and Block share one defense a round; an Edge (Additional Defense) or trait adds more.",
-    params: { perRound: 1 },
+    summary: "Dodge, Parry and Block share one defense a round; an Edge (Additional Defense) or trait adds more, each extra one at extraPenalty (−2 in the core rules), never twice against one attack.",
+    params: { perRound: 1, extraPenalty: 0 },
     flags: ["oneDefense"],
   },
   {
@@ -6077,7 +6239,7 @@ function buildRules(config, weapons, lab, published) {
   return rules;
 }
 
-return { PUBLISHED, bandFor, TELLING_EFFECTS, EXPERIMENTS, newLabConfig, available, buildRules };
+return { PUBLISHED, bandFor, TELLING_EFFECTS, tellingEffectsFor, EXPERIMENTS, newLabConfig, available, buildRules };
 })();
 const LAB_ENCOUNTER = (() => {
 /**
@@ -6216,7 +6378,10 @@ function defenseOptions(enc, rules, d, w) {
   const shared = flags.has("oneDefense") && !flags.has("dodgeEveryAttack");
   const allowed = shared ? (rules.params.oneDefense.perRound || 1) + live.filter((/** @type {any} */ t) => t.type === "extraDefense").reduce((n, /** @type {any} */ t) => n + (t.value || 1), 0) : 0;
   const spent = shared && d.defRound === enc.round ? d.defCount || 0 : 0;
-  const opt = (/** @type {any} */ o) => { o.preview = o.base + o.mods.reduce((/** @type {number} */ x, /** @type {any} */ m) => x + m.value, 0); if (shared) o.used = spent >= allowed; out.push(o); };
+  // A defense beyond the first this round (Additional Defense) is at the rule's extraPenalty, whatever kind it is.
+  const extra = shared && spent >= (rules.params.oneDefense.perRound || 1) && rules.params.oneDefense.extraPenalty
+    ? [{ source: "oneDefense", label: "Second defense this round", value: rules.params.oneDefense.extraPenalty, scope: rules.params.oneDefense.scope || "core" }] : [];
+  const opt = (/** @type {any} */ o) => { o.mods = [...o.mods, ...extra]; o.preview = o.base + o.mods.reduce((/** @type {number} */ x, /** @type {any} */ m) => x + m.value, 0); if (shared) o.used = spent >= allowed; out.push(o); };
   if (d.dodge !== null) {
     const gear = live.filter((/** @type {any} */ t) => t.type === "dodgeBonus").map((/** @type {any} */ t) => ({ source: "gear", label: t.label || "Gear", value: t.value, scope: "setting", preview: true }));
     opt({ kind: "dodge", label: "Dodge", base: d.dodge, mods: gear, used: d.dodgedRound === enc.round && !flags.has("dodgeEveryAttack") });
@@ -6883,6 +7048,28 @@ function mountLab(api) {
     return out;
   }
   const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"] });
+  // The battle map's distance between attacker and target, checked against the weapon: a weapon in hand's reach
+  // and the attacker's Move (as injury leaves it), or a ranged weapon's band, which it sets. Only a note: the GM rules.
+  function reachCheck(/** @type {any} */ a, /** @type {any} */ d, /** @type {any} */ w) {
+    const out = $("lab-reach"), at = a && d && w && api.mapDistance ? api.mapDistance({ ref: a.ref, name: a.name }, { ref: d.ref, name: d.name }) : null;
+    out.hidden = !at; if (!at) return;
+    const mv = LD.injuredMove(a.move || LD.THREAT_MOVE, a.injury || 0), run = (a.injury || 0) >= 2 ? 0 : mv * 2;
+    const where = at.yards !== undefined ? `${fmtYd(at.yards)} apart on the map` : `${at.lanes} lane${at.lanes === 1 ? "" : "s"} apart on the range track`;
+    let msg, bad = false;
+    if (w.reach === "melee") {
+      const reach = LD.reachYards(w) || 1;
+      if (at.yards === undefined) { msg = at.lanes <= 1 ? `${where}: close enough to move in and strike (reach ${reach} yd, Move ${mv} yd) if the GM agrees.` : `${where}: too far to strike with a weapon in hand this turn.`; bad = at.lanes > 1; }
+      else if (at.hexes <= 1 && (at.yards <= reach || at.scale <= 5)) msg = `${where}: in reach (${w.name}, ${reach} yd).`;
+      else if (at.yards <= reach + mv) msg = `${where}: out of reach (${reach} yd), but within Move (${mv} yd): move in and strike.`;
+      else { bad = true; msg = `${where}: too far to strike this turn. Reach ${reach} yd + Move ${mv} yd = ${reach + mv} yd${run ? `; running (${run} yd) closes in but takes the action` : "; seriously wounded, no running"}.`; }
+    } else if (at.band) {
+      const ok = LD.rangeModifier(w, at.band) !== null;
+      if (ok) $("lab-band").value = at.band;
+      bad = !ok; msg = `${where}: ${BAND_NAMES[at.band] || at.band}${ok ? ", set above" : `, out of range for the ${w.name.toLowerCase()}`}.`;
+    } else { bad = true; msg = `${where}: beyond Extreme range.`; }
+    out.className = "small " + (bad ? "bad" : "muted"); out.textContent = msg;
+  }
+  const fmtYd = (/** @type {number} */ y) => `${Math.round(y * 10) / 10} yd`;
   function fromCharacter(c) {
     const k = api.calc(c), gun = c.play && c.play.gun;
     // A shapechanger (api.formOf): in their form, its numbers (api.calc applies them), its claws, and its traits as a note.
@@ -6891,7 +7078,7 @@ function mountLab(api) {
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
     const formRules = fm ? shapeTraits(fm, formOn) : [];
-    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
@@ -6906,7 +7093,7 @@ function mountLab(api) {
   function fromThreat(t, name) {
     const skills = Object.fromEntries(t.attacks.map((/** @type {any} */ a) => [a.skill, a.target]));
     const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
-    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, dodge: t.dodge, skills, weapons: t.weapons,
+    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
       boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
@@ -7092,6 +7279,7 @@ function mountLab(api) {
     $("lab-target").dataset.actor = a ? a.pid : "";
     $("lab-target").closest(".field").hidden = !["attack", "aim"].includes(action);
     $("lab-atk-row").hidden = action !== "attack";
+    $("lab-reach").hidden = true; // the map check below shows it again for an attack
     $("lab-text-row").hidden = !["point", "complication", "condition", "note"].includes(action);
     $("lab-text-label").textContent = { point: "What for (a small preparation, or other)", complication: "What happens", condition: "Condition", note: "Note" }[action] || "";
     if (action === "attack" && a) {
@@ -7104,6 +7292,7 @@ function mountLab(api) {
       $("lab-band").dataset.weapon = w ? w.id : "";
       $("lab-band").innerHTML = bands.map((/** @type {string} */ b) => { const m = w ? LD.rangeModifier(w, b) : 0; return `<option value="${b}" ${m === null ? "disabled" : ""}>${BAND_NAMES[b]}${m ? " (" + signed(m) + ")" : m === null ? " (out of range)" : ""}<\/option>`; }).join("");
       $("lab-band").value = pb && bands.includes(pb) && (!w || LD.rangeModifier(w, pb) !== null) ? pb : bands.includes("close") ? "close" : bands[0];
+      reachCheck(a, E.find(en, $("lab-target").value), w);
       const modes = w && w.ammo ? MODES.filter((/** @type {any} */ m) => !m[3] || m[3].includes(w.ammo)) : [];
       $("lab-mode-wrap").hidden = !modes.length;
       $("lab-fmode").innerHTML = modes.map((/** @type {any} */ m) => `<option value="${m[0]}">${esc(m[1])} (${m[2]} ${m[2] > 1 ? esc(T.ammo || "rounds") : esc(T.ammoOne || "round")}${m[4] ? ", " + signed(m[4]) : ""})<\/option>`).join("");
@@ -7117,7 +7306,8 @@ function mountLab(api) {
       // What the attack is made of (the setting's materials): silver bullets, a wooden stake, cold iron.
       $("lab-material-wrap").hidden = !MATERIALS.length;
       if (MATERIALS.length && !$("lab-material").options.length) $("lab-material").innerHTML = `<option value="">Ordinary<\/option>` + MATERIALS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)}<\/option>`).join("");
-      if (TH && !$("lab-called").options.length) $("lab-called").innerHTML = `<option value="">None<\/option>` + LDX.TELLING_EFFECTS.map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}<\/option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}<\/option>`).join("");
+      // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
+      if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None<\/option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}<\/option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}<\/option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
       if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
       const base = w ? a.skills[w.skill] : undefined;
@@ -7233,7 +7423,7 @@ function mountLab(api) {
       btns.push(`<button class="btn" data-fx="trade-lost">${esc(d.name)}: lose a limb instead (complication)<\/button><button class="btn" data-fx="trade-crippled">${esc(d.name)}: lose a limb's use instead (complication)<\/button>`);
     if (live && ev.grievous && ev.grievous.pc && !ev.traded && ev.grievous.downgradedTo === undefined && d && d.points > 0) btns.push(`<button class="btn" data-fx="downgrade">${esc(d.name)}: downgrade the grievous wound (${esc(T.point)})<\/button>`);
     if (live && ev.telling && !ev.telling.shrugged) {
-      if (!ev.telling.called) btns.push(`<label class="small">Effect <select data-telling>${[["", "Pick…"], ...LDX.TELLING_EFFECTS].map((/** @type {any} */ [id, n]) => `<option value="${id}"${id === (ev.telling.effect || "") ? " selected" : ""}>${esc(n)}<\/option>`).join("")}<\/select><\/label>`);
+      if (!ev.telling.called) btns.push(`<label class="small">Effect <select data-telling>${[["", "Pick…"], ...LDX.tellingEffectsFor(rules().weapons[ev.weapon && ev.weapon.id] || ev.weapon, rules().skills)].map((/** @type {any} */ [id, n]) => `<option value="${id}"${id === (ev.telling.effect || "") ? " selected" : ""}>${esc(n)}<\/option>`).join("")}<\/select><\/label>`);
       if (d && d.kind === "pc" && (d.traits || []).some((/** @type {any} */ t) => t.type === "shrugTelling" && !t.used)) btns.push(`<button class="btn" data-fx="shrug-edge">${esc(d.name)}: shrug it off (Hard to put down)<\/button>`);
       if (d && d.kind === "pc" && d.points > 0) btns.push(`<button class="btn" data-fx="shrug-point">${esc(d.name)}: shrug it off (${esc(T.point)})<\/button>`);
     }
@@ -7373,7 +7563,7 @@ return { mountLab };
   // on a range track, with the Pelion linked to the ship's tracks and enemy ships from the Players' Guide.
   const DIV_COLOR = { command: "var(--gold)", sciences: "var(--blue)", operations: "var(--red)", services: "var(--red)" };
   const battleMap = mountBattleMap({ root: $("battlemap"), key: "uss-pelion", esc, toast: gmSay,
-    bands: [["Close", 10], ["Short", 50], ["Medium", 150], ["Long", 500], ["Extreme", 1760]],
+    bands: [["Close", 10], ["Short", 25], ["Medium", 100], ["Long", 300], ["Extreme", 1000]],
     kmBands: [["Close", 10], ["Short", 1000], ["Medium", 10000], ["Long", 100000], ["Extreme", 300000]],
     pointName: "Duty", stunName: "Stunned", partyName: "crew",
     rangeTracks: [{ title: "Ship fight", us: "The Pelion", vehicleTrack: "Hull", vehicleTracks: SHIP_TRACKS.map(([n]) => n), startLane: 3,
@@ -7388,7 +7578,7 @@ return { mountLab };
     crew: () => gmCrew.map((c) => { const k = gmCalc(c);
       return { id: c.id, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
         color: DIV_COLOR[k.div] || "var(--gold)", injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty, ptrack: null,
-        stats: [`Dodge ${k.dodge}`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
+        stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
     // A change made on the map is the GM's copy of the officer, the same as a change on their card.
     setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
       if ("injury" in patch) { c.play.injury = Math.max(0, Math.min(3, patch.injury)); if (c.play.injury < 3 && !gritty) c.play.dying = false; }
@@ -7403,7 +7593,7 @@ return { mountLab };
     try {
       const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n), lab: levelName(c.skills[n], n) })).filter((x) => x.l !== "U")
         .sort((a, b) => (b.l === "S") - (a.l === "S") || b.t - a.t);
-      return { skills, dodge: dodge(), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
+      return { skills, dodge: dodge(), move: moveNow(c), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
     } finally { ch = saved; }
   }
   function gmAdd(list) {
@@ -7440,7 +7630,7 @@ return { mountLab };
       return `<article class="gm-card hud ${inj >= 3 ? "down" : ""}" data-div="${k.div}">
         <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed officer")}</b>
           <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span></div></div>
-        <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b>${c.attrs[n]}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div></div>
+        <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b>${c.attrs[n]}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a Duty point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a Duty point">+</button><span class="small muted">Duty</span></span></div>
         ${PHASERS[c.play.phaser.type] ? `<div class="small muted">${PHASERS[c.play.phaser.type][0]}: <b style="color:var(--chrome)">${c.play.phaser.power}/${PHASERS[c.play.phaser.type][1]}</b> power${c.play.phaser.spares ? `, ${c.play.phaser.spares} spare cell${c.play.phaser.spares > 1 ? "s" : ""}` : ""}</div>` : ""}
@@ -7503,7 +7693,8 @@ return { mountLab };
     gritty: { table: GRIEVOUS.map((g) => ({ ...g, condition: g.dazed ? "Stunned" : undefined })), enemy: TAKEN_OUT } };
   encPanel = LAB_UI.mountLab({ PACK: ENC_PACK, T: ENC_SETTING.terms, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: null, store, esc, signed, saveText, gritty: () => gritty,
     crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = encPanel; encPanel = null; renderGM(); encPanel = p; },
-    calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n)])), dodge: dodge(), agility: c.attrs.Agility }; } finally { ch = saved; } },
+    calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n)])), dodge: dodge(), move: moveOf(c), agility: c.attrs.Agility }; } finally { ch = saved; } },
+    mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
     // Pelion grants these as advantages (chosen or bought), not Edges.
     traitsFor: (c) => [...(hasAdv("extradefense", c) ? [{ type: "extraDefense", value: 1, label: "Additional Defense" }] : []),
       ...(hasAdv("survivor", c) ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : [])],

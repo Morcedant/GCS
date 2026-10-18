@@ -10,17 +10,17 @@ The years are counted **After the Shattering (AS)**. The story begins in the yea
 
 | Weapon | Range | Boxes on a hit | What the injury looks like |
 |---|---|---|---|
-| Fists, kicks, dirty tricks | Melee | 1 | Bruises, a split lip, cracked ribs |
-| Dagger or club | Melee; dagger Close thrown | 1 | A cut, a stab or a crack on the skull |
+| Fists, kicks, dirty tricks | Melee, reach 1 yd | 1 | Bruises, a split lip, cracked ribs |
+| Dagger or club | Melee, reach 1 yd; dagger Close thrown | 1 | A cut, a stab or a crack on the skull |
 | Sling | Short | 1 | A crack on the skull |
-| Sword, axe, mace, spear | Melee | 2 | A deep wound or a broken bone |
-| Greatsword, greataxe, polearm | Melee | 2; a hit by 5 or more leaves the target Dying | A ruinous wound |
+| Sword, axe, mace, spear | Melee, reach 2 yd (spear 3) | 2 | A deep wound or a broken bone |
+| Greatsword, greataxe, polearm | Melee, reach 2 yd (polearm 3) | 2; a hit by 5 or more leaves the target Dying | A ruinous wound |
 | Bow | Long | 2 | An arrow buried deep |
 | Crossbow | Medium | 2 | A bolt buried deep |
 | Wheel-lock pistol | Close | 2 | A gunshot wound |
 | Arquebus or hand-cannon | Short | 3, and Dying | A ruinous wound |
 | Powder bomb | Close (thrown) | 1 to everyone nearby, 3 and Dying at the center | Blast and burns; Dodge means diving clear |
-| Claws, fangs, venom | Melee | 2 (venom: Body roll or Reeling) | Torn flesh, poison in the blood |
+| Claws, fangs, venom | Melee, reach 1 yd | 2 (venom: Body roll or Reeling) | Torn flesh, poison in the blood |
 | Shadow Bolt | Short | 2 | Black frost in the wound |
 | Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
 | Fire | — | 1 each round in the flames | Burns |
@@ -33,7 +33,7 @@ To take someone down without killing them, use fists, a club, a grapple, or the 
 
 <!-- SECTION:medicine -->
 
-Healers have herbs, needles, wine and prayers. Poison and fever kill more adventurers than swords do. The **Mend** cantrip clears one box once per wound; it does not replace a healer's care.
+Healers have herbs, needles, wine and prayers. Poison and fever kill more adventurers than swords do. The **Mend** cantrip clears one box once per set of injuries; it does not replace a healer's care.
 
 <!-- SECTION:tracks -->
 
@@ -60,21 +60,21 @@ A caster knows a few **cantrips**, the quick spells of *Magic*: as many as their
 | Specialty | 3 | the Second Seal | 1 |
 | Expert | 4 | the Third Seal | 2 |
 
-Cast one with **an action and a Sorcery roll**, −1 for each Boost you spend; where it makes sense, the target resists with **Will**. Choose your cantrips in the creator.
+Cast one with **an action and a Sorcery roll**, −1 for each Boost you spend; each cantrip below says whether **Dodge applies** or which attribute **resists**, never both (see *Defense or resistance* in *Magic*). Choose your cantrips in the creator.
 
 | Cantrip | Base effect |
 |---|---|
 | Shadow Bolt | A ranged attack with Sorcery; marks 2 boxes. Dodge applies. |
-| Witchfire | Light, or set something burning: 1 box a round in the flames. |
+| Witchfire | Light, or set something burning: 1 box a round in the flames. Aimed at a person, it's an attack: Dodge applies; once alight, the flames are ordinary fire. |
 | Ward | Attacks against one ally are at −2 for the scene. |
 | Hex | The target is at −2 on all rolls for the scene (Will resists). |
-| Charm | Presence contest: the target treats you as a friend for the scene. |
-| Dread | The target rolls Will or flees or freezes. |
-| Sleep | The target rolls Will or sleeps; minor opponents just drop. |
-| Mend | Clear one injury box, once per wound. |
-| Beast-tongue | Speak with an animal, and command it for a scene. |
+| Charm | The target treats you as a friend for the scene (Presence resists). |
+| Dread | The target flees or freezes (Will resists). |
+| Sleep | The target sleeps (Will resists); minor opponents just drop, without resisting. |
+| Mend | Clear one injury box, once per set of injuries. |
+| Beast-tongue | Speak with an animal, and command it for a scene (a hostile animal's Will resists). |
 | Sorcerer's Sight | See magic, curses, spirits and disguised monsters. |
-| Shatter | Break a lock, chain, blade or door. |
+| Shatter | Break a lock, chain, blade or door. No defense against an unattended object; against a blade or shield in someone's hand, it's an attack: Dodge applies. |
 | Veil | +3 to Stealth for the scene; you're hard to notice. |
 
 **Changing cantrips.** Cantrips are learned, not prayed for each morning, so a caster keeps the ones they know:

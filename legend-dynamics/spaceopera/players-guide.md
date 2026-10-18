@@ -121,8 +121,8 @@ Spend all your Edges. Each one buys:
 | Second advantage | A second general advantage, with no extra complication | 1 |
 | Extra Resolve | Start every session with 3 Resolve points instead of 2 | 1 |
 | A friend | A named contact who helps once per job | 1 |
-| A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
-| Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix | 1 |
+| A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one narrowly defined use of a named skill (see *Gear*) | 1 |
+| Additional Defense | A second defense each round, at −2: Dodge, Parry or Block, in any mix (see *Attacking and defending*) | 1 |
 | Hard to put down | Once per fight, shrug off a telling hit's effect: you still take its boxes (see *Telling hits*) | 1 |
 | Powered Armor | Powered armor, yours by right: legion-grade from a military or a Hegemony House, a commercial security suit, or a colony-built rig from an illicit armorer. Say which, and where it came from (take its Allegiance if it's issued). The GM approves it, and someone always wants it back. | 1 |
 
@@ -192,7 +192,7 @@ The GM can add others met in play (the creator's GM view has a **Campaign allegi
 
 ## Step 5: Prepare
 
-Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Resolve points (three with Extra Resolve) and your gear. Name your friend or your fine weapon or tool, if you took those Edges. Describe one connection to another player's character.
+Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Your Move is 5 yards, +1 for every 2 points of Agility + Body above 20, plus the same Athletics bonus and any species speed adjustment (see *Move and reach*). Begin uninjured, with two Resolve points (three with Extra Resolve) and your gear. Name your friend, or your fine weapon or tool and the one narrow use it improves, if you took those Edges. Describe one connection to another player's character.
 
 ### Top 10 connections to another character
 
@@ -250,7 +250,23 @@ A plausible untrained attempt uses attribute −4. Specialized work such as surg
 
 ## Gear
 
-Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bonus; exceptional tools may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
+Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bonus. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
+
+### Fine weapons and tools
+
+A fine weapon or tool grants +2 to one narrowly defined use of a named skill, agreed when chosen. It does not stack with an advantage bonus on the same roll and never improves Dodge, Parry, or Block.
+
+The use is narrower than the skill: the item is fine *at something*. A use that would apply to almost every roll made with the item is too broad.
+
+| Fine item | Narrow use (+2) | Not covered |
+|---|---|---|
+| A rifle with a telescopic sight | Aimed shots at Long range or farther | Snap shots, anything at Close or Short |
+| A watchmaker's instruments | Delicate repairs: clockwork, locks, small mechanisms | Forcing, breaking or building anything large |
+| A surgeon's instruments | Field treatment of a wound: stitching, dressing, setting | Diagnosis, emergency stabilization |
+| A great axe of old make | Breaking a shield, a door or a weapon | Ordinary attacks |
+| **Too broad:** "my rifle: +2 to Firearms", "my kit: +2 to Medicine" | | |
+
+When a roll qualifies for both the fine item and an advantage, take +2 once.
 
 | Item | Control | What it does |
 |---|---|---|
@@ -388,15 +404,16 @@ Run a chase as a progress clock for the pursuers against a danger clock for the 
 
 ## Turn order and actions
 
-Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance (up to 10 yards: the Close band below) and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
+Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move up to your **Move** (below) and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
 
 ## Attacking and defending
 
 Roll Firearms for a ranged attack, Close Combat for a weapon in hand, or Close Combat for fists and grappling. If the attack succeeds, an aware target able to move may **defend**: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.
 
-- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits. The **Additional Defense** Edge gives a second.
+- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits.
+- **Additional Defense.** With this Edge you may attempt a second defense each round at −2, in addition to attack-quality and injury penalties. You cannot defend twice against the same attack.
 - **Dodge** is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert.
-- **Parry.** Against a weapon in hand or fists, roll Close Combat −3 with a weapon in hand, or Close Combat −3 bare-handed against fists. An open hand can't parry a blade, claws or fangs. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a shot or a missile.
+- **Parry.** Against a weapon in hand or fists, roll Close Combat −3 with a weapon in hand, or Close Combat −3 bare-handed against fists. An open hand can't parry a blade, claws or fangs. Nobody parries a shot or a missile.
 - **Block.** With a shield, or anything that can stand in for one (a chair, a plank, a crate lid), you can block a weapon in hand, fists, or a thrown or loosed missile: roll Close Combat −2, plus the shield's bonus. Nothing you can lift blocks a gunshot or a blast. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
 - **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. An advantage that rewards aiming adds its bonus to this.
@@ -408,20 +425,20 @@ Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effe
 A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.
 
 - **A telling hit** is an attack that succeeds by **5 or more**, or on a natural 3 or 4, and isn't stopped by a defense. The attacker picks **one effect** below and describes it. The weapon still marks its usual boxes.
-- **A called shot.** Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, an eye, a rope, a lock). If the attack hits at all, the effect happens, whatever the margin. An advantage that rewards aiming cuts this penalty by 1.
+- **A called shot.** Before rolling, name an effect your weapon can deliver and take −2 on the attack, or −4 for a small target (a hand, an eye, a rope, a lock). If the attack hits at all, the effect happens, whatever the margin. An advantage that rewards aiming cuts this penalty by 1.
 - **Both ways.** Opponents land telling hits on characters too.
 
-| Effect | What happens |
-|---|---|
-| Disarm | The weapon or held item drops, or flies a few yards away |
-| Knock down | The target falls prone, or is driven back a few steps |
-| Pin | The target is held, tangled or pinned down: their next action goes to getting free |
-| Rattle | −2 to the target's next roll |
-| Break gear | A shield, weapon or tool breaks; armor loses 1 protection until it's repaired |
-| Open them up | The next attack on this target this round gets +2 |
-| Precise | You hit exactly what you aimed at: the lantern, the rope, the tire, the hand on the trigger |
+| Effect | With | What happens |
+|---|---|---|
+| Disarm | Any attack | The weapon or held item drops, or flies a few yards away |
+| Knock down | A weapon in hand or fists, or a shot or missile that marks 2 or more boxes | The target falls prone, or is driven back a few steps. Standing up uses the target's move on their next turn; they still take their action |
+| Pin | A weapon in hand, fists or a grapple | The target is grabbed, held, or pinned against a wall or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack |
+| Rattle | Any attack | −2 to the target's next roll |
+| Break gear | Any attack but bare hands and natural weapons | A weapon, shield or tool is knocked out of use (jammed, bent, unstrung, cracked) until its owner spends an action putting it right. It's destroyed for good only if it was already vulnerable (a rotten haft, an improvised shield) or the attacker has a weakness to exploit. Armor loses 1 protection until it's repaired |
+| Open them up | Any attack | The next attack on this target this round gets +2 |
+| Precise | Any attack | You hit exactly what you aimed at: the lantern, the rope, the tire, the hand on the trigger. It changes the situation, never the rules: no extra boxes, no getting past a defense, no instant death |
 
-**Limits.** A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a bear or knocks down a train, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next, like sending one crashing into another.
+**Limits.** A telling hit never adds boxes and never gets past a defense. It never kills outright, disables a character for good, or destroys exceptional equipment: those come only from injury, from the *Dying and death* rules, or from an established weakness. Only the effects a weapon can deliver are open to it (the *With* column; a weapon's entry may add one, as a taser knocks down). Keeping someone's head down with gunfire isn't a pin: that's cover and a threat. The effect still has to make sense: nobody disarms a bear or knocks down a train, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next, like sending one crashing into another.
 
 **Staying alive.** A character on the receiving end can shrug off a telling hit's effect with **Hard to put down** (once per fight) or by spending a Resolve point. Either way, they still take the boxes.
 
@@ -432,22 +449,51 @@ Distances fall into five bands:
 | Band | Distance | For example |
 |---|---|---|
 | Close | Up to 10 yards | Across a room; one move covers it |
-| Short | Up to 50 yards | Across a street or a courtyard |
-| Medium | Up to 150 yards | A city block, a long field |
-| Long | Up to 500 yards | Across a valley, a park or a harbor |
-| Extreme | Up to a mile, in line of sight | Rooftop to rooftop across a town |
+| Short | Up to 25 yards | Across a street or a courtyard |
+| Medium | Up to 100 yards | A city block, a long field |
+| Long | Up to 300 yards | Across a park, a harbor or a small valley |
+| Extreme | Up to 1,000 yards, in line of sight | Rooftop to rooftop across a town |
 
-Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand and fists reach only someone next to you; move into reach as part of your turn. A thrown weapon's effective band is Close.
+Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. A thrown weapon's effective band is Close.
 
-Moving: your move each turn covers the Close band. Give up your action to run and you cover Short instead.
+## Move and reach
+
+**Move** is how far you go in a turn: **5 yards, +1 for every 2 points of Agility + Body above 20** (rounded down; nothing is taken off below 20), **+1 for Trained Athletics or +2 for Athletics as a Specialty or Expert**, plus your species's speed adjustment, if it has one. Most characters move 6 to 9 yards. Give up your action to **run** and you cover twice your Move. Threats move 8 yards unless their entry says otherwise.
+
+- **Injury slows you.** Wounded (1 box): Move −2 yards. Seriously wounded (2 boxes): half your Move, rounded down, and you can't run. Incapacitated: you don't move. Never less than 1 yard while you can act.
+- **Hard going halves it.** Climbing, swimming, wading, crawling, deep snow or sand, thick brush, rubble or a crowd: half your Move (and half a run), rounded down. Injury and hard going both apply, injury first.
+- **Stepping away.** You can move away from someone in reach freely; leaving a fight doesn't give them a free attack.
+
+### Mounts and vehicles
+
+A rider or driver moves at the mount's or vehicle's Move, not their own, and running it (a gallop, full throttle) takes their action. Attacking from a moving mount or vehicle is −2. A wounded mount slows down under the same injury rule as a person. Starships, aircraft and car chases are too fast for yards: they use range tracks and chase clocks.
+
+| Mount or vehicle | Move | Run or gallop | Notes |
+|---|---|---|---|
+| Rover or ground car | 25 yd | 60 yd | Takes hits on its own damage boxes (3 unless the GM says otherwise). |
+| Grav-bike | 30 yd | 100 yd | Shooting from it is at −2, as from any moving vehicle. |
+
+| Agility + Body | 20 or less | 21–22 | 23–24 | 25–26 | 27–28 | 29–30 |
+|---|---|---|---|---|---|---|
+| Move before Athletics | 5 | 6 | 7 | 8 | 9 | 10 |
+
+A weapon in hand strikes anyone within its **reach**, shown in the weapons table. Move into reach as part of your turn and attack in the same turn.
+
+| Reach | Weapons |
+|---|---|
+| 1 yard | Fists, kicks and grappling; knives, daggers and hatchets; clubs, bottles and batons; claws and fangs |
+| 2 yards | Swords, sabers, axes and maces; a rifle butt or a bayonet held short |
+| 3 yards | Spears and polearms |
+
+A weapon in hand can't reach past 3 yards; anything farther is a ranged attack.
 
 ## Injury
 
 | Boxes marked | Condition | Effect |
 |---|---|---|
 | 0 | Uninjured | No injury penalty |
-| 1 | Wounded | −1 to physical actions |
-| 2 | Seriously wounded | −2 to physical actions |
+| 1 | Wounded | −1 to physical actions; Move −2 yards |
+| 2 | Seriously wounded | −2 to physical actions; half Move, no running |
 | 3 | Incapacitated | Unable to act; medical aid needed |
 
 Injury penalties replace each other rather than stacking. They apply to movement, attacks, Dodge, and other tasks the injury physically hinders.
@@ -489,9 +535,9 @@ How many boxes a hit marks depends on the **weapon**, not on how well the attack
 
 | Weapon | Range | Boxes on a hit | What the injury looks like |
 |---|---|---|---|
-| Fists, kicks, a baton | Melee | 1 | Bruises, a cracked rib, a concussion |
-| Knife | Melee; Close thrown | 1 | A cut or stab wound |
-| Vibroblade, implant blades, claws | Melee | 2 | A deep wound |
+| Fists, kicks, a baton | Melee, reach 1 yd | 1 | Bruises, a cracked rib, a concussion |
+| Knife | Melee, reach 1 yd; Close thrown | 1 | A cut or stab wound |
+| Vibroblade, implant blades, claws | Melee, reach 2 yd (implant blades and claws 1) | 2 | A deep wound |
 | Slug pistol | Short | 2 | A gunshot wound |
 | Slug carbine | Medium | 2 | A gunshot wound |
 | Laser pistol | Short | 2 | A cauterized burn through flesh |
@@ -538,11 +584,20 @@ Roll Medicine when the diagnosis is uncertain or an urgent treatment decision ma
 
 ## Field treatment
 
-With a medkit and several uninterrupted minutes, successful Medicine removes one injury box; success by 5 or more removes two. Each injury receives one field-treatment attempt; further attempts need changed circumstances.
+With a medkit and several uninterrupted minutes, successful Medicine removes one injury box; success by 5 or more removes two.
 
 ## Proper care
 
 A clinic with a biotech suite grants +2 to Medicine. A successful treatment removes two boxes; success by 5 or more removes three. Allow the time the treatment requires.
+
+## Treatment attempts
+
+Each set of injuries permits one field-treatment attempt and one proper-care attempt. Further rolls require a meaningful improvement in care, a new treatment, or recovery time. Simply waiting and trying again is insufficient.
+
+- **A set of injuries** is the injury boxes from one encounter or one harmful incident: a fight, a fall, a fire, a night of exposure.
+- **Later injuries start a new set.** Its attempts can remove only its own boxes. A fresh scratch doesn't reopen the wounds you already treated: those boxes stay until their own set allows another roll, or rest clears them.
+- **What allows another roll:** a meaningful improvement (moving from the field to A clinic with a biotech suite, a better healer taking over), a new treatment (surgery, a remedy, healing magic), or recovery time (rest that has already cleared a box from that set). The GM decides whether a change is meaningful.
+- **Stabilization is separate.** Stopping someone Dying is never limited by these attempts and never removes boxes; a treatment roll that removes boxes also stabilizes.
 
 ## Natural recovery
 
@@ -1281,7 +1336,7 @@ Psionic potential is rare, but it is not unique to any people. It appears in sub
 
 Most of the older civilizations treat psionics as a danger to be **controlled**: registered, suppressed, or wiped out. Their **Mandates** require travelers to be tested at corridor gates and checkpoints, and in many jurisdictions a traveler who tests positive is **killed on the spot**. The Hegemony's Shivar inquisitors enforce the strictest Mandates; others are lax, corrupt or merely brutal.
 
-- **Psionic characters** take the **Psionic** advantage and learn **psionic powers** with the **Psionics** skill: 2 at Trained, 3 at Specialty, 4 at Expert. Using a power takes an action and a Psionics roll; the target resists with Will where it makes sense. **Psionic powers can't be swapped:** a power, once learned, is yours for good, and new ones come only when Psionics advances.
+- **Psionic characters** take the **Psionic** advantage and learn **psionic powers** with the **Psionics** skill: 2 at Trained, 3 at Specialty, 4 at Expert. Using a power takes an action and a Psionics roll; each power below says which attribute resists, if any: a contest between the Psionics roll and the target's roll, ties to the target. **Psionic powers can't be swapped:** a power, once learned, is yours for good, and new ones come only when Psionics advances.
 - **Every slip is noticed.** A failed use or a natural 18 marks a box of **Heat**. Mandate scanners detect active powers nearby.
 - **Unregistered.** A psionic who has never been tested, or carries a forged result, takes the **Unregistered** complication. Screenings, scans and witnesses are life-or-death moments: hide, forge, bluff or run.
 - **The Quiet Network** smuggles psionics past the Mandates with false papers, safe routes and new names.
@@ -1294,12 +1349,12 @@ Most of the older civilizations treat psionics as a danger to be **controlled**:
 | Push | A short suggestion the target follows unless they resist with Will |
 | Surface Thoughts | By touch, read what the target is thinking right now (Will resists) |
 | Mind Link | Speak mind to mind with one ally for a scene, anywhere in the same system |
-| Calm | Soothe fear or rage in one person, or a small group at −2 |
-| Kinetic Shove | Push a person or object with force: knock down, disarm, slam a door |
+| Calm | Soothe fear or rage in one person (or a small group at −2); an unwilling target's Will resists |
+| Kinetic Shove | Push a person or object with force: knock down, disarm, slam a door (a person's Body resists) |
 | Kinetic Lift | Move a small object you can see, delicately, for a scene |
-| Static | Disrupt nearby electronics: a lock, a camera, a weapon's targeting |
+| Static | Disrupt nearby electronics: a lock, a camera, a weapon's targeting. No defense or resistance: it works on the machine |
 | Precognitive Flash | Once per scene, +2 to one roll as you glimpse what's coming |
-| Healing Trance | Clear one injury box on yourself, once per wound |
+| Healing Trance | Clear one injury box on yourself, once per set of injuries |
 
 # Technology
 
@@ -1329,7 +1384,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 - **Attributes:** Body 10, Agility 11, Intellect 13, Presence 8, Will 13. **Dodge** 10.
 - **Skills:** Navigation 16 (Specialty). Trained: Commerce 14, Computers 14, Engineering 14, Investigation 14, Science 14, Sensors 14, Survival 14, Piloting 12, Athletics 11.
-- **Edges:** Extra Resolve, A fine weapon or tool; a fine tool: a hive-made survey kit (+2 Sensors).
+- **Edges:** Extra Resolve, A fine weapon or tool; a fine tool: a hive-made survey kit (+2 to Sensors for surveying a world: minerals, water and life signs).
 - **Advantage:** Debt-Born (species; companion: The Homeworld's Debt). **Complication:** Debt-Bound; trigger: a creditor offers to forgive it for a favor.
 - **Why I'm out here:** I owe more than I can ever repay, unless I take every job. **Connection:** Ilvi Saradh's AI found the corridor Kesh's hive needed; Kesh owes them both.
 
@@ -1349,7 +1404,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 - **Attributes:** Body 9, Agility 12, Intellect 13, Presence 11, Will 10. **Dodge** 11.
 - **Skills:** Computers 16 (Specialty). Trained: Commerce 14, Engineering 14, Investigation 14, Science 14, Sensors 14, Piloting 13, Stealth 13, Diplomacy 12, Psychology 11, Athletics 10; Navigation 14 (free).
-- **Edges:** Extra Trained skill, A fine weapon or tool; a fine tool: Quill's core, a guild-grade AI (+2 Computers).
+- **Edges:** Extra Trained skill, A fine weapon or tool; a fine tool: Quill's core, a guild-grade AI (+2 to Computers for breaking old guild encryption and recovering lost navigation data).
 - **Advantage:** Corridor Sense. **Complication:** Dangerous Knowledge; trigger: someone close to the truth.
 - **Why I'm out here:** The galaxy is full of things no one understands yet. I want to be first. **Connection:** Quill found the corridor Kesh's hive needed. Ilvi never told the guild.
 
@@ -1463,6 +1518,10 @@ Adaptable, socially restless, and remarkably willing to challenge established in
 *Tier 0 · 3 Edges · Body −1, Agility +1*
 
 Slender quadrupeds who handle tools with prehensile sensory tendrils, and who reached the corridors only 24 years ago. Their governments struggle to stay independent while learning from civilizations thousands of years older, and humans recognize the struggle.
+
+**Species rules:**
+
+- Quick on four legs: Move +1.
 
 **Suggested skills:** Diplomacy, Science, Athletics, Sensors.
 
@@ -1876,6 +1935,7 @@ Silicon-based beings of slowly growing crystal with distributed nervous systems,
 
 - Crystalline: immune to vacuum, toxins and disease; you need a translator to speak with most species.
 - Slow time sense: −1 to Psychology with fast-living peoples.
+- Heavy crystal: Move −1.
 
 **Suggested skills:** Engineering, Science, Computers, Commerce.
 
@@ -1894,7 +1954,7 @@ Compact, slow-moving beings in layered mineral shells who live more than a thous
 **Species rules:**
 
 - Shell: once per fight, a hit marks one fewer box.
-- Slow: you always act last in a fight.
+- Slow: you always act last in a fight, and Move −1.
 
 **Suggested skills:** Science, Investigation, Navigation, Psychology.
 
@@ -1944,6 +2004,8 @@ When in doubt, choose the higher tier.
 
 Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most species change two to four attributes.
 
+A species that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
+
 ### 4. Core rules (tier 1 and up)
 
 One to three short rules that always apply: what they can do (see in the dark, resist cold, a free Trained skill) and what it costs (a weakness, a people's distrust, a hazard they can't abide). A strength with no drawback is worth more than it looks, so price it a tier higher.
@@ -1954,7 +2016,7 @@ Write one to three. Each works like a general advantage: **+2 to one skill in a 
 
 ### 6. An alternate form (optional, tier 2 or 3)
 
-If the species changes shape, give the form attribute bonuses (usually +2 to one attribute and +1 to another), two or three traits, and its drawbacks. The shared rules for forms in *Species* apply. The bonuses count only while the character is in that form: the sheet's form switch shows both sets of numbers.
+If the species changes shape, give the form attribute bonuses (usually +2 to one attribute and +1 to another), two or three traits, and its drawbacks. A form's Agility and Body bonuses change its Move, and a fast form may add a speed adjustment of its own. The shared rules for forms in *Species* apply. The bonuses count only while the character is in that form: the sheet's form switch shows both sets of numbers.
 
 ### In the creator
 
@@ -1995,6 +2057,8 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 # Quick reference
 
+**Fine weapon or tool:** +2 to one narrow, agreed use of a skill; never with an advantage on the same roll; never to Dodge, Parry or Block.
+
 **Creation:** attributes start at 10, adjusted by species (always totaling zero), plus 5 points; maximum 13 plus any species bonus. 3 points split between species tier and Edges. Generalist: one Specialty and nine Trained. Specialist: one Expert at +5 and seven Trained. One advantage (general or species) and one complication; an optional Allegiance.
 
 **Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Specialist) = attribute +5.
@@ -2007,9 +2071,11 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Clocks:** 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).
 
-**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural 3–4): the attacker picks an effect; called shot −2 (small target −4). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
+**Move:** 5 yd, +1 per 2 points of Agility + Body above 20, +1 Trained Athletics or +2 Specialty/Expert, ± species speed; run (no action) twice that. Threats 8 yd. Wounded −2 yd; seriously wounded half, no run. Hard going: half. Stepping away is free. Reach: 1 yd fists, knives, clubs; 2 yd swords, axes; 3 yd spears, polearms.
 
-**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone's care).
+**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit; Additional Defense: a second, at −2) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural 3–4): the attacker picks an effect the weapon can deliver (pin: weapon in hand or grapple only), which never adds boxes or kills outright; called shot −2 (small target −4). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
+
+**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Each set of injuries (one fight or incident) gets one field and one proper-care attempt; more need better care, a new treatment or recovery time. Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone's care).
 
 **Resolve:** start each session with two. Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.
 

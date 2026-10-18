@@ -1388,7 +1388,7 @@
    "desc": "Compact, slow-moving beings in layered mineral shells who live more than a thousand years. Their experiments have run for centuries; they have watched empires rise and fall, and their warnings about corridor instability carry great weight.",
    "core": [
     "Shell: once per fight, a hit marks one fewer box.",
-    "Slow: you always act last in a fight."
+    "Slow: you always act last in a fight, and Move −1."
    ],
    "form": null,
    "skills": [
@@ -1425,7 +1425,8 @@
      "Shell-Slow",
      "You can't run. Accept being caught."
     ]
-   ]
+   ],
+   "speed": -1
   },
   {
    "id": "joruun",
@@ -1491,7 +1492,8 @@
    "desc": "Silicon-based beings of slowly growing crystal with distributed nervous systems, speaking by electromagnetic and mechanical oscillation. Masters of materials and computation, the Qor take Tessan capital but refuse debts that threaten sovereignty.",
    "core": [
     "Crystalline: immune to vacuum, toxins and disease; you need a translator to speak with most species.",
-    "Slow time sense: −1 to Psychology with fast-living peoples."
+    "Slow time sense: −1 to Psychology with fast-living peoples.",
+    "Heavy crystal: Move −1."
    ],
    "form": null,
    "skills": [
@@ -1528,7 +1530,8 @@
      "Mineral Wealth",
      "Prospectors eye your homeworld. Accept the confrontation."
     ]
-   ]
+   ],
+   "speed": -1
   },
   {
    "id": "ommek",
@@ -1590,7 +1593,9 @@
     "Body": -1
    },
    "desc": "Slender quadrupeds who handle tools with prehensile sensory tendrils, and who reached the corridors only 24 years ago. Their governments struggle to stay independent while learning from civilizations thousands of years older, and humans recognize the struggle.",
-   "core": [],
+   "core": [
+    "Quick on four legs: Move +1."
+   ],
    "form": null,
    "skills": [
     "Diplomacy",
@@ -1626,7 +1631,8 @@
      "Easily Exploited",
      "Everyone has a deal for you. Accept the bad bargain."
     ]
-   ]
+   ],
+   "speed": 1
   },
   {
    "id": "uth",
@@ -2746,7 +2752,7 @@
    "psionic"
   ],
   "originAdvantages": [],
-  "note": "Using a power takes an action and a Psionics roll; the target resists with Will where it makes sense. A failed use or a natural 18 marks a box of Heat: someone noticed. Mandate scanners detect active powers nearby.",
+  "note": "Using a power takes an action and a Psionics roll; each power says which attribute resists, if any. A failed use or a natural 18 marks a box of Heat: someone noticed. Mandate scanners detect active powers nearby.",
   "list": [
    [
     "sense",
@@ -2781,12 +2787,12 @@
    [
     "calm",
     "Calm",
-    "Soothe fear or rage in one person (or a small group at −2)."
+    "Soothe fear or rage in one person (or a small group at −2); an unwilling target's Will resists."
    ],
    [
     "shove",
     "Kinetic Shove",
-    "Push a person or object with force: knock down, disarm, slam a door."
+    "Push a person or object with force: knock down, disarm, slam a door (a person's Body resists)."
    ],
    [
     "lift",
@@ -2796,7 +2802,7 @@
    [
     "static",
     "Static",
-    "Disrupt nearby electronics: a lock, a camera, a weapon's targeting."
+    "Disrupt nearby electronics: a lock, a camera, a weapon's targeting. No defense or resistance: it works on the machine."
    ],
    [
     "flash",
@@ -2806,7 +2812,7 @@
    [
     "trance",
     "Healing Trance",
-    "Clear one injury box on yourself, once per wound."
+    "Clear one injury box on yourself, once per set of injuries."
    ]
   ]
  },
@@ -3005,7 +3011,8 @@
    },
    "gear": {
     "item": "A hive-made survey kit",
-    "skill": "Sensors"
+    "skill": "Sensors",
+    "use": "surveying a world: minerals, water and life signs"
    },
    "equipment": {
     "scanner": true,
@@ -3112,7 +3119,8 @@
    },
    "gear": {
     "item": "Quill's core, a guild-grade AI",
-    "skill": "Computers"
+    "skill": "Computers",
+    "use": "breaking old guild encryption and recovering lost navigation data"
    },
    "equipment": {
     "laser": true,
@@ -3584,7 +3592,8 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "knife",
@@ -3597,7 +3606,8 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "blade",
@@ -3610,7 +3620,9 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 2,
+   "reachNote": "implant blades and claws 1"
   },
   {
    "id": "claws",
@@ -3624,7 +3636,8 @@
    },
    "traits": [],
    "rows": [],
-   "natural": true
+   "natural": true,
+   "reachYards": 1
   },
   {
    "id": "pistol",
@@ -3717,7 +3730,12 @@
    "firearm": true,
    "stun": true,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "telling": {
+    "add": [
+     "knockdown"
+    ]
+   }
   },
   {
    "id": "grenade",
@@ -4194,5 +4212,19 @@
   },
   "origins": "A character's species can suit a method: senses, memory, psionics or a people's own history with the subject. A species that touches minds can advance a phase with Psionics, at the GM's call.",
   "subjects": []
- }
+ },
+ "mounts": [
+  [
+   "Rover or ground car",
+   "25 yd",
+   "60 yd",
+   "Takes hits on its own damage boxes (3 unless the GM says otherwise)."
+  ],
+  [
+   "Grav-bike",
+   "30 yd",
+   "100 yd",
+   "Shooting from it is at −2, as from any moving vehicle."
+  ]
+ ]
 }

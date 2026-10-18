@@ -212,6 +212,10 @@ tr.lvl-U td.target { color: var(--muted); }
 .log li { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid rgba({{theme.line}}, .12); padding: 3px 0; }
 .log .s { color: var(--good); }
 .log .f { color: var(--bad); }
+.tbl-log li { display: block; line-height: 1.45; }
+.tbl-badge { display: block; color: var(--accent); }
+.tbl-log .tbl-old { opacity: .55; }
+#gm-table .tbl-log { max-height: 22rem; overflow-y: auto; }
 .ref { display: grid; gap: 6px; font-size: .88rem; margin: 0; }
 .ref dt { font: 600 .72rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--chrome); }
 .ref dd { margin: 0 0 6px; color: {{theme.text2}}; }
@@ -382,7 +386,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .gm-head .avatar.portrait { width: 40px; height: 54px; }
 .gm-head b { font-family: var(--display); letter-spacing: .06em; text-transform: uppercase; font-size: 1.05rem; overflow-wrap: anywhere; }
 .gm-head .small { display: block; }
-.gm-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.gm-stats { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
 .gm-stats div { border: 1px solid var(--line); border-radius: 6px; padding: 4px 2px; background: var(--well); }
 .gm-stats span { display: block; font: .56rem var(--mono); letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
 .gm-stats b { font: 400 1.15rem var(--mono); color: var(--chrome); }
@@ -623,6 +627,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field" id="species-name-wrap" hidden><label for="f-species">{{origin}} name</label><input type="text" id="f-species" placeholder="Name it"></div>
             <div class="field" id="custom-tier-wrap" hidden><label for="f-customtier">Tier (agreed with the GM)</label>
               <select id="f-customtier"><option value="0">Tier 0: 3 Edges</option><option value="1">Tier 1: 2 Edges</option><option value="2">Tier 2: 1 Edge</option><option value="3">Tier 3: no Edges</option></select></div>
+            <div class="field" id="custom-speed-wrap" hidden><label for="f-customspeed">Speed (agreed with the GM)</label>
+              <select id="f-customspeed"><option value="-1">Slower: Move −1</option><option value="0">Human pace</option><option value="1">Faster: Move +1</option></select></div>
             <div class="field wide" id="horror-wrap"><div class="checks"><label><input type="checkbox" id="f-horror"> {{restrictedToggle}}</label></div></div>
             <div class="field wide"><div class="trait-desc" id="species-desc"></div></div>
             <div class="field wide" id="species-adj-wrap" hidden><span class="label">Custom adjustments (must total 0, each −2 to +2)</span>
@@ -803,6 +809,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <div class="field wide" id="contact-wrap" hidden><label for="f-contact">A friend (Edge)</label><input type="text" id="f-contact" placeholder="Who, and what they can do for you"></div>
             <div class="field" id="gear-wrap" hidden><label for="f-gearitem">Fine weapon or tool (Edge)</label><input type="text" id="f-gearitem" placeholder="e.g. An heirloom weapon"></div>
             <div class="field" id="gearskill-wrap" hidden><label for="f-gearskill">+2 to</label><select id="f-gearskill"></select></div>
+            <div class="field wide" id="gearuse-wrap" hidden><label for="f-gearuse">Only for (one narrow use, agreed with the GM)</label><input type="text" id="f-gearuse" placeholder="e.g. Aimed shots at Long range or farther"></div>
             <div id="xedge-fields" style="display:contents"></div>
             <div class="field wide"><label for="f-otherequip">Other {{gearLower}}</label><input type="text" id="f-otherequip" placeholder="Anything else you carry"></div>
             <div class="field wide"><label for="f-connection">Connection to another character</label>
@@ -822,6 +829,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="panel hud">
           <div class="stats">
             <div class="stat"><span class="eyebrow">Dodge</span><b id="st-dodge"></b></div>
+            <div class="stat"><span class="eyebrow">Move</span><b id="st-move"></b></div>
             <div class="stat"><span class="eyebrow">{{point}}</span><b id="st-grit">2</b></div>
             <div class="stat"><span class="eyebrow">Best</span><b id="st-best"></b></div>
           </div>
@@ -867,6 +875,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   <!-- GM VIEW -->
   <section id="view-gm" role="tabpanel" aria-labelledby="tab-gm" hidden>
+    <div class="panel hud no-print" id="gm-table"></div>
     <div class="gm-top">
       <div class="card hud no-print">
         <h3>Characters</h3>
@@ -1033,6 +1042,7 @@ tr.lvl-U td.target { color: var(--muted); }
           </div>
         </div>
 
+        <div class="card hud no-print" id="card-table"></div>
         <div class="card hud no-print" id="card-roll">
           <h3>Roll 3d6</h3>
           <div class="fields">
@@ -1064,6 +1074,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <label id="r-phys-wrap"><input type="checkbox" id="r-phys"> <span id="r-phys-label">Physical action (injury penalty)</span></label>
             <label><input type="checkbox" id="r-stun"> {{stun}} −2</label>
             <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> <span id="r-aim-label">Aimed at this target</span></label>
+            <label id="r-second-wrap" hidden><input type="checkbox" id="r-second"> <span id="r-second-label">Second defense this round</span></label>
+            <label id="r-fine-wrap" hidden><input type="checkbox" id="r-fine"> <span id="r-fine-label">Fine weapon or tool +2</span></label>
           </div>
           <div class="btn-row"><button class="btn primary" id="r-roll">Roll</button>
             <span class="muted small" id="r-target"></span></div>
@@ -1122,6 +1134,8 @@ tr.lvl-U td.target { color: var(--muted); }
   /* RULES:CORE */
   /* RULES:LAB */
   const T = PACK.terms;
+  const TABLE_SERVER = "{{TABLE_SERVER}}"; // the shared table server (legend-dynamics/table-server), set at build time
+  let sharedTable = null; // mounted with the GM view below
   // Advancement point costs (core rules, Advancement). Magic and powers use the costs their chapters give.
   const COSTS = { UT: 1, TS: 2, revise: 1, edge: 3, attr: 4 };
   const ATTRS = [
@@ -1167,6 +1181,8 @@ tr.lvl-U td.target { color: var(--muted); }
   // A form whose claws or fangs mark 2 boxes fights with the setting's claws.
   const formWeapon = (f) => (f && (PACK.arms || []).some((a) => a.id === "claws") && (f.traits || []).some((x) => /marks? 2 boxes/i.test(x)) ? "claws" : null);
   const tierOf = (c = ch) => (c.speciesId === "custom" ? c.customTier : heritageOf(c)?.tier ?? 0);
+  // Speed adjustment to Move: the origin's (most have none), plus a form's own while in it.
+  const speedOf = (c = ch) => (c.speciesId === "custom" ? c.customSpeed || 0 : heritageOf(c)?.speed || 0) + (inForm(c) ? formOf(c).speed || 0 : 0);
   // Edges: every character has a few points shared between origin tier and Edges.
   const EDGE_POINTS = PACK.edgePoints ?? 3;
   const EDGE_DEFS = [
@@ -1175,8 +1191,8 @@ tr.lvl-U td.target { color: var(--muted); }
     ["adv2", "Second advantage", "A second general advantage, with no extra complication.", 1],
     ["grit", `Extra ${T.point}`, `Start every session with 3 ${T.point} points instead of 2.`, 1],
     ["contact", "A friend", "A named contact who helps once per " + T.missionLower + ".", 1],
-    ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a fine kit: +2 to one skill when it's used.", 1],
-    ["extradefense", "Additional Defense", "A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2.", 1],
+    ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a fine kit: +2 to one narrowly defined use of a named skill, agreed with the GM. Not with an advantage on the same roll; never to Dodge, Parry or Block.", 1],
+    ["extradefense", "Additional Defense", "A second defense each round at −2 (Dodge, Parry or Block, in any mix), on top of attack-quality and injury penalties. Never twice against the same attack.", 1],
     ["survivor", "Hard to put down", "Once per fight, shrug off a telling hit's effect. You still take its boxes.", 1],
     ...(PACK.extraEdges || []), // a setting's own Edges, e.g. Stronger Power
   ];
@@ -1263,8 +1279,8 @@ tr.lvl-U td.target { color: var(--muted); }
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
-      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "" }, edgeNotes: {},
-      allegiance: "", allegianceDef: null, customTier: 1, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
+      edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "", use: "" }, edgeNotes: {},
+      allegiance: "", allegianceDef: null, customTier: 1, customSpeed: 0, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
       play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [], lasting: [], gwLast: null },
@@ -1321,10 +1337,11 @@ tr.lvl-U td.target { color: var(--muted); }
     out.edges = Object.fromEntries(EDGE_DEFS.map(([k, , , max]) => [k, Math.max(0, Math.min(max, parseInt((c.edges || {})[k], 10) || 0))]));
     out.adv2 = { id: "", detail: "", ...(c.adv2 || {}) };
     if (!ADVANTAGES.some((a) => a[0] === out.adv2.id)) out.adv2.id = "";
-    out.gear = { item: "", skill: "", ...(c.gear || {}) };
+    out.gear = { item: "", skill: "", use: "", ...(c.gear || {}) };
     out.allegianceDef = Array.isArray(c.allegianceDef) && c.allegianceDef.length === 4 ? c.allegianceDef.map((x) => String(x ?? "")) : null;
     if (!allegiances(out).some((a) => a[0] === out.allegiance)) out.allegiance = "";
     out.customTier = [0, 1, 2, 3].includes(+out.customTier) ? +out.customTier : 1;
+    out.customSpeed = [-1, 0, 1].includes(+out.customSpeed) ? +out.customSpeed : 0;
     if (typeof out.contact !== "string") out.contact = "";
     // A setting's own Edges can ask for a short description (which talisman, which heirloom): kept per Edge.
     out.edgeNotes = Object.fromEntries(Object.entries(out.edgeNotes && typeof out.edgeNotes === "object" ? out.edgeNotes : {}).filter(([, v]) => typeof v === "string"));
@@ -1445,7 +1462,7 @@ tr.lvl-U td.target { color: var(--muted); }
     step: () => [`${cap1(MW.bursts)} and ${MW.step === "step" ? "Boosts" : cap1(MW.step) + "s"}`, (MW.help?.step || `<p>Your ${MW.step} comes from ${MW.steps || "your magic skill"}.</p>`) +
       `<p>Each ${MW.step} above the first gives <b>one Boost</b>, chosen when you cast: Harder, Wider, Longer or Farther. Each Boost you spend is <b>−1 to the roll</b>, so you can always hold back.</p>`],
     boost: () => ["Boosts", `<p>Choose when you cast; each one is <b>−1 to the roll</b>. You can spend fewer, or none.</p><ul>
-      <li><b>Harder:</b> +1 box, or the penalty goes −2 to −3 (two Boosts: +2 boxes, or −4)</li><li><b>Wider:</b> a handful of targets (two: a crowd or an area)</li>
+      <li><b>Harder:</b> +1 box, or the penalty goes −2 to −3 (two Boosts: +2 boxes, or −4). Never more than 3 boxes on one target.</li><li><b>Wider:</b> a handful of targets (two: a crowd or an area)</li>
       <li><b>Longer:</b> a day (two: until it's lifted)</li><li><b>Farther:</b> one range band farther (two: two bands)</li></ul>${MW.help?.boost || ""}`],
     price: () => ["The price", `<p>A failed ${MW.burst} marks <b>${MW.price}</b>. A natural 18 marks two, or something answers that shouldn't.</p>${MW.help?.price || ""}`],
     charms: () => [cap1(MW.charms), `<p>A ${MW.charm} is a ${MW.working} worked <b>in advance</b> and stored in an object. Break it to release it: <b>one action, no roll</b>.</p><p>${MW.help?.charms || `You can carry as many ready ${MW.charms} as your ${MW.skill} training allows: Trained 2, Specialty 3, Expert 4.`}</p>`],
@@ -1454,7 +1471,7 @@ tr.lvl-U td.target { color: var(--muted); }
     deeper: () => [`Deeper ${MW.step}`, `<p>One ${MW.burst} you know works one ${MW.step} deeper than your ${MW.skill} allows: <b>one more Boost</b> with it. Once per ${MW.burst}.</p>` + ADV_NOTE],
     charm: () => [`Another ${MW.charm}`, `<p>Carry one more ready ${MW.charm}. Up to 2 extra.</p>` + ADV_NOTE],
     heart: () => ["By heart", `<p>One kind of ${MW.working} (wards, curses, questions of the dead) takes <b>one fewer segment</b>, to a minimum of 1. Once per kind. Write the kinds you know by heart here.</p>` + ADV_NOTE],
-    quicker: () => ["Quicker hand", `<p>One ${MW.working} you know goes <b>one pace faster</b>: an hour a roll becomes ten minutes, ten minutes becomes one action. Once per ${MW.working}. Write each one and its new pace here.</p>` + ADV_NOTE],
+    quicker: () => ["Quicker hand", `<p>For one specific ${MW.working}, the time between rolls drops one step: an hour becomes ten minutes, ten minutes becomes one minute. Never faster than one minute a roll. The clock and the rolls it needs stay the same, and releasing it in a fight still needs a ${MW.charm}. Once per ${MW.working}. Write each one and its new pace here.</p>` + ADV_NOTE],
     mastery: () => [MW.masterName || "Mastery", `<p>${cap1(MW.skill)} becomes <b>Expert (+5)</b>: more ${MW.bursts} known, a deeper ${MW.step}, and more ready ${MW.charms}.</p><p><b>Once, at the end of a long campaign</b>, with the GM's approval. It needs ${MW.skill} as a Specialty first.</p>`],
   };
   const helpBtn = (key) => `<button type="button" class="help" data-help="${key}" aria-label="About ${esc(HELP[key]()[0])}" aria-expanded="false">?</button>`;
@@ -1492,6 +1509,11 @@ tr.lvl-U td.target { color: var(--muted); }
   const levelName = (l, name) => ((l === "S" && isGS() && !(name && advancedToS(name))) || (l === "S" && masterSkill(name)) ? "Expert" : LEVELS[l].name);
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
   const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge);
+  // Move in yards, in the current form (a form's Agility and Body count while in it).
+  const moveOf = (c = ch) => LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c));
+  // Move as the character's injuries leave it (wounded −2 yards, seriously wounded half and no running).
+  const moveNow = (c = ch) => LD.injuredMove(moveOf(c), (c.play && c.play.injury) || 0);
+  const runNow = (c = ch) => ((c.play && c.play.injury) >= 2 ? 0 : moveNow(c) * 2);
   // The core attack and defense rules (engine/combat.json), with the setting's own overrides.
   const CR = PACK.combatRules || {};
   const PARRY = !CR.parry ? [] : T.meleeSkill === T.unarmedSkill ? [[T.meleeSkill, "armed, or bare-handed against fists"]] : [[T.meleeSkill, "with a weapon"], [T.unarmedSkill, "bare-handed, fists only"]];
@@ -1530,7 +1552,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const POOL = pool(), ea = edgesAvail(), es = edgesSpent();
     const edgeNeeds = [edgeN("adv2") && !ch.adv2.id ? "choose the second advantage" : "", edgeN("adv2") && ADVANTAGES.find((a) => a[0] === ch.adv2.id)?.[4] && !ch.adv2.detail.trim() ? "finish the second advantage" : "",
       edgeN("contact") && !ch.contact.trim() ? "name your friend" : "",
-      ...XEDGE_NOTES.filter(([k]) => edgeN(k) && !(ch.edgeNotes[k] || "").trim()).map(([, , , , d]) => d.missing || "describe " + d.label.toLowerCase()), edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill) ? "describe the fine weapon or tool and its skill" : ""].filter(Boolean);
+      ...XEDGE_NOTES.filter(([k]) => edgeN(k) && !(ch.edgeNotes[k] || "").trim()).map(([, , , , d]) => d.missing || "describe " + d.label.toLowerCase()), edgeN("gear") && !(ch.gear.item.trim() && ch.gear.skill && (ch.gear.use || "").trim()) ? "describe the fine weapon or tool, its skill and its one narrow use" : ""].filter(Boolean);
     const horrorOff = heritageOf()?.restricted && !horrorOn();
     return [
       [!!ch.name.trim(), ch.name.trim() ? "Name entered" : "Enter a name"],
@@ -1656,10 +1678,11 @@ tr.lvl-U td.target { color: var(--muted); }
     $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
     EQUIPMENT.forEach(([k]) => ($("eq-" + k).checked = !!ch.equipment[k]));
     $("f-stunned").checked = !!ch.play.stunned;
-    $("f-contact").value = ch.contact; $("f-gearitem").value = ch.gear.item; $("f-adv2detail").value = ch.adv2.detail;
+    $("f-contact").value = ch.contact; $("f-gearitem").value = ch.gear.item; $("f-gearuse").value = ch.gear.use || ""; $("f-adv2detail").value = ch.adv2.detail;
   }
 
   function render() {
+    if (sharedTable) sharedTable.setCharacter(ch.name);
     // A slot given up for pure sorcery can't carry Stronger Power: clear it, and move one Edge to the Cantrips slot if there's room.
     if (POWERS && SPELLS && isPure()) { const sl = powerSlots(), k = sl.findIndex((_, j) => ch.powers[j] === SPELLS.power); let moved = false;
       sl.forEach((_, i) => { if (i !== k && (ch.powerBoost[i] || 0) > 0) { ch.powerBoost[i] = 0; moved = true; } });
@@ -1695,6 +1718,8 @@ tr.lvl-U td.target { color: var(--muted); }
     $("f-speciesid").value = ch.speciesId;
     const custom = ch.speciesId === "custom", sd = speciesDef();
     $("custom-tier-wrap").hidden = !custom;
+    $("custom-speed-wrap").hidden = !custom;
+    $("f-customspeed").value = ch.customSpeed;
     $("f-customtier").value = ch.customTier;
     $("species-name-wrap").hidden = !custom;
     $("species-adj-wrap").hidden = !custom;
@@ -1726,7 +1751,7 @@ tr.lvl-U td.target { color: var(--muted); }
       $("xedge-fields").innerHTML = xf.map(([k, , , , d]) => `<div class="field wide"><label for="f-xedge-${k}">${esc(d.label)} (Edge)</label><input type="text" id="f-xedge-${k}" data-xedge="${k}" placeholder="${esc(d.placeholder || "")}"></div>`).join("");
     }
     xf.forEach(([k]) => { const el = $("f-xedge-" + k); if (el && document.activeElement !== el) el.value = ch.edgeNotes[k] || ""; });
-    $("gear-wrap").hidden = $("gearskill-wrap").hidden = !edgeN("gear");
+    $("gear-wrap").hidden = $("gearskill-wrap").hidden = $("gearuse-wrap").hidden = !edgeN("gear");
     $("f-gearskill").value = ch.gear.skill;
     const al = allegianceOf();
     $("f-allegiance").innerHTML = allegiances().map(([id, n]) => `<option value="${esc(id)}">${esc(n)}</option>`).join("");
@@ -1824,10 +1849,12 @@ tr.lvl-U td.target { color: var(--muted); }
     $("ms-text").className = $("ready-status").className;
     $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
     $("st-dodge").textContent = dodge();
+    $("st-move").textContent = `${moveNow()} yd`;
     $("st-grit").textContent = gritStart();
     $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`
       + (CR.parry ? `. Parry = ${PARRY.map(([s]) => `${s} ${skillTarget(s)} ${signed(CR.parry.mod)} = ${parryOf(s)}`).join(", or ")}` : "")
-      + (CR.oneDefense ? `. ${defensesPerRound() > 1 ? `${["", "One", "Two", "Three"][defensesPerRound()] || defensesPerRound()} defenses a round (Additional Defense)` : "One defense a round"}: Dodge${CR.parry ? ", Parry" : ""}${CR.block ? " or Block" : ""}.` : "");
+      + `. Move = 5 yd + ${Math.floor(Math.max(0, ch.attrs.Agility + ch.attrs.Body - 20) / 2)} (Agility + Body ${ch.attrs.Agility + ch.attrs.Body}) + ${LEVELS[ch.skills.Athletics].dodge} (Athletics)${speedOf() ? ` ${signed(speedOf())} (${T.originLower} speed)` : ""} = ${moveOf()} yd; run ${moveOf() * 2} yd${moveNow() !== moveOf() ? ` (wounded: ${moveNow()} yd${runNow() ? `, run ${runNow()}` : ", no running"})` : ""}`
+      + (CR.oneDefense ? `. ${defensesPerRound() > 1 ? `${["", "One", "Two", "Three"][defensesPerRound()] || defensesPerRound()} defenses a round (Additional Defense: the second at ${signed(CR.oneDefense.extraPenalty || 0)})` : "One defense a round"}: Dodge${CR.parry ? ", Parry" : ""}${CR.block ? " or Block" : ""}.` : "");
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
     renderRoster();
@@ -1917,6 +1944,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div><span class="label">${T.role}</span><b>${esc(ch.dept)}</b></div>
         <div><span class="label">${T.origin}</span><b>${esc(ch.species || "—")}</b><span class="small muted">Tier ${tierOf()} · ${esc(adjText(adjOf()))}</span></div>
         <div><span class="label">Dodge</span><b class="num">${dodge() + formDodge()}</b>${formDodge() ? `<span class="small muted">human ${dodge()}</span>` : ""}${dodgeGearBonus() ? `<span class="small muted">${dodge() + formDodge() + dodgeGearBonus()} with ${esc(dodgeGear().map(([n]) => n.toLowerCase()).join(" and "))}</span>` : ""}</div>
+        <div><span class="label">Move</span><b class="num">${moveNow()} yd</b><span class="small muted">${runNow() ? `run ${runNow()} yd` : "no running while seriously wounded"}${moveNow() !== moveOf() ? ` · ${moveOf()} yd unhurt` : ""}${inForm() ? ` · human ${LD.moveYards(ch.attrs.Agility, ch.attrs.Body, LEVELS[ch.skills.Athletics].dodge, speedOf() - (formOf().speed || 0))} yd` : ""}</span></div>
         ${CR.parry ? `<div><span class="label">Parry</span><b class="num">${parryOf(T.meleeSkill) + formSkill(T.meleeSkill)}</b><span class="small muted">${T.meleeSkill}${PARRY.length > 1 ? `; ${parryOf(T.unarmedSkill) + formSkill(T.unarmedSkill)} bare-handed, fists only` : ""}</span></div>` : ""}
       </div>
       ${ch.role ? `<p>${esc(ch.role)}</p>` : ""}
@@ -1951,7 +1979,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${canCast() && ch.spells.length ? `<div class="field wide"><span class="label">${SPELLS.plural}</span><span>${SPELLS.list.filter(([k]) => ch.spells.includes(k)).map(([k, n, eff]) => { const t = spellTier(k); return `<b>${esc(n)}${t >= 0 ? ` (${SPELLS.tiers[t]}, ${boostText(t)})` : ""}:</b> ${esc(eff)}`; }).join("<br>")}${SPELLS.tiers ? `<br><span class="small muted">${helpBtn("boost")} Boosts, chosen as you cast, each −1 to the roll: Harder (+1 box or −1 more), Wider (a handful, then a crowd), Longer (a day, then until lifted), Farther (one range band).</span>` : ""}</span></div>` : ""}
         ${MAGIC && MAGIC.charms && ch.skills[MAGIC.skill] && ch.skills[MAGIC.skill] !== "U" && charmsOK() ? `<div class="field"><span class="label">Ready ${charmWord()}${helpBtn("charms")}</span><span>${readyCharms()}</span></div>` : ""}
         ${MAGIC && (ch.magic.heart || ch.magic.quicker) ? `<div class="field wide"><span class="label">Ritual mastery</span><span>${ch.magic.heart ? "<b>By heart:</b> " + esc(ch.magic.heart) : ""}${ch.magic.heart && ch.magic.quicker ? "<br>" : ""}${ch.magic.quicker ? "<b>Quicker hand:</b> " + esc(ch.magic.quicker) : ""}</span></div>` : ""}
-        ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 ${esc(ch.gear.skill)})` : ""}</span></div>` : ""}
+        ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 to ${esc(ch.gear.skill)}${ch.gear.use ? ` for ${esc(ch.gear.use)}` : ""})` : ""}</span></div>` : ""}
         ${al ? `<div class="field"><span class="label">Allegiance: ${esc(al[1])}</span><span class="small">${esc(al[2])}</span><span class="small muted">${esc(al[3])}</span></div>` : ""}
       </div>`; })()}
       <div class="fields">
@@ -2109,12 +2137,15 @@ tr.lvl-U td.target { color: var(--muted); }
     const parts = [];
     const mod = +$("r-mod").value; if (mod) parts.push(mod);
     const asst = +$("r-assist").value; if (asst) parts.push(asst);
-    if ($("r-adv").checked && !$("r-adv").disabled) parts.push(2);
+    // An advantage and a fine weapon or tool don't stack: +2 once, whichever applies.
+    if (($("r-adv").checked && !$("r-adv").disabled) || ($("r-fine").checked && !$("r-fine-wrap").hidden)) parts.push(2);
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
     if (CR.attackQualityDodge && isDefense(name)) parts.push(+$("r-quality").value || 0);
-    if (CR.parry && isParry(name)) parts.push((+$("r-parries").value || 0) * CR.parry.repeatPenalty);
+    if (CR.parry && CR.parry.repeatPenalty && isParry(name)) parts.push((+$("r-parries").value || 0) * CR.parry.repeatPenalty);
+    // Additional Defense: a second defense in a round is at −2 (core), on top of attack quality and injury.
+    if (CR.oneDefense && CR.oneDefense.extraPenalty && isDefense(name) && !$("r-second-wrap").hidden && $("r-second").checked) parts.push(CR.oneDefense.extraPenalty);
     if (CR.aim && !$("r-aim-wrap").hidden && $("r-aim").checked) parts.push(CR.aim.bonus);
     // An ability like Know its weakness: no called-shot penalty against a creature the character has identified.
     if (!$("r-called-wrap").hidden && +$("r-called").value && !($("r-weak").checked && !$("r-weak-wrap").hidden)) parts.push(+$("r-called").value);
@@ -2142,7 +2173,12 @@ tr.lvl-U td.target { color: var(--muted); }
     updateInjuryToggle();
     const sk = $("r-skill").value || "";
     $("r-quality-wrap").hidden = !(CR.attackQualityDodge && isDefense(sk));
-    $("r-parries-wrap").hidden = !(CR.parry && isParry(sk) && defensesPerRound() > 1);
+    $("r-parries-wrap").hidden = !(CR.parry && CR.parry.repeatPenalty && isParry(sk) && defensesPerRound() > 1);
+    $("r-second-wrap").hidden = !(CR.oneDefense && CR.oneDefense.extraPenalty && isDefense(sk) && defensesPerRound() > 1);
+    $("r-second-label").textContent = `Second defense this round ${signed(CR.oneDefense?.extraPenalty || 0)}`;
+    // A fine weapon or tool: only its named skill, only its narrow use (the player ticks it), never a defense.
+    $("r-fine-wrap").hidden = !(edgeN("gear") && ch.gear.skill && sk === ch.gear.skill && !isDefense(sk));
+    $("r-fine-label").textContent = `${ch.gear.item || "Fine weapon or tool"} +2${ch.gear.use ? `: only for ${ch.gear.use.toLowerCase()}` : ""} (not with an advantage)`;
     $("r-aim-wrap").hidden = !(CR.aim && [T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk));
     $("r-called-wrap").hidden = ![T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk);
     $("r-weak-wrap").hidden = $("r-called-wrap").hidden || !+$("r-called").value || !hasFx("freeCalledShot");
@@ -2156,7 +2192,7 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   let last = null;
-  function doRoll(isReroll) {
+  async function doRoll(isReroll) {
     let weaponNote = "";
     if (!isReroll && !$("r-setting-wrap").hidden && $("r-setting").value !== "none") {
       const set = spendGun($("r-setting").value);
@@ -2168,12 +2204,20 @@ tr.lvl-U td.target { color: var(--muted); }
     // A reroll repeats the same shot, whatever the shot menu shows now.
     const fireMod = isReroll && last ? last.fireMod || 0 : shot;
     const t = base + total - shot + fireMod;
-    const roll = LD.resolve(LD.rollDice(), t); // published core: 3d6 roll-under, natural 3–4 and 17–18 automatic
+    const attackRoll = !$("r-called-wrap").hidden, called = attackRoll ? (isReroll && last ? last.called : +$("r-called").value) : 0;
+    // At a shared table, the table rolls the dice and everyone sees them; otherwise (or if it doesn't answer) they're rolled here.
+    let tableDice = null, sharedN = null;
+    if (sharedTable && sharedTable.live()) {
+      $("r-roll").disabled = true;
+      try { const e = await sharedTable.roll({ label: name, target: t, base, mod: t - base, attack: attackRoll, called: !!called, of: isReroll && last ? last.sharedN : undefined }); tableDice = e.dice; sharedN = e.n; }
+      catch (err) { toast(`The table didn't take that roll (${err.message}), so it was rolled here and only you see it.`, true); }
+      finally { $("r-roll").disabled = false; }
+    }
+    const roll = LD.resolve(tableDice || LD.rollDice(), t); // published core: 3d6 roll-under, natural 3–4 and 17–18 automatic
     const { dice, total: sum, success: ok, margin } = roll;
     const auto = roll.auto === "success" ? "auto-s" : roll.auto === "failure" ? "auto-f" : "";
     const jam = PACK.weapons.jamOn18 && sum === 18 && (weaponNote || (isReroll && last && last.weaponNote));
-    const attackRoll = !$("r-called-wrap").hidden, called = attackRoll ? (isReroll && last ? last.called : +$("r-called").value) : 0;
-    last = { name, t, dice, sum, ok, margin, auto, jam, attackRoll, called, rerolled: !!isReroll, fireMod, weaponNote: weaponNote || (isReroll && last ? last.weaponNote : "") };
+    last = { name, t, dice, sum, ok, margin, auto, jam, attackRoll, called, sharedN, shared: !!tableDice, sk: isReroll && last ? last.sk : $("r-skill").value, rerolled: !!isReroll, fireMod, weaponNote: weaponNote || (isReroll && last ? last.weaponNote : "") };
     ch.play.log.unshift({ name, t, sum, ok, margin, rr: !!isReroll });
     ch.play.log = ch.play.log.slice(0, 12);
     if ($("r-stun").checked) { ch.play.stunned = false; $("f-stunned").checked = false; }
@@ -2191,7 +2235,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (r.auto === "auto-f") note = "Natural " + r.sum + ": automatic failure.";
     else note = r.ok ? `Succeeded by ${r.margin}.` : `Failed by ${-r.margin}.`;
     if (r.attackRoll && r.ok && r.called) note += " Called shot: if it isn't defended, the effect you named happens. No extra boxes.";
-    else if (r.attackRoll && r.ok && (r.margin >= 5 || r.auto === "auto-s")) note += " <b>Telling hit</b> if it isn't defended: pick one effect (disarm, knock down, pin, rattle −2, break gear, open them up +2, or precise). No extra boxes.";
+    else if (r.attackRoll && r.ok && (r.margin >= 5 || r.auto === "auto-s")) note += ` <b>Telling hit</b> if it isn't defended: pick one effect (${tellingText(r.sk)}). No extra boxes.`;
     if (gritty && r.attackRoll && r.ok && (r.margin >= 7 || r.auto === "auto-s")) note += " <b>Gritty combat:</b> if it marks 2 or more boxes, it's grievous. A character rolls the grievous wound table; an opponent is taken out.";
     if (r.ok && r.margin >= 5 && !r.attackRoll) note += " Margin 5+: assistance gives +2; medical care clears an extra box; a progress clock gets 2 segments.";
     if (r.sum === 18) note += " As an assistant, an 18 introduces a complication.";
@@ -2201,7 +2245,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (r.jam) note += " Natural 18: the gun jams. Clearing it takes an action.";
     el.innerHTML = `
       <div class="dice">${r.dice.map((d) => `<span class="die rolling">${d}</span>`).join("")}
-        <span class="num" style="font-size:1.3rem">= ${r.sum}</span><span class="muted">vs ${r.t}</span></div>
+        <span class="num" style="font-size:1.3rem">= ${r.sum}</span><span class="muted">vs ${r.t}</span>${r.shared ? `<span class="small muted">· rolled by the table</span>` : ""}</div>
       <div class="verdict">${r.ok ? "Success" : "Failure"}</div>
       <p class="small">${note}${r.rerolled ? ` <i>${T.point} reroll: this result stands.</i>` : ""}</p>
       ${!r.rerolled && ch.play.duty > 0 ? `<div><button class="btn" id="r-reroll">Spend a ${T.point} point to reroll</button></div>` : ""}`;
@@ -2216,7 +2260,15 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   // ---- persistence ----
-  function save() { store.set(STORE_CURRENT, ch); }
+  function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
+  // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
+  const pickPlay = (c) => { const p = c.play || {}, g = p.gun || {};
+    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.form, ptrack: p.ptrack || 0, lasting: p.lasting || [] };
+    if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
+    return o; };
+  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "form", "ptrack", "lasting"]) if (k in q) c.play[k] = q[k];
+    if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
+  const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
   function load(c) { ch = normalize(c); last = null; $("r-setting").innerHTML = ""; $("r-result").hidden = true; bindFields(); render(); }
   // A role's core skills are marked Trained when the role is chosen (and on a new character). Changing
@@ -2244,7 +2296,7 @@ tr.lvl-U td.target { color: var(--muted); }
     if (textMap[id]) { ch[textMap[id]] = e.target.value; touch(); render(); return; }
     const sub = { "f-advname": ["adv", "name"], "f-advtext": ["adv", "text"], "f-advdetail": ["adv", "detail"],
       "f-compname": ["comp", "name"], "f-comptext": ["comp", "text"], "f-comptrigger": ["comp", "trigger"],
-      "f-gearitem": ["gear", "item"], "f-adv2detail": ["adv2", "detail"],
+      "f-gearitem": ["gear", "item"], "f-gearuse": ["gear", "use"], "f-adv2detail": ["adv2", "detail"],
       "f-sadvname": ["sadv", "name"], "f-sadvtext": ["sadv", "text"], "f-scompname": ["sadv", "compName"], "f-scomptext": ["sadv", "compText"] }[id];
     if (sub) { ch[sub[0]][sub[1]] = e.target.value; touch(); render(); return; }
     if (e.target.dataset && e.target.dataset.al && ch.allegiance === "custom") { ch.allegianceDef[+e.target.dataset.al] = e.target.value; touch(); render(); return; }
@@ -2266,6 +2318,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-form") { ch.play.form = t.checked; save(); renderSheet(); updateTarget(); }
     else if (t.id === "f-horror") { store.set(STORE_HORROR, t.checked); render(); }
     else if (t.id === "f-customtier") { ch.customTier = +t.value; touch(); render(); }
+    else if (t.id === "f-customspeed") { ch.customSpeed = +t.value; touch(); render(); }
     else if (t.id === "f-adv2") { ch.adv2.id = t.value; touch(); render(); }
     else if (t.id === "f-allegiance") {
       ch.allegiance = t.value;
@@ -2350,7 +2403,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
@@ -2391,6 +2444,10 @@ tr.lvl-U td.target { color: var(--muted); }
   const clockListeners = []; // the Rules Lab listens, to log clock changes during an encounter
   const clockNotify = (c, from, to) => clockListeners.forEach((f) => f(c, from, to));
   const gunOf = () => ch.play.gun;
+  // The telling-hit effects open to an attack with this skill (core rules: a pin needs a weapon in hand or a grapple).
+  const tellingText = (sk) => sk === T.rangedSkill ? "disarm, knock down if it marks 2 or more boxes, rattle −2, break gear, open them up +2, or precise; a shot can't pin"
+    : sk === T.unarmedSkill && sk !== T.meleeSkill ? "disarm, knock down, pin, rattle −2, open them up +2, or precise; bare hands don't break gear"
+    : "disarm, knock down, pin, rattle −2, break gear (not bare-handed), open them up +2, or precise";
   function renderGun() {
     const g = gunOf(), def = GUNS[g.type];
     $("ph-type").value = g.type;
@@ -2592,25 +2649,49 @@ tr.lvl-U td.target { color: var(--muted); }
   let gmCrew = (store.get(STORE_GM, []) || []).filter((c) => c && typeof c === "object").map(normalize);
   const gmSay = (m, err) => { const el = $("gm-msg"); el.textContent = m; el.className = "toast" + (err ? " err" : ""); };
   /* BATTLEMAP */
+  /* TABLECLIENT */
+  // The shared table: players join from their play tab, the GM starts one here, and every roll at the table shows on both.
+  sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay,
+    server: TABLE_SERVER, character: () => ch.name, esc, toast,
+    // Phase 2: the player shares their character; the GM's cards follow the table's characters, and both follow each other's changes.
+    onPlayers: () => renderGM(), // who's at the table, on the GM's cards
+    onConnected: (role) => { if (role === "player") sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); renderGM(); },
+    onSheet: (e) => {
+      if (e.key === ch.id && sharedTable.role() === "player") { applyPlay(ch, e.play); store.set(STORE_CURRENT, ch); render(); return; }
+      if (sharedTable.role() !== "gm") return;
+      const i = gmCrew.findIndex((c) => c.tableKey === e.key || c.id === e.key), was = i >= 0 ? gmCrew[i] : null;
+      const c = normalize({ ...JSON.parse(JSON.stringify(e.sheet)), id: was ? was.id : e.key, portrait: was ? was.portrait : e.sheet.portrait, tableKey: e.key, tableOwner: e.owner.name, play: was ? was.play : {} });
+      applyPlay(c, e.play);
+      if (was) gmCrew[i] = c; else gmCrew.push(c);
+      store.set(STORE_GM, gmCrew); renderGM();
+    },
+    onUnshared: (keys) => { // a removed player's character: the GM's card stays, as an ordinary copy
+      let n = 0; for (const c of gmCrew) if (keys.includes(c.tableKey)) { delete c.tableKey; delete c.tableOwner; n++; }
+      if (n) { store.set(STORE_GM, gmCrew); renderGM(); } },
+    onPlay: (key, play) => {
+      if (key === ch.id && sharedTable.role() === "player") { applyPlay(ch, play); store.set(STORE_CURRENT, ch); render(); return; }
+      const c = gmCrew.find((x) => x.tableKey === key); if (!c) return;
+      applyPlay(c, play); store.set(STORE_GM, gmCrew); renderGM();
+    } });
   // The battle map: the GM's characters as tokens (portrait, group color, down or Dying) on a hex map at any scale,
   // or on a range track of bands (a setting's pack can name its own, with ships and a crew track for the ship).
   const RTRACK = PACK.rangeTrack || {};
   const battleMap = mountBattleMap({ root: $("battlemap"), key: PACK.id, esc, toast: gmSay,
-    bands: [["Close", 10], ["Short", 50], ["Medium", 150], ["Long", 500], ["Extreme", 1760]], kmBands: RTRACK.kmBands || [],
+    bands: [["Close", 10], ["Short", 25], ["Medium", 100], ["Long", 300], ["Extreme", 1000]], kmBands: RTRACK.kmBands || [],
     rangeTracks: PACK.rangeTracks || (RTRACK.bands ? [RTRACK] : []),
     vehicles: RTRACK.threats ? threatsFromGuide($("guide"), RTRACK.threats, "ship-") : [],
     groupTracks: () => PACK.tracks.map((t) => ({ name: t.name, boxes: t.boxes, value: Math.min(t.boxes, ship[t.name] || 0), effect: shipEffect(t.name, Math.min(t.boxes, ship[t.name] || 0)) })),
     setGroupTrack: (name, v) => { const t = PACK.tracks.find((x) => x.name === name); if (!t) return; ship[name] = Math.max(0, Math.min(t.boxes, v)); store.set(STORE_SHIP, ship); renderShip(); },
     pointName: T.point, stunName: T.stun, partyName: T.party,
     // The setting's threats: its data where it has them, otherwise the Players' Guide's Threats table.
-    threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge,
+    threats: !(PACK.threats || []).length ? threatsFromGuide($("guide")) : PACK.threats.map((x) => ({ id: x.id, name: x.label || x.name, boxes: x.boxes || 1, dodge: x.dodge, move: x.move || LD.THREAT_MOVE,
       attacks: (x.attacks || []).map((a) => `${a.skill} ${a.target}`).join(", "), trait: x.trait ? `${x.trait}: ${x.traitText || ""}`.replace(/: $/, "") : "" })),
     crew: () => gmCrew.map((c) => { const k = gmCalc(c);
       return { id: c.id, name: c.name || "Unnamed", portrait: c.portrait || "", down: c.play.injury >= 3, dying: !!c.play.dying,
         color: `var(${(PACK.groups.find((g) => g.id === k.div) || PACK.groups[0]).color})`,
         injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty,
         ptrack: PTRACK ? { name: PTRACK.name, max: PTRACK.boxes, value: c.play.ptrack || 0 } : null,
-        stats: [`Dodge ${k.dodge}`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
+        stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
     // A change made on the map is the GM's copy of the character, the same as a change on their card.
     setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
       if ("injury" in patch) { c.play.injury = Math.max(0, Math.min(3, patch.injury)); if (c.play.injury < 3 && !gritty) c.play.dying = false; }
@@ -2619,14 +2700,17 @@ tr.lvl-U td.target { color: var(--muted); }
       if ("points" in patch) c.play.duty = Math.max(0, patch.points);
       if ("ptrack" in patch && PTRACK) c.play.ptrack = Math.max(0, Math.min(PTRACK.boxes, patch.ptrack));
       saveGM(); renderGM(); } });
-  const saveGM = () => { if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true); };
+  const saveGM = () => {
+    if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true);
+    if (sharedTable) for (const c of gmCrew) if (c.tableKey) sharedTable.pushPlay(c.tableKey, pickPlay(c)); // a change here reaches the player's sheet
+  };
   // Work out a crew member's numbers with the same rules as the sheet, by briefly treating them as the current character.
   function gmCalc(c) {
     const saved = ch; ch = c;
     try {
       const skills = SKILLS.map(([n]) => ({ n, l: c.skills[n], t: skillTarget(n) + formSkill(n, c), lab: levelName(c.skills[n], n) })).filter((x) => x.l !== "U")
         .sort((a, b) => (b.l === "S") - (a.l === "S") || b.t - a.t);
-      return { skills, dodge: dodge() + formDodge(c), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
+      return { skills, dodge: dodge() + formDodge(c), move: moveNow(c), adv: c.sadv.id ? sAdvName() : advName(), comp: compName(), scomp: c.sadv.id ? sCompName() : "", top: levelName("S"), div: division() };
     } finally { ch = saved; }
   }
   function gmAdd(list) {
@@ -2783,9 +2867,9 @@ tr.lvl-U td.target { color: var(--muted); }
         : badgeSvg(k.div);
       return `<article class="gm-card hud ${inj >= 3 ? "down" : ""}" data-div="${k.div}">
         <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed character")}</b>
-          <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span></div></div>
+          <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span>${c.tableKey ? `<span class="small tbl-badge">${sharedTable && sharedTable.isHere(c.tableOwner) ? "● at the table" : "○ away from the table"}${c.tableOwner ? ` · ${esc(c.tableOwner)}` : ""}</span>` : ""}</div></div>
         ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? T.formName : T.formHuman || "human form"))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (T.formHuman || "human form").toLowerCase() : T.formName)}</button></div>` : ""}
-        <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div></div>
+        <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span></div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.form ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.form ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
@@ -2878,10 +2962,11 @@ tr.lvl-U td.target { color: var(--muted); }
   // where a test configuration exists. Never used by the sheet. ----
   if ((PACK.arms || []).length) {
     labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText, gritty: () => gritty,
+      mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
       crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
       // A character's numbers, as the sheet works them out; with powers, their Defense Class from Toughness or Force Field.
       // In a shapechanger's form (play.form), the form's numbers; otherwise the human form's.
-      calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n) + formSkill(n, c)])), dodge: dodge() + formDodge(c), agility: c.attrs.Agility + formAttr("Agility", c),
+      calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n) + formSkill(n, c)])), dodge: dodge() + formDodge(c), move: moveOf(c), agility: c.attrs.Agility + formAttr("Agility", c),
         defense: POWERS ? Math.max(0, ...allPowers(c).filter((x) => ["toughness", "forcefield"].includes(x.id)).map((x) => classIndex(x.cl) + 1)) : 0 }; } finally { ch = saved; } },
       clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
         set: (id, filled) => { const c = clocks.find((x) => x.id === id); if (!c) return; const from = c.filled; c.filled = filled; store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, filled); },

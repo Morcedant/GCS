@@ -135,7 +135,10 @@ export function defenseOptions(enc, rules, d, w) {
   const shared = flags.has("oneDefense") && !flags.has("dodgeEveryAttack");
   const allowed = shared ? (rules.params.oneDefense.perRound || 1) + live.filter((/** @type {any} */ t) => t.type === "extraDefense").reduce((n, /** @type {any} */ t) => n + (t.value || 1), 0) : 0;
   const spent = shared && d.defRound === enc.round ? d.defCount || 0 : 0;
-  const opt = (/** @type {any} */ o) => { o.preview = o.base + o.mods.reduce((/** @type {number} */ x, /** @type {any} */ m) => x + m.value, 0); if (shared) o.used = spent >= allowed; out.push(o); };
+  // A defense beyond the first this round (Additional Defense) is at the rule's extraPenalty, whatever kind it is.
+  const extra = shared && spent >= (rules.params.oneDefense.perRound || 1) && rules.params.oneDefense.extraPenalty
+    ? [{ source: "oneDefense", label: "Second defense this round", value: rules.params.oneDefense.extraPenalty, scope: rules.params.oneDefense.scope || "core" }] : [];
+  const opt = (/** @type {any} */ o) => { o.mods = [...o.mods, ...extra]; o.preview = o.base + o.mods.reduce((/** @type {number} */ x, /** @type {any} */ m) => x + m.value, 0); if (shared) o.used = spent >= allowed; out.push(o); };
   if (d.dodge !== null) {
     const gear = live.filter((/** @type {any} */ t) => t.type === "dodgeBonus").map((/** @type {any} */ t) => ({ source: "gear", label: t.label || "Gear", value: t.value, scope: "setting", preview: true }));
     opt({ kind: "dodge", label: "Dodge", base: d.dodge, mods: gear, used: d.dodgedRound === enc.round && !flags.has("dodgeEveryAttack") });

@@ -12,8 +12,8 @@ Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every a
 
 | Weapon | Range | Class | Boxes on a hit | What the injury looks like |
 |---|---|---|---|---|
-| Fists, kicks, a baton | Melee | I | 1 | Bruises, a cracked rib, a concussion |
-| Knife | Melee; Close thrown | I | 1 | A cut or stab wound |
+| Fists, kicks, a baton | Melee, reach 1 yd | I | 1 | Bruises, a cracked rib, a concussion |
+| Knife | Melee, reach 1 yd; Close thrown | I | 1 | A cut or stab wound |
 | Pistol or submachine gun | Short | I | 2 | A gunshot wound |
 | Rifle | Long | I | 2 | A gunshot wound |
 | Shotgun, at Close range | Close | I | 3, and Dying | A ruinous wound |
@@ -240,7 +240,7 @@ Comic-book magic is fast: a bolt, a shield, a binding, in a single panel. **Cant
 | Fifth | V | 6 |
 | Sixth | VI | 7 |
 
-- **Casting:** one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense.
+- **Casting:** one action and a Powers roll. Each cantrip below says whether Dodge applies or which attribute resists, never both (see *Defense or resistance* in *Magic*).
 - **The price of versatility:** a failed cast marks a box of **Strain**, which other powers don't.
 - **Growing:** pushing, Stronger Power and growth in play all work as usual; each Class higher raises you a Circle, teaches you another cantrip and strengthens them all.
 - **Who:** Cantrips is on the Adept's mystic list. Other origins can take it with a magical reason: a Bonded artifact, a Mythic heritage, a Touched vision.
@@ -249,18 +249,18 @@ Comic-book magic is fast: a bolt, a shield, a binding, in a single panel. **Cant
 
 | Cantrip | Effect |
 |---|---|
-| Bolt | A mystic blast: an attack at your Circle's Class, effective at Short range. |
+| Bolt | A mystic blast: an attack at your Circle's Class, effective at Short range. Dodge applies, and the target's Defense counts against its Class. |
 | Shield | A barrier: Defense at the power's Class until your next turn. |
 | Bind | Bands of force hold a target in place (Body resists). |
 | Dispel | Cancel a spell, ward or magical effect of equal or lower Class. |
 | Veil | Hide yourself or an object from sight for the scene. |
-| Glamour | A quick illusion that fools the eye (Will or Intellect sees through it). |
+| Glamour | A quick illusion that fools the eye (Intellect resists: the target sees through it). |
 | Sight | See magic, spirits, curses and disguises. |
 | Hex | −2 to all of a target's rolls for the scene (Will resists). |
 | Charm | The target treats you as a friend for the scene (Will resists). |
 | Levitate | Float yourself or an object; at higher Classes, a car or a group. |
 | Step | Vanish and reappear within Close range; farther at higher Classes. |
-| Mend | Clear one injury box, once per wound. |
+| Mend | Clear one injury box, once per set of injuries. |
 
 Rituals are still the way to do *anything*, given time and fuel. Cantrips are the way to do a few things *now*.
 

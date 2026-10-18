@@ -26,6 +26,7 @@ This revision keeps every rule from the original guide and adds these campaign r
 - **Defenses, telling hits and called shots:** Parry and Block beside Dodge, and great hits that decide what happens.
 - **Advancement points**, earned after missions and spent on skills, advantages and attributes.
 - **Gritty combat**, an optional rule for grievous wounds.
+- **Move and reach:** how far you move in a turn, how injury and hard going slow you, and how far a weapon in hand reaches.
 - **A battle map** in the GM view, for away teams and ship fights.
 
 ## Guide scope
@@ -97,6 +98,8 @@ After applying your species, distribute **five additional points** among the att
 - The starting maximum is **13**, plus any species bonus to that attribute. A Vulcan can start with Body or Will at 14.
 - You cannot lower an attribute below its species base to gain points.
 
+Your species can also change how fast you move. Only the Lanthanite does, at Move −1; see *Move and reach*.
+
 ### Species descriptions
 
 **Human.** Adaptable and widespread across Starfleet. No adjustments; spend your points wherever you like.
@@ -111,7 +114,7 @@ After applying your species, distribute **five additional points** among the att
 
 **Illyrian.** A people who reshape themselves through genetic modification. Federation law bars augmented officers, so Illyrians in Starfleet, like Una Chin-Riley, have faced suspicion and secrecy.
 
-**Lanthanite.** Extremely long-lived people who look human and have quietly lived on Earth for millennia, like Pelia. Centuries of experience; a body that dislikes hurrying.
+**Lanthanite.** Extremely long-lived people who look human and have quietly lived on Earth for millennia, like Pelia. Centuries of experience; a body that dislikes hurrying: Move −1.
 
 **Caitian.** A feline species with keen senses and quick reflexes. Lt. M'Ress served aboard the Enterprise in this era.
 
@@ -169,7 +172,7 @@ An advantage gives +2 to one narrowly defined kind of task when the GM agrees it
 
 ## Step 5: Prepare for duty
 
-Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Your Parry is Unarmed Combat −3, and your Block Unarmed Combat −2. Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.
+Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty. Your Parry is Unarmed Combat −3, and your Block Unarmed Combat −2. Your **Move** is 5 yards, +1 for every 2 points of Agility + Body above 20, plus the same Athletics bonus and your species' speed, if it has one (see *Move and reach*). Begin uninjured, with two Duty points and your assigned equipment. Describe one connection to another crew member.
 
 ### Top 10 connections to a crewmate
 
@@ -192,7 +195,7 @@ Human. Body 10, Agility 10, Intellect 13, Presence 11, Will 11.
 
 - **Specialty:** Sensors 16.
 - **Trained:** Physical Sciences 14, Computers 14, Electronics 14, Life Sciences 14, Medicine 14, Engineering 14, Communications 14, Diplomacy 12, Phasers 11.
-- **Dodge:** Athletics is Untrained, so Dodge is 8.
+- **Dodge:** Athletics is Untrained, so Dodge is 8. **Move:** Agility + Body is 20, so Move is 5 yards.
 - **Advantage:** Subspace Specialist. **Complication:** Cannot Leave a Mystery Alone.
 
 # Skills and equipment
@@ -226,7 +229,7 @@ A plausible untrained attempt uses attribute −4. Specialized procedures such a
 
 ## Standard equipment
 
-Equipment makes tasks possible rather than easier. Ordinary equipment grants no blanket bonus; exceptional tools or preparation may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible. Every crew member carries a communicator; the rest is issued for the mission.
+Equipment makes tasks possible rather than easier. Ordinary equipment grants no blanket bonus. A **fine weapon or tool** grants +2 to one narrowly defined use of a named skill, agreed when chosen. It does not stack with an advantage bonus on the same roll and never improves Dodge, Parry, or Block. A Vulcan resonator kit might give +2 to Electronics for tuning a sensor array, but not to every repair; a surgeon's own laser scalpel set +2 to Medicine for field surgery, but not to diagnosis. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible. Every crew member carries a communicator; the rest is issued for the mission.
 
 | Item | What it does |
 |---|---|
@@ -306,15 +309,16 @@ Ask concrete questions and explain your approach. Evidence may require several d
 
 ## Turn order and actions
 
-Act in descending Agility order. Players choose the order of tied crew members; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as attacking, using equipment, helping, or attempting a task. The GM judges movement by the scene; there is no fixed grid scale.
+Act in descending Agility order. Players choose the order of tied crew members; the GM resolves other ties. A round lasts a few seconds. On your turn, move up to your **Move** (see *Move and reach*) and take one meaningful action, such as attacking, using equipment, helping, or attempting a task.
 
 ## Attacking and defending
 
 Roll Phasers for a ranged attack, or Unarmed Combat for fists, grappling and a weapon in hand. If the attack succeeds, an aware target able to move may **defend**: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.
 
-- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits. The **Additional Defense** advantage gives a second.
+- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits.
+- **Additional Defense.** With this advantage you may attempt a second defense each round at −2, in addition to attack-quality and injury penalties. You cannot defend twice against the same attack.
 - **Dodge** is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert. Untrained Athletics adds nothing; use the training level, not the final Athletics score.
-- **Parry.** Against a weapon in hand or fists, roll Unarmed Combat −3 with a weapon in hand: a d'k tahg, a lirpa, a length of pipe. Bare-handed, Unarmed Combat −3 parries fists only. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a phaser beam or a disruptor bolt.
+- **Parry.** Against a weapon in hand or fists, roll Unarmed Combat −3 with a weapon in hand: a d'k tahg, a lirpa, a length of pipe. Bare-handed, Unarmed Combat −3 parries fists only. Nobody parries a phaser beam or a disruptor bolt.
 - **Block.** With anything that can stand in for a shield (a chair, a crate lid, a torn-off panel), you can block a weapon in hand, fists or a thrown weapon: roll Unarmed Combat −2. Nothing you can lift blocks an energy weapon. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.
 - **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
 - **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. **Careful Marksman** adds its +2 to this.
@@ -326,25 +330,25 @@ Solid cover blocks a shot. Partial cover imposes −2 on the attack. Other diffi
 A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.
 
 - **A telling hit** is an attack that succeeds by **5 or more**, or on a natural 3 or 4, and isn't stopped by a defense. The attacker picks **one effect** below and describes it. The weapon still marks its usual boxes.
-- **A called shot.** Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, a phaser, a control panel, a power cell). If the attack hits at all, the effect happens, whatever the margin. **Careful Marksman** cuts this penalty by 1.
+- **A called shot.** Before rolling, name an effect your weapon can deliver and take −2 on the attack, or −4 for a small target (a hand, a phaser, a control panel, a power cell). If the attack hits at all, the effect happens, whatever the margin. **Careful Marksman** cuts this penalty by 1.
 - **Phasers on stun** land telling hits too. The effect happens whether or not the target resists the stun.
 - **Both ways.** Klingons, pirates and stranger things land telling hits on the crew too.
 
-| Effect | What happens |
-|---|---|
-| Disarm | The weapon or held item drops, or flies a few yards away |
-| Knock down | The target falls prone, or is driven back a few steps |
-| Pin | The target is held, tangled or pinned down: their next action goes to getting free |
-| Rattle | −2 to the target's next roll |
-| Break gear | A phaser, tricorder, communicator or improvised shield breaks |
-| Open them up | The next attack on this target this round gets +2 |
-| Precise | You hit exactly what you aimed at: the control panel, the power coupling, the hand on the trigger |
+| Effect | With | What happens |
+|---|---|---|
+| Disarm | Any attack | The weapon or held item drops, or flies a few yards away |
+| Knock down | A weapon in hand or fists, a phaser on stun, or a shot that marks 2 or more boxes | The target falls prone, or is driven back a few steps. Standing up uses the target's move on their next turn; they still take their action |
+| Pin | A weapon in hand, fists or a grapple | The target is grabbed, held, or pinned against a bulkhead or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack |
+| Rattle | Any attack | −2 to the target's next roll |
+| Break gear | Any attack but bare hands and natural weapons | A phaser, tricorder, communicator or shield is knocked out of use (jammed, cracked, shorted out) until its owner spends an action putting it right. It's destroyed for good only if it was already vulnerable (a drained phaser, an improvised shield) or the attacker has a weakness to exploit |
+| Open them up | Any attack | The next attack on this target this round gets +2 |
+| Precise | Any attack | You hit exactly what you aimed at: the control panel, the power coupling, the hand on the trigger. It changes the situation, never the rules: no extra boxes, no getting past a defense, no instant death |
 
-**Limits.** A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a Gorn of its claws, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.
+**Limits.** A telling hit never adds boxes and never gets past a defense. It never kills outright, disables a crew member for good, or destroys exceptional equipment: those come only from injury, from *Dying and death*, or from an established weakness. Only the effects a weapon can deliver are open to it (the *With* column). Keeping someone's head down with phaser fire isn't a pin: that's cover and a threat. The effect still has to make sense: nobody disarms a Gorn of its claws, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next.
 
 **Staying alive.** A crew member on the receiving end can shrug off a telling hit's effect with **Hard to put down** (once per fight) or by spending a Duty point. Either way, they still take the boxes.
 
-*Example:* a Klingon warrior slashes at Lt. Reyes with a d'k tahg and succeeds by 5. Reyes hasn't defended yet this round: Dodge 12, −2 for the clean hit, needs a 10 or less. Bare-handed, Reyes can't parry a blade, so Reyes dodges. When the second Klingon swings before Reyes's next turn, there's no defense left, unless Reyes has Additional Defense.
+*Example:* a Klingon warrior slashes at Lt. Reyes with a d'k tahg and succeeds by 5. Reyes hasn't defended yet this round: Dodge 12, −2 for the clean hit, needs a 10 or less. Bare-handed, Reyes can't parry a blade, so Reyes dodges. When the second Klingon swings before Reyes's next turn, there's no defense left, unless Reyes has Additional Defense, which allows a second at −2.
 
 ## Range
 
@@ -352,21 +356,45 @@ Distances fall into five bands:
 
 | Band | Distance | For example |
 |---|---|---|
-| Close | Up to 10 yards | Across a room or a corridor junction; one move covers it |
-| Short | Up to 50 yards | Across a shuttle bay or a village square |
-| Medium | Up to 150 yards | Across a cargo hold or a city block |
-| Long | Up to 500 yards | Across a canyon or a landing field |
-| Extreme | Up to a mile, in line of sight | Ridge to ridge |
+| Close | Up to 10 yards | Across a room or a corridor junction |
+| Short | Up to 25 yards | Across a shuttle bay or a village square |
+| Medium | Up to 100 yards | Across a cargo hold or a city block |
+| Long | Up to 300 yards | Across a canyon or a landing field |
+| Extreme | Up to 1,000 yards, in line of sight | Ridge to ridge |
 
-Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Melee weapons and fists reach only someone next to you. Your move each turn covers the Close band; give up your action to run and you cover Short.
+Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. A thrown weapon's effective band is Close.
+
+## Move and reach
+
+**Move** is how far you go in a turn: **5 yards, +1 for every 2 points of Agility + Body above 20** (rounded down; nothing is taken off below 20), **+1 for Trained Athletics or +2 for Athletics as a Specialty or Expert**, plus your species' speed adjustment, if it has one (the Lanthanite's −1). Most crew move 6 to 9 yards. Give up your action to **run** and you cover twice your Move. Opponents move 8 yards unless their entry says otherwise.
+
+| Agility + Body | 20 or less | 21–22 | 23–24 | 25–26 | 27–28 | 29–30 |
+|---|---|---|---|---|---|---|
+| Move before Athletics | 5 | 6 | 7 | 8 | 9 | 10 |
+
+- **Injury slows you.** Wounded (1 box): Move −2 yards. Seriously wounded (2 boxes): half your Move, rounded down, and you can't run. Incapacitated: you don't move. Never less than 1 yard while you can act.
+- **Hard going halves it.** Climbing, swimming, wading, crawling through a Jefferies tube, deep snow or sand, rubble or a crowd: half your Move (and half a run), rounded down. Injury and hard going both apply, injury first.
+- **Stepping away.** You can move away from someone in reach freely; leaving a fight doesn't give them a free attack.
+
+A weapon in hand strikes anyone within its **reach**, shown in the weapons table. Move into reach as part of your turn and attack in the same turn.
+
+| Reach | Weapons |
+|---|---|
+| 1 yard | Fists, kicks and grappling; knives and d'k tahgs; clubs; claws, bites and crushing grips |
+| 2 yards | Swords, axes and other heavy blades; a rifle butt |
+| 3 yards | A lirpa, a spear or another polearm |
+
+A weapon in hand can't reach past 3 yards; anything farther is a ranged attack.
+
+**Vehicles.** A driver or pilot moves at the vehicle's speed, not their own, and running it flat out takes their action; firing from a moving vehicle is −2. Shuttles and starships are too fast for yards: they use *Range in space* and the ship rules.
 
 ## Injury
 
 | Boxes marked | Condition | Effect |
 |---|---|---|
 | 0 | Uninjured | No injury penalty |
-| 1 | Wounded | −1 to physical actions |
-| 2 | Seriously wounded | −2 to physical actions |
+| 1 | Wounded | −1 to physical actions; Move −2 yards |
+| 2 | Seriously wounded | −2 to physical actions; half Move, no running |
 | 3 | Incapacitated | Unable to act; medical aid needed |
 
 A normal damaging hit marks one box. A powerful attack can mark two, and a killing weapon marks three (see Weapons and damage). Injury penalties replace each other rather than stacking. They apply to movement, attacks, Dodge, and other tasks the injury physically hinders. The GM announces especially lethal hazards before resolution where possible.
@@ -410,11 +438,11 @@ How many boxes a hit marks depends on the **weapon**, not on how well the attack
 
 | Weapon | Range | Boxes on a hit | What the injury looks like |
 |---|---|---|---|
-| Punch, kick, headbutt | Melee | 1 | Bruising, a split lip, cracked ribs |
-| Club, rifle butt, thrown rock | Melee; rock Close thrown | 1 | A concussion, a broken finger, heavy bruising |
-| Knife or dagger, such as a Klingon d'k tahg | Melee; Close thrown | 1 | A cut or stab wound that bleeds |
+| Punch, kick, headbutt | Melee, reach 1 yd | 1 | Bruising, a split lip, cracked ribs |
+| Club, rifle butt, thrown rock | Melee, reach 1 yd (rifle butt 2); rock Close thrown | 1 | A concussion, a broken finger, heavy bruising |
+| Knife or dagger, such as a Klingon d'k tahg | Melee, reach 1 yd; Close thrown | 1 | A cut or stab wound that bleeds |
 | Arrow, spear, or primitive firearm | Medium; spear Close thrown | 1 | A puncture or gunshot wound |
-| Heavy melee weapon, such as a Vulcan lirpa, a sword, or an axe | Melee | 2 | A deep wound or a broken bone |
+| Heavy melee weapon, such as a Vulcan lirpa, a sword, or an axe | Melee, reach 2 yd (lirpa 3) | 2 | A deep wound or a broken bone |
 | Phaser on stun | Short (type 1), Medium (type 2) | 0 | No wound; the target makes the stun roll (see Phaser settings) |
 | Phaser on kill | Short (type 1), Medium (type 2) | 3, and Dying | Severe burns and energy trauma |
 | Klingon disruptor | Medium | 3, and Dying | Severe burns and tissue disruption |
@@ -470,13 +498,22 @@ Emergency stabilization takes one action and a successful Medicine roll with a m
 
 ## Field treatment
 
-With a medical kit and several uninterrupted minutes, successful Medicine removes one injury box. Success by 5 or more removes two. Each injury receives one field-treatment attempt, even if that attempt fails; further attempts require changed circumstances such as better equipment, new diagnostic information, or access to sickbay. New injuries can receive their own treatment, but cannot justify treating an old injury repeatedly.
+With a medical kit and several uninterrupted minutes, successful Medicine removes one injury box. Success by 5 or more removes two.
 
 ## Sickbay treatment
 
-A functioning, equipped sickbay grants +2 to Medicine for diagnosis and treatment. A successful treatment removes two injury boxes; success by 5 or more removes three. Allow the time the procedure requires rather than completing surgery in one combat action. Sickbay care can follow field treatment. Do not repeat an unsuccessful procedure without a meaningful change in the situation.
+A functioning, equipped sickbay grants +2 to Medicine for diagnosis and treatment. A successful treatment removes two injury boxes; success by 5 or more removes three. Allow the time the procedure requires rather than completing surgery in one combat action. Sickbay care can follow field treatment.
 
 Removing injury boxes removes their associated penalties, but major organ damage, severe burns, and complex internal trauma can still require a procedure and recovery period set by the GM. The physician determines whether the patient is fit for duty. Pain suppression does not itself heal an injury. Stun normally wears off at the end of the scene; prolonged unconsciousness requires assessment.
+
+## Treatment attempts
+
+Each set of injuries permits one field-treatment attempt and one proper-care attempt. Further rolls require a meaningful improvement in care, a new treatment, or recovery time. Simply waiting and trying again is insufficient.
+
+- **A set of injuries** is the boxes from one encounter or harmful incident: one fight, one fall, one console explosion. Sickbay treatment is the proper care.
+- **Later injuries are a new set.** Its attempts remove only its own boxes; they don't reopen injuries already treated.
+- **What allows another roll:** sickbay after field care, a new diagnosis or a treatment that wasn't tried, a specialist or the right species data, or recovery time (the next day's rest).
+- **Stabilization is separate.** Stabilizing a Dying patient is never limited by these attempts and never removes boxes.
 
 ## Natural recovery
 
@@ -686,7 +723,7 @@ Six crew members ready to play, for one-shots, new players, or a crew in a hurry
 
 *Lieutenant Commander, Command. Andorian.* First officer: keeps the crew moving when the captain's plan meets reality, and keeps the captain honest.
 
-- **Attributes:** Body 10, Agility 12, Intellect 10, Presence 13, Will 10. **Dodge** 11.
+- **Attributes:** Body 10, Agility 12, Intellect 10, Presence 13, Will 10. **Dodge** 11, **Move** 7 yd.
 - **Skills:** Leadership 16 (Specialty). Trained: Diplomacy 14, Helm 13, Phasers 13, Unarmed Combat 13, Navigation 11, Psychology 11, Athletics 11, Sensors 11, Communications 11.
 - **Advantage:** Crisis Leader. **Complication:** Reputation to Uphold; trigger: someone questions your competence in front of others.
 - **Why I serve:** Starfleet runs in my family, and I mean to live up to the name. **Connection:** Took Yeoman Rrinn under their wing when Rrinn first came aboard.
@@ -695,7 +732,7 @@ Six crew members ready to play, for one-shots, new players, or a crew in a hurry
 
 *Lieutenant, Science. Vulcan.* Ship's sciences officer: reads the anomaly, names the risk, and calculates the odds no one asked for.
 
-- **Attributes:** Body 11, Agility 11, Intellect 13, Presence 8, Will 12. **Dodge** 10.
+- **Attributes:** Body 11, Agility 11, Intellect 13, Presence 8, Will 12. **Dodge** 10, **Move** 7 yd.
 - **Skills:** Physical Sciences 16 (Specialty). Trained: Sensors 14, Computers 14, Life Sciences 14, Navigation 14, Engineering 14, Electronics 14, Psychology 14, Unarmed Combat 12, Athletics 12.
 - **Advantage:** Eidetic Recall (species; companion: Suppressed Emotion). **Complication:** Cannot Leave a Mystery Alone; trigger: sensor data that contradicts known science.
 - **Why I serve:** The best laboratory in the galaxy is a starship on the frontier. **Connection:** Friendly rivals with Lt. Grath: they argue every engineering theory, and both enjoy it.
@@ -704,7 +741,7 @@ Six crew members ready to play, for one-shots, new players, or a crew in a hurry
 
 *Lieutenant Commander, Medical. Denobulan.* Chief medical officer: patches up the crew, argues with the captain, and keeps an alarming menagerie of medicinal creatures in sickbay.
 
-- **Attributes:** Body 9, Agility 9, Intellect 13, Presence 12, Will 12. **Dodge** 7.
+- **Attributes:** Body 9, Agility 9, Intellect 13, Presence 12, Will 12. **Dodge** 7, **Move** 5 yd.
 - **Skills:** Medicine 16 (Specialty). Trained: Life Sciences 14, Psychology 14, Sensors 14, Computers 14, Electronics 14, Survival 14, Communications 14, Diplomacy 13, Leadership 13.
 - **Advantage:** Denobulan Pharmacopoeia (species; companion: Unorthodox Methods). **Complication:** Protects Others at Personal Risk; trigger: civilians are caught in the danger.
 - **Why I serve:** To protect the Federation and the people who can't protect themselves. **Connection:** Pulled Lt. Reyes out of a burning shuttle on a survey mission; Reyes has never let the doctor pay for a drink since.
@@ -713,7 +750,7 @@ Six crew members ready to play, for one-shots, new players, or a crew in a hurry
 
 *Lieutenant, Engineering. Tellarite.* Engineer: keeps the Pelion's power flowing and will tell you, at length, exactly why your idea won't work.
 
-- **Attributes:** Body 12, Agility 10, Intellect 13, Presence 9, Will 11. **Dodge** 9.
+- **Attributes:** Body 12, Agility 10, Intellect 13, Presence 9, Will 11. **Dodge** 9, **Move** 7 yd.
 - **Skills:** Engineering 16 (Specialty). Trained: Electronics 14, Computers 14, Physical Sciences 14, Sensors 14, Communications 14, Survival 14, Athletics 13, Helm 11, Unarmed Combat 11.
 - **Advantage:** Improvisational Engineer. **Complication:** Experimental Enthusiasm; trigger: an untested device or technique could solve the problem.
 - **Why I serve:** To prove I'm good enough, to everyone who doubted me and to myself. **Connection:** Off-duty friends with Commander sh'Vari: a weekly game of Andorian chess in which both of them cheat.
@@ -722,7 +759,7 @@ Six crew members ready to play, for one-shots, new players, or a crew in a hurry
 
 *Lieutenant (j.g.), Security. Human.* Security officer: first through the door on every away mission, and the last to set a phaser to kill.
 
-- **Attributes:** Body 12, Agility 13, Intellect 10, Presence 10, Will 10. **Dodge** 12.
+- **Attributes:** Body 12, Agility 13, Intellect 10, Presence 10, Will 10. **Dodge** 12, **Move** 8 yd.
 - **Skills:** Phasers 16 (Specialty). Trained: Unarmed Combat 14, Stealth 14, Helm 14, Athletics 13, Survival 11, Sensors 11, Medicine 11, Leadership 11, Communications 11.
 - **Advantage:** Careful Marksman. **Complication:** Reluctant to Use Lethal Force; trigger: a hostile refuses to surrender.
 - **Why I serve:** A Starfleet officer once saved my home, and I want to be that person for someone else. **Connection:** Owes Dr. Vessik their life after a shuttle crash, and never lets the doctor forget it.
@@ -731,7 +768,7 @@ Six crew members ready to play, for one-shots, new players, or a crew in a hurry
 
 *Yeoman 2nd Class, General Services. Caitian.* Captain's yeoman: keeps the records, carries the orders, and hears everything said on the bridge.
 
-- **Attributes:** Body 9, Agility 12, Intellect 13, Presence 11, Will 10. **Dodge** 11.
+- **Attributes:** Body 9, Agility 12, Intellect 13, Presence 11, Will 10. **Dodge** 11, **Move** 6 yd.
 - **Skills:** Computers 18 (Expert). Trained: Communications 14, Psychology 14, Sensors 14, Electronics 14, Stealth 13, Diplomacy 12, Athletics 10.
 - **Advantage:** Keen Hearing (species; companion: Sensitive Ears). **Complication:** Someone Back Home; trigger: a message from home arrives.
 - **Why I serve:** To leave behind a past, a world, or a life that was too small for me. **Connection:** Shares a secret with Lt. Sevek from a mission neither of them talks about.
@@ -758,7 +795,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Unshakable Courage | +2 to Will against overwhelming fear. It does not protect against alien compulsion or guarantee sensible decisions. |
 | Guarded Mind | +2 to Will when resisting an external mental intrusion or compulsion. It provides no telepathy or ability to detect the source. |
 | Careful Marksman | +2 to Phasers when you aim (with Aim's +1, +3 in all) at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it. A called shot is 1 easier for you. |
-| Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix. A second parry is still −2. No +2 to rolls. |
+| Additional Defense | A second defense each round at −2 (Dodge, Parry or Block, in any mix), on top of attack-quality and injury penalties. Never twice against the same attack. No +2 to rolls. |
 | Hard to put down | Once per fight, shrug off a telling hit's effect. You still take its boxes. No +2 to rolls. |
 
 # Species advantages
@@ -890,6 +927,8 @@ Two or three sentences: where they come from, what sets them apart, and how othe
 
 Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most species change two to four attributes.
 
+A species that is plainly faster or slower on its feet than a human may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
+
 ### 3. Core rules
 
 One to three short rules that always apply: what they can do (see in the dark, resist cold, a free Trained skill) and what it costs (a weakness, a people's distrust, a hazard they can't abide). A strength with no drawback is worth more than it looks.
@@ -966,7 +1005,11 @@ Will protects your resolve; Presence influences others. Leadership and Diplomacy
 
 **Assistance:** success +1; success by 5 or more +2; failure no bonus; 18 causes a complication. One assistant per roll.
 
-**Combat:** short movement plus one action. Successful attack → optional Dodge → weapon effect. Dodge = Agility −2, plus Athletics training (+0 Untrained, +1 Trained, +2 Specialty), once per round. One injury box gives −1 to physical actions; two give −2; three incapacitate.
+**Combat:** Move plus one action. Successful attack → one defense a round (Dodge, Parry or Block; Additional Defense: a second, at −2) → weapon effect. Dodge = Agility −2, plus Athletics training (+0 Untrained, +1 Trained, +2 Specialty). Telling hit (by 5+ or a natural 3–4): an effect the weapon can deliver (pin: weapon in hand or grapple only), never extra boxes or an outright kill. One injury box gives −1 to physical actions; two give −2; three incapacitate.
+
+**Move:** 5 yd, +1 per 2 points of Agility + Body above 20, +1 Trained Athletics or +2 Specialty/Expert, ± species speed; run (no action) twice that. Opponents 8 yd. Wounded −2 yd; seriously wounded half, no run. Hard going: half. Stepping away is free. Reach: 1 yd fists, knives, clubs; 2 yd heavy blades; 3 yd lirpa or spear.
+
+**Range:** Close 10 yd, Short 25 yd, Medium 100 yd, Long 300 yd, Extreme 1,000 yd. One band beyond a weapon's −2, two −4.
 
 **Damage:** the weapon decides. Fists, clubs, knives, arrows and primitive firearms mark 1 box; heavy blades mark 2; a phaser or disruptor on kill marks 3 and leaves the target Dying (dead at the end of the scene unless stabilized); stun marks none. At three boxes, another hit from a 2-box or killing weapon is fatal.
 
@@ -978,7 +1021,7 @@ Will protects your resolve; Presence influences others. Leadership and Diplomacy
 
 **Ship:** Shields (3) take hits first; then Hull (4) and a system (3 each: −2, −4, offline). Normal hit 1 box, heavy hit 2. Helm evades once per exchange; Engineering clears a box.
 
-**Medicine:** one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery. Rest clears one box per full day, but not from three boxes: treatment must clear the first one.
+**Medicine:** one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery. Each set of injuries (one fight or incident) gets one field and one sickbay attempt. Rest clears one box per full day, but not from three boxes: treatment must clear the first one.
 
 **Will:** resist overwhelming fear or mental intrusion and maintain concentration. Ordinary danger needs no roll. Fear or distraction failure normally causes hesitation or −2 on your next action.
 

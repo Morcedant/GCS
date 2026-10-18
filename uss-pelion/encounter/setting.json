@@ -12,7 +12,8 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "club",
@@ -25,7 +26,9 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1,
+   "reachNote": "rifle butt 2"
   },
   {
    "id": "knife",
@@ -38,7 +41,8 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "heavy",
@@ -51,7 +55,9 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 2,
+   "reachNote": "lirpa 3"
   },
   {
    "id": "primitive",
@@ -82,7 +88,12 @@
     }
    },
    "traits": [],
-   "rows": []
+   "rows": [],
+   "telling": {
+    "add": [
+     "knockdown"
+    ]
+   }
   },
   {
    "id": "phaser-kill",
@@ -163,7 +174,8 @@
    },
    "natural": true,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "bite",
@@ -177,7 +189,8 @@
    },
    "natural": true,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   },
   {
    "id": "grip",
@@ -191,7 +204,8 @@
    },
    "unarmed": true,
    "traits": [],
-   "rows": []
+   "rows": [],
+   "reachYards": 1
   }
  ],
  "threats": [
@@ -410,7 +424,8 @@
  "combatRules": {
   "oneDefense": {
    "perRound": 1,
-   "edge": "extradefense"
+   "edge": "extradefense",
+   "extraPenalty": -2
   },
   "attackQualityDodge": {
    "bands": [
@@ -434,7 +449,7 @@
   },
   "parry": {
    "mod": -3,
-   "repeatPenalty": -2,
+   "repeatPenalty": 0,
    "bareHanded": "unarmed"
   },
   "block": {

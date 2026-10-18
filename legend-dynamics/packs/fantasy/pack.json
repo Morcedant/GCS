@@ -894,13 +894,15 @@
     "dodge": 0,
     "traits": [
      "Claws and fangs mark 2 boxes",
+     "Fast on four legs: Move +1",
      "Keen senses: track by scent",
      "Beast-quick: run and leap like an animal"
     ],
     "drawbacks": [
      "Can't speak, cast or use tools",
      "Horses bolt; townsfolk panic"
-    ]
+    ],
+    "speed": 1
    },
    "skills": [
     "Brawling",
@@ -1912,7 +1914,7 @@
    "gb-gift",
    "ud-gift"
   ],
-  "note": "Your Sorcery sets your Seal: the First at Trained (no Boosts), the Second at Specialty (1 Boost), the Third at Expert (2 Boosts). Casting takes an action and a Sorcery roll, −1 for each Boost you spend; the target resists with Will where it makes sense. A failed cast marks a box of Corruption; a natural 18 marks two.",
+  "note": "Your Sorcery sets your Seal: the First at Trained (no Boosts), the Second at Specialty (1 Boost), the Third at Expert (2 Boosts). Casting takes an action and a Sorcery roll, −1 for each Boost you spend; each cantrip says whether Dodge applies or which attribute resists. A failed cast marks a box of Corruption; a natural 18 marks two.",
   "list": [
    [
     "bolt",
@@ -1922,7 +1924,7 @@
    [
     "witchfire",
     "Witchfire",
-    "Light, or set something burning: 1 box a round in the flames."
+    "Light, or set something burning: 1 box a round in the flames. Aimed at a person, it's an attack: Dodge applies; once alight, the flames are ordinary fire."
    ],
    [
     "ward",
@@ -1937,27 +1939,27 @@
    [
     "charm",
     "Charm",
-    "Presence contest: the target treats you as a friend for the scene."
+    "The target treats you as a friend for the scene (Presence resists)."
    ],
    [
     "dread",
     "Dread",
-    "The target rolls Will or flees or freezes."
+    "The target flees or freezes (Will resists)."
    ],
    [
     "sleep",
     "Sleep",
-    "The target rolls Will or sleeps; minor opponents just drop."
+    "The target sleeps (Will resists); minor opponents just drop, without resisting."
    ],
    [
     "mend",
     "Mend",
-    "Clear one injury box, once per wound."
+    "Clear one injury box, once per set of injuries."
    ],
    [
     "beast",
     "Beast-tongue",
-    "Speak with an animal, and command it for a scene."
+    "Speak with an animal, and command it for a scene (a hostile animal's Will resists)."
    ],
    [
     "sight",
@@ -1967,7 +1969,7 @@
    [
     "shatter",
     "Shatter",
-    "Break a lock, chain, blade or door."
+    "Break a lock, chain, blade or door. No defense against an unattended object; against a blade or shield in someone's hand, it's an attack: Dodge applies."
    ],
    [
     "veil",
@@ -2055,7 +2057,8 @@
   },
   "gear": {
    "item": "Her father's longaxe, Wolfbiter",
-   "skill": "Melee"
+   "skill": "Melee",
+   "use": "breaking a shield, a door or a weapon"
   },
   "equipment": {
    "greatweapon": true,
@@ -2316,7 +2319,8 @@
    },
    "gear": {
     "item": "Her mother's arquebus, Widowmaker",
-    "skill": "Marksmanship"
+    "skill": "Marksmanship",
+    "use": "aimed shots at Medium range or farther"
    },
    "equipment": {
     "arquebus": true,
@@ -2696,12 +2700,13 @@
    "rows": [
     [
      "Fists, kicks, dirty tricks",
-     "Melee",
+     "Melee, reach 1 yd",
      "1",
      "Bruises, a split lip, cracked ribs"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "dagger",
@@ -2716,12 +2721,13 @@
    "rows": [
     [
      "Dagger or club",
-     "Melee; dagger Close thrown",
+     "Melee, reach 1 yd; dagger Close thrown",
      "1",
      "A cut, a stab or a crack on the skull"
     ]
    ],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "club",
@@ -2734,7 +2740,8 @@
     }
    },
    "rows": [],
-   "traits": []
+   "traits": [],
+   "reachYards": 1
   },
   {
    "id": "dagger-thrown",
@@ -2786,7 +2793,7 @@
    "rows": [
     [
      "Sword, axe, mace, spear",
-     "Melee",
+     "Melee, reach 2 yd (spear 3)",
      "2",
      "A deep wound or a broken bone"
     ]
@@ -2794,7 +2801,9 @@
    "traits": [],
    "equip": [
     "spear"
-   ]
+   ],
+   "reachYards": 2,
+   "reachNote": "spear 3"
   },
   {
    "id": "greatweapon",
@@ -2820,11 +2829,13 @@
    "rows": [
     [
      "Greatsword, greataxe, polearm",
-     "Melee",
+     "Melee, reach 2 yd (polearm 3)",
      "2; a hit by 5 or more leaves the target Dying",
      "A ruinous wound"
     ]
-   ]
+   ],
+   "reachYards": 2,
+   "reachNote": "polearm 3"
   },
   {
    "id": "bow",
@@ -2975,11 +2986,12 @@
    "rows": [
     [
      "Claws, fangs, venom",
-     "Melee",
+     "Melee, reach 1 yd",
      "2 (venom: Body roll or Reeling)",
      "Torn flesh, poison in the blood"
     ]
-   ]
+   ],
+   "reachYards": 1
   },
   {
    "id": "shadowbolt",
@@ -3368,6 +3380,32 @@
   [
    "fire",
    "Fire"
+  ]
+ ],
+ "mounts": [
+  [
+   "Horse",
+   "15 yd",
+   "40 yd",
+   "Galloping over hard going takes a riding roll; failing it means a fall."
+  ],
+  [
+   "Pony or mule",
+   "12 yd",
+   "25 yd",
+   "Sure-footed: trails and slopes don't count as hard going."
+  ],
+  [
+   "Warhorse",
+   "15 yd",
+   "35 yd",
+   "Trained for battle: it doesn't bolt at fire, steel or a beast's roar."
+  ],
+  [
+   "Wagon or cart",
+   "10 yd",
+   "25 yd",
+   "Slow, but it carries a camp."
   ]
  ]
 }
