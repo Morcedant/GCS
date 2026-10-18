@@ -595,7 +595,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="cfb137e" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · cfb137e</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="784b41d" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 784b41d</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -9045,7 +9045,7 @@ function mountTable(api) {
     return `<div class="tbl-help-head"><b>How a shared game works<\/b><button type="button" class="btn small" data-tblhelp="close" aria-label="Close">Close<\/button><\/div>
       <div class="btn-row" role="tablist"><button type="button" class="btn${who === "gm" ? " primary" : ""}" role="tab" aria-selected="${who === "gm"}" data-tblhelp="gm">Running the game (GM)<\/button><button type="button" class="btn${who === "player" ? " primary" : ""}" role="tab" aria-selected="${who === "player"}" data-tblhelp="player">Playing (players)<\/button><\/div>
       ${who === "gm" ? gm : player}
-      <p class="small muted">Everyone needs the same game's creator open (a Trails table takes only Trails characters) and an internet connection. Anyone with the code can join, so share it only with your players. Without a table, everything works as before, on your own device.<\/p>`;
+      <p class="small muted">Everyone needs this game's creator open (a table takes characters only from its own game) and an internet connection. Anyone with the code can join, so share it only with your players. Without a table, everything works as before, on your own device.<\/p>`;
   }
   function openHelp(who) {
     let d = document.getElementById("tbl-help");

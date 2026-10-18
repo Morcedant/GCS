@@ -258,7 +258,7 @@ function mountTable(api) {
     return `<div class="tbl-help-head"><b>How a shared game works</b><button type="button" class="btn small" data-tblhelp="close" aria-label="Close">Close</button></div>
       <div class="btn-row" role="tablist"><button type="button" class="btn${who === "gm" ? " primary" : ""}" role="tab" aria-selected="${who === "gm"}" data-tblhelp="gm">Running the game (GM)</button><button type="button" class="btn${who === "player" ? " primary" : ""}" role="tab" aria-selected="${who === "player"}" data-tblhelp="player">Playing (players)</button></div>
       ${who === "gm" ? gm : player}
-      <p class="small muted">Everyone needs the same game's creator open (a Trails table takes only Trails characters) and an internet connection. Anyone with the code can join, so share it only with your players. Without a table, everything works as before, on your own device.</p>`;
+      <p class="small muted">Everyone needs this game's creator open (a table takes characters only from its own game) and an internet connection. Anyone with the code can join, so share it only with your players. Without a table, everything works as before, on your own device.</p>`;
   }
   function openHelp(who) {
     let d = document.getElementById("tbl-help");
