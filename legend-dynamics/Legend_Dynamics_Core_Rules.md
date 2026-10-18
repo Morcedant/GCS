@@ -291,14 +291,14 @@ Distances fall into five bands:
 | Band | Distance | For example |
 |---|---|---|
 | Close | Up to 10 yards | Across a room; one move covers it |
-| Short | Up to 50 yards | Across a street or a courtyard |
-| Medium | Up to 150 yards | A city block, a long field |
-| Long | Up to 500 yards | Across a valley, a park or a harbor |
-| Extreme | Up to a mile, in line of sight | Rooftop to rooftop across a town |
+| Short | Up to 25 yards | Across a street or a courtyard |
+| Medium | Up to 100 yards | A city block, a long field |
+| Long | Up to 300 yards | Across a park, a harbor or a small valley |
+| Extreme | Up to 1,000 yards, in line of sight | Rooftop to rooftop across a town |
 
 Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand and fists reach only someone next to you; move into reach as part of your turn. A thrown weapon's effective band is Close.
 
-Moving: your move each turn covers the Close band. Give up your action to run and you cover Short instead.
+Moving: your move each turn covers the Close band. Give up your action to run and you cover twice that, 20 yards.
 
 ## Injury
 

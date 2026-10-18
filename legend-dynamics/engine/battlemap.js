@@ -25,7 +25,7 @@ function mountBattleMap(api) {
   const PARTY = api.partyName || "party", Party = PARTY[0].toUpperCase() + PARTY.slice(1);
   // The range tracks: the setting's own (a ship fight, a stagecoach chase), or one plain track. The first is "range".
   const TRACKS = ((api.rangeTracks || []).length ? api.rangeTracks : [api.rangeTrack || {}]).map((r, i) => Object.assign({ title: "Range track", us: "Us", note: "",
-    bands: [["Close", "up to 10 yd"], ["Short", "up to 50 yd"], ["Medium", "up to 150 yd"], ["Long", "up to 500 yd"], ["Extreme", "up to a mile"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
+    bands: [["Close", "up to 10 yd"], ["Short", "up to 25 yd"], ["Medium", "up to 100 yd"], ["Long", "up to 300 yd"], ["Extreme", "up to 1,000 yd"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
   const addName = (x) => x.replace(/^(Our|The) /, (m) => m.toLowerCase());
   const UNITS = { yd: { name: "yards", one: "yard", bands: api.bands || [], presets: [1, 2, 5, 10, 50] } };
   if ((api.kmBands || []).length) UNITS.km = { name: "km", one: "km", bands: api.kmBands, presets: [1, 10, 100, 1000, 10000] };

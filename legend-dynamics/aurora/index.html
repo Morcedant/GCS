@@ -587,7 +587,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="1f6adf1" data-version-date="2026.10.17" title="The code changes whenever this page changes.">Version 2026.10.17 · 1f6adf1</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="04561b7" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 04561b7</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -2191,28 +2191,28 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="even">
 <td>Short</td>
-<td>Up to 50 yards</td>
+<td>Up to 25 yards</td>
 <td>Across a street or a courtyard</td>
 </tr>
 <tr class="odd">
 <td>Medium</td>
-<td>Up to 150 yards</td>
+<td>Up to 100 yards</td>
 <td>A city block, a long field</td>
 </tr>
 <tr class="even">
 <td>Long</td>
-<td>Up to 500 yards</td>
-<td>Across a valley, a park or a harbor</td>
+<td>Up to 300 yards</td>
+<td>Across a park, a harbor or a small valley</td>
 </tr>
 <tr class="odd">
 <td>Extreme</td>
-<td>Up to a mile, in line of sight</td>
+<td>Up to 1,000 yards, in line of sight</td>
 <td>Rooftop to rooftop across a town</td>
 </tr>
 </tbody>
 </table>
 <p>Every ranged weapon has an <strong>effective band</strong>, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand and fists reach only someone next to you; move into reach as part of your turn. A thrown weapon’s effective band is Close.</p>
-<p>Moving: your move each turn covers the Close band. Give up your action to run and you cover Short instead.</p>
+<p>Moving: your move each turn covers the Close band. Give up your action to run and you cover twice that, 20 yards.</p>
 <h2 id="g-injury">Injury</h2>
 <table>
 <thead>
@@ -5531,7 +5531,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <dt>Combat</dt><dd>Move a short distance and take one action. Hit → target may defend once per round: Dodge, Parry or Block → weapon effect. Partial cover −2.</dd>
             <dt>Defending</dt><dd>One defense a round; Additional Defense: a second, at −2, never twice against one attack. Dodge: Agility −2 + Athletics. Parry a weapon in hand or fists: Melee or Brawling −3. Block a weapon in hand, fists or a missile with a shield or anything that stands in for one: Melee −2 + the shield&#x27;s bonus (never a gunshot or blast); an improvised one breaks on a 2+ box hit. Attack succeeded by 3–4: defense −1; 5–6: −2; 7+: −3. Aim (one action): +1 to your next attack on that target.</dd>
             <dt>Telling hit</dt><dd>Hit by 5+ or a natural 3–4, not defended: the attacker picks one effect (disarm; knock down: standing uses their move; pin: their next action frees them; rattle −2; break gear: out of use until an action fixes it; open them up +2; precise). Called shot: −2 (small target −4), and any hit gets the effect. No extra boxes, never an outright kill. Shrug it off: Hard to put down (once a fight) or a point.</dd>
-            <dt>Range</dt><dd>Close 10 yd, Short 50 yd, Medium 150 yd, Long 500 yd, Extreme 1 mile. Within a weapon&#x27;s effective band: no penalty; one band beyond −2, two −4, farther out of range. Move: Close; run (no action): Short.</dd>
+            <dt>Range</dt><dd>Close 10 yd, Short 25 yd, Medium 100 yd, Long 300 yd, Extreme 1,000 yd. Within a weapon&#x27;s effective band: no penalty; one band beyond −2, two −4, farther out of range. Move: 10 yd; run (no action): 20 yd.</dd>
             <dt>Dying</dt><dd>A 2-box weapon that brings you to 3 boxes: Dying; dead at the end of the scene unless stabilized (one action, Medicine, first-aid kit). At 3 boxes, another 2-box hit kills.</dd>
             <dt>Medicine</dt><dd>Stabilize: one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2, clears 2 (3 on margin 5+). One field and one proper-care attempt per set of injuries (one fight or incident); more need better care, a new treatment or recovery time.</dd>
             <dt>Rest</dt><dd>Clearing one box: a full day at 1 box, at least three days at 2, a week at 3 (and only once someone has stabilized or treated you).</dd>
@@ -5742,9 +5742,9 @@ function priceFor(weapon, roll) {
   return { track: p.track, boxes: roll.total === 18 && p.natural18 ? p.natural18 : p.fail };
 }
 
-/** Defender traits that are switched on (a trait with toggle: true can be switched off, e.g. a Ward once broken). @param {any} defender */
 /** The most boxes one target takes from one personal-scale spell, burst or charm. */
 const MAGIC_HARM_CAP = 3;
+/** Defender traits that are switched on (a trait with toggle: true can be switched off, e.g. a Ward once broken). @param {any} defender */
 const liveTraits = (defender) => (defender.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false);
 
 const DEFENDED = /** @type {Record<string, string>} */ ({ dodge: "dodged", parry: "parried", block: "blocked", deflect: "deflected" });
@@ -8827,7 +8827,7 @@ function mountBattleMap(api) {
   const PARTY = api.partyName || "party", Party = PARTY[0].toUpperCase() + PARTY.slice(1);
   // The range tracks: the setting's own (a ship fight, a stagecoach chase), or one plain track. The first is "range".
   const TRACKS = ((api.rangeTracks || []).length ? api.rangeTracks : [api.rangeTrack || {}]).map((r, i) => Object.assign({ title: "Range track", us: "Us", note: "",
-    bands: [["Close", "up to 10 yd"], ["Short", "up to 50 yd"], ["Medium", "up to 150 yd"], ["Long", "up to 500 yd"], ["Extreme", "up to a mile"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
+    bands: [["Close", "up to 10 yd"], ["Short", "up to 25 yd"], ["Medium", "up to 100 yd"], ["Long", "up to 300 yd"], ["Extreme", "up to 1,000 yd"]] }, r, { id: i ? r.id || "rt" + i : "range" }));
   const addName = (x) => x.replace(/^(Our|The) /, (m) => m.toLowerCase());
   const UNITS = { yd: { name: "yards", one: "yard", bands: api.bands || [], presets: [1, 2, 5, 10, 50] } };
   if ((api.kmBands || []).length) UNITS.km = { name: "km", one: "km", bands: api.kmBands, presets: [1, 10, 100, 1000, 10000] };
@@ -9373,7 +9373,7 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
   // or on a range track of bands (a setting's pack can name its own, with ships and a crew track for the ship).
   const RTRACK = PACK.rangeTrack || {};
   const battleMap = mountBattleMap({ root: $("battlemap"), key: PACK.id, esc, toast: gmSay,
-    bands: [["Close", 10], ["Short", 50], ["Medium", 150], ["Long", 500], ["Extreme", 1760]], kmBands: RTRACK.kmBands || [],
+    bands: [["Close", 10], ["Short", 25], ["Medium", 100], ["Long", 300], ["Extreme", 1000]], kmBands: RTRACK.kmBands || [],
     rangeTracks: PACK.rangeTracks || (RTRACK.bands ? [RTRACK] : []),
     vehicles: RTRACK.threats ? threatsFromGuide($("guide"), RTRACK.threats, "ship-") : [],
     groupTracks: () => PACK.tracks.map((t) => ({ name: t.name, boxes: t.boxes, value: Math.min(t.boxes, ship[t.name] || 0), effect: shipEffect(t.name, Math.min(t.boxes, ship[t.name] || 0)) })),
