@@ -111,6 +111,7 @@ def home():
   <div class="ld-actions">
     <a class="ld-button" href="#games">Choose a game</a>
     <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">Read the core rules</a>
+    <a class="ld-button ld-button--ghost" href="#online">Play online</a>
     <a class="ld-button ld-button--ghost" href="{WHY_SLUG}">Why I made it</a>
   </div>
 </div>
@@ -128,6 +129,21 @@ def home():
   <div class="ld-games">
 {cards}
   </div>
+</div>
+
+<!-- Block 3b: playing online (give this section the anchor id "online" in Squarespace, or keep the id below) -->
+<div class="ld" id="online">
+  <div class="ld-eyebrow">Play online</div>
+  <p>Not round the same table? There are two ways to play together, and both work with every game.</p>
+  <ul class="ld-pillars">
+    <li><b>The shared table</b><span>Built into every character creator. The GM opens the <strong>GM view</strong>, presses <strong>Start a table</strong> and sends the players the link; each player joins from their character's play tab. The table rolls everyone's dice where all can see them, keeps each character's injuries and points in step with the GM's cards, and shows the GM's battle map and fight on every player's screen, where they move their own token and send the GM what they do on their turn. Best when everyone has their own phone, tablet or computer. Each creator has a <strong>How a shared game works</strong> guide beside the table.</span></li>
+    <li><b>Screen share and the Discord dice bot</b><span>Rather run it all from your own screen? Stream it: share the GM view's battle map and encounter panel in a Discord call (or Zoom, Meet or any video call), and run the fight there as usual. Players roll with the Legend Dynamics dice bot in your Discord channel, which knows each game's points, clocks and tracks. Nobody else needs the creator open, only their character sheet.</span></li>
+  </ul>
+  <div class="ld-actions" style="margin-top:1.2rem">
+    <a class="ld-button" href="#games">Open a creator for the shared table</a>
+    <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}">Set up the Discord dice bot</a>
+  </div>
+  <p style="font-size:.9rem;color:var(--ld-ink-2);margin-top:1rem">You can mix them: stream the map to a group on Discord while players who have the creator open join the shared table, or roll with the bot while the GM keeps the encounter panel.</p>
 </div>
 
 <!-- Block 4: the odds -->
@@ -195,6 +211,7 @@ def game_page(pid):
     <li><b>Choose a {e(role.lower())} and {e(origin.lower())}.</b> Your {e(role.lower())}'s core skills are marked for you; your {e(origin.lower())} sets your attributes and Edges.</li>
     <li><b>Save your character file.</b> Bring it to the table, print the sheet, or keep it in the browser.</li>
     <li><b>Read the Players' Guide.</b> It's in the creator's guide tab: the full rules, the setting and its dangers.</li>
+    <li><b>Playing online?</b> Join your GM's <b>shared table</b> from your character's {e(t.get('tabPlay', 'Play'))} tab, or roll with the <a href="{DISCORD_SLUG}">Discord dice bot</a> while the GM shares their screen.</li>
   </ol>
 </div>
 """
