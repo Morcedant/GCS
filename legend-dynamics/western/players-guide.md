@@ -467,6 +467,16 @@ Every ranged weapon has an **effective band**, shown in the weapons table. Attac
 - **Hard going halves it.** Climbing, swimming, wading, crawling, deep snow or sand, thick brush, rubble or a crowd: half your Move (and half a run), rounded down. Injury and hard going both apply, injury first.
 - **Stepping away.** You can move away from someone in reach freely; leaving a fight doesn't give them a free attack.
 
+### Mounts and vehicles
+
+A rider or driver moves at the mount's or vehicle's Move, not their own, and running it (a gallop, full throttle) takes their action. Attacking from a moving mount or vehicle is −2. A wounded mount slows down under the same injury rule as a person. Starships, aircraft and car chases are too fast for yards: they use range tracks and chase clocks.
+
+| Mount or vehicle | Move | Run or gallop | Notes |
+|---|---|---|---|
+| Horse | 15 yd | 40 yd | Galloping over hard going takes a Riding roll; failing it means a fall. |
+| Mule | 12 yd | 25 yd | Sure-footed: trails and slopes don't count as hard going. |
+| Wagon or stagecoach | 10 yd | 25 yd | In a chase, it runs on the stagecoach track. |
+
 | Agility + Body | 20 or less | 21–22 | 23–24 | 25–26 | 27–28 | 29–30 |
 |---|---|---|---|---|---|---|
 | Move before Athletics | 5 | 6 | 7 | 8 | 9 | 10 |
@@ -1094,7 +1104,7 @@ Cursed with the wolf. By day you pass for anyone; under the full moon, or in fur
 - Silver: silver weapons mark one extra box on you and ignore Tough.
 - The curse: your bite can pass it on, if the GM says so.
 
-**Monstrous form:** Body +2; Agility +1; Claws and fangs mark 2 boxes; Tough: hits of 2+ boxes mark one fewer, except silver; Keen senses: track by scent; Dark sight. **Drawbacks:** Horses bolt; townsfolk panic.
+**Monstrous form:** Body +2; Agility +1; Claws and fangs mark 2 boxes; Fast on four legs: Move +1; Tough: hits of 2+ boxes mark one fewer, except silver; Keen senses: track by scent; Dark sight. **Drawbacks:** Horses bolt; townsfolk panic.
 
 **Suggested skills:** Brawling, Tracking, Survival, Athletics.
 

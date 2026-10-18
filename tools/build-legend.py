@@ -236,6 +236,8 @@ def gen(name, pack, t):
         return table(["Threat", "Attack (target)", "Dodge", "Boxes", "Weapon", "Trait"],
                      [[x["label"], x.get("attackJoin", ", ").join(f"{a['skill']} {a['target']}" for a in x["attacks"]), "—" if x["dodge"] is None else x["dodge"],
                        x["boxesText"], x["weaponText"], f"**{x['trait']}.** {x['traitText']}"] for x in p["threats"]])
+    if name == "mounts":
+        return table(["Mount or vehicle", "Move", "Run or gallop", "Notes"], p["mounts"]) if p.get("mounts") else ""
     if name == "materials-note":
         m = p.get("materials")
         if not m:

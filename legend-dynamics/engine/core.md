@@ -278,6 +278,12 @@ Every ranged weapon has an **effective band**, shown in the weapons table. Attac
 - **Hard going halves it.** Climbing, swimming, wading, crawling, deep snow or sand, thick brush, rubble or a crowd: half your Move (and half a run), rounded down. Injury and hard going both apply, injury first.
 - **Stepping away.** You can move away from someone in reach freely; leaving a fight doesn't give them a free attack.
 
+### Mounts and vehicles
+
+A rider or driver moves at the mount's or vehicle's Move, not their own, and running it (a gallop, full throttle) takes their action. Attacking from a moving mount or vehicle is −2. A wounded mount slows down under the same injury rule as a person. Starships, aircraft and car chases are too fast for yards: they use range tracks and chase clocks.
+
+{{GEN:mounts}}
+
 | Agility + Body | 20 or less | 21–22 | 23–24 | 25–26 | 27–28 | 29–30 |
 |---|---|---|---|---|---|---|
 | Move before Athletics | 5 | 6 | 7 | 8 | 9 | 10 |

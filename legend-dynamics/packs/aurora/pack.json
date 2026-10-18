@@ -4358,5 +4358,19 @@
   },
   "origins": "Some powers are methods in themselves: a telepath, a psychometrist or a power that senses energy can advance a phase with the Powers skill, at the GM's call.",
   "subjects": []
- }
+ },
+ "mounts": [
+  [
+   "Car",
+   "25 yd",
+   "60 yd",
+   "Takes hits on its own damage boxes (3 unless the GM says otherwise)."
+  ],
+  [
+   "Motorcycle",
+   "30 yd",
+   "100 yd",
+   "Shooting from it is at −2, as from any moving vehicle."
+  ]
+ ]
 }

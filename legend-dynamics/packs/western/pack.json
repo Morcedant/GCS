@@ -815,13 +815,15 @@
     "dodge": 0,
     "traits": [
      "Claws and fangs mark 2 boxes",
+     "Fast on four legs: Move +1",
      "Tough: hits of 2+ boxes mark one fewer, except silver",
      "Keen senses: track by scent",
      "Dark sight"
     ],
     "drawbacks": [
      "Horses bolt; townsfolk panic"
-    ]
+    ],
+    "speed": 1
    },
    "skills": [
     "Brawling",
@@ -3807,6 +3809,26 @@
   [
    "fire",
    "Fire (a torch, burning oil)"
+  ]
+ ],
+ "mounts": [
+  [
+   "Horse",
+   "15 yd",
+   "40 yd",
+   "Galloping over hard going takes a Riding roll; failing it means a fall."
+  ],
+  [
+   "Mule",
+   "12 yd",
+   "25 yd",
+   "Sure-footed: trails and slopes don't count as hard going."
+  ],
+  [
+   "Wagon or stagecoach",
+   "10 yd",
+   "25 yd",
+   "In a chase, it runs on the stagecoach track."
   ]
  ]
 }

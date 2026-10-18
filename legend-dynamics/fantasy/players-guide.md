@@ -377,6 +377,17 @@ Every ranged weapon has an **effective band**, shown in the weapons table. Attac
 - **Hard going halves it.** Climbing, swimming, wading, crawling, deep snow or sand, thick brush, rubble or a crowd: half your Move (and half a run), rounded down. Injury and hard going both apply, injury first.
 - **Stepping away.** You can move away from someone in reach freely; leaving a fight doesn't give them a free attack.
 
+### Mounts and vehicles
+
+A rider or driver moves at the mount's or vehicle's Move, not their own, and running it (a gallop, full throttle) takes their action. Attacking from a moving mount or vehicle is −2. A wounded mount slows down under the same injury rule as a person. Starships, aircraft and car chases are too fast for yards: they use range tracks and chase clocks.
+
+| Mount or vehicle | Move | Run or gallop | Notes |
+|---|---|---|---|
+| Horse | 15 yd | 40 yd | Galloping over hard going takes a riding roll; failing it means a fall. |
+| Pony or mule | 12 yd | 25 yd | Sure-footed: trails and slopes don't count as hard going. |
+| Warhorse | 15 yd | 35 yd | Trained for battle: it doesn't bolt at fire, steel or a beast's roar. |
+| Wagon or cart | 10 yd | 25 yd | Slow, but it carries a camp. |
+
 | Agility + Body | 20 or less | 21–22 | 23–24 | 25–26 | 27–28 | 29–30 |
 |---|---|---|---|---|---|---|
 | Move before Athletics | 5 | 6 | 7 | 8 | 9 | 10 |
@@ -1076,7 +1087,7 @@ Beast-cursed: wolf, bear or great cat. You pass for human until fury or the moon
 - Cold iron: weapons of cold iron mark one extra box on you in beast form.
 - The moon: on the full moon, a Will roll at −2 or the beast takes you for the night.
 
-**Beast form:** Body +2; Agility +1; Claws and fangs mark 2 boxes; Keen senses: track by scent; Beast-quick: run and leap like an animal. **Drawbacks:** Can't speak, cast or use tools; Horses bolt; townsfolk panic.
+**Beast form:** Body +2; Agility +1; Claws and fangs mark 2 boxes; Fast on four legs: Move +1; Keen senses: track by scent; Beast-quick: run and leap like an animal. **Drawbacks:** Can't speak, cast or use tools; Horses bolt; townsfolk panic.
 
 **Suggested skills:** Brawling, Tracking, Survival, Athletics.
 

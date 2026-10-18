@@ -894,13 +894,15 @@
     "dodge": 0,
     "traits": [
      "Claws and fangs mark 2 boxes",
+     "Fast on four legs: Move +1",
      "Keen senses: track by scent",
      "Beast-quick: run and leap like an animal"
     ],
     "drawbacks": [
      "Can't speak, cast or use tools",
      "Horses bolt; townsfolk panic"
-    ]
+    ],
+    "speed": 1
    },
    "skills": [
     "Brawling",
@@ -3378,6 +3380,32 @@
   [
    "fire",
    "Fire"
+  ]
+ ],
+ "mounts": [
+  [
+   "Horse",
+   "15 yd",
+   "40 yd",
+   "Galloping over hard going takes a riding roll; failing it means a fall."
+  ],
+  [
+   "Pony or mule",
+   "12 yd",
+   "25 yd",
+   "Sure-footed: trails and slopes don't count as hard going."
+  ],
+  [
+   "Warhorse",
+   "15 yd",
+   "35 yd",
+   "Trained for battle: it doesn't bolt at fire, steel or a beast's roar."
+  ],
+  [
+   "Wagon or cart",
+   "10 yd",
+   "25 yd",
+   "Slow, but it carries a camp."
   ]
  ]
 }

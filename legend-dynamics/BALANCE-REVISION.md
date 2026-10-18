@@ -186,3 +186,17 @@ Assessed against what an Edge buys (+1 attribute point, a Trained skill, a secon
 6. Wound a character in two separate fights, treat both, and try a second treatment. Is "set of injuries" easy to track on the sheet?
 7. Try Quicker hand on a ritual. Does "combat release requires a charm" stop a working being used mid-fight?
 8. Check the flagged items above (Hold, Witchfire, Charm, Pact-Bound, Healing) as they come up, and record the rulings.
+
+## Follow-up after the playtest: range, Move, reach and telling hits
+
+Made after the playtest checks above, so the simulation numbers don't include them.
+
+- **Range bands:** Close 10 yd, Short 25, Medium 100, Long 300, Extreme 1,000 (were 50, 150, 500 and a mile). Weapon bands and penalties unchanged.
+- **Move:** 5 yards, +1 per 2 points of Agility + Body above 20, +1 Trained or +2 Specialty/Expert Athletics, plus an origin speed adjustment. Run is twice Move; threats move 8 yards. Origin speeds: Werewolf and Skinchanger forms +1, Vesh +1, Sen −1, Qor −1 (Sen was already flagged as overpriced above; this makes that case stronger).
+- **Injury and terrain:** wounded −2 yards; seriously wounded half and no running; hard going halves Move. Stepping away from a fight is free.
+- **Reach:** weapons in hand reach 1 yard (fists, knives, clubs, claws), 2 (swords, axes, maces) or 3 (spears, polearms), shown in each weapons table.
+- **Mounts and vehicles:** riders use the mount's Move, attacks from a moving mount are −2, and each setting lists its mounts or vehicles. Starships, aircraft and car chases stay on range tracks and chase clocks.
+- **Telling hits by weapon:** Pin needs a weapon in hand, fists or a grapple; knock down needs one of those or a shot of 2+ boxes (taser and stunner add it); bare hands and natural weapons don't break gear. The Encounter panel offers only the weapon's effects.
+- **Encounter panel and battle map:** with both people on the map, the attack form checks the distance against the weapon's reach and the attacker's Move (after injury), or sets a ranged weapon's band.
+
+Tests: `rules/test/move.test.mjs` (Move, injury, bands, reach in every weapons table, telling effects by weapon).
