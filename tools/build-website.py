@@ -28,6 +28,8 @@ CORE_SLUG = "/core-rules"
 DISCORD_SLUG = "/discord"
 WHY_SLUG = "/why-legend-dynamics"
 TABLE_SLUG = "/shared-table"
+CONTACT_SLUG = "/contact"
+CONTACT_EMAIL = "contact@legenddynamicsrpg.com"
 
 BRAND_FONTS = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
 
@@ -114,6 +116,50 @@ def table_page():
   <div class="ld-eyebrow">If something goes wrong</div>
   <table><thead><tr><th>What you see</th><th>What to do</th></tr></thead><tbody>{rows}</tbody></table>
   <p>Updates to the server reach Cloudflare by themselves: each change to the branch it builds deploys again. The creators keep working with an older server, so the site and the server can be updated in either order.</p>
+</div>
+"""
+
+
+def contact_page():
+    """Contact: the address, and a form that writes the email in the visitor's own mail app (the site has no server)."""
+    games = "".join(f"<option>{e(pack(g)['terms']['title'])}</option>" for g in GAMES)
+    return f"""<!-- Contact page (suggested URL {CONTACT_SLUG}). No theme injection: it uses the Legend Dynamics brand.
+     Paste each block into its own Code Block (Display Source off). The form needs no server: it opens the
+     visitor's email app with the message filled in. If a Code Block won't run its script, the address still works. -->
+
+<!-- Block 1: hero -->
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Contact</div>
+  <h1>Questions, ideas and stories from your table</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">Comments on the rules, a game you ran, a bug in a character creator, or a setting you'd like to see: I'd like to hear it.</p>
+  <div class="ld-actions"><a class="ld-button" href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a></div>
+</div>
+
+<!-- Block 2: the form -->
+<div class="ld">
+  <div class="ld-eyebrow">Write to me</div>
+  <form class="ld-form" id="ld-contact" action="mailto:{CONTACT_EMAIL}" method="post" enctype="text/plain">
+    <label>Your name <input type="text" name="name" autocomplete="name" maxlength="80"></label>
+    <label>About <select name="topic"><option>A comment or suggestion</option><option>A question about the rules</option><option>Something isn't working</option><option>A story from my game</option><option>Something else</option></select></label>
+    <label>Game <select name="game"><option>Any or all</option>{games}<option>USS Pelion</option><option>Grimm</option></select></label>
+    <label class="ld-wide">Your message <textarea name="message" rows="7" required maxlength="5000"></textarea></label>
+    <div class="ld-actions ld-wide"><button class="ld-button" type="submit">Write the email</button></div>
+    <p class="ld-wide ld-note">This opens your own email app with the message ready to send to {CONTACT_EMAIL}; nothing is sent until you press send there. No email app? Copy your message and write to the address above from any email account.</p>
+  </form>
+  <script>
+  (function () {{
+    var f = document.getElementById("ld-contact"); if (!f) return;
+    f.addEventListener("submit", function (ev) {{
+      ev.preventDefault();
+      var v = function (n) {{ return (f.elements[n].value || "").trim(); }};
+      var subject = "Legend Dynamics: " + v("topic") + (v("game") !== "Any or all" ? " (" + v("game") + ")" : "");
+      var body = v("message") + "\\n\\n" + (v("name") ? "— " + v("name") + "\\n" : "") + "Game: " + v("game");
+      var url = "mailto:{CONTACT_EMAIL}?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+      f.dataset.mailto = url; location.href = url;
+    }});
+  }})();
+  </script>
 </div>
 """
 
@@ -222,6 +268,12 @@ def home():
   <div class="ld-odds">
 {cells}
   </div>
+</div>
+
+<!-- Block 4b: contact -->
+<div class="ld ld-callout">
+  <b>Get in touch</b>
+  <p>Comments, questions or a story from your table? Write to <a href="mailto:{CONTACT_EMAIL}">{CONTACT_EMAIL}</a>, or use the <a href="{CONTACT_SLUG}">contact page</a>.</p>
 </div>
 
 <!-- Block 5: license (or paste this text into your Squarespace footer) -->
@@ -391,6 +443,7 @@ def main():
     write(WEB / "blocks" / "discord.html", discord_page())
     write(WEB / "blocks" / "why.html", why_page())
     write(WEB / "blocks" / "shared-table.html", table_page())
+    write(WEB / "blocks" / "contact.html", contact_page())
 
     # preview.html: the three kinds of page in a plain wrapper, using custom.css, with a tab per theme.
     css = (WEB / "custom.css").read_text()
@@ -402,6 +455,7 @@ def main():
     pages["discord"] = ("Discord", "", strip(discord_page()))
     pages["why"] = ("Why Legend Dynamics", "", strip(why_page()))
     pages["table"] = ("Shared table", "", strip(table_page()))
+    pages["contact"] = ("Contact", "", strip(contact_page()))
     tabs = "".join(f'<button data-p="{k}" data-c="{c}">{e(n)}</button>' for k, (n, c, _) in pages.items())
     sections = "".join(f'<main class="pv" id="pv-{k}" hidden><section class="page-section"><div class="section-background"></div><div class="content">{body}</div></section></main>' for k, (_, _, body) in pages.items())
     write(WEB / "preview.html", f"""<!doctype html>
@@ -426,7 +480,7 @@ const show = (k) => {{ document.querySelectorAll(".pv").forEach((m) => (m.hidden
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${{k}}"]`).dataset.c; scrollTo(0, 0); }};
 document.querySelector(".pv-bar").onclick = (ev) => {{ const b = ev.target.closest("button"); if (b) show(b.dataset.p); }};
 document.addEventListener("click", (ev) => {{ const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{SLUGS['aurora']}": "aurora", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord", "{WHY_SLUG}": "why", "{TABLE_SLUG}": "table" }}[a.getAttribute("href")]; if (k) show(k); }});
+  const k = {{ "{SLUGS['western']}": "western", "{SLUGS['spaceopera']}": "spaceopera", "{SLUGS['fantasy']}": "fantasy", "{SLUGS['aurora']}": "aurora", "{CORE_SLUG}": "rules", "{DISCORD_SLUG}": "discord", "{WHY_SLUG}": "why", "{TABLE_SLUG}": "table", "{CONTACT_SLUG}": "contact" }}[a.getAttribute("href")]; if (k) show(k); }});
 show(location.hash.slice(1) || "home");
 </script></body></html>
 """)
