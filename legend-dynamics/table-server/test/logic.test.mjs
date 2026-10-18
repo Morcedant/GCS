@@ -107,3 +107,15 @@ test("phase 2: the GM changes anyone's play state, a player only their own; valu
   assert.match(L.changePlay(sheets, { role: "gm", name: "Sam" }, { key: "abc123", play: { injury: 9, duty: -1, dying: "yes" } }, 1300).error, /Nothing to change/);
   assert.match(L.changePlay(sheets, { role: "gm", name: "Sam" }, { key: "nobody", play: { injury: 1 } }, 1300).error, /isn't shared/);
 });
+
+test("the GM removes a player: their browser is banned and their characters unshared", () => {
+  const t = table(), sheets = {};
+  L.shareSheet(sheets, ruth, { key: "r1", sheet: { name: "Ruth" }, play: {} }, 1000);
+  L.shareSheet(sheets, { role: "player", name: "Kim", character: "Webb", owner: "h-kim" }, { key: "w1", sheet: { name: "Webb" }, play: {} }, 1000);
+  assert.deepEqual(L.removeOwner(t, sheets, "h-kim"), ["w1"]);
+  assert.deepEqual(Object.keys(sheets), ["r1"]); assert.ok(L.isBanned(t, "h-kim")); assert.ok(!L.isBanned(t, "h-des"));
+  assert.ok(!L.isBanned(t, ""), "a browser without an id can't be banned (it can still be disconnected)");
+  for (let i = 0; i < L.MAX_BANNED + 5; i++) L.removeOwner(t, sheets, "h" + i);
+  assert.equal(t.banned.length, L.MAX_BANNED);
+  assert.deepEqual(L.presence([{ cid: "abc", role: "player", name: "Des", character: "Ruth", owner: "h-des" }]), [{ cid: "abc", role: "player", name: "Des", character: "Ruth" }], "presence carries the handle, never the owner id");
+});

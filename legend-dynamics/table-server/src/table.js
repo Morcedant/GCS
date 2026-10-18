@@ -8,6 +8,8 @@
  *   { type: "roll", req, label, target, base?, mod?, attack?, called?, of? } of: the roll a point reroll answers
  *   { type: "sheet", key, sheet, play? }   a player shares their character (key: its id); play only the first time
  *   { type: "play", key, play }            a change to a shared character's play state (GM: anyone's; player: their own)
+ *   { type: "kick", cid }                  GM: remove a player (they can't rejoin from that browser; their characters stop being shared)
+ *   { type: "recode" }                     GM: move the table to a new code; everyone connected follows, the old code stops working
  *   { type: "ping" }
  * Server → client
  *   { type: "welcome", table: { name, game }, you, log, players, sheets }   sheets: every shared character
@@ -17,9 +19,12 @@
  *   { type: "rerolled", n }               the roll a reroll answered (marked in everyone's log)
  *   { type: "players", players }
  *   { type: "error", error, req? }
+ *   { type: "unshared", keys }             characters no longer shared (their player was removed)
+ *   { type: "kicked" }                     to a removed player, before their connection closes
+ *   { type: "moved", code }                the table's new code: reconnect with it
  *   { type: "pong" }
  */
-import { newTable, hello, roll, rateCheck, presence, hashKey, serverDice, shareSheet, changePlay, publicSheet, publicEntry, MAX_MESSAGE, MAX_SHEET, IDLE_DAYS } from "./logic.js";
+import { newTable, hello, roll, rateCheck, presence, hashKey, serverDice, shareSheet, changePlay, publicSheet, publicEntry, removeOwner, isBanned, newCode, newCid, cryptoInt, MAX_MESSAGE, MAX_SHEET, IDLE_DAYS } from "./logic.js";
 
 const DAY = 86_400_000;
 
@@ -48,6 +53,15 @@ export class Table {
       await this.save();
       await this.ctx.storage.setAlarm(Date.now() + IDLE_DAYS * DAY);
       return Response.json({ name: this.table.name });
+    }
+    if (path === "/import") { // a table moving here from its old code
+      if (this.table) return Response.json({ error: "exists" }, { status: 409 });
+      const b = /** @type {any} */ (await req.json());
+      this.table = b.table; this.sheets = {};
+      for (const e of b.sheets || []) { this.sheets[e.key] = e; await this.saveSheet(e); }
+      await this.save();
+      await this.ctx.storage.setAlarm(Date.now() + IDLE_DAYS * DAY);
+      return Response.json({ ok: true });
     }
     if (!this.table) return Response.json({ error: "There's no table with that code. Check it with your GM." }, { status: 404 });
     if (path === "/info") return Response.json({ name: this.table.name, game: this.table.game, players: this.whos().length });
@@ -85,6 +99,8 @@ export class Table {
       if ("error" in r) { this.send(ws, { type: "error", error: r.error }); ws.close(1008, "refused"); return; }
       // A player's browser keeps a private id; the table keeps only its hash, and a character belongs to the browser that shared it.
       if (typeof msg.pid === "string" && msg.pid.length >= 16 && msg.pid.length <= 64) r.who.owner = await hashKey("player:" + msg.pid);
+      if (r.who.role === "player" && isBanned(this.table, r.who.owner)) { this.send(ws, { type: "error", error: "The GM has removed you from this table." }); ws.close(1008, "removed"); return; }
+      r.who.cid = newCid();
       att.who = r.who; ws.serializeAttachment(att);
       this.send(ws, { type: "welcome", table: { name: this.table.name, game: this.table.game }, you: { role: r.who.role, name: r.who.name, character: r.who.character }, log: this.table.log.map(publicEntry), players: presence(this.whos()), sheets: Object.values(this.sheets).map(publicSheet) });
       this.broadcast({ type: "players", players: presence(this.whos()) }, ws);
@@ -111,6 +127,34 @@ export class Table {
       this.table.active = now; await this.save();
       if (msg.type === "sheet") this.broadcast({ type: "sheet", entry: publicSheet(r.entry) });
       else this.broadcast({ type: "play", key: r.entry.key, play: r.entry.play, rev: r.entry.rev });
+      return;
+    }
+    if (msg.type === "kick" || msg.type === "recode") {
+      if (att.who.role !== "gm") { this.send(ws, { type: "error", error: "Only the GM can do that." }); return; }
+      if (msg.type === "kick") {
+        const target = this.ctx.getWebSockets().find((/** @type {any} */ s) => ((s.deserializeAttachment() || {}).who || {}).cid === msg.cid);
+        const who = target && target.deserializeAttachment().who;
+        if (!who || who.role !== "player") { this.send(ws, { type: "error", error: "That player isn't at the table." }); return; }
+        const keys = removeOwner(this.table, this.sheets, who.owner);
+        for (const k of keys) await this.ctx.storage.delete("sheet:" + k);
+        await this.save();
+        this.send(target, { type: "kicked" }); try { target.close(4003, "removed"); } catch { /* gone */ }
+        if (keys.length) this.broadcast({ type: "unshared", keys }, target);
+        this.broadcast({ type: "players", players: presence(this.whos(target)) }, target);
+        return;
+      }
+      // A new code: the table's state moves to a new Durable Object; everyone connected now follows it, and this one is emptied.
+      for (let i = 0; i < 5; i++) {
+        const code = newCode(cryptoInt), stub = this.env.TABLES.get(this.env.TABLES.idFromName(code));
+        const r = await stub.fetch("https://table/import", { method: "POST", body: JSON.stringify({ table: this.table, sheets: Object.values(this.sheets) }) });
+        if (r.status === 409) continue;
+        if (!r.ok) break;
+        this.broadcast({ type: "moved", code });
+        for (const s of this.ctx.getWebSockets()) try { s.close(4004, "moved"); } catch { /* gone */ }
+        this.table = null; this.sheets = {}; await this.ctx.storage.deleteAll();
+        return;
+      }
+      this.send(ws, { type: "error", error: "The code couldn't be changed just now: try again." });
       return;
     }
     this.send(ws, { type: "error", req: msg.req, error: "That isn't something the table does." });
