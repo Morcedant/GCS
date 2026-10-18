@@ -1,0 +1,17 @@
+name = "legend-table"
+main = "src/worker.js"
+compatibility_date = "2025-04-01"
+
+# One Durable Object per table. SQLite storage works on the Workers Free plan.
+[[durable_objects.bindings]]
+name = "TABLES"
+class_name = "Table"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Table"]
+
+[vars]
+# The sites whose pages may start and join tables, comma-separated (e.g. "https://legend-dynamics.pages.dev").
+# "*" allows any site; "null" allows a creator opened as a file from your computer.
+ALLOWED_ORIGINS = "*"

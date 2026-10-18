@@ -444,6 +444,13 @@ def pack_sections(md):
     return {parts[i]: parts[i + 1].strip() for i in range(1, len(parts), 2)}
 
 
+def table_server():
+    """The shared table server's address (legend-dynamics/table-server/server-url.txt, once it's deployed), or "": players then type it in."""
+    f = LD / "table-server" / "server-url.txt"
+    url = f.read_text().strip() if f.exists() else ""
+    return url if re.fullmatch(r"https://[\w.-]+(:\d+)?", url) else ""
+
+
 def inline_module(path, name):
     """An ES module from engine/rules or engine/lab as a plain script constant: `const name = (() => { ...; return {exports} })();`.
     The pages stay single files; the same module files are imported directly by the tests."""
@@ -589,6 +596,8 @@ def build(pid, docx):
     tpl = tpl.replace("{{GROUPCSS}}", "\n".join(f'[data-div="{g["id"]}"] {{ --accent: var({g["color"]}); }}' for g in pack["groups"]))
     tpl = tpl.replace("{{QUICKREF}}", quickref(pack, t))
     tpl = tpl.replace("/* BATTLEMAP */", (ENGINE / "battlemap.js").read_text().replace("</", "<\\/"))
+    tpl = tpl.replace("/* TABLECLIENT */", (ENGINE / "table-client.js").read_text().replace("</", "<\\/"))
+    tpl = tpl.replace("{{TABLE_SERVER}}", table_server())
     tpl = tpl.replace("{{OUTCOMES}}", "".join(f"<option>{html.escape(o)}</option>" for o in pack["journal"]["outcomes"]))
     tpl = re.sub(r"\{\{theme\.(\w+)\}\}", lambda m: str(theme[m.group(1)]), tpl)
     tpl = tpl.replace("{{fontsHref}}", t["fontsHref"])
