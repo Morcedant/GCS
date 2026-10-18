@@ -86,3 +86,11 @@ The GM view of the character creator has a **battle map** for fights where it he
 ## The Encounter panel
 
 The GM view also has an **Encounter** panel that runs a fight by the *Personal combat* rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit (offering only the effects the weapon can deliver), offering a Grit point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so. For each attack, choose what it's made of (silver, a wooden stake or fire), and the panel applies the rules that turn on it: a Wesen's Tough in full woge (and what gets past it), and a creature only the right weapon can hurt, like a Siegbarste's iron bones.
+
+## The shared table
+
+The GM can start a **shared table** from the GM view and give the players its code; each player joins from their character's Play tab. While they're connected, every roll from a sheet is rolled by the table server, so the whole posse sees the same dice as they land, in a live log on the Play tab and on the GM view. A Grit reroll answers its own roll, once.
+
+Each player's character is shared with the GM too: it appears among the GM view's characters, marked at the table, and its injuries, Grit, rounds, full woge and lasting wounds stay in step both ways, whether they're changed on the sheet, on the GM's card or in an encounter. In a fight, each player's Play tab shows the GM's battle map and the encounter's turn order and latest results; a player drags their own token, and on their turn sends the GM what they'll do, which the GM puts into the Encounter panel and runs.
+
+The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.
