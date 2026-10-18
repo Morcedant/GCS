@@ -6,16 +6,20 @@
  * Client → server
  *   { type: "hello", role: "player" | "gm", name, character, game, key? }   first, once
  *   { type: "roll", req, label, target, base?, mod?, attack?, called?, of? } of: the roll a point reroll answers
+ *   { type: "sheet", key, sheet, play? }   a player shares their character (key: its id); play only the first time
+ *   { type: "play", key, play }            a change to a shared character's play state (GM: anyone's; player: their own)
  *   { type: "ping" }
  * Server → client
- *   { type: "welcome", table: { name, game }, you, log, players }
+ *   { type: "welcome", table: { name, game }, you, log, players, sheets }   sheets: every shared character
+ *   { type: "sheet", entry }              a character shared or updated: { key, owner, sheet, play, rev }
+ *   { type: "play", key, play, rev }       a shared character's play state, after a change
  *   { type: "roll", entry, req? }         to everyone; req only to the roller, matching its request
  *   { type: "rerolled", n }               the roll a reroll answered (marked in everyone's log)
  *   { type: "players", players }
  *   { type: "error", error, req? }
  *   { type: "pong" }
  */
-import { newTable, hello, roll, rateCheck, presence, hashKey, serverDice, MAX_MESSAGE, IDLE_DAYS } from "./logic.js";
+import { newTable, hello, roll, rateCheck, presence, hashKey, serverDice, shareSheet, changePlay, publicSheet, publicEntry, MAX_MESSAGE, MAX_SHEET, IDLE_DAYS } from "./logic.js";
 
 const DAY = 86_400_000;
 
@@ -24,9 +28,15 @@ export class Table {
   constructor(ctx, env) {
     this.ctx = ctx; this.env = env;
     /** @type {any} */ this.table = null;
-    ctx.blockConcurrencyWhile(async () => { this.table = (await ctx.storage.get("table")) || null; });
+    /** @type {Record<string, any>} */ this.sheets = {}; // shared characters, each kept as its own "sheet:<key>"
+    ctx.blockConcurrencyWhile(async () => {
+      this.table = (await ctx.storage.get("table")) || null;
+      for (const [, v] of await ctx.storage.list({ prefix: "sheet:" })) this.sheets[v.key] = v;
+    });
   }
   async save() { await this.ctx.storage.put("table", this.table); }
+  /** @param {any} entry */
+  async saveSheet(entry) { await this.ctx.storage.put("sheet:" + entry.key, entry); }
 
   /** @param {Request} req */
   async fetch(req) {
@@ -63,7 +73,7 @@ export class Table {
   /** @param {any} ws @param {string | ArrayBuffer} data */
   async webSocketMessage(ws, data) {
     if (!this.table) { this.send(ws, { type: "error", error: "This table has closed." }); ws.close(1008, "no table"); return; }
-    if (typeof data !== "string" || data.length > MAX_MESSAGE) { this.send(ws, { type: "error", error: "That message was too large." }); return; }
+    if (typeof data !== "string" || data.length > MAX_SHEET + 1024 || (data.length > MAX_MESSAGE && !data.startsWith('{"type":"sheet"'))) { this.send(ws, { type: "error", error: "That message was too large." }); return; }
     /** @type {any} */ let msg;
     try { msg = JSON.parse(data); } catch { this.send(ws, { type: "error", error: "That wasn't a message the table understands." }); return; }
     const att = ws.deserializeAttachment() || { who: null, times: [] };
@@ -73,8 +83,10 @@ export class Table {
       const keyOk = msg.role === "gm" && typeof msg.key === "string" && (await hashKey(msg.key)) === this.table.gmKeyHash;
       const r = hello(msg, this.table, keyOk);
       if ("error" in r) { this.send(ws, { type: "error", error: r.error }); ws.close(1008, "refused"); return; }
+      // A player's browser keeps a private id; the table keeps only its hash, and a character belongs to the browser that shared it.
+      if (typeof msg.pid === "string" && msg.pid.length >= 16 && msg.pid.length <= 64) r.who.owner = await hashKey("player:" + msg.pid);
       att.who = r.who; ws.serializeAttachment(att);
-      this.send(ws, { type: "welcome", table: { name: this.table.name, game: this.table.game }, you: r.who, log: this.table.log, players: presence(this.whos()) });
+      this.send(ws, { type: "welcome", table: { name: this.table.name, game: this.table.game }, you: { role: r.who.role, name: r.who.name, character: r.who.character }, log: this.table.log.map(publicEntry), players: presence(this.whos()), sheets: Object.values(this.sheets).map(publicSheet) });
       this.broadcast({ type: "players", players: presence(this.whos()) }, ws);
       return;
     }
@@ -88,8 +100,17 @@ export class Table {
       await this.save();
       await this.ctx.storage.setAlarm(now + IDLE_DAYS * DAY);
       if (r.entry.reroll) this.broadcast({ type: "rerolled", n: r.entry.reroll });
-      this.send(ws, { type: "roll", entry: r.entry, req: msg.req });
-      this.broadcast({ type: "roll", entry: r.entry }, ws);
+      this.send(ws, { type: "roll", entry: publicEntry(r.entry), req: msg.req });
+      this.broadcast({ type: "roll", entry: publicEntry(r.entry) }, ws);
+      return;
+    }
+    if (msg.type === "sheet" || msg.type === "play") {
+      const now = Date.now(), r = msg.type === "sheet" ? shareSheet(this.sheets, att.who, msg, now) : changePlay(this.sheets, att.who, msg, now);
+      if ("error" in r) { this.send(ws, { type: "error", req: msg.req, error: r.error }); return; }
+      await this.saveSheet(r.entry);
+      this.table.active = now; await this.save();
+      if (msg.type === "sheet") this.broadcast({ type: "sheet", entry: publicSheet(r.entry) });
+      else this.broadcast({ type: "play", key: r.entry.key, play: r.entry.play, rev: r.entry.rev });
       return;
     }
     this.send(ws, { type: "error", req: msg.req, error: "That isn't something the table does." });
@@ -106,7 +127,7 @@ export class Table {
   // A table nobody has rolled on for IDLE_DAYS days is deleted.
   async alarm() {
     if (!this.table) return;
-    if (Date.now() - this.table.active >= IDLE_DAYS * DAY && !this.whos().length) { this.table = null; await this.ctx.storage.deleteAll(); return; }
+    if (Date.now() - this.table.active >= IDLE_DAYS * DAY && !this.whos().length) { this.table = null; this.sheets = {}; await this.ctx.storage.deleteAll(); return; }
     await this.ctx.storage.setAlarm(Math.max(Date.now() + DAY, this.table.active + IDLE_DAYS * DAY));
   }
 }
