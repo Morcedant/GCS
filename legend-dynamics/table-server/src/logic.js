@@ -21,6 +21,8 @@ export const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 export const CODE_LENGTH = 6;
 export const LOG_KEEP = 200; // rolls kept and sent to anyone joining
 export const MAX_MESSAGE = 2048; // bytes; a roll request is a few hundred
+export const MAX_SHEET = 32_768; // a character sheet (without its portrait) is a few kilobytes
+export const MAX_SHEETS = 12; // characters shared at one table
 export const RATE = { rolls: 20, perMs: 60_000 }; // per connection
 export const REROLL_WITHIN_MS = 10 * 60_000; // a point reroll answers a recent roll
 export const IDLE_DAYS = 30; // a table nobody has used for this long is deleted
@@ -54,7 +56,7 @@ export function hello(msg, table, keyOk) {
   if (table.game && game && game !== table.game) return { error: `This table plays a different game (${table.game}). Open that game's creator to join.` };
   const name = cleanText(msg.name, 40), character = cleanText(msg.character, 60);
   if (role === "player" && !character && !name) return { error: "Give your name or your character's name." };
-  return { who: { role, name: name || (role === "gm" ? "GM" : ""), character } };
+  return { who: { role, name: name || (role === "gm" ? "GM" : ""), character, owner: "" } }; // owner: set by the caller from the browser's private id
 }
 
 /** A sliding-window rate check; returns the new window, or null when it's full. @param {number[]} times @param {number} now */
@@ -78,7 +80,7 @@ export function roll(table, who, msg, dice, now) {
   if (msg.of !== undefined && msg.of !== null) {
     const prior = table.log.find((/** @type {any} */ e) => e.n === msg.of);
     if (!prior) return { error: "That roll isn't in the log any more." };
-    if (prior.character !== who.character || prior.by !== who.name) return { error: "Only whoever made a roll can reroll it." };
+    if (prior.character !== who.character || prior.by !== who.name || (prior.owner || "") !== (who.owner || "")) return { error: "Only whoever made a roll can reroll it." };
     if (prior.rerolled) return { error: "That roll has already been rerolled: the second result stands." };
     if (prior.reroll) return { error: "A reroll can't be rerolled: it stands." };
     if (now - prior.at > REROLL_WITHIN_MS) return { error: "That roll is too old to reroll." };
@@ -92,7 +94,7 @@ export function roll(table, who, msg, dice, now) {
     base: int(msg.base, -20, 40), mod: int(msg.mod, -40, 40),
     dice: r.dice, total: r.total, success: r.success, auto: r.auto, margin: r.margin,
     attack, called, telling: attack && !called && r.success && (r.margin >= 5 || r.auto === "success"),
-    reroll: of,
+    reroll: of, owner: who.owner || "",
   };
   table.log.push(entry);
   if (table.log.length > LOG_KEEP) table.log.splice(0, table.log.length - LOG_KEEP);
@@ -117,3 +119,61 @@ export function serverDice() {
   while (out.length < 3) { crypto.getRandomValues(buf); if (buf[0] < 252) out.push(1 + (buf[0] % 6)); }
   return /** @type {[number, number, number]} */ (out);
 }
+
+// ---- phase 2: shared characters ----
+// A player's sheet is shared with the table under its character's id (key). Its play state (injury, points, ammo,
+// form) is the part both sides change: the player on their sheet, the GM on their cards or in the encounter panel.
+// The table keeps one copy of it, and every change goes to everyone.
+
+/** The play state the table shares, cleaned: anything else is dropped. @param {any} p */
+export function cleanPlay(p) {
+  const out = /** @type {Record<string, any>} */ ({});
+  if (!p || typeof p !== "object") return out;
+  const n = (/** @type {string} */ k, /** @type {number} */ lo, /** @type {number} */ hi) => { const v = int(p[k], lo, hi); if (v !== null) out[k] = v; };
+  n("injury", 0, 3); n("duty", 0, 30); n("ptrack", 0, 30); n("rounds", 0, 200); n("spares", 0, 50);
+  for (const k of ["dying", "stunned", "form"]) if (typeof p[k] === "boolean") out[k] = p[k];
+  if (Array.isArray(p.lasting) && p.lasting.length <= 12 && JSON.stringify(p.lasting).length <= 3000) out.lasting = p.lasting;
+  return out;
+}
+const validKey = (/** @type {any} */ k) => typeof k === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(k);
+
+/**
+ * A player shares (or updates) their character. The first sharer of a key owns it.
+ * @param {Record<string, any>} sheets @param {{ role: string, name: string, character: string }} who @param {any} msg @param {number} now
+ * @returns {{ entry: any } | { error: string }}
+ */
+export function shareSheet(sheets, who, msg, now) {
+  if (who.role !== "player") return { error: "Only a player shares a character." };
+  if (!validKey(msg.key)) return { error: "That character has no id." };
+  if (!msg.sheet || typeof msg.sheet !== "object" || Array.isArray(msg.sheet)) return { error: "That isn't a character." };
+  if (JSON.stringify(msg.sheet).length > MAX_SHEET) return { error: "That character is too large to share (remove its portrait?)." };
+  if (!who.owner) return { error: "Reload the page to share your character (it needs this browser's private id)." };
+  const had = sheets[msg.key];
+  if (had && had.owner.id !== who.owner) return { error: `That character is ${had.owner.name}'s at this table.` };
+  if (!had && Object.keys(sheets).length >= MAX_SHEETS) return { error: `A table shares at most ${MAX_SHEETS} characters.` };
+  const sheet = { ...msg.sheet }; delete sheet.play; delete sheet.portrait;
+  const play = had ? had.play : cleanPlay(msg.play); // the table's copy wins once it has one
+  const entry = { key: msg.key, owner: { id: who.owner, name: who.name, character: cleanText(sheet.name, 60) || who.character }, sheet, play, rev: (had ? had.rev : 0) + 1, at: now };
+  sheets[msg.key] = entry;
+  return { entry };
+}
+
+/**
+ * A change to a shared character's play state: the GM for anyone, a player for their own.
+ * @param {Record<string, any>} sheets @param {{ role: string, name: string }} who @param {any} msg @param {number} now
+ * @returns {{ entry: any } | { error: string }}
+ */
+export function changePlay(sheets, who, msg, now) {
+  const had = validKey(msg.key) && sheets[msg.key];
+  if (!had) return { error: "That character isn't shared at this table." };
+  if (who.role !== "gm" && (!who.owner || had.owner.id !== who.owner)) return { error: "Only the GM or the character's player can change it." };
+  const patch = cleanPlay(msg.play);
+  if (!Object.keys(patch).length) return { error: "Nothing to change." };
+  had.play = { ...had.play, ...patch }; had.rev++; had.at = now;
+  return { entry: had };
+}
+
+/** A shared character as everyone may see it: without its owner's private id. @param {any} e */
+export const publicSheet = (e) => ({ ...e, owner: { name: e.owner.name, character: e.owner.character } });
+/** A roll as everyone may see it: without its roller's private id. @param {any} e */
+export const publicEntry = (e) => { const { owner, ...rest } = e; void owner; return rest; };

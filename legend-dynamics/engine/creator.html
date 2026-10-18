@@ -213,6 +213,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .log .s { color: var(--good); }
 .log .f { color: var(--bad); }
 .tbl-log li { display: block; line-height: 1.45; }
+.tbl-badge { display: block; color: var(--accent); }
 .tbl-log .tbl-old { opacity: .55; }
 #gm-table .tbl-log { max-height: 22rem; overflow-y: auto; }
 .ref { display: grid; gap: 6px; font-size: .88rem; margin: 0; }
@@ -2259,7 +2260,15 @@ tr.lvl-U td.target { color: var(--muted); }
   }
 
   // ---- persistence ----
-  function save() { store.set(STORE_CURRENT, ch); }
+  function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
+  // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
+  const pickPlay = (c) => { const p = c.play || {}, g = p.gun || {};
+    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.form, ptrack: p.ptrack || 0, lasting: p.lasting || [] };
+    if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
+    return o; };
+  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "form", "ptrack", "lasting"]) if (k in q) c.play[k] = q[k];
+    if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
+  const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
   function load(c) { ch = normalize(c); last = null; $("r-setting").innerHTML = ""; $("r-result").hidden = true; bindFields(); render(); }
   // A role's core skills are marked Trained when the role is chosen (and on a new character). Changing
@@ -2643,7 +2652,24 @@ tr.lvl-U td.target { color: var(--muted); }
   /* TABLECLIENT */
   // The shared table: players join from their play tab, the GM starts one here, and every roll at the table shows on both.
   sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay,
-    server: TABLE_SERVER, character: () => ch.name, esc, toast });
+    server: TABLE_SERVER, character: () => ch.name, esc, toast,
+    // Phase 2: the player shares their character; the GM's cards follow the table's characters, and both follow each other's changes.
+    onPlayers: () => renderGM(), // who's at the table, on the GM's cards
+    onConnected: (role) => { if (role === "player") sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); renderGM(); },
+    onSheet: (e) => {
+      if (e.key === ch.id && sharedTable.role() === "player") { applyPlay(ch, e.play); store.set(STORE_CURRENT, ch); render(); return; }
+      if (sharedTable.role() !== "gm") return;
+      const i = gmCrew.findIndex((c) => c.tableKey === e.key || c.id === e.key), was = i >= 0 ? gmCrew[i] : null;
+      const c = normalize({ ...JSON.parse(JSON.stringify(e.sheet)), id: was ? was.id : e.key, portrait: was ? was.portrait : e.sheet.portrait, tableKey: e.key, tableOwner: e.owner.name, play: was ? was.play : {} });
+      applyPlay(c, e.play);
+      if (was) gmCrew[i] = c; else gmCrew.push(c);
+      store.set(STORE_GM, gmCrew); renderGM();
+    },
+    onPlay: (key, play) => {
+      if (key === ch.id && sharedTable.role() === "player") { applyPlay(ch, play); store.set(STORE_CURRENT, ch); render(); return; }
+      const c = gmCrew.find((x) => x.tableKey === key); if (!c) return;
+      applyPlay(c, play); store.set(STORE_GM, gmCrew); renderGM();
+    } });
   // The battle map: the GM's characters as tokens (portrait, group color, down or Dying) on a hex map at any scale,
   // or on a range track of bands (a setting's pack can name its own, with ships and a crew track for the ship).
   const RTRACK = PACK.rangeTrack || {};
@@ -2671,7 +2697,10 @@ tr.lvl-U td.target { color: var(--muted); }
       if ("points" in patch) c.play.duty = Math.max(0, patch.points);
       if ("ptrack" in patch && PTRACK) c.play.ptrack = Math.max(0, Math.min(PTRACK.boxes, patch.ptrack));
       saveGM(); renderGM(); } });
-  const saveGM = () => { if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true); };
+  const saveGM = () => {
+    if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true);
+    if (sharedTable) for (const c of gmCrew) if (c.tableKey) sharedTable.pushPlay(c.tableKey, pickPlay(c)); // a change here reaches the player's sheet
+  };
   // Work out a crew member's numbers with the same rules as the sheet, by briefly treating them as the current character.
   function gmCalc(c) {
     const saved = ch; ch = c;
@@ -2835,7 +2864,7 @@ tr.lvl-U td.target { color: var(--muted); }
         : badgeSvg(k.div);
       return `<article class="gm-card hud ${inj >= 3 ? "down" : ""}" data-div="${k.div}">
         <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed character")}</b>
-          <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span></div></div>
+          <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span>${c.tableKey ? `<span class="small tbl-badge">${sharedTable && sharedTable.isHere(c.tableOwner) ? "● at the table" : "○ away from the table"}${c.tableOwner ? ` · ${esc(c.tableOwner)}` : ""}</span>` : ""}</div></div>
         ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? T.formName : T.formHuman || "human form"))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (T.formHuman || "human form").toLowerCase() : T.formName)}</button></div>` : ""}
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>

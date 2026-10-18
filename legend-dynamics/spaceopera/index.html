@@ -217,6 +217,7 @@ tr.lvl-U td.target { color: var(--muted); }
 .log .s { color: var(--good); }
 .log .f { color: var(--bad); }
 .tbl-log li { display: block; line-height: 1.45; }
+.tbl-badge { display: block; color: var(--accent); }
 .tbl-log .tbl-old { opacity: .55; }
 #gm-table .tbl-log { max-height: 22rem; overflow-y: auto; }
 .ref { display: grid; gap: 6px; font-size: .88rem; margin: 0; }
@@ -590,7 +591,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="0e271b0" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 0e271b0</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="377a92b" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 377a92b</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -5507,7 +5508,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Ship fight.</strong> In this setting the range track is for ship fights, with the bands Close (under 10 km), Short (up to 1,000 km), Medium (up to 10,000 km), Long (up to 100,000 km), Extreme (about a light-second). <strong>Add our ship</strong> places a token linked to the crew’s Hull track, so damage marked on the map is marked on the sheet. Enemy ships come from the Enemy ships table with their Hull boxes. Each lane is a range band from our ship. When the pilots make their opposed Piloting roll, drag the enemy one lane in or out. Weapons take −2 one band beyond their range and −4 two bands beyond.</p>
 <h2 id="gm-the-encounter-panel">The Encounter panel</h2>
 <p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit, offering a Resolve point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so.</p>
-<p><strong>The shared table.</strong> The GM can start a shared table from the GM view and give the players its code; each player joins from their character’s Play tab. While they’re connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the Play tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Without a table, the roller works exactly as it always has.</p>
+<p><strong>The shared table.</strong> The GM can start a shared table from the GM view and give the players its code; each player joins from their character’s Play tab. While they’re connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the Play tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Each player’s character is shared with the GM too: it appears among the GM view’s characters, marked at the table, and its injuries, points, ammunition and form stay in step both ways, whether they’re changed on the sheet, on the GM’s card or in an encounter. Without a table, the roller works exactly as it always has.</p>
 <h2 id="gm-the-discovery-panel">The Discovery panel</h2>
 <p>The GM view’s <strong>Discovery</strong> panel runs discovery clocks and the Countdown they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every data record the characters in the GM view already hold for it. The <strong>Failed roll</strong> and <strong>Push</strong> buttons tick the track for how they were digging. When a clock fills, <strong>Mint</strong> gives the primary investigator the data record and everyone you tick as present a shared copy. Save all to file afterwards, so the players’ character files carry it. The Discord bot’s <code>/discovery</code> and <code>/cards</code> commands do the same at a table that plays online.</p>
 </div>
@@ -8624,7 +8625,15 @@ return { mountLab };
   }
 
   // ---- persistence ----
-  function save() { store.set(STORE_CURRENT, ch); }
+  function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
+  // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
+  const pickPlay = (c) => { const p = c.play || {}, g = p.gun || {};
+    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.form, ptrack: p.ptrack || 0, lasting: p.lasting || [] };
+    if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
+    return o; };
+  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "form", "ptrack", "lasting"]) if (k in q) c.play[k] = q[k];
+    if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
+  const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
   function load(c) { ch = normalize(c); last = null; $("r-setting").innerHTML = ""; $("r-result").hidden = true; bindFields(); render(); }
   // A role's core skills are marked Trained when the role is chosen (and on a new character). Changing
@@ -9600,15 +9609,22 @@ function threatsFromGuide(guide, heading = "Threats", prefix = "guide-") {
 //
 // mountTable(api) with api: { playRoot, gmRoot (elements), key (storage prefix), game (the setting's id), title,
 //   server (the default table server, may be ""), character() → the sheet's character name, esc, toast }
-// Returns { live(), roll(req) → Promise<entry>, setCharacter(name) }.
+// Phase 2, shared characters: api.onSheet(entry) and api.onPlay(key, play) hear the table's characters; the page
+// calls shareMine(key, sheet, play) after a player's sheet changes and pushPlay(key, play) after the GM's cards change.
+// Only what changed is sent; what the table sends back is remembered, so it isn't sent again.
+// Returns { live(), roll(req) → Promise<entry>, setCharacter(name), shareMine, pushPlay, isHere(ownerName), role() }.
 function mountTable(api) {
   const esc = api.esc, KEY = api.key + ".table.v1";
   const say = (m, err) => (api.toast ? api.toast(m, err) : null);
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
   const st = Object.assign({ server: api.server || "", code: "", name: "", role: "player", gmKeys: {}, joined: false }, load());
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch { /* private window: works for this visit */ } };
+  // This browser's private id: the table knows a player's characters by it, so nobody can change them by typing the same name.
+  if (!st.pid) { const b = new Uint8Array(18); crypto.getRandomValues(b); st.pid = btoa(String.fromCharCode(...b)).replace(/[+/=]/g, (c) => ({ "+": "-", "/": "_", "=": "" })[c]); save(); }
   let ws = null, live = false, status = "", table = null, you = null, players = [], log = [], retry = 0, retryTimer = null, pingTimer = null, leaving = false, character = "", otherServer = false;
   const pending = new Map(); // req → { resolve, reject, timer }
+  const lastPlay = {}, lastSheet = {}; // key → the play state / sheet (JSON) the table last had
+  let sheetTimer = null;
   const base = () => (st.server || api.server || "").trim().replace(/\/+$/, "");
   const wsUrl = () => `${base().replace(/^http/, "ws")}/api/tables/${encodeURIComponent(st.code)}/ws`;
   const shareLink = () => `${location.href.split("#")[0]}#table=${st.code}`;
@@ -9626,18 +9642,25 @@ function mountTable(api) {
     try { sock = new WebSocket(wsUrl()); } catch { status = "That table server address doesn't work."; render(); return; }
     ws = sock;
     sock.onopen = () => {
-      sock.send(JSON.stringify({ type: "hello", role: st.role, name: st.name, character: st.role === "gm" ? "" : character, game: api.game, key: st.role === "gm" ? st.gmKeys[st.code] : undefined }));
+      sock.send(JSON.stringify({ type: "hello", role: st.role, name: st.name, character: st.role === "gm" ? "" : character, game: api.game, key: st.role === "gm" ? st.gmKeys[st.code] : undefined, pid: st.pid }));
       clearInterval(pingTimer); pingTimer = setInterval(() => { if (sock.readyState === 1) sock.send('{"type":"ping"}'); }, 30000);
     };
     sock.onmessage = (e) => {
       let m; try { m = JSON.parse(e.data); } catch { return; }
-      if (m.type === "welcome") { live = true; retry = 0; table = m.table; you = m.you; log = m.log || []; players = m.players || []; status = ""; st.joined = true; save(); render(); }
+      if (m.type === "welcome") {
+        live = true; retry = 0; table = m.table; you = m.you; log = m.log || []; players = m.players || []; status = ""; st.joined = true; save(); render();
+        for (const k in lastSheet) delete lastSheet[k];
+        for (const e of m.sheets || []) { lastPlay[e.key] = e.play; if (api.onSheet) api.onSheet(e); }
+        if (api.onConnected) api.onConnected(you.role);
+      }
+      else if (m.type === "sheet") { lastPlay[m.entry.key] = m.entry.play; if (api.onSheet) api.onSheet(m.entry); }
+      else if (m.type === "play") { lastPlay[m.key] = m.play; if (api.onPlay) api.onPlay(m.key, m.play); }
       else if (m.type === "roll") {
         log.push(m.entry); if (log.length > 200) log.shift();
         const p = m.req && pending.get(m.req); if (p) { clearTimeout(p.timer); pending.delete(m.req); p.resolve(m.entry); }
         renderLog();
       } else if (m.type === "rerolled") { const x = log.find((l) => l.n === m.n); if (x) x.rerolled = true; renderLog(); }
-      else if (m.type === "players") { players = m.players || []; renderPlayers(); }
+      else if (m.type === "players") { players = m.players || []; renderPlayers(); if (api.onPlayers) api.onPlayers(); }
       else if (m.type === "error") {
         const p = m.req && pending.get(m.req);
         if (p) { clearTimeout(p.timer); pending.delete(m.req); p.reject(new Error(m.error)); }
@@ -9689,6 +9712,33 @@ function mountTable(api) {
       ws.send(JSON.stringify({ type: "roll", req: id, ...req }));
     });
   }
+  // ---- shared characters ----
+  const diff = (key, play) => { const was = lastPlay[key] || {}, d = {};
+    for (const k of Object.keys(play)) if (JSON.stringify(play[k]) !== JSON.stringify(was[k])) d[k] = play[k];
+    return d; };
+  const sendJSON = (o) => { if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); };
+  /** A player's own character: the sheet when it changes (a moment after the last edit), the play state at once. */
+  function shareMine(key, sheet, play) {
+    if (!live || !you || you.role !== "player" || !key) return;
+    const js = JSON.stringify(sheet);
+    if (lastSheet[key] !== js) {
+      clearTimeout(sheetTimer);
+      const first = lastSheet[key] === undefined && !lastPlay[key];
+      sheetTimer = setTimeout(() => { lastSheet[key] = js; sendJSON({ type: "sheet", key, sheet, play: first ? play : undefined }); }, lastSheet[key] === undefined ? 0 : 700);
+      if (first) return; // the first share carries the play state
+    }
+    if (!lastPlay[key]) return;
+    const d = diff(key, play);
+    if (Object.keys(d).length) { lastPlay[key] = { ...lastPlay[key], ...d }; sendJSON({ type: "play", key, play: d }); }
+  }
+  /** The GM's copy of a shared character changed (a card, the encounter panel, the map). */
+  function pushPlay(key, play) {
+    if (!live || !you || you.role !== "gm" || !lastPlay[key]) return;
+    const d = diff(key, play);
+    if (Object.keys(d).length) { lastPlay[key] = { ...lastPlay[key], ...d }; sendJSON({ type: "play", key, play: d }); }
+  }
+  const isHere = (owner) => players.some((p) => p.role === "player" && p.name === owner);
+
   // A different character on the sheet joins under its own name.
   function setCharacter(name) {
     const n = String(name || "").trim();
@@ -9722,7 +9772,7 @@ function mountTable(api) {
     const showServer = otherServer || !api.server || (!!st.server && st.server !== api.server);
     if (api.playRoot) {
       api.playRoot.innerHTML = live ? `<h3>Shared table<\/h3>
-          <p class="small">Connected to <b>${esc(table.name)}<\/b> (code <b class="num">${esc(st.code)}<\/b>)${you.role === "gm" ? " as the GM" : ` as ${esc(character || st.name)}`}. Your rolls are rolled by the table, and everyone sees them.<\/p>
+          <p class="small">Connected to <b>${esc(table.name)}<\/b> (code <b class="num">${esc(st.code)}<\/b>)${you.role === "gm" ? " as the GM" : ` as ${esc(character || st.name)}`}. Your rolls are rolled by the table, and everyone sees them.${you.role === "gm" ? "" : " Your character is shared with the GM: injuries, points, ammo and form stay in step with the GM's card."}<\/p>
           <p class="small muted tbl-players"><\/p><div class="btn-row"><button class="btn" data-tbl="leave">Leave the table<\/button><\/div>${statusP}
           <div class="field"><span class="label">At the table<\/span><ul class="log tbl-log"><\/ul><\/div>`
         : `<h3>Shared table<\/h3><p class="small muted">Join your GM's table to roll where everyone can see it. Without one, the roller works as usual.<\/p>
@@ -9735,7 +9785,7 @@ function mountTable(api) {
       const isGM = live && you && you.role === "gm";
       api.gmRoot.innerHTML = isGM ? `<div class="eyebrow">Shared table<\/div>
           <p><b>${esc(table.name)}<\/b> · code <b class="num" style="font-size:1.25rem;letter-spacing:.12em">${esc(st.code)}<\/b><\/p>
-          <p class="small muted">Players open their character, go to the ${esc(api.playTab || "play")} tab and join with this code, or use the link.<\/p>
+          <p class="small muted">Players open their character, go to the ${esc(api.playTab || "play")} tab and join with this code, or use the link. Their characters appear under Characters below, marked <b>at the table<\/b>, and stay in step both ways: mark a box or a point here or in an encounter and the player's sheet changes too.<\/p>
           <div class="btn-row"><button class="btn" data-tbl="copycode">Copy code<\/button><button class="btn" data-tbl="copylink">Copy link<\/button><button class="btn" data-tbl="leave">Leave<\/button><\/div>
           <p class="small tbl-players"><\/p>${statusP}<ul class="log tbl-log"><\/ul>`
         : `<div class="eyebrow">Shared table<\/div>
@@ -9761,7 +9811,9 @@ function mountTable(api) {
     else if (k === "leave") leave();
     else if (k === "copycode") copy(st.code, "Table code copied.");
     else if (k === "copylink") copy(shareLink(), "Link copied: send it to the players.");
-    else if (k === "showserver") { otherServer = true; render(); }
+    else if (k === "showserver") { // keep what was typed
+      if (val("code")) st.code = val("code").toUpperCase(); if (val("name")) st.name = val("name"); const tn = val("tname");
+      otherServer = true; render(); const t = api.gmRoot && api.gmRoot.querySelector('[data-tbl="tname"]'); if (t && tn) t.value = tn; }
     save();
   }
   function copy(text, done) {
@@ -9775,12 +9827,29 @@ function mountTable(api) {
   character = String(api.character() || "").trim();
   render();
   if (st.joined && st.code && base()) connect(); // back at the table after a reload
-  return { live: () => live, roll, setCharacter };
+  return { live: () => live, roll, setCharacter, shareMine, pushPlay, isHere, role: () => (live && you ? you.role : null) };
 }
 
   // The shared table: players join from their play tab, the GM starts one here, and every roll at the table shows on both.
   sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay,
-    server: TABLE_SERVER, character: () => ch.name, esc, toast });
+    server: TABLE_SERVER, character: () => ch.name, esc, toast,
+    // Phase 2: the player shares their character; the GM's cards follow the table's characters, and both follow each other's changes.
+    onPlayers: () => renderGM(), // who's at the table, on the GM's cards
+    onConnected: (role) => { if (role === "player") sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); renderGM(); },
+    onSheet: (e) => {
+      if (e.key === ch.id && sharedTable.role() === "player") { applyPlay(ch, e.play); store.set(STORE_CURRENT, ch); render(); return; }
+      if (sharedTable.role() !== "gm") return;
+      const i = gmCrew.findIndex((c) => c.tableKey === e.key || c.id === e.key), was = i >= 0 ? gmCrew[i] : null;
+      const c = normalize({ ...JSON.parse(JSON.stringify(e.sheet)), id: was ? was.id : e.key, portrait: was ? was.portrait : e.sheet.portrait, tableKey: e.key, tableOwner: e.owner.name, play: was ? was.play : {} });
+      applyPlay(c, e.play);
+      if (was) gmCrew[i] = c; else gmCrew.push(c);
+      store.set(STORE_GM, gmCrew); renderGM();
+    },
+    onPlay: (key, play) => {
+      if (key === ch.id && sharedTable.role() === "player") { applyPlay(ch, play); store.set(STORE_CURRENT, ch); render(); return; }
+      const c = gmCrew.find((x) => x.tableKey === key); if (!c) return;
+      applyPlay(c, play); store.set(STORE_GM, gmCrew); renderGM();
+    } });
   // The battle map: the GM's characters as tokens (portrait, group color, down or Dying) on a hex map at any scale,
   // or on a range track of bands (a setting's pack can name its own, with ships and a crew track for the ship).
   const RTRACK = PACK.rangeTrack || {};
@@ -9808,7 +9877,10 @@ function mountTable(api) {
       if ("points" in patch) c.play.duty = Math.max(0, patch.points);
       if ("ptrack" in patch && PTRACK) c.play.ptrack = Math.max(0, Math.min(PTRACK.boxes, patch.ptrack));
       saveGM(); renderGM(); } });
-  const saveGM = () => { if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true); };
+  const saveGM = () => {
+    if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true);
+    if (sharedTable) for (const c of gmCrew) if (c.tableKey) sharedTable.pushPlay(c.tableKey, pickPlay(c)); // a change here reaches the player's sheet
+  };
   // Work out a crew member's numbers with the same rules as the sheet, by briefly treating them as the current character.
   function gmCalc(c) {
     const saved = ch; ch = c;
@@ -9972,7 +10044,7 @@ function mountTable(api) {
         : badgeSvg(k.div);
       return `<article class="gm-card hud ${inj >= 3 ? "down" : ""}" data-div="${k.div}">
         <div class="gm-head">${art}<div><b>${esc(c.name || "Unnamed character")}</b>
-          <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span></div></div>
+          <span class="small muted">${esc([c.rank, c.species, c.dept].filter(Boolean).join(" · "))}</span>${c.tableKey ? `<span class="small tbl-badge">${sharedTable && sharedTable.isHere(c.tableOwner) ? "● at the table" : "○ away from the table"}${c.tableOwner ? ` · ${esc(c.tableOwner)}` : ""}</span>` : ""}</div></div>
         ${formOf(c) ? `<div class="gm-form small"><b>${esc(capFirst(inForm(c) ? T.formName : T.formHuman || "human form"))}</b> <button class="linkish" data-gm="${c.id}" data-gmform>change to ${esc(inForm(c) ? (T.formHuman || "human form").toLowerCase() : T.formName)}</button></div>` : ""}
         <div class="gm-stats">${ATTRS.map(([n]) => `<div><span>${n.slice(0, 3)}</span><b${formAttr(n, c) ? ' style="color:var(--accent)"' : ""}>${c.attrs[n] + formAttr(n, c)}</b></div>`).join("")}<div class="dodge"><span>Dodge</span><b>${k.dodge}</b></div><div><span>Move</span><b>${k.move}</b></div></div>
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>

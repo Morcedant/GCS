@@ -5,7 +5,8 @@ A small server that lets a whole table roll together. The GM starts a table from
 - every roll a player makes from their sheet is rolled **by the server**, so everyone sees the same dice and nobody can fudge them;
 - the roll appears at once in a live log on every player's play tab and on the GM view: who rolled, what, the target, the dice, the margin, and any telling hit;
 - a point reroll answers its own roll, once, and the log marks the first roll as rerolled;
-- the GM view lists who is at the table.
+- the GM view lists who is at the table;
+- **shared characters (phase 2):** each player's character appears among the GM view's characters, marked *at the table* (or *away* when they've left), and its injuries, points, ammunition, form and setting track stay in step both ways: a box marked on the player's sheet shows on the GM's card, and one marked on the card or by the encounter panel shows on the sheet. The table keeps its own copy, so a change the GM makes while a player is away reaches them when they rejoin. Character portraits stay in each browser.
 
 Without a table, or if the server can't be reached, the roller works exactly as before and rolls in the page.
 
@@ -62,4 +63,15 @@ Joining checks the game: a Trails table only takes players from the Trails creat
 
 Limits: 20 rolls a minute per connection, the last 200 rolls kept, messages up to 2 KB, names up to 40 characters.
 
-Phase 1 shares rolls. Later phases can share the characters' injuries and points, and then the encounter panel and battle map.
+## Security
+
+A table is meant for a private game among friends, like a video-call link.
+
+- **The code is the door.** Anyone with a table's code (or link) can join it as a player: see the rolls and the shared characters, roll, and share a character. Six characters from 31 give about 887 million codes, so a table can't realistically be stumbled on, but share the code only with your players.
+- **The GM key.** Starting a table gives the GM's browser a private key (24 random bytes); the server keeps only its hash. Only that browser can join as the GM and change other players' characters.
+- **Each player's browser has a private id**, and a shared character belongs to the browser that shared it (the server keeps only a hash). Someone who joins with the same name can't change that character or reroll its rolls.
+- **Everything travels over HTTPS/WSS.** Names, characters and rolls are kept on Cloudflare until the table has gone 30 days unused. Don't put anything private in a character.
+- **Lock it to your site.** Set `ALLOWED_ORIGINS` (above) so only your site's pages can use the server.
+- **Rate limits.** Rolls are limited per connection. To limit starting tables and guessing codes too, add a rate-limiting rule in the Cloudflare dashboard (Security → WAF → Rate limiting rules; the free plan allows one): for example, 20 requests a minute per IP to paths starting with `/api/tables`.
+
+Phase 3 can run the encounter panel and battle map on the table.
