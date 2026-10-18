@@ -395,10 +395,10 @@ Each spell has a short **base effect**: one target, for one scene, at Close or S
 | Spell | Base effect |
 |---|---|
 | Flame | A lash of fire at Short range; marks 2 boxes. Dodge applies. |
-| Force | Unseen force hurls the target down: 1 box, and they lose their next move (Body resists). |
+| Force | Unseen force hurls the target down: 1 box, and they're knocked down as by a telling hit: prone, or driven back a few steps, and standing up uses their next move (Body resists). |
 | Ward | Attacks against one ally are at −2 for the scene. |
 | Fluch | The target is at −2 on all rolls for the scene (Will resists). |
-| Bind | The target is held where they stand for the scene, or until they break free (Body resists). |
+| Bind | The target is held where they stand, as a pin: their next action goes to getting free, and then they're free. Holding them again takes another casting (Body resists). |
 | Snuff | Every lamp in a room goes out, or one gun jams; clearing a jam takes an action. |
 | Unmask | A Wesen in sight rolls Will or woges, there and then. |
 | Stanch | Stop the bleeding: clear one injury box, once per set of injuries. |
@@ -972,7 +972,7 @@ Water-dwelling Wesen from New Zealand: guardians of rivers and the people they c
 - Resists poison: +4 to Body against any poison.
 - Hunger (horror): each season you must eat human flesh; until you do, mark a box that rest can't clear, every three days.
 
-**Woge profile:** Body +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Amphibious: breathes water, swims as fast as a horse runs; Burrows through earth; Dark sight. **Drawbacks:** Must be submerged in water daily, or mark a box that rest can't clear, each hour; Pounamu (greenstone) wounds mark one extra box.
+**Woge profile:** Body +1; Claws mark 2 boxes; Tough: hits of 2+ boxes mark one fewer; Amphibious: breathes water and swims at full Move, fast as a dolphin (water isn't hard going for them; a strong current, a storm or choked water still halves it); Burrows through earth; Dark sight. **Drawbacks:** Must be submerged in water daily, or mark a box that rest can't clear, each hour; Pounamu (greenstone) wounds mark one extra box.
 
 **Suggested skills:** Athletics, Brawling, Survival, Stealth.
 
