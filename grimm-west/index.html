@@ -600,7 +600,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="4089da5" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · 4089da5</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="23f4d40" data-version-date="2026.10.19" title="The code changes whenever this page changes.">Version 2026.10.19 · 23f4d40</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1367,7 +1367,7 @@ tr.lvl-U td.target { color: var(--muted); }
 </tr>
 <tr class="odd">
 <td>Talisman</td>
-<td>A ready charm made for you by a Braucher, a hexenbiest or a root doctor (a Himmelsbrief, a mojo hand, a blessed buckeye), holding a Minor ritual agreed with the GM; break it to release it. Renewed between cases; doesn’t count against a charm limit</td>
+<td>A ready charm made for you by a Braucher, a hexenbiest or a root doctor (a Himmelsbrief, a mojo hand, a blessed buckeye), holding a Minor ritual agreed with the GM; break it to release it. Doesn’t count against a charm limit. Once broken, renewed only between cases, by going back to its maker or another of the same tradition</td>
 <td>1</td>
 </tr>
 </tbody>
@@ -4652,7 +4652,7 @@ tr.lvl-U td.target { color: var(--muted); }
     ["gear", "A fine weapon or tool", "An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one narrowly defined use of a named skill, agreed with the GM. Not with an advantage on the same roll; never to Dodge, Parry or Block.", 1],
     ["extradefense", "Additional Defense", "A second defense each round at −2 (Dodge, Parry or Block, in any mix), on top of attack-quality and injury penalties. Never twice against the same attack.", 1],
     ["survivor", "Hard to put down", "Once per fight, shrug off a telling hit's effect. You still take its boxes.", 1],
-    ["talisman", "Talisman", "A ready charm from the folk traditions, made for you by a Braucher, a hexenbiest or a root doctor: a Himmelsbrief sewn in your coat, a mojo hand, a blessed buckeye. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one; it's renewed between cases and doesn't count against a charm limit.", 1],
+    ["talisman", "Talisman", "A ready charm from the folk traditions, made for you by a Braucher, a hexenbiest or a root doctor: a Himmelsbrief sewn in your coat, a mojo hand, a blessed buckeye. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one, and it doesn't count against a charm limit. Once broken, it's renewed only between cases, and only by going back to its maker or another of the same tradition; until then it stays spent.", 1],
   ];
   const SET_ALLEGIANCES = [
     ["church", "The Church", "Once per case, shelter, records or a favor from the clergy.", "Duty: the Church gives you orders. Sicarii discipline ties you to the Order of the Holy Knife."],
@@ -5424,7 +5424,7 @@ tr.lvl-U td.target { color: var(--muted); }
         ${ed.length ? `<div class="field"><span class="label">Edges</span><span>${esc(ed.join(", "))}</span></div>` : ""}
         ${a2 && edgeN("adv2") ? `<div class="field"><span class="label">Second advantage</span><b>${esc(a2[1])}${ch.adv2.detail ? ": " + esc(ch.adv2.detail) : ""}</b><span class="small muted">${esc(a2[2])}</span></div>` : ""}
         ${edgeN("contact") && ch.contact ? `<div class="field"><span class="label">Friend in town</span><span>${esc(ch.contact)}</span></div>` : ""}
-        ${edgeN("talisman") && ch.talisman ? `<div class="field"><span class="label">Talisman (renewed each case)</span><span>${esc(ch.talisman)}</span></div>` : ""}
+        ${edgeN("talisman") && ch.talisman ? `<div class="field"><span class="label">Talisman (renewed between cases, from its maker)</span><span>${esc(ch.talisman)}</span></div>` : ""}
         ${edgeN("gear") && ch.gear.item ? `<div class="field"><span class="label">Fine weapon or tool</span><span>${esc(ch.gear.item)}${ch.gear.skill ? ` (+2 to ${esc(ch.gear.skill)}${ch.gear.use ? ` for ${esc(ch.gear.use)}` : ""})` : ""}</span></div>` : ""}
         ${al ? `<div class="field"><span class="label">Allegiance: ${esc(al[1])}</span><span class="small">${esc(al[2])}</span><span class="small muted">${esc(al[3])}</span></div>` : ""}
       </div>`; })()}
