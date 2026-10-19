@@ -9,7 +9,9 @@ links to beside it, so nothing points at claude.ai:
   /<game>/                          each game's page
   /<game>/create/                   that game's character creator
   /<game>/<Players_Guide>.docx      its Players' Guide in Word (and its GM's Guide, where it has one)
+  /start/                           Start here: choose a setting, create a character, play
   /core-rules/                      the core rules (and the .docx)
+  /changelog/                       rules changes and website updates (from rules-version.json)
   /discord/                         the Discord bot's commands for every setting
   /discord/<game>/                  each game's printable handout, with the bot's setup and code
 
@@ -34,7 +36,7 @@ GAMES, SLUGS = bw.GAMES, bw.SLUGS
 # The creators live on the site now.
 bw.CREATORS = {g: f"{SLUGS[g]}/create/" for g in GAMES}
 
-NAV = [("/", "Home"), (bw.WHY_SLUG, "About")] + [(SLUGS[g], bw.pack(g)["terms"]["title"]) for g in GAMES] + [(bw.CORE_SLUG, "Core rules"), (bw.DISCORD_SLUG, "Discord")]
+NAV = [("/", "Home"), (bw.START_SLUG, "Start here"), (bw.WHY_SLUG, "About")] + [(SLUGS[g], bw.pack(g)["terms"]["title"]) for g in GAMES] + [(bw.CORE_SLUG, "Core rules"), (bw.TABLE_SLUG, "Shared table"), (bw.DISCORD_SLUG, "Discord"), (bw.CONTACT_SLUG, "Contact")]
 
 FRAME_CSS = """
 /* ---------- 5. Site frame (Cloudflare Pages build; Squarespace supplies its own) ---------- */
@@ -101,7 +103,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None):
 {sections}
 </main>
 <footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. This RPG is released under the <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener" target="_blank">Creative Commons Attribution 4.0 International License</a>. You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.</span>
-<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.DISCORD_SLUG}">Discord bot</a></div></footer>
+<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>
 </body>
 </html>
 """
@@ -156,18 +158,30 @@ def main():
     core_docx = LD / "Legend_Dynamics_Core_Rules.docx"
     copy(core_docx, f"core-rules/{core_docx.name}")
     write("core-rules/index.html", page(bw.CORE_SLUG, "Core rules · Legend Dynamics", "The Legend Dynamics core rules, shared by every setting.",
-                                        [downloads([(f"{bw.CORE_SLUG}/{core_docx.name}", "Core rules (Word)")])] + blocks(bw.core_rules()),
+                                        [downloads([(f"{bw.CORE_SLUG}/{core_docx.name}", "Core rules (Word)")])] + [b for b in blocks(bw.core_rules()) if "rel=\"license" not in b],
                                         fonts=font_links({bw.BRAND_FONTS})))
 
     write(bw.WHY_SLUG.strip("/") + "/index.html", page(bw.WHY_SLUG, "Why Legend Dynamics · Legend Dynamics", "Why the Legend Dynamics roleplaying game system was made: the 3d6 bell curve married to Fate's narrative heart.",
                                                      blocks(bw.why_page()), fonts=font_links({bw.BRAND_FONTS})))
 
+    write(bw.TABLE_SLUG.strip("/") + "/index.html", page(bw.TABLE_SLUG, "The shared table · Legend Dynamics", "Play Legend Dynamics online with the shared table, and host your own table server on Cloudflare.",
+                                                       blocks(bw.table_page()), fonts=font_links({bw.BRAND_FONTS})))
+
+    write(bw.CONTACT_SLUG.strip("/") + "/index.html", page(bw.CONTACT_SLUG, "Contact · Legend Dynamics", "Comments, questions and stories for the maker of the Legend Dynamics roleplaying games.",
+                                                         blocks(bw.contact_page()), fonts=font_links({bw.BRAND_FONTS})))
+
+    write(bw.START_SLUG.strip("/") + "/index.html", page(bw.START_SLUG, "Start here · Legend Dynamics", "New to Legend Dynamics? Choose a setting, create a character, and join or run a game.",
+                                                       blocks(bw.start_page()), fonts=font_links({bw.BRAND_FONTS})))
+
+    write(bw.CHANGELOG_SLUG.strip("/") + "/index.html", page(bw.CHANGELOG_SLUG, "Changelog · Legend Dynamics", "Changes to the Legend Dynamics rules and website.",
+                                                           blocks(bw.changelog_page()), fonts=font_links({bw.BRAND_FONTS})))
+
     d = blocks(bw.discord_page())
     rows = "".join(f'<li><a class="ld-button ld-button--ghost" href="{bw.DISCORD_SLUG}/{SLUGS[g].strip("/")}/">{e(bw.pack(g)["terms"]["title"])}</a></li>' for g in GAMES)
     d.append(f"""<div class="ld">
   <div class="ld-eyebrow">For the GM</div>
-  <h2 style="margin:.2rem 0 .8rem">Run the bot for your group</h2>
-  <p style="max-width:40rem">Each setting has a one-page handout for your table, with the steps to set the bot up (about 15 minutes, free) and the bot's code to copy.</p>
+  <h2 style="margin:.2rem 0 .8rem">Handouts and the bot code</h2>
+  <p style="max-width:40rem">Each setting has a one-page handout for your table: its commands, the setup steps above, the <b>bot code</b> to copy (the same for every game) and what to check if it isn't working.</p>
   <ul class="ld-downloads">{rows}</ul>
 </div>""")
     for g in GAMES:

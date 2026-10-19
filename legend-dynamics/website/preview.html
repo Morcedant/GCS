@@ -301,6 +301,16 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 .ld-why .ld-why-sign { font-family: var(--ld-display); font-style: italic; color: var(--ld-ink-2); margin-top: 1.8rem; }
 .ld-why .ld-why-sign::before { content: "— "; }
 
+/* ---------- Contact form ---------- */
+.ld-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem 1.25rem; max-width: 46rem; }
+.ld-form label { display: grid; gap: .35rem; font: 600 .76rem/1.2 var(--ld-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ld-ink-2); }
+.ld-form input, .ld-form select, .ld-form textarea { font: 400 1rem/1.4 var(--ld-body); color: var(--ld-ink); background: var(--ld-panel, var(--ld-bg)); border: 1px solid var(--ld-line); border-radius: var(--ld-radius, 6px); padding: .6rem .7rem; width: 100%; box-sizing: border-box; letter-spacing: normal; text-transform: none; }
+.ld-form textarea { resize: vertical; min-height: 9rem; }
+.ld-form input:focus, .ld-form select:focus, .ld-form textarea:focus { outline: 2px solid var(--ld-accent); outline-offset: 1px; }
+.ld-form .ld-wide { grid-column: 1 / -1; }
+.ld-form .ld-actions { margin: 0; }
+.ld-form .ld-note { font-size: .9rem; color: var(--ld-ink-2); margin: 0; }
+
 /* preview only: a stand-in for Squarespace's page frame */
 body { margin: 0; }
 .pv-bar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 16px; background: var(--ld-header-bg); }
@@ -311,17 +321,20 @@ body { margin: 0; }
 .page-section .section-background { position: absolute; inset: 0; z-index: -1; }
 .content { max-width: 72rem; margin: 0 auto; padding: 0 16px 4rem; display: grid; gap: 3rem; }
 </style></head>
-<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Trails of Blood &amp; Dust</button><button data-p="spaceopera" data-c="ld-spaceopera">Fracture Lines</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="aurora" data-c="ld-aurora">Aurora</button><button data-p="rules" data-c="">Core rules</button><button data-p="discord" data-c="">Discord</button><button data-p="why" data-c="">Why Legend Dynamics</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<body><div class="pv-bar"><b>Legend Dynamics</b><button data-p="home" data-c="">Home</button><button data-p="western" data-c="ld-western">Trails of Blood &amp; Dust</button><button data-p="spaceopera" data-c="ld-spaceopera">Fracture Lines</button><button data-p="fantasy" data-c="ld-fantasy">The Shattered Crown</button><button data-p="aurora" data-c="ld-aurora">Aurora</button><button data-p="rules" data-c="">Core rules</button><button data-p="discord" data-c="">Discord</button><button data-p="why" data-c="">Why Legend Dynamics</button><button data-p="table" data-c="">Shared table</button><button data-p="contact" data-c="">Contact</button><button data-p="start" data-c="">Start here</button><button data-p="changelog" data-c="">Changelog</button></div><main class="pv" id="pv-home" hidden><section class="page-section"><div class="section-background"></div><div class="content">
 <div class="ld ld-hero">
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Heroes are made of skill, nerve and a little luck.</h1>
   <hr class="ld-rule">
   <p class="ld-lede">A tabletop roleplaying system built on three six-sided dice and concrete skills. One core, many worlds: Gothic Westerns, starships, swords against sorcery, and superheroes under the law.</p>
   <div class="ld-actions">
-    <a class="ld-button" href="#games">Choose a game</a>
+    <a class="ld-button" href="/start">Start here</a>
+    <a class="ld-button ld-button--ghost" href="#games">Choose a game</a>
     <a class="ld-button ld-button--ghost" href="/core-rules">Read the core rules</a>
+    <a class="ld-button ld-button--ghost" href="#online">Play online</a>
     <a class="ld-button ld-button--ghost" href="/why-legend-dynamics">Why I made it</a>
   </div>
+  <p style="font-size:.92rem;color:var(--ld-ink-2);max-width:40rem;margin:1.4rem 0 0">Legend Dynamics RPG is a living game system. The rules and online tools are available now and continue to evolve through playtesting and player feedback. <a href="/contact">Tell me how your game went</a>.</p>
 </div>
 
 <ul class="ld ld-pillars">
@@ -337,30 +350,44 @@ body { margin: 0; }
     <div class="ld-eyebrow">Gothic Western</div>
     <h3>Trails of Blood &amp; Dust</h3>
     <p>The railroad is coming, and it is bringing more than settlers. In the fog-bound timber towns and lamplit mining camps, the old things of the world have followed the wagons west: wolves that walk as men, the dead that will not stay buried, pale strangers who only come out after dark, and witches who know their names. <i>Trails of Blood &amp; Dust</i> is a Gothic Western for the Legend Dynamics RPG system. Most people never see the darkness. You do, and you stand between it and them.</p>
-    <div class="ld-game-meta"><span class="ld-tag">16 callings</span><span class="ld-tag">13 origins</span><span class="ld-tag">Grit points</span></div>
+    <div class="ld-game-meta"><span class="ld-tag">16 roles</span><span class="ld-tag">13 origins</span><span class="ld-tag">Grit points</span></div>
     <div class="ld-go">Enter →</div>
   </a>
   <a class="ld-game ld-game--spaceopera" href="/fracture-lines">
     <div class="ld-eyebrow">Science fiction</div>
     <h3>Fracture Lines</h3>
     <p>The inhabited regions of the Orion Spur and the Sagittarius Arm are home to civilizations separated by thousands of years of technological development, radically different biological origins, and competing ideas about government, freedom, commerce and survival. Ancient empires are collapsing, but their armies remain dangerous. Commercial powers grow more influential every year. Entire worlds wait behind collapsed corridors to be rediscovered.</p>
-    <div class="ld-game-meta"><span class="ld-tag">26 callings</span><span class="ld-tag">25 species</span><span class="ld-tag">Resolve points</span></div>
+    <div class="ld-game-meta"><span class="ld-tag">26 roles</span><span class="ld-tag">25 species</span><span class="ld-tag">Resolve points</span></div>
     <div class="ld-go">Enter →</div>
   </a>
   <a class="ld-game ld-game--fantasy" href="/the-shattered-crown">
     <div class="ld-eyebrow">Sword and sorcery</div>
     <h3>The Shattered Crown</h3>
     <p>A thousand years ago the <b>Crown of Aeon</b> bound a sorcerer-empire together. When the last emperor died, the Crown shattered into nine shards, and the empire with it. Each shard gives power to whoever holds it, and each slowly devours them. Now warlords, sorcerer-princes and merchant-kings fight over the empire's corpse, and the old things beneath its cities are waking.</p>
-    <div class="ld-game-meta"><span class="ld-tag">12 callings</span><span class="ld-tag">12 ancestries</span><span class="ld-tag">Fortune points</span></div>
+    <div class="ld-game-meta"><span class="ld-tag">12 roles</span><span class="ld-tag">12 ancestries</span><span class="ld-tag">Fortune points</span></div>
     <div class="ld-go">Enter →</div>
   </a>
   <a class="ld-game ld-game--aurora" href="/aurora">
     <div class="ld-eyebrow">Superheroes</div>
     <h3>Aurora</h3>
     <p>In April 1938 the sky burned green for four weeks. The auroras killed five million people and left behind the first <b>Operants</b>: men and women with powers no science could explain. For decades the world pretended they were myths. Then, in 1952, a battle at Fort Knox made pretending impossible, and the law has been trying to catch up ever since, through the <b>Extraordinary Law Enforcement Agency (ExLAW)</b>.</p>
-    <div class="ld-game-meta"><span class="ld-tag">23 callings</span><span class="ld-tag">9 origins</span><span class="ld-tag">Spark points</span></div>
+    <div class="ld-game-meta"><span class="ld-tag">23 roles</span><span class="ld-tag">9 origins</span><span class="ld-tag">Spark points</span></div>
     <div class="ld-go">Enter →</div>
   </a>
+  </div>
+</div>
+
+<div class="ld" id="online">
+  <div class="ld-eyebrow">Play online</div>
+  <p class="ld-lede" style="margin:0 0 1.2rem">Create characters, share dice rolls, and play together on a shared map.</p>
+  <ul class="ld-pillars">
+    <li><b>The shared table</b><span>Built into every character creator. The GM starts a table and sends the players a code; each joins from their character sheet. Everyone sees the same dice, characters and battle map on their own phone, tablet or computer. Nothing to install.</span></li>
+    <li><b>Screen share and the Discord dice bot</b><span>Or the GM shares their screen in a Discord call (or any video call), and players roll with the Legend Dynamics dice bot in the channel.</span></li>
+  </ul>
+  <div class="ld-actions" style="margin-top:1.2rem">
+    <a class="ld-button ld-button--ghost" href="/shared-table">Run a game on the shared table</a>
+    <a class="ld-button ld-button--ghost" href="/discord#session">Run a game over Discord</a>
+    <a class="ld-button ld-button--ghost" href="/discord#load">Add the dice bot to Discord</a>
   </div>
 </div>
 
@@ -380,6 +407,11 @@ body { margin: 0; }
   </div>
 </div>
 
+<div class="ld ld-callout">
+  <b>Get in touch</b>
+  <p>Comments, questions or a story from your table? Write to <a href="mailto:contact@legenddynamicsrpg.com">contact@legenddynamicsrpg.com</a>, or use the <a href="/contact">contact page</a>.</p>
+</div>
+
 <p class="ld" style="font-size:.9rem;color:var(--ld-ink-2)">Legend Dynamics RPG system, created by Don Smallwood. This RPG is released under the <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener" target="_blank">Creative Commons Attribution 4.0 International License</a>. You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.</p>
 </div></section></main><main class="pv" id="pv-western" hidden><section class="page-section"><div class="section-background"></div><div class="content">
 <div class="ld ld-hero">
@@ -396,7 +428,7 @@ body { margin: 0; }
 
 <dl class="ld ld-facts">
   <div><dt>Genre</dt><dd>Gothic Western</dd></div>
-  <div><dt>Callings</dt><dd>16, in 3 groups</dd></div>
+  <div><dt>Roles</dt><dd>16, in 3 groups</dd></div>
   <div><dt>Origins</dt><dd>13 to choose from</dd></div>
   <div><dt>Points</dt><dd>Grit</dd></div>
   <div><dt>Shared tracks</dt><dd>Heat, Whispers, The Dark</dd></div>
@@ -405,16 +437,17 @@ body { margin: 0; }
 <div class="ld">
   <div class="ld-eyebrow">Who you can play</div>
   <ul class="ld-pillars"><li><b>The Law</b><span>Lawman, Bounty Hunter, Lawyer, Circuit Judge, Politician</span></li><li><b>The Learned</b><span>Doctor, Occultist, Journalist, Preacher</span></li><li><b>The Frontier</b><span>Monster Hunter, Gunslinger, Scout, Gambler, Wrangler, Undertaker, Shotgun Messenger</span></li></ul>
-  <p style="margin-top:1.4rem"><b>Origins:</b> Frontier-born, City-bred, War Veteran, Drifter, Immigrant, Old Money, Railroad Hand, Sighted, Werewolf, Dhampir, Revenant, Practitioner, Pact-Bound. Or build your own calling or origin with the GM: the Players' Guide shows how.</p>
+  <p style="margin-top:1.4rem"><b>Origins:</b> Frontier-born, City-bred, War Veteran, Drifter, Immigrant, Old Money, Railroad Hand, Sighted, Werewolf, Dhampir, Revenant, Practitioner, Pact-Bound. Or build your own role or origin with the GM: the Players' Guide shows how.</p>
 </div>
 
 <div class="ld">
   <div class="ld-eyebrow">Start playing</div>
   <ol class="ld-steps">
     <li><b>Open the creator.</b> It walks you through five steps and checks every rule as you go. Or load one of the ready-made characters.</li>
-    <li><b>Choose a calling and origin.</b> Your calling's core skills are marked for you; your origin sets your attributes and Edges.</li>
+    <li><b>Choose a role and origin.</b> Your role's core skills are marked for you; your origin sets your attributes and Edges.</li>
     <li><b>Save your character file.</b> Bring it to the table, print the sheet, or keep it in the browser.</li>
     <li><b>Read the Players' Guide.</b> It's in the creator's guide tab: the full rules, the setting and its dangers.</li>
+    <li><b>Playing online?</b> Join your GM's <b>shared table</b> from your character's Ride tab, or roll with the <a href="/discord">Discord dice bot</a> while the GM shares their screen.</li>
   </ol>
 </div>
 </div></section></main><main class="pv" id="pv-spaceopera" hidden><section class="page-section"><div class="section-background"></div><div class="content">
@@ -432,7 +465,7 @@ body { margin: 0; }
 
 <dl class="ld ld-facts">
   <div><dt>Genre</dt><dd>Science fiction</dd></div>
-  <div><dt>Callings</dt><dd>26, in 5 groups</dd></div>
+  <div><dt>Roles</dt><dd>26, in 5 groups</dd></div>
   <div><dt>Species</dt><dd>25 to choose from</dd></div>
   <div><dt>Points</dt><dd>Resolve</dd></div>
   <div><dt>Shared tracks</dt><dd>Debt, Heat, Reputation, Hull</dd></div>
@@ -441,16 +474,17 @@ body { margin: 0; }
 <div class="ld">
   <div class="ld-eyebrow">Who you can play</div>
   <ul class="ld-pillars"><li><b>Commerce</b><span>Trader, Broker, Corporate Agent, Smuggler</span></li><li><b>Frontier</b><span>Explorer, Prospector, Salvager, AI Minder, Scientist</span></li><li><b>Ship Crew</b><span>Captain, Pilot, Gunner, Navigator, Engineer, Medtech, Crew</span></li><li><b>Service</b><span>Medic, Liaison, Missionary, Journalist, Cyberneticist</span></li><li><b>Trouble</b><span>Mercenary, Investigator, Fixer, Hacker, Augment</span></li></ul>
-  <p style="margin-top:1.4rem"><b>Species:</b> Human, Vesh, Tessan, Kel, Mirrun, Ylith, Shivar, Brulvek, Zhaq, Veyari, Vael, Thrum, Corvani, Uxarra, Joruun, Ommek, Uth, Draelin, Zethri, Ozhvek, Dresh, Eshuum, Khaum, Sen, Qor. Or build your own calling or species with the GM: the Players' Guide shows how.</p>
+  <p style="margin-top:1.4rem"><b>Species:</b> Human, Vesh, Tessan, Kel, Mirrun, Ylith, Shivar, Brulvek, Zhaq, Veyari, Vael, Thrum, Corvani, Uxarra, Joruun, Ommek, Uth, Draelin, Zethri, Ozhvek, Dresh, Eshuum, Khaum, Sen, Qor. Or build your own role or species with the GM: the Players' Guide shows how.</p>
 </div>
 
 <div class="ld">
   <div class="ld-eyebrow">Start playing</div>
   <ol class="ld-steps">
     <li><b>Open the creator.</b> It walks you through five steps and checks every rule as you go. Or load one of the ready-made characters.</li>
-    <li><b>Choose a calling and species.</b> Your calling's core skills are marked for you; your species sets your attributes and Edges.</li>
+    <li><b>Choose a role and species.</b> Your role's core skills are marked for you; your species sets your attributes and Edges.</li>
     <li><b>Save your character file.</b> Bring it to the table, print the sheet, or keep it in the browser.</li>
     <li><b>Read the Players' Guide.</b> It's in the creator's guide tab: the full rules, the setting and its dangers.</li>
+    <li><b>Playing online?</b> Join your GM's <b>shared table</b> from your character's Play tab, or roll with the <a href="/discord">Discord dice bot</a> while the GM shares their screen.</li>
   </ol>
 </div>
 </div></section></main><main class="pv" id="pv-fantasy" hidden><section class="page-section"><div class="section-background"></div><div class="content">
@@ -468,7 +502,7 @@ body { margin: 0; }
 
 <dl class="ld ld-facts">
   <div><dt>Genre</dt><dd>Sword and sorcery</dd></div>
-  <div><dt>Callings</dt><dd>12, in 3 groups</dd></div>
+  <div><dt>Roles</dt><dd>12, in 3 groups</dd></div>
   <div><dt>Ancestries</dt><dd>12 to choose from</dd></div>
   <div><dt>Points</dt><dd>Fortune</dd></div>
   <div><dt>Shared tracks</dt><dd>Infamy, Doom, Debt, Hunger</dd></div>
@@ -477,16 +511,17 @@ body { margin: 0; }
 <div class="ld">
   <div class="ld-eyebrow">Who you can play</div>
   <ul class="ld-pillars"><li><b>Steel</b><span>Barbarian, Sellsword, Duelist, Corsair</span></li><li><b>Shadow</b><span>Thief, Assassin, Outrider, Charlatan</span></li><li><b>Lore</b><span>Sorcerer, Witch, Priest, Alchemist</span></li></ul>
-  <p style="margin-top:1.4rem"><b>Ancestries:</b> Northlander, Crownlander, Sand-born, Islander, Ashborn, Deepkin, Witch-blooded, Giant-blooded, Serpent-kin, Demon-marked, Skinchanger, Godblooded. Or build your own calling or ancestry with the GM: the Players' Guide shows how.</p>
+  <p style="margin-top:1.4rem"><b>Ancestries:</b> Northlander, Crownlander, Sand-born, Islander, Ashborn, Deepkin, Witch-blooded, Giant-blooded, Serpent-kin, Demon-marked, Skinchanger, Godblooded. Or build your own role or ancestry with the GM: the Players' Guide shows how.</p>
 </div>
 
 <div class="ld">
   <div class="ld-eyebrow">Start playing</div>
   <ol class="ld-steps">
     <li><b>Open the creator.</b> It walks you through five steps and checks every rule as you go. Or load one of the ready-made characters.</li>
-    <li><b>Choose a calling and ancestry.</b> Your calling's core skills are marked for you; your ancestry sets your attributes and Edges.</li>
+    <li><b>Choose a role and ancestry.</b> Your role's core skills are marked for you; your ancestry sets your attributes and Edges.</li>
     <li><b>Save your character file.</b> Bring it to the table, print the sheet, or keep it in the browser.</li>
     <li><b>Read the Players' Guide.</b> It's in the creator's guide tab: the full rules, the setting and its dangers.</li>
+    <li><b>Playing online?</b> Join your GM's <b>shared table</b> from your character's Adventure tab, or roll with the <a href="/discord">Discord dice bot</a> while the GM shares their screen.</li>
   </ol>
 </div>
 </div></section></main><main class="pv" id="pv-aurora" hidden><section class="page-section"><div class="section-background"></div><div class="content">
@@ -504,7 +539,7 @@ body { margin: 0; }
 
 <dl class="ld ld-facts">
   <div><dt>Genre</dt><dd>Superheroes</dd></div>
-  <div><dt>Callings</dt><dd>23, in 5 groups</dd></div>
+  <div><dt>Roles</dt><dd>23, in 5 groups</dd></div>
   <div><dt>Origins</dt><dd>9 to choose from</dd></div>
   <div><dt>Points</dt><dd>Spark</dd></div>
   <div><dt>Shared tracks</dt><dd>Collateral, Scrutiny, Backlash</dd></div>
@@ -513,20 +548,23 @@ body { margin: 0; }
 <div class="ld">
   <div class="ld-eyebrow">Who you can play</div>
   <ul class="ld-pillars"><li><b>The Badge</b><span>ExLAW Agent, Officer, Aegis Pilot, International Operative</span></li><li><b>The Masks</b><span>Vigilante, Public Hero, Guardian, Crusader, Avenger</span></li><li><b>The Learned</b><span>Scientist, Occultist, Doctor, Relic Hunter, Journalist</span></li><li><b>The Fringe</b><span>Mercenary, Fugitive, Activist</span></li><li><b>The Underworld</b><span>Thief, Con Artist, Enforcer, Smuggler, Hacker, Fixer</span></li></ul>
-  <p style="margin-top:1.4rem"><b>Origins:</b> Non-Operant, Adept, Aurora-born, Lab-made, Bonded, Otherworlder, Touched, Ambrosia, Mythic. Or build your own calling or origin with the GM: the Players' Guide shows how.</p>
+  <p style="margin-top:1.4rem"><b>Origins:</b> Non-Operant, Adept, Aurora-born, Lab-made, Bonded, Otherworlder, Touched, Ambrosia, Mythic. Or build your own role or origin with the GM: the Players' Guide shows how.</p>
 </div>
 
 <div class="ld">
   <div class="ld-eyebrow">Start playing</div>
   <ol class="ld-steps">
     <li><b>Open the creator.</b> It walks you through five steps and checks every rule as you go. Or load one of the ready-made characters.</li>
-    <li><b>Choose a calling and origin.</b> Your calling's core skills are marked for you; your origin sets your attributes and Edges.</li>
+    <li><b>Choose a role and origin.</b> Your role's core skills are marked for you; your origin sets your attributes and Edges.</li>
     <li><b>Save your character file.</b> Bring it to the table, print the sheet, or keep it in the browser.</li>
     <li><b>Read the Players' Guide.</b> It's in the creator's guide tab: the full rules, the setting and its dangers.</li>
+    <li><b>Playing online?</b> Join your GM's <b>shared table</b> from your character's Play tab, or roll with the <a href="/discord">Discord dice bot</a> while the GM shares their screen.</li>
   </ol>
 </div>
-</div></section></main><main class="pv" id="pv-rules" hidden><section class="page-section"><div class="section-background"></div><div class="content"><div class="ld ld-rules">
+</div></section></main><main class="pv" id="pv-rules" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<div class="ld ld-rules">
 <div class="ld-eyebrow">Legend Dynamics RPG system</div>
+<p style="font-size:.92rem;color:var(--ld-ink-2)">New to Legend Dynamics? <a href="/start">Start here</a>: you can make a character without reading these rules first. · Rules last updated 18 October 2026 · <a href="/changelog">Changelog</a></p>
 <nav class="ld-toc"><a href="#ld-create-your-character">Create your character</a><a href="#ld-skills-and-gear">Skills and gear</a><a href="#ld-actions-and-teamwork">Actions and teamwork</a><a href="#ld-personal-combat">Personal combat</a><a href="#ld-medical-care">Medical care</a><a href="#ld-magic">Magic</a><a href="#ld-legend-points-and-tracks">Legend points and tracks</a><a href="#ld-running-missions">Running missions</a><a href="#ld-ready-made-characters">Ready-made characters</a><a href="#ld-advantages">Advantages</a><a href="#ld-origins">Origins</a><a href="#ld-making-your-own">Making your own</a><a href="#ld-complications">Complications</a><a href="#ld-quick-reference">Quick reference</a></nav>
 <p>Legend Dynamics is a roleplaying system for heroic stories in any
 genre: concrete skills, a 3d6 roll-under core, and a small pool of
@@ -1893,7 +1931,7 @@ to match</td>
 move the attribute’s base (+1 starts it at 11) and raise its starting
 maximum (13 plus the bonus). Most origins change two to four
 attributes.</p>
-<p>A origin that is plainly faster or slower on its feet than a human
+<p>An origin that is plainly faster or slower on its feet than a human
 (long-legged, heavy, built for another gravity) may also take a
 <strong>speed adjustment</strong> of +1 or −1 to Move. Most have none.
 It isn’t an attribute adjustment and needn’t balance.</p>
@@ -1990,14 +2028,10 @@ time. Rest clears a box in a day at 1 box, three days at 2, a week at 3
 <p><strong>Legend:</strong> start each session with two. Reroll, reduce
 an injury by one box, shrug off a telling hit, or establish a small
 preparation. Earn one from an accepted complication.</p>
-<p><em>Legend Dynamics RPG system, created by Don Smallwood.</em> This
-RPG is released under the <a
-href="https://creativecommons.org/licenses/by/4.0/">Creative Commons
-Attribution 4.0 International License</a>. You may share, adapt, and use
-it for any purpose, including commercially, as long as you give
-appropriate credit to the author.</p>
 
 </div>
+
+<p class="ld" style="font-size:.9rem;color:var(--ld-ink-2)">Legend Dynamics RPG system, created by Don Smallwood. This RPG is released under the <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener" target="_blank">Creative Commons Attribution 4.0 International License</a>. You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.</p>
 </div></section></main><main class="pv" id="pv-discord" hidden><section class="page-section"><div class="section-background"></div><div class="content">
 <div class="ld ld-hero">
   <div class="ld-eyebrow">Legend Dynamics · Every setting</div>
@@ -2005,6 +2039,37 @@ appropriate credit to the author.</p>
   <hr class="ld-rule">
   <p class="ld-lede">One dice bot runs every Legend Dynamics setting. It rolls 3d6 under your target and keeps your table's points, clocks and tracks.
   The commands are the same everywhere; only a few names change with the setting.</p>
+  <div class="ld-actions">
+    <a class="ld-button" href="#load">Load the bot on your server</a>
+    <a class="ld-button ld-button--ghost" href="#session">Run a game over Discord</a>
+  </div>
+</div>
+
+<div class="ld" id="load">
+  <div class="ld-eyebrow">Load the bot on your Discord server</div>
+  <p><b>The quick way: use a bot that's already running.</b> If someone in your group (or the game's maker) already runs the Legend Dynamics bot, ask them for its <b>install link</b>. Open it, pick your Discord server and press <b>Authorize</b>: you need the <b>Manage Server</b> permission on that server. Then run <code>/game set</code> to choose your setting. That's all; skip to <a href="#session">running a game</a>.</p>
+  <p><b>Or run your own bot</b> (for the GM, once per group: about 15 minutes, free, no installs; it works from an iPad's browser). The bot runs on Cloudflare Workers, so there's no computer to keep switched on.</p>
+  <ol class="ld-steps">
+    <li><b>Create the Discord application.</b> At <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">discord.com/developers/applications</a>, choose <b>New Application</b> and name it (e.g. <i>Legend Dice</i>). On <b>General Information</b>, copy the <b>Application ID</b> and <b>Public Key</b>. On <b>Bot</b>, press <b>Reset Token</b> and copy the token; keep it private, as you need it only once.</li>
+    <li><b>Create the Worker.</b> At <a href="https://dash.cloudflare.com" target="_blank" rel="noopener">dash.cloudflare.com</a> (free; no card), open <b>Workers &amp; Pages → Create</b>, choose <b>Start with Hello World!</b>, name it <code>legend-dice</code> and <b>Deploy</b>. Then press <b>Edit code</b>, replace everything in the file with the <b>bot code</b> (open any game's handout below and press <b>Copy bot code</b>: it's the same for every game) and <b>Deploy</b> again.</li>
+    <li><b>Add its settings.</b> In the Worker's <b>Settings → Variables and Secrets</b>, add <code>DISCORD_PUBLIC_KEY</code> (the Public Key), <code>DISCORD_APPLICATION_ID</code> (the Application ID) and <code>DISCORD_BOT_TOKEN</code> (the token, as a <b>Secret</b>). Optionally add <code>DEFAULT_GAME</code>: <code>western</code>, <code>spaceopera</code>, <code>fantasy</code>, <code>aurora</code>, <code>grimm</code> or <code>pelion</code>.</li>
+    <li><b>Give it storage</b> (needed for points, clocks, tracks and <code>/game set</code>). Open <b>Storage &amp; databases → Workers KV → Create</b> and name it <code>legend-store</code>. In the Worker's <b>Settings → Bindings → Add → KV namespace</b>, set the variable name to <code>STORE</code> and pick <code>legend-store</code>.</li>
+    <li><b>Connect it to Discord.</b> Copy the Worker's address (like <code>https://legend-dice.yourname.workers.dev</code>) into the Discord app's <b>Interactions Endpoint URL</b> on <b>General Information</b> and save: if it saves, the connection works. Then open the same address with <code>/register</code> on the end in your browser; it lists the commands it registered. Delete <code>DISCORD_BOT_TOKEN</code> from the Worker afterwards.</li>
+    <li><b>Invite it to your server.</b> On the Discord app's <b>Installation</b> page, make sure <b>Guild Install</b> includes the <code>applications.commands</code> scope, open the install link and pick your server. Share that same link with other GMs who want to use your bot.</li>
+    <li><b>Choose the game.</b> In your server, run <code>/game set</code>. New commands can take a minute to appear (press Ctrl+R, or Cmd+R on a Mac, to refresh Discord).</li>
+  </ol>
+  <p style="margin-top:1rem">Each game's handout (below, under <i>For the GM</i>) has the bot code to copy and an <b>If it isn't working</b> list: open the Worker's address in a browser first, as what it shows tells you which side to look at.</p>
+</div>
+
+<div class="ld" id="session">
+  <div class="ld-eyebrow">Run a game over Discord</div>
+  <ol class="ld-steps">
+    <li><b>Gather in a voice channel.</b> Everyone joins the server's voice channel; keep a text channel for the dice.</li>
+    <li><b>Share your screen.</b> The GM opens the game's creator on the <b>GM view</b> (battle map, encounter panel, clocks) and presses <b>Share Screen</b> (or <b>Go Live</b>) in Discord, choosing that browser window or tab.</li>
+    <li><b>Players roll with the bot.</b> Each player reads their target off their own character sheet and rolls with <code>/roll</code> in the text channel; <code>/points</code> tracks their points and <code>/clock</code> and <code>/track</code> the table's clocks and tracks.</li>
+    <li><b>The GM keeps the fight.</b> Run the encounter panel and battle map on your shared screen as usual, marking hits on the characters' cards.</li>
+  </ol>
+  <p style="margin-top:1rem">Prefer everyone to see the same dice and map on their own devices? Use the <a href="/shared-table">shared table</a> instead, or as well.</p>
 </div>
 
 <div class="ld">
@@ -2058,6 +2123,142 @@ appropriate credit to the author.</p>
     <a class="ld-button ld-button--ghost" href="/core-rules">Read the core rules</a>
   </div>
 </div>
+</div></section></main><main class="pv" id="pv-table" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Play online</div>
+  <h1>The shared table</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">Every character creator can join a shared table: the GM starts one, the players join with a code, and everyone sees the same dice, the same characters and the same fight, each on their own device.</p>
+  <div class="ld-actions">
+    <a class="ld-button" href="/#games">Open a creator</a>
+    <a class="ld-button ld-button--ghost" href="#host">Host your own table server</a>
+    <a class="ld-button ld-button--ghost" href="/discord">Or play with the Discord bot</a>
+  </div>
+</div>
+
+<div class="ld" id="run">
+  <div class="ld-eyebrow">Running a game</div>
+  <ol class="ld-steps">
+    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
+    <li><b>Players join.</b> Each opens their character, goes to the play tab, types the code and their name, and presses <b>Join</b>.</li>
+    <li><b>Play.</b> Rolls from every sheet are rolled by the table and shown to all. Each character appears on the GM's cards, and injuries, points and ammunition stay in step both ways.</li>
+    <li><b>Fight.</b> The GM's battle map and encounter show on every player's play tab. Players move their own tokens and, on their turn, send the GM what they do; the GM puts it into the Encounter panel and runs it.</li>
+    <li><b>Keep it private.</b> Anyone with the code can join. The GM can <b>Remove</b> a player and <b>Change code</b> at any time.</li>
+  </ol>
+  <p style="margin-top:1rem">Each creator has a <b>How a shared game works</b> guide beside the table, for the GM and for players. The creators on this site already use a table server: nothing to set up. Read on only to host your own.</p>
+  <p style="font-size:.9rem;color:var(--ld-ink-2);margin-top:1rem">You can mix it with the <a href="/discord">Discord dice bot</a>: stream the map to a group on Discord while players who have the creator open join the shared table, or roll with the bot while the GM keeps the encounter panel.</p>
+</div>
+
+<div class="ld" id="host">
+  <div class="ld-eyebrow">Host your own table server on Cloudflare</div>
+  <p>The table server is a small Cloudflare Worker with one Durable Object (a little database) per table. It runs on Cloudflare's free Workers plan, costs nothing while nobody is rolling, and deletes a table nobody has used for 30 days. Everything below works from a browser, an iPad included.</p>
+  <p><b>You need:</b> a free Cloudflare account; a GitHub account; and a copy of the Legend Dynamics repository on your GitHub account, with the server's folder, <code>legend-dynamics/table-server</code>, on the branch Cloudflare will build (usually <code>main</code>).</p>
+  <ol class="ld-steps">
+    <li><b>Create a Worker from your repository.</b> In the Cloudflare dashboard, open <b>Workers &amp; Pages</b> and press <b>Create</b>. On the <b>Workers</b> side (not Pages: Pages only serves files and can't run the server), choose <b>Continue with GitHub</b> or <b>Import a repository</b>. The first time, connect GitHub and let Cloudflare see the repository; then pick it.</li>
+    <li><b>Fill in the setup.</b> Project name <code>legend-table</code> (it must match the name in the folder's <code>wrangler.toml</code>). Build command: leave it empty. Deploy command: <code>npx wrangler deploy</code>. Preview command, if shown: <code>npx wrangler versions upload</code>. Root directory, often under <b>Advanced settings</b>: <code>legend-dynamics/table-server</code>. No <code>cd</code> in the commands: the root directory takes care of that. Press <b>Deploy</b>.</li>
+    <li><b>Check the branch.</b> Cloudflare builds the repository's production branch. If that branch doesn't have the server folder, the build stops with "root directory not found": open the Worker's <b>Settings → Build</b> and set the production branch (it may be called <b>Branch control</b>) to the branch that has it, then retry the build.</li>
+    <li><b>Check it's running.</b> The Worker's page shows its address, like <code>https://legend-table.yourname.workers.dev</code>. Open it: it should say <i>Legend Dynamics table server.</i></li>
+    <li><b>Point the creators at it.</b> In any creator's <b>Shared table</b> box, press <b>Another table server…</b> and paste the address; each browser remembers it, so the GM and every player do this once. If you host your own copy of this site, put the address in <code>legend-dynamics/table-server/server-url.txt</code> and rebuild: the creators then use it without asking.</li>
+    <li><b>Tidy up (recommended).</b> In <code>wrangler.toml</code>, set <code>ALLOWED_ORIGINS</code> to your site's address (add <code>null</code> if people open the creators as files) so only your pages can use the server. In <b>Settings → Build</b>, set <b>Build watch paths</b> to <code>legend-dynamics/table-server/*</code> so other changes don't rebuild it. In <b>Security → WAF → Rate limiting rules</b>, add one rule (the free plan allows one): about 20 requests a minute per visitor to paths starting with <code>/api/tables</code>.</li>
+  </ol>
+  <p style="margin-top:1rem">From a computer instead: in the <code>legend-dynamics/table-server</code> folder, run <code>npx wrangler login</code> and then <code>npx wrangler deploy</code>. The folder's README has the details.</p>
+</div>
+
+<div class="ld ld-rules">
+  <div class="ld-eyebrow">If something goes wrong</div>
+  <table><thead><tr><th>What you see</th><th>What to do</th></tr></thead><tbody><tr><td>The address ends in <b>pages.dev</b>, or no deploy command was asked for</td><td>It was made as a Pages project, which only serves files. Delete it (its <b>Settings</b>, at the bottom) and create it again from the <b>Workers</b> side, as in step 1.</td></tr><tr><td>Build log: <b>root directory not found</b></td><td>Check the root directory is spelled <code>legend-dynamics/table-server</code> exactly, and that the branch being built has that folder (step 3).</td></tr><tr><td>Build log: <b>/bin/sh: legend-dynamics/table-server: not found</b></td><td>A command starts with the folder name. With the root directory set, the commands need no <code>cd</code>: just <code>npx wrangler deploy</code> and <code>npx wrangler versions upload</code>.</td></tr><tr><td>Build log: <b>pending Durable Object migration</b></td><td>The first build must be a full deploy, which creates the table storage. Retry the build from your production branch, or set the preview command to <code>npx wrangler deploy</code> for one build, then set it back.</td></tr><tr><td>A failed <b>Workers Builds</b> check on other branches</td><td>Branches without the server folder can't build it. Set <b>Build watch paths</b> to <code>legend-dynamics/table-server/*</code> (step 6) and they're skipped.</td></tr><tr><td>The creator says <b>Couldn't reach the table server</b></td><td>Check the address you pasted (it starts with https:// and ends in workers.dev) and that opening it in a browser shows the greeting (step 4).</td></tr><tr><td><b>This site isn't allowed to use the table server</b></td><td>Your site isn't in <code>ALLOWED_ORIGINS</code> (step 6). Add its address, or <code>null</code> for creators opened as files, and redeploy.</td></tr></tbody></table>
+  <p>Updates to the server reach Cloudflare by themselves: each change to the branch it builds deploys again. The creators keep working with an older server, so the site and the server can be updated in either order.</p>
+</div>
+</div></section></main><main class="pv" id="pv-contact" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Contact</div>
+  <h1>Questions, ideas and stories from your table</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">Comments on the rules, a game you ran, a bug in a character creator, or a setting you'd like to see: I'd like to hear it.</p>
+  <div class="ld-actions"><a class="ld-button" href="mailto:contact@legenddynamicsrpg.com">contact@legenddynamicsrpg.com</a></div>
+</div>
+
+<div class="ld">
+  <div class="ld-eyebrow">Write to me</div>
+  <form class="ld-form" id="ld-contact" action="mailto:contact@legenddynamicsrpg.com" method="post" enctype="text/plain">
+    <label>Your name <input type="text" name="name" autocomplete="name" maxlength="80"></label>
+    <label>About <select name="topic"><option>A comment or suggestion</option><option>A question about the rules</option><option>Something isn't working</option><option>A story from my game</option><option>Something else</option></select></label>
+    <label>Game <select name="game"><option>Any or all</option><option>Trails of Blood &amp; Dust</option><option>Fracture Lines</option><option>The Shattered Crown</option><option>Aurora</option><option>USS Pelion</option><option>Grimm</option></select></label>
+    <label class="ld-wide">Your message <textarea name="message" rows="7" required maxlength="5000"></textarea></label>
+    <div class="ld-actions ld-wide"><button class="ld-button" type="submit">Write the email</button></div>
+    <p class="ld-wide ld-note">This opens your own email app with the message ready to send to contact@legenddynamicsrpg.com; nothing is sent until you press send there. No email app? Copy your message and write to the address above from any email account.</p>
+  </form>
+  <script>
+  (function () {
+    var f = document.getElementById("ld-contact"); if (!f) return;
+    f.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var v = function (n) { return (f.elements[n].value || "").trim(); };
+      var subject = "Legend Dynamics: " + v("topic") + (v("game") !== "Any or all" ? " (" + v("game") + ")" : "");
+      var body = v("message") + "\n\n" + (v("name") ? "— " + v("name") + "\n" : "") + "Game: " + v("game");
+      var url = "mailto:contact@legenddynamicsrpg.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+      f.dataset.mailto = url; location.href = url;
+    });
+  })();
+  </script>
+</div>
+</div></section></main><main class="pv" id="pv-start" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Start here</div>
+  <h1>From first look to first roll</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">Three steps: pick a world, make a character, and play. You don't need to read the rules first: the character creator explains each choice as you make it, and the rules are there when you want them.</p>
+</div>
+
+<div class="ld">
+  <ol class="ld-steps">
+    <li><b>Choose a setting.</b> Four games share one set of core rules: <i>Trails of Blood &amp; Dust</i>, gothic western; <i>Fracture Lines</i>, science fiction; <i>The Shattered Crown</i>, sword and sorcery; <i>Aurora</i>, superheroes. Each page shows who you can play and the setting's guides.
+      <div class="ld-actions" style="margin-top:.8rem"><a class="ld-button ld-button--ghost" href="/trails-of-blood-and-dust">Trails of Blood &amp; Dust</a><a class="ld-button ld-button--ghost" href="/fracture-lines">Fracture Lines</a><a class="ld-button ld-button--ghost" href="/the-shattered-crown">The Shattered Crown</a><a class="ld-button ld-button--ghost" href="/aurora">Aurora</a></div></li>
+    <li><b>Create a character.</b> Open the setting's character creator. It walks you through five steps and checks every rule as you go, or you can load a ready-made character. Save the file, print the sheet, or keep it in your browser.
+      <div class="ld-actions" style="margin-top:.8rem"><a class="ld-button ld-button--ghost" href="/trails-of-blood-and-dust/create/" target="_blank" rel="noopener">Trails of Blood &amp; Dust creator</a><a class="ld-button ld-button--ghost" href="/fracture-lines/create/" target="_blank" rel="noopener">Fracture Lines creator</a><a class="ld-button ld-button--ghost" href="/the-shattered-crown/create/" target="_blank" rel="noopener">The Shattered Crown creator</a><a class="ld-button ld-button--ghost" href="/aurora/create/" target="_blank" rel="noopener">Aurora creator</a></div></li>
+    <li><b>Join or run a game.</b> Round a table, bring your sheet and three six-sided dice (or use the sheet's roller). Online, play on the <a href="/shared-table">shared table</a> built into every creator, or <a href="/discord#session">over Discord</a> with the GM sharing their screen and the dice bot in the channel.
+      <div class="ld-actions" style="margin-top:.8rem"><a class="ld-button ld-button--ghost" href="/shared-table#run">Use the shared table</a><a class="ld-button ld-button--ghost" href="/discord#session">Play over Discord</a></div></li>
+  </ol>
+</div>
+
+<div class="ld">
+  <div class="ld-eyebrow">Who needs what</div>
+  <ul class="ld-pillars">
+    <li><b>A player needs</b><span>A character from the creator, and three six-sided dice or the roller on its sheet. To play online: the code or link for the GM's shared table, or an invitation to the group's Discord server.</span></li>
+    <li><b>The GM needs</b><span>The setting's creator, open on its <strong>GM view</strong>: everyone's characters, the battle map, the encounter panel and the clocks. The setting's guides, from its page. To play online: start a <a href="/shared-table#run">shared table</a> there, or <a href="/discord#load">add the dice bot</a> to your Discord server and share your screen.</span></li>
+  </ul>
+  <div class="ld-actions" style="margin-top:1.4rem">
+    <a class="ld-button ld-button--ghost" href="/core-rules">The core rules, when you want them</a>
+    <a class="ld-button ld-button--ghost" href="/contact">Questions? Get in touch</a>
+  </div>
+</div>
+</div></section></main><main class="pv" id="pv-changelog" hidden><section class="page-section"><div class="section-background"></div><div class="content">
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Legend Dynamics RPG system</div>
+  <h1>Changelog</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">Rules last updated 18 October 2026. A <b>rules change</b> changes how the game plays (a <b>setting rules change</b>, one setting's own rules, leaves the core rules' date alone); a <b>website and wording</b> update fixes or improves the site and the text without changing the rules, and leaves the rules' date alone.</p>
+  <div class="ld-actions">
+    <a class="ld-button ld-button--ghost" href="/core-rules">Core rules</a>
+    <a class="ld-button ld-button--ghost" href="/contact">Send feedback</a>
+  </div>
+</div>
+
+<div class="ld ld-rules">
+<h2 id="2026-10-19-setting">Trails of Blood &amp; Dust: renewing a talisman</h2>
+<p class="ld-eyebrow" style="margin:0">19 October 2026 · Setting rules change</p>
+<ul><li>A broken talisman (the Talisman Edge) is renewed only between jobs, and only by going back to its maker or another worker of the same tradition. Until then it stays spent.</li></ul>
+<h2 id="2026-10-18-site">Website and editorial improvements</h2>
+<p class="ld-eyebrow" style="margin:0">18 October 2026 · Website and wording</p>
+<p><b>No intended mechanics changes.</b></p><ul><li>A Start here page: choose a setting, create a character, join or run a game.</li><li>Shorter Play online section on the home page, linking to the shared-table and Discord pages for setup.</li><li>The four settings now call a character&#x27;s role a role everywhere (the home page and creators said calling). Same choices, same saved characters.</li><li>Small wording fixes in the core rules (an origin, a role), and one copyright notice per page.</li><li>This changelog, and the rules&#x27; last-updated date on the core-rules page.</li></ul>
+<h2 id="2026-10-18-rules">Movement, reach and range bands</h2>
+<p class="ld-eyebrow" style="margin:0">18 October 2026 · Rules change</p>
+<ul><li>Tighter range bands: Short 25 yards, Medium 100, Long 300, Extreme 1,000; Close stays 10. Running covers 20 yards.</li><li>Move: each character has a Move in yards, worked out from their attributes, Athletics and origin; Run is twice Move.</li><li>Weapon reach: every weapon in hand has a reach of 1, 2 or 3 yards.</li><li>Injury and hard going slow Move; stepping away from a fight is free.</li><li>Telling-hit effects depend on the weapon: Pin needs a weapon in hand, fists or a grapple.</li><li>Origin speed adjustments, and mounts and vehicles.</li></ul>
+<h2 id="2026-10-17-rules">Balance revision</h2>
+<p class="ld-eyebrow" style="margin:0">17 October 2026 · Rules change</p>
+<ul><li>Fine weapons and tools: +2 to one narrowly defined use of a skill, never a defense.</li><li>Additional Defense: a second defense each round at −2.</li><li>Magic limits: Quicker hand, every hostile burst names a defense or a resistance, personal magic marks at most 3 boxes, and charms still face the target&#x27;s defense.</li><li>Telling hits: Break gear, Pin, Precise and Knock down clarified, with firm limits.</li><li>Medical treatment: one field-treatment and one proper-care attempt per set of injuries.</li></ul>
+<p style="font-size:.9rem;color:var(--ld-ink-2)">Changes before October 2026 aren't listed here.</p>
+</div>
 </div></section></main>
 <script>
 const show = (k) => { document.querySelectorAll(".pv").forEach((m) => (m.hidden = m.id !== "pv-" + k));
@@ -2065,6 +2266,6 @@ const show = (k) => { document.querySelectorAll(".pv").forEach((m) => (m.hidden 
   document.documentElement.className = document.querySelector(`.pv-bar button[data-p="${k}"]`).dataset.c; scrollTo(0, 0); };
 document.querySelector(".pv-bar").onclick = (ev) => { const b = ev.target.closest("button"); if (b) show(b.dataset.p); };
 document.addEventListener("click", (ev) => { const a = ev.target.closest("a[href^='/']"); if (!a) return; ev.preventDefault();
-  const k = { "/trails-of-blood-and-dust": "western", "/fracture-lines": "spaceopera", "/the-shattered-crown": "fantasy", "/aurora": "aurora", "/core-rules": "rules", "/discord": "discord", "/why-legend-dynamics": "why" }[a.getAttribute("href")]; if (k) show(k); });
+  const k = { "/trails-of-blood-and-dust": "western", "/fracture-lines": "spaceopera", "/the-shattered-crown": "fantasy", "/aurora": "aurora", "/core-rules": "rules", "/discord": "discord", "/why-legend-dynamics": "why", "/shared-table": "table", "/contact": "contact", "/start": "start", "/changelog": "changelog" }[a.getAttribute("href")]; if (k) show(k); });
 show(location.hash.slice(1) || "home");
 </script></body></html>

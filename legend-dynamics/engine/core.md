@@ -469,7 +469,7 @@ The {{rolePluralLower}} and {{originPluralLower}} in this book are a starting po
 
 ## A custom {{roleLower}}
 
-A {{roleLower}} is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
+{{A:roleLower}} is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
 
 1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the {{rolePluralLower}} above: *{{PACK:customrole}}*
 2. **Choose a group.** Pick the one it belongs with: {{GEN:group-names}}. The group only sets your sheet's colors and emblem.
@@ -503,7 +503,7 @@ When in doubt, choose the higher tier.
 
 Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most {{originPluralLower}} change two to four attributes.
 
-A {{originLower}} that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
+{{A:originLower}} that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
 
 ### 4. Core rules (tier 1 and up)
 

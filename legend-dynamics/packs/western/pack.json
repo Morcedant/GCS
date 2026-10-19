@@ -6,8 +6,8 @@
   "guideTitle": "Trails of Blood & Dust Players' Guide",
   "guideSubtitle": "A Gothic Western for the Legend Dynamics RPG system",
   "point": "Grit",
-  "role": "Calling",
-  "roleLower": "calling",
+  "role": "Role",
+  "roleLower": "role",
   "origin": "Origin",
   "originLower": "origin",
   "originPlural": "Origins",
@@ -3342,13 +3342,13 @@
   [
    "talisman",
    "Talisman",
-   "A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a Himmelsbrief (a German heaven's letter) sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one. It's renewed between jobs and doesn't count against a charm limit.",
+   "A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a Himmelsbrief (a German heaven's letter) sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one, and it doesn't count against a charm limit. Once it's broken, you can renew it only between jobs, and only by going back to its maker or another worker of the same tradition; until you do, it stays spent.",
    1,
    {
     "label": "Your talisman",
     "placeholder": "e.g. A mojo hand against hexes, from a root doctor in New Orleans",
     "missing": "describe your talisman, who made it, and its ritual",
-    "sheetNote": "renewed each job"
+    "sheetNote": "renewed between jobs, from its maker"
    }
   ]
  ],

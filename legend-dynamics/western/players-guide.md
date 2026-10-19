@@ -16,17 +16,17 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Trails of Blood & Dust** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**. The material for running the game (job seeds, the monsters' weaknesses and curses, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Trails of Blood & Dust** setting: its roles, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Grit points**. The material for running the game (job seeds, the monsters' weaknesses and curses, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.
 
 # Create your character
 
 Work through the five steps in order. The character creator follows the same steps and checks the rules for you.
 
-## Step 1: Choose your calling
+## Step 1: Choose your role
 
-Choose a calling and describe what you bring. Your calling places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
+Choose a role and describe what you bring. Your role places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
 
-| Calling | Group | Typical contribution | Core skills | Ability |
+| Role | Group | Typical contribution | Core skills | Ability |
 |---|---|---|---|---|
 | Lawman | The Law | wears a badge or carries credentials, and brings the guilty in: a U.S. marshal, a Texas Ranger, a sheriff or deputy, a city policeman, or a Pinkerton detective. Your Allegiance says which force you serve; a Badge or Pinkerton Credentials advantage gives its authority. | Shooting, Riding, Leadership, Law | **The badge.** +2 to Leadership when you give orders in the law's name: an arrest, raising a posse, clearing a street. |
 | Bounty Hunter | The Law | tracks wanted men across three territories and brings them in, upright or across a saddle. | Shooting, Tracking, Read People, Investigation | **Paper on them.** +2 to Tracking and Investigation to find someone with a price on their head or a warrant out. |
@@ -45,7 +45,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 | Undertaker | The Frontier | buries the dead, and makes sure they stay buried. | Melee, Stealth, Persuasion, Medicine | **Ask the body.** Once per job, examine a corpse and learn how and when it died, and one thing about who did it. |
 | Shotgun Messenger | The Frontier | rides beside the driver guarding the mail, the strongbox and the passengers. | Shooting, Animal Handling, Persuasion, Survival | **Riding shotgun.** Once per fight, when someone next to you is hit, you take the hit instead. |
 
-The creator marks your calling's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven't changed.
+The creator marks your role's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing role swaps the core skills you haven't changed.
 
 ### Well-rounded or Old hand
 
@@ -103,7 +103,7 @@ Spend all your Edges. Each one buys:
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one narrowly defined use of a named skill (see *Gear*) | 1 |
 | Additional Defense | A second defense each round, at −2: Dodge, Parry or Block, in any mix (see *Attacking and defending*) | 1 |
 | Hard to put down | Once per fight, shrug off a telling hit's effect: you still take its boxes (see *Telling hits*) | 1 |
-| Talisman | A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a Himmelsbrief (a German heaven's letter) sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one. It's renewed between jobs and doesn't count against a charm limit. | 1 |
+| Talisman | A ready charm from the folk traditions: a hoodoo mojo hand, a gris-gris, a Himmelsbrief (a German heaven's letter) sewn in your coat, a buckeye blessed by a granny woman. It holds a Minor ritual agreed with the GM; break it to release it. Anyone can carry one, and it doesn't count against a charm limit. Once it's broken, you can renew it only between jobs, and only by going back to its maker or another worker of the same tradition; until you do, it stays spent. | 1 |
 
 ### Spending points
 
@@ -356,7 +356,7 @@ When an investigation roll fails, or a player pushes, one of the shared tracks t
 
 ### Methods
 
-Which methods suit a character depends on their calling, origin and skills. The GM says which methods can advance each phase.
+Which methods suit a character depends on their role, origin and skills. The GM says which methods can advance each phase.
 
 | Method | Skills | Suits | Phases | For example |
 |---|---|---|---|---|
@@ -772,7 +772,7 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 - **Trappings.** The right materials (grave dirt, silver, a lock of hair, the hour of midnight) remove one segment.
 - **Charms.** Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Sorcerer carries only one.
-- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a Himmelsbrief (heaven's letter) from a Pennsylvania German Braucher, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual, is renewed between jobs, and doesn't count against a charm limit.
+- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a Himmelsbrief (heaven's letter) from a Pennsylvania German Braucher, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual and doesn't count against a charm limit. Once broken, it's renewed only between jobs, and only by going back to the one who made it or another of the same tradition: a mojo hand from a root doctor, a Himmelsbrief from a Braucher. A job that keeps you far from them leaves it spent.
 - **Attention.** Magic worked openly can mark a box of **The Dark**, and the Order of the Iron Cross hunts known practitioners.
 
 **The old country's magic.** German settlers brought theirs west with the wagons. **Braucher**, the folk healers of the Pennsylvania settlements, the Ohio valley and the Texas Hill Country, heal with charms whispered from Hohman's *Long Lost Friend* and never take pay. Soldiers sew **heaven's letters** into their coats against bullets. The *Sixth and Seventh Books of Moses*, a German grimoire, passes from hand to hand, prized by Hermeticists and hoodoo root doctors alike. And where there is a Braucher, there is a **Hexenmeister** who will curse for money.
@@ -891,7 +891,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Unshaken Faith | +2 to Will against magic, possession and the undead's influence. |
 | Hunter's Almanac | You start play with a hunter's almanac of three lore cards, for creatures you've faced or studied, chosen at creation. They grant no bonus: they let you act on what you know. |
 
-**Badges.** A badge is legal authority, not a magic word: outlaws and the powerful don't always care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency's reach and files, but no badge.
+**Badges.** A badge is legal authority, not a magic word: outlaws and the powerful don't always care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law roles (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency's reach and files, but no badge.
 
 # Origins
 
@@ -1156,18 +1156,18 @@ Undead, ageless and beautiful, with a thirst that never ends. You walk at night 
 
 # Making your own
 
-The callings and origins in this book are a starting point, not a limit. With the GM's agreement, any player can create their own calling or origin. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
+The roles and origins in this book are a starting point, not a limit. With the GM's agreement, any player can create their own role or origin. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
 
-## A custom calling
+## A custom role
 
-A calling is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
+A role is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
 
-1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the callings above: *"Gravedigger: digs the holes, reads the stones, and knows which of the dead are restless."*
+1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the roles above: *"Gravedigger: digs the holes, reads the stones, and knows which of the dead are restless."*
 2. **Choose a group.** Pick the one it belongs with: The Law, The Learned or The Frontier. The group only sets your sheet's colors and emblem.
-3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in callings do this for you); they count toward your normal Trained skills.
-4. **Check it with the GM.** It should fit the setting and overlap the existing callings as little as possible.
+3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in roles do this for you); they count toward your normal Trained skills.
+4. **Check it with the GM.** It should fit the setting and overlap the existing roles as little as possible.
 
-**In the creator:** in step 1, choose **Custom calling…** at the end of the Calling list, then enter its name and group. Write the description in *What you bring*.
+**In the creator:** in step 1, choose **Custom role…** at the end of the Role list, then enter its name and group. Write the description in *What you bring*.
 
 ## A custom origin
 
@@ -1194,7 +1194,7 @@ When in doubt, choose the higher tier.
 
 Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most origins change two to four attributes.
 
-A origin that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
+An origin that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
 
 ### 4. Core rules (tier 1 and up)
 

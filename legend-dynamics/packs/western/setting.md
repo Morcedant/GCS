@@ -76,7 +76,7 @@ Werewolves and vampires have a **monstrous form**: the wolf, or the feral face. 
 
 - **Trappings.** The right materials (grave dirt, silver, a lock of hair, the hour of midnight) remove one segment.
 - **Charms.** Carry as many ready charms as your Occult training allows: Trained 2, Specialty 3, Expert 4. A Sorcerer carries only one.
-- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a Himmelsbrief (heaven's letter) from a Pennsylvania German Braucher, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual, is renewed between jobs, and doesn't count against a charm limit.
+- **Folk talismans.** Anyone, practitioner or not, can carry a charm made in the old folk ways through the **Talisman** Edge: a mojo hand from a hoodoo root doctor, a gris-gris from a Voodoo mambo in New Orleans, a Himmelsbrief (heaven's letter) from a Pennsylvania German Braucher, a blessed buckeye from an Appalachian granny woman. It holds a Minor ritual and doesn't count against a charm limit. Once broken, it's renewed only between jobs, and only by going back to the one who made it or another of the same tradition: a mojo hand from a root doctor, a Himmelsbrief from a Braucher. A job that keeps you far from them leaves it spent.
 - **Attention.** Magic worked openly can mark a box of **The Dark**, and the Order of the Iron Cross hunts known practitioners.
 
 **The old country's magic.** German settlers brought theirs west with the wagons. **Braucher**, the folk healers of the Pennsylvania settlements, the Ohio valley and the Texas Hill Country, heal with charms whispered from Hohman's *Long Lost Friend* and never take pay. Soldiers sew **heaven's letters** into their coats against bullets. The *Sixth and Seventh Books of Moses*, a German grimoire, passes from hand to hand, prized by Hermeticists and hoodoo root doctors alike. And where there is a Braucher, there is a **Hexenmeister** who will curse for money.
@@ -140,7 +140,7 @@ Opponents use the same rules as the characters. **Minor opponents** (hired guns,
 
 <!-- SECTION:advantages -->
 
-**Badges.** A badge is legal authority, not a magic word: outlaws and the powerful don't always care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law callings (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency's reach and files, but no badge.
+**Badges.** A badge is legal authority, not a magic word: outlaws and the powerful don't always care about it, and it carries a duty. Your superiors can give you orders, and abusing the badge or failing in your duty can cost you it. Law roles (Marshal, Deputy) usually take one, as their advantage or as a second advantage Edge. A Pinkerton detective takes Pinkerton Credentials instead: the agency's reach and files, but no badge.
 
 <!-- SECTION:customrole -->
 

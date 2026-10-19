@@ -8,6 +8,39 @@
   <hr class="ld-rule">
   <p class="ld-lede">One dice bot runs every Legend Dynamics setting. It rolls 3d6 under your target and keeps your table's points, clocks and tracks.
   The commands are the same everywhere; only a few names change with the setting.</p>
+  <div class="ld-actions">
+    <a class="ld-button" href="#load">Load the bot on your server</a>
+    <a class="ld-button ld-button--ghost" href="#session">Run a game over Discord</a>
+  </div>
+</div>
+
+<!-- Block 1b: loading the bot (give this section the anchor id "load" in Squarespace, or keep the id below) -->
+<div class="ld" id="load">
+  <div class="ld-eyebrow">Load the bot on your Discord server</div>
+  <p><b>The quick way: use a bot that's already running.</b> If someone in your group (or the game's maker) already runs the Legend Dynamics bot, ask them for its <b>install link</b>. Open it, pick your Discord server and press <b>Authorize</b>: you need the <b>Manage Server</b> permission on that server. Then run <code>/game set</code> to choose your setting. That's all; skip to <a href="#session">running a game</a>.</p>
+  <p><b>Or run your own bot</b> (for the GM, once per group: about 15 minutes, free, no installs; it works from an iPad's browser). The bot runs on Cloudflare Workers, so there's no computer to keep switched on.</p>
+  <ol class="ld-steps">
+    <li><b>Create the Discord application.</b> At <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">discord.com/developers/applications</a>, choose <b>New Application</b> and name it (e.g. <i>Legend Dice</i>). On <b>General Information</b>, copy the <b>Application ID</b> and <b>Public Key</b>. On <b>Bot</b>, press <b>Reset Token</b> and copy the token; keep it private, as you need it only once.</li>
+    <li><b>Create the Worker.</b> At <a href="https://dash.cloudflare.com" target="_blank" rel="noopener">dash.cloudflare.com</a> (free; no card), open <b>Workers &amp; Pages → Create</b>, choose <b>Start with Hello World!</b>, name it <code>legend-dice</code> and <b>Deploy</b>. Then press <b>Edit code</b>, replace everything in the file with the <b>bot code</b> (open any game's handout below and press <b>Copy bot code</b>: it's the same for every game) and <b>Deploy</b> again.</li>
+    <li><b>Add its settings.</b> In the Worker's <b>Settings → Variables and Secrets</b>, add <code>DISCORD_PUBLIC_KEY</code> (the Public Key), <code>DISCORD_APPLICATION_ID</code> (the Application ID) and <code>DISCORD_BOT_TOKEN</code> (the token, as a <b>Secret</b>). Optionally add <code>DEFAULT_GAME</code>: <code>western</code>, <code>spaceopera</code>, <code>fantasy</code>, <code>aurora</code>, <code>grimm</code> or <code>pelion</code>.</li>
+    <li><b>Give it storage</b> (needed for points, clocks, tracks and <code>/game set</code>). Open <b>Storage &amp; databases → Workers KV → Create</b> and name it <code>legend-store</code>. In the Worker's <b>Settings → Bindings → Add → KV namespace</b>, set the variable name to <code>STORE</code> and pick <code>legend-store</code>.</li>
+    <li><b>Connect it to Discord.</b> Copy the Worker's address (like <code>https://legend-dice.yourname.workers.dev</code>) into the Discord app's <b>Interactions Endpoint URL</b> on <b>General Information</b> and save: if it saves, the connection works. Then open the same address with <code>/register</code> on the end in your browser; it lists the commands it registered. Delete <code>DISCORD_BOT_TOKEN</code> from the Worker afterwards.</li>
+    <li><b>Invite it to your server.</b> On the Discord app's <b>Installation</b> page, make sure <b>Guild Install</b> includes the <code>applications.commands</code> scope, open the install link and pick your server. Share that same link with other GMs who want to use your bot.</li>
+    <li><b>Choose the game.</b> In your server, run <code>/game set</code>. New commands can take a minute to appear (press Ctrl+R, or Cmd+R on a Mac, to refresh Discord).</li>
+  </ol>
+  <p style="margin-top:1rem">Each game's handout (below, under <i>For the GM</i>) has the bot code to copy and an <b>If it isn't working</b> list: open the Worker's address in a browser first, as what it shows tells you which side to look at.</p>
+</div>
+
+<!-- Block 1c: running a game over Discord (anchor id "session") -->
+<div class="ld" id="session">
+  <div class="ld-eyebrow">Run a game over Discord</div>
+  <ol class="ld-steps">
+    <li><b>Gather in a voice channel.</b> Everyone joins the server's voice channel; keep a text channel for the dice.</li>
+    <li><b>Share your screen.</b> The GM opens the game's creator on the <b>GM view</b> (battle map, encounter panel, clocks) and presses <b>Share Screen</b> (or <b>Go Live</b>) in Discord, choosing that browser window or tab.</li>
+    <li><b>Players roll with the bot.</b> Each player reads their target off their own character sheet and rolls with <code>/roll</code> in the text channel; <code>/points</code> tracks their points and <code>/clock</code> and <code>/track</code> the table's clocks and tracks.</li>
+    <li><b>The GM keeps the fight.</b> Run the encounter panel and battle map on your shared screen as usual, marking hits on the characters' cards.</li>
+  </ol>
+  <p style="margin-top:1rem">Prefer everyone to see the same dice and map on their own devices? Use the <a href="/shared-table">shared table</a> instead, or as well.</p>
 </div>
 
 <!-- Block 2: getting started -->

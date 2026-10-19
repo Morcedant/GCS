@@ -583,7 +583,7 @@ When in doubt, choose the higher tier.
 
 Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most origins change two to four attributes.
 
-A origin that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
+An origin that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
 
 ### 4. Core rules (tier 1 and up)
 

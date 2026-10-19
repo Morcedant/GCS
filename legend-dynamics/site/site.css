@@ -293,6 +293,16 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 .ld-why .ld-why-sign { font-family: var(--ld-display); font-style: italic; color: var(--ld-ink-2); margin-top: 1.8rem; }
 .ld-why .ld-why-sign::before { content: "— "; }
 
+/* ---------- Contact form ---------- */
+.ld-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem 1.25rem; max-width: 46rem; }
+.ld-form label { display: grid; gap: .35rem; font: 600 .76rem/1.2 var(--ld-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ld-ink-2); }
+.ld-form input, .ld-form select, .ld-form textarea { font: 400 1rem/1.4 var(--ld-body); color: var(--ld-ink); background: var(--ld-panel, var(--ld-bg)); border: 1px solid var(--ld-line); border-radius: var(--ld-radius, 6px); padding: .6rem .7rem; width: 100%; box-sizing: border-box; letter-spacing: normal; text-transform: none; }
+.ld-form textarea { resize: vertical; min-height: 9rem; }
+.ld-form input:focus, .ld-form select:focus, .ld-form textarea:focus { outline: 2px solid var(--ld-accent); outline-offset: 1px; }
+.ld-form .ld-wide { grid-column: 1 / -1; }
+.ld-form .ld-actions { margin: 0; }
+.ld-form .ld-note { font-size: .9rem; color: var(--ld-ink-2); margin: 0; }
+
 /* ---------- 5. Site frame (Cloudflare Pages build; Squarespace supplies its own) ---------- */
 html, body { margin: 0; }
 body { min-height: 100vh; display: flex; flex-direction: column; }

@@ -18,17 +18,17 @@ Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes
 
 ## How this book is organized
 
-This book combines the **Legend Dynamics core rules**, which every setting shares, with the **The Shattered Crown** setting: its callings, ancestries, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Fortune points**. The material for running the game (venture seeds, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **The Shattered Crown** setting: its roles, ancestries, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Fortune points**. The material for running the game (venture seeds, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.
 
 # Create your character
 
 Work through the five steps in order. The character creator follows the same steps and checks the rules for you.
 
-## Step 1: Choose your calling
+## Step 1: Choose your role
 
-Choose a calling and describe what you bring. Your calling places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
+Choose a role and describe what you bring. Your role places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
 
-| Calling | Group | Typical contribution | Core skills |
+| Role | Group | Typical contribution | Core skills |
 |---|---|---|---|
 | Barbarian | Steel | came out of the wild places with an axe and an appetite, and trusts strength over sorcery. | Melee, Athletics, Survival, Brawling |
 | Sellsword | Steel | fights for coin and keeps the contract, mostly; knows how battles are really won. | Melee, Marksmanship, Leadership, Riding |
@@ -43,7 +43,7 @@ Choose a calling and describe what you bring. Your calling places you in a group
 | Priest | Lore | speaks for a god who may be dying, performs the old rites, and tends the wounded. | Persuasion, Lore, Healing, Leadership |
 | Alchemist | Lore | powders, poisons, cures and black powder; half scholar, half bomb-maker. | Craft, Healing, Lore, Marksmanship |
 
-The creator marks your calling's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven't changed.
+The creator marks your role's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing role swaps the core skills you haven't changed.
 
 ### Seasoned or Master
 
@@ -877,7 +877,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Hard Bargainer | Once per venture, a deal, a price or a reward goes your way. |
 | Monster-Slayer | +2 to Lore about a creature you face, and +1 to hit it once you know its weakness. |
 
-**Gifted and the old bloods.** *Gifted* (or an ancestry's equivalent) lets a character of any calling learn cantrips and work rituals. Sorcerers and Witches don't need it. Taking it means training **Sorcery** too, or the gift has nothing to work with.
+**Gifted and the old bloods.** *Gifted* (or an ancestry's equivalent) lets a character of any role learn cantrips and work rituals. Sorcerers and Witches don't need it. Taking it means training **Sorcery** too, or the gift has nothing to work with.
 
 # Ancestries
 
@@ -1008,7 +1008,7 @@ Human, with old sorcery in the veins: a witch grandmother, a sorcerer's bastard,
 **Ancestry rules:**
 
 - Sorcery is Trained for free.
-- To cast cantrips you need a casting calling (Sorcerer or Witch), Gifted, or The Old Blood.
+- To cast cantrips you need a casting role (Sorcerer or Witch), Gifted, or The Old Blood.
 
 **Free skill:** Sorcery is always at least Trained and doesn't use a Trained pick.
 
@@ -1138,18 +1138,18 @@ A sorcerer who cheated death. Your heart no longer beats; your soul waits in a h
 
 # Making your own
 
-The callings and ancestries in this book are a starting point, not a limit. With the GM's agreement, any player can create their own calling or ancestry. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
+The roles and ancestries in this book are a starting point, not a limit. With the GM's agreement, any player can create their own role or ancestry. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
 
-## A custom calling
+## A custom role
 
-A calling is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
+A role is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
 
-1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the callings above: *"Gladiator: fought for the crowd in the arena pits, and still knows how to win one."*
+1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the roles above: *"Gladiator: fought for the crowd in the arena pits, and still knows how to win one."*
 2. **Choose a group.** Pick the one it belongs with: Steel, Shadow or Lore. The group only sets your sheet's colors and emblem.
-3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in callings do this for you); they count toward your normal Trained skills.
-4. **Check it with the GM.** It should fit the setting and overlap the existing callings as little as possible.
+3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in roles do this for you); they count toward your normal Trained skills.
+4. **Check it with the GM.** It should fit the setting and overlap the existing roles as little as possible.
 
-**In the creator:** in step 1, choose **Custom calling…** at the end of the Calling list, then enter its name and group. Write the description in *What you bring*.
+**In the creator:** in step 1, choose **Custom role…** at the end of the Role list, then enter its name and group. Write the description in *What you bring*.
 
 ## A custom ancestry
 
@@ -1176,7 +1176,7 @@ When in doubt, choose the higher tier.
 
 Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most ancestries change two to four attributes.
 
-A ancestry that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
+An ancestry that is plainly faster or slower on its feet than a human (long-legged, heavy, built for another gravity) may also take a **speed adjustment** of +1 or −1 to Move. Most have none. It isn't an attribute adjustment and needn't balance.
 
 ### 4. Core rules (tier 1 and up)
 

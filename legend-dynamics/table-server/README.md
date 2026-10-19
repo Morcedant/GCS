@@ -20,15 +20,18 @@ You need a Cloudflare account (the same one as the site and the dice bot).
 
 ### From a browser (works on an iPad)
 
-1. In the Cloudflare dashboard go to **Workers & Pages → Create → Import a repository** and pick this GitHub repository.
-2. Set:
-   - **Project name:** `legend-table`
-   - **Branch:** the branch with this folder on it
-   - **Root directory:** `legend-dynamics/table-server`
+1. In the Cloudflare dashboard open **Workers & Pages → Create**. On the **Workers** side (not Pages: Pages only serves files and can't run the server), choose **Continue with GitHub** / **Import a repository**, connect GitHub the first time, and pick this repository.
+2. Fill in:
+   - **Project name:** `legend-table` (it must match `name` in `wrangler.toml`)
    - **Build command:** leave empty
    - **Deploy command:** `npx wrangler deploy`
-3. Deploy. Cloudflare reads `wrangler.toml`, creates the Durable Object and gives the Worker an address like `https://legend-table.<your-subdomain>.workers.dev`.
-4. Open that address: it should say "Legend Dynamics table server."
+   - **Preview command** (if shown): `npx wrangler versions upload`
+   - **Root directory** (often under Advanced settings): `legend-dynamics/table-server`. No `cd` in the commands: the root directory does that.
+3. Deploy. Cloudflare builds the repository's production branch: if that branch hasn't got this folder, the build stops with "root directory not found". Set the production branch in the Worker's **Settings → Build** (it may be called Branch control) to one that has it, and retry.
+4. The first deploy must be a full `wrangler deploy` (it creates the Durable Object). A preview build (`versions upload`) before it fails with "pending Durable Object migration": retry the production build, or set the preview command to `npx wrangler deploy` for one build.
+5. Open the Worker's address (`https://legend-table.<your-subdomain>.workers.dev`): it should say "Legend Dynamics table server."
+
+Recommended: set **Build watch paths** to `legend-dynamics/table-server/*` in **Settings → Build**, so branches without this folder don't fail a build.
 
 ### From a computer
 

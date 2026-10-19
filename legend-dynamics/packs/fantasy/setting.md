@@ -176,7 +176,7 @@ Opponents use the same rules as the characters. **Minor opponents** (guards, ban
 
 <!-- SECTION:advantages -->
 
-**Gifted and the old bloods.** *Gifted* (or an ancestry's equivalent) lets a character of any calling learn cantrips and work rituals. Sorcerers and Witches don't need it. Taking it means training **Sorcery** too, or the gift has nothing to work with.
+**Gifted and the old bloods.** *Gifted* (or an ancestry's equivalent) lets a character of any role learn cantrips and work rituals. Sorcerers and Witches don't need it. Taking it means training **Sorcery** too, or the gift has nothing to work with.
 
 <!-- SECTION:customrole -->
 
