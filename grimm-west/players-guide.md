@@ -103,7 +103,7 @@ Spend all your Edges. Each one buys:
 | A fine weapon or tool | An heirloom weapon, a master's instruments or a charm-maker's kit: +2 to one narrowly defined use of a named skill (see *Fine weapons and tools*) | 1 |
 | Additional Defense | A second defense each round, at −2: Dodge, Parry or Block, in any mix (see *Attacking and defending*) | 1 |
 | Hard to put down | Once per fight, shrug off a telling hit's effect: you still take its boxes (see *Telling hits*) | 1 |
-| Talisman | A ready charm made for you by a Braucher, a hexenbiest or a root doctor (a Himmelsbrief, a mojo hand, a blessed buckeye), holding a Minor ritual agreed with the GM; break it to release it. Renewed between cases; doesn't count against a charm limit | 1 |
+| Talisman | A ready charm made for you by a Braucher, a hexenbiest or a root doctor (a Himmelsbrief, a mojo hand, a blessed buckeye), holding a Minor ritual agreed with the GM; break it to release it. Doesn't count against a charm limit. Once broken, renewed only between cases, by going back to its maker or another of the same tradition | 1 |
 
 ### Spending points
 
