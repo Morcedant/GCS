@@ -261,7 +261,7 @@ def start_page():
 def changelog_page():
     """The changelog, from rules-version.json: rules changes and website or wording updates, kept apart."""
     v = rules_version()
-    kinds = {"rules": "Rules change", "site": "Website and wording"}
+    kinds = {"rules": "Rules change", "setting": "Setting rules change", "site": "Website and wording"}
     entries = []
     for c in v["changes"]:
         items = "".join(f"<li>{e(i)}</li>" for i in c.get("items", []))
@@ -276,7 +276,7 @@ def changelog_page():
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Changelog</h1>
   <hr class="ld-rule">
-  <p class="ld-lede">{rules_stamp()}. A <b>rules change</b> changes how the game plays; a <b>website and wording</b> update fixes or improves the site and the text without changing the rules, and leaves the rules' date alone.</p>
+  <p class="ld-lede">{rules_stamp()}. A <b>rules change</b> changes how the game plays (a <b>setting rules change</b>, one setting's own rules, leaves the core rules' date alone); a <b>website and wording</b> update fixes or improves the site and the text without changing the rules, and leaves the rules' date alone.</p>
   <div class="ld-actions">
     <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">Core rules</a>
     <a class="ld-button ld-button--ghost" href="{CONTACT_SLUG}">Send feedback</a>

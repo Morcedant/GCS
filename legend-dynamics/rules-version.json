@@ -4,6 +4,14 @@
   "rulesUpdated": "2026-10-18",
   "changes": [
     {
+      "date": "2026-10-19",
+      "kind": "setting",
+      "title": "Trails of Blood & Dust: renewing a talisman",
+      "items": [
+        "A broken talisman (the Talisman Edge) is renewed only between jobs, and only by going back to its maker or another worker of the same tradition. Until then it stays spent."
+      ]
+    },
+    {
       "date": "2026-10-18",
       "kind": "site",
       "title": "Website and editorial improvements",
