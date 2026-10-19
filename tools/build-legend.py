@@ -253,8 +253,8 @@ def gen(name, pack, t):
         return "\n".join(["## The Discovery panel", "",
             f"The GM view's **Discovery** panel runs discovery clocks and the {th['name']} they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every {d['card']} the characters in the GM view already hold for it. "
             f"The **Failed roll** and **Push** buttons tick the track for how they were digging" + (f", and a failed roll ticks the {th['name']} too" if th.get("repeat") else "") + f". When a clock fills, **Mint** gives the primary investigator the {d['card']} and everyone you tick as present a shared copy. "
-            f"**Record a finding without a clock** gives a {d['card']} for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick. "
-            f"Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.", ""])
+            + (f"**Record a finding without a clock** gives a {d['card']} for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick. " if d.get("scoped") else "")
+            + f"Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.", ""])
     if name == "discovery-subjects":
         d = p.get("discovery") or {}
         return table(["Creature", "What the " + d.get("card", "card") + " knows", "What it permits"], [[f"**{x[1]}**", x[2], x[3]] for x in d.get("subjects", [])])

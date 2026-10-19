@@ -597,7 +597,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="a337047" data-version-date="2026.10.19" title="The code changes whenever this page changes.">Version 2026.10.19 · a337047</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="5146fe7" data-version-date="2026.10.19" title="The code changes whenever this page changes.">Version 2026.10.19 · 5146fe7</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -9025,7 +9025,10 @@ function mountTable(api) {
     discSave();
     if (fired) discSay(`${T2.name} filled: ${T2.onFill}.` + (T2.repeat ? ` ${capFirst(T2.count || "times filled")}: ${th.count}.` : ""));
   }
+  // Recording a finding without a clock is part of scoped lore (Trails of Blood & Dust); other settings keep the clock only.
   function renderAward() {
+    $("disc-award").hidden = !DISC.scoped;
+    if (!DISC.scoped) return;
     const sig = gmCrew.map((c) => c.id + ":" + (c.name || "")).join(",");
     if ($("disc-award").dataset.sig === sig) return;
     $("disc-award").dataset.sig = sig;

@@ -2829,7 +2829,10 @@ tr.lvl-U td.target { color: var(--muted); }
     discSave();
     if (fired) discSay(`${T2.name} filled: ${T2.onFill}.` + (T2.repeat ? ` ${capFirst(T2.count || "times filled")}: ${th.count}.` : ""));
   }
+  // Recording a finding without a clock is part of scoped lore (Trails of Blood & Dust); other settings keep the clock only.
   function renderAward() {
+    $("disc-award").hidden = !DISC.scoped;
+    if (!DISC.scoped) return;
     const sig = gmCrew.map((c) => c.id + ":" + (c.name || "")).join(",");
     if ($("disc-award").dataset.sig === sig) return;
     $("disc-award").dataset.sig = sig;

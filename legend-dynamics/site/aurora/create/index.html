@@ -599,7 +599,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="8ec6541" data-version-date="2026.10.19" title="The code changes whenever this page changes.">Version 2026.10.19 · 8ec6541</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="a2eeece" data-version-date="2026.10.19" title="The code changes whenever this page changes.">Version 2026.10.19 · a2eeece</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -5526,7 +5526,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit, offering a Spark point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so.</p>
 <p><strong>The shared table.</strong> The GM can start a shared table from the GM view and give the players its code; each player joins from their character’s Play tab. While they’re connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the Play tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Each player’s character is shared with the GM too: it appears among the GM view’s characters, marked at the table, and its injuries, points, ammunition and form stay in step both ways, whether they’re changed on the sheet, on the GM’s card or in an encounter. In a fight, each player’s Play tab shows the GM’s battle map and the encounter’s turn order and latest results; a player drags their own token, and on their turn sends the GM what they’ll do, which the GM puts into the Encounter panel and runs. The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.</p>
 <h2 id="gm-the-discovery-panel">The Discovery panel</h2>
-<p>The GM view’s <strong>Discovery</strong> panel runs discovery clocks and the Escalation they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every dossier the characters in the GM view already hold for it. The <strong>Failed roll</strong> and <strong>Push</strong> buttons tick the track for how they were digging, and a failed roll ticks the Escalation too. When a clock fills, <strong>Mint</strong> gives the primary investigator the dossier and everyone you tick as present a shared copy. <strong>Record a finding without a clock</strong> gives a dossier for something established directly (seen or tested, a reliable account, a creature’s word with evidence behind it) to whoever you tick. Save all to file afterwards, so the players’ character files carry it. The Discord bot’s <code>/discovery</code> and <code>/cards</code> commands do the same at a table that plays online.</p>
+<p>The GM view’s <strong>Discovery</strong> panel runs discovery clocks and the Escalation they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every dossier the characters in the GM view already hold for it. The <strong>Failed roll</strong> and <strong>Push</strong> buttons tick the track for how they were digging, and a failed roll ticks the Escalation too. When a clock fills, <strong>Mint</strong> gives the primary investigator the dossier and everyone you tick as present a shared copy. Save all to file afterwards, so the players’ character files carry it. The Discord bot’s <code>/discovery</code> and <code>/cards</code> commands do the same at a table that plays online.</p>
 </div>
 <!-- GUIDE:END -->
       </article>
@@ -10185,7 +10185,10 @@ function mountTable(api) {
     discSave();
     if (fired) discSay(`${T2.name} filled: ${T2.onFill}.` + (T2.repeat ? ` ${capFirst(T2.count || "times filled")}: ${th.count}.` : ""));
   }
+  // Recording a finding without a clock is part of scoped lore (Trails of Blood & Dust); other settings keep the clock only.
   function renderAward() {
+    $("disc-award").hidden = !DISC.scoped;
+    if (!DISC.scoped) return;
     const sig = gmCrew.map((c) => c.id + ":" + (c.name || "")).join(",");
     if ($("disc-award").dataset.sig === sig) return;
     $("disc-award").dataset.sig = sig;
