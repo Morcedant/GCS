@@ -2,13 +2,15 @@
 /**
  * Legend Dynamics shared table: a Cloudflare Worker with one Durable Object per table.
  *
- *   POST /api/tables              { name, game }  → { code, gmKey, name }   start a table (the GM keeps the key)
+ *   POST /api/tables              { name, game, access? }  → { code, gmKey, name }   start a table (the GM keeps the key)
  *   GET  /api/tables/CODE                         → { name, game, players }  does it exist, and what is it
  *   GET  /api/tables/CODE/ws      WebSocket: the table's live connection (see table.js for the messages)
  *
  * ALLOWED_ORIGINS (a var in wrangler.toml) lists the sites whose pages may connect, comma-separated, or "*".
+ * GM_CODES (a secret, set in the Cloudflare dashboard) lists the GMs who may start tables: "Name: code", one per line
+ * or comma. While it's empty, anyone may start one. Joining an existing table only ever needs that table's code.
  */
-import { newCode, validCode, hashKey } from "./logic.js";
+import { newCode, validCode, hashKey, parseAccess, checkAccess } from "./logic.js";
 export { Table } from "./table.js";
 
 /** @param {any} env @param {string} origin */
@@ -38,12 +40,23 @@ export default {
     if (url.pathname === "/api/tables" && req.method === "POST") {
       /** @type {any} */ let body = {};
       try { body = await req.json(); } catch { /* an empty body is fine */ }
+      const access = parseAccess(env.GM_CODES);
+      let by = "";
+      if (access.length) {
+        const who = await checkAccess(access, body.access);
+        if (who === null) return json({ error: body.access ? "That GM access code isn't recognised" : "This table server needs a GM access code to start a table", access: true }, 401, h);
+        by = who;
+      }
       const gmKey = newKey(), gmKeyHash = await hashKey(gmKey);
       for (let i = 0; i < 5; i++) { // a code already in use is tried again
         const code = newCode(randomInt);
         const stub = env.TABLES.get(env.TABLES.idFromName(code));
         const r = await stub.fetch("https://table/init", { method: "POST", body: JSON.stringify({ name: body.name, game: body.game, gmKeyHash }) });
-        if (r.ok) { const t = /** @type {any} */ (await r.json()); return json({ code, gmKey, name: t.name }, 201, h); }
+        if (r.ok) {
+          const t = /** @type {any} */ (await r.json());
+          console.log(`table ${code} started${by ? ` by ${by}` : ""}`); // in the Worker's logs
+          return json({ code, gmKey, name: t.name }, 201, h);
+        }
         if (r.status !== 409) return json({ error: "The table couldn't be started." }, 500, h);
       }
       return json({ error: "No free table code: try again." }, 503, h);

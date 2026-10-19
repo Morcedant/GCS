@@ -136,3 +136,16 @@ test("phase 3: the GM shares the scene; a player moves only their own token and 
   assert.match(L.checkAsk(sheets, ruth, { key: "r1", action: "fireball" }).error, /Choose/);
   assert.match(L.checkAsk(sheets, gm, { key: "r1", action: "aim" }).error, /only for your own/);
 });
+
+test("GM access codes: who may start a table", async () => {
+  const list = L.parseAccess("Don: k7Qp2mXv9Lr4\n Sam:  w3Hn8Tz5Bq1c , bare-code-123,  , Nobody:");
+  assert.deepEqual(list, [{ name: "Don", code: "k7Qp2mXv9Lr4" }, { name: "Sam", code: "w3Hn8Tz5Bq1c" }, { name: "GM", code: "bare-code-123" }]);
+  assert.equal(await L.checkAccess(list, "w3Hn8Tz5Bq1c"), "Sam");
+  assert.equal(await L.checkAccess(list, " k7Qp2mXv9Lr4 "), "Don", "spaces around a pasted code don't matter");
+  assert.equal(await L.checkAccess(list, "bare-code-123"), "GM");
+  assert.equal(await L.checkAccess(list, "k7qp2mxv9lr4"), null, "codes are case-sensitive");
+  assert.equal(await L.checkAccess(list, ""), null);
+  assert.equal(await L.checkAccess(list, undefined), null);
+  assert.deepEqual(L.parseAccess(undefined), [], "no secret: anyone may start a table");
+  assert.deepEqual(L.parseAccess(""), []);
+});
