@@ -12,13 +12,14 @@
     <a class="ld-button ld-button--ghost" href="#host">Host your own table server</a>
     <a class="ld-button ld-button--ghost" href="/discord">Or play with the Discord bot</a>
   </div>
+  <div class="ld ld-callout" style="margin:1.2rem 0"><b>Restricted playtest</b><p>The shared table is in a restricted playtest. For now, only GMs with an access code can start a table on it; players can join any table their GM starts, with its code. Want to run a game on it? <a href="/contact#ld-contact">Ask for a GM access code</a>. Or <a href="#host">host your own table server</a>: the playtest limit applies only to this site's.</p></div>
 </div>
 
 <!-- Block 2: running a game (anchor id "run") -->
 <div class="ld" id="run">
   <div class="ld-eyebrow">Running a game</div>
   <ol class="ld-steps">
-    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
+    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. If the table server asks for a <b>GM access code</b>, type the one its owner gave you; the creator remembers it. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
     <li><b>Players join.</b> Each opens their character, goes to the play tab, types the code and their name, and presses <b>Join</b>.</li>
     <li><b>Play.</b> Rolls from every sheet are rolled by the table and shown to all. Each character appears on the GM's cards, and injuries, points and ammunition stay in step both ways.</li>
     <li><b>Fight.</b> The GM's battle map and encounter show on every player's play tab. Players move their own tokens and, on their turn, send the GM what they do; the GM puts it into the Encounter panel and runs it.</li>
@@ -40,6 +41,7 @@
     <li><b>Check it's running.</b> The Worker's page shows its address, like <code>https://legend-table.yourname.workers.dev</code>. Open it: it should say <i>Legend Dynamics table server.</i></li>
     <li><b>Point the creators at it.</b> In any creator's <b>Shared table</b> box, press <b>Another table server…</b> and paste the address; each browser remembers it, so the GM and every player do this once. If you host your own copy of this site, put the address in <code>legend-dynamics/table-server/server-url.txt</code> and rebuild: the creators then use it without asking.</li>
     <li><b>Tidy up (recommended).</b> In <code>wrangler.toml</code>, set <code>ALLOWED_ORIGINS</code> to your site's address (add <code>null</code> if people open the creators as files) so only your pages can use the server. In <b>Settings → Build</b>, set <b>Build watch paths</b> to <code>legend-dynamics/table-server/*</code> so other changes don't rebuild it. In <b>Security → WAF → Rate limiting rules</b>, add one rule (the free plan allows one): about 20 requests a minute per visitor to paths starting with <code>/api/tables</code>.</li>
+    <li><b>Only your GMs (recommended).</b> So that only people you've chosen can start tables on your server (and use up its free allowance), give each GM a private <b>access code</b>. In the Worker's <b>Settings → Variables and Secrets</b>, add a <b>Secret</b> named <code>GM_CODES</code> listing them, one GM per line or comma: <code>Don: k7Qp2mXv9Lr4, Sam: w3Hn8Tz5Bq1c</code> (examples: make your own). Make each code long and random (12 or more letters and digits; a password generator is ideal). The first time a GM presses <b>Start a table</b>, the creator asks for their code and then remembers it. Players never need one: they join with the table's code. To remove a GM, delete their entry and save. With no <code>GM_CODES</code>, anyone can start a table.</li>
   </ol>
   <p style="margin-top:1rem">From a computer instead: in the <code>legend-dynamics/table-server</code> folder, run <code>npx wrangler login</code> and then <code>npx wrangler deploy</code>. The folder's README has the details.</p>
 </div>

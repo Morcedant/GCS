@@ -74,8 +74,8 @@ b, strong { font-weight: 600; }
 .field { display: grid; gap: 5px; min-width: 0; align-content: start; }
 .field.wide { grid-column: 1 / -1; }
 label, .label { font: 600 .72rem/1.3 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--chrome-dim); }
-input[type="text"], select, textarea { width: 100%; font: inherit; color: var(--fg); background: var(--well); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; }
-input[type="text"]:hover, select:hover, textarea:hover { border-color: var(--chrome-dim); }
+input[type="text"], input[type="url"], input[type="password"], select, textarea { width: 100%; font: inherit; color: var(--fg); background: var(--well); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; }
+input[type="text"]:hover, input[type="url"]:hover, input[type="password"]:hover, select:hover, textarea:hover { border-color: var(--chrome-dim); }
 select option, select optgroup { background: #0a1628; color: var(--fg); }
 textarea { resize: vertical; min-height: 64px; }
 ::placeholder { color: rgba(138, 162, 194, .6); }
@@ -597,7 +597,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="dd9a5be" data-version-date="2026.10.18" title="The code changes whenever this page changes.">Version 2026.10.18 · dd9a5be</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="25b9e3c" data-version-date="2026.10.19" title="The code changes whenever this page changes.">Version 2026.10.19 · 25b9e3c</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -9783,14 +9783,21 @@ function mountTable(api) {
   }
   function leave() { leaving = true; st.joined = false; save(); clearTimeout(retryTimer); if (ws) try { ws.close(); } catch { /* closed */ } live = false; table = null; status = ""; render(); }
 
+  let tname = ""; // the table name being started, kept if the server asks for an access code first
   async function start(name) {
+    tname = name || "";
     if (!base()) { say("Set the table server's address first.", true); return; }
     status = "Starting a table…"; render();
     try {
-      const r = await fetch(base() + "/api/tables", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, game: api.game }) });
+      const r = await fetch(base() + "/api/tables", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, game: api.game, access: st.access || undefined }) });
       const b = await r.json();
+      if (r.status === 401 && b.access) { // this server only lets registered GMs start tables
+        const had = !!st.access; st.access = ""; st.needAccess = true; save();
+        status = had ? "That GM access code isn't recognised: check it with the table server's owner." : "This table server needs a GM access code to start a table. Type the one its owner gave you.";
+        render(); return;
+      }
       if (!r.ok) throw new Error(b.error || "the server refused");
-      st.code = b.code; st.gmKeys[b.code] = b.gmKey; st.role = "gm"; st.name = st.name || "GM"; st.joined = true; save(); connect();
+      tname = ""; st.needAccess = false; st.code = b.code; st.gmKeys[b.code] = b.gmKey; st.role = "gm"; st.name = st.name || "GM"; st.joined = true; save(); connect();
     } catch (e) { status = `Couldn't start a table: ${e.message}.`; render(); }
   }
 
@@ -9880,9 +9887,12 @@ function mountTable(api) {
     if (gmList) { const ps = players.filter((p) => p.role === "player");
       gmList.innerHTML = ps.length ? ps.map((p) => `<button class="btn small" data-tbl="kick" data-cid="${esc(p.cid || "")}" data-who="${esc(p.character || p.name)}">Remove ${esc(p.character || p.name)}<\/button>`).join(" ") : ""; }
   }
+  // A GM access code: asked for once a server says it needs one, then kept in this browser.
+  const accessField = () => st.needAccess && !st.access
+    ? `<div class="field"><label for="tbl-access">GM access code<\/label><input type="password" id="tbl-access" data-tbl="access" maxlength="100" autocomplete="off" spellcheck="false"><\/div>` : "";
   const serverField = (id) => `<div class="field wide"><label for="${id}">Table server<\/label><input type="url" id="${id}" data-tbl="server" placeholder="https://legend-table.example.workers.dev" value="${esc(st.server || api.server || "")}"><\/div>`;
   function render() {
-    const statusP = status ? `<p class="small ${/couldn|isn't|lost|doesn't|refus|different|first/i.test(status) ? "bad" : "muted"}" role="status">${esc(status)}<\/p>` : "";
+    const statusP = status ? `<p class="small ${/couldn|isn't|lost|doesn't|refus|different|first|needs/i.test(status) ? "bad" : "muted"}" role="status">${esc(status)}<\/p>` : "";
     const showServer = otherServer || !api.server || (!!st.server && st.server !== api.server);
     if (api.playRoot) {
       api.playRoot.innerHTML = live ? `<h3>Shared table<\/h3>
@@ -9905,8 +9915,8 @@ function mountTable(api) {
           <p class="small tbl-players"><\/p>${statusP}<ul class="log tbl-log"><\/ul>`
         : `<div class="eyebrow">Shared table<\/div>
           <p class="small muted">Start a table and give the players its code. Every roll they make from their sheet shows up here as it happens, rolled by the table so nobody can fudge it.<\/p>
-          <div class="fields"><div class="field"><label for="tbl-tname">Table name<\/label><input type="text" id="tbl-tname" data-tbl="tname" maxlength="60" placeholder="Saturday's game"><\/div>${showServer ? serverField("tbl-gserver") : ""}<\/div>
-          <div class="btn-row"><button class="btn primary" data-tbl="start">Start a table<\/button>${st.gmKeys[st.code] ? `<button class="btn" data-tbl="rejoin">Rejoin ${esc(st.code)} as GM<\/button>` : ""}${!showServer ? `<button class="linkish small" data-tbl="showserver">Another table server…<\/button>` : ""}<\/div>${statusP}`;
+          <div class="fields"><div class="field"><label for="tbl-tname">Table name<\/label><input type="text" id="tbl-tname" data-tbl="tname" maxlength="60" placeholder="Saturday's game" value="${esc(tname)}"><\/div>${accessField()}${showServer ? serverField("tbl-gserver") : ""}<\/div>
+          <div class="btn-row"><button class="btn primary" data-tbl="start">Start a table<\/button>${st.gmKeys[st.code] ? `<button class="btn" data-tbl="rejoin">Rejoin ${esc(st.code)} as GM<\/button>` : ""}${!showServer ? `<button class="linkish small" data-tbl="showserver">Another table server…<\/button>` : ""}${st.access ? `<button class="linkish small" data-tbl="forgetaccess">Forget my GM access code<\/button>` : ""}<\/div>${statusP}`;
     }
     for (const [root, who] of [[api.playRoot, "player"], [api.gmRoot, "gm"]]) if (root)
       root.insertAdjacentHTML("beforeend", `<p class="small tbl-helpline"><button type="button" class="linkish" data-tbl="help" data-who="${who}">How a shared game works<\/button><\/p>`);
@@ -9918,7 +9928,7 @@ function mountTable(api) {
     const P = esc(api.playTab || "play"), pt = esc(api.pointName || "point"), party = esc(api.partyName || "party");
     const step = (h, body) => `<li><b>${h}<\/b> ${body}<\/li>`;
     const gm = `<ol class="tbl-steps">
-      ${step("Start the table.", `Open the <b>GM view<\/b>. In <b>Shared table<\/b>, give the game a name and press <b>Start a table<\/b>. You get a six-character code.`)}
+      ${step("Start the table.", `Open the <b>GM view<\/b>. In <b>Shared table<\/b>, give the game a name and press <b>Start a table<\/b>. You get a six-character code. If the server asks for a <b>GM access code<\/b>, type the one its owner gave you: it's asked for once.`)}
       ${step("Invite the players.", `Press <b>Copy link<\/b> and send it to them (a message, a chat, an email), or read out the code. Keep this page open; if you close it, <b>Rejoin as GM<\/b> brings you back from this same browser.`)}
       ${step("Watch them arrive.", `Each player's character appears under <b>Characters<\/b>, marked <i>at the table<\/i>. Their injuries, ${pt} points and ammunition stay in step both ways: mark a box on their card and it shows on their sheet, and the other way round.`)}
       ${step("Roll.", `Every roll from a player's sheet is rolled by the table and lands in the log here, with the dice, the target and any telling hit. A ${pt} point reroll answers its roll once.`)}
@@ -9965,12 +9975,14 @@ function mountTable(api) {
     const val = (k) => { const i = root && root.querySelector(`[data-tbl="${k}"]`); return i ? i.value.trim() : ""; };
     const k = b.dataset.tbl;
     if (val("server")) { st.server = val("server"); }
+    if (val("access")) { st.access = val("access"); }
     if (k === "join") {
       const code = val("code").toUpperCase(), name = val("name");
       if (!/^[A-Z0-9]{6}$/.test(code)) { status = "A table code has six letters and numbers."; render(); return; }
       if (!name && !character) { status = "Give your name (or name your character)."; render(); return; }
       st.code = code; st.name = name; st.role = "player"; save(); join();
     } else if (k === "start") start(val("tname"));
+    else if (k === "forgetaccess") { st.access = ""; st.needAccess = true; status = ""; render(); }
     else if (k === "rejoin") { st.role = "gm"; st.joined = true; save(); connect(); }
     else if (k === "leave") leave();
     else if (k === "help") { openHelp(b.dataset.who); return; }

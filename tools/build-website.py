@@ -31,11 +31,23 @@ TABLE_SLUG = "/shared-table"
 CONTACT_SLUG = "/contact"
 CONTACT_EMAIL = "contact@legenddynamicsrpg.com"
 START_SLUG = "/start"
+# The shared table's restricted playtest: only GMs with an access code can start a table on the site's table server
+# (GM_CODES, legend-dynamics/table-server/README.md). Set to False to take the notice off every page.
+TABLE_PLAYTEST = True
 CHANGELOG_SLUG = "/changelog"
 
 BRAND_FONTS = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
 
 e = html.escape
+
+
+def table_notice(extra=""):
+    """The restricted-playtest notice, wherever the site offers the shared table ("" when TABLE_PLAYTEST is off)."""
+    if not TABLE_PLAYTEST:
+        return ""
+    return (f'<div class="ld ld-callout" style="margin:1.2rem 0"><b>Restricted playtest</b><p>The shared table is in a restricted playtest. '
+            f'For now, only GMs with an access code can start a table on it; players can join any table their GM starts, with its code. '
+            f'Want to run a game on it? <a href="{CONTACT_SLUG}#ld-contact">Ask for a GM access code</a>.{extra}</p></div>')
 
 
 def rules_version():
@@ -100,13 +112,14 @@ def table_page():
     <a class="ld-button ld-button--ghost" href="#host">Host your own table server</a>
     <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}">Or play with the Discord bot</a>
   </div>
+  {table_notice(' Or <a href="#host">host your own table server</a>: the playtest limit applies only to this site\'s.')}
 </div>
 
 <!-- Block 2: running a game (anchor id "run") -->
 <div class="ld" id="run">
   <div class="ld-eyebrow">Running a game</div>
   <ol class="ld-steps">
-    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
+    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. If the table server asks for a <b>GM access code</b>, type the one its owner gave you; the creator remembers it. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
     <li><b>Players join.</b> Each opens their character, goes to the play tab, types the code and their name, and presses <b>Join</b>.</li>
     <li><b>Play.</b> Rolls from every sheet are rolled by the table and shown to all. Each character appears on the GM's cards, and injuries, points and ammunition stay in step both ways.</li>
     <li><b>Fight.</b> The GM's battle map and encounter show on every player's play tab. Players move their own tokens and, on their turn, send the GM what they do; the GM puts it into the Encounter panel and runs it.</li>
@@ -128,6 +141,7 @@ def table_page():
     <li><b>Check it's running.</b> The Worker's page shows its address, like {code('https://legend-table.yourname.workers.dev')}. Open it: it should say <i>Legend Dynamics table server.</i></li>
     <li><b>Point the creators at it.</b> In any creator's <b>Shared table</b> box, press <b>Another table server…</b> and paste the address; each browser remembers it, so the GM and every player do this once. If you host your own copy of this site, put the address in {code('legend-dynamics/table-server/server-url.txt')} and rebuild: the creators then use it without asking.</li>
     <li><b>Tidy up (recommended).</b> In {code('wrangler.toml')}, set {code('ALLOWED_ORIGINS')} to your site's address (add {code('null')} if people open the creators as files) so only your pages can use the server. In <b>Settings → Build</b>, set <b>Build watch paths</b> to {code('legend-dynamics/table-server/*')} so other changes don't rebuild it. In <b>Security → WAF → Rate limiting rules</b>, add one rule (the free plan allows one): about 20 requests a minute per visitor to paths starting with {code('/api/tables')}.</li>
+    <li><b>Only your GMs (recommended).</b> So that only people you've chosen can start tables on your server (and use up its free allowance), give each GM a private <b>access code</b>. In the Worker's <b>Settings → Variables and Secrets</b>, add a <b>Secret</b> named {code('GM_CODES')} listing them, one GM per line or comma: {code('Don: k7Qp2mXv9Lr4, Sam: w3Hn8Tz5Bq1c')} (examples: make your own). Make each code long and random (12 or more letters and digits; a password generator is ideal). The first time a GM presses <b>Start a table</b>, the creator asks for their code and then remembers it. Players never need one: they join with the table's code. To remove a GM, delete their entry and save. With no {code('GM_CODES')}, anyone can start a table.</li>
   </ol>
   <p style="margin-top:1rem">From a computer instead: in the {code('legend-dynamics/table-server')} folder, run {code('npx wrangler login')} and then {code('npx wrangler deploy')}. The folder's README has the details.</p>
 </div>
@@ -162,7 +176,7 @@ def contact_page():
   <div class="ld-eyebrow">Write to me</div>
   <form class="ld-form" id="ld-contact" action="mailto:{CONTACT_EMAIL}" method="post" enctype="text/plain">
     <label>Your name <input type="text" name="name" autocomplete="name" maxlength="80"></label>
-    <label>About <select name="topic"><option>A comment or suggestion</option><option>A question about the rules</option><option>Something isn't working</option><option>A story from my game</option><option>Something else</option></select></label>
+    <label>About <select name="topic"><option>A comment or suggestion</option><option>A question about the rules</option><option>Something isn't working</option><option>A story from my game</option>{"<option>A GM access code for the shared table</option>" if TABLE_PLAYTEST else ""}<option>Something else</option></select></label>
     <label>Game <select name="game"><option>Any or all</option>{games}<option>USS Pelion</option><option>Grimm</option></select></label>
     <label class="ld-wide">Your message <textarea name="message" rows="7" required maxlength="5000"></textarea></label>
     <div class="ld-actions ld-wide"><button class="ld-button" type="submit">Write the email</button></div>
@@ -241,6 +255,7 @@ def start_page():
     <li><b>Join or run a game.</b> Round a table, bring your sheet and three six-sided dice (or use the sheet's roller). Online, play on the <a href="{TABLE_SLUG}">shared table</a> built into every creator, or <a href="{DISCORD_SLUG}#session">over Discord</a> with the GM sharing their screen and the dice bot in the channel.
       <div class="ld-actions" style="margin-top:.8rem"><a class="ld-button ld-button--ghost" href="{TABLE_SLUG}#run">Use the shared table</a><a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}#session">Play over Discord</a></div></li>
   </ol>
+  {table_notice()}
 </div>
 
 <!-- Block 3: what each person needs -->
@@ -357,6 +372,7 @@ def home():
     <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}#session">Run a game over Discord</a>
     <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}#load">Add the dice bot to Discord</a>
   </div>
+  {table_notice(" The Discord dice bot is open to everyone.")}
 </div>
 
 <!-- Block 4: the odds -->

@@ -49,9 +49,22 @@ Put the address in `legend-dynamics/table-server/server-url.txt` (one line, `htt
 
 `ALLOWED_ORIGINS` in `wrangler.toml` says which sites' pages may use the server. `"*"` lets any page connect, which is fine for a private game. To allow only your site, set it to that address, for example `"https://legend-dynamics.pages.dev"`, and add `null` if you also open creators as files on your computer: `"https://legend-dynamics.pages.dev,null"`. Redeploy after changing it.
 
+### Only registered GMs (recommended)
+
+So that only GMs you've chosen can start tables on your server, and nobody else runs up its usage, give each one a private access code. In the Worker's **Settings → Variables and Secrets**, add a **Secret** named `GM_CODES`, one GM per line or comma:
+
+```
+Don: k7Qp2mXv9Lr4
+Sam: w3Hn8Tz5Bq1c
+```
+
+Those two are examples: don't use them. Make each code long and random: 12 or more letters and digits, from a password generator. The first time a GM presses **Start a table**, the creator asks for the code and then remembers it in that browser (**Forget my GM access code** clears it). Players never need one; they join with the table's code. To remove a GM, delete their line and save: they can't start new tables, and their existing tables carry on until they go idle. Each table started is logged with the GM's name (the Worker's **Logs**). With no `GM_CODES`, anyone can start a table. From a computer: `npx wrangler secret put GM_CODES`.
+
+Keep it a **Secret**, not a variable in `wrangler.toml`: a secret survives every deploy, and the codes stay out of the repository.
+
 ## Use it
 
-- **GM:** GM view → **Shared table** → name it → **Start a table**. Share the code, or **Copy link** and send that (the link fills in the code). **Rejoin** gets you back in after closing the page; the key that makes you the GM stays in your browser.
+- **GM:** GM view → **Shared table** → name it → **Start a table** (and the GM access code, the first time, if the server has `GM_CODES`). Share the code, or **Copy link** and send that (the link fills in the code). **Rejoin** gets you back in after closing the page; the key that makes you the GM stays in your browser.
 - **Players:** open your character → play tab → **Shared table** → type the code and your name → **Join**. A reload, or a dropped phone connection, reconnects by itself. **Leave the table** goes back to rolling on your own.
 
 Joining checks the game: a Trails table only takes players from the Trails creator.
@@ -73,6 +86,7 @@ Limits: 20 rolls a minute per connection, the last 200 rolls kept, messages up t
 A table is meant for a private game among friends, like a video-call link.
 
 - **The code is the door.** Anyone with a table's code (or link) can join it as a player: see the rolls and the shared characters, roll, and share a character. Six characters from 31 give about 887 million codes, so a table can't realistically be stumbled on, but share the code only with your players.
+- **Who can start tables.** With `GM_CODES` set (above), only GMs with an access code can start a table; the server compares hashes of the codes. Without it, anyone who can reach the server can.
 - **The GM key.** Starting a table gives the GM's browser a private key (24 random bytes); the server keeps only its hash. Only that browser can join as the GM and change other players' characters.
 - **Each player's browser has a private id**, and a shared character belongs to the browser that shared it (the server keeps only a hash). Someone who joins with the same name can't change that character or reroll its rolls.
 - **Remove a player.** On the GM view, **Remove** next to a player disconnects them, stops sharing their character (the GM's card stays, as an ordinary copy) and stops that browser rejoining this table.
