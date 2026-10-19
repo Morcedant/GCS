@@ -112,6 +112,28 @@ export async function hashKey(key) {
   return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/**
+ * The GMs allowed to start tables: the GM_CODES secret, one "Name: code" per line or comma (a bare code is "GM").
+ * No entries: anyone may start a table. Joining a table never needs one; its own code is the door.
+ * @param {any} text @returns {{ name: string, code: string }[]}
+ */
+export function parseAccess(text) {
+  return String(text ?? "").split(/[\n,]/).map((s) => s.trim()).filter(Boolean).map((s) => {
+    const i = s.indexOf(":");
+    return i < 0 ? { name: "GM", code: s } : { name: s.slice(0, i).trim() || "GM", code: s.slice(i + 1).trim() };
+  }).filter((a) => a.code);
+}
+
+/** The name an access code belongs to, or null. Hashes are compared, not the codes themselves. @param {{ name: string, code: string }[]} list @param {any} given */
+export async function checkAccess(list, given) {
+  const g = String(given ?? "").trim();
+  if (!g) return null;
+  const h = await hashKey(g);
+  let who = null;
+  for (const a of list) if ((await hashKey(a.code)) === h && who === null) who = a.name;
+  return who;
+}
+
 /** Server dice: three d6 from the platform's cryptographic random source, without modulo bias. */
 export function serverDice() {
   const out = /** @type {number[]} */ ([]);

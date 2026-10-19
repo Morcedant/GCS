@@ -106,7 +106,7 @@ def table_page():
 <div class="ld" id="run">
   <div class="ld-eyebrow">Running a game</div>
   <ol class="ld-steps">
-    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
+    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. If the table server asks for a <b>GM access code</b>, type the one its owner gave you; the creator remembers it. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
     <li><b>Players join.</b> Each opens their character, goes to the play tab, types the code and their name, and presses <b>Join</b>.</li>
     <li><b>Play.</b> Rolls from every sheet are rolled by the table and shown to all. Each character appears on the GM's cards, and injuries, points and ammunition stay in step both ways.</li>
     <li><b>Fight.</b> The GM's battle map and encounter show on every player's play tab. Players move their own tokens and, on their turn, send the GM what they do; the GM puts it into the Encounter panel and runs it.</li>
@@ -128,6 +128,7 @@ def table_page():
     <li><b>Check it's running.</b> The Worker's page shows its address, like {code('https://legend-table.yourname.workers.dev')}. Open it: it should say <i>Legend Dynamics table server.</i></li>
     <li><b>Point the creators at it.</b> In any creator's <b>Shared table</b> box, press <b>Another table server…</b> and paste the address; each browser remembers it, so the GM and every player do this once. If you host your own copy of this site, put the address in {code('legend-dynamics/table-server/server-url.txt')} and rebuild: the creators then use it without asking.</li>
     <li><b>Tidy up (recommended).</b> In {code('wrangler.toml')}, set {code('ALLOWED_ORIGINS')} to your site's address (add {code('null')} if people open the creators as files) so only your pages can use the server. In <b>Settings → Build</b>, set <b>Build watch paths</b> to {code('legend-dynamics/table-server/*')} so other changes don't rebuild it. In <b>Security → WAF → Rate limiting rules</b>, add one rule (the free plan allows one): about 20 requests a minute per visitor to paths starting with {code('/api/tables')}.</li>
+    <li><b>Only your GMs (recommended).</b> So that only people you've chosen can start tables on your server (and use up its free allowance), give each GM a private <b>access code</b>. In the Worker's <b>Settings → Variables and Secrets</b>, add a <b>Secret</b> named {code('GM_CODES')} listing them, one GM per line or comma: {code('Don: k7Qp2mXv9Lr4, Sam: w3Hn8Tz5Bq1c')} (examples: make your own). Make each code long and random (12 or more letters and digits; a password generator is ideal). The first time a GM presses <b>Start a table</b>, the creator asks for their code and then remembers it. Players never need one: they join with the table's code. To remove a GM, delete their entry and save. With no {code('GM_CODES')}, anyone can start a table.</li>
   </ol>
   <p style="margin-top:1rem">From a computer instead: in the {code('legend-dynamics/table-server')} folder, run {code('npx wrangler login')} and then {code('npx wrangler deploy')}. The folder's README has the details.</p>
 </div>
