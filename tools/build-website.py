@@ -31,11 +31,23 @@ TABLE_SLUG = "/shared-table"
 CONTACT_SLUG = "/contact"
 CONTACT_EMAIL = "contact@legenddynamicsrpg.com"
 START_SLUG = "/start"
+# The shared table's restricted playtest: only GMs with an access code can start a table on the site's table server
+# (GM_CODES, legend-dynamics/table-server/README.md). Set to False to take the notice off every page.
+TABLE_PLAYTEST = True
 CHANGELOG_SLUG = "/changelog"
 
 BRAND_FONTS = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
 
 e = html.escape
+
+
+def table_notice(extra=""):
+    """The restricted-playtest notice, wherever the site offers the shared table ("" when TABLE_PLAYTEST is off)."""
+    if not TABLE_PLAYTEST:
+        return ""
+    return (f'<div class="ld ld-callout" style="margin:1.2rem 0"><b>Restricted playtest</b><p>The shared table is in a restricted playtest. '
+            f'For now, only GMs with an access code can start a table on it; players can join any table their GM starts, with its code. '
+            f'Want to run a game on it? <a href="{CONTACT_SLUG}#ld-contact">Ask for a GM access code</a>.{extra}</p></div>')
 
 
 def rules_version():
@@ -100,6 +112,7 @@ def table_page():
     <a class="ld-button ld-button--ghost" href="#host">Host your own table server</a>
     <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}">Or play with the Discord bot</a>
   </div>
+  {table_notice(' Or <a href="#host">host your own table server</a>: the playtest limit applies only to this site\'s.')}
 </div>
 
 <!-- Block 2: running a game (anchor id "run") -->
@@ -163,7 +176,7 @@ def contact_page():
   <div class="ld-eyebrow">Write to me</div>
   <form class="ld-form" id="ld-contact" action="mailto:{CONTACT_EMAIL}" method="post" enctype="text/plain">
     <label>Your name <input type="text" name="name" autocomplete="name" maxlength="80"></label>
-    <label>About <select name="topic"><option>A comment or suggestion</option><option>A question about the rules</option><option>Something isn't working</option><option>A story from my game</option><option>Something else</option></select></label>
+    <label>About <select name="topic"><option>A comment or suggestion</option><option>A question about the rules</option><option>Something isn't working</option><option>A story from my game</option>{"<option>A GM access code for the shared table</option>" if TABLE_PLAYTEST else ""}<option>Something else</option></select></label>
     <label>Game <select name="game"><option>Any or all</option>{games}<option>USS Pelion</option><option>Grimm</option></select></label>
     <label class="ld-wide">Your message <textarea name="message" rows="7" required maxlength="5000"></textarea></label>
     <div class="ld-actions ld-wide"><button class="ld-button" type="submit">Write the email</button></div>
@@ -242,6 +255,7 @@ def start_page():
     <li><b>Join or run a game.</b> Round a table, bring your sheet and three six-sided dice (or use the sheet's roller). Online, play on the <a href="{TABLE_SLUG}">shared table</a> built into every creator, or <a href="{DISCORD_SLUG}#session">over Discord</a> with the GM sharing their screen and the dice bot in the channel.
       <div class="ld-actions" style="margin-top:.8rem"><a class="ld-button ld-button--ghost" href="{TABLE_SLUG}#run">Use the shared table</a><a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}#session">Play over Discord</a></div></li>
   </ol>
+  {table_notice()}
 </div>
 
 <!-- Block 3: what each person needs -->
@@ -358,6 +372,7 @@ def home():
     <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}#session">Run a game over Discord</a>
     <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}#load">Add the dice bot to Discord</a>
   </div>
+  {table_notice(" The Discord dice bot is open to everyone.")}
 </div>
 
 <!-- Block 4: the odds -->
