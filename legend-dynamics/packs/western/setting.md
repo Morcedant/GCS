@@ -97,21 +97,32 @@ A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells c
 | Witch-sight | See spirits, curses, charms and things wearing human skin. |
 | Stanch | Stop the bleeding: clear one injury box, once per set of injuries. |
 
+## Folklore, truth and lore cards
+
+What people say about the dark, what is actually true, and what your character knows are three different things.
+
+- **Local folklore.** The stories, warnings and superstitions everyone has heard: hang garlic at the window, never answer a voice calling from the trees, salt the threshold. Some of it is right, some is half right, and some is wrong. It's where an investigation starts.
+- **The truth.** What a creature really is and what really stops it. The GM knows it; you find it out.
+- **Lore cards.** What your character has established for themselves: one finding at a time, with its limits and how you know it. A card holds only what you found out, never a creature's whole story (see *Discovery clocks and lore cards*).
+
+A real weakness works whether or not anyone holds a card for it. Act on what you suspect: load silver, salt the doorway, try fire. The GM will ask what your idea rests on, and a good reason is all it needs.
+
 ## Weaknesses
 
-Every monster has a weakness, and finding it is often the whole job: a discovery clock that ends in a lore card (see *Discovery clocks and lore cards* in the Players' Guide). The Monster Hunter advantage and the Sighted's Monster's Eye help with the Identify rolls. A weakness works whoever stumbles on it: silver marks its extra box even fired by someone who has never heard of werewolves. A lore card is what lets a hunter use it on purpose: a called shot at the heart, a line of salt laid in time, the true name spoken.
+Every monster has a weakness, and finding it is often the whole job: a discovery clock, a survivor's account, or a test that works (see *Discovery clocks and lore cards* in the Players' Guide). The Monster Hunter advantage and the Sighted's Monster's Eye help with the Identify rolls. **A real weakness works whoever uses it, card or no card:** silver marks its extra box fired by someone who has never heard of werewolves, and a hunter who suspects silver can load it on purpose. Called shots (at a heart, a head) follow the ordinary combat rules. What a weakness doesn't give anyone is an unfamiliar ritual: a banishment, a binding or a cure still needs its procedure, the knowledge, the skill and the components.
 
 | Creature | Weakness |
 |---|---|
 | Werewolf | Silver: an extra box, and its toughness doesn't help. Wolfsbane keeps it away. |
-| Vampire | A wooden stake through the heart incapacitates; fire, sunlight and beheading destroy. Holy symbols hold it back; it can't enter a home uninvited. |
+| Vampire | A wooden stake through the heart incapacitates but doesn't kill; fire, sunlight and beheading destroy. Holy symbols hold it back; it can't enter a home uninvited. Destroying a natural vampire frees its whole lineage (see *Vampires*). |
 | Zombie | A shot to the head (−2 to hit) or fire puts it down for good; anything else just slows it. |
 | Ghost | Can't be hurt. Lay it to rest by finishing its business, or bind it with a ritual. |
 | Wraith | Only silver, cold iron, salt and fire hurt it. It can't cross a line of salt or iron filings. Destroyed for good only when its bones are found and burned. |
 | Banshee | Weapons don't touch her. She leaves at dawn if the one she keens for is still alive. A hit with silver, or an iron bell rung at her, silences her for the scene. |
 | Ghoul | Fire and daylight. It flees from holy ground. |
-| Demon | Holy water burns it; a ritual banishes it. It must keep a bargain to the letter. |
-| Wendigo | Fire: the only thing that truly hurts it. It is destroyed for good only when its heart of ice is cut out and burned. It is strongest in deep winter and weakest in summer heat. |
+| Demon | Holy water burns it. A true demon is not fought like a beast: a major ritual or a powerful holy talisman banishes it (see *Demons*). It must keep a bargain to the letter. |
+| Hellhound | Holy water drives it off for a time. Its hunt ends only when the claim on its quarry's soul is resolved or changed, or a major ritual interferes with the pact (see *Hellhounds*). |
+| Wendigo | Ordinary weapons wound it, but it heals unnaturally, and only fire stops the healing (only fire marks more than 1 box at a time). It is destroyed for good only when it is beheaded and its body burned. It is strongest in deep winter and weakest in summer heat. |
 | Skinwalker | Underneath, it is a person. In a stolen shape, ordinary wounds mark only 1 box at a time; in its own shape, it is as mortal as anyone. Speak its true name to its face and it is forced back into its own shape for the scene. |
 | Headless Rider | Its head, hidden near where it died: laid back in the grave, the rider rests for good. It can't cross running water, so a bridge over a creek is safety. |
 
@@ -125,10 +136,57 @@ What a lore card for each creature knows, and what it permits. These are also th
 
 - **Zombie bite.** A bite that marks a box starts a 4-segment **Infection** clock, ticking each hour. A successful Medicine roll with an Occult remedy stops it; when it fills, you die, and rise.
 - **Werewolf bite.** A bite under the full moon can pass on the curse; the GM decides, and lifting it is a major ritual.
-- **Vampire bite.** A vampire who drains a victim to Dying can choose to turn them.
+- **Vampire bite.** A vampire who drains a victim to Dying can choose to turn them. The turned belong to its lineage (see *Vampires*).
 - **The wendigo's hunger.** It begins with someone who ate human flesh to survive a starving winter in the high passes. A character who does starts a 4-segment **Hunger** clock, ticking each week they go without it again; when it fills, they belong to the wendigo. Only a major ritual lifts it.
 - **A wraith's touch.** Someone killed by it rises as a wraith at the next new moon, unless they're buried with salt in the coffin.
 - **A banshee's keening.** She is tied to a family's blood, not a place: once she has keened for one of a line, she can follow that family from town to town.
+
+## Vampires
+
+- **Lineages.** Each **natural vampire** sustains its own lineage: everyone it has turned, and everyone they have turned in turn. There is more than one natural vampire.
+- **Freeing a lineage.** Destroy the natural source, and the whole chain reverts to human, including those infected only indirectly. Destroying a vampire it turned (an intermediate) cures nobody.
+- **A stake isn't the end.** A stake through the heart incapacitates a vampire; it doesn't destroy it. Staking the source doesn't free its lineage; destroying it does.
+- **What reversion does to the body.** Wounds that vampiric regeneration already healed stay healed. Wounds that hadn't healed remain, and have their ordinary human consequences at once: someone reverting with three boxes marked is Dying. Reversion itself repairs nothing.
+- This cure is a vampire's alone: no other creature's victims are freed by killing their maker.
+
+## The wendigo
+
+- Ordinary weapons wound it; only fire marks more than 1 box at a time.
+- It heals unnaturally fast, and only fire interferes with that healing.
+- It is destroyed for good only when it is **beheaded and its body burned**. After beheading, the body can still lash out, but blindly: its actions have no direction.
+- How fast it heals, how long fire holds the healing back, and how the headless body's blind attacks are run are not yet set; until they are, the GM rules.
+
+## Hellhounds
+
+- A hellhound's hunt is a **curse tied to a claim on someone's soul**.
+- The hunt ends only when the conditions behind the claim are **resolved or changed**. A powerful practitioner can interfere with the pact through a **major ritual**.
+- **Holy water** drives a hellhound off and protects its quarry for a time; it doesn't cancel the pact.
+- Whether destroying a hellhound's physical body buys the quarry time, and how much, is not settled: the GM rules case by case.
+
+## The shadow realm
+
+The **shadow realm** is a real place in the same world as ours, not another Earth: it has no copies of our towns or our people. It is an independent and brutal ecology, with its own hunters and prey. Some of its creatures cross over, and some of those spread a **contagion** (a bite, a curse) that makes more of their kind; others never do. Each threat has its own weaknesses, found out on their own terms: not every horror is an infection.
+
+Some hold that the things of the dark are **fallen angels** and their brood. Others call that a preacher's story. No one has settled it, and the game doesn't.
+
+## Demons
+
+Three kinds of thing get called a demon, and they aren't the same:
+
+- **Demonic creatures** native to the shadow realm: beasts and hunters of that ecology.
+- **Creatures under demonic influence**: something, or someone, bent by a demon's power.
+- **True demons**, native to the deeper **Abyss**: a realm of no light and of eldritch powers, not a fiery hell. A true demon isn't a creature of fire.
+
+A **true demon can't enter our world unaided**: it must be **summoned**, or come through a **possession**. A person can be possessed only if they are corrupted and have no faith of any kind at all. True demons are exceptionally powerful, and a generic fight is not how they are met: the encounter is a **ritual or a negotiation**, and the countermeasures are major rituals and powerful holy talismans.
+
+- **Banishment by a talisman.** A sufficiently powerful holy talisman can banish a demon by breaking its binding to our world. What happens to the host depends on the talisman and how it acts: a holy sword that fatally wounds the host banishes the demon and kills the host.
+- **Banishment by ritual.** A properly completed banishment ritual preserves the host, if their body can survive without the demon holding it up.
+- **A possessed body.** A demon can keep a body moving through wounds that would otherwise be fatal, but possession heals nothing and grows nothing back. Ordinary injury to the body doesn't kill the demon. This is not a vampire's regeneration: when the demon goes, the body's wounds are all still there.
+- What counts as faith, how a possession is resolved at the table, and whether a possessed host's wounds can be stabilized before the banishment are not yet set; until they are, the GM rules.
+
+## Rituals and remedies
+
+A remedy or a ritual against the dark always has a procedure: what it requires, how long it takes, which rolls it calls for, its components, what happens if it's interrupted, and what failure costs. Zombie treatment, lifting a curse, binding a ghost, banishing a demon and interfering with a hellhound's pact all work this way. Use the *Magic* rules (a ritual clock in Occult rolls) and the weights above for any the GM hasn't spelled out.
 
 # Threats
 

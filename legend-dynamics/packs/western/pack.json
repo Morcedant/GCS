@@ -3253,7 +3253,7 @@
     "jaws"
    ],
    "trait": "Hunter",
-   "traitText": "Always finds its quarry; holy water drives it off."
+   "traitText": "Always finds its quarry: its hunt is a curse tied to a claim on that soul. Holy water drives it off for a time."
   },
   {
    "id": "wendigo",
@@ -3278,7 +3278,7 @@
     "claws"
    ],
    "trait": "Endless hunger",
-   "traitText": "Calls out in the voices of the lost to lure prey; ignores the Wounded penalty. Only fire marks more than 1 box at a time, and it rises again unless its heart of ice is burned.",
+   "traitText": "Calls out in the voices of the lost to lure prey; ignores the Wounded penalty. Only fire marks more than 1 box at a time. Ordinary wounds heal unnaturally; fire stops the healing. Destroyed for good only when beheaded and its body burned.",
    "traits": [
     {
      "type": "capBoxes",
@@ -3582,11 +3582,17 @@
    },
    {
     "title": "Monsters",
-    "intro": "The details behind *Monsters and magic* in the Players' Guide: what each monster fears, what a lore card for it permits, and what its bite or curse does. In the story, hunters learn these the hard way: a discovery clock, a survivor's tale, or a fight that goes wrong.",
+    "intro": "The truth behind *Monsters and magic* in the Players' Guide: what each monster fears, what a lore card for it records, what its bite or curse does, and the rulings for vampires, the wendigo, hellhounds, the shadow realm and demons. In the story, hunters learn these a piece at a time: a discovery clock, a survivor's tale, a test that works, or a fight that goes wrong.",
     "take": [
      "## Weaknesses",
      "## Lore cards",
-     "## Bites and curses"
+     "## Bites and curses",
+     "## Vampires",
+     "## The wendigo",
+     "## Hellhounds",
+     "## The shadow realm",
+     "## Demons",
+     "## Rituals and remedies"
     ]
    },
    {
@@ -3604,7 +3610,7 @@
    }
   ],
   "leave": {
-   "## Weaknesses": "## Weaknesses\n\nEvery monster has a weakness, and finding it is often the whole job: a discovery clock that ends in a lore card (see *Discovery clocks and lore cards*). The Monster Hunter advantage and the Sighted's Monster's Eye help with the Identify rolls. A weakness works whoever stumbles on it; a lore card is what lets a hunter use it on purpose. Each monster's weakness, what its lore card permits, and what its bite or curse does are in the *Monsters* chapter of the GM's Guide."
+   "## Weaknesses": "## Weaknesses\n\nEvery monster has a weakness, and finding it is often the whole job: a discovery clock, a survivor's account, or a test that works (see *Discovery clocks and lore cards*). The Monster Hunter advantage and the Sighted's Monster's Eye help with the Identify rolls. A real weakness works whoever uses it, card or no card; called shots follow the ordinary combat rules, and an unfamiliar ritual still needs its procedure. What each monster really is and what stops it are in the *Monsters* chapter of the GM's Guide."
   },
   "replace": [
    [
@@ -3642,11 +3648,11 @@
    ],
    [
     "Identify",
-    "Name the creature. This is the gate: until its identity is confirmed, no lore card applies, and the GM treats your theories as suspicion only."
+    "Name the creature. This is the gate: until its identity is confirmed, what you know about a kind of creature doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works."
    ],
    [
     "Uncover",
-    "Learn how it is beaten. Filling this phase fills the clock and mints a lore card."
+    "Learn how it is beaten. Filling this phase fills the clock and earns a lore card for what you established."
    ]
   ],
   "threat": {
@@ -3733,8 +3739,8 @@
    [
     "vampire",
     "Vampire",
-    "A stake through the heart incapacitates it; fire, sunlight and beheading destroy it; holy symbols hold it back; it can't enter uninvited.",
-    "A called shot with a stake at the heart: its weakness, which incapacitates it (an established weakness, not a telling-hit pin); hunting it by day; refusing it entry."
+    "A stake through the heart incapacitates it but doesn't kill it; fire, sunlight and beheading destroy it; holy symbols hold it back; it can't enter uninvited. Each natural vampire sustains its own lineage: destroy the natural source, and everyone infected from it, directly or through others, turns human again.",
+    "Hunting it by day; refusing it entry; staking it to hold it while the source of its line is found and destroyed."
    ],
    [
     "zombie",
@@ -3769,14 +3775,20 @@
    [
     "demon",
     "Demon",
-    "Holy water burns it; a ritual banishes it; it must keep a bargain to the letter.",
-    "The banishing ritual; holding it to the letter of a bargain."
+    "A true demon can't enter our world unaided: it must be summoned, or possess someone. Major rituals and powerful holy talismans are what work against it, not a gunfight; a holy talisman strong enough breaks its binding to our world and banishes it. Holy water burns it. It must keep a bargain to the letter.",
+    "Negotiating with it on safe terms; preparing a banishment; recognizing a possession for what it is."
+   ],
+   [
+    "hellhound",
+    "Hellhound",
+    "Its hunt is a curse tied to a claim on someone's soul. Holy water drives it off for a time but doesn't cancel the pact. The hunt ends only when the conditions behind the claim are resolved or changed, or a powerful practitioner interferes with the pact through a major ritual.",
+    "Protecting its quarry with holy water while the claim is looked into; seeking out the terms of the pact."
    ],
    [
     "wendigo",
     "Wendigo",
-    "Fire alone truly hurts it; it is destroyed only when its heart of ice is cut out and burned; weakest in summer heat.",
-    "A called shot to cut out its heart; driving it into the heat."
+    "Ordinary weapons wound it, but it heals unnaturally; only fire stops the healing. It is destroyed for good only when it is beheaded and its body burned, and the headless body still lashes out, blindly, until it burns. It is strongest in deep winter and weakest in summer heat.",
+    "Bringing fire to the fight; planning to behead it and burn the body; hunting it in the warm months."
    ],
    [
     "skinwalker",
@@ -3791,7 +3803,30 @@
     "Finding its head; making a stand across running water."
    ]
   ],
-  "start": "**A hunter's almanac at creation.** A character who already knows the dark (a Monster Hunter, most often) can take the **Hunter's Almanac** advantage: three lore cards, for creatures they've faced or studied, chosen at creation. Pick them from the creatures in the GM's Guide; each says what you know and what it permits."
+  "start": "**A hunter's almanac at creation.** A character who already knows the dark (a Monster Hunter, most often) can take the **Hunter's Almanac** advantage: three lore cards, for creatures they've faced or studied, chosen at creation. Pick them from the creatures in the GM's Guide; each says what you know and what it permits.",
+  "scoped": true,
+  "routes": [
+   [
+    "investigation",
+    "A discovery clock",
+    "filled to the end of Uncover"
+   ],
+   [
+    "experience",
+    "Seen or tested firsthand",
+    "direct experience, or a sensible experiment"
+   ],
+   [
+    "account",
+    "A reliable account",
+    "reliable transmitted experience: a survivor, a grimoire, church archives, Shadow Knight records. A source's reputation alone doesn't make it right, but a reliable account can establish a fact without anyone repeating a dangerous test"
+   ],
+   [
+    "creature",
+    "A creature's word, backed up",
+    "what a supernatural creature says, supported by evidence"
+   ]
+  ]
  },
  "materials": [
   [

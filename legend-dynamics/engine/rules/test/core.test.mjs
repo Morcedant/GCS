@@ -120,4 +120,9 @@ test("stun weapons, Defense Classes and always-on armor", () => {
   assert.equal(hit(revolver, wraith).damage, null, "nothing else hurts it");
   assert.match(hit(revolver, wraith).outcome, /marks nothing \(Life-drinker\)/);
   assert.equal(hit({ ...revolver, materials: ["iron"] }, wraith).damage.boxes, 2);
+  // A real weakness works whoever uses it: an attacker with no lore cards gets the same result as one holding many.
+  const hitBy = (/** @type {any} */ who) => LD.resolveAttack({ attacker: who, defender: def(were), weapon: silver, band: "close" }, LD.NO_HOOKS, roll);
+  const novice = { ...atk, cards: [] }, hunter = { ...atk, cards: [{ tag: "werewolf", knowledge: "Silver hurts it" }] };
+  assert.deepEqual(hitBy(novice).damage, hitBy(hunter).damage, "lore cards don't change a weakness");
+  assert.equal(hitBy(novice).weakness, "Silver");
 });

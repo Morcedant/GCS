@@ -344,6 +344,8 @@ tr.lvl-U td.target { color: var(--muted); }
 .dclock.done { border-color: var(--accent); }
 .disc-match { font-size: .88rem; }
 .disc-mint { display: grid; gap: 6px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.disc-award { border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 10px; display: grid; gap: 6px; }
+.disc-award > summary { cursor: pointer; font-weight: 600; }
 .lcard { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px; background: var(--well); }
 .lcard .fields { margin: 0; }
 .lcard-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; justify-content: space-between; }
@@ -935,6 +937,11 @@ tr.lvl-U td.target { color: var(--muted); }
           <option value="1,2,2">1 · 2 · 2 (quick)</option><option value="2,2,2" selected>2 · 2 · 2</option><option value="2,3,3">2 · 3 · 3 (substantial)</option><option value="2,3,3,x">8 in all (long)</option></select></div>
       </div>
       <div class="btn-row"><button class="btn primary" id="disc-add">Start the clock</button></div>
+      <details class="disc-award" id="disc-award"><summary>Record a finding without a clock</summary>
+        <p class="small muted" id="disc-award-intro"></p>
+        <div class="fields" id="da-fields"></div>
+        <div class="btn-row"><button class="btn primary" id="da-go">Record it</button></div>
+      </details>
       <div class="toast" id="disc-msg" role="status" aria-live="polite"></div>
     </div>
     <div class="card hud no-print bm-card">
@@ -1267,8 +1274,11 @@ tr.lvl-U td.target { color: var(--muted); }
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const uid = () => Math.random().toString(36).slice(2, 10);
   // Discovery clocks and the cards they mint (pack discovery): lore cards, dossiers, data records. A card grants no bonus;
-  // it records what was learned and what it permits, kept in the character file under "cards".
+  // it records what was learned and what it permits, kept in the character file under "cards". A setting with scoped cards
+  // (discovery.scoped) records only what the characters established: the finding, its limits, the evidence or source, how it
+  // was learned (discovery.routes) and when; nothing is filled in from the creature's full profile.
   const DISC = PACK.discovery || null;
+  const ROUTES = (DISC && DISC.routes) || [];
   const capFirst = (x) => x ? x[0].toUpperCase() + x.slice(1) : x;
   const slugTag = (x) => String(x || "").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const cardStr = (v, n = 300) => (typeof v === "string" ? v : "").slice(0, n);
@@ -1278,7 +1288,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const name = cardStr(x.name, 80) || cardStr(x.tag, 80);
     return { id: cardStr(x.id, 20) || uid(), tag: slugTag(x.tag || name), name, knowledge: cardStr(x.knowledge), permits: cardStr(x.permits),
       ...(kinds.length ? { kind: kinds.some((k) => k[0] === x.kind) ? x.kind : kinds[0][0] } : {}),
-      job: cardStr(x.job, 120), owner: cardStr(x.owner, 60), shared: !!x.shared, present, source: ["almanac", "play", "taught"].includes(x.source) ? x.source : "play" };
+      job: cardStr(x.job, 120), owner: cardStr(x.owner, 60), shared: !!x.shared, present, source: ["almanac", "play", "taught"].includes(x.source) ? x.source : "play",
+      limits: cardStr(x.limits), evidence: cardStr(x.evidence), route: ROUTES.some((r) => r[0] === x.route) ? x.route : "", date: cardStr(x.date, 60) };
   }
   const signed = (n) => (n > 0 ? "+" + n : n < 0 ? "−" + Math.abs(n) : "0");
 
@@ -1886,12 +1897,16 @@ tr.lvl-U td.target { color: var(--muted); }
   function almanacCard(sub) {
     return normCard({ tag: sub[0], name: sub[1], knowledge: sub[2], permits: sub[3], job: "Before play (Hunter's Almanac)", owner: ch.name.trim(), source: "almanac" });
   }
+  const routeName = (id) => (ROUTES.find((r) => r[0] === id) || [, id])[1];
+  const routeOpts = (sel) => `<option value="">How it was learned…</option>` + ROUTES.map((r) => `<option value="${esc(r[0])}"${r[0] === sel ? " selected" : ""}>${esc(r[1])}</option>`).join("");
   function cardLine(k) {
     const kind = DISC.kinds && k.kind ? (DISC.kinds.find((x) => x[0] === k.kind) || [])[0] : "";
     return `<b>${esc(k.name || k.tag || "Unnamed")}</b>${kind ? ` <span class="muted small">(${esc(kind)})</span>` : ""}`
       + (k.knowledge ? `<span class="small">${esc(k.knowledge)}</span>` : "")
+      + (k.limits ? `<span class="small"><b>Limits:</b> ${esc(k.limits)}</span>` : "")
       + (k.permits ? `<span class="small"><b>Permits:</b> ${esc(k.permits)}</span>` : "")
-      + `<span class="small muted">${[k.job && esc(k.job), k.shared ? `shared copy; owner ${esc(k.owner || "unknown")}` : k.owner ? `owner ${esc(k.owner)}` : "", k.present.length ? `present: ${esc(k.present.join(", "))}` : ""].filter(Boolean).join(" · ")}</span>`;
+      + (k.evidence || k.route ? `<span class="small"><b>${k.route ? esc(routeName(k.route)) : "Source"}:</b> ${esc(k.evidence || "—")}</span>` : "")
+      + `<span class="small muted">${[k.date && esc(k.date), k.job && esc(k.job), k.shared ? `shared copy; owner ${esc(k.owner || "unknown")}` : k.owner ? `owner ${esc(k.owner)}` : "", k.present.length ? `present: ${esc(k.present.join(", "))}` : ""].filter(Boolean).join(" · ")}</span>`;
   }
   function renderCards() {
     $("cards-wrap").hidden = !DISC;
@@ -1900,7 +1915,9 @@ tr.lvl-U td.target { color: var(--muted); }
     if (!hasAlmanac() && ch.cards.some((k) => k.source === "almanac")) ch.cards = ch.cards.filter((k) => k.source !== "almanac");
     const own = ch.cards.filter((k) => k.source !== "almanac"), alm = ch.cards.filter((k) => k.source === "almanac");
     $("cards-label").textContent = `${capFirst(DISC.cards)} learned in play: your ${DISC.collection}` + (ch.cards.length ? ` (${ch.cards.length})` : "");
-    $("cards-intro").textContent = `A ${DISC.card} is earned at the end of a discovery clock, by the primary investigator and everyone present. It grants no bonus: it records what you learned and what it permits. The GM can add one to everyone present from the GM view; write one here when you earn it or someone teaches you.`;
+    $("cards-intro").textContent = DISC.scoped
+      ? `A ${DISC.card} records one thing your character has established about the supernatural: what, how far it goes, and how you know it. Earn one at the end of a discovery clock, from something you saw or tested yourself, or from a reliable account; the GM can record it for everyone who was there from the GM view. It grants no bonus, and a weakness works whether or not you hold a card for it. Write one here when you earn it or someone teaches you.`
+      : `A ${DISC.card} is earned at the end of a discovery clock, by the primary investigator and everyone present. It grants no bonus: it records what you learned and what it permits. The GM can add one to everyone present from the GM view; write one here when you earn it or someone teaches you.`;
     $("card-add").textContent = `Add a ${DISC.card}`;
     $("almanac-wrap").hidden = !hasAlmanac();
     if (hasAlmanac()) {
@@ -1917,8 +1934,12 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="field"><label for="cd-name-${k.id}">Subject</label><input type="text" id="cd-name-${k.id}" data-cf="name" placeholder="${DISC.subjects && DISC.subjects[0] ? esc(DISC.subjects[0][1]) : "Who or what it's about"}"></div>
           ${DISC.kinds ? `<div class="field"><label for="cd-kind-${k.id}">Kind</label><select id="cd-kind-${k.id}" data-cf="kind">${DISC.kinds.map((x) => `<option value="${x[0]}">${esc(capFirst(x[0]))}</option>`).join("")}</select></div>` : ""}
           <div class="field"><label for="cd-job-${k.id}">Earned in</label><input type="text" id="cd-job-${k.id}" data-cf="job" placeholder="The ${esc(T.missionLower || "job")}"></div>
-          <div class="field wide"><label for="cd-know-${k.id}">What you learned</label><input type="text" id="cd-know-${k.id}" data-cf="knowledge"></div>
-          <div class="field wide"><label for="cd-perm-${k.id}">What it permits</label><input type="text" id="cd-perm-${k.id}" data-cf="permits"></div>
+          <div class="field wide"><label for="cd-know-${k.id}">${DISC.scoped ? "What you established" : "What you learned"}</label><input type="text" id="cd-know-${k.id}" data-cf="knowledge"></div>
+          ${DISC.scoped ? `<div class="field wide"><label for="cd-lim-${k.id}">Limits: what it doesn't tell you</label><input type="text" id="cd-lim-${k.id}" data-cf="limits"></div>` : ""}
+          <div class="field wide"><label for="cd-perm-${k.id}">What it permits${DISC.scoped ? " (optional)" : ""}</label><input type="text" id="cd-perm-${k.id}" data-cf="permits"></div>
+          ${DISC.scoped ? `<div class="field wide"><label for="cd-evid-${k.id}">Evidence or source</label><input type="text" id="cd-evid-${k.id}" data-cf="evidence"></div>
+          ${ROUTES.length ? `<div class="field"><label for="cd-route-${k.id}">How it was learned</label><select id="cd-route-${k.id}" data-cf="route">${routeOpts("")}</select></div>` : ""}
+          <div class="field"><label for="cd-date-${k.id}">Date</label><input type="text" id="cd-date-${k.id}" data-cf="date" placeholder="In the story, e.g. May 1874"></div>` : ""}
           <div class="field"><label for="cd-owner-${k.id}">Owner</label><input type="text" id="cd-owner-${k.id}" data-cf="owner" placeholder="The primary investigator"></div>
           <div class="field"><label for="cd-present-${k.id}">Who was there</label><input type="text" id="cd-present-${k.id}" data-cf="present" placeholder="Names, with commas"></div>
           <div class="field wide"><div class="checks"><label><input type="checkbox" id="cd-shared-${k.id}" data-cf="shared"> A shared copy (someone else is the owner)</label>
@@ -1931,6 +1952,7 @@ tr.lvl-U td.target { color: var(--muted); }
       set("cd-name-" + k.id, k.name); set("cd-job-" + k.id, k.job); set("cd-know-" + k.id, k.knowledge); set("cd-perm-" + k.id, k.permits);
       set("cd-owner-" + k.id, k.owner); set("cd-present-" + k.id, k.present.join(", ")); set("cd-shared-" + k.id, k.shared); set("cd-taught-" + k.id, k.source === "taught");
       if (DISC.kinds) set("cd-kind-" + k.id, k.kind);
+      set("cd-lim-" + k.id, k.limits); set("cd-evid-" + k.id, k.evidence); set("cd-route-" + k.id, k.route); set("cd-date-" + k.id, k.date);
     }
   }
 
@@ -2807,9 +2829,24 @@ tr.lvl-U td.target { color: var(--muted); }
     discSave();
     if (fired) discSay(`${T2.name} filled: ${T2.onFill}.` + (T2.repeat ? ` ${capFirst(T2.count || "times filled")}: ${th.count}.` : ""));
   }
+  function renderAward() {
+    const sig = gmCrew.map((c) => c.id + ":" + (c.name || "")).join(",");
+    if ($("disc-award").dataset.sig === sig) return;
+    $("disc-award").dataset.sig = sig;
+    $("disc-award-intro").textContent = DISC.scoped
+      ? `When the characters establish something directly, by seeing or testing it themselves, from a reliable account, or from a creature whose word is backed up, record it here. No clock is needed. Write down only what they established.`
+      : `Record a ${DISC.card} learned without a clock: something seen directly, or taught.`;
+    $("da-fields").innerHTML = `<div class="field"><label for="da-sub">Subject</label><input type="text" id="da-sub" list="da-subs" placeholder="${esc(DISC.subjects && DISC.subjects[0] ? DISC.subjects[0][1] : "Who or what it's about")}"><datalist id="da-subs">${(DISC.subjects || []).map((x) => `<option value="${esc(x[1])}">`).join("")}</datalist></div>
+      ${DISC.kinds ? `<div class="field"><label for="da-kind">Kind</label><select id="da-kind">${DISC.kinds.map((x) => `<option value="${x[0]}">${esc(capFirst(x[0]))}</option>`).join("")}</select></div>` : ""}
+      ${DISC.scoped ? scopedFields("da-", null) : `<div class="field wide"><label for="da-know">What they learned</label><input type="text" id="da-know"></div><div class="field wide"><label for="da-perm">What it permits</label><input type="text" id="da-perm"></div>`}
+      <div class="field"><label for="da-job">Earned in</label><input type="text" id="da-job" placeholder="The ${esc(T.missionLower || "job")}"></div>
+      <div class="field"><label for="da-owner">Owner</label><select id="da-owner"><option value="">Who holds it…</option>${gmCrew.map((c) => `<option value="${c.id}">${esc(c.name || "Unnamed")}</option>`).join("")}</select></div>
+      <div class="field wide"><span class="label">Recipients: everyone who established it or heard it</span><div class="checks">${gmCrew.map((c) => `<label><input type="checkbox" data-dawho value="${c.id}"> ${esc(c.name || "Unnamed")}</label>`).join("") || `<span class="small muted">Add the characters above first.</span>`}</div></div>`;
+  }
   function renderDisc() {
     $("disc-card").hidden = !DISC;
     if (!DISC) return;
+    renderAward();
     const T2 = DISC.threat, th = disc.threat;
     $("disc-title").textContent = `Discovery: ${capFirst(DISC.cards)}`;
     $("disc-intro").textContent = `Discovery clocks fill in three phases (${PHASE_NAMES().join(", ")}); filling one mints a ${DISC.card} for the primary investigator and a shared copy for everyone present. Each races the ${T2.name}.`;
@@ -2840,27 +2877,58 @@ tr.lvl-U td.target { color: var(--muted); }
           ${k.tag ? `<div class="disc-match">${held.length ? `<b>Already held:</b> ${held.map(({ c, k: card }) => `${esc(c.name)} (${esc(card.name || card.tag)}${card.shared ? `, shared; owner ${esc(card.owner)}` : ""}): ${esc(card.permits || card.knowledge)}`).join("; ")}` : `<span class="muted small">No one holds a ${esc(DISC.card)} for ${esc(k.subject)} yet.</span>`}</div>` : ""}
           ${full && !k.minted ? `<div class="disc-mint"><b>Mint the ${esc(DISC.card)}</b>
             <div class="fields">${DISC.kinds ? `<div class="field"><label for="dk-kind-${k.id}">Kind</label><select id="dk-kind-${k.id}">${DISC.kinds.map((x) => `<option value="${x[0]}">${esc(capFirst(x[0]))}</option>`).join("")}</select></div>` : ""}
-              <div class="field wide"><label for="dk-know-${k.id}">What they learned</label><input type="text" id="dk-know-${k.id}" value="${esc((DISC.subjects || []).find((x) => x[0] === k.tag)?.[2] || "")}"></div>
-              <div class="field wide"><label for="dk-perm-${k.id}">What it permits</label><input type="text" id="dk-perm-${k.id}" value="${esc((DISC.subjects || []).find((x) => x[0] === k.tag)?.[3] || "")}"></div>
+              ${DISC.scoped ? scopedFields("dk-" + k.id + "-", (DISC.subjects || []).find((x) => x[0] === k.tag)) : `<div class="field wide"><label for="dk-know-${k.id}">What they learned</label><input type="text" id="dk-know-${k.id}" value="${esc((DISC.subjects || []).find((x) => x[0] === k.tag)?.[2] || "")}"></div>
+              <div class="field wide"><label for="dk-perm-${k.id}">What it permits</label><input type="text" id="dk-perm-${k.id}" value="${esc((DISC.subjects || []).find((x) => x[0] === k.tag)?.[3] || "")}"></div>`}
               <div class="field wide"><label for="dk-job-${k.id}">Earned in</label><input type="text" id="dk-job-${k.id}" value="${esc(k.name)}"></div>
               <div class="field wide"><span class="label">Present at the minting</span><div class="checks">${gmCrew.map((c) => `<label><input type="checkbox" data-kpresent="${k.id}" value="${c.id}" checked> ${esc(c.name || "Unnamed")}</label>`).join("") || `<span class="small muted">Add the characters above first.</span>`}</div></div></div>
             <div class="btn-row"><button class="btn primary" data-kmint="${k.id}">Mint for everyone present</button></div></div>` : ""}`}
       </div>`; }).join("") : `<p class="small muted">No discovery clocks running. Start one when a ${esc(T.missionLower || "job")} turns on something unknown.</p>`;
   }
+  // A scoped setting's card fields (mint and direct award): the finding starts empty; the subject's reference text is only a hint.
+  function scopedFields(pre, sub) {
+    return `<div class="field wide"><label for="${pre}know">What they established</label><input type="text" id="${pre}know" placeholder="${esc(sub ? "Only what they found out, e.g. " + String(sub[2]).split(/[;.]/)[0] : "Only what they found out")}"></div>
+      <div class="field wide"><label for="${pre}lim">Limits: what it doesn't show</label><input type="text" id="${pre}lim" placeholder="e.g. Seen once, on one creature; not why it works"></div>
+      <div class="field wide"><label for="${pre}evid">Evidence or source</label><input type="text" id="${pre}evid" placeholder="What they saw, tested, read or were told, and by whom"></div>
+      ${ROUTES.length ? `<div class="field"><label for="${pre}route">How it was learned</label><select id="${pre}route">${routeOpts(pre.startsWith("dk-") ? "investigation" : "")}</select></div>` : ""}
+      <div class="field"><label for="${pre}date">Date</label><input type="text" id="${pre}date" placeholder="In the story, e.g. May 1874"></div>
+      <div class="field wide"><label for="${pre}perm">What it permits (optional)</label><input type="text" id="${pre}perm"></div>`;
+  }
+  const scopedRead = (pre) => { const v = (f) => ($(pre + f) ? $(pre + f).value.trim() : "");
+    return { knowledge: v("know"), limits: v("lim"), evidence: v("evid"), route: v("route"), date: v("date"), permits: v("perm") }; };
+  // Give a card to each recipient: the owner holds it, everyone else a shared copy. A card from the same subject and job is replaced.
+  function giveCards(base, owner, present) {
+    if (!present.includes(owner)) present.unshift(owner);
+    base = { ...base, owner: owner.name || "", present: present.map((c) => c.name || "Unnamed") };
+    for (const c of present) {
+      c.cards = (c.cards || []).filter((x) => !(x.tag === base.tag && x.source !== "almanac" && x.job === base.job));
+      c.cards.push(normCard({ ...base, shared: c !== owner }));
+    }
+    return present;
+  }
   function mintCard(k) {
     const present = [...document.querySelectorAll(`[data-kpresent="${k.id}"]:checked`)].map((x) => gmCrew.find((c) => c.id === x.value)).filter(Boolean);
     const owner = gmCrew.find((c) => c.id === k.primary);
     if (!owner) return discSay(`Choose the primary investigator first: they own the ${DISC.card}.`, true);
-    if (!present.includes(owner)) present.unshift(owner);
-    const base = { tag: k.tag, name: k.subject, knowledge: $("dk-know-" + k.id).value.trim(), permits: $("dk-perm-" + k.id).value.trim(), job: $("dk-job-" + k.id).value.trim(),
-      ...(DISC.kinds ? { kind: $("dk-kind-" + k.id).value } : {}), owner: owner.name || "", present: present.map((c) => c.name || "Unnamed"), source: "play" };
-    if (!base.permits) return discSay(`Say what the ${DISC.card} permits: that's what it's for.`, true);
-    for (const c of present) {
-      c.cards = (c.cards || []).filter((x) => !(x.tag === k.tag && x.source !== "almanac" && x.job === base.job));
-      c.cards.push(normCard({ ...base, shared: c !== owner }));
-    }
+    const base = { tag: k.tag, name: k.subject, job: $("dk-job-" + k.id).value.trim(), ...(DISC.kinds ? { kind: $("dk-kind-" + k.id).value } : {}), source: "play",
+      ...(DISC.scoped ? scopedRead("dk-" + k.id + "-") : { knowledge: $("dk-know-" + k.id).value.trim(), permits: $("dk-perm-" + k.id).value.trim() }) };
+    if (DISC.scoped ? !base.knowledge : !base.permits) return discSay(DISC.scoped ? `Say what they established: the ${DISC.card} records only that.` : `Say what the ${DISC.card} permits: that's what it's for.`, true);
+    const all = giveCards(base, owner, present);
     k.minted = true; discSave(); saveGM(); renderGM();
-    discSay(`${capFirst(DISC.card)} for ${k.subject} minted: ${owner.name} owns it, with shared copies for ${present.filter((c) => c !== owner).map((c) => c.name).join(", ") || "no one else"}. Save all to file so the players get it.`);
+    discSay(`${capFirst(DISC.card)} for ${k.subject} minted: ${owner.name} owns it, with shared copies for ${all.filter((c) => c !== owner).map((c) => c.name).join(", ") || "no one else"}. Save all to file so the players get it.`);
+  }
+  // A finding established without a clock: seen or tested directly, a reliable account, or a creature's word with support.
+  function awardCard() {
+    const name = $("da-sub").value.trim(), owner = gmCrew.find((c) => c.id === $("da-owner").value);
+    const present = [...document.querySelectorAll("[data-dawho]:checked")].map((x) => gmCrew.find((c) => c.id === x.value)).filter(Boolean);
+    if (!name) return discSay(`Name the subject of the ${DISC.card} first.`, true);
+    if (!owner) return discSay(`Choose who owns the ${DISC.card}.`, true);
+    const base = { tag: slugTag(name), name, job: $("da-job").value.trim(), source: "play", ...(DISC.kinds ? { kind: $("da-kind").value } : {}),
+      ...(DISC.scoped ? scopedRead("da-") : { knowledge: $("da-know").value.trim(), permits: $("da-perm").value.trim() }) };
+    if (!base.knowledge) return discSay(`Say what they established: the ${DISC.card} records only that.`, true);
+    const all = giveCards(base, owner, present);
+    saveGM(); renderGM();
+    for (const id of ["da-sub", "da-know", "da-lim", "da-evid", "da-perm", "da-job", "da-date"]) if ($(id)) $(id).value = "";
+    discSay(`${capFirst(DISC.card)} for ${name} recorded: ${owner.name} owns it, with shared copies for ${all.filter((c) => c !== owner).map((c) => c.name).join(", ") || "no one else"}. Save all to file so the players get it.`);
   }
   $("disc-add").onclick = () => {
     const name = $("disc-new-name").value.trim(); if (!name) return discSay("Name the clock first.", true);
@@ -2886,6 +2954,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (b.dataset.kadv) { const k = kOf(b.dataset.kadv); if (k) { const before = k.filled; advance(k, +b.dataset.n); if (+b.dataset.n > 0 && k.filled === before && !k.tag && !k.plain) discSay("The clock is at the gate: confirm the identity first.", true); } discSave(); }
     else if (b.dataset.krm) { disc.clocks = disc.clocks.filter((x) => x.id !== b.dataset.krm); discSave(); }
     else if (b.dataset.kmint) { const k = kOf(b.dataset.kmint); if (k) mintCard(k); return; }
+    else if (b.id === "da-go") { awardCard(); return; }
     else return;
     renderDisc();
   });

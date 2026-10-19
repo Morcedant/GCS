@@ -253,6 +253,7 @@ def gen(name, pack, t):
         return "\n".join(["## The Discovery panel", "",
             f"The GM view's **Discovery** panel runs discovery clocks and the {th['name']} they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every {d['card']} the characters in the GM view already hold for it. "
             f"The **Failed roll** and **Push** buttons tick the track for how they were digging" + (f", and a failed roll ticks the {th['name']} too" if th.get("repeat") else "") + f". When a clock fills, **Mint** gives the primary investigator the {d['card']} and everyone you tick as present a shared copy. "
+            f"**Record a finding without a clock** gives a {d['card']} for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick. "
             f"Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.", ""])
     if name == "discovery-subjects":
         d = p.get("discovery") or {}
@@ -390,6 +391,26 @@ NEUTRAL_DISCOVERY = {
 }
 
 
+def scoped_card_md(d, t, card, cards):
+    """A setting whose cards are scoped (pack discovery.scoped): a card records only what the characters established,
+    weaknesses work without one, and knowledge can be earned without a clock (discovery.routes)."""
+    job = t["missionLower"]
+    out = [f"### The {card}", "",
+           f"A {card} is a permanent record of one specific thing the characters have established. It holds only what they found out, never the whole truth about a creature: later discoveries add to it with more {cards}. It grants **no bonus** to any roll.", "",
+           f"- **Weaknesses work anyway.** A real weakness works whoever uses it, {card} or no {card}: silver marks its extra box fired by someone who has never heard of werewolves, and a hunter who suspects silver can load it. Called shots follow the ordinary combat rules. An unfamiliar ritual still needs its procedure, the knowledge, the skill and the components.",
+           f"- **What a {card} is for.** It's what the character knows for certain and can rely on, plan around and teach. A correct deduction, a sensible experiment or an ordinary precaution needs no {card}.",
+           f"- **The identification gate.** Before a subject is confirmed, you can form hypotheses, test them and take precautions, but what you know about a kind of creature isn't applied to this one until the Identify phase confirms it. Holding a {card} never proves that this is that.",
+           f"- **Shared copies.** Everyone who establishes a finding, or is there when a {card} is earned, gets a shared copy; one character is recorded as its owner. A character who wasn't there can be taught it later, from a reliable account.",
+           f"- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, the date, its owner and who received it. It's kept on the character sheet, under *Learned in play*.", "",
+           f"### Earning a {card}", "",
+           f"A discovery clock is one way to earn a {card}. The others need no clock: when a fact is established directly or taught reliably, the GM records the {card} at once.", ""]
+    out += [table(["How it was learned", "What counts"], [[f"**{r[1]}**", r[2][0].upper() + r[2][1:] + "."] for r in d.get("routes", [])]), ""]
+    out += [f"- **A basis for a proposal.** An investigation proposal needs a reasonable basis: folklore the characters have heard, evidence, testimony, their own experience, or a suspicion they can explain. Naming the right answer with nothing behind it doesn't earn a {card}. The GM asks what supports an approach, and never rejects it just because it matches the hidden truth.",
+            f"- **Ideas are free.** Proposing a theory costs nothing. Investigation rolls, failures and pushes cost what they always do (below).",
+            f"- **Enough clues.** The GM provides enough clues, and more than one route to each answer: a {job} shouldn't stall on a single missed roll.", ""]
+    return out
+
+
 def discovery_md(d, t, neutral=False):
     """Discovery clocks and the cards they mint (a setting's pack discovery block): the shared rules, then the setting's
     names, threat clock, investigation costs and methods."""
@@ -405,7 +426,10 @@ def discovery_md(d, t, neutral=False):
             "- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.",
             f"- **The primary investigator.** One character leads and owns the {card}. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant {card} can assist with a method they couldn't otherwise bring (the {card} is why they're qualified); it adds nothing beyond the normal assistance.",
             f"- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.", ""]
-    out += [f"### The {card}", "",
+    if d.get("scoped"):
+        out += scoped_card_md(d, t, card, cards)
+    else:
+      out += [f"### The {card}", "",
             f"A {card} grants **no bonus** to any roll. It is an earned permission: knowledge that makes possible an action otherwise forbidden or unavailable against that subject. Without it, the GM can rule that the action isn't possible: you can't aim for a heart you don't know is the weakness, or speak a name you never learned. A {card} can authorize a called shot or a telling-hit effect that would otherwise be unavailable.", "",
             f"- A {card} never helps confirm its own subject: holding one doesn't prove this is that. It applies once the Identify phase has confirmed it.",
             f"- **Shared copies.** Every character present when the {card} is minted (the climactic confrontation or the breakthrough) gets a shared copy; the primary investigator is recorded as its owner. An absent character doesn't, though a holder can teach it to them later with the GM's agreement.",
