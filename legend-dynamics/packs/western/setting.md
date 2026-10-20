@@ -54,6 +54,22 @@ The characters share three Trouble tracks. **Heat** is the law and the powerful 
 
 <!-- SECTION:setting -->
 
+# Lore cards
+
+What your character knows about the dark, and how they come to know it: the difference between rumor and truth, how an investigation runs, and the lore cards that record what you've established.
+
+## Folklore, truth and lore cards
+
+What people say about the dark, what is actually true, and what your character knows are three different things.
+
+- **Local folklore.** The stories, warnings and superstitions everyone has heard: hang garlic at the window, never answer a voice calling from the trees, salt the threshold. Some of it is right, some is half right, and some is wrong. It's where an investigation starts.
+- **The truth.** What a creature really is and what really stops it. The GM knows it; you find it out.
+- **Lore cards.** What your character has established for themselves: one finding at a time, with its limits and how you know it. A card holds only what you found out, never a creature's whole story (see *Discovery clocks and lore cards*).
+
+A real weakness works whether or not anyone holds a card for it. Act on what you suspect: load silver, salt the doorway, try fire. The GM will ask what your idea rests on, and a good reason is all it needs.
+
+{{GEN:discovery-chapter}}
+
 # Monsters and magic
 
 ## The Sight
@@ -97,16 +113,6 @@ A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells c
 | Witch-sight | See spirits, curses, charms and things wearing human skin. |
 | Stanch | Stop the bleeding: clear one injury box, once per set of injuries. |
 
-## Folklore, truth and lore cards
-
-What people say about the dark, what is actually true, and what your character knows are three different things.
-
-- **Local folklore.** The stories, warnings and superstitions everyone has heard: hang garlic at the window, never answer a voice calling from the trees, salt the threshold. Some of it is right, some is half right, and some is wrong. It's where an investigation starts.
-- **The truth.** What a creature really is and what really stops it. The GM knows it; you find it out.
-- **Lore cards.** What your character has established for themselves: one finding at a time, with its limits and how you know it. A card holds only what you found out, never a creature's whole story (see *Discovery clocks and lore cards*).
-
-A real weakness works whether or not anyone holds a card for it. Act on what you suspect: load silver, salt the doorway, try fire. The GM will ask what your idea rests on, and a good reason is all it needs.
-
 ## Weaknesses
 
 Every monster has a weakness, and finding it is often the whole job: a discovery clock, a survivor's account, or a test that works (see *Discovery clocks and lore cards* in the Players' Guide). The Monster Hunter advantage and the Sighted's Monster's Eye help with the Identify rolls. **A real weakness works whoever uses it, card or no card:** silver marks its extra box fired by someone who has never heard of werewolves, and a hunter who suspects silver can load it on purpose. Called shots (at a heart, a head) follow the ordinary combat rules. What a weakness doesn't give anyone is an unfamiliar ritual: a banishment, a binding or a cure still needs its procedure, the knowledge, the skill and the components.
@@ -126,7 +132,7 @@ Every monster has a weakness, and finding it is often the whole job: a discovery
 | Skinwalker | Underneath, it is a person. In a stolen shape, ordinary wounds mark only 1 box at a time; in its own shape, it is as mortal as anyone. Speak its true name to its face and it is forced back into its own shape for the scene. |
 | Headless Rider | Its head, hidden near where it died: laid back in the grave, the rider rests for good. It can't cross running water, so a bridge over a creek is safety. |
 
-## Lore cards
+## Lore card subjects
 
 What a lore card for each creature knows, and what it permits. These are also the cards a Hunter's Almanac can start with.
 

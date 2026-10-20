@@ -3582,10 +3582,9 @@
    },
    {
     "title": "Monsters",
-    "intro": "The truth behind *Monsters and magic* in the Players' Guide: what each monster fears, what a lore card for it records, what its bite or curse does, and the rulings for vampires, the wendigo, hellhounds, the shadow realm and demons. In the story, hunters learn these a piece at a time: a discovery clock, a survivor's tale, a test that works, or a fight that goes wrong.",
+    "intro": "The truth behind *Monsters and magic* in the Players' Guide: what each monster fears, what its bite or curse does, and the rulings for vampires, the wendigo, hellhounds, the shadow realm and demons. In the story, hunters learn these a piece at a time: a discovery clock, a survivor's tale, a test that works, or a fight that goes wrong.",
     "take": [
      "## Weaknesses",
-     "## Lore cards",
      "## Bites and curses",
      "## Vampires",
      "## The wendigo",
@@ -3593,6 +3592,14 @@
      "## The shadow realm",
      "## Demons",
      "## Rituals and remedies"
+    ]
+   },
+   {
+    "title": "Lore cards",
+    "intro": "Running investigations and recording what the characters learn. The rules players use are in the *Lore cards* chapter of the Players' Guide; here are the subjects a card can cover (and a Hunter's Almanac can start with), and the GM view's tools for clocks and cards.",
+    "take": [
+     "## Lore card subjects",
+     "## The Discovery panel"
     ]
    },
    {
@@ -3604,8 +3611,7 @@
     "title": "The GM's tools",
     "take": [
      "## The battle map",
-     "## The Encounter panel",
-     "## The Discovery panel"
+     "## The Encounter panel"
     ]
    }
   ],
@@ -3826,7 +3832,8 @@
     "A creature's word, backed up",
     "what a supernatural creature says, supported by evidence"
    ]
-  ]
+  ],
+  "chapter": "Lore cards"
  },
  "materials": [
   [
