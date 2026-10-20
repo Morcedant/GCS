@@ -9,7 +9,7 @@ Every item carries one of these labels:
 - **Proposed** is a draft that needs approval before it becomes canon.
 - **Open** is undecided; the guides say the GM rules until it is decided.
 
-Folklore entries in section 4 are drafts written from the existing setting text and from widely known traditions. They still have to be reconciled with the author's folklore guide, which wasn't available for this pass.
+Folklore entries in section 4 are drafts written from the existing setting text and from widely known traditions. Reconciling them with the author's folklore guide is set aside for this release (section 5).
 
 ---
 
@@ -425,9 +425,9 @@ Each threat is described under these headings:
 
 ---
 
-## 5. Waiting for the folklore guide
+## 5. Set aside: the folklore additions
 
-These parts of the request need the author's folklore guide, which wasn't available in this session:
+The author set these aside for this release (20 October 2026). They need the author's folklore guide, which wasn't available:
 
 - the **eighteen adventure seeds** (to keep as editable proposals);
 - the **regional guide**, by region, supported locality and period (1860–64, 1865–69, 1870–74, 1875–79, 1880–84, 1885–89, with 1890 separately), with documentary dates, alleged event dates and fictional placement kept apart;
