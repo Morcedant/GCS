@@ -52,7 +52,7 @@ Roll 3d6 on each table and read the total, or pick what you like. Middle results
 
 # Monsters
 
-The truth behind *Monsters and magic* in the Players' Guide: what each monster fears, what a lore card for it records, what its bite or curse does, and the rulings for vampires, the wendigo, hellhounds, the shadow realm and demons. In the story, hunters learn these a piece at a time: a discovery clock, a survivor's tale, a test that works, or a fight that goes wrong.
+The truth behind *Monsters and magic* in the Players' Guide: what each monster fears, what its bite or curse does, and the rulings for vampires, the wendigo, hellhounds, the shadow realm and demons. In the story, hunters learn these a piece at a time: a discovery clock, a survivor's tale, a test that works, or a fight that goes wrong.
 
 ## Weaknesses
 
@@ -72,25 +72,6 @@ Every monster has a weakness, and finding it is often the whole job: a discovery
 | Wendigo | Ordinary weapons wound it, but it heals unnaturally, and only fire stops the healing (only fire marks more than 1 box at a time). It is destroyed for good only when it is beheaded and its body burned. It is strongest in deep winter and weakest in summer heat. |
 | Skinwalker | Underneath, it is a person. In a stolen shape, ordinary wounds mark only 1 box at a time; in its own shape, it is as mortal as anyone. Speak its true name to its face and it is forced back into its own shape for the scene. |
 | Headless Rider | Its head, hidden near where it died: laid back in the grave, the rider rests for good. It can't cross running water, so a bridge over a creek is safety. |
-
-## Lore cards
-
-What a lore card for each creature knows, and what it permits. These are also the cards a Hunter's Almanac can start with.
-
-| Creature | What the lore card knows | What it permits |
-|---|---|---|
-| **Werewolf** | Silver hurts it (an extra box, and its toughness doesn't help); wolfsbane keeps it away; under the full moon it has no choice. | Called shots with silver at its heart; warding a door with wolfsbane; luring it out at moonrise. |
-| **Vampire** | A stake through the heart incapacitates it but doesn't kill it; fire, sunlight and beheading destroy it; holy symbols hold it back; it can't enter uninvited. Each natural vampire sustains its own lineage: destroy the natural source, and everyone infected from it, directly or through others, turns human again. | Hunting it by day; refusing it entry; staking it to hold it while the source of its line is found and destroyed. |
-| **Zombie** | Only a shot to the head or fire puts it down for good; its bite carries the Infection. | Called shots at the head; the Occult remedy that stops an Infection clock. |
-| **Ghost** | It can't be hurt, only laid to rest by finishing its business, or bound with a ritual. | Finding and finishing its business; the binding ritual. |
-| **Wraith** | Only silver, cold iron, salt and fire hurt it; it can't cross a line of salt or iron filings; burning its bones destroys it. | Holding a line of salt or iron; finding and burning its bones. |
-| **Banshee** | Weapons don't touch her; silver or an iron bell silences her for the scene; she leaves at dawn if the one she keens for lives. | Silencing her with silver or an iron bell; keeping her chosen alive until dawn. |
-| **Ghoul** | Fire and daylight hurt it; it flees from holy ground. | Driving it onto holy ground; burning out its warren by day. |
-| **Demon** | A true demon can't enter our world unaided: it must be summoned, or possess someone. Major rituals and powerful holy talismans are what work against it, not a gunfight; a holy talisman strong enough breaks its binding to our world and banishes it. Holy water burns it. It must keep a bargain to the letter. | Negotiating with it on safe terms; preparing a banishment; recognizing a possession for what it is. |
-| **Hellhound** | Its hunt is a curse tied to a claim on someone's soul. Holy water drives it off for a time but doesn't cancel the pact. The hunt ends only when the conditions behind the claim are resolved or changed, or a powerful practitioner interferes with the pact through a major ritual. | Protecting its quarry with holy water while the claim is looked into; seeking out the terms of the pact. |
-| **Wendigo** | Ordinary weapons wound it, but it heals unnaturally; only fire stops the healing. It is destroyed for good only when it is beheaded and its body burned, and the headless body still lashes out, blindly, until it burns. It is strongest in deep winter and weakest in summer heat. | Bringing fire to the fight; planning to behead it and burn the body; hunting it in the warm months. |
-| **Skinwalker** | In a stolen shape, ordinary wounds mark only 1 box; its true name, spoken to its face, forces it into its own mortal shape. | Speaking its true name to force it back into its own shape. |
-| **Headless Rider** | Its head, hidden near where it died, laid back in the grave lets it rest; it can't cross running water. | Finding its head; making a stand across running water. |
 
 ## Bites and curses
 
@@ -148,6 +129,33 @@ A **true demon can't enter our world unaided**: it must be **summoned**, or come
 
 A remedy or a ritual against the dark always has a procedure: what it requires, how long it takes, which rolls it calls for, its components, what happens if it's interrupted, and what failure costs. Zombie treatment, lifting a curse, binding a ghost, banishing a demon and interfering with a hellhound's pact all work this way. Use the *Magic* rules (a ritual clock in Occult rolls) and the weights above for any the GM hasn't spelled out.
 
+# Lore cards
+
+Running investigations and recording what the characters learn. The rules players use are in the *Lore cards* chapter of the Players' Guide; here are the subjects a card can cover (and a Hunter's Almanac can start with), and the GM view's tools for clocks and cards.
+
+## Lore card subjects
+
+What a lore card for each creature knows, and what it permits. These are also the cards a Hunter's Almanac can start with.
+
+| Creature | What the lore card knows | What it permits |
+|---|---|---|
+| **Werewolf** | Silver hurts it (an extra box, and its toughness doesn't help); wolfsbane keeps it away; under the full moon it has no choice. | Called shots with silver at its heart; warding a door with wolfsbane; luring it out at moonrise. |
+| **Vampire** | A stake through the heart incapacitates it but doesn't kill it; fire, sunlight and beheading destroy it; holy symbols hold it back; it can't enter uninvited. Each natural vampire sustains its own lineage: destroy the natural source, and everyone infected from it, directly or through others, turns human again. | Hunting it by day; refusing it entry; staking it to hold it while the source of its line is found and destroyed. |
+| **Zombie** | Only a shot to the head or fire puts it down for good; its bite carries the Infection. | Called shots at the head; the Occult remedy that stops an Infection clock. |
+| **Ghost** | It can't be hurt, only laid to rest by finishing its business, or bound with a ritual. | Finding and finishing its business; the binding ritual. |
+| **Wraith** | Only silver, cold iron, salt and fire hurt it; it can't cross a line of salt or iron filings; burning its bones destroys it. | Holding a line of salt or iron; finding and burning its bones. |
+| **Banshee** | Weapons don't touch her; silver or an iron bell silences her for the scene; she leaves at dawn if the one she keens for lives. | Silencing her with silver or an iron bell; keeping her chosen alive until dawn. |
+| **Ghoul** | Fire and daylight hurt it; it flees from holy ground. | Driving it onto holy ground; burning out its warren by day. |
+| **Demon** | A true demon can't enter our world unaided: it must be summoned, or possess someone. Major rituals and powerful holy talismans are what work against it, not a gunfight; a holy talisman strong enough breaks its binding to our world and banishes it. Holy water burns it. It must keep a bargain to the letter. | Negotiating with it on safe terms; preparing a banishment; recognizing a possession for what it is. |
+| **Hellhound** | Its hunt is a curse tied to a claim on someone's soul. Holy water drives it off for a time but doesn't cancel the pact. The hunt ends only when the conditions behind the claim are resolved or changed, or a powerful practitioner interferes with the pact through a major ritual. | Protecting its quarry with holy water while the claim is looked into; seeking out the terms of the pact. |
+| **Wendigo** | Ordinary weapons wound it, but it heals unnaturally; only fire stops the healing. It is destroyed for good only when it is beheaded and its body burned, and the headless body still lashes out, blindly, until it burns. It is strongest in deep winter and weakest in summer heat. | Bringing fire to the fight; planning to behead it and burn the body; hunting it in the warm months. |
+| **Skinwalker** | In a stolen shape, ordinary wounds mark only 1 box; its true name, spoken to its face, forces it into its own mortal shape. | Speaking its true name to force it back into its own shape. |
+| **Headless Rider** | Its head, hidden near where it died, laid back in the grave lets it rest; it can't cross running water. | Finding its head; making a stand across running water. |
+
+## The Discovery panel
+
+The GM view's **Discovery** panel runs discovery clocks and the Harvest they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every lore card the characters in the GM view already hold for it. The **Failed roll** and **Push** buttons tick the track for how they were digging, and a failed roll ticks the Harvest too. When a clock fills, **Mint** gives the primary investigator the lore card and everyone you tick as present a shared copy. **Record a finding without a clock** gives a lore card for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick. Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.
+
 # Threats
 
 Opponents use the same rules as the characters. **Minor opponents** (hired guns, a mob, shambling dead) have **one box**: any hit that gets through takes them out of the fight.
@@ -194,7 +202,3 @@ The GM view of the character creator has a **battle map** for fights where it he
 The GM view also has an **Encounter** panel that runs a fight by the *Personal combat* rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit, offering a Grit point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so. For each attack, choose what it's made of (silver, cold iron, a wooden stake or fire), and the panel applies the rules that turn on it: a shapechanger's Tough in their form (and what gets past it), a weakness that marks one box more, and a creature only the right weapon can hurt.
 
 **The shared table.** The GM can start a shared table from the GM view and give the players its code; each player joins from their character's Ride tab. While they're connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the Ride tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Each player's character is shared with the GM too: it appears among the GM view's characters, marked at the table, and its injuries, points, ammunition and form stay in step both ways, whether they're changed on the sheet, on the GM's card or in an encounter. In a fight, each player's Ride tab shows the GM's battle map and the encounter's turn order and latest results; a player drags their own token, and on their turn sends the GM what they'll do, which the GM puts into the Encounter panel and runs. The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.
-
-## The Discovery panel
-
-The GM view's **Discovery** panel runs discovery clocks and the Harvest they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every lore card the characters in the GM view already hold for it. The **Failed roll** and **Push** buttons tick the track for how they were digging, and a failed roll ticks the Harvest too. When a clock fills, **Mint** gives the primary investigator the lore card and everyone you tick as present a shared copy. **Record a finding without a clock** gives a lore card for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick. Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.

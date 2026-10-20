@@ -259,6 +259,12 @@ def gen(name, pack, t):
         d = p.get("discovery") or {}
         return table(["Creature", "What the " + d.get("card", "card") + " knows", "What it permits"], [[f"**{x[1]}**", x[2], x[3]] for x in d.get("subjects", [])])
     if name == "discovery":
+        # A setting can give its cards a chapter of their own (discovery.chapter): the rules move there, and a pointer stays here.
+        d = p.get("discovery") or {}
+        if d.get("chapter"):
+            return f"Investigating the supernatural has its own rules: see *{d['chapter']}*."
+        return discovery_md(p.get("discovery"), t)
+    if name == "discovery-chapter":
         return discovery_md(p.get("discovery"), t)
     if name == "magic":
         return magic_chapter(p["magic"], t["title"]) if p.get("magic") else ""

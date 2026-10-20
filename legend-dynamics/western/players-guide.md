@@ -317,76 +317,7 @@ A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something tha
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. A successful roll does not force someone to abandon a core belief or reveal what they do not know.
 
-## Discovery clocks and lore cards
-
-When a job turns on an unknown subject (a supernatural creature and its weakness), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **lore card**: what the characters learned, kept for good. A character's lore cards are their **hunter's almanac**.
-
-| Phase | What it means |
-|---|---|
-| 1. Confront the unknown | Effects without a cause: a body drained white, cattle torn open, a town gone too quiet. You may suspect, but nothing is confirmed. |
-| 2. Identify | Name the creature. This is the gate: until its identity is confirmed, what you know about a kind of creature doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works. |
-| 3. Uncover | Learn how it is beaten. Filling this phase fills the clock and earns a lore card for what you established. |
-
-- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
-- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
-- **The primary investigator.** One character leads and owns the lore card. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant lore card can assist with a method they couldn't otherwise bring (the lore card is why they're qualified); it adds nothing beyond the normal assistance.
-- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
-
-### The lore card
-
-A lore card is a permanent record of one specific thing the characters have established. It holds only what they found out, never the whole truth about a creature: later discoveries add to it with more lore cards. It grants **no bonus** to any roll.
-
-- **Weaknesses work anyway.** A real weakness works whoever uses it, lore card or no lore card: silver marks its extra box fired by someone who has never heard of werewolves, and a hunter who suspects silver can load it. Called shots follow the ordinary combat rules. An unfamiliar ritual still needs its procedure, the knowledge, the skill and the components.
-- **What a lore card is for.** It's what the character knows for certain and can rely on, plan around and teach. A correct deduction, a sensible experiment or an ordinary precaution needs no lore card.
-- **The identification gate.** Before a subject is confirmed, you can form hypotheses, test them and take precautions, but what you know about a kind of creature isn't applied to this one until the Identify phase confirms it. Holding a lore card never proves that this is that.
-- **Shared copies.** Everyone who establishes a finding, or is there when a lore card is earned, gets a shared copy; one character is recorded as its owner. A character who wasn't there can be taught it later, from a reliable account.
-- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, the date, its owner and who received it. It's kept on the character sheet, under *Learned in play*.
-
-### Earning a lore card
-
-A discovery clock is one way to earn a lore card. The others need no clock: when a fact is established directly or taught reliably, the GM records the lore card at once.
-
-| How it was learned | What counts |
-|---|---|
-| **A discovery clock** | Filled to the end of Uncover. |
-| **Seen or tested firsthand** | Direct experience, or a sensible experiment. |
-| **A reliable account** | Reliable transmitted experience: a survivor, a grimoire, church archives, Shadow Knight records. A source's reputation alone doesn't make it right, but a reliable account can establish a fact without anyone repeating a dangerous test. |
-| **A creature's word, backed up** | What a supernatural creature says, supported by evidence. |
-
-- **A basis for a proposal.** An investigation proposal needs a reasonable basis: folklore the characters have heard, evidence, testimony, their own experience, or a suspicion they can explain. Naming the right answer with nothing behind it doesn't earn a lore card. The GM asks what supports an approach, and never rejects it just because it matches the hidden truth.
-- **Ideas are free.** Proposing a theory costs nothing. Investigation rolls, failures and pushes cost what they always do (below).
-- **Enough clues.** The GM provides enough clues, and more than one route to each answer: a job shouldn't stall on a single missed roll.
-
-### The Harvest
-
-A discovery clock always races a threat clock. While you dig, the creature is still hunting. The Harvest clock (4 or 6 segments, one per job) ticks once for each scene spent investigating and once for each failed investigation roll. Each time it fills, the creature claims another victim, and the clock starts again. The dread is the race: learn its weakness before it takes someone you were protecting.
-
-### What investigating costs
-
-When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
-
-| Track | Ticks for | For example |
-|---|---|---|
-| **Heat** | provoking the law and authority | searching private property, leaning on officials, aggressive questioning |
-| **Whispers** | spreading word and alarming the town | asking around openly, interviewing many people, visibly poking at the uncanny |
-| **The Dark** | touching the supernatural directly | forbidden texts, cursed evidence, occult research, getting close to the threat |
-
-### Methods
-
-Which methods suit a character depends on their role, origin and skills. The GM says which methods can advance each phase.
-
-| Method | Skills | Suits | Phases | For example |
-|---|---|---|---|---|
-| Examine the evidence | Investigation, Medicine | The Frontier, The Learned | Confront, Identify | A body, a wound, a scorched doorframe, what the creature left behind. |
-| Track it | Tracking, Survival | The Frontier | Confront, Identify | Prints, broken brush, where the dogs won't go. |
-| Question witnesses | Read People, Persuasion | The Law | Confront, Identify | Survivors, neighbors, the drunk who saw something. |
-| Consult the records | Law, Investigation | The Law, The Learned | Identify, Uncover | Court files, old newspapers, land deeds, the parish register. |
-| Research the lore | Occult | The Learned | Identify, Uncover | Grimoires, folk tales, a letter from a hunter long dead. |
-| Lean on someone | Persuasion, Leadership, Deception | The Law | Any | The man who knows more than he says. Always ticks Heat on a failure. |
-
-- **The Learned:** natural identifiers: Occult, Medicine and the archives; **The Frontier:** physical evidence and tracking; **The Law:** witnesses and records.
-- A **Sighted** character sees what others can't: looking with Occult can advance Confront or Identify where nothing else would. A **Practitioner** can work a ritual of seeing (Witch-sight, a question asked of the dead) as a method.
-- **A hunter's almanac at creation.** A character who already knows the dark (a Monster Hunter, most often) can take the **Hunter's Almanac** advantage: three lore cards, for creatures they've faced or studied, chosen at creation. Pick them from the creatures in the GM's Guide; each says what you know and what it permits.
+Investigating the supernatural has its own rules: see *Lore cards*.
 
 ## Chases
 
@@ -767,6 +698,91 @@ End each job with a short entry, written together:
 4. **What changed?** New allies or enemies, damage, open threads for next time.
 5. **Advancement.** After a significant job, each character earns 1 advancement point; at a milestone, 2 more.
 
+# Lore cards
+
+What your character knows about the dark, and how they come to know it: the difference between rumor and truth, how an investigation runs, and the lore cards that record what you've established.
+
+## Folklore, truth and lore cards
+
+What people say about the dark, what is actually true, and what your character knows are three different things.
+
+- **Local folklore.** The stories, warnings and superstitions everyone has heard: hang garlic at the window, never answer a voice calling from the trees, salt the threshold. Some of it is right, some is half right, and some is wrong. It's where an investigation starts.
+- **The truth.** What a creature really is and what really stops it. The GM knows it; you find it out.
+- **Lore cards.** What your character has established for themselves: one finding at a time, with its limits and how you know it. A card holds only what you found out, never a creature's whole story (see *Discovery clocks and lore cards*).
+
+A real weakness works whether or not anyone holds a card for it. Act on what you suspect: load silver, salt the doorway, try fire. The GM will ask what your idea rests on, and a good reason is all it needs.
+
+## Discovery clocks and lore cards
+
+When a job turns on an unknown subject (a supernatural creature and its weakness), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **lore card**: what the characters learned, kept for good. A character's lore cards are their **hunter's almanac**.
+
+| Phase | What it means |
+|---|---|
+| 1. Confront the unknown | Effects without a cause: a body drained white, cattle torn open, a town gone too quiet. You may suspect, but nothing is confirmed. |
+| 2. Identify | Name the creature. This is the gate: until its identity is confirmed, what you know about a kind of creature doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works. |
+| 3. Uncover | Learn how it is beaten. Filling this phase fills the clock and earns a lore card for what you established. |
+
+- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
+- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
+- **The primary investigator.** One character leads and owns the lore card. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant lore card can assist with a method they couldn't otherwise bring (the lore card is why they're qualified); it adds nothing beyond the normal assistance.
+- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
+
+### The lore card
+
+A lore card is a permanent record of one specific thing the characters have established. It holds only what they found out, never the whole truth about a creature: later discoveries add to it with more lore cards. It grants **no bonus** to any roll.
+
+- **Weaknesses work anyway.** A real weakness works whoever uses it, lore card or no lore card: silver marks its extra box fired by someone who has never heard of werewolves, and a hunter who suspects silver can load it. Called shots follow the ordinary combat rules. An unfamiliar ritual still needs its procedure, the knowledge, the skill and the components.
+- **What a lore card is for.** It's what the character knows for certain and can rely on, plan around and teach. A correct deduction, a sensible experiment or an ordinary precaution needs no lore card.
+- **The identification gate.** Before a subject is confirmed, you can form hypotheses, test them and take precautions, but what you know about a kind of creature isn't applied to this one until the Identify phase confirms it. Holding a lore card never proves that this is that.
+- **Shared copies.** Everyone who establishes a finding, or is there when a lore card is earned, gets a shared copy; one character is recorded as its owner. A character who wasn't there can be taught it later, from a reliable account.
+- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, the date, its owner and who received it. It's kept on the character sheet, under *Learned in play*.
+
+### Earning a lore card
+
+A discovery clock is one way to earn a lore card. The others need no clock: when a fact is established directly or taught reliably, the GM records the lore card at once.
+
+| How it was learned | What counts |
+|---|---|
+| **A discovery clock** | Filled to the end of Uncover. |
+| **Seen or tested firsthand** | Direct experience, or a sensible experiment. |
+| **A reliable account** | Reliable transmitted experience: a survivor, a grimoire, church archives, Shadow Knight records. A source's reputation alone doesn't make it right, but a reliable account can establish a fact without anyone repeating a dangerous test. |
+| **A creature's word, backed up** | What a supernatural creature says, supported by evidence. |
+
+- **A basis for a proposal.** An investigation proposal needs a reasonable basis: folklore the characters have heard, evidence, testimony, their own experience, or a suspicion they can explain. Naming the right answer with nothing behind it doesn't earn a lore card. The GM asks what supports an approach, and never rejects it just because it matches the hidden truth.
+- **Ideas are free.** Proposing a theory costs nothing. Investigation rolls, failures and pushes cost what they always do (below).
+- **Enough clues.** The GM provides enough clues, and more than one route to each answer: a job shouldn't stall on a single missed roll.
+
+### The Harvest
+
+A discovery clock always races a threat clock. While you dig, the creature is still hunting. The Harvest clock (4 or 6 segments, one per job) ticks once for each scene spent investigating and once for each failed investigation roll. Each time it fills, the creature claims another victim, and the clock starts again. The dread is the race: learn its weakness before it takes someone you were protecting.
+
+### What investigating costs
+
+When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
+
+| Track | Ticks for | For example |
+|---|---|---|
+| **Heat** | provoking the law and authority | searching private property, leaning on officials, aggressive questioning |
+| **Whispers** | spreading word and alarming the town | asking around openly, interviewing many people, visibly poking at the uncanny |
+| **The Dark** | touching the supernatural directly | forbidden texts, cursed evidence, occult research, getting close to the threat |
+
+### Methods
+
+Which methods suit a character depends on their role, origin and skills. The GM says which methods can advance each phase.
+
+| Method | Skills | Suits | Phases | For example |
+|---|---|---|---|---|
+| Examine the evidence | Investigation, Medicine | The Frontier, The Learned | Confront, Identify | A body, a wound, a scorched doorframe, what the creature left behind. |
+| Track it | Tracking, Survival | The Frontier | Confront, Identify | Prints, broken brush, where the dogs won't go. |
+| Question witnesses | Read People, Persuasion | The Law | Confront, Identify | Survivors, neighbors, the drunk who saw something. |
+| Consult the records | Law, Investigation | The Law, The Learned | Identify, Uncover | Court files, old newspapers, land deeds, the parish register. |
+| Research the lore | Occult | The Learned | Identify, Uncover | Grimoires, folk tales, a letter from a hunter long dead. |
+| Lean on someone | Persuasion, Leadership, Deception | The Law | Any | The man who knows more than he says. Always ticks Heat on a failure. |
+
+- **The Learned:** natural identifiers: Occult, Medicine and the archives; **The Frontier:** physical evidence and tracking; **The Law:** witnesses and records.
+- A **Sighted** character sees what others can't: looking with Occult can advance Confront or Identify where nothing else would. A **Practitioner** can work a ritual of seeing (Witch-sight, a question asked of the dead) as a method.
+- **A hunter's almanac at creation.** A character who already knows the dark (a Monster Hunter, most often) can take the **Hunter's Almanac** advantage: three lore cards, for creatures they've faced or studied, chosen at creation. Pick them from the creatures in the GM's Guide; each says what you know and what it permits.
+
 # Monsters and magic
 
 ## The Sight
@@ -809,16 +825,6 @@ A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells c
 | Shroud | +3 to Stealth for the scene; eyes slide off you. |
 | Witch-sight | See spirits, curses, charms and things wearing human skin. |
 | Stanch | Stop the bleeding: clear one injury box, once per set of injuries. |
-
-## Folklore, truth and lore cards
-
-What people say about the dark, what is actually true, and what your character knows are three different things.
-
-- **Local folklore.** The stories, warnings and superstitions everyone has heard: hang garlic at the window, never answer a voice calling from the trees, salt the threshold. Some of it is right, some is half right, and some is wrong. It's where an investigation starts.
-- **The truth.** What a creature really is and what really stops it. The GM knows it; you find it out.
-- **Lore cards.** What your character has established for themselves: one finding at a time, with its limits and how you know it. A card holds only what you found out, never a creature's whole story (see *Discovery clocks and lore cards*).
-
-A real weakness works whether or not anyone holds a card for it. Act on what you suspect: load silver, salt the doorway, try fire. The GM will ask what your idea rests on, and a good reason is all it needs.
 
 ## Weaknesses
 
