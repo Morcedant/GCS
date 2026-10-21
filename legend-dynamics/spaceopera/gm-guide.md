@@ -103,7 +103,7 @@ For the GM: when a data record is earned, and how to write one. A data record is
 - **When a later finding disagrees.** Write a new data record that says what they now know; the old one stays on the sheet as what they believed then, and the new one's limits can say so.
 - **A data record is never proof of identity.** Holding a data record about one subject doesn't prove that the thing in front of them is that subject: the Identify phase does.
 - **Weaknesses work anyway.** Don't hold back a real weakness because no one holds the data record: if they try it, it works.
-- **Classified Codex.** Agree each starting data record with its player before play: it must come from the character's role or species, be narrow, and be a real secret: something that isn't in any database or published record. Make sure it fits what you know to be true, adjust it if it doesn't, and keep a note of it.
+- **Classified Archive.** Agree each starting data record with its player before play: it must come from the character's role or species, be narrow, and be a real secret: something that isn't in any database or published record. Make sure it fits what you know to be true, adjust it if it doesn't, and keep a note of it.
 
 ## The Discovery panel
 

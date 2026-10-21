@@ -164,7 +164,7 @@ For the GM: when a dossier is earned, and how to write one. A dossier is a recor
 - **When a later finding disagrees.** Write a new dossier that says what they now know; the old one stays on the sheet as what they believed then, and the new one's limits can say so.
 - **A dossier is never proof of identity.** Holding a dossier about one subject doesn't prove that the thing in front of them is that subject: the Identify phase does.
 - **Weaknesses work anyway.** Don't hold back a real weakness because no one holds the dossier: if they try it, it works.
-- **Sealed Case Files.** Agree each starting dossier with its player before play: it must come from the character's role or origin, be narrow, and be a real secret: something that isn't in any database, registry or published record. Make sure it fits what you know to be true, adjust it if it doesn't, and keep a note of it.
+- **Sealed Binder.** Agree each starting dossier with its player before play: it must come from the character's role or origin, be narrow, and be a real secret: something that isn't in any database, registry or published record. Make sure it fits what you know to be true, adjust it if it doesn't, and keep a note of it.
 
 ## The Discovery panel
 

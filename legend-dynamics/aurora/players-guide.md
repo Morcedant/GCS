@@ -725,9 +725,9 @@ A discovery clock is one way to earn a dossier. The others need no clock: when a
 - **Ideas are free; information isn't.** Proposing a theory costs nothing. Learning something does: a discovery clock's scenes and failed rolls, or the price of a direct source (above).
 - **Enough clues.** The GM provides enough clues, and more than one route to each answer: a case shouldn't stall on a single missed roll.
 
-### Sealed Case Files
+### Sealed Binder
 
-A character who takes the **Sealed Case Files** advantage starts play with three dossiers they write themselves, with the GM's agreement. Each must hold a **secret**: something that isn't in any database, registry or published record. Each comes from the character's role or origin: what their work or their people taught them. The creator asks for the subject, the secret, which it comes from, and why it isn't common knowledge.
+A character who takes the **Sealed Binder** advantage starts play with three dossiers they write themselves, with the GM's agreement. Each must hold a **secret**: something that isn't in any database, registry or published record. Each comes from the character's role or origin: what their work or their people taught them. The creator asks for the subject, the secret, which it comes from, and why it isn't common knowledge.
 
 ### The Escalation
 
@@ -1299,7 +1299,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Fine Control | +2 to Powers to use a power precisely: around bystanders, at a distance or delicately. |
 | Secret Identity | +2 to Deception to keep your two lives apart. Take the Secret Identity complication unless the GM agrees otherwise. |
 | Cool Under Fire | +2 to Will to keep acting under fire, fear or mind powers. |
-| Sealed Case Files | You start play with three dossiers, each a secret your work or your origin taught you: something in no database, registry or published record. They grant no bonus: they let you act on what you know. |
+| Sealed Binder | You start play with three dossiers, each a secret your work or your origin taught you: something in no database, registry or published record. They grant no bonus: they let you act on what you know. |
 
 **Aegis Certified** lets a character who isn't an Aegis Pilot use the Aegis suit from the gear list. **Secret Identity** comes with the *Secret Identity* complication unless the GM agrees otherwise. Origin advantages (in each origin's entry) are often the most flavorful choice for an Operant.
 

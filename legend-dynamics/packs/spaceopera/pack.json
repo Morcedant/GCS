@@ -2075,7 +2075,7 @@
   ],
   [
    "codex",
-   "Classified Codex",
+   "Classified Archive",
    "You start play with three data records, each a secret your work or your people taught you: something in no database or published record. They grant no bonus: they let you act on what you know.",
    "Investigation"
   ]
@@ -4268,7 +4268,7 @@
   "startCards": {
    "adv": "codex",
    "n": 3,
-   "label": "Classified Codex",
+   "label": "Classified Archive",
    "secret": "isn't in any database or published record",
    "note": "Each record is a secret your work or your people taught you, agreed with the GM."
   },

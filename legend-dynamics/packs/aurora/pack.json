@@ -1312,7 +1312,7 @@
   ],
   [
    "casefiles",
-   "Sealed Case Files",
+   "Sealed Binder",
    "You start play with three dossiers, each a secret your work or your origin taught you: something in no database, registry or published record. They grant no bonus: they let you act on what you know.",
    "Investigation"
   ]
@@ -4412,7 +4412,7 @@
   "startCards": {
    "adv": "casefiles",
    "n": 3,
-   "label": "Sealed Case Files",
+   "label": "Sealed Binder",
    "secret": "isn't in any database, registry or published record",
    "note": "Each dossier is a secret your work or your origin taught you, agreed with the GM."
   },

@@ -670,9 +670,9 @@ A discovery clock is one way to earn a data record. The others need no clock: wh
 - **Ideas are free; information isn't.** Proposing a theory costs nothing. Learning something does: a discovery clock's scenes and failed rolls, or the price of a direct source (above).
 - **Enough clues.** The GM provides enough clues, and more than one route to each answer: a job shouldn't stall on a single missed roll.
 
-### Classified Codex
+### Classified Archive
 
-A character who takes the **Classified Codex** advantage starts play with three data records they write themselves, with the GM's agreement. Each must hold a **secret**: something that isn't in any database or published record. Each comes from the character's role or species: what their work or their people taught them. The creator asks for the subject, the secret, which it comes from, and why it isn't common knowledge.
+A character who takes the **Classified Archive** advantage starts play with three data records they write themselves, with the GM's agreement. Each must hold a **secret**: something that isn't in any database or published record. Each comes from the character's role or species: what their work or their people taught them. The creator asks for the subject, the secret, which it comes from, and why it isn't common knowledge.
 
 **Two kinds of data records.** **Weakness:** How it is beaten: a predator's or a hostile system's weakness. **Permission:** How it is used: a species' customs that allow negotiation, a derelict's systems that allow operating it.
 
@@ -1503,7 +1503,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Implant: Reflex Wiring | +1 Dodge, and +2 to act first in a fight. It shows on scans. |
 | Cool Under Fire | +2 to Will to keep acting under fire, fear or pressure. |
 | Psionic | You have psionic potential: you can learn psionic powers (see Psionics and the Mandates). Take the Unregistered complication unless the GM agrees otherwise. |
-| Classified Codex | You start play with three data records, each a secret your work or your people taught you: something in no database or published record. They grant no bonus: they let you act on what you know. |
+| Classified Archive | You start play with three data records, each a secret your work or your people taught you: something in no database or published record. They grant no bonus: they let you act on what you know. |
 
 **Implants** (the advantages marked *Implant*) are visible and show on scans; a character with several should consider the *Implant Upkeep* complication. **Psionic** comes with the *Unregistered* complication unless the GM agrees the character is registered (and watched). **A Ship of Your Own** belongs to the whole crew once it's taken.
 
