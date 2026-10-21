@@ -697,6 +697,7 @@ export function mountLab(api) {
     if (q.target) $("lab-target").value = q.target;
     if (q.weapon && [...$("lab-weapon").options].some((/** @type {any} */ o) => o.value === q.weapon)) { $("lab-weapon").value = q.weapon; renderAction(); if (q.target) $("lab-target").value = q.target; }
     if (q.action === "other" && q.note) $("lab-text").value = q.note;
+    if (typeof window !== "undefined" && window.ldReveal) window.ldReveal($("lab-act-wrap")); // the GM view may be showing another panel group
     $("lab-act-wrap").scrollIntoView({ block: "nearest" });
     return true;
   }

@@ -63,6 +63,22 @@ b, strong { font-weight: 600; }
 .step-head { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
 .step-no { font: 600 .74rem/1 var(--mono); letter-spacing: .16em; color: var(--on-accent); background: var(--accent); border-radius: 999px; padding: 6px 12px 6px 10px; }
 .step-no::before { content: "STEP 0"; }
+/* Less scrolling: Create shows one step at a time, the GM view one group of panels, the guide one chapter.
+   Hidden panes only hide on screen; printing shows everything as before. */
+@media screen { .pane-off { display: none !important; } }
+.subtabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 22px; background: var(--well); }
+.subtabs .tab { font-size: .78rem; padding: 9px 14px; }
+.subtabs .tab .n { opacity: .7; margin-right: 6px; }
+#view-gm > .subtabs { margin: 22px 0 18px; }
+.steps > .subtabs { margin-bottom: 0; }
+.step-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; border-top: 1px dashed var(--line); padding-top: 14px; }
+.step-nav .btn:only-child { margin-left: auto; }
+.guide-pager { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; border-top: 1px solid var(--line); margin-top: 28px; padding-top: 16px; }
+.guide-pager .btn { max-width: 48%; text-align: left; }
+.guide-pager .btn.next { margin-left: auto; text-align: right; }
+.guide-toc a[aria-current="true"] { color: var(--chrome); font-weight: 600; }
+.checklist li.goto { cursor: pointer; }
+.checklist li.goto:hover span:last-child { text-decoration: underline; }
 .step-head p { flex-basis: 100%; }
 
 /* Forms */
@@ -607,6 +623,7 @@ tr.lvl-U td.target { color: var(--muted); }
   <section id="view-create" role="tabpanel" aria-labelledby="tab-create">
     <div class="layout">
       <div class="steps">
+        <nav class="subtabs no-print" id="step-tabs" role="tablist" aria-label="Creation steps"></nav>
 
         <section class="step hud">
           <div class="step-head"><span class="step-no">1</span><h2>Choose your {{roleLower}}</h2>
@@ -883,6 +900,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   <!-- GM VIEW -->
   <section id="view-gm" role="tabpanel" aria-labelledby="tab-gm" hidden>
+    <nav class="subtabs no-print" id="gm-tabs" role="tablist" aria-label="GM view sections"></nav>
     <div class="panel hud no-print" id="gm-table"></div>
     <div class="gm-top">
       <div class="card hud no-print">
@@ -1008,6 +1026,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <span class="eyebrow">{{eyebrow}}</span><h2 class="h1" id="guide-h">{{guideTitle}}</h2>
           <span class="muted" id="guide-sub">{{guideSubtitle}}</span><span class="muted small">By Don Smallwood</span></header>
 <!-- GUIDE:START --><!-- GUIDE:END -->
+        <nav class="guide-pager no-print" id="guide-pager" aria-label="Chapters"></nav>
       </article>
     </div>
   </section>
@@ -1872,7 +1891,9 @@ tr.lvl-U td.target { color: var(--muted); }
     $("ready-status").textContent = ready ? T.readyText : `${list.filter((c) => !c[0]).length} items outstanding`;
     $("ms-text").textContent = $("ready-status").textContent;
     $("ms-text").className = $("ready-status").className;
-    $("checklist").innerHTML = list.map(([ok, t]) => `<li><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`).join("");
+    // Each item opens the step where it's fixed (Create shows one step at a time).
+    $("checklist").innerHTML = list.map(([ok, t]) => { const f = fieldFor(t);
+      return `<li${f ? ` data-goto="${f}" class="goto" title="Go to it"` : ""}><span class="mark ${ok ? "ok" : "no"}">${ok ? "✓" : "!"}</span><span>${esc(t)}</span></li>`; }).join("");
     $("st-dodge").textContent = dodge();
     $("st-move").textContent = `${moveNow()} yd`;
     $("st-grit").textContent = gritStart();
@@ -3394,6 +3415,11 @@ tr.lvl-U td.target { color: var(--muted); }
   $("duty-reset").onclick = () => { ch.play.duty = gritStart(); ch.play.log = []; render(); };
   $("r-roll").onclick = () => doRoll(false);
 
+  // Which field a readiness item is about, so a click on it can open that step.
+  const FIELD_FOR = [[/^enter a name|^name/i, "f-name"], [/allegiance/i, "f-allegiance"], [/legal status/i, "f-status"], [/trigger/i, "f-comptrigger"], [/complication/i, "f-comp"],
+    [/connection/i, "f-connection"], [/specialty|trained|skill/i, "skill-tally"], [/edges|attribute|tier|custom adjustments|origin|ancestr|species|heritage/i, "f-speciesid"],
+    [/advantage|almanac|archive|binder|untold|written/i, "f-adv"], [/chosen$|role|calling/i, "f-dept"]];
+  const fieldFor = (t) => (FIELD_FOR.find(([re, id]) => re.test(t) && $(id)) || [])[1] || "";
   function selectTab(which) {
     for (const v of ["create", "sheet", "guide", "gm"]) {
       $("tab-" + v).setAttribute("aria-selected", v === which);
@@ -3434,12 +3460,17 @@ tr.lvl-U td.target { color: var(--muted); }
     const b = e.target.closest(".help");
     if (b && HELP[b.dataset.help]) { e.preventDefault(); e.stopPropagation(); if (opener === b) closeHelp(false); else openHelp(b); return; }
     if (e.target.closest(".help-close")) { closeHelp(true); return; }
-    if (e.target.closest(".help-more")) { closeHelp(false); selectTab("guide"); if ($("guide-gm")) showBook("players"); document.getElementById("g-magic").scrollIntoView({ block: "start" }); return; }
+    if (e.target.closest(".help-more")) { closeHelp(false); selectTab("guide"); if ($("guide-gm")) showBook("players"); reveal(document.getElementById("g-magic")); document.getElementById("g-magic").scrollIntoView({ block: "start" }); return; }
     if (!e.target.closest("#help-pop")) closeHelp(false);
   }, true);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !pop.hidden) closeHelp(true); });
   window.addEventListener("resize", () => closeHelp(false));
   $("tab-gm").onclick = () => { renderGM(); selectTab("gm"); };
+  $("checklist").addEventListener("click", (e) => {
+    const li = e.target.closest("[data-goto]"); if (!li) return;
+    const el = $(li.dataset.goto); if (!el) return;
+    reveal(el); el.scrollIntoView({ block: "center" }); if (el.focus) el.focus({ preventScroll: true });
+  });
   $("ms-go").onclick = () => $("checklist").scrollIntoView({ behavior: "smooth", block: "center" });
   // On narrow screens the guide's contents list starts folded and folds again after a jump.
   const narrow = window.matchMedia && matchMedia("(max-width: 900px)");
@@ -3456,8 +3487,36 @@ tr.lvl-U td.target { color: var(--muted); }
       $("guide-switch").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.book === which)));
       try { sessionStorage.setItem(PACK.id + ".guide", which); } catch {}
     }
-    $("guide-toc").innerHTML = `<li><a href="#guide">Introduction</a></li>` +
-      [...root.querySelectorAll("h1")].map((h) => `<li><a href="#${h.id}">${esc(h.textContent)}</a></li>`).join("");
+    chapterize(root);
+    $("guide-toc").innerHTML = chaptersOf(root).map((c, i) => `<li><a href="#${c.dataset.anchor}" data-chap="${i}">${esc(c.dataset.title)}</a></li>`).join("");
+    let at = 0; try { at = +(sessionStorage.getItem(PACK.id + ".chapter." + which) || 0); } catch {}
+    showChapter(root, at, false);
+  }
+  // The guide shows one chapter at a time: everything from one chapter heading to the next.
+  const chaptersOf = (root) => [...root.querySelectorAll(":scope > .gchap")];
+  function chapterize(root) {
+    if (root.dataset.chapters) return;
+    root.dataset.chapters = "1";
+    const kids = [...root.children].filter((el) => !el.matches("header, .guide-pager, .guide-switch"));
+    const chaps = []; let cur = null;
+    const start = (title, anchor) => { cur = document.createElement("section"); cur.className = "gchap"; cur.dataset.title = title; cur.dataset.anchor = anchor; chaps.push(cur); };
+    start("Introduction", root.id === "guide" ? "guide" : root.id);
+    for (const el of kids) { if (el.tagName === "H1") start(el.textContent, el.id); cur.append(el); }
+    const keep = chaps.filter((c) => c.childElementCount);
+    root.append(...keep);
+  }
+  function showChapter(root, i, scroll = true) {
+    const chaps = chaptersOf(root); if (!chaps.length) return;
+    i = Math.max(0, Math.min(chaps.length - 1, i || 0));
+    chaps.forEach((c, k) => c.classList.toggle("pane-off", k !== i));
+    $("guide-toc").querySelectorAll("a[data-chap]").forEach((a) => a.setAttribute("aria-current", String(+a.dataset.chap === i)));
+    const prev = chaps[i - 1], next = chaps[i + 1];
+    $("guide-pager").innerHTML = (prev ? `<button type="button" class="btn" data-chapgo="${i - 1}">← ${esc(prev.dataset.title)}</button>` : "")
+      + (next ? `<button type="button" class="btn next" data-chapgo="${i + 1}">${esc(next.dataset.title)} →</button>` : "");
+    $("guide-pager").dataset.root = root.id;
+    const which = books ? Object.keys(books).find((k) => books[k] === root) || "players" : "players";
+    try { sessionStorage.setItem(PACK.id + ".chapter." + which, String(i)); } catch {}
+    if (scroll) $("guide").scrollIntoView({ block: "start" });
   }
   if (books) {
     $("guide-switch").hidden = false; $("tab-guide").textContent = "Guides";
@@ -3468,6 +3527,59 @@ tr.lvl-U td.target { color: var(--muted); }
   let book = "players";
   try { if (books && sessionStorage.getItem(PACK.id + ".guide") === "gm") book = "gm"; } catch {}
   showBook(book);
+  $("guide-toc").addEventListener("click", (e) => { const a = e.target.closest("a[data-chap]"); if (a) { e.preventDefault(); showChapter(document.getElementById($("guide-pager").dataset.root), +a.dataset.chap); } });
+  $("guide-pager").addEventListener("click", (e) => { const b = e.target.closest("[data-chapgo]"); if (b) showChapter(document.getElementById($("guide-pager").dataset.root), +b.dataset.chapgo); });
+
+  // ---- Create: one step at a time ----
+  const STEPS = [...document.querySelectorAll("#view-create .step")];
+  const stepTitle = (st) => st.querySelector("h2").textContent.trim();
+  $("step-tabs").innerHTML = STEPS.map((st, i) => `<button type="button" class="tab" role="tab" data-step="${i}"><span class="n">${i + 1}</span>${esc(stepTitle(st))}</button>`).join("");
+  STEPS.forEach((st, i) => st.insertAdjacentHTML("beforeend", `<div class="step-nav no-print">${i ? `<button type="button" class="btn" data-step="${i - 1}">← ${esc(stepTitle(STEPS[i - 1]))}</button>` : ""}${STEPS[i + 1] ? `<button type="button" class="btn primary" data-step="${i + 1}">Next: ${esc(stepTitle(STEPS[i + 1]))} →</button>` : ""}</div>`));
+  function showStep(i, scroll) {
+    i = Math.max(0, Math.min(STEPS.length - 1, i || 0));
+    STEPS.forEach((st, k) => st.classList.toggle("pane-off", k !== i));
+    $("step-tabs").querySelectorAll("[data-step]").forEach((b) => b.setAttribute("aria-selected", String(+b.dataset.step === i)));
+    try { sessionStorage.setItem(PACK.id + ".step", String(i)); } catch {}
+    if (scroll && $("step-tabs").getBoundingClientRect().top < 0) $("step-tabs").scrollIntoView({ block: "start" });
+  }
+  $("view-create").addEventListener("click", (e) => { const b = e.target.closest("button[data-step]"); if (b) showStep(+b.dataset.step, true); });
+  { let at = 0; try { at = +(sessionStorage.getItem(PACK.id + ".step") || 0); } catch {} showStep(at); }
+
+  // ---- the GM view: one group of panels at a time ----
+  const GM_GROUPS = [["table", "Table and characters", ["#gm-table", ".gm-top", "#gm-grid"]], ["fight", "Map and fight", [".bm-card", "#lab"]],
+    ...(DISC ? [["discovery", `Discovery: ${capFirst(DISC.cards)}`, ["#disc-card"]]] : []), ["tools", "Clocks and tools", [".gm-tools"]]];
+  for (const [id, , sels] of GM_GROUPS) for (const q of sels) { const el = document.querySelector("#view-gm " + q); if (el) el.dataset.gmpane = id; }
+  $("gm-tabs").innerHTML = GM_GROUPS.map(([id, name]) => `<button type="button" class="tab" role="tab" data-gmtab="${id}">${esc(name)}</button>`).join("");
+  function showGmTab(id) {
+    if (!GM_GROUPS.some((g) => g[0] === id)) id = GM_GROUPS[0][0];
+    document.querySelectorAll("#view-gm [data-gmpane]").forEach((el) => el.classList.toggle("pane-off", el.dataset.gmpane !== id));
+    $("gm-tabs").querySelectorAll("[data-gmtab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.gmtab === id)));
+    try { sessionStorage.setItem(PACK.id + ".gmtab", id); } catch {}
+    if (id === "fight") try { battleMap.refresh(); } catch {}
+  }
+  $("gm-tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-gmtab]"); if (b) showGmTab(b.dataset.gmtab); });
+  { let at = "table"; try { at = sessionStorage.getItem(PACK.id + ".gmtab") || "table"; } catch {} showGmTab(at); }
+
+  // Anything that jumps to a part of the page (a link, a help pop-up's "more", a turn request put into the encounter)
+  // first opens the tab, step, GM panel group or guide chapter that holds it.
+  function reveal(el) {
+    if (!el || !el.closest) return;
+    const view = el.closest('[role="tabpanel"]'); if (view && view.hidden) selectTab(view.id.replace("view-", ""));
+    const st = el.closest("#view-create .step"); if (st) showStep(STEPS.indexOf(st));
+    const pane = el.closest("[data-gmpane]"); if (pane) showGmTab(pane.dataset.gmpane);
+    const chap = el.closest(".gchap");
+    if (chap) {
+      const root = chap.parentElement, which = books && Object.keys(books).find((k) => books[k] === root);
+      if (which && root.hidden) showBook(which);
+      showChapter(root, chaptersOf(root).indexOf(chap), false);
+    }
+  }
+  window.ldReveal = reveal;
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="#"]'); if (!a || a.getAttribute("href").length < 2) return;
+    const t = document.getElementById(decodeURIComponent(a.getAttribute("href").slice(1))); if (t) reveal(t);
+  });
+  if (location.hash.length > 1) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) { reveal(t); t.scrollIntoView({ block: "start" }); } }
   // Wide tables scroll inside their own box on narrow screens.
   $("guide").querySelectorAll("table").forEach((t) => { const w = document.createElement("div"); w.className = "table-scroll"; t.before(w); w.append(t); });
 
