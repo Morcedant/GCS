@@ -205,28 +205,45 @@ A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something tha
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. A successful roll does not force someone to abandon a core belief or reveal what they do not know.
 
-## Discovery clocks and cards
+## Discovery clocks and Legend cards
 
-When a mission turns on an unknown subject (a creature, a rival's power, a strange device), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **card**: what the characters learned, kept for good. A character's cards are their **collection**.
+When a mission turns on an unknown subject (a creature, a rival's power, a strange device), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **Legend card**: what the characters learned, kept for good. A character's Legend cards are their **collection**.
 
 | Phase | What it means |
 |---|---|
 | 1. Confront the unknown | Effects without a cause. You may suspect, but nothing is confirmed. |
-| 2. Identify | Name the subject. This is the gate: until its identity is confirmed, no card applies, and the GM treats your theories as suspicion only. |
-| 3. Uncover | Learn how it is beaten or used. Filling this phase fills the clock and mints a card. |
+| 2. Identify | Name the subject. This is the gate: until its identity is confirmed, what you know about a kind of subject doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works. |
+| 3. Uncover | Learn how it is beaten or used. Filling this phase fills the clock and earns a Legend card for what you established. |
 
 - **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
 - **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
-- **The primary investigator.** One character leads and owns the card. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant card can assist with a method they couldn't otherwise bring (the card is why they're qualified); it adds nothing beyond the normal assistance.
+- **The primary investigator.** One character leads and owns the Legend card. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant Legend card can assist with a method they couldn't otherwise bring (the Legend card is why they're qualified); it adds nothing beyond the normal assistance.
 - **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
 
-### The card
+### The Legend card
 
-A card grants **no bonus** to any roll. It is an earned permission: knowledge that makes possible an action otherwise forbidden or unavailable against that subject. Without it, the GM can rule that the action isn't possible: you can't aim for a heart you don't know is the weakness, or speak a name you never learned. A card can authorize a called shot or a telling-hit effect that would otherwise be unavailable.
+A Legend card is a permanent record of one specific thing the characters have established. It holds only what they found out, never the whole truth: later discoveries add to it with more Legend cards. It grants **no bonus** to any roll.
 
-- A card never helps confirm its own subject: holding one doesn't prove this is that. It applies once the Identify phase has confirmed it.
-- **Shared copies.** Every character present when the card is minted (the climactic confrontation or the breakthrough) gets a shared copy; the primary investigator is recorded as its owner. An absent character doesn't, though a holder can teach it to them later with the GM's agreement.
-- **What it records.** The subject (its tag), what was learned, what it permits, the mission where it was earned, its owner, and who was there. It's kept on the character sheet, under *Learned in play*.
+- **Weaknesses work anyway.** A real weakness works whoever uses it, Legend card or no Legend card. An unfamiliar procedure still needs its method, the knowledge, the skill and the means.
+- **What a Legend card is for.** It's what the character knows for certain and can rely on, plan around and teach. A correct deduction, a sensible experiment or an ordinary precaution needs no Legend card.
+- **The identification gate.** Before a subject is confirmed, you can form hypotheses, test them and take precautions, but what you know about a kind of subject isn't applied to this one until the Identify phase confirms it. Holding a Legend card never proves that this is that.
+- **Shared copies.** Everyone who establishes a finding, or is there when a Legend card is earned, gets a shared copy; one character is recorded as its owner. A character who wasn't there can be taught it later, from a reliable account.
+- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, what it cost, the date, its owner and who received it. It's kept on the character sheet, under *Learned in play*.
+
+### Earning a Legend card
+
+A discovery clock is one way to earn a Legend card. The others need no clock: when a fact is established directly or taught reliably, the GM records the Legend card at once. **Information is never free:** each source has its price, marked when the Legend card is recorded.
+
+| How it was learned | What counts | What it costs |
+|---|---|---|
+| **A discovery clock** | Filled to the end of Uncover. | What the clock cost along the way |
+| **Seen or tested firsthand** | Direct experience, or a sensible experiment. | threat clock +1 or a track +1 |
+| **A reliable account** | A witness, a record or a book the GM judges reliable. A source's reputation alone doesn't make it right, but a reliable account can establish a fact without anyone repeating a dangerous test. | a track +1 |
+| **Its own word, backed up** | What the subject itself, or someone close to it, tells you, supported by evidence. | a track +1 |
+
+- **A basis for a proposal.** An investigation proposal needs a reasonable basis: what the characters have heard, evidence, testimony, their own experience, or a suspicion they can explain. Naming the right answer with nothing behind it doesn't earn a Legend card. The GM asks what supports an approach, and never rejects it just because it matches the hidden truth.
+- **Ideas are free; information isn't.** Proposing a theory costs nothing. Learning something does: a discovery clock's scenes and failed rolls, or the price of a direct source (above).
+- **Enough clues.** The GM provides enough clues, and more than one route to each answer: a mission shouldn't stall on a single missed roll.
 
 ### The threat clock
 
@@ -236,7 +253,7 @@ A discovery clock always races a threat clock. The setting names the threat cloc
 
 When an investigation roll fails, or a player pushes, one of the setting's shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
 
-*Your setting pack names the card, the threat clock, the tracks investigating pushes, and the methods.*
+*Each setting names its Legend cards, their collection, the threat clock, the tracks investigating pushes, each source's price and the methods. Trails of Blood & Dust: lore cards in a hunter's almanac; Fracture Lines: data records in an archive; The Shattered Crown: tales in a saga; Aurora: dossiers in a binder.*
 
 ## Chases
 
@@ -369,6 +386,24 @@ The GM view of the character creator has a **battle map** for fights where it he
 The GM view also has an **Encounter** panel that runs a fight by these rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit, offering a Legend point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so.
 
 **The shared table.** The GM can start a shared table from the GM view and give the players its code; each player joins from their character's Play tab. While they're connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the Play tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Each player's character is shared with the GM too: it appears among the GM view's characters, marked at the table, and its injuries, points, ammunition and form stay in step both ways, whether they're changed on the sheet, on the GM's card or in an encounter. In a fight, each player's Play tab shows the GM's battle map and the encounter's turn order and latest results; a player drags their own token, and on their turn sends the GM what they'll do, which the GM puts into the Encounter panel and runs. The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.
+
+## Making Legend cards
+
+For the GM: when a Legend card is earned, and how to write one. A Legend card is a record of what the characters established, so writing it well matters more than how often you hand one out.
+
+1. **Decide that something is established.** A Legend card is earned when a discovery clock fills, or when the characters see or test something themselves, hear it from a source you judge reliable, or are told it by the subject itself with evidence to back it up. A guess, however right, isn't established, and neither is a rumor. Ask what supports their idea; when the answer is good, let them act on it, and give the Legend card once they've confirmed it.
+2. **Write the finding narrowly.** One fact, in the words the characters would use, and no more than they found out: "bright light drove it back", not "it fears light". Two separate facts make two Legend cards. Never write the subject's whole truth onto a Legend card; later discoveries add more Legend cards.
+3. **Write its limits.** What the finding doesn't show: how often it was seen, under what conditions, and what is still unknown. The limits are what keep the next investigation interesting.
+4. **Note the evidence or source.** What they saw, tested, read or were told, and by whom. A source's reputation doesn't make it right: if it was only probably true, the limits say so.
+5. **Charge the price.** A Legend card from a discovery clock costs nothing more: the scenes, failed rolls and pushes were its price. Any other source has its price (see *Earning a Legend card*): choose the one that fits how they learned it, and mark it.
+6. **Choose the owner and the recipients.** Whoever did the finding owns the Legend card. Everyone who was there, or heard it from a reliable source, gets a shared copy.
+7. **Record it.** Write it on each recipient's sheet, under *Learned in play*.
+
+*Example:* **The thing in the mine.** Established: *Bright light drove it back down the shaft*. Limits: *Seen once; not whether light harms it, or how long it stays away*. Source: What the characters saw at the mine head (seen or tested firsthand). Cost: the threat clock +1 (the night spent watching).
+
+- **When a later finding disagrees.** Write a new Legend card that says what they now know; the old one stays on the sheet as what they believed then, and the new one's limits can say so.
+- **A Legend card is never proof of identity.** Holding a Legend card about one subject doesn't prove that the thing in front of them is that subject: the Identify phase does.
+- **Weaknesses work anyway.** Don't hold back a real weakness because no one holds the Legend card: if they try it, it works.
 
 # Medical care
 

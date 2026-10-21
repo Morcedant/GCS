@@ -3355,6 +3355,7 @@
     "title": "Tales",
     "intro": "Running investigations and recording what the heroes learn. The rules players use are in the *Tales* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and tales.",
     "take": [
+     "## Making tales",
      "## The Discovery panel"
     ]
    },
@@ -3561,6 +3562,14 @@
    "secret": "isn't in common books or lore",
    "note": "Each tale is a secret your role or your people taught you, agreed with the GM."
   },
-  "clockExample": "Who flayed the priest of the river temple"
+  "clockExample": "Who flayed the priest of the river temple",
+  "cardExample": {
+   "subject": "The Thing from the Deep",
+   "finding": "It would not cross the line of salt at the temple door",
+   "limits": "One night, one door; not whether salt harms it",
+   "evidence": "The old priest's telling, borne out by the tracks that stop at the salt",
+   "route": "account",
+   "cost": "Debt +1 (the priest's price)"
+  }
  }
 }

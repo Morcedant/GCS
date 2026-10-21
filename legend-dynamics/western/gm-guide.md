@@ -152,6 +152,24 @@ What a lore card for each creature knows, and what it permits. These are also th
 | **Skinwalker** | In a stolen shape, ordinary wounds mark only 1 box; its true name, spoken to its face, forces it into its own mortal shape. | Speaking its true name to force it back into its own shape. |
 | **Headless Rider** | Its head, hidden near where it died, laid back in the grave lets it rest; it can't cross running water. | Finding its head; making a stand across running water. |
 
+## Making lore cards
+
+For the GM: when a lore card is earned, and how to write one. A lore card is a record of what the characters established, so writing it well matters more than how often you hand one out.
+
+1. **Decide that something is established.** A lore card is earned when a discovery clock fills, or when the characters see or test something themselves, hear it from a source you judge reliable, or are told it by the subject itself with evidence to back it up. A guess, however right, isn't established, and neither is a rumor. Ask what supports their idea; when the answer is good, let them act on it, and give the lore card once they've confirmed it.
+2. **Write the finding narrowly.** One fact, in the words the characters would use, and no more than they found out: "bright light drove it back", not "it fears light". Two separate facts make two lore cards. Never write the subject's whole truth onto a lore card; later discoveries add more lore cards.
+3. **Write its limits.** What the finding doesn't show: how often it was seen, under what conditions, and what is still unknown. The limits are what keep the next investigation interesting.
+4. **Note the evidence or source.** What they saw, tested, read or were told, and by whom. A source's reputation doesn't make it right: if it was only probably true, the limits say so.
+5. **Charge the price.** A lore card from a discovery clock costs nothing more: the scenes, failed rolls and pushes were its price. Any other source has its price (see *Earning a lore card*): choose the one that fits how they learned it, and mark it.
+6. **Choose the owner and the recipients.** Whoever did the finding owns the lore card. Everyone who was there, or heard it from a reliable source, gets a shared copy.
+7. **Record it.** In the GM view's **Discovery** panel: **Mint** a full clock's lore card, or use **Record a finding without a clock**, which marks the price for you. Then save everyone's characters to file, so the players' sheets carry it. A player can also write a lore card on their own sheet, when you agree it's been earned.
+
+*Example:* **Werewolf.** Established: *Silver buckshot made it bleed and run*. Limits: *One wolf, one night; not whether silver can kill it*. Source: Ruth Calloway's shotgun at the Haskell barn (seen or tested firsthand). Cost: Harvest +1 (the night spent waiting for it).
+
+- **When a later finding disagrees.** Write a new lore card that says what they now know; the old one stays on the sheet as what they believed then, and the new one's limits can say so.
+- **A lore card is never proof of identity.** Holding a lore card about one subject doesn't prove that the thing in front of them is that subject: the Identify phase does.
+- **Weaknesses work anyway.** Don't hold back a real weakness because no one holds the lore card: if they try it, it works.
+
 ## The Discovery panel
 
 The GM view's **Discovery** panel runs discovery clocks and the Harvest they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every lore card the characters in the GM view already hold for it. The **Failed roll** and **Push** buttons tick the track for how they were digging, and a failed roll ticks the Harvest too. When a clock fills, **Mint** gives the primary investigator the lore card and everyone you tick as present a shared copy. **Record a finding without a clock** gives a lore card for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick, and marks its price: the track or the Harvest that source costs. Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.

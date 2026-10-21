@@ -345,6 +345,8 @@ The GM view also has an **Encounter** panel that runs a fight by these rules and
 
 **The shared table.** The GM can start a shared table from the GM view and give the players its code; each player joins from their character's {{tabPlay}} tab. While they're connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the {{tabPlay}} tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Each player's character is shared with the GM too: it appears among the GM view's characters, marked at the table, and its injuries, points, ammunition and form stay in step both ways, whether they're changed on the sheet, on the GM's card or in an encounter. In a fight, each player's {{tabPlay}} tab shows the GM's battle map and the encounter's turn order and latest results; a player drags their own token, and on their turn sends the GM what they'll do, which the GM puts into the Encounter panel and runs. The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.
 
+{{GEN:card-howto}}
+
 {{GEN:discovery-panel}}
 
 

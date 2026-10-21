@@ -3599,6 +3599,7 @@
     "intro": "Running investigations and recording what the characters learn. The rules players use are in the *Lore cards* chapter of the Players' Guide; here are the subjects a card can cover (and a Hunter's Almanac can start with), and the GM view's tools for clocks and cards.",
     "take": [
      "## Lore card subjects",
+     "## Making lore cards",
      "## The Discovery panel"
     ]
    },
@@ -3848,7 +3849,15 @@
   "chapter": "Lore cards",
   "anyway": "A real weakness works whoever uses it, lore card or no lore card: silver marks its extra box fired by someone who has never heard of werewolves, and a hunter who suspects silver can load it. Called shots follow the ordinary combat rules. An unfamiliar ritual still needs its procedure, the knowledge, the skill and the components.",
   "basis": "folklore the characters have heard, evidence, testimony, their own experience, or a suspicion they can explain",
-  "datePlaceholder": "In the story, e.g. May 1874"
+  "datePlaceholder": "In the story, e.g. May 1874",
+  "cardExample": {
+   "subject": "Werewolf",
+   "finding": "Silver buckshot made it bleed and run",
+   "limits": "One wolf, one night; not whether silver can kill it",
+   "evidence": "Ruth Calloway's shotgun at the Haskell barn",
+   "route": "experience",
+   "cost": "Harvest +1 (the night spent waiting for it)"
+  }
  },
  "materials": [
   [

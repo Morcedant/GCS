@@ -264,6 +264,8 @@ def gen(name, pack, t):
         if d.get("chapter"):
             return f"Investigations have rules of their own, and earn {d['cards']}: see *{d['chapter']}*."
         return discovery_md(p.get("discovery"), t)
+    if name == "card-howto":
+        return card_howto_md(p.get("discovery"), t)
     if name == "discovery-chapter":
         return discovery_md(p.get("discovery"), t)
     if name == "magic":
@@ -389,11 +391,18 @@ def gen(name, pack, t):
 
 
 NEUTRAL_DISCOVERY = {
-    "card": "card", "cards": "cards", "collection": "collection", "subject": "a creature, a rival's power, a strange device", "uncover": "how it is beaten or used",
+    "card": "Legend card", "cards": "Legend cards", "collection": "collection", "subject": "a creature, a rival's power, a strange device", "uncover": "how it is beaten or used",
     "phases": [["Confront the unknown", "Effects without a cause. You may suspect, but nothing is confirmed."],
-               ["Identify", "Name the subject. This is the gate: until its identity is confirmed, no card applies, and the GM treats your theories as suspicion only."],
-               ["Uncover", "Learn how it is beaten or used. Filling this phase fills the clock and mints a card."]],
+               ["Identify", "Name the subject. This is the gate: until its identity is confirmed, what you know about a kind of subject doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works."],
+               ["Uncover", "Learn how it is beaten or used. Filling this phase fills the clock and earns a Legend card for what you established."]],
     "threat": {"name": "threat clock", "text": "The setting names the threat clock and what happens when it fills: a creature claiming another victim, a villain escalating, a reactor going critical."},
+    "scoped": True,
+    "routes": [["investigation", "A discovery clock", "filled to the end of Uncover", []],
+               ["experience", "Seen or tested firsthand", "direct experience, or a sensible experiment", ["threat", "a track"]],
+               ["account", "A reliable account", "a witness, a record or a book the GM judges reliable. A source's reputation alone doesn't make it right, but a reliable account can establish a fact without anyone repeating a dangerous test", ["a track"]],
+               ["creature", "Its own word, backed up", "what the subject itself, or someone close to it, tells you, supported by evidence", ["a track"]]],
+    "cardExample": {"subject": "The thing in the mine", "finding": "Bright light drove it back down the shaft", "limits": "Seen once; not whether light harms it, or how long it stays away",
+                "evidence": "What the characters saw at the mine head", "route": "experience", "cost": "the threat clock +1 (the night spent watching)"},
 }
 
 
@@ -422,6 +431,36 @@ def scoped_card_md(d, t, card, cards):
         out += [f"### {sc['label']}", "",
                 f"A character who takes the **{sc['label']}** advantage starts play with {['no', 'one', 'two', 'three', 'four', 'five'][sc['n']] if sc['n'] <= 5 else sc['n']} {cards} they write themselves, with the GM's agreement. Each must hold a **secret**: something that {sc['secret']}. Each comes from the character's {t['roleLower']} or {t['originLower']}: what their work or their people taught them. The creator asks for the subject, the secret, which it comes from, and why it isn't common knowledge.", ""]
     return out
+
+
+def card_howto_md(d, t, neutral=False):
+    """For the GM: when a card is earned, and how to write and record one (scoped cards)."""
+    if not d or not d.get("scoped"):
+        return ""
+    card, cards = d["card"], d["cards"]
+    Card = card[0].upper() + card[1:]
+    threat = d["threat"].get("track") or d["threat"]["name"]
+    ex = d.get("cardExample") or {}
+    route = {r[0]: r[1] for r in d.get("routes", [])}.get(ex.get("route"), "")
+    out = [f"## Making {cards}", "",
+           f"For the GM: when a {card} is earned, and how to write one. A {card} is a record of what the characters established, so writing it well matters more than how often you hand one out.", "",
+           f"1. **Decide that something is established.** A {card} is earned when a discovery clock fills, or when the characters see or test something themselves, hear it from a source you judge reliable, or are told it by the subject itself with evidence to back it up. A guess, however right, isn't established, and neither is a rumor. Ask what supports their idea; when the answer is good, let them act on it, and give the {card} once they've confirmed it.",
+           f"2. **Write the finding narrowly.** One fact, in the words the characters would use, and no more than they found out: \"bright light drove it back\", not \"it fears light\". Two separate facts make two {cards}. Never write the subject's whole truth onto a {card}; later discoveries add more {cards}.",
+           f"3. **Write its limits.** What the finding doesn't show: how often it was seen, under what conditions, and what is still unknown. The limits are what keep the next investigation interesting.",
+           f"4. **Note the evidence or source.** What they saw, tested, read or were told, and by whom. A source's reputation doesn't make it right: if it was only probably true, the limits say so.",
+           f"5. **Charge the price.** A {card} from a discovery clock costs nothing more: the scenes, failed rolls and pushes were its price. Any other source has its price (see *Earning a {card}*): choose the one that fits how they learned it, and mark it.",
+           f"6. **Choose the owner and the recipients.** Whoever did the finding owns the {card}. Everyone who was there, or heard it from a reliable source, gets a shared copy.",
+           f"7. **Record it.** " + ("Write it on each recipient's sheet, under *Learned in play*." if neutral else f"In the GM view's **Discovery** panel: **Mint** a full clock's {card}, or use **Record a finding without a clock**, which marks the price for you. Then save everyone's characters to file, so the players' sheets carry it. A player can also write a {card} on their own sheet, when you agree it's been earned."), ""]
+    if ex:
+        out += [f"*Example:* **{ex['subject']}.** Established: *{ex['finding']}*. Limits: *{ex['limits']}*. Source: {ex['evidence']} ({route.lower() or 'firsthand'}). Cost: {ex['cost']}.", ""]
+    out += [f"- **When a later finding disagrees.** Write a new {card} that says what they now know; the old one stays on the sheet as what they believed then, and the new one's limits can say so.",
+            f"- **A {card} is never proof of identity.** Holding a {card} about one subject doesn't prove that the thing in front of them is that subject: the Identify phase does.",
+            f"- **Weaknesses work anyway.** Don't hold back a real weakness because no one holds the {card}: if they try it, it works."]
+    if d.get("startCards"):
+        sc = d["startCards"]
+        out += [f"- **{sc['label']}.** Agree each starting {card} with its player before play: it must come from the character's {t['roleLower']} or {t['originLower']}, be narrow, and be a real secret: something that {sc['secret']}. Make sure it fits what you know to be true, adjust it if it doesn't, and keep a note of it."]
+    out += [""]
+    return "\n".join(out)
 
 
 def discovery_md(d, t, neutral=False):
@@ -472,7 +511,14 @@ def discovery_md(d, t, neutral=False):
             out += ["- " + d["start"]]
         out += [""]
     if neutral:
-        out += [f"*Your setting pack names the {card}, the threat clock, the tracks investigating pushes, and the methods.*", ""]
+        names = []
+        order = ["western", "spaceopera", "fantasy", "aurora"]
+        for f in sorted((LD / "packs").glob("*/pack.json"), key=lambda f: order.index(f.parent.name) if f.parent.name in order else 99):
+            pk = json.loads(f.read_text()); dd = pk.get("discovery")
+            if dd:
+                names.append((pk["terms"]["title"], dd["cards"], dd["collection"]))
+        out += [f"*Each setting names its {cards}, their collection, the threat clock, the tracks investigating pushes, each source's price and the methods. "
+                + "; ".join(f"{t2}: {c} in {'an' if col[0] in 'aeiou' else 'a'} {col}" for t2, c, col in names) + ".*", ""]
     return "\n".join(out)
 
 
@@ -684,7 +730,7 @@ def core_rules(docx=False):
     # Neutral stand-ins for the pack-specific parts of "Making your own".
     core = core.replace("{{GEN:extra-edges}}\n", "").replace("{{GEN:gritty}}", "").replace("{{GEN:battlemap}}", "")
     core = core.replace("{{GEN:magic}}", magic_chapter({}))
-    core = core.replace("{{GEN:discovery}}", discovery_md(NEUTRAL_DISCOVERY, t, neutral=True)).replace("{{GEN:discovery-panel}}\n", "").replace("{{GEN:materials-note}}", "")
+    core = core.replace("{{GEN:discovery}}", discovery_md(NEUTRAL_DISCOVERY, t, neutral=True)).replace("{{GEN:card-howto}}", card_howto_md(NEUTRAL_DISCOVERY, t, neutral=True)).replace("{{GEN:discovery-panel}}\n", "").replace("{{GEN:materials-note}}", "")
     core = core.replace("{{PACK:customrole}}", '"Smuggler: knows every back door, bribe and hidden hold."')
     core = core.replace("{{GEN:group-names}}", "one of your setting's groups")
     core = core.replace("{{PACK:customorigin}}", "**Hill-folk (tier 1).** Stocky herders from high, cold country. *Adjustments:* Body +1, Presence −1. *Core rule:* at home in the heights: no penalty for thin air or cold. *Origin advantage:* **Sure-Footed**: +2 to Athletics to climb and keep your footing. *Companion:* **Clannish**: you trust your own people first; when it matters, accept the cost of that loyalty.")

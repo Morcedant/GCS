@@ -1,8 +1,31 @@
 {
   "_about": "The one place for the core rules' version and change history. tools/build-website.py reads it for the core-rules page and the changelog. rulesVersion and rulesUpdated change only when the rules (mechanics) change; a website or wording update adds a 'site' entry and leaves them alone. rulesVersion is null until the author picks a numbering scheme.",
   "rulesVersion": null,
-  "rulesUpdated": "2026-10-18",
+  "rulesUpdated": "2026-10-21",
   "changes": [
+    {
+      "date": "2026-10-21",
+      "kind": "rules",
+      "title": "Legend cards and the price of information",
+      "items": [
+        "A Legend card records one thing the characters have established: the finding, its limits, the evidence or source, how it was learned, what it cost, and who holds it. Each setting names its cards.",
+        "A card can be earned by a discovery clock, or directly: seen or tested firsthand, a reliable account, or the subject's own word backed by evidence.",
+        "Information is never free: each direct source has a price, ticking the threat clock or a track. A clock's card costs what the clock already cost. Proposing an idea is free.",
+        "A real weakness works whether or not anyone holds a card for it.",
+        "A new section for the GM: making Legend cards."
+      ]
+    },
+    {
+      "date": "2026-10-21",
+      "kind": "setting",
+      "title": "Fracture Lines, Aurora and The Shattered Crown: data records, dossiers and tales",
+      "items": [
+        "Fracture Lines keeps data records in an archive, Aurora dossiers in a binder, and The Shattered Crown tales in a saga, each with its own chapter in both guides.",
+        "The Shattered Crown gains discovery clocks, racing its Doom track.",
+        "New advantages give three starting cards the player writes: secrets from their role or origin that aren't common knowledge.",
+        "Trails of Blood & Dust: each source of a lore card now has its price."
+      ]
+    },
     {
       "date": "2026-10-19",
       "kind": "setting",

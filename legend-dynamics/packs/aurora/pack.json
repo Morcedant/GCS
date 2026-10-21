@@ -4247,6 +4247,7 @@
     "title": "Dossiers",
     "intro": "Running investigations and recording what the team learns. The rules players use are in the *Dossiers* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and dossiers.",
     "take": [
+     "## Making dossiers",
      "## The Discovery panel"
     ]
    },
@@ -4415,7 +4416,15 @@
    "secret": "isn't in any database, registry or published record",
    "note": "Each dossier is a secret your work or your origin taught you, agreed with the GM."
   },
-  "clockExample": "Who keeps emptying the Ironside vaults"
+  "clockExample": "Who keeps emptying the Ironside vaults",
+  "cardExample": {
+   "subject": "Lord Marrow",
+   "finding": "His bone-shaping stops when he's soaked through",
+   "limits": "Seen in one fight in the rain; not how long it lasts once he's dry",
+   "evidence": "The team's own fight with him at the Ironside docks",
+   "route": "experience",
+   "cost": "Collateral +1 (the docks took the damage)"
+  }
  },
  "mounts": [
   [

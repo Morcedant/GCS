@@ -4091,6 +4091,7 @@
     "title": "Data records",
     "intro": "Running investigations and recording what the crew learns. The rules players use are in the *Data records* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and records.",
     "take": [
+     "## Making data records",
      "## The Discovery panel"
     ]
    },
@@ -4271,7 +4272,15 @@
    "secret": "isn't in any database or published record",
    "note": "Each record is a secret your work or your people taught you, agreed with the GM."
   },
-  "clockExample": "What woke the derelict at Kessel Deep"
+  "clockExample": "What woke the derelict at Kessel Deep",
+  "cardExample": {
+   "subject": "The Kessel Deep derelict",
+   "finding": "Its reactor powers down whenever the corridor beacon goes silent",
+   "limits": "Seen twice, from outside the hull; not what restarts it",
+   "evidence": "The crew's own sensor logs",
+   "route": "experience",
+   "cost": "Countdown +1 (the hours spent watching it)"
+  }
  },
  "mounts": [
   [
