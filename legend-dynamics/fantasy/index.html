@@ -72,6 +72,8 @@ b, strong { font-weight: 600; }
 .subtabs .tab { font-size: .78rem; padding: 9px 14px; }
 .subtabs .tab .n { opacity: .7; margin-right: 6px; }
 #view-gm > .subtabs { margin: 22px 0 18px; }
+.subtabs .tab.ping::after { content: ""; display: inline-block; width: 8px; height: 8px; margin-left: 7px; border-radius: 50%; background: var(--accent); vertical-align: middle; }
+@media (min-width: 901px) { #sheet-tabs .narrow-only { display: none; } }
 .steps > .subtabs { margin-bottom: 0; }
 .step-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; border-top: 1px dashed var(--line); padding-top: 14px; }
 .step-nav .btn:only-child { margin-left: auto; }
@@ -274,6 +276,7 @@ tr.lvl-U td.target { color: var(--muted); }
   /* Duty station: condition and roller first, the full sheet after them. */
   .sheet { display: flex; flex-direction: column; }
   .play-col { display: contents; }
+  #sheet-tabs { order: 0; }
   #card-condition { order: 1; } #card-roll { order: 2; } #card-weapon { order: 3; } #card-clocks { order: 4; } #card-ship { order: 5; } #sheet-main { order: 6; } #card-ref { order: 7; }
   /* Create: readiness rides along at the bottom instead of sitting above step 1. */
   #app[data-view="create"] .mobile-status, #app:not([data-view]) .mobile-status {
@@ -613,7 +616,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="e312c67" data-version-date="2026.10.21" title="The code changes whenever this page changes.">Version 2026.10.21 · e312c67</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="d7d07e9" data-version-date="2026.10.21" title="The code changes whenever this page changes.">Version 2026.10.21 · d7d07e9</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -4636,6 +4639,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="field" id="ptrack-print" hidden></div>
       </div>
       <div class="play-col">
+        <nav class="subtabs no-print" id="sheet-tabs" role="tablist" aria-label="Play panels"></nav>
         <div class="card hud no-print" id="card-condition">
           <h3>Condition</h3>
           <div class="field"><span class="label">Injury track</span>
@@ -9232,8 +9236,10 @@ function mountTable(api) {
   let viewerMap = null;
   function renderFight(sc) {
     const card = $("card-fight"), me = sharedTable && sharedTable.role() === "player";
+    const was = card.hidden;
     card.hidden = !me || !sc || (!sc.map && !sc.fight);
     if (card.hidden) return;
+    if (was) try { pingSheetTab("table"); } catch {}
     if (sc.map) {
       if (!viewerMap) viewerMap = mountBattleMap({ root: $("table-map"), key: PACK.id, esc, toast, viewer: true, bands: MAP_BANDS, kmBands: RTRACK.kmBands || [], rangeTracks: MAP_TRACKS,
         pointName: T.point, stunName: T.stun, partyName: T.party, crew: () => [], threats: [],
@@ -9241,7 +9247,8 @@ function mountTable(api) {
       viewerMap.setState(sc.map);
     }
     $("table-map").hidden = !sc.map;
-    const f = sc.fight;
+    const f = sc.fight, fk = f ? `${f.id}.${f.status}` : "";
+    if (fk !== (card.dataset.fk || "")) { card.dataset.fk = fk; try { pingSheetTab("table"); } catch {} } // a fight starts or ends
     if (!f) { $("fight-strip").innerHTML = `<p class="small muted">No fight running.</p>`; $("fight-turn").innerHTML = ""; return; }
     const now = f.people.find((p) => p.pid === f.actor), mine = f.people.find((p) => p.own === ch.id);
     $("fight-strip").innerHTML = `<p class="small">${f.status === "ended" ? "The fight is over." : `Round ${f.round}${now ? ` · <b>${esc(now.name)}</b>'s turn` : ""}`}</p>
@@ -9252,6 +9259,7 @@ function mountTable(api) {
     if (!turn) { $("fight-turn").innerHTML = ""; $("fight-turn").dataset.turn = ""; return; }
     if (prev === key) return; // keep what the player is choosing
     $("fight-turn").dataset.turn = key;
+    try { pingSheetTab("table"); } catch {}
     const others = f.people.filter((p) => p.pid !== mine.pid && !p.dead), foe = others.find((p) => p.side !== mine.side && !p.out);
     $("fight-turn").innerHTML = `<p><b>Your turn.</b> Tell the GM what ${esc(mine.name)} does; they run it.</p>
       <div class="fields"><div class="field"><label for="ft-action">Action</label><select id="ft-action"><option value="attack">Attack</option><option value="aim">Aim</option><option value="other">Something else</option></select></div>
@@ -9985,6 +9993,28 @@ function mountTable(api) {
   $("gm-tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-gmtab]"); if (b) showGmTab(b.dataset.gmtab); });
   { let at = "table"; try { at = sessionStorage.getItem(PACK.id + ".gmtab") || "table"; } catch {} showGmTab(at); }
 
+  // The play tab: the cards beside the sheet, a group at a time. On a phone the sheet itself is a group too.
+  const NARROW = matchMedia("(max-width: 900px)");
+  const SHEET_GROUPS = [["char", "Character", ["#sheet-main"]], ["roll", "Roll", ["#card-condition", "#card-roll", "#card-weapon"]], ["table", "Table", ["#card-table", "#card-fight"]],
+    ["tracks", "Clocks", ["#card-clocks", "#card-ship"]], ["ref", "Reference", ["#card-ref"]]];
+  for (const [id, , sels] of SHEET_GROUPS) for (const q of sels) { const el = document.querySelector("#view-sheet " + q); if (el) el.dataset.sheetpane = id; }
+  $("sheet-tabs").innerHTML = SHEET_GROUPS.map(([id, name]) => `<button type="button" class="tab${id === "char" ? " narrow-only" : ""}" role="tab" data-sheettab="${id}">${esc(name)}</button>`).join("");
+  let sheetAt = "roll";
+  function showSheetTab(id) {
+    if (!SHEET_GROUPS.some((g) => g[0] === id)) id = "roll";
+    sheetAt = id; const shown = id === "char" && !NARROW.matches ? "roll" : id;
+    document.querySelectorAll("#view-sheet [data-sheetpane]").forEach((el) => el.classList.toggle("pane-off",
+      el.dataset.sheetpane === "char" ? NARROW.matches && id !== "char" : el.dataset.sheetpane !== shown));
+    $("sheet-tabs").querySelectorAll("[data-sheettab]").forEach((b) => { b.setAttribute("aria-selected", String(b.dataset.sheettab === shown)); if (b.dataset.sheettab === shown) b.classList.remove("ping"); });
+    try { sessionStorage.setItem(PACK.id + ".sheettab", id); } catch {}
+    if (shown === "table") try { viewerMap && viewerMap.refresh(); } catch {}
+  }
+  // Something new on a group that isn't open (the GM's map arrives, or it's your turn) marks its tab.
+  function pingSheetTab(id) { if (sheetAt !== id) { const b = $("sheet-tabs").querySelector(`[data-sheettab="${id}"]`); if (b) b.classList.add("ping"); } }
+  $("sheet-tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-sheettab]"); if (b) showSheetTab(b.dataset.sheettab); });
+  NARROW.addEventListener("change", () => showSheetTab(sheetAt));
+  { let at = "roll"; try { at = sessionStorage.getItem(PACK.id + ".sheettab") || "roll"; } catch {} showSheetTab(at); }
+
   // Anything that jumps to a part of the page (a link, a help pop-up's "more", a turn request put into the encounter)
   // first opens the tab, step, GM panel group or guide chapter that holds it.
   function reveal(el) {
@@ -9992,6 +10022,7 @@ function mountTable(api) {
     const view = el.closest('[role="tabpanel"]'); if (view && view.hidden) selectTab(view.id.replace("view-", ""));
     const st = el.closest("#view-create .step"); if (st) showStep(STEPS.indexOf(st));
     const pane = el.closest("[data-gmpane]"); if (pane) showGmTab(pane.dataset.gmpane);
+    const sp = el.closest("[data-sheetpane]"); if (sp) showSheetTab(sp.dataset.sheetpane);
     const chap = el.closest(".gchap");
     if (chap) {
       const root = chap.parentElement, which = books && Object.keys(books).find((k) => books[k] === root);
