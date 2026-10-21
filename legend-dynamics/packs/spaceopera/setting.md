@@ -41,6 +41,22 @@ The crew shares four tracks; **Hull**, the ship's own damage, is explained under
 
 <!-- SECTION:setting -->
 
+# Data records
+
+What your crew knows about the unknown, and how it comes to know it: the difference between dock talk and the truth, how an investigation runs, and the data records that hold what you've established.
+
+## Rumor, truth and data records
+
+What spacers say, what is actually true, and what your crew knows are three different things.
+
+- **Rumor.** Dock talk, corporate claims, a species' reputation, what the newsfeeds say about a dead world. Some of it is right, some half right, some wrong. It's where an investigation starts.
+- **The truth.** What a species, a derelict, a world or a faction really is, and what really works against it or with it. The GM knows it; you find it out.
+- **Data records.** What your crew has established for itself: one finding at a time, with its limits, how you know it and what it cost. A record holds only what you found out, never the whole story (see *Discovery clocks and data records*).
+
+A real weakness works whether or not anyone holds a record for it. Act on what you suspect: run the frequency, try the override, keep your distance. The GM will ask what your idea rests on, and a good reason is all it needs. Learning, though, is never free.
+
+{{GEN:discovery-chapter}}
+
 # A galaxy of obligations
 
 ## Humanity's first contact

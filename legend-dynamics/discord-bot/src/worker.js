@@ -236,7 +236,7 @@ export const PACKS = {
   "discovery": {
    "card": "dossier",
    "cards": "dossiers",
-   "collection": "case file",
+   "collection": "binder",
    "phases": [
     "Confront the unknown",
     "Identify",
@@ -482,6 +482,27 @@ export const PACKS = {
      "A child who is a shard reborn"
     ]
    ]
+  },
+  "discovery": {
+   "card": "tale",
+   "cards": "tales",
+   "collection": "saga",
+   "phases": [
+    "Confront the unknown",
+    "Identify",
+    "Uncover"
+   ],
+   "threat": {
+    "name": "Doom",
+    "repeat": false,
+    "onFill": "the old power comes for you",
+    "track": "Doom"
+   },
+   "costs": [
+    "Infamy",
+    "Debt",
+    "Hunger"
+   ]
   }
  },
  "spaceopera": {
@@ -715,7 +736,7 @@ export const PACKS = {
   "discovery": {
    "card": "data record",
    "cards": "data records",
-   "collection": "codex",
+   "collection": "archive",
    "phases": [
     "Confront the unknown",
     "Identify",
@@ -2170,7 +2191,16 @@ async function discoveryCommand(interaction, env, game) {
   const id = String(opt.name || "").trim().toLowerCase();
   const k = st.clocks[id];
   const missing = () => reply(`No discovery clock called "${opt.name}". Use /discovery show to see them.`, true);
-  const tickThreat = (n) => {
+  // A setting can race one of its own tracks instead of a threat clock (discovery.threat.track: The Shattered Crown's Doom).
+  const raceTrack = d.threat.track ? findTrack(game, d.threat.track) : null, tracksKey = `tracks:${guildOf(interaction)}:${game.id}`;
+  const threatNow = async () => raceTrack ? trackLine(raceTrack, ((await env.STORE.get(tracksKey, "json")) || {})[raceTrack.name] || 0) : threatLine(st.threat, game);
+  const ticksOnFail = !!(d.threat.repeat || raceTrack);
+  const tickThreat = async (n) => {
+    if (raceTrack) {
+      const ts = (await env.STORE.get(tracksKey, "json")) || {}, was = ts[raceTrack.name] || 0;
+      ts[raceTrack.name] = Math.max(0, Math.min(raceTrack.boxes, was + n)); await env.STORE.put(tracksKey, JSON.stringify(ts));
+      return n > 0 && was < raceTrack.boxes && ts[raceTrack.name] >= raceTrack.boxes ? `\n⚠️ **${raceTrack.name} is full:** ${d.threat.onFill}.` : "";
+    }
     const th = st.threat; th.filled = Math.max(0, th.filled + n); let fired = 0;
     while (th.filled >= th.size) { fired++; if (d.threat.repeat) { th.filled -= th.size; th.count++; } else { th.filled = th.size; break; } }
     return fired ? `\n⚠️ **${d.threat.name} fills:** ${d.threat.onFill}.` : "";
@@ -2188,7 +2218,7 @@ async function discoveryCommand(interaction, env, game) {
       const ph = String(opt.phases || "2,2,2").split(",").map(Number);
       st.clocks[id] = { name: String(opt.name).trim().slice(0, 40), plain: !!opt.plain, phases: opt.plain ? [ph.reduce((a, b) => a + b, 0)] : ph, filled: 0, subject: "", tag: "", minted: false };
       await save();
-      return reply(`New ${opt.plain ? "progress" : "discovery"} clock, racing the ${d.threat.name}: ${discLine(st.clocks[id], game)}`);
+      return reply(`New ${opt.plain ? "progress" : "discovery"} clock, racing the ${d.threat.track || d.threat.name}: ${discLine(st.clocks[id], game)}`);
     }
     case "tick": {
       if (!k) return missing();
@@ -2212,15 +2242,15 @@ async function discoveryCommand(interaction, env, game) {
     case "push": {
       const line = await trackTick(opt.track);
       if (!line) return reply(`No track called "${opt.track}". Investigating pushes: ${(d.costs || []).join(", ")}.`, true);
-      const extra = sub === "fail" && d.threat.repeat ? tickThreat(1) : "";
+      const extra = sub === "fail" && ticksOnFail ? await tickThreat(1) : "";
       await save();
-      return reply(`${sub === "fail" ? "Failed investigation roll" : "A push"}: ${line}${sub === "fail" && d.threat.repeat ? `\n${threatLine(st.threat, game)}` : ""}${extra}`);
+      return reply(`${sub === "fail" ? "Failed investigation roll" : "A push"}: ${line}${sub === "fail" && ticksOnFail ? `\n${await threatNow()}` : ""}${extra}`);
     }
     case "threat": {
-      if (Number.isInteger(opt.size)) { if (!isGM(interaction)) return gmOnly(); st.threat.size = opt.size; st.threat.filled = Math.min(st.threat.filled, opt.size); }
-      const extra = Number.isInteger(opt.size) && !Number.isInteger(opt.segments) ? "" : tickThreat(Number.isInteger(opt.segments) ? opt.segments : 1);
+      if (Number.isInteger(opt.size) && !raceTrack) { if (!isGM(interaction)) return gmOnly(); st.threat.size = opt.size; st.threat.filled = Math.min(st.threat.filled, opt.size); }
+      const extra = Number.isInteger(opt.size) && !Number.isInteger(opt.segments) ? "" : await tickThreat(Number.isInteger(opt.segments) ? opt.segments : 1);
       await save();
-      return reply(threatLine(st.threat, game) + extra);
+      return reply((await threatNow()) + extra);
     }
     case "mint": {
       if (!isGM(interaction)) return gmOnly();
@@ -2243,7 +2273,7 @@ async function discoveryCommand(interaction, env, game) {
     case "show": {
       const table = (await env.STORE.get(cardsKey, "json")) || {};
       const list = Object.values(st.clocks);
-      return reply([threatLine(st.threat, game), ...(list.length ? list.map((x) => discLine(x, game)) : ["No discovery clocks running. Start one with /discovery new."]),
+      return reply([await threatNow(), ...(list.length ? list.map((x) => discLine(x, game)) : ["No discovery clocks running. Start one with /discovery new."]),
         ...(st.active ? [`**Active subject:** ${st.active}`, heldLines(table, st.active, game)] : [])].join("\n"));
     }
     case "remove": {
@@ -2254,7 +2284,7 @@ async function discoveryCommand(interaction, env, game) {
     case "reset": {
       if (!isGM(interaction)) return gmOnly();
       await env.STORE.put(key, JSON.stringify({ threat: { size: st.threat.size, filled: 0, count: 0 }, clocks: {}, active: "" }));
-      return reply(`Every discovery clock is cleared, and the ${d.threat.name} is empty.`);
+      return reply(raceTrack ? `Every discovery clock is cleared. ${raceTrack.name} stays as it is: clear it with /track.` : `Every discovery clock is cleared, and the ${d.threat.name} is empty.`);
     }
   }
   return reply("Unknown /discovery option.", true);

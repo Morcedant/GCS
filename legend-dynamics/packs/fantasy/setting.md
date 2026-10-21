@@ -46,6 +46,22 @@ Each character also keeps a personal **Corruption** track on their sheet (see *S
 
 <!-- SECTION:setting -->
 
+# Tales
+
+What your heroes know of the old powers, and how they come to know it: the difference between legend and truth, how an investigation runs, and the tales that hold what you've established.
+
+## Legend, truth and tales
+
+What the legends say, what is actually true, and what your hero knows are three different things.
+
+- **Legend.** What the skalds sing, what the temples warn, what an old woman mutters at the well. Some of it is right, some half right, some wrong. It's where an investigation starts.
+- **The truth.** What a sorcerer, a demon or a thing from the Deep really is, and what really stops it. The GM knows it; you find it out.
+- **Tales.** What your hero has established for themselves: one finding at a time, with its limits, how you know it and what it cost. A tale holds only what you found out, never the whole saga (see *Discovery clocks and tales*).
+
+A real weakness works whether or not anyone holds a tale for it. Act on what you suspect: bring fire, salt the threshold, speak the name. The GM will ask what your idea rests on, and a good reason is all it needs. Learning, though, is never free.
+
+{{GEN:discovery-chapter}}
+
 # Sorcery
 
 Sorcery is real, rare and expensive. It is worked by **Sorcerers** and **Witches**, by anyone with the **Gifted** advantage, and by those whose blood grants it (the Witch-blooded's *The Old Blood*, the Serpent-kin's *Temple-Taught*, the Demon-marked's *Infernal Gift*, the Godblooded's *Divine Spark* and the Undying's *Deathless Sorcery*). Everyone else can resist it, fear it and pay for it.

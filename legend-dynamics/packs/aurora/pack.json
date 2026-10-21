@@ -1309,6 +1309,12 @@
    "Cool Under Fire",
    "+2 to Will to keep acting under fire, fear or mind powers.",
    "Will"
+  ],
+  [
+   "casefiles",
+   "Sealed Binder",
+   "You start play with three dossiers, each a secret your work or your origin taught you: something in no database, registry or published record. They grant no bonus: they let you act on what you know.",
+   "Investigation"
   ]
  ],
  "complications": [
@@ -4238,11 +4244,18 @@
     ]
    },
    {
+    "title": "Dossiers",
+    "intro": "Running investigations and recording what the team learns. The rules players use are in the *Dossiers* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and dossiers.",
+    "take": [
+     "## Making dossiers",
+     "## The Discovery panel"
+    ]
+   },
+   {
     "title": "The GM's tools",
     "take": [
      "## The battle map",
-     "## The Encounter panel",
-     "## The Discovery panel"
+     "## The Encounter panel"
     ]
    }
   ],
@@ -4264,7 +4277,7 @@
  "discovery": {
   "card": "dossier",
   "cards": "dossiers",
-  "collection": "case file",
+  "collection": "binder",
   "subject": "an Operant's power set and its limits",
   "uncover": "the counter: the tell, the cost, the cooldown, what shuts the power down",
   "phases": [
@@ -4274,11 +4287,11 @@
    ],
    [
     "Identify",
-    "Name the Operant and what they can do. This is the gate: until it's confirmed, no dossier applies, and the GM treats your theories as suspicion only."
+    "Name the Operant and what they can do. This is the gate: until its identity is confirmed, what you know about a kind of subject doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works."
    ],
    [
     "Uncover",
-    "Find the counter: the tell before they act, what the power costs them, how long it takes to come back, what shuts it down. Filling this phase fills the clock and mints a dossier."
+    "Find the counter: the tell before they act, what the power costs them, how long it takes to come back, what shuts it down. Filling this phase fills the clock and earns a dossier for what you established."
    ]
   ],
   "threat": {
@@ -4357,7 +4370,61 @@
    "fringe": "contacts on the edges"
   },
   "origins": "Some powers are methods in themselves: a telepath, a psychometrist or a power that senses energy can advance a phase with the Powers skill, at the GM's call.",
-  "subjects": []
+  "subjects": [],
+  "scoped": true,
+  "chapter": "Dossiers",
+  "datePlaceholder": "In the story, e.g. March 2025",
+  "routes": [
+   [
+    "investigation",
+    "A discovery clock",
+    "filled to the end of Uncover",
+    []
+   ],
+   [
+    "experience",
+    "Seen in action",
+    "watching the power used, or a careful test of it",
+    [
+     "threat",
+     "Collateral"
+    ]
+   ],
+   [
+    "account",
+    "A reliable record",
+    "sealed case notes, a former teammate's account, a lab's test results. A source's reputation alone doesn't make it right, but a reliable record can establish a fact without anyone repeating a dangerous test",
+    [
+     "Scrutiny"
+    ]
+   ],
+   [
+    "creature",
+    "Their own word, backed up",
+    "what the Operant, or someone close to them, admits, supported by evidence",
+    [
+     "Backlash"
+    ]
+   ]
+  ],
+  "anyway": "A real counter works whoever uses it, dossier or no dossier: if a power fails in the dark, it fails in the dark for anyone. Shutting a power down with equipment or a procedure still needs that equipment, the knowledge and the skill.",
+  "basis": "street rumor and the tabloids, evidence, testimony, the team's own experience, or a suspicion they can explain",
+  "startCards": {
+   "adv": "casefiles",
+   "n": 3,
+   "label": "Sealed Binder",
+   "secret": "isn't in any database, registry or published record",
+   "note": "Each dossier is a secret your work or your origin taught you, agreed with the GM."
+  },
+  "clockExample": "Who keeps emptying the Ironside vaults",
+  "cardExample": {
+   "subject": "Lord Marrow",
+   "finding": "His bone-shaping stops when he's soaked through",
+   "limits": "Seen in one fight in the rain; not how long it lasts once he's dry",
+   "evidence": "The team's own fight with him at the Ironside docks",
+   "route": "experience",
+   "cost": "Collateral +1 (the docks took the damage)"
+  }
  },
  "mounts": [
   [

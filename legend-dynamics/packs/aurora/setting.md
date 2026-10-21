@@ -49,6 +49,22 @@ Each character also has **Strain**, their own track for pushing powers and fueli
 
 <!-- SECTION:setting -->
 
+# Dossiers
+
+What your team knows about the Operants it faces, and how it comes to know it: the difference between rumor and the truth, how an investigation runs, and the dossiers that hold what you've established.
+
+## Rumor, truth and dossiers
+
+What people say about an Operant, what is actually true, and what your team knows are three different things.
+
+- **Rumor.** Street talk, tabloid stories, what a witness swears they saw, an Operant's public name and press. Some of it is right, some half right, some wrong. It's where an investigation starts.
+- **The truth.** What an Operant can really do, what it costs them, and what really stops them. The GM knows it; you find it out.
+- **Dossiers.** What your team has established for itself: one finding at a time, with its limits, how you know it and what it cost. A dossier holds only what you found out, never the whole file (see *Discovery clocks and dossiers*).
+
+A real counter works whether or not anyone holds a dossier for it. Act on what you suspect: cut the lights, hit them while they recover, keep them away from water. The GM will ask what your idea rests on, and a good reason is all it needs. Learning, though, is never free.
+
+{{GEN:discovery-chapter}}
+
 # The world of Aurora
 
 ## The First Wave

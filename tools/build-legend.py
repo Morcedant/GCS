@@ -251,9 +251,9 @@ def gen(name, pack, t):
             return ""
         th = d["threat"]
         return "\n".join(["## The Discovery panel", "",
-            f"The GM view's **Discovery** panel runs discovery clocks and the {th['name']} they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every {d['card']} the characters in the GM view already hold for it. "
-            f"The **Failed roll** and **Push** buttons tick the track for how they were digging" + (f", and a failed roll ticks the {th['name']} too" if th.get("repeat") else "") + f". When a clock fills, **Mint** gives the primary investigator the {d['card']} and everyone you tick as present a shared copy. "
-            + (f"**Record a finding without a clock** gives a {d['card']} for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick. " if d.get("scoped") else "")
+            f"The GM view's **Discovery** panel runs discovery clocks and the {th.get('track') or th['name']} they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every {d['card']} the characters in the GM view already hold for it. "
+            f"The **Failed roll** and **Push** buttons tick the track for how they were digging" + (f", and a failed roll ticks the {th.get('track') or th['name']} too" if th.get("repeat") or th.get("track") else "") + f". When a clock fills, **Mint** gives the primary investigator the {d['card']} and everyone you tick as present a shared copy. "
+            + (f"**Record a finding without a clock** gives a {d['card']} for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick, and marks its price: the track or the {th.get('track') or th['name']} that source costs. " if d.get("scoped") else "")
             + f"Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.", ""])
     if name == "discovery-subjects":
         d = p.get("discovery") or {}
@@ -262,8 +262,10 @@ def gen(name, pack, t):
         # A setting can give its cards a chapter of their own (discovery.chapter): the rules move there, and a pointer stays here.
         d = p.get("discovery") or {}
         if d.get("chapter"):
-            return f"Investigating the supernatural has its own rules: see *{d['chapter']}*."
+            return f"Investigations have rules of their own, and earn {d['cards']}: see *{d['chapter']}*."
         return discovery_md(p.get("discovery"), t)
+    if name == "card-howto":
+        return card_howto_md(p.get("discovery"), t)
     if name == "discovery-chapter":
         return discovery_md(p.get("discovery"), t)
     if name == "magic":
@@ -389,32 +391,76 @@ def gen(name, pack, t):
 
 
 NEUTRAL_DISCOVERY = {
-    "card": "card", "cards": "cards", "collection": "collection", "subject": "a creature, a rival's power, a strange device", "uncover": "how it is beaten or used",
+    "card": "Legend card", "cards": "Legend cards", "collection": "collection", "subject": "a creature, a rival's power, a strange device", "uncover": "how it is beaten or used",
     "phases": [["Confront the unknown", "Effects without a cause. You may suspect, but nothing is confirmed."],
-               ["Identify", "Name the subject. This is the gate: until its identity is confirmed, no card applies, and the GM treats your theories as suspicion only."],
-               ["Uncover", "Learn how it is beaten or used. Filling this phase fills the clock and mints a card."]],
+               ["Identify", "Name the subject. This is the gate: until its identity is confirmed, what you know about a kind of subject doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works."],
+               ["Uncover", "Learn how it is beaten or used. Filling this phase fills the clock and earns a Legend card for what you established."]],
     "threat": {"name": "threat clock", "text": "The setting names the threat clock and what happens when it fills: a creature claiming another victim, a villain escalating, a reactor going critical."},
+    "scoped": True,
+    "routes": [["investigation", "A discovery clock", "filled to the end of Uncover", []],
+               ["experience", "Seen or tested firsthand", "direct experience, or a sensible experiment", ["threat", "a track"]],
+               ["account", "A reliable account", "a witness, a record or a book the GM judges reliable. A source's reputation alone doesn't make it right, but a reliable account can establish a fact without anyone repeating a dangerous test", ["a track"]],
+               ["creature", "Its own word, backed up", "what the subject itself, or someone close to it, tells you, supported by evidence", ["a track"]]],
+    "cardExample": {"subject": "The thing in the mine", "finding": "Bright light drove it back down the shaft", "limits": "Seen once; not whether light harms it, or how long it stays away",
+                "evidence": "What the characters saw at the mine head", "route": "experience", "cost": "the threat clock +1 (the night spent watching)"},
 }
 
 
 def scoped_card_md(d, t, card, cards):
     """A setting whose cards are scoped (pack discovery.scoped): a card records only what the characters established,
-    weaknesses work without one, and knowledge can be earned without a clock (discovery.routes)."""
+    a real weakness works without one, knowledge can be earned without a clock (discovery.routes), and every source
+    has a price (each route's costs: "threat" or a track)."""
     job = t["missionLower"]
+    threat = d["threat"].get("track") or d["threat"]["name"]
+    price = lambda r: " or ".join(f"{threat if c == 'threat' else c} +1" for c in (r[3] if len(r) > 3 else [])) or "What the clock cost along the way"
     out = [f"### The {card}", "",
-           f"A {card} is a permanent record of one specific thing the characters have established. It holds only what they found out, never the whole truth about a creature: later discoveries add to it with more {cards}. It grants **no bonus** to any roll.", "",
-           f"- **Weaknesses work anyway.** A real weakness works whoever uses it, {card} or no {card}: silver marks its extra box fired by someone who has never heard of werewolves, and a hunter who suspects silver can load it. Called shots follow the ordinary combat rules. An unfamiliar ritual still needs its procedure, the knowledge, the skill and the components.",
+           f"A {card} is a permanent record of one specific thing the characters have established. It holds only what they found out, never the whole truth: later discoveries add to it with more {cards}. It grants **no bonus** to any roll.", "",
+           f"- **Weaknesses work anyway.** " + d.get("anyway", f"A real weakness works whoever uses it, {card} or no {card}. An unfamiliar procedure still needs its method, the knowledge, the skill and the means."),
            f"- **What a {card} is for.** It's what the character knows for certain and can rely on, plan around and teach. A correct deduction, a sensible experiment or an ordinary precaution needs no {card}.",
-           f"- **The identification gate.** Before a subject is confirmed, you can form hypotheses, test them and take precautions, but what you know about a kind of creature isn't applied to this one until the Identify phase confirms it. Holding a {card} never proves that this is that.",
+           f"- **The identification gate.** Before a subject is confirmed, you can form hypotheses, test them and take precautions, but what you know about a kind of subject isn't applied to this one until the Identify phase confirms it. Holding a {card} never proves that this is that.",
            f"- **Shared copies.** Everyone who establishes a finding, or is there when a {card} is earned, gets a shared copy; one character is recorded as its owner. A character who wasn't there can be taught it later, from a reliable account.",
-           f"- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, the date, its owner and who received it. It's kept on the character sheet, under *Learned in play*.", "",
+           f"- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, what it cost, the date, its owner and who received it. It's kept on the character sheet, under *Learned in play*.", "",
            f"### Earning a {card}", "",
-           f"A discovery clock is one way to earn a {card}. The others need no clock: when a fact is established directly or taught reliably, the GM records the {card} at once.", ""]
-    out += [table(["How it was learned", "What counts"], [[f"**{r[1]}**", r[2][0].upper() + r[2][1:] + "."] for r in d.get("routes", [])]), ""]
-    out += [f"- **A basis for a proposal.** An investigation proposal needs a reasonable basis: folklore the characters have heard, evidence, testimony, their own experience, or a suspicion they can explain. Naming the right answer with nothing behind it doesn't earn a {card}. The GM asks what supports an approach, and never rejects it just because it matches the hidden truth.",
-            f"- **Ideas are free.** Proposing a theory costs nothing. Investigation rolls, failures and pushes cost what they always do (below).",
+           f"A discovery clock is one way to earn a {card}. The others need no clock: when a fact is established directly or taught reliably, the GM records the {card} at once. **Information is never free:** each source has its price, marked when the {card} is recorded.", ""]
+    out += [table(["How it was learned", "What counts", "What it costs"], [[f"**{r[1]}**", r[2][0].upper() + r[2][1:] + ".", price(r)] for r in d.get("routes", [])]), ""]
+    out += [f"- **A basis for a proposal.** An investigation proposal needs a reasonable basis: " + d.get("basis", "what the characters have heard, evidence, testimony, their own experience, or a suspicion they can explain") + f". Naming the right answer with nothing behind it doesn't earn a {card}. The GM asks what supports an approach, and never rejects it just because it matches the hidden truth.",
+            f"- **Ideas are free; information isn't.** Proposing a theory costs nothing. Learning something does: a discovery clock's scenes and failed rolls, or the price of a direct source (above).",
             f"- **Enough clues.** The GM provides enough clues, and more than one route to each answer: a {job} shouldn't stall on a single missed roll.", ""]
+    if d.get("startCards"):
+        sc = d["startCards"]
+        out += [f"### {sc['label']}", "",
+                f"A character who takes the **{sc['label']}** advantage starts play with {['no', 'one', 'two', 'three', 'four', 'five'][sc['n']] if sc['n'] <= 5 else sc['n']} {cards} they write themselves, with the GM's agreement. Each must hold a **secret**: something that {sc['secret']}. Each comes from the character's {t['roleLower']} or {t['originLower']}: what their work or their people taught them. The creator asks for the subject, the secret, which it comes from, and why it isn't common knowledge.", ""]
     return out
+
+
+def card_howto_md(d, t, neutral=False):
+    """For the GM: when a card is earned, and how to write and record one (scoped cards)."""
+    if not d or not d.get("scoped"):
+        return ""
+    card, cards = d["card"], d["cards"]
+    Card = card[0].upper() + card[1:]
+    threat = d["threat"].get("track") or d["threat"]["name"]
+    ex = d.get("cardExample") or {}
+    route = {r[0]: r[1] for r in d.get("routes", [])}.get(ex.get("route"), "")
+    out = [f"## Making {cards}", "",
+           f"For the GM: when a {card} is earned, and how to write one. A {card} is a record of what the characters established, so writing it well matters more than how often you hand one out.", "",
+           f"1. **Decide that something is established.** A {card} is earned when a discovery clock fills, or when the characters see or test something themselves, hear it from a source you judge reliable, or are told it by the subject itself with evidence to back it up. A guess, however right, isn't established, and neither is a rumor. Ask what supports their idea; when the answer is good, let them act on it, and give the {card} once they've confirmed it.",
+           f"2. **Write the finding narrowly.** One fact, in the words the characters would use, and no more than they found out: \"bright light drove it back\", not \"it fears light\". Two separate facts make two {cards}. Never write the subject's whole truth onto a {card}; later discoveries add more {cards}.",
+           f"3. **Write its limits.** What the finding doesn't show: how often it was seen, under what conditions, and what is still unknown. The limits are what keep the next investigation interesting.",
+           f"4. **Note the evidence or source.** What they saw, tested, read or were told, and by whom. A source's reputation doesn't make it right: if it was only probably true, the limits say so.",
+           f"5. **Charge the price.** A {card} from a discovery clock costs nothing more: the scenes, failed rolls and pushes were its price. Any other source has its price (see *Earning a {card}*): choose the one that fits how they learned it, and mark it.",
+           f"6. **Choose the owner and the recipients.** Whoever did the finding owns the {card}. Everyone who was there, or heard it from a reliable source, gets a shared copy.",
+           f"7. **Record it.** " + ("Write it on each recipient's sheet, under *Learned in play*." if neutral else f"In the GM view's **Discovery** panel: **Mint** a full clock's {card}, or use **Record a finding without a clock**, which marks the price for you. Then save everyone's characters to file, so the players' sheets carry it. A player can also write a {card} on their own sheet, when you agree it's been earned."), ""]
+    if ex:
+        out += [f"*Example:* **{ex['subject']}.** Established: *{ex['finding']}*. Limits: *{ex['limits']}*. Source: {ex['evidence']} ({route.lower() or 'firsthand'}). Cost: {ex['cost']}.", ""]
+    out += [f"- **When a later finding disagrees.** Write a new {card} that says what they now know; the old one stays on the sheet as what they believed then, and the new one's limits can say so.",
+            f"- **A {card} is never proof of identity.** Holding a {card} about one subject doesn't prove that the thing in front of them is that subject: the Identify phase does.",
+            f"- **Weaknesses work anyway.** Don't hold back a real weakness because no one holds the {card}: if they try it, it works."]
+    if d.get("startCards"):
+        sc = d["startCards"]
+        out += [f"- **{sc['label']}.** Agree each starting {card} with its player before play: it must come from the character's {t['roleLower']} or {t['originLower']}, be narrow, and be a real secret: something that {sc['secret']}. Make sure it fits what you know to be true, adjust it if it doesn't, and keep a note of it."]
+    out += [""]
+    return "\n".join(out)
 
 
 def discovery_md(d, t, neutral=False):
@@ -442,8 +488,8 @@ def discovery_md(d, t, neutral=False):
             f"- **What it records.** The subject (its tag), what was learned, what it permits, the {t['missionLower']} where it was earned, its owner, and who was there. It's kept on the character sheet, under *Learned in play*.", ""]
     if d.get("kinds"):
         out += [f"**Two kinds of {cards}.** " + " ".join(f"**{k[0].capitalize()}:** {k[1]}." for k in d["kinds"]), ""]
-    out += [f"### The {th['name']}" if not neutral else "### The threat clock", "",
-            "A discovery clock always races a threat clock. " + th["text"], ""]
+    out += [(f"### Racing the {th['track']}" if th.get("track") else f"### The {th['name']}") if not neutral else "### The threat clock", "",
+            ("A discovery clock always races a threat: here, the " + th["track"] + " track. " if th.get("track") else "A discovery clock always races a threat clock. ") + th["text"], ""]
     if d.get("costs"):
         out += ["### What investigating costs", "",
                 "When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.", "",
@@ -465,7 +511,14 @@ def discovery_md(d, t, neutral=False):
             out += ["- " + d["start"]]
         out += [""]
     if neutral:
-        out += [f"*Your setting pack names the {card}, the threat clock, the tracks investigating pushes, and the methods.*", ""]
+        names = []
+        order = ["western", "spaceopera", "fantasy", "aurora"]
+        for f in sorted((LD / "packs").glob("*/pack.json"), key=lambda f: order.index(f.parent.name) if f.parent.name in order else 99):
+            pk = json.loads(f.read_text()); dd = pk.get("discovery")
+            if dd:
+                names.append((pk["terms"]["title"], dd["cards"], dd["collection"]))
+        out += [f"*Each setting names its {cards}, their collection, the threat clock, the tracks investigating pushes, each source's price and the methods. "
+                + "; ".join(f"{t2}: {c} in {'an' if col[0] in 'aeiou' else 'a'} {col}" for t2, c, col in names) + ".*", ""]
     return "\n".join(out)
 
 
@@ -677,7 +730,7 @@ def core_rules(docx=False):
     # Neutral stand-ins for the pack-specific parts of "Making your own".
     core = core.replace("{{GEN:extra-edges}}\n", "").replace("{{GEN:gritty}}", "").replace("{{GEN:battlemap}}", "")
     core = core.replace("{{GEN:magic}}", magic_chapter({}))
-    core = core.replace("{{GEN:discovery}}", discovery_md(NEUTRAL_DISCOVERY, t, neutral=True)).replace("{{GEN:discovery-panel}}\n", "").replace("{{GEN:materials-note}}", "")
+    core = core.replace("{{GEN:discovery}}", discovery_md(NEUTRAL_DISCOVERY, t, neutral=True)).replace("{{GEN:card-howto}}", card_howto_md(NEUTRAL_DISCOVERY, t, neutral=True)).replace("{{GEN:discovery-panel}}\n", "").replace("{{GEN:materials-note}}", "")
     core = core.replace("{{PACK:customrole}}", '"Smuggler: knows every back door, bribe and hidden hold."')
     core = core.replace("{{GEN:group-names}}", "one of your setting's groups")
     core = core.replace("{{PACK:customorigin}}", "**Hill-folk (tier 1).** Stocky herders from high, cold country. *Adjustments:* Body +1, Presence −1. *Core rule:* at home in the heights: no penalty for thin air or cold. *Origin advantage:* **Sure-Footed**: +2 to Athletics to climb and keep your footing. *Companion:* **Clannish**: you trust your own people first; when it matters, accept the cost of that loyalty.")
@@ -708,7 +761,7 @@ def bot_packs():
         if pack.get("discovery"):  # discovery clocks and cards: names, the threat clock, which tracks investigating pushes
             d = pack["discovery"]
             data[pack["id"]]["discovery"] = {"card": d["card"], "cards": d["cards"], "collection": d["collection"], "phases": [p[0] for p in d["phases"]],
-                                             "threat": {k: d["threat"].get(k) for k in ("name", "repeat", "onFill", "count")}, "costs": [c[0] for c in d.get("costs", [])],
+                                             "threat": {k: d["threat"].get(k) for k in ("name", "repeat", "onFill", "count", "track") if d["threat"].get(k) is not None}, "costs": [c[0] for c in d.get("costs", [])],
                                              **({"kinds": [k[0] for k in d["kinds"]]} if d.get("kinds") else {})}
     # Games outside Legend Dynamics (USS Pelion, Grimm): their own data, seed tables read from their creators.
     for f in sorted((LD / "discord-bot" / "games").glob("*.json")):

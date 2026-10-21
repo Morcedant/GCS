@@ -325,58 +325,7 @@ A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something tha
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. A successful roll does not force someone to abandon a core belief or reveal what they do not know.
 
-## Discovery clocks and dossiers
-
-When a case turns on an unknown subject (an Operant's power set and its limits), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **dossier**: what the characters learned, kept for good. A character's dossiers are their **case file**.
-
-| Phase | What it means |
-|---|---|
-| 1. Confront the unknown | Effects without a cause: a vault opened from the inside, a blackout that follows someone, witnesses who can't agree on what they saw. You may suspect, but nothing is confirmed. |
-| 2. Identify | Name the Operant and what they can do. This is the gate: until it's confirmed, no dossier applies, and the GM treats your theories as suspicion only. |
-| 3. Uncover | Find the counter: the tell before they act, what the power costs them, how long it takes to come back, what shuts it down. Filling this phase fills the clock and mints a dossier. |
-
-- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
-- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
-- **The primary investigator.** One character leads and owns the dossier. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant dossier can assist with a method they couldn't otherwise bring (the dossier is why they're qualified); it adds nothing beyond the normal assistance.
-- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
-
-### The dossier
-
-A dossier grants **no bonus** to any roll. It is an earned permission: knowledge that makes possible an action otherwise forbidden or unavailable against that subject. Without it, the GM can rule that the action isn't possible: you can't aim for a heart you don't know is the weakness, or speak a name you never learned. A dossier can authorize a called shot or a telling-hit effect that would otherwise be unavailable.
-
-- A dossier never helps confirm its own subject: holding one doesn't prove this is that. It applies once the Identify phase has confirmed it.
-- **Shared copies.** Every character present when the dossier is minted (the climactic confrontation or the breakthrough) gets a shared copy; the primary investigator is recorded as its owner. An absent character doesn't, though a holder can teach it to them later with the GM's agreement.
-- **What it records.** The subject (its tag), what was learned, what it permits, the case where it was earned, its owner, and who was there. It's kept on the character sheet, under *Learned in play*.
-
-### The Escalation
-
-A discovery clock always races a threat clock. The Operant forces the pace. The Escalation clock (4 or 6 segments) ticks once for each scene spent investigating and once for each failed investigation roll. Each time it fills, their next move is bigger: a heist becomes a hostage situation becomes a fight across a city block. This is comic-book rising action, not a slow timer.
-
-### What investigating costs
-
-When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
-
-| Track | Ticks for | For example |
-|---|---|---|
-| **Scrutiny** | digging publicly or drawing official attention | pulling federal files, flashing a badge you shouldn't, staking out in the open |
-| **Backlash** | provoking the Operant or their allies | leaning on their friends, taunting them on air, raiding their haunts |
-| **Collateral** | messy, public confrontations and property damage | forcing a test of the power in a crowd, a chase through traffic, breaking in |
-
-### Methods
-
-Which methods suit a character depends on their role, origin and skills. The GM says which methods can advance each phase.
-
-| Method | Skills | Suits | Phases | For example |
-|---|---|---|---|---|
-| Profile the Operant | Read People, Investigation | The Badge, The Learned | Confront, Identify | Pattern of crimes, choice of targets, what they want. |
-| Run the records | Computers, Law | The Badge | Identify, Uncover | EMD registry, ExLAW files, court records, hospital admissions. |
-| Analyze the power | Science, Occult, Powers | The Learned | Identify, Uncover | Residue, readings, footage frame by frame, the physics or the magic of it. |
-| Work the back channels | Streetwise, Deception | The Underworld | Confront, Identify | Fences, fixers, who hired whom, who's scared. |
-| See it in the field | Investigation, Stealth, Athletics | The Masks | Any | Shadow them, test them, take the hit and watch what happens. |
-| Work the media | Media, Persuasion | The Masks, The Fringe | Confront, Identify | Viewer footage, tips, a reporter's notes. Always ticks Scrutiny on a failure. |
-
-- **The Badge:** natural profilers, with the records; **The Learned:** natural profilers, through analysis; **The Underworld:** intel through back channels; **The Masks:** intel gathered in the field; **The Fringe:** contacts on the edges.
-- Some powers are methods in themselves: a telepath, a psychometrist or a power that senses energy can advance a phase with the Powers skill, at the GM's call.
+Investigations have rules of their own, and earn dossiers: see *Dossiers*.
 
 ## Chases
 
@@ -721,6 +670,94 @@ End each case with a short entry, written together:
 3. **Complications.** Which ones came into play, and what did they cost?
 4. **What changed?** New allies or enemies, damage, open threads for next time.
 5. **Advancement.** After a significant case, each character earns 1 advancement point; at a milestone, 2 more.
+
+# Dossiers
+
+What your team knows about the Operants it faces, and how it comes to know it: the difference between rumor and the truth, how an investigation runs, and the dossiers that hold what you've established.
+
+## Rumor, truth and dossiers
+
+What people say about an Operant, what is actually true, and what your team knows are three different things.
+
+- **Rumor.** Street talk, tabloid stories, what a witness swears they saw, an Operant's public name and press. Some of it is right, some half right, some wrong. It's where an investigation starts.
+- **The truth.** What an Operant can really do, what it costs them, and what really stops them. The GM knows it; you find it out.
+- **Dossiers.** What your team has established for itself: one finding at a time, with its limits, how you know it and what it cost. A dossier holds only what you found out, never the whole file (see *Discovery clocks and dossiers*).
+
+A real counter works whether or not anyone holds a dossier for it. Act on what you suspect: cut the lights, hit them while they recover, keep them away from water. The GM will ask what your idea rests on, and a good reason is all it needs. Learning, though, is never free.
+
+## Discovery clocks and dossiers
+
+When a case turns on an unknown subject (an Operant's power set and its limits), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **dossier**: what the characters learned, kept for good. A character's dossiers are their **binder**.
+
+| Phase | What it means |
+|---|---|
+| 1. Confront the unknown | Effects without a cause: a vault opened from the inside, a blackout that follows someone, witnesses who can't agree on what they saw. You may suspect, but nothing is confirmed. |
+| 2. Identify | Name the Operant and what they can do. This is the gate: until its identity is confirmed, what you know about a kind of subject doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works. |
+| 3. Uncover | Find the counter: the tell before they act, what the power costs them, how long it takes to come back, what shuts it down. Filling this phase fills the clock and earns a dossier for what you established. |
+
+- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
+- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
+- **The primary investigator.** One character leads and owns the dossier. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant dossier can assist with a method they couldn't otherwise bring (the dossier is why they're qualified); it adds nothing beyond the normal assistance.
+- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
+
+### The dossier
+
+A dossier is a permanent record of one specific thing the characters have established. It holds only what they found out, never the whole truth: later discoveries add to it with more dossiers. It grants **no bonus** to any roll.
+
+- **Weaknesses work anyway.** A real counter works whoever uses it, dossier or no dossier: if a power fails in the dark, it fails in the dark for anyone. Shutting a power down with equipment or a procedure still needs that equipment, the knowledge and the skill.
+- **What a dossier is for.** It's what the character knows for certain and can rely on, plan around and teach. A correct deduction, a sensible experiment or an ordinary precaution needs no dossier.
+- **The identification gate.** Before a subject is confirmed, you can form hypotheses, test them and take precautions, but what you know about a kind of subject isn't applied to this one until the Identify phase confirms it. Holding a dossier never proves that this is that.
+- **Shared copies.** Everyone who establishes a finding, or is there when a dossier is earned, gets a shared copy; one character is recorded as its owner. A character who wasn't there can be taught it later, from a reliable account.
+- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, what it cost, the date, its owner and who received it. It's kept on the character sheet, under *Learned in play*.
+
+### Earning a dossier
+
+A discovery clock is one way to earn a dossier. The others need no clock: when a fact is established directly or taught reliably, the GM records the dossier at once. **Information is never free:** each source has its price, marked when the dossier is recorded.
+
+| How it was learned | What counts | What it costs |
+|---|---|---|
+| **A discovery clock** | Filled to the end of Uncover. | What the clock cost along the way |
+| **Seen in action** | Watching the power used, or a careful test of it. | Escalation +1 or Collateral +1 |
+| **A reliable record** | Sealed case notes, a former teammate's account, a lab's test results. A source's reputation alone doesn't make it right, but a reliable record can establish a fact without anyone repeating a dangerous test. | Scrutiny +1 |
+| **Their own word, backed up** | What the Operant, or someone close to them, admits, supported by evidence. | Backlash +1 |
+
+- **A basis for a proposal.** An investigation proposal needs a reasonable basis: street rumor and the tabloids, evidence, testimony, the team's own experience, or a suspicion they can explain. Naming the right answer with nothing behind it doesn't earn a dossier. The GM asks what supports an approach, and never rejects it just because it matches the hidden truth.
+- **Ideas are free; information isn't.** Proposing a theory costs nothing. Learning something does: a discovery clock's scenes and failed rolls, or the price of a direct source (above).
+- **Enough clues.** The GM provides enough clues, and more than one route to each answer: a case shouldn't stall on a single missed roll.
+
+### Sealed Binder
+
+A character who takes the **Sealed Binder** advantage starts play with three dossiers they write themselves, with the GM's agreement. Each must hold a **secret**: something that isn't in any database, registry or published record. Each comes from the character's role or origin: what their work or their people taught them. The creator asks for the subject, the secret, which it comes from, and why it isn't common knowledge.
+
+### The Escalation
+
+A discovery clock always races a threat clock. The Operant forces the pace. The Escalation clock (4 or 6 segments) ticks once for each scene spent investigating and once for each failed investigation roll. Each time it fills, their next move is bigger: a heist becomes a hostage situation becomes a fight across a city block. This is comic-book rising action, not a slow timer.
+
+### What investigating costs
+
+When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
+
+| Track | Ticks for | For example |
+|---|---|---|
+| **Scrutiny** | digging publicly or drawing official attention | pulling federal files, flashing a badge you shouldn't, staking out in the open |
+| **Backlash** | provoking the Operant or their allies | leaning on their friends, taunting them on air, raiding their haunts |
+| **Collateral** | messy, public confrontations and property damage | forcing a test of the power in a crowd, a chase through traffic, breaking in |
+
+### Methods
+
+Which methods suit a character depends on their role, origin and skills. The GM says which methods can advance each phase.
+
+| Method | Skills | Suits | Phases | For example |
+|---|---|---|---|---|
+| Profile the Operant | Read People, Investigation | The Badge, The Learned | Confront, Identify | Pattern of crimes, choice of targets, what they want. |
+| Run the records | Computers, Law | The Badge | Identify, Uncover | EMD registry, ExLAW files, court records, hospital admissions. |
+| Analyze the power | Science, Occult, Powers | The Learned | Identify, Uncover | Residue, readings, footage frame by frame, the physics or the magic of it. |
+| Work the back channels | Streetwise, Deception | The Underworld | Confront, Identify | Fences, fixers, who hired whom, who's scared. |
+| See it in the field | Investigation, Stealth, Athletics | The Masks | Any | Shadow them, test them, take the hit and watch what happens. |
+| Work the media | Media, Persuasion | The Masks, The Fringe | Confront, Identify | Viewer footage, tips, a reporter's notes. Always ticks Scrutiny on a failure. |
+
+- **The Badge:** natural profilers, with the records; **The Learned:** natural profilers, through analysis; **The Underworld:** intel through back channels; **The Masks:** intel gathered in the field; **The Fringe:** contacts on the edges.
+- Some powers are methods in themselves: a telepath, a psychometrist or a power that senses energy can advance a phase with the Powers skill, at the GM's call.
 
 # The world of Aurora
 
@@ -1262,6 +1299,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Fine Control | +2 to Powers to use a power precisely: around bystanders, at a distance or delicately. |
 | Secret Identity | +2 to Deception to keep your two lives apart. Take the Secret Identity complication unless the GM agrees otherwise. |
 | Cool Under Fire | +2 to Will to keep acting under fire, fear or mind powers. |
+| Sealed Binder | You start play with three dossiers, each a secret your work or your origin taught you: something in no database, registry or published record. They grant no bonus: they let you act on what you know. |
 
 **Aegis Certified** lets a character who isn't an Aegis Pilot use the Aegis suit from the gear list. **Secret Identity** comes with the *Secret Identity* complication unless the GM agrees otherwise. Origin advantages (in each origin's entry) are often the most flavorful choice for an Operant.
 

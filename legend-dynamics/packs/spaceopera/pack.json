@@ -2072,6 +2072,12 @@
    "Psionic",
    "You have psionic potential: you can learn psionic powers (see Psionics and the Mandates). Take the Unregistered complication unless the GM agrees otherwise.",
    "Psionics"
+  ],
+  [
+   "codex",
+   "Classified Archive",
+   "You start play with three data records, each a secret your work or your people taught you: something in no database or published record. They grant no bonus: they let you act on what you know.",
+   "Investigation"
   ]
  ],
  "complications": [
@@ -4082,11 +4088,18 @@
     ]
    },
    {
+    "title": "Data records",
+    "intro": "Running investigations and recording what the crew learns. The rules players use are in the *Data records* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and records.",
+    "take": [
+     "## Making data records",
+     "## The Discovery panel"
+    ]
+   },
+   {
     "title": "The GM's tools",
     "take": [
      "## The battle map",
-     "## The Encounter panel",
-     "## The Discovery panel"
+     "## The Encounter panel"
     ]
    }
   ],
@@ -4108,7 +4121,7 @@
  "discovery": {
   "card": "data record",
   "cards": "data records",
-  "collection": "codex",
+  "collection": "archive",
   "subject": "an alien species, a derelict technology, an uncharted world behind a collapsed corridor, or a faction's intentions",
   "uncover": "how it is beaten, or how it is used",
   "kinds": [
@@ -4128,11 +4141,11 @@
    ],
    [
     "Identify",
-    "Name it: the species, the technology, the world, the faction's aim. This is the gate: until it's confirmed, no data record applies, and the GM treats your theories as suspicion only."
+    "Name it: the species, the technology, the world, the faction's aim. This is the gate: until its identity is confirmed, what you know about a kind of subject doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works."
    ],
    [
     "Uncover",
-    "Learn how it is beaten, or how it is used. Filling this phase fills the clock and mints a data record."
+    "Learn how it is beaten, or how it is used. Filling this phase fills the clock and earns a data record for what you established."
    ]
   ],
   "threat": {
@@ -4211,7 +4224,63 @@
    "trouble": "what others would rather keep hidden"
   },
   "origins": "A character's species can suit a method: senses, memory, psionics or a people's own history with the subject. A species that touches minds can advance a phase with Psionics, at the GM's call.",
-  "subjects": []
+  "subjects": [],
+  "scoped": true,
+  "chapter": "Data records",
+  "datePlaceholder": "In the story",
+  "routes": [
+   [
+    "investigation",
+    "A discovery clock",
+    "filled to the end of Uncover",
+    []
+   ],
+   [
+    "experience",
+    "Scanned or tested firsthand",
+    "your own scans and samples, or a careful field test",
+    [
+     "threat",
+     "Hull"
+    ]
+   ],
+   [
+    "account",
+    "A reliable record",
+    "a trusted archive, another ship's logs, a species' own historians. A source's reputation alone doesn't make it right, but a reliable record can establish a fact without anyone repeating a dangerous test",
+    [
+     "Debt",
+     "Reputation"
+    ]
+   ],
+   [
+    "creature",
+    "Its own word, backed up",
+    "what an alien, an AI or a faction tells you, supported by evidence",
+    [
+     "Debt",
+     "Heat"
+    ]
+   ]
+  ],
+  "anyway": "A real weakness works whoever uses it, data record or no data record: a predator's blind spot or a system's back door works for anyone who finds it. Operating unfamiliar technology, or dealing by a species' customs, still needs the right procedure, the knowledge and the skill.",
+  "basis": "dock talk and rumor, scans, testimony, the crew's own experience, or a suspicion they can explain",
+  "startCards": {
+   "adv": "codex",
+   "n": 3,
+   "label": "Classified Archive",
+   "secret": "isn't in any database or published record",
+   "note": "Each record is a secret your work or your people taught you, agreed with the GM."
+  },
+  "clockExample": "What woke the derelict at Kessel Deep",
+  "cardExample": {
+   "subject": "The Kessel Deep derelict",
+   "finding": "Its reactor powers down whenever the corridor beacon goes silent",
+   "limits": "Seen twice, from outside the hull; not what restarts it",
+   "evidence": "The crew's own sensor logs",
+   "route": "experience",
+   "cost": "Countdown +1 (the hours spent watching it)"
+  }
  },
  "mounts": [
   [

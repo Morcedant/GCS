@@ -70,6 +70,33 @@ Opponents use the same rules as the characters. **Minor opponents** (guards, ban
 
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
 
+# Tales
+
+Running investigations and recording what the heroes learn. The rules players use are in the *Tales* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and tales.
+
+## Making tales
+
+For the GM: when a tale is earned, and how to write one. A tale is a record of what the characters established, so writing it well matters more than how often you hand one out.
+
+1. **Decide that something is established.** A tale is earned when a discovery clock fills, or when the characters see or test something themselves, hear it from a source you judge reliable, or are told it by the subject itself with evidence to back it up. A guess, however right, isn't established, and neither is a rumor. Ask what supports their idea; when the answer is good, let them act on it, and give the tale once they've confirmed it.
+2. **Write the finding narrowly.** One fact, in the words the characters would use, and no more than they found out: "bright light drove it back", not "it fears light". Two separate facts make two tales. Never write the subject's whole truth onto a tale; later discoveries add more tales.
+3. **Write its limits.** What the finding doesn't show: how often it was seen, under what conditions, and what is still unknown. The limits are what keep the next investigation interesting.
+4. **Note the evidence or source.** What they saw, tested, read or were told, and by whom. A source's reputation doesn't make it right: if it was only probably true, the limits say so.
+5. **Charge the price.** A tale from a discovery clock costs nothing more: the scenes, failed rolls and pushes were its price. Any other source has its price (see *Earning a tale*): choose the one that fits how they learned it, and mark it.
+6. **Choose the owner and the recipients.** Whoever did the finding owns the tale. Everyone who was there, or heard it from a reliable source, gets a shared copy.
+7. **Record it.** In the GM view's **Discovery** panel: **Mint** a full clock's tale, or use **Record a finding without a clock**, which marks the price for you. Then save everyone's characters to file, so the players' sheets carry it. A player can also write a tale on their own sheet, when you agree it's been earned.
+
+*Example:* **The Thing from the Deep.** Established: *It would not cross the line of salt at the temple door*. Limits: *One night, one door; not whether salt harms it*. Source: The old priest's telling, borne out by the tracks that stop at the salt (a trusted telling). Cost: Debt +1 (the priest's price).
+
+- **When a later finding disagrees.** Write a new tale that says what they now know; the old one stays on the sheet as what they believed then, and the new one's limits can say so.
+- **A tale is never proof of identity.** Holding a tale about one subject doesn't prove that the thing in front of them is that subject: the Identify phase does.
+- **Weaknesses work anyway.** Don't hold back a real weakness because no one holds the tale: if they try it, it works.
+- **Untold Tales.** Agree each starting tale with its player before play: it must come from the character's role or ancestry, be narrow, and be a real secret: something that isn't in common books or lore. Make sure it fits what you know to be true, adjust it if it doesn't, and keep a note of it.
+
+## The Discovery panel
+
+The GM view's **Discovery** panel runs discovery clocks and the Doom they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every tale the characters in the GM view already hold for it. The **Failed roll** and **Push** buttons tick the track for how they were digging, and a failed roll ticks the Doom too. When a clock fills, **Mint** gives the primary investigator the tale and everyone you tick as present a shared copy. **Record a finding without a clock** gives a tale for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick, and marks its price: the track or the Doom that source costs. Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.
+
 # The GM's tools
 
 ## The battle map
