@@ -236,7 +236,7 @@ export const PACKS = {
   "discovery": {
    "card": "dossier",
    "cards": "dossiers",
-   "collection": "case file",
+   "collection": "binder",
    "phases": [
     "Confront the unknown",
     "Identify",
@@ -736,7 +736,7 @@ export const PACKS = {
   "discovery": {
    "card": "data record",
    "cards": "data records",
-   "collection": "codex",
+   "collection": "archive",
    "phases": [
     "Confront the unknown",
     "Identify",

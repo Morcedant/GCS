@@ -4276,7 +4276,7 @@
  "discovery": {
   "card": "dossier",
   "cards": "dossiers",
-  "collection": "case file",
+  "collection": "binder",
   "subject": "an Operant's power set and its limits",
   "uncover": "the counter: the tell, the cost, the cooldown, what shuts the power down",
   "phases": [

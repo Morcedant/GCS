@@ -687,7 +687,7 @@ A real counter works whether or not anyone holds a dossier for it. Act on what y
 
 ## Discovery clocks and dossiers
 
-When a case turns on an unknown subject (an Operant's power set and its limits), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **dossier**: what the characters learned, kept for good. A character's dossiers are their **case file**.
+When a case turns on an unknown subject (an Operant's power set and its limits), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **dossier**: what the characters learned, kept for good. A character's dossiers are their **binder**.
 
 | Phase | What it means |
 |---|---|

@@ -632,7 +632,7 @@ A real weakness works whether or not anyone holds a record for it. Act on what y
 
 ## Discovery clocks and data records
 
-When a job turns on an unknown subject (an alien species, a derelict technology, an uncharted world behind a collapsed corridor, or a faction's intentions), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **data record**: what the characters learned, kept for good. A character's data records are their **codex**.
+When a job turns on an unknown subject (an alien species, a derelict technology, an uncharted world behind a collapsed corridor, or a faction's intentions), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **data record**: what the characters learned, kept for good. A character's data records are their **archive**.
 
 | Phase | What it means |
 |---|---|
