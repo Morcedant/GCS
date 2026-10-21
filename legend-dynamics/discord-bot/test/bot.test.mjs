@@ -321,7 +321,11 @@ test("/discovery: phases, the Identify gate, the Harvest, costs, minting; /cards
   assert.match((await D("threat", [{ name: "segments", value: 6 }])).content, /Countdown\*\* ●●●●●● 6\/6  \*\*It happens: the situation hits/);
   assert.match((await D("new", [{ name: "name", value: "Fix the drive" }, { name: "plain", value: true }])).content, /progress clock[\s\S]*○○○○○○ 0\/6 · progress/);
   assert.equal((await signedCall(env2, attach("a2", "https://cdn.example/ruth.json"))).flags, 64, "a Trails file on a Fracture Lines server is refused");
-  // Crown has no discovery clocks.
+  // The Shattered Crown races its Doom track, not a clock of its own: a failed roll ticks Doom on the shared tracks.
   await signedCall(env2, sub("game", "set", [{ name: "game", value: "fantasy" }], { gm: true }));
-  assert.equal((await D("show")).flags, 64);
+  assert.match((await D("new", [{ name: "name", value: "The flayed priest" }])).content, /racing the Doom/);
+  const f = (await D("fail", [{ name: "track", value: "infamy" }])).content;
+  assert.match(f, /Infamy\*\* ■□□□/); assert.match(f, /Doom\*\* ■□□□/, "a failed roll ticks Doom too");
+  assert.match((await D("threat", [{ name: "segments", value: 3 }])).content, /Doom\*\* ■■■■[\s\S]*Doom is full:\*\* the old power comes for you/);
+  assert.match((await D("show")).content, /Doom\*\* ■■■■/);
 });

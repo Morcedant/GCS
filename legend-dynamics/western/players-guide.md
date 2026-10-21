@@ -317,7 +317,7 @@ A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something tha
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. A successful roll does not force someone to abandon a core belief or reveal what they do not know.
 
-Investigating the supernatural has its own rules: see *Lore cards*.
+Investigations have rules of their own, and earn lore cards: see *Lore cards*.
 
 ## Chases
 
@@ -729,27 +729,27 @@ When a job turns on an unknown subject (a supernatural creature and its weakness
 
 ### The lore card
 
-A lore card is a permanent record of one specific thing the characters have established. It holds only what they found out, never the whole truth about a creature: later discoveries add to it with more lore cards. It grants **no bonus** to any roll.
+A lore card is a permanent record of one specific thing the characters have established. It holds only what they found out, never the whole truth: later discoveries add to it with more lore cards. It grants **no bonus** to any roll.
 
 - **Weaknesses work anyway.** A real weakness works whoever uses it, lore card or no lore card: silver marks its extra box fired by someone who has never heard of werewolves, and a hunter who suspects silver can load it. Called shots follow the ordinary combat rules. An unfamiliar ritual still needs its procedure, the knowledge, the skill and the components.
 - **What a lore card is for.** It's what the character knows for certain and can rely on, plan around and teach. A correct deduction, a sensible experiment or an ordinary precaution needs no lore card.
-- **The identification gate.** Before a subject is confirmed, you can form hypotheses, test them and take precautions, but what you know about a kind of creature isn't applied to this one until the Identify phase confirms it. Holding a lore card never proves that this is that.
+- **The identification gate.** Before a subject is confirmed, you can form hypotheses, test them and take precautions, but what you know about a kind of subject isn't applied to this one until the Identify phase confirms it. Holding a lore card never proves that this is that.
 - **Shared copies.** Everyone who establishes a finding, or is there when a lore card is earned, gets a shared copy; one character is recorded as its owner. A character who wasn't there can be taught it later, from a reliable account.
-- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, the date, its owner and who received it. It's kept on the character sheet, under *Learned in play*.
+- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, what it cost, the date, its owner and who received it. It's kept on the character sheet, under *Learned in play*.
 
 ### Earning a lore card
 
-A discovery clock is one way to earn a lore card. The others need no clock: when a fact is established directly or taught reliably, the GM records the lore card at once.
+A discovery clock is one way to earn a lore card. The others need no clock: when a fact is established directly or taught reliably, the GM records the lore card at once. **Information is never free:** each source has its price, marked when the lore card is recorded.
 
-| How it was learned | What counts |
-|---|---|
-| **A discovery clock** | Filled to the end of Uncover. |
-| **Seen or tested firsthand** | Direct experience, or a sensible experiment. |
-| **A reliable account** | Reliable transmitted experience: a survivor, a grimoire, church archives, Shadow Knight records. A source's reputation alone doesn't make it right, but a reliable account can establish a fact without anyone repeating a dangerous test. |
-| **A creature's word, backed up** | What a supernatural creature says, supported by evidence. |
+| How it was learned | What counts | What it costs |
+|---|---|---|
+| **A discovery clock** | Filled to the end of Uncover. | What the clock cost along the way |
+| **Seen or tested firsthand** | Direct experience, or a sensible experiment. | Harvest +1 or The Dark +1 |
+| **A reliable account** | Reliable transmitted experience: a survivor, a grimoire, church archives, Shadow Knight records. A source's reputation alone doesn't make it right, but a reliable account can establish a fact without anyone repeating a dangerous test. | Whispers +1 or Heat +1 |
+| **A creature's word, backed up** | What a supernatural creature says, supported by evidence. | The Dark +1 |
 
 - **A basis for a proposal.** An investigation proposal needs a reasonable basis: folklore the characters have heard, evidence, testimony, their own experience, or a suspicion they can explain. Naming the right answer with nothing behind it doesn't earn a lore card. The GM asks what supports an approach, and never rejects it just because it matches the hidden truth.
-- **Ideas are free.** Proposing a theory costs nothing. Investigation rolls, failures and pushes cost what they always do (below).
+- **Ideas are free; information isn't.** Proposing a theory costs nothing. Learning something does: a discovery clock's scenes and failed rolls, or the price of a direct source (above).
 - **Enough clues.** The GM provides enough clues, and more than one route to each answer: a job shouldn't stall on a single missed roll.
 
 ### The Harvest

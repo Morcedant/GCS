@@ -309,6 +309,8 @@ A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something tha
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. A successful roll does not force someone to abandon a core belief or reveal what they do not know.
 
+Investigations have rules of their own, and earn tales: see *Tales*.
+
 ## Chases
 
 Run a chase as a progress clock for the pursuers against a danger clock for the quarry's escape. Each exchange, the characters roll the skill that moves them (Riding, or Athletics on foot): success ticks the pursuers' clock, failure ticks the escape. Terrain, a tired mount or a damaged engine, and attacks made on the move (at −2) adjust the rolls.
@@ -666,6 +668,94 @@ End each venture with a short entry, written together:
 4. **What changed?** New allies or enemies, damage, open threads for next time.
 5. **Advancement.** After a significant venture, each character earns 1 advancement point; at a milestone, 2 more.
 
+# Tales
+
+What your heroes know of the old powers, and how they come to know it: the difference between legend and truth, how an investigation runs, and the tales that hold what you've established.
+
+## Legend, truth and tales
+
+What the legends say, what is actually true, and what your hero knows are three different things.
+
+- **Legend.** What the skalds sing, what the temples warn, what an old woman mutters at the well. Some of it is right, some half right, some wrong. It's where an investigation starts.
+- **The truth.** What a sorcerer, a demon or a thing from the Deep really is, and what really stops it. The GM knows it; you find it out.
+- **Tales.** What your hero has established for themselves: one finding at a time, with its limits, how you know it and what it cost. A tale holds only what you found out, never the whole saga (see *Discovery clocks and tales*).
+
+A real weakness works whether or not anyone holds a tale for it. Act on what you suspect: bring fire, salt the threshold, speak the name. The GM will ask what your idea rests on, and a good reason is all it needs. Learning, though, is never free.
+
+## Discovery clocks and tales
+
+When a venture turns on an unknown subject (a sorcerer, a demon, a cult or a thing from the Deep, and how it is beaten), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **tale**: what the characters learned, kept for good. A character's tales are their **saga**.
+
+| Phase | What it means |
+|---|---|
+| 1. Confront the unknown | Signs without a cause: a village emptied in a night, a priest found flayed, a star that wasn't there last year. You may suspect, but nothing is confirmed. |
+| 2. Identify | Name the power behind it. This is the gate: until its identity is confirmed, what you know about a kind of subject doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works. |
+| 3. Uncover | Learn how it is beaten. Filling this phase fills the clock and earns a tale for what you established. |
+
+- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
+- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
+- **The primary investigator.** One character leads and owns the tale. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant tale can assist with a method they couldn't otherwise bring (the tale is why they're qualified); it adds nothing beyond the normal assistance.
+- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
+
+### The tale
+
+A tale is a permanent record of one specific thing the characters have established. It holds only what they found out, never the whole truth: later discoveries add to it with more tales. It grants **no bonus** to any roll.
+
+- **Weaknesses work anyway.** A real weakness works whoever uses it, tale or no tale: if a thing from the Deep burns, it burns at anyone's torch. A rite against it still needs its ritual, the knowledge, the skill and the components.
+- **What a tale is for.** It's what the character knows for certain and can rely on, plan around and teach. A correct deduction, a sensible experiment or an ordinary precaution needs no tale.
+- **The identification gate.** Before a subject is confirmed, you can form hypotheses, test them and take precautions, but what you know about a kind of subject isn't applied to this one until the Identify phase confirms it. Holding a tale never proves that this is that.
+- **Shared copies.** Everyone who establishes a finding, or is there when a tale is earned, gets a shared copy; one character is recorded as its owner. A character who wasn't there can be taught it later, from a reliable account.
+- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, what it cost, the date, its owner and who received it. It's kept on the character sheet, under *Learned in play*.
+
+### Earning a tale
+
+A discovery clock is one way to earn a tale. The others need no clock: when a fact is established directly or taught reliably, the GM records the tale at once. **Information is never free:** each source has its price, marked when the tale is recorded.
+
+| How it was learned | What counts | What it costs |
+|---|---|---|
+| **A discovery clock** | Filled to the end of Uncover. | What the clock cost along the way |
+| **Seen or tried firsthand** | What you saw with your own eyes, or a careful trial. | Doom +1 or Hunger +1 |
+| **A trusted telling** | An old priest's memory, a survivor's account, a sage's scroll, a temple's records. A teller's renown alone doesn't make it true, but a trusted telling can establish a fact without anyone repeating a deadly trial. | Debt +1 or Infamy +1 |
+| **A spirit's or demon's word, backed up** | What a bound spirit, a demon or a sorcerer admits, supported by evidence. | Doom +1 |
+
+- **A basis for a proposal.** An investigation proposal needs a reasonable basis: legends the characters have heard, evidence, testimony, their own experience, or a suspicion they can explain. Naming the right answer with nothing behind it doesn't earn a tale. The GM asks what supports an approach, and never rejects it just because it matches the hidden truth.
+- **Ideas are free; information isn't.** Proposing a theory costs nothing. Learning something does: a discovery clock's scenes and failed rolls, or the price of a direct source (above).
+- **Enough clues.** The GM provides enough clues, and more than one route to each answer: a venture shouldn't stall on a single missed roll.
+
+### Untold Tales
+
+A character who takes the **Untold Tales** advantage starts play with three tales they write themselves, with the GM's agreement. Each must hold a **secret**: something that isn't in common books or lore. Each comes from the character's role or ancestry: what their work or their people taught them. The creator asks for the subject, the secret, which it comes from, and why it isn't common knowledge.
+
+### Racing the Doom
+
+A discovery clock always races a threat: here, the Doom track. While you dig, the thing you hunt is learning your names. Doom ticks once for each scene spent investigating and once for each failed investigation roll, and a cleansing rite clears it as usual. When it fills, the old power comes for you.
+
+### What investigating costs
+
+When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
+
+| Track | Ticks for | For example |
+|---|---|---|
+| **Infamy** | drawing the watch and the rulers | open questions, trespass in temples and palaces, violence in the street |
+| **Debt** | buying help | a sage's fee, a bribe, an informant's silence |
+| **Hunger** | days lost to the search | weeks in the archives, wilderness trails, supplies spent on the hunt |
+
+### Methods
+
+Which methods suit a character depends on their role, ancestry and skills. The GM says which methods can advance each phase.
+
+| Method | Skills | Suits | Phases | For example |
+|---|---|---|---|---|
+| Read the signs | Investigation, Healing | Shadow, Lore | Confront, Identify | A corpse, a ward-mark, a burned altar: what the thing left behind. |
+| Track it | Tracking, Survival | Steel | Confront, Identify | Spoor, broken reeds, where the horses won't go. |
+| Question witnesses | Read People, Persuasion | Steel, Shadow | Confront, Identify | Survivors, tavern talk, the slave who saw the rite. |
+| Search the old texts | Lore | Lore | Identify, Uncover | Temple archives, clay tablets, a sorcerer's stolen book. |
+| Read the sorcery | Sorcery | Lore | Identify, Uncover | Sense the working, read the sigils, question a bound spirit. |
+| Steal it or lean on someone | Thievery, Deception, Persuasion | Shadow | Any | The priest who knows more than he says. Always ticks Infamy on a failure. |
+
+- **Steel:** witnesses and the trail; **Shadow:** what others would rather hide; **Lore:** natural identifiers: old texts and sorcery.
+- A character's people can suit a method: an old blood that remembers, eyes that see in the dark. A **Sorcerer** or **Witch** can work a cantrip or ritual of seeing as a method.
+
 # Sorcery
 
 Sorcery is real, rare and expensive. It is worked by **Sorcerers** and **Witches**, by anyone with the **Gifted** advantage, and by those whose blood grants it (the Witch-blooded's *The Old Blood*, the Serpent-kin's *Temple-Taught*, the Demon-marked's *Infernal Gift*, the Godblooded's *Divine Spark* and the Undying's *Deathless Sorcery*). Everyone else can resist it, fear it and pay for it.
@@ -876,6 +966,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Shadow-Walker | +2 to Stealth in darkness or crowds. |
 | Hard Bargainer | Once per venture, a deal, a price or a reward goes your way. |
 | Monster-Slayer | +2 to Lore about a creature you face, and +1 to hit it once you know its weakness. |
+| Untold Tales | You start play with three tales, each a secret your role or your people taught you: something in no common book or lore. They grant no bonus: they let you act on what you know. |
 
 **Gifted and the old bloods.** *Gifted* (or an ancestry's equivalent) lets a character of any role learn cantrips and work rituals. Sorcerers and Witches don't need it. Taking it means training **Sorcery** too, or the gift has nothing to work with.
 

@@ -70,6 +70,14 @@ Opponents use the same rules as the characters. **Minor opponents** (guards, ban
 
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
 
+# Tales
+
+Running investigations and recording what the heroes learn. The rules players use are in the *Tales* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and tales.
+
+## The Discovery panel
+
+The GM view's **Discovery** panel runs discovery clocks and the Doom they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every tale the characters in the GM view already hold for it. The **Failed roll** and **Push** buttons tick the track for how they were digging, and a failed roll ticks the Doom too. When a clock fills, **Mint** gives the primary investigator the tale and everyone you tick as present a shared copy. **Record a finding without a clock** gives a tale for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick, and marks its price: the track or the Doom that source costs. Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.
+
 # The GM's tools
 
 ## The battle map

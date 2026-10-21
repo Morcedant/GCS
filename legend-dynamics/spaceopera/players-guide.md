@@ -341,60 +341,7 @@ A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something tha
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. A successful roll does not force someone to abandon a core belief or reveal what they do not know.
 
-## Discovery clocks and data records
-
-When a job turns on an unknown subject (an alien species, a derelict technology, an uncharted world behind a collapsed corridor, or a faction's intentions), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **data record**: what the characters learned, kept for good. A character's data records are their **codex**.
-
-| Phase | What it means |
-|---|---|
-| 1. Confront the unknown | Effects without a cause: a signal no one can read, a derelict that powers up, a crew that won't answer. You may suspect, but nothing is confirmed. |
-| 2. Identify | Name it: the species, the technology, the world, the faction's aim. This is the gate: until it's confirmed, no data record applies, and the GM treats your theories as suspicion only. |
-| 3. Uncover | Learn how it is beaten, or how it is used. Filling this phase fills the clock and mints a data record. |
-
-- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
-- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
-- **The primary investigator.** One character leads and owns the data record. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant data record can assist with a method they couldn't otherwise bring (the data record is why they're qualified); it adds nothing beyond the normal assistance.
-- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
-
-### The data record
-
-A data record grants **no bonus** to any roll. It is an earned permission: knowledge that makes possible an action otherwise forbidden or unavailable against that subject. Without it, the GM can rule that the action isn't possible: you can't aim for a heart you don't know is the weakness, or speak a name you never learned. A data record can authorize a called shot or a telling-hit effect that would otherwise be unavailable.
-
-- A data record never helps confirm its own subject: holding one doesn't prove this is that. It applies once the Identify phase has confirmed it.
-- **Shared copies.** Every character present when the data record is minted (the climactic confrontation or the breakthrough) gets a shared copy; the primary investigator is recorded as its owner. An absent character doesn't, though a holder can teach it to them later with the GM's agreement.
-- **What it records.** The subject (its tag), what was learned, what it permits, the job where it was earned, its owner, and who was there. It's kept on the character sheet, under *Learned in play*.
-
-**Two kinds of data records.** **Weakness:** How it is beaten: a predator's or a hostile system's weakness. **Permission:** How it is used: a species' customs that allow negotiation, a derelict's systems that allow operating it.
-
-### The Countdown
-
-A discovery clock always races a threat clock. The threat is often the situation itself: failing life support, a collapsing corridor, a reactor going critical, a first-contact window closing. A Countdown is a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.
-
-### What investigating costs
-
-When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
-
-| Track | Ticks for | For example |
-|---|---|---|
-| **Heat** | intrusion and provocation | overt scanning of restricted space, slicing into a faction's systems, provoking their security |
-| **Reputation** | digging in the open | asking every port about the derelict, broadcasting on open channels, a first contact that gets noticed |
-| **Hull** | strain on ship and crew | close passes to the anomaly, pushing the sensors past their limits, docking with the unknown |
-
-### Methods
-
-Which methods suit a character depends on their role, species and skills. The GM says which methods can advance each phase.
-
-| Method | Skills | Suits | Phases | For example |
-|---|---|---|---|---|
-| Scan it | Sensors | Ship Crew, Frontier | Confront, Identify | Passive first, active if you must (active scanning of restricted space ticks Heat). |
-| Analyze it | Science, Medicine | Frontier | Identify, Uncover | Samples, spectra, biology, the physics of the drive. |
-| Slice the systems | Computers, Engineering | Ship Crew, Trouble | Identify, Uncover | Logs, firmware, the derelict's own records, a faction's network. |
-| Read the people | Psychology, Diplomacy | Service | Any | Their customs, their fears, what their silence means. |
-| Buy or trade for it | Commerce, Streetwise | Commerce, Trouble | Confront, Identify | Brokers, archives, a captain who's been there. |
-| Survey the ground | Survival, Navigation | Frontier | Confront, Identify | Walk the world, chart the collapsed corridor, map the derelict deck by deck. |
-
-- **Ship Crew:** sensors and systems; **Frontier:** science, survey and the unknown itself; **Service:** people and customs; **Commerce:** what can be bought or traded; **Trouble:** what others would rather keep hidden.
-- A character's species can suit a method: senses, memory, psionics or a people's own history with the subject. A species that touches minds can advance a phase with Psionics, at the GM's call.
+Investigations have rules of their own, and earn data records: see *Data records*.
 
 ## Chases
 
@@ -668,6 +615,96 @@ End each job with a short entry, written together:
 3. **Complications.** Which ones came into play, and what did they cost?
 4. **What changed?** New allies or enemies, damage, open threads for next time.
 5. **Advancement.** After a significant job, each character earns 1 advancement point; at a milestone, 2 more.
+
+# Data records
+
+What your crew knows about the unknown, and how it comes to know it: the difference between dock talk and the truth, how an investigation runs, and the data records that hold what you've established.
+
+## Rumor, truth and data records
+
+What spacers say, what is actually true, and what your crew knows are three different things.
+
+- **Rumor.** Dock talk, corporate claims, a species' reputation, what the newsfeeds say about a dead world. Some of it is right, some half right, some wrong. It's where an investigation starts.
+- **The truth.** What a species, a derelict, a world or a faction really is, and what really works against it or with it. The GM knows it; you find it out.
+- **Data records.** What your crew has established for itself: one finding at a time, with its limits, how you know it and what it cost. A record holds only what you found out, never the whole story (see *Discovery clocks and data records*).
+
+A real weakness works whether or not anyone holds a record for it. Act on what you suspect: run the frequency, try the override, keep your distance. The GM will ask what your idea rests on, and a good reason is all it needs. Learning, though, is never free.
+
+## Discovery clocks and data records
+
+When a job turns on an unknown subject (an alien species, a derelict technology, an uncharted world behind a collapsed corridor, or a faction's intentions), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **data record**: what the characters learned, kept for good. A character's data records are their **codex**.
+
+| Phase | What it means |
+|---|---|
+| 1. Confront the unknown | Effects without a cause: a signal no one can read, a derelict that powers up, a crew that won't answer. You may suspect, but nothing is confirmed. |
+| 2. Identify | Name it: the species, the technology, the world, the faction's aim. This is the gate: until its identity is confirmed, what you know about a kind of subject doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works. |
+| 3. Uncover | Learn how it is beaten, or how it is used. Filling this phase fills the clock and earns a data record for what you established. |
+
+- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
+- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
+- **The primary investigator.** One character leads and owns the data record. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant data record can assist with a method they couldn't otherwise bring (the data record is why they're qualified); it adds nothing beyond the normal assistance.
+- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
+
+### The data record
+
+A data record is a permanent record of one specific thing the characters have established. It holds only what they found out, never the whole truth: later discoveries add to it with more data records. It grants **no bonus** to any roll.
+
+- **Weaknesses work anyway.** A real weakness works whoever uses it, data record or no data record: a predator's blind spot or a system's back door works for anyone who finds it. Operating unfamiliar technology, or dealing by a species' customs, still needs the right procedure, the knowledge and the skill.
+- **What a data record is for.** It's what the character knows for certain and can rely on, plan around and teach. A correct deduction, a sensible experiment or an ordinary precaution needs no data record.
+- **The identification gate.** Before a subject is confirmed, you can form hypotheses, test them and take precautions, but what you know about a kind of subject isn't applied to this one until the Identify phase confirms it. Holding a data record never proves that this is that.
+- **Shared copies.** Everyone who establishes a finding, or is there when a data record is earned, gets a shared copy; one character is recorded as its owner. A character who wasn't there can be taught it later, from a reliable account.
+- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, what it cost, the date, its owner and who received it. It's kept on the character sheet, under *Learned in play*.
+
+### Earning a data record
+
+A discovery clock is one way to earn a data record. The others need no clock: when a fact is established directly or taught reliably, the GM records the data record at once. **Information is never free:** each source has its price, marked when the data record is recorded.
+
+| How it was learned | What counts | What it costs |
+|---|---|---|
+| **A discovery clock** | Filled to the end of Uncover. | What the clock cost along the way |
+| **Scanned or tested firsthand** | Your own scans and samples, or a careful field test. | Countdown +1 or Hull +1 |
+| **A reliable record** | A trusted archive, another ship's logs, a species' own historians. A source's reputation alone doesn't make it right, but a reliable record can establish a fact without anyone repeating a dangerous test. | Debt +1 or Reputation +1 |
+| **Its own word, backed up** | What an alien, an AI or a faction tells you, supported by evidence. | Debt +1 or Heat +1 |
+
+- **A basis for a proposal.** An investigation proposal needs a reasonable basis: dock talk and rumor, scans, testimony, the crew's own experience, or a suspicion they can explain. Naming the right answer with nothing behind it doesn't earn a data record. The GM asks what supports an approach, and never rejects it just because it matches the hidden truth.
+- **Ideas are free; information isn't.** Proposing a theory costs nothing. Learning something does: a discovery clock's scenes and failed rolls, or the price of a direct source (above).
+- **Enough clues.** The GM provides enough clues, and more than one route to each answer: a job shouldn't stall on a single missed roll.
+
+### Classified Codex
+
+A character who takes the **Classified Codex** advantage starts play with three data records they write themselves, with the GM's agreement. Each must hold a **secret**: something that isn't in any database or published record. Each comes from the character's role or species: what their work or their people taught them. The creator asks for the subject, the secret, which it comes from, and why it isn't common knowledge.
+
+**Two kinds of data records.** **Weakness:** How it is beaten: a predator's or a hostile system's weakness. **Permission:** How it is used: a species' customs that allow negotiation, a derelict's systems that allow operating it.
+
+### The Countdown
+
+A discovery clock always races a threat clock. The threat is often the situation itself: failing life support, a collapsing corridor, a reactor going critical, a first-contact window closing. A Countdown is a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.
+
+### What investigating costs
+
+When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
+
+| Track | Ticks for | For example |
+|---|---|---|
+| **Heat** | intrusion and provocation | overt scanning of restricted space, slicing into a faction's systems, provoking their security |
+| **Reputation** | digging in the open | asking every port about the derelict, broadcasting on open channels, a first contact that gets noticed |
+| **Hull** | strain on ship and crew | close passes to the anomaly, pushing the sensors past their limits, docking with the unknown |
+
+### Methods
+
+Which methods suit a character depends on their role, species and skills. The GM says which methods can advance each phase.
+
+| Method | Skills | Suits | Phases | For example |
+|---|---|---|---|---|
+| Scan it | Sensors | Ship Crew, Frontier | Confront, Identify | Passive first, active if you must (active scanning of restricted space ticks Heat). |
+| Analyze it | Science, Medicine | Frontier | Identify, Uncover | Samples, spectra, biology, the physics of the drive. |
+| Slice the systems | Computers, Engineering | Ship Crew, Trouble | Identify, Uncover | Logs, firmware, the derelict's own records, a faction's network. |
+| Read the people | Psychology, Diplomacy | Service | Any | Their customs, their fears, what their silence means. |
+| Buy or trade for it | Commerce, Streetwise | Commerce, Trouble | Confront, Identify | Brokers, archives, a captain who's been there. |
+| Survey the ground | Survival, Navigation | Frontier | Confront, Identify | Walk the world, chart the collapsed corridor, map the derelict deck by deck. |
+
+- **Ship Crew:** sensors and systems; **Frontier:** science, survey and the unknown itself; **Service:** people and customs; **Commerce:** what can be bought or traded; **Trouble:** what others would rather keep hidden.
+- A character's species can suit a method: senses, memory, psionics or a people's own history with the subject. A species that touches minds can advance a phase with Psionics, at the GM's call.
 
 # A galaxy of obligations
 
@@ -1466,6 +1503,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Implant: Reflex Wiring | +1 Dodge, and +2 to act first in a fight. It shows on scans. |
 | Cool Under Fire | +2 to Will to keep acting under fire, fear or pressure. |
 | Psionic | You have psionic potential: you can learn psionic powers (see Psionics and the Mandates). Take the Unregistered complication unless the GM agrees otherwise. |
+| Classified Codex | You start play with three data records, each a secret your work or your people taught you: something in no database or published record. They grant no bonus: they let you act on what you know. |
 
 **Implants** (the advantages marked *Implant*) are visible and show on scans; a character with several should consider the *Implant Upkeep* complication. **Psionic** comes with the *Unregistered* complication unless the GM agrees the character is registered (and watched). **A Ship of Your Own** belongs to the whole crew once it's taken.
 

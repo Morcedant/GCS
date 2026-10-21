@@ -82,6 +82,14 @@ Opponents use the same rules as the characters. **Minor opponents** have **one b
 | Hegemony warship | 14 / 15 | 8 | Coilgun spinal mount, lasers, missiles, point defense | **Armor.** A legion of marines ready to board. |
 | Drone swarm | — / 12 | 1 each | Lasers | **Swarm.** Kill the controller ship and they go dead. |
 
+# Data records
+
+Running investigations and recording what the crew learns. The rules players use are in the *Data records* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and records.
+
+## The Discovery panel
+
+The GM view's **Discovery** panel runs discovery clocks and the Countdown they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every data record the characters in the GM view already hold for it. The **Failed roll** and **Push** buttons tick the track for how they were digging. When a clock fills, **Mint** gives the primary investigator the data record and everyone you tick as present a shared copy. **Record a finding without a clock** gives a data record for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick, and marks its price: the track or the Countdown that source costs. Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.
+
 # The GM's tools
 
 ## The battle map
@@ -104,7 +112,3 @@ The GM view of the character creator has a **battle map** for fights where it he
 The GM view also has an **Encounter** panel that runs a fight by the *Personal combat* rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit, offering a Resolve point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so.
 
 **The shared table.** The GM can start a shared table from the GM view and give the players its code; each player joins from their character's Play tab. While they're connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the Play tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Each player's character is shared with the GM too: it appears among the GM view's characters, marked at the table, and its injuries, points, ammunition and form stay in step both ways, whether they're changed on the sheet, on the GM's card or in an encounter. In a fight, each player's Play tab shows the GM's battle map and the encounter's turn order and latest results; a player drags their own token, and on their turn sends the GM what they'll do, which the GM puts into the Encounter panel and runs. The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.
-
-## The Discovery panel
-
-The GM view's **Discovery** panel runs discovery clocks and the Countdown they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every data record the characters in the GM view already hold for it. The **Failed roll** and **Push** buttons tick the track for how they were digging. When a clock fills, **Mint** gives the primary investigator the data record and everyone you tick as present a shared copy. Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.

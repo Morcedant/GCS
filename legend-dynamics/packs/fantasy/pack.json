@@ -1301,6 +1301,12 @@
    "Monster-Slayer",
    "+2 to Lore about a creature you face, and +1 to hit it once you know its weakness.",
    "Lore"
+  ],
+  [
+   "untold",
+   "Untold Tales",
+   "You start play with three tales, each a secret your role or your people taught you: something in no common book or lore. They grant no bonus: they let you act on what you know.",
+   "Lore"
   ]
  ],
  "complications": [
@@ -3346,6 +3352,13 @@
     ]
    },
    {
+    "title": "Tales",
+    "intro": "Running investigations and recording what the heroes learn. The rules players use are in the *Tales* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and tales.",
+    "take": [
+     "## The Discovery panel"
+    ]
+   },
+   {
     "title": "The GM's tools",
     "take": [
      "## The battle map",
@@ -3407,5 +3420,147 @@
    "25 yd",
    "Slow, but it carries a camp."
   ]
- ]
+ ],
+ "discovery": {
+  "card": "tale",
+  "cards": "tales",
+  "collection": "saga",
+  "subject": "a sorcerer, a demon, a cult or a thing from the Deep, and how it is beaten",
+  "uncover": "how it is beaten",
+  "phases": [
+   [
+    "Confront the unknown",
+    "Signs without a cause: a village emptied in a night, a priest found flayed, a star that wasn't there last year. You may suspect, but nothing is confirmed."
+   ],
+   [
+    "Identify",
+    "Name the power behind it. This is the gate: until its identity is confirmed, what you know about a kind of subject doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works."
+   ],
+   [
+    "Uncover",
+    "Learn how it is beaten. Filling this phase fills the clock and earns a tale for what you established."
+   ]
+  ],
+  "threat": {
+   "name": "Doom",
+   "track": "Doom",
+   "repeat": false,
+   "onFill": "the old power comes for you",
+   "text": "While you dig, the thing you hunt is learning your names. Doom ticks once for each scene spent investigating and once for each failed investigation roll, and a cleansing rite clears it as usual. When it fills, the old power comes for you."
+  },
+  "costs": [
+   [
+    "Infamy",
+    "drawing the watch and the rulers",
+    "open questions, trespass in temples and palaces, violence in the street"
+   ],
+   [
+    "Debt",
+    "buying help",
+    "a sage's fee, a bribe, an informant's silence"
+   ],
+   [
+    "Hunger",
+    "days lost to the search",
+    "weeks in the archives, wilderness trails, supplies spent on the hunt"
+   ]
+  ],
+  "methods": [
+   [
+    "Read the signs",
+    "Investigation, Healing",
+    "Shadow, Lore",
+    "Confront, Identify",
+    "A corpse, a ward-mark, a burned altar: what the thing left behind."
+   ],
+   [
+    "Track it",
+    "Tracking, Survival",
+    "Steel",
+    "Confront, Identify",
+    "Spoor, broken reeds, where the horses won't go."
+   ],
+   [
+    "Question witnesses",
+    "Read People, Persuasion",
+    "Steel, Shadow",
+    "Confront, Identify",
+    "Survivors, tavern talk, the slave who saw the rite."
+   ],
+   [
+    "Search the old texts",
+    "Lore",
+    "Lore",
+    "Identify, Uncover",
+    "Temple archives, clay tablets, a sorcerer's stolen book."
+   ],
+   [
+    "Read the sorcery",
+    "Sorcery",
+    "Lore",
+    "Identify, Uncover",
+    "Sense the working, read the sigils, question a bound spirit."
+   ],
+   [
+    "Steal it or lean on someone",
+    "Thievery, Deception, Persuasion",
+    "Shadow",
+    "Any",
+    "The priest who knows more than he says. Always ticks Infamy on a failure."
+   ]
+  ],
+  "groups": {
+   "steel": "witnesses and the trail",
+   "shadow": "what others would rather hide",
+   "lore": "natural identifiers: old texts and sorcery"
+  },
+  "origins": "A character's people can suit a method: an old blood that remembers, eyes that see in the dark. A **Sorcerer** or **Witch** can work a cantrip or ritual of seeing as a method.",
+  "scoped": true,
+  "chapter": "Tales",
+  "datePlaceholder": "In the story",
+  "routes": [
+   [
+    "investigation",
+    "A discovery clock",
+    "filled to the end of Uncover",
+    []
+   ],
+   [
+    "experience",
+    "Seen or tried firsthand",
+    "what you saw with your own eyes, or a careful trial",
+    [
+     "threat",
+     "Hunger"
+    ]
+   ],
+   [
+    "account",
+    "A trusted telling",
+    "an old priest's memory, a survivor's account, a sage's scroll, a temple's records. A teller's renown alone doesn't make it true, but a trusted telling can establish a fact without anyone repeating a deadly trial",
+    [
+     "Debt",
+     "Infamy"
+    ]
+   ],
+   [
+    "creature",
+    "A spirit's or demon's word, backed up",
+    "what a bound spirit, a demon or a sorcerer admits, supported by evidence",
+    [
+     "threat"
+    ]
+   ]
+  ],
+  "anyway": "A real weakness works whoever uses it, tale or no tale: if a thing from the Deep burns, it burns at anyone's torch. A rite against it still needs its ritual, the knowledge, the skill and the components.",
+  "basis": "legends the characters have heard, evidence, testimony, their own experience, or a suspicion they can explain",
+  "startCards": {
+   "adv": "untold",
+   "n": 3,
+   "label": "Untold Tales",
+   "secret": "isn't in common books or lore",
+   "note": "Each tale is a secret your role or your people taught you, agreed with the GM."
+  },
+  "clockExample": "Who flayed the priest of the river temple"
+ }
 }
