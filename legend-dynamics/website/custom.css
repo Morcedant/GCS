@@ -176,7 +176,7 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 
 /* Hero */
 .ld-hero { padding: clamp(2.5rem, 6vw, 5rem) 0 clamp(2rem, 4vw, 3.5rem); max-width: 54rem; }
-.ld-hero h1 { font-family: var(--ld-display); font-size: clamp(2.6rem, 7vw, 5rem); margin: 0 0 1rem; line-height: 1.02; }
+.ld-hero h1 { font-family: var(--ld-display); font-size: clamp(1.3rem, 3.5vw, 2.5rem); margin: 0 0 1rem; line-height: 1.1; }
 .ld-hero .ld-lede { font-size: clamp(1.1rem, 2.2vw, 1.35rem); color: var(--ld-ink-2); max-width: 40rem; margin: 0 0 1.8rem; }
 .ld-hero .ld-rule { width: 4.5rem; height: 3px; background: var(--ld-accent); border: 0; margin: 0 0 1.6rem; }
 
