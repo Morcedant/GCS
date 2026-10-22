@@ -57,6 +57,91 @@ A real weakness works whether or not anyone holds a record for it. Act on what y
 
 {{GEN:discovery-chapter}}
 
+## Skill and the unknown
+
+**What a skill covers, a record doesn't.** Skills cover categories of technology and ordinary knowledge: a trained engineer can work any reactor in known space, and a trained slicer any common system. A data record covers one specific anomalous, alien or unknown thing that no skill reaches. If a trained character could already do it, there's no record to earn.
+
+**A relevant skill gets you started.** A character trained in the skill that fits the subject (Engineering for an alien power core, Computers for a rogue intelligence, Navigation for a fold in space) can skip **Confront the unknown**: they recognize at once that it's something new. Identify and Uncover still have to be filled to earn the record.
+
+## Example data records
+
+Seven subjects the crew might investigate, each with what goes wrong on a failed roll or a success at a cost in each phase, what its record permits, and the skill that lets a character skip Confront. A failure is where the GM may start a Countdown, when the stakes are real.
+
+### Halvane lattice core
+
+A crystalline power system found on derelict Halvane haulers, the work of a people lost behind a collapsed corridor. Ordinary engineering can't read it.
+
+- **Confront the unknown:** get the core to respond. *On a failure:* it pulses and drains nearby power cells; suits and tools lose charge.
+- **Identify:** learn it feeds on the crew's own power signatures. *On a failure:* resonance builds; the GM may start a Countdown to critical.
+- **Uncover:** find the harmonic frequency that controls it. *On a failure:* a feedback surge injures whoever is linked to it.
+- **Permits:** waking, powering down or rerouting any Halvane lattice core. **Skill:** Engineering.
+
+### The Warden of the Ashkarr
+
+One damaged military intelligence, the Warden, still running aboard the derelict Hegemony warship *Ashkarr*. An AI Minder's training covers AIs in general; this record covers only the Warden's own command authority.
+
+- **Confront the unknown:** get it to acknowledge the crew. *On a failure:* it activates the ship's defenses; the GM may start a Countdown to full lockdown.
+- **Identify:** learn it is still executing a wartime directive and takes the crew for enemy boarders. *On a failure:* it vents a section or seals bulkheads, splitting the party.
+- **Uncover:** find its original command authority code (the captain's quarters, the black-box logs, a dead officer's implant). *On a failure:* it detects the tampering and purges the trail; another source must be found.
+- **Permits:** issuing orders the Warden obeys, or shutting it down cleanly without tripping its failsafes. **Skill:** Computers.
+
+### A corridor engine
+
+An ancient machine, inert until approached. Corridors are natural folds, and no one builds them; but where a fold already runs close, this machine forces open a mouth that no chart shows. Who made it, and why, is a question for another investigation.
+
+- **Confront the unknown:** detect that it's active, not wreckage. *On a failure:* a spatial pulse throws crew or objects a short distance.
+- **Identify:** learn it is still keyed to a far mouth, and something on the other side is listening. *On a failure:* the mouth half-opens; something comes through, or a signal goes out.
+- **Uncover:** decode its address glyphs and its sealing sequence. *On a failure:* it locks onto a random mouth; the GM may start a Countdown to an unstable opening.
+- **Permits:** opening its mouth to a known destination along the fold, or sealing it for good. **Skill:** Science.
+
+### Spatial fracture
+
+An unstable region where space folds on itself; the sensors return contradictory readings.
+
+- **Confront the unknown:** map the fracture's edge. *On a failure:* the ship clips it; mark Hull, or a system goes offline.
+- **Identify:** learn it shifts in a cycle tied to an outside rhythm (a pulsar, a nearby drive's signature). *On a failure:* time slips; the crew loses hours.
+- **Uncover:** plot the safe corridor that opens on each cycle. *On a failure:* the ship is caught mid-fold; the GM starts a Countdown to hull failure.
+- **Permits:** navigating this fracture, and fractures of its kind, safely. **Skill:** Navigation.
+
+### A living hull
+
+A living ship that treats intruders as an infection.
+
+- **Confront the unknown:** realize the ship is alive and aware. *On a failure:* tissue walls close passages or secrete irritants.
+- **Identify:** learn its immune response escalates with each disturbance, and in the end digests foreign matter. *On a failure:* antibody organisms attack; the GM may start a Countdown to its full immune response.
+- **Uncover:** find the chemical or bio-signature it accepts as self (from its dead crew, its nursery, its pilot cradle). *On a failure:* the wrong signature marks the crew as its first target.
+- **Permits:** moving through the ship unopposed, and coaxing its doors, systems or will to cooperate. **Skill:** Science or Medicine.
+
+### Corporate black-site encryption
+
+A proprietary security layer guarding a corporate facility or data vault.
+
+- **Confront the unknown:** recognize it as an adaptive, corporation-specific system, not standard encryption. *On a failure:* the attempt is logged; mark Heat.
+- **Identify:** learn it has a dead-man response: tampering calls corporate security or wipes the vault. *On a failure:* the GM may start a Countdown to the security response or the wipe.
+- **Uncover:** obtain a valid credential pattern (a defector, a stolen badge, a maintenance back door). *On a failure:* the credential is flagged, and its source is burned.
+- **Permits:** bypassing this corporation's black-site security, or forging credentials it accepts. **Skill:** Computers.
+
+### An alien weapon cache
+
+A stockpile of weapons built by a hostile species, perhaps still being used against the crew.
+
+- **Confront the unknown:** survive or witness the weapons in use. *On a failure:* one discharges, or is turned on the crew.
+- **Identify:** learn they're keyed to their makers' biology, or tuned to a frequency. *On a failure:* a weapon self-destructs or alerts its owners.
+- **Uncover:** find how they fail (a frequency that overloads them, a biometric spoof). *On a failure:* a booby trap goes off; if the cache is rigged to blow, the GM may start a Countdown.
+- **Permits:** disabling these weapons in a fight (a telling hit's break-gear effect works on them even in the makers' hands), or turning them against their makers. **Skill:** Engineering or Firearms.
+
+## Rival clocks
+
+A careful crew can investigate without ever starting a Countdown. To keep the pressure on, give the discovery a **rival**: an ordinary danger clock named for someone racing the crew to the same find. It ticks on delays, noisy methods and open digging. When it fills, the rival gets there first. No new rules are needed.
+
+| Rival | What they want |
+|---|---|
+| A Draelin cartographic guild | Corridor data, which they sell to both sides |
+| The Veyari archives | The discovery preserved, perhaps out of the crew's reach |
+| A corporation | Salvage and technology it can own and sell |
+| A Hegemony house | Imperial ruins and technology returned |
+| A syndicate | Anything it can fence |
+
 # A galaxy of obligations
 
 ## Humanity's first contact

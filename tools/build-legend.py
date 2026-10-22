@@ -251,7 +251,7 @@ def gen(name, pack, t):
             return ""
         th = d["threat"]
         return "\n".join(["## The Discovery panel", "",
-            f"The GM view's **Discovery** panel runs discovery clocks and the {th.get('track') or th['name']} they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every {d['card']} the characters in the GM view already hold for it. "
+            f"The GM view's **Discovery** panel runs discovery clocks and the {th.get('track') or th['name']} they race" + (f" (it stays idle until you **Start the {th['name']}** after a failed roll or a success at a cost)" if th.get("startsOnFailure") else "") + f". Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every {d['card']} the characters in the GM view already hold for it. "
             f"The **Failed roll** and **Push** buttons tick the track for how they were digging" + (f", and a failed roll ticks the {th.get('track') or th['name']} too" if th.get("repeat") or th.get("track") else "") + f". When a clock fills, **Mint** gives the primary investigator the {d['card']} and everyone you tick as present a shared copy. "
             + (f"**Record a finding without a clock** gives a {d['card']} for something established directly (seen or tested, a reliable account, a creature's word with evidence behind it) to whoever you tick, and marks its price: the track or the {th.get('track') or th['name']} that source costs. " if d.get("scoped") else "")
             + f"Save all to file afterwards, so the players' character files carry it. The Discord bot's `/discovery` and `/cards` commands do the same at a table that plays online.", ""])
@@ -498,7 +498,7 @@ def discovery_md(d, t, neutral=False):
     if d.get("kinds"):
         out += [f"**Two kinds of {cards}.** " + " ".join(f"**{k[0].capitalize()}:** {k[1]}." for k in d["kinds"]), ""]
     out += [(f"### Racing the {th['track']}" if th.get("track") else f"### The {th['name']}") if not neutral else "### The threat clock", "",
-            ("A discovery clock always races a threat: here, the " + th["track"] + " track. " if th.get("track") else "A discovery clock always races a threat clock. ") + th["text"], ""]
+            ("A discovery clock always races a threat: here, the " + th["track"] + " track. " if th.get("track") else "" if th.get("startsOnFailure") else "A discovery clock always races a threat clock. ") + th["text"], ""]
     if d.get("costs"):
         out += ["### What investigating costs", "",
                 "When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.", "",

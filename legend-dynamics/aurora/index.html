@@ -620,7 +620,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="b5be738" data-version-date="2026.10.22" title="The code changes whenever this page changes.">Version 2026.10.22 · b5be738</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="e003a2e" data-version-date="2026.10.22" title="The code changes whenever this page changes.">Version 2026.10.22 · e003a2e</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -8431,7 +8431,10 @@ return { mountLab };
   const threatName = () => DISC.threat.track || DISC.threat.name;
   const theThreat = () => (DISC.threat.track ? DISC.threat.track : "the " + DISC.threat.name); // a track needs no "the": "and Doom ticks"
   const costName = (c) => (c === "threat" ? threatName() : c) + " +1";
-  const costOpts = (route) => { const r = ROUTES.find((x) => x[0] === route), cs = (r && r[3]) || [];
+  // A source's prices; a Countdown that starts only on a failure (Fracture Lines) can't be a price until it's running.
+  const routeCosts = (route) => { const r = ROUTES.find((x) => x[0] === route);
+    return ((r && r[3]) || []).filter((c) => !(c === "threat" && DISC.threat.startsOnFailure && !(disc.threat && disc.threat.running))); };
+  const costOpts = (route) => { const cs = routeCosts(route);
     return cs.length ? `<option value="">What it cost…</option>` + cs.map((c) => `<option value="${esc(c)}">${esc(costName(c))}</option>`).join("") : `<option value="">No cost for this source</option>`; };
   const routeOpts = (sel) => `<option value="">How it was learned…</option>` + ROUTES.map((r) => `<option value="${esc(r[0])}"${r[0] === sel ? " selected" : ""}>${esc(r[1])}</option>`).join("");
   function cardLine(k) {
@@ -10369,6 +10372,7 @@ function mountTable(api) {
       if (t && n > 0 && was < t.boxes && (ship[T2.track] || 0) >= t.boxes) discSay(`${T2.track} is full: ${T2.onFill}.`);
       return;
     }
+    if (T2.startsOnFailure && !th.running) return; // a Countdown that waits for a failure to start (Fracture Lines) isn't running yet
     th.filled = Math.max(0, th.filled + n);
     let fired = 0;
     while (th.filled >= th.size) { fired++; if (T2.repeat) { th.filled -= th.size; th.count++; } else { th.filled = th.size; break; } }
@@ -10408,12 +10412,15 @@ function mountTable(api) {
         <div class="dsegs">${Array.from({ length: T2t.boxes }, (_, i) => `<span class="dseg ${i < v ? "on" : ""}"></span>`).join("")}</div>
         <span class="small">${v}/${T2t.boxes}: ${esc(shipEffect(T2.track, v))}</span>
         <div class="btn-row"><button class="btn" data-tick="1">A scene passes (+1)</button><button class="linkish" data-tick="-1">Undo</button></div>`;
-    } else
+    } else if (T2.startsOnFailure && !th.running)
+    $("disc-threat").innerHTML = `<b>${esc(T2.name)}: not running</b><span class="small muted">Routine discovery has no clock against it. When a failed roll or a success at a cost puts real stakes in play, start one: from then on it ticks with time, whatever the crew does. When it fills, ${esc(T2.onFill)}.</span>
+      <div class="btn-row"><select data-tsize style="width:auto" aria-label="${esc(T2.name)} size">${[4, 6, 8].map((n) => `<option value="${n}"${n === th.size ? " selected" : ""}>${n} segments</option>`).join("")}</select><button class="btn" data-tstart>Start the ${esc(T2.name)}</button></div>`;
+    else
     $("disc-threat").innerHTML = `<b>${esc(T2.name)}</b><span class="small muted">${T2.repeat ? `Ticks once a scene of investigating and once a failed investigation roll. When it fills, ${esc(T2.onFill)}, and it starts again.` : `A hard timer: it ticks with time, whatever the crew does. When it fills, ${esc(T2.onFill)}.`}</span>
       <div class="dsegs">${Array.from({ length: th.size }, (_, i) => `<button class="dseg ${i < th.filled ? "on" : ""}" data-tseg="${i + 1}" aria-label="${esc(T2.name)} segment ${i + 1}"></button>`).join("")}
         <select data-tsize style="width:auto" aria-label="${esc(T2.name)} size">${[4, 6, 8].map((n) => `<option value="${n}"${n === th.size ? " selected" : ""}>${n}</option>`).join("")}</select></div>
       ${T2.repeat ? `<span class="small">${esc(capFirst(T2.count || "times filled"))}: <b>${th.count}</b></span>` : th.filled >= th.size ? `<span class="small"><b>It has happened.</b></span>` : ""}
-      <div class="btn-row"><button class="btn" data-tick="1">${T2.repeat ? "A scene passes (+1)" : "Time passes (+1)"}</button><button class="linkish" data-tick="-1">Undo</button><button class="linkish" data-treset>Reset</button></div>`;
+      <div class="btn-row"><button class="btn" data-tick="1">${T2.repeat ? "A scene passes (+1)" : "Time passes (+1)"}</button><button class="linkish" data-tick="-1">Undo</button><button class="linkish" data-treset>${T2.startsOnFailure ? "Stop it" : "Reset"}</button></div>`;
     $("disc-costs").innerHTML = `<b>What investigating costs</b><span class="small muted">A failed investigation roll${T2.repeat || T2.track ? ` (which also ticks ${esc(theThreat())})` : ""} or a push ticks one track, chosen by how the ${esc(T.party || "party")} is digging.</span>`
       + (DISC.costs || []).map(([name, why]) => { const t = PACK.tracks.find((x) => x.name === name); const v = Math.min(t ? t.boxes : 4, ship[name] || 0);
         return `<div><b>${esc(name)}</b> <span class="small muted">${esc(why)} · ${v}/${t ? t.boxes : 4}: ${esc(shipEffect(name, v))}</span>
@@ -10428,7 +10435,7 @@ function mountTable(api) {
       return `<div class="dclock ${full ? "done" : ""}" data-kid="${k.id}"><b>${esc(k.name)}</b>
         <span class="small muted">${k.plain ? `Progress clock, ${k.filled}/${size}` : `${esc(phaseNow)} · ${k.filled}/${size}`}</span>
         <div class="dsegs">${segs}</div>
-        <div class="btn-row"><button class="btn" data-kadv="${k.id}" data-n="1">+1</button><button class="btn" data-kadv="${k.id}" data-n="2">+2 (by 5+)</button><button class="linkish" data-kadv="${k.id}" data-n="-1">Undo</button><button class="linkish danger" data-krm="${k.id}">Remove</button></div>
+        <div class="btn-row"><button class="btn" data-kadv="${k.id}" data-n="1">+1</button><button class="btn" data-kadv="${k.id}" data-n="2">+2 (by 5+)</button><button class="linkish" data-kadv="${k.id}" data-n="-1">Undo</button><button class="linkish danger" data-krm="${k.id}">Remove</button>${DISC.skillSkip && !k.plain && k.filled < k.phases[0] ? `<button class="linkish" data-kskip="${k.id}" title="${esc(DISC.skillSkip)}">A relevant skill: skip Confront</button>` : ""}</div>
         ${k.plain ? "" : `<div class="fields"><div class="field"><label for="dk-pi-${k.id}">Primary investigator</label><select id="dk-pi-${k.id}" data-kpi="${k.id}">${crewOpts(k.primary)}</select></div>
           <div class="field"><label for="dk-sub-${k.id}">Identified as</label><input type="text" id="dk-sub-${k.id}" data-ksub="${k.id}" value="${esc(k.subject || "")}" placeholder="${k.filled >= gate ? "Name it to pass the gate" : "Not until Identify is full"}"${k.filled < gate && !k.subject ? " disabled" : ""}></div></div>
           ${k.filled >= gate && !k.tag ? `<span class="small"><b>The gate:</b> confirm the identity above before the clock can go on. Until then, theories are suspicion only, and no ${esc(DISC.card)} applies.</span>` : ""}
@@ -10485,7 +10492,7 @@ function mountTable(api) {
       ...(DISC.scoped ? scopedRead("da-") : { knowledge: $("da-know").value.trim(), permits: $("da-perm").value.trim() }) };
     if (!base.knowledge) return discSay(`Say what they established: the ${DISC.card} records only that.`, true);
     // Information is never free: the source's price ticks a track or the threat.
-    const route = ROUTES.find((r) => r[0] === base.route), costs = (route && route[3]) || [], cost = $("da-cost") ? $("da-cost").value : "";
+    const route = ROUTES.find((r) => r[0] === base.route), costs = routeCosts(base.route), cost = $("da-cost") ? $("da-cost").value : "";
     if (ROUTES.length && !route) return discSay(`Say how they learned it: each source has its price.`, true);
     if (costs.length && !costs.includes(cost)) return discSay(`Choose what it cost them: ${costs.map(costName).join(" or ")}.`, true);
     if (cost) { base.cost = costName(cost); if (cost === "threat") tickThreat(1); else setTrack(cost, 1); }
@@ -10512,7 +10519,13 @@ function mountTable(api) {
     const kOf = (id) => disc.clocks.find((x) => x.id === id);
     if (b.dataset.tseg) { const i = +b.dataset.tseg; disc.threat.filled = disc.threat.filled === i ? i - 1 : i; discSave(); }
     else if (b.dataset.tick) tickThreat(+b.dataset.tick);
-    else if (b.dataset.treset !== undefined) { disc.threat = { ...disc.threat, filled: 0, count: 0 }; discSave(); }
+    else if (b.dataset.treset !== undefined || b.dataset.tstart !== undefined) {
+      const start = b.dataset.tstart !== undefined;
+      disc.threat = { ...disc.threat, filled: 0, count: 0, running: start }; discSave();
+      if ($("da-cost") && $("da-route")) $("da-cost").innerHTML = costOpts($("da-route").value); // the Countdown is a price only while it runs
+      if (start) discSay(`The ${DISC.threat.name} is running.`);
+    }
+    else if (b.dataset.kskip) { const k = kOf(b.dataset.kskip); if (k && k.filled < k.phases[0]) k.filled = k.phases[0]; discSave(); discSay("A relevant skill: Confront the unknown is done."); }
     else if (b.dataset.cost) { setTrack(b.dataset.cost, 1); const both = b.dataset.fail && (DISC.threat.repeat || DISC.threat.track); if (both) tickThreat(1); discSay(`${b.dataset.cost} +1${both ? `, and ${theThreat()} ticks` : ""}.`); }
     else if (b.dataset.kseg) { const k = kOf(b.dataset.kseg), i = +b.dataset.i; if (k) advance(k, (k.filled === i ? i - 1 : i) - k.filled); discSave(); }
     else if (b.dataset.kadv) { const k = kOf(b.dataset.kadv); if (k) { const before = k.filled; advance(k, +b.dataset.n); if (+b.dataset.n > 0 && k.filled === before && !k.tag && !k.plain) discSay("The clock is at the gate: confirm the identity first.", true); } discSave(); }

@@ -678,7 +678,7 @@ A character who takes the **Classified Archive** advantage starts play with thre
 
 ### The Countdown
 
-A discovery clock always races a threat clock. The threat is often the situation itself: failing life support, a collapsing corridor, a reactor going critical, a first-contact window closing. A Countdown is a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.
+The threat is often the situation itself: failing life support, a collapsing corridor, a reactor going critical, a first-contact window closing. Routine discovery runs without one. When a failed investigation roll or a success at a cost puts real stakes in play, the GM may start a **Countdown** of 4, 6 or 8 segments. From then on it's a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.
 
 ### What investigating costs
 
@@ -705,6 +705,12 @@ Which methods suit a character depends on their role, species and skills. The GM
 
 - **Ship Crew:** sensors and systems; **Frontier:** science, survey and the unknown itself; **Service:** people and customs; **Commerce:** what can be bought or traded; **Trouble:** what others would rather keep hidden.
 - A character's species can suit a method: senses, memory, psionics or a people's own history with the subject. A species that touches minds can advance a phase with Psionics, at the GM's call.
+
+## Skill and the unknown
+
+**What a skill covers, a record doesn't.** Skills cover categories of technology and ordinary knowledge: a trained engineer can work any reactor in known space, and a trained slicer any common system. A data record covers one specific anomalous, alien or unknown thing that no skill reaches. If a trained character could already do it, there's no record to earn.
+
+**A relevant skill gets you started.** A character trained in the skill that fits the subject (Engineering for an alien power core, Computers for a rogue intelligence, Navigation for a fold in space) can skip **Confront the unknown**: they recognize at once that it's something new. Identify and Uncover still have to be filled to earn the record.
 
 # A galaxy of obligations
 
