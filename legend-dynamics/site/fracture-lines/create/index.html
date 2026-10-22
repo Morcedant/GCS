@@ -44,6 +44,9 @@ b, strong { font-weight: 600; }
 .hud::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; border-bottom-right-radius: var(--radius); }
 
 /* Header */
+.site-back { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 4px 10px; font: .78rem var(--mono); letter-spacing: .08em; }
+.site-back a { color: var(--chrome); text-decoration: none; }
+.site-back a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .masthead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; padding: 20px 22px; }
 .masthead .id { display: flex; gap: 18px; align-items: center; min-width: 0; }
 .masthead .who { display: grid; gap: 6px; min-width: 0; }
@@ -602,6 +605,7 @@ tr.lvl-U td.target { color: var(--muted); }
   </linearGradient></defs></svg>
 <canvas id="embers" aria-hidden="true"></canvas>
 <div class="wrap" id="app" data-div="law">
+  <nav class="site-back no-print" aria-label="Site"><a href="/">← Legend Dynamics home</a><a href="/fracture-lines">Fracture Lines</a></nav>
   <header class="masthead hud">
     <div class="id">
       <img class="avatar" id="hdr-portrait" alt="" hidden>
@@ -620,7 +624,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="c678ac2" data-version-date="2026.10.22" title="The code changes whenever this page changes.">Version 2026.10.22 · c678ac2</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="89422ce" data-version-date="2026.10.22" title="The code changes whenever this page changes.">Version 2026.10.22 · 89422ce</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -8525,7 +8529,10 @@ return { mountLab };
   const threatName = () => DISC.threat.track || DISC.threat.name;
   const theThreat = () => (DISC.threat.track ? DISC.threat.track : "the " + DISC.threat.name); // a track needs no "the": "and Doom ticks"
   const costName = (c) => (c === "threat" ? threatName() : c) + " +1";
-  const costOpts = (route) => { const r = ROUTES.find((x) => x[0] === route), cs = (r && r[3]) || [];
+  // A source's prices; a Countdown that starts only on a failure (Fracture Lines) can't be a price until it's running.
+  const routeCosts = (route) => { const r = ROUTES.find((x) => x[0] === route);
+    return ((r && r[3]) || []).filter((c) => !(c === "threat" && DISC.threat.startsOnFailure && !(disc.threat && disc.threat.running))); };
+  const costOpts = (route) => { const cs = routeCosts(route);
     return cs.length ? `<option value="">What it cost…</option>` + cs.map((c) => `<option value="${esc(c)}">${esc(costName(c))}</option>`).join("") : `<option value="">No cost for this source</option>`; };
   const routeOpts = (sel) => `<option value="">How it was learned…</option>` + ROUTES.map((r) => `<option value="${esc(r[0])}"${r[0] === sel ? " selected" : ""}>${esc(r[1])}</option>`).join("");
   function cardLine(k) {
@@ -10583,7 +10590,7 @@ function mountTable(api) {
       ...(DISC.scoped ? scopedRead("da-") : { knowledge: $("da-know").value.trim(), permits: $("da-perm").value.trim() }) };
     if (!base.knowledge) return discSay(`Say what they established: the ${DISC.card} records only that.`, true);
     // Information is never free: the source's price ticks a track or the threat.
-    const route = ROUTES.find((r) => r[0] === base.route), costs = (route && route[3]) || [], cost = $("da-cost") ? $("da-cost").value : "";
+    const route = ROUTES.find((r) => r[0] === base.route), costs = routeCosts(base.route), cost = $("da-cost") ? $("da-cost").value : "";
     if (ROUTES.length && !route) return discSay(`Say how they learned it: each source has its price.`, true);
     if (costs.length && !costs.includes(cost)) return discSay(`Choose what it cost them: ${costs.map(costName).join(" or ")}.`, true);
     if (cost) { base.cost = costName(cost); if (cost === "threat") tickThreat(1); else setTrack(cost, 1); }
@@ -10610,8 +10617,12 @@ function mountTable(api) {
     const kOf = (id) => disc.clocks.find((x) => x.id === id);
     if (b.dataset.tseg) { const i = +b.dataset.tseg; disc.threat.filled = disc.threat.filled === i ? i - 1 : i; discSave(); }
     else if (b.dataset.tick) tickThreat(+b.dataset.tick);
-    else if (b.dataset.treset !== undefined) { disc.threat = { ...disc.threat, filled: 0, count: 0, running: false }; discSave(); }
-    else if (b.dataset.tstart !== undefined) { disc.threat = { ...disc.threat, filled: 0, running: true }; discSave(); discSay(`The ${DISC.threat.name} is running.`); }
+    else if (b.dataset.treset !== undefined || b.dataset.tstart !== undefined) {
+      const start = b.dataset.tstart !== undefined;
+      disc.threat = { ...disc.threat, filled: 0, count: 0, running: start }; discSave();
+      if ($("da-cost") && $("da-route")) $("da-cost").innerHTML = costOpts($("da-route").value); // the Countdown is a price only while it runs
+      if (start) discSay(`The ${DISC.threat.name} is running.`);
+    }
     else if (b.dataset.kskip) { const k = kOf(b.dataset.kskip); if (k && k.filled < k.phases[0]) k.filled = k.phases[0]; discSave(); discSay("A relevant skill: Confront the unknown is done."); }
     else if (b.dataset.cost) { setTrack(b.dataset.cost, 1); const both = b.dataset.fail && (DISC.threat.repeat || DISC.threat.track); if (both) tickThreat(1); discSay(`${b.dataset.cost} +1${both ? `, and ${theThreat()} ticks` : ""}.`); }
     else if (b.dataset.kseg) { const k = kOf(b.dataset.kseg), i = +b.dataset.i; if (k) advance(k, (k.filled === i ? i - 1 : i) - k.filled); discSave(); }

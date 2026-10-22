@@ -40,6 +40,9 @@ b, strong { font-weight: 600; }
 .hud::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; border-bottom-right-radius: var(--radius); }
 
 /* Header */
+.site-back { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 4px 10px; font: .78rem var(--mono); letter-spacing: .08em; }
+.site-back a { color: var(--chrome); text-decoration: none; }
+.site-back a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .masthead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; padding: 20px 22px; }
 .masthead .id { display: flex; gap: 18px; align-items: center; min-width: 0; }
 .masthead .who { display: grid; gap: 6px; min-width: 0; }
@@ -598,6 +601,7 @@ tr.lvl-U td.target { color: var(--muted); }
   </linearGradient></defs></svg>
 <canvas id="embers" aria-hidden="true"></canvas>
 <div class="wrap" id="app" data-div="law">
+  <!-- SITE-NAV: the website copy puts its links back to the site here (tools/build-site.py) -->
   <header class="masthead hud">
     <div class="id">
       <img class="avatar" id="hdr-portrait" alt="" hidden>
