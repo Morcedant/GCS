@@ -82,6 +82,45 @@ The ships the Pelion meets most, built on the registry's classes. The GM keeps t
 | Orion raider | Escort | 13 / 11 | 6 | 2 | 3 | Disruptors, tractor beam | **Fast.** Runs once its Shields are down. |
 | Gorn cruiser | Cruiser | 10 / 13 | 3 | 4 | 4 | Disruptors, photon torpedoes | **Ablative armor** (2). |
 
+# Library records
+
+The rules for library records are in the Players' Guide (*Library records*). This chapter is about making them.
+
+## Making a library record
+
+A library record holds **one finding**, never a subject's whole story. Write it in the crew's words, from what they actually did:
+
+- **What they established.** One sentence: "It answers only in prime-number sequences", not everything the GM knows about the machine-mind.
+- **Limits.** What it doesn't tell them: "Seen once; not what it wants." Limits keep a record honest and leave room for the next discovery.
+- **Evidence or source.** What they scanned, tested, read or were told, and by whom.
+- **How it was learned, and what it cost.** A discovery clock, or one of the direct routes with its price.
+- **What it permits (optional).** What the finding lets them attempt that they couldn't before: hailing it in a way it answers, shutting it down cleanly, crossing a rift safely. Permission only, never a bonus.
+
+**Keep the truth separate.** Decide what's really true of a subject before play, and let the crew find it piece by piece. A record can be wrong if its evidence was thin; reality wins at the table, and the next record corrects the last.
+
+**Restricted Files.** Approve each starting secret before play. A good one is specific, belongs to the character's department or species, and wouldn't be in Starfleet's open files: what a Vulcan elder taught about a forbidden discipline, what an engineer saw in a classified refit. Turn down anything that would solve a mission you have planned, or ask the player to narrow it.
+
+## Choosing the cost
+
+Information is never free. Choose the price from how the crew went about it:
+
+- **Starfleet Command +1** for anything that draws Command's eye: contact the Prime Directive frowns on, a risky deal with a power, orders bent to get the answer.
+- **A Duty point** when the owner pushes themselves: a sleepless night in the lab, a personal favor called in.
+- **A ship's system** when the ship carries the strain: Sensors pushed past their limits, a transporter used on something unknown, Communications held open to a hostile signal.
+- **A danger clock or the Countdown** when it takes time the crew doesn't have.
+
+Don't start a Countdown for routine discovery. Start one when a failed roll or a success at a cost puts something real at stake, and show it to the players.
+
+## Example subjects
+
+| Subject | What a record might establish | What it might permit |
+|---|---|---|
+| The machine-mind of a dead colony | It still follows its last order, and treats the crew as the threat that order named | Issuing orders it will accept, or shutting it down without tripping its failsafes |
+| A silicon-based lifeform in the mines | It tunnels with acid, and it is guarding something, not attacking | Talking to it through a mind-meld or a modified translator; moving its young to safety |
+| A rift that opens with a pulsar's beat | It folds space in a cycle tied to the pulsar | Plotting a safe course through it on each cycle |
+| A derelict of unknown origin | Its systems wake to a power signature like a starship's | Waking or powering it down on the crew's terms |
+| A Klingon house's intentions | The house wants the colony's dilithium, not a war | Opening talks the house will listen to |
+
 # The GM's tools
 
 ## The battle map
@@ -97,6 +136,10 @@ The GM view of the creator has a **battle map** for fights where it helps to see
 **Tokens.** The GM places the crew with one button. Their tokens stay linked to the officers in the GM view: marking Injury, Dying, Stunned or a Duty point on a token marks it on the officer, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.
 
 **Keeping a map.** The map stays in the GM's browser. **Save map to file** keeps every map, its picture and tokens in one file, to prepare a fight ahead of time or share it with another GM.
+
+## The Discovery panel
+
+The GM view's **Discovery: library records** panel runs discovery clocks. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), mark segments as the crew succeeds, name the subject at the gate, and choose the primary investigator. When the clock fills, write what they established and **mint** it: the primary investigator owns the record and everyone present gets a shared copy. **Record a finding without a clock** does the same for a direct finding, and marks the cost you choose. The **Countdown** stays idle until you start it after a failed roll or a success at a cost. Save the crew's files afterwards so the players get their records.
 
 ## The Encounter panel
 

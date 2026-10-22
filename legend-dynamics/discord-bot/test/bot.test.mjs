@@ -213,13 +213,18 @@ test("/seed rolls one entry from each of the game's tables, without storage", as
 test("USS Pelion and Grimm are games too, and their old storage bindings still work", async () => {
   const { PACKS } = await import("../src/worker.js");
   assert.equal(PACKS.pelion.point, "Duty"); assert.equal(PACKS.grimm.point, "Grit");
-  assert.equal(PACKS.pelion.tracks.length, 8); assert.equal(Object.keys(PACKS.grimm.seeds).length, 6);
+  assert.equal(PACKS.pelion.tracks.length, 9); assert.equal(Object.keys(PACKS.grimm.seeds).length, 6);
+  // Pelion's library records: the Starfleet Command track, and a Countdown that only ticks when the GM says so.
+  assert.equal(PACKS.pelion.discovery.card, "library record"); assert.equal(PACKS.pelion.discovery.threat.repeat, false);
+  assert.ok(PACKS.pelion.tracks.some((t) => t.name === "Starfleet Command" && t.boxes === 4));
   assert.equal(PACKS.grimm.seeds.mission[0], "Case");
 
   // A Pelion Worker's DUTY binding: storage works and the server starts on USS Pelion.
   const pel = { ...env, DUTY: new MemoryKV() };
   assert.match((await signedCall(pel, sub("game", "show"))).content, /USS Pelion.*Duty points.*Shields, Hull/);
   assert.match((await signedCall(pel, sub("points", "show"))).content, /2 Duty points/);
+  const fail = (await signedCall(pel, sub("discovery", "fail", [{ name: "track", value: "Starfleet Command" }]))).content;
+  assert.match(fail, /Failed investigation roll: .*Starfleet Command/); assert.doesNotMatch(fail, /Countdown/);
   assert.match((await signedCall(pel, sub("track", "mark", [{ name: "name", value: "life" }]))).content, /\*\*Life support\*\* ■□□ 1\/3: Damaged: −2/);
   const roll = await signedCall(pel, { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name: "roll", options: [{ name: "target", value: 16 }] } });
   assert.equal(roll.components[0].components[0].label, "Spend a Duty point to reroll");

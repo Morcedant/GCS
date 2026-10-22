@@ -28,6 +28,7 @@ This revision keeps every rule from the original guide and adds these campaign r
 - **Gritty combat**, an optional rule for grievous wounds.
 - **Move and reach:** how far you move in a turn, how injury and hard going slow you, and how far a weapon in hand reaches.
 - **A battle map** in the GM view, for away teams and ship fights.
+- **Library records:** what the crew has established about the unknown, one finding at a time, and what that information costs.
 
 ## Guide scope
 
@@ -304,6 +305,67 @@ Clocks are how a failed roll changes the situation without stopping the story. R
 ## Investigation and social scenes
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. Diplomacy can secure cooperation or concessions, while Psychology offers insight into behavior. A successful roll does not force someone to abandon a core belief or provide information they do not possess.
+
+# Library records
+
+What your character knows about the unknown, and how they came to know it: an alien species, a lifeform, a piece of technology, a phenomenon, or what a power intends.
+
+## Rumor, truth and records
+
+- **What people say.** Rumor on a starbase, an old survey report, a story from another ship's crew. Some of it is right, some half right, some wrong. It's where an investigation starts.
+- **The truth.** What the thing really is and what really stops it or makes it work. The GM knows it; the crew finds it out.
+- **Library records.** What your character has established for themselves, one finding at a time, filed in their **library file**: what they found, how far it goes, how they know it, what it cost, and the stardate.
+
+A library record grants **no bonus** to any roll. It records what you established and what it lets you attempt. Whatever is actually true works whether or not anyone holds a record for it: a frequency that disrupts a lifeform disrupts it for whoever finds it. Operating unfamiliar technology, or dealing with a people by their own customs, still needs the right procedure, the knowledge and the skill.
+
+## Discovery clocks
+
+When a mission turns on something unknown, the GM starts a **discovery clock** in three phases:
+
+1. **Confront the unknown.** Effects without a cause: a signal no one can read, a dead world with power readings, a crew that won't answer. You may suspect, but nothing is confirmed.
+2. **Identify.** Name it: the species, the lifeform, the technology, the phenomenon, the power's aim. This is **the gate**. Until it's confirmed, what you know about a kind of thing doesn't yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works.
+3. **Uncover.** Learn how it is stopped, or how it is used. Filling this phase fills the clock.
+
+Each successful investigation roll fills one segment, two on a success by 5 or more. The GM sets the segments per phase (2, 2, 2 is usual; 1, 2, 2 for something quick; 2, 3, 3 for something substantial). The crew member who led the investigation is the **primary investigator**. When the clock fills, they own the library record, and everyone present gets a **shared copy**.
+
+A library record never confirms its own subject: holding one about a kind of thing doesn't prove that the thing in front of you is that kind. Only the Identify phase does.
+
+## The Countdown
+
+Routine discovery has no clock racing it. When a failed investigation roll, or a success at a cost, puts real stakes in play (a reactor going critical, a first-contact window closing, a ship hunting you), the GM may start a **Countdown** of 4, 6 or 8 segments. From then on it's a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. When it fills, the situation hits. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.
+
+## Learning without a clock
+
+A library record can also come directly, without a clock:
+
+- **Scanned or tested firsthand:** your own tricorder readings and samples, or a careful field test.
+- **A reliable record:** Starfleet's library computer, another ship's logs, a species' own historians. A source's reputation alone doesn't make it right, but a reliable record can establish a fact without anyone repeating a dangerous test.
+- **Its own word, backed up:** what an alien, a computer or a being tells you, supported by evidence.
+
+**Information is never free.** Each direct finding costs the crew one of these, chosen by the GM from how they went about it:
+
+- **Starfleet Command's attention:** one box on the Starfleet Command track (below).
+- **A Duty point,** spent by the record's owner.
+- **Strain on the ship:** one box on a ship's system (Sensors pushed past their limits, a transporter used on something unknown).
+- **Time:** one segment on a danger clock that's running, or on the Countdown.
+
+A failed investigation roll or a success at a cost can carry the same price, or start the Countdown.
+
+## The Starfleet Command track
+
+How much attention the crew is drawing from Starfleet Command: questions about the Prime Directive, risky contacts, orders bent. It sits on the USS Pelion's status card. A starbase repairs the ship, but not Command's opinion of the crew; boxes clear only when the GM says the matter is settled.
+
+| Boxes | Effect |
+|---|---|
+| 0 | Command isn't asking. |
+| 1 | Questions in the next report. |
+| 2 | A formal inquiry: an admiral wants a full account. |
+| 3 | Orders to stand down: −2 to Diplomacy and Leadership with Starfleet officials. |
+| 4 | A board of inquiry: start a Hearing clock. |
+
+## Starting records: Restricted Files
+
+The **Restricted Files** advantage gives you **three library records** at the start. Each is a secret that comes from your **department** (something you were trained in or saw on duty) or your **species** (something your people know), and that **isn't in Starfleet's open databases or published reports**. Write each one in the creator: its subject, the secret, and why it isn't common knowledge. The GM approves each one. The records come with the advantage and go if you change it.
 
 # Personal combat
 
@@ -797,6 +859,7 @@ Choose one advantage at character creation: a general advantage from this chapte
 | Careful Marksman | +2 to Phasers when you aim (with Aim's +1, +3 in all) at the same visible target without attacking or moving. The bonus applies to one shot; losing sight of the target cancels it. A called shot is 1 easier for you. |
 | Additional Defense | A second defense each round at −2 (Dodge, Parry or Block, in any mix), on top of attack-quality and injury penalties. Never twice against the same attack. No +2 to rolls. |
 | Hard to put down | Once per fight, shrug off a telling hit's effect. You still take its boxes. No +2 to rolls. |
+| Restricted Files | Three library records to start, each a secret from your department or your species that isn't in Starfleet's open databases or published reports (see *Library records*). No +2 to rolls. |
 
 # Species advantages
 
@@ -1016,6 +1079,8 @@ Will protects your resolve; Presence influences others. Leadership and Diplomacy
 **Near misses:** fail by 1–2 and the GM may offer success at a cost; never on a natural 17–18.
 
 **Clocks:** 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).
+
+**Library records:** no bonus; they record what you established and what it permits. Discovery clocks in three phases (Confront the unknown, Identify, Uncover); identity confirmed at the gate. Direct findings cost Starfleet Command +1, a Duty point, a ship system box or a danger clock segment. The Countdown starts only on a failed roll or a success at a cost.
 
 **Phaser power:** Type 1 holds 8, Type 2 16, rifle 30. Stun 1, heat/cut 1, kill 2, wide-beam stun 3, disintegrate 4. Spare cell refills; overload needs 4+.
 

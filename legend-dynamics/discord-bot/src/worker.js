@@ -1303,8 +1303,41 @@ export const PACKS = {
      "Crippled: −4, basic function only",
      "Offline"
     ]
+   },
+   {
+    "name": "Starfleet Command",
+    "boxes": 4,
+    "effects": [
+     "Command isn't asking",
+     "Questions in the next report",
+     "A formal inquiry: an admiral wants a full account",
+     "Orders to stand down: −2 to Diplomacy and Leadership with Starfleet officials",
+     "A board of inquiry: start a Hearing clock"
+    ]
    }
   ],
+  "discovery": {
+   "card": "library record",
+   "cards": "library records",
+   "collection": "library file",
+   "phases": [
+    "Confront the unknown",
+    "Identify",
+    "Uncover"
+   ],
+   "threat": {
+    "name": "Countdown",
+    "repeat": false,
+    "onFill": "the situation hits"
+   },
+   "costs": [
+    "Starfleet Command",
+    "Sensors",
+    "Communications",
+    "Transporters"
+   ],
+   "example": "The Theta Kiri machine-mind"
+  },
   "seeds": {
    "mission": [
     "Mission",
