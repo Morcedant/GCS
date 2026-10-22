@@ -1706,11 +1706,6 @@
    "Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre. Close range (thrown)."
   ],
   [
-   "silver",
-   "Silver bullets",
-   "One reload of silver rounds. Silver marks an extra box on werewolves and similar creatures, and ignores their toughness."
-  ],
-  [
    "holywater",
    "Holy water",
    "Three flasks. Thrown or splashed, it burns undead and demons (1 box) and breaks minor hexes. Close range (thrown)."
@@ -3157,9 +3152,10 @@
      "except": [
       "silver",
       "iron",
+      "salt",
       "fire"
      ],
-     "label": "Life-drinker (only silver, cold iron or fire hurts it)"
+     "label": "Life-drinker (only silver, cold iron, salt or fire hurts it)"
     }
    ]
   },
@@ -3875,6 +3871,14 @@
   [
    "fire",
    "Fire (a torch, burning oil)"
+  ],
+  [
+   "salt",
+   "Rock salt"
+  ],
+  [
+   "blessed",
+   "Blessed (holy water, blessed rounds)"
   ]
  ],
  "mounts": [
@@ -3896,5 +3900,57 @@
    "25 yd",
    "In a chase, it runs on the stagecoach track."
   ]
- ]
+ ],
+ "loads": {
+  "uses": 3,
+  "items": [
+   [
+    "silver",
+    "Silver rounds",
+    null,
+    "silver",
+    "Werewolves: an extra box, and Relentless doesn't stop it. Wraiths. A hit silences a banshee for the scene.",
+    "Cast from silver by a gunsmith or anyone with Tinkering. Buying silver is ordinary trade; it marks Whispers only if folks learn what it's for (a smith asked to cast bullets, rounds seen in your gun). Taking church silver marks Heat."
+   ],
+   [
+    "salt",
+    "Rock salt shells",
+    [
+     "shotgun"
+    ],
+    "salt",
+    "Wraiths and the restless dead: a hit hurts a wraith. Against the living it stings (1 box at most).",
+    "Packed by hand from a sack of salt. No cost."
+   ],
+   [
+    "iron",
+    "Cold iron shot",
+    [
+     "shotgun",
+     "derringer"
+    ],
+    "iron",
+    "Wraiths, and whatever else cold iron hurts.",
+    "Hammered from cold iron by a smith, or with Tinkering. No cost, but it takes a day."
+   ],
+   [
+    "blessed",
+    "Blessed rounds",
+    null,
+    "blessed",
+    "Undead and demons: a hit also burns (1 box), like holy water. It never banishes a true demon.",
+    "Blessed by a priest or preacher who believes you, which marks Whispers, or with an Occult working."
+   ],
+   [
+    "fire",
+    "Incendiary shells",
+    [
+     "shotgun"
+    ],
+    "fire",
+    "Wendigos (fire marks more than 1 box and stops the healing), zombies, ghouls.",
+    "Mixed with phosphorus by someone with Tinkering. Buying the makings marks Heat."
+   ]
+  ]
+ }
 }

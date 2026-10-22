@@ -263,7 +263,6 @@ When a roll qualifies for both the fine item and an advantage, take +2 once.
 | Field glasses | See detail at a distance. Spotting something far off without them is very difficult (−4) or impossible. |
 | Law books and blank warrants | Needed to draw up papers, check a statute or argue a point of law away from a courthouse. |
 | Dynamite | Three sticks. Throw with Athletics; the fuse burns for a round. 1 box nearby, 3 and Dying at the centre. Close range (thrown). |
-| Silver bullets | One reload of silver rounds. Silver marks an extra box on werewolves and similar creatures, and ignores their toughness. |
 | Holy water | Three flasks. Thrown or splashed, it burns undead and demons (1 box) and breaks minor hexes. Close range (thrown). |
 | Stakes and mallet | A wooden stake through a helpless vampire's heart incapacitates it. |
 | Ritual kit | Chalk, candles, herbs, bones and old books. Needed for rituals away from a prepared place. |
@@ -528,6 +527,23 @@ To take someone down without killing them, use fists, a club, a grapple, or a la
 - **Every shot spends rounds, hit or miss.** A Grit reroll repeats the same shot and costs nothing extra.
 - **Empty means it won't work.** Reload (one action): refills it from a spare. Restock in town: refills it fully between jobs. Packing a spare is a good use of a Grit point's small preparation.
 - **Jams.** A natural 18 with this weapon also jams it: clearing it takes an action.
+
+## Special loads
+
+A **special load** is ammunition made of something a creature fears: silver, salt, cold iron, a blessing, fire. It's tracked loosely, as **3 uses a job** for each load you carry, not counted bullets: a use is one fight or scene of shooting it. They're restocked between jobs. Choose the loads you carry in the creator, beside your gear.
+
+| Load | Fits | What it answers | Coming by it |
+|---|---|---|---|
+| Silver rounds | Any gun | Werewolves: an extra box, and Relentless doesn't stop it. Wraiths. A hit silences a banshee for the scene. | Cast from silver by a gunsmith or anyone with Tinkering. Buying silver is ordinary trade; it marks Whispers only if folks learn what it's for (a smith asked to cast bullets, rounds seen in your gun). Taking church silver marks Heat. |
+| Rock salt shells | Double-barrel shotgun only | Wraiths and the restless dead: a hit hurts a wraith. Against the living it stings (1 box at most). | Packed by hand from a sack of salt. No cost. |
+| Cold iron shot | Double-barrel shotgun or Derringer only | Wraiths, and whatever else cold iron hurts. | Hammered from cold iron by a smith, or with Tinkering. No cost, but it takes a day. |
+| Blessed rounds | Any gun | Undead and demons: a hit also burns (1 box), like holy water. It never banishes a true demon. | Blessed by a priest or preacher who believes you, which marks Whispers, or with an Occult working. |
+| Incendiary shells | Double-barrel shotgun only | Wendigos (fire marks more than 1 box and stops the healing), zombies, ghouls. | Mixed with phosphorus by someone with Tinkering. Buying the makings marks Heat. |
+
+- **No bonus on its own.** A load is ordinary ammunition with one difference: what it's made of. Against a creature whose weakness it is, that weakness works, whoever fires it and whether or not they know why (see *Weaknesses*). Against anything else it's just a bullet.
+- **A hunter's shot.** When you, or someone assisting you, hold a lore card for the creature and you fire the load its weakness calls for, you can make a **hunter's shot**: the called shot or effect the card permits, one that would otherwise be impossible against it (silver at a werewolf's heart). Card and load together: the card alone gives the knowledge, the load alone the material. It's still a roll, with a called shot's usual penalty, and it adds no bonus.
+- **Not proof.** A lore card never confirms its own creature: a hunter's shot needs the creature identified first (the Identify phase), as every card does.
+- **Getting them can cost.** Buying silver is ordinary trade, but if folks learn what it's for (a smith asked to cast bullets, rounds seen in your gun) word gets around (Whispers); taking church silver or buying the makings for fire draws the law (Heat). A character with Tinkering can cast silver, hammer cold iron or mix incendiaries; a preacher, or an Occult working, blesses rounds.
 
 # Medical care
 

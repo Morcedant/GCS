@@ -169,7 +169,7 @@ export function mountLab(api) {
     }
     return out;
   }
-  const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"] });
+  const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"], salt: ["salt"], blessed: ["blessed", "holy water"] });
   // The battle map's distance between attacker and target, checked against the weapon: a weapon in hand's reach
   // and the attacker's Move (as injury leaves it), or a ranged weapon's band, which it sets. Only a note: the GM rules.
   function reachCheck(/** @type {any} */ a, /** @type {any} */ d, /** @type {any} */ w) {

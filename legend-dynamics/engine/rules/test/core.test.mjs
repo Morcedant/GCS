@@ -126,3 +126,16 @@ test("stun weapons, Defense Classes and always-on armor", () => {
   assert.deepEqual(hitBy(novice).damage, hitBy(hunter).damage, "lore cards don't change a weakness");
   assert.equal(hitBy(novice).weakness, "Silver");
 });
+
+test("special loads: each Trails load's material is one the fight panel knows, and rock salt hurts the setting's wraith", async () => {
+  const { readFileSync } = await import("node:fs");
+  const pack = JSON.parse(readFileSync(new URL("../../../packs/western/pack.json", import.meta.url), "utf8"));
+  const mats = pack.materials.map((m) => m[0]);
+  for (const l of pack.loads.items) assert.ok(mats.includes(l[3]), `${l[1]}: material ${l[3]}`);
+  const roll = (/** @type {string} */ k) => (k === "attack" ? [1, 1, 1] : [6, 6, 6]);
+  const wraith = pack.threats.find((t) => t.id === "wraith").traits;
+  const shot = (/** @type {string[]} */ materials) => LD.resolveAttack({ attacker: { id: "a", skillTarget: 12, injury: 0 },
+    defender: { id: "d", canDodge: true, dodgeBase: 9, injury: 0, traits: wraith }, weapon: { id: "shotgun", band: "close", firearm: true, damage: { any: { boxes: 2 } }, materials }, band: "close" }, LD.NO_HOOKS, roll);
+  assert.equal(shot([]).damage, null, "an ordinary shell does nothing to a wraith");
+  assert.equal(shot(["salt"]).damage.boxes, 2, "rock salt hurts it");
+});
