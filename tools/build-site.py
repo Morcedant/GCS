@@ -149,7 +149,10 @@ def main():
         links = [(f"{SLUGS[g]}/{guide.name}", f"{t['title']} Players' Guide (Word)")] + ([(f"{SLUGS[g]}/{gm.name}", f"{t['title']} GM's Guide (Word)")] if gm else [])
         for d in [guide] + ([gm] if gm else []):
             copy(d, f"{slug}/{d.name}")
-        copy(LD / g / "index.html", f"{slug}/create/index.html")
+        # The creator, with links back to the site above its header (the published creator has none).
+        nav = (f'<nav class="site-back no-print" aria-label="Site"><a href="/">← Legend Dynamics home</a>'
+               f'<a href="{SLUGS[g]}">{e(t["title"])}</a></nav>')
+        write(f"{slug}/create/index.html", re.sub(r"<!-- SITE-NAV:.*?-->", lambda _: nav, (LD / g / "index.html").read_text(), count=1))
         b = blocks(bw.game_page(g))
         b.append(downloads(links))
         write(f"{slug}/index.html", page(SLUGS[g], f"{t['title']} · Legend Dynamics", re.sub(r"<[^>]+>", "", bw.first_para(g))[:300],
