@@ -1,0 +1,15 @@
+{
+ "notes": "Core attack and defense rules, published for every Legend Dynamics setting. A pack's combatRules can add rules or override parameters (Trails of Blood & Dust: bare-handed parries against claws). The same ids are the Rules Lab's experiments.",
+ "rules": {
+  "oneDefense": { "perRound": 1, "edge": "extradefense" },
+  "attackQualityDodge": { "bands": [ { "from": 0, "mod": 0 }, { "from": 3, "mod": -1 }, { "from": 5, "mod": -2 }, { "from": 7, "mod": -3 } ] },
+  "parry": { "mod": -3, "repeatPenalty": -2, "bareHanded": "unarmed" },
+  "block": { "mod": -2 },
+  "aim": { "bonus": 1 },
+  "tellingHits": { "margin": 5, "natural": true, "called": -2, "small": -4 }
+ },
+ "protection": [
+  { "id": "improvised", "name": "Improvised shield", "text": "Anything that can stand in for a shield, snatched up in the fight: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.",
+    "traits": [ { "type": "shield", "value": 0, "breaksOn": 2, "label": "Improvised shield" } ] }
+ ]
+}

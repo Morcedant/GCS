@@ -1,0 +1,91 @@
+{
+ "id": "pelion",
+ "title": "USS Pelion",
+ "point": "Duty",
+ "mission": "Mission",
+ "trackTitle": "Ship status",
+ "seedsFrom": "uss-pelion/index.html",
+ "tracks": [
+  {
+   "name": "Shields",
+   "boxes": 3,
+   "effects": [
+    "Up",
+    "Weakened",
+    "Failing",
+    "Down: hits go to Hull and a system"
+   ]
+  },
+  {
+   "name": "Hull",
+   "boxes": 4,
+   "effects": [
+    "Intact",
+    "Scarred",
+    "Minor breaches",
+    "Serious breaches, decks lost",
+    "Breaking up: start an Abandon ship clock"
+   ]
+  },
+  {
+   "name": "Weapons",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  },
+  {
+   "name": "Engines",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  },
+  {
+   "name": "Sensors",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  },
+  {
+   "name": "Communications",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  },
+  {
+   "name": "Transporters",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  },
+  {
+   "name": "Life support",
+   "boxes": 3,
+   "effects": [
+    "Working",
+    "Damaged: −2",
+    "Crippled: −4, basic function only",
+    "Offline"
+   ]
+  }
+ ]
+}

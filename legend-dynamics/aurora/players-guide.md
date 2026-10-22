@@ -1,0 +1,1520 @@
+---
+title: "Aurora Players' Guide"
+subtitle: "Operants, ExLAW and the powers behind them, for the Legend Dynamics RPG system"
+author: "Don Smallwood"
+---
+
+In April 1938 the sky burned green for four weeks. The auroras killed five million people and left behind the first **Operants**: men and women with powers no science could explain. For decades the world pretended they were myths. Then, in 1952, a battle at Fort Knox made pretending impossible, and the law has been trying to catch up ever since, through the **Extraordinary Law Enforcement Agency (ExLAW)**.
+
+It is 2025. ExLAW enforces the Extraordinary Powers Act with Operant agents and armored Aegis pilots. Masked heroes work beside it, or around it. Labs nobody admits to are making new Operants, a breach in 2012 let an invasion through, a forest has swallowed southern Indiana, and the walls between worlds are thinning.
+
+*Aurora* is a superhero setting for the Legend Dynamics RPG system. Play agents, cops, sheriffs and Aegis pilots; masked vigilantes and televised heroes; scholars, reporters and relic hunters; fugitives from the labs; or thieves and fixers on the wrong side of the law. Every story is a **case**: a crime, a crisis or a secret, and the question of who has the right to deal with it.
+
+## The rule to remember
+
+Roll 3d6 at or below your adjusted skill to succeed. Your skill already includes your training and attribute. Do not add the attribute again.
+
+*Example:* a skill of 13, with a −2 penalty for bad conditions, gives a target of 11. A roll of 9 succeeds by 2. A roll of 12 fails by 1.
+
+## How this book is organized
+
+This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Aurora** setting: its callings, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Spark points**. The material for running the game (case seeds, the notable Operants, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.
+
+# Create your character
+
+Work through the five steps in order. The character creator follows the same steps and checks the rules for you.
+
+## Step 1: Choose your calling
+
+Choose a calling and describe what you bring. Your calling places you in a group, which only changes your sheet's colors and seal. A title or rank is agreed with the GM and gives no bonus.
+
+| Calling | Group | Typical contribution | Core skills |
+|---|---|---|---|
+| ExLAW Agent | The Badge | a full-time federal agent of the Extraordinary Law Enforcement Agency (ExLAW), enforcing the Extraordinary Powers Act with a badge that opens doors and an EPAOC file that never closes. | Law, Investigation, Firearms, Read People |
+| Officer | The Badge | carries a badge and the law's authority, working alongside ExLAW or around it: an FBI agent or U.S. marshal, an elected county sheriff (maybe on the edge of the Mad Fringe), a city cop first on the scene of an Operant fight, a detective, or a licensed private eye. Your Allegiance says which force you serve. | Investigation, Firearms, Law, Read People |
+| Aegis Pilot | The Badge | flies the armored power suit that is the government's answer to Operants, and knows exactly what it costs per hour. | Piloting, Engineering, Firearms, Athletics |
+| International Operative | The Badge | Interpol, the French Affaires spéciales or MI5; the law has borders, Operants don't. | Law, Deception, Firearms, Computers |
+| Vigilante | The Masks | fights crime on the streets, unsanctioned and masked, and hopes ExLAW keeps looking the other way. | Brawling, Stealth, Streetwise, Athletics |
+| Public Hero | The Masks | famous, sponsored and televised, like the New Power Legion; the cameras are part of the job. | Media, Leadership, Persuasion, Powers |
+| Guardian | The Masks | protects one place or one people (a neighborhood, a reservation, the Haven) and answers to them first. | Powers, Leadership, Read People, Persuasion |
+| Crusader | The Masks | sworn to an order or a cause, like the Shadow Knights; the vow comes before the law. | Melee, Occult, Leadership, Athletics |
+| Avenger | The Masks | answers one kind of wrong, whatever the law says, as Uathach does. | Brawling, Investigation, Stealth, Powers |
+| Scientist | The Learned | studies Operants, metatropic fields or the breaches, for a university, a corporation or a government that won't say why. | Science, Engineering, Computers, Medicine |
+| Occultist | The Learned | an Earth Warden or a scholar of the hidden world, who knows which doors should stay shut. | Occult, Investigation, Persuasion, Science |
+| Doctor | The Learned | treats what hospitals can't, Operant or not, and doesn't ask for a registration number. | Medicine, Science, Read People, Persuasion |
+| Relic Hunter | The Learned | tracks down artifacts before the Foundation does, and sometimes before their owners notice. | Occult, Athletics, Investigation, Deception |
+| Journalist | The Learned | reporter, blogger or documentary maker chasing the Operant story the public isn't being told. | Media, Investigation, Persuasion, Read People |
+| Mercenary | The Fringe | powers or skills for hire, with a code or without one. | Firearms, Brawling, Piloting, Streetwise |
+| Fugitive | The Fringe | escaped from a lab or a cell; staying free is a full-time job. | Stealth, Deception, Athletics, Powers |
+| Activist | The Fringe | fights for a cause the law won't touch (the Haven, the environment, Operant rights) on the street and on camera. | Media, Persuasion, Leadership, Law |
+| Thief | The Underworld | burglar, cat burglar or safecracker; powers make the impossible jobs possible. | Stealth, Athletics, Engineering, Streetwise |
+| Con Artist | The Underworld | grifter and impostor; illusions and telepathy are tools of the trade. | Deception, Persuasion, Read People, Streetwise |
+| Enforcer | The Underworld | muscle for a gang, a cartel or the Morcain. | Brawling, Firearms, Read People, Streetwise |
+| Smuggler | The Underworld | moves people and cargo (relics, Ambrosia, refugees for the Haven) where the law can't see. | Piloting, Streetwise, Deception, Stealth |
+| Hacker | The Underworld | breaks into systems: corporate, police, the EMD itself. | Computers, Engineering, Stealth, Deception |
+| Fixer | The Underworld | knows everyone, moves anything, owes and is owed. | Streetwise, Persuasion, Deception, Computers |
+
+The creator marks your calling's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing calling swaps the core skills you haven't changed.
+
+### Generalist or Specialist
+
+Choose how your character trained (see Step 3):
+
+- **Generalist:** one Specialty at +3 and nine Trained skills.
+- **Specialist:** one Expert skill at +5 and seven Trained skills: a lifetime spent at one thing.
+
+## Step 2: Choose your origin, spend Edges, assign attributes
+
+### Attributes
+
+| Attribute | Used for |
+|---|---|
+| Body | Strength, endurance, resisting injury |
+| Agility | Coordination, reflexes, movement |
+| Intellect | Reasoning, observation, knowledge |
+| Presence | Leadership, persuasion, social influence |
+| Will | Resolve, concentration, resisting fear and influence |
+
+### Origin and tier
+
+Choose your origin from the **Origins** chapter. Every attribute starts at 10, and your origin adjusts some of them; the result is your **base**. Adjustments always total zero.
+
+Origins can differ in power, so each has a **tier** from 0 to 3. Every character has **4 points** to split between origin power and **Edges**: the higher the tier, the fewer Edges. Edges are useful in every scene, which keeps characters of every tier equally worth playing.
+
+| Origin | Tier | Edges | Adjustments |
+|---|---|---|---|
+| Non-Operant | 0 | 4 | None |
+| Adept | 1 | 3 | Body −1, Intellect +1 |
+| Aurora-born | 2 | 2 | None |
+| Bonded | 2 | 2 | Presence −1, Will +1 |
+| Lab-made | 2 | 2 | Body +1, Presence −1 |
+| Otherworlder | 2 | 2 | Agility +1, Will −1 |
+| Shadow Earth Defector (GM's permission) | 2 | 2 | Agility +1, Presence −1 |
+| Touched | 2 | 2 | Intellect −1, Will +1 |
+| Ambrosia | 3 | 1 | Body +1, Agility −1, Intellect −1, Presence +1 |
+| Mythic | 3 | 1 | Body +1, Intellect −1, Presence −1, Will +1 |
+
+### Edges
+
+Spend all your Edges. Each one buys:
+
+| Edge | What you get | Limit |
+|---|---|---|
+| +1 attribute point | One more point to spend in the next step, within the normal maximum | 2 |
+| Extra Trained skill | One more Trained skill in Step 3 | 3 |
+| Second advantage | A second general advantage, with no extra complication | 1 |
+| Extra Spark | Start every session with 3 Spark points instead of 2 | 1 |
+| A friend | A named contact who helps once per case | 1 |
+| A fine weapon or tool | An heirloom weapon, a master's instruments or a fine kit: +2 to one named skill when it's used | 1 |
+| Additional Defense | A second defense each round: Dodge, Parry or Block, in any mix | 1 |
+| Hard to put down | Once per fight, shrug off a telling hit's effect: you still take its boxes (see *Telling hits*) | 1 |
+| Stronger Power | Raise one of your powers by one Class. Class III is the limit at creation, unless the GM approves one power at Class IV. | 3 |
+| Extra Power | One more power, at Class I. | 1 |
+
+### Spending points
+
+After applying your origin, distribute **five additional points** among the attributes, plus one for each attribute Edge.
+
+- The starting maximum is **13**, plus any origin bonus to that attribute.
+- You cannot lower an attribute below its base to gain points.
+
+### Custom origin
+
+You can build your own origin with the GM. See *Making your own* for the steps.
+
+## Step 3: Choose trained skills
+
+**A Generalist** character chooses ten different skills: one **Specialty** at its governing attribute +3 and nine **Trained** skills at attribute +1. **A Specialist** chooses **one Expert skill at +5** and **seven Trained skills at +1**. Each Extra Trained skill Edge adds one more Trained skill. All other skills are **Untrained** at attribute −4 when an attempt is plausible. Each skill has its own final target number; do not add the attribute again when rolling.
+
+The Expert's extra bonus matters most when the work is hard. With an attribute of 13, an Expert has a target of 18, which only natural 17–18 can fail; under a −4 "very difficult" penalty the target is still 14. If Athletics is the Expert skill, Dodge adds +2, the same as a Specialty.
+
+Some origins give one skill Trained for free; it doesn't use one of your Trained picks.
+
+**Broadening.** A Specialist can broaden later (the GM's call, usually after a significant case): the Expert skill becomes a Specialty at +3, and two more skills become Trained.
+
+## Step 4: Describe your character
+
+Choose your name, title if any, and a short reason for what you do. Then choose **one advantage** and **one complication**.
+
+### Top 10 reasons
+
+1. **Justice.** The law should mean something, for Operants and everyone else.
+2. **Protection.** Someone has to stand between ordinary people and what's out there.
+3. **Redemption.** I've done things I'm not proud of. This is how I pay it back.
+4. **Fame.** The cameras love an Operant, and I love the cameras.
+5. **Money.** Powers pay. So does knowing who has them.
+6. **Revenge.** Someone did this to me. I'm going to find them.
+7. **Freedom.** No lab, no registry and no government owns me.
+8. **Truth.** There's a story nobody's telling. I'm going to tell it.
+9. **Duty.** I swore an oath, to a badge, an order or a god. I keep it.
+10. **Belonging.** This team is the only place where I'm not a freak.
+
+- **Advantage.** Choose either a general advantage or one of your origin's advantages. An origin advantage replaces the general advantage and always brings its companion complication.
+- **Complication.** Choose one complication. You keep it even if you take an origin advantage, so a character with an origin advantage has two complications.
+- **Allegiance (optional).** Choose an allegiance below, or none.
+
+An advantage gives +2 to one narrowly defined kind of task when the GM agrees it applies. It cannot improve every use of a broad skill. A complication creates choices and problems; it is not a permanent penalty.
+
+### Allegiance
+
+Anyone can owe allegiance to one of the setting's powers. It's a benefit paired with a burden; the burden works like a complication and earns Spark when it causes you a real problem.
+
+The GM can add others met in play (the creator's GM view has a **Campaign allegiances** list), and a player can write one with the GM: choose *Another allegiance* and give it a name, a benefit and a burden.
+
+| Allegiance | Benefit | Burden |
+|---|---|---|
+| ExLAW | Once per case, a database search, an Aegis wing or federal backup. | Duty: the Director's orders, the EPAOC's questions and the paperwork. |
+| A Federal Agency | Once per case, records, a lab or a warrant. | Duty: the agency's priorities, and its turf war with ExLAW. |
+| A County Sheriff's Office | Once per case, a deputy's help, the county jail, or the county's records and a word with the judge. | Duty: the sheriff answers to the voters, and the county's feuds and elections become yours. |
+| A City Police Department | Once per case, patrol backup, a holding cell, or the department's files and crime lab. | Duty: the chain of command, the union's politics, and a department that resents Operants and ExLAW alike. |
+| DIRE | Once per case, military hardware, a medical team or a classified file. | Duty: DIRE's research comes first, and you may be part of it. |
+| Interpol | Once per case, international reach: a Red Notice, a foreign police force's help, or a flight to anywhere. | Duty: member countries who want different things, and fugitives who know your face. |
+| Affaires spéciales | Once per case, French intelligence, a safehouse in Europe or a discreet extraction. | Duty: France's interests, which aren't always yours. |
+| The New Power Legion | Once per case, a famous ally, a sponsor's money or the press on your side. | Duty: the sponsor's image, the schedule and the cameras. |
+| The Shadow Knights | Once per case, a relic, a specialist or a safe house of the Ordo. | Duty: the vow; bring light into the shadows, whatever the law says. |
+| The Earth Wardens | Once per case, an Adept's help, ritual materials or lore. | Duty: guard the Earth Gates, and answer when the Wardens call. |
+| The Haven | Once per case, sanctuary in the Mad Forest, or the Green Man's attention. | Duty: protect the Earth and the Haven; and only vegetarian meals. |
+| The Morcain | Once per case, money, a fence, a smuggling route or muscle. | Duty: the 12 take their cut, and send you their jobs. |
+
+## Step 5: Prepare
+
+Your Dodge is Agility −2, plus your Athletics training bonus: +0 if Untrained, +1 if Trained, or +2 if a Specialty or Expert. Begin uninjured, with two Spark points (three with Extra Spark) and your gear. Name your friend or your fine weapon or tool, if you took those Edges. Describe one connection to another player's character.
+
+### Top 10 connections to another character
+
+1. **Partners.** We've worked cases together for years and trust each other with our lives.
+2. **They saved my life.** They pulled me out of a burning building, a lab or a firefight.
+3. **I saved theirs.** I got them out when no one else would, and they haven't forgotten.
+4. **Same wave.** Our powers woke the same night, and we found each other afterward.
+5. **I arrested them.** Once I put them in cuffs. Now we work together, uneasily.
+6. **Rivals.** We want the same job, the same headline or the same collar.
+7. **Family.** We're related, by blood, by marriage or by the same lab.
+8. **A shared secret.** We know what really happened on that case. Nobody else does.
+9. **Mentor.** They taught me how to use my powers, or how to survive without them.
+10. **An unpaid debt.** I owe them money or a favor, and I haven't paid it yet.
+
+## Example character
+
+Aurora-born (tier 2, 2 Edges): Extra Spark, Stronger Power. Body 12, Agility 10, Intellect 10, Presence 12, Will 11.
+
+- **Specialty:** Leadership 15.
+- **Trained:** Athletics 13, Brawling 13, Persuasion 13, Powers 12, Read People 12, Firearms 11, Investigation 11, Law 11, Piloting 11.
+- **Dodge:** 9.
+- **Advantage:** Natural Leader. **Complication:** Protects the Innocent; trigger: a civilian in the crossfire.
+- **Powers:** Toughness III, Strength I, Enhanced Senses I.
+- **Legal status:** Registered.
+
+# Skills and gear
+
+Choose the skill that matches your method. The GM chooses one primary skill for each distinct task.
+
+| Skill | Attribute | Typical use |
+|---|---|---|
+| Leadership | Presence | Command, rally, coordinate a team |
+| Persuasion | Presence | Convince, negotiate, calm a crowd |
+| Deception | Presence | Lie, bluff, disguise, forge, keep a secret identity |
+| Streetwise | Presence | Informants, the underworld, black markets, rumors |
+| Media | Presence | Cameras, the press, social media, public image |
+| Read People | Will | Judge motives, spot a lie, interrogate |
+| Investigation | Intellect | Search a scene, forensics, follow the money |
+| Law | Intellect | The Extraordinary Powers Act, warrants, procedure, courts |
+| Computers | Intellect | Systems, data, hacking and surveillance |
+| Science | Intellect | Physics, biology, metatropic theory |
+| Engineering | Intellect | Build, repair and modify machines, locks, Aegis suits |
+| Medicine | Intellect | First aid, surgery, Operant physiology |
+| Occult | Intellect | Magic, spirits, rituals, Otherworld and its creatures |
+| Piloting | Agility | Drive, fly, chase; pilot an Aegis suit |
+| Firearms | Agility | Pistols, rifles, shotguns, suit weapons |
+| Melee | Agility | Batons, blades, staves and swords |
+| Brawling | Body | Fists, grapples, martial arts, restraint |
+| Athletics | Body | Run, climb, jump, swim, Dodge |
+| Stealth | Agility | Sneak, hide, tail someone |
+| Powers | Will | Aim, control and push your powers; perform rituals |
+
+## Untrained actions
+
+A plausible untrained attempt uses attribute −4. Specialized work such as surgery requires relevant training or direct guidance. Guidance permits an attempt only when the GM finds it credible; it does not grant the expert's skill.
+
+## Gear
+
+Gear makes tasks possible rather than easier. Ordinary gear grants no blanket bonus; exceptional tools may justify +2. Missing essential tools can make a task impossible, or very difficult (−4) when the GM finds an attempt plausible.
+
+| Item | What it does |
+|---|---|
+| Pistol | Fifteen rounds. Class I; hits mark 2 boxes. |
+| Shotgun | Six shells. Class I. Within a few paces a hit marks 3 boxes and leaves the target Dying; farther away, 1 box. |
+| Submachine gun | Thirty rounds; can fire bursts. Class I; hits mark 2 boxes. |
+| Rifle | Twenty rounds; long range. Class I; hits mark 2 boxes. |
+| Taser | Two shots. The target rolls Body −2: failure, out for the scene; success, −2 on their next action. Marks no box. |
+| Baton or knife | Class I melee: hits mark 1 box. |
+| Body armor | Once per fight, a Class I hit marks one box fewer. |
+| Riot shield | A clear polycarbonate shield: +1 to Block against blows, thrown objects and missiles. It won't stop a bullet. −2 to Stealth while you carry it. |
+| Dampening cuffs | ExLAW issue: a cuffed Operant's powers drop one Class (two with a successful Engineering roll to tune them). |
+| Badge and ID | Federal, police or press credentials: open doors and get you past cordons. |
+| Radio and phone | Stay in touch with your team and dispatch. |
+| First-aid kit | Needed to stabilize a patient and give field treatment. |
+| Forensics kit | Needed for most Investigation at a crime scene. |
+| Hacking rig | Needed for most Computers work against secured systems. |
+| Toolkit | Needed for most Engineering in the field, and for Aegis suit repairs. |
+| Ritual kit | Chalk, salt, candles, herbs: Class I ritual materials for a few workings. |
+| Lock picks | Needed to pick locks with Engineering. |
+| Camera and press pass | Record, broadcast, and get into press events. |
+| Aegis AS-6 suit | Aegis Pilots or Aegis Certified only. While suited: Strength II, Toughness II, Flight I and a Class II arm cannon (Firearms). Takes a minute to suit up; a hit to the power pack (−2 to aim) can shut it down. |
+
+# Actions and teamwork
+
+## When to roll
+
+Routine work succeeds automatically when you have appropriate training, gear and time. Roll when failure could change the situation. Before rolling, establish your goal, the relevant skill, any modifiers, and what is at stake.
+
+| Circumstances | Modifier |
+|---|---|
+| Favorable conditions or excellent preparation | +2 |
+| Ordinary challenge under pressure | 0 |
+| Difficult | −2 |
+| Very difficult | −4 |
+| Extreme | −6 |
+
+Apply the main circumstance modifier once. Add separately specified effects such as assistance or injury when they apply. The GM avoids charging twice for the same obstacle.
+
+## Results and margins
+
+Add the three dice. A total at or below the adjusted skill succeeds. Margin of success equals the adjusted skill minus the roll. A larger margin may mean better information, more precise work, or a stronger position.
+
+A natural 3 or 4 always succeeds. A natural 17 or 18 always fails. An impossible action receives no roll.
+
+In an opposed contest, each side rolls its relevant skill. One success beats one failure. If both succeed, the larger success margin wins. A tie, or two failures, favors the defender or preserves the situation. For an automatic success above its target, count its contest margin as zero.
+
+## Assistance
+
+One qualified assistant can roll a relevant skill before the lead character rolls. Success grants +1 to the lead roll; success by 5 or more grants +2. Failure gives no bonus. An 18 introduces a complication described by the GM. Other characters can do other tasks but cannot stack assistance bonuses on the same roll.
+
+## Failure and another attempt
+
+Failure changes the situation: time passes, the trail goes cold, supplies run out, or danger grows. Do not repeat an unchanged roll until it succeeds. A new approach, new evidence, better tools, or more time may justify another attempt.
+
+## Success at a cost
+
+When a roll fails by only **1 or 2**, the GM may offer **success at a cost**: you get what you were after, but something else goes wrong. Typical costs are an injury box, broken gear, lost time (tick a clock), a box on a track, or someone noticing. The GM names the cost before you accept; you can always take the plain failure instead. A natural 17 or 18 is never a success at a cost.
+
+## Progress clocks
+
+A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something that takes time or builds toward disaster.
+
+- **Danger clocks** fill when things go wrong: a failed roll, a success at a cost, or time passing. When one fills, the danger happens.
+- **Progress clocks** fill as the characters succeed: one segment for a success, two for success by 5 or more. When one fills, the goal is achieved.
+- The GM sizes the clock (2 = quick, 4 = urgent or simple, 6 = substantial, 8 = long or complex) and shows it to the players.
+
+## Investigation and social scenes
+
+Ask concrete questions and explain your approach. Evidence may require several different tasks. A successful roll does not force someone to abandon a core belief or reveal what they do not know.
+
+## Discovery clocks and dossiers
+
+When a case turns on an unknown subject (an Operant's power set and its limits), the GM sets up a **discovery clock**. It fills in three phases, and filling it mints a **dossier**: what the characters learned, kept for good. A character's dossiers are their **case file**.
+
+| Phase | What it means |
+|---|---|
+| 1. Confront the unknown | Effects without a cause: a vault opened from the inside, a blackout that follows someone, witnesses who can't agree on what they saw. You may suspect, but nothing is confirmed. |
+| 2. Identify | Name the Operant and what they can do. This is the gate: until it's confirmed, no dossier applies, and the GM treats your theories as suspicion only. |
+| 3. Uncover | Find the counter: the tell before they act, what the power costs them, how long it takes to come back, what shuts it down. Filling this phase fills the clock and mints a dossier. |
+
+- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.
+- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
+- **The primary investigator.** One character leads and owns the dossier. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant dossier can assist with a method they couldn't otherwise bring (the dossier is why they're qualified); it adds nothing beyond the normal assistance.
+- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
+
+### The dossier
+
+A dossier grants **no bonus** to any roll. It is an earned permission: knowledge that makes possible an action otherwise forbidden or unavailable against that subject. Without it, the GM can rule that the action isn't possible: you can't aim for a heart you don't know is the weakness, or speak a name you never learned. A dossier can authorize a called shot or a telling-hit effect that would otherwise be unavailable.
+
+- A dossier never helps confirm its own subject: holding one doesn't prove this is that. It applies once the Identify phase has confirmed it.
+- **Shared copies.** Every character present when the dossier is minted (the climactic confrontation or the breakthrough) gets a shared copy; the primary investigator is recorded as its owner. An absent character doesn't, though a holder can teach it to them later with the GM's agreement.
+- **What it records.** The subject (its tag), what was learned, what it permits, the case where it was earned, its owner, and who was there. It's kept on the character sheet, under *Learned in play*.
+
+### The Escalation
+
+A discovery clock always races a threat clock. The Operant forces the pace. The Escalation clock (4 or 6 segments) ticks once for each scene spent investigating and once for each failed investigation roll. Each time it fills, their next move is bigger: a heist becomes a hostage situation becomes a fight across a city block. This is comic-book rising action, not a slow timer.
+
+### What investigating costs
+
+When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
+
+| Track | Ticks for | For example |
+|---|---|---|
+| **Scrutiny** | digging publicly or drawing official attention | pulling federal files, flashing a badge you shouldn't, staking out in the open |
+| **Backlash** | provoking the Operant or their allies | leaning on their friends, taunting them on air, raiding their haunts |
+| **Collateral** | messy, public confrontations and property damage | forcing a test of the power in a crowd, a chase through traffic, breaking in |
+
+### Methods
+
+Which methods suit a character depends on their calling, origin and skills. The GM says which methods can advance each phase.
+
+| Method | Skills | Suits | Phases | For example |
+|---|---|---|---|---|
+| Profile the Operant | Read People, Investigation | The Badge, The Learned | Confront, Identify | Pattern of crimes, choice of targets, what they want. |
+| Run the records | Computers, Law | The Badge | Identify, Uncover | EMD registry, ExLAW files, court records, hospital admissions. |
+| Analyze the power | Science, Occult, Powers | The Learned | Identify, Uncover | Residue, readings, footage frame by frame, the physics or the magic of it. |
+| Work the back channels | Streetwise, Deception | The Underworld | Confront, Identify | Fences, fixers, who hired whom, who's scared. |
+| See it in the field | Investigation, Stealth, Athletics | The Masks | Any | Shadow them, test them, take the hit and watch what happens. |
+| Work the media | Media, Persuasion | The Masks, The Fringe | Confront, Identify | Viewer footage, tips, a reporter's notes. Always ticks Scrutiny on a failure. |
+
+- **The Badge:** natural profilers, with the records; **The Learned:** natural profilers, through analysis; **The Underworld:** intel through back channels; **The Masks:** intel gathered in the field; **The Fringe:** contacts on the edges.
+- Some powers are methods in themselves: a telepath, a psychometrist or a power that senses energy can advance a phase with the Powers skill, at the GM's call.
+
+## Chases
+
+Run a chase as a progress clock for the pursuers against a danger clock for the quarry's escape. Each exchange, the characters roll the skill that moves them (Piloting, or Athletics on foot): success ticks the pursuers' clock, failure ticks the escape. Terrain, a tired mount or a damaged engine, and attacks made on the move (at −2) adjust the rolls.
+
+# Personal combat
+
+## Turn order and actions
+
+Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance (up to 10 yards: the Close band below) and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
+
+## Attacking and defending
+
+Roll Firearms for a ranged attack, Melee for a weapon in hand, or Brawling for fists and grappling. If the attack succeeds, an aware target able to move may **defend**: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.
+
+- **One defense a round.** A target gets one defense a round, between its turns, and chooses which when an attack hits. The **Additional Defense** Edge gives a second.
+- **Dodge** is Agility −2, with +1 for Trained Athletics or +2 for Athletics as a Specialty or Expert.
+- **Parry.** Against a weapon in hand or fists, roll Melee −3 with a weapon in hand, or Brawling −3 bare-handed against fists. An open hand can't parry a blade, claws or fangs. A second parry in the same round (with Additional Defense) is a further −2. Nobody parries a shot or a missile.
+- **Block.** With a shield, or anything that can stand in for one (a chair, a plank, a crate lid), you can block a weapon in hand, fists, or a thrown or loosed missile: roll Melee −2, plus the shield's bonus. Nothing you can lift blocks a gunshot or a blast. An improvised shield breaks the first time it blocks a hit of 2 or more boxes.
+- **Attack quality.** A clean hit is harder to escape. When an attack succeeds by 3 or 4, the defense is at −1; by 5 or 6, −2; by 7 or more, −3.
+- **Aim.** Spend your action aiming at a target you can see: +1 to your next attack against it. An advantage that rewards aiming adds its bonus to this.
+
+Solid cover blocks a shot. Partial cover imposes −2 on the attack. Weapon effects apply after a hit survives any defense. Success margin does not increase damage: a great hit decides *what* happens instead.
+
+## Telling hits
+
+A really good shot, or a blow that lands exactly where it was meant to, lets the attacker say what it does.
+
+- **A telling hit** is an attack that succeeds by **5 or more**, or on a natural 3 or 4, and isn't stopped by a defense. The attacker picks **one effect** below and describes it. The weapon still marks its usual boxes.
+- **A called shot.** Before rolling, name the effect you want and take −2 on the attack, or −4 for a small target (a hand, an eye, a rope, a lock). If the attack hits at all, the effect happens, whatever the margin. An advantage that rewards aiming cuts this penalty by 1.
+- **Both ways.** Opponents land telling hits on characters too.
+
+| Effect | What happens |
+|---|---|
+| Disarm | The weapon or held item drops, or flies a few yards away |
+| Knock down | The target falls prone, or is driven back a few steps |
+| Pin | The target is held, tangled or pinned down: their next action goes to getting free |
+| Rattle | −2 to the target's next roll |
+| Break gear | A shield, weapon or tool breaks; armor loses 1 protection until it's repaired |
+| Open them up | The next attack on this target this round gets +2 |
+| Precise | You hit exactly what you aimed at: the lantern, the rope, the tire, the hand on the trigger |
+
+**Limits.** A telling hit never adds boxes and never gets past a defense. The effect has to make sense: nobody disarms a bear or knocks down a train, and the GM can rule an effect out. Opponents who drop from one hit are already down, so a telling hit against them sets up what comes next, like sending one crashing into another.
+
+**Staying alive.** A character on the receiving end can shrug off a telling hit's effect with **Hard to put down** (once per fight) or by spending a Spark point. Either way, they still take the boxes.
+
+## Range
+
+Distances fall into five bands:
+
+| Band | Distance | For example |
+|---|---|---|
+| Close | Up to 10 yards | Across a room; one move covers it |
+| Short | Up to 50 yards | Across a street or a courtyard |
+| Medium | Up to 150 yards | A city block, a long field |
+| Long | Up to 500 yards | Across a valley, a park or a harbor |
+| Extreme | Up to a mile, in line of sight | Rooftop to rooftop across a town |
+
+Every ranged weapon has an **effective band**, shown in the weapons table. Attacks within it take no penalty. One band beyond it is −2, two bands beyond is −4, and anything farther is out of range. Weapons in hand and fists reach only someone next to you; move into reach as part of your turn. A thrown weapon's effective band is Close.
+
+Moving: your move each turn covers the Close band. Give up your action to run and you cover Short instead.
+
+## Injury
+
+| Boxes marked | Condition | Effect |
+|---|---|---|
+| 0 | Uninjured | No injury penalty |
+| 1 | Wounded | −1 to physical actions |
+| 2 | Seriously wounded | −2 to physical actions |
+| 3 | Incapacitated | Unable to act; medical aid needed |
+
+Injury penalties replace each other rather than stacking. They apply to movement, attacks, Dodge, and other tasks the injury physically hinders.
+
+### Dying and death
+
+- **Dying.** A hit from a weapon that marks **2 or more boxes** and brings you to three boxes leaves you Incapacitated and **Dying**. A Dying character dies at the end of the scene unless someone stabilizes them: one action and a successful Medicine roll with a first-aid kit.
+- **A further hit.** While you are at three boxes, any hit from a weapon that marks 2 or more boxes kills you. Fists, clubs and knives just keep you down.
+- **Certain death.** Some fates (a fall into a furnace, a beheading, disintegration) bypass the track entirely.
+
+Your protection is avoiding the hit: a defense (Dodge, Parry or Block), cover, and a Spark point, which reduces a hit by one box.
+
+### Optional rule: gritty combat
+
+For a harder, bloodier game, the GM can turn on **gritty combat** for the campaign (the creator has a switch on the Condition card and in the GM view). The rest of the rules stay the same.
+
+**Grievous hits.** A hit that marks **2 or more boxes** is **grievous** when the attack succeeded by **7 or more**, rolled a **natural 3 or 4**, or left the target **Dying**.
+
+- **A character** rolls 3d6 on the table below and suffers the result on top of the boxes.
+- **An opponent** is simply taken out: no roll, no boxes to count. Describe how, or let the GM view roll a description.
+- **With a telling hit,** the attacker also chooses which limb.
+
+| 3d6 | Grievous wound | Effect | Heals |
+|---|---|---|---|
+| 3–4 | Lost limb | A hand, an arm or a leg is gone for good; the GM says which. −4 to tasks that need it, or impossible. Dying unless someone stops the bleeding. | Never: a complication |
+| 5–6 | Lost eye | −2 to Firearms and to spotting things. | Never: a complication |
+| 7–9 | Broken bone | The limb is useless until it's set with proper care. | Several weeks |
+| 10–12 | Torn muscle | −1 to physical tasks. | Several weeks |
+| 13–15 | Concussion | Stunned, and −2 to thinking tasks for the scene. | After the scene |
+| 16–18 | Internal injury | Dying even with boxes to spare; it needs a hospital's trauma surgeons. | Several weeks after surgery |
+
+- **Spark.** Spend a Spark point to **downgrade** a grievous wound one step: lost limb becomes broken bone; lost eye becomes concussion; broken bone becomes torn muscle; torn muscle becomes nothing lasting; concussion becomes nothing lasting; internal injury becomes torn muscle.
+- **A limb for a life.** Once a fight, a character who would be left Dying or killed can **lose a limb, or the use of one**, instead. They live, Incapacitated but stable, and the limb becomes a complication. It replaces any grievous wound from the same hit.
+- **Healing.** Grievous wounds heal on their own clock, whatever the boxes say. A lost limb, a lost eye or a disfigurement never heals.
+
+## Weapons and damage
+
+How many boxes a hit marks depends on the **weapon**, not on how well the attack succeeded.
+
+Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every attack also has a **Class**, which matters against an Operant's **Defense** (see below). **Powers** mark boxes by their Class: **Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3** (see *Powers*).
+
+| Weapon | Range | Class | Boxes on a hit | What the injury looks like |
+|---|---|---|---|---|
+| Fists, kicks, a baton | Melee | I | 1 | Bruises, a cracked rib, a concussion |
+| Knife | Melee; Close thrown | I | 1 | A cut or stab wound |
+| Pistol or submachine gun | Short | I | 2 | A gunshot wound |
+| Rifle | Long | I | 2 | A gunshot wound |
+| Shotgun, at Close range | Close | I | 3, and Dying | A ruinous wound |
+| Shotgun, at Short range | Short (no effect beyond) | I | 1 | Scattered pellets |
+| Sniper or heavy rifle | Extreme (−2 at Close) | II | 3, and Dying | A ruinous wound |
+| Taser | Close | — | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
+| Heavy machine gun, Aegis arm cannon | Long | II | 2 | Torn apart |
+| Anti-tank rocket | Long | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
+| Grenade or explosive charge | Close (thrown) | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
+| Fall | — | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fire | — | — | 1 each round in the flames | Burns |
+
+**Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack whose Class is **above** your Defense hits in full; one **equal** to it marks one box fewer; one **below** it does nothing. A bulletproof Operant (Defense II) ignores pistols and rifles, and an Aegis cannon still marks a box.
+
+*Defense is not a defense roll.* Your **defense** (Dodge, Parry or Block, one a round) decides whether an attack hits at all. Your **Defense** Class is armor: it applies to whatever hits, every time, at no cost. A Force Field doesn't use up your Dodge.
+
+*Example:* a gang member's pistol shot hits Sheriff Wade Collier. It's Class I against his Toughness II: it does nothing, and the gang member starts to run. The same shot would have marked two boxes on his deputy. A White Hand soldier's Class II Blast is equal to his Defense, so it marks one box instead of two.
+
+A submachine gun can fire a **burst** (three rounds, +1 to hit). Firearms jam on a natural 18. To take someone down without killing them, use fists, a taser, dampening cuffs, or a power used with care.
+
+## Weapon and ammunition
+
+| Weapon | Rounds |
+|---|---|
+| Pistol | 15 |
+| Shotgun | 6 |
+| Submachine gun | 30 |
+| Rifle | 20 |
+
+| Fire | Rounds | Roll |
+|---|---|---|
+| Single shot | 1 | — |
+| Burst (Submachine gun only) | 3 | +1 |
+| Covering fire | 3 | — |
+
+- **Every fire spends rounds, hit or miss.** A Spark reroll repeats the same fire and costs nothing extra.
+- **Empty means it won't work.** Reload (one action): refills it from a spare. Resupply: refills it fully between cases. Packing a spare is a good use of a Spark point's small preparation.
+- **Jams.** A natural 18 with this weapon also jams it: clearing it takes an action.
+
+# Medical care
+
+Operant medicine is a specialty of its own. Most hospitals have an **Operant ward** (proper care) with sedatives strong enough for a Class III metabolism; ExLAW's medical wing and the Foundation's black labs have better, and use it for different reasons. Powers such as Regeneration and Healing follow their own rules (see *Powers*).
+
+## Diagnosis and stabilization
+
+Roll Medicine when the diagnosis is uncertain or an urgent treatment decision matters. Emergency stabilization takes one action and a successful Medicine roll with a first-aid kit. It ends Dying and stops deterioration, but removes no boxes.
+
+## Field treatment
+
+With a first-aid kit and several uninterrupted minutes, successful Medicine removes one injury box; success by 5 or more removes two. Each injury receives one field-treatment attempt; further attempts need changed circumstances.
+
+## Proper care
+
+A hospital with an Operant ward grants +2 to Medicine. A successful treatment removes two boxes; success by 5 or more removes three. Allow the time the treatment requires.
+
+## Natural recovery
+
+Rest clears injury one box at a time, and the worse you're hurt, the longer each box takes. Rest means nothing strenuous: no fighting, no hard travel, no long days of work.
+
+| Boxes marked | Rest to clear one box |
+|---|---|
+| 1 | A full day |
+| 2 | At least three days |
+| 3 | A week, and only in someone's care |
+
+At three boxes, rest alone does nothing until someone has stabilized or treated you; after that, a week of rest in their care clears the first box. A successful treatment is faster. The times add up: from three boxes, rest alone takes about a week and a half to heal completely (a week, then three days, then a day).
+
+# Magic
+
+Magic works at two speeds, with a third tool that turns one into the other. Every magical character uses the same three tools; this setting decides who gets which, what they're called and what they cost.
+
+| Tool | Speed | How it works |
+|---|---|---|
+| **Cantrips** | One action | A quick spell you know. Roll Powers; on a success it happens. |
+| **Rituals** | Minutes to nights | Anything else. Describe the effect; the GM sets its weight; fill a progress clock. |
+| **Fetishes** | One action, no roll | A finished ritual stored in an object, released by breaking it. |
+
+## Cantrips
+
+Each cantrip has a short **base effect**: one target, for one scene, at Close or Short range. Harm marks 2 boxes; a penalty is −2; the target resists with an attribute where it makes sense.
+
+**Boosts.** Your Circle sets your power (your Cantrips power's Class: the First Circle at Class I, the Second at Class II, and on up). Each Circle above the first gives **one Boost**, chosen **as you cast**. Each Boost you spend is **−1 to the roll**, so you can always hold back.
+
+| Boost | One Boost | Two Boosts |
+|---|---|---|
+| **Harder** | +1 box, or the penalty becomes −3 | +2 boxes, or −4 |
+| **Wider** | A handful of targets | A crowd, or an area |
+| **Longer** | A day | Until it's lifted |
+| **Farther** | One range band farther | Two bands farther |
+
+**The price.** A failed cantrip marks a box of Strain; a natural 18 marks two, or something answers that shouldn't.
+
+## Rituals
+
+1. **Describe the effect.** The GM sets its weight and says what it can and can't do before you start.
+2. **Fill the clock** with Powers rolls at your pace (usually ten minutes a roll). Success fills one segment, success by 5 or more two. A failure costs time or ticks a danger clock.
+3. **It happens** when the clock is full. A ritual interrupted with energy gathered may go wrong.
+
+| Weight | Segments | Scale |
+|---|---|---|
+| Minor | 2 | One person, one night, one small thing |
+| Significant | 4 | A household, a building, a question answered |
+| Major | 6 | A bloodline, a town, a demon bound |
+
+**Trappings.** The right materials, hour or place remove one segment.
+
+## Fetishes
+
+Work a ritual in advance and store it in an object; break it (one action, no roll) to release it. An Adept can keep **one** ready fetish, two with Powers as an Expert skill. Preparation is how slow magic wins a fast fight.
+
+## Magic in Aurora
+
+|  | How it works here |
+|---|---|
+| **Feel** | Comic-book magic: flashy, fast and plentiful. |
+| **Cantrips** | The Cantrips power (see Cantrips). Each Circle above the First gives a Boost, so a Fourth Circle sorcerer has three. From the Fourth Circle, a Wider Boost can take a city block and a Longer one can make an effect permanent, with the GM's approval. Bolt, Shield and Dispel already work at your Class, so they take Wider, Longer and Farther Boosts, not Harder. |
+| **Rituals** | Adepts copy any power by ritual (see Rituals): Class I is a Minor working, Class II Significant, Class III Major. |
+| **Fetishes** | Rare. An Adept can keep one ready fetish, two with Powers as an Expert skill. |
+| **Price** | Strain. A failed cantrip or ritual marks a box. |
+| **Growing** | Cantrips grow with the power's Class: pushing, Stronger Power and growth in play. |
+
+# Spark points and tracks
+
+## Using Spark points
+
+Begin each session with two Spark points (three with Extra Spark); unused points do not carry over. Spend no more than one point on a single roll or injury event.
+
+| Spend one point to | Timing and limits |
+|---|---|
+| Reroll your own roll | Declare after seeing the result but before its consequences. Keep the second result, even if worse. |
+| Reduce an injury by one box | Declare when a hit would mark boxes, before applying them. Does not prevent certain death. |
+| Shrug off a telling hit | Cancel the effect an attacker picked against you; you still take the boxes. |
+| Establish a small preparation | Propose a plausible detail, such as having packed something useful. GM approval is required. |
+
+Gain one point when one of your complications creates a meaningful problem you accept, including a companion complication. You can decline the proposed complication without penalty.
+
+## Collateral, Scrutiny and Backlash
+
+The team shares three tracks. **Collateral** is the damage your cases leave behind: wrecked property, hurt bystanders, and the lawsuits and hearings that follow, as Warlord I learned in 1973. **Scrutiny** is official attention: ExLAW, the FBI, the EPAOC, and in the end the Foundation and Raster Zero. **Backlash** is the public turning against you, and against Operants in general.
+
+- **Marking:** a fight in a crowded street or a collapsed building (Collateral); breaking procedure, using powers illegally or being noticed by the wrong people (Scrutiny); a disaster on camera or a scandal (Backlash). A success at a cost can mark any of them.
+- **Clearing:** paying for the damage or a clean arrest that stands up in court (Collateral); lying low, a friend in the right office (Scrutiny); a rescue on live TV, a good interview (Backlash).
+
+Each character also has **Strain**, their own track for pushing powers and fueling rituals (see *Powers*).
+
+| Track | Boxes | As boxes fill |
+|---|---|---|
+| Collateral | 4 | 1: Property damage: insurance claims and angry owners; 2: Bystanders hurt: −2 to Media and Persuasion with the public; 3: Lawsuits and charges: someone is held liable; 4: An EPAOC hearing: start a clock; a team member may lose their status |
+| Scrutiny | 4 | 1: Questions in a report; 2: Flagged: −2 at checkpoints, cordons and with federal agencies; 3: Investigated: ExLAW or the FBI opens a file on you; 4: Hunted: the Foundation or Raster Zero takes an interest; start a clock |
+| Backlash | 4 | 1: Talk shows ask hard questions; 2: Protests: −2 to Media and Leadership with crowds; 3: Anti-Operant laws proposed; Operant friends blame you; 4: Riots: the next case starts in a city that wants you gone |
+
+## Advancement
+
+Characters grow by earning **advancement points** and spending them.
+
+- **Earning.** After a significant case, the GM awards each character **1 point**. At a **milestone**, the end of a story arc, everyone earns **2 more**.
+- **Spending.** Spend points when you earn them, or bank them for something bigger. Each purchase needs the GM's approval and a reason from the story: training with someone, something you lived through, a debt paid.
+
+| Purchase | Cost | Limit |
+|---|---|---|
+| A skill from Untrained to Trained | 1 | — |
+| A skill from Trained to Specialty | 2 | Specialty (+3) is the ceiling: only a Specialist's starting skill is Expert, unless they broaden (see Step 3) |
+| Revise an advantage or complication | 1 | — |
+| A new Edge | 3 | Any Edge except the attribute and Trained-skill Edges, within its own limit |
+| +1 to an attribute | 4 | Once per attribute; no higher than one above the starting maximum (14, plus any origin bonus) |
+
+Magic and powers grow the same way, at the costs their chapters give.
+
+# Running cases
+
+## The case files
+
+End each case with a short entry, written together:
+
+1. **The case.** What happened, and did we succeed: fully, partly, or not at all?
+2. **Who stood out?** A moment worth remembering.
+3. **Complications.** Which ones came into play, and what did they cost?
+4. **What changed?** New allies or enemies, damage, open threads for next time.
+5. **Advancement.** After a significant case, each character earns 1 advancement point; at a milestone, 2 more.
+
+# The world of Aurora
+
+## The First Wave
+
+Extraordinary humans were recognized as a phenomenon as early as the 1880s, but the few who came to public notice were dismissed as myths, linked with spiritualism and urban legends. Then, from **April 3rd to April 30th, 1938**, strange auroras bathed the night sky worldwide. Astronomers spoke of a belt of charged particles in the upper atmosphere. During those weeks deaths from a dozen ailments rose across the world, and by the end of April the "aurora deaths" passed **five million**. Adolf Hitler died of pneumonia and Reinhard Heydrich replaced him; Heinrich Himmler died under mysterious circumstances.
+
+The survivors didn't all come through unchanged. The auroras were the **First Wave**: the night the first generation of Operants awoke.
+
+- **June 1938.** Herbert Unler, an American occult scholar, became the first non-Briton recruited to the **Shadow Knights**, after he banished a demon in Boston: the first mystical creature seen in more than a century.
+- **August 1938.** Without Hitler, the National Socialist movement fell apart. The SS became a quasi-mystical order, and **Zarloff the Elder** appeared to a cell of initiates in Berlin, promising them the new world order Hitler had dreamed of.
+- **1941–1945.** At least thirty Operants served secretly in the militaries of six nations, Germany among them. **Hector Gonzalez**, Nikola Tesla's assistant, received **Ambrosia** in 1943 and became **Mr. Marvel**; the immortal **Ivory Phoenix** fought for the Allies and destroyed the first Steel Falcon.
+
+## The public years
+
+In **1952** a highly publicized battle between US Army forces and unidentified assailants at **Fort Knox**, together with growing reports from around the world, forced the public to accept that people with powers existed. In the same year the first **Hephaestus Keys** were found in London, and Lord Colslo used one to open the Celtic Gate to Avalon.
+
+Senator Edward McCarthy led the campaign against the "abnormal powers" menace. Congress passed the **Human Powers Control Act**, requiring the registration of all "citizens with operant capabilities outside the human physiological norms": the origin of the official term, **Operants**. No one could agree how to register or enforce anything, and only one warrant was ever issued under the HPCA, for **Charlie Swift**, the "fastest man alive", a popular critic of the government. He was shot during the botched arrest, spent a year in a coma, lost his powers and drank himself out of public life. McCarthy was censured and ousted.
+
+Untrained police couldn't deal with powered crime, so unsanctioned teams of Operants and ordinary volunteers stepped in. The most respected was the **Power Legion**, led by **Mr. Marvel**, *maravilla del señor*, a World War II hero whose popularity crossed the color lines of 1950s America. The Legion supported law enforcement along the East Coast until it was forcibly disbanded during the **Khatorsi Crisis of 1968**. Its paramilitary uniforms set the style for every public team that followed.
+
+In **1959** Dr. Richard Kennedy was bathed in a runaway reactor's radiation and bonded to an entity from beyond: **the Atomic Man**.
+
+## ExLAW
+
+In **1972** Congress and President Richard Nixon replaced the HPCA with the **Extraordinary Powers Act (EPA)**, and created the **Extraordinary Law Enforcement Agency (ExLAW)** under the Department of Justice to enforce it. A House committee, the **EPA Oversight Commission (EPAOC)**, became its watchdog.
+
+Nixon's science advisor **Dr. Edmund Hamilton**, an authority on Operants and one of the authors of the EPA, became the first Director. The first agents came from the FBI and the special forces, with law or criminology degrees and top-secret clearance: five Operant investigators and twenty-seven transferred FBI agents, with lawyers and staff behind them.
+
+At the same time the Department of Defense finished testing the **Aegis Series I** power suit, an armored exoskeleton likened to "a slow, sweaty tank you can wear". Some credited the AS-I corps with victory in Vietnam, but the Pentagon dropped the program after the war in 1973. EPAOC members persuaded the Justice Department to adopt it as an alternative to Operant agents, and the first ExLAW Aegis pilots went into service in January 1974. Steady improvements through the 1970s and 1980s made the suits a tactical success.
+
+Local police were slow to trust ExLAW until its agents captured **General Markum** and his renegades. ExLAW's enforcement of the EPA estranged the unofficial teams, many of whom refused to register and kept their secret identities. Hamilton answered with **Reserve Agent** status: masked Operants could register while their identities stayed sealed. The EPA let the Director grant false identities to agents at risk, and no one but the Director or the Attorney General could open an agent's file without a criminal warrant. Hamilton extended that protection, quietly and often, to every Reserve Agent.
+
+Reserve status had a price. Reserve Agents were held to police procedure and liable for any damage they caused. In **1973** **Warlord I** fought the criminal **Armageddon** in an apartment block; Armageddon's charges brought the building down and killed hundreds. Warlord was convicted of reckless endangerment and died in a prison riot. Some heroes refused Hamilton's offer and stayed unsanctioned; Hamilton kept his agents focused on the Operants who endangered the public, and let the rest be.
+
+In **1977** Hamilton's protégé **Johnny Vanroy**, Mr. Power, was arrested for the murder of heiress Lita Weston. He was cleared, but left ExLAW in 1978, and the EPAOC never stopped accusing Hamilton of favoritism. By **1982** ExLAW had more than thirty full-time Operant agents and fifty AS-III pilots. That year a cell of terrorist Operants led by **Autuarch** attacked the **US Capitol**. ExLAW tracked them to Los Angeles and captured all but a few; Autuarch escaped to Argentina and founded the **White Hand**.
+
+## The Second Wave
+
+In **1985** Hamilton retired. Months later the **Second Wave** came: a new surge of awakenings across the world, just after **John Marcus Mars Jr.**, Merlin's chosen heir, defeated Mordred and Morgan le Fay in a final battle he barely survived. Thousands of new Operants appeared, many of them young, frightened and dangerous.
+
+President Ronald Reagan appointed **Dr. Allison Manchester**, the architect of **Raster Seven**, the underground Operant prison the civil-rights community calls *Tartarus*. In **1986** ExLAW turned paramilitary: hunt down every non-registered Operant. Manchester expanded the AS-III and AS-IV units, rescinded Reserve status and made no secret of her distrust of Operants. The old-guard heroes and a younger, angrier generation split. The **1993 Los Angeles protests** against ExLAW's methods, during a Senate debate on stripping secret-identity protections, wrecked the Coliseum and won ExLAW a wider mandate. The **AS-V**, with "positive response controls" that stopped the suits straining their pilots' muscles, arrived in 1995. That year Manchester released every Operant agent from ExLAW; some went to the FBI, some retired, and some turned to crime.
+
+On **December 15th, 1996**, Raster Seven was breached for the first time. Fifteen of America's most dangerous Operants escaped and nineteen died. Nine were recaptured; six reached Argentina and the White Hand.
+
+From 1998 to 2000 the UN built **Raster Eight** in low Earth orbit, and **Interpol** opened its Operant division, pooling the police of the US, the Commonwealth of Independent States, Britain, China and many others against terrorism and Operant crime.
+
+## A new century
+
+President **John McCain** (2001–2009) wanted a director who could bridge the gap with the Operant community. He persuaded Manchester to retire and appointed **Juan Rodriguez**, a surgeon, author and former Power Legion member, who restored Reserve status and brought six Operant FBI agents into ExLAW.
+
+**October 9th, 2001.** A White Hand cell, three Raster Seven escapees backed by conventional bombers, brought down the Sears Tower and two neighboring towers in Chicago's Loop, killing more than 2,000 people. Autuarch claimed the attack within the hour. The investigations showed that Operant and ordinary agents had warned of activity in Buenos Aires and Chicago and been ignored, because the CIA and FBI didn't trust their own Operant agents. The **Department of Homeland Security** was created; ExLAW moved under it, Rodriguez became Deputy Director of DHS, and **Garret Cane**, ExLAW's non-Operant chief of operations, became Director.
+
+That same year **Iran's Islamic Republic fell**. Months of strikes and street protests became a revolution led by a coalition of communist and socialist parties, which proclaimed the secular **People's Republic of Iran**. Washington, unsure whether to welcome or fear it, has kept it at arm's length ever since.
+
+- **2002–2004.** Under Cane, ExLAW became a publicity engine: televised rescues and recruiting drives. Operant and AS-6 units spearheaded the UN-led **invasion of Iraq**, which had sheltered White Hand training camps. ExLAW and Interpol turned on the White Hand and the **Morcain**.
+- **2006.** Congress approved ExLAW's **regional commands** over police objections: six regional offices, each with its own Operant team and Aegis wing.
+- **2007.** The Foundation's enforcer **Sergei Grachyov** fought the Atomic Man in Washington, and the **Washington Monument** fell. Both walked away.
+- **2009.** President **Margaret Hale** took office.
+
+## The Umkas invasion
+
+In **2012** **Steel Hawk** and **Autuarch** opened a dimensional breach over New York, and the **Umkas** came through. **Celerity**, the **Golden Centurion**, **Uathach** and dozens of others held the city. Steel Hawk nearly killed Celerity, and she spent a year in a coma. Chat Roux's transport was destroyed and he was stranded on this Earth. The breach tore Limbo open as well, and **Michael Lance**, a private eye lost since 1946, walked out into 2012. Then Steel Hawk turned: he and Autuarch closed the breach together, and escaped ExLAW.
+
+The breach left the walls between worlds thin.
+
+- **2013–2014.** **Shadow Earth** incursions began in New York, and **Vanguard**'s killings started. The Army founded **DIRE**, the Defense Intelligence and Research Enterprise, to answer the next invasion; **Helios** was its first success.
+- **2015.** **Evelyn Dark**'s breakout destroyed a Foundation black lab and the town around it: the first public evidence that the Foundation exists, though no one can prove who runs it.
+- **2016.** **Micky Holt** became the **Green Man**, and the **Mad Forest** swallowed southern Indiana in a week.
+- **2018.** The US, China and Russia secretly built a weapon to kill the Atomic Man. It failed, and he destroyed their arsenals.
+- **2019.** Garret Cane retired, and **Steven Humbacht** became Director of ExLAW. On paper a career defense-research administrator, he spent fifteen years inside a cabal hidden in DARPA, running **Raster Zero**: an extradimensional prison and experimental lab for Operants that no oversight committee knows exists.
+- **2021.** Celerity persuaded the Green Man to open **the Haven**, and America's homeless began walking to the forest.
+- **2024.** The Atomic Man found a grey hair. Federal attempts to stop the march to the Haven brought standoff after standoff; Celerity intervened at every one, and a federal warrant was issued for her arrest.
+
+## 2025
+
+ExLAW has the warrant for Celerity, and hasn't moved on it; the EPAOC wants to know why. Shadow Earth incursions are increasing. Autuarch and Steel Hawk are at large. The Morcain's council, **the 12**, is expanding through Korea under Hyun Wang. And in a pocket dimension no one has found, Director Humbacht's other prison is filling up.
+
+# The law
+
+## The Extraordinary Powers Act
+
+The EPA requires every Operant who is a US citizen or resident to **register** with ExLAW: identity, powers and a Class rating in the **ExLAW Metahuman Database (EMD)**, the most complete record of Operants on Earth (it kept its old name when "Operant" became the official term). Registered Operants may use their powers in self-defense and emergencies; using powers in public otherwise, or being an unregistered Operant, is a federal crime.
+
+## EMD classifications
+
+The EMD rates every Operant by their strongest power, in six **Classes**. The same Classes are the rules for powers in this game:
+
+| Class | The EMD's definition | In play |
+|---|---|---|
+| I | Abnormal, but countered by standard police equipment: body armor, martial arts, armor-piercing rounds; strength up to about twice the human maximum | A punch that cracks brick, a pistol-strength blast |
+| II | Outside the human spectrum; needs special countermeasures | Pyrokinesis, super-speed, low-level regeneration; bullets glance off |
+| III | Can't easily be countered by non-Operant force | Tears down walls; outfights an Aegis suit |
+| IV | Only military force or another Operant can answer it | Wrecks buildings; flies beside jets |
+| V | A threat to a city | Grachyov, the Golden Centurion |
+| VI | A threat to nations | The Atomic Man, Autuarch |
+
+## Legal status
+
+The EMD also files every Operant by their relationship to ExLAW. Every character has a **legal status**:
+
+| Legal status | Benefit | Cost |
+|---|---|---|
+| **Civilian** | No registration needed: you have no powers to register. | No federal protection when Operants come calling. |
+| **Registered** | Legal to use your powers in self-defense and emergencies; protected under the Extraordinary Powers Act. | Your identity and powers are in the EMD, and anyone with access can read them. |
+| **Reserve Agent** | You can make arrests, and the Director protects your secret identity. | You're held to police procedure, and liable for the damage you cause. |
+| **Full Agent** | Federal authority, backup and ExLAW resources. | Orders, paperwork and EPAOC scrutiny. |
+| **Non-registered** | You're not in the EMD; nobody can look you up. | Using your powers in public is a federal crime. |
+| **Convict** | ExLAW may offer a deal: work off your sentence. | A parole officer, a tracking device and no second chances. |
+
+A status can change in play: a Non-registered vigilante caught by ExLAW may be offered Reserve status, or a cell. Losing Reserve status means losing the Director's protection of your identity.
+
+## The Rasters
+
+- **Raster Seven**, "Tartarus": ExLAW's underground prison for Operants, built in the 1980s and breached once, in 1996.
+- **Raster Eight**: the UN's prison in low Earth orbit, where Interpol sends the Operants it catches.
+- **Raster Zero**: doesn't exist. *(GM: Director Humbacht's DARPA cabal runs it in a pocket dimension, as a prison and a lab: a rival to the Foundation. ExLAW doesn't know.)*
+
+# Powers
+
+Every Operant has powers, and every power has a **Class** from I to VI. Player characters start at Class I to III; Classes IV to VI belong to the GM's characters, and follow the same pattern a step further each time.
+
+## Using powers
+
+- **Rolling.** Roll **Powers** to aim a power at someone, or to use it with skill: precisely, at a distance, around bystanders. Passive powers (Toughness, Regeneration, Speed and the like) just work. Targets resist with **Dodge** (things you can dodge), **Body** (things that work on the body) or **Will** (things that work on the mind).
+- **Damage.** A power marks boxes by its Class: Class I marks 1 box, Class II marks 2, Class III marks 2 and knocks the target down, Class IV and above mark 3. Ordinary weapons mark the boxes in their table (see *Personal combat*).
+- **Defense.** Armor, not a defense roll: an attack above your Defense hits in full; an equal one marks a box fewer; a lower one does nothing. It applies after your Dodge, Parry or Block.
+- **Range.** Unless a power says otherwise, a ranged power's effective band (see *Range* in Personal combat) is **Short at Class I, Long at Class II, Extreme at Class III**, and miles at Class IV and above, out to the horizon. Mind powers keep the reach their descriptions give: touch, a room, sight or a city.
+- **Pushing.** For one action, use a power one Class higher than you have it, and mark a box of **Strain**.
+
+**Strain** is your personal track:
+
+| Strain | Effect |
+|---|---|
+| 0 | Steady |
+| 1 | −1 to Powers |
+| 2 | −2 to Powers; nosebleeds, sparks and flicker |
+| 3 | On a natural 16–18 with Powers, the power goes wild: the GM decides how |
+| 4 | Burned out: your powers fail until you rest a full day |
+
+A night's sleep clears one box; a full day's rest clears them all.
+
+## Powers at creation
+
+Your origin's tier sets your powers:
+
+| Tier | Powers |
+|---|---|
+| 0: Non-Operant | None: training, gear and Edges. An Aegis suit counts as Strength II, Toughness II, Flight I and a Class II weapon. |
+| 1: Adept | Two powers from the mystic list at Class I; the first is Class II once Powers is your top skill. Plus rituals. |
+| 2: most origins | Three powers: one at Class II, two at Class I. |
+| 3: Ambrosia and Mythic | Three powers: one at Class III, one at Class II, one at Class I. |
+
+Choose them in the creator's step 4. Powers marked **(GM)** need the GM's approval, and so does every power a **Mythic** character takes.
+
+**Aurora characters have 4 Edge points** (one more than other Legend Dynamics settings), and two Edges of their own:
+
+| Edge | Effect | Limit |
+|---|---|---|
+| **Stronger Power** | Raise one of your powers by one Class | Up to three; Class III is the limit at creation, unless the GM approves **one power at Class IV** (tick *GM's approval for Class IV* in the creator) |
+| **Extra Power** | One more power, at Class I | Once |
+
+So an Ambrosia or Mythic character can start with a Class IV power by spending their one Edge, if the GM agrees; a tier 2 Operant can trade their Edges for a stronger power or a fourth one.
+
+## Growing your powers
+
+Powers grow with advancement points (see *Advancement*), with the GM's approval:
+
+| Advancement | Cost | Limit |
+|---|---|---|
+| Raise one power by one Class | 2 | Up to Class III |
+| Learn a new power at Class I | 2 | Needs a story reason: a ritual, an exposure, Ambrosia, a bond that deepens |
+| Raise a Class III power to **Class IV** | 4 | Once per campaign, at a major story turning point, with the GM's approval |
+| **Class V** | — | Only at the end of a long campaign, as the climax of a character's story; the GM grants it |
+
+**Class VI** stays with the GM's characters. Until then, pushing (one action, one box of Strain) is how a character briefly reaches the Class above their own. Record grown and newly learned powers in the creator's step 4, under *Powers grown in play*.
+
+## The powers
+
+## Energy and attack
+
+| Power | Class I | Class II | Class III |
+|---|---|---|---|
+| **Blast** (fire, ice, light, plasma, electricity or force) | Class I attack; effective at Short range, like a pistol. | Class II attack; effective at Long range, like a rifle. | Class III attack, effective at Extreme range; or Class II against everyone in a small area. |
+| **Elemental Control** (choose air, earth, water or plants) | Shape a little of your element nearby: a gust, a mud patch, grasping vines. | Shape a room's worth: walls of earth, a waterspout, a thicket; Class II attacks. | Shape a city block's worth: a tremor, a flood surge, a forest overnight. |
+| **Weather Control** | Fog, wind or rain around you for a scene. | A storm over a neighborhood; lightning as a Class II attack. | A storm over a city: grounded aircraft, Class III lightning. |
+| **Darkness / Shadow** | Darken a room; +2 to Stealth in shadow. | Total darkness only you see through; step between shadows within sight. | Solid shadow constructs (Class II attacks or barriers); swallow a block in night. |
+| **Gravity / Density** | Make one object or person heavy (−2 to move) or light enough to throw. | Pin a group to the ground (Body resists); become dense (Defense II) or light enough to float. | Crush a vehicle; Defense III; hurl a car as a Class III attack. |
+| **Energy Absorption** (choose a type: sunlight, electricity, kinetic, radiation…) | Attacks of your energy type are one Class lower against you. | Ignore your energy type up to Class II; spend what you absorb on a Class II Blast. | Ignore your type up to Class III; once a scene, absorbed energy fuels a Class III Blast or a push without Strain. |
+| **Natural Weapons** (claws, fangs, horns or spikes) | Unarmed hits are Class I. | Unarmed hits are Class II; you can climb with them. | Unarmed hits are Class III; they cut through steel doors. |
+| **Manifest** (weapons or objects from nothing) | Any hand weapon or simple tool, lasting a scene. | Any personal firearm or complex tool; Class II attacks. | Heavy weapons or a vehicle's worth of matter; Class III attacks. |
+
+## Body and movement
+
+| Power | Class I | Class II | Class III |
+|---|---|---|---|
+| **Strength** | Lift a motorcycle; unarmed hits are Class I. | Lift a car; unarmed hits are Class II; tear doors off. | Lift a truck or a small plane; unarmed hits are Class III. |
+| **Toughness** | Defense I against physical harm. | Defense II. | Defense III. |
+| **Force Field** | Defense I for you, for a scene. | Defense II for you, or Defense I around a small group. | Defense III, or Defense II around a group; seal a doorway. |
+| **Speed** | Up to 70 mph, as fast as a car; act first in any round. | Up to 200 mph; run across water and up walls; two moves a round. | Mach 1 (about 760 mph); once a scene, two actions in a round. |
+| **Flight** | Fly up to 70 mph, as fast as a car. | Fly up to 300 mph, as fast as a light plane. | Mach 2 (about 1,500 mph): keep up with fighter jets. |
+| **Super Leaping** | Leap 30 ft up or 100 ft across: onto a three-story roof. | Leap 100 ft up or a city block (300 ft) across. | Leap a quarter mile up or a mile across. |
+| **Wall-Crawling** | Climb any wall as easily as walking. | Run up walls and across ceilings. | Cling upside down under a moving vehicle or aircraft. |
+| **Regeneration** | Clear one injury box after a scene's rest. | Clear one box at the end of each scene; a single hit never leaves you Dying. | Clear a box every few rounds; regrow lost limbs. |
+| **Adaptation** | Ignore one hazard: heat, cold, poison or thin air. | Breathe water and ignore all ordinary hazards. | Survive vacuum, the deep ocean and fire. |
+| **Size Change** | Shrink to a cat (+2 Stealth) or grow to 10 feet (+2 to Body feats). | Insect-sized, or 20 feet tall with Strength I and Toughness I while big. | Microscopic, or 50 feet tall with Strength II and Toughness II while big. |
+| **Stretching** | Reach across a room. | Wrap a group, squeeze under doors; Class I attacks at range. | Stretch a block; bounce Class II hits back at the attacker. |
+| **Invisibility** | Fade from notice: +4 to Stealth if you stay still. | Invisible while moving. | You and those you touch, to cameras and sensors too. |
+| **Phasing** | Pass slowly through a wall (one action). | Walk through walls; physical attacks below Class II pass through you. | Phase as a reaction: attacks below Class III pass through; wreck a machine by passing through it. |
+| **Duplication** | One copy for a scene that helps (+2 assistance). | Three copies that act on their own (minor characters). | A crowd of copies; you know what all of them know. |
+| **Transformation** (an alternate form; you design its powers) | Change in one action; the form has two Class I powers of its own. | The form's powers rise to Class II. | The form's powers rise to Class III. If the form has a will of its own, each change marks Strain. |
+| **Immortality** *(GM)* *(Mythic only)* | You don't age. | You can't die of age, disease or poison. | Even death doesn't hold: you return within days, as the GM decides. |
+
+## Mind and senses
+
+| Power | Class I | Class II | Class III |
+|---|---|---|---|
+| **Telepathy** | Hear surface thoughts by touch; speak mind to mind within a room. | Read thoughts within sight; link a team's minds for a scene. | Search memories; link minds across a city. |
+| **Mind Control** *(GM)* | One simple command that doesn't endanger them (Will resists). | Control a person's actions for a scene (Will resists each round). | Control a small group, or plant a lasting command. |
+| **Emotion Control** | Push one person toward fear, calm, rage or trust (Will resists). | Sway a crowd; fear makes them flee. | Terror or rapture that paralyzes a crowd for a scene. |
+| **Memory Manipulation** *(GM)* | Blur the last minute in one person's memory. | Erase or alter a day; read memories by touch. | Rewrite years; plant a false life. |
+| **Illusion** | A sound or small image at a distance. | A convincing person or scene that fools sight and hearing (Will or Intellect sees through). | Illusions every sense believes; they can frighten someone into collapse. |
+| **Empathy** | Feel what one person feels; +2 to Read People. | Sense lies and intentions in a room; share or ease pain by touch. | Feel a crowd's mood across a block; find a person by their emotions. |
+| **Precognition** | +2 to one roll a scene; you're never surprised. | Once a scene, reroll a failed roll without spending Spark. | Visions of a scene's future: the GM answers one question about what's coming. |
+| **Enhanced Senses** | +2 to perception; see in the dark. | Track by scent; hear heartbeats through walls. | See through walls; hear a whisper across a block. |
+| **Mystic Sight** | See spirits and active magic. | See auras: possession, curses, lies, Shadow Earth duplicates. | See into Otherworld and Shadow Earth; read who made a spell. |
+| **Psychometry** | Touch an object and feel its last owner's emotions. | See a key moment in its past. | Follow its whole history, and find its owner now. |
+| **Astral Projection** | Leave your body to scout a building (your body is helpless). | Travel across a city as a spirit; speak to spirits. | Cross into Otherworld or Shadow Earth in spirit; fight spirits there. |
+| **Super Intellect** | +2 to Intellect skills; learn any skill in days. | Invent a working device in a week; solve the unsolvable in a scene. | Understand any technology, alien or arcane; invent in hours. |
+
+## Control and the strange
+
+| Power | Class I | Class II | Class III |
+|---|---|---|---|
+| **Telekinesis** | Move a small object you can see; disarm. | Lift a car; Class II attacks; hold a person still (Body resists). | Lift a truck; stop a falling plane; Class III attacks. |
+| **Cantrips** (quick spells; a failed cast marks Strain) | First Circle: know 2 cantrips, quick spells cast in one action, each working at Class I. | Second Circle: know 3 cantrips, each working at Class II. | Third Circle: know 4 cantrips, each working at Class III. |
+| **Teleport** | Jump to a place in line of sight, up to about 100 yards; just you. | Jump anywhere you know within 50 miles, with one passenger. | Jump anywhere on Earth you know, with up to 4 passengers. |
+| **Portals** *(GM)* | Open a door between two places you can see. | Open a door to anywhere you've been. | Open a door into Otherworld, a haven or Shadow Earth. |
+| **Summoning** | Call a minor spirit or creature that helps for a scene (+2 assistance). | Call a creature that fights beside you (a minor character with Class II attacks). | Call something powerful; it serves, at a price. |
+| **Warding** | Seal a door or circle against spirits and magic. | Protect a building; banish a minor spirit or creature (Will resists). | Protect a block; banish powerful beings back to Otherworld. |
+| **Healing** | Stabilize the Dying by touch; clear one box once a scene. | Clear two boxes; cure ordinary disease and poison. | Clear any injury; cure the incurable; even curses yield (with the GM's approval). |
+| **Power Negation** | Suppress one Operant's Class I powers within reach for a round (Will resists). | Suppress Class II powers within a room for a scene. | Suppress Class III powers in an area; the labs would kill for you. |
+| **Power Mimicry** | Copy one Class I power from an Operant you touch, for a scene. | Copy at Class II, or two powers at Class I. | Copy at Class III, and keep a copied power until you take another. |
+| **Technopathy** | Sense and talk to machines; +2 to Computers and Engineering. | Command electronics in a room: locks, cameras, guns, drones. | Command a building's systems or a fleet of drones; take over an Aegis suit (the pilot's Will resists). |
+| **Animal Control** | Speak with animals. | Command a pack or a flock for a scene. | Command every animal across a block. |
+| **Probability Control** | Once a scene, +2 or −2 to any roll you can see. | Once a scene, turn a near miss into a success, or a success into a failure. | Once a session, choose the result of any roll you can see. |
+| **Time Manipulation** *(GM)* | Once a scene, take an extra action. | Freeze time around you for a moment: two extra actions. | Rewind the last round, once a session. |
+| **Possession** *(GM)* | Ride along in one person's senses (Will resists). | Take control of a body for a scene; your own body is helpless. | Possess and keep a body; switch bodies by touch. |
+| **Gadgeteering** | Carry three gadgets, each a Class I effect from another power. | Build gadgets with Class II effects; repair anything. | Build devices with Class III effects, or an Aegis suit of your own. |
+
+## Escalated Classes
+
+Every power keeps going at Classes IV to VI. Player characters reach Class IV only by pushing (one action, one box of Strain), with the Stronger Power Edge and the GM's approval, or at a campaign milestone; Class V is an end-of-campaign capstone, and Class VI belongs to the GM's characters. Speeds are in multiples of the speed of sound (Mach 1 is about 760 mph).
+
+| Power | Class IV | Class V | Class VI |
+|---|---|---|---|
+| **Blast** | Class IV attack, effective for miles; or Class III across a small area. | Class V attack that can level a building; or Class IV across a city block. | Class VI attack; or Class V across a district. |
+| **Elemental Control** | Shape a neighborhood's worth: a sinkhole, a river turned aside, a forest in an hour. | Shape a city's worth: an earthquake, a flood, a storm surge. | Shape a region: raise hills, redraw a coastline. |
+| **Weather Control** | A storm over a region: tornadoes, Class IV lightning. | A hurricane, and you steer it. | Change a continent's weather for a season. |
+| **Darkness / Shadow** | Plunge a neighborhood into night; constructs make Class III attacks. | Night over a city; step through shadows anywhere in it. | Open a road through shadow to anywhere, even Shadow Earth. |
+| **Gravity / Density** | Crush a building's frame; Defense IV; hurl a truck as a Class IV attack. | Pull an aircraft out of the sky; Defense V. | Bend gravity over a city; Defense VI. |
+| **Energy Absorption** | Ignore your type up to Class IV; absorbed energy fuels a Class IV Blast. | Ignore your type up to Class V. | Drink anything of your type, even a nuclear blast. |
+| **Natural Weapons** | Unarmed hits are Class IV; they carve through tank armor. | Class V; they cut through a bank vault. | Class VI; nothing made can stop them. |
+| **Manifest** | Military hardware, a tank's main gun: Class IV attacks. | A warship's worth of matter; Class V attacks. | Raise a fortress from nothing. |
+| **Strength** | Lift a tank or a jet; unarmed hits are Class IV. | Lift a ship or a building's floor; Class V. | Move a mountain's worth; Class VI. |
+| **Toughness** | Defense IV. | Defense V. | Defense VI. |
+| **Force Field** | Defense IV, or Defense III around a building. | Defense V, or Defense IV around a city block. | Defense VI, or shield a city. |
+| **Speed** | Mach 3: cross a city in seconds; two actions every round. | Mach 10: cross a continent in minutes; three actions a round. | Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still. |
+| **Flight** | Mach 5: outfly any jet; cross an ocean in an hour or two. | Mach 10: anywhere on Earth within a couple of hours. | Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it). |
+| **Super Leaping** | Leap a mile up or 5 miles across. | Leap 5 miles up or 25 miles across. | Leap into the stratosphere, or 100 miles and more across. |
+| **Wall-Crawling** | Cling to anything, even glass in a hurricane or a spaceship's hull. | Walk on water, smoke or any surface. | Stand on the air as if it were ground. |
+| **Regeneration** | Clear one box at the start of each of your turns. A hit that would leave you Dying leaves you Incapacitated instead, and you're back up in a round. | Clear one box each turn, two after a hit that marks 3 or more. Only certain death stops you, and even then you recover within the hour unless your body is destroyed outright. | Nothing short of total annihilation keeps you down. |
+| **Adaptation** | Survive vacuum, lava or the ocean floor indefinitely. | Survive on other worlds and in other dimensions. | Survive anything that doesn't destroy you outright, even a star's surface for a while. |
+| **Size Change** | Grow to 100 feet (Strength III and Toughness III while big), or shrink to dust. | 300 feet (Strength IV and Toughness IV), or subatomic. | Kaiju-sized (Strength V and Toughness V), or small enough to slip between worlds. |
+| **Stretching** | Stretch a quarter mile; wrap a building; bounce Class III hits back. | Stretch a mile; bounce Class IV hits back. | Bounce Class V hits back; force can barely harm you. |
+| **Invisibility** | Invisible to every sense, and to powers below Class IV, with a group. | Make a building vanish. | Slip from notice entirely: people forget you were there. |
+| **Phasing** | Attacks below Class IV pass through you; carry others through walls. | Phase a vehicle or a crowd through anything. | Untouchable; phase through realities into Otherworld. |
+| **Duplication** | A hundred copies. | An army of copies across a city. | Copies anywhere you've ever been. |
+| **Transformation** | The form's powers rise to Class IV. | The form's powers rise to Class V. | The form's powers rise to Class VI. |
+| **Immortality** | You return within a day, even if your body was destroyed. | You return within an hour, in a body remade. | You can't be destroyed, only bound or banished. |
+| **Telepathy** | Read a crowd's thoughts; link minds across a country. | Link minds across the world. | Reach minds across dimensions; read a mind against its will (Will at −4). |
+| **Mind Control** | Control a crowd for a scene. | Control everyone in a city block. | Rule a city's minds. |
+| **Emotion Control** | Sway a city's mood for a day. | Hold a city's emotions for a week. | Panic or peace across a nation. |
+| **Memory Manipulation** | Rewrite a crowd's memory of an event. | Make a city forget. | Erase a person from the world's memory. |
+| **Illusion** | Illusions over a city block that even cameras record. | A whole false district. | Illusions that become real for those who believe them. |
+| **Empathy** | Feel every emotion in a city; find anyone by what they feel. | Ease or share a crowd's pain. | Feel the mood of a nation. |
+| **Precognition** | Twice a scene, reroll a failed roll without spending Spark; you're never ambushed. | Once a scene, know the outcome of a choice before you make it. | See the shape of days to come: the GM answers three questions a session. |
+| **Enhanced Senses** | Hear a conversation across a city; read a license plate a mile away. | Sense through walls for a mile. | Perceive anything happening across a city. |
+| **Mystic Sight** | See through any magical disguise; read spells as they're cast. | See across Otherworld; find any spirit by name. | See the threads of fate and magic over a whole city. |
+| **Psychometry** | Read the history of a building or a street. | Read a city's history; find anyone who ever touched an object. | Read the past of a place across centuries. |
+| **Astral Projection** | Travel anywhere on Earth in spirit within moments. | Act physically as a spirit, with Class III attacks. | Walk between worlds in body as well as spirit. |
+| **Super Intellect** | Out-think supercomputers; invent the impossible in an hour. | Understand any science, alien or arcane, at a glance. | Tesla's level: build doors between worlds. |
+| **Telekinesis** | Lift a jet or a building's floor; Class IV attacks. | Lift a ship; Class V attacks. | Move a mountain; Class VI attacks. |
+| **Cantrips** | Fourth Circle: know 5 cantrips, each working at Class IV. | Fifth Circle: know 6 cantrips, each working at Class V. | Sixth Circle: know 7 cantrips, each working at Class VI. |
+| **Teleport** | Anywhere on Earth, even places you've only seen in photos; up to 20 passengers or a vehicle. | Low orbit or the Moon; a building's worth of people and things. | Another world or dimension, without a door. |
+| **Portals** | Hold a door open for an army or a convoy. | Open many doors at once across a city. | Tear a breach between worlds that stays open. |
+| **Summoning** | Call something that fights with Class IV attacks. | Call a legion. | Call one of Otherworld's powers itself. |
+| **Warding** | Protect a district; banish Class IV beings. | Protect a city; banish Class V beings. | Seal an Earth Gate or a breach for good. |
+| **Healing** | Heal a crowd's ordinary wounds at once; restore lost limbs. | Bring back the newly dead, within minutes (GM's approval). | Undo death itself (GM's approval). |
+| **Power Negation** | Suppress Class IV powers across a building. | Suppress Class V powers across a city block. | Shut off powers across a city. |
+| **Power Mimicry** | Copy a power at Class IV. | Copy several powers at Class IV, or one at Class V. | Copy any power at full strength. |
+| **Technopathy** | Command a city's power grid or a military network. | Command every machine in a region. | Speak to every machine on Earth. |
+| **Animal Control** | Command every animal in a city. | Command a region's wildlife. | Command every creature that answers to instinct. |
+| **Probability Control** | Twice a scene, choose the result of a roll you can see. | Once a scene, choose the result of any roll. | Rewrite luck itself: a disaster simply doesn't happen. |
+| **Time Manipulation** | Stop time for a round for everyone but you. | Rewind a whole scene, once a session. | Travel in time (GM's approval). |
+| **Possession** | Possess and switch bodies at a distance. | Possess several bodies at once. | Possess anyone, even another Operant, against their will. |
+| **Gadgeteering** | Build Class IV devices: a better suit than ExLAW's Aegis. | Class V devices: an orbital platform. | Tesla-class inventions: doors between worlds. |
+
+## Leaping and teleporting
+
+- **Super Leaping:** one leap is your move for the turn. You land safely from any height your Class can leap; falling from higher marks boxes like any fall.
+- **Teleport:** one action. You can't arrive inside solid matter. A place you've never been is −2 to the Powers roll. On a natural 18 you arrive off target, as the GM decides: the wrong room, the wrong street, or somewhere much worse.
+
+## Cantrips
+
+Comic-book magic is fast: a bolt, a shield, a binding, in a single panel. **Cantrips** is a power for that. Instead of one effect, it gives you a few quick spells. The power's Class is your **Circle**, and every cantrip you know works at it: a Class II caster is a sorcerer of the **Second Circle**.
+
+| Circle | Cantrips Class | Cantrips known |
+|---|---|---|
+| First | I | 2 |
+| Second | II | 3 |
+| Third | III | 4 |
+| Fourth (GM's approval) | IV | 5 |
+| Fifth | V | 6 |
+| Sixth | VI | 7 |
+
+- **Casting:** one action and a Powers roll; the target resists with Dodge, Body or Will where it makes sense.
+- **The price of versatility:** a failed cast marks a box of **Strain**, which other powers don't.
+- **Growing:** pushing, Stronger Power and growth in play all work as usual; each Class higher raises you a Circle, teaches you another cantrip and strengthens them all.
+- **Who:** Cantrips is on the Adept's mystic list. Other origins can take it with a magical reason: a Bonded artifact, a Mythic heritage, a Touched vision.
+- **Changing:** between cases, swap one cantrip for another with a week of study.
+- **Pure sorcery (optional):** a character who is nothing but a spellcaster can let Cantrips take **all** their power slots. It works at the best slot's Class, and each slot given up adds **2 more cantrips**. A tier 2 character (Class II, I and I) becomes Cantrips II with 3 + 2 + 2 = **7 cantrips** and no other powers. Tick *Pure sorcery* in the creator's step 4.
+
+| Cantrip | Effect |
+|---|---|
+| Bolt | A mystic blast: an attack at your Circle's Class, effective at Short range. |
+| Shield | A barrier: Defense at the power's Class until your next turn. |
+| Bind | Bands of force hold a target in place (Body resists). |
+| Dispel | Cancel a spell, ward or magical effect of equal or lower Class. |
+| Veil | Hide yourself or an object from sight for the scene. |
+| Glamour | A quick illusion that fools the eye (Will or Intellect sees through it). |
+| Sight | See magic, spirits, curses and disguises. |
+| Hex | −2 to all of a target's rolls for the scene (Will resists). |
+| Charm | The target treats you as a friend for the scene (Will resists). |
+| Levitate | Float yourself or an object; at higher Classes, a car or a group. |
+| Step | Vanish and reappear within Close range; farther at higher Classes. |
+| Mend | Clear one injury box, once per wound. |
+
+Rituals are still the way to do *anything*, given time and fuel. Cantrips are the way to do a few things *now*.
+
+## Rituals
+
+Adepts can **emulate any power by ritual**, at any Class up to their own highest.
+
+- **The clock:** a ritual is a working (see *Magic*). Class I is **Minor** (2 segments), Class II **Significant** (4), Class III **Major** (6). Fill it with Powers rolls, ten minutes each; a Class III ritual runs through the night. It can't be done in the middle of a fight.
+- **Effect:** the power works once, or for one scene, as the GM judges, and can be cast on someone else.
+- **Cost:** a failed ritual marks a box of Strain. A natural 18 means something answered that shouldn't have.
+- Rituals for (GM) powers still need the GM's approval.
+
+**Materials.** Every ritual needs specialized materials, matched to the power: a hawk's feather and storm water for Flight, a mirror silvered with mercury for Illusion, grave dirt for Summoning.
+
+| Class | Materials | Getting them |
+|---|---|---|
+| I | Common occult supplies: chalk, salt, candles, herbs, incense | A **ritual kit** holds enough for a few workings; restocking takes a day and a shop that knows what you're asking for |
+| II | Rare components, used up in the working: meteorite iron, relic dust, water from a spring that never freezes | A lead to follow (a dealer, a collector, an Earth Wardens contact, a Morcain fence): usually a roll and a price |
+| III | One of a kind, often guarded, sometimes alive | An adventure of its own |
+
+Missing materials can sometimes be improvised at −2; the GM may rule that a ritual can't be done without the real thing.
+
+**Fuel.** Every ritual must also be fueled. Choose one source:
+
+| Fuel | Class I | Class II | Class III |
+|---|---|---|---|
+| Your own vitality | 1 Strain | 2 Strain | 1 injury box and 2 Strain |
+| A sacrifice: something of value destroyed in the working | Money or a keepsake | A rare reagent or an artifact's charge | Something irreplaceable: a relic, a bond, a memory |
+| Willing helpers, who mark 1 Strain each | 1 helper | 2 helpers | 4 helpers |
+| A place of power: a ley-line crossing, an Earth Gate, a haven's edge | Fuels it alone | Fuels it alone | Fuels it alone, but draws attention from the other side |
+| A Hephaestus Key | 1 charge | 1 charge | 2 charges |
+| A bargain with an Otherworld power | A small favor owed | A real favor owed | A debt called in at the worst moment |
+
+Without fuel, a ritual fails before it begins. Fuel taken from an unwilling person works, and is exactly how the Foundation and Raster Zero do it; for player characters it's a crime under the EPA, and a black mark on any Adept.
+
+## Aegis suits
+
+The **Aegis AS-6** is ExLAW's armored power suit, and the government's answer to Operants. A certified pilot (any Aegis Pilot, or a character with *Aegis Certified*) gets, while suited: **Strength II, Toughness II, Flight I** and a **Class II arm cannon** fired with Firearms. Suiting up takes a minute. A shot at the power pack (−2 to aim) that gets through shuts the suit down until it's repaired with Engineering. The suits belong to ExLAW, or to whoever stole one.
+
+## The labs want you
+
+A character with a Class III power, or any (GM) power, draws interest from the Foundation and Raster Zero. That interest is a story hook, not a rule.
+
+# Factions
+
+**Law and government**
+
+- **ExLAW.** The federal Operant agency, under Director Steven Humbacht: six regional commands, Operant agents, Reserve Agents and Aegis wings, and a public-relations office as busy as any of them.
+- **The EPAOC.** The congressional watchdog, always looking for a scandal; a hearing can end a career.
+- **DIRE.** The Army's Defense Intelligence and Research Enterprise, founded after 2012. It made Helios with a modified Ambrosia, and wants more like him.
+- **Interpol.** The international police organization, whose Operant division hunts fugitives across borders and fills Raster Eight.
+- **Affaires spéciales.** France's special affairs branch, home to Chat Roux.
+
+**Heroes and orders**
+
+- **The New Power Legion.** Sponsored, televised heroes; Mr. Marvel's old team reborn, with Sanders Communication's money and cameras behind it.
+- **The Shadow Knights.** The *Ordo Viarum Lucidarum*, "to bring the light of Christ into the shadows", founded (its members say) by a 12th-century knight who defied a corrupt king. A few Knights on each continent, each supported by a cell of five to twenty doctors, magicians, technicians and administrators. Grant Douglas is the Shadow Knight of North America.
+- **The Earth Wardens.** A worldwide network of Adepts gathered by a reawakened Merlin after Lord Colslo opened the Celtic Gate in 1952. They guard the re-energized **Earth Gates** against demons, faeries and malcontent gods.
+- **The Haven.** The Green Man's refuge in the Mad Forest, defended by Celerity.
+
+**Criminals and secrets**
+
+- **The Morcain.** A global crime syndicate ruled by **the 12**, Hyun Wang among them; employer of Lord Marrow and Steel Hawk, and of anyone else who sells power.
+- **The White Hand.** Autuarch's Operant army in Argentina, responsible for Chicago 2001.
+- **The Foundation.** The black labs that kidnap people, make Operants and hunt down those who escape. Sergei Grachyov is their troubleshooter. Nobody knows who runs it.
+- **The Proteus Group.** A criminal consortium the EMD tracks but can't map.
+- **Raster Zero.** *(GM only.)* Humbacht's secret prison-lab; a rival to the Foundation.
+- **Shadow Earth.** *(GM only.)* The dark reflection of our world, sending duplicates through the thinning walls.
+
+# Otherworld and Shadow Earth
+
+**Metatropic manipulation** is what physicists call the force behind many powers, and what everyone else calls magic: the same fields that let Celerity run up buildings let an Adept bend the world with a ritual.
+
+**Otherworld** is the ether beyond our Earth. Through it float the **havens**: bubble realms, pocket universes that emulate earthly environments but may have physical or spiritual quirks of their own. **Avalon** is the greatest of them: a fey realm reached through the Celtic Gate, where the survivors of Old Olympus (destroyed by Chronos and a mad Hephaestus) fled thousands of years ago, joined after Ragnarök by the remnants of Asgard's nine realms. The culture that grew out of that mix is proud, violent and steeped in old magic, and the **Accords** forbid its people from crossing to Earth. **Nikola Tesla** keeps a pocket dimension of his own: Ivry-sur-Seine in 1884, with a laboratory full of doors.
+
+The **Earth Gates** link our world to Otherworld; the **Hephaestus Keys**, crystals of stored energy, can open them, and fuel rituals.
+
+**Shadow Earth** is a strange, twisted reflection of our world, ruled by dark powers and populated by **duplicates** of our own people, who serve as the rulers' minions. Since 2012 the walls have been thin, and more of them get through every year.
+
+# Ready-made characters
+
+Characters ready to play, for one-shots, new players, or a group in a hurry. Each follows the creation rules exactly, and their connections tie them together. In the creator, choose one from the ready-made list to open it and make it your own.
+
+## Rachel Kwan
+
+*Special Agent, ExLAW Chicago, ExLAW Agent. Bonded (tier 2).* Carries a jade seal that holds a guardian spirit, inherited from her grandmother. Her partner vanished on a case Director Humbacht closed personally.
+
+- **Attributes:** Body 10, Agility 10, Intellect 13, Presence 9, Will 13. **Dodge** 9.
+- **Skills:** Investigation 16 (Specialty). Trained: Computers 14, Law 14, Occult 14, Powers 14, Read People 14, Athletics 11, Brawling 11, Firearms 11, Persuasion 10.
+- **Edges:** Extra Spark, A friend; a friend: her missing partner's last informant, who only talks to her.
+- **Advantage:** The Voice Within (origin; companion: Two Minds). **Complication:** Can't Leave It Alone; trigger: a file that shouldn't exist.
+- **Powers:** Force Field II, Mystic Sight I, Telepathy I.
+- **Legal status:** Full Agent.
+- **Why I do this:** The law should mean something, for Operants and everyone else. **Connection:** Jess Calloway is the only reporter who asked about her missing partner. Kwan hasn't decided whether to trust her.
+
+## Luis "Bulldog" Ortega
+
+*Aegis pilot, Chicago wing, Aegis Pilot. Non-Operant (tier 0); Specialist.* Twelve years in the suit, three of them in Iraq. The AS-6's new firmware came from a contractor nobody can trace, and lately the suit hesitates when he doesn't.
+
+- **Attributes:** Body 12, Agility 13, Intellect 11, Presence 10, Will 10. **Dodge** 12.
+- **Skills:** Piloting 18 (Expert). Trained: Firearms 14, Athletics 13, Brawling 13, Computers 12, Engineering 12, Law 12, Leadership 11, Read People 11.
+- **Edges:** +1 attribute point, Extra Trained skill, A friend, Extra Spark; a friend: a DIRE engineer who still owes him for Basra.
+- **Advantage:** Nerves of Steel (origin; companion: Ordinary Body). **Complication:** Orders; trigger: orders to stand down.
+- **Legal status:** Full Agent.
+- **Why I do this:** Someone has to stand between ordinary people and what's out there. **Connection:** He flew cover for Rachel Kwan the night her partner vanished, and saw something he never put in the report.
+
+## Naomi Price
+
+*Daybreak, New Power Legion, Public Hero. Ambrosia (tier 3).* The Legion's rising star, dosed with Ambrosia in a sponsor's clinic at nineteen. Her sponsor owns her image, her schedule and, she's starting to suspect, her secrets.
+
+- **Attributes:** Body 13, Agility 9, Intellect 9, Presence 14, Will 10. **Dodge** 8.
+- **Skills:** Media 17 (Specialty). Trained: Deception 15, Leadership 15, Persuasion 15, Athletics 14, Brawling 14, Powers 11, Read People 11, Law 10, Piloting 10.
+- **Edges:** Stronger Power.
+- **Advantage:** Golden Ideal (origin; companion: The Anger). **Complication:** Media Darling; trigger: a crowd with phones out.
+- **Powers:** Strength IV, Flight II, Toughness I.
+- **Legal status:** Registered.
+- **Why I do this:** The cameras love an Operant, and I love the cameras. **Connection:** Static saved her from a Foundation snatch team on live TV, and vanished before the cameras turned.
+
+## Dr. Tobias Wren
+
+*Professor of comparative religion; Earth Warden, Occultist. Adept (tier 1); Specialist.* A collector of forbidden books who once traded a year of his life to something in Avalon for a translation. The year is coming due.
+
+- **Attributes:** Body 9, Agility 10, Intellect 14, Presence 10, Will 13. **Dodge** 8.
+- **Skills:** Powers 18 (Expert). Trained: Investigation 15, Law 15, Medicine 15, Occult 15, Science 15, Read People 14, Persuasion 11.
+- **Edges:** +1 attribute point, A fine weapon or tool, Stronger Power; a fine tool: the Lammas Grimoire, annotated in four hands (+2 Occult).
+- **Advantage:** Ritualist (origin; companion: Obsessed). **Complication:** Haunted; trigger: your bond demands something.
+- **Powers:** Warding III, Mystic Sight I.
+- **Legal status:** Registered.
+- **Why I do this:** Someone has to stand between ordinary people and what's out there. **Connection:** He taught Maeve Ashgrove's handler, and was the one who recognized what Maeve really is.
+
+## Jess Calloway
+
+*Freelance investigative reporter, Journalist. Touched (tier 2).* Touched a Raster Zero file in 2024 and saw the room it came from. Nobody knows she's an Operant; she's been pulling the thread ever since.
+
+- **Attributes:** Body 10, Agility 11, Intellect 11, Presence 12, Will 12. **Dodge** 9.
+- **Skills:** Investigation 14 (Specialty). Trained: Deception 13, Media 13, Persuasion 13, Powers 13, Read People 13, Streetwise 13, Computers 12, Law 12, Stealth 12.
+- **Edges:** +1 attribute point, Extra Power.
+- **Advantage:** The Glimpse (origin; companion: Cracked). **Complication:** Secret Identity; trigger: someone close asks where you were.
+- **Powers:** Psychometry II, Precognition I, Empathy I, Enhanced Senses I.
+- **Legal status:** Non-registered.
+- **Why I do this:** There's a story nobody's telling. I'm going to tell it. **Connection:** Rachel Kwan's missing partner was her source. She hasn't told Kwan yet.
+
+## Subject 19
+
+*"Static", escaped Foundation subject, Fugitive. Lab-made (tier 2).* Escaped a Foundation black lab a year ago with electric powers, no memory of a name, and a number tattooed on one wrist. Grachyov's retrieval team is still looking.
+
+- **Attributes:** Body 12, Agility 13, Intellect 11, Presence 9, Will 10. **Dodge** 12.
+- **Skills:** Powers 13 (Specialty). Trained: Piloting 14, Stealth 14, Athletics 13, Brawling 13, Computers 12, Engineering 12, Read People 11, Deception 10, Streetwise 10.
+- **Edges:** Extra Spark, Stronger Power.
+- **Advantage:** Lab Instincts (origin; companion: Test Subject). **Complication:** Hunted by a Lab; trigger: a van with no plates outside.
+- **Powers:** Blast III, Speed I, Technopathy I.
+- **Legal status:** Non-registered.
+- **Why I do this:** No lab, no registry and no government owns me. **Connection:** Saved Daybreak from a Foundation snatch team on live TV, and ran before the cameras turned.
+
+## Maeve Ashgrove
+
+*Cat burglar, on an ExLAW deal, Thief. Otherworlder (tier 2).* A fey-born thief from Avalon, caught stealing from a Morcain vault and handed to ExLAW. She works off her sentence; her handler is the only one who knows where she came from.
+
+- **Attributes:** Body 10, Agility 14, Intellect 11, Presence 11, Will 9. **Dodge** 13.
+- **Skills:** Stealth 17 (Specialty). Trained: Melee 15, Deception 12, Engineering 12, Occult 12, Persuasion 12, Streetwise 12, Athletics 11, Powers 10, Read People 10.
+- **Edges:** A friend, Extra Spark; a friend: her ExLAW handler, Agent Dorsey, who covers for her more than he should.
+- **Advantage:** Inhuman Grace (origin; companion: Exile). **Complication:** Outsider; trigger: a form that asks for papers you don't have.
+- **Powers:** Invisibility II, Phasing I, Illusion I.
+- **Legal status:** Convict.
+- **Why I do this:** No lab, no registry and no government owns me. **Connection:** Dr. Tobias Wren saw through her glamour the first day. He's kept her secret; she wonders what it'll cost.
+
+# Advantages
+
+Choose one advantage at character creation: a general advantage from this chapter, or an origin advantage from the next. Each grants +2 only in the listed circumstances. An advantage does not grant training, authorize an impossible action, or replace essential gear. Use only one advantage bonus per roll.
+
+| Advantage | Effect |
+|---|---|
+| Steady Aim | +2 to Firearms after spending an action aiming at the same target. |
+| Street Fighter | +2 to Brawling when unarmed against more than one opponent. |
+| Martial Artist | +2 to Brawling to disarm, throw or restrain. |
+| Blade Master | +2 to Melee with a chosen weapon. |
+| Acrobat | +2 to Athletics to climb, leap or roll with a fall. |
+| Wheelman | +2 to Piloting in a chase. |
+| Aegis Certified | You can pilot an Aegis suit (Aegis Pilots are already certified); +2 to Piloting in one. |
+| Forensics | +2 to Investigation to read a crime scene or an Operant's traces. |
+| Intrusion Specialist | +2 to Computers to break security or cover your tracks. |
+| Tinkerer | +2 to Engineering to jury-rig, repair or modify on the spot. |
+| Field Medic | +2 to Medicine to stabilize a patient under fire. |
+| Occult Lore | +2 to Occult to recognize a creature, a curse or a ritual. |
+| By the Book | +2 to Law to make an arrest, a warrant or a confession stand up in court. |
+| Street Contacts | +2 to Streetwise to find a person, a rumor or a fence. |
+| Silver Tongue | +2 to Persuasion to talk someone down. |
+| Master of Disguise | +2 to Deception to pass as someone else. |
+| Natural Leader | +2 to Leadership to coordinate a team under fire. |
+| Cold Reader | +2 to Read People to spot a lie or a hidden Operant. |
+| Friend of the Press | +2 to Media to spin a story or get one out. |
+| Fine Control | +2 to Powers to use a power precisely: around bystanders, at a distance or delicately. |
+| Secret Identity | +2 to Deception to keep your two lives apart. Take the Secret Identity complication unless the GM agrees otherwise. |
+| Cool Under Fire | +2 to Will to keep acting under fire, fear or mind powers. |
+
+**Aegis Certified** lets a character who isn't an Aegis Pilot use the Aegis suit from the gear list. **Secret Identity** comes with the *Secret Identity* complication unless the GM agrees otherwise. Origin advantages (in each origin's entry) are often the most flavorful choice for an Operant.
+
+# Origins
+
+| Origin | Tier | Edges | Adjustments |
+|---|---|---|---|
+| Non-Operant | 0 | 4 | None |
+| Adept | 1 | 3 | Body −1, Intellect +1 |
+| Aurora-born | 2 | 2 | None |
+| Bonded | 2 | 2 | Presence −1, Will +1 |
+| Lab-made | 2 | 2 | Body +1, Presence −1 |
+| Otherworlder | 2 | 2 | Agility +1, Will −1 |
+| Shadow Earth Defector (GM's permission) | 2 | 2 | Agility +1, Presence −1 |
+| Touched | 2 | 2 | Intellect −1, Will +1 |
+| Ambrosia | 3 | 1 | Body +1, Agility −1, Intellect −1, Presence +1 |
+| Mythic | 3 | 1 | Body +1, Intellect −1, Presence −1, Will +1 |
+
+## Non-Operant
+
+*Tier 0 · 4 Edges · None*
+
+No powers at all: training, nerve, gear and the law. Most of ExLAW's agents, every Aegis pilot and nearly everyone else on Earth. In a fight between Operants you are the one who has to be clever.
+
+**Origin rules:**
+
+- No powers: you need no registration (your legal status is usually Civilian, or Agent).
+- Aegis suits, power-dampening cuffs and good planning are how you stand beside Operants.
+
+**Suggested skills:** Firearms, Investigation, Piloting, Read People.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Hard-Won Training | +2 to Firearms or Brawling against an Operant whose powers you have studied. | **Outclassed.** Sometimes you're simply out of your depth. Accept the danger of staying in. |
+| Always a Plan | +2 to Investigation or Leadership to prepare for a known Operant's powers. | **Resentment.** You've seen what Operants get away with. Accept the friction your bitterness causes. |
+| Nerves of Steel | +2 to Will against fear, mind powers and intimidation. | **Ordinary Body.** One good hit can end you. Accept the injury when you take a risk. |
+
+## Adept
+
+*Tier 1 · 3 Edges · Body −1, Intellect +1*
+
+A student of metatropic manipulation, the science everyone else calls magic. Learned rather than born, and growing with study: an Adept's own powers are few, but with time, materials and fuel a ritual can do almost anything.
+
+**Origin rules:**
+
+- Mystic powers: your own powers come from the mystic list (Cantrips, Warding, Summoning, Mystic Sight, Illusion, Blast, Portals, Astral Projection, Elemental Control, Teleport, Healing).
+- Rituals: you can emulate any power by ritual, with time, specialized materials and fuel (see Rituals).
+- Your second power is Class II once Powers is your top skill.
+
+**Suggested skills:** Powers, Occult, Investigation, Science.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Arcane Scholar | +2 to Occult to identify a spell, a creature or a ritual's maker. | **A Bargain Owed.** Something in Otherworld once helped you. Accept the favor it asks. |
+| Ritualist | +2 to Powers when performing a ritual. | **Obsessed.** A forbidden text or a lost rite calls to you. Accept the detour. |
+| Warden's Training | +2 to Will against spirits, possession and fear. | **Watched.** The Earth Wardens, or older things, keep an eye on what you do. Accept the summons. |
+
+## Aurora-born
+
+*Tier 2 · 2 Edges · None*
+
+Powers that woke on their own: in the First Wave of April 1938, in the Second Wave of 1985, or inherited from a parent who was touched by either. The most common kind of Operant, and the one the EMD understands best.
+
+**Origin rules:**
+
+- Choose your wave: First Wave (awakened in 1938, or a direct descendant), Second Wave (1985) or a late bloomer whose powers woke without warning.
+- Your powers are part of you: they can't be taken away, only suppressed.
+
+**Suggested skills:** Powers, Athletics, Persuasion, Read People.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Natural Talent | +2 to Powers with your Class II power. | **Family Legacy.** Your powers run in the family, and so do its enemies and debts. Accept the call. |
+| Wave-Sense | +2 to Read People or Investigation to recognize another Operant and guess their power. | **On the Register.** Your family has been in the EMD since 1952. Accept that ExLAW knows where you live. |
+| Steady Power | Once per scene, push a power without marking Strain. | **Public Face.** Everyone in your town knows what you can do. Accept the requests, the fear and the cameras. |
+
+## Bonded
+
+*Tier 2 · 2 Edges · Presence −1, Will +1*
+
+Joined to something else: an artifact, a spirit, a god or an entity from beyond. It shares its power, and sometimes its mind. Michael Lance's amulet, Uathach's litany, the Ice Reaper and the Atomic Man are all bonds.
+
+**Origin rules:**
+
+- Choose the bond: an artifact you carry, or a spirit or entity that shares your body.
+- An artifact's powers go with the artifact; a spirit's come with its wants.
+- Bonded powers suit Transformation well: the bond is the alternate form.
+
+**Suggested skills:** Powers, Occult, Read People, Investigation.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| The Voice Within | +2 to Occult or Investigation when your bond knows the answer (it remembers things you don't). | **Two Minds.** Your bond wants something you don't. Accept the choice it pushes on you. |
+| Bound Together | Your bond resists for you: +2 to Will against mind powers and possession. | **The Artifact.** Your power lives in something that can be taken. Accept the theft or the trade. |
+| Ancient Ally | +2 to Powers with the power your bond knows best. | **Old Enemies.** Your bond had enemies long before you. Accept them as yours. |
+
+## Lab-made
+
+*Tier 2 · 2 Edges · Body +1, Presence −1*
+
+Made in a Foundation black lab, a DIRE program or somewhere worse. The powers are strong and unstable, the memories are patchy, and someone still has your file and wants their property back.
+
+**Origin rules:**
+
+- Unstable: on a natural 17 or 18 with Powers, mark a box of Strain as well.
+- Property: the lab that made you knows your powers better than you do.
+
+**Suggested skills:** Powers, Stealth, Athletics, Deception.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Surge | +2 to Powers when you push a power (you still mark Strain). | **They Want You Back.** The lab hasn't given up. Accept the retrieval team. |
+| Built Tough | Once per scene, a hit that would mark 2 or more boxes marks one fewer. | **Missing Years.** There are gaps in your memory, and someone else fills them. Accept the flashback at the worst moment. |
+| Lab Instincts | +2 to Stealth or Read People to spot surveillance, restraints and traps. | **Test Subject.** Needles, labs and restraints break your nerve. Accept the panic. |
+
+## Otherworlder
+
+*Tier 2 · 2 Edges · Agility +1, Will −1*
+
+Born outside this Earth: in a haven of Otherworld such as Avalon, or on a parallel Earth like Chat Roux's. Under the Extraordinary Powers Act you aren't a person at all, which makes you hard to register and easy to disappear.
+
+**Origin rules:**
+
+- Not a person under the Act: you can't register; you're Non-registered unless ExLAW makes you a deal.
+- Choose your world: Avalon (fey, Olympian and Asgardian descent), another haven, or a parallel Earth.
+
+**Suggested skills:** Powers, Occult, Deception, Athletics.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Glamour | +2 to Deception to pass as human or hide what you are. | **Strange Customs.** You misread Earth's rules. Accept the misunderstanding. |
+| Otherworld Eyes | +2 to Occult or Read People to see through illusions and disguises. | **Cold Iron.** Iron burns you (fey-born) or your technology needs parts this Earth can't make. Accept the weakness. |
+| Inhuman Grace | +2 to Athletics to climb, leap or keep your footing. | **Exile.** Your home world wants you back, or wants you dead. Accept the envoy. |
+
+## Shadow Earth Defector
+
+*Tier 2 · 2 Edges · Agility +1, Presence −1 · GM's permission*
+
+A duplicate from Shadow Earth, the dark reflection of our world, who turned on its rulers and stayed. Somewhere on this Earth lives your original, who may not know you exist; Shadow Earth wants you back, and everyone else wants to know whose side you're on.
+
+**Origin rules:**
+
+- Your original: you are a copy of a real person on this Earth (agreed with the GM), and you share their face and their early memories.
+- Mystic Sight and Warding reveal what you are.
+- Needs the GM's permission.
+
+**Suggested skills:** Deception, Stealth, Powers, Read People.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Mirror Knowledge | +2 to Deception or Investigation about your original's life and contacts. | **The Original.** Your original turns up, or someone mistakes you for them. Accept the trouble. |
+| Shadow-Wise | +2 to Occult to recognize Shadow Earth agents, duplicates and incursions. | **Hunted Home.** Shadow Earth's rulers want their property back. Accept the duplicate sent for you. |
+| Between Worlds | +2 to Stealth in darkness and shadow. | **Distrusted.** Nobody trusts a copy. Accept the suspicion. |
+
+## Touched
+
+*Tier 2 · 2 Edges · Intellect −1, Will +1*
+
+Changed by an exposure to something nobody can name: a peyote vision in the desert, a ritual read aloud, a breach in the sky. Touched powers are strange, hard to classify and harder to control; the EMD files them under 'Other'.
+
+**Origin rules:**
+
+- Unclassifiable: the EMD can't tell what you are, and neither can you; the GM may give a power an odd limit or an odd extra.
+- Visions: once per case, the GM may give you a strange, true glimpse.
+
+**Suggested skills:** Powers, Read People, Occult, Persuasion.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| The Glimpse | +2 to Read People or Investigation when a vision points the way. | **Cracked.** Your mind was burned by what you saw. Accept the episode at the worst moment. |
+| Strange Gift | +2 to Powers with your strangest power. | **Uncanny.** People sense something wrong about you. Accept the fear. |
+| Eye of the Storm | +2 to Will to keep calm when reality goes wrong. | **Calling.** Whatever touched you wants you back. Accept the pull. |
+
+## Ambrosia
+
+*Tier 3 · 1 Edge · Body +1, Agility −1, Intellect −1, Presence +1*
+
+Dosed with Ambrosia, the elixir Tesla's circle first refined: an idealized body, slowed aging and raw power. Rare, coveted and hunted; DIRE and the Foundation have both tried to make more.
+
+**Origin rules:**
+
+- Idealized: you age a year for every ten.
+- Ambrosia works on the body: Strength, Toughness, Flight, Speed, Regeneration and Transformation suit it best (the GM may allow others).
+- Coveted: every lab on Earth wants a sample of your blood.
+
+**Suggested skills:** Powers, Athletics, Leadership, Media.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Golden Ideal | +2 to Persuasion or Media to inspire a crowd or a frightened person. | **The Anger.** The power wants to be used. In your powered form, accept the flash of temper and what it costs. |
+| Undying Vigor | Once per scene, ignore your injury penalties for one action. | **Hunted for Your Blood.** Labs want what's in your veins. Accept the attempt. |
+| Living Legend | +2 to Leadership with other heroes and with the public. | **Out of Time.** You've outlived friends and eras. Accept the grief and the gap. |
+
+## Mythic
+
+*Tier 3 · 1 Edge · Body +1, Intellect −1, Presence −1, Will +1*
+
+An ancient curse, blessing or bloodline: immortals, werewolves, the children of gods, warriors cursed by Jupiter. Mythic Operants are the oldest kind, and the hardest to classify.
+
+**Origin rules:**
+
+- GM's approval: every power a Mythic character takes, Immortality included, is agreed with the GM.
+- Only Mythic characters can take Immortality.
+- An old rule binds you: a curse's condition, a god's taboo or a bloodline's weakness, agreed with the GM.
+
+**Suggested skills:** Powers, Melee, Occult, Athletics.
+
+| Advantage | Effect | Companion complication |
+|---|---|---|
+| Old as Legend | +2 to Occult or Persuasion where your myth is remembered. | **The Curse.** Your curse or your god's taboo comes due. Accept its price. |
+| Ancient Warrior | +2 to Melee or Brawling against something as old as you. | **Out of Place.** The modern world baffles and offends you. Accept the misstep. |
+| Hard to Kill | Once per scene, ignore your injury penalties for one action. | **Feels Everything.** You don't die, but every wound hurts. Accept the pain that slows you. |
+
+# Making your own
+
+The callings and origins in this book are a starting point, not a limit. With the GM's agreement, any player can create their own calling or origin. The creator has a **Custom** option at the end of each list, and its checklist holds a custom choice to the same rules as everything else.
+
+## A custom calling
+
+A calling is a concept, not a package of powers: it gives no bonus of its own. A custom one only needs a clear place in the group.
+
+1. **Name it and describe it.** One sentence for what your character does that no one else does, in the style of the callings above: *"Bodyguard: keeps one Operant alive, whoever wants them dead, and wherever the law stands."*
+2. **Choose a group.** Pick the one it belongs with: The Badge, The Masks, The Learned, The Fringe or The Underworld. The group only sets your sheet's colors and emblem.
+3. **Pick four core skills.** The skills it can't do without. Mark them Trained yourself in step 3 (the built-in callings do this for you); they count toward your normal Trained skills.
+4. **Check it with the GM.** It should fit the setting and overlap the existing callings as little as possible.
+
+**In the creator:** in step 1, choose **Custom calling…** at the end of the Calling list, then enter its name and group. Write the description in *What you bring*.
+
+## A custom origin
+
+Build it with the GM, one step at a time.
+
+### 1. The concept
+
+Two or three sentences: where they come from, what sets them apart, and how others see them. It should be something the origins in this book don't already cover.
+
+### 2. The tier
+
+The tier measures how much the origin gives on its own. Each tier costs one of your 4 Edge points, so stronger origins start with fewer Edges.
+
+| Tier | Edges | Use it for |
+|---|---|---|
+| 0 | 3 | Ordinary people: a homeland, upbringing or culture, with no special abilities |
+| 1 | 2 | One small, constant edge: keen senses, a tough hide, a free Trained skill, resistance to one hazard |
+| 2 | 1 | Clear inhuman or supernatural gifts: venom, a second form, strong resistances |
+| 3 | 0 | Remarkable beings: several strong abilities, and serious weaknesses to match |
+
+When in doubt, choose the higher tier.
+
+### 3. Attribute adjustments
+
+Give adjustments from **−2 to +2** per attribute that **total zero**: a +2 needs a −2 or two −1s. The adjustments move the attribute's base (+1 starts it at 11) and raise its starting maximum (13 plus the bonus). Most origins change two to four attributes.
+
+### 4. Core rules (tier 1 and up)
+
+One to three short rules that always apply: what they can do (see in the dark, resist cold, a free Trained skill) and what it costs (a weakness, a people's distrust, a hazard they can't abide). A strength with no drawback is worth more than it looks, so price it a tier higher.
+
+### 5. Origin advantages
+
+Write one to three. Each works like a general advantage: **+2 to one skill in a narrow situation**, or a small, limited permission ("once per scene…"). Each comes with a **companion complication**: a problem the trait causes, with a clear trigger and a real consequence, which earns a Spark point when it bites, like any complication. A character takes one advantage, general or origin, so make them distinct choices.
+
+### 6. An alternate form (optional, tier 2 or 3)
+
+If the origin changes shape, give the form attribute bonuses (usually +2 to one attribute and +1 to another), two or three traits, and its drawbacks. The shared rules for forms in *Origins* apply. The bonuses count only while the character is in that form: the sheet's form switch shows both sets of numbers.
+
+### In the creator
+
+1. In step 2, choose **Custom origin…** at the end of the Origin list.
+2. Name it, choose the tier you agreed, and set its adjustments. The checklist confirms they total zero.
+3. Write its core rules in **Other ability (GM approval required)** in step 4.
+4. In step 4, choose **Custom origin advantage…** and enter the advantage and its companion complication.
+
+### Example
+
+**Engineered Bloodline (tier 2).** Descended from a Foundation breeding program that ran from 1952 to 1971; your powers were designed, generations ago. *Adjustments:* Intellect +1, Presence −1. *Core rule:* your powers are documented in a Foundation file you've never seen; the GM may use it. *Origin advantage:* **Designed**: +2 to Powers with your Class II power. *Companion:* **Lineage**: other descendants exist, and some of them work for the Foundation; accept the encounter. *Powers:* one at Class II, two at Class I.
+
+# Complications
+
+Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Spark point if you accept it. Every complication needs a trigger agreed with the GM; the creator suggests three for each.
+
+| Complication | What it does |
+|---|---|
+| Secret Identity | You live two lives. Accept the danger when someone gets close to the truth. |
+| Wanted | A warrant has your name or your mask on it. Accept the arrest attempt. |
+| Hunted by a Lab | The Foundation, DIRE or someone worse wants you back. Accept the retrieval team. |
+| Unstable Powers | Your powers flare when you're afraid or angry. Accept the collateral damage. |
+| Code Against Killing | You don't kill, whatever they've done. Accept the cost of mercy. |
+| Media Darling | The cameras follow you everywhere. Accept the attention at the worst moment. |
+| Under Oversight | The EPAOC or Internal Affairs is watching you. Accept the hearing. |
+| In Debt to the Morcain | You owe the 12, and they collect. Accept the job they send. |
+| Vendetta | You have an enemy who won't stop. Accept their interference. |
+| Protects the Innocent | You put bystanders first, always. Accept the cost. |
+| Family at Risk | Someone you love doesn't have powers. Accept the threat to them. |
+| Temper | Your anger gets ahead of you. Accept the fight you should have avoided. |
+| Craving | You need something to keep going: Ambrosia, a lab's serum, a ritual's fuel. Accept the hunt for more. |
+| Outsider | You don't understand this world's rules, or it doesn't accept you. Accept the misunderstanding. |
+| Haunted | A spirit, a bond or a memory won't leave you alone. Accept the vision. |
+| Survivor's Guilt | You lived through Chicago, 2012 or a lab when others didn't. Accept the reckless choice to make it right. |
+| Orders | Your badge, order or sponsor gives you orders you don't like. Accept them. |
+| Can't Leave It Alone | A loose thread pulls you in. Accept the detour or the danger. |
+| Reckless | You jump first and think later. Accept the danger. |
+
+# Quick reference
+
+**Creation:** attributes start at 10, adjusted by origin (always totaling zero), plus 5 points; maximum 13 plus any origin bonus. 4 points split between origin tier and Edges. Generalist: one Specialty and nine Trained. Specialist: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
+
+**Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Specialist) = attribute +5.
+
+**Modifiers:** favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails.
+
+**Assistance:** success +1; success by 5 or more +2; 18 causes a complication. One assistant per roll.
+
+**Near misses:** fail by 1–2 and the GM may offer success at a cost; never on a natural 17–18.
+
+**Clocks:** 2, 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).
+
+**Combat:** move plus one action. Hit → one defense a round (Dodge, Parry or Block; −1 to −3 against a clean hit) → weapon effect. Dodge = Agility −2 plus Athletics training (+0, +1, +2). Parry −3, Block −2 plus the shield. Aim: +1. Telling hit (by 5+ or natural 3–4): the attacker picks an effect; called shot −2 (small target −4). A 2-box weapon that brings you to three boxes leaves you Dying; at three boxes, another 2-box hit kills.
+
+**Medicine:** stabilize in one action. Field care clears 1 box (2 on margin 5+). Proper care gives +2 and clears 2 (3 on margin 5+). Rest clears a box in a day at 1 box, three days at 2, a week at 3 (in someone's care).
+
+**Spark:** start each session with two. Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.
+
+*Legend Dynamics RPG system, created by Don Smallwood.* This RPG is released under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/). You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.
