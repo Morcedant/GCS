@@ -73,7 +73,8 @@ def rows(g):
     ]
     d = g.get("discovery")
     if d:  # discovery clocks and the cards they mint (lore cards, dossiers, data records)
-        th, ex, tr = d["threat"]["name"], d.get("example", "Werewolf"), (d.get("costs") or [["Heat"]])[0][0]
+        c0 = (d.get("costs") or ["Heat"])[0]  # a pack lists [track, why, ...]; a game file just the track's name
+        th, ex, tr = d["threat"]["name"], d.get("example", "Werewolf"), c0 if isinstance(c0, str) else c0[0]
         rows_p += [
             ("`/cards load file:`", f"Attach your character file from the creator: the bot reads your {d['cards']} (your {d['collection']}). Load it again after you earn one."),
             ("`/cards show`", f"Your {d['cards']}. Add `player:@name` for someone else's."),

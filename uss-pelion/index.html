@@ -347,6 +347,25 @@ p.bad, .small.bad { color: var(--bad); }
 /* Clocks and ship */
 .clock-add { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; }
 .clock-add input { grid-column: 1 / -1; }
+/* Library records (discovery) */
+.disc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 10px 0; }
+.disc-threat, .disc-costs, .dclock { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--well); display: grid; gap: 6px; align-content: start; }
+.disc-clocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.dsegs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.dseg { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--line); background: transparent; cursor: pointer; padding: 0; }
+.dseg.on { background: var(--accent); border-color: var(--accent); }
+.dseg.gate { margin-right: 10px; }
+.dclock.done { border-color: var(--accent); }
+.disc-match { font-size: .88rem; }
+.disc-mint { display: grid; gap: 6px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.disc-award { border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 10px; display: grid; gap: 6px; }
+.disc-award > summary { cursor: pointer; font-weight: 600; }
+.lcard { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px; background: var(--well); }
+.lcard .fields { margin: 0; }
+.card-list { display: grid; gap: 10px; }
+.almanac-secrets { display: grid; gap: 10px; }
+.cards-sheet { display: grid; gap: 6px; }
+.cards-sheet .small { display: block; }
 .clocks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .clock { display: grid; justify-items: center; gap: 4px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--well); text-align: center; }
 .clock svg { width: 96px; height: 96px; }
@@ -567,7 +586,7 @@ p.bad, .small.bad { color: var(--bad); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="83a1981" data-version-date="2026.10.19" title="The code changes whenever this page changes.">Version 2026.10.19 · 83a1981</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="28fabc4" data-version-date="2026.10.22" title="The code changes whenever this page changes.">Version 2026.10.22 · 28fabc4</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -724,6 +743,13 @@ p.bad, .small.bad { color: var(--bad); }
               <textarea id="f-connection" rows="2" placeholder="Pick one of the top 10 above, or write your own. Name the crewmate if you know who."></textarea></div>
             <div class="field wide"><label for="f-notes">Notes</label><textarea id="f-notes" rows="2"></textarea></div>
           </div>
+          <details class="fields" id="cards-wrap"><summary class="label"><span id="cards-label"></span></summary>
+            <p class="small muted field wide" id="cards-intro"></p>
+            <div class="field wide" id="almanac-wrap" hidden><span class="label" id="almanac-label"></span>
+              <div id="almanac-list"></div><span class="small muted" id="almanac-note"></span></div>
+            <div class="field wide card-list" id="cards-list"></div>
+            <div class="btn-row field wide"><button type="button" class="linkish" id="card-add"></button></div>
+          </details>
         </section>
       </div>
 
@@ -807,6 +833,28 @@ p.bad, .small.bad { color: var(--bad); }
         <p class="small muted">Highest Agility first. Players choose the order among tied crew; the GM places opponents.</p>
         <ol class="turns" id="gm-turns"></ol>
       </div>
+    </div>
+    <div class="card hud no-print" id="disc-card">
+      <h3>Discovery: library records</h3>
+      <p class="small muted" id="disc-intro"></p>
+      <div class="disc-grid">
+        <div class="disc-threat" id="disc-threat"></div>
+        <div class="disc-costs" id="disc-costs"></div>
+      </div>
+      <div class="disc-clocks" id="disc-clocks"></div>
+      <div class="fields">
+        <div class="field wide"><label for="disc-new-name">New clock</label><input type="text" id="disc-new-name"></div>
+        <div class="field"><label for="disc-new-kind">Kind</label><select id="disc-new-kind"><option value="discovery">Discovery (mints a record)</option><option value="plain">Progress only (no record)</option></select></div>
+        <div class="field"><label for="disc-new-phases">Segments per phase</label><select id="disc-new-phases">
+          <option value="1,2,2">1 · 2 · 2 (quick)</option><option value="2,2,2" selected>2 · 2 · 2</option><option value="2,3,3">2 · 3 · 3 (substantial)</option></select></div>
+      </div>
+      <div class="btn-row"><button class="btn primary" id="disc-add">Start the clock</button></div>
+      <details class="disc-award" id="disc-award"><summary>Record a finding without a clock</summary>
+        <p class="small muted" id="disc-award-intro"></p>
+        <div class="fields" id="da-fields"></div>
+        <div class="btn-row"><button class="btn primary" id="da-go">Record it</button></div>
+      </details>
+      <div class="toast" id="disc-msg" role="status" aria-live="polite"></div>
     </div>
     <div class="card hud no-print bm-card">
       <h3>Battle map</h3>
@@ -1052,6 +1100,7 @@ p.bad, .small.bad { color: var(--bad); }
 <li><strong>Gritty combat</strong>, an optional rule for grievous wounds.</li>
 <li><strong>Move and reach:</strong> how far you move in a turn, how injury and hard going slow you, and how far a weapon in hand reaches.</li>
 <li><strong>A battle map</strong> in the GM view, for away teams and ship fights.</li>
+<li><strong>Library records:</strong> what the crew has established about the unknown, one finding at a time, and what that information costs.</li>
 </ul>
 <h2 id="g-guide-scope">Guide scope</h2>
 <p>Personal actions and away-team encounters are covered here. Starship stations use the same skills. Species abilities beyond the adjustments and species advantages in this guide still require GM approval. Ship combat uses the light rules and the ship registry in <em>The USS Pelion</em>.</p>
@@ -1545,6 +1594,79 @@ p.bad, .small.bad { color: var(--bad); }
 <p>Clocks are how a failed roll changes the situation without stopping the story. Racing a progress clock against a danger clock makes a strong climax.</p>
 <h2 id="g-investigation-and-social-scenes">Investigation and social scenes</h2>
 <p>Ask concrete questions and explain your approach. Evidence may require several different tasks. Diplomacy can secure cooperation or concessions, while Psychology offers insight into behavior. A successful roll does not force someone to abandon a core belief or provide information they do not possess.</p>
+<h1 id="g-library-records">Library records</h1>
+<p>What your character knows about the unknown, and how they came to know it: an alien species, a lifeform, a piece of technology, a phenomenon, or what a power intends.</p>
+<h2 id="g-rumor-truth-and-records">Rumor, truth and records</h2>
+<ul>
+<li><strong>What people say.</strong> Rumor on a starbase, an old survey report, a story from another ship’s crew. Some of it is right, some half right, some wrong. It’s where an investigation starts.</li>
+<li><strong>The truth.</strong> What the thing really is and what really stops it or makes it work. The GM knows it; the crew finds it out.</li>
+<li><strong>Library records.</strong> What your character has established for themselves, one finding at a time, filed in their <strong>library file</strong>: what they found, how far it goes, how they know it, what it cost, and the stardate.</li>
+</ul>
+<p>A library record grants <strong>no bonus</strong> to any roll. It records what you established and what it lets you attempt. Whatever is actually true works whether or not anyone holds a record for it: a frequency that disrupts a lifeform disrupts it for whoever finds it. Operating unfamiliar technology, or dealing with a people by their own customs, still needs the right procedure, the knowledge and the skill.</p>
+<h2 id="g-discovery-clocks">Discovery clocks</h2>
+<p>When a mission turns on something unknown, the GM starts a <strong>discovery clock</strong> in three phases:</p>
+<ol type="1">
+<li><strong>Confront the unknown.</strong> Effects without a cause: a signal no one can read, a dead world with power readings, a crew that won’t answer. You may suspect, but nothing is confirmed.</li>
+<li><strong>Identify.</strong> Name it: the species, the lifeform, the technology, the phenomenon, the power’s aim. This is <strong>the gate</strong>. Until it’s confirmed, what you know about a kind of thing doesn’t yet apply to this one, and your theories stay suspicions. You can still form hypotheses, test them and take ordinary precautions, and whatever is actually true of it works.</li>
+<li><strong>Uncover.</strong> Learn how it is stopped, or how it is used. Filling this phase fills the clock.</li>
+</ol>
+<p>Each successful investigation roll fills one segment, two on a success by 5 or more. The GM sets the segments per phase (2, 2, 2 is usual; 1, 2, 2 for something quick; 2, 3, 3 for something substantial). The crew member who led the investigation is the <strong>primary investigator</strong>. When the clock fills, they own the library record, and everyone present gets a <strong>shared copy</strong>.</p>
+<p>A library record never confirms its own subject: holding one about a kind of thing doesn’t prove that the thing in front of you is that kind. Only the Identify phase does.</p>
+<h2 id="g-the-countdown">The Countdown</h2>
+<p>Routine discovery has no clock racing it. When a failed investigation roll, or a success at a cost, puts real stakes in play (a reactor going critical, a first-contact window closing, a ship hunting you), the GM may start a <strong>Countdown</strong> of 4, 6 or 8 segments. From then on it’s a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. When it fills, the situation hits. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.</p>
+<h2 id="g-learning-without-a-clock">Learning without a clock</h2>
+<p>A library record can also come directly, without a clock:</p>
+<ul>
+<li><strong>Scanned or tested firsthand:</strong> your own tricorder readings and samples, or a careful field test.</li>
+<li><strong>A reliable record:</strong> Starfleet’s library computer, another ship’s logs, a species’ own historians. A source’s reputation alone doesn’t make it right, but a reliable record can establish a fact without anyone repeating a dangerous test.</li>
+<li><strong>Its own word, backed up:</strong> what an alien, a computer or a being tells you, supported by evidence.</li>
+</ul>
+<p><strong>Information is never free.</strong> Each direct finding costs the crew one of these, chosen by the GM from how they went about it:</p>
+<ul>
+<li><strong>Starfleet Command’s attention:</strong> one box on the Starfleet Command track (below).</li>
+<li><strong>A Duty point,</strong> spent by the record’s owner.</li>
+<li><strong>Strain on the ship:</strong> one box on a ship’s system (Sensors pushed past their limits, a transporter used on something unknown).</li>
+<li><strong>Time:</strong> one segment on a danger clock that’s running, or on the Countdown.</li>
+</ul>
+<p>A failed investigation roll or a success at a cost can carry the same price, or start the Countdown.</p>
+<h2 id="g-the-starfleet-command-track">The Starfleet Command track</h2>
+<p>How much attention the crew is drawing from Starfleet Command: questions about the Prime Directive, risky contacts, orders bent. It sits on the USS Pelion’s status card. A starbase repairs the ship, but not Command’s opinion of the crew; boxes clear only when the GM says the matter is settled.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Boxes</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>Command isn’t asking.</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>Questions in the next report.</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>A formal inquiry: an admiral wants a full account.</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>Orders to stand down: −2 to Diplomacy and Leadership with Starfleet officials.</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>A board of inquiry: start a Hearing clock.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="g-starting-records-restricted-files">Starting records: Restricted Files</h2>
+<p>The <strong>Restricted Files</strong> advantage gives you <strong>three library records</strong> at the start. Each is a secret that comes from your <strong>department</strong> (something you were trained in or saw on duty) or your <strong>species</strong> (something your people know), and that <strong>isn’t in Starfleet’s open databases or published reports</strong>. Write each one in the creator: its subject, the secret, and why it isn’t common knowledge. The GM approves each one. The records come with the advantage and go if you change it.</p>
 <h1 id="g-personal-combat">Personal combat</h1>
 <h2 id="g-turn-order-and-actions">Turn order and actions</h2>
 <p>Act in descending Agility order. Players choose the order of tied crew members; the GM resolves other ties. A round lasts a few seconds. On your turn, move up to your <strong>Move</strong> (see <em>Move and reach</em>) and take one meaningful action, such as attacking, using equipment, helping, or attempting a task.</p>
@@ -2798,6 +2920,10 @@ p.bad, .small.bad { color: var(--bad); }
 <td>Hard to put down</td>
 <td>Once per fight, shrug off a telling hit’s effect. You still take its boxes. No +2 to rolls.</td>
 </tr>
+<tr class="odd">
+<td>Restricted Files</td>
+<td>Three library records to start, each a secret from your department or your species that isn’t in Starfleet’s open databases or published reports (see <em>Library records</em>). No +2 to rolls.</td>
+</tr>
 </tbody>
 </table>
 <h1 id="g-species-advantages">Species advantages</h1>
@@ -3299,6 +3425,7 @@ p.bad, .small.bad { color: var(--bad); }
 <p><strong>Damage:</strong> the weapon decides. Fists, clubs, knives, arrows and primitive firearms mark 1 box; heavy blades mark 2; a phaser or disruptor on kill marks 3 and leaves the target Dying (dead at the end of the scene unless stabilized); stun marks none. At three boxes, another hit from a 2-box or killing weapon is fatal.</p>
 <p><strong>Near misses:</strong> fail by 1–2 and the GM may offer success at a cost; never on a natural 17–18.</p>
 <p><strong>Clocks:</strong> 4, 6 or 8 segments. Danger clocks fill on failures and time; progress clocks fill on successes (2 segments on success by 5).</p>
+<p><strong>Library records:</strong> no bonus; they record what you established and what it permits. Discovery clocks in three phases (Confront the unknown, Identify, Uncover); identity confirmed at the gate. Direct findings cost Starfleet Command +1, a Duty point, a ship system box or a danger clock segment. The Countdown starts only on a failed roll or a success at a cost.</p>
 <p><strong>Phaser power:</strong> Type 1 holds 8, Type 2 16, rifle 30. Stun 1, heat/cut 1, kill 2, wide-beam stun 3, disintegrate 4. Spare cell refills; overload needs 4+.</p>
 <p><strong>Ship:</strong> Shields (3) take hits first; then Hull (4) and a system (3 each: −2, −4, offline). Normal hit 1 box, heavy hit 2. Helm evades once per exchange; Engineering clears a box.</p>
 <p><strong>Medicine:</strong> one action to stabilize. Field care takes several minutes and clears one box, or two on success by 5. Sickbay grants +2 and clears two boxes, or three on success by 5. Major trauma may require further recovery. Each set of injuries (one fight or incident) gets one field and one sickbay attempt. Rest clears one box per full day, but not from three boxes: treatment must clear the first one.</p>
@@ -3707,6 +3834,70 @@ p.bad, .small.bad { color: var(--bad); }
 </tr>
 </tbody>
 </table>
+<h1 id="gm-library-records">Library records</h1>
+<p>The rules for library records are in the Players’ Guide (<em>Library records</em>). This chapter is about making them.</p>
+<h2 id="gm-making-a-library-record">Making a library record</h2>
+<p>A library record holds <strong>one finding</strong>, never a subject’s whole story. Write it in the crew’s words, from what they actually did:</p>
+<ul>
+<li><strong>What they established.</strong> One sentence: “It answers only in prime-number sequences”, not everything the GM knows about the machine-mind.</li>
+<li><strong>Limits.</strong> What it doesn’t tell them: “Seen once; not what it wants.” Limits keep a record honest and leave room for the next discovery.</li>
+<li><strong>Evidence or source.</strong> What they scanned, tested, read or were told, and by whom.</li>
+<li><strong>How it was learned, and what it cost.</strong> A discovery clock, or one of the direct routes with its price.</li>
+<li><strong>What it permits (optional).</strong> What the finding lets them attempt that they couldn’t before: hailing it in a way it answers, shutting it down cleanly, crossing a rift safely. Permission only, never a bonus.</li>
+</ul>
+<p><strong>Keep the truth separate.</strong> Decide what’s really true of a subject before play, and let the crew find it piece by piece. A record can be wrong if its evidence was thin; reality wins at the table, and the next record corrects the last.</p>
+<p><strong>Restricted Files.</strong> Approve each starting secret before play. A good one is specific, belongs to the character’s department or species, and wouldn’t be in Starfleet’s open files: what a Vulcan elder taught about a forbidden discipline, what an engineer saw in a classified refit. Turn down anything that would solve a mission you have planned, or ask the player to narrow it.</p>
+<h2 id="gm-choosing-the-cost">Choosing the cost</h2>
+<p>Information is never free. Choose the price from how the crew went about it:</p>
+<ul>
+<li><strong>Starfleet Command +1</strong> for anything that draws Command’s eye: contact the Prime Directive frowns on, a risky deal with a power, orders bent to get the answer.</li>
+<li><strong>A Duty point</strong> when the owner pushes themselves: a sleepless night in the lab, a personal favor called in.</li>
+<li><strong>A ship’s system</strong> when the ship carries the strain: Sensors pushed past their limits, a transporter used on something unknown, Communications held open to a hostile signal.</li>
+<li><strong>A danger clock or the Countdown</strong> when it takes time the crew doesn’t have.</li>
+</ul>
+<p>Don’t start a Countdown for routine discovery. Start one when a failed roll or a success at a cost puts something real at stake, and show it to the players.</p>
+<h2 id="gm-example-subjects">Example subjects</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Subject</th>
+<th>What a record might establish</th>
+<th>What it might permit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>The machine-mind of a dead colony</td>
+<td>It still follows its last order, and treats the crew as the threat that order named</td>
+<td>Issuing orders it will accept, or shutting it down without tripping its failsafes</td>
+</tr>
+<tr class="even">
+<td>A silicon-based lifeform in the mines</td>
+<td>It tunnels with acid, and it is guarding something, not attacking</td>
+<td>Talking to it through a mind-meld or a modified translator; moving its young to safety</td>
+</tr>
+<tr class="odd">
+<td>A rift that opens with a pulsar’s beat</td>
+<td>It folds space in a cycle tied to the pulsar</td>
+<td>Plotting a safe course through it on each cycle</td>
+</tr>
+<tr class="even">
+<td>A derelict of unknown origin</td>
+<td>Its systems wake to a power signature like a starship’s</td>
+<td>Waking or powering it down on the crew’s terms</td>
+</tr>
+<tr class="odd">
+<td>A Klingon house’s intentions</td>
+<td>The house wants the colony’s dilithium, not a war</td>
+<td>Opening talks the house will listen to</td>
+</tr>
+</tbody>
+</table>
 <h1 id="gm-the-gms-tools">The GM’s tools</h1>
 <h2 id="gm-the-battle-map">The battle map</h2>
 <p>The GM view of the creator has a <strong>battle map</strong> for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in the Players’ Guide, and a fight without it works the same way. Open <strong>How to use the map</strong> on the map itself for the buttons, step by step.</p>
@@ -3718,6 +3909,8 @@ p.bad, .small.bad { color: var(--bad); }
 </ul>
 <p><strong>Tokens.</strong> The GM places the crew with one button. Their tokens stay linked to the officers in the GM view: marking Injury, Dying, Stunned or a Duty point on a token marks it on the officer, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
 <p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps every map, its picture and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
+<h2 id="gm-the-discovery-panel">The Discovery panel</h2>
+<p>The GM view’s <strong>Discovery: library records</strong> panel runs discovery clocks. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), mark segments as the crew succeeds, name the subject at the gate, and choose the primary investigator. When the clock fills, write what they established and <strong>mint</strong> it: the primary investigator owns the record and everyone present gets a shared copy. <strong>Record a finding without a clock</strong> does the same for a direct finding, and marks the cost you choose. The <strong>Countdown</strong> stays idle until you start it after a failed roll or a success at a cost. Save the crew’s files afterwards so the players get their records.</p>
 <h2 id="gm-the-encounter-panel">The Encounter panel</h2>
 <p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), whether the attacker is in reach or in range on the battle map, the boxes marked and any telling hit, offering Duty point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so.</p>
 </div>
@@ -4178,6 +4371,7 @@ p.bad, .small.bad { color: var(--bad); }
     // Two that give no +2: they change what you can do in a fight.
     ["extradefense", "Additional Defense", "A second defense each round at −2 (Dodge, Parry or Block, in any mix), on top of attack-quality and injury penalties. Never twice against the same attack. No +2 to rolls.", ""],
     ["survivor", "Hard to put down", "Once per fight, shrug off a telling hit's effect. You still take its boxes. No +2 to rolls.", ""],
+    ["restricted", "Restricted Files", "Three library records to start, each a secret from your department or your species that isn't in Starfleet's open databases or published reports. No +2 to rolls.", ""],
   ];
   const COMPLICATIONS = [
     ["mystery", "Cannot Leave a Mystery Alone", "An unexplained reading or strange discovery tempts you to delay departure, spend a scarce resource, or pursue a risky investigation. Accept a specific cost rather than receiving points merely for asking questions."],
@@ -4215,6 +4409,36 @@ p.bad, .small.bad { color: var(--bad); }
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const uid = () => Math.random().toString(36).slice(2, 10);
   const signed = (n) => (n > 0 ? "+" + n : n < 0 ? "−" + Math.abs(n) : "0");
+  // Library records: what the crew has established about an alien species, a lifeform, a technology, a phenomenon or a
+  // power's intentions, one finding at a time, kept in the character file under "cards". A record grants no bonus. It holds
+  // the finding, its limits, the evidence or source, how it was learned (ROUTES), what it cost and when (Players' Guide, Library records).
+  const DISC = {
+    card: "library record", cards: "library records", collection: "library file",
+    phases: [["Confront the unknown", "Effects without a cause: a signal no one can read, a dead world with power readings, a crew that won't answer. You may suspect, but nothing is confirmed."],
+      ["Identify", "Name it: the species, the lifeform, the technology, the phenomenon, the power's aim. This is the gate: until it's confirmed, what you know about a kind of thing doesn't yet apply to this one."],
+      ["Uncover", "Learn how it is stopped, or how it is used. Filling this phase fills the clock and earns a library record for what you established."]],
+    threat: { name: "Countdown", onFill: "the situation hits" },
+    datePlaceholder: "Stardate", clockExample: "What is draining the colony's power on Theta Kiri II",
+    start: { adv: "restricted", n: 3, label: "Restricted Files", secret: "isn't in Starfleet's open databases or published reports" },
+  };
+  const ROUTES = [["investigation", "A discovery clock", "filled to the end of Uncover"],
+    ["experience", "Scanned or tested firsthand", "your own tricorder readings and samples, or a careful field test"],
+    ["account", "A reliable record", "Starfleet's library computer, another ship's logs, a species' own historians. A source's reputation alone doesn't make it right, but a reliable record can establish a fact without anyone repeating a dangerous test"],
+    ["creature", "Its own word, backed up", "what an alien, a computer or a being tells you, supported by evidence"]];
+  // The Starfleet Command track (on the ship's status): how much attention the crew is drawing from Command.
+  const COMMAND_BOXES = 4, COMMAND_EFFECTS = ["Command isn't asking", "Questions in the next report", "A formal inquiry: an admiral wants a full account",
+    "Orders to stand down: −2 to Diplomacy and Leadership with Starfleet officials", "A board of inquiry: start a Hearing clock"];
+  const capFirst = (x) => x ? x[0].toUpperCase() + x.slice(1) : x;
+  const slugTag = (x) => String(x || "").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const cardStr = (v, n = 300) => (typeof v === "string" ? v : "").slice(0, n);
+  function normCard(x) {
+    const present = Array.isArray(x.present) ? x.present.map((p) => cardStr(p, 60)).filter(Boolean) : cardStr(x.present).split(",").map((p) => p.trim()).filter(Boolean);
+    const name = cardStr(x.name, 80) || cardStr(x.tag, 80);
+    return { id: cardStr(x.id, 20) || uid(), tag: slugTag(x.tag || name), name, knowledge: cardStr(x.knowledge), permits: cardStr(x.permits),
+      job: cardStr(x.job, 120), owner: cardStr(x.owner, 60), shared: !!x.shared, present, source: ["almanac", "play", "taught"].includes(x.source) ? x.source : "play",
+      limits: cardStr(x.limits), evidence: cardStr(x.evidence), route: ROUTES.some((r) => r[0] === x.route) ? x.route : "", date: cardStr(x.date, 60),
+      cost: cardStr(x.cost, 80), from: ["role", "origin"].includes(x.from) ? x.from : "", why: cardStr(x.why) };
+  }
 
   function blank() {
     return {
@@ -4226,7 +4450,7 @@ p.bad, .small.bad { color: var(--bad); }
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
       equipment: { communicator: true, tricorder: false, medscanner: false, medkit: false, engkit: false, phaser: true, translator: false, envsuit: false, fieldkit: false, beacon: false, sled: false },
-      portrait: "", portraitShape: "token",
+      portrait: "", portraitShape: "token", cards: [],
       play: { injury: 0, duty: 2, stunned: false, log: [], lasting: [], gwLast: null },
     };
   }
@@ -4257,6 +4481,7 @@ p.bad, .small.bad { color: var(--bad); }
     if (!out.speciesAdj || typeof out.speciesAdj !== "object") out.speciesAdj = {};
     out.customSpeed = [-1, 0, 1].includes(+out.customSpeed) ? +out.customSpeed : 0;
     if (!Array.isArray(out.advances)) out.advances = [];
+    out.cards = (Array.isArray(c.cards) ? c.cards : []).filter((k) => k && typeof k === "object").slice(0, 200).map(normCard);
     // Phaser power: older characters with a hand phaser start with a full Type 1.
     const ph = c.play && c.play.phaser;
     out.play.phaser = ph && typeof ph === "object" && (ph.type === "" || ["type1", "type2", "rifle"].includes(ph.type))
@@ -4376,6 +4601,10 @@ p.bad, .small.bad { color: var(--bad); }
   const isBlock = (name) => name === "Block";
   const isDefense = (name) => name === "Dodge" || isParry(name) || isBlock(name);
   const hasAdv = (id, c = ch) => (!c.sadv.id && c.adv.id === id) || (c.advBought || []).includes(id);
+  // Restricted Files: three starting library records, each a secret written by the player (from their department or species).
+  const hasFiles = (c = ch) => hasAdv(DISC.start.adv, c);
+  const secretDone = (k) => !!(k.name.trim() && k.knowledge.trim() && k.from && k.why.trim());
+  const filesDone = (c = ch) => c.cards.filter((k) => k.source === "almanac").slice(0, DISC.start.n).filter(secretDone).length;
   const defensesPerRound = () => 1 + (hasAdv("extradefense") ? 1 : 0);
   const ATTACKS = ["Phasers", "Unarmed Combat"];
   const count = (lvl) => Object.values(ch.skills).filter((v) => v === lvl).length;
@@ -4411,6 +4640,7 @@ p.bad, .small.bad { color: var(--bad); }
       [!!compOk, compOk ? "Complication chosen" : ch.comp.id ? "Finish the complication details" : "Choose a complication"],
       [!!ch.comp.trigger.trim(), "Complication trigger agreed with the GM"],
       [!!ch.connection.trim(), "Connection to a crewmate"],
+      ...(hasFiles() ? [[filesDone() === DISC.start.n, filesDone() === DISC.start.n ? `${DISC.start.label}: ${DISC.start.n} secrets written` : `${DISC.start.label}: ${filesDone()} of ${DISC.start.n} secrets written`]] : []),
     ];
   }
 
@@ -4419,7 +4649,7 @@ p.bad, .small.bad { color: var(--bad); }
   $("f-dept").insertAdjacentHTML("beforeend", `<option value="__custom">Custom department…</option>`);
   $("f-customgroup").innerHTML = [["command", "Command division (gold)"], ["sciences", "Sciences division (blue)"], ["operations", "Operations division (red)"]].map(([g, gn]) => `<option value="${g}">${gn}</option>`).join("");
   const generalAdvOpts = `<optgroup label="General advantages">` +
-    ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("") + `<option value="custom">Custom advantage…</option></optgroup>`;
+    ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n}${sk ? ` (${sk})` : ""}</option>`).join("") + `<option value="custom">Custom advantage…</option></optgroup>`;
   $("f-comp").innerHTML = `<option value="">Choose a complication…</option>` +
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
   $("equip").innerHTML = EQUIPMENT.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="eq-${k}" data-eq="${k}"><span><b>${n}</b><span class="small muted">${eff}</span></span></label>`).join("");
@@ -4598,12 +4828,104 @@ p.bad, .small.bad { color: var(--bad); }
     $("st-best").textContent = best;
     renderRoster();
     renderAdvance();
+    renderCards();
     renderSheet();
     renderPhaser();
     const em = EMBLEMS[division()];
     document.querySelectorAll("[data-emblem]").forEach((e) => { e.setAttribute("d", em.d); e.classList.toggle("stroke", em.stroke); });
     save();
   }
+
+  // ---- library records learned in play, and Restricted Files' starting secrets ----
+  const routeName = (id) => (ROUTES.find((r) => r[0] === id) || [, id])[1];
+  const routeOpts = (sel) => `<option value="">How it was learned…</option>` + ROUTES.map((r) => `<option value="${esc(r[0])}"${r[0] === sel ? " selected" : ""}>${esc(r[1])}</option>`).join("");
+  function cardLine(k) {
+    return `<b>${esc(k.name || k.tag || "Unnamed")}</b>`
+      + (k.knowledge ? `<span class="small">${esc(k.knowledge)}</span>` : "")
+      + (k.limits ? `<span class="small"><b>Limits:</b> ${esc(k.limits)}</span>` : "")
+      + (k.permits ? `<span class="small"><b>Permits:</b> ${esc(k.permits)}</span>` : "")
+      + (k.evidence || k.route ? `<span class="small"><b>${k.route ? esc(routeName(k.route)) : "Source"}:</b> ${esc(k.evidence || "—")}</span>` : "")
+      + (k.cost ? `<span class="small"><b>Cost:</b> ${esc(k.cost)}</span>` : "")
+      + (k.why ? `<span class="small"><b>Why it's a secret:</b> ${esc(k.why)}${k.from ? ` (from your ${k.from === "role" ? "department" : "species"})` : ""}</span>` : "")
+      + `<span class="small muted">${[k.date && esc(k.date), k.job && esc(k.job), k.shared ? `shared copy; owner ${esc(k.owner || "unknown")}` : k.owner ? `owner ${esc(k.owner)}` : "", k.present.length ? `present: ${esc(k.present.join(", "))}` : ""].filter(Boolean).join(" · ")}</span>`;
+  }
+  function renderCards() {
+    // Restricted Files' records come with the advantage, and go with it.
+    if (!hasFiles() && ch.cards.some((k) => k.source === "almanac")) ch.cards = ch.cards.filter((k) => k.source !== "almanac");
+    const own = ch.cards.filter((k) => k.source !== "almanac"), N = DISC.start.n;
+    $("cards-label").textContent = `Library records: your library file` + (ch.cards.length ? ` (${ch.cards.length})` : "");
+    $("cards-intro").textContent = `A library record holds one thing your character has established: what, how far it goes, how you know it and what it cost. Earn one at the end of a discovery clock, or directly (${ROUTES.filter((r) => r[0] !== "investigation").map((r) => r[1].toLowerCase()).join("; ")}); the GM records it for everyone who was there from the GM view. It grants no bonus, and whatever is actually true works whether or not you hold a record for it. Write one here when you earn it or someone teaches you.`;
+    $("card-add").textContent = "Add a library record";
+    $("almanac-wrap").hidden = !hasFiles();
+    if (hasFiles()) {
+      while (ch.cards.filter((k) => k.source === "almanac").length < N) ch.cards.push(normCard({ owner: ch.name.trim(), source: "almanac", job: `Before play (${DISC.start.label})` }));
+      const mine = ch.cards.filter((k) => k.source === "almanac").slice(0, N);
+      $("almanac-label").textContent = `${DISC.start.label}: ${N} library records (${mine.filter(secretDone).length} of ${N} written)`;
+      const sig = mine.map((k) => k.id).join(",") + "|" + ch.dept + "|" + ch.species;
+      if ($("almanac-list").dataset.sig !== sig) {
+        $("almanac-list").dataset.sig = sig; $("almanac-list").className = "almanac-secrets";
+        $("almanac-list").innerHTML = mine.map((k, i) => `<div class="lcard" data-scid="${k.id}"><b>Library record ${i + 1}</b><div class="fields">
+          <div class="field"><label for="sc-name-${k.id}">Subject</label><input type="text" id="sc-name-${k.id}" data-scf="name"></div>
+          <div class="field"><label for="sc-from-${k.id}">It comes from your</label><select id="sc-from-${k.id}" data-scf="from"><option value="">Choose…</option>
+            <option value="role">Department${ch.dept ? `: ${esc(ch.dept)}` : ""}</option><option value="origin">Species${ch.species ? `: ${esc(ch.species)}` : ""}</option></select></div>
+          <div class="field wide"><label for="sc-know-${k.id}">The secret</label><input type="text" id="sc-know-${k.id}" data-scf="knowledge"></div>
+          <div class="field wide"><label for="sc-why-${k.id}">Why it isn't common knowledge</label><input type="text" id="sc-why-${k.id}" data-scf="why" placeholder="It ${esc(DISC.start.secret)}"></div>
+        </div></div>`).join("");
+      }
+      for (const k of mine) for (const f of ["name", "from", "knowledge", "why"]) { const e = $(`sc-${f === "knowledge" ? "know" : f}-${k.id}`); if (e && document.activeElement !== e) e.value = k[f]; }
+      $("almanac-note").textContent = "Something your department trained you in, or your people know, that Starfleet's open files don't hold. The GM approves each one.";
+    }
+    const sig = own.map((k) => k.id).join(",");
+    if ($("cards-list").dataset.sig !== sig) {
+      $("cards-list").dataset.sig = sig;
+      $("cards-list").innerHTML = own.map((k) => `<div class="lcard" data-cardid="${k.id}">
+        <div class="fields">
+          <div class="field"><label for="cd-name-${k.id}">Subject</label><input type="text" id="cd-name-${k.id}" data-cf="name" placeholder="Who or what it's about"></div>
+          <div class="field"><label for="cd-job-${k.id}">Earned in</label><input type="text" id="cd-job-${k.id}" data-cf="job" placeholder="The mission"></div>
+          <div class="field wide"><label for="cd-know-${k.id}">What you established</label><input type="text" id="cd-know-${k.id}" data-cf="knowledge"></div>
+          <div class="field wide"><label for="cd-lim-${k.id}">Limits: what it doesn't tell you</label><input type="text" id="cd-lim-${k.id}" data-cf="limits"></div>
+          <div class="field wide"><label for="cd-perm-${k.id}">What it permits (optional)</label><input type="text" id="cd-perm-${k.id}" data-cf="permits"></div>
+          <div class="field wide"><label for="cd-evid-${k.id}">Evidence or source</label><input type="text" id="cd-evid-${k.id}" data-cf="evidence"></div>
+          <div class="field"><label for="cd-route-${k.id}">How it was learned</label><select id="cd-route-${k.id}" data-cf="route">${routeOpts("")}</select></div>
+          <div class="field"><label for="cd-cost-${k.id}">What it cost</label><input type="text" id="cd-cost-${k.id}" data-cf="cost"></div>
+          <div class="field"><label for="cd-date-${k.id}">Stardate</label><input type="text" id="cd-date-${k.id}" data-cf="date" placeholder="${esc(DISC.datePlaceholder)}"></div>
+          <div class="field"><label for="cd-owner-${k.id}">Owner</label><input type="text" id="cd-owner-${k.id}" data-cf="owner" placeholder="The primary investigator"></div>
+          <div class="field"><label for="cd-present-${k.id}">Who was there</label><input type="text" id="cd-present-${k.id}" data-cf="present" placeholder="Names, with commas"></div>
+          <div class="field wide"><div class="checks"><label><input type="checkbox" id="cd-shared-${k.id}" data-cf="shared"> A shared copy (someone else is the owner)</label>
+            <label><input type="checkbox" id="cd-taught-${k.id}" data-cf="taught"> Taught to me later</label></div></div>
+        </div>
+        <div class="btn-row"><button type="button" class="linkish" data-carddel="${k.id}">Remove</button></div></div>`).join("");
+    }
+    for (const k of own) {
+      const set = (id, v) => { const e = $(id); if (e && document.activeElement !== e) { if (e.type === "checkbox") e.checked = v; else e.value = v; } };
+      set("cd-name-" + k.id, k.name); set("cd-job-" + k.id, k.job); set("cd-know-" + k.id, k.knowledge); set("cd-perm-" + k.id, k.permits);
+      set("cd-owner-" + k.id, k.owner); set("cd-present-" + k.id, k.present.join(", ")); set("cd-shared-" + k.id, k.shared); set("cd-taught-" + k.id, k.source === "taught");
+      set("cd-lim-" + k.id, k.limits); set("cd-evid-" + k.id, k.evidence); set("cd-route-" + k.id, k.route); set("cd-date-" + k.id, k.date); set("cd-cost-" + k.id, k.cost);
+    }
+  }
+  $("card-add").onclick = () => { ch.cards.push(normCard({ owner: ch.name.trim(), present: ch.name.trim() ? [ch.name.trim()] : [] })); $("cards-wrap").open = true; touch(); render(); };
+  const secretEdit = (e) => {
+    const t = e.target.closest("[data-scf]"), box = e.target.closest("[data-scid]"); if (!t || !box) return;
+    const k = ch.cards.find((x) => x.id === box.dataset.scid); if (!k) return;
+    k[t.dataset.scf] = t.value; if (t.dataset.scf === "name") k.tag = slugTag(t.value);
+    touch(); render();
+  };
+  $("almanac-list").addEventListener("input", secretEdit);
+  $("almanac-list").addEventListener("change", secretEdit);
+  const cardEdit = (e) => {
+    const t = e.target.closest("[data-cf]"), box = e.target.closest("[data-cardid]"); if (!t || !box) return;
+    const k = ch.cards.find((x) => x.id === box.dataset.cardid); if (!k) return;
+    const f = t.dataset.cf;
+    if (f === "shared") k.shared = t.checked;
+    else if (f === "taught") k.source = t.checked ? "taught" : "play";
+    else if (f === "present") k.present = t.value.split(",").map((x) => x.trim()).filter(Boolean);
+    else if (f === "name") { k.name = t.value; k.tag = slugTag(t.value); }
+    else k[f] = t.value;
+    touch(); render();
+  };
+  $("cards-list").addEventListener("input", cardEdit);
+  $("cards-list").addEventListener("change", cardEdit);
+  $("cards-list").addEventListener("click", (e) => { const b = e.target.closest("[data-carddel]"); if (!b) return; ch.cards = ch.cards.filter((k) => k.id !== b.dataset.carddel); touch(); render(); });
 
   function renderRoster() {
     if (!roster.length) { $("roster").innerHTML = `<li class="muted small">No saved officers yet. Save this one to keep it.</li>`; return; }
@@ -4650,6 +4972,7 @@ p.bad, .small.bad { color: var(--bad); }
         ${ch.reason ? `<div class="field"><span class="label">Why I serve</span><span>${esc(ch.reason)}</span></div>` : ""}
         ${ch.speciesNotes ? `<div class="field"><span class="label">Species ability (GM approved)</span><span>${esc(ch.speciesNotes)}</span></div>` : ""}
         ${ch.notes ? `<div class="field wide"><span class="label">Notes</span><span>${esc(ch.notes)}</span></div>` : ""}
+        ${ch.cards.length ? `<div class="field wide"><span class="label">Library file: ${ch.cards.length} library record${ch.cards.length === 1 ? "" : "s"}</span><div class="cards-sheet">${ch.cards.map((k) => `<div>${cardLine(k)}</div>`).join("")}</div></div>` : ""}
         ${ch.play.lasting.length ? `<div class="field wide"><span class="label">Lasting wounds</span><span>${ch.play.lasting.map((w) => `${esc(w.name)}${w.complication ? " (complication)" : w.heal ? ` (${esc(w.heal)})` : ""}`).join("; ")}</span></div>` : ""}
         ${ch.xp.earned || ch.advances.length ? `<div class="field wide"><span class="label">Advancement: ${pointsAvail()} point${pointsAvail() === 1 ? "" : "s"} to spend, ${ch.xp.earned} earned</span><span>${ch.advances.map((a) => `${esc(purchaseText(a))}${a.note ? ` (${esc(a.note)})` : ""}`).join("; ") || "Nothing bought yet."}</span></div>` : ""}
       </div>`;
@@ -5036,13 +5359,16 @@ p.bad, .small.bad { color: var(--bad); }
       return `<div class="ship-row ${n >= max ? "out" : n ? "hit" : ""}"><span class="label">${name}</span>
         <span class="boxes">${Array.from({ length: max }, (_, i) => `<button class="box ${i < n ? "on" : ""}" data-track="${name}" data-i="${i + 1}" aria-label="${name} box ${i + 1}${i < n ? ", marked" : ""}"></button>`).join("")}</span>
         <span class="eff">${shipEffect(name, n)}</span></div>`;
-    }).join("");
+    }).join("") + (() => { const n = Math.min(COMMAND_BOXES, ship.Command || 0);
+      return `<div class="ship-row ${n >= COMMAND_BOXES ? "out" : n ? "hit" : ""}"><span class="label">Starfleet Command</span>
+        <span class="boxes">${Array.from({ length: COMMAND_BOXES }, (_, i) => `<button class="box ${i < n ? "on" : ""}" data-track="Command" data-i="${i + 1}" aria-label="Starfleet Command box ${i + 1}${i < n ? ", marked" : ""}"></button>`).join("")}</span>
+        <span class="eff">${COMMAND_EFFECTS[n]}</span></div>`; })();
   }
   $("ship").addEventListener("click", (e) => {
     const b = e.target.closest("[data-track]"); if (!b) return;
     const name = b.dataset.track, i = +b.dataset.i;
     ship[name] = (ship[name] || 0) === i ? i - 1 : i;
-    store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {}
+    store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {} try { renderDisc(); } catch {}
   });
   $("ship-res").addEventListener("click", (e) => {
     const b = e.target.closest("[data-res]"); if (!b) return;
@@ -5059,7 +5385,8 @@ p.bad, .small.bad { color: var(--bad); }
   let resetArmed = false;
   $("ship-reset").onclick = () => {
     if (!resetArmed) { resetArmed = true; $("ship-reset").textContent = "Tap again to clear every box"; setTimeout(() => { resetArmed = false; $("ship-reset").textContent = "Full repair (starbase)"; }, 4000); return; }
-    resetArmed = false; ship = {}; store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {} $("ship-reset").textContent = "Full repair (starbase)";
+    // A starbase repairs the ship, not Command's opinion of the crew.
+    resetArmed = false; ship = ship.Command ? { Command: ship.Command } : {}; store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {} $("ship-reset").textContent = "Full repair (starbase)";
   };
   function clockSvg(c) {
     const r = 44, cx = 48, cy = 48, segs = [];
@@ -7992,6 +8319,7 @@ function mountLab(api) {
     if (q.target) $("lab-target").value = q.target;
     if (q.weapon && [...$("lab-weapon").options].some((/** @type {any} */ o) => o.value === q.weapon)) { $("lab-weapon").value = q.weapon; renderAction(); if (q.target) $("lab-target").value = q.target; }
     if (q.action === "other" && q.note) $("lab-text").value = q.note;
+    if (typeof window !== "undefined" && window.ldReveal) window.ldReveal($("lab-act-wrap")); // the GM view may be showing another panel group
     $("lab-act-wrap").scrollIntoView({ block: "nearest" });
     return true;
   }
@@ -8122,7 +8450,191 @@ return { mountLab };
     return { added, updated };
   }
   let encPanel = null; // the Encounter panel
+  // ---- discovery: clocks that mint library records, the Countdown, and the price of information ----
+  const STORE_DISC = "pelion.disc.v1";
+  const discBlank = () => ({ threat: { running: false, size: 6, filled: 0 }, clocks: [] });
+  let disc = (() => { const d = store.get(STORE_DISC, null); return d && typeof d === "object" && d.threat && Array.isArray(d.clocks) ? d : discBlank(); })();
+  const discSave = () => store.set(STORE_DISC, disc);
+  const discSay = (m, err) => { $("disc-msg").textContent = m; $("disc-msg").className = "toast" + (err ? " err" : ""); };
+  const gateAt = (k) => k.plain ? Infinity : k.phases[0] + k.phases[1];
+  const sizeOf = (k) => k.phases.reduce((a, b) => a + b, 0);
+  const cardsFor = (tag) => gmCrew.flatMap((c) => (c.cards || []).filter((k) => k.tag && k.tag === tag).map((k) => ({ c, k })));
+  // What information can cost (the GM chooses): Command's attention, a Duty point, a ship system's box, or a tick on a danger clock or the Countdown.
+  function costChoices(withDuty) {
+    const th = disc.threat;
+    return [["command", `Starfleet Command +1 (${Math.min(COMMAND_BOXES, ship.Command || 0)}/${COMMAND_BOXES})`], ...(withDuty ? [["duty", "A Duty point (the owner's)"]] : []),
+      ...SHIP_TRACKS.filter(([n]) => n !== "Shields").map(([n, max]) => ["sys:" + n, `${n}: 1 box (${Math.min(max, ship[n] || 0)}/${max})`]),
+      ...clocks.filter((c) => c.kind === "danger" && c.filled < c.size).map((c) => ["clock:" + c.id, `Danger clock: ${c.name} +1`]),
+      ...(th.running && th.filled < th.size ? [["countdown", `The Countdown +1 (${th.filled}/${th.size})`]] : [])];
+  }
+  const costOpts = (withDuty) => `<option value="">What it cost…</option>` + costChoices(withDuty).map(([v, t]) => `<option value="${esc(v)}">${esc(t)}</option>`).join("");
+  // Refresh a cost list's options (their counts change) without losing the choice already made.
+  function fillCosts(sel, withDuty) {
+    const html = costOpts(withDuty); if (!sel || sel.dataset.html === html) return;
+    const v = sel.value; sel.innerHTML = html; sel.dataset.html = html;
+    if ([...sel.options].some((o) => o.value === v)) sel.value = v;
+  }
+  // Pay a cost; returns its label for the record, or null (with a message) if it can't be paid.
+  function payCost(v, payer) {
+    if (v === "command") { ship.Command = Math.min(COMMAND_BOXES, (ship.Command || 0) + 1); store.set(STORE_SHIP, ship); renderShip(); return "Starfleet Command +1"; }
+    if (v === "duty") {
+      if (!payer) { discSay("Choose the owner first: they spend the Duty point.", true); return null; }
+      if (payer.play.duty <= 0) { discSay(`${payer.name || "The owner"} has no Duty points left. Choose another cost.`, true); return null; }
+      payer.play.duty--; return `A Duty point (${payer.name || "the owner"})`;
+    }
+    if (v.startsWith("sys:")) { const n = v.slice(4), t = SHIP_TRACKS.find(([x]) => x === n); if (!t) return null;
+      ship[n] = Math.min(t[1], (ship[n] || 0) + 1); store.set(STORE_SHIP, ship); renderShip(); try { battleMap.refresh(); } catch {} return `${n}: 1 box`; }
+    if (v.startsWith("clock:")) { const c = clocks.find((x) => x.id === v.slice(6)); if (!c) return null;
+      const from = c.filled; c.filled = Math.min(c.size, c.filled + 1); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, from, c.filled); return `${c.name} +1`; }
+    if (v === "countdown") { tickCountdown(1); return "The Countdown +1"; }
+    return null;
+  }
+  // The Countdown doesn't run on routine discovery: a failed roll or a success at a cost lets the GM start it when the stakes are real.
+  function tickCountdown(n) {
+    const th = disc.threat; if (!th.running) return;
+    const was = th.filled; th.filled = Math.max(0, Math.min(th.size, th.filled + n)); discSave();
+    if (n > 0 && was < th.size && th.filled >= th.size) discSay(`The Countdown has run out: ${DISC.threat.onFill}.`);
+  }
+  function renderAward() {
+    const sig = gmCrew.map((c) => c.id + ":" + (c.name || "")).join(",");
+    if ($("disc-award").dataset.sig === sig) return fillCosts($("da-cost"), true);
+    const keep = Object.fromEntries(["da-sub", "da-know", "da-lim", "da-evid", "da-route", "da-date", "da-perm", "da-job", "da-owner"].map((id) => [id, $(id) ? $(id).value : ""]));
+    $("disc-award").dataset.sig = sig;
+    $("disc-award-intro").textContent = `When the crew establishes something directly (${ROUTES.filter((r) => r[0] !== "investigation").map((r) => r[1].toLowerCase()).join("; ")}), record it here. No clock is needed, but information is never free: choose what it cost them, and it's marked. Write down only what they established.`;
+    $("da-fields").innerHTML = `<div class="field"><label for="da-sub">Subject</label><input type="text" id="da-sub" placeholder="Who or what it's about"></div>
+      <div class="field wide"><label for="da-know">What they established</label><input type="text" id="da-know" placeholder="Only what they found out"></div>
+      <div class="field wide"><label for="da-lim">Limits: what it doesn't show</label><input type="text" id="da-lim" placeholder="e.g. Seen once; not why it works"></div>
+      <div class="field wide"><label for="da-evid">Evidence or source</label><input type="text" id="da-evid" placeholder="What they scanned, tested, read or were told, and by whom"></div>
+      <div class="field"><label for="da-route">How it was learned</label><select id="da-route">${routeOpts("").replace(/<option value="investigation">[^<]*<\/option>/, "")}</select></div>
+      <div class="field"><label for="da-cost">What it cost</label><select id="da-cost"></select></div>
+      <div class="field"><label for="da-date">Stardate</label><input type="text" id="da-date" placeholder="${esc(DISC.datePlaceholder)}"></div>
+      <div class="field wide"><label for="da-perm">What it permits (optional)</label><input type="text" id="da-perm"></div>
+      <div class="field"><label for="da-job">Earned in</label><input type="text" id="da-job" placeholder="The mission"></div>
+      <div class="field"><label for="da-owner">Owner</label><select id="da-owner"><option value="">Who holds it…</option>${gmCrew.map((c) => `<option value="${c.id}">${esc(c.name || "Unnamed")}</option>`).join("")}</select></div>
+      <div class="field wide"><span class="label">Recipients: everyone who established it or heard it</span><div class="checks">${gmCrew.map((c) => `<label><input type="checkbox" data-dawho value="${c.id}"> ${esc(c.name || "Unnamed")}</label>`).join("") || `<span class="small muted">Add the crew above first.</span>`}</div></div>`;
+    fillCosts($("da-cost"), true);
+    for (const [id, v] of Object.entries(keep)) if ($(id) && v) $(id).value = v;
+  }
+  function renderDisc() {
+    renderAward();
+    const th = disc.threat;
+    $("disc-intro").textContent = `Discovery clocks fill in three phases (${DISC.phases.map((p) => p[0]).join(", ")}); filling one mints a library record for the primary investigator and a shared copy for everyone present. Discovery runs without a Countdown unless a failed roll or a success at a cost starts one.`;
+    $("disc-new-name").placeholder = "e.g. " + DISC.clockExample;
+    $("disc-threat").innerHTML = th.running
+      ? `<b>Countdown</b><span class="small muted">A hard timer now: it ticks with time (each scene, or each hour you set), whatever the crew does. When it fills, ${esc(DISC.threat.onFill)}.</span>
+        <div class="dsegs">${Array.from({ length: th.size }, (_, i) => `<button class="dseg ${i < th.filled ? "on" : ""}" data-tseg="${i + 1}" aria-label="Countdown segment ${i + 1}"></button>`).join("")}</div>
+        ${th.filled >= th.size ? `<span class="small"><b>It has happened.</b></span>` : ""}
+        <div class="btn-row"><button class="btn" data-tick="1">Time passes (+1)</button><button class="linkish" data-tick="-1">Undo</button><button class="linkish" data-tstop>Stop it</button></div>`
+      : `<b>Countdown: not running</b><span class="small muted">Routine discovery has no clock against it. When a failed roll or a success at a cost puts real stakes in play (a reactor going critical, a closing window, a ship hunting you), start one.</span>
+        <div class="btn-row"><select data-tsize style="width:auto" aria-label="Countdown size">${[4, 6, 8].map((n) => `<option value="${n}"${n === th.size ? " selected" : ""}>${n} segments</option>`).join("")}</select><button class="btn" data-tstart>Start the Countdown</button></div>`;
+    if (!$("dc-cost")) $("disc-costs").innerHTML = `<b>What investigating costs</b><span class="small muted">A failed investigation roll or a success at a cost can start the Countdown, or cost the crew one of these, chosen by how they're digging: Command's attention, strain on a ship's system, or a danger clock moving on.</span>
+        <div class="btn-row"><select id="dc-cost" aria-label="What the failure costs"></select><button class="btn" data-paycost>Mark it</button></div>`;
+    fillCosts($("dc-cost"), false);
+    const crewOpts = (sel) => `<option value="">Primary investigator…</option>` + gmCrew.map((c) => `<option value="${c.id}"${c.id === sel ? " selected" : ""}>${esc(c.name || "Unnamed")}</option>`).join("");
+    const names = DISC.phases.map((p) => p[0]);
+    $("disc-clocks").innerHTML = disc.clocks.length ? disc.clocks.map((k) => {
+      const size = sizeOf(k), gate = gateAt(k), full = k.filled >= size, held = k.tag ? cardsFor(k.tag) : [];
+      const phaseNow = k.plain ? "" : full ? (k.minted ? "Library record minted" : "Done: mint the library record") : k.filled < k.phases[0] ? names[0] : k.filled < gate || !k.tag ? names[1] : names[2];
+      let segs = "";
+      for (let i = 0; i < size; i++) segs += `<button class="dseg ${i < k.filled ? "on" : ""} ${!k.plain && (i + 1 === k.phases[0] || i + 1 === gate) ? "gate" : ""}" data-kseg="${k.id}" data-i="${i + 1}" aria-label="Segment ${i + 1}"></button>`;
+      return `<div class="dclock ${full ? "done" : ""}" data-kid="${k.id}"><b>${esc(k.name)}</b>
+        <span class="small muted">${k.plain ? `Progress clock, ${k.filled}/${size}` : `${esc(phaseNow)} · ${k.filled}/${size}`}</span>
+        <div class="dsegs">${segs}</div>
+        <div class="btn-row"><button class="btn" data-kadv="${k.id}" data-n="1">+1</button><button class="btn" data-kadv="${k.id}" data-n="2">+2 (by 5+)</button><button class="linkish" data-kadv="${k.id}" data-n="-1">Undo</button><button class="linkish danger" data-krm="${k.id}">Remove</button></div>
+        ${k.plain ? "" : `<div class="fields"><div class="field"><label for="dk-pi-${k.id}">Primary investigator</label><select id="dk-pi-${k.id}" data-kpi="${k.id}">${crewOpts(k.primary)}</select></div>
+          <div class="field"><label for="dk-sub-${k.id}">Identified as</label><input type="text" id="dk-sub-${k.id}" data-ksub="${k.id}" value="${esc(k.subject || "")}" placeholder="${k.filled >= gate ? "Name it to pass the gate" : "Not until Identify is full"}"${k.filled < gate && !k.subject ? " disabled" : ""}></div></div>
+          ${k.filled >= gate && !k.tag ? `<span class="small"><b>The gate:</b> confirm the identity above before the clock can go on. Until then, theories are suspicion only, and no library record applies.</span>` : ""}
+          ${k.tag ? `<div class="disc-match">${held.length ? `<b>Already held:</b> ${held.map(({ c, k: card }) => `${esc(c.name)} (${esc(card.name || card.tag)}${card.shared ? `, shared; owner ${esc(card.owner)}` : ""}): ${esc(card.permits || card.knowledge)}`).join("; ")}` : `<span class="muted small">No one holds a library record for ${esc(k.subject)} yet.</span>`}</div>` : ""}
+          ${full && !k.minted ? `<div class="disc-mint"><b>Mint the library record</b>
+            <div class="fields"><div class="field wide"><label for="dk-${k.id}-know">What they established</label><input type="text" id="dk-${k.id}-know" placeholder="Only what they found out"></div>
+              <div class="field wide"><label for="dk-${k.id}-lim">Limits: what it doesn't show</label><input type="text" id="dk-${k.id}-lim"></div>
+              <div class="field wide"><label for="dk-${k.id}-evid">Evidence or source</label><input type="text" id="dk-${k.id}-evid"></div>
+              <div class="field"><label for="dk-${k.id}-date">Stardate</label><input type="text" id="dk-${k.id}-date" placeholder="${esc(DISC.datePlaceholder)}"></div>
+              <div class="field wide"><label for="dk-${k.id}-perm">What it permits (optional)</label><input type="text" id="dk-${k.id}-perm"></div>
+              <div class="field wide"><label for="dk-job-${k.id}">Earned in</label><input type="text" id="dk-job-${k.id}" value="${esc(k.name)}"></div>
+              <div class="field wide"><span class="label">Present at the minting</span><div class="checks">${gmCrew.map((c) => `<label><input type="checkbox" data-kpresent="${k.id}" value="${c.id}" checked> ${esc(c.name || "Unnamed")}</label>`).join("") || `<span class="small muted">Add the crew above first.</span>`}</div></div></div>
+            <div class="btn-row"><button class="btn primary" data-kmint="${k.id}">Mint for everyone present</button></div></div>` : ""}`}
+      </div>`; }).join("") : `<p class="small muted">No discovery clocks running. Start one when a mission turns on something unknown.</p>`;
+  }
+  const scopedRead = (pre) => { const v = (f) => ($(pre + f) ? $(pre + f).value.trim() : "");
+    return { knowledge: v("know"), limits: v("lim"), evidence: v("evid"), date: v("date"), permits: v("perm") }; };
+  // Give a record to each recipient: the owner holds it, everyone else a shared copy. One from the same subject and mission is replaced.
+  function giveCards(base, owner, present) {
+    if (!present.includes(owner)) present.unshift(owner);
+    base = { ...base, owner: owner.name || "", present: present.map((c) => c.name || "Unnamed") };
+    for (const c of present) {
+      c.cards = (c.cards || []).filter((x) => !(x.tag === base.tag && x.source !== "almanac" && x.job === base.job));
+      c.cards.push(normCard({ ...base, shared: c !== owner }));
+    }
+    return present;
+  }
+  const others = (all, owner) => all.filter((c) => c !== owner).map((c) => c.name).join(", ") || "no one else";
+  function mintCard(k) {
+    const present = [...document.querySelectorAll(`[data-kpresent="${k.id}"]:checked`)].map((x) => gmCrew.find((c) => c.id === x.value)).filter(Boolean);
+    const owner = gmCrew.find((c) => c.id === k.primary);
+    if (!owner) return discSay("Choose the primary investigator first: they own the library record.", true);
+    const base = { tag: k.tag, name: k.subject, job: $("dk-job-" + k.id).value.trim(), source: "play", route: "investigation", ...scopedRead("dk-" + k.id + "-") };
+    if (!base.knowledge) return discSay("Say what they established: the library record holds only that.", true);
+    const all = giveCards(base, owner, present);
+    k.minted = true; discSave(); saveGM(); renderGM();
+    discSay(`Library record for ${k.subject} minted: ${owner.name} owns it, with shared copies for ${others(all, owner)}. Save the crew's files so the players get it.`);
+  }
+  function awardCard() {
+    const name = $("da-sub").value.trim(), owner = gmCrew.find((c) => c.id === $("da-owner").value);
+    const present = [...document.querySelectorAll("[data-dawho]:checked")].map((x) => gmCrew.find((c) => c.id === x.value)).filter(Boolean);
+    if (!name) return discSay("Name the subject of the library record first.", true);
+    if (!owner) return discSay("Choose who owns the library record.", true);
+    const base = { tag: slugTag(name), name, job: $("da-job").value.trim(), source: "play", route: $("da-route").value, ...scopedRead("da-") };
+    if (!base.knowledge) return discSay("Say what they established: the library record holds only that.", true);
+    if (!base.route) return discSay("Say how they learned it: each source has its price.", true);
+    if (!$("da-cost").value) return discSay("Choose what it cost them: information is never free.", true);
+    const paid = payCost($("da-cost").value, owner); if (!paid) return;
+    base.cost = paid;
+    const all = giveCards(base, owner, present);
+    saveGM(); renderGM();
+    for (const id of ["da-sub", "da-know", "da-lim", "da-evid", "da-perm", "da-job", "da-date"]) if ($(id)) $(id).value = "";
+    discSay(`Library record for ${name} recorded (it cost ${paid}): ${owner.name} owns it, with shared copies for ${others(all, owner)}. Save the crew's files so the players get it.`);
+  }
+  $("disc-add").onclick = () => {
+    const name = $("disc-new-name").value.trim(); if (!name) return discSay("Name the clock first.", true);
+    const plain = $("disc-new-kind").value === "plain", phases = $("disc-new-phases").value.split(",").map(Number);
+    disc.clocks.push({ id: uid(), name, plain, phases: plain ? [phases.reduce((a, b) => a + b, 0)] : phases, filled: 0, subject: "", tag: "", primary: "", minted: false });
+    $("disc-new-name").value = ""; discSave(); renderDisc(); discSay(`Started: ${name}.`);
+  };
+  function advanceClock(k, n) {
+    const size = sizeOf(k), gate = gateAt(k);
+    let v = Math.max(0, Math.min(size, k.filled + n));
+    if (!k.plain && !k.tag && v > gate) v = gate; // segments never spill past the gate
+    k.filled = v;
+  }
+  $("disc-card").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const kOf = (id) => disc.clocks.find((x) => x.id === id);
+    if (b.dataset.tseg) { const i = +b.dataset.tseg; disc.threat.filled = disc.threat.filled === i ? i - 1 : i; discSave(); }
+    else if (b.dataset.tick) tickCountdown(+b.dataset.tick);
+    else if (b.dataset.tstart !== undefined) { disc.threat = { ...disc.threat, running: true, filled: 0 }; discSave(); discSay("The Countdown is running."); }
+    else if (b.dataset.tstop !== undefined) { disc.threat = { ...disc.threat, running: false, filled: 0 }; discSave(); }
+    else if (b.dataset.paycost !== undefined) { const v = $("dc-cost").value; if (!v) return discSay("Choose what the failure costs.", true); const paid = payCost(v); if (paid) discSay(`Marked: ${paid}.`); }
+    else if (b.dataset.kseg) { const k = kOf(b.dataset.kseg), i = +b.dataset.i; if (k) advanceClock(k, (k.filled === i ? i - 1 : i) - k.filled); discSave(); }
+    else if (b.dataset.kadv) { const k = kOf(b.dataset.kadv); if (k) { const before = k.filled; advanceClock(k, +b.dataset.n); if (+b.dataset.n > 0 && k.filled === before && !k.tag && !k.plain) discSay("The clock is at the gate: confirm the identity first.", true); } discSave(); }
+    else if (b.dataset.krm) { disc.clocks = disc.clocks.filter((x) => x.id !== b.dataset.krm); discSave(); }
+    else if (b.dataset.kmint) { const k = kOf(b.dataset.kmint); if (k) mintCard(k); return; }
+    else if (b.id === "da-go") { awardCard(); return; }
+    else return;
+    renderDisc();
+  });
+  $("disc-card").addEventListener("change", (e) => {
+    const t = e.target, kOf = (id) => disc.clocks.find((x) => x.id === id);
+    if (t.dataset.tsize !== undefined) disc.threat.size = +t.value;
+    else if (t.dataset.kpi) { const k = kOf(t.dataset.kpi); if (k) k.primary = t.value; }
+    else if (t.dataset.ksub) { const k = kOf(t.dataset.ksub); if (k) { k.subject = t.value.trim(); k.tag = slugTag(k.subject); } }
+    else return;
+    discSave(); renderDisc();
+  });
+  clockListeners.push(() => renderDisc()); // a danger clock added, filled or removed changes what information can cost
+
   function renderGM() {
+    renderDisc();
     if (encPanel) setTimeout(encPanel.refresh, 0);
     try { battleMap.refresh(); } catch { /* the map mounts just after the GM view's first render */ }
     if (gmReady) { renderLogForm(); renderSeed(); renderLogBook(); } // the log and seed panels exist once their data has loaded
