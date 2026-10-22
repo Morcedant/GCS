@@ -4092,6 +4092,8 @@
     "intro": "Running investigations and recording what the crew learns. The rules players use are in the *Data records* chapter of the Players' Guide; here is the GM view's Discovery panel, for clocks and records.",
     "take": [
      "## Making data records",
+     "## Example data records",
+     "## Rival clocks",
      "## The Discovery panel"
     ]
    },
@@ -4152,8 +4154,9 @@
    "name": "Countdown",
    "repeat": false,
    "onFill": "the situation hits",
-   "text": "The threat is often the situation itself: failing life support, a collapsing corridor, a reactor going critical, a first-contact window closing. A Countdown is a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.",
-   "count": ""
+   "text": "The threat is often the situation itself: failing life support, a collapsing corridor, a reactor going critical, a first-contact window closing. Routine discovery runs without one. When a failed investigation roll or a success at a cost puts real stakes in play, the GM may start a **Countdown** of 4, 6 or 8 segments. From then on it's a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.",
+   "count": "",
+   "startsOnFailure": true
   },
   "costs": [
    [
@@ -4224,7 +4227,50 @@
    "trouble": "what others would rather keep hidden"
   },
   "origins": "A character's species can suit a method: senses, memory, psionics or a people's own history with the subject. A species that touches minds can advance a phase with Psionics, at the GM's call.",
-  "subjects": [],
+  "subjects": [
+   [
+    "halvane-lattice-core",
+    "Halvane lattice core",
+    "It feeds on the power signatures around it, and a single harmonic frequency controls it.",
+    "Waking, powering down or rerouting any Halvane lattice core."
+   ],
+   [
+    "the-warden-of-the-ashkarr",
+    "The Warden of the Ashkarr",
+    "It is still executing a wartime directive and takes the crew for enemy boarders; its original command authority code overrides it.",
+    "Issuing orders the Warden obeys, or shutting it down cleanly without tripping its failsafes."
+   ],
+   [
+    "corridor-engine",
+    "Corridor engine",
+    "It forces open a corridor mouth where the fold runs close, and it is still keyed to a far mouth where something listens.",
+    "Opening its mouth to a known destination along the fold, or sealing it for good."
+   ],
+   [
+    "spatial-fracture",
+    "Spatial fracture",
+    "It shifts in a cycle tied to an outside rhythm, and a safe corridor opens on each cycle.",
+    "Navigating this fracture, and fractures of its kind, safely."
+   ],
+   [
+    "living-hull",
+    "Living hull",
+    "The ship is alive and aware, its immune response escalates, and it accepts one bio-signature as self.",
+    "Moving through the ship unopposed, and coaxing its doors, systems or will to cooperate."
+   ],
+   [
+    "corporate-black-site",
+    "Corporate black-site encryption",
+    "It's an adaptive system with a dead-man response, and a valid credential pattern gets past it.",
+    "Bypassing this corporation's black-site security, or forging credentials it accepts."
+   ],
+   [
+    "alien-weapon-cache",
+    "Alien weapon cache",
+    "The weapons are keyed to their makers' biology, and a frequency or a biometric spoof makes them fail.",
+    "Disabling these weapons in a fight, or turning them against their makers."
+   ]
+  ],
   "scoped": true,
   "chapter": "Data records",
   "datePlaceholder": "In the story",
@@ -4280,7 +4326,8 @@
    "evidence": "The crew's own sensor logs",
    "route": "experience",
    "cost": "Countdown +1 (the hours spent watching it)"
-  }
+  },
+  "skillSkip": "A character trained in the skill that fits the subject (Engineering for an alien power core, Computers for a rogue intelligence) can skip Confront the unknown. Identify and Uncover still have to be filled."
  },
  "mounts": [
   [
