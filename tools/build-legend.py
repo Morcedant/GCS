@@ -353,6 +353,15 @@ def gen(name, pack, t):
                f"- **Empty means it won't work.** {t['reload']}: refills it from a spare. {t['restock']}: refills it fully between {t['missionLower']}s. Packing a spare is a good use of a {t['point']} point's small preparation."]
         if w.get("jamOn18"):
             out.append("- **Jams.** A natural 18 with this weapon also jams it: clearing it takes an action.")
+        if p.get("loads"):  # special loads: ammunition made of a creature's weakness (Trails of Blood & Dust)
+            L = p["loads"]; fits = lambda x: " or ".join(w["items"][g][0] for g in x[2]) + " only" if x[2] else "Any gun"
+            out += ["", "## Special loads", "",
+                    f"A **special load** is ammunition made of something a creature fears: silver, salt, cold iron, a blessing, fire. It's tracked loosely, as **{L['uses']} uses a job** for each load you carry, not counted bullets: a use is one fight or scene of shooting it. They're restocked between jobs. Choose the loads you carry in the creator, beside your gear.", "",
+                    table(["Load", "Fits", "What it answers", "Coming by it"], [[x[1], fits(x), x[4], x[5]] for x in L["items"]]), "",
+                    "- **No bonus on its own.** A load is ordinary ammunition with one difference: what it's made of. Against a creature whose weakness it is, that weakness works, whoever fires it and whether or not they know why (see *Weaknesses*). Against anything else it's just a bullet.",
+                    "- **A hunter's shot.** When you, or someone assisting you, hold a lore card for the creature and you fire the load its weakness calls for, you can make a **hunter's shot**: the called shot or effect the card permits, one that would otherwise be impossible against it (silver at a werewolf's heart). Card and load together: the card alone gives the knowledge, the load alone the material. It's still a roll, with a called shot's usual penalty, and it adds no bonus.",
+                    "- **Not proof.** A lore card never confirms its own creature: a hunter's shot needs the creature identified first (the Identify phase), as every card does.",
+                    "- **Getting them costs.** Buying silver in a small town gets talked about (Whispers); taking church silver or buying the makings for fire draws the law (Heat). A character with Tinkering can cast silver, hammer cold iron or mix incendiaries; a preacher, or an Occult working, blesses rounds."]
         return "\n".join(out)
     if name == "tracks":
         return table(["Track", "Boxes", "As boxes fill"], [[x["name"], x["boxes"], "; ".join(f"{i}: {e}" for i, e in enumerate(x["effects"]) if i)] for x in p["tracks"]])

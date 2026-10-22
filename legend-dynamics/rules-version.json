@@ -4,6 +4,17 @@
   "rulesUpdated": "2026-10-21",
   "changes": [
     {
+      "date": "2026-10-22",
+      "kind": "setting",
+      "title": "Trails of Blood & Dust: special loads and the hunter's shot",
+      "items": [
+        "Special loads: silver rounds, rock salt shells, cold iron shot, blessed rounds and incendiary shells, tracked as three uses a job each rather than counted bullets. Silver bullets in the gear list become silver rounds.",
+        "A load works against the weakness it's made of, whoever fires it. With a lore card for the creature and the matching load, a hunter's shot makes the called shot or effect the card permits.",
+        "Coming by loads can mark Whispers (buying silver) or Heat (church silver, the makings of fire). Blessed rounds burn a demon but never banish it.",
+        "A wraith can now be hurt by rock salt in the Encounter panel, as its weakness already said."
+      ]
+    },
+    {
       "date": "2026-10-21",
       "kind": "rules",
       "title": "Legend cards and the price of information",

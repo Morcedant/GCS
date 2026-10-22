@@ -369,6 +369,8 @@ tr.lvl-U td.target { color: var(--muted); }
 .lcard .fields { margin: 0; }
 .lcard-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; justify-content: space-between; }
 .cards-sheet { display: grid; gap: 6px; }
+#ph-loads { display: grid; gap: 4px; margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.load-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
 .cards-sheet .small { display: block; }
 .clocks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .clock { display: grid; justify-items: center; gap: 4px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--well); text-align: center; }
@@ -833,6 +835,9 @@ tr.lvl-U td.target { color: var(--muted); }
             <p class="muted small">You begin uninjured, with two {{point}} points (three with Extra {{point}}) and your {{gearLower}}.</p></div>
           <div class="field"><span class="label">{{gear}}</span>
             <div class="checks" id="equip"></div></div>
+          <div class="field" id="loads-wrap" hidden><span class="label">Special loads</span>
+            <p class="small muted" id="loads-intro"></p>
+            <div class="checks" id="loads"></div></div>
           <div class="fields">
             <div class="field wide" id="contact-wrap" hidden><label for="f-contact">A friend (Edge)</label><input type="text" id="f-contact" placeholder="Who, and what they can do for you"></div>
             <div class="field" id="gear-wrap" hidden><label for="f-gearitem">Fine weapon or tool (Edge)</label><input type="text" id="f-gearitem" placeholder="e.g. An heirloom weapon"></div>
@@ -1143,6 +1148,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <button class="btn" id="ph-recharge">{{restock}}</button>
             </div>
           </div>
+          <div id="ph-loads" hidden></div>
         </div>
         <div class="card hud no-print" id="card-clocks">
           <h3>Clocks</h3>
@@ -1281,6 +1287,9 @@ tr.lvl-U td.target { color: var(--muted); }
   const ADVANTAGES = PACK.advantages;
   const COMPLICATIONS = PACK.complications;
   const EQUIPMENT = PACK.equipment;
+  // Special loads (pack loads): ammunition made of a creature's weakness, tracked as uses a job, not bullets.
+  // [id, name, the guns it fits (null: any), its material in the fight panel, what it answers, how to come by it]
+  const LOADS = (PACK.loads && PACK.loads.items) || [], LOAD_USES = (PACK.loads && PACK.loads.uses) || 3;
   const INJURY = [
     ["Uninjured", "No injury penalty", 0],
     ["Wounded", "−1 to physical actions", -1],
@@ -1331,7 +1340,8 @@ tr.lvl-U td.target { color: var(--muted); }
       allegiance: "", allegianceDef: null, customTier: 1, customSpeed: 0, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
-      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [], lasting: [], gwLast: null },
+      loads: [],
+      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [], lasting: [], gwLast: null, loads: {} },
     };
   }
   function example() {
@@ -1365,6 +1375,11 @@ tr.lvl-U td.target { color: var(--muted); }
     if (out.path !== "hand") out.path = "rounded";
     if (PACK.roleAliases && PACK.roleAliases[out.dept]) out.dept = PACK.roleAliases[out.dept]; // a calling merged into another (Marshal → Lawman)
     if (!out.customRole && !DEPTS.some((d) => d[0] === out.dept)) out.dept = DEPTS[0][0];
+    // Special loads carried, and the uses left this job. An older file's "Silver bullets" (gear) becomes silver rounds.
+    out.loads = [...new Set(Array.isArray(c.loads) ? c.loads : c.equipment && c.equipment.silver ? ["silver"] : [])].filter((id) => LOADS.some((l) => l[0] === id));
+    delete out.equipment.silver;
+    const pl = (c.play && c.play.loads) || {};
+    out.play.loads = Object.fromEntries(out.loads.map((id) => [id, Math.max(0, Math.min(LOAD_USES, Number.isFinite(pl[id]) ? pl[id] : LOAD_USES))]));
     // The gun being tracked: its rounds and spare reloads. A character with a gun but no record starts loaded.
     const g = c.play && c.play.gun;
     out.play.gun = g && typeof g === "object" && (g.type === "" || GUNS[g.type])
@@ -1645,6 +1660,12 @@ tr.lvl-U td.target { color: var(--muted); }
     ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("") + `<option value="custom">Custom advantage…</option></optgroup>`;
   $("f-comp").innerHTML = `<option value="">Choose a complication…</option>` +
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
+  const loadFits = (l) => (l[2] ? l[2].map((g) => (GUNS[g] ? GUNS[g][0] : g)).join(" or ") + " only" : "any gun");
+  $("loads-wrap").hidden = !LOADS.length;
+  if (LOADS.length) {
+    $("loads-intro").textContent = `${LOAD_USES} uses a job each, restocked between jobs. A load works against the weakness it's made of, whoever fires it; with a lore card for the creature and the load its weakness calls for, you can make a hunter's shot.`;
+    $("loads").innerHTML = LOADS.map(([k, n, , , eff, get]) => `<label class="eq-item"><input type="checkbox" id="ld-${k}" data-load="${k}"><span><b>${esc(n)}</b> <span class="small muted">(${esc(loadFits(LOADS.find((l) => l[0] === k)))})</span><span class="small muted">${esc(eff)} ${esc(get)}</span></span></label>`).join("");
+  }
   $("equip").innerHTML = EQUIPMENT.map(([k, n, eff, meta]) => `<label class="eq-item"><input type="checkbox" id="eq-${k}" data-eq="${k}"><span><b>${n}</b>${meta && meta.control ? ` <span class="eq-ctl ctl-${meta.control.toLowerCase()}">${esc(meta.control)}</span>` : ""}<span class="small muted">${eff}</span></span></label>`).join("");
   if (CR.attackQualityDodge) {
     const b = [...CR.attackQualityDodge.bands].sort((x, y) => x.from - y.from);
@@ -1725,6 +1746,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("f-sadvname").value = ch.sadv.name; $("f-sadvtext").value = ch.sadv.text; $("f-scompname").value = ch.sadv.compName; $("f-scomptext").value = ch.sadv.compText;
     $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
     EQUIPMENT.forEach(([k]) => ($("eq-" + k).checked = !!ch.equipment[k]));
+    LOADS.forEach(([k]) => ($("ld-" + k).checked = ch.loads.includes(k)));
     $("f-stunned").checked = !!ch.play.stunned;
     $("f-contact").value = ch.contact; $("f-gearitem").value = ch.gear.item; $("f-gearuse").value = ch.gear.use || ""; $("f-adv2detail").value = ch.adv2.detail;
   }
@@ -2023,7 +2045,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const lvlOrder = { S: 0, T: 1, U: 2 };
     const sorted = SKILLS.map(([n, a]) => ({ n, a, l: ch.skills[n], t: skillTarget(n) + formSkill(n) }))
       .sort((x, y) => lvlOrder[x.l] - lvlOrder[y.l] || y.t - x.t || x.n.localeCompare(y.n));
-    const eq = EQUIPMENT.filter(([k]) => ch.equipment[k]).map(([, n]) => n);
+    const eq = EQUIPMENT.filter(([k]) => ch.equipment[k]).map(([, n]) => n).concat(ch.loads.map((id) => `${LOADS.find((l) => l[0] === id)[1]} (${LOAD_USES} uses a job)`));
     if (ch.otherEquip.trim()) eq.push(ch.otherEquip.trim());
     const advText = ch.adv.id === "custom" ? ch.adv.text : advDef()?.[2] || "";
     const compText = ch.comp.id === "custom" ? ch.comp.text : compDef()?.[2] || "";
@@ -2477,6 +2499,12 @@ tr.lvl-U td.target { color: var(--muted); }
       ch.spells = t.checked ? [...new Set([...ch.spells, k])] : ch.spells.filter((x) => x !== k);
       touch(); render();
     }
+    else if (t.dataset.load) {
+      const k = t.dataset.load;
+      ch.loads = t.checked ? [...new Set([...ch.loads, k])] : ch.loads.filter((x) => x !== k);
+      if (t.checked) ch.play.loads[k] = LOAD_USES; else delete ch.play.loads[k];
+      touch(); render();
+    }
     else if (t.dataset.eq) {
       ch.equipment[t.dataset.eq] = t.checked;
       const k = t.dataset.eq, g = gunOf();
@@ -2564,6 +2592,13 @@ tr.lvl-U td.target { color: var(--muted); }
       $("r-setting").innerHTML = opts.map(([id, n, cost]) => `<option value="${id}" ${g.rounds < cost ? "disabled" : ""}>${n} (${cost} ${cost > 1 ? T.ammo : T.ammoOne})${FIRE.find((f) => f[0] === id)[4] ? ", " + signed(FIRE.find((f) => f[0] === id)[4]) : ""}</option>`).join("") + `<option value="none">${T.otherWeapon}</option>`;
       $("r-setting").value = opts.some(([id, , cost]) => id === prev && g.rounds >= cost) || prev === "none" ? prev : opts.find(([, , cost]) => g.rounds >= cost)?.[0] || "none";
     }
+    // Special loads: uses left this job.
+    $("ph-loads").hidden = !ch.loads.length;
+    if (ch.loads.length) $("ph-loads").innerHTML = `<span class="label">Special loads</span>` + ch.loads.map((id) => {
+      const l = LOADS.find((x) => x[0] === id), n = ch.play.loads[id] ?? LOAD_USES, fits = !l[2] || l[2].includes(gunOf().type);
+      return `<div class="load-row"><b>${esc(l[1])}</b> <span class="num">${"●".repeat(n)}${"○".repeat(LOAD_USES - n)}</span>${fits ? "" : ` <span class="small muted">(${esc(loadFits(l))})</span>`}
+        <button class="linkish" data-loaduse="${id}" ${n ? "" : "disabled"}>Use one</button></div>`; }).join("")
+      + `<button class="linkish" data-loadrestock>New job: restock the loads</button>`;
     updateTarget(); // the shot can change the target
   }
   function spendGun(id) {
@@ -2582,6 +2617,13 @@ tr.lvl-U td.target { color: var(--muted); }
     const b = e.target.closest("[data-fire]"); if (!b) return;
     const set = spendGun(b.dataset.fire);
     if (set) { render(); toast(`${set[1]}: ${set[2]} ${set[2] > 1 ? T.ammo : T.ammoOne} ${T.spent}, ${gunOf().rounds} left.`); }
+  });
+  $("ph-loads").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-loaduse], [data-loadrestock]"); if (!b) return;
+    if (b.dataset.loaduse) { const id = b.dataset.loaduse; ch.play.loads[id] = Math.max(0, (ch.play.loads[id] ?? LOAD_USES) - 1);
+      toast(`${LOADS.find((l) => l[0] === id)[1]}: ${ch.play.loads[id]} use${ch.play.loads[id] === 1 ? "" : "s"} left this job.`); }
+    else { for (const id of ch.loads) ch.play.loads[id] = LOAD_USES; toast("Special loads restocked for the new job."); }
+    render();
   });
   $("ph-spare-plus").onclick = () => { gunOf().spares++; render(); };
   $("ph-spare-minus").onclick = () => { const g = gunOf(); if (g.spares > 0) { g.spares--; render(); } };
