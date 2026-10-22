@@ -34,6 +34,10 @@ START_SLUG = "/start"
 # The shared table's restricted playtest: only GMs with an access code can start a table on the site's table server
 # (GM_CODES, legend-dynamics/table-server/README.md). Set to False to take the notice off every page.
 TABLE_PLAYTEST = True
+# Held back for now (the author's call): the notice inviting GMs to ask for an access code (and the contact form's
+# topic for it), and the instructions for building and hosting your own table server. True puts them back.
+TABLE_ACCESS_REQUESTS = False
+TABLE_HOSTING = False
 CHANGELOG_SLUG = "/changelog"
 
 BRAND_FONTS = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
@@ -43,7 +47,7 @@ e = html.escape
 
 def table_notice(extra=""):
     """The restricted-playtest notice, wherever the site offers the shared table ("" when TABLE_PLAYTEST is off)."""
-    if not TABLE_PLAYTEST:
+    if not TABLE_PLAYTEST or not TABLE_ACCESS_REQUESTS:
         return ""
     return (f'<div class="ld ld-callout" style="margin:1.2rem 0"><b>Restricted playtest</b><p>The shared table is in a restricted playtest. '
             f'For now, only GMs with an access code can start a table on it; players can join any table their GM starts, with its code. '
@@ -86,7 +90,7 @@ def md_inline(t):
 
 
 def table_page():
-    """The shared table: how to run a game with it, and how to host your own table server on Cloudflare."""
+    """The shared table: how to run a game with it, and (TABLE_HOSTING) how to host your own table server on Cloudflare."""
     code = lambda x: f"<code>{e(x)}</code>"
     trouble = [
         ("The address ends in <b>pages.dev</b>, or no deploy command was asked for", "It was made as a Pages project, which only serves files. Delete it (its <b>Settings</b>, at the bottom) and create it again from the <b>Workers</b> side, as in step 1."),
@@ -98,38 +102,7 @@ def table_page():
         ("<b>This site isn't allowed to use the table server</b>", f"Your site isn't in {code('ALLOWED_ORIGINS')} (step 6). Add its address, or {code('null')} for creators opened as files, and redeploy."),
     ]
     rows = "".join(f"<tr><td>{a}</td><td>{b}</td></tr>" for a, b in trouble)
-    return f"""<!-- Shared table page (suggested URL {TABLE_SLUG}). No theme injection: it uses the Legend Dynamics brand.
-     Paste each block into its own Code Block (Display Source off). -->
-
-<!-- Block 1: hero -->
-<div class="ld ld-hero">
-  <div class="ld-eyebrow">Play online</div>
-  <h1>The shared table</h1>
-  <hr class="ld-rule">
-  <p class="ld-lede">Every character creator can join a shared table: the GM starts one, the players join with a code, and everyone sees the same dice, the same characters and the same fight, each on their own device.</p>
-  <div class="ld-actions">
-    <a class="ld-button" href="/#games">Open a creator</a>
-    <a class="ld-button ld-button--ghost" href="#host">Host your own table server</a>
-    <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}">Or play with the Discord bot</a>
-  </div>
-  {table_notice(' Or <a href="#host">host your own table server</a>: the playtest limit applies only to this site\'s.')}
-</div>
-
-<!-- Block 2: running a game (anchor id "run") -->
-<div class="ld" id="run">
-  <div class="ld-eyebrow">Running a game</div>
-  <ol class="ld-steps">
-    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. If the table server asks for a <b>GM access code</b>, type the one its owner gave you; the creator remembers it. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
-    <li><b>Players join.</b> Each opens their character, goes to the play tab, types the code and their name, and presses <b>Join</b>.</li>
-    <li><b>Play.</b> Rolls from every sheet are rolled by the table and shown to all. Each character appears on the GM's cards, and injuries, points and ammunition stay in step both ways.</li>
-    <li><b>Fight.</b> The GM's battle map and encounter show on every player's play tab. Players move their own tokens and, on their turn, send the GM what they do; the GM puts it into the Encounter panel and runs it.</li>
-    <li><b>Keep it private.</b> Anyone with the code can join. The GM can <b>Remove</b> a player and <b>Change code</b> at any time.</li>
-  </ol>
-  <p style="margin-top:1rem">Each creator has a <b>How a shared game works</b> guide beside the table, for the GM and for players. The creators on this site already use a table server: nothing to set up. Read on only to host your own.</p>
-  <p style="font-size:.9rem;color:var(--ld-ink-2);margin-top:1rem">You can mix it with the <a href="{DISCORD_SLUG}">Discord dice bot</a>: stream the map to a group on Discord while players who have the creator open join the shared table, or roll with the bot while the GM keeps the encounter panel.</p>
-</div>
-
-<!-- Block 3: host your own (give this section the anchor id "host" in Squarespace, or keep the id below) -->
+    hosting = f"""<!-- Block 3: host your own (give this section the anchor id "host" in Squarespace, or keep the id below) -->
 <div class="ld" id="host">
   <div class="ld-eyebrow">Host your own table server on Cloudflare</div>
   <p>The table server is a small Cloudflare Worker with one Durable Object (a little database) per table. It runs on Cloudflare's free Workers plan, costs nothing while nobody is rolling, and deletes a table nobody has used for 30 days. Everything below works from a browser, an iPad included.</p>
@@ -153,6 +126,38 @@ def table_page():
   <p>Updates to the server reach Cloudflare by themselves: each change to the branch it builds deploys again. The creators keep working with an older server, so the site and the server can be updated in either order.</p>
 </div>
 """
+    return f"""<!-- Shared table page (suggested URL {TABLE_SLUG}). No theme injection: it uses the Legend Dynamics brand.
+     Paste each block into its own Code Block (Display Source off). -->
+
+<!-- Block 1: hero -->
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Play online</div>
+  <h1>The shared table</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">Every character creator can join a shared table: the GM starts one, the players join with a code, and everyone sees the same dice, the same characters and the same fight, each on their own device.</p>
+  <div class="ld-actions">
+    <a class="ld-button" href="/#games">Open a creator</a>
+    {'<a class="ld-button ld-button--ghost" href="#host">Host your own table server</a>' if TABLE_HOSTING else ""}
+    <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}">Or play with the Discord bot</a>
+  </div>
+  {table_notice(' Or <a href="#host">host your own table server</a>: the playtest limit applies only to this site\'s.' if TABLE_HOSTING else "")}
+</div>
+
+<!-- Block 2: running a game (anchor id "run") -->
+<div class="ld" id="run">
+  <div class="ld-eyebrow">Running a game</div>
+  <ol class="ld-steps">
+    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. If the table server asks for a <b>GM access code</b>, type the one its owner gave you; the creator remembers it. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
+    <li><b>Players join.</b> Each opens their character, goes to the play tab, types the code and their name, and presses <b>Join</b>.</li>
+    <li><b>Play.</b> Rolls from every sheet are rolled by the table and shown to all. Each character appears on the GM's cards, and injuries, points and ammunition stay in step both ways.</li>
+    <li><b>Fight.</b> The GM's battle map and encounter show on every player's play tab. Players move their own tokens and, on their turn, send the GM what they do; the GM puts it into the Encounter panel and runs it.</li>
+    <li><b>Keep it private.</b> Anyone with the code can join. The GM can <b>Remove</b> a player and <b>Change code</b> at any time.</li>
+  </ol>
+  <p style="margin-top:1rem">Each creator has a <b>How a shared game works</b> guide beside the table, for the GM and for players. The creators on this site already use a table server: nothing to set up.{" Read on only to host your own." if TABLE_HOSTING else ""}</p>
+  <p style="font-size:.9rem;color:var(--ld-ink-2);margin-top:1rem">You can mix it with the <a href="{DISCORD_SLUG}">Discord dice bot</a>: stream the map to a group on Discord while players who have the creator open join the shared table, or roll with the bot while the GM keeps the encounter panel.</p>
+</div>
+
+{hosting if TABLE_HOSTING else ""}"""
 
 
 def contact_page():
@@ -176,7 +181,7 @@ def contact_page():
   <div class="ld-eyebrow">Write to me</div>
   <form class="ld-form" id="ld-contact" action="mailto:{CONTACT_EMAIL}" method="post" enctype="text/plain">
     <label>Your name <input type="text" name="name" autocomplete="name" maxlength="80"></label>
-    <label>About <select name="topic"><option>A comment or suggestion</option><option>A question about the rules</option><option>Something isn't working</option><option>A story from my game</option>{"<option>A GM access code for the shared table</option>" if TABLE_PLAYTEST else ""}<option>Something else</option></select></label>
+    <label>About <select name="topic"><option>A comment or suggestion</option><option>A question about the rules</option><option>Something isn't working</option><option>A story from my game</option>{"<option>A GM access code for the shared table</option>" if TABLE_PLAYTEST and TABLE_ACCESS_REQUESTS else ""}<option>Something else</option></select></label>
     <label>Game <select name="game"><option>Any or all</option>{games}<option>USS Pelion</option><option>Grimm</option></select></label>
     <label class="ld-wide">Your message <textarea name="message" rows="7" required maxlength="5000"></textarea></label>
     <div class="ld-actions ld-wide"><button class="ld-button" type="submit">Write the email</button></div>

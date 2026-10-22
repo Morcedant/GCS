@@ -168,7 +168,7 @@ def main():
     write(bw.WHY_SLUG.strip("/") + "/index.html", page(bw.WHY_SLUG, "Why Legend Dynamics · Legend Dynamics", "Why the Legend Dynamics roleplaying game system was made: the 3d6 bell curve married to Fate's narrative heart.",
                                                      blocks(bw.why_page()), fonts=font_links({bw.BRAND_FONTS})))
 
-    write(bw.TABLE_SLUG.strip("/") + "/index.html", page(bw.TABLE_SLUG, "The shared table · Legend Dynamics", "Play Legend Dynamics online with the shared table, and host your own table server on Cloudflare.",
+    write(bw.TABLE_SLUG.strip("/") + "/index.html", page(bw.TABLE_SLUG, "The shared table · Legend Dynamics", "Play Legend Dynamics online with the shared table" + (", and host your own table server on Cloudflare." if bw.TABLE_HOSTING else "."),
                                                        blocks(bw.table_page()), fonts=font_links({bw.BRAND_FONTS})))
 
     write(bw.CONTACT_SLUG.strip("/") + "/index.html", page(bw.CONTACT_SLUG, "Contact · Legend Dynamics", "Comments, questions and stories for the maker of the Legend Dynamics roleplaying games.",
