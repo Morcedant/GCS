@@ -72,6 +72,8 @@ b, strong { font-weight: 600; }
 .subtabs .tab { font-size: .78rem; padding: 9px 14px; }
 .subtabs .tab .n { opacity: .7; margin-right: 6px; }
 #view-gm > .subtabs { margin: 22px 0 18px; }
+.subtabs .tab.ping::after { content: ""; display: inline-block; width: 8px; height: 8px; margin-left: 7px; border-radius: 50%; background: var(--accent); vertical-align: middle; }
+@media (min-width: 901px) { #sheet-tabs .narrow-only { display: none; } }
 .steps > .subtabs { margin-bottom: 0; }
 .step-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; border-top: 1px dashed var(--line); padding-top: 14px; }
 .step-nav .btn:only-child { margin-left: auto; }
@@ -274,6 +276,7 @@ tr.lvl-U td.target { color: var(--muted); }
   /* Duty station: condition and roller first, the full sheet after them. */
   .sheet { display: flex; flex-direction: column; }
   .play-col { display: contents; }
+  #sheet-tabs { order: 0; }
   #card-condition { order: 1; } #card-roll { order: 2; } #card-weapon { order: 3; } #card-clocks { order: 4; } #card-ship { order: 5; } #sheet-main { order: 6; } #card-ref { order: 7; }
   /* Create: readiness rides along at the bottom instead of sitting above step 1. */
   #app[data-view="create"] .mobile-status, #app:not([data-view]) .mobile-status {
@@ -368,6 +371,8 @@ tr.lvl-U td.target { color: var(--muted); }
 .lcard .fields { margin: 0; }
 .lcard-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; justify-content: space-between; }
 .cards-sheet { display: grid; gap: 6px; }
+#ph-loads { display: grid; gap: 4px; margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; }
+.load-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
 .cards-sheet .small { display: block; }
 .clocks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .clock { display: grid; justify-items: center; gap: 4px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--well); text-align: center; }
@@ -613,7 +618,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="e312c67" data-version-date="2026.10.21" title="The code changes whenever this page changes.">Version 2026.10.21 · e312c67</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="ff90a75" data-version-date="2026.10.22" title="The code changes whenever this page changes.">Version 2026.10.22 · ff90a75</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -832,6 +837,9 @@ tr.lvl-U td.target { color: var(--muted); }
             <p class="muted small">You begin uninjured, with two Fortune points (three with Extra Fortune) and your gear.</p></div>
           <div class="field"><span class="label">Gear</span>
             <div class="checks" id="equip"></div></div>
+          <div class="field" id="loads-wrap" hidden><span class="label">Special loads</span>
+            <p class="small muted" id="loads-intro"></p>
+            <div class="checks" id="loads"></div></div>
           <div class="fields">
             <div class="field wide" id="contact-wrap" hidden><label for="f-contact">A friend (Edge)</label><input type="text" id="f-contact" placeholder="Who, and what they can do for you"></div>
             <div class="field" id="gear-wrap" hidden><label for="f-gearitem">Fine weapon or tool (Edge)</label><input type="text" id="f-gearitem" placeholder="e.g. An heirloom weapon"></div>
@@ -4636,6 +4644,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="field" id="ptrack-print" hidden></div>
       </div>
       <div class="play-col">
+        <nav class="subtabs no-print" id="sheet-tabs" role="tablist" aria-label="Play panels"></nav>
         <div class="card hud no-print" id="card-condition">
           <h3>Condition</h3>
           <div class="field"><span class="label">Injury track</span>
@@ -4732,6 +4741,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <button class="btn" id="ph-recharge">Restock in town</button>
             </div>
           </div>
+          <div id="ph-loads" hidden></div>
         </div>
         <div class="card hud no-print" id="card-clocks">
           <h3>Clocks</h3>
@@ -6097,7 +6107,7 @@ function mountLab(api) {
     }
     return out;
   }
-  const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"] });
+  const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"], salt: ["salt"], blessed: ["blessed", "holy water"] });
   // The battle map's distance between attacker and target, checked against the weapon: a weapon in hand's reach
   // and the attacker's Move (as injury leaves it), or a ranged weapon's band, which it sets. Only a note: the GM rules.
   function reachCheck(/** @type {any} */ a, /** @type {any} */ d, /** @type {any} */ w) {
@@ -6740,6 +6750,9 @@ return { mountLab };
   const ADVANTAGES = PACK.advantages;
   const COMPLICATIONS = PACK.complications;
   const EQUIPMENT = PACK.equipment;
+  // Special loads (pack loads): ammunition made of a creature's weakness, tracked as uses a job, not bullets.
+  // [id, name, the guns it fits (null: any), its material in the fight panel, what it answers, how to come by it]
+  const LOADS = (PACK.loads && PACK.loads.items) || [], LOAD_USES = (PACK.loads && PACK.loads.uses) || 3;
   const INJURY = [
     ["Uninjured", "No injury penalty", 0],
     ["Wounded", "−1 to physical actions", -1],
@@ -6790,7 +6803,8 @@ return { mountLab };
       allegiance: "", allegianceDef: null, customTier: 1, customSpeed: 0, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
-      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [], lasting: [], gwLast: null },
+      loads: [],
+      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [], lasting: [], gwLast: null, loads: {} },
     };
   }
   function example() {
@@ -6824,6 +6838,11 @@ return { mountLab };
     if (out.path !== "hand") out.path = "rounded";
     if (PACK.roleAliases && PACK.roleAliases[out.dept]) out.dept = PACK.roleAliases[out.dept]; // a calling merged into another (Marshal → Lawman)
     if (!out.customRole && !DEPTS.some((d) => d[0] === out.dept)) out.dept = DEPTS[0][0];
+    // Special loads carried, and the uses left this job. An older file's "Silver bullets" (gear) becomes silver rounds.
+    out.loads = [...new Set(Array.isArray(c.loads) ? c.loads : c.equipment && c.equipment.silver ? ["silver"] : [])].filter((id) => LOADS.some((l) => l[0] === id));
+    delete out.equipment.silver;
+    const pl = (c.play && c.play.loads) || {};
+    out.play.loads = Object.fromEntries(out.loads.map((id) => [id, Math.max(0, Math.min(LOAD_USES, Number.isFinite(pl[id]) ? pl[id] : LOAD_USES))]));
     // The gun being tracked: its rounds and spare reloads. A character with a gun but no record starts loaded.
     const g = c.play && c.play.gun;
     out.play.gun = g && typeof g === "object" && (g.type === "" || GUNS[g.type])
@@ -7104,6 +7123,12 @@ return { mountLab };
     ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("") + `<option value="custom">Custom advantage…</option></optgroup>`;
   $("f-comp").innerHTML = `<option value="">Choose a complication…</option>` +
     COMPLICATIONS.map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + `<option value="custom">Custom complication…</option>`;
+  const loadFits = (l) => (l[2] ? l[2].map((g) => (GUNS[g] ? GUNS[g][0] : g)).join(" or ") + " only" : "any gun");
+  $("loads-wrap").hidden = !LOADS.length;
+  if (LOADS.length) {
+    $("loads-intro").textContent = `${LOAD_USES} uses a job each, restocked between jobs. A load works against the weakness it's made of, whoever fires it; with a lore card for the creature and the load its weakness calls for, you can make a hunter's shot.`;
+    $("loads").innerHTML = LOADS.map(([k, n, , , eff, get]) => `<label class="eq-item"><input type="checkbox" id="ld-${k}" data-load="${k}"><span><b>${esc(n)}</b> <span class="small muted">(${esc(loadFits(LOADS.find((l) => l[0] === k)))})</span><span class="small muted">${esc(eff)} ${esc(get)}</span></span></label>`).join("");
+  }
   $("equip").innerHTML = EQUIPMENT.map(([k, n, eff, meta]) => `<label class="eq-item"><input type="checkbox" id="eq-${k}" data-eq="${k}"><span><b>${n}</b>${meta && meta.control ? ` <span class="eq-ctl ctl-${meta.control.toLowerCase()}">${esc(meta.control)}</span>` : ""}<span class="small muted">${eff}</span></span></label>`).join("");
   if (CR.attackQualityDodge) {
     const b = [...CR.attackQualityDodge.bands].sort((x, y) => x.from - y.from);
@@ -7184,6 +7209,7 @@ return { mountLab };
     $("f-sadvname").value = ch.sadv.name; $("f-sadvtext").value = ch.sadv.text; $("f-scompname").value = ch.sadv.compName; $("f-scomptext").value = ch.sadv.compText;
     $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
     EQUIPMENT.forEach(([k]) => ($("eq-" + k).checked = !!ch.equipment[k]));
+    LOADS.forEach(([k]) => ($("ld-" + k).checked = ch.loads.includes(k)));
     $("f-stunned").checked = !!ch.play.stunned;
     $("f-contact").value = ch.contact; $("f-gearitem").value = ch.gear.item; $("f-gearuse").value = ch.gear.use || ""; $("f-adv2detail").value = ch.adv2.detail;
   }
@@ -7482,7 +7508,7 @@ return { mountLab };
     const lvlOrder = { S: 0, T: 1, U: 2 };
     const sorted = SKILLS.map(([n, a]) => ({ n, a, l: ch.skills[n], t: skillTarget(n) + formSkill(n) }))
       .sort((x, y) => lvlOrder[x.l] - lvlOrder[y.l] || y.t - x.t || x.n.localeCompare(y.n));
-    const eq = EQUIPMENT.filter(([k]) => ch.equipment[k]).map(([, n]) => n);
+    const eq = EQUIPMENT.filter(([k]) => ch.equipment[k]).map(([, n]) => n).concat(ch.loads.map((id) => `${LOADS.find((l) => l[0] === id)[1]} (${LOAD_USES} uses a job)`));
     if (ch.otherEquip.trim()) eq.push(ch.otherEquip.trim());
     const advText = ch.adv.id === "custom" ? ch.adv.text : advDef()?.[2] || "";
     const compText = ch.comp.id === "custom" ? ch.comp.text : compDef()?.[2] || "";
@@ -7936,6 +7962,12 @@ return { mountLab };
       ch.spells = t.checked ? [...new Set([...ch.spells, k])] : ch.spells.filter((x) => x !== k);
       touch(); render();
     }
+    else if (t.dataset.load) {
+      const k = t.dataset.load;
+      ch.loads = t.checked ? [...new Set([...ch.loads, k])] : ch.loads.filter((x) => x !== k);
+      if (t.checked) ch.play.loads[k] = LOAD_USES; else delete ch.play.loads[k];
+      touch(); render();
+    }
     else if (t.dataset.eq) {
       ch.equipment[t.dataset.eq] = t.checked;
       const k = t.dataset.eq, g = gunOf();
@@ -8023,6 +8055,13 @@ return { mountLab };
       $("r-setting").innerHTML = opts.map(([id, n, cost]) => `<option value="${id}" ${g.rounds < cost ? "disabled" : ""}>${n} (${cost} ${cost > 1 ? T.ammo : T.ammoOne})${FIRE.find((f) => f[0] === id)[4] ? ", " + signed(FIRE.find((f) => f[0] === id)[4]) : ""}</option>`).join("") + `<option value="none">${T.otherWeapon}</option>`;
       $("r-setting").value = opts.some(([id, , cost]) => id === prev && g.rounds >= cost) || prev === "none" ? prev : opts.find(([, , cost]) => g.rounds >= cost)?.[0] || "none";
     }
+    // Special loads: uses left this job.
+    $("ph-loads").hidden = !ch.loads.length;
+    if (ch.loads.length) $("ph-loads").innerHTML = `<span class="label">Special loads</span>` + ch.loads.map((id) => {
+      const l = LOADS.find((x) => x[0] === id), n = ch.play.loads[id] ?? LOAD_USES, fits = !l[2] || l[2].includes(gunOf().type);
+      return `<div class="load-row"><b>${esc(l[1])}</b> <span class="num">${"●".repeat(n)}${"○".repeat(LOAD_USES - n)}</span>${fits ? "" : ` <span class="small muted">(${esc(loadFits(l))})</span>`}
+        <button class="linkish" data-loaduse="${id}" ${n ? "" : "disabled"}>Use one</button></div>`; }).join("")
+      + `<button class="linkish" data-loadrestock>New job: restock the loads</button>`;
     updateTarget(); // the shot can change the target
   }
   function spendGun(id) {
@@ -8041,6 +8080,13 @@ return { mountLab };
     const b = e.target.closest("[data-fire]"); if (!b) return;
     const set = spendGun(b.dataset.fire);
     if (set) { render(); toast(`${set[1]}: ${set[2]} ${set[2] > 1 ? T.ammo : T.ammoOne} ${T.spent}, ${gunOf().rounds} left.`); }
+  });
+  $("ph-loads").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-loaduse], [data-loadrestock]"); if (!b) return;
+    if (b.dataset.loaduse) { const id = b.dataset.loaduse; ch.play.loads[id] = Math.max(0, (ch.play.loads[id] ?? LOAD_USES) - 1);
+      toast(`${LOADS.find((l) => l[0] === id)[1]}: ${ch.play.loads[id]} use${ch.play.loads[id] === 1 ? "" : "s"} left this job.`); }
+    else { for (const id of ch.loads) ch.play.loads[id] = LOAD_USES; toast("Special loads restocked for the new job."); }
+    render();
   });
   $("ph-spare-plus").onclick = () => { gunOf().spares++; render(); };
   $("ph-spare-minus").onclick = () => { const g = gunOf(); if (g.spares > 0) { g.spares--; render(); } };
@@ -9232,8 +9278,10 @@ function mountTable(api) {
   let viewerMap = null;
   function renderFight(sc) {
     const card = $("card-fight"), me = sharedTable && sharedTable.role() === "player";
+    const was = card.hidden;
     card.hidden = !me || !sc || (!sc.map && !sc.fight);
     if (card.hidden) return;
+    if (was) try { pingSheetTab("table"); } catch {}
     if (sc.map) {
       if (!viewerMap) viewerMap = mountBattleMap({ root: $("table-map"), key: PACK.id, esc, toast, viewer: true, bands: MAP_BANDS, kmBands: RTRACK.kmBands || [], rangeTracks: MAP_TRACKS,
         pointName: T.point, stunName: T.stun, partyName: T.party, crew: () => [], threats: [],
@@ -9241,7 +9289,8 @@ function mountTable(api) {
       viewerMap.setState(sc.map);
     }
     $("table-map").hidden = !sc.map;
-    const f = sc.fight;
+    const f = sc.fight, fk = f ? `${f.id}.${f.status}` : "";
+    if (fk !== (card.dataset.fk || "")) { card.dataset.fk = fk; try { pingSheetTab("table"); } catch {} } // a fight starts or ends
     if (!f) { $("fight-strip").innerHTML = `<p class="small muted">No fight running.</p>`; $("fight-turn").innerHTML = ""; return; }
     const now = f.people.find((p) => p.pid === f.actor), mine = f.people.find((p) => p.own === ch.id);
     $("fight-strip").innerHTML = `<p class="small">${f.status === "ended" ? "The fight is over." : `Round ${f.round}${now ? ` · <b>${esc(now.name)}</b>'s turn` : ""}`}</p>
@@ -9252,6 +9301,7 @@ function mountTable(api) {
     if (!turn) { $("fight-turn").innerHTML = ""; $("fight-turn").dataset.turn = ""; return; }
     if (prev === key) return; // keep what the player is choosing
     $("fight-turn").dataset.turn = key;
+    try { pingSheetTab("table"); } catch {}
     const others = f.people.filter((p) => p.pid !== mine.pid && !p.dead), foe = others.find((p) => p.side !== mine.side && !p.out);
     $("fight-turn").innerHTML = `<p><b>Your turn.</b> Tell the GM what ${esc(mine.name)} does; they run it.</p>
       <div class="fields"><div class="field"><label for="ft-action">Action</label><select id="ft-action"><option value="attack">Attack</option><option value="aim">Aim</option><option value="other">Something else</option></select></div>
@@ -9305,6 +9355,7 @@ function mountTable(api) {
       if (t && n > 0 && was < t.boxes && (ship[T2.track] || 0) >= t.boxes) discSay(`${T2.track} is full: ${T2.onFill}.`);
       return;
     }
+    if (T2.startsOnFailure && !th.running) return; // a Countdown that waits for a failure to start (Fracture Lines) isn't running yet
     th.filled = Math.max(0, th.filled + n);
     let fired = 0;
     while (th.filled >= th.size) { fired++; if (T2.repeat) { th.filled -= th.size; th.count++; } else { th.filled = th.size; break; } }
@@ -9344,12 +9395,15 @@ function mountTable(api) {
         <div class="dsegs">${Array.from({ length: T2t.boxes }, (_, i) => `<span class="dseg ${i < v ? "on" : ""}"></span>`).join("")}</div>
         <span class="small">${v}/${T2t.boxes}: ${esc(shipEffect(T2.track, v))}</span>
         <div class="btn-row"><button class="btn" data-tick="1">A scene passes (+1)</button><button class="linkish" data-tick="-1">Undo</button></div>`;
-    } else
+    } else if (T2.startsOnFailure && !th.running)
+    $("disc-threat").innerHTML = `<b>${esc(T2.name)}: not running</b><span class="small muted">Routine discovery has no clock against it. When a failed roll or a success at a cost puts real stakes in play, start one: from then on it ticks with time, whatever the crew does. When it fills, ${esc(T2.onFill)}.</span>
+      <div class="btn-row"><select data-tsize style="width:auto" aria-label="${esc(T2.name)} size">${[4, 6, 8].map((n) => `<option value="${n}"${n === th.size ? " selected" : ""}>${n} segments</option>`).join("")}</select><button class="btn" data-tstart>Start the ${esc(T2.name)}</button></div>`;
+    else
     $("disc-threat").innerHTML = `<b>${esc(T2.name)}</b><span class="small muted">${T2.repeat ? `Ticks once a scene of investigating and once a failed investigation roll. When it fills, ${esc(T2.onFill)}, and it starts again.` : `A hard timer: it ticks with time, whatever the crew does. When it fills, ${esc(T2.onFill)}.`}</span>
       <div class="dsegs">${Array.from({ length: th.size }, (_, i) => `<button class="dseg ${i < th.filled ? "on" : ""}" data-tseg="${i + 1}" aria-label="${esc(T2.name)} segment ${i + 1}"></button>`).join("")}
         <select data-tsize style="width:auto" aria-label="${esc(T2.name)} size">${[4, 6, 8].map((n) => `<option value="${n}"${n === th.size ? " selected" : ""}>${n}</option>`).join("")}</select></div>
       ${T2.repeat ? `<span class="small">${esc(capFirst(T2.count || "times filled"))}: <b>${th.count}</b></span>` : th.filled >= th.size ? `<span class="small"><b>It has happened.</b></span>` : ""}
-      <div class="btn-row"><button class="btn" data-tick="1">${T2.repeat ? "A scene passes (+1)" : "Time passes (+1)"}</button><button class="linkish" data-tick="-1">Undo</button><button class="linkish" data-treset>Reset</button></div>`;
+      <div class="btn-row"><button class="btn" data-tick="1">${T2.repeat ? "A scene passes (+1)" : "Time passes (+1)"}</button><button class="linkish" data-tick="-1">Undo</button><button class="linkish" data-treset>${T2.startsOnFailure ? "Stop it" : "Reset"}</button></div>`;
     $("disc-costs").innerHTML = `<b>What investigating costs</b><span class="small muted">A failed investigation roll${T2.repeat || T2.track ? ` (which also ticks ${esc(theThreat())})` : ""} or a push ticks one track, chosen by how the ${esc(T.party || "party")} is digging.</span>`
       + (DISC.costs || []).map(([name, why]) => { const t = PACK.tracks.find((x) => x.name === name); const v = Math.min(t ? t.boxes : 4, ship[name] || 0);
         return `<div><b>${esc(name)}</b> <span class="small muted">${esc(why)} · ${v}/${t ? t.boxes : 4}: ${esc(shipEffect(name, v))}</span>
@@ -9364,7 +9418,7 @@ function mountTable(api) {
       return `<div class="dclock ${full ? "done" : ""}" data-kid="${k.id}"><b>${esc(k.name)}</b>
         <span class="small muted">${k.plain ? `Progress clock, ${k.filled}/${size}` : `${esc(phaseNow)} · ${k.filled}/${size}`}</span>
         <div class="dsegs">${segs}</div>
-        <div class="btn-row"><button class="btn" data-kadv="${k.id}" data-n="1">+1</button><button class="btn" data-kadv="${k.id}" data-n="2">+2 (by 5+)</button><button class="linkish" data-kadv="${k.id}" data-n="-1">Undo</button><button class="linkish danger" data-krm="${k.id}">Remove</button></div>
+        <div class="btn-row"><button class="btn" data-kadv="${k.id}" data-n="1">+1</button><button class="btn" data-kadv="${k.id}" data-n="2">+2 (by 5+)</button><button class="linkish" data-kadv="${k.id}" data-n="-1">Undo</button><button class="linkish danger" data-krm="${k.id}">Remove</button>${DISC.skillSkip && !k.plain && k.filled < k.phases[0] ? `<button class="linkish" data-kskip="${k.id}" title="${esc(DISC.skillSkip)}">A relevant skill: skip Confront</button>` : ""}</div>
         ${k.plain ? "" : `<div class="fields"><div class="field"><label for="dk-pi-${k.id}">Primary investigator</label><select id="dk-pi-${k.id}" data-kpi="${k.id}">${crewOpts(k.primary)}</select></div>
           <div class="field"><label for="dk-sub-${k.id}">Identified as</label><input type="text" id="dk-sub-${k.id}" data-ksub="${k.id}" value="${esc(k.subject || "")}" placeholder="${k.filled >= gate ? "Name it to pass the gate" : "Not until Identify is full"}"${k.filled < gate && !k.subject ? " disabled" : ""}></div></div>
           ${k.filled >= gate && !k.tag ? `<span class="small"><b>The gate:</b> confirm the identity above before the clock can go on. Until then, theories are suspicion only, and no ${esc(DISC.card)} applies.</span>` : ""}
@@ -9448,7 +9502,9 @@ function mountTable(api) {
     const kOf = (id) => disc.clocks.find((x) => x.id === id);
     if (b.dataset.tseg) { const i = +b.dataset.tseg; disc.threat.filled = disc.threat.filled === i ? i - 1 : i; discSave(); }
     else if (b.dataset.tick) tickThreat(+b.dataset.tick);
-    else if (b.dataset.treset !== undefined) { disc.threat = { ...disc.threat, filled: 0, count: 0 }; discSave(); }
+    else if (b.dataset.treset !== undefined) { disc.threat = { ...disc.threat, filled: 0, count: 0, running: false }; discSave(); }
+    else if (b.dataset.tstart !== undefined) { disc.threat = { ...disc.threat, filled: 0, running: true }; discSave(); discSay(`The ${DISC.threat.name} is running.`); }
+    else if (b.dataset.kskip) { const k = kOf(b.dataset.kskip); if (k && k.filled < k.phases[0]) k.filled = k.phases[0]; discSave(); discSay("A relevant skill: Confront the unknown is done."); }
     else if (b.dataset.cost) { setTrack(b.dataset.cost, 1); const both = b.dataset.fail && (DISC.threat.repeat || DISC.threat.track); if (both) tickThreat(1); discSay(`${b.dataset.cost} +1${both ? `, and ${theThreat()} ticks` : ""}.`); }
     else if (b.dataset.kseg) { const k = kOf(b.dataset.kseg), i = +b.dataset.i; if (k) advance(k, (k.filled === i ? i - 1 : i) - k.filled); discSave(); }
     else if (b.dataset.kadv) { const k = kOf(b.dataset.kadv); if (k) { const before = k.filled; advance(k, +b.dataset.n); if (+b.dataset.n > 0 && k.filled === before && !k.tag && !k.plain) discSay("The clock is at the gate: confirm the identity first.", true); } discSave(); }
@@ -9985,6 +10041,28 @@ function mountTable(api) {
   $("gm-tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-gmtab]"); if (b) showGmTab(b.dataset.gmtab); });
   { let at = "table"; try { at = sessionStorage.getItem(PACK.id + ".gmtab") || "table"; } catch {} showGmTab(at); }
 
+  // The play tab: the cards beside the sheet, a group at a time. On a phone the sheet itself is a group too.
+  const NARROW = matchMedia("(max-width: 900px)");
+  const SHEET_GROUPS = [["char", "Character", ["#sheet-main"]], ["roll", "Roll", ["#card-condition", "#card-roll", "#card-weapon"]], ["table", "Table", ["#card-table", "#card-fight"]],
+    ["tracks", "Clocks", ["#card-clocks", "#card-ship"]], ["ref", "Reference", ["#card-ref"]]];
+  for (const [id, , sels] of SHEET_GROUPS) for (const q of sels) { const el = document.querySelector("#view-sheet " + q); if (el) el.dataset.sheetpane = id; }
+  $("sheet-tabs").innerHTML = SHEET_GROUPS.map(([id, name]) => `<button type="button" class="tab${id === "char" ? " narrow-only" : ""}" role="tab" data-sheettab="${id}">${esc(name)}</button>`).join("");
+  let sheetAt = "roll";
+  function showSheetTab(id) {
+    if (!SHEET_GROUPS.some((g) => g[0] === id)) id = "roll";
+    sheetAt = id; const shown = id === "char" && !NARROW.matches ? "roll" : id;
+    document.querySelectorAll("#view-sheet [data-sheetpane]").forEach((el) => el.classList.toggle("pane-off",
+      el.dataset.sheetpane === "char" ? NARROW.matches && id !== "char" : el.dataset.sheetpane !== shown));
+    $("sheet-tabs").querySelectorAll("[data-sheettab]").forEach((b) => { b.setAttribute("aria-selected", String(b.dataset.sheettab === shown)); if (b.dataset.sheettab === shown) b.classList.remove("ping"); });
+    try { sessionStorage.setItem(PACK.id + ".sheettab", id); } catch {}
+    if (shown === "table") try { viewerMap && viewerMap.refresh(); } catch {}
+  }
+  // Something new on a group that isn't open (the GM's map arrives, or it's your turn) marks its tab.
+  function pingSheetTab(id) { if (sheetAt !== id) { const b = $("sheet-tabs").querySelector(`[data-sheettab="${id}"]`); if (b) b.classList.add("ping"); } }
+  $("sheet-tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-sheettab]"); if (b) showSheetTab(b.dataset.sheettab); });
+  NARROW.addEventListener("change", () => showSheetTab(sheetAt));
+  { let at = "roll"; try { at = sessionStorage.getItem(PACK.id + ".sheettab") || "roll"; } catch {} showSheetTab(at); }
+
   // Anything that jumps to a part of the page (a link, a help pop-up's "more", a turn request put into the encounter)
   // first opens the tab, step, GM panel group or guide chapter that holds it.
   function reveal(el) {
@@ -9992,6 +10070,7 @@ function mountTable(api) {
     const view = el.closest('[role="tabpanel"]'); if (view && view.hidden) selectTab(view.id.replace("view-", ""));
     const st = el.closest("#view-create .step"); if (st) showStep(STEPS.indexOf(st));
     const pane = el.closest("[data-gmpane]"); if (pane) showGmTab(pane.dataset.gmpane);
+    const sp = el.closest("[data-sheetpane]"); if (sp) showSheetTab(sp.dataset.sheetpane);
     const chap = el.closest(".gchap");
     if (chap) {
       const root = chap.parentElement, which = books && Object.keys(books).find((k) => books[k] === root);
