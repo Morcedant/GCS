@@ -460,18 +460,24 @@ def core_rules():
     # The notice at the end of the rules document is shown once, below the rules (or in the site footer).
     body, n = re.subn(r"\s*<p><em>Legend Dynamics RPG system, created by Don Smallwood\.</em>.*?</p>\s*$", "\n", body, flags=re.S)
     assert n == 1, "the core rules' closing notice has moved"
-    return f"""<!-- Core rules page. Paste Block 1 into one Code Block (Display Source off). If Squarespace says the
-     block is too long, split it at any <h1> and use two or more Code Blocks. -->
+    return f"""<!-- Core rules page. Paste Block 1 and Block 2 into their own Code Blocks (Display Source off). If Squarespace
+     says Block 2 is too long, split it at any <h1> and use two or more Code Blocks. -->
 
-<!-- Block 1: the rules -->
+<!-- Block 1: the title -->
+<div class="ld ld-hero">
+  <div class="ld-eyebrow">Legend Dynamics RPG system</div>
+  <h1>Core rules</h1>
+  <hr class="ld-rule">
+  <p class="ld-lede">New to Legend Dynamics? <a href="{START_SLUG}">Start here</a>: you can make a character without reading these rules first. · {rules_stamp()} · <a href="{CHANGELOG_SLUG}">Changelog</a></p>
+</div>
+
+<!-- Block 2: the rules -->
 <div class="ld ld-rules">
-<div class="ld-eyebrow">Legend Dynamics RPG system</div>
-<p style="font-size:.92rem;color:var(--ld-ink-2)">New to Legend Dynamics? <a href="{START_SLUG}">Start here</a>: you can make a character without reading these rules first. · {rules_stamp()} · <a href="{CHANGELOG_SLUG}">Changelog</a></p>
 <nav class="ld-toc">{toc}</nav>
 {body}
 </div>
 
-<!-- Block 2: license (leave this out if your Squarespace footer carries the notice, as the home page suggests) -->
+<!-- Block 3: license (leave this out if your Squarespace footer carries the notice, as the home page suggests) -->
 <p class="ld" style="font-size:.9rem;color:var(--ld-ink-2)">Legend Dynamics RPG system, created by Don Smallwood. This RPG is released under the <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener" target="_blank">Creative Commons Attribution 4.0 International License</a>. You may share, adapt, and use it for any purpose, including commercially, as long as you give appropriate credit to the author.</p>
 """
 

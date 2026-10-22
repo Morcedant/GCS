@@ -258,9 +258,9 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 
 /* Long-form rules text (core rules page) */
 .ld-rules { width: 100%; max-width: 46rem; margin: 0 auto; font-size: 1.06rem; }
-.ld-rules h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 3rem 0 1rem; padding-bottom: .6rem; border-bottom: 1px solid var(--ld-line); }
-.ld-rules h2 { font-size: 1.45rem; margin: 2.2rem 0 .7rem; color: var(--ld-accent); }
-.ld-rules h3 { font-family: var(--ld-label) !important; font-size: 1.15rem; margin: 1.6rem 0 .5rem; }
+.ld-rules h1 { font-size: clamp(1.2rem, 2.5vw, 2rem); margin: 3rem 0 1rem; padding-bottom: .6rem; border-bottom: 1px solid var(--ld-line); }
+.ld-rules h2 { font-size: clamp(1.05rem, 1.9vw, 1.45rem); margin: 2.2rem 0 .7rem; color: var(--ld-accent); }
+.ld-rules h3 { font-family: var(--ld-label) !important; font-size: clamp(1rem, 1.5vw, 1.15rem); margin: 1.6rem 0 .5rem; }
 .ld-rules p, .ld-rules li { line-height: 1.7; }
 .ld-rules strong { color: var(--ld-ink); }
 .ld-rules em { color: var(--ld-ink-2); }
