@@ -2816,6 +2816,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const gmSay = (m, err) => { const el = $("gm-msg"); el.textContent = m; el.className = "toast" + (err ? " err" : ""); };
   /* BATTLEMAP */
   /* TABLECLIENT */
+  /* GMLOCK */
   // The shared table: players join from their play tab, the GM starts one here, and every roll at the table shows on both.
   sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay, pointName: T.point, partyName: T.party,
     server: TABLE_SERVER, character: () => ch.name, esc, toast,
@@ -3622,6 +3623,10 @@ tr.lvl-U td.target { color: var(--muted); }
   let book = "players";
   try { if (books && sessionStorage.getItem(PACK.id + ".guide") === "gm") book = "gm"; } catch {}
   showBook(book);
+  // Registered GMs only: the GM view opens, and the GM's Guide arrives from the table server, once the GM access code checks out.
+  mountGmLock({ table: sharedTable, game: PACK.id, view: $("view-gm"), book: books ? books.gm : null, esc, toast,
+    onBook: () => { let at = "players"; try { at = sessionStorage.getItem(PACK.id + ".guide") || "players"; } catch {} showBook(at === "gm" ? "gm" : "players"); } });
+  protectText($("guide"), "The guides are © Don Smallwood: please don't copy them.", toast);
   $("guide-toc").addEventListener("click", (e) => { const a = e.target.closest("a[data-chap]"); if (a) { e.preventDefault(); showChapter(document.getElementById($("guide-pager").dataset.root), +a.dataset.chap); } });
   $("guide-pager").addEventListener("click", (e) => { const b = e.target.closest("[data-chapgo]"); if (b) showChapter(document.getElementById($("guide-pager").dataset.root), +b.dataset.chapgo); });
 

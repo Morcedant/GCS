@@ -15,6 +15,7 @@ from stamp import stamp
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import discord_handout
+import gm_guides
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LD = ROOT / "legend-dynamics"
@@ -678,10 +679,11 @@ def build(pid, docx):
     if gm_md:
         # Both books in the Guide tab, one shown at a time (a Players / GM switch in the page).
         (out / "gm-guide.md").write_text(gm_md)
+        # The GM's Guide itself isn't in the page: the table server gives it to registered GMs (tools/gm_guides.py).
         g = pack["gmGuide"]
+        gm_guides.write_game(out, g["title"], g.get("subtitle", ""), to_html(gm_md, "gm-"))
         guide_html = (f'<div class="guide-book" id="guide-players" data-title="{html.escape(t["guideTitle"])}" data-subtitle="{html.escape(t["guideSubtitle"])}">\n' + guide_html + "</div>\n"
-                      f'<div class="guide-book" id="guide-gm" data-title="{html.escape(g["title"])}" data-subtitle="{html.escape(g.get("subtitle", ""))}" hidden>\n'
-                      + to_html(gm_md, "gm-") + "</div>\n")
+                      + gm_guides.locked_book(g["title"], g.get("subtitle", "")))
     theme = {**THEME_DEFAULTS, **pack.get("theme", {})}
     tpl = (ENGINE / "creator.html").read_text()
     tpl = tpl.replace("{{THEMECSS}}", theme["css"])
@@ -689,6 +691,7 @@ def build(pid, docx):
     tpl = tpl.replace("{{QUICKREF}}", quickref(pack, t))
     tpl = tpl.replace("/* BATTLEMAP */", (ENGINE / "battlemap.js").read_text().replace("</", "<\\/"))
     tpl = tpl.replace("/* TABLECLIENT */", (ENGINE / "table-client.js").read_text().replace("</", "<\\/"))
+    tpl = tpl.replace("/* GMLOCK */", (ENGINE / "gm-lock.js").read_text().replace("</", "<\\/"))
     tpl = tpl.replace("{{TABLE_SERVER}}", table_server())
     tpl = tpl.replace("{{OUTCOMES}}", "".join(f"<option>{html.escape(o)}</option>" for o in pack["journal"]["outcomes"]))
     tpl = re.sub(r"\{\{theme\.(\w+)\}\}", lambda m: str(theme[m.group(1)]), tpl)
@@ -797,6 +800,7 @@ def main():
     for pid in packs:
         build(pid, a.docx)
     core_rules(a.docx)
+    gm_guides.bundle()
     bot_packs()
     for g, out in HANDOUTS:
         discord_handout.write_handout(g, out)
