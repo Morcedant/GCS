@@ -56,12 +56,12 @@ Choose a role and describe what you bring. Your role places you in a group, whic
 
 The creator marks your role's four **core skills** Trained when you choose it. Keep them, raise one to your Specialty, or swap any of them for other skills; changing role swaps the core skills you haven't changed.
 
-### Generalist or Specialist
+### Specialist or Expert
 
 Choose how your character trained (see Step 3):
 
-- **Generalist:** one Specialty at +3 and nine Trained skills.
-- **Specialist:** one Expert skill at +5 and seven Trained skills: a lifetime spent at one thing.
+- **Specialist:** one Specialty at +3 and nine Trained skills.
+- **Expert:** one Expert skill at +5 and seven Trained skills: a lifetime spent at one thing.
 
 ## Step 2: Choose your origin, spend Edges, assign attributes
 
@@ -124,13 +124,13 @@ You can build your own origin with the GM. See *Making your own* for the steps.
 
 ## Step 3: Choose trained skills
 
-**A Generalist** character chooses ten different skills: one **Specialty** at its governing attribute +3 and nine **Trained** skills at attribute +1. **A Specialist** chooses **one Expert skill at +5** and **seven Trained skills at +1**. Each Extra Trained skill Edge adds one more Trained skill. All other skills are **Untrained** at attribute −4 when an attempt is plausible. Each skill has its own final target number; do not add the attribute again when rolling.
+**A Specialist** character chooses ten different skills: one **Specialty** at its governing attribute +3 and nine **Trained** skills at attribute +1. **An Expert** chooses **one Expert skill at +5** and **seven Trained skills at +1**. Each Extra Trained skill Edge adds one more Trained skill. All other skills are **Untrained** at attribute −4 when an attempt is plausible. Each skill has its own final target number; do not add the attribute again when rolling.
 
 The Expert's extra bonus matters most when the work is hard. With an attribute of 13, an Expert has a target of 18, which only natural 17–18 can fail; under a −4 "very difficult" penalty the target is still 14. If Athletics is the Expert skill, Dodge adds +2, the same as a Specialty.
 
 Some origins give one skill Trained for free; it doesn't use one of your Trained picks.
 
-**Broadening.** A Specialist can broaden later (the GM's call, usually after a significant case): the Expert skill becomes a Specialty at +3, and two more skills become Trained.
+**Broadening.** An Expert can broaden later (the GM's call, usually after a significant case): the Expert skill becomes a Specialty at +3, and two more skills become Trained.
 
 ## Step 4: Describe your character
 
@@ -652,7 +652,7 @@ Characters grow by earning **advancement points** and spending them.
 | Purchase | Cost | Limit |
 |---|---|---|
 | A skill from Untrained to Trained | 1 | — |
-| A skill from Trained to Specialty | 2 | Specialty (+3) is the ceiling: only a Specialist's starting skill is Expert, unless they broaden (see Step 3) |
+| A skill from Trained to Specialty | 2 | Specialty (+3) is the ceiling: only an Expert's starting skill is Expert, unless they broaden (see Step 3) |
 | Revise an advantage or complication | 1 | — |
 | A new Edge | 3 | Any Edge except the attribute and Trained-skill Edges, within its own limit |
 | +1 to an attribute | 4 | Once per attribute; no higher than one above the starting maximum (14, plus any origin bonus) |
@@ -1202,7 +1202,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 ## Luis "Bulldog" Ortega
 
-*Aegis pilot, Chicago wing, Aegis Pilot. Non-Operant (tier 0); Specialist.* Twelve years in the suit, three of them in Iraq. The AS-6's new firmware came from a contractor nobody can trace, and lately the suit hesitates when he doesn't.
+*Aegis pilot, Chicago wing, Aegis Pilot. Non-Operant (tier 0); Expert.* Twelve years in the suit, three of them in Iraq. The AS-6's new firmware came from a contractor nobody can trace, and lately the suit hesitates when he doesn't.
 
 - **Attributes:** Body 12, Agility 13, Intellect 11, Presence 10, Will 10. **Dodge** 12.
 - **Skills:** Piloting 18 (Expert). Trained: Firearms 14, Athletics 13, Brawling 13, Computers 12, Engineering 12, Law 12, Leadership 11, Read People 11.
@@ -1225,7 +1225,7 @@ Characters ready to play, for one-shots, new players, or a group in a hurry. Eac
 
 ## Dr. Tobias Wren
 
-*Professor of comparative religion; Earth Warden, Occultist. Adept (tier 1); Specialist.* A collector of forbidden books who once traded a year of his life to something in Avalon for a translation. The year is coming due.
+*Professor of comparative religion; Earth Warden, Occultist. Adept (tier 1); Expert.* A collector of forbidden books who once traded a year of his life to something in Avalon for a translation. The year is coming due.
 
 - **Attributes:** Body 9, Agility 10, Intellect 14, Presence 10, Will 13. **Dodge** 8.
 - **Skills:** Powers 18 (Expert). Trained: Investigation 15, Law 15, Medicine 15, Occult 15, Science 15, Read People 14, Persuasion 11.
@@ -1608,9 +1608,9 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Fine weapon or tool:** +2 to one narrow, agreed use of a skill; never with an advantage on the same roll; never to Dodge, Parry or Block.
 
-**Creation:** attributes start at 10, adjusted by origin (always totaling zero), plus 5 points; maximum 13 plus any origin bonus. 4 points split between origin tier and Edges. Generalist: one Specialty and nine Trained. Specialist: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
+**Creation:** attributes start at 10, adjusted by origin (always totaling zero), plus 5 points; maximum 13 plus any origin bonus. 4 points split between origin tier and Edges. Specialist: one Specialty and nine Trained. Expert: one Expert at +5 and seven Trained. One advantage (general or origin) and one complication; an optional Allegiance.
 
-**Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Specialist) = attribute +5.
+**Skills:** Untrained = attribute −4; Trained = attribute +1; Specialty = attribute +3; Expert (Expert) = attribute +5.
 
 **Modifiers:** favorable +2; ordinary 0; difficult −2; very difficult −4; extreme −6. Natural 3–4 succeeds; natural 17–18 fails.
 
