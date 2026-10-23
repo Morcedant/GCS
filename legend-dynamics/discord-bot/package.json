@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Legend Dynamics 3d6 roll-under dice bot for Discord, hosted on Cloudflare Workers",
   "scripts": {
-    "test": "node --test test/bot.test.mjs",
+    "test": "node --test test/bot.test.mjs && FAN_BOT=1 node --test test/bot.test.mjs",
     "register": "node register-commands.mjs",
     "deploy": "npx wrangler deploy"
   }

@@ -16,6 +16,7 @@ from stamp import stamp
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import discord_handout
 import gm_guides
+import fan_sources
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LD = ROOT / "legend-dynamics"
@@ -762,8 +763,15 @@ def core_rules(docx=False):
         print(f"wrote {out.relative_to(ROOT)}")
 
 
+# The fan games (USS Pelion, Grimm) are private: they're in the fan-games bot only, never the public one.
+FAN = ROOT / "fan-games"
+FAN_LEGACY = {"aliases": [["pelion", "roll"], ["duty", "points", "Duty"], ["grimm", "roll"], ["grit", "points", "Grit"]],
+              "bindings": {"DUTY": "pelion", "GRIT": "grimm"}}  # the old Pelion and Grimm bots' command names and storage
+
+
 def bot_packs():
-    """Write every pack's bot data (point name, tracks, seed tables), plus discord-bot/games/*.json, into the Discord bot."""
+    """Write every pack's bot data (point name, tracks, seed tables) into the public Discord bot, and the same plus the
+    fan games (fan-games/discord-bot/games/*.json) into the private fan-games bot (fan-games/discord-bot/worker.js)."""
     bot = LD / "discord-bot" / "src" / "worker.js"
     data = {}
     for d in sorted(p for p in (LD / "packs").iterdir() if (p / "pack.json").exists()):
@@ -776,19 +784,25 @@ def bot_packs():
             data[pack["id"]]["discovery"] = {"card": d["card"], "cards": d["cards"], "collection": d["collection"], "phases": [p[0] for p in d["phases"]],
                                              "threat": {k: d["threat"].get(k) for k in ("name", "repeat", "onFill", "count", "track") if d["threat"].get(k) is not None}, "costs": [c[0] for c in d.get("costs", [])],
                                              **({"kinds": [k[0] for k in d["kinds"]]} if d.get("kinds") else {})}
-    # Games outside Legend Dynamics (USS Pelion, Grimm): their own data, seed tables read from their creators.
-    for f in sorted((LD / "discord-bot" / "games").glob("*.json")):
+    fan = dict(data)
+    # The fan games: their own data, seed tables read from their creators.
+    for f in sorted((FAN / "discord-bot" / "games").glob("*.json")):
         game = json.loads(f.read_text())
-        page = (ROOT / game.pop("seedsFrom")).read_text() if "seedsFrom" in game else ""
+        page = fan_sources.read_text(game.pop("seedsFrom")) if "seedsFrom" in game else ""
         m = re.search(r"const SEEDS = (\{.*?\});\n", page)
         game.setdefault("seeds", json.loads(m.group(1)) if m else {})
-        data[game["id"]] = game
+        fan[game["id"]] = game
     src = bot.read_text()
-    block = "/* PACKS:START */\nexport const PACKS = " + json.dumps(data, ensure_ascii=False, indent=1) + ";\n/* PACKS:END */"
-    new = re.sub(r"/\* PACKS:START \*/.*?/\* PACKS:END \*/", lambda m: block, src, flags=re.S)
-    if new != src:
-        bot.write_text(new)
+
+    def fill_bot(packs, legacy):
+        out = re.sub(r"/\* PACKS:START \*/.*?/\* PACKS:END \*/", lambda _: "/* PACKS:START */\nexport const PACKS = " + json.dumps(packs, ensure_ascii=False, indent=1) + ";\n/* PACKS:END */", src, flags=re.S)
+        return re.sub(r"/\* LEGACY:START \*/.*?/\* LEGACY:END \*/", lambda _: "/* LEGACY:START */\nexport const LEGACY = " + json.dumps(legacy, separators=(", ", ": ")) + ";\n/* LEGACY:END */", out, flags=re.S)
+    public = fill_bot(data, {"aliases": [], "bindings": {}})
+    if public != src:
+        bot.write_text(public)
     print(f"wrote {len(data)} packs into {bot.relative_to(ROOT)}")
+    (FAN / "discord-bot" / "worker.js").write_text(fill_bot(fan, FAN_LEGACY))
+    print(f"wrote {len(fan)} packs into fan-games/discord-bot/worker.js")
 
 
 def main():

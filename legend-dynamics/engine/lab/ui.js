@@ -206,7 +206,7 @@ export function mountLab(api) {
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
         ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : []),
-        ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (Pelion's advantages)
+        ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
@@ -348,7 +348,7 @@ export function mountLab(api) {
       // The character's card changes form too, so the sheet, the GM view and the encounter agree.
       const p = E.find(en, d.form), c = api.crew().find((x) => x.id === p.ref); if (!c) { say("That character isn't in the GM view any more.", true); return; }
       const on = !(p.form && p.form.on);
-      if (api.setForm) api.setForm(c, on); else c.play.form = on; // the page's own flag (Grimm keeps the woge as play.woge)
+      if (api.setForm) api.setForm(c, on); else c.play.form = on; // the page's own flag, where it keeps one
       const st = fromCharacter(c), res = E.setForm(en, p.pid, on, st);
       if (res.error) { say(res.error, true); return; }
       api.saveCrew(); api.renderCrew();

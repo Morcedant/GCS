@@ -1,8 +1,8 @@
 # Legend Dynamics dice bot
 
-One Discord bot for all six games: the Legend Dynamics settings **Trails of Blood & Dust**, **Fracture Lines**, **The Shattered Crown** and **Aurora**, plus
-**USS Pelion** and **Grimm**. Each server picks its game with `/game`. The bot then names points correctly
-(**Grit** in Trails of Blood & Dust and Grimm, **Resolve** in Fracture Lines, **Fortune** in The Shattered Crown, **Spark** in Aurora, **Duty** in USS Pelion) and shows that game's
+One Discord bot for the four Legend Dynamics settings: **Trails of Blood & Dust**, **Fracture Lines**, **The Shattered Crown** and **Aurora**.
+Each server picks its game with `/game`. The bot then names points correctly
+(**Grit** in Trails of Blood & Dust, **Resolve** in Fracture Lines, **Fortune** in The Shattered Crown, **Spark** in Aurora) and shows that game's
 tracks and seed tables. Here's how you roll:
 
 ```
@@ -30,7 +30,7 @@ command to the Worker's web address, so there is no server to keep running.
 | `/contest target:13 opponent:14 opponent_name:Werewolf label:Grapple` | Rolls both sides and names the winner by the core rules. One success beats a failure. If both succeed, the larger margin wins. Ties and double failures go to the defender: the opponent, unless you set `defender:me`. |
 | `/assist target:12 helper_target:14 helper:@Ruth label:"Hold the door"` | The helper rolls first: success gives +1, success by 5 or more +2, and a natural 18 adds a complication. Then you roll with that bonus. |
 | `/seed` | Rolls an adventure seed: one line from each of the game's tables (job, place, the darkness, twist, ticking clock, key character) |
-| `/game show` · `/game set game:Fracture Lines` | Shows or sets this server's game (GM): Trails of Blood & Dust, Fracture Lines, The Shattered Crown, Aurora, Grimm or USS Pelion |
+| `/game show` · `/game set game:Fracture Lines` | Shows or sets this server's game (GM): Trails of Blood & Dust, Fracture Lines, The Shattered Crown or Aurora |
 
 ### With storage connected
 
@@ -58,36 +58,12 @@ command to the Worker's web address, so there is no server to keep running.
 Tracks are kept separately per game, so switching games doesn't lose them. With storage connected, the reroll
 button spends a real point and refuses when you have none.
 
-## Already running the Pelion or Grimm bot?
-
-You don't need a new bot. Use your existing one:
-
-1. Open your existing Worker (`pelion-dice` or `grimm-dice`) and choose **Edit code**.
-2. Paste in this [`src/worker.js`](src/worker.js) and **Deploy**.
-3. Add `DISCORD_BOT_TOKEN` back for a moment, open `/register` once, then delete the token again.
-
-What carries over:
-
-- Your `DUTY` or `GRIT` storage keeps working, and your clocks carry over.
-- Each server starts on that bot's game: USS Pelion for the Pelion bot, Grimm for the Grimm bot.
-- Each player's points start fresh at 2.
-
-What changes for players:
-
-- The old commands still work: `/pelion` or `/grimm` rolls, and `/duty` or `/grit` tracks points.
-  `/register` adds all four to every Worker, alongside the new commands. Points take the server's game's
-  name, so `/grit` on a USS Pelion server shows Duty points.
-- The new names work too: `/roll` and `/points`, plus `/track`, `/seed` and `/game`.
-- The reroll button still says Duty or Grit.
-
-If you'd rather not see the old names, add the setting `LEGACY_COMMANDS` = `no` and open `/register` again.
-
-Any server on that bot can now also switch games with `/game set`.
+This is the public bot. The private fan games (USS Pelion and Grimm) have their own copy with their games added:
+see `fan-games/README.md`.
 
 ## Set it up from scratch (about 15 minutes, no installs)
 
-Make it its own Discord application and Cloudflare Worker (`legend-dice`). The steps are the same as for the
-Pelion and Grimm bots.
+Make it its own Discord application and Cloudflare Worker (`legend-dice`).
 
 ### 1. Create the Discord application
 
@@ -106,7 +82,7 @@ Pelion and Grimm bots.
    - `DISCORD_PUBLIC_KEY` = the Public Key
    - `DISCORD_APPLICATION_ID` = the Application ID
    - `DISCORD_BOT_TOKEN` = the bot token (choose type **Secret**)
-   - `DEFAULT_GAME` = `western`, `spaceopera`, `fantasy`, `aurora`, `grimm` or `pelion` (optional). This is the game a server starts on; without it, servers start on Trails of Blood & Dust.
+   - `DEFAULT_GAME` = `western`, `spaceopera`, `fantasy` or `aurora` (optional). This is the game a server starts on; without it, servers start on Trails of Blood & Dust.
 5. Note the Worker's address, like `https://legend-dice.YOUR-NAME.workers.dev`.
 
 ### 3. Connect storage (optional, but needed for points, clocks, tracks and `/game set`)
@@ -133,11 +109,8 @@ New commands can take a minute to appear.
 ## Updating the bot or adding a setting
 
 The bot's game data lives between `/* PACKS:START */` and `/* PACKS:END */` in `src/worker.js`. The
-`python3 tools/build-legend.py` command rewrites that data from two places:
-
-- Every `legend-dynamics/packs/*/pack.json`.
-- The files in [`games/`](games), for USS Pelion and Grimm. Their tracks are written there, and their seed tables
-  are read from `uss-pelion/index.html` and `grimm-west/index.html`.
+`python3 tools/build-legend.py` command rewrites that data from every `legend-dynamics/packs/*/pack.json`.
+It also writes the fan-games copy, `fan-games/discord-bot/worker.js`, with the fan games added.
 
 A new pack therefore appears in `/game set` automatically.
 

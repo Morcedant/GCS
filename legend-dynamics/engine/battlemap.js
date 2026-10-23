@@ -3,7 +3,7 @@
 //    optional background picture, with tokens dragged from hex to hex and distances read as range bands;
 //  - a range track: one lane per range band, for chases and ship fights where only the band matters
 //    (Fracture Lines' ship fights move the range a band at a time, from under 10 km to a light-second).
-// One module for every creator (Grimm keeps a copy). The page passes in its characters, threats, tracks and
+// One module for every creator. The page passes in its characters, threats, tracks and
 // bands; the map keeps its own state in this browser (pictures in IndexedDB, which holds large files; the
 // rest in localStorage) and in a map file the GM can save and open again.
 //
