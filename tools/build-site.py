@@ -107,7 +107,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None):
 <main id="main">
 {sections}
 </main>
-<footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. Copyright © 2025–2026 Don Smallwood. All rights reserved.</span>
+<footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. Copyright © Don Smallwood. All rights reserved.</span>
 <a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>
 </body>
 </html>
@@ -144,7 +144,7 @@ def main():
           '<text x="32" y="41" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="700" fill="#efe6d2">LD</text></svg>')
 
     write("index.html", page("/", "Legend Dynamics RPG", "A tabletop roleplaying system on 3d6 roll-under: Gothic Westerns, science fiction, swords against sorcery and superheroes.",
-                             [b for b in blocks(bw.home()) if "rel=\"license" not in b], fonts=font_links(fonts_all)))
+                             [b for b in blocks(bw.home()) if "All rights reserved" not in b], fonts=font_links(fonts_all)))
 
     for g in GAMES:
         t = bw.pack(g)["terms"]
@@ -167,7 +167,7 @@ def main():
     copy(core_docx, f"core-rules/{core_docx.name}")
     write("core-rules/index.html", page(bw.CORE_SLUG, "Core rules · Legend Dynamics", "The Legend Dynamics core rules, shared by every setting.",
                                         (lambda cr: cr[:1] + [downloads([(f"{bw.CORE_SLUG}/{core_docx.name}", "Core rules (Word)")])] + cr[1:])(  # the title first, then the download
-                                            [b for b in blocks(bw.core_rules()) if "rel=\"license" not in b]),
+                                            [b for b in blocks(bw.core_rules()) if "All rights reserved" not in b]),
                                         fonts=font_links({bw.BRAND_FONTS})))
 
     write(bw.WHY_SLUG.strip("/") + "/index.html", page(bw.WHY_SLUG, "Why Legend Dynamics · Legend Dynamics", "Why the Legend Dynamics roleplaying game system was made: the 3d6 bell curve married to Fate's narrative heart.",
