@@ -77,7 +77,7 @@ def same_tab(s):
     return re.sub(r'(href="/[^"]*")\s+target="_blank"\s+rel="noopener"', r"\1", s)
 
 
-# The playtest label (build-website.py SITE_PLAYTEST): a band above every page's header.
+# The playtest label (build-website.py SITE_PLAYTEST): a band above the home page's header (only there).
 PLAYTEST_BAR = (f'<div class="ld-playtest" role="note"><span class="ld-playtest-tag">Playtest</span> {e(bw.PLAYTEST_TEXT)}</div>' if bw.SITE_PLAYTEST else "")
 
 
@@ -102,7 +102,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None):
 </head>
 <body>
 <a class="ld-skip" href="#main">Skip to content</a>
-{PLAYTEST_BAR}
+{PLAYTEST_BAR if here == "/" else ""}
 <header class="ld-header"><div class="ld-header-in"><a class="ld-brand" href="/">Legend Dynamics</a><nav class="ld-nav" aria-label="Site">{nav}</nav></div></header>
 <main id="main">
 {sections}
@@ -156,8 +156,7 @@ def main():
             copy(d, f"{slug}/{d.name}")
         # The creator, with links back to the site above its header (the published creator has none).
         nav = (f'<nav class="site-back no-print" aria-label="Site"><a href="/">← Legend Dynamics home</a>'
-               f'<a href="{SLUGS[g]}">{e(t["title"])}</a>'
-               + (f'<span class="site-playtest" title="{e(bw.PLAYTEST_TEXT)}">Playtest: a limited group of GMs and players</span>' if bw.SITE_PLAYTEST else "") + '</nav>')
+               f'<a href="{SLUGS[g]}">{e(t["title"])}</a></nav>')
         write(f"{slug}/create/index.html", re.sub(r"<!-- SITE-NAV:.*?-->", lambda _: nav, (LD / g / "index.html").read_text(), count=1))
         b = blocks(bw.game_page(g))
         b.append(downloads(links))
@@ -197,8 +196,7 @@ def main():
     for g in GAMES:
         # The handout is written as an artifact page (no document skeleton); give it one, and a way back.
         h = (LD / g / "discord-commands.html").read_text()
-        h = h.replace('<div class="wrap">', f'<div class="wrap">\n  <a href="{bw.DISCORD_SLUG}/">← Legend Dynamics · Play on Discord</a>'
-                      + (f'\n  <p style="margin:.6rem 0 0;padding:.4rem .7rem;border-radius:6px;background:#f4c542;color:#1b1406;font-weight:600">Playtest: {e(bw.PLAYTEST_TEXT)}</p>' if bw.SITE_PLAYTEST else ""), 1)
+        h = h.replace('<div class="wrap">', f'<div class="wrap">\n  <a href="{bw.DISCORD_SLUG}/">← Legend Dynamics · Play on Discord</a>', 1)
         # Its title at the size of every other page's title on the site (.ld-hero h1 in custom.css).
         h = h.replace("</style>", "  h1 { font-size: clamp(1.3rem, 3.5vw, 2.5rem); line-height: 1.1; }\n</style>", 1)
         write(f"discord/{SLUGS[g].strip('/')}/index.html",
