@@ -421,7 +421,7 @@ def game_page(pid):
   <hr class="ld-rule">
   <p class="ld-lede">{first_para(pid)}</p>
   <div class="ld-actions">
-    <a class="ld-button" href="{CREATORS[pid]}" target="_blank" rel="noopener">Create a character</a>
+    <a class="ld-button" href="{CREATORS[pid]}" target="_blank" rel="noopener">Start playing</a>
     <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">Core rules</a>
     <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}">Play on Discord</a>
   </div>
