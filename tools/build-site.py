@@ -81,7 +81,13 @@ def same_tab(s):
 PLAYTEST_BAR = (f'<div class="ld-playtest" role="note"><span class="ld-playtest-tag">Playtest</span> {e(bw.PLAYTEST_TEXT)}</div>' if bw.SITE_PLAYTEST else "")
 
 
-def page(path, title, desc, body_blocks, theme="", fonts=None):
+# The light copy deterrent on a page of rules: no selecting, copying or right-click menu in the main text.
+PROTECT = """<style>.ld-protected { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }</style>
+<script>(() => { const m = document.getElementById("main"); m.classList.add("ld-protected");
+  for (const ev of ["copy", "cut", "contextmenu", "dragstart"]) m.addEventListener(ev, (e) => e.preventDefault()); })();</script>"""
+
+
+def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False):
     here = "/" + path.strip("/")
     here = "/" if here == "/" else here
     nav = "".join(f'<a href="{h}"{" aria-current=\"page\"" if h == here else ""}>{e(n)}</a>' for h, n in NAV)
@@ -108,7 +114,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None):
 {sections}
 </main>
 <footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. Copyright © Don Smallwood. All rights reserved.</span>
-<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>
+<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}
 </body>
 </html>
 """
@@ -149,11 +155,10 @@ def main():
     for g in GAMES:
         t = bw.pack(g)["terms"]
         slug = SLUGS[g].strip("/")
+        # The Players' Guide only: the GM's Guide goes to registered GMs, from the table server (tools/gm_guides.py).
         guide = next((LD / g).glob("*_Players_Guide.docx"))
-        gm = next((LD / g).glob("*_GM_Guide.docx"), None)  # a setting with a GM's Guide (pack gmGuide)
-        links = [(f"{SLUGS[g]}/{guide.name}", f"{t['title']} Players' Guide (Word)")] + ([(f"{SLUGS[g]}/{gm.name}", f"{t['title']} GM's Guide (Word)")] if gm else [])
-        for d in [guide] + ([gm] if gm else []):
-            copy(d, f"{slug}/{d.name}")
+        links = [(f"{SLUGS[g]}/{guide.name}", f"{t['title']} Players' Guide (Word)")]
+        copy(guide, f"{slug}/{guide.name}")
         # The creator, with links back to the site above its header (the published creator has none).
         nav = (f'<nav class="site-back no-print" aria-label="Site"><a href="/">← Legend Dynamics home</a>'
                f'<a href="{SLUGS[g]}">{e(t["title"])}</a></nav>')
@@ -168,7 +173,7 @@ def main():
     write("core-rules/index.html", page(bw.CORE_SLUG, "Core rules · Legend Dynamics", "The Legend Dynamics core rules, shared by every setting.",
                                         (lambda cr: cr[:1] + [downloads([(f"{bw.CORE_SLUG}/{core_docx.name}", "Core rules (Word)")])] + cr[1:])(  # the title first, then the download
                                             [b for b in blocks(bw.core_rules()) if "All rights reserved" not in b]),
-                                        fonts=font_links({bw.BRAND_FONTS})))
+                                        fonts=font_links({bw.BRAND_FONTS}), protect=True))
 
     write(bw.WHY_SLUG.strip("/") + "/index.html", page(bw.WHY_SLUG, "Why Legend Dynamics · Legend Dynamics", "Why the Legend Dynamics roleplaying game system was made: the 3d6 bell curve married to Fate's narrative heart.",
                                                      blocks(bw.why_page()), fonts=font_links({bw.BRAND_FONTS})))
