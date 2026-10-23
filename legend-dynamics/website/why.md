@@ -1,7 +1,5 @@
 **Why I Created the Legend Dynamics Roleplaying Game System**
 
-Honestly? I just wanted to play. I love sitting down with friends and getting lost in a good story, but too often we'd spend half the night flipping through a rulebook instead of actually playing. That always bugged me.
-
 I've got a soft spot for 3d6 systems. There's something satisfying about that bell curve, where you have a real feel for your odds before the dice hit the table. And Fate? Fate nailed the storytelling side. I loved how it rewards your character's flaws instead of just punishing them. I kept thinking, why can't I have both?
 
 Legend Dynamics grows out of the 3d6 roll-under tradition of games like GURPS and Hero System, but married to Fate's narrative heart. That combination is the whole point. You roll 3d6 under your skill, and that's the core of it. Your flaws earn you Legend points. A near miss can still succeed, at a cost. A failure moves the story along instead of stopping it cold.
