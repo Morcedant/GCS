@@ -1342,4 +1342,4 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 **Fortune:** start each session with two. Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.
 
-*Legend Dynamics RPG system, created by Don Smallwood.* Copyright © 2025–2026 Don Smallwood. All rights reserved.
+*Legend Dynamics RPG system, created by Don Smallwood.* Copyright © Don Smallwood. All rights reserved.

@@ -399,7 +399,7 @@ def home():
 </div>
 
 <!-- Block 5: license (or paste this text into your Squarespace footer) -->
-<p class="ld" style="font-size:.9rem;color:var(--ld-ink-2)">Legend Dynamics RPG system, created by Don Smallwood. Copyright © 2025–2026 Don Smallwood. All rights reserved.</p>
+<p class="ld" style="font-size:.9rem;color:var(--ld-ink-2)">Legend Dynamics RPG system, created by Don Smallwood. Copyright © Don Smallwood. All rights reserved.</p>
 """
 
 
@@ -486,7 +486,7 @@ def core_rules():
 </div>
 
 <!-- Block 3: license (leave this out if your Squarespace footer carries the notice, as the home page suggests) -->
-<p class="ld" style="font-size:.9rem;color:var(--ld-ink-2)">Legend Dynamics RPG system, created by Don Smallwood. Copyright © 2025–2026 Don Smallwood. All rights reserved.</p>
+<p class="ld" style="font-size:.9rem;color:var(--ld-ink-2)">Legend Dynamics RPG system, created by Don Smallwood. Copyright © Don Smallwood. All rights reserved.</p>
 """
 
 

@@ -562,4 +562,4 @@ Choose one complication. These are sources of meaningful choices, not constant p
 
 {{PACK:quickref}}
 
-*Legend Dynamics RPG system, created by Don Smallwood.* Copyright © 2025–2026 Don Smallwood. All rights reserved.
+*Legend Dynamics RPG system, created by Don Smallwood.* Copyright © Don Smallwood. All rights reserved.
