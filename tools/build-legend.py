@@ -26,7 +26,7 @@ DEFAULT_TERMS = {
     "title": "Legend Dynamics", "eyebrow": "Legend Dynamics RPG system", "prepareTitle": "Prepare", "titlePlaceholder": "e.g. Captain", "guideTitle": "Legend Dynamics Core Rules",
     "guideSubtitle": "The setting-neutral rules of the Legend Dynamics RPG system", "point": "Legend", "party": "party",
     "role": "Role", "roleLower": "role", "origin": "Origin", "originLower": "origin", "originPlural": "Origins",
-    "pathRounded": "Generalist", "pathExpert": "Specialist", "pathExpertPlural": "Specialists",
+    "pathRounded": "Specialist", "pathExpert": "Expert", "pathExpertPlural": "Experts",
     "reasonLabel": "Why you do what you do", "reasonSheet": "Why I do it", "gear": "Gear", "gearLower": "gear",
     "tabPlay": "Play", "readyText": "Ready to play", "stun": "Dazed", "medkit": "medical kit",
     "facility": "A proper infirmary", "mission": "Mission", "missionLower": "mission",
@@ -737,7 +737,7 @@ def core_rules(docx=False):
     core = (ENGINE / "core.md").read_text()
     core = core.replace("{{PACK:intro}}", "Legend Dynamics is a roleplaying system for heroic stories in any genre: concrete skills, a 3d6 roll-under core, and a small pool of Legend points that reward characters for their flaws. These core rules are setting-neutral. A **setting pack** supplies the roles, origins, skills, gear, weapons, tracks and dangers of one genre, and renames a few terms to suit it.")
     # Neutral stand-ins for the pack-specific parts of "Making your own".
-    core = core.replace("{{GEN:extra-edges}}\n", "").replace("{{GEN:gritty}}", "").replace("{{GEN:battlemap}}", "")
+    core = core.replace("{{GEN:extra-edges}}\n", "\nEach setting also offers special Edges of its own, such as powers in Aurora; its Players' Guide lists them.\n").replace("{{GEN:gritty}}", "").replace("{{GEN:battlemap}}", "")
     core = core.replace("{{GEN:magic}}", magic_chapter({}))
     core = core.replace("{{GEN:discovery}}", discovery_md(NEUTRAL_DISCOVERY, t, neutral=True)).replace("{{GEN:card-howto}}", card_howto_md(NEUTRAL_DISCOVERY, t, neutral=True)).replace("{{GEN:discovery-panel}}\n", "").replace("{{GEN:materials-note}}", "")
     core = core.replace("{{PACK:customrole}}", '"Smuggler: knows every back door, bribe and hidden hold."')
@@ -747,6 +747,7 @@ def core_rules(docx=False):
     core = re.sub(r"\{\{GEN:([\w-]+)\}\}", lambda m: f"*Your setting pack supplies this ({m.group(1).replace('-', ' ')}).*", core)
     core = fill(core, t).replace("This book combines the **Legend Dynamics core rules**, which every setting shares, with the **Legend Dynamics** setting: its roles, origins, skills, gear, weapons and dangers. In this setting, the core rules' Legend points are called **Legend points**.",
                         "These are the **Legend Dynamics core rules**, which every setting shares. A setting pack adds its roles, origins, skills, gear, weapons and dangers, and may rename terms: Legend points might be Grit in a Western or Resolve in space opera.")
+    core = core.replace("Expert (Expert) =", "Expert =")
     md = re.sub(r"\n{3,}", "\n\n", core)
     (LD / "Legend_Dynamics_Core_Rules.md").write_text(md)
     print("wrote legend-dynamics/Legend_Dynamics_Core_Rules.md")

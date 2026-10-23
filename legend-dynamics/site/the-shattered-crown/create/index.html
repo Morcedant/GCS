@@ -622,7 +622,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="a153781" data-version-date="2026.10.23" title="The code changes whenever this page changes.">Version 2026.10.23 · a153781</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="d424bdb" data-version-date="2026.10.23" title="The code changes whenever this page changes.">Version 2026.10.23 · d424bdb</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -6929,6 +6929,7 @@ return { mountLab };
     if (fs && ch.skills[fs] === "U") ch.skills[fs] = "T"; // this origin's free Trained skill
     if (ch.sadv.id && ch.sadv.id !== "custom" && !(SPECIES_TRAITS[id] || []).some((t) => t[0] === ch.sadv.id)) ch.sadv.id = "";
     if (POWERS) { const ok = new Set(powerOptions().map((x) => x[0])); ch.powers = ch.powers.map((x) => (ok.has(x) ? x : "")); } // powers this origin can't take are cleared
+    if (POWERS && !ch.customRole) applyRoleSkills(); // an origin with powers or without changes whether the role's powers skill applies
     if (id !== "custom") ch.species = speciesDef()[1];
     else if (SPECIES.some((x) => x[1] === ch.species)) ch.species = "";
     const after = adjOf();
@@ -7013,6 +7014,13 @@ return { mountLab };
     const slots = (c.speciesId !== "custom" && h && h.powerSlots) || POWERS.tierSlots[String(tierOf(c))] || [];
     return [...slots.map((x) => (x === "I+" ? (c.skills[POWERS.skill] === "S" ? "II" : "I") : x)), ...(edgeN("xpower", c) ? ["I"] : [])];
   };
+  // A setting's Edge marked needsPowers (Aurora's Stronger Power and Extra Power) is for an origin that has powers of its own.
+  const hasOwnPowers = (c = ch) => { if (!POWERS) return false; const h = heritageOf(c);
+    return ((c.speciesId !== "custom" && h && h.powerSlots) || POWERS.tierSlots[String(tierOf(c))] || []).length > 0; };
+  const edgeOK = (k, c = ch) => { const d = EDGE_DEFS.find((x) => x[0] === k); return !(d && d[4] && d[4].needsPowers && !hasOwnPowers(c)); };
+  // Likewise the powers skill, and any general advantage built on it (Aurora's Fine Control): nothing to train without powers.
+  const skillOK = (n, c = ch) => !(POWERS && n === POWERS.skill && !hasOwnPowers(c));
+  const advOK = (id, c = ch) => { const a = ADVANTAGES.find((x) => x[0] === id); return !(a && POWERS && a[3] === POWERS.skill && !hasOwnPowers(c)); };
   // Each slot's Class after the Stronger Power Edges the player put on it.
   const powerSlots = (c = ch) => baseSlots(c).map((cl, i) => CLASS_NAMES[Math.min(CLASS_NAMES.length - 1, CLASS_NAMES.indexOf(cl) + ((c.powerBoost || [])[i] || 0))]);
   const boostsSpent = (c = ch) => baseSlots(c).reduce((a, _, i) => a + ((c.powerBoost || [])[i] || 0), 0);
@@ -7142,7 +7150,7 @@ return { mountLab };
   if (CR.aim) $("r-aim-label").textContent = `Aimed at this target last action ${signed(CR.aim.bonus)}`;
 
   if (SPELLS) $("spell-list").innerHTML = SPELLS.list.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="sp-${k}" data-spell="${k}"><span><b>${n}</b><span class="small muted" id="sp-eff-${k}">${eff}</span></span></label>`).join("");
-  $("edge-list").innerHTML = EDGE_DEFS.map(([k, n, d]) => `<div class="edge"><b>${n}</b>
+  $("edge-list").innerHTML = EDGE_DEFS.map(([k, n, d]) => `<div class="edge" id="edge-row-${k}"><b>${n}</b>
     <span class="gm-duty"><button type="button" id="edge-m-${k}" data-edge="${k}" data-d="-1" aria-label="One fewer: ${n}">−</button><b id="edge-n-${k}">0</b><button type="button" id="edge-p-${k}" data-edge="${k}" data-d="1" aria-label="One more: ${n}">+</button></span>
     <span class="small muted">${d}</span></div>`).join("");
   $("f-adv2").innerHTML = `<option value="">Choose a second advantage…</option>` + ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("");
@@ -7219,6 +7227,12 @@ return { mountLab };
   }
 
   function render() {
+    // An origin without powers keeps no powers skill or powers advantage (from an origin chosen before).
+    if (POWERS && !hasOwnPowers()) {
+      if (ch.skills[POWERS.skill] && ch.skills[POWERS.skill] !== "U") ch.skills[POWERS.skill] = "U";
+      if (ch.adv.id && !advOK(ch.adv.id)) ch.adv.id = "";
+      if (ch.adv2.id && !advOK(ch.adv2.id)) ch.adv2.id = "";
+    }
     if (sharedTable) sharedTable.setCharacter(ch.name);
     // A slot given up for pure sorcery can't carry Stronger Power: clear it, and move one Edge to the Cantrips slot if there's room.
     if (POWERS && SPELLS && isPure()) { const sl = powerSlots(), k = sl.findIndex((_, j) => ch.powers[j] === SPELLS.power); let moved = false;
@@ -7227,7 +7241,7 @@ return { mountLab };
     $("custom-role-wrap").hidden = $("custom-group-wrap").hidden = !ch.customRole;
     if (ch.customRole) { if ($("f-customrole").value !== ch.dept) $("f-customrole").value = ch.dept; $("f-customgroup").value = ch.customGroup || PACK.groups[0].id; }
     const ra = roleAbility();
-    $("role-skills").innerHTML = ((ROLE_SKILLS[ch.dept] || []).length && !ch.customRole ? `Core skills: ${esc(ROLE_SKILLS[ch.dept].join(", "))} (marked Trained for you)` : "")
+    $("role-skills").innerHTML = ((ROLE_SKILLS[ch.dept] || []).length && !ch.customRole ? `Core skills: ${esc(ROLE_SKILLS[ch.dept].filter((n) => skillOK(n)).join(", "))} (marked Trained for you)` : "")
       + (ra ? `<br><b>${esc(ra[0])}.</b> ${esc(ra[1])}` : "");
     $("app").dataset.div = division();
     $("hdr-name").textContent = ch.name.trim() || "Unnamed character";
@@ -7265,11 +7279,14 @@ return { mountLab };
       `<div class="adj-chips"><span class="adj-chip tier-chip">Tier ${tierOf()}</span>${ATTRS.filter(([n]) => adjNow[n]).map(([n]) => `<span class="adj-chip ${adjNow[n] > 0 ? "up" : "down"}">${n} ${signed(adjNow[n])}</span>`).join("") || `<span class="adj-chip">No adjustments</span>`}</div>` +
       heritageInfo();
     // Edges
+    // An origin without powers takes no power Edges: any it had (from another origin) are given back.
+    for (const [k] of EDGE_DEFS) if (!edgeOK(k) && edgeRaw(k)) { ch.edges[k] = 0; if (k === "power") ch.powerBoost = []; }
     const ea = edgesAvail(), es = edgesSpent();
     $("edge-tally").textContent = `${es} of ${ea}`;
     $("edge-tally").className = "chip " + (es === ea ? "ok" : "no");
     $("edge-intro").textContent = ea ? `Tier ${tierOf()} leaves ${ea} Edge${ea > 1 ? "s" : ""}. Spend ${ea > 1 ? "them" : "it"} below.` : `This tier has no Edges: its power is the ${T.originLower} itself.`;
     EDGE_DEFS.forEach(([k, , , max]) => {
+      $("edge-row-" + k).hidden = !edgeOK(k);
       $("edge-n-" + k).textContent = edgeN(k);
       $("edge-m-" + k).disabled = edgeRaw(k) <= 0;
       $("edge-p-" + k).disabled = edgeN(k) >= max || es >= ea;
@@ -7311,6 +7328,7 @@ return { mountLab };
         `<option value="s:custom">Custom ${T.originLower} advantage…</option></optgroup>` + generalAdvOpts;
       $("f-adv").dataset.for = ch.speciesId + "|" + ch.species;
     }
+    for (const o of [...$("f-adv").options, ...$("f-adv2").options]) if (ADVANTAGES.some((a) => a[0] === o.value)) o.hidden = o.disabled = !advOK(o.value);
     $("f-adv").value = ch.sadv.id ? "s:" + ch.sadv.id : ch.adv.id;
     $("sadv-custom").hidden = ch.sadv.id !== "custom";
     $("sadv-desc-wrap").hidden = !ch.sadv.id;
@@ -7345,6 +7363,7 @@ return { mountLab };
     SKILLS.forEach(([n]) => {
       const key = n.replace(/\s+/g, "-"), lvl = ch.skills[n], t = skillTarget(n);
       $("sr-" + key).className = "lvl-" + lvl;
+      $("sr-" + key).hidden = !skillOK(n);
       ["U", "T", "S"].forEach((l) => {
         const r = $(`sk-${key}-${l}`);
         r.checked = lvl === l;
@@ -7513,7 +7532,7 @@ return { mountLab };
 
   function renderSheet() {
     const lvlOrder = { S: 0, T: 1, U: 2 };
-    const sorted = SKILLS.map(([n, a]) => ({ n, a, l: ch.skills[n], t: skillTarget(n) + formSkill(n) }))
+    const sorted = SKILLS.filter(([n]) => skillOK(n)).map(([n, a]) => ({ n, a, l: ch.skills[n], t: skillTarget(n) + formSkill(n) }))
       .sort((x, y) => lvlOrder[x.l] - lvlOrder[y.l] || y.t - x.t || x.n.localeCompare(y.n));
     const eq = EQUIPMENT.filter(([k]) => ch.equipment[k]).map(([, n]) => n).concat(ch.loads.map((id) => `${LOADS.find((l) => l[0] === id)[1]} (${LOAD_USES} uses a job)`));
     if (ch.otherEquip.trim()) eq.push(ch.otherEquip.trim());
@@ -7857,7 +7876,7 @@ return { mountLab };
   // A role's core skills are marked Trained when the role is chosen (and on a new character). Changing
   // role swaps them, leaving every skill the player trained or raised themselves.
   function applyRoleSkills() {
-    const want = ROLE_SKILLS[ch.dept] || [];
+    const want = (ROLE_SKILLS[ch.dept] || []).filter((s) => skillOK(s));
     const auto = (ch.roleSkills || []).filter((s) => ch.skills[s] === "T" && !freeSkill(s));
     auto.filter((s) => !want.includes(s)).forEach((s) => { ch.skills[s] = "U"; });
     const kept = auto.filter((s) => want.includes(s));
@@ -8182,9 +8201,9 @@ return { mountLab };
   }
   function advanceOptionsFor(c) {
     const avail = pointsAvail(c), tag = (cost) => (cost > avail ? ` (${cost}: needs ${cost - avail} more)` : ` (${cost})`);
-    const opts = SKILLS.filter(([n]) => c.skills[n] !== "S").map(([n]) => { const cost = c.skills[n] === "U" ? COSTS.UT : COSTS.TS;
+    const opts = SKILLS.filter(([n]) => c.skills[n] !== "S" && skillOK(n, c)).map(([n]) => { const cost = c.skills[n] === "U" ? COSTS.UT : COSTS.TS;
       return [`skill:${n}`, `${n}: ${c.skills[n] === "U" ? "Untrained → Trained" : "Trained → Specialty"}${tag(cost)}`, cost, "Skills"]; });
-    for (const [k, n, , max] of EDGE_DEFS) if (!["attr", "skill"].includes(k) && edgeN(k, c) < max) opts.push([`edge:${k}`, `${n}${tag(COSTS.edge)}`, COSTS.edge, "Edges"]);
+    for (const [k, n, , max] of EDGE_DEFS) if (!["attr", "skill"].includes(k) && edgeN(k, c) < max && edgeOK(k, c)) opts.push([`edge:${k}`, `${n}${tag(COSTS.edge)}`, COSTS.edge, "Edges"]);
     for (const [n] of ATTRS) if (!boughtAttr(n, c)) opts.push([`attr:${n}`, `+1 ${n} (to ${c.attrs[n] + 1})${tag(COSTS.attr)}`, COSTS.attr, "Attributes"]);
     opts.push(["revise", `Revise an advantage or complication${tag(COSTS.revise)}`, COSTS.revise, "Other"]);
     return opts;
@@ -8193,11 +8212,11 @@ return { mountLab };
     const i = key.indexOf(":"), kind = i < 0 ? key : key.slice(0, i), id = i < 0 ? "" : key.slice(i + 1);
     const rec = { note: note || "", date: new Date().toISOString().slice(0, 10) };
     if (kind === "skill") {
-      const from = c.skills[id]; if (!from || from === "S") return false;
+      const from = c.skills[id]; if (!from || from === "S" || !skillOK(id, c)) return false;
       const to = from === "U" ? "T" : "S"; c.skills[id] = to;
       c.advances = [...(c.advances || []), { type: "skill", skill: id, from, to, cost: from === "U" ? COSTS.UT : COSTS.TS, ...rec }];
     } else if (kind === "edge") {
-      const d = EDGE_DEFS.find(([k]) => k === id); if (!d || ["attr", "skill"].includes(id) || edgeN(id, c) >= d[3]) return false;
+      const d = EDGE_DEFS.find(([k]) => k === id); if (!d || ["attr", "skill"].includes(id) || edgeN(id, c) >= d[3] || !edgeOK(id, c)) return false;
       c.edgesBought = { ...(c.edgesBought || {}), [id]: ((c.edgesBought || {})[id] || 0) + 1 };
       c.advances = [...(c.advances || []), { type: "edge", edge: id, cost: COSTS.edge, ...rec }];
     } else if (kind === "attr") {
