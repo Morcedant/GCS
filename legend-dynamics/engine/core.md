@@ -538,10 +538,11 @@ A GM can add their own threats, weapons and Edges. Keep them in line with the bo
 - **Weapons.** Hits mark 1 box for fists, knives and arrows; 2 for swords and guns; 3 for the heavy and the point-blank; 4 only for explosives and the monstrous. Give a weapon a reach (melee) or a range band, and its shots if they run out.
 - **Edges.** An Edge is worth about as much as one of the book's: a narrow, useful benefit, often once per session or per {{missionLower}}. Say exactly what it does.
 - **Cards.** One subject, what's true about it and what that permits: as narrow as a card earned in play.
-- **Spells.** A new hex, cantrip or power matches the setting's own: an attack marks 1 or 2 boxes at Close or Short range, and anything stronger says who resists and what it costs.
+- **Powers.** Write what it does at each Class, I to VI, stepping up as the setting's own powers do; anything that bends minds, time or death needs the GM's approval.
+- **Spells.** A new hex, cantrip or psionic power matches the setting's own: an attack marks 1 or 2 boxes at Close or Short range, and anything stronger says who resists and what it costs.
 - **Rituals.** Give a ritual its weight (Minor 2 segments, Significant 4, Major 6), the time a roll takes, what it does and its price.
 
-**In the creator.** The GM view's **Homebrew** tab keeps your threats, weapons, Edges, cards, spells and rituals. They then work like the book's, marked *homebrew*: threats in the Encounter panel and on the battle map, weapons in characters' gear and the roller, Edges and spells among the creator's choices, cards where findings are recorded, and rituals in a ritual book beside *Rituals by heart*. Players get them when they join your shared table, or from a homebrew file you give them. A special trait or Edge is a note the GM applies at the table.
+**In the creator.** The GM view's **Homebrew** tab keeps your threats, weapons, Edges, cards, powers, spells and rituals. They then work like the book's, marked *homebrew*: threats in the Encounter panel and on the battle map, weapons in characters' gear and the roller, Edges, powers and spells among the creator's choices, cards where findings are recorded, and rituals in a ritual book beside *Rituals by heart*. Players get them when they join your shared table, or from a homebrew file you give them. A special trait or Edge is a note the GM applies at the table.
 
 # Complications
 
