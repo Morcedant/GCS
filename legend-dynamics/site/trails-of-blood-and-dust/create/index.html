@@ -374,6 +374,8 @@ tr.lvl-U td.target { color: var(--muted); }
 .lcard .fields { margin: 0; }
 .lcard-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; justify-content: space-between; }
 .cards-sheet { display: grid; gap: 6px; }
+#cards-create-slot > #cards-wrap > summary { grid-column: 1 / -1; cursor: pointer; font-size: .95rem; color: var(--chrome); border-top: 1px solid var(--line); padding-top: 12px; }
+#cards-ride-slot > #cards-wrap > summary { display: none; }
 #ph-loads { display: grid; gap: 4px; margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px; }
 .load-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
 .cards-sheet .small { display: block; }
@@ -622,7 +624,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="1a5fe77" data-version-date="2026.10.23" title="The code changes whenever this page changes.">Version 2026.10.23 · 1a5fe77</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="b43722b" data-version-date="2026.10.23" title="The code changes whenever this page changes.">Version 2026.10.23 · b43722b</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -827,13 +829,13 @@ tr.lvl-U td.target { color: var(--muted); }
               <div class="btn-row"><button type="button" class="linkish" id="plearn-add">Add a power learned in play</button></div></details>
           </div>
 
-          <details class="fields" id="cards-wrap" hidden><summary class="label"><span id="cards-label"></span></summary>
+          <div id="cards-create-slot"><details class="fields" id="cards-wrap" hidden><summary class="label"><span id="cards-label"></span></summary>
             <p class="small muted field wide" id="cards-intro"></p>
             <div class="field wide" id="almanac-wrap" hidden><span class="label" id="almanac-label"></span>
               <div class="checks" id="almanac-list"></div><span class="small muted" id="almanac-note"></span></div>
             <div class="field wide card-list" id="cards-list"></div>
             <div class="btn-row field wide"><button type="button" class="linkish" id="card-add"></button></div>
-          </details>
+          </details></div>
         </section>
 
         <section class="step hud">
@@ -4960,6 +4962,10 @@ tr.lvl-U td.target { color: var(--muted); }
           </div>
           <div id="ph-loads" hidden></div>
         </div>
+        <div class="card hud no-print" id="card-cards" hidden>
+          <h3 id="card-cards-title"></h3>
+          <div id="cards-ride-slot"></div>
+        </div>
         <div class="card hud no-print" id="card-clocks">
           <h3>Clocks</h3>
           <p class="small muted">Danger clocks fill on failures and time; progress clocks fill on successes. Tap a segment to fill up to it.</p>
@@ -7672,8 +7678,9 @@ return { mountLab };
       + `<span class="small muted">${[k.date && esc(k.date), k.job && esc(k.job), k.shared ? `shared copy; owner ${esc(k.owner || "unknown")}` : k.owner ? `owner ${esc(k.owner)}` : "", k.present.length ? `present: ${esc(k.present.join(", "))}` : ""].filter(Boolean).join(" · ")}</span>`;
   }
   function renderCards() {
-    $("cards-wrap").hidden = !DISC;
+    $("cards-wrap").hidden = !DISC; $("card-cards").hidden = !DISC;
     if (!DISC) return;
+    $("card-cards-title").textContent = `${capFirst(DISC.cards)}: your ${DISC.collection}` + (ch.cards.length ? ` (${ch.cards.length})` : "");
     // The almanac's cards come with the advantage, and go with it.
     if (!hasAlmanac() && ch.cards.some((k) => k.source === "almanac")) ch.cards = ch.cards.filter((k) => k.source !== "almanac");
     const own = ch.cards.filter((k) => k.source !== "almanac"), alm = ch.cards.filter((k) => k.source === "almanac");
@@ -10151,6 +10158,8 @@ function mountTable(api) {
       $("view-" + v).hidden = v !== which;
     }
     $("app").dataset.view = which;
+    // One card editor: Step 4 holds it while creating, Ride's cards tab during play.
+    if (DISC) { const w = $("cards-wrap"); $(which === "sheet" ? "cards-ride-slot" : "cards-create-slot").appendChild(w); if (which === "sheet") w.open = true; }
     try { sessionStorage.setItem(PACK.id + ".tab", which); } catch {}
   }
   // Printing works when the file is opened directly; embedded viewers block it, so hide the button there.
@@ -10288,7 +10297,7 @@ function mountTable(api) {
   // The play tab: the cards beside the sheet, a group at a time. On a phone the sheet itself is a group too.
   const NARROW = matchMedia("(max-width: 900px)");
   const SHEET_GROUPS = [["char", "Character", ["#sheet-main"]], ["roll", "Roll", ["#card-condition", "#card-roll", "#card-weapon"]], ["table", "Table", ["#card-table", "#card-fight"]],
-    ["tracks", "Clocks", ["#card-clocks", "#card-ship"]], ["ref", "Reference", ["#card-ref"]]];
+    ...(DISC ? [["cards", capFirst(DISC.cards), ["#card-cards"]]] : []), ["tracks", "Clocks", ["#card-clocks", "#card-ship"]], ["ref", "Reference", ["#card-ref"]]];
   for (const [id, , sels] of SHEET_GROUPS) for (const q of sels) { const el = document.querySelector("#view-sheet " + q); if (el) el.dataset.sheetpane = id; }
   $("sheet-tabs").innerHTML = SHEET_GROUPS.map(([id, name]) => `<button type="button" class="tab${id === "char" ? " narrow-only" : ""}" role="tab" data-sheettab="${id}">${esc(name)}</button>`).join("");
   let sheetAt = "roll";
