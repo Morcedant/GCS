@@ -2900,13 +2900,19 @@
    "power",
    "Stronger Power",
    "Raise one of your powers by one Class. Class III is the limit at creation, unless the GM approves one power at Class IV.",
-   3
+   3,
+   {
+    "needsPowers": true
+   }
   ],
   [
    "xpower",
    "Extra Power",
    "One more power, at Class I.",
-   1
+   1,
+   {
+    "needsPowers": true
+   }
   ]
  ],
  "statusLabel": "Legal status",

@@ -913,7 +913,7 @@ Your origin's tier sets your powers:
 
 Choose them in the creator's step 4. Powers marked **(GM)** need the GM's approval, and so does every power a **Mythic** character takes.
 
-**Aurora characters have 4 Edge points** (one more than other Legend Dynamics settings), and two Edges of their own:
+**Aurora characters have 4 Edge points** (one more than other Legend Dynamics settings), and two Edges of their own, for Operants only: a Non-Operant has no powers to strengthen, so these two aren't offered to them, at creation or later.
 
 | Edge | Effect | Limit |
 |---|---|---|

@@ -1550,6 +1550,10 @@ tr.lvl-U td.target { color: var(--muted); }
     const slots = (c.speciesId !== "custom" && h && h.powerSlots) || POWERS.tierSlots[String(tierOf(c))] || [];
     return [...slots.map((x) => (x === "I+" ? (c.skills[POWERS.skill] === "S" ? "II" : "I") : x)), ...(edgeN("xpower", c) ? ["I"] : [])];
   };
+  // A setting's Edge marked needsPowers (Aurora's Stronger Power and Extra Power) is for an origin that has powers of its own.
+  const hasOwnPowers = (c = ch) => { if (!POWERS) return false; const h = heritageOf(c);
+    return ((c.speciesId !== "custom" && h && h.powerSlots) || POWERS.tierSlots[String(tierOf(c))] || []).length > 0; };
+  const edgeOK = (k, c = ch) => { const d = EDGE_DEFS.find((x) => x[0] === k); return !(d && d[4] && d[4].needsPowers && !hasOwnPowers(c)); };
   // Each slot's Class after the Stronger Power Edges the player put on it.
   const powerSlots = (c = ch) => baseSlots(c).map((cl, i) => CLASS_NAMES[Math.min(CLASS_NAMES.length - 1, CLASS_NAMES.indexOf(cl) + ((c.powerBoost || [])[i] || 0))]);
   const boostsSpent = (c = ch) => baseSlots(c).reduce((a, _, i) => a + ((c.powerBoost || [])[i] || 0), 0);
@@ -1679,7 +1683,7 @@ tr.lvl-U td.target { color: var(--muted); }
   if (CR.aim) $("r-aim-label").textContent = `Aimed at this target last action ${signed(CR.aim.bonus)}`;
 
   if (SPELLS) $("spell-list").innerHTML = SPELLS.list.map(([k, n, eff]) => `<label class="eq-item"><input type="checkbox" id="sp-${k}" data-spell="${k}"><span><b>${n}</b><span class="small muted" id="sp-eff-${k}">${eff}</span></span></label>`).join("");
-  $("edge-list").innerHTML = EDGE_DEFS.map(([k, n, d]) => `<div class="edge"><b>${n}</b>
+  $("edge-list").innerHTML = EDGE_DEFS.map(([k, n, d]) => `<div class="edge" id="edge-row-${k}"><b>${n}</b>
     <span class="gm-duty"><button type="button" id="edge-m-${k}" data-edge="${k}" data-d="-1" aria-label="One fewer: ${n}">−</button><b id="edge-n-${k}">0</b><button type="button" id="edge-p-${k}" data-edge="${k}" data-d="1" aria-label="One more: ${n}">+</button></span>
     <span class="small muted">${d}</span></div>`).join("");
   $("f-adv2").innerHTML = `<option value="">Choose a second advantage…</option>` + ADVANTAGES.map(([id, n, , sk]) => `<option value="${id}">${n} (${sk})</option>`).join("");
@@ -1802,11 +1806,14 @@ tr.lvl-U td.target { color: var(--muted); }
       `<div class="adj-chips"><span class="adj-chip tier-chip">Tier ${tierOf()}</span>${ATTRS.filter(([n]) => adjNow[n]).map(([n]) => `<span class="adj-chip ${adjNow[n] > 0 ? "up" : "down"}">${n} ${signed(adjNow[n])}</span>`).join("") || `<span class="adj-chip">No adjustments</span>`}</div>` +
       heritageInfo();
     // Edges
+    // An origin without powers takes no power Edges: any it had (from another origin) are given back.
+    for (const [k] of EDGE_DEFS) if (!edgeOK(k) && edgeRaw(k)) { ch.edges[k] = 0; if (k === "power") ch.powerBoost = []; }
     const ea = edgesAvail(), es = edgesSpent();
     $("edge-tally").textContent = `${es} of ${ea}`;
     $("edge-tally").className = "chip " + (es === ea ? "ok" : "no");
     $("edge-intro").textContent = ea ? `Tier ${tierOf()} leaves ${ea} Edge${ea > 1 ? "s" : ""}. Spend ${ea > 1 ? "them" : "it"} below.` : `This tier has no Edges: its power is the ${T.originLower} itself.`;
     EDGE_DEFS.forEach(([k, , , max]) => {
+      $("edge-row-" + k).hidden = !edgeOK(k);
       $("edge-n-" + k).textContent = edgeN(k);
       $("edge-m-" + k).disabled = edgeRaw(k) <= 0;
       $("edge-p-" + k).disabled = edgeN(k) >= max || es >= ea;
@@ -2721,7 +2728,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const avail = pointsAvail(c), tag = (cost) => (cost > avail ? ` (${cost}: needs ${cost - avail} more)` : ` (${cost})`);
     const opts = SKILLS.filter(([n]) => c.skills[n] !== "S").map(([n]) => { const cost = c.skills[n] === "U" ? COSTS.UT : COSTS.TS;
       return [`skill:${n}`, `${n}: ${c.skills[n] === "U" ? "Untrained → Trained" : "Trained → Specialty"}${tag(cost)}`, cost, "Skills"]; });
-    for (const [k, n, , max] of EDGE_DEFS) if (!["attr", "skill"].includes(k) && edgeN(k, c) < max) opts.push([`edge:${k}`, `${n}${tag(COSTS.edge)}`, COSTS.edge, "Edges"]);
+    for (const [k, n, , max] of EDGE_DEFS) if (!["attr", "skill"].includes(k) && edgeN(k, c) < max && edgeOK(k, c)) opts.push([`edge:${k}`, `${n}${tag(COSTS.edge)}`, COSTS.edge, "Edges"]);
     for (const [n] of ATTRS) if (!boughtAttr(n, c)) opts.push([`attr:${n}`, `+1 ${n} (to ${c.attrs[n] + 1})${tag(COSTS.attr)}`, COSTS.attr, "Attributes"]);
     opts.push(["revise", `Revise an advantage or complication${tag(COSTS.revise)}`, COSTS.revise, "Other"]);
     return opts;
@@ -2734,7 +2741,7 @@ tr.lvl-U td.target { color: var(--muted); }
       const to = from === "U" ? "T" : "S"; c.skills[id] = to;
       c.advances = [...(c.advances || []), { type: "skill", skill: id, from, to, cost: from === "U" ? COSTS.UT : COSTS.TS, ...rec }];
     } else if (kind === "edge") {
-      const d = EDGE_DEFS.find(([k]) => k === id); if (!d || ["attr", "skill"].includes(id) || edgeN(id, c) >= d[3]) return false;
+      const d = EDGE_DEFS.find(([k]) => k === id); if (!d || ["attr", "skill"].includes(id) || edgeN(id, c) >= d[3] || !edgeOK(id, c)) return false;
       c.edgesBought = { ...(c.edgesBought || {}), [id]: ((c.edgesBought || {})[id] || 0) + 1 };
       c.advances = [...(c.advances || []), { type: "edge", edge: id, cost: COSTS.edge, ...rec }];
     } else if (kind === "attr") {
