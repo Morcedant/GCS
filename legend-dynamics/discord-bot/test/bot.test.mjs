@@ -1,7 +1,11 @@
 // Run with: npm test
 import assert from "node:assert/strict";
 import test from "node:test";
-import worker, { odds, resolve, commandsFor } from "../src/worker.js";
+// The public bot by default; FAN_BOT=1 runs the same tests on the fan-games copy (fan-games/discord-bot/worker.js),
+// which adds USS Pelion and Grimm and their old names.
+const FAN = !!process.env.FAN_BOT;
+const mod = await import(FAN ? "../../../fan-games/discord-bot/worker.js" : "../src/worker.js");
+const { default: worker, odds, resolve, commandsFor } = mod;
 
 test("roll-under with automatic results", () => {
   assert.equal(resolve([3, 3, 3], 11).success, true);
@@ -127,14 +131,14 @@ test("/clock creates, ticks, shows and removes clocks; near misses are flagged",
   assert.match((await call("show")).content, /The mob forms/);
   assert.match((await call("remove", [{ name: "name", value: "The mob forms" }])).content, /Removed/);
   assert.match((await call("show")).content, /No clocks/);
-  const { describe, resolve } = await import("../src/worker.js");
+  const { describe, resolve } = mod;
   assert.ok(describe(resolve([5, 4, 4], 11)).some((l) => /success at a cost/.test(l)), "miss by 2");
   assert.ok(!describe(resolve([5, 5, 4], 11)).some((l) => /success at a cost/.test(l)), "miss by 3");
   assert.ok(!describe(resolve([6, 6, 5], 16)).some((l) => /success at a cost/.test(l)), "natural 17 never");
 });
 
 test("contest follows the guide's opposed rules, and assist adds the helper's bonus", async () => {
-  const { contestWinner, assistBonus } = await import("../src/worker.js");
+  const { contestWinner, assistBonus } = mod;
   const R = (d, t) => resolve(d, t);
   assert.equal(contestWinner(R([3, 3, 3], 12), R([6, 6, 4], 12)), "me", "success beats failure");
   assert.equal(contestWinner(R([2, 2, 3], 14), R([3, 3, 3], 14)), "me", "larger margin wins");
@@ -196,7 +200,7 @@ test("/track marks, clears and resets the game's tracks, with each box's meaning
 });
 
 test("/seed rolls one entry from each of the game's tables, without storage", async () => {
-  const { PACKS, rollSeed } = await import("../src/worker.js");
+  const { PACKS, rollSeed } = mod;
   const rows = rollSeed(PACKS.western, () => 0);
   assert.deepEqual(rows[0], ["Job", "A whole town gone overnight", 3], "all ones: total 3, the rarest entry");
   assert.equal(rollSeed(PACKS.western, () => 0.999)[0][2], 18, "all sixes: total 18");
@@ -210,8 +214,8 @@ test("/seed rolls one entry from each of the game's tables, without storage", as
   assert.match(seed.embeds[0].title, /Job seed/);
 });
 
-test("USS Pelion and Grimm are games too, and their old storage bindings still work", async () => {
-  const { PACKS } = await import("../src/worker.js");
+test("USS Pelion and Grimm are games too, and their old storage bindings still work", { skip: !FAN && "fan-games bot only" }, async () => {
+  const { PACKS } = mod;
   assert.equal(PACKS.pelion.point, "Duty"); assert.equal(PACKS.grimm.point, "Grit");
   assert.equal(PACKS.pelion.tracks.length, 9); assert.equal(Object.keys(PACKS.grimm.seeds).length, 6);
   // Pelion's library records: the Starfleet Command track, and a Countdown that only ticks when the GM says so.
@@ -243,12 +247,12 @@ test("USS Pelion and Grimm are games too, and their old storage bindings still w
   const shared = { ...env, STORE: new MemoryKV() };
   await signedCall(shared, sub("game", "set", [{ name: "game", value: "grimm" }], { gm: true }));
   assert.match((await signedCall(shared, sub("track", "show"))).content, /Suspicion.*Exposure.*Attention/s);
-  const { COMMANDS } = await import("../src/worker.js");
+  const { COMMANDS } = mod;
   const choices = COMMANDS.find((c) => c.name === "game").options[1].options[0].choices.map((c) => c.name);
   assert.deepEqual([...choices].sort(), ["Aurora", "Fracture Lines", "Grimm", "The Shattered Crown", "Trails of Blood & Dust", "USS Pelion"]);
 });
 
-test("the old /duty, /grit, /pelion and /grimm names still work, and register on their own Workers", async () => {
+test("the old /duty, /grit, /pelion and /grimm names still work, and register on their own Workers", { skip: !FAN && "fan-games bot only" }, async () => {
   const pel = { ...env, DUTY: new MemoryKV() };
   assert.match((await signedCall(pel, sub("duty", "show"))).content, /2 Duty points/);
   const gr = { ...env, GRIT: new MemoryKV() };
@@ -258,7 +262,7 @@ test("the old /duty, /grit, /pelion and /grimm names still work, and register on
   const g = await signedCall(gr, { type: 2, guild_id: "G1", member: { user: { id: "42" } }, data: { name: "grimm", options: [{ name: "target", value: 12 }] } });
   assert.match(g.embeds[0].footer.text, /Grimm/);
 
-  const { commandsFor } = await import("../src/worker.js");
+  const { commandsFor } = mod;
   const names = (e) => commandsFor(e).map((c) => c.name);
   assert.deepEqual(names({ DUTY: {} }).slice(-4), ["pelion", "duty", "grimm", "grit"], "every Worker registers all four old names");
   assert.deepEqual(names({}).slice(-4), ["pelion", "duty", "grimm", "grit"]);
@@ -272,6 +276,13 @@ test("the old /duty, /grit, /pelion and /grimm names still work, and register on
   assert.match((await signedCall(env, sub("game", "set", [{ name: "game", value: "grimm" }], { gm: true }))).content, /needs the bot's storage/);
   const duty = commandsFor({ DUTY: {} }).find((c) => c.name === "duty");
   assert.match(duty.description, /Duty points/); assert.equal(duty.options.length, 5);
+});
+
+test("the public bot carries only the four Legend Dynamics settings, and no old names", { skip: FAN && "public bot only" }, () => {
+  assert.deepEqual(Object.keys(mod.PACKS).sort(), ["aurora", "fantasy", "spaceopera", "western"]);
+  const names = commandsFor({}).map((c) => c.name);
+  for (const old of ["pelion", "duty", "grimm", "grit"]) assert.ok(!names.includes(old), old);
+  assert.equal(mod.withLegacy({ DUTY: {} }).STORE, undefined, "no old storage bindings");
 });
 
 test("every command, option and choice fits Discord's 100-character limits", () => {

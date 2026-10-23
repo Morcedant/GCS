@@ -4,13 +4,19 @@
 in the look of that game's creator.
 
 The guides don't mention the bot at all. build-legend.py writes the handout for the Legend Dynamics
-packs; run this file to write the handouts for USS Pelion and Grimm.
+packs; run this file to write the handouts for the private fan games (USS Pelion and Grimm), which carry the
+fan-games bot (fan-games/discord-bot/worker.js) instead of the public one.
 """
-import html, json, pathlib, re
+import html, json, pathlib, re, sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import fan_sources
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BOT = ROOT / "legend-dynamics" / "discord-bot"
-GAMES_DIR = BOT / "games"
+FAN_BOT = ROOT / "fan-games" / "discord-bot"
+GAMES_DIR = FAN_BOT / "games"
+FAN_GAMES = ("pelion", "grimm")
 
 # Per game: the bot's /game choice, example names for the tables, and the old command names it keeps.
 EXAMPLES = {
@@ -201,7 +207,7 @@ def setup(g):
         ("“…need the bot's storage”", "Bind the KV namespace as <code>STORE</code> (step 3)."),
         ("“Only the GM can change the game”", "<code>/game set</code> needs the <strong>Manage Server</strong> permission."),
     ]
-    code = html.escape((BOT / "src" / "worker.js").read_text(), quote=False)
+    code = html.escape((FAN_BOT / "worker.js" if g["id"] in FAN_GAMES else BOT / "src" / "worker.js").read_text(), quote=False)
     kb = len(code.encode()) // 1024
     return f"""
   <section class="gm" id="setup">
@@ -353,24 +359,25 @@ document.addEventListener("click", (e) => {{
 """
 
 
-def write_handout(g, folder):
+def write_handout(g, folder, creator=None):
     folder = pathlib.Path(folder)
-    (folder / "discord-commands.html").write_text(handout(g, (folder / "index.html").read_text()))
+    (folder / "discord-commands.html").write_text(handout(g, creator or (folder / "index.html").read_text()))
 
 
 def legacy_games():
-    for gid in ("pelion", "grimm"):
+    """The fan games: (id, game info, its creator page)."""
+    for gid in FAN_GAMES:
         d = json.loads((GAMES_DIR / f"{gid}.json").read_text())
-        page = (ROOT / d["seedsFrom"]).read_text()
+        page = fan_sources.read_text(d["seedsFrom"])
         seeds = json.loads(re.search(r"const SEEDS = (\{.*?\});\n", page).group(1))
-        yield gid, game_info(gid, d["title"], d["point"], d["tracks"], seeds, d["trackTitle"])
+        yield gid, game_info(gid, d["title"], d["point"], d["tracks"], seeds, d["trackTitle"]), page
 
 
 def main():
     folders = {"pelion": "uss-pelion", "grimm": "grimm-west"}
-    for gid, g in legacy_games():
+    for gid, g, page in legacy_games():
         folder = ROOT / folders[gid]
-        write_handout(g, folder)
+        write_handout(g, folder, page)
         print(f"wrote {(folder / 'discord-commands.html').relative_to(ROOT)}")
 
 

@@ -3,21 +3,21 @@
 A game's build writes its GM's Guide to <game folder>/gm-guide.json and puts an empty, locked book in the page;
 bundle() gathers every game's gm-guide.json into legend-dynamics/table-server/src/gm-guides.js, which the
 server hands out to a GM whose access code checks out (POST /api/gm/guide). Grimm's guide comes from the
-claude/grimm-wild-west branch, where Grimm is built.
+claude/grimm-wild-west branch, where Grimm is built (tools/fan_sources.py).
 
   python3 tools/gm_guides.py      rebuild the server's bundle from the gm-guide.json files
 """
 import html
 import json
-import subprocess
 from pathlib import Path
+
+import fan_sources
 
 ROOT = Path(__file__).resolve().parent.parent
 SERVER = ROOT / "legend-dynamics" / "table-server" / "src" / "gm-guides.js"
 # game id (as the pages name it to the table server) → its folder
 GAMES = {"western": "legend-dynamics/western", "spaceopera": "legend-dynamics/spaceopera", "aurora": "legend-dynamics/aurora",
          "fantasy": "legend-dynamics/fantasy", "uss-pelion": "uss-pelion", "grimm-west": "grimm-west"}
-BRANCH = {"grimm-west": "origin/claude/grimm-wild-west"}  # a game built on another branch
 
 
 def locked_book(title, subtitle):
@@ -31,13 +31,10 @@ def write_game(folder, title, subtitle, body):
 
 
 def _read(game):
-    rel = f"{GAMES[game]}/gm-guide.json"
-    if game in BRANCH:
-        r = subprocess.run(["git", "-C", str(ROOT), "show", f"{BRANCH[game]}:{rel}"], capture_output=True, text=True)
-        if r.returncode == 0:
-            return json.loads(r.stdout)
-    f = ROOT / rel
-    return json.loads(f.read_text()) if f.exists() else None
+    try:
+        return json.loads(fan_sources.read_text(f"{GAMES[game]}/gm-guide.json"))
+    except FileNotFoundError:
+        return None
 
 
 def bundle():

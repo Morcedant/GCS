@@ -127,16 +127,16 @@ summary { cursor: pointer; font: 600 1.05rem/1.3 var(--display); color: var(--go
       <textarea id="bot-code" readonly spellcheck="false" aria-label="Bot code">// Legend Dynamics dice bot: a Cloudflare Worker that answers Discord slash commands over HTTP.
 // One self-contained file, so it can be pasted straight into the Cloudflare dashboard.
 // Discord signs every request; unsigned or badly signed requests are rejected with 401.
-// One bot serves every Legend Dynamics setting, plus USS Pelion and Grimm; the GM picks each server's game with /game.
+// One bot serves every game in PACKS below; the GM picks each server's game with /game.
 //
 // Settings (Cloudflare → Worker → Settings → Variables and Secrets):
 //   DISCORD_PUBLIC_KEY       required, from the Discord Developer Portal
 //   DISCORD_APPLICATION_ID   and DISCORD_BOT_TOKEN: only needed to register commands by visiting /register
-//   DEFAULT_GAME             optional: the game a server starts on (western, spaceopera, fantasy, aurora, grimm or pelion); default western
+//   DEFAULT_GAME             optional: the game a server starts on (one of the ids in PACKS); default western
 // Binding (Settings → Bindings → KV namespace):
 //   STORE                    optional; turns on /game, /points, /clock and /track, and makes rerolls spend real points
-//                            (a USS Pelion or Grimm Worker's DUTY or GRIT binding works too)
-//   LEGACY_COMMANDS          optional: "no" stops /register adding the old /pelion, /duty, /grimm and /grit names
+//                            (an older bot's binding named in LEGACY works too)
+//   LEGACY_COMMANDS          optional: "no" stops /register adding the older bots' command names in LEGACY
 
 // ---- Setting packs: written by tools/build-legend.py from legend-dynamics/packs/*/pack.json ----
 
@@ -1775,7 +1775,7 @@ export function commands() {
     },
     {
       name: "points",
-      description: "Track Duty, Grit or Resolve points (start each session with 2)",
+      description: "Track your game's points (start each session with 2)",
       options: [
         { type: 1, name: "show", description: "Show points", options: [{ type: 6, name: "player", description: "Whose points (default: yours)", required: false }] },
         { type: 1, name: "spend", description: "Spend one of your points" },
@@ -1891,17 +1891,21 @@ export function commands() {
 }
 export const COMMANDS = commands();
 
-// The USS Pelion and Grimm bots' old command names keep working: /pelion and /grimm roll, /duty and /grit track points.
-const ALIASES = { pelion: "roll", grimm: "roll", duty: "points", grit: "points" };
+// Older bots' command names and storage bindings, for a copy of this bot that carries their games: written by
+// tools/build-legend.py (the public bot has none). An alias is [name, the command it stands for, the point name].
+/* LEGACY:START */
+export const LEGACY = {"aliases": [["pelion", "roll"], ["duty", "points", "Duty"], ["grimm", "roll"], ["grit", "points", "Grit"]], "bindings": {"DUTY": "pelion", "GRIT": "grimm"}};
+/* LEGACY:END */
+const ALIASES = Object.fromEntries(LEGACY.aliases.map(([name, target]) =&gt; [name, target]));
 const aliasOf = (name, target, game) =&gt; {
   const base = COMMANDS.find((c) =&gt; c.name === target);
   return { ...base, name, description: target === "roll" ? `Roll 3d6 under your target (same as /roll)` : `Track ${game} points (same as /points)` };
 };
 
-/** The commands to register: the full set plus the four old names, unless LEGACY_COMMANDS is "no". */
+/** The commands to register: the full set plus the older bots' names, unless LEGACY_COMMANDS is "no". */
 export function commandsFor(env = {}) {
   if (String(env.LEGACY_COMMANDS || "").trim().toLowerCase() === "no") return [...COMMANDS];
-  return [...COMMANDS, aliasOf("pelion", "roll"), aliasOf("duty", "points", "Duty"), aliasOf("grimm", "roll"), aliasOf("grit", "points", "Grit")];
+  return [...COMMANDS, ...LEGACY.aliases.map(([name, target, game]) =&gt; aliasOf(name, target, game))];
 }
 const commandList = (cmds) =&gt; { const n = cmds.map((c) =&gt; `/${c.name}`); return `${n.slice(0, -1).join(", ")} and ${n[n.length - 1]}`; };
 
@@ -1912,11 +1916,12 @@ const PONG = 1, MESSAGE = 4, UPDATE_MESSAGE = 7;
 const EPHEMERAL = 64;
 const GREEN = 0x52e3a0, RED = 0xff6a5c, NEUTRAL = 0x8aa2c2;
 
-// The USS Pelion and Grimm bots kept their storage as DUTY and GRIT. Pasting this file into one of those
-// Workers keeps working: that binding becomes the storage, and the server starts on that bot's game.
+// Older bots kept their storage under another binding name (LEGACY.bindings: name → game). Pasting this file into
+// one of those Workers keeps working: that binding becomes the storage, and the server starts on that bot's game.
 export function withLegacy(env) {
-  if (env.STORE || !(env.DUTY || env.GRIT)) return env;
-  return { ...env, STORE: env.DUTY || env.GRIT, rawStore: env.DUTY ? "DUTY" : "GRIT", DEFAULT_GAME: env.DEFAULT_GAME || (env.DUTY ? "pelion" : "grimm") };
+  const b = Object.keys(LEGACY.bindings).find((k) =&gt; env[k]);
+  if (env.STORE || !b) return env;
+  return { ...env, STORE: env[b], rawStore: b, DEFAULT_GAME: env.DEFAULT_GAME || LEGACY.bindings[b] };
 }
 
 export default {
@@ -2287,7 +2292,7 @@ async function gameCommand(interaction, env, game) {
       (env.STORE ? "" : " (Connect the bot's storage to change it.)"));
   }
   if (sub === "set") {
-    if (!env.STORE) return reply("Choosing a game needs the bot's storage: bind a KV namespace to the Worker as STORE (or keep the Pelion bot's DUTY / Grimm bot's GRIT binding). Until then every server plays " + pickGame(defaultGameId(env)).title + ".", true);
+    if (!env.STORE) return reply("Choosing a game needs the bot's storage: bind a KV namespace to the Worker as STORE. Until then every server plays " + pickGame(defaultGameId(env)).title + ".", true);
     if (!isGM(interaction)) return reply("Only the GM can change the game: that's anyone with the Manage Server permission on this Discord server.", true);
     if (!PACKS[opt.game]) return reply(`Unknown game. Choose one of: ${GAME_IDS().map((id) =&gt; PACKS[id].title).join(", ")}.`, true);
     await env.STORE.put(`game:${guildOf(interaction)}`, opt.game);
