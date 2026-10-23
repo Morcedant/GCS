@@ -4,6 +4,16 @@
   "rulesUpdated": "2026-10-21",
   "changes": [
     {
+      "date": "2026-10-23",
+      "kind": "site",
+      "title": "Homebrew: your own threats, weapons and Edges",
+      "items": [
+        "The GM view has a Homebrew tab: make your own threats, weapons and Edges with simple forms, no code. They work like the setting's own, marked homebrew, in the Encounter panel, on the battle map, in characters' gear and the roller, and in the creator's Edges.",
+        "Players get the GM's homebrew when they join the shared table, or from a homebrew file.",
+        "The core rules' Making your own chapter gives the numbers to keep homebrew in line with the book's."
+      ]
+    },
+    {
       "date": "2026-10-22",
       "kind": "setting",
       "title": "Fracture Lines: example data records, the Countdown and skill",

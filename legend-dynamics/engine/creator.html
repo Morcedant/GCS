@@ -883,6 +883,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <input type="file" id="f-file" accept=".json,application/json,text/plain" class="visually-hidden">
           </div>
           <p class="small muted" id="file-note" hidden></p>
+          <div id="hb-file"></div>
           <div class="toast" id="toast" role="status" aria-live="polite"></div>
         </div>
         <div class="panel hud">
@@ -916,6 +917,7 @@ tr.lvl-U td.target { color: var(--muted); }
   <section id="view-gm" role="tabpanel" aria-labelledby="tab-gm" hidden>
     <nav class="subtabs no-print" id="gm-tabs" role="tablist" aria-label="GM view sections"></nav>
     <div class="panel hud no-print" id="gm-table"></div>
+    <div class="card hud no-print" id="hb-card"></div>
     <div class="gm-top">
       <div class="card hud no-print">
         <h3>Characters</h3>
@@ -1089,6 +1091,7 @@ tr.lvl-U td.target { color: var(--muted); }
           </div>
         </div>
 
+        <div class="card hud no-print" id="hb-note" hidden></div>
         <div class="card hud no-print" id="card-table"></div>
         <div class="card hud no-print bm-card" id="card-fight" hidden>
           <h3>Map and fight</h3>
@@ -1190,11 +1193,13 @@ tr.lvl-U td.target { color: var(--muted); }
 <script>
 (() => {
   /* PACK:START *//* PACK:END */
+  hbApply(PACK, hbLoad(PACK)); // the GM's homebrew threats, weapons and Edges (homebrew.js), before anything reads PACK
   /* RULES:CORE */
   /* RULES:LAB */
   const T = PACK.terms;
   const TABLE_SERVER = "{{TABLE_SERVER}}"; // the shared table server (legend-dynamics/table-server), set at build time
   let sharedTable = null; // mounted with the GM view below
+  let homebrewUI = null; // homebrew.js: mounted with the guides below
   // Advancement point costs (core rules, Advancement). Magic and powers use the costs their chapters give.
   const COSTS = { UT: 1, TS: 2, revise: 1, edge: 3, attr: 4 };
   const ATTRS = [
@@ -2817,13 +2822,14 @@ tr.lvl-U td.target { color: var(--muted); }
   /* BATTLEMAP */
   /* TABLECLIENT */
   /* GMLOCK */
+  /* HOMEBREW */
   // The shared table: players join from their play tab, the GM starts one here, and every roll at the table shows on both.
   sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay, pointName: T.point, partyName: T.party,
     server: TABLE_SERVER, character: () => ch.name, esc, toast,
     // Phase 2: the player shares their character; the GM's cards follow the table's characters, and both follow each other's changes.
     onPlayers: () => renderGM(), // who's at the table, on the GM's cards
     // Phase 3: the GM's map and fight go to the players; their moves and requests come back to the GM.
-    onScene: (sc) => renderFight(sc),
+    onScene: (sc) => { renderFight(sc); if (homebrewUI && sc) homebrewUI.receive(sc.homebrew); },
     onMove: (m) => { if (!battleMap.moveOwn(m.key, m.to)) gmSay(`${m.by} moved, but their token isn't on the map: add the ${T.party} to it.`, true); },
     fillAsk: (a) => { if (!labPanel || !labPanel.fillRequest) return false; $("tab-gm").click(); return labPanel.fillRequest(a); },
     onConnected: (role) => { if (role === "player") sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); else pushScene(); renderGM(); },
@@ -2881,7 +2887,7 @@ tr.lvl-U td.target { color: var(--muted); }
   function pushScene() {
     if (!sharedTable || sharedTable.role() !== "gm") return;
     try { battleMap; labPanel; } catch { return; } // not mounted yet (the page is still starting)
-    sharedTable.pushScene(() => ({ map: battleMap.snapshot(), fight: labPanel && labPanel.scene ? labPanel.scene() : null }));
+    sharedTable.pushScene(() => ({ map: battleMap.snapshot(), fight: labPanel && labPanel.scene ? labPanel.scene() : null, homebrew: homebrewUI ? homebrewUI.snapshot() : null }));
   }
   // A player's view of the GM's map and fight, on their play tab.
   let viewerMap = null;
@@ -3627,6 +3633,9 @@ tr.lvl-U td.target { color: var(--muted); }
   mountGmLock({ table: sharedTable, game: PACK.id, view: $("view-gm"), book: books ? books.gm : null, esc, toast,
     onBook: () => { let at = "players"; try { at = sessionStorage.getItem(PACK.id + ".guide") || "players"; } catch {} showBook(at === "gm" ? "gm" : "players"); } });
   protectText($("guide"), "The guides are © Don Smallwood: please don't copy them.", toast);
+  // Homebrew: the GM makes it in the GM view; players get it from a file or when they join the GM's shared table.
+  homebrewUI = mountHomebrew({ PACK, gmRoot: $("hb-card"), noteRoot: $("hb-note"), fileRoot: $("hb-file"), esc, toast, saveText });
+  pushScene();
   $("guide-toc").addEventListener("click", (e) => { const a = e.target.closest("a[data-chap]"); if (a) { e.preventDefault(); showChapter(document.getElementById($("guide-pager").dataset.root), +a.dataset.chap); } });
   $("guide-pager").addEventListener("click", (e) => { const b = e.target.closest("[data-chapgo]"); if (b) showChapter(document.getElementById($("guide-pager").dataset.root), +b.dataset.chapgo); });
 
@@ -3647,7 +3656,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   // ---- the GM view: one group of panels at a time ----
   const GM_GROUPS = [["table", "Table and characters", ["#gm-table", ".gm-top", "#gm-grid"]], ["fight", "Map and fight", [".bm-card", "#lab"]],
-    ...(DISC ? [["discovery", `Discovery: ${capFirst(DISC.cards)}`, ["#disc-card"]]] : []), ["tools", "Clocks and tools", [".gm-tools"]]];
+    ...(DISC ? [["discovery", `Discovery: ${capFirst(DISC.cards)}`, ["#disc-card"]]] : []), ["tools", "Clocks and tools", [".gm-tools"]], ["homebrew", "Homebrew", ["#hb-card"]]];
   for (const [id, , sels] of GM_GROUPS) for (const q of sels) { const el = document.querySelector("#view-gm " + q); if (el) el.dataset.gmpane = id; }
   $("gm-tabs").innerHTML = GM_GROUPS.map(([id, name]) => `<button type="button" class="tab" role="tab" data-gmtab="${id}">${esc(name)}</button>`).join("");
   function showGmTab(id) {
@@ -3662,7 +3671,7 @@ tr.lvl-U td.target { color: var(--muted); }
 
   // The play tab: the cards beside the sheet, a group at a time. On a phone the sheet itself is a group too.
   const NARROW = matchMedia("(max-width: 900px)");
-  const SHEET_GROUPS = [["char", "Character", ["#sheet-main"]], ["roll", "Roll", ["#card-condition", "#card-roll", "#card-weapon"]], ["table", "Table", ["#card-table", "#card-fight"]],
+  const SHEET_GROUPS = [["char", "Character", ["#sheet-main"]], ["roll", "Roll", ["#card-condition", "#card-roll", "#card-weapon"]], ["table", "Table", ["#hb-note", "#card-table", "#card-fight"]],
     ...(DISC ? [["cards", capFirst(DISC.cards), ["#card-cards"]]] : []), ["tracks", "Clocks", ["#card-clocks", "#card-ship"]], ["ref", "Reference", ["#card-ref"]]];
   for (const [id, , sels] of SHEET_GROUPS) for (const q of sels) { const el = document.querySelector("#view-sheet " + q); if (el) el.dataset.sheetpane = id; }
   $("sheet-tabs").innerHTML = SHEET_GROUPS.map(([id, name]) => `<button type="button" class="tab${id === "char" ? " narrow-only" : ""}" role="tab" data-sheettab="${id}">${esc(name)}</button>`).join("");

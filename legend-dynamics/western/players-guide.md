@@ -1268,6 +1268,16 @@ If the origin changes shape, give the form attribute bonuses (usually +2 to one 
 
 **Ghost-touched (tier 1).** You died once, for a minute, and came back with something following you. *Adjustments:* Will +1, Body −1. *Core rule:* the dead notice you: you can sense a ghost nearby, but ghosts can sense you too. *Origin advantage:* **Speaks with the Dead**: +2 to Occult to call up and question a ghost. *Companion:* **Cold Company**: something from the other side follows you; when it matters, accept the chill, the stopped clock or the panicked horse.
 
+## Threats, weapons and Edges for your table
+
+A GM can add their own threats, weapons and Edges. Keep them in line with the book's:
+
+- **Threats.** A minor foe has 1 box; an ordinary one 3; a tough one 4 or 5; a rare horror 6. Attack targets run 11 to 13 for most, 14 or 15 for the dangerous. Dodge runs 7 to 10. Give it one special trait, said plainly, and decide what it does before play.
+- **Weapons.** Hits mark 1 box for fists, knives and arrows; 2 for swords and guns; 3 for the heavy and the point-blank; 4 only for explosives and the monstrous. Give a weapon a reach (melee) or a range band, and its shots if they run out.
+- **Edges.** An Edge is worth about as much as one of the book's: a narrow, useful benefit, often once per session or per job. Say exactly what it does.
+
+**In the creator.** The GM view's **Homebrew** tab keeps your threats, weapons and Edges. They then work like the book's, marked *homebrew*: threats in the Encounter panel and on the battle map, weapons in characters' gear and the roller, Edges in the creator. Players get them when they join your shared table, or from a homebrew file you give them. A special trait or Edge is a note the GM applies at the table.
+
 # Complications
 
 Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Grit point if you accept it. Every complication needs a trigger agreed with the GM; the creator suggests three for each.
