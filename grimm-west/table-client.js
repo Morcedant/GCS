@@ -11,7 +11,7 @@
 // hear it through api.onScene(scene) and send sendMove(key, to) and sendAsk(request); the GM hears api.onMove(move), and
 // a player's requests wait in the GM's panel until fillAsk(ask) puts one into the encounter panel.
 // Returns { live(), roll(req) → Promise<entry>, setCharacter(name), shareMine, pushPlay, isHere(ownerName), role(),
-//   pushScene, sendMove, sendAsk, scene() }.
+//   pushScene, sendMove, sendAsk, scene(), server(), access(), setAccess(code) }.
 function mountTable(api) {
   const esc = api.esc, KEY = api.key + ".table.v1";
   const say = (m, err) => (api.toast ? api.toast(m, err) : null);
@@ -334,5 +334,8 @@ function mountTable(api) {
   character = String(api.character() || "").trim();
   render();
   if (st.joined && st.code && base()) connect(); // back at the table after a reload
-  return { live: () => live, roll, setCharacter, shareMine, pushPlay, isHere, role: () => (live && you ? you.role : null), pushScene, sendMove, sendAsk, scene: () => scene };
+  // The GM access code, shared with the GM view's lock (gm-lock.js): typed once, kept in this browser.
+  const setAccess = (c) => { st.access = String(c || "").trim(); st.needAccess = !st.access; save(); render(); };
+  return { live: () => live, roll, setCharacter, shareMine, pushPlay, isHere, role: () => (live && you ? you.role : null), pushScene, sendMove, sendAsk, scene: () => scene,
+    server: base, access: () => st.access || "", setAccess };
 }

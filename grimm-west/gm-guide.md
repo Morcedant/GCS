@@ -3,7 +3,7 @@ title: "Grimm GM's Guide"
 subtitle: "Running Gothic horror in the Grimm-verse: cases, threats and the GM's tools"
 ---
 
-This book is for whoever runs the game, and anyone can read it. It gathers what the GM reaches for at the table: case seeds, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.
+This book is for whoever runs the game. It gathers what the GM reaches for at the table: case seeds, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.
 
 # Running cases
 
