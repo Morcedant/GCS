@@ -161,13 +161,14 @@ def main():
     core_docx = LD / "Legend_Dynamics_Core_Rules.docx"
     copy(core_docx, f"core-rules/{core_docx.name}")
     write("core-rules/index.html", page(bw.CORE_SLUG, "Core rules · Legend Dynamics", "The Legend Dynamics core rules, shared by every setting.",
-                                        [downloads([(f"{bw.CORE_SLUG}/{core_docx.name}", "Core rules (Word)")])] + [b for b in blocks(bw.core_rules()) if "rel=\"license" not in b],
+                                        (lambda cr: cr[:1] + [downloads([(f"{bw.CORE_SLUG}/{core_docx.name}", "Core rules (Word)")])] + cr[1:])(  # the title first, then the download
+                                            [b for b in blocks(bw.core_rules()) if "rel=\"license" not in b]),
                                         fonts=font_links({bw.BRAND_FONTS})))
 
     write(bw.WHY_SLUG.strip("/") + "/index.html", page(bw.WHY_SLUG, "Why Legend Dynamics · Legend Dynamics", "Why the Legend Dynamics roleplaying game system was made: the 3d6 bell curve married to Fate's narrative heart.",
                                                      blocks(bw.why_page()), fonts=font_links({bw.BRAND_FONTS})))
 
-    write(bw.TABLE_SLUG.strip("/") + "/index.html", page(bw.TABLE_SLUG, "The shared table · Legend Dynamics", "Play Legend Dynamics online with the shared table, and host your own table server on Cloudflare.",
+    write(bw.TABLE_SLUG.strip("/") + "/index.html", page(bw.TABLE_SLUG, "The shared table · Legend Dynamics", "Play Legend Dynamics online with the shared table" + (", and host your own table server on Cloudflare." if bw.TABLE_HOSTING else "."),
                                                        blocks(bw.table_page()), fonts=font_links({bw.BRAND_FONTS})))
 
     write(bw.CONTACT_SLUG.strip("/") + "/index.html", page(bw.CONTACT_SLUG, "Contact · Legend Dynamics", "Comments, questions and stories for the maker of the Legend Dynamics roleplaying games.",
@@ -191,6 +192,8 @@ def main():
         # The handout is written as an artifact page (no document skeleton); give it one, and a way back.
         h = (LD / g / "discord-commands.html").read_text()
         h = h.replace('<div class="wrap">', f'<div class="wrap">\n  <a href="{bw.DISCORD_SLUG}/">← Legend Dynamics · Play on Discord</a>', 1)
+        # Its title at the size of every other page's title on the site (.ld-hero h1 in custom.css).
+        h = h.replace("</style>", "  h1 { font-size: clamp(1.3rem, 3.5vw, 2.5rem); line-height: 1.1; }\n</style>", 1)
         write(f"discord/{SLUGS[g].strip('/')}/index.html",
               '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
               '<link rel="icon" href="/favicon.svg" type="image/svg+xml">\n' + h)
