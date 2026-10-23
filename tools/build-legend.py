@@ -693,6 +693,7 @@ def build(pid, docx):
     tpl = tpl.replace("/* BATTLEMAP */", (ENGINE / "battlemap.js").read_text().replace("</", "<\\/"))
     tpl = tpl.replace("/* TABLECLIENT */", (ENGINE / "table-client.js").read_text().replace("</", "<\\/"))
     tpl = tpl.replace("/* GMLOCK */", (ENGINE / "gm-lock.js").read_text().replace("</", "<\\/"))
+    tpl = tpl.replace("/* HOMEBREW */", (ENGINE / "homebrew.js").read_text().replace("</", "<\\/"))
     tpl = tpl.replace("{{TABLE_SERVER}}", table_server())
     tpl = tpl.replace("{{OUTCOMES}}", "".join(f"<option>{html.escape(o)}</option>" for o in pack["journal"]["outcomes"]))
     tpl = re.sub(r"\{\{theme\.(\w+)\}\}", lambda m: str(theme[m.group(1)]), tpl)

@@ -127,6 +127,11 @@ test("phase 3: the GM shares the scene; a player moves only their own token and 
   assert.match(L.checkScene(ruth, { map: {} }).error, /Only the GM/);
   assert.deepEqual(L.checkScene(gm, { map: { kind: "hex" }, fight: null }).scene, { map: { kind: "hex" }, fight: null });
   assert.match(L.checkScene(gm, { map: { x: "y".repeat(L.MAX_SCENE) } }).error, /too large/);
+  // The GM's homebrew rides along, within its own size limit; anything else is dropped.
+  assert.deepEqual(L.checkScene(gm, { map: null, homebrew: { threats: [{ name: "Ghoul" }] } }).scene.homebrew, { threats: [{ name: "Ghoul" }] });
+  assert.equal(L.checkScene(gm, { homebrew: { x: "y".repeat(L.MAX_HOMEBREW) } }).scene.homebrew, undefined);
+  assert.equal(L.checkScene(gm, { homebrew: [1] }).scene.homebrew, undefined);
+  assert.equal(L.checkScene(gm, { other: 1 }).scene.other, undefined);
   assert.deepEqual(L.checkMove(sheets, ruth, { key: "r1", to: { q: 3, r: -2 } }).move, { key: "r1", by: "Ruth", to: { q: 3, r: -2 } });
   assert.deepEqual(L.checkMove(sheets, ruth, { key: "r1", to: { lane: 2, y: 140.6 } }).move.to, { lane: 2, y: 141 });
   assert.match(L.checkMove(sheets, kim, { key: "r1", to: { q: 1, r: 1 } }).error, /only your own/);

@@ -226,10 +226,13 @@ export function removeOwner(table, sheets, owner) {
 // Players can drag their own token (the move goes to the GM's map) and, on their turn, ask for an action; the GM runs it.
 export const MAX_SCENE = 65_536;
 
-/** The GM's scene: { map?, fight? }, kept as sent (it's only shown). @param {any} who @param {any} msg */
+export const MAX_HOMEBREW = 32_768;
+/** The GM's scene: { map?, fight?, homebrew? }, kept as sent (it's only shown; the homebrew, the GM's own threats, weapons
+ * and Edges, is checked again by each player's page before it's used). @param {any} who @param {any} msg */
 export function checkScene(who, msg) {
   if (who.role !== "gm") return { error: "Only the GM shares the map and the fight." };
-  const scene = { map: msg.map && typeof msg.map === "object" ? msg.map : null, fight: msg.fight && typeof msg.fight === "object" ? msg.fight : null };
+  const hb = msg.homebrew && typeof msg.homebrew === "object" && !Array.isArray(msg.homebrew) && JSON.stringify(msg.homebrew).length <= MAX_HOMEBREW ? msg.homebrew : null;
+  const scene = { map: msg.map && typeof msg.map === "object" ? msg.map : null, fight: msg.fight && typeof msg.fight === "object" ? msg.fight : null, ...(hb ? { homebrew: hb } : {}) };
   if (JSON.stringify(scene).length > MAX_SCENE) return { error: "The map is too large to share." };
   return { scene };
 }

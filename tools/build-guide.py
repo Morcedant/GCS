@@ -78,6 +78,13 @@ def main():
     if "/* GMLOCK:START */" in app:
         gl = (ROOT / "legend-dynamics" / "engine" / "gm-lock.js").read_text().replace("</", "<\\/")
         app = re.sub(r"/\* GMLOCK:START \*/.*?/\* GMLOCK:END \*/", lambda _: "/* GMLOCK:START */\n" + gl + "/* GMLOCK:END */", app, flags=re.S)
+    # A page with HOMEBREW markers gets the GM's homebrew threats and weapons (legend-dynamics/engine/homebrew.js, or the
+    # game's own copy where the branch has no engine).
+    if "/* HOMEBREW:START */" in app:
+        src = ROOT / a.game / "homebrew.js"
+        src = src if src.exists() else ROOT / "legend-dynamics" / "engine" / "homebrew.js"
+        hb = src.read_text().replace("</", "<\\/")
+        app = re.sub(r"/\* HOMEBREW:START \*/.*?/\* HOMEBREW:END \*/", lambda _: "/* HOMEBREW:START */\n" + hb + "/* HOMEBREW:END */", app, flags=re.S)
     app = stamp(app, APP)  # the version footer: a fingerprint of the page, and the day it last changed
     APP.write_text(app)
     print(f"updated {APP.relative_to(ROOT)}")
