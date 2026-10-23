@@ -1499,6 +1499,8 @@ tr.lvl-U td.target { color: var(--muted); }
   // Edges: those chosen at creation (the tier's budget) plus those bought later with advancement points.
   const edgeRaw = (k, c = ch) => (c.edges || {})[k] || 0;
   const edgeN = (k, c = ch) => edgeRaw(k, c) + ((c.edgesBought || {})[k] || 0);
+  // Homebrew Edges with bonuses the table works out (homebrew.js): a skill, Dodge or Move.
+  const hbBonus = (kind, c = ch, skill) => hbEdgeBonus(PACK, (k) => edgeN(k, c), kind, skill);
   const edgesAvail = (c = ch) => EDGE_POINTS - tierOf(c);
   const edgesSpent = (c = ch) => EDGE_DEFS.reduce((a, [k]) => a + edgeRaw(k, c), 0);
   const pool = () => 5 + edgeN("attr");
@@ -1594,10 +1596,10 @@ tr.lvl-U td.target { color: var(--muted); }
     ...(c.powersLearned || []).map((x) => ({ id: x.id, base: "I", cl: x.cl, learned: true })),
   ].filter((x) => x.id);
   const levelName = (l, name) => ((l === "S" && isGS() && !(name && advancedToS(name))) || (l === "S" && masterSkill(name)) ? "Expert" : LEVELS[l].name);
-  const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
-  const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge);
+  const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name) + hbBonus("skill", ch, name); };
+  const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge) + hbBonus("dodge");
   // Move in yards, in the current form (a form's Agility and Body count while in it).
-  const moveOf = (c = ch) => LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c));
+  const moveOf = (c = ch) => LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c)) + hbBonus("move", c);
   // Move as the character's injuries leave it (wounded −2 yards, seriously wounded half and no running).
   const moveNow = (c = ch) => LD.injuredMove(moveOf(c), (c.play && c.play.injury) || 0);
   const runNow = (c = ch) => ((c.play && c.play.injury) >= 2 ? 0 : moveNow(c) * 2);
@@ -3266,6 +3268,7 @@ tr.lvl-U td.target { color: var(--muted); }
   // where a test configuration exists. Never used by the sheet. ----
   if ((PACK.arms || []).length) {
     labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText, gritty: () => gritty,
+      traitsFor: (c) => hbEdgeTraits(PACK, (k) => edgeN(k, c)), // homebrew Edges' fight traits
       mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
       onScene: () => pushScene(), // the shared table's players see the fight
       crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },

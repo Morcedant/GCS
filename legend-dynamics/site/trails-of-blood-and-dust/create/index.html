@@ -624,7 +624,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="a3749de" data-version-date="2026.10.23" title="The code changes whenever this page changes.">Version 2026.10.23 · a3749de</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="6dccb15" data-version-date="2026.10.23" title="The code changes whenever this page changes.">Version 2026.10.23 · 6dccb15</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -4145,7 +4145,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Spells.</strong> A new hex, cantrip or psionic power matches the setting’s own: an attack marks 1 or 2 boxes at Close or Short range, and anything stronger says who resists and what it costs.</li>
 <li><strong>Rituals.</strong> Give a ritual its weight (Minor 2 segments, Significant 4, Major 6), the time a roll takes, what it does and its price.</li>
 </ul>
-<p><strong>In the creator.</strong> The GM view’s <strong>Homebrew</strong> tab keeps your threats, weapons, Edges, cards, powers, spells and rituals. They then work like the book’s, marked <em>homebrew</em>: threats in the Encounter panel and on the battle map, weapons in characters’ gear and the roller, Edges, powers and spells among the creator’s choices, cards where findings are recorded, and rituals in a ritual book beside <em>Rituals by heart</em>. Players get them when they join your shared table, or from a homebrew file you give them. A special trait or Edge is a note the GM applies at the table.</p>
+<p><strong>In the creator.</strong> The GM view’s <strong>Homebrew</strong> tab keeps your threats, weapons, Edges, cards, powers, spells and rituals. They then work like the book’s, marked <em>homebrew</em>: threats in the Encounter panel and on the battle map, weapons in characters’ gear and the roller, Edges, powers and spells among the creator’s choices, cards where findings are recorded, and rituals in a ritual book beside <em>Rituals by heart</em>. Players get them when they join your shared table, or from a homebrew file you give them. Bonuses chosen from the tab’s menus are worked out for you: a weapon’s accuracy, strong hits and what it’s made of; a threat’s hard hide, weaknesses, what alone can hurt it and how hard it is to hit; an Edge’s skill, Dodge or Move bonus and extra defense; an attack spell cast in the Encounter panel. Anything else is a note the GM applies at the table.</p>
 <h1 id="g-complications">Complications</h1>
 <p>Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Grit point if you accept it. Every complication needs a trigger agreed with the GM; the creator suggests three for each.</p>
 <table>
@@ -6582,6 +6582,8 @@ return { mountLab };
   // Edges: those chosen at creation (the tier's budget) plus those bought later with advancement points.
   const edgeRaw = (k, c = ch) => (c.edges || {})[k] || 0;
   const edgeN = (k, c = ch) => edgeRaw(k, c) + ((c.edgesBought || {})[k] || 0);
+  // Homebrew Edges with bonuses the table works out (homebrew.js): a skill, Dodge or Move.
+  const hbBonus = (kind, c = ch, skill) => hbEdgeBonus(PACK, (k) => edgeN(k, c), kind, skill);
   const edgesAvail = (c = ch) => EDGE_POINTS - tierOf(c);
   const edgesSpent = (c = ch) => EDGE_DEFS.reduce((a, [k]) => a + edgeRaw(k, c), 0);
   const pool = () => 5 + edgeN("attr");
@@ -6677,10 +6679,10 @@ return { mountLab };
     ...(c.powersLearned || []).map((x) => ({ id: x.id, base: "I", cl: x.cl, learned: true })),
   ].filter((x) => x.id);
   const levelName = (l, name) => ((l === "S" && isGS() && !(name && advancedToS(name))) || (l === "S" && masterSkill(name)) ? "Expert" : LEVELS[l].name);
-  const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name); };
-  const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge);
+  const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name) + hbBonus("skill", ch, name); };
+  const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge) + hbBonus("dodge");
   // Move in yards, in the current form (a form's Agility and Body count while in it).
-  const moveOf = (c = ch) => LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c));
+  const moveOf = (c = ch) => LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c)) + hbBonus("move", c);
   // Move as the character's injuries leave it (wounded −2 yards, seriously wounded half and no running).
   const moveNow = (c = ch) => LD.injuredMove(moveOf(c), (c.play && c.play.injury) || 0);
   const runNow = (c = ch) => ((c.play && c.play.injury) >= 2 ? 0 : moveNow(c) * 2);
@@ -9003,6 +9005,28 @@ function hbId(v, name, taken) {
   for (let i = 2; taken.has(id); i++) id = id.replace(/-\d+$/, "") + "-" + i;
   taken.add(id); return id;
 }
+// Bonuses the table works out, chosen from a menu: each maps onto something the rules engine already applies.
+function hbMats(PACK, v) { const ok = new Set((PACK.materials || []).map((m) => m[0])); return [...new Set(Array.isArray(v) ? v : [])].filter((m) => ok.has(m)).slice(0, 4); }
+function hbWeaponBonus(PACK, b) { b = b && typeof b === "object" ? b : {}; return { accuracy: hbInt(b.accuracy, 0, 2, 0), aimedOnly: !!b.aimedOnly, strong: !!b.strong, materials: hbMats(PACK, b.materials) }; }
+function hbThreatBonus(PACK, b) { b = b && typeof b === "object" ? b : {};
+  return { armor: !!b.armor, hardToHit: hbInt(b.hardToHit, 0, 2, 0), weak: hbMats(PACK, b.weak), onlyBy: hbMats(PACK, b.onlyBy), onlyMax: hbInt(b.onlyMax, 0, 1, 1), shrug: !!b.shrug, extraDefense: !!b.extraDefense }; }
+function hbEdgeBonusClean(b, skills) { b = b && typeof b === "object" ? b : {};
+  return { skill: skills.includes(b.skill) ? b.skill : "", skillValue: skills.includes(b.skill) ? hbInt(b.skillValue, 0, 2, 0) : 0, dodge: hbInt(b.dodge, 0, 1, 0), move: hbInt(b.move, 0, 3, 0), extraDefense: !!b.extraDefense, shrugTelling: !!b.shrugTelling }; }
+// A character's bonus from homebrew Edges (count(id): how many times they have it): "skill" (for one skill), "dodge" or "move".
+function hbEdgeBonus(PACK, count, kind, skill) {
+  let n = 0;
+  for (const x of PACK.hbEdges || []) { const k = count(x.id) || 0, b = x.bonus; if (!k || !b) continue;
+    n += kind === "skill" ? (b.skill === skill ? b.skillValue : 0) * k : kind === "dodge" ? b.dodge * k : kind === "move" ? b.move * k : 0; }
+  return n;
+}
+// The fight traits homebrew Edges give a character in the Encounter panel.
+function hbEdgeTraits(PACK, count) {
+  const out = [];
+  for (const x of PACK.hbEdges || []) { if (!count(x.id) || !x.bonus) continue;
+    if (x.bonus.extraDefense) out.push({ type: "extraDefense", value: 1, label: x.name });
+    if (x.bonus.shrugTelling) out.push({ type: "shrugTelling", oncePerFight: true, label: x.name }); }
+  return out;
+}
 // The skills a weapon can use: the ones the setting's own weapons use.
 function hbSkills(PACK) { return [...new Set((PACK.arms || []).filter((a) => !a.hazard && !a.homebrew).map((a) => a.skill))]; }
 
@@ -9014,7 +9038,7 @@ function hbClean(raw, PACK) {
     const melee = w.kind !== "ranged";
     return { id: hbId(w.id, name, taken), name, skill: skills.includes(w.skill) ? w.skill : skills[0] || "Melee", kind: melee ? "melee" : "ranged",
       ...(melee ? { reach: hbInt(w.reach, 1, 3, 1) } : { band: hbBands().some((b) => b[0] === w.band) ? w.band : "close", rounds: hbInt(w.rounds, 0, 30, 0) }),
-      boxes: hbInt(w.boxes, 1, 4, 1), note: hbText(w.note, 200) };
+      boxes: hbInt(w.boxes, 1, 4, 1), note: hbText(w.note, 200), bonus: hbWeaponBonus(PACK, w.bonus) };
   }).filter(Boolean);
   const armIds = new Set([...(PACK.arms || []).filter((a) => !a.hazard && !a.homebrew).map((a) => a.id), ...weapons.map((w) => w.id)]);
   const threats = (Array.isArray(r.threats) ? r.threats : []).slice(0, hbLimits().threats).map((t) => {
@@ -9022,16 +9046,20 @@ function hbClean(raw, PACK) {
     const ws = [...new Set((Array.isArray(t.weapons) ? t.weapons : []).filter((id) => armIds.has(id)))].slice(0, 3);
     if (!ws.length) return null;
     return { id: hbId(t.id, name, taken), name, minor: !!t.minor, target: hbInt(t.target, 3, 18, 12), dodge: hbInt(t.dodge, 3, 18, 8),
-      boxes: t.minor ? 1 : hbInt(t.boxes, 1, 6, 3), weapons: ws, trait: hbText(t.trait, 40), traitText: hbText(t.traitText, 300) };
+      boxes: t.minor ? 1 : hbInt(t.boxes, 1, 6, 3), weapons: ws, trait: hbText(t.trait, 40), traitText: hbText(t.traitText, 300), bonus: hbThreatBonus(PACK, t.bonus) };
   }).filter(Boolean);
   const edges = (Array.isArray(r.edges) ? r.edges : []).slice(0, hbLimits().edges).map((x) => {
     const name = hbText(x && x.name, 40), text = hbText(x && x.text, 300); if (!name || !text) return null;
-    return { id: hbId(x.id, name, taken), name, text, limit: hbInt(x.limit, 1, 3, 1) };
+    const allSkills = [...new Set([...skills, ...(PACK.skills || []).map((x) => x[0])])], bonus = hbEdgeBonusClean(x.bonus, allSkills);
+    // An Edge with a number bonus is taken once, so it can't stack past the book's limits.
+    return { id: hbId(x.id, name, taken), name, text, limit: bonus.skillValue || bonus.dodge || bonus.move ? 1 : hbInt(x.limit, 1, 3, 1), bonus };
   }).filter(Boolean);
   const list = (k) => (Array.isArray(r[k]) ? r[k] : []).slice(0, hbLimits()[k]);
   const spells = list("spells").map((x) => {
     const name = hbText(x && x.name, 40), text = hbText(x && x.text, 300); if (!name || !text) return null;
-    return { id: hbId(x.id, name, taken), name, text };
+    const a = x.attack && typeof x.attack === "object" ? x.attack : {};
+    // An attack spell: it can be cast as an attack in the Encounter panel, with the setting's spell skill.
+    return { id: hbId(x.id, name, taken), name, text, attack: { boxes: hbInt(a.boxes, 0, 3, 0), band: hbBands().some((b) => b[0] === a.band) ? a.band : "short" } };
   }).filter(Boolean);
   const cards = list("cards").map((x) => {
     const name = hbText(x && x.name, 40), knowledge = hbText(x && x.knowledge, 300); if (!name || !knowledge) return null;
@@ -9057,6 +9085,18 @@ function hbLoad(PACK) {
 }
 function hbSave(PACK, hb) { try { localStorage.setItem(hbKey(PACK.id), JSON.stringify(hb)); return true; } catch { return false; } }
 
+/** A homebrew threat's bonuses, as the engine's traits. */
+function hbThreatTraits(PACK, t) {
+  const b = t.bonus || {}, mat = (id) => ((PACK.materials || []).find((m) => m[0] === id) || [id, id])[1], out = [];
+  if (b.armor) out.push({ type: "armor", always: true, minBoxes: 2, label: `${t.name}: hard hide` });
+  if (b.hardToHit) out.push({ type: "attackPenalty", value: -b.hardToHit, label: `${t.name}: hard to hit` });
+  for (const m of b.weak || []) out.push({ type: "weakness", material: m, extra: 1, label: `Weak to ${mat(m).toLowerCase()}` });
+  if ((b.onlyBy || []).length) out.push({ type: "capBoxes", max: b.onlyMax, except: b.onlyBy, label: `Only ${b.onlyBy.map((m) => mat(m).toLowerCase()).join(" or ")} ${b.onlyMax ? "marks more than 1 box" : "hurts it"}` });
+  if (b.shrug) out.push({ type: "ignoreHits", oncePerFight: true, maxBoxes: 1, label: `${t.name}: shrugs it off` });
+  if (b.extraDefense) out.push({ type: "extraDefense", value: 1, label: `${t.name}: quick` });
+  return out;
+}
+
 /** Add homebrew to the page's data, as the setting's own entries are shaped. */
 function hbApply(PACK, hb) {
   if (!hbCount(hb)) return;
@@ -9064,7 +9104,10 @@ function hbApply(PACK, hb) {
   const band = (b) => (hbBands().find((x) => x[0] === b) || ["", b])[1];
   for (const w of hb.weapons) {
     const range = w.kind === "melee" ? `Melee, reach ${w.reach} yd` : band(w.band);
-    PACK.arms.push({ id: w.id, name: w.name, skill: w.skill, homebrew: true, traits: [],
+    const bn = w.bonus || {}, traits = [];
+    if (bn.accuracy) traits.push({ type: "accuracy", value: bn.accuracy, ...(bn.aimedOnly ? { requires: { aimed: true } } : {}), label: `${w.name}: accurate` });
+    if (bn.strong) traits.push({ type: "marginDamage", margin: 5, damage: { boxes: w.boxes + 1 }, label: `${w.name}: strong hit` });
+    PACK.arms.push({ id: w.id, name: w.name, skill: w.skill, homebrew: true, traits, ...(bn.materials && bn.materials.length ? { materials: bn.materials } : {}),
       ...(w.kind === "melee" ? { reach: "melee", reachYards: w.reach, damage: { melee: { boxes: w.boxes } } } : { band: w.band, damage: { any: { boxes: w.boxes } } }),
       ...(w.rounds ? { ammo: w.id, firearm: true } : {}),
       rows: [[`${w.name} (homebrew)`, range, String(w.boxes), w.note || "—"]] });
@@ -9076,11 +9119,16 @@ function hbApply(PACK, hb) {
     const ws = t.weapons.map(arm).filter(Boolean);
     PACK.threats.push({ id: t.id, name: t.name, label: `${t.name} (homebrew${t.minor ? ", minor" : ""})`, minor: t.minor, homebrew: true,
       attacks: [...new Set(ws.map((a) => a.skill))].map((skill) => ({ skill, target: t.target })), dodge: t.dodge, boxes: t.boxes, boxesText: String(t.boxes),
-      weaponText: ws.map((a) => a.name).join(", "), weapons: ws.map((a) => a.id), trait: t.trait || "Homebrew", traitText: t.traitText || "A GM's own creation." });
+      weaponText: ws.map((a) => a.name).join(", "), weapons: ws.map((a) => a.id), trait: t.trait || "Homebrew", traitText: t.traitText || "A GM's own creation.", traits: hbThreatTraits(PACK, t) });
   }
   for (const x of hb.edges) PACK.extraEdges.push([x.id, `${x.name} (homebrew)`, x.text, x.limit]);
+  PACK.hbEdges = hb.edges.map((x) => ({ id: x.id, name: x.name, bonus: x.bonus }));
   const has = hbHas(PACK);
-  if (has.spells) for (const x of hb.spells) PACK.spells.list.push([x.id, `${x.name} (homebrew)`, x.text]);
+  if (has.spells) for (const x of hb.spells) {
+    PACK.spells.list.push([x.id, `${x.name} (homebrew)`, x.text]);
+    if (x.attack && x.attack.boxes) PACK.arms.push({ id: x.id + "-attack", name: x.name, skill: PACK.spells.skill, cantrip: x.id, homebrew: true, traits: [], band: x.attack.band,
+      damage: { any: { boxes: x.attack.boxes } }, rows: [[`${x.name} (homebrew)`, band(x.attack.band), String(x.attack.boxes), x.text]] });
+  }
   if (has.cards && hb.cards.length) PACK.discovery.subjects = [...(PACK.discovery.subjects || []), ...hb.cards.map((x) => [x.id, x.name, x.knowledge, x.permits || ""])];
   if (has.rituals) PACK.ritualBook = hb.rituals.map((x) => ({ ...x }));
   if (has.powers) for (const x of hb.powers) {
@@ -9111,6 +9159,18 @@ function mountHomebrew(api) {
   const item = (kind, x, line) => `<li><b>${esc(x.name)}<\/b> <span class="muted small">${esc(line)}<\/span>
     <span class="btn-row" style="display:inline-flex;margin:0 0 0 6px"><button type="button" class="linkish" data-hbedit="${kind}" data-id="${esc(x.id)}">Edit<\/button><button type="button" class="linkish" data-hbdel="${kind}" data-id="${esc(x.id)}">Delete<\/button><\/span><\/li>`;
   const find = (kind, id) => (hb[kind] || []).find((x) => x.id === id) || null;
+  // The bonus menus: what's chosen here, the table works out.
+  const MATS = PACK.materials || [], matName = (id) => ((MATS.find((m) => m[0] === id) || [id, id])[1]);
+  const box = (name, on, label) => `<label><input type="checkbox" name="${name}"${on ? " checked" : ""}> ${label}<\/label>`;
+  const matBoxes = (name, sel) => MATS.length ? `<div class="checks">${MATS.map(([id, n]) => box(`${name}:${id}`, (sel || []).includes(id), esc(n))).join("")}<\/div>` : "";
+  const bonusBlock = (inner) => `<fieldset class="field wide hb-bonus"><legend class="label">Bonuses the table works out<\/legend>${inner}<\/fieldset>`;
+  const plus = (n) => (n > 0 ? "+" + n : String(n));
+  const weaponBonusLine = (b) => !b ? "" : [b.accuracy ? `${plus(b.accuracy)} to hit${b.aimedOnly ? " when aimed" : ""}` : "", b.strong ? "+1 box on success by 5" : "", (b.materials || []).length ? b.materials.map(matName).join(", ") : ""].filter(Boolean).join("; ");
+  const threatBonusLine = (b) => !b ? "" : [b.armor ? "hard hide" : "", b.hardToHit ? `${plus(-b.hardToHit)} to hit it` : "", (b.weak || []).length ? `weak to ${b.weak.map(matName).join(", ")}` : "",
+    (b.onlyBy || []).length ? `only ${b.onlyBy.map(matName).join(" or ")} ${b.onlyMax ? "marks more than 1" : "hurts it"}` : "", b.shrug ? "shrugs off a 1-box hit once" : "", b.extraDefense ? "a second defense" : ""].filter(Boolean).join("; ");
+  const edgeBonusLine = (b) => !b ? "" : [b.skillValue ? `${plus(b.skillValue)} ${b.skill}` : "", b.dodge ? `${plus(b.dodge)} Dodge` : "", b.move ? `+${b.move} yd Move` : "", b.extraDefense ? "a second defense in fights" : "", b.shrugTelling ? "shrugs off a telling hit once a fight" : ""].filter(Boolean).join("; ");
+  const withBonus = (line, b) => (b ? `${line}. Bonuses: ${b}` : line);
+  const checkedMats = (f, name) => MATS.map(([id]) => id).filter((id) => f.elements[`${name}:${id}`] && f.elements[`${name}:${id}`].checked);
 
   function weaponForm() {
     const w = editing && editing[0] === "weapons" ? find("weapons", editing[1]) : null, melee = !w || w.kind === "melee";
@@ -9123,6 +9183,9 @@ function mountHomebrew(api) {
       <div class="field" data-hbranged${melee ? " hidden" : ""}><label>Range<\/label><select name="band">${opts(hbBands(), w && w.band ? w.band : "close")}<\/select><\/div>
       <div class="field" data-hbranged${melee ? " hidden" : ""}><label>Shots before reloading (0 = none to track)<\/label><input name="rounds" type="number" min="0" max="30" value="${w && w.rounds ? w.rounds : 0}"><\/div>
       <div class="field wide"><label>Note (what a hit does, any special rule, agreed at the table)<\/label><input name="note" maxlength="200" value="${esc(w ? w.note : "")}"><\/div>
+      ${bonusBlock(`<div class="fields"><div class="field"><label>Accuracy<\/label><select name="b-accuracy">${opts([["0", "None"], ["1", "+1 to hit"], ["2", "+2 to hit"]], String(w && w.bonus ? w.bonus.accuracy : 0))}<\/select><\/div>
+        <div class="field"><div class="checks">${box("b-aimed", w && w.bonus && w.bonus.aimedOnly, "Only when aimed")}${box("b-strong", w && w.bonus && w.bonus.strong, "Strong hit: success by 5 marks 1 more box")}<\/div><\/div><\/div>
+        ${MATS.length ? `<span class="small muted">Made of (counts against weaknesses):<\/span>${matBoxes("b-mat", w && w.bonus && w.bonus.materials)}` : ""}`)}
       <div class="btn-row field wide"><button class="btn primary" type="submit">${w ? "Save changes" : "Add the weapon"}<\/button>${w ? `<button type="button" class="linkish" data-hbcancel>Cancel<\/button>` : ""}<\/div><\/form>`;
   }
   function threatForm() {
@@ -9138,6 +9201,10 @@ function mountHomebrew(api) {
       <div class="field"><label>Weapon<\/label>${sel(0)}<\/div><div class="field"><label>Second weapon<\/label>${sel(1)}<\/div><div class="field"><label>Third weapon<\/label>${sel(2)}<\/div>
       <div class="field"><label>Special trait<\/label><input name="trait" maxlength="40" value="${esc(t ? t.trait : "")}" placeholder="e.g. Grave-cold"><\/div>
       <div class="field wide"><label>What it does (the GM applies it)<\/label><input name="traitText" maxlength="300" value="${esc(t ? t.traitText : "")}" placeholder="e.g. Fire marks 1 more box; ordinary weapons 1 fewer (minimum 1)."><\/div>
+      ${(() => { const b = (t && t.bonus) || {}; return bonusBlock(`<div class="checks">${box("b-armor", b.armor, "Hard hide: a hit of 2 or more boxes marks 1 fewer")}${box("b-shrug", b.shrug, "Shrugs off a 1-box hit once a fight")}${box("b-xdef", b.extraDefense, "Quick: a second defense each round")}<\/div>
+        <div class="field"><label>Hard to hit<\/label><select name="b-hard">${opts([["0", "No"], ["1", "Attacks at −1"], ["2", "Attacks at −2"]], String(b.hardToHit || 0))}<\/select><\/div>
+        ${MATS.length ? `<span class="small muted">Weak to (marks 1 more box):<\/span>${matBoxes("b-weak", b.weak)}
+        <span class="small muted">Only hurt by:<\/span>${matBoxes("b-only", b.onlyBy)}<div class="field"><label>Anything else<\/label><select name="b-onlymax">${opts([["1", "marks at most 1 box"], ["0", "marks nothing"]], String(b.onlyMax ?? 1))}<\/select><\/div>` : ""}`); })()}
       <div class="btn-row field wide"><button class="btn primary" type="submit">${t ? "Save changes" : "Add the threat"}<\/button>${t ? `<button type="button" class="linkish" data-hbcancel>Cancel<\/button>` : ""}<\/div><\/form>`;
   }
   function edgeForm() {
@@ -9146,6 +9213,12 @@ function mountHomebrew(api) {
       <div class="field"><label>Name<\/label><input name="name" maxlength="40" required value="${esc(x ? x.name : "")}" placeholder="e.g. Iron stomach"><\/div>
       <div class="field"><label>Can be taken<\/label><select name="limit">${opts([["1", "Once"], ["2", "Up to twice"], ["3", "Up to three times"]], String(x ? x.limit : 1))}<\/select><\/div>
       <div class="field wide"><label>What it gives (the GM applies it)<\/label><input name="text" maxlength="300" required value="${esc(x ? x.text : "")}" placeholder="e.g. Once per session, ignore a poison or bad water."><\/div>
+      ${(() => { const b = (x && x.bonus) || {}, skills = (PACK.skills || []).map((k) => [k[0], k[0]]); return bonusBlock(`<div class="fields">
+        <div class="field"><label>Skill bonus<\/label><select name="b-skill"><option value="">None<\/option>${opts(skills, b.skill || "")}<\/select><\/div>
+        <div class="field"><label>By<\/label><select name="b-skillv">${opts([["1", "+1"], ["2", "+2"]], String(b.skillValue || 1))}<\/select><\/div>
+        <div class="field"><label>Move<\/label><select name="b-move">${opts([["0", "No change"], ["1", "+1 yd"], ["2", "+2 yd"], ["3", "+3 yd"]], String(b.move || 0))}<\/select><\/div><\/div>
+        <div class="checks">${box("b-dodge", b.dodge, "+1 Dodge")}${box("b-xdef", b.extraDefense, "A second defense in fights")}${box("b-shrugt", b.shrugTelling, "Shrug off a telling hit once a fight")}<\/div>
+        <span class="small muted">An Edge with a number bonus is taken once.<\/span>`); })()}
       <div class="btn-row field wide"><button class="btn primary" type="submit">${x ? "Save changes" : "Add the Edge"}<\/button>${x ? `<button type="button" class="linkish" data-hbcancel>Cancel<\/button>` : ""}<\/div><\/form>`;
   }
   const formOf = (kind, fields, label) => {
@@ -9154,7 +9227,10 @@ function mountHomebrew(api) {
       <div class="btn-row field wide"><button class="btn primary" type="submit">${x ? "Save changes" : label}<\/button>${x ? `<button type="button" class="linkish" data-hbcancel>Cancel<\/button>` : ""}<\/div><\/form>`;
   };
   const input = (x, name, label, max, ph, wide) => `<div class="field${wide ? " wide" : ""}"><label>${label}<\/label><input name="${name}" maxlength="${max}" value="${esc(x ? x[name] || "" : "")}" placeholder="${esc(ph)}"><\/div>`;
-  const spellForm = () => formOf("spells", (x) => input(x, "name", "Name", 40, "e.g. Grave Chill") + input(x, "text", "What it does (range, boxes, who resists)", 300, "e.g. A creeping cold at Close range; 1 box, and the target is Stunned (Will resists).", true), `Add the ${W.spell}`);
+  const spellForm = () => formOf("spells", (x) => input(x, "name", "Name", 40, "e.g. Grave Chill") + input(x, "text", "What it does (range, boxes, who resists)", 300, "e.g. A creeping cold at Close range; 1 box, and the target is Stunned (Will resists).", true) +
+    bonusBlock(`<div class="fields"><div class="field"><label>An attack?<\/label><select name="b-atk">${opts([["0", "No: the GM applies it"], ["1", "Yes: marks 1 box"], ["2", "Yes: marks 2 boxes"], ["3", "Yes: marks 3 boxes"]], String(x && x.attack ? x.attack.boxes : 0))}<\/select><\/div>
+      <div class="field"><label>Range<\/label><select name="b-band">${opts(hbBands(), x && x.attack ? x.attack.band : "short")}<\/select><\/div><\/div>
+      <span class="small muted">An attack ${esc(W.spell)} can be cast in the Encounter panel by anyone who knows it, with ${esc(PACK.spells ? PACK.spells.skill : "the spell skill")}; Dodge applies.<\/span>`), `Add the ${W.spell}`);
   const cardForm = () => formOf("cards", (x) => input(x, "name", "Subject", 40, "e.g. Ghoul") + input(x, "knowledge", "What's true", 300, "e.g. Fire hurts it; it can't cross running water.", true) + input(x, "permits", "What it permits", 200, "e.g. Burning or drowning one with fire or a river crossing.", true), `Add the ${W.card}`);
   const ritualForm = () => formOf("rituals", (x) => input(x, "name", "Name", 40, "e.g. Salt Circle") +
     `<div class="field"><label>Weight<\/label><select name="weight">${opts(hbWeights().map(([k, n, seg]) => [k, `${n} (${seg} segments)`]), x ? x.weight : "minor")}<\/select><\/div>` +
@@ -9175,12 +9251,12 @@ function mountHomebrew(api) {
         ${changed ? `<p class="small hb-reload"><b>Saved.<\/b> Reload the page to use the changes. <button type="button" class="btn" data-hbreload>Reload now<\/button><\/p>` : ""}
         <div class="btn-row"><button type="button" class="btn" data-hbexport${hbCount(hb) ? "" : " disabled"}>Save to file<\/button>
           <label class="btn" tabindex="0">Open file<input type="file" accept=".json,application/json,text/plain" class="visually-hidden" data-hbimport><\/label><\/div>
-        ${section("threats", "Threats", hb.threats, threatLine, threatForm)}
-        ${section("weapons", "Weapons", hb.weapons, weaponLine, weaponForm)}
-        ${EDGES ? section("edges", "Edges", hb.edges, (x) => `${x.limit === 1 ? "once" : `up to ${x.limit}×`}: ${x.text}`, edgeForm) : ""}
+        ${section("threats", "Threats", hb.threats, (t) => withBonus(threatLine(t), threatBonusLine(t.bonus)), threatForm)}
+        ${section("weapons", "Weapons", hb.weapons, (w) => withBonus(weaponLine(w), weaponBonusLine(w.bonus)), weaponForm)}
+        ${EDGES ? section("edges", "Edges", hb.edges, (x) => withBonus(`${x.limit === 1 ? "once" : `up to ${x.limit}×`}: ${x.text}`, edgeBonusLine(x.bonus)), edgeForm) : ""}
         ${HAS.cards ? section("cards", cap(W.cards), hb.cards, (x) => `${x.knowledge}${x.permits ? ` Permits: ${x.permits}` : ""}`, cardForm) : ""}
         ${HAS.powers ? section("powers", "Powers", hb.powers, (x) => `${x.gm ? "GM's approval; " : ""}Class I: ${x.classes[0]}`, powerForm) : ""}
-        ${HAS.spells ? section("spells", cap(W.spells), hb.spells, (x) => x.text, spellForm) : ""}
+        ${HAS.spells ? section("spells", cap(W.spells), hb.spells, (x) => withBonus(x.text, x.attack && x.attack.boxes ? `an attack, ${x.attack.boxes} box${x.attack.boxes === 1 ? "" : "es"} at ${(hbBands().find((b) => b[0] === x.attack.band) || [])[1]} range` : ""), spellForm) : ""}
         ${HAS.rituals ? section("rituals", cap(W.rituals), hb.rituals, ritualLine, ritualForm) : ""}`;
     }
     if (api.fileRoot) {
@@ -9205,13 +9281,17 @@ function mountHomebrew(api) {
   const replaceWith = (raw, from) => { const next = hbClean({ ...raw, from }, PACK); hb = next; editing = null; store(); return next; };
   function readForm(f) {
     const v = (n) => (f.elements[n] ? f.elements[n].value : ""), kind = f.dataset.hbform, id = editing && editing[0] === kind ? editing[1] : undefined;
-    if (kind === "weapons") return { id, name: v("name"), skill: v("skill"), kind: v("kind"), boxes: v("boxes"), reach: v("reach"), band: v("band"), rounds: v("rounds"), note: v("note") };
-    if (kind === "threats") return { id, name: v("name"), minor: f.elements.minor.checked, target: v("target"), dodge: v("dodge"), boxes: v("boxes"), weapons: [v("w0"), v("w1"), v("w2")].filter(Boolean), trait: v("trait"), traitText: v("traitText") };
-    if (kind === "spells") return { id, name: v("name"), text: v("text") };
+    const on = (n) => !!(f.elements[n] && f.elements[n].checked);
+    if (kind === "weapons") return { id, name: v("name"), skill: v("skill"), kind: v("kind"), boxes: v("boxes"), reach: v("reach"), band: v("band"), rounds: v("rounds"), note: v("note"),
+      bonus: { accuracy: v("b-accuracy"), aimedOnly: on("b-aimed"), strong: on("b-strong"), materials: checkedMats(f, "b-mat") } };
+    if (kind === "threats") return { id, name: v("name"), minor: f.elements.minor.checked, target: v("target"), dodge: v("dodge"), boxes: v("boxes"), weapons: [v("w0"), v("w1"), v("w2")].filter(Boolean), trait: v("trait"), traitText: v("traitText"),
+      bonus: { armor: on("b-armor"), hardToHit: v("b-hard"), weak: checkedMats(f, "b-weak"), onlyBy: checkedMats(f, "b-only"), onlyMax: v("b-onlymax") || 1, shrug: on("b-shrug"), extraDefense: on("b-xdef") } };
+    if (kind === "spells") return { id, name: v("name"), text: v("text"), attack: { boxes: v("b-atk"), band: v("b-band") } };
     if (kind === "powers") return { id, name: v("name"), group: v("group"), classes: hbClasses().map((_, i) => v("c" + i)), gm: f.elements.gm.checked, variety: v("variety") };
     if (kind === "cards") return { id, name: v("name"), knowledge: v("knowledge"), permits: v("permits") };
     if (kind === "rituals") return { id, name: v("name"), weight: v("weight"), time: v("time"), text: v("text"), price: v("price") };
-    return { id, name: v("name"), limit: v("limit"), text: v("text") };
+    return { id, name: v("name"), limit: v("limit"), text: v("text"),
+      bonus: { skill: v("b-skill"), skillValue: v("b-skill") ? v("b-skillv") : 0, dodge: on("b-dodge") ? 1 : 0, move: v("b-move"), extraDefense: on("b-xdef"), shrugTelling: on("b-shrugt") } };
   }
   const roots = () => [api.gmRoot, api.fileRoot, api.noteRoot, api.ritualRoot].filter(Boolean);
   for (const root of roots()) {
@@ -9714,6 +9794,7 @@ function mountHomebrew(api) {
   // where a test configuration exists. Never used by the sheet. ----
   if ((PACK.arms || []).length) {
     labPanel = LAB_UI.mountLab({ PACK, T, LD, LDX, E: LAB_ENCOUNTER, S: LAB_STATS, LAB: LAB_DATA, store, esc, signed, saveText, gritty: () => gritty,
+      traitsFor: (c) => hbEdgeTraits(PACK, (k) => edgeN(k, c)), // homebrew Edges' fight traits
       mapDistance: (a, b) => battleMap.distanceBetween(a, b), // where two people stand on the battle map, if both are on it
       onScene: () => pushScene(), // the shared table's players see the fight
       crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
