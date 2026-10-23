@@ -1,4 +1,5 @@
-// Homebrew: a GM's own threats, weapons and Edges, made in the GM view without touching any code. Plain script,
+// Homebrew: a GM's own threats, weapons, Edges, cards, spells (hexes, cantrips, powers) and rituals, made in the GM view
+// without touching any code. Plain script,
 // inlined by tools/build-legend.py (/* HOMEBREW */) and tools/build-guide.py (HOMEBREW markers); no modules, no page globals.
 //
 // hbLoad(game) reads this browser's homebrew; hbApply(PACK, hb) adds it to the page's data before anything reads it,
@@ -6,12 +7,18 @@
 // "homebrew"). Changes take effect on the next page load.
 // mountHomebrew(api) with api: { PACK (as built, before hbApply), game, gmRoot (the GM view's Homebrew card),
 //   noteRoot (a card on the play tab for homebrew the GM shares), fileRoot (the Character file panel), esc, toast,
-//   saveText(text, name, say), edges (false for a game without Edges) } returns { snapshot() (what the shared table
+//   saveText(text, name, say), edges (false for a game without Edges), ritualRoot (where the creator lists the ritual
+//   book, beside Rituals by heart), heartInput (that field) } returns { snapshot() (what the shared table
 //   sends players, or null), receive(hb) }.
 // Sharing: as a file (Save to file / Open file), or through the shared table: players who join get the GM's homebrew
 // and choose to use it.
 // Function declarations only, above mountHomebrew: hbLoad and hbApply run as the page starts, before this file's place.
-function hbLimits() { return { threats: 30, weapons: 30, edges: 20 }; }
+function hbLimits() { return { threats: 30, weapons: 30, edges: 20, spells: 20, cards: 30, rituals: 30 }; }
+function hbKinds() { return ["threats", "weapons", "edges", "spells", "cards", "rituals"]; }
+// A ritual's weight sets its clock, as in the core rules' magic chapter.
+function hbWeights() { return [["minor", "Minor", 2], ["significant", "Significant", 4], ["major", "Major", 6]]; }
+// What a setting can take: spells need its spell list, cards its discovery cards, rituals its magic.
+function hbHas(PACK) { return { spells: !!(PACK.spells && Array.isArray(PACK.spells.list)), cards: !!PACK.discovery, rituals: !!(PACK.magic && PACK.magic.workings) }; }
 function hbBands() { return [["close", "Close"], ["short", "Short"], ["medium", "Medium"], ["long", "Long"], ["extreme", "Extreme"]]; }
 function hbKey(game) { return game + ".homebrew.v1"; }
 function hbInt(v, lo, hi, d) { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; }
@@ -47,10 +54,23 @@ function hbClean(raw, PACK) {
     const name = hbText(x && x.name, 40), text = hbText(x && x.text, 300); if (!name || !text) return null;
     return { id: hbId(x.id, name, taken), name, text, limit: hbInt(x.limit, 1, 3, 1) };
   }).filter(Boolean);
-  return { threats, weapons, edges, from: r.from === "gm" ? "gm" : "mine" };
+  const list = (k) => (Array.isArray(r[k]) ? r[k] : []).slice(0, hbLimits()[k]);
+  const spells = list("spells").map((x) => {
+    const name = hbText(x && x.name, 40), text = hbText(x && x.text, 300); if (!name || !text) return null;
+    return { id: hbId(x.id, name, taken), name, text };
+  }).filter(Boolean);
+  const cards = list("cards").map((x) => {
+    const name = hbText(x && x.name, 40), knowledge = hbText(x && x.knowledge, 300); if (!name || !knowledge) return null;
+    return { id: hbId(x.id, name, taken), name, knowledge, permits: hbText(x.permits, 200) };
+  }).filter(Boolean);
+  const rituals = list("rituals").map((x) => {
+    const name = hbText(x && x.name, 40), text = hbText(x && x.text, 300); if (!name || !text) return null;
+    return { id: hbId(x.id, name, taken), name, weight: hbWeights().some((w) => w[0] === x.weight) ? x.weight : "minor", time: hbText(x.time, 40), text, price: hbText(x.price, 120) };
+  }).filter(Boolean);
+  return { threats, weapons, edges, spells, cards, rituals, from: r.from === "gm" ? "gm" : "mine" };
 }
-function hbCount(hb) { return hb ? hb.threats.length + hb.weapons.length + hb.edges.length : 0; }
-function hbBody(hb) { return JSON.stringify({ threats: hb.threats, weapons: hb.weapons, edges: hb.edges }); }
+function hbCount(hb) { return hb ? hbKinds().reduce((n, k) => n + (hb[k] || []).length, 0) : 0; }
+function hbBody(hb) { return JSON.stringify(Object.fromEntries(hbKinds().map((k) => [k, hb[k] || []]))); }
 function hbLoad(PACK) {
   try { return hbClean(JSON.parse(localStorage.getItem(hbKey(PACK.id)) || "null"), PACK); } catch { return hbClean(null, PACK); }
 }
@@ -78,17 +98,29 @@ function hbApply(PACK, hb) {
       weaponText: ws.map((a) => a.name).join(", "), weapons: ws.map((a) => a.id), trait: t.trait || "Homebrew", traitText: t.traitText || "A GM's own creation." });
   }
   for (const x of hb.edges) PACK.extraEdges.push([x.id, `${x.name} (homebrew)`, x.text, x.limit]);
+  const has = hbHas(PACK);
+  if (has.spells) for (const x of hb.spells) PACK.spells.list.push([x.id, `${x.name} (homebrew)`, x.text]);
+  if (has.cards && hb.cards.length) PACK.discovery.subjects = [...(PACK.discovery.subjects || []), ...hb.cards.map((x) => [x.id, x.name, x.knowledge, x.permits || ""])];
+  if (has.rituals) PACK.ritualBook = hb.rituals.map((x) => ({ ...x }));
 }
 
 function mountHomebrew(api) {
   const { PACK, esc } = api, say = (m, err) => (api.toast ? api.toast(m, err) : null);
   let hb = hbLoad(PACK), changed = false, offered = null, editing = null; // editing: [kind, id] being edited
-  const EDGES = api.edges !== false;
+  const EDGES = api.edges !== false, HAS = hbHas(PACK), M = PACK.magic || {}, D = PACK.discovery || {};
+  const cap = (x) => (x ? x[0].toUpperCase() + x.slice(1) : x);
+  // A setting's own words: hexes or cantrips or psionic powers; lore cards or data records; rituals or workings.
+  const W = { spell: M.burst || (HAS.spells ? PACK.spells.plural.toLowerCase().replace(/s$/, "") : "spell"), spells: M.bursts || (HAS.spells ? PACK.spells.plural.toLowerCase() : "spells"),
+    card: D.card || "card", cards: D.cards || "cards", ritual: M.working || "ritual", rituals: M.workings || "rituals" };
   const SKILLS = hbSkills(PACK);
   const armsBuilt = (PACK.arms || []).filter((a) => !a.hazard && !a.homebrew);
   const opts = (list, sel) => list.map(([v, n]) => `<option value="${esc(v)}"${v === sel ? " selected" : ""}>${esc(n)}</option>`).join("");
   const store = () => { if (!hbSave(PACK, hb)) say("This browser won't keep the homebrew: save it to a file.", true); changed = true; render(); };
-  const summary = (h) => [[h.threats.length, "threat"], [h.weapons.length, "weapon"], ...(EDGES ? [[h.edges.length, "Edge"]] : [])].filter(([n]) => n).map(([n, w]) => `${n} ${w}${n === 1 ? "" : "s"}`).join(", ") || "nothing yet";
+  const summary = (h) => [[h.threats.length, "threat", "threats"], [h.weapons.length, "weapon", "weapons"], ...(EDGES ? [[h.edges.length, "Edge", "Edges"]] : []),
+    ...(HAS.cards ? [[h.cards.length, W.card, W.cards]] : []), ...(HAS.spells ? [[h.spells.length, W.spell, W.spells]] : []), ...(HAS.rituals ? [[h.rituals.length, W.ritual, W.rituals]] : [])]
+    .filter(([n]) => n).map(([n, one, many]) => `${n} ${n === 1 ? one : many}`).join(", ") || "nothing yet";
+  const weightOf = (k) => hbWeights().find((w) => w[0] === k) || hbWeights()[0];
+  const ritualLine = (x) => `${weightOf(x.weight)[1]} (${weightOf(x.weight)[2]} segments)${x.time ? `, ${x.time}` : ""}: ${x.text}${x.price ? ` Price: ${x.price}` : ""}`;
   const weaponLine = (w) => `${w.skill}; ${w.kind === "melee" ? `melee, reach ${w.reach} yd` : (hbBands().find((b) => b[0] === w.band) || [])[1] + " range"}; ${w.boxes} box${w.boxes === 1 ? "" : "es"}${w.rounds ? `; ${w.rounds} shots` : ""}`;
   const threatLine = (t) => `${t.minor ? "Minor; " : ""}attacks at ${t.target}, Dodge ${t.dodge}, ${t.boxes} box${t.boxes === 1 ? "" : "es"}; ${t.weapons.map((id) => (hb.weapons.find((w) => w.id === id) || armsBuilt.find((a) => a.id === id) || {}).name || id).join(", ")}`;
   const item = (kind, x, line) => `<li><b>${esc(x.name)}</b> <span class="muted small">${esc(line)}</span>
@@ -131,31 +163,51 @@ function mountHomebrew(api) {
       <div class="field wide"><label>What it gives (the GM applies it)</label><input name="text" maxlength="300" required value="${esc(x ? x.text : "")}" placeholder="e.g. Once per session, ignore a poison or bad water."></div>
       <div class="btn-row field wide"><button class="btn primary" type="submit">${x ? "Save changes" : "Add the Edge"}</button>${x ? `<button type="button" class="linkish" data-hbcancel>Cancel</button>` : ""}</div></form>`;
   }
+  const formOf = (kind, fields, label) => {
+    const x = editing && editing[0] === kind ? find(kind, editing[1]) : null;
+    return `<form data-hbform="${kind}" class="fields">${fields(x)}
+      <div class="btn-row field wide"><button class="btn primary" type="submit">${x ? "Save changes" : label}</button>${x ? `<button type="button" class="linkish" data-hbcancel>Cancel</button>` : ""}</div></form>`;
+  };
+  const input = (x, name, label, max, ph, wide) => `<div class="field${wide ? " wide" : ""}"><label>${label}</label><input name="${name}" maxlength="${max}" value="${esc(x ? x[name] || "" : "")}" placeholder="${esc(ph)}"></div>`;
+  const spellForm = () => formOf("spells", (x) => input(x, "name", "Name", 40, "e.g. Grave Chill") + input(x, "text", "What it does (range, boxes, who resists)", 300, "e.g. A creeping cold at Close range; 1 box, and the target is Stunned (Will resists).", true), `Add the ${W.spell}`);
+  const cardForm = () => formOf("cards", (x) => input(x, "name", "Subject", 40, "e.g. Ghoul") + input(x, "knowledge", "What's true", 300, "e.g. Fire hurts it; it can't cross running water.", true) + input(x, "permits", "What it permits", 200, "e.g. Burning or drowning one with fire or a river crossing.", true), `Add the ${W.card}`);
+  const ritualForm = () => formOf("rituals", (x) => input(x, "name", "Name", 40, "e.g. Salt Circle") +
+    `<div class="field"><label>Weight</label><select name="weight">${opts(hbWeights().map(([k, n, seg]) => [k, `${n} (${seg} segments)`]), x ? x.weight : "minor")}</select></div>` +
+    input(x, "time", "Time a roll", 40, "e.g. ten minutes") + input(x, "text", "What it does", 300, "e.g. Nothing unnatural crosses the circle until dawn.", true) + input(x, "price", "Price", 120, "e.g. a box of The Dark if it fails", true), `Add the ${W.ritual}`);
   const section = (kind, title, list, line, form) => `<details class="hb-sec"${editing && editing[0] === kind ? " open" : ""}><summary class="label">${title} (${list.length})</summary>
     <ul class="small adv-list">${list.map((x) => item(kind, x, line(x))).join("") || `<li class="muted">None yet.</li>`}</ul>${list.length >= hbLimits()[kind] && !(editing && editing[0] === kind) ? `<p class="small muted">That's the most this keeps (${hbLimits()[kind]}).</p>` : form()}</details>`;
 
   function render() {
     if (api.gmRoot) {
       api.gmRoot.innerHTML = `<h3>Homebrew</h3>
-        <p class="small muted">Your own threats, weapons${EDGES ? " and Edges" : ""}, made here: no code. They work like the setting's own, marked <i>homebrew</i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}. Keep numbers in line with the setting's (see <i>Making your own</i> in the core rules); anything special is a note you apply at the table.</p>
+        <p class="small muted">Your own threats, weapons${EDGES ? ", Edges" : ""}${HAS.cards ? `, ${W.cards}` : ""}${HAS.spells ? `, ${W.spells}` : ""}${HAS.rituals ? ` and ${W.rituals}` : ""}, made here: no code. They work like the setting's own, marked <i>homebrew</i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}${HAS.cards ? `, ${W.cards} where you record findings` : ""}${HAS.spells ? `, ${W.spells} among the creator's choices` : ""}${HAS.rituals ? `, ${W.rituals} in a ${W.ritual} book beside Rituals by heart` : ""}. Keep numbers in line with the setting's (see <i>Making your own</i> in the core rules); anything special is a note you apply at the table.</p>
         <p class="small"><b>In this browser:</b> ${esc(summary(hb))}${hb.from === "gm" ? " (shared by your GM)" : ""}. Players get it when they join your shared table, or from a file.</p>
         ${changed ? `<p class="small hb-reload"><b>Saved.</b> Reload the page to use the changes. <button type="button" class="btn" data-hbreload>Reload now</button></p>` : ""}
         <div class="btn-row"><button type="button" class="btn" data-hbexport${hbCount(hb) ? "" : " disabled"}>Save to file</button>
           <label class="btn" tabindex="0">Open file<input type="file" accept=".json,application/json,text/plain" class="visually-hidden" data-hbimport></label></div>
         ${section("threats", "Threats", hb.threats, threatLine, threatForm)}
         ${section("weapons", "Weapons", hb.weapons, weaponLine, weaponForm)}
-        ${EDGES ? section("edges", "Edges", hb.edges, (x) => `${x.limit === 1 ? "once" : `up to ${x.limit}×`}: ${x.text}`, edgeForm) : ""}`;
+        ${EDGES ? section("edges", "Edges", hb.edges, (x) => `${x.limit === 1 ? "once" : `up to ${x.limit}×`}: ${x.text}`, edgeForm) : ""}
+        ${HAS.cards ? section("cards", cap(W.cards), hb.cards, (x) => `${x.knowledge}${x.permits ? ` Permits: ${x.permits}` : ""}`, cardForm) : ""}
+        ${HAS.spells ? section("spells", cap(W.spells), hb.spells, (x) => x.text, spellForm) : ""}
+        ${HAS.rituals ? section("rituals", cap(W.rituals), hb.rituals, ritualLine, ritualForm) : ""}`;
     }
     if (api.fileRoot) {
       api.fileRoot.innerHTML = `<div class="eyebrow">Homebrew</div>
-        <p class="small muted">${hbCount(hb) ? `${esc(summary(hb))}${hb.from === "gm" ? ", from your GM" : ""}.` : `Your GM's own threats, weapons${EDGES ? " and Edges" : ""}, if they share a file.`}</p>
+        <p class="small muted">${hbCount(hb) ? `${esc(summary(hb))}${hb.from === "gm" ? ", from your GM" : ""}.` : "Your GM's own threats, weapons and more, if they share a file."}</p>
         <div class="btn-row"><label class="btn" tabindex="0">Open homebrew file<input type="file" accept=".json,application/json,text/plain" class="visually-hidden" data-hbimport></label>
         ${hbCount(hb) ? `<button type="button" class="linkish" data-hbclear>Remove it</button>` : ""}</div>
         ${changed ? `<p class="small"><button type="button" class="btn" data-hbreload>Reload to use it</button></p>` : ""}`;
     }
+    if (api.ritualRoot) {
+      const book = PACK.ritualBook || [];
+      api.ritualRoot.hidden = !book.length;
+      api.ritualRoot.innerHTML = book.length ? `<details><summary class="label">Your GM's ${esc(W.ritual)} book (${book.length})</summary><ul class="small adv-list">${book.map((x) =>
+        `<li><b>${esc(x.name)}</b> <span class="muted">${esc(ritualLine(x))}</span>${api.heartInput ? ` <button type="button" class="linkish" data-hbheart="${esc(x.name)}">Know it by heart</button>` : ""}</li>`).join("")}</ul></details>` : "";
+    }
     if (api.noteRoot) {
       api.noteRoot.hidden = !offered;
-      api.noteRoot.innerHTML = offered ? `<h3>Homebrew from your GM</h3><p class="small">${esc(summary(offered))}: their own threats, weapons${EDGES ? " and Edges" : ""} for this game.</p>
+      api.noteRoot.innerHTML = offered ? `<h3>Homebrew from your GM</h3><p class="small">${esc(summary(offered))}: their own additions to this game.</p>
         <div class="btn-row"><button type="button" class="btn primary" data-hbuse>Use it</button><button type="button" class="linkish" data-hbskip>Not now</button></div>` : "";
     }
   }
@@ -164,9 +216,12 @@ function mountHomebrew(api) {
     const v = (n) => (f.elements[n] ? f.elements[n].value : ""), kind = f.dataset.hbform, id = editing && editing[0] === kind ? editing[1] : undefined;
     if (kind === "weapons") return { id, name: v("name"), skill: v("skill"), kind: v("kind"), boxes: v("boxes"), reach: v("reach"), band: v("band"), rounds: v("rounds"), note: v("note") };
     if (kind === "threats") return { id, name: v("name"), minor: f.elements.minor.checked, target: v("target"), dodge: v("dodge"), boxes: v("boxes"), weapons: [v("w0"), v("w1"), v("w2")].filter(Boolean), trait: v("trait"), traitText: v("traitText") };
+    if (kind === "spells") return { id, name: v("name"), text: v("text") };
+    if (kind === "cards") return { id, name: v("name"), knowledge: v("knowledge"), permits: v("permits") };
+    if (kind === "rituals") return { id, name: v("name"), weight: v("weight"), time: v("time"), text: v("text"), price: v("price") };
     return { id, name: v("name"), limit: v("limit"), text: v("text") };
   }
-  const roots = () => [api.gmRoot, api.fileRoot, api.noteRoot].filter(Boolean);
+  const roots = () => [api.gmRoot, api.fileRoot, api.noteRoot, api.ritualRoot].filter(Boolean);
   for (const root of roots()) {
     root.addEventListener("submit", (e) => {
       const f = e.target.closest("[data-hbform]"); if (!f) return; e.preventDefault();
@@ -174,7 +229,8 @@ function mountHomebrew(api) {
       const at = entry.id ? list.findIndex((x) => x.id === entry.id) : -1;
       if (at >= 0) list[at] = entry; else list.push(entry);
       const next = hbClean({ ...hb, [kind]: list }, PACK);
-      if (next[kind].length < list.length) { say(kind === "threats" ? "A threat needs a name and at least one weapon." : kind === "edges" ? "An Edge needs a name and what it gives." : "A weapon needs a name.", true); return; }
+      if (next[kind].length < list.length) { say({ threats: "A threat needs a name and at least one weapon.", edges: "An Edge needs a name and what it gives.", weapons: "A weapon needs a name.",
+        spells: `A ${W.spell} needs a name and what it does.`, cards: `A ${W.card} needs a subject and what's true.`, rituals: `A ${W.ritual} needs a name and what it does.` }[kind], true); return; }
       hb = next; editing = null; hb.from = "mine"; store(); say(at >= 0 ? "Saved." : "Added.");
     });
     root.addEventListener("change", async (e) => {
@@ -193,6 +249,11 @@ function mountHomebrew(api) {
     root.addEventListener("click", (e) => {
       const b = e.target.closest("button"); if (!b) return;
       if (b.matches("[data-hbreload]")) { location.reload(); return; }
+      if (b.matches("[data-hbheart]") && api.heartInput) { // add the ritual to Rituals by heart, as if typed there
+        const f = api.heartInput, have = f.value.split(",").map((x) => x.trim()).filter(Boolean);
+        if (!have.includes(b.dataset.hbheart)) { f.value = [...have, b.dataset.hbheart].join(", "); f.dispatchEvent(new Event("input", { bubbles: true })); }
+        return;
+      }
       if (b.matches("[data-hbexport]")) { api.saveText(JSON.stringify({ format: PACK.id + "-homebrew", version: 1, ...JSON.parse(hbBody(hb)) }, null, 1), `${PACK.terms.title} homebrew.json`, say); return; }
       if (b.matches("[data-hbedit]")) { editing = [b.dataset.hbedit, b.dataset.id]; render(); return; }
       if (b.matches("[data-hbcancel]")) { editing = null; render(); return; }
