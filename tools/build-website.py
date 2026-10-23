@@ -34,6 +34,9 @@ START_SLUG = "/start"
 # The shared table's restricted playtest: only GMs with an access code can start a table on the site's table server
 # (GM_CODES, legend-dynamics/table-server/README.md). Set to False to take the notice off every page.
 TABLE_PLAYTEST = True
+# The whole site is in a limited playtest: a label on every page says so. False takes it off.
+SITE_PLAYTEST = True
+PLAYTEST_TEXT = "Legend Dynamics is in a limited playtest, for a small group of GMs and players."
 # Held back for now (the author's call): the notice inviting GMs to ask for an access code (and the contact form's
 # topic for it), and the instructions for building and hosting your own table server. True puts them back.
 TABLE_ACCESS_REQUESTS = False
