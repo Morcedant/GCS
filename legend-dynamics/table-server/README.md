@@ -98,3 +98,5 @@ A table is meant for a private game among friends, like a video-call link.
 - **Rate limits.** Rolls are limited per connection. To limit starting tables and guessing codes too, add a rate-limiting rule in the Cloudflare dashboard (Security → WAF → Rate limiting rules; the free plan allows one): for example, 20 requests a minute per IP to paths starting with `/api/tables`.
 
 Phase 3 can run the encounter panel and battle map on the table.
+
+_Cloudflare builds this folder from `main` (root directory `legend-dynamics/table-server`). After making the repository private, reconnect Cloudflare's GitHub access (Settings → Build) so it can still read the code._
