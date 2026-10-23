@@ -77,6 +77,10 @@ def same_tab(s):
     return re.sub(r'(href="/[^"]*")\s+target="_blank"\s+rel="noopener"', r"\1", s)
 
 
+# The playtest label (build-website.py SITE_PLAYTEST): a band above the home page's header (only there).
+PLAYTEST_BAR = (f'<div class="ld-playtest" role="note"><span class="ld-playtest-tag">Playtest</span> {e(bw.PLAYTEST_TEXT)}</div>' if bw.SITE_PLAYTEST else "")
+
+
 def page(path, title, desc, body_blocks, theme="", fonts=None):
     here = "/" + path.strip("/")
     here = "/" if here == "/" else here
@@ -98,6 +102,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None):
 </head>
 <body>
 <a class="ld-skip" href="#main">Skip to content</a>
+{PLAYTEST_BAR if here == "/" else ""}
 <header class="ld-header"><div class="ld-header-in"><a class="ld-brand" href="/">Legend Dynamics</a><nav class="ld-nav" aria-label="Site">{nav}</nav></div></header>
 <main id="main">
 {sections}

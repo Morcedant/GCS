@@ -303,6 +303,10 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 .ld-form .ld-actions { margin: 0; }
 .ld-form .ld-note { font-size: .9rem; color: var(--ld-ink-2); margin: 0; }
 
+/* The playtest label (the Cloudflare site puts it above every page's header) */
+.ld-playtest { background: #f4c542; color: #1b1406; text-align: center; padding: .55rem 16px; font: 600 .92rem/1.4 var(--ld-body, Georgia, serif); }
+.ld-playtest-tag { display: inline-block; margin-right: .5rem; padding: .05rem .5rem; border-radius: 4px; background: #1b1406; color: #f4c542; font: 600 .74rem var(--ld-label, monospace); letter-spacing: .14em; text-transform: uppercase; vertical-align: .08em; }
+
 /* ---------- 5. Site frame (Cloudflare Pages build; Squarespace supplies its own) ---------- */
 html, body { margin: 0; }
 body { min-height: 100vh; display: flex; flex-direction: column; }

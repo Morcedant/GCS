@@ -34,6 +34,9 @@ START_SLUG = "/start"
 # The shared table's restricted playtest: only GMs with an access code can start a table on the site's table server
 # (GM_CODES, legend-dynamics/table-server/README.md). Set to False to take the notice off every page.
 TABLE_PLAYTEST = True
+# The whole site is in a limited playtest: a label on the home page says so. False takes it off.
+SITE_PLAYTEST = True
+PLAYTEST_TEXT = "Legend Dynamics is in a limited playtest, for a small group of GMs and players."
 # Held back for now (the author's call): the notice inviting GMs to ask for an access code (and the contact form's
 # topic for it), and the instructions for building and hosting your own table server. True puts them back.
 TABLE_ACCESS_REQUESTS = False
@@ -147,7 +150,7 @@ def table_page():
 <div class="ld" id="run">
   <div class="ld-eyebrow">Running a game</div>
   <ol class="ld-steps">
-    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. If the table server asks for a <b>GM access code</b>, type the one its owner gave you; the creator remembers it. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
+    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. During the playtest, starting a table here needs a <b>GM access code</b>: <a href="mailto:{CONTACT_EMAIL}?subject=GM%20access%20code">email me at {CONTACT_EMAIL}</a> for one. Type it when the creator asks; it remembers it. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
     <li><b>Players join.</b> Each opens their character, goes to the play tab, types the code and their name, and presses <b>Join</b>.</li>
     <li><b>Play.</b> Rolls from every sheet are rolled by the table and shown to all. Each character appears on the GM's cards, and injuries, points and ammunition stay in step both ways.</li>
     <li><b>Fight.</b> The GM's battle map and encounter show on every player's play tab. Players move their own tokens and, on their turn, send the GM what they do; the GM puts it into the Encounter panel and runs it.</li>
