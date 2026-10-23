@@ -62,6 +62,8 @@ Those two are examples: don't use them. Make each code long and random: 12 or mo
 
 Keep it a **Secret**, not a variable in `wrangler.toml`: a secret survives every deploy, and the codes stay out of the repository.
 
+**The GM view and the GM's Guides.** The same codes open each creator's **GM view**, which stays covered by a code box until the server accepts the code (`POST /api/gm`). The GM's Guides aren't in the pages at all: the server hands a game's guide to a GM whose code checks out (`POST /api/gm/guide`), from `src/gm-guides.js`, which `tools/gm_guides.py` builds from each game's `gm-guide.json` whenever the guides are rebuilt. So a change to a GM's Guide reaches GMs once the server is redeployed. With no `GM_CODES`, the GM view and the guides are open to anyone, like starting tables.
+
 ## Use it
 
 - **GM:** GM view → **Shared table** → name it → **Start a table** (and the GM access code, the first time, if the server has `GM_CODES`). Share the code, or **Copy link** and send that (the link fills in the code). **Rejoin** gets you back in after closing the page; the key that makes you the GM stays in your browser.
