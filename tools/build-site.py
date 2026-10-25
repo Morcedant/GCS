@@ -151,7 +151,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, bl
 {sections}
 </main>
 <footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. Copyright © Don Smallwood. All rights reserved.</span>
-<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{BLOG_SLUG}/">Dev blog</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}
+<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{BLOG_SLUG}/">Dev blog</a><a href="/join">Join our Discord</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}
 </body>
 </html>
 """
@@ -272,7 +272,8 @@ def main():
     for old, old_guide in [("/dust-and-damnation", "Dust_Damnation_Players_Guide.docx"), ("/pact-of-bones", "Pact_of_Bones_Players_Guide.docx")]:
         rules += [(f"{old}/{old_guide}", f"{new}/{guide}"), (old, f"{new}/"), (f"{old}/*", f"{new}/:splat"),
                   (f"/discord{old}", f"/discord{new}/"), (f"/discord{old}/*", f"/discord{new}/:splat")]
-    write("_redirects", "".join(f"{a} {b} 301\n" for a, b in rules))
+    # /join: the community Discord's invite (302, so a new invite takes over at once).
+    write("_redirects", "".join(f"{a} {b} 301\n" for a, b in rules) + f"/join {bw.DISCORD_INVITE} 302\n")
     n = sum(1 for p in SITE.rglob("*") if p.is_file())
     print(f"wrote {n} files into {SITE.relative_to(ROOT)}/")
 
