@@ -53,7 +53,12 @@
   function api(path, body) {
     if (!SERVER) return Promise.reject(new Error("The blog isn't connected to the table server."));
     return fetch(SERVER + path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {})
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || "The blog didn't answer (" + r.status + ")."); return j; }); });
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) {
+        // A server from before the blog answers every /api/blog address with a plain "Not found."
+        if (r.status === 404 && j.error === "Not found.") throw new Error("The blog's server hasn't been updated yet, so there's nothing to show. (Paste the new worker.js into the legend-table Worker.)");
+        if (!r.ok) throw new Error(j.error || "The blog didn't answer (" + r.status + ").");
+        return j; }); },
+        function () { throw new Error("Couldn't reach the blog just now. Check your connection and reload the page."); });
   }
   var tagsHtml = function (tags) { return (tags || []).map(function (t) { return '<span class="ld-tag">' + esc(t) + "</span>"; }).join(""); };
   var card = function (p) {
@@ -81,7 +86,7 @@
     return api("/api/blog" + (tag ? "?tag=" + encodeURIComponent(tag) : "")).then(function (j) {
       var filter = '<nav class="ld-blog-tags" aria-label="Topics"><a href="/blog/"' + (tag ? "" : ' aria-current="page"') + ">All</a>" +
         j.tags.map(function (t) { return '<a href="/blog/?tag=' + encodeURIComponent(t) + '"' + (t === tag ? ' aria-current="page"' : "") + ">" + esc(t) + "</a>"; }).join("") + "</nav>";
-      root.innerHTML = filter + (j.posts.length ? '<div class="ld-posts">' + j.posts.map(card).join("") + "</div>" : "<p>No posts" + (tag ? " about " + esc(tag) : "") + " yet.</p>");
+      root.innerHTML = filter + (j.posts.length ? '<div class="ld-posts">' + j.posts.map(card).join("") + "</div>" : "<p>No posts" + (tag ? " about " + esc(tag) : "") + " yet. Check back soon.</p>");
     }).catch(function (e) { root.innerHTML = "<p>" + esc(e.message) + "</p>"; });
   }
 
@@ -103,7 +108,8 @@
 
     function login(msg) {
       root.innerHTML = '<form class="ld-form" id="ld-w-login"><label class="ld-wide">Author code <input type="password" id="ld-w-code" autocomplete="current-password" required></label>' +
-        '<div class="ld-actions ld-wide"><button class="ld-button" type="submit">Sign in</button></div><p class="ld-wide ld-note" id="ld-w-status">' + esc(msg || "Your DEV code. It stays on this device until you sign out.") + "</p></form>";
+        '<div class="ld-actions ld-wide"><button class="ld-button" type="submit">Sign in</button></div><p class="ld-wide ld-note" id="ld-w-status">' + esc(msg || "Your DEV code. It stays on this device until you sign out.") + "</p>" +
+        '<p class="ld-wide ld-note">Just here to read? <a href="/blog/">See the posts on the Dev blog</a>; no sign-in needed.</p></form>';
       $("ld-w-login").onsubmit = function (ev) {
         ev.preventDefault(); code = $("ld-w-code").value.trim(); say("Checking…");
         admin("list").then(function (j) { store.set(code); tags = j.tags; posts = j.posts; list(); })
@@ -114,6 +120,7 @@
       cur = null;
       root.innerHTML = '<div class="ld-actions"><button class="ld-button" id="ld-w-new">New post</button><button class="ld-button ld-button--ghost" id="ld-w-out">Sign out</button></div>' +
         '<p class="ld-note" id="ld-w-status">' + esc(msg || "") + "</p>" +
+        (posts.some(function (p) { return p.draft; }) ? '<p class="ld-note">Drafts are only seen here. Open one and press <b>Publish</b> to put it on the <a href="/blog/">Dev blog</a> for everyone.</p>' : "") +
         (posts.length ? '<ul class="ld-w-list">' + posts.map(function (p) {
           return '<li><button type="button" data-id="' + esc(p.id) + '"><b>' + esc(p.title) + "</b><span>" + (p.draft ? "Draft · " : "") + esc(day(p.published || p.updated)) + "</span></button></li>";
         }).join("") + "</ul>" : "<p>No posts yet. Start with <b>New post</b>.</p>");
