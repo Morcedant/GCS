@@ -4,6 +4,15 @@
   "rulesUpdated": "2026-10-21",
   "changes": [
     {
+      "date": "2026-10-25",
+      "kind": "site",
+      "title": "A dev blog",
+      "items": [
+        "The new Dev blog page carries news from the making of the game: rules changes, the settings, playtest notes and what's coming. Filter it by setting, or read every post.",
+        "The home page shows the latest three posts."
+      ]
+    },
+    {
       "date": "2026-10-23",
       "kind": "site",
       "title": "Homebrew: your own threats, weapons, Edges, cards, powers, spells and rituals",
