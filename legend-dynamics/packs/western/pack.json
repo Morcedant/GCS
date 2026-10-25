@@ -3952,5 +3952,69 @@
     "Mixed with phosphorus by someone with Tinkering. Buying the makings marks Heat."
    ]
   ]
+ },
+ "campaign": {
+  "names": {
+   "first": [
+    "Abigail",
+    "Amos",
+    "Bess",
+    "Caleb",
+    "Clementine",
+    "Cyrus",
+    "Delia",
+    "Eli",
+    "Ezra",
+    "Hattie",
+    "Hiram",
+    "Ida",
+    "Isaiah",
+    "Josefina",
+    "Lorenzo",
+    "Lucinda",
+    "Mateo",
+    "Mercy",
+    "Nathaniel",
+    "Ophelia",
+    "Rosa",
+    "Silas",
+    "Tobias",
+    "Cora",
+    "Wen",
+    "Zeke",
+    "Augustus",
+    "Pearl"
+   ],
+   "last": [
+    "Abernathy",
+    "Blackwood",
+    "Calloway",
+    "Castillo",
+    "Crane",
+    "Delgado",
+    "Everett",
+    "Fairbanks",
+    "Graves",
+    "Hollis",
+    "Jessup",
+    "Kincaid",
+    "Lark",
+    "McCready",
+    "Navarro",
+    "Oakes",
+    "Pruitt",
+    "Quill",
+    "Ransom",
+    "Salazar",
+    "Thorne",
+    "Underhill",
+    "Vance",
+    "Whitlock",
+    "Yates",
+    "Chen",
+    "Okafor",
+    "Duval"
+   ]
+  }
  }
 }

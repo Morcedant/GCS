@@ -224,15 +224,17 @@ export function removeOwner(table, sheets, owner) {
 // The GM's page runs the encounter and the battle map, as it always has; it sends the table a scene (the map without
 // pictures, and the fight's order, injuries and latest lines), which the table keeps and passes to every player.
 // Players can drag their own token (the move goes to the GM's map) and, on their turn, ask for an action; the GM runs it.
-export const MAX_SCENE = 65_536;
+export const MAX_SCENE = 98_304;
 
 export const MAX_HOMEBREW = 32_768;
-/** The GM's scene: { map?, fight?, homebrew? }, kept as sent (it's only shown; the homebrew, the GM's own threats, weapons
+export const MAX_CAMPAIGN = 24_576;
+/** The GM's scene: { map?, fight?, homebrew?, campaign? (what the GM shares of their campaign) }, kept as sent (it's only shown; the homebrew, the GM's own threats, weapons
  * and Edges, is checked again by each player's page before it's used). @param {any} who @param {any} msg */
 export function checkScene(who, msg) {
   if (who.role !== "gm") return { error: "Only the GM shares the map and the fight." };
   const hb = msg.homebrew && typeof msg.homebrew === "object" && !Array.isArray(msg.homebrew) && JSON.stringify(msg.homebrew).length <= MAX_HOMEBREW ? msg.homebrew : null;
-  const scene = { map: msg.map && typeof msg.map === "object" ? msg.map : null, fight: msg.fight && typeof msg.fight === "object" ? msg.fight : null, ...(hb ? { homebrew: hb } : {}) };
+  const cp = msg.campaign && typeof msg.campaign === "object" && !Array.isArray(msg.campaign) && JSON.stringify(msg.campaign).length <= MAX_CAMPAIGN ? msg.campaign : null;
+  const scene = { map: msg.map && typeof msg.map === "object" ? msg.map : null, fight: msg.fight && typeof msg.fight === "object" ? msg.fight : null, ...(hb ? { homebrew: hb } : {}), ...(cp ? { campaign: cp } : {}) };
   if (JSON.stringify(scene).length > MAX_SCENE) return { error: "The map is too large to share." };
   return { scene };
 }

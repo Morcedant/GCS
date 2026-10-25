@@ -544,6 +544,12 @@ A GM can add their own threats, weapons and Edges. Keep them in line with the bo
 
 **In the creator.** The GM view's **Homebrew** tab keeps your threats, weapons, Edges, origins, advantages, cards, powers, spells and rituals. They then work like the book's, marked *homebrew*: threats in the Encounter panel and on the battle map, weapons in characters' gear and the roller, Edges, origins, advantages, powers and spells among the creator's choices (a homebrew origin follows the steps above, with the tier, attribute changes, origin skills and origin advantages you set), cards where findings are recorded, and rituals in a ritual book beside *Rituals by heart*. Players get them when they join your shared table, or from a homebrew file you give them. Bonuses chosen from the tab's menus are worked out for you: a weapon's accuracy, strong hits and what it's made of; a threat's hard hide, weaknesses, what alone can hurt it and how hard it is to hit; an Edge's skill, Dodge or Move bonus and extra defense; an attack spell cast in the Encounter panel. Anything else is a note the GM applies at the table.
 
+## Your campaign
+
+The GM view's **Campaign** tab holds the campaign itself: its premise, an outline of adventures, its people, places and factions, and its sessions (the plan before, the log after). **Roll** fills any of them from the setting's own tables, its adventure seeds, key characters, places, threats and names, and you change what you like before you keep it. Everything stays yours until you **share** it; then the players see its public part on their play tab, never a secret or your notes.
+
+**Triggers: cards that open the story.** A step of the outline can have a trigger: it stays locked until the group holds the cards it names (a subject, or several) and as many cards as you ask for. The moment a character's cards meet it, the step unlocks for good and the GM view tells you what happens. Share a locked step to give the players a goal ("it opens with a card about the drowned god"), or keep it to yourself. Cards are earned through discovery, so a trigger makes finding things out the way the story moves: the next chapter waits for the group to learn what it needs.
+
 # Complications
 
 Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one {{point}} point if you accept it. Every complication needs a trigger agreed with the GM; the creator suggests three for each.

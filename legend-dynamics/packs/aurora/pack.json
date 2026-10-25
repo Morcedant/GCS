@@ -4445,5 +4445,61 @@
    "100 yd",
    "Shooting from it is at −2, as from any moving vehicle."
   ]
- ]
+ ],
+ "campaign": {
+  "names": {
+   "first": [
+    "Alex",
+    "Bianca",
+    "Carlos",
+    "Dana",
+    "Elijah",
+    "Fatima",
+    "Grace",
+    "Hank",
+    "Imani",
+    "Jamal",
+    "Kim",
+    "Leo",
+    "Maya",
+    "Nate",
+    "Olivia",
+    "Priya",
+    "Quentin",
+    "Rosa",
+    "Sam",
+    "Tess",
+    "Victor",
+    "Wanda",
+    "Yusuf",
+    "Zoe",
+    "Frank",
+    "Dolores"
+   ],
+   "last": [
+    "Alvarez",
+    "Brooks",
+    "Chen",
+    "Daniels",
+    "Escobar",
+    "Fitzgerald",
+    "Garcia",
+    "Hughes",
+    "Ito",
+    "Johnson",
+    "Kowalski",
+    "Lopez",
+    "Morgan",
+    "Nguyen",
+    "O'Brien",
+    "Patel",
+    "Reyes",
+    "Sullivan",
+    "Thompson",
+    "Washington",
+    "Young",
+    "Rossi"
+   ]
+  }
+ }
 }
