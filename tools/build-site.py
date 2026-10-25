@@ -151,7 +151,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, bl
 {sections}
 </main>
 <footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. Copyright © Don Smallwood. All rights reserved.</span>
-<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}
+<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{BLOG_SLUG}/">Dev blog</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}
 </body>
 </html>
 """
