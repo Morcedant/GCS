@@ -6,10 +6,11 @@
     {
       "date": "2026-10-25",
       "kind": "site",
-      "title": "A dev blog",
+      "title": "A dev blog and the community Discord",
       "items": [
         "The new Dev blog page carries news from the making of the game: rules changes, the settings, playtest notes and what's coming. Filter it by setting, or read every post.",
-        "The home page shows the latest three posts."
+        "The home page shows the latest three posts.",
+        "Join the Legend Dynamics Discord server from the home page, the Discord page or any page's footer, or at legenddynamicsrpg.com/join."
       ]
     },
     {

@@ -30,6 +30,8 @@ WHY_SLUG = "/why-legend-dynamics"
 TABLE_SLUG = "/shared-table"
 CONTACT_SLUG = "/contact"
 CONTACT_EMAIL = "contact@legenddynamicsrpg.com"
+# The community Discord server's invite (one that never expires). The Cloudflare site also serves it as /join.
+DISCORD_INVITE = "https://discord.gg/6BcPvRvRNg"
 START_SLUG = "/start"
 # The shared table's restricted playtest: only GMs with an access code can start a table on the site's table server
 # (GM_CODES, legend-dynamics/table-server/README.md). Set to False to take the notice off every page.
@@ -379,6 +381,7 @@ def home():
     <a class="ld-button ld-button--ghost" href="{TABLE_SLUG}">Run a game on the shared table</a>
     <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}#session">Run a game over Discord</a>
     <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}#load">Add the dice bot to Discord</a>
+    <a class="ld-button" href="{DISCORD_INVITE}" target="_blank" rel="noopener">Join our Discord</a>
   </div>
   {table_notice(" The Discord dice bot is open to everyone.")}
 </div>
@@ -520,6 +523,7 @@ def discord_page():
   <p class="ld-lede">One dice bot runs every Legend Dynamics setting. It rolls 3d6 under your target and keeps your table's points, clocks and tracks.
   The commands are the same everywhere; only a few names change with the setting.</p>
   <div class="ld-actions">
+    <a class="ld-button" href="{DISCORD_INVITE}" target="_blank" rel="noopener">Join the Legend Dynamics Discord</a>
     <a class="ld-button" href="#load">Load the bot on your server</a>
     <a class="ld-button ld-button--ghost" href="#session">Run a game over Discord</a>
   </div>
