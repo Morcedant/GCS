@@ -680,11 +680,12 @@ def build(pid, docx):
     if gm_md:
         # Both books in the Guide tab, one shown at a time (a Players / GM switch in the page).
         (out / "gm-guide.md").write_text(gm_md)
-        # The GM's Guide itself isn't in the page: the table server gives it to registered GMs (tools/gm_guides.py).
+        # The GM's Guide: in the page, or from the table server for registered GMs only (tools/gm_guides.py, GM_GUIDES_OPEN).
         g = pack["gmGuide"]
-        gm_guides.write_game(out, g["title"], g.get("subtitle", ""), to_html(gm_md, "gm-"))
+        gm_html = to_html(gm_md, "gm-")
+        gm_guides.write_game(out, g["title"], g.get("subtitle", ""), gm_html)
         guide_html = (f'<div class="guide-book" id="guide-players" data-title="{html.escape(t["guideTitle"])}" data-subtitle="{html.escape(t["guideSubtitle"])}">\n' + guide_html + "</div>\n"
-                      + gm_guides.locked_book(g["title"], g.get("subtitle", "")))
+                      + gm_guides.book(g["title"], g.get("subtitle", ""), gm_html))
     theme = {**THEME_DEFAULTS, **pack.get("theme", {})}
     tpl = (ENGINE / "creator.html").read_text()
     tpl = tpl.replace("{{THEMECSS}}", theme["css"])

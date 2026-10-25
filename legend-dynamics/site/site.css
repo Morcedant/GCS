@@ -331,7 +331,10 @@ main { flex: 1; }
 .ld-downloads { display: flex; flex-wrap: wrap; gap: .75rem; margin: 0; padding: 0; list-style: none; }
 @media (prefers-reduced-motion: reduce) { .ld-button, .ld-game { transition: none !important; } }
 /* The dev blog (/blog/, website/blog.js) */
-.ld-posts { display: grid; gap: 1rem; }
+.ld-posts { display: grid; gap: 1rem; max-width: 52rem; }
+.ld-blog-head { margin: 0 0 1.4rem; }
+.ld-blog-head h1 { margin: .3rem 0 .4rem; font-size: clamp(1.6rem, 4vw, 2.4rem); }
+.ld-blog-head .ld-note { margin: 0; max-width: 46rem; font-size: 1rem; }
 .ld-post-card { background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: 1.1rem 1.2rem; }
 .ld-post-card h2 { margin: .25rem 0 .5rem; font-size: clamp(1.1rem, 2vw, 1.4rem); }
 .ld-post-card h2 a { color: var(--ld-ink); text-decoration: none; }

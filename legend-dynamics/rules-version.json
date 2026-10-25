@@ -6,10 +6,21 @@
     {
       "date": "2026-10-25",
       "kind": "site",
-      "title": "A dev blog",
+      "title": "The GM view and GM's Guides open to everyone; homebrew origins and advantages",
+      "items": [
+        "Every creator's GM view and GM's Guide are open again, and the GM's Guides are back on the setting pages in Word. A GM access code is needed only to start a shared table on this site: ask for one in the Discord server or by email.",
+        "Homebrew now takes origins (tier, attribute changes, origin skills, origin advantages and their complications; in Aurora, powers like one of the setting's origins) and advantages (+2 to a narrow task with a skill). They join the creator's choices like the setting's own.",
+        "Want your own table server on Cloudflare? Ask, and we'll send you the package."
+      ]
+    },
+    {
+      "date": "2026-10-25",
+      "kind": "site",
+      "title": "A dev blog and the community Discord",
       "items": [
         "The new Dev blog page carries news from the making of the game: rules changes, the settings, playtest notes and what's coming. Filter it by setting, or read every post.",
-        "The home page shows the latest three posts."
+        "The home page shows the latest three posts.",
+        "Join the Legend Dynamics Discord server from the home page, the Discord page or any page's footer, or at legenddynamicsrpg.com/join."
       ]
     },
     {

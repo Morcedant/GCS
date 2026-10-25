@@ -43,10 +43,11 @@ def main():
     html = pandoc("-f", "markdown", "-t", "html", "--id-prefix=g-", "--wrap=none")
     # A game with a GM's Guide (<game>/gm-guide.md): both books in the Guide tab, one shown at a time.
     GM = ROOT / a.game / "gm-guide.md"
-    # The GM's Guide itself isn't in the page: the table server gives it to registered GMs (tools/gm_guides.py).
+    # The GM's Guide: in the page, or from the table server for registered GMs only (tools/gm_guides.py, GM_GUIDES_OPEN).
     if GM.exists():
-        gm_guides.write_game(ROOT / a.game, front(GM, "title"), front(GM, "subtitle"), pandoc("-f", "markdown", "-t", "html", "--id-prefix=gm-", "--wrap=none", src=GM))
-        html = '<div class="guide-book" id="guide-players">\n' + html + "</div>\n" + gm_guides.locked_book(front(GM, "title"), front(GM, "subtitle"))
+        gm_html = pandoc("-f", "markdown", "-t", "html", "--id-prefix=gm-", "--wrap=none", src=GM)
+        gm_guides.write_game(ROOT / a.game, front(GM, "title"), front(GM, "subtitle"), gm_html)
+        html = '<div class="guide-book" id="guide-players">\n' + html + "</div>\n" + gm_guides.book(front(GM, "title"), front(GM, "subtitle"), gm_html)
     app = APP.read_text()
     if START not in app or END not in app:
         sys.exit(f"GUIDE markers missing from {APP}")

@@ -3633,7 +3633,7 @@ tr.lvl-U td.target { color: var(--muted); }
   let book = "players";
   try { if (books && sessionStorage.getItem(PACK.id + ".guide") === "gm") book = "gm"; } catch {}
   showBook(book);
-  // Registered GMs only: the GM view opens, and the GM's Guide arrives from the table server, once the GM access code checks out.
+  // The GM's Guide, if the build kept it for registered GMs: it arrives from the table server once the GM access code checks out.
   mountGmLock({ table: sharedTable, game: PACK.id, view: $("view-gm"), book: books ? books.gm : null, esc, toast,
     onBook: () => { let at = "players"; try { at = sessionStorage.getItem(PACK.id + ".guide") || "players"; } catch {} showBook(at === "gm" ? "gm" : "players"); } });
   protectText($("guide"), "The guides are © Don Smallwood: please don't copy them.", toast);
