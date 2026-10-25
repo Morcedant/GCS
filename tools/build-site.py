@@ -23,7 +23,9 @@ Run after build-legend.py:
 
 Then upload legend-dynamics/site/ in Cloudflare (see legend-dynamics/CLOUDFLARE-PAGES.md).
 """
-import html, importlib.util, pathlib, re, shutil
+import html, importlib.util, pathlib, re, shutil, sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import gm_guides
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LD = ROOT / "legend-dynamics"
@@ -209,10 +211,14 @@ def main():
     for g in GAMES:
         t = bw.pack(g)["terms"]
         slug = SLUGS[g].strip("/")
-        # The Players' Guide only: the GM's Guide goes to registered GMs, from the table server (tools/gm_guides.py).
+        # The Players' Guide, and the GM's Guide when the guides are open (tools/gm_guides.py, GM_GUIDES_OPEN).
         guide = next((LD / g).glob("*_Players_Guide.docx"))
         links = [(f"{SLUGS[g]}/{guide.name}", f"{t['title']} Players' Guide (Word)")]
         copy(guide, f"{slug}/{guide.name}")
+        gm = next((LD / g).glob("*_GM_Guide.docx"), None)
+        if gm and gm_guides.GM_GUIDES_OPEN:
+            links.append((f"{SLUGS[g]}/{gm.name}", f"{t['title']} GM's Guide (Word)"))
+            copy(gm, f"{slug}/{gm.name}")
         # The creator, with links back to the site above its header (the published creator has none).
         nav = (f'<nav class="site-back no-print" aria-label="Site"><a href="/">← Legend Dynamics home</a>'
                f'<a href="{SLUGS[g]}">{e(t["title"])}</a></nav>')

@@ -67,3 +67,33 @@ test("homebrew powers join Aurora's list, with every Class filled in", () => {
   assert.match(p[3][1], /As Class I, stronger/);
   assert.deepEqual(p[4], { gm: true });
 });
+
+test("homebrew advantages and origins join the creator's choices, held to the setting's shape", () => {
+  const P = pack("western"), skills = P.skills.map((k) => k[0]), n = P.origins.length;
+  const trait = { name: "Night Eyes", skill: "Tracking", text: "+2 to Tracking in the dark.", compName: "Sun-Dazzled", compText: "Bright light blinds you." };
+  const hb = HB.hbClean({
+    advantages: [{ name: "Trail Cook", skill: "Survival", text: "+2 to Survival to feed a party." }, { name: "No text" }],
+    origins: [{ name: "Cave-born", desc: "From under the hills.", tier: 9, adj: { Agility: 1, Presence: -1 }, skills: ["Tracking", "Juggling", "Stealth"], traits: [trait, { name: "half done" }] },
+      { name: "Lopsided", desc: "x", adj: { Body: 2 }, skills: ["Stealth"], traits: [trait] },
+      { name: "No advantage", desc: "x", adj: {}, skills: ["Stealth"], traits: [] }],
+  }, P);
+  assert.equal(hb.advantages.length, 1);
+  assert.equal(hb.origins.length, 1, "attributes must total 0, and an origin needs an advantage with its complication");
+  const o = hb.origins[0];
+  assert.deepEqual([o.tier, o.adj, o.skills, o.traits.length], [Math.max(...P.origins.map((x) => x.tier)), { Agility: 1, Presence: -1 }, ["Tracking", "Stealth"], 1]);
+  HB.hbApply(P, hb);
+  const added = P.origins[n];
+  assert.equal(added.name, "Cave-born (homebrew)");
+  assert.deepEqual(added.traits[0], ["hb-cave-born-1", "Night Eyes", "+2 to Tracking in the dark.", "Tracking", true, "Sun-Dazzled", "Bright light blinds you."]);
+  assert.ok(added.skills.every((s) => skills.includes(s)));
+  assert.deepEqual(P.advantages.at(-1), ["hb-trail-cook", "Trail Cook (homebrew)", "+2 to Survival to feed a party.", "Survival"]);
+});
+
+test("a homebrew origin in Aurora takes its powers from one of the setting's origins", () => {
+  const P = pack("aurora"), like = P.origins.find((o) => o.powerSlots);
+  HB.hbApply(P, HB.hbClean({ origins: [{ name: "Star-touched", desc: "Hit by a falling star.", adj: {}, skills: [P.skills[0][0]], powersLike: like.id,
+    traits: [{ name: "Glow", text: "You shine.", compName: "Seen", compText: "Hard to hide." }] }] }, P));
+  const o = P.origins.at(-1);
+  assert.deepEqual(o.powerSlots, like.powerSlots);
+  assert.equal(o.traits[0][4], false, "an advantage with no skill gives no roll bonus");
+});

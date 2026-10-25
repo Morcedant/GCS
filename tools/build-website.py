@@ -94,6 +94,15 @@ def md_inline(t):
     return re.sub(r"\*(.+?)\*", r"<i>\1</i>", t)
 
 
+# Hosting your own table server, when the step-by-step (TABLE_HOSTING) is held back: ask, and get the package.
+HOST_ASK = f"""<!-- Block 3: host your own (anchor id "host") -->
+<div class="ld ld-callout" id="host">
+  <b>Host your own table server</b>
+  <p>Want your own shared tables, for your group or your games, on your own free Cloudflare account? We can provide the package to run your own: the table server, set up for the Legend Dynamics creators, with step-by-step instructions (it works from a browser, an iPad included). Ask in <a href="{DISCORD_INVITE}" target="_blank" rel="noopener">the Discord server</a> or at <a href="mailto:{CONTACT_EMAIL}?subject=Table%20server%20package">{CONTACT_EMAIL}</a>.</p>
+</div>
+"""
+
+
 def table_page():
     """The shared table: how to run a game with it, and (TABLE_HOSTING) how to host your own table server on Cloudflare."""
     code = lambda x: f"<code>{e(x)}</code>"
@@ -140,9 +149,11 @@ def table_page():
   <h1>The shared table</h1>
   <hr class="ld-rule">
   <p class="ld-lede">Every character creator can join a shared table: the GM starts one, the players join with a code, and everyone sees the same dice, the same characters and the same fight, each on their own device.</p>
+  <p>Every creator's <b>GM view</b> and <b>GM's Guide</b> are open to everyone. To <b>start a shared table</b> on this site, a GM needs a <b>GM access code</b>: ask for one in <a href="{DISCORD_INVITE}" target="_blank" rel="noopener">the Legend Dynamics Discord server</a> or by email at <a href="mailto:{CONTACT_EMAIL}?subject=GM%20access%20code">{CONTACT_EMAIL}</a>. Players never need one: they join with the table's code.</p>
   <div class="ld-actions">
     <a class="ld-button" href="/#games">Open a creator</a>
-    {'<a class="ld-button ld-button--ghost" href="#host">Host your own table server</a>' if TABLE_HOSTING else ""}
+    <a class="ld-button ld-button--ghost" href="{DISCORD_INVITE}" target="_blank" rel="noopener">Ask for a GM code on Discord</a>
+    <a class="ld-button ld-button--ghost" href="#host">Host your own table server</a>
     <a class="ld-button ld-button--ghost" href="{DISCORD_SLUG}">Or play with the Discord bot</a>
   </div>
   {table_notice(' Or <a href="#host">host your own table server</a>: the playtest limit applies only to this site\'s.' if TABLE_HOSTING else "")}
@@ -152,7 +163,7 @@ def table_page():
 <div class="ld" id="run">
   <div class="ld-eyebrow">Running a game</div>
   <ol class="ld-steps">
-    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. During the playtest, starting a table here needs a <b>GM access code</b>: <a href="mailto:{CONTACT_EMAIL}?subject=GM%20access%20code">email me at {CONTACT_EMAIL}</a> for one. Type it when the creator asks; it remembers it. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
+    <li><b>Start the table.</b> In the creator's <b>GM view</b>, under <b>Shared table</b>, name the game and press <b>Start a table</b>. Starting a table here needs a <b>GM access code</b>: ask in <a href="{DISCORD_INVITE}" target="_blank" rel="noopener">our Discord server</a> or <a href="mailto:{CONTACT_EMAIL}?subject=GM%20access%20code">email {CONTACT_EMAIL}</a> for one. Type it when the creator asks; it remembers it. Send the players the link (<b>Copy link</b>) or the six-character code.</li>
     <li><b>Players join.</b> Each opens their character, goes to the play tab, types the code and their name, and presses <b>Join</b>.</li>
     <li><b>Play.</b> Rolls from every sheet are rolled by the table and shown to all. Each character appears on the GM's cards, and injuries, points and ammunition stay in step both ways.</li>
     <li><b>Fight.</b> The GM's battle map and encounter show on every player's play tab. Players move their own tokens and, on their turn, send the GM what they do; the GM puts it into the Encounter panel and runs it.</li>
@@ -162,7 +173,7 @@ def table_page():
   <p style="font-size:.9rem;color:var(--ld-ink-2);margin-top:1rem">You can mix it with the <a href="{DISCORD_SLUG}">Discord dice bot</a>: stream the map to a group on Discord while players who have the creator open join the shared table, or roll with the bot while the GM keeps the encounter panel.</p>
 </div>
 
-{hosting if TABLE_HOSTING else ""}"""
+{hosting if TABLE_HOSTING else HOST_ASK}"""
 
 
 def contact_page():
@@ -186,7 +197,7 @@ def contact_page():
   <div class="ld-eyebrow">Write to me</div>
   <form class="ld-form" id="ld-contact" action="mailto:{CONTACT_EMAIL}" method="post" enctype="text/plain">
     <label>Your name <input type="text" name="name" autocomplete="name" maxlength="80"></label>
-    <label>About <select name="topic"><option>A comment or suggestion</option><option>A question about the rules</option><option>Something isn't working</option><option>A story from my game</option>{"<option>A GM access code for the shared table</option>" if TABLE_PLAYTEST and TABLE_ACCESS_REQUESTS else ""}<option>Something else</option></select></label>
+    <label>About <select name="topic"><option>A comment or suggestion</option><option>A question about the rules</option><option>Something isn't working</option><option>A story from my game</option>{"<option>A GM access code for the shared table</option>" if TABLE_PLAYTEST else ""}<option>The package to host my own table server</option><option>Something else</option></select></label>
     <label>Game <select name="game"><option>Any or all</option>{games}</select></label>
     <label class="ld-wide">Your message <textarea name="message" rows="7" required maxlength="5000"></textarea></label>
     <div class="ld-actions ld-wide"><button class="ld-button" type="submit">Write the email</button></div>
@@ -273,7 +284,7 @@ def start_page():
   <div class="ld-eyebrow">Who needs what</div>
   <ul class="ld-pillars">
     <li><b>A player needs</b><span>A character from the creator, and three six-sided dice or the roller on its sheet. To play online: the code or link for the GM's shared table, or an invitation to the group's Discord server.</span></li>
-    <li><b>The GM needs</b><span>The setting's creator, open on its <strong>GM view</strong>: everyone's characters, the battle map, the encounter panel and the clocks. The setting's guides, from its page. To play online: start a <a href="{TABLE_SLUG}#run">shared table</a> there, or <a href="{DISCORD_SLUG}#load">add the dice bot</a> to your Discord server and share your screen.</span></li>
+    <li><b>The GM needs</b><span>The setting's creator, open on its <strong>GM view</strong>: everyone's characters, the battle map, the encounter panel and the clocks. The setting's guides, the GM's Guide included, in the creator's Guide tab or from its page. To play online: start a <a href="{TABLE_SLUG}#run">shared table</a> there, or <a href="{DISCORD_SLUG}#load">add the dice bot</a> to your Discord server and share your screen.</span></li>
   </ul>
   <div class="ld-actions" style="margin-top:1.4rem">
     <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">The core rules, when you want them</a>
@@ -343,7 +354,7 @@ def home():
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Heroes are made of skill, nerve and a little luck.</h1>
   <hr class="ld-rule">
-  <p class="ld-lede">A tabletop roleplaying system built on three six-sided dice and concrete skills. One core, many worlds: Gothic Westerns, starships, swords against sorcery, and superheroes under the law.</p>
+  <p class="ld-lede">One core, many worlds: Gothic Westerns, starships, swords against sorcery, and superheroes under the law.</p>
   <div class="ld-actions">
     <a class="ld-button" href="{START_SLUG}">Start here</a>
     <a class="ld-button ld-button--ghost" href="#games">Choose a game</a>
@@ -359,6 +370,7 @@ def home():
   <li><b>Roll 3d6 under your skill</b><span>One roll for everything. Your sheet shows the number to beat, and the margin tells you how well you did.</span></li>
   <li><b>Skills, not classes</b><span>Train what your character knows. A specialty is worth +3, an expert's craft +5; everything else is plausible, just harder.</span></li>
   <li><b>Flaws that pay</b><span>Complications cause trouble at the worst moment, and earn the points that let you reroll, soak a wound or be ready.</span></li>
+  <li><b>Make it your own</b><span>The system is built to grow. In the GM view, GMs add their own origins, Edges, advantages, cards and weapons (threats, spells and powers too) with simple forms, no code, and share them with their table.</span></li>
 </ul>
 
 <!-- Block 3: the games (give this section the anchor id "games" in Squarespace, or keep the id below) -->
@@ -374,7 +386,7 @@ def home():
   <div class="ld-eyebrow">Play online</div>
   <p class="ld-lede" style="margin:0 0 1.2rem">Create characters, share dice rolls, and play together on a shared map.</p>
   <ul class="ld-pillars">
-    <li><b>The shared table</b><span>Built into every character creator. The GM starts a table and sends the players a code; each joins from their character sheet. Everyone sees the same dice, characters and battle map on their own phone, tablet or computer. Nothing to install.</span></li>
+    <li><b>The shared table</b><span>Built into every character creator. The GM starts a table and sends the players a code; each joins from their character sheet. Everyone sees the same dice, characters and battle map on their own phone, tablet or computer. Nothing to install. The GM view and the guides are open to everyone; starting a shared table here takes a <b>GM access code</b>: ask for one in <a href="{DISCORD_INVITE}" target="_blank" rel="noopener">our Discord server</a> or at <a href="mailto:{CONTACT_EMAIL}?subject=GM%20access%20code">{CONTACT_EMAIL}</a>. Rather host your own table server on Cloudflare? <a href="{TABLE_SLUG}#host">Ask, and we'll send you the package</a>.</span></li>
     <li><b>Screen share and the Discord dice bot</b><span>Or the GM shares their screen in a Discord call (or any video call), and players roll with the Legend Dynamics dice bot in the channel.</span></li>
   </ul>
   <div class="ld-actions" style="margin-top:1.2rem">

@@ -586,7 +586,7 @@ p.bad, .small.bad { color: var(--bad); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="6cabaee" data-version-date="2026.10.23" title="The code changes whenever this page changes.">Version 2026.10.23 · 6cabaee</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="2c98945" data-version-date="2026.10.25" title="The code changes whenever this page changes.">Version 2026.10.25 · 2c98945</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -3434,7 +3434,487 @@ p.bad, .small.bad { color: var(--bad); }
 <p><strong>Will:</strong> resist overwhelming fear or mental intrusion and maintain concentration. Ordinary danger needs no roll. Fear or distraction failure normally causes hesitation or −2 on your next action.</p>
 <p><strong>Duty points:</strong> start each session with two. Spend one to reroll, reduce an injury by one box, or establish a plausible preparation. Earn one when an accepted complication, including a companion complication, creates a meaningful problem.</p>
 </div>
-<div class="guide-book" id="guide-gm" data-title="USS Pelion GM&#x27;s Guide" data-subtitle="Running the campaign: missions, threats, enemy ships and the GM&#x27;s tools" data-locked="1" hidden>
+<div class="guide-book" id="guide-gm" data-title="USS Pelion GM&#x27;s Guide" data-subtitle="Running the campaign: missions, threats, enemy ships and the GM&#x27;s tools" hidden>
+<p>This book is for whoever runs the game. It gathers what the GM reaches for at the table: mission seeds, the threats and enemy ships with their numbers, and how to use the GM view’s battle map and Encounter panel. The rules themselves are in the <strong>Players’ Guide</strong>; this book builds on them.</p>
+<h1 id="gm-running-missions">Running missions</h1>
+<h2 id="gm-mission-seeds">Mission seeds</h2>
+<p>Short of a plot? Roll 3d6 on each table and read the total; middle results come up most often, the strangest sit at 3, 4, 17 and 18, or pick what you like. Read the results together: a <em>mission</em> in a <em>place</em>, made strange by <em>something strange</em>, turned by a <em>twist</em>, against a <em>ticking clock</em>, with a <em>key character</em> at its heart. The GM view in the creator rolls these for you and can start the clock.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>Mission</th>
+<th>Place</th>
+<th>Something strange</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>Answer a call from a ship lost a century ago</td>
+<td>The edge of the galaxy</td>
+<td>The crew’s past selves</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Ferry a delegation to a world that left the Federation</td>
+<td>Inside a living starship</td>
+<td>A dead star that sings</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Answer a distress call</td>
+<td>A storm-wracked ocean world</td>
+<td>A subspace anomaly that distorts time</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Survey an uncharted system</td>
+<td>A dead world with ancient ruins</td>
+<td>A non-corporeal life form</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Make first contact</td>
+<td>A struggling frontier colony</td>
+<td>An ancient machine that still works</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Escort a diplomatic delegation</td>
+<td>An asteroid mining station</td>
+<td>Duplicates of the crew</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>Find a missing ship or outpost</td>
+<td>A drifting derelict starship</td>
+<td>A signal repeating a crew member’s name</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>Deliver urgent medical supplies</td>
+<td>An ice-covered moon of a gas giant</td>
+<td>A planet-wide illusion</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Evacuate a colony</td>
+<td>A pre-warp civilization’s world</td>
+<td>A rift into another universe</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>Patrol the Neutral Zone border</td>
+<td>A nebula that blinds the sensors</td>
+<td>A disease no one recognizes</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>Recover a lost probe or artifact</td>
+<td>A starbase in crisis</td>
+<td>A gravity well that traps ships</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>Mediate a dispute between two worlds</td>
+<td>A world that seems too perfect</td>
+<td>A godlike being testing the crew</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>Test experimental technology</td>
+<td>A jungle planet thick with life</td>
+<td>An alien probe draining power</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>Shore leave that goes wrong</td>
+<td>Deep space between the stars</td>
+<td>Memories that aren’t the crew’s own</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>Carry a message across the Neutral Zone</td>
+<td>A Klingon prison world</td>
+<td>A crossing into a mirror universe</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>Host a first contact aboard the Pelion</td>
+<td>A Romulan listening post</td>
+<td>A machine that remembers the Pelion</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>Twist</th>
+<th>Ticking clock (segments)</th>
+<th>Key character</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>The captain has been replaced</td>
+<td>The time loop resets (4)</td>
+<td>A crew member’s future self</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>The enemy is a Federation colony</td>
+<td>The ship’s power drains (6)</td>
+<td>A legend thought dead</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Klingons arrive with their own claim</td>
+<td>Orbit decays (6)</td>
+<td>An idealistic Federation ambassador</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>The people asking for help are lying</td>
+<td>Warp core breach (4)</td>
+<td>A Klingon captain with a grudge</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>A crew member’s complication comes into play</td>
+<td>Klingon battle cruiser arrives (6)</td>
+<td>A stranded Orion trader</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Orders conflict with doing the right thing</td>
+<td>The disease reaches the ship (8)</td>
+<td>A brilliant, reckless scientist</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>The Prime Directive forbids interfering</td>
+<td>The storm closes the beam-out window (4)</td>
+<td>A colony leader hiding a secret</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>A cloaked Romulan ship is watching</td>
+<td>Life support fails on the station (6)</td>
+<td>A former Starfleet officer gone rogue</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Orion pirates want the same prize</td>
+<td>The anomaly collapses (6)</td>
+<td>A local child who has seen too much</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>The Pelion’s systems start failing</td>
+<td>Peace talks break down (8)</td>
+<td>A disapproving Vulcan observer</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>A respected visitor has a hidden agenda</td>
+<td>The hostages’ air runs out (4)</td>
+<td>An old friend of one of the crew</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>The ‘threat’ is only defending itself</td>
+<td>The star goes nova (8)</td>
+<td>A Romulan who wants to defect</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>Contact with Starfleet is cut off</td>
+<td>Shields fail under bombardment (4)</td>
+<td>A Starfleet admiral with sealed orders</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>A civilian is trapped out of reach</td>
+<td>The away team is discovered (6)</td>
+<td>An android that wants to be free</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>The mission was a test</td>
+<td>The duel at dawn (4)</td>
+<td>A godlike child</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>History must not change</td>
+<td>The Klingon ultimatum (6)</td>
+<td>An admiral’s spy aboard</td>
+</tr>
+</tbody>
+</table>
+<p><em>Example:</em> 3, 9, 5, 10, 2, 4 gives <strong>first contact</strong> at <strong>a starbase in crisis</strong>, where <strong>a signal repeats a crew member’s name</strong>; <strong>the “threat” is only defending itself</strong>, a <strong>warp core breach</strong> clock (4) is ticking, and <strong>a brilliant, reckless scientist</strong> is in the middle of it.</p>
+<h1 id="gm-threats">Threats</h1>
+<p>Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge once per round, and mark injury boxes. Each threat below is one line of numbers and one special trait.</p>
+<p><strong>Minor opponents</strong> (guards, crewmen, a mob) have <strong>one box</strong>: any hit that gets through takes them out of the fight. Save full injury tracks for threats that matter.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Threat</th>
+<th>Attack (target)</th>
+<th>Dodge</th>
+<th>Boxes</th>
+<th>Weapon</th>
+<th>Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Security guard (minor)</td>
+<td>Phasers or disruptor 11</td>
+<td>7</td>
+<td>1</td>
+<td>Hand weapon</td>
+<td><strong>Numbers.</strong> Usually two or three; they surrender or flee when half are down.</td>
+</tr>
+<tr class="even">
+<td>Klingon warrior</td>
+<td>Disruptor 12, Blade 13, Unarmed 12</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor (kill), d’k tahg</td>
+<td><strong>Relentless.</strong> Ignores the Wounded penalty; only Seriously wounded slows them.</td>
+</tr>
+<tr class="odd">
+<td>Klingon officer</td>
+<td>Disruptor 12, Leadership 13</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor (kill)</td>
+<td><strong>Battle commander.</strong> Once per round, gives one ally +1 on an attack.</td>
+</tr>
+<tr class="even">
+<td>Romulan centurion</td>
+<td>Disruptor 12, Stealth 13</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor (kill)</td>
+<td><strong>Ambush.</strong> +2 on the first attack from hiding; prefers to withdraw rather than be captured.</td>
+</tr>
+<tr class="odd">
+<td>Orion pirate</td>
+<td>Disruptor 11, Blade 12, Stealth 12</td>
+<td>9</td>
+<td>3</td>
+<td>Disruptor, knife</td>
+<td><strong>Dirty fighter.</strong> Winning a grapple also disarms the target.</td>
+</tr>
+<tr class="even">
+<td>Gorn warrior</td>
+<td>Unarmed 14</td>
+<td>6</td>
+<td>4</td>
+<td>Claws, thrown rocks</td>
+<td><strong>Immense strength.</strong> Unarmed hits mark 2 boxes; slow, so it acts last in a round.</td>
+</tr>
+<tr class="odd">
+<td>Mugato</td>
+<td>Unarmed (bite and horn) 13</td>
+<td>8</td>
+<td>3</td>
+<td>Venomous bite</td>
+<td><strong>Venom.</strong> A bite that marks a box also poisons: without Medicine before the scene ends, mark another box.</td>
+</tr>
+<tr class="even">
+<td>Rogue android</td>
+<td>Unarmed 13, Computers 15</td>
+<td>7</td>
+<td>4</td>
+<td>Crushing grip</td>
+<td><strong>Logic trap.</strong> A Diplomacy or Psychology contest that presents a paradox stuns it for the scene.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship registry in <em>The USS Pelion</em>; its <em>Enemy ships</em> table gives the common ones.</p>
+<h2 id="gm-enemy-ships">Enemy ships</h2>
+<p>The ships the Pelion meets most, built on the registry’s classes. The GM keeps their tracks the same way as the Pelion’s.</p>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Ship</th>
+<th>Class</th>
+<th>Helm / Gunner</th>
+<th>Maneuver</th>
+<th>Shields</th>
+<th>Hull</th>
+<th>Weapons</th>
+<th>Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Klingon battle cruiser</td>
+<td>Heavy Cruiser</td>
+<td>12 / 12</td>
+<td>3</td>
+<td>5</td>
+<td>5</td>
+<td>Disruptors (heavy), photon torpedoes</td>
+<td><strong>Cloak.</strong> <strong>Relentless:</strong> doesn’t break off until its Hull has 3 boxes.</td>
+</tr>
+<tr class="even">
+<td>Klingon bird-of-prey</td>
+<td>Escort</td>
+<td>13 / 12</td>
+<td>5</td>
+<td>2</td>
+<td>3</td>
+<td>Disruptors</td>
+<td><strong>Cloak.</strong> Its first volley from the cloak is at +2.</td>
+</tr>
+<tr class="odd">
+<td>Romulan bird-of-prey</td>
+<td>Light Cruiser</td>
+<td>11 / 12</td>
+<td>5</td>
+<td>3</td>
+<td>3</td>
+<td>Plasma torpedo</td>
+<td><strong>Cloak.</strong> Would rather self-destruct than be captured.</td>
+</tr>
+<tr class="even">
+<td>Orion raider</td>
+<td>Escort</td>
+<td>13 / 11</td>
+<td>6</td>
+<td>2</td>
+<td>3</td>
+<td>Disruptors, tractor beam</td>
+<td><strong>Fast.</strong> Runs once its Shields are down.</td>
+</tr>
+<tr class="odd">
+<td>Gorn cruiser</td>
+<td>Cruiser</td>
+<td>10 / 13</td>
+<td>3</td>
+<td>4</td>
+<td>4</td>
+<td>Disruptors, photon torpedoes</td>
+<td><strong>Ablative armor</strong> (2).</td>
+</tr>
+</tbody>
+</table>
+<h1 id="gm-library-records">Library records</h1>
+<p>The rules for library records are in the Players’ Guide (<em>Library records</em>). This chapter is about making them.</p>
+<h2 id="gm-making-a-library-record">Making a library record</h2>
+<p>A library record holds <strong>one finding</strong>, never a subject’s whole story. Write it in the crew’s words, from what they actually did:</p>
+<ul>
+<li><strong>What they established.</strong> One sentence: “It answers only in prime-number sequences”, not everything the GM knows about the machine-mind.</li>
+<li><strong>Limits.</strong> What it doesn’t tell them: “Seen once; not what it wants.” Limits keep a record honest and leave room for the next discovery.</li>
+<li><strong>Evidence or source.</strong> What they scanned, tested, read or were told, and by whom.</li>
+<li><strong>How it was learned, and what it cost.</strong> A discovery clock, or one of the direct routes with its price.</li>
+<li><strong>What it permits (optional).</strong> What the finding lets them attempt that they couldn’t before: hailing it in a way it answers, shutting it down cleanly, crossing a rift safely. Permission only, never a bonus.</li>
+</ul>
+<p><strong>Keep the truth separate.</strong> Decide what’s really true of a subject before play, and let the crew find it piece by piece. A record can be wrong if its evidence was thin; reality wins at the table, and the next record corrects the last.</p>
+<p><strong>Restricted Files.</strong> Approve each starting secret before play. A good one is specific, belongs to the character’s department or species, and wouldn’t be in Starfleet’s open files: what a Vulcan elder taught about a forbidden discipline, what an engineer saw in a classified refit. Turn down anything that would solve a mission you have planned, or ask the player to narrow it.</p>
+<h2 id="gm-choosing-the-cost">Choosing the cost</h2>
+<p>Information is never free. Choose the price from how the crew went about it:</p>
+<ul>
+<li><strong>Starfleet Command +1</strong> for anything that draws Command’s eye: contact the Prime Directive frowns on, a risky deal with a power, orders bent to get the answer.</li>
+<li><strong>A Duty point</strong> when the owner pushes themselves: a sleepless night in the lab, a personal favor called in.</li>
+<li><strong>A ship’s system</strong> when the ship carries the strain: Sensors pushed past their limits, a transporter used on something unknown, Communications held open to a hostile signal.</li>
+<li><strong>A danger clock or the Countdown</strong> when it takes time the crew doesn’t have.</li>
+</ul>
+<p>Don’t start a Countdown for routine discovery. Start one when a failed roll or a success at a cost puts something real at stake, and show it to the players.</p>
+<h2 id="gm-example-subjects">Example subjects</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Subject</th>
+<th>What a record might establish</th>
+<th>What it might permit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>The machine-mind of a dead colony</td>
+<td>It still follows its last order, and treats the crew as the threat that order named</td>
+<td>Issuing orders it will accept, or shutting it down without tripping its failsafes</td>
+</tr>
+<tr class="even">
+<td>A silicon-based lifeform in the mines</td>
+<td>It tunnels with acid, and it is guarding something, not attacking</td>
+<td>Talking to it through a mind-meld or a modified translator; moving its young to safety</td>
+</tr>
+<tr class="odd">
+<td>A rift that opens with a pulsar’s beat</td>
+<td>It folds space in a cycle tied to the pulsar</td>
+<td>Plotting a safe course through it on each cycle</td>
+</tr>
+<tr class="even">
+<td>A derelict of unknown origin</td>
+<td>Its systems wake to a power signature like a starship’s</td>
+<td>Waking or powering it down on the crew’s terms</td>
+</tr>
+<tr class="odd">
+<td>A Klingon house’s intentions</td>
+<td>The house wants the colony’s dilithium, not a war</td>
+<td>Opening talks the house will listen to</td>
+</tr>
+</tbody>
+</table>
+<h1 id="gm-the-gms-tools">The GM’s tools</h1>
+<h2 id="gm-the-battle-map">The battle map</h2>
+<p>The GM view of the creator has a <strong>battle map</strong> for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in the Players’ Guide, and a fight without it works the same way. Open <strong>How to use the map</strong> on the map itself for the buttons, step by step.</p>
+<p><strong>Three kinds of map.</strong></p>
+<ul>
+<li><strong>A hex map</strong> for an away team’s fight where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard inside a ship, 5 or 10 yards on a city street, 50 on open ground, or a number of kilometres for ships in space. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range tables.</li>
+<li><strong>A ship fight</strong> on a range track: a lane for the Pelion and one for each space range band, from under 10 km to a light-second. When the helms make their contest, the GM moves the enemy a lane in or out. <strong>Add the Pelion</strong> places the ship, linked to its Shields, Hull and systems: marking a box on the map marks it on the ship’s tracks, and the other way round. Enemy ships come from the <em>Enemy ships</em> table with their Hull boxes.</li>
+<li><strong>A range track</strong> for an away team’s chase or a running fight where only distance matters.</li>
+</ul>
+<p><strong>Tokens.</strong> The GM places the crew with one button. Their tokens stay linked to the officers in the GM view: marking Injury, Dying, Stunned or a Duty point on a token marks it on the officer, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
+<p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps every map, its picture and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
+<h2 id="gm-the-discovery-panel">The Discovery panel</h2>
+<p>The GM view’s <strong>Discovery: library records</strong> panel runs discovery clocks. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), mark segments as the crew succeeds, name the subject at the gate, and choose the primary investigator. When the clock fills, write what they established and <strong>mint</strong> it: the primary investigator owns the record and everyone present gets a shared copy. <strong>Record a finding without a clock</strong> does the same for a direct finding, and marks the cost you choose. The <strong>Countdown</strong> stays idle until you start it after a failed roll or a success at a cost. Save the crew’s files afterwards so the players get their records.</p>
+<h2 id="gm-the-encounter-panel">The Encounter panel</h2>
+<p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), whether the attacker is in reach or in range on the battle map, the boxes marked and any telling hit, offering Duty point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so.</p>
 </div>
 <!-- GUIDE:END -->
       </article>
@@ -6000,22 +6480,23 @@ function mountTable(api) {
 }
 /* TABLECLIENT:END */
 /* GMLOCK:START */
-// The GM view and the GM's Guide, for registered GMs only. Plain script, inlined by tools/build-legend.py (/* GMLOCK */)
+// The GM's Guide, for registered GMs only. Plain script, inlined by tools/build-legend.py (/* GMLOCK */)
 // and tools/build-guide.py (GMLOCK markers); no modules, no page globals.
 //
 // mountGmLock(api) with api: { table (mountTable's handle: server(), access(), setAccess(code)), game (the id the table
 //   server knows the game by), view (the GM view's element), book (the GM's Guide's empty, locked book, or null),
 //   onBook() (show the book again once it's filled in), esc, toast }
-// The GM view stays covered by a code box until the table server accepts the GM access code (POST /api/gm); the GM's
-// Guide isn't in the page at all, and comes from the server (POST /api/gm/guide) once the code checks out. The code
-// is the same one that starts a table, kept in this browser, so a GM types it once.
-// Returns { open() } → whether the GM view is open.
+// The GM view is open to everyone (starting a shared table from it still asks for the code, on the table server). So is
+// the GM's Guide when the build puts it in the page (tools/gm_guides.py, GM_GUIDES_OPEN). Otherwise the guide isn't in the page: its book shows a code box, and the guide comes from the server
+// (POST /api/gm/guide) once the table server accepts the GM access code (POST /api/gm). The code is the same one that
+// starts a table, kept in this browser, so a GM types it once.
+// Returns { open() } → whether a GM access code has been accepted.
 //
 // protectText(root, note, toast): the light copy deterrent on a guide: no selecting, copying or right-click menu
 // in it (form fields aside), with a short note instead.
 function mountGmLock(api) {
   const esc = api.esc, say = (m, err) => (api.toast ? api.toast(m, err) : null);
-  let open = false, busy = false, msg = "", guideDone = !api.book;
+  let open = false, busy = false, msg = "", guideDone = !api.book || !api.book.dataset.locked; // an open guide is already in the page
   if (!document.getElementById("gm-lock-css")) {
     const css = document.createElement("style"); css.id = "gm-lock-css";
     css.textContent = `#${api.view.id}.gm-locked > :not(.gm-lock) { display: none !important; }
@@ -6026,18 +6507,15 @@ function mountGmLock(api) {
     document.head.append(css);
   }
   const panel = (where) => `<div class="gm-lock card hud" data-gmlock="${where}">
-    <h3>${where === "book" ? "The GM's Guide is for registered GMs" : "The GM view is for registered GMs"}<\/h3>
-    <p class="small">${where === "book" ? "It holds the setting's secrets, so it's only sent to GMs with a GM access code." : "It holds the encounters, threats and secrets your players shouldn't see, so it opens only with a GM access code."}
-      The code is the one that starts a shared table; type it once and this browser remembers it. To ask for one, email <a href="mailto:contact@legenddynamicsrpg.com">contact@legenddynamicsrpg.com<\/a>.<\/p>
+    <h3>The GM's Guide is for registered GMs<\/h3>
+    <p class="small">It holds the setting's secrets, so it's only sent to GMs with a GM access code.
+      The code is the one that starts a shared table; type it once and this browser remembers it. To ask for one, join the
+      <a href="https://legenddynamicsrpg.com/join" target="_blank" rel="noopener">Legend Dynamics Discord<\/a> or email <a href="mailto:contact@legenddynamicsrpg.com">contact@legenddynamicsrpg.com<\/a>.<\/p>
     <form data-gmlock-form><label class="field"><span class="label">GM access code<\/span>
       <input type="password" name="code" maxlength="100" autocomplete="off" spellcheck="false" aria-label="GM access code"><\/label>
       <button class="btn primary" type="submit"${busy ? " disabled" : ""}>${busy ? "Checking…" : "Unlock"}<\/button><\/form>
     <p class="small gm-lock-msg" role="status">${esc(msg)}<\/p><\/div>`;
   function render() {
-    api.view.classList.toggle("gm-locked", !open);
-    let p = api.view.querySelector(':scope > [data-gmlock="view"]');
-    if (open) { if (p) p.remove(); }
-    else if (p) p.outerHTML = panel("view"); else api.view.insertAdjacentHTML("afterbegin", panel("view"));
     if (api.book && !guideDone) api.book.innerHTML = open ? `<p class="muted">Loading the GM's Guide…<\/p>` : panel("book");
   }
   const post = async (path, body) => {
@@ -6064,7 +6542,7 @@ function mountGmLock(api) {
       if (r.ok) {
         open = true; msg = ""; api.table.setAccess(code);
         const b = await r.json().catch(() => ({}));
-        if (!quiet) say(`GM view unlocked${b.name && b.name !== "GM" ? ` for ${b.name}` : ""}.`);
+        if (!quiet) say(`GM access code accepted${b.name && b.name !== "GM" ? ` for ${b.name}` : ""}.`);
       } else if (r.status === 401) { msg = quiet ? "" : "That GM access code isn't recognised: check it, or ask for one."; if (!quiet) api.table.setAccess(""); }
       else msg = "The table server couldn't check the code just now. Try again in a moment.";
     } catch (e) {
@@ -6101,7 +6579,8 @@ function protectText(root, note, toast) {
 }
 /* GMLOCK:END */
 /* HOMEBREW:START */
-// Homebrew: a GM's own threats, weapons, Edges, cards, spells (hexes, cantrips, psionic powers), powers and rituals, made in the GM view
+// Homebrew: a GM's own threats, weapons, Edges, advantages, origins, cards, spells (hexes, cantrips, psionic powers), powers and
+// rituals, made in the GM view
 // without touching any code. Plain script,
 // inlined by tools/build-legend.py (/* HOMEBREW */) and tools/build-guide.py (HOMEBREW markers); no modules, no page globals.
 //
@@ -6116,14 +6595,17 @@ function protectText(root, note, toast) {
 // Sharing: as a file (Save to file / Open file), or through the shared table: players who join get the GM's homebrew
 // and choose to use it.
 // Function declarations only, above mountHomebrew: hbLoad and hbApply run as the page starts, before this file's place.
-function hbLimits() { return { threats: 30, weapons: 30, edges: 20, spells: 20, cards: 30, rituals: 30, powers: 20 }; }
-function hbKinds() { return ["threats", "weapons", "edges", "spells", "cards", "rituals", "powers"]; }
+function hbLimits() { return { threats: 30, weapons: 30, edges: 20, spells: 20, cards: 30, rituals: 30, powers: 20, advantages: 20, origins: 10 }; }
+function hbKinds() { return ["threats", "weapons", "edges", "spells", "cards", "rituals", "powers", "advantages", "origins"]; }
+function hbAttrs() { return ["Body", "Agility", "Intellect", "Presence", "Will"]; }
 function hbClasses() { return ["I", "II", "III", "IV", "V", "VI"]; }
 // A ritual's weight sets its clock, as in the core rules' magic chapter.
 function hbWeights() { return [["minor", "Minor", 2], ["significant", "Significant", 4], ["major", "Major", 6]]; }
 // What a setting can take: spells need its spell list, cards its discovery cards, rituals its magic.
 function hbHas(PACK) { return { spells: !!(PACK.spells && Array.isArray(PACK.spells.list)), cards: !!PACK.discovery, rituals: !!(PACK.magic && PACK.magic.workings),
-  powers: !!(PACK.powers && Array.isArray(PACK.powers.list)) }; }
+  powers: !!(PACK.powers && Array.isArray(PACK.powers.list)),
+  advantages: Array.isArray(PACK.advantages) && PACK.advantages.length > 0 && PACK.advantages.every(Array.isArray) && Array.isArray(PACK.skills),
+  origins: Array.isArray(PACK.origins) && PACK.origins.length > 0 && PACK.origins.every((o) => o && o.adj && Array.isArray(o.traits)) && Array.isArray(PACK.skills) }; }
 function hbBands() { return [["close", "Close"], ["short", "Short"], ["medium", "Medium"], ["long", "Long"], ["extreme", "Extreme"]]; }
 function hbKey(game) { return game + ".homebrew.v1"; }
 function hbInt(v, lo, hi, d) { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; }
@@ -6205,7 +6687,29 @@ function hbClean(raw, PACK) {
     if (!name || !cls[0]) return null;
     return { id: hbId(x.id, name, taken), name, group: groups.includes(x.group) ? x.group : groups[0] || "", classes: cls, gm: !!x.gm, variety: hbText(x.variety, 120) };
   }).filter(Boolean);
-  return { threats, weapons, edges, spells, cards, rituals, powers, from: r.from === "gm" ? "gm" : "mine" };
+  // An advantage: +2 to one narrow kind of task with a skill, when the GM agrees it applies (the roller's Advantage box).
+  const skillNames = (PACK.skills || []).map((k) => k[0]);
+  const advantages = list("advantages").map((x) => {
+    const name = hbText(x && x.name, 40), text = hbText(x && x.text, 300); if (!name || !text) return null;
+    return { id: hbId(x.id, name, taken), name, text, skill: skillNames.includes(x.skill) ? x.skill : skillNames[0] || "" };
+  }).filter(Boolean);
+  // An origin, as the setting's own: its tier (paid from the Edge points), attribute changes totalling 0, four origin
+  // skills, and one to three origin advantages, each with its complication. Powers (Aurora) follow an origin of the setting's.
+  const tiers = (PACK.origins || []).map((o) => o.tier || 0), maxTier = Math.max(0, ...tiers);
+  const powerOrigins = (PACK.origins || []).filter((o) => o.powerSlots && !o.homebrew).map((o) => o.id);
+  const origins = list("origins").map((x) => {
+    const name = hbText(x && x.name, 40), desc = hbText(x && x.desc, 400); if (!name || !desc) return null;
+    const adj = {}; for (const a of hbAttrs()) { const n = hbInt(x.adj && x.adj[a], -2, 2, 0); if (n) adj[a] = n; }
+    if (Object.values(adj).reduce((t, n) => t + n, 0) !== 0) return null; // every origin's changes total 0
+    const sk = [...new Set((Array.isArray(x.skills) ? x.skills : []).filter((k) => skillNames.includes(k)))].slice(0, 4);
+    const traits = (Array.isArray(x.traits) ? x.traits : []).slice(0, 3).map((t) => ({ name: hbText(t && t.name, 40), text: hbText(t && t.text, 300),
+      skill: skillNames.includes(t && t.skill) ? t.skill : "", compName: hbText(t && t.compName, 40), compText: hbText(t && t.compText, 300) }))
+      .filter((t) => t.name && t.text && t.compName && t.compText);
+    if (!sk.length || !traits.length) return null;
+    return { id: hbId(x.id, name, taken), name, desc, tier: hbInt(x.tier, 0, maxTier, 0), adj, skills: sk, traits,
+      powersLike: powerOrigins.includes(x.powersLike) ? x.powersLike : "" };
+  }).filter(Boolean);
+  return { threats, weapons, edges, spells, cards, rituals, powers, advantages, origins, from: r.from === "gm" ? "gm" : "mine" };
 }
 function hbCount(hb) { return hb ? hbKinds().reduce((n, k) => n + (hb[k] || []).length, 0) : 0; }
 function hbBody(hb) { return JSON.stringify(Object.fromEntries(hbKinds().map((k) => [k, hb[k] || []]))); }
@@ -6264,6 +6768,13 @@ function hbApply(PACK, hb) {
     const cls = []; x.classes.forEach((c, i) => cls.push(c || `As Class ${hbClasses()[i - 1]}, stronger: the GM sets how much.`));
     PACK.powers.list.push([x.id, `${x.name} (homebrew)`, x.group, cls, x.gm ? { gm: true } : {}, x.variety || ""]);
   }
+  if (has.advantages) for (const x of hb.advantages) PACK.advantages.push([x.id, `${x.name} (homebrew)`, x.text, x.skill]);
+  if (has.origins) for (const x of hb.origins) {
+    const like = x.powersLike ? PACK.origins.find((o) => o.id === x.powersLike) : null;
+    PACK.origins.push({ id: x.id, name: `${x.name} (homebrew)`, tier: x.tier, adj: { ...x.adj }, desc: x.desc, core: [], form: null, skills: x.skills.slice(), homebrew: true,
+      traits: x.traits.map((t, i) => [`${x.id}-${i + 1}`, t.name, t.text, t.skill || x.skills[0], !!t.skill, t.compName, t.compText]),
+      ...(like ? { powerSlots: like.powerSlots, ...(like.powerList ? { powerList: like.powerList } : {}), ...(like.mythic ? { mythic: like.mythic } : {}) } : {}) });
+  }
 }
 
 function mountHomebrew(api) {
@@ -6274,11 +6785,14 @@ function mountHomebrew(api) {
   // A setting's own words: hexes or cantrips or psionic powers; lore cards or data records; rituals or workings.
   const W = { spell: M.burst || (HAS.spells ? PACK.spells.plural.toLowerCase().replace(/s$/, "") : "spell"), spells: M.bursts || (HAS.spells ? PACK.spells.plural.toLowerCase() : "spells"),
     card: D.card || "card", cards: D.cards || "cards", ritual: M.working || "ritual", rituals: M.workings || "rituals" };
-  const SKILLS = hbSkills(PACK);
+  const SKILLS = hbSkills(PACK), ALL_SKILLS = (PACK.skills || []).map((k) => [k[0], k[0]]);
+  // The setting's word for an origin: species, heritage, background…
+  const T = { origin: ((PACK.terms && PACK.terms.origin) || "Origin").toLowerCase(), origins: ((PACK.terms && PACK.terms.originPlural) || "Origins").toLowerCase() };
   const armsBuilt = (PACK.arms || []).filter((a) => !a.hazard && !a.homebrew);
   const opts = (list, sel) => list.map(([v, n]) => `<option value="${esc(v)}"${v === sel ? " selected" : ""}>${esc(n)}<\/option>`).join("");
   const store = () => { if (!hbSave(PACK, hb)) say("This browser won't keep the homebrew: save it to a file.", true); changed = true; render(); };
   const summary = (h) => [[h.threats.length, "threat", "threats"], [h.weapons.length, "weapon", "weapons"], ...(EDGES ? [[h.edges.length, "Edge", "Edges"]] : []),
+    ...(HAS.origins ? [[h.origins.length, T.origin, T.origins]] : []), ...(HAS.advantages ? [[h.advantages.length, "advantage", "advantages"]] : []),
     ...(HAS.cards ? [[h.cards.length, W.card, W.cards]] : []), ...(HAS.powers ? [[h.powers.length, "power", "powers"]] : []), ...(HAS.spells ? [[h.spells.length, W.spell, W.spells]] : []), ...(HAS.rituals ? [[h.rituals.length, W.ritual, W.rituals]] : [])]
     .filter(([n]) => n).map(([n, one, many]) => `${n} ${n === 1 ? one : many}`).join(", ") || "nothing yet";
   const weightOf = (k) => hbWeights().find((w) => w[0] === k) || hbWeights()[0];
@@ -6369,13 +6883,39 @@ function mountHomebrew(api) {
     hbClasses().map((c, i) => `<div class="field wide"><label>Class ${c}${i ? " (blank: the GM decides)" : ""}<\/label><input name="c${i}" maxlength="200" value="${esc(x ? x.classes[i] : "")}" placeholder="${i ? "" : "e.g. Step from one shadow to another you can see, up to 10 yd."}"><\/div>`).join("") +
     `<div class="field"><label><input type="checkbox" name="gm"${x && x.gm ? " checked" : ""}> Needs the GM's approval<\/label><\/div>` +
     input(x, "variety", "Kinds it comes in (optional)", 120, "e.g. darkness, smoke or mirrors", true), "Add the power");
+  const advantageForm = () => formOf("advantages", (x) => input(x, "name", "Name", 40, "e.g. Trail Cook") +
+    `<div class="field"><label>Skill<\/label><select name="skill">${opts(ALL_SKILLS, x ? x.skill : "")}<\/select><\/div>` +
+    input(x, "text", "What it gives: +2 to one narrow kind of task", 300, "e.g. +2 to Survival to feed a party on what the land gives.", true), "Add the advantage");
+  function originForm() {
+    const x = editing && editing[0] === "origins" ? find("origins", editing[1]) : null;
+    const maxTier = Math.max(0, ...(PACK.origins || []).filter((o) => !o.homebrew).map((o) => o.tier || 0));
+    const adjSel = (a) => `<div class="field"><label>${a}<\/label><select name="adj-${a}">${opts([["-2", "−2"], ["-1", "−1"], ["0", "0"], ["1", "+1"], ["2", "+2"]], String((x && x.adj[a]) || 0))}<\/select><\/div>`;
+    const skillSel = (i) => `<div class="field"><label>${cap(T.origin)} skill ${i + 1}<\/label><select name="sk${i}">${i ? `<option value="">None<\/option>` : ""}${opts(ALL_SKILLS, x ? x.skills[i] || "" : "")}<\/select><\/div>`;
+    const trait = (i) => { const t = (x && x.traits[i]) || {}; return `<fieldset class="field wide hb-bonus"><legend class="label">${cap(T.origin)} advantage ${i + 1}${i ? " (optional)" : ""}<\/legend><div class="fields">
+      <div class="field"><label>Name<\/label><input name="t${i}-name" maxlength="40" value="${esc(t.name || "")}" placeholder="${i ? "" : "e.g. Night Eyes"}"><\/div>
+      <div class="field"><label>+2 to<\/label><select name="t${i}-skill"><option value="">No roll bonus<\/option>${opts(ALL_SKILLS, t.skill || "")}<\/select><\/div>
+      <div class="field wide"><label>What it gives<\/label><input name="t${i}-text" maxlength="300" value="${esc(t.text || "")}" placeholder="${i ? "" : "e.g. +2 to Awareness to spot movement in darkness."}"><\/div>
+      <div class="field"><label>Its complication<\/label><input name="t${i}-cname" maxlength="40" value="${esc(t.compName || "")}" placeholder="${i ? "" : "e.g. Sun-Dazzled"}"><\/div>
+      <div class="field wide"><label>What the complication does<\/label><input name="t${i}-ctext" maxlength="300" value="${esc(t.compText || "")}" placeholder="${i ? "" : "e.g. Bright light blinds you. Accept the stumble at the worst moment."}"><\/div><\/div><\/fieldset>`; };
+    const powerOrigins = (PACK.origins || []).filter((o) => o.powerSlots && !o.homebrew);
+    return `<form data-hbform="origins" class="fields">
+      <div class="field"><label>Name<\/label><input name="name" maxlength="40" required value="${esc(x ? x.name : "")}" placeholder="e.g. Cave-born"><\/div>
+      <div class="field"><label>Tier (paid from Edge points)<\/label><select name="tier">${opts(Array.from({ length: maxTier + 1 }, (_, i) => [String(i), String(i)]), String(x ? x.tier : 0))}<\/select><\/div>
+      <div class="field wide"><label>Description<\/label><input name="desc" maxlength="400" required value="${esc(x ? x.desc : "")}" placeholder="Who they are and where they come from."><\/div>
+      <fieldset class="field wide hb-bonus"><legend class="label">Attribute changes (they must total 0)<\/legend><div class="fields">${hbAttrs().map(adjSel).join("")}<\/div><\/fieldset>
+      ${[0, 1, 2, 3].map(skillSel).join("")}
+      ${powerOrigins.length ? `<div class="field wide"><label>Powers<\/label><select name="powersLike"><option value="">None<\/option>${opts(powerOrigins.map((o) => [o.id, `As ${o.name}`]), x ? x.powersLike : "")}<\/select><\/div>` : ""}
+      ${[0, 1, 2].map(trait).join("")}
+      <div class="btn-row field wide"><button class="btn primary" type="submit">${x ? "Save changes" : `Add the ${esc(T.origin)}`}<\/button>${x ? `<button type="button" class="linkish" data-hbcancel>Cancel<\/button>` : ""}<\/div><\/form>`;
+  }
+  const adjLine = (adj) => Object.entries(adj).map(([a, n]) => `${a} ${plus(n)}`).join(", ") || "no attribute changes";
   const section = (kind, title, list, line, form) => `<details class="hb-sec"${editing && editing[0] === kind ? " open" : ""}><summary class="label">${title} (${list.length})<\/summary>
     <ul class="small adv-list">${list.map((x) => item(kind, x, line(x))).join("") || `<li class="muted">None yet.<\/li>`}<\/ul>${list.length >= hbLimits()[kind] && !(editing && editing[0] === kind) ? `<p class="small muted">That's the most this keeps (${hbLimits()[kind]}).<\/p>` : form()}<\/details>`;
 
   function render() {
     if (api.gmRoot) {
       api.gmRoot.innerHTML = `<h3>Homebrew<\/h3>
-        <p class="small muted">Your own threats, weapons${EDGES ? ", Edges" : ""}${HAS.cards ? `, ${W.cards}` : ""}${HAS.powers ? ", powers" : ""}${HAS.spells ? `, ${W.spells}` : ""}${HAS.rituals ? ` and ${W.rituals}` : ""}, made here: no code. They work like the setting's own, marked <i>homebrew<\/i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}${HAS.cards ? `, ${W.cards} where you record findings` : ""}${HAS.powers ? ", powers among the creator's choices" : ""}${HAS.spells ? `, ${W.spells} among the creator's choices` : ""}${HAS.rituals ? `, ${W.rituals} in a ${W.ritual} book beside Rituals by heart` : ""}. Keep numbers in line with the setting's (see <i>Making your own<\/i> in the core rules); anything special is a note you apply at the table.<\/p>
+        <p class="small muted">Your own threats, weapons${EDGES ? ", Edges" : ""}${HAS.origins ? `, ${esc(T.origins)}` : ""}${HAS.advantages ? ", advantages" : ""}${HAS.cards ? `, ${W.cards}` : ""}${HAS.powers ? ", powers" : ""}${HAS.spells ? `, ${W.spells}` : ""}${HAS.rituals ? ` and ${W.rituals}` : ""}, made here: no code. They work like the setting's own, marked <i>homebrew<\/i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}${HAS.origins || HAS.advantages ? `, ${[HAS.origins ? esc(T.origins) : "", HAS.advantages ? "advantages" : ""].filter(Boolean).join(" and ")} among the creator's choices` : ""}${HAS.cards ? `, ${W.cards} where you record findings` : ""}${HAS.powers ? ", powers among the creator's choices" : ""}${HAS.spells ? `, ${W.spells} among the creator's choices` : ""}${HAS.rituals ? `, ${W.rituals} in a ${W.ritual} book beside Rituals by heart` : ""}. Keep numbers in line with the setting's (see <i>Making your own<\/i> in the core rules); anything special is a note you apply at the table.<\/p>
         <p class="small"><b>In this browser:<\/b> ${esc(summary(hb))}${hb.from === "gm" ? " (shared by your GM)" : ""}. Players get it when they join your shared table, or from a file.<\/p>
         ${changed ? `<p class="small hb-reload"><b>Saved.<\/b> Reload the page to use the changes. <button type="button" class="btn" data-hbreload>Reload now<\/button><\/p>` : ""}
         <div class="btn-row"><button type="button" class="btn" data-hbexport${hbCount(hb) ? "" : " disabled"}>Save to file<\/button>
@@ -6383,6 +6923,8 @@ function mountHomebrew(api) {
         ${section("threats", "Threats", hb.threats, (t) => withBonus(threatLine(t), threatBonusLine(t.bonus)), threatForm)}
         ${section("weapons", "Weapons", hb.weapons, (w) => withBonus(weaponLine(w), weaponBonusLine(w.bonus)), weaponForm)}
         ${EDGES ? section("edges", "Edges", hb.edges, (x) => withBonus(`${x.limit === 1 ? "once" : `up to ${x.limit}×`}: ${x.text}`, edgeBonusLine(x.bonus)), edgeForm) : ""}
+        ${HAS.origins ? section("origins", cap(T.origins), hb.origins, (x) => `tier ${x.tier}; ${adjLine(x.adj)}; skills ${x.skills.join(", ")}; ${x.traits.map((t) => t.name).join(", ")}`, originForm) : ""}
+        ${HAS.advantages ? section("advantages", "Advantages", hb.advantages, (x) => `${x.skill}: ${x.text}`, advantageForm) : ""}
         ${HAS.cards ? section("cards", cap(W.cards), hb.cards, (x) => `${x.knowledge}${x.permits ? ` Permits: ${x.permits}` : ""}`, cardForm) : ""}
         ${HAS.powers ? section("powers", "Powers", hb.powers, (x) => `${x.gm ? "GM's approval; " : ""}Class I: ${x.classes[0]}`, powerForm) : ""}
         ${HAS.spells ? section("spells", cap(W.spells), hb.spells, (x) => withBonus(x.text, x.attack && x.attack.boxes ? `an attack, ${x.attack.boxes} box${x.attack.boxes === 1 ? "" : "es"} at ${(hbBands().find((b) => b[0] === x.attack.band) || [])[1]} range` : ""), spellForm) : ""}
@@ -6419,6 +6961,10 @@ function mountHomebrew(api) {
     if (kind === "powers") return { id, name: v("name"), group: v("group"), classes: hbClasses().map((_, i) => v("c" + i)), gm: f.elements.gm.checked, variety: v("variety") };
     if (kind === "cards") return { id, name: v("name"), knowledge: v("knowledge"), permits: v("permits") };
     if (kind === "rituals") return { id, name: v("name"), weight: v("weight"), time: v("time"), text: v("text"), price: v("price") };
+    if (kind === "advantages") return { id, name: v("name"), skill: v("skill"), text: v("text") };
+    if (kind === "origins") return { id, name: v("name"), tier: v("tier"), desc: v("desc"), powersLike: v("powersLike"),
+      adj: Object.fromEntries(hbAttrs().map((a) => [a, v("adj-" + a)])), skills: [0, 1, 2, 3].map((i) => v("sk" + i)).filter(Boolean),
+      traits: [0, 1, 2].map((i) => ({ name: v(`t${i}-name`), skill: v(`t${i}-skill`), text: v(`t${i}-text`), compName: v(`t${i}-cname`), compText: v(`t${i}-ctext`) })).filter((t) => t.name || t.text) };
     return { id, name: v("name"), limit: v("limit"), text: v("text"),
       bonus: { skill: v("b-skill"), skillValue: v("b-skill") ? v("b-skillv") : 0, dodge: on("b-dodge") ? 1 : 0, move: v("b-move"), extraDefense: on("b-xdef"), shrugTelling: on("b-shrugt") } };
   }
@@ -6431,7 +6977,9 @@ function mountHomebrew(api) {
       if (at >= 0) list[at] = entry; else list.push(entry);
       const next = hbClean({ ...hb, [kind]: list }, PACK);
       if (next[kind].length < list.length) { say({ threats: "A threat needs a name and at least one weapon.", edges: "An Edge needs a name and what it gives.", weapons: "A weapon needs a name.",
-        spells: `A ${W.spell} needs a name and what it does.`, powers: "A power needs a name and what it does at Class I.", cards: `A ${W.card} needs a subject and what's true.`, rituals: `A ${W.ritual} needs a name and what it does.` }[kind], true); return; }
+        spells: `A ${W.spell} needs a name and what it does.`, powers: "A power needs a name and what it does at Class I.", cards: `A ${W.card} needs a subject and what's true.`, rituals: `A ${W.ritual} needs a name and what it does.`,
+        advantages: "An advantage needs a name and what it gives.",
+        origins: `A ${T.origin} needs a name, a description, at least one skill and one advantage with its complication, and attribute changes that total 0.` }[kind], true); return; }
       hb = next; editing = null; hb.from = "mine"; store(); say(at >= 0 ? "Saved." : "Added.");
     });
     root.addEventListener("change", async (e) => {

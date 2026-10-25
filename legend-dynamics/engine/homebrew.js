@@ -1,4 +1,5 @@
-// Homebrew: a GM's own threats, weapons, Edges, cards, spells (hexes, cantrips, psionic powers), powers and rituals, made in the GM view
+// Homebrew: a GM's own threats, weapons, Edges, advantages, origins, cards, spells (hexes, cantrips, psionic powers), powers and
+// rituals, made in the GM view
 // without touching any code. Plain script,
 // inlined by tools/build-legend.py (/* HOMEBREW */) and tools/build-guide.py (HOMEBREW markers); no modules, no page globals.
 //
@@ -13,14 +14,17 @@
 // Sharing: as a file (Save to file / Open file), or through the shared table: players who join get the GM's homebrew
 // and choose to use it.
 // Function declarations only, above mountHomebrew: hbLoad and hbApply run as the page starts, before this file's place.
-function hbLimits() { return { threats: 30, weapons: 30, edges: 20, spells: 20, cards: 30, rituals: 30, powers: 20 }; }
-function hbKinds() { return ["threats", "weapons", "edges", "spells", "cards", "rituals", "powers"]; }
+function hbLimits() { return { threats: 30, weapons: 30, edges: 20, spells: 20, cards: 30, rituals: 30, powers: 20, advantages: 20, origins: 10 }; }
+function hbKinds() { return ["threats", "weapons", "edges", "spells", "cards", "rituals", "powers", "advantages", "origins"]; }
+function hbAttrs() { return ["Body", "Agility", "Intellect", "Presence", "Will"]; }
 function hbClasses() { return ["I", "II", "III", "IV", "V", "VI"]; }
 // A ritual's weight sets its clock, as in the core rules' magic chapter.
 function hbWeights() { return [["minor", "Minor", 2], ["significant", "Significant", 4], ["major", "Major", 6]]; }
 // What a setting can take: spells need its spell list, cards its discovery cards, rituals its magic.
 function hbHas(PACK) { return { spells: !!(PACK.spells && Array.isArray(PACK.spells.list)), cards: !!PACK.discovery, rituals: !!(PACK.magic && PACK.magic.workings),
-  powers: !!(PACK.powers && Array.isArray(PACK.powers.list)) }; }
+  powers: !!(PACK.powers && Array.isArray(PACK.powers.list)),
+  advantages: Array.isArray(PACK.advantages) && PACK.advantages.length > 0 && PACK.advantages.every(Array.isArray) && Array.isArray(PACK.skills),
+  origins: Array.isArray(PACK.origins) && PACK.origins.length > 0 && PACK.origins.every((o) => o && o.adj && Array.isArray(o.traits)) && Array.isArray(PACK.skills) }; }
 function hbBands() { return [["close", "Close"], ["short", "Short"], ["medium", "Medium"], ["long", "Long"], ["extreme", "Extreme"]]; }
 function hbKey(game) { return game + ".homebrew.v1"; }
 function hbInt(v, lo, hi, d) { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; }
@@ -102,7 +106,29 @@ function hbClean(raw, PACK) {
     if (!name || !cls[0]) return null;
     return { id: hbId(x.id, name, taken), name, group: groups.includes(x.group) ? x.group : groups[0] || "", classes: cls, gm: !!x.gm, variety: hbText(x.variety, 120) };
   }).filter(Boolean);
-  return { threats, weapons, edges, spells, cards, rituals, powers, from: r.from === "gm" ? "gm" : "mine" };
+  // An advantage: +2 to one narrow kind of task with a skill, when the GM agrees it applies (the roller's Advantage box).
+  const skillNames = (PACK.skills || []).map((k) => k[0]);
+  const advantages = list("advantages").map((x) => {
+    const name = hbText(x && x.name, 40), text = hbText(x && x.text, 300); if (!name || !text) return null;
+    return { id: hbId(x.id, name, taken), name, text, skill: skillNames.includes(x.skill) ? x.skill : skillNames[0] || "" };
+  }).filter(Boolean);
+  // An origin, as the setting's own: its tier (paid from the Edge points), attribute changes totalling 0, four origin
+  // skills, and one to three origin advantages, each with its complication. Powers (Aurora) follow an origin of the setting's.
+  const tiers = (PACK.origins || []).map((o) => o.tier || 0), maxTier = Math.max(0, ...tiers);
+  const powerOrigins = (PACK.origins || []).filter((o) => o.powerSlots && !o.homebrew).map((o) => o.id);
+  const origins = list("origins").map((x) => {
+    const name = hbText(x && x.name, 40), desc = hbText(x && x.desc, 400); if (!name || !desc) return null;
+    const adj = {}; for (const a of hbAttrs()) { const n = hbInt(x.adj && x.adj[a], -2, 2, 0); if (n) adj[a] = n; }
+    if (Object.values(adj).reduce((t, n) => t + n, 0) !== 0) return null; // every origin's changes total 0
+    const sk = [...new Set((Array.isArray(x.skills) ? x.skills : []).filter((k) => skillNames.includes(k)))].slice(0, 4);
+    const traits = (Array.isArray(x.traits) ? x.traits : []).slice(0, 3).map((t) => ({ name: hbText(t && t.name, 40), text: hbText(t && t.text, 300),
+      skill: skillNames.includes(t && t.skill) ? t.skill : "", compName: hbText(t && t.compName, 40), compText: hbText(t && t.compText, 300) }))
+      .filter((t) => t.name && t.text && t.compName && t.compText);
+    if (!sk.length || !traits.length) return null;
+    return { id: hbId(x.id, name, taken), name, desc, tier: hbInt(x.tier, 0, maxTier, 0), adj, skills: sk, traits,
+      powersLike: powerOrigins.includes(x.powersLike) ? x.powersLike : "" };
+  }).filter(Boolean);
+  return { threats, weapons, edges, spells, cards, rituals, powers, advantages, origins, from: r.from === "gm" ? "gm" : "mine" };
 }
 function hbCount(hb) { return hb ? hbKinds().reduce((n, k) => n + (hb[k] || []).length, 0) : 0; }
 function hbBody(hb) { return JSON.stringify(Object.fromEntries(hbKinds().map((k) => [k, hb[k] || []]))); }
@@ -161,6 +187,13 @@ function hbApply(PACK, hb) {
     const cls = []; x.classes.forEach((c, i) => cls.push(c || `As Class ${hbClasses()[i - 1]}, stronger: the GM sets how much.`));
     PACK.powers.list.push([x.id, `${x.name} (homebrew)`, x.group, cls, x.gm ? { gm: true } : {}, x.variety || ""]);
   }
+  if (has.advantages) for (const x of hb.advantages) PACK.advantages.push([x.id, `${x.name} (homebrew)`, x.text, x.skill]);
+  if (has.origins) for (const x of hb.origins) {
+    const like = x.powersLike ? PACK.origins.find((o) => o.id === x.powersLike) : null;
+    PACK.origins.push({ id: x.id, name: `${x.name} (homebrew)`, tier: x.tier, adj: { ...x.adj }, desc: x.desc, core: [], form: null, skills: x.skills.slice(), homebrew: true,
+      traits: x.traits.map((t, i) => [`${x.id}-${i + 1}`, t.name, t.text, t.skill || x.skills[0], !!t.skill, t.compName, t.compText]),
+      ...(like ? { powerSlots: like.powerSlots, ...(like.powerList ? { powerList: like.powerList } : {}), ...(like.mythic ? { mythic: like.mythic } : {}) } : {}) });
+  }
 }
 
 function mountHomebrew(api) {
@@ -171,11 +204,14 @@ function mountHomebrew(api) {
   // A setting's own words: hexes or cantrips or psionic powers; lore cards or data records; rituals or workings.
   const W = { spell: M.burst || (HAS.spells ? PACK.spells.plural.toLowerCase().replace(/s$/, "") : "spell"), spells: M.bursts || (HAS.spells ? PACK.spells.plural.toLowerCase() : "spells"),
     card: D.card || "card", cards: D.cards || "cards", ritual: M.working || "ritual", rituals: M.workings || "rituals" };
-  const SKILLS = hbSkills(PACK);
+  const SKILLS = hbSkills(PACK), ALL_SKILLS = (PACK.skills || []).map((k) => [k[0], k[0]]);
+  // The setting's word for an origin: species, heritage, background…
+  const T = { origin: ((PACK.terms && PACK.terms.origin) || "Origin").toLowerCase(), origins: ((PACK.terms && PACK.terms.originPlural) || "Origins").toLowerCase() };
   const armsBuilt = (PACK.arms || []).filter((a) => !a.hazard && !a.homebrew);
   const opts = (list, sel) => list.map(([v, n]) => `<option value="${esc(v)}"${v === sel ? " selected" : ""}>${esc(n)}</option>`).join("");
   const store = () => { if (!hbSave(PACK, hb)) say("This browser won't keep the homebrew: save it to a file.", true); changed = true; render(); };
   const summary = (h) => [[h.threats.length, "threat", "threats"], [h.weapons.length, "weapon", "weapons"], ...(EDGES ? [[h.edges.length, "Edge", "Edges"]] : []),
+    ...(HAS.origins ? [[h.origins.length, T.origin, T.origins]] : []), ...(HAS.advantages ? [[h.advantages.length, "advantage", "advantages"]] : []),
     ...(HAS.cards ? [[h.cards.length, W.card, W.cards]] : []), ...(HAS.powers ? [[h.powers.length, "power", "powers"]] : []), ...(HAS.spells ? [[h.spells.length, W.spell, W.spells]] : []), ...(HAS.rituals ? [[h.rituals.length, W.ritual, W.rituals]] : [])]
     .filter(([n]) => n).map(([n, one, many]) => `${n} ${n === 1 ? one : many}`).join(", ") || "nothing yet";
   const weightOf = (k) => hbWeights().find((w) => w[0] === k) || hbWeights()[0];
@@ -266,13 +302,39 @@ function mountHomebrew(api) {
     hbClasses().map((c, i) => `<div class="field wide"><label>Class ${c}${i ? " (blank: the GM decides)" : ""}</label><input name="c${i}" maxlength="200" value="${esc(x ? x.classes[i] : "")}" placeholder="${i ? "" : "e.g. Step from one shadow to another you can see, up to 10 yd."}"></div>`).join("") +
     `<div class="field"><label><input type="checkbox" name="gm"${x && x.gm ? " checked" : ""}> Needs the GM's approval</label></div>` +
     input(x, "variety", "Kinds it comes in (optional)", 120, "e.g. darkness, smoke or mirrors", true), "Add the power");
+  const advantageForm = () => formOf("advantages", (x) => input(x, "name", "Name", 40, "e.g. Trail Cook") +
+    `<div class="field"><label>Skill</label><select name="skill">${opts(ALL_SKILLS, x ? x.skill : "")}</select></div>` +
+    input(x, "text", "What it gives: +2 to one narrow kind of task", 300, "e.g. +2 to Survival to feed a party on what the land gives.", true), "Add the advantage");
+  function originForm() {
+    const x = editing && editing[0] === "origins" ? find("origins", editing[1]) : null;
+    const maxTier = Math.max(0, ...(PACK.origins || []).filter((o) => !o.homebrew).map((o) => o.tier || 0));
+    const adjSel = (a) => `<div class="field"><label>${a}</label><select name="adj-${a}">${opts([["-2", "−2"], ["-1", "−1"], ["0", "0"], ["1", "+1"], ["2", "+2"]], String((x && x.adj[a]) || 0))}</select></div>`;
+    const skillSel = (i) => `<div class="field"><label>${cap(T.origin)} skill ${i + 1}</label><select name="sk${i}">${i ? `<option value="">None</option>` : ""}${opts(ALL_SKILLS, x ? x.skills[i] || "" : "")}</select></div>`;
+    const trait = (i) => { const t = (x && x.traits[i]) || {}; return `<fieldset class="field wide hb-bonus"><legend class="label">${cap(T.origin)} advantage ${i + 1}${i ? " (optional)" : ""}</legend><div class="fields">
+      <div class="field"><label>Name</label><input name="t${i}-name" maxlength="40" value="${esc(t.name || "")}" placeholder="${i ? "" : "e.g. Night Eyes"}"></div>
+      <div class="field"><label>+2 to</label><select name="t${i}-skill"><option value="">No roll bonus</option>${opts(ALL_SKILLS, t.skill || "")}</select></div>
+      <div class="field wide"><label>What it gives</label><input name="t${i}-text" maxlength="300" value="${esc(t.text || "")}" placeholder="${i ? "" : "e.g. +2 to Awareness to spot movement in darkness."}"></div>
+      <div class="field"><label>Its complication</label><input name="t${i}-cname" maxlength="40" value="${esc(t.compName || "")}" placeholder="${i ? "" : "e.g. Sun-Dazzled"}"></div>
+      <div class="field wide"><label>What the complication does</label><input name="t${i}-ctext" maxlength="300" value="${esc(t.compText || "")}" placeholder="${i ? "" : "e.g. Bright light blinds you. Accept the stumble at the worst moment."}"></div></div></fieldset>`; };
+    const powerOrigins = (PACK.origins || []).filter((o) => o.powerSlots && !o.homebrew);
+    return `<form data-hbform="origins" class="fields">
+      <div class="field"><label>Name</label><input name="name" maxlength="40" required value="${esc(x ? x.name : "")}" placeholder="e.g. Cave-born"></div>
+      <div class="field"><label>Tier (paid from Edge points)</label><select name="tier">${opts(Array.from({ length: maxTier + 1 }, (_, i) => [String(i), String(i)]), String(x ? x.tier : 0))}</select></div>
+      <div class="field wide"><label>Description</label><input name="desc" maxlength="400" required value="${esc(x ? x.desc : "")}" placeholder="Who they are and where they come from."></div>
+      <fieldset class="field wide hb-bonus"><legend class="label">Attribute changes (they must total 0)</legend><div class="fields">${hbAttrs().map(adjSel).join("")}</div></fieldset>
+      ${[0, 1, 2, 3].map(skillSel).join("")}
+      ${powerOrigins.length ? `<div class="field wide"><label>Powers</label><select name="powersLike"><option value="">None</option>${opts(powerOrigins.map((o) => [o.id, `As ${o.name}`]), x ? x.powersLike : "")}</select></div>` : ""}
+      ${[0, 1, 2].map(trait).join("")}
+      <div class="btn-row field wide"><button class="btn primary" type="submit">${x ? "Save changes" : `Add the ${esc(T.origin)}`}</button>${x ? `<button type="button" class="linkish" data-hbcancel>Cancel</button>` : ""}</div></form>`;
+  }
+  const adjLine = (adj) => Object.entries(adj).map(([a, n]) => `${a} ${plus(n)}`).join(", ") || "no attribute changes";
   const section = (kind, title, list, line, form) => `<details class="hb-sec"${editing && editing[0] === kind ? " open" : ""}><summary class="label">${title} (${list.length})</summary>
     <ul class="small adv-list">${list.map((x) => item(kind, x, line(x))).join("") || `<li class="muted">None yet.</li>`}</ul>${list.length >= hbLimits()[kind] && !(editing && editing[0] === kind) ? `<p class="small muted">That's the most this keeps (${hbLimits()[kind]}).</p>` : form()}</details>`;
 
   function render() {
     if (api.gmRoot) {
       api.gmRoot.innerHTML = `<h3>Homebrew</h3>
-        <p class="small muted">Your own threats, weapons${EDGES ? ", Edges" : ""}${HAS.cards ? `, ${W.cards}` : ""}${HAS.powers ? ", powers" : ""}${HAS.spells ? `, ${W.spells}` : ""}${HAS.rituals ? ` and ${W.rituals}` : ""}, made here: no code. They work like the setting's own, marked <i>homebrew</i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}${HAS.cards ? `, ${W.cards} where you record findings` : ""}${HAS.powers ? ", powers among the creator's choices" : ""}${HAS.spells ? `, ${W.spells} among the creator's choices` : ""}${HAS.rituals ? `, ${W.rituals} in a ${W.ritual} book beside Rituals by heart` : ""}. Keep numbers in line with the setting's (see <i>Making your own</i> in the core rules); anything special is a note you apply at the table.</p>
+        <p class="small muted">Your own threats, weapons${EDGES ? ", Edges" : ""}${HAS.origins ? `, ${esc(T.origins)}` : ""}${HAS.advantages ? ", advantages" : ""}${HAS.cards ? `, ${W.cards}` : ""}${HAS.powers ? ", powers" : ""}${HAS.spells ? `, ${W.spells}` : ""}${HAS.rituals ? ` and ${W.rituals}` : ""}, made here: no code. They work like the setting's own, marked <i>homebrew</i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}${HAS.origins || HAS.advantages ? `, ${[HAS.origins ? esc(T.origins) : "", HAS.advantages ? "advantages" : ""].filter(Boolean).join(" and ")} among the creator's choices` : ""}${HAS.cards ? `, ${W.cards} where you record findings` : ""}${HAS.powers ? ", powers among the creator's choices" : ""}${HAS.spells ? `, ${W.spells} among the creator's choices` : ""}${HAS.rituals ? `, ${W.rituals} in a ${W.ritual} book beside Rituals by heart` : ""}. Keep numbers in line with the setting's (see <i>Making your own</i> in the core rules); anything special is a note you apply at the table.</p>
         <p class="small"><b>In this browser:</b> ${esc(summary(hb))}${hb.from === "gm" ? " (shared by your GM)" : ""}. Players get it when they join your shared table, or from a file.</p>
         ${changed ? `<p class="small hb-reload"><b>Saved.</b> Reload the page to use the changes. <button type="button" class="btn" data-hbreload>Reload now</button></p>` : ""}
         <div class="btn-row"><button type="button" class="btn" data-hbexport${hbCount(hb) ? "" : " disabled"}>Save to file</button>
@@ -280,6 +342,8 @@ function mountHomebrew(api) {
         ${section("threats", "Threats", hb.threats, (t) => withBonus(threatLine(t), threatBonusLine(t.bonus)), threatForm)}
         ${section("weapons", "Weapons", hb.weapons, (w) => withBonus(weaponLine(w), weaponBonusLine(w.bonus)), weaponForm)}
         ${EDGES ? section("edges", "Edges", hb.edges, (x) => withBonus(`${x.limit === 1 ? "once" : `up to ${x.limit}×`}: ${x.text}`, edgeBonusLine(x.bonus)), edgeForm) : ""}
+        ${HAS.origins ? section("origins", cap(T.origins), hb.origins, (x) => `tier ${x.tier}; ${adjLine(x.adj)}; skills ${x.skills.join(", ")}; ${x.traits.map((t) => t.name).join(", ")}`, originForm) : ""}
+        ${HAS.advantages ? section("advantages", "Advantages", hb.advantages, (x) => `${x.skill}: ${x.text}`, advantageForm) : ""}
         ${HAS.cards ? section("cards", cap(W.cards), hb.cards, (x) => `${x.knowledge}${x.permits ? ` Permits: ${x.permits}` : ""}`, cardForm) : ""}
         ${HAS.powers ? section("powers", "Powers", hb.powers, (x) => `${x.gm ? "GM's approval; " : ""}Class I: ${x.classes[0]}`, powerForm) : ""}
         ${HAS.spells ? section("spells", cap(W.spells), hb.spells, (x) => withBonus(x.text, x.attack && x.attack.boxes ? `an attack, ${x.attack.boxes} box${x.attack.boxes === 1 ? "" : "es"} at ${(hbBands().find((b) => b[0] === x.attack.band) || [])[1]} range` : ""), spellForm) : ""}
@@ -316,6 +380,10 @@ function mountHomebrew(api) {
     if (kind === "powers") return { id, name: v("name"), group: v("group"), classes: hbClasses().map((_, i) => v("c" + i)), gm: f.elements.gm.checked, variety: v("variety") };
     if (kind === "cards") return { id, name: v("name"), knowledge: v("knowledge"), permits: v("permits") };
     if (kind === "rituals") return { id, name: v("name"), weight: v("weight"), time: v("time"), text: v("text"), price: v("price") };
+    if (kind === "advantages") return { id, name: v("name"), skill: v("skill"), text: v("text") };
+    if (kind === "origins") return { id, name: v("name"), tier: v("tier"), desc: v("desc"), powersLike: v("powersLike"),
+      adj: Object.fromEntries(hbAttrs().map((a) => [a, v("adj-" + a)])), skills: [0, 1, 2, 3].map((i) => v("sk" + i)).filter(Boolean),
+      traits: [0, 1, 2].map((i) => ({ name: v(`t${i}-name`), skill: v(`t${i}-skill`), text: v(`t${i}-text`), compName: v(`t${i}-cname`), compText: v(`t${i}-ctext`) })).filter((t) => t.name || t.text) };
     return { id, name: v("name"), limit: v("limit"), text: v("text"),
       bonus: { skill: v("b-skill"), skillValue: v("b-skill") ? v("b-skillv") : 0, dodge: on("b-dodge") ? 1 : 0, move: v("b-move"), extraDefense: on("b-xdef"), shrugTelling: on("b-shrugt") } };
   }
@@ -328,7 +396,9 @@ function mountHomebrew(api) {
       if (at >= 0) list[at] = entry; else list.push(entry);
       const next = hbClean({ ...hb, [kind]: list }, PACK);
       if (next[kind].length < list.length) { say({ threats: "A threat needs a name and at least one weapon.", edges: "An Edge needs a name and what it gives.", weapons: "A weapon needs a name.",
-        spells: `A ${W.spell} needs a name and what it does.`, powers: "A power needs a name and what it does at Class I.", cards: `A ${W.card} needs a subject and what's true.`, rituals: `A ${W.ritual} needs a name and what it does.` }[kind], true); return; }
+        spells: `A ${W.spell} needs a name and what it does.`, powers: "A power needs a name and what it does at Class I.", cards: `A ${W.card} needs a subject and what's true.`, rituals: `A ${W.ritual} needs a name and what it does.`,
+        advantages: "An advantage needs a name and what it gives.",
+        origins: `A ${T.origin} needs a name, a description, at least one skill and one advantage with its complication, and attribute changes that total 0.` }[kind], true); return; }
       hb = next; editing = null; hb.from = "mine"; store(); say(at >= 0 ? "Saved." : "Added.");
     });
     root.addEventListener("change", async (e) => {

@@ -626,7 +626,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="516107d" data-version-date="2026.10.23" title="The code changes whenever this page changes.">Version 2026.10.23 · 516107d</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="b584023" data-version-date="2026.10.25" title="The code changes whenever this page changes.">Version 2026.10.25 · b584023</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -5057,7 +5057,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Spells.</strong> A new hex, cantrip or psionic power matches the setting’s own: an attack marks 1 or 2 boxes at Close or Short range, and anything stronger says who resists and what it costs.</li>
 <li><strong>Rituals.</strong> Give a ritual its weight (Minor 2 segments, Significant 4, Major 6), the time a roll takes, what it does and its price.</li>
 </ul>
-<p><strong>In the creator.</strong> The GM view’s <strong>Homebrew</strong> tab keeps your threats, weapons, Edges, cards, powers, spells and rituals. They then work like the book’s, marked <em>homebrew</em>: threats in the Encounter panel and on the battle map, weapons in characters’ gear and the roller, Edges, powers and spells among the creator’s choices, cards where findings are recorded, and rituals in a ritual book beside <em>Rituals by heart</em>. Players get them when they join your shared table, or from a homebrew file you give them. Bonuses chosen from the tab’s menus are worked out for you: a weapon’s accuracy, strong hits and what it’s made of; a threat’s hard hide, weaknesses, what alone can hurt it and how hard it is to hit; an Edge’s skill, Dodge or Move bonus and extra defense; an attack spell cast in the Encounter panel. Anything else is a note the GM applies at the table.</p>
+<p><strong>In the creator.</strong> The GM view’s <strong>Homebrew</strong> tab keeps your threats, weapons, Edges, origins, advantages, cards, powers, spells and rituals. They then work like the book’s, marked <em>homebrew</em>: threats in the Encounter panel and on the battle map, weapons in characters’ gear and the roller, Edges, origins, advantages, powers and spells among the creator’s choices (a homebrew origin follows the steps above, with the tier, attribute changes, origin skills and origin advantages you set), cards where findings are recorded, and rituals in a ritual book beside <em>Rituals by heart</em>. Players get them when they join your shared table, or from a homebrew file you give them. Bonuses chosen from the tab’s menus are worked out for you: a weapon’s accuracy, strong hits and what it’s made of; a threat’s hard hide, weaknesses, what alone can hurt it and how hard it is to hit; an Edge’s skill, Dodge or Move bonus and extra defense; an attack spell cast in the Encounter panel. Anything else is a note the GM applies at the table.</p>
 <h1 id="g-complications">Complications</h1>
 <p>Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Spark point if you accept it. Every complication needs a trigger agreed with the GM; the creator suggests three for each.</p>
 <table>
@@ -5164,7 +5164,498 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Spark:</strong> start each session with two. Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.</p>
 <p><em>Legend Dynamics RPG system, created by Don Smallwood.</em> Copyright © Don Smallwood. All rights reserved.</p>
 </div>
-<div class="guide-book" id="guide-gm" data-title="Aurora GM&#x27;s Guide" data-subtitle="Running the superhero setting: cases, notable Operants, threats and the GM&#x27;s tools" data-locked="1" hidden>
+<div class="guide-book" id="guide-gm" data-title="Aurora GM&#x27;s Guide" data-subtitle="Running the superhero setting: cases, notable Operants, threats and the GM&#x27;s tools" hidden>
+<p>This book is for whoever runs the game. It gathers what the GM reaches for at the table: case seeds, the notable Operants of the world, the threats with their numbers, and how to use the GM view’s battle map and Encounter panel. The rules themselves are in the <strong>Players’ Guide</strong>; this book builds on them.</p>
+<h1 id="gm-running-cases">Running cases</h1>
+<h2 id="gm-case-seeds">Case seeds</h2>
+<p>Roll 3d6 on each table and read the total, or pick what you like. Middle results come up most often; the strangest sit at 3, 4, 17 and 18. The GM view in the creator rolls these for you and can start the clock.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>The case</th>
+<th>Where</th>
+<th>The Operant angle</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>A breach opens where the Umkas came through</td>
+<td>Raster Eight, in orbit</td>
+<td>Two people with the same power and the same face</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Raster Zero’s existence leaks</td>
+<td>Tesla’s 1884 Paris, through a door</td>
+<td>A power the EMD says can’t exist</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Recover a Hephaestus Key before the Foundation</td>
+<td>A Foundation black lab, abandoned</td>
+<td>Someone’s powers woke tonight</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>A Raster Seven transfer goes wrong</td>
+<td>The Mad Forest’s edge, south of Bloomington</td>
+<td>A Shadow Earth duplicate</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Bring in an Operant who just woke up, before someone else does</td>
+<td>The Chicago Loop memorial</td>
+<td>An Operant who doesn’t know they are one</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>An Operant bank robbery</td>
+<td>A Manhattan rooftop at night</td>
+<td>A stolen power: someone mimicked it</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>Protect an EPAOC witness</td>
+<td>An ExLAW regional office</td>
+<td>A Lab-made escapee</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>Find a missing registration file</td>
+<td>A small town in the Midwest</td>
+<td>A Non-registered Operant hiding in plain sight</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Arrest a Non-registered vigilante</td>
+<td>A Los Angeles studio lot</td>
+<td>A ritual done badly</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>Investigate a powers-related death</td>
+<td>A Morcain casino in Macau</td>
+<td>A bonded artifact looking for a new host</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>Stop a Morcain shipment of Ambrosia</td>
+<td>The New Power Legion’s tower</td>
+<td>A power for sale</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>Escort an Operant to a hearing</td>
+<td>A university archive</td>
+<td>An Aegis suit that moves on its own</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>A hero’s sponsor wants a scandal buried</td>
+<td>A subway tunnel the city forgot</td>
+<td>A spirit riding someone</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>A White Hand cell on US soil</td>
+<td>Buenos Aires, White Hand territory</td>
+<td>A Class V power in an ordinary person</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>A Shadow Earth duplicate replaces someone important</td>
+<td>A haven in Otherworld</td>
+<td>The 1938 auroras, back for a night</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>The Atomic Man asks for help</td>
+<td>Shadow Earth’s mirror of your city</td>
+<td>A third wave beginning</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>The twist</th>
+<th>Ticking clock (segments)</th>
+<th>Key character</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>The Director knew all along</td>
+<td>The breach widens (8)</td>
+<td>Director Steven Humbacht</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>One of you is in the Raster Zero files</td>
+<td>The Atomic Man loses patience (6)</td>
+<td>Nikola Tesla, visiting</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>The victim is the culprit</td>
+<td>The escapee’s power destabilizes (6)</td>
+<td>A Foundation scientist with a conscience</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>ExLAW wants it buried</td>
+<td>Raster Seven’s transfer convoy leaves (4)</td>
+<td>Celerity, on the run</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>The Foundation is already there</td>
+<td>The press arrives (4)</td>
+<td>A frightened new Operant</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>The villain is right</td>
+<td>The witness disappears (4)</td>
+<td>An EPAOC staffer</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>A friend is being blackmailed</td>
+<td>The bomb goes off (6)</td>
+<td>A Morcain fixer who owes you</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>The witness is lying for a good reason</td>
+<td>The mob forms (4)</td>
+<td>A sheriff on the edge of the Mad Forest</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>The press arrives first</td>
+<td>Federal agents take the case (4)</td>
+<td>A reporter with a theory</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>It was an accident</td>
+<td>The EPAOC subpoena (6)</td>
+<td>An ExLAW agent who doesn’t trust Operants</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>The real target is someone else</td>
+<td>The Morcain clean house (6)</td>
+<td>A New Power Legion star</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>The local police want it more than you do</td>
+<td>The ritual completes at midnight (6)</td>
+<td>A Shadow Knight</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>A rival team is on the same case</td>
+<td>The building comes down (4)</td>
+<td>An Earth Warden</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>The Morcain want to help</td>
+<td>The sponsor pulls out (6)</td>
+<td>Michael Lance, out of his time</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>The culprit is a duplicate of someone on the team</td>
+<td>Shadow Earth’s rulers notice (8)</td>
+<td>Steel Hawk, offering a deal</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>Shadow Earth planned this</td>
+<td>The third wave (8)</td>
+<td>Your own Shadow Earth duplicate</td>
+</tr>
+</tbody>
+</table>
+<h1 id="gm-notable-operants">Notable Operants</h1>
+<p>Ages are as of 2025.</p>
+<p><strong>Mr. Marvel (Hector Gonzalez), 113.</strong> At 31, Hector Gonzalez was Nikola Tesla’s friend and lab assistant. Given Ambrosia in 1943, he gained an alternate, idealized form, and chose to stay on Earth while Tesla and Kessler journeyed through Otherworld. Mr. Marvel flies, has enormous strength, fires electrical bolts and is incredibly tough, and doesn’t age; Gonzalez does, slowly, thanks to the Ambrosia. He is a family doctor in Los Angeles, still able to call up Marvel when needed, and worried by the impatience and anger that come with the form.</p>
+<p><strong>Celerity (Ava Torres), 33.</strong> The super-fast Latina heroine of New York, who protects the innocent and defends the helpless. She fought the Umkas in 2012, and Steel Hawk nearly killed her; the Golden Centurion got her help, but she spent a year in a coma. Since waking she has dedicated herself to helping people across the country. She befriended the Green Man and persuaded him to open the Haven, and has stood between federal authorities and the refugees at every confrontation. There is a warrant for her arrest; ExLAW’s Operants aren’t pursuing it, yet.</p>
+<p><strong>The Green Man (Micky Holt).</strong> A struggling folk singer, exposed to something… different on a peyote-driven walkabout in the Southwest. It drove him insane, though he still loves to play. His power over plants raised an impenetrable forest across southern Indiana in a matter of days: from Bloomington to the Ohio River you travel on foot, on horseback or by boat. He offers sanctuary to anyone who swears to protect the Earth and spread its message, and serves only vegetarian meals. Any attempt to burn or harm the forest ends in horror-movie destruction by rampaging plants. The Haven, his refuge for America’s homeless, is the one place he allows fire, for warmth and cooking.</p>
+<p><strong>Michael Lance, 47.</strong> A 1940s private investigator pulled into a timeless Limbo during a case in 1946, and released by the breach in 2012. He wields a mystic amulet inherited from his grandfather, bonded to him by the spirit of <strong>Em Antu</strong>, the Egyptian priest and sorcerer who made it. It lights a room, fires a laser that cuts steel, and casts realistic illusions. He has used it against all manner of strange beings in New York’s shadows, and against the duplicates of Shadow Earth.</p>
+<p><strong>Steel Hawk, about 110.</strong> An Olympic athlete and German attorney in Brussels, kidnapped in 1952 while prosecuting a wealthy industrialist and taken to a Foundation black lab. There he was tortured and exposed to an artifact that turned his body to living metal, charged it with a spectral energy, let him regenerate from terrible wounds and stopped him aging. He escaped with no memory of who he had been, and with an anger and a need to control everything around him. He became a mercenary for the Morcain; when he discovered the Foundation’s part in his making, his revenge put him in the crosshairs of governments worldwide. In 2012 he helped Autuarch open the breach, came to regret it, and helped close it.</p>
+<p><strong>Chat Roux (Red Cat).</strong> An officer of a multi-dimensional law enforcement organization, stranded on this Earth when his transport was destroyed during the Umkas invasion. He now works for the French <strong>Affaires spéciales</strong>, undercover behind a holographic mask from an Earth far more advanced than ours. He worries the mask will fail without proper maintenance.</p>
+<p><strong>Vanguard (“Louis Feslen”).</strong> Able to manifest any firearm he can imagine. Believed to be a French expatriate with military and martial-arts training; wanted by the Affaires spéciales, Interpol, MI5 and ExLAW for at least seventeen deaths worldwide. Rumor says every one of them was a Shadow Earth minion. No one has confirmed it.</p>
+<p><strong>Abd al-Rahman.</strong> An Iranian Operant criminal who opposes the People’s Republic. Remarkably strong, tough and brilliant, he leads a band of mercenaries for the highest bidder. He may be able to teleport; no official source will comment.</p>
+<p><strong>The Golden Centurion, about 2,050.</strong> An immortal warrior born in ancient Rome, cursed (the current story goes) by Jupiter to wander the Earth unaging for his crimes against the gods, running off with a Vestal Virgin among them. He regenerates quickly, is incredibly tough and cannot die; but he feels everything, even when his head is cut off. Brutal and unyielding in his moral code, he gives himself entirely to whichever cause he chooses.</p>
+<p><strong>The Shadow Knight (Grant Douglas).</strong> The North American Knight of the <em>Ordo Viarum Lucidarum</em>: a former Marine and mercenary who somehow came into possession of several supernatural artifacts. He leads a small team of specialists in a private war against monsters and Operants who threaten human lives.</p>
+<p><strong>Lord Marrow (Altari Marrow).</strong> A self-proclaimed magus with illusory and telepathic powers, who brings his victims’ fears to life. He can’t control minds, but he can terrify people into handing over money, jewels or secrets his weak mental scans can’t find. Strong minds resist him, so he researches his victims to find the perfect fear. He lives somewhere in Europe and works for the Morcain on special occasions; his reliance on horror-film images betrays a lack of imagination.</p>
+<p><strong>The Ice Reaper (Hyun Wang).</strong> A South Korean gangster who found an artifact that bonded an <em>aleum sasin</em>, an Ice Reaper, to him. He can become the bloodthirsty spirit at will, and used it to become the <em>Sangsanim</em>, boss of his country’s underworld. He sits on the 12.</p>
+<p><strong>Helios (David Carlysle Jones), 44.</strong> A former Army major recruited into DIRE and given a heavily modified Ambrosia. The transformation was agonizing, and made him one of the most powerful Operants alive: he absorbs and redirects sunlight as energy blasts or flight, and is nearly invulnerable and remarkably strong. His weakness: eight hours without sunlight (the moon and stars don’t count) leave him near human.</p>
+<p><strong>Zephyr (Dr. Alemayehu Okafor).</strong> A famed Ethiopian archaeologist who pursues cryptozoological artifacts with militant zeal. A native Operant with heightened strength and resilience and the power to control the air, he is an avowed environmentalist, wanted in several countries for alleged attacks on industrial and mining concerns in Africa.</p>
+<p><strong>Evelyn Dark, 25.</strong> Born in Avalon to a line of witches descended from Hecate and Freya, with a rare gift for manipulating energy and matter. A seer foretold she would bring Avalon’s doom, and at thirteen she fled to Earth in defiance of the Accords. She gathered homeless children into a ring of thieves and con artists, the <strong>Dark Ones</strong>, until the Foundation caught her two years later. Its experiments heightened and destabilized her powers; one destroyed the lab and the town around it, and she was the only survivor. In the decade since, she has used her powers sparingly, helping where she can and hiding from Earth’s most powerful magic users.</p>
+<p><strong>Milon Dubinsky, about 650.</strong> Once a king in what is now Romania, who killed every man in a conquered village so he could marry the chieftain’s wife. She poisoned him before the wedding, and when he begged for a cure, cursed him to undying life as a wolfman, unable to return to human form. He found he could share part of his curse with the descendants of his tribe (supernaturally tough and able to change back, but mortal), and over six centuries has built a small army of werewolves to do his bidding.</p>
+<p><strong>Nikola Tesla, 169.</strong> Rarely on our Earth now. He prefers his pocket dimension, 1884 Ivry-sur-Seine, where his laboratory has doors to many other dimensions, Shadow Earth among them. He experiments with inventions to enhance or modify Operant abilities, including the metatropic manipulations called magic. He has devised a way to trap Richard Kennedy, and hasn’t used it: he doesn’t want to interrupt the man’s good works.</p>
+<p><strong>The Atomic Man (Dr. Richard Kennedy), about 100.</strong> A nuclear scientist and cousin of the political dynasty, irradiated in 1959 when he pushed his colleagues to safety from a runaway reactor. As he lay dying, an interdimensional entity offered to bond with him so he could continue his work and protect his world. He agreed, and was healed: he controls the strong and weak nuclear forces around him, and his mind holds the entity’s intellect as well as his own. Strength, speed, invulnerability, energy blasts, flight. He doesn’t seem to age, though in 2024 he found a grey hair. He supports democratic causes worldwide, protects civilians in war, and has destroyed whole arsenals to free nations from oppression. The US, China and Russia once built a weapon together to kill him; it failed. Only Sergei Grachyov has stood against him, in the 2007 battle that destroyed the Washington Monument. Grachyov’s rumored cancers are blamed on Kennedy.</p>
+<p><strong>Sergei Grachyov.</strong> Considered one of the strongest men on Earth, he serves the Foundation as troubleshooter and chief recovery expert for the empowered, traumatized and psychopathic escapees from its black labs. Wanted worldwide, he is considered a weapon of mass destruction by himself. He has been reported dead several times; it never sticks. He has fought the Golden Centurion and Vanguard to a standstill.</p>
+<p><strong>Uathach (Ciara Byrne).</strong> When Ciara Byrne recites a litany she found on her grandfather’s farm, she takes on the body and power of <strong>Uathach</strong>, a Celtic warrior goddess pushed to the edges of Irish myth, and shares her consciousness with the bloodthirsty spirit. Uathach usually avenges wrongs done to women around the world, but she has fought beside others against Autuarch in South America, against the Umkas, and against the minions of Shadow Earth.</p>
+<blockquote>
+<p>Come, Uathach, walk with me in the clash, stand with me in the storm, lend me your hand of red flame, your unbroken will of iron. I kindle your name, I breathe your power, I bear your shadow, and I rise.</p>
+</blockquote>
+<p><strong>The Ragged Magus (Dr. Elias Marron).</strong> Once an adjunct professor of comparative folklore in New York, obsessed with a single current of power he believed older than civilization. In a university archive he found untranslated manuscripts in a 19th-century occultist’s papers: a ritual encoded in language itself. He spoke the words aloud, and his mind opened for a few burning moments to the raw currents of Otherworld. It shattered him. He lost his job and his name, and wanders New York’s alleys and subway tunnels muttering. Yet his chalk sigils ward whole stations by accident, his ramblings predict murders and market crashes, pigeons land on his shoulders as if awaiting orders, and children sometimes see a crown of burning letters over his head. He is part prophet, part lunatic, part guardian and part danger.</p>
+<h1 id="gm-threats">Threats</h1>
+<p>Opponents use the same rules as the characters. <strong>Minor opponents</strong> have <strong>one box</strong>: any hit that gets through takes them out of the fight. <strong>Defense</strong> works as for characters.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Threat</th>
+<th>Attack (target)</th>
+<th>Dodge</th>
+<th>Boxes</th>
+<th>Attacks</th>
+<th>Defense</th>
+<th>Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Street gang (minor)</td>
+<td>Firearms 11</td>
+<td>7</td>
+<td>1</td>
+<td>Pistols (I)</td>
+<td>—</td>
+<td><strong>Numbers.</strong> Three or four of them; they scatter when half are down.</td>
+</tr>
+<tr class="even">
+<td>Morcain enforcer (Operant)</td>
+<td>Brawling 14</td>
+<td>9</td>
+<td>3</td>
+<td>Strength I, SMG (I)</td>
+<td>I</td>
+<td><strong>Connected.</strong> Arresting one makes the Morcain notice you (Scrutiny).</td>
+</tr>
+<tr class="odd">
+<td>White Hand soldier</td>
+<td>Firearms 13</td>
+<td>9</td>
+<td>2</td>
+<td>Blast II</td>
+<td>—</td>
+<td><strong>Fanatic.</strong> Never surrenders, never talks.</td>
+</tr>
+<tr class="even">
+<td>Foundation retrieval team (minor)</td>
+<td>Firearms 13</td>
+<td>9</td>
+<td>1 each</td>
+<td>Tranquilizer rifles; a dampening net (Power Negation II)</td>
+<td>—</td>
+<td><strong>Recovery.</strong> They want the target alive, and leave no witnesses.</td>
+</tr>
+<tr class="odd">
+<td>Rogue Aegis suit</td>
+<td>Piloting 14</td>
+<td>8</td>
+<td>3</td>
+<td>Arm cannon (II)</td>
+<td>II</td>
+<td><strong>Pilot.</strong> Hit the pilot (−4) or the power pack (−2) to end it fast.</td>
+</tr>
+<tr class="even">
+<td>Lab escapee</td>
+<td>Powers 13</td>
+<td>10</td>
+<td>3</td>
+<td>One wild power, Class II–III</td>
+<td>II</td>
+<td><strong>Unstable.</strong> On a natural 17–18, the power hits everyone nearby.</td>
+</tr>
+<tr class="odd">
+<td>Shadow Earth duplicate</td>
+<td>As the original</td>
+<td>As the original</td>
+<td>3</td>
+<td>As the original</td>
+<td>As the original</td>
+<td><strong>Mirror.</strong> Knows what the original knows; Mystic Sight reveals it.</td>
+</tr>
+<tr class="even">
+<td>Dubinsky werewolf</td>
+<td>Brawling 15</td>
+<td>11</td>
+<td>4</td>
+<td>Claws (II)</td>
+<td>I</td>
+<td><strong>Pack.</strong> Comes in threes; silver ignores its Defense.</td>
+</tr>
+<tr class="odd">
+<td>Fey raider (Avalon)</td>
+<td>Melee 14</td>
+<td>12</td>
+<td>2</td>
+<td>Elf-shot (II), glamour</td>
+<td>—</td>
+<td><strong>Cold iron.</strong> Iron weapons count one Class higher against it.</td>
+</tr>
+<tr class="even">
+<td>Umkas soldier</td>
+<td>Firearms 14</td>
+<td>9</td>
+<td>3</td>
+<td>Breach rifle (II)</td>
+<td>II</td>
+<td><strong>Stranded.</strong> Left behind in 2012; desperate and dangerous.</td>
+</tr>
+<tr class="odd">
+<td>Raster Zero hunter</td>
+<td>Firearms 14</td>
+<td>10</td>
+<td>3</td>
+<td>Rifle (I), Power Negation II</td>
+<td>I</td>
+<td><strong>Unacknowledged.</strong> No badge and no record; if caught, they never existed.</td>
+</tr>
+<tr class="even">
+<td>Mad Forest wildwood</td>
+<td>Brawling 14</td>
+<td>—</td>
+<td>6</td>
+<td>Grasping roots (II)</td>
+<td>II</td>
+<td><strong>Rooted.</strong> Fire hurts it, but burning it brings the forest down on you.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Named villains</strong> are the GM’s characters, built like player characters but with powers of Class III to VI and as many boxes as the story needs:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Villain</th>
+<th>Class</th>
+<th>In brief</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Autuarch</td>
+<td>VI</td>
+<td>Master of the White Hand; a threat to nations.</td>
+</tr>
+<tr class="even">
+<td>Sergei Grachyov</td>
+<td>V</td>
+<td>The Foundation’s strongman; fought the Atomic Man to a draw.</td>
+</tr>
+<tr class="odd">
+<td>Steel Hawk</td>
+<td>IV</td>
+<td>Living metal, regenerating, ageless; out for revenge on the Foundation.</td>
+</tr>
+<tr class="even">
+<td>The Ice Reaper (Hyun Wang)</td>
+<td>IV</td>
+<td>Gangster and member of the 12; transforms at will.</td>
+</tr>
+<tr class="odd">
+<td>Abd al-Rahman</td>
+<td>IV</td>
+<td>Strength and brilliance; a rumored teleporter; a mercenary leader.</td>
+</tr>
+<tr class="even">
+<td>Milon Dubinsky</td>
+<td>IV</td>
+<td>The undying wolf-king and his army of descendants.</td>
+</tr>
+<tr class="odd">
+<td>Vanguard</td>
+<td>III</td>
+<td>Manifests any firearm; seventeen kills, perhaps all Shadow Earth duplicates.</td>
+</tr>
+<tr class="even">
+<td>Zephyr (Okafor)</td>
+<td>III</td>
+<td>Air control; eco-saboteur, wanted across Africa.</td>
+</tr>
+<tr class="odd">
+<td>Lord Marrow</td>
+<td>III</td>
+<td>Illusions and telepathy; brings fears to life.</td>
+</tr>
+</tbody>
+</table>
+<p>Some of them (Steel Hawk, Vanguard, Zephyr) can be enemies or uneasy allies, as the campaign needs.</p>
+<p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box, or raise a power one Class; for a weaker one, subtract.</p>
+<h1 id="gm-dossiers">Dossiers</h1>
+<p>Running investigations and recording what the team learns. The rules players use are in the <em>Dossiers</em> chapter of the Players’ Guide; here is the GM view’s Discovery panel, for clocks and dossiers.</p>
+<h2 id="gm-making-dossiers">Making dossiers</h2>
+<p>For the GM: when a dossier is earned, and how to write one. A dossier is a record of what the characters established, so writing it well matters more than how often you hand one out.</p>
+<ol type="1">
+<li><strong>Decide that something is established.</strong> A dossier is earned when a discovery clock fills, or when the characters see or test something themselves, hear it from a source you judge reliable, or are told it by the subject itself with evidence to back it up. A guess, however right, isn’t established, and neither is a rumor. Ask what supports their idea; when the answer is good, let them act on it, and give the dossier once they’ve confirmed it.</li>
+<li><strong>Write the finding narrowly.</strong> One fact, in the words the characters would use, and no more than they found out: “bright light drove it back”, not “it fears light”. Two separate facts make two dossiers. Never write the subject’s whole truth onto a dossier; later discoveries add more dossiers.</li>
+<li><strong>Write its limits.</strong> What the finding doesn’t show: how often it was seen, under what conditions, and what is still unknown. The limits are what keep the next investigation interesting.</li>
+<li><strong>Note the evidence or source.</strong> What they saw, tested, read or were told, and by whom. A source’s reputation doesn’t make it right: if it was only probably true, the limits say so.</li>
+<li><strong>Charge the price.</strong> A dossier from a discovery clock costs nothing more: the scenes, failed rolls and pushes were its price. Any other source has its price (see <em>Earning a dossier</em>): choose the one that fits how they learned it, and mark it.</li>
+<li><strong>Choose the owner and the recipients.</strong> Whoever did the finding owns the dossier. Everyone who was there, or heard it from a reliable source, gets a shared copy.</li>
+<li><strong>Record it.</strong> In the GM view’s <strong>Discovery</strong> panel: <strong>Mint</strong> a full clock’s dossier, or use <strong>Record a finding without a clock</strong>, which marks the price for you. Then save everyone’s characters to file, so the players’ sheets carry it. A player can also write a dossier on their own sheet, when you agree it’s been earned.</li>
+</ol>
+<p><em>Example:</em> <strong>Lord Marrow.</strong> Established: <em>His bone-shaping stops when he’s soaked through</em>. Limits: <em>Seen in one fight in the rain; not how long it lasts once he’s dry</em>. Source: The team’s own fight with him at the Ironside docks (seen in action). Cost: Collateral +1 (the docks took the damage).</p>
+<ul>
+<li><strong>When a later finding disagrees.</strong> Write a new dossier that says what they now know; the old one stays on the sheet as what they believed then, and the new one’s limits can say so.</li>
+<li><strong>A dossier is never proof of identity.</strong> Holding a dossier about one subject doesn’t prove that the thing in front of them is that subject: the Identify phase does.</li>
+<li><strong>Weaknesses work anyway.</strong> Don’t hold back a real weakness because no one holds the dossier: if they try it, it works.</li>
+<li><strong>Sealed Binder.</strong> Agree each starting dossier with its player before play: it must come from the character’s role or origin, be narrow, and be a real secret: something that isn’t in any database, registry or published record. Make sure it fits what you know to be true, adjust it if it doesn’t, and keep a note of it.</li>
+</ul>
+<h2 id="gm-the-discovery-panel">The Discovery panel</h2>
+<p>The GM view’s <strong>Discovery</strong> panel runs discovery clocks and the Escalation they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every dossier the characters in the GM view already hold for it. The <strong>Failed roll</strong> and <strong>Push</strong> buttons tick the track for how they were digging, and a failed roll ticks the Escalation too. When a clock fills, <strong>Mint</strong> gives the primary investigator the dossier and everyone you tick as present a shared copy. <strong>Record a finding without a clock</strong> gives a dossier for something established directly (seen or tested, a reliable account, a creature’s word with evidence behind it) to whoever you tick, and marks its price: the track or the Escalation that source costs. Save all to file afterwards, so the players’ character files carry it. The Discord bot’s <code>/discovery</code> and <code>/cards</code> commands do the same at a table that plays online.</p>
+<h1 id="gm-the-gms-tools">The GM’s tools</h1>
+<h2 id="gm-the-battle-map">The battle map</h2>
+<p>The GM view of the character creator has a <strong>battle map</strong> for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the <em>Personal combat</em> rules in the Players’ Guide, and a fight without it works the same way. Open <strong>How to use the map</strong> on the map itself for the buttons, step by step.</p>
+<p><strong>Two kinds of map.</strong></p>
+<ul>
+<li><strong>A hex map</strong> for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a room, 5 or 10 yards for a street, 50 for open ground. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range table in the Players’ Guide.</li>
+<li><strong>A range track</strong> for fights where only distance matters: a chase, a running fight across open country. It has a lane for the team and one for each range band. Moving a token into the next lane moves it one band in or out.</li>
+</ul>
+<p><strong>Tokens.</strong> The GM places the team with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, the stunned condition or a Spark point on a token marks it on the character, and the other way round. Opponents come from the setting’s threats with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
+<p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
+<h2 id="gm-the-encounter-panel">The Encounter panel</h2>
+<p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit, offering a Spark point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so.</p>
+<p><strong>The shared table.</strong> The GM can start a shared table from the GM view and give the players its code; each player joins from their character’s Play tab. While they’re connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the Play tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Each player’s character is shared with the GM too: it appears among the GM view’s characters, marked at the table, and its injuries, points, ammunition and form stay in step both ways, whether they’re changed on the sheet, on the GM’s card or in an encounter. In a fight, each player’s Play tab shows the GM’s battle map and the encounter’s turn order and latest results; a player drags their own token, and on their turn sends the GM what they’ll do, which the GM puts into the Encounter panel and runs. The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.</p>
 </div>
 <!-- GUIDE:END -->
         <nav class="guide-pager no-print" id="guide-pager" aria-label="Chapters"></nav>
@@ -9787,22 +10278,23 @@ function mountTable(api) {
     server: base, access: () => st.access || "", setAccess };
 }
 
-  // The GM view and the GM's Guide, for registered GMs only. Plain script, inlined by tools/build-legend.py (/* GMLOCK */)
+  // The GM's Guide, for registered GMs only. Plain script, inlined by tools/build-legend.py (/* GMLOCK */)
 // and tools/build-guide.py (GMLOCK markers); no modules, no page globals.
 //
 // mountGmLock(api) with api: { table (mountTable's handle: server(), access(), setAccess(code)), game (the id the table
 //   server knows the game by), view (the GM view's element), book (the GM's Guide's empty, locked book, or null),
 //   onBook() (show the book again once it's filled in), esc, toast }
-// The GM view stays covered by a code box until the table server accepts the GM access code (POST /api/gm); the GM's
-// Guide isn't in the page at all, and comes from the server (POST /api/gm/guide) once the code checks out. The code
-// is the same one that starts a table, kept in this browser, so a GM types it once.
-// Returns { open() } → whether the GM view is open.
+// The GM view is open to everyone (starting a shared table from it still asks for the code, on the table server). So is
+// the GM's Guide when the build puts it in the page (tools/gm_guides.py, GM_GUIDES_OPEN). Otherwise the guide isn't in the page: its book shows a code box, and the guide comes from the server
+// (POST /api/gm/guide) once the table server accepts the GM access code (POST /api/gm). The code is the same one that
+// starts a table, kept in this browser, so a GM types it once.
+// Returns { open() } → whether a GM access code has been accepted.
 //
 // protectText(root, note, toast): the light copy deterrent on a guide: no selecting, copying or right-click menu
 // in it (form fields aside), with a short note instead.
 function mountGmLock(api) {
   const esc = api.esc, say = (m, err) => (api.toast ? api.toast(m, err) : null);
-  let open = false, busy = false, msg = "", guideDone = !api.book;
+  let open = false, busy = false, msg = "", guideDone = !api.book || !api.book.dataset.locked; // an open guide is already in the page
   if (!document.getElementById("gm-lock-css")) {
     const css = document.createElement("style"); css.id = "gm-lock-css";
     css.textContent = `#${api.view.id}.gm-locked > :not(.gm-lock) { display: none !important; }
@@ -9813,18 +10305,15 @@ function mountGmLock(api) {
     document.head.append(css);
   }
   const panel = (where) => `<div class="gm-lock card hud" data-gmlock="${where}">
-    <h3>${where === "book" ? "The GM's Guide is for registered GMs" : "The GM view is for registered GMs"}<\/h3>
-    <p class="small">${where === "book" ? "It holds the setting's secrets, so it's only sent to GMs with a GM access code." : "It holds the encounters, threats and secrets your players shouldn't see, so it opens only with a GM access code."}
-      The code is the one that starts a shared table; type it once and this browser remembers it. To ask for one, email <a href="mailto:contact@legenddynamicsrpg.com">contact@legenddynamicsrpg.com<\/a>.<\/p>
+    <h3>The GM's Guide is for registered GMs<\/h3>
+    <p class="small">It holds the setting's secrets, so it's only sent to GMs with a GM access code.
+      The code is the one that starts a shared table; type it once and this browser remembers it. To ask for one, join the
+      <a href="https://legenddynamicsrpg.com/join" target="_blank" rel="noopener">Legend Dynamics Discord<\/a> or email <a href="mailto:contact@legenddynamicsrpg.com">contact@legenddynamicsrpg.com<\/a>.<\/p>
     <form data-gmlock-form><label class="field"><span class="label">GM access code<\/span>
       <input type="password" name="code" maxlength="100" autocomplete="off" spellcheck="false" aria-label="GM access code"><\/label>
       <button class="btn primary" type="submit"${busy ? " disabled" : ""}>${busy ? "Checking…" : "Unlock"}<\/button><\/form>
     <p class="small gm-lock-msg" role="status">${esc(msg)}<\/p><\/div>`;
   function render() {
-    api.view.classList.toggle("gm-locked", !open);
-    let p = api.view.querySelector(':scope > [data-gmlock="view"]');
-    if (open) { if (p) p.remove(); }
-    else if (p) p.outerHTML = panel("view"); else api.view.insertAdjacentHTML("afterbegin", panel("view"));
     if (api.book && !guideDone) api.book.innerHTML = open ? `<p class="muted">Loading the GM's Guide…<\/p>` : panel("book");
   }
   const post = async (path, body) => {
@@ -9851,7 +10340,7 @@ function mountGmLock(api) {
       if (r.ok) {
         open = true; msg = ""; api.table.setAccess(code);
         const b = await r.json().catch(() => ({}));
-        if (!quiet) say(`GM view unlocked${b.name && b.name !== "GM" ? ` for ${b.name}` : ""}.`);
+        if (!quiet) say(`GM access code accepted${b.name && b.name !== "GM" ? ` for ${b.name}` : ""}.`);
       } else if (r.status === 401) { msg = quiet ? "" : "That GM access code isn't recognised: check it, or ask for one."; if (!quiet) api.table.setAccess(""); }
       else msg = "The table server couldn't check the code just now. Try again in a moment.";
     } catch (e) {
@@ -9887,7 +10376,8 @@ function protectText(root, note, toast) {
   });
 }
 
-  // Homebrew: a GM's own threats, weapons, Edges, cards, spells (hexes, cantrips, psionic powers), powers and rituals, made in the GM view
+  // Homebrew: a GM's own threats, weapons, Edges, advantages, origins, cards, spells (hexes, cantrips, psionic powers), powers and
+// rituals, made in the GM view
 // without touching any code. Plain script,
 // inlined by tools/build-legend.py (/* HOMEBREW */) and tools/build-guide.py (HOMEBREW markers); no modules, no page globals.
 //
@@ -9902,14 +10392,17 @@ function protectText(root, note, toast) {
 // Sharing: as a file (Save to file / Open file), or through the shared table: players who join get the GM's homebrew
 // and choose to use it.
 // Function declarations only, above mountHomebrew: hbLoad and hbApply run as the page starts, before this file's place.
-function hbLimits() { return { threats: 30, weapons: 30, edges: 20, spells: 20, cards: 30, rituals: 30, powers: 20 }; }
-function hbKinds() { return ["threats", "weapons", "edges", "spells", "cards", "rituals", "powers"]; }
+function hbLimits() { return { threats: 30, weapons: 30, edges: 20, spells: 20, cards: 30, rituals: 30, powers: 20, advantages: 20, origins: 10 }; }
+function hbKinds() { return ["threats", "weapons", "edges", "spells", "cards", "rituals", "powers", "advantages", "origins"]; }
+function hbAttrs() { return ["Body", "Agility", "Intellect", "Presence", "Will"]; }
 function hbClasses() { return ["I", "II", "III", "IV", "V", "VI"]; }
 // A ritual's weight sets its clock, as in the core rules' magic chapter.
 function hbWeights() { return [["minor", "Minor", 2], ["significant", "Significant", 4], ["major", "Major", 6]]; }
 // What a setting can take: spells need its spell list, cards its discovery cards, rituals its magic.
 function hbHas(PACK) { return { spells: !!(PACK.spells && Array.isArray(PACK.spells.list)), cards: !!PACK.discovery, rituals: !!(PACK.magic && PACK.magic.workings),
-  powers: !!(PACK.powers && Array.isArray(PACK.powers.list)) }; }
+  powers: !!(PACK.powers && Array.isArray(PACK.powers.list)),
+  advantages: Array.isArray(PACK.advantages) && PACK.advantages.length > 0 && PACK.advantages.every(Array.isArray) && Array.isArray(PACK.skills),
+  origins: Array.isArray(PACK.origins) && PACK.origins.length > 0 && PACK.origins.every((o) => o && o.adj && Array.isArray(o.traits)) && Array.isArray(PACK.skills) }; }
 function hbBands() { return [["close", "Close"], ["short", "Short"], ["medium", "Medium"], ["long", "Long"], ["extreme", "Extreme"]]; }
 function hbKey(game) { return game + ".homebrew.v1"; }
 function hbInt(v, lo, hi, d) { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; }
@@ -9991,7 +10484,29 @@ function hbClean(raw, PACK) {
     if (!name || !cls[0]) return null;
     return { id: hbId(x.id, name, taken), name, group: groups.includes(x.group) ? x.group : groups[0] || "", classes: cls, gm: !!x.gm, variety: hbText(x.variety, 120) };
   }).filter(Boolean);
-  return { threats, weapons, edges, spells, cards, rituals, powers, from: r.from === "gm" ? "gm" : "mine" };
+  // An advantage: +2 to one narrow kind of task with a skill, when the GM agrees it applies (the roller's Advantage box).
+  const skillNames = (PACK.skills || []).map((k) => k[0]);
+  const advantages = list("advantages").map((x) => {
+    const name = hbText(x && x.name, 40), text = hbText(x && x.text, 300); if (!name || !text) return null;
+    return { id: hbId(x.id, name, taken), name, text, skill: skillNames.includes(x.skill) ? x.skill : skillNames[0] || "" };
+  }).filter(Boolean);
+  // An origin, as the setting's own: its tier (paid from the Edge points), attribute changes totalling 0, four origin
+  // skills, and one to three origin advantages, each with its complication. Powers (Aurora) follow an origin of the setting's.
+  const tiers = (PACK.origins || []).map((o) => o.tier || 0), maxTier = Math.max(0, ...tiers);
+  const powerOrigins = (PACK.origins || []).filter((o) => o.powerSlots && !o.homebrew).map((o) => o.id);
+  const origins = list("origins").map((x) => {
+    const name = hbText(x && x.name, 40), desc = hbText(x && x.desc, 400); if (!name || !desc) return null;
+    const adj = {}; for (const a of hbAttrs()) { const n = hbInt(x.adj && x.adj[a], -2, 2, 0); if (n) adj[a] = n; }
+    if (Object.values(adj).reduce((t, n) => t + n, 0) !== 0) return null; // every origin's changes total 0
+    const sk = [...new Set((Array.isArray(x.skills) ? x.skills : []).filter((k) => skillNames.includes(k)))].slice(0, 4);
+    const traits = (Array.isArray(x.traits) ? x.traits : []).slice(0, 3).map((t) => ({ name: hbText(t && t.name, 40), text: hbText(t && t.text, 300),
+      skill: skillNames.includes(t && t.skill) ? t.skill : "", compName: hbText(t && t.compName, 40), compText: hbText(t && t.compText, 300) }))
+      .filter((t) => t.name && t.text && t.compName && t.compText);
+    if (!sk.length || !traits.length) return null;
+    return { id: hbId(x.id, name, taken), name, desc, tier: hbInt(x.tier, 0, maxTier, 0), adj, skills: sk, traits,
+      powersLike: powerOrigins.includes(x.powersLike) ? x.powersLike : "" };
+  }).filter(Boolean);
+  return { threats, weapons, edges, spells, cards, rituals, powers, advantages, origins, from: r.from === "gm" ? "gm" : "mine" };
 }
 function hbCount(hb) { return hb ? hbKinds().reduce((n, k) => n + (hb[k] || []).length, 0) : 0; }
 function hbBody(hb) { return JSON.stringify(Object.fromEntries(hbKinds().map((k) => [k, hb[k] || []]))); }
@@ -10050,6 +10565,13 @@ function hbApply(PACK, hb) {
     const cls = []; x.classes.forEach((c, i) => cls.push(c || `As Class ${hbClasses()[i - 1]}, stronger: the GM sets how much.`));
     PACK.powers.list.push([x.id, `${x.name} (homebrew)`, x.group, cls, x.gm ? { gm: true } : {}, x.variety || ""]);
   }
+  if (has.advantages) for (const x of hb.advantages) PACK.advantages.push([x.id, `${x.name} (homebrew)`, x.text, x.skill]);
+  if (has.origins) for (const x of hb.origins) {
+    const like = x.powersLike ? PACK.origins.find((o) => o.id === x.powersLike) : null;
+    PACK.origins.push({ id: x.id, name: `${x.name} (homebrew)`, tier: x.tier, adj: { ...x.adj }, desc: x.desc, core: [], form: null, skills: x.skills.slice(), homebrew: true,
+      traits: x.traits.map((t, i) => [`${x.id}-${i + 1}`, t.name, t.text, t.skill || x.skills[0], !!t.skill, t.compName, t.compText]),
+      ...(like ? { powerSlots: like.powerSlots, ...(like.powerList ? { powerList: like.powerList } : {}), ...(like.mythic ? { mythic: like.mythic } : {}) } : {}) });
+  }
 }
 
 function mountHomebrew(api) {
@@ -10060,11 +10582,14 @@ function mountHomebrew(api) {
   // A setting's own words: hexes or cantrips or psionic powers; lore cards or data records; rituals or workings.
   const W = { spell: M.burst || (HAS.spells ? PACK.spells.plural.toLowerCase().replace(/s$/, "") : "spell"), spells: M.bursts || (HAS.spells ? PACK.spells.plural.toLowerCase() : "spells"),
     card: D.card || "card", cards: D.cards || "cards", ritual: M.working || "ritual", rituals: M.workings || "rituals" };
-  const SKILLS = hbSkills(PACK);
+  const SKILLS = hbSkills(PACK), ALL_SKILLS = (PACK.skills || []).map((k) => [k[0], k[0]]);
+  // The setting's word for an origin: species, heritage, background…
+  const T = { origin: ((PACK.terms && PACK.terms.origin) || "Origin").toLowerCase(), origins: ((PACK.terms && PACK.terms.originPlural) || "Origins").toLowerCase() };
   const armsBuilt = (PACK.arms || []).filter((a) => !a.hazard && !a.homebrew);
   const opts = (list, sel) => list.map(([v, n]) => `<option value="${esc(v)}"${v === sel ? " selected" : ""}>${esc(n)}<\/option>`).join("");
   const store = () => { if (!hbSave(PACK, hb)) say("This browser won't keep the homebrew: save it to a file.", true); changed = true; render(); };
   const summary = (h) => [[h.threats.length, "threat", "threats"], [h.weapons.length, "weapon", "weapons"], ...(EDGES ? [[h.edges.length, "Edge", "Edges"]] : []),
+    ...(HAS.origins ? [[h.origins.length, T.origin, T.origins]] : []), ...(HAS.advantages ? [[h.advantages.length, "advantage", "advantages"]] : []),
     ...(HAS.cards ? [[h.cards.length, W.card, W.cards]] : []), ...(HAS.powers ? [[h.powers.length, "power", "powers"]] : []), ...(HAS.spells ? [[h.spells.length, W.spell, W.spells]] : []), ...(HAS.rituals ? [[h.rituals.length, W.ritual, W.rituals]] : [])]
     .filter(([n]) => n).map(([n, one, many]) => `${n} ${n === 1 ? one : many}`).join(", ") || "nothing yet";
   const weightOf = (k) => hbWeights().find((w) => w[0] === k) || hbWeights()[0];
@@ -10155,13 +10680,39 @@ function mountHomebrew(api) {
     hbClasses().map((c, i) => `<div class="field wide"><label>Class ${c}${i ? " (blank: the GM decides)" : ""}<\/label><input name="c${i}" maxlength="200" value="${esc(x ? x.classes[i] : "")}" placeholder="${i ? "" : "e.g. Step from one shadow to another you can see, up to 10 yd."}"><\/div>`).join("") +
     `<div class="field"><label><input type="checkbox" name="gm"${x && x.gm ? " checked" : ""}> Needs the GM's approval<\/label><\/div>` +
     input(x, "variety", "Kinds it comes in (optional)", 120, "e.g. darkness, smoke or mirrors", true), "Add the power");
+  const advantageForm = () => formOf("advantages", (x) => input(x, "name", "Name", 40, "e.g. Trail Cook") +
+    `<div class="field"><label>Skill<\/label><select name="skill">${opts(ALL_SKILLS, x ? x.skill : "")}<\/select><\/div>` +
+    input(x, "text", "What it gives: +2 to one narrow kind of task", 300, "e.g. +2 to Survival to feed a party on what the land gives.", true), "Add the advantage");
+  function originForm() {
+    const x = editing && editing[0] === "origins" ? find("origins", editing[1]) : null;
+    const maxTier = Math.max(0, ...(PACK.origins || []).filter((o) => !o.homebrew).map((o) => o.tier || 0));
+    const adjSel = (a) => `<div class="field"><label>${a}<\/label><select name="adj-${a}">${opts([["-2", "−2"], ["-1", "−1"], ["0", "0"], ["1", "+1"], ["2", "+2"]], String((x && x.adj[a]) || 0))}<\/select><\/div>`;
+    const skillSel = (i) => `<div class="field"><label>${cap(T.origin)} skill ${i + 1}<\/label><select name="sk${i}">${i ? `<option value="">None<\/option>` : ""}${opts(ALL_SKILLS, x ? x.skills[i] || "" : "")}<\/select><\/div>`;
+    const trait = (i) => { const t = (x && x.traits[i]) || {}; return `<fieldset class="field wide hb-bonus"><legend class="label">${cap(T.origin)} advantage ${i + 1}${i ? " (optional)" : ""}<\/legend><div class="fields">
+      <div class="field"><label>Name<\/label><input name="t${i}-name" maxlength="40" value="${esc(t.name || "")}" placeholder="${i ? "" : "e.g. Night Eyes"}"><\/div>
+      <div class="field"><label>+2 to<\/label><select name="t${i}-skill"><option value="">No roll bonus<\/option>${opts(ALL_SKILLS, t.skill || "")}<\/select><\/div>
+      <div class="field wide"><label>What it gives<\/label><input name="t${i}-text" maxlength="300" value="${esc(t.text || "")}" placeholder="${i ? "" : "e.g. +2 to Awareness to spot movement in darkness."}"><\/div>
+      <div class="field"><label>Its complication<\/label><input name="t${i}-cname" maxlength="40" value="${esc(t.compName || "")}" placeholder="${i ? "" : "e.g. Sun-Dazzled"}"><\/div>
+      <div class="field wide"><label>What the complication does<\/label><input name="t${i}-ctext" maxlength="300" value="${esc(t.compText || "")}" placeholder="${i ? "" : "e.g. Bright light blinds you. Accept the stumble at the worst moment."}"><\/div><\/div><\/fieldset>`; };
+    const powerOrigins = (PACK.origins || []).filter((o) => o.powerSlots && !o.homebrew);
+    return `<form data-hbform="origins" class="fields">
+      <div class="field"><label>Name<\/label><input name="name" maxlength="40" required value="${esc(x ? x.name : "")}" placeholder="e.g. Cave-born"><\/div>
+      <div class="field"><label>Tier (paid from Edge points)<\/label><select name="tier">${opts(Array.from({ length: maxTier + 1 }, (_, i) => [String(i), String(i)]), String(x ? x.tier : 0))}<\/select><\/div>
+      <div class="field wide"><label>Description<\/label><input name="desc" maxlength="400" required value="${esc(x ? x.desc : "")}" placeholder="Who they are and where they come from."><\/div>
+      <fieldset class="field wide hb-bonus"><legend class="label">Attribute changes (they must total 0)<\/legend><div class="fields">${hbAttrs().map(adjSel).join("")}<\/div><\/fieldset>
+      ${[0, 1, 2, 3].map(skillSel).join("")}
+      ${powerOrigins.length ? `<div class="field wide"><label>Powers<\/label><select name="powersLike"><option value="">None<\/option>${opts(powerOrigins.map((o) => [o.id, `As ${o.name}`]), x ? x.powersLike : "")}<\/select><\/div>` : ""}
+      ${[0, 1, 2].map(trait).join("")}
+      <div class="btn-row field wide"><button class="btn primary" type="submit">${x ? "Save changes" : `Add the ${esc(T.origin)}`}<\/button>${x ? `<button type="button" class="linkish" data-hbcancel>Cancel<\/button>` : ""}<\/div><\/form>`;
+  }
+  const adjLine = (adj) => Object.entries(adj).map(([a, n]) => `${a} ${plus(n)}`).join(", ") || "no attribute changes";
   const section = (kind, title, list, line, form) => `<details class="hb-sec"${editing && editing[0] === kind ? " open" : ""}><summary class="label">${title} (${list.length})<\/summary>
     <ul class="small adv-list">${list.map((x) => item(kind, x, line(x))).join("") || `<li class="muted">None yet.<\/li>`}<\/ul>${list.length >= hbLimits()[kind] && !(editing && editing[0] === kind) ? `<p class="small muted">That's the most this keeps (${hbLimits()[kind]}).<\/p>` : form()}<\/details>`;
 
   function render() {
     if (api.gmRoot) {
       api.gmRoot.innerHTML = `<h3>Homebrew<\/h3>
-        <p class="small muted">Your own threats, weapons${EDGES ? ", Edges" : ""}${HAS.cards ? `, ${W.cards}` : ""}${HAS.powers ? ", powers" : ""}${HAS.spells ? `, ${W.spells}` : ""}${HAS.rituals ? ` and ${W.rituals}` : ""}, made here: no code. They work like the setting's own, marked <i>homebrew<\/i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}${HAS.cards ? `, ${W.cards} where you record findings` : ""}${HAS.powers ? ", powers among the creator's choices" : ""}${HAS.spells ? `, ${W.spells} among the creator's choices` : ""}${HAS.rituals ? `, ${W.rituals} in a ${W.ritual} book beside Rituals by heart` : ""}. Keep numbers in line with the setting's (see <i>Making your own<\/i> in the core rules); anything special is a note you apply at the table.<\/p>
+        <p class="small muted">Your own threats, weapons${EDGES ? ", Edges" : ""}${HAS.origins ? `, ${esc(T.origins)}` : ""}${HAS.advantages ? ", advantages" : ""}${HAS.cards ? `, ${W.cards}` : ""}${HAS.powers ? ", powers" : ""}${HAS.spells ? `, ${W.spells}` : ""}${HAS.rituals ? ` and ${W.rituals}` : ""}, made here: no code. They work like the setting's own, marked <i>homebrew<\/i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}${HAS.origins || HAS.advantages ? `, ${[HAS.origins ? esc(T.origins) : "", HAS.advantages ? "advantages" : ""].filter(Boolean).join(" and ")} among the creator's choices` : ""}${HAS.cards ? `, ${W.cards} where you record findings` : ""}${HAS.powers ? ", powers among the creator's choices" : ""}${HAS.spells ? `, ${W.spells} among the creator's choices` : ""}${HAS.rituals ? `, ${W.rituals} in a ${W.ritual} book beside Rituals by heart` : ""}. Keep numbers in line with the setting's (see <i>Making your own<\/i> in the core rules); anything special is a note you apply at the table.<\/p>
         <p class="small"><b>In this browser:<\/b> ${esc(summary(hb))}${hb.from === "gm" ? " (shared by your GM)" : ""}. Players get it when they join your shared table, or from a file.<\/p>
         ${changed ? `<p class="small hb-reload"><b>Saved.<\/b> Reload the page to use the changes. <button type="button" class="btn" data-hbreload>Reload now<\/button><\/p>` : ""}
         <div class="btn-row"><button type="button" class="btn" data-hbexport${hbCount(hb) ? "" : " disabled"}>Save to file<\/button>
@@ -10169,6 +10720,8 @@ function mountHomebrew(api) {
         ${section("threats", "Threats", hb.threats, (t) => withBonus(threatLine(t), threatBonusLine(t.bonus)), threatForm)}
         ${section("weapons", "Weapons", hb.weapons, (w) => withBonus(weaponLine(w), weaponBonusLine(w.bonus)), weaponForm)}
         ${EDGES ? section("edges", "Edges", hb.edges, (x) => withBonus(`${x.limit === 1 ? "once" : `up to ${x.limit}×`}: ${x.text}`, edgeBonusLine(x.bonus)), edgeForm) : ""}
+        ${HAS.origins ? section("origins", cap(T.origins), hb.origins, (x) => `tier ${x.tier}; ${adjLine(x.adj)}; skills ${x.skills.join(", ")}; ${x.traits.map((t) => t.name).join(", ")}`, originForm) : ""}
+        ${HAS.advantages ? section("advantages", "Advantages", hb.advantages, (x) => `${x.skill}: ${x.text}`, advantageForm) : ""}
         ${HAS.cards ? section("cards", cap(W.cards), hb.cards, (x) => `${x.knowledge}${x.permits ? ` Permits: ${x.permits}` : ""}`, cardForm) : ""}
         ${HAS.powers ? section("powers", "Powers", hb.powers, (x) => `${x.gm ? "GM's approval; " : ""}Class I: ${x.classes[0]}`, powerForm) : ""}
         ${HAS.spells ? section("spells", cap(W.spells), hb.spells, (x) => withBonus(x.text, x.attack && x.attack.boxes ? `an attack, ${x.attack.boxes} box${x.attack.boxes === 1 ? "" : "es"} at ${(hbBands().find((b) => b[0] === x.attack.band) || [])[1]} range` : ""), spellForm) : ""}
@@ -10205,6 +10758,10 @@ function mountHomebrew(api) {
     if (kind === "powers") return { id, name: v("name"), group: v("group"), classes: hbClasses().map((_, i) => v("c" + i)), gm: f.elements.gm.checked, variety: v("variety") };
     if (kind === "cards") return { id, name: v("name"), knowledge: v("knowledge"), permits: v("permits") };
     if (kind === "rituals") return { id, name: v("name"), weight: v("weight"), time: v("time"), text: v("text"), price: v("price") };
+    if (kind === "advantages") return { id, name: v("name"), skill: v("skill"), text: v("text") };
+    if (kind === "origins") return { id, name: v("name"), tier: v("tier"), desc: v("desc"), powersLike: v("powersLike"),
+      adj: Object.fromEntries(hbAttrs().map((a) => [a, v("adj-" + a)])), skills: [0, 1, 2, 3].map((i) => v("sk" + i)).filter(Boolean),
+      traits: [0, 1, 2].map((i) => ({ name: v(`t${i}-name`), skill: v(`t${i}-skill`), text: v(`t${i}-text`), compName: v(`t${i}-cname`), compText: v(`t${i}-ctext`) })).filter((t) => t.name || t.text) };
     return { id, name: v("name"), limit: v("limit"), text: v("text"),
       bonus: { skill: v("b-skill"), skillValue: v("b-skill") ? v("b-skillv") : 0, dodge: on("b-dodge") ? 1 : 0, move: v("b-move"), extraDefense: on("b-xdef"), shrugTelling: on("b-shrugt") } };
   }
@@ -10217,7 +10774,9 @@ function mountHomebrew(api) {
       if (at >= 0) list[at] = entry; else list.push(entry);
       const next = hbClean({ ...hb, [kind]: list }, PACK);
       if (next[kind].length < list.length) { say({ threats: "A threat needs a name and at least one weapon.", edges: "An Edge needs a name and what it gives.", weapons: "A weapon needs a name.",
-        spells: `A ${W.spell} needs a name and what it does.`, powers: "A power needs a name and what it does at Class I.", cards: `A ${W.card} needs a subject and what's true.`, rituals: `A ${W.ritual} needs a name and what it does.` }[kind], true); return; }
+        spells: `A ${W.spell} needs a name and what it does.`, powers: "A power needs a name and what it does at Class I.", cards: `A ${W.card} needs a subject and what's true.`, rituals: `A ${W.ritual} needs a name and what it does.`,
+        advantages: "An advantage needs a name and what it gives.",
+        origins: `A ${T.origin} needs a name, a description, at least one skill and one advantage with its complication, and attribute changes that total 0.` }[kind], true); return; }
       hb = next; editing = null; hb.from = "mine"; store(); say(at >= 0 ? "Saved." : "Added.");
     });
     root.addEventListener("change", async (e) => {
@@ -11074,7 +11633,7 @@ function mountHomebrew(api) {
   let book = "players";
   try { if (books && sessionStorage.getItem(PACK.id + ".guide") === "gm") book = "gm"; } catch {}
   showBook(book);
-  // Registered GMs only: the GM view opens, and the GM's Guide arrives from the table server, once the GM access code checks out.
+  // The GM's Guide, if the build kept it for registered GMs: it arrives from the table server once the GM access code checks out.
   mountGmLock({ table: sharedTable, game: PACK.id, view: $("view-gm"), book: books ? books.gm : null, esc, toast,
     onBook: () => { let at = "players"; try { at = sessionStorage.getItem(PACK.id + ".guide") || "players"; } catch {} showBook(at === "gm" ? "gm" : "players"); } });
   protectText($("guide"), "The guides are © Don Smallwood: please don't copy them.", toast);

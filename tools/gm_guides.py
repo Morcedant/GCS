@@ -1,4 +1,6 @@
-"""The GM's Guides, kept out of the pages: only registered GMs get them, from the table server.
+"""The GM's Guides: in the pages for everyone (GM_GUIDES_OPEN), or kept out of them for registered GMs only.
+
+With GM_GUIDES_OPEN, each page carries its GM's Guide like the Players' Guide. Without it:
 
 A game's build writes its GM's Guide to <game folder>/gm-guide.json and puts an empty, locked book in the page;
 bundle() gathers every game's gm-guide.json into legend-dynamics/table-server/src/gm-guides.js, which the
@@ -18,6 +20,18 @@ SERVER = ROOT / "legend-dynamics" / "table-server" / "src" / "gm-guides.js"
 # game id (as the pages name it to the table server) → its folder
 GAMES = {"western": "legend-dynamics/western", "spaceopera": "legend-dynamics/spaceopera", "aurora": "legend-dynamics/aurora",
          "fantasy": "legend-dynamics/fantasy", "uss-pelion": "uss-pelion", "grimm-west": "grimm-west"}
+
+
+# True: every visitor reads the GM's Guides in the creators. False: only GMs whose access code checks out.
+GM_GUIDES_OPEN = True
+
+
+def book(title, subtitle, body):
+    """The GM's Guide's place in the page: the guide itself (GM_GUIDES_OPEN), or empty until a registered GM unlocks it."""
+    if GM_GUIDES_OPEN:
+        return (f'<div class="guide-book" id="guide-gm" data-title="{html.escape(title)}" data-subtitle="{html.escape(subtitle)}" hidden>\n'
+                + body + "</div>\n")
+    return locked_book(title, subtitle)
 
 
 def locked_book(title, subtitle):

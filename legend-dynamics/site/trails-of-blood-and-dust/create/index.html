@@ -624,7 +624,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="6dccb15" data-version-date="2026.10.23" title="The code changes whenever this page changes.">Version 2026.10.23 · 6dccb15</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="f1a94ab" data-version-date="2026.10.25" title="The code changes whenever this page changes.">Version 2026.10.25 · f1a94ab</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -4145,7 +4145,7 @@ tr.lvl-U td.target { color: var(--muted); }
 <li><strong>Spells.</strong> A new hex, cantrip or psionic power matches the setting’s own: an attack marks 1 or 2 boxes at Close or Short range, and anything stronger says who resists and what it costs.</li>
 <li><strong>Rituals.</strong> Give a ritual its weight (Minor 2 segments, Significant 4, Major 6), the time a roll takes, what it does and its price.</li>
 </ul>
-<p><strong>In the creator.</strong> The GM view’s <strong>Homebrew</strong> tab keeps your threats, weapons, Edges, cards, powers, spells and rituals. They then work like the book’s, marked <em>homebrew</em>: threats in the Encounter panel and on the battle map, weapons in characters’ gear and the roller, Edges, powers and spells among the creator’s choices, cards where findings are recorded, and rituals in a ritual book beside <em>Rituals by heart</em>. Players get them when they join your shared table, or from a homebrew file you give them. Bonuses chosen from the tab’s menus are worked out for you: a weapon’s accuracy, strong hits and what it’s made of; a threat’s hard hide, weaknesses, what alone can hurt it and how hard it is to hit; an Edge’s skill, Dodge or Move bonus and extra defense; an attack spell cast in the Encounter panel. Anything else is a note the GM applies at the table.</p>
+<p><strong>In the creator.</strong> The GM view’s <strong>Homebrew</strong> tab keeps your threats, weapons, Edges, origins, advantages, cards, powers, spells and rituals. They then work like the book’s, marked <em>homebrew</em>: threats in the Encounter panel and on the battle map, weapons in characters’ gear and the roller, Edges, origins, advantages, powers and spells among the creator’s choices (a homebrew origin follows the steps above, with the tier, attribute changes, origin skills and origin advantages you set), cards where findings are recorded, and rituals in a ritual book beside <em>Rituals by heart</em>. Players get them when they join your shared table, or from a homebrew file you give them. Bonuses chosen from the tab’s menus are worked out for you: a weapon’s accuracy, strong hits and what it’s made of; a threat’s hard hide, weaknesses, what alone can hurt it and how hard it is to hit; an Edge’s skill, Dodge or Move bonus and extra defense; an attack spell cast in the Encounter panel. Anything else is a note the GM applies at the table.</p>
 <h1 id="g-complications">Complications</h1>
 <p>Choose one complication. These are sources of meaningful choices, not constant penalties. The GM proposes a concrete problem and offers one Grit point if you accept it. Every complication needs a trigger agreed with the GM; the creator suggests three for each.</p>
 <table>
@@ -4252,7 +4252,613 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Grit:</strong> start each session with two. Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.</p>
 <p><em>Legend Dynamics RPG system, created by Don Smallwood.</em> Copyright © Don Smallwood. All rights reserved.</p>
 </div>
-<div class="guide-book" id="guide-gm" data-title="Trails of Blood &amp; Dust GM&#x27;s Guide" data-subtitle="Running the Gothic Western: jobs, monsters, threats and the GM&#x27;s tools" data-locked="1" hidden>
+<div class="guide-book" id="guide-gm" data-title="Trails of Blood &amp; Dust GM&#x27;s Guide" data-subtitle="Running the Gothic Western: jobs, monsters, threats and the GM&#x27;s tools" hidden>
+<p>This book is for whoever runs the game. It gathers what the GM reaches for at the table: job seeds, the monsters’ weaknesses and what their bites and curses do, the threats with their numbers, and how to use the GM view’s battle map and Encounter panel. The rules themselves are in the <strong>Players’ Guide</strong>; this book builds on them.</p>
+<h1 id="gm-running-jobs">Running jobs</h1>
+<h2 id="gm-job-seeds">Job seeds</h2>
+<p>Roll 3d6 on each table and read the total, or pick what you like. Middle results come up most often; the strangest sit at 3, 4, 17 and 18. The GM view in the creator rolls these for you and can start the clock.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>Job</th>
+<th>Place</th>
+<th>The darkness</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>A whole town gone overnight</td>
+<td>A town that isn’t on any map</td>
+<td>Something older than any of them, waking</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>A dead man hires you</td>
+<td>A sanitarium in the hills</td>
+<td>A wraith feeding on a boarding house</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>A body found drained of blood</td>
+<td>A silver boomtown</td>
+<td>A werewolf that has acquired the taste</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>A stagecoach that never arrived</td>
+<td>A logging camp in the deep woods</td>
+<td>A vampire who owns the town</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Livestock torn apart in the night</td>
+<td>A river steamboat</td>
+<td>The dead rising from a flooded graveyard</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>A child gone missing</td>
+<td>The railroad’s end-of-track camp</td>
+<td>A witch’s curse on a family</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>A miner raving about the dead walking</td>
+<td>A lonely homestead</td>
+<td>A ghost that wants justice</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>A bounty on a man who died last year</td>
+<td>A ghost town</td>
+<td>Ghouls in the mine</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Travelers vanishing on the trail</td>
+<td>A burned mission church</td>
+<td>A demon summoned by a desperate man</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>A traveling medicine show</td>
+<td>A saloon and gambling hall</td>
+<td>A wendigo stalking a snowbound camp</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>A new preacher packs the church</td>
+<td>A frontier fort</td>
+<td>A headless rider on the stage road</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>A town where no one sleeps</td>
+<td>A fog-bound waterfront</td>
+<td>A hellhound on someone’s trail</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>A hanging that went wrong</td>
+<td>A canyon cemetery</td>
+<td>A cult in the church cellar</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>A monster asks for help</td>
+<td>A snowbound mountain pass</td>
+<td>A skinwalker wearing a neighbor’s face</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>A train arrives with no one aboard</td>
+<td>A circus wintering in the badlands</td>
+<td>A town that made a pact</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>A child asks you to kill their father, the monster</td>
+<td>A mine sealed since the cave-in</td>
+<td>A creature no one has a name for</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>Twist</th>
+<th>Ticking clock (segments)</th>
+<th>Key character</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>A character is already cursed</td>
+<td>The eclipse (4)</td>
+<td>A ghost who wants to help</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>The monster is a character’s kin</td>
+<td>The last train out (6)</td>
+<td>A monster who once saved a character’s life</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>The victim was the monster</td>
+<td>The mob forms (6)</td>
+<td>A sheriff who wants it simple</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>The law is in on it</td>
+<td>Nightfall (4)</td>
+<td>A widow who knows more than she says</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Two monsters are at war</td>
+<td>The full moon rises (4)</td>
+<td>A traveling doctor</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>The client lied about everything</td>
+<td>The next victim (6)</td>
+<td>A Pinkerton detective</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>A rich man pays for silence</td>
+<td>The dead finish rising (6)</td>
+<td>A railroad baron</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>A banshee keens for one of the characters</td>
+<td>The river floods (8)</td>
+<td>A frightened homesteader family</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>The monster is protecting its family</td>
+<td>The trail goes cold (4)</td>
+<td>A werewolf trying to stay human</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>Someone is using the monster</td>
+<td>The hanging at dawn (4)</td>
+<td>A child who saw it happen</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>The town wants a hanging, any hanging</td>
+<td>The ritual completes (6)</td>
+<td>A preacher with a past</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>The Order of the Iron Cross arrives to burn everything</td>
+<td>The fire spreads (4)</td>
+<td>A newspaperman who’s close to the truth</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>Another hunter is after the same prey</td>
+<td>The curse takes hold (8)</td>
+<td>A witch who needs protection</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>The trail leads to someone a character loves</td>
+<td>The snows close the pass (8)</td>
+<td>A dying hunter with a last request</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>The hunter is the monster</td>
+<td>The body count doubles (6)</td>
+<td>A senator with a secret</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>It happened before, thirty years ago</td>
+<td>The pact comes due (8)</td>
+<td>The last of a hunter bloodline</td>
+</tr>
+</tbody>
+</table>
+<h1 id="gm-monsters">Monsters</h1>
+<p>The truth behind <em>Monsters and magic</em> in the Players’ Guide: what each monster fears, what its bite or curse does, and the rulings for vampires, the wendigo, hellhounds, the shadow realm and demons. In the story, hunters learn these a piece at a time: a discovery clock, a survivor’s tale, a test that works, or a fight that goes wrong.</p>
+<h2 id="gm-weaknesses">Weaknesses</h2>
+<p>Every monster has a weakness, and finding it is often the whole job: a discovery clock, a survivor’s account, or a test that works (see <em>Discovery clocks and lore cards</em> in the Players’ Guide). The Monster Hunter advantage and the Sighted’s Monster’s Eye help with the Identify rolls. <strong>A real weakness works whoever uses it, card or no card:</strong> silver marks its extra box fired by someone who has never heard of werewolves, and a hunter who suspects silver can load it on purpose. Called shots (at a heart, a head) follow the ordinary combat rules. With a lore card for the creature and the load its weakness calls for, a hunter can make a <strong>hunter’s shot</strong>: the called shot or effect the card permits, which would otherwise be impossible (see <em>Special loads</em>). What a weakness doesn’t give anyone is an unfamiliar ritual: a banishment, a binding or a cure still needs its procedure, the knowledge, the skill and the components.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Creature</th>
+<th>Weakness</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Werewolf</td>
+<td>Silver: an extra box, and its toughness doesn’t help. Wolfsbane keeps it away.</td>
+</tr>
+<tr class="even">
+<td>Vampire</td>
+<td>A wooden stake through the heart incapacitates but doesn’t kill; fire, sunlight and beheading destroy. Holy symbols hold it back; it can’t enter a home uninvited. Destroying a natural vampire frees its whole lineage (see <em>Vampires</em>).</td>
+</tr>
+<tr class="odd">
+<td>Zombie</td>
+<td>A shot to the head (−2 to hit) or fire puts it down for good; anything else just slows it.</td>
+</tr>
+<tr class="even">
+<td>Ghost</td>
+<td>Can’t be hurt. Lay it to rest by finishing its business, or bind it with a ritual.</td>
+</tr>
+<tr class="odd">
+<td>Wraith</td>
+<td>Only silver, cold iron, salt and fire hurt it. It can’t cross a line of salt or iron filings. Destroyed for good only when its bones are found and burned.</td>
+</tr>
+<tr class="even">
+<td>Banshee</td>
+<td>Weapons don’t touch her. She leaves at dawn if the one she keens for is still alive. A hit with silver, or an iron bell rung at her, silences her for the scene.</td>
+</tr>
+<tr class="odd">
+<td>Ghoul</td>
+<td>Fire and daylight. It flees from holy ground.</td>
+</tr>
+<tr class="even">
+<td>Demon</td>
+<td>Holy water burns it. A true demon is not fought like a beast: a major ritual or a powerful holy talisman banishes it (see <em>Demons</em>). It must keep a bargain to the letter.</td>
+</tr>
+<tr class="odd">
+<td>Hellhound</td>
+<td>Holy water drives it off for a time. Its hunt ends only when the claim on its quarry’s soul is resolved or changed, or a major ritual interferes with the pact (see <em>Hellhounds</em>).</td>
+</tr>
+<tr class="even">
+<td>Wendigo</td>
+<td>Ordinary weapons wound it, but it heals unnaturally, and only fire stops the healing (only fire marks more than 1 box at a time). It is destroyed for good only when it is beheaded and its body burned. It is strongest in deep winter and weakest in summer heat.</td>
+</tr>
+<tr class="odd">
+<td>Skinwalker</td>
+<td>Underneath, it is a person. In a stolen shape, ordinary wounds mark only 1 box at a time; in its own shape, it is as mortal as anyone. Speak its true name to its face and it is forced back into its own shape for the scene.</td>
+</tr>
+<tr class="even">
+<td>Headless Rider</td>
+<td>Its head, hidden near where it died: laid back in the grave, the rider rests for good. It can’t cross running water, so a bridge over a creek is safety.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="gm-bites-and-curses">Bites and curses</h2>
+<ul>
+<li><strong>Zombie bite.</strong> A bite that marks a box starts a 4-segment <strong>Infection</strong> clock, ticking each hour. A successful Medicine roll with an Occult remedy stops it; when it fills, you die, and rise.</li>
+<li><strong>Werewolf bite.</strong> A bite under the full moon can pass on the curse; the GM decides, and lifting it is a major ritual.</li>
+<li><strong>Vampire bite.</strong> A vampire who drains a victim to Dying can choose to turn them. The turned belong to its lineage (see <em>Vampires</em>).</li>
+<li><strong>The wendigo’s hunger.</strong> It begins with someone who ate human flesh to survive a starving winter in the high passes. A character who does starts a 4-segment <strong>Hunger</strong> clock, ticking each week they go without it again; when it fills, they belong to the wendigo. Only a major ritual lifts it.</li>
+<li><strong>A wraith’s touch.</strong> Someone killed by it rises as a wraith at the next new moon, unless they’re buried with salt in the coffin.</li>
+<li><strong>A banshee’s keening.</strong> She is tied to a family’s blood, not a place: once she has keened for one of a line, she can follow that family from town to town.</li>
+</ul>
+<h2 id="gm-vampires">Vampires</h2>
+<ul>
+<li><strong>Lineages.</strong> Each <strong>natural vampire</strong> sustains its own lineage: everyone it has turned, and everyone they have turned in turn. There is more than one natural vampire.</li>
+<li><strong>Freeing a lineage.</strong> Destroy the natural source, and the whole chain reverts to human, including those infected only indirectly. Destroying a vampire it turned (an intermediate) cures nobody.</li>
+<li><strong>A stake isn’t the end.</strong> A stake through the heart incapacitates a vampire; it doesn’t destroy it. Staking the source doesn’t free its lineage; destroying it does.</li>
+<li><strong>What reversion does to the body.</strong> Wounds that vampiric regeneration already healed stay healed. Wounds that hadn’t healed remain, and have their ordinary human consequences at once: someone reverting with three boxes marked is Dying. Reversion itself repairs nothing.</li>
+<li>This cure is a vampire’s alone: no other creature’s victims are freed by killing their maker.</li>
+</ul>
+<h2 id="gm-the-wendigo">The wendigo</h2>
+<ul>
+<li>Ordinary weapons wound it; only fire marks more than 1 box at a time.</li>
+<li>It heals unnaturally fast, and only fire interferes with that healing.</li>
+<li>It is destroyed for good only when it is <strong>beheaded and its body burned</strong>. After beheading, the body can still lash out, but blindly: its actions have no direction.</li>
+<li>How fast it heals, how long fire holds the healing back, and how the headless body’s blind attacks are run are not yet set; until they are, the GM rules.</li>
+</ul>
+<h2 id="gm-hellhounds">Hellhounds</h2>
+<ul>
+<li>A hellhound’s hunt is a <strong>curse tied to a claim on someone’s soul</strong>.</li>
+<li>The hunt ends only when the conditions behind the claim are <strong>resolved or changed</strong>. A powerful practitioner can interfere with the pact through a <strong>major ritual</strong>.</li>
+<li><strong>Holy water</strong> drives a hellhound off and protects its quarry for a time; it doesn’t cancel the pact.</li>
+<li>Whether destroying a hellhound’s physical body buys the quarry time, and how much, is not settled: the GM rules case by case.</li>
+</ul>
+<h2 id="gm-the-shadow-realm">The shadow realm</h2>
+<p>The <strong>shadow realm</strong> is a real place in the same world as ours, not another Earth: it has no copies of our towns or our people. It is an independent and brutal ecology, with its own hunters and prey. Some of its creatures cross over, and some of those spread a <strong>contagion</strong> (a bite, a curse) that makes more of their kind; others never do. Each threat has its own weaknesses, found out on their own terms: not every horror is an infection.</p>
+<p>Some hold that the things of the dark are <strong>fallen angels</strong> and their brood. Others call that a preacher’s story. No one has settled it, and the game doesn’t.</p>
+<h2 id="gm-demons">Demons</h2>
+<p>Three kinds of thing get called a demon, and they aren’t the same:</p>
+<ul>
+<li><strong>Demonic creatures</strong> native to the shadow realm: beasts and hunters of that ecology.</li>
+<li><strong>Creatures under demonic influence</strong>: something, or someone, bent by a demon’s power.</li>
+<li><strong>True demons</strong>, native to the deeper <strong>Abyss</strong>: a realm of no light and of eldritch powers, not a fiery hell. A true demon isn’t a creature of fire.</li>
+</ul>
+<p>A <strong>true demon can’t enter our world unaided</strong>: it must be <strong>summoned</strong>, or come through a <strong>possession</strong>. A person can be possessed only if they are corrupted and have no faith of any kind at all. True demons are exceptionally powerful, and a generic fight is not how they are met: the encounter is a <strong>ritual or a negotiation</strong>, and the countermeasures are major rituals and powerful holy talismans.</p>
+<ul>
+<li><strong>Banishment by a talisman.</strong> A sufficiently powerful holy talisman can banish a demon by breaking its binding to our world. What happens to the host depends on the talisman and how it acts: a holy sword that fatally wounds the host banishes the demon and kills the host.</li>
+<li><strong>Banishment by ritual.</strong> A properly completed banishment ritual preserves the host, if their body can survive without the demon holding it up.</li>
+<li><strong>A possessed body.</strong> A demon can keep a body moving through wounds that would otherwise be fatal, but possession heals nothing and grows nothing back. Ordinary injury to the body doesn’t kill the demon. This is not a vampire’s regeneration: when the demon goes, the body’s wounds are all still there.</li>
+<li>What counts as faith, how a possession is resolved at the table, and whether a possessed host’s wounds can be stabilized before the banishment are not yet set; until they are, the GM rules.</li>
+</ul>
+<h2 id="gm-rituals-and-remedies">Rituals and remedies</h2>
+<p>A remedy or a ritual against the dark always has a procedure: what it requires, how long it takes, which rolls it calls for, its components, what happens if it’s interrupted, and what failure costs. Zombie treatment, lifting a curse, binding a ghost, banishing a demon and interfering with a hellhound’s pact all work this way. Use the <em>Magic</em> rules (a ritual clock in Occult rolls) and the weights above for any the GM hasn’t spelled out.</p>
+<h1 id="gm-lore-cards">Lore cards</h1>
+<p>Running investigations and recording what the characters learn. The rules players use are in the <em>Lore cards</em> chapter of the Players’ Guide; here are the subjects a card can cover (and a Hunter’s Almanac can start with), and the GM view’s tools for clocks and cards.</p>
+<h2 id="gm-lore-card-subjects">Lore card subjects</h2>
+<p>What a lore card for each creature knows, and what it permits. These are also the cards a Hunter’s Almanac can start with.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Creature</th>
+<th>What the lore card knows</th>
+<th>What it permits</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Werewolf</strong></td>
+<td>Silver hurts it (an extra box, and its toughness doesn’t help); wolfsbane keeps it away; under the full moon it has no choice.</td>
+<td>Called shots with silver at its heart; warding a door with wolfsbane; luring it out at moonrise.</td>
+</tr>
+<tr class="even">
+<td><strong>Vampire</strong></td>
+<td>A stake through the heart incapacitates it but doesn’t kill it; fire, sunlight and beheading destroy it; holy symbols hold it back; it can’t enter uninvited. Each natural vampire sustains its own lineage: destroy the natural source, and everyone infected from it, directly or through others, turns human again.</td>
+<td>Hunting it by day; refusing it entry; staking it to hold it while the source of its line is found and destroyed.</td>
+</tr>
+<tr class="odd">
+<td><strong>Zombie</strong></td>
+<td>Only a shot to the head or fire puts it down for good; its bite carries the Infection.</td>
+<td>Called shots at the head; the Occult remedy that stops an Infection clock.</td>
+</tr>
+<tr class="even">
+<td><strong>Ghost</strong></td>
+<td>It can’t be hurt, only laid to rest by finishing its business, or bound with a ritual.</td>
+<td>Finding and finishing its business; the binding ritual.</td>
+</tr>
+<tr class="odd">
+<td><strong>Wraith</strong></td>
+<td>Only silver, cold iron, salt and fire hurt it; it can’t cross a line of salt or iron filings; burning its bones destroys it.</td>
+<td>Holding a line of salt or iron; finding and burning its bones.</td>
+</tr>
+<tr class="even">
+<td><strong>Banshee</strong></td>
+<td>Weapons don’t touch her; silver or an iron bell silences her for the scene; she leaves at dawn if the one she keens for lives.</td>
+<td>Silencing her with silver or an iron bell; keeping her chosen alive until dawn.</td>
+</tr>
+<tr class="odd">
+<td><strong>Ghoul</strong></td>
+<td>Fire and daylight hurt it; it flees from holy ground.</td>
+<td>Driving it onto holy ground; burning out its warren by day.</td>
+</tr>
+<tr class="even">
+<td><strong>Demon</strong></td>
+<td>A true demon can’t enter our world unaided: it must be summoned, or possess someone. Major rituals and powerful holy talismans are what work against it, not a gunfight; a holy talisman strong enough breaks its binding to our world and banishes it. Holy water burns it. It must keep a bargain to the letter.</td>
+<td>Negotiating with it on safe terms; preparing a banishment; recognizing a possession for what it is.</td>
+</tr>
+<tr class="odd">
+<td><strong>Hellhound</strong></td>
+<td>Its hunt is a curse tied to a claim on someone’s soul. Holy water drives it off for a time but doesn’t cancel the pact. The hunt ends only when the conditions behind the claim are resolved or changed, or a powerful practitioner interferes with the pact through a major ritual.</td>
+<td>Protecting its quarry with holy water while the claim is looked into; seeking out the terms of the pact.</td>
+</tr>
+<tr class="even">
+<td><strong>Wendigo</strong></td>
+<td>Ordinary weapons wound it, but it heals unnaturally; only fire stops the healing. It is destroyed for good only when it is beheaded and its body burned, and the headless body still lashes out, blindly, until it burns. It is strongest in deep winter and weakest in summer heat.</td>
+<td>Bringing fire to the fight; planning to behead it and burn the body; hunting it in the warm months.</td>
+</tr>
+<tr class="odd">
+<td><strong>Skinwalker</strong></td>
+<td>In a stolen shape, ordinary wounds mark only 1 box; its true name, spoken to its face, forces it into its own mortal shape.</td>
+<td>Speaking its true name to force it back into its own shape.</td>
+</tr>
+<tr class="even">
+<td><strong>Headless Rider</strong></td>
+<td>Its head, hidden near where it died, laid back in the grave lets it rest; it can’t cross running water.</td>
+<td>Finding its head; making a stand across running water.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="gm-making-lore-cards">Making lore cards</h2>
+<p>For the GM: when a lore card is earned, and how to write one. A lore card is a record of what the characters established, so writing it well matters more than how often you hand one out.</p>
+<ol type="1">
+<li><strong>Decide that something is established.</strong> A lore card is earned when a discovery clock fills, or when the characters see or test something themselves, hear it from a source you judge reliable, or are told it by the subject itself with evidence to back it up. A guess, however right, isn’t established, and neither is a rumor. Ask what supports their idea; when the answer is good, let them act on it, and give the lore card once they’ve confirmed it.</li>
+<li><strong>Write the finding narrowly.</strong> One fact, in the words the characters would use, and no more than they found out: “bright light drove it back”, not “it fears light”. Two separate facts make two lore cards. Never write the subject’s whole truth onto a lore card; later discoveries add more lore cards.</li>
+<li><strong>Write its limits.</strong> What the finding doesn’t show: how often it was seen, under what conditions, and what is still unknown. The limits are what keep the next investigation interesting.</li>
+<li><strong>Note the evidence or source.</strong> What they saw, tested, read or were told, and by whom. A source’s reputation doesn’t make it right: if it was only probably true, the limits say so.</li>
+<li><strong>Charge the price.</strong> A lore card from a discovery clock costs nothing more: the scenes, failed rolls and pushes were its price. Any other source has its price (see <em>Earning a lore card</em>): choose the one that fits how they learned it, and mark it.</li>
+<li><strong>Choose the owner and the recipients.</strong> Whoever did the finding owns the lore card. Everyone who was there, or heard it from a reliable source, gets a shared copy.</li>
+<li><strong>Record it.</strong> In the GM view’s <strong>Discovery</strong> panel: <strong>Mint</strong> a full clock’s lore card, or use <strong>Record a finding without a clock</strong>, which marks the price for you. Then save everyone’s characters to file, so the players’ sheets carry it. A player can also write a lore card on their own sheet, when you agree it’s been earned.</li>
+</ol>
+<p><em>Example:</em> <strong>Werewolf.</strong> Established: <em>Silver buckshot made it bleed and run</em>. Limits: <em>One wolf, one night; not whether silver can kill it</em>. Source: Ruth Calloway’s shotgun at the Haskell barn (seen or tested firsthand). Cost: Harvest +1 (the night spent waiting for it).</p>
+<ul>
+<li><strong>When a later finding disagrees.</strong> Write a new lore card that says what they now know; the old one stays on the sheet as what they believed then, and the new one’s limits can say so.</li>
+<li><strong>A lore card is never proof of identity.</strong> Holding a lore card about one subject doesn’t prove that the thing in front of them is that subject: the Identify phase does.</li>
+<li><strong>Weaknesses work anyway.</strong> Don’t hold back a real weakness because no one holds the lore card: if they try it, it works.</li>
+</ul>
+<h2 id="gm-the-discovery-panel">The Discovery panel</h2>
+<p>The GM view’s <strong>Discovery</strong> panel runs discovery clocks and the Harvest they race. Start a clock with its segments per phase (or a plain progress clock for a repair or a task in the same race), and fill it as the investigation rolls succeed. It stops at the Identify gate until you name the subject; then it shows every lore card the characters in the GM view already hold for it. The <strong>Failed roll</strong> and <strong>Push</strong> buttons tick the track for how they were digging, and a failed roll ticks the Harvest too. When a clock fills, <strong>Mint</strong> gives the primary investigator the lore card and everyone you tick as present a shared copy. <strong>Record a finding without a clock</strong> gives a lore card for something established directly (seen or tested, a reliable account, a creature’s word with evidence behind it) to whoever you tick, and marks its price: the track or the Harvest that source costs. Save all to file afterwards, so the players’ character files carry it. The Discord bot’s <code>/discovery</code> and <code>/cards</code> commands do the same at a table that plays online.</p>
+<h1 id="gm-threats">Threats</h1>
+<p>Opponents use the same rules as the characters. <strong>Minor opponents</strong> (hired guns, a mob, shambling dead) have <strong>one box</strong>: any hit that gets through takes them out of the fight.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Threat</th>
+<th>Attack (target)</th>
+<th>Dodge</th>
+<th>Boxes</th>
+<th>Weapon</th>
+<th>Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hired gun (minor)</td>
+<td>Shooting 11</td>
+<td>7</td>
+<td>1</td>
+<td>Revolver</td>
+<td><strong>Numbers.</strong> Two or three of them; they flee when half are down.</td>
+</tr>
+<tr class="even">
+<td>Outlaw</td>
+<td>Shooting 13, Brawling 11</td>
+<td>9</td>
+<td>3</td>
+<td>Revolver, rifle</td>
+<td><strong>Quick draw.</strong> +2 on the first shot of a fight.</td>
+</tr>
+<tr class="odd">
+<td>Zombie (minor, many)</td>
+<td>Brawling 10</td>
+<td>4</td>
+<td>1 each</td>
+<td>Bite (1)</td>
+<td><strong>Horde.</strong> Only a headshot (−2) or fire puts one down; other hits just knock it over. Its bite infects.</td>
+</tr>
+<tr class="even">
+<td>Ghoul</td>
+<td>Brawling 12, Stealth 13</td>
+<td>8</td>
+<td>3</td>
+<td>Claws (2)</td>
+<td><strong>Corpse-eater.</strong> Drags the fallen away; flees daylight and fire.</td>
+</tr>
+<tr class="odd">
+<td>Werewolf</td>
+<td>Brawling 14, Tracking 14</td>
+<td>10</td>
+<td>4</td>
+<td>Claws and fangs (2)</td>
+<td><strong>Relentless.</strong> Ignores the Wounded penalty; only silver marks more than 1 box at a time.</td>
+</tr>
+<tr class="even">
+<td>Vampire</td>
+<td>Brawling 13, Persuasion 15</td>
+<td>10</td>
+<td>4</td>
+<td>Fangs (2)</td>
+<td><strong>Mesmerize.</strong> Once per scene, a Presence contest makes one victim obey a simple command.</td>
+</tr>
+<tr class="odd">
+<td>Ghost</td>
+<td>Will 14</td>
+<td>—</td>
+<td>—</td>
+<td>Terror, cold</td>
+<td><strong>Haunting.</strong> Can’t be hurt; once per scene, everyone present rolls Will or flees in terror.</td>
+</tr>
+<tr class="even">
+<td>Wraith</td>
+<td>Brawling 13, Stealth 14</td>
+<td>10</td>
+<td>3</td>
+<td>Grave touch (1)</td>
+<td><strong>Life-drinker.</strong> Passes through walls; only silver, cold iron, salt or fire can hurt it. Each box its touch marks clears one of its own.</td>
+</tr>
+<tr class="odd">
+<td>Banshee</td>
+<td>Will 15</td>
+<td>—</td>
+<td>—</td>
+<td>The keen</td>
+<td><strong>Death-omen.</strong> Can’t be hurt. Once per scene her keen makes everyone in earshot roll Will or be Dazed for a round. Until dawn, the one she keens for can’t shrug off a telling hit with Grit, and stabilizing them is at −2.</td>
+</tr>
+<tr class="even">
+<td>Witch</td>
+<td>Occult 14, Deception 13</td>
+<td>8</td>
+<td>3</td>
+<td>Curses</td>
+<td><strong>Hex.</strong> Once per round, a target with a link to her rolls Will or marks a box.</td>
+</tr>
+<tr class="odd">
+<td>Skinwalker</td>
+<td>Brawling 14, Deception 14, Stealth 14</td>
+<td>11</td>
+<td>3</td>
+<td>Claws (2)</td>
+<td><strong>Stolen shapes.</strong> Wears the shape of a coyote, a wolf, an owl or a person it has seen, and mimics voices. Once per scene, meeting its eyes means a Will roll or being Dazed for a round.</td>
+</tr>
+<tr class="even">
+<td>Hellhound</td>
+<td>Brawling 14</td>
+<td>10</td>
+<td>3</td>
+<td>Burning jaws (2)</td>
+<td><strong>Hunter.</strong> Always finds its quarry: its hunt is a curse tied to a claim on that soul. Holy water drives it off for a time.</td>
+</tr>
+<tr class="odd">
+<td>Wendigo</td>
+<td>Brawling 15, Tracking 15</td>
+<td>11</td>
+<td>4</td>
+<td>Claws and teeth (2)</td>
+<td><strong>Endless hunger.</strong> Calls out in the voices of the lost to lure prey; ignores the Wounded penalty. Only fire marks more than 1 box at a time. Ordinary wounds heal unnaturally; fire stops the healing. Destroyed for good only when beheaded and its body burned.</td>
+</tr>
+<tr class="even">
+<td>Revenant gunslinger</td>
+<td>Shooting 15</td>
+<td>11</td>
+<td>4</td>
+<td>Two revolvers</td>
+<td><strong>Undying.</strong> Rises at the next midnight unless its grave is salted and burned.</td>
+</tr>
+<tr class="odd">
+<td>Headless Rider</td>
+<td>Melee 14, Shooting 13</td>
+<td>10</td>
+<td>4</td>
+<td>Saber (2), revolver</td>
+<td><strong>Hell-ridden.</strong> Its horse never tires: Riding 15 in a chase. No head to stun or aim at. Rises at the next midnight unless its head is laid back in its grave.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.</p>
+<h1 id="gm-the-gms-tools">The GM’s tools</h1>
+<h2 id="gm-the-battle-map">The battle map</h2>
+<p>The GM view of the character creator has a <strong>battle map</strong> for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the <em>Personal combat</em> rules in the Players’ Guide, and a fight without it works the same way. Open <strong>How to use the map</strong> on the map itself for the buttons, step by step.</p>
+<p><strong>Two kinds of map.</strong></p>
+<ul>
+<li><strong>A hex map</strong> for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a room, 5 or 10 yards for a street, 50 for open ground. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range table in the Players’ Guide.</li>
+<li><strong>A range track</strong> for fights where only distance matters: a chase, a running fight across open country. It has a lane for the posse and one for each range band. Moving a token into the next lane moves it one band in or out.</li>
+</ul>
+<p><strong>Tokens.</strong> The GM places the posse with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, the stunned condition or a Grit point on a token marks it on the character, and the other way round. Opponents come from the setting’s threats with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
+<p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
+<p><strong>Stagecoach chase.</strong> Besides the plain range track, the map has a <strong>Stagecoach chase</strong> track. <strong>Add the stagecoach</strong> places the stagecoach in the first lane with its own Coach boxes; its panel shows what the damage does. The rules are under <em>Stagecoach chases</em> in the Players’ Guide.</p>
+<h2 id="gm-the-encounter-panel">The Encounter panel</h2>
+<p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit, offering a Grit point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so. For each attack, choose what it’s made of (silver, cold iron, a wooden stake, fire, rock salt or blessed), and the panel applies the rules that turn on it: a shapechanger’s Tough in their form (and what gets past it), a weakness that marks one box more, and a creature only the right weapon can hurt.</p>
+<p><strong>The shared table.</strong> The GM can start a shared table from the GM view and give the players its code; each player joins from their character’s Ride tab. While they’re connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the Ride tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Each player’s character is shared with the GM too: it appears among the GM view’s characters, marked at the table, and its injuries, points, ammunition and form stay in step both ways, whether they’re changed on the sheet, on the GM’s card or in an encounter. In a fight, each player’s Ride tab shows the GM’s battle map and the encounter’s turn order and latest results; a player drags their own token, and on their turn sends the GM what they’ll do, which the GM puts into the Encounter panel and runs. The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.</p>
 </div>
 <!-- GUIDE:END -->
         <nav class="guide-pager no-print" id="guide-pager" aria-label="Chapters"></nav>
@@ -8872,22 +9478,23 @@ function mountTable(api) {
     server: base, access: () => st.access || "", setAccess };
 }
 
-  // The GM view and the GM's Guide, for registered GMs only. Plain script, inlined by tools/build-legend.py (/* GMLOCK */)
+  // The GM's Guide, for registered GMs only. Plain script, inlined by tools/build-legend.py (/* GMLOCK */)
 // and tools/build-guide.py (GMLOCK markers); no modules, no page globals.
 //
 // mountGmLock(api) with api: { table (mountTable's handle: server(), access(), setAccess(code)), game (the id the table
 //   server knows the game by), view (the GM view's element), book (the GM's Guide's empty, locked book, or null),
 //   onBook() (show the book again once it's filled in), esc, toast }
-// The GM view stays covered by a code box until the table server accepts the GM access code (POST /api/gm); the GM's
-// Guide isn't in the page at all, and comes from the server (POST /api/gm/guide) once the code checks out. The code
-// is the same one that starts a table, kept in this browser, so a GM types it once.
-// Returns { open() } → whether the GM view is open.
+// The GM view is open to everyone (starting a shared table from it still asks for the code, on the table server). So is
+// the GM's Guide when the build puts it in the page (tools/gm_guides.py, GM_GUIDES_OPEN). Otherwise the guide isn't in the page: its book shows a code box, and the guide comes from the server
+// (POST /api/gm/guide) once the table server accepts the GM access code (POST /api/gm). The code is the same one that
+// starts a table, kept in this browser, so a GM types it once.
+// Returns { open() } → whether a GM access code has been accepted.
 //
 // protectText(root, note, toast): the light copy deterrent on a guide: no selecting, copying or right-click menu
 // in it (form fields aside), with a short note instead.
 function mountGmLock(api) {
   const esc = api.esc, say = (m, err) => (api.toast ? api.toast(m, err) : null);
-  let open = false, busy = false, msg = "", guideDone = !api.book;
+  let open = false, busy = false, msg = "", guideDone = !api.book || !api.book.dataset.locked; // an open guide is already in the page
   if (!document.getElementById("gm-lock-css")) {
     const css = document.createElement("style"); css.id = "gm-lock-css";
     css.textContent = `#${api.view.id}.gm-locked > :not(.gm-lock) { display: none !important; }
@@ -8898,18 +9505,15 @@ function mountGmLock(api) {
     document.head.append(css);
   }
   const panel = (where) => `<div class="gm-lock card hud" data-gmlock="${where}">
-    <h3>${where === "book" ? "The GM's Guide is for registered GMs" : "The GM view is for registered GMs"}<\/h3>
-    <p class="small">${where === "book" ? "It holds the setting's secrets, so it's only sent to GMs with a GM access code." : "It holds the encounters, threats and secrets your players shouldn't see, so it opens only with a GM access code."}
-      The code is the one that starts a shared table; type it once and this browser remembers it. To ask for one, email <a href="mailto:contact@legenddynamicsrpg.com">contact@legenddynamicsrpg.com<\/a>.<\/p>
+    <h3>The GM's Guide is for registered GMs<\/h3>
+    <p class="small">It holds the setting's secrets, so it's only sent to GMs with a GM access code.
+      The code is the one that starts a shared table; type it once and this browser remembers it. To ask for one, join the
+      <a href="https://legenddynamicsrpg.com/join" target="_blank" rel="noopener">Legend Dynamics Discord<\/a> or email <a href="mailto:contact@legenddynamicsrpg.com">contact@legenddynamicsrpg.com<\/a>.<\/p>
     <form data-gmlock-form><label class="field"><span class="label">GM access code<\/span>
       <input type="password" name="code" maxlength="100" autocomplete="off" spellcheck="false" aria-label="GM access code"><\/label>
       <button class="btn primary" type="submit"${busy ? " disabled" : ""}>${busy ? "Checking…" : "Unlock"}<\/button><\/form>
     <p class="small gm-lock-msg" role="status">${esc(msg)}<\/p><\/div>`;
   function render() {
-    api.view.classList.toggle("gm-locked", !open);
-    let p = api.view.querySelector(':scope > [data-gmlock="view"]');
-    if (open) { if (p) p.remove(); }
-    else if (p) p.outerHTML = panel("view"); else api.view.insertAdjacentHTML("afterbegin", panel("view"));
     if (api.book && !guideDone) api.book.innerHTML = open ? `<p class="muted">Loading the GM's Guide…<\/p>` : panel("book");
   }
   const post = async (path, body) => {
@@ -8936,7 +9540,7 @@ function mountGmLock(api) {
       if (r.ok) {
         open = true; msg = ""; api.table.setAccess(code);
         const b = await r.json().catch(() => ({}));
-        if (!quiet) say(`GM view unlocked${b.name && b.name !== "GM" ? ` for ${b.name}` : ""}.`);
+        if (!quiet) say(`GM access code accepted${b.name && b.name !== "GM" ? ` for ${b.name}` : ""}.`);
       } else if (r.status === 401) { msg = quiet ? "" : "That GM access code isn't recognised: check it, or ask for one."; if (!quiet) api.table.setAccess(""); }
       else msg = "The table server couldn't check the code just now. Try again in a moment.";
     } catch (e) {
@@ -8972,7 +9576,8 @@ function protectText(root, note, toast) {
   });
 }
 
-  // Homebrew: a GM's own threats, weapons, Edges, cards, spells (hexes, cantrips, psionic powers), powers and rituals, made in the GM view
+  // Homebrew: a GM's own threats, weapons, Edges, advantages, origins, cards, spells (hexes, cantrips, psionic powers), powers and
+// rituals, made in the GM view
 // without touching any code. Plain script,
 // inlined by tools/build-legend.py (/* HOMEBREW */) and tools/build-guide.py (HOMEBREW markers); no modules, no page globals.
 //
@@ -8987,14 +9592,17 @@ function protectText(root, note, toast) {
 // Sharing: as a file (Save to file / Open file), or through the shared table: players who join get the GM's homebrew
 // and choose to use it.
 // Function declarations only, above mountHomebrew: hbLoad and hbApply run as the page starts, before this file's place.
-function hbLimits() { return { threats: 30, weapons: 30, edges: 20, spells: 20, cards: 30, rituals: 30, powers: 20 }; }
-function hbKinds() { return ["threats", "weapons", "edges", "spells", "cards", "rituals", "powers"]; }
+function hbLimits() { return { threats: 30, weapons: 30, edges: 20, spells: 20, cards: 30, rituals: 30, powers: 20, advantages: 20, origins: 10 }; }
+function hbKinds() { return ["threats", "weapons", "edges", "spells", "cards", "rituals", "powers", "advantages", "origins"]; }
+function hbAttrs() { return ["Body", "Agility", "Intellect", "Presence", "Will"]; }
 function hbClasses() { return ["I", "II", "III", "IV", "V", "VI"]; }
 // A ritual's weight sets its clock, as in the core rules' magic chapter.
 function hbWeights() { return [["minor", "Minor", 2], ["significant", "Significant", 4], ["major", "Major", 6]]; }
 // What a setting can take: spells need its spell list, cards its discovery cards, rituals its magic.
 function hbHas(PACK) { return { spells: !!(PACK.spells && Array.isArray(PACK.spells.list)), cards: !!PACK.discovery, rituals: !!(PACK.magic && PACK.magic.workings),
-  powers: !!(PACK.powers && Array.isArray(PACK.powers.list)) }; }
+  powers: !!(PACK.powers && Array.isArray(PACK.powers.list)),
+  advantages: Array.isArray(PACK.advantages) && PACK.advantages.length > 0 && PACK.advantages.every(Array.isArray) && Array.isArray(PACK.skills),
+  origins: Array.isArray(PACK.origins) && PACK.origins.length > 0 && PACK.origins.every((o) => o && o.adj && Array.isArray(o.traits)) && Array.isArray(PACK.skills) }; }
 function hbBands() { return [["close", "Close"], ["short", "Short"], ["medium", "Medium"], ["long", "Long"], ["extreme", "Extreme"]]; }
 function hbKey(game) { return game + ".homebrew.v1"; }
 function hbInt(v, lo, hi, d) { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; }
@@ -9076,7 +9684,29 @@ function hbClean(raw, PACK) {
     if (!name || !cls[0]) return null;
     return { id: hbId(x.id, name, taken), name, group: groups.includes(x.group) ? x.group : groups[0] || "", classes: cls, gm: !!x.gm, variety: hbText(x.variety, 120) };
   }).filter(Boolean);
-  return { threats, weapons, edges, spells, cards, rituals, powers, from: r.from === "gm" ? "gm" : "mine" };
+  // An advantage: +2 to one narrow kind of task with a skill, when the GM agrees it applies (the roller's Advantage box).
+  const skillNames = (PACK.skills || []).map((k) => k[0]);
+  const advantages = list("advantages").map((x) => {
+    const name = hbText(x && x.name, 40), text = hbText(x && x.text, 300); if (!name || !text) return null;
+    return { id: hbId(x.id, name, taken), name, text, skill: skillNames.includes(x.skill) ? x.skill : skillNames[0] || "" };
+  }).filter(Boolean);
+  // An origin, as the setting's own: its tier (paid from the Edge points), attribute changes totalling 0, four origin
+  // skills, and one to three origin advantages, each with its complication. Powers (Aurora) follow an origin of the setting's.
+  const tiers = (PACK.origins || []).map((o) => o.tier || 0), maxTier = Math.max(0, ...tiers);
+  const powerOrigins = (PACK.origins || []).filter((o) => o.powerSlots && !o.homebrew).map((o) => o.id);
+  const origins = list("origins").map((x) => {
+    const name = hbText(x && x.name, 40), desc = hbText(x && x.desc, 400); if (!name || !desc) return null;
+    const adj = {}; for (const a of hbAttrs()) { const n = hbInt(x.adj && x.adj[a], -2, 2, 0); if (n) adj[a] = n; }
+    if (Object.values(adj).reduce((t, n) => t + n, 0) !== 0) return null; // every origin's changes total 0
+    const sk = [...new Set((Array.isArray(x.skills) ? x.skills : []).filter((k) => skillNames.includes(k)))].slice(0, 4);
+    const traits = (Array.isArray(x.traits) ? x.traits : []).slice(0, 3).map((t) => ({ name: hbText(t && t.name, 40), text: hbText(t && t.text, 300),
+      skill: skillNames.includes(t && t.skill) ? t.skill : "", compName: hbText(t && t.compName, 40), compText: hbText(t && t.compText, 300) }))
+      .filter((t) => t.name && t.text && t.compName && t.compText);
+    if (!sk.length || !traits.length) return null;
+    return { id: hbId(x.id, name, taken), name, desc, tier: hbInt(x.tier, 0, maxTier, 0), adj, skills: sk, traits,
+      powersLike: powerOrigins.includes(x.powersLike) ? x.powersLike : "" };
+  }).filter(Boolean);
+  return { threats, weapons, edges, spells, cards, rituals, powers, advantages, origins, from: r.from === "gm" ? "gm" : "mine" };
 }
 function hbCount(hb) { return hb ? hbKinds().reduce((n, k) => n + (hb[k] || []).length, 0) : 0; }
 function hbBody(hb) { return JSON.stringify(Object.fromEntries(hbKinds().map((k) => [k, hb[k] || []]))); }
@@ -9135,6 +9765,13 @@ function hbApply(PACK, hb) {
     const cls = []; x.classes.forEach((c, i) => cls.push(c || `As Class ${hbClasses()[i - 1]}, stronger: the GM sets how much.`));
     PACK.powers.list.push([x.id, `${x.name} (homebrew)`, x.group, cls, x.gm ? { gm: true } : {}, x.variety || ""]);
   }
+  if (has.advantages) for (const x of hb.advantages) PACK.advantages.push([x.id, `${x.name} (homebrew)`, x.text, x.skill]);
+  if (has.origins) for (const x of hb.origins) {
+    const like = x.powersLike ? PACK.origins.find((o) => o.id === x.powersLike) : null;
+    PACK.origins.push({ id: x.id, name: `${x.name} (homebrew)`, tier: x.tier, adj: { ...x.adj }, desc: x.desc, core: [], form: null, skills: x.skills.slice(), homebrew: true,
+      traits: x.traits.map((t, i) => [`${x.id}-${i + 1}`, t.name, t.text, t.skill || x.skills[0], !!t.skill, t.compName, t.compText]),
+      ...(like ? { powerSlots: like.powerSlots, ...(like.powerList ? { powerList: like.powerList } : {}), ...(like.mythic ? { mythic: like.mythic } : {}) } : {}) });
+  }
 }
 
 function mountHomebrew(api) {
@@ -9145,11 +9782,14 @@ function mountHomebrew(api) {
   // A setting's own words: hexes or cantrips or psionic powers; lore cards or data records; rituals or workings.
   const W = { spell: M.burst || (HAS.spells ? PACK.spells.plural.toLowerCase().replace(/s$/, "") : "spell"), spells: M.bursts || (HAS.spells ? PACK.spells.plural.toLowerCase() : "spells"),
     card: D.card || "card", cards: D.cards || "cards", ritual: M.working || "ritual", rituals: M.workings || "rituals" };
-  const SKILLS = hbSkills(PACK);
+  const SKILLS = hbSkills(PACK), ALL_SKILLS = (PACK.skills || []).map((k) => [k[0], k[0]]);
+  // The setting's word for an origin: species, heritage, background…
+  const T = { origin: ((PACK.terms && PACK.terms.origin) || "Origin").toLowerCase(), origins: ((PACK.terms && PACK.terms.originPlural) || "Origins").toLowerCase() };
   const armsBuilt = (PACK.arms || []).filter((a) => !a.hazard && !a.homebrew);
   const opts = (list, sel) => list.map(([v, n]) => `<option value="${esc(v)}"${v === sel ? " selected" : ""}>${esc(n)}<\/option>`).join("");
   const store = () => { if (!hbSave(PACK, hb)) say("This browser won't keep the homebrew: save it to a file.", true); changed = true; render(); };
   const summary = (h) => [[h.threats.length, "threat", "threats"], [h.weapons.length, "weapon", "weapons"], ...(EDGES ? [[h.edges.length, "Edge", "Edges"]] : []),
+    ...(HAS.origins ? [[h.origins.length, T.origin, T.origins]] : []), ...(HAS.advantages ? [[h.advantages.length, "advantage", "advantages"]] : []),
     ...(HAS.cards ? [[h.cards.length, W.card, W.cards]] : []), ...(HAS.powers ? [[h.powers.length, "power", "powers"]] : []), ...(HAS.spells ? [[h.spells.length, W.spell, W.spells]] : []), ...(HAS.rituals ? [[h.rituals.length, W.ritual, W.rituals]] : [])]
     .filter(([n]) => n).map(([n, one, many]) => `${n} ${n === 1 ? one : many}`).join(", ") || "nothing yet";
   const weightOf = (k) => hbWeights().find((w) => w[0] === k) || hbWeights()[0];
@@ -9240,13 +9880,39 @@ function mountHomebrew(api) {
     hbClasses().map((c, i) => `<div class="field wide"><label>Class ${c}${i ? " (blank: the GM decides)" : ""}<\/label><input name="c${i}" maxlength="200" value="${esc(x ? x.classes[i] : "")}" placeholder="${i ? "" : "e.g. Step from one shadow to another you can see, up to 10 yd."}"><\/div>`).join("") +
     `<div class="field"><label><input type="checkbox" name="gm"${x && x.gm ? " checked" : ""}> Needs the GM's approval<\/label><\/div>` +
     input(x, "variety", "Kinds it comes in (optional)", 120, "e.g. darkness, smoke or mirrors", true), "Add the power");
+  const advantageForm = () => formOf("advantages", (x) => input(x, "name", "Name", 40, "e.g. Trail Cook") +
+    `<div class="field"><label>Skill<\/label><select name="skill">${opts(ALL_SKILLS, x ? x.skill : "")}<\/select><\/div>` +
+    input(x, "text", "What it gives: +2 to one narrow kind of task", 300, "e.g. +2 to Survival to feed a party on what the land gives.", true), "Add the advantage");
+  function originForm() {
+    const x = editing && editing[0] === "origins" ? find("origins", editing[1]) : null;
+    const maxTier = Math.max(0, ...(PACK.origins || []).filter((o) => !o.homebrew).map((o) => o.tier || 0));
+    const adjSel = (a) => `<div class="field"><label>${a}<\/label><select name="adj-${a}">${opts([["-2", "−2"], ["-1", "−1"], ["0", "0"], ["1", "+1"], ["2", "+2"]], String((x && x.adj[a]) || 0))}<\/select><\/div>`;
+    const skillSel = (i) => `<div class="field"><label>${cap(T.origin)} skill ${i + 1}<\/label><select name="sk${i}">${i ? `<option value="">None<\/option>` : ""}${opts(ALL_SKILLS, x ? x.skills[i] || "" : "")}<\/select><\/div>`;
+    const trait = (i) => { const t = (x && x.traits[i]) || {}; return `<fieldset class="field wide hb-bonus"><legend class="label">${cap(T.origin)} advantage ${i + 1}${i ? " (optional)" : ""}<\/legend><div class="fields">
+      <div class="field"><label>Name<\/label><input name="t${i}-name" maxlength="40" value="${esc(t.name || "")}" placeholder="${i ? "" : "e.g. Night Eyes"}"><\/div>
+      <div class="field"><label>+2 to<\/label><select name="t${i}-skill"><option value="">No roll bonus<\/option>${opts(ALL_SKILLS, t.skill || "")}<\/select><\/div>
+      <div class="field wide"><label>What it gives<\/label><input name="t${i}-text" maxlength="300" value="${esc(t.text || "")}" placeholder="${i ? "" : "e.g. +2 to Awareness to spot movement in darkness."}"><\/div>
+      <div class="field"><label>Its complication<\/label><input name="t${i}-cname" maxlength="40" value="${esc(t.compName || "")}" placeholder="${i ? "" : "e.g. Sun-Dazzled"}"><\/div>
+      <div class="field wide"><label>What the complication does<\/label><input name="t${i}-ctext" maxlength="300" value="${esc(t.compText || "")}" placeholder="${i ? "" : "e.g. Bright light blinds you. Accept the stumble at the worst moment."}"><\/div><\/div><\/fieldset>`; };
+    const powerOrigins = (PACK.origins || []).filter((o) => o.powerSlots && !o.homebrew);
+    return `<form data-hbform="origins" class="fields">
+      <div class="field"><label>Name<\/label><input name="name" maxlength="40" required value="${esc(x ? x.name : "")}" placeholder="e.g. Cave-born"><\/div>
+      <div class="field"><label>Tier (paid from Edge points)<\/label><select name="tier">${opts(Array.from({ length: maxTier + 1 }, (_, i) => [String(i), String(i)]), String(x ? x.tier : 0))}<\/select><\/div>
+      <div class="field wide"><label>Description<\/label><input name="desc" maxlength="400" required value="${esc(x ? x.desc : "")}" placeholder="Who they are and where they come from."><\/div>
+      <fieldset class="field wide hb-bonus"><legend class="label">Attribute changes (they must total 0)<\/legend><div class="fields">${hbAttrs().map(adjSel).join("")}<\/div><\/fieldset>
+      ${[0, 1, 2, 3].map(skillSel).join("")}
+      ${powerOrigins.length ? `<div class="field wide"><label>Powers<\/label><select name="powersLike"><option value="">None<\/option>${opts(powerOrigins.map((o) => [o.id, `As ${o.name}`]), x ? x.powersLike : "")}<\/select><\/div>` : ""}
+      ${[0, 1, 2].map(trait).join("")}
+      <div class="btn-row field wide"><button class="btn primary" type="submit">${x ? "Save changes" : `Add the ${esc(T.origin)}`}<\/button>${x ? `<button type="button" class="linkish" data-hbcancel>Cancel<\/button>` : ""}<\/div><\/form>`;
+  }
+  const adjLine = (adj) => Object.entries(adj).map(([a, n]) => `${a} ${plus(n)}`).join(", ") || "no attribute changes";
   const section = (kind, title, list, line, form) => `<details class="hb-sec"${editing && editing[0] === kind ? " open" : ""}><summary class="label">${title} (${list.length})<\/summary>
     <ul class="small adv-list">${list.map((x) => item(kind, x, line(x))).join("") || `<li class="muted">None yet.<\/li>`}<\/ul>${list.length >= hbLimits()[kind] && !(editing && editing[0] === kind) ? `<p class="small muted">That's the most this keeps (${hbLimits()[kind]}).<\/p>` : form()}<\/details>`;
 
   function render() {
     if (api.gmRoot) {
       api.gmRoot.innerHTML = `<h3>Homebrew<\/h3>
-        <p class="small muted">Your own threats, weapons${EDGES ? ", Edges" : ""}${HAS.cards ? `, ${W.cards}` : ""}${HAS.powers ? ", powers" : ""}${HAS.spells ? `, ${W.spells}` : ""}${HAS.rituals ? ` and ${W.rituals}` : ""}, made here: no code. They work like the setting's own, marked <i>homebrew<\/i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}${HAS.cards ? `, ${W.cards} where you record findings` : ""}${HAS.powers ? ", powers among the creator's choices" : ""}${HAS.spells ? `, ${W.spells} among the creator's choices` : ""}${HAS.rituals ? `, ${W.rituals} in a ${W.ritual} book beside Rituals by heart` : ""}. Keep numbers in line with the setting's (see <i>Making your own<\/i> in the core rules); anything special is a note you apply at the table.<\/p>
+        <p class="small muted">Your own threats, weapons${EDGES ? ", Edges" : ""}${HAS.origins ? `, ${esc(T.origins)}` : ""}${HAS.advantages ? ", advantages" : ""}${HAS.cards ? `, ${W.cards}` : ""}${HAS.powers ? ", powers" : ""}${HAS.spells ? `, ${W.spells}` : ""}${HAS.rituals ? ` and ${W.rituals}` : ""}, made here: no code. They work like the setting's own, marked <i>homebrew<\/i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}${HAS.origins || HAS.advantages ? `, ${[HAS.origins ? esc(T.origins) : "", HAS.advantages ? "advantages" : ""].filter(Boolean).join(" and ")} among the creator's choices` : ""}${HAS.cards ? `, ${W.cards} where you record findings` : ""}${HAS.powers ? ", powers among the creator's choices" : ""}${HAS.spells ? `, ${W.spells} among the creator's choices` : ""}${HAS.rituals ? `, ${W.rituals} in a ${W.ritual} book beside Rituals by heart` : ""}. Keep numbers in line with the setting's (see <i>Making your own<\/i> in the core rules); anything special is a note you apply at the table.<\/p>
         <p class="small"><b>In this browser:<\/b> ${esc(summary(hb))}${hb.from === "gm" ? " (shared by your GM)" : ""}. Players get it when they join your shared table, or from a file.<\/p>
         ${changed ? `<p class="small hb-reload"><b>Saved.<\/b> Reload the page to use the changes. <button type="button" class="btn" data-hbreload>Reload now<\/button><\/p>` : ""}
         <div class="btn-row"><button type="button" class="btn" data-hbexport${hbCount(hb) ? "" : " disabled"}>Save to file<\/button>
@@ -9254,6 +9920,8 @@ function mountHomebrew(api) {
         ${section("threats", "Threats", hb.threats, (t) => withBonus(threatLine(t), threatBonusLine(t.bonus)), threatForm)}
         ${section("weapons", "Weapons", hb.weapons, (w) => withBonus(weaponLine(w), weaponBonusLine(w.bonus)), weaponForm)}
         ${EDGES ? section("edges", "Edges", hb.edges, (x) => withBonus(`${x.limit === 1 ? "once" : `up to ${x.limit}×`}: ${x.text}`, edgeBonusLine(x.bonus)), edgeForm) : ""}
+        ${HAS.origins ? section("origins", cap(T.origins), hb.origins, (x) => `tier ${x.tier}; ${adjLine(x.adj)}; skills ${x.skills.join(", ")}; ${x.traits.map((t) => t.name).join(", ")}`, originForm) : ""}
+        ${HAS.advantages ? section("advantages", "Advantages", hb.advantages, (x) => `${x.skill}: ${x.text}`, advantageForm) : ""}
         ${HAS.cards ? section("cards", cap(W.cards), hb.cards, (x) => `${x.knowledge}${x.permits ? ` Permits: ${x.permits}` : ""}`, cardForm) : ""}
         ${HAS.powers ? section("powers", "Powers", hb.powers, (x) => `${x.gm ? "GM's approval; " : ""}Class I: ${x.classes[0]}`, powerForm) : ""}
         ${HAS.spells ? section("spells", cap(W.spells), hb.spells, (x) => withBonus(x.text, x.attack && x.attack.boxes ? `an attack, ${x.attack.boxes} box${x.attack.boxes === 1 ? "" : "es"} at ${(hbBands().find((b) => b[0] === x.attack.band) || [])[1]} range` : ""), spellForm) : ""}
@@ -9290,6 +9958,10 @@ function mountHomebrew(api) {
     if (kind === "powers") return { id, name: v("name"), group: v("group"), classes: hbClasses().map((_, i) => v("c" + i)), gm: f.elements.gm.checked, variety: v("variety") };
     if (kind === "cards") return { id, name: v("name"), knowledge: v("knowledge"), permits: v("permits") };
     if (kind === "rituals") return { id, name: v("name"), weight: v("weight"), time: v("time"), text: v("text"), price: v("price") };
+    if (kind === "advantages") return { id, name: v("name"), skill: v("skill"), text: v("text") };
+    if (kind === "origins") return { id, name: v("name"), tier: v("tier"), desc: v("desc"), powersLike: v("powersLike"),
+      adj: Object.fromEntries(hbAttrs().map((a) => [a, v("adj-" + a)])), skills: [0, 1, 2, 3].map((i) => v("sk" + i)).filter(Boolean),
+      traits: [0, 1, 2].map((i) => ({ name: v(`t${i}-name`), skill: v(`t${i}-skill`), text: v(`t${i}-text`), compName: v(`t${i}-cname`), compText: v(`t${i}-ctext`) })).filter((t) => t.name || t.text) };
     return { id, name: v("name"), limit: v("limit"), text: v("text"),
       bonus: { skill: v("b-skill"), skillValue: v("b-skill") ? v("b-skillv") : 0, dodge: on("b-dodge") ? 1 : 0, move: v("b-move"), extraDefense: on("b-xdef"), shrugTelling: on("b-shrugt") } };
   }
@@ -9302,7 +9974,9 @@ function mountHomebrew(api) {
       if (at >= 0) list[at] = entry; else list.push(entry);
       const next = hbClean({ ...hb, [kind]: list }, PACK);
       if (next[kind].length < list.length) { say({ threats: "A threat needs a name and at least one weapon.", edges: "An Edge needs a name and what it gives.", weapons: "A weapon needs a name.",
-        spells: `A ${W.spell} needs a name and what it does.`, powers: "A power needs a name and what it does at Class I.", cards: `A ${W.card} needs a subject and what's true.`, rituals: `A ${W.ritual} needs a name and what it does.` }[kind], true); return; }
+        spells: `A ${W.spell} needs a name and what it does.`, powers: "A power needs a name and what it does at Class I.", cards: `A ${W.card} needs a subject and what's true.`, rituals: `A ${W.ritual} needs a name and what it does.`,
+        advantages: "An advantage needs a name and what it gives.",
+        origins: `A ${T.origin} needs a name, a description, at least one skill and one advantage with its complication, and attribute changes that total 0.` }[kind], true); return; }
       hb = next; editing = null; hb.from = "mine"; store(); say(at >= 0 ? "Saved." : "Added.");
     });
     root.addEventListener("change", async (e) => {
@@ -10159,7 +10833,7 @@ function mountHomebrew(api) {
   let book = "players";
   try { if (books && sessionStorage.getItem(PACK.id + ".guide") === "gm") book = "gm"; } catch {}
   showBook(book);
-  // Registered GMs only: the GM view opens, and the GM's Guide arrives from the table server, once the GM access code checks out.
+  // The GM's Guide, if the build kept it for registered GMs: it arrives from the table server once the GM access code checks out.
   mountGmLock({ table: sharedTable, game: PACK.id, view: $("view-gm"), book: books ? books.gm : null, esc, toast,
     onBook: () => { let at = "players"; try { at = sessionStorage.getItem(PACK.id + ".guide") || "players"; } catch {} showBook(at === "gm" ? "gm" : "players"); } });
   protectText($("guide"), "The guides are © Don Smallwood: please don't copy them.", toast);
