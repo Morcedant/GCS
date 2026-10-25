@@ -7,6 +7,9 @@
  *   GET  /api/tables/CODE/ws      WebSocket: the table's live connection (see table.js for the messages)
  *   POST /api/gm                  { access }        → { name }                  is this a registered GM (opens the GM view)
  *   POST /api/gm/guide            { access, game }  → { title, subtitle, html }  a game's GM's Guide, for registered GMs only
+ *   GET  /api/blog?tag=            → { posts, tags }        the dev blog's published posts, newest first (blog.js)
+ *   GET  /api/blog/ID              → { post }               one post
+ *   POST /api/blog/admin           { access, action: "list" | "get" | "save" | "delete", id?, post? }   an author only (the DEV secret)
  *
  * ALLOWED_ORIGINS (a var in wrangler.toml) lists the sites whose pages may connect, comma-separated, or "*".
  * GM_CODES (a secret, set in the Cloudflare dashboard) lists the GMs who may start tables: "Name: code", one per line
@@ -16,6 +19,14 @@
 import { newCode, validCode, hashKey, parseAccess, checkAccess } from "./logic.js";
 export { Table } from "./table.js";
 import GM_GUIDES from "./gm-guides.js";
+import { BLOG_NAME } from "./blog.js";
+
+/** Who may write the blog: a code in the DEV secret (a bare code, or "Name: code" lines), its own codes, not the GMs'.
+ * Null for anyone else. @param {any} env @param {any} code */
+async function blogAuthor(env, code) {
+  const authors = parseAccess(env.DEV).map((a) => (a.name === "GM" ? { ...a, name: "DEV" } : a)); // a bare code is "DEV"
+  return authors.length ? checkAccess(authors, code) : null; // no DEV secret, no writing
+}
 
 /** @param {any} env @param {string} origin */
 const originOk = (env, origin) => {
@@ -76,6 +87,27 @@ export default {
       const guide = Object.prototype.hasOwnProperty.call(GM_GUIDES, body.game) ? GM_GUIDES[body.game] : null;
       if (!guide) return json({ error: "This server has no GM's Guide for that game." }, 404, h);
       return json(guide, 200, { ...h, "Cache-Control": "no-store" });
+    }
+
+    // The dev blog: anyone reads; an author writes.
+    if (url.pathname === "/api/blog" || url.pathname.startsWith("/api/blog/")) {
+      const stub = env.TABLES.get(env.TABLES.idFromName(BLOG_NAME)), pass = async (/** @type {string} */ p, /** @type {any} */ init) => {
+        const r = await stub.fetch("https://table" + p, init); return json(await r.json(), r.status, { ...h, "Cache-Control": "no-store" }); };
+      if (url.pathname === "/api/blog" && req.method === "GET") return pass(`/blog/list?tag=${encodeURIComponent(url.searchParams.get("tag") || "")}`);
+      if (url.pathname === "/api/blog/admin" && req.method === "POST") {
+        /** @type {any} */ let body = {};
+        try { body = await req.json(); } catch { /* refused below */ }
+        const author = await blogAuthor(env, body.access);
+        if (!author) return json({ error: body.access ? "That code can't write the blog." : "Writing the blog needs the author's code.", access: true }, 401, h);
+        if (body.action === "list") return pass("/blog/list?drafts=1");
+        if (body.action === "get") return pass(`/blog/get?drafts=1&id=${encodeURIComponent(body.id || "")}`);
+        if (body.action === "save") return pass("/blog/save", { method: "POST", body: JSON.stringify({ post: body.post, author }) });
+        if (body.action === "delete") return pass("/blog/delete", { method: "POST", body: JSON.stringify({ id: body.id }) });
+        return json({ error: "Unknown action." }, 400, h);
+      }
+      const one = url.pathname.match(/^\/api\/blog\/([a-z0-9-]{1,80})$/);
+      if (one && req.method === "GET") return pass(`/blog/get?id=${one[1]}`);
+      return json({ error: "Not found." }, 404, h);
     }
 
     const m = url.pathname.match(/^\/api\/tables\/([^/]+)(\/ws)?$/);
