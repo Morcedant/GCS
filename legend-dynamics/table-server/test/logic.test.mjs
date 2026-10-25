@@ -131,6 +131,9 @@ test("phase 3: the GM shares the scene; a player moves only their own token and 
   assert.deepEqual(L.checkScene(gm, { map: null, homebrew: { threats: [{ name: "Ghoul" }] } }).scene.homebrew, { threats: [{ name: "Ghoul" }] });
   assert.equal(L.checkScene(gm, { homebrew: { x: "y".repeat(L.MAX_HOMEBREW) } }).scene.homebrew, undefined);
   assert.equal(L.checkScene(gm, { homebrew: [1] }).scene.homebrew, undefined);
+  // So does what the GM shares of their campaign.
+  assert.deepEqual(L.checkScene(gm, { campaign: { name: "Copper Creek", people: [] } }).scene.campaign, { name: "Copper Creek", people: [] });
+  assert.equal(L.checkScene(gm, { campaign: { x: "y".repeat(L.MAX_CAMPAIGN) } }).scene.campaign, undefined);
   assert.equal(L.checkScene(gm, { other: 1 }).scene.other, undefined);
   assert.deepEqual(L.checkMove(sheets, ruth, { key: "r1", to: { q: 3, r: -2 } }).move, { key: "r1", by: "Ruth", to: { q: 3, r: -2 } });
   assert.deepEqual(L.checkMove(sheets, ruth, { key: "r1", to: { lane: 2, y: 140.6 } }).move.to, { lane: 2, y: 141 });

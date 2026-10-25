@@ -3571,5 +3571,57 @@
    "route": "account",
    "cost": "Debt +1 (the priest's price)"
   }
+ },
+ "campaign": {
+  "names": {
+   "first": [
+    "Aldren",
+    "Brisa",
+    "Corvin",
+    "Dagny",
+    "Edda",
+    "Faelan",
+    "Gisla",
+    "Haldor",
+    "Isolde",
+    "Jory",
+    "Kestrel",
+    "Leofric",
+    "Maren",
+    "Niall",
+    "Orla",
+    "Perrin",
+    "Rowena",
+    "Sigrun",
+    "Taliesin",
+    "Ulla",
+    "Wystan",
+    "Yrsa",
+    "Bertil",
+    "Mirela"
+   ],
+   "last": [
+    "of the Fen",
+    "Ashdown",
+    "Blackbriar",
+    "Coldwater",
+    "Duncliff",
+    "Emberly",
+    "Greymantle",
+    "Hollowell",
+    "Ironwood",
+    "Kestrelmoor",
+    "Lowmere",
+    "Marrowgate",
+    "Northwick",
+    "Ravensholt",
+    "Stonebridge",
+    "Thornfield",
+    "Wyndham",
+    "the Grey",
+    "Oakenshaw",
+    "Saltmarsh"
+   ]
+  }
  }
 }
