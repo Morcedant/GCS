@@ -600,7 +600,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="45b9948" data-version-date="2026.10.23" title="The code changes whenever this page changes.">Version 2026.10.23 · 45b9948</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="4166d24" data-version-date="2026.10.25" title="The code changes whenever this page changes.">Version 2026.10.25 · 4166d24</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -4023,7 +4023,360 @@ tr.lvl-U td.target { color: var(--muted); }
 <p><strong>Rituals:</strong> describe the effect; fill a clock of 2, 4 or 6 segments with Occult rolls at your Lens’s pace. Trappings remove a segment. Charms: Trained 2, Specialty 3, Expert 4.</p>
 <p><strong>Grit:</strong> start each session with two (three with True grit). Reroll, reduce an injury by one box, shrug off a telling hit, or establish a small preparation. Earn one from an accepted complication.</p>
 </div>
-<div class="guide-book" id="guide-gm" data-title="Grimm GM&#x27;s Guide" data-subtitle="Running Gothic horror in the Grimm-verse: cases, threats and the GM&#x27;s tools" data-locked="1" hidden>
+<div class="guide-book" id="guide-gm" data-title="Grimm GM&#x27;s Guide" data-subtitle="Running Gothic horror in the Grimm-verse: cases, threats and the GM&#x27;s tools" hidden>
+<p>This book is for whoever runs the game. It gathers what the GM reaches for at the table: case seeds, the threats with their numbers, and how to use the GM view’s battle map and Encounter panel. The rules themselves are in the <strong>Players’ Guide</strong>; this book builds on them.</p>
+<h1 id="gm-running-cases">Running cases</h1>
+<h2 id="gm-case-seeds">Case seeds</h2>
+<p>Roll 3d6 on each table and read the total; middle results come up most often, the strangest sit at 3, 4, 17 and 18, or pick what you like: a <em>case</em> at a <em>place</em>, caused by <em>the hidden world</em>, turned by a <em>twist</em>, against a <em>ticking clock</em>, with a <em>key character</em> at its heart. The GM view in the creator rolls these for you.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>Case</th>
+<th>Place</th>
+<th>The hidden world</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>A Grimm’s grave robbed</td>
+<td>A Royal Family’s estate</td>
+<td>A Hexenbiest queen</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>The Wesen Council summons you</td>
+<td>A Wesen fight ring under a church</td>
+<td>The Wesen Council itself</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>A body torn apart at the edge of town</td>
+<td>A silver boomtown</td>
+<td>A Wendigo that has acquired the taste</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>A stagecoach that never arrived</td>
+<td>A logging camp in the deep woods</td>
+<td>A Blutbad pack that’s gone back to the hunt</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Livestock slaughtered in the night</td>
+<td>A river steamboat</td>
+<td>A Siegbarste whom bullets barely trouble</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>A child gone missing</td>
+<td>The railroad’s end-of-track camp</td>
+<td>A Mauvais Dentes, sent by a Royal Family</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>A miner raving about monsters</td>
+<td>A lonely homestead</td>
+<td>A Spinnetod keeping herself young</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>A bounty on a man who isn’t a man</td>
+<td>A ghost town</td>
+<td>Geier selling organs to the highest bidder</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>Travelers vanishing on the trail</td>
+<td>A mission church</td>
+<td>A Hexenbiest’s curse</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>A traveling medicine show</td>
+<td>A saloon and gambling hall</td>
+<td>A Ziegevolk swindler with half the town in thrall</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>A new preacher packs the church</td>
+<td>A frontier fort</td>
+<td>A Löwen fight ring</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>A cattle drive spooked by something</td>
+<td>A fog-bound waterfront</td>
+<td>A Hässlich demanding tolls at a bridge</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>A hanging that went wrong</td>
+<td>A canyon ranch</td>
+<td>A Brotherhood of the Holy Earth rite against the railroad</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>A Wesen asks for help</td>
+<td>A snowbound mountain pass</td>
+<td>A Golden Dawn magician’s working gone wrong</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>A Royal’s child goes missing</td>
+<td>A Grimm’s hidden library</td>
+<td>A Grimm gone bad</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>A town where everyone is Wesen</td>
+<td>An abandoned asylum</td>
+<td>A Zauberbiest’s working</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>3d6</th>
+<th>Twist</th>
+<th>Ticking clock (segments)</th>
+<th>Key character</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>A character has Wesen blood</td>
+<td>The Royals arrive (6)</td>
+<td>A Royal heir in hiding</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>The Grimm is the target</td>
+<td>The full moon (4)</td>
+<td>A Grimm’s long-lost sibling</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>The victim was the monster</td>
+<td>The mob forms (6)</td>
+<td>A sheriff who wants it simple</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>The law is in on it</td>
+<td>Nightfall (4)</td>
+<td>A widow who knows more than she says</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Two Wesen clans are feuding</td>
+<td>The next victim (6)</td>
+<td>A traveling doctor</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>The Wesen Council wants it hushed up</td>
+<td>The stage leaves town (4)</td>
+<td>A Pinkerton detective</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>A Royal Family’s agent is behind it</td>
+<td>The Reapers arrive (6)</td>
+<td>A railroad baron</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>A character’s complication comes into play</td>
+<td>The river floods (8)</td>
+<td>A frightened Eisbiber family</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>The Wesen is protecting its family</td>
+<td>The trail goes cold (4)</td>
+<td>A Blutbad trying to stay clean</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>A human is using the Wesen</td>
+<td>The hanging at dawn (4)</td>
+<td>A child who saw the woge</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>The town wants a hanging, any hanging</td>
+<td>The newspaper prints the story (8)</td>
+<td>A preacher with a past</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td>The Order of the Holy Knife arrives to cleanse</td>
+<td>The fire spreads (4)</td>
+<td>A newspaperman who’s close to the truth</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td>Another Grimm hunts the same quarry</td>
+<td>The Wesen flees the territory (6)</td>
+<td>An Incantare who needs protection</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td>The trail leads to someone a character loves</td>
+<td>The snows close the pass (8)</td>
+<td>A dying Grimm with a last request</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td>The Royals want it to happen</td>
+<td>The Reapers’ deadline (4)</td>
+<td>A Wesen Council judge</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td>The Council wanted the Grimm to find it</td>
+<td>The Council’s verdict (6)</td>
+<td>A Hexenbiest who wants out</td>
+</tr>
+</tbody>
+</table>
+<h1 id="gm-threats">Threats</h1>
+<p>Opponents use the same rules as the characters. <strong>Minor opponents</strong> (hired guns, a mob, a Royal’s footmen) have <strong>one box</strong>: any hit that gets through takes them out of the fight.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Threat</th>
+<th>Attack (target)</th>
+<th>Dodge</th>
+<th>Boxes</th>
+<th>Weapon</th>
+<th>Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hired gun (minor)</td>
+<td>Shooting 11</td>
+<td>7</td>
+<td>1</td>
+<td>Revolver</td>
+<td><strong>Numbers.</strong> Two or three of them; they flee when half are down.</td>
+</tr>
+<tr class="even">
+<td>Outlaw</td>
+<td>Shooting 13, Brawling 11</td>
+<td>9</td>
+<td>3</td>
+<td>Revolver, rifle</td>
+<td><strong>Quick draw.</strong> +2 on the first shot of a fight.</td>
+</tr>
+<tr class="odd">
+<td>Blutbad in full woge</td>
+<td>Brawling 13, Tracking 14</td>
+<td>9</td>
+<td>3</td>
+<td>Claws and fangs (2)</td>
+<td><strong>Relentless.</strong> Ignores the Wounded penalty.</td>
+</tr>
+<tr class="even">
+<td>Siegbarste</td>
+<td>Brawling 14</td>
+<td>6</td>
+<td>4</td>
+<td>Fists (2), clubs</td>
+<td><strong>Iron bones.</strong> Bullets and blades mark 1 box at most; a Siegbarste’s weakness must be learned.</td>
+</tr>
+<tr class="odd">
+<td>Mauvais Dentes</td>
+<td>Brawling 15, Stealth 13</td>
+<td>10</td>
+<td>4</td>
+<td>Sabre teeth (2)</td>
+<td><strong>Royal hound.</strong> Hunts one named target and doesn’t stop.</td>
+</tr>
+<tr class="even">
+<td>Hexenbiest</td>
+<td>Occult 14, Deception 13</td>
+<td>8</td>
+<td>3</td>
+<td>Spells, knives</td>
+<td><strong>Telekinesis.</strong> Once per round, throws a person (1 box) instead of attacking. Grimm blood drunk under a full moon ends her power.</td>
+</tr>
+<tr class="odd">
+<td>Wendigo</td>
+<td>Brawling 13, Stealth 14</td>
+<td>9</td>
+<td>3</td>
+<td>Claws (2)</td>
+<td><strong>Larder.</strong> Drags victims away alive; a Survival roll finds the cache.</td>
+</tr>
+<tr class="even">
+<td>Hundjäger (Royal enforcer)</td>
+<td>Melee 13, Tracking 14</td>
+<td>9</td>
+<td>3</td>
+<td>Blade (2), crossbow</td>
+<td><strong>Pack.</strong> Comes in threes; +1 to attack a target an ally hit this round.</td>
+</tr>
+<tr class="odd">
+<td>Order of the Holy Knife assassin</td>
+<td>Melee 14, Stealth 14</td>
+<td>10</td>
+<td>3</td>
+<td>Consecrated knife (1)</td>
+<td><strong>Ambush.</strong> +2 on the first attack from hiding; poisons blades (Body roll or 1 more box).</td>
+</tr>
+<tr class="even">
+<td>Brotherhood druid</td>
+<td>Occult 14, Survival 13</td>
+<td>8</td>
+<td>3</td>
+<td>Staff, nature rites</td>
+<td><strong>Living ground.</strong> Commands roots, weather or beasts outdoors; powerless on rails and stone.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.</p>
+<h1 id="gm-the-gms-tools">The GM’s tools</h1>
+<h2 id="gm-the-battle-map">The battle map</h2>
+<p>The GM view of the character creator has a <strong>battle map</strong> for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the <em>Personal combat</em> rules in the Players’ Guide, and a fight without it works the same way. Open <strong>How to use the map</strong> on the map itself for the buttons, step by step.</p>
+<p><strong>Two kinds of map.</strong></p>
+<ul>
+<li><strong>A hex map</strong> for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a saloon, 5 or 10 yards for a street, 50 for open prairie. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range table in the Players’ Guide. Up close it names the reach: a knife or claws at 1 yard, a saber at 2, a spear at 3. When both the attacker and the target have tokens on the map (a character by their card, anyone else by the same name as in the Encounter panel), the panel checks the distance against the weapon: in reach, close enough to move in and strike, too far this turn, or for a gun the range band, which it sets.</li>
+<li><strong>A range track</strong> for fights where only distance matters: a chase after a stagecoach, a running fight across open country. It has a lane for the posse and one for each range band. Moving a token into the next lane moves it one band in or out.</li>
+</ul>
+<p><strong>Tokens.</strong> The GM places the posse with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, Dazed or Grit points on a token marks it on the character, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.</p>
+<p><strong>Keeping a map.</strong> The map stays in the GM’s browser. <strong>Save map to file</strong> keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.</p>
+<h2 id="gm-the-encounter-panel">The Encounter panel</h2>
+<p>The GM view also has an <strong>Encounter</strong> panel that runs a fight by the <em>Personal combat</em> rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit (offering only the effects the weapon can deliver), offering a Grit point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It’s a helper, not a rule: the GM can rule any result differently, and the log says so. For each attack, choose what it’s made of (silver, a wooden stake or fire), and the panel applies the rules that turn on it: a Wesen’s Tough in full woge (and what gets past it), and a creature only the right weapon can hurt, like a Siegbarste’s iron bones.</p>
+<h2 id="gm-the-shared-table">The shared table</h2>
+<p>The GM can start a <strong>shared table</strong> from the GM view and give the players its code; each player joins from their character’s Play tab. While they’re connected, every roll from a sheet is rolled by the table server, so the whole posse sees the same dice as they land, in a live log on the Play tab and on the GM view. A Grit reroll answers its own roll, once.</p>
+<p>Each player’s character is shared with the GM too: it appears among the GM view’s characters, marked at the table, and its injuries, Grit, rounds, full woge and lasting wounds stay in step both ways, whether they’re changed on the sheet, on the GM’s card or in an encounter. In a fight, each player’s Play tab shows the GM’s battle map and the encounter’s turn order and latest results; a player drags their own token, and on their turn sends the GM what they’ll do, which the GM puts into the Encounter panel and runs.</p>
+<p>The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.</p>
 </div>
 <!-- GUIDE:END -->
       </article>
@@ -6592,22 +6945,23 @@ function mountTable(api) {
 }
 /* TABLECLIENT:END */
 /* GMLOCK:START */
-// The GM view and the GM's Guide, for registered GMs only. Plain script, inlined by tools/build-legend.py (/* GMLOCK */)
+// The GM's Guide, for registered GMs only. Plain script, inlined by tools/build-legend.py (/* GMLOCK */)
 // and tools/build-guide.py (GMLOCK markers); no modules, no page globals.
 //
 // mountGmLock(api) with api: { table (mountTable's handle: server(), access(), setAccess(code)), game (the id the table
 //   server knows the game by), view (the GM view's element), book (the GM's Guide's empty, locked book, or null),
 //   onBook() (show the book again once it's filled in), esc, toast }
-// The GM view stays covered by a code box until the table server accepts the GM access code (POST /api/gm); the GM's
-// Guide isn't in the page at all, and comes from the server (POST /api/gm/guide) once the code checks out. The code
-// is the same one that starts a table, kept in this browser, so a GM types it once.
-// Returns { open() } → whether the GM view is open.
+// The GM view is open to everyone (starting a shared table from it still asks for the code, on the table server). So is
+// the GM's Guide when the build puts it in the page (tools/gm_guides.py, GM_GUIDES_OPEN). Otherwise the guide isn't in the page: its book shows a code box, and the guide comes from the server
+// (POST /api/gm/guide) once the table server accepts the GM access code (POST /api/gm). The code is the same one that
+// starts a table, kept in this browser, so a GM types it once.
+// Returns { open() } → whether a GM access code has been accepted.
 //
 // protectText(root, note, toast): the light copy deterrent on a guide: no selecting, copying or right-click menu
 // in it (form fields aside), with a short note instead.
 function mountGmLock(api) {
   const esc = api.esc, say = (m, err) => (api.toast ? api.toast(m, err) : null);
-  let open = false, busy = false, msg = "", guideDone = !api.book;
+  let open = false, busy = false, msg = "", guideDone = !api.book || !api.book.dataset.locked; // an open guide is already in the page
   if (!document.getElementById("gm-lock-css")) {
     const css = document.createElement("style"); css.id = "gm-lock-css";
     css.textContent = `#${api.view.id}.gm-locked > :not(.gm-lock) { display: none !important; }
@@ -6618,18 +6972,15 @@ function mountGmLock(api) {
     document.head.append(css);
   }
   const panel = (where) => `<div class="gm-lock card hud" data-gmlock="${where}">
-    <h3>${where === "book" ? "The GM's Guide is for registered GMs" : "The GM view is for registered GMs"}<\/h3>
-    <p class="small">${where === "book" ? "It holds the setting's secrets, so it's only sent to GMs with a GM access code." : "It holds the encounters, threats and secrets your players shouldn't see, so it opens only with a GM access code."}
-      The code is the one that starts a shared table; type it once and this browser remembers it. To ask for one, email <a href="mailto:contact@legenddynamicsrpg.com">contact@legenddynamicsrpg.com<\/a>.<\/p>
+    <h3>The GM's Guide is for registered GMs<\/h3>
+    <p class="small">It holds the setting's secrets, so it's only sent to GMs with a GM access code.
+      The code is the one that starts a shared table; type it once and this browser remembers it. To ask for one, join the
+      <a href="https://legenddynamicsrpg.com/join" target="_blank" rel="noopener">Legend Dynamics Discord<\/a> or email <a href="mailto:contact@legenddynamicsrpg.com">contact@legenddynamicsrpg.com<\/a>.<\/p>
     <form data-gmlock-form><label class="field"><span class="label">GM access code<\/span>
       <input type="password" name="code" maxlength="100" autocomplete="off" spellcheck="false" aria-label="GM access code"><\/label>
       <button class="btn primary" type="submit"${busy ? " disabled" : ""}>${busy ? "Checking…" : "Unlock"}<\/button><\/form>
     <p class="small gm-lock-msg" role="status">${esc(msg)}<\/p><\/div>`;
   function render() {
-    api.view.classList.toggle("gm-locked", !open);
-    let p = api.view.querySelector(':scope > [data-gmlock="view"]');
-    if (open) { if (p) p.remove(); }
-    else if (p) p.outerHTML = panel("view"); else api.view.insertAdjacentHTML("afterbegin", panel("view"));
     if (api.book && !guideDone) api.book.innerHTML = open ? `<p class="muted">Loading the GM's Guide…<\/p>` : panel("book");
   }
   const post = async (path, body) => {
@@ -6656,7 +7007,7 @@ function mountGmLock(api) {
       if (r.ok) {
         open = true; msg = ""; api.table.setAccess(code);
         const b = await r.json().catch(() => ({}));
-        if (!quiet) say(`GM view unlocked${b.name && b.name !== "GM" ? ` for ${b.name}` : ""}.`);
+        if (!quiet) say(`GM access code accepted${b.name && b.name !== "GM" ? ` for ${b.name}` : ""}.`);
       } else if (r.status === 401) { msg = quiet ? "" : "That GM access code isn't recognised: check it, or ask for one."; if (!quiet) api.table.setAccess(""); }
       else msg = "The table server couldn't check the code just now. Try again in a moment.";
     } catch (e) {
@@ -6693,7 +7044,8 @@ function protectText(root, note, toast) {
 }
 /* GMLOCK:END */
 /* HOMEBREW:START */
-// Homebrew: a GM's own threats, weapons, Edges, cards, spells (hexes, cantrips, psionic powers), powers and rituals, made in the GM view
+// Homebrew: a GM's own threats, weapons, Edges, advantages, origins, cards, spells (hexes, cantrips, psionic powers), powers and
+// rituals, made in the GM view
 // without touching any code. Plain script,
 // inlined by tools/build-legend.py (/* HOMEBREW */) and tools/build-guide.py (HOMEBREW markers); no modules, no page globals.
 //
@@ -6708,14 +7060,17 @@ function protectText(root, note, toast) {
 // Sharing: as a file (Save to file / Open file), or through the shared table: players who join get the GM's homebrew
 // and choose to use it.
 // Function declarations only, above mountHomebrew: hbLoad and hbApply run as the page starts, before this file's place.
-function hbLimits() { return { threats: 30, weapons: 30, edges: 20, spells: 20, cards: 30, rituals: 30, powers: 20 }; }
-function hbKinds() { return ["threats", "weapons", "edges", "spells", "cards", "rituals", "powers"]; }
+function hbLimits() { return { threats: 30, weapons: 30, edges: 20, spells: 20, cards: 30, rituals: 30, powers: 20, advantages: 20, origins: 10 }; }
+function hbKinds() { return ["threats", "weapons", "edges", "spells", "cards", "rituals", "powers", "advantages", "origins"]; }
+function hbAttrs() { return ["Body", "Agility", "Intellect", "Presence", "Will"]; }
 function hbClasses() { return ["I", "II", "III", "IV", "V", "VI"]; }
 // A ritual's weight sets its clock, as in the core rules' magic chapter.
 function hbWeights() { return [["minor", "Minor", 2], ["significant", "Significant", 4], ["major", "Major", 6]]; }
 // What a setting can take: spells need its spell list, cards its discovery cards, rituals its magic.
 function hbHas(PACK) { return { spells: !!(PACK.spells && Array.isArray(PACK.spells.list)), cards: !!PACK.discovery, rituals: !!(PACK.magic && PACK.magic.workings),
-  powers: !!(PACK.powers && Array.isArray(PACK.powers.list)) }; }
+  powers: !!(PACK.powers && Array.isArray(PACK.powers.list)),
+  advantages: Array.isArray(PACK.advantages) && PACK.advantages.length > 0 && PACK.advantages.every(Array.isArray) && Array.isArray(PACK.skills),
+  origins: Array.isArray(PACK.origins) && PACK.origins.length > 0 && PACK.origins.every((o) => o && o.adj && Array.isArray(o.traits)) && Array.isArray(PACK.skills) }; }
 function hbBands() { return [["close", "Close"], ["short", "Short"], ["medium", "Medium"], ["long", "Long"], ["extreme", "Extreme"]]; }
 function hbKey(game) { return game + ".homebrew.v1"; }
 function hbInt(v, lo, hi, d) { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; }
@@ -6797,7 +7152,29 @@ function hbClean(raw, PACK) {
     if (!name || !cls[0]) return null;
     return { id: hbId(x.id, name, taken), name, group: groups.includes(x.group) ? x.group : groups[0] || "", classes: cls, gm: !!x.gm, variety: hbText(x.variety, 120) };
   }).filter(Boolean);
-  return { threats, weapons, edges, spells, cards, rituals, powers, from: r.from === "gm" ? "gm" : "mine" };
+  // An advantage: +2 to one narrow kind of task with a skill, when the GM agrees it applies (the roller's Advantage box).
+  const skillNames = (PACK.skills || []).map((k) => k[0]);
+  const advantages = list("advantages").map((x) => {
+    const name = hbText(x && x.name, 40), text = hbText(x && x.text, 300); if (!name || !text) return null;
+    return { id: hbId(x.id, name, taken), name, text, skill: skillNames.includes(x.skill) ? x.skill : skillNames[0] || "" };
+  }).filter(Boolean);
+  // An origin, as the setting's own: its tier (paid from the Edge points), attribute changes totalling 0, four origin
+  // skills, and one to three origin advantages, each with its complication. Powers (Aurora) follow an origin of the setting's.
+  const tiers = (PACK.origins || []).map((o) => o.tier || 0), maxTier = Math.max(0, ...tiers);
+  const powerOrigins = (PACK.origins || []).filter((o) => o.powerSlots && !o.homebrew).map((o) => o.id);
+  const origins = list("origins").map((x) => {
+    const name = hbText(x && x.name, 40), desc = hbText(x && x.desc, 400); if (!name || !desc) return null;
+    const adj = {}; for (const a of hbAttrs()) { const n = hbInt(x.adj && x.adj[a], -2, 2, 0); if (n) adj[a] = n; }
+    if (Object.values(adj).reduce((t, n) => t + n, 0) !== 0) return null; // every origin's changes total 0
+    const sk = [...new Set((Array.isArray(x.skills) ? x.skills : []).filter((k) => skillNames.includes(k)))].slice(0, 4);
+    const traits = (Array.isArray(x.traits) ? x.traits : []).slice(0, 3).map((t) => ({ name: hbText(t && t.name, 40), text: hbText(t && t.text, 300),
+      skill: skillNames.includes(t && t.skill) ? t.skill : "", compName: hbText(t && t.compName, 40), compText: hbText(t && t.compText, 300) }))
+      .filter((t) => t.name && t.text && t.compName && t.compText);
+    if (!sk.length || !traits.length) return null;
+    return { id: hbId(x.id, name, taken), name, desc, tier: hbInt(x.tier, 0, maxTier, 0), adj, skills: sk, traits,
+      powersLike: powerOrigins.includes(x.powersLike) ? x.powersLike : "" };
+  }).filter(Boolean);
+  return { threats, weapons, edges, spells, cards, rituals, powers, advantages, origins, from: r.from === "gm" ? "gm" : "mine" };
 }
 function hbCount(hb) { return hb ? hbKinds().reduce((n, k) => n + (hb[k] || []).length, 0) : 0; }
 function hbBody(hb) { return JSON.stringify(Object.fromEntries(hbKinds().map((k) => [k, hb[k] || []]))); }
@@ -6856,6 +7233,13 @@ function hbApply(PACK, hb) {
     const cls = []; x.classes.forEach((c, i) => cls.push(c || `As Class ${hbClasses()[i - 1]}, stronger: the GM sets how much.`));
     PACK.powers.list.push([x.id, `${x.name} (homebrew)`, x.group, cls, x.gm ? { gm: true } : {}, x.variety || ""]);
   }
+  if (has.advantages) for (const x of hb.advantages) PACK.advantages.push([x.id, `${x.name} (homebrew)`, x.text, x.skill]);
+  if (has.origins) for (const x of hb.origins) {
+    const like = x.powersLike ? PACK.origins.find((o) => o.id === x.powersLike) : null;
+    PACK.origins.push({ id: x.id, name: `${x.name} (homebrew)`, tier: x.tier, adj: { ...x.adj }, desc: x.desc, core: [], form: null, skills: x.skills.slice(), homebrew: true,
+      traits: x.traits.map((t, i) => [`${x.id}-${i + 1}`, t.name, t.text, t.skill || x.skills[0], !!t.skill, t.compName, t.compText]),
+      ...(like ? { powerSlots: like.powerSlots, ...(like.powerList ? { powerList: like.powerList } : {}), ...(like.mythic ? { mythic: like.mythic } : {}) } : {}) });
+  }
 }
 
 function mountHomebrew(api) {
@@ -6866,11 +7250,14 @@ function mountHomebrew(api) {
   // A setting's own words: hexes or cantrips or psionic powers; lore cards or data records; rituals or workings.
   const W = { spell: M.burst || (HAS.spells ? PACK.spells.plural.toLowerCase().replace(/s$/, "") : "spell"), spells: M.bursts || (HAS.spells ? PACK.spells.plural.toLowerCase() : "spells"),
     card: D.card || "card", cards: D.cards || "cards", ritual: M.working || "ritual", rituals: M.workings || "rituals" };
-  const SKILLS = hbSkills(PACK);
+  const SKILLS = hbSkills(PACK), ALL_SKILLS = (PACK.skills || []).map((k) => [k[0], k[0]]);
+  // The setting's word for an origin: species, heritage, background…
+  const T = { origin: ((PACK.terms && PACK.terms.origin) || "Origin").toLowerCase(), origins: ((PACK.terms && PACK.terms.originPlural) || "Origins").toLowerCase() };
   const armsBuilt = (PACK.arms || []).filter((a) => !a.hazard && !a.homebrew);
   const opts = (list, sel) => list.map(([v, n]) => `<option value="${esc(v)}"${v === sel ? " selected" : ""}>${esc(n)}<\/option>`).join("");
   const store = () => { if (!hbSave(PACK, hb)) say("This browser won't keep the homebrew: save it to a file.", true); changed = true; render(); };
   const summary = (h) => [[h.threats.length, "threat", "threats"], [h.weapons.length, "weapon", "weapons"], ...(EDGES ? [[h.edges.length, "Edge", "Edges"]] : []),
+    ...(HAS.origins ? [[h.origins.length, T.origin, T.origins]] : []), ...(HAS.advantages ? [[h.advantages.length, "advantage", "advantages"]] : []),
     ...(HAS.cards ? [[h.cards.length, W.card, W.cards]] : []), ...(HAS.powers ? [[h.powers.length, "power", "powers"]] : []), ...(HAS.spells ? [[h.spells.length, W.spell, W.spells]] : []), ...(HAS.rituals ? [[h.rituals.length, W.ritual, W.rituals]] : [])]
     .filter(([n]) => n).map(([n, one, many]) => `${n} ${n === 1 ? one : many}`).join(", ") || "nothing yet";
   const weightOf = (k) => hbWeights().find((w) => w[0] === k) || hbWeights()[0];
@@ -6961,13 +7348,39 @@ function mountHomebrew(api) {
     hbClasses().map((c, i) => `<div class="field wide"><label>Class ${c}${i ? " (blank: the GM decides)" : ""}<\/label><input name="c${i}" maxlength="200" value="${esc(x ? x.classes[i] : "")}" placeholder="${i ? "" : "e.g. Step from one shadow to another you can see, up to 10 yd."}"><\/div>`).join("") +
     `<div class="field"><label><input type="checkbox" name="gm"${x && x.gm ? " checked" : ""}> Needs the GM's approval<\/label><\/div>` +
     input(x, "variety", "Kinds it comes in (optional)", 120, "e.g. darkness, smoke or mirrors", true), "Add the power");
+  const advantageForm = () => formOf("advantages", (x) => input(x, "name", "Name", 40, "e.g. Trail Cook") +
+    `<div class="field"><label>Skill<\/label><select name="skill">${opts(ALL_SKILLS, x ? x.skill : "")}<\/select><\/div>` +
+    input(x, "text", "What it gives: +2 to one narrow kind of task", 300, "e.g. +2 to Survival to feed a party on what the land gives.", true), "Add the advantage");
+  function originForm() {
+    const x = editing && editing[0] === "origins" ? find("origins", editing[1]) : null;
+    const maxTier = Math.max(0, ...(PACK.origins || []).filter((o) => !o.homebrew).map((o) => o.tier || 0));
+    const adjSel = (a) => `<div class="field"><label>${a}<\/label><select name="adj-${a}">${opts([["-2", "−2"], ["-1", "−1"], ["0", "0"], ["1", "+1"], ["2", "+2"]], String((x && x.adj[a]) || 0))}<\/select><\/div>`;
+    const skillSel = (i) => `<div class="field"><label>${cap(T.origin)} skill ${i + 1}<\/label><select name="sk${i}">${i ? `<option value="">None<\/option>` : ""}${opts(ALL_SKILLS, x ? x.skills[i] || "" : "")}<\/select><\/div>`;
+    const trait = (i) => { const t = (x && x.traits[i]) || {}; return `<fieldset class="field wide hb-bonus"><legend class="label">${cap(T.origin)} advantage ${i + 1}${i ? " (optional)" : ""}<\/legend><div class="fields">
+      <div class="field"><label>Name<\/label><input name="t${i}-name" maxlength="40" value="${esc(t.name || "")}" placeholder="${i ? "" : "e.g. Night Eyes"}"><\/div>
+      <div class="field"><label>+2 to<\/label><select name="t${i}-skill"><option value="">No roll bonus<\/option>${opts(ALL_SKILLS, t.skill || "")}<\/select><\/div>
+      <div class="field wide"><label>What it gives<\/label><input name="t${i}-text" maxlength="300" value="${esc(t.text || "")}" placeholder="${i ? "" : "e.g. +2 to Awareness to spot movement in darkness."}"><\/div>
+      <div class="field"><label>Its complication<\/label><input name="t${i}-cname" maxlength="40" value="${esc(t.compName || "")}" placeholder="${i ? "" : "e.g. Sun-Dazzled"}"><\/div>
+      <div class="field wide"><label>What the complication does<\/label><input name="t${i}-ctext" maxlength="300" value="${esc(t.compText || "")}" placeholder="${i ? "" : "e.g. Bright light blinds you. Accept the stumble at the worst moment."}"><\/div><\/div><\/fieldset>`; };
+    const powerOrigins = (PACK.origins || []).filter((o) => o.powerSlots && !o.homebrew);
+    return `<form data-hbform="origins" class="fields">
+      <div class="field"><label>Name<\/label><input name="name" maxlength="40" required value="${esc(x ? x.name : "")}" placeholder="e.g. Cave-born"><\/div>
+      <div class="field"><label>Tier (paid from Edge points)<\/label><select name="tier">${opts(Array.from({ length: maxTier + 1 }, (_, i) => [String(i), String(i)]), String(x ? x.tier : 0))}<\/select><\/div>
+      <div class="field wide"><label>Description<\/label><input name="desc" maxlength="400" required value="${esc(x ? x.desc : "")}" placeholder="Who they are and where they come from."><\/div>
+      <fieldset class="field wide hb-bonus"><legend class="label">Attribute changes (they must total 0)<\/legend><div class="fields">${hbAttrs().map(adjSel).join("")}<\/div><\/fieldset>
+      ${[0, 1, 2, 3].map(skillSel).join("")}
+      ${powerOrigins.length ? `<div class="field wide"><label>Powers<\/label><select name="powersLike"><option value="">None<\/option>${opts(powerOrigins.map((o) => [o.id, `As ${o.name}`]), x ? x.powersLike : "")}<\/select><\/div>` : ""}
+      ${[0, 1, 2].map(trait).join("")}
+      <div class="btn-row field wide"><button class="btn primary" type="submit">${x ? "Save changes" : `Add the ${esc(T.origin)}`}<\/button>${x ? `<button type="button" class="linkish" data-hbcancel>Cancel<\/button>` : ""}<\/div><\/form>`;
+  }
+  const adjLine = (adj) => Object.entries(adj).map(([a, n]) => `${a} ${plus(n)}`).join(", ") || "no attribute changes";
   const section = (kind, title, list, line, form) => `<details class="hb-sec"${editing && editing[0] === kind ? " open" : ""}><summary class="label">${title} (${list.length})<\/summary>
     <ul class="small adv-list">${list.map((x) => item(kind, x, line(x))).join("") || `<li class="muted">None yet.<\/li>`}<\/ul>${list.length >= hbLimits()[kind] && !(editing && editing[0] === kind) ? `<p class="small muted">That's the most this keeps (${hbLimits()[kind]}).<\/p>` : form()}<\/details>`;
 
   function render() {
     if (api.gmRoot) {
       api.gmRoot.innerHTML = `<h3>Homebrew<\/h3>
-        <p class="small muted">Your own threats, weapons${EDGES ? ", Edges" : ""}${HAS.cards ? `, ${W.cards}` : ""}${HAS.powers ? ", powers" : ""}${HAS.spells ? `, ${W.spells}` : ""}${HAS.rituals ? ` and ${W.rituals}` : ""}, made here: no code. They work like the setting's own, marked <i>homebrew<\/i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}${HAS.cards ? `, ${W.cards} where you record findings` : ""}${HAS.powers ? ", powers among the creator's choices" : ""}${HAS.spells ? `, ${W.spells} among the creator's choices` : ""}${HAS.rituals ? `, ${W.rituals} in a ${W.ritual} book beside Rituals by heart` : ""}. Keep numbers in line with the setting's (see <i>Making your own<\/i> in the core rules); anything special is a note you apply at the table.<\/p>
+        <p class="small muted">Your own threats, weapons${EDGES ? ", Edges" : ""}${HAS.origins ? `, ${esc(T.origins)}` : ""}${HAS.advantages ? ", advantages" : ""}${HAS.cards ? `, ${W.cards}` : ""}${HAS.powers ? ", powers" : ""}${HAS.spells ? `, ${W.spells}` : ""}${HAS.rituals ? ` and ${W.rituals}` : ""}, made here: no code. They work like the setting's own, marked <i>homebrew<\/i>: threats in the Encounter panel and on the battle map, weapons in characters' gear${EDGES ? " and the roller, Edges in the creator" : ""}${HAS.origins || HAS.advantages ? `, ${[HAS.origins ? esc(T.origins) : "", HAS.advantages ? "advantages" : ""].filter(Boolean).join(" and ")} among the creator's choices` : ""}${HAS.cards ? `, ${W.cards} where you record findings` : ""}${HAS.powers ? ", powers among the creator's choices" : ""}${HAS.spells ? `, ${W.spells} among the creator's choices` : ""}${HAS.rituals ? `, ${W.rituals} in a ${W.ritual} book beside Rituals by heart` : ""}. Keep numbers in line with the setting's (see <i>Making your own<\/i> in the core rules); anything special is a note you apply at the table.<\/p>
         <p class="small"><b>In this browser:<\/b> ${esc(summary(hb))}${hb.from === "gm" ? " (shared by your GM)" : ""}. Players get it when they join your shared table, or from a file.<\/p>
         ${changed ? `<p class="small hb-reload"><b>Saved.<\/b> Reload the page to use the changes. <button type="button" class="btn" data-hbreload>Reload now<\/button><\/p>` : ""}
         <div class="btn-row"><button type="button" class="btn" data-hbexport${hbCount(hb) ? "" : " disabled"}>Save to file<\/button>
@@ -6975,6 +7388,8 @@ function mountHomebrew(api) {
         ${section("threats", "Threats", hb.threats, (t) => withBonus(threatLine(t), threatBonusLine(t.bonus)), threatForm)}
         ${section("weapons", "Weapons", hb.weapons, (w) => withBonus(weaponLine(w), weaponBonusLine(w.bonus)), weaponForm)}
         ${EDGES ? section("edges", "Edges", hb.edges, (x) => withBonus(`${x.limit === 1 ? "once" : `up to ${x.limit}×`}: ${x.text}`, edgeBonusLine(x.bonus)), edgeForm) : ""}
+        ${HAS.origins ? section("origins", cap(T.origins), hb.origins, (x) => `tier ${x.tier}; ${adjLine(x.adj)}; skills ${x.skills.join(", ")}; ${x.traits.map((t) => t.name).join(", ")}`, originForm) : ""}
+        ${HAS.advantages ? section("advantages", "Advantages", hb.advantages, (x) => `${x.skill}: ${x.text}`, advantageForm) : ""}
         ${HAS.cards ? section("cards", cap(W.cards), hb.cards, (x) => `${x.knowledge}${x.permits ? ` Permits: ${x.permits}` : ""}`, cardForm) : ""}
         ${HAS.powers ? section("powers", "Powers", hb.powers, (x) => `${x.gm ? "GM's approval; " : ""}Class I: ${x.classes[0]}`, powerForm) : ""}
         ${HAS.spells ? section("spells", cap(W.spells), hb.spells, (x) => withBonus(x.text, x.attack && x.attack.boxes ? `an attack, ${x.attack.boxes} box${x.attack.boxes === 1 ? "" : "es"} at ${(hbBands().find((b) => b[0] === x.attack.band) || [])[1]} range` : ""), spellForm) : ""}
@@ -7011,6 +7426,10 @@ function mountHomebrew(api) {
     if (kind === "powers") return { id, name: v("name"), group: v("group"), classes: hbClasses().map((_, i) => v("c" + i)), gm: f.elements.gm.checked, variety: v("variety") };
     if (kind === "cards") return { id, name: v("name"), knowledge: v("knowledge"), permits: v("permits") };
     if (kind === "rituals") return { id, name: v("name"), weight: v("weight"), time: v("time"), text: v("text"), price: v("price") };
+    if (kind === "advantages") return { id, name: v("name"), skill: v("skill"), text: v("text") };
+    if (kind === "origins") return { id, name: v("name"), tier: v("tier"), desc: v("desc"), powersLike: v("powersLike"),
+      adj: Object.fromEntries(hbAttrs().map((a) => [a, v("adj-" + a)])), skills: [0, 1, 2, 3].map((i) => v("sk" + i)).filter(Boolean),
+      traits: [0, 1, 2].map((i) => ({ name: v(`t${i}-name`), skill: v(`t${i}-skill`), text: v(`t${i}-text`), compName: v(`t${i}-cname`), compText: v(`t${i}-ctext`) })).filter((t) => t.name || t.text) };
     return { id, name: v("name"), limit: v("limit"), text: v("text"),
       bonus: { skill: v("b-skill"), skillValue: v("b-skill") ? v("b-skillv") : 0, dodge: on("b-dodge") ? 1 : 0, move: v("b-move"), extraDefense: on("b-xdef"), shrugTelling: on("b-shrugt") } };
   }
@@ -7023,7 +7442,9 @@ function mountHomebrew(api) {
       if (at >= 0) list[at] = entry; else list.push(entry);
       const next = hbClean({ ...hb, [kind]: list }, PACK);
       if (next[kind].length < list.length) { say({ threats: "A threat needs a name and at least one weapon.", edges: "An Edge needs a name and what it gives.", weapons: "A weapon needs a name.",
-        spells: `A ${W.spell} needs a name and what it does.`, powers: "A power needs a name and what it does at Class I.", cards: `A ${W.card} needs a subject and what's true.`, rituals: `A ${W.ritual} needs a name and what it does.` }[kind], true); return; }
+        spells: `A ${W.spell} needs a name and what it does.`, powers: "A power needs a name and what it does at Class I.", cards: `A ${W.card} needs a subject and what's true.`, rituals: `A ${W.ritual} needs a name and what it does.`,
+        advantages: "An advantage needs a name and what it gives.",
+        origins: `A ${T.origin} needs a name, a description, at least one skill and one advantage with its complication, and attribute changes that total 0.` }[kind], true); return; }
       hb = next; editing = null; hb.from = "mine"; store(); say(at >= 0 ? "Saved." : "Added.");
     });
     root.addEventListener("change", async (e) => {
