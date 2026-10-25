@@ -64,6 +64,10 @@ Keep it a **Secret**, not a variable in `wrangler.toml`: a secret survives every
 
 **The GM view and the GM's Guides.** The same codes open each creator's **GM view**, which stays covered by a code box until the server accepts the code (`POST /api/gm`). The GM's Guides aren't in the pages at all: the server hands a game's guide to a GM whose code checks out (`POST /api/gm/guide`), from `src/gm-guides.js`, which `tools/gm_guides.py` builds from each game's `gm-guide.json` whenever the guides are rebuilt. So a change to a GM's Guide reaches GMs once the server is redeployed. With no `GM_CODES`, the GM view and the guides are open to anyone, like starting tables.
 
+### The dev blog
+
+The same server keeps the site's dev blog (`/blog/` on the website; the posts live in the server's own storage, `src/blog.js`). Anyone can read published posts. To write them, add a **Secret** named `DEV` in the Worker's **Settings → Variables and Secrets**: a long random code of its own (not a GM code), or `Name: code` lines for more than one author. Then open `/blog/write/` on the site and sign in with it; that browser remembers it until **Sign out**. With no `DEV` secret, nobody can write. Posts and drafts are kept until you delete them, whatever happens to the tables.
+
 ## Use it
 
 - **GM:** GM view → **Shared table** → name it → **Start a table** (and the GM access code, the first time, if the server has `GM_CODES`). Share the code, or **Copy link** and send that (the link fills in the code). **Rejoin** gets you back in after closing the page; the key that makes you the GM stays in your browser.

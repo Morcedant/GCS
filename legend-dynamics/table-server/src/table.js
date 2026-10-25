@@ -31,6 +31,8 @@
  */
 import { newTable, hello, roll, rateCheck, presence, hashKey, serverDice, shareSheet, changePlay, publicSheet, publicEntry, removeOwner, isBanned, newCode, newCid, cryptoInt, checkScene, checkMove, checkAsk, MAX_SCENE, MAX_MESSAGE, MAX_SHEET, IDLE_DAYS } from "./logic.js";
 
+import { blogFetch } from "./blog.js";
+
 const DAY = 86_400_000;
 
 export class Table {
@@ -51,6 +53,7 @@ export class Table {
   /** @param {Request} req */
   async fetch(req) {
     const path = new URL(req.url).pathname;
+    if (path.startsWith("/blog/")) return blogFetch(this.ctx.storage, req); // the dev blog's own object (blog.js): never a table
     if (path === "/init") {
       if (this.table) return Response.json({ error: "exists" }, { status: 409 });
       const b = /** @type {any} */ (await req.json());

@@ -14,6 +14,8 @@ links to beside it, so nothing points at claude.ai:
   /changelog/                       rules changes and website updates (from rules-version.json)
   /discord/                         the Discord bot's commands for every setting
   /discord/<game>/                  each game's printable handout, with the bot's setup and code
+  /blog/                            the dev blog: posts from the table server (/blog/?p=<id> for one post)
+  /blog/write/                      the author's page for writing them, behind the DEV code (not linked or indexed)
 
 Run after build-legend.py:
 
@@ -36,7 +38,11 @@ GAMES, SLUGS = bw.GAMES, bw.SLUGS
 # The creators live on the site now.
 bw.CREATORS = {g: f"{SLUGS[g]}/create/" for g in GAMES}
 
-NAV = [("/", "Home"), (bw.START_SLUG, "Start here"), (bw.WHY_SLUG, "About")] + [(SLUGS[g], bw.pack(g)["terms"]["title"]) for g in GAMES] + [(bw.CORE_SLUG, "Core rules"), (bw.TABLE_SLUG, "Shared table"), (bw.DISCORD_SLUG, "Discord"), (bw.CONTACT_SLUG, "Contact")]
+BLOG_SLUG = "/blog"
+# The table server holds the blog's posts (legend-dynamics/table-server/server-url.txt, as for the creators).
+_url = (LD / "table-server" / "server-url.txt")
+BLOG_SERVER = _url.read_text().strip() if _url.exists() else ""
+NAV = [("/", "Home"), (bw.START_SLUG, "Start here"), (bw.WHY_SLUG, "About")] + [(SLUGS[g], bw.pack(g)["terms"]["title"]) for g in GAMES] + [(bw.CORE_SLUG, "Core rules"), (bw.TABLE_SLUG, "Shared table"), (bw.DISCORD_SLUG, "Discord"), (BLOG_SLUG, "Dev blog"), (bw.CONTACT_SLUG, "Contact")]
 
 FRAME_CSS = """
 /* ---------- 5. Site frame (Cloudflare Pages build; Squarespace supplies its own) ---------- */
@@ -62,6 +68,37 @@ main { flex: 1; }
 .ld-footer a { color: var(--ld-header-fg); }
 .ld-downloads { display: flex; flex-wrap: wrap; gap: .75rem; margin: 0; padding: 0; list-style: none; }
 @media (prefers-reduced-motion: reduce) { .ld-button, .ld-game { transition: none !important; } }
+/* The dev blog (/blog/, website/blog.js) */
+.ld-posts { display: grid; gap: 1rem; }
+.ld-post-card { background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: 1.1rem 1.2rem; }
+.ld-post-card h2 { margin: .25rem 0 .5rem; font-size: clamp(1.1rem, 2vw, 1.4rem); }
+.ld-post-card h2 a { color: var(--ld-ink); text-decoration: none; }
+.ld-post-card h2 a:hover { color: var(--ld-accent); }
+.ld-post-card p { margin: 0 0 .6rem; }
+.ld-post-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ld-post-tags .ld-tag { font: .72rem/1 var(--ld-mono); letter-spacing: .08em; padding: .35rem .6rem; border: 1px solid currentColor; border-radius: 999px; color: var(--ld-accent); }
+[hidden] { display: none !important; }
+.ld-blog-tags { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0 0 1.4rem; }
+.ld-blog-tags a { border: 1px solid var(--ld-line); border-radius: 999px; padding: .3rem .8rem; font: 600 .78rem/1.2 var(--ld-label); color: var(--ld-ink); text-decoration: none; }
+.ld-blog-tags a[aria-current="page"], .ld-blog-tags a:hover { border-color: var(--ld-accent); color: var(--ld-accent); }
+.ld-post { max-width: 46rem; margin: 0 auto; }
+.ld-post h1 { margin: .3rem 0 .6rem; }
+.ld-post .ld-rules { max-width: none; }
+.ld-note { font-size: .9rem; color: var(--ld-ink-2); }
+.ld-bad { color: var(--ld-accent-2, #b8383a); }
+.ld-w-list { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: .5rem; max-width: 46rem; }
+.ld-w-list button { width: 100%; text-align: left; display: grid; gap: .2rem; background: var(--ld-panel); color: var(--ld-ink); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: .8rem 1rem; font: inherit; cursor: pointer; }
+.ld-w-list button:hover { border-color: var(--ld-accent); }
+.ld-w-list span { font-size: .85rem; color: var(--ld-ink-2); }
+.ld-w-tags { border: 1px solid var(--ld-line); border-radius: var(--ld-radius); display: flex; flex-wrap: wrap; gap: .5rem 1rem; padding: .6rem .8rem; margin: 0; }
+.ld-w-tags legend { font: 600 .76rem/1.2 var(--ld-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ld-ink-2); padding: 0 .3rem; }
+.ld-form .ld-w-tags label { display: flex; align-items: center; gap: .35rem; font: 400 .95rem/1.3 var(--ld-body); letter-spacing: normal; text-transform: none; color: var(--ld-ink); }
+.ld-form .ld-w-tags input { width: auto; }
+.ld-w-tools { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ld-w-tools button { background: var(--ld-panel); color: var(--ld-ink); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: .4rem .7rem; font: 600 .85rem/1 var(--ld-body); cursor: pointer; min-height: 2.2rem; }
+.ld-w-tools button:hover, .ld-w-tools button[aria-pressed="true"] { border-color: var(--ld-accent); }
+.ld-w-preview { border: 1px dashed var(--ld-line); border-radius: var(--ld-radius); padding: .4rem 1rem; max-width: none; }
+.ld-w-edit textarea { min-height: 22rem; font-size: 1rem; }
 """
 
 
@@ -87,19 +124,19 @@ PROTECT = """<style>.ld-protected { -webkit-user-select: none; user-select: none
   for (const ev of ["copy", "cut", "contextmenu", "dragstart"]) m.addEventListener(ev, (e) => e.preventDefault()); })();</script>"""
 
 
-def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False):
+def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, blog=False, robots=""):
     here = "/" + path.strip("/")
     here = "/" if here == "/" else here
     nav = "".join(f'<a href="{h}"{" aria-current=\"page\"" if h == here else ""}>{e(n)}</a>' for h, n in NAV)
     sections = "\n".join(f'<section class="page-section"><div class="section-background"></div><div class="content">\n{same_tab(b)}\n</div></section>' for b in body_blocks)
-    cls = f' class="ld-{theme}"' if theme else ""
+    cls = (f' class="ld-{theme}"' if theme else "") + (f' data-blog-server="{e(BLOG_SERVER)}"' if blog else "")
     return f"""<!doctype html>
 <html lang="en"{cls}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{e(title)}</title>
-<meta name="description" content="{e(desc)}">
+<meta name="description" content="{e(desc)}">{f'<meta name="robots" content="{robots}">' if robots else ""}
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -114,7 +151,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False):
 {sections}
 </main>
 <footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. Copyright © Don Smallwood. All rights reserved.</span>
-<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}
+<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}
 </body>
 </html>
 """
@@ -149,8 +186,21 @@ def main():
           '<path d="M32 9 52 21v22L32 55 12 43V21Z" fill="none" stroke="#9b6b1f" stroke-width="4"/>'
           '<text x="32" y="41" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="700" fill="#efe6d2">LD</text></svg>')
 
+    home = [b for b in blocks(bw.home()) if "All rights reserved" not in b]
+    home.insert(next(i for i, b in enumerate(home) if 'id="online"' in b), '<div class="ld" id="ld-blog-latest" hidden></div>')  # filled when there are posts
     write("index.html", page("/", "Legend Dynamics RPG", "A tabletop roleplaying system on 3d6 roll-under: Gothic Westerns, science fiction, swords against sorcery and superheroes.",
-                             [b for b in blocks(bw.home()) if "All rights reserved" not in b], fonts=font_links(fonts_all)))
+                             home, fonts=font_links(fonts_all), blog=True))
+    copy(LD / "website" / "blog.js", "blog.js")
+    write("blog/index.html", page(BLOG_SLUG, "Dev blog · Legend Dynamics", "News from the making of Legend Dynamics: rules changes, the settings, and what's coming.",
+                                  ['<div class="ld ld-hero" id="ld-blog-hero"><div class="ld-eyebrow">Legend Dynamics RPG system</div><h1>Dev blog</h1><hr class="ld-rule">'
+                                   '<p class="ld-lede">News from the making of the game: rules changes, the settings, playtest notes and what\'s coming. '
+                                   f'For the list of every rules change, see the <a href="{bw.CHANGELOG_SLUG}">changelog</a>.</p></div>',
+                                   '<div class="ld" id="ld-blog"><noscript>The dev blog needs JavaScript.</noscript></div>'],
+                                  fonts=font_links({bw.BRAND_FONTS}), blog=True))
+    write("blog/write/index.html", page(BLOG_SLUG + "/write", "Write · Dev blog · Legend Dynamics", "The dev blog's author page.",
+                                        ['<div class="ld ld-hero"><div class="ld-eyebrow">Dev blog</div><h1>Write a post</h1><hr class="ld-rule"></div>',
+                                         '<div class="ld" id="ld-blog-write"><noscript>Writing needs JavaScript.</noscript></div>'],
+                                        fonts=font_links({bw.BRAND_FONTS}), blog=True, robots="noindex, nofollow"))
 
     for g in GAMES:
         t = bw.pack(g)["terms"]
