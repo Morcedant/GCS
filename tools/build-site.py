@@ -69,7 +69,10 @@ main { flex: 1; }
 .ld-downloads { display: flex; flex-wrap: wrap; gap: .75rem; margin: 0; padding: 0; list-style: none; }
 @media (prefers-reduced-motion: reduce) { .ld-button, .ld-game { transition: none !important; } }
 /* The dev blog (/blog/, website/blog.js) */
-.ld-posts { display: grid; gap: 1rem; }
+.ld-posts { display: grid; gap: 1rem; max-width: 52rem; }
+.ld-blog-head { margin: 0 0 1.4rem; }
+.ld-blog-head h1 { margin: .3rem 0 .4rem; font-size: clamp(1.6rem, 4vw, 2.4rem); }
+.ld-blog-head .ld-note { margin: 0; max-width: 46rem; font-size: 1rem; }
 .ld-post-card { background: var(--ld-panel); border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: 1.1rem 1.2rem; }
 .ld-post-card h2 { margin: .25rem 0 .5rem; font-size: clamp(1.1rem, 2vw, 1.4rem); }
 .ld-post-card h2 a { color: var(--ld-ink); text-decoration: none; }
@@ -192,9 +195,10 @@ def main():
                              home, fonts=font_links(fonts_all), blog=True))
     copy(LD / "website" / "blog.js", "blog.js")
     write("blog/index.html", page(BLOG_SLUG, "Dev blog · Legend Dynamics", "News from the making of Legend Dynamics: rules changes, the settings, and what's coming.",
-                                  ['<div class="ld ld-hero" id="ld-blog-hero"><div class="ld-eyebrow">Legend Dynamics RPG system</div><h1>Dev blog</h1><hr class="ld-rule">'
-                                   '<p class="ld-lede">News from the making of the game: rules changes, the settings, playtest notes and what\'s coming. '
-                                   f'For the list of every rules change, see the <a href="{bw.CHANGELOG_SLUG}">changelog</a>.</p></div>',
+                                  # One section: a short heading, then the posts straight away (no tall hero pushing them off the screen).
+                                  ['<div class="ld ld-blog-head" id="ld-blog-hero"><div class="ld-eyebrow">Legend Dynamics RPG system</div><h1>Dev blog</h1>'
+                                   '<p class="ld-note">News from the making of the game: rules changes, the settings, playtest notes and what\'s coming. '
+                                   f'Every rules change is also listed in the <a href="{bw.CHANGELOG_SLUG}">changelog</a>.</p></div>\n'
                                    '<div class="ld" id="ld-blog"><noscript>The dev blog needs JavaScript.</noscript></div>'],
                                   fonts=font_links({bw.BRAND_FONTS}), blog=True))
     write("blog/write/index.html", page(BLOG_SLUG + "/write", "Write · Dev blog · Legend Dynamics", "The dev blog's author page.",

@@ -71,8 +71,7 @@
   function blogPage(root) {
     var q = new URLSearchParams(location.search), id = q.get("p"), tag = q.get("tag") || "";
     if (id) {
-      var hero = $("ld-blog-hero"), sec = hero && hero.closest("section");
-      if (sec) sec.hidden = true; // the post has its own title
+      if ($("ld-blog-hero")) $("ld-blog-hero").hidden = true; // the post has its own title
       root.innerHTML = '<p class="ld-note">Loading…</p>';
       return api("/api/blog/" + encodeURIComponent(id)).then(function (j) {
         var p = j.post;
@@ -86,7 +85,7 @@
     return api("/api/blog" + (tag ? "?tag=" + encodeURIComponent(tag) : "")).then(function (j) {
       var filter = '<nav class="ld-blog-tags" aria-label="Topics"><a href="/blog/"' + (tag ? "" : ' aria-current="page"') + ">All</a>" +
         j.tags.map(function (t) { return '<a href="/blog/?tag=' + encodeURIComponent(t) + '"' + (t === tag ? ' aria-current="page"' : "") + ">" + esc(t) + "</a>"; }).join("") + "</nav>";
-      root.innerHTML = filter + (j.posts.length ? '<div class="ld-posts">' + j.posts.map(card).join("") + "</div>" : "<p>No posts" + (tag ? " about " + esc(tag) : "") + " yet. Check back soon.</p>");
+      root.innerHTML = filter + (j.posts.length ? '<div class="ld-posts">' + j.posts.map(card).join("") + "</div>" : (tag ? '<p>No posts about ' + esc(tag) + ' yet. <a href="/blog/">See all posts</a>.</p>' : "<p>No posts yet. Check back soon.</p>"));
     }).catch(function (e) { root.innerHTML = "<p>" + esc(e.message) + "</p>"; });
   }
 
