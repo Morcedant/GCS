@@ -20,6 +20,18 @@ GAMES = {"western": "legend-dynamics/western", "spaceopera": "legend-dynamics/sp
 BRANCH = {"grimm-west": "origin/claude/grimm-wild-west"}  # a game built on another branch
 
 
+# True: every visitor reads the GM's Guides in the creators. False: only GMs whose access code checks out.
+GM_GUIDES_OPEN = True
+
+
+def book(title, subtitle, body):
+    """The GM's Guide's place in the page: the guide itself (GM_GUIDES_OPEN), or empty until a registered GM unlocks it."""
+    if GM_GUIDES_OPEN:
+        return (f'<div class="guide-book" id="guide-gm" data-title="{html.escape(title)}" data-subtitle="{html.escape(subtitle)}" hidden>\n'
+                + body + "</div>\n")
+    return locked_book(title, subtitle)
+
+
 def locked_book(title, subtitle):
     """The GM's Guide's place in the page: empty until a registered GM unlocks it."""
     return (f'<div class="guide-book" id="guide-gm" data-title="{html.escape(title)}" data-subtitle="{html.escape(subtitle)}" data-locked="1" hidden>\n'
