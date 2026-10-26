@@ -3928,6 +3928,245 @@
    "rows": [],
    "natural": true,
    "reachYards": 1
+  },
+  {
+   "id": "op-blast3",
+   "name": "Power blast (Class III)",
+   "skill": "Powers",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   }
+  },
+  {
+   "id": "op-blast4",
+   "name": "Power blast (Class IV)",
+   "skill": "Powers",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   }
+  },
+  {
+   "id": "op-blast5",
+   "name": "Power blast (Class V)",
+   "skill": "Powers",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   }
+  },
+  {
+   "id": "op-blast6",
+   "name": "Power blast (Class VI)",
+   "skill": "Powers",
+   "class": 6,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   }
+  },
+  {
+   "id": "op-strength2",
+   "name": "Strong blow (Class II)",
+   "skill": "Brawling",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true
+  },
+  {
+   "id": "op-strength3",
+   "name": "Super-strong blow (Class III)",
+   "skill": "Brawling",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true
+  },
+  {
+   "id": "op-strength4",
+   "name": "Super-strong blow (Class IV)",
+   "skill": "Brawling",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   },
+   "natural": true
+  },
+  {
+   "id": "op-strength5",
+   "name": "Super-strong blow (Class V)",
+   "skill": "Brawling",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   },
+   "natural": true
+  },
+  {
+   "id": "op-strength6",
+   "name": "Super-strong blow (Class VI)",
+   "skill": "Brawling",
+   "class": 6,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   },
+   "natural": true
+  },
+  {
+   "id": "op-weapon3",
+   "name": "Power weapon in hand (Class III)",
+   "skill": "Melee",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   }
+  },
+  {
+   "id": "op-weapon4",
+   "name": "Power weapon in hand (Class IV)",
+   "skill": "Melee",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   }
+  },
+  {
+   "id": "op-manifest3",
+   "name": "Manifested firearm (Class III)",
+   "skill": "Firearms",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "firearm": true
+  },
+  {
+   "id": "op-sidearm2",
+   "name": "Advanced sidearm (Class II)",
+   "skill": "Firearms",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "firearm": true
+  },
+  {
+   "id": "op-nightmare2",
+   "name": "Living nightmare (Class II; Will resists)",
+   "skill": "Powers",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   }
+  },
+  {
+   "id": "op-speed2",
+   "name": "Blur of blows (Class II)",
+   "skill": "Brawling",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true
   }
  ],
  "threats": [
@@ -4223,6 +4462,701 @@
      "type": "defenseClass",
      "value": 2,
      "label": "Defense II"
+    }
+   ]
+  },
+  {
+   "id": "op-marvel",
+   "name": "Mr. Marvel (Hector Gonzalez)",
+   "label": "Mr. Marvel (Hector Gonzalez) (Class IV)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 15
+    },
+    {
+     "skill": "Powers",
+     "target": 15
+    }
+   ],
+   "dodge": 11,
+   "boxes": 6,
+   "boxesText": "6",
+   "weaponText": "Strength IV, electrical bolt, Blast IV",
+   "weapons": [
+    "op-strength4",
+    "op-blast4"
+   ],
+   "trait": "Two lives",
+   "traitText": "As Hector Gonzalez he has no powers and Medicine 15. In the Marvel form his impatience and anger rise: a Will roll to walk away from a fight he's winning.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 4,
+     "label": "Defense IV"
+    }
+   ]
+  },
+  {
+   "id": "op-celerity",
+   "name": "Celerity (Ava Torres)",
+   "label": "Celerity (Ava Torres) (Class IV)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 14
+    }
+   ],
+   "dodge": 14,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "blows at speed, Class II",
+   "weapons": [
+    "op-speed2"
+   ],
+   "trait": "Faster than the fight",
+   "traitText": "Two actions a round, and a second defense. A federal warrant hangs over her: helping her marks Scrutiny.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 1,
+     "label": "Defense I"
+    },
+    {
+     "type": "extraDefense",
+     "value": 1,
+     "label": "Celerity (Ava Torres): quick"
+    }
+   ]
+  },
+  {
+   "id": "op-greenman",
+   "name": "The Green Man (Micky Holt)",
+   "label": "The Green Man (Micky Holt) (Class V)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Powers",
+     "target": 15
+    }
+   ],
+   "dodge": 9,
+   "boxes": 5,
+   "boxesText": "5",
+   "weaponText": "roots and thorns, Class IV in the Mad Forest, III outside it",
+   "weapons": [
+    "op-blast4"
+   ],
+   "trait": "The forest is his",
+   "traitText": "In the Mad Forest two wildwoods answer him each round he asks. Anyone who burns or harms the forest is the forest's enemy. Mad: what he wants changes with the song.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 2,
+     "label": "Defense II"
+    }
+   ]
+  },
+  {
+   "id": "op-lance",
+   "name": "Michael Lance",
+   "label": "Michael Lance (Class III)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 13
+    },
+    {
+     "skill": "Powers",
+     "target": 14
+    }
+   ],
+   "dodge": 11,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "a .38 revolver, Class I, the amulet's beam, Blast III",
+   "weapons": [
+    "pistol",
+    "op-blast3"
+   ],
+   "trait": "The amulet",
+   "traitText": "Without the amulet he's a 1940s private eye with a revolver. Em Antu's spirit has its own opinions, and sometimes its own plans.",
+   "traits": []
+  },
+  {
+   "id": "op-steelhawk",
+   "name": "Steel Hawk",
+   "label": "Steel Hawk (Class IV)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 15
+    },
+    {
+     "skill": "Powers",
+     "target": 15
+    }
+   ],
+   "dodge": 10,
+   "boxes": 5,
+   "boxesText": "5",
+   "weaponText": "Strength III, spectral energy, Blast IV",
+   "weapons": [
+    "op-strength3",
+    "op-blast4"
+   ],
+   "trait": "Control",
+   "traitText": "He must run every room he's in. Orders make him dig in; a deal that leaves him in charge can buy him for a while.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 4,
+     "label": "Defense IV"
+    }
+   ]
+  },
+  {
+   "id": "op-chatroux",
+   "name": "Chat Roux (Red Cat)",
+   "label": "Chat Roux (Red Cat) (Class II)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 14
+    },
+    {
+     "skill": "Brawling",
+     "target": 13
+    }
+   ],
+   "dodge": 12,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "dimensional sidearm, Class II, unarmed, Class I",
+   "weapons": [
+    "op-sidearm2",
+    "fists"
+   ],
+   "trait": "The mask",
+   "traitText": "On a natural 17 or 18 with Deception, the mask flickers. Without repairs from his own Earth, one day it will fail for good.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 1,
+     "label": "Defense I"
+    }
+   ]
+  },
+  {
+   "id": "op-vanguard",
+   "name": "Vanguard (\"Louis Feslen\")",
+   "label": "Vanguard (\"Louis Feslen\") (Class III)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Firearms",
+     "target": 16
+    },
+    {
+     "skill": "Brawling",
+     "target": 14
+    }
+   ],
+   "dodge": 12,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "a manifested firearm, Class III, martial arts, Class I",
+   "weapons": [
+    "op-manifest3",
+    "fists"
+   ],
+   "trait": "Seventeen kills",
+   "traitText": "Wanted on four continents. If the rumor is true, every target was a Shadow Earth duplicate, and he knows how to spot them.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 1,
+     "label": "Defense I"
+    }
+   ]
+  },
+  {
+   "id": "op-abd",
+   "name": "Abd al-Rahman",
+   "label": "Abd al-Rahman (Class IV)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 15
+    },
+    {
+     "skill": "Firearms",
+     "target": 13
+    }
+   ],
+   "dodge": 10,
+   "boxes": 5,
+   "boxesText": "5",
+   "weaponText": "Strength IV, rifle, Class I",
+   "weapons": [
+    "op-strength4",
+    "rifle"
+   ],
+   "trait": "Mercenary leader",
+   "traitText": "Never alone: four Morcain enforcers' worth of mercenaries. Once a fight, he Teleports out with one passenger.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 3,
+     "label": "Defense III"
+    }
+   ]
+  },
+  {
+   "id": "op-centurion",
+   "name": "The Golden Centurion",
+   "label": "The Golden Centurion (Class V)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 16
+    }
+   ],
+   "dodge": 11,
+   "boxes": 6,
+   "boxesText": "6",
+   "weaponText": "gladius and strength, Class IV",
+   "weapons": [
+    "op-weapon4"
+   ],
+   "trait": "Cannot die",
+   "traitText": "He clears a box every turn and comes back within an hour from anything, but he feels every wound. His code is iron: he never breaks his word, or forgives a broken one.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 4,
+     "label": "Defense IV"
+    }
+   ]
+  },
+  {
+   "id": "op-shadowknight",
+   "name": "The Shadow Knight (Grant Douglas)",
+   "label": "The Shadow Knight (Grant Douglas) (Class III)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 15
+    },
+    {
+     "skill": "Firearms",
+     "target": 14
+    }
+   ],
+   "dodge": 11,
+   "boxes": 5,
+   "boxesText": "5",
+   "weaponText": "consecrated blade, Class III, sidearm, Class I",
+   "weapons": [
+    "op-weapon3",
+    "pistol"
+   ],
+   "trait": "The Order",
+   "traitText": "He brings his specialists: two or three ExLAW-grade operatives. Lose the artifacts and he's a very good ex-Marine.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 2,
+     "label": "Defense II"
+    }
+   ]
+  },
+  {
+   "id": "op-marrow",
+   "name": "Lord Marrow (Altari Marrow)",
+   "label": "Lord Marrow (Altari Marrow) (Class III)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Powers",
+     "target": 15
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "a living nightmare, Class II; Will resists",
+   "weapons": [
+    "op-nightmare2"
+   ],
+   "trait": "Strong minds",
+   "traitText": "A character with Will 13 or more resists his illusions at +2. He studies his victims first: if he knows your fear, the nightmare is Class III.",
+   "traits": []
+  },
+  {
+   "id": "op-icereaper",
+   "name": "The Ice Reaper (Hyun Wang)",
+   "label": "The Ice Reaper (Hyun Wang) (Class IV)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 16
+    },
+    {
+     "skill": "Powers",
+     "target": 14
+    }
+   ],
+   "dodge": 11,
+   "boxes": 5,
+   "boxesText": "5",
+   "weaponText": "the Reaper's scythe of ice, Class IV, killing cold, Blast III",
+   "weapons": [
+    "op-weapon4",
+    "op-blast3"
+   ],
+   "trait": "Bloodthirsty spirit",
+   "traitText": "In the Reaper's form he must take a life before the scene ends, or mark Strain. One of the 12: harming him draws the Morcain.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 3,
+     "label": "Defense III"
+    }
+   ]
+  },
+  {
+   "id": "op-helios",
+   "name": "Helios (David Carlysle Jones)",
+   "label": "Helios (David Carlysle Jones) (Class V)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Powers",
+     "target": 16
+    },
+    {
+     "skill": "Brawling",
+     "target": 14
+    }
+   ],
+   "dodge": 11,
+   "boxes": 6,
+   "boxesText": "6",
+   "weaponText": "solar blast, Class V, Strength III",
+   "weapons": [
+    "op-blast5",
+    "op-strength3"
+   ],
+   "trait": "Sunlight",
+   "traitText": "Eight hours without sunlight (not moonlight or starlight) and every power drops to Class I until he's back in the sun.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 4,
+     "label": "Defense IV"
+    }
+   ]
+  },
+  {
+   "id": "op-zephyr",
+   "name": "Zephyr (Dr. Alemayehu Okafor)",
+   "label": "Zephyr (Dr. Alemayehu Okafor) (Class III)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Powers",
+     "target": 15
+    },
+    {
+     "skill": "Brawling",
+     "target": 13
+    }
+   ],
+   "dodge": 12,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "a hammer of wind, Class III, Strength II",
+   "weapons": [
+    "op-blast3",
+    "op-strength2"
+   ],
+   "trait": "Eco-saboteur",
+   "traitText": "Wanted in several countries. He spares workers and strikes machines; give him a polluter and he may become an ally.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 2,
+     "label": "Defense II"
+    }
+   ]
+  },
+  {
+   "id": "op-dark",
+   "name": "Evelyn Dark",
+   "label": "Evelyn Dark (Class V)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Powers",
+     "target": 16
+    }
+   ],
+   "dodge": 12,
+   "boxes": 4,
+   "boxesText": "4",
+   "weaponText": "raw energy, Class V",
+   "weapons": [
+    "op-blast5"
+   ],
+   "trait": "Unstable",
+   "traitText": "On a natural 17 or 18 with Powers, the power hits everyone nearby. Using a power above Class III draws Avalon's hunters (Scrutiny).",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 3,
+     "label": "Defense III"
+    }
+   ]
+  },
+  {
+   "id": "op-dubinsky",
+   "name": "Milon Dubinsky",
+   "label": "Milon Dubinsky (Class IV)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 17
+    }
+   ],
+   "dodge": 12,
+   "boxes": 6,
+   "boxesText": "6",
+   "weaponText": "claws and fangs, Class IV",
+   "weapons": [
+    "op-strength4"
+   ],
+   "trait": "The wolf-king",
+   "traitText": "Silver ignores his Defense and stops his Regeneration. He never fights without three Dubinsky werewolves, and can't take human form.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 3,
+     "label": "Defense III"
+    }
+   ]
+  },
+  {
+   "id": "op-tesla",
+   "name": "Nikola Tesla",
+   "label": "Nikola Tesla (Class VI)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Powers",
+     "target": 15
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "a lightning projector, Class IV",
+   "weapons": [
+    "op-blast4"
+   ],
+   "trait": "Not really here",
+   "traitText": "He arrives and leaves through a door from 1884 Ivry-sur-Seine. He has a way to trap the Atomic Man, and won't use it.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 4,
+     "label": "Defense IV"
+    }
+   ]
+  },
+  {
+   "id": "op-atomic",
+   "name": "The Atomic Man (Dr. Richard Kennedy)",
+   "label": "The Atomic Man (Dr. Richard Kennedy) (Class VI)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Powers",
+     "target": 17
+    },
+    {
+     "skill": "Brawling",
+     "target": 16
+    }
+   ],
+   "dodge": 13,
+   "boxes": 8,
+   "boxesText": "8",
+   "weaponText": "nuclear force, Class VI, Strength VI",
+   "weapons": [
+    "op-blast6",
+    "op-strength6"
+   ],
+   "trait": "Protector",
+   "traitText": "He won't risk a civilian, ever: put one in the line of fire and he stops. Only Grachyov has fought him to a draw.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 6,
+     "label": "Defense VI"
+    },
+    {
+     "type": "extraDefense",
+     "value": 1,
+     "label": "The Atomic Man (Dr. Richard Kennedy): quick"
+    }
+   ]
+  },
+  {
+   "id": "op-grachyov",
+   "name": "Sergei Grachyov",
+   "label": "Sergei Grachyov (Class V)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Brawling",
+     "target": 17
+    }
+   ],
+   "dodge": 10,
+   "boxes": 7,
+   "boxesText": "7",
+   "weaponText": "Strength V",
+   "weapons": [
+    "op-strength5"
+   ],
+   "trait": "It never sticks",
+   "traitText": "Reported dead several times. He's come for someone, never for a fight: hand over the escapee and he leaves.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 5,
+     "label": "Defense V"
+    }
+   ]
+  },
+  {
+   "id": "op-uathach",
+   "name": "Uathach (Ciara Byrne)",
+   "label": "Uathach (Ciara Byrne) (Class IV)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Melee",
+     "target": 16
+    },
+    {
+     "skill": "Powers",
+     "target": 14
+    }
+   ],
+   "dodge": 12,
+   "boxes": 5,
+   "boxesText": "5",
+   "weaponText": "the goddess's spear, Class IV, hand of red flame, Blast III",
+   "weapons": [
+    "op-weapon4",
+    "op-blast3"
+   ],
+   "trait": "Shared mind",
+   "traitText": "The goddess is bloodthirsty: sparing a beaten enemy takes a Will roll. Ciara can't change back until the fight ends.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 3,
+     "label": "Defense III"
+    }
+   ]
+  },
+  {
+   "id": "op-magus",
+   "name": "The Ragged Magus (Dr. Elias Marron)",
+   "label": "The Ragged Magus (Dr. Elias Marron) (Class IV)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Powers",
+     "target": 14
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "a crown of burning letters, Class III",
+   "weapons": [
+    "op-blast3"
+   ],
+   "trait": "Part prophet, part danger",
+   "traitText": "His ramblings hold a real clue each scene (a Read People or Occult roll to make sense of it). Threaten him and every pigeon in the tunnel answers.",
+   "traits": []
+  },
+  {
+   "id": "op-autuarch",
+   "name": "Autuarch",
+   "label": "Autuarch (Class VI)",
+   "minor": false,
+   "named": true,
+   "attacks": [
+    {
+     "skill": "Powers",
+     "target": 17
+    }
+   ],
+   "dodge": 12,
+   "boxes": 8,
+   "boxesText": "8",
+   "weaponText": "will made force, Class VI",
+   "weapons": [
+    "op-blast6"
+   ],
+   "trait": "Master of the White Hand",
+   "traitText": "Never met alone: White Hand soldiers die for him without a word. He has escaped ExLAW three times; he always has a door open behind him.",
+   "traits": [
+    {
+     "type": "defenseClass",
+     "value": 5,
+     "label": "Defense V"
+    },
+    {
+     "type": "extraDefense",
+     "value": 1,
+     "label": "Autuarch: quick"
     }
    ]
   }
