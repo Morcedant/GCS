@@ -142,6 +142,8 @@ function cpTables() {
 }
 function cpPick(list, rnd) { return list.length ? list[Math.floor(rnd() * list.length)] : ""; }
 function cpCap(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
+/** The first letter in lower case, for a phrase in the middle of a sentence: names (Vulcan, Klingon) keep their capitals. */
+function cpLow(s) { return s ? s[0].toLowerCase() + s.slice(1) : s; }
 function cpName(PACK, rnd) {
   const n = (PACK.campaign && PACK.campaign.names) || {};
   return [cpPick(n.first || [], rnd), cpPick(n.last || [], rnd)].filter(Boolean).join(" ");
@@ -158,7 +160,8 @@ function cpRoll(PACK, kind, c, rnd = Math.random) {
   const threats = (PACK.threats || []).filter((t) => !t.minor).map((t) => t.name);
   if (kind === "people") {
     // Who they are: one of the setting's key characters (or, now and then, one of its roles); how they come across.
-    const role = rnd() < 0.75 ? cpSeed(PACK, "who", rnd) : `A ${cpPick((PACK.roles || []).map((r) => r.name.toLowerCase()), rnd)}`;
+    const job = cpPick((PACK.roles || []).map((r) => cpLow(r.name)), rnd);
+    const role = rnd() < 0.75 || !job ? cpSeed(PACK, "who", rnd) : `${/^[aeiou]/.test(job) ? "An" : "A"} ${job}`;
     return { name: cpName(PACK, rnd), role, faction: rnd() < 0.6 ? cpPick(factionNames, rnd) : "", desc: `${cpPick(T.manner, rnd)}.`,
       goal: cpCap(cpPick(T.want, rnd)), secret: cpPick(T.secret, rnd) };
   }
@@ -171,9 +174,9 @@ function cpRoll(PACK, kind, c, rnd = Math.random) {
   if (kind === "sessions") {
     const who = cpSeed(PACK, "who", rnd), place = cpSeed(PACK, "place", rnd);
     return { title: cpSeed(PACK, "mission", rnd), date: "",
-      scenes: `1. The hook: ${who.toLowerCase()} brings the trouble.\n2. ${place}: ${cpPick(T.feature, rnd).toLowerCase()}\n3. ${cpSeed(PACK, "strange", rnd)}.\n4. The twist: ${cpSeed(PACK, "twist", rnd)}.`,
+      scenes: `1. The hook: ${cpLow(who)} brings the trouble.\n2. ${place}: ${cpLow(cpPick(T.feature, rnd))}\n3. ${cpSeed(PACK, "strange", rnd)}.\n4. The twist: ${cpSeed(PACK, "twist", rnd)}.`,
       threats: [...new Set([cpPick(threats, rnd), cpPick(threats, rnd)].filter(Boolean))].join(", ") + (threats.length ? "\n" : "") + `Clock: ${cpSeed(PACK, "clock", rnd)}.`,
-      clues: `${cpPick(T.secret, rnd)} (${who.toLowerCase()})\n${cpPick(T.feature, rnd)} (${place.toLowerCase()})`, rewards: cpPick(T.reward, rnd), log: "", recap: "" };
+      clues: `${cpPick(T.secret, rnd)} (${cpLow(who)})\n${cpPick(T.feature, rnd)} (${cpLow(place)})`, rewards: cpPick(T.reward, rnd), log: "", recap: "" };
   }
   return {};
 }

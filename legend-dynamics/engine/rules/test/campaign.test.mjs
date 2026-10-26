@@ -48,7 +48,7 @@ test("the generators roll from each setting's own tables, ready to change", () =
     const P = pack(id), c = CP.cpClean(null);
     const person = CP.cpRoll(P, "people", c, seq(0.1, 0.5, 0.9, 0.3, 0.7));
     assert.ok(person.name.split(" ").length >= 2 && P.campaign.names.first.includes(person.name.split(" ")[0]), id + ": a name from the setting");
-    assert.ok(P.seeds.who[1].includes(person.role) || P.roles.some((r) => person.role === "A " + r.name.toLowerCase()), id + ": who they are, from the setting");
+    assert.ok(P.seeds.who[1].includes(person.role) || P.roles.some((r) => person.role === (/^[aeiou]/i.test(r.name) ? "An " : "A ") + r.name[0].toLowerCase() + r.name.slice(1)), id + ": who they are, from the setting");
     assert.ok(person.desc && person.goal && person.secret);
     const place = CP.cpRoll(P, "places", c, seq(0.2, 0.6));
     assert.ok(P.seeds.place[1].includes(place.name));
