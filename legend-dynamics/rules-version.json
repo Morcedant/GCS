@@ -4,6 +4,15 @@
   "rulesUpdated": "2026-10-21",
   "changes": [
     {
+      "date": "2026-10-26",
+      "kind": "setting",
+      "title": "Aurora: stats for every named character",
+      "items": [
+        "Every Notable Operant in Aurora's GM's Guide now has a stat block: Class, attacks, Dodge, boxes, Defense, powers, skills and what makes them who they are at the table. Autuarch, master of the White Hand, gets an entry of his own.",
+        "All 22 are in the GM view, in the Encounter panel and on the battle map, under their name and Class. Their Defense works as the rules say: an attack below it does nothing, one equal to it marks a box fewer."
+      ]
+    },
+    {
       "date": "2026-10-25",
       "kind": "site",
       "title": "The campaign builder, with card triggers",
