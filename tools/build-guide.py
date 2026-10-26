@@ -62,6 +62,11 @@ def main():
     if "/* HOMEBREW:START */" in app:
         hb = (ROOT / a.game / "homebrew.js").read_text().replace("</", "<\\/")
         app = re.sub(r"/\* HOMEBREW:START \*/.*?/\* HOMEBREW:END \*/", lambda _: "/* HOMEBREW:START */\n" + hb + "/* HOMEBREW:END */", app, flags=re.S)
+    # A page with CAMPAIGN markers gets the campaign builder (<game>/campaign.js, a copy of
+    # legend-dynamics/engine/campaign.js on the claude/legend-dynamics branch).
+    if "/* CAMPAIGN:START */" in app:
+        cp = (ROOT / a.game / "campaign.js").read_text().replace("</", "<\\/")
+        app = re.sub(r"/\* CAMPAIGN:START \*/.*?/\* CAMPAIGN:END \*/", lambda _: "/* CAMPAIGN:START */\n" + cp + "/* CAMPAIGN:END */", app, flags=re.S)
     app = stamp(app, APP)  # the version footer: a fingerprint of the page, and the day it last changed
     APP.write_text(app)
     print(f"updated {APP.relative_to(ROOT)}")
