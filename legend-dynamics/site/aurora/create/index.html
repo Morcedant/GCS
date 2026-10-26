@@ -632,7 +632,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="540742d" data-version-date="2026.10.26" title="The code changes whenever this page changes.">Version 2026.10.26 · 540742d</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="527374d" data-version-date="2026.10.26" title="The code changes whenever this page changes.">Version 2026.10.26 · 527374d</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -10854,7 +10854,8 @@ function mountHomebrew(api) {
 //
 // mountCampaign(api) with api: { PACK, gmRoot (the GM view's Campaign card), noteRoot (a card on the play tab for what
 //   the GM shares), esc, toast, saveText(text, name, say), onShare() (the shared part changed: send it),
-//   cards() (the cards the group holds: [{ tag, name }]), words ({ card, cards }: the setting's word for a card) }
+//   cards() (the cards the group holds: [{ tag, name }]; leave it out in a game without cards, and the outline has no
+//   triggers), words ({ card, cards }: the setting's word for a card) }
 // returns { snapshot() (what the shared table sends players, or null), receive(shared), check() (look at the cards again) }.
 // Function declarations only.
 
@@ -11030,6 +11031,7 @@ function cpRollPremise(PACK, rnd = Math.random) {
 function mountCampaign(api) {
   const { PACK, esc } = api, say = (m, err) => (api.toast ? api.toast(m, err) : null);
   const F = cpFields(), S = cpStatuses(), W = api.words || { card: "card", cards: "cards" };
+  const TRIGGERS = typeof api.cards === "function"; // a game with cards: steps of the outline can wait for them
   const groupCards = () => { try { return api.cards ? api.cards() || [] : []; } catch { return []; } };
   const subjects = ((PACK.discovery && PACK.discovery.subjects) || []).map((x) => x[1]).filter(Boolean);
   let c = cpLoad(PACK), editing = null, draft = null, received = null; // editing: [kind, id or "new"]; draft: a rolled entry being changed
@@ -11045,7 +11047,7 @@ function mountCampaign(api) {
     const x = draft || (editing[1] === "new" ? {} : c[kind].find((y) => y.id === editing[1]) || {});
     const trig = (f) => /^unlock/.test(f[0]);
     return `<form data-cpform="${kind}" class="fields cp-form">${F[kind].filter((f) => !trig(f)).map((f) => field(kind, x, f)).join("")}
-      ${kind === "arc" ? `<fieldset class="field wide cp-trigger"><legend class="label">Trigger: unlock this step with ${esc(W.cards)}<\/legend>
+      ${kind === "arc" && TRIGGERS ? `<fieldset class="field wide cp-trigger"><legend class="label">Trigger: unlock this step with ${esc(W.cards)}<\/legend>
         <p class="small muted">The step stays locked until the group holds ${esc(W.cards)} about every subject listed, and at least the number asked for. Then it unlocks for good and tells you what happens. Leave both empty for no trigger.<\/p>
         <div class="fields">
         <div class="field wide"><label>${esc(W.cards[0].toUpperCase() + W.cards.slice(1))} about (a comma between subjects)<\/label><input type="text" name="unlockCards" maxlength="300" value="${esc(x.unlockCards || "")}" list="cp-subjects" placeholder="${esc(subjects.slice(0, 2).join(", ") || "e.g. the cult, the drowned god")}"><\/div>
@@ -11117,7 +11119,7 @@ function mountCampaign(api) {
     const v = (n) => (f.elements[n] ? f.elements[n].value : "");
     const e = Object.fromEntries(F[kind].map(([n]) => [n, v(n)]));
     if (S[kind]) e.status = v("status");
-    if (kind === "arc") { e.unlockCount = v("unlockCount"); e.unlockHint = !!(f.elements.unlockHint && f.elements.unlockHint.checked); }
+    if (kind === "arc" && TRIGGERS) { e.unlockCount = v("unlockCount"); e.unlockHint = !!(f.elements.unlockHint && f.elements.unlockHint.checked); }
     e.shared = !!(f.elements.shared && f.elements.shared.checked);
     return e;
   };
@@ -11174,6 +11176,7 @@ function mountCampaign(api) {
   }
   /** Fire any trigger the group's cards now meet: the step unlocks for good, and the GM is told what happens. */
   function check() {
+    if (!TRIGGERS) { if (!editing) render(); return; }
     const cards = groupCards(), fired = c.arc.filter((x) => !x.unlocked && cpHasTrigger(x) && cpTrigger(x, cards).met);
     if (!fired.length) { if (!editing) render(); return; } // no re-render under a form being filled in
     for (const x of fired) x.unlocked = true;
