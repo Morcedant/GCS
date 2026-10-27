@@ -66,25 +66,21 @@
   "party": "team"
  },
  "theme": {
-  "comment": "An ExLAW case terminal at night: blue-black glass, federal-blue rules, hazard-amber highlights, and the green of the 1938 auroras drifting up behind it.",
-  "css": "--space: #070a10; --glass: rgba(14, 20, 32, .86); --glass-hi: rgba(22, 32, 50, .9); --well: rgba(4, 7, 12, .74); --fg: #e8ecf2; --muted: #8f9bb0; --line: rgba(120, 160, 220, .22); --chrome: #7fb2ff; --chrome-dim: rgba(127, 178, 255, .55); --gold: #ffc23d; --blue: #4d8dff; --red: #ff4d4d; --good: #4fd18b; --bad: #ff5c5c; --warn: #ffb02e; --on-accent: #0a0d12; --display: \"Saira Condensed\", \"Arial Narrow\", sans-serif; --title: \"Saira Extra Condensed\", \"Saira Condensed\", \"Arial Narrow\", sans-serif; --body: \"IBM Plex Sans\", \"Segoe UI\", system-ui, sans-serif; --mono: \"IBM Plex Mono\", ui-monospace, monospace; --numbers: \"IBM Plex Mono\", ui-monospace, monospace; --radius: 6px;",
-  "glow": "127, 178, 255",
-  "line": "120, 160, 220",
-  "highlight": "190, 215, 255",
-  "wash1": "40, 90, 200, .22",
-  "wash2": "40, 200, 140, .14",
-  "optionBg": "#0e1420",
-  "barBg": "8, 12, 20, .95",
-  "text2": "#cfd7e4",
-  "goodRgb": "79, 209, 139",
-  "badRgb": "255, 92, 92",
-  "placeholder": "rgba(143, 155, 176, .6)",
-  "particles": {
-   "direction": "up",
-   "rgb": "120, 255, 200",
-   "density": 9000,
-   "alpha": 0.5
-  }
+  "comment": "Aurora, plain: a case file from 2025, like the game's page on the site.",
+  "css": "--space: #eceee9; --glass: #f7f8f5; --glass-hi: #fbfcfa; --well: #ffffff; --fg: #15181c; --muted: #50565e; --line: rgba(21, 24, 28, .2); --chrome: #0f6b5c; --chrome-dim: rgba(15, 107, 92, .55); --gold: #0f6b5c; --blue: #2f5aa0; --red: #b0302a; --good: #237a4b; --bad: #b0302a; --warn: #9a6a0e; --on-accent: #f7f8f5; --display: \"Saira Condensed\", \"Arial Narrow\", sans-serif; --title: \"Saira Extra Condensed\", \"Saira Condensed\", \"Arial Narrow\", sans-serif; --body: \"IBM Plex Sans\", \"Segoe UI\", system-ui, sans-serif; --mono: \"IBM Plex Sans\", \"Segoe UI\", system-ui, sans-serif; --numbers: \"IBM Plex Mono\", ui-monospace, monospace; --radius: 4px;",
+  "glow": "15, 107, 92",
+  "line": "21, 24, 28",
+  "highlight": "255, 255, 255",
+  "wash1": "0, 0, 0, 0",
+  "wash2": "0, 0, 0, 0",
+  "optionBg": "#f7f8f5",
+  "barBg": "236, 238, 233, .97",
+  "text2": "#2e343b",
+  "goodRgb": "35, 122, 75",
+  "badRgb": "176, 48, 42",
+  "placeholder": "rgba(80, 86, 94, .6)",
+  "particles": null,
+  "plain": true
  },
  "docxColors": [
   "14213D",

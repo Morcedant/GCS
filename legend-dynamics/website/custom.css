@@ -363,7 +363,15 @@ html.ld-site .ld-pillars li > b { font: 700 1.15rem/1.2 var(--ld-body); }
 html.ld-site .ld-pillars span b { color: var(--ld-ink); }
 html.ld-site .ld-game { box-shadow: none; border-radius: var(--ld-radius); }
 html.ld-site .ld-game:hover { transform: none; box-shadow: none; outline: 2px solid var(--ld-gold); }
-html.ld-site .ld-game .ld-eyebrow { color: var(--c-acc); } /* each game's label in its own color, readable on its card */
+html.ld-site .ld-game .ld-eyebrow { color: var(--c-acc); }
+/* Each game's card in its page's plain colors: the paper, ink and accent the card leads to. */
+html.ld-site .ld-game { border: 1px solid var(--ld-line); }
+html.ld-site .ld-game::before { display: none; }
+html.ld-site .ld-game--western { --c-bg: #ece2cc; --c-fg: #1e1914; --c-mute: #4f453b; --c-acc: #7d1612; }
+html.ld-site .ld-game--spaceopera { --c-bg: #e6eaee; --c-fg: #142033; --c-mute: #46546a; --c-acc: #1f5fa8; }
+html.ld-site .ld-game--fantasy { --c-bg: #efe6d3; --c-fg: #221e18; --c-mute: #524a3e; --c-acc: #2f5a3a; }
+html.ld-site .ld-game--aurora { --c-bg: #eceee9; --c-fg: #15181c; --c-mute: #4a5058; --c-acc: #0f6b5c; }
+html.ld-site .ld-game p strong, html.ld-site .ld-game p b { color: var(--c-fg) !important; } /* each game's label in its own color, readable on its card */
 html.ld-site .ld-game .ld-tag, html.ld-site .ld-game .ld-go { font-family: var(--ld-body); letter-spacing: 0; text-transform: none; }
 html.ld-site .ld-callout { border: 1px solid var(--ld-line); border-left: 3px solid var(--ld-accent); background: var(--ld-panel); box-shadow: none; }
 html.ld-site .ld-callout > b:first-child { font: 700 1.05rem/1.2 var(--ld-body); letter-spacing: 0; text-transform: none; color: var(--ld-accent); }
@@ -525,3 +533,52 @@ html.ld-fantasy .ld-steps li::before { background: var(--ld-accent); color: var(
 html.ld-fantasy .ld-steps b { font-family: var(--ld-body); font-weight: 700; }
 html.ld-fantasy .ld-callout { border: 1px solid var(--ld-line); border-left: 3px solid var(--ld-accent); background: var(--ld-panel); box-shadow: none; }
 html.ld-fantasy .ld-rules th { font-family: var(--ld-body); letter-spacing: 0; text-transform: none; color: var(--ld-ink); border-bottom-color: var(--ld-accent); }
+
+/* =========================================================================
+   9. Aurora, in the same plain hobby style: a case file from 2025. Crisp
+   off-white paper, near-black ink, aurora green, a hero-yellow rule. Colors
+   and background only; the game's own fonts.
+   ========================================================================= */
+html.ld-aurora {
+  --ld-bg: #eceee9; --ld-bg-2: #e2e5df; --ld-panel: #f7f8f5;
+  --ld-ink: #15181c; --ld-ink-2: #4a5058; --ld-line: rgba(21, 24, 28, .2);
+  --ld-accent: #0f6b5c;        /* aurora green */
+  --ld-accent-2: #e0a81e;      /* hero yellow */
+  --ld-on-accent: #f7f8f5;
+  --ld-header-bg: #15181c; --ld-header-fg: #eceee9;
+  --ld-label: "IBM Plex Sans", system-ui, sans-serif; --ld-mono: "IBM Plex Sans", system-ui, sans-serif;
+  --ld-radius: 3px;
+  --ld-shadow: none;
+}
+html.ld-aurora body {
+  background-color: var(--ld-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .12 0 0 0 0 .12 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+html.ld-aurora .page-section .section-background { background: transparent !important; }
+html.ld-aurora .page-section:nth-of-type(even) .section-background { background: rgba(15, 107, 92, .06) !important; }
+html.ld-aurora .ld-header { border-bottom: 3px solid var(--ld-accent-2); }
+html.ld-aurora .ld-footer { border-top: 3px solid var(--ld-accent-2); }
+html.ld-aurora .ld-nav a { font: 500 .95rem/1 var(--ld-body); letter-spacing: 0; text-transform: none; }
+html.ld-aurora .ld-nav a:hover, html.ld-aurora .ld-nav a[aria-current="page"] { border-bottom-color: var(--ld-accent-2); }
+html.ld-aurora .ld-footer a { color: var(--ld-header-fg); }
+
+html.ld-aurora .ld-eyebrow { font: 600 .95rem/1.2 var(--ld-body); letter-spacing: 0; text-transform: none; color: var(--ld-accent); }
+html.ld-aurora .ld-hero h1 { font-size: clamp(2.4rem, 6vw, 4rem); line-height: 1; color: var(--ld-ink); }
+html.ld-aurora .ld-hero .ld-rule { width: 5rem; height: 3px; background: var(--ld-accent-2); }
+html.ld-aurora .ld-hero .ld-lede { color: var(--ld-ink-2); }
+html.ld-aurora .ld a, html.ld-aurora p a { color: var(--ld-accent); }
+
+html.ld-aurora .ld-button { font: 600 1rem/1 var(--ld-body); letter-spacing: 0; text-transform: none; padding: .75rem 1.1rem; background: var(--ld-accent); border-color: var(--ld-accent); color: var(--ld-on-accent) !important; }
+html.ld-aurora .ld-button:hover { transform: none; box-shadow: none; background: #0b5246; }
+html.ld-aurora .ld-button--ghost { background: transparent; color: var(--ld-ink) !important; border: 1px solid var(--ld-ink-2); }
+html.ld-aurora .ld-button--ghost:hover { background: rgba(15, 107, 92, .07); color: var(--ld-accent) !important; border-color: var(--ld-accent); }
+
+html.ld-aurora .ld-facts { box-shadow: none; }
+html.ld-aurora .ld-facts dt { font: 500 .85rem/1.2 var(--ld-body); letter-spacing: 0; text-transform: none; color: var(--ld-ink-2); }
+html.ld-aurora .ld-facts dd { font: 600 1.05rem/1.3 var(--ld-body); }
+html.ld-aurora .ld-pillars li { border-top: 2px solid var(--ld-accent); }
+html.ld-aurora .ld-pillars li > b { font: 700 1.4rem/1.1 var(--ld-display); }
+html.ld-aurora .ld-steps li::before { background: var(--ld-accent); color: var(--ld-on-accent); font: 700 1rem/1 var(--ld-body); }
+html.ld-aurora .ld-steps b { font-family: var(--ld-body); font-weight: 600; }
+html.ld-aurora .ld-callout { border: 1px solid var(--ld-line); border-left: 3px solid var(--ld-accent); background: var(--ld-panel); box-shadow: none; }
+html.ld-aurora .ld-rules th { font-family: var(--ld-body); letter-spacing: 0; text-transform: none; color: var(--ld-ink); border-bottom-color: var(--ld-accent); }
