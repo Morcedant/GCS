@@ -45,7 +45,7 @@ TABLE_ACCESS_REQUESTS = False
 TABLE_HOSTING = False
 CHANGELOG_SLUG = "/changelog"
 
-BRAND_FONTS = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
+BRAND_FONTS = "https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&family=Alegreya:ital,wght@0,400;0,600;0,700;1,400&family=Alegreya+Sans+SC:wght@500;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
 
 e = html.escape
 

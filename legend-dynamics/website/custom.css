@@ -196,7 +196,7 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 /* Pillars: three short points under the hero */
 .ld-pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.25rem; margin: 0; padding: 0; list-style: none; }
 .ld-pillars li { border-top: 2px solid var(--ld-accent); padding-top: 1rem; margin: 0; }
-.ld-pillars b { display: block; font: 600 1.15rem/1.2 var(--ld-label); margin-bottom: .35rem; color: var(--ld-ink); }
+.ld-pillars li > b { display: block; font: 600 1.15rem/1.2 var(--ld-label); margin-bottom: .35rem; color: var(--ld-ink); }
 .ld-pillars span { color: var(--ld-ink-2); }
 
 /* Game cards: each card carries its own game's colors, even on the brand pages */
@@ -306,3 +306,75 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 /* The playtest label (the Cloudflare site puts it above every page's header) */
 .ld-playtest { background: #f4c542; color: #1b1406; text-align: center; padding: .55rem 16px; font: 600 .92rem/1.4 var(--ld-body, Georgia, serif); }
 .ld-playtest-tag { display: inline-block; margin-right: .5rem; padding: .05rem .5rem; border-radius: 4px; background: #1b1406; color: #f4c542; font: 600 .74rem var(--ld-label, monospace); letter-spacing: .14em; text-transform: uppercase; vertical-align: .08em; }
+
+/* =========================================================================
+   5. The hobby look: the brand pages (html.ld-site: everything but the four
+   game pages, which keep their own themes). Kept plain on purpose, like a
+   fan's game site: parchment, ink, red and a little gold; no ornaments.
+   ========================================================================= */
+html.ld-site {
+  --ld-bg: #f3e3bf; --ld-bg-2: #ecd7ab; --ld-panel: #fbf1d9;
+  --ld-ink: #2b1d14; --ld-ink-2: #5c4433; --ld-line: rgba(74, 44, 24, .25);
+  --ld-accent: #a3261a;        /* red */
+  --ld-accent-2: #7b4a12;
+  --ld-gold: #b8862a;
+  --ld-on-accent: #fff4dc;
+  --ld-header-bg: #4a1a12; --ld-header-fg: #f6e3b4;
+  --ld-display: "Almendra", "Fraunces", Georgia, serif;
+  --ld-body: "Alegreya", "Source Serif 4", Georgia, serif;
+  --ld-label: "Alegreya", "Source Serif 4", Georgia, serif;
+  --ld-mono: "Alegreya", "Source Serif 4", Georgia, serif;
+  --ld-radius: 4px;
+  --ld-shadow: none;
+}
+/* The background: parchment, with a faint paper grain */
+html.ld-site body {
+  background-color: var(--ld-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .18 0 0 0 0 .08 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+html.ld-site .page-section .section-background { background: transparent !important; }
+html.ld-site .page-section:nth-of-type(even) .section-background { background: rgba(184, 134, 42, .1) !important; }
+html.ld-site h1, html.ld-site h2 { font-weight: 700; letter-spacing: 0; }
+
+/* Header and footer: plain dark red, a gold rule */
+html.ld-site .ld-header, html.ld-site .ld-footer { background: var(--ld-header-bg); }
+html.ld-site .ld-header { border-bottom: 2px solid var(--ld-gold); }
+html.ld-site .ld-footer { border-top: 2px solid var(--ld-gold); }
+html.ld-site .ld-brand { font: 700 1.35rem/1 var(--ld-display); color: #f2cf73; }
+html.ld-site .ld-nav a { font: 600 .95rem/1 var(--ld-body); letter-spacing: 0; text-transform: none; }
+html.ld-site .ld-nav a:hover, html.ld-site .ld-nav a[aria-current="page"] { border-bottom-color: #f2cf73; }
+html.ld-site .ld-footer a { color: #f2cf73; }
+
+/* Text: plain headings, red small headings and links */
+html.ld-site .ld-eyebrow { font: 600 .95rem/1.2 var(--ld-body); letter-spacing: 0; text-transform: none; color: var(--ld-accent); }
+html.ld-site .ld-hero h1 { font-size: clamp(1.9rem, 4.6vw, 3rem); line-height: 1.08; }
+html.ld-site .ld-hero .ld-rule { width: 5rem; height: 2px; background: var(--ld-accent); }
+html.ld-site .ld a, html.ld-site p a { color: var(--ld-accent); }
+
+/* Buttons: plain red, or a plain outline */
+html.ld-site .ld-button { font: 600 1rem/1 var(--ld-body); letter-spacing: 0; text-transform: none; padding: .75rem 1.1rem; background: var(--ld-accent); border-color: var(--ld-accent); }
+html.ld-site .ld-button:hover { transform: none; box-shadow: none; background: #8a1f15; }
+html.ld-site .ld-button--ghost { background: transparent; color: var(--ld-ink) !important; border: 1px solid var(--ld-ink-2); }
+html.ld-site .ld-button--ghost:hover { background: rgba(163, 38, 26, .08); color: var(--ld-accent) !important; border-color: var(--ld-accent); }
+
+/* Boxes: a thin line and the lighter parchment, nothing more */
+html.ld-site .ld-pillars li { border-top: 2px solid var(--ld-accent); }
+html.ld-site .ld-pillars li > b { font: 700 1.15rem/1.2 var(--ld-body); }
+html.ld-site .ld-pillars span b { color: var(--ld-ink); }
+html.ld-site .ld-game { box-shadow: none; border-radius: var(--ld-radius); }
+html.ld-site .ld-game:hover { transform: none; box-shadow: none; outline: 2px solid var(--ld-gold); }
+html.ld-site .ld-game .ld-eyebrow { color: var(--c-acc); } /* each game's label in its own color, readable on its card */
+html.ld-site .ld-game .ld-tag, html.ld-site .ld-game .ld-go { font-family: var(--ld-body); letter-spacing: 0; text-transform: none; }
+html.ld-site .ld-callout { border: 1px solid var(--ld-line); border-left: 3px solid var(--ld-accent); background: var(--ld-panel); box-shadow: none; }
+html.ld-site .ld-callout > b:first-child { font: 700 1.05rem/1.2 var(--ld-body); letter-spacing: 0; text-transform: none; color: var(--ld-accent); }
+html.ld-site .ld-odds > div { background: var(--ld-panel); }
+html.ld-site .ld-odds b { color: var(--ld-ink); }
+html.ld-site .ld-odds span, html.ld-site .ld-facts dt, html.ld-site .ld-rules th { font-family: var(--ld-body); letter-spacing: 0; text-transform: none; }
+html.ld-site .ld-odds .ld-bar { background: linear-gradient(90deg, var(--ld-accent) var(--p), var(--ld-line) var(--p)); }
+html.ld-site .ld-steps li::before { background: var(--ld-accent); font-family: var(--ld-body); }
+html.ld-site .ld-tag { font-family: var(--ld-body); letter-spacing: 0; }
+html.ld-site #online { margin-top: 2.5rem; }
+
+/* The playtest label */
+html.ld-site .ld-playtest { background: #f2cf73; color: #3a1610; }
+html.ld-site .ld-playtest-tag { background: var(--ld-accent); color: #fff4dc; font-family: var(--ld-body); letter-spacing: .04em; }
