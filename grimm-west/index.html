@@ -580,6 +580,43 @@ tr.lvl-U td.target { color: var(--muted); }
 /* Numbers in the book serif with even, aligned figures; the small-caps label face keeps old-style figures. */
 .num, .attr .val, .stat b, td.target, td.pct, .skill-line b, .attr-strip b, .duty .count, .die, .gm-stats b, .gm-duty b, .log, .verdict + p, .clock .kind {
   font-family: "EB Garamond", Garamond, Georgia, serif; font-variant-numeric: lining-nums tabular-nums; }
+/* The plain hobby look, like the other games' pages: built in by tools/build-guide.py from plain-theme.css. */
+/* PLAIN:START */
+/* The plain look (a theme with "plain": true): the creator in the same hobby style as the game's page on the site.
+   Light paper, ink and one accent from the theme's colors; no glows, shadows, corner brackets or drifting particles. */
+:root { color-scheme: light; }
+html { background: var(--space); }
+body { background: var(--space) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .15 0 0 0 0 .1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+#embers { display: none; }
+/* No glows or drop shadows anywhere; a pop-up keeps a plain border to stand out instead. */
+body * { text-shadow: none !important; box-shadow: none !important; }
+.delta, .badge, svg { filter: none !important; }
+#help-pop, .popover, [role="dialog"] { border: 1px solid var(--chrome-dim) !important; }
+/* Sentence case: no spaced-out capitals in labels, tabs, steps or buttons. Text people type is left alone. */
+body *:not(input):not(textarea):not(select) { text-transform: none !important; letter-spacing: normal !important; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.1rem; }
+.hud { backdrop-filter: none; box-shadow: none; }
+.hud::before, .hud::after { display: none; }
+.scanbar { height: 2px; background: var(--accent); }
+.btn { font-weight: 600; }
+.guide strong { color: var(--fg); }
+/* PLAIN:END */
+/* Grimm, plain: a Grimm's journal on pale grey-green paper, black ink, deep wine, a pewter rule. The groups keep
+   their colors (the Law pewter, the Learned verdigris, the Frontier blood red) in shades that read on paper. */
+:root {
+  --space: #e7e7df; --glass: #f4f4ef; --glass-hi: #fafaf6; --well: #ffffff;
+  --fg: #1a1a18; --muted: #4f514c; --line: rgba(26, 26, 24, .2);
+  --chrome: #5e1f3a; --chrome-dim: rgba(94, 31, 58, .55);
+  --gold: #4c5a5e; --blue: #2f6b5e; --red: #8f2a24;
+  --good: #2e6b3f; --bad: #8f2a24; --warn: #85600f; --on-accent: #f4f4ef;
+  --display: "EB Garamond", Garamond, Georgia, serif; --mono: "EB Garamond", Garamond, Georgia, serif; --numbers: "EB Garamond", Garamond, Georgia, serif;
+  --radius: 4px;
+}
+select option, select optgroup { background: var(--glass); color: var(--fg); }
+::placeholder { color: rgba(79, 81, 76, .6); }
+.trait-desc, .ref dd, .gm-skills { color: var(--fg); }
+.masthead { border-bottom: 2px solid #8a8f8c; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -606,7 +643,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="34a612b" data-version-date="2026.10.26" title="The code changes whenever this page changes.">Version 2026.10.26 · 34a612b</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="818574e" data-version-date="2026.10.27" title="The code changes whenever this page changes.">Version 2026.10.27 · 818574e</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
