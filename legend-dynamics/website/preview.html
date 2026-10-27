@@ -485,6 +485,55 @@ html.ld-spaceopera .ld-steps b { font-family: var(--ld-body); font-weight: 700; 
 html.ld-spaceopera .ld-callout { border: 1px solid var(--ld-line); border-left: 3px solid var(--ld-accent); background: var(--ld-panel); box-shadow: none; }
 html.ld-spaceopera .ld-rules th { font-family: var(--ld-body); letter-spacing: 0; text-transform: none; color: var(--ld-ink); border-bottom-color: var(--ld-accent); }
 
+/* =========================================================================
+   8. The Shattered Crown, in the same plain hobby style: an illuminated
+   manuscript. Warm vellum, dark ink, deep forest green, a tarnished-gold
+   rule. Colors and background only; the game's own fonts.
+   ========================================================================= */
+html.ld-fantasy {
+  --ld-bg: #efe6d3; --ld-bg-2: #e6dbc3; --ld-panel: #f7f1e4;
+  --ld-ink: #221e18; --ld-ink-2: #524a3e; --ld-line: rgba(34, 30, 24, .22);
+  --ld-accent: #2f5a3a;        /* forest green */
+  --ld-accent-2: #a07a2c;      /* tarnished gold */
+  --ld-on-accent: #f7f1e4;
+  --ld-header-bg: #221e18; --ld-header-fg: #efe6d3;
+  --ld-label: "Cormorant Garamond", Garamond, Georgia, serif; --ld-mono: "Cormorant Garamond", Garamond, Georgia, serif;
+  --ld-radius: 3px;
+  --ld-shadow: none;
+}
+html.ld-fantasy body {
+  background-color: var(--ld-bg); font-size: 1.06rem; font-weight: 500;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .22 0 0 0 0 .17 0 0 0 0 .1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+html.ld-fantasy .page-section .section-background { background: transparent !important; }
+html.ld-fantasy .page-section:nth-of-type(even) .section-background { background: rgba(47, 90, 58, .06) !important; }
+html.ld-fantasy .ld-header { border-bottom: 2px solid var(--ld-accent-2); }
+html.ld-fantasy .ld-footer { border-top: 2px solid var(--ld-accent-2); }
+html.ld-fantasy .ld-nav a { font: 600 1.02rem/1 var(--ld-body); letter-spacing: 0; text-transform: none; }
+html.ld-fantasy .ld-nav a:hover, html.ld-fantasy .ld-nav a[aria-current="page"] { border-bottom-color: #c9a24e; }
+html.ld-fantasy .ld-footer a { color: var(--ld-header-fg); }
+
+html.ld-fantasy .ld-eyebrow { font: 600 1.05rem/1.2 var(--ld-body); letter-spacing: 0; text-transform: none; color: var(--ld-accent); }
+html.ld-fantasy .ld-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.08; color: var(--ld-ink); }
+html.ld-fantasy .ld-hero .ld-rule { width: 5rem; height: 2px; background: var(--ld-accent-2); }
+html.ld-fantasy .ld-hero .ld-lede { color: var(--ld-ink-2); font-weight: 500; }
+html.ld-fantasy .ld a, html.ld-fantasy p a { color: var(--ld-accent); }
+
+html.ld-fantasy .ld-button { font: 600 1.08rem/1 var(--ld-body); letter-spacing: 0; text-transform: none; padding: .75rem 1.1rem; background: var(--ld-accent); border-color: var(--ld-accent); color: var(--ld-on-accent) !important; }
+html.ld-fantasy .ld-button:hover { transform: none; box-shadow: none; background: #234530; }
+html.ld-fantasy .ld-button--ghost { background: transparent; color: var(--ld-ink) !important; border: 1px solid var(--ld-ink-2); }
+html.ld-fantasy .ld-button--ghost:hover { background: rgba(47, 90, 58, .07); color: var(--ld-accent) !important; border-color: var(--ld-accent); }
+
+html.ld-fantasy .ld-facts { box-shadow: none; }
+html.ld-fantasy .ld-facts dt { font: 600 .92rem/1.2 var(--ld-body); letter-spacing: 0; text-transform: none; color: var(--ld-ink-2); }
+html.ld-fantasy .ld-facts dd { font: 700 1.15rem/1.3 var(--ld-body); }
+html.ld-fantasy .ld-pillars li { border-top: 2px solid var(--ld-accent); }
+html.ld-fantasy .ld-pillars li > b { font: 600 1.15rem/1.2 "Cinzel", Georgia, serif; }
+html.ld-fantasy .ld-steps li::before { background: var(--ld-accent); color: var(--ld-on-accent); font: 700 1rem/1 var(--ld-body); }
+html.ld-fantasy .ld-steps b { font-family: var(--ld-body); font-weight: 700; }
+html.ld-fantasy .ld-callout { border: 1px solid var(--ld-line); border-left: 3px solid var(--ld-accent); background: var(--ld-panel); box-shadow: none; }
+html.ld-fantasy .ld-rules th { font-family: var(--ld-body); letter-spacing: 0; text-transform: none; color: var(--ld-ink); border-bottom-color: var(--ld-accent); }
+
 /* preview only: a stand-in for Squarespace's page frame */
 body { margin: 0; }
 .pv-bar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 16px; background: var(--ld-header-bg); }
