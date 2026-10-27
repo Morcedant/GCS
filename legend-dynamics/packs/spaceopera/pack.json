@@ -63,14 +63,21 @@
   "party": "crew"
  },
  "theme": {
-  "comment": "A starship console: dark glass panels with cyan rules over a slow starfield.",
-  "css": "--space: #03060d; --glass: rgba(10, 22, 40, .78); --glass-hi: rgba(18, 38, 66, .82); --well: rgba(2, 8, 18, .72); --fg: #e4eefb; --muted: #8aa2c2; --line: rgba(92, 170, 255, .22); --chrome: #5cc8ff; --chrome-dim: rgba(92, 200, 255, .55); --gold: #f2b84b; --blue: #58a8ff; --red: #ff5f4a; --good: #52e3a0; --bad: #ff6a5c; --warn: #ffb547; --on-accent: #03060d; --display: \"Oxanium\", \"Arial Narrow\", sans-serif; --title: \"Oxanium\", \"Arial Narrow\", sans-serif; --body: \"Exo 2\", \"Segoe UI\", system-ui, sans-serif; --mono: \"Share Tech Mono\", ui-monospace, monospace; --numbers: \"Share Tech Mono\", ui-monospace, monospace; --radius: 14px;",
-  "particles": {
-   "direction": "left",
-   "rgb": "200, 225, 255",
-   "density": 5200,
-   "alpha": 0.9
-  }
+  "comment": "Fracture Lines, plain: a starship's technical manual, like the game's page on the site.",
+  "css": "--space: #e6eaee; --glass: #f3f5f7; --glass-hi: #f9fafb; --well: #ffffff; --fg: #142033; --muted: #4f5d72; --line: rgba(20, 32, 51, .2); --chrome: #1f5fa8; --chrome-dim: rgba(31, 95, 168, .55); --gold: #1f5fa8; --blue: #2d6e8e; --red: #b0352a; --good: #237a4b; --bad: #b0352a; --warn: #9a6512; --on-accent: #f3f5f7; --display: \"Exo 2\", \"Segoe UI\", system-ui, sans-serif; --title: \"Oxanium\", \"Arial Narrow\", sans-serif; --body: \"Exo 2\", \"Segoe UI\", system-ui, sans-serif; --mono: \"Exo 2\", \"Segoe UI\", system-ui, sans-serif; --numbers: \"Oxanium\", \"Exo 2\", sans-serif; --radius: 4px;",
+  "particles": null,
+  "plain": true,
+  "glow": "31, 95, 168",
+  "line": "20, 32, 51",
+  "highlight": "255, 255, 255",
+  "wash1": "0, 0, 0, 0",
+  "wash2": "0, 0, 0, 0",
+  "optionBg": "#f3f5f7",
+  "barBg": "230, 234, 238, .97",
+  "text2": "#2b3a52",
+  "goodRgb": "35, 122, 75",
+  "badRgb": "176, 53, 42",
+  "placeholder": "rgba(79, 93, 114, .6)"
  },
  "docxColors": [
   "1B2A4A",

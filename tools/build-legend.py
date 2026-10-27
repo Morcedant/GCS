@@ -689,6 +689,8 @@ def build(pid, docx):
     theme = {**THEME_DEFAULTS, **pack.get("theme", {})}
     tpl = (ENGINE / "creator.html").read_text()
     tpl = tpl.replace("{{THEMECSS}}", theme["css"])
+    # The plain look: light paper, ink and one accent, like the game's page on the site (engine/plain-theme.css).
+    tpl = tpl.replace("{{PLAINCSS}}", (ENGINE / "plain-theme.css").read_text() if theme.get("plain") else "")
     tpl = tpl.replace("{{GROUPCSS}}", "\n".join(f'[data-div="{g["id"]}"] {{ --accent: var({g["color"]}); }}' for g in pack["groups"]))
     tpl = tpl.replace("{{QUICKREF}}", quickref(pack, t))
     tpl = tpl.replace("/* BATTLEMAP */", (ENGINE / "battlemap.js").read_text().replace("</", "<\\/"))

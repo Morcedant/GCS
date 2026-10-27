@@ -7,9 +7,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
 <style>
 /* Legend Dynamics character creator. Theme: A sorcerer's ledger by brazier light: soot-black panels, tarnished bronze rules, blood-red accents, embers rising.
-   Builder steps on the left, readiness on the right; the second tab is the play sheet. Dark only.
+   Builder steps on the left, readiness on the right; the second tab is the play sheet. Dark, or light in the plain
+   look (a theme with "plain": true, engine/plain-theme.css).
    The accent follows the character's role group. */
 :root { --space: #0c0806; --glass: rgba(26, 17, 12, .9); --glass-hi: rgba(38, 26, 18, .92); --well: rgba(10, 6, 4, .74); --fg: #eee2cf; --muted: #a39079; --line: rgba(205, 152, 88, .22); --chrome: #d6a660; --chrome-dim: rgba(214, 166, 96, .55); --gold: #dcb26a; --blue: #9a86d0; --red: #c0392b; --good: #a3bd7c; --bad: #d4473b; --warn: #dc9a45; --on-accent: #120b07; --display: "Cinzel", Georgia, serif; --title: "Cinzel Decorative", "Cinzel", Georgia, serif; --body: "Cormorant Garamond", Garamond, Georgia, serif; --mono: "Cinzel", Georgia, serif; --numbers: "Cormorant Garamond", Garamond, Georgia, serif; --radius: 4px; --accent: var(--gold); color-scheme: dark; }
+
 [data-div="steel"] { --accent: var(--red); }
 [data-div="shadow"] { --accent: var(--gold); }
 [data-div="lore"] { --accent: var(--blue); }
@@ -93,8 +95,8 @@ b, strong { font-weight: 600; }
 .field { display: grid; gap: 5px; min-width: 0; align-content: start; }
 .field.wide { grid-column: 1 / -1; }
 label, .label { font: 600 .72rem/1.3 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--chrome-dim); }
-input[type="text"], input[type="url"], input[type="password"], select, textarea { width: 100%; font: inherit; color: var(--fg); background: var(--well); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; }
-input[type="text"]:hover, input[type="url"]:hover, input[type="password"]:hover, select:hover, textarea:hover { border-color: var(--chrome-dim); }
+input[type="text"], input:not([type]), input[type="url"], input[type="password"], select, textarea { width: 100%; font: inherit; color: var(--fg); background: var(--well); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; }
+input[type="text"]:hover, input:not([type]):hover, input[type="url"]:hover, input[type="password"]:hover, select:hover, textarea:hover { border-color: var(--chrome-dim); }
 select option, select optgroup { background: #1a110c; color: var(--fg); }
 textarea { resize: vertical; min-height: 64px; }
 ::placeholder { color: rgba(163, 144, 121, .6); }
@@ -630,7 +632,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="aa0d037" data-version-date="2026.10.26" title="The code changes whenever this page changes.">Version 2026.10.26 · aa0d037</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="b250cf1" data-version-date="2026.10.27" title="The code changes whenever this page changes.">Version 2026.10.27 · b250cf1</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
