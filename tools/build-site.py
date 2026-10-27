@@ -61,6 +61,8 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
 .ld-nav a:hover, .ld-nav a[aria-current="page"] { opacity: 1; border-bottom-color: var(--ld-accent); }
 .ld-nav a:focus-visible, .ld-brand:focus-visible, .ld-button:focus-visible { outline: 2px solid var(--ld-accent); outline-offset: 3px; }
 main { flex: 1; }
+/* A section holding only a hidden block (the home page's latest posts, before there are any) takes no space. */
+.page-section:has(> .content > [hidden]:only-child) { display: none; }
 .page-section { position: relative; isolation: isolate; }
 .page-section .section-background { position: absolute; inset: 0; z-index: -1; }
 .page-section .content { max-width: 72rem; margin: 0 auto; padding: clamp(2rem, 5vw, 3.5rem) 16px; }
@@ -134,7 +136,9 @@ def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, bl
     here = "/" if here == "/" else here
     nav = "".join(f'<a href="{h}"{" aria-current=\"page\"" if h == here else ""}>{e(n)}</a>' for h, n in NAV)
     sections = "\n".join(f'<section class="page-section"><div class="section-background"></div><div class="content">\n{same_tab(b)}\n</div></section>' for b in body_blocks)
-    cls = (f' class="ld-{theme}"' if theme else "") + (f' data-blog-server="{e(BLOG_SERVER)}"' if blog else "")
+    # A game's page takes its game's theme; every other page the brand's hobby look (custom.css, section 5).
+    cls = f' class="ld-{theme}"' if theme else ' class="ld-site"'
+    cls += f' data-blog-server="{e(BLOG_SERVER)}"' if blog else ""
     return f"""<!doctype html>
 <html lang="en"{cls}>
 <head>

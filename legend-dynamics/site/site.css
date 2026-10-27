@@ -196,7 +196,7 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 /* Pillars: three short points under the hero */
 .ld-pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.25rem; margin: 0; padding: 0; list-style: none; }
 .ld-pillars li { border-top: 2px solid var(--ld-accent); padding-top: 1rem; margin: 0; }
-.ld-pillars b { display: block; font: 600 1.15rem/1.2 var(--ld-label); margin-bottom: .35rem; color: var(--ld-ink); }
+.ld-pillars li > b { display: block; font: 600 1.15rem/1.2 var(--ld-label); margin-bottom: .35rem; color: var(--ld-ink); }
 .ld-pillars span { color: var(--ld-ink-2); }
 
 /* Game cards: each card carries its own game's colors, even on the brand pages */
@@ -307,6 +307,177 @@ p, li, .sqs-html-content p, .sqs-html-content li {
 .ld-playtest { background: #f4c542; color: #1b1406; text-align: center; padding: .55rem 16px; font: 600 .92rem/1.4 var(--ld-body, Georgia, serif); }
 .ld-playtest-tag { display: inline-block; margin-right: .5rem; padding: .05rem .5rem; border-radius: 4px; background: #1b1406; color: #f4c542; font: 600 .74rem var(--ld-label, monospace); letter-spacing: .14em; text-transform: uppercase; vertical-align: .08em; }
 
+/* =========================================================================
+   5. The hobby look: the brand pages (html.ld-site: everything but the four
+   game pages, which keep their own themes). An adventurer's handbook left
+   on the game table: parchment, ink, dragon red and gold, dice for numbers,
+   game cards taped down like character sheets.
+   ========================================================================= */
+html.ld-site {
+  --ld-bg: #f3e3bf; --ld-bg-2: #ead3a3; --ld-panel: #fbf1d9;
+  --ld-ink: #2b1d14; --ld-ink-2: #5c4433; --ld-line: rgba(74, 44, 24, .22);
+  --ld-accent: #a3261a;        /* dragon red */
+  --ld-accent-2: #7b4a12;
+  --ld-gold: #c9952b; --ld-gold-2: #f2cf73;
+  --ld-on-accent: #fff4dc;
+  --ld-header-bg: #3a1610; --ld-header-fg: #f6e3b4;
+  --ld-display: "Almendra", "Fraunces", Georgia, serif;
+  --ld-body: "Alegreya", "Source Serif 4", Georgia, serif;
+  --ld-label: "Alegreya Sans SC", "Alegreya Sans", system-ui, sans-serif;
+  --ld-mono: "Alegreya Sans SC", "Alegreya Sans", system-ui, sans-serif;
+  --ld-radius: 10px;
+  --ld-shadow: 0 2px 0 rgba(74, 44, 24, .12), 0 14px 30px rgba(74, 44, 24, .16);
+  /* paper grain, drawn in the page: no image files */
+  --ld-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .18 0 0 0 0 .08 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+html.ld-site body {
+  background-color: var(--ld-bg);
+  background-image: var(--ld-grain), radial-gradient(120% 80% at 50% 0%, transparent 55%, rgba(122, 74, 30, .18));
+  background-attachment: fixed;
+}
+html.ld-site .page-section .section-background { background: transparent !important; }
+html.ld-site .page-section:nth-of-type(even) .section-background {
+  background: linear-gradient(rgba(201, 149, 43, .13), rgba(201, 149, 43, .13)) !important;
+  border-top: 2px dashed rgba(122, 74, 30, .25); border-bottom: 2px dashed rgba(122, 74, 30, .25);
+}
+html.ld-site h1, html.ld-site h2 { font-weight: 700; letter-spacing: 0; }
+html.ld-site h3, html.ld-site h4 { letter-spacing: .03em; }
+
+/* The header and footer: a leather band with gold trim */
+html.ld-site .ld-header, html.ld-site .ld-footer {
+  background: var(--ld-grain), linear-gradient(180deg, #4a1d14, #2f110c);
+  border-bottom: 3px double var(--ld-gold);
+  box-shadow: 0 6px 18px rgba(47, 17, 12, .35);
+}
+html.ld-site .ld-footer { border-bottom: 0; border-top: 3px double var(--ld-gold); box-shadow: none; }
+html.ld-site .ld-brand { font: 700 1.45rem/1 var(--ld-display); color: var(--ld-gold-2); display: inline-flex; align-items: center; gap: .55rem; text-shadow: 0 2px 0 rgba(0, 0, 0, .35); }
+html.ld-site .ld-brand::before { /* a d20 */
+  content: ""; width: 1.7rem; height: 1.7rem; flex: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 1 29.5 8.8v14.4L16 31 2.5 23.2V8.8Z' fill='%23a3261a' stroke='%23f2cf73' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M16 1 9.8 13.4h12.4ZM9.8 13.4 2.5 8.8M22.2 13.4l7.3-4.6M9.8 13.4 16 24.6l6.2-11.2M16 24.6V31M9.8 13.4 2.5 23.2M22.2 13.4l7.3 9.8M2.5 23.2 16 24.6l13.5-1.4' fill='none' stroke='%23f2cf73' stroke-width='1.1' stroke-linejoin='round'/%3E%3Ctext x='16' y='20.6' font-family='Georgia' font-size='7' font-weight='700' text-anchor='middle' fill='%23fff4dc'%3E20%3C/text%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform .4s ease;
+}
+html.ld-site .ld-brand:hover::before { transform: rotate(180deg); }
+html.ld-site .ld-nav a { font: 700 .86rem/1 var(--ld-label); letter-spacing: .06em; text-transform: none; color: var(--ld-header-fg); opacity: .9; padding: .5rem .2rem; }
+html.ld-site .ld-nav a:hover, html.ld-site .ld-nav a[aria-current="page"] { color: var(--ld-gold-2); opacity: 1; border-bottom-color: var(--ld-gold); }
+html.ld-site .ld-footer a { color: var(--ld-gold-2); }
+
+/* Headings: the eyebrow is a red ribbon; the rule under a title is a die between two lines */
+html.ld-site .ld-eyebrow {
+  display: inline-block; font: 700 .8rem/1 var(--ld-label); letter-spacing: .12em; text-transform: none;
+  color: var(--ld-on-accent); background: var(--ld-accent); padding: .38rem .9rem .42rem .8rem;
+  clip-path: polygon(0 0, 100% 0, calc(100% - .55rem) 50%, 100% 100%, 0 100%); box-shadow: 0 2px 0 rgba(0, 0, 0, .15);
+}
+html.ld-site .ld-hero { padding-top: clamp(1.5rem, 4vw, 3rem); }
+html.ld-site .ld-hero h1 { font-size: clamp(2rem, 5.2vw, 3.6rem); line-height: 1.02; color: var(--ld-ink); text-shadow: 0 2px 0 rgba(255, 244, 220, .7); }
+html.ld-site .ld-hero .ld-rule {
+  width: 12rem; height: 1.4rem; border: 0; margin: .3rem 0 1.4rem;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='2' width='20' height='20' rx='4' fill='%23fbf1d9' stroke='%23a3261a' stroke-width='2'/%3E%3Ccircle cx='7.5' cy='7.5' r='1.9' fill='%23a3261a'/%3E%3Ccircle cx='12' cy='12' r='1.9' fill='%23a3261a'/%3E%3Ccircle cx='16.5' cy='16.5' r='1.9' fill='%23a3261a'/%3E%3C/svg%3E") center / 1.4rem no-repeat,
+    linear-gradient(var(--ld-gold), var(--ld-gold)) left center / calc(50% - 1.1rem) 2px no-repeat,
+    linear-gradient(var(--ld-gold), var(--ld-gold)) right center / calc(50% - 1.1rem) 2px no-repeat;
+}
+html.ld-site .ld-hero .ld-lede { color: var(--ld-ink-2); }
+
+/* Buttons: a red banner with a gold edge; the quieter ones are stamped in ink */
+html.ld-site .ld-button {
+  font: 700 .95rem/1 var(--ld-label); letter-spacing: .04em; text-transform: none;
+  padding: .85rem 1.35rem; border-radius: 999px;
+  background: linear-gradient(180deg, #bf3424, #8f1f15); color: var(--ld-on-accent) !important;
+  border: 2px solid var(--ld-gold); box-shadow: 0 3px 0 #5e140d, 0 10px 18px rgba(94, 20, 13, .25);
+}
+html.ld-site .ld-button:hover { transform: translateY(-2px) rotate(-1deg); box-shadow: 0 5px 0 #5e140d, 0 14px 22px rgba(94, 20, 13, .3); }
+html.ld-site .ld-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #5e140d; }
+html.ld-site .ld-button--ghost {
+  background: var(--ld-panel); color: var(--ld-ink) !important; border: 2px solid var(--ld-ink);
+  box-shadow: 3px 3px 0 var(--ld-ink);
+}
+html.ld-site .ld-button--ghost:hover { color: var(--ld-accent) !important; border-color: var(--ld-accent); box-shadow: 4px 4px 0 var(--ld-accent); }
+
+/* Pillars: each point on its own card, with a die face for a badge */
+html.ld-site .ld-pillars { gap: 1.4rem; }
+html.ld-site .ld-pillars li {
+  position: relative; border: 2px solid var(--ld-ink); border-radius: var(--ld-radius); background: var(--ld-panel);
+  padding: 1.6rem 1.2rem 1.2rem 1.2rem; box-shadow: 4px 4px 0 rgba(43, 29, 20, .85);
+}
+html.ld-site .ld-pillars li::before {
+  content: ""; position: absolute; top: -1.1rem; left: 1rem; width: 2.2rem; height: 2.2rem; transform: rotate(-8deg);
+  background: center / contain no-repeat var(--die, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='1.5' y='1.5' width='21' height='21' rx='5' fill='%23a3261a' stroke='%232b1d14' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='12' r='2.2' fill='%23fff4dc'/%3E%3C/svg%3E"));
+}
+html.ld-site .ld-pillars li:nth-child(4n+2)::before { transform: rotate(6deg); --die: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='1.5' y='1.5' width='21' height='21' rx='5' fill='%23c9952b' stroke='%232b1d14' stroke-width='1.5'/%3E%3Ccircle cx='7.5' cy='7.5' r='2.1' fill='%232b1d14'/%3E%3Ccircle cx='12' cy='12' r='2.1' fill='%232b1d14'/%3E%3Ccircle cx='16.5' cy='16.5' r='2.1' fill='%232b1d14'/%3E%3C/svg%3E"); }
+html.ld-site .ld-pillars li:nth-child(4n+3)::before { transform: rotate(-4deg); --die: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='1.5' y='1.5' width='21' height='21' rx='5' fill='%232f5d50' stroke='%232b1d14' stroke-width='1.5'/%3E%3Ccircle cx='7.5' cy='7.5' r='2.1' fill='%23fff4dc'/%3E%3Ccircle cx='16.5' cy='7.5' r='2.1' fill='%23fff4dc'/%3E%3Ccircle cx='12' cy='12' r='2.1' fill='%23fff4dc'/%3E%3Ccircle cx='7.5' cy='16.5' r='2.1' fill='%23fff4dc'/%3E%3Ccircle cx='16.5' cy='16.5' r='2.1' fill='%23fff4dc'/%3E%3C/svg%3E"); }
+html.ld-site .ld-pillars li:nth-child(4n)::before { transform: rotate(9deg); --die: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='1.5' y='1.5' width='21' height='21' rx='5' fill='%23fbf1d9' stroke='%232b1d14' stroke-width='1.5'/%3E%3Ccircle cx='7.5' cy='7' r='2' fill='%23a3261a'/%3E%3Ccircle cx='16.5' cy='7' r='2' fill='%23a3261a'/%3E%3Ccircle cx='7.5' cy='12' r='2' fill='%23a3261a'/%3E%3Ccircle cx='16.5' cy='12' r='2' fill='%23a3261a'/%3E%3Ccircle cx='7.5' cy='17' r='2' fill='%23a3261a'/%3E%3Ccircle cx='16.5' cy='17' r='2' fill='%23a3261a'/%3E%3C/svg%3E"); }
+html.ld-site .ld-pillars li > b { font: 700 1.25rem/1.15 var(--ld-display); }
+html.ld-site .ld-pillars span b { color: var(--ld-ink); }
+
+/* Game cards: character sheets taped to the table, each in its own game's colors */
+html.ld-site .ld-games { gap: 2.2rem 2rem; padding-top: .6rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); }
+html.ld-site .ld-game { border-radius: 8px; border: 3px solid rgba(255, 255, 255, .08); transform: rotate(-1.2deg); overflow: visible; }
+html.ld-site .ld-game:nth-child(even) { transform: rotate(1.1deg); }
+html.ld-site .ld-game::before { border-radius: 6px; }
+html.ld-site .ld-game::after { /* a strip of tape */
+  content: ""; position: absolute; top: -.75rem; left: 50%; width: 6.5rem; height: 1.5rem; transform: translateX(-50%) rotate(-3deg);
+  background: rgba(244, 226, 170, .82); box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  clip-path: polygon(3% 0, 97% 4%, 100% 50%, 96% 100%, 4% 96%, 0 50%);
+}
+html.ld-site .ld-game:hover { transform: rotate(0) translateY(-6px) scale(1.015); }
+html.ld-site .ld-games + *, html.ld-site #games + .ld { margin-top: 3rem; }
+html.ld-site #online { margin-top: 3rem; }
+html.ld-site .ld-game h3 { font-size: 2.15rem; }
+html.ld-site .ld-game .ld-eyebrow { background: none; clip-path: none; box-shadow: none; padding: 0; color: var(--c-acc); font-size: .82rem; }
+html.ld-site .ld-game .ld-go { font: 700 .95rem/1 var(--ld-label); letter-spacing: .04em; text-transform: none; }
+
+/* Callouts: a note pinned with a wax seal */
+html.ld-site .ld-callout {
+  position: relative; border: 2px solid rgba(74, 44, 24, .35); border-left: 2px solid rgba(74, 44, 24, .35); border-radius: var(--ld-radius);
+  background: var(--ld-grain), var(--ld-panel); padding: 1.5rem 1.5rem 1.3rem 4.4rem; box-shadow: var(--ld-shadow);
+}
+html.ld-site .ld-callout::before {
+  content: ""; position: absolute; left: 1rem; top: 1.2rem; width: 2.5rem; height: 2.5rem; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d4473a, #8f1f15 62%, #6b170f); box-shadow: 0 2px 0 rgba(0, 0, 0, .25), inset 0 0 0 3px rgba(255, 255, 255, .12);
+}
+html.ld-site .ld-callout::after {
+  content: "LD"; position: absolute; left: 1rem; top: 1.2rem; width: 2.5rem; line-height: 2.5rem; text-align: center;
+  font: 700 .9rem/2.5rem var(--ld-display); color: rgba(255, 228, 200, .85);
+}
+html.ld-site .ld-callout > b:first-child { font: 700 1.05rem/1.2 var(--ld-display); letter-spacing: 0; text-transform: none; color: var(--ld-accent); }
+
+/* The odds: a row of dice */
+html.ld-site .ld-odds > div { background: var(--ld-panel); border: 2px solid var(--ld-ink); border-radius: 12px; box-shadow: 3px 3px 0 rgba(43, 29, 20, .8); }
+html.ld-site .ld-odds > div:nth-child(odd) { transform: rotate(-2deg); }
+html.ld-site .ld-odds > div:nth-child(even) { transform: rotate(2deg); }
+html.ld-site .ld-odds b { font: 700 1.6rem/1 var(--ld-display); color: var(--ld-accent); }
+html.ld-site .ld-odds span { font: 700 .82rem/1 var(--ld-label); }
+html.ld-site .ld-odds .ld-bar { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--ld-gold) var(--p), rgba(74, 44, 24, .15) var(--p)); }
+
+/* Steps: numbered with dice */
+html.ld-site .ld-steps li::before {
+  border-radius: 9px; width: 2.3rem; height: 2.3rem; font: 700 1.15rem/1 var(--ld-display);
+  background: var(--ld-accent); color: var(--ld-on-accent); border: 2px solid var(--ld-ink); box-shadow: 2px 2px 0 var(--ld-ink); transform: rotate(-6deg);
+}
+html.ld-site .ld-steps li:nth-child(even)::before { background: var(--ld-gold); color: var(--ld-ink); transform: rotate(5deg); }
+
+/* Tags, facts, table of contents, rules text */
+html.ld-site .ld-tag { border-radius: 4px !important; }
+html.ld-site .ld-facts { border: 2px solid var(--ld-ink); box-shadow: 4px 4px 0 rgba(43, 29, 20, .85); }
+html.ld-site .ld-toc { border: 2px solid var(--ld-ink); box-shadow: 4px 4px 0 rgba(43, 29, 20, .85); background: var(--ld-grain), var(--ld-panel); }
+html.ld-site .ld-rules h1 { border-bottom: 3px double var(--ld-gold); }
+html.ld-site .ld-rules h2 { color: var(--ld-accent); }
+html.ld-site .ld-rules th { font: 700 .82rem/1.2 var(--ld-label); letter-spacing: .04em; text-transform: none; color: var(--ld-ink); border-bottom: 3px double var(--ld-gold); }
+html.ld-site .ld-rules blockquote { border-left: 4px solid var(--ld-accent); background: var(--ld-grain), var(--ld-panel); }
+
+/* The playtest label: a gold ribbon */
+html.ld-site .ld-playtest { background: linear-gradient(180deg, #f2cf73, #d9a93c); color: #3a1610; border-bottom: 2px solid #8f6514; font-family: var(--ld-body); }
+html.ld-site .ld-playtest-tag { background: #a3261a; color: #fff4dc; border-radius: 3px; font-family: var(--ld-label); letter-spacing: .08em; }
+
+@media (max-width: 640px) {
+  html.ld-site .ld-game, html.ld-site .ld-game:nth-child(even) { transform: none; }
+  html.ld-site .ld-callout { padding-left: 1.2rem; padding-top: 3.8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.ld-site .ld-brand::before, html.ld-site .ld-button { transition: none; }
+  html.ld-site .ld-button:hover, html.ld-site .ld-game:hover { transform: none; }
+}
+
 /* ---------- 5. Site frame (Cloudflare Pages build; Squarespace supplies its own) ---------- */
 html, body { margin: 0; }
 body { min-height: 100vh; display: flex; flex-direction: column; }
@@ -321,6 +492,8 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
 .ld-nav a:hover, .ld-nav a[aria-current="page"] { opacity: 1; border-bottom-color: var(--ld-accent); }
 .ld-nav a:focus-visible, .ld-brand:focus-visible, .ld-button:focus-visible { outline: 2px solid var(--ld-accent); outline-offset: 3px; }
 main { flex: 1; }
+/* A section holding only a hidden block (the home page's latest posts, before there are any) takes no space. */
+.page-section:has(> .content > [hidden]:only-child) { display: none; }
 .page-section { position: relative; isolation: isolate; }
 .page-section .section-background { position: absolute; inset: 0; z-index: -1; }
 .page-section .content { max-width: 72rem; margin: 0 auto; padding: clamp(2rem, 5vw, 3.5rem) 16px; }
