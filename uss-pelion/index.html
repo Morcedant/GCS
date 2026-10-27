@@ -566,6 +566,43 @@ p.bad, .small.bad { color: var(--bad); }
   .print-only { display: grid !important; }
 }
 .print-only { display: none; }
+/* The plain hobby look, like the other games' pages: built in by tools/build-guide.py from plain-theme.css. */
+/* PLAIN:START */
+/* The plain look (a theme with "plain": true): the creator in the same hobby style as the game's page on the site.
+   Light paper, ink and one accent from the theme's colors; no glows, shadows, corner brackets or drifting particles. */
+:root { color-scheme: light; }
+html { background: var(--space); }
+body { background: var(--space) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .15 0 0 0 0 .1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+#embers { display: none; }
+/* No glows or drop shadows anywhere; a pop-up keeps a plain border to stand out instead. */
+body * { text-shadow: none !important; box-shadow: none !important; }
+.delta, .badge, svg { filter: none !important; }
+#help-pop, .popover, [role="dialog"] { border: 1px solid var(--chrome-dim) !important; }
+/* Sentence case: no spaced-out capitals in labels, tabs, steps or buttons. Text people type is left alone. */
+body *:not(input):not(textarea):not(select) { text-transform: none !important; letter-spacing: normal !important; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.1rem; }
+.hud { backdrop-filter: none; box-shadow: none; }
+.hud::before, .hud::after { display: none; }
+.scanbar { height: 2px; background: var(--accent); }
+.btn { font-weight: 600; }
+.guide strong { color: var(--fg); }
+/* PLAIN:END */
+/* USS Pelion, plain: a Starfleet briefing on pale paper. Navy for the interface, a gold rule, and the divisions'
+   colors (command gold, sciences blue, operations red) in shades that read on paper. */
+:root {
+  --space: #ebeae4; --glass: #f6f5f1; --glass-hi: #fbfaf7; --well: #ffffff;
+  --fg: #161a22; --muted: #4d5462; --line: rgba(22, 26, 34, .2);
+  --chrome: #1d3f6e; --chrome-dim: rgba(29, 63, 110, .55);
+  --gold: #8a650c; --blue: #24569a; --red: #a8301f;
+  --good: #237a4b; --bad: #a8301f; --warn: #8a650c; --on-accent: #f6f5f1;
+  --radius: 4px;
+}
+#stars { display: none; }
+select option, select optgroup { background: var(--glass); color: var(--fg); }
+::placeholder { color: rgba(77, 84, 98, .6); }
+.trait-desc, .ref dd, .gm-skills { color: var(--fg); }
+.masthead { border-bottom: 2px solid #c9962e; }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -592,7 +629,7 @@ p.bad, .small.bad { color: var(--bad); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="f52b6d3" data-version-date="2026.10.26" title="The code changes whenever this page changes.">Version 2026.10.26 · f52b6d3</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="8224402" data-version-date="2026.10.27" title="The code changes whenever this page changes.">Version 2026.10.27 · 8224402</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>

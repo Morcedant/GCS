@@ -86,6 +86,13 @@ def main():
         src = src if src.exists() else ROOT / "legend-dynamics" / "engine" / "homebrew.js"
         hb = src.read_text().replace("</", "<\\/")
         app = re.sub(r"/\* HOMEBREW:START \*/.*?/\* HOMEBREW:END \*/", lambda _: "/* HOMEBREW:START */\n" + hb + "/* HOMEBREW:END */", app, flags=re.S)
+    # A page with PLAIN markers gets the plain hobby look (<game>/plain-theme.css, or legend-dynamics/engine/plain-theme.css),
+    # with the game's own palette after it in the page.
+    if "/* PLAIN:START */" in app:
+        src = ROOT / a.game / "plain-theme.css"
+        src = src if src.exists() else ROOT / "legend-dynamics" / "engine" / "plain-theme.css"
+        pl = src.read_text()
+        app = re.sub(r"/\* PLAIN:START \*/.*?/\* PLAIN:END \*/", lambda _: "/* PLAIN:START */\n" + pl + "/* PLAIN:END */", app, flags=re.S)
     # A page with CAMPAIGN markers gets the campaign builder (<game>/campaign.js, or legend-dynamics/engine/campaign.js).
     if "/* CAMPAIGN:START */" in app:
         src = ROOT / a.game / "campaign.js"

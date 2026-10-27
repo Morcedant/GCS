@@ -21,20 +21,21 @@ GAMES = {
     "uss-pelion": ("USS Pelion", "Star Trek, campaign year 2268: the crew of a Starfleet ship.", "uss-pelion", "USS_Pelion_Players_Guide.docx"),
     "grimm": ("Grimm", "Gothic horror in the Grimm-verse, the late 1800s.", "grimm-west", "Grimm_Players_Guide.docx"),
 }
-CSS = """:root { color-scheme: dark; --bg: #121318; --card: #1b1d24; --fg: #ece6da; --muted: #a59d8f; --line: #343744; --gold: #c99a3f; }
+CSS = """:root { color-scheme: light; --bg: #ecebe6; --card: #f7f6f2; --fg: #1a1b1f; --muted: #50535b; --line: rgba(26, 27, 31, .2); --accent: #5e1f3a; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.55 Georgia, "Times New Roman", serif; }
 main { max-width: 52rem; margin: 0 auto; padding: 40px 16px 60px; }
-h1 { font-size: 2rem; margin: 0 0 6px; letter-spacing: .02em; }
+h1 { font-size: 2rem; margin: 0 0 6px; }
 .lede { color: var(--muted); margin: 0 0 28px; }
 .games { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
-.game { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 10px; align-content: start; }
+.game { background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 18px; display: grid; gap: 10px; align-content: start; }
 .game h2 { margin: 0; font-size: 1.35rem; }
 .game p { margin: 0; color: var(--muted); }
 .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-.links a { color: var(--fg); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: .92rem; }
-.links a.primary { background: var(--gold); border-color: var(--gold); color: #17130b; }
-.links a:hover { border-color: var(--gold); }
+.links a { color: var(--fg); text-decoration: none; border: 1px solid var(--muted); border-radius: 3px; padding: 6px 12px; font-size: .92rem; }
+.links a.primary { background: var(--accent); border-color: var(--accent); color: #f7f6f2; }
+.links a:hover { border-color: var(--accent); color: var(--accent); }
+.links a.primary:hover { color: #f7f6f2; opacity: .9; }
 footer { color: var(--muted); font-size: .85rem; margin-top: 36px; border-top: 1px solid var(--line); padding-top: 14px; }
 """
 BACK = ('<nav class="no-print" aria-label="Site" style="max-width:1200px;margin:0 auto;padding:10px 16px 0;font:.78rem system-ui,sans-serif;letter-spacing:.06em">'
