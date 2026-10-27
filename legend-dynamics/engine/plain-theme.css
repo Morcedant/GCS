@@ -1,0 +1,19 @@
+/* The plain look (a theme with "plain": true): the creator in the same hobby style as the game's page on the site.
+   Light paper, ink and one accent from the theme's colors; no glows, shadows, corner brackets or drifting particles. */
+:root { color-scheme: light; }
+html { background: var(--space); }
+body { background: var(--space) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .15 0 0 0 0 .1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+#embers { display: none; }
+/* No glows or drop shadows anywhere; a pop-up keeps a plain border to stand out instead. */
+body * { text-shadow: none !important; box-shadow: none !important; }
+.delta, .badge, svg { filter: none !important; }
+#help-pop, .popover, [role="dialog"] { border: 1px solid var(--chrome-dim) !important; }
+/* Sentence case: no spaced-out capitals in labels, tabs, steps or buttons. Text people type is left alone. */
+body *:not(input):not(textarea):not(select) { text-transform: none !important; letter-spacing: normal !important; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.1rem; }
+.hud { backdrop-filter: none; box-shadow: none; }
+.hud::before, .hud::after { display: none; }
+.scanbar { height: 2px; background: var(--accent); }
+.btn { font-weight: 600; }
+.guide strong { color: var(--fg); }

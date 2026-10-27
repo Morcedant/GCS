@@ -66,27 +66,23 @@
   "party": "posse"
  },
  "theme": {
-  "comment": "A gothic ledger by candlelight: slate panels, tarnished-silver rules, blood-red accents, ash falling.",
-  "css": "--space: #090b0d; --glass: rgba(18, 22, 26, .9); --glass-hi: rgba(28, 33, 38, .92); --well: rgba(6, 8, 10, .74); --fg: #e4e2da; --muted: #8e958f; --line: rgba(160, 172, 166, .22); --chrome: #b9c2bd; --chrome-dim: rgba(185, 194, 189, .55); --gold: #c5ccc8; --blue: #5f9e8f; --red: #b8383a; --good: #8fb59a; --bad: #c9393b; --warn: #c99a4e; --on-accent: #0b0d0f; --display: \"IM Fell English SC\", Georgia, serif; --title: \"Pirata One\", \"IM Fell English SC\", Georgia, serif; --body: \"EB Garamond\", Garamond, Georgia, serif; --mono: \"IM Fell DW Pica SC\", \"EB Garamond\", Georgia, serif; --numbers: \"EB Garamond\", Garamond, Georgia, serif; --radius: 6px;",
-  "glow": "185, 194, 189",
-  "line": "160, 172, 166",
-  "highlight": "220, 228, 224",
-  "wash1": "110, 14, 18, .26",
-  "wash2": "24, 54, 58, .3",
-  "optionBg": "#12161a",
-  "barBg": "12, 15, 18, .95",
-  "text2": "#cfd3cd",
-  "goodRgb": "143, 181, 154",
-  "badRgb": "201, 57, 59",
-  "placeholder": "rgba(142, 149, 143, .6)",
+  "comment": "Trails of Blood & Dust, plain: weathered paper, dark ink and blood red, like the game's page on the site.",
+  "css": "--space: #ece2cc; --glass: #f5eedd; --glass-hi: #faf5ea; --well: #fffaf0; --fg: #1e1914; --muted: #5d5246; --line: rgba(30, 25, 20, .22); --chrome: #7d1612; --chrome-dim: rgba(125, 22, 18, .55); --gold: #7d1612; --blue: #2f5d50; --red: #a3261a; --good: #2e6b3f; --bad: #a3261a; --warn: #8a5a10; --on-accent: #f5eedd; --display: \"EB Garamond\", Garamond, Georgia, serif; --title: \"Pirata One\", \"IM Fell English SC\", Georgia, serif; --body: \"EB Garamond\", Garamond, Georgia, serif; --mono: \"EB Garamond\", Garamond, Georgia, serif; --numbers: \"EB Garamond\", Garamond, Georgia, serif; --radius: 4px;",
+  "glow": "125, 22, 18",
+  "line": "30, 25, 20",
+  "highlight": "255, 255, 255",
+  "wash1": "0, 0, 0, 0",
+  "wash2": "0, 0, 0, 0",
+  "optionBg": "#f5eedd",
+  "barBg": "236, 226, 204, .97",
+  "text2": "#3a3129",
+  "goodRgb": "46, 107, 63",
+  "badRgb": "163, 38, 26",
+  "placeholder": "rgba(93, 82, 70, .6)",
   "badgeStops": "<stop offset=\"0\" stop-color=\"#eef1ef\"/><stop offset=\".35\" stop-color=\"#aab3ae\"/><stop offset=\".7\" stop-color=\"#6b7571\"/><stop offset=\"1\" stop-color=\"#363d3a\"/>",
   "badgeEdge": "#23292a",
-  "particles": {
-   "direction": "down",
-   "rgb": "190, 198, 194",
-   "density": 16000,
-   "alpha": 0.55
-  }
+  "particles": null,
+  "plain": true
  },
  "groups": [
   {
