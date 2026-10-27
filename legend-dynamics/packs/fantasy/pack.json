@@ -65,27 +65,23 @@
   "titlePlaceholder": "e.g. Reaver of the Ulfang clan"
  },
  "theme": {
-  "comment": "A sorcerer's ledger by brazier light: soot-black panels, tarnished bronze rules, blood-red accents, embers rising.",
-  "css": "--space: #0c0806; --glass: rgba(26, 17, 12, .9); --glass-hi: rgba(38, 26, 18, .92); --well: rgba(10, 6, 4, .74); --fg: #eee2cf; --muted: #a39079; --line: rgba(205, 152, 88, .22); --chrome: #d6a660; --chrome-dim: rgba(214, 166, 96, .55); --gold: #dcb26a; --blue: #9a86d0; --red: #c0392b; --good: #a3bd7c; --bad: #d4473b; --warn: #dc9a45; --on-accent: #120b07; --display: \"Cinzel\", Georgia, serif; --title: \"Cinzel Decorative\", \"Cinzel\", Georgia, serif; --body: \"Cormorant Garamond\", Garamond, Georgia, serif; --mono: \"Cinzel\", Georgia, serif; --numbers: \"Cormorant Garamond\", Garamond, Georgia, serif; --radius: 4px;",
-  "glow": "214, 166, 96",
-  "line": "205, 152, 88",
-  "highlight": "242, 214, 168",
-  "wash1": "150, 30, 18, .26",
-  "wash2": "70, 40, 110, .22",
-  "optionBg": "#1a110c",
-  "barBg": "18, 12, 8, .95",
-  "text2": "#e0d2bd",
-  "goodRgb": "163, 189, 124",
-  "badRgb": "212, 71, 59",
-  "placeholder": "rgba(163, 144, 121, .6)",
+  "comment": "The Shattered Crown, plain: an illuminated manuscript, like the game's page on the site.",
+  "css": "--space: #efe6d3; --glass: #f7f1e4; --glass-hi: #fbf7ee; --well: #fffbf2; --fg: #221e18; --muted: #5a5144; --line: rgba(34, 30, 24, .22); --chrome: #2f5a3a; --chrome-dim: rgba(47, 90, 58, .55); --gold: #2f5a3a; --blue: #4a4a8a; --red: #8f2a20; --good: #2e6b3f; --bad: #9a2b20; --warn: #8a6214; --on-accent: #f7f1e4; --display: \"Cinzel\", Georgia, serif; --title: \"Cinzel Decorative\", \"Cinzel\", Georgia, serif; --body: \"Cormorant Garamond\", Garamond, Georgia, serif; --mono: \"Cormorant Garamond\", Garamond, Georgia, serif; --numbers: \"Cormorant Garamond\", Garamond, Georgia, serif; --radius: 4px;",
+  "glow": "47, 90, 58",
+  "line": "34, 30, 24",
+  "highlight": "255, 255, 255",
+  "wash1": "0, 0, 0, 0",
+  "wash2": "0, 0, 0, 0",
+  "optionBg": "#f7f1e4",
+  "barBg": "239, 230, 211, .97",
+  "text2": "#3a342b",
+  "goodRgb": "46, 107, 63",
+  "badRgb": "154, 43, 32",
+  "placeholder": "rgba(90, 81, 68, .6)",
   "badgeStops": "<stop offset=\"0\" stop-color=\"#ffe7b8\"/><stop offset=\".35\" stop-color=\"#d6a35a\"/><stop offset=\".7\" stop-color=\"#9a6328\"/><stop offset=\"1\" stop-color=\"#5a3410\"/>",
   "badgeEdge": "#3a2008",
-  "particles": {
-   "direction": "up",
-   "rgb": "236, 140, 64",
-   "density": 15000,
-   "alpha": 0.6
-  }
+  "particles": null,
+  "plain": true
  },
  "docxColors": [
   "5A2A1A",
