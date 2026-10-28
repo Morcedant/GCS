@@ -1090,7 +1090,8 @@ tr.lvl-U td.target { color: var(--muted); }
             <span class="muted small" id="ptrack-effect"></span></div>
           <div class="field" id="xtrack-wrap" hidden><span class="label" id="xtrack-label"></span>
             <div class="boxes" id="xtrack-boxes"></div>
-            <span class="muted small" id="xtrack-effect"></span></div>
+            <span class="muted small" id="xtrack-effect"></span>
+            <div id="xknown" class="small" style="margin-top:6px"></div></div>
           <div class="field" id="files-mine" hidden></div>
           <div class="checks"><label><input type="checkbox" id="f-stunned"> {{stun}}: −2 on next action roll</label>
             <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label>
@@ -1303,6 +1304,11 @@ tr.lvl-U td.target { color: var(--muted); }
   // Optional: the villains' files on the heroes (PACK.heroFiles): what a villain has learned about one hero. The GM keeps
   // them on the hero (play.files); the ones the hero has found out about reach their sheet (play.knownFiles).
   const HFILES = PACK.heroFiles || null;
+  // Who already knows the secret (identityTrack.knownBy): what the character's legal status means (fixed), and the people and groups
+  // the player records (play.knownBy). Exposure measures how close the secret is to getting past them.
+  const XKNOWN = (XTRACK && XTRACK.knownBy) || null;
+  const knownByStatus = (c = ch) => (XKNOWN && XKNOWN.byStatus && c.status && XKNOWN.byStatus[c.status]) || "";
+  const knownList = (c = ch) => [knownByStatus(c), ...((c.play && c.play.knownBy) || [])].filter(Boolean);
   // Optional: powers with a Class. The origin sets the slots (e.g. one Class II and two Class I); each slot holds one power.
   // "I+" is a Class I slot that becomes Class II when the powers skill is the top skill. Origins can limit the list.
   const POWERS = PACK.powers || null;
@@ -1381,7 +1387,7 @@ tr.lvl-U td.target { color: var(--muted); }
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
       loads: [],
-      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, xtrack: 0, log: [], lasting: [], gwLast: null, loads: {} },
+      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, xtrack: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
     };
   }
   function example() {
@@ -1463,6 +1469,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const files = (v) => (Array.isArray(v) ? v : []).filter((f) => f && typeof f === "object").slice(0, 40);
     out.play.files = files(out.play.files).map((f) => ({ id: fs(f.id, 20) || uid(), ...fileOf(f), found: !!f.found })).filter((f) => f.holder && f.knows);
     out.play.knownFiles = files(out.play.knownFiles).map(fileOf).filter((f) => f.holder && f.knows);
+    out.play.knownBy = [...new Set((Array.isArray(out.play.knownBy) ? out.play.knownBy : []).map((w) => fs(w, 60).trim()).filter(Boolean))].slice(0, 16);
     return out;
   }
 
@@ -2296,7 +2303,16 @@ tr.lvl-U td.target { color: var(--muted); }
       $("xtrack-label").textContent = XTRACK.name;
       $("xtrack-boxes").innerHTML = Array.from({ length: XTRACK.boxes }, (_, i) => `<button class="box ${i < xt ? "on" : ""}" data-xbox="${i + 1}" aria-label="${XTRACK.name} box ${i + 1}${i < xt ? ", marked" : ""}"></button>`).join("");
       $("xtrack-effect").textContent = XTRACK.effects[xt];
-      $("xtrack-print").innerHTML = `<span class="label">${XTRACK.name}</span><span>${XTRACK.effects.slice(1).map((e) => "☐ " + esc(e.split(":")[0])).join(" &nbsp; ")}</span>`;
+      $("xtrack-print").innerHTML = `<span class="label">${XTRACK.name}</span><span>${XTRACK.effects.slice(1).map((e) => "☐ " + esc(e.split(":")[0])).join(" &nbsp; ")}</span>` +
+        (XKNOWN ? `<span class="small">${esc(XKNOWN.label)}: ${knownList().map(esc).join(", ") || "no one"}</span>` : "");
+      if (XKNOWN) {
+        const mine = ch.play.knownBy || [], st = knownByStatus(), al = ch.allegiance ? allegianceOf()[1] : "";
+        const sugg = [...new Set([al, ...(XKNOWN.suggest || [])])].filter((x) => x && !mine.includes(x));
+        $("xknown").innerHTML = `<span class="label">${esc(XKNOWN.label)}</span><div class="muted">${esc(XKNOWN.intro)}</div>
+          <ul class="adv-list">${st ? `<li>${esc(st)} <span class="muted">(your ${esc((PACK.statusLabel || "status").toLowerCase())})</span></li>` : ""}${mine.map((w, i) => `<li>${esc(w)} <button class="linkish no-print" data-xkdel="${i}" aria-label="Remove ${esc(w)}">remove</button></li>`).join("")}${!st && !mine.length ? `<li class="muted">No one.</li>` : ""}</ul>
+          <div class="btn-row no-print"><input type="text" id="xk-new" maxlength="60" placeholder="${esc(XKNOWN.placeholder || "")}" aria-label="Someone who knows" style="flex:1;min-width:10em"><button class="btn" id="xk-add">Add</button>
+          ${sugg.map((x) => `<button class="linkish" data-xkadd="${esc(x)}">+ ${esc(x)}</button>`).join("")}</div>`;
+      }
     }
     const known = HFILES ? (ch.play.knownFiles || []) : [];
     $("files-mine").hidden = !known.length;
@@ -2459,13 +2475,13 @@ tr.lvl-U td.target { color: var(--muted); }
   function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
   // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
   const pickPlay = (c, gm = false) => { const p = c.play || {}, g = p.gun || {};
-    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, lasting: p.lasting || [] };
+    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, knownBy: p.knownBy || [], lasting: p.lasting || [] };
     // The files a villain holds on this hero: the GM sends the ones the hero has found out about (never the others);
     // the player's page passes on what it was sent.
     if (HFILES) o.knownFiles = gm ? (p.files || []).filter((f) => f.found).map(({ holder, knows, gives, destroyed }) => ({ holder, knows, gives, destroyed: !!destroyed })) : p.knownFiles || [];
     if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
     return o; };
-  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "form", "ptrack", "xtrack", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
+  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "form", "ptrack", "xtrack", "knownBy", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
     if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
   const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
@@ -3261,7 +3277,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span></div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.form ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.form ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
-        ${hasXT(c) ? `<div class="gm-row small"><span class="muted">${esc(XTRACK.name)}</span><span class="boxes">${Array.from({ length: XTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.xtrack || 0) ? "on" : ""}" data-gm="${c.id}" data-gmxt="${i + 1}" aria-label="${esc(c.name)} ${XTRACK.name} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(XTRACK.effects[Math.min(XTRACK.boxes, c.play.xtrack || 0)].split(":")[0])}</span></div>` : ""}
+        ${hasXT(c) ? `<div class="gm-row small"><span class="muted">${esc(XTRACK.name)}</span><span class="boxes">${Array.from({ length: XTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.xtrack || 0) ? "on" : ""}" data-gm="${c.id}" data-gmxt="${i + 1}" aria-label="${esc(c.name)} ${XTRACK.name} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(XTRACK.effects[Math.min(XTRACK.boxes, c.play.xtrack || 0)].split(":")[0])}</span></div>${XKNOWN ? `<div class="gm-row small"><span class="muted">${esc(XKNOWN.label)}</span><span>${knownList(c).map(esc).join(", ") || "no one"}</span></div>` : ""}` : ""}
         <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
         <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${x.lab})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
         <div class="gm-traits"><span><strong>Advantage:</strong> ${esc(k.adv || "—")}</span>
@@ -3519,6 +3535,18 @@ tr.lvl-U td.target { color: var(--muted); }
     $("r-phys").checked = PHYSICAL.has($("r-skill").value);
     render();
   });
+  $("xknown").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const list = ch.play.knownBy || [];
+    if (b.dataset.xkdel !== undefined) ch.play.knownBy = list.filter((_, i) => i !== +b.dataset.xkdel);
+    else {
+      const w = (b.id === "xk-add" ? $("xk-new").value : b.dataset.xkadd || "").trim().slice(0, 60);
+      if (!w || list.includes(w) || list.length >= 16) return;
+      ch.play.knownBy = [...list, w];
+    }
+    render();
+  });
+  $("xknown").addEventListener("keydown", (e) => { if (e.target.id === "xk-new" && e.key === "Enter") { e.preventDefault(); $("xk-add").click(); } });
   $("xtrack-boxes").addEventListener("click", (e) => {
     const b = e.target.closest("[data-xbox]"); if (!b) return;
     const i = +b.dataset.xbox;

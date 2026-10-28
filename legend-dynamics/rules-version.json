@@ -9,6 +9,7 @@
       "title": "Aurora: Exposure, villains' files and team-ups",
       "items": [
         "A character with a Secret Identity has Exposure, a track of four boxes: marked when the secret slips, cleared by alibis. When it fills, the hero is unmasked and the player chooses the price. It shows on the play tab and in the GM view.",
+        "Exposure is relative: each hero keeps a list of who already knows the secret (family, a team, ExLAW, a villain). A legal status adds its own (Registered: the EMD; Reserve Agent: ExLAW's Director). Exposure measures the secret getting past them, and someone new who learns it goes on the list.",
         "Villains keep files on the heroes: what they know, and +2 against that hero when it applies. The GM records them in the GM view; a hero who finds a file sees it on their sheet, and can destroy it.",
         "Team-ups: two heroes combine powers in one action. The attack counts one Class higher and both mark a box of Strain. The Encounter panel has a Team-up choice for attacks with a Class."
       ]
