@@ -71,10 +71,30 @@ def long_date(iso):
 
 
 def rules_stamp():
-    """'Rules version … · last updated …', or just the date while no version number has been set."""
+    """'Core rules version … · last updated …', or just the date while no version number has been set. The core rules'
+    date only: a setting's own rules changes don't move it (see setting_stamp)."""
     v = rules_version()
     when = f"last updated {long_date(v['rulesUpdated'])}"
-    return f"Rules version {e(v['rulesVersion'])} · {when}" if v.get("rulesVersion") else f"Rules {when}"
+    return f"Core rules version {e(v['rulesVersion'])} · {when}" if v.get("rulesVersion") else f"Core rules {when}"
+
+
+def setting_stamp():
+    """'Setting rules last updated … (Aurora)': the newest changelog entry of kind "setting", and the settings it names
+    (the part of each title before the colon). Empty when there's none, or when it's no newer than the core rules."""
+    v = rules_version()
+    sets = [c for c in v["changes"] if c.get("kind") == "setting"]
+    if not sets:
+        return ""
+    day = max(c["date"] for c in sets)
+    if day <= v["rulesUpdated"]:
+        return ""
+    names = []
+    for c in sets:
+        if c["date"] == day:
+            for n in re.split(r",\s*|\s+and\s+", c["title"].split(":", 1)[0]):
+                if n.strip() and n.strip() not in names:
+                    names.append(n.strip())
+    return f"setting rules last updated {long_date(day)} ({e(', '.join(names))})"
 
 
 def pack(pid):
@@ -312,7 +332,7 @@ def changelog_page():
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Changelog</h1>
   <hr class="ld-rule">
-  <p class="ld-lede">{rules_stamp()}. A <b>rules change</b> changes how the game plays (a <b>setting rules change</b>, one setting's own rules, leaves the core rules' date alone); a <b>website and wording</b> update fixes or improves the site and the text without changing the rules, and leaves the rules' date alone.</p>
+  <p class="ld-lede">{rules_stamp()}{" · " + setting_stamp() if setting_stamp() else ""}. A <b>rules change</b> changes how the game plays (a <b>setting rules change</b>, one setting's own rules, leaves the core rules' date alone); a <b>website and wording</b> update fixes or improves the site and the text without changing the rules, and leaves the rules' date alone.</p>
   <div class="ld-actions">
     <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">Core rules</a>
     <a class="ld-button ld-button--ghost" href="{CONTACT_SLUG}">Send feedback</a>
