@@ -10194,7 +10194,7 @@ return { mountLab };
     if (g.dazed) ch.play.stunned = true;
     const w = addWound(g);
     ch.play.gwLast = { key: w.key, total, dice, dyingBefore, stunnedBefore, downgraded: false };
-    $("gw-result").innerHTML = `3d6 = ${total} (${dice.join(" + ")}): <b>${esc(g.name)}.</b> ${esc(g.text)}${g.dying ? " <b class='bad'>Dying.</b>" : ""}`;
+    $("gw-result").innerHTML = `3d6 = ${total} (${dice.join(" + ")}): <b>${esc(g.name)}</b>${g.dying ? ", and <b class='bad'>Dying</b>" : ""}. What it does is in your lasting wounds below.`; // the list holds the text: not twice
     touch(); render(); save();
   };
   $("gw-down").onclick = () => {
@@ -10207,7 +10207,7 @@ return { mountLab };
     let now = null;
     if (to) { now = addWound(to); if (to.dying) ch.play.dying = true; if (to.dazed) ch.play.stunned = true; } // …and suffer the milder one instead
     ch.play.gwLast = now ? { ...last, key: now.key, downgraded: true } : null;
-    $("gw-result").innerHTML = `Grit point: ${esc(lw.name)} becomes <b>${to ? esc(to.name) : "nothing lasting"}</b>.${to ? " " + esc(to.text) : ""}`;
+    $("gw-result").innerHTML = `Grit point: ${esc(lw.name)} becomes <b>${to ? esc(to.name) : "nothing lasting"}</b>.`;
     touch(); render(); save();
   };
   const tradeLimb = (kind) => {
