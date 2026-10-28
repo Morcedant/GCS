@@ -68,6 +68,17 @@ Opponents use the same rules as the characters. **Minor opponents** (hired guns,
 
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
 
+## Your own threats, weapons and Edges
+
+A GM can add their own. Keep them in line with the book's:
+
+- **Threats.** A minor foe has 1 box; an ordinary one 3; a tough one 4 or 5; a rare horror 6. Attack targets run 11 to 13 for most, 14 or 15 for the dangerous. Dodge runs 7 to 10. Give it one special trait, said plainly, and decide what it does before play: toughness, a weakness or armor works as in *Armor, toughness and weaknesses*.
+- **Weapons.** Hits mark 1 box for fists, knives and arrows; 2 for sabers and guns; 3, and Dying, for the heavy and the point-blank. Give a weapon a reach (melee) or a range band, and its rounds if they run out.
+- **Edges.** Worth about as much as one of the book's: a narrow, useful benefit, often once per session or per case. Say exactly what it does.
+- **Spells and rituals.** A new spell matches the book's (an attack marks 1 or 2 boxes at Close or Short range; anything stronger says who resists); a ritual has its weight (Minor 2 segments, Significant 4, Major 6), the time a roll takes, what it does and its price.
+
+**In the creator.** The GM view's **Homebrew** tab keeps your threats, weapons, Edges, heritages, advantages, spells and rituals. They then work like the book's, marked *homebrew*. Save them to a file to keep them or share them with another GM.
+
 # The GM's tools
 
 ## The battle map
@@ -76,12 +87,16 @@ The GM view of the character creator has a **battle map** for fights where it he
 
 **Two kinds of map.**
 
-- **A hex map** for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a saloon, 5 or 10 yards for a street, 50 for open prairie. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range table in the Players' Guide. Up close it names the reach: a knife or claws at 1 yard, a saber at 2, a spear at 3. When both the attacker and the target have tokens on the map (a character by their card, anyone else by the same name as in the Encounter panel), the panel checks the distance against the weapon: in reach, close enough to move in and strike, too far this turn, or for a gun the range band, which it sets.
+- **A hex map** for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a saloon, 5 or 10 yards for a street, 50 for open prairie. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range table in the Players' Guide. Up close it names the reach: a knife or claws at 1 yard, a saber at 2, a spear at 3. When both the attacker and the target have tokens on the map (a character by their card, anyone else by the same name as in the Encounter panel), the panel checks the distance against the weapon: in reach, close enough to move in and strike, too far this turn, or for a gun the range band, which it sets. A token can have a height (a rider on a bluff, a shooter in a church tower), and the distance counts it.
 - **A range track** for fights where only distance matters: a chase after a stagecoach, a running fight across open country. It has a lane for the posse and one for each range band. Moving a token into the next lane moves it one band in or out.
 
 **Tokens.** The GM places the posse with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, Dazed or Grit points on a token marks it on the character, and the other way round. Opponents come from the Threats table with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.
 
 **Keeping a map.** The map stays in the GM's browser. **Save map to file** keeps both maps, their pictures and tokens in one file, to prepare a fight ahead of time or share it with another GM.
+
+## The Discovery panel
+
+The GM view's **Discovery: the diaries** panel runs discovery clocks. Start a clock with its segments per phase (or a plain progress clock for a task in the same race), mark segments as the characters succeed, name the subject at the gate, and choose the primary investigator. When the clock fills, write what they established and **mint** it: the primary investigator owns the diary entry and everyone present gets a shared copy. **Record a finding without a clock** does the same for a direct finding, and marks the cost you choose: a box of Trouble, or a tick on a danger clock or the threat clock. The **threat clock** stays idle until you start it. Save the characters' files afterwards so the players get their entries. A step of the campaign builder's outline can wait for diary entries, as its trigger.
 
 ## The Encounter panel
 

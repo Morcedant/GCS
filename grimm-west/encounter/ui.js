@@ -31,6 +31,8 @@ export function mountLab(api) {
   const MATERIALS = PACK.materials || []; // [id, name]: what an attack can be made of, against weaknesses and Tough // published protective gear (a shield, a mail shirt) as data
   const protTraits = (/** @type {string[]} */ ids) => PROT.filter((/** @type {any} */ x) => ids.includes(x.id)).flatMap((/** @type {any} */ x) => x.traits.map((/** @type {any} */ t) => ({ ...t })));
   const PTRACK = PACK.personalTrack || null; // a setting's personal price track (Corruption, Strain), kept on the character
+  // A setting's Mind track (Aurora): psychic attacks mark it, Will resists them, and Mind Defense stops the weaker ones.
+  const MT = PACK.mindTrack || null;
   const BAND_NAMES = { melee: "In reach", close: "Close", short: "Short", medium: "Medium", long: "Long", extreme: "Extreme" };
 
   /** @type {{ mode: "published" | "lab", cfg: any, enc: any, history: any[], compare: any }} */
@@ -169,7 +171,7 @@ export function mountLab(api) {
     }
     return out;
   }
-  const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"] });
+  const MAT_WORDS = /** @type {Record<string, string[]>} */ ({ wood: ["stake", "wooden"], iron: ["cold iron", "iron"], fire: ["fire", "flame"], silver: ["silver"], salt: ["salt"], blessed: ["blessed", "holy water"] });
   // The battle map's distance between attacker and target, checked against the weapon: a weapon in hand's reach
   // and the attacker's Move (as injury leaves it), or a ranged weapon's band, which it sets. Only a note: the GM rules.
   function reachCheck(/** @type {any} */ a, /** @type {any} */ d, /** @type {any} */ w) {
@@ -200,23 +202,48 @@ export function mountLab(api) {
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
     const formRules = fm ? shapeTraits(fm, formOn) : [];
-    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+    // Powers that attack (setting data: arms with a power and its Class): the character's own, at the Class they have it.
+    const pw = api.powers ? api.powers(c) : [];
+    for (const a of Object.values(WEAPONS)) if (a.power && pw.some((/** @type {any} */ x) => x.id === a.power && x.cls === a.powerClass)) weapons.push(a.id);
+    // Strength (a power, or a suit that gives it): weapons in hand hit harder, and pins hold.
+    const strength = Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === "strength").map((/** @type {any} */ x) => x.cls), ...((c.equipment || {}).aegis ? [2] : []));
+    // Powers in a fight (powers.fight: Speed acts first, defends twice and acts more than once a round; Flight flies).
+    const F = (PACK.powers && PACK.powers.fight) || {}, clsOf = (/** @type {string} */ id) => Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === id).map((/** @type {any} */ x) => x.cls));
+    const fight = {
+      ...(F.actFirst && clsOf(F.actFirst.power) >= F.actFirst.from ? { actFirst: true } : {}),
+      ...(F.actions && clsOf(F.actions.power) ? { actions: F.actions.byClass[clsOf(F.actions.power) - 1] || 1 } : {}),
+      ...((F.flies || []).some((/** @type {string} */ id) => clsOf(id)) || (c.equipment || {}).aegis ? { flies: true } : {}) };
+    // Mind Defense (MT.defenseFrom: Telepathy, Mind Control, Possession at their Class; MT.gear: equipment that gives it), and advantages
+    // that steady the mind (MT.resistAdvantages: Cool Under Fire, +2).
+    const md = MT ? Math.max(0, ...(MT.defenseFrom || []).map((/** @type {string} */ id) => clsOf(id)),
+      ...Object.entries(MT.gear || {}).filter(([id]) => (c.equipment || {})[id]).map(([, v]) => +v)) : 0;
+    const steady = MT && MT.resistAdvantages ? [c.adv, c.adv2].filter((x) => x && MT.resistAdvantages[x.id]).map((x) => ({ type: "resistMind", value: MT.resistAdvantages[x.id], label: ((PACK.advantages || []).find((v) => v[0] === x.id) || [])[1] || x.id })) : [];
+    const mindTraits = [...(md ? [{ type: "mindDefense", value: md, label: `Mind Defense ${["", "I", "II", "III", "IV", "V", "VI"][md]}` }] : []), ...steady];
+    const speedDefense = F.extraDefense && clsOf(F.extraDefense.power) >= F.extraDefense.from && !(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge])
+      ? [{ type: "extraDefense", value: 1, label: "Speed: a second defense" }] : [];
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", ...(strength ? { strength } : {}), ...fight, agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
+        ...speedDefense, ...mindTraits,
         ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : []),
-        ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (Pelion's advantages)
+        ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
-      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
+      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo,
+      ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes, will: c.attrs.Will } : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A threat from the setting's data. @param {any} t @param {string} name */
   function fromThreat(t, name) {
     const skills = Object.fromEntries(t.attacks.map((/** @type {any} */ a) => [a.skill, a.target]));
     const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
-    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
-      boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}`,
+    // A threat's Strength: the Class of its strength attacks.
+    const strength = Math.max(0, ...t.weapons.filter((/** @type {string} */ w) => /strength/.test(w) && WEAPONS[w]).map((/** @type {string} */ w) => WEAPONS[w].class || 0));
+    return { kind: "npc", name, side: "foe", ...(strength ? { strength } : {}), ...(t.actFirst ? { actFirst: true } : {}), ...(t.actions > 1 ? { actions: t.actions } : {}), ...(t.flies ? { flies: true } : {}), agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
+      boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo,
+      // The Mind track: as many boxes as the body (one for a minor opponent); Will as given, or estimated.
+      ...(MT ? { mind: 0, mindBoxes: t.minor ? 1 : t.boxes || 3, will: t.will ?? (t.minor ? 9 : t.named ? 12 : 10), ...(t.will === undefined ? { willEstimated: true } : {}) } : {}), note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
   function ensureEnc() {
@@ -263,6 +290,7 @@ export function mountLab(api) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
+      if (MT && (c.play.mind || 0) !== (p.mind || 0)) E.override(en, rules(), LD, "mind", { pid: p.pid, mind: c.play.mind || 0, reason: "changed on the character card" });
       if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
       // A shapechanger who changed form on the card (the GM view, or the sheet's file) changes in the encounter too.
       const fm = p.form && api.formOf ? api.formOf(c) : null;
@@ -278,6 +306,7 @@ export function mountLab(api) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       c.play.injury = Math.min(3, p.injury); c.play.dying = p.dying; c.play.duty = p.points;
+      if (MT) c.play.mind = Math.min(MT.boxes, p.mind || 0);
       if (c.play.gun && p.ammo[c.play.gun.type] !== undefined) c.play.gun.rounds = p.ammo[c.play.gun.type];
       if (PTRACK && p.tracks) c.play.ptrack = Math.min(PTRACK.boxes, p.tracks[PTRACK.name] || 0);
       // Lasting wounds from gritty combat go on the card's list once each.
@@ -348,7 +377,7 @@ export function mountLab(api) {
       // The character's card changes form too, so the sheet, the GM view and the encounter agree.
       const p = E.find(en, d.form), c = api.crew().find((x) => x.id === p.ref); if (!c) { say("That character isn't in the GM view any more.", true); return; }
       const on = !(p.form && p.form.on);
-      if (api.setForm) api.setForm(c, on); else c.play.form = on; // the page's own flag (Grimm keeps the woge as play.woge)
+      if (api.setForm) api.setForm(c, on); else c.play.form = on; // the page's own flag, where it keeps one
       const st = fromCharacter(c), res = E.setForm(en, p.pid, on, st);
       if (res.error) { say(res.error, true); return; }
       api.saveCrew(); api.renderCrew();
@@ -403,6 +432,8 @@ export function mountLab(api) {
     $("lab-atk-row").hidden = action !== "attack";
     $("lab-reach").hidden = true; // the map check below shows it again for an attack
     $("lab-text-row").hidden = !["point", "complication", "condition", "note"].includes(action);
+    // The core's conditions, offered when adding one (any other text works too).
+    $("lab-cond-list").innerHTML = action === "condition" ? [T.stun || "Stunned", "Frightened", "Charmed", "Pinned", "Prone"].map((c) => `<option value="${esc(c)}">`).join("") : "";
     $("lab-text-label").textContent = { point: "What for (a small preparation, or other)", complication: "What happens", condition: "Condition", note: "Note" }[action] || "";
     if (action === "attack" && a) {
       const pw = $("lab-weapon").value;
@@ -431,6 +462,14 @@ export function mountLab(api) {
       // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
       if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None</option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
+      // A dive: a flier strikes in reach at full speed.
+      $("lab-dive-wrap").hidden = !(a && a.flies && w && w.reach === "melee");
+      if ($("lab-dive-wrap").hidden) $("lab-dive").checked = false;
+      // A team-up (a power with a Class): another character puts their power into this attack, one Class higher.
+      const mates = w && w.class ? en.participants.filter((/** @type {any} */ p) => p.pid !== a.pid && p.side === a.side && p.pid !== $("lab-target").value && !p.dead && !E.isOut(p)) : [];
+      $("lab-team-wrap").hidden = !mates.length;
+      if (mates.length) { const was = $("lab-team").value; $("lab-team").innerHTML = `<option value="">No one</option>` + mates.map((/** @type {any} */ p) => `<option value="${p.pid}">${esc(p.name)} (Class ${["", "I", "II", "III", "IV", "V", "VI"][Math.min(6, w.class + 1)]})</option>`).join(""); $("lab-team").value = mates.some((/** @type {any} */ p) => p.pid === was) ? was : ""; }
+      else $("lab-team").value = "";
       if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
       const base = w ? a.skills[w.skill] : undefined;
       if ($("lab-skill").dataset.for !== `${a.pid}|${w && w.id}`) { $("lab-skill").value = base ?? ""; $("lab-skill").dataset.for = `${a.pid}|${w && w.id}`; }
@@ -464,6 +503,8 @@ export function mountLab(api) {
         mode: mode ? { id: mode[0], label: mode[1], mod: mode[4] || 0, cost: mode[2] } : null, ammo: $("lab-ammo-wrap").hidden ? null : $("lab-ammo").value,
         material: $("lab-material-wrap").hidden || !$("lab-material").value ? null : $("lab-material").value,
         called: $("lab-called-wrap").hidden || !$("lab-called").value ? null : { effect: $("lab-called").value.split("|")[0], small: $("lab-called").value.endsWith("|small") },
+        teamUp: $("lab-team-wrap").hidden || !$("lab-team").value ? null : $("lab-team").value,
+        dive: !$("lab-dive-wrap").hidden && $("lab-dive").checked,
         cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
@@ -486,6 +527,15 @@ export function mountLab(api) {
     const L = [], r = ev.rules;
     L.push(`<span class="${r.kind === "lab" ? "x" : ""}">Rules: ${esc(r.kind === "lab" ? r.label + (r.active.length ? ": " + r.active.map((/** @type {any} */ a) => `${a.id} (${a.scope.toUpperCase()})`).join(", ") : ": no experiments") : "Published")}</span>`);
     L.push(`${esc(ev.attacker.name)} → ${esc(ev.defender.name)} · ${esc(ev.weapon.name)}${ev.ammo ? ", " + esc(ev.ammo) : ""} · ${BAND_NAMES[ev.band] || ev.band}${ev.reroll ? ` · <span class="x">${esc(T.point)} reroll of the ${ev.reroll}</span>` : ""}`);
+    if (ev.mind) { // a psychic attack: a contest against Will, on the Mind track
+      L.push("", `${esc(ev.skill)}: ${ev.base}`, ...ev.attackMods.map((/** @type {any} */ m) => `${esc(m.label)}: ${signed(m.value)}`), `Final target: <b>${ev.target}</b>`,
+        `Roll: <b>${ev.attackTotal}</b> ${diceText(ev.attackDice)}${ev.auto ? ` · natural ${ev.attackTotal}: automatic ${ev.auto}` : ""} · ${ev.success ? `succeeded by ${ev.margin}` : `failed by ${-ev.margin}`}`);
+      if (ev.dodgeDice) L.push("", `${esc(ev.defender.name)}'s Will: ${ev.willBase}`, ...ev.resistMods.map((/** @type {any} */ m) => `${esc(m.label)}: ${signed(m.value)}`),
+        `Resists at <b>${ev.effectiveDodge}</b>: rolled <b>${ev.dodgeTotal}</b> ${diceText(ev.dodgeDice)}`, "A success beats a failure; if both succeed, the larger margin wins; ties go to the target.");
+      L.push("", ev.hit ? `<span class="ok">${esc(ev.outcome)}</span>` : `<span class="bad">${esc(ev.outcome[0].toUpperCase() + ev.outcome.slice(1))}</span>`);
+      if (ev.hit) L.push(`${esc(ev.defender.name)}'s Mind track: ${ev.mindBefore} → <b>${ev.mindAfter}</b> of ${ev.mindBoxes}${ev.unconscious ? ", <span class='bad'>unconscious</span>" : ""}. Toughness and Dodge don't help against the mind.`);
+      return L.join("\n");
+    }
     if (!ev.attackDice) { L.push(`<span class="bad">${esc(ev.outcome)}</span>`); return L.join("\n"); }
     L.push("", `${esc(ev.skill)}: ${ev.base}`);
     for (const m of ev.attackMods) L.push(`${esc(m.label)}: ${signed(m.value)}${m.scope === "experiment" ? ' <span class="x">[experiment]</span>' : ""}`);
@@ -596,12 +646,13 @@ export function mountLab(api) {
       case "leave": return `${esc(e.name)} leaves.`;
       case "start": return `Combat starts. Rules: ${esc(e.rules.kind === "lab" ? e.rules.label + " (" + (e.rules.active.map((/** @type {any} */ a) => `${a.id}, ${a.scope}`).join("; ") || "no experiments") + ")" : "Published")}${e.seed !== null && e.seed !== undefined ? ` · seed ${esc(e.seed)}` : ""}. Order: ${esc(e.order.join(", "))}.`;
       case "round": return `<b>Round ${e.round}.</b>`;
-      case "turn": return `${esc(e.name || "")}'s turn.`;
+      case "turn": return `${esc(e.name || "")}'s turn${e.of ? ` (action ${e.action} of ${e.of})` : ""}.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}`;
+      case "attack": if (e.mind) return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}` : ""}${e.dodgeDice ? `; Will ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → <b>${esc(e.outcome)}</b>${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}`;
+        return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}${e.dive ? ` · a dive, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.dive.cls]}${e.dive.hurts && e.hit ? `: ${esc(e.attacker.name)} marks a box too` : ""}` : ""}${e.flierFalls && !e.superseded ? ` · ${esc(e.defender.name)} falls from the air unless they make a Powers roll` : ""}${e.strongHands ? ` · in strong hands, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.strongHands.cls]}${e.strongHands.breaks ? "; an ordinary weapon breaks" : ""}` : ""}${e.knockback && !e.superseded ? ` · knocked down, and can be thrown back up to ${e.knockback} hex${e.knockback > 1 ? "es" : ""} or a range band${e.knockback > 1 ? "s" : ""} (through a wall: Collateral)` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
       case "trade": return `<b>${esc(e.name)} trades a limb for their life:</b> ${esc(e.wound)}.`;
-      case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.`;
+      case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.${e.grip ? ` ${esc(e.name)} is stronger: to break free, ${esc(e.target)} rolls Body −${2 * e.grip}; on a failure the pin holds.` : ""}`;
       case "shrug": return `${esc(e.name)} shrugs off a telling hit (${esc(e.label)}).`;
       case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation", downgrade: "downgrade a grievous wound", shrug: "shrug off a telling hit" }[e.use] || e.use)}${e.from ? ` (${esc(e.from)} → ${esc(e.to)})` : ""}${e.note ? ` (${esc(e.note)})` : ""}.`;
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
@@ -697,6 +748,7 @@ export function mountLab(api) {
     if (q.target) $("lab-target").value = q.target;
     if (q.weapon && [...$("lab-weapon").options].some((/** @type {any} */ o) => o.value === q.weapon)) { $("lab-weapon").value = q.weapon; renderAction(); if (q.target) $("lab-target").value = q.target; }
     if (q.action === "other" && q.note) $("lab-text").value = q.note;
+    if (typeof window !== "undefined" && window.ldReveal) window.ldReveal($("lab-act-wrap")); // the GM view may be showing another panel group
     $("lab-act-wrap").scrollIntoView({ block: "nearest" });
     return true;
   }

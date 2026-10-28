@@ -727,7 +727,8 @@
   "meleeSkill": "Melee",
   "unarmedSkill": "Brawling",
   "ammo": "rounds",
-  "ammoOne": "round"
+  "ammoOne": "round",
+  "stun": "Dazed"
  },
  "materials": [
   [
