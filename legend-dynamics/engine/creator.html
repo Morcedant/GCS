@@ -1150,6 +1150,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <label><input type="checkbox" id="r-stun"> {{stun}} −2</label>
             <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> <span id="r-aim-label">Aimed at this target</span></label>
             <label id="r-second-wrap" hidden><input type="checkbox" id="r-second"> <span id="r-second-label">Second defense this round</span></label>
+            <label id="r-feat-wrap" hidden><input type="checkbox" id="r-feat"> <span id="r-feat-label">A feat of strength or breaking a hold +2</span></label>
             <label id="r-fine-wrap" hidden><input type="checkbox" id="r-fine"> <span id="r-fine-label">Fine weapon or tool +2</span></label>
           </div>
           <div class="btn-row"><button class="btn primary" id="r-roll">Roll</button>
@@ -2351,6 +2352,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const asst = +$("r-assist").value; if (asst) parts.push(asst);
     // An advantage and a fine weapon or tool don't stack: +2 once, whichever applies.
     if (($("r-adv").checked && !$("r-adv").disabled) || ($("r-fine").checked && !$("r-fine-wrap").hidden)) parts.push(2);
+    if ($("r-feat").checked && !$("r-feat-wrap").hidden) parts.push(2);
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
@@ -2389,6 +2391,10 @@ tr.lvl-U td.target { color: var(--muted); }
     $("r-second-wrap").hidden = !(CR.oneDefense && CR.oneDefense.extraPenalty && isDefense(sk) && defensesPerRound() > 1);
     $("r-second-label").textContent = `Second defense this round ${signed(CR.oneDefense?.extraPenalty || 0)}`;
     // A fine weapon or tool: only its named skill, only its narrow use (the player ticks it), never a defense.
+    // A power that makes the body mighty (powers.bodyFeats: Strength, Size): +2 to Body for feats of strength and breaking holds, never against injury.
+    const feat = POWERS && POWERS.bodyFeats ? allPowers().find((x) => POWERS.bodyFeats.includes(x.id)) : null;
+    $("r-feat-wrap").hidden = !(feat && sk === "Body");
+    if (feat) $("r-feat-label").textContent = `${powerDef(feat.id)[1]}: a feat of strength or breaking a hold +2`;
     $("r-fine-wrap").hidden = !(edgeN("gear") && ch.gear.skill && sk === ch.gear.skill && !isDefense(sk));
     $("r-fine-label").textContent = `${ch.gear.item || "Fine weapon or tool"} +2${ch.gear.use ? `: only for ${ch.gear.use.toLowerCase()}` : ""} (not with an advantage)`;
     $("r-aim-wrap").hidden = !(CR.aim && [T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk));
@@ -2624,7 +2630,7 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine", "r-feat"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
@@ -3374,6 +3380,7 @@ tr.lvl-U td.target { color: var(--muted); }
       crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
       // A character's numbers, as the sheet works them out; with powers, their Defense Class from Toughness or Force Field.
       // In a shapechanger's form (play.form), the form's numbers; otherwise the human form's.
+      powers: (c) => (POWERS ? allPowers(c).map((x) => ({ id: x.id, cls: classIndex(x.cl) + 1 })) : []), // the Class of each power a character has
       calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n) + formSkill(n, c)])), dodge: dodge() + formDodge(c), move: moveOf(c), agility: c.attrs.Agility + formAttr("Agility", c),
         defense: POWERS ? Math.max(0, ...allPowers(c).filter((x) => ["toughness", "forcefield"].includes(x.id)).map((x) => classIndex(x.cl) + 1)) : 0 }; } finally { ch = saved; } },
       clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),

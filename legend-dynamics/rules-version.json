@@ -6,6 +6,17 @@
     {
       "date": "2026-10-28",
       "kind": "setting",
+      "title": "Aurora: super strength, and every power's attacks in the Encounter panel",
+      "items": [
+        "Super strength has its own rules: lifting (one step past your Class is a push), objects with a Class to break, throwing (Athletics; a car also hits everyone next to the target), weapons in strong hands (the higher Class; ordinary weapons break above Class II), knockback from Class III, and pins that hold against weaker targets (Body −2 per Class of difference).",
+        "Strength and Size give +2 to Body for feats and breaking holds: a new choice in the sheet's roller.",
+        "A player character's attack powers now come into the Encounter panel at their Class: Strength (blows and throws), Natural Weapons, Blast, Telekinesis, Elemental and Weather Control, Gravity, Shadow, Manifest and Stretching. Before, a hero with powers fought there with fists and gear only.",
+        "The Encounter panel applies strong hands and logs knockback and how hard a pin is to break."
+      ]
+    },
+    {
+      "date": "2026-10-28",
+      "kind": "setting",
       "title": "Aurora: Exposure, villains' files and team-ups",
       "items": [
         "A character with a Secret Identity has Exposure, a track of four boxes: marked when the secret slips, cleared by alibis. When it fills, the hero is unmasked and the player chooses the price. It shows on the play tab and in the GM view.",
