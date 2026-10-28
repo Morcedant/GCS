@@ -66,9 +66,10 @@ export function removeParticipant(enc, pid) {
   log(enc, "leave", { pid, name: p.name });
 }
 
-/** Turn order: Agility, highest first; ties in the order they joined (the GM can move anyone). @param {any} enc @param {any} rules */
+/** Turn order: anyone who acts first (actFirst: Aurora's Speed), then Agility, highest first; ties in the order they joined
+ * (the GM can move anyone). @param {any} enc @param {any} rules */
 export function startCombat(enc, rules) {
-  enc.order = [...enc.participants].sort((a, b) => b.agility - a.agility).map((p) => p.pid);
+  enc.order = [...enc.participants].sort((a, b) => (b.actFirst ? 1 : 0) - (a.actFirst ? 1 : 0) || b.agility - a.agility).map((p) => p.pid);
   enc.status = "combat"; enc.round = 1; enc.turn = 0;
   enc.setup = { participants: clone(enc.participants), order: [...enc.order] };
   enc.commands.push({ type: "start" });
@@ -100,13 +101,20 @@ function advance(enc) {
   if (enc.turn >= enc.order.length) { enc.turn = 0; enc.round++; log(enc, "round", { round: enc.round }); }
 }
 
-/** End the active participant's turn. @param {any} enc */
+/** End the active participant's action: their next action this round (actions: Aurora's Speed), or the next turn. @param {any} enc */
 export function nextTurn(enc) {
   if (enc.status !== "combat") return;
   enc.commands.push({ type: "next" });
+  const cur = active(enc);
+  if (cur && !isOut(cur) && (cur.actions || 1) > (cur.acted || 0) + 1) {
+    cur.acted = (cur.acted || 0) + 1;
+    log(enc, "turn", { pid: cur.pid, name: cur.name, action: cur.acted + 1, of: cur.actions });
+    return;
+  }
+  if (cur) cur.acted = 0;
   advance(enc); skipOut(enc);
   const p = active(enc);
-  log(enc, "turn", { pid: p && p.pid, name: p && p.name });
+  log(enc, "turn", { pid: p && p.pid, name: p && p.name, ...(p && (p.actions || 1) > 1 ? { action: 1, of: p.actions } : {}) });
 }
 
 /** Aim (when the rules allow it): the next attack on this target gets the Aim bonus. @param {any} enc @param {any} rules @param {string} pid @param {string} target */
@@ -199,6 +207,10 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   // An ordinary weapon swung above Class II breaks after the blow.
   const strong = a && weapon && weapon.reach === "melee" && !weapon.natural && !weapon.power && (a.strength || 0) > (weapon.class || 1) ? a.strength : 0;
   if (strong) weapon = atClass(weapon, strong);
+  // A dive (a flier striking at full speed): a blow in reach, one Class higher; the diver marks a box too unless their Defense
+  // is at least the dive's Class (on their sheet).
+  const dive = cmd.dive && a && a.flies && weapon && weapon.reach === "melee" ? Math.min(6, (weapon.class || 1) + 1) : 0;
+  if (dive) weapon = atClass(weapon, dive);
   // A team-up: another character puts their power into a power with a Class, and it strikes one Class higher.
   // Both mark a box of Strain, on their sheets.
   const mate = cmd.teamUp && weapon && weapon.class ? find(enc, cmd.teamUp) : null;
@@ -295,12 +307,15 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
     teamUp: mate ? { pid: mate.pid, name: mate.name, cls: weapon.class } : null,
     strongHands: strong ? { cls: strong, breaks: strong >= 3 } : null,
+    dive: dive ? { cls: dive, hurts: Math.max(0, ...(a.traits || []).filter((/** @type {any} */ t) => t.type === "defenseClass").map((/** @type {any} */ t) => t.value)) < dive } : null,
     // A hit of Class III or more knocks the target down, and can throw them a hex (or a range band) for each Class above II.
     knockback: res.hit && res.damage && res.damage.boxes && (weapon.class || 1) >= 3 ? weapon.class - 2 : 0,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null, defenseClass: res.defenseClass || null, stun: !!res.stun,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
     injuryBefore: pre.defender.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead, injuryResult: res.injury ? res.injury.change : null,
+    // A flier stunned, knocked back or taken out in the air falls, unless they make a Powers roll (Aurora).
+    flierFalls: !!(d.flies && res.hit && (res.stun || ((weapon.class || 1) >= 3 && res.damage && res.damage.boxes) || isOut(d))),
   });
   if (grievous && grievous.pc) d.lasting[d.lasting.length - 1].about = ev.n;
   if (extraDodge) log(enc, "override", { what: "dodge", about: ev.n, pid: d.pid, name: d.name, defense: chosen.kind, from: `already used ${chosen.kind} this round`, to: `${chosen.kind} allowed`, reason: "GM allowed it again" });

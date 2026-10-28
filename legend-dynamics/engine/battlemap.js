@@ -261,7 +261,7 @@ function mountBattleMap(api) {
       // Injury (or Hull) pips above the token: one per box, filled as they're marked.
       if (k.boxes) { const pr = Math.max(2.5, unit * 0.1), gap = pr * 2.6;
         for (let i = 0; i < k.boxes; i++) g.appendChild(el("circle", { class: "bm-pip" + (i < k.inj ? " on" : ""), r: pr, cx: (i - (k.boxes - 1) / 2) * gap, cy: -rad - pr * 1.8 })); }
-      const lb = el("text", { class: "bm-label", y: rad + Math.max(10, unit * 0.38), "font-size": Math.max(9, unit * 0.32) }); lb.textContent = k.name || ""; g.appendChild(lb);
+      const lb = el("text", { class: "bm-label", y: rad + Math.max(10, unit * 0.38), "font-size": Math.max(9, unit * 0.32) }); lb.textContent = (k.name || "") + (t.alt > 0 && !isRange() ? ` ↑${t.alt} ${st.scale.unit}` : ""); g.appendChild(lb);
       gTok.appendChild(g);
     }
   }
@@ -305,6 +305,7 @@ function mountBattleMap(api) {
     box.innerHTML = `<b>${esc(k.name || "Token")}</b>${whose ? ` <span class="small muted">${whose}</span>` : ""}${isRange() && laneName(t.lane || 0) !== k.name ? ` <span class="small muted">· ${esc(laneName(t.lane || 0))}</span>` : ""}
       ${tracks}
       ${c ? "" : `<label>Name <input type="text" data-bms="name" value="${esc(t.name || "")}"></label><label>Color <input type="color" data-bms="color" value="${esc(t.color || "#777777")}"></label>`}
+      ${isRange() ? "" : `<label>Height <input type="number" min="0" max="100000" step="1" data-bms="alt" value="${t.alt || 0}" style="width:6em" aria-label="Height above the ground, in ${esc(st.scale.unit)}"> ${esc(st.scale.unit)} up</label>`}
       <label>Size <select data-bms="tsize">${[["1", "Normal"], ["2", "Large"], ["3", "Huge"]].map(([n, l]) => `<option value="${n}"${String(t.tsize || 1) === n ? " selected" : ""}>${l}</option>`).join("")}</select></label>
       <button class="btn" data-bm="dup">Copy</button><button class="btn" data-bm="del">Remove</button><button class="linkish" data-bm="desel">Done</button>`;
   }
@@ -531,7 +532,7 @@ function mountBattleMap(api) {
       else if (+i.value > 0) st.scale.n = +i.value;
       save(); draw();
     } else if (i.dataset.bmg) { const k = i.dataset.bmg; st[k] = i.type === "checkbox" ? i.checked : i.tagName === "SELECT" ? i.value : +i.value; save(); draw(); }
-    else if (i.dataset.bms) { const t = toks().find((x) => x.id === sel); if (!t) return; const k = i.dataset.bms; t[k] = k === "tsize" || k === "boxes" ? Math.max(1, +i.value || 1) : i.value; save(); drawTokens(); if (k === "boxes") drawSel(); }
+    else if (i.dataset.bms) { const t = toks().find((x) => x.id === sel); if (!t) return; const k = i.dataset.bms; t[k] = k === "tsize" || k === "boxes" ? Math.max(1, +i.value || 1) : k === "alt" ? Math.max(0, Math.min(100000, Math.round(+i.value) || 0)) : i.value; save(); drawTokens(); if (k === "boxes") drawSel(); }
     else if (i.dataset.bmc) { const t = toks().find((x) => x.id === sel); if (t && t.ref && api.setCrew) api.setCrew(t.ref, { [i.dataset.bmc]: i.checked }); }
     else if (i.dataset.bmf === "threat") {
       // Picking a threat fills in its name (numbered), boxes and a foe's color.
@@ -565,15 +566,17 @@ function mountBattleMap(api) {
       return band ? { band: String(band[0]).toLowerCase(), lanes: n } : { band: null, lanes: n };
     }
     if (st.scale.unit !== "yd") return null;
-    const hexes = dist(ta, tb), yards = hexes * st.scale.n;
-    return { hexes, yards, scale: st.scale.n, band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
+    // Height (a flier, a sniper on a roof): the straight line through the air, from the ground distance and the difference in height.
+    const ground = dist(ta, tb) * st.scale.n, up = Math.abs((ta.alt || 0) - (tb.alt || 0));
+    const yards = up ? Math.round(Math.hypot(ground, up)) : ground, hexes = up ? Math.round(yards / st.scale.n) : dist(ta, tb);
+    return { hexes, yards, scale: st.scale.n, ...(up ? { height: up } : {}), band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
   }
 
   // ---- the shared table ----
   // The map as players see it: positions and what each token shows, without pictures; "own" is the shared character's key.
   function snapshot() {
     const res = (l) => l.map((t) => { const k = info(t), c = k.c;
-      return { id: t.id, q: t.q, r: t.r, lane: t.lane, y: t.y, tsize: t.tsize, name: k.name || "", color: k.color || "#777", boxes: k.boxes || 0, injury: k.inj || 0, dying: !!k.dying, own: c ? c.tableKey || null : t.own || null }; });
+      return { id: t.id, q: t.q, r: t.r, lane: t.lane, y: t.y, tsize: t.tsize, alt: t.alt || 0, name: k.name || "", color: k.color || "#777", boxes: k.boxes || 0, injury: k.inj || 0, dying: !!k.dying, own: c ? c.tableKey || null : t.own || null }; });
     return { kind: st.kind, scale: st.scale, size: st.size, orient: st.orient, ox: st.ox, oy: st.oy, cols: st.cols, rows: st.rows, grid: st.grid, gridAlpha: st.gridAlpha,
       tokens: res(st.tokens), rts: Object.fromEntries(Object.entries(st.rts).map(([k, v]) => [k, { tokens: res(v.tokens) }])) };
   }

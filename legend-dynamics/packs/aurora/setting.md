@@ -23,7 +23,7 @@ Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every a
 | Heavy machine gun, Aegis arm cannon | Long | II | 2 | Torn apart |
 | Anti-tank rocket | Long | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
 | Grenade or explosive charge | Close (thrown) | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
-| Fall | — | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fall, by height (see *Falling*) | — | I to IV | 1 from a story or two (I); 2 from a rooftop (II); 2 from a skyscraper (III); 3 from higher (IV) | A sprain, a fracture, or worse |
 | Fire | — | — | 1 each round in the flames | Burns |
 
 **Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack whose Class is **above** your Defense hits in full; one **equal** to it marks one box fewer; one **below** it does nothing. A bulletproof Operant (Defense II) ignores pistols and rifles, and an Aegis cannon still marks a box.
@@ -225,6 +225,32 @@ Every Operant has powers, and every power has a **Class** from I to VI. Player c
 
 A night's sleep clears one box; a full day's rest clears them all.
 
+## Speed, flight and height
+
+Superheroes fight at speeds that make yards meaningless. These rules cover the moves, the extra actions, the air and the ground coming up to meet you.
+
+- **Moving in a fight.** Speed, Flight and Super Leaping cover a range band in one move: **Medium (100 yd) at Class I, Long at Class II, Extreme at Class III**, and anywhere in the scene from Class IV. (Flight only while you're flying; Leaping is one leap.) Your sheet's Move shows it.
+- **Speed in a fight.** Class I acts first in any round. Class II adds a **second defense each round** (as the Additional Defense Edge; the two don't stack) and blows at speed. Class III: once a scene, two actions in one round. Class IV: two actions every round; Class V, three. Characters who act first go in Agility order among themselves.
+- **Blows at speed.** From Speed II, your unarmed blows hit at **one Class below your Speed**: a hundred punches in a second. Roll Brawling.
+- **Chases.** Vehicles have a Class: **a car I, a helicopter or light plane II, a jet III, a fighter IV**. In a chase, a pursuer (or quarry) whose Speed or Flight is a higher Class than the other side's catches up (or gets away) without a roll. Equal Classes run the chase clocks as usual (see *Chases*). A lower Class needs a trick: a shortcut, a trap, a power that isn't speed.
+
+**Height.** A flier's height counts in the distance: a target 100 yards up and 100 yards away is about 140 yards off, at Long range. Nothing reaches a flier in melee without Flight, Leaping, Stretching or something to stand on. On the battle map, give a token its height; the distance shown counts it.
+
+- **Dive.** A flier who strikes in reach at full speed hits **one Class higher**, and marks a box too unless their Defense is at least that Class.
+- **Carrying.** A flier carries what their Strength can lift, or one person without it, and flies one Class slower while they do.
+- **Falling out of the sky.** A flier who is stunned, knocked out, or knocked back (a hit of Class III or more) in the air falls, unless they make a **Powers** roll to catch themselves. Knocked out, they just fall.
+
+**Falling.** A fall is an attack, with a Class by its height, and Defense works against it as against any attack:
+
+| Height | Class | Boxes |
+|---|---|---|
+| A story or two | I | 1 |
+| A rooftop (up to 25 yd) | II | 2 |
+| A skyscraper (up to 300 yd) | III | 2, and knocked down |
+| Higher | IV | 3 |
+
+Toughness II walks away from a rooftop; Toughness IV from a plane. A fall into a furnace or onto spikes is worse, as the GM decides. Super Leaping lands safely from any height its Class can leap.
+
 ## Super strength
 
 **Strength** is the most common power on the street, and the most physical: what it lifts, breaks, throws and holds.
@@ -417,7 +443,7 @@ Ages are as of 2025. Each comes with a stat block, and each is in the GM view's 
 
 **Celerity (Ava Torres), 33.** The super-fast Latina heroine of New York, who protects the innocent and defends the helpless. She fought the Umkas in 2012, and Steel Hawk nearly killed her; the Golden Centurion got her help, but she spent a year in a coma. Since waking she has dedicated herself to helping people across the country. She befriended the Green Man and persuaded him to open the Haven, and has stood between federal authorities and the refugees at every confrontation. There is a warrant for her arrest; ExLAW's Operants aren't pursuing it, yet.
 
-*Class IV.* **Attacks** Brawling 14 (blows at speed, Class II). **Dodge** 14 (a second defense each round). **Boxes** 4. **Defense** I (friction-proof skin). **Powers** Speed IV (two actions every round), Toughness I, Adaptation I (friction and wind). **Skills** Athletics 15, Persuasion 13, Streetwise 13, Read People 13. **Faster than the fight.** Two actions a round, and a second defense. A federal warrant hangs over her: helping her marks Scrutiny.
+*Class IV.* **Attacks** Brawling 14 (blows at speed, Class III). **Dodge** 14 (a second defense each round). **Boxes** 4. **Defense** I (friction-proof skin). **Powers** Speed IV (two actions every round), Toughness I, Adaptation I (friction and wind). **Skills** Athletics 15, Persuasion 13, Streetwise 13, Read People 13. **Faster than the fight.** Two actions a round, and a second defense. A federal warrant hangs over her: helping her marks Scrutiny.
 
 **The Green Man (Micky Holt).** A struggling folk singer, exposed to something... different on a peyote-driven walkabout in the Southwest. It drove him insane, though he still loves to play. His power over plants raised an impenetrable forest across southern Indiana in a matter of days: from Bloomington to the Ohio River you travel on foot, on horseback or by boat. He offers sanctuary to anyone who swears to protect the Earth and spread its message, and serves only vegetarian meals. Any attempt to burn or harm the forest ends in horror-movie destruction by rampaging plants. The Haven, his refuge for America's homeless, is the one place he allows fire, for warmth and cooking.
 

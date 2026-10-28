@@ -1637,7 +1637,14 @@ tr.lvl-U td.target { color: var(--muted); }
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name) + hbBonus("skill", ch, name); };
   const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge) + hbBonus("dodge");
   // Move in yards, in the current form (a form's Agility and Body count while in it).
-  const moveOf = (c = ch) => LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c)) + hbBonus("move", c);
+  // Powers that move you (powers.fight.move: Speed, Flight, Leaping): a move covers their distance by Class, if that's farther.
+  const FIGHT = (POWERS && POWERS.fight) || null;
+  const powerMove = (c = ch) => { if (!FIGHT || !FIGHT.move) return null;
+    let best = null; for (const x of allPowers(c)) { const t = FIGHT.move[x.id]; const y = t && t[Math.min(classIndex(x.cl), t.length - 1)];
+      if (y && (!best || y > best.yards)) best = { yards: y, name: `${powerDef(x.id)[1]} ${x.cl}` }; } return best; };
+  const moveOf = (c = ch) => Math.max(LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c)) + hbBonus("move", c), powerMove(c)?.yards || 0);
+  // Acting first (powers.fight.actFirst: Speed), for the GM's turn order.
+  const powerFirst = (c) => { const f = FIGHT && FIGHT.actFirst; return !!f && allPowers(c).some((x) => x.id === f.power && classIndex(x.cl) + 1 >= f.from); };
   // Move as the character's injuries leave it (wounded −2 yards, seriously wounded half and no running).
   const moveNow = (c = ch) => LD.injuredMove(moveOf(c), (c.play && c.play.injury) || 0);
   const runNow = (c = ch) => ((c.play && c.play.injury) >= 2 ? 0 : moveNow(c) * 2);
@@ -1647,7 +1654,9 @@ tr.lvl-U td.target { color: var(--muted); }
   const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
   const isParry = (name) => name.startsWith("Parry:");
   // One defense a round, more with the setting's Edge (Additional Defense).
-  const defensesPerRound = () => CR.oneDefense ? (CR.oneDefense.perRound || 1) + edgeN(CR.oneDefense.edge || "") : Infinity;
+  // Speed (powers.fight.extraDefense) gives a second defense, like the Additional Defense Edge; the two don't stack.
+  const speedDefends = () => { const f = FIGHT && FIGHT.extraDefense; return !!f && allPowers().some((x) => x.id === f.power && classIndex(x.cl) + 1 >= f.from); };
+  const defensesPerRound = () => CR.oneDefense ? (CR.oneDefense.perRound || 1) + Math.max(edgeN(CR.oneDefense.edge || ""), speedDefends() ? 1 : 0) : Infinity;
   // Block: with a real shield (gear, +its bonus) or anything picked up in the fight (no bonus).
   const SHIELDS = CR.block ? (PACK.protection || []).filter((g) => g.traits.some((t) => t.type === "shield")) : [];
   const shieldBonus = (g) => g.traits.find((t) => t.type === "shield").value || 0;
@@ -2000,7 +2009,7 @@ tr.lvl-U td.target { color: var(--muted); }
     $("st-grit").textContent = gritStart();
     $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`
       + (CR.parry ? `. Parry = ${PARRY.map(([s]) => `${s} ${skillTarget(s)} ${signed(CR.parry.mod)} = ${parryOf(s)}`).join(", or ")}` : "")
-      + `. Move = 5 yd + ${Math.floor(Math.max(0, ch.attrs.Agility + ch.attrs.Body - 20) / 2)} (Agility + Body ${ch.attrs.Agility + ch.attrs.Body}) + ${LEVELS[ch.skills.Athletics].dodge} (Athletics)${speedOf() ? ` ${signed(speedOf())} (${T.originLower} speed)` : ""} = ${moveOf()} yd; run ${moveOf() * 2} yd${moveNow() !== moveOf() ? ` (wounded: ${moveNow()} yd${runNow() ? `, run ${runNow()}` : ", no running"})` : ""}`
+      + `. Move = 5 yd + ${Math.floor(Math.max(0, ch.attrs.Agility + ch.attrs.Body - 20) / 2)} (Agility + Body ${ch.attrs.Agility + ch.attrs.Body}) + ${LEVELS[ch.skills.Athletics].dodge} (Athletics)${speedOf() ? ` ${signed(speedOf())} (${T.originLower} speed)` : ""}${powerMove() ? `; ${esc(powerMove().name)}: ${powerMove().yards >= 5000 ? "anywhere in the scene" : `${powerMove().yards} yd`}` : ""} = ${moveOf()} yd; run ${moveOf() * 2} yd${moveNow() !== moveOf() ? ` (wounded: ${moveNow()} yd${runNow() ? `, run ${runNow()}` : ", no running"})` : ""}`
       + (CR.oneDefense ? `. ${defensesPerRound() > 1 ? `${["", "One", "Two", "Three"][defensesPerRound()] || defensesPerRound()} defenses a round (Additional Defense: the second at ${signed(CR.oneDefense.extraPenalty || 0)})` : "One defense a round"}: Dodge${CR.parry ? ", Parry" : ""}${CR.block ? " or Block" : ""}.` : "");
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
@@ -3264,11 +3273,11 @@ tr.lvl-U td.target { color: var(--muted); }
     const QD = anyFx("firstInGunfight") ? PACK.roles.find((r) => (r.abilityFx || []).includes("firstInGunfight")) : null;
     $("gm-gunfight-wrap").hidden = !QD;
     if (QD) $("gm-gunfight-label").textContent = `First round of a gunfight (${QD.ability[0]}: ${QD.name} acts first)`;
-    const first = (c) => (gunfight && hasFx("firstInGunfight", c) ? 1 : 0);
+    const first = (c) => ((gunfight && hasFx("firstInGunfight", c)) || powerFirst(c) ? 1 : 0);
     const order = gmCrew.map((c) => ({ c, a: c.attrs.Agility, q: first(c) })).sort((x, y) => y.q - x.q || y.a - x.a || x.c.name.localeCompare(y.c.name));
     $("gm-turns").innerHTML = order.length ? order.map(({ c, a, q }, i) => {
       const tied = order.some((o, j) => j !== i && o.a === a && o.q === q);
-      return `<li>${esc(c.name || "Unnamed")}<span class="num">Agility ${a}</span>${q ? `<span class="tie">${esc(roleAbility(c)[0])}</span>` : ""}${tied ? '<span class="tie">tie</span>' : ""}${c.play.injury >= 3 ? ' <span class="tie">down</span>' : ""}</li>`;
+      return `<li>${esc(c.name || "Unnamed")}<span class="num">Agility ${a}</span>${q ? `<span class="tie">${esc(powerFirst(c) ? "Speed: acts first" : roleAbility(c)[0])}</span>` : ""}${tied ? '<span class="tie">tie</span>' : ""}${c.play.injury >= 3 ? ' <span class="tie">down</span>' : ""}</li>`;
     }).join("") : `<li class="muted" style="list-style:none;margin-left:-1.6em">Add characters to see the turn order.</li>`;
     $("gm-grid").innerHTML = gmCrew.length ? gmCrew.map((c) => {
       const k = gmCalc(c), inj = c.play.injury;
