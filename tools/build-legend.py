@@ -488,7 +488,8 @@ def discovery_md(d, t, neutral=False):
     out += ["- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and which methods can advance it, and shows the clock to the players.",
             "- **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.",
             f"- **The primary investigator.** One character leads and owns the {card}. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant {card} can assist with a method they couldn't otherwise bring (the {card} is why they're qualified); it adds nothing beyond the normal assistance.",
-            f"- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.", ""]
+            f"- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.",
+            f"- **A head start.** A character trained in the skill whose field squarely covers the subject (an engineer before an alien power core, a doctor before a new disease) recognizes at once that it's something new: the clock starts at Identify, skipping Confront. The GM says whether a skill fits. Identify and Uncover still have to be filled to earn the {card}.", ""]
     if d.get("scoped"):
         out += scoped_card_md(d, t, card, cards)
     else:
@@ -500,7 +501,8 @@ def discovery_md(d, t, neutral=False):
     if d.get("kinds"):
         out += [f"**Two kinds of {cards}.** " + " ".join(f"**{k[0].capitalize()}:** {k[1]}." for k in d["kinds"]), ""]
     out += [(f"### Racing the {th['track']}" if th.get("track") else f"### The {th['name']}") if not neutral else "### The threat clock", "",
-            ("A discovery clock always races a threat: here, the " + th["track"] + " track. " if th.get("track") else "" if th.get("startsOnFailure") else "A discovery clock always races a threat clock. ") + th["text"], ""]
+            ("A discovery clock always races a threat: here, the " + th["track"] + " track. " if th.get("track") else "" if th.get("startsOnFailure") else "A discovery clock always races a threat clock. ") + th["text"], "",
+            f"**A rival.** When nothing threatens yet, give the discovery a rival instead: an ordinary danger clock named for someone racing the {t['party']} to the same find. It ticks on delays, noisy methods and open digging; when it fills, the rival gets there first.", ""]
     if d.get("costs"):
         out += ["### What investigating costs", "",
                 "When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.", "",
@@ -521,6 +523,8 @@ def discovery_md(d, t, neutral=False):
         if d.get("start"):
             out += ["- " + d["start"]]
         out += [""]
+    out += ["### When the other side investigates you", "",
+            f"Enemies keep files too. What a villain, a rival or a monster has learned about a character (a weakness, a habit, a real name, the people they love) gives it **+2 against them when it applies**: an ambush where they always go, a trap built for a weakness, a hostage who matters. The GM keeps these files in the GM view and decides when one applies. A character who finds out a file exists (an informant, a captured lieutenant, a stolen ledger) sees it on their sheet, and can **destroy** it: burn the papers, discredit the source, kill the spy. A destroyed file gives nothing.", ""]
     if neutral:
         names = []
         order = ["western", "spaceopera", "fantasy", "aurora"]

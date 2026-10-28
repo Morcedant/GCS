@@ -4336,6 +4336,13 @@
   },
   "skillSkip": "A character trained in the skill that fits the subject (Engineering for an alien power core, Computers for a rogue intelligence) can skip Confront the unknown. Identify and Uncover still have to be filled."
  },
+ "heroFiles": {
+  "title": "Files on the crew",
+  "intro": "What a corporation, a syndicate, a Hegemony house or the Mandates have on a crew member: a weakness, a habit, a real name, the people they love. When it applies, it gets the file's bonus against them. A crew member who finds out sees it on their sheet; when they destroy it, the bonus is gone.",
+  "mine": "Files kept on you",
+  "knowsExample": "Bribes the same customs officer at Halvane Junction",
+  "gives": "+2 against them when it applies"
+ },
  "mounts": [
   [
    "Rover or ground car",

@@ -2883,7 +2883,7 @@
    [
     "charm",
     "Charm",
-    "The target treats you as a friend for the scene (Will resists)."
+    "The target is Charmed: it treats you as a friend for the scene (Will resists)."
    ],
    [
     "levitate",
@@ -6872,7 +6872,7 @@
   "effects": [
    "Clear",
    "Shaken: −1 to mental actions",
-   "Reeling: −2 to mental actions",
+   "Overwhelmed: −2 to mental actions",
    "Broken: unconscious or catatonic until you rest (never Dying)"
   ],
   "defenseFrom": [

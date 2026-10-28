@@ -432,6 +432,8 @@ export function mountLab(api) {
     $("lab-atk-row").hidden = action !== "attack";
     $("lab-reach").hidden = true; // the map check below shows it again for an attack
     $("lab-text-row").hidden = !["point", "complication", "condition", "note"].includes(action);
+    // The core's conditions, offered when adding one (any other text works too).
+    $("lab-cond-list").innerHTML = action === "condition" ? [T.stun || "Stunned", "Frightened", "Charmed", "Pinned", "Prone"].map((c) => `<option value="${esc(c)}">`).join("") : "";
     $("lab-text-label").textContent = { point: "What for (a small preparation, or other)", complication: "What happens", condition: "Condition", note: "Note" }[action] || "";
     if (action === "attack" && a) {
       const pw = $("lab-weapon").value;

@@ -20,9 +20,9 @@ The years are counted **After the Shattering (AS)**. The story begins in the yea
 | Wheel-lock pistol | Close | 2 | A gunshot wound |
 | Arquebus or hand-cannon | Short | 3, and Dying | A ruinous wound |
 | Powder bomb | Close (thrown) | 1 to everyone nearby, 3 and Dying at the center | Blast and burns; Dodge means diving clear |
-| Claws, fangs, venom | Melee, reach 1 yd | 2 (venom: Body roll or Reeling) | Torn flesh, poison in the blood |
+| Claws, fangs, venom | Melee, reach 1 yd | 2 (venom: a Body roll or Reeling) | Torn flesh, poison in the blood |
 | Shadow Bolt | Short | 2 | Black frost in the wound |
-| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fall | — | By height: 1 to 3, and worse (see *Falls, fire and foul air*) | A sprain, a fracture, or worse |
 | Fire | — | 1 each round in the flames | Burns |
 
 **Gunpowder** is common but slow. Anyone can carry a pistol or an arquebus, but reloading takes a **full round** (a crossbow takes one action), and rain or seawater ruins the powder until it's dried. An arquebus misfires on a natural 17 or 18; any missile weapon fails on a natural 18 (a string snaps, a bolt jams, the powder fizzles).
@@ -84,8 +84,8 @@ Cast one with **an action and a Sorcery roll**, −1 for each Boost you spend; e
 | Witchfire | Light, or set something burning: 1 box a round in the flames. Aimed at a person, it's an attack: Dodge applies; once alight, the flames are ordinary fire. |
 | Ward | Attacks against one ally are at −2 for the scene. |
 | Hex | The target is at −2 on all rolls for the scene (Will resists). |
-| Charm | The target treats you as a friend for the scene (Presence resists). |
-| Dread | The target flees or freezes (Will resists). |
+| Charm | The target is Charmed: it treats you as a friend for the scene (Will resists). |
+| Dread | The target is Frightened: it flees or freezes (Will resists). |
 | Sleep | The target sleeps (Will resists); minor opponents just drop, without resisting. |
 | Mend | Clear one injury box, once per set of injuries. |
 | Beast-tongue | Speak with an animal, and command it for a scene (a hostile animal's Will resists). |
@@ -186,7 +186,7 @@ Opponents use the same rules as the characters. **Minor opponents** (guards, ban
 | Giant ape or great beast | Brawling 15 | 9 | 5 | Claws and jaws (2) | **Huge.** Hits of 1 box mark nothing. |
 | Demon | Melee 15, Sorcery 14 | 11 | 4 | Claws (2), Witchfire | **Bound.** Holy rites and its true name mark an extra box; it must keep a bargain to the letter. |
 | Shard-bearer | Melee 15 or Sorcery 15 | 11 | 5 | As the bearer | **Crown shard.** One great power: command, fire, flight, terror. Breaking the bearer's will ends it. |
-| Thing from the Deep | Brawling 16 | 8 | 6 | Tentacles (2) | **Horror.** Once per scene, everyone who sees it rolls Will or flees in terror. |
+| Thing from the Deep | Brawling 16 | 8 | 6 | Tentacles (2) | **Horror.** Once per scene, everyone who sees it rolls Will or is Frightened. |
 
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract.
 

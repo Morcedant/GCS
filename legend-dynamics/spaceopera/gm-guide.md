@@ -174,7 +174,7 @@ A stockpile of weapons built by a hostile species, perhaps still being used agai
 
 ## Rival clocks
 
-A careful crew can investigate without ever starting a Countdown. To keep the pressure on, give the discovery a **rival**: an ordinary danger clock named for someone racing the crew to the same find. It ticks on delays, noisy methods and open digging. When it fills, the rival gets there first. No new rules are needed.
+A careful crew can investigate without ever starting a Countdown. To keep the pressure on, give the discovery **a rival** (see *Discovery clocks*). The corridors are full of them:
 
 | Rival | What they want |
 |---|---|
@@ -196,7 +196,7 @@ The GM view of the character creator has a **battle map** for fights where it he
 
 **Two kinds of map.**
 
-- **A hex map** for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a room, 5 or 10 yards for a street, 50 for open ground. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range table in the Players' Guide.
+- **A hex map** for fights where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard for a brawl in a room, 5 or 10 yards for a street, 50 for open ground. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range table in the Players' Guide. A token can have a height (a flier, a sniper on a roof), and the distance counts it.
 - **A range track** for fights where only distance matters: a chase, a running fight across open country. It has a lane for the crew and one for each range band. Moving a token into the next lane moves it one band in or out.
 
 **Tokens.** The GM places the crew with one button. Their tokens stay linked to the characters in the GM view: marking Injury, Dying, the stunned condition or a Resolve point on a token marks it on the character, and the other way round. Opponents come from the setting's threats with their boxes filled in. Their pips fill as they are hurt, and a token whose boxes are all marked is taken out.

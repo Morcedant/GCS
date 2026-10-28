@@ -2517,7 +2517,7 @@
    [
     "chill",
     "Grave Chill",
-    "The target flees or freezes (Will resists)."
+    "The target is Frightened: it flees or freezes (Will resists)."
    ],
    [
     "hold",
@@ -2884,8 +2884,8 @@
     [
      "Fall",
      "—",
-     "1 for a bad fall, 2 for a long one",
-     "A sprain or a fracture"
+     "By height: 1 to 3, and worse (see Falls, fire and foul air)",
+     "A sprain, a fracture, or worse"
     ]
    ],
    "traits": []
@@ -3850,6 +3850,13 @@
    "route": "experience",
    "cost": "Harvest +1 (the night spent waiting for it)"
   }
+ },
+ "heroFiles": {
+  "title": "What the dark knows",
+  "intro": "What something in the dark (or an outlaw, or a powerful man) has learned about a hunter: a weakness, a habit, a real name, the people they love. When it applies, it gets the file's bonus against that hunter. Hunters who find out see it on their sheet; when they destroy it, the bonus is gone.",
+  "mine": "What the dark knows about you",
+  "knowsExample": "Drinks alone at the Silver Dollar every Saturday night",
+  "gives": "+2 against them when it applies"
  },
  "materials": [
   [

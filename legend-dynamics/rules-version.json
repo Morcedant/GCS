@@ -1,14 +1,28 @@
 {
   "_about": "The one place for the core rules' version and change history. tools/build-website.py reads it for the core-rules page and the changelog. rulesVersion and rulesUpdated change only when the rules (mechanics) change; a website or wording update adds a 'site' entry and leaves them alone. rulesVersion is null until the author picks a numbering scheme.",
   "rulesVersion": null,
-  "rulesUpdated": "2026-10-21",
+  "rulesUpdated": "2026-10-28",
   "changes": [
+    {
+      "date": "2026-10-28",
+      "kind": "rules",
+      "title": "The settings and the core rules, brought in line",
+      "items": [
+        "What the settings had worked out separately is now in the core rules, for every setting: chases where one side is clearly faster, chases by range (an opposed roll moves the range a band), and a damage track for vehicles; acting first and acting more than once a round; helping in a fight; pins that hold against someone much stronger.",
+        "Falls mark boxes by height (a story 1, a rooftop 2, a tower 3 and Dying, higher is certain death), with fire and foul air beside them. Every setting's fall uses it; Aurora's adds Classes.",
+        "Conditions, defined once: stunned, Frightened (keep away from the source, −2 against it, Will each turn to shake it) and Charmed. The settings' fear spells and horrors (Grave Chill, Dread, the Thing from the Deep, Emotion Control) now say Frightened.",
+        "Weapons: what \"3, and Dying\" means, explosions, stun weapons and jams; and armor, toughness, weaknesses and materials, the way every setting's gear and threats already use them. Guns now jam on a natural 18 in Trails of Blood & Dust too, as in the other settings.",
+        "Investigation: a head start (a character trained in the right field skips Confront) and a rival clock, from Fracture Lines; and enemies' files on the characters (+2 when it applies, destroyed when found), from Aurora, now in every setting's GM view.",
+        "Tracks: shared and personal tracks described once. A Mind track (Aurora's mental harm) is described as an option any setting can use; its middle box is now Overwhelmed, since Reeling is the Shattered Crown's word for stunned.",
+        "Smaller fixes: The Shattered Crown's Charm is resisted with Will (it said Presence), as everywhere else; Fracture Lines' ship fights are described as they're actually run."
+      ]
+    },
     {
       "date": "2026-10-28",
       "kind": "setting",
       "title": "Aurora: mind powers, a Mind track and Mind Defense",
       "items": [
-        "Every character has a Mind track of three boxes beside the injury track: Shaken (−1 to mental actions), Reeling (−2), Broken (unconscious or catatonic). Psychic attacks mark it; it never leaves anyone Dying, and a night's sleep clears it. It's on the play tab, the printed sheet, the GM view's cards and the battle map.",
+        "Every character has a Mind track of three boxes beside the injury track: Shaken (−1 to mental actions), Overwhelmed (−2), Broken (unconscious or catatonic). Psychic attacks mark it; it never leaves anyone Dying, and a night's sleep clears it. It's on the play tab, the printed sheet, the GM view's cards and the battle map.",
         "Mind Defense from Telepathy, Mind Control, Possession or an ExLAW psi-dampening headset: a weaker mind power does nothing, an equal one is resisted at +2. A Class IV mind against someone without it is resisted at −2.",
         "Psychic attacks: Telepathy II (a psychic stab) and Illusion III (fears made real), one Class below the power, Powers against Will, never Dodge, Toughness or Force Field.",
         "Rules for reading minds (and being noticed), mind links, being controlled (the player keeps playing; +2 against a harmful command, +4 against hurting a friend; Spark for another roll), emotions, illusions and sensing lies.",

@@ -1941,12 +1941,12 @@
    [
     "charm",
     "Charm",
-    "The target treats you as a friend for the scene (Presence resists)."
+    "The target is Charmed: it treats you as a friend for the scene (Will resists)."
    ],
    [
     "dread",
     "Dread",
-    "The target flees or freezes (Will resists)."
+    "The target is Frightened: it flees or freezes (Will resists)."
    ],
    [
     "sleep",
@@ -3029,8 +3029,8 @@
     [
      "Fall",
      "—",
-     "1 for a bad fall, 2 for a long one",
-     "A sprain or a fracture"
+     "By height: 1 to 3, and worse (see Falls, fire and foul air)",
+     "A sprain, a fracture, or worse"
     ]
    ],
    "traits": []
@@ -3326,7 +3326,7 @@
     "claws"
    ],
    "trait": "Horror",
-   "traitText": "Once per scene, everyone who sees it rolls Will or flees in terror.",
+   "traitText": "Once per scene, everyone who sees it rolls Will or is Frightened.",
    "traits": []
   }
  ],
@@ -3567,6 +3567,13 @@
    "route": "account",
    "cost": "Debt +1 (the priest's price)"
   }
+ },
+ "heroFiles": {
+  "title": "Your enemies' spies",
+  "intro": "What a sorcerer-prince, a guild or a thing from the Deep has learned about one of the party: a weakness, a habit, a true name, the people they love. When it applies, it gets the file's bonus against them. A hero who finds out sees it on their sheet; when they destroy it, the bonus is gone.",
+  "mine": "What your enemies know",
+  "knowsExample": "Her true name, bought from a temple scribe",
+  "gives": "+2 against them when it applies"
  },
  "campaign": {
   "names": {

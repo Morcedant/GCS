@@ -315,11 +315,18 @@ Investigations have rules of their own, and earn tales: see *Tales*.
 
 Run a chase as a progress clock for the pursuers against a danger clock for the quarry's escape. Each exchange, the characters roll the skill that moves them (Riding, or Athletics on foot): success ticks the pursuers' clock, failure ticks the escape. Terrain, a tired mount or a damaged engine, and attacks made on the move (at −2) adjust the rolls.
 
+- **Clearly faster.** A side that is a whole class faster (a horse against a runner, a car against a horse, a jet against a car) catches up, or gets away, without a roll. Roll the chase between equals, or when terrain or a trick evens things out.
+- **Chases by range.** When the distance itself is the fight (riders closing on a coach, ships maneuvering for a shot), run the chase on the battle map's range track instead of clocks. Each exchange, the two sides roll an opposed contest of the skill that moves them; the winner shifts the range one band, in or out, and a tie leaves it. Anyone pushed past Extreme drops out of the chase, and a quarry that wins at Extreme by 5 or more breaks away. Everyone else fights as usual, at −2 on the move.
+- **Vehicles take damage on a track.** A coach, a car or a ship has a track of four boxes. One marks no penalty yet; two means a system, a wheel or a horse is hit (−2 to rolls that use it); three means it's crippled; four, it's wrecked or stops dead, and everyone aboard rolls Athletics or marks a box. Each setting says what its vehicles' boxes do.
+
 # Personal combat
 
 ## Turn order and actions
 
 Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move up to your **Move** (below) and take one meaningful action, such as attacking, reloading, helping, or attempting a task.
+
+- **Acting first and acting twice.** An ability can let a character act first in a round (a quick draw, super-speed): they go before everyone else, in Agility order among themselves. An ability that gives more than one action a round gives each one in turn, before the next character acts.
+- **Helping in a fight.** Helping a friend's attack (drawing a guard's eye, steadying a shot, combining your powers) is your action: you assist under the usual rules (+1, or +2 by 5 or more) before they roll.
 
 ## Attacking and defending
 
@@ -347,7 +354,7 @@ A really good shot, or a blow that lands exactly where it was meant to, lets the
 |---|---|---|
 | Disarm | Any attack | The weapon or held item drops, or flies a few yards away |
 | Knock down | A weapon in hand or fists, or a shot or missile that marks 2 or more boxes | The target falls prone, or is driven back a few steps. Standing up uses the target's move on their next turn; they still take their action |
-| Pin | A weapon in hand, fists or a grapple | The target is grabbed, held, or pinned against a wall or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack |
+| Pin | A weapon in hand, fists or a grapple | The target is grabbed, held, or pinned against a wall or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack. Against someone much stronger (a grizzly, a giant, a super-strong grip), getting free takes a Body roll, −2 or −4 against something huge; on a failure they're still held |
 | Rattle | Any attack | −2 to the target's next roll |
 | Break gear | Any attack but bare hands and natural weapons | A weapon, shield or tool is knocked out of use (jammed, bent, unstrung, cracked) until its owner spends an action putting it right. It's destroyed for good only if it was already vulnerable (a rotten haft, an improvised shield) or the attacker has a weakness to exploit. Armor loses 1 protection until it's repaired |
 | Open them up | Any attack | The next attack on this target this round gets +2 |
@@ -423,6 +430,29 @@ Injury penalties replace each other rather than stacking. They apply to movement
 
 Your protection is avoiding the hit: a defense (Dodge, Parry or Block), cover, and a Fortune point, which reduces a hit by one box.
 
+### Falls, fire and foul air
+
+A fall marks boxes by its height. Deep water, a haystack or an awning makes it one step better.
+
+| Height | Boxes |
+|---|---|
+| A story or two (up to 10 yards) | 1 |
+| A rooftop (up to 25 yards) | 2 |
+| A tower or a cliff (up to 100 yards) | 3, and Dying |
+| Higher | Certain death, unless something breaks the fall |
+
+**Fire** marks 1 box each round in the flames. **Smoke, poison air or vacuum** marks 1 box each round you breathe it, unless you have a mask or a suit.
+
+### Fear and other conditions
+
+- **Reeling.** −2 on your next action roll; then it's over.
+- **Frightened.** Fear, a hex, a horror: you must keep away from its source, and you're −2 to act against it. At the end of each of your turns, roll Will to shake it off (+2 if you've been hurt since). A spell or a trait that makes its target *flee or freeze* makes them Frightened.
+- **Charmed.** You treat the one who charmed you as a friend for the scene. Harming you or your friends ends it at once.
+
+### Mental harm (a setting option)
+
+A setting can give every character a **Mind** track beside the injury track (Aurora does). Attacks on the mind mark it: Powers or a spell against Will, never Dodge, and armor doesn't help. One box is Shaken (−1 to mental actions: Will, and skills of Intellect and Presence), two Overwhelmed (−2), three Broken: unconscious or catatonic until they rest. It never leaves anyone Dying; a scene's rest clears one box, a night's sleep all of them. Opponents have as many Mind boxes as injury boxes.
+
 ### Optional rule: gritty combat
 
 For a harder, bloodier game, the GM can turn on **gritty combat** for the campaign (the creator has a switch on the Condition card and in the GM view). The rest of the rules stay the same.
@@ -450,6 +480,18 @@ For a harder, bloodier game, the GM can turn on **gritty combat** for the campai
 
 How many boxes a hit marks depends on the **weapon**, not on how well the attack succeeded.
 
+- **"3, and Dying."** The deadliest weapons (a buffalo rifle, a plasma rifle, a grenade at the center) mark 3 boxes: enough to take an unhurt character straight to Incapacitated and Dying.
+- **Explosions** mark 1 box on everyone nearby and their full boxes at the center; Dodge means diving clear.
+- **Stun weapons** (a taser, a stunner) mark no box: the target rolls Body −2. On a failure they're out for the scene; on a success, −2 on their next action.
+- **Jams.** A firearm jams on a natural 18 (a setting's older guns may misfire more often); clearing it takes an action.
+
+### Armor, toughness and weaknesses
+
+- **Armor** turns some hits. A typical piece (a mail shirt, a heavy coat, a vest) makes a hit of 2 or more boxes mark one fewer, once per fight, and its entry says what it works against. Heavy armor works every time.
+- **Toughness.** A threat's trait can say *hits of 1 box mark nothing* (a huge beast, an armored soldier) or *hits of 2 or more boxes mark one fewer* (chrome, scales, a curse).
+- **Weaknesses.** What a creature is weak to marks one box more, and its toughness and armor don't help against it. *Only fire (or silver, or cold iron) marks more than 1 box* means everything else marks at most 1.
+- **Materials.** What an attack is made of (silver, cold iron, a wooden stake, holy water) is what counts for a weakness: say it when you attack. A weakness works whoever uses it, whether or not anyone knows of it.
+
 | Weapon | Range | Boxes on a hit | What the injury looks like |
 |---|---|---|---|
 | Fists, kicks, dirty tricks | Melee, reach 1 yd | 1 | Bruises, a split lip, cracked ribs |
@@ -462,9 +504,9 @@ How many boxes a hit marks depends on the **weapon**, not on how well the attack
 | Wheel-lock pistol | Close | 2 | A gunshot wound |
 | Arquebus or hand-cannon | Short | 3, and Dying | A ruinous wound |
 | Powder bomb | Close (thrown) | 1 to everyone nearby, 3 and Dying at the center | Blast and burns; Dodge means diving clear |
-| Claws, fangs, venom | Melee, reach 1 yd | 2 (venom: Body roll or Reeling) | Torn flesh, poison in the blood |
+| Claws, fangs, venom | Melee, reach 1 yd | 2 (venom: a Body roll or Reeling) | Torn flesh, poison in the blood |
 | Shadow Bolt | Short | 2 | Black frost in the wound |
-| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fall | — | By height: 1 to 3, and worse (see *Falls, fire and foul air*) | A sprain, a fracture, or worse |
 | Fire | — | 1 each round in the flames | Burns |
 
 **Gunpowder** is common but slow. Anyone can carry a pistol or an arquebus, but reloading takes a **full round** (a crossbow takes one action), and rain or seawater ruins the powder until it's dried. An arquebus misfires on a natural 17 or 18; any missile weapon fails on a natural 18 (a string snaps, a bolt jams, the powder fizzles).
@@ -625,6 +667,8 @@ Gain one point when one of your complications creates a meaningful problem you a
 
 ## Troubles
 
+A track is a row of boxes that fills as consequences catch up with you, and each box means something. **Shared tracks** belong to the whole party (the law noticing, debts, the dark learning your names): deeds, a success at a cost or a failed investigation mark them, and lying low, paying up or a public good clears them. A setting can also give each character a **personal track** of four boxes: the price of their power (Strain, Corruption) or of a secret (Exposure), with what each box does on the sheet.
+
 The party shares four **Troubles**. **Infamy** is the rulers and the watch taking notice; **Doom** is the old powers learning your names; **Debt** is what you owe moneylenders, patrons and sorcerers; **Hunger** is supplies, coin and morale running thin on the road. They fill as your deeds catch up with you; the GM narrates what each box means.
 
 - **Marking:** killing in the open or a beast form seen in town (Infamy); blatant sorcery or taking a cursed treasure (Doom); borrowing or buying on credit (Debt); each day in the wilds without supplies (Hunger). A success at a cost can mark any of them.
@@ -696,6 +740,7 @@ When a venture turns on an unknown subject (a sorcerer, a demon, a cult or a thi
 - **Advancing.** Each roll that advances the clock uses a concrete **method** tied to a skill (below): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
 - **The primary investigator.** One character leads and owns the tale. Others **assist** under the usual assistance rules, rolling a relevant skill. A character who holds a relevant tale can assist with a method they couldn't otherwise bring (the tale is why they're qualified); it adds nothing beyond the normal assistance.
 - **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a track ticks (below) whatever the roll.
+- **A head start.** A character trained in the skill whose field squarely covers the subject (an engineer before an alien power core, a doctor before a new disease) recognizes at once that it's something new: the clock starts at Identify, skipping Confront. The GM says whether a skill fits. Identify and Uncover still have to be filled to earn the tale.
 
 ### The tale
 
@@ -730,6 +775,8 @@ A character who takes the **Untold Tales** advantage starts play with three tale
 
 A discovery clock always races a threat: here, the Doom track. While you dig, the thing you hunt is learning your names. Doom ticks once for each scene spent investigating and once for each failed investigation roll, and a cleansing rite clears it as usual. When it fills, the old power comes for you.
 
+**A rival.** When nothing threatens yet, give the discovery a rival instead: an ordinary danger clock named for someone racing the party to the same find. It ticks on delays, noisy methods and open digging; when it fills, the rival gets there first.
+
 ### What investigating costs
 
 When an investigation roll fails, or a player pushes, one of the shared tracks ticks up by one, chosen by how the party is digging. A failed roll can still turn up a lead when the story allows it, but the track still ticks.
@@ -756,6 +803,10 @@ Which methods suit a character depends on their role, ancestry and skills. The G
 - **Steel:** witnesses and the trail; **Shadow:** what others would rather hide; **Lore:** natural identifiers: old texts and sorcery.
 - A character's people can suit a method: an old blood that remembers, eyes that see in the dark. A **Sorcerer** or **Witch** can work a cantrip or ritual of seeing as a method.
 
+### When the other side investigates you
+
+Enemies keep files too. What a villain, a rival or a monster has learned about a character (a weakness, a habit, a real name, the people they love) gives it **+2 against them when it applies**: an ambush where they always go, a trap built for a weakness, a hostage who matters. The GM keeps these files in the GM view and decides when one applies. A character who finds out a file exists (an informant, a captured lieutenant, a stolen ledger) sees it on their sheet, and can **destroy** it: burn the papers, discredit the source, kill the spy. A destroyed file gives nothing.
+
 # Sorcery
 
 Sorcery is real, rare and expensive. It is worked by **Sorcerers** and **Witches**, by anyone with the **Gifted** advantage, and by those whose blood grants it (the Witch-blooded's *The Old Blood*, the Serpent-kin's *Temple-Taught*, the Demon-marked's *Infernal Gift*, the Godblooded's *Divine Spark* and the Undying's *Deathless Sorcery*). Everyone else can resist it, fear it and pay for it.
@@ -778,8 +829,8 @@ Cast one with **an action and a Sorcery roll**, −1 for each Boost you spend; e
 | Witchfire | Light, or set something burning: 1 box a round in the flames. Aimed at a person, it's an attack: Dodge applies; once alight, the flames are ordinary fire. |
 | Ward | Attacks against one ally are at −2 for the scene. |
 | Hex | The target is at −2 on all rolls for the scene (Will resists). |
-| Charm | The target treats you as a friend for the scene (Presence resists). |
-| Dread | The target flees or freezes (Will resists). |
+| Charm | The target is Charmed: it treats you as a friend for the scene (Will resists). |
+| Dread | The target is Frightened: it flees or freezes (Will resists). |
 | Sleep | The target sleeps (Will resists); minor opponents just drop, without resisting. |
 | Mend | Clear one injury box, once per set of injuries. |
 | Beast-tongue | Speak with an animal, and command it for a scene (a hostile animal's Will resists). |
@@ -1296,7 +1347,7 @@ If the ancestry changes shape, give the form attribute bonuses (usually +2 to on
 
 A GM can add their own threats, weapons and Edges. Keep them in line with the book's:
 
-- **Threats.** A minor foe has 1 box; an ordinary one 3; a tough one 4 or 5; a rare horror 6. Attack targets run 11 to 13 for most, 14 or 15 for the dangerous. Dodge runs 7 to 10. Give it one special trait, said plainly, and decide what it does before play.
+- **Threats.** A minor foe has 1 box; an ordinary one 3; a tough one 4 or 5; a rare horror 6. Attack targets run 11 to 13 for most, 14 or 15 for the dangerous. Dodge runs 7 to 10. Give it one special trait, said plainly, and decide what it does before play: toughness, a weakness or armor works as in *Armor, toughness and weaknesses*. For a tougher version of any threat, add +1 to its targets and one box; for a weaker one, subtract.
 - **Weapons.** Hits mark 1 box for fists, knives and arrows; 2 for swords and guns; 3 for the heavy and the point-blank; 4 only for explosives and the monstrous. Give a weapon a reach (melee) or a range band, and its shots if they run out.
 - **Edges.** An Edge is worth about as much as one of the book's: a narrow, useful benefit, often once per session or per venture. Say exactly what it does.
 - **Cards.** One subject, what's true about it and what that permits: as narrow as a card earned in play.
