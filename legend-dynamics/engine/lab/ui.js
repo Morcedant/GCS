@@ -431,6 +431,11 @@ export function mountLab(api) {
       // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
       if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None</option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
+      // A team-up (a power with a Class): another character puts their power into this attack, one Class higher.
+      const mates = w && w.class ? en.participants.filter((/** @type {any} */ p) => p.pid !== a.pid && p.side === a.side && p.pid !== $("lab-target").value && !p.dead && !E.isOut(p)) : [];
+      $("lab-team-wrap").hidden = !mates.length;
+      if (mates.length) { const was = $("lab-team").value; $("lab-team").innerHTML = `<option value="">No one</option>` + mates.map((/** @type {any} */ p) => `<option value="${p.pid}">${esc(p.name)} (Class ${["", "I", "II", "III", "IV", "V", "VI"][Math.min(6, w.class + 1)]})</option>`).join(""); $("lab-team").value = mates.some((/** @type {any} */ p) => p.pid === was) ? was : ""; }
+      else $("lab-team").value = "";
       if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
       const base = w ? a.skills[w.skill] : undefined;
       if ($("lab-skill").dataset.for !== `${a.pid}|${w && w.id}`) { $("lab-skill").value = base ?? ""; $("lab-skill").dataset.for = `${a.pid}|${w && w.id}`; }
@@ -464,6 +469,7 @@ export function mountLab(api) {
         mode: mode ? { id: mode[0], label: mode[1], mod: mode[4] || 0, cost: mode[2] } : null, ammo: $("lab-ammo-wrap").hidden ? null : $("lab-ammo").value,
         material: $("lab-material-wrap").hidden || !$("lab-material").value ? null : $("lab-material").value,
         called: $("lab-called-wrap").hidden || !$("lab-called").value ? null : { effect: $("lab-called").value.split("|")[0], small: $("lab-called").value.endsWith("|small") },
+        teamUp: $("lab-team-wrap").hidden || !$("lab-team").value ? null : $("lab-team").value,
         cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
@@ -599,7 +605,7 @@ export function mountLab(api) {
       case "turn": return `${esc(e.name || "")}'s turn.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}`;
+      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
       case "trade": return `<b>${esc(e.name)} trades a limb for their life:</b> ${esc(e.wound)}.`;
       case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.`;
       case "shrug": return `${esc(e.name)} shrugs off a telling hit (${esc(e.label)}).`;
