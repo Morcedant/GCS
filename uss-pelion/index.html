@@ -629,7 +629,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="8224402" data-version-date="2026.10.27" title="The code changes whenever this page changes.">Version 2026.10.27 · 8224402</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="b3e88f8" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · b3e88f8</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -902,6 +902,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
       </details>
       <div class="toast" id="disc-msg" role="status" aria-live="polite"></div>
     </div>
+    <div class="card hud no-print" id="files-card" hidden></div>
     <div class="card hud no-print bm-card">
       <h3>Battle map</h3>
       <p class="small muted">A hex map at any scale for an away team's fight, or a range track of bands for a ship fight or a chase. Tokens for the crew stay linked to the officers, and the Pelion's token to the ship's tracks, so you can mark damage from the map. Open <b>How to use the map</b> for the steps.</p>
@@ -1066,6 +1067,8 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
               <div class="field"><label for="lab-cover">Cover</label><select id="lab-cover"><option value="none">None</option><option value="partial">Partial (−2)</option><option value="solid">Solid (blocks)</option></select></div>
               <div class="field" id="lab-material-wrap" hidden><label for="lab-material">Made of</label><select id="lab-material"></select></div>
               <div class="field" id="lab-called-wrap" hidden><label for="lab-called">Called shot</label><select id="lab-called"></select></div>
+              <div class="field" id="lab-dive-wrap" hidden><label><input type="checkbox" id="lab-dive"> Dive: one Class higher; the diver marks a box unless their Defense is that high</label></div>
+              <div class="field" id="lab-team-wrap" hidden><label for="lab-team">Team-up with</label><select id="lab-team"></select></div>
               <div class="field"><label for="lab-sit-label">Other modifier</label><input type="text" id="lab-sit-label" placeholder="e.g. Darkness"></div>
               <div class="field" style="flex:0 0 5em"><label for="lab-sit">±</label><input type="number" id="lab-sit" value="0" min="-10" max="10"></div>
               <div class="field" style="flex:0 0 9em" id="lab-boost-wrap" hidden><label for="lab-boost">Harder Boosts</label><select id="lab-boost"><option value="0">None</option><option value="1">1 (−1, +1 box)</option><option value="2">2 (−2, +2 boxes)</option></select></div>
@@ -1075,7 +1078,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
             </div>
             <p class="small" id="lab-reach" hidden style="margin:6px 0 0"></p>
             <div class="lab-row" id="lab-text-row" style="margin-top:8px" hidden>
-              <div class="field" style="flex:1 1 100%"><label for="lab-text" id="lab-text-label">Note</label><input type="text" id="lab-text"></div>
+              <div class="field" style="flex:1 1 100%"><label for="lab-text" id="lab-text-label">Note</label><input type="text" id="lab-text" list="lab-cond-list"><datalist id="lab-cond-list"></datalist></div>
             </div>
             <div class="btn-row" style="margin-top:8px"><button type="button" class="btn primary" id="lab-go">Resolve</button></div>
             <div id="lab-result"></div>
@@ -1631,15 +1634,22 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 <p>A natural 17 or 18 is never a success at a cost. A cost that comes from your complication can still earn a Duty point, as usual.</p>
 <p><em>Example:</em> Lieutenant Okafor needs 12 or less to lock the transporter on a falling shuttle and rolls 13. The GM offers success at a cost: the crew beams out, but the transporter burns out a relay and is offline until Engineering repairs it. Okafor accepts.</p>
 <h2 id="g-progress-clocks">Progress clocks</h2>
-<p>A <strong>clock</strong> is a circle cut into 4, 6 or 8 segments that tracks something that takes time or builds toward disaster: <em>Warp core breach (4)</em>, <em>Repair the shuttle (6)</em>, <em>Klingon reinforcements arrive (4)</em>, <em>Win the council’s trust (8)</em>.</p>
+<p>A <strong>clock</strong> is a circle cut into 2, 4, 6 or 8 segments that tracks something that takes time or builds toward disaster: <em>Warp core breach (4)</em>, <em>Repair the shuttle (6)</em>, <em>Klingon reinforcements arrive (4)</em>, <em>Win the council’s trust (8)</em>.</p>
 <ul>
 <li><strong>Danger clocks</strong> fill when things go wrong: a failed roll, a success at a cost, or time passing. When one fills, the danger happens.</li>
 <li><strong>Progress clocks</strong> fill as the crew succeeds: one segment for a success, two for success by 5 or more. When one fills, the goal is achieved.</li>
-<li>The GM sizes the clock (4 = urgent or simple, 6 = substantial, 8 = long or complex) and shows it to the players, so everyone can see the pressure building.</li>
+<li>The GM sizes the clock (2 = quick, 4 = urgent or simple, 6 = substantial, 8 = long or complex) and shows it to the players, so everyone can see the pressure building.</li>
 </ul>
 <p>Clocks are how a failed roll changes the situation without stopping the story. Racing a progress clock against a danger clock makes a strong climax.</p>
 <h2 id="g-investigation-and-social-scenes">Investigation and social scenes</h2>
 <p>Ask concrete questions and explain your approach. Evidence may require several different tasks. Diplomacy can secure cooperation or concessions, while Psychology offers insight into behavior. A successful roll does not force someone to abandon a core belief or provide information they do not possess.</p>
+<h2 id="g-chases">Chases</h2>
+<p>Run a chase as a progress clock for the pursuers against a danger clock for the quarry’s escape. Each exchange, the characters roll the skill that moves them (Helm or Piloting in a vehicle, Athletics on foot): success ticks the pursuers’ clock, failure ticks the escape. Terrain, a damaged engine, and attacks made on the move (at −2) adjust the rolls.</p>
+<ul>
+<li><strong>Clearly faster.</strong> A side that is a whole class faster (a shuttle against a ground car, a starship at warp against one at impulse) catches up, or gets away, without a roll. Roll the chase between equals, or when terrain or a trick evens things out.</li>
+<li><strong>Chases by range.</strong> When the distance itself is the fight, run the chase on the battle map’s range track instead of clocks: each exchange, the two sides roll an opposed contest of the skill that moves them, and the winner shifts the range one band, in or out; a tie leaves it. Anyone pushed past Extreme drops out of the chase, and a quarry that wins at Extreme by 5 or more breaks away. Ship fights work this way (see <em>Range in space</em>).</li>
+<li><strong>Vehicles take damage on a track.</strong> A vehicle has a track of boxes, and each costs something: a system hit gives −2 to rolls that use it, then it’s crippled, then wrecked. The Pelion’s Shields, Hull and systems are its track (see <em>The USS Pelion</em>).</li>
+</ul>
 <h1 id="g-library-records">Library records</h1>
 <p>What your character knows about the unknown, and how they came to know it: an alien species, a lifeform, a piece of technology, a phenomenon, or what a power intends.</p>
 <h2 id="g-rumor-truth-and-records">Rumor, truth and records</h2>
@@ -1657,9 +1667,15 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 <li><strong>Uncover.</strong> Learn how it is stopped, or how it is used. Filling this phase fills the clock.</li>
 </ol>
 <p>Each successful investigation roll fills one segment, two on a success by 5 or more. The GM sets the segments per phase (2, 2, 2 is usual; 1, 2, 2 for something quick; 2, 3, 3 for something substantial). The crew member who led the investigation is the <strong>primary investigator</strong>. When the clock fills, they own the library record, and everyone present gets a <strong>shared copy</strong>.</p>
+<ul>
+<li><strong>Assisting.</strong> Others <strong>assist</strong> under the usual assistance rules, rolling a relevant skill. A crew member who holds a relevant record can assist with a method they couldn’t otherwise bring; it adds nothing beyond the normal assistance.</li>
+<li><strong>Pushing.</strong> A player can push to dig faster or harder: a success advances one extra segment, but the investigation’s price (below) is paid whatever the roll.</li>
+<li><strong>A head start.</strong> A crew member trained in the skill whose field squarely covers the subject (an engineer before an alien power core, a doctor before a new disease) recognizes at once that it’s something new: the clock starts at Identify, skipping Confront. The GM says whether a skill fits.</li>
+</ul>
 <p>A library record never confirms its own subject: holding one about a kind of thing doesn’t prove that the thing in front of you is that kind. Only the Identify phase does.</p>
 <h2 id="g-the-countdown">The Countdown</h2>
 <p>Routine discovery has no clock racing it. When a failed investigation roll, or a success at a cost, puts real stakes in play (a reactor going critical, a first-contact window closing, a ship hunting you), the GM may start a <strong>Countdown</strong> of 4, 6 or 8 segments. From then on it’s a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. When it fills, the situation hits. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.</p>
+<p><strong>A rival.</strong> When nothing threatens yet, give the discovery a rival instead: an ordinary danger clock named for someone racing the crew to the same find (a Klingon science vessel, an Orion salvager, a Federation survey team with other orders). It ticks on delays, noisy methods and open digging; when it fills, the rival gets there first.</p>
 <h2 id="g-learning-without-a-clock">Learning without a clock</h2>
 <p>A library record can also come directly, without a clock:</p>
 <ul>
@@ -1675,6 +1691,8 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 <li><strong>Time:</strong> one segment on a danger clock that’s running, or on the Countdown.</li>
 </ul>
 <p>A failed investigation roll or a success at a cost can carry the same price, or start the Countdown.</p>
+<h2 id="g-when-the-other-side-investigates-you">When the other side investigates you</h2>
+<p>Enemies keep files too. What a power, a rival captain or an alien intelligence has learned about a crew member (a weakness, a habit, a family on Earth, the people they love) gives it <strong>+2 against them when it applies</strong>: an ambush on a predictable shore leave, a trap built for a weakness, a hostage who matters. The GM keeps these files in the GM view and decides when one applies. A crew member who finds out a file exists (a captured agent, a decrypted transmission, a defector) sees it on their sheet, and can <strong>destroy</strong> it: wipe the data core, discredit the source, turn the spy. A destroyed file gives nothing.</p>
 <h2 id="g-the-starfleet-command-track">The Starfleet Command track</h2>
 <p>How much attention the crew is drawing from Starfleet Command: questions about the Prime Directive, risky contacts, orders bent. It sits on the USS Pelion’s status card. A starbase repairs the ship, but not Command’s opinion of the crew; boxes clear only when the GM says the matter is settled.</p>
 <table>
@@ -1716,6 +1734,10 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 <h1 id="g-personal-combat">Personal combat</h1>
 <h2 id="g-turn-order-and-actions">Turn order and actions</h2>
 <p>Act in descending Agility order. Players choose the order of tied crew members; the GM resolves other ties. A round lasts a few seconds. On your turn, move up to your <strong>Move</strong> (see <em>Move and reach</em>) and take one meaningful action, such as attacking, using equipment, helping, or attempting a task.</p>
+<ul>
+<li><strong>Acting first and acting twice.</strong> An ability can let a crew member act first in a round: they go before everyone else, in Agility order among themselves. An ability that gives more than one action a round gives each one in turn, before the next character acts.</li>
+<li><strong>Helping in a fight.</strong> Helping a crewmate’s attack (drawing a guard’s eye, steadying a shot, a sensor sweep that marks the target) is your action: you assist under the usual rules (+1, or +2 by 5 or more) before they roll.</li>
+</ul>
 <h2 id="g-attacking-and-defending">Attacking and defending</h2>
 <p>Roll Phasers for a ranged attack, or Unarmed Combat for fists, grappling and a weapon in hand. If the attack succeeds, an aware target able to move may <strong>defend</strong>: Dodge, Parry or Block. A successful defense cancels the hit. Apply injury penalties to every defense.</p>
 <ul>
@@ -1763,7 +1785,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 <tr class="odd">
 <td>Pin</td>
 <td>A weapon in hand, fists or a grapple</td>
-<td>The target is grabbed, held, or pinned against a bulkhead or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack</td>
+<td>The target is grabbed, held, or pinned against a bulkhead or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack. Against someone much stronger (a Gorn, a Vulcan’s grip, a Mugato), getting free takes a Body roll, −2 or −4 against something huge; on a failure they’re still held</td>
 </tr>
 <tr class="even">
 <td>Rattle</td>
@@ -1928,13 +1950,50 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 </table>
 <p>A normal damaging hit marks one box. A powerful attack can mark two, and a killing weapon marks three (see Weapons and damage). Injury penalties replace each other rather than stacking. They apply to movement, attacks, Dodge, and other tasks the injury physically hinders. The GM announces especially lethal hazards before resolution where possible.</p>
 <h3 id="g-dying-and-death">Dying and death</h3>
-<p>Two boxes hurt; they don’t kill. Death comes from three things:</p>
+<p>Death comes from three things:</p>
 <ul>
-<li><strong>Dying.</strong> A hit from a killing weapon (a phaser or disruptor on kill) that takes you to three boxes leaves you Incapacitated and <strong>Dying</strong>. A Dying character dies at the end of the scene unless someone stabilizes them: one action and a successful Medicine roll with a medical kit. Once stabilized, you are still Incapacitated but no longer Dying.</li>
+<li><strong>Dying.</strong> A hit from a weapon that marks <strong>2 or more boxes</strong> and brings you to three boxes leaves you Incapacitated and <strong>Dying</strong>: a phaser or disruptor on kill, or a lirpa that finishes what a punch started. A Dying character dies at the end of the scene unless someone stabilizes them: one action and a successful Medicine roll with a medical kit. Once stabilized, you are still Incapacitated but no longer Dying.</li>
 <li><strong>A further lethal hit.</strong> While you are at three boxes, any hit from a weapon that marks two or more boxes (a heavy blade, a phaser or disruptor on kill, an explosion’s centre) kills you. Fists, clubs and knives just keep you down.</li>
 <li><strong>Disintegration</strong> and comparable hazards bypass the track entirely.</li>
 </ul>
 <p>Your protection is avoiding the hit: Dodge, cover, and a Duty point, which reduces a kill shot from three boxes to two, leaving you Seriously wounded but on your feet.</p>
+<h3 id="g-falls-fire-and-foul-air">Falls, fire and foul air</h3>
+<p>A fall marks boxes by its height. Deep water, a snowbank or an antigravity field makes it one step better.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Height</th>
+<th>Boxes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A story or two (up to 10 yards)</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>A rooftop (up to 25 yards)</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>A tower or a cliff (up to 100 yards)</td>
+<td>3, and Dying</td>
+</tr>
+<tr class="even">
+<td>Higher</td>
+<td>Certain death, unless something breaks the fall</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fire</strong> marks 1 box each round in the flames. <strong>Smoke, poison air or vacuum</strong> marks 1 box each round you breathe it, unless you have a mask, an environment suit, or the transporter gets you out first.</p>
+<h3 id="g-fear-and-other-conditions">Fear and other conditions</h3>
+<ul>
+<li><strong>Stunned.</strong> −2 on your next action roll; then it’s over.</li>
+<li><strong>Frightened.</strong> Fear, an alien compulsion, a horror: you must keep away from its source, and you’re −2 to act against it. At the end of each of your turns, roll Will to shake it off (+2 if you’ve been hurt since). An effect that makes its target <em>flee or freeze</em> makes them Frightened.</li>
+<li><strong>Charmed.</strong> You treat the one who charmed you as a friend for the scene. Harming you or your friends ends it at once.</li>
+</ul>
+<h3 id="g-mental-harm-an-option">Mental harm (an option)</h3>
+<p>A GM whose missions turn on telepaths and mind-bending aliens (the Talosians, a Melkot) can give every crew member a <strong>Mind</strong> track beside the injury track. Attacks on the mind mark it: the attacker’s ability against Will, never Dodge, and armor doesn’t help. One box is Shaken (−1 to mental actions: Will, and skills of Intellect and Presence), two Overwhelmed (−2), three Broken: unconscious or catatonic until they rest. It never leaves anyone Dying; a scene’s rest clears one box, a night’s sleep all of them.</p>
 <h3 id="g-optional-rule-gritty-combat">Optional rule: gritty combat</h3>
 <p>For a harder, bloodier game, the GM can turn on <strong>gritty combat</strong> for the campaign (the creator has a switch on the Condition card and in the GM view). The rest of the rules stay the same.</p>
 <p><strong>Grievous hits.</strong> A hit that marks <strong>2 or more boxes</strong> is <strong>grievous</strong> when the attack succeeded by <strong>7 or more</strong>, rolled a <strong>natural 3 or 4</strong>, or left the target <strong>Dying</strong>.</p>
@@ -2004,6 +2063,18 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 </ul>
 <h2 id="g-weapons-and-damage">Weapons and damage</h2>
 <p>How many boxes a hit marks depends on the <strong>weapon</strong>, not on how well the attack roll succeeded. Apply it only after the hit survives any defense. This list sorts common weapons into one-box, two-box and killing (three-box) categories; the GM places anything else by comparison.</p>
+<ul>
+<li><strong>“3, and Dying.”</strong> A killing weapon marks 3 boxes: enough to take an unhurt crew member straight to Incapacitated and Dying.</li>
+<li><strong>Explosions</strong> mark 1 box on everyone nearby and their full boxes at the centre; Dodge means diving clear.</li>
+<li><strong>Stun weapons</strong> (a phaser on stun) mark no box: the target rolls Body −2. On a failure they’re out for the scene; on a success, −2 on their next action (see <em>Phaser settings</em>).</li>
+<li><strong>Jams.</strong> Phasers and disruptors don’t jam; a primitive firearm jams on a natural 18, and clearing it takes an action.</li>
+</ul>
+<h3 id="g-armor-toughness-and-weaknesses">Armor, toughness and weaknesses</h3>
+<ul>
+<li><strong>Armor</strong> turns some hits. A typical piece makes a hit of 2 or more boxes mark one fewer, once per fight, and says what it works against. Starfleet issues none; Klingon and Gorn soldiers sometimes wear it.</li>
+<li><strong>Toughness.</strong> A creature’s trait can say <em>hits of 1 box mark nothing</em> (a Horta, a Gorn’s hide) or <em>hits of 2 or more boxes mark one fewer</em>.</li>
+<li><strong>Weaknesses.</strong> What a creature is weak to marks one box more, and its toughness and armor don’t help against it. <em>Only a certain frequency marks more than 1 box</em> means everything else marks at most 1. A weakness works whoever uses it, whether or not anyone knows of it.</li>
+</ul>
 <table>
 <colgroup>
 <col style="width: 25%" />
@@ -2083,8 +2154,8 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 <tr class="odd">
 <td>Fall</td>
 <td>—</td>
-<td>1 for a bad fall, 2 for a long one</td>
-<td>A sprain or a fracture</td>
+<td>By height: 1 to 3, and worse (see <em>Falls, fire and foul air</em>)</td>
+<td>A sprain, a fracture, or worse</td>
 </tr>
 </tbody>
 </table>
@@ -2117,7 +2188,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 </tr>
 </tbody>
 </table>
-<p>Declare the setting before firing. Stun effects do not stack; a later failed resistance roll still incapacitates the target. Unarmed strikes normally mark one box. A grapple uses an opposed Unarmed Combat contest; winning restrains the target while the hold is maintained. Escape uses an action and a new contest.</p>
+<p>Declare the setting before firing. Stun effects do not stack; a later failed resistance roll still incapacitates the target. Unarmed strikes normally mark one box. A grapple is an Unarmed Combat attack: a hit that pins (a telling hit, or a called shot for one) holds the target as the <em>Pin</em> effect says, and their next action goes to getting free.</p>
 <h2 id="g-phaser-power">Phaser power</h2>
 <p>Hand phasers run on power cells, and every shot draws on them. This is a campaign rule; the GM tracks opponents’ weapons loosely.</p>
 <table>
@@ -2271,6 +2342,8 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 </table>
 <p>Gain one point when one of your complications creates a meaningful problem you accept. This includes a companion complication from a species advantage. The GM offers or approves the award. You can decline the proposed complication without a penalty. Repeating a harmless habit does not earn points.</p>
 <p><em>Example:</em> your curiosity tempts you to remain beside an anomaly while the team withdraws. If you accept the resulting separation and danger, the GM awards one Duty point. The point does not remove that danger.</p>
+<h2 id="g-tracks">Tracks</h2>
+<p>A track is a row of boxes that fills as consequences catch up with you, and each box means something. The crew shares the <strong>Starfleet Command</strong> track (see <em>Library records</em>), and the ship has its own: <strong>Shields</strong>, <strong>Hull</strong> and its systems (see <em>The USS Pelion</em>). Deeds, a success at a cost or a failed investigation mark them; a settled inquiry or a starbase’s repairs clear them.</p>
 <h2 id="g-working-on-the-bridge">Working on the bridge</h2>
 <p>Describe the effect you want before selecting a skill. Each exchange gives occupied stations a chance to contribute. Roll for consequential decisions and uncertain work; routine station operation needs no roll.</p>
 <table>
@@ -3450,7 +3523,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 <h1 id="g-quick-reference">Quick reference</h1>
 <h2 id="g-will-and-mental-resistance">Will and mental resistance</h2>
 <p>Roll against Will to resist overwhelming fear, alien compulsion, or mental intrusion, or to maintain concentration through severe distraction. Apply the normal difficulty modifiers. Ordinary danger does not require a Will roll. If an adversary actively imposes mental influence, use an opposed contest of your Will against the adversary’s relevant ability.</p>
-<p>Before the roll, the GM states the possible effect and its duration. Failed fear or concentration rolls normally cause brief hesitation or −2 on your next action, rather than forcing a belief or personal decision. Mental intrusion can impose a specific effect established before the roll; resisting that effect does not reveal the intruder’s identity or intentions.</p>
+<p>Before the roll, the GM states the possible effect and its duration. A failed fear roll leaves you Frightened (see <em>Fear and other conditions</em>); a failed concentration roll gives −2 on your next action. Neither forces a belief or personal decision. Mental intrusion can impose a specific effect established before the roll; resisting that effect does not reveal the intruder’s identity or intentions.</p>
 <p>Will protects your resolve; Presence influences others. Leadership and Diplomacy still use Presence. Species adjustments may change your starting Will, but mental advantages apply only to their agreed, narrow circumstances.</p>
 <h2 id="g-at-the-table">At the table</h2>
 <ol type="1">
@@ -3802,6 +3875,15 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 </tbody>
 </table>
 <p><strong>Adjusting difficulty.</strong> For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship registry in <em>The USS Pelion</em>; its <em>Enemy ships</em> table gives the common ones.</p>
+<h2 id="gm-your-own-threats-weapons-and-advantages">Your own threats, weapons and advantages</h2>
+<p>A GM can add their own. Keep them in line with the book’s:</p>
+<ul>
+<li><strong>Threats.</strong> A minor foe has 1 box; an ordinary one 3; a tough one 4 or 5; a rare horror 6. Attack targets run 11 to 13 for most, 14 or 15 for the dangerous. Dodge runs 7 to 10. Give it one special trait, said plainly, and decide what it does before play: toughness, a weakness or armor works as in <em>Armor, toughness and weaknesses</em>.</li>
+<li><strong>Weapons.</strong> Hits mark 1 box for fists, knives and primitive weapons; 2 for heavy blades; 3, and Dying, for anything on kill. Give a weapon a reach (melee) or a range band.</li>
+<li><strong>Advantages.</strong> Worth about as much as one of the book’s: a narrow, useful benefit, often once per session or per mission. Say exactly what it does.</li>
+<li><strong>Records.</strong> One subject, what’s true about it and what that permits: as narrow as a record earned in play.</li>
+</ul>
+<p><strong>In the creator.</strong> The GM view’s <strong>Homebrew</strong> tab keeps your threats, weapons, advantages, species and records. They then work like the book’s, marked <em>homebrew</em>: threats in the Encounter panel and on the battle map, weapons in characters’ gear and the roller. Save them to a file to keep them or share them with another GM.</p>
 <h2 id="gm-enemy-ships">Enemy ships</h2>
 <p>The ships the Pelion meets most, built on the registry’s classes. The GM keeps their tracks the same way as the Pelion’s.</p>
 <table>
@@ -3949,7 +4031,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
 <p>The GM view of the creator has a <strong>battle map</strong> for fights where it helps to see who is where. It is a tool, not a rule: everything on it follows the rules in the Players’ Guide, and a fight without it works the same way. Open <strong>How to use the map</strong> on the map itself for the buttons, step by step.</p>
 <p><strong>Three kinds of map.</strong></p>
 <ul>
-<li><strong>A hex map</strong> for an away team’s fight where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard inside a ship, 5 or 10 yards on a city street, 50 on open ground, or a number of kilometres for ships in space. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range tables.</li>
+<li><strong>A hex map</strong> for an away team’s fight where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard inside a ship, 5 or 10 yards on a city street, 50 on open ground, or a number of kilometres for ships in space. Dragging a token or measuring shows the distance and its <strong>range band</strong>, so the GM can read the penalty from the Range tables. A token can have a height (a shuttle overhead, a sniper on a ridge), and the distance counts it.</li>
 <li><strong>A ship fight</strong> on a range track: a lane for the Pelion and one for each space range band, from under 10 km to a light-second. When the helms make their contest, the GM moves the enemy a lane in or out. <strong>Add the Pelion</strong> places the ship, linked to its Shields, Hull and systems: marking a box on the map marks it on the ship’s tracks, and the other way round. Enemy ships come from the <em>Enemy ships</em> table with their Hull boxes.</li>
 <li><strong>A range track</strong> for an away team’s chase or a running fight where only distance matters.</li>
 </ul>
@@ -3989,6 +4071,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
               <button class="linkish" id="duty-reset">New session (reset to 2)</button>
             </div>
             <span class="muted small">Max one point per roll or injury event. Earn one when you accept a meaningful problem from your complication.</span></div>
+          <div class="field" id="files-mine" hidden></div>
           <div class="checks"><label><input type="checkbox" id="f-stunned"> Stunned: −2 on next action roll</label>
             <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label></div>
           <div class="gritty-box" id="gritty-box">
@@ -4490,6 +4573,9 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
       cost: cardStr(x.cost, 80), from: ["role", "origin"].includes(x.from) ? x.from : "", why: cardStr(x.why) };
   }
 
+  // The enemies' files on the characters (core rules: When the other side investigates you).
+  const HFILES = {"title": "Files on the crew", "intro": "What a power, a rival captain or an alien intelligence has learned about a crew member: a weakness, a habit, a family on Earth, the people they love. When it applies, it gets the file's bonus against them. A crew member who finds out sees it on their sheet; when they destroy it, the bonus is gone.", "mine": "Files kept on you", "knowsExample": "Takes shore leave on Wrigley's Pleasure Planet every year", "gives": "+2 against them when it applies"};
+
   function blank() {
     return {
       id: uid(), example: false, name: "", species: "Human", speciesId: "human", speciesAdj: {}, rank: "", dept: "Science", role: ROLE_SUGGESTIONS.Science, reason: "",
@@ -4564,6 +4650,10 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
     for (const k of Object.keys(out.skills)) if (!LEVELS[out.skills[k]]) out.skills[k] = "U";
     for (const k of Object.keys(out.attrs)) out.attrs[k] = Math.max(1, Math.min(20, parseInt(out.attrs[k], 10) || BASE));
     if (!Array.isArray(out.play.log)) out.play.log = [];
+    const fs = (v, n) => String(v ?? "").slice(0, n), fileOf = (f) => ({ holder: fs(f.holder, 60), knows: fs(f.knows, 200), gives: fs(f.gives, 120), destroyed: !!f.destroyed });
+    const files = (v) => (Array.isArray(v) ? v : []).filter((f) => f && typeof f === "object").slice(0, 40);
+    out.play.files = files(out.play.files).map((f) => ({ id: fs(f.id, 20) || uid(), ...fileOf(f), found: !!f.found })).filter((f) => f.holder && f.knows);
+    out.play.knownFiles = files(out.play.knownFiles).map(fileOf).filter((f) => f.holder && f.knows);
     out.play.lasting = (Array.isArray(out.play.lasting) ? out.play.lasting : []).filter((w) => w && typeof w.name === "string")
       .map((w) => ({ id: String(w.id || ""), name: w.name, text: String(w.text || ""), heal: String(w.heal || ""), complication: !!w.complication, date: String(w.date || ""), key: String(w.key || uid()) }));
     if (!out.play.gwLast || typeof out.play.gwLast !== "object" || !out.play.lasting.some((w) => w.key === out.play.gwLast.key)) out.play.gwLast = null;
@@ -5036,6 +5126,10 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
     $("dying-wrap").hidden = inj < 3 && !ch.play.dying;
     renderGritty();
     $("f-dying").checked = !!ch.play.dying;
+    const known = ch.play.knownFiles || [];
+    $("files-mine").hidden = !known.length;
+    $("files-mine").innerHTML = known.length ? `<span class="label">${esc(HFILES.mine)}</span><ul class="small adv-list">${known.map((f) =>
+      `<li${f.destroyed ? ' style="text-decoration:line-through"' : ""}><b>${esc(f.holder)}</b> knows: ${esc(f.knows)}${f.gives ? ` <span class="muted">(${esc(f.gives)})</span>` : ""}${f.destroyed ? " <i>destroyed</i>" : ""}</li>`).join("")}</ul>` : "";
     $("duty-count").textContent = ch.play.duty;
     $("duty-minus").disabled = ch.play.duty <= 0;
     $("r-stun").checked = !!ch.play.stunned;
@@ -5171,11 +5265,13 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
   function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
   // The shared table's part of an officer (phase 2): its play state, as the table keeps it, and its sheet without that.
   // Pelion's phaser power and spare cells travel as the table's rounds and spares.
-  const pickPlay = (c) => { const p = c.play || {}, ph = p.phaser || {};
+  const pickPlay = (c, gm = false) => { const p = c.play || {}, ph = p.phaser || {};
     const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, lasting: p.lasting || [] };
     if (Number.isInteger(ph.power)) o.rounds = ph.power; if (Number.isInteger(ph.spares)) o.spares = ph.spares;
+    // The files an enemy holds on this character: the GM sends the ones they've found out about (never the others).
+    o.knownFiles = gm ? (p.files || []).filter((f) => f.found).map(({ holder, knows, gives, destroyed }) => ({ holder, knows, gives, destroyed: !!destroyed })) : p.knownFiles || [];
     return o; };
-  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "lasting"]) if (k in q) c.play[k] = q[k];
+  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
     if (c.play.phaser) { if ("rounds" in q) c.play.phaser.power = q.rounds; if ("spares" in q) c.play.phaser.spares = q.spares; } };
   const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
@@ -5820,7 +5916,7 @@ function mountBattleMap(api) {
       // Injury (or Hull) pips above the token: one per box, filled as they're marked.
       if (k.boxes) { const pr = Math.max(2.5, unit * 0.1), gap = pr * 2.6;
         for (let i = 0; i < k.boxes; i++) g.appendChild(el("circle", { class: "bm-pip" + (i < k.inj ? " on" : ""), r: pr, cx: (i - (k.boxes - 1) / 2) * gap, cy: -rad - pr * 1.8 })); }
-      const lb = el("text", { class: "bm-label", y: rad + Math.max(10, unit * 0.38), "font-size": Math.max(9, unit * 0.32) }); lb.textContent = k.name || ""; g.appendChild(lb);
+      const lb = el("text", { class: "bm-label", y: rad + Math.max(10, unit * 0.38), "font-size": Math.max(9, unit * 0.32) }); lb.textContent = (k.name || "") + (t.alt > 0 && !isRange() ? ` ↑${t.alt} ${st.scale.unit}` : ""); g.appendChild(lb);
       gTok.appendChild(g);
     }
   }
@@ -5850,6 +5946,7 @@ function mountBattleMap(api) {
         <label><input type="checkbox" data-bmc="dying"${c.dying ? " checked" : ""}> Dying<\/label>
         <label><input type="checkbox" data-bmc="stunned"${c.stunned ? " checked" : ""}> ${esc(api.stunName || "Stunned")}<\/label>
         <span class="bm-track">${esc(api.pointName || "Points")} <button type="button" class="btn" data-bmc-points="-1" aria-label="One point fewer">−<\/button><b>${c.points ?? 0}<\/b><button type="button" class="btn" data-bmc-points="1" aria-label="One point more">+<\/button><\/span>
+        ${c.mtrack ? `<span class="bm-track">${esc(c.mtrack.name)} ${boxRow(c.mtrack.max, c.mtrack.value || 0, "data-bmc-mtrack", c.mtrack.name)}<\/span>` : ""}
         ${c.ptrack ? `<span class="bm-track">${esc(c.ptrack.name)} ${boxRow(c.ptrack.max, c.ptrack.value || 0, "data-bmc-ptrack", c.ptrack.name)}<\/span>` : ""}<\/div>`;
     else if (tr && t.tracks) {
       // A ship with several crew tracks (Shields, Hull, systems): one row each, with what its damage does.
@@ -5864,6 +5961,7 @@ function mountBattleMap(api) {
     box.innerHTML = `<b>${esc(k.name || "Token")}<\/b>${whose ? ` <span class="small muted">${whose}<\/span>` : ""}${isRange() && laneName(t.lane || 0) !== k.name ? ` <span class="small muted">· ${esc(laneName(t.lane || 0))}<\/span>` : ""}
       ${tracks}
       ${c ? "" : `<label>Name <input type="text" data-bms="name" value="${esc(t.name || "")}"><\/label><label>Color <input type="color" data-bms="color" value="${esc(t.color || "#777777")}"><\/label>`}
+      ${isRange() ? "" : `<label>Height <input type="number" min="0" max="100000" step="1" data-bms="alt" value="${t.alt || 0}" style="width:6em" aria-label="Height above the ground, in ${esc(st.scale.unit)}"> ${esc(st.scale.unit)} up<\/label>`}
       <label>Size <select data-bms="tsize">${[["1", "Normal"], ["2", "Large"], ["3", "Huge"]].map(([n, l]) => `<option value="${n}"${String(t.tsize || 1) === n ? " selected" : ""}>${l}<\/option>`).join("")}<\/select><\/label>
       <button class="btn" data-bm="dup">Copy<\/button><button class="btn" data-bm="del">Remove<\/button><button class="linkish" data-bm="desel">Done<\/button>`;
   }
@@ -6012,7 +6110,7 @@ function mountBattleMap(api) {
   api.root.addEventListener("click", async (ev) => {
     // Tracks in the selection panel: a posse token's go to the character, the crew's ship's to the crew's track,
     // and anyone else's stay on the token.
-    const tb = ev.target.closest("[data-bmc-injury],[data-bmc-ptrack],[data-bmc-points],[data-bmt-injury],[data-bmk-track]");
+    const tb = ev.target.closest("[data-bmc-injury],[data-bmc-ptrack],[data-bmc-mtrack],[data-bmc-points],[data-bmt-injury],[data-bmk-track]");
     if (tb) {
       const t = toks().find((x) => x.id === sel); if (!t) return;
       const c = live(t), tr = trackOf(t), d = tb.dataset, toggle = (cur, v) => (cur === v ? v - 1 : v);
@@ -6023,6 +6121,7 @@ function mountBattleMap(api) {
       }
       if (!c || !api.setCrew) return;
       if (d.bmcInjury) api.setCrew(t.ref, { injury: toggle(c.injury || 0, +d.bmcInjury) });
+      else if (d.bmcMtrack) api.setCrew(t.ref, { mtrack: toggle(c.mtrack.value || 0, +d.bmcMtrack) });
       else if (d.bmcPtrack) api.setCrew(t.ref, { ptrack: toggle(c.ptrack.value || 0, +d.bmcPtrack) });
       else if (d.bmcPoints) api.setCrew(t.ref, { points: Math.max(0, (c.points || 0) + +d.bmcPoints) });
       return;
@@ -6090,7 +6189,7 @@ function mountBattleMap(api) {
       else if (+i.value > 0) st.scale.n = +i.value;
       save(); draw();
     } else if (i.dataset.bmg) { const k = i.dataset.bmg; st[k] = i.type === "checkbox" ? i.checked : i.tagName === "SELECT" ? i.value : +i.value; save(); draw(); }
-    else if (i.dataset.bms) { const t = toks().find((x) => x.id === sel); if (!t) return; const k = i.dataset.bms; t[k] = k === "tsize" || k === "boxes" ? Math.max(1, +i.value || 1) : i.value; save(); drawTokens(); if (k === "boxes") drawSel(); }
+    else if (i.dataset.bms) { const t = toks().find((x) => x.id === sel); if (!t) return; const k = i.dataset.bms; t[k] = k === "tsize" || k === "boxes" ? Math.max(1, +i.value || 1) : k === "alt" ? Math.max(0, Math.min(100000, Math.round(+i.value) || 0)) : i.value; save(); drawTokens(); if (k === "boxes") drawSel(); }
     else if (i.dataset.bmc) { const t = toks().find((x) => x.id === sel); if (t && t.ref && api.setCrew) api.setCrew(t.ref, { [i.dataset.bmc]: i.checked }); }
     else if (i.dataset.bmf === "threat") {
       // Picking a threat fills in its name (numbered), boxes and a foe's color.
@@ -6124,15 +6223,17 @@ function mountBattleMap(api) {
       return band ? { band: String(band[0]).toLowerCase(), lanes: n } : { band: null, lanes: n };
     }
     if (st.scale.unit !== "yd") return null;
-    const hexes = dist(ta, tb), yards = hexes * st.scale.n;
-    return { hexes, yards, scale: st.scale.n, band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
+    // Height (a flier, a sniper on a roof): the straight line through the air, from the ground distance and the difference in height.
+    const ground = dist(ta, tb) * st.scale.n, up = Math.abs((ta.alt || 0) - (tb.alt || 0));
+    const yards = up ? Math.round(Math.hypot(ground, up)) : ground, hexes = up ? Math.round(yards / st.scale.n) : dist(ta, tb);
+    return { hexes, yards, scale: st.scale.n, ...(up ? { height: up } : {}), band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
   }
 
   // ---- the shared table ----
   // The map as players see it: positions and what each token shows, without pictures; "own" is the shared character's key.
   function snapshot() {
     const res = (l) => l.map((t) => { const k = info(t), c = k.c;
-      return { id: t.id, q: t.q, r: t.r, lane: t.lane, y: t.y, tsize: t.tsize, name: k.name || "", color: k.color || "#777", boxes: k.boxes || 0, injury: k.inj || 0, dying: !!k.dying, own: c ? c.tableKey || null : t.own || null }; });
+      return { id: t.id, q: t.q, r: t.r, lane: t.lane, y: t.y, tsize: t.tsize, alt: t.alt || 0, name: k.name || "", color: k.color || "#777", boxes: k.boxes || 0, injury: k.inj || 0, dying: !!k.dying, own: c ? c.tableKey || null : t.own || null }; });
     return { kind: st.kind, scale: st.scale, size: st.size, orient: st.orient, ox: st.ox, oy: st.oy, cols: st.cols, rows: st.rows, grid: st.grid, gridAlpha: st.gridAlpha,
       tokens: res(st.tokens), rts: Object.fromEntries(Object.entries(st.rts).map(([k, v]) => [k, { tokens: res(v.tokens) }])) };
   }
@@ -7438,7 +7539,7 @@ function mountCampaign(api) {
 /* CAMPAIGN:END */
   // The Encounter panel's modules and Pelion's setting data (tools/build-guide.py fills this in).
   /* ENCOUNTER:START */
-const ENC_SETTING = {"id":"uss-pelion","arms":[{"id":"fists","name":"Punch, kick, headbutt","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1},{"id":"club","name":"Club, rifle butt or thrown rock","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1,"reachNote":"rifle butt 2"},{"id":"knife","name":"Knife or dagger (a Klingon d'k tahg)","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1},{"id":"heavy","name":"Heavy melee weapon (a lirpa, a sword, an axe)","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":2}},"traits":[],"rows":[],"reachYards":2,"reachNote":"lirpa 3"},{"id":"primitive","name":"Arrow, spear or primitive firearm","skill":"Phasers","band":"medium","damage":{"any":{"boxes":1}},"wound":"missile","traits":[],"rows":[]},{"id":"phaser-stun","name":"Hand phaser on stun","skill":"Phasers","band":"short","stun":true,"equip":["phaser"],"damage":{"any":{"boxes":0}},"traits":[],"rows":[],"telling":{"add":["knockdown"]}},{"id":"phaser-kill","name":"Hand phaser on kill","skill":"Phasers","band":"short","damage":{"any":{"boxes":3,"dying":true}},"equip":["phaser"],"wound":"energy","traits":[],"rows":[]},{"id":"phaser-rifle","name":"Phaser rifle","skill":"Phasers","band":"long","damage":{"any":{"boxes":3,"dying":true}},"wound":"energy","traits":[],"rows":[]},{"id":"disruptor","name":"Disruptor","skill":"Phasers","band":"medium","damage":{"any":{"boxes":3,"dying":true}},"wound":"energy","traits":[],"rows":[]},{"id":"grenade","name":"Explosion (a thrown grenade)","skill":"Athletics","band":"close","maxBand":"close","damage":{"any":{"boxes":2}},"traits":[{"type":"area","note":"1 box to everyone nearby; 2 at the centre. Dodge means diving clear."}],"rows":[]},{"id":"gorn","name":"Gorn's crushing blows","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":2}},"natural":true,"traits":[],"rows":[],"reachYards":1},{"id":"bite","name":"Venomous bite and horn","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"natural":true,"traits":[],"rows":[],"reachYards":1},{"id":"grip","name":"Crushing grip","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"unarmed":true,"traits":[],"rows":[],"reachYards":1}],"threats":[{"id":"guard","name":"Security guard","label":"Security guard (minor)","minor":true,"attacks":[{"skill":"Phasers","target":11}],"dodge":7,"boxes":1,"boxesText":"1","weaponText":"Hand weapon","weapons":["phaser-stun","disruptor"],"trait":"Numbers","traitText":"Usually two or three; they surrender or flee when half are down."},{"id":"klingon","name":"Klingon warrior","label":"Klingon warrior","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Unarmed Combat","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill), d'k tahg","weapons":["disruptor","knife"],"trait":"Relentless","traitText":"Ignores the Wounded penalty; only Seriously wounded slows them."},{"id":"klingon-officer","name":"Klingon officer","label":"Klingon officer","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Leadership","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill)","weapons":["disruptor"],"trait":"Battle commander","traitText":"Once per round, gives one ally +1 on an attack."},{"id":"romulan","name":"Romulan centurion","label":"Romulan centurion","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Stealth","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill)","weapons":["disruptor"],"trait":"Ambush","traitText":"+2 on the first attack from hiding; prefers to withdraw rather than be captured."},{"id":"orion","name":"Orion pirate","label":"Orion pirate","minor":false,"attacks":[{"skill":"Phasers","target":11},{"skill":"Unarmed Combat","target":12},{"skill":"Stealth","target":12}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor, knife","weapons":["disruptor","knife"],"trait":"Dirty fighter","traitText":"Winning a grapple also disarms the target."},{"id":"gorn","name":"Gorn warrior","label":"Gorn warrior","minor":false,"attacks":[{"skill":"Unarmed Combat","target":14}],"dodge":6,"boxes":4,"boxesText":"4","weaponText":"Claws, thrown rocks","weapons":["gorn","club"],"trait":"Immense strength","traitText":"Unarmed hits mark 2 boxes; slow, so it acts last in a round."},{"id":"mugato","name":"Mugato","label":"Mugato","minor":false,"attacks":[{"skill":"Unarmed Combat","target":13}],"dodge":8,"boxes":3,"boxesText":"3","weaponText":"Venomous bite","weapons":["bite"],"trait":"Venom","traitText":"A bite that marks a box also poisons: without Medicine before the scene ends, mark another box."},{"id":"android","name":"Rogue android","label":"Rogue android","minor":false,"attacks":[{"skill":"Unarmed Combat","target":13},{"skill":"Computers","target":15}],"dodge":7,"boxes":4,"boxesText":"4","weaponText":"Crushing grip","weapons":["grip"],"trait":"Logic trap","traitText":"A Diplomacy or Psychology contest that presents a paradox stuns it for the scene."}],"protection":[{"id":"improvised","name":"Improvised shield","text":"A chair, a crate lid or a torn-off panel: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.","traits":[{"type":"shield","value":0,"breaksOn":2,"label":"Improvised shield"}]}],"combatRules":{"oneDefense":{"perRound":1,"edge":"extradefense","extraPenalty":-2},"attackQualityDodge":{"bands":[{"from":0,"mod":0},{"from":3,"mod":-1},{"from":5,"mod":-2},{"from":7,"mod":-3}]},"parry":{"mod":-3,"repeatPenalty":0,"bareHanded":"unarmed"},"block":{"mod":-2},"aim":{"bonus":1},"tellingHits":{"margin":5,"natural":true,"called":-2,"small":-4}},"coreCombat":["aim","attackQualityDodge","block","oneDefense","parry","tellingHits"],"terms":{"title":"USS Pelion","point":"Duty","meleeSkill":"Unarmed Combat","unarmedSkill":"Unarmed Combat","ammo":"power","ammoOne":"power"}};
+const ENC_SETTING = {"id":"uss-pelion","arms":[{"id":"fists","name":"Punch, kick, headbutt","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1},{"id":"club","name":"Club, rifle butt or thrown rock","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1,"reachNote":"rifle butt 2"},{"id":"knife","name":"Knife or dagger (a Klingon d'k tahg)","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"traits":[],"rows":[],"reachYards":1},{"id":"heavy","name":"Heavy melee weapon (a lirpa, a sword, an axe)","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":2}},"traits":[],"rows":[],"reachYards":2,"reachNote":"lirpa 3"},{"id":"primitive","name":"Arrow, spear or primitive firearm","skill":"Phasers","band":"medium","damage":{"any":{"boxes":1}},"wound":"missile","traits":[],"rows":[]},{"id":"phaser-stun","name":"Hand phaser on stun","skill":"Phasers","band":"short","stun":true,"equip":["phaser"],"damage":{"any":{"boxes":0}},"traits":[],"rows":[],"telling":{"add":["knockdown"]}},{"id":"phaser-kill","name":"Hand phaser on kill","skill":"Phasers","band":"short","damage":{"any":{"boxes":3,"dying":true}},"equip":["phaser"],"wound":"energy","traits":[],"rows":[]},{"id":"phaser-rifle","name":"Phaser rifle","skill":"Phasers","band":"long","damage":{"any":{"boxes":3,"dying":true}},"wound":"energy","traits":[],"rows":[]},{"id":"disruptor","name":"Disruptor","skill":"Phasers","band":"medium","damage":{"any":{"boxes":3,"dying":true}},"wound":"energy","traits":[],"rows":[]},{"id":"grenade","name":"Explosion (a thrown grenade)","skill":"Athletics","band":"close","maxBand":"close","damage":{"any":{"boxes":2}},"traits":[{"type":"area","note":"1 box to everyone nearby; 2 at the centre. Dodge means diving clear."}],"rows":[]},{"id":"gorn","name":"Gorn's crushing blows","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":2}},"natural":true,"traits":[],"rows":[],"reachYards":1},{"id":"bite","name":"Venomous bite and horn","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"natural":true,"traits":[],"rows":[],"reachYards":1},{"id":"grip","name":"Crushing grip","skill":"Unarmed Combat","reach":"melee","damage":{"melee":{"boxes":1}},"unarmed":true,"traits":[],"rows":[],"reachYards":1}],"threats":[{"id":"guard","name":"Security guard","label":"Security guard (minor)","minor":true,"attacks":[{"skill":"Phasers","target":11}],"dodge":7,"boxes":1,"boxesText":"1","weaponText":"Hand weapon","weapons":["phaser-stun","disruptor"],"trait":"Numbers","traitText":"Usually two or three; they surrender or flee when half are down."},{"id":"klingon","name":"Klingon warrior","label":"Klingon warrior","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Unarmed Combat","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill), d'k tahg","weapons":["disruptor","knife"],"trait":"Relentless","traitText":"Ignores the Wounded penalty; only Seriously wounded slows them."},{"id":"klingon-officer","name":"Klingon officer","label":"Klingon officer","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Leadership","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill)","weapons":["disruptor"],"trait":"Battle commander","traitText":"Once per round, gives one ally +1 on an attack."},{"id":"romulan","name":"Romulan centurion","label":"Romulan centurion","minor":false,"attacks":[{"skill":"Phasers","target":12},{"skill":"Stealth","target":13}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor (kill)","weapons":["disruptor"],"trait":"Ambush","traitText":"+2 on the first attack from hiding; prefers to withdraw rather than be captured."},{"id":"orion","name":"Orion pirate","label":"Orion pirate","minor":false,"attacks":[{"skill":"Phasers","target":11},{"skill":"Unarmed Combat","target":12},{"skill":"Stealth","target":12}],"dodge":9,"boxes":3,"boxesText":"3","weaponText":"Disruptor, knife","weapons":["disruptor","knife"],"trait":"Dirty fighter","traitText":"Winning a grapple also disarms the target."},{"id":"gorn","name":"Gorn warrior","label":"Gorn warrior","minor":false,"attacks":[{"skill":"Unarmed Combat","target":14}],"dodge":6,"boxes":4,"boxesText":"4","weaponText":"Claws, thrown rocks","weapons":["gorn","club"],"trait":"Immense strength","traitText":"Unarmed hits mark 2 boxes; slow, so it acts last in a round."},{"id":"mugato","name":"Mugato","label":"Mugato","minor":false,"attacks":[{"skill":"Unarmed Combat","target":13}],"dodge":8,"boxes":3,"boxesText":"3","weaponText":"Venomous bite","weapons":["bite"],"trait":"Venom","traitText":"A bite that marks a box also poisons: without Medicine before the scene ends, mark another box."},{"id":"android","name":"Rogue android","label":"Rogue android","minor":false,"attacks":[{"skill":"Unarmed Combat","target":13},{"skill":"Computers","target":15}],"dodge":7,"boxes":4,"boxesText":"4","weaponText":"Crushing grip","weapons":["grip"],"trait":"Logic trap","traitText":"A Diplomacy or Psychology contest that presents a paradox stuns it for the scene."}],"protection":[{"id":"improvised","name":"Improvised shield","text":"A chair, a crate lid or a torn-off panel: you Block with it at no bonus. It breaks the first time it blocks a hit of 2 or more boxes.","traits":[{"type":"shield","value":0,"breaksOn":2,"label":"Improvised shield"}]}],"combatRules":{"oneDefense":{"perRound":1,"edge":"extradefense","extraPenalty":-2},"attackQualityDodge":{"bands":[{"from":0,"mod":0},{"from":3,"mod":-1},{"from":5,"mod":-2},{"from":7,"mod":-3}]},"parry":{"mod":-3,"repeatPenalty":0,"bareHanded":"unarmed"},"block":{"mod":-2},"aim":{"bonus":1},"tellingHits":{"margin":5,"natural":true,"called":-2,"small":-4}},"coreCombat":["aim","attackQualityDodge","block","oneDefense","parry","tellingHits"],"terms":{"title":"USS Pelion","point":"Duty","meleeSkill":"Unarmed Combat","unarmedSkill":"Unarmed Combat","ammo":"power","ammoOne":"power","stun":"Stunned"}};
 const LD = (() => {
 /**
  * Legend Dynamics core rules: pure functions, no page code.
@@ -7970,7 +8071,8 @@ const LAB_ENCOUNTER = (() => {
  */
 
 const clone = (/** @type {any} */ x) => JSON.parse(JSON.stringify(x));
-const isOut = (/** @type {Participant} */ p) => p.dead || p.injury >= p.boxes;
+// Out of the fight: dead, every injury box marked, or (Aurora) every box of the Mind track: unconscious or catatonic.
+const isOut = (/** @type {Participant} */ p) => p.dead || p.injury >= p.boxes || (!!p.mindBoxes && (p.mind || 0) >= p.mindBoxes);
 
 /** @param {{ name?: string, setting: string, baseline: string, config: any, seed?: string | number | null }} o */
 function newEncounter(o) {
@@ -8017,9 +8119,10 @@ function removeParticipant(enc, pid) {
   log(enc, "leave", { pid, name: p.name });
 }
 
-/** Turn order: Agility, highest first; ties in the order they joined (the GM can move anyone). @param {any} enc @param {any} rules */
+/** Turn order: anyone who acts first (actFirst: Aurora's Speed), then Agility, highest first; ties in the order they joined
+ * (the GM can move anyone). @param {any} enc @param {any} rules */
 function startCombat(enc, rules) {
-  enc.order = [...enc.participants].sort((a, b) => b.agility - a.agility).map((p) => p.pid);
+  enc.order = [...enc.participants].sort((a, b) => (b.actFirst ? 1 : 0) - (a.actFirst ? 1 : 0) || b.agility - a.agility).map((p) => p.pid);
   enc.status = "combat"; enc.round = 1; enc.turn = 0;
   enc.setup = { participants: clone(enc.participants), order: [...enc.order] };
   enc.commands.push({ type: "start" });
@@ -8051,13 +8154,20 @@ function advance(enc) {
   if (enc.turn >= enc.order.length) { enc.turn = 0; enc.round++; log(enc, "round", { round: enc.round }); }
 }
 
-/** End the active participant's turn. @param {any} enc */
+/** End the active participant's action: their next action this round (actions: Aurora's Speed), or the next turn. @param {any} enc */
 function nextTurn(enc) {
   if (enc.status !== "combat") return;
   enc.commands.push({ type: "next" });
+  const cur = active(enc);
+  if (cur && !isOut(cur) && (cur.actions || 1) > (cur.acted || 0) + 1) {
+    cur.acted = (cur.acted || 0) + 1;
+    log(enc, "turn", { pid: cur.pid, name: cur.name, action: cur.acted + 1, of: cur.actions });
+    return;
+  }
+  if (cur) cur.acted = 0;
   advance(enc); skipOut(enc);
   const p = active(enc);
-  log(enc, "turn", { pid: p && p.pid, name: p && p.name });
+  log(enc, "turn", { pid: p && p.pid, name: p && p.name, ...(p && (p.actions || 1) > 1 ? { action: 1, of: p.actions } : {}) });
 }
 
 /** Aim (when the rules allow it): the next attack on this target gets the Aim bonus. @param {any} enc @param {any} rules @param {string} pid @param {string} target */
@@ -8142,7 +8252,23 @@ const sumBy = (/** @type {any[]} */ mods, /** @type {string[]} */ sources) => mo
 function attack(enc, rules, core, cmd, opts = {}) {
   const a = find(enc, cmd.attacker), d = find(enc, cmd.defender), base = rules.weapons[cmd.weapon];
   // A material the attack is made of, chosen for this attack (silver bullets, a wooden stake), joins the weapon's own.
-  const weapon = base && cmd.material ? { ...base, materials: [...new Set([...(base.materials || []), cmd.material])] } : base;
+  let weapon = base && cmd.material ? { ...base, materials: [...new Set([...(base.materials || []), cmd.material])] } : base;
+  // An attack at a higher Class marks boxes as that Class does: 1 at Class I, 2 at Class II and III, 3 from Class IV.
+  const atClass = (/** @type {any} */ w, /** @type {number} */ cls) => ({ ...w, class: cls,
+    damage: Object.fromEntries(Object.entries(w.damage || {}).map(([k, v]) => [k, v ? { ...v, boxes: Math.max(v.boxes || 0, cls >= 4 ? 3 : cls >= 2 ? 2 : 1) } : v])) });
+  // A weapon in strong hands (Aurora's Strength): a weapon in hand hits at the higher of its own Class and the wielder's Strength.
+  // An ordinary weapon swung above Class II breaks after the blow.
+  const strong = a && weapon && weapon.reach === "melee" && !weapon.natural && !weapon.power && (a.strength || 0) > (weapon.class || 1) ? a.strength : 0;
+  if (strong) weapon = atClass(weapon, strong);
+  // A dive (a flier striking at full speed): a blow in reach, one Class higher; the diver marks a box too unless their Defense
+  // is at least the dive's Class (on their sheet).
+  const dive = cmd.dive && a && a.flies && weapon && weapon.reach === "melee" ? Math.min(6, (weapon.class || 1) + 1) : 0;
+  if (dive) weapon = atClass(weapon, dive);
+  // A team-up: another character puts their power into a power with a Class, and it strikes one Class higher.
+  // Both mark a box of Strain, on their sheets.
+  const mate = cmd.teamUp && weapon && weapon.class ? find(enc, cmd.teamUp) : null;
+  if (cmd.teamUp && !mate) return { error: "Choose who the team-up is with." };
+  if (mate) weapon = atClass(weapon, Math.min(6, weapon.class + 1));
   if (!a || !d) return { error: "Choose an attacker and a target." };
   if (!weapon) return { error: "Choose a weapon." };
   if (!opts.reroll && isOut(a)) return { error: `${a.name} can't act.` };
@@ -8161,6 +8287,8 @@ function attack(enc, rules, core, cmd, opts = {}) {
   }
   const n = prior ? prior.key : enc.events.filter((/** @type {any} */ e) => e.type === "attack" && !e.reroll && e.round === enc.round && e.attacker.pid === a.pid && e.defender.pid === d.pid).length;
   const key = (/** @type {string} */ kind) => `r${enc.round}|${a.pid}>${d.pid}|${n}|${kind}${opts.reroll === kind ? "|rr" : ""}`;
+  // A psychic attack (weapon.mind) isn't dodged: it's a contest against Will, and it marks the Mind track.
+  if (weapon.mind) return mindAttack(enc, rules, core, cmd, opts, { a, d, weapon, skillTarget: +skillTarget, prior, n, key });
   const aimed = prior ? prior.aimed : (rules.actions.has("aim") && a.aim && a.aim.target === d.pid ? 1 : 0);
   // The defense. Published: one Dodge a round. Experiments add Parry and Block; the GM can allow a used one again (logged).
   const choice = cmd.canDodge === false ? "none" : cmd.defense || "auto";
@@ -8232,13 +8360,67 @@ function attack(enc, rules, core, cmd, opts = {}) {
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
     enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
+    teamUp: mate ? { pid: mate.pid, name: mate.name, cls: weapon.class } : null,
+    strongHands: strong ? { cls: strong, breaks: strong >= 3 } : null,
+    dive: dive ? { cls: dive, hurts: Math.max(0, ...(a.traits || []).filter((/** @type {any} */ t) => t.type === "defenseClass").map((/** @type {any} */ t) => t.value)) < dive } : null,
+    // A hit of Class III or more knocks the target down, and can throw them a hex (or a range band) for each Class above II.
+    knockback: res.hit && res.damage && res.damage.boxes && (weapon.class || 1) >= 3 ? weapon.class - 2 : 0,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null, defenseClass: res.defenseClass || null, stun: !!res.stun,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
     injuryBefore: pre.defender.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead, injuryResult: res.injury ? res.injury.change : null,
+    // A flier stunned, knocked back or taken out in the air falls, unless they make a Powers roll (Aurora).
+    flierFalls: !!(d.flies && res.hit && (res.stun || ((weapon.class || 1) >= 3 && res.damage && res.damage.boxes) || isOut(d))),
   });
   if (grievous && grievous.pc) d.lasting[d.lasting.length - 1].about = ev.n;
   if (extraDodge) log(enc, "override", { what: "dodge", about: ev.n, pid: d.pid, name: d.name, defense: chosen.kind, from: `already used ${chosen.kind} this round`, to: `${chosen.kind} allowed`, reason: "GM allowed it again" });
+  if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
+  return { event: ev };
+}
+
+/** The Mind track's penalty to mental rolls (Powers, Will): −1 with one box, −2 with two. @param {any} p */
+const mindPenalty = (p) => (p.mindBoxes ? -Math.min(2, p.mind || 0) : 0);
+
+/**
+ * A psychic attack (Aurora): Powers against the target's Will, by the contest rules (a success beats a failure; if both
+ * succeed, the larger margin wins; ties go to the target). Toughness doesn't apply; Mind Defense does: a power below it does
+ * nothing, one equal to it gives +2 to resist, and a Class IV or higher power against someone without it gives −2.
+ * It marks the Mind track by Class (1 at Class I, 2 at II and III, 3 from IV), never Dying: a full track is unconscious.
+ * @param {any} enc @param {any} rules @param {any} core @param {any} cmd @param {any} opts @param {any} x
+ */
+function mindAttack(enc, rules, core, cmd, opts, x) {
+  const { a, d, weapon, skillTarget, prior, n, key } = x;
+  const R = ["", "I", "II", "III", "IV", "V", "VI"], cls = weapon.class || 1;
+  const range = core.rangeModifier(weapon, cmd.band);
+  if (range === null) return { error: `Out of range for the ${weapon.name.toLowerCase()}.` };
+  const md = Math.max(0, ...(d.traits || []).filter((/** @type {any} */ t) => t.type === "mindDefense").map((/** @type {any} */ t) => t.value || 0));
+  const pre = { defender: { mind: d.mind || 0 }, attackerTracks: clone(a.tracks || {}) };
+  const atkMods = [...(range ? [{ label: `Range (${cmd.band})`, value: range }] : []),
+    ...(mindPenalty(a) ? [{ label: "Mind track", value: mindPenalty(a) }] : []),
+    ...(cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ label: m.label || "Situation", value: +m.value }))];
+  const resMods = [...(md && cls === md ? [{ label: `Mind Defense ${R[md]}`, value: 2 }] : []), ...(!md && cls >= 4 ? [{ label: `A Class ${R[cls]} mind`, value: -2 }] : []),
+    ...(d.traits || []).filter((/** @type {any} */ t) => t.type === "resistMind" && t.value).map((/** @type {any} */ t) => ({ label: t.label || "Steady mind", value: t.value })),
+    ...(mindPenalty(d) ? [{ label: "Mind track", value: mindPenalty(d) }] : [])];
+  const dice = (/** @type {string} */ kind) => (prior && opts.reroll !== kind && prior[kind + "Dice"] ? prior[kind + "Dice"] : core.diceFor(enc.seed, key(kind)));
+  const sum = (/** @type {any[]} */ l) => l.reduce((s, m) => s + m.value, 0);
+  const target = skillTarget + sum(atkMods), willBase = d.will ?? 10, resistTarget = willBase + sum(resMods);
+  const blocked = md > cls;
+  const ra = core.resolve(dice("attack"), target), rd = blocked || !ra.success ? null : core.resolve(dice("dodge"), resistTarget);
+  const win = !blocked && ra.success && (!rd || !rd.success || ra.contestMargin > rd.contestMargin);
+  const dmg = core.weaponDamage(weapon, cmd.band), boxes = win ? (dmg ? dmg.boxes : cls >= 4 ? 3 : cls >= 2 ? 2 : 1) : 0;
+  if (win) d.mind = Math.min(d.mindBoxes || 3, (d.mind || 0) + boxes);
+  const out = win && isOut(d);
+  const outcome = blocked ? `no effect (Mind Defense ${R[md]} against a Class ${R[cls]} mind)` : !ra.success ? "failed" : !win ? "resisted"
+    : `${boxes} Mind box${boxes > 1 ? "es" : ""}${out ? `: ${d.name} is unconscious` : ""}`;
+  const ev = log(enc, "attack", {
+    mind: true, rules: rulesTag(rules), cmd: clone(cmd), key: n, reroll: opts.reroll || null, replaces: prior ? prior.n : null, pre,
+    attacker: { pid: a.pid, name: a.name }, defender: { pid: d.pid, name: d.name }, weapon: { id: weapon.id, name: weapon.name },
+    band: cmd.band, skill: weapon.skill, base: skillTarget, canDodge: false, attackMods: atkMods, target, attackDice: ra.dice, attackTotal: ra.total,
+    margin: ra.margin, success: ra.success, auto: ra.auto, willBase, resistMods: resMods, effectiveDodge: rd ? resistTarget : null,
+    dodgeDice: rd ? rd.dice : null, dodgeTotal: rd ? rd.total : null, dodged: !!(rd && !win && ra.success), defense: "will", defenseLabel: "Will",
+    mindDefense: md || null, hit: win, rolledHit: win, outcome, damage: boxes, mindBefore: pre.defender.mind, mindAfter: d.mind || 0, mindBoxes: d.mindBoxes || 3, unconscious: out,
+    injuryBefore: d.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead,
+  });
   if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
   return { event: ev };
 }
@@ -8251,7 +8433,10 @@ function tellingEffect(enc, n, effect) {
   if (!ev || !ev.telling || ev.superseded) return { error: "Only a telling hit has an effect to pick." };
   if (ev.telling.shrugged) return { error: `${ev.defender.name} already shrugged it off.` };
   const from = ev.telling.effect; ev.telling.effect = effect;
-  return { event: log(enc, "telling", { about: n, pid: ev.attacker.pid, name: ev.attacker.name, target: ev.defender.name, effect, from }) };
+  // A pin by someone stronger (Strength) holds: breaking free takes a Body roll at −2 for each Class of difference.
+  const holder = find(enc, ev.attacker.pid), held = find(enc, ev.defender.pid);
+  const grip = effect === "pin" && holder && held ? Math.max(0, (holder.strength || 0) - (held.strength || 0)) : 0;
+  return { event: log(enc, "telling", { about: n, pid: ev.attacker.pid, name: ev.attacker.name, target: ev.defender.name, effect, from, ...(grip ? { grip } : {}) }) };
 }
 
 /**
@@ -8436,9 +8621,16 @@ function override(enc, rules, core, what, o) {
     const p = find(enc, o.pid); if (!p) return { error: "Who?" };
     return { event: log(enc, "override", { what, pid: p.pid, name: p.name, skill: o.skill, from: o.from ?? null, to: o.to, reason: o.reason || "" }) };
   }
+  // The Mind track, changed by hand (on the character card, or by the GM).
+  if (what === "mind") {
+    const p = find(enc, o.pid); if (!p) return { error: "Who?" };
+    const from = p.mind || 0; p.mind = Math.max(0, Math.min(p.mindBoxes || 3, +o.mind || 0));
+    return { event: log(enc, "override", { what, pid: p.pid, name: p.name, from, to: p.mind, reason: o.reason || "" }) };
+  }
   if (what === "outcome") {
     const ev = enc.events.find((/** @type {any} */ e) => e.n === o.event && e.type === "attack");
     if (!ev || ev.superseded) return { error: "Choose an attack to override." };
+    if (ev.mind) return { error: "A psychic attack's result: change the Mind track on the card instead." };
     const d = find(enc, ev.defender.pid), from = { hit: ev.hit, injury: d.injury };
     if (o.hit && !ev.hit) {
       const dmg = ev.rolledDamage || core.weaponDamage(rules.weapons[ev.weapon.id], ev.band) || { boxes: 0 }; // the damage the dice gave, if they gave a hit
@@ -8617,6 +8809,8 @@ function mountLab(api) {
   const MATERIALS = PACK.materials || []; // [id, name]: what an attack can be made of, against weaknesses and Tough // published protective gear (a shield, a mail shirt) as data
   const protTraits = (/** @type {string[]} */ ids) => PROT.filter((/** @type {any} */ x) => ids.includes(x.id)).flatMap((/** @type {any} */ x) => x.traits.map((/** @type {any} */ t) => ({ ...t })));
   const PTRACK = PACK.personalTrack || null; // a setting's personal price track (Corruption, Strain), kept on the character
+  // A setting's Mind track (Aurora): psychic attacks mark it, Will resists them, and Mind Defense stops the weaker ones.
+  const MT = PACK.mindTrack || null;
   const BAND_NAMES = { melee: "In reach", close: "Close", short: "Short", medium: "Medium", long: "Long", extreme: "Extreme" };
 
   /** @type {{ mode: "published" | "lab", cfg: any, enc: any, history: any[], compare: any }} */
@@ -8786,23 +8980,48 @@ function mountLab(api) {
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
     const formRules = fm ? shapeTraits(fm, formOn) : [];
-    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+    // Powers that attack (setting data: arms with a power and its Class): the character's own, at the Class they have it.
+    const pw = api.powers ? api.powers(c) : [];
+    for (const a of Object.values(WEAPONS)) if (a.power && pw.some((/** @type {any} */ x) => x.id === a.power && x.cls === a.powerClass)) weapons.push(a.id);
+    // Strength (a power, or a suit that gives it): weapons in hand hit harder, and pins hold.
+    const strength = Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === "strength").map((/** @type {any} */ x) => x.cls), ...((c.equipment || {}).aegis ? [2] : []));
+    // Powers in a fight (powers.fight: Speed acts first, defends twice and acts more than once a round; Flight flies).
+    const F = (PACK.powers && PACK.powers.fight) || {}, clsOf = (/** @type {string} */ id) => Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === id).map((/** @type {any} */ x) => x.cls));
+    const fight = {
+      ...(F.actFirst && clsOf(F.actFirst.power) >= F.actFirst.from ? { actFirst: true } : {}),
+      ...(F.actions && clsOf(F.actions.power) ? { actions: F.actions.byClass[clsOf(F.actions.power) - 1] || 1 } : {}),
+      ...((F.flies || []).some((/** @type {string} */ id) => clsOf(id)) || (c.equipment || {}).aegis ? { flies: true } : {}) };
+    // Mind Defense (MT.defenseFrom: Telepathy, Mind Control, Possession at their Class; MT.gear: equipment that gives it), and advantages
+    // that steady the mind (MT.resistAdvantages: Cool Under Fire, +2).
+    const md = MT ? Math.max(0, ...(MT.defenseFrom || []).map((/** @type {string} */ id) => clsOf(id)),
+      ...Object.entries(MT.gear || {}).filter(([id]) => (c.equipment || {})[id]).map(([, v]) => +v)) : 0;
+    const steady = MT && MT.resistAdvantages ? [c.adv, c.adv2].filter((x) => x && MT.resistAdvantages[x.id]).map((x) => ({ type: "resistMind", value: MT.resistAdvantages[x.id], label: ((PACK.advantages || []).find((v) => v[0] === x.id) || [])[1] || x.id })) : [];
+    const mindTraits = [...(md ? [{ type: "mindDefense", value: md, label: `Mind Defense ${["", "I", "II", "III", "IV", "V", "VI"][md]}` }] : []), ...steady];
+    const speedDefense = F.extraDefense && clsOf(F.extraDefense.power) >= F.extraDefense.from && !(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge])
+      ? [{ type: "extraDefense", value: 1, label: "Speed: a second defense" }] : [];
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", ...(strength ? { strength } : {}), ...fight, agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
+        ...speedDefense, ...mindTraits,
         ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : []),
         ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
-      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
+      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo,
+      ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes, will: c.attrs.Will } : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A threat from the setting's data. @param {any} t @param {string} name */
   function fromThreat(t, name) {
     const skills = Object.fromEntries(t.attacks.map((/** @type {any} */ a) => [a.skill, a.target]));
     const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
-    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
-      boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}`,
+    // A threat's Strength: the Class of its strength attacks.
+    const strength = Math.max(0, ...t.weapons.filter((/** @type {string} */ w) => /strength/.test(w) && WEAPONS[w]).map((/** @type {string} */ w) => WEAPONS[w].class || 0));
+    return { kind: "npc", name, side: "foe", ...(strength ? { strength } : {}), ...(t.actFirst ? { actFirst: true } : {}), ...(t.actions > 1 ? { actions: t.actions } : {}), ...(t.flies ? { flies: true } : {}), agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
+      boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo,
+      // The Mind track: as many boxes as the body (one for a minor opponent); Will as given, or estimated.
+      ...(MT ? { mind: 0, mindBoxes: t.minor ? 1 : t.boxes || 3, will: t.will ?? (t.minor ? 9 : t.named ? 12 : 10), ...(t.will === undefined ? { willEstimated: true } : {}) } : {}), note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
   function ensureEnc() {
@@ -8849,6 +9068,7 @@ function mountLab(api) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
+      if (MT && (c.play.mind || 0) !== (p.mind || 0)) E.override(en, rules(), LD, "mind", { pid: p.pid, mind: c.play.mind || 0, reason: "changed on the character card" });
       if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
       // A shapechanger who changed form on the card (the GM view, or the sheet's file) changes in the encounter too.
       const fm = p.form && api.formOf ? api.formOf(c) : null;
@@ -8864,6 +9084,7 @@ function mountLab(api) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       c.play.injury = Math.min(3, p.injury); c.play.dying = p.dying; c.play.duty = p.points;
+      if (MT) c.play.mind = Math.min(MT.boxes, p.mind || 0);
       if (c.play.gun && p.ammo[c.play.gun.type] !== undefined) c.play.gun.rounds = p.ammo[c.play.gun.type];
       if (PTRACK && p.tracks) c.play.ptrack = Math.min(PTRACK.boxes, p.tracks[PTRACK.name] || 0);
       // Lasting wounds from gritty combat go on the card's list once each.
@@ -8989,6 +9210,8 @@ function mountLab(api) {
     $("lab-atk-row").hidden = action !== "attack";
     $("lab-reach").hidden = true; // the map check below shows it again for an attack
     $("lab-text-row").hidden = !["point", "complication", "condition", "note"].includes(action);
+    // The core's conditions, offered when adding one (any other text works too).
+    $("lab-cond-list").innerHTML = action === "condition" ? [T.stun || "Stunned", "Frightened", "Charmed", "Pinned", "Prone"].map((c) => `<option value="${esc(c)}">`).join("") : "";
     $("lab-text-label").textContent = { point: "What for (a small preparation, or other)", complication: "What happens", condition: "Condition", note: "Note" }[action] || "";
     if (action === "attack" && a) {
       const pw = $("lab-weapon").value;
@@ -9017,6 +9240,14 @@ function mountLab(api) {
       // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
       if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None<\/option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}<\/option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}<\/option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
+      // A dive: a flier strikes in reach at full speed.
+      $("lab-dive-wrap").hidden = !(a && a.flies && w && w.reach === "melee");
+      if ($("lab-dive-wrap").hidden) $("lab-dive").checked = false;
+      // A team-up (a power with a Class): another character puts their power into this attack, one Class higher.
+      const mates = w && w.class ? en.participants.filter((/** @type {any} */ p) => p.pid !== a.pid && p.side === a.side && p.pid !== $("lab-target").value && !p.dead && !E.isOut(p)) : [];
+      $("lab-team-wrap").hidden = !mates.length;
+      if (mates.length) { const was = $("lab-team").value; $("lab-team").innerHTML = `<option value="">No one<\/option>` + mates.map((/** @type {any} */ p) => `<option value="${p.pid}">${esc(p.name)} (Class ${["", "I", "II", "III", "IV", "V", "VI"][Math.min(6, w.class + 1)]})<\/option>`).join(""); $("lab-team").value = mates.some((/** @type {any} */ p) => p.pid === was) ? was : ""; }
+      else $("lab-team").value = "";
       if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
       const base = w ? a.skills[w.skill] : undefined;
       if ($("lab-skill").dataset.for !== `${a.pid}|${w && w.id}`) { $("lab-skill").value = base ?? ""; $("lab-skill").dataset.for = `${a.pid}|${w && w.id}`; }
@@ -9050,6 +9281,8 @@ function mountLab(api) {
         mode: mode ? { id: mode[0], label: mode[1], mod: mode[4] || 0, cost: mode[2] } : null, ammo: $("lab-ammo-wrap").hidden ? null : $("lab-ammo").value,
         material: $("lab-material-wrap").hidden || !$("lab-material").value ? null : $("lab-material").value,
         called: $("lab-called-wrap").hidden || !$("lab-called").value ? null : { effect: $("lab-called").value.split("|")[0], small: $("lab-called").value.endsWith("|small") },
+        teamUp: $("lab-team-wrap").hidden || !$("lab-team").value ? null : $("lab-team").value,
+        dive: !$("lab-dive-wrap").hidden && $("lab-dive").checked,
         cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
@@ -9072,6 +9305,15 @@ function mountLab(api) {
     const L = [], r = ev.rules;
     L.push(`<span class="${r.kind === "lab" ? "x" : ""}">Rules: ${esc(r.kind === "lab" ? r.label + (r.active.length ? ": " + r.active.map((/** @type {any} */ a) => `${a.id} (${a.scope.toUpperCase()})`).join(", ") : ": no experiments") : "Published")}<\/span>`);
     L.push(`${esc(ev.attacker.name)} → ${esc(ev.defender.name)} · ${esc(ev.weapon.name)}${ev.ammo ? ", " + esc(ev.ammo) : ""} · ${BAND_NAMES[ev.band] || ev.band}${ev.reroll ? ` · <span class="x">${esc(T.point)} reroll of the ${ev.reroll}<\/span>` : ""}`);
+    if (ev.mind) { // a psychic attack: a contest against Will, on the Mind track
+      L.push("", `${esc(ev.skill)}: ${ev.base}`, ...ev.attackMods.map((/** @type {any} */ m) => `${esc(m.label)}: ${signed(m.value)}`), `Final target: <b>${ev.target}<\/b>`,
+        `Roll: <b>${ev.attackTotal}<\/b> ${diceText(ev.attackDice)}${ev.auto ? ` · natural ${ev.attackTotal}: automatic ${ev.auto}` : ""} · ${ev.success ? `succeeded by ${ev.margin}` : `failed by ${-ev.margin}`}`);
+      if (ev.dodgeDice) L.push("", `${esc(ev.defender.name)}'s Will: ${ev.willBase}`, ...ev.resistMods.map((/** @type {any} */ m) => `${esc(m.label)}: ${signed(m.value)}`),
+        `Resists at <b>${ev.effectiveDodge}<\/b>: rolled <b>${ev.dodgeTotal}<\/b> ${diceText(ev.dodgeDice)}`, "A success beats a failure; if both succeed, the larger margin wins; ties go to the target.");
+      L.push("", ev.hit ? `<span class="ok">${esc(ev.outcome)}<\/span>` : `<span class="bad">${esc(ev.outcome[0].toUpperCase() + ev.outcome.slice(1))}<\/span>`);
+      if (ev.hit) L.push(`${esc(ev.defender.name)}'s Mind track: ${ev.mindBefore} → <b>${ev.mindAfter}<\/b> of ${ev.mindBoxes}${ev.unconscious ? ", <span class='bad'>unconscious<\/span>" : ""}. Toughness and Dodge don't help against the mind.`);
+      return L.join("\n");
+    }
     if (!ev.attackDice) { L.push(`<span class="bad">${esc(ev.outcome)}<\/span>`); return L.join("\n"); }
     L.push("", `${esc(ev.skill)}: ${ev.base}`);
     for (const m of ev.attackMods) L.push(`${esc(m.label)}: ${signed(m.value)}${m.scope === "experiment" ? ' <span class="x">[experiment]<\/span>' : ""}`);
@@ -9182,12 +9424,13 @@ function mountLab(api) {
       case "leave": return `${esc(e.name)} leaves.`;
       case "start": return `Combat starts. Rules: ${esc(e.rules.kind === "lab" ? e.rules.label + " (" + (e.rules.active.map((/** @type {any} */ a) => `${a.id}, ${a.scope}`).join("; ") || "no experiments") + ")" : "Published")}${e.seed !== null && e.seed !== undefined ? ` · seed ${esc(e.seed)}` : ""}. Order: ${esc(e.order.join(", "))}.`;
       case "round": return `<b>Round ${e.round}.<\/b>`;
-      case "turn": return `${esc(e.name || "")}'s turn.`;
+      case "turn": return `${esc(e.name || "")}'s turn${e.of ? ` (action ${e.action} of ${e.of})` : ""}.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}<\/b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)<\/span>" : ""}${e.overridden ? " <span class='muted'>(overridden)<\/span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}<\/b>` : ""}`;
+      case "attack": if (e.mind) return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}` : ""}${e.dodgeDice ? `; Will ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → <b>${esc(e.outcome)}<\/b>${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)<\/span>" : ""}`;
+        return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}<\/b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)<\/span>" : ""}${e.overridden ? " <span class='muted'>(overridden)<\/span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}<\/b>` : ""}${e.dive ? ` · a dive, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.dive.cls]}${e.dive.hurts && e.hit ? `: ${esc(e.attacker.name)} marks a box too` : ""}` : ""}${e.flierFalls && !e.superseded ? ` · ${esc(e.defender.name)} falls from the air unless they make a Powers roll` : ""}${e.strongHands ? ` · in strong hands, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.strongHands.cls]}${e.strongHands.breaks ? "; an ordinary weapon breaks" : ""}` : ""}${e.knockback && !e.superseded ? ` · knocked down, and can be thrown back up to ${e.knockback} hex${e.knockback > 1 ? "es" : ""} or a range band${e.knockback > 1 ? "s" : ""} (through a wall: Collateral)` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
       case "trade": return `<b>${esc(e.name)} trades a limb for their life:<\/b> ${esc(e.wound)}.`;
-      case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.`;
+      case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.${e.grip ? ` ${esc(e.name)} is stronger: to break free, ${esc(e.target)} rolls Body −${2 * e.grip}; on a failure the pin holds.` : ""}`;
       case "shrug": return `${esc(e.name)} shrugs off a telling hit (${esc(e.label)}).`;
       case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation", downgrade: "downgrade a grievous wound", shrug: "shrug off a telling hit" }[e.use] || e.use)}${e.from ? ` (${esc(e.from)} → ${esc(e.to)})` : ""}${e.note ? ` (${esc(e.note)})` : ""}.`;
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
@@ -9351,7 +9594,7 @@ return { mountLab };
       saveGM(); renderGM(); } });
   const saveGM = () => {
     if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the crew. Save the crew to a file.", true);
-    if (sharedTable) for (const c of gmCrew) if (c.tableKey) sharedTable.pushPlay(c.tableKey, pickPlay(c)); // a change here reaches the player's sheet
+    if (sharedTable) for (const c of gmCrew) if (c.tableKey) sharedTable.pushPlay(c.tableKey, pickPlay(c, true)); // a change here reaches the player's sheet
     pushScene();
   };
   // Phase 3: the map and the fight as the players see them (sent a moment after the last change, and only by the GM).
@@ -9480,7 +9723,13 @@ return { mountLab };
     fillCosts($("da-cost"), true);
     for (const [id, v] of Object.entries(keep)) if ($(id) && v) $(id).value = v;
   }
+  let discBusy = false;
   function renderDisc() {
+    // Rebuilding the panel takes away a focused field, whose change event can ask for another render mid-rebuild: skip that one.
+    if (discBusy) return; discBusy = true;
+    try { renderDiscNow(); } finally { discBusy = false; }
+  }
+  function renderDiscNow() {
     renderAward();
     const th = disc.threat;
     $("disc-intro").textContent = `Discovery clocks fill in three phases (${DISC.phases.map((p) => p[0]).join(", ")}); filling one mints a library record for the primary investigator and a shared copy for everyone present. Discovery runs without a Countdown unless a failed roll or a success at a cost starts one.`;
@@ -9598,7 +9847,47 @@ return { mountLab };
   });
   clockListeners.push(() => renderDisc()); // a danger clock added, filled or removed changes what information can cost
 
+  const HOLDER_EXAMPLE = "e.g. a Klingon intelligence officer";
+  // ---- the enemies' files on the characters (HFILES) ----
+  let fileFor = "", filesBusy = false;
+  function renderFiles() {
+    // Rebuilding the card takes away a focused field, whose change event can ask for another render mid-rebuild: skip that one.
+    if (filesBusy) return; filesBusy = true;
+    try { renderFilesNow(); } finally { filesBusy = false; }
+  }
+  function renderFilesNow() {
+    const card = $("files-card"); if (!card) return;
+    card.hidden = !HFILES; if (!HFILES) return;
+    const crew = gmCrew.filter((c) => c.name), all = crew.flatMap((c) => (c.play.files || []).map((f) => ({ c, f })));
+    if (!crew.some((c) => c.id === fileFor)) fileFor = crew[0] ? crew[0].id : "";
+    const holders = [...new Set((ENC_PACK.threats || []).filter((t) => t.named || !t.minor).map((t) => t.name))];
+    card.innerHTML = `<h3>${esc(HFILES.title)}</h3><p class="small muted">${HFILES.intro}</p>
+      ${crew.length ? `<div class="fields">
+        <div class="field"><label for="hf-hero">On</label><select id="hf-hero">${crew.map((c) => `<option value="${c.id}"${c.id === fileFor ? " selected" : ""}>${esc(c.name)}</option>`).join("")}</select></div>
+        <div class="field"><label for="hf-holder">Held by</label><input type="text" id="hf-holder" maxlength="60" list="hf-holders" placeholder="${esc(HOLDER_EXAMPLE)}"><datalist id="hf-holders">${holders.map((n) => `<option value="${esc(n)}">`).join("")}</datalist></div>
+        <div class="field wide"><label for="hf-knows">What they know</label><input type="text" id="hf-knows" maxlength="200" placeholder="${esc(HFILES.knowsExample)}"></div>
+        <div class="field wide"><label for="hf-gives">What it gives them</label><input type="text" id="hf-gives" maxlength="120" value="${esc(HFILES.gives)}"></div>
+      </div><div class="btn-row"><button class="btn primary" id="hf-add">Add the file</button></div>` : `<p class="small">Open the characters first.</p>`}
+      ${all.length ? `<ul class="small adv-list">${all.map(({ c, f }) => `<li${f.destroyed ? ' style="text-decoration:line-through"' : ""}><b>${esc(f.holder)}</b> on <b>${esc(c.name)}</b>: ${esc(f.knows)} <span class="muted">(${esc(f.gives || "")}${f.found ? "; found out" : "; secret"})</span>
+        <span class="btn-row" style="display:inline-flex;margin-left:6px"><button class="linkish" data-hf="${c.id}" data-hfid="${f.id}" data-hfdo="found">${f.found ? "Hide from them" : "They found out"}</button>
+        <button class="linkish" data-hf="${c.id}" data-hfid="${f.id}" data-hfdo="destroyed">${f.destroyed ? "Restore" : "Destroyed"}</button>
+        <button class="linkish danger" data-hf="${c.id}" data-hfid="${f.id}" data-hfdo="delete">Delete</button></span></li>`).join("")}</ul>` : ""}`;
+  }
+  $("files-card").addEventListener("change", (e) => { if (e.target.id === "hf-hero") fileFor = e.target.value; });
+  $("files-card").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.id === "hf-add") {
+      const c = gmCrew.find((x) => x.id === $("hf-hero").value), holder = $("hf-holder").value.trim(), knows = $("hf-knows").value.trim();
+      if (!c || !holder || !knows) { gmSay("A file needs who holds it and what they know.", true); return; }
+      c.play.files = [...(c.play.files || []), { id: uid(), holder, knows, gives: $("hf-gives").value.trim(), found: false, destroyed: false }];
+      fileFor = c.id; saveGM(); renderGM(); gmSay(`${holder} now has a file on ${c.name}.`); return;
+    }
+    const c = gmCrew.find((x) => x.id === b.dataset.hf), f = c && (c.play.files || []).find((x) => x.id === b.dataset.hfid); if (!f) return;
+    if (b.dataset.hfdo === "delete") c.play.files = c.play.files.filter((x) => x !== f); else f[b.dataset.hfdo] = !f[b.dataset.hfdo];
+    saveGM(); renderGM();
+  });
   function renderGM() {
+    renderFiles();
     if (campaignUI) campaignUI.check(); // a library record just recorded may unlock a step of the campaign
     renderDisc();
     if (encPanel) setTimeout(encPanel.refresh, 0);

@@ -294,17 +294,25 @@ A natural 17 or 18 is never a success at a cost. A cost that comes from your com
 
 ## Progress clocks
 
-A **clock** is a circle cut into 4, 6 or 8 segments that tracks something that takes time or builds toward disaster: *Warp core breach (4)*, *Repair the shuttle (6)*, *Klingon reinforcements arrive (4)*, *Win the council's trust (8)*.
+A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something that takes time or builds toward disaster: *Warp core breach (4)*, *Repair the shuttle (6)*, *Klingon reinforcements arrive (4)*, *Win the council's trust (8)*.
 
 - **Danger clocks** fill when things go wrong: a failed roll, a success at a cost, or time passing. When one fills, the danger happens.
 - **Progress clocks** fill as the crew succeeds: one segment for a success, two for success by 5 or more. When one fills, the goal is achieved.
-- The GM sizes the clock (4 = urgent or simple, 6 = substantial, 8 = long or complex) and shows it to the players, so everyone can see the pressure building.
+- The GM sizes the clock (2 = quick, 4 = urgent or simple, 6 = substantial, 8 = long or complex) and shows it to the players, so everyone can see the pressure building.
 
 Clocks are how a failed roll changes the situation without stopping the story. Racing a progress clock against a danger clock makes a strong climax.
 
 ## Investigation and social scenes
 
 Ask concrete questions and explain your approach. Evidence may require several different tasks. Diplomacy can secure cooperation or concessions, while Psychology offers insight into behavior. A successful roll does not force someone to abandon a core belief or provide information they do not possess.
+
+## Chases
+
+Run a chase as a progress clock for the pursuers against a danger clock for the quarry's escape. Each exchange, the characters roll the skill that moves them (Helm or Piloting in a vehicle, Athletics on foot): success ticks the pursuers' clock, failure ticks the escape. Terrain, a damaged engine, and attacks made on the move (at −2) adjust the rolls.
+
+- **Clearly faster.** A side that is a whole class faster (a shuttle against a ground car, a starship at warp against one at impulse) catches up, or gets away, without a roll. Roll the chase between equals, or when terrain or a trick evens things out.
+- **Chases by range.** When the distance itself is the fight, run the chase on the battle map's range track instead of clocks: each exchange, the two sides roll an opposed contest of the skill that moves them, and the winner shifts the range one band, in or out; a tie leaves it. Anyone pushed past Extreme drops out of the chase, and a quarry that wins at Extreme by 5 or more breaks away. Ship fights work this way (see *Range in space*).
+- **Vehicles take damage on a track.** A vehicle has a track of boxes, and each costs something: a system hit gives −2 to rolls that use it, then it's crippled, then wrecked. The Pelion's Shields, Hull and systems are its track (see *The USS Pelion*).
 
 # Library records
 
@@ -328,11 +336,17 @@ When a mission turns on something unknown, the GM starts a **discovery clock** i
 
 Each successful investigation roll fills one segment, two on a success by 5 or more. The GM sets the segments per phase (2, 2, 2 is usual; 1, 2, 2 for something quick; 2, 3, 3 for something substantial). The crew member who led the investigation is the **primary investigator**. When the clock fills, they own the library record, and everyone present gets a **shared copy**.
 
+- **Assisting.** Others **assist** under the usual assistance rules, rolling a relevant skill. A crew member who holds a relevant record can assist with a method they couldn't otherwise bring; it adds nothing beyond the normal assistance.
+- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but the investigation's price (below) is paid whatever the roll.
+- **A head start.** A crew member trained in the skill whose field squarely covers the subject (an engineer before an alien power core, a doctor before a new disease) recognizes at once that it's something new: the clock starts at Identify, skipping Confront. The GM says whether a skill fits.
+
 A library record never confirms its own subject: holding one about a kind of thing doesn't prove that the thing in front of you is that kind. Only the Identify phase does.
 
 ## The Countdown
 
 Routine discovery has no clock racing it. When a failed investigation roll, or a success at a cost, puts real stakes in play (a reactor going critical, a first-contact window closing, a ship hunting you), the GM may start a **Countdown** of 4, 6 or 8 segments. From then on it's a hard timer: it ticks with time (each scene, or each hour the GM sets), whatever the crew does. When it fills, the situation hits. Several clocks can race the same Countdown: one to understand the alien and one to repair the ship, all needed before it ends.
+
+**A rival.** When nothing threatens yet, give the discovery a rival instead: an ordinary danger clock named for someone racing the crew to the same find (a Klingon science vessel, an Orion salvager, a Federation survey team with other orders). It ticks on delays, noisy methods and open digging; when it fills, the rival gets there first.
 
 ## Learning without a clock
 
@@ -350,6 +364,10 @@ A library record can also come directly, without a clock:
 - **Time:** one segment on a danger clock that's running, or on the Countdown.
 
 A failed investigation roll or a success at a cost can carry the same price, or start the Countdown.
+
+## When the other side investigates you
+
+Enemies keep files too. What a power, a rival captain or an alien intelligence has learned about a crew member (a weakness, a habit, a family on Earth, the people they love) gives it **+2 against them when it applies**: an ambush on a predictable shore leave, a trap built for a weakness, a hostage who matters. The GM keeps these files in the GM view and decides when one applies. A crew member who finds out a file exists (a captured agent, a decrypted transmission, a defector) sees it on their sheet, and can **destroy** it: wipe the data core, discredit the source, turn the spy. A destroyed file gives nothing.
 
 ## The Starfleet Command track
 
@@ -372,6 +390,9 @@ The **Restricted Files** advantage gives you **three library records** at the st
 ## Turn order and actions
 
 Act in descending Agility order. Players choose the order of tied crew members; the GM resolves other ties. A round lasts a few seconds. On your turn, move up to your **Move** (see *Move and reach*) and take one meaningful action, such as attacking, using equipment, helping, or attempting a task.
+
+- **Acting first and acting twice.** An ability can let a crew member act first in a round: they go before everyone else, in Agility order among themselves. An ability that gives more than one action a round gives each one in turn, before the next character acts.
+- **Helping in a fight.** Helping a crewmate's attack (drawing a guard's eye, steadying a shot, a sensor sweep that marks the target) is your action: you assist under the usual rules (+1, or +2 by 5 or more) before they roll.
 
 ## Attacking and defending
 
@@ -400,7 +421,7 @@ A really good shot, or a blow that lands exactly where it was meant to, lets the
 |---|---|---|
 | Disarm | Any attack | The weapon or held item drops, or flies a few yards away |
 | Knock down | A weapon in hand or fists, a phaser on stun, or a shot that marks 2 or more boxes | The target falls prone, or is driven back a few steps. Standing up uses the target's move on their next turn; they still take their action |
-| Pin | A weapon in hand, fists or a grapple | The target is grabbed, held, or pinned against a bulkhead or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack |
+| Pin | A weapon in hand, fists or a grapple | The target is grabbed, held, or pinned against a bulkhead or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack. Against someone much stronger (a Gorn, a Vulcan's grip, a Mugato), getting free takes a Body roll, −2 or −4 against something huge; on a failure they're still held |
 | Rattle | Any attack | −2 to the target's next roll |
 | Break gear | Any attack but bare hands and natural weapons | A phaser, tricorder, communicator or shield is knocked out of use (jammed, cracked, shorted out) until its owner spends an action putting it right. It's destroyed for good only if it was already vulnerable (a drained phaser, an improvised shield) or the attacker has a weakness to exploit |
 | Open them up | Any attack | The next attack on this target this round gets +2 |
@@ -463,13 +484,36 @@ A normal damaging hit marks one box. A powerful attack can mark two, and a killi
 
 ### Dying and death
 
-Two boxes hurt; they don't kill. Death comes from three things:
+Death comes from three things:
 
-- **Dying.** A hit from a killing weapon (a phaser or disruptor on kill) that takes you to three boxes leaves you Incapacitated and **Dying**. A Dying character dies at the end of the scene unless someone stabilizes them: one action and a successful Medicine roll with a medical kit. Once stabilized, you are still Incapacitated but no longer Dying.
+- **Dying.** A hit from a weapon that marks **2 or more boxes** and brings you to three boxes leaves you Incapacitated and **Dying**: a phaser or disruptor on kill, or a lirpa that finishes what a punch started. A Dying character dies at the end of the scene unless someone stabilizes them: one action and a successful Medicine roll with a medical kit. Once stabilized, you are still Incapacitated but no longer Dying.
 - **A further lethal hit.** While you are at three boxes, any hit from a weapon that marks two or more boxes (a heavy blade, a phaser or disruptor on kill, an explosion's centre) kills you. Fists, clubs and knives just keep you down.
 - **Disintegration** and comparable hazards bypass the track entirely.
 
 Your protection is avoiding the hit: Dodge, cover, and a Duty point, which reduces a kill shot from three boxes to two, leaving you Seriously wounded but on your feet.
+
+### Falls, fire and foul air
+
+A fall marks boxes by its height. Deep water, a snowbank or an antigravity field makes it one step better.
+
+| Height | Boxes |
+|---|---|
+| A story or two (up to 10 yards) | 1 |
+| A rooftop (up to 25 yards) | 2 |
+| A tower or a cliff (up to 100 yards) | 3, and Dying |
+| Higher | Certain death, unless something breaks the fall |
+
+**Fire** marks 1 box each round in the flames. **Smoke, poison air or vacuum** marks 1 box each round you breathe it, unless you have a mask, an environment suit, or the transporter gets you out first.
+
+### Fear and other conditions
+
+- **Stunned.** −2 on your next action roll; then it's over.
+- **Frightened.** Fear, an alien compulsion, a horror: you must keep away from its source, and you're −2 to act against it. At the end of each of your turns, roll Will to shake it off (+2 if you've been hurt since). An effect that makes its target *flee or freeze* makes them Frightened.
+- **Charmed.** You treat the one who charmed you as a friend for the scene. Harming you or your friends ends it at once.
+
+### Mental harm (an option)
+
+A GM whose missions turn on telepaths and mind-bending aliens (the Talosians, a Melkot) can give every crew member a **Mind** track beside the injury track. Attacks on the mind mark it: the attacker's ability against Will, never Dodge, and armor doesn't help. One box is Shaken (−1 to mental actions: Will, and skills of Intellect and Presence), two Overwhelmed (−2), three Broken: unconscious or catatonic until they rest. It never leaves anyone Dying; a scene's rest clears one box, a night's sleep all of them.
 
 ### Optional rule: gritty combat
 
@@ -498,6 +542,17 @@ For a harder, bloodier game, the GM can turn on **gritty combat** for the campai
 
 How many boxes a hit marks depends on the **weapon**, not on how well the attack roll succeeded. Apply it only after the hit survives any defense. This list sorts common weapons into one-box, two-box and killing (three-box) categories; the GM places anything else by comparison.
 
+- **"3, and Dying."** A killing weapon marks 3 boxes: enough to take an unhurt crew member straight to Incapacitated and Dying.
+- **Explosions** mark 1 box on everyone nearby and their full boxes at the centre; Dodge means diving clear.
+- **Stun weapons** (a phaser on stun) mark no box: the target rolls Body −2. On a failure they're out for the scene; on a success, −2 on their next action (see *Phaser settings*).
+- **Jams.** Phasers and disruptors don't jam; a primitive firearm jams on a natural 18, and clearing it takes an action.
+
+### Armor, toughness and weaknesses
+
+- **Armor** turns some hits. A typical piece makes a hit of 2 or more boxes mark one fewer, once per fight, and says what it works against. Starfleet issues none; Klingon and Gorn soldiers sometimes wear it.
+- **Toughness.** A creature's trait can say *hits of 1 box mark nothing* (a Horta, a Gorn's hide) or *hits of 2 or more boxes mark one fewer*.
+- **Weaknesses.** What a creature is weak to marks one box more, and its toughness and armor don't help against it. *Only a certain frequency marks more than 1 box* means everything else marks at most 1. A weakness works whoever uses it, whether or not anyone knows of it.
+
 | Weapon | Range | Boxes on a hit | What the injury looks like |
 |---|---|---|---|
 | Punch, kick, headbutt | Melee, reach 1 yd | 1 | Bruising, a split lip, cracked ribs |
@@ -510,7 +565,7 @@ How many boxes a hit marks depends on the **weapon**, not on how well the attack
 | Klingon disruptor | Medium | 3, and Dying | Severe burns and tissue disruption |
 | Phaser rifle, or a ship's weapon fired at a person | Long; ship's weapon Extreme | 3 and Dying, or disintegration if the GM rules it | Massive energy trauma |
 | Explosion | Close (thrown grenade) | 1 to everyone nearby, 2 at the centre | Blast, shrapnel, and burns; Dodge means diving clear, so you need somewhere to go |
-| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fall | — | By height: 1 to 3, and worse (see *Falls, fire and foul air*) | A sprain, a fracture, or worse |
 
 *Example:* a Klingon's punch leaves Ensign Reyes Wounded (−1). On the next round a d'k tahg slash marks a second box: Seriously wounded (−2). A disruptor shot instead, on an unhurt Reyes, would mark all three boxes: Incapacitated and Dying, with the end of the scene as the deadline for a medic. Spending a Duty point when the disruptor hits reduces it to two boxes, leaving Reyes Seriously wounded but still standing. If Reyes is already down at three boxes, another disruptor shot or a lirpa blow kills; a punch does not.
 
@@ -524,7 +579,7 @@ To take someone down without hurting them, use a phaser on stun, a grapple, or t
 | Heat or cut | Controlled tool use. Material, time, and the task determine the skill and difficulty. |
 | Kill | Marks three injury boxes: the target is Incapacitated and Dying. Disintegration requires a deliberate setting and an exposed target; the GM determines whether it is possible. |
 
-Declare the setting before firing. Stun effects do not stack; a later failed resistance roll still incapacitates the target. Unarmed strikes normally mark one box. A grapple uses an opposed Unarmed Combat contest; winning restrains the target while the hold is maintained. Escape uses an action and a new contest.
+Declare the setting before firing. Stun effects do not stack; a later failed resistance roll still incapacitates the target. Unarmed strikes normally mark one box. A grapple is an Unarmed Combat attack: a hit that pins (a telling hit, or a called shot for one) holds the target as the *Pin* effect says, and their next action goes to getting free.
 
 ## Phaser power
 
@@ -622,6 +677,10 @@ Begin each session with two Duty points; unused points do not carry into the nex
 Gain one point when one of your complications creates a meaningful problem you accept. This includes a companion complication from a species advantage. The GM offers or approves the award. You can decline the proposed complication without a penalty. Repeating a harmless habit does not earn points.
 
 *Example:* your curiosity tempts you to remain beside an anomaly while the team withdraws. If you accept the resulting separation and danger, the GM awards one Duty point. The point does not remove that danger.
+
+## Tracks
+
+A track is a row of boxes that fills as consequences catch up with you, and each box means something. The crew shares the **Starfleet Command** track (see *Library records*), and the ship has its own: **Shields**, **Hull** and its systems (see *The USS Pelion*). Deeds, a success at a cost or a failed investigation mark them; a settled inquiry or a starbase's repairs clear them.
 
 ## Working on the bridge
 
@@ -1046,7 +1105,7 @@ General advantages and complications describe individual crew members and can su
 
 Roll against Will to resist overwhelming fear, alien compulsion, or mental intrusion, or to maintain concentration through severe distraction. Apply the normal difficulty modifiers. Ordinary danger does not require a Will roll. If an adversary actively imposes mental influence, use an opposed contest of your Will against the adversary's relevant ability.
 
-Before the roll, the GM states the possible effect and its duration. Failed fear or concentration rolls normally cause brief hesitation or −2 on your next action, rather than forcing a belief or personal decision. Mental intrusion can impose a specific effect established before the roll; resisting that effect does not reveal the intruder's identity or intentions.
+Before the roll, the GM states the possible effect and its duration. A failed fear roll leaves you Frightened (see *Fear and other conditions*); a failed concentration roll gives −2 on your next action. Neither forces a belief or personal decision. Mental intrusion can impose a specific effect established before the roll; resisting that effect does not reveal the intruder's identity or intentions.
 
 Will protects your resolve; Presence influences others. Leadership and Diplomacy still use Presence. Species adjustments may change your starting Will, but mental advantages apply only to their agreed, narrow circumstances.
 

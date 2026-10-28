@@ -3252,8 +3252,13 @@ tr.lvl-U td.target { color: var(--muted); }
   });
 
   // ---- the villains' files on the heroes (PACK.heroFiles) ----
-  let fileFor = "";
+  let fileFor = "", filesBusy = false;
   function renderFiles() {
+    // Rebuilding the card takes away a focused field, whose change event can ask for another render mid-rebuild: skip that one.
+    if (filesBusy) return; filesBusy = true;
+    try { renderFilesNow(); } finally { filesBusy = false; }
+  }
+  function renderFilesNow() {
     const card = $("files-card"); if (!card) return;
     card.hidden = !HFILES; if (!HFILES) return;
     const crew = gmCrew.filter((c) => c.name), all = crew.flatMap((c) => (c.play.files || []).map((f) => ({ c, f })));
