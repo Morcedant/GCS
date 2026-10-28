@@ -653,7 +653,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="e338cc1" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · e338cc1</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="43de72e" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · 43de72e</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -12402,7 +12402,7 @@ function mountCampaign(api) {
     if (g.condition) ch.play.stunned = true;
     const w = addWound(g);
     ch.play.gwLast = { key: w.key, total, dice, dyingBefore, stunnedBefore, downgraded: false };
-    $("gw-result").innerHTML = `3d6 = ${total} (${dice.join(" + ")}): <b>${esc(g.name)}.</b> ${esc(g.text)}${g.dying ? " <b class='bad'>Dying.</b>" : ""}`;
+    $("gw-result").innerHTML = `3d6 = ${total} (${dice.join(" + ")}): <b>${esc(g.name)}</b>${g.dying ? ", and <b class='bad'>Dying</b>" : ""}. What it does is in your lasting wounds below.`; // the list holds the text: not twice
     touch(); render(); save();
   };
   $("gw-down").onclick = () => {
@@ -12415,7 +12415,7 @@ function mountCampaign(api) {
     let now = null;
     if (to) { now = addWound(to); if (to.dying) ch.play.dying = true; if (to.condition) ch.play.stunned = true; } // …and suffer the milder one instead
     ch.play.gwLast = now ? { ...last, key: now.key, downgraded: true } : null;
-    $("gw-result").innerHTML = `${esc(T.point)} point: ${esc(lw.name)} becomes <b>${to ? esc(to.name) : "nothing lasting"}</b>.${to ? " " + esc(to.text) : ""}`;
+    $("gw-result").innerHTML = `${esc(T.point)} point: ${esc(lw.name)} becomes <b>${to ? esc(to.name) : "nothing lasting"}</b>.`;
     touch(); render(); save();
   };
   const tradeLimb = (kind) => {
