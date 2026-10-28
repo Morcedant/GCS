@@ -651,7 +651,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="1d8b891" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · 1d8b891</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="ed3a0f5" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · ed3a0f5</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -4909,6 +4909,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="field"><span class="label">Injury track</span>
           <span>☐ Wounded (−1 physical) &nbsp; ☐ Seriously wounded (−2 physical) &nbsp; ☐ Incapacitated</span></div>
         <div class="field"><span class="label">Grit points (start each session with 2)</span><span>☐ ☐ ☐ ☐ ☐</span></div>
+        <div class="field" id="mtrack-print" hidden></div>
         <div class="field" id="ptrack-print" hidden></div>
         <div class="field" id="xtrack-print" hidden></div>
       </div>
@@ -4927,6 +4928,9 @@ tr.lvl-U td.target { color: var(--muted); }
               <button class="linkish" id="duty-reset">New session (reset)</button>
             </div>
             <span class="muted small">Max one point per roll or injury event. Earn one when you accept a meaningful problem from your complication.</span></div>
+          <div class="field" id="mtrack-wrap" hidden><span class="label" id="mtrack-label"></span>
+            <div class="boxes" id="mtrack-boxes"></div>
+            <span class="muted small" id="mtrack-effect"></span></div>
           <div class="field" id="ptrack-wrap" hidden><span class="label" id="ptrack-label"></span>
             <div class="boxes" id="ptrack-boxes"></div>
             <span class="muted small" id="ptrack-effect"></span></div>
@@ -4989,6 +4993,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="checks">
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
             <label id="r-phys-wrap"><input type="checkbox" id="r-phys"> <span id="r-phys-label">Physical action (injury penalty)</span></label>
+            <label id="r-mental-wrap" hidden><input type="checkbox" id="r-mental"> <span id="r-mental-label">Mental action (Mind penalty)</span></label>
             <label><input type="checkbox" id="r-stun"> Dazed −2</label>
             <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> <span id="r-aim-label">Aimed at this target</span></label>
             <label id="r-second-wrap" hidden><input type="checkbox" id="r-second"> <span id="r-second-label">Second defense this round</span></label>
@@ -5605,7 +5610,8 @@ return { PUBLISHED, bandFor, TELLING_EFFECTS, tellingEffectsFor, EXPERIMENTS, ne
  */
 
 const clone = (/** @type {any} */ x) => JSON.parse(JSON.stringify(x));
-const isOut = (/** @type {Participant} */ p) => p.dead || p.injury >= p.boxes;
+// Out of the fight: dead, every injury box marked, or (Aurora) every box of the Mind track: unconscious or catatonic.
+const isOut = (/** @type {Participant} */ p) => p.dead || p.injury >= p.boxes || (!!p.mindBoxes && (p.mind || 0) >= p.mindBoxes);
 
 /** @param {{ name?: string, setting: string, baseline: string, config: any, seed?: string | number | null }} o */
 function newEncounter(o) {
@@ -5820,6 +5826,8 @@ function attack(enc, rules, core, cmd, opts = {}) {
   }
   const n = prior ? prior.key : enc.events.filter((/** @type {any} */ e) => e.type === "attack" && !e.reroll && e.round === enc.round && e.attacker.pid === a.pid && e.defender.pid === d.pid).length;
   const key = (/** @type {string} */ kind) => `r${enc.round}|${a.pid}>${d.pid}|${n}|${kind}${opts.reroll === kind ? "|rr" : ""}`;
+  // A psychic attack (weapon.mind) isn't dodged: it's a contest against Will, and it marks the Mind track.
+  if (weapon.mind) return mindAttack(enc, rules, core, cmd, opts, { a, d, weapon, skillTarget: +skillTarget, prior, n, key });
   const aimed = prior ? prior.aimed : (rules.actions.has("aim") && a.aim && a.aim.target === d.pid ? 1 : 0);
   // The defense. Published: one Dodge a round. Experiments add Parry and Block; the GM can allow a used one again (logged).
   const choice = cmd.canDodge === false ? "none" : cmd.defense || "auto";
@@ -5905,6 +5913,53 @@ function attack(enc, rules, core, cmd, opts = {}) {
   });
   if (grievous && grievous.pc) d.lasting[d.lasting.length - 1].about = ev.n;
   if (extraDodge) log(enc, "override", { what: "dodge", about: ev.n, pid: d.pid, name: d.name, defense: chosen.kind, from: `already used ${chosen.kind} this round`, to: `${chosen.kind} allowed`, reason: "GM allowed it again" });
+  if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
+  return { event: ev };
+}
+
+/** The Mind track's penalty to mental rolls (Powers, Will): −1 with one box, −2 with two. @param {any} p */
+const mindPenalty = (p) => (p.mindBoxes ? -Math.min(2, p.mind || 0) : 0);
+
+/**
+ * A psychic attack (Aurora): Powers against the target's Will, by the contest rules (a success beats a failure; if both
+ * succeed, the larger margin wins; ties go to the target). Toughness doesn't apply; Mind Defense does: a power below it does
+ * nothing, one equal to it gives +2 to resist, and a Class IV or higher power against someone without it gives −2.
+ * It marks the Mind track by Class (1 at Class I, 2 at II and III, 3 from IV), never Dying: a full track is unconscious.
+ * @param {any} enc @param {any} rules @param {any} core @param {any} cmd @param {any} opts @param {any} x
+ */
+function mindAttack(enc, rules, core, cmd, opts, x) {
+  const { a, d, weapon, skillTarget, prior, n, key } = x;
+  const R = ["", "I", "II", "III", "IV", "V", "VI"], cls = weapon.class || 1;
+  const range = core.rangeModifier(weapon, cmd.band);
+  if (range === null) return { error: `Out of range for the ${weapon.name.toLowerCase()}.` };
+  const md = Math.max(0, ...(d.traits || []).filter((/** @type {any} */ t) => t.type === "mindDefense").map((/** @type {any} */ t) => t.value || 0));
+  const pre = { defender: { mind: d.mind || 0 }, attackerTracks: clone(a.tracks || {}) };
+  const atkMods = [...(range ? [{ label: `Range (${cmd.band})`, value: range }] : []),
+    ...(mindPenalty(a) ? [{ label: "Mind track", value: mindPenalty(a) }] : []),
+    ...(cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ label: m.label || "Situation", value: +m.value }))];
+  const resMods = [...(md && cls === md ? [{ label: `Mind Defense ${R[md]}`, value: 2 }] : []), ...(!md && cls >= 4 ? [{ label: `A Class ${R[cls]} mind`, value: -2 }] : []),
+    ...(d.traits || []).filter((/** @type {any} */ t) => t.type === "resistMind" && t.value).map((/** @type {any} */ t) => ({ label: t.label || "Steady mind", value: t.value })),
+    ...(mindPenalty(d) ? [{ label: "Mind track", value: mindPenalty(d) }] : [])];
+  const dice = (/** @type {string} */ kind) => (prior && opts.reroll !== kind && prior[kind + "Dice"] ? prior[kind + "Dice"] : core.diceFor(enc.seed, key(kind)));
+  const sum = (/** @type {any[]} */ l) => l.reduce((s, m) => s + m.value, 0);
+  const target = skillTarget + sum(atkMods), willBase = d.will ?? 10, resistTarget = willBase + sum(resMods);
+  const blocked = md > cls;
+  const ra = core.resolve(dice("attack"), target), rd = blocked || !ra.success ? null : core.resolve(dice("dodge"), resistTarget);
+  const win = !blocked && ra.success && (!rd || !rd.success || ra.contestMargin > rd.contestMargin);
+  const dmg = core.weaponDamage(weapon, cmd.band), boxes = win ? (dmg ? dmg.boxes : cls >= 4 ? 3 : cls >= 2 ? 2 : 1) : 0;
+  if (win) d.mind = Math.min(d.mindBoxes || 3, (d.mind || 0) + boxes);
+  const out = win && isOut(d);
+  const outcome = blocked ? `no effect (Mind Defense ${R[md]} against a Class ${R[cls]} mind)` : !ra.success ? "failed" : !win ? "resisted"
+    : `${boxes} Mind box${boxes > 1 ? "es" : ""}${out ? `: ${d.name} is unconscious` : ""}`;
+  const ev = log(enc, "attack", {
+    mind: true, rules: rulesTag(rules), cmd: clone(cmd), key: n, reroll: opts.reroll || null, replaces: prior ? prior.n : null, pre,
+    attacker: { pid: a.pid, name: a.name }, defender: { pid: d.pid, name: d.name }, weapon: { id: weapon.id, name: weapon.name },
+    band: cmd.band, skill: weapon.skill, base: skillTarget, canDodge: false, attackMods: atkMods, target, attackDice: ra.dice, attackTotal: ra.total,
+    margin: ra.margin, success: ra.success, auto: ra.auto, willBase, resistMods: resMods, effectiveDodge: rd ? resistTarget : null,
+    dodgeDice: rd ? rd.dice : null, dodgeTotal: rd ? rd.total : null, dodged: !!(rd && !win && ra.success), defense: "will", defenseLabel: "Will",
+    mindDefense: md || null, hit: win, rolledHit: win, outcome, damage: boxes, mindBefore: pre.defender.mind, mindAfter: d.mind || 0, mindBoxes: d.mindBoxes || 3, unconscious: out,
+    injuryBefore: d.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead,
+  });
   if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
   return { event: ev };
 }
@@ -6105,9 +6160,16 @@ function override(enc, rules, core, what, o) {
     const p = find(enc, o.pid); if (!p) return { error: "Who?" };
     return { event: log(enc, "override", { what, pid: p.pid, name: p.name, skill: o.skill, from: o.from ?? null, to: o.to, reason: o.reason || "" }) };
   }
+  // The Mind track, changed by hand (on the character card, or by the GM).
+  if (what === "mind") {
+    const p = find(enc, o.pid); if (!p) return { error: "Who?" };
+    const from = p.mind || 0; p.mind = Math.max(0, Math.min(p.mindBoxes || 3, +o.mind || 0));
+    return { event: log(enc, "override", { what, pid: p.pid, name: p.name, from, to: p.mind, reason: o.reason || "" }) };
+  }
   if (what === "outcome") {
     const ev = enc.events.find((/** @type {any} */ e) => e.n === o.event && e.type === "attack");
     if (!ev || ev.superseded) return { error: "Choose an attack to override." };
+    if (ev.mind) return { error: "A psychic attack's result: change the Mind track on the card instead." };
     const d = find(enc, ev.defender.pid), from = { hit: ev.hit, injury: d.injury };
     if (o.hit && !ev.hit) {
       const dmg = ev.rolledDamage || core.weaponDamage(rules.weapons[ev.weapon.id], ev.band) || { boxes: 0 }; // the damage the dice gave, if they gave a hit
@@ -6286,6 +6348,8 @@ function mountLab(api) {
   const MATERIALS = PACK.materials || []; // [id, name]: what an attack can be made of, against weaknesses and Tough // published protective gear (a shield, a mail shirt) as data
   const protTraits = (/** @type {string[]} */ ids) => PROT.filter((/** @type {any} */ x) => ids.includes(x.id)).flatMap((/** @type {any} */ x) => x.traits.map((/** @type {any} */ t) => ({ ...t })));
   const PTRACK = PACK.personalTrack || null; // a setting's personal price track (Corruption, Strain), kept on the character
+  // A setting's Mind track (Aurora): psychic attacks mark it, Will resists them, and Mind Defense stops the weaker ones.
+  const MT = PACK.mindTrack || null;
   const BAND_NAMES = { melee: "In reach", close: "Close", short: "Short", medium: "Medium", long: "Long", extreme: "Extreme" };
 
   /** @type {{ mode: "published" | "lab", cfg: any, enc: any, history: any[], compare: any }} */
@@ -6466,6 +6530,12 @@ function mountLab(api) {
       ...(F.actFirst && clsOf(F.actFirst.power) >= F.actFirst.from ? { actFirst: true } : {}),
       ...(F.actions && clsOf(F.actions.power) ? { actions: F.actions.byClass[clsOf(F.actions.power) - 1] || 1 } : {}),
       ...((F.flies || []).some((/** @type {string} */ id) => clsOf(id)) || c.equipment.aegis ? { flies: true } : {}) };
+    // Mind Defense (MT.defenseFrom: Telepathy, Mind Control, Possession at their Class; MT.gear: equipment that gives it), and advantages
+    // that steady the mind (MT.resistAdvantages: Cool Under Fire, +2).
+    const md = MT ? Math.max(0, ...(MT.defenseFrom || []).map((/** @type {string} */ id) => clsOf(id)),
+      ...Object.entries(MT.gear || {}).filter(([id]) => c.equipment[id]).map(([, v]) => +v)) : 0;
+    const steady = MT && MT.resistAdvantages ? [c.adv, c.adv2].filter((x) => x && MT.resistAdvantages[x.id]).map((x) => ({ type: "resistMind", value: MT.resistAdvantages[x.id], label: ((PACK.advantages || []).find((v) => v[0] === x.id) || [])[1] || x.id })) : [];
+    const mindTraits = [...(md ? [{ type: "mindDefense", value: md, label: `Mind Defense ${["", "I", "II", "III", "IV", "V", "VI"][md]}` }] : []), ...steady];
     const speedDefense = F.extraDefense && clsOf(F.extraDefense.power) >= F.extraDefense.from && !(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge])
       ? [{ type: "extraDefense", value: 1, label: "Speed: a second defense" }] : [];
     return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", ...(strength ? { strength } : {}), ...fight, agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
@@ -6473,12 +6543,13 @@ function mountLab(api) {
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
-        ...speedDefense,
+        ...speedDefense, ...mindTraits,
         ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : []),
         ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
-      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
+      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo,
+      ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes, will: c.attrs.Will } : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A threat from the setting's data. @param {any} t @param {string} name */
   function fromThreat(t, name) {
@@ -6487,7 +6558,9 @@ function mountLab(api) {
     // A threat's Strength: the Class of its strength attacks.
     const strength = Math.max(0, ...t.weapons.filter((/** @type {string} */ w) => /strength/.test(w) && WEAPONS[w]).map((/** @type {string} */ w) => WEAPONS[w].class || 0));
     return { kind: "npc", name, side: "foe", ...(strength ? { strength } : {}), ...(t.actFirst ? { actFirst: true } : {}), ...(t.actions > 1 ? { actions: t.actions } : {}), ...(t.flies ? { flies: true } : {}), agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
-      boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}`,
+      boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo,
+      // The Mind track: as many boxes as the body (one for a minor opponent); Will as given, or estimated.
+      ...(MT ? { mind: 0, mindBoxes: t.minor ? 1 : t.boxes || 3, will: t.will ?? (t.minor ? 9 : t.named ? 12 : 10), ...(t.will === undefined ? { willEstimated: true } : {}) } : {}), note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
   function ensureEnc() {
@@ -6534,6 +6607,7 @@ function mountLab(api) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
+      if (MT && (c.play.mind || 0) !== (p.mind || 0)) E.override(en, rules(), LD, "mind", { pid: p.pid, mind: c.play.mind || 0, reason: "changed on the character card" });
       if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
       // A shapechanger who changed form on the card (the GM view, or the sheet's file) changes in the encounter too.
       const fm = p.form && api.formOf ? api.formOf(c) : null;
@@ -6549,6 +6623,7 @@ function mountLab(api) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       c.play.injury = Math.min(3, p.injury); c.play.dying = p.dying; c.play.duty = p.points;
+      if (MT) c.play.mind = Math.min(MT.boxes, p.mind || 0);
       if (c.play.gun && p.ammo[c.play.gun.type] !== undefined) c.play.gun.rounds = p.ammo[c.play.gun.type];
       if (PTRACK && p.tracks) c.play.ptrack = Math.min(PTRACK.boxes, p.tracks[PTRACK.name] || 0);
       // Lasting wounds from gritty combat go on the card's list once each.
@@ -6767,6 +6842,15 @@ function mountLab(api) {
     const L = [], r = ev.rules;
     L.push(`<span class="${r.kind === "lab" ? "x" : ""}">Rules: ${esc(r.kind === "lab" ? r.label + (r.active.length ? ": " + r.active.map((/** @type {any} */ a) => `${a.id} (${a.scope.toUpperCase()})`).join(", ") : ": no experiments") : "Published")}</span>`);
     L.push(`${esc(ev.attacker.name)} → ${esc(ev.defender.name)} · ${esc(ev.weapon.name)}${ev.ammo ? ", " + esc(ev.ammo) : ""} · ${BAND_NAMES[ev.band] || ev.band}${ev.reroll ? ` · <span class="x">${esc(T.point)} reroll of the ${ev.reroll}</span>` : ""}`);
+    if (ev.mind) { // a psychic attack: a contest against Will, on the Mind track
+      L.push("", `${esc(ev.skill)}: ${ev.base}`, ...ev.attackMods.map((/** @type {any} */ m) => `${esc(m.label)}: ${signed(m.value)}`), `Final target: <b>${ev.target}</b>`,
+        `Roll: <b>${ev.attackTotal}</b> ${diceText(ev.attackDice)}${ev.auto ? ` · natural ${ev.attackTotal}: automatic ${ev.auto}` : ""} · ${ev.success ? `succeeded by ${ev.margin}` : `failed by ${-ev.margin}`}`);
+      if (ev.dodgeDice) L.push("", `${esc(ev.defender.name)}'s Will: ${ev.willBase}`, ...ev.resistMods.map((/** @type {any} */ m) => `${esc(m.label)}: ${signed(m.value)}`),
+        `Resists at <b>${ev.effectiveDodge}</b>: rolled <b>${ev.dodgeTotal}</b> ${diceText(ev.dodgeDice)}`, "A success beats a failure; if both succeed, the larger margin wins; ties go to the target.");
+      L.push("", ev.hit ? `<span class="ok">${esc(ev.outcome)}</span>` : `<span class="bad">${esc(ev.outcome[0].toUpperCase() + ev.outcome.slice(1))}</span>`);
+      if (ev.hit) L.push(`${esc(ev.defender.name)}'s Mind track: ${ev.mindBefore} → <b>${ev.mindAfter}</b> of ${ev.mindBoxes}${ev.unconscious ? ", <span class='bad'>unconscious</span>" : ""}. Toughness and Dodge don't help against the mind.`);
+      return L.join("\n");
+    }
     if (!ev.attackDice) { L.push(`<span class="bad">${esc(ev.outcome)}</span>`); return L.join("\n"); }
     L.push("", `${esc(ev.skill)}: ${ev.base}`);
     for (const m of ev.attackMods) L.push(`${esc(m.label)}: ${signed(m.value)}${m.scope === "experiment" ? ' <span class="x">[experiment]</span>' : ""}`);
@@ -6880,7 +6964,8 @@ function mountLab(api) {
       case "turn": return `${esc(e.name || "")}'s turn${e.of ? ` (action ${e.action} of ${e.of})` : ""}.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}${e.dive ? ` · a dive, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.dive.cls]}${e.dive.hurts && e.hit ? `: ${esc(e.attacker.name)} marks a box too` : ""}` : ""}${e.flierFalls && !e.superseded ? ` · ${esc(e.defender.name)} falls from the air unless they make a Powers roll` : ""}${e.strongHands ? ` · in strong hands, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.strongHands.cls]}${e.strongHands.breaks ? "; an ordinary weapon breaks" : ""}` : ""}${e.knockback && !e.superseded ? ` · knocked down, and can be thrown back up to ${e.knockback} hex${e.knockback > 1 ? "es" : ""} or a range band${e.knockback > 1 ? "s" : ""} (through a wall: Collateral)` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
+      case "attack": if (e.mind) return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}` : ""}${e.dodgeDice ? `; Will ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → <b>${esc(e.outcome)}</b>${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}`;
+        return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}${e.dive ? ` · a dive, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.dive.cls]}${e.dive.hurts && e.hit ? `: ${esc(e.attacker.name)} marks a box too` : ""}` : ""}${e.flierFalls && !e.superseded ? ` · ${esc(e.defender.name)} falls from the air unless they make a Powers roll` : ""}${e.strongHands ? ` · in strong hands, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.strongHands.cls]}${e.strongHands.breaks ? "; an ordinary weapon breaks" : ""}` : ""}${e.knockback && !e.superseded ? ` · knocked down, and can be thrown back up to ${e.knockback} hex${e.knockback > 1 ? "es" : ""} or a range band${e.knockback > 1 ? "s" : ""} (through a wall: Collateral)` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
       case "trade": return `<b>${esc(e.name)} trades a limb for their life:</b> ${esc(e.wound)}.`;
       case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.${e.grip ? ` ${esc(e.name)} is stronger: to break free, ${esc(e.target)} rolls Body −${2 * e.grip}; on a failure the pin holds.` : ""}`;
       case "shrug": return `${esc(e.name)} shrugs off a telling hit (${esc(e.label)}).`;
@@ -7078,6 +7163,17 @@ return { mountLab };
   // Optional: the villains' files on the heroes (PACK.heroFiles): what a villain has learned about one hero. The GM keeps
   // them on the hero (play.files); the ones the hero has found out about reach their sheet (play.knownFiles).
   const HFILES = PACK.heroFiles || null;
+  // A Mind track beside the injury track (Aurora): psychic harm, with its own penalty to mental rolls; never Dying.
+  const MTRACK = PACK.mindTrack || null;
+  const mindPen = (c = ch) => (MTRACK ? MTRACK.penalties[Math.min(MTRACK.boxes, (c.play && c.play.mind) || 0)] || 0 : 0);
+  function renderMind() {
+    const m = Math.min(MTRACK.boxes, ch.play.mind || 0);
+    $("mtrack-wrap").hidden = false; $("mtrack-print").hidden = false;
+    $("mtrack-label").textContent = `${MTRACK.name} track`;
+    $("mtrack-boxes").innerHTML = Array.from({ length: MTRACK.boxes }, (_, i) => `<button class="box ${i < m ? "on" : ""}" data-mbox="${i + 1}" aria-label="${esc(MTRACK.name)} box ${i + 1}${i < m ? ", marked" : ""}"></button>`).join("");
+    $("mtrack-effect").textContent = MTRACK.effects[m];
+    $("mtrack-print").innerHTML = `<span class="label">${esc(MTRACK.name)} track</span><span>${MTRACK.effects.slice(1).map((e) => "☐ " + esc(e)).join(" &nbsp; ")}</span>`;
+  }
   // Who already knows the secret (identityTrack.knownBy): what the character's legal status means (fixed), and the people and groups
   // the player records (play.knownBy). Exposure measures how close the secret is to getting past them.
   const XKNOWN = (XTRACK && XTRACK.knownBy) || null;
@@ -7161,7 +7257,7 @@ return { mountLab };
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
       loads: [],
-      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, xtrack: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
+      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, xtrack: 0, mind: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
     };
   }
   function example() {
@@ -7238,6 +7334,7 @@ return { mountLab };
       .map((w) => ({ id: String(w.id || ""), name: w.name, text: String(w.text || ""), heal: String(w.heal || ""), complication: !!w.complication, date: String(w.date || ""), key: String(w.key || uid()) }));
     if (!out.play.gwLast || typeof out.play.gwLast !== "object" || !out.play.lasting.some((w) => w.key === out.play.gwLast.key)) out.play.gwLast = null;
     // The identity track and the villains' files: kept to their shapes and sizes.
+    out.play.mind = MTRACK ? Math.max(0, Math.min(MTRACK.boxes, parseInt(out.play.mind, 10) || 0)) : 0;
     out.play.xtrack = XTRACK ? Math.max(0, Math.min(XTRACK.boxes, parseInt(out.play.xtrack, 10) || 0)) : 0;
     const fs = (v, n) => String(v ?? "").slice(0, n), fileOf = (f) => ({ holder: fs(f.holder, 60), knows: fs(f.knows, 200), gives: fs(f.gives, 120), destroyed: !!f.destroyed });
     const files = (v) => (Array.isArray(v) ? v : []).filter((f) => f && typeof f === "object").slice(0, 40);
@@ -8072,6 +8169,7 @@ return { mountLab };
       sl.forEach((base, i) => { const s = $("f-praise-" + i); if (s) s.value = CLASS_NAMES[Math.max(classIndex(base), classIndex(ch.powerRaise[ch.powers[i]] || base))]; });
       ch.powersLearned.forEach((x, i) => { $("f-plearn-" + i).value = x.id; $("f-plearncl-" + i).value = x.cl; });
     }
+    if (MTRACK) renderMind();
     if (PTRACK) {
       const pt = Math.min(PTRACK.boxes, ch.play.ptrack || 0);
       $("ptrack-wrap").hidden = false; $("ptrack-print").hidden = false;
@@ -8135,6 +8233,7 @@ return { mountLab };
     // An advantage and a fine weapon or tool don't stack: +2 once, whichever applies.
     if (($("r-adv").checked && !$("r-adv").disabled) || ($("r-fine").checked && !$("r-fine-wrap").hidden)) parts.push(2);
     if ($("r-feat").checked && !$("r-feat-wrap").hidden) parts.push(2);
+    if (MTRACK && $("r-mental").checked && mindPen()) parts.push(mindPen());
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
@@ -8159,6 +8258,12 @@ return { mountLab };
     return { name: name === "Dodge+" ? "Dodge" : rollLabel(name), base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) + shot, shot };
   }
   function updateInjuryToggle() {
+    if (MTRACK) {
+      const mp = mindPen();
+      $("r-mental-wrap").hidden = false;
+      $("r-mental-label").textContent = mp ? `Mental action: ${MTRACK.name} ${signed(mp)}` : `Mental action (no ${MTRACK.name} penalty now)`;
+      $("r-mental-wrap").classList.toggle("injured", !!mp); $("r-mental-wrap").classList.toggle("applied", !!mp && $("r-mental").checked);
+    }
     const pen = INJURY[ch.play.injury][2];
     const label = pen ? `Physical action: injury ${signed(pen)}` : "Physical action (no injury penalty now)";
     $("r-phys-label").textContent = label;
@@ -8263,13 +8368,13 @@ return { mountLab };
   function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
   // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
   const pickPlay = (c, gm = false) => { const p = c.play || {}, g = p.gun || {};
-    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, knownBy: p.knownBy || [], lasting: p.lasting || [] };
+    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, mind: p.mind || 0, knownBy: p.knownBy || [], lasting: p.lasting || [] };
     // The files a villain holds on this hero: the GM sends the ones the hero has found out about (never the others);
     // the player's page passes on what it was sent.
     if (HFILES) o.knownFiles = gm ? (p.files || []).filter((f) => f.found).map(({ holder, knows, gives, destroyed }) => ({ holder, knows, gives, destroyed: !!destroyed })) : p.knownFiles || [];
     if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
     return o; };
-  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "form", "ptrack", "xtrack", "knownBy", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
+  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "form", "ptrack", "xtrack", "mind", "knownBy", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
     if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
   const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
@@ -8411,8 +8516,8 @@ return { mountLab };
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
-    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine", "r-feat"].includes(t.id)) updateTarget();
+    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); $("r-mental").checked = !$("r-phys").checked; updateTarget(); renderGun(); }
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine", "r-feat", "r-mental"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
@@ -8964,6 +9069,7 @@ function mountBattleMap(api) {
         <label><input type="checkbox" data-bmc="dying"${c.dying ? " checked" : ""}> Dying<\/label>
         <label><input type="checkbox" data-bmc="stunned"${c.stunned ? " checked" : ""}> ${esc(api.stunName || "Stunned")}<\/label>
         <span class="bm-track">${esc(api.pointName || "Points")} <button type="button" class="btn" data-bmc-points="-1" aria-label="One point fewer">−<\/button><b>${c.points ?? 0}<\/b><button type="button" class="btn" data-bmc-points="1" aria-label="One point more">+<\/button><\/span>
+        ${c.mtrack ? `<span class="bm-track">${esc(c.mtrack.name)} ${boxRow(c.mtrack.max, c.mtrack.value || 0, "data-bmc-mtrack", c.mtrack.name)}<\/span>` : ""}
         ${c.ptrack ? `<span class="bm-track">${esc(c.ptrack.name)} ${boxRow(c.ptrack.max, c.ptrack.value || 0, "data-bmc-ptrack", c.ptrack.name)}<\/span>` : ""}<\/div>`;
     else if (tr && t.tracks) {
       // A ship with several crew tracks (Shields, Hull, systems): one row each, with what its damage does.
@@ -9127,7 +9233,7 @@ function mountBattleMap(api) {
   api.root.addEventListener("click", async (ev) => {
     // Tracks in the selection panel: a posse token's go to the character, the crew's ship's to the crew's track,
     // and anyone else's stay on the token.
-    const tb = ev.target.closest("[data-bmc-injury],[data-bmc-ptrack],[data-bmc-points],[data-bmt-injury],[data-bmk-track]");
+    const tb = ev.target.closest("[data-bmc-injury],[data-bmc-ptrack],[data-bmc-mtrack],[data-bmc-points],[data-bmt-injury],[data-bmk-track]");
     if (tb) {
       const t = toks().find((x) => x.id === sel); if (!t) return;
       const c = live(t), tr = trackOf(t), d = tb.dataset, toggle = (cur, v) => (cur === v ? v - 1 : v);
@@ -9138,6 +9244,7 @@ function mountBattleMap(api) {
       }
       if (!c || !api.setCrew) return;
       if (d.bmcInjury) api.setCrew(t.ref, { injury: toggle(c.injury || 0, +d.bmcInjury) });
+      else if (d.bmcMtrack) api.setCrew(t.ref, { mtrack: toggle(c.mtrack.value || 0, +d.bmcMtrack) });
       else if (d.bmcPtrack) api.setCrew(t.ref, { ptrack: toggle(c.ptrack.value || 0, +d.bmcPtrack) });
       else if (d.bmcPoints) api.setCrew(t.ref, { points: Math.max(0, (c.points || 0) + +d.bmcPoints) });
       return;
@@ -10595,6 +10702,7 @@ function mountCampaign(api) {
         color: `var(${(PACK.groups.find((g) => g.id === k.div) || PACK.groups[0]).color})`,
         injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty,
         ptrack: PTRACK ? { name: PTRACK.name, max: PTRACK.boxes, value: c.play.ptrack || 0 } : null,
+        mtrack: MTRACK ? { name: MTRACK.name, max: MTRACK.boxes, value: c.play.mind || 0 } : null,
         stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
     // A change made on the map is the GM's copy of the character, the same as a change on their card.
     setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
@@ -10603,6 +10711,7 @@ function mountCampaign(api) {
       if ("stunned" in patch) c.play.stunned = !!patch.stunned;
       if ("points" in patch) c.play.duty = Math.max(0, patch.points);
       if ("ptrack" in patch && PTRACK) c.play.ptrack = Math.max(0, Math.min(PTRACK.boxes, patch.ptrack));
+      if ("mtrack" in patch && MTRACK) c.play.mind = Math.max(0, Math.min(MTRACK.boxes, patch.mtrack));
       saveGM(); renderGM(); } });
   const saveGM = () => {
     if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true);
@@ -10938,6 +11047,7 @@ function mountCampaign(api) {
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span></div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.form ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.form ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
+        ${MTRACK ? `<div class="gm-row small"><span class="muted">${esc(MTRACK.name)}</span><span class="boxes">${Array.from({ length: MTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.mind || 0) ? "on" : ""}" data-gm="${c.id}" data-gmmind="${i + 1}" aria-label="${esc(c.name)} ${esc(MTRACK.name)} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(MTRACK.effects[Math.min(MTRACK.boxes, c.play.mind || 0)].split(":")[0])}</span></div>` : ""}
         ${hasXT(c) ? `<div class="gm-row small"><span class="muted">${esc(XTRACK.name)}</span><span class="boxes">${Array.from({ length: XTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.xtrack || 0) ? "on" : ""}" data-gm="${c.id}" data-gmxt="${i + 1}" aria-label="${esc(c.name)} ${XTRACK.name} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(XTRACK.effects[Math.min(XTRACK.boxes, c.play.xtrack || 0)].split(":")[0])}</span></div>${XKNOWN ? `<div class="gm-row small"><span class="muted">${esc(XKNOWN.label)}</span><span>${knownList(c).map(esc).join(", ") || "no one"}</span></div>` : ""}` : ""}
         <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
         <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${x.lab})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
@@ -10953,6 +11063,7 @@ function mountCampaign(api) {
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
     if (el.dataset.gmbox) { const i = +el.dataset.gmbox; c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; }
     else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
+    else if (el.dataset.gmmind) { const i = +el.dataset.gmmind; c.play.mind = (c.play.mind || 0) === i ? i - 1 : i; }
     else if (el.dataset.gmxt) { const i = +el.dataset.gmxt; c.play.xtrack = (c.play.xtrack || 0) === i ? i - 1 : i; }
     else if ("gmform" in el.dataset) c.play.form = !inForm(c);
     else if ("gmrm" in el.dataset) gmCrew = gmCrew.filter((x) => x !== c);
@@ -11213,6 +11324,12 @@ function mountCampaign(api) {
     const b = e.target.closest("[data-xbox]"); if (!b) return;
     const i = +b.dataset.xbox;
     ch.play.xtrack = (ch.play.xtrack || 0) === i ? i - 1 : i;
+    render();
+  });
+  $("mtrack-boxes").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-mbox]"); if (!b) return;
+    const i = +b.dataset.mbox;
+    ch.play.mind = (ch.play.mind || 0) === i ? i - 1 : i;
     render();
   });
   $("ptrack-boxes").addEventListener("click", (e) => {

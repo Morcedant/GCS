@@ -19,7 +19,8 @@
  */
 
 const clone = (/** @type {any} */ x) => JSON.parse(JSON.stringify(x));
-export const isOut = (/** @type {Participant} */ p) => p.dead || p.injury >= p.boxes;
+// Out of the fight: dead, every injury box marked, or (Aurora) every box of the Mind track: unconscious or catatonic.
+export const isOut = (/** @type {Participant} */ p) => p.dead || p.injury >= p.boxes || (!!p.mindBoxes && (p.mind || 0) >= p.mindBoxes);
 
 /** @param {{ name?: string, setting: string, baseline: string, config: any, seed?: string | number | null }} o */
 export function newEncounter(o) {
@@ -234,6 +235,8 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   }
   const n = prior ? prior.key : enc.events.filter((/** @type {any} */ e) => e.type === "attack" && !e.reroll && e.round === enc.round && e.attacker.pid === a.pid && e.defender.pid === d.pid).length;
   const key = (/** @type {string} */ kind) => `r${enc.round}|${a.pid}>${d.pid}|${n}|${kind}${opts.reroll === kind ? "|rr" : ""}`;
+  // A psychic attack (weapon.mind) isn't dodged: it's a contest against Will, and it marks the Mind track.
+  if (weapon.mind) return mindAttack(enc, rules, core, cmd, opts, { a, d, weapon, skillTarget: +skillTarget, prior, n, key });
   const aimed = prior ? prior.aimed : (rules.actions.has("aim") && a.aim && a.aim.target === d.pid ? 1 : 0);
   // The defense. Published: one Dodge a round. Experiments add Parry and Block; the GM can allow a used one again (logged).
   const choice = cmd.canDodge === false ? "none" : cmd.defense || "auto";
@@ -319,6 +322,53 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   });
   if (grievous && grievous.pc) d.lasting[d.lasting.length - 1].about = ev.n;
   if (extraDodge) log(enc, "override", { what: "dodge", about: ev.n, pid: d.pid, name: d.name, defense: chosen.kind, from: `already used ${chosen.kind} this round`, to: `${chosen.kind} allowed`, reason: "GM allowed it again" });
+  if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
+  return { event: ev };
+}
+
+/** The Mind track's penalty to mental rolls (Powers, Will): −1 with one box, −2 with two. @param {any} p */
+const mindPenalty = (p) => (p.mindBoxes ? -Math.min(2, p.mind || 0) : 0);
+
+/**
+ * A psychic attack (Aurora): Powers against the target's Will, by the contest rules (a success beats a failure; if both
+ * succeed, the larger margin wins; ties go to the target). Toughness doesn't apply; Mind Defense does: a power below it does
+ * nothing, one equal to it gives +2 to resist, and a Class IV or higher power against someone without it gives −2.
+ * It marks the Mind track by Class (1 at Class I, 2 at II and III, 3 from IV), never Dying: a full track is unconscious.
+ * @param {any} enc @param {any} rules @param {any} core @param {any} cmd @param {any} opts @param {any} x
+ */
+function mindAttack(enc, rules, core, cmd, opts, x) {
+  const { a, d, weapon, skillTarget, prior, n, key } = x;
+  const R = ["", "I", "II", "III", "IV", "V", "VI"], cls = weapon.class || 1;
+  const range = core.rangeModifier(weapon, cmd.band);
+  if (range === null) return { error: `Out of range for the ${weapon.name.toLowerCase()}.` };
+  const md = Math.max(0, ...(d.traits || []).filter((/** @type {any} */ t) => t.type === "mindDefense").map((/** @type {any} */ t) => t.value || 0));
+  const pre = { defender: { mind: d.mind || 0 }, attackerTracks: clone(a.tracks || {}) };
+  const atkMods = [...(range ? [{ label: `Range (${cmd.band})`, value: range }] : []),
+    ...(mindPenalty(a) ? [{ label: "Mind track", value: mindPenalty(a) }] : []),
+    ...(cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ label: m.label || "Situation", value: +m.value }))];
+  const resMods = [...(md && cls === md ? [{ label: `Mind Defense ${R[md]}`, value: 2 }] : []), ...(!md && cls >= 4 ? [{ label: `A Class ${R[cls]} mind`, value: -2 }] : []),
+    ...(d.traits || []).filter((/** @type {any} */ t) => t.type === "resistMind" && t.value).map((/** @type {any} */ t) => ({ label: t.label || "Steady mind", value: t.value })),
+    ...(mindPenalty(d) ? [{ label: "Mind track", value: mindPenalty(d) }] : [])];
+  const dice = (/** @type {string} */ kind) => (prior && opts.reroll !== kind && prior[kind + "Dice"] ? prior[kind + "Dice"] : core.diceFor(enc.seed, key(kind)));
+  const sum = (/** @type {any[]} */ l) => l.reduce((s, m) => s + m.value, 0);
+  const target = skillTarget + sum(atkMods), willBase = d.will ?? 10, resistTarget = willBase + sum(resMods);
+  const blocked = md > cls;
+  const ra = core.resolve(dice("attack"), target), rd = blocked || !ra.success ? null : core.resolve(dice("dodge"), resistTarget);
+  const win = !blocked && ra.success && (!rd || !rd.success || ra.contestMargin > rd.contestMargin);
+  const dmg = core.weaponDamage(weapon, cmd.band), boxes = win ? (dmg ? dmg.boxes : cls >= 4 ? 3 : cls >= 2 ? 2 : 1) : 0;
+  if (win) d.mind = Math.min(d.mindBoxes || 3, (d.mind || 0) + boxes);
+  const out = win && isOut(d);
+  const outcome = blocked ? `no effect (Mind Defense ${R[md]} against a Class ${R[cls]} mind)` : !ra.success ? "failed" : !win ? "resisted"
+    : `${boxes} Mind box${boxes > 1 ? "es" : ""}${out ? `: ${d.name} is unconscious` : ""}`;
+  const ev = log(enc, "attack", {
+    mind: true, rules: rulesTag(rules), cmd: clone(cmd), key: n, reroll: opts.reroll || null, replaces: prior ? prior.n : null, pre,
+    attacker: { pid: a.pid, name: a.name }, defender: { pid: d.pid, name: d.name }, weapon: { id: weapon.id, name: weapon.name },
+    band: cmd.band, skill: weapon.skill, base: skillTarget, canDodge: false, attackMods: atkMods, target, attackDice: ra.dice, attackTotal: ra.total,
+    margin: ra.margin, success: ra.success, auto: ra.auto, willBase, resistMods: resMods, effectiveDodge: rd ? resistTarget : null,
+    dodgeDice: rd ? rd.dice : null, dodgeTotal: rd ? rd.total : null, dodged: !!(rd && !win && ra.success), defense: "will", defenseLabel: "Will",
+    mindDefense: md || null, hit: win, rolledHit: win, outcome, damage: boxes, mindBefore: pre.defender.mind, mindAfter: d.mind || 0, mindBoxes: d.mindBoxes || 3, unconscious: out,
+    injuryBefore: d.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead,
+  });
   if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
   return { event: ev };
 }
@@ -519,9 +569,16 @@ export function override(enc, rules, core, what, o) {
     const p = find(enc, o.pid); if (!p) return { error: "Who?" };
     return { event: log(enc, "override", { what, pid: p.pid, name: p.name, skill: o.skill, from: o.from ?? null, to: o.to, reason: o.reason || "" }) };
   }
+  // The Mind track, changed by hand (on the character card, or by the GM).
+  if (what === "mind") {
+    const p = find(enc, o.pid); if (!p) return { error: "Who?" };
+    const from = p.mind || 0; p.mind = Math.max(0, Math.min(p.mindBoxes || 3, +o.mind || 0));
+    return { event: log(enc, "override", { what, pid: p.pid, name: p.name, from, to: p.mind, reason: o.reason || "" }) };
+  }
   if (what === "outcome") {
     const ev = enc.events.find((/** @type {any} */ e) => e.n === o.event && e.type === "attack");
     if (!ev || ev.superseded) return { error: "Choose an attack to override." };
+    if (ev.mind) return { error: "A psychic attack's result: change the Mind track on the card instead." };
     const d = find(enc, ev.defender.pid), from = { hit: ev.hit, injury: d.injury };
     if (o.hit && !ev.hit) {
       const dmg = ev.rolledDamage || core.weaponDamage(rules.weapons[ev.weapon.id], ev.band) || { boxes: 0 }; // the damage the dice gave, if they gave a hit
