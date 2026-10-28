@@ -1704,6 +1704,27 @@
    "Burned out: your powers fail until you rest a full day"
   ]
  },
+ "identityTrack": {
+  "name": "Exposure",
+  "boxes": 4,
+  "for": [
+   "secretid"
+  ],
+  "effects": [
+   "Safe: no one has put the two of you together",
+   "Rumors: a reporter or a neighbour wonders out loud",
+   "Suspected: someone who matters is sure; −2 to Deception about who you are",
+   "Cornered: one more slip and it's out; the people close to you are being watched",
+   "Unmasked: the world knows. Choose the price: a loved one taken, your job or home lost, or a hunter on your trail"
+  ]
+ },
+ "heroFiles": {
+  "title": "Villains' files",
+  "intro": "What a villain knows about a hero: a weakness, a habit, a name, a loved one. When it applies, the villain gets the file's bonus against that hero. Heroes who find a file can see it on their sheet; when they destroy it, the bonus is gone.",
+  "mine": "Files kept on you",
+  "knowsExample": "Visits her mother at St. Agnes every Sunday",
+  "gives": "+2 against them when it applies"
+ },
  "seeds": {
   "mission": [
    "The case",

@@ -636,6 +636,20 @@ The team shares three tracks. **Collateral** is the damage your cases leave behi
 
 Each character also has **Strain**, their own track for pushing powers and fueling rituals (see *Powers*).
 
+A character with a **Secret Identity** (the advantage or the complication) also has **Exposure**: four boxes for how close the world is to learning who is behind the mask.
+
+| Exposure | Effect |
+|---|---|
+| 0 | Safe: no one has put the two of you together |
+| 1 | Rumors: a reporter or a neighbour wonders out loud |
+| 2 | Suspected: someone who matters is sure; −2 to Deception about who you are |
+| 3 | Cornered: one more slip and it's out; the people close to you are being watched |
+| 4 | Unmasked: the world knows |
+
+- **Marking:** the secret slips. You're seen changing, you use a power in your civilian life, a villain's file names you, an injury shows up on both of you, you can't explain where you were. A success at a cost can mark it.
+- **Clearing:** an alibi. A friend stands in as you while the hero is seen elsewhere, a cover story that holds, a staged appearance of both of you at once, a file destroyed (see *Their files on you*). Each clears a box.
+- **Unmasked.** When the fourth box is marked, the secret is out, and you choose the price: a loved one taken or hunted, your job or home lost, or an enemy who now knows where you sleep. The track then stays full; the advantage's +2 to Deception is gone, and the GM may offer a new complication in its place.
+
 | Track | Boxes | As boxes fill |
 |---|---|---|
 | Collateral | 4 | 1: Property damage: insurance claims and angry owners; 2: Bystanders hurt: −2 to Media and Persuasion with the public; 3: Lawsuits and charges: someone is held liable; 4: An EPAOC hearing: start a clock; a team member may lose their status |
@@ -684,6 +698,12 @@ What people say about an Operant, what is actually true, and what your team know
 - **Dossiers.** What your team has established for itself: one finding at a time, with its limits, how you know it and what it cost. A dossier holds only what you found out, never the whole file (see *Discovery clocks and dossiers*).
 
 A real counter works whether or not anyone holds a dossier for it. Act on what you suspect: cut the lights, hit them while they recover, keep them away from water. The GM will ask what your idea rests on, and a good reason is all it needs. Learning, though, is never free.
+
+## Their files on you
+
+Villains keep files too. What a villain knows about a hero (a weakness, a habit, a real name, the people they love) is written down somewhere, and **when it applies, the villain gets +2 against that hero**: an ambush where the hero always patrols, a trap built for a weakness, a hostage who matters. The GM keeps these files and decides when one applies.
+
+Heroes can find out a file exists, by investigation, a captured lieutenant or a hacked server, and then it shows on their sheet: who holds it and what it says. A found file can be **destroyed**: burn the folder, wipe the drive, discredit the source. A destroyed file gives nothing, and if it held the hero's secret identity, destroying it clears a box of Exposure.
 
 ## Discovery clocks and dossiers
 
@@ -887,6 +907,7 @@ Every Operant has powers, and every power has a **Class** from I to VI. Player c
 - **Defense.** Armor, not a defense roll: an attack above your Defense hits in full; an equal one marks a box fewer; a lower one does nothing. It applies after your Dodge, Parry or Block.
 - **Range.** Unless a power says otherwise, a ranged power's effective band (see *Range* in Personal combat) is **Short at Class I, Long at Class II, Extreme at Class III**, and miles at Class IV and above, out to the horizon. Mind powers keep the reach their descriptions give: touch, a room, sight or a city.
 - **Pushing.** For one action, use a power one Class higher than you have it, and mark a box of **Strain**.
+- **Team-ups.** Two heroes combine their powers into one action: one makes the roll, the other adds their power to it (a lightning bolt through a water spout, a thrown car carried by telekinesis). The attack counts **one Class higher** than the rolling hero's power, marking boxes and meeting Defense as that Class. Both heroes mark a box of **Strain**, and the helper gives up their own action that round. Describe how the powers fit together; the GM can refuse a team-up that makes no sense.
 
 **Strain** is your personal track:
 

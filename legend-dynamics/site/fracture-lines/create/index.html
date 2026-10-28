@@ -653,7 +653,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="6368dbd" data-version-date="2026.10.27" title="The code changes whenever this page changes.">Version 2026.10.27 · 6368dbd</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="d69c9dd" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · d69c9dd</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1011,6 +1011,7 @@ tr.lvl-U td.target { color: var(--muted); }
       </details>
       <div class="toast" id="disc-msg" role="status" aria-live="polite"></div>
     </div>
+    <div class="card hud no-print" id="files-card" hidden></div>
     <div class="card hud no-print bm-card">
       <h3>Battle map</h3>
       <p class="small muted">A hex map at any scale, or a range track of bands, for the fight. Tokens for the crew stay linked to the characters, so you can mark injuries and points from the map. Open <b>How to use the map</b> for the steps.</p>
@@ -1175,6 +1176,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <div class="field"><label for="lab-cover">Cover</label><select id="lab-cover"><option value="none">None</option><option value="partial">Partial (−2)</option><option value="solid">Solid (blocks)</option></select></div>
               <div class="field" id="lab-material-wrap" hidden><label for="lab-material">Made of</label><select id="lab-material"></select></div>
               <div class="field" id="lab-called-wrap" hidden><label for="lab-called">Called shot</label><select id="lab-called"></select></div>
+              <div class="field" id="lab-team-wrap" hidden><label for="lab-team">Team-up with</label><select id="lab-team"></select></div>
               <div class="field"><label for="lab-sit-label">Other modifier</label><input type="text" id="lab-sit-label" placeholder="e.g. Darkness"></div>
               <div class="field" style="flex:0 0 5em"><label for="lab-sit">±</label><input type="number" id="lab-sit" value="0" min="-10" max="10"></div>
               <div class="field" style="flex:0 0 9em" id="lab-boost-wrap" hidden><label for="lab-boost">Harder Boosts</label><select id="lab-boost"><option value="0">None</option><option value="1">1 (−1, +1 box)</option><option value="2">2 (−2, +2 boxes)</option></select></div>
@@ -5798,6 +5800,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <span>☐ Wounded (−1 physical) &nbsp; ☐ Seriously wounded (−2 physical) &nbsp; ☐ Incapacitated</span></div>
         <div class="field"><span class="label">Resolve points (start each session with 2)</span><span>☐ ☐ ☐ ☐ ☐</span></div>
         <div class="field" id="ptrack-print" hidden></div>
+        <div class="field" id="xtrack-print" hidden></div>
       </div>
       <div class="play-col">
         <nav class="subtabs no-print" id="sheet-tabs" role="tablist" aria-label="Play panels"></nav>
@@ -5817,6 +5820,10 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="field" id="ptrack-wrap" hidden><span class="label" id="ptrack-label"></span>
             <div class="boxes" id="ptrack-boxes"></div>
             <span class="muted small" id="ptrack-effect"></span></div>
+          <div class="field" id="xtrack-wrap" hidden><span class="label" id="xtrack-label"></span>
+            <div class="boxes" id="xtrack-boxes"></div>
+            <span class="muted small" id="xtrack-effect"></span></div>
+          <div class="field" id="files-mine" hidden></div>
           <div class="checks"><label><input type="checkbox" id="f-stunned"> Stunned: −2 on next action roll</label>
             <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label>
             <label id="form-wrap" hidden><input type="checkbox" id="f-form"> In alternate form</label></div>
@@ -6661,7 +6668,15 @@ const sumBy = (/** @type {any[]} */ mods, /** @type {string[]} */ sources) => mo
 function attack(enc, rules, core, cmd, opts = {}) {
   const a = find(enc, cmd.attacker), d = find(enc, cmd.defender), base = rules.weapons[cmd.weapon];
   // A material the attack is made of, chosen for this attack (silver bullets, a wooden stake), joins the weapon's own.
-  const weapon = base && cmd.material ? { ...base, materials: [...new Set([...(base.materials || []), cmd.material])] } : base;
+  let weapon = base && cmd.material ? { ...base, materials: [...new Set([...(base.materials || []), cmd.material])] } : base;
+  // A team-up: another character puts their power into a power with a Class, and it strikes one Class higher (marking
+  // boxes as that Class does: 2 at Class II and III, 3 from Class IV). Both mark a box of Strain, on their sheets.
+  const mate = cmd.teamUp && weapon && weapon.class ? find(enc, cmd.teamUp) : null;
+  if (cmd.teamUp && !mate) return { error: "Choose who the team-up is with." };
+  if (mate) {
+    const cls = Math.min(6, weapon.class + 1), boxes = cls >= 4 ? 3 : 2;
+    weapon = { ...weapon, class: cls, damage: Object.fromEntries(Object.entries(weapon.damage || {}).map(([k, v]) => [k, v ? { ...v, boxes: Math.max(v.boxes || 0, boxes) } : v])) };
+  }
   if (!a || !d) return { error: "Choose an attacker and a target." };
   if (!weapon) return { error: "Choose a weapon." };
   if (!opts.reroll && isOut(a)) return { error: `${a.name} can't act.` };
@@ -6751,6 +6766,7 @@ function attack(enc, rules, core, cmd, opts = {}) {
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
     enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
+    teamUp: mate ? { pid: mate.pid, name: mate.name, cls: weapon.class } : null,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null, defenseClass: res.defenseClass || null, stun: !!res.stun,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
@@ -7536,6 +7552,11 @@ function mountLab(api) {
       // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
       if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None</option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
+      // A team-up (a power with a Class): another character puts their power into this attack, one Class higher.
+      const mates = w && w.class ? en.participants.filter((/** @type {any} */ p) => p.pid !== a.pid && p.side === a.side && p.pid !== $("lab-target").value && !p.dead && !E.isOut(p)) : [];
+      $("lab-team-wrap").hidden = !mates.length;
+      if (mates.length) { const was = $("lab-team").value; $("lab-team").innerHTML = `<option value="">No one</option>` + mates.map((/** @type {any} */ p) => `<option value="${p.pid}">${esc(p.name)} (Class ${["", "I", "II", "III", "IV", "V", "VI"][Math.min(6, w.class + 1)]})</option>`).join(""); $("lab-team").value = mates.some((/** @type {any} */ p) => p.pid === was) ? was : ""; }
+      else $("lab-team").value = "";
       if ($("lab-boost-wrap").hidden) $("lab-boost").value = "0";
       const base = w ? a.skills[w.skill] : undefined;
       if ($("lab-skill").dataset.for !== `${a.pid}|${w && w.id}`) { $("lab-skill").value = base ?? ""; $("lab-skill").dataset.for = `${a.pid}|${w && w.id}`; }
@@ -7569,6 +7590,7 @@ function mountLab(api) {
         mode: mode ? { id: mode[0], label: mode[1], mod: mode[4] || 0, cost: mode[2] } : null, ammo: $("lab-ammo-wrap").hidden ? null : $("lab-ammo").value,
         material: $("lab-material-wrap").hidden || !$("lab-material").value ? null : $("lab-material").value,
         called: $("lab-called-wrap").hidden || !$("lab-called").value ? null : { effect: $("lab-called").value.split("|")[0], small: $("lab-called").value.endsWith("|small") },
+        teamUp: $("lab-team-wrap").hidden || !$("lab-team").value ? null : $("lab-team").value,
         cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
@@ -7704,7 +7726,7 @@ function mountLab(api) {
       case "turn": return `${esc(e.name || "")}'s turn.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}`;
+      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
       case "trade": return `<b>${esc(e.name)} trades a limb for their life:</b> ${esc(e.wound)}.`;
       case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.`;
       case "shrug": return `${esc(e.name)} shrugs off a telling hit (${esc(e.label)}).`;
@@ -7895,6 +7917,13 @@ return { mountLab };
   // personal track every character keeps on their sheet (e.g. Corruption).
   const SPELLS = PACK.spells || null;
   const PTRACK = PACK.personalTrack || null;
+  // Optional: a second personal track for some characters only (e.g. Exposure, for a secret identity): it shows when the
+  // character took one of its advantages or complications ("for": their ids).
+  const XTRACK = PACK.identityTrack || null;
+  const hasXT = (c = ch) => !!XTRACK && [c.adv && c.adv.id, c.adv2 && c.adv2.id, c.comp && c.comp.id].some((id) => id && XTRACK.for.includes(id));
+  // Optional: the villains' files on the heroes (PACK.heroFiles): what a villain has learned about one hero. The GM keeps
+  // them on the hero (play.files); the ones the hero has found out about reach their sheet (play.knownFiles).
+  const HFILES = PACK.heroFiles || null;
   // Optional: powers with a Class. The origin sets the slots (e.g. one Class II and two Class I); each slot holds one power.
   // "I+" is a Class I slot that becomes Class II when the powers skill is the top skill. Origins can limit the list.
   const POWERS = PACK.powers || null;
@@ -7973,7 +8002,7 @@ return { mountLab };
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
       loads: [],
-      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, log: [], lasting: [], gwLast: null, loads: {} },
+      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, xtrack: 0, log: [], lasting: [], gwLast: null, loads: {} },
     };
   }
   function example() {
@@ -8049,6 +8078,12 @@ return { mountLab };
     out.play.lasting = (Array.isArray(out.play.lasting) ? out.play.lasting : []).filter((w) => w && typeof w.name === "string")
       .map((w) => ({ id: String(w.id || ""), name: w.name, text: String(w.text || ""), heal: String(w.heal || ""), complication: !!w.complication, date: String(w.date || ""), key: String(w.key || uid()) }));
     if (!out.play.gwLast || typeof out.play.gwLast !== "object" || !out.play.lasting.some((w) => w.key === out.play.gwLast.key)) out.play.gwLast = null;
+    // The identity track and the villains' files: kept to their shapes and sizes.
+    out.play.xtrack = XTRACK ? Math.max(0, Math.min(XTRACK.boxes, parseInt(out.play.xtrack, 10) || 0)) : 0;
+    const fs = (v, n) => String(v ?? "").slice(0, n), fileOf = (f) => ({ holder: fs(f.holder, 60), knows: fs(f.knows, 200), gives: fs(f.gives, 120), destroyed: !!f.destroyed });
+    const files = (v) => (Array.isArray(v) ? v : []).filter((f) => f && typeof f === "object").slice(0, 40);
+    out.play.files = files(out.play.files).map((f) => ({ id: fs(f.id, 20) || uid(), ...fileOf(f), found: !!f.found })).filter((f) => f.holder && f.knows);
+    out.play.knownFiles = files(out.play.knownFiles).map(fileOf).filter((f) => f.holder && f.knows);
     return out;
   }
 
@@ -8876,6 +8911,18 @@ return { mountLab };
       $("ptrack-effect").textContent = PTRACK.effects[pt];
       $("ptrack-print").innerHTML = `<span class="label">${PTRACK.name}</span><span>${PTRACK.effects.slice(1).map((e) => "☐ " + esc(e.split(":")[0])).join(" &nbsp; ")}</span>`;
     }
+    $("xtrack-wrap").hidden = $("xtrack-print").hidden = !hasXT();
+    if (hasXT()) {
+      const xt = Math.min(XTRACK.boxes, ch.play.xtrack || 0);
+      $("xtrack-label").textContent = XTRACK.name;
+      $("xtrack-boxes").innerHTML = Array.from({ length: XTRACK.boxes }, (_, i) => `<button class="box ${i < xt ? "on" : ""}" data-xbox="${i + 1}" aria-label="${XTRACK.name} box ${i + 1}${i < xt ? ", marked" : ""}"></button>`).join("");
+      $("xtrack-effect").textContent = XTRACK.effects[xt];
+      $("xtrack-print").innerHTML = `<span class="label">${XTRACK.name}</span><span>${XTRACK.effects.slice(1).map((e) => "☐ " + esc(e.split(":")[0])).join(" &nbsp; ")}</span>`;
+    }
+    const known = HFILES ? (ch.play.knownFiles || []) : [];
+    $("files-mine").hidden = !known.length;
+    $("files-mine").innerHTML = known.length ? `<span class="label">${esc(HFILES.mine)}</span><ul class="small adv-list">${known.map((f) =>
+      `<li${f.destroyed ? ' style="text-decoration:line-through"' : ""}><b>${esc(f.holder)}</b> knows: ${esc(f.knows)}${f.gives ? ` <span class="muted">(${esc(f.gives)})</span>` : ""}${f.destroyed ? " <i>destroyed</i>" : ""}</li>`).join("")}</ul>` : "";
     $("duty-minus").disabled = ch.play.duty <= 0;
     $("r-stun").checked = !!ch.play.stunned;
 
@@ -9032,11 +9079,14 @@ return { mountLab };
   // ---- persistence ----
   function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
   // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
-  const pickPlay = (c) => { const p = c.play || {}, g = p.gun || {};
-    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.form, ptrack: p.ptrack || 0, lasting: p.lasting || [] };
+  const pickPlay = (c, gm = false) => { const p = c.play || {}, g = p.gun || {};
+    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, lasting: p.lasting || [] };
+    // The files a villain holds on this hero: the GM sends the ones the hero has found out about (never the others);
+    // the player's page passes on what it was sent.
+    if (HFILES) o.knownFiles = gm ? (p.files || []).filter((f) => f.found).map(({ holder, knows, gives, destroyed }) => ({ holder, knows, gives, destroyed: !!destroyed })) : p.knownFiles || [];
     if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
     return o; };
-  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "form", "ptrack", "lasting"]) if (k in q) c.play[k] = q[k];
+  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "form", "ptrack", "xtrack", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
     if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
   const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
@@ -11370,7 +11420,7 @@ function mountCampaign(api) {
       saveGM(); renderGM(); } });
   const saveGM = () => {
     if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true);
-    if (sharedTable) for (const c of gmCrew) if (c.tableKey) sharedTable.pushPlay(c.tableKey, pickPlay(c)); // a change here reaches the player's sheet
+    if (sharedTable) for (const c of gmCrew) if (c.tableKey) sharedTable.pushPlay(c.tableKey, pickPlay(c, true)); // a change here reaches the player's sheet
     pushScene();
   };
   // Phase 3: the map and the fight as the players see them (sent a moment after the last change, and only by the GM).
@@ -11634,7 +11684,41 @@ function mountCampaign(api) {
     discSave(); renderDisc();
   });
 
+  // ---- the villains' files on the heroes (PACK.heroFiles) ----
+  let fileFor = "";
+  function renderFiles() {
+    const card = $("files-card"); if (!card) return;
+    card.hidden = !HFILES; if (!HFILES) return;
+    const crew = gmCrew.filter((c) => c.name), all = crew.flatMap((c) => (c.play.files || []).map((f) => ({ c, f })));
+    if (!crew.some((c) => c.id === fileFor)) fileFor = crew[0] ? crew[0].id : "";
+    const holders = [...new Set((PACK.threats || []).filter((t) => t.named || !t.minor).map((t) => t.name))];
+    card.innerHTML = `<h3>${esc(HFILES.title)}</h3><p class="small muted">${HFILES.intro}</p>
+      ${crew.length ? `<div class="fields">
+        <div class="field"><label for="hf-hero">On</label><select id="hf-hero">${crew.map((c) => `<option value="${c.id}"${c.id === fileFor ? " selected" : ""}>${esc(c.name)}</option>`).join("")}</select></div>
+        <div class="field"><label for="hf-holder">Held by</label><input type="text" id="hf-holder" maxlength="60" list="hf-holders" placeholder="e.g. Steel Hawk"><datalist id="hf-holders">${holders.map((n) => `<option value="${esc(n)}">`).join("")}</datalist></div>
+        <div class="field wide"><label for="hf-knows">What they know</label><input type="text" id="hf-knows" maxlength="200" placeholder="${esc(HFILES.knowsExample)}"></div>
+        <div class="field wide"><label for="hf-gives">What it gives them</label><input type="text" id="hf-gives" maxlength="120" value="${esc(HFILES.gives)}"></div>
+      </div><div class="btn-row"><button class="btn primary" id="hf-add">Add the file</button></div>` : `<p class="small">Open the characters first.</p>`}
+      ${all.length ? `<ul class="small adv-list">${all.map(({ c, f }) => `<li${f.destroyed ? ' style="text-decoration:line-through"' : ""}><b>${esc(f.holder)}</b> on <b>${esc(c.name)}</b>: ${esc(f.knows)} <span class="muted">(${esc(f.gives || "")}${f.found ? "; found out" : "; secret"})</span>
+        <span class="btn-row" style="display:inline-flex;margin-left:6px"><button class="linkish" data-hf="${c.id}" data-hfid="${f.id}" data-hfdo="found">${f.found ? "Hide from them" : "They found out"}</button>
+        <button class="linkish" data-hf="${c.id}" data-hfid="${f.id}" data-hfdo="destroyed">${f.destroyed ? "Restore" : "Destroyed"}</button>
+        <button class="linkish danger" data-hf="${c.id}" data-hfid="${f.id}" data-hfdo="delete">Delete</button></span></li>`).join("")}</ul>` : ""}`;
+  }
+  $("files-card").addEventListener("change", (e) => { if (e.target.id === "hf-hero") fileFor = e.target.value; });
+  $("files-card").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.id === "hf-add") {
+      const c = gmCrew.find((x) => x.id === $("hf-hero").value), holder = $("hf-holder").value.trim(), knows = $("hf-knows").value.trim();
+      if (!c || !holder || !knows) { gmSay("A file needs who holds it and what they know.", true); return; }
+      c.play.files = [...(c.play.files || []), { id: uid(), holder, knows, gives: $("hf-gives").value.trim(), found: false, destroyed: false }];
+      fileFor = c.id; saveGM(); renderGM(); gmSay(`${holder} now has a file on ${c.name}.`); return;
+    }
+    const c = gmCrew.find((x) => x.id === b.dataset.hf), f = c && (c.play.files || []).find((x) => x.id === b.dataset.hfid); if (!f) return;
+    if (b.dataset.hfdo === "delete") c.play.files = c.play.files.filter((x) => x !== f); else f[b.dataset.hfdo] = !f[b.dataset.hfdo];
+    saveGM(); renderGM();
+  });
   function renderGM() {
+    renderFiles();
     if (campaignUI) campaignUI.check(); // a card just recorded may unlock a step of the campaign
     renderDisc();
     if (labPanel) setTimeout(labPanel.refresh, 0);
@@ -11668,6 +11752,7 @@ function mountCampaign(api) {
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span></div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.form ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.form ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
+        ${hasXT(c) ? `<div class="gm-row small"><span class="muted">${esc(XTRACK.name)}</span><span class="boxes">${Array.from({ length: XTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.xtrack || 0) ? "on" : ""}" data-gm="${c.id}" data-gmxt="${i + 1}" aria-label="${esc(c.name)} ${XTRACK.name} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(XTRACK.effects[Math.min(XTRACK.boxes, c.play.xtrack || 0)].split(":")[0])}</span></div>` : ""}
         <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
         <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${x.lab})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
         <div class="gm-traits"><span><strong>Advantage:</strong> ${esc(k.adv || "—")}</span>
@@ -11682,6 +11767,7 @@ function mountCampaign(api) {
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
     if (el.dataset.gmbox) { const i = +el.dataset.gmbox; c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; }
     else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
+    else if (el.dataset.gmxt) { const i = +el.dataset.gmxt; c.play.xtrack = (c.play.xtrack || 0) === i ? i - 1 : i; }
     else if ("gmform" in el.dataset) c.play.form = !inForm(c);
     else if ("gmrm" in el.dataset) gmCrew = gmCrew.filter((x) => x !== c);
     else if ("gmsave" in el.dataset) {
@@ -11924,6 +12010,12 @@ function mountCampaign(api) {
     $("r-phys").checked = PHYSICAL.has($("r-skill").value);
     render();
   });
+  $("xtrack-boxes").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-xbox]"); if (!b) return;
+    const i = +b.dataset.xbox;
+    ch.play.xtrack = (ch.play.xtrack || 0) === i ? i - 1 : i;
+    render();
+  });
   $("ptrack-boxes").addEventListener("click", (e) => {
     const b = e.target.closest("[data-pbox]"); if (!b) return;
     const i = +b.dataset.pbox;
@@ -12152,7 +12244,7 @@ function mountCampaign(api) {
 
   // ---- the GM view: one group of panels at a time ----
   const GM_GROUPS = [["table", "Table and characters", ["#gm-table", ".gm-top", "#gm-grid"]], ["fight", "Map and fight", [".bm-card", "#lab"]],
-    ...(DISC ? [["discovery", `Discovery: ${capFirst(DISC.cards)}`, ["#disc-card"]]] : []), ["tools", "Clocks and tools", [".gm-tools"]], ["campaign", "Campaign", ["#cp-card"]], ["homebrew", "Homebrew", ["#hb-card"]]];
+    ...(DISC ? [["discovery", `Discovery: ${capFirst(DISC.cards)}`, ["#disc-card", "#files-card"]]] : []), ["tools", "Clocks and tools", [".gm-tools", ...(DISC ? [] : ["#files-card"])]], ["campaign", "Campaign", ["#cp-card"]], ["homebrew", "Homebrew", ["#hb-card"]]];
   for (const [id, , sels] of GM_GROUPS) for (const q of sels) { const el = document.querySelector("#view-gm " + q); if (el) el.dataset.gmpane = id; }
   $("gm-tabs").innerHTML = GM_GROUPS.map(([id, name]) => `<button type="button" class="tab" role="tab" data-gmtab="${id}">${esc(name)}</button>`).join("");
   function showGmTab(id) {
