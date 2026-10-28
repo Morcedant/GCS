@@ -1067,6 +1067,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="field"><span class="label">Injury track</span>
           <span>☐ Wounded (−1 physical) &nbsp; ☐ Seriously wounded (−2 physical) &nbsp; ☐ Incapacitated</span></div>
         <div class="field"><span class="label">{{point}} points (start each session with 2)</span><span>☐ ☐ ☐ ☐ ☐</span></div>
+        <div class="field" id="mtrack-print" hidden></div>
         <div class="field" id="ptrack-print" hidden></div>
         <div class="field" id="xtrack-print" hidden></div>
       </div>
@@ -1085,6 +1086,9 @@ tr.lvl-U td.target { color: var(--muted); }
               <button class="linkish" id="duty-reset">New session (reset)</button>
             </div>
             <span class="muted small">Max one point per roll or injury event. Earn one when you accept a meaningful problem from your complication.</span></div>
+          <div class="field" id="mtrack-wrap" hidden><span class="label" id="mtrack-label"></span>
+            <div class="boxes" id="mtrack-boxes"></div>
+            <span class="muted small" id="mtrack-effect"></span></div>
           <div class="field" id="ptrack-wrap" hidden><span class="label" id="ptrack-label"></span>
             <div class="boxes" id="ptrack-boxes"></div>
             <span class="muted small" id="ptrack-effect"></span></div>
@@ -1147,6 +1151,7 @@ tr.lvl-U td.target { color: var(--muted); }
           <div class="checks">
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
             <label id="r-phys-wrap"><input type="checkbox" id="r-phys"> <span id="r-phys-label">Physical action (injury penalty)</span></label>
+            <label id="r-mental-wrap" hidden><input type="checkbox" id="r-mental"> <span id="r-mental-label">Mental action (Mind penalty)</span></label>
             <label><input type="checkbox" id="r-stun"> {{stun}} −2</label>
             <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> <span id="r-aim-label">Aimed at this target</span></label>
             <label id="r-second-wrap" hidden><input type="checkbox" id="r-second"> <span id="r-second-label">Second defense this round</span></label>
@@ -1305,6 +1310,17 @@ tr.lvl-U td.target { color: var(--muted); }
   // Optional: the villains' files on the heroes (PACK.heroFiles): what a villain has learned about one hero. The GM keeps
   // them on the hero (play.files); the ones the hero has found out about reach their sheet (play.knownFiles).
   const HFILES = PACK.heroFiles || null;
+  // A Mind track beside the injury track (Aurora): psychic harm, with its own penalty to mental rolls; never Dying.
+  const MTRACK = PACK.mindTrack || null;
+  const mindPen = (c = ch) => (MTRACK ? MTRACK.penalties[Math.min(MTRACK.boxes, (c.play && c.play.mind) || 0)] || 0 : 0);
+  function renderMind() {
+    const m = Math.min(MTRACK.boxes, ch.play.mind || 0);
+    $("mtrack-wrap").hidden = false; $("mtrack-print").hidden = false;
+    $("mtrack-label").textContent = `${MTRACK.name} track`;
+    $("mtrack-boxes").innerHTML = Array.from({ length: MTRACK.boxes }, (_, i) => `<button class="box ${i < m ? "on" : ""}" data-mbox="${i + 1}" aria-label="${esc(MTRACK.name)} box ${i + 1}${i < m ? ", marked" : ""}"></button>`).join("");
+    $("mtrack-effect").textContent = MTRACK.effects[m];
+    $("mtrack-print").innerHTML = `<span class="label">${esc(MTRACK.name)} track</span><span>${MTRACK.effects.slice(1).map((e) => "☐ " + esc(e)).join(" &nbsp; ")}</span>`;
+  }
   // Who already knows the secret (identityTrack.knownBy): what the character's legal status means (fixed), and the people and groups
   // the player records (play.knownBy). Exposure measures how close the secret is to getting past them.
   const XKNOWN = (XTRACK && XTRACK.knownBy) || null;
@@ -1388,7 +1404,7 @@ tr.lvl-U td.target { color: var(--muted); }
       portrait: "", portraitShape: "token",
       spells: [], powers: [], powerBoost: [], gmClass4: false, pureSorcery: false, magic: { extraSpells: 0, mastered: [], deeper: [], extraCharms: 0, heart: "", quicker: "", master: false }, powerRaise: {}, powersLearned: [], status: "", cards: [],
       loads: [],
-      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, xtrack: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
+      play: { injury: 0, duty: 2, stunned: false, form: false, ptrack: 0, xtrack: 0, mind: 0, knownBy: [], log: [], lasting: [], gwLast: null, loads: {} },
     };
   }
   function example() {
@@ -1465,6 +1481,7 @@ tr.lvl-U td.target { color: var(--muted); }
       .map((w) => ({ id: String(w.id || ""), name: w.name, text: String(w.text || ""), heal: String(w.heal || ""), complication: !!w.complication, date: String(w.date || ""), key: String(w.key || uid()) }));
     if (!out.play.gwLast || typeof out.play.gwLast !== "object" || !out.play.lasting.some((w) => w.key === out.play.gwLast.key)) out.play.gwLast = null;
     // The identity track and the villains' files: kept to their shapes and sizes.
+    out.play.mind = MTRACK ? Math.max(0, Math.min(MTRACK.boxes, parseInt(out.play.mind, 10) || 0)) : 0;
     out.play.xtrack = XTRACK ? Math.max(0, Math.min(XTRACK.boxes, parseInt(out.play.xtrack, 10) || 0)) : 0;
     const fs = (v, n) => String(v ?? "").slice(0, n), fileOf = (f) => ({ holder: fs(f.holder, 60), knows: fs(f.knows, 200), gives: fs(f.gives, 120), destroyed: !!f.destroyed });
     const files = (v) => (Array.isArray(v) ? v : []).filter((f) => f && typeof f === "object").slice(0, 40);
@@ -2299,6 +2316,7 @@ tr.lvl-U td.target { color: var(--muted); }
       sl.forEach((base, i) => { const s = $("f-praise-" + i); if (s) s.value = CLASS_NAMES[Math.max(classIndex(base), classIndex(ch.powerRaise[ch.powers[i]] || base))]; });
       ch.powersLearned.forEach((x, i) => { $("f-plearn-" + i).value = x.id; $("f-plearncl-" + i).value = x.cl; });
     }
+    if (MTRACK) renderMind();
     if (PTRACK) {
       const pt = Math.min(PTRACK.boxes, ch.play.ptrack || 0);
       $("ptrack-wrap").hidden = false; $("ptrack-print").hidden = false;
@@ -2362,6 +2380,7 @@ tr.lvl-U td.target { color: var(--muted); }
     // An advantage and a fine weapon or tool don't stack: +2 once, whichever applies.
     if (($("r-adv").checked && !$("r-adv").disabled) || ($("r-fine").checked && !$("r-fine-wrap").hidden)) parts.push(2);
     if ($("r-feat").checked && !$("r-feat-wrap").hidden) parts.push(2);
+    if (MTRACK && $("r-mental").checked && mindPen()) parts.push(mindPen());
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
@@ -2386,6 +2405,12 @@ tr.lvl-U td.target { color: var(--muted); }
     return { name: name === "Dodge+" ? "Dodge" : rollLabel(name), base: rollBase(name), total: parts.reduce((a, b) => a + b, 0) + shot, shot };
   }
   function updateInjuryToggle() {
+    if (MTRACK) {
+      const mp = mindPen();
+      $("r-mental-wrap").hidden = false;
+      $("r-mental-label").textContent = mp ? `Mental action: ${MTRACK.name} ${signed(mp)}` : `Mental action (no ${MTRACK.name} penalty now)`;
+      $("r-mental-wrap").classList.toggle("injured", !!mp); $("r-mental-wrap").classList.toggle("applied", !!mp && $("r-mental").checked);
+    }
     const pen = INJURY[ch.play.injury][2];
     const label = pen ? `Physical action: injury ${signed(pen)}` : "Physical action (no injury penalty now)";
     $("r-phys-label").textContent = label;
@@ -2490,13 +2515,13 @@ tr.lvl-U td.target { color: var(--muted); }
   function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
   // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
   const pickPlay = (c, gm = false) => { const p = c.play || {}, g = p.gun || {};
-    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, knownBy: p.knownBy || [], lasting: p.lasting || [] };
+    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, mind: p.mind || 0, knownBy: p.knownBy || [], lasting: p.lasting || [] };
     // The files a villain holds on this hero: the GM sends the ones the hero has found out about (never the others);
     // the player's page passes on what it was sent.
     if (HFILES) o.knownFiles = gm ? (p.files || []).filter((f) => f.found).map(({ holder, knows, gives, destroyed }) => ({ holder, knows, gives, destroyed: !!destroyed })) : p.knownFiles || [];
     if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
     return o; };
-  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "form", "ptrack", "xtrack", "knownBy", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
+  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "form", "ptrack", "xtrack", "mind", "knownBy", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
     if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
   const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
@@ -2638,8 +2663,8 @@ tr.lvl-U td.target { color: var(--muted); }
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
-    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine", "r-feat"].includes(t.id)) updateTarget();
+    else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); $("r-mental").checked = !$("r-phys").checked; updateTarget(); renderGun(); }
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine", "r-feat", "r-mental"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
@@ -2949,6 +2974,7 @@ tr.lvl-U td.target { color: var(--muted); }
         color: `var(${(PACK.groups.find((g) => g.id === k.div) || PACK.groups[0]).color})`,
         injury: c.play.injury, boxes: 3, stunned: !!c.play.stunned, points: c.play.duty,
         ptrack: PTRACK ? { name: PTRACK.name, max: PTRACK.boxes, value: c.play.ptrack || 0 } : null,
+        mtrack: MTRACK ? { name: MTRACK.name, max: MTRACK.boxes, value: c.play.mind || 0 } : null,
         stats: [`Dodge ${k.dodge}`, `Move ${k.move} yd`, ...k.skills.slice(0, 3).map((x) => `${x.n} ${x.t}`)].join(" · ") }; }),
     // A change made on the map is the GM's copy of the character, the same as a change on their card.
     setCrew: (id, patch) => { const c = gmCrew.find((x) => x.id === id); if (!c) return;
@@ -2957,6 +2983,7 @@ tr.lvl-U td.target { color: var(--muted); }
       if ("stunned" in patch) c.play.stunned = !!patch.stunned;
       if ("points" in patch) c.play.duty = Math.max(0, patch.points);
       if ("ptrack" in patch && PTRACK) c.play.ptrack = Math.max(0, Math.min(PTRACK.boxes, patch.ptrack));
+      if ("mtrack" in patch && MTRACK) c.play.mind = Math.max(0, Math.min(MTRACK.boxes, patch.mtrack));
       saveGM(); renderGM(); } });
   const saveGM = () => {
     if (!store.set(STORE_GM, gmCrew)) gmSay("This browser couldn't keep the characters. Save them to a file.", true);
@@ -3292,6 +3319,7 @@ tr.lvl-U td.target { color: var(--muted); }
         <div class="gm-row"><span class="boxes">${[1, 2, 3].map((i) => `<button class="box ${i <= inj ? "on" : ""}" data-gm="${c.id}" data-gmbox="${i}" aria-label="${esc(c.name)} injury box ${i}"></button>`).join("")}</span>
           <span class="gm-duty"><button data-gm="${c.id}" data-gmduty="-1" aria-label="Spend a ${T.point} point">−</button><b>${c.play.duty}</b><button data-gm="${c.id}" data-gmduty="1" aria-label="Gain a ${T.point} point">+</button><span class="small muted">${T.point}</span></span></div>
         ${GUNS[c.play.gun.type] ? `<div class="small muted">${GUNS[c.play.gun.type][0]}: <b style="color:var(--chrome)">${c.play.gun.rounds}/${GUNS[c.play.gun.type][1]}</b> ${T.ammo}${c.play.gun.spares ? `, ${c.play.gun.spares} spare${c.play.gun.spares > 1 ? "s" : ""}` : ""}${c.play.form ? ` · <b style="color:var(--bad)">${T.formName}</b>` : ""}</div>` : c.play.form ? `<div class="small"><b style="color:var(--bad)">${T.formToggle}</b></div>` : ""}
+        ${MTRACK ? `<div class="gm-row small"><span class="muted">${esc(MTRACK.name)}</span><span class="boxes">${Array.from({ length: MTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.mind || 0) ? "on" : ""}" data-gm="${c.id}" data-gmmind="${i + 1}" aria-label="${esc(c.name)} ${esc(MTRACK.name)} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(MTRACK.effects[Math.min(MTRACK.boxes, c.play.mind || 0)].split(":")[0])}</span></div>` : ""}
         ${hasXT(c) ? `<div class="gm-row small"><span class="muted">${esc(XTRACK.name)}</span><span class="boxes">${Array.from({ length: XTRACK.boxes }, (_, i) => `<button class="box ${i < (c.play.xtrack || 0) ? "on" : ""}" data-gm="${c.id}" data-gmxt="${i + 1}" aria-label="${esc(c.name)} ${XTRACK.name} box ${i + 1}"></button>`).join("")}</span><span class="muted">${esc(XTRACK.effects[Math.min(XTRACK.boxes, c.play.xtrack || 0)].split(":")[0])}</span></div>${XKNOWN ? `<div class="gm-row small"><span class="muted">${esc(XKNOWN.label)}</span><span>${knownList(c).map(esc).join(", ") || "no one"}</span></div>` : ""}` : ""}
         <div class="gm-cond ${inj >= 3 ? "out" : inj ? "hurt" : ""}">${cond}${inj === 3 ? ` <label class="small"><input type="checkbox" data-gm="${c.id}" data-gmdying ${c.play.dying ? "checked" : ""}> Dying</label>` : ""}</div>
         <div class="gm-skills">${k.skills.map((x) => x.l === "S" ? `<b>${x.n} ${x.t} (${x.lab})</b>` : `${x.n} ${x.t}`).join(" · ")}</div>
@@ -3307,6 +3335,7 @@ tr.lvl-U td.target { color: var(--muted); }
     const c = gmCrew.find((x) => x.id === el.dataset.gm); if (!c) return;
     if (el.dataset.gmbox) { const i = +el.dataset.gmbox; c.play.injury = c.play.injury === i ? i - 1 : i; if (c.play.injury < 3) c.play.dying = false; }
     else if (el.dataset.gmduty) c.play.duty = Math.max(0, c.play.duty + +el.dataset.gmduty);
+    else if (el.dataset.gmmind) { const i = +el.dataset.gmmind; c.play.mind = (c.play.mind || 0) === i ? i - 1 : i; }
     else if (el.dataset.gmxt) { const i = +el.dataset.gmxt; c.play.xtrack = (c.play.xtrack || 0) === i ? i - 1 : i; }
     else if ("gmform" in el.dataset) c.play.form = !inForm(c);
     else if ("gmrm" in el.dataset) gmCrew = gmCrew.filter((x) => x !== c);
@@ -3567,6 +3596,12 @@ tr.lvl-U td.target { color: var(--muted); }
     const b = e.target.closest("[data-xbox]"); if (!b) return;
     const i = +b.dataset.xbox;
     ch.play.xtrack = (ch.play.xtrack || 0) === i ? i - 1 : i;
+    render();
+  });
+  $("mtrack-boxes").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-mbox]"); if (!b) return;
+    const i = +b.dataset.mbox;
+    ch.play.mind = (ch.play.mind || 0) === i ? i - 1 : i;
     render();
   });
   $("ptrack-boxes").addEventListener("click", (e) => {

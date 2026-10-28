@@ -291,6 +291,7 @@ function mountBattleMap(api) {
         <label><input type="checkbox" data-bmc="dying"${c.dying ? " checked" : ""}> Dying</label>
         <label><input type="checkbox" data-bmc="stunned"${c.stunned ? " checked" : ""}> ${esc(api.stunName || "Stunned")}</label>
         <span class="bm-track">${esc(api.pointName || "Points")} <button type="button" class="btn" data-bmc-points="-1" aria-label="One point fewer">−</button><b>${c.points ?? 0}</b><button type="button" class="btn" data-bmc-points="1" aria-label="One point more">+</button></span>
+        ${c.mtrack ? `<span class="bm-track">${esc(c.mtrack.name)} ${boxRow(c.mtrack.max, c.mtrack.value || 0, "data-bmc-mtrack", c.mtrack.name)}</span>` : ""}
         ${c.ptrack ? `<span class="bm-track">${esc(c.ptrack.name)} ${boxRow(c.ptrack.max, c.ptrack.value || 0, "data-bmc-ptrack", c.ptrack.name)}</span>` : ""}</div>`;
     else if (tr && t.tracks) {
       // A ship with several crew tracks (Shields, Hull, systems): one row each, with what its damage does.
@@ -454,7 +455,7 @@ function mountBattleMap(api) {
   api.root.addEventListener("click", async (ev) => {
     // Tracks in the selection panel: a posse token's go to the character, the crew's ship's to the crew's track,
     // and anyone else's stay on the token.
-    const tb = ev.target.closest("[data-bmc-injury],[data-bmc-ptrack],[data-bmc-points],[data-bmt-injury],[data-bmk-track]");
+    const tb = ev.target.closest("[data-bmc-injury],[data-bmc-ptrack],[data-bmc-mtrack],[data-bmc-points],[data-bmt-injury],[data-bmk-track]");
     if (tb) {
       const t = toks().find((x) => x.id === sel); if (!t) return;
       const c = live(t), tr = trackOf(t), d = tb.dataset, toggle = (cur, v) => (cur === v ? v - 1 : v);
@@ -465,6 +466,7 @@ function mountBattleMap(api) {
       }
       if (!c || !api.setCrew) return;
       if (d.bmcInjury) api.setCrew(t.ref, { injury: toggle(c.injury || 0, +d.bmcInjury) });
+      else if (d.bmcMtrack) api.setCrew(t.ref, { mtrack: toggle(c.mtrack.value || 0, +d.bmcMtrack) });
       else if (d.bmcPtrack) api.setCrew(t.ref, { ptrack: toggle(c.ptrack.value || 0, +d.bmcPtrack) });
       else if (d.bmcPoints) api.setCrew(t.ref, { points: Math.max(0, (c.points || 0) + +d.bmcPoints) });
       return;

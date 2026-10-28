@@ -276,6 +276,7 @@ When a roll qualifies for both the fine item and an advantage, take +2 once.
 | Lock picks | Needed to pick locks with Engineering. |
 | Camera and press pass | Record, broadcast, and get into press events. |
 | Aegis AS-6 suit | Aegis Pilots or Aegis Certified only. While suited: Strength II, Toughness II, Flight I and a Class II arm cannon (Firearms). Takes a minute to suit up; a hit to the power pack (−2 to aim) can shut it down. |
+| Psi-dampening headset | ExLAW issue for agents who face telepaths: Mind Defense II while worn. Obvious, and it hums. |
 
 # Actions and teamwork
 
@@ -977,6 +978,49 @@ Toughness II walks away from a rooftop; Toughness IV from a plane. A fall into a
 
 The Aegis suit counts as Strength II for all of this.
 
+## Mind powers
+
+Telepaths, mind controllers, empaths and illusionists don't break bones. They break people.
+
+**The Mind track.** Every character has a **Mind** track of three boxes beside the injury track. Psychic attacks mark it; bullets and fists never do.
+
+| Mind | Effect |
+|---|---|
+| 0 | Clear |
+| 1 | Shaken: −1 to mental actions |
+| 2 | Reeling: −2 to mental actions |
+| 3 | Broken: unconscious or catatonic until you rest |
+
+Mental actions are Powers rolls, Will, and skills of Intellect and Presence; physical actions take the injury penalty instead. A full Mind track never leaves you Dying and never causes a grievous wound. A scene's rest clears one box; a night's sleep clears them all. Empathy that eases pain clears a Mind box too. Opponents have as many Mind boxes as injury boxes (one, for a minor opponent).
+
+**Resisting.** A mind power used on an unwilling target is a contest: your **Powers** against their **Will** (a success beats a failure; if both succeed, the larger margin wins; ties go to the target). Dodge never helps, and neither do Toughness or Force Field.
+
+**Mind Defense.** Telepathy, Mind Control and Possession give **Mind Defense** at their Class; so does an ExLAW **psi-dampening headset** (Mind Defense II). A mind power **below** your Mind Defense does nothing; one **equal** to it is resisted at +2. A mind of **Class IV or more** against someone with no Mind Defense is resisted at −2: sheer force tells. Cool Under Fire adds +2 to Will against mind powers.
+
+**Psychic attacks.** From Telepathy II (a psychic stab) and Illusion III (fears made real), a mind can hurt: a psychic attack is one Class below the power, rolled with Powers and resisted with Will, and marks the Mind track as any attack marks injury (1 box at Class I, 2 at II and III, 3 from IV).
+
+**Telepathy.**
+- **Reading.** Surface thoughts of an unwilling mind: Will resists. If they win, they feel the touch, and they know it was you if they've met you. Searching memories (Class III) is resisted at +2, and they always know. Telepaths and anyone with Mind Defense always notice a read, win or lose. Class VI reads any mind without its knowing.
+- **Links.** A linked team speaks mind to mind, instantly and silently, and can help each other (assistance) without words or line of sight. An enemy telepath can listen in: their Powers against the linking telepath's.
+
+**Being controlled.** When a mind controls a hero, the player still plays them, doing what they're told.
+- **Resisting.** Will resists each new command, and each round from Mind Control II. A harmful command (walk into traffic, hand over the codes) is resisted at **+2**; hurting a friend or a loved one at **+4**.
+- **Breaking free.** Spending a Spark point gives another roll at once. Taking a hit breaks the hold until the end of that round.
+- **Planted commands.** A command planted to trigger later (Class III) is resisted when it triggers, not when it's planted.
+
+**Emotions.** Emotion Control lasts a scene, or until the target wins a Will roll at the end of each of their turns (at +2 if they've been hurt since).
+
+| Emotion | Effect |
+|---|---|
+| Fear | Must keep away from the source; −2 to act against it |
+| Rage | Attacks the nearest foe; −2 to Dodge |
+| Calm | Won't start a fight; defends if attacked |
+| Trust | +2 to Persuasion and Deception against them |
+
+**Illusions** are believed until there's a reason to doubt: touching one, or seeing it act wrong. Then the target rolls Will or Intellect (whichever is better) against your Powers. Class IV illusions fool cameras and microphones too.
+
+**Empathy** senses a lie as a contest: your Powers against the liar's Deception.
+
 ## Powers at creation
 
 Your origin's tier sets your powers:
@@ -1052,11 +1096,11 @@ Powers grow with advancement points (see *Advancement*), with the GM's approval:
 
 | Power | Class I | Class II | Class III |
 |---|---|---|---|
-| **Telepathy** | Hear surface thoughts by touch; speak mind to mind within a room. | Read thoughts within sight; link a team's minds for a scene. | Search memories; link minds across a city. |
+| **Telepathy** | Hear surface thoughts by touch; speak mind to mind within a room. Will resists an unwilling mind. | Read thoughts within sight; link a team's minds for a scene; a psychic stab (Class I). | Search memories (Will at +2 resists, and they know); link minds across a city; psychic attacks at Class II. |
 | **Mind Control** *(GM)* | One simple command that doesn't endanger them (Will resists). | Control a person's actions for a scene (Will resists each round). | Control a small group, or plant a lasting command. |
 | **Emotion Control** | Push one person toward fear, calm, rage or trust (Will resists). | Sway a crowd; fear makes them flee. | Terror or rapture that paralyzes a crowd for a scene. |
 | **Memory Manipulation** *(GM)* | Blur the last minute in one person's memory. | Erase or alter a day; read memories by touch. | Rewrite years; plant a false life. |
-| **Illusion** | A sound or small image at a distance. | A convincing person or scene that fools sight and hearing (Will or Intellect sees through). | Illusions every sense believes; they can frighten someone into collapse. |
+| **Illusion** | A sound or small image at a distance. | A convincing person or scene that fools sight and hearing (Will or Intellect sees through). | Illusions every sense believes; fears made real (a psychic attack at Class II). |
 | **Empathy** | Feel what one person feels; +2 to Read People. | Sense lies and intentions in a room; share or ease pain by touch. | Feel a crowd's mood across a block; find a person by their emotions. |
 | **Precognition** | +2 to one roll a scene; you're never surprised. | Once a scene, reroll a failed roll without spending Spark. | Visions of a scene's future: the GM answers one question about what's coming. |
 | **Enhanced Senses** | +2 to perception; see in the dark. | Track by scent; hear heartbeats through walls. | See through walls; hear a whisper across a block. |
@@ -1115,11 +1159,11 @@ Every power keeps going at Classes IV to VI. Player characters reach Class IV on
 | **Duplication** | A hundred copies. | An army of copies across a city. | Copies anywhere you've ever been. |
 | **Transformation** | The form's powers rise to Class IV. | The form's powers rise to Class V. | The form's powers rise to Class VI. |
 | **Immortality** | You return within a day, even if your body was destroyed. | You return within an hour, in a body remade. | You can't be destroyed, only bound or banished. |
-| **Telepathy** | Read a crowd's thoughts; link minds across a country. | Link minds across the world. | Reach minds across dimensions; read a mind against its will (Will at −4). |
+| **Telepathy** | Read a crowd's thoughts; link minds across a country; psychic attacks at Class III. | Link minds across the world; psychic attacks at Class IV. | Reach minds across dimensions; read any mind without its knowing. |
 | **Mind Control** | Control a crowd for a scene. | Control everyone in a city block. | Rule a city's minds. |
 | **Emotion Control** | Sway a city's mood for a day. | Hold a city's emotions for a week. | Panic or peace across a nation. |
 | **Memory Manipulation** | Rewrite a crowd's memory of an event. | Make a city forget. | Erase a person from the world's memory. |
-| **Illusion** | Illusions over a city block that even cameras record. | A whole false district. | Illusions that become real for those who believe them. |
+| **Illusion** | Illusions over a city block that even cameras record; fears made real at Class III. | A whole false district. | Illusions that become real for those who believe them. |
 | **Empathy** | Feel every emotion in a city; find anyone by what they feel. | Ease or share a crowd's pain. | Feel the mood of a nation. |
 | **Precognition** | Twice a scene, reroll a failed roll without spending Spark; you're never ambushed. | Once a scene, know the outcome of a choice before you make it. | See the shape of days to come: the GM answers three questions a session. |
 | **Enhanced Senses** | Hear a conversation across a city; read a license plate a mile away. | Sense through walls for a mile. | Perceive anything happening across a city. |

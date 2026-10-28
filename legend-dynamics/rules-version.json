@@ -6,6 +6,18 @@
     {
       "date": "2026-10-28",
       "kind": "setting",
+      "title": "Aurora: mind powers, a Mind track and Mind Defense",
+      "items": [
+        "Every character has a Mind track of three boxes beside the injury track: Shaken (−1 to mental actions), Reeling (−2), Broken (unconscious or catatonic). Psychic attacks mark it; it never leaves anyone Dying, and a night's sleep clears it. It's on the play tab, the printed sheet, the GM view's cards and the battle map.",
+        "Mind Defense from Telepathy, Mind Control, Possession or an ExLAW psi-dampening headset: a weaker mind power does nothing, an equal one is resisted at +2. A Class IV mind against someone without it is resisted at −2.",
+        "Psychic attacks: Telepathy II (a psychic stab) and Illusion III (fears made real), one Class below the power, Powers against Will, never Dodge, Toughness or Force Field.",
+        "Rules for reading minds (and being noticed), mind links, being controlled (the player keeps playing; +2 against a harmful command, +4 against hurting a friend; Spark for another roll), emotions, illusions and sensing lies.",
+        "The Encounter panel resolves psychic attacks as Will contests on the Mind track (Lord Marrow's nightmare no longer meets Toughness or Dodge), and the sheet's roller applies the Mind penalty to mental actions."
+      ]
+    },
+    {
+      "date": "2026-10-28",
+      "kind": "setting",
       "title": "Aurora: speed, flight, height and falling",
       "items": [
         "Speed, Flight and Super Leaping move a range band in a fight: Medium at Class I, Long at II, Extreme at III, anywhere in the scene from IV. The sheet's Move shows it.",

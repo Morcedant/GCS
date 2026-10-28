@@ -276,6 +276,49 @@ Toughness II walks away from a rooftop; Toughness IV from a plane. A fall into a
 
 The Aegis suit counts as Strength II for all of this.
 
+## Mind powers
+
+Telepaths, mind controllers, empaths and illusionists don't break bones. They break people.
+
+**The Mind track.** Every character has a **Mind** track of three boxes beside the injury track. Psychic attacks mark it; bullets and fists never do.
+
+| Mind | Effect |
+|---|---|
+| 0 | Clear |
+| 1 | Shaken: −1 to mental actions |
+| 2 | Reeling: −2 to mental actions |
+| 3 | Broken: unconscious or catatonic until you rest |
+
+Mental actions are Powers rolls, Will, and skills of Intellect and Presence; physical actions take the injury penalty instead. A full Mind track never leaves you Dying and never causes a grievous wound. A scene's rest clears one box; a night's sleep clears them all. Empathy that eases pain clears a Mind box too. Opponents have as many Mind boxes as injury boxes (one, for a minor opponent).
+
+**Resisting.** A mind power used on an unwilling target is a contest: your **Powers** against their **Will** (a success beats a failure; if both succeed, the larger margin wins; ties go to the target). Dodge never helps, and neither do Toughness or Force Field.
+
+**Mind Defense.** Telepathy, Mind Control and Possession give **Mind Defense** at their Class; so does an ExLAW **psi-dampening headset** (Mind Defense II). A mind power **below** your Mind Defense does nothing; one **equal** to it is resisted at +2. A mind of **Class IV or more** against someone with no Mind Defense is resisted at −2: sheer force tells. Cool Under Fire adds +2 to Will against mind powers.
+
+**Psychic attacks.** From Telepathy II (a psychic stab) and Illusion III (fears made real), a mind can hurt: a psychic attack is one Class below the power, rolled with Powers and resisted with Will, and marks the Mind track as any attack marks injury (1 box at Class I, 2 at II and III, 3 from IV).
+
+**Telepathy.**
+- **Reading.** Surface thoughts of an unwilling mind: Will resists. If they win, they feel the touch, and they know it was you if they've met you. Searching memories (Class III) is resisted at +2, and they always know. Telepaths and anyone with Mind Defense always notice a read, win or lose. Class VI reads any mind without its knowing.
+- **Links.** A linked team speaks mind to mind, instantly and silently, and can help each other (assistance) without words or line of sight. An enemy telepath can listen in: their Powers against the linking telepath's.
+
+**Being controlled.** When a mind controls a hero, the player still plays them, doing what they're told.
+- **Resisting.** Will resists each new command, and each round from Mind Control II. A harmful command (walk into traffic, hand over the codes) is resisted at **+2**; hurting a friend or a loved one at **+4**.
+- **Breaking free.** Spending a Spark point gives another roll at once. Taking a hit breaks the hold until the end of that round.
+- **Planted commands.** A command planted to trigger later (Class III) is resisted when it triggers, not when it's planted.
+
+**Emotions.** Emotion Control lasts a scene, or until the target wins a Will roll at the end of each of their turns (at +2 if they've been hurt since).
+
+| Emotion | Effect |
+|---|---|
+| Fear | Must keep away from the source; −2 to act against it |
+| Rage | Attacks the nearest foe; −2 to Dodge |
+| Calm | Won't start a fight; defends if attacked |
+| Trust | +2 to Persuasion and Deception against them |
+
+**Illusions** are believed until there's a reason to doubt: touching one, or seeing it act wrong. Then the target rolls Will or Intellect (whichever is better) against your Powers. Class IV illusions fool cameras and microphones too.
+
+**Empathy** senses a lie as a contest: your Powers against the liar's Deception.
+
 ## Powers at creation
 
 Your origin's tier sets your powers:

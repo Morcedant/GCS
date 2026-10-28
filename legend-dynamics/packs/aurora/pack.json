@@ -1602,6 +1602,11 @@
    "aegis",
    "Aegis AS-6 suit",
    "Aegis Pilots or Aegis Certified only. While suited: Strength II, Toughness II, Flight I and a Class II arm cannon (Firearms). Takes a minute to suit up; a hit to the power pack (−2 to aim) can shut it down."
+  ],
+  [
+   "psihelm",
+   "Psi-dampening headset",
+   "ExLAW issue for agents who face telepaths: Mind Defense II while worn. Obvious, and it hums."
   ]
  ],
  "weapons": {
@@ -2319,12 +2324,12 @@
     "Telepathy",
     "mind",
     [
-     "Hear surface thoughts by touch; speak mind to mind within a room.",
-     "Read thoughts within sight; link a team's minds for a scene.",
-     "Search memories; link minds across a city.",
-     "Read a crowd's thoughts; link minds across a country.",
-     "Link minds across the world.",
-     "Reach minds across dimensions; read a mind against its will (Will at −4)."
+     "Hear surface thoughts by touch; speak mind to mind within a room. Will resists an unwilling mind.",
+     "Read thoughts within sight; link a team's minds for a scene; a psychic stab (Class I).",
+     "Search memories (Will at +2 resists, and they know); link minds across a city; psychic attacks at Class II.",
+     "Read a crowd's thoughts; link minds across a country; psychic attacks at Class III.",
+     "Link minds across the world; psychic attacks at Class IV.",
+     "Reach minds across dimensions; read any mind without its knowing."
     ],
     {},
     ""
@@ -2385,8 +2390,8 @@
     [
      "A sound or small image at a distance.",
      "A convincing person or scene that fools sight and hearing (Will or Intellect sees through).",
-     "Illusions every sense believes; they can frighten someone into collapse.",
-     "Illusions over a city block that even cameras record.",
+     "Illusions every sense believes; fears made real (a psychic attack at Class II).",
+     "Illusions over a city block that even cameras record; fears made real at Class III.",
      "A whole false district.",
      "Illusions that become real for those who believe them."
     ],
@@ -4234,7 +4239,8 @@
     "any": {
      "boxes": 2
     }
-   }
+   },
+   "mind": true
   },
   {
    "id": "op-speed2",
@@ -5402,6 +5408,168 @@
     }
    },
    "natural": true
+  },
+  {
+   "id": "pw-psy2",
+   "name": "Telepathy II: psychic stab (Class I; Will resists)",
+   "skill": "Powers",
+   "class": 1,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "mind": true,
+   "power": "telepathy",
+   "powerClass": 2
+  },
+  {
+   "id": "pw-psy3",
+   "name": "Telepathy III: psychic stab (Class II; Will resists)",
+   "skill": "Powers",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "mind": true,
+   "power": "telepathy",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-psy4",
+   "name": "Telepathy IV: psychic stab (Class III; Will resists)",
+   "skill": "Powers",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "mind": true,
+   "power": "telepathy",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-psy5",
+   "name": "Telepathy V: psychic stab (Class IV; Will resists)",
+   "skill": "Powers",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "mind": true,
+   "power": "telepathy",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-psy6",
+   "name": "Telepathy VI: psychic stab (Class V; Will resists)",
+   "skill": "Powers",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "mind": true,
+   "power": "telepathy",
+   "powerClass": 6
+  },
+  {
+   "id": "pw-fear3",
+   "name": "Illusion III: fears made real (Class II; Will resists)",
+   "skill": "Powers",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "mind": true,
+   "power": "illusion",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-fear4",
+   "name": "Illusion IV: fears made real (Class III; Will resists)",
+   "skill": "Powers",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "mind": true,
+   "power": "illusion",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-fear5",
+   "name": "Illusion V: fears made real (Class IV; Will resists)",
+   "skill": "Powers",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "mind": true,
+   "power": "illusion",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-fear6",
+   "name": "Illusion VI: fears made real (Class V; Will resists)",
+   "skill": "Powers",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "mind": true,
+   "power": "illusion",
+   "powerClass": 6
   }
  ],
  "threats": [
@@ -6049,7 +6217,13 @@
    ],
    "trait": "Strong minds",
    "traitText": "A character with Will 13 or more resists his illusions at +2. He studies his victims first: if he knows your fear, the nightmare is Class III.",
-   "traits": []
+   "traits": [
+    {
+     "type": "mindDefense",
+     "value": 2,
+     "label": "Mind Defense II"
+    }
+   ]
   },
   {
    "id": "op-icereaper",
@@ -6401,6 +6575,11 @@
      "type": "extraDefense",
      "value": 1,
      "label": "Autuarch: quick"
+    },
+    {
+     "type": "mindDefense",
+     "value": 3,
+     "label": "Mind Defense III"
     }
    ],
    "flies": true
@@ -6679,6 +6858,33 @@
     "Young",
     "Rossi"
    ]
+  }
+ },
+ "mindTrack": {
+  "name": "Mind",
+  "boxes": 3,
+  "penalties": [
+   0,
+   -1,
+   -2,
+   null
+  ],
+  "effects": [
+   "Clear",
+   "Shaken: −1 to mental actions",
+   "Reeling: −2 to mental actions",
+   "Broken: unconscious or catatonic until you rest (never Dying)"
+  ],
+  "defenseFrom": [
+   "telepathy",
+   "mindcontrol",
+   "possession"
+  ],
+  "gear": {
+   "psihelm": 2
+  },
+  "resistAdvantages": {
+   "coolhead": 2
   }
  }
 }
