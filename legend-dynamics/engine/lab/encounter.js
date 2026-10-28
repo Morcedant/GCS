@@ -192,14 +192,18 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   const a = find(enc, cmd.attacker), d = find(enc, cmd.defender), base = rules.weapons[cmd.weapon];
   // A material the attack is made of, chosen for this attack (silver bullets, a wooden stake), joins the weapon's own.
   let weapon = base && cmd.material ? { ...base, materials: [...new Set([...(base.materials || []), cmd.material])] } : base;
-  // A team-up: another character puts their power into a power with a Class, and it strikes one Class higher (marking
-  // boxes as that Class does: 2 at Class II and III, 3 from Class IV). Both mark a box of Strain, on their sheets.
+  // An attack at a higher Class marks boxes as that Class does: 1 at Class I, 2 at Class II and III, 3 from Class IV.
+  const atClass = (/** @type {any} */ w, /** @type {number} */ cls) => ({ ...w, class: cls,
+    damage: Object.fromEntries(Object.entries(w.damage || {}).map(([k, v]) => [k, v ? { ...v, boxes: Math.max(v.boxes || 0, cls >= 4 ? 3 : cls >= 2 ? 2 : 1) } : v])) });
+  // A weapon in strong hands (Aurora's Strength): a weapon in hand hits at the higher of its own Class and the wielder's Strength.
+  // An ordinary weapon swung above Class II breaks after the blow.
+  const strong = a && weapon && weapon.reach === "melee" && !weapon.natural && !weapon.power && (a.strength || 0) > (weapon.class || 1) ? a.strength : 0;
+  if (strong) weapon = atClass(weapon, strong);
+  // A team-up: another character puts their power into a power with a Class, and it strikes one Class higher.
+  // Both mark a box of Strain, on their sheets.
   const mate = cmd.teamUp && weapon && weapon.class ? find(enc, cmd.teamUp) : null;
   if (cmd.teamUp && !mate) return { error: "Choose who the team-up is with." };
-  if (mate) {
-    const cls = Math.min(6, weapon.class + 1), boxes = cls >= 4 ? 3 : 2;
-    weapon = { ...weapon, class: cls, damage: Object.fromEntries(Object.entries(weapon.damage || {}).map(([k, v]) => [k, v ? { ...v, boxes: Math.max(v.boxes || 0, boxes) } : v])) };
-  }
+  if (mate) weapon = atClass(weapon, Math.min(6, weapon.class + 1));
   if (!a || !d) return { error: "Choose an attacker and a target." };
   if (!weapon) return { error: "Choose a weapon." };
   if (!opts.reroll && isOut(a)) return { error: `${a.name} can't act.` };
@@ -290,6 +294,9 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
     enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
     teamUp: mate ? { pid: mate.pid, name: mate.name, cls: weapon.class } : null,
+    strongHands: strong ? { cls: strong, breaks: strong >= 3 } : null,
+    // A hit of Class III or more knocks the target down, and can throw them a hex (or a range band) for each Class above II.
+    knockback: res.hit && res.damage && res.damage.boxes && (weapon.class || 1) >= 3 ? weapon.class - 2 : 0,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null, defenseClass: res.defenseClass || null, stun: !!res.stun,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
@@ -309,7 +316,10 @@ export function tellingEffect(enc, n, effect) {
   if (!ev || !ev.telling || ev.superseded) return { error: "Only a telling hit has an effect to pick." };
   if (ev.telling.shrugged) return { error: `${ev.defender.name} already shrugged it off.` };
   const from = ev.telling.effect; ev.telling.effect = effect;
-  return { event: log(enc, "telling", { about: n, pid: ev.attacker.pid, name: ev.attacker.name, target: ev.defender.name, effect, from }) };
+  // A pin by someone stronger (Strength) holds: breaking free takes a Body roll at −2 for each Class of difference.
+  const holder = find(enc, ev.attacker.pid), held = find(enc, ev.defender.pid);
+  const grip = effect === "pin" && holder && held ? Math.max(0, (holder.strength || 0) - (held.strength || 0)) : 0;
+  return { event: log(enc, "telling", { about: n, pid: ev.attacker.pid, name: ev.attacker.name, target: ev.defender.name, effect, from, ...(grip ? { grip } : {}) }) };
 }
 
 /**

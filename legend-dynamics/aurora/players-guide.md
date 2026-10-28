@@ -926,6 +926,31 @@ Every Operant has powers, and every power has a **Class** from I to VI. Player c
 
 A night's sleep clears one box; a full day's rest clears them all.
 
+## Super strength
+
+**Strength** is the most common power on the street, and the most physical: what it lifts, breaks, throws and holds.
+
+- **Lifting.** Up to your Class's weight (see *The powers*) just works: no roll. One step past it (a Strength II hero lifting a truck) is a push: one action, a box of Strain.
+- **Hitting.** Your unarmed blows are your Strength's Class. Roll **Brawling**.
+- **Breaking things.** Objects have a Class too. Strength equal to or above it breaks the object in one action, no roll; one Class below it is a push.
+
+| Class | Objects |
+|---|---|
+| I | A door, a car window, handcuffs, a chain-link fence |
+| II | A brick wall, a car door, a steel security door, a lamppost |
+| III | A vault door, an engine block, a load-bearing wall, a city bus |
+| IV | A bunker, a tank's armor, a bridge support |
+| V | A dam, a skyscraper's frame |
+
+- **Throwing.** Roll **Athletics** to throw what you can lift: effective at Close range (Short from Class III), hitting at your Strength's Class. Something car-sized or bigger also marks 1 box on everyone next to the target, who may Dodge. Wrecking a street this way marks **Collateral**.
+- **Weapons in your hands.** A weapon in hand hits at the higher of its own Class and your Strength. An ordinary weapon swung above Class II breaks after the blow: a Strength III hero with a crowbar gets one swing.
+- **Knockback.** Any hit of Class III or more knocks the target down (see *Damage*), and can throw them one hex (or one range band) for each Class above II: two at Class IV, three at Class V. Through a wall, a window or into traffic, mark **Collateral**.
+- **Holding on.** A pin (a telling hit, see *Personal combat*) normally lasts one action: the target spends it getting free. A pin by someone stronger holds: to break free, the target rolls **Body at −2 for each Class of difference** (Strength 0 for anyone without it), and on a failure they're still held. With equal or greater Strength, the usual rule stands: free, no roll.
+- **Body.** Strength (and Size, while big) gives **+2 to Body** for feats of strength and breaking holds. It never helps against injury: that's **Toughness**. Most strong Operants have both; one without Toughness hits like a truck and bleeds like anyone.
+- **Strength or Telekinesis?** They lift the same weights. Telekinesis does it at a distance, rolled with Powers, and it can't be pinned away from its target; Strength needs your hands, and gives the Body bonus, the grip and the knockback of a body that strong.
+
+The Aegis suit counts as Strength II for all of this.
+
 ## Powers at creation
 
 Your origin's tier sets your powers:
@@ -980,7 +1005,7 @@ Powers grow with advancement points (see *Advancement*), with the GM's approval:
 
 | Power | Class I | Class II | Class III |
 |---|---|---|---|
-| **Strength** | Lift a motorcycle; unarmed hits are Class I. | Lift a car; unarmed hits are Class II; tear doors off. | Lift a truck or a small plane; unarmed hits are Class III. |
+| **Strength** | Lift a motorcycle; unarmed hits and thrown objects are Class I; break Class I objects (a door). | Lift a car; hits and throws are Class II; break a brick wall; tear doors off. | Lift a truck or a small plane; hits and throws are Class III, and knock targets back; break a vault door. |
 | **Toughness** | Defense I against physical harm. | Defense II. | Defense III. |
 | **Force Field** | Defense I for you, for a scene. | Defense II for you, or Defense I around a small group. | Defense III, or Defense II around a group; seal a doorway. |
 | **Speed** | Up to 70 mph, as fast as a car; act first in any round. | Up to 200 mph; run across water and up walls; two moves a round. | Mach 1 (about 760 mph); once a scene, two actions in a round. |
@@ -1048,7 +1073,7 @@ Every power keeps going at Classes IV to VI. Player characters reach Class IV on
 | **Energy Absorption** | Ignore your type up to Class IV; absorbed energy fuels a Class IV Blast. | Ignore your type up to Class V. | Drink anything of your type, even a nuclear blast. |
 | **Natural Weapons** | Unarmed hits are Class IV; they carve through tank armor. | Class V; they cut through a bank vault. | Class VI; nothing made can stop them. |
 | **Manifest** | Military hardware, a tank's main gun: Class IV attacks. | A warship's worth of matter; Class V attacks. | Raise a fortress from nothing. |
-| **Strength** | Lift a tank or a jet; unarmed hits are Class IV. | Lift a ship or a building's floor; Class V. | Move a mountain's worth; Class VI. |
+| **Strength** | Lift a tank or a jet; Class IV; punch through a bunker. | Lift a ship or a building's floor; Class V. | Move a mountain's worth; Class VI. |
 | **Toughness** | Defense IV. | Defense V. | Defense VI. |
 | **Force Field** | Defense IV, or Defense III around a building. | Defense V, or Defense IV around a city block. | Defense VI, or shield a city. |
 | **Speed** | Mach 3: cross a city in seconds; two actions every round. | Mach 10: cross a continent in minutes; three actions a round. | Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still. |

@@ -2076,10 +2076,10 @@
     "Strength",
     "body",
     [
-     "Lift a motorcycle; unarmed hits are Class I.",
-     "Lift a car; unarmed hits are Class II; tear doors off.",
-     "Lift a truck or a small plane; unarmed hits are Class III.",
-     "Lift a tank or a jet; unarmed hits are Class IV.",
+     "Lift a motorcycle; unarmed hits and thrown objects are Class I; break Class I objects (a door).",
+     "Lift a car; hits and throws are Class II; break a brick wall; tear doors off.",
+     "Lift a truck or a small plane; hits and throws are Class III, and knock targets back; break a vault door.",
+     "Lift a tank or a jet; Class IV; punch through a bunker.",
      "Lift a ship or a building's floor; Class V.",
      "Move a mountain's worth; Class VI."
     ],
@@ -2747,7 +2747,11 @@
     "I"
    ]
   },
-  "note": "Roll Powers to aim a power or use it with skill; passive powers just work. Push a power one Class higher for one action by marking Strain. Powers marked (GM) need the GM's approval; so does every Mythic power."
+  "note": "Roll Powers to aim a power or use it with skill; passive powers just work. Push a power one Class higher for one action by marking Strain. Powers marked (GM) need the GM's approval; so does every Mythic power.",
+  "bodyFeats": [
+   "strength",
+   "size"
+  ]
  },
  "spells": {
   "skill": "Powers",
@@ -4198,6 +4202,1044 @@
     }
    },
    "natural": true
+  },
+  {
+   "id": "pw-strength1",
+   "name": "Strength I: blow (Class I)",
+   "skill": "Brawling",
+   "class": 1,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "natural": true,
+   "power": "strength",
+   "powerClass": 1
+  },
+  {
+   "id": "pw-throw1",
+   "name": "Strength I: thrown object (Class I)",
+   "skill": "Athletics",
+   "class": 1,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "close",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "power": "strength",
+   "powerClass": 1
+  },
+  {
+   "id": "pw-natural1",
+   "name": "Natural weapons I (Class I)",
+   "skill": "Brawling",
+   "class": 1,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "natural": true,
+   "power": "natural",
+   "powerClass": 1
+  },
+  {
+   "id": "pw-blast1",
+   "name": "Blast I (Class I)",
+   "skill": "Powers",
+   "class": 1,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "power": "blast",
+   "powerClass": 1
+  },
+  {
+   "id": "pw-strength2",
+   "name": "Strength II: blow (Class II)",
+   "skill": "Brawling",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true,
+   "power": "strength",
+   "powerClass": 2
+  },
+  {
+   "id": "pw-throw2",
+   "name": "Strength II: thrown object (Class II)",
+   "skill": "Athletics",
+   "class": 2,
+   "traits": [
+    {
+     "type": "area",
+     "note": "Something car-sized or bigger also marks 1 box on everyone next to the target (they may Dodge)."
+    }
+   ],
+   "rows": [],
+   "wound": "power",
+   "band": "close",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "strength",
+   "powerClass": 2
+  },
+  {
+   "id": "pw-natural2",
+   "name": "Natural weapons II (Class II)",
+   "skill": "Brawling",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true,
+   "power": "natural",
+   "powerClass": 2
+  },
+  {
+   "id": "pw-blast2",
+   "name": "Blast II (Class II)",
+   "skill": "Powers",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "blast",
+   "powerClass": 2
+  },
+  {
+   "id": "pw-tk2",
+   "name": "Telekinesis II: strike (Class II)",
+   "skill": "Powers",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "telekinesis",
+   "powerClass": 2
+  },
+  {
+   "id": "pw-elemental2",
+   "name": "Elemental Control II: attack (Class II)",
+   "skill": "Powers",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "elemental",
+   "powerClass": 2
+  },
+  {
+   "id": "pw-weather2",
+   "name": "Weather Control II: lightning (Class II)",
+   "skill": "Powers",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "weather",
+   "powerClass": 2
+  },
+  {
+   "id": "pw-manifest2",
+   "name": "Manifested weapon II (Class II)",
+   "skill": "Firearms",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "manifest",
+   "powerClass": 2
+  },
+  {
+   "id": "pw-stretch2",
+   "name": "Stretching II: blow at range (Class I)",
+   "skill": "Brawling",
+   "class": 1,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "damage": {
+    "any": {
+     "boxes": 1
+    }
+   },
+   "power": "stretching",
+   "powerClass": 2,
+   "band": "short"
+  },
+  {
+   "id": "pw-strength3",
+   "name": "Strength III: blow (Class III)",
+   "skill": "Brawling",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true,
+   "power": "strength",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-throw3",
+   "name": "Strength III: thrown object (Class III)",
+   "skill": "Athletics",
+   "class": 3,
+   "traits": [
+    {
+     "type": "area",
+     "note": "Something car-sized or bigger also marks 1 box on everyone next to the target (they may Dodge)."
+    }
+   ],
+   "rows": [],
+   "wound": "power",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "strength",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-natural3",
+   "name": "Natural weapons III (Class III)",
+   "skill": "Brawling",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true,
+   "power": "natural",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-blast3",
+   "name": "Blast III (Class III)",
+   "skill": "Powers",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "blast",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-tk3",
+   "name": "Telekinesis III: strike (Class III)",
+   "skill": "Powers",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "telekinesis",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-elemental3",
+   "name": "Elemental Control III: attack (Class III)",
+   "skill": "Powers",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "elemental",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-weather3",
+   "name": "Weather Control III: lightning (Class III)",
+   "skill": "Powers",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "weather",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-manifest3",
+   "name": "Manifested weapon III (Class III)",
+   "skill": "Firearms",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "manifest",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-stretch3",
+   "name": "Stretching III: blow at range (Class II)",
+   "skill": "Brawling",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "stretching",
+   "powerClass": 3,
+   "band": "medium"
+  },
+  {
+   "id": "pw-gravity3",
+   "name": "Gravity III: hurled object (Class III)",
+   "skill": "Powers",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "gravity",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-shadow3",
+   "name": "Shadow III: construct (Class II)",
+   "skill": "Powers",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "long",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "shadow",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-strength4",
+   "name": "Strength IV: blow (Class IV)",
+   "skill": "Brawling",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   },
+   "natural": true,
+   "power": "strength",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-throw4",
+   "name": "Strength IV: thrown object (Class IV)",
+   "skill": "Athletics",
+   "class": 4,
+   "traits": [
+    {
+     "type": "area",
+     "note": "Something car-sized or bigger also marks 1 box on everyone next to the target (they may Dodge)."
+    }
+   ],
+   "rows": [],
+   "wound": "power",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "strength",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-natural4",
+   "name": "Natural weapons IV (Class IV)",
+   "skill": "Brawling",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   },
+   "natural": true,
+   "power": "natural",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-blast4",
+   "name": "Blast IV (Class IV)",
+   "skill": "Powers",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "blast",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-tk4",
+   "name": "Telekinesis IV: strike (Class IV)",
+   "skill": "Powers",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "telekinesis",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-elemental4",
+   "name": "Elemental Control IV: attack (Class IV)",
+   "skill": "Powers",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "elemental",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-weather4",
+   "name": "Weather Control IV: lightning (Class IV)",
+   "skill": "Powers",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "weather",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-manifest4",
+   "name": "Manifested weapon IV (Class IV)",
+   "skill": "Firearms",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "manifest",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-stretch4",
+   "name": "Stretching IV: blow at range (Class III)",
+   "skill": "Brawling",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "stretching",
+   "powerClass": 4,
+   "band": "long"
+  },
+  {
+   "id": "pw-gravity4",
+   "name": "Gravity IV: hurled object (Class IV)",
+   "skill": "Powers",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "gravity",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-shadow4",
+   "name": "Shadow IV: construct (Class III)",
+   "skill": "Powers",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 2
+    }
+   },
+   "power": "shadow",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-strength5",
+   "name": "Strength V: blow (Class V)",
+   "skill": "Brawling",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   },
+   "natural": true,
+   "power": "strength",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-throw5",
+   "name": "Strength V: thrown object (Class V)",
+   "skill": "Athletics",
+   "class": 5,
+   "traits": [
+    {
+     "type": "area",
+     "note": "Something car-sized or bigger also marks 1 box on everyone next to the target (they may Dodge)."
+    }
+   ],
+   "rows": [],
+   "wound": "power",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "strength",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-natural5",
+   "name": "Natural weapons V (Class V)",
+   "skill": "Brawling",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   },
+   "natural": true,
+   "power": "natural",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-blast5",
+   "name": "Blast V (Class V)",
+   "skill": "Powers",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "blast",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-tk5",
+   "name": "Telekinesis V: strike (Class V)",
+   "skill": "Powers",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "telekinesis",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-elemental5",
+   "name": "Elemental Control V: attack (Class V)",
+   "skill": "Powers",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "elemental",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-weather5",
+   "name": "Weather Control V: lightning (Class V)",
+   "skill": "Powers",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "weather",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-manifest5",
+   "name": "Manifested weapon V (Class V)",
+   "skill": "Firearms",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "manifest",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-stretch5",
+   "name": "Stretching V: blow at range (Class IV)",
+   "skill": "Brawling",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "stretching",
+   "powerClass": 5,
+   "band": "long"
+  },
+  {
+   "id": "pw-gravity5",
+   "name": "Gravity V: hurled object (Class V)",
+   "skill": "Powers",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "gravity",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-shadow5",
+   "name": "Shadow V: construct (Class IV)",
+   "skill": "Powers",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "shadow",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-strength6",
+   "name": "Strength VI: blow (Class VI)",
+   "skill": "Brawling",
+   "class": 6,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   },
+   "natural": true,
+   "power": "strength",
+   "powerClass": 6
+  },
+  {
+   "id": "pw-throw6",
+   "name": "Strength VI: thrown object (Class VI)",
+   "skill": "Athletics",
+   "class": 6,
+   "traits": [
+    {
+     "type": "area",
+     "note": "Something car-sized or bigger also marks 1 box on everyone next to the target (they may Dodge)."
+    }
+   ],
+   "rows": [],
+   "wound": "power",
+   "band": "short",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "strength",
+   "powerClass": 6
+  },
+  {
+   "id": "pw-natural6",
+   "name": "Natural weapons VI (Class VI)",
+   "skill": "Brawling",
+   "class": 6,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   },
+   "natural": true,
+   "power": "natural",
+   "powerClass": 6
+  },
+  {
+   "id": "pw-blast6",
+   "name": "Blast VI (Class VI)",
+   "skill": "Powers",
+   "class": 6,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "blast",
+   "powerClass": 6
+  },
+  {
+   "id": "pw-tk6",
+   "name": "Telekinesis VI: strike (Class VI)",
+   "skill": "Powers",
+   "class": 6,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "telekinesis",
+   "powerClass": 6
+  },
+  {
+   "id": "pw-elemental6",
+   "name": "Elemental Control VI: attack (Class VI)",
+   "skill": "Powers",
+   "class": 6,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "elemental",
+   "powerClass": 6
+  },
+  {
+   "id": "pw-weather6",
+   "name": "Weather Control VI: lightning (Class VI)",
+   "skill": "Powers",
+   "class": 6,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "weather",
+   "powerClass": 6
+  },
+  {
+   "id": "pw-manifest6",
+   "name": "Manifested weapon VI (Class VI)",
+   "skill": "Firearms",
+   "class": 6,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "medium",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "manifest",
+   "powerClass": 6
+  },
+  {
+   "id": "pw-stretch6",
+   "name": "Stretching VI: blow at range (Class V)",
+   "skill": "Brawling",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "stretching",
+   "powerClass": 6,
+   "band": "long"
+  },
+  {
+   "id": "pw-gravity6",
+   "name": "Gravity VI: hurled object (Class VI)",
+   "skill": "Powers",
+   "class": 6,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "gravity",
+   "powerClass": 6
+  },
+  {
+   "id": "pw-shadow6",
+   "name": "Shadow VI: construct (Class V)",
+   "skill": "Powers",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "band": "extreme",
+   "damage": {
+    "any": {
+     "boxes": 3
+    }
+   },
+   "power": "shadow",
+   "powerClass": 6
+  },
+  {
+   "id": "aegis-blow",
+   "name": "Aegis suit: blow (Class II)",
+   "skill": "Piloting",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true,
+   "equip": [
+    "aegis"
+   ]
   }
  ],
  "threats": [

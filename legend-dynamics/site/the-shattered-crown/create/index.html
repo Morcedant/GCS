@@ -651,7 +651,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="259f0e5" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · 259f0e5</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="3fadb11" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · 3fadb11</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -4778,6 +4778,7 @@ tr.lvl-U td.target { color: var(--muted); }
             <label><input type="checkbox" id="r-stun"> Reeling −2</label>
             <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> <span id="r-aim-label">Aimed at this target</span></label>
             <label id="r-second-wrap" hidden><input type="checkbox" id="r-second"> <span id="r-second-label">Second defense this round</span></label>
+            <label id="r-feat-wrap" hidden><input type="checkbox" id="r-feat"> <span id="r-feat-label">A feat of strength or breaking a hold +2</span></label>
             <label id="r-fine-wrap" hidden><input type="checkbox" id="r-fine"> <span id="r-fine-label">Fine weapon or tool +2</span></label>
           </div>
           <div class="btn-row"><button class="btn primary" id="r-roll">Roll</button>
@@ -5562,14 +5563,18 @@ function attack(enc, rules, core, cmd, opts = {}) {
   const a = find(enc, cmd.attacker), d = find(enc, cmd.defender), base = rules.weapons[cmd.weapon];
   // A material the attack is made of, chosen for this attack (silver bullets, a wooden stake), joins the weapon's own.
   let weapon = base && cmd.material ? { ...base, materials: [...new Set([...(base.materials || []), cmd.material])] } : base;
-  // A team-up: another character puts their power into a power with a Class, and it strikes one Class higher (marking
-  // boxes as that Class does: 2 at Class II and III, 3 from Class IV). Both mark a box of Strain, on their sheets.
+  // An attack at a higher Class marks boxes as that Class does: 1 at Class I, 2 at Class II and III, 3 from Class IV.
+  const atClass = (/** @type {any} */ w, /** @type {number} */ cls) => ({ ...w, class: cls,
+    damage: Object.fromEntries(Object.entries(w.damage || {}).map(([k, v]) => [k, v ? { ...v, boxes: Math.max(v.boxes || 0, cls >= 4 ? 3 : cls >= 2 ? 2 : 1) } : v])) });
+  // A weapon in strong hands (Aurora's Strength): a weapon in hand hits at the higher of its own Class and the wielder's Strength.
+  // An ordinary weapon swung above Class II breaks after the blow.
+  const strong = a && weapon && weapon.reach === "melee" && !weapon.natural && !weapon.power && (a.strength || 0) > (weapon.class || 1) ? a.strength : 0;
+  if (strong) weapon = atClass(weapon, strong);
+  // A team-up: another character puts their power into a power with a Class, and it strikes one Class higher.
+  // Both mark a box of Strain, on their sheets.
   const mate = cmd.teamUp && weapon && weapon.class ? find(enc, cmd.teamUp) : null;
   if (cmd.teamUp && !mate) return { error: "Choose who the team-up is with." };
-  if (mate) {
-    const cls = Math.min(6, weapon.class + 1), boxes = cls >= 4 ? 3 : 2;
-    weapon = { ...weapon, class: cls, damage: Object.fromEntries(Object.entries(weapon.damage || {}).map(([k, v]) => [k, v ? { ...v, boxes: Math.max(v.boxes || 0, boxes) } : v])) };
-  }
+  if (mate) weapon = atClass(weapon, Math.min(6, weapon.class + 1));
   if (!a || !d) return { error: "Choose an attacker and a target." };
   if (!weapon) return { error: "Choose a weapon." };
   if (!opts.reroll && isOut(a)) return { error: `${a.name} can't act.` };
@@ -5660,6 +5665,9 @@ function attack(enc, rules, core, cmd, opts = {}) {
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
     enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
     teamUp: mate ? { pid: mate.pid, name: mate.name, cls: weapon.class } : null,
+    strongHands: strong ? { cls: strong, breaks: strong >= 3 } : null,
+    // A hit of Class III or more knocks the target down, and can throw them a hex (or a range band) for each Class above II.
+    knockback: res.hit && res.damage && res.damage.boxes && (weapon.class || 1) >= 3 ? weapon.class - 2 : 0,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null, defenseClass: res.defenseClass || null, stun: !!res.stun,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
@@ -5679,7 +5687,10 @@ function tellingEffect(enc, n, effect) {
   if (!ev || !ev.telling || ev.superseded) return { error: "Only a telling hit has an effect to pick." };
   if (ev.telling.shrugged) return { error: `${ev.defender.name} already shrugged it off.` };
   const from = ev.telling.effect; ev.telling.effect = effect;
-  return { event: log(enc, "telling", { about: n, pid: ev.attacker.pid, name: ev.attacker.name, target: ev.defender.name, effect, from }) };
+  // A pin by someone stronger (Strength) holds: breaking free takes a Body roll at −2 for each Class of difference.
+  const holder = find(enc, ev.attacker.pid), held = find(enc, ev.defender.pid);
+  const grip = effect === "pin" && holder && held ? Math.max(0, (holder.strength || 0) - (held.strength || 0)) : 0;
+  return { event: log(enc, "telling", { about: n, pid: ev.attacker.pid, name: ev.attacker.name, target: ev.defender.name, effect, from, ...(grip ? { grip } : {}) }) };
 }
 
 /**
@@ -6214,7 +6225,12 @@ function mountLab(api) {
     const ammo = gun && PACK.weapons.items[gun.type] ? { [gun.type]: gun.rounds } : {};
     if (formOn && fm.weapon && WEAPONS[fm.weapon]) weapons.push(fm.weapon);
     const formRules = fm ? shapeTraits(fm, formOn) : [];
-    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+    // Powers that attack (setting data: arms with a power and its Class): the character's own, at the Class they have it.
+    const pw = api.powers ? api.powers(c) : [];
+    for (const a of Object.values(WEAPONS)) if (a.power && pw.some((/** @type {any} */ x) => x.id === a.power && x.cls === a.powerClass)) weapons.push(a.id);
+    // Strength (a power, or a suit that gives it): weapons in hand hit harder, and pins hold.
+    const strength = Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === "strength").map((/** @type {any} */ x) => x.cls), ...(c.equipment.aegis ? [2] : []));
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", ...(strength ? { strength } : {}), agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
@@ -6229,7 +6245,9 @@ function mountLab(api) {
   function fromThreat(t, name) {
     const skills = Object.fromEntries(t.attacks.map((/** @type {any} */ a) => [a.skill, a.target]));
     const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
-    return { kind: "npc", name, side: "foe", agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
+    // A threat's Strength: the Class of its strength attacks.
+    const strength = Math.max(0, ...t.weapons.filter((/** @type {string} */ w) => /strength/.test(w) && WEAPONS[w]).map((/** @type {string} */ w) => WEAPONS[w].class || 0));
+    return { kind: "npc", name, side: "foe", ...(strength ? { strength } : {}), agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
       boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
@@ -6619,9 +6637,9 @@ function mountLab(api) {
       case "turn": return `${esc(e.name || "")}'s turn.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
+      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}${e.strongHands ? ` · in strong hands, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.strongHands.cls]}${e.strongHands.breaks ? "; an ordinary weapon breaks" : ""}` : ""}${e.knockback && !e.superseded ? ` · knocked down, and can be thrown back up to ${e.knockback} hex${e.knockback > 1 ? "es" : ""} or a range band${e.knockback > 1 ? "s" : ""} (through a wall: Collateral)` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
       case "trade": return `<b>${esc(e.name)} trades a limb for their life:</b> ${esc(e.wound)}.`;
-      case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.`;
+      case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.${e.grip ? ` ${esc(e.name)} is stronger: to break free, ${esc(e.target)} rolls Body −${2 * e.grip}; on a failure the pin holds.` : ""}`;
       case "shrug": return `${esc(e.name)} shrugs off a telling hit (${esc(e.label)}).`;
       case "point": return `${esc(e.name)} spends a ${pt} point: ${esc({ "reroll-attack": "reroll the attack", "reroll-dodge": "reroll the Dodge", reduce: "one box fewer", prep: "a small preparation", downgrade: "downgrade a grievous wound", shrug: "shrug off a telling hit" }[e.use] || e.use)}${e.from ? ` (${esc(e.from)} → ${esc(e.to)})` : ""}${e.note ? ` (${esc(e.note)})` : ""}.`;
       case "complication": return `${esc(e.name)}'s complication comes into play${e.note ? `: ${esc(e.note)}` : ""}. +1 ${pt}.`;
@@ -7864,6 +7882,7 @@ return { mountLab };
     const asst = +$("r-assist").value; if (asst) parts.push(asst);
     // An advantage and a fine weapon or tool don't stack: +2 once, whichever applies.
     if (($("r-adv").checked && !$("r-adv").disabled) || ($("r-fine").checked && !$("r-fine-wrap").hidden)) parts.push(2);
+    if ($("r-feat").checked && !$("r-feat-wrap").hidden) parts.push(2);
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
@@ -7902,6 +7921,10 @@ return { mountLab };
     $("r-second-wrap").hidden = !(CR.oneDefense && CR.oneDefense.extraPenalty && isDefense(sk) && defensesPerRound() > 1);
     $("r-second-label").textContent = `Second defense this round ${signed(CR.oneDefense?.extraPenalty || 0)}`;
     // A fine weapon or tool: only its named skill, only its narrow use (the player ticks it), never a defense.
+    // A power that makes the body mighty (powers.bodyFeats: Strength, Size): +2 to Body for feats of strength and breaking holds, never against injury.
+    const feat = POWERS && POWERS.bodyFeats ? allPowers().find((x) => POWERS.bodyFeats.includes(x.id)) : null;
+    $("r-feat-wrap").hidden = !(feat && sk === "Body");
+    if (feat) $("r-feat-label").textContent = `${powerDef(feat.id)[1]}: a feat of strength or breaking a hold +2`;
     $("r-fine-wrap").hidden = !(edgeN("gear") && ch.gear.skill && sk === ch.gear.skill && !isDefense(sk));
     $("r-fine-label").textContent = `${ch.gear.item || "Fine weapon or tool"} +2${ch.gear.use ? `: only for ${ch.gear.use.toLowerCase()}` : ""} (not with an advantage)`;
     $("r-aim-wrap").hidden = !(CR.aim && [T.rangedSkill, T.meleeSkill, T.unarmedSkill].includes(sk));
@@ -8137,7 +8160,7 @@ return { mountLab };
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || t.value === "Dodge+" || isParry(t.value) || isBlock(t.value); updateTarget(); renderGun(); }
-    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine"].includes(t.id)) updateTarget();
+    else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine", "r-feat"].includes(t.id)) updateTarget();
     else if (t.id === "f-file" && t.files[0]) {
       const fr = new FileReader();
       fr.onload = () => importText(fr.result);
@@ -10757,6 +10780,7 @@ function mountCampaign(api) {
       crew: () => gmCrew, saveCrew: saveGM, renderCrew: () => { const p = labPanel; labPanel = null; renderGM(); labPanel = p; },
       // A character's numbers, as the sheet works them out; with powers, their Defense Class from Toughness or Force Field.
       // In a shapechanger's form (play.form), the form's numbers; otherwise the human form's.
+      powers: (c) => (POWERS ? allPowers(c).map((x) => ({ id: x.id, cls: classIndex(x.cl) + 1 })) : []), // the Class of each power a character has
       calc: (c) => { const saved = ch; ch = c; try { return { skills: Object.fromEntries(SKILLS.map(([n]) => [n, skillTarget(n) + formSkill(n, c)])), dodge: dodge() + formDodge(c), move: moveOf(c), agility: c.attrs.Agility + formAttr("Agility", c),
         defense: POWERS ? Math.max(0, ...allPowers(c).filter((x) => ["toughness", "forcefield"].includes(x.id)).map((x) => classIndex(x.cl) + 1)) : 0 }; } finally { ch = saved; } },
       clocks: { list: () => clocks, listen: (f) => clockListeners.push(f),
