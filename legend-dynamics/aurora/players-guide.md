@@ -479,7 +479,7 @@ Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every a
 | Heavy machine gun, Aegis arm cannon | Long | II | 2 | Torn apart |
 | Anti-tank rocket | Long | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
 | Grenade or explosive charge | Close (thrown) | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
-| Fall | — | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fall, by height (see *Falling*) | — | I to IV | 1 from a story or two (I); 2 from a rooftop (II); 2 from a skyscraper (III); 3 from higher (IV) | A sprain, a fracture, or worse |
 | Fire | — | — | 1 each round in the flames | Burns |
 
 **Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack whose Class is **above** your Defense hits in full; one **equal** to it marks one box fewer; one **below** it does nothing. A bulletproof Operant (Defense II) ignores pistols and rifles, and an Aegis cannon still marks a box.
@@ -926,6 +926,32 @@ Every Operant has powers, and every power has a **Class** from I to VI. Player c
 
 A night's sleep clears one box; a full day's rest clears them all.
 
+## Speed, flight and height
+
+Superheroes fight at speeds that make yards meaningless. These rules cover the moves, the extra actions, the air and the ground coming up to meet you.
+
+- **Moving in a fight.** Speed, Flight and Super Leaping cover a range band in one move: **Medium (100 yd) at Class I, Long at Class II, Extreme at Class III**, and anywhere in the scene from Class IV. (Flight only while you're flying; Leaping is one leap.) Your sheet's Move shows it.
+- **Speed in a fight.** Class I acts first in any round. Class II adds a **second defense each round** (as the Additional Defense Edge; the two don't stack) and blows at speed. Class III: once a scene, two actions in one round. Class IV: two actions every round; Class V, three. Characters who act first go in Agility order among themselves.
+- **Blows at speed.** From Speed II, your unarmed blows hit at **one Class below your Speed**: a hundred punches in a second. Roll Brawling.
+- **Chases.** Vehicles have a Class: **a car I, a helicopter or light plane II, a jet III, a fighter IV**. In a chase, a pursuer (or quarry) whose Speed or Flight is a higher Class than the other side's catches up (or gets away) without a roll. Equal Classes run the chase clocks as usual (see *Chases*). A lower Class needs a trick: a shortcut, a trap, a power that isn't speed.
+
+**Height.** A flier's height counts in the distance: a target 100 yards up and 100 yards away is about 140 yards off, at Long range. Nothing reaches a flier in melee without Flight, Leaping, Stretching or something to stand on. On the battle map, give a token its height; the distance shown counts it.
+
+- **Dive.** A flier who strikes in reach at full speed hits **one Class higher**, and marks a box too unless their Defense is at least that Class.
+- **Carrying.** A flier carries what their Strength can lift, or one person without it, and flies one Class slower while they do.
+- **Falling out of the sky.** A flier who is stunned, knocked out, or knocked back (a hit of Class III or more) in the air falls, unless they make a **Powers** roll to catch themselves. Knocked out, they just fall.
+
+**Falling.** A fall is an attack, with a Class by its height, and Defense works against it as against any attack:
+
+| Height | Class | Boxes |
+|---|---|---|
+| A story or two | I | 1 |
+| A rooftop (up to 25 yd) | II | 2 |
+| A skyscraper (up to 300 yd) | III | 2, and knocked down |
+| Higher | IV | 3 |
+
+Toughness II walks away from a rooftop; Toughness IV from a plane. A fall into a furnace or onto spikes is worse, as the GM decides. Super Leaping lands safely from any height its Class can leap.
+
 ## Super strength
 
 **Strength** is the most common power on the street, and the most physical: what it lifts, breaks, throws and holds.
@@ -1008,9 +1034,9 @@ Powers grow with advancement points (see *Advancement*), with the GM's approval:
 | **Strength** | Lift a motorcycle; unarmed hits and thrown objects are Class I; break Class I objects (a door). | Lift a car; hits and throws are Class II; break a brick wall; tear doors off. | Lift a truck or a small plane; hits and throws are Class III, and knock targets back; break a vault door. |
 | **Toughness** | Defense I against physical harm. | Defense II. | Defense III. |
 | **Force Field** | Defense I for you, for a scene. | Defense II for you, or Defense I around a small group. | Defense III, or Defense II around a group; seal a doorway. |
-| **Speed** | Up to 70 mph, as fast as a car; act first in any round. | Up to 200 mph; run across water and up walls; two moves a round. | Mach 1 (about 760 mph); once a scene, two actions in a round. |
-| **Flight** | Fly up to 70 mph, as fast as a car. | Fly up to 300 mph, as fast as a light plane. | Mach 2 (about 1,500 mph): keep up with fighter jets. |
-| **Super Leaping** | Leap 30 ft up or 100 ft across: onto a three-story roof. | Leap 100 ft up or a city block (300 ft) across. | Leap a quarter mile up or a mile across. |
+| **Speed** | Up to 70 mph; in a fight, a move covers Medium range (100 yd); act first in any round. | Up to 200 mph; run across water and up walls; a move covers Long range; a second defense each round; blows at Class I. | Mach 1 (about 760 mph); a move covers Extreme range; once a scene, two actions in a round; blows at Class II. |
+| **Flight** | Fly up to 70 mph, as fast as a car; in a fight, a move covers Medium range (100 yd). | Fly up to 300 mph, as fast as a light plane; a move covers Long range. | Mach 2 (about 1,500 mph): keep up with fighter jets; a move covers Extreme range. |
+| **Super Leaping** | Leap 30 ft up or 100 ft across: onto a three-story roof. In a fight, one leap covers Medium range (100 yd). | Leap 100 ft up or a city block (300 ft) across. A leap covers Long range. | Leap a quarter mile up or a mile across. A leap covers Extreme range. |
 | **Wall-Crawling** | Climb any wall as easily as walking. | Run up walls and across ceilings. | Cling upside down under a moving vehicle or aircraft. |
 | **Regeneration** | Clear one injury box after a scene's rest. | Clear one box at the end of each scene; a single hit never leaves you Dying. | Clear a box every few rounds; regrow lost limbs. |
 | **Adaptation** | Ignore one hazard: heat, cold, poison or thin air. | Breathe water and ignore all ordinary hazards. | Survive vacuum, the deep ocean and fire. |
@@ -1076,8 +1102,8 @@ Every power keeps going at Classes IV to VI. Player characters reach Class IV on
 | **Strength** | Lift a tank or a jet; Class IV; punch through a bunker. | Lift a ship or a building's floor; Class V. | Move a mountain's worth; Class VI. |
 | **Toughness** | Defense IV. | Defense V. | Defense VI. |
 | **Force Field** | Defense IV, or Defense III around a building. | Defense V, or Defense IV around a city block. | Defense VI, or shield a city. |
-| **Speed** | Mach 3: cross a city in seconds; two actions every round. | Mach 10: cross a continent in minutes; three actions a round. | Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still. |
-| **Flight** | Mach 5: outfly any jet; cross an ocean in an hour or two. | Mach 10: anywhere on Earth within a couple of hours. | Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it). |
+| **Speed** | Mach 3: cross a city in seconds; move anywhere in the scene; two actions every round; blows at Class III. | Mach 10: cross a continent in minutes; three actions a round; blows at Class IV. | Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still. |
+| **Flight** | Mach 5: outfly any jet; cross an ocean in an hour or two; move anywhere in the scene. | Mach 10: anywhere on Earth within a couple of hours. | Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it). |
 | **Super Leaping** | Leap a mile up or 5 miles across. | Leap 5 miles up or 25 miles across. | Leap into the stratosphere, or 100 miles and more across. |
 | **Wall-Crawling** | Cling to anything, even glass in a hurricane or a spaceship's hull. | Walk on water, smoke or any surface. | Stand on the air as if it were ground. |
 | **Regeneration** | Clear one box at the start of each of your turns. A hit that would leave you Dying leaves you Incapacitated instead, and you're back up in a round. | Clear one box each turn, two after a hit that marks 3 or more. Only certain death stops you, and even then you recover within the hour unless your body is destroyed outright. | Nothing short of total annihilation keeps you down. |

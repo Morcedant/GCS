@@ -651,7 +651,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="3fadb11" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · 3fadb11</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="d8d738e" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · d8d738e</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1174,6 +1174,7 @@ tr.lvl-U td.target { color: var(--muted); }
               <div class="field"><label for="lab-cover">Cover</label><select id="lab-cover"><option value="none">None</option><option value="partial">Partial (−2)</option><option value="solid">Solid (blocks)</option></select></div>
               <div class="field" id="lab-material-wrap" hidden><label for="lab-material">Made of</label><select id="lab-material"></select></div>
               <div class="field" id="lab-called-wrap" hidden><label for="lab-called">Called shot</label><select id="lab-called"></select></div>
+              <div class="field" id="lab-dive-wrap" hidden><label><input type="checkbox" id="lab-dive"> Dive: one Class higher; the diver marks a box unless their Defense is that high</label></div>
               <div class="field" id="lab-team-wrap" hidden><label for="lab-team">Team-up with</label><select id="lab-team"></select></div>
               <div class="field"><label for="lab-sit-label">Other modifier</label><input type="text" id="lab-sit-label" placeholder="e.g. Darkness"></div>
               <div class="field" style="flex:0 0 5em"><label for="lab-sit">±</label><input type="number" id="lab-sit" value="0" min="-10" max="10"></div>
@@ -5437,9 +5438,10 @@ function removeParticipant(enc, pid) {
   log(enc, "leave", { pid, name: p.name });
 }
 
-/** Turn order: Agility, highest first; ties in the order they joined (the GM can move anyone). @param {any} enc @param {any} rules */
+/** Turn order: anyone who acts first (actFirst: Aurora's Speed), then Agility, highest first; ties in the order they joined
+ * (the GM can move anyone). @param {any} enc @param {any} rules */
 function startCombat(enc, rules) {
-  enc.order = [...enc.participants].sort((a, b) => b.agility - a.agility).map((p) => p.pid);
+  enc.order = [...enc.participants].sort((a, b) => (b.actFirst ? 1 : 0) - (a.actFirst ? 1 : 0) || b.agility - a.agility).map((p) => p.pid);
   enc.status = "combat"; enc.round = 1; enc.turn = 0;
   enc.setup = { participants: clone(enc.participants), order: [...enc.order] };
   enc.commands.push({ type: "start" });
@@ -5471,13 +5473,20 @@ function advance(enc) {
   if (enc.turn >= enc.order.length) { enc.turn = 0; enc.round++; log(enc, "round", { round: enc.round }); }
 }
 
-/** End the active participant's turn. @param {any} enc */
+/** End the active participant's action: their next action this round (actions: Aurora's Speed), or the next turn. @param {any} enc */
 function nextTurn(enc) {
   if (enc.status !== "combat") return;
   enc.commands.push({ type: "next" });
+  const cur = active(enc);
+  if (cur && !isOut(cur) && (cur.actions || 1) > (cur.acted || 0) + 1) {
+    cur.acted = (cur.acted || 0) + 1;
+    log(enc, "turn", { pid: cur.pid, name: cur.name, action: cur.acted + 1, of: cur.actions });
+    return;
+  }
+  if (cur) cur.acted = 0;
   advance(enc); skipOut(enc);
   const p = active(enc);
-  log(enc, "turn", { pid: p && p.pid, name: p && p.name });
+  log(enc, "turn", { pid: p && p.pid, name: p && p.name, ...(p && (p.actions || 1) > 1 ? { action: 1, of: p.actions } : {}) });
 }
 
 /** Aim (when the rules allow it): the next attack on this target gets the Aim bonus. @param {any} enc @param {any} rules @param {string} pid @param {string} target */
@@ -5570,6 +5579,10 @@ function attack(enc, rules, core, cmd, opts = {}) {
   // An ordinary weapon swung above Class II breaks after the blow.
   const strong = a && weapon && weapon.reach === "melee" && !weapon.natural && !weapon.power && (a.strength || 0) > (weapon.class || 1) ? a.strength : 0;
   if (strong) weapon = atClass(weapon, strong);
+  // A dive (a flier striking at full speed): a blow in reach, one Class higher; the diver marks a box too unless their Defense
+  // is at least the dive's Class (on their sheet).
+  const dive = cmd.dive && a && a.flies && weapon && weapon.reach === "melee" ? Math.min(6, (weapon.class || 1) + 1) : 0;
+  if (dive) weapon = atClass(weapon, dive);
   // A team-up: another character puts their power into a power with a Class, and it strikes one Class higher.
   // Both mark a box of Strain, on their sheets.
   const mate = cmd.teamUp && weapon && weapon.class ? find(enc, cmd.teamUp) : null;
@@ -5666,12 +5679,15 @@ function attack(enc, rules, core, cmd, opts = {}) {
     enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
     teamUp: mate ? { pid: mate.pid, name: mate.name, cls: weapon.class } : null,
     strongHands: strong ? { cls: strong, breaks: strong >= 3 } : null,
+    dive: dive ? { cls: dive, hurts: Math.max(0, ...(a.traits || []).filter((/** @type {any} */ t) => t.type === "defenseClass").map((/** @type {any} */ t) => t.value)) < dive } : null,
     // A hit of Class III or more knocks the target down, and can throw them a hex (or a range band) for each Class above II.
     knockback: res.hit && res.damage && res.damage.boxes && (weapon.class || 1) >= 3 ? weapon.class - 2 : 0,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null, defenseClass: res.defenseClass || null, stun: !!res.stun,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
     injuryBefore: pre.defender.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead, injuryResult: res.injury ? res.injury.change : null,
+    // A flier stunned, knocked back or taken out in the air falls, unless they make a Powers roll (Aurora).
+    flierFalls: !!(d.flies && res.hit && (res.stun || ((weapon.class || 1) >= 3 && res.damage && res.damage.boxes) || isOut(d))),
   });
   if (grievous && grievous.pc) d.lasting[d.lasting.length - 1].about = ev.n;
   if (extraDodge) log(enc, "override", { what: "dodge", about: ev.n, pid: d.pid, name: d.name, defense: chosen.kind, from: `already used ${chosen.kind} this round`, to: `${chosen.kind} allowed`, reason: "GM allowed it again" });
@@ -6230,11 +6246,20 @@ function mountLab(api) {
     for (const a of Object.values(WEAPONS)) if (a.power && pw.some((/** @type {any} */ x) => x.id === a.power && x.cls === a.powerClass)) weapons.push(a.id);
     // Strength (a power, or a suit that gives it): weapons in hand hit harder, and pins hold.
     const strength = Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === "strength").map((/** @type {any} */ x) => x.cls), ...(c.equipment.aegis ? [2] : []));
-    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", ...(strength ? { strength } : {}), agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+    // Powers in a fight (powers.fight: Speed acts first, defends twice and acts more than once a round; Flight flies).
+    const F = (PACK.powers && PACK.powers.fight) || {}, clsOf = (/** @type {string} */ id) => Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === id).map((/** @type {any} */ x) => x.cls));
+    const fight = {
+      ...(F.actFirst && clsOf(F.actFirst.power) >= F.actFirst.from ? { actFirst: true } : {}),
+      ...(F.actions && clsOf(F.actions.power) ? { actions: F.actions.byClass[clsOf(F.actions.power) - 1] || 1 } : {}),
+      ...((F.flies || []).some((/** @type {string} */ id) => clsOf(id)) || c.equipment.aegis ? { flies: true } : {}) };
+    const speedDefense = F.extraDefense && clsOf(F.extraDefense.power) >= F.extraDefense.from && !(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge])
+      ? [{ type: "extraDefense", value: 1, label: "Speed: a second defense" }] : [];
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", ...(strength ? { strength } : {}), ...fight, agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
+        ...speedDefense,
         ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : []),
         ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
@@ -6247,7 +6272,7 @@ function mountLab(api) {
     const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
     // A threat's Strength: the Class of its strength attacks.
     const strength = Math.max(0, ...t.weapons.filter((/** @type {string} */ w) => /strength/.test(w) && WEAPONS[w]).map((/** @type {string} */ w) => WEAPONS[w].class || 0));
-    return { kind: "npc", name, side: "foe", ...(strength ? { strength } : {}), agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
+    return { kind: "npc", name, side: "foe", ...(strength ? { strength } : {}), ...(t.actFirst ? { actFirst: true } : {}), ...(t.actions > 1 ? { actions: t.actions } : {}), ...(t.flies ? { flies: true } : {}), agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
       boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
@@ -6463,6 +6488,9 @@ function mountLab(api) {
       // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
       if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None</option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
+      // A dive: a flier strikes in reach at full speed.
+      $("lab-dive-wrap").hidden = !(a && a.flies && w && w.reach === "melee");
+      if ($("lab-dive-wrap").hidden) $("lab-dive").checked = false;
       // A team-up (a power with a Class): another character puts their power into this attack, one Class higher.
       const mates = w && w.class ? en.participants.filter((/** @type {any} */ p) => p.pid !== a.pid && p.side === a.side && p.pid !== $("lab-target").value && !p.dead && !E.isOut(p)) : [];
       $("lab-team-wrap").hidden = !mates.length;
@@ -6502,6 +6530,7 @@ function mountLab(api) {
         material: $("lab-material-wrap").hidden || !$("lab-material").value ? null : $("lab-material").value,
         called: $("lab-called-wrap").hidden || !$("lab-called").value ? null : { effect: $("lab-called").value.split("|")[0], small: $("lab-called").value.endsWith("|small") },
         teamUp: $("lab-team-wrap").hidden || !$("lab-team").value ? null : $("lab-team").value,
+        dive: !$("lab-dive-wrap").hidden && $("lab-dive").checked,
         cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
@@ -6634,10 +6663,10 @@ function mountLab(api) {
       case "leave": return `${esc(e.name)} leaves.`;
       case "start": return `Combat starts. Rules: ${esc(e.rules.kind === "lab" ? e.rules.label + " (" + (e.rules.active.map((/** @type {any} */ a) => `${a.id}, ${a.scope}`).join("; ") || "no experiments") + ")" : "Published")}${e.seed !== null && e.seed !== undefined ? ` · seed ${esc(e.seed)}` : ""}. Order: ${esc(e.order.join(", "))}.`;
       case "round": return `<b>Round ${e.round}.</b>`;
-      case "turn": return `${esc(e.name || "")}'s turn.`;
+      case "turn": return `${esc(e.name || "")}'s turn${e.of ? ` (action ${e.action} of ${e.of})` : ""}.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}${e.strongHands ? ` · in strong hands, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.strongHands.cls]}${e.strongHands.breaks ? "; an ordinary weapon breaks" : ""}` : ""}${e.knockback && !e.superseded ? ` · knocked down, and can be thrown back up to ${e.knockback} hex${e.knockback > 1 ? "es" : ""} or a range band${e.knockback > 1 ? "s" : ""} (through a wall: Collateral)` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
+      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}${e.dive ? ` · a dive, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.dive.cls]}${e.dive.hurts && e.hit ? `: ${esc(e.attacker.name)} marks a box too` : ""}` : ""}${e.flierFalls && !e.superseded ? ` · ${esc(e.defender.name)} falls from the air unless they make a Powers roll` : ""}${e.strongHands ? ` · in strong hands, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.strongHands.cls]}${e.strongHands.breaks ? "; an ordinary weapon breaks" : ""}` : ""}${e.knockback && !e.superseded ? ` · knocked down, and can be thrown back up to ${e.knockback} hex${e.knockback > 1 ? "es" : ""} or a range band${e.knockback > 1 ? "s" : ""} (through a wall: Collateral)` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
       case "trade": return `<b>${esc(e.name)} trades a limb for their life:</b> ${esc(e.wound)}.`;
       case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.${e.grip ? ` ${esc(e.name)} is stronger: to break free, ${esc(e.target)} rolls Body −${2 * e.grip}; on a failure the pin holds.` : ""}`;
       case "shrug": return `${esc(e.name)} shrugs off a telling hit (${esc(e.label)}).`;
@@ -7167,7 +7196,14 @@ return { mountLab };
   const skillTarget = (name) => { const s = SKILLS.find((x) => x[0] === name); return ch.attrs[s[1]] + levelMod(ch.skills[name], name) + hbBonus("skill", ch, name); };
   const dodge = () => LD.dodgeBase(ch.attrs.Agility, LEVELS[ch.skills.Athletics].dodge) + hbBonus("dodge");
   // Move in yards, in the current form (a form's Agility and Body count while in it).
-  const moveOf = (c = ch) => LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c)) + hbBonus("move", c);
+  // Powers that move you (powers.fight.move: Speed, Flight, Leaping): a move covers their distance by Class, if that's farther.
+  const FIGHT = (POWERS && POWERS.fight) || null;
+  const powerMove = (c = ch) => { if (!FIGHT || !FIGHT.move) return null;
+    let best = null; for (const x of allPowers(c)) { const t = FIGHT.move[x.id]; const y = t && t[Math.min(classIndex(x.cl), t.length - 1)];
+      if (y && (!best || y > best.yards)) best = { yards: y, name: `${powerDef(x.id)[1]} ${x.cl}` }; } return best; };
+  const moveOf = (c = ch) => Math.max(LD.moveYards(c.attrs.Agility + formAttr("Agility", c), c.attrs.Body + formAttr("Body", c), LEVELS[c.skills.Athletics].dodge, speedOf(c)) + hbBonus("move", c), powerMove(c)?.yards || 0);
+  // Acting first (powers.fight.actFirst: Speed), for the GM's turn order.
+  const powerFirst = (c) => { const f = FIGHT && FIGHT.actFirst; return !!f && allPowers(c).some((x) => x.id === f.power && classIndex(x.cl) + 1 >= f.from); };
   // Move as the character's injuries leave it (wounded −2 yards, seriously wounded half and no running).
   const moveNow = (c = ch) => LD.injuredMove(moveOf(c), (c.play && c.play.injury) || 0);
   const runNow = (c = ch) => ((c.play && c.play.injury) >= 2 ? 0 : moveNow(c) * 2);
@@ -7177,7 +7213,9 @@ return { mountLab };
   const parryOf = (skill) => skillTarget(skill) + CR.parry.mod;
   const isParry = (name) => name.startsWith("Parry:");
   // One defense a round, more with the setting's Edge (Additional Defense).
-  const defensesPerRound = () => CR.oneDefense ? (CR.oneDefense.perRound || 1) + edgeN(CR.oneDefense.edge || "") : Infinity;
+  // Speed (powers.fight.extraDefense) gives a second defense, like the Additional Defense Edge; the two don't stack.
+  const speedDefends = () => { const f = FIGHT && FIGHT.extraDefense; return !!f && allPowers().some((x) => x.id === f.power && classIndex(x.cl) + 1 >= f.from); };
+  const defensesPerRound = () => CR.oneDefense ? (CR.oneDefense.perRound || 1) + Math.max(edgeN(CR.oneDefense.edge || ""), speedDefends() ? 1 : 0) : Infinity;
   // Block: with a real shield (gear, +its bonus) or anything picked up in the fight (no bonus).
   const SHIELDS = CR.block ? (PACK.protection || []).filter((g) => g.traits.some((t) => t.type === "shield")) : [];
   const shieldBonus = (g) => g.traits.find((t) => t.type === "shield").value || 0;
@@ -7530,7 +7568,7 @@ return { mountLab };
     $("st-grit").textContent = gritStart();
     $("st-dodge-note").textContent = `Dodge = Agility ${ch.attrs.Agility} − 2 + ${LEVELS[ch.skills.Athletics].dodge} (${levelName(ch.skills.Athletics, "Athletics")} Athletics)`
       + (CR.parry ? `. Parry = ${PARRY.map(([s]) => `${s} ${skillTarget(s)} ${signed(CR.parry.mod)} = ${parryOf(s)}`).join(", or ")}` : "")
-      + `. Move = 5 yd + ${Math.floor(Math.max(0, ch.attrs.Agility + ch.attrs.Body - 20) / 2)} (Agility + Body ${ch.attrs.Agility + ch.attrs.Body}) + ${LEVELS[ch.skills.Athletics].dodge} (Athletics)${speedOf() ? ` ${signed(speedOf())} (${T.originLower} speed)` : ""} = ${moveOf()} yd; run ${moveOf() * 2} yd${moveNow() !== moveOf() ? ` (wounded: ${moveNow()} yd${runNow() ? `, run ${runNow()}` : ", no running"})` : ""}`
+      + `. Move = 5 yd + ${Math.floor(Math.max(0, ch.attrs.Agility + ch.attrs.Body - 20) / 2)} (Agility + Body ${ch.attrs.Agility + ch.attrs.Body}) + ${LEVELS[ch.skills.Athletics].dodge} (Athletics)${speedOf() ? ` ${signed(speedOf())} (${T.originLower} speed)` : ""}${powerMove() ? `; ${esc(powerMove().name)}: ${powerMove().yards >= 5000 ? "anywhere in the scene" : `${powerMove().yards} yd`}` : ""} = ${moveOf()} yd; run ${moveOf() * 2} yd${moveNow() !== moveOf() ? ` (wounded: ${moveNow()} yd${runNow() ? `, run ${runNow()}` : ", no running"})` : ""}`
       + (CR.oneDefense ? `. ${defensesPerRound() > 1 ? `${["", "One", "Two", "Three"][defensesPerRound()] || defensesPerRound()} defenses a round (Additional Defense: the second at ${signed(CR.oneDefense.extraPenalty || 0)})` : "One defense a round"}: Dodge${CR.parry ? ", Parry" : ""}${CR.block ? " or Block" : ""}.` : "");
     const best = SKILLS.map(([n]) => skillTarget(n)).reduce((a, b) => Math.max(a, b), 0);
     $("st-best").textContent = best;
@@ -8682,7 +8720,7 @@ function mountBattleMap(api) {
       // Injury (or Hull) pips above the token: one per box, filled as they're marked.
       if (k.boxes) { const pr = Math.max(2.5, unit * 0.1), gap = pr * 2.6;
         for (let i = 0; i < k.boxes; i++) g.appendChild(el("circle", { class: "bm-pip" + (i < k.inj ? " on" : ""), r: pr, cx: (i - (k.boxes - 1) / 2) * gap, cy: -rad - pr * 1.8 })); }
-      const lb = el("text", { class: "bm-label", y: rad + Math.max(10, unit * 0.38), "font-size": Math.max(9, unit * 0.32) }); lb.textContent = k.name || ""; g.appendChild(lb);
+      const lb = el("text", { class: "bm-label", y: rad + Math.max(10, unit * 0.38), "font-size": Math.max(9, unit * 0.32) }); lb.textContent = (k.name || "") + (t.alt > 0 && !isRange() ? ` ↑${t.alt} ${st.scale.unit}` : ""); g.appendChild(lb);
       gTok.appendChild(g);
     }
   }
@@ -8726,6 +8764,7 @@ function mountBattleMap(api) {
     box.innerHTML = `<b>${esc(k.name || "Token")}<\/b>${whose ? ` <span class="small muted">${whose}<\/span>` : ""}${isRange() && laneName(t.lane || 0) !== k.name ? ` <span class="small muted">· ${esc(laneName(t.lane || 0))}<\/span>` : ""}
       ${tracks}
       ${c ? "" : `<label>Name <input type="text" data-bms="name" value="${esc(t.name || "")}"><\/label><label>Color <input type="color" data-bms="color" value="${esc(t.color || "#777777")}"><\/label>`}
+      ${isRange() ? "" : `<label>Height <input type="number" min="0" max="100000" step="1" data-bms="alt" value="${t.alt || 0}" style="width:6em" aria-label="Height above the ground, in ${esc(st.scale.unit)}"> ${esc(st.scale.unit)} up<\/label>`}
       <label>Size <select data-bms="tsize">${[["1", "Normal"], ["2", "Large"], ["3", "Huge"]].map(([n, l]) => `<option value="${n}"${String(t.tsize || 1) === n ? " selected" : ""}>${l}<\/option>`).join("")}<\/select><\/label>
       <button class="btn" data-bm="dup">Copy<\/button><button class="btn" data-bm="del">Remove<\/button><button class="linkish" data-bm="desel">Done<\/button>`;
   }
@@ -8952,7 +8991,7 @@ function mountBattleMap(api) {
       else if (+i.value > 0) st.scale.n = +i.value;
       save(); draw();
     } else if (i.dataset.bmg) { const k = i.dataset.bmg; st[k] = i.type === "checkbox" ? i.checked : i.tagName === "SELECT" ? i.value : +i.value; save(); draw(); }
-    else if (i.dataset.bms) { const t = toks().find((x) => x.id === sel); if (!t) return; const k = i.dataset.bms; t[k] = k === "tsize" || k === "boxes" ? Math.max(1, +i.value || 1) : i.value; save(); drawTokens(); if (k === "boxes") drawSel(); }
+    else if (i.dataset.bms) { const t = toks().find((x) => x.id === sel); if (!t) return; const k = i.dataset.bms; t[k] = k === "tsize" || k === "boxes" ? Math.max(1, +i.value || 1) : k === "alt" ? Math.max(0, Math.min(100000, Math.round(+i.value) || 0)) : i.value; save(); drawTokens(); if (k === "boxes") drawSel(); }
     else if (i.dataset.bmc) { const t = toks().find((x) => x.id === sel); if (t && t.ref && api.setCrew) api.setCrew(t.ref, { [i.dataset.bmc]: i.checked }); }
     else if (i.dataset.bmf === "threat") {
       // Picking a threat fills in its name (numbered), boxes and a foe's color.
@@ -8986,15 +9025,17 @@ function mountBattleMap(api) {
       return band ? { band: String(band[0]).toLowerCase(), lanes: n } : { band: null, lanes: n };
     }
     if (st.scale.unit !== "yd") return null;
-    const hexes = dist(ta, tb), yards = hexes * st.scale.n;
-    return { hexes, yards, scale: st.scale.n, band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
+    // Height (a flier, a sniper on a roof): the straight line through the air, from the ground distance and the difference in height.
+    const ground = dist(ta, tb) * st.scale.n, up = Math.abs((ta.alt || 0) - (tb.alt || 0));
+    const yards = up ? Math.round(Math.hypot(ground, up)) : ground, hexes = up ? Math.round(yards / st.scale.n) : dist(ta, tb);
+    return { hexes, yards, scale: st.scale.n, ...(up ? { height: up } : {}), band: (UNITS.yd.bands.find(([, max]) => yards <= max) || [null])[0]?.toLowerCase() || null };
   }
 
   // ---- the shared table ----
   // The map as players see it: positions and what each token shows, without pictures; "own" is the shared character's key.
   function snapshot() {
     const res = (l) => l.map((t) => { const k = info(t), c = k.c;
-      return { id: t.id, q: t.q, r: t.r, lane: t.lane, y: t.y, tsize: t.tsize, name: k.name || "", color: k.color || "#777", boxes: k.boxes || 0, injury: k.inj || 0, dying: !!k.dying, own: c ? c.tableKey || null : t.own || null }; });
+      return { id: t.id, q: t.q, r: t.r, lane: t.lane, y: t.y, tsize: t.tsize, alt: t.alt || 0, name: k.name || "", color: k.color || "#777", boxes: k.boxes || 0, injury: k.inj || 0, dying: !!k.dying, own: c ? c.tableKey || null : t.own || null }; });
     return { kind: st.kind, scale: st.scale, size: st.size, orient: st.orient, ox: st.ox, oy: st.oy, cols: st.cols, rows: st.rows, grid: st.grid, gridAlpha: st.gridAlpha,
       tokens: res(st.tokens), rts: Object.fromEntries(Object.entries(st.rts).map(([k, v]) => [k, { tokens: res(v.tokens) }])) };
   }
@@ -10664,11 +10705,11 @@ function mountCampaign(api) {
     const QD = anyFx("firstInGunfight") ? PACK.roles.find((r) => (r.abilityFx || []).includes("firstInGunfight")) : null;
     $("gm-gunfight-wrap").hidden = !QD;
     if (QD) $("gm-gunfight-label").textContent = `First round of a gunfight (${QD.ability[0]}: ${QD.name} acts first)`;
-    const first = (c) => (gunfight && hasFx("firstInGunfight", c) ? 1 : 0);
+    const first = (c) => ((gunfight && hasFx("firstInGunfight", c)) || powerFirst(c) ? 1 : 0);
     const order = gmCrew.map((c) => ({ c, a: c.attrs.Agility, q: first(c) })).sort((x, y) => y.q - x.q || y.a - x.a || x.c.name.localeCompare(y.c.name));
     $("gm-turns").innerHTML = order.length ? order.map(({ c, a, q }, i) => {
       const tied = order.some((o, j) => j !== i && o.a === a && o.q === q);
-      return `<li>${esc(c.name || "Unnamed")}<span class="num">Agility ${a}</span>${q ? `<span class="tie">${esc(roleAbility(c)[0])}</span>` : ""}${tied ? '<span class="tie">tie</span>' : ""}${c.play.injury >= 3 ? ' <span class="tie">down</span>' : ""}</li>`;
+      return `<li>${esc(c.name || "Unnamed")}<span class="num">Agility ${a}</span>${q ? `<span class="tie">${esc(powerFirst(c) ? "Speed: acts first" : roleAbility(c)[0])}</span>` : ""}${tied ? '<span class="tie">tie</span>' : ""}${c.play.injury >= 3 ? ' <span class="tie">down</span>' : ""}</li>`;
     }).join("") : `<li class="muted" style="list-style:none;margin-left:-1.6em">Add characters to see the turn order.</li>`;
     $("gm-grid").innerHTML = gmCrew.length ? gmCrew.map((c) => {
       const k = gmCalc(c), inj = c.play.injury;

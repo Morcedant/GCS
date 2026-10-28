@@ -6,6 +6,19 @@
     {
       "date": "2026-10-28",
       "kind": "setting",
+      "title": "Aurora: speed, flight, height and falling",
+      "items": [
+        "Speed, Flight and Super Leaping move a range band in a fight: Medium at Class I, Long at II, Extreme at III, anywhere in the scene from IV. The sheet's Move shows it.",
+        "Speed's steps, evened out: acts first (I), a second defense and blows at speed (II), two actions once a scene (III), two actions a round (IV), three (V). Blows at speed hit one Class below your Speed. Celerity's now hit at Class III.",
+        "Chases against vehicles: a car is Class I, a helicopter II, a jet III, a fighter IV; a higher Class wins without a roll.",
+        "Height counts in the distance (and on the battle map, where a token can have a height). Dives hit one Class higher; carrying slows you a Class; a flier stunned, knocked out or knocked back falls unless they make a Powers roll.",
+        "A fall is an attack with a Class by its height (I to IV), so Toughness protects against it.",
+        "The Encounter panel puts Speed first in the turn order, gives the extra actions and the second defense, offers a Dive to fliers, and warns when a flier falls."
+      ]
+    },
+    {
+      "date": "2026-10-28",
+      "kind": "setting",
       "title": "Aurora: super strength, and every power's attacks in the Encounter panel",
       "items": [
         "Super strength has its own rules: lifting (one step past your Class is a push), objects with a Class to break, throwing (Athletics; a car also hits everyone next to the target), weapons in strong hands (the higher Class; ordinary weapons break above Class II), knockback from Class III, and pins that hold against weaker targets (Body −2 per Class of difference).",

@@ -205,11 +205,20 @@ export function mountLab(api) {
     for (const a of Object.values(WEAPONS)) if (a.power && pw.some((/** @type {any} */ x) => x.id === a.power && x.cls === a.powerClass)) weapons.push(a.id);
     // Strength (a power, or a suit that gives it): weapons in hand hit harder, and pins hold.
     const strength = Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === "strength").map((/** @type {any} */ x) => x.cls), ...(c.equipment.aegis ? [2] : []));
-    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", ...(strength ? { strength } : {}), agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
+    // Powers in a fight (powers.fight: Speed acts first, defends twice and acts more than once a round; Flight flies).
+    const F = (PACK.powers && PACK.powers.fight) || {}, clsOf = (/** @type {string} */ id) => Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === id).map((/** @type {any} */ x) => x.cls));
+    const fight = {
+      ...(F.actFirst && clsOf(F.actFirst.power) >= F.actFirst.from ? { actFirst: true } : {}),
+      ...(F.actions && clsOf(F.actions.power) ? { actions: F.actions.byClass[clsOf(F.actions.power) - 1] || 1 } : {}),
+      ...((F.flies || []).some((/** @type {string} */ id) => clsOf(id)) || c.equipment.aegis ? { flies: true } : {}) };
+    const speedDefense = F.extraDefense && clsOf(F.extraDefense.power) >= F.extraDefense.from && !(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge])
+      ? [{ type: "extraDefense", value: 1, label: "Speed: a second defense" }] : [];
+    return { kind: "pc", ref: c.id, name: c.name || "Unnamed", side: "party", ...(strength ? { strength } : {}), ...fight, agility: k.agility, move: k.move, dodge: k.dodge, skills: k.skills, weapons: [...new Set(weapons)],
       ...(fm ? { form: { name: fm.name, human: fm.human, on: formOn } } : {}), note: formOn ? `In ${fm.name}: ${fm.traits.join("; ")}${fm.drawbacks.length ? `. Drawbacks: ${fm.drawbacks.join("; ")}` : ""}.` : "",
       traits: [...protTraits(PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id)),
         ...(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge] ? [{ type: "extraDefense", value: c.edges[PUB.oneDefense.edge], label: "Additional Defense" }] : []),
         ...((c.edges || {}).survivor || (c.edgesBought || {}).survivor ? [{ type: "shrugTelling", oncePerFight: true, label: "Hard to put down" }] : []),
+        ...speedDefense,
         ...(k.defense ? [{ type: "defenseClass", value: k.defense, label: `Defense ${["", "I", "II", "III", "IV", "V", "VI"][k.defense]}` }] : []),
         ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
@@ -222,7 +231,7 @@ export function mountLab(api) {
     const ammo = Object.fromEntries(t.weapons.map((/** @type {string} */ w) => WEAPONS[w] && WEAPONS[w].ammo).filter(Boolean).map((/** @type {string} */ a) => [a, PACK.weapons.items[a][1]]));
     // A threat's Strength: the Class of its strength attacks.
     const strength = Math.max(0, ...t.weapons.filter((/** @type {string} */ w) => /strength/.test(w) && WEAPONS[w]).map((/** @type {string} */ w) => WEAPONS[w].class || 0));
-    return { kind: "npc", name, side: "foe", ...(strength ? { strength } : {}), agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
+    return { kind: "npc", name, side: "foe", ...(strength ? { strength } : {}), ...(t.actFirst ? { actFirst: true } : {}), ...(t.actions > 1 ? { actions: t.actions } : {}), ...(t.flies ? { flies: true } : {}), agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
       boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo, note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
@@ -438,6 +447,9 @@ export function mountLab(api) {
       // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
       if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None</option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
+      // A dive: a flier strikes in reach at full speed.
+      $("lab-dive-wrap").hidden = !(a && a.flies && w && w.reach === "melee");
+      if ($("lab-dive-wrap").hidden) $("lab-dive").checked = false;
       // A team-up (a power with a Class): another character puts their power into this attack, one Class higher.
       const mates = w && w.class ? en.participants.filter((/** @type {any} */ p) => p.pid !== a.pid && p.side === a.side && p.pid !== $("lab-target").value && !p.dead && !E.isOut(p)) : [];
       $("lab-team-wrap").hidden = !mates.length;
@@ -477,6 +489,7 @@ export function mountLab(api) {
         material: $("lab-material-wrap").hidden || !$("lab-material").value ? null : $("lab-material").value,
         called: $("lab-called-wrap").hidden || !$("lab-called").value ? null : { effect: $("lab-called").value.split("|")[0], small: $("lab-called").value.endsWith("|small") },
         teamUp: $("lab-team-wrap").hidden || !$("lab-team").value ? null : $("lab-team").value,
+        dive: !$("lab-dive-wrap").hidden && $("lab-dive").checked,
         cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
@@ -609,10 +622,10 @@ export function mountLab(api) {
       case "leave": return `${esc(e.name)} leaves.`;
       case "start": return `Combat starts. Rules: ${esc(e.rules.kind === "lab" ? e.rules.label + " (" + (e.rules.active.map((/** @type {any} */ a) => `${a.id}, ${a.scope}`).join("; ") || "no experiments") + ")" : "Published")}${e.seed !== null && e.seed !== undefined ? ` · seed ${esc(e.seed)}` : ""}. Order: ${esc(e.order.join(", "))}.`;
       case "round": return `<b>Round ${e.round}.</b>`;
-      case "turn": return `${esc(e.name || "")}'s turn.`;
+      case "turn": return `${esc(e.name || "")}'s turn${e.of ? ` (action ${e.action} of ${e.of})` : ""}.`;
       case "order": return `Turn order: ${esc(e.order.join(", "))}.`;
       case "aim": return `${esc(e.name)} aims at ${esc(e.targetName)}.`;
-      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}${e.strongHands ? ` · in strong hands, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.strongHands.cls]}${e.strongHands.breaks ? "; an ordinary weapon breaks" : ""}` : ""}${e.knockback && !e.superseded ? ` · knocked down, and can be thrown back up to ${e.knockback} hex${e.knockback > 1 ? "es" : ""} or a range band${e.knockback > 1 ? "s" : ""} (through a wall: Collateral)` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
+      case "attack": return `${esc(e.attacker.name)} → ${esc(e.defender.name)} (${esc(e.weapon.name)}, ${esc(BAND_NAMES[e.band] || e.band)}): ${e.attackDice ? `${e.attackTotal} vs ${e.target}${e.success ? `, by ${e.margin}` : ""}${e.dodgeDice ? `; ${esc((e.defenseLabel || "Dodge").split(" (")[0])} ${e.dodgeTotal} vs ${e.effectiveDodge}` : ""} → ` : ""}<b>${esc(e.overridden ? `GM: ${e.hit ? `hit, ${e.injuryBefore}→${e.injuryAfter}` : "miss"}` : e.hit ? (e.damage ? `hit, ${e.injuryBefore}→${e.injuryAfter}${e.dead ? " dead" : e.dying ? " Dying" : ""}` : e.stun ? "hit, stunned (Body −2)" : "hit, no effect") : e.outcome)}</b>${e.price ? ` · ${e.price.boxes} ${esc(e.price.track)}` : ""}${e.reroll ? ` (${pt} reroll)` : ""}${e.superseded ? " <span class='muted'>(rerolled)</span>" : ""}${e.overridden ? " <span class='muted'>(overridden)</span>" : ""}${e.grievous ? ` · <b class='bad'>${e.grievous.pc ? esc(e.grievous.name) : "taken out"}</b>` : ""}${e.dive ? ` · a dive, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.dive.cls]}${e.dive.hurts && e.hit ? `: ${esc(e.attacker.name)} marks a box too` : ""}` : ""}${e.flierFalls && !e.superseded ? ` · ${esc(e.defender.name)} falls from the air unless they make a Powers roll` : ""}${e.strongHands ? ` · in strong hands, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.strongHands.cls]}${e.strongHands.breaks ? "; an ordinary weapon breaks" : ""}` : ""}${e.knockback && !e.superseded ? ` · knocked down, and can be thrown back up to ${e.knockback} hex${e.knockback > 1 ? "es" : ""} or a range band${e.knockback > 1 ? "s" : ""} (through a wall: Collateral)` : ""}${e.teamUp ? ` · team-up with ${esc(e.teamUp.name)}, Class ${["", "I", "II", "III", "IV", "V", "VI"][e.teamUp.cls]}: both mark a box of Strain` : ""}`;
       case "trade": return `<b>${esc(e.name)} trades a limb for their life:</b> ${esc(e.wound)}.`;
       case "telling": return `${esc(e.name)}'s telling hit on ${esc(e.target)}: ${esc((LDX.TELLING_EFFECTS.find((/** @type {any} */ x) => x[0] === e.effect) || [0, e.effect || "no effect"])[1])}.${e.grip ? ` ${esc(e.name)} is stronger: to break free, ${esc(e.target)} rolls Body −${2 * e.grip}; on a failure the pin holds.` : ""}`;
       case "shrug": return `${esc(e.name)} shrugs off a telling hit (${esc(e.label)}).`;

@@ -2121,11 +2121,11 @@
     "Speed",
     "body",
     [
-     "Up to 70 mph, as fast as a car; act first in any round.",
-     "Up to 200 mph; run across water and up walls; two moves a round.",
-     "Mach 1 (about 760 mph); once a scene, two actions in a round.",
-     "Mach 3: cross a city in seconds; two actions every round.",
-     "Mach 10: cross a continent in minutes; three actions a round.",
+     "Up to 70 mph; in a fight, a move covers Medium range (100 yd); act first in any round.",
+     "Up to 200 mph; run across water and up walls; a move covers Long range; a second defense each round; blows at Class I.",
+     "Mach 1 (about 760 mph); a move covers Extreme range; once a scene, two actions in a round; blows at Class II.",
+     "Mach 3: cross a city in seconds; move anywhere in the scene; two actions every round; blows at Class III.",
+     "Mach 10: cross a continent in minutes; three actions a round; blows at Class IV.",
      "Mach 25 and beyond: circle the Earth in under two hours; the world all but stands still."
     ],
     {},
@@ -2136,10 +2136,10 @@
     "Flight",
     "body",
     [
-     "Fly up to 70 mph, as fast as a car.",
-     "Fly up to 300 mph, as fast as a light plane.",
-     "Mach 2 (about 1,500 mph): keep up with fighter jets.",
-     "Mach 5: outfly any jet; cross an ocean in an hour or two.",
+     "Fly up to 70 mph, as fast as a car; in a fight, a move covers Medium range (100 yd).",
+     "Fly up to 300 mph, as fast as a light plane; a move covers Long range.",
+     "Mach 2 (about 1,500 mph): keep up with fighter jets; a move covers Extreme range.",
+     "Mach 5: outfly any jet; cross an ocean in an hour or two; move anywhere in the scene.",
      "Mach 10: anywhere on Earth within a couple of hours.",
      "Mach 25 and beyond: orbital speed; fly into space (with Adaptation to survive it)."
     ],
@@ -2151,9 +2151,9 @@
     "Super Leaping",
     "body",
     [
-     "Leap 30 ft up or 100 ft across: onto a three-story roof.",
-     "Leap 100 ft up or a city block (300 ft) across.",
-     "Leap a quarter mile up or a mile across.",
+     "Leap 30 ft up or 100 ft across: onto a three-story roof. In a fight, one leap covers Medium range (100 yd).",
+     "Leap 100 ft up or a city block (300 ft) across. A leap covers Long range.",
+     "Leap a quarter mile up or a mile across. A leap covers Extreme range.",
      "Leap a mile up or 5 miles across.",
      "Leap 5 miles up or 25 miles across.",
      "Leap into the stratosphere, or 100 miles and more across."
@@ -2751,7 +2751,57 @@
   "bodyFeats": [
    "strength",
    "size"
-  ]
+  ],
+  "fight": {
+   "move": {
+    "speed": [
+     100,
+     300,
+     1000,
+     5000,
+     5000,
+     5000
+    ],
+    "flight": [
+     100,
+     300,
+     1000,
+     5000,
+     5000,
+     5000
+    ],
+    "leaping": [
+     100,
+     300,
+     1000,
+     5000,
+     5000,
+     5000
+    ]
+   },
+   "actFirst": {
+    "power": "speed",
+    "from": 1
+   },
+   "extraDefense": {
+    "power": "speed",
+    "from": 2
+   },
+   "actions": {
+    "power": "speed",
+    "byClass": [
+     1,
+     1,
+     1,
+     2,
+     3,
+     3
+    ]
+   },
+   "flies": [
+    "flight"
+   ]
+  }
  },
  "spells": {
   "skill": "Powers",
@@ -5240,6 +5290,118 @@
    "equip": [
     "aegis"
    ]
+  },
+  {
+   "id": "pw-speed2",
+   "name": "Speed II: blows at speed (Class I)",
+   "skill": "Brawling",
+   "class": 1,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 1
+    }
+   },
+   "natural": true,
+   "power": "speed",
+   "powerClass": 2
+  },
+  {
+   "id": "pw-speed3",
+   "name": "Speed III: blows at speed (Class II)",
+   "skill": "Brawling",
+   "class": 2,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true,
+   "power": "speed",
+   "powerClass": 3
+  },
+  {
+   "id": "pw-speed4",
+   "name": "Speed IV: blows at speed (Class III)",
+   "skill": "Brawling",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true,
+   "power": "speed",
+   "powerClass": 4
+  },
+  {
+   "id": "pw-speed5",
+   "name": "Speed V: blows at speed (Class IV)",
+   "skill": "Brawling",
+   "class": 4,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   },
+   "natural": true,
+   "power": "speed",
+   "powerClass": 5
+  },
+  {
+   "id": "pw-speed6",
+   "name": "Speed VI: blows at speed (Class V)",
+   "skill": "Brawling",
+   "class": 5,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 3
+    }
+   },
+   "natural": true,
+   "power": "speed",
+   "powerClass": 6
+  },
+  {
+   "id": "op-speed3",
+   "name": "Blur of blows (Class III)",
+   "skill": "Brawling",
+   "class": 3,
+   "traits": [],
+   "rows": [],
+   "wound": "power",
+   "reach": "melee",
+   "reachYards": 1,
+   "damage": {
+    "melee": {
+     "boxes": 2
+    }
+   },
+   "natural": true
   }
  ],
  "threats": [
@@ -5570,7 +5732,8 @@
      "value": 4,
      "label": "Defense IV"
     }
-   ]
+   ],
+   "flies": true
   },
   {
    "id": "op-celerity",
@@ -5587,9 +5750,9 @@
    "dodge": 14,
    "boxes": 4,
    "boxesText": "4",
-   "weaponText": "blows at speed, Class II",
+   "weaponText": "blows at speed, Class III",
    "weapons": [
-    "op-speed2"
+    "op-speed3"
    ],
    "trait": "Faster than the fight",
    "traitText": "Two actions a round, and a second defense. A federal warrant hangs over her: helping her marks Scrutiny.",
@@ -5604,7 +5767,9 @@
      "value": 1,
      "label": "Celerity (Ava Torres): quick"
     }
-   ]
+   ],
+   "actFirst": true,
+   "actions": 2
   },
   {
    "id": "op-greenman",
@@ -5695,7 +5860,8 @@
      "value": 4,
      "label": "Defense IV"
     }
-   ]
+   ],
+   "flies": true
   },
   {
    "id": "op-chatroux",
@@ -5951,7 +6117,8 @@
      "value": 4,
      "label": "Defense IV"
     }
-   ]
+   ],
+   "flies": true
   },
   {
    "id": "op-zephyr",
@@ -5985,7 +6152,8 @@
      "value": 2,
      "label": "Defense II"
     }
-   ]
+   ],
+   "flies": true
   },
   {
    "id": "op-dark",
@@ -6111,7 +6279,10 @@
      "value": 1,
      "label": "The Atomic Man (Dr. Richard Kennedy): quick"
     }
-   ]
+   ],
+   "actFirst": true,
+   "actions": 2,
+   "flies": true
   },
   {
    "id": "op-grachyov",
@@ -6231,7 +6402,8 @@
      "value": 1,
      "label": "Autuarch: quick"
     }
-   ]
+   ],
+   "flies": true
   }
  ],
  "gmGuide": {
