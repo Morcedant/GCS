@@ -33,6 +33,8 @@ export function mountLab(api) {
   const PTRACK = PACK.personalTrack || null; // a setting's personal price track (Corruption, Strain), kept on the character
   // A setting's Mind track (Aurora): psychic attacks mark it, Will resists them, and Mind Defense stops the weaker ones.
   const MT = PACK.mindTrack || null;
+  // Frightened (core rules): any condition named "Frightened" (or "Frightened of …").
+  const isFrightened = (/** @type {any} */ p) => !!p && (p.conditions || []).some((/** @type {string} */ x) => /^frightened\b/i.test(x));
   const BAND_NAMES = { melee: "In reach", close: "Close", short: "Short", medium: "Medium", long: "Long", extreme: "Extreme" };
 
   /** @type {{ mode: "published" | "lab", cfg: any, enc: any, history: any[], compare: any }} */
@@ -231,7 +233,7 @@ export function mountLab(api) {
         ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
-      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo,
+      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
       ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes, will: c.attrs.Will } : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A threat from the setting's data. @param {any} t @param {string} name */
@@ -291,6 +293,7 @@ export function mountLab(api) {
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
       if (MT && (c.play.mind || 0) !== (p.mind || 0)) E.override(en, rules(), LD, "mind", { pid: p.pid, mind: c.play.mind || 0, reason: "changed on the character card" });
+      if (!!c.play.frightened !== isFrightened(p)) E.setCondition(en, p.pid, (p.conditions || []).find((x) => /^frightened\b/i.test(x)) || "Frightened", !!c.play.frightened);
       if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
       // A shapechanger who changed form on the card (the GM view, or the sheet's file) changes in the encounter too.
       const fm = p.form && api.formOf ? api.formOf(c) : null;
@@ -306,6 +309,7 @@ export function mountLab(api) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       c.play.injury = Math.min(3, p.injury); c.play.dying = p.dying; c.play.duty = p.points;
+      c.play.frightened = isFrightened(p);
       if (MT) c.play.mind = Math.min(MT.boxes, p.mind || 0);
       if (c.play.gun && p.ammo[c.play.gun.type] !== undefined) c.play.gun.rounds = p.ammo[c.play.gun.type];
       if (PTRACK && p.tracks) c.play.ptrack = Math.min(PTRACK.boxes, p.tracks[PTRACK.name] || 0);
@@ -462,6 +466,10 @@ export function mountLab(api) {
       // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
       if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None</option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}</option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}</option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
+      // Frightened (core rules): −2 to act against what frightens them. Ticked when they come up; the GM unticks it otherwise.
+      const fr = isFrightened(a);
+      if ($("lab-fright-wrap").hidden === fr) $("lab-fright").checked = fr;
+      $("lab-fright-wrap").hidden = !fr;
       // A dive: a flier strikes in reach at full speed.
       $("lab-dive-wrap").hidden = !(a && a.flies && w && w.reach === "melee");
       if ($("lab-dive-wrap").hidden) $("lab-dive").checked = false;
@@ -505,7 +513,8 @@ export function mountLab(api) {
         called: $("lab-called-wrap").hidden || !$("lab-called").value ? null : { effect: $("lab-called").value.split("|")[0], small: $("lab-called").value.endsWith("|small") },
         teamUp: $("lab-team-wrap").hidden || !$("lab-team").value ? null : $("lab-team").value,
         dive: !$("lab-dive-wrap").hidden && $("lab-dive").checked,
-        cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
+        cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: [...(+$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : []),
+          ...(!$("lab-fright-wrap").hidden && $("lab-fright").checked ? [{ label: "Frightened: against what frightens them", value: -2 }] : [])],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
     } else if (action === "aim") res = E.aim(en, r, a.pid, $("lab-target").value);

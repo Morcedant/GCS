@@ -662,7 +662,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="4b9305e" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · 4b9305e</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="d42b026" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · d42b026</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1146,6 +1146,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
               <div class="field" id="lab-material-wrap" hidden><label for="lab-material">Made of</label><select id="lab-material"></select></div>
               <div class="field" id="lab-called-wrap" hidden><label for="lab-called">Called shot</label><select id="lab-called"></select></div>
               <div class="field" id="lab-dive-wrap" hidden><label><input type="checkbox" id="lab-dive"> Dive: one Class higher; the diver marks a box unless their Defense is that high</label></div>
+              <div class="field" id="lab-fright-wrap" hidden><label><input type="checkbox" id="lab-fright"> Frightened: acting against what frightens them (−2)</label></div>
               <div class="field" id="lab-team-wrap" hidden><label for="lab-team">Team-up with</label><select id="lab-team"></select></div>
               <div class="field"><label for="lab-sit-label">Other modifier</label><input type="text" id="lab-sit-label" placeholder="e.g. Darkness"></div>
               <div class="field" style="flex:0 0 5em"><label for="lab-sit">±</label><input type="number" id="lab-sit" value="0" min="-10" max="10"></div>
@@ -4668,6 +4669,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
             <span class="muted small">Max one point per roll or injury event. Earn one when you accept a meaningful problem from your complication.</span></div>
           <div class="field" id="files-mine" hidden></div>
           <div class="checks"><label><input type="checkbox" id="f-stunned"> Dazed: −2 on next action roll</label>
+            <label><input type="checkbox" id="f-fright"> Frightened: −2 against its source; roll Will at the end of each turn to shake it</label>
             <label id="dying-wrap" class="dying" hidden><input type="checkbox" id="f-dying"> Dying: dies at the end of the scene unless stabilized</label>
             <label id="woge-wrap" hidden><input type="checkbox" id="f-woge"> In full woge</label></div>
           <div class="gritty-box" id="gritty-box">
@@ -4723,6 +4725,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
             <label><input type="checkbox" id="r-adv"> <span id="r-adv-label">Advantage applies +2</span></label>
             <label id="r-phys-wrap"><input type="checkbox" id="r-phys"> <span id="r-phys-label">Physical action (injury penalty)</span></label>
             <label><input type="checkbox" id="r-stun"> Dazed −2</label>
+            <label id="r-fright-wrap" hidden><input type="checkbox" id="r-fright"> Frightened: against what frightens you −2</label>
             <label id="r-aim-wrap" hidden><input type="checkbox" id="r-aim"> Aimed at this target last action +1</label>
             <label id="r-second-wrap" hidden><input type="checkbox" id="r-second"> Second defense this round −2</label>
             <label id="r-fine-wrap" hidden><input type="checkbox" id="r-fine"> <span id="r-fine-label">Fine weapon or tool +2</span></label>
@@ -5202,7 +5205,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", talisman: "", gear: { item: "", skill: "", use: "" },
       allegiance: "", allegianceDef: null, customTier: 1, customSpeed: 0, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token", cards: [],
-      play: { injury: 0, duty: 2, stunned: false, woge: false, log: [], lasting: [], gwLast: null },
+      play: { injury: 0, duty: 2, stunned: false, frightened: false, woge: false, log: [], lasting: [], gwLast: null },
     };
   }
   function example() {
@@ -5507,6 +5510,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
     $("f-comp").value = ch.comp.id; $("f-compname").value = ch.comp.name; $("f-comptext").value = ch.comp.text; $("f-comptrigger").value = ch.comp.trigger;
     EQUIPMENT.forEach(([k]) => ($("eq-" + k).checked = !!ch.equipment[k]));
     $("f-stunned").checked = !!ch.play.stunned;
+    $("f-fright").checked = !!ch.play.frightened;
     $("f-contact").value = ch.contact; $("f-talisman").value = ch.talisman || ""; $("f-gearitem").value = ch.gear.item; $("f-gearuse").value = ch.gear.use || ""; $("f-adv2detail").value = ch.adv2.detail;
   }
 
@@ -5854,6 +5858,8 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
     $("duty-count").textContent = ch.play.duty;
     $("duty-minus").disabled = ch.play.duty <= 0;
     $("r-stun").checked = !!ch.play.stunned;
+    if ($("r-fright-wrap").hidden === !!ch.play.frightened) $("r-fright").checked = !!ch.play.frightened;
+    $("r-fright-wrap").hidden = !ch.play.frightened;
 
     // roller options
     const sel = $("r-skill"), prev = sel.value;
@@ -5887,6 +5893,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
     const injPen = INJURY[ch.play.injury][2];
     if ($("r-phys").checked && injPen) parts.push(injPen);
     if ($("r-stun").checked) parts.push(-2);
+    if (!$("r-fright-wrap").hidden && $("r-fright").checked) parts.push(-2);
     if (isDefense(name)) parts.push(+$("r-quality").value || 0);
     // Additional Defense: a second defense in a round is at −2, whichever kind, on top of attack quality and injury.
     if (isDefense(name) && !$("r-second-wrap").hidden && $("r-second").checked) parts.push(-2);
@@ -6009,12 +6016,12 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
   // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
   // The table calls a full woge "form"; Grimm keeps it as play.woge.
   const pickPlay = (c, gm = false) => { const p = c.play || {}, g = p.gun || {};
-    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, form: !!p.woge, lasting: p.lasting || [] };
+    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, frightened: !!p.frightened, form: !!p.woge, lasting: p.lasting || [] };
     if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
     // The files an enemy holds on this character: the GM sends the ones they've found out about (never the others).
     o.knownFiles = gm ? (p.files || []).filter((f) => f.found).map(({ holder, knows, gives, destroyed }) => ({ holder, knows, gives, destroyed: !!destroyed })) : p.knownFiles || [];
     return o; };
-  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
+  const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "frightened", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
     if ("form" in q) c.play.woge = !!q.form;
     if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
   const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
@@ -6130,6 +6137,8 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
     }
     else if (t.id === "f-dying") { ch.play.dying = t.checked; render(); }
     else if (t.id === "f-stunned") { ch.play.stunned = t.checked; render(); }
+    else if (t.id === "f-fright") { ch.play.frightened = t.checked; render(); }
+    else if (t.id === "r-fright") updateTarget();
     else if (t.id === "r-stun") { ch.play.stunned = t.checked; $("f-stunned").checked = t.checked; save(); updateTarget(); }
     else if (t.id === "r-skill") { $("r-phys").checked = PHYSICAL.has(t.value) || isBlock(t.value) || isParry(t.value); updateTarget(); renderGun(); }
     else if (["r-mod", "r-assist", "r-adv", "r-phys", "r-setting", "r-quality", "r-parries", "r-aim", "r-called", "r-weak", "r-second", "r-fine"].includes(t.id)) updateTarget();
@@ -8909,6 +8918,9 @@ function nextTurn(enc) {
   if (enc.status !== "combat") return;
   enc.commands.push({ type: "next" });
   const cur = active(enc);
+  // Frightened (core rules): at the end of each of their turns, they roll Will to shake it off.
+  if (cur && !isOut(cur) && (cur.conditions || []).some((/** @type {string} */ x) => /^frightened\b/i.test(x)) && !((cur.actions || 1) > (cur.acted || 0) + 1))
+    log(enc, "note", { text: `${cur.name}'s turn ends: roll Will to shake off being Frightened (+2 if hurt since it began).` });
   if (cur && !isOut(cur) && (cur.actions || 1) > (cur.acted || 0) + 1) {
     cur.acted = (cur.acted || 0) + 1;
     log(enc, "turn", { pid: cur.pid, name: cur.name, action: cur.acted + 1, of: cur.actions });
@@ -9561,6 +9573,8 @@ function mountLab(api) {
   const PTRACK = PACK.personalTrack || null; // a setting's personal price track (Corruption, Strain), kept on the character
   // A setting's Mind track (Aurora): psychic attacks mark it, Will resists them, and Mind Defense stops the weaker ones.
   const MT = PACK.mindTrack || null;
+  // Frightened (core rules): any condition named "Frightened" (or "Frightened of …").
+  const isFrightened = (/** @type {any} */ p) => !!p && (p.conditions || []).some((/** @type {string} */ x) => /^frightened\b/i.test(x));
   const BAND_NAMES = { melee: "In reach", close: "Close", short: "Short", medium: "Medium", long: "Long", extreme: "Extreme" };
 
   /** @type {{ mode: "published" | "lab", cfg: any, enc: any, history: any[], compare: any }} */
@@ -9759,7 +9773,7 @@ function mountLab(api) {
         ...(api.traitsFor ? api.traitsFor(c) : []), // a page's own way of granting them (from its advantages)
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
-      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo,
+      boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
       ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes, will: c.attrs.Will } : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
   }
   /** A threat from the setting's data. @param {any} t @param {string} name */
@@ -9819,6 +9833,7 @@ function mountLab(api) {
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       if ((c.play.injury || 0) !== p.injury || !!c.play.dying !== p.dying) E.override(en, rules(), LD, "injury", { pid: p.pid, injury: c.play.injury || 0, dying: !!c.play.dying, dead: p.dead, reason: "changed on the character card" });
       if (MT && (c.play.mind || 0) !== (p.mind || 0)) E.override(en, rules(), LD, "mind", { pid: p.pid, mind: c.play.mind || 0, reason: "changed on the character card" });
+      if (!!c.play.frightened !== isFrightened(p)) E.setCondition(en, p.pid, (p.conditions || []).find((x) => /^frightened\b/i.test(x)) || "Frightened", !!c.play.frightened);
       if ((c.play.duty || 0) !== p.points) E.override(en, rules(), LD, "points", { pid: p.pid, points: c.play.duty || 0, reason: "changed on the character card" });
       // A shapechanger who changed form on the card (the GM view, or the sheet's file) changes in the encounter too.
       const fm = p.form && api.formOf ? api.formOf(c) : null;
@@ -9834,6 +9849,7 @@ function mountLab(api) {
       if (p.kind !== "pc" || !p.ref) continue;
       const c = api.crew().find((x) => x.id === p.ref); if (!c) continue;
       c.play.injury = Math.min(3, p.injury); c.play.dying = p.dying; c.play.duty = p.points;
+      c.play.frightened = isFrightened(p);
       if (MT) c.play.mind = Math.min(MT.boxes, p.mind || 0);
       if (c.play.gun && p.ammo[c.play.gun.type] !== undefined) c.play.gun.rounds = p.ammo[c.play.gun.type];
       if (PTRACK && p.tracks) c.play.ptrack = Math.min(PTRACK.boxes, p.tracks[PTRACK.name] || 0);
@@ -9990,6 +10006,10 @@ function mountLab(api) {
       // A called shot names an effect this weapon can deliver (a pin needs a weapon in hand or a grapple).
       if (TH && $("lab-called").dataset.for !== (w ? w.id : "")) { const was = $("lab-called").value; $("lab-called").dataset.for = w ? w.id : ""; $("lab-called").innerHTML = `<option value="">None<\/option>` + LDX.tellingEffectsFor(w, r.skills).map((/** @type {any} */ [id, n]) => `<option value="${id}">${esc(n)} ${signed(TH.called)}<\/option><option value="${id}|small">${esc(n)}, small target ${signed(TH.small)}<\/option>`).join(""); $("lab-called").value = [...$("lab-called").options].some((o) => o.value === was) ? was : ""; }
       if (!TH) $("lab-called").value = "";
+      // Frightened (core rules): −2 to act against what frightens them. Ticked when they come up; the GM unticks it otherwise.
+      const fr = isFrightened(a);
+      if ($("lab-fright-wrap").hidden === fr) $("lab-fright").checked = fr;
+      $("lab-fright-wrap").hidden = !fr;
       // A dive: a flier strikes in reach at full speed.
       $("lab-dive-wrap").hidden = !(a && a.flies && w && w.reach === "melee");
       if ($("lab-dive-wrap").hidden) $("lab-dive").checked = false;
@@ -10033,7 +10053,8 @@ function mountLab(api) {
         called: $("lab-called-wrap").hidden || !$("lab-called").value ? null : { effect: $("lab-called").value.split("|")[0], small: $("lab-called").value.endsWith("|small") },
         teamUp: $("lab-team-wrap").hidden || !$("lab-team").value ? null : $("lab-team").value,
         dive: !$("lab-dive-wrap").hidden && $("lab-dive").checked,
-        cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [],
+        cover: $("lab-cover").value, boosts: $("lab-boost-wrap").hidden ? 0 : +$("lab-boost").value, situational: [...(+$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : []),
+          ...(!$("lab-fright-wrap").hidden && $("lab-fright").checked ? [{ label: "Frightened: against what frightens them", value: -2 }] : [])],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
     } else if (action === "aim") res = E.aim(en, r, a.pid, $("lab-target").value);
