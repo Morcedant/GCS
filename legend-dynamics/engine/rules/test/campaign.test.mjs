@@ -50,8 +50,16 @@ test("the generators roll from each setting's own tables, ready to change", () =
     assert.ok(person.name.split(" ").length >= 2 && P.campaign.names.first.includes(person.name.split(" ")[0]), id + ": a name from the setting");
     assert.ok(P.seeds.who[1].includes(person.role) || P.roles.some((r) => person.role === (/^[aeiou]/i.test(r.name) ? "An " : "A ") + r.name[0].toLowerCase() + r.name.slice(1)), id + ": who they are, from the setting");
     assert.ok(person.desc && person.goal && person.secret);
-    const place = CP.cpRoll(P, "places", c, seq(0.2, 0.6));
+    const place = CP.cpRoll(P, "places", c, seq(0.6, 0.2, 0.6));
     assert.ok(P.seeds.place[1].includes(place.name));
+    // A setting with towns (PACK.campaign.towns) rolls one half the time: a name from its parts, what it is, and what's wrong.
+    const TW = P.campaign.towns;
+    if (TW) {
+      const town = CP.cpRoll(P, "places", c, seq(0.2, 0.3, 0.7, 0.5, 0.1, 0.4, 0.9, 0.6));
+      assert.ok(TW.kind.includes(town.kind) && TW.wrong.includes(town.secret) && TW.first.some((f) => town.name.startsWith(f)), id + ": a town");
+      assert.ok(/^It lives on .+\. .+ runs it\. /.test(town.desc), town.desc);
+      assert.ok(P.campaign.tables.manner.some((m) => person.desc.startsWith(m)), id + ": the setting's own manners");
+    }
     const s = CP.cpRoll(P, "sessions", c, seq(0.4, 0.8, 0.15));
     assert.ok(P.seeds.mission[1].includes(s.title) && /Clock: .*segment clock/.test(s.threats) && s.scenes.split("\n").length === 4);
     const f = CP.cpRoll(P, "factions", c, seq(0.1, 0.3));

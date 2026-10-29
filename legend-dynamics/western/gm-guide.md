@@ -4,7 +4,52 @@ subtitle: "Running the Gothic Western: jobs, monsters, threats and the GM's tool
 author: "Don Smallwood"
 ---
 
-This book is for whoever runs the game. It gathers what the GM reaches for at the table: job seeds, the monsters' weaknesses and what their bites and curses do, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.
+This book is for whoever runs the game. It opens with a first job, ready to run, and gathers what the GM reaches for at the table: job seeds, the monsters' weaknesses and what their bites and curses do, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.
+
+# Your first job
+
+A ready-to-run monster hunt to start a campaign with. Everything it needs is here, the hook reaches hunters of any role, and the pregenerated characters in the creator are written into it.
+
+## The first job: Dead Man's Wages
+
+A starter job for three to six hunters, for one or two sessions. It's a monster hunt: strange deaths, a town that won't talk, an investigation that names the thing, and a descent into the dark to finish it. Along the way it shows off the trail, a showdown and the discovery clocks. It's written for the six pregenerated characters, and works for hunters of any role: the hook reaches each of them for a different reason.
+
+**The hook.** Each hunter gets a letter, a $50 bank draft and a reason to come. *Come to Mercy Springs. Something is killing my men in the Lazarus mine, and the company calls it cave-ins. Ask for me at the Silver Dollar. Ezra Quill, foreman.* Give each role its own way in:
+
+- **A lawman** has a stack of missing-person reports from Mercy Springs that nobody answered. Ruth Calloway knows Quill wrote to the Marshal's office a month ago.
+- **A doctor** is asked to look at bodies the company doctor won't sign for.
+- **A preacher** is asked to bury them, because the town's own preacher has fled.
+- **A gambler or a practitioner** hears the silver's still coming up, and that the cards turn up the Hanged Man for anyone who asks about the place. Lucinda Marsh's do, the night the letter comes.
+- **A bounty hunter** is offered the price on whatever is doing the killing.
+- **A cursed or a dead hunter** gets the letter in a hand they somehow know: the dead write to the dead. Isaiah Booker and Tom Feeney both feel it.
+
+**What's really happening.** The Lazarus mine broke into a burial cave older than the territory, and ghouls came up out of it. They take a miner a night and drag the bodies down to feed. Augustus Crane, who owns the mine, wants the silver more than the men; his foreman Ezra Quill wouldn't keep quiet, so Crane had him shot and buried two weeks ago. Quill rose at the next midnight. He's a revenant, and he wrote the letters. He'll help the hunters against the ghouls, because they're eating his men, but what he really wants is Crane.
+
+**1. The ride in.** Mercy Springs is a few days' ride: a trail clock of 4. Run it by *The trail* rules in the Players' Guide. Whatever the hazards are, the last day's is *Something on the trail*: drag marks leading off toward the hills, and a miner's boot with the foot still in it. Hunters with the Sight see that the marks were made by hands.
+
+**2. Mercy Springs.** A silver boomtown gone quiet. Every door is barred by sundown, and dogs won't go near the mine road. Miners drink in silence at the Silver Dollar; the widows sit together at the back. Sheriff Hiram Vance meets the hunters before they've watered their horses. He's in Crane's pocket, and tells them there's no work here. Ezra Quill? The sheriff buried him himself: a cave-in. The letter's postmark is from last Tuesday.
+
+**3. The digging.** Start a discovery clock for the creature, with the Harvest clock ticking beside it (*Lore cards*, in the Players' Guide): another miner goes missing each time it fills. The clues, and who finds them best:
+
+- **The bodies** (Medicine): the wounds were made by teeth, after death. The dead were dragged, not carried, and their fingernails are full of grave dirt that isn't theirs.
+- **The graveyard** (Investigation, Occult): Quill's grave is empty, dug out from below. The coffin lid is scratched on the inside. Three older graves have been opened from beneath and emptied.
+- **The widows** (Persuasion, Read People): their men came home with sand in their boots. There's no sand in a silver mine.
+- **The church** (Occult, or a preacher's standing): locked, the preacher gone. In his desk, a map of the Lazarus mine's lowest drift, marked *the old graves*, and a page torn from a hymnal with a warning written in the margin: *they come up where the dead are, and they hate the light.*
+- **The night watch** (Stealth, Shooting): a pale thing at a boarding house window, long-armed and quick, and a man in a burial suit shooting at it from the street. Hunters who give chase find a sinkhole behind the livery, and a tunnel going down.
+
+When the Identify phase is done, the hunters know what the creatures are: **ghouls**. They flee daylight and fire, and they drag their dead away. Filling the clock earns a lore card for what the hunters established.
+
+**4. The man in the burial suit.** Ezra Quill finds the hunters at midnight, when he rises. He's been holding the ghouls off on his own, a night at a time, and he's losing. He knows the mine, and he'll lead them down. Anyone with the Sight, or who's dead themselves, knows what he is at a glance; Isaiah Booker knows it in his bones. Quill doesn't hide it: he rises at the next midnight unless his grave is salted and burned, and he means to keep rising until Crane is in the ground.
+
+**5. The showdown.** At noon, Crane's gunman Cyrus Pruitt (an Outlaw, Will 11) calls out the hunter who's asked the most questions. Crane wants them gone before they go down the mine. Run it as a showdown. If they kill him with half the town watching, Sheriff Vance calls it murder and Heat marks a box. If the hunters back down, Pruitt follows them to the mine that night, and the ghouls find him first.
+
+**6. The Lazarus mine.** The lowest drift opens into the burial cave, a place of niches cut in the rock and bones older than any tribe in the territory. There are three ghouls, plus one more for each time the Harvest clock has filled. They fight in the dark and drag the fallen away. Lamps, torches and lamp oil keep them back; a burning drift holds them for a scene. The missing miners are here, what's left of them. Dynamite seals the cave, if someone can set it and get clear, or the hunters can burn the ghouls out a niche at a time. At the back of the cave, something older is sleeping under the stones. The hunters don't have to wake it, but someone may want to come back.
+
+**7. Midnight at the Crane house.** With the ghouls finished, Quill goes for Crane, and Crane's two hired guns stand in his way. The hunters choose: help a dead man take his revenge, stand aside, or stop him. Ruth Calloway's badge says Crane should hang by the law; Quill doesn't believe the law will do it. Crane's ledger in his safe shows the payments to the sheriff and the order on Quill. Stopping Quill for good means salting and burning his grave before the next midnight, and he knows it.
+
+**Rewards.** The $50 drafts, and whatever Crane's safe holds. A lore card on ghouls, and another on revenants if the hunters learned how one is laid to rest. If the mine is sealed, Mercy Springs remembers the hunters well: clear a box of Whispers. If the ghouls were seen in the street, mark one. And something still sleeps at the back of the cave, so The Dark marks a box.
+
+**Threats.** Ghoul ×3 or more; Outlaw (Cyrus Pruitt); Hired gun ×2; Revenant gunslinger (Ezra Quill). Sheriff Vance is a Hired gun who won't draw first.
 
 # Running jobs
 
@@ -182,6 +227,7 @@ Opponents use the same rules as the characters. **Minor opponents** (hired guns,
 |---|---|---|---|---|---|
 | Hired gun (minor) | Shooting 11 | 7 | 1 | Revolver | **Numbers.** Two or three of them; they flee when half are down. |
 | Outlaw | Shooting 13, Brawling 11 | 9 | 3 | Revolver, rifle | **Quick draw.** +2 on the first shot of a fight. |
+| Bounty hunter | Shooting 14, Brawling 12 | 9 | 3 | Revolver, rifle, club | **The price on your head.** +2 to track anyone with a poster out, and +2 on the draw in a showdown. Takes you alive if the poster says Alive; doesn't if it says Dead or Alive. |
 | Zombie (minor, many) | Brawling 10 | 4 | 1 each | Bite (1) | **Horde.** Only a headshot (−2) or fire puts one down; other hits just knock it over. Its bite infects. |
 | Ghoul | Brawling 12, Stealth 13 | 8 | 3 | Claws (2) | **Corpse-eater.** Drags the fallen away; flees daylight and fire. |
 | Werewolf | Brawling 14, Tracking 14 | 10 | 4 | Claws and fangs (2) | **Relentless.** Ignores the Wounded penalty; only silver marks more than 1 box at a time. |
@@ -220,3 +266,12 @@ The GM view of the character creator has a **battle map** for fights where it he
 The GM view also has an **Encounter** panel that runs a fight by the *Personal combat* rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit, offering a Grit point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so. For each attack, choose what it's made of (silver, cold iron, a wooden stake, fire, rock salt or blessed), and the panel applies the rules that turn on it: a shapechanger's Tough in their form (and what gets past it), a weakness that marks one box more, and a creature only the right weapon can hurt.
 
 **The shared table.** The GM can start a shared table from the GM view and give the players its code; each player joins from their character's Ride tab. While they're connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the Ride tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Each player's character is shared with the GM too: it appears among the GM view's characters, marked at the table, and its injuries, points, ammunition and form stay in step both ways, whether they're changed on the sheet, on the GM's card or in an encounter. In a fight, each player's Ride tab shows the GM's battle map and the encounter's turn order and latest results; a player drags their own token, and on their turn sends the GM what they'll do, which the GM puts into the Encounter panel and runs. The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.
+
+## Towns, strangers and the frontier tools
+
+The GM view has tools made for the frontier:
+
+- **The Campaign tab's generators** roll from Trails' own tables. A rolled place is half the time a frontier town: its name, what it lives on, who runs it, and what's wrong there (the secret). A rolled person gets a frontier manner, a want and a secret.
+- **Wanted posters** (in *Clocks and tools*): choose a character, the name on the poster, the crimes (or roll them), and the reward, which follows Heat. **Put up the poster** puts it on that character's sheet, and through the shared table on the player's own page. **Take it down** when the warrant is answered.
+- **The trail** (in *Clocks and tools*): start a ride and it goes on the clocks. **Roll the day** rolls the guide's Survival with the modifiers in force, fills the clock, counts down the supplies and, on a failure, rolls the hazard.
+- **Showdowns** run in the Encounter panel: **Showdown: the staredown** rolls Will against Will, and **Showdown: the draw** rolls Shooting against Shooting and fires the shots. A bounty hunter and an outlaw have their quick draw in the panel already; a threat's Will is estimated unless its entry gives one.

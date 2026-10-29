@@ -408,6 +408,18 @@ tr.lvl-U td.target { color: var(--muted); }
 .adv-list { margin: 0; padding-left: 1.2em; }
 
 /* GM view */
+/* Wanted posters (frontier.js): a printed bill, the same paper in either theme */
+.wanted-poster { display: grid; justify-items: center; gap: 2px; max-width: 320px; margin: 10px auto; padding: 16px 14px 14px; text-align: center;
+  background: #eadcb8; color: #2a1d10; border: 1px solid #8a6a3a; box-shadow: 0 6px 18px rgba(0, 0, 0, .35); font-family: var(--display); }
+.wanted-poster .wp-top { font-family: var(--title); font-size: 2.2rem; letter-spacing: .12em; text-transform: uppercase; line-height: 1; }
+.wanted-poster .wp-doa { font-size: .8rem; letter-spacing: .3em; text-transform: uppercase; border-block: 2px solid #2a1d10; padding: 2px 8px; margin: 4px 0; }
+.wanted-poster .wp-name { font-size: 1.35rem; letter-spacing: .06em; text-transform: uppercase; overflow-wrap: anywhere; }
+.wanted-poster .wp-aka, .wanted-poster .wp-by { font: italic .8rem/1.3 var(--body); }
+.wanted-poster .wp-for { font: .92rem/1.35 var(--body); }
+.wanted-poster .wp-reward { font-family: var(--title); font-size: 1.6rem; letter-spacing: .06em; margin-top: 4px; }
+#wanted-card input[type="number"], #trail-card input[type="number"] { width: 100%; font: inherit; color: var(--fg); background: var(--well); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; }
+.wp-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; align-items: end; margin-top: 8px; }
+
 /* Campaign builder (campaign.js) and homebrew's bonus boxes */
 .cp-sec { margin-top: 10px; } .cp-sec > summary { cursor: pointer; padding: 6px 0; }
 .cp-form { margin: 8px 0 12px; }
@@ -1006,6 +1018,8 @@ tr.lvl-U td.target { color: var(--muted); }
         </div>
         <div class="toast" id="seed-msg" role="status" aria-live="polite"></div>
       </div>
+      <div class="card hud no-print" id="wanted-card" hidden></div>
+      <div class="card hud no-print" id="trail-card" hidden></div>
       <div class="card hud no-print" id="gm-gritty-card" hidden>
         <h3>Gritty combat</h3>
         <label class="gritty-toggle"><input type="checkbox" id="gm-gritty"> <b>Gritty combat in this campaign</b></label>
@@ -1113,6 +1127,7 @@ tr.lvl-U td.target { color: var(--muted); }
           </div>
         </div>
 
+        <div class="card hud no-print" id="card-wanted" hidden></div>
         <div class="card hud no-print" id="hb-note" hidden></div>
         <div class="card hud no-print" id="cp-note" hidden></div>
         <div class="card hud no-print" id="card-table"></div>
@@ -1226,6 +1241,7 @@ tr.lvl-U td.target { color: var(--muted); }
   const TABLE_SERVER = "{{TABLE_SERVER}}"; // the shared table server (legend-dynamics/table-server), set at build time
   let sharedTable = null; // mounted with the GM view below
   let homebrewUI = null; // homebrew.js: mounted with the guides below
+  let wantedUI = null; // frontier.js: wanted posters in the GM view
   let campaignUI = null; // campaign.js: the GM's campaign builder, mounted with homebrew
   // Advancement point costs (core rules, Advancement). Magic and powers use the costs their chapters give.
   const COSTS = { UT: 1, TS: 2, revise: 1, edge: 3, attr: 4 };
@@ -1489,6 +1505,8 @@ tr.lvl-U td.target { color: var(--muted); }
     const files = (v) => (Array.isArray(v) ? v : []).filter((f) => f && typeof f === "object").slice(0, 40);
     out.play.files = files(out.play.files).map((f) => ({ id: fs(f.id, 20) || uid(), ...fileOf(f), found: !!f.found })).filter((f) => f.holder && f.knows);
     out.play.knownFiles = files(out.play.knownFiles).map(fileOf).filter((f) => f.holder && f.knows);
+    out.play.frightened = !!out.play.frightened;
+    if (PACK.wanted) out.play.wanted = wantedClean(out.play.wanted); else delete out.play.wanted;
     out.play.knownBy = [...new Set((Array.isArray(out.play.knownBy) ? out.play.knownBy : []).map((w) => fs(w, 60).trim()).filter(Boolean))].slice(0, 16);
     return out;
   }
@@ -1841,6 +1859,9 @@ tr.lvl-U td.target { color: var(--muted); }
     LOADS.forEach(([k]) => ($("ld-" + k).checked = ch.loads.includes(k)));
     $("f-stunned").checked = !!ch.play.stunned;
     $("f-fright").checked = !!ch.play.frightened;
+    // A wanted poster the GM put out on this character (PACK.wanted).
+    $("card-wanted").hidden = !(PACK.wanted && ch.play.wanted);
+    if (!$("card-wanted").hidden) $("card-wanted").innerHTML = `<h3>${esc(PACK.wanted.sheetTitle || "Wanted")}</h3>${wantedHTML(ch.play.wanted, esc, PACK, ch.name)}<p class="small muted">${esc(PACK.wanted.sheetNote || "")}</p>`;
     $("f-contact").value = ch.contact; $("f-gearitem").value = ch.gear.item; $("f-gearuse").value = ch.gear.use || ""; $("f-adv2detail").value = ch.adv2.detail;
   }
 
@@ -2521,13 +2542,15 @@ tr.lvl-U td.target { color: var(--muted); }
   function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
   // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
   const pickPlay = (c, gm = false) => { const p = c.play || {}, g = p.gun || {};
-    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, frightened: !!p.frightened, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, mind: p.mind || 0, knownBy: p.knownBy || [], lasting: p.lasting || [] };
+    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, frightened: !!p.frightened, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, mind: p.mind || 0, knownBy: p.knownBy || [], lasting: p.lasting || [],
+      ...(PACK.wanted ? { wanted: p.wanted || null } : {}) };
     // The files a villain holds on this hero: the GM sends the ones the hero has found out about (never the others);
     // the player's page passes on what it was sent.
     if (HFILES) o.knownFiles = gm ? (p.files || []).filter((f) => f.found).map(({ holder, knows, gives, destroyed }) => ({ holder, knows, gives, destroyed: !!destroyed })) : p.knownFiles || [];
     if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
     return o; };
   const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "frightened", "form", "ptrack", "xtrack", "mind", "knownBy", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
+    if (PACK.wanted && "wanted" in q) c.play.wanted = wantedClean(q.wanted);
     if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
   const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
@@ -2785,6 +2808,7 @@ tr.lvl-U td.target { color: var(--muted); }
   if (!ship || typeof ship !== "object") ship = {};
   const shipEffect = (name, n) => (PACK.tracks.find((t) => t.name === name)?.effects || [])[n] || "";
   function renderShip() {
+    if (wantedUI) wantedUI.render(); // the poster's reward follows the law's track
     $("ship").innerHTML = SHIP_TRACKS.map(([name, max]) => {
       const n = Math.min(max, ship[name] || 0);
       return `<div class="ship-row ${n >= max ? "out" : n ? "hit" : ""}"><span class="label">${name}</span>
@@ -2936,6 +2960,7 @@ tr.lvl-U td.target { color: var(--muted); }
   /* GMLOCK */
   /* HOMEBREW */
   /* CAMPAIGN */
+  /* FRONTIER */
   // The shared table: players join from their play tab, the GM starts one here, and every roll at the table shows on both.
   sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay, pointName: T.point, partyName: T.party,
     server: TABLE_SERVER, character: () => ch.name, esc, toast,
@@ -3822,6 +3847,16 @@ tr.lvl-U td.target { color: var(--muted); }
   // Homebrew: the GM makes it in the GM view; players get it from a file or when they join the GM's shared table.
   homebrewUI = mountHomebrew({ PACK, gmRoot: $("hb-card"), noteRoot: $("hb-note"), fileRoot: $("hb-file"), ritualRoot: $("hb-rituals"), heartInput: $("f-ma-heart"), esc, toast, saveText });
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
+  // Frontier tools (frontier.js): wanted posters and the trail, for a setting with them.
+  if (PACK.wanted) { $("wanted-card").hidden = false;
+    wantedUI = mountWanted({ PACK, root: $("wanted-card"), esc, crew: () => gmCrew, level: () => Math.min(4, ship[PACK.wanted.track] || 0),
+      setWanted: (c, w) => { c.play.wanted = w; saveGM(); renderGM(); }, toast: gmSay }); }
+  if (PACK.trail) { $("trail-card").hidden = false;
+    mountTrail({ PACK, root: $("trail-card"), esc, crew: () => gmCrew, toast: gmSay,
+      skillOf: (c, sk) => { const saved = ch; ch = c; try { return skillTarget(sk); } finally { ch = saved; } },
+      addClock: (name, size) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind: "progress", filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); return nc.id; },
+      clockOf: (id) => clocks.find((x) => x.id === id) || null,
+      fillClock: (id, n) => { const c = clocks.find((x) => x.id === id); if (!c || !n) return; const was = c.filled; c.filled = Math.min(c.size, c.filled + n); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, was, c.filled); } }); }
   campaignUI = mountCampaign({ PACK, gmRoot: $("cp-card"), noteRoot: $("cp-note"), esc, toast, saveText, onShare: () => pushScene(),
     cards: () => gmCrew.flatMap((c) => c.cards || []), words: DISC ? { card: DISC.card, cards: DISC.cards } : null }); // triggers: the group's cards
   pushScene();

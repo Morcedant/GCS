@@ -629,7 +629,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="5cb167f" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · 5cb167f</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="f9ed7e3" data-version-date="2026.10.29" title="The code changes whenever this page changes.">Version 2026.10.29 · f9ed7e3</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1076,6 +1076,12 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
               <div class="field" style="flex:0 0 6.5em" id="lab-skill-wrap"><label for="lab-skill">Skill target</label><input type="number" id="lab-skill" min="1" max="30"></div>
               <div class="field" style="flex:1 1 16em"><label for="lab-defense">Target's defense</label><select id="lab-defense"></select>
                 <span class="small muted" id="lab-dodge-note" role="status"></span></div>
+            </div>
+            <div class="lab-row" id="lab-sd-row" style="margin-top:8px" hidden>
+              <div class="field"><label for="lab-sd-mine" id="lab-sd-mine-label">Their gun</label><select id="lab-sd-mine"></select></div>
+              <div class="field"><label for="lab-sd-theirs" id="lab-sd-theirs-label">Opponent's gun</label><select id="lab-sd-theirs"></select></div>
+              <div class="field"><label for="lab-sd-band">Range</label><select id="lab-sd-band"></select></div>
+              <p class="small muted" id="lab-sd-note" style="flex:1 1 100%;margin:0"></p>
             </div>
             <p class="small" id="lab-reach" hidden style="margin:6px 0 0"></p>
             <div class="lab-row" id="lab-text-row" style="margin-top:8px" hidden>
@@ -7344,7 +7350,8 @@ function cpSeed(PACK, k, rnd) {
 }
 /** A rolled entry of a kind, every field filled in, ready to change in its form. @param {() => number} rnd */
 function cpRoll(PACK, kind, c, rnd = Math.random) {
-  const T = cpTables(), al = (PACK.allegiances || []).filter((a) => a[0]);
+  // The setting's own tables (PACK.campaign.tables) take the place of the general ones they name.
+  const T = { ...cpTables(), ...((PACK.campaign && PACK.campaign.tables) || {}) }, al = (PACK.allegiances || []).filter((a) => a[0]);
   const factionNames = [...(c ? c.factions.map((f) => f.name) : []), ...al.map((a) => a[1])];
   const threats = (PACK.threats || []).filter((t) => !t.minor).map((t) => t.name);
   if (kind === "people") {
@@ -7354,6 +7361,10 @@ function cpRoll(PACK, kind, c, rnd = Math.random) {
     return { name: cpName(PACK, rnd), role, faction: rnd() < 0.6 ? cpPick(factionNames, rnd) : "", desc: `${cpPick(T.manner, rnd)}.`,
       goal: cpCap(cpPick(T.want, rnd)), secret: cpPick(T.secret, rnd) };
   }
+  // A town (PACK.campaign.towns: name parts, what it lives on, who runs it, what's wrong), half the time in a setting with them.
+  const TW = PACK.campaign && PACK.campaign.towns;
+  if (kind === "places" && TW && rnd() < 0.5) return { name: `${cpPick(TW.first, rnd)}${cpPick(TW.second, rnd)}`, kind: cpPick(TW.kind, rnd),
+    desc: `It lives on ${cpLow(cpPick(TW.livesOn, rnd))}. ${cpPick(TW.runs, rnd)} runs it. ${cpPick(T.feature, rnd)}`, secret: cpPick(TW.wrong, rnd) };
   if (kind === "places") return { name: cpSeed(PACK, "place", rnd), kind: "", desc: cpPick(T.feature, rnd), secret: `${cpSeed(PACK, "strange", rnd)}.` };
   if (kind === "factions") {
     const a = rnd() < 0.5 && al.length ? cpPick(al, rnd) : null;
@@ -8437,6 +8448,74 @@ function mindAttack(enc, rules, core, cmd, opts, x) {
   return { event: ev };
 }
 
+/** A contest by the core rules: a success beats a failure; if both succeed, the larger margin wins; anything else is a tie.
+ * 1 if the first roll wins, −1 if the second does, 0 for a tie. @param {any} ra @param {any} rb */
+const contest = (ra, rb) => (ra.success !== rb.success ? (ra.success ? 1 : -1) : ra.success && ra.contestMargin !== rb.contestMargin ? (ra.contestMargin > rb.contestMargin ? 1 : -1) : 0);
+
+/**
+ * A showdown (Trails of Blood & Dust): two duelists settle it in the street, in two steps.
+ * "stare": the staredown, Will against Will. The winner gets +2 on the draw; anyone who fails their Will roll by 5 or more
+ *   has lost their nerve, and may back down before the draw (the GM's call: no roll for it).
+ * "draw": Shooting against Shooting (the weapon's skill), with the staredown's +2, any drawBonus (Quick Draw) and wound
+ *   penalties. The winner fires first; a tie fires together (unless one of them has drawFirst, the Gunslinger's quick draw,
+ *   and wins it). The shots are ordinary attacks that can't be dodged. The one fired on shoots back if still standing,
+ *   unless they fumbled the draw (failed it by 5 or more). After that it's an ordinary fight, or it's over.
+ * cmd: { phase, attacker, defender, weapon, defWeapon, band, situational? (to the attacker's draw) }
+ * @param {any} enc @param {any} rules @param {any} core @param {any} cmd
+ */
+function showdown(enc, rules, core, cmd) {
+  const a = find(enc, cmd.attacker), d = find(enc, cmd.defender);
+  if (!a || !d || a === d) return { error: "Choose the two duelists." };
+  if (isOut(a) || isOut(d)) return { error: `${isOut(a) ? a.name : d.name} can't face anyone now.` };
+  const n = enc.events.filter((/** @type {any} */ e) => e.type === "showdown").length;
+  const roll = (/** @type {string} */ kind, /** @type {number} */ target) => core.resolve(core.diceFor(enc.seed, `sd${n}|${a.pid}>${d.pid}|${kind}`), target);
+  const sum = (/** @type {any[]} */ l) => l.reduce((t, m) => t + m.value, 0);
+  const wound = (/** @type {any} */ p) => { const v = core.INJURY_PENALTY[p.injury || 0] || 0; return v ? [{ label: "Wounds", value: v }] : []; };
+  const pair = (/** @type {any} */ e) => (e.a.pid === a.pid && e.d.pid === d.pid) || (e.a.pid === d.pid && e.d.pid === a.pid);
+  if (cmd.phase === "stare") {
+    const ma = wound(a), md = wound(d), ta = (a.will ?? 10) + sum(ma), td = (d.will ?? 10) + sum(md);
+    const ra = roll("stareA", ta), rd = roll("stareD", td), w = contest(ra, rd);
+    const broke = [[a, ra], [d, rd]].filter(([, r]) => !r.success && r.margin <= -5).map(([p]) => ({ pid: p.pid, name: p.name }));
+    const ev = log(enc, "showdown", { phase: "stare", a: { pid: a.pid, name: a.name }, d: { pid: d.pid, name: d.name },
+      rolls: [{ pid: a.pid, base: a.will ?? 10, mods: ma, target: ta, dice: ra.dice, total: ra.total, margin: ra.margin, success: ra.success },
+        { pid: d.pid, base: d.will ?? 10, mods: md, target: td, dice: rd.dice, total: rd.total, margin: rd.margin, success: rd.success }],
+      winner: w > 0 ? { pid: a.pid, name: a.name } : w < 0 ? { pid: d.pid, name: d.name } : null, broke });
+    enc.commands.push({ type: "showdown", cmd: clone(cmd) });
+    return { event: ev };
+  }
+  if (cmd.phase !== "draw") return { error: "Staredown or draw?" };
+  const wa = rules.weapons[cmd.weapon], wd = rules.weapons[cmd.defWeapon];
+  if (!wa || !wd) return { error: "Choose both duelists' guns." };
+  const sa = a.skills[wa.skill], sd = d.skills[wd.skill];
+  if (sa === undefined || sd === undefined) return { error: `${sa === undefined ? a.name : d.name} has no ${(sa === undefined ? wa : wd).skill} target.` };
+  // The last staredown between these two since their last draw.
+  const last = [...enc.events].reverse().find((/** @type {any} */ e) => e.type === "showdown" && pair(e));
+  const stare = last && last.phase === "stare" ? last : null;
+  const mods = (/** @type {any} */ p) => [...(stare && stare.winner && stare.winner.pid === p.pid ? [{ label: "Won the staredown", value: 2 }] : []),
+    ...(p.drawBonus ? [{ label: "Quick Draw", value: p.drawBonus }] : []), ...wound(p),
+    ...(p === a ? (cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ label: m.label || "Situation", value: +m.value })) : [])];
+  const ma = mods(a), md = mods(d), ta = +sa + sum(ma), td = +sd + sum(md);
+  const ra = roll("drawA", ta), rd = roll("drawD", td);
+  let w = contest(ra, rd);
+  const tieBreak = !w && !!a.drawFirst !== !!d.drawFirst ? (a.drawFirst ? 1 : -1) : 0;
+  if (tieBreak) w = tieBreak;
+  const fumbled = [[a, ra], [d, rd]].filter(([, r]) => !r.success && r.margin <= -5).map(([p]) => p.pid);
+  const ev = log(enc, "showdown", { phase: "draw", a: { pid: a.pid, name: a.name }, d: { pid: d.pid, name: d.name }, band: cmd.band,
+    rolls: [{ pid: a.pid, skill: wa.skill, base: +sa, mods: ma, target: ta, dice: ra.dice, total: ra.total, margin: ra.margin, success: ra.success },
+      { pid: d.pid, skill: wd.skill, base: +sd, mods: md, target: td, dice: rd.dice, total: rd.total, margin: rd.margin, success: rd.success }],
+    winner: w > 0 ? { pid: a.pid, name: a.name } : w < 0 ? { pid: d.pid, name: d.name } : null, tieBreak: !!tieBreak, fumbled });
+  enc.commands.push({ type: "showdown", cmd: clone(cmd) });
+  // The shots: ordinary attacks, no Dodge. Together on a tie; otherwise the winner first, and the other back if they can.
+  const shot = (/** @type {any} */ x, /** @type {any} */ y, /** @type {string} */ wid) => attack(enc, rules, core, { attacker: x.pid, defender: y.pid, weapon: wid, band: cmd.band, canDodge: false, showdown: ev.n });
+  const shots = [], cmds = enc.commands.length;
+  const [first, second, w1, w2] = w >= 0 ? [a, d, cmd.weapon, cmd.defWeapon] : [d, a, cmd.defWeapon, cmd.weapon];
+  if (!fumbled.includes(first.pid)) shots.push(shot(first, second, w1));
+  if (!fumbled.includes(second.pid) && (w === 0 || !isOut(second))) shots.push(shot(second, first, w2));
+  enc.commands.length = cmds; // the showdown command replays its own shots
+  const err = shots.find((r) => r && r.error);
+  return err ? { event: ev, error: err.error } : { event: ev, shots: shots.map((r) => r.event) };
+}
+
 /**
  * The attacker picks a telling hit's effect (or changes it). @param {any} enc @param {number} n @param {string} effect
  */
@@ -8692,12 +8771,13 @@ function replay(enc, rules, core, config) {
     else if (c.type === "next") nextTurn(r);
     else if (c.type === "aim") { if (aim(r, rules, c.pid, c.target).error) skipped++; }
     else if (c.type === "attack") { if (attack(r, rules, core, c.cmd).error) skipped++; }
+    else if (c.type === "showdown") { const x = showdown(r, rules, core, c.cmd); if (x.error) skipped++; }
   }
   r.skipped = skipped;
   return { encounter: r };
 }
 
-return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, defenseOptions, chooseDefense, attack, tellingEffect, shrugTelling, tradeLimb, spendPoint, setTrait, setForm, addGear, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
+return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, defenseOptions, chooseDefense, attack, showdown, tellingEffect, shrugTelling, tradeLimb, spendPoint, setTrait, setForm, addGear, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
 })();
 const LAB_STATS = (() => {
 /**
@@ -8823,6 +8903,8 @@ function mountLab(api) {
   const PTRACK = PACK.personalTrack || null; // a setting's personal price track (Corruption, Strain), kept on the character
   // A setting's Mind track (Aurora): psychic attacks mark it, Will resists them, and Mind Defense stops the weaker ones.
   const MT = PACK.mindTrack || null;
+  // Showdowns (PACK.showdown): { skill (the draw), band, drawBonus: { advantage id: bonus }, drawFirst: ability effect that wins a tied draw }.
+  const SD = PACK.showdown || null;
   // Frightened (core rules): any condition named "Frightened" (or "Frightened of …").
   const isFrightened = (/** @type {any} */ p) => !!p && (p.conditions || []).some((/** @type {string} */ x) => /^frightened\b/i.test(x));
   const BAND_NAMES = { melee: "In reach", close: "Close", short: "Short", medium: "Medium", long: "Long", extreme: "Extreme" };
@@ -9024,7 +9106,13 @@ function mountLab(api) {
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
-      ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes, will: c.attrs.Will } : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
+      ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes } : {}), will: c.attrs.Will, ...(SD ? sdTraits(c) : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
+  }
+  /** A character's edge in a showdown: Quick Draw's bonus (an advantage), and an ability that wins a tied draw. @param {any} c */
+  function sdTraits(c) {
+    const bonus = Math.max(0, ...[c.adv, c.adv2].filter(Boolean).map((/** @type {any} */ x) => (SD.drawBonus || {})[x.id] || 0));
+    const role = !c.customRole && (PACK.roles || []).find((/** @type {any} */ x) => x.name === c.dept);
+    return { ...(bonus ? { drawBonus: bonus } : {}), ...(role && SD.drawFirst && (role.abilityFx || []).includes(SD.drawFirst) ? { drawFirst: true } : {}) };
   }
   /** A threat from the setting's data. @param {any} t @param {string} name */
   function fromThreat(t, name) {
@@ -9035,7 +9123,8 @@ function mountLab(api) {
     return { kind: "npc", name, side: "foe", ...(strength ? { strength } : {}), ...(t.actFirst ? { actFirst: true } : {}), ...(t.actions > 1 ? { actions: t.actions } : {}), ...(t.flies ? { flies: true } : {}), agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
       boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo,
       // The Mind track: as many boxes as the body (one for a minor opponent); Will as given, or estimated.
-      ...(MT ? { mind: 0, mindBoxes: t.minor ? 1 : t.boxes || 3, will: t.will ?? (t.minor ? 9 : t.named ? 12 : 10), ...(t.will === undefined ? { willEstimated: true } : {}) } : {}), note: `${t.trait}: ${t.traitText}`,
+      ...(MT ? { mind: 0, mindBoxes: t.minor ? 1 : t.boxes || 3 } : {}), ...(MT || SD ? { will: t.will ?? (t.minor ? 9 : t.named ? 12 : 10), ...(t.will === undefined ? { willEstimated: true } : {}) } : {}),
+      ...(SD && (t.drawBonus || (SD.threatDrawBonus || {})[t.id]) ? { drawBonus: t.drawBonus || SD.threatDrawBonus[t.id] } : {}), note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
   function ensureEnc() {
@@ -9212,7 +9301,7 @@ function mountLab(api) {
     $("lab-actor").innerHTML = en.order.map((/** @type {string} */ pid) => { const p = E.find(en, pid); return `<option value="${pid}">${esc(p.name)}${act && act.pid === pid ? " (turn)" : ""}<\/option>`; }).join("");
     $("lab-actor").value = prevActor; $("lab-actor").dataset.turn = turnKey;
     const a = pickActor();
-    const actions = [["attack", "Attack"], ...(r.actions.has("aim") ? [["aim", "Aim"]] : []), ["point", `Spend a ${T.point} point`], ["complication", "Complication comes into play"], ["condition", "Add a condition"], ["note", "Note"]];
+    const actions = [["attack", "Attack"], ...(r.actions.has("aim") ? [["aim", "Aim"]] : []), ...(SD ? [["stare", "Showdown: the staredown"], ["draw", "Showdown: the draw"]] : []), ["point", `Spend a ${T.point} point`], ["complication", "Complication comes into play"], ["condition", "Add a condition"], ["note", "Note"]];
     const pa = $("lab-action").value;
     $("lab-action").innerHTML = actions.map(([v, n]) => `<option value="${v}">${esc(n)}<\/option>`).join("");
     $("lab-action").value = actions.some(([v]) => v === pa) ? pa : "attack";
@@ -9222,7 +9311,8 @@ function mountLab(api) {
     if (targets.some((/** @type {any} */ p) => p.pid === pt)) $("lab-target").value = pt;
     else { const foe = targets.find((/** @type {any} */ p) => a && p.side !== a.side && !E.isOut(p)); if (foe) $("lab-target").value = foe.pid; }
     $("lab-target").dataset.actor = a ? a.pid : "";
-    $("lab-target").closest(".field").hidden = !["attack", "aim"].includes(action);
+    $("lab-target").closest(".field").hidden = !["attack", "aim", "stare", "draw"].includes(action);
+    renderShowdown(en, r, a, action);
     $("lab-atk-row").hidden = action !== "attack";
     $("lab-reach").hidden = true; // the map check below shows it again for an attack
     $("lab-text-row").hidden = !["point", "complication", "condition", "note"].includes(action);
@@ -9288,6 +9378,23 @@ function mountLab(api) {
         : used.length ? `${d.name} has already used ${used.join(" and ")} this round${used.includes("dodge") ? " (one Dodge a round in the published rules)" : ""}. Choose it anyway to allow it: it's logged as a GM override.` : "";
     }
   }
+  // A showdown (PACK.showdown: Trails of Blood & Dust): who's facing whom, each one's gun, and the range.
+  function renderShowdown(/** @type {any} */ en, /** @type {any} */ r, /** @type {any} */ a, /** @type {string} */ action) {
+    const on = !!SD && (action === "stare" || action === "draw") && !!a;
+    $("lab-sd-row").hidden = !on;
+    if (!on) return;
+    const d = E.find(en, $("lab-target").value), draw = action === "draw";
+    for (const id of ["lab-sd-mine", "lab-sd-theirs", "lab-sd-band"]) $(id).closest(".field").hidden = !draw;
+    const guns = (/** @type {any} */ p) => (p ? p.weapons.filter((/** @type {string} */ w) => r.weapons[w] && r.weapons[w].skill === SD.skill) : []);
+    const fill = (/** @type {string} */ id, /** @type {any} */ p) => { const was = $(id).value, g = guns(p); $(id).innerHTML = g.map((/** @type {string} */ w) => `<option value="${w}">${esc(r.weapons[w].name)}${p.skills[SD.skill] !== undefined ? ` (${SD.skill} ${p.skills[SD.skill]})` : ""}<\/option>`).join("") || `<option value="">No ${esc(SD.skill)} weapon<\/option>`; if (g.includes(was)) $(id).value = was; };
+    fill("lab-sd-mine", a); fill("lab-sd-theirs", d);
+    $("lab-sd-mine-label").textContent = `${a.name}'s gun`; $("lab-sd-theirs-label").textContent = d ? `${d.name}'s gun` : "Opponent's gun";
+    if (!$("lab-sd-band").options.length) { $("lab-sd-band").innerHTML = LD.BANDS.filter((/** @type {string} */ b) => b !== "melee").map((/** @type {string} */ b) => `<option value="${b}">${BAND_NAMES[b]}<\/option>`).join(""); $("lab-sd-band").value = SD.band || "short"; }
+    const will = (/** @type {any} */ p) => `${p.name} ${p.will ?? 10}${p.will === undefined || p.willEstimated ? " (estimated)" : ""}`;
+    const last = d ? [...en.events].reverse().find((/** @type {any} */ e) => e.type === "showdown" && [e.a.pid, e.d.pid].sort().join() === [a.pid, d.pid].sort().join()) : null;
+    $("lab-sd-note").textContent = !d ? "" : !draw ? `Will against Will: ${will(a)}, ${will(d)}. The winner gets +2 on the draw; failing by 5 or more loses their nerve, and they may back down before the draw.`
+      : `${last && last.phase === "stare" ? (last.winner ? `${last.winner.name} won the staredown: +2. ` : "The staredown was a tie. ") : "No staredown yet: roll one first, or draw now. "}The winner fires first and the shots can't be dodged; a tie fires together.`;
+  }
   $("lab-act-wrap").addEventListener("change", (/** @type {any} */ e) => { if (["lab-actor", "lab-action", "lab-target", "lab-weapon"].includes(e.target.id)) renderAction(); });
   $("lab-go").onclick = () => {
     const en = enc(), r = rules(), a = pickActor(), action = $("lab-action").value, text = $("lab-text").value.trim();
@@ -9307,16 +9414,22 @@ function mountLab(api) {
           ...(!$("lab-fright-wrap").hidden && $("lab-fright").checked ? [{ label: "Frightened: against what frightens them", value: -2 }] : [])],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
+    } else if (action === "stare" || action === "draw") {
+      res = E.showdown(en, r, LD, { phase: action, attacker: a.pid, defender: $("lab-target").value, weapon: $("lab-sd-mine").value, defWeapon: $("lab-sd-theirs").value, band: $("lab-sd-band").value,
+        situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [] });
     } else if (action === "aim") res = E.aim(en, r, a.pid, $("lab-target").value);
     else if (action === "point") res = E.spendPoint(en, r, LD, a.pid, "prep", { note: text });
     else if (action === "complication") res = E.invokeComplication(en, a.pid, text);
     else if (action === "condition") res = E.setCondition(en, a.pid, text, true);
     else if (action === "note") res = E.note(en, text);
-    if (res.error) { say(res.error, true); return; }
+    if (res.error && !res.event) { say(res.error, true); return; }
     if (action !== "attack") $("lab-text").value = "";
     $("lab-sit").value = 0; $("lab-sit-label").value = "";
     pushToCards(); save(); renderAll();
-    if (res.event && res.event.type === "attack") showResult(res.event.n); else { $("lab-result").innerHTML = ""; say(logText(res.event)); }
+    if (res.event && res.event.type === "attack") showResult(res.event.n);
+    else if (res.shots && res.shots.length) { showResult(res.shots[0].n); $("lab-result").insertAdjacentHTML("afterbegin", `<p>${logText(res.event)}<\/p>`);
+      if (res.shots[1]) $("lab-result").insertAdjacentHTML("beforeend", `<p class="small">Then: ${logText(res.shots[1])} <button class="linkish" data-show-shot="${res.shots[1].n}">Show this shot<\/button><\/p>`); say(res.error || "Shots fired.", !!res.error); }
+    else { $("lab-result").innerHTML = ""; say(logText(res.event)); }
   };
 
   // ---- the calculation, shown in full ----
@@ -9408,6 +9521,7 @@ function mountLab(api) {
     save(); renderAll(); showResult(n);
   });
   $("lab-result").addEventListener("click", (/** @type {any} */ e) => {
+    const sh = e.target.closest("[data-show-shot]"); if (sh) { showResult(+sh.dataset.showShot); return; }
     const b = e.target.closest("[data-fx]"), en = enc(); if (!b || !en) return;
     const n = +$("lab-result").querySelector("[data-ev]").dataset.ev, ev = en.events.find((/** @type {any} */ x) => x.n === n), fx = b.dataset.fx;
     let res;
@@ -9471,6 +9585,12 @@ function mountLab(api) {
       }
       case "clock": return e.from < 0 ? `Clock “${esc(e.name)}” started (${e.kind}, ${e.size} segments).` : `Clock “${esc(e.name)}”: ${e.from} → ${e.to} of ${e.size}.`;
       case "note": return `Note: ${esc(e.text)}`;
+      case "showdown": {
+        const nm = (/** @type {string} */ pid) => esc(pid === e.a.pid ? e.a.name : e.d.name);
+        const rl = e.rolls.map((/** @type {any} */ x) => `${nm(x.pid)} ${x.total} vs ${x.target}${x.success ? "" : " (failed)"}`).join("; ");
+        if (e.phase === "stare") return `<b>Staredown<\/b>, ${esc(e.a.name)} and ${esc(e.d.name)}: ${rl} → ${e.winner ? `<b>${esc(e.winner.name)}<\/b> wins (+2 on the draw)` : "<b>neither blinks<\/b>"}${e.broke.length ? ` · ${e.broke.map((/** @type {any} */ b) => esc(b.name)).join(" and ")} lose${e.broke.length > 1 ? "" : "s"} their nerve and may back down` : ""}.`;
+        return `<b>The draw<\/b>, ${esc(e.a.name)} and ${esc(e.d.name)}: ${rl} → ${e.winner ? `<b>${esc(e.winner.name)}<\/b> fires first${e.tieBreak ? " (a tie, won by the quick draw)" : ""}` : "<b>they fire together<\/b>"}${e.fumbled.length ? ` · ${e.fumbled.map(nm).join(" and ")} fumble${e.fumbled.length > 1 ? "" : "s"} the draw: no shot` : ""}.`;
+      }
       case "end": return `<b>Encounter ends.<\/b>`;
       default: return esc(e.type);
     }

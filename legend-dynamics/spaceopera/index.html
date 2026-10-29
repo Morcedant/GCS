@@ -431,6 +431,18 @@ tr.lvl-U td.target { color: var(--muted); }
 .adv-list { margin: 0; padding-left: 1.2em; }
 
 /* GM view */
+/* Wanted posters (frontier.js): a printed bill, the same paper in either theme */
+.wanted-poster { display: grid; justify-items: center; gap: 2px; max-width: 320px; margin: 10px auto; padding: 16px 14px 14px; text-align: center;
+  background: #eadcb8; color: #2a1d10; border: 1px solid #8a6a3a; box-shadow: 0 6px 18px rgba(0, 0, 0, .35); font-family: var(--display); }
+.wanted-poster .wp-top { font-family: var(--title); font-size: 2.2rem; letter-spacing: .12em; text-transform: uppercase; line-height: 1; }
+.wanted-poster .wp-doa { font-size: .8rem; letter-spacing: .3em; text-transform: uppercase; border-block: 2px solid #2a1d10; padding: 2px 8px; margin: 4px 0; }
+.wanted-poster .wp-name { font-size: 1.35rem; letter-spacing: .06em; text-transform: uppercase; overflow-wrap: anywhere; }
+.wanted-poster .wp-aka, .wanted-poster .wp-by { font: italic .8rem/1.3 var(--body); }
+.wanted-poster .wp-for { font: .92rem/1.35 var(--body); }
+.wanted-poster .wp-reward { font-family: var(--title); font-size: 1.6rem; letter-spacing: .06em; margin-top: 4px; }
+#wanted-card input[type="number"], #trail-card input[type="number"] { width: 100%; font: inherit; color: var(--fg); background: var(--well); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; }
+.wp-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; align-items: end; margin-top: 8px; }
+
 /* Campaign builder (campaign.js) and homebrew's bonus boxes */
 .cp-sec { margin-top: 10px; } .cp-sec > summary { cursor: pointer; padding: 6px 0; }
 .cp-form { margin: 8px 0 12px; }
@@ -653,7 +665,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="7356b35" data-version-date="2026.10.28" title="The code changes whenever this page changes.">Version 2026.10.28 · 7356b35</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="479212e" data-version-date="2026.10.29" title="The code changes whenever this page changes.">Version 2026.10.29 · 479212e</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1029,6 +1041,8 @@ tr.lvl-U td.target { color: var(--muted); }
         </div>
         <div class="toast" id="seed-msg" role="status" aria-live="polite"></div>
       </div>
+      <div class="card hud no-print" id="wanted-card" hidden></div>
+      <div class="card hud no-print" id="trail-card" hidden></div>
       <div class="card hud no-print" id="gm-gritty-card" hidden>
         <h3>Gritty combat</h3>
         <label class="gritty-toggle"><input type="checkbox" id="gm-gritty"> <b>Gritty combat in this campaign</b></label>
@@ -1185,6 +1199,12 @@ tr.lvl-U td.target { color: var(--muted); }
               <div class="field" style="flex:0 0 6.5em" id="lab-skill-wrap"><label for="lab-skill">Skill target</label><input type="number" id="lab-skill" min="1" max="30"></div>
               <div class="field" style="flex:1 1 16em"><label for="lab-defense">Target's defense</label><select id="lab-defense"></select>
                 <span class="small muted" id="lab-dodge-note" role="status"></span></div>
+            </div>
+            <div class="lab-row" id="lab-sd-row" style="margin-top:8px" hidden>
+              <div class="field"><label for="lab-sd-mine" id="lab-sd-mine-label">Their gun</label><select id="lab-sd-mine"></select></div>
+              <div class="field"><label for="lab-sd-theirs" id="lab-sd-theirs-label">Opponent's gun</label><select id="lab-sd-theirs"></select></div>
+              <div class="field"><label for="lab-sd-band">Range</label><select id="lab-sd-band"></select></div>
+              <p class="small muted" id="lab-sd-note" style="flex:1 1 100%;margin:0"></p>
             </div>
             <p class="small" id="lab-reach" hidden style="margin:6px 0 0"></p>
             <div class="lab-row" id="lab-text-row" style="margin-top:8px" hidden>
@@ -5911,6 +5931,7 @@ tr.lvl-U td.target { color: var(--muted); }
           </div>
         </div>
 
+        <div class="card hud no-print" id="card-wanted" hidden></div>
         <div class="card hud no-print" id="hb-note" hidden></div>
         <div class="card hud no-print" id="cp-note" hidden></div>
         <div class="card hud no-print" id="card-table"></div>
@@ -6928,6 +6949,74 @@ function mindAttack(enc, rules, core, cmd, opts, x) {
   return { event: ev };
 }
 
+/** A contest by the core rules: a success beats a failure; if both succeed, the larger margin wins; anything else is a tie.
+ * 1 if the first roll wins, −1 if the second does, 0 for a tie. @param {any} ra @param {any} rb */
+const contest = (ra, rb) => (ra.success !== rb.success ? (ra.success ? 1 : -1) : ra.success && ra.contestMargin !== rb.contestMargin ? (ra.contestMargin > rb.contestMargin ? 1 : -1) : 0);
+
+/**
+ * A showdown (Trails of Blood & Dust): two duelists settle it in the street, in two steps.
+ * "stare": the staredown, Will against Will. The winner gets +2 on the draw; anyone who fails their Will roll by 5 or more
+ *   has lost their nerve, and may back down before the draw (the GM's call: no roll for it).
+ * "draw": Shooting against Shooting (the weapon's skill), with the staredown's +2, any drawBonus (Quick Draw) and wound
+ *   penalties. The winner fires first; a tie fires together (unless one of them has drawFirst, the Gunslinger's quick draw,
+ *   and wins it). The shots are ordinary attacks that can't be dodged. The one fired on shoots back if still standing,
+ *   unless they fumbled the draw (failed it by 5 or more). After that it's an ordinary fight, or it's over.
+ * cmd: { phase, attacker, defender, weapon, defWeapon, band, situational? (to the attacker's draw) }
+ * @param {any} enc @param {any} rules @param {any} core @param {any} cmd
+ */
+function showdown(enc, rules, core, cmd) {
+  const a = find(enc, cmd.attacker), d = find(enc, cmd.defender);
+  if (!a || !d || a === d) return { error: "Choose the two duelists." };
+  if (isOut(a) || isOut(d)) return { error: `${isOut(a) ? a.name : d.name} can't face anyone now.` };
+  const n = enc.events.filter((/** @type {any} */ e) => e.type === "showdown").length;
+  const roll = (/** @type {string} */ kind, /** @type {number} */ target) => core.resolve(core.diceFor(enc.seed, `sd${n}|${a.pid}>${d.pid}|${kind}`), target);
+  const sum = (/** @type {any[]} */ l) => l.reduce((t, m) => t + m.value, 0);
+  const wound = (/** @type {any} */ p) => { const v = core.INJURY_PENALTY[p.injury || 0] || 0; return v ? [{ label: "Wounds", value: v }] : []; };
+  const pair = (/** @type {any} */ e) => (e.a.pid === a.pid && e.d.pid === d.pid) || (e.a.pid === d.pid && e.d.pid === a.pid);
+  if (cmd.phase === "stare") {
+    const ma = wound(a), md = wound(d), ta = (a.will ?? 10) + sum(ma), td = (d.will ?? 10) + sum(md);
+    const ra = roll("stareA", ta), rd = roll("stareD", td), w = contest(ra, rd);
+    const broke = [[a, ra], [d, rd]].filter(([, r]) => !r.success && r.margin <= -5).map(([p]) => ({ pid: p.pid, name: p.name }));
+    const ev = log(enc, "showdown", { phase: "stare", a: { pid: a.pid, name: a.name }, d: { pid: d.pid, name: d.name },
+      rolls: [{ pid: a.pid, base: a.will ?? 10, mods: ma, target: ta, dice: ra.dice, total: ra.total, margin: ra.margin, success: ra.success },
+        { pid: d.pid, base: d.will ?? 10, mods: md, target: td, dice: rd.dice, total: rd.total, margin: rd.margin, success: rd.success }],
+      winner: w > 0 ? { pid: a.pid, name: a.name } : w < 0 ? { pid: d.pid, name: d.name } : null, broke });
+    enc.commands.push({ type: "showdown", cmd: clone(cmd) });
+    return { event: ev };
+  }
+  if (cmd.phase !== "draw") return { error: "Staredown or draw?" };
+  const wa = rules.weapons[cmd.weapon], wd = rules.weapons[cmd.defWeapon];
+  if (!wa || !wd) return { error: "Choose both duelists' guns." };
+  const sa = a.skills[wa.skill], sd = d.skills[wd.skill];
+  if (sa === undefined || sd === undefined) return { error: `${sa === undefined ? a.name : d.name} has no ${(sa === undefined ? wa : wd).skill} target.` };
+  // The last staredown between these two since their last draw.
+  const last = [...enc.events].reverse().find((/** @type {any} */ e) => e.type === "showdown" && pair(e));
+  const stare = last && last.phase === "stare" ? last : null;
+  const mods = (/** @type {any} */ p) => [...(stare && stare.winner && stare.winner.pid === p.pid ? [{ label: "Won the staredown", value: 2 }] : []),
+    ...(p.drawBonus ? [{ label: "Quick Draw", value: p.drawBonus }] : []), ...wound(p),
+    ...(p === a ? (cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ label: m.label || "Situation", value: +m.value })) : [])];
+  const ma = mods(a), md = mods(d), ta = +sa + sum(ma), td = +sd + sum(md);
+  const ra = roll("drawA", ta), rd = roll("drawD", td);
+  let w = contest(ra, rd);
+  const tieBreak = !w && !!a.drawFirst !== !!d.drawFirst ? (a.drawFirst ? 1 : -1) : 0;
+  if (tieBreak) w = tieBreak;
+  const fumbled = [[a, ra], [d, rd]].filter(([, r]) => !r.success && r.margin <= -5).map(([p]) => p.pid);
+  const ev = log(enc, "showdown", { phase: "draw", a: { pid: a.pid, name: a.name }, d: { pid: d.pid, name: d.name }, band: cmd.band,
+    rolls: [{ pid: a.pid, skill: wa.skill, base: +sa, mods: ma, target: ta, dice: ra.dice, total: ra.total, margin: ra.margin, success: ra.success },
+      { pid: d.pid, skill: wd.skill, base: +sd, mods: md, target: td, dice: rd.dice, total: rd.total, margin: rd.margin, success: rd.success }],
+    winner: w > 0 ? { pid: a.pid, name: a.name } : w < 0 ? { pid: d.pid, name: d.name } : null, tieBreak: !!tieBreak, fumbled });
+  enc.commands.push({ type: "showdown", cmd: clone(cmd) });
+  // The shots: ordinary attacks, no Dodge. Together on a tie; otherwise the winner first, and the other back if they can.
+  const shot = (/** @type {any} */ x, /** @type {any} */ y, /** @type {string} */ wid) => attack(enc, rules, core, { attacker: x.pid, defender: y.pid, weapon: wid, band: cmd.band, canDodge: false, showdown: ev.n });
+  const shots = [], cmds = enc.commands.length;
+  const [first, second, w1, w2] = w >= 0 ? [a, d, cmd.weapon, cmd.defWeapon] : [d, a, cmd.defWeapon, cmd.weapon];
+  if (!fumbled.includes(first.pid)) shots.push(shot(first, second, w1));
+  if (!fumbled.includes(second.pid) && (w === 0 || !isOut(second))) shots.push(shot(second, first, w2));
+  enc.commands.length = cmds; // the showdown command replays its own shots
+  const err = shots.find((r) => r && r.error);
+  return err ? { event: ev, error: err.error } : { event: ev, shots: shots.map((r) => r.event) };
+}
+
 /**
  * The attacker picks a telling hit's effect (or changes it). @param {any} enc @param {number} n @param {string} effect
  */
@@ -7183,12 +7272,13 @@ function replay(enc, rules, core, config) {
     else if (c.type === "next") nextTurn(r);
     else if (c.type === "aim") { if (aim(r, rules, c.pid, c.target).error) skipped++; }
     else if (c.type === "attack") { if (attack(r, rules, core, c.cmd).error) skipped++; }
+    else if (c.type === "showdown") { const x = showdown(r, rules, core, c.cmd); if (x.error) skipped++; }
   }
   r.skipped = skipped;
   return { encounter: r };
 }
 
-return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, defenseOptions, chooseDefense, attack, tellingEffect, shrugTelling, tradeLimb, spendPoint, setTrait, setForm, addGear, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
+return { isOut, newEncounter, rulesTag, find, active, addParticipant, removeParticipant, startCombat, moveInOrder, nextTurn, aim, defenseOptions, chooseDefense, attack, showdown, tellingEffect, shrugTelling, tradeLimb, spendPoint, setTrait, setForm, addGear, invokeComplication, setCondition, override, clockChange, note, endEncounter, replay };
 })();
   const LAB_STATS = (() => {
 /**
@@ -7314,6 +7404,8 @@ function mountLab(api) {
   const PTRACK = PACK.personalTrack || null; // a setting's personal price track (Corruption, Strain), kept on the character
   // A setting's Mind track (Aurora): psychic attacks mark it, Will resists them, and Mind Defense stops the weaker ones.
   const MT = PACK.mindTrack || null;
+  // Showdowns (PACK.showdown): { skill (the draw), band, drawBonus: { advantage id: bonus }, drawFirst: ability effect that wins a tied draw }.
+  const SD = PACK.showdown || null;
   // Frightened (core rules): any condition named "Frightened" (or "Frightened of …").
   const isFrightened = (/** @type {any} */ p) => !!p && (p.conditions || []).some((/** @type {string} */ x) => /^frightened\b/i.test(x));
   const BAND_NAMES = { melee: "In reach", close: "Close", short: "Short", medium: "Medium", long: "Long", extreme: "Extreme" };
@@ -7515,7 +7607,13 @@ function mountLab(api) {
         ...formRules],
       gear: PROT.filter((/** @type {any} */ x) => c.equipment[x.equipment]).map((/** @type {any} */ x) => x.id),
       boxes: 3, injury: c.play.injury || 0, dying: !!c.play.dying, points: c.play.duty || 0, ammo, conditions: c.play.frightened ? ["Frightened"] : [],
-      ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes, will: c.attrs.Will } : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
+      ...(MT ? { mind: c.play.mind || 0, mindBoxes: MT.boxes } : {}), will: c.attrs.Will, ...(SD ? sdTraits(c) : {}), tracks: PTRACK ? { [PTRACK.name]: c.play.ptrack || 0 } : {} };
+  }
+  /** A character's edge in a showdown: Quick Draw's bonus (an advantage), and an ability that wins a tied draw. @param {any} c */
+  function sdTraits(c) {
+    const bonus = Math.max(0, ...[c.adv, c.adv2].filter(Boolean).map((/** @type {any} */ x) => (SD.drawBonus || {})[x.id] || 0));
+    const role = !c.customRole && (PACK.roles || []).find((/** @type {any} */ x) => x.name === c.dept);
+    return { ...(bonus ? { drawBonus: bonus } : {}), ...(role && SD.drawFirst && (role.abilityFx || []).includes(SD.drawFirst) ? { drawFirst: true } : {}) };
   }
   /** A threat from the setting's data. @param {any} t @param {string} name */
   function fromThreat(t, name) {
@@ -7526,7 +7624,8 @@ function mountLab(api) {
     return { kind: "npc", name, side: "foe", ...(strength ? { strength } : {}), ...(t.actFirst ? { actFirst: true } : {}), ...(t.actions > 1 ? { actions: t.actions } : {}), ...(t.flies ? { flies: true } : {}), agility: t.dodge !== null ? t.dodge + 1 : 10, agilityEstimated: true, move: t.move || LD.THREAT_MOVE, dodge: t.dodge, skills, weapons: t.weapons,
       boxes: t.minor ? 1 : t.boxes || 3, minor: !!t.minor, ammo,
       // The Mind track: as many boxes as the body (one for a minor opponent); Will as given, or estimated.
-      ...(MT ? { mind: 0, mindBoxes: t.minor ? 1 : t.boxes || 3, will: t.will ?? (t.minor ? 9 : t.named ? 12 : 10), ...(t.will === undefined ? { willEstimated: true } : {}) } : {}), note: `${t.trait}: ${t.traitText}`,
+      ...(MT ? { mind: 0, mindBoxes: t.minor ? 1 : t.boxes || 3 } : {}), ...(MT || SD ? { will: t.will ?? (t.minor ? 9 : t.named ? 12 : 10), ...(t.will === undefined ? { willEstimated: true } : {}) } : {}),
+      ...(SD && (t.drawBonus || (SD.threatDrawBonus || {})[t.id]) ? { drawBonus: t.drawBonus || SD.threatDrawBonus[t.id] } : {}), note: `${t.trait}: ${t.traitText}`,
       traits: (t.traits || []).map((/** @type {any} */ x) => (x.toggle ? { ...x, on: true } : { ...x })) };
   }
   function ensureEnc() {
@@ -7703,7 +7802,7 @@ function mountLab(api) {
     $("lab-actor").innerHTML = en.order.map((/** @type {string} */ pid) => { const p = E.find(en, pid); return `<option value="${pid}">${esc(p.name)}${act && act.pid === pid ? " (turn)" : ""}</option>`; }).join("");
     $("lab-actor").value = prevActor; $("lab-actor").dataset.turn = turnKey;
     const a = pickActor();
-    const actions = [["attack", "Attack"], ...(r.actions.has("aim") ? [["aim", "Aim"]] : []), ["point", `Spend a ${T.point} point`], ["complication", "Complication comes into play"], ["condition", "Add a condition"], ["note", "Note"]];
+    const actions = [["attack", "Attack"], ...(r.actions.has("aim") ? [["aim", "Aim"]] : []), ...(SD ? [["stare", "Showdown: the staredown"], ["draw", "Showdown: the draw"]] : []), ["point", `Spend a ${T.point} point`], ["complication", "Complication comes into play"], ["condition", "Add a condition"], ["note", "Note"]];
     const pa = $("lab-action").value;
     $("lab-action").innerHTML = actions.map(([v, n]) => `<option value="${v}">${esc(n)}</option>`).join("");
     $("lab-action").value = actions.some(([v]) => v === pa) ? pa : "attack";
@@ -7713,7 +7812,8 @@ function mountLab(api) {
     if (targets.some((/** @type {any} */ p) => p.pid === pt)) $("lab-target").value = pt;
     else { const foe = targets.find((/** @type {any} */ p) => a && p.side !== a.side && !E.isOut(p)); if (foe) $("lab-target").value = foe.pid; }
     $("lab-target").dataset.actor = a ? a.pid : "";
-    $("lab-target").closest(".field").hidden = !["attack", "aim"].includes(action);
+    $("lab-target").closest(".field").hidden = !["attack", "aim", "stare", "draw"].includes(action);
+    renderShowdown(en, r, a, action);
     $("lab-atk-row").hidden = action !== "attack";
     $("lab-reach").hidden = true; // the map check below shows it again for an attack
     $("lab-text-row").hidden = !["point", "complication", "condition", "note"].includes(action);
@@ -7779,6 +7879,23 @@ function mountLab(api) {
         : used.length ? `${d.name} has already used ${used.join(" and ")} this round${used.includes("dodge") ? " (one Dodge a round in the published rules)" : ""}. Choose it anyway to allow it: it's logged as a GM override.` : "";
     }
   }
+  // A showdown (PACK.showdown: Trails of Blood & Dust): who's facing whom, each one's gun, and the range.
+  function renderShowdown(/** @type {any} */ en, /** @type {any} */ r, /** @type {any} */ a, /** @type {string} */ action) {
+    const on = !!SD && (action === "stare" || action === "draw") && !!a;
+    $("lab-sd-row").hidden = !on;
+    if (!on) return;
+    const d = E.find(en, $("lab-target").value), draw = action === "draw";
+    for (const id of ["lab-sd-mine", "lab-sd-theirs", "lab-sd-band"]) $(id).closest(".field").hidden = !draw;
+    const guns = (/** @type {any} */ p) => (p ? p.weapons.filter((/** @type {string} */ w) => r.weapons[w] && r.weapons[w].skill === SD.skill) : []);
+    const fill = (/** @type {string} */ id, /** @type {any} */ p) => { const was = $(id).value, g = guns(p); $(id).innerHTML = g.map((/** @type {string} */ w) => `<option value="${w}">${esc(r.weapons[w].name)}${p.skills[SD.skill] !== undefined ? ` (${SD.skill} ${p.skills[SD.skill]})` : ""}</option>`).join("") || `<option value="">No ${esc(SD.skill)} weapon</option>`; if (g.includes(was)) $(id).value = was; };
+    fill("lab-sd-mine", a); fill("lab-sd-theirs", d);
+    $("lab-sd-mine-label").textContent = `${a.name}'s gun`; $("lab-sd-theirs-label").textContent = d ? `${d.name}'s gun` : "Opponent's gun";
+    if (!$("lab-sd-band").options.length) { $("lab-sd-band").innerHTML = LD.BANDS.filter((/** @type {string} */ b) => b !== "melee").map((/** @type {string} */ b) => `<option value="${b}">${BAND_NAMES[b]}</option>`).join(""); $("lab-sd-band").value = SD.band || "short"; }
+    const will = (/** @type {any} */ p) => `${p.name} ${p.will ?? 10}${p.will === undefined || p.willEstimated ? " (estimated)" : ""}`;
+    const last = d ? [...en.events].reverse().find((/** @type {any} */ e) => e.type === "showdown" && [e.a.pid, e.d.pid].sort().join() === [a.pid, d.pid].sort().join()) : null;
+    $("lab-sd-note").textContent = !d ? "" : !draw ? `Will against Will: ${will(a)}, ${will(d)}. The winner gets +2 on the draw; failing by 5 or more loses their nerve, and they may back down before the draw.`
+      : `${last && last.phase === "stare" ? (last.winner ? `${last.winner.name} won the staredown: +2. ` : "The staredown was a tie. ") : "No staredown yet: roll one first, or draw now. "}The winner fires first and the shots can't be dodged; a tie fires together.`;
+  }
   $("lab-act-wrap").addEventListener("change", (/** @type {any} */ e) => { if (["lab-actor", "lab-action", "lab-target", "lab-weapon"].includes(e.target.id)) renderAction(); });
   $("lab-go").onclick = () => {
     const en = enc(), r = rules(), a = pickActor(), action = $("lab-action").value, text = $("lab-text").value.trim();
@@ -7798,16 +7915,22 @@ function mountLab(api) {
           ...(!$("lab-fright-wrap").hidden && $("lab-fright").checked ? [{ label: "Frightened: against what frightens them", value: -2 }] : [])],
         defense: $("lab-defense").value, allowExtraDodge: !["auto", "none"].includes($("lab-defense").value), skillTarget: skill !== undefined && skill !== a.skills[w && w.skill] ? skill : undefined });
       if (res.event && skill !== undefined && w && skill !== a.skills[w.skill]) E.override(en, r, LD, "skill", { pid: a.pid, skill: w.skill, from: a.skills[w.skill] ?? null, to: skill, reason: "GM set the target for this attack" });
+    } else if (action === "stare" || action === "draw") {
+      res = E.showdown(en, r, LD, { phase: action, attacker: a.pid, defender: $("lab-target").value, weapon: $("lab-sd-mine").value, defWeapon: $("lab-sd-theirs").value, band: $("lab-sd-band").value,
+        situational: +$("lab-sit").value ? [{ label: $("lab-sit-label").value.trim() || "Situation", value: +$("lab-sit").value }] : [] });
     } else if (action === "aim") res = E.aim(en, r, a.pid, $("lab-target").value);
     else if (action === "point") res = E.spendPoint(en, r, LD, a.pid, "prep", { note: text });
     else if (action === "complication") res = E.invokeComplication(en, a.pid, text);
     else if (action === "condition") res = E.setCondition(en, a.pid, text, true);
     else if (action === "note") res = E.note(en, text);
-    if (res.error) { say(res.error, true); return; }
+    if (res.error && !res.event) { say(res.error, true); return; }
     if (action !== "attack") $("lab-text").value = "";
     $("lab-sit").value = 0; $("lab-sit-label").value = "";
     pushToCards(); save(); renderAll();
-    if (res.event && res.event.type === "attack") showResult(res.event.n); else { $("lab-result").innerHTML = ""; say(logText(res.event)); }
+    if (res.event && res.event.type === "attack") showResult(res.event.n);
+    else if (res.shots && res.shots.length) { showResult(res.shots[0].n); $("lab-result").insertAdjacentHTML("afterbegin", `<p>${logText(res.event)}</p>`);
+      if (res.shots[1]) $("lab-result").insertAdjacentHTML("beforeend", `<p class="small">Then: ${logText(res.shots[1])} <button class="linkish" data-show-shot="${res.shots[1].n}">Show this shot</button></p>`); say(res.error || "Shots fired.", !!res.error); }
+    else { $("lab-result").innerHTML = ""; say(logText(res.event)); }
   };
 
   // ---- the calculation, shown in full ----
@@ -7899,6 +8022,7 @@ function mountLab(api) {
     save(); renderAll(); showResult(n);
   });
   $("lab-result").addEventListener("click", (/** @type {any} */ e) => {
+    const sh = e.target.closest("[data-show-shot]"); if (sh) { showResult(+sh.dataset.showShot); return; }
     const b = e.target.closest("[data-fx]"), en = enc(); if (!b || !en) return;
     const n = +$("lab-result").querySelector("[data-ev]").dataset.ev, ev = en.events.find((/** @type {any} */ x) => x.n === n), fx = b.dataset.fx;
     let res;
@@ -7962,6 +8086,12 @@ function mountLab(api) {
       }
       case "clock": return e.from < 0 ? `Clock “${esc(e.name)}” started (${e.kind}, ${e.size} segments).` : `Clock “${esc(e.name)}”: ${e.from} → ${e.to} of ${e.size}.`;
       case "note": return `Note: ${esc(e.text)}`;
+      case "showdown": {
+        const nm = (/** @type {string} */ pid) => esc(pid === e.a.pid ? e.a.name : e.d.name);
+        const rl = e.rolls.map((/** @type {any} */ x) => `${nm(x.pid)} ${x.total} vs ${x.target}${x.success ? "" : " (failed)"}`).join("; ");
+        if (e.phase === "stare") return `<b>Staredown</b>, ${esc(e.a.name)} and ${esc(e.d.name)}: ${rl} → ${e.winner ? `<b>${esc(e.winner.name)}</b> wins (+2 on the draw)` : "<b>neither blinks</b>"}${e.broke.length ? ` · ${e.broke.map((/** @type {any} */ b) => esc(b.name)).join(" and ")} lose${e.broke.length > 1 ? "" : "s"} their nerve and may back down` : ""}.`;
+        return `<b>The draw</b>, ${esc(e.a.name)} and ${esc(e.d.name)}: ${rl} → ${e.winner ? `<b>${esc(e.winner.name)}</b> fires first${e.tieBreak ? " (a tie, won by the quick draw)" : ""}` : "<b>they fire together</b>"}${e.fumbled.length ? ` · ${e.fumbled.map(nm).join(" and ")} fumble${e.fumbled.length > 1 ? "" : "s"} the draw: no shot` : ""}.`;
+      }
       case "end": return `<b>Encounter ends.</b>`;
       default: return esc(e.type);
     }
@@ -8052,6 +8182,7 @@ return { mountLab };
   const TABLE_SERVER = "https://legend-table.des0906.workers.dev"; // the shared table server (legend-dynamics/table-server), set at build time
   let sharedTable = null; // mounted with the GM view below
   let homebrewUI = null; // homebrew.js: mounted with the guides below
+  let wantedUI = null; // frontier.js: wanted posters in the GM view
   let campaignUI = null; // campaign.js: the GM's campaign builder, mounted with homebrew
   // Advancement point costs (core rules, Advancement). Magic and powers use the costs their chapters give.
   const COSTS = { UT: 1, TS: 2, revise: 1, edge: 3, attr: 4 };
@@ -8315,6 +8446,8 @@ return { mountLab };
     const files = (v) => (Array.isArray(v) ? v : []).filter((f) => f && typeof f === "object").slice(0, 40);
     out.play.files = files(out.play.files).map((f) => ({ id: fs(f.id, 20) || uid(), ...fileOf(f), found: !!f.found })).filter((f) => f.holder && f.knows);
     out.play.knownFiles = files(out.play.knownFiles).map(fileOf).filter((f) => f.holder && f.knows);
+    out.play.frightened = !!out.play.frightened;
+    if (PACK.wanted) out.play.wanted = wantedClean(out.play.wanted); else delete out.play.wanted;
     out.play.knownBy = [...new Set((Array.isArray(out.play.knownBy) ? out.play.knownBy : []).map((w) => fs(w, 60).trim()).filter(Boolean))].slice(0, 16);
     return out;
   }
@@ -8667,6 +8800,9 @@ return { mountLab };
     LOADS.forEach(([k]) => ($("ld-" + k).checked = ch.loads.includes(k)));
     $("f-stunned").checked = !!ch.play.stunned;
     $("f-fright").checked = !!ch.play.frightened;
+    // A wanted poster the GM put out on this character (PACK.wanted).
+    $("card-wanted").hidden = !(PACK.wanted && ch.play.wanted);
+    if (!$("card-wanted").hidden) $("card-wanted").innerHTML = `<h3>${esc(PACK.wanted.sheetTitle || "Wanted")}</h3>${wantedHTML(ch.play.wanted, esc, PACK, ch.name)}<p class="small muted">${esc(PACK.wanted.sheetNote || "")}</p>`;
     $("f-contact").value = ch.contact; $("f-gearitem").value = ch.gear.item; $("f-gearuse").value = ch.gear.use || ""; $("f-adv2detail").value = ch.adv2.detail;
   }
 
@@ -9347,13 +9483,15 @@ return { mountLab };
   function save() { store.set(STORE_CURRENT, ch); if (sharedTable) sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); }
   // The shared table's part of a character (phase 2): its play state, as the table keeps it, and its sheet without that.
   const pickPlay = (c, gm = false) => { const p = c.play || {}, g = p.gun || {};
-    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, frightened: !!p.frightened, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, mind: p.mind || 0, knownBy: p.knownBy || [], lasting: p.lasting || [] };
+    const o = { injury: p.injury || 0, dying: !!p.dying, duty: p.duty || 0, stunned: !!p.stunned, frightened: !!p.frightened, form: !!p.form, ptrack: p.ptrack || 0, xtrack: p.xtrack || 0, mind: p.mind || 0, knownBy: p.knownBy || [], lasting: p.lasting || [],
+      ...(PACK.wanted ? { wanted: p.wanted || null } : {}) };
     // The files a villain holds on this hero: the GM sends the ones the hero has found out about (never the others);
     // the player's page passes on what it was sent.
     if (HFILES) o.knownFiles = gm ? (p.files || []).filter((f) => f.found).map(({ holder, knows, gives, destroyed }) => ({ holder, knows, gives, destroyed: !!destroyed })) : p.knownFiles || [];
     if (Number.isInteger(g.rounds)) o.rounds = g.rounds; if (Number.isInteger(g.spares)) o.spares = g.spares;
     return o; };
   const applyPlay = (c, q) => { for (const k of ["injury", "dying", "duty", "stunned", "frightened", "form", "ptrack", "xtrack", "mind", "knownBy", "knownFiles", "lasting"]) if (k in q) c.play[k] = q[k];
+    if (PACK.wanted && "wanted" in q) c.play.wanted = wantedClean(q.wanted);
     if (c.play.gun) { if ("rounds" in q) c.play.gun.rounds = q.rounds; if ("spares" in q) c.play.gun.spares = q.spares; } };
   const sheetOf = (c) => { const { play, portrait, tableKey, tableOwner, ...rest } = c; void play; void portrait; void tableKey; void tableOwner; return rest; };
   function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); clearTimeout(toast.h); toast.h = setTimeout(() => (t.textContent = ""), 3500); }
@@ -9611,6 +9749,7 @@ return { mountLab };
   if (!ship || typeof ship !== "object") ship = {};
   const shipEffect = (name, n) => (PACK.tracks.find((t) => t.name === name)?.effects || [])[n] || "";
   function renderShip() {
+    if (wantedUI) wantedUI.render(); // the poster's reward follows the law's track
     $("ship").innerHTML = SHIP_TRACKS.map(([name, max]) => {
       const n = Math.min(max, ship[name] || 0);
       return `<div class="ship-row ${n >= max ? "out" : n ? "hit" : ""}"><span class="label">${name}</span>
@@ -11435,7 +11574,8 @@ function cpSeed(PACK, k, rnd) {
 }
 /** A rolled entry of a kind, every field filled in, ready to change in its form. @param {() => number} rnd */
 function cpRoll(PACK, kind, c, rnd = Math.random) {
-  const T = cpTables(), al = (PACK.allegiances || []).filter((a) => a[0]);
+  // The setting's own tables (PACK.campaign.tables) take the place of the general ones they name.
+  const T = { ...cpTables(), ...((PACK.campaign && PACK.campaign.tables) || {}) }, al = (PACK.allegiances || []).filter((a) => a[0]);
   const factionNames = [...(c ? c.factions.map((f) => f.name) : []), ...al.map((a) => a[1])];
   const threats = (PACK.threats || []).filter((t) => !t.minor).map((t) => t.name);
   if (kind === "people") {
@@ -11445,6 +11585,10 @@ function cpRoll(PACK, kind, c, rnd = Math.random) {
     return { name: cpName(PACK, rnd), role, faction: rnd() < 0.6 ? cpPick(factionNames, rnd) : "", desc: `${cpPick(T.manner, rnd)}.`,
       goal: cpCap(cpPick(T.want, rnd)), secret: cpPick(T.secret, rnd) };
   }
+  // A town (PACK.campaign.towns: name parts, what it lives on, who runs it, what's wrong), half the time in a setting with them.
+  const TW = PACK.campaign && PACK.campaign.towns;
+  if (kind === "places" && TW && rnd() < 0.5) return { name: `${cpPick(TW.first, rnd)}${cpPick(TW.second, rnd)}`, kind: cpPick(TW.kind, rnd),
+    desc: `It lives on ${cpLow(cpPick(TW.livesOn, rnd))}. ${cpPick(TW.runs, rnd)} runs it. ${cpPick(T.feature, rnd)}`, secret: cpPick(TW.wrong, rnd) };
   if (kind === "places") return { name: cpSeed(PACK, "place", rnd), kind: "", desc: cpPick(T.feature, rnd), secret: `${cpSeed(PACK, "strange", rnd)}.` };
   if (kind === "factions") {
     const a = rnd() < 0.5 && al.length ? cpPick(al, rnd) : null;
@@ -11635,6 +11779,158 @@ function mountCampaign(api) {
       render();
     },
   };
+}
+
+  // Frontier tools for the GM view: wanted posters (PACK.wanted) and the trail (PACK.trail). Plain script, inlined by
+// tools/build-legend.py (/* FRONTIER */); no modules, no page globals. Trails of Blood & Dust uses both.
+//
+// Wanted posters: when the law's track (wanted.track, Heat) reaches wanted.from, the GM can put a poster out on a
+// character: the name the law knows them by, what they're wanted for, and a reward that climbs with the track
+// (wanted.rewards: [[boxes, amount]]), "Dead or Alive" from wanted.doaFrom. The poster goes on the character's sheet
+// (c.play.wanted), so the player sees it, and comes down when the GM takes it down.
+// The trail: a ride between towns as a progress clock (trail.lengths: [[name, segments]]). Each day the guide rolls
+// (trail.skill, Survival): a success fills a segment, by 5 or more two; a failure fills none and draws a hazard (1d6 on
+// trail.hazards). Supplies count down a day at a time; out of them, rolls on the trail are at −2.
+//
+// mountWanted(api) with api: { PACK, root, esc, crew() (the GM view's characters), level() (the track's boxes now),
+//   setWanted(c, wanted or null) (puts it on the card and saves), toast(m, err) }
+// mountTrail(api) with api: { PACK, root, esc, crew(), skillOf(c, skill) (a character's target), addClock(name, size)
+//   (returns its id), clockOf(id) ({ filled, size } or null), fillClock(id, n), toast(m, err) }
+// wantedClean(raw) checks a poster from a file; wantedHTML(w, esc, PACK) draws one (the GM view and the sheet).
+// Function declarations only.
+
+function wantedClean(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const line = (v, max) => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+  const crimes = (Array.isArray(raw.crimes) ? raw.crimes : []).map((x) => line(x, 60)).filter(Boolean).slice(0, 4);
+  const reward = Math.max(0, Math.min(100000, Math.round(+raw.reward || 0)));
+  if (!crimes.length && !reward) return null;
+  return { alias: line(raw.alias, 60), crimes, reward, doa: !!raw.doa, by: line(raw.by, 80) };
+}
+/** The reward the track's level calls for, and whether it's Dead or Alive. */
+function wantedReward(W, level) {
+  let reward = 0;
+  for (const [boxes, amount] of W.rewards || []) if (level >= boxes) reward = amount;
+  return { reward, doa: W.doaFrom ? level >= W.doaFrom : false };
+}
+function wantedList(items) { return items.length < 2 ? items.join("") : items.slice(0, -1).join(", ") + " and " + items[items.length - 1]; }
+function wantedHTML(w, esc, PACK, name) {
+  const W = PACK.wanted || {}, cur = W.currency || "$";
+  return `<div class="wanted-poster" role="img" aria-label="Wanted poster: ${esc(w.alias || name || "")}">
+    <span class="wp-top">${esc(W.title || "Wanted")}<\/span>
+    ${w.doa ? `<span class="wp-doa">Dead or Alive<\/span>` : ""}
+    <b class="wp-name">${esc(w.alias || name || "Unknown")}<\/b>
+    ${w.alias && name && w.alias !== name ? `<span class="wp-aka">also known as ${esc(name)}<\/span>` : ""}
+    <span class="wp-for">for ${esc(wantedList(w.crimes.map((c) => c.toLowerCase())) || "crimes against the peace")}<\/span>
+    ${w.reward ? `<span class="wp-reward">${esc(cur)}${w.reward.toLocaleString("en-US")} Reward<\/span>` : ""}
+    ${w.by ? `<span class="wp-by">${esc(w.by)}<\/span>` : ""}
+  <\/div>`;
+}
+
+function mountWanted(api) {
+  const { PACK, root, esc } = api, W = PACK.wanted;
+  if (!W || !root) return { render() {} };
+  let pick = "", draft = null;
+  const say = (m, err) => (api.toast ? api.toast(m, err) : null);
+  const rnd = (list) => list[Math.floor(Math.random() * list.length)];
+  const rollCrimes = () => { const a = rnd(W.crimes), b = Math.random() < 0.5 ? rnd(W.crimes) : ""; return [...new Set([a, b].filter(Boolean))]; };
+  const fresh = (c) => { const { reward, doa } = wantedReward(W, api.level()); return { alias: c ? c.name || "" : "", crimes: rollCrimes(), reward, doa, by: rnd(W.issuers || [""]) }; };
+  function render() {
+    const crew = api.crew(), level = api.level(), c = crew.find((x) => x.id === pick) || null, on = c && c.play && c.play.wanted;
+    const { reward, doa } = wantedReward(W, level);
+    if (c && !draft) draft = on ? { ...on } : fresh(c);
+    root.innerHTML = `<h3>${esc(W.cardTitle || "Wanted posters")}<\/h3>
+      <p class="small muted">${esc(W.track)} is at ${level}: ${level >= W.from ? `posters pay ${reward ? `${esc(W.currency || "$")}${reward.toLocaleString("en-US")}` : "nothing yet"}${doa ? ", Dead or Alive" : ""}` : `posters go up at ${W.from}`}. A poster goes on the character's sheet, where the player sees it.${W.hunters ? " " + esc(W.hunters) : ""}<\/p>
+      <div class="field"><label for="wp-who">Who<\/label><select id="wp-who"><option value="">Choose a character<\/option>${crew.map((x) => `<option value="${esc(x.id)}"${x.id === pick ? " selected" : ""}>${esc(x.name || "Unnamed")}${x.play && x.play.wanted ? " (posted)" : ""}<\/option>`).join("")}<\/select><\/div>
+      ${c ? `<div class="wp-edit">
+        <div class="field"><label for="wp-alias">The name on the poster<\/label><input type="text" id="wp-alias" maxlength="60" value="${esc(draft.alias)}"><\/div>
+        <div class="field"><label for="wp-crimes">Wanted for (comma between)<\/label><input type="text" id="wp-crimes" maxlength="200" value="${esc(draft.crimes.join(", "))}"><\/div>
+        <div class="field"><label for="wp-reward">Reward (${esc(W.currency || "$")})<\/label><input type="number" id="wp-reward" min="0" max="100000" step="50" value="${draft.reward}"><\/div>
+        <div class="field"><label for="wp-by">Issued by<\/label><input type="text" id="wp-by" maxlength="80" value="${esc(draft.by)}"><\/div>
+        <label class="small"><input type="checkbox" id="wp-doa"${draft.doa ? " checked" : ""}> Dead or Alive<\/label>
+      <\/div>
+      ${wantedHTML(wantedClean(draft) || { alias: draft.alias, crimes: [], reward: 0, doa: draft.doa, by: draft.by }, esc, PACK, c.name)}
+      <div class="btn-row">
+        <button class="btn" id="wp-roll">Roll the crimes<\/button>
+        <button class="btn" id="wp-level">Reward for ${esc(W.track)} ${level}<\/button>
+        <button class="btn primary" id="wp-post">${on ? "Update the poster" : "Put up the poster"}<\/button>
+        ${on ? `<button class="btn danger" id="wp-down">Take it down<\/button>` : ""}
+      <\/div>` : ""}`;
+  }
+  const read = () => { const g = (id) => root.querySelector("#" + id); return { alias: g("wp-alias").value, crimes: g("wp-crimes").value.split(",").map((x) => x.trim()).filter(Boolean), reward: +g("wp-reward").value || 0, doa: g("wp-doa").checked, by: g("wp-by").value }; };
+  root.addEventListener("change", (e) => {
+    if (e.target.id === "wp-who") { pick = e.target.value; draft = null; render(); return; }
+    if (e.target.closest(".wp-edit")) { draft = read(); render(); }
+  });
+  root.addEventListener("click", (e) => {
+    const c = api.crew().find((x) => x.id === pick); if (!c) return;
+    const id = e.target.id;
+    if (id === "wp-roll") { draft = { ...read(), crimes: rollCrimes() }; render(); }
+    else if (id === "wp-level") { draft = { ...read(), ...wantedReward(W, api.level()) }; render(); }
+    else if (id === "wp-post") { const w = wantedClean(read()); if (!w) { say("Give the poster a crime or a reward.", true); return; } api.setWanted(c, w); draft = { ...w }; render(); say(`The poster for ${c.name || "them"} is up, and on their sheet.`); }
+    else if (id === "wp-down") { api.setWanted(c, null); draft = null; render(); say("Poster taken down."); }
+  });
+  render();
+  return { render: () => { draft = null; render(); } };
+}
+
+function mountTrail(api) {
+  const { PACK, root, esc } = api, TR = PACK.trail;
+  if (!TR || !root) return { render() {} };
+  const KEY = PACK.id + ".trail.v1", say = (m, err) => (api.toast ? api.toast(m, err) : null);
+  const load = () => { try { const v = JSON.parse(localStorage.getItem(KEY) || "null"); return v && typeof v === "object" ? v : null; } catch { return null; } };
+  const keep = () => { try { localStorage.setItem(KEY, JSON.stringify(ride)); } catch {} };
+  let ride = load(), last = null;
+  const d6 = () => 1 + Math.floor(Math.random() * 6), roll3 = () => [d6(), d6(), d6()];
+  function render() {
+    const crew = api.crew(), clk = ride ? api.clockOf(ride.clock) : null;
+    if (ride && !clk) { ride = null; keep(); }
+    const guide = ride && crew.find((c) => c.id === ride.guide);
+    root.innerHTML = `<h3>${esc(TR.title || "The trail")}<\/h3>
+      <p class="small muted">${esc(TR.intro || "")}<\/p>
+      ${!ride ? `<div class="lab-row">
+          <div class="field"><label for="tr-name">Where to<\/label><input type="text" id="tr-name" maxlength="40" placeholder="e.g. Silver Gulch"><\/div>
+          <div class="field"><label for="tr-len">How far<\/label><select id="tr-len">${TR.lengths.map(([n, s], i) => `<option value="${i}">${esc(n)} (${s})<\/option>`).join("")}<\/select><\/div>
+          <div class="field"><label for="tr-sup">Days of supplies<\/label><input type="number" id="tr-sup" min="0" max="30" value="${TR.lengths[0][1] + 2}"><\/div>
+        <\/div>
+        <div class="btn-row"><button class="btn primary" id="tr-start">Start the ride<\/button><button class="btn" id="tr-hazard">Roll a hazard<\/button><\/div>`
+      : `<p><b>${esc(ride.name)}<\/b>: ${clk.filled} of ${clk.size} on the clock · supplies for <b>${ride.supplies}<\/b> day${ride.supplies === 1 ? "" : "s"}${ride.supplies <= 0 ? ` <span class="bad">(out: −2 on the trail)<\/span>` : ""}${ride.push ? " · pushed on last night: −2 today unless you rest" : ""}<\/p>
+        <div class="lab-row">
+          <div class="field"><label for="tr-guide">Guide<\/label><select id="tr-guide">${crew.map((c) => `<option value="${esc(c.id)}"${guide && guide.id === c.id ? " selected" : ""}>${esc(c.name || "Unnamed")} (${esc(TR.skill)} ${api.skillOf(c, TR.skill) ?? "—"})<\/option>`).join("") || `<option value="">No characters in the GM view<\/option>`}<\/select><\/div>
+          <div class="field" style="flex:0 0 7em"><label for="tr-mod">Other ±<\/label><input type="number" id="tr-mod" min="-10" max="10" value="0"><\/div>
+          <label class="small"><input type="checkbox" id="tr-pushon"> Push on through the night (+2, −2 tomorrow)<\/label>
+        <\/div>
+        <div class="btn-row"><button class="btn primary" id="tr-day">Roll the day<\/button><button class="btn" id="tr-rest">Rest a day<\/button><button class="btn" id="tr-hazard">Roll a hazard<\/button><button class="btn" id="tr-resupply">Resupply<\/button><button class="linkish danger" id="tr-end">End the ride<\/button><\/div>`}
+      ${last ? `<div class="lab-calc">${last}<\/div>` : ""}`;
+  }
+  const hazard = () => { const n = d6(), [t, x] = TR.hazards[n - 1]; return `<b>Hazard (${n}): ${esc(t)}.<\/b> ${esc(x)}`; };
+  root.addEventListener("click", (e) => {
+    const id = e.target.id, g = (k) => root.querySelector("#" + k);
+    if (id === "tr-hazard") { last = hazard(); render(); return; }
+    if (id === "tr-start") {
+      const [n, size] = TR.lengths[+g("tr-len").value], name = (g("tr-name").value.trim() || n).slice(0, 40);
+      ride = { name: `The trail: ${name}`, clock: api.addClock(`The trail: ${name}`, size), supplies: Math.max(0, Math.min(30, +g("tr-sup").value || 0)), guide: (api.crew()[0] || {}).id || "", push: false };
+      keep(); last = null; render(); say(`The ride is on the clocks: ${size} segments to ${name}.`); return;
+    }
+    if (!ride) return;
+    if (id === "tr-day") {
+      const c = api.crew().find((x) => x.id === g("tr-guide").value); if (!c) { say("Add the riders to the GM view first.", true); return; }
+      const base = api.skillOf(c, TR.skill); if (base === undefined || base === null) { say(`${c.name} has no ${TR.skill} target.`, true); return; }
+      const push = g("tr-pushon").checked, mods = [...(push ? [["Pushing on", 2]] : []), ...(ride.push ? [["Tired from last night", -2]] : []), ...(ride.supplies <= 0 ? [["Out of supplies", -2]] : []), ...(+g("tr-mod").value ? [["Other", +g("tr-mod").value]] : [])];
+      const target = base + mods.reduce((s, m) => s + m[1], 0), dice = roll3(), total = dice[0] + dice[1] + dice[2];
+      const ok = total <= 4 || (total < 17 && total <= target), margin = target - total, fill = ok ? (margin >= 5 ? 2 : 1) : 0;
+      api.fillClock(ride.clock, fill); ride.supplies = Math.max(0, ride.supplies - 1); ride.guide = c.id; ride.push = push; keep();
+      const clk = api.clockOf(ride.clock), there = clk && clk.filled >= clk.size;
+      last = `${esc(c.name)}: ${esc(TR.skill)} ${base}${mods.map(([l, v]) => ` · ${esc(l)} ${v > 0 ? "+" : "−"}${Math.abs(v)}`).join("")} → target <b>${target}<\/b>. Rolled <b>${total}<\/b> (${dice.join(" + ")}): ${ok ? `success by ${margin}, ${fill} segment${fill > 1 ? "s" : ""}` : `failed by ${-margin}: no progress, and a hazard`}.${!ok ? `<br>${hazard()}` : ""}${there ? `<br><b>You arrive.<\/b>` : ""}`;
+      if (there) { ride = null; keep(); }
+      render(); return;
+    }
+    if (id === "tr-rest") { ride.supplies = Math.max(0, ride.supplies - 1); ride.push = false; keep(); last = "A day's rest: the horses recover, and a day's supplies are gone."; render(); return; }
+    if (id === "tr-resupply") { ride.supplies = Math.min(30, ride.supplies + (TR.lengths[0][1] + 2)); keep(); last = "Resupplied: water found, game shot, or a store along the way."; render(); return; }
+    if (id === "tr-end") { ride = null; keep(); last = null; render(); }
+  });
+  render();
+  return { render };
 }
 
   // The shared table: players join from their play tab, the GM starts one here, and every roll at the table shows on both.
@@ -12523,6 +12819,16 @@ function mountCampaign(api) {
   // Homebrew: the GM makes it in the GM view; players get it from a file or when they join the GM's shared table.
   homebrewUI = mountHomebrew({ PACK, gmRoot: $("hb-card"), noteRoot: $("hb-note"), fileRoot: $("hb-file"), ritualRoot: $("hb-rituals"), heartInput: $("f-ma-heart"), esc, toast, saveText });
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
+  // Frontier tools (frontier.js): wanted posters and the trail, for a setting with them.
+  if (PACK.wanted) { $("wanted-card").hidden = false;
+    wantedUI = mountWanted({ PACK, root: $("wanted-card"), esc, crew: () => gmCrew, level: () => Math.min(4, ship[PACK.wanted.track] || 0),
+      setWanted: (c, w) => { c.play.wanted = w; saveGM(); renderGM(); }, toast: gmSay }); }
+  if (PACK.trail) { $("trail-card").hidden = false;
+    mountTrail({ PACK, root: $("trail-card"), esc, crew: () => gmCrew, toast: gmSay,
+      skillOf: (c, sk) => { const saved = ch; ch = c; try { return skillTarget(sk); } finally { ch = saved; } },
+      addClock: (name, size) => { const nc = { id: uid(), name: name.slice(0, 60), size, kind: "progress", filled: 0 }; clocks.push(nc); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(nc, -1, 0); return nc.id; },
+      clockOf: (id) => clocks.find((x) => x.id === id) || null,
+      fillClock: (id, n) => { const c = clocks.find((x) => x.id === id); if (!c || !n) return; const was = c.filled; c.filled = Math.min(c.size, c.filled + n); store.set(STORE_CLOCKS, clocks); renderClocks(); clockNotify(c, was, c.filled); } }); }
   campaignUI = mountCampaign({ PACK, gmRoot: $("cp-card"), noteRoot: $("cp-note"), esc, toast, saveText, onShare: () => pushScene(),
     cards: () => gmCrew.flatMap((c) => c.cards || []), words: DISC ? { card: DISC.card, cards: DISC.cards } : null }); // triggers: the group's cards
   pushScene();
