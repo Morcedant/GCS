@@ -106,6 +106,17 @@ main { flex: 1; }
 .ld-w-tools button:hover, .ld-w-tools button[aria-pressed="true"] { border-color: var(--ld-accent); }
 .ld-w-preview { border: 1px dashed var(--ld-line); border-radius: var(--ld-radius); padding: .4rem 1rem; max-width: none; }
 .ld-w-edit textarea { min-height: 22rem; font-size: 1rem; }
+/* The playtest page (/playtest/) and the feedback the author reads */
+.ld-fb { border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: .8rem 1rem; background: var(--ld-panel); display: grid; gap: .6rem; justify-items: start; }
+.ld-fb pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 .95rem/1.5 var(--ld-body); color: var(--ld-ink); }
+.ld-pt-scale { display: flex; flex-wrap: wrap; gap: .4rem 1rem; border: 1px solid var(--ld-line); border-radius: var(--ld-radius); padding: .6rem .8rem; margin: 0; }
+.ld-pt-scale legend { font: 600 .76rem/1.2 var(--ld-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ld-ink-2); padding: 0 .3rem; }
+.ld-form .ld-pt-scale label { display: flex; align-items: center; gap: .35rem; font: 400 .95rem/1.3 var(--ld-body); letter-spacing: normal; text-transform: none; color: var(--ld-ink); }
+.ld-form .ld-pt-scale input { width: auto; }
+.ld-pt-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.ld-pt-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.25rem; margin: 0; padding: 0; list-style: none; }
+.ld-pt-steps li { border-top: 2px solid var(--ld-accent); padding-top: .9rem; }
+.ld-pt-steps b { display: block; font: 600 1.05rem/1.2 var(--ld-label); margin-bottom: .3rem; }
 """
 
 
@@ -160,7 +171,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, bl
 {sections}
 </main>
 <footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. Copyright © Don Smallwood. All rights reserved.</span>
-<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{BLOG_SLUG}/">Dev blog</a><a href="/join">Join our Discord</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}
+<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{BLOG_SLUG}/">Dev blog</a><a href="/playtest/">Playtest</a><a href="/join">Join our Discord</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}
 </body>
 </html>
 """
@@ -181,6 +192,39 @@ def copy(src, rel):
 def downloads(links):
     items = "".join(f'<li><a class="ld-button ld-button--ghost" href="{h}" download>{e(t)}</a></li>' for h, t in links)
     return f'<div class="ld"><div class="ld-eyebrow">Downloads</div><ul class="ld-downloads">{items}</ul></div>'
+
+
+# The playtest page: how to play for someone who has never seen the game, then the feedback form (website/blog.js
+# sends it to the table server; the author reads it on the Write page).
+PLAYTEST_HERO = """<div class="ld ld-hero"><div class="ld-eyebrow">Playtest</div><h1>Play it, then tell us how it went</h1><hr class="ld-rule">
+<p class="ld-lede">Thanks for playtesting Legend Dynamics. You don't need to read anything first: the GM brings your character and explains as you go. This page has the two-minute version of the rules, and, after the game, a few questions that shape the next version.</p>
+<div class="ld-actions"><a class="ld-button" href="#feedback">Go to the questions</a></div></div>"""
+PLAYTEST_HOW = """<div class="ld" id="how"><div class="ld-eyebrow">Before you play</div><h2>The game in two minutes</h2>
+<ul class="ld-pt-steps">
+<li><b>Roll low</b>Your character sheet gives each skill a number, usually 10 to 15. Roll three six-sided dice: a total equal to or under the number succeeds, and the further under, the better. A 3 or 4 always works; a 17 or 18 always fails.</li>
+<li><b>Say what you do</b>Describe what your character tries. The GM tells you which skill to roll, and gives +2 when things are on your side or −2 when they aren't. You only roll when failing would matter.</li>
+<li><b>Close isn't failure</b>Miss by 1 or 2 and the GM may offer success at a cost: you get what you wanted, and something else goes wrong. You choose.</li>
+<li><b>Fights</b>On your turn, move and do one thing. When something hits you, you can try to dodge, once a round. Each hit marks boxes on your injury track; three boxes and you're down.</li>
+<li><b>Legend points</b>You start with two (Trails of Blood &amp; Dust calls them Grit). Spend one to reroll, to take a box less from a hit, or to have packed just the right thing. You earn more when your character's flaws get them into trouble.</li>
+<li><b>Find out what it is</b>When something strange turns up, dig into it. What you prove becomes a card on your sheet: what the thing is, and how it's beaten.</li>
+</ul></div>"""
+PLAYTEST_FORM = """<div class="ld" id="feedback"><div class="ld-eyebrow">After you play</div><h2>A few questions</h2>
+<p class="ld-note" style="max-width:46rem">Answer as many as you like; short answers are perfect. Only the game's maker reads them.</p>
+<form class="ld-form" id="ld-playtest" novalidate>
+<label>Which game <select name="game"><option value="">Choose…</option>""" + "".join(f"<option>{g}</option>" for g in ["Trails of Blood &amp; Dust", "Fracture Lines", "The Shattered Crown", "Aurora", "Something else"]) + """</select></label>
+<label>Who you played <input type="text" name="role" maxlength="120" placeholder="e.g. the preacher"></label>
+<fieldset class="ld-pt-scale ld-wide"><legend>How much fun was it?</legend>""" + "".join(f'<label><input type="radio" name="rating" value="{n}"> {n}{" (not much)" if n == 1 else " (a lot)" if n == 5 else ""}</label>' for n in range(1, 6)) + """</fieldset>
+<fieldset class="ld-pt-scale ld-wide"><legend>Would you play again?</legend>""" + "".join(f'<label><input type="radio" name="again" value="{a}"> {a}</label>' for a in ["Yes", "Maybe", "No"]) + """</fieldset>
+<label class="ld-wide">What was confusing? <textarea name="confusing" maxlength="2000" placeholder="A rule, a word on the sheet, a moment you didn't know what to do"></textarea></label>
+<label class="ld-wide">What did you never use? <textarea name="unused" maxlength="2000" placeholder="Anything on your sheet or in the rules that never came up"></textarea></label>
+<label class="ld-wide">What was the best moment? <textarea name="best" maxlength="2000"></textarea></label>
+<label class="ld-wide">Anything else? <textarea name="other" maxlength="2000"></textarea></label>
+<label>Your name (optional) <input type="text" name="name" maxlength="120" autocomplete="name"></label>
+<label>How to reach you (optional) <input type="text" name="contact" maxlength="120" placeholder="Discord name or email"></label>
+<label class="ld-pt-hp" aria-hidden="true">Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+<div class="ld-actions ld-wide"><button class="ld-button" type="submit">Send</button></div>
+<p class="ld-note ld-wide" id="ld-pt-status" role="status"></p>
+</form></div>"""
 
 
 def main():
@@ -207,6 +251,8 @@ def main():
                                    f'Every rules change is also listed in the <a href="{bw.CHANGELOG_SLUG}">changelog</a>.</p></div>\n'
                                    '<div class="ld" id="ld-blog"><noscript>The dev blog needs JavaScript.</noscript></div>'],
                                   fonts=font_links({bw.BRAND_FONTS}), blog=True))
+    write("playtest/index.html", page("/playtest", "Playtest · Legend Dynamics", "Played a Legend Dynamics playtest? How to play in two minutes, and four questions about how it went.",
+                                      [PLAYTEST_HERO, PLAYTEST_HOW, PLAYTEST_FORM], fonts=font_links({bw.BRAND_FONTS}), blog=True))
     write("blog/write/index.html", page(BLOG_SLUG + "/write", "Write · Dev blog · Legend Dynamics", "The dev blog's author page.",
                                         ['<div class="ld ld-hero"><div class="ld-eyebrow">Dev blog</div><h1>Write a post</h1><hr class="ld-rule"></div>',
                                          '<div class="ld" id="ld-blog-write"><noscript>Writing needs JavaScript.</noscript></div>'],

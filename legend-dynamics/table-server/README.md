@@ -68,6 +68,8 @@ Keep it a **Secret**, not a variable in `wrangler.toml`: a secret survives every
 
 The same server keeps the site's dev blog (`/blog/` on the website; the posts live in the server's own storage, `src/blog.js`). Anyone can read published posts. To write them, add a **Secret** named `DEV` in the Worker's **Settings → Variables and Secrets**: a long random code of its own (not a GM code), or `Name: code` lines for more than one author. Then open `/blog/write/` on the site and sign in with it; that browser remembers it until **Sign out**. With no `DEV` secret, nobody can write. Posts and drafts are kept until you delete them, whatever happens to the tables.
 
+It also keeps **playtest feedback** from the site's `/playtest/` page. Anyone can send it (a few answers an hour from each address, and the newest 2,000 are kept); only an author can read it: on `/blog/write/`, sign in with the `DEV` code and press **Playtest feedback**.
+
 ## Use it
 
 - **GM:** GM view → **Shared table** → name it → **Start a table** (and the GM access code, the first time, if the server has `GM_CODES`). Share the code, or **Copy link** and send that (the link fills in the code). **Rejoin** gets you back in after closing the page; the key that makes you the GM stays in your browser.

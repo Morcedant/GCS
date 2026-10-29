@@ -1,7 +1,7 @@
 // The development blog (src/blog.js): posts are checked, listed newest first, and drafts stay hidden from readers.
 import assert from "node:assert/strict";
 import test from "node:test";
-import { cleanPost, listPosts, summary, postId, validId, blogFetch, TAGS } from "../src/blog.js";
+import { cleanPost, listPosts, summary, postId, validId, blogFetch, TAGS, cleanFeedback, FEEDBACK } from "../src/blog.js";
 
 /** A Durable Object's storage, in memory. */
 const memory = () => {
@@ -49,4 +49,22 @@ test("the blog's requests save, show, hide and delete posts", async () => {
   assert.ok((await call(s, "/blog/save", { post: { id: "2020-01-01-gone", title: "x", body: "y" } })).error, "can't edit a post that isn't there");
   await call(s, "/blog/delete", { id: post.id });
   assert.ok((await call(s, `/blog/get?id=${post.id}`)).error);
+});
+
+test("playtest feedback is checked, kept newest first, limited per sender, and deleted by id", async () => {
+  const now = Date.UTC(2026, 9, 29);
+  const f = cleanFeedback({ game: "Trails of Blood & Dust", rating: 4, again: "Yes", confusing: "  Range\r\nbands ", name: "  Sam\u0007 ", rating2: 9, game2: "x" }, now, "abc123");
+  assert.deepEqual([f.id, f.game, f.rating, f.again, f.confusing, f.name], ["2026-10-29-abc123", "Trails of Blood & Dust", 4, "Yes", "Range\nbands", "Sam"]);
+  assert.equal(cleanFeedback({ game: "Trails of Blood & Dust", name: "Only a name" }, now, "x"), null, "it has to answer something");
+  assert.equal(cleanFeedback({ rating: 7, again: "Sure", game: "Monopoly", best: "ok" }, now, "x").rating, null);
+  const s = memory();
+  assert.equal((await call(s, "/feedback/add", { feedback: { best: "The showdown" }, sender: "a" })).ok, true);
+  assert.equal((await call(s, "/feedback/add", { feedback: { name: "nothing" }, sender: "a" })).error !== undefined, true);
+  await call(s, "/feedback/add", { feedback: { best: "Second" }, sender: "b" });
+  const list = (await call(s, "/feedback/list")).feedback;
+  assert.equal(list.length, 2);
+  for (let i = 0; i < FEEDBACK.perHour; i++) await call(s, "/feedback/add", { feedback: { other: "spam " + i }, sender: "c" });
+  assert.match((await call(s, "/feedback/add", { feedback: { other: "one more" }, sender: "c" })).error, /an hour/);
+  assert.equal((await call(s, "/feedback/delete", { id: list[0].id })).ok, true);
+  assert.ok(!(await call(s, "/feedback/list")).feedback.some((x) => x.id === list[0].id));
 });
