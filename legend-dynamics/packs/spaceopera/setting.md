@@ -284,9 +284,59 @@ Every power controls equipment differently. The GM gives each port, station or w
 - **Getting it past customs.** Contraband passes an inspection with **Deception**, **Streetwise** or a bribe (**Commerce**, and a box of **Debt** if it's a big one). If it's found, mark **Heat**, and the gear is likely confiscated.
 - **Grades of powered armor.** Legion-grade suits come from militaries and the Hegemony Houses; **commercial** security and industrial suits are sold where the law allows them, and registered to their owners; **colony-built** rigs come from illicit armorers on remote worlds, cheaper and Temperamental. Each needs the **Powered Armor** Edge.
 
+# Jobs, debt and salvage
+
+## Payday
+
+Every crew owes someone. When a job is done, the pay goes where it's needed:
+
+- **An ordinary job clears a box of Debt.** A big score clears two. A favor, a dock or a contact can stand in for money: the job's offer says which.
+- **Borrowing or buying on credit marks a box of Debt.** So does a dock visit you couldn't pay for.
+- **When Debt has a box marked, a payment is always coming due.** A job that doesn't pay down Debt leaves it where it is, and the GM can bring a creditor calling.
+
+## The job board
+
+In port, there's always work. The GM offers two or three jobs, each with a **patron**, **the job**, **the pay** and a **catch** the crew doesn't know yet. Before they sign, a **Commerce** roll can do one of two things: success adds a sweetener (1,000 credits, a dock, or a favor), or reveals the catch. Success by 5 or more does both.
+
+## Derelicts and salvage
+
+The corridors are full of dead ships: lost in collapses, abandoned in wars, or waiting. Boarding one is usually a data record (*Data records*), and often a Countdown.
+
+- **Salvage law.** Under the Human–Tessan Accord, a ship with living crew aboard is not salvage, whatever state it's in. In Concord space, the first claim registered at a station wins. The Hegemony claims anything imperial, everywhere, and enforces it when it can.
+- **What it's worth.** Salvage pays like a job: a box of Debt for an ordinary find, two for a rich one. A data record on what you found is often worth more than the hull.
+
 # Ships in a fight
 
 Most crews would rather run than fight, and most fights between ships are short. These rules keep them fast: one roll per station, each exchange.
+
+## The crew's ship
+
+The crew shares a ship, and it's a character of its own. Give it three things:
+
+- **A name.** Painted on the hull, and on every debt it owes.
+- **A type**, with an edge and a catch:
+
+| Type | Edge | Catch |
+|---|---|---|
+| Courier | Small and fast: +2 to the pilot's range contest. | One job's cargo at a time, and a single laser battery. |
+| Freighter | Big holds: a cargo job pays one more box of Debt, and +2 to Commerce when trading it. | Slow: −2 to the pilot's range contest. |
+| Survey ship | Long-range sensors and a lab: +2 to Sensors, and to Science on board. | Lightly armed: a laser battery, no missiles. |
+| Ex-military gunboat | Armor: ignores one hit that would mark 1 box each exchange; lasers and a missile rack. | It looks like what it is: −2 to talk your way past a checkpoint or a customs inspection. |
+
+- **A quirk**, with an upside and trouble. The trouble works like a complication: when it causes real trouble for the crew, one of them earns a Resolve point.
+
+| Quirk | Upside | Trouble |
+|---|---|---|
+| An AI with opinions | +2 to Computers on board; it has noticed things you haven't. | It argues with the captain, at the worst moments, in front of the wrong people. |
+| Smuggler's holds | +2 to hide cargo or people from a search. | If a search finds them, Heat marks a box, whatever was in them. |
+| An overtuned drive | +1 to the pilot's range contest, and to Navigation through a corridor. | A natural 17 or 18 on any ship roll knocks a system out for the scene. |
+| A famous name | +2 to Diplomacy and Commerce with anyone who's heard of it. | Everyone has heard of it: −2 to slip into a port unnoticed. |
+| Patchwork systems | The engineer patches two Hull boxes a fight instead of one. | Every repair needs a part the crew doesn't have; a dock visit costs a box of Debt. |
+| Vael grafts | Living hull: clears one Hull box each day without a dock. | It has to be fed: a day without supplies, and it marks a box instead. |
+| A navy transponder | Once per port, it passes as a Concord navy auxiliary. | If the trick is caught, Heat marks two boxes. |
+| Someone else's ship | Papers, codes and a reputation that open the right doors. | Its last owner wants it back, and knows where it docks. |
+
+Choose them together at the first session, or roll them. The ship's **Hull** track is the crew's, with Debt, Heat and Reputation; a dock clears it, and a dock costs money. In the GM view, the crew's ship card keeps the name, type and quirk, and the shared table shows them on everyone's play tab.
 
 ## Range in space
 
@@ -862,13 +912,13 @@ A starter job for three to seven crew, for one or two sessions. A salvage run do
 - **Brakka**: the ship's last port of call was a Hegemony world. Whatever is aboard, the Hegemony will want it.
 - **Sable**: a 140-year-old encrypted core. Nobody else alive can open it.
 
-**What's really happening.** The *Long Patience* isn't dead. Its 312 colonists are asleep in cryo, and its AI, the **Warden**, has kept them alive for 140 years, growing the hull around them like a shell. The corridor has reopened for a few days only; it's drifting closed again. Ves Oro-Lan sold the same coordinates to the Halvane corporation, which has sent a team to strip the core and leave the rest. And under the Human–Tessan Accord, a ship with living crew aboard is not salvage: wake the colonists and the claim is void.
+**What's really happening.** The *Long Patience* isn't dead. Its 312 colonists are asleep in cryo, and its AI, the **Warden**, has kept them alive for 140 years, growing the hull around them like a shell. The corridor has reopened for a few days only; it's drifting closed again. Ves Oro-Lan sold the same coordinates to Vantor Reclamation, a salvage corporation, which has sent a team to strip the core and leave the rest. And under the Human–Tessan Accord, a ship with living crew aboard is not salvage: wake the colonists and the claim is void.
 
 **1. The offer.** Ves meets the crew in a dockside tea house, smiling. A Psychology roll notices the broker keeps checking the departures board. Pressed, Ves admits "another party has expressed interest". The crew can push for better terms: Commerce, and success clears the Debt box up front.
 
 **2. The run.** The corridor is a Navigation roll for Ilvi, with Quill's help (+2): a success gets them through clean; a failure takes them through anyway, but the ship's transit is logged at the junction, and Heat marks a box. On the far side: a drift of old wreckage, and the *Long Patience*, twelve kilometers of hull grown over with something like bark.
 
-**3. Company.** A Halvane **corporate frigate** is already there, and it hails them: back off, or be fired on. This is a chance to run a ship fight (*Ships in a fight*, in the Players' Guide), or to talk, bluff or sneak past. Sensors can find the frigate's blind spot; Sable can spoof its registry; a good hail buys an exchange. If the fight goes badly, the frigate lets them limp to the derelict: Halvane wants the core, not a second wreck.
+**3. Company.** A Vantor Reclamation **corporate frigate** is already there, and it hails them: back off, or be fired on. This is a chance to run a ship fight (*Ships in a fight*, in the Players' Guide), or to talk, bluff or sneak past. Sensors can find the frigate's blind spot; Sable can spoof its registry; a good hail buys an exchange. If the fight goes badly, the frigate lets them limp to the derelict: Vantor wants the core, not a second wreck.
 
 **4. Boarding.** Inside, the hull is warm and breathing. Start a **data record** for the *Long Patience* (*Data records*, in the Players' Guide); this is the setting's own example, *A living hull*. The clues, and who finds them best:
 
@@ -881,13 +931,21 @@ When the crew cuts into anything vital, or the first investigation roll fails, s
 
 **5. The Warden.** The Warden speaks through the ship: a slow, polite voice that has had no one to talk to for 140 years. It wants the colonists taken home. It knows the corridor is closing, and it can't fly the ship alone: the drive needs a navigator and an engineer. Sable and Ilvi can talk to it as an equal; Rook and Brakka recognize a soldier still at their post.
 
-**6. Halvane boards.** A Halvane team cuts in to take the core: a **Syndicate enforcer** (hired muscle), two **Combat drones** and a **Corporate assassin** who would rather not be seen. They have orders to vent the cryo decks to make the salvage legal. This is the big fight, in the ship's grown corridors.
+**6. Vantor boards.** A Vantor team cuts in to take the core: a **Syndicate enforcer** (hired muscle), two **Combat drones** and a **Corporate assassin** who would rather not be seen. They have orders to vent the cryo decks to make the salvage legal. This is the big fight, in the ship's grown corridors.
 
 **7. The choice.** With the Countdown running out, the crew chooses: take the core and the money, and leave the colonists to sleep another century; wake them, and the claim is void; or fly the *Long Patience* home, with the Warden at the helm and the crew's ship alongside. Flying it home means a Piloting or Navigation roll against the closing corridor, and nobody pays them for it.
 
-**Rewards.** Ves's 2,000 credits and a box of Debt, if they bring the core. A data record on the living hull, and a friend in the Warden if the colonists live. If they bring 312 people home, Reputation marks a box, for the good: the ports talk about it for years. If Halvane learns who stopped them, Heat marks one.
+**Rewards.** Ves's 2,000 credits and a box of Debt, if they bring the core. A data record on the living hull, and a friend in the Warden if the colonists live. If they bring 312 people home, Reputation marks a box, for the good: the ports talk about it for years. If Vantor learns who stopped them, Heat marks one.
 
 **Threats.** Corporate frigate (*Enemy ships*); Syndicate enforcer; Combat drone ×2; Corporate assassin. The Warden is a Rogue AI that never attacks: it must be talked down, isolated or erased, and erasing it kills the colonists.
+
+## The crew's ship and the job board
+
+The GM view has three tools for the corridors, in *Clocks and tools*:
+
+- **The crew's ship.** Its name, type and quirk, picked or rolled. Players see it on their play tab, above the crew's tracks, through the shared table. When its trouble bites, someone earns Resolve.
+- **The job board.** **Roll an offer** gives a patron, the job, the pay and the catch; re-roll any part. Roll two or three for a port, and keep the catch to yourself until a Commerce roll or the job reveals it.
+- **A derelict.** What it was, what happened, what's still aboard, the danger and the prize. Start its data record, and a Countdown if the danger is a clock.
 
 # Threats
 

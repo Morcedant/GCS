@@ -439,6 +439,12 @@ tr.lvl-U td.target { color: var(--muted); }
 .wanted-poster .wp-for { font: .92rem/1.35 var(--body); }
 .wanted-poster .wp-reward { font-family: var(--title); font-size: 1.6rem; letter-spacing: .06em; margin-top: 4px; }
 #wanted-card input[type="number"], #trail-card input[type="number"] { width: 100%; font: inherit; color: var(--fg); background: var(--well); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; }
+.crew-ship { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin: 8px 0 10px; display: grid; gap: 4px; }
+.crew-ship .cs-name { font-family: var(--display); font-size: 1.1rem; letter-spacing: .04em; }
+.crew-ship .cs-type { font: .74rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--chrome); }
+.crew-ship p { margin: 0; }
+.gen + .gen { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
+.gen h4 { margin: 0 0 4px; font-family: var(--display); letter-spacing: .06em; }
 .wp-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; align-items: end; margin-top: 8px; }
 
 /* Campaign builder (campaign.js) and homebrew's bonus boxes */
@@ -663,7 +669,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="316a8de" data-version-date="2026.10.29" title="The code changes whenever this page changes.">Version 2026.10.29 · 316a8de</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="43617d4" data-version-date="2026.10.29" title="The code changes whenever this page changes.">Version 2026.10.29 · 43617d4</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -1039,6 +1045,8 @@ tr.lvl-U td.target { color: var(--muted); }
         </div>
         <div class="toast" id="seed-msg" role="status" aria-live="polite"></div>
       </div>
+      <div class="card hud no-print" id="crewship-card" hidden></div>
+      <div class="card hud no-print" id="gen-card" hidden></div>
       <div class="card hud no-print" id="wanted-card" hidden></div>
       <div class="card hud no-print" id="trail-card" hidden></div>
       <div class="card hud no-print" id="gm-gritty-card" hidden>
@@ -4949,6 +4957,7 @@ tr.lvl-U td.target { color: var(--muted); }
         </div>
         <div class="card hud no-print" id="card-ship">
           <h3>Troubles</h3>
+          <div id="crew-ship-view" hidden></div>
           <p class="small muted">Shared by the whole party. Killing in the open, blatant sorcery, buying on credit or days in the wilds without supplies can mark a box. Lying low, a cleansing rite, paying up or reaching a town can clear one.</p>
           <div class="ship" id="ship"></div>
           <button class="linkish" id="ship-reset">Clear all Troubles</button>
@@ -7106,6 +7115,7 @@ return { mountLab };
   let sharedTable = null; // mounted with the GM view below
   let homebrewUI = null; // homebrew.js: mounted with the guides below
   let wantedUI = null; // frontier.js: wanted posters in the GM view
+  let crewShipUI = null, sharedCrewShip = null; // frontier.js: the crew's ship (the GM's, or the one the shared table sent)
   let campaignUI = null; // campaign.js: the GM's campaign builder, mounted with homebrew
   // Advancement point costs (core rules, Advancement). Magic and powers use the costs their chapters give.
   const COSTS = { UT: 1, TS: 2, revise: 1, edge: 3, attr: 4 };
@@ -8671,6 +8681,12 @@ return { mountLab };
   let ship = store.get(STORE_SHIP, {});
   if (!ship || typeof ship !== "object") ship = {};
   const shipEffect = (name, n) => (PACK.tracks.find((t) => t.name === name)?.effects || [])[n] || "";
+  // The crew's ship above the group's tracks on the play tab: the shared table's, or this browser's own (the GM's).
+  function renderCrewShipView() {
+    const el = $("crew-ship-view"); if (!PACK.crewShip || !crewShipUI) { el.hidden = true; return; }
+    const sh = sharedCrewShip || crewShipUI.snapshot();
+    el.hidden = !sh; el.innerHTML = sh ? crewShipUI.html(sh) : "";
+  }
   function renderShip() {
     if (wantedUI) wantedUI.render(); // the poster's reward follows the law's track
     $("ship").innerHTML = SHIP_TRACKS.map(([name, max]) => {
@@ -10720,6 +10736,14 @@ function mountCampaign(api) {
 // mountTrail(api) with api: { PACK, root, esc, crew(), skillOf(c, skill) (a character's target), addClock(name, size)
 //   (returns its id), clockOf(id) ({ filled, size } or null), fillClock(id, n), toast(m, err) }
 // wantedClean(raw) checks a poster from a file; wantedHTML(w, esc, PACK) draws one (the GM view and the sheet).
+//
+// Two more for any setting that has them:
+// The crew's ship (PACK.crewShip: types, quirks): its name, its type (an edge and a catch) and a quirk (an upside, and
+// trouble that earns a point like a complication). The GM keeps it; the shared table shows it on players' play tabs.
+// mountCrewShip(api) with api: { PACK, root, esc, onChange() (the shared part changed) } returns
+// { snapshot(), html(ship) }; crewShipClean(raw) checks one from a file or the table.
+// Tables (PACK.generators: [{ id, title, intro, button, parts: [[label, [entries]]] }]): roll every part, re-roll any,
+// copy the result. mountGenerators(api) with api: { PACK, root, esc, toast }.
 // Function declarations only.
 
 function wantedClean(raw) {
@@ -10856,13 +10880,93 @@ function mountTrail(api) {
   return { render };
 }
 
+// ---- the crew's ship ----
+function crewShipClean(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const line = (v, max) => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+  const out = { name: line(raw.name, 60), type: line(raw.type, 40), quirk: line(raw.quirk, 60), notes: line(raw.notes, 300) };
+  return out.name || out.type || out.quirk ? out : null;
+}
+function mountCrewShip(api) {
+  const { PACK, root, esc } = api, CS = PACK.crewShip;
+  if (!CS || !root) return { snapshot: () => null, html: () => "" };
+  const KEY = PACK.id + ".crewship.v1";
+  let ship = null;
+  try { ship = crewShipClean(JSON.parse(localStorage.getItem(KEY) || "null")); } catch {}
+  const keep = () => { try { localStorage.setItem(KEY, JSON.stringify(ship)); } catch {} if (api.onChange) api.onChange(); };
+  const typeOf = (id) => CS.types.find((t) => t[0] === id), quirkOf = (n) => CS.quirks.find((q) => q[0] === n);
+  const pick = (l) => l[Math.floor(Math.random() * l.length)];
+  /** The ship as everyone sees it: name, type with its edge and catch, quirk with its upside and trouble. */
+  function html(sh) {
+    if (!sh) return "";
+    const t = typeOf(sh.type), q = quirkOf(sh.quirk);
+    return `<div class="crew-ship"><b class="cs-name">${esc(sh.name || "The ship")}<\/b>${t ? `<span class="cs-type">${esc(t[1])}<\/span>` : ""}
+      ${t ? `<p class="small"><b>Edge:<\/b> ${esc(t[2])} <b>Catch:<\/b> ${esc(t[3])}<\/p>` : ""}
+      ${q ? `<p class="small"><b>${esc(q[0])}.<\/b> ${esc(q[1])} <b>Trouble:<\/b> ${esc(q[2])}<\/p>` : ""}
+      ${sh.notes ? `<p class="small muted">${esc(sh.notes)}<\/p>` : ""}<\/div>`;
+  }
+  function render() {
+    const sh = ship || { name: "", type: "", quirk: "", notes: "" };
+    root.innerHTML = `<h3>${esc(CS.title || "The crew's ship")}<\/h3><p class="small muted">${esc(CS.intro || "")}<\/p>
+      <div class="wp-edit">
+        <div class="field"><label for="cs-name">Name<\/label><input type="text" id="cs-name" maxlength="60" value="${esc(sh.name)}" placeholder="${esc(CS.namePlaceholder || "e.g. Second Chance")}"><\/div>
+        <div class="field"><label for="cs-type">Type<\/label><select id="cs-type"><option value="">Choose…<\/option>${CS.types.map((t) => `<option value="${esc(t[0])}"${t[0] === sh.type ? " selected" : ""}>${esc(t[1])}<\/option>`).join("")}<\/select><\/div>
+        <div class="field"><label for="cs-quirk">Quirk<\/label><select id="cs-quirk"><option value="">Choose…<\/option>${CS.quirks.map((q) => `<option${q[0] === sh.quirk ? " selected" : ""}>${esc(q[0])}<\/option>`).join("")}<\/select><\/div>
+        <div class="field"><label for="cs-notes">Notes (optional)<\/label><input type="text" id="cs-notes" maxlength="300" value="${esc(sh.notes)}" placeholder="Registry, history, who it's owed to"><\/div>
+      <\/div>
+      ${html(ship)}
+      <div class="btn-row"><button class="btn" id="cs-roll">Roll a ship<\/button>${ship ? `<span class="small muted">Saved. Players see it on their play tab through the shared table.<\/span>` : ""}<\/div>`;
+  }
+  const read = () => crewShipClean({ name: root.querySelector("#cs-name").value, type: root.querySelector("#cs-type").value, quirk: root.querySelector("#cs-quirk").value, notes: root.querySelector("#cs-notes").value });
+  root.addEventListener("change", (e) => { if (e.target.closest(".wp-edit")) { ship = read(); keep(); render(); } });
+  root.addEventListener("click", (e) => {
+    if (e.target.id !== "cs-roll") return;
+    const cur = read() || {};
+    ship = crewShipClean({ name: cur.name || pick(CS.names || ["Second Chance"]), type: pick(CS.types)[0], quirk: pick(CS.quirks)[0], notes: cur.notes });
+    keep(); render(); if (api.toast) api.toast("A ship rolled: change anything you like.");
+  });
+  render();
+  return { snapshot: () => ship, html };
+}
+
+// ---- tables: roll each part ----
+function mountGenerators(api) {
+  const { PACK, root, esc } = api, G = PACK.generators || [];
+  if (!G.length || !root) return { render() {} };
+  const rolled = {}, pickI = (n) => Math.floor(Math.random() * n);
+  const text = (g) => g.parts.map(([label, list], i) => `${label}: ${list[rolled[g.id][i]]}`).join("\n");
+  function render() {
+    root.innerHTML = `<h3>${esc(PACK.generatorsTitle || "Tables")}<\/h3>` + G.map((g) => `<div class="gen" data-gen="${esc(g.id)}">
+      <h4>${esc(g.title)}<\/h4>${g.intro ? `<p class="small muted">${esc(g.intro)}<\/p>` : ""}
+      ${rolled[g.id] ? `<dl class="seed">${g.parts.map(([label, list], i) => `<div><dt>${esc(label)}<\/dt><dd>${esc(list[rolled[g.id][i]])}<\/dd><button data-regen="${i}" aria-label="Re-roll ${esc(label)}" title="Re-roll">↻<\/button><\/div>`).join("")}<\/dl>` : ""}
+      <div class="btn-row"><button class="btn primary" data-roll>${esc(g.button || "Roll")}<\/button>${rolled[g.id] ? `<button class="btn" data-copygen>Copy<\/button>` : ""}<\/div><\/div>`).join("");
+  }
+  root.addEventListener("click", (e) => {
+    const box = e.target.closest("[data-gen]"); if (!box) return;
+    const g = G.find((x) => x.id === box.dataset.gen); if (!g) return;
+    const re = e.target.closest("[data-regen]");
+    if (e.target.closest("[data-roll]")) rolled[g.id] = g.parts.map(([, list]) => pickI(list.length));
+    else if (re) { const i = +re.dataset.regen, n = g.parts[i][1].length; let v; do { v = pickI(n); } while (n > 1 && v === rolled[g.id][i]); rolled[g.id][i] = v; }
+    else if (e.target.closest("[data-copygen]")) {
+      const t = text(g), p = navigator.clipboard && navigator.clipboard.writeText(t);
+      const done = (ok) => api.toast && api.toast(ok ? "Copied." : "Copying is blocked here; select the text and copy it yourself.", !ok);
+      if (p) p.then(() => done(true), () => done(false)); else done(false);
+      return;
+    } else return;
+    render();
+  });
+  render();
+  return { render };
+}
+
   // The shared table: players join from their play tab, the GM starts one here, and every roll at the table shows on both.
   sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay, pointName: T.point, partyName: T.party,
     server: TABLE_SERVER, character: () => ch.name, esc, toast,
     // Phase 2: the player shares their character; the GM's cards follow the table's characters, and both follow each other's changes.
     onPlayers: () => renderGM(), // who's at the table, on the GM's cards
     // Phase 3: the GM's map and fight go to the players; their moves and requests come back to the GM.
-    onScene: (sc) => { renderFight(sc); if (homebrewUI && sc) homebrewUI.receive(sc.homebrew); if (campaignUI && sc) campaignUI.receive(sc.campaign); },
+    onScene: (sc) => { renderFight(sc); if (homebrewUI && sc) homebrewUI.receive(sc.homebrew); if (campaignUI && sc) campaignUI.receive(sc.campaign);
+      if (PACK.crewShip && sc) { sharedCrewShip = crewShipClean(sc.crewShip); renderCrewShipView(); } },
     onMove: (m) => { if (!battleMap.moveOwn(m.key, m.to)) gmSay(`${m.by} moved, but their token isn't on the map: add the ${T.party} to it.`, true); },
     fillAsk: (a) => { if (!labPanel || !labPanel.fillRequest) return false; $("tab-gm").click(); return labPanel.fillRequest(a); },
     onConnected: (role) => { if (role === "player") sharedTable.shareMine(ch.id, sheetOf(ch), pickPlay(ch)); else pushScene(); renderGM(); },
@@ -10923,7 +11027,7 @@ function mountTrail(api) {
     if (!sharedTable || sharedTable.role() !== "gm") return;
     try { battleMap; labPanel; } catch { return; } // not mounted yet (the page is still starting)
     sharedTable.pushScene(() => ({ map: battleMap.snapshot(), fight: labPanel && labPanel.scene ? labPanel.scene() : null, homebrew: homebrewUI ? homebrewUI.snapshot() : null,
-      campaign: campaignUI ? campaignUI.snapshot() : null }));
+      campaign: campaignUI ? campaignUI.snapshot() : null, crewShip: crewShipUI ? crewShipUI.snapshot() : null }));
   }
   // A player's view of the GM's map and fight, on their play tab.
   let viewerMap = null;
@@ -11742,6 +11846,10 @@ function mountTrail(api) {
   // Homebrew: the GM makes it in the GM view; players get it from a file or when they join the GM's shared table.
   homebrewUI = mountHomebrew({ PACK, gmRoot: $("hb-card"), noteRoot: $("hb-note"), fileRoot: $("hb-file"), ritualRoot: $("hb-rituals"), heartInput: $("f-ma-heart"), esc, toast, saveText });
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
+  // The crew's ship and the setting's tables (frontier.js), for a setting with them.
+  if (PACK.crewShip) { $("crewship-card").hidden = false;
+    crewShipUI = mountCrewShip({ PACK, root: $("crewship-card"), esc, toast: gmSay, onChange: () => { renderCrewShipView(); pushScene(); } }); renderCrewShipView(); }
+  if (PACK.generators) { $("gen-card").hidden = false; mountGenerators({ PACK, root: $("gen-card"), esc, toast: gmSay }); }
   // Frontier tools (frontier.js): wanted posters and the trail, for a setting with them.
   if (PACK.wanted) { $("wanted-card").hidden = false;
     wantedUI = mountWanted({ PACK, root: $("wanted-card"), esc, crew: () => gmCrew, level: () => Math.min(4, ship[PACK.wanted.track] || 0),

@@ -905,9 +905,59 @@ Every power controls equipment differently. The GM gives each port, station or w
 - **Getting it past customs.** Contraband passes an inspection with **Deception**, **Streetwise** or a bribe (**Commerce**, and a box of **Debt** if it's a big one). If it's found, mark **Heat**, and the gear is likely confiscated.
 - **Grades of powered armor.** Legion-grade suits come from militaries and the Hegemony Houses; **commercial** security and industrial suits are sold where the law allows them, and registered to their owners; **colony-built** rigs come from illicit armorers on remote worlds, cheaper and Temperamental. Each needs the **Powered Armor** Edge.
 
+# Jobs, debt and salvage
+
+## Payday
+
+Every crew owes someone. When a job is done, the pay goes where it's needed:
+
+- **An ordinary job clears a box of Debt.** A big score clears two. A favor, a dock or a contact can stand in for money: the job's offer says which.
+- **Borrowing or buying on credit marks a box of Debt.** So does a dock visit you couldn't pay for.
+- **When Debt has a box marked, a payment is always coming due.** A job that doesn't pay down Debt leaves it where it is, and the GM can bring a creditor calling.
+
+## The job board
+
+In port, there's always work. The GM offers two or three jobs, each with a **patron**, **the job**, **the pay** and a **catch** the crew doesn't know yet. Before they sign, a **Commerce** roll can do one of two things: success adds a sweetener (1,000 credits, a dock, or a favor), or reveals the catch. Success by 5 or more does both.
+
+## Derelicts and salvage
+
+The corridors are full of dead ships: lost in collapses, abandoned in wars, or waiting. Boarding one is usually a data record (*Data records*), and often a Countdown.
+
+- **Salvage law.** Under the Human–Tessan Accord, a ship with living crew aboard is not salvage, whatever state it's in. In Concord space, the first claim registered at a station wins. The Hegemony claims anything imperial, everywhere, and enforces it when it can.
+- **What it's worth.** Salvage pays like a job: a box of Debt for an ordinary find, two for a rich one. A data record on what you found is often worth more than the hull.
+
 # Ships in a fight
 
 Most crews would rather run than fight, and most fights between ships are short. These rules keep them fast: one roll per station, each exchange.
+
+## The crew's ship
+
+The crew shares a ship, and it's a character of its own. Give it three things:
+
+- **A name.** Painted on the hull, and on every debt it owes.
+- **A type**, with an edge and a catch:
+
+| Type | Edge | Catch |
+|---|---|---|
+| Courier | Small and fast: +2 to the pilot's range contest. | One job's cargo at a time, and a single laser battery. |
+| Freighter | Big holds: a cargo job pays one more box of Debt, and +2 to Commerce when trading it. | Slow: −2 to the pilot's range contest. |
+| Survey ship | Long-range sensors and a lab: +2 to Sensors, and to Science on board. | Lightly armed: a laser battery, no missiles. |
+| Ex-military gunboat | Armor: ignores one hit that would mark 1 box each exchange; lasers and a missile rack. | It looks like what it is: −2 to talk your way past a checkpoint or a customs inspection. |
+
+- **A quirk**, with an upside and trouble. The trouble works like a complication: when it causes real trouble for the crew, one of them earns a Resolve point.
+
+| Quirk | Upside | Trouble |
+|---|---|---|
+| An AI with opinions | +2 to Computers on board; it has noticed things you haven't. | It argues with the captain, at the worst moments, in front of the wrong people. |
+| Smuggler's holds | +2 to hide cargo or people from a search. | If a search finds them, Heat marks a box, whatever was in them. |
+| An overtuned drive | +1 to the pilot's range contest, and to Navigation through a corridor. | A natural 17 or 18 on any ship roll knocks a system out for the scene. |
+| A famous name | +2 to Diplomacy and Commerce with anyone who's heard of it. | Everyone has heard of it: −2 to slip into a port unnoticed. |
+| Patchwork systems | The engineer patches two Hull boxes a fight instead of one. | Every repair needs a part the crew doesn't have; a dock visit costs a box of Debt. |
+| Vael grafts | Living hull: clears one Hull box each day without a dock. | It has to be fed: a day without supplies, and it marks a box instead. |
+| A navy transponder | Once per port, it passes as a Concord navy auxiliary. | If the trick is caught, Heat marks two boxes. |
+| Someone else's ship | Papers, codes and a reputation that open the right doors. | Its last owner wants it back, and knows where it docks. |
+
+Choose them together at the first session, or roll them. The ship's **Hull** track is the crew's, with Debt, Heat and Reputation; a dock clears it, and a dock costs money. In the GM view, the crew's ship card keeps the name, type and quirk, and the shared table shows them on everyone's play tab.
 
 ## Range in space
 
