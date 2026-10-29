@@ -238,35 +238,42 @@ A remedy or a ritual against the dark always has a procedure: what it requires, 
 
 ## The first job: Dead Man's Wages
 
-A starter job for three to six hunters, for one or two sessions. It shows off what makes the setting different: a ride on the trail, a showdown in the street, Heat and a wanted poster, an investigation that ends in a lore card, and a monster that isn't the one you came for. It's written for the six pregenerated characters, and works with any.
+A starter job for three to six hunters, for one or two sessions. It's a monster hunt: strange deaths, a town that won't talk, an investigation that names the thing, and a descent into the dark to finish it. Along the way it shows off the trail, a showdown and the discovery clocks. It's written for the six pregenerated characters, and works for hunters of any role: the hook reaches each of them for a different reason.
 
-**The hook.** Each hunter gets a letter and a $50 bank draft. *Come to Mercy Springs. Something is killing my men in the Lazarus mine, and the company says it's cave-ins. Ask for me at the Silver Dollar. Ezra Quill, foreman.* Lucinda Marsh's cards turn up the Hanged Man the night it arrives. Ruth Calloway knows the name: Quill wrote to the Marshal's office a month ago, and nobody answered.
+**The hook.** Each hunter gets a letter, a $50 bank draft and a reason to come. *Come to Mercy Springs. Something is killing my men in the Lazarus mine, and the company calls it cave-ins. Ask for me at the Silver Dollar. Ezra Quill, foreman.* Give each role its own way in:
 
-**What's really happening.** The Lazarus mine broke into a burial cave older than the territory, and ghouls came up out of it. They take a miner a night and drag the bodies down. The company's owner, Augustus Crane, wants the silver more than the men, and told his foreman to keep quiet. Ezra Quill wouldn't, so Crane had him shot and buried two weeks ago. Quill rose at the next midnight: he's a revenant, and he wrote the letters. He wants Crane dead, and he'll help the hunters with the ghouls if they help him with that.
+- **A lawman** has a stack of missing-person reports from Mercy Springs that nobody answered. Ruth Calloway knows Quill wrote to the Marshal's office a month ago.
+- **A doctor** is asked to look at bodies the company doctor won't sign for.
+- **A preacher** is asked to bury them, because the town's own preacher has fled.
+- **A gambler or a practitioner** hears the silver's still coming up, and that the cards turn up the Hanged Man for anyone who asks about the place. Lucinda Marsh's do, the night the letter comes.
+- **A bounty hunter** is offered the price on whatever is doing the killing.
+- **A cursed or a dead hunter** gets the letter in a hand they somehow know: the dead write to the dead. Isaiah Booker and Tom Feeney both feel it.
 
-**1. The ride in.** Mercy Springs is a few days' ride: a trail clock of 4. Run it by *The trail* rules in the Players' Guide. Whatever the hazards are, on the last day the guide finds drag marks leading off the trail toward the hills, and a boot with a foot still in it.
+**What's really happening.** The Lazarus mine broke into a burial cave older than the territory, and ghouls came up out of it. They take a miner a night and drag the bodies down to feed. Augustus Crane, who owns the mine, wants the silver more than the men; his foreman Ezra Quill wouldn't keep quiet, so Crane had him shot and buried two weeks ago. Quill rose at the next midnight. He's a revenant, and he wrote the letters. He'll help the hunters against the ghouls, because they're eating his men, but what he really wants is Crane.
 
-**2. Mercy Springs.** A silver boomtown gone quiet. Miners drink in silence at the Silver Dollar. Sheriff Hiram Vance meets the hunters before they've watered their horses. He's in Crane's pocket and tells them there's no work here. Ezra Quill? The sheriff buried him himself: a cave-in. The letter's postmark is from last Tuesday.
+**1. The ride in.** Mercy Springs is a few days' ride: a trail clock of 4. Run it by *The trail* rules in the Players' Guide. Whatever the hazards are, the last day's is *Something on the trail*: drag marks leading off toward the hills, and a miner's boot with the foot still in it. Hunters with the Sight see that the marks were made by hands.
 
-**3. The showdown.** Crane's gunman, Cyrus Pruitt (an Outlaw, Will 11), calls out whichever hunter asks the most questions, at noon on Main Street. Run it as a showdown. If he dies with half the town watching, Sheriff Vance calls it murder: Heat marks a box. If Heat reaches two, put a poster out on the shooter. That gives the next job its bounty hunter.
+**2. Mercy Springs.** A silver boomtown gone quiet. Every door is barred by sundown, and dogs won't go near the mine road. Miners drink in silence at the Silver Dollar; the widows sit together at the back. Sheriff Hiram Vance meets the hunters before they've watered their horses. He's in Crane's pocket, and tells them there's no work here. Ezra Quill? The sheriff buried him himself: a cave-in. The letter's postmark is from last Tuesday.
 
-**4. The digging.** The investigation runs on a discovery clock with the Harvest clock ticking (*Lore cards*, in the Players' Guide); another miner goes missing each time it fills. The clues:
+**3. The digging.** Start a discovery clock for the creature, with the Harvest clock ticking beside it (*Lore cards*, in the Players' Guide): another miner goes missing each time it fills. The clues, and who finds them best:
 
-- Dr. Webb's examination finds the dead miners' wounds were made by teeth, after death. The bodies were dragged, not carried.
-- Quill's grave is empty, dug out from below, and the coffin lid has scratches on the inside.
-- The miners' widows say their men came home with sand in their boots. There's no sand in a silver mine.
-- Rev. Stone finds the church locked and the preacher gone. In his desk: a map of the Lazarus mine's lowest drift, marked *the old graves*.
-- A night watch on the boarding house: a ghoul at the window, and a man in a burial suit shooting at it from the street.
+- **The bodies** (Medicine): the wounds were made by teeth, after death. The dead were dragged, not carried, and their fingernails are full of grave dirt that isn't theirs.
+- **The graveyard** (Investigation, Occult): Quill's grave is empty, dug out from below. The coffin lid is scratched on the inside. Three older graves have been opened from beneath and emptied.
+- **The widows** (Persuasion, Read People): their men came home with sand in their boots. There's no sand in a silver mine.
+- **The church** (Occult, or a preacher's standing): locked, the preacher gone. In his desk, a map of the Lazarus mine's lowest drift, marked *the old graves*, and a page torn from a hymnal with a warning written in the margin: *they come up where the dead are, and they hate the light.*
+- **The night watch** (Stealth, Shooting): a pale thing at a boarding house window, long-armed and quick, and a man in a burial suit shooting at it from the street. Hunters who give chase find a sinkhole behind the livery, and a tunnel going down.
 
-When the Identify phase is done, the hunters know what the creatures are: ghouls (flee daylight and fire). Filling the clock earns a lore card for what they've established.
+When the Identify phase is done, the hunters know what the creatures are: **ghouls**. They flee daylight and fire, and they drag their dead away. Filling the clock earns a lore card for what the hunters established.
 
-**5. Ezra Quill.** The man in the burial suit finds the hunters, at midnight, when he rises. He wants Crane, and he offers what he knows of the mine in exchange. Isaiah Booker knows what it is to be put in the ground before your time, and Quill knows it about him at a glance. Quill is a Revenant gunslinger. He rises at the next midnight unless his grave is salted and burned, and he knows it.
+**4. The man in the burial suit.** Ezra Quill finds the hunters at midnight, when he rises. He's been holding the ghouls off on his own, a night at a time, and he's losing. He knows the mine, and he'll lead them down. Anyone with the Sight, or who's dead themselves, knows what he is at a glance; Isaiah Booker knows it in his bones. Quill doesn't hide it: he rises at the next midnight unless his grave is salted and burned, and he means to keep rising until Crane is in the ground.
 
-**6. The Lazarus mine.** The lowest drift opens into the burial cave: three ghouls, plus one more each time the Harvest clock has filled. Fire and lamp oil drive them back; dynamite seals the cave, if someone can light it and get clear. The cave holds the missing miners' bones, and something older at the back that the hunters don't have to wake.
+**5. The showdown.** At noon, Crane's gunman Cyrus Pruitt (an Outlaw, Will 11) calls out the hunter who's asked the most questions. Crane wants them gone before they go down the mine. Run it as a showdown. If they kill him with half the town watching, Sheriff Vance calls it murder and Heat marks a box. If the hunters back down, Pruitt follows them to the mine that night, and the ghouls find him first.
 
-**7. Midnight at the Crane house.** Quill comes for Crane, and Crane's two hired guns stand in his way. The hunters choose: help a dead man take his revenge, stand aside, or stop him. Ruth's badge says Crane should hang by the law, and Quill doesn't believe the law will do it. Whatever they choose, Crane's confession, or his ledger, can clear any Heat from the showdown, and stopping Quill means salting and burning his grave before the next midnight.
+**6. The Lazarus mine.** The lowest drift opens into the burial cave, a place of niches cut in the rock and bones older than any tribe in the territory. There are three ghouls, plus one more for each time the Harvest clock has filled. They fight in the dark and drag the fallen away. Lamps, torches and lamp oil keep them back; a burning drift holds them for a scene. The missing miners are here, what's left of them. Dynamite seals the cave, if someone can set it and get clear, or the hunters can burn the ghouls out a niche at a time. At the back of the cave, something older is sleeping under the stones. The hunters don't have to wake it, but someone may want to come back.
 
-**Rewards.** The $50 drafts, and whatever Crane's safe holds. A lore card on ghouls, and one on revenants for whoever salts the grave. If the mine is sealed, the town remembers the hunters well: clear a box of Whispers. If Quill got his revenge in the open, mark one.
+**7. Midnight at the Crane house.** With the ghouls finished, Quill goes for Crane, and Crane's two hired guns stand in his way. The hunters choose: help a dead man take his revenge, stand aside, or stop him. Ruth Calloway's badge says Crane should hang by the law; Quill doesn't believe the law will do it. Crane's ledger in his safe shows the payments to the sheriff and the order on Quill. Stopping Quill for good means salting and burning his grave before the next midnight, and he knows it.
+
+**Rewards.** The $50 drafts, and whatever Crane's safe holds. A lore card on ghouls, and another on revenants if the hunters learned how one is laid to rest. If the mine is sealed, Mercy Springs remembers the hunters well: clear a box of Whispers. If the ghouls were seen in the street, mark one. And something still sleeps at the back of the cave, so The Dark marks a box.
 
 **Threats.** Ghoul ×3 or more; Outlaw (Cyrus Pruitt); Hired gun ×2; Revenant gunslinger (Ezra Quill). Sheriff Vance is a Hired gun who won't draw first.
 

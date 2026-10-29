@@ -3596,7 +3596,7 @@
   "chapters": [
    {
     "title": "Your first job",
-    "intro": "A ready-to-run job to start a campaign with: everything it needs is here, and the pregenerated characters in the creator are written into it.",
+    "intro": "A ready-to-run monster hunt to start a campaign with. Everything it needs is here, the hook reaches hunters of any role, and the pregenerated characters in the creator are written into it.",
     "take": [
      "## The first job: Dead Man's Wages"
     ]
@@ -4316,23 +4316,23 @@
    ]
   ]
  },
- "pitch": "You hunt the things that followed the wagons west, and the law hunts you: your face is on the posters too.",
+ "pitch": "Something followed the wagons west. Most folk never see it. You do, and you hunt it.",
  "signature": [
+  [
+   "Monsters with a weakness",
+   "Rumor isn't truth. Investigate the thing, name it, and earn the lore card that says how it dies."
+  ],
+  [
+   "Hunters of every stripe",
+   "A marshal, a doctor, a preacher, a gambler who reads the cards, a werewolf in chains, a dead man who got back up."
+  ],
   [
    "Showdowns",
    "Noon on Main Street: a staredown of Will, then the draw, and a shot nobody can dodge."
   ],
   [
-   "Wanted posters",
-   "Every killing raises the Heat. At two boxes your face is on a poster, and the price brings bounty hunters."
-  ],
-  [
-   "The trail",
-   "Days of open country between towns: a clock to fill, supplies running low, and hazards on every failed day."
-  ],
-  [
-   "Lore cards",
-   "Rumor isn't truth. Investigate the monster, confirm what it is, and earn the card that says how it dies."
+   "The trail and the law",
+   "Days of open country between towns, and a Heat track that puts your face on a poster when the hunt goes public."
   ]
  ]
 }
