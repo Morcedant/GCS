@@ -70,6 +70,17 @@ Opponents use the same rules as the crew: they roll 3d6 under their skill, Dodge
 
 **Adjusting difficulty.** For a tougher version, add +1 to its targets and one box; for a weaker one, subtract. Starships use the ship registry in *The USS Pelion*; its *Enemy ships* table gives the common ones.
 
+## Your own threats, weapons and advantages
+
+A GM can add their own. Keep them in line with the book's:
+
+- **Threats.** A minor foe has 1 box; an ordinary one 3; a tough one 4 or 5; a rare horror 6. Attack targets run 11 to 13 for most, 14 or 15 for the dangerous. Dodge runs 7 to 10. Give it one special trait, said plainly, and decide what it does before play: toughness, a weakness or armor works as in *Armor, toughness and weaknesses*.
+- **Weapons.** Hits mark 1 box for fists, knives and primitive weapons; 2 for heavy blades; 3, and Dying, for anything on kill. Give a weapon a reach (melee) or a range band.
+- **Advantages.** Worth about as much as one of the book's: a narrow, useful benefit, often once per session or per mission. Say exactly what it does.
+- **Records.** One subject, what's true about it and what that permits: as narrow as a record earned in play.
+
+**In the creator.** The GM view's **Homebrew** tab keeps your threats, weapons, advantages, species and records. They then work like the book's, marked *homebrew*: threats in the Encounter panel and on the battle map, weapons in characters' gear and the roller. Save them to a file to keep them or share them with another GM.
+
 ## Enemy ships
 
 The ships the Pelion meets most, built on the registry's classes. The GM keeps their tracks the same way as the Pelion's.
@@ -129,7 +140,7 @@ The GM view of the creator has a **battle map** for fights where it helps to see
 
 **Three kinds of map.**
 
-- **A hex map** for an away team's fight where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard inside a ship, 5 or 10 yards on a city street, 50 on open ground, or a number of kilometres for ships in space. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range tables.
+- **A hex map** for an away team's fight where position matters: cover, doorways, who can reach whom. The GM chooses what one hex is: 1 yard inside a ship, 5 or 10 yards on a city street, 50 on open ground, or a number of kilometres for ships in space. Dragging a token or measuring shows the distance and its **range band**, so the GM can read the penalty from the Range tables. A token can have a height (a shuttle overhead, a sniper on a ridge), and the distance counts it.
 - **A ship fight** on a range track: a lane for the Pelion and one for each space range band, from under 10 km to a light-second. When the helms make their contest, the GM moves the enemy a lane in or out. **Add the Pelion** places the ship, linked to its Shields, Hull and systems: marking a box on the map marks it on the ship's tracks, and the other way round. Enemy ships come from the *Enemy ships* table with their Hull boxes.
 - **A range track** for an away team's chase or a running fight where only distance matters.
 

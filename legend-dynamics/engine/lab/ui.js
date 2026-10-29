@@ -206,17 +206,17 @@ export function mountLab(api) {
     const pw = api.powers ? api.powers(c) : [];
     for (const a of Object.values(WEAPONS)) if (a.power && pw.some((/** @type {any} */ x) => x.id === a.power && x.cls === a.powerClass)) weapons.push(a.id);
     // Strength (a power, or a suit that gives it): weapons in hand hit harder, and pins hold.
-    const strength = Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === "strength").map((/** @type {any} */ x) => x.cls), ...(c.equipment.aegis ? [2] : []));
+    const strength = Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === "strength").map((/** @type {any} */ x) => x.cls), ...((c.equipment || {}).aegis ? [2] : []));
     // Powers in a fight (powers.fight: Speed acts first, defends twice and acts more than once a round; Flight flies).
     const F = (PACK.powers && PACK.powers.fight) || {}, clsOf = (/** @type {string} */ id) => Math.max(0, ...pw.filter((/** @type {any} */ x) => x.id === id).map((/** @type {any} */ x) => x.cls));
     const fight = {
       ...(F.actFirst && clsOf(F.actFirst.power) >= F.actFirst.from ? { actFirst: true } : {}),
       ...(F.actions && clsOf(F.actions.power) ? { actions: F.actions.byClass[clsOf(F.actions.power) - 1] || 1 } : {}),
-      ...((F.flies || []).some((/** @type {string} */ id) => clsOf(id)) || c.equipment.aegis ? { flies: true } : {}) };
+      ...((F.flies || []).some((/** @type {string} */ id) => clsOf(id)) || (c.equipment || {}).aegis ? { flies: true } : {}) };
     // Mind Defense (MT.defenseFrom: Telepathy, Mind Control, Possession at their Class; MT.gear: equipment that gives it), and advantages
     // that steady the mind (MT.resistAdvantages: Cool Under Fire, +2).
     const md = MT ? Math.max(0, ...(MT.defenseFrom || []).map((/** @type {string} */ id) => clsOf(id)),
-      ...Object.entries(MT.gear || {}).filter(([id]) => c.equipment[id]).map(([, v]) => +v)) : 0;
+      ...Object.entries(MT.gear || {}).filter(([id]) => (c.equipment || {})[id]).map(([, v]) => +v)) : 0;
     const steady = MT && MT.resistAdvantages ? [c.adv, c.adv2].filter((x) => x && MT.resistAdvantages[x.id]).map((x) => ({ type: "resistMind", value: MT.resistAdvantages[x.id], label: ((PACK.advantages || []).find((v) => v[0] === x.id) || [])[1] || x.id })) : [];
     const mindTraits = [...(md ? [{ type: "mindDefense", value: md, label: `Mind Defense ${["", "I", "II", "III", "IV", "V", "VI"][md]}` }] : []), ...steady];
     const speedDefense = F.extraDefense && clsOf(F.extraDefense.power) >= F.extraDefense.from && !(PUB && PUB.oneDefense && PUB.oneDefense.edge && (c.edges || {})[PUB.oneDefense.edge])

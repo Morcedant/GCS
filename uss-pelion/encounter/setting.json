@@ -479,6 +479,7 @@
   "meleeSkill": "Unarmed Combat",
   "unarmedSkill": "Unarmed Combat",
   "ammo": "power",
-  "ammoOne": "power"
+  "ammoOne": "power",
+  "stun": "Stunned"
  }
 }
