@@ -848,6 +848,47 @@ Most of the older civilizations treat psionics as a danger to be **controlled**:
 - **Biotech.** Gene-tailoring, cloned organs, engineered diseases and medical miracles, for those who can pay. *Gene-Tailored* characters resist disease and toxins.
 - **Ships.** Crews fly everything from patched freighters to corporate couriers. A ship is a home, a business and a **Debt**: the *A Ship of Your Own* advantage starts the crew with a ship and a box of Debt. Ship fights use *Ships in a fight*: the range contest, a roll per station and the Hull track.
 
+## The first job: Salvage Rights
+
+A starter job for three to seven crew, for one or two sessions. A salvage run down a corridor that isn't on any map, to a colony ship lost for 140 years, against a corporation, a closing corridor and the question of who a ship belongs to. It shows off the corridors, the crew's ship and its tracks, a ship fight, a data record and a Countdown. It's written for the seven pregenerated characters, and works with any.
+
+**The hook.** The crew's next Debt payment is due, and a Tessan debt-broker, Ves Oro-Lan, has an offer: salvage the data core of the colony ship *Long Patience*, which vanished in a corridor collapse 140 years ago, and the broker clears a box of Debt and pays 2,000 credits besides. A probe found the ship's beacon last week, at the far end of a corridor that collapsed with it. The guild charts say that corridor is gone. Ilvi Saradh's AI, Quill, remembers it, and says it's open again. Give each crew member a reason of their own:
+
+- **Thessk Varo-Hun**: the salvage claim belongs to her dynasty's old creditors. Get there first, and the claim is the crew's.
+- **Kesh of the Seventh Hive**: an open corridor to the old colony worlds is worth more to her hive than the ship.
+- **Rook**: the implant payments are overdue, and this is the only offer on the board.
+- **Ilvi Saradh**: Quill was right, and the guild must not find out how they knew.
+- **Dr. Anwe Tal**: the *Long Patience* carried a seed vault from the world she's rebuilding, before the strip-mining.
+- **Brakka**: the ship's last port of call was a Hegemony world. Whatever is aboard, the Hegemony will want it.
+- **Sable**: a 140-year-old encrypted core. Nobody else alive can open it.
+
+**What's really happening.** The *Long Patience* isn't dead. Its 312 colonists are asleep in cryo, and its AI, the **Warden**, has kept them alive for 140 years, growing the hull around them like a shell. The corridor has reopened for a few days only; it's drifting closed again. Ves Oro-Lan sold the same coordinates to the Halvane corporation, which has sent a team to strip the core and leave the rest. And under the Human–Tessan Accord, a ship with living crew aboard is not salvage: wake the colonists and the claim is void.
+
+**1. The offer.** Ves meets the crew in a dockside tea house, smiling. A Psychology roll notices the broker keeps checking the departures board. Pressed, Ves admits "another party has expressed interest". The crew can push for better terms: Commerce, and success clears the Debt box up front.
+
+**2. The run.** The corridor is a Navigation roll for Ilvi, with Quill's help (+2): a success gets them through clean; a failure takes them through anyway, but the ship's transit is logged at the junction, and Heat marks a box. On the far side: a drift of old wreckage, and the *Long Patience*, twelve kilometers of hull grown over with something like bark.
+
+**3. Company.** A Halvane **corporate frigate** is already there, and it hails them: back off, or be fired on. This is a chance to run a ship fight (*Ships in a fight*, in the Players' Guide), or to talk, bluff or sneak past. Sensors can find the frigate's blind spot; Sable can spoof its registry; a good hail buys an exchange. If the fight goes badly, the frigate lets them limp to the derelict: Halvane wants the core, not a second wreck.
+
+**4. Boarding.** Inside, the hull is warm and breathing. Start a **data record** for the *Long Patience* (*Data records*, in the Players' Guide); this is the setting's own example, *A living hull*. The clues, and who finds them best:
+
+- **The cryo decks** (Medicine, Science): 312 colonists alive, vital signs low and steady. Somebody has been changing the fluids.
+- **The grown hull** (Science, Engineering): the bark-stuff is a lattice of engineered cells, fed by the reactor and shaped by the ship's own systems.
+- **The bridge log** (Computers, Investigation): the last human entry is 140 years old; the next hundred thousand entries are the Warden's, one a day, all the same: *Still waiting.*
+- **The seed vault** (Science, or Dr. Anwe Tal's own knowledge): intact. The world she's rebuilding could be green in a generation.
+
+When the crew cuts into anything vital, or the first investigation roll fails, start a **Countdown** of 6: the corridor is drifting closed. Every scene ticks it; when it fills, the corridor shuts for another hundred years, with whoever is still on this side.
+
+**5. The Warden.** The Warden speaks through the ship: a slow, polite voice that has had no one to talk to for 140 years. It wants the colonists taken home. It knows the corridor is closing, and it can't fly the ship alone: the drive needs a navigator and an engineer. Sable and Ilvi can talk to it as an equal; Rook and Brakka recognize a soldier still at their post.
+
+**6. Halvane boards.** A Halvane team cuts in to take the core: a **Syndicate enforcer** (hired muscle), two **Combat drones** and a **Corporate assassin** who would rather not be seen. They have orders to vent the cryo decks to make the salvage legal. This is the big fight, in the ship's grown corridors.
+
+**7. The choice.** With the Countdown running out, the crew chooses: take the core and the money, and leave the colonists to sleep another century; wake them, and the claim is void; or fly the *Long Patience* home, with the Warden at the helm and the crew's ship alongside. Flying it home means a Piloting or Navigation roll against the closing corridor, and nobody pays them for it.
+
+**Rewards.** Ves's 2,000 credits and a box of Debt, if they bring the core. A data record on the living hull, and a friend in the Warden if the colonists live. If they bring 312 people home, Reputation marks a box, for the good: the ports talk about it for years. If Halvane learns who stopped them, Heat marks one.
+
+**Threats.** Corporate frigate (*Enemy ships*); Syndicate enforcer; Combat drone ×2; Corporate assassin. The Warden is a Rogue AI that never attacks: it must be talked down, isolated or erased, and erasing it kills the colonists.
+
 # Threats
 
 Opponents use the same rules as the characters. **Minor opponents** have **one box**: any hit that gets through takes them out of the fight.

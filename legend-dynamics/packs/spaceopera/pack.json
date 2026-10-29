@@ -4079,9 +4079,16 @@
  "gmGuide": {
   "title": "Fracture Lines GM's Guide",
   "subtitle": "Running the space opera: jobs, threats, enemy ships and the GM's tools",
-  "intro": "This book is for whoever runs the game. It gathers what the GM reaches for at the table: job seeds, the threats and enemy ships with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.",
+  "intro": "This book is for whoever runs the game. It opens with a first adventure, ready to run, and gathers what the GM reaches for at the table: job seeds, the threats and enemy ships with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.",
   "playersNote": "The material for running the game (job seeds, the threats and enemy ships, and the GM's tools) is in a companion book, the **GM's Guide**.",
   "chapters": [
+   {
+    "title": "Your first job",
+    "intro": "A ready-to-run salvage job to start a campaign with. Everything it needs is here, and the pregenerated characters in the creator are written into it.",
+    "take": [
+     "## The first job: Salvage Rights"
+    ]
+   },
    {
     "title": "Running jobs and missions",
     "take": [
