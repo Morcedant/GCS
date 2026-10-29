@@ -52,7 +52,7 @@ export const summary = (body) => {
 // Kept in the same object as "fb:<id>". Each answer is short text; a sender (by a hash of their address, never the
 // address) can send a few an hour, and the store keeps the newest FEEDBACK.max.
 export const FEEDBACK = { max: 2000, text: 2000, short: 120, perHour: 6 };
-export const FEEDBACK_GAMES = ["Trails of Blood & Dust", "Fracture Lines", "The Shattered Crown", "Aurora", "Something else"];
+export const FEEDBACK_GAMES = ["Trails of Blood & Dust", "Fracture Lines", "The Shattered Crown", "Aurora", "USS Pelion", "Grimm", "Something else"]; // the last two from the private fan-games site
 export const FEEDBACK_AGAIN = ["Yes", "Maybe", "No"];
 /**
  * Feedback as a player sent it, checked; null when it says nothing.
