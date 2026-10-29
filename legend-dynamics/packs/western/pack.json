@@ -2995,6 +2995,34 @@
    "traitText": "+2 on the first shot of a fight."
   },
   {
+   "id": "bounty-hunter",
+   "name": "Bounty hunter",
+   "label": "Bounty hunter",
+   "minor": false,
+   "attacks": [
+    {
+     "skill": "Shooting",
+     "target": 14
+    },
+    {
+     "skill": "Brawling",
+     "target": 12
+    }
+   ],
+   "dodge": 9,
+   "boxes": 3,
+   "boxesText": "3",
+   "weaponText": "Revolver, rifle, club",
+   "weapons": [
+    "revolver",
+    "rifle",
+    "club"
+   ],
+   "will": 12,
+   "trait": "The price on your head",
+   "traitText": "+2 to track anyone with a poster out, and +2 on the draw in a showdown. Takes you alive if the poster says Alive; doesn't if it says Dead or Alive."
+  },
+  {
    "id": "zombie",
    "name": "Zombie",
    "label": "Zombie (minor, many)",
@@ -3563,9 +3591,16 @@
  "gmGuide": {
   "title": "Trails of Blood & Dust GM's Guide",
   "subtitle": "Running the Gothic Western: jobs, monsters, threats and the GM's tools",
-  "intro": "This book is for whoever runs the game. It gathers what the GM reaches for at the table: job seeds, the monsters' weaknesses and what their bites and curses do, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.",
+  "intro": "This book is for whoever runs the game. It opens with a first job, ready to run, and gathers what the GM reaches for at the table: job seeds, the monsters' weaknesses and what their bites and curses do, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.",
   "playersNote": "The material for running the game (job seeds, the monsters' weaknesses and curses, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.",
   "chapters": [
+   {
+    "title": "Your first job",
+    "intro": "A ready-to-run job to start a campaign with: everything it needs is here, and the pregenerated characters in the creator are written into it.",
+    "take": [
+     "## The first job: Dead Man's Wages"
+    ]
+   },
    {
     "title": "Running jobs",
     "take": [
@@ -3604,7 +3639,8 @@
     "title": "The GM's tools",
     "take": [
      "## The battle map",
-     "## The Encounter panel"
+     "## The Encounter panel",
+     "## Towns, strangers and the frontier tools"
     ]
    }
   ],
@@ -4018,6 +4054,285 @@
     "Okafor",
     "Duval"
    ]
+  },
+  "tables": {
+   "manner": [
+    "Talks too much once the whiskey's poured",
+    "Watches the door, always",
+    "Polite as a deacon, and twice as cold",
+    "Laughs at the wrong moments",
+    "Quotes Scripture at everything",
+    "Never takes off their gloves",
+    "Bone-tired and mean with it",
+    "Friendly to strangers, close-mouthed with neighbors",
+    "Proud of a past nobody can check",
+    "Jumps at sudden noises",
+    "Spits before answering",
+    "Kind to animals and nobody else",
+    "Counts their money in front of you",
+    "Calls everyone \"friend\"",
+    "Wears mourning black, and won't say for whom",
+    "Sings hymns under their breath"
+   ],
+   "want": [
+    "to pay off the bank before it takes the farm",
+    "the man who killed their brother, dead",
+    "to get their family out before winter",
+    "to be left alone on their claim",
+    "the railroad's money, and the railroad gone",
+    "to know what really happened at the mine",
+    "a ticket east and a new name",
+    "the respect the town never gave them",
+    "to keep a grave from being dug up",
+    "the land that was stolen from them",
+    "gold, and quickly",
+    "to wear the badge, and be worth it",
+    "to find a daughter who rode off with a stranger",
+    "to undo a bargain made at a crossroads",
+    "to see the church finished",
+    "safety for their people on the reservation"
+   ],
+   "secret": [
+    "They owe money to the wrong saloon.",
+    "They rode with an outlaw gang under another name.",
+    "They saw who did the killing and said nothing.",
+    "They're on the railroad's payroll.",
+    "They have consumption, and hide the cough.",
+    "They did the thing they hang on others.",
+    "They love someone the town would never allow.",
+    "They know where the stage-line gold was buried.",
+    "Something bit them last spring, and they've been different since.",
+    "Someone is blackmailing them over a marriage.",
+    "They sold out a friend to the law.",
+    "They mean to leave on the next stage, without a word.",
+    "They keep a book of spells under the floorboards.",
+    "They have a second family two towns over.",
+    "They're the one sending letters to the marshal.",
+    "They died once, and came back."
+   ]
+  },
+  "towns": {
+   "first": [
+    "Silver",
+    "Copper",
+    "Lone",
+    "Dead",
+    "Red",
+    "Cold",
+    "Black",
+    "Bitter",
+    "Gallows",
+    "Paradise",
+    "Shiloh",
+    "Mercy",
+    "Coyote",
+    "Raven",
+    "Lost",
+    "Hangtown"
+   ],
+   "second": [
+    " Gulch",
+    " Springs",
+    " Creek",
+    " Flats",
+    " Bluff",
+    " Wells",
+    "ville",
+    " Crossing",
+    " Rock",
+    " Hollow",
+    " Ridge",
+    " City",
+    " Bend",
+    " Junction",
+    " Fork",
+    ""
+   ],
+   "kind": [
+    "A silver boomtown",
+    "A cattle town on the trail",
+    "A railroad town",
+    "A timber camp",
+    "A dying mining camp",
+    "A county seat with a new courthouse",
+    "A Mormon settlement",
+    "A town around a fort",
+    "A river landing",
+    "A stage stop and not much more",
+    "A border town",
+    "A ghost town that won't stay empty"
+   ],
+   "livesOn": [
+    "Silver and the men who dig it",
+    "Cattle and the drives that pass through",
+    "The railroad's money",
+    "Timber",
+    "A copper mine that's playing out",
+    "The stage line",
+    "Whiskey, cards and the women upstairs",
+    "The fort's payroll",
+    "Farming, when the rain comes",
+    "Freight on the river",
+    "Smuggling across the line",
+    "Nothing anyone will name"
+   ],
+   "runs": [
+    "The mining company",
+    "A cattle baron",
+    "The railroad's agent",
+    "A sheriff nobody elected",
+    "The preacher",
+    "The saloon owner",
+    "A town council of old money",
+    "The bank",
+    "A widow who owns half the buildings",
+    "Nobody, since the last sheriff died",
+    "The army",
+    "A man who came back from the dead"
+   ],
+   "wrong": [
+    "Folk go missing on moonless nights.",
+    "The mine broke into something old.",
+    "The sheriff answers to the outlaws.",
+    "The graveyard is empty.",
+    "The railroad wants the town gone, and someone's helping.",
+    "Nobody here has aged in years.",
+    "The new preacher isn't a man of God.",
+    "There's a hanging tree that bears fruit.",
+    "The water's gone bad, and the doctor says it's nothing.",
+    "A family on the hill feeds something in the cellar.",
+    "Every dog in town has died.",
+    "A witch put a price on the founder's line, and it's coming due."
+   ]
   }
- }
+ },
+ "showdown": {
+  "skill": "Shooting",
+  "band": "short",
+  "drawBonus": {
+   "quickdraw": 2
+  },
+  "drawFirst": "firstInGunfight",
+  "threatDrawBonus": {
+   "outlaw": 2,
+   "bounty-hunter": 2,
+   "revenant-gunslinger": 2
+  }
+ },
+ "wanted": {
+  "track": "Heat",
+  "from": 2,
+  "rewards": [
+   [
+    2,
+    100
+   ],
+   [
+    3,
+    500
+   ],
+   [
+    4,
+    1000
+   ]
+  ],
+  "doaFrom": 4,
+  "currency": "$",
+  "title": "Wanted",
+  "cardTitle": "Wanted posters",
+  "sheetTitle": "Your face on a poster",
+  "sheetNote": "Bounty hunters read these too. It comes down when the warrant is answered: a judge, a pardon, a lawman's word, or a body that's thought to be yours.",
+  "hunters": "At Heat 3, a bounty hunter comes looking at the start of each job; at 4, a pair of them.",
+  "crimes": [
+   "Murder",
+   "Horse theft",
+   "Robbing the mails",
+   "Jailbreak",
+   "Arson",
+   "Grave robbing",
+   "Assaulting an officer of the law",
+   "Train robbery",
+   "Cattle rustling",
+   "Bank robbery",
+   "Claim jumping",
+   "Desecrating a church",
+   "Breaking a prisoner from the gallows",
+   "Witchcraft",
+   "Disturbing the peace",
+   "Consorting with outlaws"
+  ],
+  "issuers": [
+   "U.S. Marshal's Office",
+   "the County Sheriff",
+   "the Overland Stage Company",
+   "the Great Western & Pacific Railroad",
+   "the Territorial Governor",
+   "the Cattlemen's Association",
+   "the Citizens' Committee of Vigilance"
+  ]
+ },
+ "trail": {
+  "title": "The trail",
+  "skill": "Survival",
+  "intro": "A ride between towns, as a progress clock. Each day the guide rolls Survival: a success fills a segment, by 5 or more two; a failure fills none and draws a hazard. A day of riding uses a day of supplies.",
+  "lengths": [
+   [
+    "A few days' ride",
+    4
+   ],
+   [
+    "A week on the trail",
+    6
+   ],
+   [
+    "Across the badlands",
+    8
+   ]
+  ],
+  "hazards": [
+   [
+    "Weather",
+    "A dust storm, a norther or a flash flood. The guide rolls Survival again; on a failure, you shelter and lose a day's supplies."
+   ],
+   [
+    "A lame horse",
+    "Someone rolls Animal Handling to nurse it along. On a failure, a rider doubles up, and tomorrow's roll is at −2."
+   ],
+   [
+    "A dry water hole",
+    "Lose a day's supplies. If that leaves none, every roll on the trail is at −2 until you find water."
+   ],
+   [
+    "Riders on the ridge",
+    "Outlaws, a posse if Heat is 3 or more, or bounty hunters if anyone has a poster out. Decide what they want before they ride down."
+   ],
+   [
+    "Lost",
+    "The trail loses a segment. The guide rolls Tracking to find the way before tomorrow's roll."
+   ],
+   [
+    "Something on the trail",
+    "Tracks that are wrong, a camp with nobody in it, a grave dug up from below. Use the job's Strange, or mark a box of The Dark."
+   ]
+  ]
+ },
+ "pitch": "You hunt the things that followed the wagons west, and the law hunts you: your face is on the posters too.",
+ "signature": [
+  [
+   "Showdowns",
+   "Noon on Main Street: a staredown of Will, then the draw, and a shot nobody can dodge."
+  ],
+  [
+   "Wanted posters",
+   "Every killing raises the Heat. At two boxes your face is on a poster, and the price brings bounty hunters."
+  ],
+  [
+   "The trail",
+   "Days of open country between towns: a clock to fill, supplies running low, and hazards on every failed day."
+  ],
+  [
+   "Lore cards",
+   "Rumor isn't truth. Investigate the monster, confirm what it is, and earn the card that says how it dies."
+  ]
+ ]
 }

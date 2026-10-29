@@ -374,7 +374,7 @@ def game_card(pid, href):
     return f"""  <a class="ld-game ld-game--{pid}" href="{href}">
     <div class="ld-eyebrow">{e(GENRE[pid])}</div>
     <h3>{e(t['title'])}</h3>
-    <p>{first_para(pid)}</p>
+{f'    <p><b>{e(p["pitch"])}</b></p>{chr(10)}' if p.get("pitch") else ""}    <p>{first_para(pid)}</p>
     <div class="ld-game-meta">{''.join(f'<span class="ld-tag">{e(x)}</span>' for x in tags)}</div>
     <div class="ld-go">Enter →</div>
   </a>"""
@@ -464,6 +464,10 @@ def game_page(pid):
     origins = ", ".join(o["name"] for o in sorted(p["origins"], key=lambda o: o["tier"]) if not o.get("restricted"))
     tracks = ", ".join(x["name"] for x in p.get("tracks", []))
     role, origin = t.get("role", "Role"), t.get("origin", "Origin")
+    # What only this setting has (pack "signature": [[name, what it is]]), above who you can play.
+    signature = (f'<div class="ld-eyebrow">What makes it different</div>\n  <ul class="ld-pillars">'
+                 + "".join(f"<li><b>{e(n)}</b><span>{e(x)}</span></li>" for n, x in p["signature"])
+                 + '</ul>\n  <div style="margin-top:2.2rem"></div>\n  ') if p.get("signature") else ""
     return f"""<!-- {t['title']} page. In this page's Settings → Advanced → Page Header Code Injection,
      paste page-injection/{pid}.html so the page takes the {t['title']} theme.
      Then paste each block below into its own Code Block (Display Source off). -->
@@ -473,7 +477,7 @@ def game_page(pid):
   <div class="ld-eyebrow">Legend Dynamics · {e(GENRE[pid])}</div>
   <h1>{e(t['title'])}</h1>
   <hr class="ld-rule">
-  <p class="ld-lede">{first_para(pid)}</p>
+{f'  <p class="ld-lede"><b>{e(p["pitch"])}</b></p>{chr(10)}' if p.get("pitch") else ""}  <p class="ld-lede">{first_para(pid)}</p>
   <div class="ld-actions">
     <a class="ld-button" href="{CREATORS[pid]}" target="_blank" rel="noopener">Start playing</a>
     <a class="ld-button ld-button--ghost" href="{CORE_SLUG}">Core rules</a>
@@ -492,7 +496,7 @@ def game_page(pid):
 
 <!-- Block 3: who you can play -->
 <div class="ld">
-  <div class="ld-eyebrow">Who you can play</div>
+  {signature}<div class="ld-eyebrow">Who you can play</div>
   <ul class="ld-pillars">{roles}</ul>
   <p style="margin-top:1.4rem"><b>{e(t.get('originPlural', 'Origins'))}:</b> {e(origins)}. Or build your own {e(t.get('roleLower', 'role'))} or {e(t.get('originLower', 'origin'))} with the GM: the Players' Guide shows how.</p>
 </div>

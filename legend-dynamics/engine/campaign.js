@@ -156,7 +156,8 @@ function cpSeed(PACK, k, rnd) {
 }
 /** A rolled entry of a kind, every field filled in, ready to change in its form. @param {() => number} rnd */
 function cpRoll(PACK, kind, c, rnd = Math.random) {
-  const T = cpTables(), al = (PACK.allegiances || []).filter((a) => a[0]);
+  // The setting's own tables (PACK.campaign.tables) take the place of the general ones they name.
+  const T = { ...cpTables(), ...((PACK.campaign && PACK.campaign.tables) || {}) }, al = (PACK.allegiances || []).filter((a) => a[0]);
   const factionNames = [...(c ? c.factions.map((f) => f.name) : []), ...al.map((a) => a[1])];
   const threats = (PACK.threats || []).filter((t) => !t.minor).map((t) => t.name);
   if (kind === "people") {
@@ -166,6 +167,10 @@ function cpRoll(PACK, kind, c, rnd = Math.random) {
     return { name: cpName(PACK, rnd), role, faction: rnd() < 0.6 ? cpPick(factionNames, rnd) : "", desc: `${cpPick(T.manner, rnd)}.`,
       goal: cpCap(cpPick(T.want, rnd)), secret: cpPick(T.secret, rnd) };
   }
+  // A town (PACK.campaign.towns: name parts, what it lives on, who runs it, what's wrong), half the time in a setting with them.
+  const TW = PACK.campaign && PACK.campaign.towns;
+  if (kind === "places" && TW && rnd() < 0.5) return { name: `${cpPick(TW.first, rnd)}${cpPick(TW.second, rnd)}`, kind: cpPick(TW.kind, rnd),
+    desc: `It lives on ${cpLow(cpPick(TW.livesOn, rnd))}. ${cpPick(TW.runs, rnd)} runs it. ${cpPick(T.feature, rnd)}`, secret: cpPick(TW.wrong, rnd) };
   if (kind === "places") return { name: cpSeed(PACK, "place", rnd), kind: "", desc: cpPick(T.feature, rnd), secret: `${cpSeed(PACK, "strange", rnd)}.` };
   if (kind === "factions") {
     const a = rnd() < 0.5 && al.length ? cpPick(al, rnd) : null;

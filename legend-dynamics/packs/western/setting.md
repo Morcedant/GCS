@@ -44,6 +44,18 @@ A coach on the road with riders closing in is a chase where distance is everythi
 | 3 | Lamed: −4 to the driver's Riding, and riders close on a tie |
 | 4 | Wrecked: the coach overturns or stops dead; everyone aboard rolls Athletics or marks a box of Injury |
 
+### Showdowns
+
+When two people mean to settle it in the street, guns holstered and everyone watching, run a **showdown** instead of rounds. It's usually at Short range. If anyone else joins in, it turns into an ordinary gunfight.
+
+1. **The staredown.** Both roll Will, as a contest: a success beats a failure, and if both succeed, the larger margin wins. The winner gets +2 on the draw. Anyone who fails their Will roll by 5 or more has lost their nerve, and can back down now with no shot fired. The town saw it, and the GM decides what that costs. Either duelist can also just walk away before the draw. The other can let them go, or shoot them in the back, which marks a box of Heat.
+2. **The draw.** Both roll Shooting, as a contest, with the staredown's +2 and their wound penalties. Quick Draw adds its +2 here, and a Gunslinger's quick draw wins a tied draw. The winner fires first; on a tie, both fire at once. Anyone who fails the draw by 5 or more fumbles: the gun hangs in the holster, and they don't fire.
+3. **The shots.** The first shot is an ordinary attack, and the target can't Dodge: they're drawing, not diving for cover. If the target is still on their feet, they fire back the same way. Then the showdown is over: if both still stand, it becomes an ordinary fight in rounds, or someone walks away.
+
+Grit works as it always does: spend a point to reroll any of these rolls, or to take one box fewer from a shot. In the GM view, the Encounter panel runs a showdown: choose **Showdown: the staredown**, then **Showdown: the draw**.
+
+*Example:* the Kid calls Ruth Calloway out at noon. Ruth's Will 11 succeeds by 3 and the Kid's Will 10 by 1: Ruth wins the staredown. On the draw, her Shooting 15 +2 succeeds by 6; the Kid's Shooting 14, with his Quick Draw +2, succeeds by 4. Ruth fires first, and the Kid can't Dodge.
+
 <!-- SECTION:medicine -->
 
 Frontier medicine has chloroform, carbolic acid, laudanum and steady hands, and not much else. Infection kills more men than bullets do, and no doctor's bag holds a cure for a bite from something that should be dead. See *Bites and curses* below.
@@ -52,7 +64,37 @@ Frontier medicine has chloroform, carbolic acid, laudanum and steady hands, and 
 
 The characters share three Trouble tracks. **Heat** is the law and the powerful taking notice; **Whispers** is the town talking about what it saw; **The Dark** is the things in the night learning your names. They fill as your deeds catch up with you; the GM narrates what each box means. A killing in the street, a monster seen in the open, a ritual worked carelessly, or a success at a cost can mark a box. Lying low between jobs, a good alibi (Deception) or doing the town a public good can clear one per job.
 
+**Wanted posters.** At two boxes of Heat, the law prints posters. The GM can put one out on any character the law has reason to name: the name it knows you by, what you're wanted for, and the reward. The reward climbs with Heat: $100 at two boxes, $500 at three, and $1,000 and *Dead or Alive* at four. The poster appears on your sheet. Clearing Heat doesn't tear down a poster that's already up. It comes down when the warrant is answered: a judge, a pardon, a lawman's word (a Law roll), or a body that's thought to be yours.
+
+**Bounty hunters.** A price draws hunters. At three boxes of Heat, a bounty hunter comes looking at the start of each job; at four, a pair of them. A bounty hunter knows your face from the poster and has the patience to wait for you to be alone.
+
 <!-- SECTION:setting -->
+
+# The trail
+
+Between towns is the trail: days of open country with no law, no doctor and no help. Most rides happen between scenes. When the ride matters, because something is waiting out there or you're racing someone to where you're going, play it out.
+
+## Riding the trail
+
+- **The trail clock.** The ride is a progress clock: 4 segments for a few days' ride, 6 for a week on the trail, 8 to cross the badlands. When it fills, you arrive.
+- **Each day,** one rider is the guide and rolls Survival (Tracking to follow someone else's trail). A success fills a segment, and a success by 5 or more fills two. A failure fills nothing and brings a hazard.
+- **Pushing on** through the night gives +2 to the day's roll, but tomorrow's roll is at −2 unless you rest for a day.
+- **Supplies.** Before you ride, decide how many days of food and water you carry. A clock's size plus two is usual. Each day on the trail uses one, and a hazard can cost another. Out of supplies, every roll on the trail is at −2 until you resupply: a town, a ranch, a creek, or a day spent hunting (a Survival roll in place of the day's riding).
+
+The GM can put a scene at any segment: a stranger's camp, a burned homestead, riders on the ridge. In the GM view, **The trail** card runs the ride: it starts the clock, rolls each day for the guide, keeps count of the supplies and rolls the hazards.
+
+## Trail hazards
+
+When the day's roll fails, roll a die, or the GM chooses.
+
+| Die | Hazard | What happens |
+|---|---|---|
+| 1 | Weather | A dust storm, a norther or a flash flood. The guide rolls Survival again; on a failure, you shelter and lose a day's supplies. |
+| 2 | A lame horse | Someone rolls Animal Handling to nurse it along. On a failure, a rider doubles up, and tomorrow's roll is at −2. |
+| 3 | A dry water hole | Lose a day's supplies. If that leaves none, every roll on the trail is at −2 until you find water. |
+| 4 | Riders on the ridge | Outlaws, a posse if Heat is 3 or more, or bounty hunters if anyone has a poster out. They want something; find out what before they ride down. |
+| 5 | Lost | The trail loses a segment. The guide rolls Tracking to find the way before tomorrow's roll. |
+| 6 | Something on the trail | Tracks that are wrong, a camp with nobody in it, a grave dug up from below. Something from the job is out here, or The Dark marks a box. |
 
 # Lore cards
 
@@ -193,6 +235,49 @@ A **true demon can't enter our world unaided**: it must be **summoned**, or come
 ## Rituals and remedies
 
 A remedy or a ritual against the dark always has a procedure: what it requires, how long it takes, which rolls it calls for, its components, what happens if it's interrupted, and what failure costs. Zombie treatment, lifting a curse, binding a ghost, banishing a demon and interfering with a hellhound's pact all work this way. Use the *Magic* rules (a ritual clock in Occult rolls) and the weights above for any the GM hasn't spelled out.
+
+## The first job: Dead Man's Wages
+
+A starter job for three to six hunters, for one or two sessions. It shows off what makes the setting different: a ride on the trail, a showdown in the street, Heat and a wanted poster, an investigation that ends in a lore card, and a monster that isn't the one you came for. It's written for the six pregenerated characters, and works with any.
+
+**The hook.** Each hunter gets a letter and a $50 bank draft. *Come to Mercy Springs. Something is killing my men in the Lazarus mine, and the company says it's cave-ins. Ask for me at the Silver Dollar. Ezra Quill, foreman.* Lucinda Marsh's cards turn up the Hanged Man the night it arrives. Ruth Calloway knows the name: Quill wrote to the Marshal's office a month ago, and nobody answered.
+
+**What's really happening.** The Lazarus mine broke into a burial cave older than the territory, and ghouls came up out of it. They take a miner a night and drag the bodies down. The company's owner, Augustus Crane, wants the silver more than the men, and told his foreman to keep quiet. Ezra Quill wouldn't, so Crane had him shot and buried two weeks ago. Quill rose at the next midnight: he's a revenant, and he wrote the letters. He wants Crane dead, and he'll help the hunters with the ghouls if they help him with that.
+
+**1. The ride in.** Mercy Springs is a few days' ride: a trail clock of 4. Run it by *The trail* rules in the Players' Guide. Whatever the hazards are, on the last day the guide finds drag marks leading off the trail toward the hills, and a boot with a foot still in it.
+
+**2. Mercy Springs.** A silver boomtown gone quiet. Miners drink in silence at the Silver Dollar. Sheriff Hiram Vance meets the hunters before they've watered their horses. He's in Crane's pocket and tells them there's no work here. Ezra Quill? The sheriff buried him himself: a cave-in. The letter's postmark is from last Tuesday.
+
+**3. The showdown.** Crane's gunman, Cyrus Pruitt (an Outlaw, Will 11), calls out whichever hunter asks the most questions, at noon on Main Street. Run it as a showdown. If he dies with half the town watching, Sheriff Vance calls it murder: Heat marks a box. If Heat reaches two, put a poster out on the shooter. That gives the next job its bounty hunter.
+
+**4. The digging.** The investigation runs on a discovery clock with the Harvest clock ticking (*Lore cards*, in the Players' Guide); another miner goes missing each time it fills. The clues:
+
+- Dr. Webb's examination finds the dead miners' wounds were made by teeth, after death. The bodies were dragged, not carried.
+- Quill's grave is empty, dug out from below, and the coffin lid has scratches on the inside.
+- The miners' widows say their men came home with sand in their boots. There's no sand in a silver mine.
+- Rev. Stone finds the church locked and the preacher gone. In his desk: a map of the Lazarus mine's lowest drift, marked *the old graves*.
+- A night watch on the boarding house: a ghoul at the window, and a man in a burial suit shooting at it from the street.
+
+When the Identify phase is done, the hunters know what the creatures are: ghouls (flee daylight and fire). Filling the clock earns a lore card for what they've established.
+
+**5. Ezra Quill.** The man in the burial suit finds the hunters, at midnight, when he rises. He wants Crane, and he offers what he knows of the mine in exchange. Isaiah Booker knows what it is to be put in the ground before your time, and Quill knows it about him at a glance. Quill is a Revenant gunslinger. He rises at the next midnight unless his grave is salted and burned, and he knows it.
+
+**6. The Lazarus mine.** The lowest drift opens into the burial cave: three ghouls, plus one more each time the Harvest clock has filled. Fire and lamp oil drive them back; dynamite seals the cave, if someone can light it and get clear. The cave holds the missing miners' bones, and something older at the back that the hunters don't have to wake.
+
+**7. Midnight at the Crane house.** Quill comes for Crane, and Crane's two hired guns stand in his way. The hunters choose: help a dead man take his revenge, stand aside, or stop him. Ruth's badge says Crane should hang by the law, and Quill doesn't believe the law will do it. Whatever they choose, Crane's confession, or his ledger, can clear any Heat from the showdown, and stopping Quill means salting and burning his grave before the next midnight.
+
+**Rewards.** The $50 drafts, and whatever Crane's safe holds. A lore card on ghouls, and one on revenants for whoever salts the grave. If the mine is sealed, the town remembers the hunters well: clear a box of Whispers. If Quill got his revenge in the open, mark one.
+
+**Threats.** Ghoul ×3 or more; Outlaw (Cyrus Pruitt); Hired gun ×2; Revenant gunslinger (Ezra Quill). Sheriff Vance is a Hired gun who won't draw first.
+
+## Towns, strangers and the frontier tools
+
+The GM view has tools made for the frontier:
+
+- **The Campaign tab's generators** roll from Trails' own tables. A rolled place is half the time a frontier town: its name, what it lives on, who runs it, and what's wrong there (the secret). A rolled person gets a frontier manner, a want and a secret.
+- **Wanted posters** (in *Clocks and tools*): choose a character, the name on the poster, the crimes (or roll them), and the reward, which follows Heat. **Put up the poster** puts it on that character's sheet, and through the shared table on the player's own page. **Take it down** when the warrant is answered.
+- **The trail** (in *Clocks and tools*): start a ride and it goes on the clocks. **Roll the day** rolls the guide's Survival with the modifiers in force, fills the clock, counts down the supplies and, on a failure, rolls the hazard.
+- **Showdowns** run in the Encounter panel: **Showdown: the staredown** rolls Will against Will, and **Showdown: the draw** rolls Shooting against Shooting and fires the shots. A bounty hunter and an outlaw have their quick draw in the panel already; a threat's Will is estimated unless its entry gives one.
 
 # Threats
 

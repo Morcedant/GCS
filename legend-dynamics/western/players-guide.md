@@ -399,6 +399,18 @@ A coach on the road with riders closing in is a chase where distance is everythi
 | 3 | Lamed: −4 to the driver's Riding, and riders close on a tie |
 | 4 | Wrecked: the coach overturns or stops dead; everyone aboard rolls Athletics or marks a box of Injury |
 
+### Showdowns
+
+When two people mean to settle it in the street, guns holstered and everyone watching, run a **showdown** instead of rounds. It's usually at Short range. If anyone else joins in, it turns into an ordinary gunfight.
+
+1. **The staredown.** Both roll Will, as a contest: a success beats a failure, and if both succeed, the larger margin wins. The winner gets +2 on the draw. Anyone who fails their Will roll by 5 or more has lost their nerve, and can back down now with no shot fired. The town saw it, and the GM decides what that costs. Either duelist can also just walk away before the draw. The other can let them go, or shoot them in the back, which marks a box of Heat.
+2. **The draw.** Both roll Shooting, as a contest, with the staredown's +2 and their wound penalties. Quick Draw adds its +2 here, and a Gunslinger's quick draw wins a tied draw. The winner fires first; on a tie, both fire at once. Anyone who fails the draw by 5 or more fumbles: the gun hangs in the holster, and they don't fire.
+3. **The shots.** The first shot is an ordinary attack, and the target can't Dodge: they're drawing, not diving for cover. If the target is still on their feet, they fire back the same way. Then the showdown is over: if both still stand, it becomes an ordinary fight in rounds, or someone walks away.
+
+Grit works as it always does: spend a point to reroll any of these rolls, or to take one box fewer from a shot. In the GM view, the Encounter panel runs a showdown: choose **Showdown: the staredown**, then **Showdown: the draw**.
+
+*Example:* the Kid calls Ruth Calloway out at noon. Ruth's Will 11 succeeds by 3 and the Kid's Will 10 by 1: Ruth wins the staredown. On the draw, her Shooting 15 +2 succeeds by 6; the Kid's Shooting 14, with his Quick Draw +2, succeeds by 4. Ruth fires first, and the Kid can't Dodge.
+
 ## Range
 
 Distances fall into five bands:
@@ -723,6 +735,10 @@ A track is a row of boxes that fills as consequences catch up with you, and each
 
 The characters share three Trouble tracks. **Heat** is the law and the powerful taking notice; **Whispers** is the town talking about what it saw; **The Dark** is the things in the night learning your names. They fill as your deeds catch up with you; the GM narrates what each box means. A killing in the street, a monster seen in the open, a ritual worked carelessly, or a success at a cost can mark a box. Lying low between jobs, a good alibi (Deception) or doing the town a public good can clear one per job.
 
+**Wanted posters.** At two boxes of Heat, the law prints posters. The GM can put one out on any character the law has reason to name: the name it knows you by, what you're wanted for, and the reward. The reward climbs with Heat: $100 at two boxes, $500 at three, and $1,000 and *Dead or Alive* at four. The poster appears on your sheet. Clearing Heat doesn't tear down a poster that's already up. It comes down when the warrant is answered: a judge, a pardon, a lawman's word (a Law roll), or a body that's thought to be yours.
+
+**Bounty hunters.** A price draws hunters. At three boxes of Heat, a bounty hunter comes looking at the start of each job; at four, a pair of them. A bounty hunter knows your face from the poster and has the patience to wait for you to be alone.
+
 | Track | Boxes | As boxes fill |
 |---|---|---|
 | Heat | 4 | 1: Questions at the sheriff's office; 2: Wanted posters: −2 to Persuasion with lawmen; 3: A posse is out; 4: A warrant and a manhunt: start a Manhunt clock |
@@ -757,6 +773,32 @@ End each job with a short entry, written together:
 3. **Complications.** Which ones came into play, and what did they cost?
 4. **What changed?** New allies or enemies, damage, open threads for next time.
 5. **Advancement.** After a significant job, each character earns 1 advancement point; at a milestone, 2 more.
+
+# The trail
+
+Between towns is the trail: days of open country with no law, no doctor and no help. Most rides happen between scenes. When the ride matters, because something is waiting out there or you're racing someone to where you're going, play it out.
+
+## Riding the trail
+
+- **The trail clock.** The ride is a progress clock: 4 segments for a few days' ride, 6 for a week on the trail, 8 to cross the badlands. When it fills, you arrive.
+- **Each day,** one rider is the guide and rolls Survival (Tracking to follow someone else's trail). A success fills a segment, and a success by 5 or more fills two. A failure fills nothing and brings a hazard.
+- **Pushing on** through the night gives +2 to the day's roll, but tomorrow's roll is at −2 unless you rest for a day.
+- **Supplies.** Before you ride, decide how many days of food and water you carry. A clock's size plus two is usual. Each day on the trail uses one, and a hazard can cost another. Out of supplies, every roll on the trail is at −2 until you resupply: a town, a ranch, a creek, or a day spent hunting (a Survival roll in place of the day's riding).
+
+The GM can put a scene at any segment: a stranger's camp, a burned homestead, riders on the ridge. In the GM view, **The trail** card runs the ride: it starts the clock, rolls each day for the guide, keeps count of the supplies and rolls the hazards.
+
+## Trail hazards
+
+When the day's roll fails, roll a die, or the GM chooses.
+
+| Die | Hazard | What happens |
+|---|---|---|
+| 1 | Weather | A dust storm, a norther or a flash flood. The guide rolls Survival again; on a failure, you shelter and lose a day's supplies. |
+| 2 | A lame horse | Someone rolls Animal Handling to nurse it along. On a failure, a rider doubles up, and tomorrow's roll is at −2. |
+| 3 | A dry water hole | Lose a day's supplies. If that leaves none, every roll on the trail is at −2 until you find water. |
+| 4 | Riders on the ridge | Outlaws, a posse if Heat is 3 or more, or bounty hunters if anyone has a poster out. They want something; find out what before they ride down. |
+| 5 | Lost | The trail loses a segment. The guide rolls Tracking to find the way before tomorrow's roll. |
+| 6 | Something on the trail | Tracks that are wrong, a camp with nobody in it, a grave dug up from below. Something from the job is out here, or The Dark marks a box. |
 
 # Lore cards
 
