@@ -19,7 +19,8 @@
  */
 
 const clone = (/** @type {any} */ x) => JSON.parse(JSON.stringify(x));
-export const isOut = (/** @type {Participant} */ p) => p.dead || p.injury >= p.boxes;
+// Out of the fight: dead, every injury box marked, or (Aurora) every box of the Mind track: unconscious or catatonic.
+export const isOut = (/** @type {Participant} */ p) => p.dead || p.injury >= p.boxes || (!!p.mindBoxes && (p.mind || 0) >= p.mindBoxes);
 
 /** @param {{ name?: string, setting: string, baseline: string, config: any, seed?: string | number | null }} o */
 export function newEncounter(o) {
@@ -66,9 +67,10 @@ export function removeParticipant(enc, pid) {
   log(enc, "leave", { pid, name: p.name });
 }
 
-/** Turn order: Agility, highest first; ties in the order they joined (the GM can move anyone). @param {any} enc @param {any} rules */
+/** Turn order: anyone who acts first (actFirst: Aurora's Speed), then Agility, highest first; ties in the order they joined
+ * (the GM can move anyone). @param {any} enc @param {any} rules */
 export function startCombat(enc, rules) {
-  enc.order = [...enc.participants].sort((a, b) => b.agility - a.agility).map((p) => p.pid);
+  enc.order = [...enc.participants].sort((a, b) => (b.actFirst ? 1 : 0) - (a.actFirst ? 1 : 0) || b.agility - a.agility).map((p) => p.pid);
   enc.status = "combat"; enc.round = 1; enc.turn = 0;
   enc.setup = { participants: clone(enc.participants), order: [...enc.order] };
   enc.commands.push({ type: "start" });
@@ -100,13 +102,20 @@ function advance(enc) {
   if (enc.turn >= enc.order.length) { enc.turn = 0; enc.round++; log(enc, "round", { round: enc.round }); }
 }
 
-/** End the active participant's turn. @param {any} enc */
+/** End the active participant's action: their next action this round (actions: Aurora's Speed), or the next turn. @param {any} enc */
 export function nextTurn(enc) {
   if (enc.status !== "combat") return;
   enc.commands.push({ type: "next" });
+  const cur = active(enc);
+  if (cur && !isOut(cur) && (cur.actions || 1) > (cur.acted || 0) + 1) {
+    cur.acted = (cur.acted || 0) + 1;
+    log(enc, "turn", { pid: cur.pid, name: cur.name, action: cur.acted + 1, of: cur.actions });
+    return;
+  }
+  if (cur) cur.acted = 0;
   advance(enc); skipOut(enc);
   const p = active(enc);
-  log(enc, "turn", { pid: p && p.pid, name: p && p.name });
+  log(enc, "turn", { pid: p && p.pid, name: p && p.name, ...(p && (p.actions || 1) > 1 ? { action: 1, of: p.actions } : {}) });
 }
 
 /** Aim (when the rules allow it): the next attack on this target gets the Aim bonus. @param {any} enc @param {any} rules @param {string} pid @param {string} target */
@@ -191,7 +200,23 @@ const sumBy = (/** @type {any[]} */ mods, /** @type {string[]} */ sources) => mo
 export function attack(enc, rules, core, cmd, opts = {}) {
   const a = find(enc, cmd.attacker), d = find(enc, cmd.defender), base = rules.weapons[cmd.weapon];
   // A material the attack is made of, chosen for this attack (silver bullets, a wooden stake), joins the weapon's own.
-  const weapon = base && cmd.material ? { ...base, materials: [...new Set([...(base.materials || []), cmd.material])] } : base;
+  let weapon = base && cmd.material ? { ...base, materials: [...new Set([...(base.materials || []), cmd.material])] } : base;
+  // An attack at a higher Class marks boxes as that Class does: 1 at Class I, 2 at Class II and III, 3 from Class IV.
+  const atClass = (/** @type {any} */ w, /** @type {number} */ cls) => ({ ...w, class: cls,
+    damage: Object.fromEntries(Object.entries(w.damage || {}).map(([k, v]) => [k, v ? { ...v, boxes: Math.max(v.boxes || 0, cls >= 4 ? 3 : cls >= 2 ? 2 : 1) } : v])) });
+  // A weapon in strong hands (Aurora's Strength): a weapon in hand hits at the higher of its own Class and the wielder's Strength.
+  // An ordinary weapon swung above Class II breaks after the blow.
+  const strong = a && weapon && weapon.reach === "melee" && !weapon.natural && !weapon.power && (a.strength || 0) > (weapon.class || 1) ? a.strength : 0;
+  if (strong) weapon = atClass(weapon, strong);
+  // A dive (a flier striking at full speed): a blow in reach, one Class higher; the diver marks a box too unless their Defense
+  // is at least the dive's Class (on their sheet).
+  const dive = cmd.dive && a && a.flies && weapon && weapon.reach === "melee" ? Math.min(6, (weapon.class || 1) + 1) : 0;
+  if (dive) weapon = atClass(weapon, dive);
+  // A team-up: another character puts their power into a power with a Class, and it strikes one Class higher.
+  // Both mark a box of Strain, on their sheets.
+  const mate = cmd.teamUp && weapon && weapon.class ? find(enc, cmd.teamUp) : null;
+  if (cmd.teamUp && !mate) return { error: "Choose who the team-up is with." };
+  if (mate) weapon = atClass(weapon, Math.min(6, weapon.class + 1));
   if (!a || !d) return { error: "Choose an attacker and a target." };
   if (!weapon) return { error: "Choose a weapon." };
   if (!opts.reroll && isOut(a)) return { error: `${a.name} can't act.` };
@@ -210,6 +235,8 @@ export function attack(enc, rules, core, cmd, opts = {}) {
   }
   const n = prior ? prior.key : enc.events.filter((/** @type {any} */ e) => e.type === "attack" && !e.reroll && e.round === enc.round && e.attacker.pid === a.pid && e.defender.pid === d.pid).length;
   const key = (/** @type {string} */ kind) => `r${enc.round}|${a.pid}>${d.pid}|${n}|${kind}${opts.reroll === kind ? "|rr" : ""}`;
+  // A psychic attack (weapon.mind) isn't dodged: it's a contest against Will, and it marks the Mind track.
+  if (weapon.mind) return mindAttack(enc, rules, core, cmd, opts, { a, d, weapon, skillTarget: +skillTarget, prior, n, key });
   const aimed = prior ? prior.aimed : (rules.actions.has("aim") && a.aim && a.aim.target === d.pid ? 1 : 0);
   // The defense. Published: one Dodge a round. Experiments add Parry and Block; the GM can allow a used one again (logged).
   const choice = cmd.canDodge === false ? "none" : cmd.defense || "auto";
@@ -281,13 +308,67 @@ export function attack(enc, rules, core, cmd, opts = {}) {
     dodgeBase: res.dodgeBase ?? null, attackQualityMod: sumBy(dm, ["attackQuality"]), dodgeMods: dm, effectiveDodge: res.dodgeTarget ?? null,
     dodgeDice: res.dodge ? res.dodge.dice : null, dodgeTotal: res.dodge ? res.dodge.total : null, dodged: !!(res.dodge && res.dodge.success), // any defense that worked: Dodge, Parry or Block
     enchanted: res.enchanted || 0, defense: res.defense || null, defenseLabel: res.defenseLabel || null, defenseChoice: chosen, armorUsed: res.armorUsed || null, weakness: res.weakness || null, capped: res.capped || null, material: cmd.material || null, shieldBroke, grievous, telling,
+    teamUp: mate ? { pid: mate.pid, name: mate.name, cls: weapon.class } : null,
+    strongHands: strong ? { cls: strong, breaks: strong >= 3 } : null,
+    dive: dive ? { cls: dive, hurts: Math.max(0, ...(a.traits || []).filter((/** @type {any} */ t) => t.type === "defenseClass").map((/** @type {any} */ t) => t.value)) < dive } : null,
+    // A hit of Class III or more knocks the target down, and can throw them a hex (or a range band) for each Class above II.
+    knockback: res.hit && res.damage && res.damage.boxes && (weapon.class || 1) >= 3 ? weapon.class - 2 : 0,
     hit: !!res.hit, rolledHit: !!res.hit, outcome: res.outcome, jam: !!res.jam, boosts: res.boosts || 0, price: res.price || null, marginTrait: res.marginTrait || null, defenseClass: res.defenseClass || null, stun: !!res.stun,
     defenderTraits: (d.traits || []).filter((/** @type {any} */ t) => !t.toggle || t.on !== false).map((/** @type {any} */ t) => t.label || t.type),
     damage: res.damage ? res.damage.boxes : 0, dyingWeapon: !!(res.damage && res.damage.dying), rolledDamage: res.damage || null,
     injuryBefore: pre.defender.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead, injuryResult: res.injury ? res.injury.change : null,
+    // A flier stunned, knocked back or taken out in the air falls, unless they make a Powers roll (Aurora).
+    flierFalls: !!(d.flies && res.hit && (res.stun || ((weapon.class || 1) >= 3 && res.damage && res.damage.boxes) || isOut(d))),
   });
   if (grievous && grievous.pc) d.lasting[d.lasting.length - 1].about = ev.n;
   if (extraDodge) log(enc, "override", { what: "dodge", about: ev.n, pid: d.pid, name: d.name, defense: chosen.kind, from: `already used ${chosen.kind} this round`, to: `${chosen.kind} allowed`, reason: "GM allowed it again" });
+  if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
+  return { event: ev };
+}
+
+/** The Mind track's penalty to mental rolls (Powers, Will): −1 with one box, −2 with two. @param {any} p */
+const mindPenalty = (p) => (p.mindBoxes ? -Math.min(2, p.mind || 0) : 0);
+
+/**
+ * A psychic attack (Aurora): Powers against the target's Will, by the contest rules (a success beats a failure; if both
+ * succeed, the larger margin wins; ties go to the target). Toughness doesn't apply; Mind Defense does: a power below it does
+ * nothing, one equal to it gives +2 to resist, and a Class IV or higher power against someone without it gives −2.
+ * It marks the Mind track by Class (1 at Class I, 2 at II and III, 3 from IV), never Dying: a full track is unconscious.
+ * @param {any} enc @param {any} rules @param {any} core @param {any} cmd @param {any} opts @param {any} x
+ */
+function mindAttack(enc, rules, core, cmd, opts, x) {
+  const { a, d, weapon, skillTarget, prior, n, key } = x;
+  const R = ["", "I", "II", "III", "IV", "V", "VI"], cls = weapon.class || 1;
+  const range = core.rangeModifier(weapon, cmd.band);
+  if (range === null) return { error: `Out of range for the ${weapon.name.toLowerCase()}.` };
+  const md = Math.max(0, ...(d.traits || []).filter((/** @type {any} */ t) => t.type === "mindDefense").map((/** @type {any} */ t) => t.value || 0));
+  const pre = { defender: { mind: d.mind || 0 }, attackerTracks: clone(a.tracks || {}) };
+  const atkMods = [...(range ? [{ label: `Range (${cmd.band})`, value: range }] : []),
+    ...(mindPenalty(a) ? [{ label: "Mind track", value: mindPenalty(a) }] : []),
+    ...(cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ label: m.label || "Situation", value: +m.value }))];
+  const resMods = [...(md && cls === md ? [{ label: `Mind Defense ${R[md]}`, value: 2 }] : []), ...(!md && cls >= 4 ? [{ label: `A Class ${R[cls]} mind`, value: -2 }] : []),
+    ...(d.traits || []).filter((/** @type {any} */ t) => t.type === "resistMind" && t.value).map((/** @type {any} */ t) => ({ label: t.label || "Steady mind", value: t.value })),
+    ...(mindPenalty(d) ? [{ label: "Mind track", value: mindPenalty(d) }] : [])];
+  const dice = (/** @type {string} */ kind) => (prior && opts.reroll !== kind && prior[kind + "Dice"] ? prior[kind + "Dice"] : core.diceFor(enc.seed, key(kind)));
+  const sum = (/** @type {any[]} */ l) => l.reduce((s, m) => s + m.value, 0);
+  const target = skillTarget + sum(atkMods), willBase = d.will ?? 10, resistTarget = willBase + sum(resMods);
+  const blocked = md > cls;
+  const ra = core.resolve(dice("attack"), target), rd = blocked || !ra.success ? null : core.resolve(dice("dodge"), resistTarget);
+  const win = !blocked && ra.success && (!rd || !rd.success || ra.contestMargin > rd.contestMargin);
+  const dmg = core.weaponDamage(weapon, cmd.band), boxes = win ? (dmg ? dmg.boxes : cls >= 4 ? 3 : cls >= 2 ? 2 : 1) : 0;
+  if (win) d.mind = Math.min(d.mindBoxes || 3, (d.mind || 0) + boxes);
+  const out = win && isOut(d);
+  const outcome = blocked ? `no effect (Mind Defense ${R[md]} against a Class ${R[cls]} mind)` : !ra.success ? "failed" : !win ? "resisted"
+    : `${boxes} Mind box${boxes > 1 ? "es" : ""}${out ? `: ${d.name} is unconscious` : ""}`;
+  const ev = log(enc, "attack", {
+    mind: true, rules: rulesTag(rules), cmd: clone(cmd), key: n, reroll: opts.reroll || null, replaces: prior ? prior.n : null, pre,
+    attacker: { pid: a.pid, name: a.name }, defender: { pid: d.pid, name: d.name }, weapon: { id: weapon.id, name: weapon.name },
+    band: cmd.band, skill: weapon.skill, base: skillTarget, canDodge: false, attackMods: atkMods, target, attackDice: ra.dice, attackTotal: ra.total,
+    margin: ra.margin, success: ra.success, auto: ra.auto, willBase, resistMods: resMods, effectiveDodge: rd ? resistTarget : null,
+    dodgeDice: rd ? rd.dice : null, dodgeTotal: rd ? rd.total : null, dodged: !!(rd && !win && ra.success), defense: "will", defenseLabel: "Will",
+    mindDefense: md || null, hit: win, rolledHit: win, outcome, damage: boxes, mindBefore: pre.defender.mind, mindAfter: d.mind || 0, mindBoxes: d.mindBoxes || 3, unconscious: out,
+    injuryBefore: d.injury, injuryAfter: d.injury, dying: d.dying, dead: d.dead,
+  });
   if (!prior) enc.commands.push({ type: "attack", cmd: clone(cmd) });
   return { event: ev };
 }
@@ -300,7 +381,10 @@ export function tellingEffect(enc, n, effect) {
   if (!ev || !ev.telling || ev.superseded) return { error: "Only a telling hit has an effect to pick." };
   if (ev.telling.shrugged) return { error: `${ev.defender.name} already shrugged it off.` };
   const from = ev.telling.effect; ev.telling.effect = effect;
-  return { event: log(enc, "telling", { about: n, pid: ev.attacker.pid, name: ev.attacker.name, target: ev.defender.name, effect, from }) };
+  // A pin by someone stronger (Strength) holds: breaking free takes a Body roll at −2 for each Class of difference.
+  const holder = find(enc, ev.attacker.pid), held = find(enc, ev.defender.pid);
+  const grip = effect === "pin" && holder && held ? Math.max(0, (holder.strength || 0) - (held.strength || 0)) : 0;
+  return { event: log(enc, "telling", { about: n, pid: ev.attacker.pid, name: ev.attacker.name, target: ev.defender.name, effect, from, ...(grip ? { grip } : {}) }) };
 }
 
 /**
@@ -485,9 +569,16 @@ export function override(enc, rules, core, what, o) {
     const p = find(enc, o.pid); if (!p) return { error: "Who?" };
     return { event: log(enc, "override", { what, pid: p.pid, name: p.name, skill: o.skill, from: o.from ?? null, to: o.to, reason: o.reason || "" }) };
   }
+  // The Mind track, changed by hand (on the character card, or by the GM).
+  if (what === "mind") {
+    const p = find(enc, o.pid); if (!p) return { error: "Who?" };
+    const from = p.mind || 0; p.mind = Math.max(0, Math.min(p.mindBoxes || 3, +o.mind || 0));
+    return { event: log(enc, "override", { what, pid: p.pid, name: p.name, from, to: p.mind, reason: o.reason || "" }) };
+  }
   if (what === "outcome") {
     const ev = enc.events.find((/** @type {any} */ e) => e.n === o.event && e.type === "attack");
     if (!ev || ev.superseded) return { error: "Choose an attack to override." };
+    if (ev.mind) return { error: "A psychic attack's result: change the Mind track on the card instead." };
     const d = find(enc, ev.defender.pid), from = { hit: ev.hit, injury: d.injury };
     if (o.hit && !ev.hit) {
       const dmg = ev.rolledDamage || core.weaponDamage(rules.weapons[ev.weapon.id], ev.band) || { boxes: 0 }; // the damage the dice gave, if they gave a hit

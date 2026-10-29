@@ -301,11 +301,11 @@ When a roll fails by only **1 or 2**, the GM may offer **success at a cost**: yo
 
 ## Progress clocks
 
-A **clock** is a circle cut into 4, 6 or 8 segments that tracks something that takes time or builds toward disaster: *The mob forms (6)*, *Nightfall (4)*, *Find the lair (6)*, *Win the clan's trust (8)*.
+A **clock** is a circle cut into 2, 4, 6 or 8 segments that tracks something that takes time or builds toward disaster: *The mob forms (6)*, *Nightfall (4)*, *Find the lair (6)*, *Win the clan's trust (8)*.
 
 - **Danger clocks** fill when things go wrong: a failed roll, a success at a cost, or time passing. When one fills, the danger happens.
 - **Progress clocks** fill as the characters succeed: one segment for a success, two for success by 5 or more. When one fills, the goal is achieved.
-- The GM sizes the clock (4 = urgent or simple, 6 = substantial, 8 = long or complex) and shows it to the players.
+- The GM sizes the clock (2 = quick, 4 = urgent or simple, 6 = substantial, 8 = long or complex) and shows it to the players.
 
 ## Investigation and social scenes
 
@@ -314,6 +314,10 @@ Ask concrete questions and explain your approach. Evidence may require several d
 ## Chases
 
 Run a chase as a progress clock for the pursuers against a danger clock for the quarry's escape. Each exchange, characters roll **Riding** (or Athletics on foot): success ticks the pursuers' clock, failure ticks the escape. Terrain, a tired horse, or a shot fired from the saddle (Shooting at −2) adjust the rolls.
+
+- **Clearly faster.** A side that is a whole class faster (a horse against a runner, a train against a horse) catches up, or gets away, without a roll. Roll the chase between equals, or when terrain or a trick evens things out.
+- **Chases by range.** When the distance itself is the fight, run the chase on the battle map's range track instead of clocks: each exchange, the two sides roll an opposed contest of the skill that moves them, and the winner shifts the range one band, in or out; a tie leaves it. Anyone pushed past Extreme drops out of the chase, and a quarry that wins at Extreme by 5 or more breaks away. The stagecoach chase below is one.
+- **Vehicles take damage on a track.** A coach or a wagon has a track of four boxes: one marks no penalty yet; two means a horse or a wheel is hit (−2 to rolls that use it); three, it's crippled; four, it's wrecked, and everyone aboard rolls Athletics or marks a box. The stagecoach's track is below.
 
 ### Stagecoach chases
 
@@ -332,6 +336,67 @@ A coach on the road with riders closing in is a chase where distance is everythi
 | 2 | A horse hit or a wheel cracked: −2 to the driver's Riding |
 | 3 | Lamed: −4 to the driver's Riding, and riders close on a tie |
 | 4 | Wrecked: the coach overturns or stops dead; everyone aboard rolls Athletics or marks a box of Injury |
+
+# The diaries
+
+For generations, Grimms have written down what they learned about the Wesen they hunted, and kept the books in trunks and wagons and hidden rooms. Anyone who investigates the hidden world keeps a **diary** of their own: what they've established for themselves, one finding at a time.
+
+## Folklore, truth and the diary
+
+- **Folklore.** What people say about the thing in the woods: stories, warnings, a preacher's sermon, an old Grimm diary's sketch. Some of it is right, some half right, some wrong. It's where an investigation starts.
+- **The truth.** What a Wesen, a curse or a hex really is, and what really stops it. The GM knows it; you find it out.
+- **Diary entries.** What your character has established for themselves: one finding at a time, with its limits, how you know it and what it cost (the core rules call them Legend cards).
+
+A real weakness works whether or not anyone holds an entry for it. Act on what you suspect: try silver, salt the threshold, call it by its kind. The GM will ask what your idea rests on, and a good reason is all it needs. Learning, though, is never free.
+
+## Discovery clocks
+
+When a case turns on something unknown (a body torn open on the trail, a town that won't talk), the GM sets up a **discovery clock**. It fills in three phases, and filling it earns a **diary entry**.
+
+| Phase | What it means |
+|---|---|
+| 1. Confront the unknown | Effects without a cause. You may suspect a Wesen, but nothing is confirmed. |
+| 2. Identify | Name it: the kind of Wesen, the curse, the hex, the hand behind it. This is the gate: until it's confirmed, what you know about a kind of Wesen doesn't yet apply to this one, and your theories stay suspicions. |
+| 3. Uncover | Learn how it is stopped, or what it wants. Filling this phase fills the clock and earns a diary entry for what you established. |
+
+- **Sizing.** The GM decides how many segments each phase needs (usually 1–2 to Confront, 2–3 to Identify, 2–3 to Uncover) and shows the clock to the players.
+- **Advancing.** Each roll that advances the clock uses a concrete method tied to a skill (Wesen Lore, Investigation, Tracking, Read People, Occult, Apothecary): one segment for a success, two for success by 5 or more. The clock stops at the end of Identify until the subject is confirmed: segments never spill past the gate.
+- **The primary investigator.** One character leads and owns the entry. Others **assist** under the usual assistance rules. A character who holds a relevant entry can assist with a method they couldn't otherwise bring; it adds nothing beyond the normal assistance.
+- **Pushing.** A player can push to dig faster or harder: a success advances one extra segment, but a box of Trouble is marked whatever the roll.
+- **A head start.** A character trained in the skill whose field squarely covers the subject (Wesen Lore before a Wesen, Occult before a hex, Apothecary before a poison) recognizes at once that it's something new: the clock starts at Identify, skipping Confront. The GM says whether a skill fits.
+
+### A diary entry
+
+An entry grants **no bonus** to any roll. It's what the character knows for certain and can rely on, plan around and teach.
+
+- **The gate.** Holding an entry about one kind of Wesen never proves that the one in front of you is that kind: only the Identify phase does.
+- **Shared copies.** Everyone who establishes a finding, or is there when the entry is earned, gets a shared copy; the primary investigator is its owner. Someone who wasn't there can be taught it later, from a reliable account.
+- **What it records.** The subject, the precise finding, its limits (what it doesn't show), the evidence or source, how it was learned, what it cost, the date, its owner and who received it. It's kept in the creator, under the diary.
+
+### The threat clock, or a rival
+
+A discovery clock races a **threat clock**: the Wesen killing again, the mob forming, the trail going cold. When it fills, the danger happens. When nothing threatens yet, give the discovery **a rival** instead: an ordinary danger clock named for someone racing the characters to the same find (a Verrat agent, a Reaper, a newspaperman). It ticks on delays, noisy methods and open digging; when it fills, the rival gets there first.
+
+### What investigating costs
+
+When an investigation roll fails, or a player pushes, one of the Trouble tracks ticks up by one, chosen by how the characters are digging: **Suspicion** for asking around town and digging in public, **Exposure** for prying into the Wesen world in the open, **Attention** for crossing the Royals, the Order or the Reapers. A failed roll can still turn up a lead, but the box is still marked.
+
+## Learning without a clock
+
+A diary entry can also come directly, without a clock. **Information is never free:** each source has its price, marked when the entry is written.
+
+| How it was learned | What counts | What it costs |
+|---|---|---|
+| **A discovery clock** | Filled to the end of Uncover. | What the clock cost along the way |
+| **Seen or tested firsthand** | What you saw yourself, or a careful test: silver on its skin, salt across its path. | A box of Trouble, or a tick on the threat clock |
+| **A reliable account** | An old Grimm diary, a Wesen elder, a trusted witness. A source's reputation alone doesn't make it right. | A box of Trouble |
+| **Its own word, backed up** | What a Wesen, or someone close to it, tells you, supported by evidence. | A box of Trouble |
+
+Proposing a theory costs nothing; learning something does. The GM provides enough clues, and more than one route to each answer: a case shouldn't stall on a single missed roll.
+
+## When the other side investigates you
+
+Enemies keep files too. What a Wesen family, the Verrat or a Reaper has learned about a character (a weakness, a habit, a real name, the people they love) gives it **+2 against them when it applies**: an ambush on the road they always ride, a trap built for a weakness, a hostage who matters. The GM keeps these files and decides when one applies. A character who finds out a file exists (a captured lackey, a stolen ledger) sees it on their sheet, and can **destroy** it: burn the papers, discredit the source, deal with the spy. A destroyed file gives nothing.
 
 # The woge and the hidden world
 
@@ -433,7 +498,10 @@ The Code of Swabia is the old law between Wesen and the rest of the world, and G
 
 ## Turn order and actions
 
-Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move a short distance and take one meaningful action, such as shooting, reloading, helping, or attempting a task.
+Act in descending Agility order. Players choose the order of tied characters; the GM resolves other ties. A round lasts a few seconds. On your turn, move up to your **Move** (see *Move and reach*) and take one meaningful action, such as shooting, reloading, helping, or attempting a task.
+
+- **Acting first and acting twice.** An ability can let a character act first in a round (a quick draw): they go before everyone else, in Agility order among themselves. An ability that gives more than one action a round gives each one in turn, before the next character acts.
+- **Helping in a fight.** Helping a friend's attack (drawing a gunman's eye, steadying a shot) is your action: you assist under the usual rules (+1, or +2 by 5 or more) before they roll.
 
 ## Attacking and defending
 
@@ -461,7 +529,7 @@ A really good shot, or a blow that lands exactly where it was meant to, lets the
 |---|---|---|
 | Disarm | Any attack | The weapon or held item drops, or flies a few yards away |
 | Knock down | A weapon in hand, fists or claws, or a shot or missile that marks 2 or more boxes | The target falls prone, or is driven back a few steps. Standing up uses the target's move on their next turn; they still take their action |
-| Pin | A weapon in hand, fists, claws or a grapple | The target is grabbed, held, or pinned against a wall or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack |
+| Pin | A weapon in hand, fists, claws or a grapple | The target is grabbed, held, or pinned against a wall or the ground. Their next action goes to getting free, and then they are free: no roll needed. Keeping them pinned takes another successful attack. Against someone much stronger (a Blutbad in full woge, a Jägerbär, a grizzly), getting free takes a Body roll, −2 or −4 against something huge; on a failure they're still held |
 | Rattle | Any attack | −2 to the target's next roll |
 | Break gear | Any attack but bare hands, claws and fangs | A weapon, shield or tool is knocked out of use (jammed, bent, unstrung, cracked) until its owner spends an action putting it right. It's destroyed for good only if it was already vulnerable (a rotten haft, an improvised shield) or the attacker has a weakness to exploit. Armor loses 1 protection until it's repaired |
 | Open them up | Any attack | The next attack on this target this round gets +2 |
@@ -538,6 +606,29 @@ Injury penalties replace each other rather than stacking. They apply to movement
 
 Your protection is avoiding the hit: a defense (Dodge, Parry or Block), cover, and a Grit point, which reduces a hit by one box.
 
+### Falls, fire and foul air
+
+A fall marks boxes by its height. Deep water, a haystack or an awning makes it one step better.
+
+| Height | Boxes |
+|---|---|
+| A story or two (up to 10 yards) | 1 |
+| A rooftop (up to 25 yards) | 2 |
+| A tower or a cliff (up to 100 yards) | 3, and Dying |
+| Higher | Certain death, unless something breaks the fall |
+
+**Fire** marks 1 box each round in the flames. **Smoke, mine gas or poison air** marks 1 box each round you breathe it, unless you have something to breathe through.
+
+### Fear and other conditions
+
+- **Dazed.** −2 on your next action roll; then it's over.
+- **Frightened.** Fear, a curse, a Wesen's terror: you must keep away from its source, and you're −2 to act against it. At the end of each of your turns, roll Will to shake it off (+2 if you've been hurt since). A spell or a trait that makes its target *flee or freeze* makes them Frightened.
+- **Charmed.** You treat the one who charmed you as a friend for the scene. Harming you or your friends ends it at once.
+
+### Mental harm (an option)
+
+A GM whose cases turn on curses and minds broken by the hidden world can give every character a **Mind** track beside the injury track. Attacks on the mind mark it: Occult or a Wesen's power against Will, never Dodge, and armor doesn't help. One box is Shaken (−1 to mental actions: Will, and skills of Intellect and Presence), two Overwhelmed (−2), three Broken: unconscious or catatonic until they rest. It never leaves anyone Dying; a scene's rest clears one box, a night's sleep all of them.
+
 ### Optional rule: gritty combat
 
 For a harder, bloodier game, the GM can turn on **gritty combat** for the campaign (the creator has a switch on the Condition card and in the GM view). The rest of the rules stay the same.
@@ -565,6 +656,16 @@ For a harder, bloodier game, the GM can turn on **gritty combat** for the campai
 
 How many boxes a hit marks depends on the **weapon**, not on how well the attack succeeded.
 
+- **"3, and Dying."** The deadliest weapons (a buffalo rifle, a shotgun at Close range, dynamite at the centre) mark 3 boxes: enough to take an unhurt character straight to Incapacitated and Dying.
+- **Explosions** mark 1 box on everyone nearby and their full boxes at the centre; Dodge means diving clear.
+- **Jams.** A gun jams on a natural 18; clearing it takes an action (see *Guns and ammunition*).
+
+### Armor, toughness and weaknesses
+
+- **Armor** turns some hits. Protective gear makes a hit mark one fewer box, a set number of times, and its entry says what it works against: a Himmelsbrief turns one bullet a case.
+- **Toughness.** A Wesen's or a creature's trait can say *hits of 1 box mark nothing*, *hits of 2 or more boxes mark one fewer*, or *bullets and blades mark 1 box at most* (a Siegbarste's iron bones).
+- **Weaknesses.** What a creature is weak to marks one box more, and its toughness and armor don't help against it. *Only fire marks more than 1 box* means everything else marks at most 1. What an attack is made of (silver, cold iron, a Grimm's old weapon, a poison) is what counts: say it when you attack. A weakness works whoever uses it, whether or not anyone knows of it.
+
 | Weapon | Range | Boxes on a hit | What the injury looks like |
 |---|---|---|---|
 | Punch, kick, headbutt | Melee, reach 1 yd | 1 | Bruises, a split lip, cracked ribs |
@@ -581,7 +682,7 @@ How many boxes a hit marks depends on the **weapon**, not on how well the attack
 | Shotgun, at Short range | Short (no effect beyond) | 1 | Scattered pellets |
 | Buffalo rifle | Long | 3, and Dying | A ruinous wound |
 | Dynamite | Close (thrown) | 1 to everyone nearby, 3 and Dying at the centre | Blast and burns; Dodge means diving clear |
-| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Fall | — | By height: 1 to 3, and worse (see *Falls, fire and foul air*) | A sprain, a fracture, or worse |
 | Fire | — | 1 each round in the flames | Burns |
 
 **Period ranges.** These are 1870s guns: a revolver is a close-quarters weapon, and most gunfights happen across a room or a street. A derringer is useless beyond Short range, and a shotgun beyond it does nothing.
@@ -670,7 +771,7 @@ Gain one point when one of your complications creates a meaningful problem you a
 
 ## Trouble
 
-The characters share three Trouble tracks. They fill as the hidden world strains against the ordinary one; the GM narrates what each box means.
+A track is a row of boxes that fills as consequences catch up with you, and each box means something. The characters share three Trouble tracks. They fill as the hidden world strains against the ordinary one; the GM narrates what each box means.
 
 | Track | Boxes | Effect as boxes fill |
 |---|---|---|
