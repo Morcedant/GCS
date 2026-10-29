@@ -8,7 +8,7 @@ Trails of Blood & Dust is not tied to a single place or year. Set your game in a
 
 {{GEN:arms-table}}
 
-**Period ranges.** These are 1870s guns: a revolver is a close-quarters weapon, and most gunfights happen across a room or a street. A derringer is useless beyond Short range, and a shotgun beyond it does nothing.
+**Period ranges.** These are 1870s guns: a revolver is a close-quarters weapon, and most gunfights happen across a room or a street. A derringer is useless beyond Short range, and a shotgun beyond it does nothing. Black powder fouls and caps fail: a gun jams on a natural 18, and clearing it takes an action.
 
 *Example:* an outlaw's knife leaves Deputy Ames Wounded (one box). A revolver shot that gets through marks two more: Ames is at three boxes, Incapacitated and Dying, and a further 2-box hit would kill. Spending a Grit point on that revolver shot reduces it to one box, leaving Ames Seriously wounded and still standing.
 
@@ -28,7 +28,7 @@ Trails of Blood & Dust adds these to the attack and defense rules above.
 
 ### Stagecoach chases
 
-A coach on the road with riders closing in is a chase where distance is everything. Run it on the battle map's **Stagecoach chase** track, in the GM view, instead of the chase clocks.
+A coach on the road with riders closing in is a chase where distance is everything: the core's *chase by range*, with a coach in the middle. Run it on the battle map's **Stagecoach chase** track, in the GM view, instead of the chase clocks.
 
 - **The lanes.** The stagecoach has its own lane, and each rider stands in a range band from it: Close (alongside), Short, Medium, Long or Extreme. Riders usually start at Medium or Long.
 - **Each exchange.** The driver rolls Riding against each rider's Riding (11 for a threat without it). The winner moves that rider one band: closer if the rider won, farther if the driver did. A tie leaves it where it is, and a rider pushed past Extreme drops out of the chase. A fresh horse or a good road gives +2; rough ground or a tired team gives −2.
@@ -106,7 +106,7 @@ A **Sorcerer** trades preparation for speed: they know **hexes**, quick spells c
 | Hellfire | A lash of flame at Short range; marks 2 boxes. Dodge applies. |
 | Devil's Shove | Unseen force hurls the target down: 1 box, and they lose their next move (Body resists). |
 | Evil Eye | The target is at −2 on all rolls for the scene (Will resists). |
-| Grave Chill | The target flees or freezes (Will resists). |
+| Grave Chill | The target is Frightened: it flees or freezes (Will resists). |
 | Hold | The target is held where they stand for the scene, or until they break free (Body resists). |
 | Misfire | One gun jams or one lamp gutters out; clearing a jam takes an action. No defense or resistance: it works on the gun or the lamp, not the person. |
 | Shroud | +3 to Stealth for the scene; eyes slide off you. |

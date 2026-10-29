@@ -849,7 +849,7 @@ body { margin: 0; }
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Core rules</h1>
   <hr class="ld-rule">
-  <p class="ld-lede">New to Legend Dynamics? <a href="/start">Start here</a>: you can make a character without reading these rules first. · Core rules last updated 21 October 2026 · <a href="/changelog">Changelog</a></p>
+  <p class="ld-lede">New to Legend Dynamics? <a href="/start">Start here</a>: you can make a character without reading these rules first. · Core rules last updated 28 October 2026 · <a href="/changelog">Changelog</a></p>
 </div>
 
 <div class="ld ld-rules">
@@ -1286,6 +1286,12 @@ the normal assistance.</li>
 <li><strong>Pushing.</strong> A player can push to dig faster or harder:
 a success advances one extra segment, but a track ticks (below) whatever
 the roll.</li>
+<li><strong>A head start.</strong> A character trained in the skill
+whose field squarely covers the subject (an engineer before an alien
+power core, a doctor before a new disease) recognizes at once that it’s
+something new: the clock starts at Identify, skipping Confront. The GM
+says whether a skill fits. Identify and Uncover still have to be filled
+to earn the Legend card.</li>
 </ul>
 <h3 id="ld-the-legend-card">The Legend card</h3>
 <p>A Legend card is a permanent record of one specific thing the
@@ -1377,11 +1383,26 @@ single missed roll.</li>
 <p>A discovery clock always races a threat clock. The setting names the
 threat clock and what happens when it fills: a creature claiming another
 victim, a villain escalating, a reactor going critical.</p>
+<p><strong>A rival.</strong> When nothing threatens yet, give the
+discovery a rival instead: an ordinary danger clock named for someone
+racing the party to the same find. It ticks on delays, noisy methods and
+open digging; when it fills, the rival gets there first.</p>
 <h3 id="ld-what-investigating-costs">What investigating costs</h3>
 <p>When an investigation roll fails, or a player pushes, one of the
 setting’s shared tracks ticks up by one, chosen by how the party is
 digging. A failed roll can still turn up a lead when the story allows
 it, but the track still ticks.</p>
+<h3 id="ld-when-the-other-side-investigates-you">When the other side
+investigates you</h3>
+<p>Enemies keep files too. What a villain, a rival or a monster has
+learned about a character (a weakness, a habit, a real name, the people
+they love) gives it <strong>+2 against them when it applies</strong>: an
+ambush where they always go, a trap built for a weakness, a hostage who
+matters. The GM keeps these files in the GM view and decides when one
+applies. A character who finds out a file exists (an informant, a
+captured lieutenant, a stolen ledger) sees it on their sheet, and can
+<strong>destroy</strong> it: burn the papers, discredit the source, kill
+the spy. A destroyed file gives nothing.</p>
 <p><em>Each setting names its Legend cards, their collection, the threat
 clock, the tracks investigating pushes, each source’s price and the
 methods. Trails of Blood &amp; Dust: lore cards in a hunter’s almanac;
@@ -1394,6 +1415,26 @@ skill that moves them (the chase skill, or Athletics on foot): success
 ticks the pursuers’ clock, failure ticks the escape. Terrain, a tired
 mount or a damaged engine, and attacks made on the move (at −2) adjust
 the rolls.</p>
+<ul>
+<li><strong>Clearly faster.</strong> A side that is a whole class faster
+(a horse against a runner, a car against a horse, a jet against a car)
+catches up, or gets away, without a roll. Roll the chase between equals,
+or when terrain or a trick evens things out.</li>
+<li><strong>Chases by range.</strong> When the distance itself is the
+fight (riders closing on a coach, ships maneuvering for a shot), run the
+chase on the battle map’s range track instead of clocks. Each exchange,
+the two sides roll an opposed contest of the skill that moves them; the
+winner shifts the range one band, in or out, and a tie leaves it. Anyone
+pushed past Extreme drops out of the chase, and a quarry that wins at
+Extreme by 5 or more breaks away. Everyone else fights as usual, at −2
+on the move.</li>
+<li><strong>Vehicles take damage on a track.</strong> A coach, a car or
+a ship has a track of four boxes. One marks no penalty yet; two means a
+system, a wheel or a horse is hit (−2 to rolls that use it); three means
+it’s crippled; four, it’s wrecked or stops dead, and everyone aboard
+rolls Athletics or marks a box. Each setting says what its vehicles’
+boxes do.</li>
+</ul>
 <h1 id="ld-personal-combat">Personal combat</h1>
 <h2 id="ld-turn-order-and-actions">Turn order and actions</h2>
 <p>Act in descending Agility order. Players choose the order of tied
@@ -1401,6 +1442,17 @@ characters; the GM resolves other ties. A round lasts a few seconds. On
 your turn, move up to your <strong>Move</strong> (below) and take one
 meaningful action, such as attacking, reloading, helping, or attempting
 a task.</p>
+<ul>
+<li><strong>Acting first and acting twice.</strong> An ability can let a
+character act first in a round (a quick draw, super-speed): they go
+before everyone else, in Agility order among themselves. An ability that
+gives more than one action a round gives each one in turn, before the
+next character acts.</li>
+<li><strong>Helping in a fight.</strong> Helping a friend’s attack
+(drawing a guard’s eye, steadying a shot, combining your powers) is your
+action: you assist under the usual rules (+1, or +2 by 5 or more) before
+they roll.</li>
+</ul>
 <h2 id="ld-attacking-and-defending">Attacking and defending</h2>
 <p>Roll a ranged skill for a ranged attack, a melee skill for a weapon
 in hand, or an unarmed skill for fists and grappling. If the attack
@@ -1484,7 +1536,10 @@ action</td>
 <td>A weapon in hand, fists or a grapple</td>
 <td>The target is grabbed, held, or pinned against a wall or the ground.
 Their next action goes to getting free, and then they are free: no roll
-needed. Keeping them pinned takes another successful attack</td>
+needed. Keeping them pinned takes another successful attack. Against
+someone much stronger (a grizzly, a giant, a super-strong grip), getting
+free takes a Body roll, −2 or −4 against something huge; on a failure
+they’re still held</td>
 </tr>
 <tr class="even">
 <td>Rattle</td>
@@ -1717,9 +1772,94 @@ beheading, disintegration) bypass the track entirely.</li>
 </ul>
 <p>Your protection is avoiding the hit: a defense (Dodge, Parry or
 Block), cover, and a Legend point, which reduces a hit by one box.</p>
+<h3 id="ld-falls-fire-and-foul-air">Falls, fire and foul air</h3>
+<p>A fall marks boxes by its height. Deep water, a haystack or an awning
+makes it one step better.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Height</th>
+<th>Boxes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A story or two (up to 10 yards)</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>A rooftop (up to 25 yards)</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>A tower or a cliff (up to 100 yards)</td>
+<td>3, and Dying</td>
+</tr>
+<tr class="even">
+<td>Higher</td>
+<td>Certain death, unless something breaks the fall</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fire</strong> marks 1 box each round in the flames.
+<strong>Smoke, poison air or vacuum</strong> marks 1 box each round you
+breathe it, unless you have a mask or a suit.</p>
+<h3 id="ld-fear-and-other-conditions">Fear and other conditions</h3>
+<ul>
+<li><strong>Dazed.</strong> −2 on your next action roll; then it’s
+over.</li>
+<li><strong>Frightened.</strong> Fear, a hex, a horror: you must keep
+away from its source, and you’re −2 to act against it. At the end of
+each of your turns, roll Will to shake it off (+2 if you’ve been hurt
+since). A spell or a trait that makes its target <em>flee or freeze</em>
+makes them Frightened.</li>
+<li><strong>Charmed.</strong> You treat the one who charmed you as a
+friend for the scene. Harming you or your friends ends it at once.</li>
+</ul>
+<h3 id="ld-mental-harm-a-setting-option">Mental harm (a setting
+option)</h3>
+<p>A setting can give every character a <strong>Mind</strong> track
+beside the injury track (Aurora does). Attacks on the mind mark it:
+Powers or a spell against Will, never Dodge, and armor doesn’t help. One
+box is Shaken (−1 to mental actions: Will, and skills of Intellect and
+Presence), two Overwhelmed (−2), three Broken: unconscious or catatonic
+until they rest. It never leaves anyone Dying; a scene’s rest clears one
+box, a night’s sleep all of them. Opponents have as many Mind boxes as
+injury boxes.</p>
 <h2 id="ld-weapons-and-damage">Weapons and damage</h2>
 <p>How many boxes a hit marks depends on the <strong>weapon</strong>,
 not on how well the attack succeeded.</p>
+<ul>
+<li><strong>“3, and Dying.”</strong> The deadliest weapons (a buffalo
+rifle, a plasma rifle, a grenade at the center) mark 3 boxes: enough to
+take an unhurt character straight to Incapacitated and Dying.</li>
+<li><strong>Explosions</strong> mark 1 box on everyone nearby and their
+full boxes at the center; Dodge means diving clear.</li>
+<li><strong>Stun weapons</strong> (a taser, a stunner) mark no box: the
+target rolls Body −2. On a failure they’re out for the scene; on a
+success, −2 on their next action.</li>
+<li><strong>Jams.</strong> A firearm jams on a natural 18 (a setting’s
+older guns may misfire more often); clearing it takes an action.</li>
+</ul>
+<h3 id="ld-armor-toughness-and-weaknesses">Armor, toughness and
+weaknesses</h3>
+<ul>
+<li><strong>Armor</strong> turns some hits. A typical piece (a mail
+shirt, a heavy coat, a vest) makes a hit of 2 or more boxes mark one
+fewer, once per fight, and its entry says what it works against. Heavy
+armor works every time.</li>
+<li><strong>Toughness.</strong> A threat’s trait can say <em>hits of 1
+box mark nothing</em> (a huge beast, an armored soldier) or <em>hits of
+2 or more boxes mark one fewer</em> (chrome, scales, a curse).</li>
+<li><strong>Weaknesses.</strong> What a creature is weak to marks one
+box more, and its toughness and armor don’t help against it. <em>Only
+fire (or silver, or cold iron) marks more than 1 box</em> means
+everything else marks at most 1.</li>
+<li><strong>Materials.</strong> What an attack is made of (silver, cold
+iron, a wooden stake, holy water) is what counts for a weakness: say it
+when you attack. A weakness works whoever uses it, whether or not anyone
+knows of it.</li>
+</ul>
 <p><em>Your setting pack supplies this (ammo).</em></p>
 <h2 id="ld-the-battle-map">The battle map</h2>
 <p>The GM view of the character creator has a <strong>battle
@@ -1734,7 +1874,8 @@ doorways, who can reach whom. The GM chooses what one hex is: 1 yard for
 a brawl in a room, 5 or 10 yards for a street, 50 for open ground.
 Dragging a token or measuring shows the distance and its <strong>range
 band</strong>, so the GM can read the penalty from the Range table
-above.</li>
+above. A token can have a height (a flier, a sniper on a roof), and the
+distance counts it.</li>
 <li><strong>A range track</strong> for fights where only distance
 matters: a chase, a running fight across open country. It has a lane for
 the party and one for each range band. Moving a token into the next lane
@@ -2168,6 +2309,14 @@ GM approval is required.</td>
 problem you accept, including a companion complication. You can decline
 the proposed complication without penalty.</p>
 <h2 id="ld-tracks">Tracks</h2>
+<p>A track is a row of boxes that fills as consequences catch up with
+you, and each box means something. <strong>Shared tracks</strong> belong
+to the whole party (the law noticing, debts, the dark learning your
+names): deeds, a success at a cost or a failed investigation mark them,
+and lying low, paying up or a public good clears them. A setting can
+also give each character a <strong>personal track</strong> of four
+boxes: the price of their power (Strain, Corruption) or of a secret
+(Exposure), with what each box does on the sheet.</p>
 <p><em>Your setting pack supplies this (tracks).</em></p>
 <h2 id="ld-advancement">Advancement</h2>
 <p>Characters grow by earning <strong>advancement points</strong> and
@@ -2398,7 +2547,10 @@ with the book’s:</p>
 <li><strong>Threats.</strong> A minor foe has 1 box; an ordinary one 3;
 a tough one 4 or 5; a rare horror 6. Attack targets run 11 to 13 for
 most, 14 or 15 for the dangerous. Dodge runs 7 to 10. Give it one
-special trait, said plainly, and decide what it does before play.</li>
+special trait, said plainly, and decide what it does before play:
+toughness, a weakness or armor works as in <em>Armor, toughness and
+weaknesses</em>. For a tougher version of any threat, add +1 to its
+targets and one box; for a weaker one, subtract.</li>
 <li><strong>Weapons.</strong> Hits mark 1 box for fists, knives and
 arrows; 2 for swords and guns; 3 for the heavy and the point-blank; 4
 only for explosives and the monstrous. Give a weapon a reach (melee) or
@@ -2700,7 +2852,7 @@ preparation. Earn one from an accepted complication.</p>
   <div class="ld-eyebrow">Legend Dynamics RPG system</div>
   <h1>Changelog</h1>
   <hr class="ld-rule">
-  <p class="ld-lede">Core rules last updated 21 October 2026 · setting rules last updated 28 October 2026 (Aurora). A <b>rules change</b> changes how the game plays (a <b>setting rules change</b>, one setting's own rules, leaves the core rules' date alone); a <b>website and wording</b> update fixes or improves the site and the text without changing the rules, and leaves the rules' date alone.</p>
+  <p class="ld-lede">Core rules last updated 28 October 2026. A <b>rules change</b> changes how the game plays (a <b>setting rules change</b>, one setting's own rules, leaves the core rules' date alone); a <b>website and wording</b> update fixes or improves the site and the text without changing the rules, and leaves the rules' date alone.</p>
   <div class="ld-actions">
     <a class="ld-button ld-button--ghost" href="/core-rules">Core rules</a>
     <a class="ld-button ld-button--ghost" href="/contact">Send feedback</a>
@@ -2708,9 +2860,12 @@ preparation. Earn one from an accepted complication.</p>
 </div>
 
 <div class="ld ld-rules">
+<h2 id="2026-10-28-rules">The settings and the core rules, brought in line</h2>
+<p class="ld-eyebrow" style="margin:0">28 October 2026 · Rules change</p>
+<ul><li>What the settings had worked out separately is now in the core rules, for every setting: chases where one side is clearly faster, chases by range (an opposed roll moves the range a band), and a damage track for vehicles; acting first and acting more than once a round; helping in a fight; pins that hold against someone much stronger.</li><li>Falls mark boxes by height (a story 1, a rooftop 2, a tower 3 and Dying, higher is certain death), with fire and foul air beside them. Every setting&#x27;s fall uses it; Aurora&#x27;s adds Classes.</li><li>Conditions, defined once: stunned, Frightened (keep away from the source, −2 against it, Will each turn to shake it) and Charmed. The settings&#x27; fear spells and horrors (Grave Chill, Dread, the Thing from the Deep, Emotion Control) now say Frightened.</li><li>Weapons: what &quot;3, and Dying&quot; means, explosions, stun weapons and jams; and armor, toughness, weaknesses and materials, the way every setting&#x27;s gear and threats already use them. Guns now jam on a natural 18 in Trails of Blood &amp; Dust too, as in the other settings.</li><li>Investigation: a head start (a character trained in the right field skips Confront) and a rival clock, from Fracture Lines; and enemies&#x27; files on the characters (+2 when it applies, destroyed when found), from Aurora, now in every setting&#x27;s GM view.</li><li>Tracks: shared and personal tracks described once. A Mind track (Aurora&#x27;s mental harm) is described as an option any setting can use; its middle box is now Overwhelmed, since Reeling is the Shattered Crown&#x27;s word for stunned.</li><li>Smaller fixes: The Shattered Crown&#x27;s Charm is resisted with Will (it said Presence), as everywhere else; Fracture Lines&#x27; ship fights are described as they&#x27;re actually run.</li></ul>
 <h2 id="2026-10-28-setting">Aurora: mind powers, a Mind track and Mind Defense</h2>
 <p class="ld-eyebrow" style="margin:0">28 October 2026 · Setting rules change</p>
-<ul><li>Every character has a Mind track of three boxes beside the injury track: Shaken (−1 to mental actions), Reeling (−2), Broken (unconscious or catatonic). Psychic attacks mark it; it never leaves anyone Dying, and a night&#x27;s sleep clears it. It&#x27;s on the play tab, the printed sheet, the GM view&#x27;s cards and the battle map.</li><li>Mind Defense from Telepathy, Mind Control, Possession or an ExLAW psi-dampening headset: a weaker mind power does nothing, an equal one is resisted at +2. A Class IV mind against someone without it is resisted at −2.</li><li>Psychic attacks: Telepathy II (a psychic stab) and Illusion III (fears made real), one Class below the power, Powers against Will, never Dodge, Toughness or Force Field.</li><li>Rules for reading minds (and being noticed), mind links, being controlled (the player keeps playing; +2 against a harmful command, +4 against hurting a friend; Spark for another roll), emotions, illusions and sensing lies.</li><li>The Encounter panel resolves psychic attacks as Will contests on the Mind track (Lord Marrow&#x27;s nightmare no longer meets Toughness or Dodge), and the sheet&#x27;s roller applies the Mind penalty to mental actions.</li></ul>
+<ul><li>Every character has a Mind track of three boxes beside the injury track: Shaken (−1 to mental actions), Overwhelmed (−2), Broken (unconscious or catatonic). Psychic attacks mark it; it never leaves anyone Dying, and a night&#x27;s sleep clears it. It&#x27;s on the play tab, the printed sheet, the GM view&#x27;s cards and the battle map.</li><li>Mind Defense from Telepathy, Mind Control, Possession or an ExLAW psi-dampening headset: a weaker mind power does nothing, an equal one is resisted at +2. A Class IV mind against someone without it is resisted at −2.</li><li>Psychic attacks: Telepathy II (a psychic stab) and Illusion III (fears made real), one Class below the power, Powers against Will, never Dodge, Toughness or Force Field.</li><li>Rules for reading minds (and being noticed), mind links, being controlled (the player keeps playing; +2 against a harmful command, +4 against hurting a friend; Spark for another roll), emotions, illusions and sensing lies.</li><li>The Encounter panel resolves psychic attacks as Will contests on the Mind track (Lord Marrow&#x27;s nightmare no longer meets Toughness or Dodge), and the sheet&#x27;s roller applies the Mind penalty to mental actions.</li></ul>
 <h2 id="2026-10-28-setting">Aurora: speed, flight, height and falling</h2>
 <p class="ld-eyebrow" style="margin:0">28 October 2026 · Setting rules change</p>
 <ul><li>Speed, Flight and Super Leaping move a range band in a fight: Medium at Class I, Long at II, Extreme at III, anywhere in the scene from IV. The sheet&#x27;s Move shows it.</li><li>Speed&#x27;s steps, evened out: acts first (I), a second defense and blows at speed (II), two actions once a scene (III), two actions a round (IV), three (V). Blows at speed hit one Class below your Speed. Celerity&#x27;s now hit at Class III.</li><li>Chases against vehicles: a car is Class I, a helicopter II, a jet III, a fighter IV; a higher Class wins without a roll.</li><li>Height counts in the distance (and on the battle map, where a token can have a height). Dives hit one Class higher; carrying slows you a Class; a flier stunned, knocked out or knocked back falls unless they make a Powers roll.</li><li>A fall is an attack with a Class by its height (I to IV), so Toughness protects against it.</li><li>The Encounter panel puts Speed first in the turn order, gives the extra actions and the second defense, offers a Dive to fliers, and warns when a flier falls.</li></ul>

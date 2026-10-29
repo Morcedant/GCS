@@ -18,8 +18,8 @@ Humanity has three centuries of interstellar history: young enough to challenge 
 | Coilgun or needle rifle | Long | 3, and Dying | A ruinous wound |
 | Stunner | Close | No box: the target rolls Body −2; failure, out for the scene; success, −2 on their next action | Twitching, then unconsciousness |
 | Grenade | Close (thrown) | 1 to everyone nearby, 3 and Dying at the center | Blast and shrapnel; Dodge means diving clear |
-| Vacuum or poison air without a suit | — | 1 each round | Burst vessels, choking |
-| Fall | — | 1 for a bad fall, 2 for a long one | A sprain or a fracture |
+| Vacuum or poison air without a suit | — | 1 each round (see *Falls, fire and foul air*) | Burst vessels, choking |
+| Fall | — | By height: 1 to 3, and worse (see *Falls, fire and foul air*) | A sprain, a fracture, or worse |
 | Fire | — | 1 each round in the flames | Burns |
 
 **Slug or energy.** Slug-throwers are cheap, reliable and loud; lasers are silent and recoilless but need charged cells; plasma is devastating and expensive. A carbine can fire a **burst** (three shots, +1 to hit). Any firearm jams or faults on a natural 18.
@@ -61,7 +61,7 @@ A real weakness works whether or not anyone holds a record for it. Act on what y
 
 **What a skill covers, a record doesn't.** Skills cover categories of technology and ordinary knowledge: a trained engineer can work any reactor in known space, and a trained slicer any common system. A data record covers one specific anomalous, alien or unknown thing that no skill reaches. If a trained character could already do it, there's no record to earn.
 
-**A relevant skill gets you started.** A character trained in the skill that fits the subject (Engineering for an alien power core, Computers for a rogue intelligence, Navigation for a fold in space) can skip **Confront the unknown**: they recognize at once that it's something new. Identify and Uncover still have to be filled to earn the record.
+**A head start** (see *Discovery clocks*) is common here: Engineering for an alien power core, Computers for a rogue intelligence, Navigation for a fold in space.
 
 ## Example data records
 
@@ -132,7 +132,7 @@ A stockpile of weapons built by a hostile species, perhaps still being used agai
 
 ## Rival clocks
 
-A careful crew can investigate without ever starting a Countdown. To keep the pressure on, give the discovery a **rival**: an ordinary danger clock named for someone racing the crew to the same find. It ticks on delays, noisy methods and open digging. When it fills, the rival gets there first. No new rules are needed.
+A careful crew can investigate without ever starting a Countdown. To keep the pressure on, give the discovery **a rival** (see *Discovery clocks*). The corridors are full of them:
 
 | Rival | What they want |
 |---|---|
@@ -300,7 +300,7 @@ Most crews would rather run than fight, and most fights between ships are short.
 
 As in personal combat, a weapon fires without penalty within its effective band, at −2 one band beyond and −4 two bands beyond; farther is out of range.
 
-**Closing and opening.** At the start of each exchange the pilots roll an opposed **Piloting** contest. The winner may shift the range one band, in or out. A ship that wins at Extreme range by 5 or more can break contact and run for a corridor mouth or a metric jump.
+**Closing and opening.** This is the core's *chase by range*: at the start of each exchange the pilots roll an opposed **Piloting** contest. The winner may shift the range one band, in or out. A ship that wins at Extreme range by 5 or more can break contact and run for a corridor mouth or a metric jump.
 
 ## Ship weapons
 
@@ -846,7 +846,7 @@ Most of the older civilizations treat psionics as a danger to be **controlled**:
 - **AI.** Artificial minds run ships, stations and corporations, and some want to be free. An **AI partner** has a name and a personality, played by its partner or the GM; it can **assist** Computers, Sensors and Investigation rolls (success +1, success by 5 or more +2), and acts in the world only through a drone or a ship. **AI Minders** are bonded to one and trained to handle others, from corporate systems to rogue minds.
 - **Drones.** Scout, repair and combat drones are everywhere. A drone relays what it senses; jamming its link or taking out its controller stops it.
 - **Biotech.** Gene-tailoring, cloned organs, engineered diseases and medical miracles, for those who can pay. *Gene-Tailored* characters resist disease and toxins.
-- **Ships.** Crews fly everything from patched freighters to corporate couriers. A ship is a home, a business and a **Debt**: the *A Ship of Your Own* advantage starts the crew with a ship and a box of Debt. Ship fights and chases run as clocks, with Piloting, Engineering, Sensors and Firearms rolls.
+- **Ships.** Crews fly everything from patched freighters to corporate couriers. A ship is a home, a business and a **Debt**: the *A Ship of Your Own* advantage starts the crew with a ship and a box of Debt. Ship fights use *Ships in a fight*: the range contest, a roll per station and the Hull track.
 
 # Threats
 

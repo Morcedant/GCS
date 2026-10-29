@@ -23,7 +23,7 @@ Ordinary weapons are as deadly here as anywhere: a gunshot is a gunshot. Every a
 | Heavy machine gun, Aegis arm cannon | Long | II | 2 | Torn apart |
 | Anti-tank rocket | Long | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
 | Grenade or explosive charge | Close (thrown) | III | 3 and Dying at the center; 1 to everyone nearby | Blast and shrapnel; Dodge means diving clear |
-| Fall, by height (see *Falling*) | — | I to IV | 1 from a story or two (I); 2 from a rooftop (II); 2 from a skyscraper (III); 3 from higher (IV) | A sprain, a fracture, or worse |
+| Fall, by height (see *Falling*) | — | I to V | 1 from a story or two (I); 2 from a rooftop (II); 3 from a tower (IV); higher, certain death without Defense (V) | A sprain, a fracture, or worse |
 | Fire | — | — | 1 each round in the flames | Burns |
 
 **Defense.** Toughness, Force Field and similar powers give a **Defense** Class. An attack whose Class is **above** your Defense hits in full; one **equal** to it marks one box fewer; one **below** it does nothing. A bulletproof Operant (Defense II) ignores pistols and rifles, and an Aegis cannon still marks a box.
@@ -84,9 +84,7 @@ A real counter works whether or not anyone holds a dossier for it. Act on what y
 
 ## Their files on you
 
-Villains keep files too. What a villain knows about a hero (a weakness, a habit, a real name, the people they love) is written down somewhere, and **when it applies, the villain gets +2 against that hero**: an ambush where the hero always patrols, a trap built for a weakness, a hostage who matters. The GM keeps these files and decides when one applies.
-
-Heroes can find out a file exists, by investigation, a captured lieutenant or a hacked server, and then it shows on their sheet: who holds it and what it says. A found file can be **destroyed**: burn the folder, wipe the drive, discredit the source. A destroyed file gives nothing, and if it held the hero's secret identity, destroying it clears a box of Exposure (the villain who read it still knows, and stays on the hero's list).
+Villains keep files on heroes, and a file gives its villain +2 against that hero when it applies (see *When the other side investigates you*, below). In Aurora a file is a folder, a drive or a dossier in a lair. If a destroyed file held the hero's secret identity, destroying it clears a box of Exposure (the villain who read it still knows, and stays on the hero's list).
 
 {{GEN:discovery-chapter}}
 
@@ -232,7 +230,7 @@ Superheroes fight at speeds that make yards meaningless. These rules cover the m
 - **Moving in a fight.** Speed, Flight and Super Leaping cover a range band in one move: **Medium (100 yd) at Class I, Long at Class II, Extreme at Class III**, and anywhere in the scene from Class IV. (Flight only while you're flying; Leaping is one leap.) Your sheet's Move shows it.
 - **Speed in a fight.** Class I acts first in any round. Class II adds a **second defense each round** (as the Additional Defense Edge; the two don't stack) and blows at speed. Class III: once a scene, two actions in one round. Class IV: two actions every round; Class V, three. Characters who act first go in Agility order among themselves.
 - **Blows at speed.** From Speed II, your unarmed blows hit at **one Class below your Speed**: a hundred punches in a second. Roll Brawling.
-- **Chases.** Vehicles have a Class: **a car I, a helicopter or light plane II, a jet III, a fighter IV**. In a chase, a pursuer (or quarry) whose Speed or Flight is a higher Class than the other side's catches up (or gets away) without a roll. Equal Classes run the chase clocks as usual (see *Chases*). A lower Class needs a trick: a shortcut, a trap, a power that isn't speed.
+- **Chases.** The core's *clearly faster* rule, by Class. Vehicles have a Class: **a car I, a helicopter or light plane II, a jet III, a fighter IV**. In a chase, a pursuer (or quarry) whose Speed or Flight is a higher Class than the other side's catches up (or gets away) without a roll. Equal Classes run the chase clocks as usual (see *Chases*). A lower Class needs a trick: a shortcut, a trap, a power that isn't speed.
 
 **Height.** A flier's height counts in the distance: a target 100 yards up and 100 yards away is about 140 yards off, at Long range. Nothing reaches a flier in melee without Flight, Leaping, Stretching or something to stand on. On the battle map, give a token its height; the distance shown counts it.
 
@@ -240,16 +238,16 @@ Superheroes fight at speeds that make yards meaningless. These rules cover the m
 - **Carrying.** A flier carries what their Strength can lift, or one person without it, and flies one Class slower while they do.
 - **Falling out of the sky.** A flier who is stunned, knocked out, or knocked back (a hit of Class III or more) in the air falls, unless they make a **Powers** roll to catch themselves. Knocked out, they just fall.
 
-**Falling.** A fall is an attack, with a Class by its height, and Defense works against it as against any attack:
+**Falling.** The core's falls (see *Falls, fire and foul air*), with a Class by height, so Defense works against a fall as against any attack:
 
 | Height | Class | Boxes |
 |---|---|---|
-| A story or two | I | 1 |
+| A story or two (up to 10 yd) | I | 1 |
 | A rooftop (up to 25 yd) | II | 2 |
-| A skyscraper (up to 300 yd) | III | 2, and knocked down |
-| Higher | IV | 3 |
+| A tower, a cliff or a tall building (up to 100 yd) | IV | 3 |
+| Higher | V | 3, and certain death for anyone without Defense |
 
-Toughness II walks away from a rooftop; Toughness IV from a plane. A fall into a furnace or onto spikes is worse, as the GM decides. Super Leaping lands safely from any height its Class can leap.
+Toughness III walks away from a rooftop; a tower takes Toughness V, and a fall from a plane Toughness VI. A fall into a furnace or onto spikes is worse, as the GM decides. Super Leaping lands safely from any height its Class can leap.
 
 ## Super strength
 
@@ -286,7 +284,7 @@ Telepaths, mind controllers, empaths and illusionists don't break bones. They br
 |---|---|
 | 0 | Clear |
 | 1 | Shaken: −1 to mental actions |
-| 2 | Reeling: −2 to mental actions |
+| 2 | Overwhelmed: −2 to mental actions |
 | 3 | Broken: unconscious or catatonic until you rest |
 
 Mental actions are Powers rolls, Will, and skills of Intellect and Presence; physical actions take the injury penalty instead. A full Mind track never leaves you Dying and never causes a grievous wound. A scene's rest clears one box; a night's sleep clears them all. Empathy that eases pain clears a Mind box too. Opponents have as many Mind boxes as injury boxes (one, for a minor opponent).
@@ -310,7 +308,7 @@ Mental actions are Powers rolls, Will, and skills of Intellect and Presence; phy
 
 | Emotion | Effect |
 |---|---|
-| Fear | Must keep away from the source; −2 to act against it |
+| Fear | Frightened (see *Fear and other conditions*): must keep away from the source; −2 to act against it |
 | Rage | Attacks the nearest foe; −2 to Dodge |
 | Calm | Won't start a fight; defends if attacked |
 | Trust | +2 to Persuasion and Deception against them |
@@ -393,7 +391,7 @@ Comic-book magic is fast: a bolt, a shield, a binding, in a single panel. **Cant
 | Glamour | A quick illusion that fools the eye (Intellect resists: the target sees through it). |
 | Sight | See magic, spirits, curses and disguises. |
 | Hex | −2 to all of a target's rolls for the scene (Will resists). |
-| Charm | The target treats you as a friend for the scene (Will resists). |
+| Charm | The target is Charmed: it treats you as a friend for the scene (Will resists). |
 | Levitate | Float yourself or an object; at higher Classes, a car or a group. |
 | Step | Vanish and reappear within Close range; farther at higher Classes. |
 | Mend | Clear one injury box, once per set of injuries. |
