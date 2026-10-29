@@ -299,7 +299,23 @@ def start_page():
   {table_notice()}
 </div>
 
-<!-- Block 3: what each person needs -->
+<!-- Block 3: the game in two minutes -->
+<div class="ld" id="quick-start">
+  <div class="ld-eyebrow">The game in two minutes</div>
+  <h2>How it works</h2>
+  <p class="ld-lede">Everything else in the rules builds on these six ideas. The character creator does the arithmetic for you.</p>
+  <ul class="ld-pillars">
+    <li><b>Roll low</b><span>Every skill has a number, usually 10 to 15. Roll three six-sided dice: a total <strong>equal to or under</strong> your number succeeds. The further under, the better it goes. A 3 or 4 always works; a 17 or 18 always fails.</span></li>
+    <li><b>Easier or harder</b><span>The GM adds +2 when things are in your favor, or −2, −4 when they aren't. A friend who helps first can add +1. You only roll when failing would matter.</span></li>
+    <li><b>Close isn't failure</b><span>Miss by 1 or 2 and the GM may offer success at a cost: you get what you wanted, but something else goes wrong. You choose.</span></li>
+    <li><b>Fights</b><span>On your turn, move and do one thing. If an attack hits, the target can try to dodge (once a round). A hit marks boxes by weapon: 1 for fists, 2 for a sword or a gun, 3 for the deadliest. Three boxes and you're down; a heavy hit leaves you Dying until a friend patches you up.</span></li>
+    <li><b>Legend points</b><span>Each setting names them (Grit, Fortune, Resolve, Spark). You start each session with two: spend one to reroll, to take a box less from a hit, or to have packed just the right thing. Earn more when your character's flaws get them into trouble.</span></li>
+    <li><b>Consequences and secrets</b><span>Tracks fill as your deeds catch up with you: the law noticing, debts, the dark learning your name. When something strange turns up, investigating it earns a Legend card: what you found out, kept for good.</span></li>
+  </ul>
+  <div class="ld-callout" style="margin-top:1.4rem"><b>An example</b><p>Your Firearms is 13. Taking a shot across a street, you roll 4 + 3 + 5 = 12: a hit, by 1. The outlaw tries to dodge: his Dodge is 10 and he rolls 11, so the bullet finds him and your pistol marks 2 boxes. Had you rolled 14 and missed, you could have spent a Legend point to roll again.</p></div>
+</div>
+
+<!-- Block 4: what each person needs -->
 <div class="ld">
   <div class="ld-eyebrow">Who needs what</div>
   <ul class="ld-pillars">
