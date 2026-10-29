@@ -107,6 +107,9 @@ export function nextTurn(enc) {
   if (enc.status !== "combat") return;
   enc.commands.push({ type: "next" });
   const cur = active(enc);
+  // Frightened (core rules): at the end of each of their turns, they roll Will to shake it off.
+  if (cur && !isOut(cur) && (cur.conditions || []).some((/** @type {string} */ x) => /^frightened\b/i.test(x)) && !((cur.actions || 1) > (cur.acted || 0) + 1))
+    log(enc, "note", { text: `${cur.name}'s turn ends: roll Will to shake off being Frightened (+2 if hurt since it began).` });
   if (cur && !isOut(cur) && (cur.actions || 1) > (cur.acted || 0) + 1) {
     cur.acted = (cur.acted || 0) + 1;
     log(enc, "turn", { pid: cur.pid, name: cur.name, action: cur.acted + 1, of: cur.actions });
