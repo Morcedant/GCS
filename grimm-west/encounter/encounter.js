@@ -376,6 +376,74 @@ function mindAttack(enc, rules, core, cmd, opts, x) {
   return { event: ev };
 }
 
+/** A contest by the core rules: a success beats a failure; if both succeed, the larger margin wins; anything else is a tie.
+ * 1 if the first roll wins, −1 if the second does, 0 for a tie. @param {any} ra @param {any} rb */
+const contest = (ra, rb) => (ra.success !== rb.success ? (ra.success ? 1 : -1) : ra.success && ra.contestMargin !== rb.contestMargin ? (ra.contestMargin > rb.contestMargin ? 1 : -1) : 0);
+
+/**
+ * A showdown (Trails of Blood & Dust): two duelists settle it in the street, in two steps.
+ * "stare": the staredown, Will against Will. The winner gets +2 on the draw; anyone who fails their Will roll by 5 or more
+ *   has lost their nerve, and may back down before the draw (the GM's call: no roll for it).
+ * "draw": Shooting against Shooting (the weapon's skill), with the staredown's +2, any drawBonus (Quick Draw) and wound
+ *   penalties. The winner fires first; a tie fires together (unless one of them has drawFirst, the Gunslinger's quick draw,
+ *   and wins it). The shots are ordinary attacks that can't be dodged. The one fired on shoots back if still standing,
+ *   unless they fumbled the draw (failed it by 5 or more). After that it's an ordinary fight, or it's over.
+ * cmd: { phase, attacker, defender, weapon, defWeapon, band, situational? (to the attacker's draw) }
+ * @param {any} enc @param {any} rules @param {any} core @param {any} cmd
+ */
+export function showdown(enc, rules, core, cmd) {
+  const a = find(enc, cmd.attacker), d = find(enc, cmd.defender);
+  if (!a || !d || a === d) return { error: "Choose the two duelists." };
+  if (isOut(a) || isOut(d)) return { error: `${isOut(a) ? a.name : d.name} can't face anyone now.` };
+  const n = enc.events.filter((/** @type {any} */ e) => e.type === "showdown").length;
+  const roll = (/** @type {string} */ kind, /** @type {number} */ target) => core.resolve(core.diceFor(enc.seed, `sd${n}|${a.pid}>${d.pid}|${kind}`), target);
+  const sum = (/** @type {any[]} */ l) => l.reduce((t, m) => t + m.value, 0);
+  const wound = (/** @type {any} */ p) => { const v = core.INJURY_PENALTY[p.injury || 0] || 0; return v ? [{ label: "Wounds", value: v }] : []; };
+  const pair = (/** @type {any} */ e) => (e.a.pid === a.pid && e.d.pid === d.pid) || (e.a.pid === d.pid && e.d.pid === a.pid);
+  if (cmd.phase === "stare") {
+    const ma = wound(a), md = wound(d), ta = (a.will ?? 10) + sum(ma), td = (d.will ?? 10) + sum(md);
+    const ra = roll("stareA", ta), rd = roll("stareD", td), w = contest(ra, rd);
+    const broke = [[a, ra], [d, rd]].filter(([, r]) => !r.success && r.margin <= -5).map(([p]) => ({ pid: p.pid, name: p.name }));
+    const ev = log(enc, "showdown", { phase: "stare", a: { pid: a.pid, name: a.name }, d: { pid: d.pid, name: d.name },
+      rolls: [{ pid: a.pid, base: a.will ?? 10, mods: ma, target: ta, dice: ra.dice, total: ra.total, margin: ra.margin, success: ra.success },
+        { pid: d.pid, base: d.will ?? 10, mods: md, target: td, dice: rd.dice, total: rd.total, margin: rd.margin, success: rd.success }],
+      winner: w > 0 ? { pid: a.pid, name: a.name } : w < 0 ? { pid: d.pid, name: d.name } : null, broke });
+    enc.commands.push({ type: "showdown", cmd: clone(cmd) });
+    return { event: ev };
+  }
+  if (cmd.phase !== "draw") return { error: "Staredown or draw?" };
+  const wa = rules.weapons[cmd.weapon], wd = rules.weapons[cmd.defWeapon];
+  if (!wa || !wd) return { error: "Choose both duelists' guns." };
+  const sa = a.skills[wa.skill], sd = d.skills[wd.skill];
+  if (sa === undefined || sd === undefined) return { error: `${sa === undefined ? a.name : d.name} has no ${(sa === undefined ? wa : wd).skill} target.` };
+  // The last staredown between these two since their last draw.
+  const last = [...enc.events].reverse().find((/** @type {any} */ e) => e.type === "showdown" && pair(e));
+  const stare = last && last.phase === "stare" ? last : null;
+  const mods = (/** @type {any} */ p) => [...(stare && stare.winner && stare.winner.pid === p.pid ? [{ label: "Won the staredown", value: 2 }] : []),
+    ...(p.drawBonus ? [{ label: "Quick Draw", value: p.drawBonus }] : []), ...wound(p),
+    ...(p === a ? (cmd.situational || []).filter((/** @type {any} */ m) => m && m.value).map((/** @type {any} */ m) => ({ label: m.label || "Situation", value: +m.value })) : [])];
+  const ma = mods(a), md = mods(d), ta = +sa + sum(ma), td = +sd + sum(md);
+  const ra = roll("drawA", ta), rd = roll("drawD", td);
+  let w = contest(ra, rd);
+  const tieBreak = !w && !!a.drawFirst !== !!d.drawFirst ? (a.drawFirst ? 1 : -1) : 0;
+  if (tieBreak) w = tieBreak;
+  const fumbled = [[a, ra], [d, rd]].filter(([, r]) => !r.success && r.margin <= -5).map(([p]) => p.pid);
+  const ev = log(enc, "showdown", { phase: "draw", a: { pid: a.pid, name: a.name }, d: { pid: d.pid, name: d.name }, band: cmd.band,
+    rolls: [{ pid: a.pid, skill: wa.skill, base: +sa, mods: ma, target: ta, dice: ra.dice, total: ra.total, margin: ra.margin, success: ra.success },
+      { pid: d.pid, skill: wd.skill, base: +sd, mods: md, target: td, dice: rd.dice, total: rd.total, margin: rd.margin, success: rd.success }],
+    winner: w > 0 ? { pid: a.pid, name: a.name } : w < 0 ? { pid: d.pid, name: d.name } : null, tieBreak: !!tieBreak, fumbled });
+  enc.commands.push({ type: "showdown", cmd: clone(cmd) });
+  // The shots: ordinary attacks, no Dodge. Together on a tie; otherwise the winner first, and the other back if they can.
+  const shot = (/** @type {any} */ x, /** @type {any} */ y, /** @type {string} */ wid) => attack(enc, rules, core, { attacker: x.pid, defender: y.pid, weapon: wid, band: cmd.band, canDodge: false, showdown: ev.n });
+  const shots = [], cmds = enc.commands.length;
+  const [first, second, w1, w2] = w >= 0 ? [a, d, cmd.weapon, cmd.defWeapon] : [d, a, cmd.defWeapon, cmd.weapon];
+  if (!fumbled.includes(first.pid)) shots.push(shot(first, second, w1));
+  if (!fumbled.includes(second.pid) && (w === 0 || !isOut(second))) shots.push(shot(second, first, w2));
+  enc.commands.length = cmds; // the showdown command replays its own shots
+  const err = shots.find((r) => r && r.error);
+  return err ? { event: ev, error: err.error } : { event: ev, shots: shots.map((r) => r.event) };
+}
+
 /**
  * The attacker picks a telling hit's effect (or changes it). @param {any} enc @param {number} n @param {string} effect
  */
@@ -631,6 +699,7 @@ export function replay(enc, rules, core, config) {
     else if (c.type === "next") nextTurn(r);
     else if (c.type === "aim") { if (aim(r, rules, c.pid, c.target).error) skipped++; }
     else if (c.type === "attack") { if (attack(r, rules, core, c.cmd).error) skipped++; }
+    else if (c.type === "showdown") { const x = showdown(r, rules, core, c.cmd); if (x.error) skipped++; }
   }
   r.skipped = skipped;
   return { encounter: r };
