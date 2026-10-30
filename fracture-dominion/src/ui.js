@@ -423,7 +423,7 @@ function doEndTurn() {
 // ---------- dialogs ----------
 function modal(html) { $("modal-body").innerHTML = html; $("modal").hidden = false; }
 function closeModal() { $("modal").hidden = true; }
-function showNewGame(canContinue) {
+function showNewGame(canContinue, preset) {
   modal(`<h1>Fracture Lines: Dominion</h1>
     <p class="lede">The old empires are breaking along the corridors. Lead a people of the Fracture Lines from one world to an empire: explore, settle, trade, research and fight, turn by turn.</p>
     ${canContinue ? `<div class="btn-row"><button class="btn primary" id="ng-continue">Continue your game</button></div>` : ""}
@@ -435,6 +435,10 @@ function showNewGame(canContinue) {
       <label>Seed <input type="text" id="ng-seed" placeholder="random" size="10"></label>
     </div>
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin</button><button class="btn" id="ng-help">How to play</button><button class="btn" id="ng-load">Load a saved game</button></div>`);
+  if (preset) {
+    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty;
+    const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
+  }
   if ($("ng-continue")) $("ng-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
   $("ng-start").onclick = () => {
     const seedText = $("ng-seed").value.trim();
@@ -461,6 +465,27 @@ function showHelp(back) {
     </ul><div class="btn-row"><button class="btn primary" id="help-back">Back</button></div>`);
   $("help-back").onclick = back;
 }
+/** This game's galaxy: its seed and the settings that, with it, rebuild the same map. */
+function galaxyInfo() {
+  const size = { small: "Small", medium: "Medium", large: "Large" }[S.size] || S.size, rivals = S.factions.length - 1;
+  const diff = { easy: "Easy", normal: "Normal", hard: "Hard" }[S.difficulty] || S.difficulty;
+  return { seed: String(S.seed), text: `Seed ${S.seed} · ${size} galaxy · ${rivals} rival${rivals === 1 ? "" : "s"} · ${diff}`,
+    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id } };
+}
+function galaxyBox() {
+  const g = galaxyInfo();
+  return `<div class="seedbox"><h3>This galaxy</h3><p><b class="seed" id="seed-text">${esc(g.seed)}</b></p><p class="small muted">${esc(g.text)}. The same seed and settings build the same map.</p>
+    <div class="btn-row"><button class="btn small" id="seed-copy">Copy the seed</button><button class="btn small" id="seed-replay">Replay this galaxy</button></div></div>`;
+}
+function bindGalaxyBox() {
+  const g = galaxyInfo();
+  $("seed-copy").onclick = () => {
+    const text = `Fracture Lines: Dominion — ${g.text}`, p = navigator.clipboard && navigator.clipboard.writeText(text);
+    const fail = () => { const r = document.createRange(); r.selectNodeContents($("seed-text")); const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r); toast("Copying is blocked here: the seed is selected, copy it yourself."); };
+    if (p) p.then(() => toast("Seed copied, with its settings."), fail); else fail();
+  };
+  $("seed-replay").onclick = () => showNewGame(true, g.preset);
+}
 function showMenu() {
   modal(`<h1>Menu</h1><div class="btn-row col">
     <button class="btn" id="m-resume">Back to the game</button>
@@ -468,7 +493,8 @@ function showMenu() {
     <button class="btn" id="m-export">Save code (copy)</button>
     <button class="btn" id="m-load">Load a saved game</button>
     <button class="btn danger" id="m-new">New game</button></div>
-    <p class="small muted">Your game saves itself in this browser after every action.</p>`);
+    <p class="small muted">Your game saves itself in this browser after every action.</p>${galaxyBox()}`);
+  bindGalaxyBox();
   $("m-resume").onclick = closeModal;
   $("m-help").onclick = () => showHelp(showMenu);
   $("m-new").onclick = () => showNewGame(!!S);
@@ -493,7 +519,8 @@ function showEnd() {
   const why = { conquest: "by conquest", engine: "by finishing the Corridor Engine", score: `with the highest score at turn ${RULES.maxTurns}`, fallen: "" }[S.winReason] || "";
   modal(`<h1>${won ? "Victory" : "Defeat"}</h1><p class="lede">${won ? `You win ${why}.` : W ? `${esc(W.name)} wins ${why}.` : "Your people have fallen."}</p>
     <table class="tbl"><tr><th>Faction</th><th>Worlds</th><th>Score</th></tr>${S.factions.map((F) => `<tr><td><span class="dot" style="background:${F.color}"></span>${esc(F.name)}${F.alive ? "" : " †"}</td><td>${coloniesOf(S, F.id).length}</td><td>${score(S, F.id)}</td></tr>`).join("")}</table>
-    <div class="btn-row"><button class="btn primary" id="end-new">New game</button><button class="btn" id="end-look">Look at the map</button></div>`);
+    <div class="btn-row"><button class="btn primary" id="end-new">New game</button><button class="btn" id="end-look">Look at the map</button></div>${galaxyBox()}`);
+  bindGalaxyBox();
   $("end-new").onclick = () => showNewGame(false);
   $("end-look").onclick = closeModal;
 }

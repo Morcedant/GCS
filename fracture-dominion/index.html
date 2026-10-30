@@ -86,6 +86,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .ng-row label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
 select, input[type=text], textarea { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; font: inherit; }
 textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospace; }
+.seedbox { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); } .seedbox h3 { margin-top: 0; }
+.seed { font: 700 22px var(--display); letter-spacing: .06em; color: var(--gold); user-select: all; font-variant-numeric: tabular-nums; }
 .help { padding-left: 18px; display: grid; gap: 6px; color: #c6d0e6; }
 .toast { position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); max-width: min(560px, calc(100vw - 32px)); background: #1b2440; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; opacity: 0; pointer-events: none; transition: .25s; z-index: 30; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); } .toast.bad { border-color: var(--bad); }
