@@ -464,6 +464,10 @@ def game_page(pid):
     origins = ", ".join(o["name"] for o in sorted(p["origins"], key=lambda o: o["tier"]) if not o.get("restricted"))
     tracks = ", ".join(x["name"] for x in p.get("tracks", []))
     role, origin = t.get("role", "Role"), t.get("origin", "Origin")
+    # A companion game in the same setting (pack "companion": { title, href, text }), as its own block.
+    cm = p.get("companion")
+    companion = (f'<!-- Block: the companion game -->\n<div class="ld">\n  <div class="ld-eyebrow">Also in this galaxy</div>\n  <h2>{e(cm["title"])}</h2>\n  <p style="max-width:46rem">{e(cm["text"])}</p>\n'
+                 f'  <div class="ld-actions"><a class="ld-button" href="{e(cm["href"])}">Play {e(cm["title"].split(": ")[-1])}</a></div>\n</div>\n\n') if cm else ""
     # What only this setting has (pack "signature": [[name, what it is]]), above who you can play.
     signature = (f'<div class="ld-eyebrow">What makes it different</div>\n  <ul class="ld-pillars">'
                  + "".join(f"<li><b>{e(n)}</b><span>{e(x)}</span></li>" for n, x in p["signature"])
@@ -495,7 +499,7 @@ def game_page(pid):
 </dl>
 
 <!-- Block 3: who you can play -->
-<div class="ld">
+{companion}<div class="ld">
   {signature}<div class="ld-eyebrow">Who you can play</div>
   <ul class="ld-pillars">{roles}</ul>
   <p style="margin-top:1.4rem"><b>{e(t.get('originPlural', 'Origins'))}:</b> {e(origins)}. Or build your own {e(t.get('roleLower', 'role'))} or {e(t.get('originLower', 'origin'))} with the GM: the Players' Guide shows how.</p>
