@@ -3,7 +3,53 @@ title: "Grimm GM's Guide"
 subtitle: "Running Gothic horror in the Grimm-verse: cases, threats and the GM's tools"
 ---
 
-This book is for whoever runs the game. It gathers what the GM reaches for at the table: case seeds, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.
+This book is for whoever runs the game. It opens with a first adventure, ready to run, and gathers what the GM reaches for at the table: case seeds, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.
+
+# Your first case
+
+A ready-to-run case to start a campaign with. Everything it needs is here, and the ready-made characters in the creator are written into it.
+
+## The first case: The Larder at Hoffnungstal
+
+A starter case for three to seven, for one or two sessions. Children are vanishing from a Volga German colony, a mob blames the Blutbad family down the road, and the thing taking them is somebody else entirely. It shows off the diary and its clocks, the woge and the Code of Swabia, the Trouble tracks, and a Grimm's hardest question: what the town is allowed to know. It's written for the seven ready-made characters, and works with any.
+
+**The hook.** After dark, **Pastor Jakob Unruh** knocks on Lena Baer's door. Three children have gone missing from Hoffnungstal, the Volga German colony east of town, in three weeks. The colonists say a wolf took them, and they've found a wolf to blame: the **Raebers**, a German family homesteading by the creek, who keep to themselves. Tonight the men are talking about rope. Give each of them a reason of their own:
+
+- **Magdalena "Lena" Baer**: Pastor Unruh brings his people's hard cases to her, and this one is beyond him.
+- **Eliza Kessler**: a lynching is a federal matter when the badge is in town, and a Wesen killing is a matter for a Grimm.
+- **Gus Brandt**: Old Raeber ran with Gus's pack, long ago. Gus knows the family is Blutbad, and that they gave up hunting when he did.
+- **Roz Vey**: one of the missing children's mothers buys tea at her shop every week, and hasn't come in.
+- **Dr. Thaddeus Whitlock**: the colony's doctor sent for him to look at a dog torn open in a yard. The wounds bother him.
+- **Cora Ridgeway**: she knows the creek country, and she's seen tracks out there that walk like a man and sink like a bear.
+- **Silas Thorne**: the miller who owns half the colony's debts, Konrad Weiss, plays cards with Silas every Thursday, and won big last week. Konrad never wins.
+
+**What's really happening.** **Konrad Weiss**, Hoffnungstal's miller, came west after the famine on the Volga, and in the worst of that winter he ate what he shouldn't have. He came back from it a **Wendigo**. He hid it for years; this autumn the hunger won. He takes the children alive and keeps them in a cold cellar under the old mill race, his larder. Two are still alive. The Raebers know something is out there hunting: their son Emil has been out at night, in woge, trying to find it, and that is what the colony saw.
+
+**1. Hoffnungstal.** A neat colony of whitewashed houses, a church, a mill on the creek. Mothers at the church door. Men in the street outside the Raeber land, with lanterns. Start a **Lynch mob** clock of 6 (Suspicion has done its work), and the **threat clock** for the case: the Wendigo will take another child when it fills. Eliza's badge, Lena's standing with the pastor, or Silas's tongue can hold the mob for a night: a Persuasion or Leadership roll pushes the clock back one.
+
+**2. The Raebers.** Old Raeber meets them at the door with a shotgun, and Gus with a nod. Emil has been out every night, hunting the thing. He's seen it: tall, thin, wrong, and it calls out in a child's voice. The Raebers won't woge in front of strangers, but they'll trust a Grimm who keeps the Code.
+
+**3. The diary.** Start a discovery clock for the thing taking the children (*The diaries*, in the Players' Guide). The clues, and who finds them best:
+
+- **The dog** (Medicine, Wesen Lore): torn open, and the heart is gone. A Blutbad kills for the hunt; this was hunger.
+- **The tracks by the creek** (Tracking, Survival): two legs, too long a stride, and frost in the prints though the night was mild.
+- **The colony's stories** (Read People, Persuasion with the pastor's help): the old women talk of the famine winter, and of a man who came back from it changed. They won't say who.
+- **Konrad's mill** (Investigation, or Silas at the card table): the flour sacks are stacked to hide a door. Konrad's hands shake when he looks at children; his winnings went on salt and lye.
+- **Roz's shop** (Apothecary): Konrad has bought a remedy for "a hunger that won't stop" three times this year.
+
+When the Identify phase is done, they know what it is: a **Wendigo**, and that it takes its victims alive. Filling the clock earns the diary entry on how it's stopped: fire, and a body burned.
+
+**4. The night hunt.** If the threat clock fills, another child is gone, and the mob clock jumps two. Emil Raeber is seen in woge near the empty bed, and the colony comes for him with rope. The characters can be there first, or not.
+
+**5. The larder.** A Survival roll follows the frost-tracks to the old mill race, and the cold cellar under it. Two children alive, half-frozen; Dr. Whitlock and Roz can keep them that way.
+
+**6. Konrad.** He comes home to find them in his larder. In woge, he's a **Wendigo**: Claws (2), Stealth 14, and the voices of the children he took. This is the big fight, in a dark mill with flour in the air and fire close to hand. Lena's Himmelsbrief and her charms are worth more here than a gun.
+
+**7. The Code.** The mob arrives at the mill as the fight ends, with lanterns. What do they see? If they see the woge, the Raebers are cleared, but **Exposure** marks a box and the Wesen Council will hear of it. If the characters hide it, Konrad becomes a man who died in a fire, and the town still suspects the Raebers unless someone gives it a better story (Deception), and **Suspicion** stays. Eliza's badge says the law should decide; the Code says the town must never know.
+
+**Rewards.** Two children home. A diary entry on the Wendigo. The Raebers' trust, and Gus's old pack hears he did right by them. Pastor Unruh owes Lena a great deal, and his colony owes the Raebers an apology they may never make.
+
+**Threats.** Wendigo (Konrad Weiss); the mob as Hired guns (minor) who won't shoot a lawman first; Blutbad in full woge (Emil Raeber, if it comes to a misunderstanding).
 
 # Running cases
 
