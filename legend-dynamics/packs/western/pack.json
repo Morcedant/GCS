@@ -4342,27 +4342,6 @@
   "term": "job",
   "fan": false,
   "feedback": "legenddynamicsrpg.com/playtest",
-  "posts": [
-   [
-    "Reddit · r/lfg",
-    "[Online][Other][One-shot][Free] Trails of Blood & Dust, a Gothic Western monster hunt. [DAY, DATE] at [TIME + TIME ZONE], 3 hours\n\nSomething is killing miners in the Lazarus silver mine, and the company calls it cave-ins. A dead man has written to hire you.\n\nI'm playtesting a new tabletop RPG I've designed and I'm looking for 3 to 5 players for one session. No experience needed and nothing to read: characters are ready-made (a marshal, a doctor, a preacher, a gambler who reads the cards, a werewolf in chains, a bounty hunter who came back from the dead). Rolls are 3d6, roll low.\n\nPlayed on [Discord voice / the browser table]. Afterward I'll ask a few quick questions about what worked and what didn't. Playtesters are credited in the finished book.\n\nComment or DM me to grab a seat."
-   ],
-   [
-    "Discord · LFG channel",
-    "**Free one-shot: Gothic Western monster hunt** 🤠\n[DAY, DATE] · [TIME + TIME ZONE] · 3 hours · voice\nPlaytesting my own system: 3d6 roll-low, ready-made characters, nothing to read first. Ghouls in a silver mine, and the man who hired you died two weeks ago.\n3 to 5 seats, beginners welcome. Credited in the finished book. React or DM me!"
-   ],
-   [
-    "Game store or library board",
-    "NEW GAME PLAYTEST: TRAILS OF BLOOD & DUST\nA Gothic Western monster hunt · one session · free\n[DAY, DATE], [TIME] · [PLACE]\nNo experience needed. Characters, dice and pencils provided.\nSomething is killing the miners of Mercy Springs. Come find out what.\nSign up below, or contact [NAME, CONTACT]."
-   ]
-  ],
-  "where": [
-   "<b>r/lfg</b> on Reddit, with the title format above.",
-   "<b>Roll20's \"Join a Game\"</b> listings, as a free one-shot.",
-   "The LFG channels of large tabletop Discord servers, and your own Discord's <code>/join</code> link.",
-   "<b>r/RPGdesign</b> and design Discords: offer to trade playtests with other designers.",
-   "Local game stores and Meetup groups, with the flyer."
-  ],
   "prep": [
    "Read <i>Dead Man's Wages</i> in the GM's Guide (Trails of Blood & Dust creator → Guide tab → GM's Guide → Your first job). It's about two pages.",
    "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",

@@ -4699,27 +4699,6 @@
   "term": "job",
   "fan": false,
   "feedback": "legenddynamicsrpg.com/playtest",
-  "posts": [
-   [
-    "Reddit · r/lfg",
-    "[Online][Other][One-shot][Free] Fracture Lines, a science fiction salvage job. [DAY, DATE] at [TIME + TIME ZONE], 3 hours\n\nA colony ship lost for 140 years has turned up at the end of a corridor that isn't on any map. Your crew's debts are due, and the salvage would pay them. Someone else got the coordinates too.\n\nI'm playtesting a new tabletop RPG I've designed and I'm looking for 3 to 5 players for one session. No experience needed and nothing to read: characters are ready-made (a disowned alien trader, a hive scout, a rebuilt marine, a navigator with an AI partner, an ecologist, a legion deserter, a hacker with a secret). Rolls are 3d6, roll low.\n\nPlayed on [Discord voice / the browser table]. Afterward I'll ask a few quick questions about what worked and what didn't. Playtesters are credited in the finished book.\n\nComment or DM me to grab a seat."
-   ],
-   [
-    "Discord · LFG channel",
-    "**Free one-shot: sci-fi salvage job** 🚀\n[DAY, DATE] · [TIME + TIME ZONE] · 3 hours · voice\nPlaytesting my own system: 3d6 roll-low, ready-made crew, nothing to read first. A colony ship lost for 140 years, a corporation that wants it stripped, and a corridor closing behind you.\n3 to 5 seats, beginners welcome. Credited in the finished book. React or DM me!"
-   ],
-   [
-    "Game store or library board",
-    "NEW GAME PLAYTEST: FRACTURE LINES\nA science fiction salvage job · one session · free\n[DAY, DATE], [TIME] · [PLACE]\nNo experience needed. Characters, dice and pencils provided.\nA ship lost for 140 years is calling. Who does it belong to?\nSign up below, or contact [NAME, CONTACT]."
-   ]
-  ],
-  "where": [
-   "<b>r/lfg</b> on Reddit, with the title format above.",
-   "<b>Roll20's \"Join a Game\"</b> listings, as a free one-shot.",
-   "The LFG channels of large tabletop Discord servers, and your own Discord's <code>/join</code> link.",
-   "<b>r/RPGdesign</b> and design Discords: offer to trade playtests with other designers.",
-   "Local game stores and Meetup groups, with the flyer."
-  ],
   "prep": [
    "Read <i>Salvage Rights</i> in the GM's Guide (Fracture Lines creator → Guide tab → GM's Guide → Your first job). It's about two pages.",
    "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",

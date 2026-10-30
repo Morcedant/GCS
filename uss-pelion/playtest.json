@@ -5,21 +5,6 @@
  "term": "mission",
  "fan": true,
  "feedback": "your fan-games site, /playtest/",
- "posts": [
-  [
-   "Message to friends",
-   "Want to try a Star Trek one-shot? [DAY, DATE] at [TIME], about 3 hours, on [Discord voice / the browser table].\n\nA Federation outpost has gone silent, an Orion raider is in orbit, and something in the ruins below is draining the ship's power. You'd be the Pelion's crew: the first officer, the Vulcan science officer, the doctor, the engineer, security and the captain's yeoman.\n\nIt runs on rules I've been designing (3d6, roll low). Characters are ready-made and there's nothing to read. Afterward I'll ask a few quick questions about what worked. Interested?"
-  ],
-  [
-   "Private Discord channel",
-   "**Star Trek one-shot: The Silence at Corvan II** 🖖\n[DAY, DATE] · [TIME] · ~3 hours · voice\nReady-made crew, nothing to read, beginners welcome. An outpost gone quiet, Orions in orbit, and the Prime Directive watching. React to grab a station!"
-  ]
- ],
- "where": [
-  "Friends and your regular group, by message.",
-  "Your own private Discord server, in a channel only invited people can see.",
-  "Invite them to the fan-games site first (it's locked to invited players), so they can open the creator and the Playtest page."
- ],
  "prep": [
   "Read <i>The Silence at Corvan II</i> in the GM's Guide (USS Pelion creator → Guide tab → GM's Guide → Your first mission). It's about two pages.",
   "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",
