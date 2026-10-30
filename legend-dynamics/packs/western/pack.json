@@ -66,8 +66,8 @@
   "party": "posse"
  },
  "theme": {
-  "comment": "Trails of Blood & Dust, plain: weathered paper, dark ink and blood red, like the game's page on the site.",
-  "css": "--space: #ece2cc; --glass: #f5eedd; --glass-hi: #faf5ea; --well: #fffaf0; --fg: #1e1914; --muted: #5d5246; --line: rgba(30, 25, 20, .22); --chrome: #7d1612; --chrome-dim: rgba(125, 22, 18, .55); --gold: #7d1612; --blue: #2f5d50; --red: #a3261a; --good: #2e6b3f; --bad: #a3261a; --warn: #8a5a10; --on-accent: #f5eedd; --display: \"EB Garamond\", Garamond, Georgia, serif; --title: \"Pirata One\", \"IM Fell English SC\", Georgia, serif; --body: \"EB Garamond\", Garamond, Georgia, serif; --mono: \"EB Garamond\", Garamond, Georgia, serif; --numbers: \"EB Garamond\", Garamond, Georgia, serif; --radius: 4px;",
+  "comment": "Trails of Blood & Dust, plain: weathered paper, dark ink and blood red, like the game's page on the site. No white or cream text: highlighted controls are tan with dark ink and a blood-red edge.",
+  "css": "--space: #ece2cc; --glass: #f5eedd; --glass-hi: #faf5ea; --well: #fffaf0; --fg: #1e1914; --muted: #5d5246; --line: rgba(30, 25, 20, .22); --chrome: #7d1612; --chrome-dim: rgba(125, 22, 18, .55); --gold: #7d1612; --blue: #2f5d50; --red: #a3261a; --good: #2e6b3f; --bad: #a3261a; --warn: #8a5a10; --on-accent: #1e1914; --accent-fill: #e2c79a; --accent-edge: #7d1612; --strong-ink: #1e1914; --token-ink: #1e1914; --token-halo: #fffaf0; --readout-ink: #1e1914; --readout-bg: rgba(245, 238, 221, .94); --display: \"EB Garamond\", Garamond, Georgia, serif; --title: \"Pirata One\", \"IM Fell English SC\", Georgia, serif; --body: \"EB Garamond\", Garamond, Georgia, serif; --mono: \"EB Garamond\", Garamond, Georgia, serif; --numbers: \"EB Garamond\", Garamond, Georgia, serif; --radius: 4px;",
   "glow": "125, 22, 18",
   "line": "30, 25, 20",
   "highlight": "255, 255, 255",
