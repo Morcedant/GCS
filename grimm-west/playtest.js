@@ -3,7 +3,7 @@
 // and by tools/build-guide.py (/* PLAYTEST:START */ … /* PLAYTEST:END */) into the fan games; no modules, no globals.
 //
 // The kit (a pack's "playtest", or a fan game's playtest.json): { name, short, adv (the adventure), term, fan,
-//   feedback (where players answer the questions), posts: [[label, text]], where: [html], prep: [html],
+//   feedback (where players answer the questions), prep: [html],
 //   cast: [[name, line]], castNote, run: [[time, title, html, cut?]] }.
 // The prep ticks and the session notes are kept in this browser (<storeKey>.ticks, <storeKey>.notes).
 //
@@ -21,8 +21,6 @@ function mountPlaytest(api) {
     const st = document.createElement("style"); st.id = "pt-style";
     st.textContent = `.pt-sec { border-top: 1px solid var(--line); padding: 8px 0; } .pt-sec > summary { cursor: pointer; padding: 4px 0; }
       .pt-sec pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; font: inherit; font-size: .92rem; }
-      .pt-slip { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin: 8px 0; }
-      .pt-slip-head { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
       .pt-check { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 6px; } .pt-check label { display: flex; gap: 8px; align-items: flex-start; font: inherit; font-size: .95rem; color: var(--fg); letter-spacing: normal; text-transform: none; }
       .pt-check input { margin-top: 5px; flex: none; }
       .pt-cast { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 8px; }
@@ -40,20 +38,17 @@ function mountPlaytest(api) {
   try { ticks = JSON.parse(get("ticks") || "{}") || {}; } catch { ticks = {}; }
   const sec = (id, title, body, open) => `<details class="pt-sec" data-sec="${id}"${open ? " open" : ""}><summary><b>${esc(title)}</b></summary>${body}</details>`;
   root.innerHTML = `<h3>Playtest kit: ${esc(K.adv)}</h3>
-    <p class="small muted">Run a three-hour playtest of this ${esc(K.term)} with people who've never seen the game: find players, prepare, follow the run sheet, and ask the right questions after. The ${esc(K.term)} itself is in the GM's Guide.${K.fan ? " This is a fan game: keep it to people you know, never a public listing." : ""}</p>
-    ${sec("find", "1. Find players", `<p class="small">Post two or three weeks ahead and fill in the bracketed parts. A specific time, "free" and "no experience needed" do most of the work. Ask for 3 to 5 players and accept up to 6.</p>
-      ${K.posts.map(([label, text], i) => `<div class="pt-slip"><div class="pt-slip-head"><b>${esc(label)}</b><button type="button" class="linkish" data-ptcopy="${i}">Copy</button></div><pre id="pt-post-${i}">${esc(text)}</pre></div>`).join("")}
-      <p class="small"><b>Where to post</b></p><ul class="small">${K.where.map((w) => `<li>${w}</li>`).join("")}</ul>`)}
-    ${sec("prep", "2. Before the session", `<ul class="pt-check">${K.prep.map((t, i) => `<li><label><input type="checkbox" data-pttick="${i}"${ticks[i] ? " checked" : ""}> <span>${t}</span></label></li>`).join("")}</ul>
+    <p class="small muted">Run a three-hour playtest of this ${esc(K.term)} with people who've never seen the game: prepare, follow the run sheet, and ask the right questions after. The ${esc(K.term)} itself is in the GM's Guide.</p>
+    ${sec("prep", "1. Before the session", `<ul class="pt-check">${K.prep.map((t, i) => `<li><label><input type="checkbox" data-pttick="${i}"${ticks[i] ? " checked" : ""}> <span>${t}</span></label></li>`).join("")}</ul>
       <p class="small"><b>The cast, in one line each</b></p>
       <div class="pt-cast">${K.cast.map(([n, t]) => `<div><b>${esc(n)}</b><span class="small muted">${esc(t)}</span></div>`).join("")}</div>
       <p class="small muted">${esc(K.castNote || "")}</p>`, true)}
-    ${sec("run", "3. The run sheet: three hours", `<p class="small">The full ${esc(K.term)} is written for one or two sessions; this is the cut for one evening. If you're running behind, take the cuts.</p>
+    ${sec("run", "2. The run sheet: three hours", `<p class="small">The full ${esc(K.term)} is written for one or two sessions; this is the cut for one evening. If you're running behind, take the cuts.</p>
       <ol class="pt-run">${[...K.run, ptWrapRow()].map(([t, h, body, cut]) => `<li><span class="pt-mark num">${esc(t)}</span><div><b>${esc(h)}</b>${body}${cut ? `<p class="small"><span class="pt-cut">Cut</span> ${esc(cut)}</p>` : ""}</div></li>`).join("")}</ol>`)}
-    ${sec("watch", "4. During the game", `<p class="small">Jot these down as they happen: every rule you had to look up, every time a player asked "what do I roll?", what nobody touched on their sheet, how long each scene took, and the moments people leaned in.</p>
+    ${sec("watch", "3. During the game", `<p class="small">Jot these down as they happen: every rule you had to look up, every time a player asked "what do I roll?", what nobody touched on their sheet, how long each scene took, and the moments people leaned in.</p>
       <div class="field"><label for="pt-notes">Your notes for this session</label><textarea id="pt-notes" rows="7" placeholder="0:52 — a player asked what Investigation covers"></textarea></div>
       <div class="btn-row"><button type="button" class="btn" id="pt-notes-copy">Copy notes</button><button type="button" class="btn" id="pt-notes-clear">Clear</button><span class="small muted">Kept in this browser as you type.</span></div>`)}
-    ${sec("after", "5. After the game", `<p class="small"><b>Ask out loud, before anyone leaves:</b> What was confusing? What did you never use? What was the best moment? Would you play again, and what would you want to do next time? Listen more than you explain.</p>
+    ${sec("after", "4. After the game", `<p class="small"><b>Ask out loud, before anyone leaves:</b> What was confusing? What did you never use? What was the best moment? Would you play again, and what would you want to do next time? Listen more than you explain.</p>
       <p class="small"><b>Then the written answers:</b> players answer the same questions on <code>${esc(K.feedback)}</code>. Only you read them: on the main site's Dev blog Write page, sign in with your DEV code and press <b>Playtest feedback</b>.</p>
       <p class="small"><b>Say thank you</b> within a day: tell each player one thing you're changing because of them, and ask how they'd like their name in the credits.</p>`)}`;
   const notes = root.querySelector("#pt-notes");
@@ -67,8 +62,6 @@ function mountPlaytest(api) {
     set("ticks", JSON.stringify(ticks));
   });
   root.addEventListener("click", (e) => {
-    const b = e.target.closest("[data-ptcopy]");
-    if (b) { const el = root.querySelector("#pt-post-" + b.dataset.ptcopy); copy(el.textContent, (ok) => say(ok ? "Copied." : "Copying is blocked here; select the text and copy it yourself.", !ok)); return; }
     if (e.target.id === "pt-notes-copy") { copy(notes.value, (ok) => { if (!ok) notes.select(); say(ok ? "Notes copied." : "Selected: copy them yourself.", !ok); }); return; }
     if (e.target.id === "pt-notes-clear") {
       if (!armed) { armed = true; e.target.textContent = "Tap again to clear"; setTimeout(() => { armed = false; e.target.textContent = "Clear"; }, 3000); return; }
