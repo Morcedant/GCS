@@ -662,7 +662,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="70b057f" data-version-date="2026.10.29" title="The code changes whenever this page changes.">Version 2026.10.29 · 70b057f</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="f452149" data-version-date="2026.10.30" title="The code changes whenever this page changes.">Version 2026.10.30 · f452149</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -919,6 +919,7 @@ select option, select optgroup { background: var(--glass); color: var(--fg); }
     <div class="panel hud no-print" id="gm-table"></div>
     <div class="card hud no-print" id="hb-card"></div>
     <div class="card hud no-print" id="cp-card"></div>
+    <div class="card hud no-print" id="pt-card"></div>
     <div class="gm-top">
       <div class="card hud no-print">
         <h3>Characters</h3>
@@ -8307,6 +8308,364 @@ function mountCampaign(api) {
   };
 }
 /* CAMPAIGN:END */
+/* PLAYTEST:START */
+// The playtest kit in the GM view: everything for running a three-hour playtest of the game's first adventure with
+// people who have never seen it. Plain script, inlined by tools/build-legend.py (/* PLAYTEST */) into the creators,
+// and by tools/build-guide.py (/* PLAYTEST:START */ … /* PLAYTEST:END */) into the fan games; no modules, no globals.
+//
+// The kit (a pack's "playtest", or a fan game's playtest.json): { name, short, adv (the adventure), term, fan,
+//   feedback (where players answer the questions), posts: [[label, text]], where: [html], prep: [html],
+//   cast: [[name, line]], castNote, run: [[time, title, html, cut?]] }.
+// The prep ticks and the session notes are kept in this browser (<storeKey>.ticks, <storeKey>.notes).
+//
+// mountPlaytest(api) with api: { kit, root, esc, storeKey, toast(m, err) }.
+// Function declarations only.
+
+function ptWrapRow() {
+  return ["2:45", "Wrap up and questions", "<p>Say what happened. Then stop the game and ask the debrief questions below, out loud, before anyone leaves. Post the Playtest page link in the chat for anyone who'd rather write.<\/p>"];
+}
+
+function mountPlaytest(api) {
+  const { kit: K, root, esc } = api;
+  if (!K || !root) return;
+  if (!document.getElementById("pt-style")) {
+    const st = document.createElement("style"); st.id = "pt-style";
+    st.textContent = `.pt-sec { border-top: 1px solid var(--line); padding: 8px 0; } .pt-sec > summary { cursor: pointer; padding: 4px 0; }
+      .pt-sec pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; font: inherit; font-size: .92rem; }
+      .pt-slip { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin: 8px 0; }
+      .pt-slip-head { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+      .pt-check { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 6px; } .pt-check label { display: flex; gap: 8px; align-items: flex-start; font: inherit; font-size: .95rem; color: var(--fg); letter-spacing: normal; text-transform: none; }
+      .pt-check input { margin-top: 5px; flex: none; }
+      .pt-cast { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 8px; }
+      .pt-cast > div { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: grid; min-width: 0; }
+      .pt-run { list-style: none; padding: 0; margin: 8px 0; } .pt-run > li { display: grid; grid-template-columns: 3.6rem 1fr; gap: 10px; padding: 8px 0; border-top: 1px dashed var(--line); }
+      .pt-run p { margin: 4px 0; } .pt-mark { color: var(--chrome); }
+      .pt-cut { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }`;
+    document.head.appendChild(st);
+  }
+  const key = api.storeKey || "playtest";
+  const get = (k) => { try { return localStorage.getItem(key + "." + k); } catch { return null; } };
+  const set = (k, v) => { try { v === null ? localStorage.removeItem(key + "." + k) : localStorage.setItem(key + "." + k, v); } catch {} };
+  const say = (m, err) => (api.toast ? api.toast(m, err) : null);
+  let ticks = {};
+  try { ticks = JSON.parse(get("ticks") || "{}") || {}; } catch { ticks = {}; }
+  const sec = (id, title, body, open) => `<details class="pt-sec" data-sec="${id}"${open ? " open" : ""}><summary><b>${esc(title)}<\/b><\/summary>${body}<\/details>`;
+  root.innerHTML = `<h3>Playtest kit: ${esc(K.adv)}<\/h3>
+    <p class="small muted">Run a three-hour playtest of this ${esc(K.term)} with people who've never seen the game: find players, prepare, follow the run sheet, and ask the right questions after. The ${esc(K.term)} itself is in the GM's Guide.${K.fan ? " This is a fan game: keep it to people you know, never a public listing." : ""}<\/p>
+    ${sec("find", "1. Find players", `<p class="small">Post two or three weeks ahead and fill in the bracketed parts. A specific time, "free" and "no experience needed" do most of the work. Ask for 3 to 5 players and accept up to 6.<\/p>
+      ${K.posts.map(([label, text], i) => `<div class="pt-slip"><div class="pt-slip-head"><b>${esc(label)}<\/b><button type="button" class="linkish" data-ptcopy="${i}">Copy<\/button><\/div><pre id="pt-post-${i}">${esc(text)}<\/pre><\/div>`).join("")}
+      <p class="small"><b>Where to post<\/b><\/p><ul class="small">${K.where.map((w) => `<li>${w}<\/li>`).join("")}<\/ul>`)}
+    ${sec("prep", "2. Before the session", `<ul class="pt-check">${K.prep.map((t, i) => `<li><label><input type="checkbox" data-pttick="${i}"${ticks[i] ? " checked" : ""}> <span>${t}<\/span><\/label><\/li>`).join("")}<\/ul>
+      <p class="small"><b>The cast, in one line each<\/b><\/p>
+      <div class="pt-cast">${K.cast.map(([n, t]) => `<div><b>${esc(n)}<\/b><span class="small muted">${esc(t)}<\/span><\/div>`).join("")}<\/div>
+      <p class="small muted">${esc(K.castNote || "")}<\/p>`, true)}
+    ${sec("run", "3. The run sheet: three hours", `<p class="small">The full ${esc(K.term)} is written for one or two sessions; this is the cut for one evening. If you're running behind, take the cuts.<\/p>
+      <ol class="pt-run">${[...K.run, ptWrapRow()].map(([t, h, body, cut]) => `<li><span class="pt-mark num">${esc(t)}<\/span><div><b>${esc(h)}<\/b>${body}${cut ? `<p class="small"><span class="pt-cut">Cut<\/span> ${esc(cut)}<\/p>` : ""}<\/div><\/li>`).join("")}<\/ol>`)}
+    ${sec("watch", "4. During the game", `<p class="small">Jot these down as they happen: every rule you had to look up, every time a player asked "what do I roll?", what nobody touched on their sheet, how long each scene took, and the moments people leaned in.<\/p>
+      <div class="field"><label for="pt-notes">Your notes for this session<\/label><textarea id="pt-notes" rows="7" placeholder="0:52 — a player asked what Investigation covers"><\/textarea><\/div>
+      <div class="btn-row"><button type="button" class="btn" id="pt-notes-copy">Copy notes<\/button><button type="button" class="btn" id="pt-notes-clear">Clear<\/button><span class="small muted">Kept in this browser as you type.<\/span><\/div>`)}
+    ${sec("after", "5. After the game", `<p class="small"><b>Ask out loud, before anyone leaves:<\/b> What was confusing? What did you never use? What was the best moment? Would you play again, and what would you want to do next time? Listen more than you explain.<\/p>
+      <p class="small"><b>Then the written answers:<\/b> players answer the same questions on <code>${esc(K.feedback)}<\/code>. Only you read them: on the main site's Dev blog Write page, sign in with your DEV code and press <b>Playtest feedback<\/b>.<\/p>
+      <p class="small"><b>Say thank you<\/b> within a day: tell each player one thing you're changing because of them, and ask how they'd like their name in the credits.<\/p>`)}`;
+  const notes = root.querySelector("#pt-notes");
+  notes.value = get("notes") || "";
+  notes.addEventListener("input", () => set("notes", notes.value));
+  const copy = (text, done) => { const p = navigator.clipboard && navigator.clipboard.writeText(text); if (p) p.then(() => done(true), () => done(false)); else done(false); };
+  let armed = false;
+  root.addEventListener("change", (e) => {
+    const t = e.target.closest("[data-pttick]"); if (!t) return;
+    if (t.checked) ticks[t.dataset.pttick] = 1; else delete ticks[t.dataset.pttick];
+    set("ticks", JSON.stringify(ticks));
+  });
+  root.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-ptcopy]");
+    if (b) { const el = root.querySelector("#pt-post-" + b.dataset.ptcopy); copy(el.textContent, (ok) => say(ok ? "Copied." : "Copying is blocked here; select the text and copy it yourself.", !ok)); return; }
+    if (e.target.id === "pt-notes-copy") { copy(notes.value, (ok) => { if (!ok) notes.select(); say(ok ? "Notes copied." : "Selected: copy them yourself.", !ok); }); return; }
+    if (e.target.id === "pt-notes-clear") {
+      if (!armed) { armed = true; e.target.textContent = "Tap again to clear"; setTimeout(() => { armed = false; e.target.textContent = "Clear"; }, 3000); return; }
+      armed = false; notes.value = ""; set("notes", null); e.target.textContent = "Clear"; say("Notes cleared.");
+    }
+  });
+}
+const PLAYTEST_KIT = {
+ "name": "Grimm",
+ "short": "Grimm",
+ "adv": "The Larder at Hoffnungstal",
+ "term": "case",
+ "fan": true,
+ "feedback": "your fan-games site, /playtest/",
+ "posts": [
+  [
+   "Message to friends",
+   "Want to try a Grimm one-shot, set in the Old West? [DAY, DATE] at [TIME], about 3 hours, on [Discord voice / the browser table].\n\nChildren are vanishing from a German colony on the plains, the colonists have a family they mean to hang for it, and the thing taking them is someone else. You'd be a Grimm marshal, a reformed Blutbad blacksmith, a Fuchsbau apothecary, a skeptical doctor, a Coyotl scout, a Ziegevolk gambler, or a Braucher.\n\nIt runs on rules I've been designing (3d6, roll low). Characters are ready-made and there's nothing to read. Afterward I'll ask a few quick questions about what worked. Interested?"
+  ],
+  [
+   "Private Discord channel",
+   "**Grimm one-shot: The Larder at Hoffnungstal** 🐺\n[DAY, DATE] · [TIME] · ~3 hours · voice\nReady-made characters, nothing to read, beginners welcome. Missing children, a lynch mob at the wrong door, and the Code of Swabia. React to grab a seat!"
+  ]
+ ],
+ "where": [
+  "Friends and your regular group, by message.",
+  "Your own private Discord server, in a channel only invited people can see.",
+  "Invite them to the fan-games site first (it's locked to invited players), so they can open the creator and the Playtest page."
+ ],
+ "prep": [
+  "Read <i>The Larder at Hoffnungstal<\/i> in the GM's Guide (Grimm creator → Guide tab → GM's Guide → Your first case). It's about two pages.",
+  "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",
+  "Online: start a shared table and have its link ready, or set up the dice bot in your Discord. In person: print the character sheets.",
+  "In the Discovery tab, prepare a diary discovery clock for the thing taking the children, with its threat clock; and have a Lynch mob clock (6) ready.",
+  "In <i>Map and fight<\/i>, check you can add a Wendigo (Konrad Weiss), a few Hired guns for the mob, and a Blutbad in full woge (Emil Raeber).",
+  "The day before: send everyone the time, the table link, and the Playtest page, <code>your fan-games site, /playtest/<\/code>. Tell them there's nothing to read.",
+  "Have a timer or clock in view. The run sheet below has the times."
+ ],
+ "cast": [
+  [
+   "Eliza Kessler",
+   "Grimm and Deputy U.S. Marshal. The law and the Code, in one person."
+  ],
+  [
+   "Gus Brandt",
+   "Blutbad blacksmith. Old Raeber ran with his pack."
+  ],
+  [
+   "Roz Vey",
+   "Fuchsbau apothecary. Konrad's been buying a remedy for hunger."
+  ],
+  [
+   "Dr. Thaddeus Whitlock",
+   "Army surgeon. The torn dog's wounds bother him."
+  ],
+  [
+   "Cora Ridgeway",
+   "Coyotl scout. Has seen tracks that walk like a man."
+  ],
+  [
+   "Silas Thorne",
+   "Ziegevolk gambler. Konrad won big at cards, and Konrad never wins."
+  ],
+  [
+   "Magdalena \"Lena\" Baer",
+   "Braucher. Pastor Unruh brings the case to her door."
+  ]
+ ],
+ "castNote": "With fewer players, keep Lena (the hook) and Eliza or Gus (the mob and the Raebers). Silas or Roz leads them to the mill.",
+ "run": [
+  [
+   "0:00",
+   "Welcome and the characters",
+   "<p>Pitch it in one breath: <i>Wesen live hidden among us, and Grimms keep the old law between them and the rest of the world.<\/i> Each player takes a character and reads their role and connection aloud. Explain only the roll: <b>3d6, at or under your number<\/b>.<\/p>"
+  ],
+  [
+   "0:15",
+   "The pastor's knock",
+   "<p>Pastor Unruh at Lena's door: three children gone, and the colony means to hang the Raebers. Go around: why does each of them ride out tonight?<\/p>"
+  ],
+  [
+   "0:25",
+   "Hoffnungstal",
+   "<p>Lanterns outside the Raeber land. Start the Lynch mob clock (6) and the threat clock. A Persuasion or Leadership roll pushes the mob back one for the night.<\/p>"
+  ],
+  [
+   "0:45",
+   "The Raebers and the diary",
+   "<p>Old Raeber with a shotgun; Emil, who's been hunting it. Start the diary clock. Clues: the dog (Medicine), the frost-tracks (Tracking), the famine stories (Read People), the mill (Investigation, or Silas), Roz's ledger (Apothecary). <b>Three clues are enough.<\/b><\/p>"
+  ],
+  [
+   "1:35",
+   "The larder",
+   "<p>A Survival roll follows the tracks to the cold cellar under the mill race. Two children, alive. Whitlock and Roz keep them that way.<\/p>",
+   "Skip the roll: Emil leads them there."
+  ],
+  [
+   "1:55",
+   "Konrad",
+   "<p>He comes home in woge: a Wendigo with the children's voices. The big fight, in a dark mill with flour in the air and fire close to hand.<\/p>"
+  ],
+  [
+   "2:35",
+   "The Code",
+   "<p>The mob arrives with lanterns. Do they see the woge? Exposure, or Suspicion and a cover story. Eliza's badge against the Code.<\/p>"
+  ]
+ ]
+};
+/* PLAYTEST:END */) into the fan games; no modules, no globals.
+//
+// The kit (a pack's "playtest", or a fan game's playtest.json): { name, short, adv (the adventure), term, fan,
+//   feedback (where players answer the questions), posts: [[label, text]], where: [html], prep: [html],
+//   cast: [[name, line]], castNote, run: [[time, title, html, cut?]] }.
+// The prep ticks and the session notes are kept in this browser (<storeKey>.ticks, <storeKey>.notes).
+//
+// mountPlaytest(api) with api: { kit, root, esc, storeKey, toast(m, err) }.
+// Function declarations only.
+
+function ptWrapRow() {
+  return ["2:45", "Wrap up and questions", "<p>Say what happened. Then stop the game and ask the debrief questions below, out loud, before anyone leaves. Post the Playtest page link in the chat for anyone who'd rather write.<\/p>"];
+}
+
+function mountPlaytest(api) {
+  const { kit: K, root, esc } = api;
+  if (!K || !root) return;
+  if (!document.getElementById("pt-style")) {
+    const st = document.createElement("style"); st.id = "pt-style";
+    st.textContent = `.pt-sec { border-top: 1px solid var(--line); padding: 8px 0; } .pt-sec > summary { cursor: pointer; padding: 4px 0; }
+      .pt-sec pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; font: inherit; font-size: .92rem; }
+      .pt-slip { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin: 8px 0; }
+      .pt-slip-head { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+      .pt-check { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 6px; } .pt-check label { display: flex; gap: 8px; align-items: flex-start; }
+      .pt-check input { margin-top: 5px; flex: none; }
+      .pt-cast { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 8px; }
+      .pt-cast > div { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: grid; min-width: 0; }
+      .pt-run { list-style: none; padding: 0; margin: 8px 0; } .pt-run > li { display: grid; grid-template-columns: 3.6rem 1fr; gap: 10px; padding: 8px 0; border-top: 1px dashed var(--line); }
+      .pt-run p { margin: 4px 0; } .pt-mark { color: var(--chrome); }
+      .pt-cut { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }`;
+    document.head.appendChild(st);
+  }
+  const key = api.storeKey || "playtest";
+  const get = (k) => { try { return localStorage.getItem(key + "." + k); } catch { return null; } };
+  const set = (k, v) => { try { v === null ? localStorage.removeItem(key + "." + k) : localStorage.setItem(key + "." + k, v); } catch {} };
+  const say = (m, err) => (api.toast ? api.toast(m, err) : null);
+  let ticks = {};
+  try { ticks = JSON.parse(get("ticks") || "{}") || {}; } catch { ticks = {}; }
+  const sec = (id, title, body, open) => `<details class="pt-sec" data-sec="${id}"${open ? " open" : ""}><summary><b>${esc(title)}<\/b><\/summary>${body}<\/details>`;
+  root.innerHTML = `<h3>Playtest kit: ${esc(K.adv)}<\/h3>
+    <p class="small muted">Run a three-hour playtest of this ${esc(K.term)} with people who've never seen the game: find players, prepare, follow the run sheet, and ask the right questions after. The ${esc(K.term)} itself is in the GM's Guide.${K.fan ? " This is a fan game: keep it to people you know, never a public listing." : ""}<\/p>
+    ${sec("find", "1. Find players", `<p class="small">Post two or three weeks ahead and fill in the bracketed parts. A specific time, "free" and "no experience needed" do most of the work. Ask for 3 to 5 players and accept up to 6.<\/p>
+      ${K.posts.map(([label, text], i) => `<div class="pt-slip"><div class="pt-slip-head"><b>${esc(label)}<\/b><button type="button" class="linkish" data-ptcopy="${i}">Copy<\/button><\/div><pre id="pt-post-${i}">${esc(text)}<\/pre><\/div>`).join("")}
+      <p class="small"><b>Where to post<\/b><\/p><ul class="small">${K.where.map((w) => `<li>${w}<\/li>`).join("")}<\/ul>`)}
+    ${sec("prep", "2. Before the session", `<ul class="pt-check">${K.prep.map((t, i) => `<li><label><input type="checkbox" data-pttick="${i}"${ticks[i] ? " checked" : ""}> <span>${t}<\/span><\/label><\/li>`).join("")}<\/ul>
+      <p class="small"><b>The cast, in one line each<\/b><\/p>
+      <div class="pt-cast">${K.cast.map(([n, t]) => `<div><b>${esc(n)}<\/b><span class="small muted">${esc(t)}<\/span><\/div>`).join("")}<\/div>
+      <p class="small muted">${esc(K.castNote || "")}<\/p>`, true)}
+    ${sec("run", "3. The run sheet: three hours", `<p class="small">The full ${esc(K.term)} is written for one or two sessions; this is the cut for one evening. If you're running behind, take the cuts.<\/p>
+      <ol class="pt-run">${[...K.run, ptWrapRow()].map(([t, h, body, cut]) => `<li><span class="pt-mark num">${esc(t)}<\/span><div><b>${esc(h)}<\/b>${body}${cut ? `<p class="small"><span class="pt-cut">Cut<\/span> ${esc(cut)}<\/p>` : ""}<\/div><\/li>`).join("")}<\/ol>`)}
+    ${sec("watch", "4. During the game", `<p class="small">Jot these down as they happen: every rule you had to look up, every time a player asked "what do I roll?", what nobody touched on their sheet, how long each scene took, and the moments people leaned in.<\/p>
+      <div class="field"><label for="pt-notes">Your notes for this session<\/label><textarea id="pt-notes" rows="7" placeholder="0:52 — a player asked what Investigation covers"><\/textarea><\/div>
+      <div class="btn-row"><button type="button" class="btn" id="pt-notes-copy">Copy notes<\/button><button type="button" class="btn" id="pt-notes-clear">Clear<\/button><span class="small muted">Kept in this browser as you type.<\/span><\/div>`)}
+    ${sec("after", "5. After the game", `<p class="small"><b>Ask out loud, before anyone leaves:<\/b> What was confusing? What did you never use? What was the best moment? Would you play again, and what would you want to do next time? Listen more than you explain.<\/p>
+      <p class="small"><b>Then the written answers:<\/b> players answer the same questions on <code>${esc(K.feedback)}<\/code>. Only you read them: on the main site's Dev blog Write page, sign in with your DEV code and press <b>Playtest feedback<\/b>.<\/p>
+      <p class="small"><b>Say thank you<\/b> within a day: tell each player one thing you're changing because of them, and ask how they'd like their name in the credits.<\/p>`)}`;
+  const notes = root.querySelector("#pt-notes");
+  notes.value = get("notes") || "";
+  notes.addEventListener("input", () => set("notes", notes.value));
+  const copy = (text, done) => { const p = navigator.clipboard && navigator.clipboard.writeText(text); if (p) p.then(() => done(true), () => done(false)); else done(false); };
+  let armed = false;
+  root.addEventListener("change", (e) => {
+    const t = e.target.closest("[data-pttick]"); if (!t) return;
+    if (t.checked) ticks[t.dataset.pttick] = 1; else delete ticks[t.dataset.pttick];
+    set("ticks", JSON.stringify(ticks));
+  });
+  root.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-ptcopy]");
+    if (b) { const el = root.querySelector("#pt-post-" + b.dataset.ptcopy); copy(el.textContent, (ok) => say(ok ? "Copied." : "Copying is blocked here; select the text and copy it yourself.", !ok)); return; }
+    if (e.target.id === "pt-notes-copy") { copy(notes.value, (ok) => { if (!ok) notes.select(); say(ok ? "Notes copied." : "Selected: copy them yourself.", !ok); }); return; }
+    if (e.target.id === "pt-notes-clear") {
+      if (!armed) { armed = true; e.target.textContent = "Tap again to clear"; setTimeout(() => { armed = false; e.target.textContent = "Clear"; }, 3000); return; }
+      armed = false; notes.value = ""; set("notes", null); e.target.textContent = "Clear"; say("Notes cleared.");
+    }
+  });
+}
+const PLAYTEST_KIT = {
+ "name": "Grimm",
+ "short": "Grimm",
+ "adv": "The Larder at Hoffnungstal",
+ "term": "case",
+ "fan": true,
+ "feedback": "your fan-games site, /playtest/",
+ "posts": [
+  [
+   "Message to friends",
+   "Want to try a Grimm one-shot, set in the Old West? [DAY, DATE] at [TIME], about 3 hours, on [Discord voice / the browser table].\n\nChildren are vanishing from a German colony on the plains, the colonists have a family they mean to hang for it, and the thing taking them is someone else. You'd be a Grimm marshal, a reformed Blutbad blacksmith, a Fuchsbau apothecary, a skeptical doctor, a Coyotl scout, a Ziegevolk gambler, or a Braucher.\n\nIt runs on rules I've been designing (3d6, roll low). Characters are ready-made and there's nothing to read. Afterward I'll ask a few quick questions about what worked. Interested?"
+  ],
+  [
+   "Private Discord channel",
+   "**Grimm one-shot: The Larder at Hoffnungstal** 🐺\n[DAY, DATE] · [TIME] · ~3 hours · voice\nReady-made characters, nothing to read, beginners welcome. Missing children, a lynch mob at the wrong door, and the Code of Swabia. React to grab a seat!"
+  ]
+ ],
+ "where": [
+  "Friends and your regular group, by message.",
+  "Your own private Discord server, in a channel only invited people can see.",
+  "Invite them to the fan-games site first (it's locked to invited players), so they can open the creator and the Playtest page."
+ ],
+ "prep": [
+  "Read <i>The Larder at Hoffnungstal<\/i> in the GM's Guide (Grimm creator → Guide tab → GM's Guide → Your first case). It's about two pages.",
+  "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",
+  "Online: start a shared table and have its link ready, or set up the dice bot in your Discord. In person: print the character sheets.",
+  "In the Discovery tab, prepare a diary discovery clock for the thing taking the children, with its threat clock; and have a Lynch mob clock (6) ready.",
+  "In <i>Map and fight<\/i>, check you can add a Wendigo (Konrad Weiss), a few Hired guns for the mob, and a Blutbad in full woge (Emil Raeber).",
+  "The day before: send everyone the time, the table link, and the Playtest page, <code>your fan-games site, /playtest/<\/code>. Tell them there's nothing to read.",
+  "Have a timer or clock in view. The run sheet below has the times."
+ ],
+ "cast": [
+  [
+   "Eliza Kessler",
+   "Grimm and Deputy U.S. Marshal. The law and the Code, in one person."
+  ],
+  [
+   "Gus Brandt",
+   "Blutbad blacksmith. Old Raeber ran with his pack."
+  ],
+  [
+   "Roz Vey",
+   "Fuchsbau apothecary. Konrad's been buying a remedy for hunger."
+  ],
+  [
+   "Dr. Thaddeus Whitlock",
+   "Army surgeon. The torn dog's wounds bother him."
+  ],
+  [
+   "Cora Ridgeway",
+   "Coyotl scout. Has seen tracks that walk like a man."
+  ],
+  [
+   "Silas Thorne",
+   "Ziegevolk gambler. Konrad won big at cards, and Konrad never wins."
+  ],
+  [
+   "Magdalena \"Lena\" Baer",
+   "Braucher. Pastor Unruh brings the case to her door."
+  ]
+ ],
+ "castNote": "With fewer players, keep Lena (the hook) and Eliza or Gus (the mob and the Raebers). Silas or Roz leads them to the mill.",
+ "run": [
+  [
+   "0:00",
+   "Welcome and the characters",
+   "<p>Pitch it in one breath: <i>Wesen live hidden among us, and Grimms keep the old law between them and the rest of the world.<\/i> Each player takes a character and reads their role and connection aloud. Explain only the roll: <b>3d6, at or under your number<\/b>.<\/p>"
+  ],
+  [
+   "0:15",
+   "The pastor's knock",
+   "<p>Pastor Unruh at Lena's door: three children gone, and the colony means to hang the Raebers. Go around: why does each of them ride out tonight?<\/p>"
+  ],
+  [
+   "0:25",
+   "Hoffnungstal",
+   "<p>Lanterns outside the Raeber land. Start the Lynch mob clock (6) and the threat clock. A Persuasion or Leadership roll pushes the mob back one for the night.<\/p>"
+  ],
+  [
+   "0:45",
+   "The Raebers and the diary",
+   "<p>Old Raeber with a shotgun; Emil, who's been hunting it. Start the diary clock. Clues: the dog (Medicine), the frost-tracks (Tracking), the famine stories (Read People), the mill (Investigation, or Silas), Roz's ledger (Apothecary). <b>Three clues are enough.<\/b><\/p>"
+  ],
+  [
+   "1:35",
+   "The larder",
+   "<p>A Survival roll follows the tracks to the cold cellar under the mill race. Two children, alive. Whitlock and Roz keep them that way.<\/p>",
+   "Skip the roll: Emil leads them there."
+  ],
+  [
+   "1:55",
+   "Konrad",
+   "<p>He comes home in woge: a Wendigo with the children's voices. The big fight, in a dark mill with flour in the air and fire close to hand.<\/p>"
+  ],
+  [
+   "2:35",
+   "The Code",
+   "<p>The mob arrives with lanterns. Do they see the woge? Exposure, or Suspicion and a cover story. Eliza's badge against the Code.<\/p>"
+  ]
+ ]
+};
+/* PLAYTEST:END */
   // The shared table: players join from their Play tab, the GM starts one here, and every roll at the table shows on both.
   sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: "grimm-west", game: "grimm-west", playTab: "Play", pointName: "Grit", partyName: "posse",
     server: TABLE_SERVER, character: () => ch.name, esc, toast,
@@ -10922,6 +11281,8 @@ return { mountLab };
   const STORE_SEED = "grimm.seed.v1";
   // The campaign builder (campaign.js): its generators read the case seeds, the callings, the threats and the
   // allegiances. Grimm has no cards, so the outline has no triggers. What the GM shares reaches the players.
+  // The playtest kit (playtest.js and playtest.json): this game's first adventure, run as a three-hour playtest.
+  mountPlaytest({ kit: PLAYTEST_KIT, root: $("pt-card"), esc, storeKey: "grimm.playtest", toast: gmSay });
   campaignUI = mountCampaign({
     PACK: { id: "grimm-west", terms: { title: "Grimm" }, seeds: SEEDS, roles: DEPTS.map(([name]) => ({ name })), threats: ENC_PACK.threats,
       allegiances: allegiances().filter((a) => a[0] && a[0] !== "custom"),
