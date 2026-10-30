@@ -3633,5 +3633,118 @@
     "Saltmarsh"
    ]
   }
+ },
+ "playtest": {
+  "name": "The Shattered Crown",
+  "short": "The Shattered Crown",
+  "adv": "The Thirsting Well",
+  "term": "venture",
+  "fan": false,
+  "feedback": "legenddynamicsrpg.com/playtest",
+  "posts": [
+   [
+    "Reddit · r/lfg",
+    "[Online][Other][One-shot][Free] The Shattered Crown, a sword-and-sorcery tomb raid. [DAY, DATE] at [TIME + TIME ZONE], 3 hours\n\nA merchant princess is paying gold for what's in a serpent-king's tomb under a dying oasis. She hasn't told you what's guarding it.\n\nI'm playtesting a new tabletop RPG I've designed and I'm looking for 3 to 5 players for one session. No experience needed and nothing to read: characters are ready-made (a thief, a serpent-kin sorcerer, a hedge-witch, a giant-blooded sellsword, a corsair captain without a ship, an assassin on the run, the last priest of a dying god). Rolls are 3d6, roll low.\n\nPlayed on [Discord voice / the browser table]. Afterward I'll ask a few quick questions about what worked and what didn't. Playtesters are credited in the finished book.\n\nComment or DM me to grab a seat."
+   ],
+   [
+    "Discord · LFG channel",
+    "**Free one-shot: sword-and-sorcery tomb raid** ⚔️\n[DAY, DATE] · [TIME + TIME ZONE] · 3 hours · voice\nPlaytesting my own system: 3d6 roll-low, ready-made characters, nothing to read first. A serpent-king's tomb, a dying god's last well, and something under it that's waking up thirsty.\n3 to 5 seats, beginners welcome. Credited in the finished book. React or DM me!"
+   ],
+   [
+    "Game store or library board",
+    "NEW GAME PLAYTEST: THE SHATTERED CROWN\nA sword-and-sorcery tomb raid · one session · free\n[DAY, DATE], [TIME] · [PLACE]\nNo experience needed. Characters, dice and pencils provided.\nGold, a tomb, and something old waking under the sands.\nSign up below, or contact [NAME, CONTACT]."
+   ]
+  ],
+  "where": [
+   "<b>r/lfg</b> on Reddit, with the title format above.",
+   "<b>Roll20's \"Join a Game\"</b> listings, as a free one-shot.",
+   "The LFG channels of large tabletop Discord servers, and your own Discord's <code>/join</code> link.",
+   "<b>r/RPGdesign</b> and design Discords: offer to trade playtests with other designers.",
+   "Local game stores and Meetup groups, with the flyer."
+  ],
+  "prep": [
+   "Read <i>The Thirsting Well</i> in the GM's Guide (The Shattered Crown creator → Guide tab → GM's Guide → Your first venture). It's about two pages.",
+   "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",
+   "Online: start a shared table and have its link ready, or set up the dice bot in your Discord. In person: print the character sheets.",
+   "In the Discovery tab, prepare a tale for the thing in the tomb, with Doom ticking as they dig.",
+   "In <i>Map and fight</i>, check you can add four Cultists, a Sellsword captain (Dask) with two Guardsmen, two Ghouls or tomb-dead, and a Serpent-priest (Ssethra).",
+   "The day before: send everyone the time, the table link, and the Playtest page, <code>legenddynamicsrpg.com/playtest</code>. Tell them there's nothing to read.",
+   "Have a timer or clock in view. The run sheet below has the times."
+  ],
+  "cast": [
+   [
+    "Vessa Thorn",
+    "Thief and climber. The only one who can reach the upper door."
+   ],
+   [
+    "Ithrann",
+    "Serpent-kin scholar. The tomb may hold the lost library."
+   ],
+   [
+    "Nyx",
+    "Hedge-witch. Sells cures to the sick oasis tribes."
+   ],
+   [
+    "Gorrum Ironjaw",
+    "Iron Company sergeant, hired to guard the dig."
+   ],
+   [
+    "Mira Saltwind",
+    "Corsair captain. The merchant princess holds her crew's debts."
+   ],
+   [
+    "Cinder",
+    "Assassin on the run. Knows the Ash Guild is here too."
+   ],
+   [
+    "Oren Sael",
+    "Last priest of Haddu. The oasis is his dying god's last well."
+   ]
+  ],
+  "castNote": "With fewer players, keep Oren (the god's well) and Ithrann (the true name). Vessa makes the tomb's entrance a scene.",
+  "run": [
+   [
+    "0:00",
+    "Welcome and the characters",
+    "<p>Pitch it in one breath: <i>You are not heroes. You live on steel, wits and luck in a world that has no heroes left.</i> Each player takes a character and reads their role and their connection aloud. Explain only the roll: <b>3d6, at or under your number</b>.</p>"
+   ],
+   [
+    "0:15",
+    "Qasreth",
+    "<p>Ysolde Varr on her barge, half the gold in advance, and Dask her captain. A Read People roll sees she's afraid of the tomb itself.</p>"
+   ],
+   [
+    "0:25",
+    "The road and the cultists",
+    "<p>One Survival roll for the crossing (a failure marks Hunger), then the Burning God's cultists come for the sorcerers at night. Keep it short: a first fight to learn the rules.</p>",
+    "Skip the fight: the cultists are watching from the dunes, and will be back."
+   ],
+   [
+    "0:50",
+    "Ain Haddu",
+    "<p>The shrinking pool, the herders who won't drink after dark, the shrine's flame nearly out. The water hisses at night.</p>"
+   ],
+   [
+    "1:00",
+    "Into the tomb",
+    "<p>The upper door (Vessa) or the broken lower one. Start the tale, with Doom ticking. Clues: the carvings (Lore), the robbers' dry bodies (Healing), the draining water (Survival, or Oren's faith), the library. <b>Three clues are enough.</b></p>"
+   ],
+   [
+    "1:40",
+    "The hall of kings",
+    "<p>The tomb-dead rise, two plus one per box of Doom. In the middle of it, Dask makes his move for the gold. The big fight: use the battle map. Fire and daylight drive the dead back.</p>"
+   ],
+   [
+    "2:20",
+    "Ssethra",
+    "<p>The serpent-priest in its drowned chamber. Its true name binds it for a round (Will); Haddu's water burns it. Sorcery here risks corruption.</p>"
+   ],
+   [
+    "2:40",
+    "The choice",
+    "<p>The tomb is falling: they can carry one thing out. The gold, the library, or the god's water back to the pool.</p>",
+    "Narrate the escape; just ask what they carry."
+   ]
+  ]
  }
 }

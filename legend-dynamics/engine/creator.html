@@ -946,6 +946,7 @@ tr.lvl-U td.target { color: var(--muted); }
     <div class="panel hud no-print" id="gm-table"></div>
     <div class="card hud no-print" id="hb-card"></div>
     <div class="card hud no-print" id="cp-card"></div>
+    <div class="card hud no-print" id="pt-card" hidden></div>
     <div class="gm-top">
       <div class="card hud no-print">
         <h3>Characters</h3>
@@ -2977,6 +2978,7 @@ tr.lvl-U td.target { color: var(--muted); }
   /* HOMEBREW */
   /* CAMPAIGN */
   /* FRONTIER */
+  /* PLAYTEST */
   // The shared table: players join from their play tab, the GM starts one here, and every roll at the table shows on both.
   sharedTable = mountTable({ playRoot: $("card-table"), gmRoot: $("gm-table"), key: PACK.id, game: PACK.id, playTab: T.tabPlay, pointName: T.point, partyName: T.party,
     server: TABLE_SERVER, character: () => ch.name, esc, toast,
@@ -3864,6 +3866,8 @@ tr.lvl-U td.target { color: var(--muted); }
   // Homebrew: the GM makes it in the GM view; players get it from a file or when they join the GM's shared table.
   homebrewUI = mountHomebrew({ PACK, gmRoot: $("hb-card"), noteRoot: $("hb-note"), fileRoot: $("hb-file"), ritualRoot: $("hb-rituals"), heartInput: $("f-ma-heart"), esc, toast, saveText });
   // The campaign builder: the GM's campaign in the GM view; what they share reaches players through the shared table.
+  // The playtest kit (playtest.js): a setting's first adventure, run as a three-hour playtest.
+  if (PACK.playtest) { $("pt-card").hidden = false; mountPlaytest({ kit: PACK.playtest, root: $("pt-card"), esc, storeKey: PACK.id + ".playtest", toast: gmSay }); }
   // The crew's ship and the setting's tables (frontier.js), for a setting with them.
   if (PACK.crewShip) { $("crewship-card").hidden = false;
     crewShipUI = mountCrewShip({ PACK, root: $("crewship-card"), esc, toast: gmSay, onChange: () => { renderCrewShipView(); pushScene(); } }); renderCrewShipView(); }
@@ -3901,7 +3905,8 @@ tr.lvl-U td.target { color: var(--muted); }
 
   // ---- the GM view: one group of panels at a time ----
   const GM_GROUPS = [["table", "Table and characters", ["#gm-table", ".gm-top", "#gm-grid"]], ["fight", "Map and fight", [".bm-card", "#lab"]],
-    ...(DISC ? [["discovery", `Discovery: ${capFirst(DISC.cards)}`, ["#disc-card", "#files-card"]]] : []), ["tools", "Clocks and tools", [".gm-tools", ...(DISC ? [] : ["#files-card"])]], ["campaign", "Campaign", ["#cp-card"]], ["homebrew", "Homebrew", ["#hb-card"]]];
+    ...(DISC ? [["discovery", `Discovery: ${capFirst(DISC.cards)}`, ["#disc-card", "#files-card"]]] : []), ["tools", "Clocks and tools", [".gm-tools", ...(DISC ? [] : ["#files-card"])]], ["campaign", "Campaign", ["#cp-card"]], ["homebrew", "Homebrew", ["#hb-card"]],
+    ...(PACK.playtest ? [["playtest", "Playtest", ["#pt-card"]]] : [])];
   for (const [id, , sels] of GM_GROUPS) for (const q of sels) { const el = document.querySelector("#view-gm " + q); if (el) el.dataset.gmpane = id; }
   $("gm-tabs").innerHTML = GM_GROUPS.map(([id, name]) => `<button type="button" class="tab" role="tab" data-gmtab="${id}">${esc(name)}</button>`).join("");
   function showGmTab(id) {

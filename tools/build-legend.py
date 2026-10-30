@@ -703,6 +703,7 @@ def build(pid, docx):
     tpl = tpl.replace("/* HOMEBREW */", (ENGINE / "homebrew.js").read_text().replace("</", "<\\/"))
     tpl = tpl.replace("/* CAMPAIGN */", (ENGINE / "campaign.js").read_text().replace("</", "<\\/"))
     tpl = tpl.replace("/* FRONTIER */", (ENGINE / "frontier.js").read_text().replace("</", "<\\/"))
+    tpl = tpl.replace("/* PLAYTEST */", (ENGINE / "playtest.js").read_text().replace("</", "<\\/"))
     tpl = tpl.replace("{{TABLE_SERVER}}", table_server())
     tpl = tpl.replace("{{OUTCOMES}}", "".join(f"<option>{html.escape(o)}</option>" for o in pack["journal"]["outcomes"]))
     tpl = re.sub(r"\{\{theme\.(\w+)\}\}", lambda m: str(theme[m.group(1)]), tpl)
