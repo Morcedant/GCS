@@ -2,7 +2,8 @@
 // (legend-dynamics/table-server/src/blog.js). Three uses, picked by what the page holds:
 //   #ld-blog         /blog/: the posts, a tag filter, and one post at /blog/?p=<id>
 //   #ld-blog-latest  the home page: the newest three
-//   #ld-blog-write   /blog/write/: the author's page, behind the DEV code
+//   #ld-blog-write   /blog/write/: the author's page, behind the DEV code (posts, and the playtest feedback)
+//   #ld-playtest     /playtest/: the playtest feedback form; anyone sends it, only an author reads it
 (function () {
   "use strict";
   var SERVER = document.documentElement.dataset.blogServer || "";
@@ -120,14 +121,45 @@
       root.innerHTML = '<div class="ld-actions"><button class="ld-button" id="ld-w-new">New post</button><button class="ld-button ld-button--ghost" id="ld-w-out">Sign out</button></div>' +
         '<p class="ld-note" id="ld-w-status">' + esc(msg || "") + "</p>" +
         (posts.some(function (p) { return p.draft; }) ? '<p class="ld-note">Drafts are only seen here. Open one and press <b>Publish</b> to put it on the <a href="/blog/">Dev blog</a> for everyone.</p>' : "") +
+        '<p class="ld-note"><button type="button" class="ld-button ld-button--ghost" id="ld-w-fb">Playtest feedback</button></p>' +
         (posts.length ? '<ul class="ld-w-list">' + posts.map(function (p) {
           return '<li><button type="button" data-id="' + esc(p.id) + '"><b>' + esc(p.title) + "</b><span>" + (p.draft ? "Draft · " : "") + esc(day(p.published || p.updated)) + "</span></button></li>";
         }).join("") + "</ul>" : "<p>No posts yet. Start with <b>New post</b>.</p>");
       $("ld-w-new").onclick = function () { edit({ title: "", body: "", tags: [], draft: true }); };
       $("ld-w-out").onclick = function () { store.set(""); code = ""; login("Signed out."); };
+      $("ld-w-fb").onclick = function () { feedback(); };
       root.querySelectorAll("[data-id]").forEach(function (b) {
         b.onclick = function () { say("Opening…"); admin("get", { id: b.dataset.id }).then(function (j) { edit(j.post); }).catch(function (e) { say(e.message, true); }); };
       });
+    }
+    // The playtest feedback players sent from /playtest/, newest first: read it, copy it all, or delete one.
+    var fbText = function (f) {
+      return [day(f.at) + (f.game ? " · " + f.game : "") + (f.role ? " · played " + f.role : ""), f.rating ? "Fun: " + f.rating + " of 5" : "", f.again ? "Play again: " + f.again : "",
+        f.confusing ? "Confusing: " + f.confusing : "", f.unused ? "Never used: " + f.unused : "", f.best ? "Best moment: " + f.best : "", f.other ? "Anything else: " + f.other : "",
+        f.name || f.contact ? "From: " + [f.name, f.contact].filter(Boolean).join(", ") : ""].filter(Boolean).join("\n");
+    };
+    function feedback(msg) {
+      root.innerHTML = '<p class="ld-note">Loading the feedback…</p>';
+      api("/api/feedback/admin", { access: code, action: "list" }).then(function (j) {
+        var all = j.feedback || [];
+        var avg = all.filter(function (f) { return f.rating; }), again = all.filter(function (f) { return f.again === "Yes"; }).length;
+        root.innerHTML = '<div class="ld-actions"><button class="ld-button ld-button--ghost" id="ld-w-back">Back to the posts</button>' + (all.length ? '<button class="ld-button ld-button--ghost" id="ld-w-copy">Copy it all</button>' : "") + "</div>" +
+          '<p class="ld-note" id="ld-w-status">' + esc(msg || (all.length ? all.length + " response" + (all.length > 1 ? "s" : "") + (avg.length ? " · fun " + (avg.reduce(function (t, f) { return t + f.rating; }, 0) / avg.length).toFixed(1) + " of 5" : "") + " · " + again + " would play again" : "No feedback yet. Players send it from the Playtest page.")) + "</p>" +
+          (all.length ? '<ul class="ld-w-list">' + all.map(function (f) {
+            return '<li class="ld-fb"><pre>' + esc(fbText(f)) + '</pre><button type="button" class="ld-button ld-button--ghost" data-fbdel="' + esc(f.id) + '">Delete</button></li>';
+          }).join("") + "</ul>" : "");
+        $("ld-w-back").onclick = function () { list(); };
+        if ($("ld-w-copy")) $("ld-w-copy").onclick = function () {
+          var t = all.map(fbText).join("\n\n---\n\n"), done = function (ok) { say(ok ? "Copied." : "Copying is blocked here: select the text and copy it.", !ok); };
+          if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { done(true); }, function () { done(false); }); else done(false);
+        };
+        root.querySelectorAll("[data-fbdel]").forEach(function (b) {
+          b.onclick = function () {
+            if (b.dataset.armed !== "1") { b.dataset.armed = "1"; b.textContent = "Tap again to delete"; return; }
+            api("/api/feedback/admin", { access: code, action: "delete", id: b.dataset.fbdel }).then(function () { feedback("Deleted."); }).catch(function (e) { say(e.message, true); });
+          };
+        });
+      }).catch(function (e) { root.innerHTML = "<p>" + esc(e.message) + "</p>"; });
     }
     function edit(p) {
       cur = p;
@@ -196,6 +228,30 @@
     admin("list").then(function (j) { tags = j.tags; posts = j.posts; list(); }).catch(function (e) { store.set(""); code = ""; login(e.message); });
   }
 
+  // The playtest feedback form (/playtest/): sent to the table server; only an author can read it.
+  function playtest(form) {
+    var say = function (msg, bad) { var st = $("ld-pt-status"); st.textContent = msg; st.className = "ld-note ld-wide" + (bad ? " ld-bad" : ""); };
+    form.onsubmit = function (ev) {
+      ev.preventDefault();
+      var v = function (n) { var el = form.elements[n]; return el ? el.value : ""; };
+      var rating = form.querySelector('input[name="rating"]:checked'), again = form.querySelector('input[name="again"]:checked');
+      var f = { game: v("game"), role: v("role"), rating: rating ? +rating.value : null, again: again ? again.value : "", confusing: v("confusing"), unused: v("unused"), best: v("best"), other: v("other"), name: v("name"), contact: v("contact") };
+      if (!f.rating && !f.again && !f.confusing.trim() && !f.unused.trim() && !f.best.trim() && !f.other.trim()) { say("Answer at least one question first.", true); return; }
+      var btn = form.querySelector("button[type=submit]"); btn.disabled = true; say("Sending…");
+      api("/api/feedback", { feedback: f, website: v("website") }).then(function () {
+        form.innerHTML = '<p class="ld-wide"><b>Thank you!</b> Your answers are in. They go straight into the next version of the rules.</p>';
+      }).catch(function (e) {
+        // The server couldn't take it (an old server, or no connection): the answers aren't lost, they can go by email.
+        btn.disabled = false;
+        var lines = [f.game, f.role && "Played: " + f.role, f.rating && "Fun: " + f.rating + " of 5", f.again && "Play again: " + f.again, f.confusing && "Confusing: " + f.confusing,
+          f.unused && "Never used: " + f.unused, f.best && "Best moment: " + f.best, f.other && "Anything else: " + f.other, (f.name || f.contact) && "From: " + [f.name, f.contact].filter(Boolean).join(", ")].filter(Boolean).join("\n");
+        say(/too many|an hour|at least one/i.test(e.message) ? e.message : "Your answers couldn't be sent just now. Copy them below and email them to contact@legenddynamicsrpg.com, or try again later.", true);
+        if (!/too many|an hour|at least one/i.test(e.message) && !$("ld-pt-copy")) $("ld-pt-status").insertAdjacentHTML("afterend", '<textarea class="ld-wide" id="ld-pt-copy" readonly>' + esc(lines) + "</textarea>");
+      });
+    };
+  }
+
+  if ($("ld-playtest")) playtest($("ld-playtest"));
   if ($("ld-blog")) blogPage($("ld-blog"));
   if ($("ld-blog-latest")) latest($("ld-blog-latest"));
   if ($("ld-blog-write")) writePage($("ld-blog-write"));

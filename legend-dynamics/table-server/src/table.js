@@ -53,7 +53,7 @@ export class Table {
   /** @param {Request} req */
   async fetch(req) {
     const path = new URL(req.url).pathname;
-    if (path.startsWith("/blog/")) return blogFetch(this.ctx.storage, req); // the dev blog's own object (blog.js): never a table
+    if (path.startsWith("/blog/") || path.startsWith("/feedback/")) return blogFetch(this.ctx.storage, req); // the dev blog's own object (blog.js): never a table
     if (path === "/init") {
       if (this.table) return Response.json({ error: "exists" }, { status: 409 });
       const b = /** @type {any} */ (await req.json());

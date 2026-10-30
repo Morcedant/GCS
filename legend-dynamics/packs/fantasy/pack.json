@@ -3333,9 +3333,16 @@
  "gmGuide": {
   "title": "The Shattered Crown GM's Guide",
   "subtitle": "Running sword and sorcery: ventures, threats and the GM's tools",
-  "intro": "This book is for whoever runs the game. It gathers what the GM reaches for at the table: venture seeds, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.",
+  "intro": "This book is for whoever runs the game. It opens with a first adventure, ready to run, and gathers what the GM reaches for at the table: venture seeds, the threats with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.",
   "playersNote": "The material for running the game (venture seeds, the threats, and the GM's tools) is in a companion book, the **GM's Guide**.",
   "chapters": [
+   {
+    "title": "Your first venture",
+    "intro": "A ready-to-run venture to start a campaign with. Everything it needs is here, and the pregenerated characters in the creator are written into it.",
+    "take": [
+     "## The first venture: The Thirsting Well"
+    ]
+   },
    {
     "title": "Running ventures",
     "take": [

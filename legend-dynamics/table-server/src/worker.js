@@ -10,6 +10,8 @@
  *   GET  /api/blog?tag=            → { posts, tags }        the dev blog's published posts, newest first (blog.js)
  *   GET  /api/blog/ID              → { post }               one post
  *   POST /api/blog/admin           { access, action: "list" | "get" | "save" | "delete", id?, post? }   an author only (the DEV secret)
+ *   POST /api/feedback             { feedback }            → { ok }  playtest feedback from the site, from anyone (a few an hour each)
+ *   POST /api/feedback/admin       { access, action: "list" | "delete", id? }   an author only: read it, or delete one
  *
  * ALLOWED_ORIGINS (a var in wrangler.toml) lists the sites whose pages may connect, comma-separated, or "*".
  * GM_CODES (a secret, set in the Cloudflare dashboard) lists the GMs who may start tables: "Name: code", one per line
@@ -108,6 +110,24 @@ export default {
       const one = url.pathname.match(/^\/api\/blog\/([a-z0-9-]{1,80})$/);
       if (one && req.method === "GET") return pass(`/blog/get?id=${one[1]}`);
       return json({ error: "Not found." }, 404, h);
+    }
+
+    // Playtest feedback: anyone sends it; an author (the DEV secret) reads it.
+    if ((url.pathname === "/api/feedback" || url.pathname === "/api/feedback/admin") && req.method === "POST") {
+      const stub = env.TABLES.get(env.TABLES.idFromName(BLOG_NAME)), pass = async (/** @type {string} */ p, /** @type {any} */ init) => {
+        const r = await stub.fetch("https://table" + p, init); return json(await r.json(), r.status, { ...h, "Cache-Control": "no-store" }); };
+      /** @type {any} */ let body = {};
+      try { body = await req.json(); } catch { /* refused below */ }
+      if (url.pathname === "/api/feedback") {
+        if (body.website) return json({ ok: true }, 200, h); // the form's hidden field: only a robot fills it in
+        const sender = await hashKey(String(req.headers.get("CF-Connecting-IP") || "") + "|feedback");
+        return pass("/feedback/add", { method: "POST", body: JSON.stringify({ feedback: body.feedback, sender }) });
+      }
+      const author = await blogAuthor(env, body.access);
+      if (!author) return json({ error: body.access ? "That code can't read the feedback." : "Reading the feedback needs the author's code.", access: true }, 401, h);
+      if (body.action === "list") return pass("/feedback/list");
+      if (body.action === "delete") return pass("/feedback/delete", { method: "POST", body: JSON.stringify({ id: body.id }) });
+      return json({ error: "Unknown action." }, 400, h);
     }
 
     const m = url.pathname.match(/^\/api\/tables\/([^/]+)(\/ws)?$/);

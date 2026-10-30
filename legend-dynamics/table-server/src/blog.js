@@ -48,6 +48,27 @@ export const summary = (body) => {
   return plain.length > 220 ? plain.slice(0, 217).replace(/\s+\S*$/, "") + "…" : plain;
 };
 
+// ---- Playtest feedback: anyone sends it from the site's Playtest page; only an author reads it ----
+// Kept in the same object as "fb:<id>". Each answer is short text; a sender (by a hash of their address, never the
+// address) can send a few an hour, and the store keeps the newest FEEDBACK.max.
+export const FEEDBACK = { max: 2000, text: 2000, short: 120, perHour: 6 };
+export const FEEDBACK_GAMES = ["Trails of Blood & Dust", "Fracture Lines", "The Shattered Crown", "Aurora", "USS Pelion", "Grimm", "Something else"]; // the last two from the private fan-games site
+export const FEEDBACK_AGAIN = ["Yes", "Maybe", "No"];
+/**
+ * Feedback as a player sent it, checked; null when it says nothing.
+ * @param {any} f @param {number} now @param {string} rand a few random characters for the id
+ */
+export function cleanFeedback(f, now, rand) {
+  const b = f && typeof f === "object" ? f : {}, line = (/** @type {any} */ v) => text(v, FEEDBACK.short).replace(/\s+/g, " ").trim();
+  const long = (/** @type {any} */ v) => text(v, FEEDBACK.text).trim();
+  const out = { id: `${new Date(now).toISOString().slice(0, 10)}-${String(rand).replace(/[^a-z0-9]/g, "").slice(0, 8) || "x"}`, at: now,
+    game: FEEDBACK_GAMES.includes(b.game) ? b.game : "", role: line(b.role), rating: Number.isInteger(b.rating) && b.rating >= 1 && b.rating <= 5 ? b.rating : null,
+    again: FEEDBACK_AGAIN.includes(b.again) ? b.again : "", confusing: long(b.confusing), unused: long(b.unused), best: long(b.best), other: long(b.other),
+    name: line(b.name), contact: line(b.contact) };
+  return out.rating || out.again || out.confusing || out.unused || out.best || out.other ? out : null;
+}
+export const validFeedbackId = (/** @type {any} */ id) => typeof id === "string" && /^\d{4}-\d{2}-\d{2}-[a-z0-9]{1,8}$/.test(id);
+
 /**
  * The blog's own requests, inside its Durable Object. The worker checks the author before passing a write on.
  *   GET  /blog/list?tag=&drafts=1   GET /blog/get?id=   POST /blog/save { post, author }   POST /blog/delete { id }
@@ -79,6 +100,31 @@ export async function blogFetch(storage, req) {
     const b = /** @type {any} */ (await req.json());
     if (!validId(b.id)) return Response.json({ error: "There's no post here." }, { status: 404 });
     await storage.delete("post:" + b.id);
+    return Response.json({ ok: true });
+  }
+  // Feedback: POST /feedback/add { feedback, sender } (sender: a hash, for the hourly limit), GET /feedback/list,
+  // POST /feedback/delete { id }. The worker checks the author before list and delete.
+  if (path === "/feedback/add" && req.method === "POST") {
+    const b = /** @type {any} */ (await req.json()), now = Date.now();
+    const f = cleanFeedback(b.feedback, now, Math.random().toString(36).slice(2, 10));
+    if (!f) return Response.json({ error: "Answer at least one question before you send it." }, { status: 400 });
+    const rk = "fbrate:" + String(b.sender || "").slice(0, 64), rate = /** @type {any} */ (await storage.get(rk)) || { since: now, n: 0 };
+    if (now - rate.since > 3_600_000) { rate.since = now; rate.n = 0; }
+    if (rate.n >= FEEDBACK.perHour) return Response.json({ error: "That's a lot of feedback at once: try again in an hour." }, { status: 429 });
+    rate.n++; await storage.put(rk, rate);
+    const have = [...(await storage.list({ prefix: "fb:" })).keys()].sort();
+    if (have.length >= FEEDBACK.max) await storage.delete(have.slice(0, have.length - FEEDBACK.max + 1)); // the oldest go first
+    await storage.put("fb:" + f.at + ":" + f.id, f);
+    return Response.json({ ok: true });
+  }
+  if (path === "/feedback/list") {
+    const list = [...(await storage.list({ prefix: "fb:" })).values()].sort((x, y) => y.at - x.at);
+    return Response.json({ feedback: list });
+  }
+  if (path === "/feedback/delete" && req.method === "POST") {
+    const b = /** @type {any} */ (await req.json());
+    if (!validFeedbackId(b.id)) return Response.json({ error: "There's no feedback here." }, { status: 404 });
+    for (const [k, v] of await storage.list({ prefix: "fb:" })) if (/** @type {any} */ (v).id === b.id) await storage.delete(k);
     return Response.json({ ok: true });
   }
   return Response.json({ error: "Not found." }, { status: 404 });

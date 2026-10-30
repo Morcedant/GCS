@@ -170,6 +170,47 @@ The empire is gone, but its bones are everywhere: roads no one repairs, aqueduct
 - **The Iron Company and its rivals.** Mercenary companies who decide most wars, for a price.
 - **The Thieves' Guild.** Every city has one; they don't all get along.
 
+## The first venture: The Thirsting Well
+
+A starter venture for three to seven, for one or two sessions. A tomb in the Burning Sands, a merchant princess's gold, a dying god's last well, and something old waking under it. It shows off the desert road and Hunger, the Doom track and a tale, sorcery and its corruption, and a hard choice at the end. It's written for the seven pregenerated characters, and works with any.
+
+**The hook.** In the caravan city of Qasreth, the merchant princess **Ysolde Varr** is hiring: there's a serpent-king tomb under the oasis of Ain Haddu, three days into the sands, and she'll pay 200 gold crowns a head to anyone who brings her its treasure. Everyone in Qasreth knows the oasis is drying up. Give each of them a reason of their own:
+
+- **Oren Sael**: Ain Haddu is the last well of Haddu, his god. The water has been going down for a month, and the flame at his shrine with it.
+- **Ithrann**: the tomb is Ssa'kethi. The drowned temple's lost library could be inside.
+- **Vessa Thorn**: the tomb's upper door is sealed sixty feet up a sheer wall, and she's the only one who can reach it.
+- **Gorrum Ironjaw**: Ysolde hired the Iron Company to guard the dig, and Gorrum's squad drew the job.
+- **Mira Saltwind**: Ysolde holds her crew's debts. Bring back the gold, and they're paid.
+- **Nyx**: the oasis tribes are sick, and a hedge-witch can sell cures to people who can't go anywhere else.
+- **Cinder**: the Ash Guild has sent someone after the same tomb. Cinder knows the style.
+
+**What's really happening.** Under Ain Haddu sleeps **Ssethra**, a serpent-priest of the old kings, bound there when the serpent kings fell. A month ago, grave robbers broke the outer seal, and Ssethra began to wake. It's drinking the oasis dry from below, and every day it drinks, it grows stronger. When the well runs dry, Ssethra wakes fully, the tomb-dead rise with it, and Haddu dies. Ysolde Varr knows the tomb is guarded by something; she hasn't said so.
+
+**1. Qasreth.** Ysolde receives them on her barge, under silk awnings. She pays half in advance. A Read People roll sees she's afraid of the tomb, not of the competition. Her captain, a **Sellsword captain** named Dask, is coming too, and Dask has his own orders.
+
+**2. The road.** Three days across the Burning Sands. Each day, someone rolls Survival; on a failure, Hunger marks a box (short rations, a bad well, a sandstorm). On the second night, a **Cultist** band of the Burning God tries to take Ithrann and Nyx: sorcerers, they say, and the tomb should be burned with them inside. This fight can be short; it's a chance to learn the rules.
+
+**3. Ain Haddu.** A few palms, a shrinking pool, a tribe of herders who won't go near the water after dark, and Oren's god's shrine, its flame almost out. The herders say the water hisses at night. Their dead have been missing from the graves.
+
+**4. Into the tomb.** The upper door, for whoever can climb to it; or the lower one, broken open by the grave robbers, whose bodies are just inside. Start a **tale** about the thing in the tomb (*Tales*, in the Players' Guide), with **Doom** ticking as they dig: it learns their names. The clues, and who finds them best:
+
+- **The carvings** (Lore, or Ithrann reading Ssa'kethi): the priest was bound by its true name, carved over the sealed chamber and chiseled off by the grave robbers.
+- **The grave robbers' bodies** (Healing, Investigation): bitten, poisoned, and dry as old leather. Not a drop of blood in them.
+- **The water** (Survival, or Oren's faith): the pool drains through a crack into the tomb. Haddu's water still carries the god, and the thing drinking it flinches from the god in it.
+- **The library** (Lore): the Ssa'kethi scrolls, intact in a dry room. Among them, the priest's name, in a list of the bound.
+
+When the tale's Identify phase is done, they know what it is: a **serpent-priest**. Filling the clock earns the tale that says how it's beaten: speak its true name, or bind it with Haddu's water.
+
+**5. The hall of kings.** The tomb-dead rise from their niches, two of them and one more for each box of Doom: **Ghouls or tomb-dead**. Fire and daylight drive them back. In the middle of the fight, Dask makes his move: his orders are to take the gold and leave the hirelings inside.
+
+**6. Ssethra.** In the drowned chamber, half-awake in the water it stole, the serpent-priest commands the snakes in the walls and speaks with the voice of the well. Sorcery against it pulls at the caster: every spell cast in its chamber is at risk of corruption. Its true name, spoken by someone who read it, makes it roll Will or be bound for a round; Haddu's water burns it like fire.
+
+**7. The choice.** The tomb is coming down as the bound thing thrashes. They can carry one thing out: Ysolde's gold (the debts paid), the Ssa'kethi library (Ithrann's life's work), or the god's water, carried back to the pool before it's gone (Haddu lives, and Oren's flame burns again).
+
+**Rewards.** 200 gold crowns a head, if they bring the gold, and Debt clears a box. A tale on serpent-priests. If Haddu lives, Oren's god owes them a blessing, and the herders' tribe their lives. If they left Dask alive, Infamy marks a box: he'll talk. If Ssethra was only bound, not destroyed, Doom keeps one box: something remembers their names.
+
+**Threats.** Cultist ×4 (one blessed); Sellsword captain (Dask) and two Guardsmen or bandits; Ghoul or tomb-dead ×2 or more; Serpent-priest (Ssethra).
+
 # Threats
 
 Opponents use the same rules as the characters. **Minor opponents** (guards, bandits, cultists) have **one box**: any hit that gets through takes them out of the fight.

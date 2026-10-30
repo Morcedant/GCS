@@ -576,6 +576,45 @@ Ages are as of 2025. Each comes with a stat block, and each is in the GM view's 
 
 *Class VI.* **Attacks** Powers 17 (will made force, Class VI). **Dodge** 12 (a second defense each round). **Boxes** 8. **Defense** V (Force Field). **Powers** Telekinesis VI, Force Field V, Portals V (the 2012 breach), Flight IV, Mind Control III (his fanatics). **Skills** Leadership 17, Deception 15, Occult 14, Persuasion 15. **Master of the White Hand.** Never met alone: White Hand soldiers die for him without a word. He has escaped ExLAW three times; he always has a door open behind him.
 
+## The first case: Static on the Line
+
+A starter case for three to seven, for one or two sessions. A teenager wakes up an Operant in the middle of a Chicago blackout, and everyone wants her: ExLAW, the cameras, and the lab that made her. It shows off the law and its tracks, a dossier and the Escalation clock, secret identities and Exposure, a team-up, and the files a villain keeps on a hero. It's written for the seven pregenerated characters, and works with any.
+
+**The hook.** At 9:40 on a Tuesday night, half of Pilsen goes dark. Transformers blow down a six-block line, a CTA train stops dead on the Pink Line, and a 911 caller says a girl is "made of lightning" on the Eighteenth Street bridge. Give each of them a reason to be there:
+
+- **Rachel Kwan** catches the case: an unregistered Operant event, Class unknown. ExLAW Chicago wants the subject brought in before anyone gets hurt.
+- **Luis "Bulldog" Ortega** flies cover. His AS-6's sensors light up with a signature they've never logged before, and his new firmware flags it.
+- **Naomi Price (Daybreak)**: her sponsor's producers are already rolling. A live rescue would be the best ratings of the year.
+- **Dr. Tobias Wren**: Kwan calls him in, because the readings look like the auroras of 1938.
+- **Jess Calloway** hears it on the police scanner and is there before the cordon.
+- **Subject 19, "Static"**: the girl's power feels like their own. Static knows what that means: the Foundation made her.
+- **Maeve Ashgrove** is working off her deal at Kwan's side, and the Foundation's people move like Morcain vault guards. Maeve knows the type.
+
+**What's really happening.** The girl is **Lupe Herrera**, fifteen, from Pilsen. Three weeks ago she spent a night in a "free health screening" van, and woke up with a headache and a puncture mark. The Foundation dosed her and let her go on purpose. She's bait: their file on Static says Subject 19 always comes for the young ones. Their troubleshooter, **Sergei Grachyov**, is waiting for Static to show.
+
+**1. The bridge.** Lupe is terrified, sparking, and every time someone shouts, the power gets worse. Start a **dossier** on her power (*Dossiers*, in the Players' Guide), with the **Escalation** clock: each time it fills, her power's next surge is bigger. A blown transformer becomes a stalled train full of commuters, and the train becomes a fire. Talking works better than force: Persuasion, Read People, or Static showing their own sparks. Force marks **Collateral**.
+
+**2. The cameras.** Daybreak's producers want the rescue live, and the shot. Jess wants the real story. Every time an Operant uses a power on camera, the GM asks: does this mark Backlash? An Operant with a secret identity who uses powers in front of the cameras risks their **Exposure**: Static especially. Kwan has a cordon to hold.
+
+**3. The dossier.** The clues, and who finds them best:
+
+- **Lupe herself** (Read People, Persuasion): the health screening van, the headache, the mark on her neck.
+- **The mark** (Medicine, Science, or Occult for Dr. Wren): a subdermal tag, still transmitting.
+- **The power grid** (Science, Computers): her surges match a pattern. They're being triggered from outside, by the tag.
+- **Static's memory** (Will, at the GM's call): the van. Static has seen one before, from inside.
+
+When the Identify phase is done, they know what her power is and why it's out of control. The tag is the trigger; take it out and she calms down.
+
+**4. The retrieval.** A **Foundation retrieval team** hits the bridge: four of them, in unmarked gear, with a jammer that blinds the Aegis suit's sensors. They want Lupe alive and no witnesses. This is the big fight, and a good place for a **team-up**: Bulldog's suit and Static's lightning, or Daybreak and anyone. The Foundation's file on Static gives the team +2 against them when it applies: they know Static's habits.
+
+**5. Grachyov.** When the team breaks, **Sergei Grachyov** walks out of the dark, unhurried. He isn't here to fight. He offers a trade: Static for the girl. Hand Static over and he leaves, and Lupe is free. Refuse, and he shrugs, and goes; the Foundation will try again. He's Class V: nobody should try to arrest him tonight.
+
+**6. The choice.** Lupe needs somewhere to go. ExLAW custody means registration, a legal status and a Raster file; her family will know where she is. Daybreak's sponsor offers a clinic and a contract. Static's underground can hide her, and she'll never go home. And Jess has the story of the year: the Foundation is dosing kids in Chicago. Running it marks **Scrutiny** for everyone in it; burying it means the Foundation keeps doing it.
+
+**Rewards.** A dossier on Lupe's power, and a first look at the Foundation's tags. Lupe's thanks, and her family's. If Collateral stayed clear, ExLAW Chicago remembers it. If the story runs, Backlash or Scrutiny marks a box, and the Foundation's file on Static gets a new line.
+
+**Threats.** Lab escapee (Lupe, if it comes to it: she's Unstable); Foundation retrieval team ×4; Sergei Grachyov (Class V), who talks, not fights.
+
 # Threats
 
 Opponents use the same rules as the characters. **Minor opponents** have **one box**: any hit that gets through takes them out of the fight. **Defense** works as for characters.

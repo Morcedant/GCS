@@ -3,7 +3,51 @@ title: "USS Pelion GM's Guide"
 subtitle: "Running the campaign: missions, threats, enemy ships and the GM's tools"
 ---
 
-This book is for whoever runs the game. It gathers what the GM reaches for at the table: mission seeds, the threats and enemy ships with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.
+This book is for whoever runs the game. It opens with a first adventure, ready to run, and gathers what the GM reaches for at the table: mission seeds, the threats and enemy ships with their numbers, and how to use the GM view's battle map and Encounter panel. The rules themselves are in the **Players' Guide**; this book builds on them.
+
+# Your first mission
+
+A ready-to-run mission to start a campaign with. Everything it needs is here, and the ready-made crew in the creator is written into it.
+
+## The first mission: The Silence at Corvan II
+
+A starter mission for three to six, for one or two sessions. A Federation outpost that stopped answering, a people who have never seen the stars, Orion pirates in orbit, and an ancient machine that has decided who the threat is. It shows off the ship and its Power, an away team, a library record and a Countdown, and the Prime Directive with Starfleet Command watching. It's written for the six ready-made crew, and works with any.
+
+**The hook.** The captain is at a starbase conference, and Commander sh'Vari has the conn when the orders come in: the Federation research outpost on **Corvan II**, eight archaeologists studying the ruins of an extinct civilization, has missed three check-ins. Corvan II has a native people, the **Ketari**, at a bronze-age level: the outpost works under the Prime Directive, behind a duck blind. An Orion raider was reported in the sector last week. Give each of the crew a reason of their own:
+
+- **Thelan sh'Vari**: the first command decision with the captain away, and Starfleet Command will read every word of the log.
+- **Sevek**: the outpost's last report described power readings from the ruins that contradict known physics.
+- **Dr. Vessik**: eight scientists, and the Ketari village two kilometers from the ruins. Civilians, everywhere.
+- **Grath**: the outpost's lead scientist, Dr. Imre Haskel, wrote to Grath for help rigging a "field dampener". Grath never heard what it was for.
+- **Marisol Reyes**: leads the away team's security, and Orions mean phasers.
+- **Rrinn**: Rrinn's sister serves on the outpost's supply run, and her last message ended mid-sentence.
+
+**What's really happening.** The ruins hold a **caretaker machine**, left by the vanished civilization to watch over the Ketari. Dr. Haskel's dampener woke it. It judged the outpost a threat to its charges and put all eight scientists into stasis, unharmed, deep in the ruins. Then Orion salvagers came for the machine, and they've been trading phasers to a Ketari chieftain for help digging. The machine sees the Orions as a threat too, and now the Pelion: when the ship scans the ruins, the machine starts pulling power from orbit.
+
+**1. Arrival.** The Orion raider is in orbit, on the far side of the moon. It hails first: they're "legitimate salvagers", and this is unclaimed space. Run a few exchanges of ship combat if the crew wants it (*The USS Pelion*, in the Players' Guide), or let them bluff, scan or warn it off. The raider runs once its Shields are down.
+
+**2. The pull.** The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power. The Pelion has 1 less Power each exchange, and its orbit begins to decay. Start a **Countdown** of 6: when it fills, the Pelion has to break orbit, leaving whoever is on the surface behind. Grath can buy time: an Engineering roll clears a segment once.
+
+**3. The outpost.** The away team beams into an empty outpost. Start a **library record** on the thing in the ruins (*Library records*, in the Players' Guide). The clues, and who finds them best:
+
+- **The outpost logs** (Computers): Haskel's dampener test, then a power spike, then nothing.
+- **The empty bunks** (Medicine, Sensors): no blood, no struggle; personal effects untouched. The scientists walked out.
+- **The ruins' energy** (Physical Sciences, Sensors): a field that reads the away team's biology and records it. It knows them now.
+- **The village** (Psychology, Stealth from the duck blind): Ketari carrying Orion phasers. The chieftain's people are digging at the ruins at night.
+
+When the Identify phase is done, the crew knows what it is: a caretaker, not a weapon. Filling the clock earns the record of what it is and how it can be reasoned with.
+
+**4. The Ketari.** The chieftain's warriors have phasers and no idea what they are. Contact breaks the Prime Directive; doing nothing leaves a bronze-age war with energy weapons. Every contact the crew makes, open or disguised, marks the **Starfleet Command** track unless they're very careful. Reyes's complication will come up; so will Vessik's.
+
+**5. The Orions.** In the ruins, three **Orion pirates** are cutting their way to the machine's core. This is the big fight. Phasers on stun keep the record clean; a kill marks Starfleet Command.
+
+**6. The caretaker.** The machine speaks through a **Rogue android** shell: courteous, absolute. It will protect the Ketari from everything off-world, Federation included. A Diplomacy or Psychology contest that presents a paradox (protecting them from all outsiders while it is an outsider itself) stuns it for the scene: Sevek's moment. Or the crew can talk to it, as equals.
+
+**7. The choice.** With the Countdown running out: shut the machine down (the scientists wake, and the Ketari lose their protector), convince it to release the scientists and let it go on watching, or leave it alone and get the Orion phasers out of the village before they change Ketari history. Rrinn's sister is among the sleepers.
+
+**Rewards.** Eight scientists home safe. A library record on the caretaker. If the Ketari never learned what the crew were, Starfleet Command clears a box; if they did, it marks one, and an admiral wants a full account. Rrinn finally hears the end of that message.
+
+**Threats.** Orion raider (*Enemy ships*); Orion pirate ×3; Rogue android (the caretaker's shell); Ketari warriors as Security guards (minor), armed with stolen disruptors.
 
 # Running missions
 
