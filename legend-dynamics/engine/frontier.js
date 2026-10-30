@@ -14,6 +14,14 @@
 // mountTrail(api) with api: { PACK, root, esc, crew(), skillOf(c, skill) (a character's target), addClock(name, size)
 //   (returns its id), clockOf(id) ({ filled, size } or null), fillClock(id, n), toast(m, err) }
 // wantedClean(raw) checks a poster from a file; wantedHTML(w, esc, PACK) draws one (the GM view and the sheet).
+//
+// Two more for any setting that has them:
+// The crew's ship (PACK.crewShip: types, quirks): its name, its type (an edge and a catch) and a quirk (an upside, and
+// trouble that earns a point like a complication). The GM keeps it; the shared table shows it on players' play tabs.
+// mountCrewShip(api) with api: { PACK, root, esc, onChange() (the shared part changed) } returns
+// { snapshot(), html(ship) }; crewShipClean(raw) checks one from a file or the table.
+// Tables (PACK.generators: [{ id, title, intro, button, parts: [[label, [entries]]] }]): roll every part, re-roll any,
+// copy the result. mountGenerators(api) with api: { PACK, root, esc, toast }.
 // Function declarations only.
 
 function wantedClean(raw) {
@@ -145,6 +153,85 @@ function mountTrail(api) {
     if (id === "tr-rest") { ride.supplies = Math.max(0, ride.supplies - 1); ride.push = false; keep(); last = "A day's rest: the horses recover, and a day's supplies are gone."; render(); return; }
     if (id === "tr-resupply") { ride.supplies = Math.min(30, ride.supplies + (TR.lengths[0][1] + 2)); keep(); last = "Resupplied: water found, game shot, or a store along the way."; render(); return; }
     if (id === "tr-end") { ride = null; keep(); last = null; render(); }
+  });
+  render();
+  return { render };
+}
+
+// ---- the crew's ship ----
+function crewShipClean(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const line = (v, max) => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+  const out = { name: line(raw.name, 60), type: line(raw.type, 40), quirk: line(raw.quirk, 60), notes: line(raw.notes, 300) };
+  return out.name || out.type || out.quirk ? out : null;
+}
+function mountCrewShip(api) {
+  const { PACK, root, esc } = api, CS = PACK.crewShip;
+  if (!CS || !root) return { snapshot: () => null, html: () => "" };
+  const KEY = PACK.id + ".crewship.v1";
+  let ship = null;
+  try { ship = crewShipClean(JSON.parse(localStorage.getItem(KEY) || "null")); } catch {}
+  const keep = () => { try { localStorage.setItem(KEY, JSON.stringify(ship)); } catch {} if (api.onChange) api.onChange(); };
+  const typeOf = (id) => CS.types.find((t) => t[0] === id), quirkOf = (n) => CS.quirks.find((q) => q[0] === n);
+  const pick = (l) => l[Math.floor(Math.random() * l.length)];
+  /** The ship as everyone sees it: name, type with its edge and catch, quirk with its upside and trouble. */
+  function html(sh) {
+    if (!sh) return "";
+    const t = typeOf(sh.type), q = quirkOf(sh.quirk);
+    return `<div class="crew-ship"><b class="cs-name">${esc(sh.name || "The ship")}</b>${t ? `<span class="cs-type">${esc(t[1])}</span>` : ""}
+      ${t ? `<p class="small"><b>Edge:</b> ${esc(t[2])} <b>Catch:</b> ${esc(t[3])}</p>` : ""}
+      ${q ? `<p class="small"><b>${esc(q[0])}.</b> ${esc(q[1])} <b>Trouble:</b> ${esc(q[2])}</p>` : ""}
+      ${sh.notes ? `<p class="small muted">${esc(sh.notes)}</p>` : ""}</div>`;
+  }
+  function render() {
+    const sh = ship || { name: "", type: "", quirk: "", notes: "" };
+    root.innerHTML = `<h3>${esc(CS.title || "The crew's ship")}</h3><p class="small muted">${esc(CS.intro || "")}</p>
+      <div class="wp-edit">
+        <div class="field"><label for="cs-name">Name</label><input type="text" id="cs-name" maxlength="60" value="${esc(sh.name)}" placeholder="${esc(CS.namePlaceholder || "e.g. Second Chance")}"></div>
+        <div class="field"><label for="cs-type">Type</label><select id="cs-type"><option value="">Choose…</option>${CS.types.map((t) => `<option value="${esc(t[0])}"${t[0] === sh.type ? " selected" : ""}>${esc(t[1])}</option>`).join("")}</select></div>
+        <div class="field"><label for="cs-quirk">Quirk</label><select id="cs-quirk"><option value="">Choose…</option>${CS.quirks.map((q) => `<option${q[0] === sh.quirk ? " selected" : ""}>${esc(q[0])}</option>`).join("")}</select></div>
+        <div class="field"><label for="cs-notes">Notes (optional)</label><input type="text" id="cs-notes" maxlength="300" value="${esc(sh.notes)}" placeholder="Registry, history, who it's owed to"></div>
+      </div>
+      ${html(ship)}
+      <div class="btn-row"><button class="btn" id="cs-roll">Roll a ship</button>${ship ? `<span class="small muted">Saved. Players see it on their play tab through the shared table.</span>` : ""}</div>`;
+  }
+  const read = () => crewShipClean({ name: root.querySelector("#cs-name").value, type: root.querySelector("#cs-type").value, quirk: root.querySelector("#cs-quirk").value, notes: root.querySelector("#cs-notes").value });
+  root.addEventListener("change", (e) => { if (e.target.closest(".wp-edit")) { ship = read(); keep(); render(); } });
+  root.addEventListener("click", (e) => {
+    if (e.target.id !== "cs-roll") return;
+    const cur = read() || {};
+    ship = crewShipClean({ name: cur.name || pick(CS.names || ["Second Chance"]), type: pick(CS.types)[0], quirk: pick(CS.quirks)[0], notes: cur.notes });
+    keep(); render(); if (api.toast) api.toast("A ship rolled: change anything you like.");
+  });
+  render();
+  return { snapshot: () => ship, html };
+}
+
+// ---- tables: roll each part ----
+function mountGenerators(api) {
+  const { PACK, root, esc } = api, G = PACK.generators || [];
+  if (!G.length || !root) return { render() {} };
+  const rolled = {}, pickI = (n) => Math.floor(Math.random() * n);
+  const text = (g) => g.parts.map(([label, list], i) => `${label}: ${list[rolled[g.id][i]]}`).join("\n");
+  function render() {
+    root.innerHTML = `<h3>${esc(PACK.generatorsTitle || "Tables")}</h3>` + G.map((g) => `<div class="gen" data-gen="${esc(g.id)}">
+      <h4>${esc(g.title)}</h4>${g.intro ? `<p class="small muted">${esc(g.intro)}</p>` : ""}
+      ${rolled[g.id] ? `<dl class="seed">${g.parts.map(([label, list], i) => `<div><dt>${esc(label)}</dt><dd>${esc(list[rolled[g.id][i]])}</dd><button data-regen="${i}" aria-label="Re-roll ${esc(label)}" title="Re-roll">↻</button></div>`).join("")}</dl>` : ""}
+      <div class="btn-row"><button class="btn primary" data-roll>${esc(g.button || "Roll")}</button>${rolled[g.id] ? `<button class="btn" data-copygen>Copy</button>` : ""}</div></div>`).join("");
+  }
+  root.addEventListener("click", (e) => {
+    const box = e.target.closest("[data-gen]"); if (!box) return;
+    const g = G.find((x) => x.id === box.dataset.gen); if (!g) return;
+    const re = e.target.closest("[data-regen]");
+    if (e.target.closest("[data-roll]")) rolled[g.id] = g.parts.map(([, list]) => pickI(list.length));
+    else if (re) { const i = +re.dataset.regen, n = g.parts[i][1].length; let v; do { v = pickI(n); } while (n > 1 && v === rolled[g.id][i]); rolled[g.id][i] = v; }
+    else if (e.target.closest("[data-copygen]")) {
+      const t = text(g), p = navigator.clipboard && navigator.clipboard.writeText(t);
+      const done = (ok) => api.toast && api.toast(ok ? "Copied." : "Copying is blocked here; select the text and copy it yourself.", !ok);
+      if (p) p.then(() => done(true), () => done(false)); else done(false);
+      return;
+    } else return;
+    render();
   });
   render();
   return { render };

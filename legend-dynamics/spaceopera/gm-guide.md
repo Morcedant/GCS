@@ -24,13 +24,13 @@ A starter job for three to seven crew, for one or two sessions. A salvage run do
 - **Brakka**: the ship's last port of call was a Hegemony world. Whatever is aboard, the Hegemony will want it.
 - **Sable**: a 140-year-old encrypted core. Nobody else alive can open it.
 
-**What's really happening.** The *Long Patience* isn't dead. Its 312 colonists are asleep in cryo, and its AI, the **Warden**, has kept them alive for 140 years, growing the hull around them like a shell. The corridor has reopened for a few days only; it's drifting closed again. Ves Oro-Lan sold the same coordinates to the Halvane corporation, which has sent a team to strip the core and leave the rest. And under the Human–Tessan Accord, a ship with living crew aboard is not salvage: wake the colonists and the claim is void.
+**What's really happening.** The *Long Patience* isn't dead. Its 312 colonists are asleep in cryo, and its AI, the **Warden**, has kept them alive for 140 years, growing the hull around them like a shell. The corridor has reopened for a few days only; it's drifting closed again. Ves Oro-Lan sold the same coordinates to Vantor Reclamation, a salvage corporation, which has sent a team to strip the core and leave the rest. And under the Human–Tessan Accord, a ship with living crew aboard is not salvage: wake the colonists and the claim is void.
 
 **1. The offer.** Ves meets the crew in a dockside tea house, smiling. A Psychology roll notices the broker keeps checking the departures board. Pressed, Ves admits "another party has expressed interest". The crew can push for better terms: Commerce, and success clears the Debt box up front.
 
 **2. The run.** The corridor is a Navigation roll for Ilvi, with Quill's help (+2): a success gets them through clean; a failure takes them through anyway, but the ship's transit is logged at the junction, and Heat marks a box. On the far side: a drift of old wreckage, and the *Long Patience*, twelve kilometers of hull grown over with something like bark.
 
-**3. Company.** A Halvane **corporate frigate** is already there, and it hails them: back off, or be fired on. This is a chance to run a ship fight (*Ships in a fight*, in the Players' Guide), or to talk, bluff or sneak past. Sensors can find the frigate's blind spot; Sable can spoof its registry; a good hail buys an exchange. If the fight goes badly, the frigate lets them limp to the derelict: Halvane wants the core, not a second wreck.
+**3. Company.** A Vantor Reclamation **corporate frigate** is already there, and it hails them: back off, or be fired on. This is a chance to run a ship fight (*Ships in a fight*, in the Players' Guide), or to talk, bluff or sneak past. Sensors can find the frigate's blind spot; Sable can spoof its registry; a good hail buys an exchange. If the fight goes badly, the frigate lets them limp to the derelict: Vantor wants the core, not a second wreck.
 
 **4. Boarding.** Inside, the hull is warm and breathing. Start a **data record** for the *Long Patience* (*Data records*, in the Players' Guide); this is the setting's own example, *A living hull*. The clues, and who finds them best:
 
@@ -43,11 +43,11 @@ When the crew cuts into anything vital, or the first investigation roll fails, s
 
 **5. The Warden.** The Warden speaks through the ship: a slow, polite voice that has had no one to talk to for 140 years. It wants the colonists taken home. It knows the corridor is closing, and it can't fly the ship alone: the drive needs a navigator and an engineer. Sable and Ilvi can talk to it as an equal; Rook and Brakka recognize a soldier still at their post.
 
-**6. Halvane boards.** A Halvane team cuts in to take the core: a **Syndicate enforcer** (hired muscle), two **Combat drones** and a **Corporate assassin** who would rather not be seen. They have orders to vent the cryo decks to make the salvage legal. This is the big fight, in the ship's grown corridors.
+**6. Vantor boards.** A Vantor team cuts in to take the core: a **Syndicate enforcer** (hired muscle), two **Combat drones** and a **Corporate assassin** who would rather not be seen. They have orders to vent the cryo decks to make the salvage legal. This is the big fight, in the ship's grown corridors.
 
 **7. The choice.** With the Countdown running out, the crew chooses: take the core and the money, and leave the colonists to sleep another century; wake them, and the claim is void; or fly the *Long Patience* home, with the Warden at the helm and the crew's ship alongside. Flying it home means a Piloting or Navigation roll against the closing corridor, and nobody pays them for it.
 
-**Rewards.** Ves's 2,000 credits and a box of Debt, if they bring the core. A data record on the living hull, and a friend in the Warden if the colonists live. If they bring 312 people home, Reputation marks a box, for the good: the ports talk about it for years. If Halvane learns who stopped them, Heat marks one.
+**Rewards.** Ves's 2,000 credits and a box of Debt, if they bring the core. A data record on the living hull, and a friend in the Warden if the colonists live. If they bring 312 people home, Reputation marks a box, for the good: the ports talk about it for years. If Vantor learns who stopped them, Heat marks one.
 
 **Threats.** Corporate frigate (*Enemy ships*); Syndicate enforcer; Combat drone ×2; Corporate assassin. The Warden is a Rogue AI that never attacks: it must be talked down, isolated or erased, and erasing it kills the colonists.
 
@@ -255,3 +255,11 @@ The GM view of the character creator has a **battle map** for fights where it he
 The GM view also has an **Encounter** panel that runs a fight by the *Personal combat* rules and shows every roll. Add characters from the GM view and opponents from the Threats table (or make one up on the spot), then start: it keeps the turn order by Agility, and for each attack works out the range, the defense (Dodge, Parry or Block, one a round, and a second at −2 with Additional Defense), the boxes marked and any telling hit, offering a Resolve point choices at the moment they apply. Hits land on the character cards and the battle map, and with gritty combat on, grievous wounds are rolled and kept. The panel keeps a log and a summary of the fight, which can be saved to a file. It's a helper, not a rule: the GM can rule any result differently, and the log says so.
 
 **The shared table.** The GM can start a shared table from the GM view and give the players its code; each player joins from their character's Play tab. While they're connected, every roll from a sheet is rolled by the table server, so the whole table sees the same dice as they land, in a live log on the Play tab and on the GM view, along with who rolled, against what, and any telling hit. A point reroll answers its own roll, once. Each player's character is shared with the GM too: it appears among the GM view's characters, marked at the table, and its injuries, points, ammunition and form stay in step both ways, whether they're changed on the sheet, on the GM's card or in an encounter. In a fight, each player's Play tab shows the GM's battle map and the encounter's turn order and latest results; a player drags their own token, and on their turn sends the GM what they'll do, which the GM puts into the Encounter panel and runs. The GM can remove a player from the table, and give the table a new code: everyone at it moves with it, and the old code stops working. Without a table, the roller works exactly as it always has.
+
+## The crew's ship and the job board
+
+The GM view has three tools for the corridors, in *Clocks and tools*:
+
+- **The crew's ship.** Its name, type and quirk, picked or rolled. Players see it on their play tab, above the crew's tracks, through the shared table. When its trouble bites, someone earns Resolve.
+- **The job board.** **Roll an offer** gives a patron, the job, the pay and the catch; re-roll any part. Roll two or three for a port, and keep the catch to yourself until a Commerce roll or the job reveals it.
+- **A derelict.** What it was, what happened, what's still aboard, the danger and the prize. Start its data record, and a Countdown if the danger is a clock.

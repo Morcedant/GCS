@@ -4115,7 +4115,8 @@
     "title": "The GM's tools",
     "take": [
      "## The battle map",
-     "## The Encounter panel"
+     "## The Encounter panel",
+     "## The crew's ship and the job board"
     ]
    }
   ],
@@ -4419,5 +4420,269 @@
     "Voss"
    ]
   }
- }
+ },
+ "crewShip": {
+  "title": "The crew's ship",
+  "intro": "Give the ship a name, a type and a quirk. Players see it on their play tab. When its trouble makes real trouble, someone aboard earns a Resolve point.",
+  "namePlaceholder": "e.g. Second Chance",
+  "types": [
+   [
+    "courier",
+    "Courier",
+    "Small and fast: +2 to the pilot's range contest.",
+    "One job's cargo at a time, and a single laser battery."
+   ],
+   [
+    "freighter",
+    "Freighter",
+    "Big holds: a cargo job pays one more box of Debt, and +2 to Commerce when trading it.",
+    "Slow: −2 to the pilot's range contest."
+   ],
+   [
+    "survey",
+    "Survey ship",
+    "Long-range sensors and a lab: +2 to Sensors, and to Science on board.",
+    "Lightly armed: a laser battery, no missiles."
+   ],
+   [
+    "gunboat",
+    "Ex-military gunboat",
+    "Armor: ignores one hit that would mark 1 box each exchange; lasers and a missile rack.",
+    "It looks like what it is: −2 to talk your way past a checkpoint or a customs inspection."
+   ]
+  ],
+  "quirks": [
+   [
+    "An AI with opinions",
+    "+2 to Computers on board; it has noticed things you haven't.",
+    "It argues with the captain, at the worst moments, in front of the wrong people."
+   ],
+   [
+    "Smuggler's holds",
+    "+2 to hide cargo or people from a search.",
+    "If a search finds them, Heat marks a box, whatever was in them."
+   ],
+   [
+    "An overtuned drive",
+    "+1 to the pilot's range contest, and to Navigation through a corridor.",
+    "A natural 17 or 18 on any ship roll knocks a system out for the scene."
+   ],
+   [
+    "A famous name",
+    "+2 to Diplomacy and Commerce with anyone who's heard of it.",
+    "Everyone has heard of it: −2 to slip into a port unnoticed."
+   ],
+   [
+    "Patchwork systems",
+    "The engineer patches two Hull boxes a fight instead of one.",
+    "Every repair needs a part the crew doesn't have; a dock visit costs a box of Debt."
+   ],
+   [
+    "Vael grafts",
+    "Living hull: clears one Hull box each day without a dock.",
+    "It has to be fed: a day without supplies, and it marks a box instead."
+   ],
+   [
+    "A navy transponder",
+    "Once per port, it passes as a Concord navy auxiliary.",
+    "If the trick is caught, Heat marks two boxes."
+   ],
+   [
+    "Someone else's ship",
+    "Papers, codes and a reputation that open the right doors.",
+    "Its last owner wants it back, and knows where it docks."
+   ]
+  ],
+  "names": [
+   "Second Chance",
+   "Paid in Full",
+   "Long Odds",
+   "Quiet Margin",
+   "Small Mercies",
+   "Fair Weather",
+   "Last Invoice",
+   "Good Intentions",
+   "Borrowed Time",
+   "Kestrel's Due",
+   "Open Ledger",
+   "Cold Comfort"
+  ]
+ },
+ "generatorsTitle": "Jobs and derelicts",
+ "generators": [
+  {
+   "id": "job",
+   "title": "The job board",
+   "button": "Roll an offer",
+   "intro": "A job on offer in port. Roll three and let the crew choose; Commerce gets better terms or the catch.",
+   "parts": [
+    [
+     "Patron",
+     [
+      "A Tessan debt-broker",
+      "A Kel hive's trade envoy",
+      "A Draelin cartographic guild",
+      "A corporation's procurement office",
+      "A Veyari archivist",
+      "A Hegemony house in exile",
+      "A syndicate fixer",
+      "A refugee council",
+      "A Concord survey bureau",
+      "A Corvani restoration project",
+      "A Mirrun clan elder",
+      "A stranger who pays in advance"
+     ]
+    ],
+    [
+     "The job",
+     [
+      "Run cargo through a contested corridor",
+      "Recover a ship lost in a collapse",
+      "Escort a convoy to the next junction",
+      "Find someone who doesn't want to be found",
+      "Carry a passenger who won't say why",
+      "Survey a corridor nobody admits exists",
+      "Deliver medicine past a blockade",
+      "Salvage a derelict before a rival does",
+      "Collect a debt from someone dangerous",
+      "Smuggle a psionic past a Mandate screening",
+      "Steal back what was stolen",
+      "Broker a meeting between enemies"
+     ]
+    ],
+    [
+     "The pay",
+     [
+      "Clears a box of Debt",
+      "Clears a box of Debt",
+      "Clears a box of Debt, and 1,000 credits",
+      "Clears two boxes of Debt",
+      "A favor from the patron instead of money",
+      "Fuel, repairs and a dock: clears the Hull track",
+      "Clears a box of Debt, and a contact who owes you",
+      "Clears two boxes of Debt, half on delivery"
+     ]
+    ],
+    [
+     "The catch",
+     [
+      "The cargo isn't what the manifest says",
+      "Someone else was hired for the same job",
+      "The patron can't pay, and hasn't said so",
+      "The law is watching the patron",
+      "It's a trap for one of the crew",
+      "The corridor's due to drift",
+      "The passenger is wanted",
+      "It's legal here and a crime where you're going",
+      "The real job is the one after this one",
+      "It's exactly what it seems, for once",
+      "The rival is someone the crew owes",
+      "Finishing it makes an enemy"
+     ]
+    ]
+   ]
+  },
+  {
+   "id": "derelict",
+   "title": "A derelict",
+   "button": "Roll a derelict",
+   "intro": "Something drifting in the dark. Boarding it is a data record, and often a Countdown.",
+   "parts": [
+    [
+     "What it was",
+     [
+      "A colony ship",
+      "A Hegemony warship",
+      "A Tessan treasure barge",
+      "A corporate research station",
+      "A Kel hive-ship",
+      "A Vael living ship, dead",
+      "A pirate's prize, abandoned",
+      "A Halvane hauler",
+      "A Veyari archive vessel",
+      "A survey probe the size of a city",
+      "A prison hulk",
+      "Something nobody can name"
+     ]
+    ],
+    [
+     "What happened",
+     [
+      "A corridor collapsed under it",
+      "Its crew mutinied",
+      "It was boarded and gutted",
+      "A plague, or something like one",
+      "Its AI locked everyone out",
+      "It fled a battle and never stopped",
+      "It's not dead: it's waiting",
+      "Its reactor slowly failed",
+      "It was scuttled on purpose",
+      "Nobody knows: the logs end mid-sentence"
+     ]
+    ],
+    [
+     "Still aboard",
+     [
+      "Survivors in cryo",
+      "A working weapon cache",
+      "Its cargo, intact",
+      "A data core worth a fortune",
+      "Something that came aboard after",
+      "A Halvane lattice core",
+      "Another salvage crew",
+      "Booby traps the crew left",
+      "The ship's AI, lonely",
+      "Charts of corridors that don't exist anymore"
+     ]
+    ],
+    [
+     "The danger",
+     [
+      "Vacuum and failing gravity",
+      "A reactor about to go",
+      "Drones still on patrol",
+      "Its orbit is decaying",
+      "The corridor behind you is drifting closed",
+      "A rival ship arriving",
+      "Whatever killed the crew",
+      "The hull is breaking up",
+      "A legal claim the crew didn't know about",
+      "Radiation, and no time"
+     ]
+    ],
+    [
+     "The prize",
+     [
+      "Salvage worth two boxes of Debt",
+      "A data record on something new",
+      "A ship system the crew can fit to theirs",
+      "Someone grateful",
+      "Proof of a crime",
+      "A claim worth selling",
+      "A corridor's location",
+      "Nothing of value, and something worth more"
+     ]
+    ]
+   ]
+  }
+ ],
+ "pitch": "Your ship is old, your debts are real, and the job on the board is the only way to keep flying.",
+ "signature": [
+  [
+   "The crew's ship",
+   "A name, a type and a quirk: an edge, a catch, and trouble that pays out in Resolve. It fights by stations, and it can break."
+  ],
+  [
+   "Debt and the job board",
+   "Every job pays down what you owe, and every offer has a catch. Commerce gets better terms, or tells you what the catch is."
+  ],
+  [
+   "Derelicts and data records",
+   "Lost ships, dead empires and corridors that shouldn't exist. Board them, name what you've found, and earn the record that proves it."
+  ],
+  [
+   "Peoples between empires",
+   "Tessan creditors, Kel hives, the fractured Hegemony, and humans who were never supposed to matter."
+  ]
+ ]
 }
