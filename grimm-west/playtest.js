@@ -1,6 +1,6 @@
 // The playtest kit in the GM view: everything for running a three-hour playtest of the game's first adventure with
 // people who have never seen it. Plain script, inlined by tools/build-legend.py (/* PLAYTEST */) into the creators,
-// and by tools/build-guide.py (/* PLAYTEST:START */ … /* PLAYTEST:END */) into the fan games; no modules, no globals.
+// and by tools/build-guide.py (between the page's PLAYTEST start and end markers) into the fan games; no modules, no globals.
 //
 // The kit (a pack's "playtest", or a fan game's playtest.json): { name, short, adv (the adventure), term, fan,
 //   feedback (where players answer the questions), prep: [html],
