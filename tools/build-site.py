@@ -171,7 +171,7 @@ def page(path, title, desc, body_blocks, theme="", fonts=None, protect=False, bl
 {sections}
 </main>
 <footer class="ld-footer"><div class="ld-footer-in"><span>Legend Dynamics RPG system, created by Don Smallwood. Copyright © Don Smallwood. All rights reserved.</span>
-<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{BLOG_SLUG}/">Dev blog</a><a href="/playtest/">Playtest</a><a href="/join">Join our Discord</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}
+<a href="{bw.CORE_SLUG}">Core rules</a><a href="{bw.TABLE_SLUG}">Shared table</a><a href="{bw.DISCORD_SLUG}">Discord bot</a><a href="{bw.CHANGELOG_SLUG}">Changelog</a><a href="{BLOG_SLUG}/">Dev blog</a><a href="/dominion/">Dominion (strategy game)</a><a href="/playtest/">Playtest</a><a href="/join">Join our Discord</a><a href="{bw.CONTACT_SLUG}">Contact</a> · <a href="mailto:{bw.CONTACT_EMAIL}">{bw.CONTACT_EMAIL}</a></div></footer>{PROTECT if protect else ""}{'<script src="/blog.js" defer></script>' if blog else ""}
 </body>
 </html>
 """
@@ -251,6 +251,9 @@ def main():
                                    f'Every rules change is also listed in the <a href="{bw.CHANGELOG_SLUG}">changelog</a>.</p></div>\n'
                                    '<div class="ld" id="ld-blog"><noscript>The dev blog needs JavaScript.</noscript></div>'],
                                   fonts=font_links({bw.BRAND_FONTS}), blog=True))
+    # Fracture Lines: Dominion, the strategy game (fracture-dominion/, built by its own build.mjs): its standalone page.
+    dom = ROOT / "fracture-dominion" / "dist" / "play.html"
+    if dom.exists(): write("dominion/index.html", dom.read_text())
     write("playtest/index.html", page("/playtest", "Playtest · Legend Dynamics", "Played a Legend Dynamics playtest? How to play in two minutes, and four questions about how it went.",
                                       [PLAYTEST_HERO, PLAYTEST_HOW, PLAYTEST_FORM], fonts=font_links({bw.BRAND_FONTS}), blog=True))
     write("blog/write/index.html", page(BLOG_SLUG + "/write", "Write · Dev blog · Legend Dynamics", "The dev blog's author page.",

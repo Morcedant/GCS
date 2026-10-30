@@ -4780,5 +4780,10 @@
     "Skip the final roll: the Countdown has one segment left, and they make it."
    ]
   ]
+ },
+ "companion": {
+  "title": "Fracture Lines: Dominion",
+  "href": "/dominion/",
+  "text": "A turn-based strategy game in the same galaxy. Lead the Concord, the Tessan Dynasties, the Kel Hives, the Hegemony Remnant or the Vael from one world to an empire: explore, settle, trade, research and fight. Free, in your browser."
  }
 }
