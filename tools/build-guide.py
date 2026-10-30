@@ -99,6 +99,11 @@ def main():
         src = src if src.exists() else ROOT / "legend-dynamics" / "engine" / "campaign.js"
         cp = src.read_text().replace("</", "<\\/")
         app = re.sub(r"/\* CAMPAIGN:START \*/.*?/\* CAMPAIGN:END \*/", lambda _: "/* CAMPAIGN:START */\n" + cp + "/* CAMPAIGN:END */", app, flags=re.S)
+    # A page with PLAYTEST markers gets the playtest kit: legend-dynamics/engine/playtest.js and <game>/playtest.json.
+    if "/* PLAYTEST:START */" in app:
+        kit = (ROOT / a.game / "playtest.json").read_text() if (ROOT / a.game / "playtest.json").exists() else "null"
+        pt = (ROOT / "legend-dynamics" / "engine" / "playtest.js").read_text() + "const PLAYTEST_KIT = " + kit.strip() + ";\n"
+        app = re.sub(r"/\* PLAYTEST:START \*/.*?/\* PLAYTEST:END \*/", lambda _: "/* PLAYTEST:START */\n" + pt.replace("</", "<\\/") + "/* PLAYTEST:END */", app, flags=re.S)
     app = stamp(app, APP)  # the version footer: a fingerprint of the page, and the day it last changed
     APP.write_text(app)
     print(f"updated {APP.relative_to(ROOT)}")

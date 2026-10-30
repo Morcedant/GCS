@@ -4334,5 +4334,115 @@
    "The trail and the law",
    "Days of open country between towns, and a Heat track that puts your face on a poster when the hunt goes public."
   ]
- ]
+ ],
+ "playtest": {
+  "name": "Trails of Blood & Dust",
+  "short": "Trails",
+  "adv": "Dead Man's Wages",
+  "term": "job",
+  "fan": false,
+  "feedback": "legenddynamicsrpg.com/playtest",
+  "posts": [
+   [
+    "Reddit · r/lfg",
+    "[Online][Other][One-shot][Free] Trails of Blood & Dust, a Gothic Western monster hunt. [DAY, DATE] at [TIME + TIME ZONE], 3 hours\n\nSomething is killing miners in the Lazarus silver mine, and the company calls it cave-ins. A dead man has written to hire you.\n\nI'm playtesting a new tabletop RPG I've designed and I'm looking for 3 to 5 players for one session. No experience needed and nothing to read: characters are ready-made (a marshal, a doctor, a preacher, a gambler who reads the cards, a werewolf in chains, a bounty hunter who came back from the dead). Rolls are 3d6, roll low.\n\nPlayed on [Discord voice / the browser table]. Afterward I'll ask a few quick questions about what worked and what didn't. Playtesters are credited in the finished book.\n\nComment or DM me to grab a seat."
+   ],
+   [
+    "Discord · LFG channel",
+    "**Free one-shot: Gothic Western monster hunt** 🤠\n[DAY, DATE] · [TIME + TIME ZONE] · 3 hours · voice\nPlaytesting my own system: 3d6 roll-low, ready-made characters, nothing to read first. Ghouls in a silver mine, and the man who hired you died two weeks ago.\n3 to 5 seats, beginners welcome. Credited in the finished book. React or DM me!"
+   ],
+   [
+    "Game store or library board",
+    "NEW GAME PLAYTEST: TRAILS OF BLOOD & DUST\nA Gothic Western monster hunt · one session · free\n[DAY, DATE], [TIME] · [PLACE]\nNo experience needed. Characters, dice and pencils provided.\nSomething is killing the miners of Mercy Springs. Come find out what.\nSign up below, or contact [NAME, CONTACT]."
+   ]
+  ],
+  "where": [
+   "<b>r/lfg</b> on Reddit, with the title format above.",
+   "<b>Roll20's \"Join a Game\"</b> listings, as a free one-shot.",
+   "The LFG channels of large tabletop Discord servers, and your own Discord's <code>/join</code> link.",
+   "<b>r/RPGdesign</b> and design Discords: offer to trade playtests with other designers.",
+   "Local game stores and Meetup groups, with the flyer."
+  ],
+  "prep": [
+   "Read <i>Dead Man's Wages</i> in the GM's Guide (Trails of Blood & Dust creator → Guide tab → GM's Guide → Your first job). It's about two pages.",
+   "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",
+   "Online: start a shared table and have its link ready, or set up the dice bot in your Discord. In person: print the character sheets.",
+   "In <i>Clocks and tools</i>, get ready to start the ride to Mercy Springs (4 segments). In the Discovery tab, prepare a discovery clock for the thing in the Lazarus mine, with the Harvest clock.",
+   "In <i>Map and fight</i>, check you can add three Ghouls, an Outlaw (Cyrus Pruitt) and a Revenant gunslinger (Ezra Quill).",
+   "The day before: send everyone the time, the table link, and the Playtest page, <code>legenddynamicsrpg.com/playtest</code>. Tell them there's nothing to read.",
+   "Have a timer or clock in view. The run sheet below has the times."
+  ],
+  "cast": [
+   [
+    "Ruth Calloway",
+    "Deputy U.S. Marshal with the Sight. Knows Quill wrote to her office."
+   ],
+   [
+    "Dr. Elias Webb",
+    "Town physician with a past. The one to examine the bodies."
+   ],
+   [
+    "Tom Feeney",
+    "Horse breaker and werewolf. Feels the dead man's letter in his bones."
+   ],
+   [
+    "Lucinda Marsh",
+    "Gambler and practitioner. Her cards turn up the Hanged Man."
+   ],
+   [
+    "Isaiah Booker",
+    "Bounty hunter who came back from the dead. Knows what Quill is."
+   ],
+   [
+    "Rev. Abigail Stone",
+    "Circuit preacher with a shotgun. Finds the locked church."
+   ]
+  ],
+  "castNote": "With fewer than six players, use any of them. Ruth, Webb and Stone cover the investigation best; Isaiah and Tom make the revenant scene land.",
+  "run": [
+   [
+    "0:00",
+    "Welcome and the characters",
+    "<p>Say the pitch in one breath: <i>Something followed the wagons west. Most folk never see it. You do, and you hunt it.</i> Ask if there's anything anyone doesn't want in a horror game, and agree you can pause at any time.</p><p>Each player takes a character and reads their one-line role and their connection aloud. Explain only the roll: <b>3d6, at or under your number</b>. Everything else gets explained the first time it comes up.</p>"
+   ],
+   [
+    "0:15",
+    "The letter and the ride in",
+    "<p>Read the letter. Go around once: why did each of them come? Start the trail clock (4) and roll two days only; then jump to the last day: drag marks, and a boot with the foot still in it.</p>",
+    "Skip the rolls and open on the boot."
+   ],
+   [
+    "0:30",
+    "Mercy Springs",
+    "<p>The barred doors, the silent saloon, the widows at the back. Sheriff Vance warns them off; Quill was buried two weeks ago, but the letter was posted last Tuesday. Start the discovery clock and the Harvest clock (4).</p>"
+   ],
+   [
+    "0:45",
+    "The digging",
+    "<p>Let the players split up. Offer the clues by what they choose to do: the bodies (Medicine), the empty grave (Investigation), the widows (Persuasion), the church (Occult), and the night watch. <b>Three clues are enough</b> to identify ghouls.</p><p>When the Harvest clock fills, a miner is taken: let the players hear it happen.</p>"
+   ],
+   [
+    "1:25",
+    "The man in the burial suit",
+    "<p>At midnight, Ezra Quill finds them. He knows the mine and wants Crane. Let the players react to a dead man asking for help; this is often the best scene of the night.</p>"
+   ],
+   [
+    "1:40",
+    "Noon: the showdown",
+    "<p>Cyrus Pruitt calls out the nosiest hunter. Run it in the Encounter panel: <b>Showdown: the staredown</b>, then <b>the draw</b>. It teaches combat in one exchange.</p>",
+    "Skip it: Pruitt is at the mine instead, and dies to the ghouls in front of them."
+   ],
+   [
+    "1:50",
+    "The Lazarus mine",
+    "<p>Down into the burial cave with lamps and fire. Three ghouls, plus one for each time the Harvest clock filled. This is the big fight: use the battle map. Fire and light hold them back; dynamite seals the cave.</p>"
+   ],
+   [
+    "2:35",
+    "Midnight at the Crane house",
+    "<p>Quill comes for Crane. The players choose: help him, stand aside, or stop him. Play it as talk and one or two rolls, not a second fight.</p>",
+    "Narrate it from the players' choice in a minute or two."
+   ]
+  ]
+ }
 }

@@ -6893,5 +6893,113 @@
   "resistAdvantages": {
    "coolhead": 2
   }
+ },
+ "playtest": {
+  "name": "Aurora",
+  "short": "Aurora",
+  "adv": "Static on the Line",
+  "term": "case",
+  "fan": false,
+  "feedback": "legenddynamicsrpg.com/playtest",
+  "posts": [
+   [
+    "Reddit · r/lfg",
+    "[Online][Other][One-shot][Free] Aurora, a superhero case under the law. [DAY, DATE] at [TIME + TIME ZONE], 3 hours\n\nHalf of Chicago's Pilsen neighborhood just went dark, and a fifteen-year-old made of lightning is standing on a bridge. The federal agency, the TV cameras and the lab that made her all want her first.\n\nI'm playtesting a new tabletop RPG I've designed and I'm looking for 3 to 5 players for one session. No experience needed and nothing to read: characters are ready-made (a federal agent with a spirit in a jade seal, an armored-suit pilot, a televised hero, an occultist professor, a reporter with a secret, a lab escapee, a fey thief working off a deal). Rolls are 3d6, roll low.\n\nPlayed on [Discord voice / the browser table]. Afterward I'll ask a few quick questions about what worked and what didn't. Playtesters are credited in the finished book.\n\nComment or DM me to grab a seat."
+   ],
+   [
+    "Discord · LFG channel",
+    "**Free one-shot: superhero case** ⚡\n[DAY, DATE] · [TIME + TIME ZONE] · 3 hours · voice\nPlaytesting my own system: 3d6 roll-low, ready-made heroes, nothing to read first. A blackout, a scared kid with lightning in her hands, cameras rolling, and a lab that wants her back.\n3 to 5 seats, beginners welcome. Credited in the finished book. React or DM me!"
+   ],
+   [
+    "Game store or library board",
+    "NEW GAME PLAYTEST: AURORA\nA superhero case under the law · one session · free\n[DAY, DATE], [TIME] · [PLACE]\nNo experience needed. Characters, dice and pencils provided.\nA blackout, a girl made of lightning, and everyone wants her.\nSign up below, or contact [NAME, CONTACT]."
+   ]
+  ],
+  "where": [
+   "<b>r/lfg</b> on Reddit, with the title format above.",
+   "<b>Roll20's \"Join a Game\"</b> listings, as a free one-shot.",
+   "The LFG channels of large tabletop Discord servers, and your own Discord's <code>/join</code> link.",
+   "<b>r/RPGdesign</b> and design Discords: offer to trade playtests with other designers.",
+   "Local game stores and Meetup groups, with the flyer."
+  ],
+  "prep": [
+   "Read <i>Static on the Line</i> in the GM's Guide (Aurora creator → Guide tab → GM's Guide → Your first case). It's about two pages.",
+   "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",
+   "Online: start a shared table and have its link ready, or set up the dice bot in your Discord. In person: print the character sheets.",
+   "In the Discovery tab, prepare a dossier on Lupe Herrera's power, with the Escalation clock (4).",
+   "In the GM view's files tool, give the Foundation a file on Static (for example, <i>Always comes for the young ones</i>): it gives the retrieval team +2 when it applies.",
+   "In <i>Map and fight</i>, check you can add four of the Foundation retrieval team, and have Sergei Grachyov's entry to hand (he talks, he doesn't fight).",
+   "The day before: send everyone the time, the table link, and the Playtest page, <code>legenddynamicsrpg.com/playtest</code>. Tell them there's nothing to read.",
+   "Have a timer or clock in view. The run sheet below has the times."
+  ],
+  "cast": [
+   [
+    "Rachel Kwan",
+    "ExLAW agent with a guardian spirit. She caught the case."
+   ],
+   [
+    "Luis \"Bulldog\" Ortega",
+    "Aegis pilot. His suit logs a signature it's never seen."
+   ],
+   [
+    "Naomi Price (Daybreak)",
+    "Televised hero. Her sponsor wants the rescue live."
+   ],
+   [
+    "Dr. Tobias Wren",
+    "Occultist. The readings look like 1938."
+   ],
+   [
+    "Jess Calloway",
+    "Reporter, secretly an Operant. First on the scene."
+   ],
+   [
+    "Subject 19, \"Static\"",
+    "Lab escapee. Knows the Foundation made this girl."
+   ],
+   [
+    "Maeve Ashgrove",
+    "Fey thief on an ExLAW deal. Knows a vault guard's walk."
+   ]
+  ],
+  "castNote": "With fewer players, keep Static (the heart of it) and Kwan (the law). Daybreak or Jess brings the cameras into it.",
+  "run": [
+   [
+    "0:00",
+    "Welcome and the characters",
+    "<p>Pitch it in one breath: <i>Powers came from the sky in 1938, and the law has been trying to catch up ever since.</i> Each player takes a character and reads their role and their connection aloud. Explain only the roll: <b>3d6, at or under your number</b>.</p>"
+   ],
+   [
+    "0:15",
+    "The blackout",
+    "<p>9:40 on a Tuesday: Pilsen goes dark, a train stops, a girl on the Eighteenth Street bridge is sparking. Go around: how does each of them get there?</p>"
+   ],
+   [
+    "0:25",
+    "The bridge",
+    "<p>Lupe is terrified, and shouting makes it worse. Start the dossier and the Escalation clock (4): each time it fills, her next surge is bigger. Talking (Persuasion, Read People, or Static's own sparks) works better than force; force marks Collateral.</p>"
+   ],
+   [
+    "0:55",
+    "The cameras and the dossier",
+    "<p>Daybreak's producers, Jess, the cordon. Powers on camera may mark Backlash, and risk a secret identity's Exposure. Clues: Lupe's story, the tag in her neck, the triggered surges, Static's memory. <b>Three clues are enough.</b></p>"
+   ],
+   [
+    "1:40",
+    "The retrieval",
+    "<p>The Foundation team hits: four of them, a jammer blinding the Aegis suit. They want Lupe alive and no witnesses. The big fight, and the place for a team-up. Their file on Static gives them +2 when it applies.</p>"
+   ],
+   [
+    "2:20",
+    "Grachyov",
+    "<p>Sergei Grachyov walks out of the dark and offers a trade: Static for the girl. Let the players feel how dangerous he is, and decide.</p>",
+    "Have him make the offer and leave before they answer."
+   ],
+   [
+    "2:35",
+    "Where Lupe goes",
+    "<p>ExLAW custody and a Raster file, the sponsor's clinic and contract, or Static's underground. And does Jess run the story? Mark Scrutiny or Backlash as it falls.</p>"
+   ]
+  ]
  }
 }

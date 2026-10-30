@@ -4691,5 +4691,115 @@
    "Peoples between empires",
    "Tessan creditors, Kel hives, the fractured Hegemony, and humans who were never supposed to matter."
   ]
- ]
+ ],
+ "playtest": {
+  "name": "Fracture Lines",
+  "short": "Fracture Lines",
+  "adv": "Salvage Rights",
+  "term": "job",
+  "fan": false,
+  "feedback": "legenddynamicsrpg.com/playtest",
+  "posts": [
+   [
+    "Reddit · r/lfg",
+    "[Online][Other][One-shot][Free] Fracture Lines, a science fiction salvage job. [DAY, DATE] at [TIME + TIME ZONE], 3 hours\n\nA colony ship lost for 140 years has turned up at the end of a corridor that isn't on any map. Your crew's debts are due, and the salvage would pay them. Someone else got the coordinates too.\n\nI'm playtesting a new tabletop RPG I've designed and I'm looking for 3 to 5 players for one session. No experience needed and nothing to read: characters are ready-made (a disowned alien trader, a hive scout, a rebuilt marine, a navigator with an AI partner, an ecologist, a legion deserter, a hacker with a secret). Rolls are 3d6, roll low.\n\nPlayed on [Discord voice / the browser table]. Afterward I'll ask a few quick questions about what worked and what didn't. Playtesters are credited in the finished book.\n\nComment or DM me to grab a seat."
+   ],
+   [
+    "Discord · LFG channel",
+    "**Free one-shot: sci-fi salvage job** 🚀\n[DAY, DATE] · [TIME + TIME ZONE] · 3 hours · voice\nPlaytesting my own system: 3d6 roll-low, ready-made crew, nothing to read first. A colony ship lost for 140 years, a corporation that wants it stripped, and a corridor closing behind you.\n3 to 5 seats, beginners welcome. Credited in the finished book. React or DM me!"
+   ],
+   [
+    "Game store or library board",
+    "NEW GAME PLAYTEST: FRACTURE LINES\nA science fiction salvage job · one session · free\n[DAY, DATE], [TIME] · [PLACE]\nNo experience needed. Characters, dice and pencils provided.\nA ship lost for 140 years is calling. Who does it belong to?\nSign up below, or contact [NAME, CONTACT]."
+   ]
+  ],
+  "where": [
+   "<b>r/lfg</b> on Reddit, with the title format above.",
+   "<b>Roll20's \"Join a Game\"</b> listings, as a free one-shot.",
+   "The LFG channels of large tabletop Discord servers, and your own Discord's <code>/join</code> link.",
+   "<b>r/RPGdesign</b> and design Discords: offer to trade playtests with other designers.",
+   "Local game stores and Meetup groups, with the flyer."
+  ],
+  "prep": [
+   "Read <i>Salvage Rights</i> in the GM's Guide (Fracture Lines creator → Guide tab → GM's Guide → Your first job). It's about two pages.",
+   "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",
+   "Online: start a shared table and have its link ready, or set up the dice bot in your Discord. In person: print the character sheets.",
+   "In <i>Clocks and tools</i>, give the crew's ship a name, a type and a quirk (or roll one), so it's on everyone's play tab from the start.",
+   "In the Discovery tab, prepare a data record for the <i>Long Patience</i> (it's the setting's own example, <i>A living hull</i>), and be ready to start a Countdown of 6.",
+   "Read <i>Ships in a fight</i> in the Players' Guide once, and have the Corporate frigate's line from <i>Enemy ships</i> to hand.",
+   "In <i>Map and fight</i>, check you can add a Syndicate enforcer, two Combat drones and a Corporate assassin.",
+   "The day before: send everyone the time, the table link, and the Playtest page, <code>legenddynamicsrpg.com/playtest</code>. Tell them there's nothing to read.",
+   "Have a timer or clock in view. The run sheet below has the times."
+  ],
+  "cast": [
+   [
+    "Thessk Varo-Hun",
+    "Disowned Tessan trader. Her dynasty's creditors hold the salvage claim."
+   ],
+   [
+    "Kesh of the Seventh Hive",
+    "Kel market scout. An open corridor matters more to her hive than the ship."
+   ],
+   [
+    "Rook",
+    "Former marine, rebuilt. The implant payments are overdue."
+   ],
+   [
+    "Ilvi Saradh",
+    "Guild navigator. Her AI, Quill, remembers the corridor."
+   ],
+   [
+    "Dr. Anwe Tal",
+    "Ecologist. The ship carries the seed vault of the world she's rebuilding."
+   ],
+   [
+    "Brakka",
+    "Legion deserter. The ship's last port was a Hegemony world."
+   ],
+   [
+    "Sable",
+    "Hacker, secretly psionic. The only one who can open a 140-year-old core."
+   ]
+  ],
+  "castNote": "With fewer players, keep Ilvi (the corridor) and Sable or Anwe (the ship's secrets). Rook and Brakka carry the boarding fight.",
+  "run": [
+   [
+    "0:00",
+    "Welcome and the crew",
+    "<p>Pitch it in one breath: <i>You live along the faults between empires, and every job has someone else's claim on it.</i> Each player takes a character and reads their role and their connection aloud. Explain only the roll: <b>3d6, at or under your number</b>.</p>"
+   ],
+   [
+    "0:15",
+    "The offer",
+    "<p>Ves Oro-Lan in the dockside tea house. Debt is due; the job clears a box and pays 2,000. Let the crew haggle (Commerce) and notice the broker watching the departures board.</p>"
+   ],
+   [
+    "0:30",
+    "The run and the frigate",
+    "<p>Ilvi's Navigation roll through the lost corridor (Quill gives +2): a failure logs them at the junction, and Heat marks a box. A Vantor Reclamation frigate is waiting: run two or three exchanges of a ship fight, or let them talk, bluff or sneak past.</p>",
+    "Have the frigate hail them, and play it as a single tense conversation."
+   ],
+   [
+    "1:00",
+    "Boarding the Long Patience",
+    "<p>Warm, breathing corridors. Start the data record. Clues: the cryo decks (Medicine, Science), the grown hull (Science, Engineering), the bridge log (Computers), the seed vault. <b>Three clues are enough.</b> When they cut into something vital, start the Countdown (6): the corridor is closing.</p>"
+   ],
+   [
+    "1:35",
+    "The Warden",
+    "<p>The ship's AI speaks: polite, lonely, 140 years of <i>Still waiting.</i> It wants the colonists taken home and can't fly the ship alone. Let Sable and Ilvi talk to it; this is often the best scene of the night.</p>"
+   ],
+   [
+    "1:55",
+    "Vantor boards",
+    "<p>The big fight: a Syndicate enforcer, two Combat drones and a Corporate assassin, with orders to vent the cryo decks. Use the battle map. Kill or jam the drones' controller and they drop.</p>"
+   ],
+   [
+    "2:35",
+    "The choice",
+    "<p>Take the core and the money, wake the colonists and void the claim, or fly the ship home with the Warden at the helm (Piloting or Navigation against the closing corridor). Let them argue it out.</p>",
+    "Skip the final roll: the Countdown has one segment left, and they make it."
+   ]
+  ]
+ }
 }

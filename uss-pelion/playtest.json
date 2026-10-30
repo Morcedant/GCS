@@ -1,0 +1,103 @@
+{
+ "name": "USS Pelion",
+ "short": "USS Pelion",
+ "adv": "The Silence at Corvan II",
+ "term": "mission",
+ "fan": true,
+ "feedback": "your fan-games site, /playtest/",
+ "posts": [
+  [
+   "Message to friends",
+   "Want to try a Star Trek one-shot? [DAY, DATE] at [TIME], about 3 hours, on [Discord voice / the browser table].\n\nA Federation outpost has gone silent, an Orion raider is in orbit, and something in the ruins below is draining the ship's power. You'd be the Pelion's crew: the first officer, the Vulcan science officer, the doctor, the engineer, security and the captain's yeoman.\n\nIt runs on rules I've been designing (3d6, roll low). Characters are ready-made and there's nothing to read. Afterward I'll ask a few quick questions about what worked. Interested?"
+  ],
+  [
+   "Private Discord channel",
+   "**Star Trek one-shot: The Silence at Corvan II** 🖖\n[DAY, DATE] · [TIME] · ~3 hours · voice\nReady-made crew, nothing to read, beginners welcome. An outpost gone quiet, Orions in orbit, and the Prime Directive watching. React to grab a station!"
+  ]
+ ],
+ "where": [
+  "Friends and your regular group, by message.",
+  "Your own private Discord server, in a channel only invited people can see.",
+  "Invite them to the fan-games site first (it's locked to invited players), so they can open the creator and the Playtest page."
+ ],
+ "prep": [
+  "Read <i>The Silence at Corvan II</i> in the GM's Guide (USS Pelion creator → Guide tab → GM's Guide → Your first mission). It's about two pages.",
+  "Open the creator's GM view and add the ready-made characters for as many players as you have (Table and characters → Add a ready-made character).",
+  "Online: start a shared table and have its link ready, or set up the dice bot in your Discord. In person: print the character sheets.",
+  "In the Discovery tab, prepare a library record on the thing in the ruins, and be ready to start a Countdown of 6 when the Pelion scans them.",
+  "Have the Orion raider's line from <i>Enemy ships</i> to hand, and the Pelion's Power and Shields on its status card.",
+  "In <i>Map and fight</i>, check you can add three Orion pirates and a Rogue android (the caretaker's shell).",
+  "The day before: send everyone the time, the table link, and the Playtest page, <code>your fan-games site, /playtest/</code>. Tell them there's nothing to read.",
+  "Have a timer or clock in view. The run sheet below has the times."
+ ],
+ "cast": [
+  [
+   "Thelan sh'Vari",
+   "First officer, in command with the captain away. Every word goes in the log."
+  ],
+  [
+   "Sevek",
+   "Vulcan science officer. The readings contradict known physics."
+  ],
+  [
+   "Dr. Vessik",
+   "Denobulan doctor. Eight scientists and a village of civilians."
+  ],
+  [
+   "Grath",
+   "Tellarite engineer. Helped rig the dampener that woke it."
+  ],
+  [
+   "Marisol Reyes",
+   "Security. Orions mean phasers; Reyes would rather they were on stun."
+  ],
+  [
+   "Rrinn",
+   "Caitian yeoman. Their sister is on the outpost's supply run."
+  ]
+ ],
+ "castNote": "With fewer players, keep Sevek (the paradox) and sh'Vari (the command decision). Grath buys time on the Countdown.",
+ "run": [
+  [
+   "0:00",
+   "Welcome and the crew",
+   "<p>Pitch it in one breath: <i>The captain's away, the outpost's silent, and you have the conn.</i> Each player takes a crew member and reads their role and connection aloud. Explain only the roll: <b>3d6, at or under your number</b>.</p>"
+  ],
+  [
+   "0:15",
+   "Arrival and the raider",
+   "<p>The Orion raider hails: legitimate salvagers, they say. A couple of exchanges of ship combat, or a bluff and a warning. It runs when its Shields are down.</p>",
+   "Have the raider break orbit as soon as the Pelion arrives."
+  ],
+  [
+   "0:35",
+   "The pull",
+   "<p>The sensors sweep the ruins and the lights flicker. One less Power each exchange, and the orbit begins to decay: start the Countdown (6). Grath's Engineering roll clears a segment once.</p>"
+  ],
+  [
+   "0:45",
+   "The outpost",
+   "<p>An empty outpost. Start the library record. Clues: the logs (Computers), the untouched bunks (Medicine), the field that reads them (Physical Sciences), the village through the duck blind. <b>Three clues are enough.</b></p>"
+  ],
+  [
+   "1:20",
+   "The Ketari",
+   "<p>Warriors with Orion phasers. Contact marks Starfleet Command unless they're careful; doing nothing leaves a war. Let the crew argue the Prime Directive.</p>"
+  ],
+  [
+   "1:45",
+   "The Orions in the ruins",
+   "<p>Three Orion pirates cutting toward the machine's core. The big fight; stun keeps the record clean, a kill marks Starfleet Command.</p>"
+  ],
+  [
+   "2:15",
+   "The caretaker",
+   "<p>The machine speaks through its android shell. A paradox (Diplomacy or Psychology) stuns it; or they talk to it as equals. Sevek's moment.</p>"
+  ],
+  [
+   "2:35",
+   "The choice",
+   "<p>Shut it down, bargain for the scientists, or leave it and take the phasers back. Rrinn's sister is among the sleepers. The Countdown decides how long they have.</p>"
+  ]
+ ]
+}
