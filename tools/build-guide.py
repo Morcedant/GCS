@@ -69,6 +69,12 @@ def main():
         app = re.sub(r"/\* PLAIN:START \*/.*?/\* PLAIN:END \*/", lambda _: "/* PLAIN:START */\n" + pl + "/* PLAIN:END */", app, flags=re.S)
     # A page with CAMPAIGN markers gets the campaign builder (<game>/campaign.js, a copy of
     # legend-dynamics/engine/campaign.js on the claude/legend-dynamics branch).
+    # A page with PLAYTEST markers gets the playtest kit: <game>/playtest.js (a copy of legend-dynamics/engine/playtest.js
+    # on the claude/legend-dynamics branch) and <game>/playtest.json.
+    if "/* PLAYTEST:START */" in app:
+        kit = (ROOT / a.game / "playtest.json").read_text() if (ROOT / a.game / "playtest.json").exists() else "null"
+        pt = (ROOT / a.game / "playtest.js").read_text() + "const PLAYTEST_KIT = " + kit.strip() + ";\n"
+        app = re.sub(r"/\* PLAYTEST:START \*/.*?/\* PLAYTEST:END \*/", lambda _: "/* PLAYTEST:START */\n" + pt.replace("</", "<\\/") + "/* PLAYTEST:END */", app, flags=re.S)
     if "/* CAMPAIGN:START */" in app:
         cp = (ROOT / a.game / "campaign.js").read_text().replace("</", "<\\/")
         app = re.sub(r"/\* CAMPAIGN:START \*/.*?/\* CAMPAIGN:END \*/", lambda _: "/* CAMPAIGN:START */\n" + cp + "/* CAMPAIGN:END */", app, flags=re.S)
