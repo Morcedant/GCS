@@ -278,7 +278,7 @@ When a roll qualifies for both the fine item and an advantage, take +2 once.
 | Vibroblade | Licensed | A humming blade. Hits mark 2 boxes. |
 | Body armor | Licensed | Once per fight, a hit that marks 2 or more boxes marks one fewer. Shows under scans. |
 | Riot shield | Licensed | A hardened security shield: +1 to Block against blades, fists and thrown objects. It won't stop a slug or a beam. −2 to Stealth while you carry it. |
-| Vac suit | Open | Air for six hours in vacuum or poison atmosphere. |
+| Skinsuit | Open | Standard issue: a skin-tight vacuum suit with a hood that seals into a helmet in two seconds. Pressure protection, its own air (twelve hours a cell), a close radio to the crew, and a HUD with low-light and thermal vision. Not armor. |
 | Medkit | Open | Biotech dressings, stims and a scanner. Needed to stabilize a patient and give field treatment. |
 | Toolkit | Open | Needed for most Engineering in the field. |
 | Intrusion deck | Restricted | A hacking rig. Needed for most Computers work against secured systems. |
@@ -286,7 +286,7 @@ When a roll qualifies for both the fine item and an advantage, take +2 once.
 | Scout drone | Licensed | A small flying drone that can scout and relay what it sees. |
 | Translator | Open | Translates most known languages, slowly. Thrum and Qor need one to talk with most peoples. |
 | Exo-frame | Open | A light powered frame: no gravity penalty for Vael and others built for low gravity. |
-| Hardsuit | Licensed | An armored vac suit: air for six hours in vacuum or poison atmosphere, and once per fight a hit that marks 2 or more boxes marks one fewer. −1 to Athletics and Stealth while you wear it; a breach is the GM's call. Not with other armor. |
+| Hardsuit | Licensed | An armored skinsuit: every skinsuit system, and once per fight a hit that marks 2 or more boxes marks one fewer. −1 to Athletics and Stealth while you wear it. Not with other armor. |
 | Combat exoskeleton | Restricted | A powered military frame: +2 to Athletics to lift, carry, climb or break things, your unarmed blows mark 2 boxes, and you carry a heavy weapon one-handed. Its plating works as body armor: once per fight, a 2+ box hit marks one fewer. −2 to Stealth; needs a fresh power cell each day. Not with other armor. |
 | Powered armor, legion-grade | Military | Legion-grade, sealed and powered: hits that would mark 1 box mark nothing, and once per fight a hit that marks 2 or more boxes marks one fewer. Air for six hours, and the strength of a combat exoskeleton. −2 to Stealth, any scanner picks it up, and it needs a fresh power cell each day. A shot at the power pack (−2 to hit) can lock it up until someone spends an action freeing you. Needs the Powered Armor Edge. Not with other armor. |
 | Powered armor, commercial | Restricted | A security or industrial suit, sold where the law allows it: once per fight a hit that would mark 1 box marks nothing, and once per fight a 2+ box hit marks one fewer. Air for six hours, and the strength of a combat exoskeleton. −2 to Stealth and a power cell each day. Registered: any scanner reads its owner. Needs the Powered Armor Edge. Not with other armor. |
@@ -890,6 +890,16 @@ Control of corridor intersections is one of the fundamental sources of political
 - **Collapse.** An unstable corridor is a danger clock (usually 6 segments) that ticks with time and every failed transit; when it fills, the corridor closes, with whoever is inside.
 - **Messages.** A quantum-gravimetric transceiver reaches anywhere on the network: within a junction's region in minutes, across several junctions in hours. Worlds behind collapsed corridors can't be reached at all. Every message passes through junctions, and their owners listen: sending something sensitive through a hostile junction takes a **Computers** roll to hide it, and a failure marks **Heat**.
 - **Mouths and junctions.** Expect papers, tolls (which can mark **Debt**) and Mandate screenings.
+
+## Skinsuits
+
+Everyone who lives between the stars owns a **skinsuit**, and most people wear one under their clothes aboard any ship or station. It's a skin-tight layer of smart fabric with a hood that seals into a clear helmet in two seconds, with no action needed when the alarms go. Every character starts with one, on top of the gear they choose.
+
+- **Pressure.** The fabric squeezes like a second skin, so vacuum, poison air and the cold of a shadowed hull don't hurt you. Small punctures seal themselves. In vacuum, a hit that marks 2 or more boxes **breaches** the suit: you take vacuum damage (1 box each round) until someone patches it, which takes an action. Every suit carries three patches.
+- **Air.** The suit makes its own air from its power cell and your breath: twelve hours on a cell. A ship or station recharges a cell in an hour, and a spare cell is something anyone can carry.
+- **Close radio.** Voice from suit to suit, encrypted among the crew, out to about 10 km (Medium range) in open space, and less through hulls and rock. It can be jammed (a Sensors contest), and anyone with a scanner can tell a suit is transmitting.
+- **The HUD.** The visor overlays what you need: low-light and thermal vision (no penalty for darkness or smoke), each crew member's position and vital signs, a range-finder, and the feed from a linked scanner or scout drone. It shows you the target; it doesn't aim for you.
+- **What it isn't.** A skinsuit is not armor. A **hardsuit** adds armored plates over the same systems, and powered armor seals a skinsuit inside it.
 
 ## Controlled gear
 

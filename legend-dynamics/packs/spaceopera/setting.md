@@ -270,6 +270,16 @@ Control of corridor intersections is one of the fundamental sources of political
 - **Messages.** A quantum-gravimetric transceiver reaches anywhere on the network: within a junction's region in minutes, across several junctions in hours. Worlds behind collapsed corridors can't be reached at all. Every message passes through junctions, and their owners listen: sending something sensitive through a hostile junction takes a **Computers** roll to hide it, and a failure marks **Heat**.
 - **Mouths and junctions.** Expect papers, tolls (which can mark **Debt**) and Mandate screenings.
 
+## Skinsuits
+
+Everyone who lives between the stars owns a **skinsuit**, and most people wear one under their clothes aboard any ship or station. It's a skin-tight layer of smart fabric with a hood that seals into a clear helmet in two seconds, with no action needed when the alarms go. Every character starts with one, on top of the gear they choose.
+
+- **Pressure.** The fabric squeezes like a second skin, so vacuum, poison air and the cold of a shadowed hull don't hurt you. Small punctures seal themselves. In vacuum, a hit that marks 2 or more boxes **breaches** the suit: you take vacuum damage (1 box each round) until someone patches it, which takes an action. Every suit carries three patches.
+- **Air.** The suit makes its own air from its power cell and your breath: twelve hours on a cell. A ship or station recharges a cell in an hour, and a spare cell is something anyone can carry.
+- **Close radio.** Voice from suit to suit, encrypted among the crew, out to about 10 km (Medium range) in open space, and less through hulls and rock. It can be jammed (a Sensors contest), and anyone with a scanner can tell a suit is transmitting.
+- **The HUD.** The visor overlays what you need: low-light and thermal vision (no penalty for darkness or smoke), each crew member's position and vital signs, a range-finder, and the feed from a linked scanner or scout drone. It shows you the target; it doesn't aim for you.
+- **What it isn't.** A skinsuit is not armor. A **hardsuit** adds armored plates over the same systems, and powered armor seals a skinsuit inside it.
+
 ## Controlled gear
 
 Every power controls equipment differently. The GM gives each port, station or world a **control level**, and every piece of gear carries a **control tag** (see Gear).

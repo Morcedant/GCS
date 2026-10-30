@@ -1426,7 +1426,7 @@ tr.lvl-U td.target { color: var(--muted); }
       adv: { id: "", name: "", text: "", detail: "" },
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
-      equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
+      equipment: Object.fromEntries(EQUIPMENT.map(([k, , , meta]) => [k, !!(meta && meta.standard)])), // standard issue (a skinsuit) starts ticked
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "", use: "" }, edgeNotes: {},
       allegiance: "", allegianceDef: null, customTier: 1, customSpeed: 0, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",

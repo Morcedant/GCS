@@ -2348,10 +2348,11 @@
   ],
   [
    "vacsuit",
-   "Vac suit",
-   "Air for six hours in vacuum or poison atmosphere.",
+   "Skinsuit",
+   "Standard issue: a skin-tight vacuum suit with a hood that seals into a helmet in two seconds. Pressure protection, its own air (twelve hours a cell), a close radio to the crew, and a HUD with low-light and thermal vision. Not armor.",
    {
-    "control": "Open"
+    "control": "Open",
+    "standard": true
    }
   ],
   [
@@ -2413,7 +2414,7 @@
   [
    "hardsuit",
    "Hardsuit",
-   "An armored vac suit: air for six hours in vacuum or poison atmosphere, and once per fight a hit that marks 2 or more boxes marks one fewer. −1 to Athletics and Stealth while you wear it; a breach is the GM's call. Not with other armor.",
+   "An armored skinsuit: every skinsuit system, and once per fight a hit that marks 2 or more boxes marks one fewer. −1 to Athletics and Stealth while you wear it. Not with other armor.",
    {
     "control": "Licensed"
    }
@@ -2969,7 +2970,8 @@
    "equipment": {
     "laser": true,
     "scanner": true,
-    "papers": true
+    "papers": true,
+    "vacsuit": true
    },
    "play": {
     "gun": {
@@ -3078,7 +3080,8 @@
    "equipment": {
     "carbine": true,
     "blade": true,
-    "armor": true
+    "armor": true,
+    "vacsuit": true
    },
    "play": {
     "gun": {
@@ -3138,7 +3141,8 @@
    "equipment": {
     "laser": true,
     "deck": true,
-    "scanner": true
+    "scanner": true,
+    "vacsuit": true
    },
    "allegiance": "guild",
    "play": {
@@ -3196,7 +3200,8 @@
    "equipment": {
     "scanner": true,
     "medkit": true,
-    "stunner": true
+    "stunner": true,
+    "vacsuit": true
    },
    "allegiance": "relief"
   },
@@ -3245,7 +3250,8 @@
    "equipment": {
     "plasma": true,
     "armor": true,
-    "blade": true
+    "blade": true,
+    "vacsuit": true
    },
    "play": {
     "gun": {
@@ -3305,7 +3311,8 @@
    "equipment": {
     "pistol": true,
     "deck": true,
-    "papers": true
+    "papers": true,
+    "vacsuit": true
    },
    "allegiance": "quiet",
    "play": {
@@ -3349,7 +3356,7 @@
    "id": "hardsuit",
    "equipment": "hardsuit",
    "name": "Hardsuit",
-   "text": "An armored vac suit: air for six hours in vacuum or poison atmosphere, and once per fight a hit that marks 2 or more boxes marks one fewer. −1 to Athletics and Stealth while you wear it; a breach is the GM's call. Not with other armor.",
+   "text": "An armored skinsuit: every skinsuit system, and once per fight a hit that marks 2 or more boxes marks one fewer. −1 to Athletics and Stealth while you wear it. Not with other armor.",
    "traits": [
     {
      "type": "armor",

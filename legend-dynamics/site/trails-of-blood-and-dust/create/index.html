@@ -669,7 +669,7 @@ tr.lvl-U td.target { color: var(--muted); }
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="178a422" data-version-date="2026.10.29" title="The code changes whenever this page changes.">Version 2026.10.29 · 178a422</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="3dda23c" data-version-date="2026.10.30" title="The code changes whenever this page changes.">Version 2026.10.30 · 3dda23c</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -7589,7 +7589,7 @@ return { mountLab };
       adv: { id: "", name: "", text: "", detail: "" },
       sadv: { id: "", name: "", text: "", compName: "", compText: "" },
       comp: { id: "", name: "", text: "", trigger: "" },
-      equipment: Object.fromEntries(EQUIPMENT.map(([k]) => [k, false])),
+      equipment: Object.fromEntries(EQUIPMENT.map(([k, , , meta]) => [k, !!(meta && meta.standard)])), // standard issue (a skinsuit) starts ticked
       edges: Object.fromEntries(EDGE_DEFS.map(([k]) => [k, 0])), adv2: { id: "", detail: "" }, contact: "", gear: { item: "", skill: "", use: "" }, edgeNotes: {},
       allegiance: "", allegianceDef: null, customTier: 1, customSpeed: 0, xp: { earned: 0, log: [] }, edgesBought: {}, attrBought: {},
       portrait: "", portraitShape: "token",
