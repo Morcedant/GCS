@@ -103,3 +103,14 @@ test("an ordinary sensor sweep over Corvan II also starts the pull", () => {
   attempt(S, "pelion", "sweep"); if (S.pending) resolve(S, false);
   assert.equal(S.arc.stage, "pull");
 });
+test("the target an action card shows is the target the roll uses", async () => {
+  const { rollTarget } = await import("../src/game.js");
+  const S = newGame({ seed: "pv" });
+  const a = actionsFor(S).find((x) => x.id === "sweep");
+  const shown = rollTarget(S, a, "rrinn", "Computers");
+  assert.equal(shown.total, 18 - 2 + 2 + 1);   // Computers 18, hunting the hidden −2, Keen Hearing +2, a helper +1
+  attempt(S, "pelion", "sweep", { officer: "rrinn", skill: "Computers" });
+  const p = S.pending || S.log.find((l) => l.text.startsWith("Rrinn"));
+  if (S.pending) assert.equal(S.pending.target.total, shown.total);
+  else assert.ok(p.text.includes(`against ${shown.total}`));
+});

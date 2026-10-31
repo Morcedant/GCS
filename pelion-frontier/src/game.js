@@ -265,6 +265,20 @@ function engageNote(S, e) {
   return `${E.name}: shields ${E.shields - e.shields}/${E.shields}, hull ${E.hull - e.hull}/${E.hull}.`;
 }
 
+const actionCtx = (S, a) => ({ action: a.id === "mission" ? "mission" : a.id, order: a.order && S.orders.find((o) => o.id === a.order), listen: a.id === "hail" || a.id === "sweep" });
+const hailWill = (S, a) => { const e = S.enemies[a.enemy], will = ENEMIES[e.type].will + (e.power === "romulan" ? 2 : 0); return [`Their captain's Will ${will}`, 10 - will]; };
+/**
+ * The target for this officer doing this action, every modifier named: their skill, their advantage, wounds, the ship's
+ * sensors, the action's own difficulty, a second trained officer helping (+1), a captain's Will. The page shows it before
+ * the roll; the roll uses the same.
+ */
+export function rollTarget(S, a, who, skill) {
+  const t = target(S, who, skill, { ...actionCtx(S, a), extra: a.extra || [] });
+  const helper = CREW.find((c) => c.id !== who && available(S, c.id) && (!a.who || a.who.includes(c.id)) && skillOf(S, c.id, skill) >= 13);
+  if (helper) { t.parts.push([`${helper.short} assists`, 1]); t.total += 1; }
+  if (a.id === "hail") { const w = hailWill(S, a); t.parts.push(w); t.total += w[1]; }
+  return t;
+}
 /** Roll an action. Returns a pending result for the player to accept, or to reroll with a Duty point. */
 export function attempt(S, unit, actionId, opts = {}) {
   if (S.over || S.battle || S.event || S.pending) return { error: "Finish what's in front of you first." };
@@ -273,8 +287,7 @@ export function attempt(S, unit, actionId, opts = {}) {
   if (!a) return { error: "Not possible here." };
   if (a.why) return { error: a.why };
   if (actionId === "engage") { startBattleHook(S, a.enemy, "pelion"); S.pelion.acted = true; return { ok: true, battle: true }; }
-  const order = a.order && S.orders.find((o) => o.id === a.order);
-  const ctx = { action: actionId === "mission" ? "mission" : actionId, order, listen: actionId === "hail" || actionId === "sweep" };
+  const ctx = actionCtx(S, a);
   let who, skill, t;
   if (unit !== "pelion") { who = unit; skill = a.skills[0]; t = { parts: [["Science vessel's crew", SUPPORT.science.skill], ["Its sensors", 2]], total: SUPPORT.science.skill + 2 }; }
   else {
@@ -283,15 +296,9 @@ export function attempt(S, unit, actionId, opts = {}) {
     if (!who || !skill || !available(S, who) || !skillOf(S, who, skill) || !a.skills.includes(skill) || (a.who && !a.who.includes(who))) {
       const b = bestOfficer(S, a.skills, ctx, a.who); if (!b) return { error: a.who ? "No one there has the training." : "Nobody fit for duty has the training." }; who = b.officer; skill = b.skill;
     }
-    t = target(S, who, skill, { ...ctx, extra: a.extra || [] });
-    // A second officer trained in the skill helps: +1.
-    const helper = CREW.find((c) => c.id !== who && available(S, c.id) && (!a.who || a.who.includes(c.id)) && skillOf(S, c.id, skill) >= 13);
-    if (helper && opts.assist !== false) { t.parts.push([`${helper.short} assists`, 1]); t.total += 1; }
+    t = rollTarget(S, a, who, skill);
   }
-  if (actionId === "hail") {
-    const e = S.enemies[a.enemy]; const will = ENEMIES[e.type].will + (e.power === "romulan" ? 2 : 0);
-    t.parts.push([`Their captain's Will ${will}`, 10 - will]); t.total += 10 - will;
-  }
+  if (actionId === "hail" && unit !== "pelion") { const w = hailWill(S, a); t.parts.push(w); t.total += w[1]; }
   const roll = check(S, t.total);
   S.pending = { unit, action: actionId, arc: a.arc, order: a.order, enemy: a.enemy, sys: a.sys, officer: who, skill, target: t, roll, rerolled: false, name: a.name };
   if (roll.success) return resolve(S, false);
