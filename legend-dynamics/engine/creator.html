@@ -3949,12 +3949,11 @@ tr.lvl-U td.target { color: var(--muted); }
     const st = el.closest("#view-create .step"); if (st) showStep(STEPS.indexOf(st));
     const pane = el.closest("[data-gmpane]"); if (pane) showGmTab(pane.dataset.gmpane);
     const sp = el.closest("[data-sheetpane]"); if (sp) showSheetTab(sp.dataset.sheetpane);
+    // A book not opened yet isn't split into chapters, so show it first (that splits it), then find the chapter.
+    const inBook = books && Object.keys(books).find((k) => books[k].contains(el));
+    if (inBook && books[inBook].hidden) showBook(inBook);
     const chap = el.closest(".gchap");
-    if (chap) {
-      const root = chap.parentElement, which = books && Object.keys(books).find((k) => books[k] === root);
-      if (which && root.hidden) showBook(which);
-      showChapter(root, chaptersOf(root).indexOf(chap), false);
-    }
+    if (chap) showChapter(chap.parentElement, chaptersOf(chap.parentElement).indexOf(chap), false);
   }
   window.ldReveal = reveal;
   document.addEventListener("click", (e) => {

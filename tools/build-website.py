@@ -278,7 +278,9 @@ def start_page():
     # The first adventure each GM's Guide opens with (pack "firstAdventure"): a spoiler-free blurb for players and GMs alike.
     adventures = "".join(
         f'<li><b>{e(fa["title"])}</b><span class="ld-eyebrow" style="display:block;margin:.1rem 0 .4rem">{e(pack(g)["terms"]["title"])} · {e(fa["kind"])}</span>'
-        f'<span>{e(fa["blurb"])}</span><span style="display:block;margin-top:.5rem;font-size:.9rem">{e(fa["length"])}. <a href="{SLUGS[g]}">About {e(pack(g)["terms"]["title"])}</a></span></li>'
+        f'<span>{e(fa["blurb"])}</span><span style="display:block;margin-top:.5rem;font-size:.9rem">{e(fa["length"])}.</span>'
+        f'<span style="display:flex;flex-wrap:wrap;gap:.4rem 1rem;margin-top:.6rem;font-size:.95rem"><a href="{CREATORS[g]}#{fa["anchor"]}" target="_blank" rel="noopener"><b>Read the adventure →</b></a>'
+        f'<a href="{SLUGS[g]}">About {e(pack(g)["terms"]["title"])}</a></span></li>'
         for g in GAMES for fa in [pack(g).get("firstAdventure")] if fa)
     return f"""<!-- Start here page (suggested URL {START_SLUG}). No theme injection: it uses the Legend Dynamics brand.
      Paste each block into its own Code Block (Display Source off). -->
@@ -324,7 +326,7 @@ def start_page():
 <div class="ld" id="first-adventures">
   <div class="ld-eyebrow">Ready to run</div>
   <h2>A first adventure for every setting</h2>
-  <p class="ld-lede">Each setting's GM's Guide opens with an adventure to start on: everything the GM needs is written out, and every ready-made character has a reason to be there. Pick one and play tonight.</p>
+  <p class="ld-lede">Each setting's GM's Guide opens with an adventure to start on: everything the GM needs is written out, and every ready-made character has a reason to be there. Pick one and play tonight. (The links open the adventure in the GM's Guide, so players may want to skip them.)</p>
   <ul class="ld-pillars">{adventures}</ul>
 </div>
 

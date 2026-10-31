@@ -4790,6 +4790,7 @@
   "title": "Salvage Rights",
   "kind": "A salvage job",
   "blurb": "A colony ship lost 140 years ago has turned up at the end of a corridor the charts say is gone. Your debts are due, a broker is paying, and someone else bought the same coordinates.",
-  "length": "One or two sessions, for 3 to 7 players, with the ready-made characters"
+  "length": "One or two sessions, for 3 to 7 players, with the ready-made characters",
+    "anchor": "gm-the-first-job-salvage-rights"
  }
 }
