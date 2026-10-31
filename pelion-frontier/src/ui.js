@@ -40,6 +40,7 @@ const mark = () => S.logSeq || 0;
 /** Note what a choice led to: every log line since `since` (story scenes have their own pop-ups). */
 function reportSince(title, since, roll) {
   const lines = S.log.filter((l) => l.id > since && !l.story).map((l) => l.text);
+  if (roll && roll.contest) roll = null;   // a contest shows its own rolls, exchange by exchange
   if (lines.length || roll) report = { title, roll, lines };
 }
 function after() {
@@ -613,11 +614,11 @@ function bindChrome() {
       const r = attempt(S, unit, a.id, { order: a.order, enemy: a.enemy, arc: a.arc, officer: who, skill, assist });
       if (r.error) { toast(r.error, true); return; }
       lastResult = r.done ? r.result : null;
-      if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill });
+      if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill, contest: r.result.arc === "reason" });
       else if (r.battle) reportSince(b.closest(".card")?.querySelector("h4")?.textContent || "Engage", since);
       after(); return;
     }
-    if (b.dataset.resolve) { const since = mark(); const r = resolve(S, b.dataset.resolve === "reroll"); lastResult = r.done ? r.result : null; if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill }); after(); return; }
+    if (b.dataset.resolve) { const since = mark(); const r = resolve(S, b.dataset.resolve === "reroll"); lastResult = r.done ? r.result : null; if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill, contest: r.result.arc === "reason" }); after(); return; }
     if (b.dataset.refit) { const since = mark(); const r = fitRefit(S, b.dataset.refit); if (r.error) toast(r.error, true); else reportSince(REFITS[b.dataset.refit].name, since); after(); return; }
     if (b.dataset.req) { const since = mark(); const r = requisition(S, b.dataset.req); if (r.error) toast(r.error, true); else reportSince("Requisition: " + SUPPORT[b.dataset.req].name, since); after(); return; }
   });

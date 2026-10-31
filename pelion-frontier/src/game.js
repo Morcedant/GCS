@@ -349,7 +349,7 @@ export function resolve(S, reroll) {
   if (p.action === "sweep" && p.unit === "pelion") arcSweepHook(S);   // a sweep over Corvan II wakes the ruins
   const where = sysAt(S, U.at)?.name || "open space";
   const who = p.unit === "pelion" ? (p.officer === "captain" ? S.captain : officer(p.officer).name) : S.support[p.unit]?.name || "The science vessel";
-  const r = p.roll, head = `${who} (${p.skill || "crew"}) · ${p.name} at ${where}: rolled ${r.dice.join("+")} = ${r.total} against ${r.target}, ${r.success ? `success by ${r.margin}` : `failed by ${-r.margin}`}${p.rerolled ? " after spending a Duty point to reroll" : ""}.`;
+  const r = p.roll, head = p.arc === "reason" ? `${who} (${p.skill}) · ${p.name} at ${where}${p.rerolled ? ", after spending a Duty point to reroll the first exchange" : ""}:` : `${who} (${p.skill || "crew"}) · ${p.name} at ${where}: rolled ${r.dice.join("+")} = ${r.total} against ${r.target}, ${r.success ? `success by ${r.margin}` : `failed by ${-r.margin}`}${p.rerolled ? " after spending a Duty point to reroll" : ""}.`;
   if (S.log.length > pre) S.log[pre].text = head + " " + S.log[pre].text; else log(S, head);
   if (p.unit === "pelion" && p.roll.success && p.officer !== "captain") gainXp(S, p.officer, p.skill);
   updateVisibility(S);
