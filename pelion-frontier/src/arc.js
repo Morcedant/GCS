@@ -18,6 +18,7 @@ const raider = (S) => enemiesAt(S, S.systems[S.corvan].at).find((e) => e.goal ==
 export function arcActions(S) {
   const A = S.arc, out = [];
   const add = (arc, name, skills, blurb, extra) => out.push({ id: "arc", arc, name, skills, blurb, extra });
+  if (A.stage === "orbit") add("scan", "Sweep the ruins with the ship's sensors", ["Sensors", "Physical Sciences"], "Find out what's down there before anyone beams down. Whatever the roll, something in the ruins will notice.");
   if (A.stage === "pull") {
     for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `A clue for the record (${A.clock}/${CLOCK}). A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]]);
     if (!A.boughtTime && A.countdown > 0) add("time", "Buy time: reroute power", ["Engineering"], "Clear a segment of the Countdown. Once.");
@@ -37,6 +38,12 @@ export function arcActions(S) {
 
 export function arcStep(S, p) {
   const A = S.arc, r = p.roll, k = p.arc, who = officer(p.officer)?.short || "The away team";
+  if (k === "scan") {
+    if (r.success) { A.clock = 1; log(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. (Record 1/${CLOCK})`, "discovery"); }
+    else log(S, `${who}'s sweep of the ruins at Corvan II: interference, and then the readings go strange.`);
+    startPull(S);
+    return "";
+  }
   if (k.startsWith("clue-")) {
     const c = CLUES[k.slice(5)];
     if (!r.success) {
@@ -113,11 +120,19 @@ function finishArc(S, how) {
 export function arcTick(S) {
   const A = S.arc, cv = S.systems[S.corvan];
   if (A.stage === "travel" && S.pelion.at === cv.at && !raider(S) && !S.battle) {
-    A.stage = "pull";
+    // In orbit and unopposed. Nothing happens below until the Pelion's sensors sweep the ruins.
+    A.stage = "orbit";
     const o = arcOrder(S); if (o) o.deadline = 999;
-    storyEvent(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. The away team beams down to an empty outpost.");
+    log(S, "In orbit over Corvan II, the raider gone. The outpost doesn't answer hails. The ruins are two kilometers from the Ketari village. Sweep them with the ship's sensors (the Here tab) to learn what happened.", "order");
   }
 }
+/** The sweep that wakes what's in the ruins: the arc's own scan, or an ordinary sensor sweep over Corvan II. */
+function startPull(S) {
+  const A = S.arc; if (A.stage !== "orbit") return;
+  A.stage = "pull";
+  storyEvent(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. The away team beams down to an empty outpost.");
+}
+export function arcSweep(S) { if (S.arc.stage === "orbit" && S.pelion.at === S.systems[S.corvan].at) startPull(S); }
 /** End of turn: the drain on the ship while it stays in orbit. */
 export function arcTurn(S) {
   const A = S.arc;
@@ -151,6 +166,6 @@ export function arcEventChoose(S, id, roll) {
   return {};
 }
 
-registerHooks({ arcActions, arcStep });
+registerHooks({ arcActions, arcStep, arcSweep });
 export { CLUES };
 export const raiderName = ENEMIES.orion.name;

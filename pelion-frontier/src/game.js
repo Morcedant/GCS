@@ -303,6 +303,7 @@ export function resolve(S, reroll) {
   U.acted = true;
   const pre = S.log.length;
   const out = applyAction(S, p);
+  if (p.action === "sweep" && p.unit === "pelion") arcSweepHook(S);   // a sweep over Corvan II wakes the ruins
   const where = sysAt(S, U.at)?.name || "open space";
   const who = p.unit === "pelion" ? (p.officer === "captain" ? S.captain : officer(p.officer).name) : S.support[p.unit]?.name || "The science vessel";
   const r = p.roll, head = `${who} (${p.skill || "crew"}) · ${p.name} at ${where}: rolled ${r.dice.join("+")} = ${r.total} against ${r.target}, ${r.success ? `success by ${r.margin}` : `failed by ${-r.margin}`}${p.rerolled ? " after spending a Duty point to reroll" : ""}.`;
@@ -522,5 +523,5 @@ export function checkEnd(S) {
 }
 
 // ---------- hooks set by the other modules (they import game.js, so they register here) ----------
-let startBattleHook = () => {}, arcActionsHook = () => [], arcStepHook = () => "";
-export function registerHooks(h) { if (h.startBattle) startBattleHook = h.startBattle; if (h.arcActions) arcActionsHook = h.arcActions; if (h.arcStep) arcStepHook = h.arcStep; }
+let startBattleHook = () => {}, arcActionsHook = () => [], arcStepHook = () => "", arcSweepHook = () => {};
+export function registerHooks(h) { if (h.startBattle) startBattleHook = h.startBattle; if (h.arcActions) arcActionsHook = h.arcActions; if (h.arcStep) arcStepHook = h.arcStep; if (h.arcSweep) arcSweepHook = h.arcSweep; }

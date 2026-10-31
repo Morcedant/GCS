@@ -183,6 +183,7 @@ function hint() {
   const A = S.arc, cv = S.systems[S.corvan];
   let t = "";
   if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:</b> fly to Corvan II (the gold <b>!</b>). Double-click it on the map: the Pelion goes as far as it can this turn. Then <b>End turn</b>.`;
+  else if (A.stage === "orbit") t = "<b>Next:</b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
   else if (A.stage === "pull") t = "<b>Next:</b> the away team. Use the actions below, one a turn, to fill the record before the Countdown fills.";
   else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:</b> finish it on Corvan II: the action below.";
   else if (S.turn <= 12) t = "<b>Next:</b> Starfleet will send new orders (the Orders tab). Meanwhile: survey the unknown (?), court the independent worlds, and watch for raiders.";
@@ -290,7 +291,7 @@ function crewHTML() {
 function ordersHTML() {
   let h = hint() + `<h2>Orders</h2>`;
   const A = S.arc;
-  if (A.stage !== "travel" && A.stage !== "done") {
+  if (A.stage !== "travel" && A.stage !== "orbit" && A.stage !== "done") {
     h += `<div class="card gold"><h4>The Silence at Corvan II</h4><div class="kv small"><span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} (break orbit when full)</span><span>Record</span><span>${boxes(A.clock, CLOCK, "blue")}</span></div>`
       + `<div class="small muted" style="margin-top:4px">${Object.entries(CLUES).filter(([k]) => A.clues[k]).map(([, c]) => `${esc(c.name)}: ${esc(c.found)}`).join("<br>") || "No clues yet."}</div><div class="roll-row"><button class="btn small" data-center="${S.systems[S.corvan].at}">Find Corvan II</button></div></div>`;
   }
@@ -299,7 +300,7 @@ function ordersHTML() {
     const left = o.deadline - S.turn;
     h += `<div class="card ${left <= 2 && !o.arc ? "red" : "gold"}"><h4>${esc(o.title)}</h4>`;
     if (o.text) h += `<p class="small">${esc(o.text)}</p>`;
-    if (!o.arc || A.stage === "travel") h += `<div class="small">${o.arc ? "" : `${o.have}/${o.segs} done with ${esc(o.skills.join(", "))}. `}Due by turn ${o.deadline} (${left} turn${left === 1 ? "" : "s"} left).</div>`;
+    if (!o.arc || A.stage === "travel" || A.stage === "orbit") h += `<div class="small">${o.arc ? "" : `${o.have}/${o.segs} done with ${esc(o.skills.join(", "))}. `}Due by turn ${o.deadline} (${left} turn${left === 1 ? "" : "s"} left).</div>`;
     h += `<div class="small muted">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.</div>`;
     h += `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-go="${o.at}">Set course</button></div></div>`;
   }

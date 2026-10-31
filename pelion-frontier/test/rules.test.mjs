@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { newGame, check, actionsFor, attempt, resolve, moveTo, reachable, target, markCommand, score } from "../src/game.js";
 import { startBattle, exchange, battleStats } from "../src/combat.js";
-import { endTurn, chooseEvent, closeBattle } from "../src/turn.js";
+import { endTurn, chooseEvent, closeBattle, dismissEvent } from "../src/turn.js";
 import { chance } from "../src/data.js";
 
 test("the same seed builds the same sector", () => {
@@ -53,7 +53,7 @@ test("a battle runs to an end and the Pelion's numbers come from the bridge crew
   for (let i = 0; i < 20 && !S.battle.over; i++) exchange(S, { shields: true, phasers: true, torps: true });
   assert.ok(S.battle.over); closeBattle(S); assert.equal(S.battle, null);
 });
-test("Corvan II: arriving brings the raider's hail; warning it off starts the pull", () => {
+test("Corvan II: arriving brings the raider's hail; the pull waits for a sensor sweep of the ruins", () => {
   const S = newGame({ seed: "cv" });
   S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
   assert.equal(S.event.kind, "arc-arrive");
@@ -62,7 +62,14 @@ test("Corvan II: arriving brings the raider's hail; warning it off starts the pu
     if (S.event && S.event.kind === "arc-arrive") chooseEvent(S, "warn");
     else if (S.battle) { if (S.battle.over) closeBattle(S); else exchange(S, { shields: true, phasers: true, torps: true }); }
   }
+  // Gone, the raider leaves the Pelion in orbit: nothing happens below until the sensors sweep the ruins.
+  assert.equal(S.arc.stage, "orbit");
+  assert.equal(S.event, null);
+  assert.ok(!actionsFor(S).some((a) => a.arc === "clue-logs"));
+  const r = attempt(S, "pelion", "arc", { arc: "scan" }); if (S.pending) resolve(S, false);
+  assert.ok(r.ok);
   assert.equal(S.arc.stage, "pull");
+  assert.equal(S.event.title, "The pull");
   assert.ok(actionsFor(S).some((a) => a.arc === "clue-logs"));
 });
 test("the score counts", () => { const S = newGame({ seed: "sc" }); assert.equal(score(S).total, 15); });
@@ -74,4 +81,14 @@ test("every discovery is in the log, and trimming never drops one", async () => 
   for (let i = 0; i < 500; i++) log(S, "noise " + i);
   assert.ok(S.log.some((l) => l.text.startsWith("The pull")));
   assert.ok(S.log.length <= 301);
+});
+
+test("an ordinary sensor sweep over Corvan II also starts the pull", () => {
+  const S = newGame({ seed: "sw" });
+  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
+  const e = Object.values(S.enemies).find((x) => x.goal === "arc"); delete S.enemies[e.id]; S.event = null;
+  dismissEvent(S);
+  assert.equal(S.arc.stage, "orbit");
+  attempt(S, "pelion", "sweep"); if (S.pending) resolve(S, false);
+  assert.equal(S.arc.stage, "pull");
 });

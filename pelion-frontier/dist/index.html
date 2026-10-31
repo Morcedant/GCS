@@ -723,6 +723,7 @@ function resolve(S, reroll) {
   U.acted = true;
   const pre = S.log.length;
   const out = applyAction(S, p);
+  if (p.action === "sweep" && p.unit === "pelion") arcSweepHook(S);   // a sweep over Corvan II wakes the ruins
   const where = sysAt(S, U.at)?.name || "open space";
   const who = p.unit === "pelion" ? (p.officer === "captain" ? S.captain : officer(p.officer).name) : S.support[p.unit]?.name || "The science vessel";
   const r = p.roll, head = `${who} (${p.skill || "crew"}) · ${p.name} at ${where}: rolled ${r.dice.join("+")} = ${r.total} against ${r.target}, ${r.success ? `success by ${r.margin}` : `failed by ${-r.margin}`}${p.rerolled ? " after spending a Duty point to reroll" : ""}.`;
@@ -942,8 +943,8 @@ function checkEnd(S) {
 }
 
 // ---------- hooks set by the other modules (they import game.js, so they register here) ----------
-let startBattleHook = () => {}, arcActionsHook = () => [], arcStepHook = () => "";
-function registerHooks(h) { if (h.startBattle) startBattleHook = h.startBattle; if (h.arcActions) arcActionsHook = h.arcActions; if (h.arcStep) arcStepHook = h.arcStep; }
+let startBattleHook = () => {}, arcActionsHook = () => [], arcStepHook = () => "", arcSweepHook = () => {};
+function registerHooks(h) { if (h.startBattle) startBattleHook = h.startBattle; if (h.arcActions) arcActionsHook = h.arcActions; if (h.arcStep) arcStepHook = h.arcStep; if (h.arcSweep) arcSweepHook = h.arcSweep; }
 
 // ---- combat.js ----
 // Ship combat, from the Players' Guide's "The USS Pelion": exchanges; Power to spend on shields, phasers and
@@ -1174,6 +1175,7 @@ const raider = (S) => enemiesAt(S, S.systems[S.corvan].at).find((e) => e.goal ==
 function arcActions(S) {
   const A = S.arc, out = [];
   const add = (arc, name, skills, blurb, extra) => out.push({ id: "arc", arc, name, skills, blurb, extra });
+  if (A.stage === "orbit") add("scan", "Sweep the ruins with the ship's sensors", ["Sensors", "Physical Sciences"], "Find out what's down there before anyone beams down. Whatever the roll, something in the ruins will notice.");
   if (A.stage === "pull") {
     for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `A clue for the record (${A.clock}/${CLOCK}). A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]]);
     if (!A.boughtTime && A.countdown > 0) add("time", "Buy time: reroute power", ["Engineering"], "Clear a segment of the Countdown. Once.");
@@ -1193,6 +1195,12 @@ function arcActions(S) {
 
 function arcStep(S, p) {
   const A = S.arc, r = p.roll, k = p.arc, who = officer(p.officer)?.short || "The away team";
+  if (k === "scan") {
+    if (r.success) { A.clock = 1; log(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. (Record 1/${CLOCK})`, "discovery"); }
+    else log(S, `${who}'s sweep of the ruins at Corvan II: interference, and then the readings go strange.`);
+    startPull(S);
+    return "";
+  }
   if (k.startsWith("clue-")) {
     const c = CLUES[k.slice(5)];
     if (!r.success) {
@@ -1269,11 +1277,19 @@ function finishArc(S, how) {
 function arcTick(S) {
   const A = S.arc, cv = S.systems[S.corvan];
   if (A.stage === "travel" && S.pelion.at === cv.at && !raider(S) && !S.battle) {
-    A.stage = "pull";
+    // In orbit and unopposed. Nothing happens below until the Pelion's sensors sweep the ruins.
+    A.stage = "orbit";
     const o = arcOrder(S); if (o) o.deadline = 999;
-    storyEvent(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. The away team beams down to an empty outpost.");
+    log(S, "In orbit over Corvan II, the raider gone. The outpost doesn't answer hails. The ruins are two kilometers from the Ketari village. Sweep them with the ship's sensors (the Here tab) to learn what happened.", "order");
   }
 }
+/** The sweep that wakes what's in the ruins: the arc's own scan, or an ordinary sensor sweep over Corvan II. */
+function startPull(S) {
+  const A = S.arc; if (A.stage !== "orbit") return;
+  A.stage = "pull";
+  storyEvent(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. The away team beams down to an empty outpost.");
+}
+function arcSweep(S) { if (S.arc.stage === "orbit" && S.pelion.at === S.systems[S.corvan].at) startPull(S); }
 /** End of turn: the drain on the ship while it stays in orbit. */
 function arcTurn(S) {
   const A = S.arc;
@@ -1307,7 +1323,7 @@ function arcEventChoose(S, id, roll) {
   return {};
 }
 
-registerHooks({ arcActions, arcStep });
+registerHooks({ arcActions, arcStep, arcSweep });
 
 const raiderName = ENEMIES.orion.name;
 
@@ -1682,6 +1698,7 @@ function hint() {
   const A = S.arc, cv = S.systems[S.corvan];
   let t = "";
   if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:<\/b> fly to Corvan II (the gold <b>!<\/b>). Double-click it on the map: the Pelion goes as far as it can this turn. Then <b>End turn<\/b>.`;
+  else if (A.stage === "orbit") t = "<b>Next:<\/b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
   else if (A.stage === "pull") t = "<b>Next:<\/b> the away team. Use the actions below, one a turn, to fill the record before the Countdown fills.";
   else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:<\/b> finish it on Corvan II: the action below.";
   else if (S.turn <= 12) t = "<b>Next:<\/b> Starfleet will send new orders (the Orders tab). Meanwhile: survey the unknown (?), court the independent worlds, and watch for raiders.";
@@ -1789,7 +1806,7 @@ function crewHTML() {
 function ordersHTML() {
   let h = hint() + `<h2>Orders<\/h2>`;
   const A = S.arc;
-  if (A.stage !== "travel" && A.stage !== "done") {
+  if (A.stage !== "travel" && A.stage !== "orbit" && A.stage !== "done") {
     h += `<div class="card gold"><h4>The Silence at Corvan II<\/h4><div class="kv small"><span>Countdown<\/span><span>${boxes(A.countdown, COUNTDOWN)} (break orbit when full)<\/span><span>Record<\/span><span>${boxes(A.clock, CLOCK, "blue")}<\/span><\/div>`
       + `<div class="small muted" style="margin-top:4px">${Object.entries(CLUES).filter(([k]) => A.clues[k]).map(([, c]) => `${esc(c.name)}: ${esc(c.found)}`).join("<br>") || "No clues yet."}<\/div><div class="roll-row"><button class="btn small" data-center="${S.systems[S.corvan].at}">Find Corvan II<\/button><\/div><\/div>`;
   }
@@ -1798,7 +1815,7 @@ function ordersHTML() {
     const left = o.deadline - S.turn;
     h += `<div class="card ${left <= 2 && !o.arc ? "red" : "gold"}"><h4>${esc(o.title)}<\/h4>`;
     if (o.text) h += `<p class="small">${esc(o.text)}<\/p>`;
-    if (!o.arc || A.stage === "travel") h += `<div class="small">${o.arc ? "" : `${o.have}/${o.segs} done with ${esc(o.skills.join(", "))}. `}Due by turn ${o.deadline} (${left} turn${left === 1 ? "" : "s"} left).<\/div>`;
+    if (!o.arc || A.stage === "travel" || A.stage === "orbit") h += `<div class="small">${o.arc ? "" : `${o.have}/${o.segs} done with ${esc(o.skills.join(", "))}. `}Due by turn ${o.deadline} (${left} turn${left === 1 ? "" : "s"} left).<\/div>`;
     h += `<div class="small muted">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.<\/div>`;
     h += `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it<\/button><button class="btn small primary" data-go="${o.at}">Set course<\/button><\/div><\/div>`;
   }
