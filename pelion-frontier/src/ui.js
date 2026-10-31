@@ -588,7 +588,7 @@ function campaignHTML() {
   let h = `<div class="card gold"><h4>The campaign: ${esc(CAMPAIGN.title)} <span class="badge-status ${C.over === "lost" ? "bad" : C.over ? "good" : ""}">${esc(campaignAct(S))}</span></h4>
     <p class="small">${esc(CAMPAIGN.premise)}</p>
     <div class="kv small"><span>Threads</span><span>${boxes(n, CAMPAIGN.finaleAt, "blue")} ${esc(status)}</span></div>`;
-  if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})</summary>${beats.map((b) => `<p><b>${esc(b.act)}: ${esc(b.title)}.</b> ${esc(b.text.split("\n")[0])}</p>`).join("")}</details>`;
+  if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})</summary>${beats.map((b) => `<p style="white-space:pre-line"><b>${esc(b.act)}: ${esc(b.title)}.</b> ${esc(b.text)}</p>`).join("")}</details>`;
   if (C.threads.length) h += `<details class="small" style="margin-top:4px"><summary>Threads found (${C.threads.length})</summary><ol>${C.threads.map((t) => `<li><b>${esc(t.title)}</b> (turn ${t.turn}): ${esc(t.text)}</li>`).join("")}</ol></details>`;
   return h + `</div>`;
 }
@@ -732,7 +732,7 @@ function showStarter(canContinue) {
   <div class="grid2">
     <div class="brief"><h3>The ship</h3><p>Double-click a hex to fly there. A hex is a light-year and a turn a week; speed is v = W³ × c, so warp 6, the Pelion's maximum stable speed, covers about 4 light-years a week, and warp 8, its emergency maximum, about 10, at a risk to the engines. Urgent orders call for emergency warp. Nebulae count double. Then the crew goes to work where you are: every officer acts once a turn (survey, investigate, negotiate, sweep, repair), each job once. Starbase 23 repairs, rearms and refits you.</p></div>
     <div class="brief"><h3>The crew</h3><p>The six officers from the Players' Guide do the work. Every action is the tabletop roll: 3d6 at or under their skill. Pick who does it, and whether a second officer assists (+1, using their turn); a Duty point rerolls a failure.</p></div>
-    <div class="brief"><h3>The campaign</h3><p>${esc(CAMPAIGN.title)}: it begins with The Silence at Corvan II. Something left machines all over this sector to watch over younger worlds, and someone is digging them up. Every order you carry out turns up a thread; six threads lead to the finale.</p></div>
+    <div class="brief"><h3>The campaign</h3><p>${esc(CAMPAIGN.title)}: it begins with The Silence at Corvan II. Something left machines all over this sector to watch over younger worlds. Two sites have already been dug up, and everyone who was there, a survey team and a whole mining settlement, is gone. Every order you carry out turns up a thread toward who is doing it; six threads lead to the finale.</p></div>
     <div class="brief"><h3>Orders</h3><p>Starfleet sends missions, each with a deadline, a twist, its own story, and a reason tied to the campaign. Each ends with a decision that's yours to make.</p></div>
     <div class="brief"><h3>The worlds</h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.</p></div>
     <div class="brief"><h3>Battles</h3><p>Ship combat from the Players' Guide: spend Power on shields, phasers and torpedoes, give the captain's order, and break away if it goes wrong.</p></div>
