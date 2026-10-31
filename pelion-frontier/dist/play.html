@@ -988,7 +988,7 @@ function earnRecord(S) {
   if (!left.length) return null;
   const rec = pick(S, left); S.records.push(rec.id); return rec;
 }
-function join(S, s) { s.kind = "member"; s.harm = 0; S.joined++; S.commendations += 2; S.seenSys[s.id] = true; markCommand(S, -1, `${s.name} joins the Federation.`); }
+function join(S, s) { s.kind = "member"; s.harm = 0; S.joined++; S.commendations += 2; S.seenSys[s.id] = true; log(S, `${s.name} joins the Federation: +2 commendations.`, "victory"); }
 
 // ---------- orders ----------
 const orderHere = (S, hex, where) => S.orders.some((o) => o.at === hex && (!where || o.where === where));
@@ -1021,14 +1021,24 @@ function completeOrder(S, o, ok, how) {
   recordOrder(S, o, ok ? "done" : "failed", how || (ok ? "Carried out." : `Not carried out by turn ${o.deadline}.`));
   if (ok) {
     S.done++; S.commendations += o.arc ? 4 : 2; S.supplies += 10; S.science += 8;
+    // Three orders carried out in a row clear a box on the Starfleet Command track (if one is marked). Orders carried
+    // out with Starfleet out of contact don't count toward the run, but don't break it either.
     const credit = !(o.twist && o.twist.fx === "nocredit");
-    if (credit) markCommand(S, -1, `orders carried out: ${o.title}.`);
-    const ev = missionReport(S, o, "done", how || "Carried out.", ["+10 supplies", "+8 science", `+${o.arc ? 4 : 2} commendations`].concat(credit ? ["a Starfleet Command box cleared"] : []));
+    let streakLine = "Out of contact with Starfleet: this one doesn't count toward three in a row.";
+    if (credit) {
+      S.streak = (S.streak || 0) + 1;
+      if (S.streak >= 3) {
+        S.streak = 0;
+        if (S.command > 0) { markCommand(S, -1, "three orders carried out in a row."); streakLine = "Three orders carried out in a row: a Starfleet Command box cleared."; }
+        else streakLine = "Three orders carried out in a row (no box to clear).";
+      } else streakLine = `${S.streak} of 3 orders carried out in a row: at 3, a Starfleet Command box is cleared.`;
+    }
+    const ev = missionReport(S, o, "done", how || "Carried out.", ["+10 supplies", "+8 science", `+${o.arc ? 4 : 2} commendations`, streakLine]);
     const had = new Set(S.orders.map((x) => x.id));
     fillFromBacklog(S);
     const next = S.orders.filter((x) => !had.has(x.id)); if (next.length) ev.next = next.map((x) => x.title);
   } else {
-    S.failed++; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
+    S.failed++; S.streak = 0; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
     const s = o.sys && S.systems[o.sys];
     if (s && /Evacuate|distress|medical/i.test(o.title) && ["colony", "member", "independent"].includes(s.kind)) harmWorld(S, s, 1, "help never came");
     fillFromBacklog(S);
@@ -1652,7 +1662,7 @@ function completeArc(S, how, fresh) {
     A.phasers = true;
     astory(S, "The Ketari's own history", "The away team has every Orion phaser back from the village, and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
     alog(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
-    if (o) { const how = "Partly: the Orion phasers recovered and the Ketari left their history, but the scientists still asleep."; S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; recordOrder(S, o, "partly", how); missionReport(S, o, "partly", how, ["+8 science", "+1 commendation"]); }
+    if (o) { const how = "Partly: the Orion phasers recovered and the Ketari left their history, but the scientists still asleep."; S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; S.streak = 0; recordOrder(S, o, "partly", how); missionReport(S, o, "partly", how, ["+8 science", "+1 commendation", "Only partly carried out: the run of orders in a row starts again."]); }
   } else {
     astory(S, fresh ? (how === "reason" ? "Equals" : "Silence, for good") : "Orders carried out", fresh ? resolvedText(how) + (how === "reason" ? " The Ketari keep their guardian, and the Federation has a library record no one else has." : "") : `The phasers are back aboard, and the away team beams up. ${how === "reason" ? "The caretaker goes on watching, the Ketari keep their guardian, and the Federation has a library record no one else has." : "The ruins are only ruins now."} The eight scientists are in sickbay, and Rrinn hasn't left her sister's side.`);
     alog(S, `The Silence at Corvan II: the eight scientists are safe and the Orion phasers recovered.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
@@ -1662,7 +1672,7 @@ function completeArc(S, how, fresh) {
     if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); if (rep) rep.rewards.push("+4 more commendations and +15 science for a peaceful answer", "Library record: the caretaker of Corvan II"); }
     else { S.commendations += 1; if (rep) rep.rewards.push("+1 more commendation"); }
   }
-  if (!A.seen) markCommand(S, -1, "the Ketari never learned what the crew were.");
+  if (!A.seen) { S.commendations += 1; log(S, "The Ketari never learned what the crew were: +1 commendation.", "good"); }
 }
 
 /** After anything happens: move the story on. */
@@ -2552,7 +2562,7 @@ function ordersHTML() {
   const hist = S.history || [], back = S.backlog || [];
   const doneN = hist.filter((x) => x.result !== "failed").length, failN = hist.filter((x) => x.result === "failed").length;
   h += `<div class="kv small" style="margin-bottom:10px"><span>Tour<\/span><span>${bar(Math.min(S.turn, TOUR), TOUR, "var(--gold)")} Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hourly(S) ? ` · hour ${(S.hour || 0) + 1} on Corvan II` : ""}<\/span>
-    <span>Starfleet Command<\/span><span>${boxes(S.command, 5)} ${S.command} of 5 against the captain: failed orders, Prime Directive violations and incidents each mark one; carried-out orders clear one. At 5 the captain is relieved of command.<\/span>
+    <span>Starfleet Command<\/span><span>${boxes(S.command, 5)} ${S.command} of 5 against the captain: failed orders, Prime Directive violations and incidents each mark one. Three orders carried out in a row clear one (now ${S.streak || 0} of 3). At 5 the captain is relieved of command.<\/span>
     <span>Orders<\/span><span><b>${S.orders.length}<\/b> under way · <b>${back.length}<\/b> in the backlog · <b class="good">${doneN}<\/b> carried out · <b class="bad">${failN}<\/b> failed<\/span><\/div>`;
   h += `<h3>Under way<\/h3>`;
   if (!S.orders.length) h += `<p class="muted small">No orders under way. ${back.length ? "Take one on from the backlog below." : "Starfleet will send more; meanwhile, the sector is yours to patrol."}<\/p>`;
@@ -2599,7 +2609,7 @@ function missionHTML() {
       h += `<ol class="steps-list"><li class="${there || o.have ? "done" : "now"}"><span>${there || o.have ? "✓" : "▶"}<\/span>Reach ${esc(o.sys ? S.systems[o.sys].name : "the border")} (${distance(S.pelion.at, o.at)} ly away)<\/li><li class="${o.have >= o.segs ? "done" : there || o.have ? "now" : ""}"><span>${o.have >= o.segs ? "✓" : there || o.have ? "▶" : "·"}<\/span>${o.segs} successes with ${esc(o.skills.join(", "))}: ${o.have} of ${o.segs}<\/li><\/ol>`;
       h += `<div class="kv small"><span>Progress<\/span><span>${boxes(o.have, o.segs, "blue")} ${o.have} of ${o.segs} successes<\/span>
         <span>Deadline<\/span><span>${boxes(Math.max(0, left), total, "gold")} ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})<\/span><\/div>`;
-      h += `<div class="small" style="margin-top:6px"><b class="good">Success:<\/b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))}, ${o.oppose ? `opposed by ${esc(o.oppose.name)} (${esc(o.oppose.skill)} ${o.oppose.target})` : `−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}`}: +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? "" : ", and a Starfleet Command box cleared"}. <b class="bad">Failure:<\/b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.<\/div>`;
+      h += `<div class="small" style="margin-top:6px"><b class="good">Success:<\/b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))}, ${o.oppose ? `opposed by ${esc(o.oppose.name)} (${esc(o.oppose.skill)} ${o.oppose.target})` : `−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}`}: +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? " (out of contact: it won't count toward three in a row)" : ", and one toward three in a row, which clears a Starfleet Command box"}. <b class="bad">Failure:<\/b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.<\/div>`;
       h += `<div class="small muted" style="margin-top:4px">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.<\/div>`;
     }
     h += urgentLine(o) + courseRow(o) + `<\/div>`;
@@ -2707,7 +2717,7 @@ function showStarter(canContinue) {
     <div class="brief"><h3>Orders<\/h3><p>Starfleet sends missions from the GM's Guide's tables, each with a deadline and a twist. The first is The Silence at Corvan II.<\/p><\/div>
     <div class="brief"><h3>The worlds<\/h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.<\/p><\/div>
     <div class="brief"><h3>Battles<\/h3><p>Ship combat from the Players' Guide: spend Power on shields, phasers and torpedoes, give the captain's order, and break away if it goes wrong.<\/p><\/div>
-    <div class="brief"><h3>Starfleet Command<\/h3><p>Five boxes and you're relieved: incidents, the Prime Directive, lost colonies and failed orders mark it; success clears it. Survive the tour and earn your rating.<\/p><\/div>
+    <div class="brief"><h3>Starfleet Command<\/h3><p>Five boxes and you're relieved of command: failed orders, the Prime Directive, incidents and lost colonies mark it. Three orders carried out in a row clear a box. Survive the tour and earn your rating.<\/p><\/div>
   <\/div>
   <div class="ng-row"><label>Captain's name<input type="text" id="ng-name" placeholder="Captain" maxlength="30"><\/label>
   <label>Difficulty<select id="ng-diff"><option value="easy">Easy<\/option><option value="normal" selected>Normal<\/option><option value="hard">Hard<\/option><\/select><\/label>

@@ -266,7 +266,7 @@ function completeArc(S, how, fresh) {
     A.phasers = true;
     astory(S, "The Ketari's own history", "The away team has every Orion phaser back from the village, and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
     alog(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
-    if (o) { const how = "Partly: the Orion phasers recovered and the Ketari left their history, but the scientists still asleep."; S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; recordOrder(S, o, "partly", how); missionReport(S, o, "partly", how, ["+8 science", "+1 commendation"]); }
+    if (o) { const how = "Partly: the Orion phasers recovered and the Ketari left their history, but the scientists still asleep."; S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; S.streak = 0; recordOrder(S, o, "partly", how); missionReport(S, o, "partly", how, ["+8 science", "+1 commendation", "Only partly carried out: the run of orders in a row starts again."]); }
   } else {
     astory(S, fresh ? (how === "reason" ? "Equals" : "Silence, for good") : "Orders carried out", fresh ? resolvedText(how) + (how === "reason" ? " The Ketari keep their guardian, and the Federation has a library record no one else has." : "") : `The phasers are back aboard, and the away team beams up. ${how === "reason" ? "The caretaker goes on watching, the Ketari keep their guardian, and the Federation has a library record no one else has." : "The ruins are only ruins now."} The eight scientists are in sickbay, and Rrinn hasn't left her sister's side.`);
     alog(S, `The Silence at Corvan II: the eight scientists are safe and the Orion phasers recovered.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
@@ -276,7 +276,7 @@ function completeArc(S, how, fresh) {
     if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); if (rep) rep.rewards.push("+4 more commendations and +15 science for a peaceful answer", "Library record: the caretaker of Corvan II"); }
     else { S.commendations += 1; if (rep) rep.rewards.push("+1 more commendation"); }
   }
-  if (!A.seen) markCommand(S, -1, "the Ketari never learned what the crew were.");
+  if (!A.seen) { S.commendations += 1; log(S, "The Ketari never learned what the crew were: +1 commendation.", "good"); }
 }
 
 /** After anything happens: move the story on. */

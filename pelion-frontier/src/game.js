@@ -559,7 +559,7 @@ function earnRecord(S) {
   if (!left.length) return null;
   const rec = pick(S, left); S.records.push(rec.id); return rec;
 }
-function join(S, s) { s.kind = "member"; s.harm = 0; S.joined++; S.commendations += 2; S.seenSys[s.id] = true; markCommand(S, -1, `${s.name} joins the Federation.`); }
+function join(S, s) { s.kind = "member"; s.harm = 0; S.joined++; S.commendations += 2; S.seenSys[s.id] = true; log(S, `${s.name} joins the Federation: +2 commendations.`, "victory"); }
 
 // ---------- orders ----------
 export const orderHere = (S, hex, where) => S.orders.some((o) => o.at === hex && (!where || o.where === where));
@@ -592,14 +592,24 @@ export function completeOrder(S, o, ok, how) {
   recordOrder(S, o, ok ? "done" : "failed", how || (ok ? "Carried out." : `Not carried out by turn ${o.deadline}.`));
   if (ok) {
     S.done++; S.commendations += o.arc ? 4 : 2; S.supplies += 10; S.science += 8;
+    // Three orders carried out in a row clear a box on the Starfleet Command track (if one is marked). Orders carried
+    // out with Starfleet out of contact don't count toward the run, but don't break it either.
     const credit = !(o.twist && o.twist.fx === "nocredit");
-    if (credit) markCommand(S, -1, `orders carried out: ${o.title}.`);
-    const ev = missionReport(S, o, "done", how || "Carried out.", ["+10 supplies", "+8 science", `+${o.arc ? 4 : 2} commendations`].concat(credit ? ["a Starfleet Command box cleared"] : []));
+    let streakLine = "Out of contact with Starfleet: this one doesn't count toward three in a row.";
+    if (credit) {
+      S.streak = (S.streak || 0) + 1;
+      if (S.streak >= 3) {
+        S.streak = 0;
+        if (S.command > 0) { markCommand(S, -1, "three orders carried out in a row."); streakLine = "Three orders carried out in a row: a Starfleet Command box cleared."; }
+        else streakLine = "Three orders carried out in a row (no box to clear).";
+      } else streakLine = `${S.streak} of 3 orders carried out in a row: at 3, a Starfleet Command box is cleared.`;
+    }
+    const ev = missionReport(S, o, "done", how || "Carried out.", ["+10 supplies", "+8 science", `+${o.arc ? 4 : 2} commendations`, streakLine]);
     const had = new Set(S.orders.map((x) => x.id));
     fillFromBacklog(S);
     const next = S.orders.filter((x) => !had.has(x.id)); if (next.length) ev.next = next.map((x) => x.title);
   } else {
-    S.failed++; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
+    S.failed++; S.streak = 0; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
     const s = o.sys && S.systems[o.sys];
     if (s && /Evacuate|distress|medical/i.test(o.title) && ["colony", "member", "independent"].includes(s.kind)) harmWorld(S, s, 1, "help never came");
     fillFromBacklog(S);

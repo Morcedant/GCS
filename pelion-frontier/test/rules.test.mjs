@@ -281,3 +281,11 @@ test("orders: a backlog when two are under way, a Mission Success report when on
   const d = newOrder(S); assert.ok(d.backlog);
   assert.ok(acceptOrder(S, d.id).ok); assert.equal(S.orders.length, 3);   // taken on at once
 });
+test("Starfleet Command: three orders carried out in a row clear a box; a failure starts the run again", () => {
+  const S = newGame({ seed: "streak" });
+  S.orders = []; S.backlog = []; S.arc.stage = "done"; S.command = 2;
+  const ok = () => { const o = newOrder(S); S.event = null; S.eventQueue = []; o.twist = null; completeOrder(S, o, true); S.event = null; S.eventQueue = []; };
+  ok(); ok(); assert.equal(S.command, 2); assert.equal(S.streak, 2);
+  const f = newOrder(S); completeOrder(S, f, false); assert.equal(S.command, 3); assert.equal(S.streak, 0);
+  ok(); ok(); ok(); assert.equal(S.command, 2); assert.equal(S.streak, 0);
+});

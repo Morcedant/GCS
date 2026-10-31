@@ -557,7 +557,7 @@ function ordersHTML() {
   const hist = S.history || [], back = S.backlog || [];
   const doneN = hist.filter((x) => x.result !== "failed").length, failN = hist.filter((x) => x.result === "failed").length;
   h += `<div class="kv small" style="margin-bottom:10px"><span>Tour</span><span>${bar(Math.min(S.turn, TOUR), TOUR, "var(--gold)")} Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hourly(S) ? ` · hour ${(S.hour || 0) + 1} on Corvan II` : ""}</span>
-    <span>Starfleet Command</span><span>${boxes(S.command, 5)} ${S.command} of 5 against the captain: failed orders, Prime Directive violations and incidents each mark one; carried-out orders clear one. At 5 the captain is relieved of command.</span>
+    <span>Starfleet Command</span><span>${boxes(S.command, 5)} ${S.command} of 5 against the captain: failed orders, Prime Directive violations and incidents each mark one. Three orders carried out in a row clear one (now ${S.streak || 0} of 3). At 5 the captain is relieved of command.</span>
     <span>Orders</span><span><b>${S.orders.length}</b> under way · <b>${back.length}</b> in the backlog · <b class="good">${doneN}</b> carried out · <b class="bad">${failN}</b> failed</span></div>`;
   h += `<h3>Under way</h3>`;
   if (!S.orders.length) h += `<p class="muted small">No orders under way. ${back.length ? "Take one on from the backlog below." : "Starfleet will send more; meanwhile, the sector is yours to patrol."}</p>`;
@@ -604,7 +604,7 @@ function missionHTML() {
       h += `<ol class="steps-list"><li class="${there || o.have ? "done" : "now"}"><span>${there || o.have ? "✓" : "▶"}</span>Reach ${esc(o.sys ? S.systems[o.sys].name : "the border")} (${distance(S.pelion.at, o.at)} ly away)</li><li class="${o.have >= o.segs ? "done" : there || o.have ? "now" : ""}"><span>${o.have >= o.segs ? "✓" : there || o.have ? "▶" : "·"}</span>${o.segs} successes with ${esc(o.skills.join(", "))}: ${o.have} of ${o.segs}</li></ol>`;
       h += `<div class="kv small"><span>Progress</span><span>${boxes(o.have, o.segs, "blue")} ${o.have} of ${o.segs} successes</span>
         <span>Deadline</span><span>${boxes(Math.max(0, left), total, "gold")} ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})</span></div>`;
-      h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))}, ${o.oppose ? `opposed by ${esc(o.oppose.name)} (${esc(o.oppose.skill)} ${o.oppose.target})` : `−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}`}: +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? "" : ", and a Starfleet Command box cleared"}. <b class="bad">Failure:</b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.</div>`;
+      h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))}, ${o.oppose ? `opposed by ${esc(o.oppose.name)} (${esc(o.oppose.skill)} ${o.oppose.target})` : `−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}`}: +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? " (out of contact: it won't count toward three in a row)" : ", and one toward three in a row, which clears a Starfleet Command box"}. <b class="bad">Failure:</b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.</div>`;
       h += `<div class="small muted" style="margin-top:4px">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.</div>`;
     }
     h += urgentLine(o) + courseRow(o) + `</div>`;
@@ -712,7 +712,7 @@ function showStarter(canContinue) {
     <div class="brief"><h3>Orders</h3><p>Starfleet sends missions from the GM's Guide's tables, each with a deadline and a twist. The first is The Silence at Corvan II.</p></div>
     <div class="brief"><h3>The worlds</h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.</p></div>
     <div class="brief"><h3>Battles</h3><p>Ship combat from the Players' Guide: spend Power on shields, phasers and torpedoes, give the captain's order, and break away if it goes wrong.</p></div>
-    <div class="brief"><h3>Starfleet Command</h3><p>Five boxes and you're relieved: incidents, the Prime Directive, lost colonies and failed orders mark it; success clears it. Survive the tour and earn your rating.</p></div>
+    <div class="brief"><h3>Starfleet Command</h3><p>Five boxes and you're relieved of command: failed orders, the Prime Directive, incidents and lost colonies mark it. Three orders carried out in a row clear a box. Survive the tour and earn your rating.</p></div>
   </div>
   <div class="ng-row"><label>Captain's name<input type="text" id="ng-name" placeholder="Captain" maxlength="30"></label>
   <label>Difficulty<select id="ng-diff"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label>
