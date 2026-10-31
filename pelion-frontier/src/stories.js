@@ -23,6 +23,7 @@ export const CAMPAIGN = {
 };
 export const STORIES = {
   "The Makers' Gate": {
+    type: "Campaign",
     keys: ["the Kor'vath commander, Captain Dakhar"], strange: ["the Makers' Gate"],
     why: "Every thread of this tour leads here. If House Kor'vath takes the Gate, it takes every caretaker in the sector with it.",
     thread: "The Makers' Watch is over.",
@@ -41,6 +42,8 @@ export const STORIES = {
     fail: "House Kor'vath reached the Gate first. Within a month, the caretakers across the sector have started to go dark, one by one, and no one knows what they're being told to do instead.",
   },
   "Answer a distress call": {
+    type: "Rescue",
+    reason: "Forty people are dying in the dark, and the Pelion is the nearest ship. That's reason enough.",
     why: "Starfleet Intelligence has tracked the Calloway's Pride for a month: it has been buying salvage from Orion diggers. If it carries what they think it carries, the Makers' machines are being smuggled out of the sector.",
     thread: "The Pride's manifest names its buyer: a Klingon house, Kor'vath, paying in dilithium for anything that hums.",
     keys: ["the freighter's first mate", "a passenger travelling under a false name", "the cargo's anxious owner", "a former Starfleet officer working the freight lanes"],
@@ -59,6 +62,8 @@ export const STORIES = {
     fail: "By the time anyone reaches the Calloway's Pride, her hold is cold and the signal has stopped. The inquiry asks why the Pelion took so long.",
   },
   "Survey an uncharted system": {
+    type: "Exploration",
+    reason: "Charting the frontier is what the Pelion is out here for: a system no one has mapped is a hazard to every ship that passes it, and a discovery waiting to be made.",
     why: "The Corvan II caretaker spoke of its makers coming from the stars. Sevek believes a system this impossibly stable is being held together by another of their machines.",
     thread: "The system's heart answers to the same carrier wave as Corvan II's ruins: another of the Makers' machines, still keeping its watch.",
     keys: ["a brilliant, reckless scientist", "a Vulcan astrophysicist observing the survey", "a survey specialist on loan from Memory Alpha", "the young ensign who spotted the readings first"],
@@ -78,6 +83,8 @@ export const STORIES = {
     fail: "The survey of {world} never gets done. Another ship will chart it, eventually, and find whatever the Pelion missed.",
   },
   "Make first contact": {
+    type: "Diplomatic",
+    reason: "A new warp-capable people is the Federation's first chance to be a friend, and the Klingons' first chance to be something else. Starfleet wants the Federation's voice heard first.",
     why: "Their oldest myths speak of travellers who came from the stars and left a guardian behind. Starfleet wants to hear those stories before anyone else does, and to make sure no one else exploits them.",
     thread: "Their myth names the travellers' home: a gate in the sky, three days' light from their sun. It's the first time anyone has heard of the Makers' Gate.",
     keys: ["a Klingon captain with a grudge", "an Orion trader with an offer of his own", "a Tellarite trade consortium's envoy", "a Romulan observer in disguise"],
@@ -97,6 +104,8 @@ export const STORIES = {
     fail: "Someone else reached {world} first. The Federation will be the second voice they hear, and second voices are easier to ignore.",
   },
   "Escort a diplomatic delegation": {
+    type: "Diplomatic",
+    reason: "These talks would open trade along the sector's spinward worlds. Someone has threatened the delegation, and Starfleet won't let a threat decide the sector's future.",
     why: "These talks would close a corridor the Orion diggers use to reach Makers' sites. Someone wants the corridor kept open, badly enough to stop the delegation.",
     thread: "The spy's masters pay for Makers' artifacts by the gram. The transmitter's address leads to an Orion broker who sells to Klingons.",
     keys: ["an aide nobody remembers hiring", "a journalist who talked their way aboard", "the ambassador's estranged son", "a translator with very good references"],
@@ -115,6 +124,8 @@ export const STORIES = {
     fail: "The delegation never reached {world}. The talks were cancelled, and someone, somewhere, got exactly what they wanted.",
   },
   "Find a missing ship or outpost": {
+    type: "Rescue",
+    reason: "Fourteen people are missing. Starfleet doesn't leave its own behind.",
     why: "The Arkwright was charting Makers' sites for Starfleet when it vanished. What took it may be what Corvan II's caretaker was protecting the Ketari from.",
     thread: "The Arkwright's crew all dreamed the same dream: a ring of light, and a voice counting down. The Makers left more than caretakers.",
     keys: ["the Arkwright's captain's husband", "a freighter pilot who passed them on the way out", "the survey's reckless sponsor", "an old friend of one of the crew"],
@@ -134,6 +145,8 @@ export const STORIES = {
     fail: "The Arkwright is still out there, still drifting. The search is called off.",
   },
   "Deliver urgent medical supplies": {
+    type: "Rescue",
+    reason: "An outbreak with no name, and the only stock of the retroviral in the sector is aboard the Pelion.",
     why: "The fever broke out downriver of a dig site where Orions sold the locals 'ancient medicine'. Starfleet suspects it came out of a disturbed Makers' cache.",
     thread: "The contaminant is a Makers' preservative: the same compound that kept the Corvan II scientists asleep. Someone is opening their stores.",
     keys: ["former Starfleet surgeon Dr. Imani Okafor", "an exhausted young doctor in charge for a week", "an elderly physician who has seen this fever before", "a brilliant, reckless epidemiologist"],
@@ -152,6 +165,8 @@ export const STORIES = {
     fail: "The supplies arrived too late for {world}. The fever has run its course, and the count is grim.",
   },
   "Evacuate a colony": {
+    type: "Rescue",
+    reason: "Twelve hundred colonists and a star that won't wait. Every hour counts.",
     why: "The colony's star began to flare the week an Orion crew was seen at a Makers' ruin on its outer moon. If they took the machine that steadied the star, more stars may follow.",
     thread: "The outer moon's ruin is empty: whatever steadied the star was cut out and carried off. The cutting tools match the ones on Corvan II.",
     keys: ["a governor who built the colony with her own hands", "a governor up for re-election in a month", "a stubborn old governor who has survived three flares", "a governor with a secret reason to stay"],
@@ -171,6 +186,8 @@ export const STORIES = {
     fail: "The flare reached {world} before the transports cleared. Not everyone got out.",
   },
   "Patrol the Neutral Zone border": {
+    type: "Security",
+    reason: "The border outposts haven't seen a starship in months, and the Romulans notice when no one is watching. Show the flag.",
     why: "Romulan ships have been seen near three Makers' sites in a month. Starfleet wants to know what the Romulans know.",
     thread: "The Romulan ship was mapping shield frequencies, and something else: the bearings of every Makers' site on this side of the Zone.",
     keys: ["an outpost commander who hasn't slept in a week", "a nervous listening-post technician", "a disapproving Vulcan observer", "a Romulan who wants to defect"],
@@ -189,6 +206,8 @@ export const STORIES = {
     fail: "The patrol never happened. Whatever was watching the border has finished watching.",
   },
   "Recover a lost probe or artifact": {
+    type: "Exploration",
+    reason: "The probe's logs hold three years of deep-space survey data, and whoever reaches the wreck first owns them.",
     why: "The probe went down near a Makers' site, carrying a piece of whatever it found. A Klingon house and an Orion broker both want it.",
     thread: "The fragment carries a star chart: the Makers' sites in the Corvan Sector, and lines between them that all point to one place.",
     keys: ["a stranded Orion trader", "a salvage broker who asks no questions", "a former Starfleet officer gone rogue", "a collector of curiosities with deep pockets"],
@@ -208,6 +227,8 @@ export const STORIES = {
     fail: "Someone else reached the probe first. Its logs, and whatever it brought home, are in other hands now.",
   },
   "Mediate a dispute between two worlds": {
+    type: "Diplomatic",
+    reason: "Two independent worlds are a week from war, and a war on the frontier draws in everyone, the Klingons first.",
     why: "The moon they're fighting over holds a Makers' machine in its mines. War would put it up for sale to whoever helps the winner.",
     thread: "Under the mines is a Makers' relay, still transmitting toward the same point in space as all the others.",
     keys: ["an idealistic Federation ambassador", "the moon's own mining guild boss", "a Vulcan arbiter sent to observe", "a retired admiral who brokered the last truce"],
@@ -227,6 +248,8 @@ export const STORIES = {
     fail: "The talks failed. {world} and its neighbour are at war over a moon.",
   },
   "Test experimental technology": {
+    type: "Technology",
+    reason: "Starfleet R&D needs field trials before the prototype goes fleetwide, and the Pelion is the only Heavy Cruiser on this frontier.",
     why: "Starfleet R&D built the prototype from what the Pelion learned at Corvan II: a way to see through a Makers' field, and through a cloak.",
     thread: "At full power the prototype sees a Klingon ship trailing the Pelion, cloaked, for weeks: House Kor'vath is following the Pelion to the Makers' sites.",
     keys: ["a brilliant, reckless scientist", "a Daystrom Institute prodigy", "an engineer who designed the prototype in a weekend", "a Starfleet R&D commander with a deadline"],
@@ -246,6 +269,8 @@ export const STORIES = {
     fail: "The trials never happened. R&D will find another ship, and another schedule.",
   },
   "Ferry a delegation to a world that left the Federation": {
+    type: "Diplomatic",
+    reason: "They left because the Federation failed them. Starfleet wants the chance to make it right, and they've asked for the Pelion by name.",
     why: "The disaster that drove them out of the Federation began when a Makers' machine on their moon failed. They want answers Starfleet has only just started to find.",
     thread: "Their machine didn't fail: it was switched off, from a distance, by a signal from the same point every Makers' relay points to.",
     keys: ["a first minister who lost family in the disaster", "a former Federation liaison who resigned in protest", "the spaceport's director", "a council elder who voted to leave"],
@@ -265,6 +290,8 @@ export const STORIES = {
     fail: "The delegation never reached {world}. Its people will remember that too.",
   },
   "Shore leave that goes wrong": {
+    type: "Crew",
+    reason: "The crew have earned a week's liberty. Starfleet only asks that they come back on time and in one piece.",
     why: "Starfleet only meant this as shore leave, but the 'carnival of illusions' is powered by something an Orion sold the owners, and two of the crew walked into it.",
     thread: "The carnival's illusions run on a Makers' machine, bought from Orions who said there were many more where it came from.",
     keys: ["the local magistrate", "a market guild leader", "the owner of the gaming house", "a colony constable"],
@@ -283,6 +310,8 @@ export const STORIES = {
     fail: "Shore leave ended badly, and late. The incident report is longer than the liberty was.",
   },
   "Carry a message across the Neutral Zone": {
+    type: "Security",
+    reason: "A message that can't go by subspace, to a contact who will only talk to a starship. Starfleet won't say what's in it.",
     why: "A Romulan officer has warned Starfleet that the Romulan Star Empire is searching for the Makers' Gate too. This is the reply.",
     thread: "The Romulan reply: the Gate is real, it's in the Corvan Sector, and the Klingons are close to finding it.",
     keys: ["a Starfleet admiral with sealed orders", "an admiral's intelligence aide", "a Federation ambassador who once served on the Romulan border", "a Vulcan diplomat with old Romulan contacts"],

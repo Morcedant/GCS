@@ -315,7 +315,10 @@ test("the campaign: Corvan II opens it, each order adds a thread, six lead to th
   const arc = S.orders.find((o) => o.arc); S.arc.stage = "done"; completeOrder(S, arc, true, "Done."); S.event = null; S.eventQueue = [];
   assert.ok(S.campaign.beats.includes(0));
   S.orders = []; S.backlog = [];
-  for (let i = 0; i < CAMPAIGN.finaleAt; i++) { const o = newOrder(S); S.event = null; S.eventQueue = []; completeOrder(S, o, true); S.event = null; S.eventQueue = []; }
+  // Ordinary orders turn up nothing; orders that are part of the campaign turn up a thread each.
+  const plain = newOrder(S); plain.campaign = false; S.event = null; S.eventQueue = []; completeOrder(S, plain, true); S.event = null; S.eventQueue = [];
+  assert.equal(S.campaign.threads.length, 0);
+  for (let i = 0; i < CAMPAIGN.finaleAt; i++) { const o = newOrder(S); o.campaign = true; S.event = null; S.eventQueue = []; completeOrder(S, o, true); S.event = null; S.eventQueue = []; }
   assert.equal(S.campaign.threads.length, CAMPAIGN.finaleAt);
   assert.deepEqual(S.campaign.beats.sort(), [0, 2, 4, 6]);
   const gate = S.orders.find((o) => o.finale); assert.ok(gate && gate.urgent && gate.place === "the Makers' Gate");
@@ -328,10 +331,14 @@ test("the prologue shows nothing of the campaign: no reasons, no threads, until 
   const { orderReason, campaignOpen } = await import("../src/game.js");
   const S = newGame({ seed: "pro" });
   assert.ok(!campaignOpen(S));
-  for (const o of S.backlog) assert.equal(orderReason(S, o), null);
-  const o = S.backlog[0]; acceptOrder(S, o.id); S.event = null; S.eventQueue = []; completeOrder(S, o, true); S.event = null; S.eventQueue = [];
+  for (const o of S.backlog) { assert.ok(orderReason(S, o)); assert.ok(!/Maker|caretaker|Kor'vath|dug up/i.test(orderReason(S, o))); }   // their own reasons only
+  const o = S.backlog[0]; o.campaign = true; acceptOrder(S, o.id); S.event = null; S.eventQueue = []; completeOrder(S, o, true); S.event = null; S.eventQueue = [];
   assert.equal(S.campaign.threads.length, 0);                 // done during the prologue: no thread
   assert.ok(!S.log.some((l) => /Maker|caretaker|Kor'vath/i.test(l.text)));
   const arc = S.orders.find((x) => x.arc); S.arc.stage = "done"; completeOrder(S, arc, true, "Done.");
-  assert.ok(campaignOpen(S)); assert.ok(orderReason(S, S.backlog[0] || S.orders.find((x) => !x.arc)));
+  assert.ok(campaignOpen(S));
+  const tied = S.backlog[0] || S.orders.find((x) => !x.arc); tied.campaign = true;
+  const { STORIES } = await import("../src/stories.js");
+  assert.equal(orderReason(S, tied), STORIES[tied.story].why);              // part of the campaign: the campaign's reason
+  tied.campaign = false; assert.equal(orderReason(S, tied), STORIES[tied.story].reason);   // ordinary work: its own
 });

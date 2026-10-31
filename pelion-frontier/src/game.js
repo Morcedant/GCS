@@ -606,7 +606,12 @@ export const campaignAct = (S) => { const C = campaignOf(S), b = CAMPAIGN.beats.
 /** Is the campaign known yet? Only once Corvan II is over: before that, nothing about it may show. */
 export const campaignOpen = (S) => campaignOf(S).beats.includes(0);
 /** Starfleet's reason for an order, tied to the campaign: only once the campaign is known. */
-export const orderReason = (S, o) => { const st = storyOf(o); return st && st.why && campaignOpen(S) ? st.why : null; };
+/** Is this order part of the campaign (and is that known yet)? About half are; the rest are the frontier's ordinary work. */
+export const orderTied = (S, o) => !!(o && (o.finale || o.campaign) && campaignOpen(S));
+/** Starfleet's reason for an order: the campaign's, if it's part of it and the campaign is known; otherwise its own. */
+export const orderReason = (S, o) => { const st = storyOf(o); if (!st) return null; return orderTied(S, o) && st.why ? st.why : st.reason || null; };
+/** What kind of mission an order is: Diplomatic, Rescue, Technology, Exploration, Security, Crew, or the Campaign. */
+export const orderType = (o) => (storyOf(o) && storyOf(o).type) || null;
 /** A beat of the campaign's story, once. */
 function campaignBeat(S, at) {
   const C = campaignOf(S), b = CAMPAIGN.beats.find((x) => x.at === at);
@@ -620,7 +625,7 @@ function campaignThread(S, o) {
   if (o.finale) return null;
   if (o.arc) { campaignBeat(S, 0); return null; }
   // Before Corvan II is over, nothing is known of the Makers: no threads, no reasons. Once the Gate is decided, it's over.
-  if (!st || !st.thread || C.over || !C.beats.includes(0)) return null;
+  if (!st || !st.thread || C.over || !C.beats.includes(0) || !o.campaign) return null;
   C.threads.push({ title: o.title, text: storyText(S, o, st.thread), turn: S.turn });
   const n = C.threads.length;
   log(S, `${CAMPAIGN.title}, thread ${n}: ${storyText(S, o, st.thread)}`, "discovery");
@@ -778,6 +783,8 @@ export function newOrder(S) {
   const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
     deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, (STORIES[m.text] && STORIES[m.text].strange) || STRANGE), key: pick(S, (STORIES[m.text] && STORIES[m.text].keys) || KEYS), oppose: orderOpposition(m.oppose, twist) };
   if (STORIES[m.text]) { o.story = m.text; o.text = storyText(S, o, STORIES[m.text].brief); }
+  // About half of all orders are part of the campaign (once it has begun); the rest are the frontier's ordinary work.
+  const C = campaignOf(S); o.campaign = !C.over && rand(S) < 0.5;
   S.backlog = S.backlog || [];
   if (busy(S)) {
     o.backlog = true; o.received = S.turn; S.backlog.push(o);

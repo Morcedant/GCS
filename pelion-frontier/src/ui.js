@@ -2,7 +2,7 @@
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
-  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, missionChoices, chooseMission, campaignOf, campaignAct, campaignOpen, orderReason } from "./game.js";
+  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, missionChoices, chooseMission, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType } from "./game.js";
 import { storyOf, CAMPAIGN } from "./stories.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
@@ -564,7 +564,7 @@ function ordersHTML() {
   if (!S.orders.length) h += `<p class="muted small">No orders under way. ${back.length ? "Take one on from the backlog below." : "Starfleet will send more; meanwhile, the sector is yours to patrol."}</p>`;
   for (const o of S.orders) {
     const st = orderStatus(o), left = o.deadline - S.turn;
-    h += `<div class="card ${st[1] === "bad" ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}</span></h4>
+    h += `<div class="card ${st[1] === "bad" ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}</span>${orderTags(o)}</h4>
       <div class="small">${o.arc ? esc(o.text) : `${o.text ? esc(o.text) + "<br>" : ""}${orderReason(S, o) ? `<b>Starfleet's reason:</b> ${esc(orderReason(S, o))}<br>` : ""}${o.have} of ${o.segs} successes · ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})`}</div>${urgentLine(o)}
       <div class="roll-row"><button class="btn small" data-tab-go="mission">Progress (Mission tab)</button><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}</button></div></div>`;
   }
@@ -573,19 +573,21 @@ function ordersHTML() {
   if (!back.length) h += `<p class="small muted">Nothing waiting. With two orders under way, or urgent orders in hand, new orders from Starfleet wait here.</p>`;
   else {
     h += `<p class="small muted">Waiting their turn: the oldest moves up when an order under way is finished. Their clocks start when they do. You can take one on now, if you think the Pelion can manage more.</p>`;
-    for (const o of back) h += `<div class="card"><h4>${esc(o.title)}${isUrgent(o) ? ` <span class="badge-status bad">Urgent</span>` : ""}</h4><div class="small">Received turn ${o.received || o.issued} · ${o.segs} successes with ${esc(o.skills.join(", "))} · ${distance(S.pelion.at, o.at)} ly away${o.twist ? ` · Twist: ${esc(o.twist.text)}` : ""}</div>${orderReason(S, o) ? `<div class="small"><b>Starfleet's reason:</b> ${esc(orderReason(S, o))}</div>` : ""}
+    for (const o of back) h += `<div class="card"><h4>${esc(o.title)}${isUrgent(o) ? ` <span class="badge-status bad">Urgent</span>` : ""}${orderTags(o)}</h4><div class="small">Received turn ${o.received || o.issued} · ${o.segs} successes with ${esc(o.skills.join(", "))} · ${distance(S.pelion.at, o.at)} ly away${o.twist ? ` · Twist: ${esc(o.twist.text)}` : ""}</div>${orderReason(S, o) ? `<div class="small"><b>Starfleet's reason:</b> ${esc(orderReason(S, o))}</div>` : ""}
       <div class="roll-row"><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-accept="${o.id}">Take it on now</button></div></div>`;
   }
   // Past orders.
   h += `<h3>Past orders</h3>` + (hist.length ? `<ul class="log">${hist.slice().reverse().map((x) => `<li class="${x.result === "failed" ? "bad" : x.result === "partly" ? "order" : "good"}"><b>${x.result === "failed" ? "✗ Failed" : x.result === "partly" ? "◐ Partly" : "✓ Carried out"}</b> · turn ${x.turn} · ${esc(x.title)}<br><span class="small">${esc(x.how)}</span></li>`).join("")}</ul>` : `<p class="small muted">None yet. Each order carried out clears a Starfleet Command box; each failure marks one.</p>`);
   return h;
 }
+/** An order's type, and whether it's part of the campaign: little labels for its card. */
+const orderTags = (o) => (orderType(o) ? ` <span class="badge-status">${esc(orderType(o))}</span>` : "") + (orderTied(S, o) && !o.finale ? ` <span class="badge-status good">${esc(CAMPAIGN.title)}</span>` : "");
 /** The campaign this tour: The Makers' Watch, its act, the threads found, and the story so far. */
 function campaignHTML() {
   if (!campaignOpen(S)) return `<div class="card gold"><h4>The campaign <span class="badge-status">Prologue</span></h4><p class="small">The tour begins with your first orders: The Silence at Corvan II. What the Pelion finds there will set the course of everything after it.</p></div>`;
   const C = campaignOf(S), n = Math.min(C.threads.length, CAMPAIGN.finaleAt), beats = CAMPAIGN.beats.filter((b) => C.beats.includes(b.at));
   const next = CAMPAIGN.beats.find((b) => !C.beats.includes(b.at) && b.at > 0);
-  const status = C.over === "close" ? "Resolved: the watch is over, the Gate closed." : C.over === "guard" ? "Resolved: the Gate kept open, under Starfleet's guard." : C.over === "lost" ? "Lost: House Kor'vath reached the Gate first." : C.finale ? "The finale: get to the Makers' Gate first (the Orders tab)." : !C.beats.includes(0) ? "It begins at Corvan II." : `${n} of ${CAMPAIGN.finaleAt} threads to find the Makers' Gate${next ? `; the next revelation at ${next.at}` : ""}.`;
+  const status = C.over === "close" ? "Resolved: the watch is over, the Gate closed." : C.over === "guard" ? "Resolved: the Gate kept open, under Starfleet's guard." : C.over === "lost" ? "Lost: House Kor'vath reached the Gate first." : C.finale ? "The finale: get to the Makers' Gate first (the Orders tab)." : !C.beats.includes(0) ? "It begins at Corvan II." : `${n} of ${CAMPAIGN.finaleAt} threads to find the Makers' Gate${next ? `; the next revelation at ${next.at}` : ""}. Orders marked ${CAMPAIGN.title} turn up threads; the others are the frontier's ordinary work.`;
   let h = `<div class="card gold"><h4>The campaign: ${esc(CAMPAIGN.title)} <span class="badge-status ${C.over === "lost" ? "bad" : C.over ? "good" : ""}">${esc(campaignAct(S))}</span></h4>
     <p class="small">${esc(CAMPAIGN.premise)}</p>
     <div class="kv small"><span>Threads</span><span>${boxes(n, CAMPAIGN.finaleAt, "blue")} ${esc(status)}</span></div>`;
@@ -614,7 +616,7 @@ function missionHTML() {
       h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> find out what happened to the eight scientists, bring them home, and recover the Orion phasers. <b class="bad">Failure:</b> ${A.stage === "travel" ? `not reaching Corvan II by turn ${o.deadline}` : live ? "the Countdown filling before the job is done" : "running out of time"}.</div>`;
     } else {
       const there = S.pelion.at === o.at;
-      h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}</span></h4>`;
+      h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}</span>${orderTags(o)}</h4>`;
       const story = storyOf(o);
       if (o.text) h += `<p class="small">${esc(o.text)}</p>`;
       if (orderReason(S, o)) h += `<p class="small"><b>Starfleet's reason:</b> ${esc(orderReason(S, o))}</p>`;
