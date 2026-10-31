@@ -1,7 +1,7 @@
 // The page: the sector map on a canvas, the side panel's tabs, and the dialogs (new game, battle, story, the end).
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
-import { newGame, navBearing, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
+import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
   speedOf, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
@@ -93,7 +93,7 @@ function goTo(hex) {
   const r = moveTo(S, unit, dest);
   if (r.error) { toast(r.error, true); return; }
   selHex = dest === hex ? hex : selHex; lastResult = null;
-  if (dest !== hex) { selHex = hex; toast(`Under way on ${navBearing(S, U().at, hex).text}: you'll get there next turn or after.`); }
+  if (dest !== hex) { selHex = hex; toast(`Under way, ${navBearing(S, U().at, hex).text} from the bow: you'll get there next turn or after.`); }
   after();
 }
 function hexPath(ctx, cx, cy, r) { ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = (Math.PI / 180) * (60 * i - 30); i ? ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)) : ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); } ctx.closePath(); }
@@ -144,8 +144,8 @@ function draw() {
       ctx.strokeStyle = "rgba(242,193,78,.8)"; ctx.lineWidth = 2; ctx.setLineDash([5, 4]); ctx.beginPath();
       let q = toPixel(u.at, size); ctx.moveTo(q.x, q.y); for (const k of p.path) { q = toPixel(k, size); ctx.lineTo(q.x, q.y); } ctx.stroke(); ctx.setLineDash([]);
       const sp = unit === "pelion" ? speedOf(S) : SUPPORT[u.type].speed, first = Math.min(u.mp, p.cost), turns = p.cost <= u.mp ? 0 : Math.ceil((p.cost - first) / sp);
-      const nb = navBearing(S, u.at, selHex);
-      ctx.fillStyle = "#f2c14e"; ctx.font = "bold 11px system-ui"; ctx.fillText(`${String(nb.heading).padStart(3, "0")} mark ${String(nb.mark).padStart(3, "0")} · ${turns ? `${turns + 1} turns` : "this turn"}`, q.x + 9, q.y - 9);
+      const nb = navBearing(S, u.at, selHex, unit === "pelion" ? S.pelion.facing || 0 : u.facing || 0);
+      ctx.fillStyle = "#f2c14e"; ctx.font = "bold 11px system-ui"; ctx.fillText(`${nb.text} · ${turns ? `${turns + 1} turns` : "this turn"}`, q.x + 9, q.y - 9);
     }
   }
   // Ships.
@@ -159,7 +159,20 @@ function draw() {
     if (ENEMIES[e.type].base) { ctx.fillStyle = POWERS.orion.color; ctx.beginPath(); ctx.arc(x - 12, y - 12, 6, 0, Math.PI * 2); ctx.fill(); return; }
     icon(x - 12 + i * 10, y - 15, POWERS[e.power].color, false, e.hostile ? "#ff5040" : null, e.revealed); }); }
   for (const s of Object.values(S.support)) { const { x, y } = toPixel(s.at, size); icon(x - 2, y + 15, "#6fb4ff", false, unit === s.id ? "#fff" : null); }
-  { const { x, y } = toPixel(S.pelion.at, size); icon(x + 4, y - 2, "#f2c14e", true, unit === "pelion" ? "#fff" : null); }
+  {
+    // The Pelion, turned to its facing, with its six hex sides marked in relative bearings: 000 ahead, 200 astern.
+    const { x, y } = toPixel(S.pelion.at, size), fc = S.pelion.facing || 0;
+    const dirAng = (i) => ((sideHeading(i) - 100) * Math.PI) / 200;   // canvas angle (0 = east) of hex side i
+    ctx.save(); ctx.translate(x, y); ctx.rotate(dirAng(fc)); icon(0, 0, "#f2c14e", true, unit === "pelion" ? "#fff" : null); ctx.restore();
+    if (view.zoom > 0.6 && !S.battle) {
+      ctx.font = "600 9px system-ui, sans-serif"; ctx.textAlign = "center";
+      for (let i = 0; i < 6; i++) {
+        const rel = Math.round(((sideHeading(i) - sideHeading(fc)) % 400 + 400) % 400) % 400, a = dirAng(i), r = size * 0.78;
+        ctx.fillStyle = rel === 0 ? "#f2c14e" : "rgba(242,193,78,.6)"; ctx.fillText(String(rel).padStart(3, "0"), x + Math.cos(a) * r, y + Math.sin(a) * r + 3);
+      }
+      ctx.textAlign = "left";
+    }
+  }
   // The away team on Corvan II: a small figure for each officer on the surface, in their division's color, under the world.
   const A = S.arc;
   if (A.team && ["pull", "orions", "caretaker"].includes(A.stage)) {
@@ -335,6 +348,7 @@ function hereHTML() {
   const k = s && shownKind(s);
   h += `<h2>${esc(s ? s.name : S.hexes[hex].terrain === "zone" ? "The Neutral Zone" : S.hexes[hex].terrain === "nebula" ? "Nebula" : "Open space")}</h2>`;
   h += `<p class="muted">${s ? esc(k ? kindName({ ...s, kind: k }) : "Uncharted system: survey it to find out") : ""}${S.hexes[hex].terrain === "nebula" ? " · Nebula: 2 moves to enter" : ""}${inZone(hex) ? " · Entering marks Starfleet Command, unless orders send you" : ""}</p>`;
+  h += `<p class="small muted" style="margin-top:-4px">Position: ${esc(position(S, hex).text)}</p>`;
   if (s && k === "independent") h += `<div class="kv"><span>Accord</span><span>${s.accord > 0 ? "+" : ""}${s.accord} (Federation at +5, Klingon Empire at −5)</span></div>`;
   if (s && s.harm) h += `<div class="kv"><span>Harm</span><span class="bad">${s.harm}/3</span></div>`;
   if (s && (k === "anomaly" || k === "ruins") && s.surveyed) h += `<div class="kv"><span>Discovery</span><span>${s.recorded ? "Recorded" : `${s.clock}/${s.need}`}</span></div>`;
@@ -343,8 +357,8 @@ function hereHTML() {
   for (const o of S.orders.filter((x) => x.at === hex)) h += `<div class="card gold"><h4>Orders: ${esc(o.title)}</h4><div class="small">${o.arc ? "The first mission." : `${o.have}/${o.segs} done · due by turn ${o.deadline}`}</div></div>`;
   if (!here) {
     const p = findPath(S, u.at, hex, unit === "pelion" ? "pelion" : "support");
-    if (p) { const R = reachable(S, unit), nb = navBearing(S, u.at, hex), sp = unit === "pelion" ? speedOf(S) : SUPPORT[u.type].speed;
-      h += `<p class="small"><b>Navigation:</b> ${nb.text} · ${distance(u.at, hex)} hex${distance(u.at, hex) === 1 ? "" : "es"} · ${R[hex] !== undefined ? "reachable this turn" : `about ${Math.ceil(Math.max(0, p.cost - u.mp) / sp) + 1} turns`}</p><div class="btn-row"><button class="btn primary" data-go="${hex}">${R[hex] !== undefined ? `Move here (${R[hex]} of ${u.mp} moves)` : "Set course: as far as we can this turn"}</button></div>`; }
+    if (p) { const R = reachable(S, unit), nb = navBearing(S, u.at, hex, unit === "pelion" ? S.pelion.facing || 0 : u.facing || 0), sp = unit === "pelion" ? speedOf(S) : SUPPORT[u.type].speed;
+      h += `<p class="small"><b>Flight path:</b> ${nb.text} (from the ship's bow) · ${distance(u.at, hex)} hex${distance(u.at, hex) === 1 ? "" : "es"} · ${R[hex] !== undefined ? "reachable this turn" : `about ${Math.ceil(Math.max(0, p.cost - u.mp) / sp) + 1} turns`}</p><div class="btn-row"><button class="btn primary" data-go="${hex}">${R[hex] !== undefined ? `Move here (${R[hex]} of ${u.mp} moves)` : "Set course: as far as we can this turn"}</button></div>`; }
     return h;
   }
   // What the ship can do here.

@@ -220,14 +220,19 @@ test("finished orders are kept, with how they ended", async () => {
   assert.equal(S.history[1].how, "Too late.");
   assert.ok(!/Neutral Zone near the Neutral Zone/.test(o.title));
 });
-test("Starfleet bearings: 400 degrees, heading clockwise from galactic north, with a mark for the z axis", async () => {
-  const { navBearing } = await import("../src/game.js");
+test("Starfleet flight paths: three values in 400 degrees, relative to the ship's bow; positions from the sector's center", async () => {
+  const { navBearing, position } = await import("../src/game.js");
   const S = newGame({ seed: "nav" });
-  assert.equal(navBearing(S, "0,0", "1,-2").heading, 0);     // straight up the map
-  assert.equal(navBearing(S, "0,0", "1,0").heading, 100);    // east
-  assert.equal(navBearing(S, "0,0", "-1,2").heading, 200);   // south
-  assert.equal(navBearing(S, "0,0", "-1,0").heading, 300);   // west
-  const b = navBearing(S, "0,0", "3,-1");
-  assert.match(b.text, /^bearing \d{3} mark \d{3}$/);
-  assert.ok(b.mark < 100 || b.mark > 300);                   // a climb or a dip, never past the vertical
+  const east = 0;                                               // facing the hex side toward the east
+  assert.equal(navBearing(S, "0,0", "3,0", east).bearing, 0);   // dead ahead
+  assert.equal(navBearing(S, "0,0", "-3,0", east).bearing, 200); // astern
+  assert.equal(navBearing(S, "0,0", "1,-2", east).bearing, 300); // galactic north is to port when facing east
+  assert.equal(navBearing(S, "0,0", "-1,2", east).bearing, 100); // and south to starboard
+  assert.equal(navBearing(S, "0,0", "1,-2", 2).bearing, 33);     // facing north-west, north is a little to starboard
+  assert.match(navBearing(S, "0,0", "2,-1").text, /^\d{3} mark \d+ mark \d+$/);
+  const c = position(S, "0,0");
+  assert.ok(Math.abs(c.x) < 0.05 && Math.abs(c.y) < 0.05);   // the center is the origin
+  assert.ok(c.fromSol > 150 && c.fromSol < 260);
+  assert.ok(position(S, "1,0").x > 4.9 && position(S, "1,0").x < 5.1);              // five light-years a hex
+  assert.match(c.text, /ly from the sector's center · \d+ ly from Sector 001 \(Sol\)$/);
 });

@@ -172,6 +172,8 @@ export function moveTo(S, unit, hex) {
   const r = reachable(S, unit);
   if (r[hex] === undefined) return { error: "Too far for this turn." };
   const p = findPath(S, U.at, hex, unit === "pelion" ? "pelion" : "support");
+  // The ship now faces the hex side it last crossed.
+  if (p && p.path.length) { const prev = p.path.length > 1 ? p.path[p.path.length - 2] : U.at, d = neighbors(prev).indexOf(hex); if (d >= 0) U.facing = d; }
   U.mp -= r[hex]; U.at = hex;
   if (unit === "pelion") {
     S.pelion.docked = false;
@@ -433,19 +435,36 @@ function applyAction(S, p) {
   return "";
 }
 const say = (S, text, kind = "") => { log(S, text, kind); return text; };
+// ---------- Starfleet navigation ----------
+const HEX_LY = 5;                                     // a hex is five light-years across
+const PX = (k) => { const [q, r] = k.split(",").map(Number); return { x: Math.sqrt(3) * (q + r / 2), y: 1.5 * r }; };
+const zOf = (S, k) => ((hashString(S.seed + ":z:" + k) % 41) - 20) / 10;   // each hex's height off the sector's plane: ±2 hex widths
+const ang = (y, x) => (Math.round(((Math.atan2(y, x) * 200) / Math.PI + 400) % 400) % 400);   // an angle in 400 degrees
+/** A hex side's direction (0–5, as hex.js lists the neighbours), as an angle clockwise from galactic north. */
+export const sideHeading = (i) => [100, 33.33, 366.67, 300, 233.33, 166.67][i];
 /**
- * Starfleet navigation, in 400 degrees: the heading goes around the sector's plane (x, y), clockwise from galactic north
- * (the top of the map); the mark is the climb or dip out of that plane (z), where each hex sits a little above or below
- * it. Both are given as three digits, and a dip reads as a mark near 400: "bearing 115 mark 392".
+ * A flight path the Starfleet way: three values in 400 degrees, relative to the ship. The bearing goes around the ship:
+ * 000 (400) dead ahead, 100 starboard, 200 astern, 300 port. The first mark is the climb or dip along the ship's
+ * forward line, the second across its beam; both read 0 when level, and a dip reads near 400. "287 mark 15 mark 98".
  */
-export function navBearing(S, from, to) {
-  const P = (k) => { const [q, r] = k.split(",").map(Number); return { x: Math.sqrt(3) * (q + r / 2), y: 1.5 * r }; };
-  const z = (k) => ((hashString(S.seed + ":z:" + k) % 41) - 20) / 10;   // each hex's height off the plane: ±2 hex widths
-  const a = P(from), b = P(to), dx = b.x - a.x, dy = b.y - a.y;
-  const heading = Math.round(((Math.atan2(dx, -dy) * 200) / Math.PI + 400) % 400) % 400;
-  const mark = Math.round(((Math.atan2(z(to) - z(from), Math.hypot(dx, dy)) * 200) / Math.PI + 400) % 400) % 400;
-  const f3 = (n) => String(n).padStart(3, "0");
-  return { heading, mark, text: `bearing ${f3(heading)} mark ${f3(mark)}` };
+export function navBearing(S, from, to, facing = S.pelion.facing || 0) {
+  const a = PX(from), b = PX(to), dx = b.x - a.x, dy = b.y - a.y, dz = zOf(S, to) - zOf(S, from);
+  const abs = (Math.atan2(dx, -dy) * 200) / Math.PI, rel = ((abs - sideHeading(facing)) % 400 + 400) % 400;
+  const flat = Math.hypot(dx, dy), t = (rel * Math.PI) / 200, fwd = flat * Math.cos(t), stb = flat * Math.sin(t);
+  const bearing = Math.round(rel) % 400, mark1 = ang(dz, Math.abs(fwd) || 1e-9), mark2 = ang(dz, Math.abs(stb) || 1e-9);
+  return { bearing, mark1, mark2, text: `${String(bearing).padStart(3, "0")} mark ${mark1} mark ${mark2}` };
+}
+/**
+ * Where a hex is: x, y, z in light-years from the center of the Corvan Sector (the middle of the map: x east, y galactic
+ * north, z above the sector's plane), and how far that is from Sector 001 (Sol), a little under 200 light-years away.
+ */
+export function position(S, hex) {
+  const p = PX(hex), h = hashString("origin:" + S.seed);
+  const x = (p.x * HEX_LY) / Math.sqrt(3), y = -(p.y * HEX_LY) / Math.sqrt(3), z = zOf(S, hex) * HEX_LY;
+  const sol = { x: -(140 + (h % 40)), y: 120 + ((h >> 8) % 40), z: -(((h >> 16) % 21) - 10) };   // Sol, from the sector's center
+  const f = (n) => (n >= 0 ? "+" : "−") + Math.abs(n).toFixed(1);
+  const fromSol = Math.hypot(x - sol.x, y - sol.y, z - sol.z);
+  return { x, y, z, fromSol, text: `${f(x)}, ${f(y)}, ${f(z)} ly from the sector's center · ${Math.round(fromSol)} ly from Sector 001 (Sol)` };
 }
 function hazard(S, p) {
   if (rand(S) < 0.5 && p.unit === "pelion") { const id = p.officer; S.crew[id].inj = Math.min(3, S.crew[id].inj + 1); return `${officer(id).short} is hurt (${S.crew[id].inj}/3).`; }
