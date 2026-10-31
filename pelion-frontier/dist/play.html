@@ -366,11 +366,14 @@ const NAMES = ["Corvan", "Tessaly", "Marrow's Reach", "Hadley", "Ilyra", "Brennu
 // ---- stories.js ----
 // The stories behind each kind of order, in the way of The Silence at Corvan II: a briefing, a scene on arrival, a scene
 // for each stage of the work, a decision at the end with two ways to go, and what happens if the Pelion is too late.
-// {world} is where it happens, {key} the key character, {strange} the strange thing, {captain} you.
+// {world} is where it happens, {key} the key character, {strange} the strange thing, {captain} you. Each kind of order
+// has its own key characters and strange things, chosen to fit its story.
 // A choice's `fx` is what it does: commendations, science, supplies, accord (the world's), command (boxes marked),
 // tension (with the Klingon Empire), heal (the world's harm).
 const STORIES = {
   "Answer a distress call": {
+    keys: ["the freighter's first mate", "a passenger travelling under a false name", "the cargo's anxious owner", "a former Starfleet officer working the freight lanes"],
+    strange: ["a crystal that sings when it's cold", "a dormant alien life form", "dilithium of a purity no one mines", "a weapon component from a war a century gone"],
     brief: "A distress call from {world}, cut off mid-word: a freighter, the Calloway's Pride, with forty aboard, adrift and losing life support. The signal repeats every eleven minutes. Something in it doesn't match the freighter's registry.",
     arrive: "The Calloway's Pride hangs dark above {world}, venting atmosphere from a long scar down her flank. Life signs: thirty-one, clustered in the aft cargo hold where the last warm air is. And aboard, {key}, who says they know why the call was cut off.",
     steps: [
@@ -385,6 +388,8 @@ const STORIES = {
     fail: "By the time anyone reaches the Calloway's Pride, her hold is cold and the signal has stopped. The inquiry asks why the Pelion took so long.",
   },
   "Survey an uncharted system": {
+    keys: ["a brilliant, reckless scientist", "a Vulcan astrophysicist observing the survey", "a survey specialist on loan from Memory Alpha", "the young ensign who spotted the readings first"],
+    strange: ["a dead star that sings", "a gravity well older than the star", "a subspace anomaly that distorts time", "a machine the size of a moon"],
     brief: "{world} has never been properly charted: long-range scans show a system that shouldn't be stable, and a reading the computers file under {strange}. Chart it, and find out what keeps it together.",
     arrive: "{world} on the main viewer: orbits too tight, a star that flickers on a rhythm, and a sensor echo that answers the Pelion's own pings a half-second late.",
     steps: [
@@ -400,6 +405,8 @@ const STORIES = {
     fail: "The survey of {world} never gets done. Another ship will chart it, eventually, and find whatever the Pelion missed.",
   },
   "Make first contact": {
+    keys: ["a Klingon captain with a grudge", "an Orion trader with an offer of his own", "a Tellarite trade consortium's envoy", "a Romulan observer in disguise"],
+    strange: ["a myth of travellers from the stars", "a signal they've been receiving for centuries", "an ancient machine that still works", "a star chart carved into their oldest temple"],
     brief: "{world} has warp drive now: a test flight was detected last month. Starfleet wants first contact made before anyone else makes it for them, and before {key} gets there first.",
     arrive: "{world}'s first warp ship is still in orbit, ringed by news drones. Their government hails the Pelion before it hails them: polite, careful, and with a weapons lock that no one mentions.",
     steps: [
@@ -415,8 +422,10 @@ const STORIES = {
     fail: "Someone else reached {world} first. The Federation will be the second voice they hear, and second voices are easier to ignore.",
   },
   "Escort a diplomatic delegation": {
+    keys: ["an aide nobody remembers hiring", "a journalist who talked their way aboard", "the ambassador's estranged son", "a translator with very good references"],
+    strange: ["a sealed diplomatic pouch", "a gift no one will open", "a treaty draft with a missing page", "an heirloom both sides claim"],
     brief: "Ambassador Teresh and her delegation are bound for talks at {world}, and someone has made it clear they shouldn't arrive. Get them there, alive and on time.",
-    arrive: "The delegation boards: eleven diplomats, too much luggage, and {key}, who wasn't on the manifest. The ambassador vouches for them. Reyes doesn't.",
+    arrive: "The delegation boards: eleven diplomats, too much luggage, and {key}: not on the manifest. The ambassador vouches for them. Reyes doesn't.",
     steps: [
       ["Keep them safe en route", "Halfway there, a sensor ghost shadows the Pelion: a ship running dark that won't answer hails. It peels away when the shields go up. Someone was watching."],
       ["Deliver them to the talks", "The delegation arrives, and the talks open. Then Rrinn finds a transmitter in the ambassador's luggage, sending the delegation's position to someone outside the system."],
@@ -429,6 +438,8 @@ const STORIES = {
     fail: "The delegation never reached {world}. The talks were cancelled, and someone, somewhere, got exactly what they wanted.",
   },
   "Find a missing ship or outpost": {
+    keys: ["the Arkwright's captain's husband", "a freighter pilot who passed them on the way out", "the survey's reckless sponsor", "an old friend of one of the crew"],
+    strange: ["a non-corporeal life form", "a nebula that dreams", "a subspace anomaly that distorts time", "a cloud of light that sings"],
     brief: "The survey ship Arkwright stopped reporting near {world} nine days ago: fourteen crew, no distress call, no debris. {key} was the last to speak to them.",
     arrive: "Near {world} the Pelion's sensors find a faint ion trail, nine days cold, leading into a region where {strange} has been reported. The Arkwright's last log entry ends with the word \"beautiful\".",
     steps: [
@@ -444,6 +455,8 @@ const STORIES = {
     fail: "The Arkwright is still out there, still drifting. The search is called off.",
   },
   "Deliver urgent medical supplies": {
+    keys: ["former Starfleet surgeon Dr. Imani Okafor", "an exhausted young doctor in charge for a week", "an elderly physician who has seen this fever before", "a brilliant, reckless epidemiologist"],
+    strange: ["an unlicensed agricultural mutagen", "Orion spice with a contaminant", "ice from a comet no one had tested", "fertilizer from an unregistered supplier"],
     brief: "An outbreak on {world}: a fever their doctors can't name, spreading faster each day. The Pelion carries the only stock of a broad-spectrum retroviral in the sector.",
     arrive: "{world}'s capital is under quarantine; the streets are empty and the hospitals full. Their chief physician, {key}, meets the away team at the transporter with a single question: how much did you bring?",
     steps: [
@@ -458,7 +471,9 @@ const STORIES = {
     fail: "The supplies arrived too late for {world}. The fever has run its course, and the count is grim.",
   },
   "Evacuate a colony": {
-    brief: "{world}'s star is flaring, months ahead of every prediction. The colony has days, not months: twelve hundred people, three transports, and a governor, {key}, who doesn't believe the readings.",
+    keys: ["a governor who built the colony with her own hands", "a governor up for re-election in a month", "a stubborn old governor who has survived three flares", "a governor with a secret reason to stay"],
+    strange: ["a field of glass flowers that sing at dawn", "a ruin older than any known civilization", "a spring whose water heals", "an ancient machine that still works"],
+    brief: "{world}'s star is flaring, months ahead of every prediction. The colony has days, not months: twelve hundred people, three transports, and {key}. The governor doesn't believe the readings.",
     arrive: "The flare's first wave has already cooked {world}'s northern hemisphere. The colony's transports are on the ground, half-loaded. The governor wants proof.",
     steps: [
       ["Convince the governor", "Sevek's projections, shown on every screen in the colony, settle the argument. The governor gives the order to evacuate, and the colony starts to move."],
@@ -473,7 +488,9 @@ const STORIES = {
     fail: "The flare reached {world} before the transports cleared. Not everyone got out.",
   },
   "Patrol the Neutral Zone border": {
-    brief: "Romulan ships have been sighted near the Neutral Zone at {world}: a patrol is overdue. Show the flag, watch the border, and don't start a war.",
+    keys: ["an outpost commander who hasn't slept in a week", "a nervous listening-post technician", "a disapproving Vulcan observer", "a Romulan who wants to defect"],
+    strange: ["a ghost ship seen crossing the Zone", "lights in the Zone where there are no stars", "a Romulan buoy that wasn't there last week", "a signal repeating a crew member's name"],
+    brief: "Romulan ships have been sighted along the Neutral Zone: a patrol is overdue. Show the flag, watch the border, and don't start a war.",
     arrive: "The border is quiet. Too quiet: the outpost listening stations report a gap in their coverage, as if something were jamming them on purpose, and {key} is waiting for the Pelion with a story about {strange}.",
     steps: [
       ["Sweep the border", "Rrinn hears it first: the faint echo of a cloaked ship, holding station on the Zone's edge, close enough to watch every outpost on the line."],
@@ -487,7 +504,9 @@ const STORIES = {
     fail: "The patrol never happened. Whatever was watching the border has finished watching.",
   },
   "Recover a lost probe or artifact": {
-    brief: "A Federation deep-space probe went down near {world} carrying sensor logs from beyond the sector's edge, and {strange} it was never meant to find. Recover it before anyone else does.",
+    keys: ["a stranded Orion trader", "a salvage broker who asks no questions", "a former Starfleet officer gone rogue", "a collector of curiosities with deep pockets"],
+    strange: ["a derelict of an unknown design", "a living crystal", "a fragment of a dead civilization's beacon", "a shard of a hull no one built"],
+    brief: "A Federation deep-space probe went down near {world} carrying sensor logs from beyond the sector's edge, and something it was never meant to find: {strange}. Recover it before anyone else does.",
     arrive: "The probe's beacon is still pinging from {world}'s debris field, and the Pelion isn't the only ship listening: {key} is already there, in a ship with no registry.",
     steps: [
       ["Find it in the debris", "The probe is lodged in a tumbling asteroid, its casing cracked. Something inside it is still powered, and it isn't the probe's own reactor."],
@@ -502,6 +521,8 @@ const STORIES = {
     fail: "Someone else reached the probe first. Its logs, and whatever it brought home, are in other hands now.",
   },
   "Mediate a dispute between two worlds": {
+    keys: ["an idealistic Federation ambassador", "the moon's own mining guild boss", "a Vulcan arbiter sent to observe", "a retired admiral who brokered the last truce"],
+    strange: ["a seam of pure dilithium", "an ancient machine that still works", "fossils of their shared ancestors", "a crystal that stores memories"],
     brief: "{world} and its neighbour are a week from war over a mining moon that orbits between them. Both have asked the Federation to mediate; neither trusts it.",
     arrive: "The talks are held aboard the Pelion, the only neutral ground in the system. The two delegations arrive within a minute of each other and refuse to share a turbolift. {key} sits with neither.",
     steps: [
@@ -517,6 +538,8 @@ const STORIES = {
     fail: "The talks failed. {world} and its neighbour are at war over a moon.",
   },
   "Test experimental technology": {
+    keys: ["a brilliant, reckless scientist", "a Daystrom Institute prodigy", "an engineer who designed the prototype in a weekend", "a Starfleet R&D commander with a deadline"],
+    strange: ["a cloaked ship that shouldn't be there", "a hidden Orion cache", "a ships' graveyard nobody charted", "a signal repeating a crew member's name"],
     brief: "Starfleet R&D has a prototype for the Pelion to test near {world}: a sensor-cloak inverter, built by {key}, that should let a starship see through a cloak. It hasn't been tested outside a lab.",
     arrive: "{key} beams aboard with the prototype in three crates and a manner that suggests the Pelion should be grateful. Grath takes one look at the wiring and asks who signed off on it.",
     steps: [
@@ -532,6 +555,8 @@ const STORIES = {
     fail: "The trials never happened. R&D will find another ship, and another schedule.",
   },
   "Ferry a delegation to a world that left the Federation": {
+    keys: ["a first minister who lost family in the disaster", "a former Federation liaison who resigned in protest", "the spaceport's director", "a council elder who voted to leave"],
+    strange: ["a Klingon raid that held every ship nearby", "an ion storm that grounded the relief fleet", "a priority order to protect a Federation ambassador", "a misfiled distress call"],
     brief: "{world} left the Federation two years ago, after a disaster Starfleet was too slow to answer. Now they've asked for a delegation to talk about coming back, and they've asked for the Pelion by name.",
     arrive: "The welcome at {world} is formal and cold. The spaceport still has the scorch marks from the disaster, unrepaired, as if on purpose. {key} meets the delegation and doesn't offer a hand.",
     steps: [
@@ -547,13 +572,15 @@ const STORIES = {
     fail: "The delegation never reached {world}. Its people will remember that too.",
   },
   "Shore leave that goes wrong": {
+    keys: ["the local magistrate", "a market guild leader", "the owner of the gaming house", "a colony constable"],
+    strange: ["a carnival of illusions", "a pleasure garden that grants wishes", "a casino where time runs slow", "a hall of mirrors that shows other lives"],
     brief: "Shore leave at {world}, at last: a week's liberty for the crew. Starfleet only asks that the Pelion's people come back on time and in one piece. {strange} is the local attraction.",
     arrive: "The crew scatters across {world}'s pleasure districts. By the second evening, six of them haven't checked in, and {key} is asking for the captain.",
     steps: [
       ["Find the missing crew", "Four of the six are found at once: a card game, a misunderstanding, a local magistrate who wants a fine paid. The other two are somewhere {strange} leads."],
       ["Bring them home", "The last two are found, dazed and delighted and with no memory of the last day. And one of them has something they shouldn't, which {key} says was stolen."],
     ],
-    choice: { title: "The stolen thing", text: "{key} wants the crewman handed over to the local magistrate. The crewman swears it was a gift. Local law is local law; Starfleet looks after its own.",
+    choice: { title: "The stolen thing", text: "{key} wants the crewman handed over to local justice. The crewman swears it was a gift. Local law is local law; Starfleet looks after its own.",
       options: [
         { id: "local", name: "Hand them over", blurb: "Respect local law: +1 accord with {world}; the crewman faces a local court.", how: "Shore leave sorted out under local law.", fx: { accord: 1 }, text: "The magistrate is fair, the fine is paid, and the crewman serves three days sweeping the market. {world} remembers that the Pelion played by its rules." },
         { id: "ship", name: "Starfleet handles it", blurb: "+1 commendation; the locals aren't happy.", how: "Shore leave sorted out under Starfleet discipline.", fx: { commendations: 1, accord: -1 }, text: "The crewman faces a captain's mast instead, and the item is returned with an apology. {key} calls it Starfleet arrogance, loudly." },
@@ -561,6 +588,8 @@ const STORIES = {
     fail: "Shore leave ended badly, and late. The incident report is longer than the liberty was.",
   },
   "Carry a message across the Neutral Zone": {
+    keys: ["a Starfleet admiral with sealed orders", "an admiral's intelligence aide", "a Federation ambassador who once served on the Romulan border", "a Vulcan diplomat with old Romulan contacts"],
+    strange: ["a Romulan weapon test planned near the Zone", "a coup brewing in the Romulan Senate", "a plague on a Romulan colony world", "a fleet massing behind the Zone"],
     brief: "A sealed message for a Romulan contact on the far side of the Zone, near {world}. Crossing is an act of war if they catch you; Starfleet will deny sending you. {key} wrote the message.",
     arrive: "The Zone's edge on the viewer: empty space that every officer aboard has been trained to fear. Somewhere across it, a contact waits who will only talk to the Pelion.",
     steps: [
@@ -1373,7 +1402,7 @@ function newOrder(S) {
   const urgent = !!(twist && twist.fx === "urgent");
   const dist = Math.ceil(distance(from, at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
   const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
-    deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, STRANGE), key: pick(S, KEYS), oppose: orderOpposition(m.oppose, twist) };
+    deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, (STORIES[m.text] && STORIES[m.text].strange) || STRANGE), key: pick(S, (STORIES[m.text] && STORIES[m.text].keys) || KEYS), oppose: orderOpposition(m.oppose, twist) };
   if (STORIES[m.text]) { o.story = m.text; o.text = storyText(S, o, STORIES[m.text].brief); }
   S.backlog = S.backlog || [];
   if (busy(S)) {
