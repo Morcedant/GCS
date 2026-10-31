@@ -430,7 +430,8 @@ function crewHTML() {
   for (const c of CREW) {
     const st = S.crew[c.id];
     const stations = Object.keys(S.stations).filter((st) => stationOfficer(S, st) === c.id).map((st) => st[0].toUpperCase() + st.slice(1));
-    h += `<div class="officer ${DIV[c.id]}"><h4>${esc(c.name)}</h4><div class="small"><b>Role: ${esc(c.role)}</b> · ${esc(c.post)}${stations.length ? ` · <span class="gold">Battle station: ${esc(stations.join(", "))}</span>` : ""}</div><div class="small muted">${esc(c.rank)}. ${esc(c.species)}.</div>
+    h += `<div class="officer ${DIV[c.id]}"><h4>${esc(c.name)}</h4><div class="small muted" style="margin-bottom:8px">${esc(c.rank)} · ${esc(c.species)}</div>
+      <div class="kv small" style="margin-bottom:8px"><span>Role</span><b>${esc(c.role)}</b><span>Position</span><b>${esc(c.post)}</b><span>Battle station</span><b class="gold">${stations.length ? esc(stations.join(", ")) : "None (on call)"}</b></div>
       <div class="small">${st.inj ? `<span class="bad">Hurt ${st.inj}/3${st.inj >= 3 ? ": in sickbay" : st.inj === 2 ? ": −2" : ""}</span> · ` : ""}Duty ${boxes(st.duty, 2, "gold")} · Experience ${st.xp}/5</div>
       <div class="skills">${Object.keys(c.skills).map((sk) => `<span>${esc(sk)} <b>${skillOf(S, c.id, sk)}</b></span>`).join("")}</div>
       <div class="small" style="margin-top:4px"><b>${esc(c.adv)}:</b> <span class="muted">${esc(c.advText)}</span></div></div>`;
@@ -450,7 +451,7 @@ function awayHTML() {
   if (!A.team) h += `<p class="small muted">${A.stage === "orbit" ? "No one yet." : "No one: choose an away team on the Here tab."}</p>`;
   else {
     h += `<div class="crew">` + A.team.map((id) => { const c = officer(id), st = S.crew[id], where = SITES[(A.pos && A.pos[id]) || "outpost"];
-      return `<div class="officer ${DIV[id]}" style="padding:8px 10px"><h4 style="font-size:15px">${esc(c.name)}</h4><div class="small muted">${esc(c.role)} · ${esc(c.post)}</div><div class="small">At ${esc(where.name.toLowerCase())}${st.inj ? ` · <span class="bad">hurt ${st.inj}/3${st.inj >= 3 ? ", beamed to sickbay" : ""}</span>` : ""} · Duty ${st.duty}</div></div>`; }).join("") + `</div>`;
+      return `<div class="officer ${DIV[id]}" style="padding:8px 10px"><h4 style="font-size:15px;margin-bottom:4px">${esc(c.name)}</h4><div class="small muted" style="margin-bottom:4px">${esc(c.post)} · ${esc(c.role)}</div><div class="small">At ${esc(where.name.toLowerCase())}${st.inj ? ` · <span class="bad">hurt ${st.inj}/3${st.inj >= 3 ? ", beamed to sickbay" : ""}</span>` : ""} · Duty ${st.duty}</div></div>`; }).join("") + `</div>`;
     h += `<div class="btn-row"><button class="btn small" data-tab-go="here">Their actions (Here tab)</button>${mapMode === "surface" ? "" : `<button class="btn small" data-surface="1">Show the surface map</button>`}</div>`;
   }
   const found = Object.entries(CLUES).filter(([k]) => A.clues[k]);
