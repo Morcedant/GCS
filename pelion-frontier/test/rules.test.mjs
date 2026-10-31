@@ -342,3 +342,18 @@ test("the prologue shows nothing of the campaign: no reasons, no threads, until 
   assert.equal(orderReason(S, tied), STORIES[tied.story].why);              // part of the campaign: the campaign's reason
   tied.campaign = false; assert.equal(orderReason(S, tied), STORIES[tied.story].reason);   // ordinary work: its own
 });
+test("a successful technology trial leaves a cloak inverter on the Pelion: +2 sweeps; the full-power run reaches 5 ly", async () => {
+  const { sweepRange } = await import("../src/game.js");
+  for (const [choice, range] of [["shut", 3], ["push", 5]]) {
+    const S = newGame({ seed: "inv" + choice });
+    S.orders = []; S.backlog = []; S.arc.stage = "done";
+    let o; for (let i = 0; i < 200 && !(o && o.story === "Test experimental technology"); i++) { o = newOrder(S); S.orders = []; }
+    S.orders = [o]; S.event = { kind: "mission-choice", orderId: o.id }; o.have = o.segs;
+    assert.equal(S.pelion.refits.inverter, undefined);
+    assert.ok(chooseMission(S, o.id, choice).ok);
+    assert.ok(S.pelion.refits.inverter >= 1); assert.equal(sweepRange(S), range);
+    const sweep = actionsFor(S).find((a) => a.id === "sweep");
+    assert.ok(target(S, "rrinn", "Computers", { action: "sweep" }).parts.some(([n, v]) => n === "Cloak inverter" && v === 2));
+    assert.match(sweep.blurb, new RegExp(`within ${range} light-years`));
+  }
+});
