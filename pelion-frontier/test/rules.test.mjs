@@ -210,3 +210,13 @@ test("the Corvan II raider, chased off, leaves for good", () => {
   }
   assert.ok(checked > 0);
 });
+test("finished orders are kept, with how they ended", async () => {
+  const { completeOrder, newOrder } = await import("../src/game.js");
+  const S = newGame({ seed: "hist" });
+  const o = newOrder(S) || newOrder(S);
+  completeOrder(S, o, true);
+  completeOrder(S, S.orders.find((x) => x.arc), false, "Too late.");
+  assert.deepEqual(S.history.map((h) => h.result), ["done", "failed"]);
+  assert.equal(S.history[1].how, "Too late.");
+  assert.ok(!/Neutral Zone near the Neutral Zone/.test(o.title));
+});

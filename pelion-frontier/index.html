@@ -94,6 +94,11 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
 .orders-choice { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
 .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 16px; padding: 6px 11px; cursor: pointer; font-size: 13px; }
 .chip[hidden] { display: none; }
+.badge-status { font: 600 11px var(--body); letter-spacing: .04em; text-transform: none; border: 1px solid var(--line); border-radius: 10px; padding: 1px 8px; margin-left: 6px; vertical-align: 3px; color: var(--muted); }
+.badge-status.good { color: var(--green); border-color: rgba(123,196,127,.5); } .badge-status.bad { color: #ff9a8f; border-color: rgba(224,86,74,.6); }
+.steps-list { list-style: none; padding: 0; margin: 4px 0; display: grid; gap: 3px; font-size: 13px; }
+.steps-list li { display: flex; gap: 8px; color: var(--muted); } .steps-list li > span { width: 14px; flex: none; text-align: center; }
+.steps-list li.done { color: var(--green); } .steps-list li.now { color: var(--ink); font-weight: 600; } .steps-list li.now > span { color: var(--gold); }
 .chip:has(input:checked) { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; } .chip input { accent-color: var(--gold); margin: 0; }
 .chip.off { opacity: .45; }
 .blog { max-height: 220px; overflow-y: auto; font-size: 13px; background: #0b0d16; border-radius: 8px; padding: 8px 10px; margin-top: 10px; display: grid; gap: 3px; }

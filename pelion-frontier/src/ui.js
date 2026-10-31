@@ -122,7 +122,7 @@ function draw() {
   // The Neutral Zone's label.
   if (view.zoom > 0.5) { const p = toPixel(key(4, -RADIUS), size); ctx.fillStyle = "rgba(255,150,140,.55)"; ctx.font = "600 12px Antonio, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ROMULAN NEUTRAL ZONE", p.x, p.y + 4); ctx.textAlign = "left"; }
   // Orders.
-  for (const o of S.orders) { const { x, y } = toPixel(o.at, size); ctx.strokeStyle = "#f2c14e"; ctx.lineWidth = 2; ctx.setLineDash([4, 3]); hexPath(ctx, x, y, size - 3); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#f2c14e"; ctx.font = "bold 13px system-ui, sans-serif"; ctx.fillText("!", x + size * 0.45, y - size * 0.35); }
+  for (const o of S.orders) { const { x, y } = toPixel(o.at, size), late = !o.arc && o.deadline - S.turn <= 2; ctx.strokeStyle = late ? "#e0564a" : "#f2c14e"; ctx.lineWidth = 2; ctx.setLineDash([4, 3]); hexPath(ctx, x, y, size - 3); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = late ? "#e0564a" : "#f2c14e"; ctx.font = "bold 13px system-ui, sans-serif"; ctx.fillText("!", x + size * 0.45, y - size * 0.35); }
   // Systems.
   for (const s of Object.values(S.systems)) {
     const { x, y } = toPixel(s.at, size), k = shownKind(s), col = k ? SYS_COLOR[k] : "#8e9ab4", r = k === "starbase" ? 7 : 6;
@@ -485,21 +485,58 @@ function awayHTML() {
   h += `<h3>Away team log</h3>` + (L.length ? `<ul class="log">${L.map((l) => `<li class="${l.kind}"><span class="t">${l.t}</span>${esc(l.text)}</li>`).join("")}</ul>` : `<p class="small muted">Nothing logged yet.</p>`);
   return h;
 }
+const bar = (v, max, color) => `<span class="meter" style="display:inline-block;width:110px;vertical-align:middle;margin-right:6px"><span style="width:${Math.max(0, Math.min(100, (v / max) * 100))}%;background:${color}"></span></span>`;
+/** The Silence at Corvan II, step by step: done, now, or to come. */
+function arcSteps() {
+  const A = S.arc, st = A.stage, after = (x) => ["travel", "orbit", "pull", "orions", "caretaker", "done"].indexOf(st) > ["travel", "orbit", "pull", "orions", "caretaker", "done"].indexOf(x);
+  const raider = Object.values(S.enemies).find((e) => e.arcRaider), n = cluesFound(A);
+  const steps = [
+    ["Reach Corvan II", st !== "travel"],
+    [raider && raider.hidden ? "Check the space around Corvan II: a Sensor sweep (an unseen ship would strike within a day)" : "Deal with the Orion raider (warn it off, or fight)", !raider, true],
+    ["Sweep the ruins with the ship's sensors", after("orbit")],
+    ["Beam down an away team", !!A.team || after("caretaker") || !!A.podsSeen],
+    [`Find clues: ${n} of ${CLOCK} (Sevek needs ${THEORY_AT})`, n >= THEORY_AT || !!A.theory],
+    ["Sevek's theory: what's in the ruins", !!A.theory],
+    ["Stop the Orion diggers in the ruins", !!A.podsSeen],
+    ["Decide the caretaker's fate", st === "done"],
+  ];
+  let current = steps.findIndex(([, done, optional]) => !done && !optional);
+  return `<ol class="steps-list">${steps.map(([t, done, optional], i) => `<li class="${done ? "done" : i === current ? "now" : ""}"><span>${done ? "✓" : i === current ? "▶" : optional ? "·" : "○"}</span>${esc(t)}</li>`).join("")}</ol>`;
+}
 function ordersHTML() {
   let h = hint() + `<h2>Orders</h2>`;
-  const A = S.arc;
-  if (awayActive()) h += `<div class="card small">The away team's work on Corvan II (who's down, the Countdown, the clues, its log) is on the <button class="btn small" data-tab-go="away">Away team</button> tab.</div>`;
-  if (!S.orders.length && (A.stage === "done" || A.stage === "travel")) h += `<p class="muted">No orders. Starfleet will send more; meanwhile, the sector is yours to patrol.</p>`;
+  const A = S.arc, hist = S.history || [];
+  const doneN = hist.filter((x) => x.result !== "failed").length, failN = hist.filter((x) => x.result === "failed").length;
+  // The tour clock and the tally.
+  h += `<div class="kv small" style="margin-bottom:10px"><span>Tour</span><span>${bar(Math.min(S.turn, TOUR), TOUR, "var(--gold)")} Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hourly(S) ? ` · hour ${(S.hour || 0) + 1} on Corvan II` : ""}</span>
+    <span>Orders</span><span><b>${S.orders.length}</b> active · <b class="good">${doneN}</b> carried out · <b class="bad">${failN}</b> failed</span></div>`;
+  if (awayActive()) h += `<div class="card small">The away team's work on Corvan II (who's down, the clues, its log) is on the <button class="btn small" data-tab-go="away">Away team</button> tab.</div>`;
+  if (!S.orders.length) h += `<p class="muted">No orders right now. Starfleet will send more; meanwhile, the sector is yours to patrol.</p>`;
   for (const o of S.orders) {
-    const left = o.deadline - S.turn;
-    h += `<div class="card ${left <= 2 && !o.arc ? "red" : "gold"}"><h4>${esc(o.title)}</h4>`;
-    if (o.text) h += `<p class="small">${esc(o.text)}</p>`;
-    if (!o.arc || A.stage === "travel" || A.stage === "orbit") h += `<div class="small">${o.arc ? "" : `${o.have}/${o.segs} done with ${esc(o.skills.join(", "))}. `}Due by turn ${o.deadline} (${left} turn${left === 1 ? "" : "s"} left).</div>`;
-    h += o.personal ? `<div class="small"><b>A personal connection:</b> ${esc(o.personal)}</div>`
-      : `<div class="small muted">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.</div>`;
+    const left = o.deadline - S.turn, total = Math.max(1, o.deadline - (o.issued || 1));
+    if (o.arc) {
+      const live = ["pull", "orions", "caretaker"].includes(A.stage);
+      const status = live && A.countdown >= COUNTDOWN - 2 ? ["Running out of time", "bad"] : A.stage === "travel" && left <= 2 ? ["Running out of time", "bad"] : ["In progress", "good"];
+      h += `<div class="card gold"><h4>${esc(o.title)} <span class="badge-status ${status[1]}">${status[0]}</span></h4><p class="small">${esc(o.text)}</p>`;
+      h += `<div class="small"><b>A personal connection:</b> ${esc(o.personal)}</div>`;
+      h += `<div class="kv small" style="margin-top:8px">` + (A.stage === "travel"
+        ? `<span>Deadline</span><span>${boxes(Math.max(0, left), total, "gold")} reach Corvan II by turn ${o.deadline} (${left} week${left === 1 ? "" : "s"} left)</span>`
+        : live ? `<span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} ${COUNTDOWN - A.countdown} left: it fills every hour in orbit and with each failure below</span>`
+        : `<span>Clock</span><span>No deadline in orbit: the Countdown starts when the ruins are swept.</span>`) + `</div>`;
+      h += `<h3>The mission</h3>` + arcSteps();
+      h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> the eight scientists brought home (shut the caretaker down, or reason with it). <b>Partial:</b> leave it be and take back the Orion phasers. <b class="bad">Failure:</b> the Countdown fills, or you don't reach Corvan II by turn ${o.arc && A.stage === "travel" ? o.deadline : 12}.</div>`;
+    } else {
+      const status = left <= 1 ? ["Due this week", "bad"] : left <= 2 ? ["Running out of time", "bad"] : o.have ? ["Under way", "good"] : ["Not started", ""];
+      h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${status[1]}">${status[0]}</span></h4>`;
+      h += `<div class="kv small"><span>Progress</span><span>${boxes(o.have, o.segs, "blue")} ${o.have} of ${o.segs} successes</span>
+        <span>Deadline</span><span>${boxes(Math.max(0, left), total, "gold")} ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})</span></div>`;
+      h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))} (−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}): +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? "" : ", and a Starfleet Command box cleared"}. <b class="bad">Failure:</b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.</div>`;
+      h += `<div class="small muted" style="margin-top:4px">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.</div>`;
+    }
     h += `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-go="${o.at}">Set course</button></div></div>`;
   }
-  h += `<p class="small muted">Carried out: ${S.done}. Failed: ${S.failed}. Each success clears a Starfleet Command box; each failure marks one.</p>`;
+  // Past orders.
+  h += `<h3>Past orders</h3>` + (hist.length ? `<ul class="log">${hist.slice().reverse().map((x) => `<li class="${x.result === "failed" ? "bad" : x.result === "partly" ? "order" : "good"}"><b>${x.result === "failed" ? "✗ Failed" : x.result === "partly" ? "◐ Partly" : "✓ Carried out"}</b> · turn ${x.turn} · ${esc(x.title)}<br><span class="small">${esc(x.how)}</span></li>`).join("")}</ul>` : `<p class="small muted">None yet. Each order carried out clears a Starfleet Command box; each failure marks one.</p>`);
   return h;
 }
 

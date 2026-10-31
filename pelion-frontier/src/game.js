@@ -38,7 +38,7 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
   const cv = S.systems[S.corvan];
   S.orders.push({ id: "o1", arc: true, title: "The Silence at Corvan II", at: cv.at, sys: cv.id, skills: [], segs: 0, have: 0, deadline: 12,
     text: "The Federation research outpost on Corvan II, eight archaeologists studying the ruins of an extinct civilization, has missed three check-ins. Corvan II has a native people, the Ketari, at a bronze-age level: the outpost works under the Prime Directive. An Orion raider was reported in the sector last week.",
-    twist: null, personal: "Rrinn's sister serves on the outpost's supply run." });
+    twist: null, personal: "Rrinn's sister serves on the outpost's supply run.", issued: 1 });
   // The raider holds station on the far side of Corvan II's moon: passive sensors won't see it; an active sweep will.
   spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at, hidden: true, arcRaider: true });
   const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");
@@ -460,8 +460,11 @@ function missionStep(S, p) {
   completeOrder(S, o, true);
   return say(S, `Orders complete: ${o.title}. Commended.`, "victory");
 }
-export function completeOrder(S, o, ok) {
+/** Every finished order, for the Orders tab: { title, result: "done" | "partly" | "failed", turn, how }. */
+export function recordOrder(S, o, result, how) { (S.history = S.history || []).push({ title: o.title, result, turn: S.turn, how }); }
+export function completeOrder(S, o, ok, how) {
   S.orders = S.orders.filter((x) => x !== o);
+  recordOrder(S, o, ok ? "done" : "failed", how || (ok ? "Carried out." : `Not carried out by turn ${o.deadline}.`));
   if (ok) {
     S.done++; S.commendations += o.arc ? 4 : 2; S.supplies += 10; S.science += 8;
     if (!(o.twist && o.twist.fx === "nocredit")) markCommand(S, -1, `orders carried out: ${o.title}.`);
@@ -487,7 +490,7 @@ export function newOrder(S) {
   }
   const twist = rand(S) < 0.6 ? pick(S, TWISTS) : null;
   const dist = Math.ceil(distance(from, at) / speedOf(S));
-  const o = { id: "o" + S.nextId++, title: m.text + (sys ? ` at ${sys.name}` : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
+  const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
     deadline: S.turn + dist + m.segs + 4 - (twist && twist.fx === "urgent" ? 2 : 0), twist, strange: pick(S, STRANGE), key: pick(S, KEYS) };
   S.orders.push(o);
   if (twist && twist.fx === "klingon") { const k = closestOutpost(S, at); if (k) spawnEnemy(S, "kbc", k.at, { goal: "claim", target: at }); }

@@ -38,7 +38,7 @@ export function endTurn(S) {
   if (S.turn % 8 === 0) { for (const id in S.crew) S.crew[id].duty = 2; log(S, "Duty points restored.", "good"); }
   arcTurn(S);
   // Orders fall due.
-  for (const o of [...S.orders]) if (S.turn >= o.deadline) { log(S, `Orders failed: ${o.title}.`, "bad"); completeOrder(S, o, false); if (o.arc) { S.arc.stage = "done"; storyEvent(S, "Too late", "Another ship reached Corvan II first. Whatever happened to the eight scientists, the Pelion wasn't there for it, and Starfleet Command has noted it."); } }
+  for (const o of [...S.orders]) if (S.turn >= o.deadline) { log(S, `Orders failed: ${o.title}.`, "bad"); completeOrder(S, o, false, o.arc ? "Too late: another ship reached Corvan II first." : undefined); if (o.arc) { S.arc.stage = "done"; storyEvent(S, "Too late", "Another ship reached Corvan II first. Whatever happened to the eight scientists, the Pelion wasn't there for it, and Starfleet Command has noted it."); } }
   // The Klingon border pulls on nearby worlds.
   if (S.turn % 8 === 0) {
     const k = sys.filter((s) => s.kind === "klingon" || s.kind === "claimed");

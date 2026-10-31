@@ -2,7 +2,7 @@
 // power and a Countdown of 6; the away team's investigation (a discovery clock of 4); Orion diggers in the ruins; and
 // the caretaker machine, with a choice about what to do with it.
 import { ENEMIES, CREW } from "./data.js";
-import { log, markCommand, completeOrder, registerHooks, enemiesAt, available, officer, sendHome, storyEvent } from "./game.js";
+import { log, markCommand, completeOrder, recordOrder, registerHooks, enemiesAt, available, officer, sendHome, storyEvent } from "./game.js";
 import { startBattle } from "./combat.js";
 
 const CLUES = {
@@ -145,7 +145,7 @@ function checkCountdown(S) {
   const A = S.arc;
   if (A.countdown < COUNTDOWN || A.stage === "done") return "";
   A.stage = "done";
-  const o = arcOrder(S); if (o) completeOrder(S, o, false);
+  const o = arcOrder(S); if (o) completeOrder(S, o, false, "The Countdown ran out: the Pelion had to break orbit, and the scientists were left asleep.");
   astory(S, "Breaking orbit", "The Countdown runs out: the drain on the Pelion's power is too much, and the ship has to break orbit or fall. The away team beams up with nothing. The scientists sleep on in the ruins, and Rrinn never hears the end of that message.");
   return "";
 }
@@ -153,12 +153,12 @@ function finishArc(S, how) {
   const A = S.arc; A.stage = "done";
   const o = arcOrder(S);
   if (how === "leave") {
-    if (o) { S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; }
+    if (o) { S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; recordOrder(S, o, "partly", "Partly: the Orion phasers recovered and the Ketari left their history, but the scientists still asleep."); }
     S.science += 8;
     astory(S, "The Ketari's own history", "The away team takes back every Orion phaser from the village and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
     alog(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
   } else {
-    if (o) completeOrder(S, o, true);
+    if (o) completeOrder(S, o, true, how === "reason" ? "The caretaker reasoned with: the scientists released, the Ketari still watched over." : "The caretaker shut down: the scientists awake and home.");
     if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); }
     else S.commendations += 1;
     astory(S, how === "reason" ? "Equals" : "Silence, for good", how === "reason"
