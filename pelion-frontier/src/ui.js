@@ -2,10 +2,10 @@
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
-  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating } from "./game.js";
+  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
-import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound, contestOdds, exchangeOdds } from "./arc.js";
+import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound, contestOdds } from "./arc.js";
 import { kindName } from "./ai.js";
 import { RADIUS, inZone } from "./sector.js";
 
@@ -603,7 +603,7 @@ function missionHTML() {
       h += `<ol class="steps-list"><li class="${there || o.have ? "done" : "now"}"><span>${there || o.have ? "✓" : "▶"}</span>Reach ${esc(o.sys ? S.systems[o.sys].name : "the border")} (${distance(S.pelion.at, o.at)} ly away)</li><li class="${o.have >= o.segs ? "done" : there || o.have ? "now" : ""}"><span>${o.have >= o.segs ? "✓" : there || o.have ? "▶" : "·"}</span>${o.segs} successes with ${esc(o.skills.join(", "))}: ${o.have} of ${o.segs}</li></ol>`;
       h += `<div class="kv small"><span>Progress</span><span>${boxes(o.have, o.segs, "blue")} ${o.have} of ${o.segs} successes</span>
         <span>Deadline</span><span>${boxes(Math.max(0, left), total, "gold")} ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})</span></div>`;
-      h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))} (−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}): +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? "" : ", and a Starfleet Command box cleared"}. <b class="bad">Failure:</b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.</div>`;
+      h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))}, ${o.oppose ? `opposed by ${esc(o.oppose.name)} (${esc(o.oppose.skill)} ${o.oppose.target})` : `−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}`}: +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? "" : ", and a Starfleet Command box cleared"}. <b class="bad">Failure:</b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.</div>`;
       h += `<div class="small muted" style="margin-top:4px">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.</div>`;
     }
     h += urgentLine(o) + courseRow(o) + `</div>`;

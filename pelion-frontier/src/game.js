@@ -117,7 +117,7 @@ export function target(S, id, skill, ctx = {}) {
   if (ctx.action === "envoy" && hasRecord(S, "envoy1")) parts.push(["A dead language", 1]);
   if (ctx.action === "sweep" && hasRecord(S, "sweep2")) parts.push(["Cloaked wake", 2]);
   if (ctx.action === "sweep") parts.push(["Hunting the hidden", -2]);
-  if (ctx.order && ctx.order.twist && ctx.order.twist.fx === "hard") parts.push([ctx.order.twist.text, -2]);
+  if (ctx.order && ctx.order.twist && ctx.order.twist.fx === "hard" && !ctx.order.oppose) parts.push([ctx.order.twist.text, -2]);
   if (ctx.order && enemiesAt(S, ctx.order.at).some((e) => e.power === "klingon" && !e.hostile)) parts.push(["Klingons in the way", -2]);
   if (ctx.extra) parts.push(...ctx.extra);
   return { parts, total: parts.reduce((t, p) => t + p[1], 0) };
@@ -285,27 +285,33 @@ export function actionsFor(S, unit = "pelion") {
   const add = (id, extra = {}) => out.push({ id, ...ACTIONS[id], ...extra });
   const sci = unit !== "pelion";
   if (s && !s.surveyed && s.kind !== "klingon") add("survey", { sys: s.id });
-  if (s && s.surveyed && (s.kind === "anomaly" || s.kind === "ruins") && !s.recorded) add("investigate", { sys: s.id, blurb: `Discovery clock ${s.clock}/${s.need}. Fill it for a library record. Fail by 3 or more and it bites back.`, extra: [["The unknown", -3]] });
+  if (s && s.surveyed && (s.kind === "anomaly" || s.kind === "ruins") && !s.recorded) add("investigate", { sys: s.id, blurb: `Discovery clock ${s.clock}/${s.need}. Fill it for a library record. Lose by 3 or more and it bites back.`, oppose: s.kind === "ruins" ? { name: "the ruins' old defenses", skill: "Hazard", target: 12, why: "Whoever built this didn't want visitors." } : { name: "the anomaly", skill: "Strangeness", target: 12, why: "It doesn't follow the physics the sensors expect." } });
   if (sci) return out.map((a) => ({ ...a, why: U.acted ? "Already acted this turn." : null }));
-  if (s && s.kind === "independent") add("envoy", { sys: s.id, blurb: `Accord ${signedAccord(s.accord)}. At +5 they petition to join the Federation; at −5 they join the Klingon Empire. The closer they come, the harder the last steps.`, extra: [["Their reluctance", -(1 + Math.max(0, s.accord))]] });
-  if (s && s.kind === "prewarp" && s.surveyed && !s.observed) add("observe", { sys: s.id, extra: [["Unseen", -2]] });
+  if (s && s.kind === "independent") add("envoy", { sys: s.id, blurb: `Accord ${signedAccord(s.accord)}. At +5 they petition to join the Federation; at −5 they join the Klingon Empire. The closer they come, the harder the last steps.`, oppose: envoyOpposition(S, s) });
+  if (s && s.kind === "prewarp" && s.surveyed && !s.observed) add("observe", { sys: s.id, oppose: { name: "their watchers", skill: "Notice", target: 10, why: "Even a pre-warp people looks up at the sky." } });
   if (s && s.harm > 0 && ["colony", "member", "independent"].includes(s.kind)) add("aid", { sys: s.id, blurb: `Harm ${s.harm}/3. Clear a box.` });
   const P = S.pelion;
   if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair");
   add("sweep");
   for (const e of enemiesAt(S, U.at)) if ((!e.cloaked || e.revealed) && !e.hidden && !ENEMIES[e.type].base) {
-    if (ENEMIES[e.type].will) add("hail", { enemy: e.id, name: `Hail the ${ENEMIES[e.type].name}` });
+    if (ENEMIES[e.type].will) add("hail", { enemy: e.id, name: `Hail the ${ENEMIES[e.type].name}`, oppose: { name: `the ${ENEMIES[e.type].name}'s captain`, skill: "Will", target: ENEMIES[e.type].will + (e.power === "romulan" ? 2 : 0), why: e.power === "klingon" ? "A Klingon captain backs down from nothing lightly." : e.power === "romulan" ? "Romulans don't negotiate from weakness, and never think they're weak." : "Pirates weigh the odds, and the profit." } });
     out.push({ id: "engage", enemy: e.id, name: `Engage the ${ENEMIES[e.type].name}`, skills: [], blurb: engageNote(S, e) });
   }
   const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && e.at === U.at && e.found);
   if (base) out.push({ id: "engage", enemy: base.id, name: "Attack the Orion base", skills: [], blurb: "Its guns and shields against yours. Destroy it and the raids stop." });
-  for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, extra: [["In the field", -2]] });
+  for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, ...(o.oppose ? { oppose: o.oppose } : { extra: [["In the field", -2]] }) });
   if (s && s.id === S.corvan) out.push(...arcActionsHook(S));
   // With an away team on Corvan II's surface, the away team does the mission's work and the bridge crew (whoever stayed
   // aboard) runs the ship: its operations are theirs alone.
   const surface = s && s.id === S.corvan && S.arc.team && ["pull", "orions", "caretaker", "phasers"].includes(S.arc.stage);
   if (surface) { const aboard = CREW.map((c) => c.id).filter((id) => !S.arc.team.includes(id)); for (const x of out) if (x.id !== "arc" && x.id !== "beam" && !x.who) { x.who = aboard; x.bridge = true; } }
   return out.map((a) => ({ ...a, why: a.why || whyNot(S, a) }));
+}
+/** Who works against the Pelion's envoys: Klingon envoys courting the same world, or the world's own doubters. */
+function envoyOpposition(S, s) {
+  const k = Object.values(S.enemies).find((e) => e.goal === "influence" && e.target === s.at && e.power === "klingon");
+  if (k) return { name: "the Klingon envoys courting them", skill: "Persuasion", target: 12, why: "The Empire is making its own offer, with a battle cruiser in orbit to underline it." };
+  return { name: "their council's doubters", skill: "Doubt", target: 9 + Math.max(0, s.accord), why: s.accord > 0 ? "The closer they come to the Federation, the louder the voices against it." : "Not everyone wants outsiders' promises." };
 }
 const sig = (a) => [a.id, a.arc || "", a.order || "", a.enemy || "", a.sys || ""].join(":");
 /** Why an action can't be taken now: tried already this turn, or no one free (or fit) with the training. */
@@ -337,7 +343,7 @@ export function rollTarget(S, a, who, skill, assist = false) {
   const t = target(S, who, skill, { ...actionCtx(S, a), extra: a.extra || [] });
   const helper = assist ? helperFor(S, a, who, skill) : null;
   if (helper) { t.parts.push([`${helper.short} assists`, 1]); t.total += 1; t.helper = helper.id; }
-  if (a.id === "hail") { const w = hailWill(S, a); t.parts.push(w); t.total += w[1]; }
+  if (a.id === "hail" && !a.oppose) { const w = hailWill(S, a); t.parts.push(w); t.total += w[1]; }
   return t;
 }
 /** Roll an action. Returns a pending result for the player to accept, or to reroll with a Duty point. */
@@ -364,7 +370,7 @@ export function attempt(S, unit, actionId, opts = {}) {
   (S.tried = S.tried || {})[unit + ":" + sig(a)] = true;
   if (actionId === "hail" && unit !== "pelion") { const w = hailWill(S, a); t.parts.push(w); t.total += w[1]; }
   const roll = check(S, t.total);
-  S.pending = { unit, action: actionId, arc: a.arc, order: a.order, enemy: a.enemy, sys: a.sys, officer: who, skill, target: t, roll, rerolled: false, name: a.name, opposed: !!(a.oppose || a.contest) };
+  S.pending = { unit, action: actionId, arc: a.arc, order: a.order, enemy: a.enemy, sys: a.sys, officer: who, skill, target: t, roll, rerolled: false, name: a.name, opposed: !!(a.oppose || a.contest), oppose: a.oppose || null };
   if (roll.success) return resolve(S, false);
   return { ok: true, pending: S.pending };
 }
@@ -381,6 +387,13 @@ export function resolve(S, reroll) {
   const U = p.unit === "pelion" ? S.pelion : S.support[p.unit];
   if (p.unit !== "pelion") U.acted = true;
   const pre = S.log.length;
+  // Opposition (outside Corvan II, which rolls its own): the action is won on the better margin, not the roll alone.
+  if (p.oppose && !p.arc) {
+    const nm = p.unit === "pelion" ? officer(p.officer)?.short || "The captain" : S.support[p.unit]?.name || "The science vessel";
+    const o = opposed(S, p.roll, p.oppose, nm);
+    p.rawRoll = p.roll; p.roll = { ...p.roll, success: o.win, margin: o.diff }; p.won = o.win; p.oppLine = o.line;
+    log(S, o.line, o.win ? "good" : "bad");
+  }
   const out = applyAction(S, p);
   if (p.action === "sweep" && p.unit === "pelion") arcSweepHook(S);   // a sweep over Corvan II wakes the ruins
   const where = sysAt(S, U.at)?.name || "open space";
@@ -391,6 +404,22 @@ export function resolve(S, reroll) {
   updateVisibility(S);
   checkEnd(S);
   return { ok: true, done: true, result: { ...p, text: out } };
+}
+/** One exchange of opposed rolls: the crew's roll against the opposition's. Better margin wins; ties to the opposition. */
+export function opposed(S, mine, o, who) {
+  const its = check(S, o.target);
+  const ms = mine.success ? mine.margin : Math.min(mine.margin, -1), mc = its.success ? its.margin : Math.min(its.margin, -1);
+  const win = ms > mc;
+  const plural = /s$/.test(o.name.split(" ").pop()) || / and /.test(o.name);
+  const line = `${who} rolled ${mine.dice.join("+")} = ${mine.total} against ${mine.target} (${mine.success ? `by ${mine.margin}` : `failed by ${-mine.margin}`}); opposing, ${o.name} (${o.skill} ${o.target}) rolled ${its.dice.join("+")} = ${its.total} (${its.success ? `by ${its.margin}` : `failed by ${-its.margin}`}). ${win ? `${who} wins` : `${o.name[0].toUpperCase() + o.name.slice(1)} win${plural ? "" : "s"}`}${ms === mc ? " (a tie goes to the opposition)" : ""}.`;
+  return { win, diff: ms - mc, its, line };
+}
+/** The chance to win one opposed roll at this target against this one, worked out exactly. */
+export function exchangeOdds(T, them) {
+  const dist = {}; for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) for (let c = 1; c <= 6; c++) dist[a + b + c] = (dist[a + b + c] || 0) + 1 / 216;
+  const eff = (t, n) => (n <= 4 || (n <= t && n < 17) ? t - n : Math.min(t - n, -1));
+  let p = 0; for (const x in dist) for (const y in dist) if (eff(T, +x) > eff(them, +y)) p += dist[x] * dist[y];
+  return p;
 }
 function gainXp(S, id, skill) {
   const c = S.crew[id]; c.xp++;
@@ -585,6 +614,14 @@ function activateOrder(S, o, why) {
   if (twist && twist.fx === "romulan") { const z = Object.keys(S.hexes).filter(inZone); spawnEnemy(S, "rbop", pick(S, z), { goal: "watch", target: at, cloaked: true, hostile: true }); }
   log(S, `${why ? `Orders ${why}` : "New orders from Starfleet"}: ${o.title}.${urgent ? " Urgent: maximum emergency warp." : ""} Work it with ${o.skills.join(", ")} (${o.segs} successes), due by turn ${o.deadline}.${twist ? ` Twist: ${twist.text}.` : ""} Something strange: ${o.strange}. Key character: ${o.key}.`, "order");
 }
+/** A mission's opposition, made worse by its twist: rivals for the prize, a watcher, people who aren't telling the truth. */
+function orderOpposition(base, twist) {
+  if (!base) return null;
+  const o = { ...base };
+  const add = { klingon: [" and Klingon agents with their own claim", 1], orion: [" and Orion pirates after the same prize", 1], romulan: [", watched by a cloaked Romulan ship", 1], hard: [", and people who aren't telling the truth", 2] }[twist && twist.fx];
+  if (add) { o.name += add[0]; o.target += add[1]; o.why += ` Twist: ${twist.text}.`; }
+  return o;
+}
 export function newOrder(S) {
   const roll = d6(S) + d6(S) + d6(S);
   const m = MISSIONS.reduce((best, x) => (Math.abs(x.roll - roll) < Math.abs(best.roll - roll) ? x : best), MISSIONS[0]);
@@ -604,7 +641,7 @@ export function newOrder(S) {
   const urgent = !!(twist && twist.fx === "urgent");
   const dist = Math.ceil(distance(from, at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
   const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
-    deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, STRANGE), key: pick(S, KEYS) };
+    deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, STRANGE), key: pick(S, KEYS), oppose: orderOpposition(m.oppose, twist) };
   S.backlog = S.backlog || [];
   if (busy(S)) {
     o.backlog = true; o.received = S.turn; S.backlog.push(o);

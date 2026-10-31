@@ -2,7 +2,7 @@
 // power and a Countdown of 6; the away team's investigation (a discovery clock of 4); Orion diggers in the ruins; and
 // the caretaker machine, with a choice about what to do with it.
 import { ENEMIES, CREW } from "./data.js";
-import { log, check, markCommand, completeOrder, recordOrder, missionReport, registerHooks, enemiesAt, available, officer, sendHome, storyEvent } from "./game.js";
+import { log, check, opposed, exchangeOdds, markCommand, completeOrder, recordOrder, missionReport, registerHooks, enemiesAt, available, officer, sendHome, storyEvent } from "./game.js";
 import { startBattle } from "./combat.js";
 
 const CLUES = {
@@ -103,21 +103,6 @@ export function opposition(S, k) {
     shutdown: { name: "the caretaker's defenses", skill: "Countermeasures", target: 14, why: "It doesn't want to be shut down, and it has had eleven thousand years to plan for it." },
     leave: A.phasers ? { name: "the caretaker's judgement", skill: "Logic", target: 12, why: "It has to believe you will go and not come back." } : guards,
   }[k] || null;
-}
-/** One exchange of opposed rolls: the crew's roll against the opposition's. */
-export function opposed(S, mine, o, who) {
-  const its = check(S, o.target);
-  const ms = mine.success ? mine.margin : Math.min(mine.margin, -1), mc = its.success ? its.margin : Math.min(its.margin, -1);
-  const win = ms > mc;
-  const line = `${who} rolled ${mine.dice.join("+")} = ${mine.total} against ${mine.target} (${mine.success ? `by ${mine.margin}` : `failed by ${-mine.margin}`}); opposing, ${o.name} (${o.skill} ${o.target}) rolled ${its.dice.join("+")} = ${its.total} (${its.success ? `by ${its.margin}` : `failed by ${-its.margin}`}). ${win ? `${who} wins` : `${o.name[0].toUpperCase() + o.name.slice(1)} win${/s$/.test(o.name.split(" ").pop()) || / and /.test(o.name) ? "" : "s"}`}${ms === mc ? " (a tie goes to the opposition)" : ""}.`;
-  return { win, diff: ms - mc, its, line };
-}
-/** The chance to win one opposed roll at this target against this one, worked out exactly. */
-export function exchangeOdds(T, them) {
-  const dist = {}; for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) for (let c = 1; c <= 6; c++) dist[a + b + c] = (dist[a + b + c] || 0) + 1 / 216;
-  const eff = (t, n) => (n <= 4 || (n <= t && n < 17) ? t - n : Math.min(t - n, -1));
-  let p = 0; for (const x in dist) for (const y in dist) if (eff(T, +x) > eff(them, +y)) p += dist[x] * dist[y];
-  return p;
 }
 
 export function arcStep(S, p) {
