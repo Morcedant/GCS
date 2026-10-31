@@ -420,7 +420,8 @@ function rng(s) { const r = makeRng(1); r.setState(s.rngState); return { ...r, s
 /** Discoveries (systems charted, ruins surveyed, contacts, technologies) are never trimmed from the log. */
 const DISCOVERY = ["explore", "research", "contact"];
 function log(s, fid, text, kind = "info") {
-  s.log.push({ turn: s.turn, fid, text, kind });
+  s.logSeq = (s.logSeq || 0) + 1;   // each entry is numbered, so the page can show what one choice led to
+  s.log.push({ id: s.logSeq, turn: s.turn, fid, text, kind });
   let n = s.log.length - 400;
   for (let i = 0; i < s.log.length && n > 0; ) { if (!DISCOVERY.includes(s.log[i].kind)) { s.log.splice(i, 1); n--; } else i++; }
 }
@@ -1344,7 +1345,10 @@ function fleetHTML() {
   const o = invasionOdds(S, f.id);
   if (o && o.troops) {
     const war = atWar(S, me.id, sys.colony.owner);
-    h += `<p class="small">Invasion: your troops ${o.troops} against their defense ${o.defense}.${o.guarded ? " Their orbital guns or warships still hold the orbit." : ""}${!war ? " You're not at war with them." : ""}<\/p><button class="btn wide ${o.troops >= o.defense ? "primary" : ""}" data-invade ${!war || o.guarded ? "disabled" : ""}>Land the troops<\/button>`;
+    const tr = f.ships.filter((x) => x.type === "transport").length, per = shipStats(S, me.id, "transport").troops;
+    const defParts = sys.colony.kind === "outpost" ? "an outpost: 0.5" : `population ${sys.colony.pop} × ${RULES.troopDefensePerPop}${sys.colony.capital ? " + 2 for a capital" : ""}`;
+    h += `<p class="small">Invasion: your troops ${o.troops} against their defense ${o.defense}.${o.guarded ? " Their orbital guns or warships still hold the orbit." : ""}${!war ? " You're not at war with them." : ""}<\/p>
+      <p class="small muted" style="margin-top:-4px">Troops: ${tr} transport${tr === 1 ? "" : "s"} × ${per} = ${o.troops}. Defense: ${defParts} = ${o.defense}. ${o.troops >= o.defense ? "<b class=\"good\">Enough: the landing takes it.<\/b>" : `<b class="bad">Not enough: ${fmt(o.defense - o.troops)} more troops needed, or the transports are lost.<\/b>`}<\/p><button class="btn wide ${o.troops >= o.defense ? "primary" : ""}" data-invade ${!war || o.guarded ? "disabled" : ""}>Land the troops<\/button>`;
   }
   const others = fleetsAt(S, f.at).filter((o) => o.owner === me.id && o.id !== f.id);
   if (others.length) h += `<h3>Join with<\/h3>` + others.map((o) => `<button class="row" data-merge="${o.id}">${esc(fleetName(o))}<\/button>`).join("");
@@ -1483,20 +1487,33 @@ function bindChrome() {
     else if (d.move !== undefined) { moveMode = !moveMode; if (moveMode) toast("Click where to send this fleet. Esc cancels."); }
     else if (d.stop !== undefined) setDestination(S, sel.id, S.fleets[sel.id].at);
     else if (d.sentry !== undefined) { const f = S.fleets[sel.id]; f.sentry = !f.sentry; if (f.sentry) nextIdle(); }
-    else if (d.settle !== undefined) { const at = S.fleets[sel.id].at, r = settle(S, sel.id); if (r.error) toast(r.error, true); else { toast(`${S.systems[S.sysAt[at]].name} is yours.`); if (!S.fleets[sel.id]) sel = { kind: "system", id: S.sysAt[at] }; } }
-    else if (d.invade !== undefined) { const r = invade(S, sel.id); if (r.error) toast(r.error, true); else toast(r.taken ? "The world is yours." : "The landing failed.", !r.taken); if (!S.fleets[sel.id]) sel = null; }
+    else if (d.settle !== undefined) { const since = mark(), at = S.fleets[sel.id].at, nm = S.systems[S.sysAt[at]].name, r = settle(S, sel.id); if (!r.error) reportSince(`${nm}`, since); if (r.error) toast(r.error, true); else { toast(`${S.systems[S.sysAt[at]].name} is yours.`); if (!S.fleets[sel.id]) sel = { kind: "system", id: S.sysAt[at] }; } }
+    else if (d.invade !== undefined) {
+      const since = mark(), o = invasionOdds(S, sel.id), nm = S.systems[S.sysAt[S.fleets[sel.id].at]].name, r = invade(S, sel.id);
+      if (r.error) toast(r.error, true);
+      else { reportSince(`Invasion of ${nm}`, since); if (report) report.lines.unshift(`Your troops ${o.troops} against their defense ${o.defense}: ${r.taken ? "the landing takes the world." : "the landing fails, and the transports are lost."}`); }
+      if (!S.fleets[sel.id]) sel = null;
+    }
     else if (d.merge) { const r = mergeFleets(S, sel.id, d.merge); if (r.error) toast(r.error, true); }
     else if (d.split) { const r = splitFleet(S, sel.id, d.split); if (r.error) toast(r.error, true); else sel = { kind: "fleet", id: r.fleet }; }
     else if (d.tech) setResearch(S, me.id, d.tech);
     else if (d.dip) {
       const [fid, what] = d.dip.split(":");
-      if (what === "war") { if (b.dataset.armed !== "1") { b.dataset.armed = "1"; b.textContent = "Click again to declare war"; return; } declareWar(S, me.id, fid); toast(`You are at war with ${faction(S, fid).name}.`, true); }
-      else { const r = propose(S, me.id, fid, what); if (r.error) toast(r.error, true); else toast(what === "endTrade" ? "Trade ended." : r.accepted ? "They accept." : "They refuse.", !r.accepted); }
+      const since = mark(), F = faction(S, fid);
+      if (what === "war") { if (b.dataset.armed !== "1") { b.dataset.armed = "1"; b.textContent = "Click again to declare war"; return; } declareWar(S, me.id, fid); reportSince(`War with ${F.name}`, since); if (report) report.lines.push(`Their worlds and fleets are fair targets now, and yours are theirs. Peace can be proposed from the Diplomacy tab; they'll consider it once the war has cost them.`); }
+      else {
+        const r = propose(S, me.id, fid, what);
+        if (r.error) toast(r.error, true);
+        else { reportSince(what === "peace" ? `Peace with ${F.name}?` : what === "trade" ? `A trade treaty with ${F.name}?` : `Trade with ${F.name}`, since);
+          report = report || { title: F.name, lines: [] };
+          if (what === "endTrade") report.lines.push(`The trade treaty with ${F.name} is over: +3 credits a turn less for each of you.`);
+          else if (!r.accepted) report.lines.push(`${F.name} refuse${what === "peace" ? ": the war goes on" : ""}. ${F.relations[me.id].score < 0 ? "They don't trust you yet." : "Ask again later."}`); }
+      }
     } else if (d.offer) {
       const [i, ans] = d.offer.split(":"); const o = S.offers[+i];
-      if (o) { if (ans === "yes") propose(S, o.from, o.to, o.what); S.offers.splice(+i, 1); toast(ans === "yes" ? "Agreed." : "Declined."); }
+      if (o) { const since = mark(), F = faction(S, o.from); if (ans === "yes") propose(S, o.from, o.to, o.what); S.offers.splice(+i, 1); const own = F.name.endsWith("s") ? `${F.name}'` : `${F.name}'s`; reportSince(`${own} offer`, since); report = report || { title: `${own} offer`, lines: [] }; if (ans !== "yes") report.lines.push(`You decline ${own} offer of ${o.what === "peace" ? "peace: the war goes on" : "a trade treaty"}.`); }
     } else return;
-    save(); renderAll();
+    save(); renderAll(); if (report) showReport();
   });
   document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; renderTabs(); renderPanel(); }));
   $("steps").addEventListener("click", (e) => {
@@ -1544,8 +1561,28 @@ function doEndTurn() {
     if (sel && sel.kind === "fleet" && !S.fleets[sel.id]) sel = null;
     renderAll();
     if (S.winner) { showEnd(); return; }
-    if (news.length) toast(news.slice(-3).map((l) => l.text).join(" "));
+    // A report of the turn, when anything happened to you: the books first, then the rest; charted systems are counted.
+    const charted = S.log.slice(before.log).filter((l) => l.fid === me.id && l.text.startsWith("Charted ")).length;
+    if (news.length || charted) {
+      const books = S.log.slice(before.log).find((l) => l.fid === me.id && l.kind === "turn");
+      report = { title: `Turn ${S.turn - 1}: what happened`, lines: [...news.map((l) => l.text), ...(charted ? [`${charted} new system${charted === 1 ? "" : "s"} charted (see the Log).`] : []), ...(books ? [books.text] : [])] };
+      showReport();
+    }
   }, 30);
+}
+
+// ---------- reports: what a choice led to, in a pop-up ----------
+let report = null;
+const mark = () => S.logSeq || 0;
+function reportSince(title, since) {
+  const me = player(S);
+  const lines = S.log.filter((l) => l.id > since && (!l.fid || l.fid === me.id || l.text.includes(me.name))).map((l) => l.text);
+  report = { title, lines };
+}
+function showReport() {
+  const r = report;
+  modal(`<h2>${esc(r.title)}<\/h2>${r.lines.map((t) => `<p>${esc(t)}<\/p>`).join("") || `<p class="muted">Nothing more came of it.<\/p>`}<div class="btn-row"><button class="btn primary" id="report-ok">Continue<\/button><\/div>`);
+  $("report-ok").onclick = () => { report = null; closeModal(); renderAll(); };
 }
 
 // ---------- dialogs ----------
