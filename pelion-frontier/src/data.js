@@ -69,7 +69,7 @@ export const ACTIONS = {
   survey: { name: "Survey the system", skills: ["Sensors", "Physical Sciences", "Navigation"], blurb: "Chart it: what's there, and science for the refits." },
   investigate: { name: "Investigate", skills: ["Physical Sciences", "Sensors", "Computers", "Life Sciences"], blurb: "Fill the discovery clock to earn a library record." },
   envoy: { name: "Diplomatic mission", skills: ["Diplomacy", "Psychology", "Communications"], blurb: "Bring the world closer to the Federation: +1 accord, +2 on success by 5." },
-  observe: { name: "Observe from orbit", skills: ["Sensors", "Life Sciences", "Psychology", "Stealth"], blurb: "Study them unseen. Fail by 3 or more and they see you: the Prime Directive, and Starfleet Command, take note." },
+  observe: { name: "Observe from orbit", skills: ["Sensors", "Life Sciences", "Psychology"], blurb: "Study them from orbit: a pre-warp people can't see a starship, so the Prime Directive is safe. A failure only means nothing useful this turn." },
   aid: { name: "Relief and repairs", skills: ["Engineering", "Medicine", "Leadership"], blurb: "Help a world that's been raided: clear a harm box." },
   repair: { name: "Repairs underway", skills: ["Engineering"], blurb: "Clear a box from the shields or a system (two on success by 5), or patch one hull box." },
   sweep: { name: "Sensor sweep", skills: ["Sensors", "Communications", "Computers"], blurb: "Listen for cloaked ships and raiders within 3: reveals them. Finds a hidden base here." },

@@ -557,6 +557,7 @@ function ordersHTML() {
   const hist = S.history || [], back = S.backlog || [];
   const doneN = hist.filter((x) => x.result !== "failed").length, failN = hist.filter((x) => x.result === "failed").length;
   h += `<div class="kv small" style="margin-bottom:10px"><span>Tour</span><span>${bar(Math.min(S.turn, TOUR), TOUR, "var(--gold)")} Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hourly(S) ? ` · hour ${(S.hour || 0) + 1} on Corvan II` : ""}</span>
+    <span>Starfleet Command</span><span>${boxes(S.command, 5)} ${S.command} of 5 against the captain: failed orders, Prime Directive violations and incidents each mark one; carried-out orders clear one. At 5 the captain is relieved of command.</span>
     <span>Orders</span><span><b>${S.orders.length}</b> under way · <b>${back.length}</b> in the backlog · <b class="good">${doneN}</b> carried out · <b class="bad">${failN}</b> failed</span></div>`;
   h += `<h3>Under way</h3>`;
   if (!S.orders.length) h += `<p class="muted small">No orders under way. ${back.length ? "Take one on from the backlog below." : "Starfleet will send more; meanwhile, the sector is yours to patrol."}</p>`;

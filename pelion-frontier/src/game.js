@@ -272,8 +272,9 @@ export function spawnEnemy(S, type, at, extra = {}) {
 // ---------- Starfleet Command ----------
 export function markCommand(S, n, why) {
   S.command = Math.max(0, Math.min(5, S.command + n));
-  if (n > 0) log(S, `Starfleet Command marks ${n === 1 ? "a box" : n + " boxes"}: ${why}`, "bad");
-  else log(S, `Starfleet Command clears ${-n === 1 ? "a box" : -n + " boxes"}: ${why}`, "good");
+  // The captain's standing with Starfleet: five boxes and the captain is relieved of command.
+  if (n > 0) log(S, `Starfleet Command marks ${n === 1 ? "a box" : n + " boxes"} against the captain: ${why} (${S.command} of 5${S.command >= 5 ? "" : `; at 5 the captain is relieved of command`}).`, "bad");
+  else log(S, `Starfleet Command clears ${-n === 1 ? "a box" : -n + " boxes"}: ${why} (${S.command} of 5).`, "good");
   if (S.command >= 5 && !S.over) S.over = { win: false, why: "Starfleet Command has relieved you of command. The Pelion returns to Starbase 23 under another captain." };
 }
 
@@ -288,7 +289,7 @@ export function actionsFor(S, unit = "pelion") {
   if (s && s.surveyed && (s.kind === "anomaly" || s.kind === "ruins") && !s.recorded) add("investigate", { sys: s.id, blurb: `Discovery clock ${s.clock}/${s.need}. Fill it for a library record. Lose by 3 or more and it bites back.`, oppose: s.kind === "ruins" ? { name: "the ruins' old defenses", skill: "Hazard", target: 12, why: "Whoever built this didn't want visitors." } : { name: "the anomaly", skill: "Strangeness", target: 12, why: "It doesn't follow the physics the sensors expect." } });
   if (sci) return out.map((a) => ({ ...a, why: U.acted ? "Already acted this turn." : null }));
   if (s && s.kind === "independent") add("envoy", { sys: s.id, blurb: `Accord ${signedAccord(s.accord)}. At +5 they petition to join the Federation; at −5 they join the Klingon Empire. The closer they come, the harder the last steps.`, oppose: envoyOpposition(S, s) });
-  if (s && s.kind === "prewarp" && s.surveyed && !s.observed) add("observe", { sys: s.id, oppose: { name: "their watchers", skill: "Notice", target: 10, why: "Even a pre-warp people looks up at the sky." } });
+  if (s && s.kind === "prewarp" && s.surveyed && !s.observed) add("observe", { sys: s.id });   // from orbit: nothing on the planet can oppose a starship
   if (s && s.harm > 0 && ["colony", "member", "independent"].includes(s.kind)) add("aid", { sys: s.id, blurb: `Harm ${s.harm}/3. Clear a box.`, oppose: aidOpposition(S, s) });
   const P = S.pelion;
   if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair", { oppose: repairOpposition(S) });
@@ -474,7 +475,6 @@ function applyAction(S, p) {
     }
     case "observe": {
       if (r.success) { s.observed = true; S.science += 6; return say(S, `${name} studies ${s.name}'s people unseen: +6 science.`, "discovery"); }
-      if (r.margin <= -3) { markCommand(S, 1, `${s.name}'s people saw the Pelion's away team. The Prime Directive.`); return say(S, `Contact at ${s.name}!`, "bad"); }
       return say(S, `Nothing useful from ${s.name} this time.`);
     }
     case "aid": {
