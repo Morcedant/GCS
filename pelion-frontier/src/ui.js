@@ -175,7 +175,7 @@ function draw() {
   }
   // The away team on Corvan II: a small figure for each officer on the surface, in their division's color, under the world.
   const A = S.arc;
-  if (A.team && ["pull", "orions", "caretaker"].includes(A.stage)) {
+  if (A.team && ["pull", "orions", "caretaker", "phasers"].includes(A.stage)) {
     const { x, y } = toPixel(S.systems[S.corvan].at, size), n = A.team.length, w = 13;
     const DIVCOL = { shvari: "#f2c14e", sevek: "#6fb4ff", vessik: "#6fb4ff", grath: "#e0564a", reyes: "#e0564a", rrinn: "#e0564a" };
     const x0 = x - ((n - 1) * w) / 2, y0 = y + 36;   // below the world's name
@@ -196,7 +196,7 @@ function draw() {
 }
 
 // ---------- the planetary map: Corvan II's surface, while an away team is down ----------
-const surfaceUp = () => S && S.arc.team && ["pull", "orions", "caretaker"].includes(S.arc.stage) && S.pelion.at === S.systems[S.corvan].at;
+const surfaceUp = () => S && S.arc.team && ["pull", "orions", "caretaker", "phasers"].includes(S.arc.stage) && S.pelion.at === S.systems[S.corvan].at;
 /** Keep the map mode honest: no surface map without an away team on it; the button shows when there is one. */
 function syncSurface() {
   const up = surfaceUp();
@@ -336,6 +336,7 @@ function hint() {
   else if (A.stage === "pull" && cluesFound(A) >= THEORY_AT) t = "<b>Next:</b> there's enough evidence. Have Sevek form his theory of what's in the ruins (the Here tab), or find the last clue first for better odds.";
   else if (A.stage === "pull") t = `<b>Next:</b> the away team. Find clues on the Here tab (each officer can act once a turn): Sevek needs ${THEORY_AT} to form a theory of what's in the ruins, before the Countdown fills.`;
   else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:</b> finish it on Corvan II: the away team's actions on the Here tab.";
+  else if (A.stage === "phasers") t = "<b>Next:</b> one thing left: recover the Orion phasers from the Ketari village, unseen (the Here tab).";
   else if (S.turn <= 12) t = "<b>Next:</b> Starfleet will send new orders (the Orders tab). Meanwhile: survey the unknown (?), court the independent worlds, and watch for raiders.";
   return t ? `<div class="card gold small">${t}</div>` : "";
 }
@@ -389,7 +390,7 @@ function beamCard(a) {
 }
 function teamLine() {
   const A = S.arc;
-  if (!A.team || !["pull", "orions", "caretaker"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at || unit !== "pelion") return "";
+  if (!A.team || !["pull", "orions", "caretaker", "phasers"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at || unit !== "pelion") return "";
   return `<div class="card small"><b>Away team on Corvan II:</b> ${A.team.map((id) => esc(officer(id).short) + (available(S, id) ? "" : " (in sickbay)")).join(", ")}. Only they can act on the surface. The ship's other duties (sweeps, observation, repairs) wait until they beam back up.
     <div class="roll-row"><button class="btn small" data-beamup="1">Beam them up (choose again)</button></div></div>`;
 }
@@ -482,12 +483,12 @@ function crewHTML() {
 
 // ---------- Orders ----------
 // ---------- Away team: the Corvan II mission on the surface, apart from the orders ----------
-const awayActive = () => S && ["orbit", "pull", "orions", "caretaker"].includes(S.arc.stage);
+const awayActive = () => S && ["orbit", "pull", "orions", "caretaker", "phasers"].includes(S.arc.stage);
 function awayHTML() {
   const A = S.arc;
   let h = `<h2>Away team: Corvan II</h2>`;
   if (A.stage === "orbit") h += `<p class="small muted">In orbit. Nobody has gone down yet: sweep the ruins with the ship's sensors first (the Here tab).</p>`;
-  else h += `<div class="kv small"><span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} the Pelion breaks orbit when it fills</span><span>Clues</span><span>${boxes(cluesFound(A), CLOCK, "blue")} ${A.theory ? (A.stage === "caretaker" ? "the caretaker found" : "Sevek's theory: a guardian") : cluesFound(A) >= THEORY_AT ? "enough for Sevek's theory" : `Sevek needs ${THEORY_AT} for a theory`}</span><span>Stage</span><span>${{ pull: "Investigating", orions: "The Orion diggers", caretaker: "The caretaker" }[A.stage]}</span></div>`;
+  else h += `<div class="kv small"><span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} the Pelion breaks orbit when it fills</span><span>Clues</span><span>${boxes(cluesFound(A), CLOCK, "blue")} ${A.theory ? (A.stage === "caretaker" ? "the caretaker found" : "Sevek's theory: a guardian") : cluesFound(A) >= THEORY_AT ? "enough for Sevek's theory" : `Sevek needs ${THEORY_AT} for a theory`}</span><span>Stage</span><span>${{ pull: "Investigating", orions: "The Orion diggers", caretaker: "The caretaker", phasers: "The Orion phasers" }[A.stage]}</span></div>`;
   h += `<h3>Who's down there</h3>`;
   if (!A.team) h += `<p class="small muted">${A.stage === "orbit" ? "No one yet." : "No one: choose an away team on the Here tab."}</p>`;
   else {
@@ -504,7 +505,7 @@ function awayHTML() {
 const bar = (v, max, color) => `<span class="meter" style="display:inline-block;width:110px;vertical-align:middle;margin-right:6px"><span style="width:${Math.max(0, Math.min(100, (v / max) * 100))}%;background:${color}"></span></span>`;
 /** The Silence at Corvan II, step by step: done, now, or to come. */
 function arcSteps() {
-  const A = S.arc, st = A.stage, after = (x) => ["travel", "orbit", "pull", "orions", "caretaker", "done"].indexOf(st) > ["travel", "orbit", "pull", "orions", "caretaker", "done"].indexOf(x);
+  const A = S.arc, st = A.stage, after = (x) => ["travel", "orbit", "pull", "orions", "caretaker", "phasers", "done"].indexOf(st) > ["travel", "orbit", "pull", "orions", "caretaker", "phasers", "done"].indexOf(x);
   const raider = Object.values(S.enemies).find((e) => e.arcRaider), n = cluesFound(A);
   const steps = [
     ["Reach Corvan II", st !== "travel"],
@@ -514,7 +515,8 @@ function arcSteps() {
     [`Find clues: ${n} of ${CLOCK} (Sevek needs ${THEORY_AT})`, n >= THEORY_AT || !!A.theory],
     ["Sevek's theory: what's in the ruins", !!A.theory],
     ["Stop the Orion diggers in the ruins", !!A.podsSeen],
-    ["Decide the caretaker's fate", st === "done"],
+    ["Decide the caretaker's fate", st === "done" || !!A.resolved],
+    ["Recover the Orion phasers from the Ketari village", !!A.phasers],
   ];
   // Only what's been done and what's next: later steps stay hidden until the one before is achieved. The raider (optional)
   // shows once the Pelion is at Corvan II.
@@ -535,12 +537,13 @@ function ordersHTML() {
   for (const o of S.orders) {
     const left = o.deadline - S.turn, total = Math.max(1, o.deadline - (o.issued || 1));
     if (o.arc) {
-      const live = ["pull", "orions", "caretaker"].includes(A.stage);
+      const live = ["pull", "orions", "caretaker", "phasers"].includes(A.stage);
       const status = live && A.countdown >= COUNTDOWN - 2 ? ["Running out of time", "bad"] : A.stage === "travel" && left <= 2 ? ["Running out of time", "bad"] : ["In progress", "good"];
       h += `<div class="card gold"><h4>${esc(o.title)} <span class="badge-status ${status[1]}">${status[0]}</span></h4><p class="small">${esc(o.text)}</p>`;
       h += `<div class="small"><b>A personal connection:</b> ${esc(o.personal)}</div>`;
       h += `<div class="kv small" style="margin-top:8px">` + (A.stage === "travel"
         ? `<span>Deadline</span><span>${boxes(Math.max(0, left), total, "gold")} reach Corvan II by turn ${o.deadline} (${left} week${left === 1 ? "" : "s"} left)</span>`
+        : A.stage === "phasers" ? `<span>Countdown</span><span>Stopped: the drain on the ship has ended. One task left: the Orion phasers.</span>`
         : live ? `<span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} ${COUNTDOWN - A.countdown} left: it fills every hour in orbit and with each failure below</span>`
         : `<span>Clock</span><span>No deadline in orbit: the Countdown starts when the ruins are swept.</span>`) + `</div>`;
       h += `<h3>The mission</h3>` + arcSteps();

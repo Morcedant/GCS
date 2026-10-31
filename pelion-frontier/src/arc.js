@@ -26,6 +26,7 @@ export const THEORY_AT = 3;
 /** How each skill is used, for the actions that aren't clues. */
 const HOW = {
   leave: { Stealth: "Slip into the village and take the phasers back unseen.", Psychology: "Learn their routines, so no one is there when the phasers go." },
+  phasers: { Stealth: "Slip into the village by night and take the phasers back unseen.", Psychology: "Learn their routines, so no one is there when the phasers go." },
 };
 export const cluesFound = (A) => Object.values(A.clues || {}).filter(Boolean).length;
 // The away team's own log: the same captain's log, with these entries marked so the Away team tab can show them.
@@ -39,14 +40,14 @@ export const SITES = {
   blind: { name: "The duck blind", sub: "A hidden post above the village", x: 0.70, y: 0.66 },
   village: { name: "The Ketari village", sub: "Bronze age; two kilometers from the ruins", x: 0.86, y: 0.78 },
 };
-export const SITE_OF = { "clue-logs": "outpost", "clue-bunks": "outpost", "clue-energy": "ruins", "clue-village": "blind", stun: "ruins", kill: "ruins", shutdown: "core", reason: "core", leave: "village" };
+export const SITE_OF = { phasers: "village", "clue-logs": "outpost", "clue-bunks": "outpost", "clue-energy": "ruins", "clue-village": "blind", stun: "ruins", kill: "ruins", shutdown: "core", reason: "core", leave: "village" };
 const arcOrder = (S) => S.orders.find((o) => o.arc);
 const raider = (S) => enemiesAt(S, S.systems[S.corvan].at).find((e) => e.goal === "arc");
 
 export function arcActions(S) {
   const A = S.arc, out = [];
   const add = (arc, name, skills, blurb, extra, who, how) => out.push({ id: "arc", arc, name, skills, blurb, extra, who, how: how || (arc.startsWith("clue-") ? CLUES[arc.slice(5)].how : HOW[arc]) });
-  const surface = ["pull", "orions", "caretaker"].includes(A.stage);
+  const surface = ["pull", "orions", "caretaker", "phasers"].includes(A.stage);
   // The surface needs an away team: choosing and beaming them down is free, and done before anything below.
   if (surface && !A.team) { out.push({ id: "beam", name: "Beam down an away team", skills: [], free: true, blurb: "Choose two to four officers. Only the away team can act on the surface; whoever stays aboard runs the ship. The transporter takes no action." }); return out; }
   const team = A.team, aboard = surface ? CREW.map((c) => c.id).filter((id) => !team.includes(id)) : null;
@@ -67,6 +68,9 @@ export function arcActions(S) {
     add("stun", "Stop the Orion diggers (phasers on stun)", ["Phasers", "Unarmed Combat", "Stealth"], "Three Orion pirates in the ruins. A failure hurts whoever leads it, and costs time.", [["Three of them", -3]], team);
     add("kill", "Stop them, phasers on kill", ["Phasers"], "No −3, but Starfleet Command marks a box for the bodies.", [], team);
   }
+  // The Orion phasers in the village: part of the orders, once the crew know about them, at any point on the surface.
+  if (A.knowPhasers && !A.phasers && ["pull", "orions", "caretaker", "phasers"].includes(A.stage))
+    add("phasers", "Recover the Orion phasers from the village", ["Stealth", "Psychology"], `Part of the orders: Starfleet weapons-grade disruptors can't stay in a bronze-age village. Take every one back without being seen. A failure costs time${A.stage === "phasers" ? "" : " (the Countdown fills)"}; fail by 3 or more and the Ketari see you.`, [["A whole village", -2]], team);
   if (A.stage === "caretaker") {
     add("shutdown", "Shut the caretaker down", ["Engineering", "Electronics"], "The scientists wake. The Ketari lose their protector.", [["Technology older than the Federation", -4]], team);
     // The paradox: Sevek argues it against the caretaker itself, in three exchanges of contested rolls.
@@ -76,7 +80,8 @@ export function arcActions(S) {
     if (!team.includes("sevek")) rs.why = "Only Sevek can argue the paradox, and he isn't on the away team. Beam him down.";
     else if (!available(S, "sevek")) rs.why = "Sevek is in sickbay.";
     out.push(rs);
-    add("leave", "Leave it be; take back the Orion phasers", ["Stealth", "Psychology"], "Keep Ketari history their own. The scientists stay asleep. Fail by 3 or more and the Ketari see you.", [["A whole village", -2]], team);
+    if (A.phasers) add("leave", "Leave it be", ["Psychology", "Diplomacy"], "Keep Ketari history their own, and go. The scientists stay asleep: the orders only partly carried out.", [], team, { Psychology: "Persuade the caretaker that the Pelion will leave in peace.", Diplomacy: "Take formal leave of it, and promise it nothing will follow." });
+    else add("leave", "Leave it be; take back the Orion phasers", ["Stealth", "Psychology"], "Keep Ketari history their own. The scientists stay asleep. Fail by 3 or more and the Ketari see you.", [["A whole village", -2]], team);
   }
   return out;
 }
@@ -100,6 +105,7 @@ export function arcStep(S, p) {
       return checkCountdown(S);
     }
     A.clues[k.slice(5)] = true; A.clock = cluesFound(A);
+    if (k === "clue-village") A.knowPhasers = true;
     if (r.margin >= 5) A.strong = (A.strong || 0) + 1;
     astory(S, c.name, c.detail);
     const n = A.clock;
@@ -129,12 +135,26 @@ export function arcStep(S, p) {
     }
     if (k === "kill") markCommand(S, 1, "Orion pirates killed on Corvan II when stun would have done.");
     A.stage = "caretaker";
+    if (!A.knowPhasers) { A.knowPhasers = true; alog(S, "The Orion diggers' gear includes a tally: eleven disruptor pistols traded to the Ketari for their labor. Starfleet weapons can't be left in a bronze-age village: the away team has to get them back.", "discovery"); }
     A.podsSeen = true;
     alog(S, "The deep chamber, seen at last: eight stasis pods in a ring around a column of light, and in each one a scientist from the outpost, asleep, unharmed, breathing once a minute. Rrinn's sister is in the third. Then a voice speaks: the caretaker, a machine left by the city's builders to watch over the Ketari. Sevek's hypothesis was right.", "discovery");
     astory(S, "The caretaker speaks", `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and beamed to the brig."} Past their cutting gear a ramp spirals down, and the away team comes out into a chamber the size of a cathedral: eight stasis pods in a ring around a column of light, and in each one a scientist from the outpost, asleep and unharmed. Rrinn's sister is in the third.\n\nThe column brightens, and a figure steps out of it: an android shell, tall and featureless, its hands open. When it speaks, the voice comes from the walls as much as from the figure, calm and courteous and very old.\n\n${SPEECH}\n\nIt waits, perfectly still. It will not be threatened, and it has eternity to wait. The Countdown stands at ${A.countdown}/${COUNTDOWN}.`);
     return "";
   }
   if (k === "reason") return argue(S, p);
+  if (k === "phasers") {
+    if (!r.success) {
+      if (r.margin <= -3 && !A.seen) { A.seen = true; markCommand(S, 1, "the Ketari saw the away team. The Prime Directive."); }
+      if (A.stage === "phasers") { alog(S, `The village is awake tonight: ${who} can't get near the phasers without being seen.${A.seen ? " Worse: a sentry saw strangers, and the village talks of sky-demons." : " Try again next hour."}`, "bad"); return ""; }
+      A.countdown++;
+      alog(S, `The village is awake tonight: ${who} can't get near the phasers.${A.seen ? " Worse: a sentry saw strangers." : ""} The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
+      return checkCountdown(S);
+    }
+    A.phasers = true;
+    alog(S, `${who} recovers the Orion phasers from the Ketari village: all eleven, from the chieftain's hall, the warriors' cords and the smithy, swapped for bronze copies. Come morning the talismans are still there; they just don't burn trees any more.`, "good");
+    if (A.stage === "phasers") completeArc(S, A.resolved);
+    return "";
+  }
   if (k === "shutdown" || k === "leave") {
     if (!r.success) {
       A.countdown++;
@@ -197,22 +217,36 @@ function checkCountdown(S) {
   astory(S, "Breaking orbit", "The Countdown runs out: the drain on the Pelion's power is too much, and the ship has to break orbit or fall. The away team beams up with nothing. The scientists sleep on in the ruins, and Rrinn never hears the end of that message.");
   return "";
 }
+/** The caretaker's fate is decided. The orders aren't carried out until the Orion phasers are back as well. */
 function finishArc(S, how) {
+  const A = S.arc;
+  if (how !== "leave" && !A.phasers) {
+    A.resolved = how; A.stage = "phasers"; A.knowPhasers = true;
+    astory(S, how === "reason" ? "Equals" : "Silence, for good", resolvedText(how) + "\n\nThe drain on the Pelion stops. One part of the orders is left: eleven Orion disruptors are still in the Ketari village, worn as talismans. They have to come back before the Pelion leaves, without the Ketari seeing who takes them.");
+    alog(S, "The scientists are safe. Still to do: recover the Orion phasers from the Ketari village.", "order");
+    return;
+  }
+  completeArc(S, how, true);
+}
+const resolvedText = (how) => how === "reason"
+  ? "The caretaker is silent for a long time: the longest, it says afterward, that it has been silent since its makers left. \"The argument holds. I am an outsider here, and the eight are outsiders, and what does not belong to this world must leave it. I release them. I will go on watching, and I will not act again. If harm comes to the Ketari, I will tell you, and you will decide; I find I would rather someone decided.\" The pods open one by one. Rrinn's sister is the first one out, and finally finishes that sentence."
+  : "The caretaker goes dark. The eight scientists wake, cold and confused and alive, and the Ketari will never know what watched over them, or that it's gone. Rrinn's sister is among the sleepers, and finally finishes that sentence.";
+/** Everything done: the orders carried out (or, leaving the scientists asleep, partly). */
+function completeArc(S, how, fresh) {
   const A = S.arc; A.stage = "done";
   const o = arcOrder(S);
   if (how === "leave") {
     if (o) { S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; recordOrder(S, o, "partly", "Partly: the Orion phasers recovered and the Ketari left their history, but the scientists still asleep."); }
     S.science += 8;
-    astory(S, "The Ketari's own history", "The away team takes back every Orion phaser from the village and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
+    A.phasers = true;
+    astory(S, "The Ketari's own history", "The away team has every Orion phaser back from the village, and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
     alog(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
   } else {
-    if (o) completeOrder(S, o, true, how === "reason" ? "The caretaker reasoned with: the scientists released, the Ketari still watched over." : "The caretaker shut down: the scientists awake and home.");
+    if (o) completeOrder(S, o, true, (how === "reason" ? "The caretaker reasoned with: the scientists released, the Ketari still watched over" : "The caretaker shut down: the scientists awake and home") + "; the Orion phasers recovered.");
     if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); }
     else S.commendations += 1;
-    astory(S, how === "reason" ? "Equals" : "Silence, for good", how === "reason"
-      ? "The caretaker is silent for a long time: the longest, it says afterward, that it has been silent since its makers left. \"The argument holds. I am an outsider here, and the eight are outsiders, and what does not belong to this world must leave it. I release them. I will go on watching, and I will not act again. If harm comes to the Ketari, I will tell you, and you will decide; I find I would rather someone decided.\" The pods open one by one. The Ketari keep their guardian, and the Federation has a library record no one else has. Rrinn's sister is the first one out, and finally finishes that sentence."
-      : "The caretaker goes dark. The eight scientists wake, cold and confused and alive, and the Ketari will never know what watched over them, or that it's gone. Rrinn's sister is among the sleepers, and finally finishes that sentence.");
-    alog(S, `The Silence at Corvan II: the eight scientists are safe.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
+    astory(S, fresh ? (how === "reason" ? "Equals" : "Silence, for good") : "Orders carried out", fresh ? resolvedText(how) + (how === "reason" ? " The Ketari keep their guardian, and the Federation has a library record no one else has." : "") : `The phasers are back aboard, and the away team beams up. ${how === "reason" ? "The caretaker goes on watching, the Ketari keep their guardian, and the Federation has a library record no one else has." : "The ruins are only ruins now."} The eight scientists are in sickbay, and Rrinn hasn't left her sister's side.`);
+    alog(S, `The Silence at Corvan II: the eight scientists are safe and the Orion phasers recovered.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
   }
   if (!A.seen) markCommand(S, -1, "the Ketari never learned what the crew were.");
 }
@@ -238,7 +272,7 @@ function startPull(S) {
 /** Beam an away team down (2 to 4 officers fit for duty), or beam them all back up (ids empty). Takes no action. */
 export function beamDown(S, ids) {
   const A = S.arc;
-  if (!["pull", "orions", "caretaker"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at) return { error: "There's nowhere to beam down to." };
+  if (!["pull", "orions", "caretaker", "phasers"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at) return { error: "There's nowhere to beam down to." };
   if (!ids || !ids.length) { if (A.team) alog(S, `The away team (${A.team.map((id) => officer(id).short).join(", ")}) beams back aboard.`, "move"); A.team = null; return { ok: true }; }
   ids = [...new Set(ids)].filter((id) => available(S, id));
   if (ids.length < 2 || ids.length > 4) return { error: "An away team is two to four officers fit for duty." };
@@ -282,6 +316,7 @@ export function arcEventChoose(S, id, roll) {
   if (!e) { S.event = null; arcTick(S); return { text: "The raider is gone." }; }
   if (id === "scan") {
     const r = roll("Sensors", "scan"); S.arc.scanned = true;
+    if (r.success) S.arc.knowPhasers = true;
     if (r.success) log(S, "Scan of the Orion raider at Corvan II: its hold is full of digging gear, and its manifest lists Starfleet-pattern phasers \"traded\" planetside. They're arming the natives.", "discovery");
     return { roll: r, text: r.success ? "Their hold is full of digging gear, and their manifest lists Starfleet-pattern phasers \"traded\" planetside. They're arming the natives." : "Their hull scatters the scan." };
   }

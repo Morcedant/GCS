@@ -177,7 +177,15 @@ test("what's in the ruins is earned: Sevek's theory needs three clues, and only 
   const rs = actionsFor(S).find((a) => a.arc === "reason");
   assert.deepEqual(rs.who, ["sevek"]); assert.ok(rs.paradox);
   for (let i = 0; i < 30 && S.arc.stage === "caretaker"; i++) { S.tried = {}; S.crew.sevek.acted = false; S.event = null; S.eventQueue = []; S.arc.countdown = 0; attempt(S, "pelion", "arc", { arc: "reason" }); if (S.pending) resolve(S, false); }
+  // The scientists are free, but the orders aren't done until the Orion phasers are back.
+  assert.equal(S.arc.stage, "phasers");
+  assert.ok(S.orders.some((o) => o.arc));
+  assert.ok(actionsFor(S).find((a) => a.arc === "phasers"));
+  for (let i = 0; i < 30 && S.arc.stage === "phasers"; i++) { S.tried = {}; for (const id in S.crew) S.crew[id].acted = false; S.event = null; S.eventQueue = []; attempt(S, "pelion", "arc", { arc: "phasers" }); if (S.pending) resolve(S, false); }
   assert.equal(S.arc.stage, "done");
+  assert.ok(S.arc.phasers);
+  assert.ok(!S.orders.some((o) => o.arc));
+  assert.ok(S.history.some((h) => /phasers recovered/.test(h.how || h.text || JSON.stringify(h))));
   assert.ok(S.log.some((l) => /Exchange 2, "Your makers": Sevek rolled .* the caretaker rolled/.test(l.text)));
 });
 test("with the away team down, a turn is an hour: the week waits, the Countdown runs, the ship stays", async () => {

@@ -164,7 +164,7 @@ export function reachable(S, unit = "pelion") {
   return out;
 }
 /** While an away team is on Corvan II's surface, turns are hours, and the Pelion stays in orbit. */
-export const hourly = (S) => !!(S.arc.team && ["pull", "orions", "caretaker"].includes(S.arc.stage) && S.pelion.at === S.systems[S.corvan].at);
+export const hourly = (S) => !!(S.arc.team && ["pull", "orions", "caretaker", "phasers"].includes(S.arc.stage) && S.pelion.at === S.systems[S.corvan].at);
 export function moveTo(S, unit, hex) {
   if (S.over || S.battle || S.event) return { error: "Finish what's in front of you first." };
   if (unit === "pelion" && hourly(S)) return { error: "The away team is on the surface. Beam them up before leaving orbit." };
@@ -267,7 +267,7 @@ export function actionsFor(S, unit = "pelion") {
   if (s && s.id === S.corvan) out.push(...arcActionsHook(S));
   // With an away team on Corvan II's surface, the away team does the mission's work and the bridge crew (whoever stayed
   // aboard) runs the ship: its operations are theirs alone.
-  const surface = s && s.id === S.corvan && S.arc.team && ["pull", "orions", "caretaker"].includes(S.arc.stage);
+  const surface = s && s.id === S.corvan && S.arc.team && ["pull", "orions", "caretaker", "phasers"].includes(S.arc.stage);
   if (surface) { const aboard = CREW.map((c) => c.id).filter((id) => !S.arc.team.includes(id)); for (const x of out) if (x.id !== "arc" && x.id !== "beam" && !x.who) { x.who = aboard; x.bridge = true; } }
   return out.map((a) => ({ ...a, why: a.why || whyNot(S, a) }));
 }
