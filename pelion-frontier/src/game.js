@@ -256,6 +256,10 @@ export function actionsFor(S, unit = "pelion") {
   if (base) out.push({ id: "engage", enemy: base.id, name: "Attack the Orion base", skills: [], blurb: "Its guns and shields against yours. Destroy it and the raids stop." });
   for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, extra: [["In the field", -2]] });
   if (s && s.id === S.corvan) out.push(...arcActionsHook(S));
+  // With an away team on Corvan II's surface, the turn is theirs: only what the mission calls for (their actions, and the
+  // one done from the ship to buy time), plus answering a ship in orbit.
+  const surface = s && s.id === S.corvan && S.arc.team && ["pull", "orions", "caretaker"].includes(S.arc.stage);
+  if (surface) out.splice(0, out.length, ...out.filter((x) => x.id === "arc" || x.id === "beam" || x.id === "engage" || x.id === "hail"));
   return out.map((a) => ({ ...a, why: P.acted && !a.free ? "The Pelion has already acted this turn." : null }));
 }
 const signedAccord = (a) => (a > 0 ? "+" : a < 0 ? "−" : "") + Math.abs(a);

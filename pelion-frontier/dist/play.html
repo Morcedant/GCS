@@ -679,6 +679,10 @@ function actionsFor(S, unit = "pelion") {
   if (base) out.push({ id: "engage", enemy: base.id, name: "Attack the Orion base", skills: [], blurb: "Its guns and shields against yours. Destroy it and the raids stop." });
   for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, extra: [["In the field", -2]] });
   if (s && s.id === S.corvan) out.push(...arcActionsHook(S));
+  // With an away team on Corvan II's surface, the turn is theirs: only what the mission calls for (their actions, and the
+  // one done from the ship to buy time), plus answering a ship in orbit.
+  const surface = s && s.id === S.corvan && S.arc.team && ["pull", "orions", "caretaker"].includes(S.arc.stage);
+  if (surface) out.splice(0, out.length, ...out.filter((x) => x.id === "arc" || x.id === "beam" || x.id === "engage" || x.id === "hail"));
   return out.map((a) => ({ ...a, why: P.acted && !a.free ? "The Pelion has already acted this turn." : null }));
 }
 const signedAccord = (a) => (a > 0 ? "+" : a < 0 ? "−" : "") + Math.abs(a);
@@ -1949,7 +1953,7 @@ function beamCard(a) {
 function teamLine() {
   const A = S.arc;
   if (!A.team || !["pull", "orions", "caretaker"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at || unit !== "pelion") return "";
-  return `<div class="card small"><b>Away team on Corvan II:<\/b> ${A.team.map((id) => esc(officer(id).short) + (available(S, id) ? "" : " (in sickbay)")).join(", ")}. Only they can act on the surface.
+  return `<div class="card small"><b>Away team on Corvan II:<\/b> ${A.team.map((id) => esc(officer(id).short) + (available(S, id) ? "" : " (in sickbay)")).join(", ")}. Only they can act on the surface. The ship's other duties (sweeps, observation, repairs) wait until they beam back up.
     <div class="roll-row"><button class="btn small" data-beamup="1">Beam them up (choose again)<\/button><\/div><\/div>`;
 }
 /** "Computers 18 · Something here is wrong −2 · Sevek assists +1 = 17 (98%)": how a target is made. */

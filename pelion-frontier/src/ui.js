@@ -368,7 +368,7 @@ function beamCard(a) {
 function teamLine() {
   const A = S.arc;
   if (!A.team || !["pull", "orions", "caretaker"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at || unit !== "pelion") return "";
-  return `<div class="card small"><b>Away team on Corvan II:</b> ${A.team.map((id) => esc(officer(id).short) + (available(S, id) ? "" : " (in sickbay)")).join(", ")}. Only they can act on the surface.
+  return `<div class="card small"><b>Away team on Corvan II:</b> ${A.team.map((id) => esc(officer(id).short) + (available(S, id) ? "" : " (in sickbay)")).join(", ")}. Only they can act on the surface. The ship's other duties (sweeps, observation, repairs) wait until they beam back up.
     <div class="roll-row"><button class="btn small" data-beamup="1">Beam them up (choose again)</button></div></div>`;
 }
 /** "Computers 18 · Something here is wrong −2 · Sevek assists +1 = 17 (98%)": how a target is made. */

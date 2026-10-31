@@ -114,3 +114,16 @@ test("the target an action card shows is the target the roll uses", async () => 
   if (S.pending) assert.equal(S.pending.target.total, shown.total);
   else assert.ok(p.text.includes(`against ${shown.total}`));
 });
+test("with the away team down, only the mission's actions are offered", () => {
+  const S = newGame({ seed: "aw" });
+  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
+  const e = Object.values(S.enemies).find((x) => x.goal === "arc"); delete S.enemies[e.id]; S.event = null; dismissEvent(S);
+  attempt(S, "pelion", "arc", { arc: "scan" }); if (S.pending) resolve(S, false); S.event = null; S.pelion.acted = false;
+  assert.ok(actionsFor(S).some((a) => a.id === "sweep"));        // before beaming down, the ship's own actions are there
+  beamDown(S, ["sevek", "vessik", "reyes", "rrinn"]);
+  const ids = actionsFor(S).map((a) => a.id);
+  assert.ok(ids.every((id) => ["arc", "engage", "hail"].includes(id)), ids.join(","));
+  assert.ok(actionsFor(S).some((a) => a.arc === "clue-logs"));
+  beamDown(S, []);
+  assert.ok(actionsFor(S).some((a) => a.id === "sweep"));        // beamed back up: the ship's actions return
+});
