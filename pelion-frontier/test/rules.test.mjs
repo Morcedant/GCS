@@ -268,7 +268,8 @@ test("Starfleet flight paths: three values in 400 degrees, relative to the ship'
 });
 test("orders: a backlog when two are under way, a Mission Success report when one is done", () => {
   const S = newGame({ seed: "bk" });
-  S.orders = S.orders.filter((o) => !o.arc); S.arc.stage = "done";   // past the first mission
+  assert.equal(S.backlog.length, 3);                                 // orders already waiting behind Corvan II
+  S.orders = S.orders.filter((o) => !o.arc); S.arc.stage = "done"; S.backlog = [];   // past the first mission
   S.turn = 4; const a = newOrder(S), b = newOrder(S), c = newOrder(S);
   assert.equal(S.orders.length, 2); assert.equal(S.backlog.length, 1); assert.equal(S.backlog[0], c);
   a.have = a.segs; completeOrder(S, a, true);

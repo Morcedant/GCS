@@ -5,6 +5,7 @@ import { newGame, endTurn, faction, player, coloniesOf, fleetsOf, fleetsAt, ship
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY } from "./game.js";
 import { aiTurn } from "./ai.js";
+import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, ACTIVE_MAX } from "./orders.js";
 
 const SAVE_KEY = "fracture-dominion.save.v1";
 const $ = (id) => document.getElementById(id);
@@ -39,6 +40,7 @@ function startGame(state) {
   centerOn(cap.at); view.zoom = 1;
   select({ kind: "system", id: cap.id });
   tab = "objectives";   // the game opens on the race to win; the capital is selected, a click away
+  ensureDirectives(S);
   $("app").hidden = false; closeModal();
   renderAll(); renderSteps();
   if (S.turn === 1) toast(`You lead ${player(S).name}. Explore, settle, and find out who else is out here.`);
@@ -241,6 +243,7 @@ function renderTabs() {
 function renderPanel() {
   const P = $("panel");
   if (tab === "objectives") P.innerHTML = objectivesHTML();
+  else if (tab === "mission") P.innerHTML = missionHTML();
   else if (tab === "selected") P.innerHTML = sel ? (sel.kind === "fleet" ? fleetHTML() : systemHTML()) : `<p class="muted">Select a world or a fleet on the map. Drag to pan, scroll or use the buttons to zoom. With a fleet selected, right-click a hex (or press <b>Move</b>) to send it there.</p>`;
   else if (tab === "empire") P.innerHTML = empireHTML();
   else if (tab === "research") P.innerHTML = researchHTML();
@@ -362,6 +365,43 @@ function objectivesHTML() {
   h += `<p class="small muted"><b>Defeat:</b> your last world falls; a rival finishes the Corridor Engine or stands alone; or a rival leads on score at turn ${RULES.maxTurns}.</p>`;
   return h;
 }
+/** The Mission tab: the directives under way (progress, deadline, reward), the backlog, and past directives. */
+function missionHTML() {
+  const D = ensureDirectives(S), A = authorityOf(S);
+  let h = `<h2>Mission</h2><p class="small muted">Directives from ${esc(A.name)}: what your people ask of you, beyond winning. ${ACTIVE_MAX} at a time; each pays credits when it's done.</p>`;
+  h += `<h3>Under way</h3>`;
+  if (!D.active.length) h += `<p class="small muted">None under way.${D.backlog.length ? " Take one on from the backlog below." : ` ${esc(A.name[0].toUpperCase() + A.name.slice(1))} will send more.`}</p>`;
+  for (const d of D.active) {
+    const p = progress(S, d), left = d.deadline - S.turn, total = Math.max(1, d.deadline - d.issued);
+    const badge = left <= 1 ? ["Due now", "bad"] : left <= 3 ? ["Running out of time", "bad"] : p ? ["Under way", "good"] : ["Not started", ""];
+    h += `<div class="card obj"><h3 class="obj-h">${esc(d.title)} <span class="badge-status ${badge[1]}">${badge[0]}</span></h3>
+      <ol class="steps-list">${stepLi(p >= d.need ? "done" : "now", `${esc(d.title)}: ${p} of ${d.need}`)}${stepLi(p >= d.need ? "now" : "", `Report to ${esc(d.from || A.name)}: ${d.reward} credits`)}</ol>
+      <div class="kv small"><span>Progress</span><span>${ibar(p, d.need, "var(--accent)")} ${p} of ${d.need}</span>
+      <span>Deadline</span><span>${ibar(Math.max(0, left), total, "var(--gold)")} turn ${d.deadline} (${left} turn${left === 1 ? "" : "s"} left)</span></div>
+      <p class="small" style="margin-top:6px"><b>How:</b> ${esc(howText(d))}</p>
+      <p class="small"><b class="good">Success:</b> +${d.reward} credits. <b class="bad">Failure:</b> not done by turn ${d.deadline}; ${esc(d.from || A.name)} takes note.</p></div>`;
+  }
+  h += `<h3>Backlog</h3>`;
+  if (!D.backlog.length) h += `<p class="small muted">Nothing waiting. With ${ACTIVE_MAX} directives under way, new ones wait here.</p>`;
+  else {
+    h += `<p class="small muted">Waiting their turn: the oldest moves up when a directive under way is finished, and its clock starts then. Or take one on now.</p>`;
+    for (const d of D.backlog) h += `<div class="card"><h4>${esc(d.title)}</h4><div class="small">Received turn ${d.received} · ${esc(howText(d))}</div><div class="btn-row"><button class="btn small primary" data-accept="${d.id}">Take it on now</button></div></div>`;
+  }
+  h += `<h3>Past directives</h3>` + (D.history.length ? `<ul class="log">${D.history.slice().reverse().map((x) => `<li class="${x.result === "failed" ? "bad" : "good"}"><b>${x.result === "failed" ? "✗ Not done" : "✓ Done"}</b> · turn ${x.turn} · ${esc(x.title)}</li>`).join("")}</ul>` : `<p class="small muted">None yet.</p>`);
+  return h;
+}
+/** Mission Success reports, one after another, after whatever report is showing. */
+function showNextMission() {
+  const D = S && S.directives; if (!D || !D.reports.length) return false;
+  const r = D.reports[0];
+  modal(`<h2>Mission success</h2><h3 style="margin-top:0">${esc(r.title)}</h3><p class="small muted">Turn ${r.turn} · ${r.turns} turn${r.turns === 1 ? "" : "s"} from directive to done · for ${esc(r.from)}</p>
+    <h3>What was done</h3><ol class="steps-list">${stepLi("done", esc(r.title))}${stepLi("done", `Reported to ${esc(r.from)}`)}</ol>
+    <h3>Reward</h3><ul class="small">${r.rewards.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+    ${r.next ? `<p class="small"><b>Up next, from the backlog:</b> ${esc(r.next.join("; "))} (the Mission tab).</p>` : ""}
+    <div class="btn-row"><button class="btn primary" id="mission-ok">Continue</button></div>`);
+  $("mission-ok").onclick = () => { D.reports.shift(); closeModal(); save(); renderAll(); showNextMission(); };
+  return true;
+}
 const ordinal = (n) => n + (n % 10 === 1 && n % 100 !== 11 ? "st" : n % 10 === 2 && n % 100 !== 12 ? "nd" : n % 10 === 3 && n % 100 !== 13 ? "rd" : "th");
 function empireHTML() {
   const me = player(S), t = totals(S, me.id);
@@ -428,6 +468,7 @@ function bindChrome() {
     const b = e.target.closest("button, tr[data-selsys]"); if (!b || !S) return;
     const d = b.dataset, me = player(S);
     if (d.logf) { logFilter = d.logf; renderPanel(); return; }
+    if (d.accept) { const r = acceptDirective(S, d.accept); if (r.error) toast(r.error, true); else toast("Directive taken on: its clock starts now."); checkDirectives(S); save(); renderAll(); showNextMission(); return; }
     if (d.selfleet) { select({ kind: "fleet", id: d.selfleet }); const f = S.fleets[d.selfleet]; if (f) { centerOn(f.at); draw(); } return; }
     if (d.selsys) { select({ kind: "system", id: d.selsys }); centerOn(S.systems[d.selsys].at); draw(); return; }
     if (d.build) { const [k, id] = d.build.split(":"); const r = enqueue(S, sel.id, k, id); if (r.error) toast(r.error, true); }
@@ -462,7 +503,7 @@ function bindChrome() {
       const [i, ans] = d.offer.split(":"); const o = S.offers[+i];
       if (o) { const since = mark(), F = faction(S, o.from); if (ans === "yes") propose(S, o.from, o.to, o.what); S.offers.splice(+i, 1); const own = F.name.endsWith("s") ? `${F.name}'` : `${F.name}'s`; reportSince(`${own} offer`, since); report = report || { title: `${own} offer`, lines: [] }; if (ans !== "yes") report.lines.push(`You decline ${own} offer of ${o.what === "peace" ? "peace: the war goes on" : "a trade treaty"}.`); }
     } else return;
-    save(); renderAll(); if (report) showReport();
+    checkDirectives(S); save(); renderAll(); if (report) showReport(); else showNextMission();
   });
   document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; renderTabs(); renderPanel(); }));
   $("steps").addEventListener("click", (e) => {
@@ -503,6 +544,7 @@ function doEndTurn() {
   setTimeout(() => {
     S.offers = S.offers.filter((o) => S.turn - o.turn < 3);
     endTurn(S, aiTurn);
+    if (!S.winner) directivesTurn(S);
     $("end-turn").textContent = "End turn";
     save();
     // News: what happened to you this turn.
@@ -516,7 +558,7 @@ function doEndTurn() {
       const books = S.log.slice(before.log).find((l) => l.fid === me.id && l.kind === "turn");
       report = { title: `Turn ${S.turn - 1}: what happened`, lines: [...news.map((l) => l.text), ...(charted ? [`${charted} new system${charted === 1 ? "" : "s"} charted (see the Log).`] : []), ...(books ? [books.text] : [])] };
       showReport();
-    }
+    } else showNextMission();
   }, 30);
 }
 
@@ -531,7 +573,7 @@ function reportSince(title, since) {
 function showReport() {
   const r = report;
   modal(`<h2>${esc(r.title)}</h2>${r.lines.map((t) => `<p>${esc(t)}</p>`).join("") || `<p class="muted">Nothing more came of it.</p>`}<div class="btn-row"><button class="btn primary" id="report-ok">Continue</button></div>`);
-  $("report-ok").onclick = () => { report = null; closeModal(); renderAll(); };
+  $("report-ok").onclick = () => { report = null; closeModal(); renderAll(); showNextMission(); };
 }
 
 // ---------- dialogs ----------

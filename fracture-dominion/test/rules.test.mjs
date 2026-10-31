@@ -97,3 +97,23 @@ test("discoveries go in the log and survive trimming", async () => {
   for (let i = 0; i < 1000; i++) log(s, null, "noise " + i);
   assert.ok(s.log.some((l) => l.text === first));
 });
+test("directives: from the player's own faction, two under way, a backlog, and a report when one is done", async () => {
+  const { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, AUTHORITY } = await import("../src/orders.js");
+  for (const fid of ["concord", "tessan", "kel", "hegemony", "vael"]) {
+    const s = newGame({ seed: 5, player: fid, rivals: 2 });
+    const D = ensureDirectives(s);
+    assert.equal(D.active.length, 2); assert.equal(D.backlog.length, 1);
+    for (const d of D.active.concat(D.backlog)) { assert.ok(AUTHORITY[fid].kinds.includes(d.kind) || ["outpost", "explore", "ships"].includes(d.kind), fid + " " + d.kind); assert.equal(d.from, AUTHORITY[fid].name); }
+  }
+  const s = newGame({ seed: 5, player: "tessan", rivals: 2 });
+  const D = ensureDirectives(s), d = D.active[0], waiting = D.backlog[0];
+  assert.equal(progress(s, d), 0);
+  // Make it done, whatever it is: force its measure past the need.
+  d.base -= 999; checkDirectives(s);
+  assert.equal(D.reports.length, 1); assert.equal(D.reports[0].title, d.title);
+  assert.equal(D.backlog.length, 0); assert.ok(D.active.includes(waiting));   // the backlog moved up
+  assert.deepEqual(D.reports[0].next, [waiting.title]);
+  for (let i = 0; i < 12; i++) { s.turn++; directivesTurn(s); }
+  assert.ok(D.history.length >= 1);
+  if (D.backlog.length) assert.ok(acceptDirective(s, D.backlog[0].id).ok);
+});

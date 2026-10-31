@@ -268,6 +268,7 @@ export function invade(s, fleetId) {
 function capture(s, sys, by) {
   const was = sys.colony.owner, wasCapital = sys.colony.capital;
   log(s, by, `${faction(s, by).name} took ${sys.name} from ${faction(s, was).name}.`, "war");
+  faction(s, by).stats.taken = (faction(s, by).stats.taken || 0) + 1;
   sys.colony.owner = by; sys.colony.capital = false; sys.colony.queue = []; sys.colony.stock = 0;
   if (sys.colony.kind === "colony") sys.colony.pop = Math.max(1, sys.colony.pop - 1);
   delete sys.colony.buildings.engine;

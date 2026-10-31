@@ -46,6 +46,8 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
   const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");
   spawnEnemy(S, "orionBase", ob.at, { goal: "base", hostile: true, found: false });
   log(S, "Orders from Starfleet Command, urgent: the research outpost on Corvan II has gone silent. Proceed at maximum emergency warp and investigate.", "order");
+  // Starfleet's other orders for the Pelion are already waiting: in the backlog until Corvan II is done.
+  for (let i = 0; i < 3; i++) newOrder(S);
   updateVisibility(S);
   return S;
 }
