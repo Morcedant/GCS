@@ -293,7 +293,15 @@ def start_page():
   <p class="ld-lede">Three steps: pick a world, make a character, and play. You don't need to read the rules first: the character creator explains each choice as you make it, and the rules are there when you want them.</p>
 </div>
 
-<!-- Block 2: the three steps -->
+<!-- Block 2: a first adventure for each setting -->
+<div class="ld" id="first-adventures">
+  <div class="ld-eyebrow">Ready to run</div>
+  <h2>A first adventure for every setting</h2>
+  <p class="ld-lede">Each setting's GM's Guide opens with an adventure to start on: everything the GM needs is written out, and every ready-made character has a reason to be there. Pick one and play tonight. (The links open the adventure in the GM's Guide, so players may want to skip them.)</p>
+  <ul class="ld-pillars">{adventures}</ul>
+</div>
+
+<!-- Block 3: the three steps -->
 <div class="ld">
   <ol class="ld-steps">
     <li><b>Choose a setting.</b> Four games share one set of core rules: {genres}. Each page shows who you can play and the setting's guides.
@@ -306,7 +314,7 @@ def start_page():
   {table_notice()}
 </div>
 
-<!-- Block 3: the game in two minutes -->
+<!-- Block 4: the game in two minutes -->
 <div class="ld" id="quick-start">
   <div class="ld-eyebrow">The game in two minutes</div>
   <h2>How it works</h2>
@@ -322,15 +330,7 @@ def start_page():
   <div class="ld-callout" style="margin-top:1.4rem"><b>An example</b><p>Your Firearms is 13. Taking a shot across a street, you roll 4 + 3 + 5 = 12: a hit, by 1. The outlaw tries to dodge: his Dodge is 10 and he rolls 11, so the bullet finds him and your pistol marks 2 boxes. Had you rolled 14 and missed, you could have spent a Legend point to roll again.</p></div>
 </div>
 
-<!-- Block 4: a first adventure for each setting -->
-<div class="ld" id="first-adventures">
-  <div class="ld-eyebrow">Ready to run</div>
-  <h2>A first adventure for every setting</h2>
-  <p class="ld-lede">Each setting's GM's Guide opens with an adventure to start on: everything the GM needs is written out, and every ready-made character has a reason to be there. Pick one and play tonight. (The links open the adventure in the GM's Guide, so players may want to skip them.)</p>
-  <ul class="ld-pillars">{adventures}</ul>
-</div>
-
-<!-- Block 4: what each person needs -->
+<!-- Block 5: what each person needs -->
 <div class="ld">
   <div class="ld-eyebrow">Who needs what</div>
   <ul class="ld-pillars">
