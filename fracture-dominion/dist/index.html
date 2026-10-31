@@ -27,7 +27,7 @@ button { font: inherit; color: inherit; }
 #map { width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
 .map-tools { position: absolute; left: max(12px, env(safe-area-inset-left, 0px)); bottom: 12px; display: flex; gap: 6px; }
 .map-tools button { width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--line); background: rgba(14, 20, 36, .9); cursor: pointer; font-size: 18px; }
-.side { background: var(--panel); border-left: 1px solid var(--line); display: grid; grid-template-rows: auto 1fr auto; min-height: 0; }
+.side { background: var(--panel); border-left: 1px solid var(--line); display: grid; grid-template-rows: auto auto 1fr auto; min-height: 0; }
 .tabs { display: flex; flex-wrap: wrap; gap: 2px; padding: 8px 10px 0; border-bottom: 1px solid var(--line); }
 .tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 6px 8px; cursor: pointer; color: var(--muted); font: 600 13px var(--display); letter-spacing: .03em; }
 .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
@@ -88,6 +88,24 @@ select, input[type=text], textarea { background: var(--panel-2); color: var(--in
 textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospace; }
 .seedbox { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); } .seedbox h3 { margin-top: 0; }
 .seed { font: 700 22px var(--display); letter-spacing: .06em; color: var(--gold); user-select: all; font-variant-numeric: tabular-nums; }
+/* First steps and the starter guide */
+#steps { margin: 10px 12px 0; padding: 10px 12px; border: 1px solid rgba(123, 196, 127, .45); border-radius: 10px; background: rgba(123, 196, 127, .07); }
+.steps-head { display: flex; align-items: center; gap: 8px; } .steps-head b { font-family: var(--display); letter-spacing: .04em; flex: 1; }
+.steps { list-style: none; padding: 0; margin: 6px 0 0; display: grid; gap: 4px; font-size: 13px; }
+.steps li { display: flex; align-items: center; gap: 8px; color: var(--muted); } .steps li > span { width: 16px; color: var(--good); font-weight: 700; }
+.steps li.now { color: var(--ink); font-weight: 600; } .steps li.done { text-decoration: line-through; text-decoration-color: rgba(142,154,180,.5); }
+.steps .btn { margin-left: auto; text-decoration: none; }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(240, 200, 90, 0); } 50% { box-shadow: 0 0 0 6px rgba(240, 200, 90, .55); } }
+.pulse { animation: pulse .8s ease-in-out 3; }
+.starter .sg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; margin: 16px 0; }
+.sg-card { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: start; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-width: 0; }
+.sg-card h3 { margin: 0 0 4px; color: var(--ink); text-transform: none; letter-spacing: .02em; font-size: 15px; } .sg-card p { margin: 0; font-size: 13px; color: #c6d0e6; }
+.sg-icon svg { width: 52px; height: 52px; display: block; }
+.sg-keys { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 1px 6px; color: var(--ink); margin-right: 4px; }
+.btn.big { font: 700 16px var(--display); letter-spacing: .04em; padding: 12px 20px; }
+.check-line { display: flex; align-items: center; gap: 8px; margin-top: 10px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .pulse { animation: none; outline: 2px solid var(--gold); } }
 .help { padding-left: 18px; display: grid; gap: 6px; color: #c6d0e6; }
 .toast { position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); max-width: min(560px, calc(100vw - 32px)); background: #1b2440; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; opacity: 0; pointer-events: none; transition: .25s; z-index: 30; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); } .toast.bad { border-color: var(--bad); }
@@ -112,6 +130,7 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
   </div>
   <aside class="side">
     <nav class="tabs" role="tablist"><button data-tab="selected" role="tab">Selected</button><button data-tab="empire" role="tab">Empire</button><button data-tab="research" role="tab">Research</button><button data-tab="diplomacy" role="tab">Diplomacy</button><button data-tab="log" role="tab">Log</button></nav>
+    <div id="steps" hidden></div>
     <div id="panel"></div>
     <div class="side-foot"><button class="btn" id="next">Next</button><button class="btn primary" id="end-turn">End turn</button></div>
   </aside>
@@ -1020,7 +1039,7 @@ function boot() {
   bindChrome();
   debugHook();
   const saved = store.get();
-  showNewGame(!!saved);
+  if (saved) showNewGame(true); else showStarter(false);
 }
 function startGame(state) {
   S = state; sel = null; moveMode = false; tab = "selected";
@@ -1028,7 +1047,7 @@ function startGame(state) {
   centerOn(cap.at); view.zoom = 1;
   select({ kind: "system", id: cap.id });
   $("app").hidden = false; closeModal();
-  renderAll();
+  renderAll(); renderSteps();
   if (S.turn === 1) toast(`You lead ${player(S).name}. Explore, settle, and find out who else is out here.`);
 }
 function save() { if (S) store.set(JSON.stringify(S)); }
@@ -1087,8 +1106,9 @@ function orderMove(hex) {
   if (!f || f.owner !== player(S).id) return;
   const r = setDestination(S, f.id, hex);
   moveMode = false;
+  if (!r.error && f.ships.some((x) => x.type === "scout") && S.tutorial) S.tutorial.scouted = true;
   if (r.error) toast(r.error, true); else if (hex !== f.at) toast(`On course: ${r.turns} turn${r.turns === 1 ? "" : "s"}.`);
-  save(); renderPanel(); draw();
+  save(); renderPanel(); renderSteps(); draw();
 }
 
 function territory() {
@@ -1207,7 +1227,7 @@ function draw() {
 }
 
 // ---------- the bar and the panels ----------
-function renderAll() { renderBar(); renderTabs(); renderPanel(); draw(); }
+function renderAll() { renderBar(); renderTabs(); renderPanel(); renderSteps(); draw(); }
 function renderBar() {
   const me = player(S), t = totals(S, me.id), R = me.research, tech = R.current && TECHS.find((x) => x.id === R.current);
   $("bar-faction").innerHTML = `<span class="dot" style="background:${me.color}"><\/span>${esc(me.name)}`;
@@ -1365,6 +1385,11 @@ function bindChrome() {
     save(); renderAll();
   });
   document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; renderTabs(); renderPanel(); }));
+  $("steps").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b || !S) return;
+    if (b.dataset.show) showMe(b.dataset.show);
+    else if (b.hasAttribute("data-steps-off")) { S.tutorial.on = false; save(); renderSteps(); toast("Checklist hidden. The Menu brings it back."); }
+  });
   $("end-turn").addEventListener("click", doEndTurn);
   $("zoom-in").addEventListener("click", () => zoomBy(1.25));
   $("zoom-out").addEventListener("click", () => zoomBy(0.8));
@@ -1423,7 +1448,8 @@ function showNewGame(canContinue, preset) {
       <label>Difficulty <select id="ng-diff"><option value="easy">Easy<\/option><option value="normal" selected>Normal<\/option><option value="hard">Hard<\/option><\/select><\/label>
       <label>Seed <input type="text" id="ng-seed" placeholder="random" size="10"><\/label>
     <\/div>
-    <div class="btn-row"><button class="btn primary" id="ng-start">Begin<\/button><button class="btn" id="ng-help">How to play<\/button><button class="btn" id="ng-load">Load a saved game<\/button><\/div>`);
+    <label class="small check-line"><input type="checkbox" id="ng-steps" checked> Show the First steps checklist<\/label>
+    <div class="btn-row"><button class="btn primary" id="ng-start">Begin<\/button><button class="btn" id="ng-guide">New here? The starter guide<\/button><button class="btn" id="ng-load">Load a saved game<\/button><\/div>`);
   if (preset) {
     $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty;
     const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
@@ -1431,13 +1457,95 @@ function showNewGame(canContinue, preset) {
   if ($("ng-continue")) $("ng-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
   $("ng-start").onclick = () => {
     const seedText = $("ng-seed").value.trim();
-    startGame(newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
-      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value }));
-    save();
+    const st = newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
+      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value });
+    if ($("ng-steps").checked) st.tutorial = { on: true };
+    startGame(st); save();
   };
-  $("ng-help").onclick = () => showHelp(() => showNewGame(canContinue));
+  $("ng-guide").onclick = () => showStarter(canContinue);
   $("ng-load").onclick = () => showLoad(() => showNewGame(canContinue));
 }
+// The starter guide: what the game is and how a turn goes, before the first game.
+const ICONS = {
+  goal: `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="22" fill="none" stroke="#5ec8e0" stroke-width="3"/><circle cx="32" cy="32" r="12" fill="none" stroke="#5ec8e0" stroke-width="3"/><circle cx="32" cy="32" r="4" fill="#f0c85a"/><\/svg>`,
+  turn: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M50 32a18 18 0 1 1-6-13.4" fill="none" stroke="#5ec8e0" stroke-width="4" stroke-linecap="round"/><path d="M44 8v12h12" fill="none" stroke="#f0c85a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><\/svg>`,
+  world: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 54 19v26L32 58 10 45V19z" fill="rgba(30,40,70,.6)" stroke="#5e7ab8" stroke-width="2"/><circle cx="32" cy="32" r="11" fill="#5fa86a"/><circle cx="32" cy="32" r="16" fill="none" stroke="#3d7fbf" stroke-width="3"/><\/svg>`,
+  ships: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 50 54 14" stroke="rgba(110,200,230,.7)" stroke-width="3" stroke-dasharray="6 5"/><circle cx="10" cy="50" r="6" fill="#4a8fc4"/><circle cx="54" cy="14" r="6" fill="#d0a25a"/><path d="M40 34l-14-7 4 7-4 7z" fill="#3d7fbf" stroke="#000" stroke-width="1"/><\/svg>`,
+  battle: `<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="20" width="16" height="16" rx="3" fill="#dfe7f7"/><rect x="26" y="28" width="16" height="16" rx="3" fill="#dfe7f7"/><rect x="44" y="18" width="16" height="16" rx="3" fill="#dfe7f7"/><circle cx="16" cy="28" r="2" fill="#070a12"/><circle cx="31" cy="33" r="2" fill="#070a12"/><circle cx="37" cy="39" r="2" fill="#070a12"/><circle cx="48" cy="22" r="2" fill="#070a12"/><circle cx="52" cy="26" r="2" fill="#070a12"/><circle cx="56" cy="30" r="2" fill="#070a12"/><\/svg>`,
+  win: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M20 10h24v14a12 12 0 0 1-24 0z" fill="#f0c85a"/><path d="M20 14H10a8 8 0 0 0 10 10M44 14h10a8 8 0 0 1-10 10" fill="none" stroke="#f0c85a" stroke-width="3"/><path d="M32 36v10M22 54h20" stroke="#f0c85a" stroke-width="4" stroke-linecap="round"/><\/svg>`,
+};
+function showStarter(canContinue) {
+  const card = (icon, title, body) => `<div class="sg-card"><div class="sg-icon">${ICONS[icon]}<\/div><div><h3>${title}<\/h3>${body}<\/div><\/div>`;
+  modal(`<div class="starter"><h1>Fracture Lines: Dominion<\/h1>
+    <p class="lede">A strategy game of empires in the Fracture Lines galaxy. You start with one world, a scout, a frigate and a colony ship. Everything else, you build.<\/p>
+    <div class="sg-grid">
+      ${card("goal", "Your goal", `<p>Grow from one world into the strongest people in the galaxy. Win by <b>conquest<\/b>, by building the <b>Corridor Engine<\/b>, or with the <b>best score<\/b> at turn ${RULES.maxTurns}.<\/p>`)}
+      ${card("turn", "How a turn goes", `<p>Give your orders, then press <b>End turn<\/b>. Everyone moves at once; then worlds grow, build and research.<\/p>`)}
+      ${card("world", "Worlds", `<p>Click a world to see it. Population makes <b>industry<\/b> (to build), <b>science<\/b> (to research) and <b>credits<\/b> (to pay upkeep). Each world has its own build queue.<\/p>`)}
+      ${card("ships", "Ships and moving", `<p>Click your fleet, then <b>right-click<\/b> where it should go (or press <b>Move<\/b>). Dashed lines are <b>corridors<\/b>: one move takes you all the way along one.<\/p>`)}
+      ${card("battle", "Battles", `<p>Fleets of peoples at war fight when they meet. Each warship rolls three dice and hits on its skill or less. Take worlds with troop transports.<\/p>`)}
+      ${card("win", "Your first ten turns", `<p>Pick research. Build a scout or a factory. Send the scout into the dark. Fly the colony ship to a good world and found a colony. The <b>First steps<\/b> list in the game walks you through it.<\/p>`)}
+    <\/div>
+    <div class="sg-keys"><span><kbd>Drag<\/kbd> pan<\/span><span><kbd>Scroll<\/kbd> zoom<\/span><span><kbd>Click<\/kbd> select<\/span><span><kbd>Right-click<\/kbd> move<\/span><span><kbd>N<\/kbd> next idle<\/span><span><kbd>Enter<\/kbd> end turn<\/span><\/div>
+    <div class="btn-row"><button class="btn primary big" id="sg-first">Start my first game<\/button><button class="btn" id="sg-choose">Choose my own settings<\/button>${canContinue ? `<button class="btn" id="sg-continue">Continue your game<\/button>` : ""}<\/div>
+    <p class="small muted">The first game is set up to learn on: the Concord, a small galaxy, two easy rivals, and the First steps checklist.<\/p><\/div>`);
+  $("sg-first").onclick = () => { const st = newGame({ player: "concord", size: "small", rivals: 2, difficulty: "easy" }); st.tutorial = { on: true }; startGame(st); save(); };
+  $("sg-choose").onclick = () => showNewGame(canContinue);
+  if ($("sg-continue")) $("sg-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
+}
+
+// First steps: a checklist that ticks itself off as the player does each thing.
+function stepsList() {
+  const me = player(S), cols = coloniesOf(S, me.id);
+  return [
+    { id: "research", label: "Choose what to research", done: !!me.research.current || me.research.done.length > 0 },
+    { id: "build", label: "Build something at your capital", done: cols.some((x) => x.colony.queue.length) || me.stats.built > 0 },
+    { id: "scout", label: "Send your scout into the dark", done: !!(S.tutorial && S.tutorial.scouted) || S.turn > 12 },
+    { id: "colony", label: "Found a second colony", done: cols.filter((x) => x.colony.kind === "colony").length >= 2 },
+    { id: "turn", label: "End your turn", done: S.turn >= 2 },
+  ];
+}
+function renderSteps() {
+  const el = $("steps");
+  if (!S || !S.tutorial || !S.tutorial.on) { el.hidden = true; return; }
+  const list = stepsList(), n = list.filter((x) => x.done).length;
+  el.hidden = false;
+  if (n === list.length) {
+    el.innerHTML = `<div class="steps-head"><b>First steps: done<\/b><button class="x" data-steps-off title="Hide">×<\/button><\/div>
+      <p class="small">You're off. Next: build a Factory and a Research lab at your capital, keep two or three frigates at home, and look for your neighbours under <b>Diplomacy<\/b>.<\/p>
+      <button class="btn small" data-steps-off>Hide the checklist<\/button>`;
+    return;
+  }
+  const next = list.find((x) => !x.done);
+  el.innerHTML = `<div class="steps-head"><b>First steps<\/b><span class="small muted">${n} of ${list.length}<\/span><button class="x" data-steps-off title="Hide the checklist">×<\/button><\/div>
+    <span class="meter"><span style="width:${(n / list.length) * 100}%;background:var(--good)"><\/span><\/span>
+    <ol class="steps">${list.map((x) => `<li class="${x.done ? "done" : x === next ? "now" : ""}"><span>${x.done ? "✓" : ""}<\/span>${esc(x.label)}${x === next ? ` <button class="btn small" data-show="${x.id}">Show me<\/button>` : ""}<\/li>`).join("")}<\/ol>`;
+}
+function showMe(id) {
+  const me = player(S), cap = S.systems[me.capital];
+  if (id === "research") { tab = "research"; renderTabs(); renderPanel(); toast("Click a technology to research it. Deep sensors and Xenology are good first picks."); return; }
+  if (id === "build") { select({ kind: "system", id: cap.id }); centerOn(cap.at); draw(); toast("Under Add to the queue, click a Scout, a Factory or a Colony ship."); return; }
+  if (id === "scout") {
+    const f = fleetsOf(S, me.id).find((x) => x.ships.some((y) => y.type === "scout"));
+    if (!f) { select({ kind: "system", id: cap.id }); toast("Build a Scout at your capital first."); return; }
+    select({ kind: "fleet", id: f.id }); centerOn(f.at); moveMode = true; renderPanel(); draw();
+    toast("Your scout is selected. Click a dark hex far from home to send it there."); return;
+  }
+  if (id === "colony") {
+    const f = fleetsOf(S, me.id).find((x) => x.ships.some((y) => y.type === "colony"));
+    if (!f) { select({ kind: "system", id: cap.id }); toast("Build a Colony ship at your capital (Add to the queue)."); return; }
+    const here = S.sysAt[f.at] && S.systems[S.sysAt[f.at]];
+    if (here && canSettle(S, me.id, here, "colony")) { select({ kind: "fleet", id: f.id }); toast(`Your colony ship is at ${here.name}: press Found a colony.`); return; }
+    const best = Object.values(S.systems).filter((x) => me.explored[x.at] && canSettle(S, me.id, x, "colony"))
+      .sort((a, b) => (WORLDS[b.world].pop + b.size * 2) / (1 + distance(f.at, b.at) / 3) - (WORLDS[a.world].pop + a.size * 2) / (1 + distance(f.at, a.at) / 3))[0];
+    select({ kind: "fleet", id: f.id });
+    if (best) { setDestination(S, f.id, best.at); centerOn(best.at); save(); renderPanel(); draw(); toast(`Your colony ship is on its way to ${best.name}, a good world nearby. When it arrives, select it and press Found a colony.`); }
+    else { centerOn(f.at); moveMode = true; renderPanel(); draw(); toast("No good world seen yet: explore, or click a world to send the colony ship there."); }
+    return;
+  }
+  if (id === "turn") { const b = $("end-turn"); b.classList.add("pulse"); setTimeout(() => b.classList.remove("pulse"), 2400); toast("Press End turn (or Enter) when your orders are given."); }
+}
+
 function showHelp(back) {
   modal(`<h1>How to play<\/h1>
     <ul class="help">
@@ -1479,6 +1587,8 @@ function showMenu() {
   modal(`<h1>Menu<\/h1><div class="btn-row col">
     <button class="btn" id="m-resume">Back to the game<\/button>
     <button class="btn" id="m-help">How to play<\/button>
+    <button class="btn" id="m-guide">The starter guide<\/button>
+    <button class="btn" id="m-steps">${S && S.tutorial && S.tutorial.on ? "Hide" : "Show"} the First steps checklist<\/button>
     <button class="btn" id="m-export">Save code (copy)<\/button>
     <button class="btn" id="m-load">Load a saved game<\/button>
     <button class="btn danger" id="m-new">New game<\/button><\/div>
@@ -1486,6 +1596,8 @@ function showMenu() {
   bindGalaxyBox();
   $("m-resume").onclick = closeModal;
   $("m-help").onclick = () => showHelp(showMenu);
+  $("m-guide").onclick = () => showStarter(true);
+  $("m-steps").onclick = () => { S.tutorial = S.tutorial || {}; S.tutorial.on = !S.tutorial.on; save(); closeModal(); renderSteps(); };
   $("m-new").onclick = () => showNewGame(!!S);
   $("m-load").onclick = () => showLoad(showMenu);
   $("m-export").onclick = () => {

@@ -31,7 +31,7 @@ function boot() {
   bindChrome();
   debugHook();
   const saved = store.get();
-  showNewGame(!!saved);
+  if (saved) showNewGame(true); else showStarter(false);
 }
 function startGame(state) {
   S = state; sel = null; moveMode = false; tab = "selected";
@@ -39,7 +39,7 @@ function startGame(state) {
   centerOn(cap.at); view.zoom = 1;
   select({ kind: "system", id: cap.id });
   $("app").hidden = false; closeModal();
-  renderAll();
+  renderAll(); renderSteps();
   if (S.turn === 1) toast(`You lead ${player(S).name}. Explore, settle, and find out who else is out here.`);
 }
 function save() { if (S) store.set(JSON.stringify(S)); }
@@ -98,8 +98,9 @@ function orderMove(hex) {
   if (!f || f.owner !== player(S).id) return;
   const r = setDestination(S, f.id, hex);
   moveMode = false;
+  if (!r.error && f.ships.some((x) => x.type === "scout") && S.tutorial) S.tutorial.scouted = true;
   if (r.error) toast(r.error, true); else if (hex !== f.at) toast(`On course: ${r.turns} turn${r.turns === 1 ? "" : "s"}.`);
-  save(); renderPanel(); draw();
+  save(); renderPanel(); renderSteps(); draw();
 }
 
 function territory() {
@@ -218,7 +219,7 @@ function draw() {
 }
 
 // ---------- the bar and the panels ----------
-function renderAll() { renderBar(); renderTabs(); renderPanel(); draw(); }
+function renderAll() { renderBar(); renderTabs(); renderPanel(); renderSteps(); draw(); }
 function renderBar() {
   const me = player(S), t = totals(S, me.id), R = me.research, tech = R.current && TECHS.find((x) => x.id === R.current);
   $("bar-faction").innerHTML = `<span class="dot" style="background:${me.color}"></span>${esc(me.name)}`;
@@ -376,6 +377,11 @@ function bindChrome() {
     save(); renderAll();
   });
   document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; renderTabs(); renderPanel(); }));
+  $("steps").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b || !S) return;
+    if (b.dataset.show) showMe(b.dataset.show);
+    else if (b.hasAttribute("data-steps-off")) { S.tutorial.on = false; save(); renderSteps(); toast("Checklist hidden. The Menu brings it back."); }
+  });
   $("end-turn").addEventListener("click", doEndTurn);
   $("zoom-in").addEventListener("click", () => zoomBy(1.25));
   $("zoom-out").addEventListener("click", () => zoomBy(0.8));
@@ -434,7 +440,8 @@ function showNewGame(canContinue, preset) {
       <label>Difficulty <select id="ng-diff"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label>
       <label>Seed <input type="text" id="ng-seed" placeholder="random" size="10"></label>
     </div>
-    <div class="btn-row"><button class="btn primary" id="ng-start">Begin</button><button class="btn" id="ng-help">How to play</button><button class="btn" id="ng-load">Load a saved game</button></div>`);
+    <label class="small check-line"><input type="checkbox" id="ng-steps" checked> Show the First steps checklist</label>
+    <div class="btn-row"><button class="btn primary" id="ng-start">Begin</button><button class="btn" id="ng-guide">New here? The starter guide</button><button class="btn" id="ng-load">Load a saved game</button></div>`);
   if (preset) {
     $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty;
     const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
@@ -442,13 +449,95 @@ function showNewGame(canContinue, preset) {
   if ($("ng-continue")) $("ng-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
   $("ng-start").onclick = () => {
     const seedText = $("ng-seed").value.trim();
-    startGame(newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
-      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value }));
-    save();
+    const st = newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
+      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value });
+    if ($("ng-steps").checked) st.tutorial = { on: true };
+    startGame(st); save();
   };
-  $("ng-help").onclick = () => showHelp(() => showNewGame(canContinue));
+  $("ng-guide").onclick = () => showStarter(canContinue);
   $("ng-load").onclick = () => showLoad(() => showNewGame(canContinue));
 }
+// The starter guide: what the game is and how a turn goes, before the first game.
+const ICONS = {
+  goal: `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="22" fill="none" stroke="#5ec8e0" stroke-width="3"/><circle cx="32" cy="32" r="12" fill="none" stroke="#5ec8e0" stroke-width="3"/><circle cx="32" cy="32" r="4" fill="#f0c85a"/></svg>`,
+  turn: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M50 32a18 18 0 1 1-6-13.4" fill="none" stroke="#5ec8e0" stroke-width="4" stroke-linecap="round"/><path d="M44 8v12h12" fill="none" stroke="#f0c85a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  world: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 54 19v26L32 58 10 45V19z" fill="rgba(30,40,70,.6)" stroke="#5e7ab8" stroke-width="2"/><circle cx="32" cy="32" r="11" fill="#5fa86a"/><circle cx="32" cy="32" r="16" fill="none" stroke="#3d7fbf" stroke-width="3"/></svg>`,
+  ships: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 50 54 14" stroke="rgba(110,200,230,.7)" stroke-width="3" stroke-dasharray="6 5"/><circle cx="10" cy="50" r="6" fill="#4a8fc4"/><circle cx="54" cy="14" r="6" fill="#d0a25a"/><path d="M40 34l-14-7 4 7-4 7z" fill="#3d7fbf" stroke="#000" stroke-width="1"/></svg>`,
+  battle: `<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="20" width="16" height="16" rx="3" fill="#dfe7f7"/><rect x="26" y="28" width="16" height="16" rx="3" fill="#dfe7f7"/><rect x="44" y="18" width="16" height="16" rx="3" fill="#dfe7f7"/><circle cx="16" cy="28" r="2" fill="#070a12"/><circle cx="31" cy="33" r="2" fill="#070a12"/><circle cx="37" cy="39" r="2" fill="#070a12"/><circle cx="48" cy="22" r="2" fill="#070a12"/><circle cx="52" cy="26" r="2" fill="#070a12"/><circle cx="56" cy="30" r="2" fill="#070a12"/></svg>`,
+  win: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M20 10h24v14a12 12 0 0 1-24 0z" fill="#f0c85a"/><path d="M20 14H10a8 8 0 0 0 10 10M44 14h10a8 8 0 0 1-10 10" fill="none" stroke="#f0c85a" stroke-width="3"/><path d="M32 36v10M22 54h20" stroke="#f0c85a" stroke-width="4" stroke-linecap="round"/></svg>`,
+};
+function showStarter(canContinue) {
+  const card = (icon, title, body) => `<div class="sg-card"><div class="sg-icon">${ICONS[icon]}</div><div><h3>${title}</h3>${body}</div></div>`;
+  modal(`<div class="starter"><h1>Fracture Lines: Dominion</h1>
+    <p class="lede">A strategy game of empires in the Fracture Lines galaxy. You start with one world, a scout, a frigate and a colony ship. Everything else, you build.</p>
+    <div class="sg-grid">
+      ${card("goal", "Your goal", `<p>Grow from one world into the strongest people in the galaxy. Win by <b>conquest</b>, by building the <b>Corridor Engine</b>, or with the <b>best score</b> at turn ${RULES.maxTurns}.</p>`)}
+      ${card("turn", "How a turn goes", `<p>Give your orders, then press <b>End turn</b>. Everyone moves at once; then worlds grow, build and research.</p>`)}
+      ${card("world", "Worlds", `<p>Click a world to see it. Population makes <b>industry</b> (to build), <b>science</b> (to research) and <b>credits</b> (to pay upkeep). Each world has its own build queue.</p>`)}
+      ${card("ships", "Ships and moving", `<p>Click your fleet, then <b>right-click</b> where it should go (or press <b>Move</b>). Dashed lines are <b>corridors</b>: one move takes you all the way along one.</p>`)}
+      ${card("battle", "Battles", `<p>Fleets of peoples at war fight when they meet. Each warship rolls three dice and hits on its skill or less. Take worlds with troop transports.</p>`)}
+      ${card("win", "Your first ten turns", `<p>Pick research. Build a scout or a factory. Send the scout into the dark. Fly the colony ship to a good world and found a colony. The <b>First steps</b> list in the game walks you through it.</p>`)}
+    </div>
+    <div class="sg-keys"><span><kbd>Drag</kbd> pan</span><span><kbd>Scroll</kbd> zoom</span><span><kbd>Click</kbd> select</span><span><kbd>Right-click</kbd> move</span><span><kbd>N</kbd> next idle</span><span><kbd>Enter</kbd> end turn</span></div>
+    <div class="btn-row"><button class="btn primary big" id="sg-first">Start my first game</button><button class="btn" id="sg-choose">Choose my own settings</button>${canContinue ? `<button class="btn" id="sg-continue">Continue your game</button>` : ""}</div>
+    <p class="small muted">The first game is set up to learn on: the Concord, a small galaxy, two easy rivals, and the First steps checklist.</p></div>`);
+  $("sg-first").onclick = () => { const st = newGame({ player: "concord", size: "small", rivals: 2, difficulty: "easy" }); st.tutorial = { on: true }; startGame(st); save(); };
+  $("sg-choose").onclick = () => showNewGame(canContinue);
+  if ($("sg-continue")) $("sg-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
+}
+
+// First steps: a checklist that ticks itself off as the player does each thing.
+function stepsList() {
+  const me = player(S), cols = coloniesOf(S, me.id);
+  return [
+    { id: "research", label: "Choose what to research", done: !!me.research.current || me.research.done.length > 0 },
+    { id: "build", label: "Build something at your capital", done: cols.some((x) => x.colony.queue.length) || me.stats.built > 0 },
+    { id: "scout", label: "Send your scout into the dark", done: !!(S.tutorial && S.tutorial.scouted) || S.turn > 12 },
+    { id: "colony", label: "Found a second colony", done: cols.filter((x) => x.colony.kind === "colony").length >= 2 },
+    { id: "turn", label: "End your turn", done: S.turn >= 2 },
+  ];
+}
+function renderSteps() {
+  const el = $("steps");
+  if (!S || !S.tutorial || !S.tutorial.on) { el.hidden = true; return; }
+  const list = stepsList(), n = list.filter((x) => x.done).length;
+  el.hidden = false;
+  if (n === list.length) {
+    el.innerHTML = `<div class="steps-head"><b>First steps: done</b><button class="x" data-steps-off title="Hide">×</button></div>
+      <p class="small">You're off. Next: build a Factory and a Research lab at your capital, keep two or three frigates at home, and look for your neighbours under <b>Diplomacy</b>.</p>
+      <button class="btn small" data-steps-off>Hide the checklist</button>`;
+    return;
+  }
+  const next = list.find((x) => !x.done);
+  el.innerHTML = `<div class="steps-head"><b>First steps</b><span class="small muted">${n} of ${list.length}</span><button class="x" data-steps-off title="Hide the checklist">×</button></div>
+    <span class="meter"><span style="width:${(n / list.length) * 100}%;background:var(--good)"></span></span>
+    <ol class="steps">${list.map((x) => `<li class="${x.done ? "done" : x === next ? "now" : ""}"><span>${x.done ? "✓" : ""}</span>${esc(x.label)}${x === next ? ` <button class="btn small" data-show="${x.id}">Show me</button>` : ""}</li>`).join("")}</ol>`;
+}
+function showMe(id) {
+  const me = player(S), cap = S.systems[me.capital];
+  if (id === "research") { tab = "research"; renderTabs(); renderPanel(); toast("Click a technology to research it. Deep sensors and Xenology are good first picks."); return; }
+  if (id === "build") { select({ kind: "system", id: cap.id }); centerOn(cap.at); draw(); toast("Under Add to the queue, click a Scout, a Factory or a Colony ship."); return; }
+  if (id === "scout") {
+    const f = fleetsOf(S, me.id).find((x) => x.ships.some((y) => y.type === "scout"));
+    if (!f) { select({ kind: "system", id: cap.id }); toast("Build a Scout at your capital first."); return; }
+    select({ kind: "fleet", id: f.id }); centerOn(f.at); moveMode = true; renderPanel(); draw();
+    toast("Your scout is selected. Click a dark hex far from home to send it there."); return;
+  }
+  if (id === "colony") {
+    const f = fleetsOf(S, me.id).find((x) => x.ships.some((y) => y.type === "colony"));
+    if (!f) { select({ kind: "system", id: cap.id }); toast("Build a Colony ship at your capital (Add to the queue)."); return; }
+    const here = S.sysAt[f.at] && S.systems[S.sysAt[f.at]];
+    if (here && canSettle(S, me.id, here, "colony")) { select({ kind: "fleet", id: f.id }); toast(`Your colony ship is at ${here.name}: press Found a colony.`); return; }
+    const best = Object.values(S.systems).filter((x) => me.explored[x.at] && canSettle(S, me.id, x, "colony"))
+      .sort((a, b) => (WORLDS[b.world].pop + b.size * 2) / (1 + distance(f.at, b.at) / 3) - (WORLDS[a.world].pop + a.size * 2) / (1 + distance(f.at, a.at) / 3))[0];
+    select({ kind: "fleet", id: f.id });
+    if (best) { setDestination(S, f.id, best.at); centerOn(best.at); save(); renderPanel(); draw(); toast(`Your colony ship is on its way to ${best.name}, a good world nearby. When it arrives, select it and press Found a colony.`); }
+    else { centerOn(f.at); moveMode = true; renderPanel(); draw(); toast("No good world seen yet: explore, or click a world to send the colony ship there."); }
+    return;
+  }
+  if (id === "turn") { const b = $("end-turn"); b.classList.add("pulse"); setTimeout(() => b.classList.remove("pulse"), 2400); toast("Press End turn (or Enter) when your orders are given."); }
+}
+
 function showHelp(back) {
   modal(`<h1>How to play</h1>
     <ul class="help">
@@ -490,6 +579,8 @@ function showMenu() {
   modal(`<h1>Menu</h1><div class="btn-row col">
     <button class="btn" id="m-resume">Back to the game</button>
     <button class="btn" id="m-help">How to play</button>
+    <button class="btn" id="m-guide">The starter guide</button>
+    <button class="btn" id="m-steps">${S && S.tutorial && S.tutorial.on ? "Hide" : "Show"} the First steps checklist</button>
     <button class="btn" id="m-export">Save code (copy)</button>
     <button class="btn" id="m-load">Load a saved game</button>
     <button class="btn danger" id="m-new">New game</button></div>
@@ -497,6 +588,8 @@ function showMenu() {
   bindGalaxyBox();
   $("m-resume").onclick = closeModal;
   $("m-help").onclick = () => showHelp(showMenu);
+  $("m-guide").onclick = () => showStarter(true);
+  $("m-steps").onclick = () => { S.tutorial = S.tutorial || {}; S.tutorial.on = !S.tutorial.on; save(); closeModal(); renderSteps(); };
   $("m-new").onclick = () => showNewGame(!!S);
   $("m-load").onclick = () => showLoad(showMenu);
   $("m-export").onclick = () => {
