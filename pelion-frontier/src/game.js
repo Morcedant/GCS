@@ -53,7 +53,8 @@ export const officer = (id) => CREW.find((c) => c.id === id);
 export const hasRecord = (S, perk) => S.records.some((id) => RECORDS.find((r) => r.id === id)?.perk === perk);
 /** The captain's log, oldest first. Discoveries are never trimmed: the log keeps the newest 300 other entries. */
 export function log(S, text, kind = "", extra = null) {
-  S.log.push({ t: S.turn, text, kind, ...(extra || {}) });
+  S.logSeq = (S.logSeq || 0) + 1;   // each entry is numbered, so the page can show what one choice led to
+  S.log.push({ id: S.logSeq, t: S.turn, text, kind, ...(extra || {}) });
   let n = S.log.length - 300;
   for (let i = 0; i < S.log.length && n > 0; ) { if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } else i++; }
 }
@@ -61,7 +62,7 @@ export function log(S, text, kind = "", extra = null) {
 export function storyEvent(S, title, text, extra = null) {
   const ev = { kind: "story", title, text };
   if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;   // a second scene waits for the first
-  log(S, `${title}: ${text}`, "discovery", extra);
+  log(S, `${title}: ${text}`, "discovery", { ...(extra || {}), story: true });
 }
 export const available = (S, id) => S.crew[id].inj < 3;
 export function skillOf(S, id, skill) {

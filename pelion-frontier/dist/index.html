@@ -475,7 +475,8 @@ const officer = (id) => CREW.find((c) => c.id === id);
 const hasRecord = (S, perk) => S.records.some((id) => RECORDS.find((r) => r.id === id)?.perk === perk);
 /** The captain's log, oldest first. Discoveries are never trimmed: the log keeps the newest 300 other entries. */
 function log(S, text, kind = "", extra = null) {
-  S.log.push({ t: S.turn, text, kind, ...(extra || {}) });
+  S.logSeq = (S.logSeq || 0) + 1;   // each entry is numbered, so the page can show what one choice led to
+  S.log.push({ id: S.logSeq, t: S.turn, text, kind, ...(extra || {}) });
   let n = S.log.length - 300;
   for (let i = 0; i < S.log.length && n > 0; ) { if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } else i++; }
 }
@@ -483,7 +484,7 @@ function log(S, text, kind = "", extra = null) {
 function storyEvent(S, title, text, extra = null) {
   const ev = { kind: "story", title, text };
   if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;   // a second scene waits for the first
-  log(S, `${title}: ${text}`, "discovery", extra);
+  log(S, `${title}: ${text}`, "discovery", { ...(extra || {}), story: true });
 }
 const available = (S, id) => S.crew[id].inj < 3;
 function skillOf(S, id, skill) {
@@ -1607,9 +1608,17 @@ function startGame(state) {
 }
 function save() { if (S) store.set(JSON.stringify(S)); }
 /** After anything changes: save, redraw, and open whatever dialog the state calls for. */
+let report = null;   // { title, roll, lines }: what the last choice led to, shown before anything it set off
+const mark = () => S.logSeq || 0;
+/** Note what a choice led to: every log line since `since` (story scenes have their own pop-ups). */
+function reportSince(title, since, roll) {
+  const lines = S.log.filter((l) => l.id > since && !l.story).map((l) => l.text);
+  if (lines.length || roll) report = { title, roll, lines };
+}
 function after() {
   save(); renderAll();
-  if (S.battle) showBattle();
+  if (report) showReport();
+  else if (S.battle) showBattle();
   else if (S.event) showEvent();
   else if (S.over) showEnd();
 }
@@ -2076,21 +2085,25 @@ function bindChrome() {
     if (b.dataset.logf) { logFilter = b.dataset.logf; renderPanel(); return; }
     if (b.dataset.tabGo) { tab = b.dataset.tabGo; renderTabs(); renderPanel(); return; }
     if (b.dataset.surface) { mapMode = "surface"; draw(); renderPanel(); return; }
-    if (b.dataset.beam) { const ids = [...b.closest(".card").querySelectorAll("[data-away]:checked")].map((x) => x.dataset.away); const r = beamDown(S, ids); if (r.error) toast(r.error, true); else mapMode = "surface"; after(); return; }
-    if (b.dataset.beamup) { beamDown(S, []); after(); return; }
+    if (b.dataset.beam) { const since = mark(); const ids = [...b.closest(".card").querySelectorAll("[data-away]:checked")].map((x) => x.dataset.away); const r = beamDown(S, ids); if (r.error) toast(r.error, true); else { mapMode = "surface"; reportSince("Energize", since); } after(); return; }
+    if (b.dataset.beamup) { const since = mark(); beamDown(S, []); reportSince("Beam them up", since); after(); return; }
     if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }
     if (b.dataset.go) { selHex = b.dataset.go; goTo(b.dataset.go); return; }
     if (b.dataset.center) { centerOn(b.dataset.center); selHex = b.dataset.center; tab = "here"; renderAll(); return; }
     if (b.dataset.act) {
       const a = JSON.parse(b.dataset.act), sel = b.parentElement.querySelector("[data-who]");
       const [who, skill] = sel ? sel.value.split("|") : [];
+      const since = mark();
       const r = attempt(S, unit, a.id, { order: a.order, enemy: a.enemy, arc: a.arc, officer: who, skill });
       if (r.error) { toast(r.error, true); return; }
-      lastResult = r.done ? r.result : null; after(); return;
+      lastResult = r.done ? r.result : null;
+      if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill });
+      else if (r.battle) reportSince(b.closest(".card")?.querySelector("h4")?.textContent || "Engage", since);
+      after(); return;
     }
-    if (b.dataset.resolve) { const r = resolve(S, b.dataset.resolve === "reroll"); lastResult = r.done ? r.result : null; after(); return; }
-    if (b.dataset.refit) { const r = fitRefit(S, b.dataset.refit); if (r.error) toast(r.error, true); after(); return; }
-    if (b.dataset.req) { const r = requisition(S, b.dataset.req); if (r.error) toast(r.error, true); after(); return; }
+    if (b.dataset.resolve) { const since = mark(); const r = resolve(S, b.dataset.resolve === "reroll"); lastResult = r.done ? r.result : null; if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill }); after(); return; }
+    if (b.dataset.refit) { const since = mark(); const r = fitRefit(S, b.dataset.refit); if (r.error) toast(r.error, true); else reportSince(REFITS[b.dataset.refit].name, since); after(); return; }
+    if (b.dataset.req) { const since = mark(); const r = requisition(S, b.dataset.req); if (r.error) toast(r.error, true); else reportSince("Requisition: " + SUPPORT[b.dataset.req].name, since); after(); return; }
   });
   $("panel").addEventListener("change", (e) => { const s = e.target.closest("[data-station]"); if (s) { setStation(S, s.dataset.station, s.value); after(); } });
   $("panel").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-hex]"); if (tr) { selHex = tr.dataset.hex; centerOn(selHex); tab = "here"; renderAll(); } });
@@ -2146,6 +2159,13 @@ function showMenu() {
     <h3>Load<\/h3><textarea id="load" rows="2" placeholder="Paste a save code"><\/textarea><div class="btn-row"><button class="btn small" data-m="load">Load it<\/button><\/div>`);
 }
 function showHelp() { showStarter(true); $("modal-body").querySelector("[data-m=new]").textContent = "Start a new tour"; }
+function showReport() {
+  const r = report, roll = r.roll;
+  modal(`<h2>${esc(r.title)}<\/h2>
+    ${roll ? `<div class="result ${roll.success ? "ok" : "no"}">${roll.officer ? `<span class="small muted">${esc(officer(roll.officer)?.short || "The captain")}, ${esc(roll.skill)}:<\/span> ` : ""}${diceHTML(roll)} ${roll.total} against ${roll.target}: <b class="${roll.success ? "good" : "bad"}">${roll.success ? `success by ${roll.margin}` : `fails by ${-roll.margin}`}<\/b><\/div>` : ""}
+    ${r.lines.map((t) => `<p style="white-space:pre-line">${esc(t)}<\/p>`).join("")}
+    <div class="btn-row"><button class="btn primary" data-m="report-ok">Continue<\/button><\/div>`);
+}
 function showEvent() {
   const ev = S.event;
   if (ev.kind === "arc-arrive") {
@@ -2192,7 +2212,18 @@ function showEnd() {
 function modalClick(e) {
   const b = e.target.closest("button"); if (!b) return;
   const m = b.dataset.m;
-  if (b.dataset.ev) { eventResult = chooseEvent(S, b.dataset.ev); if (!S.event) eventResult = null; after(); if (!S.event && !S.battle && !S.over) closeModal(); return; }
+  if (b.dataset.ev) {
+    const since = mark(), title = b.textContent.trim();
+    eventResult = chooseEvent(S, b.dataset.ev);
+    // While the arrival is still open (a scan), its own dialog shows the result; once it ends, a pop-up says what happened.
+    if (!S.event || S.event.kind !== "arc-arrive") {
+      const out = eventResult || {}; eventResult = null; report = null;
+      reportSince(title, since, out.roll);
+      if (out.text) { report = report || { title, roll: out.roll, lines: [] }; report.lines.unshift(out.text); }
+    }
+    after(); if (!report && !S.event && !S.battle && !S.over) closeModal(); return;
+  }
+  if (m === "report-ok") { report = null; closeModal(); after(); return; }
   if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value }); startGame(s); return; }
   if (m === "continue") { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } return; }
   if (m === "close") { closeModal(); return; }
