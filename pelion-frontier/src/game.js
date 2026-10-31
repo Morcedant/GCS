@@ -26,6 +26,7 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
     pelion: { at: sb.at, warp: CRUISE_WARP, days: 7, mp: lyPerWeek(CRUISE_WARP), acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true },
     stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
     crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false }])),
+    backlog: [],   // orders waiting their turn
     tried: {},   // actions tried this turn: each can be attempted once a turn
     support: {}, enemies: {}, nextId: 1,
     supplies: 20, science: 0, command: 0, tension: 2, commendations: 0,
@@ -527,17 +528,60 @@ function missionStep(S, p) {
 }
 /** Every finished order, for the Orders tab: { title, result: "done" | "partly" | "failed", turn, how }. */
 export function recordOrder(S, o, result, how) { (S.history = S.history || []).push({ title: o.title, result, turn: S.turn, how }); }
+/**
+ * The Mission Success report: a pop-up when every task of an order is done, with what was done, how long it took and
+ * what it earned. `extra` adds rewards an order earns beyond the usual (the arc's library record).
+ */
+export function missionReport(S, o, result, how, rewards) {
+  const tasks = o.arc ? null : [`Reach ${o.sys ? S.systems[o.sys].name : "the border"}`, `${o.segs} successes with ${o.skills.join(", ")}: ${o.have || o.segs} of ${o.segs}`];
+  const ev = { kind: "success", orderId: o.id, arc: !!o.arc, result, title: o.title, how, tasks, rewards, weeks: Math.max(1, S.turn - (o.issued || 1) + 1), turn: S.turn };
+  if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
+  log(S, `Mission ${result === "partly" ? "partly successful" : "success"}: ${o.title}. ${how} Rewards: ${rewards.join("; ")}.`, "victory", { story: true });
+  return ev;
+}
 export function completeOrder(S, o, ok, how) {
   S.orders = S.orders.filter((x) => x !== o);
   recordOrder(S, o, ok ? "done" : "failed", how || (ok ? "Carried out." : `Not carried out by turn ${o.deadline}.`));
   if (ok) {
     S.done++; S.commendations += o.arc ? 4 : 2; S.supplies += 10; S.science += 8;
-    if (!(o.twist && o.twist.fx === "nocredit")) markCommand(S, -1, `orders carried out: ${o.title}.`);
+    const credit = !(o.twist && o.twist.fx === "nocredit");
+    if (credit) markCommand(S, -1, `orders carried out: ${o.title}.`);
+    const ev = missionReport(S, o, "done", how || "Carried out.", ["+10 supplies", "+8 science", `+${o.arc ? 4 : 2} commendations`].concat(credit ? ["a Starfleet Command box cleared"] : []));
+    const had = new Set(S.orders.map((x) => x.id));
+    fillFromBacklog(S);
+    const next = S.orders.filter((x) => !had.has(x.id)); if (next.length) ev.next = next.map((x) => x.title);
   } else {
     S.failed++; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
     const s = o.sys && S.systems[o.sys];
     if (s && /Evacuate|distress|medical/i.test(o.title) && ["colony", "member", "independent"].includes(s.kind)) harmWorld(S, s, 1, "help never came");
+    fillFromBacklog(S);
   }
+}
+// ---------- the backlog ----------
+// Starfleet keeps sending orders. With two under way (or urgent orders in hand), new ones wait in the backlog; the
+// oldest moves up when an order is finished, or the captain can take one on at once. Their clocks start then.
+export const BACKLOG_MAX = 4;
+const busy = (S) => S.orders.filter((o) => !o.arc).length >= 2 || S.orders.some((o) => o.arc);
+export function fillFromBacklog(S) {
+  S.backlog = S.backlog || [];
+  while (S.backlog.length && !busy(S)) activateOrder(S, S.backlog.shift(), "from the backlog");
+}
+/** Take a backlogged order on now. */
+export function acceptOrder(S, id) {
+  const i = (S.backlog || []).findIndex((o) => o.id === id);
+  if (i < 0) return { error: "No such order in the backlog." };
+  const [o] = S.backlog.splice(i, 1); activateOrder(S, o, "taken on from the backlog");
+  return { ok: true, order: o };
+}
+function activateOrder(S, o, why) {
+  const urgent = o.urgent, dist = Math.ceil(distance(S.pelion.at, o.at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
+  o.issued = S.turn; o.deadline = S.turn + dist + o.segs + (urgent ? 1 : 4); delete o.backlog;
+  S.orders.push(o);
+  const twist = o.twist, at = o.at;
+  if (twist && twist.fx === "klingon") { const k = closestOutpost(S, at); if (k) spawnEnemy(S, "kbc", k.at, { goal: "claim", target: at }); }
+  if (twist && twist.fx === "orion") { const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base); spawnEnemy(S, "orion", b ? b.at : at, { goal: "raid", target: at, hostile: true }); }
+  if (twist && twist.fx === "romulan") { const z = Object.keys(S.hexes).filter(inZone); spawnEnemy(S, "rbop", pick(S, z), { goal: "watch", target: at, cloaked: true, hostile: true }); }
+  log(S, `${why ? `Orders ${why}` : "New orders from Starfleet"}: ${o.title}.${urgent ? " Urgent: maximum emergency warp." : ""} Work it with ${o.skills.join(", ")} (${o.segs} successes), due by turn ${o.deadline}.${twist ? ` Twist: ${twist.text}.` : ""} Something strange: ${o.strange}. Key character: ${o.key}.`, "order");
 }
 export function newOrder(S) {
   const roll = d6(S) + d6(S) + d6(S);
@@ -549,7 +593,7 @@ export function newOrder(S) {
     at = pick(S, hexes);
   } else {
     const cands = Object.values(S.systems).filter((s) => (m.where.includes(s.kind) || (s.kind === "member" && m.where.includes("independent")) || (s.kind === "orionBase" && m.where.includes("empty")))
-      && !S.orders.some((o) => o.sys === s.id) && distance(s.at, from) >= 2 && distance(s.at, from) <= 10 && s.id !== S.corvan);
+      && !S.orders.concat(S.backlog || []).some((o) => o.sys === s.id) && distance(s.at, from) >= 2 && distance(s.at, from) <= 10 && s.id !== S.corvan);
     if (!cands.length) return null;
     sys = pick(S, cands); at = sys.at; S.seenSys[sys.id] = true;
   }
@@ -559,11 +603,13 @@ export function newOrder(S) {
   const dist = Math.ceil(distance(from, at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
   const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
     deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, STRANGE), key: pick(S, KEYS) };
-  S.orders.push(o);
-  if (twist && twist.fx === "klingon") { const k = closestOutpost(S, at); if (k) spawnEnemy(S, "kbc", k.at, { goal: "claim", target: at }); }
-  if (twist && twist.fx === "orion") { const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base); spawnEnemy(S, "orion", b ? b.at : at, { goal: "raid", target: at, hostile: true }); }
-  if (twist && twist.fx === "romulan") { const z = Object.keys(S.hexes).filter(inZone); spawnEnemy(S, "rbop", pick(S, z), { goal: "watch", target: at, cloaked: true, hostile: true }); }
-  log(S, `New orders from Starfleet: ${o.title}. Work it with ${o.skills.join(", ")} (${o.segs} successes), due by turn ${o.deadline}.${twist ? ` Twist: ${twist.text}.` : ""} Something strange: ${o.strange}. Key character: ${o.key}.`, "order");
+  S.backlog = S.backlog || [];
+  if (busy(S)) {
+    o.backlog = true; o.received = S.turn; S.backlog.push(o);
+    log(S, `New orders from Starfleet, to the backlog: ${o.title}${urgent ? " (urgent)" : ""}. They wait until an order under way is finished, or until you take them on (the Orders tab).`, "order");
+    return o;
+  }
+  activateOrder(S, o);
   return o;
 }
 export const closestOutpost = (S, at) => Object.values(S.systems).filter((s) => s.kind === "klingon").sort((a, b) => distance(a.at, at) - distance(b.at, at))[0];

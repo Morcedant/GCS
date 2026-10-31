@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { newGame, check, actionsFor, attempt, resolve, moveTo, reachable, target, markCommand, score, visibleEnemies, setWarp, maxWarp, lyPerWeek, isUrgent, CRUISE_WARP } from "../src/game.js";
+import { newGame, check, actionsFor, attempt, resolve, moveTo, reachable, target, markCommand, score, visibleEnemies, setWarp, maxWarp, lyPerWeek, isUrgent, CRUISE_WARP, newOrder, completeOrder, acceptOrder } from "../src/game.js";
 import { startBattle, exchange, battleStats } from "../src/combat.js";
 import { beamDown } from "../src/arc.js";
 import { endTurn, chooseEvent, closeBattle, dismissEvent } from "../src/turn.js";
@@ -265,4 +265,18 @@ test("Starfleet flight paths: three values in 400 degrees, relative to the ship'
   assert.ok(c.fromSol > 150 && c.fromSol < 260);
   assert.ok(position(S, "1,0").x > 0.99 && position(S, "1,0").x < 1.01);              // a light-year a hex
   assert.match(c.text, /ly from the sector's center · \d+ ly from Sector 001 \(Sol\)$/);
+});
+test("orders: a backlog when two are under way, a Mission Success report when one is done", () => {
+  const S = newGame({ seed: "bk" });
+  S.orders = S.orders.filter((o) => !o.arc); S.arc.stage = "done";   // past the first mission
+  S.turn = 4; const a = newOrder(S), b = newOrder(S), c = newOrder(S);
+  assert.equal(S.orders.length, 2); assert.equal(S.backlog.length, 1); assert.equal(S.backlog[0], c);
+  a.have = a.segs; completeOrder(S, a, true);
+  assert.equal(S.event.kind, "success"); assert.equal(S.event.title, a.title);
+  assert.ok(S.event.rewards.some((r) => /supplies/.test(r)));
+  assert.equal(S.backlog.length, 0); assert.ok(S.orders.includes(c));        // the backlog moves up
+  assert.deepEqual(S.event.next, [c.title]);
+  assert.ok(c.deadline > S.turn);
+  const d = newOrder(S); assert.ok(d.backlog);
+  assert.ok(acceptOrder(S, d.id).ok); assert.equal(S.orders.length, 3);   // taken on at once
 });

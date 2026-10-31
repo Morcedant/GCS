@@ -2,7 +2,7 @@
 // power and a Countdown of 6; the away team's investigation (a discovery clock of 4); Orion diggers in the ruins; and
 // the caretaker machine, with a choice about what to do with it.
 import { ENEMIES, CREW } from "./data.js";
-import { log, check, markCommand, completeOrder, recordOrder, registerHooks, enemiesAt, available, officer, sendHome, storyEvent } from "./game.js";
+import { log, check, markCommand, completeOrder, recordOrder, missionReport, registerHooks, enemiesAt, available, officer, sendHome, storyEvent } from "./game.js";
 import { startBattle } from "./combat.js";
 
 const CLUES = {
@@ -235,17 +235,19 @@ function completeArc(S, how, fresh) {
   const A = S.arc; A.stage = "done";
   const o = arcOrder(S);
   if (how === "leave") {
-    if (o) { S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; recordOrder(S, o, "partly", "Partly: the Orion phasers recovered and the Ketari left their history, but the scientists still asleep."); }
     S.science += 8;
     A.phasers = true;
     astory(S, "The Ketari's own history", "The away team has every Orion phaser back from the village, and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
     alog(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
+    if (o) { const how = "Partly: the Orion phasers recovered and the Ketari left their history, but the scientists still asleep."; S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; recordOrder(S, o, "partly", how); missionReport(S, o, "partly", how, ["+8 science", "+1 commendation"]); }
   } else {
-    if (o) completeOrder(S, o, true, (how === "reason" ? "The caretaker reasoned with: the scientists released, the Ketari still watched over" : "The caretaker shut down: the scientists awake and home") + "; the Orion phasers recovered.");
-    if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); }
-    else S.commendations += 1;
     astory(S, fresh ? (how === "reason" ? "Equals" : "Silence, for good") : "Orders carried out", fresh ? resolvedText(how) + (how === "reason" ? " The Ketari keep their guardian, and the Federation has a library record no one else has." : "") : `The phasers are back aboard, and the away team beams up. ${how === "reason" ? "The caretaker goes on watching, the Ketari keep their guardian, and the Federation has a library record no one else has." : "The ruins are only ruins now."} The eight scientists are in sickbay, and Rrinn hasn't left her sister's side.`);
     alog(S, `The Silence at Corvan II: the eight scientists are safe and the Orion phasers recovered.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
+    // The Mission Success report comes after the scene.
+    if (o) completeOrder(S, o, true, (how === "reason" ? "The caretaker reasoned with: the scientists released, the Ketari still watched over" : "The caretaker shut down: the scientists awake and home") + "; the Orion phasers recovered.");
+    const rep = [S.event].concat(S.eventQueue || []).find((e) => e && e.kind === "success" && e.orderId === (o && o.id));
+    if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); if (rep) rep.rewards.push("+4 more commendations and +15 science for a peaceful answer", "Library record: the caretaker of Corvan II"); }
+    else { S.commendations += 1; if (rep) rep.rewards.push("+1 more commendation"); }
   }
   if (!A.seen) markCommand(S, -1, "the Ketari never learned what the crew were.");
 }

@@ -126,7 +126,7 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
     <div class="map-hint">Click a hex to look · double-click (or right-click) to move there</div>
   </div>
   <aside class="side">
-    <nav class="tabs" role="tablist"><button data-tab="orders" role="tab">Orders</button><button data-tab="here" role="tab">Here</button><button data-tab="away" role="tab" hidden>Away team</button><button data-tab="ship" role="tab">Ship</button><button data-tab="crew" role="tab">Crew</button><button data-tab="sector" role="tab">Sector</button><button data-tab="log" role="tab">Log</button></nav>
+    <nav class="tabs" role="tablist"><button data-tab="orders" role="tab">Orders</button><button data-tab="mission" role="tab">Mission</button><button data-tab="here" role="tab">Here</button><button data-tab="away" role="tab" hidden>Away team</button><button data-tab="ship" role="tab">Ship</button><button data-tab="crew" role="tab">Crew</button><button data-tab="sector" role="tab">Sector</button><button data-tab="log" role="tab">Log</button></nav>
     <div id="panel"></div>
     <div class="side-foot"><button class="btn primary" id="end-turn">End turn</button></div>
   </aside>
@@ -455,6 +455,7 @@ function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
     pelion: { at: sb.at, warp: CRUISE_WARP, days: 7, mp: lyPerWeek(CRUISE_WARP), acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true },
     stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
     crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false }])),
+    backlog: [],   // orders waiting their turn
     tried: {},   // actions tried this turn: each can be attempted once a turn
     support: {}, enemies: {}, nextId: 1,
     supplies: 20, science: 0, command: 0, tension: 2, commendations: 0,
@@ -956,17 +957,60 @@ function missionStep(S, p) {
 }
 /** Every finished order, for the Orders tab: { title, result: "done" | "partly" | "failed", turn, how }. */
 function recordOrder(S, o, result, how) { (S.history = S.history || []).push({ title: o.title, result, turn: S.turn, how }); }
+/**
+ * The Mission Success report: a pop-up when every task of an order is done, with what was done, how long it took and
+ * what it earned. `extra` adds rewards an order earns beyond the usual (the arc's library record).
+ */
+function missionReport(S, o, result, how, rewards) {
+  const tasks = o.arc ? null : [`Reach ${o.sys ? S.systems[o.sys].name : "the border"}`, `${o.segs} successes with ${o.skills.join(", ")}: ${o.have || o.segs} of ${o.segs}`];
+  const ev = { kind: "success", orderId: o.id, arc: !!o.arc, result, title: o.title, how, tasks, rewards, weeks: Math.max(1, S.turn - (o.issued || 1) + 1), turn: S.turn };
+  if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
+  log(S, `Mission ${result === "partly" ? "partly successful" : "success"}: ${o.title}. ${how} Rewards: ${rewards.join("; ")}.`, "victory", { story: true });
+  return ev;
+}
 function completeOrder(S, o, ok, how) {
   S.orders = S.orders.filter((x) => x !== o);
   recordOrder(S, o, ok ? "done" : "failed", how || (ok ? "Carried out." : `Not carried out by turn ${o.deadline}.`));
   if (ok) {
     S.done++; S.commendations += o.arc ? 4 : 2; S.supplies += 10; S.science += 8;
-    if (!(o.twist && o.twist.fx === "nocredit")) markCommand(S, -1, `orders carried out: ${o.title}.`);
+    const credit = !(o.twist && o.twist.fx === "nocredit");
+    if (credit) markCommand(S, -1, `orders carried out: ${o.title}.`);
+    const ev = missionReport(S, o, "done", how || "Carried out.", ["+10 supplies", "+8 science", `+${o.arc ? 4 : 2} commendations`].concat(credit ? ["a Starfleet Command box cleared"] : []));
+    const had = new Set(S.orders.map((x) => x.id));
+    fillFromBacklog(S);
+    const next = S.orders.filter((x) => !had.has(x.id)); if (next.length) ev.next = next.map((x) => x.title);
   } else {
     S.failed++; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
     const s = o.sys && S.systems[o.sys];
     if (s && /Evacuate|distress|medical/i.test(o.title) && ["colony", "member", "independent"].includes(s.kind)) harmWorld(S, s, 1, "help never came");
+    fillFromBacklog(S);
   }
+}
+// ---------- the backlog ----------
+// Starfleet keeps sending orders. With two under way (or urgent orders in hand), new ones wait in the backlog; the
+// oldest moves up when an order is finished, or the captain can take one on at once. Their clocks start then.
+const BACKLOG_MAX = 4;
+const busy = (S) => S.orders.filter((o) => !o.arc).length >= 2 || S.orders.some((o) => o.arc);
+function fillFromBacklog(S) {
+  S.backlog = S.backlog || [];
+  while (S.backlog.length && !busy(S)) activateOrder(S, S.backlog.shift(), "from the backlog");
+}
+/** Take a backlogged order on now. */
+function acceptOrder(S, id) {
+  const i = (S.backlog || []).findIndex((o) => o.id === id);
+  if (i < 0) return { error: "No such order in the backlog." };
+  const [o] = S.backlog.splice(i, 1); activateOrder(S, o, "taken on from the backlog");
+  return { ok: true, order: o };
+}
+function activateOrder(S, o, why) {
+  const urgent = o.urgent, dist = Math.ceil(distance(S.pelion.at, o.at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
+  o.issued = S.turn; o.deadline = S.turn + dist + o.segs + (urgent ? 1 : 4); delete o.backlog;
+  S.orders.push(o);
+  const twist = o.twist, at = o.at;
+  if (twist && twist.fx === "klingon") { const k = closestOutpost(S, at); if (k) spawnEnemy(S, "kbc", k.at, { goal: "claim", target: at }); }
+  if (twist && twist.fx === "orion") { const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base); spawnEnemy(S, "orion", b ? b.at : at, { goal: "raid", target: at, hostile: true }); }
+  if (twist && twist.fx === "romulan") { const z = Object.keys(S.hexes).filter(inZone); spawnEnemy(S, "rbop", pick(S, z), { goal: "watch", target: at, cloaked: true, hostile: true }); }
+  log(S, `${why ? `Orders ${why}` : "New orders from Starfleet"}: ${o.title}.${urgent ? " Urgent: maximum emergency warp." : ""} Work it with ${o.skills.join(", ")} (${o.segs} successes), due by turn ${o.deadline}.${twist ? ` Twist: ${twist.text}.` : ""} Something strange: ${o.strange}. Key character: ${o.key}.`, "order");
 }
 function newOrder(S) {
   const roll = d6(S) + d6(S) + d6(S);
@@ -978,7 +1022,7 @@ function newOrder(S) {
     at = pick(S, hexes);
   } else {
     const cands = Object.values(S.systems).filter((s) => (m.where.includes(s.kind) || (s.kind === "member" && m.where.includes("independent")) || (s.kind === "orionBase" && m.where.includes("empty")))
-      && !S.orders.some((o) => o.sys === s.id) && distance(s.at, from) >= 2 && distance(s.at, from) <= 10 && s.id !== S.corvan);
+      && !S.orders.concat(S.backlog || []).some((o) => o.sys === s.id) && distance(s.at, from) >= 2 && distance(s.at, from) <= 10 && s.id !== S.corvan);
     if (!cands.length) return null;
     sys = pick(S, cands); at = sys.at; S.seenSys[sys.id] = true;
   }
@@ -988,11 +1032,13 @@ function newOrder(S) {
   const dist = Math.ceil(distance(from, at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
   const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
     deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, STRANGE), key: pick(S, KEYS) };
-  S.orders.push(o);
-  if (twist && twist.fx === "klingon") { const k = closestOutpost(S, at); if (k) spawnEnemy(S, "kbc", k.at, { goal: "claim", target: at }); }
-  if (twist && twist.fx === "orion") { const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base); spawnEnemy(S, "orion", b ? b.at : at, { goal: "raid", target: at, hostile: true }); }
-  if (twist && twist.fx === "romulan") { const z = Object.keys(S.hexes).filter(inZone); spawnEnemy(S, "rbop", pick(S, z), { goal: "watch", target: at, cloaked: true, hostile: true }); }
-  log(S, `New orders from Starfleet: ${o.title}. Work it with ${o.skills.join(", ")} (${o.segs} successes), due by turn ${o.deadline}.${twist ? ` Twist: ${twist.text}.` : ""} Something strange: ${o.strange}. Key character: ${o.key}.`, "order");
+  S.backlog = S.backlog || [];
+  if (busy(S)) {
+    o.backlog = true; o.received = S.turn; S.backlog.push(o);
+    log(S, `New orders from Starfleet, to the backlog: ${o.title}${urgent ? " (urgent)" : ""}. They wait until an order under way is finished, or until you take them on (the Orders tab).`, "order");
+    return o;
+  }
+  activateOrder(S, o);
   return o;
 }
 const closestOutpost = (S, at) => Object.values(S.systems).filter((s) => s.kind === "klingon").sort((a, b) => distance(a.at, at) - distance(b.at, at))[0];
@@ -1519,17 +1565,19 @@ function completeArc(S, how, fresh) {
   const A = S.arc; A.stage = "done";
   const o = arcOrder(S);
   if (how === "leave") {
-    if (o) { S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; recordOrder(S, o, "partly", "Partly: the Orion phasers recovered and the Ketari left their history, but the scientists still asleep."); }
     S.science += 8;
     A.phasers = true;
     astory(S, "The Ketari's own history", "The away team has every Orion phaser back from the village, and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
     alog(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
+    if (o) { const how = "Partly: the Orion phasers recovered and the Ketari left their history, but the scientists still asleep."; S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; recordOrder(S, o, "partly", how); missionReport(S, o, "partly", how, ["+8 science", "+1 commendation"]); }
   } else {
-    if (o) completeOrder(S, o, true, (how === "reason" ? "The caretaker reasoned with: the scientists released, the Ketari still watched over" : "The caretaker shut down: the scientists awake and home") + "; the Orion phasers recovered.");
-    if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); }
-    else S.commendations += 1;
     astory(S, fresh ? (how === "reason" ? "Equals" : "Silence, for good") : "Orders carried out", fresh ? resolvedText(how) + (how === "reason" ? " The Ketari keep their guardian, and the Federation has a library record no one else has." : "") : `The phasers are back aboard, and the away team beams up. ${how === "reason" ? "The caretaker goes on watching, the Ketari keep their guardian, and the Federation has a library record no one else has." : "The ruins are only ruins now."} The eight scientists are in sickbay, and Rrinn hasn't left her sister's side.`);
     alog(S, `The Silence at Corvan II: the eight scientists are safe and the Orion phasers recovered.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
+    // The Mission Success report comes after the scene.
+    if (o) completeOrder(S, o, true, (how === "reason" ? "The caretaker reasoned with: the scientists released, the Ketari still watched over" : "The caretaker shut down: the scientists awake and home") + "; the Orion phasers recovered.");
+    const rep = [S.event].concat(S.eventQueue || []).find((e) => e && e.kind === "success" && e.orderId === (o && o.id));
+    if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); if (rep) rep.rewards.push("+4 more commendations and +15 science for a peaceful answer", "Library record: the caretaker of Corvan II"); }
+    else { S.commendations += 1; if (rep) rep.rewards.push("+1 more commendation"); }
   }
   if (!A.seen) markCommand(S, -1, "the Ketari never learned what the crew were.");
 }
@@ -1789,8 +1837,10 @@ function endTurn(S) {
   if (S.turn % 4 === 0) for (const s of sys) if (s.harm > 0 && !Object.values(S.enemies).some((e) => e.at === s.at && e.hostile)) { s.harm--; log(S, `${s.name} rebuilds: harm ${s.harm}/3.`, "good"); }
   if (S.turn % 6 === 0 && S.tension > 0) S.tension--;
   // New orders.
-  const active = S.orders.filter((o) => !o.arc).length;
-  if (S.turn >= 3 && active < 2 && (S.turn % 4 === 0 || active === 0 && S.turn % 2 === 0)) newOrder(S);
+  // Starfleet sends orders every four weeks (every two while there's nothing to do); with two under way, or urgent
+  // orders in hand, they wait in the backlog.
+  const active = S.orders.filter((o) => !o.arc).length, waiting = (S.backlog || []).length;
+  if (S.turn >= 3 && waiting < BACKLOG_MAX && (S.turn % 4 === 0 || active === 0 && !waiting && S.turn % 2 === 0)) newOrder(S);
   warpStrain(S);
   // Next turn.
   S.turn++;
@@ -2175,7 +2225,7 @@ function renderTabs() {
 }
 function renderPanel() {
   if (tab === "away" && !awayActive()) tab = "orders";
-  const html = { here: hereHTML, ship: shipHTML, crew: crewHTML, orders: ordersHTML, away: awayHTML, sector: sectorHTML, log: logHTML }[tab]();
+  const html = { here: hereHTML, ship: shipHTML, crew: crewHTML, orders: ordersHTML, mission: missionHTML, away: awayHTML, sector: sectorHTML, log: logHTML }[tab]();
   $("panel").innerHTML = html;
   if (tab === "log") $("panel").scrollTop = $("panel").scrollHeight;  // the latest entry
 }
@@ -2400,42 +2450,71 @@ function arcSteps() {
   return `<ol class="steps-list">${shown.map(([t, done, optional, i]) => `<li class="${done ? "done" : i === current ? "now" : ""}"><span>${done ? "✓" : i === current ? "▶" : "·"}<\/span>${esc(t)}<\/li>`).join("")}<\/ol>`
     + (current >= 0 && current < steps.length - 1 ? `<p class="small muted" style="margin:4px 0 0">Further steps are revealed as you go.<\/p>` : "");
 }
+/** A short line on an order's state, for the Orders tab and the Mission tab. */
+function orderStatus(o) {
+  const A = S.arc, left = o.deadline - S.turn;
+  if (o.arc) { const live = ["pull", "orions", "caretaker", "phasers"].includes(A.stage); return live && A.stage !== "phasers" && A.countdown >= COUNTDOWN - 2 ? ["Running out of time", "bad"] : A.stage === "travel" && left <= 2 ? ["Running out of time", "bad"] : ["In progress", "good"]; }
+  return left <= 1 ? ["Due this week", "bad"] : left <= 2 ? ["Running out of time", "bad"] : o.have ? ["Under way", "good"] : ["Not started", ""];
+}
+const courseRow = (o) => `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it<\/button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}<\/button><\/div>`;
+const urgentLine = (o) => (isUrgent(o) ? `<div class="small" style="margin-top:6px"><b class="bad">Urgent:<\/b> proceed at maximum emergency warp (warp ${maxWarp(S)}). The deadline assumes it; above warp 6 the engines strain.<\/div>` : "");
+/** The Orders tab: the tour, the orders under way (briefly), the backlog, and past orders. */
 function ordersHTML() {
   let h = hint() + `<h2>Orders<\/h2>`;
-  const A = S.arc, hist = S.history || [];
+  const hist = S.history || [], back = S.backlog || [];
   const doneN = hist.filter((x) => x.result !== "failed").length, failN = hist.filter((x) => x.result === "failed").length;
-  // The tour clock and the tally.
   h += `<div class="kv small" style="margin-bottom:10px"><span>Tour<\/span><span>${bar(Math.min(S.turn, TOUR), TOUR, "var(--gold)")} Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hourly(S) ? ` · hour ${(S.hour || 0) + 1} on Corvan II` : ""}<\/span>
-    <span>Orders<\/span><span><b>${S.orders.length}<\/b> active · <b class="good">${doneN}<\/b> carried out · <b class="bad">${failN}<\/b> failed<\/span><\/div>`;
-  if (awayActive()) h += `<div class="card small">The away team's work on Corvan II (who's down, the clues, its log) is on the <button class="btn small" data-tab-go="away">Away team<\/button> tab.<\/div>`;
-  if (!S.orders.length) h += `<p class="muted">No orders right now. Starfleet will send more; meanwhile, the sector is yours to patrol.<\/p>`;
+    <span>Orders<\/span><span><b>${S.orders.length}<\/b> under way · <b>${back.length}<\/b> in the backlog · <b class="good">${doneN}<\/b> carried out · <b class="bad">${failN}<\/b> failed<\/span><\/div>`;
+  h += `<h3>Under way<\/h3>`;
+  if (!S.orders.length) h += `<p class="muted small">No orders under way. ${back.length ? "Take one on from the backlog below." : "Starfleet will send more; meanwhile, the sector is yours to patrol."}<\/p>`;
   for (const o of S.orders) {
-    const left = o.deadline - S.turn, total = Math.max(1, o.deadline - (o.issued || 1));
+    const st = orderStatus(o), left = o.deadline - S.turn;
+    h += `<div class="card ${st[1] === "bad" ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}<\/span><\/h4>
+      <div class="small">${o.arc ? esc(o.text) : `${o.have} of ${o.segs} successes · ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})`}<\/div>${urgentLine(o)}
+      <div class="roll-row"><button class="btn small" data-tab-go="mission">Progress (Mission tab)<\/button><button class="btn small" data-center="${o.at}">Find it<\/button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}<\/button><\/div><\/div>`;
+  }
+  // The backlog.
+  h += `<h3>Backlog<\/h3>`;
+  if (!back.length) h += `<p class="small muted">Nothing waiting. With two orders under way, or urgent orders in hand, new orders from Starfleet wait here.<\/p>`;
+  else {
+    h += `<p class="small muted">Waiting their turn: the oldest moves up when an order under way is finished. Their clocks start when they do. You can take one on now, if you think the Pelion can manage more.<\/p>`;
+    for (const o of back) h += `<div class="card"><h4>${esc(o.title)}${isUrgent(o) ? ` <span class="badge-status bad">Urgent<\/span>` : ""}<\/h4><div class="small">Received turn ${o.received || o.issued} · ${o.segs} successes with ${esc(o.skills.join(", "))} · ${distance(S.pelion.at, o.at)} ly away${o.twist ? ` · Twist: ${esc(o.twist.text)}` : ""}<\/div>
+      <div class="roll-row"><button class="btn small" data-center="${o.at}">Find it<\/button><button class="btn small primary" data-accept="${o.id}">Take it on now<\/button><\/div><\/div>`;
+  }
+  // Past orders.
+  h += `<h3>Past orders<\/h3>` + (hist.length ? `<ul class="log">${hist.slice().reverse().map((x) => `<li class="${x.result === "failed" ? "bad" : x.result === "partly" ? "order" : "good"}"><b>${x.result === "failed" ? "✗ Failed" : x.result === "partly" ? "◐ Partly" : "✓ Carried out"}<\/b> · turn ${x.turn} · ${esc(x.title)}<br><span class="small">${esc(x.how)}<\/span><\/li>`).join("")}<\/ul>` : `<p class="small muted">None yet. Each order carried out clears a Starfleet Command box; each failure marks one.<\/p>`);
+  return h;
+}
+/** The Mission tab: how each order under way is progressing, step by step, with its clock and what counts as success. */
+function missionHTML() {
+  let h = hint() + `<h2>Mission<\/h2>`;
+  const A = S.arc;
+  if (awayActive()) h += `<div class="card small">The away team's work on Corvan II (who's down, the clues, its log) is on the <button class="btn small" data-tab-go="away">Away team<\/button> tab.<\/div>`;
+  if (!S.orders.length) h += `<p class="muted">No orders under way.${(S.backlog || []).length ? ` ${(S.backlog || []).length} waiting in the backlog (the Orders tab).` : ""}<\/p>`;
+  for (const o of S.orders) {
+    const left = o.deadline - S.turn, total = Math.max(1, o.deadline - (o.issued || 1)), st = orderStatus(o);
     if (o.arc) {
       const live = ["pull", "orions", "caretaker", "phasers"].includes(A.stage);
-      const status = live && A.countdown >= COUNTDOWN - 2 ? ["Running out of time", "bad"] : A.stage === "travel" && left <= 2 ? ["Running out of time", "bad"] : ["In progress", "good"];
-      h += `<div class="card gold"><h4>${esc(o.title)} <span class="badge-status ${status[1]}">${status[0]}<\/span><\/h4><p class="small">${esc(o.text)}<\/p>`;
+      h += `<div class="card gold"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}<\/span><\/h4><p class="small">${esc(o.text)}<\/p>`;
       h += `<div class="small"><b>A personal connection:<\/b> ${esc(o.personal)}<\/div>`;
       h += `<div class="kv small" style="margin-top:8px">` + (A.stage === "travel"
         ? `<span>Deadline<\/span><span>${boxes(Math.max(0, left), total, "gold")} reach Corvan II by turn ${o.deadline} (${left} week${left === 1 ? "" : "s"} left)<\/span>`
         : A.stage === "phasers" ? `<span>Countdown<\/span><span>Stopped: the drain on the ship has ended. One task left: the Orion phasers.<\/span>`
         : live ? `<span>Countdown<\/span><span>${boxes(A.countdown, COUNTDOWN)} ${COUNTDOWN - A.countdown} left: it fills every hour in orbit and with each failure below<\/span>`
         : `<span>Clock<\/span><span>No deadline in orbit: the Countdown starts when the ruins are swept.<\/span>`) + `<\/div>`;
-      h += `<h3>The mission<\/h3>` + arcSteps();
-      h += `<div class="small" style="margin-top:6px"><b class="good">Success:<\/b> find out what happened to the eight scientists and bring them home. <b class="bad">Failure:<\/b> ${A.stage === "travel" ? `not reaching Corvan II by turn ${o.deadline}` : live ? "the Countdown filling before the job is done" : "running out of time"}.<\/div>`;
+      h += `<h3>Progress<\/h3>` + arcSteps();
+      h += `<div class="small" style="margin-top:6px"><b class="good">Success:<\/b> find out what happened to the eight scientists, bring them home, and recover the Orion phasers. <b class="bad">Failure:<\/b> ${A.stage === "travel" ? `not reaching Corvan II by turn ${o.deadline}` : live ? "the Countdown filling before the job is done" : "running out of time"}.<\/div>`;
     } else {
-      const status = left <= 1 ? ["Due this week", "bad"] : left <= 2 ? ["Running out of time", "bad"] : o.have ? ["Under way", "good"] : ["Not started", ""];
-      h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${status[1]}">${status[0]}<\/span><\/h4>`;
+      const there = S.pelion.at === o.at;
+      h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}<\/span><\/h4>`;
+      h += `<ol class="steps-list"><li class="${there || o.have ? "done" : "now"}"><span>${there || o.have ? "✓" : "▶"}<\/span>Reach ${esc(o.sys ? S.systems[o.sys].name : "the border")} (${distance(S.pelion.at, o.at)} ly away)<\/li><li class="${o.have >= o.segs ? "done" : there || o.have ? "now" : ""}"><span>${o.have >= o.segs ? "✓" : there || o.have ? "▶" : "·"}<\/span>${o.segs} successes with ${esc(o.skills.join(", "))}: ${o.have} of ${o.segs}<\/li><\/ol>`;
       h += `<div class="kv small"><span>Progress<\/span><span>${boxes(o.have, o.segs, "blue")} ${o.have} of ${o.segs} successes<\/span>
         <span>Deadline<\/span><span>${boxes(Math.max(0, left), total, "gold")} ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})<\/span><\/div>`;
       h += `<div class="small" style="margin-top:6px"><b class="good">Success:<\/b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))} (−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}): +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? "" : ", and a Starfleet Command box cleared"}. <b class="bad">Failure:<\/b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.<\/div>`;
       h += `<div class="small muted" style="margin-top:4px">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.<\/div>`;
     }
-    if (isUrgent(o)) h += `<div class="small" style="margin-top:6px"><b class="bad">Urgent:<\/b> proceed at maximum emergency warp (warp ${maxWarp(S)}). The deadline assumes it; above warp 6 the engines strain.<\/div>`;
-    h += `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it<\/button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}<\/button><\/div><\/div>`;
+    h += urgentLine(o) + courseRow(o) + `<\/div>`;
   }
-  // Past orders.
-  h += `<h3>Past orders<\/h3>` + (hist.length ? `<ul class="log">${hist.slice().reverse().map((x) => `<li class="${x.result === "failed" ? "bad" : x.result === "partly" ? "order" : "good"}"><b>${x.result === "failed" ? "✗ Failed" : x.result === "partly" ? "◐ Partly" : "✓ Carried out"}<\/b> · turn ${x.turn} · ${esc(x.title)}<br><span class="small">${esc(x.how)}<\/span><\/li>`).join("")}<\/ul>` : `<p class="small muted">None yet. Each order carried out clears a Starfleet Command box; each failure marks one.<\/p>`);
   return h;
 }
 
@@ -2479,6 +2558,7 @@ function bindChrome() {
     if (b.dataset.beam) { const since = mark(); const ids = [...b.closest(".card").querySelectorAll("[data-away]:checked")].map((x) => x.dataset.away); const r = beamDown(S, ids); if (r.error) toast(r.error, true); else { mapMode = "surface"; reportSince("Energize", since); } after(); return; }
     if (b.dataset.beamup) { const since = mark(); beamDown(S, []); reportSince("Beam them up", since); after(); return; }
     if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }
+    if (b.dataset.accept) { const since = mark(); const r = acceptOrder(S, b.dataset.accept); if (r.error) toast(r.error, true); else reportSince("Orders taken on", since); after(); return; }
     if (b.dataset.go) { selHex = b.dataset.go; goTo(b.dataset.go, b.dataset.warpGo !== undefined ? +b.dataset.warpGo : undefined); return; }
     if (b.dataset.center) { centerOn(b.dataset.center); selHex = b.dataset.center; tab = "here"; renderAll(); return; }
     if (b.dataset.act) {
@@ -2571,7 +2651,19 @@ function showEvent() {
       <div class="grid2">${ch.map((c) => `<div class="brief"><h3>${esc(c.name)}<\/h3><p>${esc(c.blurb)}<\/p><div class="btn-row"><button class="btn ${c.id === "engage" ? "red" : "primary"} small" data-ev="${c.id}" ${c.disabled ? "disabled" : ""}>${esc(c.name)}<\/button><\/div><\/div>`).join("")}<\/div>`);
     return;
   }
+  if (ev.kind === "success") { modal(successHTML(ev)); return; }
   modal(`<h2>${esc(ev.title || "")}<\/h2><p style="white-space:pre-line">${esc(ev.text || "")}<\/p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue<\/button><\/div>`);
+}
+/** The Mission Success report. */
+function successHTML(ev) {
+  const part = ev.result === "partly";
+  const tasks = ev.arc ? arcSteps().replace(/<p class="small muted"[^]*$/, "") : `<ol class="steps-list">${ev.tasks.map((t) => `<li class="done"><span>✓<\/span>${esc(t)}<\/li>`).join("")}<\/ol>`;
+  return `<h2>${part ? "Mission partly successful" : "Mission success"}<\/h2><h3 style="margin-top:0">${esc(ev.title)}<\/h3>
+    <p class="small muted">Turn ${ev.turn} · ${ev.weeks} week${ev.weeks === 1 ? "" : "s"} from orders to done<\/p>
+    <h3>What was done<\/h3>${tasks}<p>${esc(ev.how)}<\/p>
+    <h3>Starfleet Command<\/h3><ul class="small">${ev.rewards.map((r) => `<li>${esc(r)}<\/li>`).join("")}<\/ul>
+    ${ev.next ? `<p class="small"><b>Up next, from the backlog:<\/b> ${esc(ev.next.join("; "))} (the Orders tab).<\/p>` : ""}
+    <div class="btn-row"><button class="btn primary" data-m="event-ok">Continue<\/button><\/div>`;
 }
 function showBattle() {
   const B = S.battle, e = S.enemies[B.enemy], E = e ? ENEMIES[e.type] : null, P = S.pelion, st = battleStats(S), sm = shieldsMax(S);

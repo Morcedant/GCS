@@ -2,7 +2,7 @@
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
-  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
+  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
 import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound, contestOdds } from "./arc.js";
@@ -317,7 +317,7 @@ function renderTabs() {
 }
 function renderPanel() {
   if (tab === "away" && !awayActive()) tab = "orders";
-  const html = { here: hereHTML, ship: shipHTML, crew: crewHTML, orders: ordersHTML, away: awayHTML, sector: sectorHTML, log: logHTML }[tab]();
+  const html = { here: hereHTML, ship: shipHTML, crew: crewHTML, orders: ordersHTML, mission: missionHTML, away: awayHTML, sector: sectorHTML, log: logHTML }[tab]();
   $("panel").innerHTML = html;
   if (tab === "log") $("panel").scrollTop = $("panel").scrollHeight;  // the latest entry
 }
@@ -542,42 +542,71 @@ function arcSteps() {
   return `<ol class="steps-list">${shown.map(([t, done, optional, i]) => `<li class="${done ? "done" : i === current ? "now" : ""}"><span>${done ? "✓" : i === current ? "▶" : "·"}</span>${esc(t)}</li>`).join("")}</ol>`
     + (current >= 0 && current < steps.length - 1 ? `<p class="small muted" style="margin:4px 0 0">Further steps are revealed as you go.</p>` : "");
 }
+/** A short line on an order's state, for the Orders tab and the Mission tab. */
+function orderStatus(o) {
+  const A = S.arc, left = o.deadline - S.turn;
+  if (o.arc) { const live = ["pull", "orions", "caretaker", "phasers"].includes(A.stage); return live && A.stage !== "phasers" && A.countdown >= COUNTDOWN - 2 ? ["Running out of time", "bad"] : A.stage === "travel" && left <= 2 ? ["Running out of time", "bad"] : ["In progress", "good"]; }
+  return left <= 1 ? ["Due this week", "bad"] : left <= 2 ? ["Running out of time", "bad"] : o.have ? ["Under way", "good"] : ["Not started", ""];
+}
+const courseRow = (o) => `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}</button></div>`;
+const urgentLine = (o) => (isUrgent(o) ? `<div class="small" style="margin-top:6px"><b class="bad">Urgent:</b> proceed at maximum emergency warp (warp ${maxWarp(S)}). The deadline assumes it; above warp 6 the engines strain.</div>` : "");
+/** The Orders tab: the tour, the orders under way (briefly), the backlog, and past orders. */
 function ordersHTML() {
   let h = hint() + `<h2>Orders</h2>`;
-  const A = S.arc, hist = S.history || [];
+  const hist = S.history || [], back = S.backlog || [];
   const doneN = hist.filter((x) => x.result !== "failed").length, failN = hist.filter((x) => x.result === "failed").length;
-  // The tour clock and the tally.
   h += `<div class="kv small" style="margin-bottom:10px"><span>Tour</span><span>${bar(Math.min(S.turn, TOUR), TOUR, "var(--gold)")} Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hourly(S) ? ` · hour ${(S.hour || 0) + 1} on Corvan II` : ""}</span>
-    <span>Orders</span><span><b>${S.orders.length}</b> active · <b class="good">${doneN}</b> carried out · <b class="bad">${failN}</b> failed</span></div>`;
-  if (awayActive()) h += `<div class="card small">The away team's work on Corvan II (who's down, the clues, its log) is on the <button class="btn small" data-tab-go="away">Away team</button> tab.</div>`;
-  if (!S.orders.length) h += `<p class="muted">No orders right now. Starfleet will send more; meanwhile, the sector is yours to patrol.</p>`;
+    <span>Orders</span><span><b>${S.orders.length}</b> under way · <b>${back.length}</b> in the backlog · <b class="good">${doneN}</b> carried out · <b class="bad">${failN}</b> failed</span></div>`;
+  h += `<h3>Under way</h3>`;
+  if (!S.orders.length) h += `<p class="muted small">No orders under way. ${back.length ? "Take one on from the backlog below." : "Starfleet will send more; meanwhile, the sector is yours to patrol."}</p>`;
   for (const o of S.orders) {
-    const left = o.deadline - S.turn, total = Math.max(1, o.deadline - (o.issued || 1));
+    const st = orderStatus(o), left = o.deadline - S.turn;
+    h += `<div class="card ${st[1] === "bad" ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}</span></h4>
+      <div class="small">${o.arc ? esc(o.text) : `${o.have} of ${o.segs} successes · ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})`}</div>${urgentLine(o)}
+      <div class="roll-row"><button class="btn small" data-tab-go="mission">Progress (Mission tab)</button><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}</button></div></div>`;
+  }
+  // The backlog.
+  h += `<h3>Backlog</h3>`;
+  if (!back.length) h += `<p class="small muted">Nothing waiting. With two orders under way, or urgent orders in hand, new orders from Starfleet wait here.</p>`;
+  else {
+    h += `<p class="small muted">Waiting their turn: the oldest moves up when an order under way is finished. Their clocks start when they do. You can take one on now, if you think the Pelion can manage more.</p>`;
+    for (const o of back) h += `<div class="card"><h4>${esc(o.title)}${isUrgent(o) ? ` <span class="badge-status bad">Urgent</span>` : ""}</h4><div class="small">Received turn ${o.received || o.issued} · ${o.segs} successes with ${esc(o.skills.join(", "))} · ${distance(S.pelion.at, o.at)} ly away${o.twist ? ` · Twist: ${esc(o.twist.text)}` : ""}</div>
+      <div class="roll-row"><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-accept="${o.id}">Take it on now</button></div></div>`;
+  }
+  // Past orders.
+  h += `<h3>Past orders</h3>` + (hist.length ? `<ul class="log">${hist.slice().reverse().map((x) => `<li class="${x.result === "failed" ? "bad" : x.result === "partly" ? "order" : "good"}"><b>${x.result === "failed" ? "✗ Failed" : x.result === "partly" ? "◐ Partly" : "✓ Carried out"}</b> · turn ${x.turn} · ${esc(x.title)}<br><span class="small">${esc(x.how)}</span></li>`).join("")}</ul>` : `<p class="small muted">None yet. Each order carried out clears a Starfleet Command box; each failure marks one.</p>`);
+  return h;
+}
+/** The Mission tab: how each order under way is progressing, step by step, with its clock and what counts as success. */
+function missionHTML() {
+  let h = hint() + `<h2>Mission</h2>`;
+  const A = S.arc;
+  if (awayActive()) h += `<div class="card small">The away team's work on Corvan II (who's down, the clues, its log) is on the <button class="btn small" data-tab-go="away">Away team</button> tab.</div>`;
+  if (!S.orders.length) h += `<p class="muted">No orders under way.${(S.backlog || []).length ? ` ${(S.backlog || []).length} waiting in the backlog (the Orders tab).` : ""}</p>`;
+  for (const o of S.orders) {
+    const left = o.deadline - S.turn, total = Math.max(1, o.deadline - (o.issued || 1)), st = orderStatus(o);
     if (o.arc) {
       const live = ["pull", "orions", "caretaker", "phasers"].includes(A.stage);
-      const status = live && A.countdown >= COUNTDOWN - 2 ? ["Running out of time", "bad"] : A.stage === "travel" && left <= 2 ? ["Running out of time", "bad"] : ["In progress", "good"];
-      h += `<div class="card gold"><h4>${esc(o.title)} <span class="badge-status ${status[1]}">${status[0]}</span></h4><p class="small">${esc(o.text)}</p>`;
+      h += `<div class="card gold"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}</span></h4><p class="small">${esc(o.text)}</p>`;
       h += `<div class="small"><b>A personal connection:</b> ${esc(o.personal)}</div>`;
       h += `<div class="kv small" style="margin-top:8px">` + (A.stage === "travel"
         ? `<span>Deadline</span><span>${boxes(Math.max(0, left), total, "gold")} reach Corvan II by turn ${o.deadline} (${left} week${left === 1 ? "" : "s"} left)</span>`
         : A.stage === "phasers" ? `<span>Countdown</span><span>Stopped: the drain on the ship has ended. One task left: the Orion phasers.</span>`
         : live ? `<span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} ${COUNTDOWN - A.countdown} left: it fills every hour in orbit and with each failure below</span>`
         : `<span>Clock</span><span>No deadline in orbit: the Countdown starts when the ruins are swept.</span>`) + `</div>`;
-      h += `<h3>The mission</h3>` + arcSteps();
-      h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> find out what happened to the eight scientists and bring them home. <b class="bad">Failure:</b> ${A.stage === "travel" ? `not reaching Corvan II by turn ${o.deadline}` : live ? "the Countdown filling before the job is done" : "running out of time"}.</div>`;
+      h += `<h3>Progress</h3>` + arcSteps();
+      h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> find out what happened to the eight scientists, bring them home, and recover the Orion phasers. <b class="bad">Failure:</b> ${A.stage === "travel" ? `not reaching Corvan II by turn ${o.deadline}` : live ? "the Countdown filling before the job is done" : "running out of time"}.</div>`;
     } else {
-      const status = left <= 1 ? ["Due this week", "bad"] : left <= 2 ? ["Running out of time", "bad"] : o.have ? ["Under way", "good"] : ["Not started", ""];
-      h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${status[1]}">${status[0]}</span></h4>`;
+      const there = S.pelion.at === o.at;
+      h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}</span></h4>`;
+      h += `<ol class="steps-list"><li class="${there || o.have ? "done" : "now"}"><span>${there || o.have ? "✓" : "▶"}</span>Reach ${esc(o.sys ? S.systems[o.sys].name : "the border")} (${distance(S.pelion.at, o.at)} ly away)</li><li class="${o.have >= o.segs ? "done" : there || o.have ? "now" : ""}"><span>${o.have >= o.segs ? "✓" : there || o.have ? "▶" : "·"}</span>${o.segs} successes with ${esc(o.skills.join(", "))}: ${o.have} of ${o.segs}</li></ol>`;
       h += `<div class="kv small"><span>Progress</span><span>${boxes(o.have, o.segs, "blue")} ${o.have} of ${o.segs} successes</span>
         <span>Deadline</span><span>${boxes(Math.max(0, left), total, "gold")} ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})</span></div>`;
       h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))} (−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}): +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? "" : ", and a Starfleet Command box cleared"}. <b class="bad">Failure:</b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.</div>`;
       h += `<div class="small muted" style="margin-top:4px">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.</div>`;
     }
-    if (isUrgent(o)) h += `<div class="small" style="margin-top:6px"><b class="bad">Urgent:</b> proceed at maximum emergency warp (warp ${maxWarp(S)}). The deadline assumes it; above warp 6 the engines strain.</div>`;
-    h += `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}</button></div></div>`;
+    h += urgentLine(o) + courseRow(o) + `</div>`;
   }
-  // Past orders.
-  h += `<h3>Past orders</h3>` + (hist.length ? `<ul class="log">${hist.slice().reverse().map((x) => `<li class="${x.result === "failed" ? "bad" : x.result === "partly" ? "order" : "good"}"><b>${x.result === "failed" ? "✗ Failed" : x.result === "partly" ? "◐ Partly" : "✓ Carried out"}</b> · turn ${x.turn} · ${esc(x.title)}<br><span class="small">${esc(x.how)}</span></li>`).join("")}</ul>` : `<p class="small muted">None yet. Each order carried out clears a Starfleet Command box; each failure marks one.</p>`);
   return h;
 }
 
@@ -621,6 +650,7 @@ function bindChrome() {
     if (b.dataset.beam) { const since = mark(); const ids = [...b.closest(".card").querySelectorAll("[data-away]:checked")].map((x) => x.dataset.away); const r = beamDown(S, ids); if (r.error) toast(r.error, true); else { mapMode = "surface"; reportSince("Energize", since); } after(); return; }
     if (b.dataset.beamup) { const since = mark(); beamDown(S, []); reportSince("Beam them up", since); after(); return; }
     if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }
+    if (b.dataset.accept) { const since = mark(); const r = acceptOrder(S, b.dataset.accept); if (r.error) toast(r.error, true); else reportSince("Orders taken on", since); after(); return; }
     if (b.dataset.go) { selHex = b.dataset.go; goTo(b.dataset.go, b.dataset.warpGo !== undefined ? +b.dataset.warpGo : undefined); return; }
     if (b.dataset.center) { centerOn(b.dataset.center); selHex = b.dataset.center; tab = "here"; renderAll(); return; }
     if (b.dataset.act) {
@@ -713,7 +743,19 @@ function showEvent() {
       <div class="grid2">${ch.map((c) => `<div class="brief"><h3>${esc(c.name)}</h3><p>${esc(c.blurb)}</p><div class="btn-row"><button class="btn ${c.id === "engage" ? "red" : "primary"} small" data-ev="${c.id}" ${c.disabled ? "disabled" : ""}>${esc(c.name)}</button></div></div>`).join("")}</div>`);
     return;
   }
+  if (ev.kind === "success") { modal(successHTML(ev)); return; }
   modal(`<h2>${esc(ev.title || "")}</h2><p style="white-space:pre-line">${esc(ev.text || "")}</p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue</button></div>`);
+}
+/** The Mission Success report. */
+function successHTML(ev) {
+  const part = ev.result === "partly";
+  const tasks = ev.arc ? arcSteps().replace(/<p class="small muted"[^]*$/, "") : `<ol class="steps-list">${ev.tasks.map((t) => `<li class="done"><span>✓</span>${esc(t)}</li>`).join("")}</ol>`;
+  return `<h2>${part ? "Mission partly successful" : "Mission success"}</h2><h3 style="margin-top:0">${esc(ev.title)}</h3>
+    <p class="small muted">Turn ${ev.turn} · ${ev.weeks} week${ev.weeks === 1 ? "" : "s"} from orders to done</p>
+    <h3>What was done</h3>${tasks}<p>${esc(ev.how)}</p>
+    <h3>Starfleet Command</h3><ul class="small">${ev.rewards.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
+    ${ev.next ? `<p class="small"><b>Up next, from the backlog:</b> ${esc(ev.next.join("; "))} (the Orders tab).</p>` : ""}
+    <div class="btn-row"><button class="btn primary" data-m="event-ok">Continue</button></div>`;
 }
 function showBattle() {
   const B = S.battle, e = S.enemies[B.enemy], E = e ? ENEMIES[e.type] : null, P = S.pelion, st = battleStats(S), sm = shieldsMax(S);

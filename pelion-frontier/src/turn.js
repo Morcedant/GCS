@@ -2,7 +2,7 @@
 // Also the one place that ties the modules together, so the page imports this.
 import { CREW, SUPPORT, ENEMIES } from "./data.js";
 import { distance, within } from "./hex.js";
-import { hourly, check, target, CRUISE_WARP, daysPerLy, maxWarp, syncMp, isUrgent, available, log, storyEvent, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
+import { hourly, BACKLOG_MAX, check, target, CRUISE_WARP, daysPerLy, maxWarp, syncMp, isUrgent, available, log, storyEvent, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
 import { startBattle, endBattle } from "./combat.js";
 import { aiTurn, claim } from "./ai.js";
 import { arcTurn, arcTick, arcEventChoose } from "./arc.js";
@@ -48,8 +48,10 @@ export function endTurn(S) {
   if (S.turn % 4 === 0) for (const s of sys) if (s.harm > 0 && !Object.values(S.enemies).some((e) => e.at === s.at && e.hostile)) { s.harm--; log(S, `${s.name} rebuilds: harm ${s.harm}/3.`, "good"); }
   if (S.turn % 6 === 0 && S.tension > 0) S.tension--;
   // New orders.
-  const active = S.orders.filter((o) => !o.arc).length;
-  if (S.turn >= 3 && active < 2 && (S.turn % 4 === 0 || active === 0 && S.turn % 2 === 0)) newOrder(S);
+  // Starfleet sends orders every four weeks (every two while there's nothing to do); with two under way, or urgent
+  // orders in hand, they wait in the backlog.
+  const active = S.orders.filter((o) => !o.arc).length, waiting = (S.backlog || []).length;
+  if (S.turn >= 3 && waiting < BACKLOG_MAX && (S.turn % 4 === 0 || active === 0 && !waiting && S.turn % 2 === 0)) newOrder(S);
   warpStrain(S);
   // Next turn.
   S.turn++;
