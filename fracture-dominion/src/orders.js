@@ -3,7 +3,8 @@
 // wait in a backlog, and the oldest moves up when one is finished (its clock starts then). Every directive's progress is
 // measured from the moment it starts, so it asks for something new: one more colony, three more systems charted.
 import { TECHS, BUILDINGS } from "./data.js";
-import { player, coloniesOf, availableTechs, log, militaryPower } from "./game.js";
+import { player, faction, coloniesOf, availableTechs, log, militaryPower } from "./game.js";
+import { distance } from "./hex.js";
 
 export const ACTIVE_MAX = 2, BACKLOG_MAX = 3, EVERY = 5;
 
@@ -30,9 +31,9 @@ export const AUTHORITY = {
   vael: { name: "the Flotilla Choir", kinds: ["explore", "explore", "contact", "ships", "research", "outpost"] },
 };
 export const authorityOf = (s) => AUTHORITY[player(s).id] || { name: "your council", kinds: Object.keys(KINDS) };
-/** How far along the player is on a measure, right now. */
-function measure(s, d) {
-  const F = player(s), cols = coloniesOf(s, F.id);
+/** How far along a faction (the player, unless named) is on a directive's measure, right now. */
+function measure(s, d, fid) {
+  const F = fid ? faction(s, fid) : player(s), cols = coloniesOf(s, F.id);
   switch (d.kind) {
     case "colony": return cols.filter((x) => x.colony.kind === "colony").length;
     case "outpost": return cols.filter((x) => x.colony.kind === "outpost").length;
@@ -50,6 +51,32 @@ function measure(s, d) {
   return 0;
 }
 export const progress = (s, d) => Math.max(0, Math.min(d.need, measure(s, d) - d.base));
+// ---------- opposition ----------
+// Every directive is a race: a rival power (the nearest to your capital) is after the same thing, measured the same way
+// from the same turn. They need a little more than you do; if they get there first, the directive is lost.
+const rivalNeed = (d) => (d.kind === "research" ? 1 : d.need === 1 ? 2 : Math.ceil(d.need * 1.5));
+export function opposition(s, d) {
+  if (!d.rival) return null;
+  const R = faction(s, d.rival); if (!R) return null;
+  const p = R.alive ? Math.max(0, Math.min(d.rivalNeed, measure(s, d, R.id) - d.rivalBase)) : 0;
+  return { id: R.id, name: player(s).met[R.id] ? R.name : "An unmet rival", known: !!player(s).met[R.id], alive: R.alive, progress: p, need: d.rivalNeed,
+    why: OPP_WHY[d.kind] || "They want the same thing, and they're working at it." };
+}
+const OPP_WHY = {
+  colony: "They're settling the same frontier: every good world they take is one you can't.",
+  outpost: "They're claiming the same empty systems.", explore: "Their scouts are charting the same space.",
+  ships: "They're building up their own yards.", research: "Their scientists are chasing the same breakthrough.",
+  building: "They're building up their own worlds.", contact: "They're reaching out to the same powers.",
+  growth: "Their worlds are growing too.", trade: "They're courting the same trading partners.",
+  treasury: "Their treasury is growing too, and markets follow the richer power.", fleet: "They're arming as fast as you are.",
+  conquest: "They're on the march as well.",
+};
+function pickRival(s) {
+  const F = player(s), home = s.systems[F.capital];
+  const rivals = s.factions.filter((x) => x.id !== F.id && x.alive).map((x) => ({ x, d: home && s.systems[x.capital] ? distance(home.at, s.systems[x.capital].at) : 99 }));
+  rivals.sort((a, b) => a.d - b.d);
+  return rivals[0] && rivals[0].x.id;
+}
 export const kindOf = (d) => KINDS[d.kind];
 export const howText = (d) => { const h = KINDS[d.kind].how; return typeof h === "function" ? h(d) : h; };
 
@@ -87,7 +114,8 @@ export function issue(s) {
 }
 function start(s, d, why) {
   const D = s.directives;
-  d.base = measure(s, d); d.issued = s.turn; d.deadline = s.turn + KINDS[d.kind].turns; d.reward = KINDS[d.kind].reward;
+  d.base = measure(s, d); d.issued = s.turn;
+  d.rival = pickRival(s); if (d.rival) { d.rivalBase = measure(s, d, d.rival); d.rivalNeed = rivalNeed(d); } d.deadline = s.turn + KINDS[d.kind].turns; d.reward = KINDS[d.kind].reward;
   D.active.push(d);
   log(s, player(s).id, `${why}: ${d.title}, by turn ${d.deadline}, for ${d.reward} credits.`, "turn");
 }
@@ -112,15 +140,26 @@ export function checkDirectives(s) {
     F.credits += d.reward;
     D.history.push({ title: d.title, result: "done", turn: s.turn });
     log(s, F.id, `Mission success: ${d.title}. ${cap(d.from || authorityOf(s).name)} pays ${d.reward} credits.`, "victory");
-    const rep = { title: d.title, from: d.from || authorityOf(s).name, kind: d.kind, how: howText(d), need: d.need, turns: Math.max(1, s.turn - d.issued + 1), turn: s.turn, rewards: [`+${d.reward} credits`] };
+    const op = opposition(s, d);
+    const rep = { result: "done", title: d.title, from: d.from || authorityOf(s).name, kind: d.kind, how: howText(d), need: d.need, turns: Math.max(1, s.turn - d.issued + 1), turn: s.turn, rewards: [`+${d.reward} credits`],
+      beat: op ? `${op.name} had ${op.progress} of the ${op.need} they needed.` : null };
     D.reports.push(rep);
     const next = fill(s); if (next.length) rep.next = next;
   }
 }
-/** End of turn: check, then deadlines, then the council's next directive. */
+/** End of turn: check, then the opposition, then deadlines, then the council's next directive. */
 export function directivesTurn(s) {
   const D = ensureDirectives(s), F = player(s);
   checkDirectives(s);
+  for (const d of [...D.active]) {
+    const op = opposition(s, d);
+    if (!op || !op.alive || op.progress < op.need) continue;
+    D.active = D.active.filter((x) => x !== d);
+    D.history.push({ title: d.title, result: "beaten", turn: s.turn, by: op.name });
+    log(s, F.id, `Directive lost: ${op.name} got there first (${d.title}). ${cap(d.from || authorityOf(s).name)} takes note.`, "turn");
+    D.reports.push({ result: "beaten", title: d.title, from: d.from || authorityOf(s).name, turn: s.turn, turns: Math.max(1, s.turn - d.issued + 1), by: op.name, progress: progress(s, d), need: d.need, rivalNeed: op.need, rewards: [] });
+    const next = fill(s); if (next.length) D.reports[D.reports.length - 1].next = next;
+  }
   for (const d of [...D.active]) if (s.turn > d.deadline) {
     D.active = D.active.filter((x) => x !== d);
     D.history.push({ title: d.title, result: "failed", turn: s.turn });

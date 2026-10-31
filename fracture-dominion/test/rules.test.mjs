@@ -117,3 +117,14 @@ test("directives: from the player's own faction, two under way, a backlog, and a
   assert.ok(D.history.length >= 1);
   if (D.backlog.length) assert.ok(acceptDirective(s, D.backlog[0].id).ok);
 });
+test("directives have opposition: the nearest rival races for the same thing, and can win it", async () => {
+  const { ensureDirectives, directivesTurn, opposition } = await import("../src/orders.js");
+  const s = newGame({ seed: 9, player: "concord", rivals: 2 });
+  const D = ensureDirectives(s), d = D.active[0], op = opposition(s, d);
+  assert.ok(op && op.need >= d.need && op.progress === 0);
+  assert.ok(s.factions.some((f) => f.id === op.id && f.id !== "concord"));
+  d.rivalBase -= 999; directivesTurn(s);                       // the rival gets there first
+  assert.ok(!D.active.includes(d));
+  assert.equal(D.history.at(-1).result, "beaten");
+  assert.equal(D.reports.at(-1).result, "beaten");
+});

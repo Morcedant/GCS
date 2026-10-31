@@ -889,6 +889,7 @@ function checkVictory(s) {
 // measured from the moment it starts, so it asks for something new: one more colony, three more systems charted.
 
 
+
 const ACTIVE_MAX = 2, BACKLOG_MAX = 3, EVERY = 5;
 
 const KINDS = {
@@ -914,9 +915,9 @@ const AUTHORITY = {
   vael: { name: "the Flotilla Choir", kinds: ["explore", "explore", "contact", "ships", "research", "outpost"] },
 };
 const authorityOf = (s) => AUTHORITY[player(s).id] || { name: "your council", kinds: Object.keys(KINDS) };
-/** How far along the player is on a measure, right now. */
-function measure(s, d) {
-  const F = player(s), cols = coloniesOf(s, F.id);
+/** How far along a faction (the player, unless named) is on a directive's measure, right now. */
+function measure(s, d, fid) {
+  const F = fid ? faction(s, fid) : player(s), cols = coloniesOf(s, F.id);
   switch (d.kind) {
     case "colony": return cols.filter((x) => x.colony.kind === "colony").length;
     case "outpost": return cols.filter((x) => x.colony.kind === "outpost").length;
@@ -934,6 +935,32 @@ function measure(s, d) {
   return 0;
 }
 const progress = (s, d) => Math.max(0, Math.min(d.need, measure(s, d) - d.base));
+// ---------- opposition ----------
+// Every directive is a race: a rival power (the nearest to your capital) is after the same thing, measured the same way
+// from the same turn. They need a little more than you do; if they get there first, the directive is lost.
+const rivalNeed = (d) => (d.kind === "research" ? 1 : d.need === 1 ? 2 : Math.ceil(d.need * 1.5));
+function opposition(s, d) {
+  if (!d.rival) return null;
+  const R = faction(s, d.rival); if (!R) return null;
+  const p = R.alive ? Math.max(0, Math.min(d.rivalNeed, measure(s, d, R.id) - d.rivalBase)) : 0;
+  return { id: R.id, name: player(s).met[R.id] ? R.name : "An unmet rival", known: !!player(s).met[R.id], alive: R.alive, progress: p, need: d.rivalNeed,
+    why: OPP_WHY[d.kind] || "They want the same thing, and they're working at it." };
+}
+const OPP_WHY = {
+  colony: "They're settling the same frontier: every good world they take is one you can't.",
+  outpost: "They're claiming the same empty systems.", explore: "Their scouts are charting the same space.",
+  ships: "They're building up their own yards.", research: "Their scientists are chasing the same breakthrough.",
+  building: "They're building up their own worlds.", contact: "They're reaching out to the same powers.",
+  growth: "Their worlds are growing too.", trade: "They're courting the same trading partners.",
+  treasury: "Their treasury is growing too, and markets follow the richer power.", fleet: "They're arming as fast as you are.",
+  conquest: "They're on the march as well.",
+};
+function pickRival(s) {
+  const F = player(s), home = s.systems[F.capital];
+  const rivals = s.factions.filter((x) => x.id !== F.id && x.alive).map((x) => ({ x, d: home && s.systems[x.capital] ? distance(home.at, s.systems[x.capital].at) : 99 }));
+  rivals.sort((a, b) => a.d - b.d);
+  return rivals[0] && rivals[0].x.id;
+}
 const kindOf = (d) => KINDS[d.kind];
 const howText = (d) => { const h = KINDS[d.kind].how; return typeof h === "function" ? h(d) : h; };
 
@@ -971,7 +998,8 @@ function issue(s) {
 }
 function start(s, d, why) {
   const D = s.directives;
-  d.base = measure(s, d); d.issued = s.turn; d.deadline = s.turn + KINDS[d.kind].turns; d.reward = KINDS[d.kind].reward;
+  d.base = measure(s, d); d.issued = s.turn;
+  d.rival = pickRival(s); if (d.rival) { d.rivalBase = measure(s, d, d.rival); d.rivalNeed = rivalNeed(d); } d.deadline = s.turn + KINDS[d.kind].turns; d.reward = KINDS[d.kind].reward;
   D.active.push(d);
   log(s, player(s).id, `${why}: ${d.title}, by turn ${d.deadline}, for ${d.reward} credits.`, "turn");
 }
@@ -996,15 +1024,26 @@ function checkDirectives(s) {
     F.credits += d.reward;
     D.history.push({ title: d.title, result: "done", turn: s.turn });
     log(s, F.id, `Mission success: ${d.title}. ${cap(d.from || authorityOf(s).name)} pays ${d.reward} credits.`, "victory");
-    const rep = { title: d.title, from: d.from || authorityOf(s).name, kind: d.kind, how: howText(d), need: d.need, turns: Math.max(1, s.turn - d.issued + 1), turn: s.turn, rewards: [`+${d.reward} credits`] };
+    const op = opposition(s, d);
+    const rep = { result: "done", title: d.title, from: d.from || authorityOf(s).name, kind: d.kind, how: howText(d), need: d.need, turns: Math.max(1, s.turn - d.issued + 1), turn: s.turn, rewards: [`+${d.reward} credits`],
+      beat: op ? `${op.name} had ${op.progress} of the ${op.need} they needed.` : null };
     D.reports.push(rep);
     const next = fill(s); if (next.length) rep.next = next;
   }
 }
-/** End of turn: check, then deadlines, then the council's next directive. */
+/** End of turn: check, then the opposition, then deadlines, then the council's next directive. */
 function directivesTurn(s) {
   const D = ensureDirectives(s), F = player(s);
   checkDirectives(s);
+  for (const d of [...D.active]) {
+    const op = opposition(s, d);
+    if (!op || !op.alive || op.progress < op.need) continue;
+    D.active = D.active.filter((x) => x !== d);
+    D.history.push({ title: d.title, result: "beaten", turn: s.turn, by: op.name });
+    log(s, F.id, `Directive lost: ${op.name} got there first (${d.title}). ${cap(d.from || authorityOf(s).name)} takes note.`, "turn");
+    D.reports.push({ result: "beaten", title: d.title, from: d.from || authorityOf(s).name, turn: s.turn, turns: Math.max(1, s.turn - d.issued + 1), by: op.name, progress: progress(s, d), need: d.need, rivalNeed: op.need, rewards: [] });
+    const next = fill(s); if (next.length) D.reports[D.reports.length - 1].next = next;
+  }
   for (const d of [...D.active]) if (s.turn > d.deadline) {
     D.active = D.active.filter((x) => x !== d);
     D.history.push({ title: d.title, result: "failed", turn: s.turn });
@@ -1565,8 +1604,9 @@ function missionHTML() {
       <ol class="steps-list">${stepLi(p >= d.need ? "done" : "now", `${esc(d.title)}: ${p} of ${d.need}`)}${stepLi(p >= d.need ? "now" : "", `Report to ${esc(d.from || A.name)}: ${d.reward} credits`)}<\/ol>
       <div class="kv small"><span>Progress<\/span><span>${ibar(p, d.need, "var(--accent)")} ${p} of ${d.need}<\/span>
       <span>Deadline<\/span><span>${ibar(Math.max(0, left), total, "var(--gold)")} turn ${d.deadline} (${left} turn${left === 1 ? "" : "s"} left)<\/span><\/div>
+      ${(() => { const op = opposition(S, d); return op ? `<div class="kv small" style="margin-top:6px"><span class="bad">Opposition<\/span><span>${ibar(op.progress, op.need, "var(--bad)")} ${esc(op.name)}: ${op.progress} of ${op.need}${op.alive ? "" : " (fallen)"}<\/span><\/div><p class="small"><b class="bad">Racing you:<\/b> ${esc(op.why)} If they reach ${op.need} before you reach ${d.need}, the directive is lost.<\/p>` : ""; })()}
       <p class="small" style="margin-top:6px"><b>How:<\/b> ${esc(howText(d))}<\/p>
-      <p class="small"><b class="good">Success:<\/b> +${d.reward} credits. <b class="bad">Failure:<\/b> not done by turn ${d.deadline}; ${esc(d.from || A.name)} takes note.<\/p><\/div>`;
+      <p class="small"><b class="good">Success:<\/b> +${d.reward} credits. <b class="bad">Failure:<\/b> not done by turn ${d.deadline}, or the opposition gets there first; ${esc(d.from || A.name)} takes note.<\/p><\/div>`;
   }
   h += `<h3>Backlog<\/h3>`;
   if (!D.backlog.length) h += `<p class="small muted">Nothing waiting. With ${ACTIVE_MAX} directives under way, new ones wait here.<\/p>`;
@@ -1574,15 +1614,24 @@ function missionHTML() {
     h += `<p class="small muted">Waiting their turn: the oldest moves up when a directive under way is finished, and its clock starts then. Or take one on now.<\/p>`;
     for (const d of D.backlog) h += `<div class="card"><h4>${esc(d.title)}<\/h4><div class="small">Received turn ${d.received} · ${esc(howText(d))}<\/div><div class="btn-row"><button class="btn small primary" data-accept="${d.id}">Take it on now<\/button><\/div><\/div>`;
   }
-  h += `<h3>Past directives<\/h3>` + (D.history.length ? `<ul class="log">${D.history.slice().reverse().map((x) => `<li class="${x.result === "failed" ? "bad" : "good"}"><b>${x.result === "failed" ? "✗ Not done" : "✓ Done"}<\/b> · turn ${x.turn} · ${esc(x.title)}<\/li>`).join("")}<\/ul>` : `<p class="small muted">None yet.<\/p>`);
+  h += `<h3>Past directives<\/h3>` + (D.history.length ? `<ul class="log">${D.history.slice().reverse().map((x) => `<li class="${x.result === "done" ? "good" : "bad"}"><b>${x.result === "failed" ? "✗ Not done" : x.result === "beaten" ? `✗ Beaten by ${esc(x.by)}` : "✓ Done"}<\/b> · turn ${x.turn} · ${esc(x.title)}<\/li>`).join("")}<\/ul>` : `<p class="small muted">None yet.<\/p>`);
   return h;
 }
 /** Mission Success reports, one after another, after whatever report is showing. */
 function showNextMission() {
   const D = S && S.directives; if (!D || !D.reports.length) return false;
   const r = D.reports[0];
+  if (r.result === "beaten") {
+    modal(`<h2>Directive lost<\/h2><h3 style="margin-top:0">${esc(r.title)}<\/h3><p class="small muted">Turn ${r.turn} · for ${esc(r.from)}<\/p>
+      <p>${esc(r.by)} got there first: ${r.rivalNeed} of ${r.rivalNeed}, while you had ${r.progress} of ${r.need}. ${esc(r.from[0].toUpperCase() + r.from.slice(1))} takes note.<\/p>
+      ${r.next ? `<p class="small"><b>Up next, from the backlog:<\/b> ${esc(r.next.join("; "))} (the Mission tab).<\/p>` : ""}
+      <div class="btn-row"><button class="btn primary" id="mission-ok">Continue<\/button><\/div>`);
+    $("mission-ok").onclick = () => { D.reports.shift(); closeModal(); save(); renderAll(); showNextMission(); };
+    return true;
+  }
   modal(`<h2>Mission success<\/h2><h3 style="margin-top:0">${esc(r.title)}<\/h3><p class="small muted">Turn ${r.turn} · ${r.turns} turn${r.turns === 1 ? "" : "s"} from directive to done · for ${esc(r.from)}<\/p>
     <h3>What was done<\/h3><ol class="steps-list">${stepLi("done", esc(r.title))}${stepLi("done", `Reported to ${esc(r.from)}`)}<\/ol>
+    ${r.beat ? `<p class="small"><b>Against the opposition:<\/b> you got there first. ${esc(r.beat)}<\/p>` : ""}
     <h3>Reward<\/h3><ul class="small">${r.rewards.map((x) => `<li>${esc(x)}<\/li>`).join("")}<\/ul>
     ${r.next ? `<p class="small"><b>Up next, from the backlog:<\/b> ${esc(r.next.join("; "))} (the Mission tab).<\/p>` : ""}
     <div class="btn-row"><button class="btn primary" id="mission-ok">Continue<\/button><\/div>`);
