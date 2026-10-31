@@ -39,7 +39,8 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
   S.orders.push({ id: "o1", arc: true, title: "The Silence at Corvan II", at: cv.at, sys: cv.id, skills: [], segs: 0, have: 0, deadline: 12,
     text: "The Federation research outpost on Corvan II, eight archaeologists studying the ruins of an extinct civilization, has missed three check-ins. Corvan II has a native people, the Ketari, at a bronze-age level: the outpost works under the Prime Directive. An Orion raider was reported in the sector last week.",
     twist: null, strange: "An ancient machine that still works", key: "Rrinn's sister, on the outpost's supply run" });
-  spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at });
+  // The raider holds station on the far side of Corvan II's moon: passive sensors won't see it; an active sweep will.
+  spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at, hidden: true });
   const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");
   spawnEnemy(S, "orionBase", ob.at, { goal: "base", hostile: true, found: false });
   log(S, "Orders from Starfleet Command: the research outpost on Corvan II has gone silent. Investigate.", "order");
@@ -162,8 +163,11 @@ export function reachable(S, unit = "pelion") {
   }
   return out;
 }
+/** While an away team is on Corvan II's surface, turns are hours, and the Pelion stays in orbit. */
+export const hourly = (S) => !!(S.arc.team && ["pull", "orions", "caretaker"].includes(S.arc.stage) && S.pelion.at === S.systems[S.corvan].at);
 export function moveTo(S, unit, hex) {
   if (S.over || S.battle || S.event) return { error: "Finish what's in front of you first." };
+  if (unit === "pelion" && hourly(S)) return { error: "The away team is on the surface. Beam them up before leaving orbit." };
   const U = unit === "pelion" ? S.pelion : S.support[unit];
   const r = reachable(S, unit);
   if (r[hex] === undefined) return { error: "Too far for this turn." };
@@ -184,7 +188,7 @@ function arrive(S, hex) {
   if (s) {
     const known = KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost"].includes(s.kind);
     const what = { member: "a Federation member world", claimed: "a world of the Klingon Empire", lost: "an evacuated colony", independent: `an independent world (accord ${signedAccord(s.accord)})` }[s.kind] || (known ? "a " + KINDS[s.kind].name.toLowerCase() : "an uncharted system");
-    const there = Object.values(S.enemies).filter((e) => e.at === hex && !e.cloaked && !ENEMIES[e.type].base).map((e) => (/^[AEIOU]/.test(ENEMIES[e.type].name) ? "an " : "a ") + ENEMIES[e.type].name);
+    const there = Object.values(S.enemies).filter((e) => e.at === hex && !e.cloaked && !e.hidden && !ENEMIES[e.type].base).map((e) => (/^[AEIOU]/.test(ENEMIES[e.type].name) ? "an " : "a ") + ENEMIES[e.type].name);
     log(S, `The Pelion arrives at ${s.name}, ${what}${s.harm ? `, harmed ${s.harm}/3` : ""}.${there.length ? ` In orbit: ${there.join(", ")}.` : ""}`, "move");
   }
   if (s) S.seenSys[s.id] = true;
@@ -195,7 +199,7 @@ function arrive(S, hex) {
     o.arrived = true;
     if (o.twist && o.twist.fx === "systems") { S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + 1); log(S, `${o.title}: the Pelion's sensors begin failing.`, "bad"); }
   }
-  if (s && s.id === S.corvan && S.arc.stage === "travel") S.event = { kind: "arc-arrive" };
+  if (s && s.id === S.corvan && S.arc.stage === "travel") arcArriveHook(S);
 }
 function dock(S) {
   const P = S.pelion;
@@ -213,11 +217,11 @@ export function updateVisibility(S) {
   for (const u of Object.values(S.support)) see(u.at, 2);
   for (const s of Object.values(S.systems)) if (["starbase", "colony", "member"].includes(s.kind)) see(s.at, 1);
   S.visible = v;
-  for (const e of Object.values(S.enemies)) if (v[e.at] && !e.cloaked && !ENEMIES[e.type].base) e.seen = true;
+  for (const e of Object.values(S.enemies)) if (v[e.at] && !e.cloaked && !e.hidden && !ENEMIES[e.type].base) e.seen = true;
 }
 export const enemiesAt = (S, hex) => Object.values(S.enemies).filter((e) => e.at === hex);
 /** Enemy ships the player can see. */
-export const visibleEnemies = (S) => Object.values(S.enemies).filter((e) => (S.visible[e.at] && !e.cloaked && !ENEMIES[e.type].base) || e.revealed || (ENEMIES[e.type].base && e.found));
+export const visibleEnemies = (S) => Object.values(S.enemies).filter((e) => !e.hidden && ((S.visible[e.at] && !e.cloaked && !ENEMIES[e.type].base) || e.revealed || (ENEMIES[e.type].base && e.found)));
 
 // ---------- enemies ----------
 export function spawnEnemy(S, type, at, extra = {}) {
@@ -251,7 +255,7 @@ export function actionsFor(S, unit = "pelion") {
   const P = S.pelion;
   if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair");
   add("sweep");
-  for (const e of enemiesAt(S, U.at)) if ((!e.cloaked || e.revealed) && !ENEMIES[e.type].base) {
+  for (const e of enemiesAt(S, U.at)) if ((!e.cloaked || e.revealed) && !e.hidden && !ENEMIES[e.type].base) {
     if (ENEMIES[e.type].will) add("hail", { enemy: e.id, name: `Hail the ${ENEMIES[e.type].name}` });
     out.push({ id: "engage", enemy: e.id, name: `Engage the ${ENEMIES[e.type].name}`, skills: [], blurb: engageNote(S, e) });
   }
@@ -411,6 +415,7 @@ function applyAction(S, p) {
         if (distance(e.at, S.pelion.at) > 3) continue;
         if (ENEMIES[e.type].base) { if (e.at === S.pelion.at && !e.found) { e.found = true; const sy = sysAt(S, e.at); if (sy) sy.surveyed = true; found.push("an Orion pirate base, hidden in " + (sy ? sy.name : "the dust")); } continue; }
         if (e.cloaked && !e.revealed) { e.revealed = true; found.push(`a cloaked ${ENEMIES[e.type].name}`); }
+        if (e.hidden && e.at === S.pelion.at) { e.hidden = false; e.seen = true; found.push(`an ${ENEMIES[e.type].name} holding station on the far side of ${sysAt(S, e.at)?.name || "the"} moon, where passive sensors couldn't see it`); }
       }
       // A sweep also hears where the raiders come from.
       const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && !e.found);
@@ -561,5 +566,5 @@ export function checkEnd(S) {
 }
 
 // ---------- hooks set by the other modules (they import game.js, so they register here) ----------
-let startBattleHook = () => {}, arcActionsHook = () => [], arcStepHook = () => "", arcSweepHook = () => {};
-export function registerHooks(h) { if (h.startBattle) startBattleHook = h.startBattle; if (h.arcActions) arcActionsHook = h.arcActions; if (h.arcStep) arcStepHook = h.arcStep; if (h.arcSweep) arcSweepHook = h.arcSweep; }
+let startBattleHook = () => {}, arcActionsHook = () => [], arcStepHook = () => "", arcSweepHook = () => {}, arcArriveHook = () => {};
+export function registerHooks(h) { if (h.startBattle) startBattleHook = h.startBattle; if (h.arcActions) arcActionsHook = h.arcActions; if (h.arcStep) arcStepHook = h.arcStep; if (h.arcSweep) arcSweepHook = h.arcSweep; if (h.arcArrive) arcArriveHook = h.arcArrive; }

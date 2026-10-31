@@ -2,7 +2,7 @@
 // Also the one place that ties the modules together, so the page imports this.
 import { CREW, SUPPORT, ENEMIES } from "./data.js";
 import { distance, within } from "./hex.js";
-import { check, target, available, log, storyEvent, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
+import { hourly, check, target, available, log, storyEvent, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
 import { startBattle, endBattle } from "./combat.js";
 import { aiTurn, claim } from "./ai.js";
 import { arcTurn, arcTick, arcEventChoose } from "./arc.js";
@@ -11,6 +11,8 @@ export function canEndTurn(S) { return !(S.over || S.battle || S.event || S.pend
 
 export function endTurn(S) {
   if (!canEndTurn(S)) return { error: "Finish what's in front of you first." };
+  if (hourly(S)) return endHour(S);
+  S.hour = 0;
   aiTurn(S);
   // Income.
   const sys = Object.values(S.systems);
@@ -62,6 +64,18 @@ export function endTurn(S) {
   return { ok: true, income };
 }
 
+/** An hour on Corvan II while the away team is down: everyone acts again, the drain goes on; the rest of the sector waits. */
+function endHour(S) {
+  S.hour = (S.hour || 0) + 1;
+  for (const id in S.crew) S.crew[id].acted = false;
+  S.tried = {}; S.pelion.engaged = false;
+  log(S, `Hour ${S.hour} on Corvan II.`, "turn", { away: true });
+  arcTurn(S, 1);
+  updateVisibility(S);
+  arcTick(S);
+  checkEnd(S);
+  return { ok: true, hour: S.hour };
+}
 /** The arrival event at Corvan II, rolled with the best officer. */
 export function chooseEvent(S, id) {
   const roll = (skill, action, extra = []) => {

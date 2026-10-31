@@ -172,18 +172,20 @@ function finishArc(S, how) {
 /** After anything happens: move the story on. */
 export function arcTick(S) {
   const A = S.arc, cv = S.systems[S.corvan];
-  if (A.stage === "travel" && S.pelion.at === cv.at && !raider(S) && !S.battle) {
-    // In orbit and unopposed. Nothing happens below until the Pelion's sensors sweep the ruins.
+  if (A.stage === "travel" && S.pelion.at === cv.at && !S.battle) {
+    // In orbit. Passive sensors show nothing; the raider behind the moon takes an active sweep to find, and nothing
+    // happens below until the Pelion's sensors sweep the ruins.
     A.stage = "orbit";
     const o = arcOrder(S); if (o) o.deadline = 999;
-    alog(S, "In orbit over Corvan II, the raider gone. The outpost doesn't answer hails. The ruins are two kilometers from the Ketari village. Sweep them with the ship's sensors (the Here tab) to learn what happened.", "order");
+    alog(S, "Standard orbit over Corvan II. Passive sensors show nothing in orbit but the moon's shadow, and the outpost doesn't answer hails. The ruins are two kilometers from the Ketari village. A Sensor sweep would check the space around the planet; sweeping the ruins would tell you what happened below (the Here tab).", "order");
   }
 }
-/** The sweep that wakes what's in the ruins: the arc's own scan, or an ordinary sensor sweep over Corvan II. */
+export function arcArrive(S) { arcTick(S); }
+/** The sweep that wakes what's in the ruins: the arc's own scan of the surface. */
 function startPull(S) {
   const A = S.arc; if (A.stage !== "orbit") return;
   A.stage = "pull";
-  astory(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment every week the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
+  astory(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment every hour the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
 }
 /** Beam an away team down (2 to 4 officers fit for duty), or beam them all back up (ids empty). Takes no action. */
 export function beamDown(S, ids) {
@@ -196,12 +198,23 @@ export function beamDown(S, ids) {
   alog(S, `Away team: ${ids.map((id) => officer(id).name).join(", ")} beam down to the outpost on Corvan II. ${CREW.filter((c) => !ids.includes(c.id)).map((c) => c.short).join(", ")} stay${CREW.length - ids.length === 1 ? "s" : ""} aboard.`, "move");
   return { ok: true };
 }
-export function arcSweep(S) { if (S.arc.stage === "orbit" && S.pelion.at === S.systems[S.corvan].at) startPull(S); }
+/** An active sensor sweep around Corvan II: if it found the raider behind the moon, the raider, caught, hails. */
+export function arcSweep(S) {
+  const e = raider(S);
+  if (e && !e.hidden && !S.arc.raiderMet && S.pelion.at === S.systems[S.corvan].at) { S.arc.raiderMet = true; S.event = { kind: "arc-arrive" }; }
+}
 /** End of turn: the drain on the ship while it stays in orbit. */
-export function arcTurn(S) {
+export function arcTurn(S, hours = 0) {
+  // Left undetected, the raider makes its move within a day of the Pelion's arrival: 24 hours in orbit, or the end of the
+  // week it arrives, whichever comes first, it comes around the moon, firing.
+  const e = raider(S);
+  if (e && e.hidden && S.pelion.at === S.systems[S.corvan].at) {
+    S.arc.raiderHours = (S.arc.raiderHours || 0) + (hours || 24);
+    if (S.arc.raiderHours >= 24) { e.hidden = false; e.seen = true; S.arc.raiderMet = true; alog(S, "Before the day is out, an Orion raider swings out from behind Corvan II's moon, where it was hiding all along, and opens fire. An active sweep would have found it.", "war"); startBattle(S, e.id, "enemy"); }
+  }
   const A = S.arc;
-  // The drain decays the orbit every week the Pelion stays; failures on the surface cost time as well. (With every officer
-  // acting each turn, the away team and the bridge can work at once, so the clock can be this tight.)
+  // The drain decays the orbit each turn the Pelion stays (an hour while the away team is down); failures on the surface
+  // cost time as well.
   if (["pull", "orions", "caretaker"].includes(A.stage) && S.pelion.at === S.systems[S.corvan].at) {
     A.countdown++; alog(S, `Corvan II drains the Pelion and the orbit decays: the Countdown ${A.countdown}/${COUNTDOWN}.`); checkCountdown(S);
   }
@@ -234,6 +247,6 @@ export function arcEventChoose(S, id, roll) {
   return {};
 }
 
-registerHooks({ arcActions, arcStep, arcSweep });
+registerHooks({ arcActions, arcStep, arcSweep, arcArrive });
 export { CLUES };
 export const raiderName = ENEMIES.orion.name;

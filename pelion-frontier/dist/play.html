@@ -463,7 +463,8 @@ function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
   S.orders.push({ id: "o1", arc: true, title: "The Silence at Corvan II", at: cv.at, sys: cv.id, skills: [], segs: 0, have: 0, deadline: 12,
     text: "The Federation research outpost on Corvan II, eight archaeologists studying the ruins of an extinct civilization, has missed three check-ins. Corvan II has a native people, the Ketari, at a bronze-age level: the outpost works under the Prime Directive. An Orion raider was reported in the sector last week.",
     twist: null, strange: "An ancient machine that still works", key: "Rrinn's sister, on the outpost's supply run" });
-  spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at });
+  // The raider holds station on the far side of Corvan II's moon: passive sensors won't see it; an active sweep will.
+  spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at, hidden: true });
   const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");
   spawnEnemy(S, "orionBase", ob.at, { goal: "base", hostile: true, found: false });
   log(S, "Orders from Starfleet Command: the research outpost on Corvan II has gone silent. Investigate.", "order");
@@ -586,8 +587,11 @@ function reachable(S, unit = "pelion") {
   }
   return out;
 }
+/** While an away team is on Corvan II's surface, turns are hours, and the Pelion stays in orbit. */
+const hourly = (S) => !!(S.arc.team && ["pull", "orions", "caretaker"].includes(S.arc.stage) && S.pelion.at === S.systems[S.corvan].at);
 function moveTo(S, unit, hex) {
   if (S.over || S.battle || S.event) return { error: "Finish what's in front of you first." };
+  if (unit === "pelion" && hourly(S)) return { error: "The away team is on the surface. Beam them up before leaving orbit." };
   const U = unit === "pelion" ? S.pelion : S.support[unit];
   const r = reachable(S, unit);
   if (r[hex] === undefined) return { error: "Too far for this turn." };
@@ -608,7 +612,7 @@ function arrive(S, hex) {
   if (s) {
     const known = KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost"].includes(s.kind);
     const what = { member: "a Federation member world", claimed: "a world of the Klingon Empire", lost: "an evacuated colony", independent: `an independent world (accord ${signedAccord(s.accord)})` }[s.kind] || (known ? "a " + KINDS[s.kind].name.toLowerCase() : "an uncharted system");
-    const there = Object.values(S.enemies).filter((e) => e.at === hex && !e.cloaked && !ENEMIES[e.type].base).map((e) => (/^[AEIOU]/.test(ENEMIES[e.type].name) ? "an " : "a ") + ENEMIES[e.type].name);
+    const there = Object.values(S.enemies).filter((e) => e.at === hex && !e.cloaked && !e.hidden && !ENEMIES[e.type].base).map((e) => (/^[AEIOU]/.test(ENEMIES[e.type].name) ? "an " : "a ") + ENEMIES[e.type].name);
     log(S, `The Pelion arrives at ${s.name}, ${what}${s.harm ? `, harmed ${s.harm}/3` : ""}.${there.length ? ` In orbit: ${there.join(", ")}.` : ""}`, "move");
   }
   if (s) S.seenSys[s.id] = true;
@@ -619,7 +623,7 @@ function arrive(S, hex) {
     o.arrived = true;
     if (o.twist && o.twist.fx === "systems") { S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + 1); log(S, `${o.title}: the Pelion's sensors begin failing.`, "bad"); }
   }
-  if (s && s.id === S.corvan && S.arc.stage === "travel") S.event = { kind: "arc-arrive" };
+  if (s && s.id === S.corvan && S.arc.stage === "travel") arcArriveHook(S);
 }
 function dock(S) {
   const P = S.pelion;
@@ -637,11 +641,11 @@ function updateVisibility(S) {
   for (const u of Object.values(S.support)) see(u.at, 2);
   for (const s of Object.values(S.systems)) if (["starbase", "colony", "member"].includes(s.kind)) see(s.at, 1);
   S.visible = v;
-  for (const e of Object.values(S.enemies)) if (v[e.at] && !e.cloaked && !ENEMIES[e.type].base) e.seen = true;
+  for (const e of Object.values(S.enemies)) if (v[e.at] && !e.cloaked && !e.hidden && !ENEMIES[e.type].base) e.seen = true;
 }
 const enemiesAt = (S, hex) => Object.values(S.enemies).filter((e) => e.at === hex);
 /** Enemy ships the player can see. */
-const visibleEnemies = (S) => Object.values(S.enemies).filter((e) => (S.visible[e.at] && !e.cloaked && !ENEMIES[e.type].base) || e.revealed || (ENEMIES[e.type].base && e.found));
+const visibleEnemies = (S) => Object.values(S.enemies).filter((e) => !e.hidden && ((S.visible[e.at] && !e.cloaked && !ENEMIES[e.type].base) || e.revealed || (ENEMIES[e.type].base && e.found)));
 
 // ---------- enemies ----------
 function spawnEnemy(S, type, at, extra = {}) {
@@ -675,7 +679,7 @@ function actionsFor(S, unit = "pelion") {
   const P = S.pelion;
   if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair");
   add("sweep");
-  for (const e of enemiesAt(S, U.at)) if ((!e.cloaked || e.revealed) && !ENEMIES[e.type].base) {
+  for (const e of enemiesAt(S, U.at)) if ((!e.cloaked || e.revealed) && !e.hidden && !ENEMIES[e.type].base) {
     if (ENEMIES[e.type].will) add("hail", { enemy: e.id, name: `Hail the ${ENEMIES[e.type].name}` });
     out.push({ id: "engage", enemy: e.id, name: `Engage the ${ENEMIES[e.type].name}`, skills: [], blurb: engageNote(S, e) });
   }
@@ -835,6 +839,7 @@ function applyAction(S, p) {
         if (distance(e.at, S.pelion.at) > 3) continue;
         if (ENEMIES[e.type].base) { if (e.at === S.pelion.at && !e.found) { e.found = true; const sy = sysAt(S, e.at); if (sy) sy.surveyed = true; found.push("an Orion pirate base, hidden in " + (sy ? sy.name : "the dust")); } continue; }
         if (e.cloaked && !e.revealed) { e.revealed = true; found.push(`a cloaked ${ENEMIES[e.type].name}`); }
+        if (e.hidden && e.at === S.pelion.at) { e.hidden = false; e.seen = true; found.push(`an ${ENEMIES[e.type].name} holding station on the far side of ${sysAt(S, e.at)?.name || "the"} moon, where passive sensors couldn't see it`); }
       }
       // A sweep also hears where the raiders come from.
       const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && !e.found);
@@ -985,8 +990,8 @@ function checkEnd(S) {
 }
 
 // ---------- hooks set by the other modules (they import game.js, so they register here) ----------
-let startBattleHook = () => {}, arcActionsHook = () => [], arcStepHook = () => "", arcSweepHook = () => {};
-function registerHooks(h) { if (h.startBattle) startBattleHook = h.startBattle; if (h.arcActions) arcActionsHook = h.arcActions; if (h.arcStep) arcStepHook = h.arcStep; if (h.arcSweep) arcSweepHook = h.arcSweep; }
+let startBattleHook = () => {}, arcActionsHook = () => [], arcStepHook = () => "", arcSweepHook = () => {}, arcArriveHook = () => {};
+function registerHooks(h) { if (h.startBattle) startBattleHook = h.startBattle; if (h.arcActions) arcActionsHook = h.arcActions; if (h.arcStep) arcStepHook = h.arcStep; if (h.arcSweep) arcSweepHook = h.arcSweep; if (h.arcArrive) arcArriveHook = h.arcArrive; }
 
 // ---- combat.js ----
 // Ship combat, from the Players' Guide's "The USS Pelion": exchanges; Power to spend on shields, phasers and
@@ -1371,18 +1376,20 @@ function finishArc(S, how) {
 /** After anything happens: move the story on. */
 function arcTick(S) {
   const A = S.arc, cv = S.systems[S.corvan];
-  if (A.stage === "travel" && S.pelion.at === cv.at && !raider(S) && !S.battle) {
-    // In orbit and unopposed. Nothing happens below until the Pelion's sensors sweep the ruins.
+  if (A.stage === "travel" && S.pelion.at === cv.at && !S.battle) {
+    // In orbit. Passive sensors show nothing; the raider behind the moon takes an active sweep to find, and nothing
+    // happens below until the Pelion's sensors sweep the ruins.
     A.stage = "orbit";
     const o = arcOrder(S); if (o) o.deadline = 999;
-    alog(S, "In orbit over Corvan II, the raider gone. The outpost doesn't answer hails. The ruins are two kilometers from the Ketari village. Sweep them with the ship's sensors (the Here tab) to learn what happened.", "order");
+    alog(S, "Standard orbit over Corvan II. Passive sensors show nothing in orbit but the moon's shadow, and the outpost doesn't answer hails. The ruins are two kilometers from the Ketari village. A Sensor sweep would check the space around the planet; sweeping the ruins would tell you what happened below (the Here tab).", "order");
   }
 }
-/** The sweep that wakes what's in the ruins: the arc's own scan, or an ordinary sensor sweep over Corvan II. */
+function arcArrive(S) { arcTick(S); }
+/** The sweep that wakes what's in the ruins: the arc's own scan of the surface. */
 function startPull(S) {
   const A = S.arc; if (A.stage !== "orbit") return;
   A.stage = "pull";
-  astory(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment every week the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
+  astory(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment every hour the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
 }
 /** Beam an away team down (2 to 4 officers fit for duty), or beam them all back up (ids empty). Takes no action. */
 function beamDown(S, ids) {
@@ -1395,12 +1402,23 @@ function beamDown(S, ids) {
   alog(S, `Away team: ${ids.map((id) => officer(id).name).join(", ")} beam down to the outpost on Corvan II. ${CREW.filter((c) => !ids.includes(c.id)).map((c) => c.short).join(", ")} stay${CREW.length - ids.length === 1 ? "s" : ""} aboard.`, "move");
   return { ok: true };
 }
-function arcSweep(S) { if (S.arc.stage === "orbit" && S.pelion.at === S.systems[S.corvan].at) startPull(S); }
+/** An active sensor sweep around Corvan II: if it found the raider behind the moon, the raider, caught, hails. */
+function arcSweep(S) {
+  const e = raider(S);
+  if (e && !e.hidden && !S.arc.raiderMet && S.pelion.at === S.systems[S.corvan].at) { S.arc.raiderMet = true; S.event = { kind: "arc-arrive" }; }
+}
 /** End of turn: the drain on the ship while it stays in orbit. */
-function arcTurn(S) {
+function arcTurn(S, hours = 0) {
+  // Left undetected, the raider makes its move within a day of the Pelion's arrival: 24 hours in orbit, or the end of the
+  // week it arrives, whichever comes first, it comes around the moon, firing.
+  const e = raider(S);
+  if (e && e.hidden && S.pelion.at === S.systems[S.corvan].at) {
+    S.arc.raiderHours = (S.arc.raiderHours || 0) + (hours || 24);
+    if (S.arc.raiderHours >= 24) { e.hidden = false; e.seen = true; S.arc.raiderMet = true; alog(S, "Before the day is out, an Orion raider swings out from behind Corvan II's moon, where it was hiding all along, and opens fire. An active sweep would have found it.", "war"); startBattle(S, e.id, "enemy"); }
+  }
   const A = S.arc;
-  // The drain decays the orbit every week the Pelion stays; failures on the surface cost time as well. (With every officer
-  // acting each turn, the away team and the bridge can work at once, so the clock can be this tight.)
+  // The drain decays the orbit each turn the Pelion stays (an hour while the away team is down); failures on the surface
+  // cost time as well.
   if (["pull", "orions", "caretaker"].includes(A.stage) && S.pelion.at === S.systems[S.corvan].at) {
     A.countdown++; alog(S, `Corvan II drains the Pelion and the orbit decays: the Countdown ${A.countdown}/${COUNTDOWN}.`); checkCountdown(S);
   }
@@ -1433,7 +1451,7 @@ function arcEventChoose(S, id, roll) {
   return {};
 }
 
-registerHooks({ arcActions, arcStep, arcSweep });
+registerHooks({ arcActions, arcStep, arcSweep, arcArrive });
 
 const raiderName = ENEMIES.orion.name;
 
@@ -1572,6 +1590,8 @@ function canEndTurn(S) { return !(S.over || S.battle || S.event || S.pending); }
 
 function endTurn(S) {
   if (!canEndTurn(S)) return { error: "Finish what's in front of you first." };
+  if (hourly(S)) return endHour(S);
+  S.hour = 0;
   aiTurn(S);
   // Income.
   const sys = Object.values(S.systems);
@@ -1623,6 +1643,18 @@ function endTurn(S) {
   return { ok: true, income };
 }
 
+/** An hour on Corvan II while the away team is down: everyone acts again, the drain goes on; the rest of the sector waits. */
+function endHour(S) {
+  S.hour = (S.hour || 0) + 1;
+  for (const id in S.crew) S.crew[id].acted = false;
+  S.tried = {}; S.pelion.engaged = false;
+  log(S, `Hour ${S.hour} on Corvan II.`, "turn", { away: true });
+  arcTurn(S, 1);
+  updateVisibility(S);
+  arcTick(S);
+  checkEnd(S);
+  return { ok: true, hour: S.hour };
+}
 /** The arrival event at Corvan II, rolled with the best officer. */
 function chooseEvent(S, id) {
   const roll = (skill, action, extra = []) => {
@@ -1926,8 +1958,10 @@ function renderBar() {
   $("bar-stats").innerHTML = `<span><b>Supplies<\/b>${S.supplies}<\/span><span><b>Science<\/b>${S.science}<\/span>`
     + `<span title="Starfleet Command: five boxes and you're relieved of command"><b>Starfleet Command<\/b>${boxes(S.command, 5)}<\/span>`
     + `<span title="Tension with the Klingon Empire"><b>Klingon tension<\/b>${boxes(S.tension, 10, "gold")}<\/span>`;
-  $("bar-turn").textContent = `Stardate ${stardate(S)} · Turn ${Math.min(S.turn, TOUR)} of ${TOUR}`;
+  const hr = hourly(S);
+  $("bar-turn").textContent = `Stardate ${stardate(S)} · Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hr ? ` · Hour ${(S.hour || 0) + 1} on Corvan II` : ""}`;
   $("end-turn").disabled = !canEndTurn(S);
+  $("end-turn").textContent = hr ? "End hour" : "End turn";
 }
 function renderTabs() {
   const aw = document.querySelector('[data-tab="away"]'); if (aw) aw.hidden = !awayActive();
@@ -1952,7 +1986,9 @@ function hint() {
   const A = S.arc, cv = S.systems[S.corvan];
   let t = "";
   if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:<\/b> fly to Corvan II (the gold <b>!<\/b>). Double-click it on the map: the Pelion goes as far as it can this turn. Then <b>End turn<\/b>.`;
-  else if (A.stage === "orbit") t = "<b>Next:<\/b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
+  else if (A.stage === "orbit") t = Object.values(S.enemies).some((e) => e.goal === "arc" && e.hidden) && !A.raiderMet
+    ? "<b>Next:<\/b> passive sensors show nothing and the outpost is silent. A Sensor sweep checks the space around Corvan II (anything behind the moon?); sweeping the ruins finds out what happened below. Both are on the Here tab."
+    : "<b>Next:<\/b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
   else if (A.stage === "pull" && !A.team) t = "<b>Next:<\/b> choose an away team and beam them down to the outpost (the Here tab).";
   else if (A.stage === "pull" && cluesFound(A) >= THEORY_AT) t = "<b>Next:<\/b> there's enough evidence. Have Sevek form his theory of what's in the ruins (the Here tab), or find the last clue first for better odds.";
   else if (A.stage === "pull") t = `<b>Next:<\/b> the away team. Find clues on the Here tab (each officer can act once a turn): Sevek needs ${THEORY_AT} to form a theory of what's in the ruins, before the Countdown fills.`;
@@ -2263,7 +2299,7 @@ function showEvent() {
   const ev = S.event;
   if (ev.kind === "arc-arrive") {
     const ch = arcEventChoices(S);
-    modal(`<h2>Corvan II<\/h2><p>The Orion raider is in orbit, on the far side of the moon. It hails first: they're "legitimate salvagers", and this is unclaimed space.<\/p>
+    modal(`<h2>Corvan II<\/h2><p>The active sweep finds what passive sensors couldn't: an Orion raider holding station on the far side of the moon. Caught, it hails: they're "legitimate salvagers", and this is unclaimed space.<\/p>
       ${eventResult ? `<div class="result ${eventResult.roll ? (eventResult.roll.success ? "ok" : "no") : ""}">${eventResult.roll ? `${diceHTML(eventResult.roll)} ${eventResult.roll.total} against ${eventResult.roll.target} (${esc(officer(eventResult.roll.officer)?.short || "Captain")}, ${esc(eventResult.roll.skill)}). ` : ""}${esc(eventResult.text)}<\/div>` : ""}
       <div class="grid2">${ch.map((c) => `<div class="brief"><h3>${esc(c.name)}<\/h3><p>${esc(c.blurb)}<\/p><div class="btn-row"><button class="btn ${c.id === "engage" ? "red" : "primary"} small" data-ev="${c.id}" ${c.disabled ? "disabled" : ""}>${esc(c.name)}<\/button><\/div><\/div>`).join("")}<\/div>`);
     return;

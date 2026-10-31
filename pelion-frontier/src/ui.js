@@ -1,7 +1,7 @@
 // The page: the sector map on a canvas, the side panel's tabs, and the dialogs (new game, battle, story, the end).
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
-import { newGame, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
+import { newGame, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
   speedOf, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
@@ -287,8 +287,10 @@ function renderBar() {
   $("bar-stats").innerHTML = `<span><b>Supplies</b>${S.supplies}</span><span><b>Science</b>${S.science}</span>`
     + `<span title="Starfleet Command: five boxes and you're relieved of command"><b>Starfleet Command</b>${boxes(S.command, 5)}</span>`
     + `<span title="Tension with the Klingon Empire"><b>Klingon tension</b>${boxes(S.tension, 10, "gold")}</span>`;
-  $("bar-turn").textContent = `Stardate ${stardate(S)} · Turn ${Math.min(S.turn, TOUR)} of ${TOUR}`;
+  const hr = hourly(S);
+  $("bar-turn").textContent = `Stardate ${stardate(S)} · Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hr ? ` · Hour ${(S.hour || 0) + 1} on Corvan II` : ""}`;
   $("end-turn").disabled = !canEndTurn(S);
+  $("end-turn").textContent = hr ? "End hour" : "End turn";
 }
 function renderTabs() {
   const aw = document.querySelector('[data-tab="away"]'); if (aw) aw.hidden = !awayActive();
@@ -313,7 +315,9 @@ function hint() {
   const A = S.arc, cv = S.systems[S.corvan];
   let t = "";
   if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:</b> fly to Corvan II (the gold <b>!</b>). Double-click it on the map: the Pelion goes as far as it can this turn. Then <b>End turn</b>.`;
-  else if (A.stage === "orbit") t = "<b>Next:</b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
+  else if (A.stage === "orbit") t = Object.values(S.enemies).some((e) => e.goal === "arc" && e.hidden) && !A.raiderMet
+    ? "<b>Next:</b> passive sensors show nothing and the outpost is silent. A Sensor sweep checks the space around Corvan II (anything behind the moon?); sweeping the ruins finds out what happened below. Both are on the Here tab."
+    : "<b>Next:</b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
   else if (A.stage === "pull" && !A.team) t = "<b>Next:</b> choose an away team and beam them down to the outpost (the Here tab).";
   else if (A.stage === "pull" && cluesFound(A) >= THEORY_AT) t = "<b>Next:</b> there's enough evidence. Have Sevek form his theory of what's in the ruins (the Here tab), or find the last clue first for better odds.";
   else if (A.stage === "pull") t = `<b>Next:</b> the away team. Find clues on the Here tab (each officer can act once a turn): Sevek needs ${THEORY_AT} to form a theory of what's in the ruins, before the Countdown fills.`;
@@ -624,7 +628,7 @@ function showEvent() {
   const ev = S.event;
   if (ev.kind === "arc-arrive") {
     const ch = arcEventChoices(S);
-    modal(`<h2>Corvan II</h2><p>The Orion raider is in orbit, on the far side of the moon. It hails first: they're "legitimate salvagers", and this is unclaimed space.</p>
+    modal(`<h2>Corvan II</h2><p>The active sweep finds what passive sensors couldn't: an Orion raider holding station on the far side of the moon. Caught, it hails: they're "legitimate salvagers", and this is unclaimed space.</p>
       ${eventResult ? `<div class="result ${eventResult.roll ? (eventResult.roll.success ? "ok" : "no") : ""}">${eventResult.roll ? `${diceHTML(eventResult.roll)} ${eventResult.roll.total} against ${eventResult.roll.target} (${esc(officer(eventResult.roll.officer)?.short || "Captain")}, ${esc(eventResult.roll.skill)}). ` : ""}${esc(eventResult.text)}</div>` : ""}
       <div class="grid2">${ch.map((c) => `<div class="brief"><h3>${esc(c.name)}</h3><p>${esc(c.blurb)}</p><div class="btn-row"><button class="btn ${c.id === "engage" ? "red" : "primary"} small" data-ev="${c.id}" ${c.disabled ? "disabled" : ""}>${esc(c.name)}</button></div></div>`).join("")}</div>`);
     return;
