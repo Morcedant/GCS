@@ -220,12 +220,12 @@ export function settle(s, fleetId) {
   if (ci >= 0 && canSettle(s, f.owner, sys, "colony")) {
     f.ships.splice(ci, 1);
     sys.colony = { owner: f.owner, kind: "colony", pop: f.owner === "concord" ? 2 : 1, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
-    log(s, f.owner, `${faction(s, f.owner).name} founded a colony on ${sys.name}.`, "settle");
+    log(s, f.owner, `${faction(s, f.owner).name} founded a colony on ${sys.name}, ${worldDesc(sys)}.`, "settle");
   } else if (oi >= 0 || ci >= 0) {
     if (oi < 0 && !canSettle(s, f.owner, sys, "outpost")) return { error: "Nothing here to settle with." };
     f.ships.splice(oi >= 0 ? oi : ci, 1);
     sys.colony = { owner: f.owner, kind: "outpost", pop: 0, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
-    log(s, f.owner, `${faction(s, f.owner).name} claimed ${sys.name} as an outpost.`, "settle");
+    log(s, f.owner, `${faction(s, f.owner).name} claimed ${sys.name} as an outpost: ${worldDesc(sys)}. It extends your borders${sys.exotics ? " and mines its exotics" : ""}.`, "settle");
   } else return { error: "This fleet has no colony or outpost ship." };
   if (!f.ships.length) delete s.fleets[f.id];
   noticeSettling(s, f.owner, sys);
@@ -375,9 +375,7 @@ export function updateVision(s, F) {
   F.visible = vis;
   // Every system the player charts goes into the log, with what's there.
   for (const sys of charted) {
-    const w = WORLDS[sys.world], what = [`${/^[AEIOU]/.test(w.name) ? "an" : "a"} ${w.name.toLowerCase()} world`, `size ${sys.size}`];
-    if (sys.rich > 1) what.push("rich"); else if (sys.rich < 1) what.push("poor");
-    if (sys.exotics) what.push("an exotics deposit");
+    const what = [worldDesc(sys)];
     if (sys.ruins) what.push("ancient ruins to survey");
     if (sys.colony && sys.colony.owner !== F.id) what.push(`${sys.colony.kind === "colony" ? "a colony" : "an outpost"} of ${faction(s, sys.colony.owner).name}`);
     log(s, F.id, `Charted ${sys.name}: ${what.join(", ")}.`, "explore");
@@ -385,12 +383,18 @@ export function updateVision(s, F) {
   // Meeting: anyone whose world or fleet you can see.
   for (const o of s.factions) if (o.id !== F.id && o.alive && !F.met[o.id]) {
     const seen = coloniesOf(s, o.id).some((x) => vis[x.at]) || fleetsOf(s, o.id).some((f) => vis[f.at]);
-    if (seen) { F.met[o.id] = true; o.met[F.id] = true; log(s, F.id, `${F.name} made contact with ${o.name}.`, "contact"); }
+    if (seen) {
+      F.met[o.id] = true; o.met[F.id] = true;
+      const w = coloniesOf(s, o.id).find((x) => vis[x.at]), fl = fleetsOf(s, o.id).find((f) => vis[f.at]);
+      const where = w ? `their world ${w.name}` : `${fl.ships.length > 1 ? "a fleet" : "a ship"} of theirs${s.sysAt[fl.at] ? ` at ${s.systems[s.sysAt[fl.at]].name}` : " in deep space"}`;
+      log(s, F.id, `${F.name} made contact with ${o.name}: ${where} came into view. Diplomacy is open with them now.`, "contact");
+    }
   }
   // Ruins: the first to see them learns something.
   for (const sys of Object.values(s.systems)) if (sys.ruins && vis[sys.at] && fleetsAt(s, sys.at).some((f) => f.owner === F.id)) {
     sys.ruins = false; F.research.progress += 60;
-    log(s, F.id, `${F.name} surveyed the ruins at ${sys.name}: +60 research.`, "explore");
+    const cur = TECHS.find((x) => x.id === F.research.current);
+    log(s, F.id, `${F.name} surveyed the ruins at ${sys.name}: what the old empires left there is worth +60 research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}.`, "explore");
   }
 }
 
@@ -413,8 +417,19 @@ export function endTurn(s, aiTurn) {
   checkVictory(s);
   s.turn++;
 }
+/** "an ocean world, size 2, rich, an exotics deposit" */
+export function worldDesc(sys) {
+  const w = WORLDS[sys.world], what = [`${/^[AEIOU]/.test(w.name) ? "an" : "a"} ${w.name.toLowerCase()} world`, `size ${sys.size}`];
+  if (sys.rich > 1) what.push("rich"); else if (sys.rich < 1) what.push("poor");
+  if (sys.exotics) what.push("an exotics deposit");
+  return what.join(", ");
+}
 function economy(s, F) {
   const t = totals(s, F.id);
+  if (!F.ai) {
+    const cur = TECHS.find((x) => x.id === F.research.current);
+    log(s, F.id, `The books: ${t.net >= 0 ? "+" : "−"}${Math.abs(round1(t.net))} credits (treasury ${round1(F.credits + t.net)}), +${round1(t.sci)} science ${cur ? `toward ${cur.name} (${Math.round(F.research.progress + t.sci)}/${cur.cost})` : "with nothing to research: choose a technology"}${t.exo ? `, +${round1(t.exo)} exotics` : ""}.`, "turn");
+  }
   const strike = F.credits < 0 ? 0.75 : 1; // in debt: the yards and the labs slow down
   F.credits = round1(F.credits + t.net);
   F.exotics += t.exo;
@@ -452,7 +467,10 @@ function economy(s, F) {
           if (q.id === "battery") c.defense = 3;
           if (q.id === "engine") { s.winner = F.id; s.winReason = "engine"; log(s, F.id, `${F.name} finished the Corridor Engine.`, "victory"); }
         }
-        if (!F.ai || q.kind === "building") log(s, F.id, `${sys.name} finished ${q.name}.`, "build");
+        if (!F.ai || q.kind === "building") {
+          const what = (q.kind === "ship" ? SHIPS : BUILDINGS)[q.id];
+          log(s, F.id, `${sys.name} finished ${/^[AEIOU]/.test(q.name) ? "an" : "a"} ${q.name}${what && what.text ? `: ${what.text}` : "."}${q.kind === "ship" && !F.ai ? " It's in orbit, waiting for orders." : ""}`, "build");
+        }
       }
       c.stock = Math.min(c.stock, 40); // a world can only stockpile so much
       // Growth.

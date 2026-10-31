@@ -243,7 +243,7 @@ function renderPanel() {
   else if (tab === "empire") P.innerHTML = empireHTML();
   else if (tab === "research") P.innerHTML = researchHTML();
   else if (tab === "diplomacy") P.innerHTML = diplomacyHTML();
-  else if (tab === "log") P.innerHTML = logHTML();
+  else if (tab === "log") { P.innerHTML = logHTML(); P.scrollTop = P.scrollHeight; }
 }
 const bar = (v, max, color) => `<span class="meter"><span style="width:${Math.max(0, Math.min(100, (v / max) * 100))}%;background:${color || "var(--accent)"}"></span></span>`;
 function systemHTML() {
@@ -348,9 +348,15 @@ function logHTML() {
   const mine = S.log.filter((l) => !l.fid || l.fid === me.id || l.kind === "war" || l.kind === "victory" || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name)));
   // Discoveries: every one, from the first turn. Everything: the latest 80 entries.
   const found = mine.filter((l) => l.fid === me.id && DISCOVERY.includes(l.kind));
-  const rows = (logFilter === "discovery" ? found : mine.slice(-80)).slice().reverse();
-  return `<h2>Log</h2><div class="btn-row"><button class="btn small ${logFilter === "all" ? "primary" : ""}" data-logf="all">Everything</button><button class="btn small ${logFilter === "discovery" ? "primary" : ""}" data-logf="discovery">Discoveries (${found.length})</button></div>`
-    + `<ul class="log">${rows.map((l) => `<li class="${l.kind}"><span class="t">T${l.turn}</span>${esc(l.text)}</li>`).join("")}</ul>`;
+  const rows = logFilter === "discovery" ? found : mine.slice(-150);
+  // In order: oldest first, under a heading for each turn; the panel opens scrolled to the latest.
+  let body = "", turn = null;
+  for (const l of rows) {
+    if (l.turn !== turn) { if (turn !== null) body += "</ul>"; turn = l.turn; body += `<h3 class="log-turn">Turn ${l.turn}</h3><ul class="log">`; }
+    body += `<li class="${l.kind}">${esc(l.text)}</li>`;
+  }
+  if (turn !== null) body += "</ul>";
+  return `<h2>Log</h2><div class="btn-row"><button class="btn small ${logFilter === "all" ? "primary" : ""}" data-logf="all">Everything</button><button class="btn small ${logFilter === "discovery" ? "primary" : ""}" data-logf="discovery">Discoveries (${found.length})</button></div>` + body;
 }
 
 // ---------- the panel's buttons ----------
@@ -424,7 +430,7 @@ function doEndTurn() {
     $("end-turn").textContent = "End turn";
     save();
     // News: what happened to you this turn.
-    const news = S.log.slice(before.log).filter((l) => l.fid === me.id || l.kind === "victory" || (l.kind === "war" && (l.text.includes(me.name))) || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name))).filter((l) => !l.text.startsWith("Charted "));
+    const news = S.log.slice(before.log).filter((l) => l.fid === me.id || l.kind === "victory" || (l.kind === "war" && (l.text.includes(me.name))) || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name))).filter((l) => !l.text.startsWith("Charted ") && l.kind !== "turn");
     if (sel && sel.kind === "fleet" && !S.fleets[sel.id]) sel = null;
     renderAll();
     if (S.winner) { showEnd(); return; }
