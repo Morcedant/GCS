@@ -23,7 +23,7 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
   const S = {
     v: 1, seed: String(seed), difficulty, captain: captain.trim() || "Captain", turn: 1, rng: hashString("dice:" + seed),
     hexes: sec.hexes, systems: sec.systems, sysAt: sec.sysAt, starbase: sec.starbase, corvan: sec.corvan,
-    pelion: { at: sb.at, mp: PELION.speed, acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true },
+    pelion: { at: sb.at, warp: CRUISE_WARP, days: 7, mp: lyPerWeek(CRUISE_WARP), acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true },
     stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
     crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false }])),
     tried: {},   // actions tried this turn: each can be attempted once a turn
@@ -36,14 +36,15 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
   S.seenSys[S.corvan] = true; S.systems[S.corvan].surveyed = true;
   // The first orders: The Silence at Corvan II. An Orion raider is already in orbit there.
   const cv = S.systems[S.corvan];
-  S.orders.push({ id: "o1", arc: true, title: "The Silence at Corvan II", at: cv.at, sys: cv.id, skills: [], segs: 0, have: 0, deadline: 12,
+  S.orders.push({ id: "o1", arc: true, title: "The Silence at Corvan II", at: cv.at, sys: cv.id, skills: [], segs: 0, have: 0, urgent: true,
+    deadline: 1 + Math.ceil(distance(sb.at, cv.at) / lyPerWeek(8)) + 2,   // urgent: Starfleet expects maximum warp
     text: "The Federation research outpost on Corvan II, eight archaeologists studying the ruins of an extinct civilization, has missed three check-ins. Corvan II has a native people, the Ketari, at a bronze-age level: the outpost works under the Prime Directive. An Orion raider was reported in the sector last week.",
     twist: null, personal: "Rrinn's sister serves on the outpost's supply run.", issued: 1 });
   // The raider holds station on the far side of Corvan II's moon: passive sensors won't see it; an active sweep will.
   spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at, hidden: true, arcRaider: true });
   const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");
   spawnEnemy(S, "orionBase", ob.at, { goal: "base", hostile: true, found: false });
-  log(S, "Orders from Starfleet Command: the research outpost on Corvan II has gone silent. Investigate.", "order");
+  log(S, "Orders from Starfleet Command, urgent: the research outpost on Corvan II has gone silent. Proceed at maximum emergency warp and investigate.", "order");
   updateVisibility(S);
   return S;
 }
@@ -125,11 +126,41 @@ export function moveCost(S, hex, who = "pelion") {
   if (h.terrain === "nebula") return who === "pelion" && hasRecord(S, "eddies") ? 1 : 2;
   return 1;
 }
-export function speedOf(S) {
+// ---------- warp ----------
+// Speed the original-series way: v = W³ × c, W the warp factor. A hex is a light-year and a turn is a week, so a week at
+// warp W covers 7·W³/365.25 light-years: warp 6 (the Pelion's maximum stable speed, 216c) about 4.1, warp 8 (its maximum
+// emergency speed, 512c) about 9.8. Impulse is sublight: for moving within a system, not between them.
+export const CRUISE_WARP = 6;
+export const lightSpeeds = (w) => (w > 0 ? w ** 3 : 0);                          // v = W³ × c
+export const lyPerWeek = (w) => (7 * lightSpeeds(w)) / 365.25;
+export const daysPerLy = (w) => (w > 0 ? 365.25 / lightSpeeds(w) : Infinity);
+/** The highest warp the engines allow: warp 8, the emergency maximum, less 2 for each box of engine damage. */
+export const EMERGENCY_WARP = 8;
+export function maxWarp(S) {
   const e = S.pelion.sys.engines;
-  if (e >= 3) return 1;
-  return PELION.speed + (S.pelion.refits.warp ? 1 : 0) + (hasRecord(S, "speed1") ? 1 : 0) - e;
+  return e >= 3 ? 1 : EMERGENCY_WARP - 2 * e;
 }
+/** Light-years the Pelion has left this turn: the days left in the week at its warp factor. */
+export function syncMp(S) { const P = S.pelion; P.mp = P.days * lightSpeeds(P.warp) / 365.25; }
+/** Change the warp factor: 0 is impulse. The days left in the week stay the same; the distance they cover changes. */
+export function setWarp(S, w) {
+  const P = S.pelion, m = maxWarp(S);
+  w = Math.max(0, Math.min(m, Math.round(w)));
+  P.warp = w; syncMp(S);
+  return { ok: true, warp: w };
+}
+/** How a warp factor reads: "Warp 6: 216 × the speed of light, 4.1 ly a week, 1.7 days a light-year". */
+export function warpText(w) {
+  if (!w) return "Impulse: sublight, for moving within a system. A light-year would take years.";
+  const d = daysPerLy(w);
+  return `Warp ${w}: ${lightSpeeds(w)} × the speed of light · ${lyPerWeek(w).toFixed(1)} ly a week · ${d >= 2 ? Math.round(d) + " days" : (d * 24).toFixed(0) + " hours"} a light-year`;
+}
+/** Orders that call for maximum warp. */
+export const isUrgent = (o) => !!(o && (o.urgent || (o.twist && o.twist.fx === "urgent")));
+/** Ly a week the Pelion makes at its current warp (what "speed" means now). */
+export function speedOf(S) { return lyPerWeek(S.pelion.warp ?? CRUISE_WARP); }
+/** Travel time, in days, for a number of light-years at a warp factor. */
+export const travelDays = (ly, w) => ly * daysPerLy(w);
 /** Cheapest path (list of hexes after `from`) and its cost. */
 export function findPath(S, from, to, who = "pelion") {
   if (from === to) return { path: [], cost: 0 };
@@ -174,7 +205,9 @@ export function moveTo(S, unit, hex) {
   const p = findPath(S, U.at, hex, unit === "pelion" ? "pelion" : "support");
   // The ship now faces the hex side it last crossed.
   if (p && p.path.length) { const prev = p.path.length > 1 ? p.path[p.path.length - 2] : U.at, d = neighbors(prev).indexOf(hex); if (d >= 0) U.facing = d; }
-  U.mp -= r[hex]; U.at = hex;
+  if (unit === "pelion") { U.days = Math.max(0, U.days - r[hex] * daysPerLy(U.warp)); syncMp(S); U.strain = Math.max(U.strain || 0, U.warp); }
+  else U.mp -= r[hex];
+  U.at = hex;
   if (unit === "pelion") {
     S.pelion.docked = false;
     if (p && p.path.some(inZone) && !S.pelion.zoneMarked && !orderHere(S, hex, "border")) {
@@ -436,7 +469,7 @@ function applyAction(S, p) {
 }
 const say = (S, text, kind = "") => { log(S, text, kind); return text; };
 // ---------- Starfleet navigation ----------
-const HEX_LY = 5;                                     // a hex is five light-years across
+const HEX_LY = 1;                                     // a hex is a light-year across
 const PX = (k) => { const [q, r] = k.split(",").map(Number); return { x: Math.sqrt(3) * (q + r / 2), y: 1.5 * r }; };
 const zOf = (S, k) => ((hashString(S.seed + ":z:" + k) % 41) - 20) / 10;   // each hex's height off the sector's plane: ±2 hex widths
 const ang = (y, x) => (Math.round(((Math.atan2(y, x) * 200) / Math.PI + 400) % 400) % 400);   // an angle in 400 degrees
@@ -521,9 +554,11 @@ export function newOrder(S) {
     sys = pick(S, cands); at = sys.at; S.seenSys[sys.id] = true;
   }
   const twist = rand(S) < 0.6 ? pick(S, TWISTS) : null;
-  const dist = Math.ceil(distance(from, at) / speedOf(S));
+  // Travel time: at the maximum stable speed (warp 6), or, for urgent orders, at emergency warp 8, which Starfleet expects.
+  const urgent = !!(twist && twist.fx === "urgent");
+  const dist = Math.ceil(distance(from, at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
   const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
-    deadline: S.turn + dist + m.segs + 4 - (twist && twist.fx === "urgent" ? 2 : 0), twist, strange: pick(S, STRANGE), key: pick(S, KEYS) };
+    deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, STRANGE), key: pick(S, KEYS) };
   S.orders.push(o);
   if (twist && twist.fx === "klingon") { const k = closestOutpost(S, at); if (k) spawnEnemy(S, "kbc", k.at, { goal: "claim", target: at }); }
   if (twist && twist.fx === "orion") { const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base); spawnEnemy(S, "orion", b ? b.at : at, { goal: "raid", target: at, hostile: true }); }
@@ -591,8 +626,8 @@ export function score(S) {
 }
 export function rating(total) {
   // Every officer acts each turn, so a good tour scores high: these thresholds assume it.
-  return total >= 220 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 160 ? "Commended: a fine tour, and a ship Starfleet is proud of"
-    : total >= 100 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
+  return total >= 260 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 190 ? "Commended: a fine tour, and a ship Starfleet is proud of"
+    : total >= 120 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
 }
 export function checkEnd(S) {
   if (S.over) return;

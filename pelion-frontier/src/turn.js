@@ -2,7 +2,7 @@
 // Also the one place that ties the modules together, so the page imports this.
 import { CREW, SUPPORT, ENEMIES } from "./data.js";
 import { distance, within } from "./hex.js";
-import { hourly, check, target, available, log, storyEvent, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
+import { hourly, check, target, CRUISE_WARP, daysPerLy, maxWarp, syncMp, isUrgent, available, log, storyEvent, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
 import { startBattle, endBattle } from "./combat.js";
 import { aiTurn, claim } from "./ai.js";
 import { arcTurn, arcTick, arcEventChoose } from "./arc.js";
@@ -50,9 +50,10 @@ export function endTurn(S) {
   // New orders.
   const active = S.orders.filter((o) => !o.arc).length;
   if (S.turn >= 3 && active < 2 && (S.turn % 4 === 0 || active === 0 && S.turn % 2 === 0)) newOrder(S);
+  warpStrain(S);
   // Next turn.
   S.turn++;
-  S.pelion.mp = speedOf(S); S.pelion.engaged = false; S.pelion.zoneMarked = false;
+  newWeek(S); S.pelion.engaged = false; S.pelion.zoneMarked = false;
   for (const id in S.crew) S.crew[id].acted = false; S.tried = {};   // a new turn: everyone can act again
   for (const u of Object.values(S.support)) { u.mp = SUPPORT[u.type].speed; u.acted = false; }
   updateVisibility(S);
@@ -64,6 +65,30 @@ export function endTurn(S) {
   return { ok: true, income };
 }
 
+/**
+ * Above warp 6, the Pelion's maximum stable speed, is emergency speed, and the engines strain: at the end of a week in which the Pelion flew at warp 7 or more,
+ * the chief engineer rolls Engineering: −1 at warp 7, −3 at warp 8; nacelle tuning and a folded warp field give +2 each. A failure damages the engines (a box),
+ * which lowers the maximum warp by 2 until repaired. Urgent orders are worth it; Starfleet expects maximum warp for them.
+ */
+function warpStrain(S) {
+  const P = S.pelion, w = P.strain || 0;
+  if (w <= CRUISE_WARP) return;
+  const eng = available(S, "grath") ? "grath" : bestOfficer(S, ["Engineering"])?.officer;
+  if (!eng) return;
+  const extra = [[`Emergency warp ${w}`, -(2 * (w - CRUISE_WARP) - 1)]].concat(P.refits.warp ? [["Nacelle tuning", 2]] : [], hasRecord(S, "speed1") ? [["Folded warp field", 2]] : []);
+  const t = target(S, eng, "Engineering", { extra }), r = check(S, t.total), urgent = S.orders.some(isUrgent);
+  if (r.success) log(S, `Warp ${w} this week: ${officer(eng).short} keeps the engines in the green (Engineering, ${r.total} against ${r.target}).`, "good");
+  else { P.sys.engines = Math.min(3, P.sys.engines + 1); log(S, `Warp ${w} this week strains the engines past their limit (${officer(eng).short}, Engineering, ${r.total} against ${r.target}): engines damaged ${P.sys.engines}/3, maximum warp now ${maxWarp(S)} until repaired.${urgent ? " The orders were urgent; Starfleet will understand." : ""}`, "bad"); }
+}
+/** A new week for the Pelion: seven days of travel, plus any part of a light-year it was partway through. */
+function newWeek(S) {
+  const P = S.pelion;
+  if (P.warp === undefined) P.warp = CRUISE_WARP;
+  const carry = P.strain !== undefined && P.strain > 0 ? Math.min(P.days || 0, daysPerLy(P.warp), 7) : 0;
+  P.days = 7 + carry; P.strain = 0;
+  if (P.warp > maxWarp(S)) { P.warp = maxWarp(S); log(S, `Engine damage: the Pelion can make warp ${P.warp} at most.`, "bad"); }
+  syncMp(S);
+}
 /** An hour on Corvan II while the away team is down: everyone acts again, the drain goes on; the rest of the sector waits. */
 function endHour(S) {
   S.hour = (S.hour || 0) + 1;

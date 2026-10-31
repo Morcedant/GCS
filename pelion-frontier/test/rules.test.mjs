@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { newGame, check, actionsFor, attempt, resolve, moveTo, reachable, target, markCommand, score, visibleEnemies } from "../src/game.js";
+import { newGame, check, actionsFor, attempt, resolve, moveTo, reachable, target, markCommand, score, visibleEnemies, setWarp, maxWarp, lyPerWeek, isUrgent, CRUISE_WARP } from "../src/game.js";
 import { startBattle, exchange, battleStats } from "../src/combat.js";
 import { beamDown } from "../src/arc.js";
 import { endTurn, chooseEvent, closeBattle, dismissEvent } from "../src/turn.js";
@@ -29,12 +29,29 @@ test("targets add the officer's advantage and the ship's sensors", () => {
   assert.equal(target(S, "sevek", "Physical Sciences", { action: "investigate" }).total, 16 + 2);  // Eidetic Recall
   S.crew.sevek.inj = 2; assert.equal(target(S, "sevek", "Physical Sciences").total, 14);
 });
-test("moving costs moves, and a turn refills them", () => {
+test("warp: v = W³ × c; a hex is a light-year, a turn a week; above cruising the engines strain", () => {
   const S = newGame({ seed: "m" });
-  const far = Object.entries(reachable(S)).find(([, c]) => c === 3);
-  assert.ok(far); moveTo(S, "pelion", far[0]); assert.equal(S.pelion.mp, 0);
+  assert.equal(S.pelion.warp, CRUISE_WARP);
+  assert.ok(Math.abs(lyPerWeek(6) - 7 * 216 / 365.25) < 1e-9);                  // warp 6: 216c, about 4.1 ly a week
+  assert.ok(Math.abs(lyPerWeek(8) - 7 * 512 / 365.25) < 1e-9);                  // warp 8: 512c, about 9.8
+  assert.equal(Math.floor(S.pelion.mp), 4);
+  const far = Object.entries(reachable(S)).find(([, c]) => c === 4);
+  assert.ok(far); moveTo(S, "pelion", far[0]);
+  assert.ok(S.pelion.mp < 1 && S.pelion.days < 7 * 0.05);                      // most of the week used up
   assert.ok(moveTo(S, "pelion", S.systems[S.starbase].at).error);
-  endTurn(S); assert.equal(S.pelion.mp, 3);
+  setWarp(S, 8); assert.ok(S.pelion.mp > 0 && S.pelion.mp < 1);               // same days left, more distance
+  setWarp(S, 0); assert.equal(S.pelion.mp, 0);                                   // impulse: no light-years
+  setWarp(S, 12); assert.equal(S.pelion.warp, 8);                                // the emergency maximum
+  S.pelion.sys.engines = 1; assert.equal(maxWarp(S), 6);
+  S.pelion.sys.engines = 0; setWarp(S, 8);
+  endTurn(S);
+  assert.ok(S.pelion.mp >= 9.8 - 1e-9);                                          // a new week at warp 8
+  // The first orders are urgent; their deadline assumes maximum warp.
+  assert.ok(isUrgent(S.orders.find((o) => o.arc)));
+  const T = newGame({ seed: "strain" }); setWarp(T, 8);
+  moveTo(T, "pelion", Object.entries(reachable(T)).find(([, c]) => c === 1)[0]);
+  endTurn(T);
+  assert.ok(T.log.some((l) => /Warp 8 this week/.test(l.text)));                // the strain check
 });
 test("one action a turn, with a reroll for a Duty point", () => {
   const S = newGame({ seed: "a" });
@@ -249,6 +266,6 @@ test("Starfleet flight paths: three values in 400 degrees, relative to the ship'
   const c = position(S, "0,0");
   assert.ok(Math.abs(c.x) < 0.05 && Math.abs(c.y) < 0.05);   // the center is the origin
   assert.ok(c.fromSol > 150 && c.fromSol < 260);
-  assert.ok(position(S, "1,0").x > 4.9 && position(S, "1,0").x < 5.1);              // five light-years a hex
+  assert.ok(position(S, "1,0").x > 0.99 && position(S, "1,0").x < 1.01);              // a light-year a hex
   assert.match(c.text, /ly from the sector's center · \d+ ly from Sector 001 \(Sol\)$/);
 });

@@ -32,15 +32,15 @@ export const CAPTAIN = { id: "captain", short: "Captain", skills: { Leadership: 
 // Ships. Systems take 3 boxes each: 1 Damaged (−2), 2 Crippled (−4), 3 Offline.
 export const PELION = { name: "USS Pelion", reg: "NCC-1750", cls: "Heavy Cruiser", shields: 5, hull: 5, power: 5, maneuver: 3, sensors: 3, phaser: 2, torps: 40, torpBonus: 1, speed: 3 };
 export const SUPPORT = {
-  escort: { name: "Escort", cls: "Escort", cost: 30, shields: 2, hull: 3, maneuver: 5, helm: 12, gunner: 12, phaser: 1, speed: 3, blurb: "Guards a world: fights raiders that come to it, and joins the Pelion's battles." },
-  science: { name: "Science vessel", cls: "Science vessel", cost: 25, shields: 2, hull: 3, maneuver: 5, helm: 11, gunner: 10, phaser: 1, speed: 3, skill: 12, blurb: "Surveys and investigates on its own (skill 12, sensors +2)." },
+  escort: { name: "Escort", cls: "Escort", cost: 30, shields: 2, hull: 3, maneuver: 5, helm: 12, gunner: 12, phaser: 1, speed: 4, warp: 6, blurb: "Guards a world: fights raiders that come to it, and joins the Pelion's battles." },
+  science: { name: "Science vessel", cls: "Science vessel", cost: 25, shields: 2, hull: 3, maneuver: 5, helm: 11, gunner: 10, phaser: 1, speed: 4, warp: 6, skill: 12, blurb: "Surveys and investigates on its own (skill 12, sensors +2)." },
 };
 export const SUPPORT_NAMES = ["USS Kestrel", "USS Calder", "USS Ishikawa", "USS Tamsin", "USS Meridian Rose", "USS Okonkwo", "USS Halvard", "USS Sabre"];
 export const ENEMIES = {
-  kbc: { name: "Klingon battle cruiser", power: "klingon", shields: 5, hull: 5, maneuver: 3, helm: 12, gunner: 12, dmg: 2, torp: true, will: 12, cloak: true, relentless: true, speed: 3 },
-  kbop: { name: "Klingon bird-of-prey", power: "klingon", shields: 2, hull: 3, maneuver: 5, helm: 13, gunner: 12, dmg: 1, will: 11, cloak: true, ambush: true, speed: 3 },
-  rbop: { name: "Romulan bird-of-prey", power: "romulan", shields: 3, hull: 3, maneuver: 5, helm: 11, gunner: 12, dmg: 2, plasma: true, will: 13, cloak: true, ambush: true, speed: 3 },
-  orion: { name: "Orion raider", power: "orion", shields: 2, hull: 3, maneuver: 6, helm: 13, gunner: 11, dmg: 1, will: 10, fast: true, speed: 4 },
+  kbc: { name: "Klingon battle cruiser", power: "klingon", shields: 5, hull: 5, maneuver: 3, helm: 12, gunner: 12, dmg: 2, torp: true, will: 12, cloak: true, relentless: true, speed: 4, warp: 6 },
+  kbop: { name: "Klingon bird-of-prey", power: "klingon", shields: 2, hull: 3, maneuver: 5, helm: 13, gunner: 12, dmg: 1, will: 11, cloak: true, ambush: true, speed: 4, warp: 6 },
+  rbop: { name: "Romulan bird-of-prey", power: "romulan", shields: 3, hull: 3, maneuver: 5, helm: 11, gunner: 12, dmg: 2, plasma: true, will: 13, cloak: true, ambush: true, speed: 4, warp: 6 },
+  orion: { name: "Orion raider", power: "orion", shields: 2, hull: 3, maneuver: 6, helm: 13, gunner: 11, dmg: 1, will: 10, fast: true, speed: 5, warp: 6.5 },
   orionBase: { name: "Orion pirate base", power: "orion", shields: 4, hull: 4, maneuver: 0, helm: 0, gunner: 11, dmg: 2, will: 11, base: true, speed: 0 },
 };
 export const POWERS = {
@@ -124,7 +124,7 @@ export const REFITS = {
   sensors: { name: "Sensor refit", cost: 40, blurb: "Sensors rating 3 → 4: +1 more to Sensors rolls, and you see a hex farther." },
   phasers: { name: "Phaser refit", cost: 50, blurb: "+1 to hit with phasers." },
   shields: { name: "Shield emitters", cost: 50, blurb: "Shields 5 → 6." },
-  warp: { name: "Warp nacelle tuning", cost: 60, blurb: "Speed 3 → 4 hexes a turn." },
+  warp: { name: "Warp nacelle tuning", cost: 60, blurb: "+2 to the engine strain checks at emergency warp (above warp 6)." },
   power: { name: "Power couplings", cost: 60, blurb: "Power 5 → 6 in battle." },
   sickbay: { name: "Sickbay upgrade", cost: 30, blurb: "Injured crew heal a box every turn." },
 };
@@ -138,7 +138,7 @@ export const RECORDS = [
   { id: "biostasis", name: "Biostasis fields", text: "Injured crew heal a box every turn.", perk: "heal" },
   { id: "graviton", name: "Graviton lensing", text: "+1 to Survey and Investigate.", perk: "science1" },
   { id: "dilithium", name: "Dilithium resonance", text: "+1 Power in battle.", perk: "power1" },
-  { id: "warpfield", name: "A folded warp field", text: "+1 move a turn.", perk: "speed1" },
+  { id: "warpfield", name: "A folded warp field", text: "+2 to warp strain checks: the field holds at high warp.", perk: "speed1" },
   { id: "caretaker", name: "The caretaker of Corvan II", text: "A machine's account of a vanished civilization: +1 to diplomatic missions.", perk: "envoy1", story: true },
 ];
 

@@ -2,7 +2,7 @@
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
-  speedOf, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
+  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
 import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound, contestOdds } from "./arc.js";
@@ -31,7 +31,7 @@ function startGame(state) {
   fitView();
   $("app").hidden = false; closeModal();
   after();
-  if (S.turn === 1 && !S.log.some((l) => l.text.startsWith("Captain"))) toast(`Orders: Corvan II has gone silent. Double-click it (marked !) to set course.`);
+  if (S.turn === 1 && !S.log.some((l) => l.text.startsWith("Captain"))) toast(`Orders: Corvan II has gone silent. Double-click it (marked !) to set course: urgent, so at emergency warp 8.`);
 }
 function save() { if (S) store.set(JSON.stringify(S)); }
 /** After anything changes: save, redraw, and open whatever dialog the state calls for. */
@@ -83,14 +83,17 @@ function bindMap() {
 }
 function zoomBy(f) { view.zoom = Math.max(0.4, Math.min(2.6, view.zoom * f)); draw(); }
 /** Move the selected ship to a hex, or as far along the way as it can go this turn. */
-function goTo(hex) {
+function goTo(hex, warp) {
   if (!S || S.over) return;
   const u = U();
+  // Urgent orders: the helm goes to maximum warp on its own; the captain can drop it again.
+  if (unit === "pelion" && warp === undefined && S.orders.some((o) => o.at === hex && isUrgent(o)) && S.pelion.warp < maxWarp(S)) warp = maxWarp(S);
+  if (unit === "pelion" && warp !== undefined && warp !== S.pelion.warp) { setWarp(S, warp); toast(`Warp ${S.pelion.warp}: ${S.pelion.warp >= maxWarp(S) ? "emergency maximum, for urgent orders" : S.pelion.warp === CRUISE_WARP ? "maximum stable speed" : S.pelion.warp > CRUISE_WARP ? "emergency speed" : "below the maximum stable speed"}.`); }
   if (hex === u.at) { selHex = hex; renderPanel(); draw(); return; }
   const R = reachable(S, unit);
   let dest = R[hex] !== undefined ? hex : null;
   if (!dest) { const p = findPath(S, u.at, hex, unit === "pelion" ? "pelion" : "support"); if (p) for (const k of p.path) if (R[k] !== undefined) dest = k; }
-  if (!dest || dest === u.at) { toast(u.mp ? "Can't get any closer this turn." : "No moves left this turn. End the turn to go on.", true); return; }
+  if (!dest || dest === u.at) { toast(unit === "pelion" && !S.pelion.warp ? "At impulse the Pelion can't leave the system: go to warp (the Here tab)." : u.mp >= 1 ? "Can't get any closer this turn." : "Not enough of the week left for another light-year at this warp. End the turn to go on.", true); return; }
   const r = moveTo(S, unit, dest);
   if (r.error) { toast(r.error, true); return; }
   selHex = dest === hex ? hex : selHex; lastResult = null;
@@ -144,9 +147,9 @@ function draw() {
     if (p && p.path.length) {
       ctx.strokeStyle = "rgba(242,193,78,.8)"; ctx.lineWidth = 2; ctx.setLineDash([5, 4]); ctx.beginPath();
       let q = toPixel(u.at, size); ctx.moveTo(q.x, q.y); for (const k of p.path) { q = toPixel(k, size); ctx.lineTo(q.x, q.y); } ctx.stroke(); ctx.setLineDash([]);
-      const sp = unit === "pelion" ? speedOf(S) : SUPPORT[u.type].speed, first = Math.min(u.mp, p.cost), turns = p.cost <= u.mp ? 0 : Math.ceil((p.cost - first) / sp);
+      const sp = unit === "pelion" ? speedOf(S) : SUPPORT[u.type].speed, first = Math.min(u.mp, p.cost), turns = p.cost <= u.mp ? 0 : sp ? Math.ceil((p.cost - first) / sp) : Infinity;
       const nb = navBearing(S, u.at, selHex, unit === "pelion" ? S.pelion.facing || 0 : u.facing || 0);
-      ctx.fillStyle = "#f2c14e"; ctx.font = "bold 11px system-ui"; ctx.fillText(`${nb.text} · ${turns ? `${turns + 1} turns` : "this turn"}`, q.x + 9, q.y - 9);
+      ctx.fillStyle = "#f2c14e"; ctx.font = "bold 11px system-ui"; ctx.fillText(`${nb.text} · ${p.cost} ly${unit === "pelion" ? ` · warp ${S.pelion.warp}` : ""} · ${!isFinite(turns) ? "can't at impulse" : turns ? `${turns + 1} turns` : "this turn"}`, q.x + 9, q.y - 9);
     }
   }
   // Ships.
@@ -320,6 +323,14 @@ function renderPanel() {
 }
 
 // ---------- Here: what's in the selected hex, and what the ship can do ----------
+/** The warp control: impulse or warp 1 to the maximum, and what's left of the week. */
+function warpHTML() {
+  const P = S.pelion, mw = maxWarp(S), opts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter((w) => w <= Math.max(8, mw));
+  const left = P.days || 0;
+  return `<div class="card small" style="padding:8px 10px"><label><b>Speed</b> <select data-warp aria-label="Warp factor">${opts.map((w) => `<option value="${w}" ${w === P.warp ? "selected" : ""} ${w > mw ? "disabled" : ""}>${w ? `Warp ${w}${w === CRUISE_WARP ? " (maximum stable)" : w === 8 ? " (emergency maximum)" : w > CRUISE_WARP ? " (emergency)" : ""}` : "Impulse"}${w > mw ? " (engines damaged)" : ""}</option>`).join("")}</select></label>
+    <div class="muted" style="margin-top:4px">${esc(warpText(P.warp))}. v = W³ × c.</div>
+    <div style="margin-top:2px">This week: ${left.toFixed(1)} of 7 days left${P.warp ? `, ${P.mp.toFixed(1)} ly at this warp` : ""}.${P.warp > CRUISE_WARP ? ` <span class="bad">Emergency speed: an Engineering check at the end of the week, or the engines take damage.</span>` : ""}</div></div>`;
+}
 function units() {
   const list = [["pelion", "USS Pelion"], ...Object.values(S.support).map((u) => [u.id, u.name])];
   if (list.length < 2) return "";
@@ -329,7 +340,7 @@ function hint() {
   if (!S.tutorial.on || S.turn > 12) return "";
   const A = S.arc, cv = S.systems[S.corvan];
   let t = "";
-  if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:</b> fly to Corvan II (the gold <b>!</b>). Double-click it on the map: the Pelion goes as far as it can this turn. Then <b>End turn</b>.`;
+  if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:</b> fly to Corvan II (the gold <b>!</b>). The orders are urgent: double-click it on the map and the helm goes to emergency warp (warp ${maxWarp(S)}, 512 × light speed; warp 6 is the Pelion's maximum stable speed), as far as it can this turn. Then <b>End turn</b>.`;
   else if (A.stage === "orbit") t = Object.values(S.enemies).some((e) => e.goal === "arc" && e.hidden) && !A.raiderMet
     ? "<b>Next:</b> passive sensors show nothing and the outpost is silent. A Sensor sweep checks the space around Corvan II (anything behind the moon?); sweeping the ruins finds out what happened below. Both are on the Here tab."
     : "<b>Next:</b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
@@ -343,13 +354,13 @@ function hint() {
 }
 function hereHTML() {
   const u = U(), hex = selHex || u.at, s = sysAt(S, hex), here = hex === u.at;
-  let h = units() + hint();
+  let h = units() + hint() + (unit === "pelion" ? warpHTML() : "");
   if (S.pending && S.pending.unit === unit) h += pendingHTML();
   else if (lastResult) h += resultHTML(lastResult);
   // The place.
   const k = s && shownKind(s);
   h += `<h2>${esc(s ? s.name : S.hexes[hex].terrain === "zone" ? "The Neutral Zone" : S.hexes[hex].terrain === "nebula" ? "Nebula" : "Open space")}</h2>`;
-  h += `<p class="muted">${s ? esc(k ? kindName({ ...s, kind: k }) : "Uncharted system: survey it to find out") : ""}${S.hexes[hex].terrain === "nebula" ? " · Nebula: 2 moves to enter" : ""}${inZone(hex) ? " · Entering marks Starfleet Command, unless orders send you" : ""}</p>`;
+  h += `<p class="muted">${s ? esc(k ? kindName({ ...s, kind: k }) : "Uncharted system: survey it to find out") : ""}${S.hexes[hex].terrain === "nebula" ? " · Nebula: counts as 2 light-years of travel" : ""}${inZone(hex) ? " · Entering marks Starfleet Command, unless orders send you" : ""}</p>`;
   h += `<p class="small muted" style="margin-top:-4px">Position: ${esc(position(S, hex).text)}</p>`;
   if (s && k === "independent") h += `<div class="kv"><span>Accord</span><span>${s.accord > 0 ? "+" : ""}${s.accord} (Federation at +5, Klingon Empire at −5)</span></div>`;
   if (s && s.harm) h += `<div class="kv"><span>Harm</span><span class="bad">${s.harm}/3</span></div>`;
@@ -360,7 +371,13 @@ function hereHTML() {
   if (!here) {
     const p = findPath(S, u.at, hex, unit === "pelion" ? "pelion" : "support");
     if (p) { const R = reachable(S, unit), nb = navBearing(S, u.at, hex, unit === "pelion" ? S.pelion.facing || 0 : u.facing || 0), sp = unit === "pelion" ? speedOf(S) : SUPPORT[u.type].speed;
-      h += `<p class="small"><b>Flight path:</b> ${nb.text} (from the ship's bow) · ${distance(u.at, hex)} hex${distance(u.at, hex) === 1 ? "" : "es"} · ${R[hex] !== undefined ? "reachable this turn" : `about ${Math.ceil(Math.max(0, p.cost - u.mp) / sp) + 1} turns`}</p><div class="btn-row"><button class="btn primary" data-go="${hex}">${R[hex] !== undefined ? `Move here (${R[hex]} of ${u.mp} moves)` : "Set course: as far as we can this turn"}</button></div>`; }
+      const P = S.pelion, pel = unit === "pelion", urgent = pel && S.orders.some((o) => o.at === hex && isUrgent(o)), mw = maxWarp(S);
+      const eta = (w) => { const d = travelDays(p.cost, w); return d >= 2 ? `${Math.round(d)} days` : `${Math.round(d * 24)} hours`; };
+      const turnsAt = R[hex] !== undefined ? "reachable this turn" : sp ? `about ${Math.ceil(Math.max(0, p.cost - u.mp) / sp) + 1} turns` : "not at impulse: go to warp";
+      h += `<p class="small"><b>Flight path:</b> ${nb.text} (from the ship's bow) · ${p.cost} light-year${p.cost === 1 ? "" : "s"} · ${pel ? (P.warp ? `${eta(P.warp)} at warp ${P.warp} · ` : "") : ""}${turnsAt}</p>`;
+      if (pel && P.warp !== mw) h += `<p class="small muted">At warp ${mw} (emergency maximum): ${eta(mw)}.${P.warp !== CRUISE_WARP && mw >= CRUISE_WARP ? ` At warp ${CRUISE_WARP} (maximum stable): ${eta(CRUISE_WARP)}.` : ""}</p>`;
+      if (urgent) h += `<p class="small"><b class="bad">Urgent orders:</b> Starfleet expects maximum emergency warp (warp ${mw}). Above warp ${CRUISE_WARP}, the maximum stable speed, the engines strain: an Engineering check at the end of the week, or engine damage.</p>`;
+      h += `<div class="btn-row">${urgent && P.warp !== mw ? `<button class="btn primary" data-go="${hex}" data-warp-go="${mw}">Emergency speed: set course at warp ${mw}</button>` : ""}<button class="btn ${urgent && P.warp !== mw ? "" : "primary"}" data-go="${hex}">${R[hex] !== undefined ? `Move here (${p.cost} ly${pel && P.warp ? `, ${eta(P.warp)}` : ""})` : `Set course${pel ? ` at warp ${P.warp}` : ""}: as far as we can this turn`}</button></div>`; }
     return h;
   }
   // What the ship can do here.
@@ -447,7 +464,7 @@ function shipHTML() {
   let h = `<h2>USS Pelion · ${PELION.reg}</h2><p class="muted">${PELION.cls}. ${P.docked ? "Docked at Starbase 23." : `At ${esc(sysAt(S, P.at)?.name || "sector " + P.at)}.`}</p>`;
   h += `<div class="kv"><span>Shields</span><span>${boxes(sm - P.shields, sm, "blue")}</span><span>Hull</span><span>${boxes(PELION.hull - P.hull, PELION.hull, "gold")}</span>`
     + ["weapons", "engines", "sensors"].map((k) => `<span>${k[0].toUpperCase() + k.slice(1)}</span><span>${boxes(P.sys[k], 3)} ${["", "Damaged", "Crippled", "Offline"][P.sys[k]]}</span>`).join("")
-    + `<span>Power</span><span>${powerOf(S)}${P.powerLoss ? ` (−${P.powerLoss})` : ""}</span><span>Torpedoes</span><span>${P.torps}/${PELION.torps}</span><span>Speed</span><span>${speedOf(S)} hexes a turn</span><span>Sensors</span><span>rating ${sensorsRating(S)}; sees ${2 + (P.refits.sensors ? 1 : 0)} hexes</span></div>`;
+    + `<span>Power</span><span>${powerOf(S)}${P.powerLoss ? ` (−${P.powerLoss})` : ""}</span><span>Torpedoes</span><span>${P.torps}/${PELION.torps}</span><span>Speed</span><span>Warp ${P.warp}${P.warp === CRUISE_WARP ? " (maximum stable)" : P.warp > CRUISE_WARP ? " (emergency)" : ""}: ${speedOf(S).toFixed(1)} ly a week. Maximum stable warp ${CRUISE_WARP}; emergency maximum warp ${maxWarp(S)}${maxWarp(S) < 8 ? " (engines damaged)" : ""}</span><span>Sensors</span><span>rating ${sensorsRating(S)}; sees ${2 + (P.refits.sensors ? 1 : 0)} hexes</span></div>`;
   h += `<p class="small muted">Hull and systems are repaired at Starbase 23 (or by Engineering, a box at a time). Shields come back after each battle.</p>`;
   h += `<h3>Refits ${P.docked ? "" : "(at Starbase 23)"}</h3>`;
   for (const [id, R] of Object.entries(REFITS)) h += `<div class="card ${P.refits[id] ? "green" : "violet"}"><h4>${esc(R.name)}</h4><div class="small muted">${esc(R.blurb)}</div><div class="roll-row">${P.refits[id] ? `<span class="good small">Fitted</span>` : `<button class="btn small" data-refit="${id}" ${!P.docked || S.science < R.cost ? "disabled" : ""}>Fit it: ${R.cost} science</button>`}</div></div>`;
@@ -557,7 +574,8 @@ function ordersHTML() {
       h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))} (−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}): +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? "" : ", and a Starfleet Command box cleared"}. <b class="bad">Failure:</b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.</div>`;
       h += `<div class="small muted" style="margin-top:4px">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.</div>`;
     }
-    h += `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-go="${o.at}">Set course</button></div></div>`;
+    if (isUrgent(o)) h += `<div class="small" style="margin-top:6px"><b class="bad">Urgent:</b> proceed at maximum emergency warp (warp ${maxWarp(S)}). The deadline assumes it; above warp 6 the engines strain.</div>`;
+    h += `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}</button></div></div>`;
   }
   // Past orders.
   h += `<h3>Past orders</h3>` + (hist.length ? `<ul class="log">${hist.slice().reverse().map((x) => `<li class="${x.result === "failed" ? "bad" : x.result === "partly" ? "order" : "good"}"><b>${x.result === "failed" ? "✗ Failed" : x.result === "partly" ? "◐ Partly" : "✓ Carried out"}</b> · turn ${x.turn} · ${esc(x.title)}<br><span class="small">${esc(x.how)}</span></li>`).join("")}</ul>` : `<p class="small muted">None yet. Each order carried out clears a Starfleet Command box; each failure marks one.</p>`);
@@ -604,7 +622,7 @@ function bindChrome() {
     if (b.dataset.beam) { const since = mark(); const ids = [...b.closest(".card").querySelectorAll("[data-away]:checked")].map((x) => x.dataset.away); const r = beamDown(S, ids); if (r.error) toast(r.error, true); else { mapMode = "surface"; reportSince("Energize", since); } after(); return; }
     if (b.dataset.beamup) { const since = mark(); beamDown(S, []); reportSince("Beam them up", since); after(); return; }
     if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }
-    if (b.dataset.go) { selHex = b.dataset.go; goTo(b.dataset.go); return; }
+    if (b.dataset.go) { selHex = b.dataset.go; goTo(b.dataset.go, b.dataset.warpGo !== undefined ? +b.dataset.warpGo : undefined); return; }
     if (b.dataset.center) { centerOn(b.dataset.center); selHex = b.dataset.center; tab = "here"; renderAll(); return; }
     if (b.dataset.act) {
       const a = JSON.parse(b.dataset.act), sel = b.parentElement.querySelector("[data-who]");
@@ -625,6 +643,7 @@ function bindChrome() {
   // Picking someone else for an action shows how their target is made.
   $("panel").addEventListener("change", (e) => { const sel = e.target.closest("[data-who]"); if (!sel) return; refreshCard(sel.closest(".card")); });
   $("panel").addEventListener("change", (e) => { if (e.target.closest("[data-assist]")) refreshCard(e.target.closest(".card")); });
+  $("panel").addEventListener("change", (e) => { const w = e.target.closest("[data-warp]"); if (w) { setWarp(S, +w.value); after(); } });
   $("panel").addEventListener("change", (e) => { const s = e.target.closest("[data-station]"); if (s) { setStation(S, s.dataset.station, s.value); after(); } });
   $("panel").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-hex]"); if (tr) { selHex = tr.dataset.hex; centerOn(selHex); tab = "here"; renderAll(); } });
   $("end-turn").onclick = doEndTurn;
@@ -657,7 +676,7 @@ function showStarter(canContinue) {
   modal(`<h1>USS Pelion: Frontier</h1>
   <p class="lede">Stardate 5212.4. The Pelion, a Heavy Cruiser under your command, is assigned to the Corvan Sector for fifty weeks: a frontier between the Federation, the Klingon Empire and the Romulan Neutral Zone, full of worlds that haven't chosen a side and things no one has explained.</p>
   <div class="grid2">
-    <div class="brief"><h3>The ship</h3><p>Double-click a hex to fly there (3 hexes a turn; nebulae cost 2). Then the crew goes to work where you are: every officer acts once a turn (survey, investigate, negotiate, sweep, repair), each job once. Starbase 23 repairs, rearms and refits you.</p></div>
+    <div class="brief"><h3>The ship</h3><p>Double-click a hex to fly there. A hex is a light-year and a turn a week; speed is v = W³ × c, so warp 6, the Pelion's maximum stable speed, covers about 4 light-years a week, and warp 8, its emergency maximum, about 10, at a risk to the engines. Urgent orders call for emergency warp. Nebulae count double. Then the crew goes to work where you are: every officer acts once a turn (survey, investigate, negotiate, sweep, repair), each job once. Starbase 23 repairs, rearms and refits you.</p></div>
     <div class="brief"><h3>The crew</h3><p>The six officers from the Players' Guide do the work. Every action is the tabletop roll: 3d6 at or under their skill. Pick who does it, and whether a second officer assists (+1, using their turn); a Duty point rerolls a failure.</p></div>
     <div class="brief"><h3>Orders</h3><p>Starfleet sends missions from the GM's Guide's tables, each with a deadline and a twist. The first is The Silence at Corvan II.</p></div>
     <div class="brief"><h3>The worlds</h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.</p></div>
