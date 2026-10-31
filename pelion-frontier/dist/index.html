@@ -712,15 +712,15 @@ function actionsFor(S, unit = "pelion") {
   const s = sysAt(S, U.at), out = [];
   const add = (id, extra = {}) => out.push({ id, ...ACTIONS[id], ...extra });
   const sci = unit !== "pelion";
-  if (s && !s.surveyed && s.kind !== "klingon") add("survey", { sys: s.id });
+  if (s && !s.surveyed && s.kind !== "klingon") add("survey", { sys: s.id, oppose: surveyOpposition(S, s, U.at) });
   if (s && s.surveyed && (s.kind === "anomaly" || s.kind === "ruins") && !s.recorded) add("investigate", { sys: s.id, blurb: `Discovery clock ${s.clock}/${s.need}. Fill it for a library record. Lose by 3 or more and it bites back.`, oppose: s.kind === "ruins" ? { name: "the ruins' old defenses", skill: "Hazard", target: 12, why: "Whoever built this didn't want visitors." } : { name: "the anomaly", skill: "Strangeness", target: 12, why: "It doesn't follow the physics the sensors expect." } });
   if (sci) return out.map((a) => ({ ...a, why: U.acted ? "Already acted this turn." : null }));
   if (s && s.kind === "independent") add("envoy", { sys: s.id, blurb: `Accord ${signedAccord(s.accord)}. At +5 they petition to join the Federation; at −5 they join the Klingon Empire. The closer they come, the harder the last steps.`, oppose: envoyOpposition(S, s) });
   if (s && s.kind === "prewarp" && s.surveyed && !s.observed) add("observe", { sys: s.id, oppose: { name: "their watchers", skill: "Notice", target: 10, why: "Even a pre-warp people looks up at the sky." } });
-  if (s && s.harm > 0 && ["colony", "member", "independent"].includes(s.kind)) add("aid", { sys: s.id, blurb: `Harm ${s.harm}/3. Clear a box.` });
+  if (s && s.harm > 0 && ["colony", "member", "independent"].includes(s.kind)) add("aid", { sys: s.id, blurb: `Harm ${s.harm}/3. Clear a box.`, oppose: aidOpposition(S, s) });
   const P = S.pelion;
-  if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair");
-  add("sweep");
+  if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair", { oppose: repairOpposition(S) });
+  add("sweep", { oppose: { name: "cloaks and subspace static", skill: "Concealment", target: 11, why: "Anything worth finding is trying not to be found, and the sector's background noise helps it." } });
   for (const e of enemiesAt(S, U.at)) if ((!e.cloaked || e.revealed) && !e.hidden && !ENEMIES[e.type].base) {
     if (ENEMIES[e.type].will) add("hail", { enemy: e.id, name: `Hail the ${ENEMIES[e.type].name}`, oppose: { name: `the ${ENEMIES[e.type].name}'s captain`, skill: "Will", target: ENEMIES[e.type].will + (e.power === "romulan" ? 2 : 0), why: e.power === "klingon" ? "A Klingon captain backs down from nothing lightly." : e.power === "romulan" ? "Romulans don't negotiate from weakness, and never think they're weak." : "Pirates weigh the odds, and the profit." } });
     out.push({ id: "engage", enemy: e.id, name: `Engage the ${ENEMIES[e.type].name}`, skills: [], blurb: engageNote(S, e) });
@@ -734,6 +734,23 @@ function actionsFor(S, unit = "pelion") {
   const surface = s && s.id === S.corvan && S.arc.team && ["pull", "orions", "caretaker", "phasers"].includes(S.arc.stage);
   if (surface) { const aboard = CREW.map((c) => c.id).filter((id) => !S.arc.team.includes(id)); for (const x of out) if (x.id !== "arc" && x.id !== "beam" && !x.who) { x.who = aboard; x.bridge = true; } }
   return out.map((a) => ({ ...a, why: a.why || whyNot(S, a) }));
+}
+/** What a survey is up against: the system's radiation and distance, worse in a nebula or around something strange. */
+function surveyOpposition(S, s, hex) {
+  const nebula = S.hexes[hex] && S.hexes[hex].terrain === "nebula", odd = s.kind === "anomaly" || s.kind === "ruins";
+  if (nebula) return { name: "the nebula's interference", skill: "Interference", target: 12, why: "Ionized gas scatters every sensor beam." };
+  if (odd) return { name: "readings that don't add up", skill: "Distortion", target: 11, why: "Something here bends the sensor returns." };
+  return { name: "the system's radiation and distance", skill: "Interference", target: 9, why: "Stellar radiation and light-hours of distance blur the readings." };
+}
+/** Repairs: the damage itself, worse the more there is. */
+function repairOpposition(S) {
+  const P = S.pelion, boxes = P.hull + P.sys.weapons + P.sys.engines + P.sys.sensors + (P.shields ? 1 : 0);
+  return { name: "the damage itself", skill: "Severity", target: Math.min(13, 8 + boxes), why: boxes > 2 ? "One failure leads to the next: the worse the damage, the harder the fix." : "Burnt-out relays and buckled plating don't fix themselves." };
+}
+/** Relief work: the devastation, or raiders still overhead. */
+function aidOpposition(S, s) {
+  if (Object.values(S.enemies).some((e) => e.at === s.at && e.hostile && !ENEMIES[e.type].base)) return { name: "the raiders still overhead", skill: "Harassment", target: 12, why: "Relief teams under fire work slowly." };
+  return { name: "the devastation", skill: "Severity", target: 8 + s.harm, why: s.harm >= 2 ? "Whole districts are down; every fix uncovers another failure." : "Fires, failed power and frightened people." };
 }
 /** Who works against the Pelion's envoys: Klingon envoys courting the same world, or the world's own doubters. */
 function envoyOpposition(S, s) {
