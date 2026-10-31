@@ -283,11 +283,13 @@ function renderBar() {
   $("end-turn").disabled = !canEndTurn(S);
 }
 function renderTabs() {
+  const aw = document.querySelector('[data-tab="away"]'); if (aw) aw.hidden = !awayActive();
   const due = S.orders.filter((o) => o.deadline - S.turn <= 2).length;
   document.querySelectorAll(".tabs button").forEach((b) => { b.setAttribute("aria-selected", String(b.dataset.tab === tab)); if (b.dataset.tab === "orders") b.innerHTML = `Orders${S.orders.length ? `<span class="badge" style="${due ? "" : "background:var(--blue)"}">${S.orders.length}</span>` : ""}`; });
 }
 function renderPanel() {
-  const html = { here: hereHTML, ship: shipHTML, crew: crewHTML, orders: ordersHTML, sector: sectorHTML, log: logHTML }[tab]();
+  if (tab === "away" && !awayActive()) tab = "orders";
+  const html = { here: hereHTML, ship: shipHTML, crew: crewHTML, orders: ordersHTML, away: awayHTML, sector: sectorHTML, log: logHTML }[tab]();
   $("panel").innerHTML = html;
   if (tab === "log") $("panel").scrollTop = $("panel").scrollHeight;  // the latest entry
 }
@@ -305,8 +307,8 @@ function hint() {
   if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:</b> fly to Corvan II (the gold <b>!</b>). Double-click it on the map: the Pelion goes as far as it can this turn. Then <b>End turn</b>.`;
   else if (A.stage === "orbit") t = "<b>Next:</b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
   else if (A.stage === "pull" && !A.team) t = "<b>Next:</b> choose an away team and beam them down to the outpost (the Here tab).";
-  else if (A.stage === "pull") t = "<b>Next:</b> the away team. Use the actions below, one a turn, to fill the record before the Countdown fills.";
-  else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:</b> finish it on Corvan II: the action below.";
+  else if (A.stage === "pull") t = "<b>Next:</b> the away team. Use their actions on the Here tab, one a turn, to fill the record before the Countdown fills.";
+  else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:</b> finish it on Corvan II: the away team's actions on the Here tab.";
   else if (S.turn <= 12) t = "<b>Next:</b> Starfleet will send new orders (the Orders tab). Meanwhile: survey the unknown (?), court the independent worlds, and watch for raiders.";
   return t ? `<div class="card gold small">${t}</div>` : "";
 }
@@ -428,13 +430,30 @@ function crewHTML() {
 }
 
 // ---------- Orders ----------
+// ---------- Away team: the Corvan II mission on the surface, apart from the orders ----------
+const awayActive = () => S && ["orbit", "pull", "orions", "caretaker"].includes(S.arc.stage);
+function awayHTML() {
+  const A = S.arc;
+  let h = `<h2>Away team: Corvan II</h2>`;
+  if (A.stage === "orbit") h += `<p class="small muted">In orbit. Nobody has gone down yet: sweep the ruins with the ship's sensors first (the Here tab).</p>`;
+  else h += `<div class="kv small"><span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} the Pelion breaks orbit when it fills</span><span>Record</span><span>${boxes(A.clock, CLOCK, "blue")} what's in the ruins</span><span>Stage</span><span>${{ pull: "Investigating", orions: "The Orion diggers", caretaker: "The caretaker" }[A.stage]}</span></div>`;
+  h += `<h3>Who's down there</h3>`;
+  if (!A.team) h += `<p class="small muted">${A.stage === "orbit" ? "No one yet." : "No one: choose an away team on the Here tab."}</p>`;
+  else {
+    h += `<div class="crew">` + A.team.map((id) => { const c = officer(id), st = S.crew[id], where = SITES[(A.pos && A.pos[id]) || "outpost"];
+      return `<div class="officer ${DIV[id]}" style="padding:8px 10px"><h4 style="font-size:15px">${esc(c.name)}</h4><div class="small">At ${esc(where.name.toLowerCase())}${st.inj ? ` · <span class="bad">hurt ${st.inj}/3${st.inj >= 3 ? ", beamed to sickbay" : ""}</span>` : ""} · Duty ${st.duty}</div></div>`; }).join("") + `</div>`;
+    h += `<div class="btn-row"><button class="btn small" data-tab-go="here">Their actions (Here tab)</button>${mapMode === "surface" ? "" : `<button class="btn small" data-surface="1">Show the surface map</button>`}</div>`;
+  }
+  const found = Object.entries(CLUES).filter(([k]) => A.clues[k]);
+  h += `<h3>What they've found</h3>` + (found.length ? found.map(([, c]) => `<div class="card green small"><b>${esc(c.name)}:</b> ${esc(c.found)}</div>`).join("") : `<p class="small muted">Nothing yet.</p>`);
+  const L = S.log.filter((l) => l.away);
+  h += `<h3>Away team log</h3>` + (L.length ? `<ul class="log">${L.map((l) => `<li class="${l.kind}"><span class="t">${l.t}</span>${esc(l.text)}</li>`).join("")}</ul>` : `<p class="small muted">Nothing logged yet.</p>`);
+  return h;
+}
 function ordersHTML() {
   let h = hint() + `<h2>Orders</h2>`;
   const A = S.arc;
-  if (A.stage !== "travel" && A.stage !== "orbit" && A.stage !== "done") {
-    h += `<div class="card gold"><h4>The Silence at Corvan II</h4><div class="kv small"><span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} (break orbit when full)</span><span>Record</span><span>${boxes(A.clock, CLOCK, "blue")}</span></div>`
-      + `<div class="small muted" style="margin-top:4px">${Object.entries(CLUES).filter(([k]) => A.clues[k]).map(([, c]) => `${esc(c.name)}: ${esc(c.found)}`).join("<br>") || "No clues yet."}</div><div class="roll-row"><button class="btn small" data-center="${S.systems[S.corvan].at}">Find Corvan II</button></div></div>`;
-  }
+  if (awayActive()) h += `<div class="card small">The away team's work on Corvan II (who's down, the Countdown, the clues, its log) is on the <button class="btn small" data-tab-go="away">Away team</button> tab.</div>`;
   if (!S.orders.length && (A.stage === "done" || A.stage === "travel")) h += `<p class="muted">No orders. Starfleet will send more; meanwhile, the sector is yours to patrol.</p>`;
   for (const o of S.orders) {
     const left = o.deadline - S.turn;
@@ -483,6 +502,8 @@ function bindChrome() {
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b || !S) return;
     if (b.dataset.logf) { logFilter = b.dataset.logf; renderPanel(); return; }
+    if (b.dataset.tabGo) { tab = b.dataset.tabGo; renderTabs(); renderPanel(); return; }
+    if (b.dataset.surface) { mapMode = "surface"; draw(); renderPanel(); return; }
     if (b.dataset.beam) { const ids = [...b.closest(".card").querySelectorAll("[data-away]:checked")].map((x) => x.dataset.away); const r = beamDown(S, ids); if (r.error) toast(r.error, true); else mapMode = "surface"; after(); return; }
     if (b.dataset.beamup) { beamDown(S, []); after(); return; }
     if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }

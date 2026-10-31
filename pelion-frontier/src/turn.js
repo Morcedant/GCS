@@ -42,8 +42,8 @@ export function endTurn(S) {
     const k = sys.filter((s) => s.kind === "klingon" || s.kind === "claimed");
     for (const s of sys.filter((x) => x.kind === "independent")) if (k.some((o) => distance(o.at, s.at) <= 3) && s.accord > -5) { s.accord--; if (s.accord <= -5) claim(S, s); }
   }
-  // Worlds rebuild: with no raider overhead, a harm box clears every 5 turns.
-  if (S.turn % 5 === 0) for (const s of sys) if (s.harm > 0 && !Object.values(S.enemies).some((e) => e.at === s.at && e.hostile)) s.harm--;
+  // Worlds rebuild: with no raider overhead, a harm box clears every 4 turns.
+  if (S.turn % 4 === 0) for (const s of sys) if (s.harm > 0 && !Object.values(S.enemies).some((e) => e.at === s.at && e.hostile)) { s.harm--; log(S, `${s.name} rebuilds: harm ${s.harm}/3.`, "good"); }
   if (S.turn % 6 === 0 && S.tension > 0) S.tension--;
   // New orders.
   const active = S.orders.filter((o) => !o.arc).length;

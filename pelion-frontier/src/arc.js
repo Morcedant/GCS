@@ -12,6 +12,9 @@ const CLUES = {
   village: { name: "The Ketari village", skills: ["Psychology", "Stealth"], found: "Ketari carrying Orion phasers. The chieftain's people dig at the ruins by night." },
 };
 export const COUNTDOWN = 6, CLOCK = 4;
+// The away team's own log: the same captain's log, with these entries marked so the Away team tab can show them.
+const alog = (S, text, kind) => log(S, text, kind, { away: true });
+const astory = (S, title, text) => storyEvent(S, title, text, { away: true });
 /** The surface of Corvan II, for the planetary map: places (x, y from 0 to 1 across the map) and where each action happens. */
 export const SITES = {
   outpost: { name: "The outpost", sub: "Federation research station: beam-in point", x: 0.24, y: 0.58 },
@@ -54,8 +57,8 @@ export function arcStep(S, p) {
   // On the surface map, whoever did it is now where it happened.
   if (A.team && SITE_OF[k] && A.team.includes(p.officer)) { A.pos = A.pos || {}; A.pos[p.officer] = SITE_OF[k]; }
   if (k === "scan") {
-    if (r.success) { A.clock = 1; log(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. (Record 1/${CLOCK})`, "discovery"); }
-    else log(S, `${who}'s sweep of the ruins at Corvan II: interference, and then the readings go strange.`);
+    if (r.success) { A.clock = 1; alog(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. (Record 1/${CLOCK})`, "discovery"); }
+    else alog(S, `${who}'s sweep of the ruins at Corvan II: interference, and then the readings go strange.`);
     startPull(S);
     return "";
   }
@@ -64,38 +67,38 @@ export function arcStep(S, p) {
     if (!r.success) {
       A.countdown++;
       if (k === "clue-village" && r.margin <= -3) { A.seen = true; markCommand(S, 1, "the Ketari saw the away team. The Prime Directive."); }
-      log(S, `Corvan II: ${c.name} gives nothing up. The Countdown: ${A.countdown}/${COUNTDOWN}.`, "bad");
+      alog(S, `Corvan II: ${c.name} gives nothing up. The Countdown: ${A.countdown}/${COUNTDOWN}.`, "bad");
       return checkCountdown(S);
     }
     A.clues[k.slice(5)] = true; A.clock = Math.min(CLOCK, A.clock + (r.margin >= 5 ? 2 : 1));
-    log(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} (${A.clock}/${CLOCK})`, "discovery");
+    alog(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} (${A.clock}/${CLOCK})`, "discovery");
     if (A.clock >= CLOCK) {
       A.stage = "orions";
-      storyEvent(S, "A caretaker, not a weapon", "The pieces fit. The ruins hold a caretaker machine, left by the vanished civilization to watch over the Ketari. Dr. Haskel's dampener woke it, and it judged the outpost a threat: all eight scientists are in stasis, unharmed, deep in the ruins. And in the ruins now, three Orion pirates are cutting their way to the machine's core.");
+      astory(S, "A caretaker, not a weapon", "The pieces fit. The ruins hold a caretaker machine, left by the vanished civilization to watch over the Ketari. Dr. Haskel's dampener woke it, and it judged the outpost a threat: all eight scientists are in stasis, unharmed, deep in the ruins. And in the ruins now, three Orion pirates are cutting their way to the machine's core.");
     }
     return "";
   }
   if (k === "time") {
-    if (r.success) { A.countdown = Math.max(0, A.countdown - 1); A.boughtTime = true; log(S, `${who} reroutes power around the drain: the Countdown ${A.countdown}/${COUNTDOWN}.`, "good"); }
-    else { A.boughtTime = true; log(S, `${who} can't find a way around the drain.`, "bad"); }
+    if (r.success) { A.countdown = Math.max(0, A.countdown - 1); A.boughtTime = true; alog(S, `${who} reroutes power around the drain: the Countdown ${A.countdown}/${COUNTDOWN}.`, "good"); }
+    else { A.boughtTime = true; alog(S, `${who} can't find a way around the drain.`, "bad"); }
     return "";
   }
   if (k === "stun" || k === "kill") {
     if (!r.success) {
       A.countdown++; const id = p.officer; S.crew[id].inj = Math.min(3, S.crew[id].inj + 1);
-      log(S, `The Orions fight back: ${officer(id).short} is hurt (${S.crew[id].inj}/3). The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
+      alog(S, `The Orions fight back: ${officer(id).short} is hurt (${S.crew[id].inj}/3). The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
       return checkCountdown(S);
     }
     if (k === "kill") markCommand(S, 1, "Orion pirates killed on Corvan II when stun would have done.");
     A.stage = "caretaker";
-    storyEvent(S, "The caretaker speaks", `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and in the brig."} Then the machine speaks through an android shell: courteous, absolute. It will protect the Ketari from everything off-world, the Federation included. The Countdown stands at ${A.countdown}/${COUNTDOWN}.`);
+    astory(S, "The caretaker speaks", `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and in the brig."} Then the machine speaks through an android shell: courteous, absolute. It will protect the Ketari from everything off-world, the Federation included. The Countdown stands at ${A.countdown}/${COUNTDOWN}.`);
     return "";
   }
   if (k === "shutdown" || k === "reason" || k === "leave") {
     if (!r.success) {
       A.countdown++;
       if (k === "leave" && r.margin <= -3 && !A.seen) { A.seen = true; markCommand(S, 1, "the Ketari saw the away team. The Prime Directive."); }
-      log(S, `The caretaker doesn't yield. The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
+      alog(S, `The caretaker doesn't yield. The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
       return checkCountdown(S);
     }
     finishArc(S, k);
@@ -108,7 +111,7 @@ function checkCountdown(S) {
   if (A.countdown < COUNTDOWN || A.stage === "done") return "";
   A.stage = "done";
   const o = arcOrder(S); if (o) completeOrder(S, o, false);
-  storyEvent(S, "Breaking orbit", "The Countdown runs out: the drain on the Pelion's power is too much, and the ship has to break orbit or fall. The away team beams up with nothing. The scientists sleep on in the ruins, and Rrinn never hears the end of that message.");
+  astory(S, "Breaking orbit", "The Countdown runs out: the drain on the Pelion's power is too much, and the ship has to break orbit or fall. The away team beams up with nothing. The scientists sleep on in the ruins, and Rrinn never hears the end of that message.");
   return "";
 }
 function finishArc(S, how) {
@@ -117,16 +120,16 @@ function finishArc(S, how) {
   if (how === "leave") {
     if (o) { S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; }
     S.science += 8;
-    storyEvent(S, "The Ketari's own history", "The away team takes back every Orion phaser from the village and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
-    log(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
+    astory(S, "The Ketari's own history", "The away team takes back every Orion phaser from the village and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
+    alog(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
   } else {
     if (o) completeOrder(S, o, true);
     if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); }
     else S.commendations += 1;
-    storyEvent(S, how === "reason" ? "Equals" : "Silence, for good", how === "reason"
+    astory(S, how === "reason" ? "Equals" : "Silence, for good", how === "reason"
       ? "Sevek lays out the paradox, and the machine considers it for a long time. Then it releases the eight scientists and goes back to its watch: the Ketari keep their guardian, and the Federation has a library record no one else has. Rrinn's sister is the first one out, and finally finishes that sentence."
       : "The caretaker goes dark. The eight scientists wake, cold and confused and alive, and the Ketari will never know what watched over them, or that it's gone. Rrinn's sister is among the sleepers, and finally finishes that sentence.");
-    log(S, `The Silence at Corvan II: the eight scientists are safe.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
+    alog(S, `The Silence at Corvan II: the eight scientists are safe.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
   }
   if (!A.seen) markCommand(S, -1, "the Ketari never learned what the crew were.");
 }
@@ -138,31 +141,31 @@ export function arcTick(S) {
     // In orbit and unopposed. Nothing happens below until the Pelion's sensors sweep the ruins.
     A.stage = "orbit";
     const o = arcOrder(S); if (o) o.deadline = 999;
-    log(S, "In orbit over Corvan II, the raider gone. The outpost doesn't answer hails. The ruins are two kilometers from the Ketari village. Sweep them with the ship's sensors (the Here tab) to learn what happened.", "order");
+    alog(S, "In orbit over Corvan II, the raider gone. The outpost doesn't answer hails. The ruins are two kilometers from the Ketari village. Sweep them with the ship's sensors (the Here tab) to learn what happened.", "order");
   }
 }
 /** The sweep that wakes what's in the ruins: the arc's own scan, or an ordinary sensor sweep over Corvan II. */
 function startPull(S) {
   const A = S.arc; if (A.stage !== "orbit") return;
   A.stage = "pull";
-  storyEvent(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
+  astory(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
 }
 /** Beam an away team down (2 to 4 officers fit for duty), or beam them all back up (ids empty). Takes no action. */
 export function beamDown(S, ids) {
   const A = S.arc;
   if (!["pull", "orions", "caretaker"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at) return { error: "There's nowhere to beam down to." };
-  if (!ids || !ids.length) { if (A.team) log(S, `The away team (${A.team.map((id) => officer(id).short).join(", ")}) beams back aboard.`, "move"); A.team = null; return { ok: true }; }
+  if (!ids || !ids.length) { if (A.team) alog(S, `The away team (${A.team.map((id) => officer(id).short).join(", ")}) beams back aboard.`, "move"); A.team = null; return { ok: true }; }
   ids = [...new Set(ids)].filter((id) => available(S, id));
   if (ids.length < 2 || ids.length > 4) return { error: "An away team is two to four officers fit for duty." };
   A.team = ids; A.pos = Object.fromEntries(ids.map((id) => [id, "outpost"]));
-  log(S, `Away team: ${ids.map((id) => officer(id).name).join(", ")} beam down to the outpost on Corvan II. ${CREW.filter((c) => !ids.includes(c.id)).map((c) => c.short).join(", ")} stay${CREW.length - ids.length === 1 ? "s" : ""} aboard.`, "move");
+  alog(S, `Away team: ${ids.map((id) => officer(id).name).join(", ")} beam down to the outpost on Corvan II. ${CREW.filter((c) => !ids.includes(c.id)).map((c) => c.short).join(", ")} stay${CREW.length - ids.length === 1 ? "s" : ""} aboard.`, "move");
   return { ok: true };
 }
 export function arcSweep(S) { if (S.arc.stage === "orbit" && S.pelion.at === S.systems[S.corvan].at) startPull(S); }
 /** End of turn: the drain on the ship while it stays in orbit. */
 export function arcTurn(S) {
   const A = S.arc;
-  if (["pull", "orions", "caretaker"].includes(A.stage) && S.pelion.at === S.systems[S.corvan].at) { A.countdown++; log(S, `Corvan II drains the Pelion: the Countdown ${A.countdown}/${COUNTDOWN}.`); checkCountdown(S); }
+  if (["pull", "orions", "caretaker"].includes(A.stage) && S.pelion.at === S.systems[S.corvan].at) { A.countdown++; alog(S, `Corvan II drains the Pelion: the Countdown ${A.countdown}/${COUNTDOWN}.`); checkCountdown(S); }
 }
 
 /** The arrival at Corvan II: the raider hails first. */

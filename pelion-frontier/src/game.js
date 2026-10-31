@@ -52,13 +52,13 @@ export const sysAt = (S, hex) => S.sysAt[hex] && S.systems[S.sysAt[hex]];
 export const officer = (id) => CREW.find((c) => c.id === id);
 export const hasRecord = (S, perk) => S.records.some((id) => RECORDS.find((r) => r.id === id)?.perk === perk);
 /** The captain's log, oldest first. Discoveries are never trimmed: the log keeps the newest 300 other entries. */
-export function log(S, text, kind = "") {
-  S.log.push({ t: S.turn, text, kind });
+export function log(S, text, kind = "", extra = null) {
+  S.log.push({ t: S.turn, text, kind, ...(extra || {}) });
   let n = S.log.length - 300;
   for (let i = 0; i < S.log.length && n > 0; ) { if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } else i++; }
 }
 /** A story scene: shown as a dialog, and written in full into the log. */
-export function storyEvent(S, title, text) { S.event = { kind: "story", title, text }; log(S, `${title}: ${text}`, "discovery"); }
+export function storyEvent(S, title, text, extra = null) { S.event = { kind: "story", title, text }; log(S, `${title}: ${text}`, "discovery", extra); }
 export const available = (S, id) => S.crew[id].inj < 3;
 export function skillOf(S, id, skill) {
   if (id === "captain") return CAPTAIN.skills[skill] || 10;

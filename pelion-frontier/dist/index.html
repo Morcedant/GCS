@@ -31,7 +31,8 @@ button { font: inherit; color: inherit; }
 .map-hint { position: absolute; right: 12px; bottom: 12px; font-size: 12px; color: var(--muted); background: rgba(16, 18, 28, .85); padding: 5px 9px; border-radius: 6px; pointer-events: none; }
 .side { background: var(--panel); border-left: 1px solid var(--line); display: grid; grid-template-rows: auto 1fr auto; min-height: 0; }
 .tabs { display: flex; flex-wrap: wrap; gap: 2px; padding: 8px 10px 0; border-bottom: 1px solid var(--line); }
-.tabs button { background: none; border: 0; border-bottom: 3px solid transparent; padding: 6px 9px; cursor: pointer; color: var(--muted); font: 600 15px var(--display); letter-spacing: .06em; text-transform: uppercase; }
+.tabs button { background: none; border: 0; border-bottom: 3px solid transparent; padding: 6px 6px; cursor: pointer; color: var(--muted); font: 600 14px var(--display); letter-spacing: .04em; text-transform: uppercase; }
+.tabs button[hidden] { display: none; }
 .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--gold); }
 .tabs button .badge { background: var(--red); color: #fff; border-radius: 8px; font: 700 10px var(--body); padding: 1px 5px; margin-left: 4px; vertical-align: 2px; }
 #panel { overflow-y: auto; padding: 12px 14px 20px; min-height: 0; }
@@ -118,7 +119,7 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
     <div class="map-hint">Click a hex to look · double-click (or right-click) to move there</div>
   </div>
   <aside class="side">
-    <nav class="tabs" role="tablist"><button data-tab="orders" role="tab">Orders</button><button data-tab="here" role="tab">Here</button><button data-tab="ship" role="tab">Ship</button><button data-tab="crew" role="tab">Crew</button><button data-tab="sector" role="tab">Sector</button><button data-tab="log" role="tab">Log</button></nav>
+    <nav class="tabs" role="tablist"><button data-tab="orders" role="tab">Orders</button><button data-tab="away" role="tab" hidden>Away team</button><button data-tab="here" role="tab">Here</button><button data-tab="ship" role="tab">Ship</button><button data-tab="crew" role="tab">Crew</button><button data-tab="sector" role="tab">Sector</button><button data-tab="log" role="tab">Log</button></nav>
     <div id="panel"></div>
     <div class="side-foot"><button class="btn primary" id="end-turn">End turn</button></div>
   </aside>
@@ -473,13 +474,13 @@ const sysAt = (S, hex) => S.sysAt[hex] && S.systems[S.sysAt[hex]];
 const officer = (id) => CREW.find((c) => c.id === id);
 const hasRecord = (S, perk) => S.records.some((id) => RECORDS.find((r) => r.id === id)?.perk === perk);
 /** The captain's log, oldest first. Discoveries are never trimmed: the log keeps the newest 300 other entries. */
-function log(S, text, kind = "") {
-  S.log.push({ t: S.turn, text, kind });
+function log(S, text, kind = "", extra = null) {
+  S.log.push({ t: S.turn, text, kind, ...(extra || {}) });
   let n = S.log.length - 300;
   for (let i = 0; i < S.log.length && n > 0; ) { if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } else i++; }
 }
 /** A story scene: shown as a dialog, and written in full into the log. */
-function storyEvent(S, title, text) { S.event = { kind: "story", title, text }; log(S, `${title}: ${text}`, "discovery"); }
+function storyEvent(S, title, text, extra = null) { S.event = { kind: "story", title, text }; log(S, `${title}: ${text}`, "discovery", extra); }
 const available = (S, id) => S.crew[id].inj < 3;
 function skillOf(S, id, skill) {
   if (id === "captain") return CAPTAIN.skills[skill] || 10;
@@ -1173,6 +1174,9 @@ const CLUES = {
   village: { name: "The Ketari village", skills: ["Psychology", "Stealth"], found: "Ketari carrying Orion phasers. The chieftain's people dig at the ruins by night." },
 };
 const COUNTDOWN = 6, CLOCK = 4;
+// The away team's own log: the same captain's log, with these entries marked so the Away team tab can show them.
+const alog = (S, text, kind) => log(S, text, kind, { away: true });
+const astory = (S, title, text) => storyEvent(S, title, text, { away: true });
 /** The surface of Corvan II, for the planetary map: places (x, y from 0 to 1 across the map) and where each action happens. */
 const SITES = {
   outpost: { name: "The outpost", sub: "Federation research station: beam-in point", x: 0.24, y: 0.58 },
@@ -1215,8 +1219,8 @@ function arcStep(S, p) {
   // On the surface map, whoever did it is now where it happened.
   if (A.team && SITE_OF[k] && A.team.includes(p.officer)) { A.pos = A.pos || {}; A.pos[p.officer] = SITE_OF[k]; }
   if (k === "scan") {
-    if (r.success) { A.clock = 1; log(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. (Record 1/${CLOCK})`, "discovery"); }
-    else log(S, `${who}'s sweep of the ruins at Corvan II: interference, and then the readings go strange.`);
+    if (r.success) { A.clock = 1; alog(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. (Record 1/${CLOCK})`, "discovery"); }
+    else alog(S, `${who}'s sweep of the ruins at Corvan II: interference, and then the readings go strange.`);
     startPull(S);
     return "";
   }
@@ -1225,38 +1229,38 @@ function arcStep(S, p) {
     if (!r.success) {
       A.countdown++;
       if (k === "clue-village" && r.margin <= -3) { A.seen = true; markCommand(S, 1, "the Ketari saw the away team. The Prime Directive."); }
-      log(S, `Corvan II: ${c.name} gives nothing up. The Countdown: ${A.countdown}/${COUNTDOWN}.`, "bad");
+      alog(S, `Corvan II: ${c.name} gives nothing up. The Countdown: ${A.countdown}/${COUNTDOWN}.`, "bad");
       return checkCountdown(S);
     }
     A.clues[k.slice(5)] = true; A.clock = Math.min(CLOCK, A.clock + (r.margin >= 5 ? 2 : 1));
-    log(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} (${A.clock}/${CLOCK})`, "discovery");
+    alog(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} (${A.clock}/${CLOCK})`, "discovery");
     if (A.clock >= CLOCK) {
       A.stage = "orions";
-      storyEvent(S, "A caretaker, not a weapon", "The pieces fit. The ruins hold a caretaker machine, left by the vanished civilization to watch over the Ketari. Dr. Haskel's dampener woke it, and it judged the outpost a threat: all eight scientists are in stasis, unharmed, deep in the ruins. And in the ruins now, three Orion pirates are cutting their way to the machine's core.");
+      astory(S, "A caretaker, not a weapon", "The pieces fit. The ruins hold a caretaker machine, left by the vanished civilization to watch over the Ketari. Dr. Haskel's dampener woke it, and it judged the outpost a threat: all eight scientists are in stasis, unharmed, deep in the ruins. And in the ruins now, three Orion pirates are cutting their way to the machine's core.");
     }
     return "";
   }
   if (k === "time") {
-    if (r.success) { A.countdown = Math.max(0, A.countdown - 1); A.boughtTime = true; log(S, `${who} reroutes power around the drain: the Countdown ${A.countdown}/${COUNTDOWN}.`, "good"); }
-    else { A.boughtTime = true; log(S, `${who} can't find a way around the drain.`, "bad"); }
+    if (r.success) { A.countdown = Math.max(0, A.countdown - 1); A.boughtTime = true; alog(S, `${who} reroutes power around the drain: the Countdown ${A.countdown}/${COUNTDOWN}.`, "good"); }
+    else { A.boughtTime = true; alog(S, `${who} can't find a way around the drain.`, "bad"); }
     return "";
   }
   if (k === "stun" || k === "kill") {
     if (!r.success) {
       A.countdown++; const id = p.officer; S.crew[id].inj = Math.min(3, S.crew[id].inj + 1);
-      log(S, `The Orions fight back: ${officer(id).short} is hurt (${S.crew[id].inj}/3). The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
+      alog(S, `The Orions fight back: ${officer(id).short} is hurt (${S.crew[id].inj}/3). The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
       return checkCountdown(S);
     }
     if (k === "kill") markCommand(S, 1, "Orion pirates killed on Corvan II when stun would have done.");
     A.stage = "caretaker";
-    storyEvent(S, "The caretaker speaks", `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and in the brig."} Then the machine speaks through an android shell: courteous, absolute. It will protect the Ketari from everything off-world, the Federation included. The Countdown stands at ${A.countdown}/${COUNTDOWN}.`);
+    astory(S, "The caretaker speaks", `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and in the brig."} Then the machine speaks through an android shell: courteous, absolute. It will protect the Ketari from everything off-world, the Federation included. The Countdown stands at ${A.countdown}/${COUNTDOWN}.`);
     return "";
   }
   if (k === "shutdown" || k === "reason" || k === "leave") {
     if (!r.success) {
       A.countdown++;
       if (k === "leave" && r.margin <= -3 && !A.seen) { A.seen = true; markCommand(S, 1, "the Ketari saw the away team. The Prime Directive."); }
-      log(S, `The caretaker doesn't yield. The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
+      alog(S, `The caretaker doesn't yield. The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
       return checkCountdown(S);
     }
     finishArc(S, k);
@@ -1269,7 +1273,7 @@ function checkCountdown(S) {
   if (A.countdown < COUNTDOWN || A.stage === "done") return "";
   A.stage = "done";
   const o = arcOrder(S); if (o) completeOrder(S, o, false);
-  storyEvent(S, "Breaking orbit", "The Countdown runs out: the drain on the Pelion's power is too much, and the ship has to break orbit or fall. The away team beams up with nothing. The scientists sleep on in the ruins, and Rrinn never hears the end of that message.");
+  astory(S, "Breaking orbit", "The Countdown runs out: the drain on the Pelion's power is too much, and the ship has to break orbit or fall. The away team beams up with nothing. The scientists sleep on in the ruins, and Rrinn never hears the end of that message.");
   return "";
 }
 function finishArc(S, how) {
@@ -1278,16 +1282,16 @@ function finishArc(S, how) {
   if (how === "leave") {
     if (o) { S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; }
     S.science += 8;
-    storyEvent(S, "The Ketari's own history", "The away team takes back every Orion phaser from the village and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
-    log(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
+    astory(S, "The Ketari's own history", "The away team takes back every Orion phaser from the village and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
+    alog(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
   } else {
     if (o) completeOrder(S, o, true);
     if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); }
     else S.commendations += 1;
-    storyEvent(S, how === "reason" ? "Equals" : "Silence, for good", how === "reason"
+    astory(S, how === "reason" ? "Equals" : "Silence, for good", how === "reason"
       ? "Sevek lays out the paradox, and the machine considers it for a long time. Then it releases the eight scientists and goes back to its watch: the Ketari keep their guardian, and the Federation has a library record no one else has. Rrinn's sister is the first one out, and finally finishes that sentence."
       : "The caretaker goes dark. The eight scientists wake, cold and confused and alive, and the Ketari will never know what watched over them, or that it's gone. Rrinn's sister is among the sleepers, and finally finishes that sentence.");
-    log(S, `The Silence at Corvan II: the eight scientists are safe.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
+    alog(S, `The Silence at Corvan II: the eight scientists are safe.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
   }
   if (!A.seen) markCommand(S, -1, "the Ketari never learned what the crew were.");
 }
@@ -1299,31 +1303,31 @@ function arcTick(S) {
     // In orbit and unopposed. Nothing happens below until the Pelion's sensors sweep the ruins.
     A.stage = "orbit";
     const o = arcOrder(S); if (o) o.deadline = 999;
-    log(S, "In orbit over Corvan II, the raider gone. The outpost doesn't answer hails. The ruins are two kilometers from the Ketari village. Sweep them with the ship's sensors (the Here tab) to learn what happened.", "order");
+    alog(S, "In orbit over Corvan II, the raider gone. The outpost doesn't answer hails. The ruins are two kilometers from the Ketari village. Sweep them with the ship's sensors (the Here tab) to learn what happened.", "order");
   }
 }
 /** The sweep that wakes what's in the ruins: the arc's own scan, or an ordinary sensor sweep over Corvan II. */
 function startPull(S) {
   const A = S.arc; if (A.stage !== "orbit") return;
   A.stage = "pull";
-  storyEvent(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
+  astory(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
 }
 /** Beam an away team down (2 to 4 officers fit for duty), or beam them all back up (ids empty). Takes no action. */
 function beamDown(S, ids) {
   const A = S.arc;
   if (!["pull", "orions", "caretaker"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at) return { error: "There's nowhere to beam down to." };
-  if (!ids || !ids.length) { if (A.team) log(S, `The away team (${A.team.map((id) => officer(id).short).join(", ")}) beams back aboard.`, "move"); A.team = null; return { ok: true }; }
+  if (!ids || !ids.length) { if (A.team) alog(S, `The away team (${A.team.map((id) => officer(id).short).join(", ")}) beams back aboard.`, "move"); A.team = null; return { ok: true }; }
   ids = [...new Set(ids)].filter((id) => available(S, id));
   if (ids.length < 2 || ids.length > 4) return { error: "An away team is two to four officers fit for duty." };
   A.team = ids; A.pos = Object.fromEntries(ids.map((id) => [id, "outpost"]));
-  log(S, `Away team: ${ids.map((id) => officer(id).name).join(", ")} beam down to the outpost on Corvan II. ${CREW.filter((c) => !ids.includes(c.id)).map((c) => c.short).join(", ")} stay${CREW.length - ids.length === 1 ? "s" : ""} aboard.`, "move");
+  alog(S, `Away team: ${ids.map((id) => officer(id).name).join(", ")} beam down to the outpost on Corvan II. ${CREW.filter((c) => !ids.includes(c.id)).map((c) => c.short).join(", ")} stay${CREW.length - ids.length === 1 ? "s" : ""} aboard.`, "move");
   return { ok: true };
 }
 function arcSweep(S) { if (S.arc.stage === "orbit" && S.pelion.at === S.systems[S.corvan].at) startPull(S); }
 /** End of turn: the drain on the ship while it stays in orbit. */
 function arcTurn(S) {
   const A = S.arc;
-  if (["pull", "orions", "caretaker"].includes(A.stage) && S.pelion.at === S.systems[S.corvan].at) { A.countdown++; log(S, `Corvan II drains the Pelion: the Countdown ${A.countdown}/${COUNTDOWN}.`); checkCountdown(S); }
+  if (["pull", "orions", "caretaker"].includes(A.stage) && S.pelion.at === S.systems[S.corvan].at) { A.countdown++; alog(S, `Corvan II drains the Pelion: the Countdown ${A.countdown}/${COUNTDOWN}.`); checkCountdown(S); }
 }
 
 /** The arrival at Corvan II: the raider hails first. */
@@ -1395,7 +1399,8 @@ function aiTurn(S) {
   // Orions.
   const base = Object.values(S.enemies).find((e) => e.type === "orionBase");
   if (base && S.turn % ev.o === 3 && count(S, "orion") < 2) {
-    const targets = worlds(S, ["colony", "member", "member", "independent"]).filter((s) => distance(s.at, S.pelion.at) >= 3);
+    // Not a world raided in the last 6 turns: the Orions spread their raids around.
+    const targets = worlds(S, ["colony", "member", "member", "independent"]).filter((s) => distance(s.at, S.pelion.at) >= 3 && !(s.raidedAt && S.turn - s.raidedAt < 6));
     const tgt = targets.length ? pick(S, targets) : null;
     if (tgt) spawnEnemy(S, "orion", base.at, { goal: "raid", target: tgt.at, hostile: true, home: base.at });
   }
@@ -1434,9 +1439,16 @@ function aiTurn(S) {
       if (S.pelion.at === e.at) continue;  // the Pelion is here: the fight comes at the end of the turn
       if (guard) { const r = skirmish(S, guard, e); if (r === "won" || r === "drove") continue; }
       if (!S.enemies[e.id]) continue;
-      // One strike, then away: a raid harms a world once (a Romulan strike, twice) and the raider makes for home.
+      // One strike, then away: a raid harms a world once and the raider makes for home. Federation worlds have their own
+      // defenses, which drive off a raid 30% of the time.
+      if (s) s.raidedAt = S.turn;
+      if (s && ["colony", "member"].includes(s.kind) && rand(S) < 0.3) {
+        log(S, `${s.name}'s own defenses drive off the ${E.name} before it can do any harm.`, "good");
+        if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
+        sendHome(S, e, 0); continue;
+      }
       if (e.power === "orion") S.supplies = Math.max(0, S.supplies - 3);
-      if (s) harmWorld(S, s, e.goal === "strike" ? 2 : 1, e.goal === "strike" ? `a Romulan bird-of-prey decloaked over it, fired, and turned for the Neutral Zone`
+      if (s) harmWorld(S, s, 1, e.goal === "strike" ? `a Romulan bird-of-prey decloaked over it, fired, and turned for the Neutral Zone`
         : e.power === "orion" ? `an Orion raider struck it, stole 3 supplies from the Federation's convoys, and ran for home` : `a ${E.name} raided it and turned for the border`);
       if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
       sendHome(S, e, 0);
@@ -1447,6 +1459,11 @@ function aiTurn(S) {
 }
 
 function step(S, e) {
+  // A raider closing on a world: the world calls for help, while there's time to answer.
+  if ((e.goal === "raid" || (e.goal === "strike" && false)) && !e.warned && distance(e.at, e.target) <= 4) {
+    const t = sysAt(S, e.target);
+    if (t && ["colony", "member"].includes(t.kind)) { e.warned = true; log(S, `${t.name} reports ${/^[AEIOU]/.test(ENEMIES[e.type].name) ? "an" : "a"} ${ENEMIES[e.type].name} on long-range sensors, heading its way. It's about ${distance(e.at, e.target)} hexes out.`, "war"); }
+  }
   const p = findPath(S, e.at, e.target, e.power === "romulan" ? "romulan" : e.power);
   if (!p) { delete S.enemies[e.id]; return; }
   let mp = ENEMIES[e.type].speed;
@@ -1510,8 +1527,8 @@ function endTurn(S) {
     const k = sys.filter((s) => s.kind === "klingon" || s.kind === "claimed");
     for (const s of sys.filter((x) => x.kind === "independent")) if (k.some((o) => distance(o.at, s.at) <= 3) && s.accord > -5) { s.accord--; if (s.accord <= -5) claim(S, s); }
   }
-  // Worlds rebuild: with no raider overhead, a harm box clears every 5 turns.
-  if (S.turn % 5 === 0) for (const s of sys) if (s.harm > 0 && !Object.values(S.enemies).some((e) => e.at === s.at && e.hostile)) s.harm--;
+  // Worlds rebuild: with no raider overhead, a harm box clears every 4 turns.
+  if (S.turn % 4 === 0) for (const s of sys) if (s.harm > 0 && !Object.values(S.enemies).some((e) => e.at === s.at && e.hostile)) { s.harm--; log(S, `${s.name} rebuilds: harm ${s.harm}/3.`, "good"); }
   if (S.turn % 6 === 0 && S.tension > 0) S.tension--;
   // New orders.
   const active = S.orders.filter((o) => !o.arc).length;
@@ -1828,11 +1845,13 @@ function renderBar() {
   $("end-turn").disabled = !canEndTurn(S);
 }
 function renderTabs() {
+  const aw = document.querySelector('[data-tab="away"]'); if (aw) aw.hidden = !awayActive();
   const due = S.orders.filter((o) => o.deadline - S.turn <= 2).length;
   document.querySelectorAll(".tabs button").forEach((b) => { b.setAttribute("aria-selected", String(b.dataset.tab === tab)); if (b.dataset.tab === "orders") b.innerHTML = `Orders${S.orders.length ? `<span class="badge" style="${due ? "" : "background:var(--blue)"}">${S.orders.length}<\/span>` : ""}`; });
 }
 function renderPanel() {
-  const html = { here: hereHTML, ship: shipHTML, crew: crewHTML, orders: ordersHTML, sector: sectorHTML, log: logHTML }[tab]();
+  if (tab === "away" && !awayActive()) tab = "orders";
+  const html = { here: hereHTML, ship: shipHTML, crew: crewHTML, orders: ordersHTML, away: awayHTML, sector: sectorHTML, log: logHTML }[tab]();
   $("panel").innerHTML = html;
   if (tab === "log") $("panel").scrollTop = $("panel").scrollHeight;  // the latest entry
 }
@@ -1850,8 +1869,8 @@ function hint() {
   if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:<\/b> fly to Corvan II (the gold <b>!<\/b>). Double-click it on the map: the Pelion goes as far as it can this turn. Then <b>End turn<\/b>.`;
   else if (A.stage === "orbit") t = "<b>Next:<\/b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
   else if (A.stage === "pull" && !A.team) t = "<b>Next:<\/b> choose an away team and beam them down to the outpost (the Here tab).";
-  else if (A.stage === "pull") t = "<b>Next:<\/b> the away team. Use the actions below, one a turn, to fill the record before the Countdown fills.";
-  else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:<\/b> finish it on Corvan II: the action below.";
+  else if (A.stage === "pull") t = "<b>Next:<\/b> the away team. Use their actions on the Here tab, one a turn, to fill the record before the Countdown fills.";
+  else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:<\/b> finish it on Corvan II: the away team's actions on the Here tab.";
   else if (S.turn <= 12) t = "<b>Next:<\/b> Starfleet will send new orders (the Orders tab). Meanwhile: survey the unknown (?), court the independent worlds, and watch for raiders.";
   return t ? `<div class="card gold small">${t}<\/div>` : "";
 }
@@ -1973,13 +1992,30 @@ function crewHTML() {
 }
 
 // ---------- Orders ----------
+// ---------- Away team: the Corvan II mission on the surface, apart from the orders ----------
+const awayActive = () => S && ["orbit", "pull", "orions", "caretaker"].includes(S.arc.stage);
+function awayHTML() {
+  const A = S.arc;
+  let h = `<h2>Away team: Corvan II<\/h2>`;
+  if (A.stage === "orbit") h += `<p class="small muted">In orbit. Nobody has gone down yet: sweep the ruins with the ship's sensors first (the Here tab).<\/p>`;
+  else h += `<div class="kv small"><span>Countdown<\/span><span>${boxes(A.countdown, COUNTDOWN)} the Pelion breaks orbit when it fills<\/span><span>Record<\/span><span>${boxes(A.clock, CLOCK, "blue")} what's in the ruins<\/span><span>Stage<\/span><span>${{ pull: "Investigating", orions: "The Orion diggers", caretaker: "The caretaker" }[A.stage]}<\/span><\/div>`;
+  h += `<h3>Who's down there<\/h3>`;
+  if (!A.team) h += `<p class="small muted">${A.stage === "orbit" ? "No one yet." : "No one: choose an away team on the Here tab."}<\/p>`;
+  else {
+    h += `<div class="crew">` + A.team.map((id) => { const c = officer(id), st = S.crew[id], where = SITES[(A.pos && A.pos[id]) || "outpost"];
+      return `<div class="officer ${DIV[id]}" style="padding:8px 10px"><h4 style="font-size:15px">${esc(c.name)}<\/h4><div class="small">At ${esc(where.name.toLowerCase())}${st.inj ? ` · <span class="bad">hurt ${st.inj}/3${st.inj >= 3 ? ", beamed to sickbay" : ""}<\/span>` : ""} · Duty ${st.duty}<\/div><\/div>`; }).join("") + `<\/div>`;
+    h += `<div class="btn-row"><button class="btn small" data-tab-go="here">Their actions (Here tab)<\/button>${mapMode === "surface" ? "" : `<button class="btn small" data-surface="1">Show the surface map<\/button>`}<\/div>`;
+  }
+  const found = Object.entries(CLUES).filter(([k]) => A.clues[k]);
+  h += `<h3>What they've found<\/h3>` + (found.length ? found.map(([, c]) => `<div class="card green small"><b>${esc(c.name)}:<\/b> ${esc(c.found)}<\/div>`).join("") : `<p class="small muted">Nothing yet.<\/p>`);
+  const L = S.log.filter((l) => l.away);
+  h += `<h3>Away team log<\/h3>` + (L.length ? `<ul class="log">${L.map((l) => `<li class="${l.kind}"><span class="t">${l.t}<\/span>${esc(l.text)}<\/li>`).join("")}<\/ul>` : `<p class="small muted">Nothing logged yet.<\/p>`);
+  return h;
+}
 function ordersHTML() {
   let h = hint() + `<h2>Orders<\/h2>`;
   const A = S.arc;
-  if (A.stage !== "travel" && A.stage !== "orbit" && A.stage !== "done") {
-    h += `<div class="card gold"><h4>The Silence at Corvan II<\/h4><div class="kv small"><span>Countdown<\/span><span>${boxes(A.countdown, COUNTDOWN)} (break orbit when full)<\/span><span>Record<\/span><span>${boxes(A.clock, CLOCK, "blue")}<\/span><\/div>`
-      + `<div class="small muted" style="margin-top:4px">${Object.entries(CLUES).filter(([k]) => A.clues[k]).map(([, c]) => `${esc(c.name)}: ${esc(c.found)}`).join("<br>") || "No clues yet."}<\/div><div class="roll-row"><button class="btn small" data-center="${S.systems[S.corvan].at}">Find Corvan II<\/button><\/div><\/div>`;
-  }
+  if (awayActive()) h += `<div class="card small">The away team's work on Corvan II (who's down, the Countdown, the clues, its log) is on the <button class="btn small" data-tab-go="away">Away team<\/button> tab.<\/div>`;
   if (!S.orders.length && (A.stage === "done" || A.stage === "travel")) h += `<p class="muted">No orders. Starfleet will send more; meanwhile, the sector is yours to patrol.<\/p>`;
   for (const o of S.orders) {
     const left = o.deadline - S.turn;
@@ -2028,6 +2064,8 @@ function bindChrome() {
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b || !S) return;
     if (b.dataset.logf) { logFilter = b.dataset.logf; renderPanel(); return; }
+    if (b.dataset.tabGo) { tab = b.dataset.tabGo; renderTabs(); renderPanel(); return; }
+    if (b.dataset.surface) { mapMode = "surface"; draw(); renderPanel(); return; }
     if (b.dataset.beam) { const ids = [...b.closest(".card").querySelectorAll("[data-away]:checked")].map((x) => x.dataset.away); const r = beamDown(S, ids); if (r.error) toast(r.error, true); else mapMode = "surface"; after(); return; }
     if (b.dataset.beamup) { beamDown(S, []); after(); return; }
     if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }

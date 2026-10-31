@@ -36,7 +36,8 @@ export function aiTurn(S) {
   // Orions.
   const base = Object.values(S.enemies).find((e) => e.type === "orionBase");
   if (base && S.turn % ev.o === 3 && count(S, "orion") < 2) {
-    const targets = worlds(S, ["colony", "member", "member", "independent"]).filter((s) => distance(s.at, S.pelion.at) >= 3);
+    // Not a world raided in the last 6 turns: the Orions spread their raids around.
+    const targets = worlds(S, ["colony", "member", "member", "independent"]).filter((s) => distance(s.at, S.pelion.at) >= 3 && !(s.raidedAt && S.turn - s.raidedAt < 6));
     const tgt = targets.length ? pick(S, targets) : null;
     if (tgt) spawnEnemy(S, "orion", base.at, { goal: "raid", target: tgt.at, hostile: true, home: base.at });
   }
@@ -75,9 +76,16 @@ export function aiTurn(S) {
       if (S.pelion.at === e.at) continue;  // the Pelion is here: the fight comes at the end of the turn
       if (guard) { const r = skirmish(S, guard, e); if (r === "won" || r === "drove") continue; }
       if (!S.enemies[e.id]) continue;
-      // One strike, then away: a raid harms a world once (a Romulan strike, twice) and the raider makes for home.
+      // One strike, then away: a raid harms a world once and the raider makes for home. Federation worlds have their own
+      // defenses, which drive off a raid 30% of the time.
+      if (s) s.raidedAt = S.turn;
+      if (s && ["colony", "member"].includes(s.kind) && rand(S) < 0.3) {
+        log(S, `${s.name}'s own defenses drive off the ${E.name} before it can do any harm.`, "good");
+        if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
+        sendHome(S, e, 0); continue;
+      }
       if (e.power === "orion") S.supplies = Math.max(0, S.supplies - 3);
-      if (s) harmWorld(S, s, e.goal === "strike" ? 2 : 1, e.goal === "strike" ? `a Romulan bird-of-prey decloaked over it, fired, and turned for the Neutral Zone`
+      if (s) harmWorld(S, s, 1, e.goal === "strike" ? `a Romulan bird-of-prey decloaked over it, fired, and turned for the Neutral Zone`
         : e.power === "orion" ? `an Orion raider struck it, stole 3 supplies from the Federation's convoys, and ran for home` : `a ${E.name} raided it and turned for the border`);
       if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
       sendHome(S, e, 0);
@@ -88,6 +96,11 @@ export function aiTurn(S) {
 }
 
 function step(S, e) {
+  // A raider closing on a world: the world calls for help, while there's time to answer.
+  if ((e.goal === "raid" || (e.goal === "strike" && false)) && !e.warned && distance(e.at, e.target) <= 4) {
+    const t = sysAt(S, e.target);
+    if (t && ["colony", "member"].includes(t.kind)) { e.warned = true; log(S, `${t.name} reports ${/^[AEIOU]/.test(ENEMIES[e.type].name) ? "an" : "a"} ${ENEMIES[e.type].name} on long-range sensors, heading its way. It's about ${distance(e.at, e.target)} hexes out.`, "war"); }
+  }
   const p = findPath(S, e.at, e.target, e.power === "romulan" ? "romulan" : e.power);
   if (!p) { delete S.enemies[e.id]; return; }
   let mp = ENEMIES[e.type].speed;
