@@ -25,7 +25,8 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
     hexes: sec.hexes, systems: sec.systems, sysAt: sec.sysAt, starbase: sec.starbase, corvan: sec.corvan,
     pelion: { at: sb.at, mp: PELION.speed, acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true },
     stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
-    crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {} }])),
+    crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false }])),
+    tried: {},   // actions tried this turn: each can be attempted once a turn
     support: {}, enemies: {}, nextId: 1,
     supplies: 20, science: 0, command: 0, tension: 2, commendations: 0,
     records: [], orders: [], done: 0, failed: 0, lostColonies: 0, lostWorlds: 0, joined: 0, arc: { stage: "travel", countdown: 0, clock: 0, clues: {}, seen: false },
@@ -65,16 +66,18 @@ export function storyEvent(S, title, text, extra = null) {
   log(S, `${title}: ${text}`, "discovery", { ...(extra || {}), story: true });
 }
 export const available = (S, id) => S.crew[id].inj < 3;
+/** Fit for duty and hasn't acted this turn: every officer acts once a turn, on the bridge or with the away team. */
+export const free = (S, id) => available(S, id) && !S.crew[id].acted;
 export function skillOf(S, id, skill) {
   if (id === "captain") return CAPTAIN.skills[skill] || 10;
   const base = officer(id).skills[skill];
   return base ? base + (S.crew[id].plus[skill] || 0) : 0;
 }
 /** The best available officer for one of these skills (highest target), and the skill. */
-export function bestOfficer(S, skills, ctx = {}, ids = null) {
+export function bestOfficer(S, skills, ctx = {}, ids = null, freeOnly = false) {
   let best = null;
   for (const c of CREW) {
-    if (!available(S, c.id) || (ids && !ids.includes(c.id))) continue;
+    if (!(freeOnly ? free(S, c.id) : available(S, c.id)) || (ids && !ids.includes(c.id))) continue;
     for (const sk of skills) {
       const t = target(S, c.id, sk, ctx).total;
       if (skillOf(S, c.id, sk) && (!best || t > best.total)) best = { officer: c.id, skill: sk, total: t };
@@ -256,12 +259,24 @@ export function actionsFor(S, unit = "pelion") {
   if (base) out.push({ id: "engage", enemy: base.id, name: "Attack the Orion base", skills: [], blurb: "Its guns and shields against yours. Destroy it and the raids stop." });
   for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, extra: [["In the field", -2]] });
   if (s && s.id === S.corvan) out.push(...arcActionsHook(S));
-  // With an away team on Corvan II's surface, the turn is theirs: only what the mission calls for (their actions, and the
-  // one done from the ship to buy time), plus answering a ship in orbit.
+  // With an away team on Corvan II's surface, the away team does the mission's work and the bridge crew (whoever stayed
+  // aboard) runs the ship: its operations are theirs alone.
   const surface = s && s.id === S.corvan && S.arc.team && ["pull", "orions", "caretaker"].includes(S.arc.stage);
-  if (surface) out.splice(0, out.length, ...out.filter((x) => x.id === "arc" || x.id === "beam" || x.id === "engage" || x.id === "hail"));
-  return out.map((a) => ({ ...a, why: a.why || (P.acted && !a.free ? "The Pelion has already acted this turn." : null) }));
+  if (surface) { const aboard = CREW.map((c) => c.id).filter((id) => !S.arc.team.includes(id)); for (const x of out) if (x.id !== "arc" && x.id !== "beam" && !x.who) { x.who = aboard; x.bridge = true; } }
+  return out.map((a) => ({ ...a, why: a.why || whyNot(S, a) }));
 }
+const sig = (a) => [a.id, a.arc || "", a.order || "", a.enemy || "", a.sys || ""].join(":");
+/** Why an action can't be taken now: tried already this turn, or no one free (or fit) with the training. */
+function whyNot(S, a) {
+  if (a.free) return null;
+  if (a.id === "engage") return S.pelion.engaged ? "The Pelion has already fought this turn." : null;
+  if ((S.tried || {})["pelion:" + sig(a)]) return "Already tried this turn: try again next turn.";
+  const group = a.who || CREW.map((c) => c.id), trained = (id) => a.skills.some((sk) => skillOf(S, id, sk));
+  if (group.some((id) => free(S, id) && trained(id))) return null;
+  return group.some((id) => available(S, id) && trained(id)) ? "Everyone with the training has acted this turn." : "Nobody fit for duty has the training.";
+}
+/** A second officer, free and trained in the skill (13 or better), who could assist: +1, and it uses their turn. */
+export function helperFor(S, a, who, skill) { return CREW.find((c) => c.id !== who && free(S, c.id) && (!a.who || a.who.includes(c.id)) && skillOf(S, c.id, skill) >= 13); }
 const signedAccord = (a) => (a > 0 ? "+" : a < 0 ? "−" : "") + Math.abs(a);
 function engageNote(S, e) {
   const E = ENEMIES[e.type];
@@ -276,10 +291,10 @@ const hailWill = (S, a) => { const e = S.enemies[a.enemy], will = ENEMIES[e.type
  * sensors, the action's own difficulty, a second trained officer helping (+1), a captain's Will. The page shows it before
  * the roll; the roll uses the same.
  */
-export function rollTarget(S, a, who, skill) {
+export function rollTarget(S, a, who, skill, assist = false) {
   const t = target(S, who, skill, { ...actionCtx(S, a), extra: a.extra || [] });
-  const helper = CREW.find((c) => c.id !== who && available(S, c.id) && (!a.who || a.who.includes(c.id)) && skillOf(S, c.id, skill) >= 13);
-  if (helper) { t.parts.push([`${helper.short} assists`, 1]); t.total += 1; }
+  const helper = assist ? helperFor(S, a, who, skill) : null;
+  if (helper) { t.parts.push([`${helper.short} assists`, 1]); t.total += 1; t.helper = helper.id; }
   if (a.id === "hail") { const w = hailWill(S, a); t.parts.push(w); t.total += w[1]; }
   return t;
 }
@@ -290,18 +305,21 @@ export function attempt(S, unit, actionId, opts = {}) {
   const a = list.find((x) => x.id === actionId && (opts.order ? x.order === opts.order : true) && (opts.enemy ? x.enemy === opts.enemy : true) && (opts.arc ? x.arc === opts.arc : true));
   if (!a) return { error: "Not possible here." };
   if (a.why) return { error: a.why };
-  if (actionId === "engage") { startBattleHook(S, a.enemy, "pelion"); S.pelion.acted = true; return { ok: true, battle: true }; }
+  if (actionId === "engage") { startBattleHook(S, a.enemy, "pelion"); S.pelion.engaged = true; return { ok: true, battle: true }; }
   const ctx = actionCtx(S, a);
   let who, skill, t;
   if (unit !== "pelion") { who = unit; skill = a.skills[0]; t = { parts: [["Science vessel's crew", SUPPORT.science.skill], ["Its sensors", 2]], total: SUPPORT.science.skill + 2 }; }
   else {
     // a.who: only these officers can do it (the away team on the surface, or those still aboard).
     who = opts.officer; skill = opts.skill;
-    if (!who || !skill || !available(S, who) || !skillOf(S, who, skill) || !a.skills.includes(skill) || (a.who && !a.who.includes(who))) {
-      const b = bestOfficer(S, a.skills, ctx, a.who); if (!b) return { error: a.who ? "No one there has the training." : "Nobody fit for duty has the training." }; who = b.officer; skill = b.skill;
+    if (!who || !skill || !free(S, who) || !skillOf(S, who, skill) || !a.skills.includes(skill) || (a.who && !a.who.includes(who))) {
+      const b = bestOfficer(S, a.skills, ctx, a.who, true); if (!b) return { error: "No one free has the training." }; who = b.officer; skill = b.skill;
     }
-    t = rollTarget(S, a, who, skill);
+    t = rollTarget(S, a, who, skill, !!opts.assist);
+    // The officer (and whoever assisted) has acted this turn; this action has been tried this turn.
+    S.crew[who].acted = true; if (t.helper) S.crew[t.helper].acted = true;
   }
+  (S.tried = S.tried || {})[unit + ":" + sig(a)] = true;
   if (actionId === "hail" && unit !== "pelion") { const w = hailWill(S, a); t.parts.push(w); t.total += w[1]; }
   const roll = check(S, t.total);
   S.pending = { unit, action: actionId, arc: a.arc, order: a.order, enemy: a.enemy, sys: a.sys, officer: who, skill, target: t, roll, rerolled: false, name: a.name };
@@ -319,7 +337,7 @@ export function resolve(S, reroll) {
   }
   S.pending = null;
   const U = p.unit === "pelion" ? S.pelion : S.support[p.unit];
-  U.acted = true;
+  if (p.unit !== "pelion") U.acted = true;
   const pre = S.log.length;
   const out = applyAction(S, p);
   if (p.action === "sweep" && p.unit === "pelion") arcSweepHook(S);   // a sweep over Corvan II wakes the ruins
@@ -532,8 +550,9 @@ export function score(S) {
   return { parts, total: parts.reduce((t, p) => t + p[1], 0) };
 }
 export function rating(total) {
-  return total >= 110 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 75 ? "Commended: a fine tour, and a ship Starfleet is proud of"
-    : total >= 40 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
+  // Every officer acts each turn, so a good tour scores high: these thresholds assume it.
+  return total >= 220 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 160 ? "Commended: a fine tour, and a ship Starfleet is proud of"
+    : total >= 100 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
 }
 export function checkEnd(S) {
   if (S.over) return;

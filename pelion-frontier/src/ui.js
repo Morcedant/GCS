@@ -1,7 +1,7 @@
 // The page: the sector map on a canvas, the side panel's tabs, and the dialogs (new game, battle, story, the end).
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
-import { newGame, stardate, sysAt, officer, available, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
+import { newGame, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
   speedOf, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
@@ -316,7 +316,7 @@ function hint() {
   else if (A.stage === "orbit") t = "<b>Next:</b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
   else if (A.stage === "pull" && !A.team) t = "<b>Next:</b> choose an away team and beam them down to the outpost (the Here tab).";
   else if (A.stage === "pull" && cluesFound(A) >= THEORY_AT) t = "<b>Next:</b> there's enough evidence. Have Sevek form his theory of what's in the ruins (the Here tab), or find the last clue first for better odds.";
-  else if (A.stage === "pull") t = `<b>Next:</b> the away team. Find clues on the Here tab, one a turn: Sevek needs ${THEORY_AT} to form a theory of what's in the ruins, before the Countdown fills.`;
+  else if (A.stage === "pull") t = `<b>Next:</b> the away team. Find clues on the Here tab (each officer can act once a turn): Sevek needs ${THEORY_AT} to form a theory of what's in the ruins, before the Countdown fills.`;
   else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:</b> finish it on Corvan II: the away team's actions on the Here tab.";
   else if (S.turn <= 12) t = "<b>Next:</b> Starfleet will send new orders (the Orders tab). Meanwhile: survey the unknown (?), court the independent worlds, and watch for raiders.";
   return t ? `<div class="card gold small">${t}</div>` : "";
@@ -343,7 +343,8 @@ function hereHTML() {
   }
   // What the ship can do here.
   const acts = actionsFor(S, unit);
-  h += `<h3>${unit === "pelion" ? "The Pelion's action this turn" : `The ${esc(u.name)}'s action`}</h3>`;
+  if (unit === "pelion") { const freeNow = CREW.filter((c) => free(S, c.id)).map((c) => c.short); h += `<h3>Actions this turn</h3><p class="small muted">Every officer acts once a turn, here or with the away team; assisting uses a turn too. Free now: ${freeNow.length ? esc(freeNow.join(", ")) : "no one (end the turn)"}.</p>`; }
+  else h += `<h3>The ${esc(u.name)}'s action</h3>`;
   if (!acts.length) h += `<p class="muted small">Nothing to do here. Fly somewhere: double-click a hex.</p>`;
   h += teamLine();
   // On the surface map, the place clicked comes first.
@@ -355,7 +356,7 @@ function hereHTML() {
 function optionsFor(a) {
   if (unit !== "pelion") return [];
   const out = [];
-  for (const c of CREW) { if (!available(S, c.id) || (a.who && !a.who.includes(c.id))) continue; for (const sk of a.skills) if (skillOf(S, c.id, sk)) { const t = rollTarget(S, a, c.id, sk); out.push({ officer: c.id, skill: sk, total: t.total, parts: t.parts }); } }
+  for (const c of CREW) { if (!free(S, c.id) || (a.who && !a.who.includes(c.id))) continue; for (const sk of a.skills) if (skillOf(S, c.id, sk)) { const t = rollTarget(S, a, c.id, sk), ta = rollTarget(S, a, c.id, sk, true), hp = helperFor(S, a, c.id, sk); out.push({ officer: c.id, skill: sk, total: t.total, parts: t.parts, helper: hp ? hp.id : null, assisted: { skill: sk, total: ta.total, parts: ta.parts } }); } }
   return out.sort((x, y) => y.total - x.total);
 }
 // Who's best on the surface: the clues' skills, the Orions' Phasers, the caretaker's Engineering and Psychology.
@@ -378,21 +379,32 @@ function breakdown(o) {
   const sign = (v) => (v >= 0 ? "+" : "−") + Math.abs(v);
   return `${o.skill} ${first[1]}${rest.map(([n, v]) => ` · ${n} ${sign(v)}`).join("")} = ${o.total}, ${pct(o.total)} to succeed`;
 }
+/** The card's lines for the officer picked: how the skill is used, who could assist, and the target with or without them. */
+function refreshCard(card) {
+  const sel = card.querySelector("[data-who]"); if (!sel) return;
+  const o = sel.selectedOptions[0].dataset, box = card.querySelector("[data-assist]"), wrap = card.querySelector("[data-assist-wrap]");
+  if (wrap) { wrap.hidden = !o.helper; card.querySelector("[data-helper-name]").textContent = o.helper; if (!o.helper) box.checked = false; }
+  const how = card.querySelector("[data-how-for]"); if (how) how.textContent = o.how;
+  const out = card.querySelector("[data-breakdown-for]"); if (out) out.textContent = box && box.checked ? o.breakdownAssist : o.breakdown;
+}
 /** "Psychology: read their customs and who answers to whom, from the blind: no contact." */
 const howLine = (a, skill) => (a.how && a.how[skill] ? `${skill}: ${a.how[skill]}` : "");
 function actionCard(a) {
   if (a.id === "beam") return beamCard(a);
   const tone = a.id === "engage" ? "red" : a.id === "mission" || a.id === "arc" ? "gold" : a.id === "envoy" ? "green" : "";
   const enc = esc(JSON.stringify({ id: a.id, order: a.order, enemy: a.enemy, arc: a.arc }));
-  let h = `<div class="card ${tone}"><h4>${esc(a.name)}</h4><div class="small muted">${esc(a.blurb || "")}</div>`;
+  let h = `<div class="card ${tone}"><h4>${a.bridge ? "Bridge: " : a.who && a.id === "arc" && a.arc !== "time" && a.arc !== "theory" && a.arc !== "scan" ? "" : ""}${esc(a.name)}</h4><div class="small muted">${esc(a.blurb || "")}</div>`;
   if (a.why) return h + `<div class="why">${esc(a.why)}</div></div>`;
   if (a.id === "engage") return h + `<div class="roll-row"><button class="btn red small" data-act="${enc}">Engage</button></div></div>`;
   const opts = optionsFor(a);
-  if (unit === "pelion" && !opts.length) return h + `<div class="why">Nobody fit for duty has the training.</div></div>`;
+  if (unit === "pelion" && !opts.length) return h + `<div class="why">No one free has the training.</div></div>`;
   h += `<div class="roll-row">`;
-  if (opts.length) h += `<select data-who aria-label="Who does it">${opts.map((o, i) => `<option value="${o.officer}|${o.skill}" data-breakdown="${esc(breakdown(o))}" data-how="${esc(howLine(a, o.skill))}" ${i === 0 ? "selected" : ""}>${esc(officer(o.officer).short)} · ${esc(o.skill)} ${o.total} (${pct(o.total)})</option>`).join("")}</select>`;
+  if (opts.length) h += `<select data-who aria-label="Who does it">${opts.map((o, i) => `<option value="${o.officer}|${o.skill}" data-breakdown="${esc(breakdown(o))}" data-breakdown-assist="${esc(breakdown(o.assisted))}" data-helper="${o.helper ? esc(officer(o.helper).short) : ""}" data-how="${esc(howLine(a, o.skill))}" ${i === 0 ? "selected" : ""}>${esc(officer(o.officer).short)} · ${esc(o.skill)} ${o.total} (${pct(o.total)})</option>`).join("")}</select>`;
   else h += `<span class="small muted">Its crew: 14 (${pct(14)})</span>`;
-  return h + `<button class="btn primary small" data-act="${enc}">Roll</button></div>${opts.length ? `${a.how ? `<div class="small" data-how-for style="margin-top:6px">${esc(howLine(a, opts[0].skill))}</div>` : ""}<div class="parts" data-breakdown-for>${esc(breakdown(opts[0]))}</div>` : ""}</div>`;
+  const hp0 = opts.length && opts[0].helper ? officer(opts[0].helper).short : "";
+  h += `<button class="btn primary small" data-act="${enc}">Roll</button></div>`;
+  if (opts.length) h += `<label class="chip small" data-assist-wrap style="margin-top:6px;border-radius:8px" ${hp0 ? "" : "hidden"}><input type="checkbox" data-assist><span><b data-helper-name>${esc(hp0)}</b> assists: +1, and it uses their turn</span></label>`;
+  return h + `${opts.length ? `${a.how ? `<div class="small" data-how-for style="margin-top:6px">${esc(howLine(a, opts[0].skill))}</div>` : ""}<div class="parts" data-breakdown-for>${esc(breakdown(opts[0]))}</div>` : ""}</div>`;
 }
 const diceHTML = (r) => `<span class="dice">${r.dice.map((d) => `<span class="die">${d}</span>`).join("")}</span>`;
 function pendingHTML() {
@@ -441,7 +453,7 @@ function crewHTML() {
     const stations = Object.keys(S.stations).filter((st) => stationOfficer(S, st) === c.id).map((st) => st[0].toUpperCase() + st.slice(1));
     h += `<div class="officer ${DIV[c.id]}"><h4>${esc(c.name)}</h4><div class="small muted" style="margin-bottom:8px">${esc(c.rank)} · ${esc(c.species)}</div>
       <div class="kv small" style="margin-bottom:8px"><span>Role</span><b>${esc(c.role)}</b><span>Position</span><b>${esc(c.post)}</b><span>Battle station</span><b class="gold">${stations.length ? esc(stations.join(", ")) : "None (on call)"}</b></div>
-      <div class="small">${st.inj ? `<span class="bad">Hurt ${st.inj}/3${st.inj >= 3 ? ": in sickbay" : st.inj === 2 ? ": −2" : ""}</span> · ` : ""}Duty ${boxes(st.duty, 2, "gold")} · Experience ${st.xp}/5</div>
+      <div class="small">${st.acted ? `<span class="muted">Acted this turn</span> · ` : available(S, c.id) ? `<span class="good">Free this turn</span> · ` : ""}${st.inj ? `<span class="bad">Hurt ${st.inj}/3${st.inj >= 3 ? ": in sickbay" : st.inj === 2 ? ": −2" : ""}</span> · ` : ""}Duty ${boxes(st.duty, 2, "gold")} · Experience ${st.xp}/5</div>
       <div class="skills">${Object.keys(c.skills).map((sk) => `<span>${esc(sk)} <b>${skillOf(S, c.id, sk)}</b></span>`).join("")}</div>
       <div class="small" style="margin-top:4px"><b>${esc(c.adv)}:</b> <span class="muted">${esc(c.advText)}</span></div></div>`;
   }
@@ -460,7 +472,7 @@ function awayHTML() {
   if (!A.team) h += `<p class="small muted">${A.stage === "orbit" ? "No one yet." : "No one: choose an away team on the Here tab."}</p>`;
   else {
     h += `<div class="crew">` + A.team.map((id) => { const c = officer(id), st = S.crew[id], where = SITES[(A.pos && A.pos[id]) || "outpost"];
-      return `<div class="officer ${DIV[id]}" style="padding:8px 10px"><h4 style="font-size:15px;margin-bottom:4px">${esc(c.name)}</h4><div class="small muted" style="margin-bottom:4px">${esc(c.post)} · ${esc(c.role)}</div><div class="small">At ${esc(where.name.toLowerCase())}${st.inj ? ` · <span class="bad">hurt ${st.inj}/3${st.inj >= 3 ? ", beamed to sickbay" : ""}</span>` : ""} · Duty ${st.duty}</div></div>`; }).join("") + `</div>`;
+      return `<div class="officer ${DIV[id]}" style="padding:8px 10px"><h4 style="font-size:15px;margin-bottom:4px">${esc(c.name)}</h4><div class="small muted" style="margin-bottom:4px">${esc(c.post)} · ${esc(c.role)}</div><div class="small">${st.acted ? "Acted this turn · " : available(S, id) ? `<span class="good">Free</span> · ` : ""}At ${esc(where.name.toLowerCase())}${st.inj ? ` · <span class="bad">hurt ${st.inj}/3${st.inj >= 3 ? ", beamed to sickbay" : ""}</span>` : ""} · Duty ${st.duty}</div></div>`; }).join("") + `</div>`;
     h += `<div class="btn-row"><button class="btn small" data-tab-go="here">Their actions (Here tab)</button>${mapMode === "surface" ? "" : `<button class="btn small" data-surface="1">Show the surface map</button>`}</div>`;
   }
   const found = Object.entries(CLUES).filter(([k]) => A.clues[k]);
@@ -532,7 +544,8 @@ function bindChrome() {
       const a = JSON.parse(b.dataset.act), sel = b.parentElement.querySelector("[data-who]");
       const [who, skill] = sel ? sel.value.split("|") : [];
       const since = mark();
-      const r = attempt(S, unit, a.id, { order: a.order, enemy: a.enemy, arc: a.arc, officer: who, skill });
+      const assist = !!b.closest(".card").querySelector("[data-assist]:checked");
+      const r = attempt(S, unit, a.id, { order: a.order, enemy: a.enemy, arc: a.arc, officer: who, skill, assist });
       if (r.error) { toast(r.error, true); return; }
       lastResult = r.done ? r.result : null;
       if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill });
@@ -544,7 +557,8 @@ function bindChrome() {
     if (b.dataset.req) { const since = mark(); const r = requisition(S, b.dataset.req); if (r.error) toast(r.error, true); else reportSince("Requisition: " + SUPPORT[b.dataset.req].name, since); after(); return; }
   });
   // Picking someone else for an action shows how their target is made.
-  $("panel").addEventListener("change", (e) => { const sel = e.target.closest("[data-who]"); if (!sel) return; const card = sel.closest(".card"), out = card.querySelector("[data-breakdown-for]"), how = card.querySelector("[data-how-for]"); if (out) out.textContent = sel.selectedOptions[0].dataset.breakdown; if (how) how.textContent = sel.selectedOptions[0].dataset.how; });
+  $("panel").addEventListener("change", (e) => { const sel = e.target.closest("[data-who]"); if (!sel) return; refreshCard(sel.closest(".card")); });
+  $("panel").addEventListener("change", (e) => { if (e.target.closest("[data-assist]")) refreshCard(e.target.closest(".card")); });
   $("panel").addEventListener("change", (e) => { const s = e.target.closest("[data-station]"); if (s) { setStation(S, s.dataset.station, s.value); after(); } });
   $("panel").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-hex]"); if (tr) { selHex = tr.dataset.hex; centerOn(selHex); tab = "here"; renderAll(); } });
   $("end-turn").onclick = doEndTurn;
@@ -577,8 +591,8 @@ function showStarter(canContinue) {
   modal(`<h1>USS Pelion: Frontier</h1>
   <p class="lede">Stardate 5212.4. The Pelion, a Heavy Cruiser under your command, is assigned to the Corvan Sector for fifty weeks: a frontier between the Federation, the Klingon Empire and the Romulan Neutral Zone, full of worlds that haven't chosen a side and things no one has explained.</p>
   <div class="grid2">
-    <div class="brief"><h3>The ship</h3><p>Double-click a hex to fly there (3 hexes a turn; nebulae cost 2). Then do one thing where you are: survey, investigate, negotiate, sweep, repair. Starbase 23 repairs, rearms and refits you.</p></div>
-    <div class="brief"><h3>The crew</h3><p>The six officers from the Players' Guide do the work. Every action is the tabletop roll: 3d6 at or under their skill. Pick who does it; a Duty point rerolls a failure.</p></div>
+    <div class="brief"><h3>The ship</h3><p>Double-click a hex to fly there (3 hexes a turn; nebulae cost 2). Then the crew goes to work where you are: every officer acts once a turn (survey, investigate, negotiate, sweep, repair), each job once. Starbase 23 repairs, rearms and refits you.</p></div>
+    <div class="brief"><h3>The crew</h3><p>The six officers from the Players' Guide do the work. Every action is the tabletop roll: 3d6 at or under their skill. Pick who does it, and whether a second officer assists (+1, using their turn); a Duty point rerolls a failure.</p></div>
     <div class="brief"><h3>Orders</h3><p>Starfleet sends missions from the GM's Guide's tables, each with a deadline and a twist. The first is The Silence at Corvan II.</p></div>
     <div class="brief"><h3>The worlds</h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.</p></div>
     <div class="brief"><h3>Battles</h3><p>Ship combat from the Players' Guide: spend Power on shields, phasers and torpedoes, give the captain's order, and break away if it goes wrong.</p></div>

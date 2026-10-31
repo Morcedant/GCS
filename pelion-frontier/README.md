@@ -6,8 +6,9 @@ other powers. An unofficial fan work inspired by *Star Trek*, for our table only
 
 It's built from the tabletop game's own books:
 
-- **The crew** are the Players' Guide's six ready-made officers, with their skills and advantages. Every action is
-  the tabletop roll: 3d6 at or under the officer's skill, 3–4 always succeeds, 17–18 always fails, success by 5 is a
+- **The crew** are the Players' Guide's six ready-made officers, with their skills and advantages. Every officer acts
+  once a turn, on the bridge or with an away team, and each job can be tried once a turn; an officer who assists
+  (+1) uses their turn. Every action is the tabletop roll: 3d6 at or under the officer's skill, 3–4 always succeeds, 17–18 always fails, success by 5 is a
   great success. Pick who does it; a Duty point rerolls a failure. Successes earn experience (+1 to a skill every
   five); hurt officers take −2 at 2 boxes and go to sickbay at 3.
 - **The ship** fights by the Players' Guide's *The USS Pelion* rules: Power spent on shields, phasers and torpedoes

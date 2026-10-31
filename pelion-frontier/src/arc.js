@@ -181,7 +181,7 @@ export function arcTick(S) {
 function startPull(S) {
   const A = S.arc; if (A.stage !== "orbit") return;
   A.stage = "pull";
-  astory(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment every other week the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
+  astory(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment every week the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
 }
 /** Beam an away team down (2 to 4 officers fit for duty), or beam them all back up (ids empty). Takes no action. */
 export function beamDown(S, ids) {
@@ -198,11 +198,10 @@ export function arcSweep(S) { if (S.arc.stage === "orbit" && S.pelion.at === S.s
 /** End of turn: the drain on the ship while it stays in orbit. */
 export function arcTurn(S) {
   const A = S.arc;
-  // The drain decays the orbit every other week in orbit; failures on the surface cost time as well.
+  // The drain decays the orbit every week the Pelion stays; failures on the surface cost time as well. (With every officer
+  // acting each turn, the away team and the bridge can work at once, so the clock can be this tight.)
   if (["pull", "orions", "caretaker"].includes(A.stage) && S.pelion.at === S.systems[S.corvan].at) {
-    A.weeks = (A.weeks || 0) + 1;
-    if (A.weeks % 2 === 0) { A.countdown++; alog(S, `Corvan II drains the Pelion and the orbit decays: the Countdown ${A.countdown}/${COUNTDOWN}.`); checkCountdown(S); }
-    else alog(S, `Corvan II drains the Pelion; Grath's crews keep the orbit steady this week. The Countdown holds at ${A.countdown}/${COUNTDOWN}, but not for long.`);
+    A.countdown++; alog(S, `Corvan II drains the Pelion and the orbit decays: the Countdown ${A.countdown}/${COUNTDOWN}.`); checkCountdown(S);
   }
 }
 

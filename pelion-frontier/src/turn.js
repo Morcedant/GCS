@@ -50,7 +50,8 @@ export function endTurn(S) {
   if (S.turn >= 3 && active < 2 && (S.turn % 4 === 0 || active === 0 && S.turn % 2 === 0)) newOrder(S);
   // Next turn.
   S.turn++;
-  S.pelion.mp = speedOf(S); S.pelion.acted = false; S.pelion.zoneMarked = false;
+  S.pelion.mp = speedOf(S); S.pelion.engaged = false; S.pelion.zoneMarked = false;
+  for (const id in S.crew) S.crew[id].acted = false; S.tried = {};   // a new turn: everyone can act again
   for (const u of Object.values(S.support)) { u.mp = SUPPORT[u.type].speed; u.acted = false; }
   updateVisibility(S);
   // A hostile ship sharing the Pelion's hex attacks.

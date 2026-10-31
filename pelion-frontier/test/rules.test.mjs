@@ -103,29 +103,44 @@ test("an ordinary sensor sweep over Corvan II also starts the pull", () => {
   attempt(S, "pelion", "sweep"); if (S.pending) resolve(S, false);
   assert.equal(S.arc.stage, "pull");
 });
-test("the target an action card shows is the target the roll uses", async () => {
+test("the target an action card shows is the target the roll uses, with or without an assist", async () => {
   const { rollTarget } = await import("../src/game.js");
   const S = newGame({ seed: "pv" });
   const a = actionsFor(S).find((x) => x.id === "sweep");
-  const shown = rollTarget(S, a, "rrinn", "Computers");
-  assert.equal(shown.total, 18 - 2 + 2 + 1);   // Computers 18, hunting the hidden −2, Keen Hearing +2, a helper +1
-  attempt(S, "pelion", "sweep", { officer: "rrinn", skill: "Computers" });
-  const p = S.pending || S.log.find((l) => l.text.startsWith("Rrinn"));
-  if (S.pending) assert.equal(S.pending.target.total, shown.total);
-  else assert.ok(p.text.includes(`against ${shown.total}`));
+  assert.equal(rollTarget(S, a, "rrinn", "Computers").total, 18 - 2 + 2);          // Computers 18, hunting the hidden −2, Keen Hearing +2
+  assert.equal(rollTarget(S, a, "rrinn", "Computers", true).total, 18 - 2 + 2 + 1); // and a helper, if asked for
+  attempt(S, "pelion", "sweep", { officer: "rrinn", skill: "Computers", assist: true });
+  const shown = 19;
+  if (S.pending) assert.equal(S.pending.target.total, shown);
+  else assert.ok(S.log.some((l) => l.text.includes(`against ${shown}`)));
+  assert.ok(S.crew.rrinn.acted);
+  assert.equal(Object.values(S.crew).filter((c) => c.acted).length, 2);           // the helper used their turn too
 });
-test("with the away team down, only the mission's actions are offered", () => {
+test("every officer acts once a turn; each action can be tried once a turn", () => {
+  const S = newGame({ seed: "op" });
+  S.pelion.sys.engines = 1;   // something else to do: repairs
+  attempt(S, "pelion", "sweep", { officer: "rrinn", skill: "Computers" }); if (S.pending) resolve(S, false);
+  assert.ok(attempt(S, "pelion", "sweep").error);                                  // the sweep has been tried this turn
+  assert.ok(S.crew.rrinn.acted && !S.crew.grath.acted);
+  const r = attempt(S, "pelion", "repair", { officer: "grath", skill: "Engineering" });   // but another officer can do something else
+  assert.ok(!r.error, r.error); if (S.pending) resolve(S, false);
+  assert.ok(S.crew.grath.acted);
+  endTurn(S);
+  assert.ok(Object.values(S.crew).every((c) => !c.acted));                         // a new turn: everyone again
+});
+test("with the away team down, they work the surface and the bridge crew runs the ship", () => {
   const S = newGame({ seed: "aw" });
   S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
   const e = Object.values(S.enemies).find((x) => x.goal === "arc"); delete S.enemies[e.id]; S.event = null; dismissEvent(S);
-  attempt(S, "pelion", "arc", { arc: "scan" }); if (S.pending) resolve(S, false); S.event = null; S.pelion.acted = false;
-  assert.ok(actionsFor(S).some((a) => a.id === "sweep"));        // before beaming down, the ship's own actions are there
+  attempt(S, "pelion", "arc", { arc: "scan" }); if (S.pending) resolve(S, false); S.event = null; S.eventQueue = [];
   beamDown(S, ["sevek", "vessik", "reyes", "rrinn"]);
-  const ids = actionsFor(S).map((a) => a.id);
-  assert.ok(ids.every((id) => ["arc", "engage", "hail"].includes(id)), ids.join(","));
-  assert.ok(actionsFor(S).some((a) => a.arc === "clue-logs"));
+  const acts = actionsFor(S);
+  const clue = acts.find((a) => a.arc === "clue-logs"), sweep = acts.find((a) => a.id === "sweep");
+  assert.deepEqual(clue.who, ["sevek", "vessik", "reyes", "rrinn"]);              // the surface: the away team only
+  assert.ok(sweep && sweep.bridge);
+  assert.deepEqual(sweep.who, ["shvari", "grath"]);                                // the ship: whoever stayed aboard
   beamDown(S, []);
-  assert.ok(actionsFor(S).some((a) => a.id === "sweep"));        // beamed back up: the ship's actions return
+  assert.ok(!actionsFor(S).find((a) => a.id === "sweep").bridge);                  // beamed back up: anyone again
 });
 test("what's in the ruins is earned: Sevek's theory needs three clues, and only then reveals the caretaker", () => {
   const S = newGame({ seed: "th" });
@@ -137,10 +152,10 @@ test("what's in the ruins is earned: Sevek's theory needs three clues, and only 
   assert.ok(theory().why && /evidence/.test(theory().why));          // not after the scans alone
   S.arc.clues = { logs: true, bunks: true }; S.arc.clock = 2;
   assert.ok(theory().why);                                             // two clues: still not enough
-  S.arc.clues.energy = true; S.arc.clock = 3; S.pelion.acted = false;
+  S.arc.clues.energy = true; S.arc.clock = 3; S.crew.sevek.acted = false; S.tried = {};
   assert.equal(theory().why, null);                                    // three: Sevek can try
   assert.deepEqual(theory().who, ["sevek"]);
-  for (let i = 0; i < 20 && S.arc.stage === "pull"; i++) { S.pelion.acted = false; S.event = null; S.arc.countdown = 0; attempt(S, "pelion", "arc", { arc: "theory" }); if (S.pending) resolve(S, false); }
+  for (let i = 0; i < 20 && S.arc.stage === "pull"; i++) { S.tried = {}; S.crew.sevek.acted = false; S.event = null; S.arc.countdown = 0; attempt(S, "pelion", "arc", { arc: "theory" }); if (S.pending) resolve(S, false); }
   assert.equal(S.arc.stage, "orions");
   assert.ok(S.arc.theory);
   assert.ok(S.log.some((l) => l.text.includes("Sevek's theory: a caretaker, not a weapon")));
