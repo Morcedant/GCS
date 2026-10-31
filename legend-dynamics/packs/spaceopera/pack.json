@@ -4785,5 +4785,11 @@
   "title": "Fracture Lines: Dominion",
   "href": "/dominion/",
   "text": "A turn-based strategy game in the same galaxy. Lead the Concord, the Tessan Dynasties, the Kel Hives, the Hegemony Remnant or the Vael from one world to an empire: explore, settle, trade, research and fight. Free, in your browser."
+ },
+ "firstAdventure": {
+  "title": "Salvage Rights",
+  "kind": "A salvage job",
+  "blurb": "A colony ship lost 140 years ago has turned up at the end of a corridor the charts say is gone. Your debts are due, a broker is paying, and someone else bought the same coordinates.",
+  "length": "One or two sessions, for 3 to 7 players, with the ready-made characters"
  }
 }
