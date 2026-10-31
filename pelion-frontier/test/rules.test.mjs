@@ -292,7 +292,7 @@ test("Starfleet Command: three orders carried out in a row clear a box; a failur
 test("every order type has a story: arrival, a scene for each step, a decision, and what the decision does", async () => {
   const { STORIES } = await import("../src/stories.js");
   const { MISSIONS } = await import("../src/data.js");
-  for (const m of MISSIONS) { const st = STORIES[m.text]; assert.ok(st, m.text); assert.equal(st.steps.length, m.segs, m.text); assert.equal(st.choice.options.length, 2); }
+  for (const m of MISSIONS) { const st = STORIES[m.text]; assert.ok(st, m.text); assert.equal(st.steps.length, m.segs, m.text); assert.equal(st.choice.options.filter((x) => !x.needs).length, 2); }
   const S = newGame({ seed: "story" });
   S.orders = []; S.backlog = []; S.arc.stage = "done";
   const o = newOrder(S); S.event = null; S.eventQueue = [];
@@ -356,4 +356,26 @@ test("a successful technology trial leaves a cloak inverter on the Pelion: +2 sw
     assert.ok(target(S, "rrinn", "Computers", { action: "sweep" }).parts.some(([n, v]) => n === "Cloak inverter" && v === 2));
     assert.match(sweep.blurb, new RegExp(`within ${range} light-years`));
   }
+});
+test("the cloak inverter, later: it spots a cloaked bird-of-prey on a strike, no ambush, and the patrol can shadow it home", async () => {
+  const { cloakContact, cloakChoices, chooseCloak, spawnEnemy } = await import("../src/game.js");
+  const { startBattle } = await import("../src/combat.js");
+  const S = newGame({ seed: "ghost" }); S.event = null; S.eventQueue = [];
+  const tgt = Object.values(S.systems).find((s) => s.kind === "colony" || s.kind === "member");
+  const e = spawnEnemy(S, "rbop", S.pelion.at, { goal: "strike", target: tgt.at, hostile: true, cloaked: true });
+  cloakContact(S, e); assert.equal(S.event, null);                       // no inverter: unseen
+  S.pelion.refits.inverter = 1; cloakContact(S, e);
+  assert.equal(S.event.kind, "cloak-contact"); assert.equal(cloakChoices(S, S.event).options.length, 3);
+  chooseCloak(S, "warn"); assert.equal(S.event, null); assert.equal(tgt.alerted, S.turn);
+  const f = spawnEnemy(S, "rbop", S.pelion.at, { goal: "strike", target: tgt.at, hostile: true, cloaked: true });
+  startBattle(S, f.id, "enemy"); assert.equal(S.battle.ambush, false);   // the inverter sees it coming
+});
+test("the patrol's third choice, shadowing the Romulan ship home, needs the cloak inverter", () => {
+  const S = newGame({ seed: "shadow" }); S.orders = []; S.backlog = []; S.arc.stage = "done";
+  let o; for (let i = 0; i < 300 && !(o && o.story === "Patrol the Neutral Zone border"); i++) { o = newOrder(S); S.orders = []; }
+  S.orders = [o]; o.have = o.segs; const ev = { kind: "mission-choice", orderId: o.id };
+  assert.equal(missionChoices(S, ev).options.length, 2);
+  assert.ok(chooseMission(S, o.id, "shadow").error);
+  S.pelion.refits.inverter = 1; assert.equal(missionChoices(S, ev).options.length, 3);
+  S.event = ev; assert.ok(chooseMission(S, o.id, "shadow").ok);
 });

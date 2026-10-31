@@ -116,5 +116,5 @@ export function chooseEvent(S, id) {
   updateVisibility(S);
   return out;
 }
-export function dismissEvent(S) { if (S.event && S.event.kind === "mission-choice") return; S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
+export function dismissEvent(S) { if (S.event && (S.event.kind === "mission-choice" || S.event.kind === "cloak-contact")) return; S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
 export function closeBattle(S) { endBattle(S); arcTick(S); updateVisibility(S); checkEnd(S); }

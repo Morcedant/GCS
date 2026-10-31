@@ -2,7 +2,7 @@
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
-  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, missionChoices, chooseMission, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType } from "./game.js";
+  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, missionChoices, chooseMission, cloakChoices, chooseCloak, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType } from "./game.js";
 import { storyOf, CAMPAIGN } from "./stories.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
@@ -773,6 +773,13 @@ function showEvent() {
     return;
   }
   if (ev.kind === "success") { modal(successHTML(ev)); return; }
+  if (ev.kind === "cloak-contact") {
+    const c = cloakChoices(S, ev);
+    if (!c) { S.event = null; after(); return; }
+    modal(`<h2>${esc(c.title)}</h2><p>${esc(c.text)}</p>
+      <div class="grid2">${c.options.map((x) => `<div class="brief"><h3>${esc(x.name)}</h3><p>${esc(x.blurb)}</p><div class="btn-row"><button class="btn ${x.id === "pursue" ? "red" : "primary"} small" data-cloak="${x.id}">${esc(x.name)}</button></div></div>`).join("")}</div>`);
+    return;
+  }
   if (ev.kind === "mission-choice") {
     const c = missionChoices(S, ev);
     if (!c) { S.event = null; after(); return; }
@@ -849,6 +856,7 @@ function modalClick(e) {
   if (m === "copy") { const t = $("code"); t.select(); try { navigator.clipboard.writeText(t.value); toast("Copied."); } catch { document.execCommand("copy"); } return; }
   if (m === "load") { try { startGame(JSON.parse(decodeURIComponent(escape(atob($("load").value.trim()))))); } catch { toast("That code didn't load.", true); } return; }
   if (m === "event-ok") { dismissEvent(S); closeModal(); after(); return; }
+  if (b.dataset.cloak) { const since = mark(), title = b.textContent.trim(); const out = chooseCloak(S, b.dataset.cloak); closeModal(); report = null; reportSince(title, since); if (out && out.text) { report = report || { title, lines: [] }; } after(); return; }
   if (b.dataset.mchoice) { const r = chooseMission(S, b.dataset.order, b.dataset.mchoice); if (r.error) toast(r.error, true); closeModal(); after(); return; }
   if (m === "exchange") { exchange(S, { ...bchoice, order: bchoice.order === "none" ? null : bchoice.order }); save(); renderAll(); showBattle(); return; }
   if (m === "battle-done") { closeBattle(S); bchoice = null; closeModal(); after(); return; }

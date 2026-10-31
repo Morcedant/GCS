@@ -164,6 +164,49 @@ export function warpText(w) {
 /** Orders that call for maximum warp. */
 export const isUrgent = (o) => !!(o && (o.urgent || (o.twist && o.twist.fx === "urgent")));
 /** Ly a week the Pelion makes at its current warp (what "speed" means now). */
+// ---------- the cloak inverter, later ----------
+// With the inverter fitted, a cloaked Romulan bird-of-prey on a strike that passes within its range is seen, and the
+// captain chooses: pursue it, hail it, or warn the world it's heading for.
+export function cloakContact(S, e) {
+  if (!S.pelion.refits.inverter || e.type !== "rbop" || !e.cloaked || e.goal !== "strike" || e.contacted) return;
+  if (distance(e.at, S.pelion.at) > sweepRange(S)) return;
+  e.contacted = true; e.revealed = true;
+  const ev = { kind: "cloak-contact", enemy: e.id };
+  if (S.event || S.battle) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
+  log(S, `The cloak inverter paints a cloaked Romulan bird-of-prey ${distance(e.at, S.pelion.at) ? `${distance(e.at, S.pelion.at)} light-years off, on ${navBearing(S, S.pelion.at, e.at).text}` : "right beside the Pelion"}, heading for ${sysAt(S, e.target)?.name || "Federation space"}.`, "discovery");
+}
+export function cloakChoices(S, ev) {
+  const e = S.enemies[ev.enemy]; if (!e) return null;
+  const tgt = sysAt(S, e.target), d = distance(e.at, S.pelion.at);
+  return { title: "A ghost on the inverter", text: `The cloak inverter shows what no Federation sensor should: a Romulan bird-of-prey, cloaked, ${d ? `${d} light-year${d === 1 ? "" : "s"} off` : "right on top of the Pelion"} and running for ${tgt ? tgt.name : "Federation space"}. It doesn't know it's been seen.`,
+    options: [
+      { id: "pursue", name: "Pursue it", blurb: `Run it down before it reaches ${tgt ? tgt.name : "its target"}: Helm against its helmsman (Helm ${ENEMIES.rbop.helm}). Catch it, and the fight is on your terms: no ambush, and it can't hide.` },
+      { id: "hail", name: "Hail it", blurb: `Tell its commander they've been seen: Communications against their Will ${ENEMIES.rbop.will + 2}. A Romulan seen is a Romulan who goes home.` },
+      { id: "warn", name: `Warn ${tgt ? tgt.name : "its target"}`, blurb: "Send word ahead: the world's defenses will be ready, and drive the raid off when it comes." },
+    ] };
+}
+export function chooseCloak(S, id) {
+  const ev = S.event, e = ev && S.enemies[ev.enemy];
+  S.event = null;
+  if (!e) return { text: "The contact is gone." };
+  const roll = (skill) => { const b = bestOfficer(S, [skill], {}, null) || { officer: "captain", skill }; const t = target(S, b.officer, skill); return { ...check(S, t.total), officer: b.officer, skill }; };
+  const who = (r) => officer(r.officer)?.short || "The captain", tgt = sysAt(S, e.target);
+  if (id === "pursue") {
+    const r = roll("Helm"), o = opposed(S, r, { name: "the Romulan helmsman", skill: "Helm", target: ENEMIES.rbop.helm }, who(r));
+    log(S, o.line, o.win ? "good" : "bad");
+    if (o.win) { S.pelion.at = e.at; S.pelion.days = 0; syncMp(S); e.cloaked = false; log(S, `The Pelion runs the bird-of-prey down. With the inverter on it, its cloak is useless: it has to fight.`, "war"); startBattleHook(S, e.id, "pelion"); e.hostile = true; return { text: o.line + " The Pelion runs it down: its cloak is useless against the inverter, and it has to fight." }; }
+    log(S, `The bird-of-prey slips away toward ${tgt ? tgt.name : "its target"}.`, "bad");
+    return { text: o.line + " It's faster than it looks: it slips away, still cloaked, still heading for " + (tgt ? tgt.name : "its target") + "." };
+  }
+  if (id === "hail") {
+    const r = roll("Communications"), o = opposed(S, r, { name: "the Romulan commander", skill: "Will", target: ENEMIES.rbop.will + 2 }, who(r));
+    log(S, o.line, o.win ? "good" : "bad");
+    if (o.win) { sendHome(S, e, 0); e.cloaked = true; S.commendations += 1; log(S, "The bird-of-prey turns for the Neutral Zone without a word: a Romulan seen is a Romulan who goes home. +1 commendation.", "good"); return { text: o.line + " Silence on the channel, and then the contact turns for the Neutral Zone. +1 commendation." }; }
+    return { text: o.line + " Silence. The contact holds its course." };
+  }
+  if (id === "warn" && tgt) { tgt.alerted = S.turn; log(S, `${tgt.name} is warned: its defenses are ready for the bird-of-prey.`, "good"); return { text: `Word goes ahead to ${tgt.name}. When the bird-of-prey decloaks, it will find the defenses ready.` }; }
+  return { text: "The Pelion lets it go." };
+}
 /** How far a sensor sweep reaches for cloaked ships: 3 light-years, 5 with the tuned cloak inverter. */
 export const sweepRange = (S) => 3 + ((S.pelion.refits.inverter || 0) >= 2 ? 2 : 0);
 export function speedOf(S) { return lyPerWeek(S.pelion.warp ?? CRUISE_WARP); }
@@ -306,7 +349,7 @@ export function actionsFor(S, unit = "pelion") {
   }
   const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && e.at === U.at && e.found);
   if (base) out.push({ id: "engage", enemy: base.id, name: "Attack the Orion base", skills: [], blurb: "Its guns and shields against yours. Destroy it and the raids stop." });
-  for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, ...(o.oppose ? { oppose: o.oppose } : { extra: [["In the field", -2]] }) });
+  for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, ...(o.oppose ? { oppose: o.finale && S.pelion.refits.inverter ? { ...o.oppose, target: o.oppose.target - 2, why: o.oppose.why + " But their cruiser's cloak is no use against the cloak inverter: −2 to them." } : o.oppose } : { extra: [["In the field", -2]] }) });
   if (s && s.id === S.corvan) out.push(...arcActionsHook(S));
   // With an away team on Corvan II's surface, the away team does the mission's work and the bridge crew (whoever stayed
   // aboard) runs the ship: its operations are theirs alone.
@@ -667,13 +710,13 @@ export function missionChoices(S, ev) {
   const o = S.orders.find((x) => x.id === ev.orderId), st = storyOf(o);
   if (!o || !st || !st.choice) return null;
   return { order: o, title: st.choice.title, text: storyText(S, o, st.choice.text),
-    options: st.choice.options.map((x) => ({ id: x.id, name: storyText(S, o, x.name), blurb: storyText(S, o, x.blurb) })) };
+    options: st.choice.options.filter((x) => !x.needs || (x.needs === "inverter" && S.pelion.refits.inverter)).map((x) => ({ id: x.id, name: storyText(S, o, x.name), blurb: storyText(S, o, x.blurb) })) };
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
   accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`,
   heal: (n, w) => `${w}'s harm −${n}`, inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
 export function chooseMission(S, orderId, optId) {
-  const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId);
+  const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
   if (!o || !opt) return { error: "No such choice." };
   S.event = null;
   const s = o.sys && S.systems[o.sys], fx = opt.fx || {}, w = s ? s.name : "the border", lines = [];

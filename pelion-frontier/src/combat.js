@@ -21,7 +21,9 @@ export function startBattle(S, enemyId, initiator) {
     markCommand(S, 1, "the Pelion fired first on a Klingon ship. A diplomatic incident.");
     S.tension = Math.min(10, S.tension + 2); e.hostile = true;
   }
-  const ambush = initiator === "enemy" && E.ambush && e.cloaked;
+  const seenIt = e.cloaked && S.pelion.refits.inverter;   // the cloak inverter sees a cloaked ship coming
+  const ambush = initiator === "enemy" && E.ambush && e.cloaked && !seenIt;
+  if (seenIt && initiator === "enemy" && E.ambush) log(S, `The cloak inverter sees the ${E.name} coming before it decloaks: no ambush.`, "good");
   e.cloaked = false; e.revealed = false; e.seen = true;
   const P = S.pelion;
   S.battle = { enemy: enemyId, ex: 0, log: [], ambush, over: null, initiator, start: { hull: P.hull, torps: P.torps, sys: P.sys.weapons + P.sys.engines + P.sys.sensors } };

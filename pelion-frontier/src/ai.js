@@ -5,7 +5,7 @@
 //  - The Romulan Star Empire: now and then a cloaked bird-of-prey crosses the Neutral Zone to strike, and goes home.
 import { distance } from "./hex.js";
 import { ENEMIES, KINDS } from "./data.js";
-import { rand, pick, findPath, spawnEnemy, harmWorld, log, sendHome, markCommand, closestOutpost, sysAt } from "./game.js";
+import { rand, pick, findPath, spawnEnemy, harmWorld, log, sendHome, markCommand, closestOutpost, sysAt, cloakContact } from "./game.js";
 import { inZone } from "./sector.js";
 import { skirmish } from "./combat.js";
 
@@ -57,6 +57,7 @@ export function aiTurn(S) {
     if (e.cooldown) e.cooldown--;
     if (E.base || e.goal === "arc") continue;
     if (e.target && e.at !== e.target) step(S, e);
+    cloakContact(S, e);
     if (e.at !== e.target) continue;
     const s = sysAt(S, e.at);
     if (e.goal === "home") {
@@ -79,6 +80,10 @@ export function aiTurn(S) {
       // One strike, then away: a raid harms a world once and the raider makes for home. Federation worlds have their own
       // defenses, which drive off a raid 30% of the time.
       if (s) s.raidedAt = S.turn;
+      if (s && e.goal === "strike" && s.alerted && S.turn - s.alerted <= 6) {
+        log(S, `Warned by the Pelion, ${s.name}'s defenses are waiting when the bird-of-prey decloaks: it turns for the Neutral Zone without firing a shot.`, "good");
+        e.cloaked = false; e.seen = true; delete s.alerted; S.commendations += 1; sendHome(S, e, 0); continue;
+      }
       if (s && ["colony", "member"].includes(s.kind) && rand(S) < 0.3) {
         log(S, `${s.name}'s own defenses drive off the ${E.name} before it can do any harm.`, "good");
         if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
