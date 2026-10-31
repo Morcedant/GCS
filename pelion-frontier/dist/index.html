@@ -362,6 +362,227 @@ const NAMES = ["Corvan", "Tessaly", "Marrow's Reach", "Hadley", "Ilyra", "Brennu
   "Delmar", "Kethis", "Nadir", "Erebus", "Tarsus", "Larkspur", "Yarrow", "Oberth", "Fennimore", "Castellan", "Rho Draconis", "Iota Pavonis",
   "Mendez", "Aldana", "Talgorn", "Brightwater", "Usher"];
 
+// ---- stories.js ----
+// The stories behind each kind of order, in the way of The Silence at Corvan II: a briefing, a scene on arrival, a scene
+// for each stage of the work, a decision at the end with two ways to go, and what happens if the Pelion is too late.
+// {world} is where it happens, {key} the key character, {strange} the strange thing, {captain} you.
+// A choice's `fx` is what it does: commendations, science, supplies, accord (the world's), command (boxes marked),
+// tension (with the Klingon Empire), heal (the world's harm).
+const STORIES = {
+  "Answer a distress call": {
+    brief: "A distress call from {world}, cut off mid-word: a freighter, the Calloway's Pride, with forty aboard, adrift and losing life support. The signal repeats every eleven minutes. Something in it doesn't match the freighter's registry.",
+    arrive: "The Calloway's Pride hangs dark above {world}, venting atmosphere from a long scar down her flank. Life signs: thirty-one, clustered in the aft cargo hold where the last warm air is. And aboard, {key}, who says they know why the call was cut off.",
+    steps: [
+      ["Reach the survivors", "The boarding party cuts through to the aft hold. Thirty-one people, frightened and freezing, and a cargo manifest that lists nothing like what's actually in the crates: sealed containers humming with {strange}."],
+      ["Stabilize the ship", "Grath's people seal the breach and get the reactor cold. The Pride will hold together long enough to make a choice about her, and about her cargo."],
+    ],
+    choice: { title: "The cargo", text: "The survivors are safe. The cargo is not what it claims to be, and {key} wants it left aboard, sealed, no questions asked. The freighter's owners will pay well to have it back untouched.",
+      options: [
+        { id: "inspect", name: "Open the crates", blurb: "Starfleet regulations: find out what was really being carried. +6 science, +1 commendation; the owners won't be pleased.", how: "The survivors rescued; the false cargo opened and logged for Starfleet.", fx: { science: 6, commendations: 1 }, text: "Inside the crates: {strange}, packed in shielding no freighter should carry. The log goes to Starfleet Intelligence, and {key} goes very quiet." },
+        { id: "deliver", name: "Tow it home sealed", blurb: "Take the owners' word and their money: +12 supplies.", how: "The survivors rescued; the Pride towed home with her cargo sealed.", fx: { supplies: 12 }, text: "The Pride goes home under tow with her crates unopened, and her owners transfer a generous salvage fee. Whatever was in them is someone else's problem now." },
+      ] },
+    fail: "By the time anyone reaches the Calloway's Pride, her hold is cold and the signal has stopped. The inquiry asks why the Pelion took so long.",
+  },
+  "Survey an uncharted system": {
+    brief: "{world} has never been properly charted: long-range scans show a system that shouldn't be stable, and a reading the computers file under {strange}. Chart it, and find out what keeps it together.",
+    arrive: "{world} on the main viewer: orbits too tight, a star that flickers on a rhythm, and a sensor echo that answers the Pelion's own pings a half-second late.",
+    steps: [
+      ["Chart the orbits", "The orbits are impossible and stable anyway: every world sits in a gravitational well deeper than its mass explains. Something is holding them there."],
+      ["Find the source", "The source is {strange}, deep in the system's heart, and it reacts to the Pelion's scans the way a sleeper turns away from a light."],
+      ["Understand it", "Sevek's model fits at last: the system is held together by it, and has been for a hundred thousand years. Charting it is one thing. Disturbing it is another."],
+    ],
+    choice: { title: "What to report", text: "The survey is done. {key} wants a probe left in orbit to study the thing up close: the science would be extraordinary, and nobody knows what a probe's presence would do to a system balanced this finely.",
+      options: [
+        { id: "probe", name: "Leave a probe", blurb: "+12 science; a risk no one can measure yet.", how: "The system charted; a probe left to study its heart.", fx: { science: 12 }, text: "The probe settles into orbit and starts sending back data no one in the Federation has seen before. The system's rhythm stutters once, and steadies." },
+        { id: "leave", name: "Chart it and leave it alone", blurb: "+5 science, +1 commendation for caution.", how: "The system charted and left undisturbed.", fx: { science: 5, commendations: 1 }, text: "The Pelion files its charts and leaves {world} as it found it. Starfleet notes the restraint." },
+      ] },
+    fail: "The survey of {world} never gets done. Another ship will chart it, eventually, and find whatever the Pelion missed.",
+  },
+  "Make first contact": {
+    brief: "{world} has warp drive now: a test flight was detected last month. Starfleet wants first contact made before anyone else makes it for them, and before {key} gets there first.",
+    arrive: "{world}'s first warp ship is still in orbit, ringed by news drones. Their government hails the Pelion before it hails them: polite, careful, and with a weapons lock that no one mentions.",
+    steps: [
+      ["Make the first approach", "The first meeting is in a neutral room aboard their station. Their delegates are curious and afraid in equal measure, and very interested in whether the Federation will take what it wants."],
+      ["Win their trust", "A setback, then a breakthrough: a shared meal, a story about the first time humans met Vulcans, and {strange} that turns out to be part of their own history too."],
+      ["Answer their question", "They ask the question every first contact comes to: what does joining cost, and what happens if they say no?"],
+    ],
+    choice: { title: "The offer", text: "Their council wants an answer before it votes. Be honest about the Federation's rules and the long road to membership, or promise them the Federation's help now and sort out the details later.",
+      options: [
+        { id: "honest", name: "The honest answer", blurb: "Slower, but true: +1 accord with {world}, +1 commendation.", how: "First contact made honestly: the long road explained.", fx: { accord: 1, commendations: 1 }, text: "They don't like everything they hear. But they vote to keep talking, and the vote is close to unanimous." },
+        { id: "promise", name: "Promise them help", blurb: "+2 accord now; Starfleet Command marks a box for promises it didn't authorize.", how: "First contact made with promises Starfleet hadn't authorized.", fx: { accord: 2, command: 1 }, text: "The promise carries the vote by a landslide. Starfleet Command is less delighted: those weren't the captain's promises to make." },
+      ] },
+    fail: "Someone else reached {world} first. The Federation will be the second voice they hear, and second voices are easier to ignore.",
+  },
+  "Escort a diplomatic delegation": {
+    brief: "Ambassador Teresh and her delegation are bound for talks at {world}, and someone has made it clear they shouldn't arrive. Get them there, alive and on time.",
+    arrive: "The delegation boards: eleven diplomats, too much luggage, and {key}, who wasn't on the manifest. The ambassador vouches for them. Reyes doesn't.",
+    steps: [
+      ["Keep them safe en route", "Halfway there, a sensor ghost shadows the Pelion: a ship running dark that won't answer hails. It peels away when the shields go up. Someone was watching."],
+      ["Deliver them to the talks", "The delegation arrives, and the talks open. Then Rrinn finds a transmitter in the ambassador's luggage, sending the delegation's position to someone outside the system."],
+    ],
+    choice: { title: "The transmitter", text: "The transmitter was planted by someone in the delegation. Expose it now and the talks may collapse; keep it quiet and use it to feed false positions to whoever's listening.",
+      options: [
+        { id: "expose", name: "Expose it", blurb: "The truth, whatever it costs the talks: +1 commendation; −1 accord with {world}.", how: "The delegation delivered; a spy among them exposed.", fx: { commendations: 1, accord: -1 }, text: "The spy is {key}, and the talks stall for a day while everyone accuses everyone. They resume, a little colder." },
+        { id: "use", name: "Use it", blurb: "Feed them false positions quietly: +1 accord; +4 science from what Rrinn traces.", how: "The delegation delivered; a spy's transmitter quietly turned.", fx: { accord: 1, science: 4 }, text: "The listeners chase ghosts across half the sector while the talks go well. Rrinn traces the signal to its source and files the address for Starfleet Intelligence." },
+      ] },
+    fail: "The delegation never reached {world}. The talks were cancelled, and someone, somewhere, got exactly what they wanted.",
+  },
+  "Find a missing ship or outpost": {
+    brief: "The survey ship Arkwright stopped reporting near {world} nine days ago: fourteen crew, no distress call, no debris. {key} was the last to speak to them.",
+    arrive: "Near {world} the Pelion's sensors find a faint ion trail, nine days cold, leading into a region where {strange} has been reported. The Arkwright's last log entry ends with the word \"beautiful\".",
+    steps: [
+      ["Pick up the trail", "The ion trail bends, impossibly, as if the Arkwright had been steered by something outside it. Rrinn follows the bends like a hunter following tracks."],
+      ["Find the ship", "The Arkwright, intact, every light on, drifting in the heart of {strange}. Life signs: fourteen, all asleep."],
+      ["Wake the crew", "Vessik brings the first of them round. They remember nothing after the word \"beautiful\", and they all have the same dream."],
+    ],
+    choice: { title: "The dream", text: "The Arkwright's crew are safe. Sevek wants to stay and study {strange}: whatever it is, it reached into fourteen minds. Grath wants to be very far away from it.",
+      options: [
+        { id: "study", name: "Study it", blurb: "+10 science; Vessik will be watching the crew closely.", how: "The Arkwright found and her crew woken; the phenomenon studied.", fx: { science: 10 }, text: "Sevek's study fills three data cores. For a week afterwards, half the Pelion's crew dream the same dream, and then it fades." },
+        { id: "leave", name: "Get everyone out", blurb: "+1 commendation, +4 science from what's already recorded.", how: "The Arkwright found and her crew brought home.", fx: { commendations: 1, science: 4 }, text: "The Pelion tows the Arkwright clear and doesn't look back. Fourteen families get the news they were praying for." },
+      ] },
+    fail: "The Arkwright is still out there, still drifting. The search is called off.",
+  },
+  "Deliver urgent medical supplies": {
+    brief: "An outbreak on {world}: a fever their doctors can't name, spreading faster each day. The Pelion carries the only stock of a broad-spectrum retroviral in the sector.",
+    arrive: "{world}'s capital is under quarantine; the streets are empty and the hospitals full. Their chief physician, {key}, meets the away team at the transporter with a single question: how much did you bring?",
+    steps: [
+      ["Distribute the supplies", "Vessik and the medical teams work through two days and a night. The retroviral slows the fever. It doesn't stop it."],
+      ["Find the cause", "The fever isn't natural: it started at a single water plant, and the plant's logs show a shipment of {strange} a week before the first case."],
+    ],
+    choice: { title: "The cure", text: "Vessik can synthesize a cure from the samples, but there's only enough of the base compound for {world} or for the colony next door, where the first cases are just appearing. {key} begs the Pelion to stay.",
+      options: [
+        { id: "stay", name: "Cure {world} first", blurb: "+2 accord with {world}; the next colony will have to wait for Starfleet Medical.", how: "The outbreak on {world} cured; the cause found.", fx: { accord: 2, heal: 1 }, text: "The fever breaks across {world} within a week. {key} names the new hospital wing after the Pelion's doctor, which Vessik pretends to mind." },
+        { id: "split", name: "Split it, and send for more", blurb: "+1 commendation, +4 science; both outbreaks slowed, neither cured yet.", how: "The outbreak slowed on two worlds; Starfleet Medical called in.", fx: { commendations: 1, science: 4 }, text: "Half a cure for each world, and a priority call to Starfleet Medical. It's the right call and the slower one, and Vessik doesn't sleep for a week." },
+      ] },
+    fail: "The supplies arrived too late for {world}. The fever has run its course, and the count is grim.",
+  },
+  "Evacuate a colony": {
+    brief: "{world}'s star is flaring, months ahead of every prediction. The colony has days, not months: twelve hundred people, three transports, and a governor, {key}, who doesn't believe the readings.",
+    arrive: "The flare's first wave has already cooked {world}'s northern hemisphere. The colony's transports are on the ground, half-loaded. The governor wants proof.",
+    steps: [
+      ["Convince the governor", "Sevek's projections, shown on every screen in the colony, settle the argument. The governor gives the order to evacuate, and the colony starts to move."],
+      ["Load the transports", "Twelve hundred people and the things they can't leave behind: a seed vault, a hospital, a colony library, and {strange} that the colonists swear is the reason they came here."],
+      ["Get them clear", "The transports lift as the second wave hits. The Pelion's shields take the brunt of it, and hold."],
+    ],
+    choice: { title: "The last transport", text: "There's room for one more load: the colony's seed vault, the work of thirty years, or the forty colonists who refused to leave until the last moment and are now begging to.",
+      options: [
+        { id: "people", name: "The people", blurb: "Every colonist safe: +2 commendations; the colony starts again from nothing.", how: "Every colonist evacuated before the flare.", fx: { commendations: 2 }, text: "Every last colonist makes it off {world}. The seed vault burns with everything else. Thirty years of work, and twelve hundred lives." },
+        { id: "vault", name: "Both: the shuttles go back", blurb: "Risk the shuttles for both: +1 commendation, +10 supplies from what's saved; a shuttle crew is hurt.", how: "The colony evacuated, its seed vault saved by a last shuttle run.", fx: { commendations: 1, supplies: 10, hurt: 1 }, text: "The shuttles go back down through the flare's leading edge. They come back scorched, with the vault and the forty colonists aboard, and one pilot in sickbay." },
+      ] },
+    fail: "The flare reached {world} before the transports cleared. Not everyone got out.",
+  },
+  "Patrol the Neutral Zone border": {
+    brief: "Romulan ships have been sighted near the Neutral Zone at {world}: a patrol is overdue. Show the flag, watch the border, and don't start a war.",
+    arrive: "The border is quiet. Too quiet: the outpost listening stations report a gap in their coverage, as if something were jamming them on purpose, and {key} is waiting for the Pelion with a story about {strange}.",
+    steps: [
+      ["Sweep the border", "Rrinn hears it first: the faint echo of a cloaked ship, holding station on the Zone's edge, close enough to watch every outpost on the line."],
+      ["Find out why", "It's a Romulan bird-of-prey, and it's mapping the outposts' shield frequencies. Whatever it's preparing for, it isn't a visit."],
+    ],
+    choice: { title: "The watcher", text: "The Romulan ship hasn't crossed the line, quite. Hail it and tell it that it's been seen, or quietly retune every outpost's shields and let it go home with useless data.",
+      options: [
+        { id: "hail", name: "Hail it", blurb: "Let them know they've been seen: +1 commendation; tension with the Empire's allies rises.", how: "The border patrolled; a Romulan watcher challenged and sent home.", fx: { commendations: 1 }, text: "The bird-of-prey decloaks long enough for its commander to say nothing at all, and leaves. Everyone on the line breathes out." },
+        { id: "retune", name: "Retune the shields", blurb: "Let them leave with bad data: +6 science, and the outposts are safer for it.", how: "The border patrolled; a Romulan spy sent home with bad data.", fx: { science: 6 }, text: "Every outpost on the line changes frequency the moment the Romulan ship turns for home. Months of their work, wasted. They'll never know when it happened." },
+      ] },
+    fail: "The patrol never happened. Whatever was watching the border has finished watching.",
+  },
+  "Recover a lost probe or artifact": {
+    brief: "A Federation deep-space probe went down near {world} carrying sensor logs from beyond the sector's edge, and {strange} it was never meant to find. Recover it before anyone else does.",
+    arrive: "The probe's beacon is still pinging from {world}'s debris field, and the Pelion isn't the only ship listening: {key} is already there, in a ship with no registry.",
+    steps: [
+      ["Find it in the debris", "The probe is lodged in a tumbling asteroid, its casing cracked. Something inside it is still powered, and it isn't the probe's own reactor."],
+      ["Get it aboard", "Grath's people cut it free and tractor it in. The cargo bay's lights dim when it crosses the threshold."],
+      ["Find out what it found", "The probe's logs describe {strange}, and the probe brought a piece of it home."],
+    ],
+    choice: { title: "The fragment", text: "{key} makes an offer: a great deal of money for the fragment, no questions asked. Starfleet wants the whole thing sent to a research station under seal.",
+      options: [
+        { id: "starfleet", name: "Send it to Starfleet", blurb: "+8 science, +1 commendation.", how: "The probe recovered and sent to Starfleet under seal.", fx: { science: 8, commendations: 1 }, text: "The probe goes to Starbase 23's labs under a Starfleet seal. {key} watches it go and makes a note." },
+        { id: "sell", name: "Take the money", blurb: "+20 supplies; Starfleet Command marks a box.", how: "The probe recovered, and its fragment sold.", fx: { supplies: 20, command: 1 }, text: "The money is very good. Starfleet's inquiry, when it comes, is very thorough." },
+      ] },
+    fail: "Someone else reached the probe first. Its logs, and whatever it brought home, are in other hands now.",
+  },
+  "Mediate a dispute between two worlds": {
+    brief: "{world} and its neighbour are a week from war over a mining moon that orbits between them. Both have asked the Federation to mediate; neither trusts it.",
+    arrive: "The talks are held aboard the Pelion, the only neutral ground in the system. The two delegations arrive within a minute of each other and refuse to share a turbolift. {key} sits with neither.",
+    steps: [
+      ["Get them to the table", "The first session lasts eleven minutes. The second, an hour. By the third, they're arguing about the moon instead of about each other, which Psychology counts as progress."],
+      ["Find the real grievance", "The moon isn't the problem. Both sides found {strange} in its mines, and neither can bear the other having it."],
+      ["Find common ground", "Sevek finds it: neither side can extract it alone. Together, they could."],
+    ],
+    choice: { title: "The settlement", text: "A settlement is close. Propose a shared mining treaty under Federation supervision, or let them divide the moon down the middle and keep the Federation out of it.",
+      options: [
+        { id: "treaty", name: "A shared treaty", blurb: "+2 accord with {world}; the Federation is in the middle of it for years.", how: "War averted: a shared mining treaty under Federation supervision.", fx: { accord: 2 }, text: "The treaty is signed in the Pelion's briefing room. It will take a Federation office on the moon and a decade of patience, and it will hold." },
+        { id: "divide", name: "Divide the moon", blurb: "+1 commendation, +6 supplies in thanks; they'll be back at each other's throats someday.", how: "War averted: the moon divided between them.", fx: { commendations: 1, supplies: 6 }, text: "A line down the middle of a moon, and two delegations who don't have to talk to each other again. Both send gifts. Neither expects it to last." },
+      ] },
+    fail: "The talks failed. {world} and its neighbour are at war over a moon.",
+  },
+  "Test experimental technology": {
+    brief: "Starfleet R&D has a prototype for the Pelion to test near {world}: a sensor-cloak inverter, built by {key}, that should let a starship see through a cloak. It hasn't been tested outside a lab.",
+    arrive: "{key} beams aboard with the prototype in three crates and a manner that suggests the Pelion should be grateful. Grath takes one look at the wiring and asks who signed off on it.",
+    steps: [
+      ["Install it", "The prototype goes into the sensor array. The first power-up blows every fuse on deck seven, and the second one works."],
+      ["Run the trials", "It works: against a cloaked training drone, the inverter finds it in seconds. It also finds {strange}, which nobody was looking for."],
+      ["Push it to the limit", "At full power the inverter sees through a cloak at three light-years. It also starts to overheat, and {key} won't say what happens if it keeps going."],
+    ],
+    choice: { title: "The prototype", text: "The trials are done. {key} wants to push it one more time, at full power for an hour, to prove it. Grath wants it shut down and crated before it melts the array.",
+      options: [
+        { id: "push", name: "One more run", blurb: "+12 science; the sensors take a box of damage.", how: "The prototype tested to its limit.", fx: { science: 12, sensors: 1 }, text: "An hour at full power, and the most complete data set R&D has ever seen. The sensor array smokes for a day afterwards." },
+        { id: "shut", name: "Shut it down", blurb: "+6 science, +1 commendation; the array is safe.", how: "The prototype tested and safely returned.", fx: { science: 6, commendations: 1 }, text: "Grath crates it himself. {key} sulks all the way back to Starbase 23, and R&D sends a thank-you note to the chief engineer." },
+      ] },
+    fail: "The trials never happened. R&D will find another ship, and another schedule.",
+  },
+  "Ferry a delegation to a world that left the Federation": {
+    brief: "{world} left the Federation two years ago, after a disaster Starfleet was too slow to answer. Now they've asked for a delegation to talk about coming back, and they've asked for the Pelion by name.",
+    arrive: "The welcome at {world} is formal and cold. The spaceport still has the scorch marks from the disaster, unrepaired, as if on purpose. {key} meets the delegation and doesn't offer a hand.",
+    steps: [
+      ["Hear their grievance", "They want to be heard first: the disaster, the eleven days before help came, the people lost. The delegation listens, all of it."],
+      ["Answer it", "Starfleet's records show why help was slow: {strange}, and a decision made far above the Pelion. It isn't an excuse. It is the truth."],
+      ["Ask them back", "Their council meets. They want something the Federation can't easily give: an apology, in Starfleet's name, on the record."],
+    ],
+    choice: { title: "The apology", text: "The delegation can apologize in Starfleet's name, which it isn't authorized to do, or offer what it can: a promise to carry their grievance to Starfleet Command in person.",
+      options: [
+        { id: "apologize", name: "Apologize, on the record", blurb: "+2 accord with {world}; Starfleet Command marks a box.", how: "The delegation delivered; Starfleet's apology given, unauthorized.", fx: { accord: 2, command: 1 }, text: "The apology is given in the spaceport, in front of the scorch marks. Half the crowd weeps. Starfleet Command's reply is short and not pleased." },
+        { id: "carry", name: "Carry it to Starfleet", blurb: "+1 accord, +1 commendation.", how: "The delegation delivered; their grievance carried to Starfleet.", fx: { accord: 1, commendations: 1 }, text: "It isn't what they wanted. But they believe the Pelion will carry it, and that's a start." },
+      ] },
+    fail: "The delegation never reached {world}. Its people will remember that too.",
+  },
+  "Shore leave that goes wrong": {
+    brief: "Shore leave at {world}, at last: a week's liberty for the crew. Starfleet only asks that the Pelion's people come back on time and in one piece. {strange} is the local attraction.",
+    arrive: "The crew scatters across {world}'s pleasure districts. By the second evening, six of them haven't checked in, and {key} is asking for the captain.",
+    steps: [
+      ["Find the missing crew", "Four of the six are found at once: a card game, a misunderstanding, a local magistrate who wants a fine paid. The other two are somewhere {strange} leads."],
+      ["Bring them home", "The last two are found, dazed and delighted and with no memory of the last day. And one of them has something they shouldn't, which {key} says was stolen."],
+    ],
+    choice: { title: "The stolen thing", text: "{key} wants the crewman handed over to the local magistrate. The crewman swears it was a gift. Local law is local law; Starfleet looks after its own.",
+      options: [
+        { id: "local", name: "Hand them over", blurb: "Respect local law: +1 accord with {world}; the crewman faces a local court.", how: "Shore leave sorted out under local law.", fx: { accord: 1 }, text: "The magistrate is fair, the fine is paid, and the crewman serves three days sweeping the market. {world} remembers that the Pelion played by its rules." },
+        { id: "ship", name: "Starfleet handles it", blurb: "+1 commendation; the locals aren't happy.", how: "Shore leave sorted out under Starfleet discipline.", fx: { commendations: 1, accord: -1 }, text: "The crewman faces a captain's mast instead, and the item is returned with an apology. {key} calls it Starfleet arrogance, loudly." },
+      ] },
+    fail: "Shore leave ended badly, and late. The incident report is longer than the liberty was.",
+  },
+  "Carry a message across the Neutral Zone": {
+    brief: "A sealed message for a Romulan contact on the far side of the Zone, near {world}. Crossing is an act of war if they catch you; Starfleet will deny sending you. {key} wrote the message.",
+    arrive: "The Zone's edge on the viewer: empty space that every officer aboard has been trained to fear. Somewhere across it, a contact waits who will only talk to the Pelion.",
+    steps: [
+      ["Cross unseen", "Running dark, sensors passive, the Pelion slips across the line. Twice, the hull rings with a Romulan sensor sweep passing close. Twice, it passes."],
+      ["Deliver the message", "The contact is a Romulan officer, frightened and very brave. The message is a warning about {strange}, and the reply is worse."],
+    ],
+    choice: { title: "The defector", text: "The Romulan officer wants to come back with you. Taking them means a chance to be caught on the way out, and an intelligence prize beyond price. Leaving them means they'll be dead in a month.",
+      options: [
+        { id: "take", name: "Bring them out", blurb: "+12 science from what they know, +1 commendation; tension with the Empire rises.", how: "The message delivered, and a Romulan officer brought out.", fx: { science: 12, commendations: 1, tension: 1 }, text: "The run back to the line is the longest hour of the tour. The Pelion makes it, with one passenger more than the manifest says." },
+        { id: "leave", name: "Deliver and go", blurb: "+1 commendation; the officer stays behind.", how: "The message delivered across the Zone.", fx: { commendations: 1 }, text: "The Pelion slips back across the line as quietly as it came. The officer watches it go. Nobody aboard says anything for a long time." },
+      ] },
+    fail: "The message was never delivered. Whatever it warned about will come without warning now.",
+  },
+};
+/** A story's text with the order's details filled in. */
+function storyText(S, o, text) {
+  const world = o.sys ? S.systems[o.sys].name : "the border";
+  return text.replace(/\{world\}/g, world).replace(/\{key\}/g, (o.key || "a stranger").replace(/^A /, "a ").replace(/^An /, "an "))
+    .replace(/\{strange\}/g, (o.strange || "something strange").replace(/^A /, "a ").replace(/^An /, "an ").replace(/^The /, "the ")).replace(/\{captain\}/g, S.captain || "the captain")
+    .replace(/(^|[.!?]\s+|\n\s*)([a-z])/g, (m, p, c) => p + c.toUpperCase());
+}
+const storyOf = (o) => (o && o.story ? STORIES[o.story] : null);
+
 // ---- sector.js ----
 // The Corvan Sector: a hex map with the Federation's starbase and colonies to the southwest, two Klingon outposts on
 // the eastern border, the Romulan Neutral Zone along the top, and between them independent worlds, pre-warp peoples,
@@ -429,6 +650,7 @@ function makeSector(seed) {
 // ---- game.js ----
 // The rules: one JSON state, changed only by these functions. Every roll is the tabletop game's: 3d6 at or under a
 // skill target, 3 or 4 always succeeds, 17 or 18 always fails; the margin is how far under.
+
 
 
 
@@ -639,6 +861,7 @@ function moveTo(S, unit, hex) {
   if (unit === "pelion") { U.days = Math.max(0, U.days - r[hex] * daysPerLy(U.warp)); syncMp(S); U.strain = Math.max(U.strain || 0, U.warp); }
   else U.mp -= r[hex];
   U.at = hex;
+  if (unit === "pelion") for (const o of S.orders) arriveAt(S, o);
   if (unit === "pelion") {
     S.pelion.docked = false;
     if (p && p.path.some(inZone) && !S.pelion.zoneMarked && !orderHere(S, hex, "border")) {
@@ -997,8 +1220,16 @@ function missionStep(S, p) {
     if (p.roll.margin <= -4 && o.twist && o.twist.fx === "urgent") { o.deadline--; return say(S, `${o.title}: a setback. One turn less.`, "bad"); }
     return say(S, `${o.title}: no progress this turn.`);
   }
+  const was = o.have;
   o.have = Math.min(o.segs, o.have + (p.roll.margin >= 5 ? 2 : 1));
-  if (o.have < o.segs) return say(S, `${o.title}: ${o.have}/${o.segs}.`, "good");
+  const st = storyOf(o);
+  if (st) for (let i = was; i < o.have; i++) if (st.steps[i]) storyEvent(S, `${o.title}: ${st.steps[i][0].toLowerCase()}`, storyText(S, o, st.steps[i][1]));
+  if (o.have < o.segs) return say(S, `${o.title}: ${o.have}/${o.segs}${st && st.steps[o.have] ? `. Next: ${st.steps[o.have][0].toLowerCase()}` : ""}.`, "good");
+  if (st && st.choice) {   // the work is done; the decision is the captain's
+    const ev = { kind: "mission-choice", orderId: o.id };
+    if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
+    return say(S, `${o.title}: the work is done. ${st.choice.title}: the decision is yours.`, "order");
+  }
   completeOrder(S, o, true);
   return say(S, `Orders complete: ${o.title}. Commended.`, "victory");
 }
@@ -1009,11 +1240,54 @@ function recordOrder(S, o, result, how) { (S.history = S.history || []).push({ t
  * what it earned. `extra` adds rewards an order earns beyond the usual (the arc's library record).
  */
 function missionReport(S, o, result, how, rewards) {
-  const tasks = o.arc ? null : [`Reach ${o.sys ? S.systems[o.sys].name : "the border"}`, `${o.segs} successes with ${o.skills.join(", ")}: ${o.have || o.segs} of ${o.segs}`];
+  const st = storyOf(o);
+  const tasks = o.arc ? null : [`Reach ${o.sys ? S.systems[o.sys].name : "the border"}`].concat(st ? st.steps.map((x) => x[0]).concat(st.choice ? [`Decide: ${storyText(S, o, st.choice.title).toLowerCase()}`] : []) : [`${o.segs} successes with ${o.skills.join(", ")}: ${o.have || o.segs} of ${o.segs}`]);
   const ev = { kind: "success", orderId: o.id, arc: !!o.arc, result, title: o.title, how, tasks, rewards, weeks: Math.max(1, S.turn - (o.issued || 1) + 1), turn: S.turn };
   if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
   log(S, `Mission ${result === "partly" ? "partly successful" : "success"}: ${o.title}. ${how} Rewards: ${rewards.join("; ")}.`, "victory", { story: true });
   return ev;
+}
+/** The scene when the Pelion first reaches an order's location. */
+function arriveAt(S, o) {
+  const st = storyOf(o);
+  if (!st || o.arrived || o.arc || S.pelion.at !== o.at) return;
+  o.arrived = true;
+  storyEvent(S, `${o.title}: arrival`, storyText(S, o, st.arrive));
+}
+/** The decision at the end of an order: the captain's choice, and what it does. */
+function missionChoices(S, ev) {
+  const o = S.orders.find((x) => x.id === ev.orderId), st = storyOf(o);
+  if (!o || !st || !st.choice) return null;
+  return { order: o, title: st.choice.title, text: storyText(S, o, st.choice.text),
+    options: st.choice.options.map((x) => ({ id: x.id, name: storyText(S, o, x.name), blurb: storyText(S, o, x.blurb) })) };
+}
+const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
+  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: () => "tension with the Klingon Empire up",
+  heal: (n, w) => `${w}'s harm −${n}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
+function chooseMission(S, orderId, optId) {
+  const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId);
+  if (!o || !opt) return { error: "No such choice." };
+  S.event = null;
+  const s = o.sys && S.systems[o.sys], fx = opt.fx || {}, w = s ? s.name : "the border", lines = [];
+  for (const [k, n] of Object.entries(fx)) {
+    if (k === "commendations") S.commendations += n;
+    else if (k === "science") S.science += n;
+    else if (k === "supplies") S.supplies += n;
+    else if (k === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, Math.min(5, (s.accord || 0) + n)); if (s.accord >= 5 && s.kind === "independent") join(S, s); }
+    else if (k === "accord") continue;
+    else if (k === "command") markCommand(S, n, `${o.title}: ${opt.how.toLowerCase()}`);
+    else if (k === "tension") S.tension = Math.min(10, S.tension + n);
+    else if (k === "heal" && s) s.harm = Math.max(0, s.harm - n);
+    else if (k === "hurt") { const c = CREW.filter((x) => available(S, x.id) && x.id !== "captain"); const v = c[Math.floor(rand(S) * c.length)]; if (v) S.crew[v.id].inj = Math.min(3, S.crew[v.id].inj + n); }
+    else if (k === "sensors") S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + n);
+    lines.push(FX_TEXT[k] ? FX_TEXT[k](n, w) : k);
+  }
+  storyEvent(S, `${o.title}: ${storyText(S, o, opt.name).toLowerCase()}`, storyText(S, o, opt.text));
+  log(S, `${o.title}: the captain's decision, ${storyText(S, o, opt.name).toLowerCase()} (${lines.join(", ")}).`, "order");
+  completeOrder(S, o, true, storyText(S, o, opt.how));
+  const rep = [S.event].concat(S.eventQueue || []).find((e) => e && e.kind === "success" && e.orderId === o.id);
+  if (rep) { rep.choice = `${storyText(S, o, st.choice.title)}: ${storyText(S, o, opt.name)}`; rep.rewards.push(...lines.map((x) => `The decision: ${x}`)); }
+  return { ok: true };
 }
 function completeOrder(S, o, ok, how) {
   S.orders = S.orders.filter((x) => x !== o);
@@ -1038,6 +1312,7 @@ function completeOrder(S, o, ok, how) {
     const next = S.orders.filter((x) => !had.has(x.id)); if (next.length) ev.next = next.map((x) => x.title);
   } else {
     S.failed++; S.streak = 0; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
+    const st = storyOf(o); if (st) storyEvent(S, `Too late: ${o.title}`, storyText(S, o, st.fail));
     const s = o.sys && S.systems[o.sys];
     if (s && /Evacuate|distress|medical/i.test(o.title) && ["colony", "member", "independent"].includes(s.kind)) harmWorld(S, s, 1, "help never came");
     fillFromBacklog(S);
@@ -1063,6 +1338,7 @@ function activateOrder(S, o, why) {
   const urgent = o.urgent, dist = Math.ceil(distance(S.pelion.at, o.at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
   o.issued = S.turn; o.deadline = S.turn + dist + o.segs + (urgent ? 1 : 4); delete o.backlog;
   S.orders.push(o);
+  arriveAt(S, o);
   const twist = o.twist, at = o.at;
   if (twist && twist.fx === "klingon") { const k = closestOutpost(S, at); if (k) spawnEnemy(S, "kbc", k.at, { goal: "claim", target: at }); }
   if (twist && twist.fx === "orion") { const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base); spawnEnemy(S, "orion", b ? b.at : at, { goal: "raid", target: at, hostile: true }); }
@@ -1097,6 +1373,7 @@ function newOrder(S) {
   const dist = Math.ceil(distance(from, at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
   const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
     deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, STRANGE), key: pick(S, KEYS), oppose: orderOpposition(m.oppose, twist) };
+  if (STORIES[m.text]) { o.story = m.text; o.text = storyText(S, o, STORIES[m.text].brief); }
   S.backlog = S.backlog || [];
   if (busy(S)) {
     o.backlog = true; o.received = S.turn; S.backlog.push(o);
@@ -2000,11 +2277,12 @@ function chooseEvent(S, id) {
   updateVisibility(S);
   return out;
 }
-function dismissEvent(S) { S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
+function dismissEvent(S) { if (S.event && S.event.kind === "mission-choice") return; S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
 function closeBattle(S) { endBattle(S); arcTick(S); updateVisibility(S); checkEnd(S); }
 
 // ---- ui.js ----
 // The page: the sector map on a canvas, the side panel's tabs, and the dialogs (new game, battle, story, the end).
+
 
 
 
@@ -2568,7 +2846,7 @@ function ordersHTML() {
   for (const o of S.orders) {
     const st = orderStatus(o), left = o.deadline - S.turn;
     h += `<div class="card ${st[1] === "bad" ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}<\/span><\/h4>
-      <div class="small">${o.arc ? esc(o.text) : `${o.have} of ${o.segs} successes · ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})`}<\/div>${urgentLine(o)}
+      <div class="small">${o.arc ? esc(o.text) : `${o.text ? esc(o.text) + "<br>" : ""}${o.have} of ${o.segs} successes · ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})`}<\/div>${urgentLine(o)}
       <div class="roll-row"><button class="btn small" data-tab-go="mission">Progress (Mission tab)<\/button><button class="btn small" data-center="${o.at}">Find it<\/button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}<\/button><\/div><\/div>`;
   }
   // The backlog.
@@ -2605,7 +2883,16 @@ function missionHTML() {
     } else {
       const there = S.pelion.at === o.at;
       h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}<\/span><\/h4>`;
-      h += `<ol class="steps-list"><li class="${there || o.have ? "done" : "now"}"><span>${there || o.have ? "✓" : "▶"}<\/span>Reach ${esc(o.sys ? S.systems[o.sys].name : "the border")} (${distance(S.pelion.at, o.at)} ly away)<\/li><li class="${o.have >= o.segs ? "done" : there || o.have ? "now" : ""}"><span>${o.have >= o.segs ? "✓" : there || o.have ? "▶" : "·"}<\/span>${o.segs} successes with ${esc(o.skills.join(", "))}: ${o.have} of ${o.segs}<\/li><\/ol>`;
+      const story = storyOf(o);
+      if (o.text) h += `<p class="small">${esc(o.text)}<\/p>`;
+      if (story) {
+        // The story, step by step: what's done and what's next; later steps stay hidden until they come.
+        const steps = [[`Reach ${o.sys ? S.systems[o.sys].name : "the border"} (${distance(S.pelion.at, o.at)} ly away)`, there || o.arrived || o.have > 0]]
+          .concat(story.steps.map(([t], i) => [`${t} (success ${i + 1} of ${o.segs})`, o.have > i]), story.choice ? [[`Decide: ${story.choice.title.toLowerCase()}`, false]] : []);
+        const cur = steps.findIndex(([, d]) => !d);
+        h += `<ol class="steps-list">${steps.filter((x, i) => x[1] || i === cur).map(([t, d], i) => `<li class="${d ? "done" : "now"}"><span>${d ? "✓" : "▶"}<\/span>${esc(t)}<\/li>`).join("")}<\/ol>`
+          + (cur >= 0 && cur < steps.length - 1 ? `<p class="small muted" style="margin:4px 0 0">Further steps are revealed as you go.<\/p>` : "");
+      } else h += `<ol class="steps-list"><li class="${there || o.have ? "done" : "now"}"><span>${there || o.have ? "✓" : "▶"}<\/span>Reach ${esc(o.sys ? S.systems[o.sys].name : "the border")} (${distance(S.pelion.at, o.at)} ly away)<\/li><li class="${o.have >= o.segs ? "done" : there || o.have ? "now" : ""}"><span>${o.have >= o.segs ? "✓" : there || o.have ? "▶" : "·"}<\/span>${o.segs} successes with ${esc(o.skills.join(", "))}: ${o.have} of ${o.segs}<\/li><\/ol>`;
       h += `<div class="kv small"><span>Progress<\/span><span>${boxes(o.have, o.segs, "blue")} ${o.have} of ${o.segs} successes<\/span>
         <span>Deadline<\/span><span>${boxes(Math.max(0, left), total, "gold")} ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})<\/span><\/div>`;
       h += `<div class="small" style="margin-top:6px"><b class="good">Success:<\/b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))}, ${o.oppose ? `opposed by ${esc(o.oppose.name)} (${esc(o.oppose.skill)} ${o.oppose.target})` : `−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}`}: +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? " (out of contact: it won't count toward three in a row)" : ", and one toward three in a row, which clears a Starfleet Command box"}. <b class="bad">Failure:<\/b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.<\/div>`;
@@ -2750,6 +3037,13 @@ function showEvent() {
     return;
   }
   if (ev.kind === "success") { modal(successHTML(ev)); return; }
+  if (ev.kind === "mission-choice") {
+    const c = missionChoices(S, ev);
+    if (!c) { S.event = null; after(); return; }
+    modal(`<h2>${esc(c.order.title)}<\/h2><h3 style="margin-top:0">${esc(c.title)}<\/h3><p style="white-space:pre-line">${esc(c.text)}<\/p>
+      <div class="grid2">${c.options.map((x) => `<div class="brief"><h3>${esc(x.name)}<\/h3><p>${esc(x.blurb)}<\/p><div class="btn-row"><button class="btn primary small" data-mchoice="${x.id}" data-order="${c.order.id}">${esc(x.name)}<\/button><\/div><\/div>`).join("")}<\/div>`);
+    return;
+  }
   modal(`<h2>${esc(ev.title || "")}<\/h2><p style="white-space:pre-line">${esc(ev.text || "")}<\/p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue<\/button><\/div>`);
 }
 /** The Mission Success report. */
@@ -2758,7 +3052,7 @@ function successHTML(ev) {
   const tasks = ev.arc ? arcSteps().replace(/<p class="small muted"[^]*$/, "") : `<ol class="steps-list">${ev.tasks.map((t) => `<li class="done"><span>✓<\/span>${esc(t)}<\/li>`).join("")}<\/ol>`;
   return `<h2>${part ? "Mission partly successful" : "Mission success"}<\/h2><h3 style="margin-top:0">${esc(ev.title)}<\/h3>
     <p class="small muted">Turn ${ev.turn} · ${ev.weeks} week${ev.weeks === 1 ? "" : "s"} from orders to done<\/p>
-    <h3>What was done<\/h3>${tasks}<p>${esc(ev.how)}<\/p>
+    <h3>What was done<\/h3>${tasks}${ev.choice ? `<p><b>The decision:<\/b> ${esc(ev.choice)}<\/p>` : ""}<p>${esc(ev.how)}<\/p>
     <h3>Starfleet Command<\/h3><ul class="small">${ev.rewards.map((r) => `<li>${esc(r)}<\/li>`).join("")}<\/ul>
     ${ev.next ? `<p class="small"><b>Up next, from the backlog:<\/b> ${esc(ev.next.join("; "))} (the Orders tab).<\/p>` : ""}
     <div class="btn-row"><button class="btn primary" data-m="event-ok">Continue<\/button><\/div>`;
@@ -2819,6 +3113,7 @@ function modalClick(e) {
   if (m === "copy") { const t = $("code"); t.select(); try { navigator.clipboard.writeText(t.value); toast("Copied."); } catch { document.execCommand("copy"); } return; }
   if (m === "load") { try { startGame(JSON.parse(decodeURIComponent(escape(atob($("load").value.trim()))))); } catch { toast("That code didn't load.", true); } return; }
   if (m === "event-ok") { dismissEvent(S); closeModal(); after(); return; }
+  if (b.dataset.mchoice) { const r = chooseMission(S, b.dataset.order, b.dataset.mchoice); if (r.error) toast(r.error, true); closeModal(); after(); return; }
   if (m === "exchange") { exchange(S, { ...bchoice, order: bchoice.order === "none" ? null : bchoice.order }); save(); renderAll(); showBattle(); return; }
   if (m === "battle-done") { closeBattle(S); bchoice = null; closeModal(); after(); return; }
 }

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { newGame, check, actionsFor, attempt, resolve, moveTo, reachable, target, markCommand, score, visibleEnemies, setWarp, maxWarp, lyPerWeek, isUrgent, CRUISE_WARP, newOrder, completeOrder, acceptOrder } from "../src/game.js";
+import { newGame, check, actionsFor, attempt, resolve, moveTo, reachable, target, markCommand, score, visibleEnemies, setWarp, maxWarp, lyPerWeek, isUrgent, CRUISE_WARP, newOrder, completeOrder, acceptOrder, missionChoices, chooseMission } from "../src/game.js";
 import { startBattle, exchange, battleStats } from "../src/combat.js";
 import { beamDown } from "../src/arc.js";
 import { endTurn, chooseEvent, closeBattle, dismissEvent } from "../src/turn.js";
@@ -288,4 +288,24 @@ test("Starfleet Command: three orders carried out in a row clear a box; a failur
   ok(); ok(); assert.equal(S.command, 2); assert.equal(S.streak, 2);
   const f = newOrder(S); completeOrder(S, f, false); assert.equal(S.command, 3); assert.equal(S.streak, 0);
   ok(); ok(); ok(); assert.equal(S.command, 2); assert.equal(S.streak, 0);
+});
+test("every order type has a story: arrival, a scene for each step, a decision, and what the decision does", async () => {
+  const { STORIES } = await import("../src/stories.js");
+  const { MISSIONS } = await import("../src/data.js");
+  for (const m of MISSIONS) { const st = STORIES[m.text]; assert.ok(st, m.text); assert.equal(st.steps.length, m.segs, m.text); assert.equal(st.choice.options.length, 2); }
+  const S = newGame({ seed: "story" });
+  S.orders = []; S.backlog = []; S.arc.stage = "done";
+  const o = newOrder(S); S.event = null; S.eventQueue = [];
+  assert.ok(o.story && o.text && !/\{/.test(o.text));
+  S.pelion.mp = 99; moveTo(S, "pelion", o.at);
+  assert.ok(S.event && /arrival/.test(S.event.title)); S.event = null; S.eventQueue = [];
+  o.have = o.segs - 1;
+  for (let i = 0; i < 30 && S.orders.includes(o) && !(S.event && S.event.kind === "mission-choice"); i++) { S.tried = {}; for (const id in S.crew) S.crew[id].acted = false; S.event = null; S.eventQueue = []; attempt(S, "pelion", "mission", { order: o.id }); if (S.pending) resolve(S, false); if (S.eventQueue && S.eventQueue.length) { const c = [S.event].concat(S.eventQueue).find((e) => e && e.kind === "mission-choice"); if (c) S.event = c; } }
+  assert.equal(S.event.kind, "mission-choice");
+  const c = missionChoices(S, S.event); assert.equal(c.options.length, 2);
+  const before = S.done;
+  assert.ok(chooseMission(S, o.id, c.options[1].id).ok);
+  assert.equal(S.done, before + 1); assert.ok(!S.orders.includes(o));
+  const rep = [S.event].concat(S.eventQueue).find((e) => e && e.kind === "success");
+  assert.ok(rep && rep.choice && rep.rewards.some((r) => /decision/.test(r)));
 });

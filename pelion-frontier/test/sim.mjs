@@ -1,6 +1,6 @@
 // An automatic captain plays a whole tour: heads for the nearest order, does the most useful thing where it is,
 // fights with everything up. For balance and to shake out crashes.  node test/sim.mjs [seed] [games]
-import { newGame, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath, score, rating, requisition, fitRefit } from "../src/game.js";
+import { newGame, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath, score, rating, requisition, fitRefit, chooseMission, missionChoices } from "../src/game.js";
 import { exchange } from "../src/combat.js";
 import { beamDown } from "../src/arc.js";
 import { endTurn, chooseEvent, dismissEvent, closeBattle } from "../src/turn.js";
@@ -11,7 +11,7 @@ function play(seed) {
   const S = newGame({ seed });
   let guard = 0;
   while (!S.over && guard++ < 2000) {
-    if (S.event) { if (S.event.kind === "arc-arrive") chooseEvent(S, "warn"); else dismissEvent(S); continue; }
+    if (S.event) { if (S.event.kind === "arc-arrive") chooseEvent(S, "warn"); else if (S.event.kind === "mission-choice") chooseMission(S, S.event.orderId, missionChoices(S, S.event).options[0].id); else dismissEvent(S); continue; }
     if (S.battle) { if (S.battle.over) closeBattle(S); else exchange(S, { order: "command", shields: true, phasers: true, torps: true, repair: S.pelion.shields > 2 }); continue; }
     if (S.pending) { resolve(S, canReroll(S)); continue; }
     // Docked: refits and an escort.

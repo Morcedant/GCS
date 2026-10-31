@@ -3,6 +3,7 @@
 import { makeRng, neighbors, distance, within, hashString } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, SUPPORT_NAMES, ENEMIES, KINDS, ACTIONS, MISSIONS, STRANGE, KEYS, TWISTS, REFITS, RECORDS } from "./data.js";
 import { makeSector, inZone, nearZone } from "./sector.js";
+import { STORIES, storyText, storyOf } from "./stories.js";
 
 // ---------- dice ----------
 export function rand(S) { const r = makeRng(0); r.setState(S.rng); const v = r.next(); S.rng = r.state(); return v; }
@@ -211,6 +212,7 @@ export function moveTo(S, unit, hex) {
   if (unit === "pelion") { U.days = Math.max(0, U.days - r[hex] * daysPerLy(U.warp)); syncMp(S); U.strain = Math.max(U.strain || 0, U.warp); }
   else U.mp -= r[hex];
   U.at = hex;
+  if (unit === "pelion") for (const o of S.orders) arriveAt(S, o);
   if (unit === "pelion") {
     S.pelion.docked = false;
     if (p && p.path.some(inZone) && !S.pelion.zoneMarked && !orderHere(S, hex, "border")) {
@@ -569,8 +571,16 @@ function missionStep(S, p) {
     if (p.roll.margin <= -4 && o.twist && o.twist.fx === "urgent") { o.deadline--; return say(S, `${o.title}: a setback. One turn less.`, "bad"); }
     return say(S, `${o.title}: no progress this turn.`);
   }
+  const was = o.have;
   o.have = Math.min(o.segs, o.have + (p.roll.margin >= 5 ? 2 : 1));
-  if (o.have < o.segs) return say(S, `${o.title}: ${o.have}/${o.segs}.`, "good");
+  const st = storyOf(o);
+  if (st) for (let i = was; i < o.have; i++) if (st.steps[i]) storyEvent(S, `${o.title}: ${st.steps[i][0].toLowerCase()}`, storyText(S, o, st.steps[i][1]));
+  if (o.have < o.segs) return say(S, `${o.title}: ${o.have}/${o.segs}${st && st.steps[o.have] ? `. Next: ${st.steps[o.have][0].toLowerCase()}` : ""}.`, "good");
+  if (st && st.choice) {   // the work is done; the decision is the captain's
+    const ev = { kind: "mission-choice", orderId: o.id };
+    if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
+    return say(S, `${o.title}: the work is done. ${st.choice.title}: the decision is yours.`, "order");
+  }
   completeOrder(S, o, true);
   return say(S, `Orders complete: ${o.title}. Commended.`, "victory");
 }
@@ -581,11 +591,54 @@ export function recordOrder(S, o, result, how) { (S.history = S.history || []).p
  * what it earned. `extra` adds rewards an order earns beyond the usual (the arc's library record).
  */
 export function missionReport(S, o, result, how, rewards) {
-  const tasks = o.arc ? null : [`Reach ${o.sys ? S.systems[o.sys].name : "the border"}`, `${o.segs} successes with ${o.skills.join(", ")}: ${o.have || o.segs} of ${o.segs}`];
+  const st = storyOf(o);
+  const tasks = o.arc ? null : [`Reach ${o.sys ? S.systems[o.sys].name : "the border"}`].concat(st ? st.steps.map((x) => x[0]).concat(st.choice ? [`Decide: ${storyText(S, o, st.choice.title).toLowerCase()}`] : []) : [`${o.segs} successes with ${o.skills.join(", ")}: ${o.have || o.segs} of ${o.segs}`]);
   const ev = { kind: "success", orderId: o.id, arc: !!o.arc, result, title: o.title, how, tasks, rewards, weeks: Math.max(1, S.turn - (o.issued || 1) + 1), turn: S.turn };
   if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
   log(S, `Mission ${result === "partly" ? "partly successful" : "success"}: ${o.title}. ${how} Rewards: ${rewards.join("; ")}.`, "victory", { story: true });
   return ev;
+}
+/** The scene when the Pelion first reaches an order's location. */
+function arriveAt(S, o) {
+  const st = storyOf(o);
+  if (!st || o.arrived || o.arc || S.pelion.at !== o.at) return;
+  o.arrived = true;
+  storyEvent(S, `${o.title}: arrival`, storyText(S, o, st.arrive));
+}
+/** The decision at the end of an order: the captain's choice, and what it does. */
+export function missionChoices(S, ev) {
+  const o = S.orders.find((x) => x.id === ev.orderId), st = storyOf(o);
+  if (!o || !st || !st.choice) return null;
+  return { order: o, title: st.choice.title, text: storyText(S, o, st.choice.text),
+    options: st.choice.options.map((x) => ({ id: x.id, name: storyText(S, o, x.name), blurb: storyText(S, o, x.blurb) })) };
+}
+const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
+  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: () => "tension with the Klingon Empire up",
+  heal: (n, w) => `${w}'s harm −${n}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
+export function chooseMission(S, orderId, optId) {
+  const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId);
+  if (!o || !opt) return { error: "No such choice." };
+  S.event = null;
+  const s = o.sys && S.systems[o.sys], fx = opt.fx || {}, w = s ? s.name : "the border", lines = [];
+  for (const [k, n] of Object.entries(fx)) {
+    if (k === "commendations") S.commendations += n;
+    else if (k === "science") S.science += n;
+    else if (k === "supplies") S.supplies += n;
+    else if (k === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, Math.min(5, (s.accord || 0) + n)); if (s.accord >= 5 && s.kind === "independent") join(S, s); }
+    else if (k === "accord") continue;
+    else if (k === "command") markCommand(S, n, `${o.title}: ${opt.how.toLowerCase()}`);
+    else if (k === "tension") S.tension = Math.min(10, S.tension + n);
+    else if (k === "heal" && s) s.harm = Math.max(0, s.harm - n);
+    else if (k === "hurt") { const c = CREW.filter((x) => available(S, x.id) && x.id !== "captain"); const v = c[Math.floor(rand(S) * c.length)]; if (v) S.crew[v.id].inj = Math.min(3, S.crew[v.id].inj + n); }
+    else if (k === "sensors") S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + n);
+    lines.push(FX_TEXT[k] ? FX_TEXT[k](n, w) : k);
+  }
+  storyEvent(S, `${o.title}: ${storyText(S, o, opt.name).toLowerCase()}`, storyText(S, o, opt.text));
+  log(S, `${o.title}: the captain's decision, ${storyText(S, o, opt.name).toLowerCase()} (${lines.join(", ")}).`, "order");
+  completeOrder(S, o, true, storyText(S, o, opt.how));
+  const rep = [S.event].concat(S.eventQueue || []).find((e) => e && e.kind === "success" && e.orderId === o.id);
+  if (rep) { rep.choice = `${storyText(S, o, st.choice.title)}: ${storyText(S, o, opt.name)}`; rep.rewards.push(...lines.map((x) => `The decision: ${x}`)); }
+  return { ok: true };
 }
 export function completeOrder(S, o, ok, how) {
   S.orders = S.orders.filter((x) => x !== o);
@@ -610,6 +663,7 @@ export function completeOrder(S, o, ok, how) {
     const next = S.orders.filter((x) => !had.has(x.id)); if (next.length) ev.next = next.map((x) => x.title);
   } else {
     S.failed++; S.streak = 0; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
+    const st = storyOf(o); if (st) storyEvent(S, `Too late: ${o.title}`, storyText(S, o, st.fail));
     const s = o.sys && S.systems[o.sys];
     if (s && /Evacuate|distress|medical/i.test(o.title) && ["colony", "member", "independent"].includes(s.kind)) harmWorld(S, s, 1, "help never came");
     fillFromBacklog(S);
@@ -635,6 +689,7 @@ function activateOrder(S, o, why) {
   const urgent = o.urgent, dist = Math.ceil(distance(S.pelion.at, o.at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
   o.issued = S.turn; o.deadline = S.turn + dist + o.segs + (urgent ? 1 : 4); delete o.backlog;
   S.orders.push(o);
+  arriveAt(S, o);
   const twist = o.twist, at = o.at;
   if (twist && twist.fx === "klingon") { const k = closestOutpost(S, at); if (k) spawnEnemy(S, "kbc", k.at, { goal: "claim", target: at }); }
   if (twist && twist.fx === "orion") { const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base); spawnEnemy(S, "orion", b ? b.at : at, { goal: "raid", target: at, hostile: true }); }
@@ -669,6 +724,7 @@ export function newOrder(S) {
   const dist = Math.ceil(distance(from, at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
   const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
     deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, STRANGE), key: pick(S, KEYS), oppose: orderOpposition(m.oppose, twist) };
+  if (STORIES[m.text]) { o.story = m.text; o.text = storyText(S, o, STORIES[m.text].brief); }
   S.backlog = S.backlog || [];
   if (busy(S)) {
     o.backlog = true; o.received = S.turn; S.backlog.push(o);

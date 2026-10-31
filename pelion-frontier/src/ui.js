@@ -2,7 +2,8 @@
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
-  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds } from "./game.js";
+  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, missionChoices, chooseMission } from "./game.js";
+import { storyOf } from "./stories.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
 import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound, contestOdds } from "./arc.js";
@@ -564,7 +565,7 @@ function ordersHTML() {
   for (const o of S.orders) {
     const st = orderStatus(o), left = o.deadline - S.turn;
     h += `<div class="card ${st[1] === "bad" ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}</span></h4>
-      <div class="small">${o.arc ? esc(o.text) : `${o.have} of ${o.segs} successes · ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})`}</div>${urgentLine(o)}
+      <div class="small">${o.arc ? esc(o.text) : `${o.text ? esc(o.text) + "<br>" : ""}${o.have} of ${o.segs} successes · ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})`}</div>${urgentLine(o)}
       <div class="roll-row"><button class="btn small" data-tab-go="mission">Progress (Mission tab)</button><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}</button></div></div>`;
   }
   // The backlog.
@@ -601,7 +602,16 @@ function missionHTML() {
     } else {
       const there = S.pelion.at === o.at;
       h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}</span></h4>`;
-      h += `<ol class="steps-list"><li class="${there || o.have ? "done" : "now"}"><span>${there || o.have ? "✓" : "▶"}</span>Reach ${esc(o.sys ? S.systems[o.sys].name : "the border")} (${distance(S.pelion.at, o.at)} ly away)</li><li class="${o.have >= o.segs ? "done" : there || o.have ? "now" : ""}"><span>${o.have >= o.segs ? "✓" : there || o.have ? "▶" : "·"}</span>${o.segs} successes with ${esc(o.skills.join(", "))}: ${o.have} of ${o.segs}</li></ol>`;
+      const story = storyOf(o);
+      if (o.text) h += `<p class="small">${esc(o.text)}</p>`;
+      if (story) {
+        // The story, step by step: what's done and what's next; later steps stay hidden until they come.
+        const steps = [[`Reach ${o.sys ? S.systems[o.sys].name : "the border"} (${distance(S.pelion.at, o.at)} ly away)`, there || o.arrived || o.have > 0]]
+          .concat(story.steps.map(([t], i) => [`${t} (success ${i + 1} of ${o.segs})`, o.have > i]), story.choice ? [[`Decide: ${story.choice.title.toLowerCase()}`, false]] : []);
+        const cur = steps.findIndex(([, d]) => !d);
+        h += `<ol class="steps-list">${steps.filter((x, i) => x[1] || i === cur).map(([t, d], i) => `<li class="${d ? "done" : "now"}"><span>${d ? "✓" : "▶"}</span>${esc(t)}</li>`).join("")}</ol>`
+          + (cur >= 0 && cur < steps.length - 1 ? `<p class="small muted" style="margin:4px 0 0">Further steps are revealed as you go.</p>` : "");
+      } else h += `<ol class="steps-list"><li class="${there || o.have ? "done" : "now"}"><span>${there || o.have ? "✓" : "▶"}</span>Reach ${esc(o.sys ? S.systems[o.sys].name : "the border")} (${distance(S.pelion.at, o.at)} ly away)</li><li class="${o.have >= o.segs ? "done" : there || o.have ? "now" : ""}"><span>${o.have >= o.segs ? "✓" : there || o.have ? "▶" : "·"}</span>${o.segs} successes with ${esc(o.skills.join(", "))}: ${o.have} of ${o.segs}</li></ol>`;
       h += `<div class="kv small"><span>Progress</span><span>${boxes(o.have, o.segs, "blue")} ${o.have} of ${o.segs} successes</span>
         <span>Deadline</span><span>${boxes(Math.max(0, left), total, "gold")} ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})</span></div>`;
       h += `<div class="small" style="margin-top:6px"><b class="good">Success:</b> ${o.segs} successes at ${esc(o.sys ? S.systems[o.sys].name : "the border")} with ${esc(o.skills.join(", "))}, ${o.oppose ? `opposed by ${esc(o.oppose.name)} (${esc(o.oppose.skill)} ${o.oppose.target})` : `−2 in the field${o.twist && o.twist.fx === "hard" ? ", −2 more for the twist" : ""}`}: +10 supplies, +8 science, a commendation${o.twist && o.twist.fx === "nocredit" ? " (out of contact: it won't count toward three in a row)" : ", and one toward three in a row, which clears a Starfleet Command box"}. <b class="bad">Failure:</b> not done by turn ${o.deadline}: a Starfleet Command box marked${/Evacuate|distress|medical/i.test(o.title) ? ", and the world is harmed" : ""}.</div>`;
@@ -746,6 +756,13 @@ function showEvent() {
     return;
   }
   if (ev.kind === "success") { modal(successHTML(ev)); return; }
+  if (ev.kind === "mission-choice") {
+    const c = missionChoices(S, ev);
+    if (!c) { S.event = null; after(); return; }
+    modal(`<h2>${esc(c.order.title)}</h2><h3 style="margin-top:0">${esc(c.title)}</h3><p style="white-space:pre-line">${esc(c.text)}</p>
+      <div class="grid2">${c.options.map((x) => `<div class="brief"><h3>${esc(x.name)}</h3><p>${esc(x.blurb)}</p><div class="btn-row"><button class="btn primary small" data-mchoice="${x.id}" data-order="${c.order.id}">${esc(x.name)}</button></div></div>`).join("")}</div>`);
+    return;
+  }
   modal(`<h2>${esc(ev.title || "")}</h2><p style="white-space:pre-line">${esc(ev.text || "")}</p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue</button></div>`);
 }
 /** The Mission Success report. */
@@ -754,7 +771,7 @@ function successHTML(ev) {
   const tasks = ev.arc ? arcSteps().replace(/<p class="small muted"[^]*$/, "") : `<ol class="steps-list">${ev.tasks.map((t) => `<li class="done"><span>✓</span>${esc(t)}</li>`).join("")}</ol>`;
   return `<h2>${part ? "Mission partly successful" : "Mission success"}</h2><h3 style="margin-top:0">${esc(ev.title)}</h3>
     <p class="small muted">Turn ${ev.turn} · ${ev.weeks} week${ev.weeks === 1 ? "" : "s"} from orders to done</p>
-    <h3>What was done</h3>${tasks}<p>${esc(ev.how)}</p>
+    <h3>What was done</h3>${tasks}${ev.choice ? `<p><b>The decision:</b> ${esc(ev.choice)}</p>` : ""}<p>${esc(ev.how)}</p>
     <h3>Starfleet Command</h3><ul class="small">${ev.rewards.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
     ${ev.next ? `<p class="small"><b>Up next, from the backlog:</b> ${esc(ev.next.join("; "))} (the Orders tab).</p>` : ""}
     <div class="btn-row"><button class="btn primary" data-m="event-ok">Continue</button></div>`;
@@ -815,6 +832,7 @@ function modalClick(e) {
   if (m === "copy") { const t = $("code"); t.select(); try { navigator.clipboard.writeText(t.value); toast("Copied."); } catch { document.execCommand("copy"); } return; }
   if (m === "load") { try { startGame(JSON.parse(decodeURIComponent(escape(atob($("load").value.trim()))))); } catch { toast("That code didn't load.", true); } return; }
   if (m === "event-ok") { dismissEvent(S); closeModal(); after(); return; }
+  if (b.dataset.mchoice) { const r = chooseMission(S, b.dataset.order, b.dataset.mchoice); if (r.error) toast(r.error, true); closeModal(); after(); return; }
   if (m === "exchange") { exchange(S, { ...bchoice, order: bchoice.order === "none" ? null : bchoice.order }); save(); renderAll(); showBattle(); return; }
   if (m === "battle-done") { closeBattle(S); bchoice = null; closeModal(); after(); return; }
 }
