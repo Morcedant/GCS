@@ -2,7 +2,7 @@
 // Also the one place that ties the modules together, so the page imports this.
 import { CREW, SUPPORT, ENEMIES } from "./data.js";
 import { distance, within } from "./hex.js";
-import { check, target, available, log, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
+import { check, target, available, log, storyEvent, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
 import { startBattle, endBattle } from "./combat.js";
 import { aiTurn, claim } from "./ai.js";
 import { arcTurn, arcTick, arcEventChoose } from "./arc.js";
@@ -30,7 +30,7 @@ export function endTurn(S) {
   if (S.turn % 8 === 0) { for (const id in S.crew) S.crew[id].duty = 2; log(S, "Duty points restored.", "good"); }
   arcTurn(S);
   // Orders fall due.
-  for (const o of [...S.orders]) if (S.turn >= o.deadline) { log(S, `Orders failed: ${o.title}.`, "bad"); completeOrder(S, o, false); if (o.arc) { S.arc.stage = "done"; S.event = { kind: "story", title: "Too late", text: "Another ship reached Corvan II first. Whatever happened to the eight scientists, the Pelion wasn't there for it, and Starfleet Command has noted it." }; } }
+  for (const o of [...S.orders]) if (S.turn >= o.deadline) { log(S, `Orders failed: ${o.title}.`, "bad"); completeOrder(S, o, false); if (o.arc) { S.arc.stage = "done"; storyEvent(S, "Too late", "Another ship reached Corvan II first. Whatever happened to the eight scientists, the Pelion wasn't there for it, and Starfleet Command has noted it."); } }
   // The Klingon border pulls on nearby worlds.
   if (S.turn % 8 === 0) {
     const k = sys.filter((s) => s.kind === "klingon" || s.kind === "claimed");

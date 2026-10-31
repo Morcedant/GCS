@@ -51,7 +51,13 @@ export const stardate = (S) => (STARDATE0 + (S.turn - 1) * 7.3).toFixed(1);
 export const sysAt = (S, hex) => S.sysAt[hex] && S.systems[S.sysAt[hex]];
 export const officer = (id) => CREW.find((c) => c.id === id);
 export const hasRecord = (S, perk) => S.records.some((id) => RECORDS.find((r) => r.id === id)?.perk === perk);
-export function log(S, text, kind = "") { S.log.unshift({ t: S.turn, text, kind }); if (S.log.length > 200) S.log.length = 200; }
+/** The captain's log. Discoveries are never trimmed: the log keeps the newest 200 other entries. */
+export function log(S, text, kind = "") {
+  S.log.unshift({ t: S.turn, text, kind });
+  if (S.log.length > 200) { let n = S.log.length - 200; for (let i = S.log.length - 1; i >= 0 && n > 0; i--) if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } }
+}
+/** A story scene: shown as a dialog, and written in full into the log. */
+export function storyEvent(S, title, text) { S.event = { kind: "story", title, text }; log(S, `${title}: ${text}`, "discovery"); }
 export const available = (S, id) => S.crew[id].inj < 3;
 export function skillOf(S, id, skill) {
   if (id === "captain") return CAPTAIN.skills[skill] || 10;
@@ -311,7 +317,7 @@ function applyAction(S, p) {
       s.surveyed = true; S.seenSys[s.id] = true;
       const sci = 4 + (big ? 3 : 0) + (p.unit !== "pelion" ? 2 : 0); S.science += sci;
       const what = { prewarp: "a pre-warp people. The Prime Directive applies.", anomaly: "an anomaly worth investigating.", ruins: "the ruins of a vanished civilization.", empty: "nothing but rock and starlight.", orionBase: "nothing but rock and starlight." }[s.kind] || "charted.";
-      return say(S, `Survey of ${s.name}: ${what} +${sci} science.`, "good");
+      return say(S, `Survey of ${s.name}: ${what} +${sci} science.`, "discovery");
     }
     case "investigate": {
       if (!r.success) {
@@ -319,8 +325,8 @@ function applyAction(S, p) {
         return say(S, `No progress at ${s.name} this time.`);
       }
       s.clock = Math.min(s.need, s.clock + (big ? 2 : 1)); S.science += 2;
-      if (s.clock >= s.need) { s.recorded = true; const rec = earnRecord(S); return say(S, `Discovery at ${s.name}! Library record: ${rec ? rec.name + ". " + rec.text : "a fascinating footnote."} +10 science.`, "good"); }
-      return say(S, `Progress at ${s.name}: ${s.clock}/${s.need}.`);
+      if (s.clock >= s.need) { s.recorded = true; const rec = earnRecord(S); return say(S, `Discovery at ${s.name}! Library record: ${rec ? rec.name + ". " + rec.text : "a fascinating footnote."} +10 science.`, "discovery"); }
+      return say(S, `Investigating ${s.name}: ${s.clock}/${s.need} on the discovery clock.`, "discovery");
     }
     case "envoy": {
       if (!r.success) { if (r.margin <= -4) { s.accord = Math.max(-5, s.accord - 1); return say(S, `The talks at ${s.name} went badly: accord ${signedAccord(s.accord)}.`, "bad"); } return say(S, `The envoys of ${s.name} listen politely and promise nothing.`); }
@@ -329,7 +335,7 @@ function applyAction(S, p) {
       return say(S, `Talks at ${s.name} go well: accord ${signedAccord(s.accord)}.`, "good");
     }
     case "observe": {
-      if (r.success) { s.observed = true; S.science += 6; return say(S, `${name} studies ${s.name}'s people unseen: +6 science.`, "good"); }
+      if (r.success) { s.observed = true; S.science += 6; return say(S, `${name} studies ${s.name}'s people unseen: +6 science.`, "discovery"); }
       if (r.margin <= -3) { markCommand(S, 1, `${s.name}'s people saw the Pelion's away team. The Prime Directive.`); return say(S, `Contact at ${s.name}!`, "bad"); }
       return say(S, `Nothing useful from ${s.name} this time.`);
     }
@@ -358,8 +364,8 @@ function applyAction(S, p) {
       }
       // A sweep also hears where the raiders come from.
       const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && !e.found);
-      if (!found.length && base) { const d = distance(base.at, S.pelion.at); return say(S, `Nothing nearby, but ${name} hears Orion traffic ${d <= 4 ? "very close: within " + d + " hexes" : d <= 7 ? "to the " + bearing(S.pelion.at, base.at) : "far off"}.`); }
-      return say(S, found.length ? `Sweep: ${found.join("; ")}.` : "Sweep: all quiet.", found.length ? "good" : "");
+      if (!found.length && base) { const d = distance(base.at, S.pelion.at); return say(S, `Nothing nearby, but ${name} hears Orion traffic ${d <= 4 ? "very close: within " + d + " hexes" : d <= 7 ? "to the " + bearing(S.pelion.at, base.at) : "far off"}.`, "discovery"); }
+      return say(S, found.length ? `Sweep: ${found.join("; ")}.` : "Sweep: all quiet.", found.length ? "discovery" : "");
     }
     case "hail": {
       const e = S.enemies[p.enemy];

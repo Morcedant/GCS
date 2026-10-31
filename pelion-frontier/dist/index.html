@@ -71,7 +71,7 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
 .officer h4 { margin: 0; font: 700 16px var(--display); letter-spacing: .04em; text-transform: uppercase; }
 .skills { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 12px; color: var(--muted); margin-top: 4px; } .skills b { color: var(--ink); font-weight: 600; }
 .log { list-style: none; padding: 0; margin: 0; display: grid; gap: 5px; font-size: 13px; }
-.log .t { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 8px; } .log .war { color: #ffb0a6; } .log .bad { color: #ffb0a6; } .log .good { color: #b9e5bb; } .log .victory { color: var(--gold); } .log .order { color: #a8d4ff; }
+.log .t { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 8px; } .log .war { color: #ffb0a6; } .log .bad { color: #ffb0a6; } .log .good { color: #b9e5bb; } .log .victory { color: var(--gold); } .log .order { color: #a8d4ff; } .log .discovery { color: #e2d1ff; border-left: 3px solid var(--violet); padding-left: 8px; }
 #modal { position: fixed; inset: 0; background: rgba(3, 4, 8, .84); display: grid; place-items: center; z-index: 20; padding: 16px; overflow-y: auto; }
 #modal[hidden] { display: none; }
 .modal-box { background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--gold); border-radius: 14px; max-width: 760px; width: 100%; box-sizing: border-box; padding: 22px max(16px, env(safe-area-inset-right, 0px)) 22px max(16px, env(safe-area-inset-left, 0px)); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
@@ -471,7 +471,13 @@ const stardate = (S) => (STARDATE0 + (S.turn - 1) * 7.3).toFixed(1);
 const sysAt = (S, hex) => S.sysAt[hex] && S.systems[S.sysAt[hex]];
 const officer = (id) => CREW.find((c) => c.id === id);
 const hasRecord = (S, perk) => S.records.some((id) => RECORDS.find((r) => r.id === id)?.perk === perk);
-function log(S, text, kind = "") { S.log.unshift({ t: S.turn, text, kind }); if (S.log.length > 200) S.log.length = 200; }
+/** The captain's log. Discoveries are never trimmed: the log keeps the newest 200 other entries. */
+function log(S, text, kind = "") {
+  S.log.unshift({ t: S.turn, text, kind });
+  if (S.log.length > 200) { let n = S.log.length - 200; for (let i = S.log.length - 1; i >= 0 && n > 0; i--) if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } }
+}
+/** A story scene: shown as a dialog, and written in full into the log. */
+function storyEvent(S, title, text) { S.event = { kind: "story", title, text }; log(S, `${title}: ${text}`, "discovery"); }
 const available = (S, id) => S.crew[id].inj < 3;
 function skillOf(S, id, skill) {
   if (id === "captain") return CAPTAIN.skills[skill] || 10;
@@ -731,7 +737,7 @@ function applyAction(S, p) {
       s.surveyed = true; S.seenSys[s.id] = true;
       const sci = 4 + (big ? 3 : 0) + (p.unit !== "pelion" ? 2 : 0); S.science += sci;
       const what = { prewarp: "a pre-warp people. The Prime Directive applies.", anomaly: "an anomaly worth investigating.", ruins: "the ruins of a vanished civilization.", empty: "nothing but rock and starlight.", orionBase: "nothing but rock and starlight." }[s.kind] || "charted.";
-      return say(S, `Survey of ${s.name}: ${what} +${sci} science.`, "good");
+      return say(S, `Survey of ${s.name}: ${what} +${sci} science.`, "discovery");
     }
     case "investigate": {
       if (!r.success) {
@@ -739,8 +745,8 @@ function applyAction(S, p) {
         return say(S, `No progress at ${s.name} this time.`);
       }
       s.clock = Math.min(s.need, s.clock + (big ? 2 : 1)); S.science += 2;
-      if (s.clock >= s.need) { s.recorded = true; const rec = earnRecord(S); return say(S, `Discovery at ${s.name}! Library record: ${rec ? rec.name + ". " + rec.text : "a fascinating footnote."} +10 science.`, "good"); }
-      return say(S, `Progress at ${s.name}: ${s.clock}/${s.need}.`);
+      if (s.clock >= s.need) { s.recorded = true; const rec = earnRecord(S); return say(S, `Discovery at ${s.name}! Library record: ${rec ? rec.name + ". " + rec.text : "a fascinating footnote."} +10 science.`, "discovery"); }
+      return say(S, `Investigating ${s.name}: ${s.clock}/${s.need} on the discovery clock.`, "discovery");
     }
     case "envoy": {
       if (!r.success) { if (r.margin <= -4) { s.accord = Math.max(-5, s.accord - 1); return say(S, `The talks at ${s.name} went badly: accord ${signedAccord(s.accord)}.`, "bad"); } return say(S, `The envoys of ${s.name} listen politely and promise nothing.`); }
@@ -749,7 +755,7 @@ function applyAction(S, p) {
       return say(S, `Talks at ${s.name} go well: accord ${signedAccord(s.accord)}.`, "good");
     }
     case "observe": {
-      if (r.success) { s.observed = true; S.science += 6; return say(S, `${name} studies ${s.name}'s people unseen: +6 science.`, "good"); }
+      if (r.success) { s.observed = true; S.science += 6; return say(S, `${name} studies ${s.name}'s people unseen: +6 science.`, "discovery"); }
       if (r.margin <= -3) { markCommand(S, 1, `${s.name}'s people saw the Pelion's away team. The Prime Directive.`); return say(S, `Contact at ${s.name}!`, "bad"); }
       return say(S, `Nothing useful from ${s.name} this time.`);
     }
@@ -778,8 +784,8 @@ function applyAction(S, p) {
       }
       // A sweep also hears where the raiders come from.
       const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && !e.found);
-      if (!found.length && base) { const d = distance(base.at, S.pelion.at); return say(S, `Nothing nearby, but ${name} hears Orion traffic ${d <= 4 ? "very close: within " + d + " hexes" : d <= 7 ? "to the " + bearing(S.pelion.at, base.at) : "far off"}.`); }
-      return say(S, found.length ? `Sweep: ${found.join("; ")}.` : "Sweep: all quiet.", found.length ? "good" : "");
+      if (!found.length && base) { const d = distance(base.at, S.pelion.at); return say(S, `Nothing nearby, but ${name} hears Orion traffic ${d <= 4 ? "very close: within " + d + " hexes" : d <= 7 ? "to the " + bearing(S.pelion.at, base.at) : "far off"}.`, "discovery"); }
+      return say(S, found.length ? `Sweep: ${found.join("; ")}.` : "Sweep: all quiet.", found.length ? "discovery" : "");
     }
     case "hail": {
       const e = S.enemies[p.enemy];
@@ -1179,10 +1185,10 @@ function arcStep(S, p) {
       return checkCountdown(S);
     }
     A.clues[k.slice(5)] = true; A.clock = Math.min(CLOCK, A.clock + (r.margin >= 5 ? 2 : 1));
-    log(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} (${A.clock}/${CLOCK})`, "good");
+    log(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} (${A.clock}/${CLOCK})`, "discovery");
     if (A.clock >= CLOCK) {
       A.stage = "orions";
-      S.event = { kind: "story", title: "A caretaker, not a weapon", text: "The pieces fit. The ruins hold a caretaker machine, left by the vanished civilization to watch over the Ketari. Dr. Haskel's dampener woke it, and it judged the outpost a threat: all eight scientists are in stasis, unharmed, deep in the ruins. And in the ruins now, three Orion pirates are cutting their way to the machine's core." };
+      storyEvent(S, "A caretaker, not a weapon", "The pieces fit. The ruins hold a caretaker machine, left by the vanished civilization to watch over the Ketari. Dr. Haskel's dampener woke it, and it judged the outpost a threat: all eight scientists are in stasis, unharmed, deep in the ruins. And in the ruins now, three Orion pirates are cutting their way to the machine's core.");
     }
     return "";
   }
@@ -1199,7 +1205,7 @@ function arcStep(S, p) {
     }
     if (k === "kill") markCommand(S, 1, "Orion pirates killed on Corvan II when stun would have done.");
     A.stage = "caretaker";
-    S.event = { kind: "story", title: "The caretaker speaks", text: `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and in the brig."} Then the machine speaks through an android shell: courteous, absolute. It will protect the Ketari from everything off-world, the Federation included. The Countdown stands at ${A.countdown}/${COUNTDOWN}.` };
+    storyEvent(S, "The caretaker speaks", `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and in the brig."} Then the machine speaks through an android shell: courteous, absolute. It will protect the Ketari from everything off-world, the Federation included. The Countdown stands at ${A.countdown}/${COUNTDOWN}.`);
     return "";
   }
   if (k === "shutdown" || k === "reason" || k === "leave") {
@@ -1219,7 +1225,7 @@ function checkCountdown(S) {
   if (A.countdown < COUNTDOWN || A.stage === "done") return "";
   A.stage = "done";
   const o = arcOrder(S); if (o) completeOrder(S, o, false);
-  S.event = { kind: "story", title: "Breaking orbit", text: "The Countdown runs out: the drain on the Pelion's power is too much, and the ship has to break orbit or fall. The away team beams up with nothing. The scientists sleep on in the ruins, and Rrinn never hears the end of that message." };
+  storyEvent(S, "Breaking orbit", "The Countdown runs out: the drain on the Pelion's power is too much, and the ship has to break orbit or fall. The away team beams up with nothing. The scientists sleep on in the ruins, and Rrinn never hears the end of that message.");
   return "";
 }
 function finishArc(S, how) {
@@ -1228,15 +1234,15 @@ function finishArc(S, how) {
   if (how === "leave") {
     if (o) { S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; }
     S.science += 8;
-    S.event = { kind: "story", title: "The Ketari's own history", text: "The away team takes back every Orion phaser from the village and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly." };
+    storyEvent(S, "The Ketari's own history", "The away team takes back every Orion phaser from the village and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
     log(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
   } else {
     if (o) completeOrder(S, o, true);
     if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); }
     else S.commendations += 1;
-    S.event = { kind: "story", title: how === "reason" ? "Equals" : "Silence, for good", text: how === "reason"
+    storyEvent(S, how === "reason" ? "Equals" : "Silence, for good", how === "reason"
       ? "Sevek lays out the paradox, and the machine considers it for a long time. Then it releases the eight scientists and goes back to its watch: the Ketari keep their guardian, and the Federation has a library record no one else has. Rrinn's sister is the first one out, and finally finishes that sentence."
-      : "The caretaker goes dark. The eight scientists wake, cold and confused and alive, and the Ketari will never know what watched over them, or that it's gone. Rrinn's sister is among the sleepers, and finally finishes that sentence." };
+      : "The caretaker goes dark. The eight scientists wake, cold and confused and alive, and the Ketari will never know what watched over them, or that it's gone. Rrinn's sister is among the sleepers, and finally finishes that sentence.");
     log(S, `The Silence at Corvan II: the eight scientists are safe.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
   }
   if (!A.seen) markCommand(S, -1, "the Ketari never learned what the crew were.");
@@ -1248,7 +1254,7 @@ function arcTick(S) {
   if (A.stage === "travel" && S.pelion.at === cv.at && !raider(S) && !S.battle) {
     A.stage = "pull";
     const o = arcOrder(S); if (o) o.deadline = 999;
-    S.event = { kind: "story", title: "The pull", text: "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. The away team beams down to an empty outpost." };
+    storyEvent(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. The away team beams down to an empty outpost.");
   }
 }
 /** End of turn: the drain on the ship while it stays in orbit. */
@@ -1271,6 +1277,7 @@ function arcEventChoose(S, id, roll) {
   if (!e) { S.event = null; arcTick(S); return { text: "The raider is gone." }; }
   if (id === "scan") {
     const r = roll("Sensors", "scan"); S.arc.scanned = true;
+    if (r.success) log(S, "Scan of the Orion raider at Corvan II: its hold is full of digging gear, and its manifest lists Starfleet-pattern phasers \"traded\" planetside. They're arming the natives.", "discovery");
     return { roll: r, text: r.success ? "Their hold is full of digging gear, and their manifest lists Starfleet-pattern phasers \"traded\" planetside. They're arming the natives." : "Their hull scatters the scan." };
   }
   if (id === "warn") {
@@ -1427,7 +1434,7 @@ function endTurn(S) {
   if (S.turn % 8 === 0) { for (const id in S.crew) S.crew[id].duty = 2; log(S, "Duty points restored.", "good"); }
   arcTurn(S);
   // Orders fall due.
-  for (const o of [...S.orders]) if (S.turn >= o.deadline) { log(S, `Orders failed: ${o.title}.`, "bad"); completeOrder(S, o, false); if (o.arc) { S.arc.stage = "done"; S.event = { kind: "story", title: "Too late", text: "Another ship reached Corvan II first. Whatever happened to the eight scientists, the Pelion wasn't there for it, and Starfleet Command has noted it." }; } }
+  for (const o of [...S.orders]) if (S.turn >= o.deadline) { log(S, `Orders failed: ${o.title}.`, "bad"); completeOrder(S, o, false); if (o.arc) { S.arc.stage = "done"; storyEvent(S, "Too late", "Another ship reached Corvan II first. Whatever happened to the eight scientists, the Pelion wasn't there for it, and Starfleet Command has noted it."); } }
   // The Klingon border pulls on nearby worlds.
   if (S.turn % 8 === 0) {
     const k = sys.filter((s) => s.kind === "klingon" || s.kind === "claimed");
@@ -1788,13 +1795,20 @@ function sectorHTML() {
   h += `<h3>The powers<\/h3><p class="small muted"><b style="color:${POWERS.klingon.color}">Klingon Empire:<\/b> a cold war. Its ships court independent worlds; raiders strike when tension runs high. Firing first on a Klingon ship that hasn't fired is an incident. <b style="color:${POWERS.orion.color}">Orion Syndicate:<\/b> raiders from a hidden base; a sensor sweep near it hears where. <b style="color:${POWERS.romulan.color}">Romulans:<\/b> cloaked ships cross the Neutral Zone to strike; sweeps reveal them.<\/p>`;
   return h;
 }
-function logHTML() { return `<h2>Captain's log<\/h2><ul class="log">${S.log.map((l) => `<li class="${l.kind}"><span class="t">${l.t}<\/span>${esc(l.text)}<\/li>`).join("")}<\/ul>`; }
+let logFilter = "all";
+function logHTML() {
+  const rows = logFilter === "discovery" ? S.log.filter((l) => l.kind === "discovery") : S.log;
+  const n = S.log.filter((l) => l.kind === "discovery").length;
+  return `<h2>Captain's log<\/h2><div class="btn-row"><button class="btn small ${logFilter === "all" ? "primary" : ""}" data-logf="all">Everything<\/button><button class="btn small ${logFilter === "discovery" ? "primary" : ""}" data-logf="discovery">Discoveries (${n})<\/button><\/div>`
+    + (rows.length ? `<ul class="log">${rows.map((l) => `<li class="${l.kind}"><span class="t">${l.t}<\/span>${esc(l.text)}<\/li>`).join("")}<\/ul>` : `<p class="muted small">Nothing discovered yet: survey, investigate, observe and sweep.<\/p>`);
+}
 
 // ---------- the side panel's buttons ----------
 function bindChrome() {
   document.querySelector(".tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-tab]"); if (!b) return; tab = b.dataset.tab; renderTabs(); renderPanel(); });
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b || !S) return;
+    if (b.dataset.logf) { logFilter = b.dataset.logf; renderPanel(); return; }
     if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }
     if (b.dataset.go) { selHex = b.dataset.go; goTo(b.dataset.go); return; }
     if (b.dataset.center) { centerOn(b.dataset.center); selHex = b.dataset.center; tab = "here"; renderAll(); return; }

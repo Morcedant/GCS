@@ -66,3 +66,12 @@ test("Corvan II: arriving brings the raider's hail; warning it off starts the pu
   assert.ok(actionsFor(S).some((a) => a.arc === "clue-logs"));
 });
 test("the score counts", () => { const S = newGame({ seed: "sc" }); assert.equal(score(S).total, 15); });
+test("every discovery is in the log, and trimming never drops one", async () => {
+  const { log, storyEvent } = await import("../src/game.js");
+  const S = newGame({ seed: "log" });
+  storyEvent(S, "The pull", "Something below draws on the ship's power.");
+  assert.ok(S.log.some((l) => l.kind === "discovery" && l.text.startsWith("The pull: Something below")));
+  for (let i = 0; i < 500; i++) log(S, "noise " + i);
+  assert.ok(S.log.some((l) => l.text.startsWith("The pull")));
+  assert.ok(S.log.length <= 201);
+});

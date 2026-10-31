@@ -320,13 +320,20 @@ function sectorHTML() {
   h += `<h3>The powers</h3><p class="small muted"><b style="color:${POWERS.klingon.color}">Klingon Empire:</b> a cold war. Its ships court independent worlds; raiders strike when tension runs high. Firing first on a Klingon ship that hasn't fired is an incident. <b style="color:${POWERS.orion.color}">Orion Syndicate:</b> raiders from a hidden base; a sensor sweep near it hears where. <b style="color:${POWERS.romulan.color}">Romulans:</b> cloaked ships cross the Neutral Zone to strike; sweeps reveal them.</p>`;
   return h;
 }
-function logHTML() { return `<h2>Captain's log</h2><ul class="log">${S.log.map((l) => `<li class="${l.kind}"><span class="t">${l.t}</span>${esc(l.text)}</li>`).join("")}</ul>`; }
+let logFilter = "all";
+function logHTML() {
+  const rows = logFilter === "discovery" ? S.log.filter((l) => l.kind === "discovery") : S.log;
+  const n = S.log.filter((l) => l.kind === "discovery").length;
+  return `<h2>Captain's log</h2><div class="btn-row"><button class="btn small ${logFilter === "all" ? "primary" : ""}" data-logf="all">Everything</button><button class="btn small ${logFilter === "discovery" ? "primary" : ""}" data-logf="discovery">Discoveries (${n})</button></div>`
+    + (rows.length ? `<ul class="log">${rows.map((l) => `<li class="${l.kind}"><span class="t">${l.t}</span>${esc(l.text)}</li>`).join("")}</ul>` : `<p class="muted small">Nothing discovered yet: survey, investigate, observe and sweep.</p>`);
+}
 
 // ---------- the side panel's buttons ----------
 function bindChrome() {
   document.querySelector(".tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-tab]"); if (!b) return; tab = b.dataset.tab; renderTabs(); renderPanel(); });
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b || !S) return;
+    if (b.dataset.logf) { logFilter = b.dataset.logf; renderPanel(); return; }
     if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }
     if (b.dataset.go) { selHex = b.dataset.go; goTo(b.dataset.go); return; }
     if (b.dataset.center) { centerOn(b.dataset.center); selHex = b.dataset.center; tab = "here"; renderAll(); return; }
