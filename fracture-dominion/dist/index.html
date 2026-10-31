@@ -1087,6 +1087,7 @@ function startGame(state) {
   const cap = S.systems[player(S).capital];
   centerOn(cap.at); view.zoom = 1;
   select({ kind: "system", id: cap.id });
+  tab = "objectives";   // the game opens on the race to win; the capital is selected, a click away
   $("app").hidden = false; closeModal();
   renderAll(); renderSteps();
   if (S.turn === 1) toast(`You lead ${player(S).name}. Explore, settle, and find out who else is out here.`);

@@ -2183,8 +2183,12 @@ function arcSteps() {
     ["Stop the Orion diggers in the ruins", !!A.podsSeen],
     ["Decide the caretaker's fate", st === "done"],
   ];
-  let current = steps.findIndex(([, done, optional]) => !done && !optional);
-  return `<ol class="steps-list">${steps.map(([t, done, optional], i) => `<li class="${done ? "done" : i === current ? "now" : ""}"><span>${done ? "✓" : i === current ? "▶" : optional ? "·" : "○"}<\/span>${esc(t)}<\/li>`).join("")}<\/ol>`;
+  // Only what's been done and what's next: later steps stay hidden until the one before is achieved. The raider (optional)
+  // shows once the Pelion is at Corvan II.
+  const current = steps.findIndex(([, done, optional]) => !done && !optional);
+  const shown = steps.map(([t, done, optional], i) => [t, done, !!optional, i]).filter(([, done, optional, i]) => done || i === current || (optional && st !== "travel"));
+  return `<ol class="steps-list">${shown.map(([t, done, optional, i]) => `<li class="${done ? "done" : i === current ? "now" : ""}"><span>${done ? "✓" : i === current ? "▶" : "·"}<\/span>${esc(t)}<\/li>`).join("")}<\/ol>`
+    + (current >= 0 && current < steps.length - 1 ? `<p class="small muted" style="margin:4px 0 0">Further steps are revealed as you go.<\/p>` : "");
 }
 function ordersHTML() {
   let h = hint() + `<h2>Orders<\/h2>`;
@@ -2207,7 +2211,7 @@ function ordersHTML() {
         : live ? `<span>Countdown<\/span><span>${boxes(A.countdown, COUNTDOWN)} ${COUNTDOWN - A.countdown} left: it fills every hour in orbit and with each failure below<\/span>`
         : `<span>Clock<\/span><span>No deadline in orbit: the Countdown starts when the ruins are swept.<\/span>`) + `<\/div>`;
       h += `<h3>The mission<\/h3>` + arcSteps();
-      h += `<div class="small" style="margin-top:6px"><b class="good">Success:<\/b> the eight scientists brought home (shut the caretaker down, or reason with it). <b>Partial:<\/b> leave it be and take back the Orion phasers. <b class="bad">Failure:<\/b> the Countdown fills, or you don't reach Corvan II by turn ${o.arc && A.stage === "travel" ? o.deadline : 12}.<\/div>`;
+      h += `<div class="small" style="margin-top:6px"><b class="good">Success:<\/b> find out what happened to the eight scientists and bring them home. <b class="bad">Failure:<\/b> ${A.stage === "travel" ? `not reaching Corvan II by turn ${o.deadline}` : live ? "the Countdown filling before the job is done" : "running out of time"}.<\/div>`;
     } else {
       const status = left <= 1 ? ["Due this week", "bad"] : left <= 2 ? ["Running out of time", "bad"] : o.have ? ["Under way", "good"] : ["Not started", ""];
       h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${status[1]}">${status[0]}<\/span><\/h4>`;
