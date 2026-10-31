@@ -127,3 +127,21 @@ test("with the away team down, only the mission's actions are offered", () => {
   beamDown(S, []);
   assert.ok(actionsFor(S).some((a) => a.id === "sweep"));        // beamed back up: the ship's actions return
 });
+test("what's in the ruins is earned: Sevek's theory needs three clues, and only then reveals the caretaker", () => {
+  const S = newGame({ seed: "th" });
+  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
+  const e = Object.values(S.enemies).find((x) => x.goal === "arc"); delete S.enemies[e.id]; S.event = null; dismissEvent(S);
+  attempt(S, "pelion", "arc", { arc: "scan" }); if (S.pending) resolve(S, false); S.event = null; S.eventQueue = [];
+  beamDown(S, ["sevek", "vessik", "reyes", "rrinn"]);
+  const theory = () => actionsFor(S).find((a) => a.arc === "theory");
+  assert.ok(theory().why && /evidence/.test(theory().why));          // not after the scans alone
+  S.arc.clues = { logs: true, bunks: true }; S.arc.clock = 2;
+  assert.ok(theory().why);                                             // two clues: still not enough
+  S.arc.clues.energy = true; S.arc.clock = 3; S.pelion.acted = false;
+  assert.equal(theory().why, null);                                    // three: Sevek can try
+  assert.deepEqual(theory().who, ["sevek"]);
+  for (let i = 0; i < 20 && S.arc.stage === "pull"; i++) { S.pelion.acted = false; S.event = null; S.arc.countdown = 0; attempt(S, "pelion", "arc", { arc: "theory" }); if (S.pending) resolve(S, false); }
+  assert.equal(S.arc.stage, "orions");
+  assert.ok(S.arc.theory);
+  assert.ok(S.log.some((l) => l.text.includes("Sevek's theory: a caretaker, not a weapon")));
+});

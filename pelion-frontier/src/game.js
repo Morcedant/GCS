@@ -260,7 +260,7 @@ export function actionsFor(S, unit = "pelion") {
   // one done from the ship to buy time), plus answering a ship in orbit.
   const surface = s && s.id === S.corvan && S.arc.team && ["pull", "orions", "caretaker"].includes(S.arc.stage);
   if (surface) out.splice(0, out.length, ...out.filter((x) => x.id === "arc" || x.id === "beam" || x.id === "engage" || x.id === "hail"));
-  return out.map((a) => ({ ...a, why: P.acted && !a.free ? "The Pelion has already acted this turn." : null }));
+  return out.map((a) => ({ ...a, why: a.why || (P.acted && !a.free ? "The Pelion has already acted this turn." : null) }));
 }
 const signedAccord = (a) => (a > 0 ? "+" : a < 0 ? "−" : "") + Math.abs(a);
 function engageNote(S, e) {

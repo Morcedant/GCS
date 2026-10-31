@@ -5,7 +5,7 @@ import { newGame, stardate, sysAt, officer, available, skillOf, target, rollTarg
   speedOf, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
-import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF } from "./arc.js";
+import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound } from "./arc.js";
 import { kindName } from "./ai.js";
 import { RADIUS, inZone } from "./sector.js";
 
@@ -224,13 +224,13 @@ function drawSurface(ctx, W, H) {
   const notes = {
     outpost: [["Outpost logs", A.clues.logs], ["Empty bunks", A.clues.bunks]],
     ruins: [["The ruins' energy", A.clues.energy]].concat(A.stage === "orions" ? [["3 Orion pirates digging", "danger"]] : []),
-    core: A.stage === "caretaker" ? [["The caretaker", "danger"], ["8 scientists in stasis", "info"]] : A.clock >= CLOCK ? [["8 scientists in stasis", "info"]] : [["Unknown", null]],
+    core: A.stage === "caretaker" ? [["The caretaker", "danger"], ["8 scientists in stasis", "info"]] : A.theory ? [["8 scientists in stasis", "info"]] : [["Unknown", null]],
     blind: [["The village, observed", A.clues.village]],
     village: A.clues.village ? [["Armed with Orion phasers", "danger"]] : [],
   };
   for (const [k, site] of Object.entries(SITES)) {
     const s = P(site.x, site.y);
-    ctx.fillStyle = k === "core" && A.stage !== "caretaker" && A.clock < CLOCK ? "rgba(120,120,130,.8)" : "#f2c14e"; ctx.strokeStyle = "#05060a"; ctx.lineWidth = 2;
+    ctx.fillStyle = k === "core" && !A.theory ? "rgba(120,120,130,.8)" : "#f2c14e"; ctx.strokeStyle = "#05060a"; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(s.x, s.y, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     ctx.textAlign = "center"; ctx.fillStyle = "#f3efe2"; ctx.font = `700 ${small ? 11 : 13}px Antonio, system-ui, sans-serif`; ctx.fillText((small ? site.name.replace(/^The /, "") : site.name).toUpperCase(), s.x, s.y - 12);
     ctx.fillStyle = "rgba(230,225,210,.7)"; ctx.font = `${small ? 10 : 11}px system-ui, sans-serif`;
@@ -261,14 +261,14 @@ function drawSurface(ctx, W, H) {
     const bx = R.x + R.w - 158, by = R.y + R.h - 44;
     ctx.beginPath(); ctx.roundRect ? ctx.roundRect(bx, by, 150, 36, 8) : ctx.rect(bx, by, 150, 36); ctx.fill(); ctx.stroke();
     ctx.fillStyle = "#f2c14e"; ctx.font = "700 11px Antonio, system-ui, sans-serif"; ctx.fillText("CORVAN II · SURFACE", bx + 10, by + 15);
-    ctx.fillStyle = "#e6e8f2"; ctx.font = "10px system-ui, sans-serif"; ctx.fillText(`Countdown ${A.countdown}/${COUNTDOWN} · Record ${A.clock}/${CLOCK}`, bx + 10, by + 29);
+    ctx.fillStyle = "#e6e8f2"; ctx.font = "10px system-ui, sans-serif"; ctx.fillText(`Countdown ${A.countdown}/${COUNTDOWN} · Clues ${cluesFound(A)}/${CLOCK}`, bx + 10, by + 29);
     return;
   }
   ctx.beginPath(); ctx.roundRect ? ctx.roundRect(R.x + 10, R.y + 10, 250, 64, 8) : ctx.rect(R.x + 10, R.y + 10, 250, 64); ctx.fill(); ctx.stroke();
   ctx.fillStyle = "#f2c14e"; ctx.font = "700 14px Antonio, system-ui, sans-serif"; ctx.fillText("CORVAN II · SURFACE", R.x + 22, R.y + 30);
   ctx.fillStyle = "#e6e8f2"; ctx.font = "12px system-ui, sans-serif";
   ctx.fillText(`The Pelion in orbit · Countdown ${A.countdown}/${COUNTDOWN}`, R.x + 22, R.y + 48);
-  ctx.fillText(`Record ${A.clock}/${CLOCK} · Click a place to see what to do`, R.x + 22, R.y + 64);
+  ctx.fillText(`Clues ${cluesFound(A)}/${CLOCK}${A.theory ? " · Sevek's theory: a caretaker" : cluesFound(A) >= THEORY_AT ? " · Sevek can form a theory" : ""} · Click a place`, R.x + 22, R.y + 64);
 }
 function clickSurface(mx, my) {
   if (!surfaceBox) return;
@@ -315,7 +315,8 @@ function hint() {
   if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:</b> fly to Corvan II (the gold <b>!</b>). Double-click it on the map: the Pelion goes as far as it can this turn. Then <b>End turn</b>.`;
   else if (A.stage === "orbit") t = "<b>Next:</b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
   else if (A.stage === "pull" && !A.team) t = "<b>Next:</b> choose an away team and beam them down to the outpost (the Here tab).";
-  else if (A.stage === "pull") t = "<b>Next:</b> the away team. Use their actions on the Here tab, one a turn, to fill the record before the Countdown fills.";
+  else if (A.stage === "pull" && cluesFound(A) >= THEORY_AT) t = "<b>Next:</b> there's enough evidence. Have Sevek form his theory of what's in the ruins (the Here tab), or find the last clue first for better odds.";
+  else if (A.stage === "pull") t = `<b>Next:</b> the away team. Find clues on the Here tab, one a turn: Sevek needs ${THEORY_AT} to form a theory of what's in the ruins, before the Countdown fills.`;
   else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:</b> finish it on Corvan II: the away team's actions on the Here tab.";
   else if (S.turn <= 12) t = "<b>Next:</b> Starfleet will send new orders (the Orders tab). Meanwhile: survey the unknown (?), court the independent worlds, and watch for raiders.";
   return t ? `<div class="card gold small">${t}</div>` : "";
@@ -452,7 +453,7 @@ function awayHTML() {
   const A = S.arc;
   let h = `<h2>Away team: Corvan II</h2>`;
   if (A.stage === "orbit") h += `<p class="small muted">In orbit. Nobody has gone down yet: sweep the ruins with the ship's sensors first (the Here tab).</p>`;
-  else h += `<div class="kv small"><span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} the Pelion breaks orbit when it fills</span><span>Record</span><span>${boxes(A.clock, CLOCK, "blue")} what's in the ruins</span><span>Stage</span><span>${{ pull: "Investigating", orions: "The Orion diggers", caretaker: "The caretaker" }[A.stage]}</span></div>`;
+  else h += `<div class="kv small"><span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} the Pelion breaks orbit when it fills</span><span>Clues</span><span>${boxes(cluesFound(A), CLOCK, "blue")} ${A.theory ? "Sevek's theory: a caretaker" : cluesFound(A) >= THEORY_AT ? "enough for Sevek's theory" : `Sevek needs ${THEORY_AT} for a theory`}</span><span>Stage</span><span>${{ pull: "Investigating", orions: "The Orion diggers", caretaker: "The caretaker" }[A.stage]}</span></div>`;
   h += `<h3>Who's down there</h3>`;
   if (!A.team) h += `<p class="small muted">${A.stage === "orbit" ? "No one yet." : "No one: choose an away team on the Here tab."}</p>`;
   else {

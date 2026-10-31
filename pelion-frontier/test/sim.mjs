@@ -41,7 +41,7 @@ function play(seed) {
     endTurn(S);
   }
   const sc = score(S);
-  return { seed, turn: S.turn, over: S.over?.why.slice(0, 60), score: sc.total, joined: S.joined, records: S.records.length, done: S.done, failed: S.failed, command: S.command, lost: S.lostColonies, klingon: S.lostWorlds, arc: S.arc.stage, hull: S.pelion.hull };
+  return { seed, turn: S.turn, over: S.over?.why.slice(0, 60), score: sc.total, joined: S.joined, records: S.records.length, done: S.done, failed: S.failed, command: S.command, lost: S.lostColonies, klingon: S.lostWorlds, arc: S.arc.stage, arcEnd: (S.log.find((l) => /Silence at Corvan II:|Breaking orbit|Too late/.test(l.text)) || {}).text?.slice(0, 50), countdown: S.arc.countdown, hull: S.pelion.hull };
 }
 const [seed0 = "1", n = "5"] = process.argv.slice(2);
 for (let i = 0; i < +n; i++) console.log(JSON.stringify(play(seed0 + "-" + i)));

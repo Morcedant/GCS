@@ -16,7 +16,10 @@ const CLUES = {
   village: { name: "The Ketari village", skills: ["Psychology", "Stealth"], found: "Ketari carrying Orion phasers. The chieftain's people dig at the ruins by night.",
     detail: "From the duck blind at dusk: cook fires, goats, a smithy pouring bronze. In front of the chieftain's hall stand four warriors carrying Orion disruptor pistols, and they wear them like jewelry, on cords around their necks, muzzles down.\n\nAt moonrise a column of twenty Ketari leaves the village with picks and baskets, heading for the ruins, and at its head walks a hooded figure too tall for a Ketari: an Orion. The chieftain's people dig for the Orions at night, and the Orions pay them in weapons the Ketari think are talismans. One young warrior fires his into the air to show off. The bolt sets a tree burning, and the whole village goes silent." },
 };
-export const COUNTDOWN = 6, CLOCK = 4;
+export const COUNTDOWN = 6, CLOCK = 4;   // CLOCK: the four clues on the surface
+// What's in the ruins has to be worked out: Sevek forms a theory once the away team has found at least THEORY_AT clues.
+export const THEORY_AT = 3;
+export const cluesFound = (A) => Object.values(A.clues || {}).filter(Boolean).length;
 // The away team's own log: the same captain's log, with these entries marked so the Away team tab can show them.
 const alog = (S, text, kind) => log(S, text, kind, { away: true });
 const astory = (S, title, text) => storyEvent(S, title, text, { away: true });
@@ -41,7 +44,15 @@ export function arcActions(S) {
   const team = A.team, aboard = surface ? CREW.map((c) => c.id).filter((id) => !team.includes(id)) : null;
   if (A.stage === "orbit") add("scan", "Sweep the ruins with the ship's sensors", ["Sensors", "Physical Sciences"], "Find out what's down there before anyone beams down. Whatever the roll, something in the ruins will notice.");
   if (A.stage === "pull") {
-    for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `A clue for the record (${A.clock}/${CLOCK}). A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]], team);
+    for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `Evidence for Sevek's theory (${cluesFound(A)}/${CLOCK} clues; he needs ${THEORY_AT}). A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]], team);
+    // Sevek's theory: what's in the ruins. Earned by the evidence; Sevek works it out wherever he is.
+    const n = cluesFound(A), sv = available(S, "sevek");
+    const evidence = [["An uncatalogued civilization", -3]].concat(n > THEORY_AT ? [["Every clue found", n - THEORY_AT]] : [], A.strong ? [["Strong findings", Math.min(2, A.strong)]] : [], A.readings ? [["The orbital readings", 1]] : []);
+    const th = { id: "arc", arc: "theory", name: "Sevek's theory: what's in the ruins", skills: ["Physical Sciences"], who: ["sevek"], extra: evidence,
+      blurb: `Put the evidence together. Sevek alone, from the surface or the ship. Success tells you what the ruins hold; a failure costs time. The more clues found, the better the odds (${n}/${CLOCK} found).` };
+    if (n < THEORY_AT) th.why = `Not enough evidence yet: ${n} of the ${THEORY_AT} clues Sevek needs.`;
+    else if (!sv) th.why = "Sevek is in sickbay. The theory waits for him.";
+    out.push(th);
     if (!A.boughtTime && A.countdown > 0) add("time", "Aboard: buy time, reroute power", ["Engineering"], "Clear a segment of the Countdown. Once. Done from the ship, by someone still aboard.", [], aboard);
   }
   if (A.stage === "orions") {
@@ -62,7 +73,7 @@ export function arcStep(S, p) {
   // On the surface map, whoever did it is now where it happened.
   if (A.team && SITE_OF[k] && A.team.includes(p.officer)) { A.pos = A.pos || {}; A.pos[p.officer] = SITE_OF[k]; }
   if (k === "scan") {
-    if (r.success) { A.clock = 1; alog(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. (Record 1/${CLOCK})`, "discovery"); }
+    if (r.success) { A.readings = true; alog(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. Not an answer, but readings Sevek can use later (+1 to his theory).`, "discovery"); }
     else alog(S, `${who}'s sweep of the ruins at Corvan II: interference, and then the readings go strange.`);
     startPull(S);
     return "";
@@ -75,13 +86,21 @@ export function arcStep(S, p) {
       alog(S, `Corvan II: ${c.name} gives nothing up. The Countdown: ${A.countdown}/${COUNTDOWN}.`, "bad");
       return checkCountdown(S);
     }
-    A.clues[k.slice(5)] = true; A.clock = Math.min(CLOCK, A.clock + (r.margin >= 5 ? 2 : 1));
+    A.clues[k.slice(5)] = true; A.clock = cluesFound(A);
+    if (r.margin >= 5) A.strong = (A.strong || 0) + 1;
     astory(S, c.name, c.detail);
-    alog(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} The record: ${A.clock}/${CLOCK}.`, "discovery");
-    if (A.clock >= CLOCK) {
-      A.stage = "orions";
-      astory(S, "A caretaker, not a weapon", "The pieces fit. The ruins hold a caretaker machine, left by the vanished civilization to watch over the Ketari. Dr. Haskel's dampener woke it, and it judged the outpost a threat: all eight scientists are in stasis, unharmed, deep in the ruins. And in the ruins now, three Orion pirates are cutting their way to the machine's core.");
+    const n = A.clock;
+    alog(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} Clues: ${n}/${CLOCK}.${r.margin >= 5 ? " A strong finding: +1 to Sevek's theory." : ""}${n === THEORY_AT ? " Sevek thinks there's enough now to form a theory of what's in the ruins (the Here tab)." : n < THEORY_AT ? ` Sevek needs ${THEORY_AT - n} more before he can form a theory.` : ""}`, "discovery");
+    return "";
+  }
+  if (k === "theory") {
+    if (!r.success) {
+      A.countdown++;
+      alog(S, `Sevek's theory doesn't hold together yet: one piece of the evidence contradicts another. The Countdown: ${A.countdown}/${COUNTDOWN}.${cluesFound(A) < CLOCK ? " Another clue would help." : ""}`, "bad");
+      return checkCountdown(S);
     }
+    A.stage = "orions"; A.theory = true;
+    astory(S, "Sevek's theory: a caretaker, not a weapon", "Sevek lays the evidence out in the outpost's lab, one piece at a time. \"The dampener test, then the spike: Dr. Haskel's device did not damage something in the ruins. It woke it. The scientists left calmly, at one moment, as if called: they were not attacked, they were collected. The field does not strike at the away team; it catalogues them, as it has catalogued the Ketari for centuries. And the village sits inside its range.\" He looks up. \"Logic suggests a single explanation. The civilization that built this city left a caretaker: a machine set to protect the Ketari from harm. It judged Dr. Haskel's device a threat to its charges and removed the threat, without injury. The eight scientists are alive, in stasis, beneath the ruins.\"\n\nA caretaker, not a weapon. And the Orions, who came for the machine itself, are in the ruins now, cutting their way to its core.");
     return "";
   }
   if (k === "time") {
@@ -154,7 +173,7 @@ export function arcTick(S) {
 function startPull(S) {
   const A = S.arc; if (A.stage !== "orbit") return;
   A.stage = "pull";
-  astory(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
+  astory(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment every other week the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
 }
 /** Beam an away team down (2 to 4 officers fit for duty), or beam them all back up (ids empty). Takes no action. */
 export function beamDown(S, ids) {
@@ -171,7 +190,12 @@ export function arcSweep(S) { if (S.arc.stage === "orbit" && S.pelion.at === S.s
 /** End of turn: the drain on the ship while it stays in orbit. */
 export function arcTurn(S) {
   const A = S.arc;
-  if (["pull", "orions", "caretaker"].includes(A.stage) && S.pelion.at === S.systems[S.corvan].at) { A.countdown++; alog(S, `Corvan II drains the Pelion: the Countdown ${A.countdown}/${COUNTDOWN}.`); checkCountdown(S); }
+  // The drain decays the orbit every other week in orbit; failures on the surface cost time as well.
+  if (["pull", "orions", "caretaker"].includes(A.stage) && S.pelion.at === S.systems[S.corvan].at) {
+    A.weeks = (A.weeks || 0) + 1;
+    if (A.weeks % 2 === 0) { A.countdown++; alog(S, `Corvan II drains the Pelion and the orbit decays: the Countdown ${A.countdown}/${COUNTDOWN}.`); checkCountdown(S); }
+    else alog(S, `Corvan II drains the Pelion; Grath's crews keep the orbit steady this week. The Countdown holds at ${A.countdown}/${COUNTDOWN}, but not for long.`);
+  }
 }
 
 /** The arrival at Corvan II: the raider hails first. */
