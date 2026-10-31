@@ -58,7 +58,11 @@ export function log(S, text, kind = "", extra = null) {
   for (let i = 0; i < S.log.length && n > 0; ) { if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } else i++; }
 }
 /** A story scene: shown as a dialog, and written in full into the log. */
-export function storyEvent(S, title, text, extra = null) { S.event = { kind: "story", title, text }; log(S, `${title}: ${text}`, "discovery", extra); }
+export function storyEvent(S, title, text, extra = null) {
+  const ev = { kind: "story", title, text };
+  if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;   // a second scene waits for the first
+  log(S, `${title}: ${text}`, "discovery", extra);
+}
 export const available = (S, id) => S.crew[id].inj < 3;
 export function skillOf(S, id, skill) {
   if (id === "captain") return CAPTAIN.skills[skill] || 10;

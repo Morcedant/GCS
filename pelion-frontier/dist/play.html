@@ -74,7 +74,7 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
 .officer h4 { margin: 0; font: 700 16px var(--display); letter-spacing: .04em; text-transform: uppercase; }
 .skills { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 12px; color: var(--muted); margin-top: 4px; } .skills b { color: var(--ink); font-weight: 600; }
 .log { list-style: none; padding: 0; margin: 0; display: grid; gap: 5px; font-size: 13px; }
-.log .t { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 8px; } .log .war { color: #ffb0a6; } .log .bad { color: #ffb0a6; } .log .good { color: #b9e5bb; } .log .victory { color: var(--gold); } .log .order { color: #a8d4ff; } .log .turn, .log .move { color: var(--muted); } h3.log-turn { margin: 14px 0 6px; border-bottom: 1px solid var(--line); padding-bottom: 3px; } .log .discovery { color: #e2d1ff; border-left: 3px solid var(--violet); padding-left: 8px; }
+.log li { white-space: pre-line; } .log .t { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 8px; } .log .war { color: #ffb0a6; } .log .bad { color: #ffb0a6; } .log .good { color: #b9e5bb; } .log .victory { color: var(--gold); } .log .order { color: #a8d4ff; } .log .turn, .log .move { color: var(--muted); } h3.log-turn { margin: 14px 0 6px; border-bottom: 1px solid var(--line); padding-bottom: 3px; } .log .discovery { color: #e2d1ff; border-left: 3px solid var(--violet); padding-left: 8px; }
 #modal { position: fixed; inset: 0; background: rgba(3, 4, 8, .84); display: grid; place-items: center; z-index: 20; padding: 16px; overflow-y: auto; }
 #modal[hidden] { display: none; }
 .modal-box { background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--gold); border-radius: 14px; max-width: 760px; width: 100%; box-sizing: border-box; padding: 22px max(16px, env(safe-area-inset-right, 0px)) 22px max(16px, env(safe-area-inset-left, 0px)); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
@@ -481,7 +481,11 @@ function log(S, text, kind = "", extra = null) {
   for (let i = 0; i < S.log.length && n > 0; ) { if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } else i++; }
 }
 /** A story scene: shown as a dialog, and written in full into the log. */
-function storyEvent(S, title, text, extra = null) { S.event = { kind: "story", title, text }; log(S, `${title}: ${text}`, "discovery", extra); }
+function storyEvent(S, title, text, extra = null) {
+  const ev = { kind: "story", title, text };
+  if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;   // a second scene waits for the first
+  log(S, `${title}: ${text}`, "discovery", extra);
+}
 const available = (S, id) => S.crew[id].inj < 3;
 function skillOf(S, id, skill) {
   if (id === "captain") return CAPTAIN.skills[skill] || 10;
@@ -1169,10 +1173,15 @@ function skirmish(S, u, e) {
 
 
 const CLUES = {
-  logs: { name: "The outpost logs", skills: ["Computers"], found: "Dr. Haskel's dampener test, then a power spike, then nothing." },
-  bunks: { name: "The empty bunks", skills: ["Medicine", "Sensors"], found: "No blood, no struggle, personal effects untouched. The scientists walked out." },
-  energy: { name: "The ruins' energy", skills: ["Physical Sciences", "Sensors"], found: "A field that reads the away team's biology and records it. It knows them now." },
-  village: { name: "The Ketari village", skills: ["Psychology", "Stealth"], found: "Ketari carrying Orion phasers. The chieftain's people dig at the ruins by night." },
+  // found: the one line (the GM's Guide's); detail: what the away team actually reads, sees and hears.
+  logs: { name: "The outpost logs", skills: ["Computers"], found: "Dr. Haskel's dampener test, then a power spike, then nothing.",
+    detail: "Dr. Imre Haskel, personal log, day 212: \"The hum in the eastern vault isn't geological. Sixty years of survey reports called it background noise. It isn't noise; it's a carrier wave, and it's coming from under the plaza.\"\nDay 216: \"Lieutenant Grath's dampener design arrived today. Grath asked what it's for. I said calibration, which is nearly true. If I can quiet the carrier we'll finally get a clean scan of what's down there.\"\nDay 219, 0400: \"Dampener test. Field holding at thirty percent. Sixty. The hum is changing pitch, it's answering the—\"\n\nThe entry ends there. The automated record carries on: at 0412 a power spike from the ruins, off every scale the outpost has; at 0413 all eight biosigns leave the station, walking. After that, three weeks of empty entries.\n\nThe last line in the supply run's log is from Rrinn's sister, sent the same morning: \"Haskel's test did something to the ruins. The air hums. Everyone is walking toward the—\"" },
+  bunks: { name: "The empty bunks", skills: ["Medicine", "Sensors"], found: "No blood, no struggle, personal effects untouched. The scientists walked out.",
+    detail: "Eight bunks, and nothing disturbed. A mug of tea gone cold and furred over on a desk; a padd face down on a pillow, mid-chapter; two pairs of boots still by the door.\n\nThe medical scan finds no blood, no tissue, no phaser residue, no sign that anyone was hurt or forced. In the dust of the corridor the footprints run in a calm single file, booted and bare, out of the east door and across the plaza toward the ruins. All of them left at the same moment, in the middle of the night, some without their shoes.\n\nThey weren't taken. They walked out, the way sleepwalkers do." },
+  energy: { name: "The ruins' energy", skills: ["Physical Sciences", "Sensors"], found: "A field that reads the away team's biology and records it. It knows them now.",
+    detail: "The ruins hum on a frequency the tricorders have to be retuned to hear. The field covers the whole site and two kilometers beyond it, and the Ketari village sits inside it.\n\nWhen the away team steps into the plaza the field changes: it sweeps each of them three times, head to foot, and when it settles again its pattern carries a copy of every one of their biosigns. It is cataloguing them. Whatever drives the field draws more power whenever anything turns sensors on it, which is what the Pelion felt in orbit. It isn't an attack. It's attention, and it knows the away team now." },
+  village: { name: "The Ketari village", skills: ["Psychology", "Stealth"], found: "Ketari carrying Orion phasers. The chieftain's people dig at the ruins by night.",
+    detail: "From the duck blind at dusk: cook fires, goats, a smithy pouring bronze. In front of the chieftain's hall stand four warriors carrying Orion disruptor pistols, and they wear them like jewelry, on cords around their necks, muzzles down.\n\nAt moonrise a column of twenty Ketari leaves the village with picks and baskets, heading for the ruins, and at its head walks a hooded figure too tall for a Ketari: an Orion. The chieftain's people dig for the Orions at night, and the Orions pay them in weapons the Ketari think are talismans. One young warrior fires his into the air to show off. The bolt sets a tree burning, and the whole village goes silent." },
 };
 const COUNTDOWN = 6, CLOCK = 4;
 // The away team's own log: the same captain's log, with these entries marked so the Away team tab can show them.
@@ -1234,7 +1243,8 @@ function arcStep(S, p) {
       return checkCountdown(S);
     }
     A.clues[k.slice(5)] = true; A.clock = Math.min(CLOCK, A.clock + (r.margin >= 5 ? 2 : 1));
-    alog(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} (${A.clock}/${CLOCK})`, "discovery");
+    astory(S, c.name, c.detail);
+    alog(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} The record: ${A.clock}/${CLOCK}.`, "discovery");
     if (A.clock >= CLOCK) {
       A.stage = "orions";
       astory(S, "A caretaker, not a weapon", "The pieces fit. The ruins hold a caretaker machine, left by the vanished civilization to watch over the Ketari. Dr. Haskel's dampener woke it, and it judged the outpost a threat: all eight scientists are in stasis, unharmed, deep in the ruins. And in the ruins now, three Orion pirates are cutting their way to the machine's core.");
@@ -1559,7 +1569,7 @@ function chooseEvent(S, id) {
   updateVisibility(S);
   return out;
 }
-function dismissEvent(S) { S.event = null; arcTick(S); checkEnd(S); }
+function dismissEvent(S) { S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
 function closeBattle(S) { endBattle(S); arcTick(S); updateVisibility(S); checkEnd(S); }
 
 // ---- ui.js ----
@@ -2008,7 +2018,7 @@ function awayHTML() {
     h += `<div class="btn-row"><button class="btn small" data-tab-go="here">Their actions (Here tab)<\/button>${mapMode === "surface" ? "" : `<button class="btn small" data-surface="1">Show the surface map<\/button>`}<\/div>`;
   }
   const found = Object.entries(CLUES).filter(([k]) => A.clues[k]);
-  h += `<h3>What they've found<\/h3>` + (found.length ? found.map(([, c]) => `<div class="card green small"><b>${esc(c.name)}:<\/b> ${esc(c.found)}<\/div>`).join("") : `<p class="small muted">Nothing yet.<\/p>`);
+  h += `<h3>What they've found<\/h3>` + (found.length ? found.map(([, c]) => `<details class="card green small"><summary><b>${esc(c.name)}:<\/b> ${esc(c.found)}<\/summary><p style="margin:8px 0 0;white-space:pre-line">${esc(c.detail)}<\/p><\/details>`).join("") : `<p class="small muted">Nothing yet.<\/p>`);
   const L = S.log.filter((l) => l.away);
   h += `<h3>Away team log<\/h3>` + (L.length ? `<ul class="log">${L.map((l) => `<li class="${l.kind}"><span class="t">${l.t}<\/span>${esc(l.text)}<\/li>`).join("")}<\/ul>` : `<p class="small muted">Nothing logged yet.<\/p>`);
   return h;
@@ -2146,7 +2156,7 @@ function showEvent() {
       <div class="grid2">${ch.map((c) => `<div class="brief"><h3>${esc(c.name)}<\/h3><p>${esc(c.blurb)}<\/p><div class="btn-row"><button class="btn ${c.id === "engage" ? "red" : "primary"} small" data-ev="${c.id}" ${c.disabled ? "disabled" : ""}>${esc(c.name)}<\/button><\/div><\/div>`).join("")}<\/div>`);
     return;
   }
-  modal(`<h2>${esc(ev.title || "")}<\/h2><p>${esc(ev.text || "")}<\/p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue<\/button><\/div>`);
+  modal(`<h2>${esc(ev.title || "")}<\/h2><p style="white-space:pre-line">${esc(ev.text || "")}<\/p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue<\/button><\/div>`);
 }
 function showBattle() {
   const B = S.battle, e = S.enemies[B.enemy], E = e ? ENEMIES[e.type] : null, P = S.pelion, st = battleStats(S), sm = shieldsMax(S);

@@ -6,10 +6,15 @@ import { log, markCommand, completeOrder, registerHooks, enemiesAt, available, o
 import { startBattle } from "./combat.js";
 
 const CLUES = {
-  logs: { name: "The outpost logs", skills: ["Computers"], found: "Dr. Haskel's dampener test, then a power spike, then nothing." },
-  bunks: { name: "The empty bunks", skills: ["Medicine", "Sensors"], found: "No blood, no struggle, personal effects untouched. The scientists walked out." },
-  energy: { name: "The ruins' energy", skills: ["Physical Sciences", "Sensors"], found: "A field that reads the away team's biology and records it. It knows them now." },
-  village: { name: "The Ketari village", skills: ["Psychology", "Stealth"], found: "Ketari carrying Orion phasers. The chieftain's people dig at the ruins by night." },
+  // found: the one line (the GM's Guide's); detail: what the away team actually reads, sees and hears.
+  logs: { name: "The outpost logs", skills: ["Computers"], found: "Dr. Haskel's dampener test, then a power spike, then nothing.",
+    detail: "Dr. Imre Haskel, personal log, day 212: \"The hum in the eastern vault isn't geological. Sixty years of survey reports called it background noise. It isn't noise; it's a carrier wave, and it's coming from under the plaza.\"\nDay 216: \"Lieutenant Grath's dampener design arrived today. Grath asked what it's for. I said calibration, which is nearly true. If I can quiet the carrier we'll finally get a clean scan of what's down there.\"\nDay 219, 0400: \"Dampener test. Field holding at thirty percent. Sixty. The hum is changing pitch, it's answering the—\"\n\nThe entry ends there. The automated record carries on: at 0412 a power spike from the ruins, off every scale the outpost has; at 0413 all eight biosigns leave the station, walking. After that, three weeks of empty entries.\n\nThe last line in the supply run's log is from Rrinn's sister, sent the same morning: \"Haskel's test did something to the ruins. The air hums. Everyone is walking toward the—\"" },
+  bunks: { name: "The empty bunks", skills: ["Medicine", "Sensors"], found: "No blood, no struggle, personal effects untouched. The scientists walked out.",
+    detail: "Eight bunks, and nothing disturbed. A mug of tea gone cold and furred over on a desk; a padd face down on a pillow, mid-chapter; two pairs of boots still by the door.\n\nThe medical scan finds no blood, no tissue, no phaser residue, no sign that anyone was hurt or forced. In the dust of the corridor the footprints run in a calm single file, booted and bare, out of the east door and across the plaza toward the ruins. All of them left at the same moment, in the middle of the night, some without their shoes.\n\nThey weren't taken. They walked out, the way sleepwalkers do." },
+  energy: { name: "The ruins' energy", skills: ["Physical Sciences", "Sensors"], found: "A field that reads the away team's biology and records it. It knows them now.",
+    detail: "The ruins hum on a frequency the tricorders have to be retuned to hear. The field covers the whole site and two kilometers beyond it, and the Ketari village sits inside it.\n\nWhen the away team steps into the plaza the field changes: it sweeps each of them three times, head to foot, and when it settles again its pattern carries a copy of every one of their biosigns. It is cataloguing them. Whatever drives the field draws more power whenever anything turns sensors on it, which is what the Pelion felt in orbit. It isn't an attack. It's attention, and it knows the away team now." },
+  village: { name: "The Ketari village", skills: ["Psychology", "Stealth"], found: "Ketari carrying Orion phasers. The chieftain's people dig at the ruins by night.",
+    detail: "From the duck blind at dusk: cook fires, goats, a smithy pouring bronze. In front of the chieftain's hall stand four warriors carrying Orion disruptor pistols, and they wear them like jewelry, on cords around their necks, muzzles down.\n\nAt moonrise a column of twenty Ketari leaves the village with picks and baskets, heading for the ruins, and at its head walks a hooded figure too tall for a Ketari: an Orion. The chieftain's people dig for the Orions at night, and the Orions pay them in weapons the Ketari think are talismans. One young warrior fires his into the air to show off. The bolt sets a tree burning, and the whole village goes silent." },
 };
 export const COUNTDOWN = 6, CLOCK = 4;
 // The away team's own log: the same captain's log, with these entries marked so the Away team tab can show them.
@@ -71,7 +76,8 @@ export function arcStep(S, p) {
       return checkCountdown(S);
     }
     A.clues[k.slice(5)] = true; A.clock = Math.min(CLOCK, A.clock + (r.margin >= 5 ? 2 : 1));
-    alog(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} (${A.clock}/${CLOCK})`, "discovery");
+    astory(S, c.name, c.detail);
+    alog(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} The record: ${A.clock}/${CLOCK}.`, "discovery");
     if (A.clock >= CLOCK) {
       A.stage = "orions";
       astory(S, "A caretaker, not a weapon", "The pieces fit. The ruins hold a caretaker machine, left by the vanished civilization to watch over the Ketari. Dr. Haskel's dampener woke it, and it judged the outpost a threat: all eight scientists are in stasis, unharmed, deep in the ruins. And in the ruins now, three Orion pirates are cutting their way to the machine's core.");

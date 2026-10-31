@@ -445,7 +445,7 @@ function awayHTML() {
     h += `<div class="btn-row"><button class="btn small" data-tab-go="here">Their actions (Here tab)</button>${mapMode === "surface" ? "" : `<button class="btn small" data-surface="1">Show the surface map</button>`}</div>`;
   }
   const found = Object.entries(CLUES).filter(([k]) => A.clues[k]);
-  h += `<h3>What they've found</h3>` + (found.length ? found.map(([, c]) => `<div class="card green small"><b>${esc(c.name)}:</b> ${esc(c.found)}</div>`).join("") : `<p class="small muted">Nothing yet.</p>`);
+  h += `<h3>What they've found</h3>` + (found.length ? found.map(([, c]) => `<details class="card green small"><summary><b>${esc(c.name)}:</b> ${esc(c.found)}</summary><p style="margin:8px 0 0;white-space:pre-line">${esc(c.detail)}</p></details>`).join("") : `<p class="small muted">Nothing yet.</p>`);
   const L = S.log.filter((l) => l.away);
   h += `<h3>Away team log</h3>` + (L.length ? `<ul class="log">${L.map((l) => `<li class="${l.kind}"><span class="t">${l.t}</span>${esc(l.text)}</li>`).join("")}</ul>` : `<p class="small muted">Nothing logged yet.</p>`);
   return h;
@@ -583,7 +583,7 @@ function showEvent() {
       <div class="grid2">${ch.map((c) => `<div class="brief"><h3>${esc(c.name)}</h3><p>${esc(c.blurb)}</p><div class="btn-row"><button class="btn ${c.id === "engage" ? "red" : "primary"} small" data-ev="${c.id}" ${c.disabled ? "disabled" : ""}>${esc(c.name)}</button></div></div>`).join("")}</div>`);
     return;
   }
-  modal(`<h2>${esc(ev.title || "")}</h2><p>${esc(ev.text || "")}</p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue</button></div>`);
+  modal(`<h2>${esc(ev.title || "")}</h2><p style="white-space:pre-line">${esc(ev.text || "")}</p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue</button></div>`);
 }
 function showBattle() {
   const B = S.battle, e = S.enemies[B.enemy], E = e ? ENEMIES[e.type] : null, P = S.pelion, st = battleStats(S), sm = shieldsMax(S);

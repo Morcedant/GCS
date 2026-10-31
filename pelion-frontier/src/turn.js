@@ -73,5 +73,5 @@ export function chooseEvent(S, id) {
   updateVisibility(S);
   return out;
 }
-export function dismissEvent(S) { S.event = null; arcTick(S); checkEnd(S); }
+export function dismissEvent(S) { S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
 export function closeBattle(S) { endBattle(S); arcTick(S); updateVisibility(S); checkEnd(S); }
