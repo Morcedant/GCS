@@ -136,9 +136,15 @@ def main():
         write(f"{slug}/index.html", creator(fan_sources.read_text(f"{folder}/index.html")))
         write(f"{slug}/{guide}", fan_sources.read_bytes(f"{folder}/{guide}"))
         write(f"{slug}/discord-commands.html", (ROOT / folder / "discord-commands.html").read_text())
+        extra = ""
+        # USS Pelion: Frontier, the strategy game (pelion-frontier/, built by its own build.mjs).
+        frontier = ROOT / "pelion-frontier" / "dist" / "play.html"
+        if slug == "uss-pelion" and frontier.exists():
+            write(f"{slug}/frontier/index.html", frontier.read_text())
+            extra = f'\n  <a href="/{slug}/frontier/">Frontier (strategy game)</a>'
         cards.append(f"""<section class="game"><h2>{html.escape(title)}</h2><p>{html.escape(tagline)}</p>
   <div class="links"><a class="primary" href="/{slug}/">Open the creator</a><a href="/{slug}/{guide}" download>Players' Guide (Word)</a>
-  <a href="/{slug}/discord-commands.html">Discord commands</a></div></section>""")
+  <a href="/{slug}/discord-commands.html">Discord commands</a>{extra}</div></section>""")
     write("index.html", f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fan games</title><meta name="robots" content="noindex, nofollow"><style>{CSS}</style></head>
