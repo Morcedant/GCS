@@ -141,7 +141,10 @@ def main():
         frontier = ROOT / "pelion-frontier" / "dist" / "play.html"
         if slug == "uss-pelion" and frontier.exists():
             write(f"{slug}/frontier/index.html", frontier.read_text())
-            extra = f'\n  <a href="/{slug}/frontier/">Frontier (strategy game)</a>'
+            tokens = ROOT / "pelion-frontier" / "dist" / "tokens.html"
+            if tokens.exists():
+                write(f"{slug}/frontier/tokens.html", tokens.read_text())
+            extra = f'\n  <a href="/{slug}/frontier/">Frontier (strategy game)</a>' + (f'\n  <a href="/{slug}/frontier/tokens.html">Ship tokens (printable)</a>' if tokens.exists() else "")
         cards.append(f"""<section class="game"><h2>{html.escape(title)}</h2><p>{html.escape(tagline)}</p>
   <div class="links"><a class="primary" href="/{slug}/">Open the creator</a><a href="/{slug}/{guide}" download>Players' Guide (Word)</a>
   <a href="/{slug}/discord-commands.html">Discord commands</a>{extra}</div></section>""")

@@ -4,6 +4,7 @@ import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
   speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, missionChoices, chooseMission, cloakChoices, chooseCloak, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType } from "./game.js";
 import { storyOf, CAMPAIGN } from "./stories.js";
+import { SHIP_SHAPES } from "./ships.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
 import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound, contestOdds } from "./arc.js";
@@ -101,6 +102,20 @@ function goTo(hex, warp) {
   if (dest !== hex) { selHex = hex; toast(`Under way, ${navBearing(S, U().at, hex).text} from the bow: you'll get there next turn or after.`); }
   after();
 }
+/** A ship's outline on the map: its shape, turned and scaled, stroked in its color over a faint fill. */
+const SHIP_PATHS = {};
+function drawShip(ctx, kind, x, y, angle, scale, color, ring, dashed) {
+  const p = SHIP_PATHS[kind] || (SHIP_PATHS[kind] = new Path2D(SHIP_SHAPES[kind] || SHIP_SHAPES.escort));
+  ctx.save(); ctx.translate(x, y); ctx.rotate(angle); ctx.scale(scale, scale);
+  // An edge so it reads on any hex: dark, or red for a hostile ship, or white for the one you're commanding.
+  ctx.lineJoin = "round"; ctx.lineWidth = (ring ? 3.4 : 2.6) / scale; ctx.strokeStyle = ring || "rgba(5,6,10,.85)"; ctx.stroke(p);
+  ctx.globalAlpha = 0.28; ctx.fillStyle = color; ctx.fill(p); ctx.globalAlpha = 1;
+  if (dashed) ctx.setLineDash([2 / scale, 1.5 / scale]);
+  ctx.lineWidth = 1.3 / scale; ctx.strokeStyle = color; ctx.stroke(p); ctx.setLineDash([]);
+  ctx.restore();
+}
+/** The same outline as a little SVG, for the battle window and anywhere else on the page. */
+const shipSVG = (kind, color, px = 44) => `<svg width="${px}" height="${px}" viewBox="-13.5 -13.5 27 27" style="vertical-align:middle"><path d="${SHIP_SHAPES[kind]}" fill="${color}" fill-opacity=".22" stroke="${color}" stroke-width=".7" stroke-linejoin="round"/></svg>`;
 function hexPath(ctx, cx, cy, r) { ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = (Math.PI / 180) * (60 * i - 30); i ? ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)) : ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); } ctx.closePath(); }
 const SYS_COLOR = { starbase: "#9fd0ff", colony: "#6fb4ff", member: "#6fb4ff", independent: "#c9c3e8", klingon: "#e0564a", claimed: "#e0564a", prewarp: "#9ad48a", anomaly: "#c9a8ff", ruins: "#ffd36b", empty: "#8e9ab4", orionBase: "#8e9ab4", lost: "#555b6e" };
 const shownKind = (s) => (S.seenSys[s.id] && (KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost"].includes(s.kind)) ? s.kind : null);
@@ -153,22 +168,20 @@ function draw() {
       ctx.fillStyle = "#f2c14e"; ctx.font = "bold 11px system-ui"; ctx.fillText(`${nb.text} · ${p.cost} ly${unit === "pelion" ? ` · warp ${S.pelion.warp}` : ""} · ${!isFinite(turns) ? "can't at impulse" : turns ? `${turns + 1} turns` : "this turn"}`, q.x + 9, q.y - 9);
     }
   }
-  // Ships.
-  const icon = (x, y, color, big, outline, dashed) => {
-    const s = big ? 1.5 : 1; ctx.fillStyle = color; ctx.strokeStyle = outline || "rgba(0,0,0,.75)"; ctx.lineWidth = 1.5; if (dashed) ctx.setLineDash([3, 2]);
-    ctx.beginPath(); ctx.moveTo(x + 9 * s, y); ctx.lineTo(x - 5 * s, y - 6 * s); ctx.lineTo(x - 2 * s, y); ctx.lineTo(x - 5 * s, y + 6 * s); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
-  };
+  // Ships: an outline of each ship, in its power's color, turned to its heading.
+  const dirAng = (i) => ((sideHeading(i) - 100) * Math.PI) / 200;   // canvas angle (0 = east) of hex side i
+  const headingTo = (from, to) => { if (!to || to === from) return 0; const a = toPixel(from, size), b = toPixel(to, size); return Math.atan2(b.y - a.y, b.x - a.x); };
   const byHex = {};
   for (const e of visibleEnemies(S)) (byHex[e.at] = byHex[e.at] || []).push(e);
   for (const [hex, list] of Object.entries(byHex)) { const { x, y } = toPixel(hex, size); list.forEach((e, i) => {
-    if (ENEMIES[e.type].base) { ctx.fillStyle = POWERS.orion.color; ctx.beginPath(); ctx.arc(x - 12, y - 12, 6, 0, Math.PI * 2); ctx.fill(); return; }
-    icon(x - 12 + i * 10, y - 15, POWERS[e.power].color, false, e.hostile ? "#ff5040" : null, e.revealed); }); }
-  for (const s of Object.values(S.support)) { const { x, y } = toPixel(s.at, size); icon(x - 2, y + 15, "#6fb4ff", false, unit === s.id ? "#fff" : null); }
+    const E = ENEMIES[e.type];
+    if (E.base) { drawShip(ctx, "orionBase", x - 13, y - 13, 0, 0.7, POWERS.orion.color, null); return; }
+    drawShip(ctx, e.type, x - 13 + i * 14, y - 15, headingTo(e.at, e.target || S.pelion.at), 0.75, POWERS[e.power].color, e.hostile ? "rgba(255,80,64,.75)" : null, e.revealed && e.cloaked); }); }
+  for (const s of Object.values(S.support)) { const { x, y } = toPixel(s.at, size); drawShip(ctx, s.type, x - 2, y + 15, dirAng(s.facing || 0), 0.72, "#6fb4ff", unit === s.id ? "rgba(255,255,255,.8)" : null); }
   {
     // The Pelion, turned to its facing, with its six hex sides marked in relative bearings: 000 ahead, 200 astern.
     const { x, y } = toPixel(S.pelion.at, size), fc = S.pelion.facing || 0;
-    const dirAng = (i) => ((sideHeading(i) - 100) * Math.PI) / 200;   // canvas angle (0 = east) of hex side i
-    ctx.save(); ctx.translate(x, y); ctx.rotate(dirAng(fc)); icon(0, 0, "#f2c14e", true, unit === "pelion" ? "#fff" : null); ctx.restore();
+    drawShip(ctx, "cruiser", x, y, dirAng(fc), 1.1, "#f2c14e", null);
     if (view.zoom > 0.6 && !S.battle) {
       ctx.font = "600 9px system-ui, sans-serif"; ctx.textAlign = "center";
       for (let i = 0; i < 6; i++) {
@@ -810,11 +823,11 @@ function showBattle() {
   const over = B.over;
   modal(`<h2>Battle${E ? `: ${esc(E.base ? "the Orion base" : E.name)}` : ""}</h2>
   <div class="battle">
-    <div class="ship-card"><h4 class="gold">USS Pelion</h4>
+    <div class="ship-card"><h4 class="gold">${shipSVG("cruiser", "#f2c14e")} USS Pelion</h4>
       <div class="track"><span>Shields</span>${boxes(sm - P.shields, sm, "blue")}</div><div class="track"><span>Hull</span>${boxes(PELION.hull - P.hull, PELION.hull, "gold")}</div>
       <div class="track"><span>Systems</span>Weapons ${P.sys.weapons} · Engines ${P.sys.engines} · Sensors ${P.sys.sensors}</div>
       <div class="small muted">Helm ${who(st.helmId)} ${st.helm} · Tactical ${who(st.gunId)} ${st.gun} · Engineering ${who(st.engId)} ${st.eng} · Power ${st.power} · Torpedoes ${P.torps}</div></div>
-    ${E ? `<div class="ship-card"><h4 style="color:${POWERS[e.power].color}">${esc(E.base ? "Orion pirate base" : E.name)}</h4>
+    ${E ? `<div class="ship-card"><h4 style="color:${POWERS[e.power].color}">${shipSVG(E.base ? "orionBase" : e.type, POWERS[e.power].color)} ${esc(E.base ? "Orion pirate base" : E.name)}</h4>
       <div class="track"><span>Shields</span>${boxes(E.shields - e.shields, E.shields, "blue")}</div><div class="track"><span>Hull</span>${boxes(Math.max(0, E.hull - e.hull), E.hull, "gold")}</div>
       <div class="small muted">Helm ${E.helm} · Gunner ${E.gunner} · Maneuver ${E.maneuver} vs your ${st.maneuver}${E.plasma ? " · Plasma torpedo: +2 to evade it" : ""}${E.relentless ? " · Relentless" : ""}${E.fast ? " · Fast: runs when its shields fall" : ""}</div></div>` : `<div class="ship-card"><h4>Gone</h4></div>`}
   </div>
