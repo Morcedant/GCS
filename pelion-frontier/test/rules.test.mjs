@@ -73,5 +73,5 @@ test("every discovery is in the log, and trimming never drops one", async () => 
   assert.ok(S.log.some((l) => l.kind === "discovery" && l.text.startsWith("The pull: Something below")));
   for (let i = 0; i < 500; i++) log(S, "noise " + i);
   assert.ok(S.log.some((l) => l.text.startsWith("The pull")));
-  assert.ok(S.log.length <= 201);
+  assert.ok(S.log.length <= 301);
 });

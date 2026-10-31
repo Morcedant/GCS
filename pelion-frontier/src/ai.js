@@ -66,7 +66,7 @@ export function aiTurn(S) {
       // A week of gifts and promises every other turn: accord −1.
       if (e.stay % 2 === 0) {
         s.accord = Math.max(-5, s.accord - 1);
-        if (S.visible[s.at]) log(S, `The Klingons court ${s.name}: accord ${s.accord}.`, "war");
+        if (S.visible[s.at]) log(S, `A ${E.name} is courting ${s.name} with gifts and promises: its accord falls to ${s.accord}${s.accord <= -3 ? ". It's close to joining the Empire" : ""}.`, "war");
         if (s.accord <= -5) claim(S, s);
       }
       if (++e.stay >= 6 || s.kind !== "independent") sendHome(S, e, 0);
@@ -76,8 +76,9 @@ export function aiTurn(S) {
       if (guard) { const r = skirmish(S, guard, e); if (r === "won" || r === "drove") continue; }
       if (!S.enemies[e.id]) continue;
       // One strike, then away: a raid harms a world once (a Romulan strike, twice) and the raider makes for home.
-      if (s) harmWorld(S, s, e.goal === "strike" ? 2 : 1, `${E.name} ${e.goal === "strike" ? "decloaks and strikes" : "raids"}`);
       if (e.power === "orion") S.supplies = Math.max(0, S.supplies - 3);
+      if (s) harmWorld(S, s, e.goal === "strike" ? 2 : 1, e.goal === "strike" ? `a Romulan bird-of-prey decloaked over it, fired, and turned for the Neutral Zone`
+        : e.power === "orion" ? `an Orion raider struck it, stole 3 supplies from the Federation's convoys, and ran for home` : `a ${E.name} raided it and turned for the border`);
       if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
       sendHome(S, e, 0);
     } else if (e.goal === "claim" || e.goal === "watch") {

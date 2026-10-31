@@ -72,7 +72,7 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
 .officer h4 { margin: 0; font: 700 16px var(--display); letter-spacing: .04em; text-transform: uppercase; }
 .skills { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 12px; color: var(--muted); margin-top: 4px; } .skills b { color: var(--ink); font-weight: 600; }
 .log { list-style: none; padding: 0; margin: 0; display: grid; gap: 5px; font-size: 13px; }
-.log .t { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 8px; } .log .war { color: #ffb0a6; } .log .bad { color: #ffb0a6; } .log .good { color: #b9e5bb; } .log .victory { color: var(--gold); } .log .order { color: #a8d4ff; } .log .discovery { color: #e2d1ff; border-left: 3px solid var(--violet); padding-left: 8px; }
+.log .t { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 8px; } .log .war { color: #ffb0a6; } .log .bad { color: #ffb0a6; } .log .good { color: #b9e5bb; } .log .victory { color: var(--gold); } .log .order { color: #a8d4ff; } .log .turn, .log .move { color: var(--muted); } h3.log-turn { margin: 14px 0 6px; border-bottom: 1px solid var(--line); padding-bottom: 3px; } .log .discovery { color: #e2d1ff; border-left: 3px solid var(--violet); padding-left: 8px; }
 #modal { position: fixed; inset: 0; background: rgba(3, 4, 8, .84); display: grid; place-items: center; z-index: 20; padding: 16px; overflow-y: auto; }
 #modal[hidden] { display: none; }
 .modal-box { background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--gold); border-radius: 14px; max-width: 760px; width: 100%; box-sizing: border-box; padding: 22px max(16px, env(safe-area-inset-right, 0px)) 22px max(16px, env(safe-area-inset-left, 0px)); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
@@ -472,10 +472,11 @@ const stardate = (S) => (STARDATE0 + (S.turn - 1) * 7.3).toFixed(1);
 const sysAt = (S, hex) => S.sysAt[hex] && S.systems[S.sysAt[hex]];
 const officer = (id) => CREW.find((c) => c.id === id);
 const hasRecord = (S, perk) => S.records.some((id) => RECORDS.find((r) => r.id === id)?.perk === perk);
-/** The captain's log. Discoveries are never trimmed: the log keeps the newest 200 other entries. */
+/** The captain's log, oldest first. Discoveries are never trimmed: the log keeps the newest 300 other entries. */
 function log(S, text, kind = "") {
-  S.log.unshift({ t: S.turn, text, kind });
-  if (S.log.length > 200) { let n = S.log.length - 200; for (let i = S.log.length - 1; i >= 0 && n > 0; i--) if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } }
+  S.log.push({ t: S.turn, text, kind });
+  let n = S.log.length - 300;
+  for (let i = 0; i < S.log.length && n > 0; ) { if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } else i++; }
 }
 /** A story scene: shown as a dialog, and written in full into the log. */
 function storyEvent(S, title, text) { S.event = { kind: "story", title, text }; log(S, `${title}: ${text}`, "discovery"); }
@@ -593,6 +594,12 @@ function moveTo(S, unit, hex) {
 }
 function arrive(S, hex) {
   const s = sysAt(S, hex);
+  if (s) {
+    const known = KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost"].includes(s.kind);
+    const what = { member: "a Federation member world", claimed: "a world of the Klingon Empire", lost: "an evacuated colony", independent: `an independent world (accord ${signedAccord(s.accord)})` }[s.kind] || (known ? "a " + KINDS[s.kind].name.toLowerCase() : "an uncharted system");
+    const there = Object.values(S.enemies).filter((e) => e.at === hex && !e.cloaked && !ENEMIES[e.type].base).map((e) => (/^[AEIOU]/.test(ENEMIES[e.type].name) ? "an " : "a ") + ENEMIES[e.type].name);
+    log(S, `The Pelion arrives at ${s.name}, ${what}${s.harm ? `, harmed ${s.harm}/3` : ""}.${there.length ? ` In orbit: ${there.join(", ")}.` : ""}`, "move");
+  }
   if (s) S.seenSys[s.id] = true;
   if (s && s.id === S.starbase) dock(S);
   // Orders with a twist that bites on arrival.
@@ -715,7 +722,12 @@ function resolve(S, reroll) {
   S.pending = null;
   const U = p.unit === "pelion" ? S.pelion : S.support[p.unit];
   U.acted = true;
+  const pre = S.log.length;
   const out = applyAction(S, p);
+  const where = sysAt(S, U.at)?.name || "open space";
+  const who = p.unit === "pelion" ? (p.officer === "captain" ? S.captain : officer(p.officer).name) : S.support[p.unit]?.name || "The science vessel";
+  const r = p.roll, head = `${who} (${p.skill || "crew"}) · ${p.name} at ${where}: rolled ${r.dice.join("+")} = ${r.total} against ${r.target}, ${r.success ? `success by ${r.margin}` : `failed by ${-r.margin}`}${p.rerolled ? " after spending a Duty point to reroll" : ""}.`;
+  if (S.log.length > pre) S.log[pre].text = head + " " + S.log[pre].text; else log(S, head);
   if (p.unit === "pelion" && p.roll.success && p.officer !== "captain") gainXp(S, p.officer, p.skill);
   updateVisibility(S);
   checkEnd(S);
@@ -859,14 +871,14 @@ function newOrder(S) {
   if (twist && twist.fx === "klingon") { const k = closestOutpost(S, at); if (k) spawnEnemy(S, "kbc", k.at, { goal: "claim", target: at }); }
   if (twist && twist.fx === "orion") { const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base); spawnEnemy(S, "orion", b ? b.at : at, { goal: "raid", target: at, hostile: true }); }
   if (twist && twist.fx === "romulan") { const z = Object.keys(S.hexes).filter(inZone); spawnEnemy(S, "rbop", pick(S, z), { goal: "watch", target: at, cloaked: true, hostile: true }); }
-  log(S, `New orders: ${o.title}. Due by turn ${o.deadline}.`, "order");
+  log(S, `New orders from Starfleet: ${o.title}. Work it with ${o.skills.join(", ")} (${o.segs} successes), due by turn ${o.deadline}.${twist ? ` Twist: ${twist.text}.` : ""} Something strange: ${o.strange}. Key character: ${o.key}.`, "order");
   return o;
 }
 const closestOutpost = (S, at) => Object.values(S.systems).filter((s) => s.kind === "klingon").sort((a, b) => distance(a.at, at) - distance(b.at, at))[0];
 function harmWorld(S, s, n, why) {
   if (!["colony", "member", "independent"].includes(s.kind)) return;
   s.harm = Math.min(3, s.harm + n);
-  log(S, `${s.name} is harmed (${s.harm}/3): ${why}.`, "bad");
+  log(S, `${s.name} (${s.kind === "colony" ? "Federation colony" : s.kind === "member" ? "Federation member" : "independent world"}) is harmed: ${why}. Harm ${s.harm}/3${s.harm >= 3 ? "" : s.kind === "colony" ? " (at 3 it must be evacuated)" : s.kind === "member" ? " (at 3 it leaves the Federation)" : " (at 3 it loses faith in the Federation)"}.`, "bad");
   if (s.harm < 3) return;
   if (s.kind === "colony") { s.kind = "lost"; S.lostColonies++; markCommand(S, 2, `the colony on ${s.name} had to be evacuated.`); }
   else if (s.kind === "member") { s.kind = "independent"; s.accord = 1; s.harm = 1; S.joined--; markCommand(S, 1, `${s.name} leaves the Federation, which couldn't protect it.`); }
@@ -959,7 +971,8 @@ function startBattle(S, enemyId, initiator) {
   }
   const ambush = initiator === "enemy" && E.ambush && e.cloaked;
   e.cloaked = false; e.revealed = false; e.seen = true;
-  S.battle = { enemy: enemyId, ex: 0, log: [], ambush, over: null, initiator };
+  const P = S.pelion;
+  S.battle = { enemy: enemyId, ex: 0, log: [], ambush, over: null, initiator, start: { hull: P.hull, torps: P.torps, sys: P.sys.weapons + P.sys.engines + P.sys.sensors } };
   log(S, `Battle: the Pelion against ${E.base ? "the Orion base" : (/^[AEIOU]/.test(E.name) ? "an " : "a ") + E.name}${ambush ? ", which decloaks firing" : ""}.`, "war");
 }
 registerHooks({ startBattle });
@@ -1119,6 +1132,10 @@ function finish(S, L) {
     else { S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
   } else if (B.over === "lost") log(S, "The Pelion's hull is breaking up.", "bad");
   else log(S, { fled: `The ${E.name} breaks off.`, hailed: `The ${E.name} stands down.`, escaped: "The Pelion breaks away." }[B.over] || "The battle ends.");
+  // What the battle cost: one line for the log.
+  const P = S.pelion, st = B.start || { hull: P.hull, torps: P.torps, sys: 0 };
+  const hullLost = P.hull - st.hull, sysHit = P.sys.weapons + P.sys.engines + P.sys.sensors - st.sys, torps = st.torps - P.torps;
+  log(S, `The battle took ${B.ex} exchange${B.ex === 1 ? "" : "s"}${B.initiator === "enemy" ? ", and they fired first" : ""}. The Pelion ${hullLost > 0 ? `lost ${hullLost} hull box${hullLost === 1 ? "" : "es"} (hull ${Math.max(0, PELION.hull - P.hull)}/${PELION.hull})` : "kept its hull intact"}${sysHit > 0 ? `, took ${sysHit} system damage` : ""}${torps > 0 ? `, and fired ${torps} torpedo${torps === 1 ? "" : "es"} (${P.torps} left)` : ""}.`, B.over === "lost" ? "bad" : "");
   checkEnd(S);
   return L;
 }
@@ -1363,7 +1380,7 @@ function aiTurn(S) {
       // A week of gifts and promises every other turn: accord −1.
       if (e.stay % 2 === 0) {
         s.accord = Math.max(-5, s.accord - 1);
-        if (S.visible[s.at]) log(S, `The Klingons court ${s.name}: accord ${s.accord}.`, "war");
+        if (S.visible[s.at]) log(S, `A ${E.name} is courting ${s.name} with gifts and promises: its accord falls to ${s.accord}${s.accord <= -3 ? ". It's close to joining the Empire" : ""}.`, "war");
         if (s.accord <= -5) claim(S, s);
       }
       if (++e.stay >= 6 || s.kind !== "independent") sendHome(S, e, 0);
@@ -1373,8 +1390,9 @@ function aiTurn(S) {
       if (guard) { const r = skirmish(S, guard, e); if (r === "won" || r === "drove") continue; }
       if (!S.enemies[e.id]) continue;
       // One strike, then away: a raid harms a world once (a Romulan strike, twice) and the raider makes for home.
-      if (s) harmWorld(S, s, e.goal === "strike" ? 2 : 1, `${E.name} ${e.goal === "strike" ? "decloaks and strikes" : "raids"}`);
       if (e.power === "orion") S.supplies = Math.max(0, S.supplies - 3);
+      if (s) harmWorld(S, s, e.goal === "strike" ? 2 : 1, e.goal === "strike" ? `a Romulan bird-of-prey decloaked over it, fired, and turned for the Neutral Zone`
+        : e.power === "orion" ? `an Orion raider struck it, stole 3 supplies from the Federation's convoys, and ran for home` : `a ${E.name} raided it and turned for the border`);
       if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
       sendHome(S, e, 0);
     } else if (e.goal === "claim" || e.goal === "watch") {
@@ -1421,11 +1439,17 @@ function endTurn(S) {
   const sys = Object.values(S.systems);
   const income = 3 + sys.filter((s) => s.kind === "colony").length + 2 * sys.filter((s) => s.kind === "member").length;
   S.supplies += income;
+  const cols = sys.filter((s) => s.kind === "colony").length, mems = sys.filter((s) => s.kind === "member").length;
+  log(S, `Supplies this week: +${income} (Starbase 23 +3${cols ? `, ${cols} colon${cols === 1 ? "y" : "ies"} +${cols}` : ""}${mems ? `, ${mems} member world${mems === 1 ? "" : "s"} +${2 * mems}` : ""}). Now ${S.supplies}; science ${S.science}.`, "turn");
   // Healing: the doctor works on the worst hurt; a sickbay upgrade or biostasis heals everyone a little more.
   const hurt = CREW.filter((c) => S.crew[c.id].inj > 0).sort((a, b) => S.crew[b.id].inj - S.crew[a.id].inj);
   if (hurt.length) {
     const doc = available(S, "vessik") ? "vessik" : bestOfficer(S, ["Medicine"])?.officer;
-    if (doc) { const r = check(S, target(S, doc, "Medicine").total); if (r.success) { S.crew[hurt[0].id].inj--; if (S.crew[hurt[0].id].inj === 0) log(S, `${hurt[0].short} is back on duty.`, "good"); } }
+    if (doc) {
+      const r = check(S, target(S, doc, "Medicine").total), pt = hurt[0];
+      if (r.success) { S.crew[pt.id].inj--; log(S, `Sickbay: ${officer(doc).short} treats ${pt.name} (Medicine, ${r.total} against ${r.target}): ${S.crew[pt.id].inj === 0 ? "back on duty" : `hurt ${S.crew[pt.id].inj}/3`}.`, "good"); }
+      else log(S, `Sickbay: ${officer(doc).short}'s treatment of ${pt.name} doesn't take this week (${r.total} against ${r.target}); still hurt ${S.crew[pt.id].inj}/3.`);
+    }
     if (S.pelion.refits.sickbay || hasRecord(S, "heal")) for (const c of hurt) if (S.crew[c.id].inj > 0 && c !== hurt[0]) S.crew[c.id].inj--;
   }
   // Out of battle, the shields come back.
@@ -1645,6 +1669,7 @@ function renderTabs() {
 function renderPanel() {
   const html = { here: hereHTML, ship: shipHTML, crew: crewHTML, orders: ordersHTML, sector: sectorHTML, log: logHTML }[tab]();
   $("panel").innerHTML = html;
+  if (tab === "log") $("panel").scrollTop = $("panel").scrollHeight;  // the latest entry
 }
 
 // ---------- Here: what's in the selected hex, and what the ship can do ----------
@@ -1800,8 +1825,15 @@ let logFilter = "all";
 function logHTML() {
   const rows = logFilter === "discovery" ? S.log.filter((l) => l.kind === "discovery") : S.log;
   const n = S.log.filter((l) => l.kind === "discovery").length;
+  // In order: oldest first, under a heading for each turn.
+  let body = "", turn = null;
+  for (const l of rows) {
+    if (l.t !== turn) { if (turn !== null) body += "<\/ul>"; turn = l.t; body += `<h3 class="log-turn">Turn ${l.t} · Stardate ${(STARDATE0 + (l.t - 1) * 7.3).toFixed(1)}<\/h3><ul class="log">`; }
+    body += `<li class="${l.kind}">${esc(l.text)}<\/li>`;
+  }
+  if (turn !== null) body += "<\/ul>";
   return `<h2>Captain's log<\/h2><div class="btn-row"><button class="btn small ${logFilter === "all" ? "primary" : ""}" data-logf="all">Everything<\/button><button class="btn small ${logFilter === "discovery" ? "primary" : ""}" data-logf="discovery">Discoveries (${n})<\/button><\/div>`
-    + (rows.length ? `<ul class="log">${rows.map((l) => `<li class="${l.kind}"><span class="t">${l.t}<\/span>${esc(l.text)}<\/li>`).join("")}<\/ul>` : `<p class="muted small">Nothing discovered yet: survey, investigate, observe and sweep.<\/p>`);
+    + (rows.length ? body : `<p class="muted small">Nothing discovered yet: survey, investigate, observe and sweep.<\/p>`);
 }
 
 // ---------- the side panel's buttons ----------
@@ -1843,7 +1875,7 @@ function doEndTurn() {
   const before = S.log.length;
   const r = endTurn(S); if (r.error) { toast(r.error, true); return; }
   lastResult = null; unit = S.support[unit] ? unit : "pelion"; selHex = U().at;
-  const news = S.log.slice(0, Math.max(0, S.log.length - before)).filter((l) => l.kind === "order" || l.kind === "war" || l.kind === "bad");
+  const news = S.log.slice(before).filter((l) => l.kind === "order" || l.kind === "war" || l.kind === "bad");
   if (news.length) toast(news[0].text, news[0].kind !== "order");
   after();
 }

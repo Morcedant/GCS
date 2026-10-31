@@ -1,6 +1,6 @@
 // The page: the sector map on a canvas, the side panel's tabs, and the dialogs (new game, battle, story, the end).
 import { key, toPixel, fromPixel, distance } from "./hex.js";
-import { TOUR, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
+import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, stardate, sysAt, officer, available, skillOf, target, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
   speedOf, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
@@ -169,6 +169,7 @@ function renderTabs() {
 function renderPanel() {
   const html = { here: hereHTML, ship: shipHTML, crew: crewHTML, orders: ordersHTML, sector: sectorHTML, log: logHTML }[tab]();
   $("panel").innerHTML = html;
+  if (tab === "log") $("panel").scrollTop = $("panel").scrollHeight;  // the latest entry
 }
 
 // ---------- Here: what's in the selected hex, and what the ship can do ----------
@@ -324,8 +325,15 @@ let logFilter = "all";
 function logHTML() {
   const rows = logFilter === "discovery" ? S.log.filter((l) => l.kind === "discovery") : S.log;
   const n = S.log.filter((l) => l.kind === "discovery").length;
+  // In order: oldest first, under a heading for each turn.
+  let body = "", turn = null;
+  for (const l of rows) {
+    if (l.t !== turn) { if (turn !== null) body += "</ul>"; turn = l.t; body += `<h3 class="log-turn">Turn ${l.t} · Stardate ${(STARDATE0 + (l.t - 1) * 7.3).toFixed(1)}</h3><ul class="log">`; }
+    body += `<li class="${l.kind}">${esc(l.text)}</li>`;
+  }
+  if (turn !== null) body += "</ul>";
   return `<h2>Captain's log</h2><div class="btn-row"><button class="btn small ${logFilter === "all" ? "primary" : ""}" data-logf="all">Everything</button><button class="btn small ${logFilter === "discovery" ? "primary" : ""}" data-logf="discovery">Discoveries (${n})</button></div>`
-    + (rows.length ? `<ul class="log">${rows.map((l) => `<li class="${l.kind}"><span class="t">${l.t}</span>${esc(l.text)}</li>`).join("")}</ul>` : `<p class="muted small">Nothing discovered yet: survey, investigate, observe and sweep.</p>`);
+    + (rows.length ? body : `<p class="muted small">Nothing discovered yet: survey, investigate, observe and sweep.</p>`);
 }
 
 // ---------- the side panel's buttons ----------
@@ -367,7 +375,7 @@ function doEndTurn() {
   const before = S.log.length;
   const r = endTurn(S); if (r.error) { toast(r.error, true); return; }
   lastResult = null; unit = S.support[unit] ? unit : "pelion"; selHex = U().at;
-  const news = S.log.slice(0, Math.max(0, S.log.length - before)).filter((l) => l.kind === "order" || l.kind === "war" || l.kind === "bad");
+  const news = S.log.slice(before).filter((l) => l.kind === "order" || l.kind === "war" || l.kind === "bad");
   if (news.length) toast(news[0].text, news[0].kind !== "order");
   after();
 }

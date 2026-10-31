@@ -23,7 +23,8 @@ export function startBattle(S, enemyId, initiator) {
   }
   const ambush = initiator === "enemy" && E.ambush && e.cloaked;
   e.cloaked = false; e.revealed = false; e.seen = true;
-  S.battle = { enemy: enemyId, ex: 0, log: [], ambush, over: null, initiator };
+  const P = S.pelion;
+  S.battle = { enemy: enemyId, ex: 0, log: [], ambush, over: null, initiator, start: { hull: P.hull, torps: P.torps, sys: P.sys.weapons + P.sys.engines + P.sys.sensors } };
   log(S, `Battle: the Pelion against ${E.base ? "the Orion base" : (/^[AEIOU]/.test(E.name) ? "an " : "a ") + E.name}${ambush ? ", which decloaks firing" : ""}.`, "war");
 }
 registerHooks({ startBattle });
@@ -183,6 +184,10 @@ function finish(S, L) {
     else { S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
   } else if (B.over === "lost") log(S, "The Pelion's hull is breaking up.", "bad");
   else log(S, { fled: `The ${E.name} breaks off.`, hailed: `The ${E.name} stands down.`, escaped: "The Pelion breaks away." }[B.over] || "The battle ends.");
+  // What the battle cost: one line for the log.
+  const P = S.pelion, st = B.start || { hull: P.hull, torps: P.torps, sys: 0 };
+  const hullLost = P.hull - st.hull, sysHit = P.sys.weapons + P.sys.engines + P.sys.sensors - st.sys, torps = st.torps - P.torps;
+  log(S, `The battle took ${B.ex} exchange${B.ex === 1 ? "" : "s"}${B.initiator === "enemy" ? ", and they fired first" : ""}. The Pelion ${hullLost > 0 ? `lost ${hullLost} hull box${hullLost === 1 ? "" : "es"} (hull ${Math.max(0, PELION.hull - P.hull)}/${PELION.hull})` : "kept its hull intact"}${sysHit > 0 ? `, took ${sysHit} system damage` : ""}${torps > 0 ? `, and fired ${torps} torpedo${torps === 1 ? "" : "es"} (${P.torps} left)` : ""}.`, B.over === "lost" ? "bad" : "");
   checkEnd(S);
   return L;
 }

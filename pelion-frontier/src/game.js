@@ -51,10 +51,11 @@ export const stardate = (S) => (STARDATE0 + (S.turn - 1) * 7.3).toFixed(1);
 export const sysAt = (S, hex) => S.sysAt[hex] && S.systems[S.sysAt[hex]];
 export const officer = (id) => CREW.find((c) => c.id === id);
 export const hasRecord = (S, perk) => S.records.some((id) => RECORDS.find((r) => r.id === id)?.perk === perk);
-/** The captain's log. Discoveries are never trimmed: the log keeps the newest 200 other entries. */
+/** The captain's log, oldest first. Discoveries are never trimmed: the log keeps the newest 300 other entries. */
 export function log(S, text, kind = "") {
-  S.log.unshift({ t: S.turn, text, kind });
-  if (S.log.length > 200) { let n = S.log.length - 200; for (let i = S.log.length - 1; i >= 0 && n > 0; i--) if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } }
+  S.log.push({ t: S.turn, text, kind });
+  let n = S.log.length - 300;
+  for (let i = 0; i < S.log.length && n > 0; ) { if (S.log[i].kind !== "discovery") { S.log.splice(i, 1); n--; } else i++; }
 }
 /** A story scene: shown as a dialog, and written in full into the log. */
 export function storyEvent(S, title, text) { S.event = { kind: "story", title, text }; log(S, `${title}: ${text}`, "discovery"); }
@@ -172,6 +173,12 @@ export function moveTo(S, unit, hex) {
 }
 function arrive(S, hex) {
   const s = sysAt(S, hex);
+  if (s) {
+    const known = KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost"].includes(s.kind);
+    const what = { member: "a Federation member world", claimed: "a world of the Klingon Empire", lost: "an evacuated colony", independent: `an independent world (accord ${signedAccord(s.accord)})` }[s.kind] || (known ? "a " + KINDS[s.kind].name.toLowerCase() : "an uncharted system");
+    const there = Object.values(S.enemies).filter((e) => e.at === hex && !e.cloaked && !ENEMIES[e.type].base).map((e) => (/^[AEIOU]/.test(ENEMIES[e.type].name) ? "an " : "a ") + ENEMIES[e.type].name);
+    log(S, `The Pelion arrives at ${s.name}, ${what}${s.harm ? `, harmed ${s.harm}/3` : ""}.${there.length ? ` In orbit: ${there.join(", ")}.` : ""}`, "move");
+  }
   if (s) S.seenSys[s.id] = true;
   if (s && s.id === S.starbase) dock(S);
   // Orders with a twist that bites on arrival.
@@ -294,7 +301,12 @@ export function resolve(S, reroll) {
   S.pending = null;
   const U = p.unit === "pelion" ? S.pelion : S.support[p.unit];
   U.acted = true;
+  const pre = S.log.length;
   const out = applyAction(S, p);
+  const where = sysAt(S, U.at)?.name || "open space";
+  const who = p.unit === "pelion" ? (p.officer === "captain" ? S.captain : officer(p.officer).name) : S.support[p.unit]?.name || "The science vessel";
+  const r = p.roll, head = `${who} (${p.skill || "crew"}) · ${p.name} at ${where}: rolled ${r.dice.join("+")} = ${r.total} against ${r.target}, ${r.success ? `success by ${r.margin}` : `failed by ${-r.margin}`}${p.rerolled ? " after spending a Duty point to reroll" : ""}.`;
+  if (S.log.length > pre) S.log[pre].text = head + " " + S.log[pre].text; else log(S, head);
   if (p.unit === "pelion" && p.roll.success && p.officer !== "captain") gainXp(S, p.officer, p.skill);
   updateVisibility(S);
   checkEnd(S);
@@ -438,14 +450,14 @@ export function newOrder(S) {
   if (twist && twist.fx === "klingon") { const k = closestOutpost(S, at); if (k) spawnEnemy(S, "kbc", k.at, { goal: "claim", target: at }); }
   if (twist && twist.fx === "orion") { const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base); spawnEnemy(S, "orion", b ? b.at : at, { goal: "raid", target: at, hostile: true }); }
   if (twist && twist.fx === "romulan") { const z = Object.keys(S.hexes).filter(inZone); spawnEnemy(S, "rbop", pick(S, z), { goal: "watch", target: at, cloaked: true, hostile: true }); }
-  log(S, `New orders: ${o.title}. Due by turn ${o.deadline}.`, "order");
+  log(S, `New orders from Starfleet: ${o.title}. Work it with ${o.skills.join(", ")} (${o.segs} successes), due by turn ${o.deadline}.${twist ? ` Twist: ${twist.text}.` : ""} Something strange: ${o.strange}. Key character: ${o.key}.`, "order");
   return o;
 }
 export const closestOutpost = (S, at) => Object.values(S.systems).filter((s) => s.kind === "klingon").sort((a, b) => distance(a.at, at) - distance(b.at, at))[0];
 export function harmWorld(S, s, n, why) {
   if (!["colony", "member", "independent"].includes(s.kind)) return;
   s.harm = Math.min(3, s.harm + n);
-  log(S, `${s.name} is harmed (${s.harm}/3): ${why}.`, "bad");
+  log(S, `${s.name} (${s.kind === "colony" ? "Federation colony" : s.kind === "member" ? "Federation member" : "independent world"}) is harmed: ${why}. Harm ${s.harm}/3${s.harm >= 3 ? "" : s.kind === "colony" ? " (at 3 it must be evacuated)" : s.kind === "member" ? " (at 3 it leaves the Federation)" : " (at 3 it loses faith in the Federation)"}.`, "bad");
   if (s.harm < 3) return;
   if (s.kind === "colony") { s.kind = "lost"; S.lostColonies++; markCommand(S, 2, `the colony on ${s.name} had to be evacuated.`); }
   else if (s.kind === "member") { s.kind = "independent"; s.accord = 1; s.harm = 1; S.joined--; markCommand(S, 1, `${s.name} leaves the Federation, which couldn't protect it.`); }

@@ -16,11 +16,17 @@ export function endTurn(S) {
   const sys = Object.values(S.systems);
   const income = 3 + sys.filter((s) => s.kind === "colony").length + 2 * sys.filter((s) => s.kind === "member").length;
   S.supplies += income;
+  const cols = sys.filter((s) => s.kind === "colony").length, mems = sys.filter((s) => s.kind === "member").length;
+  log(S, `Supplies this week: +${income} (Starbase 23 +3${cols ? `, ${cols} colon${cols === 1 ? "y" : "ies"} +${cols}` : ""}${mems ? `, ${mems} member world${mems === 1 ? "" : "s"} +${2 * mems}` : ""}). Now ${S.supplies}; science ${S.science}.`, "turn");
   // Healing: the doctor works on the worst hurt; a sickbay upgrade or biostasis heals everyone a little more.
   const hurt = CREW.filter((c) => S.crew[c.id].inj > 0).sort((a, b) => S.crew[b.id].inj - S.crew[a.id].inj);
   if (hurt.length) {
     const doc = available(S, "vessik") ? "vessik" : bestOfficer(S, ["Medicine"])?.officer;
-    if (doc) { const r = check(S, target(S, doc, "Medicine").total); if (r.success) { S.crew[hurt[0].id].inj--; if (S.crew[hurt[0].id].inj === 0) log(S, `${hurt[0].short} is back on duty.`, "good"); } }
+    if (doc) {
+      const r = check(S, target(S, doc, "Medicine").total), pt = hurt[0];
+      if (r.success) { S.crew[pt.id].inj--; log(S, `Sickbay: ${officer(doc).short} treats ${pt.name} (Medicine, ${r.total} against ${r.target}): ${S.crew[pt.id].inj === 0 ? "back on duty" : `hurt ${S.crew[pt.id].inj}/3`}.`, "good"); }
+      else log(S, `Sickbay: ${officer(doc).short}'s treatment of ${pt.name} doesn't take this week (${r.total} against ${r.target}); still hurt ${S.crew[pt.id].inj}/3.`);
+    }
     if (S.pelion.refits.sickbay || hasRecord(S, "heal")) for (const c of hurt) if (S.crew[c.id].inj > 0 && c !== hurt[0]) S.crew[c.id].inj--;
   }
   // Out of battle, the shields come back.
