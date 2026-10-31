@@ -44,7 +44,8 @@ function rng(s) { const r = makeRng(1); r.setState(s.rngState); return { ...r, s
 /** Discoveries (systems charted, ruins surveyed, contacts, technologies) are never trimmed from the log. */
 export const DISCOVERY = ["explore", "research", "contact"];
 export function log(s, fid, text, kind = "info") {
-  s.log.push({ turn: s.turn, fid, text, kind });
+  s.logSeq = (s.logSeq || 0) + 1;   // each entry is numbered, so the page can show what one choice led to
+  s.log.push({ id: s.logSeq, turn: s.turn, fid, text, kind });
   let n = s.log.length - 400;
   for (let i = 0; i < s.log.length && n > 0; ) { if (!DISCOVERY.includes(s.log[i].kind)) { s.log.splice(i, 1); n--; } else i++; }
 }
