@@ -462,7 +462,7 @@ function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
   const cv = S.systems[S.corvan];
   S.orders.push({ id: "o1", arc: true, title: "The Silence at Corvan II", at: cv.at, sys: cv.id, skills: [], segs: 0, have: 0, deadline: 12,
     text: "The Federation research outpost on Corvan II, eight archaeologists studying the ruins of an extinct civilization, has missed three check-ins. Corvan II has a native people, the Ketari, at a bronze-age level: the outpost works under the Prime Directive. An Orion raider was reported in the sector last week.",
-    twist: null, strange: "An ancient machine that still works", key: "Rrinn's sister, on the outpost's supply run" });
+    twist: null, personal: "Rrinn's sister serves on the outpost's supply run." });
   // The raider holds station on the far side of Corvan II's moon: passive sensors won't see it; an active sweep will.
   spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at, hidden: true });
   const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");
@@ -2166,7 +2166,8 @@ function ordersHTML() {
     h += `<div class="card ${left <= 2 && !o.arc ? "red" : "gold"}"><h4>${esc(o.title)}<\/h4>`;
     if (o.text) h += `<p class="small">${esc(o.text)}<\/p>`;
     if (!o.arc || A.stage === "travel" || A.stage === "orbit") h += `<div class="small">${o.arc ? "" : `${o.have}/${o.segs} done with ${esc(o.skills.join(", "))}. `}Due by turn ${o.deadline} (${left} turn${left === 1 ? "" : "s"} left).<\/div>`;
-    h += `<div class="small muted">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.<\/div>`;
+    h += o.personal ? `<div class="small"><b>A personal connection:<\/b> ${esc(o.personal)}<\/div>`
+      : `<div class="small muted">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.<\/div>`;
     h += `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it<\/button><button class="btn small primary" data-go="${o.at}">Set course<\/button><\/div><\/div>`;
   }
   h += `<p class="small muted">Carried out: ${S.done}. Failed: ${S.failed}. Each success clears a Starfleet Command box; each failure marks one.<\/p>`;

@@ -38,7 +38,7 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
   const cv = S.systems[S.corvan];
   S.orders.push({ id: "o1", arc: true, title: "The Silence at Corvan II", at: cv.at, sys: cv.id, skills: [], segs: 0, have: 0, deadline: 12,
     text: "The Federation research outpost on Corvan II, eight archaeologists studying the ruins of an extinct civilization, has missed three check-ins. Corvan II has a native people, the Ketari, at a bronze-age level: the outpost works under the Prime Directive. An Orion raider was reported in the sector last week.",
-    twist: null, strange: "An ancient machine that still works", key: "Rrinn's sister, on the outpost's supply run" });
+    twist: null, personal: "Rrinn's sister serves on the outpost's supply run." });
   // The raider holds station on the far side of Corvan II's moon: passive sensors won't see it; an active sweep will.
   spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at, hidden: true });
   const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");

@@ -495,7 +495,8 @@ function ordersHTML() {
     h += `<div class="card ${left <= 2 && !o.arc ? "red" : "gold"}"><h4>${esc(o.title)}</h4>`;
     if (o.text) h += `<p class="small">${esc(o.text)}</p>`;
     if (!o.arc || A.stage === "travel" || A.stage === "orbit") h += `<div class="small">${o.arc ? "" : `${o.have}/${o.segs} done with ${esc(o.skills.join(", "))}. `}Due by turn ${o.deadline} (${left} turn${left === 1 ? "" : "s"} left).</div>`;
-    h += `<div class="small muted">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.</div>`;
+    h += o.personal ? `<div class="small"><b>A personal connection:</b> ${esc(o.personal)}</div>`
+      : `<div class="small muted">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.</div>`;
     h += `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-go="${o.at}">Set course</button></div></div>`;
   }
   h += `<p class="small muted">Carried out: ${S.done}. Failed: ${S.failed}. Each success clears a Starfleet Command box; each failure marks one.</p>`;
