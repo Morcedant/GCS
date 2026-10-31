@@ -670,8 +670,10 @@ tr.lvl-U td.target { color: var(--muted); }
       <button class="tab" role="tab" id="tab-gm" aria-selected="false" aria-controls="view-gm">GM view</button>
     </div>
     <button class="btn" id="btn-print" hidden>Save as PDF</button>
+    <!-- A companion game in the same setting (pack "companion"), e.g. Fracture Lines: Dominion. -->
+    <a class="btn no-print" id="link-companion" style="text-decoration:none" target="_blank" rel="noopener" hidden></a>
     <div class="scanbar" aria-hidden="true"></div>
-    <div class="page-version"><!-- VERSION:START --><span data-version-hash="46ddd26" data-version-date="2026.10.31" title="The code changes whenever this page changes.">Version 2026.10.31 · 46ddd26</span><!-- VERSION:END --></div>
+    <div class="page-version"><!-- VERSION:START --><span data-version-hash="b807e06" data-version-date="2026.10.31" title="The code changes whenever this page changes.">Version 2026.10.31 · b807e06</span><!-- VERSION:END --></div>
   </header>
 
   <div id="example-banner" class="example-banner" hidden>
@@ -13065,6 +13067,7 @@ function mountPlaytest(api) {
   try { framed = window.self !== window.top; } catch {}
   $("btn-print").hidden = framed;
   $("btn-print").onclick = () => window.print();
+  if (PACK.companion) { const a = $("link-companion"); a.href = PACK.companion.href; a.textContent = "Play " + PACK.companion.title; a.title = PACK.companion.text || ""; a.hidden = false; }
   $("tab-create").onclick = () => selectTab("create");
   $("tab-sheet").onclick = () => selectTab("sheet");
   $("tab-guide").onclick = () => selectTab("guide");
