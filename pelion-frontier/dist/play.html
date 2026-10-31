@@ -1284,7 +1284,7 @@ const astory = (S, title, text) => storyEvent(S, title, text, { away: true });
 const SITES = {
   outpost: { name: "The outpost", sub: "Federation research station: beam-in point", x: 0.24, y: 0.58 },
   ruins: { name: "The ruins", sub: "An extinct civilization's city", x: 0.58, y: 0.42 },
-  core: { name: "The caretaker's chamber", sub: "Deep in the ruins", x: 0.66, y: 0.22 },
+  core: { name: "The deep chamber", sub: "Beneath the ruins, where the field is strongest", x: 0.66, y: 0.22 },
   blind: { name: "The duck blind", sub: "A hidden post above the village", x: 0.70, y: 0.66 },
   village: { name: "The Ketari village", sub: "Bronze age; two kilometers from the ruins", x: 0.86, y: 0.78 },
 };
@@ -1318,8 +1318,13 @@ function arcActions(S) {
   }
   if (A.stage === "caretaker") {
     add("shutdown", "Shut the caretaker down", ["Engineering", "Electronics"], "The scientists wake. The Ketari lose their protector.", [["Technology older than the Federation", -4]], team);
-    add("reason", "Reason with it: the paradox", ["Psychology", "Diplomacy"], "It protects them from all outsiders, and it's an outsider itself. −4, but Sevek's logic gives +2. Success: it releases the scientists and goes on watching.",
-      [["A machine's logic", -4]].concat(available(S, "sevek") && team.includes("sevek") ? [["Sevek's paradox", 2]] : []), team);
+    // The paradox: Sevek argues it against the caretaker itself, in three exchanges of contested rolls.
+    const ev = [].concat(cluesFound(A) >= CLOCK ? [["Every clue found", 1]] : [], A.readings ? [["The orbital readings", 1]] : [], A.argued ? [["Its last answer, studied", 1]] : []);
+    const rs = { id: "arc", arc: "reason", name: "Sevek puts the paradox to the caretaker", skills: ["Psychology"], who: ["sevek"], extra: ev, contest: true,
+      blurb: `A contest of logic: three exchanges, Sevek's Psychology against the caretaker's ${CARETAKER.name} ${CARETAKER.target}. Each side rolls; the better margin takes the exchange, and the caretaker wins ties. Win two, and it releases the scientists and goes on with its watch. Lose two, and it ends the argument for the hour: the Countdown fills a segment.`, paradox: PARADOX_TEXT };
+    if (!team.includes("sevek")) rs.why = "Only Sevek can argue the paradox, and he isn't on the away team. Beam him down.";
+    else if (!available(S, "sevek")) rs.why = "Sevek is in sickbay.";
+    out.push(rs);
     add("leave", "Leave it be; take back the Orion phasers", ["Stealth", "Psychology"], "Keep Ketari history their own. The scientists stay asleep. Fail by 3 or more and the Ketari see you.", [["A whole village", -2]], team);
   }
   return out;
@@ -1357,7 +1362,7 @@ function arcStep(S, p) {
       return checkCountdown(S);
     }
     A.stage = "orions"; A.theory = true;
-    astory(S, "Sevek's theory: a caretaker, not a weapon", `Sevek lays the evidence out in the outpost's lab, one piece at a time. \"The dampener test, then the spike: Dr. Haskel's device did not damage something in the ruins. It woke it. The scientists left calmly, at one moment, as if called: they were not attacked, they were collected. The field does not strike at the away team; it catalogues them, as it has catalogued the Ketari for centuries. And the village sits inside its range.\" He looks up. \"Logic suggests a single explanation. The civilization that built this city left a caretaker: a machine set to protect the Ketari from harm. It judged Dr. Haskel's device a threat to its charges and removed the threat. Whether it harmed them, I cannot say.${A.readings ? " The ship read eight life signs deep beneath the ruins. If they are the scientists, they are alive. How they are held, I cannot know until we see it." : " If the scientists are anywhere, they are beneath the ruins, where the field is strongest. What became of them, I cannot know until we see it."}\"\n\nA caretaker, not a weapon, if Sevek is right. And the Orions, who came for the machine itself, are in the ruins now, cutting their way to its core.`);
+    astory(S, "Sevek's theory: a guardian, not a weapon", `Sevek lays the evidence out in the outpost's lab, one piece at a time. \"The dampener test, then the spike: Dr. Haskel's device did not damage something in the ruins. It woke it. The scientists left calmly, at one moment, as if called: they were not attacked, they were collected. The field does not strike at the away team; it catalogues them, as it has catalogued the Ketari for centuries. And the village sits inside its range.\" He looks up. \"The evidence suggests a hypothesis, nothing more. Something in the ruins was set to watch over the Ketari, and it judged Dr. Haskel's device a threat to them and removed the threat. Whether it is a machine, a mind or a mechanism with no mind at all, I cannot say. Whether it harmed them, I cannot say either.${A.readings ? " The ship read eight life signs deep beneath the ruins. If they are the scientists, they are alive. How they are held, I cannot know until we see it." : " If the scientists are anywhere, they are beneath the ruins, where the field is strongest. What became of them, I cannot know until we see it."}\"\n\nA guardian, not a weapon, if Sevek is right; and only a hypothesis until someone goes down there. The Orions are in the ruins now, cutting their way toward whatever it is.`);
     return "";
   }
   if (k === "time") {
@@ -1374,11 +1379,12 @@ function arcStep(S, p) {
     if (k === "kill") markCommand(S, 1, "Orion pirates killed on Corvan II when stun would have done.");
     A.stage = "caretaker";
     A.podsSeen = true;
-    alog(S, "The caretaker's chamber, seen at last: eight stasis pods in a ring around a column of light, and in each one a scientist from the outpost, asleep, unharmed, breathing once a minute. Rrinn's sister is in the third. Sevek was right about the machine; now the away team knows what it did with them.", "discovery");
-    astory(S, "The caretaker speaks", `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and in the brig."} Past their cutting gear, the away team reaches the caretaker's chamber: eight stasis pods in a ring around a column of light, and in each one a scientist from the outpost, asleep and unharmed. Rrinn's sister is in the third. Then the machine speaks through an android shell: courteous, absolute. It will protect the Ketari from everything off-world, the Federation included. The Countdown stands at ${A.countdown}/${COUNTDOWN}.`);
+    alog(S, "The deep chamber, seen at last: eight stasis pods in a ring around a column of light, and in each one a scientist from the outpost, asleep, unharmed, breathing once a minute. Rrinn's sister is in the third. Then a voice speaks: the caretaker, a machine left by the city's builders to watch over the Ketari. Sevek's hypothesis was right.", "discovery");
+    astory(S, "The caretaker speaks", `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and beamed to the brig."} Past their cutting gear a ramp spirals down, and the away team comes out into a chamber the size of a cathedral: eight stasis pods in a ring around a column of light, and in each one a scientist from the outpost, asleep and unharmed. Rrinn's sister is in the third.\n\nThe column brightens, and a figure steps out of it: an android shell, tall and featureless, its hands open. When it speaks, the voice comes from the walls as much as from the figure, calm and courteous and very old.\n\n${SPEECH}\n\nIt waits, perfectly still. It will not be threatened, and it has eternity to wait. The Countdown stands at ${A.countdown}/${COUNTDOWN}.`);
     return "";
   }
-  if (k === "shutdown" || k === "reason" || k === "leave") {
+  if (k === "reason") return argue(S, p);
+  if (k === "shutdown" || k === "leave") {
     if (!r.success) {
       A.countdown++;
       if (k === "leave" && r.margin <= -3 && !A.seen) { A.seen = true; markCommand(S, 1, "the Ketari saw the away team. The Prime Directive."); }
@@ -1390,6 +1396,48 @@ function arcStep(S, p) {
   }
   return "";
 }
+/** The caretaker's side of the contest. */
+const CARETAKER = { name: "Logic", target: 13 };
+/** What the paradox is, in full: shown on the action card. */
+const PARADOX_TEXT = "The caretaker's one law: protect the Ketari from every influence from beyond their world, so that they become whatever they will become on their own. But the caretaker is itself from beyond their world: its makers were not Ketari, and they came to Corvan II from the stars. Everything it does is outside influence. Holding eight off-worlders beneath Ketari soil keeps outsiders here for good, and its own presence is what drew the Orions and set the Ketari digging. By its own law, the outsiders, the eight scientists among them, have to leave; and the guardian has to stop acting and only watch.";
+/** The three exchanges: what Sevek argues, and what each side says when it takes the exchange. */
+const EXCHANGES = [
+  { name: "Your law", sevek: "\"State your purpose precisely.\" The caretaker does: protect the Ketari from every influence from beyond their world. Sevek has it repeat the words \"every\" and \"beyond\", and it agrees that it allows no exceptions.",
+    machine: "\"My purpose is not yours to examine.\" The caretaker refuses to define itself to an outsider, and Sevek has nothing to build on." },
+  { name: "Your makers", sevek: "\"Your makers were not Ketari. The star charts on your city's walls show where they came from. You are an influence from beyond this world.\" The caretaker's light dims; it does not deny it.",
+    machine: "\"My makers are gone. I am the last of them, and I have become part of this world.\" Sevek can't show it otherwise, not yet." },
+  { name: "Your remedy", sevek: "\"Eight off-worlders sleep beneath Ketari soil, and they will sleep there for as long as you hold them. Your presence drew the Orions; it set the Ketari digging for them. By your own law, what is not of this world must go: the eight, and every act of yours that is not watching.\"",
+    machine: "\"If I release them, they will speak of what they found, and more outsiders will come. Holding them is the lesser influence.\" It is a fair answer, and Sevek has no reply ready." },
+];
+/** The chance Sevek wins the argument (two exchanges of three) at this target, worked out exactly. */
+function contestOdds(T, them = CARETAKER.target) {
+  const dist = {}; for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) for (let c = 1; c <= 6; c++) dist[a + b + c] = (dist[a + b + c] || 0) + 1 / 216;
+  const eff = (t, n) => (n <= 4 || (n <= t && n < 17) ? t - n : Math.min(t - n, -1));
+  let p = 0; for (const x in dist) for (const y in dist) if (eff(T, +x) > eff(them, +y)) p += dist[x] * dist[y];
+  return p * p * (3 - 2 * p);
+}
+/** Sevek against the caretaker: three exchanges of contested rolls; the first is the action's own roll. Best of three. */
+function argue(S, p) {
+  const A = S.arc; let sv = 0, ct = 0;
+  for (let i = 0; i < EXCHANGES.length && sv < 2 && ct < 2; i++) {
+    const x = EXCHANGES[i], mine = i === 0 ? p.roll : check(S, p.roll.target), its = check(S, CARETAKER.target);
+    const ms = mine.success ? mine.margin : Math.min(mine.margin, -1), mc = its.success ? its.margin : Math.min(its.margin, -1);
+    const win = ms > mc; win ? sv++ : ct++;
+    alog(S, `Exchange ${i + 1}, "${x.name}": Sevek rolled ${mine.dice.join("+")} = ${mine.total} against ${mine.target} (${mine.success ? `by ${mine.margin}` : `failed by ${-mine.margin}`}); the caretaker rolled ${its.dice.join("+")} = ${its.total} against its ${CARETAKER.name} ${CARETAKER.target} (${its.success ? `by ${its.margin}` : `failed by ${-its.margin}`}). ${win ? "Sevek takes it" : "The caretaker takes it"}: ${win ? x.sevek : x.machine} (Sevek ${sv}, the caretaker ${ct}.)`, win ? "good" : "bad");
+  }
+  if (sv >= 2) { finishArc(S, "reason"); return ""; }
+  A.argued = true; A.countdown++;
+  alog(S, `The caretaker ends the argument for now: "I have heard you." Sevek can try again, and he has its answers to study (+1). The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
+  return checkCountdown(S);
+}
+/** The caretaker's first words to the away team, in full. */
+const SPEECH = `"You have come a long way to be so careless. Be still; I will not harm you. I harm no one. I have watched this world for eleven thousand of its years.
+
+"The people who built this city came here from the stars, as you have. They found the Ketari living in caves, and they loved them, and they understood too late that their love was changing them: the Ketari were learning to be smaller copies of their visitors, and forgetting how to be themselves. So the builders left, and they left me, with a single law: protect the Ketari from every influence from beyond their world, so that they may become whatever they will become, alone.
+
+"For eleven thousand years I have kept that law. I turned aside the ships that came too close. I let the city fall to ruin so that it would be a story, not a lesson. Then your people built a station within sight of the village, and one of them, the one called Haskel, reached into me with a device to silence me and see what I was. That was a threat to my charges. I removed it. I removed all eight of them, gently. They sleep, they do not age, and they do not suffer. They will sleep until the Ketari no longer need me, and that will be a very long time.
+
+"The pirates I could not stop so gently: they bribed my charges with weapons and set them digging at my walls. You have dealt with the pirates, and for that I thank you. Now I ask you to go, and to tell your people not to come back. Your ship is welcome to leave. I will release its power when it does."`;
 function checkCountdown(S) {
   const A = S.arc;
   if (A.countdown < COUNTDOWN || A.stage === "done") return "";
@@ -1411,7 +1459,7 @@ function finishArc(S, how) {
     if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); }
     else S.commendations += 1;
     astory(S, how === "reason" ? "Equals" : "Silence, for good", how === "reason"
-      ? "Sevek lays out the paradox, and the machine considers it for a long time. Then it releases the eight scientists and goes back to its watch: the Ketari keep their guardian, and the Federation has a library record no one else has. Rrinn's sister is the first one out, and finally finishes that sentence."
+      ? "The caretaker is silent for a long time: the longest, it says afterward, that it has been silent since its makers left. \"The argument holds. I am an outsider here, and the eight are outsiders, and what does not belong to this world must leave it. I release them. I will go on watching, and I will not act again. If harm comes to the Ketari, I will tell you, and you will decide; I find I would rather someone decided.\" The pods open one by one. The Ketari keep their guardian, and the Federation has a library record no one else has. Rrinn's sister is the first one out, and finally finishes that sentence."
       : "The caretaker goes dark. The eight scientists wake, cold and confused and alive, and the Ketari will never know what watched over them, or that it's gone. Rrinn's sister is among the sleepers, and finally finishes that sentence.");
     alog(S, `The Silence at Corvan II: the eight scientists are safe.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
   }
@@ -1739,7 +1787,7 @@ const U = () => (unit === "pelion" ? S.pelion : S.support[unit]) || (unit = "pel
 // ---------- start ----------
 function debugHook() {
   try { if (!/[?&]debug\b/.test(location.search)) return; } catch { return; }
-  window.__pelion = { state: () => S, screenOf: (hex) => { const c = $("map"), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
+  window.__pelion = { state: () => S, render: () => renderAll(), screenOf: (hex) => { const c = $("map"), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
 }
 function boot() { bindMap(); bindChrome(); debugHook(); showStarter(!!store.get()); }
 function startGame(state) {
@@ -1954,7 +2002,7 @@ function drawSurface(ctx, W, H) {
   const notes = {
     outpost: [["Outpost logs", A.clues.logs], ["Empty bunks", A.clues.bunks]],
     ruins: [["The ruins' energy", A.clues.energy]].concat(A.stage === "orions" ? [["3 Orion pirates digging", "danger"]] : []),
-    core: [].concat(A.theory ? [[A.stage === "caretaker" ? "The caretaker" : "The caretaker (Sevek's theory)", A.stage === "caretaker" ? "danger" : "info"]] : [["Unknown", null]], A.podsSeen ? [["8 scientists in stasis pods", "info"]] : A.theory && A.readings ? [["8 life signs below", "info"]] : []),
+    core: [].concat(A.theory ? [[A.stage === "caretaker" ? "The caretaker" : "Something watching over the Ketari (Sevek's theory)", A.stage === "caretaker" ? "danger" : "info"]] : [["Unknown", null]], A.podsSeen ? [["8 scientists in stasis pods", "info"]] : A.theory && A.readings ? [["8 life signs below", "info"]] : []),
     blind: [["The village, observed", A.clues.village]],
     village: A.clues.village ? [["Armed with Orion phasers", "danger"]] : [],
   };
@@ -1998,7 +2046,7 @@ function drawSurface(ctx, W, H) {
   ctx.fillStyle = "#f2c14e"; ctx.font = "700 14px Antonio, system-ui, sans-serif"; ctx.fillText("CORVAN II · SURFACE", R.x + 22, R.y + 30);
   ctx.fillStyle = "#e6e8f2"; ctx.font = "12px system-ui, sans-serif";
   ctx.fillText(`The Pelion in orbit · Countdown ${A.countdown}/${COUNTDOWN}`, R.x + 22, R.y + 48);
-  ctx.fillText(`Clues ${cluesFound(A)}/${CLOCK}${A.theory ? " · Sevek's theory: a caretaker" : cluesFound(A) >= THEORY_AT ? " · Sevek can form a theory" : ""} · Click a place`, R.x + 22, R.y + 64);
+  ctx.fillText(`Clues ${cluesFound(A)}/${CLOCK}${A.theory ? " · Sevek's theory: a guardian" : cluesFound(A) >= THEORY_AT ? " · Sevek can form a theory" : ""} · Click a place`, R.x + 22, R.y + 64);
 }
 function clickSurface(mx, my) {
   if (!surfaceBox) return;
@@ -2110,10 +2158,10 @@ function teamLine() {
     <div class="roll-row"><button class="btn small" data-beamup="1">Beam them up (choose again)<\/button><\/div><\/div>`;
 }
 /** "Computers 18 · Something here is wrong −2 · Sevek assists +1 = 17 (98%)": how a target is made. */
-function breakdown(o) {
+function breakdown(o, a) {
   const [first, ...rest] = o.parts;
   const sign = (v) => (v >= 0 ? "+" : "−") + Math.abs(v);
-  return `${o.skill} ${first[1]}${rest.map(([n, v]) => ` · ${n} ${sign(v)}`).join("")} = ${o.total}, ${pct(o.total)} to succeed`;
+  return `${o.skill} ${first[1]}${rest.map(([n, v]) => ` · ${n} ${sign(v)}`).join("")} = ${o.total}, ${a && a.contest ? `${Math.round(contestOdds(o.total) * 100)}% to win the argument` : `${pct(o.total)} to succeed`}`;
 }
 /** The card's lines for the officer picked: how the skill is used, who could assist, and the target with or without them. */
 function refreshCard(card) {
@@ -2129,18 +2177,18 @@ function actionCard(a) {
   if (a.id === "beam") return beamCard(a);
   const tone = a.id === "engage" ? "red" : a.id === "mission" || a.id === "arc" ? "gold" : a.id === "envoy" ? "green" : "";
   const enc = esc(JSON.stringify({ id: a.id, order: a.order, enemy: a.enemy, arc: a.arc }));
-  let h = `<div class="card ${tone}"><h4>${a.bridge ? "Bridge: " : a.who && a.id === "arc" && a.arc !== "time" && a.arc !== "theory" && a.arc !== "scan" ? "" : ""}${esc(a.name)}<\/h4><div class="small muted">${esc(a.blurb || "")}<\/div>`;
+  let h = `<div class="card ${tone}"><h4>${a.bridge ? "Bridge: " : a.who && a.id === "arc" && a.arc !== "time" && a.arc !== "theory" && a.arc !== "scan" ? "" : ""}${esc(a.name)}<\/h4><div class="small muted">${esc(a.blurb || "")}<\/div>${a.paradox ? `<div class="small" style="margin-top:6px"><b>The paradox:<\/b> ${esc(a.paradox)}<\/div>` : ""}`;
   if (a.why) return h + `<div class="why">${esc(a.why)}<\/div><\/div>`;
   if (a.id === "engage") return h + `<div class="roll-row"><button class="btn red small" data-act="${enc}">Engage<\/button><\/div><\/div>`;
   const opts = optionsFor(a);
   if (unit === "pelion" && !opts.length) return h + `<div class="why">No one free has the training.<\/div><\/div>`;
   h += `<div class="roll-row">`;
-  if (opts.length) h += `<select data-who aria-label="Who does it">${opts.map((o, i) => `<option value="${o.officer}|${o.skill}" data-breakdown="${esc(breakdown(o))}" data-breakdown-assist="${esc(breakdown(o.assisted))}" data-helper="${o.helper ? esc(officer(o.helper).short) : ""}" data-how="${esc(howLine(a, o.skill))}" ${i === 0 ? "selected" : ""}>${esc(officer(o.officer).short)} · ${esc(o.skill)} ${o.total} (${pct(o.total)})<\/option>`).join("")}<\/select>`;
+  if (opts.length) h += `<select data-who aria-label="Who does it">${opts.map((o, i) => `<option value="${o.officer}|${o.skill}" data-breakdown="${esc(breakdown(o, a))}" data-breakdown-assist="${esc(breakdown(o.assisted, a))}" data-helper="${o.helper ? esc(officer(o.helper).short) : ""}" data-how="${esc(howLine(a, o.skill))}" ${i === 0 ? "selected" : ""}>${esc(officer(o.officer).short)} · ${esc(o.skill)} ${o.total} (${a.contest ? Math.round(contestOdds(o.total) * 100) + "% to win" : pct(o.total)})<\/option>`).join("")}<\/select>`;
   else h += `<span class="small muted">Its crew: 14 (${pct(14)})<\/span>`;
   const hp0 = opts.length && opts[0].helper ? officer(opts[0].helper).short : "";
   h += `<button class="btn primary small" data-act="${enc}">Roll<\/button><\/div>`;
   if (opts.length) h += `<label class="chip small" data-assist-wrap style="margin-top:6px;border-radius:8px" ${hp0 ? "" : "hidden"}><input type="checkbox" data-assist><span><b data-helper-name>${esc(hp0)}<\/b> assists: +1, and it uses their turn<\/span><\/label>`;
-  return h + `${opts.length ? `${a.how ? `<div class="small" data-how-for style="margin-top:6px">${esc(howLine(a, opts[0].skill))}<\/div>` : ""}<div class="parts" data-breakdown-for>${esc(breakdown(opts[0]))}<\/div>` : ""}<\/div>`;
+  return h + `${opts.length ? `${a.how ? `<div class="small" data-how-for style="margin-top:6px">${esc(howLine(a, opts[0].skill))}<\/div>` : ""}<div class="parts" data-breakdown-for>${esc(breakdown(opts[0], a))}<\/div>` : ""}<\/div>`;
 }
 const diceHTML = (r) => `<span class="dice">${r.dice.map((d) => `<span class="die">${d}<\/span>`).join("")}<\/span>`;
 function pendingHTML() {
@@ -2203,7 +2251,7 @@ function awayHTML() {
   const A = S.arc;
   let h = `<h2>Away team: Corvan II<\/h2>`;
   if (A.stage === "orbit") h += `<p class="small muted">In orbit. Nobody has gone down yet: sweep the ruins with the ship's sensors first (the Here tab).<\/p>`;
-  else h += `<div class="kv small"><span>Countdown<\/span><span>${boxes(A.countdown, COUNTDOWN)} the Pelion breaks orbit when it fills<\/span><span>Clues<\/span><span>${boxes(cluesFound(A), CLOCK, "blue")} ${A.theory ? "Sevek's theory: a caretaker" : cluesFound(A) >= THEORY_AT ? "enough for Sevek's theory" : `Sevek needs ${THEORY_AT} for a theory`}<\/span><span>Stage<\/span><span>${{ pull: "Investigating", orions: "The Orion diggers", caretaker: "The caretaker" }[A.stage]}<\/span><\/div>`;
+  else h += `<div class="kv small"><span>Countdown<\/span><span>${boxes(A.countdown, COUNTDOWN)} the Pelion breaks orbit when it fills<\/span><span>Clues<\/span><span>${boxes(cluesFound(A), CLOCK, "blue")} ${A.theory ? (A.stage === "caretaker" ? "the caretaker found" : "Sevek's theory: a guardian") : cluesFound(A) >= THEORY_AT ? "enough for Sevek's theory" : `Sevek needs ${THEORY_AT} for a theory`}<\/span><span>Stage<\/span><span>${{ pull: "Investigating", orions: "The Orion diggers", caretaker: "The caretaker" }[A.stage]}<\/span><\/div>`;
   h += `<h3>Who's down there<\/h3>`;
   if (!A.team) h += `<p class="small muted">${A.stage === "orbit" ? "No one yet." : "No one: choose an away team on the Here tab."}<\/p>`;
   else {

@@ -5,7 +5,7 @@ import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, of
   speedOf, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
-import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound } from "./arc.js";
+import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound, contestOdds } from "./arc.js";
 import { kindName } from "./ai.js";
 import { RADIUS, inZone } from "./sector.js";
 
@@ -23,7 +23,7 @@ const U = () => (unit === "pelion" ? S.pelion : S.support[unit]) || (unit = "pel
 // ---------- start ----------
 function debugHook() {
   try { if (!/[?&]debug\b/.test(location.search)) return; } catch { return; }
-  window.__pelion = { state: () => S, screenOf: (hex) => { const c = $("map"), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
+  window.__pelion = { state: () => S, render: () => renderAll(), screenOf: (hex) => { const c = $("map"), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
 }
 function boot() { bindMap(); bindChrome(); debugHook(); showStarter(!!store.get()); }
 function startGame(state) {
@@ -238,7 +238,7 @@ function drawSurface(ctx, W, H) {
   const notes = {
     outpost: [["Outpost logs", A.clues.logs], ["Empty bunks", A.clues.bunks]],
     ruins: [["The ruins' energy", A.clues.energy]].concat(A.stage === "orions" ? [["3 Orion pirates digging", "danger"]] : []),
-    core: [].concat(A.theory ? [[A.stage === "caretaker" ? "The caretaker" : "The caretaker (Sevek's theory)", A.stage === "caretaker" ? "danger" : "info"]] : [["Unknown", null]], A.podsSeen ? [["8 scientists in stasis pods", "info"]] : A.theory && A.readings ? [["8 life signs below", "info"]] : []),
+    core: [].concat(A.theory ? [[A.stage === "caretaker" ? "The caretaker" : "Something watching over the Ketari (Sevek's theory)", A.stage === "caretaker" ? "danger" : "info"]] : [["Unknown", null]], A.podsSeen ? [["8 scientists in stasis pods", "info"]] : A.theory && A.readings ? [["8 life signs below", "info"]] : []),
     blind: [["The village, observed", A.clues.village]],
     village: A.clues.village ? [["Armed with Orion phasers", "danger"]] : [],
   };
@@ -282,7 +282,7 @@ function drawSurface(ctx, W, H) {
   ctx.fillStyle = "#f2c14e"; ctx.font = "700 14px Antonio, system-ui, sans-serif"; ctx.fillText("CORVAN II · SURFACE", R.x + 22, R.y + 30);
   ctx.fillStyle = "#e6e8f2"; ctx.font = "12px system-ui, sans-serif";
   ctx.fillText(`The Pelion in orbit · Countdown ${A.countdown}/${COUNTDOWN}`, R.x + 22, R.y + 48);
-  ctx.fillText(`Clues ${cluesFound(A)}/${CLOCK}${A.theory ? " · Sevek's theory: a caretaker" : cluesFound(A) >= THEORY_AT ? " · Sevek can form a theory" : ""} · Click a place`, R.x + 22, R.y + 64);
+  ctx.fillText(`Clues ${cluesFound(A)}/${CLOCK}${A.theory ? " · Sevek's theory: a guardian" : cluesFound(A) >= THEORY_AT ? " · Sevek can form a theory" : ""} · Click a place`, R.x + 22, R.y + 64);
 }
 function clickSurface(mx, my) {
   if (!surfaceBox) return;
@@ -394,10 +394,10 @@ function teamLine() {
     <div class="roll-row"><button class="btn small" data-beamup="1">Beam them up (choose again)</button></div></div>`;
 }
 /** "Computers 18 · Something here is wrong −2 · Sevek assists +1 = 17 (98%)": how a target is made. */
-function breakdown(o) {
+function breakdown(o, a) {
   const [first, ...rest] = o.parts;
   const sign = (v) => (v >= 0 ? "+" : "−") + Math.abs(v);
-  return `${o.skill} ${first[1]}${rest.map(([n, v]) => ` · ${n} ${sign(v)}`).join("")} = ${o.total}, ${pct(o.total)} to succeed`;
+  return `${o.skill} ${first[1]}${rest.map(([n, v]) => ` · ${n} ${sign(v)}`).join("")} = ${o.total}, ${a && a.contest ? `${Math.round(contestOdds(o.total) * 100)}% to win the argument` : `${pct(o.total)} to succeed`}`;
 }
 /** The card's lines for the officer picked: how the skill is used, who could assist, and the target with or without them. */
 function refreshCard(card) {
@@ -413,18 +413,18 @@ function actionCard(a) {
   if (a.id === "beam") return beamCard(a);
   const tone = a.id === "engage" ? "red" : a.id === "mission" || a.id === "arc" ? "gold" : a.id === "envoy" ? "green" : "";
   const enc = esc(JSON.stringify({ id: a.id, order: a.order, enemy: a.enemy, arc: a.arc }));
-  let h = `<div class="card ${tone}"><h4>${a.bridge ? "Bridge: " : a.who && a.id === "arc" && a.arc !== "time" && a.arc !== "theory" && a.arc !== "scan" ? "" : ""}${esc(a.name)}</h4><div class="small muted">${esc(a.blurb || "")}</div>`;
+  let h = `<div class="card ${tone}"><h4>${a.bridge ? "Bridge: " : a.who && a.id === "arc" && a.arc !== "time" && a.arc !== "theory" && a.arc !== "scan" ? "" : ""}${esc(a.name)}</h4><div class="small muted">${esc(a.blurb || "")}</div>${a.paradox ? `<div class="small" style="margin-top:6px"><b>The paradox:</b> ${esc(a.paradox)}</div>` : ""}`;
   if (a.why) return h + `<div class="why">${esc(a.why)}</div></div>`;
   if (a.id === "engage") return h + `<div class="roll-row"><button class="btn red small" data-act="${enc}">Engage</button></div></div>`;
   const opts = optionsFor(a);
   if (unit === "pelion" && !opts.length) return h + `<div class="why">No one free has the training.</div></div>`;
   h += `<div class="roll-row">`;
-  if (opts.length) h += `<select data-who aria-label="Who does it">${opts.map((o, i) => `<option value="${o.officer}|${o.skill}" data-breakdown="${esc(breakdown(o))}" data-breakdown-assist="${esc(breakdown(o.assisted))}" data-helper="${o.helper ? esc(officer(o.helper).short) : ""}" data-how="${esc(howLine(a, o.skill))}" ${i === 0 ? "selected" : ""}>${esc(officer(o.officer).short)} · ${esc(o.skill)} ${o.total} (${pct(o.total)})</option>`).join("")}</select>`;
+  if (opts.length) h += `<select data-who aria-label="Who does it">${opts.map((o, i) => `<option value="${o.officer}|${o.skill}" data-breakdown="${esc(breakdown(o, a))}" data-breakdown-assist="${esc(breakdown(o.assisted, a))}" data-helper="${o.helper ? esc(officer(o.helper).short) : ""}" data-how="${esc(howLine(a, o.skill))}" ${i === 0 ? "selected" : ""}>${esc(officer(o.officer).short)} · ${esc(o.skill)} ${o.total} (${a.contest ? Math.round(contestOdds(o.total) * 100) + "% to win" : pct(o.total)})</option>`).join("")}</select>`;
   else h += `<span class="small muted">Its crew: 14 (${pct(14)})</span>`;
   const hp0 = opts.length && opts[0].helper ? officer(opts[0].helper).short : "";
   h += `<button class="btn primary small" data-act="${enc}">Roll</button></div>`;
   if (opts.length) h += `<label class="chip small" data-assist-wrap style="margin-top:6px;border-radius:8px" ${hp0 ? "" : "hidden"}><input type="checkbox" data-assist><span><b data-helper-name>${esc(hp0)}</b> assists: +1, and it uses their turn</span></label>`;
-  return h + `${opts.length ? `${a.how ? `<div class="small" data-how-for style="margin-top:6px">${esc(howLine(a, opts[0].skill))}</div>` : ""}<div class="parts" data-breakdown-for>${esc(breakdown(opts[0]))}</div>` : ""}</div>`;
+  return h + `${opts.length ? `${a.how ? `<div class="small" data-how-for style="margin-top:6px">${esc(howLine(a, opts[0].skill))}</div>` : ""}<div class="parts" data-breakdown-for>${esc(breakdown(opts[0], a))}</div>` : ""}</div>`;
 }
 const diceHTML = (r) => `<span class="dice">${r.dice.map((d) => `<span class="die">${d}</span>`).join("")}</span>`;
 function pendingHTML() {
@@ -487,7 +487,7 @@ function awayHTML() {
   const A = S.arc;
   let h = `<h2>Away team: Corvan II</h2>`;
   if (A.stage === "orbit") h += `<p class="small muted">In orbit. Nobody has gone down yet: sweep the ruins with the ship's sensors first (the Here tab).</p>`;
-  else h += `<div class="kv small"><span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} the Pelion breaks orbit when it fills</span><span>Clues</span><span>${boxes(cluesFound(A), CLOCK, "blue")} ${A.theory ? "Sevek's theory: a caretaker" : cluesFound(A) >= THEORY_AT ? "enough for Sevek's theory" : `Sevek needs ${THEORY_AT} for a theory`}</span><span>Stage</span><span>${{ pull: "Investigating", orions: "The Orion diggers", caretaker: "The caretaker" }[A.stage]}</span></div>`;
+  else h += `<div class="kv small"><span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} the Pelion breaks orbit when it fills</span><span>Clues</span><span>${boxes(cluesFound(A), CLOCK, "blue")} ${A.theory ? (A.stage === "caretaker" ? "the caretaker found" : "Sevek's theory: a guardian") : cluesFound(A) >= THEORY_AT ? "enough for Sevek's theory" : `Sevek needs ${THEORY_AT} for a theory`}</span><span>Stage</span><span>${{ pull: "Investigating", orions: "The Orion diggers", caretaker: "The caretaker" }[A.stage]}</span></div>`;
   h += `<h3>Who's down there</h3>`;
   if (!A.team) h += `<p class="small muted">${A.stage === "orbit" ? "No one yet." : "No one: choose an away team on the Here tab."}</p>`;
   else {
