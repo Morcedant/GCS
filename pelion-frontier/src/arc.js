@@ -12,6 +12,15 @@ const CLUES = {
   village: { name: "The Ketari village", skills: ["Psychology", "Stealth"], found: "Ketari carrying Orion phasers. The chieftain's people dig at the ruins by night." },
 };
 export const COUNTDOWN = 6, CLOCK = 4;
+/** The surface of Corvan II, for the planetary map: places (x, y from 0 to 1 across the map) and where each action happens. */
+export const SITES = {
+  outpost: { name: "The outpost", sub: "Federation research station: beam-in point", x: 0.24, y: 0.58 },
+  ruins: { name: "The ruins", sub: "An extinct civilization's city", x: 0.58, y: 0.42 },
+  core: { name: "The caretaker's chamber", sub: "Deep in the ruins", x: 0.66, y: 0.22 },
+  blind: { name: "The duck blind", sub: "A hidden post above the village", x: 0.70, y: 0.66 },
+  village: { name: "The Ketari village", sub: "Bronze age; two kilometers from the ruins", x: 0.86, y: 0.78 },
+};
+export const SITE_OF = { "clue-logs": "outpost", "clue-bunks": "outpost", "clue-energy": "ruins", "clue-village": "blind", stun: "ruins", kill: "ruins", shutdown: "core", reason: "core", leave: "village" };
 const arcOrder = (S) => S.orders.find((o) => o.arc);
 const raider = (S) => enemiesAt(S, S.systems[S.corvan].at).find((e) => e.goal === "arc");
 
@@ -42,6 +51,8 @@ export function arcActions(S) {
 
 export function arcStep(S, p) {
   const A = S.arc, r = p.roll, k = p.arc, who = officer(p.officer)?.short || "The away team";
+  // On the surface map, whoever did it is now where it happened.
+  if (A.team && SITE_OF[k] && A.team.includes(p.officer)) { A.pos = A.pos || {}; A.pos[p.officer] = SITE_OF[k]; }
   if (k === "scan") {
     if (r.success) { A.clock = 1; log(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. (Record 1/${CLOCK})`, "discovery"); }
     else log(S, `${who}'s sweep of the ruins at Corvan II: interference, and then the readings go strange.`);
@@ -143,7 +154,7 @@ export function beamDown(S, ids) {
   if (!ids || !ids.length) { if (A.team) log(S, `The away team (${A.team.map((id) => officer(id).short).join(", ")}) beams back aboard.`, "move"); A.team = null; return { ok: true }; }
   ids = [...new Set(ids)].filter((id) => available(S, id));
   if (ids.length < 2 || ids.length > 4) return { error: "An away team is two to four officers fit for duty." };
-  A.team = ids;
+  A.team = ids; A.pos = Object.fromEntries(ids.map((id) => [id, "outpost"]));
   log(S, `Away team: ${ids.map((id) => officer(id).name).join(", ")} beam down to the outpost on Corvan II. ${CREW.filter((c) => !ids.includes(c.id)).map((c) => c.short).join(", ")} stay${CREW.length - ids.length === 1 ? "s" : ""} aboard.`, "move");
   return { ok: true };
 }

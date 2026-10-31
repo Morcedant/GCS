@@ -26,6 +26,7 @@ button { font: inherit; color: inherit; }
 .map-wrap { position: relative; min-width: 0; min-height: 0; }
 #map { width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
 .map-tools { position: absolute; left: max(12px, env(safe-area-inset-left, 0px)); bottom: 12px; display: flex; gap: 6px; }
+.map-tools button[hidden], .map-hint[hidden] { display: none; }
 .map-tools button { min-width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--line); background: rgba(16, 18, 28, .92); cursor: pointer; font-size: 16px; padding: 0 10px; }
 .map-hint { position: absolute; right: 12px; bottom: 12px; font-size: 12px; color: var(--muted); background: rgba(16, 18, 28, .85); padding: 5px 9px; border-radius: 6px; pointer-events: none; }
 .side { background: var(--panel); border-left: 1px solid var(--line); display: grid; grid-template-rows: auto 1fr auto; min-height: 0; }
@@ -113,7 +114,7 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
   </header>
   <div class="map-wrap">
     <canvas id="map" aria-label="The Corvan Sector"></canvas>
-    <div class="map-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="find" aria-label="Center on the Pelion">Pelion</button><button id="fit" aria-label="Show the whole sector">Sector</button></div>
+    <div class="map-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="find" aria-label="Center on the Pelion">Pelion</button><button id="fit" aria-label="Show the whole sector">Sector</button><button id="surface" hidden>Corvan II surface</button></div>
     <div class="map-hint">Click a hex to look · double-click (or right-click) to move there</div>
   </div>
   <aside class="side">

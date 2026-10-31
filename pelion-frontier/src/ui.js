@@ -5,7 +5,7 @@ import { newGame, stardate, sysAt, officer, available, skillOf, target, bestOffi
   speedOf, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
-import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown } from "./arc.js";
+import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF } from "./arc.js";
 import { kindName } from "./ai.js";
 import { RADIUS, inZone } from "./sector.js";
 
@@ -15,6 +15,7 @@ const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const pct = (t) => Math.round(chance(t) * 100) + "%";
 const store = { get: () => { try { return localStorage.getItem(SAVE_KEY); } catch { return null; } }, set: (v) => { try { localStorage.setItem(SAVE_KEY, v); } catch {} }, clear: () => { try { localStorage.removeItem(SAVE_KEY); } catch {} } };
 
+let mapMode = "sector";   // "sector", or "surface": the planetary map of Corvan II while an away team is down
 let S = null, unit = "pelion", selHex = null, tab = "here", lastResult = null, eventResult = null, bchoice = null, hoverHex = null;
 const view = { x: 0, y: 0, zoom: 1, size: 28 };
 const U = () => (unit === "pelion" ? S.pelion : S.support[unit]) || (unit = "pelion", S.pelion);
@@ -61,6 +62,7 @@ function bindMap() {
   });
   c.addEventListener("pointerup", (e) => {
     const d = drag; drag = null; if (!S || moved || !d) return;
+    if (mapMode === "surface") { const r = c.getBoundingClientRect(); clickSurface(e.clientX - r.left, e.clientY - r.top); return; }
     const hex = screenToHex(e.clientX, e.clientY); if (!S.hexes[hex]) return;
     const now = Date.now(), dbl = hex === lastHex && now - lastTap < 400; lastTap = now; lastHex = hex;
     if (d.button === 2 || dbl) { goTo(hex); return; }
@@ -96,6 +98,8 @@ function draw() {
   if (c.width !== Math.round(W * dpr) || c.height !== Math.round(H * dpr)) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
   const ctx = c.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.fillStyle = "#05060a"; ctx.fillRect(0, 0, W, H);
+  syncSurface();
+  if (mapMode === "surface") { drawSurface(ctx, W, H); return; }
   if (!stars) stars = Array.from({ length: 240 }, () => [Math.random(), Math.random(), Math.random()]);
   for (const [sx, sy, b] of stars) { ctx.fillStyle = `rgba(210,215,255,${0.15 + b * 0.5})`; ctx.fillRect(sx * W, sy * H, b > 0.85 ? 2 : 1, b > 0.85 ? 2 : 1); }
   ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(view.zoom, view.zoom); ctx.translate(-view.x, -view.y);
@@ -147,10 +151,126 @@ function draw() {
     icon(x - 12 + i * 10, y - 15, POWERS[e.power].color, false, e.hostile ? "#ff5040" : null, e.revealed); }); }
   for (const s of Object.values(S.support)) { const { x, y } = toPixel(s.at, size); icon(x - 2, y + 15, "#6fb4ff", false, unit === s.id ? "#fff" : null); }
   { const { x, y } = toPixel(S.pelion.at, size); icon(x + 4, y - 2, "#f2c14e", true, unit === "pelion" ? "#fff" : null); }
+  // The away team on Corvan II: a small figure for each officer on the surface, in their division's color, under the world.
+  const A = S.arc;
+  if (A.team && ["pull", "orions", "caretaker"].includes(A.stage)) {
+    const { x, y } = toPixel(S.systems[S.corvan].at, size), n = A.team.length, w = 13;
+    const DIVCOL = { shvari: "#f2c14e", sevek: "#6fb4ff", vessik: "#6fb4ff", grath: "#e0564a", reyes: "#e0564a", rrinn: "#e0564a" };
+    const x0 = x - ((n - 1) * w) / 2, y0 = y + 36;   // below the world's name
+    ctx.fillStyle = "rgba(5,6,10,.8)"; ctx.strokeStyle = "rgba(242,193,78,.85)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x0 - 10, y0 - 10, (n - 1) * w + 20, 22, 6) : ctx.rect(x0 - 10, y0 - 10, (n - 1) * w + 20, 22); ctx.fill(); ctx.stroke();
+    A.team.forEach((id, i) => {
+      const px = x0 + i * w, hurt = !available(S, id);
+      ctx.globalAlpha = hurt ? 0.35 : 1; ctx.fillStyle = DIVCOL[id] || "#ccc";
+      ctx.beginPath(); ctx.arc(px, y0 - 4, 3.4, 0, Math.PI * 2); ctx.fill();             // head
+      ctx.beginPath(); ctx.moveTo(px - 4.4, y0 + 8); ctx.lineTo(px, y0); ctx.lineTo(px + 4.4, y0 + 8); ctx.closePath(); ctx.fill();  // body
+      ctx.globalAlpha = 1;
+    });
+    if (view.zoom > 0.75) { ctx.fillStyle = "#f2c14e"; ctx.font = "600 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillText("Away team: " + A.team.map((id) => officer(id).short).join(", "), x, y0 + 25); ctx.textAlign = "left"; }
+  }
   if (selHex) { const { x, y } = toPixel(selHex, size); hexPath(ctx, x, y, size - 1); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke(); }
   if (hoverHex && S.hexes[hoverHex] && hoverHex !== selHex) { const { x, y } = toPixel(hoverHex, size); hexPath(ctx, x, y, size - 1); ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 1; ctx.stroke(); }
   ctx.restore();
 }
+
+// ---------- the planetary map: Corvan II's surface, while an away team is down ----------
+const surfaceUp = () => S && S.arc.team && ["pull", "orions", "caretaker"].includes(S.arc.stage) && S.pelion.at === S.systems[S.corvan].at;
+/** Keep the map mode honest: no surface map without an away team on it; the button shows when there is one. */
+function syncSurface() {
+  const up = surfaceUp();
+  if (!up && mapMode === "surface") mapMode = "sector";
+  const b = $("surface"); if (b) { b.hidden = !up; b.textContent = mapMode === "surface" ? "Sector map" : "Corvan II surface"; }
+  for (const id of ["zoom-in", "zoom-out", "find", "fit"]) { const x = $(id); if (x) x.hidden = mapMode === "surface"; }
+  const hintEl = document.querySelector(".map-hint"); if (hintEl) hintEl.hidden = mapMode === "surface";
+}
+const DIVCOL = { shvari: "#f2c14e", sevek: "#6fb4ff", vessik: "#6fb4ff", grath: "#e0564a", reyes: "#e0564a", rrinn: "#e0564a" };
+let surfaceBox = null;
+function surfaceRect(W, H) { const m = 18, w = W - 2 * m, h = H - 2 * m; return { x: m, y: m, w, h }; }
+function drawSurface(ctx, W, H) {
+  const A = S.arc, R = surfaceRect(W, H); surfaceBox = R;
+  const small = R.w < 560;   // a phone: smaller type, no subtitles, the status box in the bottom corner
+  const P = (sx, sy) => ({ x: R.x + sx * R.w, y: R.y + sy * R.h });
+  // The land: a dusk-lit valley. Grassland, hills, a river, a forest between the ruins and the village.
+  const g = ctx.createLinearGradient(0, R.y, 0, R.y + R.h); g.addColorStop(0, "#26331f"); g.addColorStop(1, "#1a2417");
+  ctx.fillStyle = g; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(R.x, R.y, R.w, R.h, 14) : ctx.rect(R.x, R.y, R.w, R.h); ctx.fill();
+  ctx.save(); ctx.clip();
+  const hill = (sx, sy, rx, ry, c) => { const p = P(sx, sy); ctx.fillStyle = c; ctx.beginPath(); ctx.ellipse(p.x, p.y, rx * R.w, ry * R.h, 0, 0, Math.PI * 2); ctx.fill(); };
+  hill(0.12, 0.18, 0.16, 0.14, "#2f3d27"); hill(0.45, 0.12, 0.2, 0.12, "#31402a"); hill(0.9, 0.2, 0.14, 0.18, "#2c3a25"); hill(0.4, 0.9, 0.25, 0.12, "#22301d");
+  // The river.
+  ctx.strokeStyle = "#2f5f80"; ctx.lineWidth = Math.max(4, R.w * 0.012); ctx.lineCap = "round"; ctx.beginPath();
+  let p = P(0.38, 0); ctx.moveTo(p.x, p.y); const q1 = P(0.30, 0.35), q2 = P(0.46, 0.62), e1 = P(0.42, 1); ctx.bezierCurveTo(q1.x, q1.y, q2.x, q2.y, e1.x, e1.y); ctx.stroke();
+  // Forest.
+  for (let i = 0; i < 70; i++) { const fx = 0.62 + ((i * 37) % 23) / 100, fy = 0.5 + ((i * 53) % 29) / 100; if (Math.hypot(fx - 0.7, fy - 0.66) < 0.05 || Math.hypot(fx - 0.86, fy - 0.78) < 0.06) continue; const t = P(fx, fy); ctx.fillStyle = i % 3 ? "#203a1f" : "#284526"; ctx.beginPath(); ctx.arc(t.x, t.y, 4 + (i % 4), 0, Math.PI * 2); ctx.fill(); }
+  // The ruins: broken walls around a plaza.
+  const ru = P(SITES.ruins.x, SITES.ruins.y), sw = R.w * 0.11, sh = R.h * 0.14;
+  ctx.strokeStyle = "#8a8578"; ctx.lineWidth = 3;
+  for (const [a, b, c2, d] of [[-1, -1, 0.2, -1], [0.5, -1, 1, -1], [1, -1, 1, 0.3], [1, 0.7, 1, 1], [-1, 1, 0.4, 1], [-1, -1, -1, 0.1], [-1, 0.5, -1, 1]]) { ctx.beginPath(); ctx.moveTo(ru.x + a * sw / 2, ru.y + b * sh / 2); ctx.lineTo(ru.x + c2 * sw / 2, ru.y + d * sh / 2); ctx.stroke(); }
+  // The village: huts.
+  const vi = P(SITES.village.x, SITES.village.y);
+  for (let i = 0; i < 9; i++) { const a = (i / 9) * Math.PI * 2; ctx.fillStyle = "#8a6a44"; ctx.beginPath(); ctx.arc(vi.x + Math.cos(a) * 26, vi.y + Math.sin(a) * 16, 5, 0, Math.PI * 2); ctx.fill(); }
+  // Paths between the places.
+  ctx.setLineDash([5, 5]); ctx.strokeStyle = "rgba(230,220,190,.35)"; ctx.lineWidth = 1.5;
+  for (const [a, b] of [["outpost", "ruins"], ["ruins", "core"], ["ruins", "blind"], ["blind", "village"]]) { const u = P(SITES[a].x, SITES[a].y), v = P(SITES[b].x, SITES[b].y); ctx.beginPath(); ctx.moveTo(u.x, u.y); ctx.lineTo(v.x, v.y); ctx.stroke(); }
+  ctx.setLineDash([]);
+  // What's known at each place.
+  const notes = {
+    outpost: [["Outpost logs", A.clues.logs], ["Empty bunks", A.clues.bunks]],
+    ruins: [["The ruins' energy", A.clues.energy]].concat(A.stage === "orions" ? [["3 Orion pirates digging", "danger"]] : []),
+    core: A.stage === "caretaker" ? [["The caretaker", "danger"], ["8 scientists in stasis", "info"]] : A.clock >= CLOCK ? [["8 scientists in stasis", "info"]] : [["Unknown", null]],
+    blind: [["The village, observed", A.clues.village]],
+    village: A.clues.village ? [["Armed with Orion phasers", "danger"]] : [],
+  };
+  for (const [k, site] of Object.entries(SITES)) {
+    const s = P(site.x, site.y);
+    ctx.fillStyle = k === "core" && A.stage !== "caretaker" && A.clock < CLOCK ? "rgba(120,120,130,.8)" : "#f2c14e"; ctx.strokeStyle = "#05060a"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(s.x, s.y, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.textAlign = "center"; ctx.fillStyle = "#f3efe2"; ctx.font = `700 ${small ? 11 : 13}px Antonio, system-ui, sans-serif`; ctx.fillText((small ? site.name.replace(/^The /, "") : site.name).toUpperCase(), s.x, s.y - 12);
+    ctx.fillStyle = "rgba(230,225,210,.7)"; ctx.font = `${small ? 10 : 11}px system-ui, sans-serif`;
+    if (!small) ctx.fillText(site.sub, s.x, s.y + 22);
+    (notes[k] || []).forEach(([t, st], i) => { const ny = s.y + (small ? 20 : 36) + i * (small ? 11 : 13);
+      ctx.fillStyle = st === "danger" ? "#ff9a8f" : st === "info" ? "#a8d4ff" : st ? "#9fe0a2" : "rgba(230,225,210,.55)";
+      ctx.fillText(`${st === true ? "✓ " : st === "danger" ? "! " : st === "info" ? "" : "· "}${t}`, s.x, ny);
+    });
+    ctx.textAlign = "left";
+  }
+  // The away team, where each last acted.
+  const at = {}; for (const id of A.team) { const k = (A.pos && A.pos[id]) || "outpost"; (at[k] = at[k] || []).push(id); }
+  for (const [k, ids] of Object.entries(at)) {
+    const s = P(SITES[k].x, SITES[k].y), w = small ? 34 : 44, x0 = s.x - ((ids.length - 1) * w) / 2, y0 = s.y - (small ? 50 : 64);   // above the place's name
+    ids.forEach((id, i) => {
+      const px = x0 + i * w, hurt = !available(S, id);
+      ctx.globalAlpha = hurt ? 0.4 : 1; ctx.fillStyle = DIVCOL[id] || "#ccc"; ctx.strokeStyle = "#05060a"; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(px, y0 - 6, 4.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(px - 6, y0 + 9); ctx.lineTo(px, y0 - 1); ctx.lineTo(px + 6, y0 + 9); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = "#fff"; ctx.font = "600 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillText(officer(id).short + (hurt ? " (sickbay)" : ""), px, y0 + 21); ctx.textAlign = "left";
+      ctx.globalAlpha = 1;
+    });
+  }
+  ctx.restore();
+  // The ship overhead.
+  ctx.fillStyle = "rgba(16,18,28,.92)"; ctx.strokeStyle = "rgba(242,193,78,.7)"; ctx.lineWidth = 1;
+  if (small) {
+    const bx = R.x + R.w - 158, by = R.y + R.h - 44;
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(bx, by, 150, 36, 8) : ctx.rect(bx, by, 150, 36); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#f2c14e"; ctx.font = "700 11px Antonio, system-ui, sans-serif"; ctx.fillText("CORVAN II · SURFACE", bx + 10, by + 15);
+    ctx.fillStyle = "#e6e8f2"; ctx.font = "10px system-ui, sans-serif"; ctx.fillText(`Countdown ${A.countdown}/${COUNTDOWN} · Record ${A.clock}/${CLOCK}`, bx + 10, by + 29);
+    return;
+  }
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(R.x + 10, R.y + 10, 250, 64, 8) : ctx.rect(R.x + 10, R.y + 10, 250, 64); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#f2c14e"; ctx.font = "700 14px Antonio, system-ui, sans-serif"; ctx.fillText("CORVAN II · SURFACE", R.x + 22, R.y + 30);
+  ctx.fillStyle = "#e6e8f2"; ctx.font = "12px system-ui, sans-serif";
+  ctx.fillText(`The Pelion in orbit · Countdown ${A.countdown}/${COUNTDOWN}`, R.x + 22, R.y + 48);
+  ctx.fillText(`Record ${A.clock}/${CLOCK} · Click a place to see what to do`, R.x + 22, R.y + 64);
+}
+function clickSurface(mx, my) {
+  if (!surfaceBox) return;
+  const R = surfaceBox;
+  const hit = Object.entries(SITES).map(([k, s]) => ({ k, s, d: Math.hypot(R.x + s.x * R.w - mx, R.y + s.y * R.h - my) })).sort((a, b) => a.d - b.d)[0];
+  if (!hit || hit.d > 60) return;
+  selHex = S.systems[S.corvan].at; tab = "here"; lastResult = null; surfaceSite = hit.k; renderTabs(); renderPanel(); draw();
+  toast(`${hit.s.name}: ${hit.s.sub}.`);
+}
+let surfaceSite = null;
 
 // ---------- the bar and the tabs ----------
 const boxes = (n, max, cls = "") => `<span class="boxes ${cls}">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>`;
@@ -215,7 +335,10 @@ function hereHTML() {
   h += `<h3>${unit === "pelion" ? "The Pelion's action this turn" : `The ${esc(u.name)}'s action`}</h3>`;
   if (!acts.length) h += `<p class="muted small">Nothing to do here. Fly somewhere: double-click a hex.</p>`;
   h += teamLine();
-  for (const a of [...acts.filter((x) => x.id === "beam"), ...acts.filter((x) => x.id !== "beam")]) h += actionCard(a);
+  // On the surface map, the place clicked comes first.
+  const atSite = (a) => mapMode === "surface" && surfaceSite && SITE_OF[a.arc] === surfaceSite;
+  if (acts.some(atSite)) h += `<p class="small gold">At ${esc(SITES[surfaceSite].name.toLowerCase())}:</p>`;
+  for (const a of [...acts.filter((x) => x.id === "beam"), ...acts.filter(atSite), ...acts.filter((x) => x.id !== "beam" && !atSite(x))]) h += actionCard(a);
   return h;
 }
 function optionsFor(a) {
@@ -360,7 +483,7 @@ function bindChrome() {
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b || !S) return;
     if (b.dataset.logf) { logFilter = b.dataset.logf; renderPanel(); return; }
-    if (b.dataset.beam) { const ids = [...b.closest(".card").querySelectorAll("[data-away]:checked")].map((x) => x.dataset.away); const r = beamDown(S, ids); if (r.error) toast(r.error, true); after(); return; }
+    if (b.dataset.beam) { const ids = [...b.closest(".card").querySelectorAll("[data-away]:checked")].map((x) => x.dataset.away); const r = beamDown(S, ids); if (r.error) toast(r.error, true); else mapMode = "surface"; after(); return; }
     if (b.dataset.beamup) { beamDown(S, []); after(); return; }
     if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }
     if (b.dataset.go) { selHex = b.dataset.go; goTo(b.dataset.go); return; }
@@ -381,7 +504,8 @@ function bindChrome() {
   $("end-turn").onclick = doEndTurn;
   $("menu").onclick = showMenu;
   $("zoom-in").onclick = () => zoomBy(1.25); $("zoom-out").onclick = () => zoomBy(0.8);
-  $("fit").onclick = () => { fitView(); draw(); };
+  $("fit").onclick = () => { mapMode = "sector"; fitView(); draw(); };
+  $("surface").onclick = () => { mapMode = mapMode === "surface" ? "sector" : "surface"; draw(); };
   $("find").onclick = () => { unit = "pelion"; centerOn(S.pelion.at); selHex = S.pelion.at; tab = "here"; renderAll(); };
   document.addEventListener("keydown", (e) => {
     if (!S || !$("modal").hidden || /input|select|textarea/i.test(e.target.tagName)) return;
