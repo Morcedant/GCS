@@ -1,0 +1,1939 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>
+<title>USS Pelion: Frontier</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="A turn-based hex strategy game for the USS Pelion fan game: command the Pelion on a tour of a frontier sector.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Antonio:wght@500;700&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+/* A bridge console: the sector map fills the screen, a status bar runs across the top, and the side panel holds what's
+   here, the ship, the crew, the orders, the sector and the log. One dark look, in the divisions' gold, blue and red. */
+:root { color-scheme: dark;
+  --bg: #07080d; --panel: #10121c; --panel-2: #181b29; --line: rgba(160, 170, 210, .2); --ink: #e6e8f2; --muted: #9aa0b8;
+  --gold: #f2c14e; --gold-ink: #1a1405; --blue: #6fb4ff; --red: #e0564a; --green: #7bc47f; --violet: #c9a8ff;
+  --display: "Antonio", "Arial Narrow", system-ui, sans-serif; --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 var(--body); margin: 0; overflow: hidden; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); }
+button { font: inherit; color: inherit; }
+#app { position: fixed; inset: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px) 0; display: grid; grid-template-rows: auto 1fr; grid-template-columns: 1fr 400px; }
+#app[hidden] { display: none; }
+.bar { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 8px max(14px, env(safe-area-inset-right, 0px)) 8px max(14px, env(safe-area-inset-left, 0px)); background: var(--panel); border-bottom: 3px solid var(--gold); }
+#bar-ship { font: 700 18px var(--display); letter-spacing: .06em; text-transform: uppercase; color: var(--gold); }
+#bar-stats { display: flex; flex-wrap: wrap; gap: 4px 16px; flex: 1 1 auto; min-width: 0; font-variant-numeric: tabular-nums; align-items: center; }
+#bar-stats b { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-right: 5px; }
+#bar-turn { font: 600 14px var(--display); color: var(--muted); letter-spacing: .04em; }
+.boxes { display: inline-flex; gap: 3px; vertical-align: -2px; } .boxes i { width: 11px; height: 11px; border: 1.5px solid var(--muted); border-radius: 2px; display: inline-block; }
+.boxes i.on { background: var(--red); border-color: var(--red); } .boxes.blue i.on { background: var(--blue); border-color: var(--blue); } .boxes.gold i.on { background: var(--gold); border-color: var(--gold); }
+.map-wrap { position: relative; min-width: 0; min-height: 0; }
+#map { width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
+.map-tools { position: absolute; left: max(12px, env(safe-area-inset-left, 0px)); bottom: 12px; display: flex; gap: 6px; }
+.map-tools button { min-width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--line); background: rgba(16, 18, 28, .92); cursor: pointer; font-size: 16px; padding: 0 10px; }
+.map-hint { position: absolute; right: 12px; bottom: 12px; font-size: 12px; color: var(--muted); background: rgba(16, 18, 28, .85); padding: 5px 9px; border-radius: 6px; pointer-events: none; }
+.side { background: var(--panel); border-left: 1px solid var(--line); display: grid; grid-template-rows: auto 1fr auto; min-height: 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: 2px; padding: 8px 10px 0; border-bottom: 1px solid var(--line); }
+.tabs button { background: none; border: 0; border-bottom: 3px solid transparent; padding: 6px 9px; cursor: pointer; color: var(--muted); font: 600 15px var(--display); letter-spacing: .06em; text-transform: uppercase; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--gold); }
+.tabs button .badge { background: var(--red); color: #fff; border-radius: 8px; font: 700 10px var(--body); padding: 1px 5px; margin-left: 4px; vertical-align: 2px; }
+#panel { overflow-y: auto; padding: 12px 14px 20px; min-height: 0; }
+.side-foot { padding: 10px 14px; border-top: 1px solid var(--line); display: flex; gap: 8px; }
+h1, h2, h3 { font-family: var(--display); letter-spacing: .04em; margin: 0; text-wrap: balance; }
+h1 { font-size: 30px; margin-bottom: 8px; text-transform: uppercase; } h2 { font-size: 21px; margin-bottom: 4px; text-transform: uppercase; }
+h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .14em; color: var(--gold); margin: 16px 0 6px; }
+p { margin: 0 0 8px; } .muted { color: var(--muted); } .small { font-size: 12px; } .bad { color: #ff9a8f; } .good { color: var(--green); } .gold { color: var(--gold); }
+.btn { background: var(--panel-2); border: 1px solid var(--line); border-radius: 18px; padding: 8px 14px; cursor: pointer; font-weight: 600; }
+.btn:hover:not(:disabled) { border-color: var(--gold); }
+.btn.primary { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
+.btn.red { background: var(--red); border-color: var(--red); color: #fff; }
+.btn.small { padding: 5px 11px; font-size: 12px; } .btn.wide { width: 100%; margin-top: 6px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+#end-turn { flex: 1; font: 700 17px var(--display); letter-spacing: .1em; text-transform: uppercase; padding: 10px; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.card { background: var(--panel-2); border-radius: 10px; padding: 10px 12px; margin: 8px 0; border-left: 4px solid var(--blue); }
+.card.gold { border-left-color: var(--gold); } .card.red { border-left-color: var(--red); } .card.green { border-left-color: var(--green); } .card.violet { border-left-color: var(--violet); }
+.card h4 { margin: 0 0 4px; font: 700 16px var(--display); letter-spacing: .04em; text-transform: uppercase; }
+.card .why { color: #ffb0a6; font-size: 12px; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; align-items: center; font-variant-numeric: tabular-nums; }
+.kv span:nth-child(odd) { color: var(--muted); }
+.roll-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+select, input[type=text], textarea { background: #0b0d16; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; font: inherit; max-width: 100%; }
+textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospace; }
+.dice { display: inline-flex; gap: 4px; } .die { width: 26px; height: 26px; border-radius: 6px; background: #f3efe2; color: #111; display: inline-grid; place-items: center; font-weight: 700; }
+.result { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; background: #0c0e17; }
+.result.ok { border-color: rgba(123, 196, 127, .6); } .result.no { border-color: rgba(224, 86, 74, .6); }
+.parts { font-size: 12px; color: var(--muted); margin: 4px 0; }
+.tbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 13px; }
+.tbl th { text-align: left; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding: 4px; border-bottom: 1px solid var(--line); }
+.tbl td { padding: 5px 4px; border-bottom: 1px solid rgba(160,170,210,.08); vertical-align: top; } .tbl tr[data-hex] { cursor: pointer; } .tbl tr[data-hex]:hover td { background: var(--panel-2); }
+.meter { display: block; height: 6px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; margin: 4px 0; } .meter > span { display: block; height: 100%; }
+.crew { display: grid; gap: 8px; }
+.officer { background: var(--panel-2); border-radius: 10px; padding: 10px 12px; border-left: 4px solid var(--gold); }
+.officer.sci { border-left-color: var(--blue); } .officer.ops { border-left-color: var(--red); }
+.officer h4 { margin: 0; font: 700 16px var(--display); letter-spacing: .04em; text-transform: uppercase; }
+.skills { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 12px; color: var(--muted); margin-top: 4px; } .skills b { color: var(--ink); font-weight: 600; }
+.log { list-style: none; padding: 0; margin: 0; display: grid; gap: 5px; font-size: 13px; }
+.log .t { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 8px; } .log .war { color: #ffb0a6; } .log .bad { color: #ffb0a6; } .log .good { color: #b9e5bb; } .log .victory { color: var(--gold); } .log .order { color: #a8d4ff; }
+#modal { position: fixed; inset: 0; background: rgba(3, 4, 8, .84); display: grid; place-items: center; z-index: 20; padding: 16px; overflow-y: auto; }
+#modal[hidden] { display: none; }
+.modal-box { background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--gold); border-radius: 14px; max-width: 760px; width: 100%; box-sizing: border-box; padding: 22px max(16px, env(safe-area-inset-right, 0px)) 22px max(16px, env(safe-area-inset-left, 0px)); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+.modal-box h1 { font-size: clamp(26px, 5vw, 40px); color: var(--gold); }
+.lede { color: var(--muted); font-size: 15px; max-width: 62ch; }
+.ng-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 4px; }
+.ng-row label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.seed { font: 700 22px var(--display); letter-spacing: .08em; color: var(--gold); user-select: all; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; margin: 14px 0; }
+.brief { background: var(--panel-2); border-radius: 10px; padding: 12px; border-top: 3px solid var(--blue); } .brief h3 { margin-top: 0; } .brief p { font-size: 13px; color: #cfd3e3; margin: 0; }
+.brief:nth-child(3n+1) { border-top-color: var(--gold); } .brief:nth-child(3n+3) { border-top-color: var(--red); }
+/* The battle */
+.battle { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .battle { grid-template-columns: 1fr; } }
+.ship-card { background: var(--panel-2); border-radius: 10px; padding: 10px 12px; }
+.ship-card h4 { margin: 0 0 6px; font: 700 16px var(--display); text-transform: uppercase; letter-spacing: .04em; }
+.track { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); margin: 3px 0; } .track span:first-child { width: 72px; }
+.orders-choice { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.chip { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 16px; padding: 6px 11px; cursor: pointer; font-size: 13px; }
+.chip:has(input:checked) { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; } .chip input { accent-color: var(--gold); margin: 0; }
+.chip.off { opacity: .45; }
+.blog { max-height: 220px; overflow-y: auto; font-size: 13px; background: #0b0d16; border-radius: 8px; padding: 8px 10px; margin-top: 10px; display: grid; gap: 3px; }
+.toast { position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); max-width: min(560px, calc(100vw - 32px)); background: #1c2033; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; opacity: 0; pointer-events: none; transition: .25s; z-index: 30; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); } .toast.bad { border-color: var(--red); }
+@media (max-width: 820px) {
+  #app { grid-template-columns: 1fr; grid-template-rows: auto minmax(260px, 52vh) 1fr; }
+  .side { border-left: 0; border-top: 1px solid var(--line); }
+  body { overflow: auto; } .map-hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+
+<div id="app" hidden>
+  <header class="bar">
+    <span id="bar-ship">USS Pelion</span>
+    <span id="bar-stats"></span>
+    <span id="bar-turn"></span>
+    <button class="btn small" id="menu">Menu</button>
+  </header>
+  <div class="map-wrap">
+    <canvas id="map" aria-label="The Corvan Sector"></canvas>
+    <div class="map-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="find" aria-label="Center on the Pelion">Pelion</button><button id="fit" aria-label="Show the whole sector">Sector</button></div>
+    <div class="map-hint">Click a hex to look · double-click (or right-click) to move there</div>
+  </div>
+  <aside class="side">
+    <nav class="tabs" role="tablist"><button data-tab="here" role="tab">Here</button><button data-tab="ship" role="tab">Ship</button><button data-tab="crew" role="tab">Crew</button><button data-tab="orders" role="tab">Orders</button><button data-tab="sector" role="tab">Sector</button><button data-tab="log" role="tab">Log</button></nav>
+    <div id="panel"></div>
+    <div class="side-foot"><button class="btn primary" id="end-turn">End turn</button></div>
+  </aside>
+</div>
+<div id="modal" hidden><div class="modal-box" id="modal-body"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+"use strict";
+// ---- hex.js ----
+// Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
+// Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
+
+/** A seeded generator (mulberry32): the same seed always builds the same galaxy and rolls the same dice. */
+function makeRng(seed) {
+  let a = (typeof seed === "number" ? seed : hashString(String(seed))) >>> 0;
+  const next = () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  return {
+    next,
+    int: (n) => Math.floor(next() * n),
+    pick: (list) => list[Math.floor(next() * list.length)],
+    d6: () => 1 + Math.floor(next() * 6),
+    state: () => a,
+    setState: (s) => { a = s >>> 0; },
+  };
+}
+function hashString(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+
+const key = (q, r) => q + "," + r;
+const parse = (k) => { const [q, r] = k.split(",").map(Number); return { q, r }; };
+const DIRS = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];
+const neighbors = (k) => { const { q, r } = parse(k); return DIRS.map(([dq, dr]) => key(q + dq, r + dr)); };
+const distance = (a, b) => {
+  const A = parse(a), B = parse(b);
+  return (Math.abs(A.q - B.q) + Math.abs(A.q + A.r - B.q - B.r) + Math.abs(A.r - B.r)) / 2;
+};
+/** All hexes of a hexagonal map of this radius. */
+function hexagon(radius) {
+  const out = [];
+  for (let q = -radius; q <= radius; q++)
+    for (let r = Math.max(-radius, -q - radius); r <= Math.min(radius, -q + radius); r++) out.push(key(q, r));
+  return out;
+}
+const inMap = (k, radius) => distance(k, "0,0") <= radius;
+/** Pixel center of a hex of this size (pointy-top). */
+function toPixel(k, size) {
+  const { q, r } = parse(k);
+  return { x: size * Math.sqrt(3) * (q + r / 2), y: size * 1.5 * r };
+}
+/** The hex under a pixel. */
+function fromPixel(x, y, size) {
+  const q = ((Math.sqrt(3) / 3) * x - y / 3) / size, r = ((2 / 3) * y) / size;
+  let rx = Math.round(q), rz = Math.round(r), ry = Math.round(-q - r);
+  const dx = Math.abs(rx - q), dz = Math.abs(rz - r), dy = Math.abs(ry - (-q - r));
+  if (dx > dy && dx > dz) rx = -ry - rz; else if (dz > dy) rz = -rx - ry;
+  return key(rx, rz);
+}
+/** Hexes within n steps of k. */
+function within(k, n) {
+  const { q, r } = parse(k), out = [];
+  for (let dq = -n; dq <= n; dq++)
+    for (let dr = Math.max(-n, -dq - n); dr <= Math.min(n, -dq + n); dr++) out.push(key(q + dq, r + dr));
+  return out;
+}
+
+// ---- data.js ----
+// The numbers: the crew (from the Players' Guide's ready-made crew), the ships (from its ship registry and the GM's
+// Guide's enemy ships), what the Pelion can do at a system, the mission tables (the GM's Guide's mission seeds),
+// refits and library records.
+
+const TOUR = 50;                      // turns in the tour; a turn is a week
+const STARDATE0 = 5212.4;             // campaign year 2268
+
+/** The six ready-made crew. Skills are the targets from their sheets. */
+const CREW = [
+  { id: "shvari", name: "Thelan sh'Vari", short: "sh'Vari", rank: "Lt. Commander", post: "First officer", species: "Andorian",
+    skills: { Leadership: 16, Diplomacy: 14, Helm: 13, Phasers: 13, Navigation: 11, Psychology: 11, Sensors: 11, Communications: 11 },
+    adv: "Crisis Leader", advText: "+2 to Leadership and Helm in ship combat.", advWhen: (ctx) => ctx.combat && ["Leadership", "Helm"].includes(ctx.skill) },
+  { id: "sevek", name: "Sevek", short: "Sevek", rank: "Lieutenant", post: "Science officer", species: "Vulcan",
+    skills: { "Physical Sciences": 16, Sensors: 14, Computers: 14, "Life Sciences": 14, Navigation: 14, Engineering: 14, Electronics: 14, Psychology: 14 },
+    adv: "Eidetic Recall", advText: "+2 when investigating an anomaly or ruins.", advWhen: (ctx) => ctx.action === "investigate" },
+  { id: "vessik", name: "Dr. Vessik", short: "Vessik", rank: "Lt. Commander", post: "Chief medical officer", species: "Denobulan",
+    skills: { Medicine: 16, "Life Sciences": 14, Psychology: 14, Sensors: 14, Computers: 14, Electronics: 14, Survival: 14, Communications: 14, Diplomacy: 13, Leadership: 13 },
+    adv: "Denobulan Pharmacopoeia", advText: "+2 to Medicine.", advWhen: (ctx) => ctx.skill === "Medicine" },
+  { id: "grath", name: "Grath", short: "Grath", rank: "Lieutenant", post: "Chief engineer", species: "Tellarite",
+    skills: { Engineering: 16, Electronics: 14, Computers: 14, "Physical Sciences": 14, Sensors: 14, Communications: 14, Survival: 14, Helm: 11 },
+    adv: "Improvisational Engineer", advText: "+2 to Engineering for repairs.", advWhen: (ctx) => ctx.skill === "Engineering" && (ctx.action === "repair" || ctx.combat) },
+  { id: "reyes", name: "Marisol Reyes", short: "Reyes", rank: "Lieutenant (j.g.)", post: "Security chief", species: "Human",
+    skills: { Phasers: 16, "Unarmed Combat": 14, Stealth: 14, Helm: 14, Athletics: 13, Survival: 11, Sensors: 11, Medicine: 11, Leadership: 11, Communications: 11 },
+    adv: "Careful Marksman", advText: "+2 to Phasers on an away team (stun).", advWhen: (ctx) => ctx.skill === "Phasers" && !ctx.combat },
+  { id: "rrinn", name: "Rrinn", short: "Rrinn", rank: "Yeoman 2nd Class", post: "Captain's yeoman", species: "Caitian",
+    skills: { Computers: 18, Communications: 14, Psychology: 14, Sensors: 14, Electronics: 14, Stealth: 13, Diplomacy: 12 },
+    adv: "Keen Hearing", advText: "+2 when listening: hailing, and sweeps for cloaked ships and raiders.", advWhen: (ctx) => ctx.action === "sweep" || (ctx.skill === "Communications" && ctx.listen) },
+];
+/** You, the captain. */
+const CAPTAIN = { id: "captain", short: "Captain", skills: { Leadership: 14, Psychology: 13, Diplomacy: 13, Will: 12 } };
+
+// Ships. Systems take 3 boxes each: 1 Damaged (−2), 2 Crippled (−4), 3 Offline.
+const PELION = { name: "USS Pelion", reg: "NCC-1750", cls: "Heavy Cruiser", shields: 5, hull: 5, power: 5, maneuver: 3, sensors: 3, phaser: 2, torps: 40, torpBonus: 1, speed: 3 };
+const SUPPORT = {
+  escort: { name: "Escort", cls: "Escort", cost: 30, shields: 2, hull: 3, maneuver: 5, helm: 12, gunner: 12, phaser: 1, speed: 3, blurb: "Guards a world: fights raiders that come to it, and joins the Pelion's battles." },
+  science: { name: "Science vessel", cls: "Science vessel", cost: 25, shields: 2, hull: 3, maneuver: 5, helm: 11, gunner: 10, phaser: 1, speed: 3, skill: 12, blurb: "Surveys and investigates on its own (skill 12, sensors +2)." },
+};
+const SUPPORT_NAMES = ["USS Kestrel", "USS Calder", "USS Ishikawa", "USS Tamsin", "USS Meridian Rose", "USS Okonkwo", "USS Halvard", "USS Sabre"];
+const ENEMIES = {
+  kbc: { name: "Klingon battle cruiser", power: "klingon", shields: 5, hull: 5, maneuver: 3, helm: 12, gunner: 12, dmg: 2, torp: true, will: 12, cloak: true, relentless: true, speed: 3 },
+  kbop: { name: "Klingon bird-of-prey", power: "klingon", shields: 2, hull: 3, maneuver: 5, helm: 13, gunner: 12, dmg: 1, will: 11, cloak: true, ambush: true, speed: 3 },
+  rbop: { name: "Romulan bird-of-prey", power: "romulan", shields: 3, hull: 3, maneuver: 5, helm: 11, gunner: 12, dmg: 2, plasma: true, will: 13, cloak: true, ambush: true, speed: 3 },
+  orion: { name: "Orion raider", power: "orion", shields: 2, hull: 3, maneuver: 6, helm: 13, gunner: 11, dmg: 1, will: 10, fast: true, speed: 4 },
+  orionBase: { name: "Orion pirate base", power: "orion", shields: 4, hull: 4, maneuver: 0, helm: 0, gunner: 11, dmg: 2, will: 11, base: true, speed: 0 },
+};
+const POWERS = {
+  federation: { name: "Federation", color: "#6fb4ff" },
+  klingon: { name: "Klingon Empire", color: "#e0564a" },
+  romulan: { name: "Romulan Star Empire", color: "#59c48a" },
+  orion: { name: "Orion Syndicate", color: "#e6a640" },
+  independent: { name: "Independent", color: "#c9c3e8" },
+};
+
+/** What a system can be. `known`: on Starfleet's charts from the start. */
+const KINDS = {
+  starbase: { name: "Starbase", known: true, color: "#9fd0ff" },
+  colony: { name: "Federation colony", known: true, color: "#6fb4ff" },
+  independent: { name: "Independent world", known: true, color: "#c9c3e8" },
+  klingon: { name: "Klingon outpost", known: true, color: "#e0564a" },
+  prewarp: { name: "Pre-warp world", color: "#9ad48a" },
+  anomaly: { name: "Anomaly", color: "#d9a8ff" },
+  ruins: { name: "Ancient ruins", color: "#ffd36b" },
+  empty: { name: "Uncharted system", color: "#8e9ab4" },
+  orionBase: { name: "Uncharted system", color: "#8e9ab4" },  // looks empty until a sweep finds the base
+};
+
+/** Things the Pelion (or a science vessel) can do at a system, one a turn. Each is a roll: 3d6 at or under the skill. */
+const ACTIONS = {
+  survey: { name: "Survey the system", skills: ["Sensors", "Physical Sciences", "Navigation"], blurb: "Chart it: what's there, and science for the refits." },
+  investigate: { name: "Investigate", skills: ["Physical Sciences", "Sensors", "Computers", "Life Sciences"], blurb: "Fill the discovery clock to earn a library record." },
+  envoy: { name: "Diplomatic mission", skills: ["Diplomacy", "Psychology", "Communications"], blurb: "Bring the world closer to the Federation: +1 accord, +2 on success by 5." },
+  observe: { name: "Observe from orbit", skills: ["Sensors", "Life Sciences", "Psychology", "Stealth"], blurb: "Study them unseen. Fail by 3 or more and they see you: the Prime Directive, and Starfleet Command, take note." },
+  aid: { name: "Relief and repairs", skills: ["Engineering", "Medicine", "Leadership"], blurb: "Help a world that's been raided: clear a harm box." },
+  repair: { name: "Repairs underway", skills: ["Engineering"], blurb: "Clear a box from the shields or a system (two on success by 5), or patch one hull box." },
+  sweep: { name: "Sensor sweep", skills: ["Sensors", "Communications", "Computers"], blurb: "Listen for cloaked ships and raiders within 3: reveals them. Finds a hidden base here." },
+  hail: { name: "Hail them", skills: ["Diplomacy", "Communications", "Psychology"], blurb: "Talk a ship into leaving, against its captain's Will. No shots, no incident." },
+  mission: { name: "Carry out orders", skills: [], blurb: "Work on the mission here." },
+};
+
+// The GM's Guide's mission seeds, turned into orders the game can run. Each `kind` says where it goes and which
+// skills work it; `segs` is how many successes it takes.
+const MISSIONS = [
+  { roll: 5, text: "Answer a distress call", where: ["colony", "independent", "empty"], skills: ["Engineering", "Medicine", "Helm"], segs: 2 },
+  { roll: 6, text: "Survey an uncharted system", where: ["empty", "anomaly", "ruins"], skills: ["Sensors", "Physical Sciences", "Navigation"], segs: 3 },
+  { roll: 7, text: "Make first contact", where: ["independent"], skills: ["Diplomacy", "Psychology", "Communications"], segs: 3 },
+  { roll: 8, text: "Escort a diplomatic delegation", where: ["independent"], skills: ["Diplomacy", "Leadership", "Helm"], segs: 2 },
+  { roll: 9, text: "Find a missing ship or outpost", where: ["empty", "anomaly"], skills: ["Sensors", "Navigation", "Computers"], segs: 3 },
+  { roll: 10, text: "Deliver urgent medical supplies", where: ["colony", "independent"], skills: ["Medicine", "Life Sciences", "Helm"], segs: 2 },
+  { roll: 11, text: "Evacuate a colony", where: ["colony"], skills: ["Leadership", "Engineering", "Helm"], segs: 3 },
+  { roll: 12, text: "Patrol the Neutral Zone border", where: ["border"], skills: ["Sensors", "Communications", "Navigation"], segs: 2 },
+  { roll: 13, text: "Recover a lost probe or artifact", where: ["anomaly", "ruins", "empty"], skills: ["Sensors", "Engineering", "Computers"], segs: 3 },
+  { roll: 14, text: "Mediate a dispute between two worlds", where: ["independent"], skills: ["Diplomacy", "Psychology", "Leadership"], segs: 3 },
+  { roll: 15, text: "Test experimental technology", where: ["empty", "anomaly"], skills: ["Engineering", "Physical Sciences", "Computers"], segs: 3 },
+  { roll: 4, text: "Ferry a delegation to a world that left the Federation", where: ["independent"], skills: ["Diplomacy", "Psychology", "Communications"], segs: 3 },
+  { roll: 16, text: "Shore leave that goes wrong", where: ["colony", "starbase"], skills: ["Leadership", "Medicine", "Psychology"], segs: 2 },
+  { roll: 17, text: "Carry a message across the Neutral Zone", where: ["border"], skills: ["Communications", "Helm", "Diplomacy"], segs: 2 },
+];
+const STRANGE = ["The crew's past selves", "A dead star that sings", "A subspace anomaly that distorts time", "A non-corporeal life form",
+  "An ancient machine that still works", "Duplicates of the crew", "A signal repeating a crew member's name", "A planet-wide illusion",
+  "A rift into another universe", "A disease no one recognizes", "A gravity well that traps ships", "A godlike being testing the crew",
+  "An alien probe draining power", "Memories that aren't the crew's own", "A crossing into a mirror universe", "A machine that remembers the Pelion"];
+const KEYS = ["A crew member's future self", "A legend thought dead", "An idealistic Federation ambassador", "A Klingon captain with a grudge",
+  "A stranded Orion trader", "A brilliant, reckless scientist", "A colony leader hiding a secret", "A former Starfleet officer gone rogue",
+  "A local child who has seen too much", "A disapproving Vulcan observer", "An old friend of one of the crew", "A Romulan who wants to defect",
+  "A Starfleet admiral with sealed orders", "An android that wants to be free", "A godlike child", "An admiral's spy aboard"];
+/** Twists. `fx` is what the game does about it; the rest is for the story. */
+const TWISTS = [
+  { text: "Klingons arrive with their own claim", fx: "klingon" },
+  { text: "Orion pirates want the same prize", fx: "orion" },
+  { text: "A cloaked Romulan ship is watching", fx: "romulan" },
+  { text: "The people asking for help are lying", fx: "hard" },
+  { text: "The Pelion's systems start failing", fx: "systems" },
+  { text: "Contact with Starfleet is cut off", fx: "nocredit" },
+  { text: "Orders conflict with doing the right thing", fx: "hard" },
+  { text: "The 'threat' is only defending itself", fx: "none" },
+  { text: "A respected visitor has a hidden agenda", fx: "none" },
+  { text: "A civilian is trapped out of reach", fx: "urgent" },
+  { text: "The mission was a test", fx: "none" },
+  { text: "A crew member's complication comes into play", fx: "none" },
+];
+
+/** Refits: fitted at the starbase, paid for in science. */
+const REFITS = {
+  sensors: { name: "Sensor refit", cost: 40, blurb: "Sensors rating 3 → 4: +1 more to Sensors rolls, and you see a hex farther." },
+  phasers: { name: "Phaser refit", cost: 50, blurb: "+1 to hit with phasers." },
+  shields: { name: "Shield emitters", cost: 50, blurb: "Shields 5 → 6." },
+  warp: { name: "Warp nacelle tuning", cost: 60, blurb: "Speed 3 → 4 hexes a turn." },
+  power: { name: "Power couplings", cost: 60, blurb: "Power 5 → 6 in battle." },
+  sickbay: { name: "Sickbay upgrade", cost: 30, blurb: "Injured crew heal a box every turn." },
+};
+
+/** Library records: what investigating the strange earns. `perk` is what it changes. */
+const RECORDS = [
+  { id: "eddies", name: "Subspace eddies", text: "Nebulae cost the Pelion 1 move, not 2.", perk: "nebula" },
+  { id: "harmonics", name: "Shield harmonics of an ion storm", text: "+1 Shields box in battle.", perk: "shield1" },
+  { id: "cloakwake", name: "The wake of a cloaked ship", text: "+2 to sensor sweeps.", perk: "sweep2" },
+  { id: "xenoling", name: "A dead language, deciphered", text: "+1 to every diplomatic mission.", perk: "envoy1" },
+  { id: "biostasis", name: "Biostasis fields", text: "Injured crew heal a box every turn.", perk: "heal" },
+  { id: "graviton", name: "Graviton lensing", text: "+1 to Survey and Investigate.", perk: "science1" },
+  { id: "dilithium", name: "Dilithium resonance", text: "+1 Power in battle.", perk: "power1" },
+  { id: "warpfield", name: "A folded warp field", text: "+1 move a turn.", perk: "speed1" },
+  { id: "caretaker", name: "The caretaker of Corvan II", text: "A machine's account of a vanished civilization: +1 to diplomatic missions.", perk: "envoy1", story: true },
+];
+
+/** 3d6 odds: the chance a roll is at or under each total. */
+const ODDS = (() => {
+  const n = Array(19).fill(0);
+  for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) for (let c = 1; c <= 6; c++) n[a + b + c]++;
+  const cum = []; let t = 0;
+  for (let i = 0; i <= 18; i++) { t += n[i]; cum[i] = t / 216; }
+  return cum;
+})();
+/** Chance to succeed against a target: 3–4 always succeed, 17–18 always fail. */
+const chance = (target) => target >= 16 ? ODDS[16] : target < 4 ? ODDS[4] : ODDS[Math.floor(target)];
+
+const NAMES = ["Corvan", "Tessaly", "Marrow's Reach", "Hadley", "Ilyra", "Brennus", "Okafor", "Saltire", "Veyl", "Kerrigan", "Drummond",
+  "Ashkelon", "Penhallow", "Rigaud", "Thessaly", "Calloway", "Imbrium", "Zan'tor", "Sorrel", "Halcyon", "Quillon", "Vasquez", "Ostrava",
+  "Delmar", "Kethis", "Nadir", "Erebus", "Tarsus", "Larkspur", "Yarrow", "Oberth", "Fennimore", "Castellan", "Rho Draconis", "Iota Pavonis",
+  "Mendez", "Aldana", "Talgorn", "Brightwater", "Usher"];
+
+// ---- sector.js ----
+// The Corvan Sector: a hex map with the Federation's starbase and colonies to the southwest, two Klingon outposts on
+// the eastern border, the Romulan Neutral Zone along the top, and between them independent worlds, pre-warp peoples,
+// anomalies, ruins and empty systems (one of which hides an Orion pirate base).
+
+
+const RADIUS = 8;
+const px = (k) => toPixel(k, 1);
+const inZone = (k) => parse(k).r <= -RADIUS + 1;                 // the top two rows
+const nearZone = (k) => parse(k).r === -RADIUS + 2;
+
+function makeSector(seed) {
+  const R = makeRng(seed);
+  const hexes = {};
+  for (const k of hexagon(RADIUS)) hexes[k] = { terrain: inZone(k) ? "zone" : "space" };
+  // Nebulae: three clouds, away from the zone.
+  const open = Object.keys(hexes).filter((k) => !inZone(k));
+  for (let n = 0; n < 3; n++) {
+    let c = R.pick(open);
+    for (let i = 0; i < 5; i++) {
+      if (hexes[c] && !inZone(c)) hexes[c].terrain = "nebula";
+      const { q, r } = parse(c), d = [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]][R.int(6)];
+      c = key(q + d[0], r + d[1]);
+    }
+  }
+  const systems = {}, sysAt = {};
+  const used = [];
+  const free = (k, gap = 2) => hexes[k] && !inZone(k) && !sysAt[k] && used.every((u) => distance(u, k) >= gap);
+  let names = [...NAMES];
+  const take = () => { const i = R.int(names.length); const n = names[i]; names.splice(i, 1); return n; };
+  const place = (k, kind, extra = {}) => {
+    const id = "s" + (Object.keys(systems).length + 1);
+    systems[id] = { id, at: k, kind, name: extra.name || take(), surveyed: false, harm: 0, ...extra };
+    sysAt[k] = id; used.push(k);
+    return systems[id];
+  };
+  const pickWhere = (test, gap = 2) => {
+    const c = open.filter((k) => free(k, gap) && test(k));
+    return c.length ? R.pick(c) : open.find((k) => free(k, 1));
+  };
+  const P = (k) => px(k);
+  // The starbase, southwest; colonies around it.
+  const sb = pickWhere((k) => P(k).x < -6 && P(k).y > 4.5 && distance(k, "0,0") >= 6 && distance(k, "0,0") <= 7);
+  place(sb, "starbase", { name: "Starbase 23", surveyed: true });
+  for (let i = 0; i < 3; i++) place(pickWhere((k) => distance(k, sb) >= 2 && distance(k, sb) <= 5 && P(k).x < 0), "colony", { surveyed: true });
+  // Klingon outposts on the eastern edge.
+  for (let i = 0; i < 2; i++) place(pickWhere((k) => P(k).x > 8 && Math.abs(P(k).y) < 9, 4), "klingon", { surveyed: true });
+  // Corvan II: the first mission, a few days out from the starbase.
+  const cv = pickWhere((k) => distance(k, sb) >= 5 && distance(k, sb) <= 7 && P(k).x < 4 && P(k).y > -6);
+  names = names.filter((n) => n !== "Corvan");
+  place(cv, "prewarp", { name: "Corvan II", ruinsToo: true });
+  // Independent worlds in the middle band, where the Federation and the Empire compete for them.
+  for (let i = 0; i < 6; i++) place(pickWhere((k) => P(k).x > -6 && P(k).x < 10 && distance(k, sb) >= 5, 3), "independent", { surveyed: true, accord: i < 2 ? 1 : 0 });
+  for (let i = 0; i < 3; i++) place(pickWhere(() => true), "prewarp");
+  for (let i = 0; i < 5; i++) place(pickWhere(() => true), "anomaly", { clock: 0, need: 3 + R.int(3) });
+  for (let i = 0; i < 3; i++) place(pickWhere(() => true), "ruins", { clock: 0, need: 4 + R.int(2) });
+  // The Orion base: far from the starbase, in a nebula if one is free.
+  const neb = open.filter((k) => hexes[k].terrain === "nebula" && free(k) && distance(k, sb) >= 7);
+  place(neb.length ? R.pick(neb) : pickWhere((k) => distance(k, sb) >= 8), "orionBase", { baseHull: 0, baseShields: 0 });
+  for (let i = 0; i < 9; i++) place(pickWhere(() => true), "empty");
+  // Starfleet's charts: the core's worlds are known; the rest is "uncharted" until surveyed.
+  return { hexes, systems, sysAt, starbase: systems[sysAt[sb]].id, corvan: systems[sysAt[cv]].id };
+}
+
+// ---- game.js ----
+// The rules: one JSON state, changed only by these functions. Every roll is the tabletop game's: 3d6 at or under a
+// skill target, 3 or 4 always succeeds, 17 or 18 always fails; the margin is how far under.
+
+
+
+// ---------- dice ----------
+function rand(S) { const r = makeRng(0); r.setState(S.rng); const v = r.next(); S.rng = r.state(); return v; }
+const d6 = (S) => 1 + Math.floor(rand(S) * 6);
+const pick = (S, list) => list[Math.floor(rand(S) * list.length)];
+/** A 3d6 check against a target. */
+function check(S, target) {
+  const dice = [d6(S), d6(S), d6(S)], total = dice[0] + dice[1] + dice[2];
+  const success = total <= 4 || (total <= target && total < 17);
+  return { dice, total, target, success, margin: target - total };
+}
+
+// ---------- a new game ----------
+function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
+  seed = seed || String(Math.floor(Math.random() * 1e9));
+  const sec = makeSector(seed);
+  const sb = sec.systems[sec.starbase];
+  const S = {
+    v: 1, seed: String(seed), difficulty, captain: captain.trim() || "Captain", turn: 1, rng: hashString("dice:" + seed),
+    hexes: sec.hexes, systems: sec.systems, sysAt: sec.sysAt, starbase: sec.starbase, corvan: sec.corvan,
+    pelion: { at: sb.at, mp: PELION.speed, acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true },
+    stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
+    crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {} }])),
+    support: {}, enemies: {}, nextId: 1,
+    supplies: 20, science: 0, command: 0, tension: 2, commendations: 0,
+    records: [], orders: [], done: 0, failed: 0, lostColonies: 0, lostWorlds: 0, joined: 0, arc: { stage: "travel", countdown: 0, clock: 0, clues: {}, seen: false },
+    visible: {}, seenSys: {}, log: [], over: null, pending: null, battle: null, event: null, tutorial: { on: true },
+  };
+  for (const s of Object.values(S.systems)) if (KINDS[s.kind].known) S.seenSys[s.id] = true;
+  S.seenSys[S.corvan] = true; S.systems[S.corvan].surveyed = true;
+  // The first orders: The Silence at Corvan II. An Orion raider is already in orbit there.
+  const cv = S.systems[S.corvan];
+  S.orders.push({ id: "o1", arc: true, title: "The Silence at Corvan II", at: cv.at, sys: cv.id, skills: [], segs: 0, have: 0, deadline: 12,
+    text: "The Federation research outpost on Corvan II, eight archaeologists studying the ruins of an extinct civilization, has missed three check-ins. Corvan II has a native people, the Ketari, at a bronze-age level: the outpost works under the Prime Directive. An Orion raider was reported in the sector last week.",
+    twist: null, strange: "An ancient machine that still works", key: "Rrinn's sister, on the outpost's supply run" });
+  spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at });
+  const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");
+  spawnEnemy(S, "orionBase", ob.at, { goal: "base", hostile: true, found: false });
+  log(S, "Orders from Starfleet Command: the research outpost on Corvan II has gone silent. Investigate.", "order");
+  updateVisibility(S);
+  return S;
+}
+
+// ---------- small helpers ----------
+const stardate = (S) => (STARDATE0 + (S.turn - 1) * 7.3).toFixed(1);
+const sysAt = (S, hex) => S.sysAt[hex] && S.systems[S.sysAt[hex]];
+const officer = (id) => CREW.find((c) => c.id === id);
+const hasRecord = (S, perk) => S.records.some((id) => RECORDS.find((r) => r.id === id)?.perk === perk);
+function log(S, text, kind = "") { S.log.unshift({ t: S.turn, text, kind }); if (S.log.length > 200) S.log.length = 200; }
+const available = (S, id) => S.crew[id].inj < 3;
+function skillOf(S, id, skill) {
+  if (id === "captain") return CAPTAIN.skills[skill] || 10;
+  const base = officer(id).skills[skill];
+  return base ? base + (S.crew[id].plus[skill] || 0) : 0;
+}
+/** The best available officer for one of these skills (highest target), and the skill. */
+function bestOfficer(S, skills, ctx = {}) {
+  let best = null;
+  for (const c of CREW) {
+    if (!available(S, c.id)) continue;
+    for (const sk of skills) {
+      const t = target(S, c.id, sk, ctx).total;
+      if (skillOf(S, c.id, sk) && (!best || t > best.total)) best = { officer: c.id, skill: sk, total: t };
+    }
+  }
+  return best;
+}
+/** Who stands a station in battle: the assigned officer, or the best available if they're in sickbay. */
+function stationOfficer(S, station) {
+  const SK = { helm: "Helm", tactical: "Phasers", science: "Sensors", engineering: "Engineering", comms: "Communications" }[station];
+  const id = S.stations[station];
+  if (id && available(S, id)) return id;
+  const b = bestOfficer(S, [SK]); return b ? b.officer : null;
+}
+const sensorsRating = (S) => PELION.sensors + (S.pelion.refits.sensors ? 1 : 0);
+const sysPenalty = (boxes) => boxes >= 3 ? -99 : -2 * boxes;
+/** A roll's target, with each modifier named. ctx: { action, combat, listen, unit } */
+function target(S, id, skill, ctx = {}) {
+  const parts = [];
+  const base = skillOf(S, id, skill); parts.push([id === "captain" ? "Captain" : officer(id).short + " · " + skill, base]);
+  if (id !== "captain") {
+    const o = officer(id);
+    if (o.advWhen({ ...ctx, skill })) parts.push([o.adv, 2]);
+    if (S.crew[id].inj === 2) parts.push(["Wounded", -2]);
+  }
+  const P = S.pelion;
+  if (skill === "Sensors" && !ctx.unit) {
+    const r = sensorsRating(S); if (r !== 2) parts.push(["Ship's sensors", r - 2]);
+    if (P.sys.sensors) parts.push(["Sensors damaged", Math.max(-6, sysPenalty(P.sys.sensors))]);
+  }
+  if ((ctx.action === "survey" || ctx.action === "investigate") && hasRecord(S, "science1")) parts.push(["Graviton lensing", 1]);
+  if (ctx.action === "envoy" && hasRecord(S, "envoy1")) parts.push(["A dead language", 1]);
+  if (ctx.action === "sweep" && hasRecord(S, "sweep2")) parts.push(["Cloaked wake", 2]);
+  if (ctx.action === "sweep") parts.push(["Hunting the hidden", -2]);
+  if (ctx.order && ctx.order.twist && ctx.order.twist.fx === "hard") parts.push([ctx.order.twist.text, -2]);
+  if (ctx.order && enemiesAt(S, ctx.order.at).some((e) => e.power === "klingon" && !e.hostile)) parts.push(["Klingons in the way", -2]);
+  if (ctx.extra) parts.push(...ctx.extra);
+  return { parts, total: parts.reduce((t, p) => t + p[1], 0) };
+}
+
+// ---------- the map: movement and sight ----------
+function moveCost(S, hex, who = "pelion") {
+  const h = S.hexes[hex]; if (!h) return Infinity;
+  if (h.terrain === "nebula") return who === "pelion" && hasRecord(S, "eddies") ? 1 : 2;
+  return 1;
+}
+function speedOf(S) {
+  const e = S.pelion.sys.engines;
+  if (e >= 3) return 1;
+  return PELION.speed + (S.pelion.refits.warp ? 1 : 0) + (hasRecord(S, "speed1") ? 1 : 0) - e;
+}
+/** Cheapest path (list of hexes after `from`) and its cost. */
+function findPath(S, from, to, who = "pelion") {
+  if (from === to) return { path: [], cost: 0 };
+  const dist = { [from]: 0 }, prev = {}, open = [from];
+  while (open.length) {
+    open.sort((a, b) => dist[a] - dist[b]);
+    const k = open.shift();
+    if (k === to) break;
+    for (const n of neighbors(k)) {
+      if (!S.hexes[n]) continue;
+      if (who === "klingon" || who === "orion") { if (inZone(n)) continue; }
+      const c = dist[k] + moveCost(S, n, who);
+      if (dist[n] === undefined || c < dist[n]) { dist[n] = c; prev[n] = k; if (!open.includes(n)) open.push(n); }
+    }
+  }
+  if (dist[to] === undefined) return null;
+  const path = []; for (let k = to; k !== from; k = prev[k]) path.unshift(k);
+  return { path, cost: dist[to] };
+}
+/** Hexes the Pelion can reach this turn, with their cost. */
+function reachable(S, unit = "pelion") {
+  const U = unit === "pelion" ? S.pelion : S.support[unit];
+  const out = { [U.at]: 0 }, open = [U.at];
+  while (open.length) {
+    const k = open.shift();
+    for (const n of neighbors(k)) {
+      if (!S.hexes[n]) continue;
+      const c = out[k] + moveCost(S, n, unit === "pelion" ? "pelion" : "support");
+      if (c <= U.mp && (out[n] === undefined || c < out[n])) { out[n] = c; open.push(n); }
+    }
+  }
+  return out;
+}
+function moveTo(S, unit, hex) {
+  if (S.over || S.battle || S.event) return { error: "Finish what's in front of you first." };
+  const U = unit === "pelion" ? S.pelion : S.support[unit];
+  const r = reachable(S, unit);
+  if (r[hex] === undefined) return { error: "Too far for this turn." };
+  const p = findPath(S, U.at, hex, unit === "pelion" ? "pelion" : "support");
+  U.mp -= r[hex]; U.at = hex;
+  if (unit === "pelion") {
+    S.pelion.docked = false;
+    if (p && p.path.some(inZone) && !S.pelion.zoneMarked && !orderHere(S, hex, "border")) {
+      S.pelion.zoneMarked = true; markCommand(S, 1, "The Pelion crossed into the Romulan Neutral Zone.");
+    }
+    arrive(S, hex);
+  }
+  updateVisibility(S);
+  return { ok: true };
+}
+function arrive(S, hex) {
+  const s = sysAt(S, hex);
+  if (s) S.seenSys[s.id] = true;
+  if (s && s.id === S.starbase) dock(S);
+  // Orders with a twist that bites on arrival.
+  for (const o of S.orders) {
+    if (o.at !== hex || o.arrived) continue;
+    o.arrived = true;
+    if (o.twist && o.twist.fx === "systems") { S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + 1); log(S, `${o.title}: the Pelion's sensors begin failing.`, "bad"); }
+  }
+  if (s && s.id === S.corvan && S.arc.stage === "travel") S.event = { kind: "arc-arrive" };
+}
+function dock(S) {
+  const P = S.pelion;
+  P.docked = true;
+  const fixed = P.shields + P.hull + P.sys.weapons + P.sys.engines + P.sys.sensors > 0 || P.torps < PELION.torps;
+  P.shields = 0; P.hull = 0; P.sys = { weapons: 0, engines: 0, sensors: 0 }; P.torps = PELION.torps;
+  for (const id in S.crew) { const c = S.crew[id]; c.inj = 0; c.duty = 2; }
+  log(S, `Docked at Starbase 23: ${fixed ? "repaired, rearmed and " : ""}crew rested; Duty points restored.`, "good");
+}
+function sightRange(S) { return 2 + (S.pelion.refits.sensors ? 1 : 0); }
+function updateVisibility(S) {
+  const v = {};
+  const see = (hex, n) => { for (const k of within(hex, n)) if (S.hexes[k]) v[k] = true; };
+  see(S.pelion.at, sightRange(S));
+  for (const u of Object.values(S.support)) see(u.at, 2);
+  for (const s of Object.values(S.systems)) if (["starbase", "colony", "member"].includes(s.kind)) see(s.at, 1);
+  S.visible = v;
+  for (const e of Object.values(S.enemies)) if (v[e.at] && !e.cloaked && !ENEMIES[e.type].base) e.seen = true;
+}
+const enemiesAt = (S, hex) => Object.values(S.enemies).filter((e) => e.at === hex);
+/** Enemy ships the player can see. */
+const visibleEnemies = (S) => Object.values(S.enemies).filter((e) => (S.visible[e.at] && !e.cloaked && !ENEMIES[e.type].base) || e.revealed || (ENEMIES[e.type].base && e.found));
+
+// ---------- enemies ----------
+function spawnEnemy(S, type, at, extra = {}) {
+  const id = "e" + S.nextId++;
+  const E = ENEMIES[type];
+  S.enemies[id] = { id, type, power: E.power, at, shields: 0, hull: 0, goal: "idle", target: null, hostile: false, cloaked: false, stay: 0, home: at, ...extra };
+  return S.enemies[id];
+}
+
+// ---------- Starfleet Command ----------
+function markCommand(S, n, why) {
+  S.command = Math.max(0, Math.min(5, S.command + n));
+  if (n > 0) log(S, `Starfleet Command marks ${n === 1 ? "a box" : n + " boxes"}: ${why}`, "bad");
+  else log(S, `Starfleet Command clears ${-n === 1 ? "a box" : -n + " boxes"}: ${why}`, "good");
+  if (S.command >= 5 && !S.over) S.over = { win: false, why: "Starfleet Command has relieved you of command. The Pelion returns to Starbase 23 under another captain." };
+}
+
+// ---------- actions at a system ----------
+/** What a unit can do where it is. Each entry: { id, name, skills, blurb, sys?, order?, why? (why it can't) }. */
+function actionsFor(S, unit = "pelion") {
+  const U = unit === "pelion" ? S.pelion : S.support[unit];
+  const s = sysAt(S, U.at), out = [];
+  const add = (id, extra = {}) => out.push({ id, ...ACTIONS[id], ...extra });
+  const sci = unit !== "pelion";
+  if (s && !s.surveyed && s.kind !== "klingon") add("survey", { sys: s.id });
+  if (s && s.surveyed && (s.kind === "anomaly" || s.kind === "ruins") && !s.recorded) add("investigate", { sys: s.id, blurb: `Discovery clock ${s.clock}/${s.need}. Fill it for a library record. Fail by 3 or more and it bites back.`, extra: [["The unknown", -3]] });
+  if (sci) return out.map((a) => ({ ...a, why: U.acted ? "Already acted this turn." : null }));
+  if (s && s.kind === "independent") add("envoy", { sys: s.id, blurb: `Accord ${signedAccord(s.accord)}. At +5 they petition to join the Federation; at −5 they join the Klingon Empire. The closer they come, the harder the last steps.`, extra: [["Their reluctance", -(1 + Math.max(0, s.accord))]] });
+  if (s && s.kind === "prewarp" && s.surveyed && !s.observed) add("observe", { sys: s.id, extra: [["Unseen", -2]] });
+  if (s && s.harm > 0 && ["colony", "member", "independent"].includes(s.kind)) add("aid", { sys: s.id, blurb: `Harm ${s.harm}/3. Clear a box.` });
+  const P = S.pelion;
+  if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair");
+  add("sweep");
+  for (const e of enemiesAt(S, U.at)) if ((!e.cloaked || e.revealed) && !ENEMIES[e.type].base) {
+    if (ENEMIES[e.type].will) add("hail", { enemy: e.id, name: `Hail the ${ENEMIES[e.type].name}` });
+    out.push({ id: "engage", enemy: e.id, name: `Engage the ${ENEMIES[e.type].name}`, skills: [], blurb: engageNote(S, e) });
+  }
+  const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && e.at === U.at && e.found);
+  if (base) out.push({ id: "engage", enemy: base.id, name: "Attack the Orion base", skills: [], blurb: "Its guns and shields against yours. Destroy it and the raids stop." });
+  for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, extra: [["In the field", -2]] });
+  if (s && s.id === S.corvan) out.push(...arcActionsHook(S));
+  return out.map((a) => ({ ...a, why: P.acted ? "The Pelion has already acted this turn." : null }));
+}
+const signedAccord = (a) => (a > 0 ? "+" : a < 0 ? "−" : "") + Math.abs(a);
+function engageNote(S, e) {
+  const E = ENEMIES[e.type];
+  if (e.power === "klingon" && !e.hostile) return "They haven't fired on anyone. Attacking first is a diplomatic incident: Starfleet Command marks a box, and tension with the Empire rises.";
+  return `${E.name}: shields ${E.shields - e.shields}/${E.shields}, hull ${E.hull - e.hull}/${E.hull}.`;
+}
+
+/** Roll an action. Returns a pending result for the player to accept, or to reroll with a Duty point. */
+function attempt(S, unit, actionId, opts = {}) {
+  if (S.over || S.battle || S.event || S.pending) return { error: "Finish what's in front of you first." };
+  const list = unit === "pelion" ? actionsFor(S) : actionsFor(S, unit);
+  const a = list.find((x) => x.id === actionId && (opts.order ? x.order === opts.order : true) && (opts.enemy ? x.enemy === opts.enemy : true) && (opts.arc ? x.arc === opts.arc : true));
+  if (!a) return { error: "Not possible here." };
+  if (a.why) return { error: a.why };
+  if (actionId === "engage") { startBattleHook(S, a.enemy, "pelion"); S.pelion.acted = true; return { ok: true, battle: true }; }
+  const order = a.order && S.orders.find((o) => o.id === a.order);
+  const ctx = { action: actionId === "mission" ? "mission" : actionId, order, listen: actionId === "hail" || actionId === "sweep" };
+  let who, skill, t;
+  if (unit !== "pelion") { who = unit; skill = a.skills[0]; t = { parts: [["Science vessel's crew", SUPPORT.science.skill], ["Its sensors", 2]], total: SUPPORT.science.skill + 2 }; }
+  else {
+    who = opts.officer; skill = opts.skill;
+    if (!who || !skill || !available(S, who) || !skillOf(S, who, skill) || !a.skills.includes(skill)) { const b = bestOfficer(S, a.skills, ctx); if (!b) return { error: "Nobody fit for duty has the training." }; who = b.officer; skill = b.skill; }
+    t = target(S, who, skill, { ...ctx, extra: a.extra || [] });
+    // A second officer trained in the skill helps: +1.
+    const helper = CREW.find((c) => c.id !== who && available(S, c.id) && skillOf(S, c.id, skill) >= 13);
+    if (helper && opts.assist !== false) { t.parts.push([`${helper.short} assists`, 1]); t.total += 1; }
+  }
+  if (actionId === "hail") {
+    const e = S.enemies[a.enemy]; const will = ENEMIES[e.type].will + (e.power === "romulan" ? 2 : 0);
+    t.parts.push([`Their captain's Will ${will}`, 10 - will]); t.total += 10 - will;
+  }
+  const roll = check(S, t.total);
+  S.pending = { unit, action: actionId, arc: a.arc, order: a.order, enemy: a.enemy, sys: a.sys, officer: who, skill, target: t, roll, rerolled: false, name: a.name };
+  if (roll.success) return resolve(S, false);
+  return { ok: true, pending: S.pending };
+}
+function canReroll(S) { const p = S.pending; return p && !p.roll.success && !p.rerolled && p.unit === "pelion" && S.crew[p.officer] && S.crew[p.officer].duty > 0; }
+/** Accept the pending roll, or spend the officer's Duty point to roll again (and keep the second). */
+function resolve(S, reroll) {
+  const p = S.pending; if (!p) return { error: "Nothing to resolve." };
+  if (reroll) {
+    if (!canReroll(S)) return { error: "No Duty point to spend." };
+    S.crew[p.officer].duty--; p.rerolled = true; p.first = p.roll; p.roll = check(S, p.target.total);
+    if (!p.roll.success) return { ok: true, pending: p };
+  }
+  S.pending = null;
+  const U = p.unit === "pelion" ? S.pelion : S.support[p.unit];
+  U.acted = true;
+  const out = applyAction(S, p);
+  if (p.unit === "pelion" && p.roll.success && p.officer !== "captain") gainXp(S, p.officer, p.skill);
+  updateVisibility(S);
+  checkEnd(S);
+  return { ok: true, done: true, result: { ...p, text: out } };
+}
+function gainXp(S, id, skill) {
+  const c = S.crew[id]; c.xp++;
+  if (c.xp >= 5) {
+    c.xp = 0;
+    const cur = skillOf(S, id, skill), cap = Math.max(17, officer(id).skills[skill]);
+    if (cur < cap) { c.plus[skill] = (c.plus[skill] || 0) + 1; log(S, `${officer(id).name} grows in the job: ${skill} ${cur} → ${cur + 1}.`, "good"); }
+  }
+}
+function applyAction(S, p) {
+  const r = p.roll, s = p.sys && S.systems[p.sys], big = r.margin >= 5;
+  const name = p.unit === "pelion" ? officer(p.officer)?.short || "The captain" : S.support[p.unit].name;
+  switch (p.action) {
+    case "survey": {
+      if (!r.success) return say(S, `${name} couldn't make sense of ${s.name}'s readings. Try again next turn.`);
+      s.surveyed = true; S.seenSys[s.id] = true;
+      const sci = 4 + (big ? 3 : 0) + (p.unit !== "pelion" ? 2 : 0); S.science += sci;
+      const what = { prewarp: "a pre-warp people. The Prime Directive applies.", anomaly: "an anomaly worth investigating.", ruins: "the ruins of a vanished civilization.", empty: "nothing but rock and starlight.", orionBase: "nothing but rock and starlight." }[s.kind] || "charted.";
+      return say(S, `Survey of ${s.name}: ${what} +${sci} science.`, "good");
+    }
+    case "investigate": {
+      if (!r.success) {
+        if (r.margin <= -3) { const hurt = hazard(S, p); return say(S, `The ${s.kind === "ruins" ? "ruins" : "anomaly"} at ${s.name} bites back: ${hurt}`, "bad"); }
+        return say(S, `No progress at ${s.name} this time.`);
+      }
+      s.clock = Math.min(s.need, s.clock + (big ? 2 : 1)); S.science += 2;
+      if (s.clock >= s.need) { s.recorded = true; const rec = earnRecord(S); return say(S, `Discovery at ${s.name}! Library record: ${rec ? rec.name + ". " + rec.text : "a fascinating footnote."} +10 science.`, "good"); }
+      return say(S, `Progress at ${s.name}: ${s.clock}/${s.need}.`);
+    }
+    case "envoy": {
+      if (!r.success) { if (r.margin <= -4) { s.accord = Math.max(-5, s.accord - 1); return say(S, `The talks at ${s.name} went badly: accord ${signedAccord(s.accord)}.`, "bad"); } return say(S, `The envoys of ${s.name} listen politely and promise nothing.`); }
+      s.accord = Math.min(5, s.accord + (big ? 2 : 1));
+      if (s.accord >= 5) { join(S, s); return say(S, `${s.name} petitions to join the United Federation of Planets!`, "victory"); }
+      return say(S, `Talks at ${s.name} go well: accord ${signedAccord(s.accord)}.`, "good");
+    }
+    case "observe": {
+      if (r.success) { s.observed = true; S.science += 6; return say(S, `${name} studies ${s.name}'s people unseen: +6 science.`, "good"); }
+      if (r.margin <= -3) { markCommand(S, 1, `${s.name}'s people saw the Pelion's away team. The Prime Directive.`); return say(S, `Contact at ${s.name}!`, "bad"); }
+      return say(S, `Nothing useful from ${s.name} this time.`);
+    }
+    case "aid": {
+      if (!r.success) return say(S, `Relief work at ${s.name} goes slowly.`);
+      s.harm = Math.max(0, s.harm - (big ? 2 : 1));
+      if (s.kind === "independent") s.accord = Math.min(5, s.accord + 1);
+      if (s.kind === "independent" && s.accord >= 5) { join(S, s); return say(S, `Grateful for the help, ${s.name} petitions to join the Federation!`, "victory"); }
+      return say(S, `Relief at ${s.name}: harm ${s.harm}/3${s.kind === "independent" ? `, accord ${signedAccord(s.accord)}` : ""}.`, "good");
+    }
+    case "repair": {
+      if (!r.success) return say(S, `${name}'s repairs don't hold.`);
+      const P = S.pelion; let n = big ? 2 : 1; const fixed = [];
+      for (const k of ["engines", "weapons", "sensors"]) while (n > 0 && P.sys[k] > 0) { P.sys[k]--; n--; fixed.push(k); }
+      while (n > 0 && P.shields > 0) { P.shields--; n--; fixed.push("shields"); }
+      if (n > 0 && P.hull > 0) { P.hull--; fixed.push("hull"); }
+      return say(S, `Repairs: ${fixed.join(", ") || "nothing needed"}.`, "good");
+    }
+    case "sweep": {
+      if (!r.success) return say(S, `The sweep finds nothing${r.margin <= -2 ? "" : " (or nothing that wants to be found)"}.`);
+      const found = [];
+      for (const e of Object.values(S.enemies)) {
+        if (distance(e.at, S.pelion.at) > 3) continue;
+        if (ENEMIES[e.type].base) { if (e.at === S.pelion.at && !e.found) { e.found = true; const sy = sysAt(S, e.at); if (sy) sy.surveyed = true; found.push("an Orion pirate base, hidden in " + (sy ? sy.name : "the dust")); } continue; }
+        if (e.cloaked && !e.revealed) { e.revealed = true; found.push(`a cloaked ${ENEMIES[e.type].name}`); }
+      }
+      // A sweep also hears where the raiders come from.
+      const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && !e.found);
+      if (!found.length && base) { const d = distance(base.at, S.pelion.at); return say(S, `Nothing nearby, but ${name} hears Orion traffic ${d <= 4 ? "very close: within " + d + " hexes" : d <= 7 ? "to the " + bearing(S.pelion.at, base.at) : "far off"}.`); }
+      return say(S, found.length ? `Sweep: ${found.join("; ")}.` : "Sweep: all quiet.", found.length ? "good" : "");
+    }
+    case "hail": {
+      const e = S.enemies[p.enemy];
+      if (!r.success) { if (e.power !== "klingon" || e.hostile) { startBattleHook(S, e.id, "enemy"); return say(S, `The ${ENEMIES[e.type].name} answers with its guns.`, "bad"); } return say(S, `The Klingon captain laughs and cuts the channel.`); }
+      sendHome(S, e, 4); return say(S, `${name} talks the ${ENEMIES[e.type].name} out of it: it withdraws.`, "good");
+    }
+    case "mission": return missionStep(S, p);
+    default: if (p.arc) return arcStepHook(S, p);
+  }
+  return "";
+}
+const say = (S, text, kind = "") => { log(S, text, kind); return text; };
+const bearing = (a, b) => { const [aq, ar] = a.split(",").map(Number), [bq, br] = b.split(",").map(Number); const x = (bq - aq) + (br - ar) / 2, y = br - ar; return (y < -1 ? "north" : y > 1 ? "south" : "") + (x > 1 ? "east" : x < -1 ? "west" : "") || "nearby"; };
+function hazard(S, p) {
+  if (rand(S) < 0.5 && p.unit === "pelion") { const id = p.officer; S.crew[id].inj = Math.min(3, S.crew[id].inj + 1); return `${officer(id).short} is hurt (${S.crew[id].inj}/3).`; }
+  if (p.unit !== "pelion") { const u = S.support[p.unit]; u.hull++; if (u.hull >= SUPPORT[u.type].hull) { delete S.support[p.unit]; return `the ${u.name} is lost with all hands.`; } return `the ${u.name} takes damage.`; }
+  const k = pick(S, ["engines", "sensors", "weapons"]); S.pelion.sys[k] = Math.min(3, S.pelion.sys[k] + 1); return `the Pelion's ${k} are damaged.`;
+}
+function earnRecord(S) {
+  const left = RECORDS.filter((r) => !r.story && !S.records.includes(r.id));
+  S.science += 10;
+  if (!left.length) return null;
+  const rec = pick(S, left); S.records.push(rec.id); return rec;
+}
+function join(S, s) { s.kind = "member"; s.harm = 0; S.joined++; S.commendations += 2; S.seenSys[s.id] = true; markCommand(S, -1, `${s.name} joins the Federation.`); }
+
+// ---------- orders ----------
+const orderHere = (S, hex, where) => S.orders.some((o) => o.at === hex && (!where || o.where === where));
+function missionStep(S, p) {
+  const o = S.orders.find((x) => x.id === p.order); if (!o) return "";
+  if (!p.roll.success) {
+    if (p.roll.margin <= -4 && o.twist && o.twist.fx === "urgent") { o.deadline--; return say(S, `${o.title}: a setback. One turn less.`, "bad"); }
+    return say(S, `${o.title}: no progress this turn.`);
+  }
+  o.have = Math.min(o.segs, o.have + (p.roll.margin >= 5 ? 2 : 1));
+  if (o.have < o.segs) return say(S, `${o.title}: ${o.have}/${o.segs}.`, "good");
+  completeOrder(S, o, true);
+  return say(S, `Orders complete: ${o.title}. Commended.`, "victory");
+}
+function completeOrder(S, o, ok) {
+  S.orders = S.orders.filter((x) => x !== o);
+  if (ok) {
+    S.done++; S.commendations += o.arc ? 4 : 2; S.supplies += 10; S.science += 8;
+    if (!(o.twist && o.twist.fx === "nocredit")) markCommand(S, -1, `orders carried out: ${o.title}.`);
+  } else {
+    S.failed++; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
+    const s = o.sys && S.systems[o.sys];
+    if (s && /Evacuate|distress|medical/i.test(o.title) && ["colony", "member", "independent"].includes(s.kind)) harmWorld(S, s, 1, "help never came");
+  }
+}
+function newOrder(S) {
+  const roll = d6(S) + d6(S) + d6(S);
+  const m = MISSIONS.reduce((best, x) => (Math.abs(x.roll - roll) < Math.abs(best.roll - roll) ? x : best), MISSIONS[0]);
+  let at = null, sys = null;
+  const from = S.pelion.at;
+  if (m.where.includes("border")) {
+    const hexes = Object.keys(S.hexes).filter((k) => nearZone(k) && distance(k, from) >= 3);
+    at = pick(S, hexes);
+  } else {
+    const cands = Object.values(S.systems).filter((s) => (m.where.includes(s.kind) || (s.kind === "member" && m.where.includes("independent")) || (s.kind === "orionBase" && m.where.includes("empty")))
+      && !S.orders.some((o) => o.sys === s.id) && distance(s.at, from) >= 2 && distance(s.at, from) <= 10 && s.id !== S.corvan);
+    if (!cands.length) return null;
+    sys = pick(S, cands); at = sys.at; S.seenSys[sys.id] = true;
+  }
+  const twist = rand(S) < 0.6 ? pick(S, TWISTS) : null;
+  const dist = Math.ceil(distance(from, at) / speedOf(S));
+  const o = { id: "o" + S.nextId++, title: m.text + (sys ? ` at ${sys.name}` : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
+    deadline: S.turn + dist + m.segs + 4 - (twist && twist.fx === "urgent" ? 2 : 0), twist, strange: pick(S, STRANGE), key: pick(S, KEYS) };
+  S.orders.push(o);
+  if (twist && twist.fx === "klingon") { const k = closestOutpost(S, at); if (k) spawnEnemy(S, "kbc", k.at, { goal: "claim", target: at }); }
+  if (twist && twist.fx === "orion") { const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base); spawnEnemy(S, "orion", b ? b.at : at, { goal: "raid", target: at, hostile: true }); }
+  if (twist && twist.fx === "romulan") { const z = Object.keys(S.hexes).filter(inZone); spawnEnemy(S, "rbop", pick(S, z), { goal: "watch", target: at, cloaked: true, hostile: true }); }
+  log(S, `New orders: ${o.title}. Due by turn ${o.deadline}.`, "order");
+  return o;
+}
+const closestOutpost = (S, at) => Object.values(S.systems).filter((s) => s.kind === "klingon").sort((a, b) => distance(a.at, at) - distance(b.at, at))[0];
+function harmWorld(S, s, n, why) {
+  if (!["colony", "member", "independent"].includes(s.kind)) return;
+  s.harm = Math.min(3, s.harm + n);
+  log(S, `${s.name} is harmed (${s.harm}/3): ${why}.`, "bad");
+  if (s.harm < 3) return;
+  if (s.kind === "colony") { s.kind = "lost"; S.lostColonies++; markCommand(S, 2, `the colony on ${s.name} had to be evacuated.`); }
+  else if (s.kind === "member") { s.kind = "independent"; s.accord = 1; s.harm = 1; S.joined--; markCommand(S, 1, `${s.name} leaves the Federation, which couldn't protect it.`); }
+  else { s.accord = Math.max(-5, s.accord - 1); s.harm = 2; }
+  if (!Object.values(S.systems).some((x) => x.kind === "colony") && !S.over) S.over = { win: false, why: "Every Federation colony in the sector has been lost. Starfleet withdraws from the Corvan Sector." };
+}
+function sendHome(S, e, turns = 3) {
+  e.goal = "home"; e.target = e.home; e.stay = turns; e.hostile = e.power !== "klingon" ? e.hostile : false;
+}
+
+// ---------- support ships ----------
+function requisition(S, type) {
+  const T = SUPPORT[type];
+  if (!S.pelion.docked) return { error: "Requisitions are made at Starbase 23." };
+  if (Object.keys(S.support).length >= 3) return { error: "Starfleet can spare three ships at most." };
+  if (S.supplies < T.cost) return { error: `Needs ${T.cost} supplies.` };
+  S.supplies -= T.cost;
+  const used = Object.values(S.support).map((u) => u.name);
+  const name = SUPPORT_NAMES.find((n) => !used.includes(n)) || "USS " + S.nextId;
+  const id = "u" + S.nextId++;
+  S.support[id] = { id, type, name, at: S.systems[S.starbase].at, mp: 0, acted: true, shields: 0, hull: 0 };
+  log(S, `The ${name} (${T.name}) joins the Pelion's command. It's ready next turn.`, "good");
+  updateVisibility(S);
+  return { ok: true, id };
+}
+function fitRefit(S, id) {
+  const R = REFITS[id];
+  if (!S.pelion.docked) return { error: "Refits are fitted at Starbase 23." };
+  if (S.pelion.refits[id]) return { error: "Already fitted." };
+  if (S.science < R.cost) return { error: `Needs ${R.cost} science.` };
+  S.science -= R.cost; S.pelion.refits[id] = true;
+  log(S, `Refit at Starbase 23: ${R.name}.`, "good");
+  updateVisibility(S);
+  return { ok: true };
+}
+function setStation(S, station, id) { if (!available(S, id)) return { error: "In sickbay." }; S.stations[station] = id; return { ok: true }; }
+
+// ---------- scoring and the end ----------
+function score(S) {
+  const sys = Object.values(S.systems);
+  const parts = [
+    ["Worlds joined the Federation", S.joined * 10],
+    ["Library records", S.records.length * 6],
+    ["Orders carried out", S.done * 4],
+    ["Commendations", S.commendations],
+    ["Colonies safe", sys.filter((s) => s.kind === "colony").length * 5],
+    ["Systems surveyed", sys.filter((s) => s.surveyed && !KINDS[s.kind]?.known && s.id !== S.corvan).length],
+    ["Starfleet Command track", -S.command * 4],
+    ["Worlds lost to the Klingon Empire", -S.lostWorlds * 8],
+    ["Colonies lost", -S.lostColonies * 10],
+  ];
+  return { parts, total: parts.reduce((t, p) => t + p[1], 0) };
+}
+function rating(total) {
+  return total >= 110 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 75 ? "Commended: a fine tour, and a ship Starfleet is proud of"
+    : total >= 40 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
+}
+function checkEnd(S) {
+  if (S.over) return;
+  if (S.pelion.hull >= PELION.hull) S.over = { win: false, why: "The Pelion's hull gave way. The crew abandoned ship, and Starfleet lost a Heavy Cruiser." };
+  else if (S.turn > TOUR) S.over = { win: true, why: "The Pelion's tour of the Corvan Sector is over." };
+}
+
+// ---------- hooks set by the other modules (they import game.js, so they register here) ----------
+let startBattleHook = () => {}, arcActionsHook = () => [], arcStepHook = () => "";
+function registerHooks(h) { if (h.startBattle) startBattleHook = h.startBattle; if (h.arcActions) arcActionsHook = h.arcActions; if (h.arcStep) arcStepHook = h.arcStep; }
+
+// ---- combat.js ----
+// Ship combat, from the Players' Guide's "The USS Pelion": exchanges; Power to spend on shields, phasers and
+// torpedoes (and what's left over as a bonus); the captain's order; Helm to evade; Shields before Hull; a concussive
+// roll for every hit that reaches the Hull; Engineering to repair mid-fight; a Helm contest to break away.
+
+
+const shieldsMax = (S) => PELION.shields + (S.pelion.refits.shields ? 1 : 0) + (hasRecord(S, "shield1") ? 1 : 0);
+const powerOf = (S) => Math.max(1, PELION.power + (S.pelion.refits.power ? 1 : 0) + (hasRecord(S, "power1") ? 1 : 0) - (S.pelion.powerLoss || 0));
+/** The Pelion's numbers for this exchange, with who stands each station. */
+function battleStats(S) {
+  const P = S.pelion, helmId = stationOfficer(S, "helm"), gunId = stationOfficer(S, "tactical"), engId = stationOfficer(S, "engineering");
+  const helm = helmId ? target(S, helmId, "Helm", { combat: true }).total + Math.max(-6, sysPenalty(P.sys.engines)) : 8;
+  const gun = gunId ? target(S, gunId, "Phasers", { combat: true }).total + (P.refits.phasers ? 1 : 0) + Math.max(-6, sysPenalty(P.sys.weapons)) : 8;
+  const eng = engId ? target(S, engId, "Engineering", { combat: true }).total : 8;
+  return { helmId, gunId, engId, helm, gun, eng, power: powerOf(S), shieldsMax: shieldsMax(S), maneuver: PELION.maneuver - (P.sys.engines ? 1 : 0), weaponsOut: P.sys.weapons >= 3 };
+}
+
+function startBattle(S, enemyId, initiator) {
+  const e = S.enemies[enemyId], E = ENEMIES[e.type];
+  if (initiator === "pelion" && e.power === "klingon" && !e.hostile) {
+    markCommand(S, 1, "the Pelion fired first on a Klingon ship. A diplomatic incident.");
+    S.tension = Math.min(10, S.tension + 2); e.hostile = true;
+  }
+  const ambush = initiator === "enemy" && E.ambush && e.cloaked;
+  e.cloaked = false; e.revealed = false; e.seen = true;
+  S.battle = { enemy: enemyId, ex: 0, log: [], ambush, over: null, initiator };
+  log(S, `Battle: the Pelion against ${E.base ? "the Orion base" : (/^[AEIOU]/.test(E.name) ? "an " : "a ") + E.name}${ambush ? ", which decloaks firing" : ""}.`, "war");
+}
+registerHooks({ startBattle });
+
+const R = (r) => `${r.total} vs ${r.target}`;
+function hitEnemy(S, e, n, L, what) {
+  const E = ENEMIES[e.type];
+  for (let i = 0; i < n; i++) { if (e.shields < E.shields) e.shields++; else e.hull++; }
+  L.push(`${what} hits: their shields ${E.shields - e.shields}/${E.shields}, hull ${Math.max(0, E.hull - e.hull)}/${E.hull}.`);
+}
+/** Mark boxes on the Pelion; return whether any reached the hull. */
+function hitPelion(S, n, shieldsUp, L, what) {
+  const P = S.pelion, max = shieldsMax(S);
+  let hull = 0;
+  for (let i = 0; i < n; i++) { if (shieldsUp && P.shields < max) P.shields++; else { P.hull++; hull++; } }
+  L.push(`${what}: shields ${max - P.shields}/${max}, hull ${Math.max(0, PELION.hull - P.hull)}/${PELION.hull}.`);
+  if (hull) concussive(S, L);
+  return hull > 0;
+}
+/** The Players' Guide's concussive system damage table, for a hit that reaches the hull. */
+function concussive(S, L) {
+  const P = S.pelion, r = check(S, 0).total;
+  const hurt = (n) => { const ids = ["helm", "tactical", "science", "engineering", "comms"].map((s) => stationOfficer(S, s)).filter(Boolean); const id = pick(S, ids); S.crew[id].inj = Math.min(3, S.crew[id].inj + n); return `${officer(id).short} is hurt (${S.crew[id].inj}/3)`; };
+  const sys = (k, n) => { P.sys[k] = Math.min(3, P.sys[k] + n); };
+  let t;
+  if (r === 3) { P.powerLoss = Math.min(4, (P.powerLoss || 0) + 2); t = "warp core offline: emergency power"; }
+  else if (r === 4) t = "a bridge station explodes: " + hurt(2);
+  else if (r === 5) { sys("engines", 3); t = "impulse engines offline"; }
+  else if (r === 6) { sys("sensors", 2); t = "computer offline"; }
+  else if (r <= 8) { sys("engines", 1); t = r === 7 ? "deflector damaged" : "warp drive damaged"; }
+  else if (r <= 10) { P.hull++; t = `hull breach: ${(check(S, 0).total) * 5} crew lost or hurt`; }
+  else if (r <= 12) { P.shields = Math.min(shieldsMax(S), P.shields + 1); t = "shield emitter damaged"; }
+  else if (r === 13) { P.powerLoss = Math.min(4, (P.powerLoss || 0) + 1); t = "power conduits damaged: Power −1"; }
+  else if (r === 14) { sys("engines", 1); t = "impulse engine damaged"; }
+  else if (r <= 16) t = "a bridge station sparks: " + hurt(1);
+  else { sys("weapons", 1); t = "fire control damaged"; }
+  L.push(`Concussive damage (${r}): ${t}.`);
+}
+
+/**
+ * One exchange. choice: { order: "command"|"read"|"hail"|null, shields, phasers, torps, repair, breakOff }.
+ * Returns the exchange's lines; S.battle.over is set when the battle ends.
+ */
+function exchange(S, choice = {}) {
+  const B = S.battle; if (!B || B.over) return [];
+  const e = S.enemies[B.enemy], E = ENEMIES[e.type], P = S.pelion, st = battleStats(S), L = [];
+  B.ex++;
+  // Power: shields, phasers, torpedoes; what's left is a bonus to one roll (+2 at most).
+  let power = st.power;
+  const up = !!choice.shields && power > 0; if (up) power--;
+  const phas = !!choice.phasers && !st.weaponsOut && power > 0 && !choice.breakOff; if (phas) power--;
+  const torp = !!choice.torps && P.torps > 0 && !st.weaponsOut && power > 0 && !choice.breakOff; if (torp) power--;
+  const spare = Math.min(2, power);
+  let hit = 0, evade = 0;
+  // The captain's order.
+  if (choice.order === "command") {
+    const r = check(S, CAPTAIN.skills.Leadership);
+    if (r.success) { hit += 2; if (r.margin >= 5) evade += 2; L.push(`Captain's order, Command (${R(r)}): +2 to Tactical${r.margin >= 5 ? " and Helm" : ""}.`); } else L.push(`Captain's order, Command (${R(r)}): the bridge is rattled.`);
+  } else if (choice.order === "read") {
+    const r = check(S, CAPTAIN.skills.Psychology);
+    if (r.success) { evade += 2; hit += 1; L.push(`Captain's order, Read the enemy (${R(r)}): you see their next move coming. +2 to evade, +1 to hit.`); } else L.push(`Captain's order, Read the enemy (${R(r)}): they're hard to read.`);
+  } else if (choice.order === "hail") {
+    const r = check(S, CAPTAIN.skills.Diplomacy), them = check(S, E.will);
+    const wins = r.success && (!them.success || r.margin > them.margin);
+    if (wins && !(E.relentless && e.hull < 3) && e.power !== "romulan" && !E.base) {
+      L.push(`Hail (${R(r)} against their Will, ${R(them)}): they stand down and withdraw.`);
+      sendHome(S, e, 4); B.over = "hailed"; return finish(S, L);
+    }
+    L.push(`Hail (${R(r)} against their Will, ${R(them)}): ${e.power === "romulan" ? "silence on every channel" : E.relentless && e.hull < 3 ? "the Klingon captain laughs at you" : "they won't listen"}.`);
+  }
+  const md = st.maneuver - (E.maneuver || 0);
+  // Breaking away: a Helm contest instead of firing.
+  if (choice.breakOff) {
+    const r = check(S, st.helm + spare + evade + Math.max(0, md)), them = E.base ? { success: false, margin: -99, total: "-", target: "-" } : check(S, E.helm + Math.max(0, -md));
+    if (r.success && (!them.success || r.margin > them.margin)) { L.push(`Break away (Helm ${R(r)} against theirs, ${R(them)}): the Pelion goes to warp.`); e.cooldown = 2; B.over = "escaped"; return finish(S, L); }
+    L.push(`Break away (Helm ${R(r)} against theirs, ${R(them)}): they stay on you.`);
+  }
+  // The Pelion fires.
+  if (phas) {
+    const r = check(S, st.gun + hit + spare);
+    if (!r.success) L.push(`Phasers (${R(r)}): miss.`);
+    else {
+      const ev = E.base ? null : check(S, E.helm + Math.max(0, -md));
+      if (ev && ev.success) L.push(`Phasers (${R(r)}): on target, but they evade (${R(ev)}).`);
+      else hitEnemy(S, e, PELION.phaser, L, `Phasers (${R(r)})`);
+    }
+  }
+  if (torp) {
+    P.torps--;
+    const r = check(S, st.gun + hit + PELION.torpBonus);
+    if (r.success) hitEnemy(S, e, 2, L, `Photon torpedoes (${R(r)})`); else L.push(`Photon torpedoes (${R(r)}): wide.`);
+  }
+  for (const u of Object.values(S.support)) {
+    if (u.at !== P.at || e.hull >= E.hull) continue;
+    const T = SUPPORT[u.type], r = check(S, T.gunner);
+    if (r.success && !(E.base ? false : check(S, E.helm).success)) hitEnemy(S, e, T.phaser, L, `The ${u.name}'s phasers (${R(r)})`);
+  }
+  if (e.hull >= E.hull) { B.over = "destroyed"; return finish(S, L); }
+  // Do they run?
+  const runs = (e.type === "orion" && e.shields >= E.shields) || (e.type === "kbop" && e.hull >= 2) || (e.type === "kbc" && e.hull >= 3);
+  if (runs) {
+    const r = check(S, E.helm + Math.max(0, -md) + (E.fast ? 2 : 0)), us = check(S, st.helm + Math.max(0, md));
+    if (r.success && (!us.success || r.margin > us.margin)) { L.push(`The ${E.name} breaks off and runs (${R(r)} against your Helm, ${R(us)}).`); sendHome(S, e, 5); e.cooldown = 2; B.over = "fled"; return finish(S, L); }
+    L.push(`The ${E.name} tries to break away, but the Pelion holds it (${R(us)}).`);
+  }
+  if (e.type === "rbop" && e.hull >= 2) { L.push("The Romulan commander overloads the warp core rather than be taken."); e.hull = E.hull; B.over = "destroyed"; return finish(S, L); }
+  // They fire: at the Pelion, or at an escort beside it.
+  const escorts = Object.values(S.support).filter((u) => u.at === P.at);
+  const tgt = escorts.length && rand(S) < 0.3 ? pick(S, escorts) : null;
+  const gun = E.gunner + (B.ambush && B.ex === 1 ? 2 : 0);
+  const volley = (label, dmg, evadable) => {
+    const r = check(S, gun + (label === "torpedo" ? 1 : 0));
+    const name = { kbc: "Disruptors", kbop: "Disruptors", rbop: "Plasma torpedo", orion: "Disruptors", orionBase: "The base's guns" }[e.type];
+    const what = label === "torpedo" ? "Photon torpedo" : name;
+    if (!r.success) { L.push(`Their ${what.toLowerCase()} (${R(r)}): miss.`); return; }
+    if (tgt) {
+      const T = SUPPORT[tgt.type];
+      if (evadable && check(S, T.helm).success) { L.push(`Their ${what.toLowerCase()} (${R(r)}): the ${tgt.name} evades.`); return; }
+      for (let i = 0; i < dmg; i++) { if (tgt.shields < T.shields) tgt.shields++; else tgt.hull++; }
+      if (tgt.hull >= T.hull) { L.push(`Their ${what.toLowerCase()} (${R(r)}): the ${tgt.name} is destroyed.`); delete S.support[tgt.id]; markCommand(S, 1, `the ${tgt.name} was lost.`); }
+      else L.push(`Their ${what.toLowerCase()} (${R(r)}): the ${tgt.name} is hit.`);
+      return;
+    }
+    if (evadable) {
+      const ev = check(S, st.helm + evade + (phas ? 0 : spare) + Math.max(0, md) + (E.plasma ? 2 : 0));
+      if (ev.success) { L.push(`Their ${what.toLowerCase()} (${R(r)}): Helm evades (${R(ev)}).`); return; }
+    }
+    hitPelion(S, dmg, up, L, `Their ${what.toLowerCase()} (${R(r)}) hits`);
+  };
+  volley("main", E.dmg, true);
+  if (e.type === "kbc" && B.ex % 2 === 0) volley("torpedo", 2, false);
+  // Damage control.
+  if (choice.repair && st.engId) {
+    const r = check(S, st.eng);
+    if (r.success) {
+      let n = r.margin >= 5 ? 2 : 1; const fixed = [];
+      if (P.powerLoss && n) { P.powerLoss--; n--; fixed.push("power"); }
+      for (const k of ["weapons", "engines", "sensors"]) while (n && P.sys[k]) { P.sys[k]--; n--; fixed.push(k); }
+      while (n && P.shields) { P.shields--; n--; fixed.push("shields"); }
+      L.push(`Damage control, ${officer(st.engId).short} (${R(r)}): ${fixed.join(", ") || "nothing left to fix"}.`);
+    } else L.push(`Damage control (${R(r)}): no luck.`);
+  }
+  if (P.hull >= PELION.hull) { B.over = "lost"; return finish(S, L); }
+  if (B.ex >= 12) { L.push("Both ships pull back to lick their wounds."); sendHome(S, e, 3); e.cooldown = 2; B.over = "fled"; }
+  return finish(S, L);
+}
+
+function finish(S, L) {
+  const B = S.battle; B.log.push(...L.map((t) => `${B.ex}. ${t}`));
+  if (!B.over) return L;
+  const e = S.enemies[B.enemy], E = ENEMIES[e.type];
+  if (B.over === "destroyed") {
+    delete S.enemies[e.id];
+    if (e.type === "orionBase") { S.commendations += 6; S.supplies += 15; S.orionBaseDown = true; log(S, "The Orion pirate base is destroyed. The raids on the sector will stop.", "victory"); }
+    else if (e.power === "orion") { S.commendations += 2; S.supplies += 6; log(S, `The Pelion destroys an Orion raider. Salvage: +6 supplies.`, "good"); }
+    else if (e.power === "romulan") { S.commendations += 3; log(S, "The Romulan bird-of-prey is destroyed.", "good"); }
+    else { S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
+  } else if (B.over === "lost") log(S, "The Pelion's hull is breaking up.", "bad");
+  else log(S, { fled: `The ${E.name} breaks off.`, hailed: `The ${E.name} stands down.`, escaped: "The Pelion breaks away." }[B.over] || "The battle ends.");
+  checkEnd(S);
+  return L;
+}
+function endBattle(S) { const B = S.battle; S.battle = null; return B; }
+
+/** A fight the Pelion isn't in: an escort guarding a world against a raider. Rolled out in full. */
+function skirmish(S, u, e) {
+  const T = SUPPORT[u.type], E = ENEMIES[e.type];
+  e.cloaked = false;
+  for (let ex = 1; ex <= 4; ex++) {
+    if (check(S, T.gunner).success && !check(S, E.helm).success) { if (e.shields < E.shields) e.shields++; else e.hull++; }
+    if (e.hull >= E.hull) { delete S.enemies[e.id]; S.commendations += 1; log(S, `The ${u.name} destroys the ${E.name}.`, "good"); return "won"; }
+    if (e.type === "orion" && e.shields >= E.shields) { sendHome(S, e, 5); log(S, `The ${u.name} drives off the ${E.name}.`, "good"); return "drove"; }
+    if (check(S, E.gunner).success && !check(S, T.helm).success) { for (let i = 0; i < E.dmg; i++) { if (u.shields < T.shields) u.shields++; else u.hull++; } }
+    if (u.hull >= T.hull) { delete S.support[u.id]; markCommand(S, 1, `the ${u.name} was lost defending ${sysAt(S, u.at)?.name || "its post"}.`); return "lost"; }
+  }
+  sendHome(S, e, 3); log(S, `The ${u.name} holds off the ${E.name}.`, "good"); return "held";
+}
+
+// ---- arc.js ----
+// The first mission, from the GM's Guide: The Silence at Corvan II. An Orion raider in orbit; the pull on the ship's
+// power and a Countdown of 6; the away team's investigation (a discovery clock of 4); Orion diggers in the ruins; and
+// the caretaker machine, with a choice about what to do with it.
+
+
+
+const CLUES = {
+  logs: { name: "The outpost logs", skills: ["Computers"], found: "Dr. Haskel's dampener test, then a power spike, then nothing." },
+  bunks: { name: "The empty bunks", skills: ["Medicine", "Sensors"], found: "No blood, no struggle, personal effects untouched. The scientists walked out." },
+  energy: { name: "The ruins' energy", skills: ["Physical Sciences", "Sensors"], found: "A field that reads the away team's biology and records it. It knows them now." },
+  village: { name: "The Ketari village", skills: ["Psychology", "Stealth"], found: "Ketari carrying Orion phasers. The chieftain's people dig at the ruins by night." },
+};
+const COUNTDOWN = 6, CLOCK = 4;
+const arcOrder = (S) => S.orders.find((o) => o.arc);
+const raider = (S) => enemiesAt(S, S.systems[S.corvan].at).find((e) => e.goal === "arc");
+
+function arcActions(S) {
+  const A = S.arc, out = [];
+  const add = (arc, name, skills, blurb, extra) => out.push({ id: "arc", arc, name, skills, blurb, extra });
+  if (A.stage === "pull") {
+    for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `A clue for the record (${A.clock}/${CLOCK}). A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]]);
+    if (!A.boughtTime && A.countdown > 0) add("time", "Buy time: reroute power", ["Engineering"], "Clear a segment of the Countdown. Once.");
+  }
+  if (A.stage === "orions") {
+    add("stun", "Stop the Orion diggers (phasers on stun)", ["Phasers", "Unarmed Combat", "Stealth"], "Three Orion pirates in the ruins. A failure hurts whoever leads it, and costs time.", [["Three of them", -3]]);
+    add("kill", "Stop them, phasers on kill", ["Phasers"], "No −3, but Starfleet Command marks a box for the bodies.", []);
+  }
+  if (A.stage === "caretaker") {
+    add("shutdown", "Shut the caretaker down", ["Engineering", "Electronics"], "The scientists wake. The Ketari lose their protector.", [["Technology older than the Federation", -4]]);
+    add("reason", "Reason with it: the paradox", ["Psychology", "Diplomacy"], "It protects them from all outsiders, and it's an outsider itself. −4, but Sevek's logic gives +2. Success: it releases the scientists and goes on watching.",
+      [["A machine's logic", -4]].concat(available(S, "sevek") ? [["Sevek's paradox", 2]] : []));
+    add("leave", "Leave it be; take back the Orion phasers", ["Stealth", "Psychology"], "Keep Ketari history their own. The scientists stay asleep. Fail by 3 or more and the Ketari see you.", [["A whole village", -2]]);
+  }
+  return out;
+}
+
+function arcStep(S, p) {
+  const A = S.arc, r = p.roll, k = p.arc, who = officer(p.officer)?.short || "The away team";
+  if (k.startsWith("clue-")) {
+    const c = CLUES[k.slice(5)];
+    if (!r.success) {
+      A.countdown++;
+      if (k === "clue-village" && r.margin <= -3) { A.seen = true; markCommand(S, 1, "the Ketari saw the away team. The Prime Directive."); }
+      log(S, `Corvan II: ${c.name} gives nothing up. The Countdown: ${A.countdown}/${COUNTDOWN}.`, "bad");
+      return checkCountdown(S);
+    }
+    A.clues[k.slice(5)] = true; A.clock = Math.min(CLOCK, A.clock + (r.margin >= 5 ? 2 : 1));
+    log(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} (${A.clock}/${CLOCK})`, "good");
+    if (A.clock >= CLOCK) {
+      A.stage = "orions";
+      S.event = { kind: "story", title: "A caretaker, not a weapon", text: "The pieces fit. The ruins hold a caretaker machine, left by the vanished civilization to watch over the Ketari. Dr. Haskel's dampener woke it, and it judged the outpost a threat: all eight scientists are in stasis, unharmed, deep in the ruins. And in the ruins now, three Orion pirates are cutting their way to the machine's core." };
+    }
+    return "";
+  }
+  if (k === "time") {
+    if (r.success) { A.countdown = Math.max(0, A.countdown - 1); A.boughtTime = true; log(S, `${who} reroutes power around the drain: the Countdown ${A.countdown}/${COUNTDOWN}.`, "good"); }
+    else { A.boughtTime = true; log(S, `${who} can't find a way around the drain.`, "bad"); }
+    return "";
+  }
+  if (k === "stun" || k === "kill") {
+    if (!r.success) {
+      A.countdown++; const id = p.officer; S.crew[id].inj = Math.min(3, S.crew[id].inj + 1);
+      log(S, `The Orions fight back: ${officer(id).short} is hurt (${S.crew[id].inj}/3). The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
+      return checkCountdown(S);
+    }
+    if (k === "kill") markCommand(S, 1, "Orion pirates killed on Corvan II when stun would have done.");
+    A.stage = "caretaker";
+    S.event = { kind: "story", title: "The caretaker speaks", text: `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and in the brig."} Then the machine speaks through an android shell: courteous, absolute. It will protect the Ketari from everything off-world, the Federation included. The Countdown stands at ${A.countdown}/${COUNTDOWN}.` };
+    return "";
+  }
+  if (k === "shutdown" || k === "reason" || k === "leave") {
+    if (!r.success) {
+      A.countdown++;
+      if (k === "leave" && r.margin <= -3 && !A.seen) { A.seen = true; markCommand(S, 1, "the Ketari saw the away team. The Prime Directive."); }
+      log(S, `The caretaker doesn't yield. The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
+      return checkCountdown(S);
+    }
+    finishArc(S, k);
+    return "";
+  }
+  return "";
+}
+function checkCountdown(S) {
+  const A = S.arc;
+  if (A.countdown < COUNTDOWN || A.stage === "done") return "";
+  A.stage = "done";
+  const o = arcOrder(S); if (o) completeOrder(S, o, false);
+  S.event = { kind: "story", title: "Breaking orbit", text: "The Countdown runs out: the drain on the Pelion's power is too much, and the ship has to break orbit or fall. The away team beams up with nothing. The scientists sleep on in the ruins, and Rrinn never hears the end of that message." };
+  return "";
+}
+function finishArc(S, how) {
+  const A = S.arc; A.stage = "done";
+  const o = arcOrder(S);
+  if (how === "leave") {
+    if (o) { S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; }
+    S.science += 8;
+    S.event = { kind: "story", title: "The Ketari's own history", text: "The away team takes back every Orion phaser from the village and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly." };
+    log(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
+  } else {
+    if (o) completeOrder(S, o, true);
+    if (how === "reason") { S.commendations += 4; S.science += 15; S.records.includes("caretaker") || S.records.push("caretaker"); }
+    else S.commendations += 1;
+    S.event = { kind: "story", title: how === "reason" ? "Equals" : "Silence, for good", text: how === "reason"
+      ? "Sevek lays out the paradox, and the machine considers it for a long time. Then it releases the eight scientists and goes back to its watch: the Ketari keep their guardian, and the Federation has a library record no one else has. Rrinn's sister is the first one out, and finally finishes that sentence."
+      : "The caretaker goes dark. The eight scientists wake, cold and confused and alive, and the Ketari will never know what watched over them, or that it's gone. Rrinn's sister is among the sleepers, and finally finishes that sentence." };
+    log(S, `The Silence at Corvan II: the eight scientists are safe.${how === "reason" ? " Library record: the caretaker." : ""}`, "victory");
+  }
+  if (!A.seen) markCommand(S, -1, "the Ketari never learned what the crew were.");
+}
+
+/** After anything happens: move the story on. */
+function arcTick(S) {
+  const A = S.arc, cv = S.systems[S.corvan];
+  if (A.stage === "travel" && S.pelion.at === cv.at && !raider(S) && !S.battle) {
+    A.stage = "pull";
+    const o = arcOrder(S); if (o) o.deadline = 999;
+    S.event = { kind: "story", title: "The pull", text: "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. The away team beams down to an empty outpost." };
+  }
+}
+/** End of turn: the drain on the ship while it stays in orbit. */
+function arcTurn(S) {
+  const A = S.arc;
+  if (["pull", "orions", "caretaker"].includes(A.stage) && S.pelion.at === S.systems[S.corvan].at) { A.countdown++; log(S, `Corvan II drains the Pelion: the Countdown ${A.countdown}/${COUNTDOWN}.`); checkCountdown(S); }
+}
+
+/** The arrival at Corvan II: the raider hails first. */
+function arcEventChoices(S) {
+  if (!S.event || S.event.kind !== "arc-arrive") return [];
+  return [
+    { id: "warn", name: "Warn them off", blurb: "Communications or Diplomacy against their captain's Will. Fail, and they open fire." + (S.arc.scanned ? " +2: you know what they've been selling." : "") },
+    { id: "scan", name: "Scan them first", blurb: "Sensors: what is an Orion raider doing over a pre-warp world?", disabled: S.arc.scanned },
+    { id: "engage", name: "Engage", blurb: "Raise shields and fire. They're pirates: no incident." },
+  ];
+}
+function arcEventChoose(S, id, roll) {
+  const e = raider(S);
+  if (!e) { S.event = null; arcTick(S); return { text: "The raider is gone." }; }
+  if (id === "scan") {
+    const r = roll("Sensors", "scan"); S.arc.scanned = true;
+    return { roll: r, text: r.success ? "Their hold is full of digging gear, and their manifest lists Starfleet-pattern phasers \"traded\" planetside. They're arming the natives." : "Their hull scatters the scan." };
+  }
+  if (id === "warn") {
+    const r = roll("Communications", "hail", [["Their captain's Will 10", 0]].concat(S.arc.scanned ? [["You know what they've done", 2]] : []));
+    S.event = null;
+    if (r.success) { sendHome(S, e, 6); e.goal = "home"; delete S.enemies[e.id]; log(S, "The Orion raider runs for the sector's edge.", "good"); arcTick(S); return { roll: r, text: "\"Legitimate salvagers\" don't argue with a Heavy Cruiser. The raider runs." }; }
+    startBattle(S, e.id, "enemy"); return { roll: r, text: "The Orion captain cuts the channel, and the raider opens fire." };
+  }
+  if (id === "engage") { S.event = null; startBattle(S, e.id, "pelion"); return { text: "Shields up." }; }
+  return {};
+}
+
+registerHooks({ arcActions, arcStep });
+
+const raiderName = ENEMIES.orion.name;
+
+// ---- ai.js ----
+// The other powers in the Corvan Sector, each turn.
+//  - The Klingon Empire: a cold war. Most of its ships court the independent worlds (lowering their accord); some
+//    raid, more as tension rises. Firing first on one that hasn't fired is an incident.
+//  - The Orion Syndicate: raiders from a hidden base strike colonies and member worlds, steal supplies and run.
+//  - The Romulan Star Empire: now and then a cloaked bird-of-prey crosses the Neutral Zone to strike, and goes home.
+
+
+
+
+
+const EVERY = { easy: { k: 9, o: 8, r: 15 }, normal: { k: 7, o: 6, r: 11 }, hard: { k: 5, o: 5, r: 8 } };
+const count = (S, power, type) => Object.values(S.enemies).filter((e) => e.power === power && (!type || e.type === type) && !ENEMIES[e.type].base).length;
+const worlds = (S, kinds) => Object.values(S.systems).filter((s) => kinds.includes(s.kind));
+
+function aiTurn(S) {
+  const ev = EVERY[S.difficulty] || EVERY.normal;
+  // Klingons.
+  const outposts = worlds(S, ["klingon", "claimed"]);
+  if (outposts.length && S.turn % ev.k === 2 && count(S, "klingon") < 2 + Math.floor(S.turn / 15)) {
+    const from = pick(S, outposts);
+    const raid = rand(S) < 0.15 + S.tension * 0.06;
+    const ind = worlds(S, ["independent"]).filter((s) => !Object.values(S.enemies).some((e) => e.target === s.at)).sort((a, b) => a.accord - b.accord || distance(a.at, from.at) - distance(b.at, from.at));
+    const tgt = raid ? pick(S, worlds(S, ["colony", "member"]).length ? worlds(S, ["colony", "member"]) : ind) : ind[0];
+    if (tgt) {
+      const e = spawnEnemy(S, rand(S) < 0.45 ? "kbc" : "kbop", from.at, { goal: raid ? "raid" : "influence", target: tgt.at, hostile: raid, home: from.at });
+      if (raid) log(S, `Intelligence: Klingon raiders are moving on ${tgt.name}.`, "war");
+      else if (S.visible[from.at]) log(S, `A ${ENEMIES[e.type].name} leaves ${from.name}.`);
+    }
+  }
+  if (S.tension >= 10) {
+    S.tension = 6;
+    for (const c of worlds(S, ["colony", "member"]).slice(0, 2)) { const o = closestOutpost(S, c.at); if (o) spawnEnemy(S, "kbc", o.at, { goal: "raid", target: c.at, hostile: true, home: o.at }); }
+    log(S, "The Klingon Empire answers the incidents: battle cruisers cross the border.", "war");
+  }
+  // Orions.
+  const base = Object.values(S.enemies).find((e) => e.type === "orionBase");
+  if (base && S.turn % ev.o === 3 && count(S, "orion") < 2) {
+    const targets = worlds(S, ["colony", "member", "member", "independent"]).filter((s) => distance(s.at, S.pelion.at) >= 3);
+    const tgt = targets.length ? pick(S, targets) : null;
+    if (tgt) spawnEnemy(S, "orion", base.at, { goal: "raid", target: tgt.at, hostile: true, home: base.at });
+  }
+  // Romulans.
+  if (S.turn >= 9 && S.turn % ev.r === 9 && count(S, "romulan") < 1) {
+    const targets = worlds(S, ["colony", "member"]);
+    if (targets.length) {
+      const tgt = pick(S, targets);
+      const zone = Object.keys(S.hexes).filter(inZone).sort((a, b) => distance(a, tgt.at) - distance(b, tgt.at));
+      spawnEnemy(S, "rbop", zone[0], { goal: "strike", target: tgt.at, hostile: true, cloaked: true, home: zone[0] });
+    }
+  }
+  // Every ship moves and does its job.
+  for (const e of Object.values(S.enemies)) {
+    if (!S.enemies[e.id]) continue;
+    const E = ENEMIES[e.type];
+    if (e.cooldown) e.cooldown--;
+    if (E.base || e.goal === "arc") continue;
+    if (e.target && e.at !== e.target) step(S, e);
+    if (e.at !== e.target) continue;
+    const s = sysAt(S, e.at);
+    if (e.goal === "home") {
+      if (e.stay > 0) { e.stay--; continue; }
+      delete S.enemies[e.id]; continue;
+    }
+    if (e.goal === "influence" && s && s.kind === "independent") {
+      // A week of gifts and promises every other turn: accord −1.
+      if (e.stay % 2 === 0) {
+        s.accord = Math.max(-5, s.accord - 1);
+        if (S.visible[s.at]) log(S, `The Klingons court ${s.name}: accord ${s.accord}.`, "war");
+        if (s.accord <= -5) claim(S, s);
+      }
+      if (++e.stay >= 6 || s.kind !== "independent") sendHome(S, e, 0);
+    } else if (e.goal === "raid" || e.goal === "strike") {
+      const guard = Object.values(S.support).find((u) => u.at === e.at && u.type === "escort");
+      if (S.pelion.at === e.at) continue;  // the Pelion is here: the fight comes at the end of the turn
+      if (guard) { const r = skirmish(S, guard, e); if (r === "won" || r === "drove") continue; }
+      if (!S.enemies[e.id]) continue;
+      // One strike, then away: a raid harms a world once (a Romulan strike, twice) and the raider makes for home.
+      if (s) harmWorld(S, s, e.goal === "strike" ? 2 : 1, `${E.name} ${e.goal === "strike" ? "decloaks and strikes" : "raids"}`);
+      if (e.power === "orion") S.supplies = Math.max(0, S.supplies - 3);
+      if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
+      sendHome(S, e, 0);
+    } else if (e.goal === "claim" || e.goal === "watch") {
+      if (!S.orders.some((o) => o.at === e.at) || ++e.stay >= 8) { if (e.goal === "watch") e.cloaked = true; sendHome(S, e, 0); }
+    }
+  }
+}
+
+function step(S, e) {
+  const p = findPath(S, e.at, e.target, e.power === "romulan" ? "romulan" : e.power);
+  if (!p) { delete S.enemies[e.id]; return; }
+  let mp = ENEMIES[e.type].speed;
+  for (const k of p.path) {
+    const c = S.hexes[k].terrain === "nebula" ? 2 : 1;
+    if (c > mp) break;
+    mp -= c; e.at = k;
+    if (k === S.pelion.at && e.hostile && !e.cloaked && e.goal !== "home") break;   // raiders stop to fight the Pelion
+  }
+}
+
+function claim(S, s) {
+  s.kind = "claimed"; s.accord = -5; S.lostWorlds++;
+  log(S, `${s.name} joins the Klingon Empire.`, "war");
+  markCommand(S, 1, `${s.name} went over to the Klingon Empire.`);
+}
+
+const kindName = (s) => (s.kind === "claimed" ? "Klingon world" : s.kind === "member" ? "Federation member" : s.kind === "lost" ? "Evacuated colony" : KINDS[s.kind]?.name);
+
+// ---- turn.js ----
+// The end of a turn: the other powers move, the crew heals, supplies come in, orders fall due, new orders arrive.
+// Also the one place that ties the modules together, so the page imports this.
+
+
+
+
+
+
+function canEndTurn(S) { return !(S.over || S.battle || S.event || S.pending); }
+
+function endTurn(S) {
+  if (!canEndTurn(S)) return { error: "Finish what's in front of you first." };
+  aiTurn(S);
+  // Income.
+  const sys = Object.values(S.systems);
+  const income = 3 + sys.filter((s) => s.kind === "colony").length + 2 * sys.filter((s) => s.kind === "member").length;
+  S.supplies += income;
+  // Healing: the doctor works on the worst hurt; a sickbay upgrade or biostasis heals everyone a little more.
+  const hurt = CREW.filter((c) => S.crew[c.id].inj > 0).sort((a, b) => S.crew[b.id].inj - S.crew[a.id].inj);
+  if (hurt.length) {
+    const doc = available(S, "vessik") ? "vessik" : bestOfficer(S, ["Medicine"])?.officer;
+    if (doc) { const r = check(S, target(S, doc, "Medicine").total); if (r.success) { S.crew[hurt[0].id].inj--; if (S.crew[hurt[0].id].inj === 0) log(S, `${hurt[0].short} is back on duty.`, "good"); } }
+    if (S.pelion.refits.sickbay || hasRecord(S, "heal")) for (const c of hurt) if (S.crew[c.id].inj > 0 && c !== hurt[0]) S.crew[c.id].inj--;
+  }
+  // Out of battle, the shields come back.
+  S.pelion.shields = 0;
+  for (const u of Object.values(S.support)) u.shields = 0;
+  // Duty points: every 8 turns, as if a new session.
+  if (S.turn % 8 === 0) { for (const id in S.crew) S.crew[id].duty = 2; log(S, "Duty points restored.", "good"); }
+  arcTurn(S);
+  // Orders fall due.
+  for (const o of [...S.orders]) if (S.turn >= o.deadline) { log(S, `Orders failed: ${o.title}.`, "bad"); completeOrder(S, o, false); if (o.arc) { S.arc.stage = "done"; S.event = { kind: "story", title: "Too late", text: "Another ship reached Corvan II first. Whatever happened to the eight scientists, the Pelion wasn't there for it, and Starfleet Command has noted it." }; } }
+  // The Klingon border pulls on nearby worlds.
+  if (S.turn % 8 === 0) {
+    const k = sys.filter((s) => s.kind === "klingon" || s.kind === "claimed");
+    for (const s of sys.filter((x) => x.kind === "independent")) if (k.some((o) => distance(o.at, s.at) <= 3) && s.accord > -5) { s.accord--; if (s.accord <= -5) claim(S, s); }
+  }
+  // Worlds rebuild: with no raider overhead, a harm box clears every 5 turns.
+  if (S.turn % 5 === 0) for (const s of sys) if (s.harm > 0 && !Object.values(S.enemies).some((e) => e.at === s.at && e.hostile)) s.harm--;
+  if (S.turn % 6 === 0 && S.tension > 0) S.tension--;
+  // New orders.
+  const active = S.orders.filter((o) => !o.arc).length;
+  if (S.turn >= 3 && active < 2 && (S.turn % 4 === 0 || active === 0 && S.turn % 2 === 0)) newOrder(S);
+  // Next turn.
+  S.turn++;
+  S.pelion.mp = speedOf(S); S.pelion.acted = false; S.pelion.zoneMarked = false;
+  for (const u of Object.values(S.support)) { u.mp = SUPPORT[u.type].speed; u.acted = false; }
+  updateVisibility(S);
+  // A hostile ship sharing the Pelion's hex attacks.
+  const foe = Object.values(S.enemies).find((e) => e.at === S.pelion.at && e.hostile && !e.cooldown && !ENEMIES[e.type].base && e.goal !== "home" && e.goal !== "arc");
+  if (foe && !S.event) startBattle(S, foe.id, "enemy");
+  arcTick(S);
+  checkEnd(S);
+  return { ok: true, income };
+}
+
+/** The arrival event at Corvan II, rolled with the best officer. */
+function chooseEvent(S, id) {
+  const roll = (skill, action, extra = []) => {
+    const b = bestOfficer(S, [skill], { action, listen: action === "hail" }) || { officer: "captain", skill };
+    const t = target(S, b.officer, skill, { action, listen: action === "hail", extra });
+    const r = check(S, t.total);
+    return { ...r, officer: b.officer, skill, parts: t.parts };
+  };
+  const out = arcEventChoose(S, id, roll);
+  updateVisibility(S);
+  return out;
+}
+function dismissEvent(S) { S.event = null; arcTick(S); checkEnd(S); }
+function closeBattle(S) { endBattle(S); arcTick(S); updateVisibility(S); checkEnd(S); }
+
+// ---- ui.js ----
+// The page: the sector map on a canvas, the side panel's tabs, and the dialogs (new game, battle, story, the end).
+
+
+
+
+
+
+
+
+const SAVE_KEY = "pelion-frontier.save.v1";
+const $ = (id) => document.getElementById(id);
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pct = (t) => Math.round(chance(t) * 100) + "%";
+const store = { get: () => { try { return localStorage.getItem(SAVE_KEY); } catch { return null; } }, set: (v) => { try { localStorage.setItem(SAVE_KEY, v); } catch {} }, clear: () => { try { localStorage.removeItem(SAVE_KEY); } catch {} } };
+
+let S = null, unit = "pelion", selHex = null, tab = "here", lastResult = null, eventResult = null, bchoice = null, hoverHex = null;
+const view = { x: 0, y: 0, zoom: 1, size: 28 };
+const U = () => (unit === "pelion" ? S.pelion : S.support[unit]) || (unit = "pelion", S.pelion);
+
+// ---------- start ----------
+function debugHook() {
+  try { if (!/[?&]debug\b/.test(location.search)) return; } catch { return; }
+  window.__pelion = { state: () => S, screenOf: (hex) => { const c = $("map"), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
+}
+function boot() { bindMap(); bindChrome(); debugHook(); showStarter(!!store.get()); }
+function startGame(state) {
+  S = state; unit = "pelion"; selHex = S.pelion.at; tab = "here"; lastResult = null; bchoice = null;
+  fitView();
+  $("app").hidden = false; closeModal();
+  after();
+  if (S.turn === 1 && !S.log.some((l) => l.text.startsWith("Captain"))) toast(`Orders: Corvan II has gone silent. Double-click it (marked !) to set course.`);
+}
+function save() { if (S) store.set(JSON.stringify(S)); }
+/** After anything changes: save, redraw, and open whatever dialog the state calls for. */
+function after() {
+  save(); renderAll();
+  if (S.battle) showBattle();
+  else if (S.event) showEvent();
+  else if (S.over) showEnd();
+}
+
+// ---------- the map ----------
+/** Show the whole sector. */
+function fitView() {
+  const c = $("map"), W = c.clientWidth || 900, H = c.clientHeight || 700, size = view.size;
+  view.x = 0; view.y = 0; view.zoom = Math.max(0.45, Math.min(1.4, Math.min(W / (Math.sqrt(3) * size * (2 * RADIUS + 2)), H / (1.5 * size * (2 * RADIUS + 1) + 2 * size))));
+}
+function centerOn(hex) { const p = toPixel(hex, view.size); view.x = p.x; view.y = p.y; }
+function screenToHex(cx, cy) {
+  const c = $("map"), r = c.getBoundingClientRect();
+  return fromPixel((cx - r.left - r.width / 2) / view.zoom + view.x, (cy - r.top - r.height / 2) / view.zoom + view.y, view.size);
+}
+function bindMap() {
+  const c = $("map"); let drag = null, moved = false, lastTap = 0, lastHex = null;
+  c.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, button: e.button }; moved = false; c.setPointerCapture(e.pointerId); });
+  c.addEventListener("pointermove", (e) => {
+    if (drag) { const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 6) moved = true; if (moved) { view.x = drag.vx - dx / view.zoom; view.y = drag.vy - dy / view.zoom; draw(); } }
+    const h = screenToHex(e.clientX, e.clientY); if (h !== hoverHex) { hoverHex = h; draw(); }
+  });
+  c.addEventListener("pointerup", (e) => {
+    const d = drag; drag = null; if (!S || moved || !d) return;
+    const hex = screenToHex(e.clientX, e.clientY); if (!S.hexes[hex]) return;
+    const now = Date.now(), dbl = hex === lastHex && now - lastTap < 400; lastTap = now; lastHex = hex;
+    if (d.button === 2 || dbl) { goTo(hex); return; }
+    selHex = hex; tab = "here"; lastResult = null; renderTabs(); renderPanel(); draw();
+  });
+  c.addEventListener("contextmenu", (e) => e.preventDefault());
+  c.addEventListener("wheel", (e) => { e.preventDefault(); zoomBy(e.deltaY < 0 ? 1.15 : 1 / 1.15); }, { passive: false });
+  new ResizeObserver(() => draw()).observe(c);
+}
+function zoomBy(f) { view.zoom = Math.max(0.4, Math.min(2.6, view.zoom * f)); draw(); }
+/** Move the selected ship to a hex, or as far along the way as it can go this turn. */
+function goTo(hex) {
+  if (!S || S.over) return;
+  const u = U();
+  if (hex === u.at) { selHex = hex; renderPanel(); draw(); return; }
+  const R = reachable(S, unit);
+  let dest = R[hex] !== undefined ? hex : null;
+  if (!dest) { const p = findPath(S, u.at, hex, unit === "pelion" ? "pelion" : "support"); if (p) for (const k of p.path) if (R[k] !== undefined) dest = k; }
+  if (!dest || dest === u.at) { toast(u.mp ? "Can't get any closer this turn." : "No moves left this turn. End the turn to go on.", true); return; }
+  const r = moveTo(S, unit, dest);
+  if (r.error) { toast(r.error, true); return; }
+  selHex = dest === hex ? hex : selHex; lastResult = null;
+  if (dest !== hex) { selHex = hex; toast("Under way: you'll get there next turn or after."); }
+  after();
+}
+function hexPath(ctx, cx, cy, r) { ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = (Math.PI / 180) * (60 * i - 30); i ? ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)) : ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); } ctx.closePath(); }
+const SYS_COLOR = { starbase: "#9fd0ff", colony: "#6fb4ff", member: "#6fb4ff", independent: "#c9c3e8", klingon: "#e0564a", claimed: "#e0564a", prewarp: "#9ad48a", anomaly: "#c9a8ff", ruins: "#ffd36b", empty: "#8e9ab4", orionBase: "#8e9ab4", lost: "#555b6e" };
+const shownKind = (s) => (S.seenSys[s.id] && (KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost"].includes(s.kind)) ? s.kind : null);
+let stars = null;
+function draw() {
+  const c = $("map"); if (!c || !S) return;
+  const dpr = window.devicePixelRatio || 1, W = c.clientWidth, H = c.clientHeight;
+  if (c.width !== Math.round(W * dpr) || c.height !== Math.round(H * dpr)) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+  const ctx = c.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = "#05060a"; ctx.fillRect(0, 0, W, H);
+  if (!stars) stars = Array.from({ length: 240 }, () => [Math.random(), Math.random(), Math.random()]);
+  for (const [sx, sy, b] of stars) { ctx.fillStyle = `rgba(210,215,255,${0.15 + b * 0.5})`; ctx.fillRect(sx * W, sy * H, b > 0.85 ? 2 : 1, b > 0.85 ? 2 : 1); }
+  ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(view.zoom, view.zoom); ctx.translate(-view.x, -view.y);
+  const size = view.size, u = U(), R = S.over || S.battle ? {} : reachable(S, unit);
+  for (const [k, h] of Object.entries(S.hexes)) {
+    const { x, y } = toPixel(k, size); hexPath(ctx, x, y, size - 0.6);
+    ctx.fillStyle = h.terrain === "zone" ? "rgba(120,30,45,.4)" : h.terrain === "nebula" ? "rgba(130,80,170,.34)" : "rgba(28,34,58,.38)"; ctx.fill();
+    if (R[k] !== undefined && k !== u.at) { ctx.fillStyle = "rgba(242,193,78,.12)"; ctx.fill(); }
+    if (!S.visible[k]) { ctx.fillStyle = "rgba(0,0,0,.32)"; ctx.fill(); }
+    ctx.strokeStyle = h.terrain === "zone" ? "rgba(224,86,74,.35)" : "rgba(140,150,200,.14)"; ctx.lineWidth = 1; ctx.stroke();
+  }
+  // The Neutral Zone's label.
+  if (view.zoom > 0.5) { const p = toPixel(key(4, -RADIUS), size); ctx.fillStyle = "rgba(255,150,140,.55)"; ctx.font = "600 12px Antonio, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ROMULAN NEUTRAL ZONE", p.x, p.y + 4); ctx.textAlign = "left"; }
+  // Orders.
+  for (const o of S.orders) { const { x, y } = toPixel(o.at, size); ctx.strokeStyle = "#f2c14e"; ctx.lineWidth = 2; ctx.setLineDash([4, 3]); hexPath(ctx, x, y, size - 3); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = "#f2c14e"; ctx.font = "bold 13px system-ui, sans-serif"; ctx.fillText("!", x + size * 0.45, y - size * 0.35); }
+  // Systems.
+  for (const s of Object.values(S.systems)) {
+    const { x, y } = toPixel(s.at, size), k = shownKind(s), col = k ? SYS_COLOR[k] : "#8e9ab4", r = k === "starbase" ? 7 : 6;
+    ctx.fillStyle = col;
+    if (k === "starbase") { ctx.fillRect(x - r, y - r, r * 2, r * 2); ctx.strokeStyle = "#fff"; ctx.lineWidth = 1; ctx.strokeRect(x - r, y - r, r * 2, r * 2); }
+    else if (k === "klingon" || k === "claimed") { ctx.beginPath(); ctx.moveTo(x, y - r - 1); ctx.lineTo(x + r, y + r); ctx.lineTo(x - r, y + r); ctx.closePath(); ctx.fill(); }
+    else { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+    if (k === "member" || k === "colony") { ctx.strokeStyle = "#6fb4ff"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r + 4, 0, Math.PI * 2); ctx.stroke(); }
+    if (k === "independent") { const a = s.accord; ctx.strokeStyle = a > 0 ? "#6fb4ff" : a < 0 ? "#e0564a" : "rgba(200,200,220,.5)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r + 4, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * Math.max(1, Math.abs(a))) / 5); ctx.stroke(); }
+    if (s.harm > 0 && k && ["colony", "member", "independent"].includes(k)) { ctx.fillStyle = "#ff8a7a"; ctx.font = "bold 10px system-ui"; ctx.fillText("✕".repeat(s.harm), x + r + 3, y + r + 2); }
+    if (!k) { ctx.fillStyle = "#05060a"; ctx.font = "bold 9px system-ui"; ctx.textAlign = "center"; ctx.fillText("?", x, y + 3); ctx.textAlign = "left"; }
+    if (k === "lost") { ctx.strokeStyle = "#999"; ctx.beginPath(); ctx.moveTo(x - 5, y - 5); ctx.lineTo(x + 5, y + 5); ctx.moveTo(x + 5, y - 5); ctx.lineTo(x - 5, y + 5); ctx.stroke(); }
+    if (view.zoom > 0.6) { ctx.font = `${selHex === s.at ? "bold " : ""}11px system-ui, sans-serif`; ctx.textAlign = "center"; ctx.fillStyle = k ? "#e6e8f2" : "rgba(200,205,225,.6)"; ctx.fillText(s.name, x, y + r + 15); ctx.textAlign = "left"; }
+  }
+  // Course to the selected hex.
+  if (selHex && selHex !== u.at && !S.battle) {
+    const p = findPath(S, u.at, selHex, unit === "pelion" ? "pelion" : "support");
+    if (p && p.path.length) {
+      ctx.strokeStyle = "rgba(242,193,78,.8)"; ctx.lineWidth = 2; ctx.setLineDash([5, 4]); ctx.beginPath();
+      let q = toPixel(u.at, size); ctx.moveTo(q.x, q.y); for (const k of p.path) { q = toPixel(k, size); ctx.lineTo(q.x, q.y); } ctx.stroke(); ctx.setLineDash([]);
+      const sp = unit === "pelion" ? speedOf(S) : SUPPORT[u.type].speed, first = Math.min(u.mp, p.cost), turns = p.cost <= u.mp ? 0 : Math.ceil((p.cost - first) / sp);
+      ctx.fillStyle = "#f2c14e"; ctx.font = "bold 11px system-ui"; ctx.fillText(turns ? `${turns + 1} turns` : "this turn", q.x + 9, q.y - 9);
+    }
+  }
+  // Ships.
+  const icon = (x, y, color, big, outline, dashed) => {
+    const s = big ? 1.5 : 1; ctx.fillStyle = color; ctx.strokeStyle = outline || "rgba(0,0,0,.75)"; ctx.lineWidth = 1.5; if (dashed) ctx.setLineDash([3, 2]);
+    ctx.beginPath(); ctx.moveTo(x + 9 * s, y); ctx.lineTo(x - 5 * s, y - 6 * s); ctx.lineTo(x - 2 * s, y); ctx.lineTo(x - 5 * s, y + 6 * s); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+  };
+  const byHex = {};
+  for (const e of visibleEnemies(S)) (byHex[e.at] = byHex[e.at] || []).push(e);
+  for (const [hex, list] of Object.entries(byHex)) { const { x, y } = toPixel(hex, size); list.forEach((e, i) => {
+    if (ENEMIES[e.type].base) { ctx.fillStyle = POWERS.orion.color; ctx.beginPath(); ctx.arc(x - 12, y - 12, 6, 0, Math.PI * 2); ctx.fill(); return; }
+    icon(x - 12 + i * 10, y - 15, POWERS[e.power].color, false, e.hostile ? "#ff5040" : null, e.revealed); }); }
+  for (const s of Object.values(S.support)) { const { x, y } = toPixel(s.at, size); icon(x - 2, y + 15, "#6fb4ff", false, unit === s.id ? "#fff" : null); }
+  { const { x, y } = toPixel(S.pelion.at, size); icon(x + 4, y - 2, "#f2c14e", true, unit === "pelion" ? "#fff" : null); }
+  if (selHex) { const { x, y } = toPixel(selHex, size); hexPath(ctx, x, y, size - 1); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke(); }
+  if (hoverHex && S.hexes[hoverHex] && hoverHex !== selHex) { const { x, y } = toPixel(hoverHex, size); hexPath(ctx, x, y, size - 1); ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 1; ctx.stroke(); }
+  ctx.restore();
+}
+
+// ---------- the bar and the tabs ----------
+const boxes = (n, max, cls = "") => `<span class="boxes ${cls}">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? "on" : ""}"><\/i>`).join("")}<\/span>`;
+function renderAll() { renderBar(); renderTabs(); renderPanel(); draw(); }
+function renderBar() {
+  $("bar-stats").innerHTML = `<span><b>Supplies<\/b>${S.supplies}<\/span><span><b>Science<\/b>${S.science}<\/span>`
+    + `<span title="Starfleet Command: five boxes and you're relieved of command"><b>Starfleet Command<\/b>${boxes(S.command, 5)}<\/span>`
+    + `<span title="Tension with the Klingon Empire"><b>Klingon tension<\/b>${boxes(S.tension, 10, "gold")}<\/span>`;
+  $("bar-turn").textContent = `Stardate ${stardate(S)} · Turn ${Math.min(S.turn, TOUR)} of ${TOUR}`;
+  $("end-turn").disabled = !canEndTurn(S);
+}
+function renderTabs() {
+  const due = S.orders.filter((o) => o.deadline - S.turn <= 2).length;
+  document.querySelectorAll(".tabs button").forEach((b) => { b.setAttribute("aria-selected", String(b.dataset.tab === tab)); if (b.dataset.tab === "orders") b.innerHTML = `Orders${S.orders.length ? `<span class="badge" style="${due ? "" : "background:var(--blue)"}">${S.orders.length}<\/span>` : ""}`; });
+}
+function renderPanel() {
+  const html = { here: hereHTML, ship: shipHTML, crew: crewHTML, orders: ordersHTML, sector: sectorHTML, log: logHTML }[tab]();
+  $("panel").innerHTML = html;
+}
+
+// ---------- Here: what's in the selected hex, and what the ship can do ----------
+function units() {
+  const list = [["pelion", "USS Pelion"], ...Object.values(S.support).map((u) => [u.id, u.name])];
+  if (list.length < 2) return "";
+  return `<div class="btn-row">${list.map(([id, n]) => `<button class="btn small ${unit === id ? "primary" : ""}" data-unit="${id}">${esc(n)}<\/button>`).join("")}<\/div>`;
+}
+function hint() {
+  if (!S.tutorial.on || S.turn > 12) return "";
+  const A = S.arc, cv = S.systems[S.corvan];
+  let t = "";
+  if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:<\/b> fly to Corvan II (the gold <b>!<\/b>). Double-click it on the map: the Pelion goes as far as it can this turn. Then <b>End turn<\/b>.`;
+  else if (A.stage === "pull") t = "<b>Next:<\/b> the away team. Use the actions below, one a turn, to fill the record before the Countdown fills.";
+  else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:<\/b> finish it on Corvan II: the action below.";
+  else if (S.turn <= 12) t = "<b>Next:<\/b> Starfleet will send new orders (the Orders tab). Meanwhile: survey the unknown (?), court the independent worlds, and watch for raiders.";
+  return t ? `<div class="card gold small">${t}<\/div>` : "";
+}
+function hereHTML() {
+  const u = U(), hex = selHex || u.at, s = sysAt(S, hex), here = hex === u.at;
+  let h = units() + hint();
+  if (S.pending && S.pending.unit === unit) h += pendingHTML();
+  else if (lastResult) h += resultHTML(lastResult);
+  // The place.
+  const k = s && shownKind(s);
+  h += `<h2>${esc(s ? s.name : S.hexes[hex].terrain === "zone" ? "The Neutral Zone" : S.hexes[hex].terrain === "nebula" ? "Nebula" : "Open space")}<\/h2>`;
+  h += `<p class="muted">${s ? esc(k ? kindName({ ...s, kind: k }) : "Uncharted system: survey it to find out") : ""}${S.hexes[hex].terrain === "nebula" ? " · Nebula: 2 moves to enter" : ""}${inZone(hex) ? " · Entering marks Starfleet Command, unless orders send you" : ""}<\/p>`;
+  if (s && k === "independent") h += `<div class="kv"><span>Accord<\/span><span>${s.accord > 0 ? "+" : ""}${s.accord} (Federation at +5, Klingon Empire at −5)<\/span><\/div>`;
+  if (s && s.harm) h += `<div class="kv"><span>Harm<\/span><span class="bad">${s.harm}/3<\/span><\/div>`;
+  if (s && (k === "anomaly" || k === "ruins") && s.surveyed) h += `<div class="kv"><span>Discovery<\/span><span>${s.recorded ? "Recorded" : `${s.clock}/${s.need}`}<\/span><\/div>`;
+  if (s && k === "prewarp") h += `<p class="small muted">The Prime Directive applies: observe them, don't be seen.${s.observed ? " Studied." : ""}<\/p>`;
+  for (const e of visibleEnemies(S).filter((x) => x.at === hex)) { const E = ENEMIES[e.type]; h += `<div class="card red"><h4>${esc(E.base ? "Orion pirate base" : E.name)}<\/h4><div class="small">${E.base ? "Found." : e.hostile ? "Hostile." : "Not hostile: it hasn't fired on anyone."} Shields ${E.shields - e.shields}/${E.shields}, hull ${E.hull - e.hull}/${E.hull}.${e.goal === "influence" ? " Courting the world here." : ""}<\/div><\/div>`; }
+  for (const o of S.orders.filter((x) => x.at === hex)) h += `<div class="card gold"><h4>Orders: ${esc(o.title)}<\/h4><div class="small">${o.arc ? "The first mission." : `${o.have}/${o.segs} done · due by turn ${o.deadline}`}<\/div><\/div>`;
+  if (!here) {
+    const p = findPath(S, u.at, hex, unit === "pelion" ? "pelion" : "support");
+    if (p) { const R = reachable(S, unit); h += `<div class="btn-row"><button class="btn primary" data-go="${hex}">${R[hex] !== undefined ? `Move here (${R[hex]} of ${u.mp} moves)` : "Set course: as far as we can this turn"}<\/button><\/div>`; }
+    return h;
+  }
+  // What the ship can do here.
+  const acts = actionsFor(S, unit);
+  h += `<h3>${unit === "pelion" ? "The Pelion's action this turn" : `The ${esc(u.name)}'s action`}<\/h3>`;
+  if (!acts.length) h += `<p class="muted small">Nothing to do here. Fly somewhere: double-click a hex.<\/p>`;
+  for (const a of acts) h += actionCard(a);
+  return h;
+}
+function optionsFor(a) {
+  if (unit !== "pelion") return [];
+  const out = [];
+  for (const c of CREW) { if (!available(S, c.id)) continue; for (const sk of a.skills) if (skillOf(S, c.id, sk)) out.push({ officer: c.id, skill: sk, total: target(S, c.id, sk, { action: a.id === "arc" ? "arc" : a.id, listen: a.id === "hail" || a.id === "sweep", extra: a.extra || [] }).total }); }
+  return out.sort((x, y) => y.total - x.total);
+}
+function actionCard(a) {
+  const tone = a.id === "engage" ? "red" : a.id === "mission" || a.id === "arc" ? "gold" : a.id === "envoy" ? "green" : "";
+  const enc = esc(JSON.stringify({ id: a.id, order: a.order, enemy: a.enemy, arc: a.arc }));
+  let h = `<div class="card ${tone}"><h4>${esc(a.name)}<\/h4><div class="small muted">${esc(a.blurb || "")}<\/div>`;
+  if (a.why) return h + `<div class="why">${esc(a.why)}<\/div><\/div>`;
+  if (a.id === "engage") return h + `<div class="roll-row"><button class="btn red small" data-act="${enc}">Engage<\/button><\/div><\/div>`;
+  const opts = optionsFor(a);
+  if (unit === "pelion" && !opts.length) return h + `<div class="why">Nobody fit for duty has the training.<\/div><\/div>`;
+  h += `<div class="roll-row">`;
+  if (opts.length) h += `<select data-who aria-label="Who does it">${opts.map((o, i) => `<option value="${o.officer}|${o.skill}" ${i === 0 ? "selected" : ""}>${esc(officer(o.officer).short)} · ${esc(o.skill)} ${o.total} (${pct(o.total)})<\/option>`).join("")}<\/select>`;
+  else h += `<span class="small muted">Its crew: 14 (${pct(14)})<\/span>`;
+  return h + `<button class="btn primary small" data-act="${enc}">Roll<\/button><\/div><\/div>`;
+}
+const diceHTML = (r) => `<span class="dice">${r.dice.map((d) => `<span class="die">${d}<\/span>`).join("")}<\/span>`;
+function pendingHTML() {
+  const p = S.pending, r = p.roll;
+  return `<div class="result no"><b>${esc(p.name)}<\/b>: ${diceHTML(r)} ${r.total} against ${r.target}: <b class="bad">fails by ${-r.margin}<\/b>
+    <div class="parts">${p.target.parts.map(([n, v]) => `${esc(n)} ${v >= 0 && n !== p.target.parts[0][0] ? "+" : ""}${v}`).join(" · ")}<\/div>
+    <div class="btn-row">${canReroll(S) ? `<button class="btn primary small" data-resolve="reroll">Spend a Duty point: reroll (${esc(officer(p.officer).short)} has ${S.crew[p.officer].duty})<\/button>` : ""}<button class="btn small" data-resolve="accept">Accept it<\/button><\/div><\/div>`;
+}
+function resultHTML(res) {
+  const r = res.roll;
+  return `<div class="result ${r.success ? "ok" : "no"}"><b>${esc(res.name)}<\/b>: ${diceHTML(r)} ${r.total} against ${r.target}: <b class="${r.success ? "good" : "bad"}">${r.success ? `success by ${r.margin}` : `fails by ${-r.margin}`}<\/b>${res.rerolled ? " (rerolled)" : ""}
+    <div class="parts">${res.target.parts.map(([n, v], i) => `${esc(n)} ${i && v >= 0 ? "+" : ""}${v}`).join(" · ")}<\/div><div>${esc(res.text || "")}<\/div><\/div>`;
+}
+
+// ---------- Ship ----------
+function shipHTML() {
+  const P = S.pelion, sm = shieldsMax(S);
+  let h = `<h2>USS Pelion · ${PELION.reg}<\/h2><p class="muted">${PELION.cls}. ${P.docked ? "Docked at Starbase 23." : `At ${esc(sysAt(S, P.at)?.name || "sector " + P.at)}.`}<\/p>`;
+  h += `<div class="kv"><span>Shields<\/span><span>${boxes(sm - P.shields, sm, "blue")}<\/span><span>Hull<\/span><span>${boxes(PELION.hull - P.hull, PELION.hull, "gold")}<\/span>`
+    + ["weapons", "engines", "sensors"].map((k) => `<span>${k[0].toUpperCase() + k.slice(1)}<\/span><span>${boxes(P.sys[k], 3)} ${["", "Damaged", "Crippled", "Offline"][P.sys[k]]}<\/span>`).join("")
+    + `<span>Power<\/span><span>${powerOf(S)}${P.powerLoss ? ` (−${P.powerLoss})` : ""}<\/span><span>Torpedoes<\/span><span>${P.torps}/${PELION.torps}<\/span><span>Speed<\/span><span>${speedOf(S)} hexes a turn<\/span><span>Sensors<\/span><span>rating ${sensorsRating(S)}; sees ${2 + (P.refits.sensors ? 1 : 0)} hexes<\/span><\/div>`;
+  h += `<p class="small muted">Hull and systems are repaired at Starbase 23 (or by Engineering, a box at a time). Shields come back after each battle.<\/p>`;
+  h += `<h3>Refits ${P.docked ? "" : "(at Starbase 23)"}<\/h3>`;
+  for (const [id, R] of Object.entries(REFITS)) h += `<div class="card ${P.refits[id] ? "green" : "violet"}"><h4>${esc(R.name)}<\/h4><div class="small muted">${esc(R.blurb)}<\/div><div class="roll-row">${P.refits[id] ? `<span class="good small">Fitted<\/span>` : `<button class="btn small" data-refit="${id}" ${!P.docked || S.science < R.cost ? "disabled" : ""}>Fit it: ${R.cost} science<\/button>`}<\/div><\/div>`;
+  h += `<h3>Your ships<\/h3>`;
+  for (const u of Object.values(S.support)) { const T = SUPPORT[u.type]; h += `<div class="card"><h4>${esc(u.name)}<\/h4><div class="small muted">${T.name}: ${T.blurb} Hull ${T.hull - u.hull}/${T.hull}.<\/div><div class="roll-row"><button class="btn small" data-unit="${u.id}">Command it<\/button><button class="btn small" data-center="${u.at}">Find it<\/button><\/div><\/div>`; }
+  if (!Object.keys(S.support).length) h += `<p class="small muted">Only the Pelion, for now.<\/p>`;
+  for (const [id, T] of Object.entries(SUPPORT)) h += `<div class="card violet"><h4>Requisition: ${esc(T.name)}<\/h4><div class="small muted">${esc(T.blurb)}<\/div><div class="roll-row"><button class="btn small" data-req="${id}" ${!P.docked || S.supplies < T.cost || Object.keys(S.support).length >= 3 ? "disabled" : ""}>${T.cost} supplies<\/button>${P.docked ? "" : `<span class="small muted">At Starbase 23<\/span>`}<\/div><\/div>`;
+  h += `<h3>Library records<\/h3>` + (S.records.length ? S.records.map((id) => { const r = RECORDS.find((x) => x.id === id); return `<div class="card green"><h4>${esc(r.name)}<\/h4><div class="small muted">${esc(r.text)}<\/div><\/div>`; }).join("") : `<p class="small muted">None yet. Investigate anomalies and ruins.<\/p>`);
+  return h;
+}
+
+// ---------- Crew ----------
+const DIV = { shvari: "", sevek: "sci", vessik: "sci", grath: "ops", reyes: "ops", rrinn: "ops" };
+function crewHTML() {
+  let h = `<h2>The crew<\/h2><p class="small muted">Each action is a roll: 3d6 at or under the officer's skill. A success earns experience; every five, +1 to the skill used. Duty points (2 each) reroll a failure, and come back every 8 turns or at Starbase 23. Hurt crew take −2 at 2 boxes and go to sickbay at 3.<\/p>`;
+  h += `<h3>Bridge stations (for battle)<\/h3><div class="kv">`;
+  const SK = { helm: "Helm", tactical: "Phasers", science: "Sensors", engineering: "Engineering", comms: "Communications" };
+  for (const [st, sk] of Object.entries(SK)) {
+    const cur = stationOfficer(S, st);
+    h += `<span>${st[0].toUpperCase() + st.slice(1)}<\/span><span><select data-station="${st}">${CREW.filter((c) => skillOf(S, c.id, sk)).map((c) => `<option value="${c.id}" ${cur === c.id ? "selected" : ""} ${available(S, c.id) ? "" : "disabled"}>${esc(c.short)} · ${sk} ${target(S, c.id, sk, { combat: true }).total}<\/option>`).join("")}<\/select><\/span>`;
+  }
+  h += `<span>Captain<\/span><span>${esc(S.captain)}: Leadership ${CAPTAIN.skills.Leadership}, Psychology ${CAPTAIN.skills.Psychology}, Diplomacy ${CAPTAIN.skills.Diplomacy}<\/span><\/div><div class="crew" style="margin-top:12px">`;
+  for (const c of CREW) {
+    const st = S.crew[c.id];
+    h += `<div class="officer ${DIV[c.id]}"><h4>${esc(c.name)}<\/h4><div class="small muted">${esc(c.rank)}, ${esc(c.post)}. ${esc(c.species)}.<\/div>
+      <div class="small">${st.inj ? `<span class="bad">Hurt ${st.inj}/3${st.inj >= 3 ? ": in sickbay" : st.inj === 2 ? ": −2" : ""}<\/span> · ` : ""}Duty ${boxes(st.duty, 2, "gold")} · Experience ${st.xp}/5<\/div>
+      <div class="skills">${Object.keys(c.skills).map((sk) => `<span>${esc(sk)} <b>${skillOf(S, c.id, sk)}<\/b><\/span>`).join("")}<\/div>
+      <div class="small" style="margin-top:4px"><b>${esc(c.adv)}:<\/b> <span class="muted">${esc(c.advText)}<\/span><\/div><\/div>`;
+  }
+  return h + `<\/div>`;
+}
+
+// ---------- Orders ----------
+function ordersHTML() {
+  let h = `<h2>Orders<\/h2>`;
+  const A = S.arc;
+  if (A.stage !== "travel" && A.stage !== "done") {
+    h += `<div class="card gold"><h4>The Silence at Corvan II<\/h4><div class="kv small"><span>Countdown<\/span><span>${boxes(A.countdown, COUNTDOWN)} (break orbit when full)<\/span><span>Record<\/span><span>${boxes(A.clock, CLOCK, "blue")}<\/span><\/div>`
+      + `<div class="small muted" style="margin-top:4px">${Object.entries(CLUES).filter(([k]) => A.clues[k]).map(([, c]) => `${esc(c.name)}: ${esc(c.found)}`).join("<br>") || "No clues yet."}<\/div><div class="roll-row"><button class="btn small" data-center="${S.systems[S.corvan].at}">Find Corvan II<\/button><\/div><\/div>`;
+  }
+  if (!S.orders.length && (A.stage === "done" || A.stage === "travel")) h += `<p class="muted">No orders. Starfleet will send more; meanwhile, the sector is yours to patrol.<\/p>`;
+  for (const o of S.orders) {
+    const left = o.deadline - S.turn;
+    h += `<div class="card ${left <= 2 && !o.arc ? "red" : "gold"}"><h4>${esc(o.title)}<\/h4>`;
+    if (o.text) h += `<p class="small">${esc(o.text)}<\/p>`;
+    if (!o.arc || A.stage === "travel") h += `<div class="small">${o.arc ? "" : `${o.have}/${o.segs} done with ${esc(o.skills.join(", "))}. `}Due by turn ${o.deadline} (${left} turn${left === 1 ? "" : "s"} left).<\/div>`;
+    h += `<div class="small muted">${o.twist ? `Twist: ${esc(o.twist.text)}. ` : ""}Something strange: ${esc(o.strange)}. Key character: ${esc(o.key)}.<\/div>`;
+    h += `<div class="roll-row"><button class="btn small" data-center="${o.at}">Find it<\/button><button class="btn small primary" data-go="${o.at}">Set course<\/button><\/div><\/div>`;
+  }
+  h += `<p class="small muted">Carried out: ${S.done}. Failed: ${S.failed}. Each success clears a Starfleet Command box; each failure marks one.<\/p>`;
+  return h;
+}
+
+// ---------- Sector ----------
+function sectorHTML() {
+  const sc = score(S);
+  let h = `<h2>The Corvan Sector<\/h2><p class="small muted">Turn ${Math.min(S.turn, TOUR)} of ${TOUR}. Score so far: <b class="gold">${sc.total}<\/b>.<\/p>`;
+  h += `<table class="tbl"><tr><th>World<\/th><th>What<\/th><th>Status<\/th><\/tr>`;
+  const order = { member: 0, colony: 1, starbase: 2, independent: 3, claimed: 4, klingon: 5, lost: 6 };
+  for (const s of Object.values(S.systems).filter((x) => shownKind(x) && order[shownKind(x)] !== undefined).sort((a, b) => order[a.kind] - order[b.kind])) {
+    const st = s.kind === "independent" ? `accord ${s.accord > 0 ? "+" : ""}${s.accord}` : s.harm ? `<span class="bad">harm ${s.harm}/3<\/span>` : "";
+    h += `<tr data-hex="${s.at}"><td>${esc(s.name)}<\/td><td>${esc(kindName(s))}<\/td><td>${st}${s.harm && s.kind === "independent" ? `, <span class="bad">harm ${s.harm}<\/span>` : ""}<\/td><\/tr>`;
+  }
+  h += `<\/table><h3>Score<\/h3><table class="tbl">${sc.parts.filter((p) => p[1]).map(([n, v]) => `<tr><td>${esc(n)}<\/td><td style="text-align:right">${v}<\/td><\/tr>`).join("")}<\/table>`;
+  h += `<h3>The powers<\/h3><p class="small muted"><b style="color:${POWERS.klingon.color}">Klingon Empire:<\/b> a cold war. Its ships court independent worlds; raiders strike when tension runs high. Firing first on a Klingon ship that hasn't fired is an incident. <b style="color:${POWERS.orion.color}">Orion Syndicate:<\/b> raiders from a hidden base; a sensor sweep near it hears where. <b style="color:${POWERS.romulan.color}">Romulans:<\/b> cloaked ships cross the Neutral Zone to strike; sweeps reveal them.<\/p>`;
+  return h;
+}
+function logHTML() { return `<h2>Captain's log<\/h2><ul class="log">${S.log.map((l) => `<li class="${l.kind}"><span class="t">${l.t}<\/span>${esc(l.text)}<\/li>`).join("")}<\/ul>`; }
+
+// ---------- the side panel's buttons ----------
+function bindChrome() {
+  document.querySelector(".tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-tab]"); if (!b) return; tab = b.dataset.tab; renderTabs(); renderPanel(); });
+  $("panel").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b || !S) return;
+    if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }
+    if (b.dataset.go) { selHex = b.dataset.go; goTo(b.dataset.go); return; }
+    if (b.dataset.center) { centerOn(b.dataset.center); selHex = b.dataset.center; tab = "here"; renderAll(); return; }
+    if (b.dataset.act) {
+      const a = JSON.parse(b.dataset.act), sel = b.parentElement.querySelector("[data-who]");
+      const [who, skill] = sel ? sel.value.split("|") : [];
+      const r = attempt(S, unit, a.id, { order: a.order, enemy: a.enemy, arc: a.arc, officer: who, skill });
+      if (r.error) { toast(r.error, true); return; }
+      lastResult = r.done ? r.result : null; after(); return;
+    }
+    if (b.dataset.resolve) { const r = resolve(S, b.dataset.resolve === "reroll"); lastResult = r.done ? r.result : null; after(); return; }
+    if (b.dataset.refit) { const r = fitRefit(S, b.dataset.refit); if (r.error) toast(r.error, true); after(); return; }
+    if (b.dataset.req) { const r = requisition(S, b.dataset.req); if (r.error) toast(r.error, true); after(); return; }
+  });
+  $("panel").addEventListener("change", (e) => { const s = e.target.closest("[data-station]"); if (s) { setStation(S, s.dataset.station, s.value); after(); } });
+  $("panel").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-hex]"); if (tr) { selHex = tr.dataset.hex; centerOn(selHex); tab = "here"; renderAll(); } });
+  $("end-turn").onclick = doEndTurn;
+  $("menu").onclick = showMenu;
+  $("zoom-in").onclick = () => zoomBy(1.25); $("zoom-out").onclick = () => zoomBy(0.8);
+  $("fit").onclick = () => { fitView(); draw(); };
+  $("find").onclick = () => { unit = "pelion"; centerOn(S.pelion.at); selHex = S.pelion.at; tab = "here"; renderAll(); };
+  document.addEventListener("keydown", (e) => {
+    if (!S || !$("modal").hidden || /input|select|textarea/i.test(e.target.tagName)) return;
+    if (e.key === "Enter" && !e.repeat) { e.preventDefault(); doEndTurn(); }
+  });
+  $("modal").addEventListener("click", modalClick);
+}
+function doEndTurn() {
+  if (!S || S.over) return;
+  if (!canEndTurn(S)) { toast(S.pending ? "Accept the roll, or reroll it, first." : "Finish what's in front of you first.", true); return; }
+  const before = S.log.length;
+  const r = endTurn(S); if (r.error) { toast(r.error, true); return; }
+  lastResult = null; unit = S.support[unit] ? unit : "pelion"; selHex = U().at;
+  const news = S.log.slice(0, Math.max(0, S.log.length - before)).filter((l) => l.kind === "order" || l.kind === "war" || l.kind === "bad");
+  if (news.length) toast(news[0].text, news[0].kind !== "order");
+  after();
+}
+
+// ---------- dialogs ----------
+function modal(html) { $("modal-body").innerHTML = html; $("modal").hidden = false; }
+function closeModal() { $("modal").hidden = true; }
+function showStarter(canContinue) {
+  modal(`<h1>USS Pelion: Frontier<\/h1>
+  <p class="lede">Stardate 5212.4. The Pelion, a Heavy Cruiser under your command, is assigned to the Corvan Sector for fifty weeks: a frontier between the Federation, the Klingon Empire and the Romulan Neutral Zone, full of worlds that haven't chosen a side and things no one has explained.<\/p>
+  <div class="grid2">
+    <div class="brief"><h3>The ship<\/h3><p>Double-click a hex to fly there (3 hexes a turn; nebulae cost 2). Then do one thing where you are: survey, investigate, negotiate, sweep, repair. Starbase 23 repairs, rearms and refits you.<\/p><\/div>
+    <div class="brief"><h3>The crew<\/h3><p>The six officers from the Players' Guide do the work. Every action is the tabletop roll: 3d6 at or under their skill. Pick who does it; a Duty point rerolls a failure.<\/p><\/div>
+    <div class="brief"><h3>Orders<\/h3><p>Starfleet sends missions from the GM's Guide's tables, each with a deadline and a twist. The first is The Silence at Corvan II.<\/p><\/div>
+    <div class="brief"><h3>The worlds<\/h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.<\/p><\/div>
+    <div class="brief"><h3>Battles<\/h3><p>Ship combat from the Players' Guide: spend Power on shields, phasers and torpedoes, give the captain's order, and break away if it goes wrong.<\/p><\/div>
+    <div class="brief"><h3>Starfleet Command<\/h3><p>Five boxes and you're relieved: incidents, the Prime Directive, lost colonies and failed orders mark it; success clears it. Survive the tour and earn your rating.<\/p><\/div>
+  <\/div>
+  <div class="ng-row"><label>Captain's name<input type="text" id="ng-name" placeholder="Captain" maxlength="30"><\/label>
+  <label>Difficulty<select id="ng-diff"><option value="easy">Easy<\/option><option value="normal" selected>Normal<\/option><option value="hard">Hard<\/option><\/select><\/label>
+  <label>Sector seed (optional)<input type="text" id="ng-seed" placeholder="random" maxlength="30"><\/label><\/div>
+  <div class="btn-row" style="margin-top:16px"><button class="btn primary" data-m="new">Take command<\/button>${canContinue ? `<button class="btn" data-m="continue">Continue your tour<\/button>` : ""}<\/div>
+  <p class="small muted">An unofficial fan game for the USS Pelion campaign, inspired by Star Trek. Not affiliated with or endorsed by Paramount or CBS Studios, who own Star Trek.<\/p>`);
+}
+function showMenu() {
+  modal(`<h2>Menu<\/h2><p class="muted">${esc(S.captain)}, turn ${S.turn} of ${TOUR}. This sector's seed: <span class="seed">${esc(S.seed)}<\/span><\/p>
+    <div class="btn-row"><button class="btn primary" data-m="close">Back to the bridge<\/button><button class="btn" data-m="help">How to play<\/button><button class="btn" data-m="restart">New tour<\/button><button class="btn" data-m="replay">Replay this sector<\/button><\/div>
+    <h3>Save code<\/h3><p class="small muted">The game saves in this browser after every move. To move it to another browser, copy this code, then paste it there under Load.<\/p>
+    <textarea id="code" rows="3" readonly>${esc(btoa(unescape(encodeURIComponent(JSON.stringify(S)))))}<\/textarea>
+    <div class="btn-row"><button class="btn small" data-m="copy">Copy<\/button><\/div>
+    <h3>Load<\/h3><textarea id="load" rows="2" placeholder="Paste a save code"><\/textarea><div class="btn-row"><button class="btn small" data-m="load">Load it<\/button><\/div>`);
+}
+function showHelp() { showStarter(true); $("modal-body").querySelector("[data-m=new]").textContent = "Start a new tour"; }
+function showEvent() {
+  const ev = S.event;
+  if (ev.kind === "arc-arrive") {
+    const ch = arcEventChoices(S);
+    modal(`<h2>Corvan II<\/h2><p>The Orion raider is in orbit, on the far side of the moon. It hails first: they're "legitimate salvagers", and this is unclaimed space.<\/p>
+      ${eventResult ? `<div class="result ${eventResult.roll ? (eventResult.roll.success ? "ok" : "no") : ""}">${eventResult.roll ? `${diceHTML(eventResult.roll)} ${eventResult.roll.total} against ${eventResult.roll.target} (${esc(officer(eventResult.roll.officer)?.short || "Captain")}, ${esc(eventResult.roll.skill)}). ` : ""}${esc(eventResult.text)}<\/div>` : ""}
+      <div class="grid2">${ch.map((c) => `<div class="brief"><h3>${esc(c.name)}<\/h3><p>${esc(c.blurb)}<\/p><div class="btn-row"><button class="btn ${c.id === "engage" ? "red" : "primary"} small" data-ev="${c.id}" ${c.disabled ? "disabled" : ""}>${esc(c.name)}<\/button><\/div><\/div>`).join("")}<\/div>`);
+    return;
+  }
+  modal(`<h2>${esc(ev.title || "")}<\/h2><p>${esc(ev.text || "")}<\/p><div class="btn-row"><button class="btn primary" data-m="event-ok">Continue<\/button><\/div>`);
+}
+function showBattle() {
+  const B = S.battle, e = S.enemies[B.enemy], E = e ? ENEMIES[e.type] : null, P = S.pelion, st = battleStats(S), sm = shieldsMax(S);
+  if (!bchoice) bchoice = { order: "command", shields: true, phasers: true, torps: P.torps > 0, repair: false, breakOff: false };
+  const used = (bchoice.shields ? 1 : 0) + (bchoice.phasers && !bchoice.breakOff ? 1 : 0) + (bchoice.torps && !bchoice.breakOff ? 1 : 0), spare = Math.max(0, st.power - used);
+  const chip = (k, label, dis) => `<label class="chip ${dis ? "off" : ""}"><input type="checkbox" data-b="${k}" ${bchoice[k] ? "checked" : ""} ${dis ? "disabled" : ""}>${label}<\/label>`;
+  const ord = (k, label) => `<label class="chip"><input type="radio" name="ord" data-o="${k}" ${bchoice.order === k ? "checked" : ""}>${label}<\/label>`;
+  const who = (id) => (id ? esc(officer(id).short) : "nobody");
+  const over = B.over;
+  modal(`<h2>Battle${E ? `: ${esc(E.base ? "the Orion base" : E.name)}` : ""}<\/h2>
+  <div class="battle">
+    <div class="ship-card"><h4 class="gold">USS Pelion<\/h4>
+      <div class="track"><span>Shields<\/span>${boxes(sm - P.shields, sm, "blue")}<\/div><div class="track"><span>Hull<\/span>${boxes(PELION.hull - P.hull, PELION.hull, "gold")}<\/div>
+      <div class="track"><span>Systems<\/span>Weapons ${P.sys.weapons} · Engines ${P.sys.engines} · Sensors ${P.sys.sensors}<\/div>
+      <div class="small muted">Helm ${who(st.helmId)} ${st.helm} · Tactical ${who(st.gunId)} ${st.gun} · Engineering ${who(st.engId)} ${st.eng} · Power ${st.power} · Torpedoes ${P.torps}<\/div><\/div>
+    ${E ? `<div class="ship-card"><h4 style="color:${POWERS[e.power].color}">${esc(E.base ? "Orion pirate base" : E.name)}<\/h4>
+      <div class="track"><span>Shields<\/span>${boxes(E.shields - e.shields, E.shields, "blue")}<\/div><div class="track"><span>Hull<\/span>${boxes(Math.max(0, E.hull - e.hull), E.hull, "gold")}<\/div>
+      <div class="small muted">Helm ${E.helm} · Gunner ${E.gunner} · Maneuver ${E.maneuver} vs your ${st.maneuver}${E.plasma ? " · Plasma torpedo: +2 to evade it" : ""}${E.relentless ? " · Relentless" : ""}${E.fast ? " · Fast: runs when its shields fall" : ""}<\/div><\/div>` : `<div class="ship-card"><h4>Gone<\/h4><\/div>`}
+  <\/div>
+  ${over ? `<div class="result ${over === "destroyed" || over === "hailed" || over === "escaped" || over === "fled" ? "ok" : "no"}"><b>${{ destroyed: "Destroyed.", fled: "They broke off.", hailed: "They stood down.", escaped: "The Pelion broke away.", lost: "The Pelion is lost." }[over]}<\/b><\/div><div class="btn-row"><button class="btn primary" data-m="battle-done">Continue<\/button><\/div>`
+  : `<h3>The captain's order<\/h3><div class="orders-choice">${ord("command", `Command (Leadership ${CAPTAIN.skills.Leadership}, ${pct(CAPTAIN.skills.Leadership)}): +2 to Tactical`)}${ord("read", `Read the enemy (Psychology ${CAPTAIN.skills.Psychology}): +2 evade, +1 to hit`)}${E && !E.base && e.power !== "romulan" ? ord("hail", `Hail (Diplomacy ${CAPTAIN.skills.Diplomacy} vs Will ${E.will}): they may stand down`) : ""}${ord("none", "No order")}<\/div>
+  <h3>Power: ${st.power} · ${used} spent · ${spare ? `+${Math.min(2, spare)} to ${bchoice.phasers && !bchoice.breakOff ? "phasers" : "evade"}` : "nothing spare"}<\/h3>
+  <div class="orders-choice">${chip("shields", "Shields up")}${chip("phasers", `Phasers (${st.gun}, ${pct(st.gun)})`, st.weaponsOut || bchoice.breakOff)}${chip("torps", `Torpedoes (${st.gun + 1}; can't be evaded)`, !P.torps || st.weaponsOut || bchoice.breakOff)}${chip("repair", `Damage control (${st.eng})`)}${chip("breakOff", `Break away (Helm ${st.helm}): instead of firing`)}<\/div>
+  <div class="btn-row"><button class="btn primary" data-m="exchange">Next exchange<\/button><\/div>`}
+  <div class="blog">${B.log.slice().reverse().map((l) => `<div>${esc(l)}<\/div>`).join("") || `<span class="muted">${B.ambush ? "They decloak, firing." : "Both ships close. Your orders, Captain?"}<\/span>`}<\/div>`);
+}
+function showEnd() {
+  const sc = score(S);
+  modal(`<h1>${S.over.win ? "The tour is over" : "Relieved"}<\/h1><p class="lede">${esc(S.over.why)}<\/p>
+  <h3>${esc(rating(sc.total))}<\/h3><table class="tbl">${sc.parts.map(([n, v]) => `<tr><td>${esc(n)}<\/td><td style="text-align:right">${v}<\/td><\/tr>`).join("")}<tr><td><b>Total<\/b><\/td><td style="text-align:right"><b>${sc.total}<\/b><\/td><\/tr><\/table>
+  <p class="small muted" style="margin-top:10px">This sector's seed: <span class="seed">${esc(S.seed)}<\/span><\/p>
+  <div class="btn-row"><button class="btn primary" data-m="restart">New tour<\/button><button class="btn" data-m="replay">Replay this sector<\/button><button class="btn" data-m="close">Look at the map<\/button><\/div>`);
+}
+function modalClick(e) {
+  const b = e.target.closest("button"); if (!b) return;
+  const m = b.dataset.m;
+  if (b.dataset.ev) { eventResult = chooseEvent(S, b.dataset.ev); if (!S.event) eventResult = null; after(); if (!S.event && !S.battle && !S.over) closeModal(); return; }
+  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value }); startGame(s); return; }
+  if (m === "continue") { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } return; }
+  if (m === "close") { closeModal(); return; }
+  if (m === "help") { showHelp(); return; }
+  if (m === "restart") { showStarter(false); return; }
+  if (m === "replay") { startGame(newGame({ seed: S.seed, difficulty: S.difficulty, captain: S.captain })); return; }
+  if (m === "copy") { const t = $("code"); t.select(); try { navigator.clipboard.writeText(t.value); toast("Copied."); } catch { document.execCommand("copy"); } return; }
+  if (m === "load") { try { startGame(JSON.parse(decodeURIComponent(escape(atob($("load").value.trim()))))); } catch { toast("That code didn't load.", true); } return; }
+  if (m === "event-ok") { dismissEvent(S); closeModal(); after(); return; }
+  if (m === "exchange") { exchange(S, { ...bchoice, order: bchoice.order === "none" ? null : bchoice.order }); save(); renderAll(); showBattle(); return; }
+  if (m === "battle-done") { closeBattle(S); bchoice = null; closeModal(); after(); return; }
+}
+document.addEventListener("change", (e) => {
+  if (!S || !S.battle || !bchoice) return;
+  const t = e.target;
+  if (t.dataset.b) { bchoice[t.dataset.b] = t.checked; showBattle(); }
+  if (t.dataset.o) { bchoice.order = t.dataset.o; showBattle(); }
+});
+let toastTimer = null;
+function toast(msg, bad) { const t = $("toast"); t.textContent = msg; t.className = "toast show" + (bad ? " bad" : ""); clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.className = "toast"), 4200); }
+
+boot();
+
+})();
+</script>
+
+</body></html>
