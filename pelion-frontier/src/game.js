@@ -603,6 +603,10 @@ export function missionReport(S, o, result, how, rewards) {
 export const campaignOf = (S) => (S.campaign = S.campaign || { threads: [], beats: [], finale: false, over: null });
 /** The current act, from the beats reached so far. */
 export const campaignAct = (S) => { const C = campaignOf(S), b = CAMPAIGN.beats.filter((x) => C.beats.includes(x.at)); return b.length ? b[b.length - 1].act : "Prologue: The Silence at Corvan II"; };
+/** Is the campaign known yet? Only once Corvan II is over: before that, nothing about it may show. */
+export const campaignOpen = (S) => campaignOf(S).beats.includes(0);
+/** Starfleet's reason for an order, tied to the campaign: only once the campaign is known. */
+export const orderReason = (S, o) => { const st = storyOf(o); return st && st.why && campaignOpen(S) ? st.why : null; };
 /** A beat of the campaign's story, once. */
 function campaignBeat(S, at) {
   const C = campaignOf(S), b = CAMPAIGN.beats.find((x) => x.at === at);
@@ -615,7 +619,8 @@ function campaignThread(S, o) {
   const st = storyOf(o), C = campaignOf(S);
   if (o.finale) return null;
   if (o.arc) { campaignBeat(S, 0); return null; }
-  if (!st || !st.thread || C.over) return null;   // once the Gate is decided, the campaign is over
+  // Before Corvan II is over, nothing is known of the Makers: no threads, no reasons. Once the Gate is decided, it's over.
+  if (!st || !st.thread || C.over || !C.beats.includes(0)) return null;
   C.threads.push({ title: o.title, text: storyText(S, o, st.thread), turn: S.turn });
   const n = C.threads.length;
   log(S, `${CAMPAIGN.title}, thread ${n}: ${storyText(S, o, st.thread)}`, "discovery");

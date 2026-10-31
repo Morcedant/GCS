@@ -324,3 +324,14 @@ test("the campaign: Corvan II opens it, each order adds a thread, six lead to th
   assert.equal(S.campaign.over, "guard"); assert.ok(S.records.includes("makers"));
   assert.ok(score(S).parts.some(([n, v]) => /the Gate/.test(n) && v === 25));
 });
+test("the prologue shows nothing of the campaign: no reasons, no threads, until Corvan II is over", async () => {
+  const { orderReason, campaignOpen } = await import("../src/game.js");
+  const S = newGame({ seed: "pro" });
+  assert.ok(!campaignOpen(S));
+  for (const o of S.backlog) assert.equal(orderReason(S, o), null);
+  const o = S.backlog[0]; acceptOrder(S, o.id); S.event = null; S.eventQueue = []; completeOrder(S, o, true); S.event = null; S.eventQueue = [];
+  assert.equal(S.campaign.threads.length, 0);                 // done during the prologue: no thread
+  assert.ok(!S.log.some((l) => /Maker|caretaker|Kor'vath/i.test(l.text)));
+  const arc = S.orders.find((x) => x.arc); S.arc.stage = "done"; completeOrder(S, arc, true, "Done.");
+  assert.ok(campaignOpen(S)); assert.ok(orderReason(S, S.backlog[0] || S.orders.find((x) => !x.arc)));
+});

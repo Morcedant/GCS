@@ -1345,6 +1345,10 @@ function missionReport(S, o, result, how, rewards) {
 const campaignOf = (S) => (S.campaign = S.campaign || { threads: [], beats: [], finale: false, over: null });
 /** The current act, from the beats reached so far. */
 const campaignAct = (S) => { const C = campaignOf(S), b = CAMPAIGN.beats.filter((x) => C.beats.includes(x.at)); return b.length ? b[b.length - 1].act : "Prologue: The Silence at Corvan II"; };
+/** Is the campaign known yet? Only once Corvan II is over: before that, nothing about it may show. */
+const campaignOpen = (S) => campaignOf(S).beats.includes(0);
+/** Starfleet's reason for an order, tied to the campaign: only once the campaign is known. */
+const orderReason = (S, o) => { const st = storyOf(o); return st && st.why && campaignOpen(S) ? st.why : null; };
 /** A beat of the campaign's story, once. */
 function campaignBeat(S, at) {
   const C = campaignOf(S), b = CAMPAIGN.beats.find((x) => x.at === at);
@@ -1357,7 +1361,8 @@ function campaignThread(S, o) {
   const st = storyOf(o), C = campaignOf(S);
   if (o.finale) return null;
   if (o.arc) { campaignBeat(S, 0); return null; }
-  if (!st || !st.thread || C.over) return null;   // once the Gate is decided, the campaign is over
+  // Before Corvan II is over, nothing is known of the Makers: no threads, no reasons. Once the Gate is decided, it's over.
+  if (!st || !st.thread || C.over || !C.beats.includes(0)) return null;
   C.threads.push({ title: o.title, text: storyText(S, o, st.thread), turn: S.turn });
   const n = C.threads.length;
   log(S, `${CAMPAIGN.title}, thread ${n}: ${storyText(S, o, st.thread)}`, "discovery");
@@ -2990,7 +2995,7 @@ function ordersHTML() {
   for (const o of S.orders) {
     const st = orderStatus(o), left = o.deadline - S.turn;
     h += `<div class="card ${st[1] === "bad" ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}<\/span><\/h4>
-      <div class="small">${o.arc ? esc(o.text) : `${o.text ? esc(o.text) + "<br>" : ""}${storyOf(o) && storyOf(o).why ? `<b>Starfleet's reason:<\/b> ${esc(storyOf(o).why)}<br>` : ""}${o.have} of ${o.segs} successes · ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})`}<\/div>${urgentLine(o)}
+      <div class="small">${o.arc ? esc(o.text) : `${o.text ? esc(o.text) + "<br>" : ""}${orderReason(S, o) ? `<b>Starfleet's reason:<\/b> ${esc(orderReason(S, o))}<br>` : ""}${o.have} of ${o.segs} successes · ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})`}<\/div>${urgentLine(o)}
       <div class="roll-row"><button class="btn small" data-tab-go="mission">Progress (Mission tab)<\/button><button class="btn small" data-center="${o.at}">Find it<\/button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}<\/button><\/div><\/div>`;
   }
   // The backlog.
@@ -2998,7 +3003,7 @@ function ordersHTML() {
   if (!back.length) h += `<p class="small muted">Nothing waiting. With two orders under way, or urgent orders in hand, new orders from Starfleet wait here.<\/p>`;
   else {
     h += `<p class="small muted">Waiting their turn: the oldest moves up when an order under way is finished. Their clocks start when they do. You can take one on now, if you think the Pelion can manage more.<\/p>`;
-    for (const o of back) h += `<div class="card"><h4>${esc(o.title)}${isUrgent(o) ? ` <span class="badge-status bad">Urgent<\/span>` : ""}<\/h4><div class="small">Received turn ${o.received || o.issued} · ${o.segs} successes with ${esc(o.skills.join(", "))} · ${distance(S.pelion.at, o.at)} ly away${o.twist ? ` · Twist: ${esc(o.twist.text)}` : ""}<\/div>${storyOf(o) && storyOf(o).why ? `<div class="small"><b>Starfleet's reason:<\/b> ${esc(storyOf(o).why)}<\/div>` : ""}
+    for (const o of back) h += `<div class="card"><h4>${esc(o.title)}${isUrgent(o) ? ` <span class="badge-status bad">Urgent<\/span>` : ""}<\/h4><div class="small">Received turn ${o.received || o.issued} · ${o.segs} successes with ${esc(o.skills.join(", "))} · ${distance(S.pelion.at, o.at)} ly away${o.twist ? ` · Twist: ${esc(o.twist.text)}` : ""}<\/div>${orderReason(S, o) ? `<div class="small"><b>Starfleet's reason:<\/b> ${esc(orderReason(S, o))}<\/div>` : ""}
       <div class="roll-row"><button class="btn small" data-center="${o.at}">Find it<\/button><button class="btn small primary" data-accept="${o.id}">Take it on now<\/button><\/div><\/div>`;
   }
   // Past orders.
@@ -3007,6 +3012,7 @@ function ordersHTML() {
 }
 /** The campaign this tour: The Makers' Watch, its act, the threads found, and the story so far. */
 function campaignHTML() {
+  if (!campaignOpen(S)) return `<div class="card gold"><h4>The campaign <span class="badge-status">Prologue<\/span><\/h4><p class="small">The tour begins with your first orders: The Silence at Corvan II. What the Pelion finds there will set the course of everything after it.<\/p><\/div>`;
   const C = campaignOf(S), n = Math.min(C.threads.length, CAMPAIGN.finaleAt), beats = CAMPAIGN.beats.filter((b) => C.beats.includes(b.at));
   const next = CAMPAIGN.beats.find((b) => !C.beats.includes(b.at) && b.at > 0);
   const status = C.over === "close" ? "Resolved: the watch is over, the Gate closed." : C.over === "guard" ? "Resolved: the Gate kept open, under Starfleet's guard." : C.over === "lost" ? "Lost: House Kor'vath reached the Gate first." : C.finale ? "The finale: get to the Makers' Gate first (the Orders tab)." : !C.beats.includes(0) ? "It begins at Corvan II." : `${n} of ${CAMPAIGN.finaleAt} threads to find the Makers' Gate${next ? `; the next revelation at ${next.at}` : ""}.`;
@@ -3041,7 +3047,7 @@ function missionHTML() {
       h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}<\/span><\/h4>`;
       const story = storyOf(o);
       if (o.text) h += `<p class="small">${esc(o.text)}<\/p>`;
-      if (story && story.why) h += `<p class="small"><b>Starfleet's reason:<\/b> ${esc(story.why)}<\/p>`;
+      if (orderReason(S, o)) h += `<p class="small"><b>Starfleet's reason:<\/b> ${esc(orderReason(S, o))}<\/p>`;
       if (story) {
         // The story, step by step: what's done and what's next; later steps stay hidden until they come.
         const steps = [[`Reach ${o.sys ? S.systems[o.sys].name : "the border"} (${distance(S.pelion.at, o.at)} ly away)`, there || o.arrived || o.have > 0]]
@@ -3157,7 +3163,7 @@ function showStarter(canContinue) {
   <div class="grid2">
     <div class="brief"><h3>The ship<\/h3><p>Double-click a hex to fly there. A hex is a light-year and a turn a week; speed is v = W³ × c, so warp 6, the Pelion's maximum stable speed, covers about 4 light-years a week, and warp 8, its emergency maximum, about 10, at a risk to the engines. Urgent orders call for emergency warp. Nebulae count double. Then the crew goes to work where you are: every officer acts once a turn (survey, investigate, negotiate, sweep, repair), each job once. Starbase 23 repairs, rearms and refits you.<\/p><\/div>
     <div class="brief"><h3>The crew<\/h3><p>The six officers from the Players' Guide do the work. Every action is the tabletop roll: 3d6 at or under their skill. Pick who does it, and whether a second officer assists (+1, using their turn); a Duty point rerolls a failure.<\/p><\/div>
-    <div class="brief"><h3>The campaign<\/h3><p>${esc(CAMPAIGN.title)}: it begins with The Silence at Corvan II. Something left machines all over this sector to watch over younger worlds. Two sites have already been dug up, and everyone who was there, a survey team and a whole mining settlement, is gone. Every order you carry out turns up a thread toward who is doing it; six threads lead to the finale.<\/p><\/div>
+    <div class="brief"><h3>The campaign<\/h3><p>The tour is one long story, and it begins with your first orders, The Silence at Corvan II. What you find there sets the course of everything after it: every order that follows will turn up a piece of it.<\/p><\/div>
     <div class="brief"><h3>Orders<\/h3><p>Starfleet sends missions, each with a deadline, a twist, its own story, and a reason tied to the campaign. Each ends with a decision that's yours to make.<\/p><\/div>
     <div class="brief"><h3>The worlds<\/h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.<\/p><\/div>
     <div class="brief"><h3>Battles<\/h3><p>Ship combat from the Players' Guide: spend Power on shields, phasers and torpedoes, give the captain's order, and break away if it goes wrong.<\/p><\/div>
