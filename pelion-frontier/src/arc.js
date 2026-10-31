@@ -52,16 +52,10 @@ export function arcActions(S) {
   if (surface && !A.team) { out.push({ id: "beam", name: "Beam down an away team", skills: [], free: true, blurb: "Choose two to four officers. Only the away team can act on the surface; whoever stays aboard runs the ship. The transporter takes no action." }); return out; }
   const team = A.team, aboard = surface ? CREW.map((c) => c.id).filter((id) => !team.includes(id)) : null;
   if (A.stage === "orbit") add("scan", "Sweep the ruins with the ship's sensors", ["Sensors", "Physical Sciences"], "Find out what's down there before anyone beams down. Whatever the roll, something in the ruins will notice.");
+  // The clues: Sevek forms his theory the moment the away team has THEORY_AT of them. The last one still helps later.
+  if (A.stage === "pull" || A.stage === "orions")
+    for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `${A.theory ? `More evidence (${cluesFound(A)}/${CLOCK} clues): every clue makes Sevek's case stronger later.` : `Evidence for Sevek's theory (${cluesFound(A)}/${CLOCK} clues): with ${THEORY_AT}, he has enough to form it.`} A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]], team);
   if (A.stage === "pull") {
-    for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `Evidence for Sevek's theory (${cluesFound(A)}/${CLOCK} clues; he needs ${THEORY_AT}). A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]], team);
-    // Sevek's theory: what's in the ruins. Earned by the evidence; Sevek works it out wherever he is.
-    const n = cluesFound(A), sv = available(S, "sevek");
-    const evidence = [["An uncatalogued civilization", -3]].concat(n > THEORY_AT ? [["Every clue found", n - THEORY_AT]] : [], A.strong ? [["Strong findings", Math.min(2, A.strong)]] : [], A.readings ? [["The orbital readings", 1]] : []);
-    const th = { id: "arc", arc: "theory", name: "Sevek's theory: what's in the ruins", skills: ["Physical Sciences"], who: ["sevek"], extra: evidence,
-      blurb: `Put the evidence together. Sevek alone, from the surface or the ship. Success tells you what the ruins hold; a failure costs time. The more clues found, the better the odds (${n}/${CLOCK} found).` };
-    if (n < THEORY_AT) th.why = `Not enough evidence yet: ${n} of the ${THEORY_AT} clues Sevek needs.`;
-    else if (!sv) th.why = "Sevek is in sickbay. The theory waits for him.";
-    out.push(th);
     if (!A.boughtTime && A.countdown > 0) add("time", "Aboard: buy time, reroute power", ["Engineering"], "Clear a segment of the Countdown. Once. Done from the ship, by someone still aboard.", [], aboard);
   }
   if (A.stage === "orions") {
@@ -91,7 +85,7 @@ export function arcStep(S, p) {
   // On the surface map, whoever did it is now where it happened.
   if (A.team && SITE_OF[k] && A.team.includes(p.officer)) { A.pos = A.pos || {}; A.pos[p.officer] = SITE_OF[k]; }
   if (k === "scan") {
-    if (r.success) { A.readings = true; alog(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. Not an answer, but readings Sevek can use later (+1 to his theory).`, "discovery"); }
+    if (r.success) { A.readings = true; alog(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. Not an answer, but readings Sevek can use later.`, "discovery"); }
     else alog(S, `${who}'s sweep of the ruins at Corvan II: interference, and then the readings go strange.`);
     startPull(S);
     return "";
@@ -106,20 +100,11 @@ export function arcStep(S, p) {
     }
     A.clues[k.slice(5)] = true; A.clock = cluesFound(A);
     if (k === "clue-village") A.knowPhasers = true;
-    if (r.margin >= 5) A.strong = (A.strong || 0) + 1;
     astory(S, c.name, c.detail);
     const n = A.clock;
-    alog(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} Clues: ${n}/${CLOCK}.${r.margin >= 5 ? " A strong finding: +1 to Sevek's theory." : ""}${n === THEORY_AT ? " Sevek thinks there's enough now to form a theory of what's in the ruins (the Here tab)." : n < THEORY_AT ? ` Sevek needs ${THEORY_AT - n} more before he can form a theory.` : ""}`, "discovery");
-    return "";
-  }
-  if (k === "theory") {
-    if (!r.success) {
-      A.countdown++;
-      alog(S, `Sevek's theory doesn't hold together yet: one piece of the evidence contradicts another. The Countdown: ${A.countdown}/${COUNTDOWN}.${cluesFound(A) < CLOCK ? " Another clue would help." : ""}`, "bad");
-      return checkCountdown(S);
-    }
-    A.stage = "orions"; A.theory = true;
-    astory(S, "Sevek's theory: a guardian, not a weapon", `Sevek lays the evidence out in the outpost's lab, one piece at a time. \"The dampener test, then the spike: Dr. Haskel's device did not damage something in the ruins. It woke it. The scientists left calmly, at one moment, as if called: they were not attacked, they were collected. The field does not strike at the away team; it catalogues them, as it has catalogued the Ketari for centuries. And the village sits inside its range.\" He looks up. \"The evidence suggests a hypothesis, nothing more. Something in the ruins was set to watch over the Ketari, and it judged Dr. Haskel's device a threat to them and removed the threat. Whether it is a machine, a mind or a mechanism with no mind at all, I cannot say. Whether it harmed them, I cannot say either.${A.readings ? " The ship read eight life signs deep beneath the ruins. If they are the scientists, they are alive. How they are held, I cannot know until we see it." : " If the scientists are anywhere, they are beneath the ruins, where the field is strongest. What became of them, I cannot know until we see it."}\"\n\nA guardian, not a weapon, if Sevek is right; and only a hypothesis until someone goes down there. The Orions are in the ruins now, cutting their way toward whatever it is.`);
+    alog(S, `Corvan II, ${c.name.toLowerCase()}: ${c.found} Clues: ${n}/${CLOCK}.${n < THEORY_AT ? ` Sevek needs ${THEORY_AT - n} more before he can form a theory.` : ""}`, "discovery");
+    if (n >= THEORY_AT && !A.theory) formTheory(S);
+    else if (A.theory) alog(S, "Sevek adds it to his case: it will help when the time comes to argue it.", "discovery");
     return "";
   }
   if (k === "time") {
@@ -209,6 +194,20 @@ const SPEECH = `"You have come a long way to be so careless. Be still; I will no
 "For eleven thousand years I have kept that law. I turned aside the ships that came too close. I let the city fall to ruin so that it would be a story, not a lesson. Then your people built a station within sight of the village, and one of them, the one called Haskel, reached into me with a device to silence me and see what I was. That was a threat to my charges. I removed it. I removed all eight of them, gently. They sleep, they do not age, and they do not suffer. They will sleep until the Ketari no longer need me, and that will be a very long time.
 
 "The pirates I could not stop so gently: they bribed my charges with weapons and set them digging at my walls. You have dealt with the pirates, and for that I thank you. Now I ask you to go, and to tell your people not to come back. Your ship is welcome to leave. I will release its power when it does."`;
+/** Enough evidence: Sevek's theory, no roll needed. Built from the clues the away team actually found. */
+const THEORY_PIECES = {
+  logs: "The dampener test, then the spike: Dr. Haskel's device did not damage something in the ruins. It woke it.",
+  bunks: "The scientists left calmly, at one moment, as if called: they were not attacked, they were collected.",
+  energy: "The field does not strike at the away team; it catalogues them, as it has surely catalogued the Ketari for centuries. And the village sits inside its range.",
+  village: "The Ketari dig in those ruins every night, and nothing there has harmed one of them: whatever is below does not treat them as intruders. Only the off-worlders vanished.",
+};
+function formTheory(S) {
+  const A = S.arc;
+  A.stage = "orions"; A.theory = true;
+  const said = Object.keys(THEORY_PIECES).filter((k) => A.clues[k]).map((k) => THEORY_PIECES[k]).join(" ");
+  alog(S, `With ${cluesFound(A)} clues, Sevek has enough to form a theory: something in the ruins watches over the Ketari, and it took the scientists. A hypothesis, until someone sees it.`, "discovery");
+  astory(S, "Sevek's theory: a guardian, not a weapon", `Sevek lays the evidence out in the outpost's lab, one piece at a time. \"${said}\" He looks up. \"The evidence suggests a hypothesis, nothing more. Something in the ruins was set to watch over the Ketari, and it judged Dr. Haskel's device a threat to them and removed the threat. Whether it is a machine, a mind or a mechanism with no mind at all, I cannot say. Whether it harmed them, I cannot say either.${A.readings ? " The ship read eight life signs deep beneath the ruins. If they are the scientists, they are alive. How they are held, I cannot know until we see it." : " If the scientists are anywhere, they are beneath the ruins, where the field is strongest. What became of them, I cannot know until we see it."}\"\n\nA guardian, not a weapon, if Sevek is right; and only a hypothesis until someone goes down there. The Orions are in the ruins now, cutting their way toward whatever it is.`);
+}
 function checkCountdown(S) {
   const A = S.arc;
   if (A.countdown < COUNTDOWN || A.stage === "done") return "";

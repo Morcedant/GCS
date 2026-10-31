@@ -286,7 +286,7 @@ function drawSurface(ctx, W, H) {
   ctx.fillStyle = "#f2c14e"; ctx.font = "700 14px Antonio, system-ui, sans-serif"; ctx.fillText("CORVAN II · SURFACE", R.x + 22, R.y + 30);
   ctx.fillStyle = "#e6e8f2"; ctx.font = "12px system-ui, sans-serif";
   ctx.fillText(`The Pelion in orbit · Countdown ${A.countdown}/${COUNTDOWN}`, R.x + 22, R.y + 48);
-  ctx.fillText(`Clues ${cluesFound(A)}/${CLOCK}${A.theory ? " · Sevek's theory: a guardian" : cluesFound(A) >= THEORY_AT ? " · Sevek can form a theory" : ""} · Click a place`, R.x + 22, R.y + 64);
+  ctx.fillText(`Clues ${cluesFound(A)}/${CLOCK}${A.theory ? " · Sevek's theory: a guardian" : ""} · Click a place`, R.x + 22, R.y + 64);
 }
 function clickSurface(mx, my) {
   if (!surfaceBox) return;
@@ -345,8 +345,7 @@ function hint() {
     ? "<b>Next:</b> passive sensors show nothing and the outpost is silent. A Sensor sweep checks the space around Corvan II (anything behind the moon?); sweeping the ruins finds out what happened below. Both are on the Here tab."
     : "<b>Next:</b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
   else if (A.stage === "pull" && !A.team) t = "<b>Next:</b> choose an away team and beam them down to the outpost (the Here tab).";
-  else if (A.stage === "pull" && cluesFound(A) >= THEORY_AT) t = "<b>Next:</b> there's enough evidence. Have Sevek form his theory of what's in the ruins (the Here tab), or find the last clue first for better odds.";
-  else if (A.stage === "pull") t = `<b>Next:</b> the away team. Find clues on the Here tab (each officer can act once a turn): Sevek needs ${THEORY_AT} to form a theory of what's in the ruins, before the Countdown fills.`;
+  else if (A.stage === "pull") t = `<b>Next:</b> the away team. Find clues on the Here tab (each officer can act once a turn): with ${THEORY_AT}, Sevek has enough to form a theory of what's in the ruins, before the Countdown fills.`;
   else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:</b> finish it on Corvan II: the away team's actions on the Here tab.";
   else if (A.stage === "phasers") t = "<b>Next:</b> one thing left: recover the Orion phasers from the Ketari village, unseen (the Here tab).";
   else if (S.turn <= 12) t = "<b>Next:</b> Starfleet will send new orders (the Orders tab). Meanwhile: survey the unknown (?), court the independent worlds, and watch for raiders.";

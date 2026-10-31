@@ -165,20 +165,17 @@ test("with the away team down, they work the surface and the bridge crew runs th
   beamDown(S, []);
   assert.ok(!actionsFor(S).find((a) => a.id === "sweep").bridge);                  // beamed back up: anyone again
 });
-test("what's in the ruins is earned: Sevek's theory needs three clues, and only then reveals the caretaker", () => {
+test("what's in the ruins is earned: three clues and Sevek forms his theory, no roll; the caretaker only when it speaks", () => {
   const S = newGame({ seed: "th" });
   S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
   const e = Object.values(S.enemies).find((x) => x.goal === "arc"); delete S.enemies[e.id]; S.event = null; dismissEvent(S);
   attempt(S, "pelion", "arc", { arc: "scan" }); if (S.pending) resolve(S, false); S.event = null; S.eventQueue = [];
   beamDown(S, ["sevek", "vessik", "reyes", "rrinn"]);
-  const theory = () => actionsFor(S).find((a) => a.arc === "theory");
-  assert.ok(theory().why && /evidence/.test(theory().why));          // not after the scans alone
-  S.arc.clues = { logs: true, bunks: true }; S.arc.clock = 2;
-  assert.ok(theory().why);                                             // two clues: still not enough
-  S.arc.clues.energy = true; S.arc.clock = 3; S.crew.sevek.acted = false; S.tried = {};
-  assert.equal(theory().why, null);                                    // three: Sevek can try
-  assert.deepEqual(theory().who, ["sevek"]);
-  for (let i = 0; i < 20 && S.arc.stage === "pull"; i++) { S.tried = {}; S.crew.sevek.acted = false; S.event = null; S.arc.countdown = 0; attempt(S, "pelion", "arc", { arc: "theory" }); if (S.pending) resolve(S, false); }
+  const clue = (k) => { for (let i = 0; i < 20 && !S.arc.clues[k]; i++) { S.tried = {}; for (const id in S.crew) S.crew[id].acted = false; S.event = null; S.eventQueue = []; S.arc.countdown = 0; attempt(S, "pelion", "arc", { arc: "clue-" + k }); if (S.pending) resolve(S, false); } };
+  assert.ok(!actionsFor(S).some((a) => a.arc === "theory"));          // no roll for the theory: the evidence earns it
+  clue("logs"); clue("bunks");
+  assert.equal(S.arc.stage, "pull"); assert.ok(!S.arc.theory);        // two clues: not enough
+  clue("energy");                                                      // the third: Sevek's theory, at once
   assert.equal(S.arc.stage, "orions");
   assert.ok(S.arc.theory);
   const th = S.log.find((l) => l.text.includes("Sevek's theory: a guardian, not a weapon"));
