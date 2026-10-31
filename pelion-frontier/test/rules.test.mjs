@@ -220,3 +220,14 @@ test("finished orders are kept, with how they ended", async () => {
   assert.equal(S.history[1].how, "Too late.");
   assert.ok(!/Neutral Zone near the Neutral Zone/.test(o.title));
 });
+test("Starfleet bearings: 400 degrees, heading clockwise from galactic north, with a mark for the z axis", async () => {
+  const { navBearing } = await import("../src/game.js");
+  const S = newGame({ seed: "nav" });
+  assert.equal(navBearing(S, "0,0", "1,-2").heading, 0);     // straight up the map
+  assert.equal(navBearing(S, "0,0", "1,0").heading, 100);    // east
+  assert.equal(navBearing(S, "0,0", "-1,2").heading, 200);   // south
+  assert.equal(navBearing(S, "0,0", "-1,0").heading, 300);   // west
+  const b = navBearing(S, "0,0", "3,-1");
+  assert.match(b.text, /^bearing \d{3} mark \d{3}$/);
+  assert.ok(b.mark < 100 || b.mark > 300);                   // a climb or a dip, never past the vertical
+});

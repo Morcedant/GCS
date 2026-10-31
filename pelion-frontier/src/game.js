@@ -419,7 +419,7 @@ function applyAction(S, p) {
       }
       // A sweep also hears where the raiders come from.
       const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && !e.found);
-      if (!found.length && base) { const d = distance(base.at, S.pelion.at); return say(S, `Nothing nearby, but ${name} hears Orion traffic ${d <= 4 ? "very close: within " + d + " hexes" : d <= 7 ? "to the " + bearing(S.pelion.at, base.at) : "far off"}.`, "discovery"); }
+      if (!found.length && base) { const d = distance(base.at, S.pelion.at); return say(S, `Nothing nearby, but ${name} hears Orion traffic ${d <= 4 ? "very close: within " + d + " hexes" : d <= 7 ? "on " + navBearing(S, S.pelion.at, base.at).text + ", " + d + " hexes out" : "far off"}.`, "discovery"); }
       return say(S, found.length ? `Sweep: ${found.join("; ")}.` : "Sweep: all quiet.", found.length ? "discovery" : "");
     }
     case "hail": {
@@ -433,7 +433,20 @@ function applyAction(S, p) {
   return "";
 }
 const say = (S, text, kind = "") => { log(S, text, kind); return text; };
-const bearing = (a, b) => { const [aq, ar] = a.split(",").map(Number), [bq, br] = b.split(",").map(Number); const x = (bq - aq) + (br - ar) / 2, y = br - ar; return (y < -1 ? "north" : y > 1 ? "south" : "") + (x > 1 ? "east" : x < -1 ? "west" : "") || "nearby"; };
+/**
+ * Starfleet navigation, in 400 degrees: the heading goes around the sector's plane (x, y), clockwise from galactic north
+ * (the top of the map); the mark is the climb or dip out of that plane (z), where each hex sits a little above or below
+ * it. Both are given as three digits, and a dip reads as a mark near 400: "bearing 115 mark 392".
+ */
+export function navBearing(S, from, to) {
+  const P = (k) => { const [q, r] = k.split(",").map(Number); return { x: Math.sqrt(3) * (q + r / 2), y: 1.5 * r }; };
+  const z = (k) => ((hashString(S.seed + ":z:" + k) % 41) - 20) / 10;   // each hex's height off the plane: ±2 hex widths
+  const a = P(from), b = P(to), dx = b.x - a.x, dy = b.y - a.y;
+  const heading = Math.round(((Math.atan2(dx, -dy) * 200) / Math.PI + 400) % 400) % 400;
+  const mark = Math.round(((Math.atan2(z(to) - z(from), Math.hypot(dx, dy)) * 200) / Math.PI + 400) % 400) % 400;
+  const f3 = (n) => String(n).padStart(3, "0");
+  return { heading, mark, text: `bearing ${f3(heading)} mark ${f3(mark)}` };
+}
 function hazard(S, p) {
   if (rand(S) < 0.5 && p.unit === "pelion") { const id = p.officer; S.crew[id].inj = Math.min(3, S.crew[id].inj + 1); return `${officer(id).short} is hurt (${S.crew[id].inj}/3).`; }
   if (p.unit !== "pelion") { const u = S.support[p.unit]; u.hull++; if (u.hull >= SUPPORT[u.type].hull) { delete S.support[p.unit]; return `the ${u.name} is lost with all hands.`; } return `the ${u.name} takes damage.`; }

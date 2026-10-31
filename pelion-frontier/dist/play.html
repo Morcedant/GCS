@@ -848,7 +848,7 @@ function applyAction(S, p) {
       }
       // A sweep also hears where the raiders come from.
       const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && !e.found);
-      if (!found.length && base) { const d = distance(base.at, S.pelion.at); return say(S, `Nothing nearby, but ${name} hears Orion traffic ${d <= 4 ? "very close: within " + d + " hexes" : d <= 7 ? "to the " + bearing(S.pelion.at, base.at) : "far off"}.`, "discovery"); }
+      if (!found.length && base) { const d = distance(base.at, S.pelion.at); return say(S, `Nothing nearby, but ${name} hears Orion traffic ${d <= 4 ? "very close: within " + d + " hexes" : d <= 7 ? "on " + navBearing(S, S.pelion.at, base.at).text + ", " + d + " hexes out" : "far off"}.`, "discovery"); }
       return say(S, found.length ? `Sweep: ${found.join("; ")}.` : "Sweep: all quiet.", found.length ? "discovery" : "");
     }
     case "hail": {
@@ -862,7 +862,20 @@ function applyAction(S, p) {
   return "";
 }
 const say = (S, text, kind = "") => { log(S, text, kind); return text; };
-const bearing = (a, b) => { const [aq, ar] = a.split(",").map(Number), [bq, br] = b.split(",").map(Number); const x = (bq - aq) + (br - ar) / 2, y = br - ar; return (y < -1 ? "north" : y > 1 ? "south" : "") + (x > 1 ? "east" : x < -1 ? "west" : "") || "nearby"; };
+/**
+ * Starfleet navigation, in 400 degrees: the heading goes around the sector's plane (x, y), clockwise from galactic north
+ * (the top of the map); the mark is the climb or dip out of that plane (z), where each hex sits a little above or below
+ * it. Both are given as three digits, and a dip reads as a mark near 400: "bearing 115 mark 392".
+ */
+function navBearing(S, from, to) {
+  const P = (k) => { const [q, r] = k.split(",").map(Number); return { x: Math.sqrt(3) * (q + r / 2), y: 1.5 * r }; };
+  const z = (k) => ((hashString(S.seed + ":z:" + k) % 41) - 20) / 10;   // each hex's height off the plane: ±2 hex widths
+  const a = P(from), b = P(to), dx = b.x - a.x, dy = b.y - a.y;
+  const heading = Math.round(((Math.atan2(dx, -dy) * 200) / Math.PI + 400) % 400) % 400;
+  const mark = Math.round(((Math.atan2(z(to) - z(from), Math.hypot(dx, dy)) * 200) / Math.PI + 400) % 400) % 400;
+  const f3 = (n) => String(n).padStart(3, "0");
+  return { heading, mark, text: `bearing ${f3(heading)} mark ${f3(mark)}` };
+}
 function hazard(S, p) {
   if (rand(S) < 0.5 && p.unit === "pelion") { const id = p.officer; S.crew[id].inj = Math.min(3, S.crew[id].inj + 1); return `${officer(id).short} is hurt (${S.crew[id].inj}/3).`; }
   if (p.unit !== "pelion") { const u = S.support[p.unit]; u.hull++; if (u.hull >= SUPPORT[u.type].hull) { delete S.support[p.unit]; return `the ${u.name} is lost with all hands.`; } return `the ${u.name} takes damage.`; }
@@ -1777,7 +1790,7 @@ function goTo(hex) {
   const r = moveTo(S, unit, dest);
   if (r.error) { toast(r.error, true); return; }
   selHex = dest === hex ? hex : selHex; lastResult = null;
-  if (dest !== hex) { selHex = hex; toast("Under way: you'll get there next turn or after."); }
+  if (dest !== hex) { selHex = hex; toast(`Under way on ${navBearing(S, U().at, hex).text}: you'll get there next turn or after.`); }
   after();
 }
 function hexPath(ctx, cx, cy, r) { ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = (Math.PI / 180) * (60 * i - 30); i ? ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)) : ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); } ctx.closePath(); }
@@ -1828,7 +1841,8 @@ function draw() {
       ctx.strokeStyle = "rgba(242,193,78,.8)"; ctx.lineWidth = 2; ctx.setLineDash([5, 4]); ctx.beginPath();
       let q = toPixel(u.at, size); ctx.moveTo(q.x, q.y); for (const k of p.path) { q = toPixel(k, size); ctx.lineTo(q.x, q.y); } ctx.stroke(); ctx.setLineDash([]);
       const sp = unit === "pelion" ? speedOf(S) : SUPPORT[u.type].speed, first = Math.min(u.mp, p.cost), turns = p.cost <= u.mp ? 0 : Math.ceil((p.cost - first) / sp);
-      ctx.fillStyle = "#f2c14e"; ctx.font = "bold 11px system-ui"; ctx.fillText(turns ? `${turns + 1} turns` : "this turn", q.x + 9, q.y - 9);
+      const nb = navBearing(S, u.at, selHex);
+      ctx.fillStyle = "#f2c14e"; ctx.font = "bold 11px system-ui"; ctx.fillText(`${String(nb.heading).padStart(3, "0")} mark ${String(nb.mark).padStart(3, "0")} · ${turns ? `${turns + 1} turns` : "this turn"}`, q.x + 9, q.y - 9);
     }
   }
   // Ships.
@@ -2026,7 +2040,8 @@ function hereHTML() {
   for (const o of S.orders.filter((x) => x.at === hex)) h += `<div class="card gold"><h4>Orders: ${esc(o.title)}<\/h4><div class="small">${o.arc ? "The first mission." : `${o.have}/${o.segs} done · due by turn ${o.deadline}`}<\/div><\/div>`;
   if (!here) {
     const p = findPath(S, u.at, hex, unit === "pelion" ? "pelion" : "support");
-    if (p) { const R = reachable(S, unit); h += `<div class="btn-row"><button class="btn primary" data-go="${hex}">${R[hex] !== undefined ? `Move here (${R[hex]} of ${u.mp} moves)` : "Set course: as far as we can this turn"}<\/button><\/div>`; }
+    if (p) { const R = reachable(S, unit), nb = navBearing(S, u.at, hex), sp = unit === "pelion" ? speedOf(S) : SUPPORT[u.type].speed;
+      h += `<p class="small"><b>Navigation:<\/b> ${nb.text} · ${distance(u.at, hex)} hex${distance(u.at, hex) === 1 ? "" : "es"} · ${R[hex] !== undefined ? "reachable this turn" : `about ${Math.ceil(Math.max(0, p.cost - u.mp) / sp) + 1} turns`}<\/p><div class="btn-row"><button class="btn primary" data-go="${hex}">${R[hex] !== undefined ? `Move here (${R[hex]} of ${u.mp} moves)` : "Set course: as far as we can this turn"}<\/button><\/div>`; }
     return h;
   }
   // What the ship can do here.

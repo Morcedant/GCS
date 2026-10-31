@@ -1,7 +1,7 @@
 // The page: the sector map on a canvas, the side panel's tabs, and the dialogs (new game, battle, story, the end).
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
-import { newGame, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
+import { newGame, navBearing, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
   speedOf, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
@@ -93,7 +93,7 @@ function goTo(hex) {
   const r = moveTo(S, unit, dest);
   if (r.error) { toast(r.error, true); return; }
   selHex = dest === hex ? hex : selHex; lastResult = null;
-  if (dest !== hex) { selHex = hex; toast("Under way: you'll get there next turn or after."); }
+  if (dest !== hex) { selHex = hex; toast(`Under way on ${navBearing(S, U().at, hex).text}: you'll get there next turn or after.`); }
   after();
 }
 function hexPath(ctx, cx, cy, r) { ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = (Math.PI / 180) * (60 * i - 30); i ? ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)) : ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); } ctx.closePath(); }
@@ -144,7 +144,8 @@ function draw() {
       ctx.strokeStyle = "rgba(242,193,78,.8)"; ctx.lineWidth = 2; ctx.setLineDash([5, 4]); ctx.beginPath();
       let q = toPixel(u.at, size); ctx.moveTo(q.x, q.y); for (const k of p.path) { q = toPixel(k, size); ctx.lineTo(q.x, q.y); } ctx.stroke(); ctx.setLineDash([]);
       const sp = unit === "pelion" ? speedOf(S) : SUPPORT[u.type].speed, first = Math.min(u.mp, p.cost), turns = p.cost <= u.mp ? 0 : Math.ceil((p.cost - first) / sp);
-      ctx.fillStyle = "#f2c14e"; ctx.font = "bold 11px system-ui"; ctx.fillText(turns ? `${turns + 1} turns` : "this turn", q.x + 9, q.y - 9);
+      const nb = navBearing(S, u.at, selHex);
+      ctx.fillStyle = "#f2c14e"; ctx.font = "bold 11px system-ui"; ctx.fillText(`${String(nb.heading).padStart(3, "0")} mark ${String(nb.mark).padStart(3, "0")} · ${turns ? `${turns + 1} turns` : "this turn"}`, q.x + 9, q.y - 9);
     }
   }
   // Ships.
@@ -342,7 +343,8 @@ function hereHTML() {
   for (const o of S.orders.filter((x) => x.at === hex)) h += `<div class="card gold"><h4>Orders: ${esc(o.title)}</h4><div class="small">${o.arc ? "The first mission." : `${o.have}/${o.segs} done · due by turn ${o.deadline}`}</div></div>`;
   if (!here) {
     const p = findPath(S, u.at, hex, unit === "pelion" ? "pelion" : "support");
-    if (p) { const R = reachable(S, unit); h += `<div class="btn-row"><button class="btn primary" data-go="${hex}">${R[hex] !== undefined ? `Move here (${R[hex]} of ${u.mp} moves)` : "Set course: as far as we can this turn"}</button></div>`; }
+    if (p) { const R = reachable(S, unit), nb = navBearing(S, u.at, hex), sp = unit === "pelion" ? speedOf(S) : SUPPORT[u.type].speed;
+      h += `<p class="small"><b>Navigation:</b> ${nb.text} · ${distance(u.at, hex)} hex${distance(u.at, hex) === 1 ? "" : "es"} · ${R[hex] !== undefined ? "reachable this turn" : `about ${Math.ceil(Math.max(0, p.cost - u.mp) / sp) + 1} turns`}</p><div class="btn-row"><button class="btn primary" data-go="${hex}">${R[hex] !== undefined ? `Move here (${R[hex]} of ${u.mp} moves)` : "Set course: as far as we can this turn"}</button></div>`; }
     return h;
   }
   // What the ship can do here.
