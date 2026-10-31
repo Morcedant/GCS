@@ -73,7 +73,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .dip, .offer { background: var(--panel-2); border-radius: 8px; padding: 10px 12px; margin: 8px 0; } .dip h3 { margin: 0 0 4px; color: var(--ink); text-transform: none; letter-spacing: .02em; font-size: 15px; }
 .offer { border: 1px solid var(--gold); }
 .log { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; font-size: 13px; }
-.log .t { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 8px; } .log .war { color: #ffb0a6; } .log .victory { color: var(--gold); } .log .research { color: #a8e0ff; }
+.log .t { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 8px; } .log .war { color: #ffb0a6; } .log .victory { color: var(--gold); } .log .research { color: #a8e0ff; } .log .explore, .log .contact { color: #e2d1ff; }
 #modal { position: fixed; inset: 0; background: rgba(3, 5, 10, .82); display: grid; place-items: center; z-index: 20; padding: 16px; overflow-y: auto; }
 #modal[hidden] { display: none; }
 .modal-box { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; max-width: 760px; width: 100%; padding: 22px max(16px, env(safe-area-inset-right, 0px)) 22px max(16px, env(safe-area-inset-left, 0px)); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
@@ -410,7 +410,13 @@ const faction = (s, id) => s.factions.find((f) => f.id === id);
 const has = (s, fid, tech) => faction(s, fid).research.done.includes(tech);
 const player = (s) => s.factions[0];
 function rng(s) { const r = makeRng(1); r.setState(s.rngState); return { ...r, save: () => { s.rngState = r.state(); } }; }
-function log(s, fid, text, kind = "info") { s.log.push({ turn: s.turn, fid, text, kind }); if (s.log.length > 400) s.log.splice(0, s.log.length - 400); }
+/** Discoveries (systems charted, ruins surveyed, contacts, technologies) are never trimmed from the log. */
+const DISCOVERY = ["explore", "research", "contact"];
+function log(s, fid, text, kind = "info") {
+  s.log.push({ turn: s.turn, fid, text, kind });
+  let n = s.log.length - 400;
+  for (let i = 0; i < s.log.length && n > 0; ) { if (!DISCOVERY.includes(s.log[i].kind)) { s.log.splice(i, 1); n--; } else i++; }
+}
 function coloniesOf(s, fid) { return Object.values(s.systems).filter((x) => x.colony && x.colony.owner === fid); }
 function fleetsOf(s, fid) { return Object.values(s.fleets).filter((f) => f.owner === fid); }
 function fleetsAt(s, hex) { return Object.values(s.fleets).filter((f) => f.at === hex); }
@@ -730,15 +736,25 @@ function militaryPower(s, fid) {
 // ---- seeing ----
 function updateVision(s, F) {
   const vis = {};
-  const see = (hex, n) => { for (const k of within(hex, n)) if (s.hexes[k]) { vis[k] = 1; F.explored[k] = 1; } };
+  const charted = [];
+  const see = (hex, n) => { for (const k of within(hex, n)) if (s.hexes[k]) { vis[k] = 1; if (!F.explored[k] && !F.ai && s.sysAt[k]) charted.push(s.systems[s.sysAt[k]]); F.explored[k] = 1; } };
   const bonus = has(s, F.id, "sensors") ? 1 : 0;
   for (const sys of coloniesOf(s, F.id)) see(sys.at, (sys.colony.kind === "colony" ? 2 : 1) + bonus);
   for (const f of fleetsOf(s, F.id)) see(f.at, Math.max(...f.ships.map((x) => shipStats(s, F.id, x.type).sensors)));
   F.visible = vis;
+  // Every system the player charts goes into the log, with what's there.
+  for (const sys of charted) {
+    const w = WORLDS[sys.world], what = [`${/^[AEIOU]/.test(w.name) ? "an" : "a"} ${w.name.toLowerCase()} world`, `size ${sys.size}`];
+    if (sys.rich > 1) what.push("rich"); else if (sys.rich < 1) what.push("poor");
+    if (sys.exotics) what.push("an exotics deposit");
+    if (sys.ruins) what.push("ancient ruins to survey");
+    if (sys.colony && sys.colony.owner !== F.id) what.push(`${sys.colony.kind === "colony" ? "a colony" : "an outpost"} of ${faction(s, sys.colony.owner).name}`);
+    log(s, F.id, `Charted ${sys.name}: ${what.join(", ")}.`, "explore");
+  }
   // Meeting: anyone whose world or fleet you can see.
   for (const o of s.factions) if (o.id !== F.id && o.alive && !F.met[o.id]) {
     const seen = coloniesOf(s, o.id).some((x) => vis[x.at]) || fleetsOf(s, o.id).some((f) => vis[f.at]);
-    if (seen) { F.met[o.id] = true; o.met[F.id] = true; log(s, F.id, `${F.name} made contact with ${o.name}.`, "diplo"); }
+    if (seen) { F.met[o.id] = true; o.met[F.id] = true; log(s, F.id, `${F.name} made contact with ${o.name}.`, "contact"); }
   }
   // Ruins: the first to see them learns something.
   for (const sys of Object.values(s.systems)) if (sys.ruins && vis[sys.at] && fleetsAt(s, sys.at).some((f) => f.owner === F.id)) {
@@ -778,7 +794,7 @@ function economy(s, F) {
     const tech = TECHS.find((x) => x.id === R.current);
     if (R.progress >= tech.cost) {
       R.progress -= tech.cost; R.done.push(tech.id); R.current = null;
-      log(s, F.id, `${F.name} discovered ${tech.name}.`, "research");
+      log(s, F.id, `${F.name} discovered ${tech.name}: ${tech.text}`, "research");
       if (tech.id === "shields") for (const f of fleetsOf(s, F.id)) for (const x of f.ships) if (SHIPS[x.type].skill) x.hull += 1;
     }
   }
@@ -1351,10 +1367,15 @@ function diplomacyHTML() {
   }
   return h;
 }
+let logFilter = "all";
 function logHTML() {
   const me = player(S);
-  const rows = S.log.filter((l) => !l.fid || l.fid === me.id || l.kind === "war" || l.kind === "victory" || (l.kind === "diplo" && l.text.includes(me.name))).slice(-80).reverse();
-  return `<h2>Log<\/h2><ul class="log">${rows.map((l) => `<li class="${l.kind}"><span class="t">T${l.turn}<\/span>${esc(l.text)}<\/li>`).join("")}<\/ul>`;
+  const mine = S.log.filter((l) => !l.fid || l.fid === me.id || l.kind === "war" || l.kind === "victory" || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name)));
+  // Discoveries: every one, from the first turn. Everything: the latest 80 entries.
+  const found = mine.filter((l) => l.fid === me.id && DISCOVERY.includes(l.kind));
+  const rows = (logFilter === "discovery" ? found : mine.slice(-80)).slice().reverse();
+  return `<h2>Log<\/h2><div class="btn-row"><button class="btn small ${logFilter === "all" ? "primary" : ""}" data-logf="all">Everything<\/button><button class="btn small ${logFilter === "discovery" ? "primary" : ""}" data-logf="discovery">Discoveries (${found.length})<\/button><\/div>`
+    + `<ul class="log">${rows.map((l) => `<li class="${l.kind}"><span class="t">T${l.turn}<\/span>${esc(l.text)}<\/li>`).join("")}<\/ul>`;
 }
 
 // ---------- the panel's buttons ----------
@@ -1362,6 +1383,7 @@ function bindChrome() {
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button, tr[data-selsys]"); if (!b || !S) return;
     const d = b.dataset, me = player(S);
+    if (d.logf) { logFilter = d.logf; renderPanel(); return; }
     if (d.selfleet) { select({ kind: "fleet", id: d.selfleet }); const f = S.fleets[d.selfleet]; if (f) { centerOn(f.at); draw(); } return; }
     if (d.selsys) { select({ kind: "system", id: d.selsys }); centerOn(S.systems[d.selsys].at); draw(); return; }
     if (d.build) { const [k, id] = d.build.split(":"); const r = enqueue(S, sel.id, k, id); if (r.error) toast(r.error, true); }
@@ -1427,7 +1449,7 @@ function doEndTurn() {
     $("end-turn").textContent = "End turn";
     save();
     // News: what happened to you this turn.
-    const news = S.log.slice(before.log).filter((l) => l.fid === me.id || l.kind === "victory" || (l.kind === "war" && (l.text.includes(me.name))) || (l.kind === "diplo" && l.text.includes(me.name)));
+    const news = S.log.slice(before.log).filter((l) => l.fid === me.id || l.kind === "victory" || (l.kind === "war" && (l.text.includes(me.name))) || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name))).filter((l) => !l.text.startsWith("Charted "));
     if (sel && sel.kind === "fleet" && !S.fleets[sel.id]) sel = null;
     renderAll();
     if (S.winner) { showEnd(); return; }
