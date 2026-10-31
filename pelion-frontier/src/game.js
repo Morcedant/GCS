@@ -3,7 +3,7 @@
 import { makeRng, neighbors, distance, within, hashString } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, SUPPORT_NAMES, ENEMIES, KINDS, ACTIONS, MISSIONS, STRANGE, KEYS, TWISTS, REFITS, RECORDS } from "./data.js";
 import { makeSector, inZone, nearZone } from "./sector.js";
-import { STORIES, storyText, storyOf } from "./stories.js";
+import { STORIES, CAMPAIGN, storyText, storyOf } from "./stories.js";
 
 // ---------- dice ----------
 export function rand(S) { const r = makeRng(0); r.setState(S.rng); const v = r.next(); S.rng = r.state(); return v; }
@@ -28,6 +28,7 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
     stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
     crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false }])),
     backlog: [],   // orders waiting their turn
+    campaign: { threads: [], beats: [], finale: false, over: null },   // The Makers' Watch
     tried: {},   // actions tried this turn: each can be attempted once a turn
     support: {}, enemies: {}, nextId: 1,
     supplies: 20, science: 0, command: 0, tension: 2, commendations: 0,
@@ -598,6 +599,49 @@ export function missionReport(S, o, result, how, rewards) {
   log(S, `Mission ${result === "partly" ? "partly successful" : "success"}: ${o.title}. ${how} Rewards: ${rewards.join("; ")}.`, "victory", { story: true });
   return ev;
 }
+// ---------- the campaign: The Makers' Watch ----------
+export const campaignOf = (S) => (S.campaign = S.campaign || { threads: [], beats: [], finale: false, over: null });
+/** The current act, from the beats reached so far. */
+export const campaignAct = (S) => { const C = campaignOf(S), b = CAMPAIGN.beats.filter((x) => C.beats.includes(x.at)); return b.length ? b[b.length - 1].act : "Prologue: The Silence at Corvan II"; };
+/** A beat of the campaign's story, once. */
+function campaignBeat(S, at) {
+  const C = campaignOf(S), b = CAMPAIGN.beats.find((x) => x.at === at);
+  if (!b || C.beats.includes(at)) return;
+  C.beats.push(at);
+  storyEvent(S, `${CAMPAIGN.title}, ${b.act}: ${b.title}`, b.text);
+}
+/** An order carried out turns up a thread of the campaign; enough threads lead to the Makers' Gate. */
+function campaignThread(S, o) {
+  const st = storyOf(o), C = campaignOf(S);
+  if (o.finale) return null;
+  if (o.arc) { campaignBeat(S, 0); return null; }
+  if (!st || !st.thread || C.over) return null;   // once the Gate is decided, the campaign is over
+  C.threads.push({ title: o.title, text: storyText(S, o, st.thread), turn: S.turn });
+  const n = C.threads.length;
+  log(S, `${CAMPAIGN.title}, thread ${n}: ${storyText(S, o, st.thread)}`, "discovery");
+  for (const b of CAMPAIGN.beats) if (b.at > 0 && n >= b.at) campaignBeat(S, b.at);
+  if (n >= CAMPAIGN.finaleAt) issueFinale(S);
+  return storyText(S, o, st.thread);
+}
+/** The end of the campaign: once Corvan II is done, whatever happened there, and late in the tour if need be. */
+export function campaignTick(S) {
+  const C = campaignOf(S);
+  if (S.arc.stage === "done") campaignBeat(S, 0);
+  if (S.arc.stage === "done" && !C.finale && S.turn >= TOUR - 14) { campaignBeat(S, CAMPAIGN.finaleAt); issueFinale(S); }
+}
+/** The final order: the Makers' Gate, in empty space where every relay points. */
+function issueFinale(S) {
+  const C = campaignOf(S); if (C.finale) return;
+  C.finale = true;
+  const sb = S.systems[S.starbase];
+  const hexes = Object.keys(S.hexes).filter((k) => !S.sysAt[k] && !inZone(k) && S.hexes[k].terrain === "space" && distance(k, sb.at) >= 5);
+  const at = pick(S, hexes) || sb.at, st = STORIES["The Makers' Gate"];
+  const o = { id: "o" + S.nextId++, issued: S.turn, title: "The Makers' Gate", at, sys: null, place: "the Makers' Gate", where: "", skills: ["Physical Sciences", "Diplomacy", "Engineering"], segs: 3, have: 0,
+    urgent: true, finale: true, twist: null, story: "The Makers' Gate", strange: st.strange[0], key: st.keys[0],
+    oppose: { name: "House Kor'vath's expedition", skill: "Ruthlessness", target: 12, why: "A Klingon battle cruiser and a house with everything to gain." } };
+  o.text = storyText(S, o, st.brief);
+  activateOrder(S, o, "issued: the finale of The Makers' Watch");
+}
 /** The scene when the Pelion first reaches an order's location. */
 function arriveAt(S, o) {
   const st = storyOf(o);
@@ -613,7 +657,7 @@ export function missionChoices(S, ev) {
     options: st.choice.options.map((x) => ({ id: x.id, name: storyText(S, o, x.name), blurb: storyText(S, o, x.blurb) })) };
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
-  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: () => "tension with the Klingon Empire up",
+  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`,
   heal: (n, w) => `${w}'s harm −${n}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
 export function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId);
@@ -627,12 +671,14 @@ export function chooseMission(S, orderId, optId) {
     else if (k === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, Math.min(5, (s.accord || 0) + n)); if (s.accord >= 5 && s.kind === "independent") join(S, s); }
     else if (k === "accord") continue;
     else if (k === "command") markCommand(S, n, `${o.title}: ${opt.how.toLowerCase()}`);
-    else if (k === "tension") S.tension = Math.min(10, S.tension + n);
+    else if (k === "tension") S.tension = Math.max(0, Math.min(10, S.tension + n));
     else if (k === "heal" && s) s.harm = Math.max(0, s.harm - n);
     else if (k === "hurt") { const c = CREW.filter((x) => available(S, x.id) && x.id !== "captain"); const v = c[Math.floor(rand(S) * c.length)]; if (v) S.crew[v.id].inj = Math.min(3, S.crew[v.id].inj + n); }
     else if (k === "sensors") S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + n);
     lines.push(FX_TEXT[k] ? FX_TEXT[k](n, w) : k);
   }
+  if (opt.record && !S.records.includes("makers")) { S.records.push("makers"); lines.push("Library record: the Makers' library"); }
+  if (o.finale) campaignOf(S).over = opt.id;
   storyEvent(S, `${o.title}: ${storyText(S, o, opt.name).toLowerCase()}`, storyText(S, o, opt.text));
   log(S, `${o.title}: the captain's decision, ${storyText(S, o, opt.name).toLowerCase()} (${lines.join(", ")}).`, "order");
   completeOrder(S, o, true, storyText(S, o, opt.how));
@@ -658,12 +704,14 @@ export function completeOrder(S, o, ok, how) {
       } else streakLine = `${S.streak} of 3 orders carried out in a row: at 3, a Starfleet Command box is cleared.`;
     }
     const ev = missionReport(S, o, "done", how || "Carried out.", ["+10 supplies", "+8 science", `+${o.arc ? 4 : 2} commendations`, streakLine]);
+    const th = campaignThread(S, o); if (th) ev.thread = th;
     const had = new Set(S.orders.map((x) => x.id));
     fillFromBacklog(S);
     const next = S.orders.filter((x) => !had.has(x.id)); if (next.length) ev.next = next.map((x) => x.title);
   } else {
     S.failed++; S.streak = 0; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
     const st = storyOf(o); if (st) storyEvent(S, `Too late: ${o.title}`, storyText(S, o, st.fail));
+    if (o.finale) { campaignOf(S).over = "lost"; S.tension = Math.min(10, S.tension + 2); }
     const s = o.sys && S.systems[o.sys];
     if (s && /Evacuate|distress|medical/i.test(o.title) && ["colony", "member", "independent"].includes(s.kind)) harmWorld(S, s, 1, "help never came");
     fillFromBacklog(S);
@@ -789,13 +837,15 @@ export function score(S) {
     ["Starfleet Command track", -S.command * 4],
     ["Worlds lost to the Klingon Empire", -S.lostWorlds * 8],
     ["Colonies lost", -S.lostColonies * 10],
+    [`${CAMPAIGN.title}: threads found`, Math.min(CAMPAIGN.finaleAt, campaignOf(S).threads.length) * 2],
+    [`${CAMPAIGN.title}: the Gate`, campaignOf(S).over === "close" || campaignOf(S).over === "guard" ? 25 : campaignOf(S).over === "lost" ? -10 : 0],
   ];
   return { parts, total: parts.reduce((t, p) => t + p[1], 0) };
 }
 export function rating(total) {
   // Every officer acts each turn, so a good tour scores high: these thresholds assume it.
-  return total >= 260 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 190 ? "Commended: a fine tour, and a ship Starfleet is proud of"
-    : total >= 120 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
+  return total >= 290 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 210 ? "Commended: a fine tour, and a ship Starfleet is proud of"
+    : total >= 140 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
 }
 export function checkEnd(S) {
   if (S.over) return;

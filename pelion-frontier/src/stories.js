@@ -4,8 +4,45 @@
 // has its own key characters and strange things, chosen to fit its story.
 // A choice's `fx` is what it does: commendations, science, supplies, accord (the world's), command (boxes marked),
 // tension (with the Klingon Empire), heal (the world's harm).
+/**
+ * The campaign: The Makers' Watch. Corvan II's caretaker was one of many machines left by a vanished people, the Makers,
+ * to watch over younger worlds. Others are hidden all over the sector, and the Orions are digging them up for a Klingon
+ * house that wants what they guard. Every order the Pelion carries out turns up a thread; enough threads lead to the
+ * Makers' Gate.
+ */
+export const CAMPAIGN = {
+  title: "The Makers' Watch",
+  premise: "The caretaker of Corvan II was not alone. A vanished people, the Makers, left machines like it across the Corvan Sector to watch over younger worlds. Now someone is digging them up: Orion crews, paid by a Klingon house, cutting the machines out of their ruins and selling them on. Every order Starfleet gives the Pelion this tour comes back to the same question: what are they looking for?",
+  finaleAt: 6,
+  beats: [
+    { at: 0, act: "Act I: The Silence", title: "The caretaker's makers", text: "The report from Corvan II reaches Starfleet Command, and Command reads it twice. A machine eleven thousand years old, left by a people who came from the stars. Within a day, Starfleet Intelligence has flagged six more sites in the Corvan Sector with the same carrier wave. Within a week, two of them have been dug up.\n\nYour orders from here on carry a second purpose. Whatever else you're doing, find out who is digging up the Makers' machines, and why." },
+    { at: 2, act: "Act II: The Diggers", title: "House Kor'vath", text: "The threads come together in the Pelion's briefing room. The Orion diggers aren't working for themselves: their buyer is House Kor'vath, a Klingon house that has been losing ground on the Council and wants something to change that. They're paying in dilithium for every Makers' machine they can get, and they're not keeping them. They're taking them apart." },
+    { at: 4, act: "Act III: The Lines", title: "Every relay points one way", text: "Sevek lays the Makers' sites on the sector chart and draws a line from each relay along the direction it transmits. The lines meet at a single point in empty space. The caretakers weren't just watching the younger worlds: they were reporting to something. House Kor'vath has worked it out too, and so, Rrinn suspects, have the Romulans." },
+    { at: 6, act: "Act IV: The Gate", title: "The Makers' Gate", text: "The last thread confirms it: at the point where every line meets is the Makers' Gate, the way they left, and the way back. Whoever controls it controls every caretaker in the sector, and every world they watch over. House Kor'vath's ships are already moving. Starfleet's orders are short: get there first." },
+  ],
+};
 export const STORIES = {
+  "The Makers' Gate": {
+    keys: ["the Kor'vath commander, Captain Dakhar"], strange: ["the Makers' Gate"],
+    why: "Every thread of this tour leads here. If House Kor'vath takes the Gate, it takes every caretaker in the sector with it.",
+    thread: "The Makers' Watch is over.",
+    brief: "At the point where every Makers' relay meets, sensors find a ring of light a kilometre across, turning slowly in empty space: the Makers' Gate. House Kor'vath's battle cruiser is already on its way, under {key}. Get there first, and decide what happens to it.",
+    arrive: "The Gate fills the viewer: a ring of light, turning, and through it stars that don't belong to this sky. Every caretaker in the sector is talking to it at once; Rrinn can hear them. On long-range sensors, the Kor'vath cruiser is eleven hours out.",
+    steps: [
+      ["Understand the Gate", "Sevek and Grath work through the night. The Gate is a door and a voice at once: through it, the Makers could reach every caretaker they left, and every caretaker could call them home."],
+      ["Hold off House Kor'vath", "The Kor'vath cruiser arrives with its shields up and its guns hot. {key} wants the Gate, and the Pelion is in the way. Hours of feints and hails later, the cruiser holds position: neither ship can afford to fire first beside the Gate."],
+      ["Reach the Makers", "The Gate answers. A voice like the Corvan II caretaker's, older and further away: the Makers are still out there, beyond it, and they want to know whether their watchers' work is done."],
+    ],
+    choice: { title: "The Gate", text: "The Makers ask the question their caretakers have been asking for eleven thousand years: are the younger worlds ready to look after themselves? Answer yes, and the Gate closes, and every caretaker in the sector goes quiet. Answer no, and the Gate stays open, and the watch goes on, with the Federation standing guard over it instead of House Kor'vath.",
+      options: [
+        { id: "close", name: "Let the watch end", blurb: "The Gate closes; the caretakers go quiet; no one can ever take them. +6 commendations, +20 science; Klingon tension falls.", how: "The Makers' Gate closed, and the watch ended.", fx: { commendations: 6, science: 20, tension: -2 }, text: "The ring of light narrows to a line, and the line to nothing. Across the sector, the caretakers fall silent one by one, their work done. {key} watches the Gate close from his bridge, salutes, and goes home with nothing. The younger worlds will have to look after themselves now. The Federation will help." },
+        { id: "guard", name: "Keep the watch", blurb: "The Gate stays open under Starfleet's guard: +40 science, +3 commendations, a library record; Klingon tension rises.", how: "The Makers' Gate kept open under Starfleet's guard.", fx: { commendations: 3, science: 40, tension: 2 }, record: true, text: "The Gate stays open, and Starfleet raises a station beside it inside a month. The Makers' library opens to the Federation, page by page. House Kor'vath files a claim with the Klingon High Council and starts building ships. The watch goes on." },
+      ] },
+    fail: "House Kor'vath reached the Gate first. Within a month, the caretakers across the sector have started to go dark, one by one, and no one knows what they're being told to do instead.",
+  },
   "Answer a distress call": {
+    why: "Starfleet Intelligence has tracked the Calloway's Pride for a month: it has been buying salvage from Orion diggers. If it carries what they think it carries, the Makers' machines are being smuggled out of the sector.",
+    thread: "The Pride's manifest names its buyer: a Klingon house, Kor'vath, paying in dilithium for anything that hums.",
     keys: ["the freighter's first mate", "a passenger travelling under a false name", "the cargo's anxious owner", "a former Starfleet officer working the freight lanes"],
     strange: ["a crystal that sings when it's cold", "a dormant alien life form", "dilithium of a purity no one mines", "a weapon component from a war a century gone"],
     brief: "A distress call from {world}, cut off mid-word: a freighter, the Calloway's Pride, with forty aboard, adrift and losing life support. The signal repeats every eleven minutes. Something in it doesn't match the freighter's registry.",
@@ -22,6 +59,8 @@ export const STORIES = {
     fail: "By the time anyone reaches the Calloway's Pride, her hold is cold and the signal has stopped. The inquiry asks why the Pelion took so long.",
   },
   "Survey an uncharted system": {
+    why: "The Corvan II caretaker spoke of its makers coming from the stars. Sevek believes a system this impossibly stable is being held together by another of their machines.",
+    thread: "The system's heart answers to the same carrier wave as Corvan II's ruins: another of the Makers' machines, still keeping its watch.",
     keys: ["a brilliant, reckless scientist", "a Vulcan astrophysicist observing the survey", "a survey specialist on loan from Memory Alpha", "the young ensign who spotted the readings first"],
     strange: ["a dead star that sings", "a gravity well older than the star", "a subspace anomaly that distorts time", "a machine the size of a moon"],
     brief: "{world} has never been properly charted: long-range scans show a system that shouldn't be stable, and a reading the computers file under {strange}. Chart it, and find out what keeps it together.",
@@ -39,6 +78,8 @@ export const STORIES = {
     fail: "The survey of {world} never gets done. Another ship will chart it, eventually, and find whatever the Pelion missed.",
   },
   "Make first contact": {
+    why: "Their oldest myths speak of travellers who came from the stars and left a guardian behind. Starfleet wants to hear those stories before anyone else does, and to make sure no one else exploits them.",
+    thread: "Their myth names the travellers' home: a gate in the sky, three days' light from their sun. It's the first time anyone has heard of the Makers' Gate.",
     keys: ["a Klingon captain with a grudge", "an Orion trader with an offer of his own", "a Tellarite trade consortium's envoy", "a Romulan observer in disguise"],
     strange: ["a myth of travellers from the stars", "a signal they've been receiving for centuries", "an ancient machine that still works", "a star chart carved into their oldest temple"],
     brief: "{world} has warp drive now: a test flight was detected last month. Starfleet wants first contact made before anyone else makes it for them, and before {key} gets there first.",
@@ -56,6 +97,8 @@ export const STORIES = {
     fail: "Someone else reached {world} first. The Federation will be the second voice they hear, and second voices are easier to ignore.",
   },
   "Escort a diplomatic delegation": {
+    why: "These talks would close a corridor the Orion diggers use to reach Makers' sites. Someone wants the corridor kept open, badly enough to stop the delegation.",
+    thread: "The spy's masters pay for Makers' artifacts by the gram. The transmitter's address leads to an Orion broker who sells to Klingons.",
     keys: ["an aide nobody remembers hiring", "a journalist who talked their way aboard", "the ambassador's estranged son", "a translator with very good references"],
     strange: ["a sealed diplomatic pouch", "a gift no one will open", "a treaty draft with a missing page", "an heirloom both sides claim"],
     brief: "Ambassador Teresh and her delegation are bound for talks at {world}, and someone has made it clear they shouldn't arrive. Get them there, alive and on time.",
@@ -72,6 +115,8 @@ export const STORIES = {
     fail: "The delegation never reached {world}. The talks were cancelled, and someone, somewhere, got exactly what they wanted.",
   },
   "Find a missing ship or outpost": {
+    why: "The Arkwright was charting Makers' sites for Starfleet when it vanished. What took it may be what Corvan II's caretaker was protecting the Ketari from.",
+    thread: "The Arkwright's crew all dreamed the same dream: a ring of light, and a voice counting down. The Makers left more than caretakers.",
     keys: ["the Arkwright's captain's husband", "a freighter pilot who passed them on the way out", "the survey's reckless sponsor", "an old friend of one of the crew"],
     strange: ["a non-corporeal life form", "a nebula that dreams", "a subspace anomaly that distorts time", "a cloud of light that sings"],
     brief: "The survey ship Arkwright stopped reporting near {world} nine days ago: fourteen crew, no distress call, no debris. {key} was the last to speak to them.",
@@ -89,6 +134,8 @@ export const STORIES = {
     fail: "The Arkwright is still out there, still drifting. The search is called off.",
   },
   "Deliver urgent medical supplies": {
+    why: "The fever broke out downriver of a dig site where Orions sold the locals 'ancient medicine'. Starfleet suspects it came out of a disturbed Makers' cache.",
+    thread: "The contaminant is a Makers' preservative: the same compound that kept the Corvan II scientists asleep. Someone is opening their stores.",
     keys: ["former Starfleet surgeon Dr. Imani Okafor", "an exhausted young doctor in charge for a week", "an elderly physician who has seen this fever before", "a brilliant, reckless epidemiologist"],
     strange: ["an unlicensed agricultural mutagen", "Orion spice with a contaminant", "ice from a comet no one had tested", "fertilizer from an unregistered supplier"],
     brief: "An outbreak on {world}: a fever their doctors can't name, spreading faster each day. The Pelion carries the only stock of a broad-spectrum retroviral in the sector.",
@@ -105,6 +152,8 @@ export const STORIES = {
     fail: "The supplies arrived too late for {world}. The fever has run its course, and the count is grim.",
   },
   "Evacuate a colony": {
+    why: "The colony's star began to flare the week an Orion crew was seen at a Makers' ruin on its outer moon. If they took the machine that steadied the star, more stars may follow.",
+    thread: "The outer moon's ruin is empty: whatever steadied the star was cut out and carried off. The cutting tools match the ones on Corvan II.",
     keys: ["a governor who built the colony with her own hands", "a governor up for re-election in a month", "a stubborn old governor who has survived three flares", "a governor with a secret reason to stay"],
     strange: ["a field of glass flowers that sing at dawn", "a ruin older than any known civilization", "a spring whose water heals", "an ancient machine that still works"],
     brief: "{world}'s star is flaring, months ahead of every prediction. The colony has days, not months: twelve hundred people, three transports, and {key}. The governor doesn't believe the readings.",
@@ -122,6 +171,8 @@ export const STORIES = {
     fail: "The flare reached {world} before the transports cleared. Not everyone got out.",
   },
   "Patrol the Neutral Zone border": {
+    why: "Romulan ships have been seen near three Makers' sites in a month. Starfleet wants to know what the Romulans know.",
+    thread: "The Romulan ship was mapping shield frequencies, and something else: the bearings of every Makers' site on this side of the Zone.",
     keys: ["an outpost commander who hasn't slept in a week", "a nervous listening-post technician", "a disapproving Vulcan observer", "a Romulan who wants to defect"],
     strange: ["a ghost ship seen crossing the Zone", "lights in the Zone where there are no stars", "a Romulan buoy that wasn't there last week", "a signal repeating a crew member's name"],
     brief: "Romulan ships have been sighted along the Neutral Zone: a patrol is overdue. Show the flag, watch the border, and don't start a war.",
@@ -138,6 +189,8 @@ export const STORIES = {
     fail: "The patrol never happened. Whatever was watching the border has finished watching.",
   },
   "Recover a lost probe or artifact": {
+    why: "The probe went down near a Makers' site, carrying a piece of whatever it found. A Klingon house and an Orion broker both want it.",
+    thread: "The fragment carries a star chart: the Makers' sites in the Corvan Sector, and lines between them that all point to one place.",
     keys: ["a stranded Orion trader", "a salvage broker who asks no questions", "a former Starfleet officer gone rogue", "a collector of curiosities with deep pockets"],
     strange: ["a derelict of an unknown design", "a living crystal", "a fragment of a dead civilization's beacon", "a shard of a hull no one built"],
     brief: "A Federation deep-space probe went down near {world} carrying sensor logs from beyond the sector's edge, and something it was never meant to find: {strange}. Recover it before anyone else does.",
@@ -155,6 +208,8 @@ export const STORIES = {
     fail: "Someone else reached the probe first. Its logs, and whatever it brought home, are in other hands now.",
   },
   "Mediate a dispute between two worlds": {
+    why: "The moon they're fighting over holds a Makers' machine in its mines. War would put it up for sale to whoever helps the winner.",
+    thread: "Under the mines is a Makers' relay, still transmitting toward the same point in space as all the others.",
     keys: ["an idealistic Federation ambassador", "the moon's own mining guild boss", "a Vulcan arbiter sent to observe", "a retired admiral who brokered the last truce"],
     strange: ["a seam of pure dilithium", "an ancient machine that still works", "fossils of their shared ancestors", "a crystal that stores memories"],
     brief: "{world} and its neighbour are a week from war over a mining moon that orbits between them. Both have asked the Federation to mediate; neither trusts it.",
@@ -172,6 +227,8 @@ export const STORIES = {
     fail: "The talks failed. {world} and its neighbour are at war over a moon.",
   },
   "Test experimental technology": {
+    why: "Starfleet R&D built the prototype from what the Pelion learned at Corvan II: a way to see through a Makers' field, and through a cloak.",
+    thread: "At full power the prototype sees a Klingon ship trailing the Pelion, cloaked, for weeks: House Kor'vath is following the Pelion to the Makers' sites.",
     keys: ["a brilliant, reckless scientist", "a Daystrom Institute prodigy", "an engineer who designed the prototype in a weekend", "a Starfleet R&D commander with a deadline"],
     strange: ["a cloaked ship that shouldn't be there", "a hidden Orion cache", "a ships' graveyard nobody charted", "a signal repeating a crew member's name"],
     brief: "Starfleet R&D has a prototype for the Pelion to test near {world}: a sensor-cloak inverter, built by {key}, that should let a starship see through a cloak. It hasn't been tested outside a lab.",
@@ -189,6 +246,8 @@ export const STORIES = {
     fail: "The trials never happened. R&D will find another ship, and another schedule.",
   },
   "Ferry a delegation to a world that left the Federation": {
+    why: "The disaster that drove them out of the Federation began when a Makers' machine on their moon failed. They want answers Starfleet has only just started to find.",
+    thread: "Their machine didn't fail: it was switched off, from a distance, by a signal from the same point every Makers' relay points to.",
     keys: ["a first minister who lost family in the disaster", "a former Federation liaison who resigned in protest", "the spaceport's director", "a council elder who voted to leave"],
     strange: ["a Klingon raid that held every ship nearby", "an ion storm that grounded the relief fleet", "a priority order to protect a Federation ambassador", "a misfiled distress call"],
     brief: "{world} left the Federation two years ago, after a disaster Starfleet was too slow to answer. Now they've asked for a delegation to talk about coming back, and they've asked for the Pelion by name.",
@@ -206,6 +265,8 @@ export const STORIES = {
     fail: "The delegation never reached {world}. Its people will remember that too.",
   },
   "Shore leave that goes wrong": {
+    why: "Starfleet only meant this as shore leave, but the 'carnival of illusions' is powered by something an Orion sold the owners, and two of the crew walked into it.",
+    thread: "The carnival's illusions run on a Makers' machine, bought from Orions who said there were many more where it came from.",
     keys: ["the local magistrate", "a market guild leader", "the owner of the gaming house", "a colony constable"],
     strange: ["a carnival of illusions", "a pleasure garden that grants wishes", "a casino where time runs slow", "a hall of mirrors that shows other lives"],
     brief: "Shore leave at {world}, at last: a week's liberty for the crew. Starfleet only asks that the Pelion's people come back on time and in one piece. {strange} is the local attraction.",
@@ -222,6 +283,8 @@ export const STORIES = {
     fail: "Shore leave ended badly, and late. The incident report is longer than the liberty was.",
   },
   "Carry a message across the Neutral Zone": {
+    why: "A Romulan officer has warned Starfleet that the Romulan Star Empire is searching for the Makers' Gate too. This is the reply.",
+    thread: "The Romulan reply: the Gate is real, it's in the Corvan Sector, and the Klingons are close to finding it.",
     keys: ["a Starfleet admiral with sealed orders", "an admiral's intelligence aide", "a Federation ambassador who once served on the Romulan border", "a Vulcan diplomat with old Romulan contacts"],
     strange: ["a Romulan weapon test planned near the Zone", "a coup brewing in the Romulan Senate", "a plague on a Romulan colony world", "a fleet massing behind the Zone"],
     brief: "A sealed message for a Romulan contact on the far side of the Zone, near {world}. Crossing is an act of war if they catch you; Starfleet will deny sending you. {key} wrote the message.",
@@ -240,7 +303,7 @@ export const STORIES = {
 };
 /** A story's text with the order's details filled in. */
 export function storyText(S, o, text) {
-  const world = o.sys ? S.systems[o.sys].name : "the border";
+  const world = o.place || (o.sys ? S.systems[o.sys].name : "the border");
   return text.replace(/\{world\}/g, world).replace(/\{key\}/g, (o.key || "a stranger").replace(/^A /, "a ").replace(/^An /, "an "))
     .replace(/\{strange\}/g, (o.strange || "something strange").replace(/^A /, "a ").replace(/^An /, "an ").replace(/^The /, "the ")).replace(/\{captain\}/g, S.captain || "the captain")
     .replace(/(^|[.!?]\s+|\n\s*)([a-z])/g, (m, p, c) => p + c.toUpperCase());

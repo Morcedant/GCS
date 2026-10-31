@@ -2,8 +2,8 @@
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
-  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, missionChoices, chooseMission } from "./game.js";
-import { storyOf } from "./stories.js";
+  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, missionChoices, chooseMission, campaignOf, campaignAct } from "./game.js";
+import { storyOf, CAMPAIGN } from "./stories.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
 import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound, contestOdds } from "./arc.js";
@@ -565,7 +565,7 @@ function ordersHTML() {
   for (const o of S.orders) {
     const st = orderStatus(o), left = o.deadline - S.turn;
     h += `<div class="card ${st[1] === "bad" ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}</span></h4>
-      <div class="small">${o.arc ? esc(o.text) : `${o.text ? esc(o.text) + "<br>" : ""}${o.have} of ${o.segs} successes · ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})`}</div>${urgentLine(o)}
+      <div class="small">${o.arc ? esc(o.text) : `${o.text ? esc(o.text) + "<br>" : ""}${storyOf(o) && storyOf(o).why ? `<b>Starfleet's reason:</b> ${esc(storyOf(o).why)}<br>` : ""}${o.have} of ${o.segs} successes · ${left} week${left === 1 ? "" : "s"} left (due by turn ${o.deadline})`}</div>${urgentLine(o)}
       <div class="roll-row"><button class="btn small" data-tab-go="mission">Progress (Mission tab)</button><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-go="${o.at}" ${isUrgent(o) ? `data-warp-go="${maxWarp(S)}"` : ""}>Set course${isUrgent(o) ? " at emergency warp" : ""}</button></div></div>`;
   }
   // The backlog.
@@ -573,16 +573,28 @@ function ordersHTML() {
   if (!back.length) h += `<p class="small muted">Nothing waiting. With two orders under way, or urgent orders in hand, new orders from Starfleet wait here.</p>`;
   else {
     h += `<p class="small muted">Waiting their turn: the oldest moves up when an order under way is finished. Their clocks start when they do. You can take one on now, if you think the Pelion can manage more.</p>`;
-    for (const o of back) h += `<div class="card"><h4>${esc(o.title)}${isUrgent(o) ? ` <span class="badge-status bad">Urgent</span>` : ""}</h4><div class="small">Received turn ${o.received || o.issued} · ${o.segs} successes with ${esc(o.skills.join(", "))} · ${distance(S.pelion.at, o.at)} ly away${o.twist ? ` · Twist: ${esc(o.twist.text)}` : ""}</div>
+    for (const o of back) h += `<div class="card"><h4>${esc(o.title)}${isUrgent(o) ? ` <span class="badge-status bad">Urgent</span>` : ""}</h4><div class="small">Received turn ${o.received || o.issued} · ${o.segs} successes with ${esc(o.skills.join(", "))} · ${distance(S.pelion.at, o.at)} ly away${o.twist ? ` · Twist: ${esc(o.twist.text)}` : ""}</div>${storyOf(o) && storyOf(o).why ? `<div class="small"><b>Starfleet's reason:</b> ${esc(storyOf(o).why)}</div>` : ""}
       <div class="roll-row"><button class="btn small" data-center="${o.at}">Find it</button><button class="btn small primary" data-accept="${o.id}">Take it on now</button></div></div>`;
   }
   // Past orders.
   h += `<h3>Past orders</h3>` + (hist.length ? `<ul class="log">${hist.slice().reverse().map((x) => `<li class="${x.result === "failed" ? "bad" : x.result === "partly" ? "order" : "good"}"><b>${x.result === "failed" ? "✗ Failed" : x.result === "partly" ? "◐ Partly" : "✓ Carried out"}</b> · turn ${x.turn} · ${esc(x.title)}<br><span class="small">${esc(x.how)}</span></li>`).join("")}</ul>` : `<p class="small muted">None yet. Each order carried out clears a Starfleet Command box; each failure marks one.</p>`);
   return h;
 }
+/** The campaign this tour: The Makers' Watch, its act, the threads found, and the story so far. */
+function campaignHTML() {
+  const C = campaignOf(S), n = Math.min(C.threads.length, CAMPAIGN.finaleAt), beats = CAMPAIGN.beats.filter((b) => C.beats.includes(b.at));
+  const next = CAMPAIGN.beats.find((b) => !C.beats.includes(b.at) && b.at > 0);
+  const status = C.over === "close" ? "Resolved: the watch is over, the Gate closed." : C.over === "guard" ? "Resolved: the Gate kept open, under Starfleet's guard." : C.over === "lost" ? "Lost: House Kor'vath reached the Gate first." : C.finale ? "The finale: get to the Makers' Gate first (the Orders tab)." : !C.beats.includes(0) ? "It begins at Corvan II." : `${n} of ${CAMPAIGN.finaleAt} threads to find the Makers' Gate${next ? `; the next revelation at ${next.at}` : ""}.`;
+  let h = `<div class="card gold"><h4>The campaign: ${esc(CAMPAIGN.title)} <span class="badge-status ${C.over === "lost" ? "bad" : C.over ? "good" : ""}">${esc(campaignAct(S))}</span></h4>
+    <p class="small">${esc(CAMPAIGN.premise)}</p>
+    <div class="kv small"><span>Threads</span><span>${boxes(n, CAMPAIGN.finaleAt, "blue")} ${esc(status)}</span></div>`;
+  if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})</summary>${beats.map((b) => `<p><b>${esc(b.act)}: ${esc(b.title)}.</b> ${esc(b.text.split("\n")[0])}</p>`).join("")}</details>`;
+  if (C.threads.length) h += `<details class="small" style="margin-top:4px"><summary>Threads found (${C.threads.length})</summary><ol>${C.threads.map((t) => `<li><b>${esc(t.title)}</b> (turn ${t.turn}): ${esc(t.text)}</li>`).join("")}</ol></details>`;
+  return h + `</div>`;
+}
 /** The Mission tab: how each order under way is progressing, step by step, with its clock and what counts as success. */
 function missionHTML() {
-  let h = hint() + `<h2>Mission</h2>`;
+  let h = hint() + `<h2>Mission</h2>` + campaignHTML();
   const A = S.arc;
   if (awayActive()) h += `<div class="card small">The away team's work on Corvan II (who's down, the clues, its log) is on the <button class="btn small" data-tab-go="away">Away team</button> tab.</div>`;
   if (!S.orders.length) h += `<p class="muted">No orders under way.${(S.backlog || []).length ? ` ${(S.backlog || []).length} waiting in the backlog (the Orders tab).` : ""}</p>`;
@@ -604,6 +616,7 @@ function missionHTML() {
       h += `<div class="card ${left <= 2 ? "red" : "gold"}"><h4>${esc(o.title)} <span class="badge-status ${st[1]}">${st[0]}</span></h4>`;
       const story = storyOf(o);
       if (o.text) h += `<p class="small">${esc(o.text)}</p>`;
+      if (story && story.why) h += `<p class="small"><b>Starfleet's reason:</b> ${esc(story.why)}</p>`;
       if (story) {
         // The story, step by step: what's done and what's next; later steps stay hidden until they come.
         const steps = [[`Reach ${o.sys ? S.systems[o.sys].name : "the border"} (${distance(S.pelion.at, o.at)} ly away)`, there || o.arrived || o.have > 0]]
@@ -719,7 +732,8 @@ function showStarter(canContinue) {
   <div class="grid2">
     <div class="brief"><h3>The ship</h3><p>Double-click a hex to fly there. A hex is a light-year and a turn a week; speed is v = W³ × c, so warp 6, the Pelion's maximum stable speed, covers about 4 light-years a week, and warp 8, its emergency maximum, about 10, at a risk to the engines. Urgent orders call for emergency warp. Nebulae count double. Then the crew goes to work where you are: every officer acts once a turn (survey, investigate, negotiate, sweep, repair), each job once. Starbase 23 repairs, rearms and refits you.</p></div>
     <div class="brief"><h3>The crew</h3><p>The six officers from the Players' Guide do the work. Every action is the tabletop roll: 3d6 at or under their skill. Pick who does it, and whether a second officer assists (+1, using their turn); a Duty point rerolls a failure.</p></div>
-    <div class="brief"><h3>Orders</h3><p>Starfleet sends missions from the GM's Guide's tables, each with a deadline and a twist. The first is The Silence at Corvan II.</p></div>
+    <div class="brief"><h3>The campaign</h3><p>${esc(CAMPAIGN.title)}: it begins with The Silence at Corvan II. Something left machines all over this sector to watch over younger worlds, and someone is digging them up. Every order you carry out turns up a thread; six threads lead to the finale.</p></div>
+    <div class="brief"><h3>Orders</h3><p>Starfleet sends missions, each with a deadline, a twist, its own story, and a reason tied to the campaign. Each ends with a decision that's yours to make.</p></div>
     <div class="brief"><h3>The worlds</h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.</p></div>
     <div class="brief"><h3>Battles</h3><p>Ship combat from the Players' Guide: spend Power on shields, phasers and torpedoes, give the captain's order, and break away if it goes wrong.</p></div>
     <div class="brief"><h3>Starfleet Command</h3><p>Five boxes and you're relieved of command: failed orders, the Prime Directive, incidents and lost colonies mark it. Three orders carried out in a row clear a box. Survive the tour and earn your rating.</p></div>
@@ -771,7 +785,7 @@ function successHTML(ev) {
   const tasks = ev.arc ? arcSteps().replace(/<p class="small muted"[^]*$/, "") : `<ol class="steps-list">${ev.tasks.map((t) => `<li class="done"><span>✓</span>${esc(t)}</li>`).join("")}</ol>`;
   return `<h2>${part ? "Mission partly successful" : "Mission success"}</h2><h3 style="margin-top:0">${esc(ev.title)}</h3>
     <p class="small muted">Turn ${ev.turn} · ${ev.weeks} week${ev.weeks === 1 ? "" : "s"} from orders to done</p>
-    <h3>What was done</h3>${tasks}${ev.choice ? `<p><b>The decision:</b> ${esc(ev.choice)}</p>` : ""}<p>${esc(ev.how)}</p>
+    <h3>What was done</h3>${tasks}${ev.choice ? `<p><b>The decision:</b> ${esc(ev.choice)}</p>` : ""}<p>${esc(ev.how)}</p>${ev.thread ? `<p><b>${esc(CAMPAIGN.title)}, thread ${Math.min(campaignOf(S).threads.length, 99)}:</b> ${esc(ev.thread)}</p>` : ""}
     <h3>Starfleet Command</h3><ul class="small">${ev.rewards.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
     ${ev.next ? `<p class="small"><b>Up next, from the backlog:</b> ${esc(ev.next.join("; "))} (the Orders tab).</p>` : ""}
     <div class="btn-row"><button class="btn primary" data-m="event-ok">Continue</button></div>`;

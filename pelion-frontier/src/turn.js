@@ -2,7 +2,7 @@
 // Also the one place that ties the modules together, so the page imports this.
 import { CREW, SUPPORT, ENEMIES } from "./data.js";
 import { distance, within } from "./hex.js";
-import { hourly, BACKLOG_MAX, check, target, CRUISE_WARP, daysPerLy, maxWarp, syncMp, isUrgent, available, log, storyEvent, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
+import { hourly, BACKLOG_MAX, campaignTick, check, target, CRUISE_WARP, daysPerLy, maxWarp, syncMp, isUrgent, available, log, storyEvent, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
 import { startBattle, endBattle } from "./combat.js";
 import { aiTurn, claim } from "./ai.js";
 import { arcTurn, arcTick, arcEventChoose } from "./arc.js";
@@ -53,6 +53,7 @@ export function endTurn(S) {
   const active = S.orders.filter((o) => !o.arc).length, waiting = (S.backlog || []).length;
   if (S.turn >= 3 && waiting < BACKLOG_MAX && (S.turn % 4 === 0 || active === 0 && !waiting && S.turn % 2 === 0)) newOrder(S);
   warpStrain(S);
+  campaignTick(S);
   // Next turn.
   S.turn++;
   newWeek(S); S.pelion.engaged = false; S.pelion.zoneMarked = false;

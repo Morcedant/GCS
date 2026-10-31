@@ -139,6 +139,7 @@ export const RECORDS = [
   { id: "graviton", name: "Graviton lensing", text: "+1 to Survey and Investigate.", perk: "science1" },
   { id: "dilithium", name: "Dilithium resonance", text: "+1 Power in battle.", perk: "power1" },
   { id: "warpfield", name: "A folded warp field", text: "+2 to warp strain checks: the field holds at high warp.", perk: "speed1" },
+  { id: "makers", name: "The Makers' library", text: "Everything beyond the Gate the Makers chose to share: +2 science a turn's worth of insight, and the Federation's envy.", perk: "none", story: true },
   { id: "caretaker", name: "The caretaker of Corvan II", text: "A machine's account of a vanished civilization: +1 to diplomatic missions.", perk: "envoy1", story: true },
 ];
 

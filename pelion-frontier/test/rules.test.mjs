@@ -309,3 +309,18 @@ test("every order type has a story: arrival, a scene for each step, a decision, 
   const rep = [S.event].concat(S.eventQueue).find((e) => e && e.kind === "success");
   assert.ok(rep && rep.choice && rep.rewards.some((r) => /decision/.test(r)));
 });
+test("the campaign: Corvan II opens it, each order adds a thread, six lead to the Makers' Gate, and the Gate ends it", async () => {
+  const { CAMPAIGN } = await import("../src/stories.js");
+  const S = newGame({ seed: "camp" });
+  const arc = S.orders.find((o) => o.arc); S.arc.stage = "done"; completeOrder(S, arc, true, "Done."); S.event = null; S.eventQueue = [];
+  assert.ok(S.campaign.beats.includes(0));
+  S.orders = []; S.backlog = [];
+  for (let i = 0; i < CAMPAIGN.finaleAt; i++) { const o = newOrder(S); S.event = null; S.eventQueue = []; completeOrder(S, o, true); S.event = null; S.eventQueue = []; }
+  assert.equal(S.campaign.threads.length, CAMPAIGN.finaleAt);
+  assert.deepEqual(S.campaign.beats.sort(), [0, 2, 4, 6]);
+  const gate = S.orders.find((o) => o.finale); assert.ok(gate && gate.urgent && gate.place === "the Makers' Gate");
+  gate.have = gate.segs; S.event = { kind: "mission-choice", orderId: gate.id };
+  assert.ok(chooseMission(S, gate.id, "guard").ok);
+  assert.equal(S.campaign.over, "guard"); assert.ok(S.records.includes("makers"));
+  assert.ok(score(S).parts.some(([n, v]) => /the Gate/.test(n) && v === 25));
+});
