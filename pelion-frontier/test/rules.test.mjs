@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { newGame, check, actionsFor, attempt, resolve, moveTo, reachable, target, markCommand, score } from "../src/game.js";
 import { startBattle, exchange, battleStats } from "../src/combat.js";
+import { beamDown } from "../src/arc.js";
 import { endTurn, chooseEvent, closeBattle, dismissEvent } from "../src/turn.js";
 import { chance } from "../src/data.js";
 
@@ -70,7 +71,17 @@ test("Corvan II: arriving brings the raider's hail; the pull waits for a sensor 
   assert.ok(r.ok);
   assert.equal(S.arc.stage, "pull");
   assert.equal(S.event.title, "The pull");
-  assert.ok(actionsFor(S).some((a) => a.arc === "clue-logs"));
+  // No clues until an away team beams down; then only the away team can work them.
+  assert.ok(!actionsFor(S).some((a) => a.arc === "clue-logs"));
+  assert.ok(actionsFor(S).some((a) => a.id === "beam"));
+  assert.ok(beamDown(S, ["sevek"]).error);
+  assert.ok(beamDown(S, ["vessik", "reyes"]).ok);
+  const clue = actionsFor(S).find((a) => a.arc === "clue-logs");
+  assert.deepEqual(clue.who, ["vessik", "reyes"]);
+  S.event = null; S.pelion.acted = false;
+  attempt(S, "pelion", "arc", { arc: "clue-logs", officer: "rrinn", skill: "Computers" });
+  const p = S.pending || null, last = S.log[S.log.length - 1].text;
+  assert.ok(p ? p.officer !== "rrinn" : !last.startsWith("Rrinn"));
 });
 test("the score counts", () => { const S = newGame({ seed: "sc" }); assert.equal(score(S).total, 15); });
 test("every discovery is in the log, and trimming never drops one", async () => {

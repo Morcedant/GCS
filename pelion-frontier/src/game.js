@@ -66,10 +66,10 @@ export function skillOf(S, id, skill) {
   return base ? base + (S.crew[id].plus[skill] || 0) : 0;
 }
 /** The best available officer for one of these skills (highest target), and the skill. */
-export function bestOfficer(S, skills, ctx = {}) {
+export function bestOfficer(S, skills, ctx = {}, ids = null) {
   let best = null;
   for (const c of CREW) {
-    if (!available(S, c.id)) continue;
+    if (!available(S, c.id) || (ids && !ids.includes(c.id))) continue;
     for (const sk of skills) {
       const t = target(S, c.id, sk, ctx).total;
       if (skillOf(S, c.id, sk) && (!best || t > best.total)) best = { officer: c.id, skill: sk, total: t };
@@ -251,7 +251,7 @@ export function actionsFor(S, unit = "pelion") {
   if (base) out.push({ id: "engage", enemy: base.id, name: "Attack the Orion base", skills: [], blurb: "Its guns and shields against yours. Destroy it and the raids stop." });
   for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, extra: [["In the field", -2]] });
   if (s && s.id === S.corvan) out.push(...arcActionsHook(S));
-  return out.map((a) => ({ ...a, why: P.acted ? "The Pelion has already acted this turn." : null }));
+  return out.map((a) => ({ ...a, why: P.acted && !a.free ? "The Pelion has already acted this turn." : null }));
 }
 const signedAccord = (a) => (a > 0 ? "+" : a < 0 ? "−" : "") + Math.abs(a);
 function engageNote(S, e) {
@@ -273,11 +273,14 @@ export function attempt(S, unit, actionId, opts = {}) {
   let who, skill, t;
   if (unit !== "pelion") { who = unit; skill = a.skills[0]; t = { parts: [["Science vessel's crew", SUPPORT.science.skill], ["Its sensors", 2]], total: SUPPORT.science.skill + 2 }; }
   else {
+    // a.who: only these officers can do it (the away team on the surface, or those still aboard).
     who = opts.officer; skill = opts.skill;
-    if (!who || !skill || !available(S, who) || !skillOf(S, who, skill) || !a.skills.includes(skill)) { const b = bestOfficer(S, a.skills, ctx); if (!b) return { error: "Nobody fit for duty has the training." }; who = b.officer; skill = b.skill; }
+    if (!who || !skill || !available(S, who) || !skillOf(S, who, skill) || !a.skills.includes(skill) || (a.who && !a.who.includes(who))) {
+      const b = bestOfficer(S, a.skills, ctx, a.who); if (!b) return { error: a.who ? "No one there has the training." : "Nobody fit for duty has the training." }; who = b.officer; skill = b.skill;
+    }
     t = target(S, who, skill, { ...ctx, extra: a.extra || [] });
     // A second officer trained in the skill helps: +1.
-    const helper = CREW.find((c) => c.id !== who && available(S, c.id) && skillOf(S, c.id, skill) >= 13);
+    const helper = CREW.find((c) => c.id !== who && available(S, c.id) && (!a.who || a.who.includes(c.id)) && skillOf(S, c.id, skill) >= 13);
     if (helper && opts.assist !== false) { t.parts.push([`${helper.short} assists`, 1]); t.total += 1; }
   }
   if (actionId === "hail") {

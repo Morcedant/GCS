@@ -2,6 +2,7 @@
 // fights with everything up. For balance and to shake out crashes.  node test/sim.mjs [seed] [games]
 import { newGame, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath, score, rating, requisition, fitRefit } from "../src/game.js";
 import { exchange } from "../src/combat.js";
+import { beamDown } from "../src/arc.js";
 import { endTurn, chooseEvent, dismissEvent, closeBattle } from "../src/turn.js";
 import { distance } from "../src/hex.js";
 import { REFITS } from "../src/data.js";
@@ -15,6 +16,8 @@ function play(seed) {
     if (S.pending) { resolve(S, canReroll(S)); continue; }
     // Docked: refits and an escort.
     if (S.pelion.docked) { for (const id of Object.keys(REFITS)) fitRefit(S, id); if (Object.keys(S.support).length < 1) requisition(S, "escort"); }
+    // Corvan II: beam an away team down when one's needed.
+    if (actionsFor(S).some((a) => a.id === "beam")) { beamDown(S, ["sevek", "vessik", "reyes", "rrinn"].filter((id) => S.crew[id].inj < 3)); if (!S.arc.team) beamDown(S, Object.keys(S.crew).filter((id) => S.crew[id].inj < 3).slice(0, 4)); continue; }
     // Act here if worth it.
     if (!S.pelion.acted) {
       const acts = actionsFor(S).filter((a) => !a.why);

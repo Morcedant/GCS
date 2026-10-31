@@ -487,10 +487,10 @@ function skillOf(S, id, skill) {
   return base ? base + (S.crew[id].plus[skill] || 0) : 0;
 }
 /** The best available officer for one of these skills (highest target), and the skill. */
-function bestOfficer(S, skills, ctx = {}) {
+function bestOfficer(S, skills, ctx = {}, ids = null) {
   let best = null;
   for (const c of CREW) {
-    if (!available(S, c.id)) continue;
+    if (!available(S, c.id) || (ids && !ids.includes(c.id))) continue;
     for (const sk of skills) {
       const t = target(S, c.id, sk, ctx).total;
       if (skillOf(S, c.id, sk) && (!best || t > best.total)) best = { officer: c.id, skill: sk, total: t };
@@ -672,7 +672,7 @@ function actionsFor(S, unit = "pelion") {
   if (base) out.push({ id: "engage", enemy: base.id, name: "Attack the Orion base", skills: [], blurb: "Its guns and shields against yours. Destroy it and the raids stop." });
   for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, extra: [["In the field", -2]] });
   if (s && s.id === S.corvan) out.push(...arcActionsHook(S));
-  return out.map((a) => ({ ...a, why: P.acted ? "The Pelion has already acted this turn." : null }));
+  return out.map((a) => ({ ...a, why: P.acted && !a.free ? "The Pelion has already acted this turn." : null }));
 }
 const signedAccord = (a) => (a > 0 ? "+" : a < 0 ? "−" : "") + Math.abs(a);
 function engageNote(S, e) {
@@ -694,11 +694,14 @@ function attempt(S, unit, actionId, opts = {}) {
   let who, skill, t;
   if (unit !== "pelion") { who = unit; skill = a.skills[0]; t = { parts: [["Science vessel's crew", SUPPORT.science.skill], ["Its sensors", 2]], total: SUPPORT.science.skill + 2 }; }
   else {
+    // a.who: only these officers can do it (the away team on the surface, or those still aboard).
     who = opts.officer; skill = opts.skill;
-    if (!who || !skill || !available(S, who) || !skillOf(S, who, skill) || !a.skills.includes(skill)) { const b = bestOfficer(S, a.skills, ctx); if (!b) return { error: "Nobody fit for duty has the training." }; who = b.officer; skill = b.skill; }
+    if (!who || !skill || !available(S, who) || !skillOf(S, who, skill) || !a.skills.includes(skill) || (a.who && !a.who.includes(who))) {
+      const b = bestOfficer(S, a.skills, ctx, a.who); if (!b) return { error: a.who ? "No one there has the training." : "Nobody fit for duty has the training." }; who = b.officer; skill = b.skill;
+    }
     t = target(S, who, skill, { ...ctx, extra: a.extra || [] });
     // A second officer trained in the skill helps: +1.
-    const helper = CREW.find((c) => c.id !== who && available(S, c.id) && skillOf(S, c.id, skill) >= 13);
+    const helper = CREW.find((c) => c.id !== who && available(S, c.id) && (!a.who || a.who.includes(c.id)) && skillOf(S, c.id, skill) >= 13);
     if (helper && opts.assist !== false) { t.parts.push([`${helper.short} assists`, 1]); t.total += 1; }
   }
   if (actionId === "hail") {
@@ -1175,21 +1178,25 @@ const raider = (S) => enemiesAt(S, S.systems[S.corvan].at).find((e) => e.goal ==
 
 function arcActions(S) {
   const A = S.arc, out = [];
-  const add = (arc, name, skills, blurb, extra) => out.push({ id: "arc", arc, name, skills, blurb, extra });
+  const add = (arc, name, skills, blurb, extra, who) => out.push({ id: "arc", arc, name, skills, blurb, extra, who });
+  const surface = ["pull", "orions", "caretaker"].includes(A.stage);
+  // The surface needs an away team: choosing and beaming them down is free, and done before anything below.
+  if (surface && !A.team) { out.push({ id: "beam", name: "Beam down an away team", skills: [], free: true, blurb: "Choose two to four officers. Only the away team can act on the surface; whoever stays aboard runs the ship. The transporter takes no action." }); return out; }
+  const team = A.team, aboard = surface ? CREW.map((c) => c.id).filter((id) => !team.includes(id)) : null;
   if (A.stage === "orbit") add("scan", "Sweep the ruins with the ship's sensors", ["Sensors", "Physical Sciences"], "Find out what's down there before anyone beams down. Whatever the roll, something in the ruins will notice.");
   if (A.stage === "pull") {
-    for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `A clue for the record (${A.clock}/${CLOCK}). A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]]);
-    if (!A.boughtTime && A.countdown > 0) add("time", "Buy time: reroute power", ["Engineering"], "Clear a segment of the Countdown. Once.");
+    for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `A clue for the record (${A.clock}/${CLOCK}). A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]], team);
+    if (!A.boughtTime && A.countdown > 0) add("time", "Aboard: buy time, reroute power", ["Engineering"], "Clear a segment of the Countdown. Once. Done from the ship, by someone still aboard.", [], aboard);
   }
   if (A.stage === "orions") {
-    add("stun", "Stop the Orion diggers (phasers on stun)", ["Phasers", "Unarmed Combat", "Stealth"], "Three Orion pirates in the ruins. A failure hurts whoever leads it, and costs time.", [["Three of them", -3]]);
-    add("kill", "Stop them, phasers on kill", ["Phasers"], "No −3, but Starfleet Command marks a box for the bodies.", []);
+    add("stun", "Stop the Orion diggers (phasers on stun)", ["Phasers", "Unarmed Combat", "Stealth"], "Three Orion pirates in the ruins. A failure hurts whoever leads it, and costs time.", [["Three of them", -3]], team);
+    add("kill", "Stop them, phasers on kill", ["Phasers"], "No −3, but Starfleet Command marks a box for the bodies.", [], team);
   }
   if (A.stage === "caretaker") {
-    add("shutdown", "Shut the caretaker down", ["Engineering", "Electronics"], "The scientists wake. The Ketari lose their protector.", [["Technology older than the Federation", -4]]);
+    add("shutdown", "Shut the caretaker down", ["Engineering", "Electronics"], "The scientists wake. The Ketari lose their protector.", [["Technology older than the Federation", -4]], team);
     add("reason", "Reason with it: the paradox", ["Psychology", "Diplomacy"], "It protects them from all outsiders, and it's an outsider itself. −4, but Sevek's logic gives +2. Success: it releases the scientists and goes on watching.",
-      [["A machine's logic", -4]].concat(available(S, "sevek") ? [["Sevek's paradox", 2]] : []));
-    add("leave", "Leave it be; take back the Orion phasers", ["Stealth", "Psychology"], "Keep Ketari history their own. The scientists stay asleep. Fail by 3 or more and the Ketari see you.", [["A whole village", -2]]);
+      [["A machine's logic", -4]].concat(available(S, "sevek") && team.includes("sevek") ? [["Sevek's paradox", 2]] : []), team);
+    add("leave", "Leave it be; take back the Orion phasers", ["Stealth", "Psychology"], "Keep Ketari history their own. The scientists stay asleep. Fail by 3 or more and the Ketari see you.", [["A whole village", -2]], team);
   }
   return out;
 }
@@ -1288,7 +1295,18 @@ function arcTick(S) {
 function startPull(S) {
   const A = S.arc; if (A.stage !== "orbit") return;
   A.stage = "pull";
-  storyEvent(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. The away team beams down to an empty outpost.");
+  storyEvent(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
+}
+/** Beam an away team down (2 to 4 officers fit for duty), or beam them all back up (ids empty). Takes no action. */
+function beamDown(S, ids) {
+  const A = S.arc;
+  if (!["pull", "orions", "caretaker"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at) return { error: "There's nowhere to beam down to." };
+  if (!ids || !ids.length) { if (A.team) log(S, `The away team (${A.team.map((id) => officer(id).short).join(", ")}) beams back aboard.`, "move"); A.team = null; return { ok: true }; }
+  ids = [...new Set(ids)].filter((id) => available(S, id));
+  if (ids.length < 2 || ids.length > 4) return { error: "An away team is two to four officers fit for duty." };
+  A.team = ids;
+  log(S, `Away team: ${ids.map((id) => officer(id).name).join(", ")} beam down to the outpost on Corvan II. ${CREW.filter((c) => !ids.includes(c.id)).map((c) => c.short).join(", ")} stay${CREW.length - ids.length === 1 ? "s" : ""} aboard.`, "move");
+  return { ok: true };
 }
 function arcSweep(S) { if (S.arc.stage === "orbit" && S.pelion.at === S.systems[S.corvan].at) startPull(S); }
 /** End of turn: the drain on the ship while it stays in orbit. */
@@ -1700,6 +1718,7 @@ function hint() {
   let t = "";
   if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:<\/b> fly to Corvan II (the gold <b>!<\/b>). Double-click it on the map: the Pelion goes as far as it can this turn. Then <b>End turn<\/b>.`;
   else if (A.stage === "orbit") t = "<b>Next:<\/b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
+  else if (A.stage === "pull" && !A.team) t = "<b>Next:<\/b> choose an away team and beam them down to the outpost (the Here tab).";
   else if (A.stage === "pull") t = "<b>Next:<\/b> the away team. Use the actions below, one a turn, to fill the record before the Countdown fills.";
   else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:<\/b> finish it on Corvan II: the action below.";
   else if (S.turn <= 12) t = "<b>Next:<\/b> Starfleet will send new orders (the Orders tab). Meanwhile: survey the unknown (?), court the independent worlds, and watch for raiders.";
@@ -1729,16 +1748,32 @@ function hereHTML() {
   const acts = actionsFor(S, unit);
   h += `<h3>${unit === "pelion" ? "The Pelion's action this turn" : `The ${esc(u.name)}'s action`}<\/h3>`;
   if (!acts.length) h += `<p class="muted small">Nothing to do here. Fly somewhere: double-click a hex.<\/p>`;
-  for (const a of acts) h += actionCard(a);
+  h += teamLine();
+  for (const a of [...acts.filter((x) => x.id === "beam"), ...acts.filter((x) => x.id !== "beam")]) h += actionCard(a);
   return h;
 }
 function optionsFor(a) {
   if (unit !== "pelion") return [];
   const out = [];
-  for (const c of CREW) { if (!available(S, c.id)) continue; for (const sk of a.skills) if (skillOf(S, c.id, sk)) out.push({ officer: c.id, skill: sk, total: target(S, c.id, sk, { action: a.id === "arc" ? "arc" : a.id, listen: a.id === "hail" || a.id === "sweep", extra: a.extra || [] }).total }); }
+  for (const c of CREW) { if (!available(S, c.id) || (a.who && !a.who.includes(c.id))) continue; for (const sk of a.skills) if (skillOf(S, c.id, sk)) out.push({ officer: c.id, skill: sk, total: target(S, c.id, sk, { action: a.id === "arc" ? "arc" : a.id, listen: a.id === "hail" || a.id === "sweep", extra: a.extra || [] }).total }); }
   return out.sort((x, y) => y.total - x.total);
 }
+// Who's best on the surface: the clues' skills, the Orions' Phasers, the caretaker's Engineering and Psychology.
+const AWAY_PICK = ["sevek", "vessik", "reyes", "rrinn"];
+function beamCard(a) {
+  const keys = { shvari: "Leadership, Diplomacy", sevek: "Physical Sciences, Sensors, Computers, Psychology", vessik: "Medicine, Sensors, Psychology", grath: "Engineering, Electronics", reyes: "Phasers, Unarmed Combat, Stealth", rrinn: "Computers, Psychology, Stealth" };
+  return `<div class="card gold"><h4>${esc(a.name)}<\/h4><div class="small muted">${esc(a.blurb)}<\/div>
+    <div style="display:grid;gap:4px;margin-top:8px">${CREW.map((c) => `<label class="chip ${available(S, c.id) ? "" : "off"}" style="border-radius:8px"><input type="checkbox" data-away="${c.id}" ${AWAY_PICK.includes(c.id) && available(S, c.id) ? "checked" : ""} ${available(S, c.id) ? "" : "disabled"}><span><b>${esc(c.short)}<\/b> <span class="muted small">${esc(keys[c.id])}<\/span><\/span><\/label>`).join("")}<\/div>
+    <div class="roll-row"><button class="btn primary small" data-beam="1">Energize<\/button><\/div><\/div>`;
+}
+function teamLine() {
+  const A = S.arc;
+  if (!A.team || !["pull", "orions", "caretaker"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at || unit !== "pelion") return "";
+  return `<div class="card small"><b>Away team on Corvan II:<\/b> ${A.team.map((id) => esc(officer(id).short) + (available(S, id) ? "" : " (in sickbay)")).join(", ")}. Only they can act on the surface.
+    <div class="roll-row"><button class="btn small" data-beamup="1">Beam them up (choose again)<\/button><\/div><\/div>`;
+}
 function actionCard(a) {
+  if (a.id === "beam") return beamCard(a);
   const tone = a.id === "engage" ? "red" : a.id === "mission" || a.id === "arc" ? "gold" : a.id === "envoy" ? "green" : "";
   const enc = esc(JSON.stringify({ id: a.id, order: a.order, enemy: a.enemy, arc: a.arc }));
   let h = `<div class="card ${tone}"><h4>${esc(a.name)}<\/h4><div class="small muted">${esc(a.blurb || "")}<\/div>`;
@@ -1859,6 +1894,8 @@ function bindChrome() {
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b || !S) return;
     if (b.dataset.logf) { logFilter = b.dataset.logf; renderPanel(); return; }
+    if (b.dataset.beam) { const ids = [...b.closest(".card").querySelectorAll("[data-away]:checked")].map((x) => x.dataset.away); const r = beamDown(S, ids); if (r.error) toast(r.error, true); after(); return; }
+    if (b.dataset.beamup) { beamDown(S, []); after(); return; }
     if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }
     if (b.dataset.go) { selHex = b.dataset.go; goTo(b.dataset.go); return; }
     if (b.dataset.center) { centerOn(b.dataset.center); selHex = b.dataset.center; tab = "here"; renderAll(); return; }

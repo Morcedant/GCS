@@ -1,7 +1,7 @@
 // The first mission, from the GM's Guide: The Silence at Corvan II. An Orion raider in orbit; the pull on the ship's
 // power and a Countdown of 6; the away team's investigation (a discovery clock of 4); Orion diggers in the ruins; and
 // the caretaker machine, with a choice about what to do with it.
-import { ENEMIES } from "./data.js";
+import { ENEMIES, CREW } from "./data.js";
 import { log, markCommand, completeOrder, registerHooks, enemiesAt, available, officer, sendHome, storyEvent } from "./game.js";
 import { startBattle } from "./combat.js";
 
@@ -17,21 +17,25 @@ const raider = (S) => enemiesAt(S, S.systems[S.corvan].at).find((e) => e.goal ==
 
 export function arcActions(S) {
   const A = S.arc, out = [];
-  const add = (arc, name, skills, blurb, extra) => out.push({ id: "arc", arc, name, skills, blurb, extra });
+  const add = (arc, name, skills, blurb, extra, who) => out.push({ id: "arc", arc, name, skills, blurb, extra, who });
+  const surface = ["pull", "orions", "caretaker"].includes(A.stage);
+  // The surface needs an away team: choosing and beaming them down is free, and done before anything below.
+  if (surface && !A.team) { out.push({ id: "beam", name: "Beam down an away team", skills: [], free: true, blurb: "Choose two to four officers. Only the away team can act on the surface; whoever stays aboard runs the ship. The transporter takes no action." }); return out; }
+  const team = A.team, aboard = surface ? CREW.map((c) => c.id).filter((id) => !team.includes(id)) : null;
   if (A.stage === "orbit") add("scan", "Sweep the ruins with the ship's sensors", ["Sensors", "Physical Sciences"], "Find out what's down there before anyone beams down. Whatever the roll, something in the ruins will notice.");
   if (A.stage === "pull") {
-    for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `A clue for the record (${A.clock}/${CLOCK}). A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]]);
-    if (!A.boughtTime && A.countdown > 0) add("time", "Buy time: reroute power", ["Engineering"], "Clear a segment of the Countdown. Once.");
+    for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `A clue for the record (${A.clock}/${CLOCK}). A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]], team);
+    if (!A.boughtTime && A.countdown > 0) add("time", "Aboard: buy time, reroute power", ["Engineering"], "Clear a segment of the Countdown. Once. Done from the ship, by someone still aboard.", [], aboard);
   }
   if (A.stage === "orions") {
-    add("stun", "Stop the Orion diggers (phasers on stun)", ["Phasers", "Unarmed Combat", "Stealth"], "Three Orion pirates in the ruins. A failure hurts whoever leads it, and costs time.", [["Three of them", -3]]);
-    add("kill", "Stop them, phasers on kill", ["Phasers"], "No −3, but Starfleet Command marks a box for the bodies.", []);
+    add("stun", "Stop the Orion diggers (phasers on stun)", ["Phasers", "Unarmed Combat", "Stealth"], "Three Orion pirates in the ruins. A failure hurts whoever leads it, and costs time.", [["Three of them", -3]], team);
+    add("kill", "Stop them, phasers on kill", ["Phasers"], "No −3, but Starfleet Command marks a box for the bodies.", [], team);
   }
   if (A.stage === "caretaker") {
-    add("shutdown", "Shut the caretaker down", ["Engineering", "Electronics"], "The scientists wake. The Ketari lose their protector.", [["Technology older than the Federation", -4]]);
+    add("shutdown", "Shut the caretaker down", ["Engineering", "Electronics"], "The scientists wake. The Ketari lose their protector.", [["Technology older than the Federation", -4]], team);
     add("reason", "Reason with it: the paradox", ["Psychology", "Diplomacy"], "It protects them from all outsiders, and it's an outsider itself. −4, but Sevek's logic gives +2. Success: it releases the scientists and goes on watching.",
-      [["A machine's logic", -4]].concat(available(S, "sevek") ? [["Sevek's paradox", 2]] : []));
-    add("leave", "Leave it be; take back the Orion phasers", ["Stealth", "Psychology"], "Keep Ketari history their own. The scientists stay asleep. Fail by 3 or more and the Ketari see you.", [["A whole village", -2]]);
+      [["A machine's logic", -4]].concat(available(S, "sevek") && team.includes("sevek") ? [["Sevek's paradox", 2]] : []), team);
+    add("leave", "Leave it be; take back the Orion phasers", ["Stealth", "Psychology"], "Keep Ketari history their own. The scientists stay asleep. Fail by 3 or more and the Ketari see you.", [["A whole village", -2]], team);
   }
   return out;
 }
@@ -130,7 +134,18 @@ export function arcTick(S) {
 function startPull(S) {
   const A = S.arc; if (A.stage !== "orbit") return;
   A.stage = "pull";
-  storyEvent(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. The away team beams down to an empty outpost.");
+  storyEvent(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment each turn the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
+}
+/** Beam an away team down (2 to 4 officers fit for duty), or beam them all back up (ids empty). Takes no action. */
+export function beamDown(S, ids) {
+  const A = S.arc;
+  if (!["pull", "orions", "caretaker"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at) return { error: "There's nowhere to beam down to." };
+  if (!ids || !ids.length) { if (A.team) log(S, `The away team (${A.team.map((id) => officer(id).short).join(", ")}) beams back aboard.`, "move"); A.team = null; return { ok: true }; }
+  ids = [...new Set(ids)].filter((id) => available(S, id));
+  if (ids.length < 2 || ids.length > 4) return { error: "An away team is two to four officers fit for duty." };
+  A.team = ids;
+  log(S, `Away team: ${ids.map((id) => officer(id).name).join(", ")} beam down to the outpost on Corvan II. ${CREW.filter((c) => !ids.includes(c.id)).map((c) => c.short).join(", ")} stay${CREW.length - ids.length === 1 ? "s" : ""} aboard.`, "move");
+  return { ok: true };
 }
 export function arcSweep(S) { if (S.arc.stage === "orbit" && S.pelion.at === S.systems[S.corvan].at) startPull(S); }
 /** End of turn: the drain on the ship while it stays in orbit. */

@@ -5,7 +5,7 @@ import { newGame, stardate, sysAt, officer, available, skillOf, target, bestOffi
   speedOf, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
-import { arcEventChoices, COUNTDOWN, CLOCK, CLUES } from "./arc.js";
+import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown } from "./arc.js";
 import { kindName } from "./ai.js";
 import { RADIUS, inZone } from "./sector.js";
 
@@ -184,6 +184,7 @@ function hint() {
   let t = "";
   if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:</b> fly to Corvan II (the gold <b>!</b>). Double-click it on the map: the Pelion goes as far as it can this turn. Then <b>End turn</b>.`;
   else if (A.stage === "orbit") t = "<b>Next:</b> the outpost is silent. Sweep the ruins with the ship's sensors: the action on the Here tab.";
+  else if (A.stage === "pull" && !A.team) t = "<b>Next:</b> choose an away team and beam them down to the outpost (the Here tab).";
   else if (A.stage === "pull") t = "<b>Next:</b> the away team. Use the actions below, one a turn, to fill the record before the Countdown fills.";
   else if (A.stage === "orions" || A.stage === "caretaker") t = "<b>Next:</b> finish it on Corvan II: the action below.";
   else if (S.turn <= 12) t = "<b>Next:</b> Starfleet will send new orders (the Orders tab). Meanwhile: survey the unknown (?), court the independent worlds, and watch for raiders.";
@@ -213,16 +214,32 @@ function hereHTML() {
   const acts = actionsFor(S, unit);
   h += `<h3>${unit === "pelion" ? "The Pelion's action this turn" : `The ${esc(u.name)}'s action`}</h3>`;
   if (!acts.length) h += `<p class="muted small">Nothing to do here. Fly somewhere: double-click a hex.</p>`;
-  for (const a of acts) h += actionCard(a);
+  h += teamLine();
+  for (const a of [...acts.filter((x) => x.id === "beam"), ...acts.filter((x) => x.id !== "beam")]) h += actionCard(a);
   return h;
 }
 function optionsFor(a) {
   if (unit !== "pelion") return [];
   const out = [];
-  for (const c of CREW) { if (!available(S, c.id)) continue; for (const sk of a.skills) if (skillOf(S, c.id, sk)) out.push({ officer: c.id, skill: sk, total: target(S, c.id, sk, { action: a.id === "arc" ? "arc" : a.id, listen: a.id === "hail" || a.id === "sweep", extra: a.extra || [] }).total }); }
+  for (const c of CREW) { if (!available(S, c.id) || (a.who && !a.who.includes(c.id))) continue; for (const sk of a.skills) if (skillOf(S, c.id, sk)) out.push({ officer: c.id, skill: sk, total: target(S, c.id, sk, { action: a.id === "arc" ? "arc" : a.id, listen: a.id === "hail" || a.id === "sweep", extra: a.extra || [] }).total }); }
   return out.sort((x, y) => y.total - x.total);
 }
+// Who's best on the surface: the clues' skills, the Orions' Phasers, the caretaker's Engineering and Psychology.
+const AWAY_PICK = ["sevek", "vessik", "reyes", "rrinn"];
+function beamCard(a) {
+  const keys = { shvari: "Leadership, Diplomacy", sevek: "Physical Sciences, Sensors, Computers, Psychology", vessik: "Medicine, Sensors, Psychology", grath: "Engineering, Electronics", reyes: "Phasers, Unarmed Combat, Stealth", rrinn: "Computers, Psychology, Stealth" };
+  return `<div class="card gold"><h4>${esc(a.name)}</h4><div class="small muted">${esc(a.blurb)}</div>
+    <div style="display:grid;gap:4px;margin-top:8px">${CREW.map((c) => `<label class="chip ${available(S, c.id) ? "" : "off"}" style="border-radius:8px"><input type="checkbox" data-away="${c.id}" ${AWAY_PICK.includes(c.id) && available(S, c.id) ? "checked" : ""} ${available(S, c.id) ? "" : "disabled"}><span><b>${esc(c.short)}</b> <span class="muted small">${esc(keys[c.id])}</span></span></label>`).join("")}</div>
+    <div class="roll-row"><button class="btn primary small" data-beam="1">Energize</button></div></div>`;
+}
+function teamLine() {
+  const A = S.arc;
+  if (!A.team || !["pull", "orions", "caretaker"].includes(A.stage) || S.pelion.at !== S.systems[S.corvan].at || unit !== "pelion") return "";
+  return `<div class="card small"><b>Away team on Corvan II:</b> ${A.team.map((id) => esc(officer(id).short) + (available(S, id) ? "" : " (in sickbay)")).join(", ")}. Only they can act on the surface.
+    <div class="roll-row"><button class="btn small" data-beamup="1">Beam them up (choose again)</button></div></div>`;
+}
 function actionCard(a) {
+  if (a.id === "beam") return beamCard(a);
   const tone = a.id === "engage" ? "red" : a.id === "mission" || a.id === "arc" ? "gold" : a.id === "envoy" ? "green" : "";
   const enc = esc(JSON.stringify({ id: a.id, order: a.order, enemy: a.enemy, arc: a.arc }));
   let h = `<div class="card ${tone}"><h4>${esc(a.name)}</h4><div class="small muted">${esc(a.blurb || "")}</div>`;
@@ -343,6 +360,8 @@ function bindChrome() {
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b || !S) return;
     if (b.dataset.logf) { logFilter = b.dataset.logf; renderPanel(); return; }
+    if (b.dataset.beam) { const ids = [...b.closest(".card").querySelectorAll("[data-away]:checked")].map((x) => x.dataset.away); const r = beamDown(S, ids); if (r.error) toast(r.error, true); after(); return; }
+    if (b.dataset.beamup) { beamDown(S, []); after(); return; }
     if (b.dataset.unit) { unit = b.dataset.unit; selHex = U().at; tab = "here"; lastResult = null; centerOn(U().at); renderAll(); return; }
     if (b.dataset.go) { selHex = b.dataset.go; goTo(b.dataset.go); return; }
     if (b.dataset.center) { centerOn(b.dataset.center); selHex = b.dataset.center; tab = "here"; renderAll(); return; }
