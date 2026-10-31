@@ -194,3 +194,19 @@ test("with the away team down, a turn is an hour: the week waits, the Countdown 
   endTurn(S);
   assert.equal(S.turn, turn + 1);                // back aboard: weeks again
 });
+test("the Corvan II raider, chased off, leaves for good", () => {
+  let checked = 0;
+  for (let n = 0; n < 40 && checked < 3; n++) {
+    const S = newGame({ seed: "chase" + n });
+    S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
+    const e = Object.values(S.enemies).find((x) => x.arcRaider); e.hidden = false;
+    startBattle(S, e.id, "pelion");
+    for (let i = 0; i < 20 && !S.battle.over; i++) exchange(S, { shields: true, phasers: true });
+    const how = S.battle.over; closeBattle(S);
+    if (how !== "fled" && how !== "hailed") continue;
+    checked++;
+    assert.ok(!S.enemies[e.id]);
+    assert.ok(!actionsFor(S).some((a) => a.id === "engage" || a.id === "hail"));
+  }
+  assert.ok(checked > 0);
+});

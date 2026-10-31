@@ -464,7 +464,7 @@ function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
     text: "The Federation research outpost on Corvan II, eight archaeologists studying the ruins of an extinct civilization, has missed three check-ins. Corvan II has a native people, the Ketari, at a bronze-age level: the outpost works under the Prime Directive. An Orion raider was reported in the sector last week.",
     twist: null, personal: "Rrinn's sister serves on the outpost's supply run." });
   // The raider holds station on the far side of Corvan II's moon: passive sensors won't see it; an active sweep will.
-  spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at, hidden: true });
+  spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at, hidden: true, arcRaider: true });
   const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");
   spawnEnemy(S, "orionBase", ob.at, { goal: "base", hostile: true, found: false });
   log(S, "Orders from Starfleet Command: the research outpost on Corvan II has gone silent. Investigate.", "order");
@@ -1178,6 +1178,11 @@ function finish(S, L) {
     else if (e.power === "romulan") { S.commendations += 3; log(S, "The Romulan bird-of-prey is destroyed.", "good"); }
     else { S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
   } else if (B.over === "lost") log(S, "The Pelion's hull is breaking up.", "bad");
+  else if (e.arcRaider && (B.over === "fled" || B.over === "hailed")) {
+    // Chased off from Corvan II, the raider leaves for good: no coming back to orbit while the away team works.
+    delete S.enemies[e.id];
+    log(S, `The ${E.name} ${B.over === "fled" ? "breaks off" : "stands down"} and runs for the sector's edge. It won't be back.`, "good");
+  }
   else log(S, { fled: `The ${E.name} breaks off.`, hailed: `The ${E.name} stands down.`, escaped: "The Pelion breaks away." }[B.over] || "The battle ends.");
   // What the battle cost: one line for the log.
   const P = S.pelion, st = B.start || { hull: P.hull, torps: P.torps, sys: 0 };

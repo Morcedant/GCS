@@ -40,7 +40,7 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
     text: "The Federation research outpost on Corvan II, eight archaeologists studying the ruins of an extinct civilization, has missed three check-ins. Corvan II has a native people, the Ketari, at a bronze-age level: the outpost works under the Prime Directive. An Orion raider was reported in the sector last week.",
     twist: null, personal: "Rrinn's sister serves on the outpost's supply run." });
   // The raider holds station on the far side of Corvan II's moon: passive sensors won't see it; an active sweep will.
-  spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at, hidden: true });
+  spawnEnemy(S, "orion", cv.at, { goal: "arc", hostile: true, home: cv.at, hidden: true, arcRaider: true });
   const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");
   spawnEnemy(S, "orionBase", ob.at, { goal: "base", hostile: true, found: false });
   log(S, "Orders from Starfleet Command: the research outpost on Corvan II has gone silent. Investigate.", "order");

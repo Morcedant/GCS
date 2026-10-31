@@ -183,6 +183,11 @@ function finish(S, L) {
     else if (e.power === "romulan") { S.commendations += 3; log(S, "The Romulan bird-of-prey is destroyed.", "good"); }
     else { S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
   } else if (B.over === "lost") log(S, "The Pelion's hull is breaking up.", "bad");
+  else if (e.arcRaider && (B.over === "fled" || B.over === "hailed")) {
+    // Chased off from Corvan II, the raider leaves for good: no coming back to orbit while the away team works.
+    delete S.enemies[e.id];
+    log(S, `The ${E.name} ${B.over === "fled" ? "breaks off" : "stands down"} and runs for the sector's edge. It won't be back.`, "good");
+  }
   else log(S, { fled: `The ${E.name} breaks off.`, hailed: `The ${E.name} stands down.`, escaped: "The Pelion breaks away." }[B.over] || "The battle ends.");
   // What the battle cost: one line for the log.
   const P = S.pelion, st = B.start || { hull: P.hull, torps: P.torps, sys: 0 };
