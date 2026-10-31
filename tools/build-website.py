@@ -275,6 +275,11 @@ def start_page():
     games = "".join(f'<a class="ld-button ld-button--ghost" href="{SLUGS[g]}">{e(pack(g)["terms"]["title"])}</a>' for g in GAMES)
     creators = "".join(f'<a class="ld-button ld-button--ghost" href="{CREATORS[g]}" target="_blank" rel="noopener">{e(pack(g)["terms"]["title"])} creator</a>' for g in GAMES)
     genres = "; ".join(f"<i>{e(pack(g)['terms']['title'])}</i>, {e(GENRE[g].lower())}" for g in GAMES)
+    # The first adventure each GM's Guide opens with (pack "firstAdventure"): a spoiler-free blurb for players and GMs alike.
+    adventures = "".join(
+        f'<li><b>{e(fa["title"])}</b><span class="ld-eyebrow" style="display:block;margin:.1rem 0 .4rem">{e(pack(g)["terms"]["title"])} · {e(fa["kind"])}</span>'
+        f'<span>{e(fa["blurb"])}</span><span style="display:block;margin-top:.5rem;font-size:.9rem">{e(fa["length"])}. <a href="{SLUGS[g]}">About {e(pack(g)["terms"]["title"])}</a></span></li>'
+        for g in GAMES for fa in [pack(g).get("firstAdventure")] if fa)
     return f"""<!-- Start here page (suggested URL {START_SLUG}). No theme injection: it uses the Legend Dynamics brand.
      Paste each block into its own Code Block (Display Source off). -->
 
@@ -313,6 +318,14 @@ def start_page():
     <li><b>Consequences and secrets</b><span>Tracks fill as your deeds catch up with you: the law noticing, debts, the dark learning your name. When something strange turns up, investigating it earns a Legend card: what you found out, kept for good.</span></li>
   </ul>
   <div class="ld-callout" style="margin-top:1.4rem"><b>An example</b><p>Your Firearms is 13. Taking a shot across a street, you roll 4 + 3 + 5 = 12: a hit, by 1. The outlaw tries to dodge: his Dodge is 10 and he rolls 11, so the bullet finds him and your pistol marks 2 boxes. Had you rolled 14 and missed, you could have spent a Legend point to roll again.</p></div>
+</div>
+
+<!-- Block 4: a first adventure for each setting -->
+<div class="ld" id="first-adventures">
+  <div class="ld-eyebrow">Ready to run</div>
+  <h2>A first adventure for every setting</h2>
+  <p class="ld-lede">Each setting's GM's Guide opens with an adventure to start on: everything the GM needs is written out, and every ready-made character has a reason to be there. Pick one and play tonight.</p>
+  <ul class="ld-pillars">{adventures}</ul>
 </div>
 
 <!-- Block 4: what each person needs -->
