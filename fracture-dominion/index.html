@@ -72,6 +72,13 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .dip, .offer { background: var(--panel-2); border-radius: 8px; padding: 10px 12px; margin: 8px 0; } .dip h3 { margin: 0 0 4px; color: var(--ink); text-transform: none; letter-spacing: .02em; font-size: 15px; }
 .offer { border: 1px solid var(--gold); }
 .log { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; font-size: 13px; }
+.card.obj { background: var(--panel-2); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: 8px; padding: 10px 12px; margin: 10px 0; }
+.obj-h { margin: 0 0 6px; color: var(--ink); text-transform: none; letter-spacing: .02em; font-size: 15px; }
+.badge-status { font: 600 11px var(--body); letter-spacing: .04em; text-transform: none; border: 1px solid var(--line); border-radius: 10px; padding: 1px 8px; margin-left: 6px; vertical-align: 2px; color: var(--muted); }
+.badge-status.good { color: var(--good); border-color: rgba(123,196,127,.5); } .badge-status.bad { color: var(--bad); border-color: rgba(255,122,107,.6); }
+.steps-list { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 3px; font-size: 13px; }
+.steps-list li { display: flex; gap: 8px; color: var(--muted); } .steps-list li > span { width: 14px; flex: none; text-align: center; }
+.steps-list li.done { color: var(--good); } .steps-list li.now { color: var(--ink); font-weight: 600; } .steps-list li.now > span { color: var(--gold); }
 .log .t { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 8px; } .log .war { color: #ffb0a6; } .log .victory { color: var(--gold); } .log .research { color: #a8e0ff; } .log .explore, .log .contact { color: #e2d1ff; } .log .turn { color: var(--muted); } h3.log-turn { margin: 14px 0 6px; padding-bottom: 3px; border-bottom: 1px solid var(--line); }
 #modal { position: fixed; inset: 0; background: rgba(3, 5, 10, .82); display: grid; place-items: center; z-index: 20; padding: 16px; overflow-y: auto; }
 #modal[hidden] { display: none; }
@@ -129,7 +136,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
     <div class="map-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="home" aria-label="Center on your capital">⌂</button></div>
   </div>
   <aside class="side">
-    <nav class="tabs" role="tablist"><button data-tab="selected" role="tab">Selected</button><button data-tab="empire" role="tab">Empire</button><button data-tab="research" role="tab">Research</button><button data-tab="diplomacy" role="tab">Diplomacy</button><button data-tab="log" role="tab">Log</button></nav>
+    <nav class="tabs" role="tablist"><button data-tab="objectives" role="tab">Objectives</button><button data-tab="selected" role="tab">Selected</button><button data-tab="empire" role="tab">Empire</button><button data-tab="research" role="tab">Research</button><button data-tab="diplomacy" role="tab">Diplomacy</button><button data-tab="log" role="tab">Log</button></nav>
     <div id="steps" hidden></div>
     <div id="panel"></div>
     <div class="side-foot"><button class="btn" id="next">Next</button><button class="btn primary" id="end-turn">End turn</button></div>

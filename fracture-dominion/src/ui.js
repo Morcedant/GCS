@@ -239,7 +239,8 @@ function renderTabs() {
 }
 function renderPanel() {
   const P = $("panel");
-  if (tab === "selected") P.innerHTML = sel ? (sel.kind === "fleet" ? fleetHTML() : systemHTML()) : `<p class="muted">Select a world or a fleet on the map. Drag to pan, scroll or use the buttons to zoom. With a fleet selected, right-click a hex (or press <b>Move</b>) to send it there.</p>`;
+  if (tab === "objectives") P.innerHTML = objectivesHTML();
+  else if (tab === "selected") P.innerHTML = sel ? (sel.kind === "fleet" ? fleetHTML() : systemHTML()) : `<p class="muted">Select a world or a fleet on the map. Drag to pan, scroll or use the buttons to zoom. With a fleet selected, right-click a hex (or press <b>Move</b>) to send it there.</p>`;
   else if (tab === "empire") P.innerHTML = empireHTML();
   else if (tab === "research") P.innerHTML = researchHTML();
   else if (tab === "diplomacy") P.innerHTML = diplomacyHTML();
@@ -300,6 +301,64 @@ function fleetHTML() {
   if (f.ships.length > 1) h += `<h3>Split off</h3><div class="opts">${types.map((t) => `<button class="opt" data-split="${t}"><b>${esc(SHIPS[t].name)}</b></button>`).join("")}</div>`;
   return h;
 }
+// ---------- Objectives: the race to win, at a glance ----------
+/** Every technology the Corridor Engine needs, in an order you could research them. */
+function engineChain() {
+  const out = [], seen = new Set();
+  const visit = (id) => { if (seen.has(id)) return; seen.add(id); const t = TECHS.find((x) => x.id === id); t.needs.forEach(visit); out.push(t); };
+  visit("engine");
+  return out;
+}
+const ibar = (v, max, color) => `<span class="meter" style="display:inline-block;width:100px;vertical-align:middle;margin:0 6px 0 0"><span style="width:${Math.max(0, Math.min(100, (v / max) * 100))}%;background:${color}"></span></span>`;
+const stepLi = (state, text) => `<li class="${state}"><span>${state === "done" ? "✓" : state === "now" ? "▶" : "○"}</span>${text}</li>`;
+function objectivesHTML() {
+  const me = player(S), alive = S.factions.filter((f) => f.alive), rivals = alive.filter((f) => f.id !== me.id), all = S.factions.filter((f) => f.id !== me.id);
+  const turnsLeft = RULES.maxTurns - S.turn;
+  const ranked = alive.map((f) => ({ f, sc: score(S, f.id) })).sort((a, b) => b.sc - a.sc), myRank = ranked.findIndex((x) => x.f.id === me.id) + 1, mine = score(S, me.id), lead = ranked[0];
+  let h = `<h2>Objectives</h2>`;
+  h += `<div class="kv small" style="margin-bottom:10px"><span>Game</span><span>${ibar(S.turn, RULES.maxTurns, "var(--gold)")} Turn ${S.turn} of ${RULES.maxTurns} (${turnsLeft} left)</span>
+    <span>Standing</span><span>Score <b>${mine}</b>, ${myRank === 1 ? `<b class="good">first</b> of ${alive.length}` : `<b>${ordinal(myRank)}</b> of ${alive.length}`}</span></div>`;
+  h += `<p class="small muted">Win one of three ways. Lose if your last world falls, or if a rival wins first.</p>`;
+  // 1. Conquest.
+  const met = all.filter((f) => me.met[f.id]).length, fallen = all.filter((f) => !f.alive).length, atWarWith = rivals.filter((f) => atWar(S, me.id, f.id)).length;
+  const cBadge = rivals.length === 0 ? ["Won", "good"] : fallen ? ["Under way", "good"] : atWarWith ? ["At war", ""] : ["Not started", ""];
+  h += `<div class="card obj"><h3 class="obj-h">Conquest <span class="badge-status ${cBadge[1]}">${cBadge[0]}</span></h3>
+    <div class="kv small"><span>Rivals left</span><span>${ibar(fallen, all.length, "var(--bad)")} ${rivals.length} of ${all.length} still standing (${fallen} fallen)</span>
+    <span>Known</span><span>${met} of ${all.length} met · at war with ${atWarWith}</span></div>
+    <p class="small" style="margin-top:6px"><b class="good">Win:</b> be the last power standing: take every rival's last world (troop transports invade worlds you've cleared of defenders).</p></div>`;
+  // 2. The Corridor Engine.
+  const done = me.research.done, chain = engineChain(), cap = S.systems[me.capital];
+  const q = cap && cap.colony ? cap.colony.queue.find((x) => x.id === "engine") : null, built = cap && cap.colony && cap.colony.buildings.engine;
+  const techDone = chain.filter((t) => done.includes(t.id)).length;
+  const eBadge = S.winner === me.id && S.winReason === "engine" ? ["Won", "good"] : q ? ["Building", "good"] : done.includes("engine") ? ["Ready to build", "good"] : techDone ? ["Researching", ""] : ["Not started", ""];
+  let firstOpen = true;
+  const step = (isDone, text) => { const st = isDone ? "done" : firstOpen ? (firstOpen = false, "now") : ""; return stepLi(st, text); };
+  h += `<div class="card obj"><h3 class="obj-h">The Corridor Engine <span class="badge-status ${eBadge[1]}">${eBadge[0]}</span></h3>
+    <div class="kv small"><span>Research</span><span>${ibar(techDone, chain.length, "#a8e0ff")} ${techDone} of ${chain.length} technologies</span>
+    <span>Exotics</span><span>${fmt(me.exotics)} of ${BUILDINGS.engine.exotics} it needs</span></div>
+    <ol class="steps-list">${chain.map((t) => step(done.includes(t.id), `Research ${esc(t.name)}${me.research.current === t.id ? ` (now: ${Math.round((me.research.progress / t.cost) * 100)}%)` : ""}`)).join("")}
+    ${step(!!q || !!built, `Queue the Corridor Engine at your capital${cap ? `, ${esc(cap.name)}` : ""} (${BUILDINGS.engine.cost} industry, ${BUILDINGS.engine.exotics} exotics)`)}
+    ${step(!!built, `Finish it${q ? `: ${Math.round((q.progress / q.cost) * 100)}% built` : ""}`)}</ol>
+    <p class="small" style="margin-top:6px"><b class="good">Win:</b> finish the Corridor Engine at your capital. <b class="bad">Watch:</b> lose your capital and the work is lost.</p></div>`;
+  // 3. Score.
+  const gap = lead.f.id === me.id ? (ranked[1] ? mine - ranked[1].sc : mine) : lead.sc - mine;
+  const sBadge = lead.f.id === me.id ? ["Leading", "good"] : ["Behind", "bad"];
+  h += `<div class="card obj"><h3 class="obj-h">Highest score at turn ${RULES.maxTurns} <span class="badge-status ${sBadge[1]}">${sBadge[0]}</span></h3>
+    <div class="kv small"><span>Yours</span><span>${ibar(mine, Math.max(1, lead.sc), "var(--accent)")} ${mine}</span>
+    <span>${lead.f.id === me.id ? "Next best" : "Leader"}</span><span>${lead.f.id === me.id ? (ranked[1] ? `${me.met[ranked[1].f.id] ? esc(ranked[1].f.name) : "An unmet rival"}: ${ranked[1].sc} (you lead by ${gap})` : "No one") : `${me.met[lead.f.id] ? esc(lead.f.name) : "An unmet rival"}: ${lead.sc} (${gap} ahead of you)`}</span></div>
+    <p class="small" style="margin-top:6px"><b class="good">Win:</b> lead on score when turn ${RULES.maxTurns} ends. Score: 5 per colony and 2 per population, 2 per outpost, 6 per technology, and a quarter of your fleet's strength.</p></div>`;
+  // The rivals' race.
+  const threats = [];
+  for (const f of rivals) {
+    const theirCap = S.systems[f.capital], tq = theirCap && theirCap.colony ? theirCap.colony.queue.find((x) => x.id === "engine") : null;
+    if (tq) threats.push(`<li class="bad"><b>${esc(f.name)}</b> is building the Corridor Engine at ${esc(theirCap.name)}${me.met[f.id] ? `: ${Math.round((tq.progress / tq.cost) * 100)}% done` : ""}. Take or blockade it before it's finished.</li>`);
+  }
+  if (rivals.length === 1) threats.push(`<li class="war">Only ${esc(rivals[0].name)} is left: one of you will win by conquest.</li>`);
+  h += `<h3>Threats</h3>` + (threats.length ? `<ul class="log">${threats.join("")}</ul>` : `<p class="small muted">No rival is close to winning yet.</p>`);
+  h += `<p class="small muted"><b>Defeat:</b> your last world falls; a rival finishes the Corridor Engine or stands alone; or a rival leads on score at turn ${RULES.maxTurns}.</p>`;
+  return h;
+}
+const ordinal = (n) => n + (n % 10 === 1 && n % 100 !== 11 ? "st" : n % 10 === 2 && n % 100 !== 12 ? "nd" : n % 10 === 3 && n % 100 !== 13 ? "rd" : "th");
 function empireHTML() {
   const me = player(S), t = totals(S, me.id);
   const cols = coloniesOf(S, me.id).sort((a, b) => (b.colony.pop || 0) - (a.colony.pop || 0));
