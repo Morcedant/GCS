@@ -41,7 +41,13 @@ export const faction = (s, id) => s.factions.find((f) => f.id === id);
 export const has = (s, fid, tech) => faction(s, fid).research.done.includes(tech);
 export const player = (s) => s.factions[0];
 function rng(s) { const r = makeRng(1); r.setState(s.rngState); return { ...r, save: () => { s.rngState = r.state(); } }; }
-export function log(s, fid, text, kind = "info") { s.log.push({ turn: s.turn, fid, text, kind }); if (s.log.length > 400) s.log.splice(0, s.log.length - 400); }
+/** Discoveries (systems charted, ruins surveyed, contacts, technologies) are never trimmed from the log. */
+export const DISCOVERY = ["explore", "research", "contact"];
+export function log(s, fid, text, kind = "info") {
+  s.log.push({ turn: s.turn, fid, text, kind });
+  let n = s.log.length - 400;
+  for (let i = 0; i < s.log.length && n > 0; ) { if (!DISCOVERY.includes(s.log[i].kind)) { s.log.splice(i, 1); n--; } else i++; }
+}
 export function coloniesOf(s, fid) { return Object.values(s.systems).filter((x) => x.colony && x.colony.owner === fid); }
 export function fleetsOf(s, fid) { return Object.values(s.fleets).filter((f) => f.owner === fid); }
 export function fleetsAt(s, hex) { return Object.values(s.fleets).filter((f) => f.at === hex); }
@@ -361,15 +367,25 @@ export function militaryPower(s, fid) {
 // ---- seeing ----
 export function updateVision(s, F) {
   const vis = {};
-  const see = (hex, n) => { for (const k of within(hex, n)) if (s.hexes[k]) { vis[k] = 1; F.explored[k] = 1; } };
+  const charted = [];
+  const see = (hex, n) => { for (const k of within(hex, n)) if (s.hexes[k]) { vis[k] = 1; if (!F.explored[k] && !F.ai && s.sysAt[k]) charted.push(s.systems[s.sysAt[k]]); F.explored[k] = 1; } };
   const bonus = has(s, F.id, "sensors") ? 1 : 0;
   for (const sys of coloniesOf(s, F.id)) see(sys.at, (sys.colony.kind === "colony" ? 2 : 1) + bonus);
   for (const f of fleetsOf(s, F.id)) see(f.at, Math.max(...f.ships.map((x) => shipStats(s, F.id, x.type).sensors)));
   F.visible = vis;
+  // Every system the player charts goes into the log, with what's there.
+  for (const sys of charted) {
+    const w = WORLDS[sys.world], what = [`${/^[AEIOU]/.test(w.name) ? "an" : "a"} ${w.name.toLowerCase()} world`, `size ${sys.size}`];
+    if (sys.rich > 1) what.push("rich"); else if (sys.rich < 1) what.push("poor");
+    if (sys.exotics) what.push("an exotics deposit");
+    if (sys.ruins) what.push("ancient ruins to survey");
+    if (sys.colony && sys.colony.owner !== F.id) what.push(`${sys.colony.kind === "colony" ? "a colony" : "an outpost"} of ${faction(s, sys.colony.owner).name}`);
+    log(s, F.id, `Charted ${sys.name}: ${what.join(", ")}.`, "explore");
+  }
   // Meeting: anyone whose world or fleet you can see.
   for (const o of s.factions) if (o.id !== F.id && o.alive && !F.met[o.id]) {
     const seen = coloniesOf(s, o.id).some((x) => vis[x.at]) || fleetsOf(s, o.id).some((f) => vis[f.at]);
-    if (seen) { F.met[o.id] = true; o.met[F.id] = true; log(s, F.id, `${F.name} made contact with ${o.name}.`, "diplo"); }
+    if (seen) { F.met[o.id] = true; o.met[F.id] = true; log(s, F.id, `${F.name} made contact with ${o.name}.`, "contact"); }
   }
   // Ruins: the first to see them learns something.
   for (const sys of Object.values(s.systems)) if (sys.ruins && vis[sys.at] && fleetsAt(s, sys.at).some((f) => f.owner === F.id)) {
@@ -409,7 +425,7 @@ function economy(s, F) {
     const tech = TECHS.find((x) => x.id === R.current);
     if (R.progress >= tech.cost) {
       R.progress -= tech.cost; R.done.push(tech.id); R.current = null;
-      log(s, F.id, `${F.name} discovered ${tech.name}.`, "research");
+      log(s, F.id, `${F.name} discovered ${tech.name}: ${tech.text}`, "research");
       if (tech.id === "shields") for (const f of fleetsOf(s, F.id)) for (const x of f.ships) if (SHIPS[x.type].skill) x.hull += 1;
     }
   }

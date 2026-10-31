@@ -88,3 +88,12 @@ test("a whole computer game runs to an end without errors", () => {
   assert.ok(s.factions.every((F) => Number.isFinite(F.credits) && Number.isFinite(score(s, F.id))));
   assert.doesNotThrow(() => JSON.parse(JSON.stringify(s)));
 });
+test("discoveries go in the log and survive trimming", async () => {
+  const { log } = await import("../src/game.js");
+  const s = newGame({ seed: "disc", player: "concord", rivals: 2 });
+  const me = s.factions.find((f) => !f.ai);
+  assert.ok(s.log.some((l) => l.fid === me.id && l.kind === "explore" && l.text.startsWith("Charted ")));
+  const first = s.log.find((l) => l.kind === "explore").text;
+  for (let i = 0; i < 1000; i++) log(s, null, "noise " + i);
+  assert.ok(s.log.some((l) => l.text === first));
+});

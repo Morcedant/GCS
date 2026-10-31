@@ -3,7 +3,7 @@ import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
 import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES } from "./data.js";
 import { newGame, endTurn, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds,
-  declareWar, propose, score, militaryPower, has, mergeFleets } from "./game.js";
+  declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY } from "./game.js";
 import { aiTurn } from "./ai.js";
 
 const SAVE_KEY = "fracture-dominion.save.v1";
@@ -342,10 +342,15 @@ function diplomacyHTML() {
   }
   return h;
 }
+let logFilter = "all";
 function logHTML() {
   const me = player(S);
-  const rows = S.log.filter((l) => !l.fid || l.fid === me.id || l.kind === "war" || l.kind === "victory" || (l.kind === "diplo" && l.text.includes(me.name))).slice(-80).reverse();
-  return `<h2>Log</h2><ul class="log">${rows.map((l) => `<li class="${l.kind}"><span class="t">T${l.turn}</span>${esc(l.text)}</li>`).join("")}</ul>`;
+  const mine = S.log.filter((l) => !l.fid || l.fid === me.id || l.kind === "war" || l.kind === "victory" || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name)));
+  // Discoveries: every one, from the first turn. Everything: the latest 80 entries.
+  const found = mine.filter((l) => l.fid === me.id && DISCOVERY.includes(l.kind));
+  const rows = (logFilter === "discovery" ? found : mine.slice(-80)).slice().reverse();
+  return `<h2>Log</h2><div class="btn-row"><button class="btn small ${logFilter === "all" ? "primary" : ""}" data-logf="all">Everything</button><button class="btn small ${logFilter === "discovery" ? "primary" : ""}" data-logf="discovery">Discoveries (${found.length})</button></div>`
+    + `<ul class="log">${rows.map((l) => `<li class="${l.kind}"><span class="t">T${l.turn}</span>${esc(l.text)}</li>`).join("")}</ul>`;
 }
 
 // ---------- the panel's buttons ----------
@@ -353,6 +358,7 @@ function bindChrome() {
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button, tr[data-selsys]"); if (!b || !S) return;
     const d = b.dataset, me = player(S);
+    if (d.logf) { logFilter = d.logf; renderPanel(); return; }
     if (d.selfleet) { select({ kind: "fleet", id: d.selfleet }); const f = S.fleets[d.selfleet]; if (f) { centerOn(f.at); draw(); } return; }
     if (d.selsys) { select({ kind: "system", id: d.selsys }); centerOn(S.systems[d.selsys].at); draw(); return; }
     if (d.build) { const [k, id] = d.build.split(":"); const r = enqueue(S, sel.id, k, id); if (r.error) toast(r.error, true); }
@@ -418,7 +424,7 @@ function doEndTurn() {
     $("end-turn").textContent = "End turn";
     save();
     // News: what happened to you this turn.
-    const news = S.log.slice(before.log).filter((l) => l.fid === me.id || l.kind === "victory" || (l.kind === "war" && (l.text.includes(me.name))) || (l.kind === "diplo" && l.text.includes(me.name)));
+    const news = S.log.slice(before.log).filter((l) => l.fid === me.id || l.kind === "victory" || (l.kind === "war" && (l.text.includes(me.name))) || ((l.kind === "diplo" || l.kind === "contact") && l.text.includes(me.name))).filter((l) => !l.text.startsWith("Charted "));
     if (sel && sel.kind === "fleet" && !S.fleets[sel.id]) sel = null;
     renderAll();
     if (S.winner) { showEnd(); return; }
