@@ -362,7 +362,7 @@ const AWAY_PICK = ["sevek", "vessik", "reyes", "rrinn"];
 function beamCard(a) {
   const keys = { shvari: "Leadership, Diplomacy", sevek: "Physical Sciences, Sensors, Computers, Psychology", vessik: "Medicine, Sensors, Psychology", grath: "Engineering, Electronics", reyes: "Phasers, Unarmed Combat, Stealth", rrinn: "Computers, Psychology, Stealth" };
   return `<div class="card gold"><h4>${esc(a.name)}</h4><div class="small muted">${esc(a.blurb)}</div>
-    <div style="display:grid;gap:4px;margin-top:8px">${CREW.map((c) => `<label class="chip ${available(S, c.id) ? "" : "off"}" style="border-radius:8px"><input type="checkbox" data-away="${c.id}" ${AWAY_PICK.includes(c.id) && available(S, c.id) ? "checked" : ""} ${available(S, c.id) ? "" : "disabled"}><span><b>${esc(c.short)}</b> <span class="muted small">${esc(keys[c.id])}</span></span></label>`).join("")}</div>
+    <div style="display:grid;gap:4px;margin-top:8px">${CREW.map((c) => `<label class="chip ${available(S, c.id) ? "" : "off"}" style="border-radius:8px"><input type="checkbox" data-away="${c.id}" ${AWAY_PICK.includes(c.id) && available(S, c.id) ? "checked" : ""} ${available(S, c.id) ? "" : "disabled"}><span><b>${esc(c.short)}</b> <span class="small">${esc(c.role)}</span> <span class="muted small">· ${esc(keys[c.id])}</span></span></label>`).join("")}</div>
     <div class="roll-row"><button class="btn primary small" data-beam="1">Energize</button></div></div>`;
 }
 function teamLine() {
@@ -429,7 +429,8 @@ function crewHTML() {
   h += `<span>Captain</span><span>${esc(S.captain)}: Leadership ${CAPTAIN.skills.Leadership}, Psychology ${CAPTAIN.skills.Psychology}, Diplomacy ${CAPTAIN.skills.Diplomacy}</span></div><div class="crew" style="margin-top:12px">`;
   for (const c of CREW) {
     const st = S.crew[c.id];
-    h += `<div class="officer ${DIV[c.id]}"><h4>${esc(c.name)}</h4><div class="small muted">${esc(c.rank)}, ${esc(c.post)}. ${esc(c.species)}.</div>
+    const stations = Object.keys(S.stations).filter((st) => stationOfficer(S, st) === c.id).map((st) => st[0].toUpperCase() + st.slice(1));
+    h += `<div class="officer ${DIV[c.id]}"><h4>${esc(c.name)}</h4><div class="small"><b>Role: ${esc(c.role)}</b> · ${esc(c.post)}${stations.length ? ` · <span class="gold">Battle station: ${esc(stations.join(", "))}</span>` : ""}</div><div class="small muted">${esc(c.rank)}. ${esc(c.species)}.</div>
       <div class="small">${st.inj ? `<span class="bad">Hurt ${st.inj}/3${st.inj >= 3 ? ": in sickbay" : st.inj === 2 ? ": −2" : ""}</span> · ` : ""}Duty ${boxes(st.duty, 2, "gold")} · Experience ${st.xp}/5</div>
       <div class="skills">${Object.keys(c.skills).map((sk) => `<span>${esc(sk)} <b>${skillOf(S, c.id, sk)}</b></span>`).join("")}</div>
       <div class="small" style="margin-top:4px"><b>${esc(c.adv)}:</b> <span class="muted">${esc(c.advText)}</span></div></div>`;
@@ -449,7 +450,7 @@ function awayHTML() {
   if (!A.team) h += `<p class="small muted">${A.stage === "orbit" ? "No one yet." : "No one: choose an away team on the Here tab."}</p>`;
   else {
     h += `<div class="crew">` + A.team.map((id) => { const c = officer(id), st = S.crew[id], where = SITES[(A.pos && A.pos[id]) || "outpost"];
-      return `<div class="officer ${DIV[id]}" style="padding:8px 10px"><h4 style="font-size:15px">${esc(c.name)}</h4><div class="small">At ${esc(where.name.toLowerCase())}${st.inj ? ` · <span class="bad">hurt ${st.inj}/3${st.inj >= 3 ? ", beamed to sickbay" : ""}</span>` : ""} · Duty ${st.duty}</div></div>`; }).join("") + `</div>`;
+      return `<div class="officer ${DIV[id]}" style="padding:8px 10px"><h4 style="font-size:15px">${esc(c.name)}</h4><div class="small muted">${esc(c.role)} · ${esc(c.post)}</div><div class="small">At ${esc(where.name.toLowerCase())}${st.inj ? ` · <span class="bad">hurt ${st.inj}/3${st.inj >= 3 ? ", beamed to sickbay" : ""}</span>` : ""} · Duty ${st.duty}</div></div>`; }).join("") + `</div>`;
     h += `<div class="btn-row"><button class="btn small" data-tab-go="here">Their actions (Here tab)</button>${mapMode === "surface" ? "" : `<button class="btn small" data-surface="1">Show the surface map</button>`}</div>`;
   }
   const found = Object.entries(CLUES).filter(([k]) => A.clues[k]);

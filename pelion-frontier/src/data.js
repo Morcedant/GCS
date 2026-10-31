@@ -7,22 +7,22 @@ export const STARDATE0 = 5212.4;             // campaign year 2268
 
 /** The six ready-made crew. Skills are the targets from their sheets. */
 export const CREW = [
-  { id: "shvari", name: "Thelan sh'Vari", short: "sh'Vari", rank: "Lt. Commander", post: "First officer", species: "Andorian",
+  { id: "shvari", name: "Thelan sh'Vari", short: "sh'Vari", rank: "Lt. Commander", role: "Command", post: "First officer", species: "Andorian",
     skills: { Leadership: 16, Diplomacy: 14, Helm: 13, Phasers: 13, Navigation: 11, Psychology: 11, Sensors: 11, Communications: 11 },
     adv: "Crisis Leader", advText: "+2 to Leadership and Helm in ship combat.", advWhen: (ctx) => ctx.combat && ["Leadership", "Helm"].includes(ctx.skill) },
-  { id: "sevek", name: "Sevek", short: "Sevek", rank: "Lieutenant", post: "Science officer", species: "Vulcan",
+  { id: "sevek", name: "Sevek", short: "Sevek", rank: "Lieutenant", role: "Science", post: "Science officer", species: "Vulcan",
     skills: { "Physical Sciences": 16, Sensors: 14, Computers: 14, "Life Sciences": 14, Navigation: 14, Engineering: 14, Electronics: 14, Psychology: 14 },
     adv: "Eidetic Recall", advText: "+2 when investigating an anomaly or ruins.", advWhen: (ctx) => ctx.action === "investigate" },
-  { id: "vessik", name: "Dr. Vessik", short: "Vessik", rank: "Lt. Commander", post: "Chief medical officer", species: "Denobulan",
+  { id: "vessik", name: "Dr. Vessik", short: "Vessik", rank: "Lt. Commander", role: "Medical", post: "Chief medical officer", species: "Denobulan",
     skills: { Medicine: 16, "Life Sciences": 14, Psychology: 14, Sensors: 14, Computers: 14, Electronics: 14, Survival: 14, Communications: 14, Diplomacy: 13, Leadership: 13 },
     adv: "Denobulan Pharmacopoeia", advText: "+2 to Medicine.", advWhen: (ctx) => ctx.skill === "Medicine" },
-  { id: "grath", name: "Grath", short: "Grath", rank: "Lieutenant", post: "Chief engineer", species: "Tellarite",
+  { id: "grath", name: "Grath", short: "Grath", rank: "Lieutenant", role: "Engineering", post: "Chief engineer", species: "Tellarite",
     skills: { Engineering: 16, Electronics: 14, Computers: 14, "Physical Sciences": 14, Sensors: 14, Communications: 14, Survival: 14, Helm: 11 },
     adv: "Improvisational Engineer", advText: "+2 to Engineering for repairs.", advWhen: (ctx) => ctx.skill === "Engineering" && (ctx.action === "repair" || ctx.combat) },
-  { id: "reyes", name: "Marisol Reyes", short: "Reyes", rank: "Lieutenant (j.g.)", post: "Security chief", species: "Human",
+  { id: "reyes", name: "Marisol Reyes", short: "Reyes", rank: "Lieutenant (j.g.)", role: "Security", post: "Security chief", species: "Human",
     skills: { Phasers: 16, "Unarmed Combat": 14, Stealth: 14, Helm: 14, Athletics: 13, Survival: 11, Sensors: 11, Medicine: 11, Leadership: 11, Communications: 11 },
     adv: "Careful Marksman", advText: "+2 to Phasers on an away team (stun).", advWhen: (ctx) => ctx.skill === "Phasers" && !ctx.combat },
-  { id: "rrinn", name: "Rrinn", short: "Rrinn", rank: "Yeoman 2nd Class", post: "Captain's yeoman", species: "Caitian",
+  { id: "rrinn", name: "Rrinn", short: "Rrinn", rank: "Yeoman 2nd Class", role: "General Services", post: "Captain's yeoman", species: "Caitian",
     skills: { Computers: 18, Communications: 14, Psychology: 14, Sensors: 14, Electronics: 14, Stealth: 13, Diplomacy: 12 },
     adv: "Keen Hearing", advText: "+2 when listening: hailing, and sweeps for cloaked ships and raiders.", advWhen: (ctx) => ctx.action === "sweep" || (ctx.skill === "Communications" && ctx.listen) },
 ];

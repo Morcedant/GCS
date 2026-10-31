@@ -205,22 +205,22 @@ const STARDATE0 = 5212.4;             // campaign year 2268
 
 /** The six ready-made crew. Skills are the targets from their sheets. */
 const CREW = [
-  { id: "shvari", name: "Thelan sh'Vari", short: "sh'Vari", rank: "Lt. Commander", post: "First officer", species: "Andorian",
+  { id: "shvari", name: "Thelan sh'Vari", short: "sh'Vari", rank: "Lt. Commander", role: "Command", post: "First officer", species: "Andorian",
     skills: { Leadership: 16, Diplomacy: 14, Helm: 13, Phasers: 13, Navigation: 11, Psychology: 11, Sensors: 11, Communications: 11 },
     adv: "Crisis Leader", advText: "+2 to Leadership and Helm in ship combat.", advWhen: (ctx) => ctx.combat && ["Leadership", "Helm"].includes(ctx.skill) },
-  { id: "sevek", name: "Sevek", short: "Sevek", rank: "Lieutenant", post: "Science officer", species: "Vulcan",
+  { id: "sevek", name: "Sevek", short: "Sevek", rank: "Lieutenant", role: "Science", post: "Science officer", species: "Vulcan",
     skills: { "Physical Sciences": 16, Sensors: 14, Computers: 14, "Life Sciences": 14, Navigation: 14, Engineering: 14, Electronics: 14, Psychology: 14 },
     adv: "Eidetic Recall", advText: "+2 when investigating an anomaly or ruins.", advWhen: (ctx) => ctx.action === "investigate" },
-  { id: "vessik", name: "Dr. Vessik", short: "Vessik", rank: "Lt. Commander", post: "Chief medical officer", species: "Denobulan",
+  { id: "vessik", name: "Dr. Vessik", short: "Vessik", rank: "Lt. Commander", role: "Medical", post: "Chief medical officer", species: "Denobulan",
     skills: { Medicine: 16, "Life Sciences": 14, Psychology: 14, Sensors: 14, Computers: 14, Electronics: 14, Survival: 14, Communications: 14, Diplomacy: 13, Leadership: 13 },
     adv: "Denobulan Pharmacopoeia", advText: "+2 to Medicine.", advWhen: (ctx) => ctx.skill === "Medicine" },
-  { id: "grath", name: "Grath", short: "Grath", rank: "Lieutenant", post: "Chief engineer", species: "Tellarite",
+  { id: "grath", name: "Grath", short: "Grath", rank: "Lieutenant", role: "Engineering", post: "Chief engineer", species: "Tellarite",
     skills: { Engineering: 16, Electronics: 14, Computers: 14, "Physical Sciences": 14, Sensors: 14, Communications: 14, Survival: 14, Helm: 11 },
     adv: "Improvisational Engineer", advText: "+2 to Engineering for repairs.", advWhen: (ctx) => ctx.skill === "Engineering" && (ctx.action === "repair" || ctx.combat) },
-  { id: "reyes", name: "Marisol Reyes", short: "Reyes", rank: "Lieutenant (j.g.)", post: "Security chief", species: "Human",
+  { id: "reyes", name: "Marisol Reyes", short: "Reyes", rank: "Lieutenant (j.g.)", role: "Security", post: "Security chief", species: "Human",
     skills: { Phasers: 16, "Unarmed Combat": 14, Stealth: 14, Helm: 14, Athletics: 13, Survival: 11, Sensors: 11, Medicine: 11, Leadership: 11, Communications: 11 },
     adv: "Careful Marksman", advText: "+2 to Phasers on an away team (stun).", advWhen: (ctx) => ctx.skill === "Phasers" && !ctx.combat },
-  { id: "rrinn", name: "Rrinn", short: "Rrinn", rank: "Yeoman 2nd Class", post: "Captain's yeoman", species: "Caitian",
+  { id: "rrinn", name: "Rrinn", short: "Rrinn", rank: "Yeoman 2nd Class", role: "General Services", post: "Captain's yeoman", species: "Caitian",
     skills: { Computers: 18, Communications: 14, Psychology: 14, Sensors: 14, Electronics: 14, Stealth: 13, Diplomacy: 12 },
     adv: "Keen Hearing", advText: "+2 when listening: hailing, and sweeps for cloaked ships and raiders.", advWhen: (ctx) => ctx.action === "sweep" || (ctx.skill === "Communications" && ctx.listen) },
 ];
@@ -1935,7 +1935,7 @@ const AWAY_PICK = ["sevek", "vessik", "reyes", "rrinn"];
 function beamCard(a) {
   const keys = { shvari: "Leadership, Diplomacy", sevek: "Physical Sciences, Sensors, Computers, Psychology", vessik: "Medicine, Sensors, Psychology", grath: "Engineering, Electronics", reyes: "Phasers, Unarmed Combat, Stealth", rrinn: "Computers, Psychology, Stealth" };
   return `<div class="card gold"><h4>${esc(a.name)}<\/h4><div class="small muted">${esc(a.blurb)}<\/div>
-    <div style="display:grid;gap:4px;margin-top:8px">${CREW.map((c) => `<label class="chip ${available(S, c.id) ? "" : "off"}" style="border-radius:8px"><input type="checkbox" data-away="${c.id}" ${AWAY_PICK.includes(c.id) && available(S, c.id) ? "checked" : ""} ${available(S, c.id) ? "" : "disabled"}><span><b>${esc(c.short)}<\/b> <span class="muted small">${esc(keys[c.id])}<\/span><\/span><\/label>`).join("")}<\/div>
+    <div style="display:grid;gap:4px;margin-top:8px">${CREW.map((c) => `<label class="chip ${available(S, c.id) ? "" : "off"}" style="border-radius:8px"><input type="checkbox" data-away="${c.id}" ${AWAY_PICK.includes(c.id) && available(S, c.id) ? "checked" : ""} ${available(S, c.id) ? "" : "disabled"}><span><b>${esc(c.short)}<\/b> <span class="small">${esc(c.role)}<\/span> <span class="muted small">· ${esc(keys[c.id])}<\/span><\/span><\/label>`).join("")}<\/div>
     <div class="roll-row"><button class="btn primary small" data-beam="1">Energize<\/button><\/div><\/div>`;
 }
 function teamLine() {
@@ -2002,7 +2002,8 @@ function crewHTML() {
   h += `<span>Captain<\/span><span>${esc(S.captain)}: Leadership ${CAPTAIN.skills.Leadership}, Psychology ${CAPTAIN.skills.Psychology}, Diplomacy ${CAPTAIN.skills.Diplomacy}<\/span><\/div><div class="crew" style="margin-top:12px">`;
   for (const c of CREW) {
     const st = S.crew[c.id];
-    h += `<div class="officer ${DIV[c.id]}"><h4>${esc(c.name)}<\/h4><div class="small muted">${esc(c.rank)}, ${esc(c.post)}. ${esc(c.species)}.<\/div>
+    const stations = Object.keys(S.stations).filter((st) => stationOfficer(S, st) === c.id).map((st) => st[0].toUpperCase() + st.slice(1));
+    h += `<div class="officer ${DIV[c.id]}"><h4>${esc(c.name)}<\/h4><div class="small"><b>Role: ${esc(c.role)}<\/b> · ${esc(c.post)}${stations.length ? ` · <span class="gold">Battle station: ${esc(stations.join(", "))}<\/span>` : ""}<\/div><div class="small muted">${esc(c.rank)}. ${esc(c.species)}.<\/div>
       <div class="small">${st.inj ? `<span class="bad">Hurt ${st.inj}/3${st.inj >= 3 ? ": in sickbay" : st.inj === 2 ? ": −2" : ""}<\/span> · ` : ""}Duty ${boxes(st.duty, 2, "gold")} · Experience ${st.xp}/5<\/div>
       <div class="skills">${Object.keys(c.skills).map((sk) => `<span>${esc(sk)} <b>${skillOf(S, c.id, sk)}<\/b><\/span>`).join("")}<\/div>
       <div class="small" style="margin-top:4px"><b>${esc(c.adv)}:<\/b> <span class="muted">${esc(c.advText)}<\/span><\/div><\/div>`;
@@ -2022,7 +2023,7 @@ function awayHTML() {
   if (!A.team) h += `<p class="small muted">${A.stage === "orbit" ? "No one yet." : "No one: choose an away team on the Here tab."}<\/p>`;
   else {
     h += `<div class="crew">` + A.team.map((id) => { const c = officer(id), st = S.crew[id], where = SITES[(A.pos && A.pos[id]) || "outpost"];
-      return `<div class="officer ${DIV[id]}" style="padding:8px 10px"><h4 style="font-size:15px">${esc(c.name)}<\/h4><div class="small">At ${esc(where.name.toLowerCase())}${st.inj ? ` · <span class="bad">hurt ${st.inj}/3${st.inj >= 3 ? ", beamed to sickbay" : ""}<\/span>` : ""} · Duty ${st.duty}<\/div><\/div>`; }).join("") + `<\/div>`;
+      return `<div class="officer ${DIV[id]}" style="padding:8px 10px"><h4 style="font-size:15px">${esc(c.name)}<\/h4><div class="small muted">${esc(c.role)} · ${esc(c.post)}<\/div><div class="small">At ${esc(where.name.toLowerCase())}${st.inj ? ` · <span class="bad">hurt ${st.inj}/3${st.inj >= 3 ? ", beamed to sickbay" : ""}<\/span>` : ""} · Duty ${st.duty}<\/div><\/div>`; }).join("") + `<\/div>`;
     h += `<div class="btn-row"><button class="btn small" data-tab-go="here">Their actions (Here tab)<\/button>${mapMode === "surface" ? "" : `<button class="btn small" data-surface="1">Show the surface map<\/button>`}<\/div>`;
   }
   const found = Object.entries(CLUES).filter(([k]) => A.clues[k]);
