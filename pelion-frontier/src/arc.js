@@ -7,18 +7,26 @@ import { startBattle } from "./combat.js";
 
 const CLUES = {
   // found: the one line (the GM's Guide's); detail: what the away team actually reads, sees and hears.
-  logs: { name: "The outpost logs", skills: ["Computers"], found: "Dr. Haskel's dampener test, then a power spike, then nothing.",
+  logs: { name: "The outpost logs", skills: ["Computers"],
+    how: { Computers: "Recover the outpost's personal and automated logs, including what was deleted or cut off." }, found: "Dr. Haskel's dampener test, then a power spike, then nothing.",
     detail: "Dr. Imre Haskel, personal log, day 212: \"The hum in the eastern vault isn't geological. Sixty years of survey reports called it background noise. It isn't noise; it's a carrier wave, and it's coming from under the plaza.\"\nDay 216: \"Lieutenant Grath's dampener design arrived today. Grath asked what it's for. I said calibration, which is nearly true. If I can quiet the carrier we'll finally get a clean scan of what's down there.\"\nDay 219, 0400: \"Dampener test. Field holding at thirty percent. Sixty. The hum is changing pitch, it's answering the—\"\n\nThe entry ends there. The automated record carries on: at 0412 a power spike from the ruins, off every scale the outpost has; at 0413 all eight biosigns leave the station, walking. After that, three weeks of empty entries.\n\nThe last line in the supply run's log is from Rrinn's sister, sent the same morning: \"Haskel's test did something to the ruins. The air hums. Everyone is walking toward the—\"" },
-  bunks: { name: "The empty bunks", skills: ["Medicine", "Sensors"], found: "No blood, no struggle, personal effects untouched. The scientists walked out.",
+  bunks: { name: "The empty bunks", skills: ["Medicine", "Sensors"],
+    how: { Medicine: "Examine the quarters as a doctor would: blood, tissue, any sign of injury or struggle.", Sensors: "Tricorder sweep of the quarters and corridors: traces, residue, the tracks in the dust." }, found: "No blood, no struggle, personal effects untouched. The scientists walked out.",
     detail: "Eight bunks, and nothing disturbed. A mug of tea gone cold and furred over on a desk; a padd face down on a pillow, mid-chapter; two pairs of boots still by the door.\n\nThe medical scan finds no blood, no tissue, no phaser residue, no sign that anyone was hurt or forced. In the dust of the corridor the footprints run in a calm single file, booted and bare, out of the east door and across the plaza toward the ruins. All of them left at the same moment, in the middle of the night, some without their shoes.\n\nThey weren't taken. They walked out, the way sleepwalkers do." },
-  energy: { name: "The ruins' energy", skills: ["Physical Sciences", "Sensors"], found: "A field that reads the away team's biology and records it. It knows them now.",
+  energy: { name: "The ruins' energy", skills: ["Physical Sciences", "Sensors"],
+    how: { "Physical Sciences": "Work out what the field is, what it does and what powers it.", Sensors: "Map the field with tricorders: its reach, its frequency, how it changes." }, found: "A field that reads the away team's biology and records it. It knows them now.",
     detail: "The ruins hum on a frequency the tricorders have to be retuned to hear. The field covers the whole site and two kilometers beyond it, and the Ketari village sits inside it.\n\nWhen the away team steps into the plaza the field changes: it sweeps each of them three times, head to foot, and when it settles again its pattern carries a copy of every one of their biosigns. It is cataloguing them. Whatever drives the field draws more power whenever anything turns sensors on it, which is what the Pelion felt in orbit. It isn't an attack. It's attention, and it knows the away team now." },
-  village: { name: "The Ketari village", skills: ["Psychology", "Stealth"], found: "Ketari carrying Orion phasers. The chieftain's people dig at the ruins by night.",
+  village: { name: "The Ketari village", skills: ["Psychology", "Stealth"],
+    how: { Psychology: "Read their customs and who answers to whom, from the blind: no contact.", Stealth: "Get close enough to see, and stay unseen." }, found: "Ketari carrying Orion phasers. The chieftain's people dig at the ruins by night.",
     detail: "From the duck blind at dusk: cook fires, goats, a smithy pouring bronze. In front of the chieftain's hall stand four warriors carrying Orion disruptor pistols, and they wear them like jewelry, on cords around their necks, muzzles down.\n\nAt moonrise a column of twenty Ketari leaves the village with picks and baskets, heading for the ruins, and at its head walks a hooded figure too tall for a Ketari: an Orion. The chieftain's people dig for the Orions at night, and the Orions pay them in weapons the Ketari think are talismans. One young warrior fires his into the air to show off. The bolt sets a tree burning, and the whole village goes silent." },
 };
 export const COUNTDOWN = 6, CLOCK = 4;   // CLOCK: the four clues on the surface
 // What's in the ruins has to be worked out: Sevek forms a theory once the away team has found at least THEORY_AT clues.
 export const THEORY_AT = 3;
+/** How each skill is used, for the actions that aren't clues. */
+const HOW = {
+  leave: { Stealth: "Slip into the village and take the phasers back unseen.", Psychology: "Learn their routines, so no one is there when the phasers go." },
+};
 export const cluesFound = (A) => Object.values(A.clues || {}).filter(Boolean).length;
 // The away team's own log: the same captain's log, with these entries marked so the Away team tab can show them.
 const alog = (S, text, kind) => log(S, text, kind, { away: true });
@@ -37,7 +45,7 @@ const raider = (S) => enemiesAt(S, S.systems[S.corvan].at).find((e) => e.goal ==
 
 export function arcActions(S) {
   const A = S.arc, out = [];
-  const add = (arc, name, skills, blurb, extra, who) => out.push({ id: "arc", arc, name, skills, blurb, extra, who });
+  const add = (arc, name, skills, blurb, extra, who, how) => out.push({ id: "arc", arc, name, skills, blurb, extra, who, how: how || (arc.startsWith("clue-") ? CLUES[arc.slice(5)].how : HOW[arc]) });
   const surface = ["pull", "orions", "caretaker"].includes(A.stage);
   // The surface needs an away team: choosing and beaming them down is free, and done before anything below.
   if (surface && !A.team) { out.push({ id: "beam", name: "Beam down an away team", skills: [], free: true, blurb: "Choose two to four officers. Only the away team can act on the surface; whoever stays aboard runs the ship. The transporter takes no action." }); return out; }

@@ -378,6 +378,8 @@ function breakdown(o) {
   const sign = (v) => (v >= 0 ? "+" : "−") + Math.abs(v);
   return `${o.skill} ${first[1]}${rest.map(([n, v]) => ` · ${n} ${sign(v)}`).join("")} = ${o.total}, ${pct(o.total)} to succeed`;
 }
+/** "Psychology: read their customs and who answers to whom, from the blind: no contact." */
+const howLine = (a, skill) => (a.how && a.how[skill] ? `${skill}: ${a.how[skill]}` : "");
 function actionCard(a) {
   if (a.id === "beam") return beamCard(a);
   const tone = a.id === "engage" ? "red" : a.id === "mission" || a.id === "arc" ? "gold" : a.id === "envoy" ? "green" : "";
@@ -388,9 +390,9 @@ function actionCard(a) {
   const opts = optionsFor(a);
   if (unit === "pelion" && !opts.length) return h + `<div class="why">Nobody fit for duty has the training.</div></div>`;
   h += `<div class="roll-row">`;
-  if (opts.length) h += `<select data-who aria-label="Who does it">${opts.map((o, i) => `<option value="${o.officer}|${o.skill}" data-breakdown="${esc(breakdown(o))}" ${i === 0 ? "selected" : ""}>${esc(officer(o.officer).short)} · ${esc(o.skill)} ${o.total} (${pct(o.total)})</option>`).join("")}</select>`;
+  if (opts.length) h += `<select data-who aria-label="Who does it">${opts.map((o, i) => `<option value="${o.officer}|${o.skill}" data-breakdown="${esc(breakdown(o))}" data-how="${esc(howLine(a, o.skill))}" ${i === 0 ? "selected" : ""}>${esc(officer(o.officer).short)} · ${esc(o.skill)} ${o.total} (${pct(o.total)})</option>`).join("")}</select>`;
   else h += `<span class="small muted">Its crew: 14 (${pct(14)})</span>`;
-  return h + `<button class="btn primary small" data-act="${enc}">Roll</button></div>${opts.length ? `<div class="parts" data-breakdown-for>${esc(breakdown(opts[0]))}</div>` : ""}</div>`;
+  return h + `<button class="btn primary small" data-act="${enc}">Roll</button></div>${opts.length ? `${a.how ? `<div class="small" data-how-for style="margin-top:6px">${esc(howLine(a, opts[0].skill))}</div>` : ""}<div class="parts" data-breakdown-for>${esc(breakdown(opts[0]))}</div>` : ""}</div>`;
 }
 const diceHTML = (r) => `<span class="dice">${r.dice.map((d) => `<span class="die">${d}</span>`).join("")}</span>`;
 function pendingHTML() {
@@ -542,7 +544,7 @@ function bindChrome() {
     if (b.dataset.req) { const since = mark(); const r = requisition(S, b.dataset.req); if (r.error) toast(r.error, true); else reportSince("Requisition: " + SUPPORT[b.dataset.req].name, since); after(); return; }
   });
   // Picking someone else for an action shows how their target is made.
-  $("panel").addEventListener("change", (e) => { const sel = e.target.closest("[data-who]"); if (!sel) return; const out = sel.closest(".card").querySelector("[data-breakdown-for]"); if (out) out.textContent = sel.selectedOptions[0].dataset.breakdown; });
+  $("panel").addEventListener("change", (e) => { const sel = e.target.closest("[data-who]"); if (!sel) return; const card = sel.closest(".card"), out = card.querySelector("[data-breakdown-for]"), how = card.querySelector("[data-how-for]"); if (out) out.textContent = sel.selectedOptions[0].dataset.breakdown; if (how) how.textContent = sel.selectedOptions[0].dataset.how; });
   $("panel").addEventListener("change", (e) => { const s = e.target.closest("[data-station]"); if (s) { setStation(S, s.dataset.station, s.value); after(); } });
   $("panel").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-hex]"); if (tr) { selHex = tr.dataset.hex; centerOn(selHex); tab = "here"; renderAll(); } });
   $("end-turn").onclick = doEndTurn;
