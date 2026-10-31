@@ -50,7 +50,7 @@ p { margin: 0 0 8px; } .muted { color: var(--muted); } .small { font-size: 12px;
 #end-turn { flex: 1; font: 700 17px var(--display); letter-spacing: .1em; text-transform: uppercase; padding: 10px; }
 button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .card { background: var(--panel-2); border-radius: 10px; padding: 10px 12px; margin: 8px 0; border-left: 4px solid var(--blue); }
-.card.gold { border-left-color: var(--gold); } .card.red { border-left-color: var(--red); } .card.green { border-left-color: var(--green); } .card.violet { border-left-color: var(--violet); }
+.card.gold { border-left-color: var(--gold); color: var(--ink); } .card.red { border-left-color: var(--red); } .card.green { border-left-color: var(--green); } .card.violet { border-left-color: var(--violet); }
 .card h4 { margin: 0 0 4px; font: 700 16px var(--display); letter-spacing: .04em; text-transform: uppercase; }
 .card .why { color: #ffb0a6; font-size: 12px; }
 .kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; align-items: center; font-variant-numeric: tabular-nums; }
@@ -118,7 +118,7 @@ textarea { width: 100%; box-sizing: border-box; font: 12px ui-monospace, monospa
     <div class="map-hint">Click a hex to look · double-click (or right-click) to move there</div>
   </div>
   <aside class="side">
-    <nav class="tabs" role="tablist"><button data-tab="here" role="tab">Here</button><button data-tab="ship" role="tab">Ship</button><button data-tab="crew" role="tab">Crew</button><button data-tab="orders" role="tab">Orders</button><button data-tab="sector" role="tab">Sector</button><button data-tab="log" role="tab">Log</button></nav>
+    <nav class="tabs" role="tablist"><button data-tab="orders" role="tab">Orders</button><button data-tab="here" role="tab">Here</button><button data-tab="ship" role="tab">Ship</button><button data-tab="crew" role="tab">Crew</button><button data-tab="sector" role="tab">Sector</button><button data-tab="log" role="tab">Log</button></nav>
     <div id="panel"></div>
     <div class="side-foot"><button class="btn primary" id="end-turn">End turn</button></div>
   </aside>
@@ -1502,7 +1502,7 @@ function debugHook() {
 }
 function boot() { bindMap(); bindChrome(); debugHook(); showStarter(!!store.get()); }
 function startGame(state) {
-  S = state; unit = "pelion"; selHex = S.pelion.at; tab = "here"; lastResult = null; bchoice = null;
+  S = state; unit = "pelion"; selHex = S.pelion.at; tab = "orders"; lastResult = null; bchoice = null;
   fitView();
   $("app").hidden = false; closeModal();
   after();
@@ -1763,7 +1763,7 @@ function crewHTML() {
 
 // ---------- Orders ----------
 function ordersHTML() {
-  let h = `<h2>Orders<\/h2>`;
+  let h = hint() + `<h2>Orders<\/h2>`;
   const A = S.arc;
   if (A.stage !== "travel" && A.stage !== "done") {
     h += `<div class="card gold"><h4>The Silence at Corvan II<\/h4><div class="kv small"><span>Countdown<\/span><span>${boxes(A.countdown, COUNTDOWN)} (break orbit when full)<\/span><span>Record<\/span><span>${boxes(A.clock, CLOCK, "blue")}<\/span><\/div>`

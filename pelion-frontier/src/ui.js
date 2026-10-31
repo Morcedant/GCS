@@ -26,7 +26,7 @@ function debugHook() {
 }
 function boot() { bindMap(); bindChrome(); debugHook(); showStarter(!!store.get()); }
 function startGame(state) {
-  S = state; unit = "pelion"; selHex = S.pelion.at; tab = "here"; lastResult = null; bchoice = null;
+  S = state; unit = "pelion"; selHex = S.pelion.at; tab = "orders"; lastResult = null; bchoice = null;
   fitView();
   $("app").hidden = false; closeModal();
   after();
@@ -287,7 +287,7 @@ function crewHTML() {
 
 // ---------- Orders ----------
 function ordersHTML() {
-  let h = `<h2>Orders</h2>`;
+  let h = hint() + `<h2>Orders</h2>`;
   const A = S.arc;
   if (A.stage !== "travel" && A.stage !== "done") {
     h += `<div class="card gold"><h4>The Silence at Corvan II</h4><div class="kv small"><span>Countdown</span><span>${boxes(A.countdown, COUNTDOWN)} (break orbit when full)</span><span>Record</span><span>${boxes(A.clock, CLOCK, "blue")}</span></div>`
