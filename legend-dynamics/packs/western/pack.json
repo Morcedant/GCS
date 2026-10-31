@@ -4423,5 +4423,11 @@
     "Narrate it from the players' choice in a minute or two."
    ]
   ]
+ },
+ "firstAdventure": {
+  "title": "Dead Man's Wages",
+  "kind": "A monster hunt",
+  "blurb": "Something is killing miners in the Lazarus silver mine, and the company calls it cave-ins. A letter arrives with fifty dollars and a plea for help, signed by a foreman nobody in town has seen in weeks.",
+  "length": "One or two sessions, for 3 to 7 players, with the ready-made characters"
  }
 }
