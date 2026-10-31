@@ -5,7 +5,7 @@ import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, of
   speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating } from "./game.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
-import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound, contestOdds } from "./arc.js";
+import { arcEventChoices, COUNTDOWN, CLOCK, CLUES, beamDown, SITES, SITE_OF, THEORY_AT, cluesFound, contestOdds, exchangeOdds } from "./arc.js";
 import { kindName } from "./ai.js";
 import { RADIUS, inZone } from "./sector.js";
 
@@ -415,7 +415,7 @@ function teamLine() {
 function breakdown(o, a) {
   const [first, ...rest] = o.parts;
   const sign = (v) => (v >= 0 ? "+" : "−") + Math.abs(v);
-  return `${o.skill} ${first[1]}${rest.map(([n, v]) => ` · ${n} ${sign(v)}`).join("")} = ${o.total}, ${a && a.contest ? `${Math.round(contestOdds(o.total) * 100)}% to win the argument` : `${pct(o.total)} to succeed`}`;
+  return `${o.skill} ${first[1]}${rest.map(([n, v]) => ` · ${n} ${sign(v)}`).join("")} = ${o.total}, ${a && a.contest ? `${Math.round(contestOdds(o.total) * 100)}% to win the argument` : a && a.oppose ? `${Math.round(exchangeOdds(o.total, a.oppose.target) * 100)}% to beat ${a.oppose.name} (${a.oppose.skill} ${a.oppose.target})` : `${pct(o.total)} to succeed`}`;
 }
 /** The card's lines for the officer picked: how the skill is used, who could assist, and the target with or without them. */
 function refreshCard(card) {
@@ -431,13 +431,13 @@ function actionCard(a) {
   if (a.id === "beam") return beamCard(a);
   const tone = a.id === "engage" ? "red" : a.id === "mission" || a.id === "arc" ? "gold" : a.id === "envoy" ? "green" : "";
   const enc = esc(JSON.stringify({ id: a.id, order: a.order, enemy: a.enemy, arc: a.arc }));
-  let h = `<div class="card ${tone}"><h4>${a.bridge ? "Bridge: " : a.who && a.id === "arc" && a.arc !== "time" && a.arc !== "theory" && a.arc !== "scan" ? "" : ""}${esc(a.name)}</h4><div class="small muted">${esc(a.blurb || "")}</div>${a.paradox ? `<div class="small" style="margin-top:6px"><b>The paradox:</b> ${esc(a.paradox)}</div>` : ""}`;
+  let h = `<div class="card ${tone}"><h4>${a.bridge ? "Bridge: " : a.who && a.id === "arc" && a.arc !== "time" && a.arc !== "theory" && a.arc !== "scan" ? "" : ""}${esc(a.name)}</h4><div class="small muted">${esc(a.blurb || "")}</div>${a.paradox ? `<div class="small" style="margin-top:6px"><b>The paradox:</b> ${esc(a.paradox)}</div>` : ""}${a.oppose ? `<div class="small" style="margin-top:6px"><b class="bad">Opposed by</b> ${esc(a.oppose.name)} (${esc(a.oppose.skill)} ${a.oppose.target}): ${esc(a.oppose.why)} Both sides roll; the better margin wins, and ties go to them.</div>` : ""}`;
   if (a.why) return h + `<div class="why">${esc(a.why)}</div></div>`;
   if (a.id === "engage") return h + `<div class="roll-row"><button class="btn red small" data-act="${enc}">Engage</button></div></div>`;
   const opts = optionsFor(a);
   if (unit === "pelion" && !opts.length) return h + `<div class="why">No one free has the training.</div></div>`;
   h += `<div class="roll-row">`;
-  if (opts.length) h += `<select data-who aria-label="Who does it">${opts.map((o, i) => `<option value="${o.officer}|${o.skill}" data-breakdown="${esc(breakdown(o, a))}" data-breakdown-assist="${esc(breakdown(o.assisted, a))}" data-helper="${o.helper ? esc(officer(o.helper).short) : ""}" data-how="${esc(howLine(a, o.skill))}" ${i === 0 ? "selected" : ""}>${esc(officer(o.officer).short)} · ${esc(o.skill)} ${o.total} (${a.contest ? Math.round(contestOdds(o.total) * 100) + "% to win" : pct(o.total)})</option>`).join("")}</select>`;
+  if (opts.length) h += `<select data-who aria-label="Who does it">${opts.map((o, i) => `<option value="${o.officer}|${o.skill}" data-breakdown="${esc(breakdown(o, a))}" data-breakdown-assist="${esc(breakdown(o.assisted, a))}" data-helper="${o.helper ? esc(officer(o.helper).short) : ""}" data-how="${esc(howLine(a, o.skill))}" ${i === 0 ? "selected" : ""}>${esc(officer(o.officer).short)} · ${esc(o.skill)} ${o.total} (${a.contest ? Math.round(contestOdds(o.total) * 100) + "% to win" : a.oppose ? Math.round(exchangeOdds(o.total, a.oppose.target) * 100) + "% to win" : pct(o.total)})</option>`).join("")}</select>`;
   else h += `<span class="small muted">Its crew: 14 (${pct(14)})</span>`;
   const hp0 = opts.length && opts[0].helper ? officer(opts[0].helper).short : "";
   h += `<button class="btn primary small" data-act="${enc}">Roll</button></div>`;
@@ -453,6 +453,7 @@ function pendingHTML() {
 }
 function resultHTML(res) {
   const r = res.roll;
+  if (res.oppLine) return `<div class="result ${res.won ? "ok" : "no"}"><b>${esc(res.name)}</b>: <b class="${res.won ? "good" : "bad"}">${res.won ? "won" : "lost"}</b>${res.rerolled ? " (rerolled)" : ""}<div>${esc(res.oppLine)}</div><div class="parts">${res.target.parts.map(([n, v], i) => `${esc(n)} ${i && v >= 0 ? "+" : ""}${v}`).join(" · ")}</div><div>${esc(res.text || "")}</div></div>`;
   return `<div class="result ${r.success ? "ok" : "no"}"><b>${esc(res.name)}</b>: ${diceHTML(r)} ${r.total} against ${r.target}: <b class="${r.success ? "good" : "bad"}">${r.success ? `success by ${r.margin}` : `fails by ${-r.margin}`}</b>${res.rerolled ? " (rerolled)" : ""}
     <div class="parts">${res.target.parts.map(([n, v], i) => `${esc(n)} ${i && v >= 0 ? "+" : ""}${v}`).join(" · ")}</div><div>${esc(res.text || "")}</div></div>`;
 }
@@ -661,11 +662,11 @@ function bindChrome() {
       const r = attempt(S, unit, a.id, { order: a.order, enemy: a.enemy, arc: a.arc, officer: who, skill, assist });
       if (r.error) { toast(r.error, true); return; }
       lastResult = r.done ? r.result : null;
-      if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill, contest: r.result.arc === "reason" });
+      if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill, contest: !!r.result.opposed });
       else if (r.battle) reportSince(b.closest(".card")?.querySelector("h4")?.textContent || "Engage", since);
       after(); return;
     }
-    if (b.dataset.resolve) { const since = mark(); const r = resolve(S, b.dataset.resolve === "reroll"); lastResult = r.done ? r.result : null; if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill, contest: r.result.arc === "reason" }); after(); return; }
+    if (b.dataset.resolve) { const since = mark(); const r = resolve(S, b.dataset.resolve === "reroll"); lastResult = r.done ? r.result : null; if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill, contest: !!r.result.opposed }); after(); return; }
     if (b.dataset.refit) { const since = mark(); const r = fitRefit(S, b.dataset.refit); if (r.error) toast(r.error, true); else reportSince(REFITS[b.dataset.refit].name, since); after(); return; }
     if (b.dataset.req) { const since = mark(); const r = requisition(S, b.dataset.req); if (r.error) toast(r.error, true); else reportSince("Requisition: " + SUPPORT[b.dataset.req].name, since); after(); return; }
   });
@@ -739,7 +740,7 @@ function showEvent() {
   if (ev.kind === "arc-arrive") {
     const ch = arcEventChoices(S);
     modal(`<h2>Corvan II</h2><p>The active sweep finds what passive sensors couldn't: an Orion raider holding station on the far side of the moon. Caught, it hails: they're "legitimate salvagers", and this is unclaimed space.</p>
-      ${eventResult ? `<div class="result ${eventResult.roll ? (eventResult.roll.success ? "ok" : "no") : ""}">${eventResult.roll ? `${diceHTML(eventResult.roll)} ${eventResult.roll.total} against ${eventResult.roll.target} (${esc(officer(eventResult.roll.officer)?.short || "Captain")}, ${esc(eventResult.roll.skill)}). ` : ""}${esc(eventResult.text)}</div>` : ""}
+      ${eventResult ? `<div class="result ${eventResult.opposed ? (eventResult.won ? "ok" : "no") : eventResult.roll ? (eventResult.roll.success ? "ok" : "no") : ""}">${eventResult.opposed ? `${esc(eventResult.line)} ` : eventResult.roll ? `${diceHTML(eventResult.roll)} ${eventResult.roll.total} against ${eventResult.roll.target} (${esc(officer(eventResult.roll.officer)?.short || "Captain")}, ${esc(eventResult.roll.skill)}). ` : ""}${esc(eventResult.text)}</div>` : ""}
       <div class="grid2">${ch.map((c) => `<div class="brief"><h3>${esc(c.name)}</h3><p>${esc(c.blurb)}</p><div class="btn-row"><button class="btn ${c.id === "engage" ? "red" : "primary"} small" data-ev="${c.id}" ${c.disabled ? "disabled" : ""}>${esc(c.name)}</button></div></div>`).join("")}</div>`);
     return;
   }
@@ -798,7 +799,7 @@ function modalClick(e) {
     // While the arrival is still open (a scan), its own dialog shows the result; once it ends, a pop-up says what happened.
     if (!S.event || S.event.kind !== "arc-arrive") {
       const out = eventResult || {}; eventResult = null; report = null;
-      reportSince(title, since, out.roll);
+      reportSince(title, since, out.opposed ? null : out.roll);
       if (out.text) { report = report || { title, roll: out.roll, lines: [] }; report.lines.unshift(out.text); }
     }
     after(); if (!report && !S.event && !S.battle && !S.over) closeModal(); return;

@@ -54,19 +54,19 @@ export function arcActions(S) {
   if (A.stage === "orbit") add("scan", "Sweep the ruins with the ship's sensors", ["Sensors", "Physical Sciences"], "Find out what's down there before anyone beams down. Whatever the roll, something in the ruins will notice.");
   // The clues: Sevek forms his theory the moment the away team has THEORY_AT of them. The last one still helps later.
   if (A.stage === "pull" || A.stage === "orions")
-    for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `${A.theory ? `More evidence (${cluesFound(A)}/${CLOCK} clues): every clue makes Sevek's case stronger later.` : `Evidence for Sevek's theory (${cluesFound(A)}/${CLOCK} clues): with ${THEORY_AT}, he has enough to form it.`} A failure costs time: the Countdown fills.${k === "village" ? " Fail by 3 or more and the Ketari see you." : ""}`, [["Something here is wrong", -2]], team);
+    for (const [k, c] of Object.entries(CLUES)) if (!A.clues[k]) add("clue-" + k, `Away team: ${c.name.toLowerCase()}`, c.skills, `${A.theory ? `More evidence (${cluesFound(A)}/${CLOCK} clues): every clue makes Sevek's case stronger later.` : `Evidence for Sevek's theory (${cluesFound(A)}/${CLOCK} clues): with ${THEORY_AT}, he has enough to form it.`} A failure costs time: the Countdown fills.${k === "village" ? " Lose by 3 or more and the Ketari see you." : ""}`, [], team);
   if (A.stage === "pull") {
     if (!A.boughtTime && A.countdown > 0) add("time", "Aboard: buy time, reroute power", ["Engineering"], "Clear a segment of the Countdown. Once. Done from the ship, by someone still aboard.", [], aboard);
   }
   if (A.stage === "orions") {
-    add("stun", "Stop the Orion diggers (phasers on stun)", ["Phasers", "Unarmed Combat", "Stealth"], "Three Orion pirates in the ruins. A failure hurts whoever leads it, and costs time.", [["Three of them", -3]], team);
-    add("kill", "Stop them, phasers on kill", ["Phasers"], "No −3, but Starfleet Command marks a box for the bodies.", [], team);
+    add("stun", "Stop the Orion diggers (phasers on stun)", ["Phasers", "Unarmed Combat", "Stealth"], "Three Orion pirates in the ruins, armed. Stun takes care: −2. A failure hurts whoever leads it, and costs time.", [["Stun only, three of them", -2]], team);
+    add("kill", "Stop them, phasers on kill", ["Phasers"], "No −2 for care, but Starfleet Command marks a box for the bodies. A failure hurts whoever leads it, and costs time.", [], team);
   }
   // The Orion phasers in the village: part of the orders, once the crew know about them, at any point on the surface.
   if (A.knowPhasers && !A.phasers && ["pull", "orions", "caretaker", "phasers"].includes(A.stage))
-    add("phasers", "Recover the Orion phasers from the village", ["Stealth", "Psychology"], `Part of the orders: Starfleet weapons-grade disruptors can't stay in a bronze-age village. Take every one back without being seen. A failure costs time${A.stage === "phasers" ? "" : " (the Countdown fills)"}; fail by 3 or more and the Ketari see you.`, [["A whole village", -2]], team);
+    add("phasers", "Recover the Orion phasers from the village", ["Stealth", "Psychology"], `Part of the orders: Starfleet weapons-grade disruptors can't stay in a bronze-age village. Take every one back without being seen. A failure costs time${A.stage === "phasers" ? "" : " (the Countdown fills)"}; lose by 3 or more and the Ketari see you.`, [], team);
   if (A.stage === "caretaker") {
-    add("shutdown", "Shut the caretaker down", ["Engineering", "Electronics"], "The scientists wake. The Ketari lose their protector.", [["Technology older than the Federation", -4]], team);
+    add("shutdown", "Shut the caretaker down", ["Engineering", "Electronics"], "The scientists wake. The Ketari lose their protector.", [], team);
     // The paradox: Sevek argues it against the caretaker itself, in three exchanges of contested rolls.
     const ev = [].concat(cluesFound(A) >= CLOCK ? [["Every clue found", 1]] : [], A.readings ? [["The orbital readings", 1]] : [], A.argued ? [["Its last answer, studied", 1]] : []);
     const rs = { id: "arc", arc: "reason", name: "Sevek puts the paradox to the caretaker", skills: ["Psychology"], who: ["sevek"], extra: ev, contest: true,
@@ -75,13 +75,57 @@ export function arcActions(S) {
     else if (!available(S, "sevek")) rs.why = "Sevek is in sickbay.";
     out.push(rs);
     if (A.phasers) add("leave", "Leave it be", ["Psychology", "Diplomacy"], "Keep Ketari history their own, and go. The scientists stay asleep: the orders only partly carried out.", [], team, { Psychology: "Persuade the caretaker that the Pelion will leave in peace.", Diplomacy: "Take formal leave of it, and promise it nothing will follow." });
-    else add("leave", "Leave it be; take back the Orion phasers", ["Stealth", "Psychology"], "Keep Ketari history their own. The scientists stay asleep. Fail by 3 or more and the Ketari see you.", [["A whole village", -2]], team);
+    else add("leave", "Leave it be; take back the Orion phasers", ["Stealth", "Psychology"], "Keep Ketari history their own. The scientists stay asleep. Lose by 3 or more and the Ketari see you.", [], team);
   }
+  // Every encounter has opposition: someone or something rolls against the crew.
+  for (const a of out) if (a.id === "arc" && !a.contest) { const o = opposition(S, a.arc); if (o) a.oppose = o; }
   return out;
+}
+/**
+ * Who or what stands against the crew in each encounter, and how good they are. Both sides roll 3d6 under their
+ * number; the better margin wins, and ties go to the opposition. A failed roll counts as a margin of −1 at best.
+ */
+export function opposition(S, k) {
+  const A = S.arc, orionsHere = A.stage === "pull" || A.stage === "orions";
+  const guards = orionsHere
+    ? { name: "the Ketari warriors and their Orion overseer", skill: "Alertness", target: 12, why: "Armed sentries at the chieftain's hall, and an Orion who knows what the guns are worth." }
+    : { name: "the Ketari warriors guarding the talismans", skill: "Alertness", target: 11, why: "The Orions are gone, but the warriors still guard their new talismans." };
+  return {
+    scan: { name: "the ruins' masking field", skill: "Interference", target: 11, why: "Something below hides itself from sensors." },
+    "clue-logs": { name: "the field's interference in the outpost's computers", skill: "Corruption", target: 11, why: "The logs were cut off mid-sentence, and the data is scrambled." },
+    "clue-bunks": { name: "the field, scrubbing the traces", skill: "Interference", target: 10, why: "Three weeks of the field's hum have faded every trace." },
+    "clue-energy": { name: "the field itself", skill: "Shifting frequency", target: 11, why: "It changes frequency whenever it's studied." },
+    "clue-village": { name: "the Ketari sentries", skill: "Alertness", target: 11, why: "Watchful, and armed with Orion disruptors." },
+    time: { name: "the drain on the ship", skill: "Pull", target: 12, why: "Whatever is below pulls harder the more power you reroute." },
+    stun: { name: "the three Orion diggers", skill: "Phasers", target: 12, why: "Pirates with disruptors, and nothing to lose." },
+    kill: { name: "the three Orion diggers", skill: "Phasers", target: 12, why: "Pirates with disruptors, and nothing to lose." },
+    phasers: guards,
+    shutdown: { name: "the caretaker's defenses", skill: "Countermeasures", target: 14, why: "It doesn't want to be shut down, and it has had eleven thousand years to plan for it." },
+    leave: A.phasers ? { name: "the caretaker's judgement", skill: "Logic", target: 12, why: "It has to believe you will go and not come back." } : guards,
+  }[k] || null;
+}
+/** One exchange of opposed rolls: the crew's roll against the opposition's. */
+export function opposed(S, mine, o, who) {
+  const its = check(S, o.target);
+  const ms = mine.success ? mine.margin : Math.min(mine.margin, -1), mc = its.success ? its.margin : Math.min(its.margin, -1);
+  const win = ms > mc;
+  const line = `${who} rolled ${mine.dice.join("+")} = ${mine.total} against ${mine.target} (${mine.success ? `by ${mine.margin}` : `failed by ${-mine.margin}`}); opposing, ${o.name} (${o.skill} ${o.target}) rolled ${its.dice.join("+")} = ${its.total} (${its.success ? `by ${its.margin}` : `failed by ${-its.margin}`}). ${win ? `${who} wins` : `${o.name[0].toUpperCase() + o.name.slice(1)} win${/s$/.test(o.name.split(" ").pop()) || / and /.test(o.name) ? "" : "s"}`}${ms === mc ? " (a tie goes to the opposition)" : ""}.`;
+  return { win, diff: ms - mc, its, line };
+}
+/** The chance to win one opposed roll at this target against this one, worked out exactly. */
+export function exchangeOdds(T, them) {
+  const dist = {}; for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) for (let c = 1; c <= 6; c++) dist[a + b + c] = (dist[a + b + c] || 0) + 1 / 216;
+  const eff = (t, n) => (n <= 4 || (n <= t && n < 17) ? t - n : Math.min(t - n, -1));
+  let p = 0; for (const x in dist) for (const y in dist) if (eff(T, +x) > eff(them, +y)) p += dist[x] * dist[y];
+  return p;
 }
 
 export function arcStep(S, p) {
-  const A = S.arc, r = p.roll, k = p.arc, who = officer(p.officer)?.short || "The away team";
+  const A = S.arc, k = p.arc, who = officer(p.officer)?.short || "The away team";
+  // The opposition rolls too: the encounter is won on the better margin, not on the crew's roll alone.
+  let r = p.roll;
+  const opp = k !== "reason" && opposition(S, k);
+  if (opp) { const o = opposed(S, p.roll, opp, who); r = { ...p.roll, success: o.win, margin: o.diff }; p.won = o.win; p.oppLine = o.line; alog(S, o.line, o.win ? "good" : "bad"); }
   // On the surface map, whoever did it is now where it happened.
   if (A.team && SITE_OF[k] && A.team.includes(p.officer)) { A.pos = A.pos || {}; A.pos[p.officer] = SITE_OF[k]; }
   if (k === "scan") {
@@ -167,9 +211,7 @@ const EXCHANGES = [
 ];
 /** The chance Sevek wins the argument (two exchanges of three) at this target, worked out exactly. */
 export function contestOdds(T, them = CARETAKER.target) {
-  const dist = {}; for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) for (let c = 1; c <= 6; c++) dist[a + b + c] = (dist[a + b + c] || 0) + 1 / 216;
-  const eff = (t, n) => (n <= 4 || (n <= t && n < 17) ? t - n : Math.min(t - n, -1));
-  let p = 0; for (const x in dist) for (const y in dist) if (eff(T, +x) > eff(them, +y)) p += dist[x] * dist[y];
+  const p = exchangeOdds(T, them);
   return p * p * (3 - 2 * p);
 }
 /** Sevek against the caretaker: three exchanges of contested rolls; the first is the action's own roll. Best of three. */
@@ -316,16 +358,20 @@ export function arcEventChoose(S, id, roll) {
   const e = raider(S);
   if (!e) { S.event = null; arcTick(S); return { text: "The raider is gone." }; }
   if (id === "scan") {
-    const r = roll("Sensors", "scan"); S.arc.scanned = true;
+    const raw = roll("Sensors", "scan"); S.arc.scanned = true;
+    const o = opposed(S, raw, { name: "the raider's sensor baffles", skill: "Baffles", target: 11 }, officer(raw.officer)?.short || "The captain"), r = { ...raw, success: o.win };
+    log(S, o.line, o.win ? "good" : "bad");
     if (r.success) S.arc.knowPhasers = true;
     if (r.success) log(S, "Scan of the Orion raider at Corvan II: its hold is full of digging gear, and its manifest lists Starfleet-pattern phasers \"traded\" planetside. They're arming the natives.", "discovery");
-    return { roll: r, text: r.success ? "Their hold is full of digging gear, and their manifest lists Starfleet-pattern phasers \"traded\" planetside. They're arming the natives." : "Their hull scatters the scan." };
+    return { roll: raw, opposed: true, won: o.win, line: o.line, text: (r.success ? "Their hold is full of digging gear, and their manifest lists Starfleet-pattern phasers \"traded\" planetside. They're arming the natives." : "Their hull scatters the scan.") };
   }
   if (id === "warn") {
-    const r = roll("Communications", "hail", [["Their captain's Will 10", 0]].concat(S.arc.scanned ? [["You know what they've done", 2]] : []));
+    const raw = roll("Communications", "hail", S.arc.scanned ? [["You know what they've done", 2]] : []);
+    const o = opposed(S, raw, { name: "the Orion captain", skill: "Will", target: 10 }, officer(raw.officer)?.short || "The captain"), r = { ...raw, success: o.win };
+    log(S, o.line, o.win ? "good" : "bad");
     S.event = null;
-    if (r.success) { sendHome(S, e, 6); e.goal = "home"; delete S.enemies[e.id]; log(S, "The Orion raider runs for the sector's edge.", "good"); arcTick(S); return { roll: r, text: "\"Legitimate salvagers\" don't argue with a Heavy Cruiser. The raider runs." }; }
-    startBattle(S, e.id, "enemy"); return { roll: r, text: "The Orion captain cuts the channel, and the raider opens fire." };
+    if (r.success) { sendHome(S, e, 6); e.goal = "home"; delete S.enemies[e.id]; log(S, "The Orion raider runs for the sector's edge.", "good"); arcTick(S); return { roll: raw, opposed: true, won: true, line: o.line, text: "\"Legitimate salvagers\" don't argue with a Heavy Cruiser. The raider runs." }; }
+    startBattle(S, e.id, "enemy"); return { roll: raw, opposed: true, won: false, line: o.line, text: "The Orion captain cuts the channel, and the raider opens fire." };
   }
   if (id === "engage") { S.event = null; startBattle(S, e.id, "pelion"); return { text: "Shields up." }; }
   return {};
