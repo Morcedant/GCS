@@ -224,7 +224,7 @@ function drawSurface(ctx, W, H) {
   const notes = {
     outpost: [["Outpost logs", A.clues.logs], ["Empty bunks", A.clues.bunks]],
     ruins: [["The ruins' energy", A.clues.energy]].concat(A.stage === "orions" ? [["3 Orion pirates digging", "danger"]] : []),
-    core: A.stage === "caretaker" ? [["The caretaker", "danger"], ["8 scientists in stasis", "info"]] : A.theory ? [["8 scientists in stasis", "info"]] : [["Unknown", null]],
+    core: [].concat(A.theory ? [[A.stage === "caretaker" ? "The caretaker" : "The caretaker (Sevek's theory)", A.stage === "caretaker" ? "danger" : "info"]] : [["Unknown", null]], A.podsSeen ? [["8 scientists in stasis pods", "info"]] : A.theory && A.readings ? [["8 life signs below", "info"]] : []),
     blind: [["The village, observed", A.clues.village]],
     village: A.clues.village ? [["Armed with Orion phasers", "danger"]] : [],
   };

@@ -158,5 +158,11 @@ test("what's in the ruins is earned: Sevek's theory needs three clues, and only 
   for (let i = 0; i < 20 && S.arc.stage === "pull"; i++) { S.tried = {}; S.crew.sevek.acted = false; S.event = null; S.arc.countdown = 0; attempt(S, "pelion", "arc", { arc: "theory" }); if (S.pending) resolve(S, false); }
   assert.equal(S.arc.stage, "orions");
   assert.ok(S.arc.theory);
-  assert.ok(S.log.some((l) => l.text.includes("Sevek's theory: a caretaker, not a weapon")));
+  const th = S.log.find((l) => l.text.includes("Sevek's theory: a caretaker, not a weapon"));
+  assert.ok(th);
+  assert.ok(!/stasis/i.test(th.text));                                 // a theory can't know about the pods
+  assert.ok(!S.arc.podsSeen);
+  for (let i = 0; i < 20 && S.arc.stage === "orions"; i++) { S.tried = {}; for (const id in S.crew) { S.crew[id].acted = false; S.crew[id].inj = 0; } S.event = null; S.eventQueue = []; S.arc.countdown = 0; attempt(S, "pelion", "arc", { arc: "stun" }); if (S.pending) resolve(S, false); }
+  assert.ok(S.arc.podsSeen);                                           // seen with their own eyes, past the Orions
+  assert.ok(S.log.some((l) => l.text.includes("eight stasis pods")));
 });

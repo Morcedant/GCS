@@ -1306,7 +1306,7 @@ function arcStep(S, p) {
       return checkCountdown(S);
     }
     A.stage = "orions"; A.theory = true;
-    astory(S, "Sevek's theory: a caretaker, not a weapon", "Sevek lays the evidence out in the outpost's lab, one piece at a time. \"The dampener test, then the spike: Dr. Haskel's device did not damage something in the ruins. It woke it. The scientists left calmly, at one moment, as if called: they were not attacked, they were collected. The field does not strike at the away team; it catalogues them, as it has catalogued the Ketari for centuries. And the village sits inside its range.\" He looks up. \"Logic suggests a single explanation. The civilization that built this city left a caretaker: a machine set to protect the Ketari from harm. It judged Dr. Haskel's device a threat to its charges and removed the threat, without injury. The eight scientists are alive, in stasis, beneath the ruins.\"\n\nA caretaker, not a weapon. And the Orions, who came for the machine itself, are in the ruins now, cutting their way to its core.");
+    astory(S, "Sevek's theory: a caretaker, not a weapon", `Sevek lays the evidence out in the outpost's lab, one piece at a time. \"The dampener test, then the spike: Dr. Haskel's device did not damage something in the ruins. It woke it. The scientists left calmly, at one moment, as if called: they were not attacked, they were collected. The field does not strike at the away team; it catalogues them, as it has catalogued the Ketari for centuries. And the village sits inside its range.\" He looks up. \"Logic suggests a single explanation. The civilization that built this city left a caretaker: a machine set to protect the Ketari from harm. It judged Dr. Haskel's device a threat to its charges and removed the threat. Whether it harmed them, I cannot say.${A.readings ? " The ship read eight life signs deep beneath the ruins. If they are the scientists, they are alive. How they are held, I cannot know until we see it." : " If the scientists are anywhere, they are beneath the ruins, where the field is strongest. What became of them, I cannot know until we see it."}\"\n\nA caretaker, not a weapon, if Sevek is right. And the Orions, who came for the machine itself, are in the ruins now, cutting their way to its core.`);
     return "";
   }
   if (k === "time") {
@@ -1322,7 +1322,9 @@ function arcStep(S, p) {
     }
     if (k === "kill") markCommand(S, 1, "Orion pirates killed on Corvan II when stun would have done.");
     A.stage = "caretaker";
-    astory(S, "The caretaker speaks", `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and in the brig."} Then the machine speaks through an android shell: courteous, absolute. It will protect the Ketari from everything off-world, the Federation included. The Countdown stands at ${A.countdown}/${COUNTDOWN}.`);
+    A.podsSeen = true;
+    alog(S, "The caretaker's chamber, seen at last: eight stasis pods in a ring around a column of light, and in each one a scientist from the outpost, asleep, unharmed, breathing once a minute. Rrinn's sister is in the third. Sevek was right about the machine; now the away team knows what it did with them.", "discovery");
+    astory(S, "The caretaker speaks", `${k === "kill" ? "The Orions are dead." : "The Orions are stunned and in the brig."} Past their cutting gear, the away team reaches the caretaker's chamber: eight stasis pods in a ring around a column of light, and in each one a scientist from the outpost, asleep and unharmed. Rrinn's sister is in the third. Then the machine speaks through an android shell: courteous, absolute. It will protect the Ketari from everything off-world, the Federation included. The Countdown stands at ${A.countdown}/${COUNTDOWN}.`);
     return "";
   }
   if (k === "shutdown" || k === "reason" || k === "leave") {
@@ -1860,7 +1862,7 @@ function drawSurface(ctx, W, H) {
   const notes = {
     outpost: [["Outpost logs", A.clues.logs], ["Empty bunks", A.clues.bunks]],
     ruins: [["The ruins' energy", A.clues.energy]].concat(A.stage === "orions" ? [["3 Orion pirates digging", "danger"]] : []),
-    core: A.stage === "caretaker" ? [["The caretaker", "danger"], ["8 scientists in stasis", "info"]] : A.theory ? [["8 scientists in stasis", "info"]] : [["Unknown", null]],
+    core: [].concat(A.theory ? [[A.stage === "caretaker" ? "The caretaker" : "The caretaker (Sevek's theory)", A.stage === "caretaker" ? "danger" : "info"]] : [["Unknown", null]], A.podsSeen ? [["8 scientists in stasis pods", "info"]] : A.theory && A.readings ? [["8 life signs below", "info"]] : []),
     blind: [["The village, observed", A.clues.village]],
     village: A.clues.village ? [["Armed with Orion phasers", "danger"]] : [],
   };
