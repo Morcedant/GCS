@@ -371,13 +371,13 @@ const NAMES = ["Corvan", "Tessaly", "Marrow's Reach", "Hadley", "Ilyra", "Brennu
 // A choice's `fx` is what it does: commendations, science, supplies, accord (the world's), command (boxes marked),
 // tension (with the Klingon Empire), heal (the world's harm).
 /**
- * The campaign: The Makers' Watch. Corvan II's caretaker was one of many machines left by a vanished people, the Makers,
+ * The campaign: Watchers of the Void. Corvan II's caretaker was one of many machines left by a vanished people, the Makers,
  * to watch over younger worlds. Others are hidden all over the sector, and the Orions are digging them up for a Klingon
  * house that wants what they guard. Every order the Pelion carries out turns up a thread; enough threads lead to the
  * Makers' Gate.
  */
 const CAMPAIGN = {
-  title: "The Makers' Watch",
+  title: "Watchers of the Void",
   premise: "The caretaker of Corvan II was not alone. A vanished people, the Makers, left machines like it across the Corvan Sector to watch over younger worlds. Two of those sites have already been dug up, and no one who was there is left to say by whom: a Federation survey team of six, gone without a trace, and a mining settlement of forty, its homes standing empty with the meals still on the tables. Starfleet Command is worried for three reasons. Someone is killing, or taking, everyone who sees them. The worlds those machines watched over are now unguarded, and one of them is already in trouble. And a machine that could pull a Heavy Cruiser out of orbit is a weapon in the wrong hands, on a border with the Klingon Empire. Every order Starfleet gives the Pelion this tour comes back to the same questions: who is doing this, and what are they looking for?",
   finaleAt: 6,
   beats: [
@@ -392,7 +392,7 @@ const STORIES = {
     type: "Campaign",
     keys: ["the Kor'vath commander, Captain Dakhar"], strange: ["the Makers' Gate"],
     why: "Every thread of this tour leads here. If House Kor'vath takes the Gate, it takes every caretaker in the sector with it.",
-    thread: "The Makers' Watch is over.",
+    thread: "The Watchers of the Void have finished their watch.",
     brief: "At the point where every Makers' relay meets, sensors find a ring of light a kilometre across, turning slowly in empty space: the Makers' Gate. House Kor'vath's battle cruiser is already on its way, under {key}. Get there first, and decide what happens to it.",
     arrive: "The Gate fills the viewer: a ring of light, turning, and through it stars that don't belong to this sky. Every caretaker in the sector is talking to it at once; Rrinn can hear them. On long-range sensors, the Kor'vath cruiser is eleven hours out.",
     steps: [
@@ -799,7 +799,7 @@ function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
     stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
     crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false }])),
     backlog: [],   // orders waiting their turn
-    campaign: { threads: [], beats: [], finale: false, over: null },   // The Makers' Watch
+    campaign: { threads: [], beats: [], finale: false, over: null },   // Watchers of the Void
     tried: {},   // actions tried this turn: each can be attempted once a turn
     support: {}, enemies: {}, nextId: 1,
     supplies: 20, science: 0, command: 0, tension: 2, commendations: 0,
@@ -1370,7 +1370,7 @@ function missionReport(S, o, result, how, rewards) {
   log(S, `Mission ${result === "partly" ? "partly successful" : "success"}: ${o.title}. ${how} Rewards: ${rewards.join("; ")}.`, "victory", { story: true });
   return ev;
 }
-// ---------- the campaign: The Makers' Watch ----------
+// ---------- the campaign: Watchers of the Void ----------
 const campaignOf = (S) => (S.campaign = S.campaign || { threads: [], beats: [], finale: false, over: null });
 /** The current act, from the beats reached so far. */
 const campaignAct = (S) => { const C = campaignOf(S), b = CAMPAIGN.beats.filter((x) => C.beats.includes(x.at)); return b.length ? b[b.length - 1].act : "Prologue: The Silence at Corvan II"; };
@@ -1421,7 +1421,7 @@ function issueFinale(S) {
     urgent: true, finale: true, twist: null, story: "The Makers' Gate", strange: st.strange[0], key: st.keys[0],
     oppose: { name: "House Kor'vath's expedition", skill: "Ruthlessness", target: 12, why: "A Klingon battle cruiser and a house with everything to gain." } };
   o.text = storyText(S, o, st.brief);
-  activateOrder(S, o, "issued: the finale of The Makers' Watch");
+  activateOrder(S, o, "issued: the finale of Watchers of the Void");
 }
 /** The scene when the Pelion first reaches an order's location. */
 function arriveAt(S, o) {
@@ -3048,7 +3048,7 @@ function ordersHTML() {
 }
 /** An order's type, and whether it's part of the campaign: little labels for its card. */
 const orderTags = (o) => (orderType(o) ? ` <span class="badge-status">${esc(orderType(o))}<\/span>` : "") + (orderTied(S, o) && !o.finale ? ` <span class="badge-status good">${esc(CAMPAIGN.title)}<\/span>` : "");
-/** The campaign this tour: The Makers' Watch, its act, the threads found, and the story so far. */
+/** The campaign this tour: Watchers of the Void, its act, the threads found, and the story so far. */
 function campaignHTML() {
   if (!campaignOpen(S)) return `<div class="card gold"><h4>The campaign <span class="badge-status">Prologue<\/span><\/h4><p class="small">The tour begins with your first orders: The Silence at Corvan II. What the Pelion finds there will set the course of everything after it.<\/p><\/div>`;
   const C = campaignOf(S), n = Math.min(C.threads.length, CAMPAIGN.finaleAt), beats = CAMPAIGN.beats.filter((b) => C.beats.includes(b.at));

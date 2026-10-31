@@ -28,7 +28,7 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
     stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
     crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false }])),
     backlog: [],   // orders waiting their turn
-    campaign: { threads: [], beats: [], finale: false, over: null },   // The Makers' Watch
+    campaign: { threads: [], beats: [], finale: false, over: null },   // Watchers of the Void
     tried: {},   // actions tried this turn: each can be attempted once a turn
     support: {}, enemies: {}, nextId: 1,
     supplies: 20, science: 0, command: 0, tension: 2, commendations: 0,
@@ -599,7 +599,7 @@ export function missionReport(S, o, result, how, rewards) {
   log(S, `Mission ${result === "partly" ? "partly successful" : "success"}: ${o.title}. ${how} Rewards: ${rewards.join("; ")}.`, "victory", { story: true });
   return ev;
 }
-// ---------- the campaign: The Makers' Watch ----------
+// ---------- the campaign: Watchers of the Void ----------
 export const campaignOf = (S) => (S.campaign = S.campaign || { threads: [], beats: [], finale: false, over: null });
 /** The current act, from the beats reached so far. */
 export const campaignAct = (S) => { const C = campaignOf(S), b = CAMPAIGN.beats.filter((x) => C.beats.includes(x.at)); return b.length ? b[b.length - 1].act : "Prologue: The Silence at Corvan II"; };
@@ -650,7 +650,7 @@ function issueFinale(S) {
     urgent: true, finale: true, twist: null, story: "The Makers' Gate", strange: st.strange[0], key: st.keys[0],
     oppose: { name: "House Kor'vath's expedition", skill: "Ruthlessness", target: 12, why: "A Klingon battle cruiser and a house with everything to gain." } };
   o.text = storyText(S, o, st.brief);
-  activateOrder(S, o, "issued: the finale of The Makers' Watch");
+  activateOrder(S, o, "issued: the finale of Watchers of the Void");
 }
 /** The scene when the Pelion first reaches an order's location. */
 function arriveAt(S, o) {

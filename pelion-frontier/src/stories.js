@@ -5,13 +5,13 @@
 // A choice's `fx` is what it does: commendations, science, supplies, accord (the world's), command (boxes marked),
 // tension (with the Klingon Empire), heal (the world's harm).
 /**
- * The campaign: The Makers' Watch. Corvan II's caretaker was one of many machines left by a vanished people, the Makers,
+ * The campaign: Watchers of the Void. Corvan II's caretaker was one of many machines left by a vanished people, the Makers,
  * to watch over younger worlds. Others are hidden all over the sector, and the Orions are digging them up for a Klingon
  * house that wants what they guard. Every order the Pelion carries out turns up a thread; enough threads lead to the
  * Makers' Gate.
  */
 export const CAMPAIGN = {
-  title: "The Makers' Watch",
+  title: "Watchers of the Void",
   premise: "The caretaker of Corvan II was not alone. A vanished people, the Makers, left machines like it across the Corvan Sector to watch over younger worlds. Two of those sites have already been dug up, and no one who was there is left to say by whom: a Federation survey team of six, gone without a trace, and a mining settlement of forty, its homes standing empty with the meals still on the tables. Starfleet Command is worried for three reasons. Someone is killing, or taking, everyone who sees them. The worlds those machines watched over are now unguarded, and one of them is already in trouble. And a machine that could pull a Heavy Cruiser out of orbit is a weapon in the wrong hands, on a border with the Klingon Empire. Every order Starfleet gives the Pelion this tour comes back to the same questions: who is doing this, and what are they looking for?",
   finaleAt: 6,
   beats: [
@@ -26,7 +26,7 @@ export const STORIES = {
     type: "Campaign",
     keys: ["the Kor'vath commander, Captain Dakhar"], strange: ["the Makers' Gate"],
     why: "Every thread of this tour leads here. If House Kor'vath takes the Gate, it takes every caretaker in the sector with it.",
-    thread: "The Makers' Watch is over.",
+    thread: "The Watchers of the Void have finished their watch.",
     brief: "At the point where every Makers' relay meets, sensors find a ring of light a kilometre across, turning slowly in empty space: the Makers' Gate. House Kor'vath's battle cruiser is already on its way, under {key}. Get there first, and decide what happens to it.",
     arrive: "The Gate fills the viewer: a ring of light, turning, and through it stars that don't belong to this sky. Every caretaker in the sector is talking to it at once; Rrinn can hear them. On long-range sensors, the Kor'vath cruiser is eleven hours out.",
     steps: [

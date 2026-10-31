@@ -582,7 +582,7 @@ function ordersHTML() {
 }
 /** An order's type, and whether it's part of the campaign: little labels for its card. */
 const orderTags = (o) => (orderType(o) ? ` <span class="badge-status">${esc(orderType(o))}</span>` : "") + (orderTied(S, o) && !o.finale ? ` <span class="badge-status good">${esc(CAMPAIGN.title)}</span>` : "");
-/** The campaign this tour: The Makers' Watch, its act, the threads found, and the story so far. */
+/** The campaign this tour: Watchers of the Void, its act, the threads found, and the story so far. */
 function campaignHTML() {
   if (!campaignOpen(S)) return `<div class="card gold"><h4>The campaign <span class="badge-status">Prologue</span></h4><p class="small">The tour begins with your first orders: The Silence at Corvan II. What the Pelion finds there will set the course of everything after it.</p></div>`;
   const C = campaignOf(S), n = Math.min(C.threads.length, CAMPAIGN.finaleAt), beats = CAMPAIGN.beats.filter((b) => C.beats.includes(b.at));
