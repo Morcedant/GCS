@@ -409,3 +409,12 @@ test("Act II says how the Pelion knows: the threads it found, and a source from 
     assert.equal(S.campaign.beatText[2], ev.text);
   }
 });
+test("bringing a Romulan defector out angers the Romulans, not the Klingons", () => {
+  const S = newGame({ seed: "defect" }); S.orders = []; S.backlog = []; S.arc.stage = "done";
+  let o; for (let i = 0; i < 300 && !(o && o.story === "Carry a message across the Neutral Zone"); i++) { o = newOrder(S); S.orders = []; }
+  S.orders = [o]; o.have = o.segs; S.event = { kind: "mission-choice", orderId: o.id };
+  const t = S.tension, rb = Object.values(S.enemies).filter((e) => e.type === "rbop").length;
+  assert.ok(chooseMission(S, o.id, "take").ok);
+  assert.equal(S.tension, t);                                                        // the Klingons don't care
+  assert.equal(Object.values(S.enemies).filter((e) => e.type === "rbop" && e.goal === "strike").length, rb + 1);   // the Romulans answer
+});

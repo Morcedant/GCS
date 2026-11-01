@@ -164,6 +164,18 @@ export function warpText(w) {
 /** Orders that call for maximum warp. */
 export const isUrgent = (o) => !!(o && (o.urgent || (o.twist && o.twist.fx === "urgent")));
 /** Ly a week the Pelion makes at its current warp (what "speed" means now). */
+/**
+ * The Romulans answer a provocation on their border the way they always do: a cloaked bird-of-prey crosses the Neutral
+ * Zone and strikes a Federation world. (Klingon tension is the Klingon Empire's; the Romulans keep their own accounts.)
+ */
+export function romulanReprisal(S, why) {
+  const targets = Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member");
+  if (!targets.length) return;
+  const tgt = pick(S, targets), zone = Object.keys(S.hexes).filter(inZone).sort((a, b) => distance(a, tgt.at) - distance(b, tgt.at));
+  if (!zone.length) return;
+  spawnEnemy(S, "rbop", zone[0], { goal: "strike", target: tgt.at, hostile: true, cloaked: true, home: zone[0] });
+  log(S, `Intelligence: after ${why}, Romulan traffic surges along the Neutral Zone. Somewhere out there, cloaked, a bird-of-prey is heading for a Federation world.`, "war");
+}
 // ---------- the cloak inverter, later ----------
 // With the inverter fitted, a cloaked Romulan bird-of-prey on a strike that passes within its range is seen, and the
 // captain chooses: pursue it, hail it, or warn the world it's heading for.
@@ -775,6 +787,7 @@ export function chooseComplication(S, optId) {
   else if (c.cost === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, s.accord - 1); log(S, `${o.title}: ${c.costText} (${s.name} now ${s.accord}).`, "bad"); }
   else if (c.cost === "sensors" || c.cost === "engines") { S.pelion.sys[c.cost] = Math.min(3, S.pelion.sys[c.cost] + 1); log(S, `${o.title}: ${c.costText}.`, "bad"); }
   else if (c.cost === "tension") { S.tension = Math.min(10, S.tension + 1); log(S, `${o.title}: ${c.costText}.`, "bad"); }
+  else if (c.cost === "romulan") { log(S, `${o.title}: ${c.costText}.`, "bad"); romulanReprisal(S, o.title); }
   else if (c.cost === "command") markCommand(S, 1, `${o.title}: ${c.costText}.`);
   else log(S, `${o.title}: ${c.costText}.`, "bad");
   return { text: "" };
@@ -794,7 +807,7 @@ export function missionChoices(S, ev) {
     options: st.choice.options.filter((x) => !x.needs || (x.needs === "inverter" && S.pelion.refits.inverter)).map((x) => ({ id: x.id, name: storyText(S, o, x.name), blurb: storyText(S, o, x.blurb) })) };
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
-  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`,
+  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike",
   heal: (n, w) => `${w}'s harm −${n}`, inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
 export function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
@@ -812,6 +825,7 @@ export function chooseMission(S, orderId, optId) {
     else if (k === "heal" && s) s.harm = Math.max(0, s.harm - n);
     else if (k === "hurt") { const c = CREW.filter((x) => available(S, x.id) && x.id !== "captain"); const v = c[Math.floor(rand(S) * c.length)]; if (v) S.crew[v.id].inj = Math.min(3, S.crew[v.id].inj + n); }
     else if (k === "sensors") S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + n);
+    else if (k === "romulan") romulanReprisal(S, o.title);
     else if (k === "inverter") S.pelion.refits.inverter = Math.max(S.pelion.refits.inverter || 0, n);
     lines.push(FX_TEXT[k] ? FX_TEXT[k](n, w) : k);
   }

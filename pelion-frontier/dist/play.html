@@ -392,7 +392,8 @@ const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", s
 // {world} is where it happens, {key} the key character, {strange} the strange thing, {captain} you. Each kind of order
 // has its own key characters and strange things, chosen to fit its story.
 // A choice's `fx` is what it does: commendations, science, supplies, accord (the world's), command (boxes marked),
-// tension (with the Klingon Empire), heal (the world's harm).
+// tension (with the Klingon Empire), romulan (a Romulan reprisal: a cloaked bird-of-prey crosses the Zone to strike a
+// Federation world), heal (the world's harm).
 /**
  * The campaign: Watchers of the Void. Corvan II's caretaker was one of many machines left by a vanished people, the Makers,
  * to watch over younger worlds. Others are hidden all over the sector, and the Orions are digging them up for a Klingon
@@ -589,7 +590,7 @@ const STORIES = {
     ],
     choice: { title: "The watcher", text: "The Romulan ship hasn't crossed the line, quite. Hail it and tell it that it's been seen, or quietly retune every outpost's shields and let it go home with useless data.",
       options: [
-        { id: "hail", name: "Hail it", blurb: "Let them know they've been seen: +1 commendation; tension with the Empire's allies rises.", how: "The border patrolled; a Romulan watcher challenged and sent home.", fx: { commendations: 1 }, text: "The bird-of-prey decloaks long enough for its commander to say nothing at all, and leaves. Everyone on the line breathes out." },
+        { id: "hail", name: "Hail it", blurb: "Let them know they've been seen: +1 commendation. The Romulans don't forget being caught.", how: "The border patrolled; a Romulan watcher challenged and sent home.", fx: { commendations: 1 }, text: "The bird-of-prey decloaks long enough for its commander to say nothing at all, and leaves. Everyone on the line breathes out." },
         { id: "shadow", needs: "inverter", name: "Shadow it home", blurb: "Only with the cloak inverter: follow it, unseen, all the way to the Zone, and record everything. +10 science, +1 commendation.", how: "The border patrolled; a cloaked Romulan ship shadowed home by the inverter.", fx: { science: 10, commendations: 1 }, text: "For two days the Pelion follows a ship that thinks it's invisible, the inverter painting it on the main viewer like a ghost. Its course, its patrol pattern, the frequency it reports home on: all of it goes to Starfleet Intelligence. The Romulans never know." },
         { id: "retune", name: "Retune the shields", blurb: "Let them leave with bad data: +6 science, and the outposts are safer for it.", how: "The border patrolled; a Romulan spy sent home with bad data.", fx: { science: 6 }, text: "Every outpost on the line changes frequency the moment the Romulan ship turns for home. Months of their work, wasted. They'll never know when it happened." },
       ] },
@@ -714,7 +715,7 @@ const STORIES = {
     ],
     choice: { title: "The defector", text: "The Romulan officer wants to come back with you. Taking them means a chance to be caught on the way out, and an intelligence prize beyond price. Leaving them means they'll be dead in a month.",
       options: [
-        { id: "take", name: "Bring them out", blurb: "+12 science from what they know, +1 commendation; tension with the Empire rises.", how: "The message delivered, and a Romulan officer brought out.", fx: { science: 12, commendations: 1, tension: 1 }, text: "The run back to the line is the longest hour of the tour. The Pelion makes it, with one passenger more than the manifest says." },
+        { id: "take", name: "Bring them out", blurb: "+12 science from what they know, +1 commendation; the Romulans will answer: a bird-of-prey crosses the Zone to strike a Federation world.", how: "The message delivered, and a Romulan officer brought out.", fx: { science: 12, commendations: 1, romulan: 1 }, text: "The run back to the line is the longest hour of the tour. The Pelion makes it, with one passenger more than the manifest says." },
         { id: "leave", name: "Deliver and go", blurb: "+1 commendation; the officer stays behind.", how: "The message delivered across the Zone.", fx: { commendations: 1 }, text: "The Pelion slips back across the line as quietly as it came. The officer watches it go. Nobody aboard says anything for a long time." },
       ] },
     fail: "The message was never delivered. Whatever it warned about will come without warning now.",
@@ -738,7 +739,7 @@ const COMPLICATIONS = {
   Diplomatic: { title: "A walkout", text: "One delegation stands up mid-session and walks out, citing an insult nobody else heard. If they reach their ship, the talks are over.", oppose: { name: "wounded pride", skill: "Grievance", target: 12 }, skills: ["Diplomacy", "Psychology", "Leadership"], cost: "accord", costText: "the talks sour: accord −1", press: "Go after them" },
   Exploration: { title: "The readings spike", text: "The sensors spike off every scale: something is reacting to the Pelion's scans, and the longer the ship stays, the harder it pushes back.", oppose: { name: "the phenomenon", skill: "Strangeness", target: 12 }, skills: ["Sensors", "Physical Sciences", "Computers"], cost: "sensors", costText: "the sensor array burns out a box", press: "Hold position and keep scanning" },
   Technology: { title: "Cascade failure", text: "The prototype's power draw spikes and a cascade starts running through the ship's systems, deck by deck. It can be shut down, or ridden out.", oppose: { name: "the cascade", skill: "Overload", target: 12 }, skills: ["Engineering", "Electronics", "Computers"], cost: "engines", costText: "the cascade reaches the warp drive: engines damaged", press: "Ride it out" },
-  Security: { title: "Contact", text: "A contact on long-range sensors, closing fast and running dark. It could be a patrol. It could be a trap.", oppose: { name: "whoever is out there", skill: "Cunning", target: 12 }, skills: ["Sensors", "Helm", "Communications"], cost: "tension", costText: "an incident on the border: Klingon tension +1", press: "Hold course and find out" },
+  Security: { title: "Contact", text: "A contact on long-range sensors, closing fast and running dark. It could be a patrol. It could be a trap.", oppose: { name: "whoever is out there", skill: "Cunning", target: 12 }, skills: ["Sensors", "Helm", "Communications"], cost: "romulan", costText: "the Romulans take it as provocation: a bird-of-prey crosses the Zone to strike a Federation world", press: "Hold course and find out" },
   Crew: { title: "It gets out of hand", text: "What started as a misunderstanding has the local constabulary involved, a crowd gathering, and a crewman who won't back down.", oppose: { name: "the crowd's temper", skill: "Anger", target: 11 }, skills: ["Leadership", "Psychology", "Diplomacy"], cost: "command", costText: "an incident report reaches Starfleet: a Command box", press: "Step in personally" },
   Campaign: { title: "Kor'vath moves first", text: "The Klingon cruiser runs its shields up and moves to cut the Pelion off from the Gate. Hold your ground, or give them room.", oppose: { name: "House Kor'vath's cruiser", skill: "Ruthlessness", target: 12 }, skills: ["Helm", "Leadership", "Diplomacy"], cost: "hurt", costText: "a disruptor hit on the bridge: a crew member is hurt", press: "Hold your ground" },
 };
@@ -984,6 +985,18 @@ function warpText(w) {
 /** Orders that call for maximum warp. */
 const isUrgent = (o) => !!(o && (o.urgent || (o.twist && o.twist.fx === "urgent")));
 /** Ly a week the Pelion makes at its current warp (what "speed" means now). */
+/**
+ * The Romulans answer a provocation on their border the way they always do: a cloaked bird-of-prey crosses the Neutral
+ * Zone and strikes a Federation world. (Klingon tension is the Klingon Empire's; the Romulans keep their own accounts.)
+ */
+function romulanReprisal(S, why) {
+  const targets = Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member");
+  if (!targets.length) return;
+  const tgt = pick(S, targets), zone = Object.keys(S.hexes).filter(inZone).sort((a, b) => distance(a, tgt.at) - distance(b, tgt.at));
+  if (!zone.length) return;
+  spawnEnemy(S, "rbop", zone[0], { goal: "strike", target: tgt.at, hostile: true, cloaked: true, home: zone[0] });
+  log(S, `Intelligence: after ${why}, Romulan traffic surges along the Neutral Zone. Somewhere out there, cloaked, a bird-of-prey is heading for a Federation world.`, "war");
+}
 // ---------- the cloak inverter, later ----------
 // With the inverter fitted, a cloaked Romulan bird-of-prey on a strike that passes within its range is seen, and the
 // captain chooses: pursue it, hail it, or warn the world it's heading for.
@@ -1595,6 +1608,7 @@ function chooseComplication(S, optId) {
   else if (c.cost === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, s.accord - 1); log(S, `${o.title}: ${c.costText} (${s.name} now ${s.accord}).`, "bad"); }
   else if (c.cost === "sensors" || c.cost === "engines") { S.pelion.sys[c.cost] = Math.min(3, S.pelion.sys[c.cost] + 1); log(S, `${o.title}: ${c.costText}.`, "bad"); }
   else if (c.cost === "tension") { S.tension = Math.min(10, S.tension + 1); log(S, `${o.title}: ${c.costText}.`, "bad"); }
+  else if (c.cost === "romulan") { log(S, `${o.title}: ${c.costText}.`, "bad"); romulanReprisal(S, o.title); }
   else if (c.cost === "command") markCommand(S, 1, `${o.title}: ${c.costText}.`);
   else log(S, `${o.title}: ${c.costText}.`, "bad");
   return { text: "" };
@@ -1614,7 +1628,7 @@ function missionChoices(S, ev) {
     options: st.choice.options.filter((x) => !x.needs || (x.needs === "inverter" && S.pelion.refits.inverter)).map((x) => ({ id: x.id, name: storyText(S, o, x.name), blurb: storyText(S, o, x.blurb) })) };
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
-  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`,
+  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike",
   heal: (n, w) => `${w}'s harm −${n}`, inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
 function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
@@ -1632,6 +1646,7 @@ function chooseMission(S, orderId, optId) {
     else if (k === "heal" && s) s.harm = Math.max(0, s.harm - n);
     else if (k === "hurt") { const c = CREW.filter((x) => available(S, x.id) && x.id !== "captain"); const v = c[Math.floor(rand(S) * c.length)]; if (v) S.crew[v.id].inj = Math.min(3, S.crew[v.id].inj + n); }
     else if (k === "sensors") S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + n);
+    else if (k === "romulan") romulanReprisal(S, o.title);
     else if (k === "inverter") S.pelion.refits.inverter = Math.max(S.pelion.refits.inverter || 0, n);
     lines.push(FX_TEXT[k] ? FX_TEXT[k](n, w) : k);
   }
