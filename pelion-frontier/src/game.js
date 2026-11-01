@@ -211,7 +211,7 @@ export function cloakContact(S, e) {
 export function cloakChoices(S, ev) {
   const e = S.enemies[ev.enemy]; if (!e) return null;
   const tgt = targetAt(S, e.target), d = distance(e.at, S.pelion.at);
-  return { title: "A ghost on the inverter", text: `The cloak inverter shows what no Federation sensor should: a Romulan bird-of-prey, cloaked, ${d ? `${d} light-year${d === 1 ? "" : "s"} off` : "right on top of the Pelion"} and running for ${tgt ? tgt.name : "Federation space"}. It doesn't know it's been seen.`,
+  return { title: "A ghost on the inverter", text: `It starts as a flicker on the cloak inverter's display that Rrinn almost dismisses as noise, and then doesn't. She sits very still. \"Captain. There's something out there that isn't there.\"\n\nOn the main viewer, false-coloured by the inverter, a shape fills in: wings, a long hull, the painted bird on its belly. A Romulan bird-of-prey, cloaked, ${d ? `${d} light-year${d === 1 ? "" : "s"} off` : "almost alongside"}, running silent for ${tgt ? tgt.name : "Federation space"}. It has no idea it can be seen. Nobody on the bridge speaks above a whisper, as if it might hear them.\n\nsh'Vari is the first to say it. \"We could catch it.\"`,
     options: [
       { id: "pursue", name: "Pursue it", blurb: `Run it down before it reaches ${tgt ? tgt.name : "its target"}: Helm against its helmsman (Helm ${ENEMIES.rbop.helm}). Catch it, and the fight is on your terms: no ambush, and it can't hide.` },
       { id: "hail", name: "Hail it", blurb: `Tell its commander they've been seen: Communications against their Will ${ENEMIES.rbop.will + 2}. A Romulan seen is a Romulan who goes home.` },
@@ -227,17 +227,24 @@ export function chooseCloak(S, id) {
   if (id === "pursue") {
     const r = roll("Helm"), o = opposed(S, r, { name: "the Romulan helmsman", skill: "Helm", target: ENEMIES.rbop.helm }, who(r));
     log(S, o.line, o.win ? "good" : "bad");
-    if (o.win) { S.pelion.at = e.at; S.pelion.days = 0; syncMp(S); e.cloaked = false; log(S, `The Pelion runs the bird-of-prey down. With the inverter on it, its cloak is useless: it has to fight.`, "war"); startBattleHook(S, e.id, "pelion"); e.hostile = true; return { text: o.line + " The Pelion runs it down: its cloak is useless against the inverter, and it has to fight." }; }
+    if (o.win) { S.pelion.at = e.at; S.pelion.days = 0; syncMp(S); e.cloaked = false; log(S, `The Pelion runs the bird-of-prey down. With the inverter on it, its cloak is useless: it has to fight.`, "war");
+      storyEvent(S, "The chase", `${who(r)} takes the Pelion in at full impulse, then warp, then full impulse again, matching every turn the Romulan makes before it makes it. On the bird-of-prey's bridge they must be wondering how: their cloak is perfect, their engines silent, and the Federation ship is still on them.\n\nWhen they finally understand, the bird-of-prey decloaks, all at once, a great green-grey shape against the stars, with its weapons already charging. There is nowhere left to hide. It has to fight.`);
+      startBattleHook(S, e.id, "pelion"); e.hostile = true; return { text: o.line + " The Pelion runs it down: its cloak is useless against the inverter, and it has to fight." }; }
     log(S, `The bird-of-prey slips away toward ${tgt ? tgt.name : "its target"}.`, "bad");
+    storyEvent(S, "The chase", `For an hour it's close. Then the Romulan commander does something no one on the Pelion's bridge expects: cuts engines entirely and drifts, cold and dark, into the debris of a dead comet, where even the inverter can only guess. By the time the guesses resolve, the ghost is gone, still cloaked, still heading for ${tgt ? tgt.name : "its target"}. Rrinn's tail lashes once. \"Clever,\" she says, and doesn't mean it as a compliment.`);
     return { text: o.line + " It's faster than it looks: it slips away, still cloaked, still heading for " + (tgt ? tgt.name : "its target") + "." };
   }
   if (id === "hail") {
     const r = roll("Communications"), o = opposed(S, r, { name: "the Romulan commander", skill: "Will", target: ENEMIES.rbop.will + 2 }, who(r));
     log(S, o.line, o.win ? "good" : "bad");
-    if (o.win) { sendHome(S, e, 0); e.cloaked = true; S.commendations += 1; log(S, "The bird-of-prey turns for the Neutral Zone without a word: a Romulan seen is a Romulan who goes home. +1 commendation.", "good"); return { text: o.line + " Silence on the channel, and then the contact turns for the Neutral Zone. +1 commendation." }; }
+    if (o.win) { sendHome(S, e, 0); e.cloaked = true; S.commendations += 1; log(S, "The bird-of-prey turns for the Neutral Zone without a word: a Romulan seen is a Romulan who goes home. +1 commendation.", "good");
+      storyEvent(S, "Seen", `${who(r)} opens a channel on the Romulan command frequency, and says, very politely, exactly where the bird-of-prey is: its heading, its speed, the name painted on its hull. Then waits.\n\nThere is no reply. There never would be. But after a long minute, on the inverter's display, the ghost banks, slowly, and turns for the Neutral Zone. A Romulan who has been seen is a Romulan who goes home to explain why.`);
+      return { text: o.line + " Silence on the channel, and then the contact turns for the Neutral Zone. +1 commendation." }; }
+    storyEvent(S, "Seen", `${who(r)} hails the bird-of-prey with its own position, heading and speed. The silence on the channel goes on and on. Then, deliberately, the ghost on the inverter's display adjusts its course by a single degree, toward ${tgt ? tgt.name : "its target"}, and keeps going. It has been seen. It doesn't care.`);
     return { text: o.line + " Silence. The contact holds its course." };
   }
-  if (id === "warn" && tgt) { tgt.alerted = S.turn; log(S, `${tgt.name} is warned: its defenses are ready for the bird-of-prey.`, "good"); return { text: `Word goes ahead to ${tgt.name}. When the bird-of-prey decloaks, it will find the defenses ready.` }; }
+  if (id === "warn" && tgt) { tgt.alerted = S.turn; log(S, `${tgt.name} is warned: its defenses are ready for the bird-of-prey.`, "good");
+    storyEvent(S, "Word ahead", `The warning goes out on a tight beam, coded, to ${tgt.name} alone, so the Romulans can't hear it go. At the other end, someone reads it twice, then sounds general quarters. Shields come up. Weapons crews who were off duty come running, half-dressed. When the bird-of-prey decloaks, it will find them waiting.`); return { text: `Word goes ahead to ${tgt.name}. When the bird-of-prey decloaks, it will find the defenses ready.` }; }
   return { text: "The Pelion lets it go." };
 }
 /** How far a sensor sweep reaches for cloaked ships: 3 light-years, 5 with the tuned cloak inverter. */
@@ -757,13 +764,14 @@ function korvathTick(S) {
   if (!C.korvathNext) { C.korvathNext = S.turn + (KORVATH_EVERY[S.difficulty] || 5); return; }
   if (S.turn < C.korvathNext) return;
   C.korvath++; C.korvathNext = S.turn + (KORVATH_EVERY[S.difficulty] || 5);
-  const site = KORVATH_SITES[(C.korvath - 1) % KORVATH_SITES.length];
+  const [site, scene] = KORVATH_SITES[(C.korvath - 1) % KORVATH_SITES.length];
   const near = Object.values(S.systems).filter((s) => ["colony", "member", "independent"].includes(s.kind) && distance(s.at, S.pelion.at) >= 3);
   const w = near.length ? pick(S, near) : null;
   if (w) harmWorld(S, w, 1, `its Makers' site was dug up, and the ground hasn't been still since`);
   S.tension = Math.min(10, S.tension + 1);
   const who = diggersName(S), ahead = C.korvath > C.threads.length;
-  storyEvent(S, `${CAMPAIGN.title}: another site falls`, `Starfleet Intelligence reports another Makers' site dug up: ${site}${w ? `, near ${w.name}` : ""}. No witnesses, again. That's ${C.korvath} site${C.korvath === 1 ? "" : "s"} to ${who}, against the Pelion's ${C.threads.length} thread${C.threads.length === 1 ? "" : "s"}.${ahead ? ` ${who[0].toUpperCase() + who.slice(1)} are ahead.` : ""} Klingon tension rises.${C.korvath >= CAMPAIGN.finaleAt ? "" : ` Every campaign order you carry out sets them back two weeks.`}`);
+  const Who = who[0].toUpperCase() + who.slice(1);
+  storyEvent(S, `${CAMPAIGN.title}: another site falls`, `Rrinn brings the report to the captain's ready room herself, which she only does when it's bad. Starfleet Intelligence, priority one: another Makers' site, ${site}${w ? `, two days' warp from ${w.name}` : ""}.\n\n${scene}\n\n${w ? `${w.name} has felt it already: the ground there hasn't been still since the caretaker was taken. ` : ""}${C.beats.includes(2) ? "On the Klingon side of the border, House Kor'vath is celebrating; Klingon tension rises." : "Across the border, the Klingon Empire takes note of the Federation's troubles: Klingon tension rises."}\n\nThat's ${C.korvath} site${C.korvath === 1 ? "" : "s"} to ${who}, against the Pelion's ${C.threads.length} thread${C.threads.length === 1 ? "" : "s"}.${ahead ? ` ${Who} are ahead, and every week they stay ahead makes the end harder.` : ""}${C.korvath >= CAMPAIGN.finaleAt ? "" : " Every campaign order the Pelion carries out sets them back two weeks."}`);
   if (C.korvath >= CAMPAIGN.finaleAt) { campaignBeat(S, 2); campaignBeat(S, 4); campaignBeat(S, CAMPAIGN.finaleAt); issueFinale(S); }
 }
 /** The final order: the Makers' Gate, in empty space where every relay points. */
@@ -793,10 +801,11 @@ export function chooseComplication(S, optId) {
   const ev = S.event; S.event = null;
   const o = ev && S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && COMPLICATIONS[st.type];
   if (!o || !c) return { text: "" };
-  if (optId === "back") { o.deadline--; log(S, `${o.title}: ${c.title.toLowerCase()}. The captain orders everyone back to regroup: safe, but a week lost (due by turn ${o.deadline} now).`, "bad"); return { text: "" }; }
+  if (optId === "back") { o.deadline--; log(S, `${o.title}: ${c.title.toLowerCase()}. The captain orders everyone back to regroup: safe, but a week lost (due by turn ${o.deadline} now).`, "bad"); storyEvent(S, `${o.title}: falling back`, "The order goes out on every channel: pull back, regroup, nobody takes the risk. The crew obey, and nobody argues, and nobody is hurt. It takes a week to get back to where they were, and everyone aboard can feel the deadline coming closer while they do."); return { text: "" }; }
   const b = bestOfficer(S, c.skills, {}, null) || { officer: "captain", skill: c.skills[0] };
   const t = target(S, b.officer, b.skill), r = check(S, t.total), op = opposed(S, r, c.oppose, officer(b.officer)?.short || "The captain");
   log(S, op.line, op.win ? "good" : "bad");
+  storyEvent(S, `${o.title}: ${c.title.toLowerCase()}`, storyText(S, o, op.win ? c.win : c.lose));
   if (op.win) {
     o.have = Math.min(o.segs - 1, o.have + 1);
     if (st.steps[o.have - 1]) storyEvent(S, `${o.title}: ${st.steps[o.have - 1][0].toLowerCase()}`, storyText(S, o, st.steps[o.have - 1][1]));

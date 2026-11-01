@@ -366,7 +366,7 @@ test("the cloak inverter, later: it spots a cloaked bird-of-prey on a strike, no
   cloakContact(S, e); assert.equal(S.event, null);                       // no inverter: unseen
   S.pelion.refits.inverter = 1; cloakContact(S, e);
   assert.equal(S.event.kind, "cloak-contact"); assert.equal(cloakChoices(S, S.event).options.length, 3);
-  chooseCloak(S, "warn"); assert.equal(S.event, null); assert.equal(tgt.alerted, S.turn);
+  chooseCloak(S, "warn"); assert.equal(S.event.title, "Word ahead"); assert.equal(tgt.alerted, S.turn); S.event = null;
   const f = spawnEnemy(S, "rbop", S.pelion.at, { goal: "strike", target: tgt.at, hostile: true, cloaked: true });
   startBattle(S, f.id, "enemy"); assert.equal(S.battle.ambush, false);   // the inverter sees it coming
 });

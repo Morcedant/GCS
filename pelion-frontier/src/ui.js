@@ -798,14 +798,14 @@ function showEvent() {
   if (ev.kind === "complication") {
     const c = complicationChoices(S, ev);
     if (!c) { S.event = null; after(); return; }
-    modal(`<h2>${esc(c.order.title)}</h2><h3 style="margin-top:0" class="bad">${esc(c.title)}</h3><p>${esc(c.text)}</p>
+    modal(`<h2>${esc(c.order.title)}</h2><h3 style="margin-top:0" class="bad">${esc(c.title)}</h3><p style="white-space:pre-line">${esc(c.text)}</p>
       <div class="grid2">${c.options.map((x) => `<div class="brief"><h3>${esc(x.name)}</h3><p>${esc(x.blurb)}</p><div class="btn-row"><button class="btn ${x.id === "press" ? "red" : "primary"} small" data-complication="${x.id}">${esc(x.name)}</button></div></div>`).join("")}</div>`);
     return;
   }
   if (ev.kind === "cloak-contact") {
     const c = cloakChoices(S, ev);
     if (!c) { S.event = null; after(); return; }
-    modal(`<h2>${esc(c.title)}</h2><p>${esc(c.text)}</p>
+    modal(`<h2>${esc(c.title)}</h2><p style="white-space:pre-line">${esc(c.text)}</p>
       <div class="grid2">${c.options.map((x) => `<div class="brief"><h3>${esc(x.name)}</h3><p>${esc(x.blurb)}</p><div class="btn-row"><button class="btn ${x.id === "pursue" ? "red" : "primary"} small" data-cloak="${x.id}">${esc(x.name)}</button></div></div>`).join("")}</div>`);
     return;
   }
