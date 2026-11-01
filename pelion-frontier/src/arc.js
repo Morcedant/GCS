@@ -148,6 +148,7 @@ export function arcStep(S, p) {
       return checkCountdown(S);
     }
     if (k === "kill") markCommand(S, 1, "Orion pirates killed on Corvan II when stun would have done.");
+    A.diggers = k === "kill" ? "killed" : "prisoners";   // what became of the Orion diggers matters later: the campaign's Act II
     A.stage = "caretaker";
     if (!A.knowPhasers) { A.knowPhasers = true; alog(S, "The Orion diggers' gear includes a tally: eleven disruptor pistols traded to the Ketari for their labor. Starfleet weapons can't be left in a bronze-age village: the away team has to get them back.", "discovery"); }
     A.podsSeen = true;

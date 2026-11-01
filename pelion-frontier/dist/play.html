@@ -406,8 +406,8 @@ const CAMPAIGN = {
   beats: [
     { at: 0, act: "Act I: The Silence", title: "Two sites, and no witnesses", text: "The report from Corvan II reaches Starfleet Command, and Command reads it twice. A machine eleven thousand years old, left by a people who came from the stars, strong enough to drain a Heavy Cruiser in orbit. Starfleet Intelligence searches the sector's records for the same carrier wave and finds it at six more sites.\n\nTwo of them have already been dug up.\n\nAt Hadley's Reach, a Federation survey team of six was cataloguing ruins. Their last report was routine. When the supply ship arrived a week later, the camp was intact, the ruins had been cut open and emptied, and the six were gone: no bodies, no blood, no message, and the camp's logs wiped. At the second site, Thessaly Deep, a mining settlement of forty lived beside the ruins. The relief crew found the homes standing, the lights on, the meals still on the tables, and no one at all. The ruins had been cut open with the same tools.\n\nNo one who saw who did it is left to tell anyone. That's the first thing that worries Starfleet Command. The second is that the machines were guarding something: the world beside Thessaly Deep has had three earthquakes since its caretaker was taken, and it never had any before. The third is the Corvan II report itself. A machine that can pull a starship out of orbit is a weapon, and the Corvan Sector borders the Klingon Empire.\n\nYour orders from here on carry a second purpose. Whatever else you're doing, find out who is digging up the Makers' machines, what they want them for, and stop them before the next site, or the next forty people." },
     { at: 2, act: "Act II: The Diggers", title: "House Kor'vath", text: "The threads come together in the Pelion's briefing room. The Orion diggers aren't working for themselves: their buyer is House Kor'vath, a Klingon house that has been losing ground on the Council and wants something to change that. They're paying in dilithium for every Makers' machine they can get, and they're not keeping them. They're taking them apart." },
-    { at: 4, act: "Act III: The Lines", title: "Every relay points one way", text: "Sevek lays the Makers' sites on the sector chart and draws a line from each relay along the direction it transmits. The lines meet at a single point in empty space. The caretakers weren't just watching the younger worlds: they were reporting to something. House Kor'vath has worked it out too, and so, Rrinn suspects, have the Romulans." },
-    { at: 6, act: "Act IV: The Gate", title: "The Makers' Gate", text: "The last thread confirms it: at the point where every line meets is the Makers' Gate, the way they left, and the way back. Whoever controls it controls every caretaker in the sector, and every world they watch over. House Kor'vath's ships are already moving. Starfleet's orders are short: get there first." },
+    { at: 4, act: "Act III: The Lines", title: "Every relay points one way", text: "Sevek takes the relay readings the Pelion has logged at every Makers' site so far, the transmission bearings each machine was still sending on, and lays them on the sector chart. Each relay transmits along a single line. The lines meet at a single point in empty space. The caretakers weren't just watching the younger worlds: they were reporting to something.\n\nThe same night, Rrinn pulls a burst of Klingon traffic out of the noise near the border: House Kor'vath's diggers being sent coordinates. Decrypted, they're the same bearings. Kor'vath has worked it out too. And the Neutral Zone patrol logs show Romulan ships near three Makers' sites in a month: Rrinn suspects the Romulans have as well." },
+    { at: 6, act: "Act IV: The Gate", title: "The Makers' Gate", text: "The last thread closes the triangle. Sevek's lines no longer meet near a point: they meet at one, to within a light-hour. The Pelion's long-range sensors turn toward it and find a ring of light a kilometre across, turning slowly in empty space: the Makers' Gate, the way they left and the way back. Whoever controls it controls every caretaker in the sector, and every world they watch over.\n\nAn hour later, Rrinn hears House Kor'vath's battle cruiser leave its border station on a heading straight for it. Starfleet's orders are short: get there first." },
   ],
 };
 const STORIES = {
@@ -1489,7 +1489,24 @@ function campaignBeat(S, at) {
   const C = campaignOf(S), b = CAMPAIGN.beats.find((x) => x.at === at);
   if (!b || C.beats.includes(at)) return;
   C.beats.push(at);
-  storyEvent(S, `${CAMPAIGN.title}, ${b.act}: ${b.title}`, b.text);
+  const text = at === 2 ? actTwo(S) : b.text;
+  C.beatText = C.beatText || {}; C.beatText[at] = text;   // the story so far shows what was actually said
+  storyEvent(S, `${CAMPAIGN.title}, ${b.act}: ${b.title}`, text);
+}
+/**
+ * Act II, House Kor'vath: how the Pelion learns who is behind the digging, from what it actually has. The two threads it
+ * has found, and a source that depends on what happened on Corvan II: Orion prisoners in the brig, the cutting gear of the
+ * diggers who died there, or, failing either, the diggers' payments, traced by Rrinn and Starfleet Intelligence.
+ */
+function actTwo(S) {
+  const C = campaignOf(S), A = S.arc, [t1, t2] = C.threads;
+  const threads = [t1, t2].filter(Boolean).map((t) => `${t.title}: ${t.text}`).join("\n") || "The Pelion's own orders have turned up nothing yet: the diggers have been too fast. The evidence comes from closer to home.";
+  const source = A.diggers === "prisoners"
+    ? "The three Orion diggers taken on Corvan II are still in the Pelion's brig. Reyes questions them again, this time with the threads in front of her, and one of them breaks. The digging crews aren't working for themselves: they're paid in dilithium, by the kilo, through an Orion broker, and every payment chit he has ever seen carries the same Klingon house seal. Rrinn identifies it from the Pelion's library: House Kor'vath."
+    : A.diggers === "killed"
+    ? "The Orion diggers who died on Corvan II left their cutting gear behind, and Grath has had it in pieces on his bench ever since. It isn't Orion work: it's Klingon military disruptor-cutters, with a house maker's mark ground half off the casings. Rrinn restores the mark from the scoring that's left: House Kor'vath."
+    : "Rrinn has been listening to Orion traffic ever since Corvan II. The broker channel the digging crews use pays out in dilithium, and Starfleet Intelligence has the dilithium's assay: it comes from a single mine on the Klingon side of the border, held by House Kor'vath.";
+  return `The threads come together in the Pelion's briefing room.\n\n${threads}\n\n${source}\n\nStarfleet Intelligence fills in the rest from its own files: Kor'vath is a Klingon house that has been losing ground on the High Council for a decade, and wants something that will change that. And Sevek has the answer to what they want the machines for. Every site in Starfleet's reports, and the ruin on Corvan II, was cut open at the caretaker's power core, the way an engineer takes out a part, not the way a thief takes a prize. Kor'vath isn't collecting the Makers' machines. It's taking them apart.`;
 }
 /** An order carried out turns up a thread of the campaign; enough threads lead to the Makers' Gate. */
 function campaignThread(S, o) {
@@ -2166,6 +2183,7 @@ function arcStep(S, p) {
       return checkCountdown(S);
     }
     if (k === "kill") markCommand(S, 1, "Orion pirates killed on Corvan II when stun would have done.");
+    A.diggers = k === "kill" ? "killed" : "prisoners";   // what became of the Orion diggers matters later: the campaign's Act II
     A.stage = "caretaker";
     if (!A.knowPhasers) { A.knowPhasers = true; alog(S, "The Orion diggers' gear includes a tally: eleven disruptor pistols traded to the Ketari for their labor. Starfleet weapons can't be left in a bronze-age village: the away team has to get them back.", "discovery"); }
     A.podsSeen = true;
@@ -3246,7 +3264,7 @@ function campaignHTML() {
     <p class="small">${esc(CAMPAIGN.premise)}<\/p>
     <div class="kv small"><span>Threads<\/span><span>${boxes(n, CAMPAIGN.finaleAt, "blue")} ${esc(status)}<\/span>
     ${C.over ? "" : `<span class="bad">${esc(diggersName(S)[0].toUpperCase() + diggersName(S).slice(1))}<\/span><span>${boxes(Math.min(C.korvath || 0, CAMPAIGN.finaleAt), CAMPAIGN.finaleAt)} ${C.korvath || 0} Makers' site${(C.korvath || 0) === 1 ? "" : "s"} dug up${C.finale ? "" : C.korvathNext ? `; the next in about ${Math.max(1, C.korvathNext - S.turn)} week${C.korvathNext - S.turn === 1 ? "" : "s"}` : ""}. ${(C.korvath || 0) > n ? "They're ahead: the Gate will be harder." : "Each campaign order you carry out sets them back two weeks."}<\/span>`}<\/div>`;
-  if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})<\/summary>${beats.map((b) => `<p style="white-space:pre-line"><b>${esc(b.act)}: ${esc(b.title)}.<\/b> ${esc(b.text)}<\/p>`).join("")}<\/details>`;
+  if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})<\/summary>${beats.map((b) => `<p style="white-space:pre-line"><b>${esc(b.act)}: ${esc(b.title)}.<\/b> ${esc((C.beatText && C.beatText[b.at]) || b.text)}<\/p>`).join("")}<\/details>`;
   if (C.threads.length) h += `<details class="small" style="margin-top:4px"><summary>Threads found (${C.threads.length})<\/summary><ol>${C.threads.map((t) => `<li><b>${esc(t.title)}<\/b> (turn ${t.turn}): ${esc(t.text)}<\/li>`).join("")}<\/ol><\/details>`;
   return h + `<\/div>`;
 }

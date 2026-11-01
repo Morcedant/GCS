@@ -669,7 +669,24 @@ function campaignBeat(S, at) {
   const C = campaignOf(S), b = CAMPAIGN.beats.find((x) => x.at === at);
   if (!b || C.beats.includes(at)) return;
   C.beats.push(at);
-  storyEvent(S, `${CAMPAIGN.title}, ${b.act}: ${b.title}`, b.text);
+  const text = at === 2 ? actTwo(S) : b.text;
+  C.beatText = C.beatText || {}; C.beatText[at] = text;   // the story so far shows what was actually said
+  storyEvent(S, `${CAMPAIGN.title}, ${b.act}: ${b.title}`, text);
+}
+/**
+ * Act II, House Kor'vath: how the Pelion learns who is behind the digging, from what it actually has. The two threads it
+ * has found, and a source that depends on what happened on Corvan II: Orion prisoners in the brig, the cutting gear of the
+ * diggers who died there, or, failing either, the diggers' payments, traced by Rrinn and Starfleet Intelligence.
+ */
+function actTwo(S) {
+  const C = campaignOf(S), A = S.arc, [t1, t2] = C.threads;
+  const threads = [t1, t2].filter(Boolean).map((t) => `${t.title}: ${t.text}`).join("\n") || "The Pelion's own orders have turned up nothing yet: the diggers have been too fast. The evidence comes from closer to home.";
+  const source = A.diggers === "prisoners"
+    ? "The three Orion diggers taken on Corvan II are still in the Pelion's brig. Reyes questions them again, this time with the threads in front of her, and one of them breaks. The digging crews aren't working for themselves: they're paid in dilithium, by the kilo, through an Orion broker, and every payment chit he has ever seen carries the same Klingon house seal. Rrinn identifies it from the Pelion's library: House Kor'vath."
+    : A.diggers === "killed"
+    ? "The Orion diggers who died on Corvan II left their cutting gear behind, and Grath has had it in pieces on his bench ever since. It isn't Orion work: it's Klingon military disruptor-cutters, with a house maker's mark ground half off the casings. Rrinn restores the mark from the scoring that's left: House Kor'vath."
+    : "Rrinn has been listening to Orion traffic ever since Corvan II. The broker channel the digging crews use pays out in dilithium, and Starfleet Intelligence has the dilithium's assay: it comes from a single mine on the Klingon side of the border, held by House Kor'vath.";
+  return `The threads come together in the Pelion's briefing room.\n\n${threads}\n\n${source}\n\nStarfleet Intelligence fills in the rest from its own files: Kor'vath is a Klingon house that has been losing ground on the High Council for a decade, and wants something that will change that. And Sevek has the answer to what they want the machines for. Every site in Starfleet's reports, and the ruin on Corvan II, was cut open at the caretaker's power core, the way an engineer takes out a part, not the way a thief takes a prize. Kor'vath isn't collecting the Makers' machines. It's taking them apart.`;
 }
 /** An order carried out turns up a thread of the campaign; enough threads lead to the Makers' Gate. */
 function campaignThread(S, o) {

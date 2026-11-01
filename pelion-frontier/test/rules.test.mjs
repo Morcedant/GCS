@@ -399,3 +399,13 @@ test("tension: the diggers race the Pelion for the sites, complications mid-miss
   S.event = { kind: "complication", orderId: p.id }; chooseComplication(S, "press");
   assert.ok(S.log.some((l) => /opposing/.test(l.text)));
 });
+test("Act II says how the Pelion knows: the threads it found, and a source from what happened on Corvan II", () => {
+  for (const [d, re] of [["prisoners", /brig/], ["killed", /cutting gear/], [undefined, /assay/]]) {
+    const S = newGame({ seed: "act2" }); S.arc.stage = "done"; S.arc.diggers = d; S.campaign.beats = [0];
+    S.orders = []; S.backlog = [];
+    for (let i = 0; i < 2; i++) { const o = newOrder(S); o.campaign = true; S.event = null; S.eventQueue = []; completeOrder(S, o, true); }
+    const ev = [S.event].concat(S.eventQueue || []).find((e) => e && /Act II/.test(e.title));
+    assert.ok(ev && re.test(ev.text) && ev.text.includes(S.campaign.threads[0].text));
+    assert.equal(S.campaign.beatText[2], ev.text);
+  }
+});

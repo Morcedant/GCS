@@ -605,7 +605,7 @@ function campaignHTML() {
     <p class="small">${esc(CAMPAIGN.premise)}</p>
     <div class="kv small"><span>Threads</span><span>${boxes(n, CAMPAIGN.finaleAt, "blue")} ${esc(status)}</span>
     ${C.over ? "" : `<span class="bad">${esc(diggersName(S)[0].toUpperCase() + diggersName(S).slice(1))}</span><span>${boxes(Math.min(C.korvath || 0, CAMPAIGN.finaleAt), CAMPAIGN.finaleAt)} ${C.korvath || 0} Makers' site${(C.korvath || 0) === 1 ? "" : "s"} dug up${C.finale ? "" : C.korvathNext ? `; the next in about ${Math.max(1, C.korvathNext - S.turn)} week${C.korvathNext - S.turn === 1 ? "" : "s"}` : ""}. ${(C.korvath || 0) > n ? "They're ahead: the Gate will be harder." : "Each campaign order you carry out sets them back two weeks."}</span>`}</div>`;
-  if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})</summary>${beats.map((b) => `<p style="white-space:pre-line"><b>${esc(b.act)}: ${esc(b.title)}.</b> ${esc(b.text)}</p>`).join("")}</details>`;
+  if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})</summary>${beats.map((b) => `<p style="white-space:pre-line"><b>${esc(b.act)}: ${esc(b.title)}.</b> ${esc((C.beatText && C.beatText[b.at]) || b.text)}</p>`).join("")}</details>`;
   if (C.threads.length) h += `<details class="small" style="margin-top:4px"><summary>Threads found (${C.threads.length})</summary><ol>${C.threads.map((t) => `<li><b>${esc(t.title)}</b> (turn ${t.turn}): ${esc(t.text)}</li>`).join("")}</ol></details>`;
   return h + `</div>`;
 }
