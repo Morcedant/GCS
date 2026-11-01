@@ -5,7 +5,7 @@
 //  - The Romulan Star Empire: now and then a cloaked bird-of-prey crosses the Neutral Zone to strike, and goes home.
 import { distance } from "./hex.js";
 import { ENEMIES, KINDS } from "./data.js";
-import { rand, pick, findPath, spawnEnemy, harmWorld, log, sendHome, markCommand, closestOutpost, sysAt, cloakContact } from "./game.js";
+import { rand, pick, findPath, spawnEnemy, harmWorld, log, sendHome, markCommand, closestOutpost, sysAt, cloakContact, livePosts, postAt, harmPost } from "./game.js";
 import { inZone } from "./sector.js";
 import { skirmish } from "./combat.js";
 
@@ -43,7 +43,8 @@ export function aiTurn(S) {
   }
   // Romulans.
   if (S.turn >= 9 && S.turn % ev.r === 9 && count(S, "romulan") < 1) {
-    const targets = worlds(S, ["colony", "member"]);
+    // The Romulans strike the listening posts that watch the Zone; only when every post is lost do they reach for worlds.
+    const posts = livePosts(S), targets = posts.length ? posts : worlds(S, ["colony", "member"]);
     if (targets.length) {
       const tgt = pick(S, targets);
       const zone = Object.keys(S.hexes).filter(inZone).sort((a, b) => distance(a, tgt.at) - distance(b, tgt.at));
@@ -80,6 +81,12 @@ export function aiTurn(S) {
       // One strike, then away: a raid harms a world once and the raider makes for home. Federation worlds have their own
       // defenses, which drive off a raid 30% of the time.
       if (s) s.raidedAt = S.turn;
+      const post = e.goal === "strike" && postAt(S, e.at);
+      if (post) {
+        if (post.alerted && S.turn - post.alerted <= 6) { log(S, `Warned by the Pelion, ${post.name} has its shields up when the bird-of-prey decloaks: it turns for the Neutral Zone without firing a shot.`, "good"); delete post.alerted; S.commendations += 1; }
+        else harmPost(S, post, "a Romulan bird-of-prey decloaked beside it, fired, and turned for home");
+        e.cloaked = false; e.seen = true; sendHome(S, e, 0); continue;
+      }
       if (s && e.goal === "strike" && s.alerted && S.turn - s.alerted <= 6) {
         log(S, `Warned by the Pelion, ${s.name}'s defenses are waiting when the bird-of-prey decloaks: it turns for the Neutral Zone without firing a shot.`, "good");
         e.cloaked = false; e.seen = true; delete s.alerted; S.commendations += 1; sendHome(S, e, 0); continue;

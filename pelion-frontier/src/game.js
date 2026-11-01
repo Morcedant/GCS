@@ -48,6 +48,7 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
   const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");
   spawnEnemy(S, "orionBase", ob.at, { goal: "base", hostile: true, found: false });
   log(S, "Orders from Starfleet Command, urgent: the research outpost on Corvan II has gone silent. Proceed at maximum emergency warp and investigate.", "order");
+  postsOf(S);   // the listening posts on the Neutral Zone
   // Starfleet's other orders for the Pelion are already waiting: in the backlog until Corvan II is done.
   for (let i = 0; i < 3; i++) newOrder(S);
   updateVisibility(S);
@@ -164,17 +165,37 @@ export function warpText(w) {
 /** Orders that call for maximum warp. */
 export const isUrgent = (o) => !!(o && (o.urgent || (o.twist && o.twist.fx === "urgent")));
 /** Ly a week the Pelion makes at its current warp (what "speed" means now). */
+// ---------- the listening posts on the Neutral Zone ----------
+// Three Federation listening posts watch the Romulan Neutral Zone from the row of hexes just outside it. When the Romulans
+// strike, it's at them: a bird-of-prey crosses, decloaks, fires and goes home. Three hits and a post is lost.
+const POST_NAMES = ["Listening Post Kappa", "Listening Post Sigma", "Listening Post Tau"];
+export function postsOf(S) {
+  if (S.posts) return S.posts;
+  const row = Object.keys(S.hexes).filter((k) => nearZone(k) && !S.sysAt[k]).sort((a, b) => Number(a.split(",")[0]) - Number(b.split(",")[0]));
+  S.posts = {};
+  POST_NAMES.forEach((name, i) => { const at = row[Math.floor(((i + 0.5) * row.length) / POST_NAMES.length)]; if (at) S.posts["p" + i] = { id: "p" + i, name, at, harm: 0, lost: false }; });
+  return S.posts;
+}
+export const postAt = (S, hex) => Object.values(postsOf(S)).find((p) => p.at === hex && !p.lost);
+export const livePosts = (S) => Object.values(postsOf(S)).filter((p) => !p.lost);
+/** What a ship is heading for, by name: a listening post or a world. */
+export const targetAt = (S, hex) => postAt(S, hex) || sysAt(S, hex);
+export function harmPost(S, p, why) {
+  p.harm = Math.min(3, p.harm + 1);
+  if (p.harm >= 3) { p.lost = true; log(S, `${p.name} is lost: ${why}. The Neutral Zone has one less pair of ears on it.`, "bad"); }
+  else log(S, `${p.name} is hit: ${why}. Damage ${p.harm}/3 (at 3 the post is lost).`, "bad");
+}
 /**
  * The Romulans answer a provocation on their border the way they always do: a cloaked bird-of-prey crosses the Neutral
- * Zone and strikes a Federation world. (Klingon tension is the Klingon Empire's; the Romulans keep their own accounts.)
+ * Zone and strikes one of the listening posts that watch it (a Federation world, if every post is lost). (Klingon tension is the Klingon Empire's; the Romulans keep their own accounts.)
  */
 export function romulanReprisal(S, why) {
-  const targets = Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member");
+  const posts = livePosts(S), targets = posts.length ? posts : Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member");
   if (!targets.length) return;
   const tgt = pick(S, targets), zone = Object.keys(S.hexes).filter(inZone).sort((a, b) => distance(a, tgt.at) - distance(b, tgt.at));
   if (!zone.length) return;
   spawnEnemy(S, "rbop", zone[0], { goal: "strike", target: tgt.at, hostile: true, cloaked: true, home: zone[0] });
-  log(S, `Intelligence: after ${why}, Romulan traffic surges along the Neutral Zone. Somewhere out there, cloaked, a bird-of-prey is heading for a Federation world.`, "war");
+  log(S, `Intelligence: after ${why}, Romulan traffic surges along the Neutral Zone. Somewhere out there, cloaked, a bird-of-prey is heading for ${posts.length ? "one of the listening posts on the Zone" : "a Federation world"}.`, "war");
 }
 // ---------- the cloak inverter, later ----------
 // With the inverter fitted, a cloaked Romulan bird-of-prey on a strike that passes within its range is seen, and the
@@ -185,11 +206,11 @@ export function cloakContact(S, e) {
   e.contacted = true; e.revealed = true;
   const ev = { kind: "cloak-contact", enemy: e.id };
   if (S.event || S.battle) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
-  log(S, `The cloak inverter paints a cloaked Romulan bird-of-prey ${distance(e.at, S.pelion.at) ? `${distance(e.at, S.pelion.at)} light-years off, on ${navBearing(S, S.pelion.at, e.at).text}` : "right beside the Pelion"}, heading for ${sysAt(S, e.target)?.name || "Federation space"}.`, "discovery");
+  log(S, `The cloak inverter paints a cloaked Romulan bird-of-prey ${distance(e.at, S.pelion.at) ? `${distance(e.at, S.pelion.at)} light-years off, on ${navBearing(S, S.pelion.at, e.at).text}` : "right beside the Pelion"}, heading for ${targetAt(S, e.target)?.name || "Federation space"}.`, "discovery");
 }
 export function cloakChoices(S, ev) {
   const e = S.enemies[ev.enemy]; if (!e) return null;
-  const tgt = sysAt(S, e.target), d = distance(e.at, S.pelion.at);
+  const tgt = targetAt(S, e.target), d = distance(e.at, S.pelion.at);
   return { title: "A ghost on the inverter", text: `The cloak inverter shows what no Federation sensor should: a Romulan bird-of-prey, cloaked, ${d ? `${d} light-year${d === 1 ? "" : "s"} off` : "right on top of the Pelion"} and running for ${tgt ? tgt.name : "Federation space"}. It doesn't know it's been seen.`,
     options: [
       { id: "pursue", name: "Pursue it", blurb: `Run it down before it reaches ${tgt ? tgt.name : "its target"}: Helm against its helmsman (Helm ${ENEMIES.rbop.helm}). Catch it, and the fight is on your terms: no ambush, and it can't hide.` },
@@ -202,7 +223,7 @@ export function chooseCloak(S, id) {
   S.event = null;
   if (!e) return { text: "The contact is gone." };
   const roll = (skill) => { const b = bestOfficer(S, [skill], {}, null) || { officer: "captain", skill }; const t = target(S, b.officer, skill); return { ...check(S, t.total), officer: b.officer, skill }; };
-  const who = (r) => officer(r.officer)?.short || "The captain", tgt = sysAt(S, e.target);
+  const who = (r) => officer(r.officer)?.short || "The captain", tgt = targetAt(S, e.target);
   if (id === "pursue") {
     const r = roll("Helm"), o = opposed(S, r, { name: "the Romulan helmsman", skill: "Helm", target: ENEMIES.rbop.helm }, who(r));
     log(S, o.line, o.win ? "good" : "bad");
@@ -910,7 +931,9 @@ export function newOrder(S) {
   let at = null, sys = null;
   const from = S.pelion.at;
   if (m.where.includes("border")) {
-    const hexes = Object.keys(S.hexes).filter((k) => nearZone(k) && distance(k, from) >= 3);
+    // Border orders go to a listening post on the Zone if one's still standing.
+    const posts = livePosts(S).filter((p) => distance(p.at, from) >= 3);
+    const hexes = posts.length ? posts.map((p) => p.at) : Object.keys(S.hexes).filter((k) => nearZone(k) && distance(k, from) >= 3);
     at = pick(S, hexes);
   } else {
     const cands = Object.values(S.systems).filter((s) => (m.where.includes(s.kind) || (s.kind === "member" && m.where.includes("independent")) || (s.kind === "orionBase" && m.where.includes("empty")))
@@ -924,6 +947,7 @@ export function newOrder(S) {
   const dist = Math.ceil(distance(from, at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
   const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
     deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, (STORIES[m.text] && STORIES[m.text].strange) || STRANGE), key: pick(S, (STORIES[m.text] && STORIES[m.text].keys) || KEYS), oppose: orderOpposition(m.oppose, twist) };
+  if (postAt(S, at)) o.place = postAt(S, at).name;
   if (STORIES[m.text]) { o.story = m.text; o.text = storyText(S, o, STORIES[m.text].brief); }
   // About half of all orders are part of the campaign (once it has begun); the rest are the frontier's ordinary work.
   const C = campaignOf(S); o.campaign = !C.over && rand(S) < 0.5;
@@ -991,6 +1015,7 @@ export function score(S) {
     ["Starfleet Command track", -S.command * 4],
     ["Worlds lost to the Klingon Empire", -S.lostWorlds * 8],
     ["Colonies lost", -S.lostColonies * 10],
+    ["Listening posts lost", -Object.values(postsOf(S)).filter((p) => p.lost).length * 5],
     [`${CAMPAIGN.title}: threads found`, Math.min(CAMPAIGN.finaleAt, campaignOf(S).threads.length) * 2],
     [`${CAMPAIGN.title}: the Gate`, campaignOf(S).over === "close" || campaignOf(S).over === "guard" ? 25 : campaignOf(S).over === "lost" ? -10 : 0],
   ];

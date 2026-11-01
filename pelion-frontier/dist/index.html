@@ -381,9 +381,11 @@ const SHIP_SHAPES = {
   // An Orion raider: a lean arrowhead with swept fins, built for speed.
   orion: "M12 0 L1 -2.4 L-5 -8.5 L-7 -8.5 L-4.5 -2.6 L-10.5 -1.2 L-10.5 1.2 L-4.5 2.6 L-7 8.5 L-5 8.5 L1 2.4 Z M3 -1 L-3 -1 M3 1 L-3 1",
   // An Orion pirate base: a ring station on spokes.
+  // A Federation listening post: a small station with a sensor dish, watching the Neutral Zone.
+  post: "M-7 -2.2 L7 -2.2 L7 2.2 L-7 2.2 Z M-2.2 -6 L2.2 -6 L2.2 6 L-2.2 6 Z M-9.5 -3.5 L-7 -2.2 L-7 2.2 L-9.5 3.5 Z M9.5 -3.5 L7 -2.2 L7 2.2 L9.5 3.5 Z M0 -6 L0 -8.5 M-4 -9.5 Q0 -12.5 4 -9.5 Z",
   orionBase: "M10 0 A10 10 0 1 1 -10 0 A10 10 0 1 1 10 0 Z M7 0 A7 7 0 1 1 -7 0 A7 7 0 1 1 7 0 Z M3 0 A3 3 0 1 1 -3 0 A3 3 0 1 1 3 0 Z M3 0 L7 0 M-3 0 L-7 0 M0 3 L0 7 M0 -3 L0 -7",
 };
-const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", science: "Science vessel", kbc: "Klingon battle cruiser", kbop: "Klingon bird-of-prey", rbop: "Romulan bird-of-prey", orion: "Orion raider", orionBase: "Orion pirate base" };
+const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", science: "Science vessel", kbc: "Klingon battle cruiser", kbop: "Klingon bird-of-prey", rbop: "Romulan bird-of-prey", orion: "Orion raider", orionBase: "Orion pirate base", post: "Federation listening post" };
 
 // ---- stories.js ----
 // The stories behind each kind of order, in the way of The Silence at Corvan II: a briefing, a scene on arrival, a scene
@@ -868,6 +870,7 @@ function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
   const ob = Object.values(S.systems).find((s) => s.kind === "orionBase");
   spawnEnemy(S, "orionBase", ob.at, { goal: "base", hostile: true, found: false });
   log(S, "Orders from Starfleet Command, urgent: the research outpost on Corvan II has gone silent. Proceed at maximum emergency warp and investigate.", "order");
+  postsOf(S);   // the listening posts on the Neutral Zone
   // Starfleet's other orders for the Pelion are already waiting: in the backlog until Corvan II is done.
   for (let i = 0; i < 3; i++) newOrder(S);
   updateVisibility(S);
@@ -984,17 +987,37 @@ function warpText(w) {
 /** Orders that call for maximum warp. */
 const isUrgent = (o) => !!(o && (o.urgent || (o.twist && o.twist.fx === "urgent")));
 /** Ly a week the Pelion makes at its current warp (what "speed" means now). */
+// ---------- the listening posts on the Neutral Zone ----------
+// Three Federation listening posts watch the Romulan Neutral Zone from the row of hexes just outside it. When the Romulans
+// strike, it's at them: a bird-of-prey crosses, decloaks, fires and goes home. Three hits and a post is lost.
+const POST_NAMES = ["Listening Post Kappa", "Listening Post Sigma", "Listening Post Tau"];
+function postsOf(S) {
+  if (S.posts) return S.posts;
+  const row = Object.keys(S.hexes).filter((k) => nearZone(k) && !S.sysAt[k]).sort((a, b) => Number(a.split(",")[0]) - Number(b.split(",")[0]));
+  S.posts = {};
+  POST_NAMES.forEach((name, i) => { const at = row[Math.floor(((i + 0.5) * row.length) / POST_NAMES.length)]; if (at) S.posts["p" + i] = { id: "p" + i, name, at, harm: 0, lost: false }; });
+  return S.posts;
+}
+const postAt = (S, hex) => Object.values(postsOf(S)).find((p) => p.at === hex && !p.lost);
+const livePosts = (S) => Object.values(postsOf(S)).filter((p) => !p.lost);
+/** What a ship is heading for, by name: a listening post or a world. */
+const targetAt = (S, hex) => postAt(S, hex) || sysAt(S, hex);
+function harmPost(S, p, why) {
+  p.harm = Math.min(3, p.harm + 1);
+  if (p.harm >= 3) { p.lost = true; log(S, `${p.name} is lost: ${why}. The Neutral Zone has one less pair of ears on it.`, "bad"); }
+  else log(S, `${p.name} is hit: ${why}. Damage ${p.harm}/3 (at 3 the post is lost).`, "bad");
+}
 /**
  * The Romulans answer a provocation on their border the way they always do: a cloaked bird-of-prey crosses the Neutral
- * Zone and strikes a Federation world. (Klingon tension is the Klingon Empire's; the Romulans keep their own accounts.)
+ * Zone and strikes one of the listening posts that watch it (a Federation world, if every post is lost). (Klingon tension is the Klingon Empire's; the Romulans keep their own accounts.)
  */
 function romulanReprisal(S, why) {
-  const targets = Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member");
+  const posts = livePosts(S), targets = posts.length ? posts : Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member");
   if (!targets.length) return;
   const tgt = pick(S, targets), zone = Object.keys(S.hexes).filter(inZone).sort((a, b) => distance(a, tgt.at) - distance(b, tgt.at));
   if (!zone.length) return;
   spawnEnemy(S, "rbop", zone[0], { goal: "strike", target: tgt.at, hostile: true, cloaked: true, home: zone[0] });
-  log(S, `Intelligence: after ${why}, Romulan traffic surges along the Neutral Zone. Somewhere out there, cloaked, a bird-of-prey is heading for a Federation world.`, "war");
+  log(S, `Intelligence: after ${why}, Romulan traffic surges along the Neutral Zone. Somewhere out there, cloaked, a bird-of-prey is heading for ${posts.length ? "one of the listening posts on the Zone" : "a Federation world"}.`, "war");
 }
 // ---------- the cloak inverter, later ----------
 // With the inverter fitted, a cloaked Romulan bird-of-prey on a strike that passes within its range is seen, and the
@@ -1005,11 +1028,11 @@ function cloakContact(S, e) {
   e.contacted = true; e.revealed = true;
   const ev = { kind: "cloak-contact", enemy: e.id };
   if (S.event || S.battle) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
-  log(S, `The cloak inverter paints a cloaked Romulan bird-of-prey ${distance(e.at, S.pelion.at) ? `${distance(e.at, S.pelion.at)} light-years off, on ${navBearing(S, S.pelion.at, e.at).text}` : "right beside the Pelion"}, heading for ${sysAt(S, e.target)?.name || "Federation space"}.`, "discovery");
+  log(S, `The cloak inverter paints a cloaked Romulan bird-of-prey ${distance(e.at, S.pelion.at) ? `${distance(e.at, S.pelion.at)} light-years off, on ${navBearing(S, S.pelion.at, e.at).text}` : "right beside the Pelion"}, heading for ${targetAt(S, e.target)?.name || "Federation space"}.`, "discovery");
 }
 function cloakChoices(S, ev) {
   const e = S.enemies[ev.enemy]; if (!e) return null;
-  const tgt = sysAt(S, e.target), d = distance(e.at, S.pelion.at);
+  const tgt = targetAt(S, e.target), d = distance(e.at, S.pelion.at);
   return { title: "A ghost on the inverter", text: `The cloak inverter shows what no Federation sensor should: a Romulan bird-of-prey, cloaked, ${d ? `${d} light-year${d === 1 ? "" : "s"} off` : "right on top of the Pelion"} and running for ${tgt ? tgt.name : "Federation space"}. It doesn't know it's been seen.`,
     options: [
       { id: "pursue", name: "Pursue it", blurb: `Run it down before it reaches ${tgt ? tgt.name : "its target"}: Helm against its helmsman (Helm ${ENEMIES.rbop.helm}). Catch it, and the fight is on your terms: no ambush, and it can't hide.` },
@@ -1022,7 +1045,7 @@ function chooseCloak(S, id) {
   S.event = null;
   if (!e) return { text: "The contact is gone." };
   const roll = (skill) => { const b = bestOfficer(S, [skill], {}, null) || { officer: "captain", skill }; const t = target(S, b.officer, skill); return { ...check(S, t.total), officer: b.officer, skill }; };
-  const who = (r) => officer(r.officer)?.short || "The captain", tgt = sysAt(S, e.target);
+  const who = (r) => officer(r.officer)?.short || "The captain", tgt = targetAt(S, e.target);
   if (id === "pursue") {
     const r = roll("Helm"), o = opposed(S, r, { name: "the Romulan helmsman", skill: "Helm", target: ENEMIES.rbop.helm }, who(r));
     log(S, o.line, o.win ? "good" : "bad");
@@ -1730,7 +1753,9 @@ function newOrder(S) {
   let at = null, sys = null;
   const from = S.pelion.at;
   if (m.where.includes("border")) {
-    const hexes = Object.keys(S.hexes).filter((k) => nearZone(k) && distance(k, from) >= 3);
+    // Border orders go to a listening post on the Zone if one's still standing.
+    const posts = livePosts(S).filter((p) => distance(p.at, from) >= 3);
+    const hexes = posts.length ? posts.map((p) => p.at) : Object.keys(S.hexes).filter((k) => nearZone(k) && distance(k, from) >= 3);
     at = pick(S, hexes);
   } else {
     const cands = Object.values(S.systems).filter((s) => (m.where.includes(s.kind) || (s.kind === "member" && m.where.includes("independent")) || (s.kind === "orionBase" && m.where.includes("empty")))
@@ -1744,6 +1769,7 @@ function newOrder(S) {
   const dist = Math.ceil(distance(from, at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
   const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
     deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, (STORIES[m.text] && STORIES[m.text].strange) || STRANGE), key: pick(S, (STORIES[m.text] && STORIES[m.text].keys) || KEYS), oppose: orderOpposition(m.oppose, twist) };
+  if (postAt(S, at)) o.place = postAt(S, at).name;
   if (STORIES[m.text]) { o.story = m.text; o.text = storyText(S, o, STORIES[m.text].brief); }
   // About half of all orders are part of the campaign (once it has begun); the rest are the frontier's ordinary work.
   const C = campaignOf(S); o.campaign = !C.over && rand(S) < 0.5;
@@ -1811,6 +1837,7 @@ function score(S) {
     ["Starfleet Command track", -S.command * 4],
     ["Worlds lost to the Klingon Empire", -S.lostWorlds * 8],
     ["Colonies lost", -S.lostColonies * 10],
+    ["Listening posts lost", -Object.values(postsOf(S)).filter((p) => p.lost).length * 5],
     [`${CAMPAIGN.title}: threads found`, Math.min(CAMPAIGN.finaleAt, campaignOf(S).threads.length) * 2],
     [`${CAMPAIGN.title}: the Gate`, campaignOf(S).over === "close" || campaignOf(S).over === "guard" ? 25 : campaignOf(S).over === "lost" ? -10 : 0],
   ];
@@ -2461,7 +2488,8 @@ function aiTurn(S) {
   }
   // Romulans.
   if (S.turn >= 9 && S.turn % ev.r === 9 && count(S, "romulan") < 1) {
-    const targets = worlds(S, ["colony", "member"]);
+    // The Romulans strike the listening posts that watch the Zone; only when every post is lost do they reach for worlds.
+    const posts = livePosts(S), targets = posts.length ? posts : worlds(S, ["colony", "member"]);
     if (targets.length) {
       const tgt = pick(S, targets);
       const zone = Object.keys(S.hexes).filter(inZone).sort((a, b) => distance(a, tgt.at) - distance(b, tgt.at));
@@ -2498,6 +2526,12 @@ function aiTurn(S) {
       // One strike, then away: a raid harms a world once and the raider makes for home. Federation worlds have their own
       // defenses, which drive off a raid 30% of the time.
       if (s) s.raidedAt = S.turn;
+      const post = e.goal === "strike" && postAt(S, e.at);
+      if (post) {
+        if (post.alerted && S.turn - post.alerted <= 6) { log(S, `Warned by the Pelion, ${post.name} has its shields up when the bird-of-prey decloaks: it turns for the Neutral Zone without firing a shot.`, "good"); delete post.alerted; S.commendations += 1; }
+        else harmPost(S, post, "a Romulan bird-of-prey decloaked beside it, fired, and turned for home");
+        e.cloaked = false; e.seen = true; sendHome(S, e, 0); continue;
+      }
       if (s && e.goal === "strike" && s.alerted && S.turn - s.alerted <= 6) {
         log(S, `Warned by the Pelion, ${s.name}'s defenses are waiting when the bird-of-prey decloaks: it turns for the Neutral Zone without firing a shot.`, "good");
         e.cloaked = false; e.seen = true; delete s.alerted; S.commendations += 1; sendHome(S, e, 0); continue;
@@ -2590,6 +2624,7 @@ function endTurn(S) {
     for (const s of sys.filter((x) => x.kind === "independent")) if (k.some((o) => distance(o.at, s.at) <= 3) && s.accord > -5) { s.accord--; if (s.accord <= -5) claim(S, s); }
   }
   // Worlds rebuild: with no raider overhead, a harm box clears every 4 turns.
+  if (S.turn % 4 === 0) for (const p of Object.values(S.posts || {})) if (p.harm > 0 && !p.lost) { p.harm--; log(S, `${p.name} is repaired: damage ${p.harm}/3.`, "good"); }
   if (S.turn % 4 === 0) for (const s of sys) if (s.harm > 0 && !Object.values(S.enemies).some((e) => e.at === s.at && e.hostile)) { s.harm--; log(S, `${s.name} rebuilds: harm ${s.harm}/3.`, "good"); }
   if (S.turn % 6 === 0 && S.tension > 0) S.tension--;
   // New orders.
@@ -2844,6 +2879,12 @@ function draw() {
   // Ships: an outline of each ship, in its power's color, turned to its heading.
   const dirAng = (i) => ((sideHeading(i) - 100) * Math.PI) / 200;   // canvas angle (0 = east) of hex side i
   const headingTo = (from, to) => { if (!to || to === from) return 0; const a = toPixel(from, size), b = toPixel(to, size); return Math.atan2(b.y - a.y, b.x - a.x); };
+  // The listening posts on the Neutral Zone.
+  for (const p of Object.values(postsOf(S))) {
+    const { x, y } = toPixel(p.at, size);
+    ctx.globalAlpha = p.lost ? 0.35 : 1; drawShip(ctx, "post", x, y, 0, 0.75, p.lost ? "#8e9ab4" : "#6fb4ff", p.harm && !p.lost ? "rgba(255,80,64,.6)" : null); ctx.globalAlpha = 1;
+    if (view.zoom > 0.6) { ctx.font = "600 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = p.lost ? "#8e9ab4" : "#9fd0ff"; ctx.fillText(p.name.replace("Listening Post ", "LP ") + (p.lost ? " (lost)" : p.harm ? ` ${p.harm}/3` : ""), x, y + 18); ctx.textAlign = "left"; }
+  }
   const byHex = {};
   for (const e of visibleEnemies(S)) (byHex[e.at] = byHex[e.at] || []).push(e);
   for (const [hex, list] of Object.entries(byHex)) { const { x, y } = toPixel(hex, size); list.forEach((e, i) => {
@@ -3048,6 +3089,8 @@ function hereHTML() {
   h += `<h2>${esc(s ? s.name : S.hexes[hex].terrain === "zone" ? "The Neutral Zone" : S.hexes[hex].terrain === "nebula" ? "Nebula" : "Open space")}<\/h2>`;
   h += `<p class="muted">${s ? esc(k ? kindName({ ...s, kind: k }) : "Uncharted system: survey it to find out") : ""}${S.hexes[hex].terrain === "nebula" ? " · Nebula: counts as 2 light-years of travel" : ""}${inZone(hex) ? " · Entering marks Starfleet Command, unless orders send you" : ""}<\/p>`;
   h += `<p class="small muted" style="margin-top:-4px">Position: ${esc(position(S, hex).text)}<\/p>`;
+  { const lp = Object.values(postsOf(S)).find((p) => p.at === hex);
+    if (lp) h += `<div class="card ${lp.lost ? "" : "blue"}"><h4>${esc(lp.name)}<\/h4><div class="small">${lp.lost ? "Lost to Romulan strikes. The Neutral Zone has one less pair of ears on it." : `A Federation listening post watching the Romulan Neutral Zone. When the Romulans strike, it's at posts like this one. Damage ${lp.harm}/3: at 3 it's lost. Repairs clear a box every four weeks.`}<\/div><\/div>`; }
   if (s && k === "independent") h += `<div class="kv"><span>Accord<\/span><span>${s.accord > 0 ? "+" : ""}${s.accord} (Federation at +5, Klingon Empire at −5)<\/span><\/div>`;
   if (s && s.harm) h += `<div class="kv"><span>Harm<\/span><span class="bad">${s.harm}/3<\/span><\/div>`;
   if (s && (k === "anomaly" || k === "ruins") && s.surveyed) h += `<div class="kv"><span>Discovery<\/span><span>${s.recorded ? "Recorded" : `${s.clock}/${s.need}`}<\/span><\/div>`;

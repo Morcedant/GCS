@@ -45,6 +45,7 @@ export function endTurn(S) {
     for (const s of sys.filter((x) => x.kind === "independent")) if (k.some((o) => distance(o.at, s.at) <= 3) && s.accord > -5) { s.accord--; if (s.accord <= -5) claim(S, s); }
   }
   // Worlds rebuild: with no raider overhead, a harm box clears every 4 turns.
+  if (S.turn % 4 === 0) for (const p of Object.values(S.posts || {})) if (p.harm > 0 && !p.lost) { p.harm--; log(S, `${p.name} is repaired: damage ${p.harm}/3.`, "good"); }
   if (S.turn % 4 === 0) for (const s of sys) if (s.harm > 0 && !Object.values(S.enemies).some((e) => e.at === s.at && e.hostile)) { s.harm--; log(S, `${s.name} rebuilds: harm ${s.harm}/3.`, "good"); }
   if (S.turn % 6 === 0 && S.tension > 0) S.tension--;
   // New orders.

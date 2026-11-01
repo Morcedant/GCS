@@ -413,8 +413,10 @@ test("bringing a Romulan defector out angers the Romulans, not the Klingons", ()
   const S = newGame({ seed: "defect" }); S.orders = []; S.backlog = []; S.arc.stage = "done";
   let o; for (let i = 0; i < 300 && !(o && o.story === "Carry a message across the Neutral Zone"); i++) { o = newOrder(S); S.orders = []; }
   S.orders = [o]; o.have = o.segs; S.event = { kind: "mission-choice", orderId: o.id };
-  const t = S.tension, rb = Object.values(S.enemies).filter((e) => e.type === "rbop").length;
+  const t = S.tension, rb = Object.values(S.enemies).filter((e) => e.type === "rbop" && e.goal === "strike").length;
   assert.ok(chooseMission(S, o.id, "take").ok);
   assert.equal(S.tension, t);                                                        // the Klingons don't care
-  assert.equal(Object.values(S.enemies).filter((e) => e.type === "rbop" && e.goal === "strike").length, rb + 1);   // the Romulans answer
+  const strikes = Object.values(S.enemies).filter((e) => e.type === "rbop" && e.goal === "strike");
+  assert.equal(strikes.length, rb + 1);                                              // the Romulans answer
+  assert.ok(Object.values(S.posts).some((p) => p.at === strikes.at(-1).target));     // at a listening post on the Zone
 });

@@ -2,7 +2,7 @@
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
-  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, missionChoices, chooseMission, cloakChoices, chooseCloak, complicationChoices, chooseComplication, diggersName, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType } from "./game.js";
+  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, postsOf, postAt, missionChoices, chooseMission, cloakChoices, chooseCloak, complicationChoices, chooseComplication, diggersName, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType } from "./game.js";
 import { storyOf, CAMPAIGN } from "./stories.js";
 import { SHIP_SHAPES } from "./ships.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
@@ -171,6 +171,12 @@ function draw() {
   // Ships: an outline of each ship, in its power's color, turned to its heading.
   const dirAng = (i) => ((sideHeading(i) - 100) * Math.PI) / 200;   // canvas angle (0 = east) of hex side i
   const headingTo = (from, to) => { if (!to || to === from) return 0; const a = toPixel(from, size), b = toPixel(to, size); return Math.atan2(b.y - a.y, b.x - a.x); };
+  // The listening posts on the Neutral Zone.
+  for (const p of Object.values(postsOf(S))) {
+    const { x, y } = toPixel(p.at, size);
+    ctx.globalAlpha = p.lost ? 0.35 : 1; drawShip(ctx, "post", x, y, 0, 0.75, p.lost ? "#8e9ab4" : "#6fb4ff", p.harm && !p.lost ? "rgba(255,80,64,.6)" : null); ctx.globalAlpha = 1;
+    if (view.zoom > 0.6) { ctx.font = "600 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = p.lost ? "#8e9ab4" : "#9fd0ff"; ctx.fillText(p.name.replace("Listening Post ", "LP ") + (p.lost ? " (lost)" : p.harm ? ` ${p.harm}/3` : ""), x, y + 18); ctx.textAlign = "left"; }
+  }
   const byHex = {};
   for (const e of visibleEnemies(S)) (byHex[e.at] = byHex[e.at] || []).push(e);
   for (const [hex, list] of Object.entries(byHex)) { const { x, y } = toPixel(hex, size); list.forEach((e, i) => {
@@ -375,6 +381,8 @@ function hereHTML() {
   h += `<h2>${esc(s ? s.name : S.hexes[hex].terrain === "zone" ? "The Neutral Zone" : S.hexes[hex].terrain === "nebula" ? "Nebula" : "Open space")}</h2>`;
   h += `<p class="muted">${s ? esc(k ? kindName({ ...s, kind: k }) : "Uncharted system: survey it to find out") : ""}${S.hexes[hex].terrain === "nebula" ? " · Nebula: counts as 2 light-years of travel" : ""}${inZone(hex) ? " · Entering marks Starfleet Command, unless orders send you" : ""}</p>`;
   h += `<p class="small muted" style="margin-top:-4px">Position: ${esc(position(S, hex).text)}</p>`;
+  { const lp = Object.values(postsOf(S)).find((p) => p.at === hex);
+    if (lp) h += `<div class="card ${lp.lost ? "" : "blue"}"><h4>${esc(lp.name)}</h4><div class="small">${lp.lost ? "Lost to Romulan strikes. The Neutral Zone has one less pair of ears on it." : `A Federation listening post watching the Romulan Neutral Zone. When the Romulans strike, it's at posts like this one. Damage ${lp.harm}/3: at 3 it's lost. Repairs clear a box every four weeks.`}</div></div>`; }
   if (s && k === "independent") h += `<div class="kv"><span>Accord</span><span>${s.accord > 0 ? "+" : ""}${s.accord} (Federation at +5, Klingon Empire at −5)</span></div>`;
   if (s && s.harm) h += `<div class="kv"><span>Harm</span><span class="bad">${s.harm}/3</span></div>`;
   if (s && (k === "anomaly" || k === "ruins") && s.surveyed) h += `<div class="kv"><span>Discovery</span><span>${s.recorded ? "Recorded" : `${s.clock}/${s.need}`}</span></div>`;
