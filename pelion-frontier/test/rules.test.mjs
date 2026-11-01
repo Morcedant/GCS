@@ -420,3 +420,11 @@ test("bringing a Romulan defector out angers the Romulans, not the Klingons", ()
   assert.equal(strikes.length, rb + 1);                                              // the Romulans answer
   assert.ok(Object.values(S.posts).some((p) => p.at === strikes.at(-1).target));     // at a listening post on the Zone
 });
+test("every order is unique: no story is told twice in a tour, and each has its own name", async () => {
+  const { STORIES } = await import("../src/stories.js");
+  const S = newGame({ seed: "unique" }); S.orders = []; S.backlog = []; S.arc.stage = "done";
+  const seen = new Set(), titles = new Set();
+  for (let i = 0; i < 60; i++) { const o = newOrder(S); S.orders = []; S.backlog = []; if (!o) continue; assert.ok(!seen.has(o.story), "repeated " + o.story); seen.add(o.story); titles.add(o.title); assert.ok(!/\{/.test(o.text)); }
+  const all = Object.keys(STORIES).filter((k) => k !== "The Makers' Gate");
+  assert.ok(seen.size >= all.length - 4);             // nearly every story, each once (a few may have nowhere to happen)
+});

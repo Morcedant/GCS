@@ -837,7 +837,7 @@ export function missionChoices(S, ev) {
     options: st.choice.options.filter((x) => !x.needs || (x.needs === "inverter" && S.pelion.refits.inverter)).map((x) => ({ id: x.id, name: storyText(S, o, x.name), blurb: storyText(S, o, x.blurb) })) };
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
-  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike",
+  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike", refit: (n) => `${REFITS[n] ? REFITS[n].name : n} fitted to the Pelion`, delay: (n) => `every other order's deadline ${n} weeks closer`,
   heal: (n, w) => `${w}'s harm −${n}`, inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
 export function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
@@ -856,6 +856,8 @@ export function chooseMission(S, orderId, optId) {
     else if (k === "hurt") { const c = CREW.filter((x) => available(S, x.id) && x.id !== "captain"); const v = c[Math.floor(rand(S) * c.length)]; if (v) S.crew[v.id].inj = Math.min(3, S.crew[v.id].inj + n); }
     else if (k === "sensors") S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + n);
     else if (k === "romulan") romulanReprisal(S, o.title);
+    else if (k === "refit") S.pelion.refits[n] = true;
+    else if (k === "delay") { for (const x of S.orders) if (x !== o) x.deadline -= n; }
     else if (k === "inverter") S.pelion.refits.inverter = Math.max(S.pelion.refits.inverter || 0, n);
     lines.push(FX_TEXT[k] ? FX_TEXT[k](n, w) : k);
   }
@@ -934,30 +936,45 @@ function orderOpposition(base, twist) {
   if (add) { o.name += add[0]; o.target += add[1]; o.why += ` Twist: ${twist.text}.`; }
   return o;
 }
+/**
+ * A new order from Starfleet. Every story is told once a tour: the 3d6 roll picks the kind of order (the nearest kind that
+ * still has an untold story and somewhere to happen), then one of its untold stories. When every story has been told,
+ * Starfleet has nothing new to send.
+ */
 export function newOrder(S) {
   const roll = d6(S) + d6(S) + d6(S);
-  const m = MISSIONS.reduce((best, x) => (Math.abs(x.roll - roll) < Math.abs(best.roll - roll) ? x : best), MISSIONS[0]);
-  let at = null, sys = null;
+  const used = (S.storiesUsed = S.storiesUsed || []);
+  const untold = (m) => Object.keys(STORIES).filter((k) => STORIES[k].mission === m.text && !used.includes(k));
   const from = S.pelion.at;
-  if (m.where.includes("border")) {
-    // Border orders go to a listening post on the Zone if one's still standing.
-    const posts = livePosts(S).filter((p) => distance(p.at, from) >= 3);
-    const hexes = posts.length ? posts.map((p) => p.at) : Object.keys(S.hexes).filter((k) => nearZone(k) && distance(k, from) >= 3);
-    at = pick(S, hexes);
-  } else {
+  const placeFor = (m) => {
+    if (m.where.includes("border")) {
+      // Border orders go to a listening post on the Zone if one's still standing.
+      const posts = livePosts(S).filter((p) => distance(p.at, from) >= 3);
+      const hexes = posts.length ? posts.map((p) => p.at) : Object.keys(S.hexes).filter((k) => nearZone(k) && distance(k, from) >= 3);
+      return hexes.length ? { at: pick(S, hexes), sys: null } : null;
+    }
     const cands = Object.values(S.systems).filter((s) => (m.where.includes(s.kind) || (s.kind === "member" && m.where.includes("independent")) || (s.kind === "orionBase" && m.where.includes("empty")))
       && !S.orders.concat(S.backlog || []).some((o) => o.sys === s.id) && distance(s.at, from) >= 2 && distance(s.at, from) <= 10 && s.id !== S.corvan);
     if (!cands.length) return null;
-    sys = pick(S, cands); at = sys.at; S.seenSys[sys.id] = true;
+    const sys = pick(S, cands); S.seenSys[sys.id] = true; return { at: sys.at, sys };
+  };
+  let m = null, place = null, storyKey = null;
+  for (const x of [...MISSIONS].sort((a, b) => Math.abs(a.roll - roll) - Math.abs(b.roll - roll))) {
+    const left = untold(x); if (!left.length) continue;
+    const p = placeFor(x); if (!p) continue;
+    m = x; place = p; storyKey = pick(S, left); break;
   }
+  if (!m) return null;   // every story has been told
+  used.push(storyKey);
+  const st = STORIES[storyKey], at = place.at, sys = place.sys;
   const twist = rand(S) < 0.6 ? pick(S, TWISTS) : null;
   // Travel time: at the maximum stable speed (warp 6), or, for urgent orders, at emergency warp 8, which Starfleet expects.
   const urgent = !!(twist && twist.fx === "urgent");
   const dist = Math.ceil(distance(from, at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
-  const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
-    deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, (STORIES[m.text] && STORIES[m.text].strange) || STRANGE), key: pick(S, (STORIES[m.text] && STORIES[m.text].keys) || KEYS), oppose: orderOpposition(m.oppose, twist) };
+  const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : postAt(S, at) ? ` at ${postAt(S, at).name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone") + `: ${st.name}`, at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
+    deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, st.strange || STRANGE), key: pick(S, st.keys || KEYS), oppose: orderOpposition(m.oppose, twist) };
   if (postAt(S, at)) o.place = postAt(S, at).name;
-  if (STORIES[m.text]) { o.story = m.text; o.text = storyText(S, o, STORIES[m.text].brief); }
+  o.story = storyKey; o.text = storyText(S, o, st.brief);
   // About half of all orders are part of the campaign (once it has begun); the rest are the frontier's ordinary work.
   const C = campaignOf(S); o.campaign = !C.over && rand(S) < 0.5;
   S.backlog = S.backlog || [];

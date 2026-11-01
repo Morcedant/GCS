@@ -740,6 +740,309 @@ function storyText(S, o, text) {
 }
 const storyOf = (o) => (o && o.story ? STORIES[o.story] : null);
 
+
+// ---------- second stories ----------
+// Every kind of order has two stories, and a tour never tells the same one twice. These are the second ones; `mission`
+// names the kind of order each belongs to. Each story has a name of its own, shown in the order's title.
+const FIRST_NAMES = {
+  "Answer a distress call": "The Calloway's Pride", "Survey an uncharted system": "The ticking star", "Make first contact": "The first warp ship",
+  "Escort a diplomatic delegation": "Ambassador Teresh", "Find a missing ship or outpost": "The Arkwright", "Deliver urgent medical supplies": "The nameless fever",
+  "Evacuate a colony": "The flaring star", "Patrol the Neutral Zone border": "The gap in the coverage", "Recover a lost probe or artifact": "The thirsty probe",
+  "Mediate a dispute between two worlds": "The contested moon", "Test experimental technology": "The cloak inverter", "Ferry a delegation to a world that left the Federation": "The scorched spaceport",
+  "Shore leave that goes wrong": "The carnival", "Carry a message across the Neutral Zone": "The sealed message", "The Makers' Gate": "The Makers' Gate",
+};
+for (const [k, n] of Object.entries(FIRST_NAMES)) if (STORIES[k]) { STORIES[k].name = n; STORIES[k].mission = k; }
+Object.assign(STORIES, {
+  "Answer a distress call#2": {
+    mission: "Answer a distress call", name: "The singing mine", type: "Rescue",
+    reason: "A mining colony's call for help, from deep underground: thirty miners trapped by a cave-in, and air for four days.",
+    why: "The mine broke into a sealed chamber the day before the collapse. The miners' last report describes a hum in the rock, and a machine. Starfleet wants the miners out, and wants to know what they found.",
+    thread: "The chamber the miners broke into held a caretaker, still asleep. Its carrier wave matches Corvan II's exactly. The diggers will want this one, and now they know where it is.",
+    keys: ["Foreman Agda Hollis|who refused to leave her crew below", "Kemal Arsen|the mine's young geologist", "Brother Tuck|the colony's chaplain, and its only doctor", "Raina Voss|the mining company's representative"],
+    strange: ["a hum in the rock that the miners call the song", "a chamber walled in metal no one can scratch", "lights in the deep tunnels that move against the air", "a seam of crystal that grows back overnight"],
+    brief: "{world}'s mining colony calls for help: a cave-in at the deep face, thirty miners trapped two kilometres down, air for four days. Their rescue equipment is buried with them.",
+    arrive: "{world}'s mining town clings to the side of a canyon, its lights all on in the middle of the day, its people gathered at the pithead in silence. {key} meets the away team at the lift cage, filthy, hoarse, and furious at the rock.\n\n\"They broke into something the day before,\" {key} says. \"A chamber. Sealed. And it's been humming ever since. The men call it {strange}. Then the roof came down.\"\n\nGrath puts his palm flat on the cage wall and frowns. \"I can feel it,\" he says. \"In the steel.\"",
+    steps: [
+      ["Reach the trapped miners", "The transporter can't lock through two kilometres of ore, so they go down the old way: lift cage, then ladders, then hands and knees through a crawlway Reyes widens with a phaser on low, a few centimetres at a time. At the bottom, behind a wall of fallen rock, someone is tapping. Three short, three long, three short. Over and over."],
+      ["Bring them up", "Grath shores the roof with a forcefield he swears is not rated for this, and they bring the miners out one at a time, through the crawlway, up the ladders, into the light. Thirty go in. Thirty come up. The last one out is the youngest, and on the pithead she turns and looks back down the shaft, and says what all of them say: the hum stopped when the roof came down. As if it had been waiting."],
+    ],
+    choice: { title: "The chamber", text: "The miners are safe. Behind them, two kilometres down, the chamber is still there, sealed again by the collapse, and whatever is in it has gone quiet.\n\n{key} wants it sealed for good: the colony has had enough of the deep face. Sevek wants a sensor drone sent down before the rock settles, while there's still a way in. \"We may not get another chance,\" he says. \"Nor may it.\"",
+      options: [
+        { id: "seal", name: "Seal the deep face", blurb: "The colony's wish: +1 accord with {world}, +1 commendation.", how: "Thirty miners rescued; the deep face sealed.", fx: { accord: 1, commendations: 1 }, text: "The colony brings the deep face down with its own charges, deliberately, and holds a service at the pithead afterwards for the thing it never saw. {key} shakes the captain's hand. \"Some things should stay buried,\" {key} says. Sevek, behind the captain, says nothing at all." },
+        { id: "drone", name: "Send the drone down", blurb: "+10 science; the colony isn't pleased.", how: "Thirty miners rescued; the deep chamber surveyed.", fx: { science: 10, accord: -1 }, text: "The drone goes down through the crawlway on its own and finds the chamber: walls of metal no tool can scratch, and at its heart a shape asleep, still faintly warm. The data fills a core. Up at the pithead, the colonists watch the drone come back out of the dark, and some of them make signs against bad luck." },
+      ] },
+    fail: "The rescue came too late. The tapping stopped on the fourth day, and the colony sealed the deep face with the miners still behind it.",
+  },
+  "Survey an uncharted system#2": {
+    mission: "Survey an uncharted system", name: "The garden world", type: "Exploration",
+    reason: "A planet on long-range sensors with a breathable atmosphere and no recorded survey, three light-years from the nearest colony. If it's what it looks like, it could be the sector's next home.",
+    why: "The planet's ecology is too perfect: tended, Sevek thinks, for a very long time. The Makers tended worlds. Starfleet wants to know if this was one of them, before the diggers do.",
+    thread: "Under the garden world's oldest forest, the roots grow around a buried shape: a caretaker, its watch long finished, the garden it kept still growing. The Makers didn't only watch peoples. They grew worlds.",
+    keys: ["Dr. Hana Ito|a xenobotanist who has waited her whole career for this", "Ensign Bo Daly|the youngest of the survey team", "Dr. Osei Brandt|a terraforming engineer with plans", "Elin Sorrow|a colony scout from the nearest settlement"],
+    strange: ["trees that turn to follow the away team", "a meadow where every flower is the same age", "a river that runs uphill for a kilometre", "birdsong in a pattern Sevek can't stop counting"],
+    brief: "A world at {world} with a breathable atmosphere, oceans, forests, and no survey on record. It could be the best colony site in the sector. It could also be something else.",
+    arrive: "The planet turns below the Pelion green and blue and perfect, and something about the perfection makes the bridge uneasy. \"No volcanoes,\" Sevek says. \"No deserts. No storms of any size. Every forest at the same stage of growth.\" He looks up. \"Worlds are not this tidy, Captain.\"\n\n{key} is already at the transporter room door, field kit packed, practically vibrating.",
+    steps: [
+      ["Walk the garden", "The away team beams into a meadow and stands for a long moment just breathing. The air smells of rain and something sweet. Then Reyes notices it: {strange}. Nobody says anything for a while after that, and nobody touches anything they don't have to."],
+      ["Read its history", "Sevek takes core samples from a hillside, and the layers tell a story that makes him sit down on the grass. Ten thousand years of stillness. Before that, chaos: ash, flood, a dead world. And between them, a single layer, a hand's width thick, where everything changed at once."],
+      ["Find the gardener", "Under the oldest forest, where the roots go deepest, the tricorders find it: a buried shape, metal and very old, the roots grown all around it like hands. It isn't awake. It isn't dead. Its work, Sevek says quietly, appears to be finished. The garden simply goes on growing."],
+    ],
+    choice: { title: "The garden's future", text: "It's the finest colony site in the sector, and Starfleet will want it. {key} is already drafting the report.\n\nBut it was made, and someone made it for a reason, and Vessik puts the question everyone is avoiding: \"Whose garden is it?\" The captain can recommend it for settlement, or recommend that it be left exactly as it is.",
+      options: [
+        { id: "settle", name: "Recommend it for settlement", blurb: "+8 supplies' worth of survey contracts, +6 science; the garden will change.", how: "The garden world surveyed and recommended for settlement.", fx: { supplies: 8, science: 6 }, text: "The report goes in with a recommendation, and within a year the first colony ships are on their way. {key} goes with them. The colonists will build carefully, Starfleet promises. The garden will be changed by it anyway. Sevek files a separate note about the shape under the forest, marked: do not disturb." },
+        { id: "preserve", name: "Leave it as it is", blurb: "+2 commendations, +6 science; the sector loses a colony site.", how: "The garden world surveyed and left as it was made.", fx: { commendations: 2, science: 6 }, text: "The captain recommends the world be left untouched, a preserve, studied from orbit only, and Starfleet, a little to everyone's surprise, agrees. {key} is bitterly disappointed. Years later, someone will find that the garden world is the only one in the sector that never suffered a single bad harvest, and wonder why." },
+      ] },
+    fail: "The survey never happened. The garden world waits, unnamed, for whoever comes next, and what they'll want from it.",
+  },
+  "Make first contact#2": {
+    mission: "Make first contact", name: "The listeners", type: "Diplomatic",
+    reason: "A signal from {world}: a pre-warp people who have been listening to Federation subspace traffic for years, and have finally worked out how to answer.",
+    why: "The listeners learned to hear subspace from a machine they dug up in their northern hills. Starfleet wants contact made before anyone else learns what they've been listening with.",
+    thread: "The listeners' machine is a Makers' caretaker, cracked open by their scientists and wired, ingeniously, into their radio telescopes. It still remembers who made it. It has been listening for them.",
+    keys: ["Dr. Iru Mak|the scientist who built their transmitter", "Old Senna|who first heard the voices in the static", "Colonel Brach|their military, and suspicious of all of it", "Archivist Pell Oru|keeper of a decade of recordings"],
+    strange: ["a machine their scientists dug from the northern hills", "a voice in the static that answered back once", "star charts in their oldest temple that match Federation ones", "a decade of recorded Federation traffic, every word"],
+    brief: "A signal from {world}: a people without warp drive who have been listening to Federation subspace traffic for ten years, and have taught themselves how to reply. Their message is short. \"We have heard you. Will you hear us?\"",
+    arrive: "The signal comes from a valley full of radio dishes, hundreds of them, hand-built, every one pointed at the sky. When the Pelion answers, the whole valley lights up.\n\nSpeaker Anan Teve speaks for them, in careful, perfect Federation Standard, learned entirely from subspace traffic and old news broadcasts, with {key} at the speaker's side. \"We know your songs,\" the speaker says. \"We know your wars. We know the names of your starships. We have been waiting a very long time to know you.\"",
+    steps: [
+      ["Answer their call", "The first conversation lasts nine hours. They know astonishing things: ship names, admirals, the scores of Federation sporting events a decade old. And they've misunderstood almost all of it. Vessik spends an hour gently explaining that a famous serial drama is not, in fact, a historical record. They take it well."],
+      ["Learn how they listened", "They show the away team how they did it, proudly: {strange}, wired into their radio telescopes by their own scientists. Sevek examines it for a long time, and when he steps back his face is even more composed than usual, which is how the captain knows he is shaken."],
+      ["Face their question", "Their council has one question, and it's not the one Starfleet expected. They don't ask what joining costs. They ask whether the Federation will let them keep what they found, or take it away from them, as every story they've overheard says the strong always do."],
+    ],
+    choice: { title: "What they found", text: "Their machine is far older than they are, and far more than they know. Starfleet's standing orders say artifacts like it are to be secured. The listeners built their whole new age around it.\n\nThe captain can ask them to give it into Federation keeping, safely, or promise them it stays theirs, with all the risk that brings.",
+      options: [
+        { id: "theirs", name: "It stays theirs", blurb: "+2 accord with {world}, +1 commendation; the machine stays where anyone can find it.", how: "First contact made; the listeners keep what they found.", fx: { accord: 2, commendations: 1 }, text: "The valley of dishes erupts in light and noise, every dish blinking at once, which {key} explains is how they cheer. The machine stays in their northern hills. Reyes quietly recommends a Starfleet watch on the system, and gets it." },
+        { id: "keep", name: "Ask to keep it safe", blurb: "+12 science; they agree, but they'll remember being asked.", how: "First contact made; the listeners' machine given into Federation keeping.", fx: { science: 12, accord: -1 }, text: "They agree. It's clear they think it's the price of friendship, and clear it costs them. The machine leaves their hills under Starfleet guard, and {key} watches it go with an expression the captain will remember for a long time." },
+      ] },
+    fail: "Nobody answered the listeners. They went on listening, for a while. Then their dishes went quiet, one by one.",
+  },
+  "Escort a diplomatic delegation#2": {
+    mission: "Escort a diplomatic delegation", name: "The heir", type: "Diplomatic",
+    reason: "The heir to {world}'s throne is travelling to a summit that could bring her world into the Federation's orbit. There have been two attempts on her life this month.",
+    why: "The heir's assassins were paid in dilithium through an Orion broker: the same channel the diggers use. Someone doesn't want {world} looking to the Federation, and Starfleet wants to know who.",
+    thread: "The would-be assassin had a map in his boots: three Makers' sites near {world}, two of them already crossed off. The diggers didn't want the heir dead for politics. They wanted the summit to fail, so no one would be watching those hills.",
+    keys: ["Lord Chancellor Vey|the heir's advisor, very protective", "Captain Arno Fell|commander of her personal guard", "Mira Tolland|the heir's lady-in-waiting, and her oldest friend", "Brother Anselm|the heir's tutor since she was six"],
+    strange: ["a poison that doesn't show up on tricorders", "a gift box that hums when no one is near it", "a guard who appears on no roster", "a message in a code nobody aboard has seen"],
+    brief: "The heir to {world}'s throne is bound for a summit, and needs a ride that nobody can intercept. Two attempts on her life this month. The Pelion is the safest ship in the sector, and everyone knows it.",
+    arrive: "Princess Ilyse comes aboard with {key}, a guard of twelve, a wardrobe of forty trunks, and an expression of resigned boredom that lasts exactly until she sees the bridge. Then she asks sh'Vari eleven questions about the helm in a row, and sh'Vari, who has no patience for royalty, answers every one.\n\nReyes reviews the guard roster and the trunk manifest and comes to the captain afterwards. \"Something's off,\" she says. \"I don't know what yet.\"",
+    steps: [
+      ["Keep her safe en route", "Two days out, Vessik catches it: {strange}, in the heir's evening meal. She'd eaten two bites. Vessik works for an hour and she lives, and is furious, and then, alone with the captain, frightened. \"It's someone on this ship,\" she says. \"Isn't it?\""],
+      ["Deliver her to the summit", "Reyes runs the trap herself, with the heir's blessing. A rumour that the princess will walk the arboretum alone at midnight; a figure in the shadows with a blade; Reyes, already there. It's one of the heir's own guards. He doesn't say who paid him. He doesn't have to: there's a dilithium chit in his boot."],
+    ],
+    choice: { title: "The guard", text: "The heir arrives at the summit alive. The would-be assassin is in the Pelion's brig. Princess Ilyse, and {key} with her, want him handed to {world}'s justice, which is swift and not merciful. The Federation can hold him instead, and find out who paid him, slowly, properly.",
+      options: [
+        { id: "hand", name: "Hand him to {world}", blurb: "Their law, their decision: +2 accord with {world}.", how: "The heir delivered safely; her would-be assassin handed to her people.", fx: { accord: 2 }, text: "The guard goes down to {world} in chains, and the heir watches him go without expression. At the summit, she speaks of the Federation with a warmth that surprises everyone, and the talks go better than anyone hoped. Nobody ever finds out who paid the guard." },
+        { id: "hold", name: "The Federation holds him", blurb: "+8 science from what he gives up, +1 commendation; {world} feels slighted.", how: "The heir delivered safely; her would-be assassin held for questioning.", fx: { science: 8, commendations: 1, accord: -1 }, text: "The guard stays in the brig. Under questioning, slowly, he gives up the broker, the channel, the dilithium, and a name that makes Starfleet Intelligence very interested indeed. {key} is coldly polite about it at the summit, and doesn't send the Pelion a farewell." },
+      ] },
+    fail: "The heir never reached the summit. Whoever paid for that got their money's worth.",
+  },
+  "Find a missing ship or outpost#2": {
+    mission: "Find a missing ship or outpost", name: "The silent station", type: "Rescue",
+    reason: "A Federation relay station near {world} has stopped answering: a crew of nine, and the only subspace link for the colonies spinward.",
+    why: "The relay's last message was a sensor log: a ship approaching with no transponder, and a reading the relay's computer classified as a Makers' carrier wave. Then silence.",
+    thread: "The relay's attackers weren't after the relay. They wanted its sensor logs: eleven years of readings, which show the bearing of every Makers' carrier wave the station ever picked up. The diggers have a map now.",
+    keys: ["Chief Lia Doran|the relay's chief, who sent the last log", "Ensign Paulo Reis|the youngest of the nine", "Torvald Henk|a supply pilot who was due to dock that week", "Dr. Ama Seth|the station's medical officer"],
+    strange: ["a sensor log that ends mid-sentence", "a docking clamp cut through from outside", "nine coffee cups, all still half full", "a message scratched into a bulkhead: THEY WANTED THE LOGS"],
+    brief: "The relay station near {world} has stopped answering. Nine crew, and the only subspace link for the colonies spinward. Its last transmission was a sensor log that ends mid-sentence.",
+    arrive: "The relay hangs in the dark, lights on, every system green, and silent. No answer on any frequency. Its docking clamps have been cut through from outside.\n\nRrinn plays the last log on the bridge, in the voice of {key}: calm, professional. \"Unidentified vessel on approach, no transponder. Their hull's reading a carrier wave I've never... wait. They're...\" Then the log ends.",
+    steps: [
+      ["Board the station", "The boarding party goes in with phasers drawn and finds no one: {strange}, nine bunks, every personal effect in its place. The station's main computer has been opened, carefully, by someone who knew exactly what they were looking for. They took the sensor archives. They left everything else."],
+      ["Follow the trail", "Rrinn finds the attackers' ion wake, and finds something else in it: an escape pod's beacon, faint, three hexes off. Inside, alive, frozen half to death, are four of the nine. They saw the attackers' faces. Orions, they say. And one who wasn't: a Klingon, standing back, giving orders."],
+      ["Find the rest", "The other five are on a barren moon two systems away, left in an emergency shelter with three days' air and no transmitter. Reyes gets them out with a day to spare. They're the first witnesses anyone has found alive, and every one of them wants to talk."],
+    ],
+    choice: { title: "The relay", text: "All nine are alive. The relay is intact but compromised: whoever took its archives knows its codes, its frequencies, its blind spots. Grath can rebuild its security from scratch, which will take the Pelion a week. Or the station can be left as it is and watched, in case they come back for more.",
+      options: [
+        { id: "rebuild", name: "Rebuild it", blurb: "+1 commendation, +6 supplies from the grateful colonies; a week of Grath's time.", how: "The relay's crew rescued and the station rebuilt.", fx: { commendations: 1, supplies: 6 }, text: "Grath rebuilds the relay's security from the ground up, cursing its original designers in detail, and the spinward colonies come back on the network a week later to a flood of grateful messages. {key} stays on as chief. The new codes are Grath's. Nobody will be getting in again." },
+        { id: "watch", name: "Leave it as bait", blurb: "+10 science from what comes back; a risk to the relay.", how: "The relay's crew rescued; the station left as bait.", fx: { science: 10 }, text: "The relay goes back on line with its old codes, and Rrinn sets a listening post a light-year off. Three weeks later, someone tries the old codes again. The listening post records everything: the ship, its heading, the voice that gives the order. It's Klingon." },
+      ] },
+    fail: "Nobody reached the relay in time. When Starfleet does, the station is empty, and so is the moon two systems away.",
+  },
+  "Deliver urgent medical supplies#2": {
+    mission: "Deliver urgent medical supplies", name: "The sleeping town", type: "Rescue",
+    reason: "A whole town on {world} has fallen asleep: four hundred people, and no one can wake them. Their doctor called for help before she went under too.",
+    why: "The town sits on a hillside above a Makers' ruin. The sleep is the same one that held the Corvan II scientists: someone has been digging, and something below has woken.",
+    thread: "Under the town's hill, the diggers cut too close to a caretaker and woke it. It did what it was made to do: it protected the town from them, the only way it knew. It put everyone to sleep.",
+    keys: ["Dr. Rhea Vance|the town's doctor, who called for help", "Mayor Tobin Ash|asleep at his desk", "Pell Garrow|a trader who arrived after it happened", "Lena Quist|a child who woke on her own"],
+    strange: ["a hum from under the hill", "a sleep that looks exactly like stasis", "dreams that every sleeper shares", "a child who woke up and remembers a voice"],
+    brief: "Four hundred people on {world} have fallen asleep and can't be woken. The town's doctor called for help before she went under too. The Pelion carries the sector's best medical team.",
+    arrive: "The town is beautiful and quiet: flowers in window boxes, a market with its stalls still open, and everywhere people asleep. In chairs, on benches, at the market stalls, in the street where they lay down. Breathing slowly. Smiling, some of them.\n\nAnd in the middle of the square, sitting cross-legged beside her sleeping mother, a single small girl wide awake: {key}. \"They're dreaming,\" she tells Vessik, very seriously. \"I woke up. I didn't like it.\"",
+    steps: [
+      ["Keep them alive", "Four hundred sleepers need water, warmth, turning. Vessik turns the town hall into a ward and the away team into nurses, and they work in shifts round the clock. The sleepers' bodies are slowed almost to stillness: {strange}. Vessik has seen it once before, in the reports from Corvan II."],
+      ["Find the cause", "The girl leads them to it: a door in the hillside behind the town, newly cut, with Orion cutting tools abandoned in the mud outside. Beyond it, a tunnel going down, and a hum. Someone dug in here, and something woke, and put everyone to sleep to keep them safe."],
+    ],
+    choice: { title: "The thing in the hill", text: "Sevek can reach the caretaker and reason with it: the diggers are gone, the town is safe, it can let them wake. It'll take time, and the sleepers are weakening. Or Grath can cut its power, now, and they'll wake at once, and the hill will have no watcher any more.",
+      options: [
+        { id: "reason", name: "Talk to it", blurb: "Slower, but the hill keeps its watcher: +1 commendation, +8 science.", how: "The sleeping town woken; its watcher reasoned with.", fx: { commendations: 1, science: 8 }, text: "Sevek sits in the hum for two days, talking quietly to the dark. On the third morning, the town wakes all at once, stretching, confused, a little rested. The hill goes quiet, but not dead. {key} tells everyone that the voice said goodbye to her. Nobody quite believes her except Sevek." },
+        { id: "cut", name: "Cut its power", blurb: "They wake at once: +2 accord with {world}; the hill's watcher is gone.", how: "The sleeping town woken; its watcher shut down.", fx: { accord: 2 }, text: "Grath cuts the power, and the hum stops, and up in the town four hundred people wake at the same moment with a single gasp. They're grateful. They're whole. And the hill is just a hill now, which is what the diggers wanted all along." },
+      ] },
+    fail: "Help came too late. The town sleeps on, and fewer of its people breathe every day.",
+  },
+  "Evacuate a colony#2": {
+    mission: "Evacuate a colony", name: "The sinking island", type: "Rescue",
+    reason: "{world}'s island colony is sinking: the seabed beneath it has started to slip, and the sea is coming in faster every day. Twelve hundred people, and a single harbour.",
+    why: "The island's seabed was stable for ten thousand years, until the diggers cut a Makers' anchor out of the reef. Starfleet wants the colony out, and wants to know what was holding the island up.",
+    thread: "The island was held up by a caretaker in the reef, keeping the seabed still. The diggers cut it out a month ago. The colony is sinking because the thing that watched over it is gone.",
+    keys: ["Harbourmaster Ines Keel|who has run the harbour for thirty years", "Councillor Abe Ruiz|who wants to save the town hall first", "Old Marta Fenn|who was born on the island and won't leave", "Lieutenant Kit Moro|of the colony's tiny security force"],
+    strange: ["a reef that glowed at night until a month ago", "tides that have stopped keeping time", "fish that left the reef all at once", "a hollow in the reef where something was cut out"],
+    brief: "{world}'s island colony is sinking. The seabed has started to slip; the sea is coming in faster every day. Twelve hundred people, one harbour, and boats for a third of them.",
+    arrive: "From orbit you can see it: the island tilted, its southern streets already under grey water, waves breaking where gardens were. The harbour is jammed with every boat the colony owns, and people standing on the quay, waiting, looking at the sea.\n\n{key} is in the harbour office with a chart and a slide rule and a face like stone. \"Four days,\" {key} says. \"Maybe three. The sea doesn't care what the experts say.\"",
+    steps: [
+      ["Organize the colony", "Reyes divides the town into districts, the districts into boat-loads, the boat-loads into a timetable, and pins it to every door. People argue. People always argue. Then the sea comes in another street's width overnight, and the arguing stops."],
+      ["Move the people", "Boats out, shuttles down, the Pelion's transporters running hot. Grath swears that the pattern buffers are not rated for this many cycles, and runs them anyway, for thirty hours straight. The island empties street by street, and the sea fills it behind them."],
+      ["Find the last ones", "The last few are the hardest: the ones who won't go. {key} finds most of them. One old woman refuses until Vessik sits down beside her on her doorstep, with the sea at the step, and talks to her about her garden for an hour, and then carries her bag down to the boat himself."],
+    ],
+    choice: { title: "The reef", text: "Everyone is off the island. And Sevek has found out why it sank: a hollow in the reef, where something was cut out a month ago. The thing that held the seabed still. Something else might still be done. Grath thinks the Pelion's tractor beam could hold the seabed for a few months while the colony salvages what it can. It would tie the ship up for weeks.",
+      options: [
+        { id: "salvage", name: "Hold the island while they salvage", blurb: "+12 supplies, +2 accord with {world}; it costs the Pelion two weeks on every other order.", how: "The island evacuated, and held up long enough to salvage it.", fx: { supplies: 12, accord: 2, delay: 2 }, text: "For two weeks the Pelion hangs over the island with its tractor beam locked on the seabed, Grath sleeping in engineering, while the colonists go back and take everything they can carry: the town hall's records, the school's books, the harbour's bell. On the last day, the beam lets go, and the island goes down into the grey sea, slowly, with dignity." },
+        { id: "let", name: "Let it go", blurb: "+1 commendation; the island sinks with everything on it.", how: "The island evacuated before it sank.", fx: { commendations: 1 }, text: "The island goes down three days later, faster than anyone expected, with everything still on it. The colonists watch from the boats. Then they turn toward the mainland, and the work of starting over, and {key} rings the harbour bell one last time from the deck of the last boat." },
+      ] },
+    fail: "The sea came faster than the boats. The island is gone, and not everyone left it.",
+  },
+  "Patrol the Neutral Zone border#2": {
+    mission: "Patrol the Neutral Zone border", name: "The drifting buoy", type: "Security",
+    reason: "A Romulan marker buoy has drifted across the Neutral Zone into Federation space near {world}. By treaty, neither side may touch the other's buoys. It's broadcasting.",
+    why: "The buoy's broadcast is a list of coordinates. Sevek recognizes them: Makers' sites, on both sides of the Zone. The Romulans are hunting them too.",
+    thread: "The Romulan buoy was mapping Makers' carrier waves, on both sides of the Zone. The Romulans have found sites of their own, and some of them have been dug up too, by someone who isn't Romulan.",
+    keys: ["Commander Ilse Varga|who hasn't slept in a week", "Lieutenant Pip Doyle|in charge since the commander fell ill", "Commander Soren|a Vulcan, unimpressed by everything", "Lieutenant Commander Aiko Rhee|twenty years on the line"],
+    strange: ["a buoy that broadcasts on a frequency no buoy uses", "coordinates repeated in a loop, every eleven seconds", "a Romulan sentry ship that watches but doesn't approach", "a second, fainter signal underneath the first"],
+    brief: "A Romulan marker buoy has drifted across the Neutral Zone near {world}. Neither side may touch the other's buoys; touching it could be an act of war. Leaving it means listening to whatever it's saying.",
+    arrive: "The buoy turns slowly in Federation space, a black spike a few metres long with a Romulan bird painted on its side. {key} has been watching it for three days from the listening post. \"It isn't drifting,\" {key} says. \"It's holding position. And it's broadcasting {strange}.\"\n\nOn the far side of the Zone, sitting very still, a Romulan sentry ship watches the Pelion arrive.",
+    steps: [
+      ["Read the buoy", "Rrinn listens for six hours and decodes it: coordinates, dozens of them, on both sides of the Zone. Sevek lays them on the chart and goes very still. \"Captain. These are the Makers' sites. Some I recognize. Many I do not. These are on the Romulan side.\""],
+      ["Face the sentry", "The Romulan sentry ship hails, for the first time anyone at the post can remember. Its commander is courteous, and precise, and makes it clear that the buoy is Romulan property, and that the Pelion will not touch it, and that the commander would very much regret having to make that point any other way."],
+    ],
+    choice: { title: "The buoy", text: "The buoy holds a Romulan map of Makers' sites the Federation has never seen. Copying its data in full would mean touching it: a treaty violation. Leaving it means the Romulans keep their map and the Federation keeps the peace.\n\nThe Romulan commander is watching.",
+      options: [
+        { id: "copy", name: "Copy its data", blurb: "+12 science, the Romulans' map; a Romulan reprisal against the listening posts.", how: "The Neutral Zone patrolled; a Romulan buoy's map copied.", fx: { science: 12, romulan: 1 }, text: "Grath makes the link in eleven seconds, and the buoy's memory is the Pelion's. The Romulan commander's hail comes a minute later, quite calm, and says only: \"Noted.\" The sentry ship turns and goes. Everyone at the listening post knows what \"noted\" means." },
+        { id: "leave", name: "Leave it alone", blurb: "+1 commendation; the Romulans keep their map.", how: "The Neutral Zone patrolled; a Romulan buoy left untouched.", fx: { commendations: 1 }, text: "The captain hails the Romulan commander and says, politely, that the buoy appears to have drifted, and that the Federation wouldn't dream of touching it. A pause. \"Of course,\" the commander says. The buoy is gone by morning. So is the sentry. {key} pours the captain a cup of the asteroid coffee in silent respect." },
+      ] },
+    fail: "The patrol never came. The buoy finished broadcasting, and went home.",
+  },
+  "Recover a lost probe or artifact#2": {
+    mission: "Recover a lost probe or artifact", name: "The museum's missing piece", type: "Exploration",
+    reason: "A shipment from the Federation Archaeological Council went missing near {world}: one crate, on a freighter that arrived without it. The Council wants it back.",
+    why: "The missing crate held a Makers' tablet, found on a dig thirty years ago and never deciphered. It's turned up for sale on an Orion market. Someone knows what it's for.",
+    thread: "The tablet is a Makers' key: a pattern that tells a caretaker who's allowed near it. The diggers have been using copies to walk past the machines' defences. That's how they cut them out without waking them.",
+    keys: ["Curator Aldo Finch|of the Archaeological Council", "Tib Rolle|the freighter's cargo master", "Dr. Ana Kaur|who found the tablet thirty years ago", "Archivist Jun Bell|who packed the crate"],
+    strange: ["a tablet covered in a script no one can read", "a crate whose seals were opened and resealed", "an auction listing in an Orion market", "a pattern on the tablet that matches the Corvan II caretaker's carvings"],
+    brief: "One crate from the Archaeological Council, gone missing between {world} and Starbase 23. The freighter arrived. The crate didn't. It has turned up for sale on an Orion market.",
+    arrive: "The freighter's cargo hold is spotless, and the crate's empty berth has fresh scratches on the clamps. {key} wrings their hands. \"Thirty years in the Council's archive and nobody gave it a second look. And then someone steals it the very first time we move it.\"\n\nRrinn already has the auction listing up: {strange}. Bids close in four days.",
+    steps: [
+      ["Find the seller", "The listing traces to an Orion trading post in an asteroid field near {world}, the kind of place that changes its name every month. Reyes goes in under cover, as a buyer. She's very good at it, which nobody on the bridge comments on."],
+      ["Get it back", "The dealer has three buyers bidding, and one of them is a Klingon, standing very still at the back of the room. Reyes outbids them all with Federation credit she doesn't have, and gets the tablet out before anyone checks."],
+      ["Read the tablet", "Sevek works on it for two nights. On the third morning he has it: the tablet isn't writing. It's a pattern. A key, he thinks. The pattern a caretaker reads to know who's allowed near it. Anyone carrying a copy could walk right past one."],
+    ],
+    choice: { title: "The key", text: "The tablet is a key to the Makers' machines, and the diggers have almost certainly copied it already. Returned to the Archaeological Council, it goes back in a drawer. Sevek could study it aboard the Pelion instead, and learn how to block it, which would mean keeping it from its rightful owners.",
+      options: [
+        { id: "return", name: "Return it to the Council", blurb: "+1 commendation, +4 supplies in thanks.", how: "The Council's tablet recovered and returned.", fx: { commendations: 1, supplies: 4 }, text: "The tablet goes back to the Council under guard, and {key} weeps a little, holding it. Sevek sends the Council a long, careful letter about what it is. They put it in a better drawer." },
+        { id: "study", name: "Keep it to study", blurb: "+12 science; the Council files a complaint.", how: "The Council's tablet recovered and kept for study.", fx: { science: 12, command: 1 }, text: "Sevek keeps the tablet in the science lab, and in a month he understands it well enough to know how a caretaker could be taught to refuse it. The Council files a formal complaint, and Starfleet Command sides with the Council, and Sevek doesn't regret a moment of it." },
+      ] },
+    fail: "The auction closed without the Pelion. The tablet went to the highest bidder, and the highest bidder was standing at the back of the room.",
+  },
+  "Mediate a dispute between two worlds#2": {
+    mission: "Mediate a dispute between two worlds", name: "The water treaty", type: "Diplomatic",
+    reason: "{world} and its twin share a single ice comet that waters them both. It's running out, and each world says the other is taking more than its share.",
+    why: "The comet's ice holds a Makers' relay, frozen in its heart. Both worlds have found it, and both think it's theirs, and the diggers would buy it from whichever one wins.",
+    thread: "Frozen in the comet's heart is a Makers' relay, still transmitting toward the same point as all the others. Someone has already been out to the comet. There are drill holes in the ice.",
+    keys: ["Speaker Olun Breck|for the near world", "Speaker Ama Tessaly|for the far world", "Chief Hydrologist Teo Vance|who has the numbers", "Judge Ilka Morrow|retired, called back to witness"],
+    strange: ["a comet whose orbit never decays", "ice that is warmer at the core than the surface", "drill holes in the ice that neither world made", "a signal from the comet's heart, very faint"],
+    brief: "{world} and its twin share one comet: every few years it passes close and they each take their water from it. This year it's running short, each says the other is stealing, and both have armed their mining ships.",
+    arrive: "The comet hangs between the two worlds, a white smudge trailing its tail, and around it, nose to nose, two fleets of armed ice-haulers. {key} meets the captain on the comet's surface, of all places: the only ground both sides will stand on.\n\n\"We have taken water from this ice for nine hundred years,\" {key} says. \"In fair shares. Until now.\"",
+    steps: [
+      ["Separate the fleets", "sh'Vari puts the Pelion between the two fleets, close enough to scrape paint, and keeps it there. Neither side wants to be the one to fire past a Federation starship. It isn't peace. It's room to talk."],
+      ["Count the water", "The hydrologist's numbers don't add up, and neither do anyone else's. Sevek finds out why: neither world is stealing. Someone else has drilled into the comet: {strange}. The water's been taken from below."],
+      ["Find what's inside", "And under the drill holes, in the comet's heart, Sevek's sensors find what the drillers were after: a relay, frozen in the ice, still transmitting. Both worlds knew it was there. Neither told the other."],
+    ],
+    choice: { title: "The water", text: "Both worlds are short of water and neither is to blame. The captain can propose they share what's left equally and jointly guard the comet. Or that the Federation takes over the comet's management, and the relay with it, and supplies both worlds fairly.",
+      options: [
+        { id: "share", name: "Share and guard it together", blurb: "+2 accord with {world}; the relay stays in the ice.", how: "The water dispute settled: a shared, guarded comet.", fx: { accord: 2 }, text: "The two speakers sign the new treaty on the comet's surface, standing in the snow. Their fleets turn their guns outward together for the first time in a generation, toward whoever comes to drill next. {key} keeps the pen." },
+        { id: "federation", name: "Federation stewardship", blurb: "+10 science from the relay, +1 commendation; both worlds lose a little pride.", how: "The water dispute settled under Federation stewardship.", fx: { science: 10, commendations: 1, accord: -1 }, text: "Starfleet takes the comet into its keeping, and the relay with it. Both worlds get their water, measured and fair, and both resent it a little, the way you resent a referee. Sevek gets the relay. He considers it a good trade." },
+      ] },
+    fail: "The talks broke down. The haulers fired. Both worlds are thirstier now, and angrier.",
+  },
+  "Test experimental technology#2": {
+    mission: "Test experimental technology", name: "The shield harmonics", type: "Technology",
+    reason: "Starfleet R&D has a new shield emitter design: stronger, faster to recover, and built from principles nobody fully understands yet. It needs a starship's power to test.",
+    why: "The emitter's design came from studying the field around the Corvan II caretaker. R&D wants to know if Makers' technology can protect a starship. So, Starfleet suspects, do the people taking the machines apart.",
+    thread: "The harmonics match the field around every Makers' site: it's how the caretakers protected themselves. Whoever is taking them apart has been learning to build them. House Kor'vath's ships may soon carry Makers' shields.",
+    keys: ["Dr. Ruth Calder|of Starfleet R&D, who designed it", "Chief Yanni Pell|an engineer who's installed it twice before", "Commander Ida Vosk|of Starfleet R&D, with a deadline", "Dr. Pell Annix|a brilliant, reckless scientist"],
+    strange: ["a shield that sings when it's struck", "harmonics that match the Corvan II field exactly", "an emitter that seems to anticipate the hit", "a power curve no engineer can explain"],
+    brief: "Starfleet R&D's new shield emitter, built from principles nobody quite understands, needs a field test under a real starship's power near {world}. It's either a breakthrough or a very expensive fire.",
+    arrive: "{key} brings the emitter aboard in a single crate the size of a coffin and installs it personally, with Grath standing over every connection with his arms folded.\n\n\"How does it work?\" Grath asks.\n\n\"We're not entirely sure,\" {key} says, cheerfully. \"That's what the test is for.\"",
+    steps: [
+      ["Fit it", "Fitting it takes a day. Grath objects to every connection and then, grudgingly, admires most of them. When the emitter powers up the whole ship hums, faintly, a low note just at the edge of hearing. Rrinn's ears flatten and stay that way."],
+      ["Take the hits", "The test range: a drone that fires phasers at the Pelion's shields, harder and harder. The new shields take it all and recover in half the time. And they do something else: {strange}. Nobody asked for that."],
+      ["Find its limit", "At full power the shields shrug off a hit that would have holed the old ones. And Sevek, reading the harmonics, goes still. \"Captain. These are the same harmonics as the field around the Corvan II caretaker. Exactly the same.\" R&D didn't invent this. They copied it."],
+    ],
+    choice: { title: "The emitter", text: "It works. It's a stronger shield than anything in the fleet, and it was copied from a Makers' machine. {key} wants it left fitted to the Pelion for further field trials. Sevek is uneasy: nobody knows what else the harmonics do.",
+      options: [
+        { id: "keep", name: "Keep it fitted", blurb: "Shield emitters fitted to the Pelion for free (Shields 5 → 6); +4 science.", how: "The new shield emitter tested and left fitted to the Pelion.", fx: { science: 4, refit: "shields" }, text: "The emitter stays. The Pelion's shields are the strongest in the sector now, and hum faintly whenever they're up, a low note that the crew come to find oddly comforting. Sevek keeps watching the harmonics, and writes careful notes, and doesn't say what he's worried about." },
+        { id: "return", name: "Send it back to R&D", blurb: "+10 science, +1 commendation for caution.", how: "The new shield emitter tested and returned to R&D.", fx: { science: 10, commendations: 1 }, text: "The emitter goes back to R&D with Sevek's notes attached: a long, careful document about the Makers' harmonics and what nobody knows about them. {key} is disappointed. R&D reads the notes, and quietly puts the program on hold." },
+      ] },
+    fail: "The trials never happened. R&D's emitter sits in its crate, and the questions it raises go unasked.",
+  },
+  "Ferry a delegation to a world that left the Federation#2": {
+    mission: "Ferry a delegation to a world that left the Federation", name: "The broken treaty", type: "Diplomatic",
+    reason: "{world} left the Federation over a trade treaty it says Starfleet broke. It's been ten years. They've asked for a delegation to talk about the terms of coming back.",
+    why: "{world} is offering to come back to the Federation in exchange for protection: something has been digging in their mountains, and they're frightened.",
+    thread: "{world}'s mountains held a Makers' site, and it's been dug up. Their scouts saw the diggers: Orion crews, and a Klingon ship that paid them. {world} came back to the Federation because the diggers frightened them more than old grudges.",
+    keys: ["Chancellor Mira Dov|who signed the treaty, and the withdrawal", "Trade Minister Rook|who still thinks the Federation cheated", "Envoy Sela Grant|the Federation's last ambassador here", "Captain Jon Abara|of their small defence fleet"],
+    strange: ["a treaty clause nobody on either side remembers agreeing to", "scouts' reports of lights in the mountains", "a trade ledger that doesn't balance by eleven percent", "a mountain pass that's been closed for a month"],
+    brief: "{world} left the Federation ten years ago over a broken trade treaty. Now they've asked for a delegation. The message doesn't say why, and it's the first time in a decade they've called.",
+    arrive: "{world}'s capital is ten years older and poorer than the briefing pictures, but not bitter. The delegation is met at the spaceport by {key}, and taken, before anything else, to see the mountains on the horizon, where at night there are lights.\n\n\"That's why we called,\" {key} says. \"We'll talk about the treaty. But that's why.\"",
+    steps: [
+      ["Settle the old grievance", "The treaty dispute takes a day of shouting and a night of ledgers. Rrinn finds it: {strange}. Neither side cheated. Both were cheated, by the same broker, who's long gone. It doesn't fix ten years. But it lets everyone stop shouting."],
+      ["Hear the new fear", "Then {world}'s scouts tell the delegation about the mountains: a ruin nobody visited, and since last month, lights, cutting, ships coming and going at night. Their small fleet went to look. It came back with holes in it."],
+      ["See for themselves", "Reyes and Sevek go up the mountain with two of {world}'s scouts. They find the ruin cut open, the caretaker gone, and the diggers' camp abandoned, still warm. In the mud, a footprint too big for an Orion."],
+    ],
+    choice: { title: "The terms", text: "{world} wants to rejoin the Federation, and wants a Starfleet guard on their mountains as the price. The delegation can agree on Starfleet's behalf, which isn't quite its place. Or carry the request back, and let Starfleet decide, which will take months.",
+      options: [
+        { id: "agree", name: "Agree to the guard", blurb: "+3 accord with {world}; Starfleet Command marks a box for promising its ships.", how: "{world} brought back toward the Federation, with a guard promised.", fx: { accord: 3, command: 1 }, text: "The delegation agrees, and {world}'s council votes to apply for readmission the same night. There's dancing in the capital. Starfleet Command's response is, to put it mildly, firm. But the guard is sent, and the mountain lights don't come back." },
+        { id: "carry", name: "Carry the request back", blurb: "+1 accord, +1 commendation.", how: "{world}'s request to rejoin carried to Starfleet.", fx: { accord: 1, commendations: 1 }, text: "The request goes back to Starfleet through proper channels, with the delegation's strong recommendation attached. {key} understands. That doesn't make the waiting easier. The mountain lights come back twice more before the answer does." },
+      ] },
+    fail: "The delegation never arrived. {world} watched its mountains alone, and stopped calling.",
+  },
+  "Shore leave that goes wrong#2": {
+    mission: "Shore leave that goes wrong", name: "The festival of masks", type: "Crew",
+    reason: "Shore leave at {world}'s Festival of Masks, the most famous party in the sector. The crew have earned it.",
+    why: "Starfleet Intelligence would like the Pelion's crew to keep their eyes open at the Festival: Orion brokers are said to be selling Makers' pieces there, behind the masks.",
+    thread: "Behind the Festival's masks, an Orion broker was selling Makers' fragments to a buyer in a Klingon house's colours. Two of the Pelion's crew saw the deal. Now they know the broker's name.",
+    keys: ["Mistress Vey|who owns the Festival's grandest house", "Constable Haro Finch|of the colony constabulary", "Lord Masque|the Festival's master of ceremonies", "Tamsin Ro|a fortune-teller who knows everyone"],
+    strange: ["masks that change their faces when no one's looking", "a masked broker selling pieces of ancient machinery", "a dance that everyone knows and no one was taught", "a mask that won't come off"],
+    brief: "Shore leave at {world}'s Festival of Masks: a week of music and masks and nobody being who they are. The crew have been counting the days.",
+    arrive: "{world}'s capital at Festival time is a riot of colour: every face masked, every street lantern-lit, music from every window. The crew pour down from the transporter room in borrowed masks, and the captain watches them go, and allows themselves a moment of hope that this will be a quiet week.\n\nIt lasts until the second evening, when {key} comes to find the captain with an expression the mask doesn't quite hide.",
+    steps: [
+      ["Find out what happened", "Three crew members, one of them Rrinn, are in a cell under the Festival hall: caught, they say, where they shouldn't have been, behind a curtain where {strange}. Rrinn says she heard something she wasn't supposed to hear. Rrinn is very hard to sneak up on."],
+      ["Get them out", "The captain argues them out of the cell with a mixture of charm, Starfleet credit, and a quiet word from Reyes. On the way back to the ship Rrinn tells the captain what she heard: a broker's name, a price, and a buyer with Klingon accents."],
+    ],
+    choice: { title: "The broker", text: "Rrinn knows the broker's name and where they'll be tomorrow night. {key} would very much like this not to become a Starfleet matter: the Festival lives on discretion. The captain can let Starfleet Intelligence know, quietly, or step in personally, publicly, and stop the deal.",
+      options: [
+        { id: "quiet", name: "Tell Intelligence, quietly", blurb: "+8 science from what they learn; the Festival never knows.", how: "Shore leave at the Festival, and a broker's name passed to Intelligence.", fx: { science: 8 }, text: "The name goes to Starfleet Intelligence in a coded burst from orbit, and the rest of the Festival passes in music and masks. Three weeks later, a broker who sold to a Klingon house stops answering their messages. The crew come back aboard tired, sunburned and happy, which is the whole point of shore leave." },
+        { id: "stop", name: "Stop the deal", blurb: "+1 commendation; the Festival is not pleased with Starfleet.", how: "Shore leave at the Festival, and an Orion deal stopped in public.", fx: { commendations: 1, accord: -1 }, text: "Reyes walks into the deal at midnight, in a Festival mask and Starfleet uniform, and the broker runs, leaving the pieces on the table. It's spectacular. It's also the talk of the Festival for all the wrong reasons, and {key} makes it clear that the Pelion's crew will not be welcome next year." },
+      ] },
+    fail: "Shore leave ended badly. Three of the crew spent the Festival in a cell, and the broker's name went unheard.",
+  },
+  "Carry a message across the Neutral Zone#2": {
+    mission: "Carry a message across the Neutral Zone", name: "The prisoner exchange", type: "Security",
+    reason: "A Starfleet officer captured by the Romulans six years ago is to be exchanged at the edge of the Neutral Zone. The Romulans asked for the Pelion. Nobody knows why.",
+    why: "The Romulans are offering more than a prisoner: their exchange officer wants to talk, quietly, about a common enemy digging up sites on both sides of the Zone.",
+    thread: "The Romulan officer's message is plain: the diggers have taken sites on the Romulan side too, and the Romulans know who's paying them. House Kor'vath. The Romulans would like it known they didn't do it.",
+    keys: ["Admiral Rhys Caldwell|who arranged the exchange", "Lieutenant Sabine Aube|an admiral's intelligence aide", "Dr. Nils Arden|a Starfleet doctor sent to meet the prisoner", "Commander Hollis Reyne|who served with the prisoner before her capture"],
+    strange: ["a prisoner who's been held for six years and doesn't know the war's over", "a Romulan officer who asks to speak to the captain alone", "a message slipped into the exchange papers", "an exchange point no Federation ship has visited in decades"],
+    brief: "A prisoner exchange at the edge of the Neutral Zone near {world}: one Starfleet officer, held six years, for a Romulan held two. The Romulans asked for the Pelion by name.",
+    arrive: "The exchange point is a patch of empty space the treaty set aside a century ago. A Romulan bird-of-prey waits there, decloaked, which in itself is a statement. Its commander hails: Subcommander Velan. Correct, cold, very formal. \"Captain. You are expected.\"\n\nAboard the Pelion for the exchange is {key}. In the brig, the Romulan prisoner waits, perfectly calm. Somewhere aboard the bird-of-prey is a Starfleet officer who hasn't seen home in six years.",
+    steps: [
+      ["Make the exchange", "Two officers cross between two ships in the same instant, beams locked together so neither side can cheat. The Starfleet officer materializes on the Pelion's transporter pad thin, pale and upright, and salutes the captain, and then sits down on the pad very suddenly and puts her face in her hands. Vessik is beside her before anyone else moves."],
+      ["Take the message", "The Romulan exchange officer asks for one more thing: a word with the captain, alone, by viewscreen. When the captain agrees, the Romulan speaks quickly and quietly: their sites have been dug up too. They know who's paying. They would like the Federation to know it isn't them."],
+    ],
+    choice: { title: "The offer", text: "The Romulan officer has offered, without quite saying so, to share what they know about the diggers: in exchange for what the Federation knows. It would be an unprecedented channel between the two powers. Starfleet would never authorize it. The captain could open it anyway, or report the offer and leave it to the admirals.",
+      options: [
+        { id: "open", name: "Open the channel", blurb: "+14 science from what they share; Starfleet Command marks a box.", how: "The prisoner exchanged; a quiet channel opened with a Romulan officer.", fx: { science: 14, command: 1 }, text: "A coded frequency, a schedule, two officers on opposite sides of a line who will never meet. What comes through it in the months that follow is extraordinary. Starfleet Command finds out, eventually, and is furious, and keeps using it." },
+        { id: "report", name: "Report it and wait", blurb: "+1 commendation; the offer is never repeated.", how: "The prisoner exchanged; the Romulan offer reported to Starfleet.", fx: { commendations: 1 }, text: "The captain reports the offer word for word, and Starfleet Command thanks them for their discretion and does nothing at all. The Romulan never calls again. The rescued officer, at least, is home, and on her first night aboard she eats three dinners." },
+      ] },
+    fail: "The Pelion never came. The Romulans took their officer home, and Starfleet's officer back to her cell.",
+  },
+});
+
 /**
  * Complications: partway through an order, something goes wrong. Press on (an opposed roll: win and you gain ground,
  * lose and it costs you) or fall back (safe, but a week lost). One set for each kind of mission.
@@ -1692,7 +1995,7 @@ function missionChoices(S, ev) {
     options: st.choice.options.filter((x) => !x.needs || (x.needs === "inverter" && S.pelion.refits.inverter)).map((x) => ({ id: x.id, name: storyText(S, o, x.name), blurb: storyText(S, o, x.blurb) })) };
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
-  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike",
+  accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike", refit: (n) => `${REFITS[n] ? REFITS[n].name : n} fitted to the Pelion`, delay: (n) => `every other order's deadline ${n} weeks closer`,
   heal: (n, w) => `${w}'s harm −${n}`, inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
 function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
@@ -1711,6 +2014,8 @@ function chooseMission(S, orderId, optId) {
     else if (k === "hurt") { const c = CREW.filter((x) => available(S, x.id) && x.id !== "captain"); const v = c[Math.floor(rand(S) * c.length)]; if (v) S.crew[v.id].inj = Math.min(3, S.crew[v.id].inj + n); }
     else if (k === "sensors") S.pelion.sys.sensors = Math.min(3, S.pelion.sys.sensors + n);
     else if (k === "romulan") romulanReprisal(S, o.title);
+    else if (k === "refit") S.pelion.refits[n] = true;
+    else if (k === "delay") { for (const x of S.orders) if (x !== o) x.deadline -= n; }
     else if (k === "inverter") S.pelion.refits.inverter = Math.max(S.pelion.refits.inverter || 0, n);
     lines.push(FX_TEXT[k] ? FX_TEXT[k](n, w) : k);
   }
@@ -1789,30 +2094,45 @@ function orderOpposition(base, twist) {
   if (add) { o.name += add[0]; o.target += add[1]; o.why += ` Twist: ${twist.text}.`; }
   return o;
 }
+/**
+ * A new order from Starfleet. Every story is told once a tour: the 3d6 roll picks the kind of order (the nearest kind that
+ * still has an untold story and somewhere to happen), then one of its untold stories. When every story has been told,
+ * Starfleet has nothing new to send.
+ */
 function newOrder(S) {
   const roll = d6(S) + d6(S) + d6(S);
-  const m = MISSIONS.reduce((best, x) => (Math.abs(x.roll - roll) < Math.abs(best.roll - roll) ? x : best), MISSIONS[0]);
-  let at = null, sys = null;
+  const used = (S.storiesUsed = S.storiesUsed || []);
+  const untold = (m) => Object.keys(STORIES).filter((k) => STORIES[k].mission === m.text && !used.includes(k));
   const from = S.pelion.at;
-  if (m.where.includes("border")) {
-    // Border orders go to a listening post on the Zone if one's still standing.
-    const posts = livePosts(S).filter((p) => distance(p.at, from) >= 3);
-    const hexes = posts.length ? posts.map((p) => p.at) : Object.keys(S.hexes).filter((k) => nearZone(k) && distance(k, from) >= 3);
-    at = pick(S, hexes);
-  } else {
+  const placeFor = (m) => {
+    if (m.where.includes("border")) {
+      // Border orders go to a listening post on the Zone if one's still standing.
+      const posts = livePosts(S).filter((p) => distance(p.at, from) >= 3);
+      const hexes = posts.length ? posts.map((p) => p.at) : Object.keys(S.hexes).filter((k) => nearZone(k) && distance(k, from) >= 3);
+      return hexes.length ? { at: pick(S, hexes), sys: null } : null;
+    }
     const cands = Object.values(S.systems).filter((s) => (m.where.includes(s.kind) || (s.kind === "member" && m.where.includes("independent")) || (s.kind === "orionBase" && m.where.includes("empty")))
       && !S.orders.concat(S.backlog || []).some((o) => o.sys === s.id) && distance(s.at, from) >= 2 && distance(s.at, from) <= 10 && s.id !== S.corvan);
     if (!cands.length) return null;
-    sys = pick(S, cands); at = sys.at; S.seenSys[sys.id] = true;
+    const sys = pick(S, cands); S.seenSys[sys.id] = true; return { at: sys.at, sys };
+  };
+  let m = null, place = null, storyKey = null;
+  for (const x of [...MISSIONS].sort((a, b) => Math.abs(a.roll - roll) - Math.abs(b.roll - roll))) {
+    const left = untold(x); if (!left.length) continue;
+    const p = placeFor(x); if (!p) continue;
+    m = x; place = p; storyKey = pick(S, left); break;
   }
+  if (!m) return null;   // every story has been told
+  used.push(storyKey);
+  const st = STORIES[storyKey], at = place.at, sys = place.sys;
   const twist = rand(S) < 0.6 ? pick(S, TWISTS) : null;
   // Travel time: at the maximum stable speed (warp 6), or, for urgent orders, at emergency warp 8, which Starfleet expects.
   const urgent = !!(twist && twist.fx === "urgent");
   const dist = Math.ceil(distance(from, at) / lyPerWeek(urgent ? 8 : CRUISE_WARP));
-  const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone"), at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
-    deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, (STORIES[m.text] && STORIES[m.text].strange) || STRANGE), key: pick(S, (STORIES[m.text] && STORIES[m.text].keys) || KEYS), oppose: orderOpposition(m.oppose, twist) };
+  const o = { id: "o" + S.nextId++, issued: S.turn, title: m.text + (sys ? ` at ${sys.name}` : postAt(S, at) ? ` at ${postAt(S, at).name}` : /Neutral Zone/.test(m.text) ? "" : " near the Neutral Zone") + `: ${st.name}`, at, sys: sys && sys.id, where: m.where.includes("border") ? "border" : "", skills: m.skills, segs: m.segs, have: 0,
+    deadline: S.turn + dist + m.segs + (urgent ? 1 : 4), urgent, twist, strange: pick(S, st.strange || STRANGE), key: pick(S, st.keys || KEYS), oppose: orderOpposition(m.oppose, twist) };
   if (postAt(S, at)) o.place = postAt(S, at).name;
-  if (STORIES[m.text]) { o.story = m.text; o.text = storyText(S, o, STORIES[m.text].brief); }
+  o.story = storyKey; o.text = storyText(S, o, st.brief);
   // About half of all orders are part of the campaign (once it has begun); the rest are the frontier's ordinary work.
   const C = campaignOf(S); o.campaign = !C.over && rand(S) < 0.5;
   S.backlog = S.backlog || [];
