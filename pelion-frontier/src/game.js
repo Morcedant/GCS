@@ -3,7 +3,7 @@
 import { makeRng, neighbors, distance, within, hashString } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, SUPPORT_NAMES, ENEMIES, KINDS, ACTIONS, MISSIONS, STRANGE, KEYS, TWISTS, REFITS, RECORDS } from "./data.js";
 import { makeSector, inZone, nearZone } from "./sector.js";
-import { STORIES, CAMPAIGN, storyText, storyOf } from "./stories.js";
+import { STORIES, CAMPAIGN, COMPLICATIONS, KORVATH_SITES, storyText, storyOf } from "./stories.js";
 
 // ---------- dice ----------
 export function rand(S) { const r = makeRng(0); r.setState(S.rng); const v = r.next(); S.rng = r.state(); return v; }
@@ -622,6 +622,12 @@ function missionStep(S, p) {
   o.have = Math.min(o.segs, o.have + (p.roll.margin >= 5 ? 2 : 1));
   const st = storyOf(o);
   if (st) for (let i = was; i < o.have; i++) if (st.steps[i]) storyEvent(S, `${o.title}: ${st.steps[i][0].toLowerCase()}`, storyText(S, o, st.steps[i][1]));
+  // Partway through, something can go wrong: once an order, a third of the time.
+  if (st && o.have < o.segs && !o.complicated && COMPLICATIONS[st.type] && rand(S) < 0.33) {
+    o.complicated = true;
+    const ev = { kind: "complication", orderId: o.id };
+    if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
+  }
   if (o.have < o.segs) return say(S, `${o.title}: ${o.have}/${o.segs}${st && st.steps[o.have] ? `. Next: ${st.steps[o.have][0].toLowerCase()}` : ""}.`, "good");
   if (st && st.choice) {   // the work is done; the decision is the captain's
     const ev = { kind: "mission-choice", orderId: o.id };
@@ -677,13 +683,38 @@ function campaignThread(S, o) {
   log(S, `${CAMPAIGN.title}, thread ${n}: ${storyText(S, o, st.thread)}`, "discovery");
   for (const b of CAMPAIGN.beats) if (b.at > 0 && n >= b.at) campaignBeat(S, b.at);
   if (n >= CAMPAIGN.finaleAt) issueFinale(S);
+  // Every thread costs the diggers time: their next site is two weeks further off.
+  if (C.korvathNext) C.korvathNext += 2;
   return storyText(S, o, st.thread);
 }
 /** The end of the campaign: once Corvan II is done, whatever happened there, and late in the tour if need be. */
 export function campaignTick(S) {
   const C = campaignOf(S);
   if (S.arc.stage === "done") campaignBeat(S, 0);
+  korvathTick(S);
   if (S.arc.stage === "done" && !C.finale && S.turn >= TOUR - 14) { campaignBeat(S, CAMPAIGN.finaleAt); issueFinale(S); }
+}
+// ---------- the race: House Kor'vath ----------
+// Once the campaign has begun, the diggers take another Makers' site every few weeks: a world nearby is harmed and Klingon
+// tension rises. Each thread the Pelion turns up sets them back. If they reach six sites first, they find the lines to the
+// Gate themselves, and the finale begins with them ahead.
+export const KORVATH_EVERY = { easy: 7, normal: 5, hard: 4 };
+export const diggersName = (S) => (campaignOf(S).beats.includes(2) ? "House Kor'vath" : "the diggers");
+function korvathTick(S) {
+  const C = campaignOf(S);
+  if (!C.beats.includes(0) || C.over || C.finale) return;
+  C.korvath = C.korvath || 0;
+  if (!C.korvathNext) { C.korvathNext = S.turn + (KORVATH_EVERY[S.difficulty] || 5); return; }
+  if (S.turn < C.korvathNext) return;
+  C.korvath++; C.korvathNext = S.turn + (KORVATH_EVERY[S.difficulty] || 5);
+  const site = KORVATH_SITES[(C.korvath - 1) % KORVATH_SITES.length];
+  const near = Object.values(S.systems).filter((s) => ["colony", "member", "independent"].includes(s.kind) && distance(s.at, S.pelion.at) >= 3);
+  const w = near.length ? pick(S, near) : null;
+  if (w) harmWorld(S, w, 1, `its Makers' site was dug up, and the ground hasn't been still since`);
+  S.tension = Math.min(10, S.tension + 1);
+  const who = diggersName(S), ahead = C.korvath > C.threads.length;
+  storyEvent(S, `${CAMPAIGN.title}: another site falls`, `Starfleet Intelligence reports another Makers' site dug up: ${site}${w ? `, near ${w.name}` : ""}. No witnesses, again. That's ${C.korvath} site${C.korvath === 1 ? "" : "s"} to ${who}, against the Pelion's ${C.threads.length} thread${C.threads.length === 1 ? "" : "s"}.${ahead ? ` ${who[0].toUpperCase() + who.slice(1)} are ahead.` : ""} Klingon tension rises.${C.korvath >= CAMPAIGN.finaleAt ? "" : ` Every campaign order you carry out sets them back two weeks.`}`);
+  if (C.korvath >= CAMPAIGN.finaleAt) { campaignBeat(S, 2); campaignBeat(S, 4); campaignBeat(S, CAMPAIGN.finaleAt); issueFinale(S); }
 }
 /** The final order: the Makers' Gate, in empty space where every relay points. */
 function issueFinale(S) {
@@ -694,9 +725,42 @@ function issueFinale(S) {
   const at = pick(S, hexes) || sb.at, st = STORIES["The Makers' Gate"];
   const o = { id: "o" + S.nextId++, issued: S.turn, title: "The Makers' Gate", at, sys: null, place: "the Makers' Gate", where: "", skills: ["Physical Sciences", "Diplomacy", "Engineering"], segs: 3, have: 0,
     urgent: true, finale: true, twist: null, story: "The Makers' Gate", strange: st.strange[0], key: st.keys[0],
-    oppose: { name: "House Kor'vath's expedition", skill: "Ruthlessness", target: 12, why: "A Klingon battle cruiser and a house with everything to gain." } };
+    oppose: { name: "House Kor'vath's expedition", skill: "Ruthlessness", target: 12 + Math.max(0, (C.korvath || 0) - C.threads.length), why: "A Klingon battle cruiser and a house with everything to gain." + ((C.korvath || 0) > C.threads.length ? ` They're ahead: they took ${C.korvath} sites to your ${C.threads.length} threads (+${C.korvath - C.threads.length}).` : "") } };
+  if ((C.korvath || 0) > C.threads.length) o.korvathAhead = true;
   o.text = storyText(S, o, st.brief);
   activateOrder(S, o, "issued: the finale of Watchers of the Void");
+}
+/** A complication's choices: press on (an opposed roll) or fall back (a week lost). */
+export function complicationChoices(S, ev) {
+  const o = S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && COMPLICATIONS[st.type];
+  if (!o || !c) return null;
+  return { order: o, title: c.title, text: c.text, options: [
+    { id: "press", name: c.press, blurb: `Opposed by ${c.oppose.name} (${c.oppose.skill} ${c.oppose.target}), with ${c.skills.join(", ")}. Win: the work leaps ahead (+1 success). Lose: ${c.costText}.` },
+    { id: "back", name: "Fall back and regroup", blurb: `Safe, but it costs a week: the deadline comes a turn closer (turn ${o.deadline - 1}).` },
+  ] };
+}
+export function chooseComplication(S, optId) {
+  const ev = S.event; S.event = null;
+  const o = ev && S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && COMPLICATIONS[st.type];
+  if (!o || !c) return { text: "" };
+  if (optId === "back") { o.deadline--; log(S, `${o.title}: ${c.title.toLowerCase()}. The captain orders everyone back to regroup: safe, but a week lost (due by turn ${o.deadline} now).`, "bad"); return { text: "" }; }
+  const b = bestOfficer(S, c.skills, {}, null) || { officer: "captain", skill: c.skills[0] };
+  const t = target(S, b.officer, b.skill), r = check(S, t.total), op = opposed(S, r, c.oppose, officer(b.officer)?.short || "The captain");
+  log(S, op.line, op.win ? "good" : "bad");
+  if (op.win) {
+    o.have = Math.min(o.segs - 1, o.have + 1);
+    if (st.steps[o.have - 1]) storyEvent(S, `${o.title}: ${st.steps[o.have - 1][0].toLowerCase()}`, storyText(S, o, st.steps[o.have - 1][1]));
+    log(S, `${o.title}: ${c.title.toLowerCase()}, and the crew push through it: ${o.have}/${o.segs}.`, "good");
+    return { text: "" };
+  }
+  const s = o.sys && S.systems[o.sys];
+  if (c.cost === "hurt") { const v = CREW.filter((x) => available(S, x.id)); const p = v[Math.floor(rand(S) * v.length)]; if (p) S.crew[p.id].inj = Math.min(3, S.crew[p.id].inj + 1); log(S, `${o.title}: ${c.costText}${p ? ` (${p.short}, hurt ${S.crew[p.id].inj}/3)` : ""}.`, "bad"); }
+  else if (c.cost === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, s.accord - 1); log(S, `${o.title}: ${c.costText} (${s.name} now ${s.accord}).`, "bad"); }
+  else if (c.cost === "sensors" || c.cost === "engines") { S.pelion.sys[c.cost] = Math.min(3, S.pelion.sys[c.cost] + 1); log(S, `${o.title}: ${c.costText}.`, "bad"); }
+  else if (c.cost === "tension") { S.tension = Math.min(10, S.tension + 1); log(S, `${o.title}: ${c.costText}.`, "bad"); }
+  else if (c.cost === "command") markCommand(S, 1, `${o.title}: ${c.costText}.`);
+  else log(S, `${o.title}: ${c.costText}.`, "bad");
+  return { text: "" };
 }
 /** The scene when the Pelion first reaches an order's location. */
 function arriveAt(S, o) {

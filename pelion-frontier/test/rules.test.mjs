@@ -379,3 +379,23 @@ test("the patrol's third choice, shadowing the Romulan ship home, needs the cloa
   S.pelion.refits.inverter = 1; assert.equal(missionChoices(S, ev).options.length, 3);
   S.event = ev; assert.ok(chooseMission(S, o.id, "shadow").ok);
 });
+test("tension: the diggers race the Pelion for the sites, complications mid-mission, and the Empire's warnings", async () => {
+  const { complicationChoices, chooseComplication, campaignTick } = await import("../src/game.js");
+  const S = newGame({ seed: "race" });
+  const arc = S.orders.find((o) => o.arc); S.arc.stage = "done"; completeOrder(S, arc, true, "Done."); S.event = null; S.eventQueue = [];
+  campaignTick(S); const first = S.campaign.korvathNext; assert.ok(first > S.turn);
+  const t0 = S.tension; S.turn = first; campaignTick(S);
+  assert.equal(S.campaign.korvath, 1); assert.equal(S.tension, t0 + 1);
+  assert.ok([S.event].concat(S.eventQueue).some((e) => e && /another site falls/.test(e.title)));
+  S.event = null; S.eventQueue = [];
+  // A thread sets them back two weeks.
+  S.orders = []; S.backlog = []; const before = S.campaign.korvathNext;
+  const o = newOrder(S); o.campaign = true; S.event = null; S.eventQueue = []; completeOrder(S, o, true); S.event = null; S.eventQueue = [];
+  assert.equal(S.campaign.korvathNext, before + 2);
+  // A complication: falling back costs a week; pressing on rolls against the opposition.
+  const p = newOrder(S); S.event = null; S.eventQueue = []; S.orders = [p]; p.have = 1;
+  S.event = { kind: "complication", orderId: p.id }; const c = complicationChoices(S, S.event); assert.equal(c.options.length, 2);
+  const d = p.deadline; chooseComplication(S, "back"); assert.equal(p.deadline, d - 1);
+  S.event = { kind: "complication", orderId: p.id }; chooseComplication(S, "press");
+  assert.ok(S.log.some((l) => /opposing/.test(l.text)));
+});

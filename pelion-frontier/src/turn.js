@@ -54,6 +54,7 @@ export function endTurn(S) {
   if (S.turn >= 3 && waiting < BACKLOG_MAX && (S.turn % 4 === 0 || active === 0 && !waiting && S.turn % 2 === 0)) newOrder(S);
   warpStrain(S);
   campaignTick(S);
+  tensionWarnings(S);
   // Next turn.
   S.turn++;
   newWeek(S); S.pelion.engaged = false; S.pelion.zoneMarked = false;
@@ -82,6 +83,13 @@ function warpStrain(S) {
   const t = target(S, eng, "Engineering", { extra }), r = check(S, t.total), urgent = S.orders.some(isUrgent);
   if (r.success) log(S, `Warp ${w} this week: ${officer(eng).short} keeps the engines in the green (Engineering, ${r.total} against ${r.target}).`, "good");
   else { P.sys.engines = Math.min(3, P.sys.engines + 1); log(S, `Warp ${w} this week strains the engines past their limit (${officer(eng).short}, Engineering, ${r.total} against ${r.target}): engines damaged ${P.sys.engines}/3, maximum warp now ${maxWarp(S)} until repaired.${urgent ? " The orders were urgent; Starfleet will understand." : ""}`, "bad"); }
+}
+/** The Klingon Empire's patience, said out loud: warnings as tension climbs toward 10, when battle cruisers cross. */
+function tensionWarnings(S) {
+  const was = S.tensionSeen || 0, now = S.tension;
+  if (now >= 7 && was < 7) storyEvent(S, "The Empire is watching", `Klingon tension stands at ${now} of 10. Starfleet Intelligence intercepts the Imperial Council's traffic: every incident in the Corvan Sector is being counted. At 10, the Empire will answer with battle cruisers against Federation worlds. Avoid incidents; let tension fall (it eases a step every six weeks).`);
+  else if (now >= 9 && was < 9) storyEvent(S, "One more incident", `Klingon tension: ${now} of 10. A Klingon captain broadcasts on an open channel, to no one in particular, that the Empire's patience has a bottom and the Federation has found it. One more incident and the battle cruisers cross the border.`);
+  S.tensionSeen = now;
 }
 /** A new week for the Pelion: seven days of travel, plus any part of a light-year it was partway through. */
 function newWeek(S) {
@@ -116,5 +124,5 @@ export function chooseEvent(S, id) {
   updateVisibility(S);
   return out;
 }
-export function dismissEvent(S) { if (S.event && (S.event.kind === "mission-choice" || S.event.kind === "cloak-contact")) return; S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
+export function dismissEvent(S) { if (S.event && ["mission-choice", "cloak-contact", "complication"].includes(S.event.kind)) return; S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
 export function closeBattle(S) { endBattle(S); arcTick(S); updateVisibility(S); checkEnd(S); }

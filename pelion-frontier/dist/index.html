@@ -728,6 +728,31 @@ function storyText(S, o, text) {
 }
 const storyOf = (o) => (o && o.story ? STORIES[o.story] : null);
 
+/**
+ * Complications: partway through an order, something goes wrong. Press on (an opposed roll: win and you gain ground,
+ * lose and it costs you) or fall back (safe, but a week lost). One set for each kind of mission.
+ */
+const COMPLICATIONS = {
+  Rescue: { title: "A second disaster", text: "Halfway through, it gets worse: a secondary explosion, a hull section giving way, a corridor filling with smoke, and people still on the far side of it.", oppose: { name: "the spreading disaster", skill: "Severity", target: 12 }, skills: ["Engineering", "Medicine", "Leadership"], cost: "hurt", costText: "a rescuer is hurt getting them out", press: "Send the team in now" },
+  Diplomatic: { title: "A walkout", text: "One delegation stands up mid-session and walks out, citing an insult nobody else heard. If they reach their ship, the talks are over.", oppose: { name: "wounded pride", skill: "Grievance", target: 12 }, skills: ["Diplomacy", "Psychology", "Leadership"], cost: "accord", costText: "the talks sour: accord −1", press: "Go after them" },
+  Exploration: { title: "The readings spike", text: "The sensors spike off every scale: something is reacting to the Pelion's scans, and the longer the ship stays, the harder it pushes back.", oppose: { name: "the phenomenon", skill: "Strangeness", target: 12 }, skills: ["Sensors", "Physical Sciences", "Computers"], cost: "sensors", costText: "the sensor array burns out a box", press: "Hold position and keep scanning" },
+  Technology: { title: "Cascade failure", text: "The prototype's power draw spikes and a cascade starts running through the ship's systems, deck by deck. It can be shut down, or ridden out.", oppose: { name: "the cascade", skill: "Overload", target: 12 }, skills: ["Engineering", "Electronics", "Computers"], cost: "engines", costText: "the cascade reaches the warp drive: engines damaged", press: "Ride it out" },
+  Security: { title: "Contact", text: "A contact on long-range sensors, closing fast and running dark. It could be a patrol. It could be a trap.", oppose: { name: "whoever is out there", skill: "Cunning", target: 12 }, skills: ["Sensors", "Helm", "Communications"], cost: "tension", costText: "an incident on the border: Klingon tension +1", press: "Hold course and find out" },
+  Crew: { title: "It gets out of hand", text: "What started as a misunderstanding has the local constabulary involved, a crowd gathering, and a crewman who won't back down.", oppose: { name: "the crowd's temper", skill: "Anger", target: 11 }, skills: ["Leadership", "Psychology", "Diplomacy"], cost: "command", costText: "an incident report reaches Starfleet: a Command box", press: "Step in personally" },
+  Campaign: { title: "Kor'vath moves first", text: "The Klingon cruiser runs its shields up and moves to cut the Pelion off from the Gate. Hold your ground, or give them room.", oppose: { name: "House Kor'vath's cruiser", skill: "Ruthlessness", target: 12 }, skills: ["Helm", "Leadership", "Diplomacy"], cost: "hurt", costText: "a disruptor hit on the bridge: a crew member is hurt", press: "Hold your ground" },
+};
+/** Each Makers' site House Kor'vath digs up, in turn: where it was and what was lost. */
+const KORVATH_SITES = [
+  "a ruin on an airless moon, its caretaker cut out in a night",
+  "a cave city on a frozen world, emptied, its watcher gone",
+  "a sea-floor vault, flooded after the diggers left",
+  "a mountain shrine the locals had guarded for a thousand years",
+  "a derelict in a slow orbit, stripped to the frame",
+  "a desert obelisk, toppled and hollow",
+  "a ring of standing stones, every stone cut open",
+  "a crater observatory, its lenses smashed",
+];
+
 // ---- sector.js ----
 // The Corvan Sector: a hex map with the Federation's starbase and colonies to the southwest, two Klingon outposts on
 // the eastern border, the Romulan Neutral Zone along the top, and between them independent worlds, pre-warp peoples,
@@ -1416,6 +1441,12 @@ function missionStep(S, p) {
   o.have = Math.min(o.segs, o.have + (p.roll.margin >= 5 ? 2 : 1));
   const st = storyOf(o);
   if (st) for (let i = was; i < o.have; i++) if (st.steps[i]) storyEvent(S, `${o.title}: ${st.steps[i][0].toLowerCase()}`, storyText(S, o, st.steps[i][1]));
+  // Partway through, something can go wrong: once an order, a third of the time.
+  if (st && o.have < o.segs && !o.complicated && COMPLICATIONS[st.type] && rand(S) < 0.33) {
+    o.complicated = true;
+    const ev = { kind: "complication", orderId: o.id };
+    if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
+  }
   if (o.have < o.segs) return say(S, `${o.title}: ${o.have}/${o.segs}${st && st.steps[o.have] ? `. Next: ${st.steps[o.have][0].toLowerCase()}` : ""}.`, "good");
   if (st && st.choice) {   // the work is done; the decision is the captain's
     const ev = { kind: "mission-choice", orderId: o.id };
@@ -1471,13 +1502,38 @@ function campaignThread(S, o) {
   log(S, `${CAMPAIGN.title}, thread ${n}: ${storyText(S, o, st.thread)}`, "discovery");
   for (const b of CAMPAIGN.beats) if (b.at > 0 && n >= b.at) campaignBeat(S, b.at);
   if (n >= CAMPAIGN.finaleAt) issueFinale(S);
+  // Every thread costs the diggers time: their next site is two weeks further off.
+  if (C.korvathNext) C.korvathNext += 2;
   return storyText(S, o, st.thread);
 }
 /** The end of the campaign: once Corvan II is done, whatever happened there, and late in the tour if need be. */
 function campaignTick(S) {
   const C = campaignOf(S);
   if (S.arc.stage === "done") campaignBeat(S, 0);
+  korvathTick(S);
   if (S.arc.stage === "done" && !C.finale && S.turn >= TOUR - 14) { campaignBeat(S, CAMPAIGN.finaleAt); issueFinale(S); }
+}
+// ---------- the race: House Kor'vath ----------
+// Once the campaign has begun, the diggers take another Makers' site every few weeks: a world nearby is harmed and Klingon
+// tension rises. Each thread the Pelion turns up sets them back. If they reach six sites first, they find the lines to the
+// Gate themselves, and the finale begins with them ahead.
+const KORVATH_EVERY = { easy: 7, normal: 5, hard: 4 };
+const diggersName = (S) => (campaignOf(S).beats.includes(2) ? "House Kor'vath" : "the diggers");
+function korvathTick(S) {
+  const C = campaignOf(S);
+  if (!C.beats.includes(0) || C.over || C.finale) return;
+  C.korvath = C.korvath || 0;
+  if (!C.korvathNext) { C.korvathNext = S.turn + (KORVATH_EVERY[S.difficulty] || 5); return; }
+  if (S.turn < C.korvathNext) return;
+  C.korvath++; C.korvathNext = S.turn + (KORVATH_EVERY[S.difficulty] || 5);
+  const site = KORVATH_SITES[(C.korvath - 1) % KORVATH_SITES.length];
+  const near = Object.values(S.systems).filter((s) => ["colony", "member", "independent"].includes(s.kind) && distance(s.at, S.pelion.at) >= 3);
+  const w = near.length ? pick(S, near) : null;
+  if (w) harmWorld(S, w, 1, `its Makers' site was dug up, and the ground hasn't been still since`);
+  S.tension = Math.min(10, S.tension + 1);
+  const who = diggersName(S), ahead = C.korvath > C.threads.length;
+  storyEvent(S, `${CAMPAIGN.title}: another site falls`, `Starfleet Intelligence reports another Makers' site dug up: ${site}${w ? `, near ${w.name}` : ""}. No witnesses, again. That's ${C.korvath} site${C.korvath === 1 ? "" : "s"} to ${who}, against the Pelion's ${C.threads.length} thread${C.threads.length === 1 ? "" : "s"}.${ahead ? ` ${who[0].toUpperCase() + who.slice(1)} are ahead.` : ""} Klingon tension rises.${C.korvath >= CAMPAIGN.finaleAt ? "" : ` Every campaign order you carry out sets them back two weeks.`}`);
+  if (C.korvath >= CAMPAIGN.finaleAt) { campaignBeat(S, 2); campaignBeat(S, 4); campaignBeat(S, CAMPAIGN.finaleAt); issueFinale(S); }
 }
 /** The final order: the Makers' Gate, in empty space where every relay points. */
 function issueFinale(S) {
@@ -1488,9 +1544,42 @@ function issueFinale(S) {
   const at = pick(S, hexes) || sb.at, st = STORIES["The Makers' Gate"];
   const o = { id: "o" + S.nextId++, issued: S.turn, title: "The Makers' Gate", at, sys: null, place: "the Makers' Gate", where: "", skills: ["Physical Sciences", "Diplomacy", "Engineering"], segs: 3, have: 0,
     urgent: true, finale: true, twist: null, story: "The Makers' Gate", strange: st.strange[0], key: st.keys[0],
-    oppose: { name: "House Kor'vath's expedition", skill: "Ruthlessness", target: 12, why: "A Klingon battle cruiser and a house with everything to gain." } };
+    oppose: { name: "House Kor'vath's expedition", skill: "Ruthlessness", target: 12 + Math.max(0, (C.korvath || 0) - C.threads.length), why: "A Klingon battle cruiser and a house with everything to gain." + ((C.korvath || 0) > C.threads.length ? ` They're ahead: they took ${C.korvath} sites to your ${C.threads.length} threads (+${C.korvath - C.threads.length}).` : "") } };
+  if ((C.korvath || 0) > C.threads.length) o.korvathAhead = true;
   o.text = storyText(S, o, st.brief);
   activateOrder(S, o, "issued: the finale of Watchers of the Void");
+}
+/** A complication's choices: press on (an opposed roll) or fall back (a week lost). */
+function complicationChoices(S, ev) {
+  const o = S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && COMPLICATIONS[st.type];
+  if (!o || !c) return null;
+  return { order: o, title: c.title, text: c.text, options: [
+    { id: "press", name: c.press, blurb: `Opposed by ${c.oppose.name} (${c.oppose.skill} ${c.oppose.target}), with ${c.skills.join(", ")}. Win: the work leaps ahead (+1 success). Lose: ${c.costText}.` },
+    { id: "back", name: "Fall back and regroup", blurb: `Safe, but it costs a week: the deadline comes a turn closer (turn ${o.deadline - 1}).` },
+  ] };
+}
+function chooseComplication(S, optId) {
+  const ev = S.event; S.event = null;
+  const o = ev && S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && COMPLICATIONS[st.type];
+  if (!o || !c) return { text: "" };
+  if (optId === "back") { o.deadline--; log(S, `${o.title}: ${c.title.toLowerCase()}. The captain orders everyone back to regroup: safe, but a week lost (due by turn ${o.deadline} now).`, "bad"); return { text: "" }; }
+  const b = bestOfficer(S, c.skills, {}, null) || { officer: "captain", skill: c.skills[0] };
+  const t = target(S, b.officer, b.skill), r = check(S, t.total), op = opposed(S, r, c.oppose, officer(b.officer)?.short || "The captain");
+  log(S, op.line, op.win ? "good" : "bad");
+  if (op.win) {
+    o.have = Math.min(o.segs - 1, o.have + 1);
+    if (st.steps[o.have - 1]) storyEvent(S, `${o.title}: ${st.steps[o.have - 1][0].toLowerCase()}`, storyText(S, o, st.steps[o.have - 1][1]));
+    log(S, `${o.title}: ${c.title.toLowerCase()}, and the crew push through it: ${o.have}/${o.segs}.`, "good");
+    return { text: "" };
+  }
+  const s = o.sys && S.systems[o.sys];
+  if (c.cost === "hurt") { const v = CREW.filter((x) => available(S, x.id)); const p = v[Math.floor(rand(S) * v.length)]; if (p) S.crew[p.id].inj = Math.min(3, S.crew[p.id].inj + 1); log(S, `${o.title}: ${c.costText}${p ? ` (${p.short}, hurt ${S.crew[p.id].inj}/3)` : ""}.`, "bad"); }
+  else if (c.cost === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, s.accord - 1); log(S, `${o.title}: ${c.costText} (${s.name} now ${s.accord}).`, "bad"); }
+  else if (c.cost === "sensors" || c.cost === "engines") { S.pelion.sys[c.cost] = Math.min(3, S.pelion.sys[c.cost] + 1); log(S, `${o.title}: ${c.costText}.`, "bad"); }
+  else if (c.cost === "tension") { S.tension = Math.min(10, S.tension + 1); log(S, `${o.title}: ${c.costText}.`, "bad"); }
+  else if (c.cost === "command") markCommand(S, 1, `${o.title}: ${c.costText}.`);
+  else log(S, `${o.title}: ${c.costText}.`, "bad");
+  return { text: "" };
 }
 /** The scene when the Pelion first reaches an order's location. */
 function arriveAt(S, o) {
@@ -2477,6 +2566,7 @@ function endTurn(S) {
   if (S.turn >= 3 && waiting < BACKLOG_MAX && (S.turn % 4 === 0 || active === 0 && !waiting && S.turn % 2 === 0)) newOrder(S);
   warpStrain(S);
   campaignTick(S);
+  tensionWarnings(S);
   // Next turn.
   S.turn++;
   newWeek(S); S.pelion.engaged = false; S.pelion.zoneMarked = false;
@@ -2505,6 +2595,13 @@ function warpStrain(S) {
   const t = target(S, eng, "Engineering", { extra }), r = check(S, t.total), urgent = S.orders.some(isUrgent);
   if (r.success) log(S, `Warp ${w} this week: ${officer(eng).short} keeps the engines in the green (Engineering, ${r.total} against ${r.target}).`, "good");
   else { P.sys.engines = Math.min(3, P.sys.engines + 1); log(S, `Warp ${w} this week strains the engines past their limit (${officer(eng).short}, Engineering, ${r.total} against ${r.target}): engines damaged ${P.sys.engines}/3, maximum warp now ${maxWarp(S)} until repaired.${urgent ? " The orders were urgent; Starfleet will understand." : ""}`, "bad"); }
+}
+/** The Klingon Empire's patience, said out loud: warnings as tension climbs toward 10, when battle cruisers cross. */
+function tensionWarnings(S) {
+  const was = S.tensionSeen || 0, now = S.tension;
+  if (now >= 7 && was < 7) storyEvent(S, "The Empire is watching", `Klingon tension stands at ${now} of 10. Starfleet Intelligence intercepts the Imperial Council's traffic: every incident in the Corvan Sector is being counted. At 10, the Empire will answer with battle cruisers against Federation worlds. Avoid incidents; let tension fall (it eases a step every six weeks).`);
+  else if (now >= 9 && was < 9) storyEvent(S, "One more incident", `Klingon tension: ${now} of 10. A Klingon captain broadcasts on an open channel, to no one in particular, that the Empire's patience has a bottom and the Federation has found it. One more incident and the battle cruisers cross the border.`);
+  S.tensionSeen = now;
 }
 /** A new week for the Pelion: seven days of travel, plus any part of a light-year it was partway through. */
 function newWeek(S) {
@@ -2539,7 +2636,7 @@ function chooseEvent(S, id) {
   updateVisibility(S);
   return out;
 }
-function dismissEvent(S) { if (S.event && (S.event.kind === "mission-choice" || S.event.kind === "cloak-contact")) return; S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
+function dismissEvent(S) { if (S.event && ["mission-choice", "cloak-contact", "complication"].includes(S.event.kind)) return; S.event = (S.eventQueue && S.eventQueue.shift()) || null; if (!S.event) arcTick(S); checkEnd(S); }
 function closeBattle(S) { endBattle(S); arcTick(S); updateVisibility(S); checkEnd(S); }
 
 // ---- ui.js ----
@@ -3146,7 +3243,8 @@ function campaignHTML() {
   const status = C.over === "close" ? "Resolved: the watch is over, the Gate closed." : C.over === "guard" ? "Resolved: the Gate kept open, under Starfleet's guard." : C.over === "lost" ? "Lost: House Kor'vath reached the Gate first." : C.finale ? "The finale: get to the Makers' Gate first (the Orders tab)." : !C.beats.includes(0) ? "It begins at Corvan II." : `${n} of ${CAMPAIGN.finaleAt} threads to find the Makers' Gate${next ? `; the next revelation at ${next.at}` : ""}. Orders marked ${CAMPAIGN.title} turn up threads; the others are the frontier's ordinary work.`;
   let h = `<div class="card gold"><h4>The campaign: ${esc(CAMPAIGN.title)} <span class="badge-status ${C.over === "lost" ? "bad" : C.over ? "good" : ""}">${esc(campaignAct(S))}<\/span><\/h4>
     <p class="small">${esc(CAMPAIGN.premise)}<\/p>
-    <div class="kv small"><span>Threads<\/span><span>${boxes(n, CAMPAIGN.finaleAt, "blue")} ${esc(status)}<\/span><\/div>`;
+    <div class="kv small"><span>Threads<\/span><span>${boxes(n, CAMPAIGN.finaleAt, "blue")} ${esc(status)}<\/span>
+    ${C.over ? "" : `<span class="bad">${esc(diggersName(S)[0].toUpperCase() + diggersName(S).slice(1))}<\/span><span>${boxes(Math.min(C.korvath || 0, CAMPAIGN.finaleAt), CAMPAIGN.finaleAt)} ${C.korvath || 0} Makers' site${(C.korvath || 0) === 1 ? "" : "s"} dug up${C.finale ? "" : C.korvathNext ? `; the next in about ${Math.max(1, C.korvathNext - S.turn)} week${C.korvathNext - S.turn === 1 ? "" : "s"}` : ""}. ${(C.korvath || 0) > n ? "They're ahead: the Gate will be harder." : "Each campaign order you carry out sets them back two weeks."}<\/span>`}<\/div>`;
   if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})<\/summary>${beats.map((b) => `<p style="white-space:pre-line"><b>${esc(b.act)}: ${esc(b.title)}.<\/b> ${esc(b.text)}<\/p>`).join("")}<\/details>`;
   if (C.threads.length) h += `<details class="small" style="margin-top:4px"><summary>Threads found (${C.threads.length})<\/summary><ol>${C.threads.map((t) => `<li><b>${esc(t.title)}<\/b> (turn ${t.turn}): ${esc(t.text)}<\/li>`).join("")}<\/ol><\/details>`;
   return h + `<\/div>`;
@@ -3329,6 +3427,13 @@ function showEvent() {
     return;
   }
   if (ev.kind === "success") { modal(successHTML(ev)); return; }
+  if (ev.kind === "complication") {
+    const c = complicationChoices(S, ev);
+    if (!c) { S.event = null; after(); return; }
+    modal(`<h2>${esc(c.order.title)}<\/h2><h3 style="margin-top:0" class="bad">${esc(c.title)}<\/h3><p>${esc(c.text)}<\/p>
+      <div class="grid2">${c.options.map((x) => `<div class="brief"><h3>${esc(x.name)}<\/h3><p>${esc(x.blurb)}<\/p><div class="btn-row"><button class="btn ${x.id === "press" ? "red" : "primary"} small" data-complication="${x.id}">${esc(x.name)}<\/button><\/div><\/div>`).join("")}<\/div>`);
+    return;
+  }
   if (ev.kind === "cloak-contact") {
     const c = cloakChoices(S, ev);
     if (!c) { S.event = null; after(); return; }
@@ -3412,6 +3517,7 @@ function modalClick(e) {
   if (m === "copy") { const t = $("code"); t.select(); try { navigator.clipboard.writeText(t.value); toast("Copied."); } catch { document.execCommand("copy"); } return; }
   if (m === "load") { try { startGame(JSON.parse(decodeURIComponent(escape(atob($("load").value.trim()))))); } catch { toast("That code didn't load.", true); } return; }
   if (m === "event-ok") { dismissEvent(S); closeModal(); after(); return; }
+  if (b.dataset.complication) { const since = mark(), title = b.textContent.trim(); chooseComplication(S, b.dataset.complication); closeModal(); report = null; reportSince(title, since); after(); return; }
   if (b.dataset.cloak) { const since = mark(), title = b.textContent.trim(); const out = chooseCloak(S, b.dataset.cloak); closeModal(); report = null; reportSince(title, since); if (out && out.text) { report = report || { title, lines: [] }; } after(); return; }
   if (b.dataset.mchoice) { const r = chooseMission(S, b.dataset.order, b.dataset.mchoice); if (r.error) toast(r.error, true); closeModal(); after(); return; }
   if (m === "exchange") { exchange(S, { ...bchoice, order: bchoice.order === "none" ? null : bchoice.order }); save(); renderAll(); showBattle(); return; }

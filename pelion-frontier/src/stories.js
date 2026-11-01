@@ -339,3 +339,28 @@ export function storyText(S, o, text) {
     .replace(/(^|[.!?]\s+|\n\s*)([a-z])/g, (m, p, c) => p + c.toUpperCase());
 }
 export const storyOf = (o) => (o && o.story ? STORIES[o.story] : null);
+
+/**
+ * Complications: partway through an order, something goes wrong. Press on (an opposed roll: win and you gain ground,
+ * lose and it costs you) or fall back (safe, but a week lost). One set for each kind of mission.
+ */
+export const COMPLICATIONS = {
+  Rescue: { title: "A second disaster", text: "Halfway through, it gets worse: a secondary explosion, a hull section giving way, a corridor filling with smoke, and people still on the far side of it.", oppose: { name: "the spreading disaster", skill: "Severity", target: 12 }, skills: ["Engineering", "Medicine", "Leadership"], cost: "hurt", costText: "a rescuer is hurt getting them out", press: "Send the team in now" },
+  Diplomatic: { title: "A walkout", text: "One delegation stands up mid-session and walks out, citing an insult nobody else heard. If they reach their ship, the talks are over.", oppose: { name: "wounded pride", skill: "Grievance", target: 12 }, skills: ["Diplomacy", "Psychology", "Leadership"], cost: "accord", costText: "the talks sour: accord −1", press: "Go after them" },
+  Exploration: { title: "The readings spike", text: "The sensors spike off every scale: something is reacting to the Pelion's scans, and the longer the ship stays, the harder it pushes back.", oppose: { name: "the phenomenon", skill: "Strangeness", target: 12 }, skills: ["Sensors", "Physical Sciences", "Computers"], cost: "sensors", costText: "the sensor array burns out a box", press: "Hold position and keep scanning" },
+  Technology: { title: "Cascade failure", text: "The prototype's power draw spikes and a cascade starts running through the ship's systems, deck by deck. It can be shut down, or ridden out.", oppose: { name: "the cascade", skill: "Overload", target: 12 }, skills: ["Engineering", "Electronics", "Computers"], cost: "engines", costText: "the cascade reaches the warp drive: engines damaged", press: "Ride it out" },
+  Security: { title: "Contact", text: "A contact on long-range sensors, closing fast and running dark. It could be a patrol. It could be a trap.", oppose: { name: "whoever is out there", skill: "Cunning", target: 12 }, skills: ["Sensors", "Helm", "Communications"], cost: "tension", costText: "an incident on the border: Klingon tension +1", press: "Hold course and find out" },
+  Crew: { title: "It gets out of hand", text: "What started as a misunderstanding has the local constabulary involved, a crowd gathering, and a crewman who won't back down.", oppose: { name: "the crowd's temper", skill: "Anger", target: 11 }, skills: ["Leadership", "Psychology", "Diplomacy"], cost: "command", costText: "an incident report reaches Starfleet: a Command box", press: "Step in personally" },
+  Campaign: { title: "Kor'vath moves first", text: "The Klingon cruiser runs its shields up and moves to cut the Pelion off from the Gate. Hold your ground, or give them room.", oppose: { name: "House Kor'vath's cruiser", skill: "Ruthlessness", target: 12 }, skills: ["Helm", "Leadership", "Diplomacy"], cost: "hurt", costText: "a disruptor hit on the bridge: a crew member is hurt", press: "Hold your ground" },
+};
+/** Each Makers' site House Kor'vath digs up, in turn: where it was and what was lost. */
+export const KORVATH_SITES = [
+  "a ruin on an airless moon, its caretaker cut out in a night",
+  "a cave city on a frozen world, emptied, its watcher gone",
+  "a sea-floor vault, flooded after the diggers left",
+  "a mountain shrine the locals had guarded for a thousand years",
+  "a derelict in a slow orbit, stripped to the frame",
+  "a desert obelisk, toppled and hollow",
+  "a ring of standing stones, every stone cut open",
+  "a crater observatory, its lenses smashed",
+];

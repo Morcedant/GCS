@@ -2,7 +2,7 @@
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
-  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, missionChoices, chooseMission, cloakChoices, chooseCloak, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType } from "./game.js";
+  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, missionChoices, chooseMission, cloakChoices, chooseCloak, complicationChoices, chooseComplication, diggersName, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType } from "./game.js";
 import { storyOf, CAMPAIGN } from "./stories.js";
 import { SHIP_SHAPES } from "./ships.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
@@ -603,7 +603,8 @@ function campaignHTML() {
   const status = C.over === "close" ? "Resolved: the watch is over, the Gate closed." : C.over === "guard" ? "Resolved: the Gate kept open, under Starfleet's guard." : C.over === "lost" ? "Lost: House Kor'vath reached the Gate first." : C.finale ? "The finale: get to the Makers' Gate first (the Orders tab)." : !C.beats.includes(0) ? "It begins at Corvan II." : `${n} of ${CAMPAIGN.finaleAt} threads to find the Makers' Gate${next ? `; the next revelation at ${next.at}` : ""}. Orders marked ${CAMPAIGN.title} turn up threads; the others are the frontier's ordinary work.`;
   let h = `<div class="card gold"><h4>The campaign: ${esc(CAMPAIGN.title)} <span class="badge-status ${C.over === "lost" ? "bad" : C.over ? "good" : ""}">${esc(campaignAct(S))}</span></h4>
     <p class="small">${esc(CAMPAIGN.premise)}</p>
-    <div class="kv small"><span>Threads</span><span>${boxes(n, CAMPAIGN.finaleAt, "blue")} ${esc(status)}</span></div>`;
+    <div class="kv small"><span>Threads</span><span>${boxes(n, CAMPAIGN.finaleAt, "blue")} ${esc(status)}</span>
+    ${C.over ? "" : `<span class="bad">${esc(diggersName(S)[0].toUpperCase() + diggersName(S).slice(1))}</span><span>${boxes(Math.min(C.korvath || 0, CAMPAIGN.finaleAt), CAMPAIGN.finaleAt)} ${C.korvath || 0} Makers' site${(C.korvath || 0) === 1 ? "" : "s"} dug up${C.finale ? "" : C.korvathNext ? `; the next in about ${Math.max(1, C.korvathNext - S.turn)} week${C.korvathNext - S.turn === 1 ? "" : "s"}` : ""}. ${(C.korvath || 0) > n ? "They're ahead: the Gate will be harder." : "Each campaign order you carry out sets them back two weeks."}</span>`}</div>`;
   if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})</summary>${beats.map((b) => `<p style="white-space:pre-line"><b>${esc(b.act)}: ${esc(b.title)}.</b> ${esc(b.text)}</p>`).join("")}</details>`;
   if (C.threads.length) h += `<details class="small" style="margin-top:4px"><summary>Threads found (${C.threads.length})</summary><ol>${C.threads.map((t) => `<li><b>${esc(t.title)}</b> (turn ${t.turn}): ${esc(t.text)}</li>`).join("")}</ol></details>`;
   return h + `</div>`;
@@ -786,6 +787,13 @@ function showEvent() {
     return;
   }
   if (ev.kind === "success") { modal(successHTML(ev)); return; }
+  if (ev.kind === "complication") {
+    const c = complicationChoices(S, ev);
+    if (!c) { S.event = null; after(); return; }
+    modal(`<h2>${esc(c.order.title)}</h2><h3 style="margin-top:0" class="bad">${esc(c.title)}</h3><p>${esc(c.text)}</p>
+      <div class="grid2">${c.options.map((x) => `<div class="brief"><h3>${esc(x.name)}</h3><p>${esc(x.blurb)}</p><div class="btn-row"><button class="btn ${x.id === "press" ? "red" : "primary"} small" data-complication="${x.id}">${esc(x.name)}</button></div></div>`).join("")}</div>`);
+    return;
+  }
   if (ev.kind === "cloak-contact") {
     const c = cloakChoices(S, ev);
     if (!c) { S.event = null; after(); return; }
@@ -869,6 +877,7 @@ function modalClick(e) {
   if (m === "copy") { const t = $("code"); t.select(); try { navigator.clipboard.writeText(t.value); toast("Copied."); } catch { document.execCommand("copy"); } return; }
   if (m === "load") { try { startGame(JSON.parse(decodeURIComponent(escape(atob($("load").value.trim()))))); } catch { toast("That code didn't load.", true); } return; }
   if (m === "event-ok") { dismissEvent(S); closeModal(); after(); return; }
+  if (b.dataset.complication) { const since = mark(), title = b.textContent.trim(); chooseComplication(S, b.dataset.complication); closeModal(); report = null; reportSince(title, since); after(); return; }
   if (b.dataset.cloak) { const since = mark(), title = b.textContent.trim(); const out = chooseCloak(S, b.dataset.cloak); closeModal(); report = null; reportSince(title, since); if (out && out.text) { report = report || { title, lines: [] }; } after(); return; }
   if (b.dataset.mchoice) { const r = chooseMission(S, b.dataset.order, b.dataset.mchoice); if (r.error) toast(r.error, true); closeModal(); after(); return; }
   if (m === "exchange") { exchange(S, { ...bchoice, order: bchoice.order === "none" ? null : bchoice.order }); save(); renderAll(); showBattle(); return; }
