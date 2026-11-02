@@ -453,3 +453,129 @@ export const SERIES_STORIES = {
     fail: "The Pelion never came. {world} paid the pirates in the end, when the food ran out, and every world in the sector saw it.",
   },
 };
+
+// ---------- Starfleet R&D's prototypes ----------
+// Technology orders, open from the start: Starfleet R&D sends a prototype for the Pelion to test in the field, and at
+// the end the captain decides whether it stays aboard (a unique upgrade, listed on the Ship tab) or goes home with its
+// data. One story each, told once.
+export const TECH_MISSIONS = [
+  { roll: 3, text: "Field-test a dilithium regulator", oppose: { name: "the regulator's feedback", skill: "Instability", target: 11, why: "It talks to the crystals, and the crystals talk back." }, where: ["empty", "anomaly"], skills: ["Engineering", "Physical Sciences", "Computers"], segs: 3 },
+  { roll: 18, text: "Trial a transporter targeting scanner", oppose: { name: "the atmosphere's interference", skill: "Interference", target: 11, why: "Storms, ionized cloud and metal-rich rock: everything a transporter hates." }, where: ["colony", "member"], skills: ["Engineering", "Computers", "Electronics"], segs: 2 },
+  { roll: 5, text: "Test Mark VI photon torpedoes", oppose: { name: "the warheads' temper", skill: "Instability", target: 12, why: "A new warhead is a bomb nobody has learned to trust yet." }, where: ["empty"], skills: ["Phasers", "Engineering", "Computers"], segs: 2 },
+  { roll: 16, text: "Shake down an antimatter containment upgrade", oppose: { name: "the magnetic bottle's drift", skill: "Drift", target: 12, why: "A containment field that drifts by a millimetre is a containment field that fails." }, where: ["empty", "anomaly"], skills: ["Engineering", "Physical Sciences", "Sensors"], segs: 3 },
+  { roll: 8, text: "Trial an auxiliary fusion reactor", oppose: { name: "the reactor's balky start", skill: "Stubbornness", target: 11, why: "Fusion reactors are reliable. New fusion reactors are not." }, where: ["colony", "member"], skills: ["Engineering", "Electronics", "Leadership"], segs: 2 },
+  { roll: 14, text: "Test experimental warp coils", oppose: { name: "the coils' harmonics", skill: "Resonance", target: 13, why: "Past warp 8, the warp field starts to sing, and then to shake." }, where: ["empty", "anomaly"], skills: ["Helm", "Engineering", "Navigation"], segs: 3 },
+];
+Object.assign(SERIES_STORIES, {
+  "Field-test a dilithium regulator": {
+    mission: "Field-test a dilithium regulator", name: "The patient crystal", type: "Technology",
+    reason: "Starfleet R&D has a regulator that might make dilithium last twice as long, and wants it proved in a working warp core, far from any shipyard, near {world}.",
+    keys: ["Dr. Maren Holt|of the Daystrom Institute, who has spent nine years on one device", "Lieutenant Oskar Vey|Holt's assistant, who does all the soldering", "Commander Tess Ibara|an R&D liaison with a stopwatch"],
+    strange: ["a crystal that glows brighter instead of dimmer", "a warp core that hums a note nobody tuned", "a second heartbeat in the matrix"],
+    brief: "Starfleet R&D has built a dilithium regulator: a lattice of fields that eases the strain on the crystals, so they wear more slowly. {key} wants it tested in a working warp core, at warp, near {world}. Grath has not been consulted, and has opinions.",
+    arrive: "{key} beams aboard near {world} with the regulator in a padded case, a thing of silver rings and fine wire no bigger than a loaf of bread, and holds it the way people hold newborns.\n\nGrath looks at it for a long time. \"You want to put that,\" he says, \"inside my warp core.\"\n\n\"Around it,\" {key} says. \"Around. It never touches the crystals. It just keeps them company.\"\n\n\"Company,\" says Grath, to nobody, and goes to get his tools.",
+    steps: [
+      ["Fit it", "It takes a day to fit, Grath and {key} shoulder to shoulder in the warp core's access crawlway, arguing in low voices about tolerances. When the regulator comes on, the crystals' faint violet glow steadies, very slightly, the way a candle flame steadies when someone shuts a door."],
+      ["Run it hard", "The Pelion runs at warp 6 for three days straight, then at warp 7, with the regulator watching every crystal and {key} watching the regulator. The wear readings come in every hour, and every hour they're lower than they should be. On the third day, Grath stops arguing."],
+      ["Find the limit", "Then, at warp 8, the regulator finds {strange}. The crystals stop wearing at all, for nine minutes, and the readings go somewhere nobody has a name for. {key} shuts the test down by hand, very calmly, and then has to sit on the deck for a while."],
+    ],
+    choice: { title: "The regulator", text: "The trial is a success: the regulator nearly halves the crystals' wear, and the data from those nine minutes at warp 8 will keep the Daystrom Institute busy for a decade. {key} would like the prototype back. Grath, unexpectedly, would like to keep it.",
+      options: [
+        { id: "keep", name: "Keep it fitted", blurb: "The dilithium regulator stays aboard: the crystals wear about a third more slowly, for the rest of the command. +4 science.", how: "The dilithium regulator tested, and kept fitted to the Pelion's warp core.", fx: { refit: "regulator", science: 4 }, text: "{key} looks at Grath, and Grath looks at the regulator, and for once neither of them argues. It stays. R&D will build another from the data. Grath checks it every morning, the way some people check on plants, and won't admit he does." },
+        { id: "return", name: "Send it home with the data", blurb: "+12 science, +1 commendation; R&D gets its prototype back.", how: "The dilithium regulator tested, and returned to R&D with its data.", fx: { science: 12, commendations: 1 }, text: "The regulator goes back to the Daystrom Institute in its padded case with every reading the Pelion took, including the nine minutes nobody can explain. {key} sends a note a month later: the next one will be better, and the Pelion will be first in line for it." },
+      ] },
+    fail: "The trial never happened. R&D's regulator went to a ship that never left the shipyard, and nobody learned what it could do at warp.",
+  },
+  "Trial a transporter targeting scanner": {
+    mission: "Trial a transporter targeting scanner", name: "The long reach", type: "Technology",
+    reason: "R&D has a targeting scanner that should let a transporter lock on through storms and rock, and {world}'s weather is the worst in the sector.",
+    keys: ["Chief Petty Officer Dana Ruiz|transporter chief, with eleven thousand beam-outs and no accidents", "Dr. Ilse Varga|who built the scanner and has never been beamed anywhere", "Warden Coll Ames|of {world}'s mountain stations, cut off by the storms"],
+    strange: ["a signal echo that arrives before the beam", "a pattern buffer that remembers a face", "a storm that seems to dodge the beam"],
+    brief: "R&D's new targeting scanner should let a transporter lock on through storms, rock and interference that would scatter an ordinary beam. {world} has three mountain stations that the storms have cut off for a month, and nobody can reach them. Test the scanner there.",
+    arrive: "From orbit, {world}'s mountains are invisible: a white whirl of storm, ionized, crackling, seventy kilometres across, sitting on the range like a lid. Three stations are under it. Their people have been eating emergency rations for a month.\n\n{key} looks at the storm on the transporter room's display and puts down the coffee she was drinking. \"With what we've got, I'd scatter anyone I sent down there across half the mountain,\" she says. \"Let's see what the new toy can do.\"",
+    steps: [
+      ["Lock on", "The scanner reaches down into the storm like a hand into dark water, feeling for the stations' life signs one at a time. It finds them. The lock holds for two seconds, then five, then steady. In the transporter room, {key} says something under her breath that might be a prayer."],
+      ["Bring them up", "Over two days the Pelion beams up everyone the storm cut off, a few at a time, and beams down food, medicine and power cells in their place. The last up are the station wardens, who refused to leave before their people did. They come out of the transporter beam blinking at the light, and one of them sits down on the pad and laughs until he cries."],
+    ],
+    choice: { title: "The scanner", text: "It works better than R&D dared hope: the scanner can lock on through storms, rock and interference that would stop any transporter in the fleet. R&D wants it back for study. {world}'s people would like it to stay: their storms come every winter, and the next ship that comes to help may not have one.",
+      options: [
+        { id: "keep", name: "Keep it on the Pelion", blurb: "The targeting scanner stays aboard: +2 to Relief and repairs and to Found a colony, for the rest of the command. +4 science.", how: "The transporter targeting scanner tested at {world}, and kept on the Pelion.", fx: { refit: "transporter", science: 4 }, text: "The scanner stays wired into the Pelion's transporters, and {key} adopts it as her own. In a month the transporter crew have names for its moods. In two, they can't remember how they worked without it. Every relief mission and every new colony will go faster for it." },
+        { id: "give", name: "Leave it with {world}", blurb: "+2 commendations, accord +1, {world}'s harm −1.", how: "The transporter targeting scanner tested at {world}, and left with its people.", fx: { commendations: 2, accord: 1, heal: 1 }, text: "The scanner goes down to {world}'s main station with a technician to show them how to use it. R&D grumbles and builds another. Next winter, when the storms come back, the mountain stations are never cut off again." },
+      ] },
+    fail: "The Pelion never came. The storm over {world}'s mountains broke on its own a fortnight later. Not everyone at the stations was still waiting.",
+  },
+  "Test Mark VI photon torpedoes": {
+    mission: "Test Mark VI photon torpedoes", name: "The live-fire range", type: "Technology",
+    reason: "Starfleet Ordnance wants its new Mark VI photon torpedo fired in anger before it goes fleetwide, and the empty space near {world} is a long way from anyone it could hurt.",
+    keys: ["Commander Asha Grell|of Starfleet Ordnance, who designed the warhead", "Lieutenant Bo Ferris|a weapons officer who has fired more torpedoes than anyone alive", "Ensign Nils Ekdahl|who will be loading them"],
+    strange: ["a warhead that arms itself", "a test target that fires back", "a torpedo that comes about on its own"],
+    brief: "Starfleet Ordnance has a new photon torpedo, the Mark VI: a bigger yield in the same casing, if it works. {key} has brought a dozen to fire at drone targets near {world}. Reyes has been waiting all week.",
+    arrive: "The drone targets hang in a line near {world}, old freighter hulls stripped and painted orange, a kilometre apart. In the torpedo bay, the Mark VIs lie in their cradles, a dull grey a shade darker than the old ones.\n\n{key} briefs the weapons crew with a long pointer and no smiles. \"Same casing. Half again the yield. Same handling, if I got it right. If I didn't, you'll know.\" A pause. \"So will I.\"",
+    steps: [
+      ["Fire the first spread", "The first spread goes out at ten thousand kilometres and every one of them hits. The orange hulls flower into white fire, one after another, and the shock fronts ripple outward through the debris for a long time after. Reyes, at tactical, says only \"Oh,\" very softly, which is the most anyone on the bridge has ever heard her say about a weapon."],
+      ["Find the flaw", "The ninth torpedo misbehaves: {strange}. It is two seconds from the launch tube when Reyes destroys it with the phasers, and the blast rocks the Pelion hard enough to throw people from their chairs. {key} has the cause in an hour: a fault in the arming sequence, and a fix, and it never happens again in the next three."],
+    ],
+    choice: { title: "The Mark VI", text: "With {key}'s fix, the Mark VI is everything Ordnance promised: half again the punch of the torpedoes the Pelion carries now. {key} can load the Pelion's magazines with them before going home. Or the Pelion can send them all back to Ordnance with the flaw documented, so the fleet's first batch is a safe one.",
+      options: [
+        { id: "load", name: "Load the magazines", blurb: "Mark VI torpedoes for the rest of the command: a torpedo hit does 3 boxes instead of 2. +2 science.", how: "The Mark VI photon torpedo tested near {world}, and loaded into the Pelion's magazines.", fx: { refit: "torp6", science: 2 }, text: "The Pelion's magazines are emptied and reloaded overnight, Ensign Ekdahl's crew working in shifts, and in the morning the torpedo bay holds forty Mark VIs, each with {key}'s fix in it. Reyes signs for them personally." },
+        { id: "report", name: "Send them back with the fix", blurb: "+10 science, +2 commendations: the fleet's first Mark VIs are safe ones.", how: "The Mark VI photon torpedo tested near {world}, and its flaw fixed for the fleet.", fx: { science: 10, commendations: 2 }, text: "The Mark VIs go back to Ordnance with {key} and the Pelion's full report. The fleet's first production batch ships with the fix, and Ordnance's letter of thanks goes up on the torpedo bay wall, where Ekdahl's crew tell everyone who'll listen about the ninth torpedo." },
+      ] },
+    fail: "The trials never happened. Ordnance shipped the Mark VI to the fleet untested, flaw and all. Nobody has said what happened next, which says enough.",
+  },
+  "Shake down an antimatter containment upgrade": {
+    mission: "Shake down an antimatter containment upgrade", name: "The cold bottle", type: "Technology",
+    reason: "R&D's new containment pods hold more antimatter in the same space, if their magnetic bottles hold steady. Test them near {world}, where a failure would hurt no one.",
+    keys: ["Dr. Iyabo Nwosu|of the Utopia Planitia yards, who designed the bottles", "Chief Petty Officer Garrow|of the Pelion's engineering crew, who has handled antimatter for thirty years", "Lieutenant Mira Haas|an R&D safety officer who does not sleep"],
+    strange: ["a containment field that hums in harmony with the stars", "antimatter that behaves as if it were somewhere else", "a bottle that seems to hold more than it should"],
+    brief: "R&D has new containment pods: magnetic bottles that hold more antimatter in the same space, and leak less of it. {key} wants them shaken down in a working ship, a long way from anywhere, near {world}. Every engineer aboard is very quiet about it.",
+    arrive: "The new pods are beamed aboard near {world} one at a time, empty, and slotted in beside the old ones in the antimatter storage bay. They look the same. They aren't: inside each, the magnetic bottle is tuned to a precision that makes Grath's eyebrows go up and stay up.\n\n\"If it fails,\" {key} says, \"it fails safe. It ejects. That's the theory.\"\n\nGrath: \"I've always liked theories. They're so much easier to clean up after than practice.\"",
+    steps: [
+      ["Fill them", "Filling the pods takes a day, antimatter fed in a few grams at a time while every display in engineering watches the bottles. They hold. The pods take a third more than the old ones, and the readings on them are steadier than anything Grath has seen."],
+      ["Shake them", "Then the shakedown: the Pelion at warp, then at emergency warp, then through the shock wave of a deliberate torpedo detonation at close range, everything the fleet might ask of a ship. One bottle drifts by a millimetre, and the safeties catch it, and the drift stops. {key} logs it without a word, and sleeps for the first time in two days."],
+      ["Find what's odd", "On the last day, in a long quiet run near {world}, the sensors find {strange}. It isn't dangerous. It is very interesting. Sevek watches it for an hour, then asks, very politely, for a copy of every reading."],
+    ],
+    choice: { title: "The pods", text: "The new pods passed everything the fleet could throw at them. {key} can leave them fitted: more fuel, burned more efficiently. Or they can go back to the yards for study, with everything the Pelion learned about them, and the odd reading too.",
+      options: [
+        { id: "keep", name: "Keep them fitted", blurb: "Antimatter containment upgraded for the rest of the command: 28 units instead of 20, burned a quarter more slowly. +8 antimatter now.", how: "The antimatter containment upgrade shaken down near {world}, and kept fitted.", fx: { refit: "containment", antimatter: 8 }, text: "The new pods stay in the Pelion's storage bay, full, and the old ones go back to the yards in their place. Grath, who has worried about running short of antimatter for his entire career, now worries about running short of things to worry about." },
+        { id: "return", name: "Send them back with the data", blurb: "+12 science, +1 commendation.", how: "The antimatter containment upgrade shaken down near {world}, and returned for study.", fx: { science: 12, commendations: 1 }, text: "The pods go back to Utopia Planitia, emptied with great care, and the data goes with them. A month later every new starship in the fleet is being fitted with the production version. {key} sends the Pelion's engineers a case of something Andorian and very strong." },
+      ] },
+    fail: "The Pelion never came. R&D tested the pods in a laboratory instead, where nothing ever shakes.",
+  },
+  "Trial an auxiliary fusion reactor": {
+    mission: "Trial an auxiliary fusion reactor", name: "The second heart", type: "Technology",
+    reason: "R&D has a compact fusion reactor that could give a starship power to spare, and wants it run for a fortnight at {world}, where its spare power can do some good.",
+    keys: ["Engineer Pallas Okoro|who built the reactor out of spare parts and stubbornness", "Mayor Jonah Brisk|of {world}, whose town has been on rationed power since winter", "Ensign Tamsin Rhee|from engineering, who has volunteered to babysit it"],
+    strange: ["a reactor that runs cooler the harder it works", "a power surge that arrives before the switch is thrown", "a hum that the colonists say they can hear in their sleep"],
+    brief: "R&D has a compact fusion reactor small enough to fit in a starship's secondary hull and powerful enough to run a town. {key} wants it trialled for a fortnight at {world}, running both the Pelion's systems and the colony's rationed grid.",
+    arrive: "The reactor comes aboard at {world} in pieces, nine crates of it, and {key} comes with it, a short, wide engineer with burn scars on both hands and a grin that never quite goes away. Down on the planet, the town's lights are out in every district but one: the colony has been on rationed power all winter.\n\n\"Let's get her running,\" {key} says, \"and give those people their lights back. That's what she's for.\"",
+    steps: [
+      ["Bring it up", "The reactor won't start. It won't start on the first try, the fourth or the eleventh, and the engineering crew are beginning to say things about it in Tellarite. On the twelfth, {key} kicks it, quite hard, in a particular place, and it starts, and runs as smooth as a heartbeat, and nobody can explain why."],
+      ["Share the power", "For a fortnight the reactor runs the Pelion's labs and sensors and the colony's grid at once, through a power beam Grath rigs to the town's substation. Down on {world}, the lights come back on, district by district. The town holds a party in the square on the first warm night, and sends up a cake for the engineering crew."],
+    ],
+    choice: { title: "The reactor", text: "The trial is a success: the reactor gives a starship a point of power to spare, every week, for as long as it runs. {key} would be glad to leave it in the Pelion. But the colony on {world} has had its lights back for a fortnight, and its winter isn't over.",
+      options: [
+        { id: "keep", name: "Keep it in the Pelion", blurb: "An auxiliary reactor for the rest of the command: +1 Power every week for the ship's systems (not in battle). +4 science.", how: "The auxiliary fusion reactor trialled at {world}, and kept aboard the Pelion.", fx: { refit: "aux", science: 4 }, text: "The reactor goes into the Pelion's secondary hull, where Ensign Rhee checks it every watch, and the ship's systems have a point of power to spare from then on. Down on {world}, R&D promises the colony a reactor of its own by spring. {key} personally guarantees it." },
+        { id: "leave", name: "Leave it with the colony", blurb: "+3 commendations, accord +1, {world}'s harm −1.", how: "The auxiliary fusion reactor trialled at {world}, and left to run the colony's grid.", fx: { commendations: 3, accord: 1, heal: 1 }, text: "The reactor goes down to {world}'s substation for good, and the colony's lights stay on all winter. {key} stays with it a week to train the colony's engineers, and leaves with an invitation to the next party in the square, which is given in her honour." },
+      ] },
+    fail: "The Pelion never came. The reactor went back to the laboratory, and the colony on {world} spent the rest of the winter in the dark.",
+  },
+  "Test experimental warp coils": {
+    mission: "Test experimental warp coils", name: "Warp nine", type: "Technology",
+    reason: "Starfleet R&D has warp coils that might take a Heavy Cruiser past warp 8, and wants them tried near {world}, where there's room to go fast.",
+    keys: ["Commander Rhea Castellano|of the Advanced Starship Design Bureau, who has been to warp 9 once, in a test shuttle", "Dr. Felix Andrade|a warp field theorist who thinks it's impossible", "Lieutenant Iko Barre|a test pilot on loan to the Pelion's helm"],
+    strange: ["stars that seem to bend backward at the edge of the viewer", "a moment when the ship's clocks disagree", "a warp wake that keeps going after the ship has stopped"],
+    brief: "The Advanced Starship Design Bureau has warp coils that should let a Heavy Cruiser make warp 9, for short runs, without tearing itself apart. {key} wants to fit them to the Pelion and find out, near {world}. Grath has requested, formally, that his objection be noted in the log.",
+    arrive: "The new coils come aboard near {world} in two long cases, wrapped in shielding, and go into the Pelion's nacelles over a day and a night while Grath supervises every weld. {key} walks the length of each nacelle afterwards, a hand on the conduits, listening.\n\n\"Warp 9,\" {key} says. \"Seven hundred and twenty-nine times the speed of light. A light-year in half a day.\" A pause. \"In theory.\"\n\nGrath, flatly: \"It's always theory until it's wreckage.\"",
+    steps: [
+      ["Warp 8.5", "The first run takes the Pelion to warp 8.5, faster than she has ever flown, and holds it for an hour. The deck vibrates with a note Rrinn can hear and nobody else can. The coils hold. Grath's readings are steady, and he looks almost offended by it."],
+      ["Warp 9", "The second run takes her to warp 9. For eleven minutes the Pelion crosses space at seven hundred and twenty-nine times the speed of light, the stars on the viewer streaming past in long blue lines, and then the warp field begins to sing, and then to shake. Helm drops her out of warp in a long, controlled glide, and everyone on the bridge starts breathing again."],
+      ["Tune the field", "The third day is Grath's and {key}'s, side by side in the nacelle control room, tuning the field against the coils' harmonics until the singing stops. In the last run, the ship's sensors catch {strange}. Sevek asks to see the readings. {key} says not yet."],
+    ],
+    choice: { title: "The coils", text: "The coils work. Tuned, they'll take the Pelion to warp 9 for short runs, with the engines straining hard. {key} can leave them fitted. Or they can go back to the Bureau with every reading, so the next ship gets coils that don't strain at all.",
+      options: [
+        { id: "keep", name: "Keep them fitted", blurb: "Experimental warp coils for the rest of the command: the emergency maximum is warp 9 (about 14 light-years a week), with a hard engine strain check. +4 science.", how: "The experimental warp coils tested near {world}, and kept in the Pelion's nacelles.", fx: { refit: "coils", science: 4 }, text: "The coils stay in the nacelles. The Pelion is the fastest Heavy Cruiser in the fleet now, if only for short runs and only with Grath's permission, which he gives with an expression of great suffering. Lieutenant Barre goes home to the Bureau and tells everyone about the eleven minutes." },
+        { id: "return", name: "Send them back to the Bureau", blurb: "+14 science, +1 commendation.", how: "The experimental warp coils tested near {world}, and returned to the Bureau.", fx: { science: 14, commendations: 1 }, text: "The coils go back to the Advanced Starship Design Bureau in their shielded cases, with the readings of those eleven minutes at warp 9. Two years from now, Starfleet's next generation of starships will cruise at speeds the Pelion only touched. Grath is quietly relieved." },
+      ] },
+    fail: "The trials never happened. The coils went to a test shuttle instead, and the shuttle never got past warp 8.",
+  },
+});

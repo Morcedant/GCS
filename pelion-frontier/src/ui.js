@@ -1,9 +1,9 @@
 // The page: the sector map on a canvas, the side panel's tabs, and the dialogs (new game, battle, story, the end).
 import { key, toPixel, fromPixel, distance } from "./hex.js";
-import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
+import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, PROTOTYPES, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
   speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, postsOf, postAt, missionChoices, chooseMission, openingScene, cloakChoices, chooseCloak, complicationChoices, chooseComplication, diggersName, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType,
-  tholianSpace, POWER_SYSTEMS, STORES, storesOf, allocOf, setAlloc, reactorPower, powerFree, warpPower, marketAt, buyStore, requestTender, keepCommand, retire, campaignDef, defOf, dilithiumPenalty } from "./game.js";
+  tholianSpace, weekPower, storeMax, POWER_SYSTEMS, STORES, storesOf, allocOf, setAlloc, reactorPower, powerFree, warpPower, marketAt, buyStore, requestTender, keepCommand, retire, campaignDef, defOf, dilithiumPenalty } from "./game.js";
 import { storyOf, CAMPAIGN } from "./stories.js";
 import { FRONTIER } from "./campaigns.js";
 import { SHIP_SHAPES } from "./ships.js";
@@ -329,9 +329,9 @@ const turnText = () => (S.mode === "open" ? `Week ${S.turn} · open command` : `
 function renderBar() {
   const st = storesOf(S), low = (k, n) => (st[k] <= n ? ' class="bad"' : "");
   $("bar-stats").innerHTML = `<span><b>Supplies</b>${S.supplies}</span><span><b>Science</b>${S.science}</span>`
-    + `<span title="Power: in use of what the reactor makes this week (the Ship tab)"><b>Power</b>${Math.max(0, reactorPower(S) - powerFree(S))}/${reactorPower(S)}</span>`
+    + `<span title="Power: in use of what the reactor makes this week (the Ship tab)"><b>Power</b>${Math.max(0, weekPower(S) - powerFree(S))}/${weekPower(S)}</span>`
     + `<span title="Dilithium crystals in the warp core's matrix"><b>Dilithium</b><span${low("dilithium", 4)}>${st.dilithium}/10</span></span>`
-    + `<span title="Antimatter: the warp drive's fuel"><b>Antimatter</b><span${low("antimatter", 3)}>${st.antimatter}/${STORES.antimatter.max}</span></span>`
+    + `<span title="Antimatter: the warp drive's fuel"><b>Antimatter</b><span${low("antimatter", 3)}>${st.antimatter}/${storeMax(S, "antimatter")}</span></span>`
     + `<span title="Spare parts: plasma injectors, warp coils, coolant"><b>Spares</b><span${low("spares", 1)}>${st.spares}</span></span>`
     + `<span title="Starfleet Command: five boxes and you're relieved of command"><b>Starfleet Command</b>${boxes(S.command, 5)}</span>`
     + `<span title="Tension with the Klingon Empire"><b>Klingon tension</b>${boxes(S.tension, 10, "gold")}</span>`;
@@ -355,17 +355,17 @@ function renderPanel() {
 // ---------- Here: what's in the selected hex, and what the ship can do ----------
 /** The warp control: impulse or warp 1 to the maximum, and what's left of the week. */
 function warpHTML() {
-  const P = S.pelion, mw = maxWarp(S), opts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter((w) => w <= Math.max(8, mw));
+  const P = S.pelion, mw = maxWarp(S), opts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter((w) => w <= Math.max(8, mw)), top = 8 + (P.refits.coils ? 1 : 0);
   const left = P.days || 0;
-  return `<div class="card small" style="padding:8px 10px"><label><b>Speed</b> <select data-warp aria-label="Warp factor">${opts.map((w) => `<option value="${w}" ${w === P.warp ? "selected" : ""} ${w > mw ? "disabled" : ""}>${w ? `Warp ${w}${w === CRUISE_WARP ? " (maximum stable)" : w === 8 ? " (emergency maximum)" : w > CRUISE_WARP ? " (emergency)" : ""}` : "Impulse"}${w > mw ? " (engines damaged)" : ""}</option>`).join("")}</select></label>
-    <div class="muted" style="margin-top:4px">${esc(warpText(P.warp))}. v = W³ × c. Engines take ${warpPower(P.warp)} of ${reactorPower(S)} Power${powerFree(S) > 0 ? `; ${powerFree(S)} unassigned (the Ship tab)` : ""}.${storesOf(S).antimatter <= 0 ? ` <span class="bad">No antimatter: warp 2 on the reserve.</span>` : ""}</div>
+  return `<div class="card small" style="padding:8px 10px"><label><b>Speed</b> <select data-warp aria-label="Warp factor">${opts.map((w) => `<option value="${w}" ${w === P.warp ? "selected" : ""} ${w > mw ? "disabled" : ""}>${w ? `Warp ${w}${w === CRUISE_WARP ? " (maximum stable)" : w === top ? " (emergency maximum)" : w > CRUISE_WARP ? " (emergency)" : ""}` : "Impulse"}${w > mw ? (w > top ? " (needs the experimental coils)" : " (engines, power or stores)") : ""}</option>`).join("")}</select></label>
+    <div class="muted" style="margin-top:4px">${esc(warpText(P.warp))}. v = W³ × c. Engines take ${warpPower(P.warp)} of ${weekPower(S)} Power${powerFree(S) > 0 ? `; ${powerFree(S)} unassigned (the Ship tab)` : ""}.${storesOf(S).antimatter <= 0 ? ` <span class="bad">No antimatter: warp 2 on the reserve.</span>` : ""}</div>
     <div style="margin-top:2px">This week: ${left.toFixed(1)} of 7 days left${P.warp ? `, ${P.mp.toFixed(1)} ly at this warp` : ""}.${P.warp > CRUISE_WARP ? ` <span class="bad">Emergency speed: an Engineering check at the end of the week, or the engines take damage.</span>` : ""}</div></div>`;
 }
 /** Stores for sale where the Pelion is. */
 function marketHTML() {
   const m = marketAt(S); if (!m) return "";
   const st = storesOf(S);
-  return `<div class="card violet small"><h4>Stores at ${esc(m.name)}</h4>${Object.entries(m.items).map(([k, price]) => `<div class="roll-row"><span style="min-width:150px">${esc(STORES[k].name)} ${st[k]}/${STORES[k].max}</span><button class="btn small" data-buy="${k}" data-n="1" ${st[k] >= STORES[k].max || S.supplies < price ? "disabled" : ""}>+1 for ${price}</button><button class="btn small" data-buy="${k}" data-n="99" ${st[k] >= STORES[k].max || S.supplies < price ? "disabled" : ""}>Fill up</button></div>`).join("")}<div class="muted" style="margin-top:4px">Prices in supplies (you have ${S.supplies}).${m.name === "Starbase 23" ? " The starbase refuels the antimatter for nothing when the Pelion docks." : ""}</div></div>`;
+  return `<div class="card violet small"><h4>Stores at ${esc(m.name)}</h4>${Object.entries(m.items).map(([k, price]) => `<div class="roll-row"><span style="min-width:150px">${esc(STORES[k].name)} ${st[k]}/${storeMax(S, k)}</span><button class="btn small" data-buy="${k}" data-n="1" ${st[k] >= storeMax(S, k) || S.supplies < price ? "disabled" : ""}>+1 for ${price}</button><button class="btn small" data-buy="${k}" data-n="99" ${st[k] >= storeMax(S, k) || S.supplies < price ? "disabled" : ""}>Fill up</button></div>`).join("")}<div class="muted" style="margin-top:4px">Prices in supplies (you have ${S.supplies}).${m.name === "Starbase 23" ? " The starbase refuels the antimatter for nothing when the Pelion docks." : ""}</div></div>`;
 }
 function units() {
   const list = [["pelion", "USS Pelion"], ...Object.values(S.support).map((u) => [u.id, u.name])];
@@ -505,6 +505,8 @@ function shipHTML() {
     + `<span>Power</span><span>${powerOf(S)}${P.powerLoss ? ` (−${P.powerLoss})` : ""}</span><span>Torpedoes</span><span>${P.torps}/${PELION.torps}</span><span>Speed</span><span>Warp ${P.warp}${P.warp === CRUISE_WARP ? " (maximum stable)" : P.warp > CRUISE_WARP ? " (emergency)" : ""}: ${speedOf(S).toFixed(1)} ly a week. Maximum stable warp ${CRUISE_WARP}; emergency maximum warp ${maxWarp(S)}${maxWarp(S) < 8 ? " (engines damaged)" : ""}</span><span>Sensors</span><span>rating ${sensorsRating(S)}; sees ${2 + (P.refits.sensors ? 1 : 0)} hexes</span>${P.refits.inverter ? `<span>Cloak inverter</span><span>Fitted by Starfleet R&D after the field trials: +2 to sensor sweeps${P.refits.inverter >= 2 ? "; tuned at full power, sweeps reach 5 light-years for cloaked ships" : ""}</span>` : ""}</div>`;
   h += `<p class="small muted">Hull and systems are repaired at Starbase 23 (or by Engineering, a box at a time, using a crate of spares). Shields come back after each battle.</p>`;
   h += powerHTML() + storesHTML();
+  const protos = Object.keys(PROTOTYPES).filter((k) => P.refits[k]);
+  h += `<h3>Prototypes from Starfleet R&D</h3>` + (protos.length ? protos.map((k) => `<div class="card green"><h4>${esc(PROTOTYPES[k].name)}</h4><div class="small muted">${esc(PROTOTYPES[k].text)}</div></div>`).join("") : `<p class="small muted">None yet. Starfleet R&D sends prototypes with its Technology orders: carry one out and choose to keep it, and it stays aboard.</p>`);
   h += `<h3>Refits ${P.docked ? "" : "(at Starbase 23)"}</h3>`;
   for (const [id, R] of Object.entries(REFITS)) h += `<div class="card ${P.refits[id] ? "green" : "violet"}"><h4>${esc(R.name)}</h4><div class="small muted">${esc(R.blurb)}</div><div class="roll-row">${P.refits[id] ? `<span class="good small">Fitted</span>` : `<button class="btn small" data-refit="${id}" ${!P.docked || S.science < R.cost ? "disabled" : ""}>Fit it: ${R.cost} science</button>`}</div></div>`;
   h += `<h3>Your ships</h3>`;
@@ -517,8 +519,8 @@ function shipHTML() {
 
 /** The week's power: the engines' share from the warp factor, the rest shared out by the captain. */
 function powerHTML() {
-  const A = allocOf(S), pw = reactorPower(S), fr = powerFree(S), P = S.pelion;
-  const why = [P.powerLoss ? `damage −${P.powerLoss}` : "", dilithiumPenalty(S) ? `failing dilithium −${dilithiumPenalty(S)}` : "", P.refits.power ? "power couplings +1" : ""].filter(Boolean).join(", ");
+  const A = allocOf(S), pw = weekPower(S), fr = powerFree(S), P = S.pelion;
+  const why = [P.powerLoss ? `damage −${P.powerLoss}` : "", dilithiumPenalty(S) ? `failing dilithium −${dilithiumPenalty(S)}` : "", P.refits.power ? "power couplings +1" : "", P.refits.aux ? "auxiliary reactor +1, not in battle" : ""].filter(Boolean).join(", ");
   let h = `<h3>Power: ${pw - fr} of ${pw} in use</h3><p class="small muted">The warp core makes ${pw}${why ? ` (${esc(why)})` : ""}. The engines take what the warp factor needs: 1 up to warp 4, 2 up to warp 6, 3 for warp 7 and 8. Share out the rest, up to 2 to a system. In battle, the same Power goes to shields, phasers, torpedoes and engines.</p>`;
   h += `<div class="card small"><div class="roll-row"><span style="min-width:150px"><b>Engines</b></span>${boxes(warpPower(P.warp), 3, "gold")} <span class="muted">warp ${P.warp}: ${warpPower(P.warp)}</span></div>`;
   for (const [k, Y] of Object.entries(POWER_SYSTEMS)) h += `<div class="roll-row"><span style="min-width:150px"><b>${esc(Y.name)}</b></span><button class="btn small" data-alloc="${k}" data-n="${A[k] - 1}" ${A[k] <= 0 ? "disabled" : ""} aria-label="Less power to ${esc(Y.name)}">−</button>${boxes(A[k], 2, "blue")}<button class="btn small" data-alloc="${k}" data-n="${A[k] + 1}" ${A[k] >= 2 || fr <= 0 ? "disabled" : ""} aria-label="More power to ${esc(Y.name)}">+</button><span class="muted">${esc(Y.blurb[A[k]])}</span></div>`;
@@ -528,7 +530,7 @@ function powerHTML() {
 function storesHTML() {
   const st = storesOf(S), P = S.pelion;
   let h = `<h3>Stores</h3>`;
-  for (const [k, T] of Object.entries(STORES)) h += `<div class="card small ${st[k] <= (k === "antimatter" ? 3 : k === "dilithium" ? 4 : 1) ? "red" : ""}"><h4>${esc(T.name)} ${st[k]}/${T.max}</h4>${bar(st[k], T.max, k === "dilithium" ? "var(--violet)" : k === "antimatter" ? "var(--blue)" : "var(--gold)")}<div class="muted">${esc(T.blurb)}</div></div>`;
+  for (const [k, T] of Object.entries(STORES)) h += `<div class="card small ${st[k] <= (k === "antimatter" ? 3 : k === "dilithium" ? 4 : 1) ? "red" : ""}"><h4>${esc(T.name)} ${st[k]}/${storeMax(S, k)}</h4>${bar(st[k], storeMax(S, k), k === "dilithium" ? "var(--violet)" : k === "antimatter" ? "var(--blue)" : "var(--gold)")}<div class="muted">${esc(T.blurb)}</div></div>`;
   h += `<p class="small muted">Where to get more: Starbase 23 refuels the antimatter free when the Pelion docks, issues spares up to six crates, and sells dilithium and spares. Colonies and member worlds sell antimatter and spares; independent worlds at accord +1 or better sell dilithium and antimatter. Surveys find seams of living dilithium to mine. Engineering can recrystallize worn crystals for a crate of spares. Orion ships and bases leave salvage. Some orders pay in stores.</p>`;
   h += `<div class="btn-row"><button class="btn small" data-tender="1" ${S.tender || P.docked || st.antimatter > 3 || S.supplies < 10 ? "disabled" : ""}>Call a fuel tender: 10 supplies, here in two weeks</button>${S.tender ? `<span class="small gold">A tender is on its way.</span>` : ""}</div>`;
   return h;

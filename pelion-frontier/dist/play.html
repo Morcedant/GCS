@@ -341,6 +341,16 @@ const REFITS = {
   sickbay: { name: "Sickbay upgrade", cost: 30, blurb: "Injured crew heal a box every turn." },
 };
 
+/** Prototypes from Starfleet R&D's technology orders: fitted only by carrying one out and choosing to keep it. */
+const PROTOTYPES = {
+  inverter: { name: "Cloak inverter", text: "+2 to sensor sweeps; sees cloaked Romulan ships coming. Tuned: sweeps reach 5 light-years." },
+  regulator: { name: "Dilithium regulator", text: "The crystals wear about a third more slowly." },
+  transporter: { name: "Transporter targeting scanner", text: "+2 to Relief and repairs and to Found a colony." },
+  torp6: { name: "Mark VI photon torpedoes", text: "A torpedo hit does 3 boxes instead of 2." },
+  containment: { name: "Antimatter containment upgrade", text: "Holds 28 antimatter instead of 20, and burns it a quarter more slowly." },
+  aux: { name: "Auxiliary fusion reactor", text: "+1 Power every week for the ship's systems (not in battle)." },
+  coils: { name: "Experimental warp coils", text: "Emergency maximum warp 9, about 14 light-years a week; the engine strain check at warp 9 is −5." },
+};
 /** Library records: what investigating the strange earns. `perk` is what it changes. */
 const RECORDS = [
   { id: "eddies", name: "Subspace eddies", text: "Nebulae cost the Pelion 1 move, not 2.", perk: "nebula" },
@@ -858,6 +868,132 @@ const SERIES_STORIES = {
     fail: "The Pelion never came. {world} paid the pirates in the end, when the food ran out, and every world in the sector saw it.",
   },
 };
+
+// ---------- Starfleet R&D's prototypes ----------
+// Technology orders, open from the start: Starfleet R&D sends a prototype for the Pelion to test in the field, and at
+// the end the captain decides whether it stays aboard (a unique upgrade, listed on the Ship tab) or goes home with its
+// data. One story each, told once.
+const TECH_MISSIONS = [
+  { roll: 3, text: "Field-test a dilithium regulator", oppose: { name: "the regulator's feedback", skill: "Instability", target: 11, why: "It talks to the crystals, and the crystals talk back." }, where: ["empty", "anomaly"], skills: ["Engineering", "Physical Sciences", "Computers"], segs: 3 },
+  { roll: 18, text: "Trial a transporter targeting scanner", oppose: { name: "the atmosphere's interference", skill: "Interference", target: 11, why: "Storms, ionized cloud and metal-rich rock: everything a transporter hates." }, where: ["colony", "member"], skills: ["Engineering", "Computers", "Electronics"], segs: 2 },
+  { roll: 5, text: "Test Mark VI photon torpedoes", oppose: { name: "the warheads' temper", skill: "Instability", target: 12, why: "A new warhead is a bomb nobody has learned to trust yet." }, where: ["empty"], skills: ["Phasers", "Engineering", "Computers"], segs: 2 },
+  { roll: 16, text: "Shake down an antimatter containment upgrade", oppose: { name: "the magnetic bottle's drift", skill: "Drift", target: 12, why: "A containment field that drifts by a millimetre is a containment field that fails." }, where: ["empty", "anomaly"], skills: ["Engineering", "Physical Sciences", "Sensors"], segs: 3 },
+  { roll: 8, text: "Trial an auxiliary fusion reactor", oppose: { name: "the reactor's balky start", skill: "Stubbornness", target: 11, why: "Fusion reactors are reliable. New fusion reactors are not." }, where: ["colony", "member"], skills: ["Engineering", "Electronics", "Leadership"], segs: 2 },
+  { roll: 14, text: "Test experimental warp coils", oppose: { name: "the coils' harmonics", skill: "Resonance", target: 13, why: "Past warp 8, the warp field starts to sing, and then to shake." }, where: ["empty", "anomaly"], skills: ["Helm", "Engineering", "Navigation"], segs: 3 },
+];
+Object.assign(SERIES_STORIES, {
+  "Field-test a dilithium regulator": {
+    mission: "Field-test a dilithium regulator", name: "The patient crystal", type: "Technology",
+    reason: "Starfleet R&D has a regulator that might make dilithium last twice as long, and wants it proved in a working warp core, far from any shipyard, near {world}.",
+    keys: ["Dr. Maren Holt|of the Daystrom Institute, who has spent nine years on one device", "Lieutenant Oskar Vey|Holt's assistant, who does all the soldering", "Commander Tess Ibara|an R&D liaison with a stopwatch"],
+    strange: ["a crystal that glows brighter instead of dimmer", "a warp core that hums a note nobody tuned", "a second heartbeat in the matrix"],
+    brief: "Starfleet R&D has built a dilithium regulator: a lattice of fields that eases the strain on the crystals, so they wear more slowly. {key} wants it tested in a working warp core, at warp, near {world}. Grath has not been consulted, and has opinions.",
+    arrive: "{key} beams aboard near {world} with the regulator in a padded case, a thing of silver rings and fine wire no bigger than a loaf of bread, and holds it the way people hold newborns.\n\nGrath looks at it for a long time. \"You want to put that,\" he says, \"inside my warp core.\"\n\n\"Around it,\" {key} says. \"Around. It never touches the crystals. It just keeps them company.\"\n\n\"Company,\" says Grath, to nobody, and goes to get his tools.",
+    steps: [
+      ["Fit it", "It takes a day to fit, Grath and {key} shoulder to shoulder in the warp core's access crawlway, arguing in low voices about tolerances. When the regulator comes on, the crystals' faint violet glow steadies, very slightly, the way a candle flame steadies when someone shuts a door."],
+      ["Run it hard", "The Pelion runs at warp 6 for three days straight, then at warp 7, with the regulator watching every crystal and {key} watching the regulator. The wear readings come in every hour, and every hour they're lower than they should be. On the third day, Grath stops arguing."],
+      ["Find the limit", "Then, at warp 8, the regulator finds {strange}. The crystals stop wearing at all, for nine minutes, and the readings go somewhere nobody has a name for. {key} shuts the test down by hand, very calmly, and then has to sit on the deck for a while."],
+    ],
+    choice: { title: "The regulator", text: "The trial is a success: the regulator nearly halves the crystals' wear, and the data from those nine minutes at warp 8 will keep the Daystrom Institute busy for a decade. {key} would like the prototype back. Grath, unexpectedly, would like to keep it.",
+      options: [
+        { id: "keep", name: "Keep it fitted", blurb: "The dilithium regulator stays aboard: the crystals wear about a third more slowly, for the rest of the command. +4 science.", how: "The dilithium regulator tested, and kept fitted to the Pelion's warp core.", fx: { refit: "regulator", science: 4 }, text: "{key} looks at Grath, and Grath looks at the regulator, and for once neither of them argues. It stays. R&D will build another from the data. Grath checks it every morning, the way some people check on plants, and won't admit he does." },
+        { id: "return", name: "Send it home with the data", blurb: "+12 science, +1 commendation; R&D gets its prototype back.", how: "The dilithium regulator tested, and returned to R&D with its data.", fx: { science: 12, commendations: 1 }, text: "The regulator goes back to the Daystrom Institute in its padded case with every reading the Pelion took, including the nine minutes nobody can explain. {key} sends a note a month later: the next one will be better, and the Pelion will be first in line for it." },
+      ] },
+    fail: "The trial never happened. R&D's regulator went to a ship that never left the shipyard, and nobody learned what it could do at warp.",
+  },
+  "Trial a transporter targeting scanner": {
+    mission: "Trial a transporter targeting scanner", name: "The long reach", type: "Technology",
+    reason: "R&D has a targeting scanner that should let a transporter lock on through storms and rock, and {world}'s weather is the worst in the sector.",
+    keys: ["Chief Petty Officer Dana Ruiz|transporter chief, with eleven thousand beam-outs and no accidents", "Dr. Ilse Varga|who built the scanner and has never been beamed anywhere", "Warden Coll Ames|of {world}'s mountain stations, cut off by the storms"],
+    strange: ["a signal echo that arrives before the beam", "a pattern buffer that remembers a face", "a storm that seems to dodge the beam"],
+    brief: "R&D's new targeting scanner should let a transporter lock on through storms, rock and interference that would scatter an ordinary beam. {world} has three mountain stations that the storms have cut off for a month, and nobody can reach them. Test the scanner there.",
+    arrive: "From orbit, {world}'s mountains are invisible: a white whirl of storm, ionized, crackling, seventy kilometres across, sitting on the range like a lid. Three stations are under it. Their people have been eating emergency rations for a month.\n\n{key} looks at the storm on the transporter room's display and puts down the coffee she was drinking. \"With what we've got, I'd scatter anyone I sent down there across half the mountain,\" she says. \"Let's see what the new toy can do.\"",
+    steps: [
+      ["Lock on", "The scanner reaches down into the storm like a hand into dark water, feeling for the stations' life signs one at a time. It finds them. The lock holds for two seconds, then five, then steady. In the transporter room, {key} says something under her breath that might be a prayer."],
+      ["Bring them up", "Over two days the Pelion beams up everyone the storm cut off, a few at a time, and beams down food, medicine and power cells in their place. The last up are the station wardens, who refused to leave before their people did. They come out of the transporter beam blinking at the light, and one of them sits down on the pad and laughs until he cries."],
+    ],
+    choice: { title: "The scanner", text: "It works better than R&D dared hope: the scanner can lock on through storms, rock and interference that would stop any transporter in the fleet. R&D wants it back for study. {world}'s people would like it to stay: their storms come every winter, and the next ship that comes to help may not have one.",
+      options: [
+        { id: "keep", name: "Keep it on the Pelion", blurb: "The targeting scanner stays aboard: +2 to Relief and repairs and to Found a colony, for the rest of the command. +4 science.", how: "The transporter targeting scanner tested at {world}, and kept on the Pelion.", fx: { refit: "transporter", science: 4 }, text: "The scanner stays wired into the Pelion's transporters, and {key} adopts it as her own. In a month the transporter crew have names for its moods. In two, they can't remember how they worked without it. Every relief mission and every new colony will go faster for it." },
+        { id: "give", name: "Leave it with {world}", blurb: "+2 commendations, accord +1, {world}'s harm −1.", how: "The transporter targeting scanner tested at {world}, and left with its people.", fx: { commendations: 2, accord: 1, heal: 1 }, text: "The scanner goes down to {world}'s main station with a technician to show them how to use it. R&D grumbles and builds another. Next winter, when the storms come back, the mountain stations are never cut off again." },
+      ] },
+    fail: "The Pelion never came. The storm over {world}'s mountains broke on its own a fortnight later. Not everyone at the stations was still waiting.",
+  },
+  "Test Mark VI photon torpedoes": {
+    mission: "Test Mark VI photon torpedoes", name: "The live-fire range", type: "Technology",
+    reason: "Starfleet Ordnance wants its new Mark VI photon torpedo fired in anger before it goes fleetwide, and the empty space near {world} is a long way from anyone it could hurt.",
+    keys: ["Commander Asha Grell|of Starfleet Ordnance, who designed the warhead", "Lieutenant Bo Ferris|a weapons officer who has fired more torpedoes than anyone alive", "Ensign Nils Ekdahl|who will be loading them"],
+    strange: ["a warhead that arms itself", "a test target that fires back", "a torpedo that comes about on its own"],
+    brief: "Starfleet Ordnance has a new photon torpedo, the Mark VI: a bigger yield in the same casing, if it works. {key} has brought a dozen to fire at drone targets near {world}. Reyes has been waiting all week.",
+    arrive: "The drone targets hang in a line near {world}, old freighter hulls stripped and painted orange, a kilometre apart. In the torpedo bay, the Mark VIs lie in their cradles, a dull grey a shade darker than the old ones.\n\n{key} briefs the weapons crew with a long pointer and no smiles. \"Same casing. Half again the yield. Same handling, if I got it right. If I didn't, you'll know.\" A pause. \"So will I.\"",
+    steps: [
+      ["Fire the first spread", "The first spread goes out at ten thousand kilometres and every one of them hits. The orange hulls flower into white fire, one after another, and the shock fronts ripple outward through the debris for a long time after. Reyes, at tactical, says only \"Oh,\" very softly, which is the most anyone on the bridge has ever heard her say about a weapon."],
+      ["Find the flaw", "The ninth torpedo misbehaves: {strange}. It is two seconds from the launch tube when Reyes destroys it with the phasers, and the blast rocks the Pelion hard enough to throw people from their chairs. {key} has the cause in an hour: a fault in the arming sequence, and a fix, and it never happens again in the next three."],
+    ],
+    choice: { title: "The Mark VI", text: "With {key}'s fix, the Mark VI is everything Ordnance promised: half again the punch of the torpedoes the Pelion carries now. {key} can load the Pelion's magazines with them before going home. Or the Pelion can send them all back to Ordnance with the flaw documented, so the fleet's first batch is a safe one.",
+      options: [
+        { id: "load", name: "Load the magazines", blurb: "Mark VI torpedoes for the rest of the command: a torpedo hit does 3 boxes instead of 2. +2 science.", how: "The Mark VI photon torpedo tested near {world}, and loaded into the Pelion's magazines.", fx: { refit: "torp6", science: 2 }, text: "The Pelion's magazines are emptied and reloaded overnight, Ensign Ekdahl's crew working in shifts, and in the morning the torpedo bay holds forty Mark VIs, each with {key}'s fix in it. Reyes signs for them personally." },
+        { id: "report", name: "Send them back with the fix", blurb: "+10 science, +2 commendations: the fleet's first Mark VIs are safe ones.", how: "The Mark VI photon torpedo tested near {world}, and its flaw fixed for the fleet.", fx: { science: 10, commendations: 2 }, text: "The Mark VIs go back to Ordnance with {key} and the Pelion's full report. The fleet's first production batch ships with the fix, and Ordnance's letter of thanks goes up on the torpedo bay wall, where Ekdahl's crew tell everyone who'll listen about the ninth torpedo." },
+      ] },
+    fail: "The trials never happened. Ordnance shipped the Mark VI to the fleet untested, flaw and all. Nobody has said what happened next, which says enough.",
+  },
+  "Shake down an antimatter containment upgrade": {
+    mission: "Shake down an antimatter containment upgrade", name: "The cold bottle", type: "Technology",
+    reason: "R&D's new containment pods hold more antimatter in the same space, if their magnetic bottles hold steady. Test them near {world}, where a failure would hurt no one.",
+    keys: ["Dr. Iyabo Nwosu|of the Utopia Planitia yards, who designed the bottles", "Chief Petty Officer Garrow|of the Pelion's engineering crew, who has handled antimatter for thirty years", "Lieutenant Mira Haas|an R&D safety officer who does not sleep"],
+    strange: ["a containment field that hums in harmony with the stars", "antimatter that behaves as if it were somewhere else", "a bottle that seems to hold more than it should"],
+    brief: "R&D has new containment pods: magnetic bottles that hold more antimatter in the same space, and leak less of it. {key} wants them shaken down in a working ship, a long way from anywhere, near {world}. Every engineer aboard is very quiet about it.",
+    arrive: "The new pods are beamed aboard near {world} one at a time, empty, and slotted in beside the old ones in the antimatter storage bay. They look the same. They aren't: inside each, the magnetic bottle is tuned to a precision that makes Grath's eyebrows go up and stay up.\n\n\"If it fails,\" {key} says, \"it fails safe. It ejects. That's the theory.\"\n\nGrath: \"I've always liked theories. They're so much easier to clean up after than practice.\"",
+    steps: [
+      ["Fill them", "Filling the pods takes a day, antimatter fed in a few grams at a time while every display in engineering watches the bottles. They hold. The pods take a third more than the old ones, and the readings on them are steadier than anything Grath has seen."],
+      ["Shake them", "Then the shakedown: the Pelion at warp, then at emergency warp, then through the shock wave of a deliberate torpedo detonation at close range, everything the fleet might ask of a ship. One bottle drifts by a millimetre, and the safeties catch it, and the drift stops. {key} logs it without a word, and sleeps for the first time in two days."],
+      ["Find what's odd", "On the last day, in a long quiet run near {world}, the sensors find {strange}. It isn't dangerous. It is very interesting. Sevek watches it for an hour, then asks, very politely, for a copy of every reading."],
+    ],
+    choice: { title: "The pods", text: "The new pods passed everything the fleet could throw at them. {key} can leave them fitted: more fuel, burned more efficiently. Or they can go back to the yards for study, with everything the Pelion learned about them, and the odd reading too.",
+      options: [
+        { id: "keep", name: "Keep them fitted", blurb: "Antimatter containment upgraded for the rest of the command: 28 units instead of 20, burned a quarter more slowly. +8 antimatter now.", how: "The antimatter containment upgrade shaken down near {world}, and kept fitted.", fx: { refit: "containment", antimatter: 8 }, text: "The new pods stay in the Pelion's storage bay, full, and the old ones go back to the yards in their place. Grath, who has worried about running short of antimatter for his entire career, now worries about running short of things to worry about." },
+        { id: "return", name: "Send them back with the data", blurb: "+12 science, +1 commendation.", how: "The antimatter containment upgrade shaken down near {world}, and returned for study.", fx: { science: 12, commendations: 1 }, text: "The pods go back to Utopia Planitia, emptied with great care, and the data goes with them. A month later every new starship in the fleet is being fitted with the production version. {key} sends the Pelion's engineers a case of something Andorian and very strong." },
+      ] },
+    fail: "The Pelion never came. R&D tested the pods in a laboratory instead, where nothing ever shakes.",
+  },
+  "Trial an auxiliary fusion reactor": {
+    mission: "Trial an auxiliary fusion reactor", name: "The second heart", type: "Technology",
+    reason: "R&D has a compact fusion reactor that could give a starship power to spare, and wants it run for a fortnight at {world}, where its spare power can do some good.",
+    keys: ["Engineer Pallas Okoro|who built the reactor out of spare parts and stubbornness", "Mayor Jonah Brisk|of {world}, whose town has been on rationed power since winter", "Ensign Tamsin Rhee|from engineering, who has volunteered to babysit it"],
+    strange: ["a reactor that runs cooler the harder it works", "a power surge that arrives before the switch is thrown", "a hum that the colonists say they can hear in their sleep"],
+    brief: "R&D has a compact fusion reactor small enough to fit in a starship's secondary hull and powerful enough to run a town. {key} wants it trialled for a fortnight at {world}, running both the Pelion's systems and the colony's rationed grid.",
+    arrive: "The reactor comes aboard at {world} in pieces, nine crates of it, and {key} comes with it, a short, wide engineer with burn scars on both hands and a grin that never quite goes away. Down on the planet, the town's lights are out in every district but one: the colony has been on rationed power all winter.\n\n\"Let's get her running,\" {key} says, \"and give those people their lights back. That's what she's for.\"",
+    steps: [
+      ["Bring it up", "The reactor won't start. It won't start on the first try, the fourth or the eleventh, and the engineering crew are beginning to say things about it in Tellarite. On the twelfth, {key} kicks it, quite hard, in a particular place, and it starts, and runs as smooth as a heartbeat, and nobody can explain why."],
+      ["Share the power", "For a fortnight the reactor runs the Pelion's labs and sensors and the colony's grid at once, through a power beam Grath rigs to the town's substation. Down on {world}, the lights come back on, district by district. The town holds a party in the square on the first warm night, and sends up a cake for the engineering crew."],
+    ],
+    choice: { title: "The reactor", text: "The trial is a success: the reactor gives a starship a point of power to spare, every week, for as long as it runs. {key} would be glad to leave it in the Pelion. But the colony on {world} has had its lights back for a fortnight, and its winter isn't over.",
+      options: [
+        { id: "keep", name: "Keep it in the Pelion", blurb: "An auxiliary reactor for the rest of the command: +1 Power every week for the ship's systems (not in battle). +4 science.", how: "The auxiliary fusion reactor trialled at {world}, and kept aboard the Pelion.", fx: { refit: "aux", science: 4 }, text: "The reactor goes into the Pelion's secondary hull, where Ensign Rhee checks it every watch, and the ship's systems have a point of power to spare from then on. Down on {world}, R&D promises the colony a reactor of its own by spring. {key} personally guarantees it." },
+        { id: "leave", name: "Leave it with the colony", blurb: "+3 commendations, accord +1, {world}'s harm −1.", how: "The auxiliary fusion reactor trialled at {world}, and left to run the colony's grid.", fx: { commendations: 3, accord: 1, heal: 1 }, text: "The reactor goes down to {world}'s substation for good, and the colony's lights stay on all winter. {key} stays with it a week to train the colony's engineers, and leaves with an invitation to the next party in the square, which is given in her honour." },
+      ] },
+    fail: "The Pelion never came. The reactor went back to the laboratory, and the colony on {world} spent the rest of the winter in the dark.",
+  },
+  "Test experimental warp coils": {
+    mission: "Test experimental warp coils", name: "Warp nine", type: "Technology",
+    reason: "Starfleet R&D has warp coils that might take a Heavy Cruiser past warp 8, and wants them tried near {world}, where there's room to go fast.",
+    keys: ["Commander Rhea Castellano|of the Advanced Starship Design Bureau, who has been to warp 9 once, in a test shuttle", "Dr. Felix Andrade|a warp field theorist who thinks it's impossible", "Lieutenant Iko Barre|a test pilot on loan to the Pelion's helm"],
+    strange: ["stars that seem to bend backward at the edge of the viewer", "a moment when the ship's clocks disagree", "a warp wake that keeps going after the ship has stopped"],
+    brief: "The Advanced Starship Design Bureau has warp coils that should let a Heavy Cruiser make warp 9, for short runs, without tearing itself apart. {key} wants to fit them to the Pelion and find out, near {world}. Grath has requested, formally, that his objection be noted in the log.",
+    arrive: "The new coils come aboard near {world} in two long cases, wrapped in shielding, and go into the Pelion's nacelles over a day and a night while Grath supervises every weld. {key} walks the length of each nacelle afterwards, a hand on the conduits, listening.\n\n\"Warp 9,\" {key} says. \"Seven hundred and twenty-nine times the speed of light. A light-year in half a day.\" A pause. \"In theory.\"\n\nGrath, flatly: \"It's always theory until it's wreckage.\"",
+    steps: [
+      ["Warp 8.5", "The first run takes the Pelion to warp 8.5, faster than she has ever flown, and holds it for an hour. The deck vibrates with a note Rrinn can hear and nobody else can. The coils hold. Grath's readings are steady, and he looks almost offended by it."],
+      ["Warp 9", "The second run takes her to warp 9. For eleven minutes the Pelion crosses space at seven hundred and twenty-nine times the speed of light, the stars on the viewer streaming past in long blue lines, and then the warp field begins to sing, and then to shake. Helm drops her out of warp in a long, controlled glide, and everyone on the bridge starts breathing again."],
+      ["Tune the field", "The third day is Grath's and {key}'s, side by side in the nacelle control room, tuning the field against the coils' harmonics until the singing stops. In the last run, the ship's sensors catch {strange}. Sevek asks to see the readings. {key} says not yet."],
+    ],
+    choice: { title: "The coils", text: "The coils work. Tuned, they'll take the Pelion to warp 9 for short runs, with the engines straining hard. {key} can leave them fitted. Or they can go back to the Bureau with every reading, so the next ship gets coils that don't strain at all.",
+      options: [
+        { id: "keep", name: "Keep them fitted", blurb: "Experimental warp coils for the rest of the command: the emergency maximum is warp 9 (about 14 light-years a week), with a hard engine strain check. +4 science.", how: "The experimental warp coils tested near {world}, and kept in the Pelion's nacelles.", fx: { refit: "coils", science: 4 }, text: "The coils stay in the nacelles. The Pelion is the fastest Heavy Cruiser in the fleet now, if only for short runs and only with Grath's permission, which he gives with an expression of great suffering. Lieutenant Barre goes home to the Bureau and tells everyone about the eleven minutes." },
+        { id: "return", name: "Send them back to the Bureau", blurb: "+14 science, +1 commendation.", how: "The experimental warp coils tested near {world}, and returned to the Bureau.", fx: { science: 14, commendations: 1 }, text: "The coils go back to the Advanced Starship Design Bureau in their shielded cases, with the readings of those eleven minutes at warp 9. Two years from now, Starfleet's next generation of starships will cruise at speeds the Pelion only touched. Grath is quietly relieved." },
+      ] },
+    fail: "The trials never happened. The coils went to a test shuttle instead, and the shuttle never got past warp 8.",
+  },
+});
 
 // ---- stories.js ----
 // The stories behind each kind of order, in the way of The Silence at Corvan II: a briefing, a scene on arrival, a scene
@@ -1771,6 +1907,7 @@ function target(S, id, skill, ctx = {}) {
     if (["Engineering", "Medicine"].includes(skill) && A.ops) parts.push(["Power to operations", A.ops]);
   }
   if (ctx.action === "repair" && !ctx.combat && storesOf(S).spares <= 0) parts.push(["No spare parts", -3]);
+  if ((ctx.action === "aid" || ctx.action === "colonize") && P.refits.transporter) parts.push(["Transporter targeting scanner", 2]);
   if ((ctx.action === "survey" || ctx.action === "investigate") && hasRecord(S, "science1")) parts.push(["Graviton lensing", 1]);
   if (ctx.action === "envoy" && hasRecord(S, "envoy1")) parts.push(["A dead language", 1]);
   if (ctx.action === "sweep" && hasRecord(S, "sweep2")) parts.push(["Cloaked wake", 2]);
@@ -1799,8 +1936,8 @@ const daysPerLy = (w) => (w > 0 ? 365.25 / lightSpeeds(w) : Infinity);
 /** The highest warp the engines allow: warp 8, the emergency maximum, less 2 for each box of engine damage. */
 const EMERGENCY_WARP = 8;
 function maxWarp(S) {
-  const P = S.pelion, e = P.sys.engines, st = storesOf(S), pw = reactorPower(S);
-  let m = e >= 3 ? 1 : EMERGENCY_WARP - 2 * e;
+  const P = S.pelion, e = P.sys.engines, st = storesOf(S), pw = weekPower(S);
+  let m = e >= 3 ? 1 : EMERGENCY_WARP + (P.refits.coils ? 1 : 0) - 2 * e;
   if (st.antimatter <= 0) m = Math.min(m, 2);          // running on the reserve
   if (st.dilithium <= 0) m = Math.min(m, 4); else if (st.dilithium <= 2) m = Math.min(m, 6);   // a failing matrix won't hold high warp
   if (pw < 3) m = Math.min(m, pw >= 2 ? 6 : 4);        // the engines need the power: warp 7 and 8 take 3
@@ -1844,12 +1981,14 @@ const dilithiumPenalty = (S) => { const d = storesOf(S).dilithium; return d <= 0
 const reactorPower = (S) => Math.max(1, PELION.power + (S.pelion.refits.power ? 1 : 0) + (hasRecord(S, "power1") ? 1 : 0) - (S.pelion.powerLoss || 0) - dilithiumPenalty(S));
 const allocOf = (S) => (S.pelion.alloc = S.pelion.alloc || { shields: 1, sensors: 1, labs: 0, ops: 0 });
 const powerUsed = (S) => warpPower(S.pelion.warp ?? CRUISE_WARP) + Object.values(allocOf(S)).reduce((t, n) => t + n, 0);
-const powerFree = (S) => reactorPower(S) - powerUsed(S);
+/** The week's Power for the ship's systems: the reactor's, and the auxiliary reactor's point if one is fitted. */
+const weekPower = (S) => reactorPower(S) + (S.pelion.refits.aux ? 1 : 0);
+const powerFree = (S) => weekPower(S) - powerUsed(S);
 /** Set the power to one system (0–2). */
 function setAlloc(S, sys, n) {
   const A = allocOf(S); if (!(sys in POWER_SYSTEMS)) return { error: "No such system." };
   n = Math.max(0, Math.min(2, Math.round(n)));
-  if (n > A[sys] && powerFree(S) < n - A[sys]) return { error: `Not enough power: ${reactorPower(S)} in all, and the engines need ${warpPower(S.pelion.warp)} at warp ${S.pelion.warp}. Lower the warp or take power from another system.` };
+  if (n > A[sys] && powerFree(S) < n - A[sys]) return { error: `Not enough power: ${weekPower(S)} in all, and the engines need ${warpPower(S.pelion.warp)} at warp ${S.pelion.warp}. Lower the warp or take power from another system.` };
   A[sys] = n;
   return { ok: true };
 }
@@ -1861,7 +2000,7 @@ function balancePower(S, why = "") {
   const A = allocOf(S), P = S.pelion, took = [];
   for (const k of ["labs", "ops", "sensors", "shields"]) while (powerFree(S) < 0 && A[k] > 0) { A[k]--; took.push(POWER_SYSTEMS[k].name); }
   while (powerFree(S) < 0 && P.warp > 0) { P.warp--; took.push("warp"); }
-  if (took.length && why !== "warp") log(S, `Power: the reactor makes ${reactorPower(S)}; ${[...new Set(took)].join(", ").toLowerCase()} lose power to make it add up.`, "bad");
+  if (took.length && why !== "warp") log(S, `Power: the reactor makes ${weekPower(S)}; ${[...new Set(took)].join(", ").toLowerCase()} lose power to make it add up.`, "bad");
   return [...new Set(took)];
 }
 
@@ -1876,11 +2015,13 @@ const STORES = {
   antimatter: { name: "Antimatter", max: 20, unit: "unit", blurb: "The fuel: about 1 a week at warp 6, 4 a week at warp 8, and 1 a battle. With none, the Pelion limps on its reserve at warp 2 until it reaches fuel, or a tender reaches it." },
   spares: { name: "Spare parts", max: 10, unit: "crate", blurb: "Plasma injectors, warp coils, coolant. Every repair uses one (−3 to repair without), and so does every week at emergency warp." },
 };
+/** How much of a store the Pelion can hold: more antimatter with the containment upgrade. */
+const storeMax = (S, k) => STORES[k].max + (k === "antimatter" && S.pelion.refits.containment ? 8 : 0);
 const storesOf = (S) => (S.pelion.stores = S.pelion.stores || { dilithium: 10, antimatter: STORES.antimatter.max, spares: 6 });
 /** Add (or take) stores, within their limits. Returns what actually changed. */
 function addStore(S, k, n) {
   const st = storesOf(S), was = st[k];
-  st[k] = Math.max(0, Math.min(STORES[k].max, st[k] + n));
+  st[k] = Math.max(0, Math.min(storeMax(S, k), st[k] + n));
   if (k === "dilithium" && st[k] !== was) balancePower(S);
   return st[k] - was;
 }
@@ -1896,12 +2037,12 @@ function marketAt(S) {
 function buyStore(S, k, n = 1) {
   const m = marketAt(S); if (!m || !m.items[k]) return { error: "Nobody here sells that." };
   if (S.battle || S.over) return { error: "Not now." };
-  const st = storesOf(S), room = STORES[k].max - st[k], price = m.items[k];
+  const st = storesOf(S), room = storeMax(S, k) - st[k], price = m.items[k];
   n = Math.min(n, room, Math.floor(S.supplies / price));
   if (room <= 0) return { error: "The holds are full." };
   if (n <= 0) return { error: `Needs ${price} supplies.` };
   S.supplies -= n * price; addStore(S, k, n);
-  log(S, `Stores: ${n} ${STORES[k].unit}${n === 1 ? "" : "s"} of ${STORES[k].name.toLowerCase()} from ${m.name}, ${n * price} supplies. Now ${st[k]}/${STORES[k].max}.`, "good");
+  log(S, `Stores: ${n} ${STORES[k].unit}${n === 1 ? "" : "s"} of ${STORES[k].name.toLowerCase()} from ${m.name}, ${n * price} supplies. Now ${st[k]}/${storeMax(S, k)}.`, "good");
   return { ok: true, n };
 }
 /** A fuel tender from Starbase 23, when the antimatter runs low far from home: 10 supplies, here in two weeks. */
@@ -1919,15 +2060,16 @@ function requestTender(S) {
 function consumeStores(S) {
   const P = S.pelion, st = storesOf(S), ly = P.lyWeek || 0, emerg = (P.strain || 0) > CRUISE_WARP, lines = [];
   if (ly > 0) {
-    const am = Math.max(1, Math.round(ly * (emerg ? 0.4 : 0.25)));
+    const am = Math.max(1, Math.round(ly * (emerg ? 0.4 : 0.25) * (P.refits.containment ? 0.75 : 1)));
     const used = -addStore(S, "antimatter", -am); lines.push(`${used} antimatter for ${ly.toFixed(1)} light-years`);
     P.wear = (P.wear || 0) + (emerg ? 2 : 1);
     if (emerg) { if (st.spares > 0) { addStore(S, "spares", -1); lines.push("a crate of spares burned out at emergency warp"); } else lines.push("no spares left to burn at emergency warp: the engines run hot"); }
   }
-  while ((P.wear || 0) >= 4) { P.wear -= 4; if (addStore(S, "dilithium", -1)) lines.push("a dilithium crystal worn out"); }
+  const per = P.refits.regulator ? 6 : 4;   // the regulator eases the strain on the crystals
+  while ((P.wear || 0) >= per) { P.wear -= per; if (addStore(S, "dilithium", -1)) lines.push("a dilithium crystal worn out"); }
   if ((S.pelion.alloc || {}).labs >= 2) { S.science += 2; lines.push("+2 science from the labs"); }
   P.lyWeek = 0;
-  if (lines.length) log(S, `Stores this week: ${lines.join("; ")}. Dilithium ${st.dilithium}/10, antimatter ${st.antimatter}/${STORES.antimatter.max}, spares ${st.spares}/${STORES.spares.max}.`, "turn");
+  if (lines.length) log(S, `Stores this week: ${lines.join("; ")}. Dilithium ${st.dilithium}/10, antimatter ${st.antimatter}/${storeMax(S, "antimatter")}, spares ${st.spares}/${STORES.spares.max}.`, "turn");
   if (st.antimatter <= 3 && st.antimatter > 0) log(S, `Antimatter low: ${st.antimatter} left. Refuel at Starbase 23 or a colony, or call a tender (the Ship tab).`, "bad");
   if (st.antimatter <= 0 && !P.docked) log(S, "Antimatter gone: the Pelion is running on its reserve, at warp 2 at most.", "bad");
   if (S.tender && S.turn + 1 >= S.tender.due) { S.tender = null; addStore(S, "antimatter", 12); addStore(S, "spares", 2); log(S, "The fuel tender reaches the Pelion: +12 antimatter, +2 spares.", "good"); }
@@ -2144,7 +2286,7 @@ function dock(S) {
   P.shields = 0; P.hull = 0; P.sys = { weapons: 0, engines: 0, sensors: 0 }; P.torps = PELION.torps;
   for (const id in S.crew) { const c = S.crew[id]; c.inj = 0; c.duty = 2; }
   // Starfleet refuels the antimatter and issues spares up to six crates; dilithium is bought (the Ship tab).
-  const st = storesOf(S), am = addStore(S, "antimatter", STORES.antimatter.max), sp = st.spares < 6 ? addStore(S, "spares", 6 - st.spares) : 0;
+  const st = storesOf(S), am = addStore(S, "antimatter", 99), sp = st.spares < 6 ? addStore(S, "spares", 6 - st.spares) : 0;
   log(S, `Docked at Starbase 23: ${fixed ? "repaired, rearmed and " : ""}crew rested; Duty points restored.${am ? ` Refuelled: +${am} antimatter.` : ""}${sp ? ` Spares issued: +${sp}.` : ""}${st.dilithium < 10 ? ` Dilithium ${st.dilithium}/10: the quartermaster has crystals, for supplies.` : ""}`, "good");
 }
 function sightRange(S) { return 2 + (S.pelion.refits.sensors ? 1 : 0) + ((S.pelion.alloc || {}).sensors >= 2 ? 1 : 0); }
@@ -2539,7 +2681,7 @@ const campId = (x) => (x && x.id) || "watchers";
 /** The current act, from the beats reached so far. */
 const campaignAct = (S) => { const C = campaignOf(S), D = campaignDef(S), b = D.beats.filter((x) => C.beats.includes(x.at)); return b.length ? b[b.length - 1].act : "Prologue: The Silence at Corvan II"; };
 /** The order types Starfleet has: the first fourteen, and each new campaign's, from the moment it begins. */
-const missionPool = (S) => MISSIONS.concat(SERIES_MISSIONS.filter((m) => (S.unlocked || []).includes(m.campaign)));
+const missionPool = (S) => MISSIONS.concat(TECH_MISSIONS, SERIES_MISSIONS.filter((m) => (S.unlocked || []).includes(m.campaign)));
 /** Is the campaign known yet? Only once Corvan II is over: before that, nothing about it may show. */
 const campaignOpen = (S) => campaignOf(S).beats.includes(0);
 /** Starfleet's reason for an order, tied to the campaign: only once the campaign is known. */
@@ -2756,7 +2898,7 @@ function missionChoices(S, ev) {
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
   accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike", refit: (n) => `${REFITS[n] ? REFITS[n].name : n} fitted to the Pelion`, delay: (n) => `every other order's deadline ${n} weeks closer`,
-  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the pirates answer: a raider strikes a Federation world", base: () => "the hidden pirate base found and charted", tholian: () => "the Assembly answers: a Tholian vessel makes for a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
+  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the pirates answer: a raider strikes a Federation world", base: () => "the hidden pirate base found and charted", tholian: () => "the Assembly answers: a Tholian vessel makes for a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged", refit: (n) => `${(PROTOTYPES[n] || REFITS[n] || { name: n }).name} fitted to the Pelion` };
 function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
   if (!o || !opt) return { error: "No such choice." };
@@ -2905,7 +3047,7 @@ function newOrder(S) {
   // About half of all orders are part of the campaign (once it has begun); the rest are the frontier's ordinary work.
   const C = campaignOf(S);
   if (st.campaign) { o.campaignId = st.campaign; o.campaign = st.campaign === campId(C) && !C.over; }
-  else { o.campaignId = "watchers"; o.campaign = campId(C) === "watchers" && !C.over && rand(S) < 0.5; }
+  else { o.campaignId = "watchers"; o.campaign = campId(C) === "watchers" && !C.over && !!st.thread && rand(S) < 0.5; }   // only orders with a thread to find
   S.backlog = S.backlog || [];
   if (busy(S)) {
     o.backlog = true; o.received = S.turn; S.backlog.push(o);
@@ -3154,7 +3296,7 @@ function exchange(S, choice = {}) {
   if (torp) {
     P.torps--;
     const r = check(S, st.gun + hit + PELION.torpBonus);
-    if (r.success) hitEnemy(S, e, 2, L, `Photon torpedoes (${R(r)})`); else L.push(`Photon torpedoes (${R(r)}): wide.`);
+    if (r.success) hitEnemy(S, e, P.refits.torp6 ? 3 : 2, L, `${P.refits.torp6 ? "Mark VI photon torpedoes" : "Photon torpedoes"} (${R(r)})`); else L.push(`Photon torpedoes (${R(r)}): wide.`);
   }
   for (const u of Object.values(S.support)) {
     if (u.at !== P.at || e.hull >= E.hull) continue;
@@ -4255,9 +4397,9 @@ const turnText = () => (S.mode === "open" ? `Week ${S.turn} · open command` : `
 function renderBar() {
   const st = storesOf(S), low = (k, n) => (st[k] <= n ? ' class="bad"' : "");
   $("bar-stats").innerHTML = `<span><b>Supplies<\/b>${S.supplies}<\/span><span><b>Science<\/b>${S.science}<\/span>`
-    + `<span title="Power: in use of what the reactor makes this week (the Ship tab)"><b>Power<\/b>${Math.max(0, reactorPower(S) - powerFree(S))}/${reactorPower(S)}<\/span>`
+    + `<span title="Power: in use of what the reactor makes this week (the Ship tab)"><b>Power<\/b>${Math.max(0, weekPower(S) - powerFree(S))}/${weekPower(S)}<\/span>`
     + `<span title="Dilithium crystals in the warp core's matrix"><b>Dilithium<\/b><span${low("dilithium", 4)}>${st.dilithium}/10<\/span><\/span>`
-    + `<span title="Antimatter: the warp drive's fuel"><b>Antimatter<\/b><span${low("antimatter", 3)}>${st.antimatter}/${STORES.antimatter.max}<\/span><\/span>`
+    + `<span title="Antimatter: the warp drive's fuel"><b>Antimatter<\/b><span${low("antimatter", 3)}>${st.antimatter}/${storeMax(S, "antimatter")}<\/span><\/span>`
     + `<span title="Spare parts: plasma injectors, warp coils, coolant"><b>Spares<\/b><span${low("spares", 1)}>${st.spares}<\/span><\/span>`
     + `<span title="Starfleet Command: five boxes and you're relieved of command"><b>Starfleet Command<\/b>${boxes(S.command, 5)}<\/span>`
     + `<span title="Tension with the Klingon Empire"><b>Klingon tension<\/b>${boxes(S.tension, 10, "gold")}<\/span>`;
@@ -4281,17 +4423,17 @@ function renderPanel() {
 // ---------- Here: what's in the selected hex, and what the ship can do ----------
 /** The warp control: impulse or warp 1 to the maximum, and what's left of the week. */
 function warpHTML() {
-  const P = S.pelion, mw = maxWarp(S), opts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter((w) => w <= Math.max(8, mw));
+  const P = S.pelion, mw = maxWarp(S), opts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter((w) => w <= Math.max(8, mw)), top = 8 + (P.refits.coils ? 1 : 0);
   const left = P.days || 0;
-  return `<div class="card small" style="padding:8px 10px"><label><b>Speed<\/b> <select data-warp aria-label="Warp factor">${opts.map((w) => `<option value="${w}" ${w === P.warp ? "selected" : ""} ${w > mw ? "disabled" : ""}>${w ? `Warp ${w}${w === CRUISE_WARP ? " (maximum stable)" : w === 8 ? " (emergency maximum)" : w > CRUISE_WARP ? " (emergency)" : ""}` : "Impulse"}${w > mw ? " (engines damaged)" : ""}<\/option>`).join("")}<\/select><\/label>
-    <div class="muted" style="margin-top:4px">${esc(warpText(P.warp))}. v = W³ × c. Engines take ${warpPower(P.warp)} of ${reactorPower(S)} Power${powerFree(S) > 0 ? `; ${powerFree(S)} unassigned (the Ship tab)` : ""}.${storesOf(S).antimatter <= 0 ? ` <span class="bad">No antimatter: warp 2 on the reserve.<\/span>` : ""}<\/div>
+  return `<div class="card small" style="padding:8px 10px"><label><b>Speed<\/b> <select data-warp aria-label="Warp factor">${opts.map((w) => `<option value="${w}" ${w === P.warp ? "selected" : ""} ${w > mw ? "disabled" : ""}>${w ? `Warp ${w}${w === CRUISE_WARP ? " (maximum stable)" : w === top ? " (emergency maximum)" : w > CRUISE_WARP ? " (emergency)" : ""}` : "Impulse"}${w > mw ? (w > top ? " (needs the experimental coils)" : " (engines, power or stores)") : ""}<\/option>`).join("")}<\/select><\/label>
+    <div class="muted" style="margin-top:4px">${esc(warpText(P.warp))}. v = W³ × c. Engines take ${warpPower(P.warp)} of ${weekPower(S)} Power${powerFree(S) > 0 ? `; ${powerFree(S)} unassigned (the Ship tab)` : ""}.${storesOf(S).antimatter <= 0 ? ` <span class="bad">No antimatter: warp 2 on the reserve.<\/span>` : ""}<\/div>
     <div style="margin-top:2px">This week: ${left.toFixed(1)} of 7 days left${P.warp ? `, ${P.mp.toFixed(1)} ly at this warp` : ""}.${P.warp > CRUISE_WARP ? ` <span class="bad">Emergency speed: an Engineering check at the end of the week, or the engines take damage.<\/span>` : ""}<\/div><\/div>`;
 }
 /** Stores for sale where the Pelion is. */
 function marketHTML() {
   const m = marketAt(S); if (!m) return "";
   const st = storesOf(S);
-  return `<div class="card violet small"><h4>Stores at ${esc(m.name)}<\/h4>${Object.entries(m.items).map(([k, price]) => `<div class="roll-row"><span style="min-width:150px">${esc(STORES[k].name)} ${st[k]}/${STORES[k].max}<\/span><button class="btn small" data-buy="${k}" data-n="1" ${st[k] >= STORES[k].max || S.supplies < price ? "disabled" : ""}>+1 for ${price}<\/button><button class="btn small" data-buy="${k}" data-n="99" ${st[k] >= STORES[k].max || S.supplies < price ? "disabled" : ""}>Fill up<\/button><\/div>`).join("")}<div class="muted" style="margin-top:4px">Prices in supplies (you have ${S.supplies}).${m.name === "Starbase 23" ? " The starbase refuels the antimatter for nothing when the Pelion docks." : ""}<\/div><\/div>`;
+  return `<div class="card violet small"><h4>Stores at ${esc(m.name)}<\/h4>${Object.entries(m.items).map(([k, price]) => `<div class="roll-row"><span style="min-width:150px">${esc(STORES[k].name)} ${st[k]}/${storeMax(S, k)}<\/span><button class="btn small" data-buy="${k}" data-n="1" ${st[k] >= storeMax(S, k) || S.supplies < price ? "disabled" : ""}>+1 for ${price}<\/button><button class="btn small" data-buy="${k}" data-n="99" ${st[k] >= storeMax(S, k) || S.supplies < price ? "disabled" : ""}>Fill up<\/button><\/div>`).join("")}<div class="muted" style="margin-top:4px">Prices in supplies (you have ${S.supplies}).${m.name === "Starbase 23" ? " The starbase refuels the antimatter for nothing when the Pelion docks." : ""}<\/div><\/div>`;
 }
 function units() {
   const list = [["pelion", "USS Pelion"], ...Object.values(S.support).map((u) => [u.id, u.name])];
@@ -4431,6 +4573,8 @@ function shipHTML() {
     + `<span>Power<\/span><span>${powerOf(S)}${P.powerLoss ? ` (−${P.powerLoss})` : ""}<\/span><span>Torpedoes<\/span><span>${P.torps}/${PELION.torps}<\/span><span>Speed<\/span><span>Warp ${P.warp}${P.warp === CRUISE_WARP ? " (maximum stable)" : P.warp > CRUISE_WARP ? " (emergency)" : ""}: ${speedOf(S).toFixed(1)} ly a week. Maximum stable warp ${CRUISE_WARP}; emergency maximum warp ${maxWarp(S)}${maxWarp(S) < 8 ? " (engines damaged)" : ""}<\/span><span>Sensors<\/span><span>rating ${sensorsRating(S)}; sees ${2 + (P.refits.sensors ? 1 : 0)} hexes<\/span>${P.refits.inverter ? `<span>Cloak inverter<\/span><span>Fitted by Starfleet R&D after the field trials: +2 to sensor sweeps${P.refits.inverter >= 2 ? "; tuned at full power, sweeps reach 5 light-years for cloaked ships" : ""}<\/span>` : ""}<\/div>`;
   h += `<p class="small muted">Hull and systems are repaired at Starbase 23 (or by Engineering, a box at a time, using a crate of spares). Shields come back after each battle.<\/p>`;
   h += powerHTML() + storesHTML();
+  const protos = Object.keys(PROTOTYPES).filter((k) => P.refits[k]);
+  h += `<h3>Prototypes from Starfleet R&D<\/h3>` + (protos.length ? protos.map((k) => `<div class="card green"><h4>${esc(PROTOTYPES[k].name)}<\/h4><div class="small muted">${esc(PROTOTYPES[k].text)}<\/div><\/div>`).join("") : `<p class="small muted">None yet. Starfleet R&D sends prototypes with its Technology orders: carry one out and choose to keep it, and it stays aboard.<\/p>`);
   h += `<h3>Refits ${P.docked ? "" : "(at Starbase 23)"}<\/h3>`;
   for (const [id, R] of Object.entries(REFITS)) h += `<div class="card ${P.refits[id] ? "green" : "violet"}"><h4>${esc(R.name)}<\/h4><div class="small muted">${esc(R.blurb)}<\/div><div class="roll-row">${P.refits[id] ? `<span class="good small">Fitted<\/span>` : `<button class="btn small" data-refit="${id}" ${!P.docked || S.science < R.cost ? "disabled" : ""}>Fit it: ${R.cost} science<\/button>`}<\/div><\/div>`;
   h += `<h3>Your ships<\/h3>`;
@@ -4443,8 +4587,8 @@ function shipHTML() {
 
 /** The week's power: the engines' share from the warp factor, the rest shared out by the captain. */
 function powerHTML() {
-  const A = allocOf(S), pw = reactorPower(S), fr = powerFree(S), P = S.pelion;
-  const why = [P.powerLoss ? `damage −${P.powerLoss}` : "", dilithiumPenalty(S) ? `failing dilithium −${dilithiumPenalty(S)}` : "", P.refits.power ? "power couplings +1" : ""].filter(Boolean).join(", ");
+  const A = allocOf(S), pw = weekPower(S), fr = powerFree(S), P = S.pelion;
+  const why = [P.powerLoss ? `damage −${P.powerLoss}` : "", dilithiumPenalty(S) ? `failing dilithium −${dilithiumPenalty(S)}` : "", P.refits.power ? "power couplings +1" : "", P.refits.aux ? "auxiliary reactor +1, not in battle" : ""].filter(Boolean).join(", ");
   let h = `<h3>Power: ${pw - fr} of ${pw} in use<\/h3><p class="small muted">The warp core makes ${pw}${why ? ` (${esc(why)})` : ""}. The engines take what the warp factor needs: 1 up to warp 4, 2 up to warp 6, 3 for warp 7 and 8. Share out the rest, up to 2 to a system. In battle, the same Power goes to shields, phasers, torpedoes and engines.<\/p>`;
   h += `<div class="card small"><div class="roll-row"><span style="min-width:150px"><b>Engines<\/b><\/span>${boxes(warpPower(P.warp), 3, "gold")} <span class="muted">warp ${P.warp}: ${warpPower(P.warp)}<\/span><\/div>`;
   for (const [k, Y] of Object.entries(POWER_SYSTEMS)) h += `<div class="roll-row"><span style="min-width:150px"><b>${esc(Y.name)}<\/b><\/span><button class="btn small" data-alloc="${k}" data-n="${A[k] - 1}" ${A[k] <= 0 ? "disabled" : ""} aria-label="Less power to ${esc(Y.name)}">−<\/button>${boxes(A[k], 2, "blue")}<button class="btn small" data-alloc="${k}" data-n="${A[k] + 1}" ${A[k] >= 2 || fr <= 0 ? "disabled" : ""} aria-label="More power to ${esc(Y.name)}">+<\/button><span class="muted">${esc(Y.blurb[A[k]])}<\/span><\/div>`;
@@ -4454,7 +4598,7 @@ function powerHTML() {
 function storesHTML() {
   const st = storesOf(S), P = S.pelion;
   let h = `<h3>Stores<\/h3>`;
-  for (const [k, T] of Object.entries(STORES)) h += `<div class="card small ${st[k] <= (k === "antimatter" ? 3 : k === "dilithium" ? 4 : 1) ? "red" : ""}"><h4>${esc(T.name)} ${st[k]}/${T.max}<\/h4>${bar(st[k], T.max, k === "dilithium" ? "var(--violet)" : k === "antimatter" ? "var(--blue)" : "var(--gold)")}<div class="muted">${esc(T.blurb)}<\/div><\/div>`;
+  for (const [k, T] of Object.entries(STORES)) h += `<div class="card small ${st[k] <= (k === "antimatter" ? 3 : k === "dilithium" ? 4 : 1) ? "red" : ""}"><h4>${esc(T.name)} ${st[k]}/${storeMax(S, k)}<\/h4>${bar(st[k], storeMax(S, k), k === "dilithium" ? "var(--violet)" : k === "antimatter" ? "var(--blue)" : "var(--gold)")}<div class="muted">${esc(T.blurb)}<\/div><\/div>`;
   h += `<p class="small muted">Where to get more: Starbase 23 refuels the antimatter free when the Pelion docks, issues spares up to six crates, and sells dilithium and spares. Colonies and member worlds sell antimatter and spares; independent worlds at accord +1 or better sell dilithium and antimatter. Surveys find seams of living dilithium to mine. Engineering can recrystallize worn crystals for a crate of spares. Orion ships and bases leave salvage. Some orders pay in stores.<\/p>`;
   h += `<div class="btn-row"><button class="btn small" data-tender="1" ${S.tender || P.docked || st.antimatter > 3 || S.supplies < 10 ? "disabled" : ""}>Call a fuel tender: 10 supplies, here in two weeks<\/button>${S.tender ? `<span class="small gold">A tender is on its way.<\/span>` : ""}<\/div>`;
   return h;

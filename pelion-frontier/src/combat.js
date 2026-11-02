@@ -132,7 +132,7 @@ export function exchange(S, choice = {}) {
   if (torp) {
     P.torps--;
     const r = check(S, st.gun + hit + PELION.torpBonus);
-    if (r.success) hitEnemy(S, e, 2, L, `Photon torpedoes (${R(r)})`); else L.push(`Photon torpedoes (${R(r)}): wide.`);
+    if (r.success) hitEnemy(S, e, P.refits.torp6 ? 3 : 2, L, `${P.refits.torp6 ? "Mark VI photon torpedoes" : "Photon torpedoes"} (${R(r)})`); else L.push(`Photon torpedoes (${R(r)}): wide.`);
   }
   for (const u of Object.values(S.support)) {
     if (u.at !== P.at || e.hull >= E.hull) continue;

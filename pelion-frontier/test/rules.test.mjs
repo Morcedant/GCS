@@ -319,7 +319,8 @@ test("the campaign: Corvan II opens it, each order adds a thread, six lead to th
   // Ordinary orders turn up nothing; orders that are part of the campaign turn up a thread each.
   const plain = newOrder(S); plain.campaign = false; S.event = null; S.eventQueue = []; completeOrder(S, plain, true); S.event = null; S.eventQueue = [];
   assert.equal(S.campaign.threads.length, 0);
-  for (let i = 0; i < CAMPAIGN.finaleAt; i++) { const o = newOrder(S); o.campaign = true; S.event = null; S.eventQueue = []; completeOrder(S, o, true); S.event = null; S.eventQueue = []; }
+  const { STORIES } = await import("../src/stories.js");
+  for (let i = 0; i < 40 && S.campaign.threads.length < CAMPAIGN.finaleAt; i++) { const o = newOrder(S); S.event = null; S.eventQueue = []; if (!STORIES[o.story].thread) { S.orders = S.orders.filter((x) => x !== o); S.backlog = []; continue; } o.campaign = true; completeOrder(S, o, true); S.event = null; S.eventQueue = []; }   // R&D's prototypes have no thread to find
   assert.equal(S.campaign.threads.length, CAMPAIGN.finaleAt);
   assert.deepEqual(S.campaign.beats.sort(), [0, 2, 4, 6]);
   const gate = S.orders.find((o) => o.finale); assert.ok(gate && gate.urgent && gate.place === "the Makers' Gate");
@@ -554,4 +555,17 @@ test("the campaigns follow the frontier's rivals: Klingon, then Romulan, then Th
   const { STORIES } = await import("../src/stories.js");
   for (const c of SERIES) assert.ok(STORIES[c.finale] && STORIES[c.finale].complication, c.finale);
   assert.equal(STORIES["The Shipyard at the Edge"], undefined);
+});
+test("R&D's prototypes: each tech order can leave a unique upgrade aboard", async () => {
+  const { TECH_MISSIONS } = await import("../src/campaigns.js");
+  const { STORIES } = await import("../src/stories.js");
+  const { PROTOTYPES } = await import("../src/data.js");
+  const { maxWarp, weekPower, storeMax, consumeStores, storesOf } = await import("../src/game.js");
+  for (const m of TECH_MISSIONS) { const st = STORIES[m.text]; assert.ok(st && st.type === "Technology" && st.choice.options.some((x) => x.fx.refit && PROTOTYPES[x.fx.refit]), m.text); }
+  const S = newGame({ seed: "proto" }), P = S.pelion;
+  P.refits.coils = true; assert.equal(maxWarp(S), 9);
+  P.refits.aux = true; assert.equal(weekPower(S), 6);
+  P.refits.containment = true; assert.equal(storeMax(S, "antimatter"), 28);
+  P.refits.regulator = true; P.wear = 5; P.lyWeek = 0; consumeStores(S); assert.equal(storesOf(S).dilithium, 10);   // wear 5 < 6: no crystal lost
+  P.refits.transporter = true; assert.ok(target(S, "grath", "Engineering", { action: "aid" }).parts.some((p) => /Transporter/.test(p[0])));
 });

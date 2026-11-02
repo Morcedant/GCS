@@ -38,6 +38,11 @@ It's built from the tabletop game's own books:
   wants: three weeks and it's Tholian territory (an independent world lost that way marks Starfleet Command). Hail
   it or fight it off. Enter Tholian space without orders and a vessel comes to see you out; in battle its web closes
   after three exchanges and there's no breaking away.
+- **Starfleet R&D's prototypes:** Technology orders bring a prototype to test; keep it at the end and it stays
+  aboard (the Ship tab): the cloak inverter, the dilithium regulator (slower crystal wear), the transporter targeting
+  scanner (+2 to relief and new colonies), Mark VI torpedoes (3 boxes a hit), antimatter containment (28 units,
+  burned more slowly), an auxiliary reactor (+1 weekly Power) and experimental warp coils (warp 9). The shield
+  harmonics fit the shield refit, and the Tholian web strand a shield record.
 - **Campaigns, one for each rival:** Watchers of the Void (the Klingons' House Kor'vath) runs from Corvan II; then
   *The Cold Fire* (a Romulan weapon killing the sector's dilithium) and *The Web* (the Tholian line, and what it
   fences), each with its own rival, beats, finale and five new kinds of orders that stay in Starfleet's book

@@ -1,10 +1,10 @@
 // The rules: one JSON state, changed only by these functions. Every roll is the tabletop game's: 3d6 at or under a
 // skill target, 3 or 4 always succeeds, 17 or 18 always fails; the margin is how far under.
 import { makeRng, neighbors, distance, within, hashString } from "./hex.js";
-import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, SUPPORT_NAMES, ENEMIES, KINDS, ACTIONS, MISSIONS, STRANGE, KEYS, TWISTS, REFITS, RECORDS } from "./data.js";
+import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, SUPPORT_NAMES, ENEMIES, KINDS, ACTIONS, MISSIONS, STRANGE, KEYS, TWISTS, REFITS, RECORDS, PROTOTYPES } from "./data.js";
 import { makeSector, inZone, nearZone } from "./sector.js";
 import { STORIES, CAMPAIGN, COMPLICATIONS, KORVATH_SITES, storyText, storyOf } from "./stories.js";
-import { SERIES, SERIES_MISSIONS } from "./campaigns.js";
+import { SERIES, SERIES_MISSIONS, TECH_MISSIONS } from "./campaigns.js";
 
 // ---------- dice ----------
 export function rand(S) { const r = makeRng(0); r.setState(S.rng); const v = r.next(); S.rng = r.state(); return v; }
@@ -129,6 +129,7 @@ export function target(S, id, skill, ctx = {}) {
     if (["Engineering", "Medicine"].includes(skill) && A.ops) parts.push(["Power to operations", A.ops]);
   }
   if (ctx.action === "repair" && !ctx.combat && storesOf(S).spares <= 0) parts.push(["No spare parts", -3]);
+  if ((ctx.action === "aid" || ctx.action === "colonize") && P.refits.transporter) parts.push(["Transporter targeting scanner", 2]);
   if ((ctx.action === "survey" || ctx.action === "investigate") && hasRecord(S, "science1")) parts.push(["Graviton lensing", 1]);
   if (ctx.action === "envoy" && hasRecord(S, "envoy1")) parts.push(["A dead language", 1]);
   if (ctx.action === "sweep" && hasRecord(S, "sweep2")) parts.push(["Cloaked wake", 2]);
@@ -157,8 +158,8 @@ export const daysPerLy = (w) => (w > 0 ? 365.25 / lightSpeeds(w) : Infinity);
 /** The highest warp the engines allow: warp 8, the emergency maximum, less 2 for each box of engine damage. */
 export const EMERGENCY_WARP = 8;
 export function maxWarp(S) {
-  const P = S.pelion, e = P.sys.engines, st = storesOf(S), pw = reactorPower(S);
-  let m = e >= 3 ? 1 : EMERGENCY_WARP - 2 * e;
+  const P = S.pelion, e = P.sys.engines, st = storesOf(S), pw = weekPower(S);
+  let m = e >= 3 ? 1 : EMERGENCY_WARP + (P.refits.coils ? 1 : 0) - 2 * e;
   if (st.antimatter <= 0) m = Math.min(m, 2);          // running on the reserve
   if (st.dilithium <= 0) m = Math.min(m, 4); else if (st.dilithium <= 2) m = Math.min(m, 6);   // a failing matrix won't hold high warp
   if (pw < 3) m = Math.min(m, pw >= 2 ? 6 : 4);        // the engines need the power: warp 7 and 8 take 3
@@ -202,12 +203,14 @@ export const dilithiumPenalty = (S) => { const d = storesOf(S).dilithium; return
 export const reactorPower = (S) => Math.max(1, PELION.power + (S.pelion.refits.power ? 1 : 0) + (hasRecord(S, "power1") ? 1 : 0) - (S.pelion.powerLoss || 0) - dilithiumPenalty(S));
 export const allocOf = (S) => (S.pelion.alloc = S.pelion.alloc || { shields: 1, sensors: 1, labs: 0, ops: 0 });
 export const powerUsed = (S) => warpPower(S.pelion.warp ?? CRUISE_WARP) + Object.values(allocOf(S)).reduce((t, n) => t + n, 0);
-export const powerFree = (S) => reactorPower(S) - powerUsed(S);
+/** The week's Power for the ship's systems: the reactor's, and the auxiliary reactor's point if one is fitted. */
+export const weekPower = (S) => reactorPower(S) + (S.pelion.refits.aux ? 1 : 0);
+export const powerFree = (S) => weekPower(S) - powerUsed(S);
 /** Set the power to one system (0–2). */
 export function setAlloc(S, sys, n) {
   const A = allocOf(S); if (!(sys in POWER_SYSTEMS)) return { error: "No such system." };
   n = Math.max(0, Math.min(2, Math.round(n)));
-  if (n > A[sys] && powerFree(S) < n - A[sys]) return { error: `Not enough power: ${reactorPower(S)} in all, and the engines need ${warpPower(S.pelion.warp)} at warp ${S.pelion.warp}. Lower the warp or take power from another system.` };
+  if (n > A[sys] && powerFree(S) < n - A[sys]) return { error: `Not enough power: ${weekPower(S)} in all, and the engines need ${warpPower(S.pelion.warp)} at warp ${S.pelion.warp}. Lower the warp or take power from another system.` };
   A[sys] = n;
   return { ok: true };
 }
@@ -219,7 +222,7 @@ export function balancePower(S, why = "") {
   const A = allocOf(S), P = S.pelion, took = [];
   for (const k of ["labs", "ops", "sensors", "shields"]) while (powerFree(S) < 0 && A[k] > 0) { A[k]--; took.push(POWER_SYSTEMS[k].name); }
   while (powerFree(S) < 0 && P.warp > 0) { P.warp--; took.push("warp"); }
-  if (took.length && why !== "warp") log(S, `Power: the reactor makes ${reactorPower(S)}; ${[...new Set(took)].join(", ").toLowerCase()} lose power to make it add up.`, "bad");
+  if (took.length && why !== "warp") log(S, `Power: the reactor makes ${weekPower(S)}; ${[...new Set(took)].join(", ").toLowerCase()} lose power to make it add up.`, "bad");
   return [...new Set(took)];
 }
 
@@ -234,11 +237,13 @@ export const STORES = {
   antimatter: { name: "Antimatter", max: 20, unit: "unit", blurb: "The fuel: about 1 a week at warp 6, 4 a week at warp 8, and 1 a battle. With none, the Pelion limps on its reserve at warp 2 until it reaches fuel, or a tender reaches it." },
   spares: { name: "Spare parts", max: 10, unit: "crate", blurb: "Plasma injectors, warp coils, coolant. Every repair uses one (−3 to repair without), and so does every week at emergency warp." },
 };
+/** How much of a store the Pelion can hold: more antimatter with the containment upgrade. */
+export const storeMax = (S, k) => STORES[k].max + (k === "antimatter" && S.pelion.refits.containment ? 8 : 0);
 export const storesOf = (S) => (S.pelion.stores = S.pelion.stores || { dilithium: 10, antimatter: STORES.antimatter.max, spares: 6 });
 /** Add (or take) stores, within their limits. Returns what actually changed. */
 export function addStore(S, k, n) {
   const st = storesOf(S), was = st[k];
-  st[k] = Math.max(0, Math.min(STORES[k].max, st[k] + n));
+  st[k] = Math.max(0, Math.min(storeMax(S, k), st[k] + n));
   if (k === "dilithium" && st[k] !== was) balancePower(S);
   return st[k] - was;
 }
@@ -254,12 +259,12 @@ export function marketAt(S) {
 export function buyStore(S, k, n = 1) {
   const m = marketAt(S); if (!m || !m.items[k]) return { error: "Nobody here sells that." };
   if (S.battle || S.over) return { error: "Not now." };
-  const st = storesOf(S), room = STORES[k].max - st[k], price = m.items[k];
+  const st = storesOf(S), room = storeMax(S, k) - st[k], price = m.items[k];
   n = Math.min(n, room, Math.floor(S.supplies / price));
   if (room <= 0) return { error: "The holds are full." };
   if (n <= 0) return { error: `Needs ${price} supplies.` };
   S.supplies -= n * price; addStore(S, k, n);
-  log(S, `Stores: ${n} ${STORES[k].unit}${n === 1 ? "" : "s"} of ${STORES[k].name.toLowerCase()} from ${m.name}, ${n * price} supplies. Now ${st[k]}/${STORES[k].max}.`, "good");
+  log(S, `Stores: ${n} ${STORES[k].unit}${n === 1 ? "" : "s"} of ${STORES[k].name.toLowerCase()} from ${m.name}, ${n * price} supplies. Now ${st[k]}/${storeMax(S, k)}.`, "good");
   return { ok: true, n };
 }
 /** A fuel tender from Starbase 23, when the antimatter runs low far from home: 10 supplies, here in two weeks. */
@@ -277,15 +282,16 @@ export function requestTender(S) {
 export function consumeStores(S) {
   const P = S.pelion, st = storesOf(S), ly = P.lyWeek || 0, emerg = (P.strain || 0) > CRUISE_WARP, lines = [];
   if (ly > 0) {
-    const am = Math.max(1, Math.round(ly * (emerg ? 0.4 : 0.25)));
+    const am = Math.max(1, Math.round(ly * (emerg ? 0.4 : 0.25) * (P.refits.containment ? 0.75 : 1)));
     const used = -addStore(S, "antimatter", -am); lines.push(`${used} antimatter for ${ly.toFixed(1)} light-years`);
     P.wear = (P.wear || 0) + (emerg ? 2 : 1);
     if (emerg) { if (st.spares > 0) { addStore(S, "spares", -1); lines.push("a crate of spares burned out at emergency warp"); } else lines.push("no spares left to burn at emergency warp: the engines run hot"); }
   }
-  while ((P.wear || 0) >= 4) { P.wear -= 4; if (addStore(S, "dilithium", -1)) lines.push("a dilithium crystal worn out"); }
+  const per = P.refits.regulator ? 6 : 4;   // the regulator eases the strain on the crystals
+  while ((P.wear || 0) >= per) { P.wear -= per; if (addStore(S, "dilithium", -1)) lines.push("a dilithium crystal worn out"); }
   if ((S.pelion.alloc || {}).labs >= 2) { S.science += 2; lines.push("+2 science from the labs"); }
   P.lyWeek = 0;
-  if (lines.length) log(S, `Stores this week: ${lines.join("; ")}. Dilithium ${st.dilithium}/10, antimatter ${st.antimatter}/${STORES.antimatter.max}, spares ${st.spares}/${STORES.spares.max}.`, "turn");
+  if (lines.length) log(S, `Stores this week: ${lines.join("; ")}. Dilithium ${st.dilithium}/10, antimatter ${st.antimatter}/${storeMax(S, "antimatter")}, spares ${st.spares}/${STORES.spares.max}.`, "turn");
   if (st.antimatter <= 3 && st.antimatter > 0) log(S, `Antimatter low: ${st.antimatter} left. Refuel at Starbase 23 or a colony, or call a tender (the Ship tab).`, "bad");
   if (st.antimatter <= 0 && !P.docked) log(S, "Antimatter gone: the Pelion is running on its reserve, at warp 2 at most.", "bad");
   if (S.tender && S.turn + 1 >= S.tender.due) { S.tender = null; addStore(S, "antimatter", 12); addStore(S, "spares", 2); log(S, "The fuel tender reaches the Pelion: +12 antimatter, +2 spares.", "good"); }
@@ -502,7 +508,7 @@ function dock(S) {
   P.shields = 0; P.hull = 0; P.sys = { weapons: 0, engines: 0, sensors: 0 }; P.torps = PELION.torps;
   for (const id in S.crew) { const c = S.crew[id]; c.inj = 0; c.duty = 2; }
   // Starfleet refuels the antimatter and issues spares up to six crates; dilithium is bought (the Ship tab).
-  const st = storesOf(S), am = addStore(S, "antimatter", STORES.antimatter.max), sp = st.spares < 6 ? addStore(S, "spares", 6 - st.spares) : 0;
+  const st = storesOf(S), am = addStore(S, "antimatter", 99), sp = st.spares < 6 ? addStore(S, "spares", 6 - st.spares) : 0;
   log(S, `Docked at Starbase 23: ${fixed ? "repaired, rearmed and " : ""}crew rested; Duty points restored.${am ? ` Refuelled: +${am} antimatter.` : ""}${sp ? ` Spares issued: +${sp}.` : ""}${st.dilithium < 10 ? ` Dilithium ${st.dilithium}/10: the quartermaster has crystals, for supplies.` : ""}`, "good");
 }
 export function sightRange(S) { return 2 + (S.pelion.refits.sensors ? 1 : 0) + ((S.pelion.alloc || {}).sensors >= 2 ? 1 : 0); }
@@ -897,7 +903,7 @@ const campId = (x) => (x && x.id) || "watchers";
 /** The current act, from the beats reached so far. */
 export const campaignAct = (S) => { const C = campaignOf(S), D = campaignDef(S), b = D.beats.filter((x) => C.beats.includes(x.at)); return b.length ? b[b.length - 1].act : "Prologue: The Silence at Corvan II"; };
 /** The order types Starfleet has: the first fourteen, and each new campaign's, from the moment it begins. */
-export const missionPool = (S) => MISSIONS.concat(SERIES_MISSIONS.filter((m) => (S.unlocked || []).includes(m.campaign)));
+export const missionPool = (S) => MISSIONS.concat(TECH_MISSIONS, SERIES_MISSIONS.filter((m) => (S.unlocked || []).includes(m.campaign)));
 /** Is the campaign known yet? Only once Corvan II is over: before that, nothing about it may show. */
 export const campaignOpen = (S) => campaignOf(S).beats.includes(0);
 /** Starfleet's reason for an order, tied to the campaign: only once the campaign is known. */
@@ -1114,7 +1120,7 @@ export function missionChoices(S, ev) {
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
   accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike", refit: (n) => `${REFITS[n] ? REFITS[n].name : n} fitted to the Pelion`, delay: (n) => `every other order's deadline ${n} weeks closer`,
-  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the pirates answer: a raider strikes a Federation world", base: () => "the hidden pirate base found and charted", tholian: () => "the Assembly answers: a Tholian vessel makes for a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
+  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the pirates answer: a raider strikes a Federation world", base: () => "the hidden pirate base found and charted", tholian: () => "the Assembly answers: a Tholian vessel makes for a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged", refit: (n) => `${(PROTOTYPES[n] || REFITS[n] || { name: n }).name} fitted to the Pelion` };
 export function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
   if (!o || !opt) return { error: "No such choice." };
@@ -1263,7 +1269,7 @@ export function newOrder(S) {
   // About half of all orders are part of the campaign (once it has begun); the rest are the frontier's ordinary work.
   const C = campaignOf(S);
   if (st.campaign) { o.campaignId = st.campaign; o.campaign = st.campaign === campId(C) && !C.over; }
-  else { o.campaignId = "watchers"; o.campaign = campId(C) === "watchers" && !C.over && rand(S) < 0.5; }
+  else { o.campaignId = "watchers"; o.campaign = campId(C) === "watchers" && !C.over && !!st.thread && rand(S) < 0.5; }   // only orders with a thread to find
   S.backlog = S.backlog || [];
   if (busy(S)) {
     o.backlog = true; o.received = S.turn; S.backlog.push(o);

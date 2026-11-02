@@ -136,6 +136,16 @@ export const REFITS = {
   sickbay: { name: "Sickbay upgrade", cost: 30, blurb: "Injured crew heal a box every turn." },
 };
 
+/** Prototypes from Starfleet R&D's technology orders: fitted only by carrying one out and choosing to keep it. */
+export const PROTOTYPES = {
+  inverter: { name: "Cloak inverter", text: "+2 to sensor sweeps; sees cloaked Romulan ships coming. Tuned: sweeps reach 5 light-years." },
+  regulator: { name: "Dilithium regulator", text: "The crystals wear about a third more slowly." },
+  transporter: { name: "Transporter targeting scanner", text: "+2 to Relief and repairs and to Found a colony." },
+  torp6: { name: "Mark VI photon torpedoes", text: "A torpedo hit does 3 boxes instead of 2." },
+  containment: { name: "Antimatter containment upgrade", text: "Holds 28 antimatter instead of 20, and burns it a quarter more slowly." },
+  aux: { name: "Auxiliary fusion reactor", text: "+1 Power every week for the ship's systems (not in battle)." },
+  coils: { name: "Experimental warp coils", text: "Emergency maximum warp 9, about 14 light-years a week; the engine strain check at warp 9 is −5." },
+};
 /** Library records: what investigating the strange earns. `perk` is what it changes. */
 export const RECORDS = [
   { id: "eddies", name: "Subspace eddies", text: "Nebulae cost the Pelion 1 move, not 2.", perk: "nebula" },
