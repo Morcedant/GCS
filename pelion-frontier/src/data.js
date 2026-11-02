@@ -41,6 +41,7 @@ export const ENEMIES = {
   kbop: { name: "Klingon bird-of-prey", power: "klingon", shields: 2, hull: 3, maneuver: 5, helm: 13, gunner: 12, dmg: 1, will: 11, cloak: true, ambush: true, speed: 4, warp: 6 },
   rbop: { name: "Romulan bird-of-prey", power: "romulan", shields: 3, hull: 3, maneuver: 5, helm: 11, gunner: 12, dmg: 2, plasma: true, will: 13, cloak: true, ambush: true, speed: 4, warp: 6 },
   orion: { name: "Orion raider", power: "orion", shields: 2, hull: 3, maneuver: 6, helm: 13, gunner: 11, dmg: 1, will: 10, fast: true, speed: 5, warp: 6.5 },
+  tholian: { name: "Tholian vessel", power: "tholian", shields: 3, hull: 2, maneuver: 5, helm: 12, gunner: 12, dmg: 1, will: 13, web: true, speed: 4, warp: 6 },
   orionBase: { name: "Orion pirate base", power: "orion", shields: 4, hull: 4, maneuver: 0, helm: 0, gunner: 11, dmg: 2, will: 11, base: true, speed: 0 },
 };
 export const POWERS = {
@@ -48,6 +49,7 @@ export const POWERS = {
   klingon: { name: "Klingon Empire", color: "#e0564a" },
   romulan: { name: "Romulan Star Empire", color: "#59c48a" },
   orion: { name: "Orion Syndicate", color: "#e6a640" },
+  tholian: { name: "Tholian Assembly", color: "#ff8fb8" },
   independent: { name: "Independent", color: "#c9c3e8" },
 };
 
@@ -57,6 +59,8 @@ export const KINDS = {
   colony: { name: "Federation colony", known: true, color: "#6fb4ff" },
   independent: { name: "Independent world", known: true, color: "#c9c3e8" },
   klingon: { name: "Klingon outpost", known: true, color: "#e0564a" },
+  tholian: { name: "Tholian outpost", known: true, color: "#ff8fb8" },
+  annexed: { name: "Tholian territory", known: true, color: "#ff8fb8" },
   prewarp: { name: "Pre-warp world", color: "#9ad48a" },
   anomaly: { name: "Anomaly", color: "#d9a8ff" },
   ruins: { name: "Ancient ruins", color: "#ffd36b" },
@@ -72,6 +76,7 @@ export const ACTIONS = {
   observe: { name: "Observe from orbit", skills: ["Sensors", "Life Sciences", "Psychology"], blurb: "Study them from orbit: a pre-warp people can't see a starship, so the Prime Directive is safe. A failure only means nothing useful this turn." },
   aid: { name: "Relief and repairs", skills: ["Engineering", "Medicine", "Leadership"], blurb: "Help a world that's been raided: clear a harm box." },
   repair: { name: "Repairs underway", skills: ["Engineering"], blurb: "Clear a box from the shields or a system (two on success by 5), or patch one hull box." },
+  colonize: { name: "Found a colony", skills: ["Leadership", "Engineering", "Life Sciences"], blurb: "Plant a Federation colony on a habitable world: the frontier pushed outward." },
   mine: { name: "Mine dilithium", skills: ["Engineering", "Physical Sciences", "Sensors"], blurb: "Cut living crystals from a seam for the Pelion's matrix." },
   recrystallize: { name: "Recrystallize dilithium", skills: ["Engineering", "Physical Sciences"], blurb: "Restore worn crystals with a field from the warp core." },
   sweep: { name: "Sensor sweep", skills: ["Sensors", "Communications", "Computers"], blurb: "Listen for cloaked ships and raiders within 3: reveals them. Finds a hidden base here." },
@@ -143,6 +148,7 @@ export const RECORDS = [
   { id: "warpfield", name: "A folded warp field", text: "+2 to warp strain checks: the field holds at high warp.", perk: "speed1" },
   { id: "makers", name: "The Makers' library", text: "Everything beyond the Gate the Makers chose to share: +2 science a turn's worth of insight, and the Federation's envy.", perk: "none", story: true },
   { id: "quietengine", name: "The Quiet Engine", text: "How the Romulans tuned a crystal to ring every dilithium lattice for light-years, and how to shield against it: +1 Power in battle.", perk: "power1", story: true },
+  { id: "webshield", name: "The stillness of a Tholian web", text: "A strand's rhythm tuned into the shield emitters: +1 Shields box in battle.", perk: "shield1", story: true },
   { id: "caretaker", name: "The caretaker of Corvan II", text: "A machine's account of a vanished civilization: +1 to diplomatic missions.", perk: "envoy1", story: true },
 ];
 

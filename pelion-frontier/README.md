@@ -1,7 +1,9 @@
 # USS Pelion: Frontier
 
 A turn-based hex strategy game for the USS Pelion fan game: command the Pelion through a fifty-week tour of the
-Corvan Sector (or open command, with no end), a frontier between the Federation, the Klingon Empire and the Romulan Neutral Zone. Solo, against the
+Corvan Sector (or open command, with no end). The theme of the whole game is **the Corvan Frontier**: the Federation
+expanding into the sector against the three powers that want it closed: the Klingon Empire (east), the Romulan Star
+Empire (behind the Neutral Zone, north) and the Tholian Assembly (southeast). Solo, against the
 other powers. An unofficial fan work inspired by *Star Trek*, for our table only (see `fan-games/README.md`).
 
 It's built from the tabletop game's own books:
@@ -28,9 +30,18 @@ It's built from the tabletop game's own books:
   warp. Starbase 23 refuels; colonies and friendly worlds sell; surveys find seams to mine; Engineering
   recrystallizes; Orion ships leave salvage; a fuel tender comes when the antimatter runs out. In battle, Power is
   split between shields (2: reinforced), phasers (2: overloaded), torpedoes and engines (evasion).
-- **Campaigns:** Watchers of the Void runs from Corvan II; after it, *The Cold Fire* (the sector's dilithium dying)
-  and *The Syndicate's Due* (the Orion Syndicate taxing the supply lines), each with its own rival, beats, finale and
-  five new kinds of orders that stay in Starfleet's book (`src/campaigns.js`). In a tour, a new campaign starts only
+- **Expansion:** surveys find habitable worlds; *Found a colony* (30 supplies) plants a Federation colony there.
+  The Sector tab shows the race for the sector: what each power holds.
+- **The Tholian Assembly:** two outposts in the southeast; Tholian space (shaded) is two light-years around them
+  and one around every world they've enclosed. Every few weeks a vessel spins a web around the nearest world it
+  wants: three weeks and it's Tholian territory (an independent world lost that way marks Starfleet Command). Hail
+  it or fight it off. Enter Tholian space without orders and a vessel comes to see you out; in battle its web closes
+  after three exchanges and there's no breaking away.
+- **Campaigns, one for each rival:** Watchers of the Void (the Klingons' House Kor'vath) runs from Corvan II; then
+  *The Cold Fire* (a Romulan weapon killing the sector's dilithium) and *The Web* (the Tholian line, and what it
+  fences), each with its own rival, beats, finale and five new kinds of orders that stay in Starfleet's book
+  (`src/campaigns.js`). The Orion Syndicate's five order types join Starfleet's book with the second campaign, as
+  the frontier's ordinary trouble. In a tour, a new campaign starts only
   with twelve weeks to go; at the tour's end, *Keep command* turns the game into open command.
 - **Starfleet Command track:** five boxes and you're relieved. Incidents (firing first on a Klingon ship), the
   Prime Directive, the Neutral Zone, lost colonies and failed orders mark it; carried-out orders clear it.

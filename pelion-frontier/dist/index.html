@@ -245,6 +245,7 @@ const ENEMIES = {
   kbop: { name: "Klingon bird-of-prey", power: "klingon", shields: 2, hull: 3, maneuver: 5, helm: 13, gunner: 12, dmg: 1, will: 11, cloak: true, ambush: true, speed: 4, warp: 6 },
   rbop: { name: "Romulan bird-of-prey", power: "romulan", shields: 3, hull: 3, maneuver: 5, helm: 11, gunner: 12, dmg: 2, plasma: true, will: 13, cloak: true, ambush: true, speed: 4, warp: 6 },
   orion: { name: "Orion raider", power: "orion", shields: 2, hull: 3, maneuver: 6, helm: 13, gunner: 11, dmg: 1, will: 10, fast: true, speed: 5, warp: 6.5 },
+  tholian: { name: "Tholian vessel", power: "tholian", shields: 3, hull: 2, maneuver: 5, helm: 12, gunner: 12, dmg: 1, will: 13, web: true, speed: 4, warp: 6 },
   orionBase: { name: "Orion pirate base", power: "orion", shields: 4, hull: 4, maneuver: 0, helm: 0, gunner: 11, dmg: 2, will: 11, base: true, speed: 0 },
 };
 const POWERS = {
@@ -252,6 +253,7 @@ const POWERS = {
   klingon: { name: "Klingon Empire", color: "#e0564a" },
   romulan: { name: "Romulan Star Empire", color: "#59c48a" },
   orion: { name: "Orion Syndicate", color: "#e6a640" },
+  tholian: { name: "Tholian Assembly", color: "#ff8fb8" },
   independent: { name: "Independent", color: "#c9c3e8" },
 };
 
@@ -261,6 +263,8 @@ const KINDS = {
   colony: { name: "Federation colony", known: true, color: "#6fb4ff" },
   independent: { name: "Independent world", known: true, color: "#c9c3e8" },
   klingon: { name: "Klingon outpost", known: true, color: "#e0564a" },
+  tholian: { name: "Tholian outpost", known: true, color: "#ff8fb8" },
+  annexed: { name: "Tholian territory", known: true, color: "#ff8fb8" },
   prewarp: { name: "Pre-warp world", color: "#9ad48a" },
   anomaly: { name: "Anomaly", color: "#d9a8ff" },
   ruins: { name: "Ancient ruins", color: "#ffd36b" },
@@ -276,6 +280,7 @@ const ACTIONS = {
   observe: { name: "Observe from orbit", skills: ["Sensors", "Life Sciences", "Psychology"], blurb: "Study them from orbit: a pre-warp people can't see a starship, so the Prime Directive is safe. A failure only means nothing useful this turn." },
   aid: { name: "Relief and repairs", skills: ["Engineering", "Medicine", "Leadership"], blurb: "Help a world that's been raided: clear a harm box." },
   repair: { name: "Repairs underway", skills: ["Engineering"], blurb: "Clear a box from the shields or a system (two on success by 5), or patch one hull box." },
+  colonize: { name: "Found a colony", skills: ["Leadership", "Engineering", "Life Sciences"], blurb: "Plant a Federation colony on a habitable world: the frontier pushed outward." },
   mine: { name: "Mine dilithium", skills: ["Engineering", "Physical Sciences", "Sensors"], blurb: "Cut living crystals from a seam for the Pelion's matrix." },
   recrystallize: { name: "Recrystallize dilithium", skills: ["Engineering", "Physical Sciences"], blurb: "Restore worn crystals with a field from the warp core." },
   sweep: { name: "Sensor sweep", skills: ["Sensors", "Communications", "Computers"], blurb: "Listen for cloaked ships and raiders within 3: reveals them. Finds a hidden base here." },
@@ -347,6 +352,7 @@ const RECORDS = [
   { id: "warpfield", name: "A folded warp field", text: "+2 to warp strain checks: the field holds at high warp.", perk: "speed1" },
   { id: "makers", name: "The Makers' library", text: "Everything beyond the Gate the Makers chose to share: +2 science a turn's worth of insight, and the Federation's envy.", perk: "none", story: true },
   { id: "quietengine", name: "The Quiet Engine", text: "How the Romulans tuned a crystal to ring every dilithium lattice for light-years, and how to shield against it: +1 Power in battle.", perk: "power1", story: true },
+  { id: "webshield", name: "The stillness of a Tholian web", text: "A strand's rhythm tuned into the shield emitters: +1 Shields box in battle.", perk: "shield1", story: true },
   { id: "caretaker", name: "The caretaker of Corvan II", text: "A machine's account of a vanished civilization: +1 to diplomatic missions.", perk: "envoy1", story: true },
 ];
 
@@ -383,22 +389,39 @@ const SHIP_SHAPES = {
   rbop: "M11 0 L6.5 -2.6 Q1 -6 -6 -5 Q-9 -2.5 -9 0 Q-9 2.5 -6 5 Q1 6 6.5 2.6 Z M3 -6.4 L-11.5 -8.4 L-11.5 -6.6 L1 -4.8 M3 6.4 L-11.5 8.4 L-11.5 6.6 L1 4.8 M-2 -3 Q-4.5 0 -2 3 M-2 0 L4 0",
   // An Orion raider: a lean arrowhead with swept fins, built for speed.
   orion: "M12 0 L1 -2.4 L-5 -8.5 L-7 -8.5 L-4.5 -2.6 L-10.5 -1.2 L-10.5 1.2 L-4.5 2.6 L-7 8.5 L-5 8.5 L1 2.4 Z M3 -1 L-3 -1 M3 1 L-3 1",
+  // A Tholian vessel: a narrow crystalline wedge, its spine running to a point.
+  tholian: "M12 0 L-9 -6.5 L-6.5 0 L-9 6.5 Z M12 0 L-6.5 0 M3 -3.4 L-1 0 L3 3.4 M-9 -6.5 L-11.5 -8 M-9 6.5 L-11.5 8",
   // An Orion pirate base: a ring station on spokes.
   // A Federation listening post: a small station with a sensor dish, watching the Neutral Zone.
   post: "M-7 -2.2 L7 -2.2 L7 2.2 L-7 2.2 Z M-2.2 -6 L2.2 -6 L2.2 6 L-2.2 6 Z M-9.5 -3.5 L-7 -2.2 L-7 2.2 L-9.5 3.5 Z M9.5 -3.5 L7 -2.2 L7 2.2 L9.5 3.5 Z M0 -6 L0 -8.5 M-4 -9.5 Q0 -12.5 4 -9.5 Z",
   orionBase: "M10 0 A10 10 0 1 1 -10 0 A10 10 0 1 1 10 0 Z M7 0 A7 7 0 1 1 -7 0 A7 7 0 1 1 7 0 Z M3 0 A3 3 0 1 1 -3 0 A3 3 0 1 1 3 0 Z M3 0 L7 0 M-3 0 L-7 0 M0 3 L0 7 M0 -3 L0 -7",
 };
-const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", science: "Science vessel", kbc: "Klingon battle cruiser", kbop: "Klingon bird-of-prey", rbop: "Romulan bird-of-prey", orion: "Orion raider", orionBase: "Orion pirate base", post: "Federation listening post" };
+const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", science: "Science vessel", kbc: "Klingon battle cruiser", kbop: "Klingon bird-of-prey", rbop: "Romulan bird-of-prey", orion: "Orion raider", tholian: "Tholian vessel", orionBase: "Orion pirate base", post: "Federation listening post" };
 
 // ---- campaigns.js ----
-// The campaigns after the first. When Watchers of the Void is over, however it ended, Starfleet's attention turns, and a
-// new campaign begins a few weeks later, with order types of its own that stay in Starfleet's book for good. Each campaign
+// The frontier, and the campaigns after the first. The whole game is one story: the Federation pushing out into the
+// Corvan Sector against the three powers that want it closed: the Klingon Empire to the east, the Romulan Star Empire
+// behind the Neutral Zone to the north, and the Tholian Assembly to the southeast. Each campaign is one chapter of it,
+// against one of them: Watchers of the Void (the Klingons' House Kor'vath), The Cold Fire (the Romulans), The Web (the
+// Tholians). When one is over, however it ended, a new one begins a few weeks later, with order types of its own that
+// stay in Starfleet's book for good. The Orion Syndicate's work comes with the second: trouble on the frontier, not a
+// chapter of its own. Each campaign
 // has a premise, beats (the story, told as the threads come in), a rival that gains ground on its own every few weeks,
 // and a finale. Each order type has one story: a briefing, an arrival, a scene for each stage, a decision and a failure.
 // `why` is Starfleet's reason while the campaign runs; `reason` is the reason once it's over; `thread` is what the order
 // turns up for the campaign.
 
-/** The campaigns that follow Watchers of the Void, in order. */
+/** The story of the whole game: what the Pelion is in the Corvan Sector to do. */
+const FRONTIER = {
+  title: "The Corvan Frontier",
+  text: "The Corvan Sector is the last open frontier on this edge of the Federation, and three powers want it closed. The Klingon Empire presses in from the east, courting the independent worlds and raiding the ones that won't be courted. The Romulan Star Empire watches from behind the Neutral Zone to the north, and strikes at anything that watches back. The Tholian Assembly, in the southeast, draws its own borders and encloses world after world in its webs. Starfleet's orders for the Pelion come down to one: extend the Federation. Chart the sector, plant colonies, bring the independent worlds in, and hold what the Federation has, before the frontier closes.",
+  rivals: [
+    ["klingon", "The Klingon Empire", "East. Courts independent worlds (at accord −5 they join the Empire) and raids the rest; firing first on a Klingon ship is an incident."],
+    ["romulan", "The Romulan Star Empire", "North, behind the Neutral Zone. Cloaked birds-of-prey strike the listening posts, and anything that provokes them."],
+    ["tholian", "The Tholian Assembly", "Southeast. Every few weeks a Tholian vessel spins a web around the nearest world it wants: three weeks, and it's Tholian territory. Its space is its own: enter it and a vessel comes to see you out."],
+  ],
+};
+/** The campaigns that follow Watchers of the Void, in order: one for each of the rivals still to come. */
 const SERIES = [
   {
     id: "coldfire",
@@ -407,7 +430,7 @@ const SERIES = [
     finale: "The Quiet Engine",
     finaleSkills: ["Physical Sciences", "Engineering", "Diplomacy"],
     finaleOppose: { name: "the Romulan warbird sent to take it home", skill: "Will", target: 12, why: "The Empire wants its weapon back, and has a warbird to say so." },
-    premise: "Dilithium is dying across the Corvan Sector. In the mines, in freighters' reactors, in the colonies' power plants, the crystals are losing their lattice overnight and turning to grey glass that won't regulate a matter-antimatter reaction. Without dilithium, a starship can't hold warp, a colony can't keep its lights on, and a winter world can't keep its people warm. Starfleet Command is worried because it is spreading, a little further every few weeks, and nobody knows why. The Pelion's own crystals are no safer than anyone else's.",
+    premise: "Dilithium is dying across the Corvan Sector. In the mines, in freighters' reactors, in the colonies' power plants, the crystals are losing their lattice overnight and turning to grey glass that won't regulate a matter-antimatter reaction. Without dilithium, a starship can't hold warp, a colony can't keep its lights on, and a winter world can't keep its people warm. Starfleet Command is worried because it is spreading, a little further every few weeks, and nobody knows why; because without dilithium the Federation's new colonies can't hold the frontier; and because the trail leads toward the Neutral Zone. The Pelion's own crystals are no safer than anyone else's.",
     rival: {
       name: "the cold", Name: "The cold", every: { easy: 7, normal: 5, hard: 4 }, fx: "dilithium",
       verb: "goes dark", head: "the cold spreads",
@@ -427,40 +450,48 @@ const SERIES = [
     ],
   },
   {
-    id: "syndicate",
-    title: "The Syndicate's Due",
+    id: "web",
+    title: "The Web",
     finaleAt: 4,
-    finale: "The Shipyard at the Edge",
-    finaleSkills: ["Helm", "Phasers", "Leadership"],
-    finaleOppose: { name: "Mother Sessaly's fleet", skill: "Ruthlessness", target: 12, why: "A shipyard full of raiders, and a matriarch who has never lost a war she started." },
-    premise: "The Orion Syndicate has decided the Corvan Sector owes it. A Syndicate matriarch called Mother Sessaly has come out from Orion space with ships, money and patience, and she is taking the sector's supply lines apart: convoys vanish, freighter crews are held for ransom, colonies that miss a shipment start rationing. Starfleet Command is worried because she always knows where the convoys will be, which means someone is telling her; because the colonies can't hold out long without their shipments; and because a Syndicate that owns a sector's supply lines owns the sector.",
+    finale: "The Annex Line",
+    finaleSkills: ["Diplomacy", "Physical Sciences", "Helm"],
+    finaleOppose: { name: "the Tholian Commander's deadline", skill: "Precision", target: 12, why: "The Tholians have named the hour. They have never once been late." },
+    premise: "The Tholian Assembly has published a border. It runs a third of the way across the Corvan Sector, through independent worlds and uncharted systems and two Federation survey claims, and the Assembly says it has always been there: the Federation simply hadn't been told. Now Tholian vessels are enclosing the worlds inside it, one by one, in webs of energy that nothing gets through. Starfleet Command is worried because the Federation's expansion stops dead at that line; because independent worlds are being taken without anyone asking them; and because if the line moves once, it will move again, and the next world inside it may be a Federation colony.",
     rival: {
-      name: "the Syndicate", Name: "The Syndicate", every: { easy: 7, normal: 5, hard: 4 }, fx: "convoy",
-      verb: "takes", head: "another convoy taken",
+      name: "the Assembly", Name: "The Assembly", every: { easy: 7, normal: 5, hard: 4 }, fx: "annex",
+      verb: "encloses", head: "the web closes",
       sites: [
-        ["the Tessaly grain convoy", "Four freighters of grain and medical stores, bound for the colonies, with an escort that was called away at the last minute by a distress call nobody can now trace. The freighters were found empty a week later, their crews alive and locked in their own cargo holds. The Syndicate's mark was painted on every hatch: a green hand, open."],
-        ["an antimatter tanker", "The tanker carried enough antimatter to fuel a starbase for a month. It never reached Starbase 23. Its transponder went quiet in the Okafor lanes, and when the Pelion's sister ships went looking, they found nothing but a green hand painted on a navigation buoy, and the buoy's log wiped."],
-        ["the Sorrel colony's medical shipment", "The shipment was small, light enough to fit in a shuttle, and worth more than its weight in latinum: the vaccines for Sorrel's children. The Syndicate took it, and then, three days later, offered to sell it back. The colony paid. Starfleet is furious. The children are fine."],
-        ["a convoy of spare parts", "Warp coils, plasma injectors, coolant: the things that keep starships flying, bound for Starbase 23. The convoy's captain swears the Syndicate knew her route before she did. Rrinn, reading the report, says quietly that she believes her."],
-        ["the ore haulers of Kerrigan", "The haulers were independent, working for themselves, and the Syndicate didn't take their cargo: it took the haulers themselves, crews and all, and sent the families a price. The independent worlds are watching to see whether the Federation will do anything about it."],
-        ["a relief convoy for a raided world", "It was carrying everything a raided world needs to rebuild: shelter, food, power cells, medical stores. The Syndicate took it in the open, in daylight, as if to make a point. The point has been made."],
+        ["", "The Tholian vessels came in pairs, as they always do, and took up stations above the world at precise intervals. Then they began to spin: threads of red-gold energy, drawn out between the ships, crossing and recrossing, a little more every hour. On the ninth day the last thread closed. Nothing has gone in or out since. The Assembly sent a single message: the world is Tholian. It always was."],
+        ["", "A trader caught inside the web as it closed got one message out before the threads cut his signal: the light through the web is red, he said, and everything below looks like it's under glass. Then nothing. The Assembly has not said whether he's still there."],
+        ["", "The Federation's survey buoy in the system was still transmitting when the web closed around it. It went on transmitting for a week, faithfully, to no one, through threads that let nothing out. Then it stopped. The Assembly's message noted the time it stopped, to the second."],
+        ["", "The world's people saw the Tholian ships in their sky for a month and had no word for them. Now their sky is a net of red light, day and night. Starfleet can only guess what they think has happened to them."],
+        ["", "It took the Tholians less than a week this time. They're getting faster. The Assembly's message was the same as the others, word for word: the line has not moved. The Federation is mistaken. It was always there."],
+        ["", "The web closed around a system the Federation had marked for a colony next year. The colonists' ship was already loading at Starbase 23. It is still loading. Nobody has told the colonists yet."],
       ],
     },
     beats: [
-      { at: 0, act: "Act I: Missing Convoys", title: "The open green hand", text: "Starfleet Command's message is short and angry. Seven convoys lost in the Corvan Sector in a month, and on every one of them, painted on a hatch or a buoy or a cargo container, the same mark: a green hand, open, palm up. The Orion Syndicate's mark. It means: pay.\n\nStarfleet Intelligence has a name for the hand behind it. Mother Sessaly, a Syndicate matriarch who has never lost a war she started, has come out from Orion space with ships, money and all the patience in the world. She isn't raiding the sector. She's taxing it.\n\nStarfleet Command is worried for three reasons. She always knows where the convoys will be, and when: someone is telling her. The colonies live on those convoys, and a colony that misses enough of them starts to ration, and then to leave. And a Syndicate that owns a sector's supply lines owns the sector, whatever the flags on the charts say.\n\nYour orders: keep the convoys moving, find out who is selling their routes, and find Mother Sessaly." },
-      { at: 2, act: "Act II: The Leak", title: "Someone at Starbase 23", text: "The threads come together in the briefing room. Every convoy the Syndicate took had one thing in common: its route was filed at Starbase 23 less than a day before it sailed. Rrinn pulls the starbase's message logs and finds a pattern in the noise: a short burst, encrypted, sent to an Orion relay buoy every time a convoy route is filed. The bursts come from a quartermaster's terminal.\n\nThe quartermaster, when Reyes and two security officers come for him, doesn't run. He's been waiting, he says, for someone to notice. The Syndicate has his brother. He gives them everything: the relay codes, the buoy positions, and a name the Syndicate uses for the place where Mother Sessaly's ships are built and repaired. The Edge." },
-      { at: 4, act: "Act III: The Shipyard", title: "The Edge", text: "The last thread closes the search. The relay codes, the captured crews' stories and the quartermaster's buoys all point the same way: a dead star at the sector's edge, ringed with asteroids, and inside the ring, hidden in the rubble, a shipyard. Mother Sessaly's ships are built there. Her prisoners are held there. Her ledgers are kept there.\n\nRrinn hears the shipyard's traffic change overnight: Sessaly knows Starfleet has found her, and she's getting ready to move. Starfleet's orders are short: get there before she does." },
+      { at: 0, act: "Act I: The Line", title: "A border nobody drew", text: "The message from the Tholian Assembly arrives at Starfleet Command at a precise hour, in a precise format, and contains a map.\n\nOn the map is a line. It runs a third of the way across the Corvan Sector, through independent worlds, uncharted systems, two Federation survey claims and a system the Federation had marked for a colony next year. Everything on the far side of it, the Assembly says, is Tholian space. It always has been. The Federation had simply not been told.\n\nStarfleet Command is worried for three reasons. The Federation's expansion into the sector stops dead at that line. The worlds inside it are being enclosed, one by one, in webs that nothing gets through, and nobody has asked them. And a border that appears from nowhere can move: if it moves once, it will move again, and the next world inside it may be a Federation colony.\n\nThe Assembly does not negotiate. It states, and it waits, and it is never late. Your orders: find out where the line really is and why the Tholians drew it, protect the Federation's worlds, and stop the web before it closes the frontier." },
+      { at: 2, act: "Act II: What They're Afraid Of", title: "The line has a reason", text: "The threads come together in the briefing room, and Sevek lays the Tholian border on the sector chart beside everything else the Pelion has logged. The line isn't arbitrary. It follows, almost exactly, the edge of a region of subspace where the Pelion's sensors have been getting strange readings for months: a slow, deep instability, spreading outward.\n\n\"They are not taking territory,\" Sevek says. \"They are fencing it. The webs are not prisons. They are shields.\"\n\nRrinn has a decrypted fragment of Tholian traffic, the first anyone has managed: a single word, repeated in every message between their ships. The computer's best translation is 'interphase'. Whatever is happening in that region of space, the Tholians are afraid of it, and they would rather enclose a dozen worlds than explain why." },
+      { at: 4, act: "Act III: The Annex Line", title: "The platform", text: "The last thread closes the search. Every web the Tholians have spun is fed from one place: a platform at the heart of the line, in empty space, where the Assembly's vessels gather like spiders at the centre of a net. From there, the Tholian Commander sets the pace of everything.\n\nRrinn hears the Assembly's traffic change overnight: the line is about to move again, and this time the worlds inside it include Federation colonies. Starfleet's orders are short: get to the platform, and settle the line, one way or another." },
     ],
   },
 ];
 
-/** The new order types, one story each. `campaign`: the campaign they belong to; they stay in Starfleet's book after it. */
+/**
+ * The new order types, one story each. `campaign`: the campaign they belong to; they stay in Starfleet's book after it.
+ * The Syndicate's are the frontier's ordinary trouble: they come into Starfleet's book with the second campaign.
+ */
 const SERIES_MISSIONS = [
   { roll: 6, campaign: "coldfire", text: "Assay a dying dilithium mine", oppose: { name: "the failing seams", skill: "Instability", target: 11, why: "A mine whose crystals are dying is a mine whose walls are holding up on habit." }, where: ["colony", "independent"], skills: ["Physical Sciences", "Engineering", "Sensors"], segs: 3 },
   { roll: 9, campaign: "coldfire", text: "Track a subspace pulse", oppose: { name: "the pulse's distortion", skill: "Distortion", target: 12, why: "Whatever sends it bends every sensor beam that touches it." }, where: ["empty", "anomaly"], skills: ["Sensors", "Physical Sciences", "Navigation"], segs: 3 },
   { roll: 12, campaign: "coldfire", text: "Escort a dilithium convoy", oppose: { name: "raiders hungry for crystal", skill: "Ambush", target: 11, why: "Good crystals are worth more every week, and everyone knows this convoy is carrying them." }, where: ["colony", "member"], skills: ["Helm", "Sensors", "Leadership"], segs: 2 },
   { roll: 14, campaign: "coldfire", text: "Negotiate for a dilithium reserve", oppose: { name: "a seller's market", skill: "Greed", target: 12, why: "They have what everyone needs, and they know it." }, where: ["independent"], skills: ["Diplomacy", "Psychology", "Communications"], segs: 3 },
   { roll: 8, campaign: "coldfire", text: "Rescue a powerless ship", oppose: { name: "the cold", skill: "Severity", target: 11, why: "No power means no heat, no air scrubbers, and no time." }, where: ["empty", "anomaly"], skills: ["Engineering", "Helm", "Leadership"], segs: 2 },
+  { roll: 7, campaign: "web", text: "Chart the Tholian line", oppose: { name: "Tholian patrols", skill: "Vigilance", target: 12, why: "The Assembly watches its border to the metre, and it doesn't like being measured." }, where: ["empty", "anomaly"], skills: ["Sensors", "Navigation", "Physical Sciences"], segs: 3 },
+  { roll: 12, campaign: "web", text: "Hold a colony inside the line", oppose: { name: "the Assembly's deadline", skill: "Precision", target: 12, why: "The Tholians have given the colony a date to leave, and they mean it to the second." }, where: ["colony"], skills: ["Diplomacy", "Leadership", "Psychology"], segs: 3 },
+  { roll: 9, campaign: "web", text: "Free a ship caught in a web", oppose: { name: "the web's pull", skill: "Tension", target: 12, why: "A Tholian web tightens on anything that struggles in it." }, where: ["empty", "anomaly"], skills: ["Engineering", "Helm", "Physical Sciences"], segs: 2 },
+  { roll: 15, campaign: "web", text: "Make contact with the Tholian Assembly", oppose: { name: "Tholian impatience", skill: "Precision", target: 13, why: "The Tholians allow exactly as much time as they've decided to allow, and not a second more." }, where: ["tholian"], skills: ["Communications", "Diplomacy", "Psychology"], segs: 3 },
+  { roll: 13, campaign: "web", text: "Study a strand of Tholian web", oppose: { name: "the strand's instability", skill: "Instability", target: 12, why: "A piece of web cut free from its ships wants to come apart, violently." }, where: ["empty", "anomaly"], skills: ["Physical Sciences", "Engineering", "Computers"], segs: 3 },
   { roll: 11, campaign: "syndicate", text: "Guard a supply convoy", oppose: { name: "Orion raiders lying in wait", skill: "Ambush", target: 12, why: "The Syndicate knows the route. It always knows the route." }, where: ["colony", "member"], skills: ["Helm", "Sensors", "Leadership"], segs: 2 },
   { roll: 7, campaign: "syndicate", text: "Free a ransomed crew", oppose: { name: "the Syndicate's guards", skill: "Vigilance", target: 12, why: "They're paid to watch, and paid more if nobody gets out." }, where: ["empty", "independent"], skills: ["Stealth", "Phasers", "Communications"], segs: 3 },
   { roll: 15, campaign: "syndicate", text: "Find the leak at Starbase 23", oppose: { name: "a careful traitor", skill: "Deception", target: 12, why: "Whoever it is has been doing this for months and hasn't been caught." }, where: ["starbase"], skills: ["Computers", "Psychology", "Communications"], segs: 3 },
@@ -593,7 +624,132 @@ const SERIES_STORIES = {
       ] },
     fail: "The warbird reached the Quiet Engine first. The heartbeat stopped a day later, and the Romulans have it still. One day, somewhere, it will beat again.",
   },
-  // ---------- The Syndicate's Due ----------
+  // ---------- The Web ----------
+  "Chart the Tholian line": {
+    mission: "Chart the Tholian line", name: "The line in space", type: "Exploration", campaign: "web",
+    reason: "Starfleet wants the Tholian border near {world} charted to the metre, so nobody crosses it by accident.",
+    why: "The Assembly's map of its border near {world} doesn't match anything on Starfleet's charts. Find out where the line really is, and what's on the other side of it.",
+    thread: "Charted to the metre, the Tholian line near {world} isn't a border at all: it traces the edge of a region where subspace itself is going slack, an instability that has been creeping outward for a year.",
+    keys: ["Lieutenant Ama Ofori|a stellar cartographer who has charted three borders and hated all of them", "Dr. Ivo Pressel|a subspace physicist who thinks the Tholians know something", "Ensign Kit Mbeki|on her first deep-space survey"],
+    strange: ["readings that drift when nothing is moving", "a buoy the Tholians left exactly on the line", "stars that flicker on one side of the line and not the other"],
+    brief: "The Tholian Assembly's border runs past {world}, and Starfleet wants to know exactly where. {key} is aboard to chart it. Don't cross it. Don't let the Tholians think you're about to.",
+    arrive: "The line has no markers, no beacons, nothing on the main viewer but stars. But two Tholian vessels hang on the far side of it near {world}, a light-hour apart, precisely, and they turn to face the Pelion the moment it drops out of warp.\n\n{key} is already at the science station beside Sevek, sleeves rolled up. \"They'll watch us the whole time,\" {key} says. \"Good. Let them see we're measuring, not crossing.\"",
+    steps: [
+      ["Find the edge", "It takes three days of slow passes, the Pelion creeping along the Tholian side of nothing at a quarter impulse while two Tholian vessels pace it, to find the line. And when they do, it isn't where the Assembly's map put it. It's somewhere stranger: a boundary in subspace itself, where the readings change, as if space on the far side were thinner."],
+      ["Follow it", "The line curves. It isn't straight, as a border drawn on a map would be; it bulges and dips and folds back on itself like a coastline. {key} plots it point by point, and Sevek watches the readings beside it drift, very slowly, outward. The line is moving. Not much. A few hundred kilometres a week."],
+      ["Look across", "At the line's closest point, the Pelion turns its long-range sensors across it for a single minute, and sees {strange}. Then a Tholian vessel moves, precisely, to put itself between the Pelion's sensors and whatever is on the other side. The message is clear without a word."],
+    ],
+    choice: { title: "The chart", text: "The chart is finished, and it shows two things: where the Tholian line really is, and that it's following something the Tholians haven't explained. Starfleet could publish the chart as the true border, the Federation's answer to the Assembly's map. Or the Pelion could send it, quietly, to the Assembly itself, with a question: what are you afraid of?",
+      options: [
+        { id: "publish", name: "Publish it as the border", blurb: "+3 commendations, +6 science: the Federation's claim to every world outside the true line. The Assembly takes note.", how: "The Tholian line near {world} charted and published as the true border.", fx: { commendations: 3, science: 6, tholian: 1 }, text: "Starfleet publishes the chart within the week, and every world on the Federation side of the true line has its claim on record. It's the first ground the Federation has gained against the Assembly. The Assembly's answer comes, as always, precisely on the hour: a Tholian vessel, leaving its outpost, on a heading for a Federation world." },
+        { id: "ask", name: "Send it to the Assembly", blurb: "+10 science, +1 commendation. No answer, yet. But someone over there read it.", how: "The Tholian line near {world} charted and sent to the Assembly with a question.", fx: { science: 10, commendations: 1 }, text: "The chart goes to the Tholian vessels on a tight beam, with a single line from the captain: \"What are you afraid of?\" There's no reply. There never is. But an hour later, exactly, the two vessels pull back from the line by a precise light-minute each, as if to say: we heard." },
+      ] },
+    fail: "The Pelion never came. The line near {world} went uncharted, and a month later it had moved, and nobody could prove where it had been.",
+  },
+  "Hold a colony inside the line": {
+    mission: "Hold a colony inside the line", name: "Eleven hours", type: "Diplomatic", campaign: "web",
+    reason: "The Tholians claim the space around {world}, and the colony there has been told to leave.",
+    why: "{world} is the first Federation colony the Tholian line has reached. The Assembly has given it a deadline. If the Federation can't hold one colony, it can't hold the frontier.",
+    thread: "The Tholian Commander at {world} let slip, in the precise way Tholians let anything slip, that the deadline had been set by 'the interphase', not by the Assembly. Something out there sets the Tholians' clock.",
+    keys: ["Administrator Rosa Kaye|who founded {world} with her own hands", "Elder Tomas Brandt|the colony's oldest settler, who won't leave his farm", "the Tholian Commander|a voice from a crystalline ship, and a deadline"],
+    strange: ["a web half-spun above the colony's sky", "a Tholian clock counting down on every channel", "a colonist's child who has drawn the web before it appeared"],
+    brief: "The Tholian line has moved, and {world} is inside it. The Assembly has given the colony eleven hours to leave. {key} has refused. The Pelion has been sent to make the Tholians wait.",
+    arrive: "Above {world}, two Tholian vessels have already begun to spin: a few threads of red-gold light across the sky, more every hour, a net being drawn closed over a town of four hundred people. On every channel, a Tholian clock counts down the eleven hours, in perfect Federation Standard.\n\n{key} beams up to meet the captain with mud on her boots. \"I built this place,\" she says. \"My husband is buried here. They can count all they like.\"",
+    steps: [
+      ["Buy time", "The captain hails the Tholian Commander and does the one thing Tholians respect: names a precise time and keeps to it. A message will be ready in one hour. It is ready in exactly one hour. The clock on every channel pauses, for the first time, at seven hours and nine minutes."],
+      ["Make the case", "sh'Vari lays it out for the Tholian Commander point by point, with charts: the colony was founded before the line was published, by four hundred people who had no way of knowing. It is not a fortress. It is farms. Vessik, beside her, adds the one point that matters most to a species that lives at two hundred degrees: four hundred humans can't survive inside a web."],
+      ["Wait", "Then nothing, for three hours. The threads in {world}'s sky stop growing, but they don't come down. The colonists come out of their houses to look up. {key} stands on the landing field with everyone else, because she won't wait anywhere else."],
+    ],
+    choice: { title: "The colony", text: "The Tholian Commander answers at last, precisely on the hour. The Assembly will let the colony stay, on one condition: that it stays exactly as it is. No more colonists, no new buildings, no expansion past its present fields, ever. Or the Pelion can refuse the condition, and stay in orbit, and dare the Tholians to finish the web over a Federation colony with a Heavy Cruiser watching.",
+      options: [
+        { id: "accept", name: "Accept the condition", blurb: "The colony stays, frozen as it is: +2 commendations, {world}'s harm −1.", how: "{world} held inside the Tholian line, on the Assembly's condition.", fx: { commendations: 2, heal: 1 }, text: "The threads come down from {world}'s sky one by one, precisely, and the Tholian vessels withdraw a light-minute each. The colony is safe. It will never grow; {key} knows it, and says so, standing in her fields. But her husband's grave is still hers. The Federation has held one colony inside the line. It's a start." },
+        { id: "dare", name: "Refuse, and stay", blurb: "+4 commendations, Starfleet Command marks the risk. The Assembly answers with a Tholian vessel.", how: "{world} held inside the Tholian line by the Pelion's refusal to leave.", fx: { commendations: 4, command: 1, tholian: 1 }, text: "The Pelion stays in orbit, shields down, deliberately, so the Tholians can see it isn't a threat, only a witness. The clock runs out. The threads in the sky hang for a long minute, and then, precisely, they come apart. The Tholians will not close a web over a Federation colony with a Federation starship watching. Not this time. Starfleet Command calls it reckless. The colonists call it something else." },
+      ] },
+    fail: "The Pelion never came. The web closed over {world} at the eleventh hour, precisely. The colonists were taken off by Starfleet transports the next day, with what they could carry.",
+  },
+  "Free a ship caught in a web": {
+    mission: "Free a ship caught in a web", name: "The spun ship", type: "Rescue", campaign: "web",
+    reason: "A ship near {world} has been caught in a Tholian web, and her crew can't get out.",
+    why: "The survey ship Hesperus strayed across the Tholian line near {world} and the Tholians spun a web around her. She's the first Federation ship they've caught.",
+    thread: "Inside the web, the Hesperus's sensors saw what the Tholians are fencing: a region of space where the ship's instruments read two positions at once. Interphase. The Tholians aren't hiding it from the Federation. They're holding it in.",
+    keys: ["Captain Jonah Wells|of the survey ship Hesperus", "Lieutenant Sun-Hee Park|the Hesperus's engineer, keeping her alive", "a Tholian web-spinner|that answers no hails"],
+    strange: ["a ship's hull frosting from the inside", "a web that sings when the Pelion's tractor touches it", "a crew member who says she saw the ship from outside"],
+    brief: "The survey ship Hesperus, twenty crew, crossed the Tholian line near {world} by a few hundred metres and found herself inside a web. It's tightening. {key} has hours, not days.",
+    arrive: "The Hesperus hangs inside a cage of red-gold light near {world}, a small ship in a net of threads that glow brighter every hour as the web tightens. Her running lights are dimming. Through the web, on the viewer, the Pelion's crew can see the Hesperus's hull beginning to buckle where the threads cross it.\n\n{key} answers on a weak, crackling channel. \"Twenty aboard,\" {key} says. \"It's getting smaller in here. I don't mean that as a figure of speech.\"",
+    steps: [
+      ["Find a gap", "Sevek and Grath study the web for an hour while it tightens. It's an energy lattice, spun between two Tholian vessels and fed from them, and it has a frequency. Hit it with the right one and it will part, just for a moment, just enough. Get it wrong and it closes on the Hesperus like a fist."],
+      ["Cut her free", "The Pelion's deflector sends the frequency into the web in a single pulse. The threads around the Hesperus flicker, part, and for nine seconds there's a gap. Helm takes the Pelion in with a tractor beam and drags the Hesperus out through it, and the web snaps shut behind them on nothing. On the Hesperus, twenty people who had stopped breathing start again."],
+    ],
+    choice: { title: "The web-spinner", text: "The Tholian web-spinner that caught the Hesperus is still out there, its web empty, its ship turning to face the Pelion. It hasn't fired. It hasn't hailed. The Pelion could fire on it for taking a Federation ship, and teach the Assembly what that costs. Or the Pelion could hail it with a formal protest, to the second, and leave.",
+      options: [
+        { id: "fire", name: "Drive it off", blurb: "+3 commendations, +2 spares (the web's crystals). The Assembly will answer.", how: "The Hesperus freed near {world}, and the web-spinner driven off under fire.", fx: { commendations: 3, spares: 2, tholian: 1 }, text: "The Pelion's phasers lance across the empty web, and the web-spinner breaks away, precisely, without returning fire. Fragments of its web drift where the Hesperus was, crystalline and still faintly warm, and Grath has them aboard for the parts. The Assembly will note the time of the attack. It notes everything." },
+        { id: "protest", name: "Protest, and leave", blurb: "+2 commendations, +8 science from the Hesperus's sensor logs.", how: "The Hesperus freed near {world}; a formal protest lodged with the Assembly.", fx: { commendations: 2, science: 8 }, text: "The protest goes out on the Tholian frequency, worded with care, timed to the second. The web-spinner receives it, and after a precise interval turns for home. The Hesperus's sensor logs come aboard the Pelion, everything she saw from inside the web, and Sevek reads them for two days without sleeping." },
+      ] },
+    fail: "The Pelion never came. The web closed on the Hesperus near {world}. The Assembly has not said what became of her crew.",
+  },
+  "Make contact with the Tholian Assembly": {
+    mission: "Make contact with the Tholian Assembly", name: "A room at two hundred degrees", type: "Diplomatic", campaign: "web",
+    reason: "The Tholian outpost at {world} has agreed to receive a Federation envoy, once, for exactly one hour.",
+    why: "For the first time, the Tholian Assembly has agreed to talk: one hour, at its outpost at {world}. If the Federation is going to move the line by anything but force, it starts here.",
+    thread: "In the one hour the Tholians allowed at {world}, the envoy heard them say it plainly: the webs hold back the interphase. Every world inside the line is a world the Tholians believe would be lost without them.",
+    keys: ["Ambassador Hesketh Morrow|the Federation's envoy, who has never met a Tholian", "the Tholian envoy|a crystalline figure behind a pane of glass, at two hundred degrees", "Lieutenant Dara Quell|a xenolinguist who has studied Tholian speech for six years"],
+    strange: ["a conference room heated to two hundred degrees", "a Tholian clock that counts in prime numbers", "a translator that keeps rendering the same word as 'fear'"],
+    brief: "The Tholian Assembly has agreed, for the first time, to receive a Federation envoy at its outpost at {world}: for one hour, to the second. {key} is aboard to speak for the Federation. Get it right; there may not be another hour.",
+    arrive: "The Tholian outpost at {world} is a lattice of crystal and red light, beautiful and alien, turning slowly above a world too hot for anything the Federation knows to live on. The room where the talks will happen has two halves: one at a comfortable twenty degrees, and one, behind a thick pane of glass, at two hundred.\n\n{key} straightens their uniform for the fourth time. \"One hour,\" {key} says. \"I've spent my career learning not to hurry. And I'm told the Tholians consider a second late an insult.\"",
+    steps: [
+      ["Be on time", "The away team beams down at the precise second the Assembly named, which takes Rrinn and the transporter chief an hour of rehearsal. The Tholian envoy behind the glass notes it. The translator renders the envoy's first words as: \"You are punctual. Proceed.\""],
+      ["Speak their way", "{key} speaks in the Tholian manner: statements, precise, no flourishes, no questions they can refuse to answer. The envoy answers in kind. Forty minutes in, the translator keeps rendering one word the same way, over and over, and Lieutenant Quell goes very still. \"It's not 'border',\" she whispers. \"It's 'fear'.\""],
+      ["Ask the question", "At fifty-eight minutes, with two minutes left, {key} asks the only question that matters: what are the webs holding back? There is a long silence on the far side of the glass, measured, the envoy's crystalline facets catching the red light. Then, with one minute left, the envoy answers."],
+    ],
+    choice: { title: "The answer", text: "The webs hold back the interphase, the envoy says: a slackness in space that is spreading out of the deep sector, where ships and worlds can fall between one moment and the next. The Tholians have been fencing it for a year, alone. The Federation could offer to help hold it: Starfleet science, Starfleet ships, alongside the webs. Or it could ask only for the line to be redrawn, so that the Federation's worlds outside the interphase are left alone.",
+      options: [
+        { id: "help", name: "Offer to help", blurb: "+12 science, +3 commendations: the first joint work the Federation and the Assembly have ever done.", how: "Contact made with the Tholian Assembly at {world}; Federation help offered against the interphase.", fx: { science: 12, commendations: 3 }, text: "The envoy considers the offer for exactly as long as the Assembly allows, and accepts it, conditionally, precisely. Starfleet science teams will be permitted to study the interphase, from the Tholian side of the line, under Tholian supervision. It's the first thing the Federation and the Assembly have ever done together. {key} walks out of the room at the end of the hour, exactly, shaking slightly." },
+        { id: "redraw", name: "Ask for the line to be redrawn", blurb: "Two worlds freed from the webs, +2 commendations.", how: "Contact made with the Tholian Assembly at {world}; the line redrawn near Federation space.", fx: { release: 2, commendations: 2 }, text: "The envoy redraws the line on a chart behind the glass, precisely, to the metre: around the interphase, and no further. Two worlds near Federation space come out of the webs within the week. It isn't friendship. But it's the first time the Tholian line has moved toward the Federation, and not away." },
+      ] },
+    fail: "The Pelion never came, or came a second late. The Assembly does not offer an hour twice.",
+  },
+  "Study a strand of Tholian web": {
+    mission: "Study a strand of Tholian web", name: "A strand of the web", type: "Technology", campaign: "web",
+    reason: "A piece of Tholian web has drifted free near {world}, and Starfleet R&D wants it studied before it decays.",
+    why: "A strand of Tholian web has broken free near {world}: the first piece of their technology the Federation has ever been able to touch. Understand it, and the webs can be understood.",
+    thread: "The strand from {world} was tuned, Grath finds, not to trap ships but to hold space itself rigid: a splint for subspace. The Tholians aren't building walls. They're holding something together.",
+    keys: ["Dr. Wen Osei|of Starfleet R&D, who has waited ten years for this", "Commander Lise Varga|from the Daystrom Institute, with a containment field of her own design", "Chief Petty Officer Abe Kowal|Grath's best hand with a field generator"],
+    strange: ["a strand of light that weighs four tonnes", "a strand that keeps its shape with nothing holding it", "a strand that hums in a Tholian prime-number rhythm"],
+    brief: "A strand of Tholian web, a hundred metres of red-gold energy, has broken free of a web near {world} and is drifting, slowly coming apart. {key} wants it aboard before it's gone.",
+    arrive: "The strand drifts in the dark near {world}, a hundred metres of red-gold light, flexing slowly like something alive. It's coming apart at the ends, shedding sparks that wink out in seconds.\n\n{key} watches it on the main viewer with their hand pressed flat against the console. \"Ten years,\" {key} says. \"Ten years I've been asking for a piece of one of these. Captain, we have perhaps a day before there's nothing left.\"",
+    steps: [
+      ["Catch it", "A tractor beam won't hold it: the strand slides through the beam like water through fingers. Grath builds a containment field around it instead, a box of force a hundred metres long, run off the Pelion's deflector, and the strand stops shedding sparks. For now. Holding it takes power from everything else."],
+      ["Read it", "Sevek and {key} work through the night. The strand is energy, but tuned: every centimetre of it vibrates at a frequency that holds the space around it perfectly still. Not a net to catch ships. A splint, to stop space from moving at all."],
+      ["Hold it together", "Toward morning the strand begins to fail anyway, its rhythm stuttering, the containment field straining to hold it. Grath and {key} race it, measuring everything they can while there's anything left to measure. At dawn it comes apart in a shower of light that every sensor aboard records."],
+    ],
+    choice: { title: "The strand", text: "The strand is gone, but the readings are all there: everything Starfleet needs to understand how a Tholian web holds space still. Starfleet R&D wants it all, at once, to build its own. Grath thinks some of it could go straight into the Pelion's shields, where a little of that stillness would turn aside a hit or two.",
+      options: [
+        { id: "rnd", name: "Send it all to R&D", blurb: "+18 science, +2 commendations.", how: "A strand of Tholian web studied near {world}, and the readings sent to Starfleet R&D.", fx: { science: 18, commendations: 2 }, text: "The readings go to Starfleet R&D under the highest security classification Starfleet has. {key} goes with them, already writing. Somewhere at Starfleet Headquarters, people who have never seen a Tholian are about to spend years trying to understand one." },
+        { id: "shields", name: "Fit it to the Pelion's shields", blurb: "+8 science, and a library record: the web's stillness in the shields, +1 Shields box in battle.", how: "A strand of Tholian web studied near {world}, and its stillness fitted to the Pelion's shields.", fx: { science: 8 }, record: "webshield", text: "Grath tunes the Pelion's shield emitters to the strand's rhythm over two days, cursing steadily, and the next time the shields come up they hold a little stiller than they ever did. The first test hit glances off them like a stone off ice. Grath pretends he isn't pleased." },
+      ] },
+    fail: "The Pelion never came. The strand near {world} came apart alone, and nobody saw what it was.",
+  },
+  "The Annex Line": {
+    type: "Campaign", campaign: "web", finale: true,
+    keys: ["the Tholian Commander|who sets the Assembly's clock"], strange: ["the web platform"],
+    why: "Every thread of The Web leads here. While the platform spins, the Tholian line can move wherever the Assembly wants it to.",
+    thread: "The line is settled.",
+    complication: { title: "The web closes", text: "The Tholian vessels around the platform move at once, precisely, and begin to spin: not around a world this time, but around the Pelion. Threads of red-gold light cross and recross the main viewer. The hull begins to groan.\n\nThe Tholian Commander's voice is perfectly calm. \"You have entered Assembly space without permission. You will be held until the Assembly decides.\"\n\nsh'Vari: \"If they close it, we're not going anywhere.\"", press: "Cut through before it closes", skills: ["Helm", "Engineering", "Physical Sciences"], oppose: { name: "the closing web", skill: "Tension", target: 13 }, win: "Grath finds the web's frequency in thirty seconds, from what the Pelion learned freeing the Hesperus, and the deflector pulses it out. The threads part. Helm takes the Pelion through the gap at full impulse and out the other side, and the web snaps shut on nothing. On the Tholian channel, for the first time, there is a pause that wasn't planned.", lose: "The web closes before Grath can find the frequency, and for an hour the Pelion is held in a cage of light while the hull groans and the shields burn down. Then the threads loosen, precisely, at the top of the hour. The Commander has made the point. The Pelion's sensors are fuzzy for a week.", cost: "sensors", costText: "the web's grip damages the sensors" },
+    brief: "At the heart of the Tholian line, sensors find the web platform: the place every web is fed from, where the Tholian Commander sets the Assembly's clock. The line is about to move again, over Federation colonies. Get there first, and settle the line.",
+    arrive: "The web platform hangs in empty space at the heart of the line: a vast lattice of crystal and red light, slowly turning, with threads running out from it in every direction toward webs the Pelion can't see. Tholian vessels move around it like spiders around a net. On the far side, faintly, the stars flicker, as if seen through water.\n\n{key} hails before the Pelion can, precisely as it drops out of warp. \"Federation vessel. You are expected. You have one hour.\"",
+    steps: [
+      ["See the interphase", "From the platform, the Pelion's sensors can see what the Tholians are fencing: a region of space beyond the line where everything reads in two places at once, and where it's spreading, slowly, outward. Sevek watches it for an hour without speaking. Then: \"They were right to be afraid.\""],
+      ["Get past the web", "The Tholian vessels close a web around the Pelion before the hour is half gone. Hours later, the Pelion is through it, or let out of it, and the Commander has seen that the Federation can't simply be held."],
+      ["Talk to the Commander", "In the last minutes of the hour, the captain and {key} talk the Tholian way, precisely, to the point. The Federation will not leave its colonies. The Tholians will not leave the interphase unfenced. Somewhere between those two statements is a line."],
+    ],
+    choice: { title: "The line", text: "{key} offers a settlement, precisely worded: a new line, drawn around the interphase and no further, freeing the worlds nearest the Federation, with the Assembly holding the rest. Or the Pelion can break the web platform itself, freeing every enclosed world at once, and leave the Federation to hold the interphase with the Tholians, or without them.",
+      options: [
+        { id: "settle", name: "Settle the line", blurb: "Half the enclosed worlds freed, +5 commendations, +10 science; the Assembly keeps its fence.", how: "The Tholian line settled at the web platform, drawn around the interphase.", fx: { release: "half", commendations: 5, science: 10 }, text: "The new line goes onto the charts of both powers within the hour, precisely, to the metre, and the webs nearest Federation space come down one after another over the following week. The Assembly keeps its fence around the interphase. The Federation keeps its colonies. Neither side trusts the other, and both of them keep to the line to the second, because that is the one thing they agree on." },
+        { id: "break", name: "Break the platform", blurb: "Every enclosed world freed, +4 commendations. The Assembly answers with force, and Starfleet Command marks the risk.", how: "The Tholian web platform broken, and every enclosed world freed.", fx: { release: "all", commendations: 4, tholian: 1, command: 1 }, text: "The Pelion's torpedoes hit the platform at its heart, and the whole lattice goes dark, thread by thread, outward, until every web in the sector has come apart. Every enclosed world is free. On the far side of the old line, the interphase stirs, slowly, with nothing holding it now. The Assembly sends one message, exact to the second: the Federation has chosen. A Tholian vessel is already under way." },
+      ] },
+    fail: "The Pelion reached the platform too late. The line moved overnight, and three Federation colonies woke up inside it.",
+  },
+  // ---------- The frontier's trouble: the Orion Syndicate (in Starfleet's book from the second campaign on) ----------
   "Guard a supply convoy": {
     mission: "Guard a supply convoy", name: "The grain run", type: "Security", campaign: "syndicate",
     reason: "A supply convoy for {world} needs an escort through raider country.",
@@ -697,26 +853,6 @@ const SERIES_STORIES = {
       ] },
     fail: "The Pelion never came. {world} paid the Syndicate in the end, when the food ran out, and every world in the sector saw it.",
   },
-  "The Shipyard at the Edge": {
-    type: "Campaign", campaign: "syndicate", finale: true,
-    keys: ["Mother Sessaly|the Syndicate matriarch who has come to tax the sector"], strange: ["the Edge"],
-    why: "Every thread of The Syndicate's Due leads here. While the Edge stands, the Syndicate owns the sector's supply lines.",
-    thread: "The green hand has closed.",
-    complication: { title: "The yard's guns", text: "The shipyard's defence platforms come awake all at once: a dozen gun turrets hidden in the asteroids, swinging toward the Pelion with a groan the sensors can hear. {key}'s voice comes over every channel, warm as honey. \"Captain. You've come all this way. Let me show you how we welcome guests.\"\n\nsh'Vari: \"If we stay in the ring, we're in their field of fire. If we pull back, she gets away.\"", press: "Hold the ring", skills: ["Helm", "Phasers", "Leadership"], oppose: { name: "the shipyard's defences", skill: "Firepower", target: 13 }, win: "The Pelion weaves through the asteroids under fire, using the rocks as cover, and Reyes takes the turrets out one by one with short, careful bursts. When the last one falls silent, the shipyard is open, and {key}'s voice on the channel isn't warm any more.", lose: "The turrets catch the Pelion between two asteroids, and the shields take a beating before Helm gets her clear. A conduit on deck six blows; the sensors go fuzzy. But the Pelion is still in the ring.", cost: "sensors", costText: "the yard's guns damage the sensors" },
-    brief: "At the sector's edge, inside a ring of asteroids around a dead star, sensors find the Edge: Mother Sessaly's shipyard, where her ships are built, her prisoners held and her ledgers kept. She knows Starfleet has found her. Get there before she moves.",
-    arrive: "The Edge is a city in the rubble: docks and cranes and hab modules built into the asteroids, lit up like a festival, with half a dozen Syndicate raiders in their berths and twice as many half-built. In the middle of it all, in an asteroid carved into a palace, is {key}.\n\nShe hails the Pelion before it can hail her, a tall Orion woman in green and gold, smiling. \"Captain. I wondered when you'd come. Sit down. Let's talk about what the Corvan Sector owes me.\"",
-    steps: [
-      ["Find the prisoners", "Rrinn finds them in the first hour: eighty-three life signs in a hab module deep in the ring, Federation and independent, freighter crews and ore haulers and one quartermaster's brother. {key} hasn't moved them. She doesn't think she needs to."],
-      ["Get past the guns", "The yard's defences come up as the Pelion closes, a ring of turrets hidden in the rocks. Hours of manoeuvre later, the Pelion is inside the ring, the turrets are silent, and {key} has stopped smiling."],
-      ["Get them out", "The transporters take the prisoners in groups of six, eighty-three people beamed up through a gap in the yard's shields that Grath holds open with sheer stubbornness. The last one up is the quartermaster's brother. Now there's only {key}, in her palace, with her ships and her ledgers, and a decision to make."],
-    ],
-    choice: { title: "Mother Sessaly", text: "The prisoners are safe, and {key} is trapped in her palace in the rock, with her ledgers: every bribe, every contact, every official in the sector who took Syndicate money. Take her, and her ledgers, and the Syndicate's operation in the sector comes down with her, and the Syndicate will never forgive it. Or let her go, back to Orion space, in exchange for the ledgers and her word that she's done with the Corvan Sector.",
-      options: [
-        { id: "take", name: "Arrest her", blurb: "+5 commendations, +15 supplies (the yard's stores), +4 spares. The Syndicate answers: a raider strikes.", how: "Mother Sessaly arrested at the Edge, and her shipyard taken.", fx: { commendations: 5, supplies: 15, spares: 4, orion: 1 }, text: "{key} comes out of her palace on her own feet, in green and gold, with her head high, and walks to the Pelion's brig as if she's going to dinner. Her ledgers bring down eleven officials across the sector in a month. The Syndicate sends a raider to burn a world in her name, because it has to. But the convoys sail, and nobody paints green hands on them any more." },
-        { id: "deal", name: "Let her go, for the ledgers", blurb: "+20 science (the ledgers), +3 commendations; no reprisal. Starfleet Command doesn't like the deal.", how: "Mother Sessaly let go at the Edge, in exchange for her ledgers and her word.", fx: { science: 20, commendations: 3, command: 1 }, text: "{key} leaves for Orion space in a single ship, with her word given and her ledgers left behind on the palace table, neatly stacked. The Syndicate's operation in the sector collapses without her within weeks. Starfleet Command marks the deal on the captain's file: they wanted her in a cell. But the convoys sail, and nobody died for it." },
-      ] },
-    fail: "Mother Sessaly moved the shipyard before the Pelion arrived. The Edge is empty rock now. Somewhere else in the sector, the green hand is open again.",
-  },
 };
 
 // ---- stories.js ----
@@ -736,7 +872,7 @@ const SERIES_STORIES = {
 
 const CAMPAIGN = {
   title: "Watchers of the Void",
-  premise: "The caretaker of Corvan II was not alone. A vanished people, the Makers, left machines like it across the Corvan Sector to watch over younger worlds. Two of those sites have already been dug up, and no one who was there is left to say by whom: a Federation survey team of six, gone without a trace, and a mining settlement of forty, its homes standing empty with the meals still on the tables. Starfleet Command is worried for three reasons. Someone is killing, or taking, everyone who sees them. The worlds those machines watched over are now unguarded, and one of them is already in trouble. And a machine that could pull a Heavy Cruiser out of orbit is a weapon in the wrong hands, on a border with the Klingon Empire. Every order Starfleet gives the Pelion this tour comes back to the same questions: who is doing this, and what are they looking for?",
+  premise: "The caretaker of Corvan II was not alone. A vanished people, the Makers, left machines like it across the Corvan Sector to watch over younger worlds. Two of those sites have already been dug up, and no one who was there is left to say by whom: a Federation survey team of six, gone without a trace, and a mining settlement of forty, its homes standing empty with the meals still on the tables. Starfleet Command is worried for three reasons. Someone is killing, or taking, everyone who sees them. The worlds those machines watched over are now unguarded, and one of them is already in trouble. And a machine that could pull a Heavy Cruiser out of orbit is a weapon in the wrong hands, on a border with the Klingon Empire. Every order Starfleet gives the Pelion this tour comes back to the same questions: who is doing this, and what are they looking for? And every world those machines watched over, left unguarded, is a world the Klingon Empire can reach before the Federation does.",
   finaleAt: 6,
   beats: [
     { at: 0, act: "Act I: The Silence", title: "Two sites, and no witnesses", text: "The report from Corvan II reaches Starfleet Command, and Command reads it twice. A machine eleven thousand years old, left by a people who came from the stars, strong enough to drain a Heavy Cruiser in orbit. Starfleet Intelligence searches the sector's records for the same carrier wave and finds it at six more sites.\n\nTwo of them have already been dug up.\n\nAt Hadley's Reach, a Federation survey team of six was cataloguing ruins. Their last report was routine. When the supply ship arrived a week later, the camp was intact, the ruins had been cut open and emptied, and the six were gone: no bodies, no blood, no message, and the camp's logs wiped. At the second site, Thessaly Deep, a mining settlement of forty lived beside the ruins. The relief crew found the homes standing, the lights on, the meals still on the tables, and no one at all. The ruins had been cut open with the same tools.\n\nNo one who saw who did it is left to tell anyone. That's the first thing that worries Starfleet Command. The second is that the machines were guarding something: the world beside Thessaly Deep has had three earthquakes since its caretaker was taken, and it never had any before. The third is the Corvan II report itself. A machine that can pull a starship out of orbit is a weapon, and the Corvan Sector borders the Klingon Empire.\n\nYour orders from here on carry a second purpose. Whatever else you're doing, find out who is digging up the Makers' machines, what they want them for, and stop them before the next site, or the next forty people." },
@@ -1430,7 +1566,8 @@ const KORVATH_SITES = [
 // ---- sector.js ----
 // The Corvan Sector: a hex map with the Federation's starbase and colonies to the southwest, two Klingon outposts on
 // the eastern border, the Romulan Neutral Zone along the top, and between them independent worlds, pre-warp peoples,
-// anomalies, ruins and empty systems (one of which hides an Orion pirate base).
+// anomalies, ruins and empty systems (one of which hides an Orion pirate base), and the Tholian Assembly's outposts in
+// the southeast, behind a border the Tholians draw for themselves.
 
 
 const RADIUS = 8;
@@ -1487,6 +1624,13 @@ function makeSector(seed) {
   const neb = open.filter((k) => hexes[k].terrain === "nebula" && free(k) && distance(k, sb) >= 7);
   place(neb.length ? R.pick(neb) : pickWhere((k) => distance(k, sb) >= 8), "orionBase", { baseHull: 0, baseShields: 0 });
   for (let i = 0; i < 9; i++) place(pickWhere(() => true), "empty");
+  // The Tholian Assembly: two outposts on the southeastern rim.
+  // The free hexes furthest to the southeast (east of south), at least three apart.
+  for (let i = 0; i < 2; i++) {
+    const se = open.filter((k) => free(k, 1) && P(k).x > 0 && P(k).y > 0).sort((a, b) => (P(b).x + 1.3 * P(b).y) - (P(a).x + 1.3 * P(a).y));
+    const k = se.find((x) => used.filter((u) => systems[sysAt[u]].kind === "tholian").every((u) => distance(u, x) >= 3)) || se[0];
+    if (k) place(k, "tholian", { surveyed: true });
+  }
   // Starfleet's charts: the core's worlds are known; the rest is "uncharted" until surveyed.
   return { hexes, systems, sysAt, starbase: systems[sysAt[sb]].id, corvan: systems[sysAt[cv]].id };
 }
@@ -1532,6 +1676,8 @@ function newGame({ seed, difficulty = "normal", captain = "", mode = "tour" } = 
   };
   for (const s of Object.values(S.systems)) if (KINDS[s.kind].known) S.seenSys[s.id] = true;
   // Dilithium deposits: about a third of the uncharted and anomalous systems have crystal seams, found by a survey.
+  // Habitable worlds: about half the uncharted systems have one, where the Federation could plant a colony.
+  for (const s of Object.values(S.systems)) if (s.kind === "empty" && hashString(S.seed + ":hab:" + s.id) % 2 === 0) s.habitable = true;
   for (const s of Object.values(S.systems)) if (["empty", "anomaly", "orionBase"].includes(s.kind) && hashString(S.seed + ":dil:" + s.id) % 3 === 0) s.dilithium = 3 + (hashString(S.seed + ":dn:" + s.id) % 4);
   S.seenSys[S.corvan] = true; S.systems[S.corvan].surveyed = true;
   // The first orders: The Silence at Corvan II. An Orion raider is already in orbit there.
@@ -1675,6 +1821,8 @@ function warpText(w) {
 /** Orders that call for maximum warp. */
 const isUrgent = (o) => !!(o && (o.urgent || (o.twist && o.twist.fx === "urgent")));
 /** Ly a week the Pelion makes at its current warp (what "speed" means now). */
+/** What a new colony costs in supplies: colonists, shelters, and a year's seed and power cells. */
+const COLONY_COST = 30;
 // ---------- the ship's power ----------
 // The warp core makes Power (5, more with refits and records, less with damage or failing dilithium), and every week it is
 // shared out, as in battle: the engines take what the warp factor needs (1 up to warp 4, 2 up to warp 6, 3 for warp 7 and
@@ -1781,6 +1929,40 @@ function consumeStores(S) {
   balancePower(S);
 }
 
+// ---------- the Tholian Assembly ----------
+// The Tholians draw their own borders: two light-years around each of their outposts, and a light-year around every
+// world they've enclosed in a web. Inside it, they expect the Pelion to leave, and send a ship to see that it does.
+function tholianSpace(S, hex) {
+  for (const s of Object.values(S.systems)) {
+    if (s.kind === "tholian" && distance(s.at, hex) <= 2) return true;
+    if (s.kind === "annexed" && distance(s.at, hex) <= 1) return true;
+  }
+  return false;
+}
+/** A world enclosed in a Tholian web becomes Tholian territory. */
+function annex(S, s, why = "") {
+  if (!s || ["tholian", "annexed", "starbase"].includes(s.kind)) return;
+  const was = s.kind; s.was = was; s.kind = "annexed"; s.harm = 0; S.seenSys[s.id] = true;
+  S.annexed = (S.annexed || 0) + 1;
+  if (was === "independent" || was === "colony" || was === "member") { S.lostTholian = (S.lostTholian || 0) + 1; markCommand(S, 1, `${s.name} was enclosed in a Tholian web${why ? `: ${why}` : ""}.`); }
+  log(S, `The web around ${s.name} closes. The Tholian Assembly declares it Tholian territory${was === "colony" ? ", and gives the colonists a day to leave" : ""}.`, "war");
+}
+/** Worlds the Tholians have enclosed, set free again (the nearest the Federation first). */
+function releaseWebs(S, n) {
+  const sb = S.systems[S.starbase], list = Object.values(S.systems).filter((s) => s.kind === "annexed").sort((a, b) => distance(a.at, sb.at) - distance(b.at, sb.at));
+  const k = n === "all" ? list.length : n === "half" ? Math.ceil(list.length / 2) : n;
+  for (const s of list.slice(0, k)) { s.kind = s.was === "colony" || s.was === "member" ? s.was : s.was || "empty"; if (s.kind === "independent") s.accord = Math.max(1, s.accord || 0); log(S, `${s.name} is free of the Tholian web.`, "good"); }
+  return Math.min(k, list.length);
+}
+/** The Assembly answers: Tholian vessels make for a Federation world. */
+function tholianReprisal(S, why) {
+  const out = Object.values(S.systems).filter((s) => s.kind === "tholian"), targets = Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member");
+  if (!out.length || !targets.length) return;
+  const from = pick(S, out), tgt = targets.sort((a, b) => distance(a.at, from.at) - distance(b.at, from.at))[0];
+  spawnEnemy(S, "tholian", from.at, { goal: "raid", target: tgt.at, hostile: true, home: from.at });
+  log(S, `Intelligence: after ${why}, a Tholian vessel has left ${from.name} for ${tgt.name}, precisely on the hour.`, "war");
+}
+
 // ---------- the listening posts on the Neutral Zone ----------
 // Three Federation listening posts watch the Romulan Neutral Zone from the row of hexes just outside it. When the Romulans
 // strike, it's at them: a bird-of-prey crosses, decloaks, fires and goes home. Three hits and a post is lost.
@@ -1878,7 +2060,7 @@ function findPath(S, from, to, who = "pelion") {
     if (k === to) break;
     for (const n of neighbors(k)) {
       if (!S.hexes[n]) continue;
-      if (who === "klingon" || who === "orion") { if (inZone(n)) continue; }
+      if (who === "klingon" || who === "orion" || who === "tholian") { if (inZone(n)) continue; }
       const c = dist[k] + moveCost(S, n, who);
       if (dist[n] === undefined || c < dist[n]) { dist[n] = c; prev[n] = k; if (!open.includes(n)) open.push(n); }
     }
@@ -1918,6 +2100,12 @@ function moveTo(S, unit, hex) {
   if (unit === "pelion") for (const o of S.orders) arriveAt(S, o);
   if (unit === "pelion") {
     S.pelion.docked = false;
+    if (tholianSpace(S, hex) && !orderHere(S, hex) && S.pelion.tholianWarned !== S.turn && !Object.values(S.enemies).some((e) => e.power === "tholian" && e.goal === "intercept")) {
+      S.pelion.tholianWarned = S.turn;
+      const out = Object.values(S.systems).filter((s) => s.kind === "tholian").sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0];
+      if (out) spawnEnemy(S, "tholian", out.at, { goal: "intercept", target: hex, home: out.at });
+      log(S, `The Pelion has crossed into space the Tholian Assembly calls its own. A message arrives, exact to the second: withdraw, or be removed. A Tholian vessel is on its way.`, "war");
+    }
     if (p && p.path.some(inZone) && !S.pelion.zoneMarked && !orderHere(S, hex, "border")) {
       S.pelion.zoneMarked = true; markCommand(S, 1, "The Pelion crossed into the Romulan Neutral Zone.");
     }
@@ -1930,7 +2118,7 @@ function arrive(S, hex) {
   const s = sysAt(S, hex);
   if (s) {
     const known = KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost"].includes(s.kind);
-    const what = { member: "a Federation member world", claimed: "a world of the Klingon Empire", lost: "an evacuated colony", independent: `an independent world (accord ${signedAccord(s.accord)})` }[s.kind] || (known ? "a " + KINDS[s.kind].name.toLowerCase() : "an uncharted system");
+    const what = { member: "a Federation member world", claimed: "a world of the Klingon Empire", annexed: "Tholian territory, enclosed in a web", tholian: "an outpost of the Tholian Assembly", lost: "an evacuated colony", independent: `an independent world (accord ${signedAccord(s.accord)})` }[s.kind] || (known ? "a " + KINDS[s.kind].name.toLowerCase() : "an uncharted system");
     const there = Object.values(S.enemies).filter((e) => e.at === hex && !e.cloaked && !e.hidden && !ENEMIES[e.type].base).map((e) => (/^[AEIOU]/.test(ENEMIES[e.type].name) ? "an " : "a ") + ENEMIES[e.type].name);
     log(S, `The Pelion arrives at ${s.name}, ${what}${s.harm ? `, harmed ${s.harm}/3` : ""}.${there.length ? ` In orbit: ${there.join(", ")}.` : ""}`, "move");
   }
@@ -2000,6 +2188,7 @@ function actionsFor(S, unit = "pelion") {
   if (s && s.harm > 0 && ["colony", "member", "independent"].includes(s.kind)) add("aid", { sys: s.id, blurb: `Harm ${s.harm}/3. Clear a box.`, oppose: aidOpposition(S, s) });
   const P = S.pelion;
   if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair", { oppose: repairOpposition(S), blurb: ACTIONS.repair.blurb + ` Uses a crate of spares (${storesOf(S).spares} left)${storesOf(S).spares ? "" : ": none left, −3"}.` });
+  if (s && s.kind === "empty" && s.surveyed && s.habitable) add("colonize", { sys: s.id, blurb: `${s.name} has a world people could live on. Plant a Federation colony: ${COLONY_COST} supplies of colonists and equipment from Starfleet (you have ${S.supplies}), paid on success. It sends supplies every week, and the Federation's border moves out to it.`, why: S.supplies < COLONY_COST ? `Needs ${COLONY_COST} supplies.` : null, oppose: { name: "the new world's hazards", skill: "Hostility", target: 10 + (enemiesAt(S, s.at).some((e) => e.hostile) ? 2 : 0), why: "Strange weather, strange microbes, and nobody has ever lived here before." } });
   if (s && s.surveyed && s.dilithium > 0 && s.kind !== "prewarp") add("mine", { sys: s.id, blurb: `A seam of about ${s.dilithium} crystal${s.dilithium === 1 ? "" : "s"} here. Cut 2 (3 on success by 5) for the Pelion's matrix (${storesOf(S).dilithium}/10). Lose by 3 or more and the seam bites back.`, oppose: { name: "the crystal seams", skill: "Instability", target: 10, why: "Living dilithium fractures if it's cut wrong, and sometimes the rock around it does too." } });
   if (storesOf(S).dilithium < STORES.dilithium.max && storesOf(S).spares > 0) add("recrystallize", { blurb: `Restore worn crystals with a field from the warp core: +1 dilithium (+2 on success by 5), for a crate of spares. Dilithium ${storesOf(S).dilithium}/10, spares ${storesOf(S).spares}.`, oppose: { name: "the fractured lattice", skill: "Fracture", target: 11, why: "A worn crystal's lattice has to be coaxed back, plane by plane." } });
   add("sweep", { blurb: `Listen for cloaked ships and raiders within ${sweepRange(S)} light-years: reveals them. Finds a hidden base here.${P.refits.inverter ? " The cloak inverter helps: +2." : ""}`, oppose: { name: "cloaks and subspace static", skill: "Concealment", target: 11, why: "Anything worth finding is trying not to be found, and the sector's background noise helps it." } });
@@ -2163,6 +2352,7 @@ function applyAction(S, p) {
     case "survey": {
       if (!r.success) return say(S, `${name} couldn't make sense of ${s.name}'s readings. Try again next turn.`);
       s.surveyed = true; S.seenSys[s.id] = true;
+      if (s.habitable && s.kind === "empty") log(S, `${s.name} has a habitable world: the Federation could plant a colony there (Found a colony, ${COLONY_COST} supplies).`, "discovery");
       if (s.dilithium) log(S, `${s.name} has a seam of living dilithium, about ${s.dilithium} crystals: the Pelion can mine it.`, "discovery");
       const sci = 4 + (big ? 3 : 0) + (p.unit !== "pelion" ? 2 : 0); S.science += sci;
       const what = { prewarp: "a pre-warp people. The Prime Directive applies.", anomaly: "an anomaly worth investigating.", ruins: "the ruins of a vanished civilization.", empty: "nothing but rock and starlight.", orionBase: "nothing but rock and starlight." }[s.kind] || "charted.";
@@ -2202,6 +2392,14 @@ function applyAction(S, p) {
       while (n > 0 && P.shields > 0) { P.shields--; n--; fixed.push("shields"); }
       if (n > 0 && P.hull > 0) { P.hull--; fixed.push("hull"); }
       return say(S, `Repairs: ${fixed.join(", ") || "nothing needed"}${usedSpare ? ` (a crate of spares used; ${storesOf(S).spares} left)` : ", improvised without spare parts"}.`, "good");
+    }
+    case "colonize": {
+      if (!r.success) {
+        if (r.margin <= -3) { S.supplies = Math.max(0, S.supplies - 8); return say(S, `The first landing on ${s.name} goes badly: a storm nobody predicted wrecks the prefabricated shelters. 8 supplies lost; the colonists wait in orbit.`, "bad"); }
+        return say(S, `The survey teams on ${s.name} aren't ready to bring colonists down yet.`);
+      }
+      S.supplies -= COLONY_COST; s.kind = "colony"; s.founded = S.turn; s.harm = 0; S.founded = (S.founded || 0) + 1; S.commendations += 3; delete s.habitable;
+      return say(S, `A new Federation colony on ${s.name}: the first two hundred colonists come down by shuttle and transporter, and by nightfall there are lights on the ground. The Federation's frontier has moved. +3 commendations.`, "victory");
     }
     case "mine": {
       if (!r.success) {
@@ -2408,6 +2606,7 @@ function startNextCampaign(S) {
   (S.campaignsDone = S.campaignsDone || []).push({ id: campId(C), title: campaignDef(S).title, over: C.over, threads: C.threads.length, rival: C.korvath || 0, threadList: C.threads, beatText: C.beatText, beats: C.beats });
   S.campaign = { id: next.id, threads: [], beats: [], finale: false, over: null, started: S.turn };
   (S.unlocked = S.unlocked || []).push(next.id);
+  if (!S.unlocked.includes("syndicate")) S.unlocked.push("syndicate");   // the frontier's other troubles: the Syndicate's work
   campaignBeat(S, 0);
   const types = SERIES_MISSIONS.filter((m) => m.campaign === next.id).map((m) => m.text);
   log(S, `A new campaign: ${next.title}. New kinds of orders from Starfleet: ${types.join("; ")}.`, "order");
@@ -2429,7 +2628,14 @@ function rivalTick(S, D) {
   const near = Object.values(S.systems).filter((s) => ["colony", "member", "independent"].includes(s.kind) && distance(s.at, S.pelion.at) >= 3);
   const w = near.length ? pick(S, near) : null;
   let cost = "";
-  if (R.fx === "dilithium") {
+  let place = site;
+  if (R.fx === "annex") {
+    const out = Object.values(S.systems).filter((s) => s.kind === "tholian");
+    const near = (s) => Math.min(...out.map((t) => distance(t.at, s.at)));
+    const cand = out.length ? Object.values(S.systems).filter((s) => ["independent", "empty", "anomaly", "ruins", "prewarp", "colony"].includes(s.kind) && s.id !== S.corvan && (s.kind !== "colony" || C.korvath >= 3)).sort((a, b) => near(a) - near(b)) : [];
+    const t = cand[0];
+    if (t) { place = t.name; annex(S, t, "the Assembly's line moved"); cost = `${t.name} is Tholian territory now. ${t.was === "colony" ? "Its colonists have a day to leave." : t.was === "independent" ? "Its people were never asked." : "Nobody lived there. That isn't the point."}`; }
+  } else if (R.fx === "dilithium") {
     if (w) harmWorld(S, w, 1, "its reactors' crystals went grey overnight, and the power failed");
     const lost = -addStore(S, "dilithium", -1);
     cost = `${w ? `${w.name} is one of the places it reached: its power plant's crystals are grey. ` : ""}${lost ? `And aboard the Pelion, Grath reports one of the warp core's crystals gone grey in its housing overnight: dilithium ${storesOf(S).dilithium}/10.` : ""}`;
@@ -2439,7 +2645,7 @@ function rivalTick(S, D) {
     cost = `${w ? `${w.name} was waiting for that convoy, and it's rationing now. ` : ""}${took ? `Starfleet's supply allotment to the Pelion is cut to cover the loss: −${took} supplies.` : ""}`;
   }
   const n = C.threads.length, ahead = C.korvath > n;
-  storyEvent(S, `${D.title}: ${R.head}`, `Rrinn brings the report to the captain's ready room herself. Starfleet Intelligence, priority one: ${R.name} ${R.verb} ${site}.\n\n${scene}\n\n${cost}\n\nThat's ${C.korvath} for ${R.name}, against the Pelion's ${n} thread${n === 1 ? "" : "s"}.${ahead ? ` ${R.Name} is ahead, and every week it stays ahead makes the end harder.` : ""}${C.korvath >= D.finaleAt ? "" : " Every campaign order the Pelion carries out sets it back two weeks."}`);
+  storyEvent(S, `${D.title}: ${R.head}`, `Rrinn brings the report to the captain's ready room herself. Starfleet Intelligence, priority one: ${R.name} ${R.verb} ${place}.\n\n${scene}\n\n${cost}\n\nThat's ${C.korvath} for ${R.name}, against the Pelion's ${n} thread${n === 1 ? "" : "s"}.${ahead ? ` ${R.Name} is ahead, and every week it stays ahead makes the end harder.` : ""}${C.korvath >= D.finaleAt ? "" : " Every campaign order the Pelion carries out sets it back two weeks."}`);
   if (C.korvath >= D.finaleAt) { for (const b of D.beats) if (b.at > 0) campaignBeat(S, b.at); issueFinale(S); }
 }
 // ---------- the race: House Kor'vath ----------
@@ -2545,7 +2751,7 @@ function missionChoices(S, ev) {
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
   accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike", refit: (n) => `${REFITS[n] ? REFITS[n].name : n} fitted to the Pelion`, delay: (n) => `every other order's deadline ${n} weeks closer`,
-  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the Syndicate answers: a raider strikes a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
+  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the Syndicate answers: a raider strikes a Federation world", tholian: () => "the Assembly answers: a Tholian vessel makes for a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
 function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
   if (!o || !opt) return { error: "No such choice." };
@@ -2557,6 +2763,8 @@ function chooseMission(S, orderId, optId) {
     else if (k === "supplies") S.supplies = Math.max(0, S.supplies + n);
     else if (k === "dilithium" || k === "antimatter" || k === "spares") addStore(S, k, n);
     else if (k === "orion") orionReprisal(S, o.title);
+    else if (k === "tholian") tholianReprisal(S, o.title);
+    else if (k === "release") { const n2 = releaseWebs(S, n); lines.push(`${n2} world${n2 === 1 ? "" : "s"} freed from the Tholian webs`); continue; }
     else if (k === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, Math.min(5, (s.accord || 0) + n)); if (s.accord >= 5 && s.kind === "independent") join(S, s); }
     else if (k === "accord") continue;
     else if (k === "command") markCommand(S, n, `${o.title}: ${opt.how.toLowerCase()}`);
@@ -2761,6 +2969,9 @@ function score(S) {
     ["Orders carried out", S.done * 4],
     ["Commendations", S.commendations],
     ["Colonies safe", sys.filter((s) => s.kind === "colony").length * 5],
+    ["Colonies founded", (S.founded || 0) * 5],
+    ["Worlds lost to the Tholian Assembly", -(S.lostTholian || 0) * 8],
+    ["Systems inside the Tholian webs", -sys.filter((s) => s.kind === "annexed").length * 3],
     ["Systems surveyed", sys.filter((s) => s.surveyed && !KINDS[s.kind]?.known && s.id !== S.corvan).length],
     ["Starfleet Command track", -S.command * 4],
     ["Worlds lost to the Klingon Empire", -S.lostWorlds * 8],
@@ -2777,8 +2988,8 @@ function score(S) {
 }
 function rating(total) {
   // Every officer acts each turn, so a good tour scores high: these thresholds assume it.
-  return total >= 290 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 210 ? "Commended: a fine tour, and a ship Starfleet is proud of"
-    : total >= 140 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
+  return total >= 330 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 240 ? "Commended: a fine tour, and a ship Starfleet is proud of"
+    : total >= 160 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
 }
 function checkEnd(S) {
   if (S.over) return;
@@ -2827,6 +3038,11 @@ function startBattle(S, enemyId, initiator) {
     markCommand(S, 1, "the Pelion fired first on a Klingon ship. A diplomatic incident.");
     S.tension = Math.min(10, S.tension + 2); e.hostile = true;
   }
+  if (initiator === "pelion" && e.power === "tholian" && !e.hostile && !(e.goal === "web")) {
+    markCommand(S, 1, "the Pelion fired first on a Tholian vessel that had done nothing but ask it to leave. An incident.");
+    e.hostile = true;
+  }
+  if (e.power === "tholian") e.hostile = true;
   const seenIt = e.cloaked && S.pelion.refits.inverter;   // the cloak inverter sees a cloaked ship coming
   const ambush = initiator === "enemy" && E.ambush && e.cloaked && !seenIt;
   if (seenIt && initiator === "enemy" && E.ambush) log(S, `The cloak inverter sees the ${E.name} coming before it decloaks: no ambush.`, "good");
@@ -2913,7 +3129,8 @@ function exchange(S, choice = {}) {
   }
   const md = st.maneuver - (E.maneuver || 0);
   // Breaking away: a Helm contest instead of firing.
-  if (choice.breakOff) {
+  if (choice.breakOff && B.web >= 3) L.push("Break away: the web holds the Pelion fast.");
+  else if (choice.breakOff) {
     const r = check(S, st.helm + spare + evade + Math.max(0, md)), them = E.base ? { success: false, margin: -99, total: "-", target: "-" } : check(S, E.helm + Math.max(0, -md));
     if (r.success && (!them.success || r.margin > them.margin)) { L.push(`Break away (Helm ${R(r)} against theirs, ${R(them)}): the Pelion goes to warp.`); e.cooldown = 2; B.over = "escaped"; return finish(S, L); }
     L.push(`Break away (Helm ${R(r)} against theirs, ${R(them)}): they stay on you.`);
@@ -2940,7 +3157,9 @@ function exchange(S, choice = {}) {
   }
   if (e.hull >= E.hull) { B.over = "destroyed"; return finish(S, L); }
   // Do they run?
-  const runs = (e.type === "orion" && e.shields >= E.shields) || (e.type === "kbop" && e.hull >= 2) || (e.type === "kbc" && e.hull >= 3);
+  // A Tholian vessel spins as it fights: after three exchanges its web closes around the Pelion, and there's no breaking away.
+  if (E.web) { B.web = (B.web || 0) + 1; if (B.web === 3) L.push("The Tholian vessel's web closes around the Pelion: there's no breaking away now."); }
+  const runs = (e.type === "tholian" && e.hull >= 1) || (e.type === "orion" && e.shields >= E.shields) || (e.type === "kbop" && e.hull >= 2) || (e.type === "kbc" && e.hull >= 3);
   if (runs) {
     const r = check(S, E.helm + Math.max(0, -md) + (E.fast ? 2 : 0)), us = check(S, st.helm + Math.max(0, md));
     if (r.success && (!us.success || r.margin > us.margin)) { L.push(`The ${E.name} breaks off and runs (${R(r)} against your Helm, ${R(us)}).`); sendHome(S, e, 5); e.cooldown = 2; B.over = "fled"; return finish(S, L); }
@@ -2953,7 +3172,7 @@ function exchange(S, choice = {}) {
   const gun = E.gunner + (B.ambush && B.ex === 1 && !B.standby ? 2 : 0);
   const volley = (label, dmg, evadable) => {
     const r = check(S, gun + (label === "torpedo" ? 1 : 0));
-    const name = { kbc: "Disruptors", kbop: "Disruptors", rbop: "Plasma torpedo", orion: "Disruptors", orionBase: "The base's guns" }[e.type];
+    const name = { kbc: "Disruptors", kbop: "Disruptors", rbop: "Plasma torpedo", orion: "Disruptors", orionBase: "The base's guns", tholian: "Energy beam" }[e.type];
     const what = label === "torpedo" ? "Photon torpedo" : name;
     if (!r.success) { L.push(`Their ${what.toLowerCase()} (${R(r)}): miss.`); return; }
     if (tgt) {
@@ -2999,6 +3218,7 @@ function finish(S, L) {
     delete S.enemies[e.id];
     if (e.type === "orionBase") { S.commendations += 6; S.supplies += 15; addStore(S, "spares", 4); addStore(S, "dilithium", 3); addStore(S, "antimatter", 6); S.orionBaseDown = true; log(S, "The Orion pirate base is destroyed. The raids on the sector will stop. Salvage: +15 supplies, +4 spares, +3 dilithium, +6 antimatter.", "victory"); }
     else if (e.power === "orion") { S.commendations += 2; S.supplies += 6; addStore(S, "spares", 2); addStore(S, "dilithium", 1); log(S, `The Pelion destroys an Orion raider. Salvage: +6 supplies, +2 spares, +1 dilithium.`, "good"); }
+    else if (e.power === "tholian") { S.commendations += 1; addStore(S, "spares", 1); log(S, "The Tholian vessel shatters like glass. The Assembly will note the time.", "war"); }
     else if (e.power === "romulan") { S.commendations += 3; addStore(S, "spares", 1); log(S, "The Romulan bird-of-prey is destroyed. Salvage: +1 spares.", "good"); }
     else { S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
   } else if (B.over === "lost") log(S, "The Pelion's hull is breaking up.", "bad");
@@ -3417,12 +3637,14 @@ const raiderName = ENEMIES.orion.name;
 //    raid, more as tension rises. Firing first on one that hasn't fired is an incident.
 //  - The Orion Syndicate: raiders from a hidden base strike colonies and member worlds, steal supplies and run.
 //  - The Romulan Star Empire: now and then a cloaked bird-of-prey crosses the Neutral Zone to strike, and goes home.
+//  - The Tholian Assembly: every few weeks a Tholian vessel goes out from its outposts and spins a web around the
+//    nearest world it wants; three weeks of spinning and the world is Tholian territory. Hail it or fight it off.
 
 
 
 
 
-const EVERY = { easy: { k: 9, o: 8, r: 15 }, normal: { k: 7, o: 6, r: 11 }, hard: { k: 5, o: 5, r: 8 } };
+const EVERY = { easy: { k: 9, o: 8, r: 15, t: 12 }, normal: { k: 7, o: 6, r: 11, t: 9 }, hard: { k: 5, o: 5, r: 8, t: 7 } };
 const count = (S, power, type) => Object.values(S.enemies).filter((e) => e.power === power && (!type || e.type === type) && !ENEMIES[e.type].base).length;
 const worlds = (S, kinds) => Object.values(S.systems).filter((s) => kinds.includes(s.kind));
 
@@ -3462,6 +3684,17 @@ function aiTurn(S) {
       const tgt = pick(S, targets);
       const zone = Object.keys(S.hexes).filter(inZone).sort((a, b) => distance(a, tgt.at) - distance(b, tgt.at));
       spawnEnemy(S, "rbop", zone[0], { goal: "strike", target: tgt.at, hostile: true, cloaked: true, home: zone[0] });
+    }
+  }
+  // Tholians: a web-spinner goes out for the nearest world the Assembly wants.
+  const tout = worlds(S, ["tholian"]);
+  if (tout.length && S.turn >= 6 && S.turn % ev.t === 5 && !Object.values(S.enemies).some((e) => e.power === "tholian" && e.goal === "web")) {
+    const near = (s) => Math.min(...tout.map((t) => distance(t.at, s.at)));
+    const cand = worlds(S, ["independent", "empty", "anomaly", "ruins", "prewarp"]).filter((s) => s.id !== S.corvan && near(s) <= 6 && (s.kind !== "independent" || s.accord < 3)).sort((a, b) => near(a) - near(b));
+    if (cand.length) {
+      const tgt = cand[0], from = tout.sort((a, b) => distance(a.at, tgt.at) - distance(b.at, tgt.at))[0];
+      spawnEnemy(S, "tholian", from.at, { goal: "web", target: tgt.at, home: from.at });
+      log(S, `Intelligence: a Tholian vessel has left ${from.name}, bound for ${tgt.name}. The Assembly means to enclose it.`, "war");
     }
   }
   // Every ship moves and does its job.
@@ -3514,6 +3747,16 @@ function aiTurn(S) {
         : e.power === "orion" ? `an Orion raider struck it, stole 3 supplies from the Federation's convoys, and ran for home` : `a ${E.name} raided it and turned for the border`);
       if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
       sendHome(S, e, 0);
+    } else if (e.goal === "web" && s) {
+      // Three weeks of spinning, and the world is Tholian territory.
+      e.stay = (e.stay || 0) + 1;
+      if (e.stay === 1) log(S, `A Tholian vessel has begun spinning a web around ${s.name}: in two more weeks it will be closed, and ${s.name} will be Tholian territory. Hail it, or drive it off.`, "war");
+      if (e.stay >= 3) { annex(S, s); sendHome(S, e, 0); }
+    } else if (e.goal === "intercept") {
+      // A Tholian vessel sent to see the Pelion out of Tholian space.
+      if (!tholianSpace(S, S.pelion.at)) { log(S, "The Pelion has left Tholian space; the Tholian vessel turns for home.", "good"); sendHome(S, e, 0); continue; }
+      e.target = S.pelion.at;
+      if (e.at === S.pelion.at) { if (!e.hostile) log(S, "The Tholian vessel's deadline passes, exactly on the second. It powers its weapons.", "war"); e.hostile = true; }
     } else if (e.goal === "claim" || e.goal === "watch") {
       if (!S.orders.some((o) => o.at === e.at) || ++e.stay >= 8) { if (e.goal === "watch") e.cloaked = true; sendHome(S, e, 0); }
     }
@@ -3543,7 +3786,7 @@ function claim(S, s) {
   markCommand(S, 1, `${s.name} went over to the Klingon Empire.`);
 }
 
-const kindName = (s) => (s.kind === "claimed" ? "Klingon world" : s.kind === "member" ? "Federation member" : s.kind === "lost" ? "Evacuated colony" : KINDS[s.kind]?.name);
+const kindName = (s) => (s.kind === "annexed" ? "Tholian territory" : s.kind === "claimed" ? "Klingon world" : s.kind === "member" ? "Federation member" : s.kind === "lost" ? "Evacuated colony" : KINDS[s.kind]?.name);
 
 // ---- turn.js ----
 // The end of a turn: the other powers move, the crew heals, supplies come in, orders fall due, new orders arrive.
@@ -3689,6 +3932,7 @@ function closeBattle(S) { endBattle(S); arcTick(S); updateVisibility(S); checkEn
 
 
 
+
 const SAVE_KEY = "pelion-frontier.save.v1";
 const $ = (id) => document.getElementById(id);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -3795,8 +4039,8 @@ function drawShip(ctx, kind, x, y, angle, scale, color, ring, dashed) {
 /** The same outline as a little SVG, for the battle window and anywhere else on the page. */
 const shipSVG = (kind, color, px = 44) => `<svg width="${px}" height="${px}" viewBox="-13.5 -13.5 27 27" style="vertical-align:middle"><path d="${SHIP_SHAPES[kind]}" fill="${color}" fill-opacity=".22" stroke="${color}" stroke-width=".7" stroke-linejoin="round"/><\/svg>`;
 function hexPath(ctx, cx, cy, r) { ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = (Math.PI / 180) * (60 * i - 30); i ? ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)) : ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); } ctx.closePath(); }
-const SYS_COLOR = { starbase: "#9fd0ff", colony: "#6fb4ff", member: "#6fb4ff", independent: "#c9c3e8", klingon: "#e0564a", claimed: "#e0564a", prewarp: "#9ad48a", anomaly: "#c9a8ff", ruins: "#ffd36b", empty: "#8e9ab4", orionBase: "#8e9ab4", lost: "#555b6e" };
-const shownKind = (s) => (S.seenSys[s.id] && (KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost"].includes(s.kind)) ? s.kind : null);
+const SYS_COLOR = { starbase: "#9fd0ff", colony: "#6fb4ff", member: "#6fb4ff", independent: "#c9c3e8", klingon: "#e0564a", claimed: "#e0564a", tholian: "#ff8fb8", annexed: "#ff8fb8", prewarp: "#9ad48a", anomaly: "#c9a8ff", ruins: "#ffd36b", empty: "#8e9ab4", orionBase: "#8e9ab4", lost: "#555b6e" };
+const shownKind = (s) => (S.seenSys[s.id] && (KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost", "annexed"].includes(s.kind)) ? s.kind : null);
 let stars = null;
 function draw() {
   const c = $("map"); if (!c || !S) return;
@@ -3813,6 +4057,7 @@ function draw() {
   for (const [k, h] of Object.entries(S.hexes)) {
     const { x, y } = toPixel(k, size); hexPath(ctx, x, y, size - 0.6);
     ctx.fillStyle = h.terrain === "zone" ? "rgba(120,30,45,.4)" : h.terrain === "nebula" ? "rgba(130,80,170,.34)" : "rgba(28,34,58,.38)"; ctx.fill();
+    if (h.terrain !== "zone" && tholianSpace(S, k)) { ctx.fillStyle = "rgba(255,143,184,.13)"; ctx.fill(); }   // Tholian space
     if (R[k] !== undefined && k !== u.at) { ctx.fillStyle = "rgba(242,193,78,.12)"; ctx.fill(); }
     if (!S.visible[k]) { ctx.fillStyle = "rgba(0,0,0,.32)"; ctx.fill(); }
     ctx.strokeStyle = h.terrain === "zone" ? "rgba(224,86,74,.35)" : "rgba(140,150,200,.14)"; ctx.lineWidth = 1; ctx.stroke();
@@ -4349,7 +4594,7 @@ function pastCampaigns() {
 }
 /** The Mission tab: how each order under way is progressing, step by step, with its clock and what counts as success. */
 function missionHTML() {
-  let h = hint() + `<h2>Mission<\/h2>` + campaignHTML();
+  let h = hint() + `<h2>Mission<\/h2>` + `<details class="card small"><summary><b>${esc(FRONTIER.title)}<\/b>: extend the Federation, against the Klingons, the Romulans and the Tholians<\/summary><p>${esc(FRONTIER.text)}<\/p><\/details>` + campaignHTML();
   const A = S.arc;
   if (awayActive()) h += `<div class="card small">The away team's work on Corvan II (who's down, the clues, its log) is on the <button class="btn small" data-tab-go="away">Away team<\/button> tab.<\/div>`;
   if (!S.orders.length) h += `<p class="muted">No orders under way.${(S.backlog || []).length ? ` ${(S.backlog || []).length} waiting in the backlog (the Orders tab).` : ""}<\/p>`;
@@ -4393,16 +4638,29 @@ function missionHTML() {
 // ---------- Sector ----------
 function sectorHTML() {
   const sc = score(S);
-  let h = `<h2>The Corvan Sector<\/h2><p class="small muted">${turnText()}. Score so far: <b class="gold">${sc.total}<\/b>.<\/p>`;
+  let h = `<h2>The Corvan Sector<\/h2><p class="small muted">${turnText()}. Score so far: <b class="gold">${sc.total}<\/b>.<\/p>` + raceHTML();
   h += `<table class="tbl"><tr><th>World<\/th><th>What<\/th><th>Status<\/th><\/tr>`;
-  const order = { member: 0, colony: 1, starbase: 2, independent: 3, claimed: 4, klingon: 5, lost: 6 };
+  const order = { member: 0, colony: 1, starbase: 2, independent: 3, claimed: 4, klingon: 5, annexed: 6, tholian: 7, lost: 8 };
   for (const s of Object.values(S.systems).filter((x) => shownKind(x) && order[shownKind(x)] !== undefined).sort((a, b) => order[a.kind] - order[b.kind])) {
     const st = s.kind === "independent" ? `accord ${s.accord > 0 ? "+" : ""}${s.accord}` : s.harm ? `<span class="bad">harm ${s.harm}/3<\/span>` : "";
     h += `<tr data-hex="${s.at}"><td>${esc(s.name)}<\/td><td>${esc(kindName(s))}<\/td><td>${st}${s.harm && s.kind === "independent" ? `, <span class="bad">harm ${s.harm}<\/span>` : ""}<\/td><\/tr>`;
   }
   h += `<\/table><h3>Score<\/h3><table class="tbl">${sc.parts.filter((p) => p[1]).map(([n, v]) => `<tr><td>${esc(n)}<\/td><td style="text-align:right">${v}<\/td><\/tr>`).join("")}<\/table>`;
-  h += `<h3>The powers<\/h3><p class="small muted"><b style="color:${POWERS.klingon.color}">Klingon Empire:<\/b> a cold war. Its ships court independent worlds; raiders strike when tension runs high. Firing first on a Klingon ship that hasn't fired is an incident. <b style="color:${POWERS.orion.color}">Orion Syndicate:<\/b> raiders from a hidden base; a sensor sweep near it hears where. <b style="color:${POWERS.romulan.color}">Romulans:<\/b> cloaked ships cross the Neutral Zone to strike; sweeps reveal them.<\/p>`;
+  h += `<h3>The powers<\/h3><p class="small muted"><b style="color:${POWERS.klingon.color}">Klingon Empire:<\/b> a cold war. Its ships court independent worlds; raiders strike when tension runs high. Firing first on a Klingon ship that hasn't fired is an incident. <b style="color:${POWERS.orion.color}">Orion Syndicate:<\/b> raiders from a hidden base; a sensor sweep near it hears where. <b style="color:${POWERS.romulan.color}">Romulans:<\/b> cloaked ships cross the Neutral Zone to strike; sweeps reveal them. <b style="color:${POWERS.tholian.color}">Tholian Assembly:<\/b> draws its own borders in the southeast (shaded on the map), and every few weeks sends a vessel to spin a web around the nearest world it wants: three weeks of spinning and it's Tholian territory. Hail it or drive it off. Enter Tholian space without orders and a Tholian vessel comes to see you out; stay, and it fires. In battle its web closes after three exchanges: no breaking away.<\/p>`;
   return h;
+}
+/** The race for the sector: what each power holds now. */
+function raceHTML() {
+  const sys = Object.values(S.systems), n = (kinds) => sys.filter((s) => kinds.includes(s.kind)).length;
+  const posts = Object.values(postsOf(S)), lostPosts = posts.filter((p) => p.lost).length;
+  const rows = [
+    ["federation", "The Federation", n(["starbase", "colony", "member"]), `${n(["colony"])} colonies (${S.founded || 0} founded this command), ${n(["member"])} member worlds; ${posts.length - lostPosts} of ${posts.length} listening posts`],
+    ["klingon", "The Klingon Empire", n(["klingon", "claimed"]), `${n(["klingon"])} outposts, ${n(["claimed"])} worlds won from the independents; tension ${S.tension}/10`],
+    ["romulan", "The Romulan Star Empire", lostPosts, `behind the Neutral Zone; ${lostPosts} listening post${lostPosts === 1 ? "" : "s"} destroyed`],
+    ["tholian", "The Tholian Assembly", n(["tholian", "annexed"]), `${n(["tholian"])} outposts, ${n(["annexed"])} worlds enclosed in webs`],
+    ["independent", "Still to be decided", n(["independent"]), `independent worlds; ${sys.filter((s) => s.kind === "empty" && s.surveyed && s.habitable).length} habitable worlds charted and unclaimed`],
+  ];
+  return `<h3>${esc(FRONTIER.title)}: the race for the sector<\/h3><table class="tbl">${rows.map(([p, name, k, what]) => `<tr><td><b style="color:${POWERS[p] ? POWERS[p].color : "var(--ink)"}">${esc(name)}<\/b><\/td><td style="text-align:right">${k}<\/td><td class="small muted">${esc(what)}<\/td><\/tr>`).join("")}<\/table>`;
 }
 let logFilter = "all";
 function logHTML() {
@@ -4486,13 +4744,14 @@ function modal(html) { $("modal-body").innerHTML = html; $("modal").hidden = fal
 function closeModal() { $("modal").hidden = true; }
 function showStarter(canContinue) {
   modal(`<h1>USS Pelion: Frontier<\/h1>
-  <p class="lede">Stardate 5212.4. The Pelion, a Heavy Cruiser under your command, is assigned to the Corvan Sector for fifty weeks: a frontier between the Federation, the Klingon Empire and the Romulan Neutral Zone, full of worlds that haven't chosen a side and things no one has explained.<\/p>
+  <p class="lede">Stardate 5212.4. The Corvan Sector is the last open frontier on this edge of the Federation, and three powers want it closed: the Klingon Empire to the east, the Romulan Star Empire behind the Neutral Zone to the north, and the Tholian Assembly to the southeast. The Pelion, a Heavy Cruiser under your command, has one order above all the others: extend the Federation, before the frontier closes.<\/p>
   <div class="grid2">
     <div class="brief"><h3>The ship<\/h3><p>Double-click a hex to fly there. A hex is a light-year and a turn a week; speed is v = W³ × c, so warp 6, the Pelion's maximum stable speed, covers about 4 light-years a week, and warp 8, its emergency maximum, about 10, at a risk to the engines. Urgent orders call for emergency warp. Nebulae count double. Then the crew goes to work where you are: every officer acts once a turn (survey, investigate, negotiate, sweep, repair), each job once. Starbase 23 repairs, rearms and refits you.<\/p><\/div>
     <div class="brief"><h3>The crew<\/h3><p>The six officers from the Players' Guide do the work. Every action is the tabletop roll: 3d6 at or under their skill. Pick who does it, and whether a second officer assists (+1, using their turn); a Duty point rerolls a failure.<\/p><\/div>
     <div class="brief"><h3>The campaigns<\/h3><p>The tour is one long story, and it begins with your first orders, The Silence at Corvan II. What you find there sets the course of everything after it. When that campaign is over, Starfleet's attention turns: a new campaign begins, with new kinds of orders of its own.<\/p><\/div>
     <div class="brief"><h3>Power and stores<\/h3><p>The warp core's Power is shared out every week, as in battle: the engines take what the warp factor needs, and the rest goes to shields, sensors, the labs and operations. The warp drive eats antimatter by the light-year and wears out its dilithium; repairs use spare parts. Refuel at the starbase, buy at colonies and friendly worlds, mine seams, salvage, recrystallize.<\/p><\/div>
     <div class="brief"><h3>Orders<\/h3><p>Starfleet sends missions, each with a deadline, a twist, its own story, and a reason tied to the campaign. Each ends with a decision that's yours to make.<\/p><\/div>
+    <div class="brief"><h3>The frontier<\/h3><p>Extend the Federation: survey the uncharted systems, plant colonies on habitable worlds (Found a colony), and bring independent worlds in. The Klingons court the same worlds; the Romulans strike from behind the Neutral Zone; the Tholians enclose worlds in webs, and see intruders out of their space. The Sector tab keeps the count.<\/p><\/div>
     <div class="brief"><h3>The worlds<\/h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.<\/p><\/div>
     <div class="brief"><h3>Battles<\/h3><p>Ship combat from the Players' Guide: split the Power between shields (reinforce them with a second point), phasers (overload them with a second), torpedoes and the engines (evasion), give the captain's order, and break away if it goes wrong.<\/p><\/div>
     <div class="brief"><h3>Starfleet Command<\/h3><p>Five boxes and you're relieved of command: failed orders, the Prime Directive, incidents and lost colonies mark it. Three orders carried out in a row clear a box. Survive the tour and earn your rating.<\/p><\/div>

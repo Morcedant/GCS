@@ -3,13 +3,15 @@
 //    raid, more as tension rises. Firing first on one that hasn't fired is an incident.
 //  - The Orion Syndicate: raiders from a hidden base strike colonies and member worlds, steal supplies and run.
 //  - The Romulan Star Empire: now and then a cloaked bird-of-prey crosses the Neutral Zone to strike, and goes home.
+//  - The Tholian Assembly: every few weeks a Tholian vessel goes out from its outposts and spins a web around the
+//    nearest world it wants; three weeks of spinning and the world is Tholian territory. Hail it or fight it off.
 import { distance } from "./hex.js";
 import { ENEMIES, KINDS } from "./data.js";
-import { rand, pick, findPath, spawnEnemy, harmWorld, log, sendHome, markCommand, closestOutpost, sysAt, cloakContact, livePosts, postAt, harmPost } from "./game.js";
+import { rand, pick, findPath, spawnEnemy, harmWorld, log, sendHome, markCommand, closestOutpost, sysAt, cloakContact, livePosts, postAt, harmPost, annex, tholianSpace } from "./game.js";
 import { inZone } from "./sector.js";
 import { skirmish } from "./combat.js";
 
-const EVERY = { easy: { k: 9, o: 8, r: 15 }, normal: { k: 7, o: 6, r: 11 }, hard: { k: 5, o: 5, r: 8 } };
+const EVERY = { easy: { k: 9, o: 8, r: 15, t: 12 }, normal: { k: 7, o: 6, r: 11, t: 9 }, hard: { k: 5, o: 5, r: 8, t: 7 } };
 const count = (S, power, type) => Object.values(S.enemies).filter((e) => e.power === power && (!type || e.type === type) && !ENEMIES[e.type].base).length;
 const worlds = (S, kinds) => Object.values(S.systems).filter((s) => kinds.includes(s.kind));
 
@@ -49,6 +51,17 @@ export function aiTurn(S) {
       const tgt = pick(S, targets);
       const zone = Object.keys(S.hexes).filter(inZone).sort((a, b) => distance(a, tgt.at) - distance(b, tgt.at));
       spawnEnemy(S, "rbop", zone[0], { goal: "strike", target: tgt.at, hostile: true, cloaked: true, home: zone[0] });
+    }
+  }
+  // Tholians: a web-spinner goes out for the nearest world the Assembly wants.
+  const tout = worlds(S, ["tholian"]);
+  if (tout.length && S.turn >= 6 && S.turn % ev.t === 5 && !Object.values(S.enemies).some((e) => e.power === "tholian" && e.goal === "web")) {
+    const near = (s) => Math.min(...tout.map((t) => distance(t.at, s.at)));
+    const cand = worlds(S, ["independent", "empty", "anomaly", "ruins", "prewarp"]).filter((s) => s.id !== S.corvan && near(s) <= 6 && (s.kind !== "independent" || s.accord < 3)).sort((a, b) => near(a) - near(b));
+    if (cand.length) {
+      const tgt = cand[0], from = tout.sort((a, b) => distance(a.at, tgt.at) - distance(b.at, tgt.at))[0];
+      spawnEnemy(S, "tholian", from.at, { goal: "web", target: tgt.at, home: from.at });
+      log(S, `Intelligence: a Tholian vessel has left ${from.name}, bound for ${tgt.name}. The Assembly means to enclose it.`, "war");
     }
   }
   // Every ship moves and does its job.
@@ -101,6 +114,16 @@ export function aiTurn(S) {
         : e.power === "orion" ? `an Orion raider struck it, stole 3 supplies from the Federation's convoys, and ran for home` : `a ${E.name} raided it and turned for the border`);
       if (e.goal === "strike") { e.cloaked = false; e.seen = true; }
       sendHome(S, e, 0);
+    } else if (e.goal === "web" && s) {
+      // Three weeks of spinning, and the world is Tholian territory.
+      e.stay = (e.stay || 0) + 1;
+      if (e.stay === 1) log(S, `A Tholian vessel has begun spinning a web around ${s.name}: in two more weeks it will be closed, and ${s.name} will be Tholian territory. Hail it, or drive it off.`, "war");
+      if (e.stay >= 3) { annex(S, s); sendHome(S, e, 0); }
+    } else if (e.goal === "intercept") {
+      // A Tholian vessel sent to see the Pelion out of Tholian space.
+      if (!tholianSpace(S, S.pelion.at)) { log(S, "The Pelion has left Tholian space; the Tholian vessel turns for home.", "good"); sendHome(S, e, 0); continue; }
+      e.target = S.pelion.at;
+      if (e.at === S.pelion.at) { if (!e.hostile) log(S, "The Tholian vessel's deadline passes, exactly on the second. It powers its weapons.", "war"); e.hostile = true; }
     } else if (e.goal === "claim" || e.goal === "watch") {
       if (!S.orders.some((o) => o.at === e.at) || ++e.stay >= 8) { if (e.goal === "watch") e.cloaked = true; sendHome(S, e, 0); }
     }
@@ -130,4 +153,4 @@ function claim(S, s) {
   markCommand(S, 1, `${s.name} went over to the Klingon Empire.`);
 }
 export { claim };
-export const kindName = (s) => (s.kind === "claimed" ? "Klingon world" : s.kind === "member" ? "Federation member" : s.kind === "lost" ? "Evacuated colony" : KINDS[s.kind]?.name);
+export const kindName = (s) => (s.kind === "annexed" ? "Tholian territory" : s.kind === "claimed" ? "Klingon world" : s.kind === "member" ? "Federation member" : s.kind === "lost" ? "Evacuated colony" : KINDS[s.kind]?.name);

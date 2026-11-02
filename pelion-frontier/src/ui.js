@@ -3,8 +3,9 @@ import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
   speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, postsOf, postAt, missionChoices, chooseMission, openingScene, cloakChoices, chooseCloak, complicationChoices, chooseComplication, diggersName, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType,
-  POWER_SYSTEMS, STORES, storesOf, allocOf, setAlloc, reactorPower, powerFree, warpPower, marketAt, buyStore, requestTender, keepCommand, retire, campaignDef, defOf, dilithiumPenalty } from "./game.js";
+  tholianSpace, POWER_SYSTEMS, STORES, storesOf, allocOf, setAlloc, reactorPower, powerFree, warpPower, marketAt, buyStore, requestTender, keepCommand, retire, campaignDef, defOf, dilithiumPenalty } from "./game.js";
 import { storyOf, CAMPAIGN } from "./stories.js";
+import { FRONTIER } from "./campaigns.js";
 import { SHIP_SHAPES } from "./ships.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
 import { endTurn, canEndTurn, chooseEvent, dismissEvent, closeBattle } from "./turn.js";
@@ -118,8 +119,8 @@ function drawShip(ctx, kind, x, y, angle, scale, color, ring, dashed) {
 /** The same outline as a little SVG, for the battle window and anywhere else on the page. */
 const shipSVG = (kind, color, px = 44) => `<svg width="${px}" height="${px}" viewBox="-13.5 -13.5 27 27" style="vertical-align:middle"><path d="${SHIP_SHAPES[kind]}" fill="${color}" fill-opacity=".22" stroke="${color}" stroke-width=".7" stroke-linejoin="round"/></svg>`;
 function hexPath(ctx, cx, cy, r) { ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = (Math.PI / 180) * (60 * i - 30); i ? ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)) : ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); } ctx.closePath(); }
-const SYS_COLOR = { starbase: "#9fd0ff", colony: "#6fb4ff", member: "#6fb4ff", independent: "#c9c3e8", klingon: "#e0564a", claimed: "#e0564a", prewarp: "#9ad48a", anomaly: "#c9a8ff", ruins: "#ffd36b", empty: "#8e9ab4", orionBase: "#8e9ab4", lost: "#555b6e" };
-const shownKind = (s) => (S.seenSys[s.id] && (KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost"].includes(s.kind)) ? s.kind : null);
+const SYS_COLOR = { starbase: "#9fd0ff", colony: "#6fb4ff", member: "#6fb4ff", independent: "#c9c3e8", klingon: "#e0564a", claimed: "#e0564a", tholian: "#ff8fb8", annexed: "#ff8fb8", prewarp: "#9ad48a", anomaly: "#c9a8ff", ruins: "#ffd36b", empty: "#8e9ab4", orionBase: "#8e9ab4", lost: "#555b6e" };
+const shownKind = (s) => (S.seenSys[s.id] && (KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost", "annexed"].includes(s.kind)) ? s.kind : null);
 let stars = null;
 function draw() {
   const c = $("map"); if (!c || !S) return;
@@ -136,6 +137,7 @@ function draw() {
   for (const [k, h] of Object.entries(S.hexes)) {
     const { x, y } = toPixel(k, size); hexPath(ctx, x, y, size - 0.6);
     ctx.fillStyle = h.terrain === "zone" ? "rgba(120,30,45,.4)" : h.terrain === "nebula" ? "rgba(130,80,170,.34)" : "rgba(28,34,58,.38)"; ctx.fill();
+    if (h.terrain !== "zone" && tholianSpace(S, k)) { ctx.fillStyle = "rgba(255,143,184,.13)"; ctx.fill(); }   // Tholian space
     if (R[k] !== undefined && k !== u.at) { ctx.fillStyle = "rgba(242,193,78,.12)"; ctx.fill(); }
     if (!S.visible[k]) { ctx.fillStyle = "rgba(0,0,0,.32)"; ctx.fill(); }
     ctx.strokeStyle = h.terrain === "zone" ? "rgba(224,86,74,.35)" : "rgba(140,150,200,.14)"; ctx.lineWidth = 1; ctx.stroke();
@@ -672,7 +674,7 @@ function pastCampaigns() {
 }
 /** The Mission tab: how each order under way is progressing, step by step, with its clock and what counts as success. */
 function missionHTML() {
-  let h = hint() + `<h2>Mission</h2>` + campaignHTML();
+  let h = hint() + `<h2>Mission</h2>` + `<details class="card small"><summary><b>${esc(FRONTIER.title)}</b>: extend the Federation, against the Klingons, the Romulans and the Tholians</summary><p>${esc(FRONTIER.text)}</p></details>` + campaignHTML();
   const A = S.arc;
   if (awayActive()) h += `<div class="card small">The away team's work on Corvan II (who's down, the clues, its log) is on the <button class="btn small" data-tab-go="away">Away team</button> tab.</div>`;
   if (!S.orders.length) h += `<p class="muted">No orders under way.${(S.backlog || []).length ? ` ${(S.backlog || []).length} waiting in the backlog (the Orders tab).` : ""}</p>`;
@@ -716,16 +718,29 @@ function missionHTML() {
 // ---------- Sector ----------
 function sectorHTML() {
   const sc = score(S);
-  let h = `<h2>The Corvan Sector</h2><p class="small muted">${turnText()}. Score so far: <b class="gold">${sc.total}</b>.</p>`;
+  let h = `<h2>The Corvan Sector</h2><p class="small muted">${turnText()}. Score so far: <b class="gold">${sc.total}</b>.</p>` + raceHTML();
   h += `<table class="tbl"><tr><th>World</th><th>What</th><th>Status</th></tr>`;
-  const order = { member: 0, colony: 1, starbase: 2, independent: 3, claimed: 4, klingon: 5, lost: 6 };
+  const order = { member: 0, colony: 1, starbase: 2, independent: 3, claimed: 4, klingon: 5, annexed: 6, tholian: 7, lost: 8 };
   for (const s of Object.values(S.systems).filter((x) => shownKind(x) && order[shownKind(x)] !== undefined).sort((a, b) => order[a.kind] - order[b.kind])) {
     const st = s.kind === "independent" ? `accord ${s.accord > 0 ? "+" : ""}${s.accord}` : s.harm ? `<span class="bad">harm ${s.harm}/3</span>` : "";
     h += `<tr data-hex="${s.at}"><td>${esc(s.name)}</td><td>${esc(kindName(s))}</td><td>${st}${s.harm && s.kind === "independent" ? `, <span class="bad">harm ${s.harm}</span>` : ""}</td></tr>`;
   }
   h += `</table><h3>Score</h3><table class="tbl">${sc.parts.filter((p) => p[1]).map(([n, v]) => `<tr><td>${esc(n)}</td><td style="text-align:right">${v}</td></tr>`).join("")}</table>`;
-  h += `<h3>The powers</h3><p class="small muted"><b style="color:${POWERS.klingon.color}">Klingon Empire:</b> a cold war. Its ships court independent worlds; raiders strike when tension runs high. Firing first on a Klingon ship that hasn't fired is an incident. <b style="color:${POWERS.orion.color}">Orion Syndicate:</b> raiders from a hidden base; a sensor sweep near it hears where. <b style="color:${POWERS.romulan.color}">Romulans:</b> cloaked ships cross the Neutral Zone to strike; sweeps reveal them.</p>`;
+  h += `<h3>The powers</h3><p class="small muted"><b style="color:${POWERS.klingon.color}">Klingon Empire:</b> a cold war. Its ships court independent worlds; raiders strike when tension runs high. Firing first on a Klingon ship that hasn't fired is an incident. <b style="color:${POWERS.orion.color}">Orion Syndicate:</b> raiders from a hidden base; a sensor sweep near it hears where. <b style="color:${POWERS.romulan.color}">Romulans:</b> cloaked ships cross the Neutral Zone to strike; sweeps reveal them. <b style="color:${POWERS.tholian.color}">Tholian Assembly:</b> draws its own borders in the southeast (shaded on the map), and every few weeks sends a vessel to spin a web around the nearest world it wants: three weeks of spinning and it's Tholian territory. Hail it or drive it off. Enter Tholian space without orders and a Tholian vessel comes to see you out; stay, and it fires. In battle its web closes after three exchanges: no breaking away.</p>`;
   return h;
+}
+/** The race for the sector: what each power holds now. */
+function raceHTML() {
+  const sys = Object.values(S.systems), n = (kinds) => sys.filter((s) => kinds.includes(s.kind)).length;
+  const posts = Object.values(postsOf(S)), lostPosts = posts.filter((p) => p.lost).length;
+  const rows = [
+    ["federation", "The Federation", n(["starbase", "colony", "member"]), `${n(["colony"])} colonies (${S.founded || 0} founded this command), ${n(["member"])} member worlds; ${posts.length - lostPosts} of ${posts.length} listening posts`],
+    ["klingon", "The Klingon Empire", n(["klingon", "claimed"]), `${n(["klingon"])} outposts, ${n(["claimed"])} worlds won from the independents; tension ${S.tension}/10`],
+    ["romulan", "The Romulan Star Empire", lostPosts, `behind the Neutral Zone; ${lostPosts} listening post${lostPosts === 1 ? "" : "s"} destroyed`],
+    ["tholian", "The Tholian Assembly", n(["tholian", "annexed"]), `${n(["tholian"])} outposts, ${n(["annexed"])} worlds enclosed in webs`],
+    ["independent", "Still to be decided", n(["independent"]), `independent worlds; ${sys.filter((s) => s.kind === "empty" && s.surveyed && s.habitable).length} habitable worlds charted and unclaimed`],
+  ];
+  return `<h3>${esc(FRONTIER.title)}: the race for the sector</h3><table class="tbl">${rows.map(([p, name, k, what]) => `<tr><td><b style="color:${POWERS[p] ? POWERS[p].color : "var(--ink)"}">${esc(name)}</b></td><td style="text-align:right">${k}</td><td class="small muted">${esc(what)}</td></tr>`).join("")}</table>`;
 }
 let logFilter = "all";
 function logHTML() {
@@ -809,13 +824,14 @@ function modal(html) { $("modal-body").innerHTML = html; $("modal").hidden = fal
 function closeModal() { $("modal").hidden = true; }
 function showStarter(canContinue) {
   modal(`<h1>USS Pelion: Frontier</h1>
-  <p class="lede">Stardate 5212.4. The Pelion, a Heavy Cruiser under your command, is assigned to the Corvan Sector for fifty weeks: a frontier between the Federation, the Klingon Empire and the Romulan Neutral Zone, full of worlds that haven't chosen a side and things no one has explained.</p>
+  <p class="lede">Stardate 5212.4. The Corvan Sector is the last open frontier on this edge of the Federation, and three powers want it closed: the Klingon Empire to the east, the Romulan Star Empire behind the Neutral Zone to the north, and the Tholian Assembly to the southeast. The Pelion, a Heavy Cruiser under your command, has one order above all the others: extend the Federation, before the frontier closes.</p>
   <div class="grid2">
     <div class="brief"><h3>The ship</h3><p>Double-click a hex to fly there. A hex is a light-year and a turn a week; speed is v = W³ × c, so warp 6, the Pelion's maximum stable speed, covers about 4 light-years a week, and warp 8, its emergency maximum, about 10, at a risk to the engines. Urgent orders call for emergency warp. Nebulae count double. Then the crew goes to work where you are: every officer acts once a turn (survey, investigate, negotiate, sweep, repair), each job once. Starbase 23 repairs, rearms and refits you.</p></div>
     <div class="brief"><h3>The crew</h3><p>The six officers from the Players' Guide do the work. Every action is the tabletop roll: 3d6 at or under their skill. Pick who does it, and whether a second officer assists (+1, using their turn); a Duty point rerolls a failure.</p></div>
     <div class="brief"><h3>The campaigns</h3><p>The tour is one long story, and it begins with your first orders, The Silence at Corvan II. What you find there sets the course of everything after it. When that campaign is over, Starfleet's attention turns: a new campaign begins, with new kinds of orders of its own.</p></div>
     <div class="brief"><h3>Power and stores</h3><p>The warp core's Power is shared out every week, as in battle: the engines take what the warp factor needs, and the rest goes to shields, sensors, the labs and operations. The warp drive eats antimatter by the light-year and wears out its dilithium; repairs use spare parts. Refuel at the starbase, buy at colonies and friendly worlds, mine seams, salvage, recrystallize.</p></div>
     <div class="brief"><h3>Orders</h3><p>Starfleet sends missions, each with a deadline, a twist, its own story, and a reason tied to the campaign. Each ends with a decision that's yours to make.</p></div>
+    <div class="brief"><h3>The frontier</h3><p>Extend the Federation: survey the uncharted systems, plant colonies on habitable worlds (Found a colony), and bring independent worlds in. The Klingons court the same worlds; the Romulans strike from behind the Neutral Zone; the Tholians enclose worlds in webs, and see intruders out of their space. The Sector tab keeps the count.</p></div>
     <div class="brief"><h3>The worlds</h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.</p></div>
     <div class="brief"><h3>Battles</h3><p>Ship combat from the Players' Guide: split the Power between shields (reinforce them with a second point), phasers (overload them with a second), torpedoes and the engines (evasion), give the captain's order, and break away if it goes wrong.</p></div>
     <div class="brief"><h3>Starfleet Command</h3><p>Five boxes and you're relieved of command: failed orders, the Prime Directive, incidents and lost colonies mark it. Three orders carried out in a row clear a box. Survive the tour and earn your rating.</p></div>

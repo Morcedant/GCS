@@ -22,6 +22,11 @@ export function startBattle(S, enemyId, initiator) {
     markCommand(S, 1, "the Pelion fired first on a Klingon ship. A diplomatic incident.");
     S.tension = Math.min(10, S.tension + 2); e.hostile = true;
   }
+  if (initiator === "pelion" && e.power === "tholian" && !e.hostile && !(e.goal === "web")) {
+    markCommand(S, 1, "the Pelion fired first on a Tholian vessel that had done nothing but ask it to leave. An incident.");
+    e.hostile = true;
+  }
+  if (e.power === "tholian") e.hostile = true;
   const seenIt = e.cloaked && S.pelion.refits.inverter;   // the cloak inverter sees a cloaked ship coming
   const ambush = initiator === "enemy" && E.ambush && e.cloaked && !seenIt;
   if (seenIt && initiator === "enemy" && E.ambush) log(S, `The cloak inverter sees the ${E.name} coming before it decloaks: no ambush.`, "good");
@@ -108,7 +113,8 @@ export function exchange(S, choice = {}) {
   }
   const md = st.maneuver - (E.maneuver || 0);
   // Breaking away: a Helm contest instead of firing.
-  if (choice.breakOff) {
+  if (choice.breakOff && B.web >= 3) L.push("Break away: the web holds the Pelion fast.");
+  else if (choice.breakOff) {
     const r = check(S, st.helm + spare + evade + Math.max(0, md)), them = E.base ? { success: false, margin: -99, total: "-", target: "-" } : check(S, E.helm + Math.max(0, -md));
     if (r.success && (!them.success || r.margin > them.margin)) { L.push(`Break away (Helm ${R(r)} against theirs, ${R(them)}): the Pelion goes to warp.`); e.cooldown = 2; B.over = "escaped"; return finish(S, L); }
     L.push(`Break away (Helm ${R(r)} against theirs, ${R(them)}): they stay on you.`);
@@ -135,7 +141,9 @@ export function exchange(S, choice = {}) {
   }
   if (e.hull >= E.hull) { B.over = "destroyed"; return finish(S, L); }
   // Do they run?
-  const runs = (e.type === "orion" && e.shields >= E.shields) || (e.type === "kbop" && e.hull >= 2) || (e.type === "kbc" && e.hull >= 3);
+  // A Tholian vessel spins as it fights: after three exchanges its web closes around the Pelion, and there's no breaking away.
+  if (E.web) { B.web = (B.web || 0) + 1; if (B.web === 3) L.push("The Tholian vessel's web closes around the Pelion: there's no breaking away now."); }
+  const runs = (e.type === "tholian" && e.hull >= 1) || (e.type === "orion" && e.shields >= E.shields) || (e.type === "kbop" && e.hull >= 2) || (e.type === "kbc" && e.hull >= 3);
   if (runs) {
     const r = check(S, E.helm + Math.max(0, -md) + (E.fast ? 2 : 0)), us = check(S, st.helm + Math.max(0, md));
     if (r.success && (!us.success || r.margin > us.margin)) { L.push(`The ${E.name} breaks off and runs (${R(r)} against your Helm, ${R(us)}).`); sendHome(S, e, 5); e.cooldown = 2; B.over = "fled"; return finish(S, L); }
@@ -148,7 +156,7 @@ export function exchange(S, choice = {}) {
   const gun = E.gunner + (B.ambush && B.ex === 1 && !B.standby ? 2 : 0);
   const volley = (label, dmg, evadable) => {
     const r = check(S, gun + (label === "torpedo" ? 1 : 0));
-    const name = { kbc: "Disruptors", kbop: "Disruptors", rbop: "Plasma torpedo", orion: "Disruptors", orionBase: "The base's guns" }[e.type];
+    const name = { kbc: "Disruptors", kbop: "Disruptors", rbop: "Plasma torpedo", orion: "Disruptors", orionBase: "The base's guns", tholian: "Energy beam" }[e.type];
     const what = label === "torpedo" ? "Photon torpedo" : name;
     if (!r.success) { L.push(`Their ${what.toLowerCase()} (${R(r)}): miss.`); return; }
     if (tgt) {
@@ -194,6 +202,7 @@ function finish(S, L) {
     delete S.enemies[e.id];
     if (e.type === "orionBase") { S.commendations += 6; S.supplies += 15; addStore(S, "spares", 4); addStore(S, "dilithium", 3); addStore(S, "antimatter", 6); S.orionBaseDown = true; log(S, "The Orion pirate base is destroyed. The raids on the sector will stop. Salvage: +15 supplies, +4 spares, +3 dilithium, +6 antimatter.", "victory"); }
     else if (e.power === "orion") { S.commendations += 2; S.supplies += 6; addStore(S, "spares", 2); addStore(S, "dilithium", 1); log(S, `The Pelion destroys an Orion raider. Salvage: +6 supplies, +2 spares, +1 dilithium.`, "good"); }
+    else if (e.power === "tholian") { S.commendations += 1; addStore(S, "spares", 1); log(S, "The Tholian vessel shatters like glass. The Assembly will note the time.", "war"); }
     else if (e.power === "romulan") { S.commendations += 3; addStore(S, "spares", 1); log(S, "The Romulan bird-of-prey is destroyed. Salvage: +1 spares.", "good"); }
     else { S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
   } else if (B.over === "lost") log(S, "The Pelion's hull is breaking up.", "bad");

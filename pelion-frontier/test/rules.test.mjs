@@ -509,3 +509,48 @@ test("battle power: split as numbers, reinforced shields and overloaded phasers"
   assert.ok(Array.isArray(L) && L.length);
   assert.ok(S.battle.log.some((l) => /Overloaded phasers|Phasers|evade/.test(l)) || S.battle.over);
 });
+
+test("the Tholian Assembly: outposts in the southeast, webs that annex worlds, and a vessel to see the Pelion out", async () => {
+  const { tholianSpace, annex, releaseWebs } = await import("../src/game.js");
+  const { aiTurn } = await import("../src/ai.js");
+  const S = newGame({ seed: "tholian" });
+  const out = Object.values(S.systems).filter((s) => s.kind === "tholian");
+  assert.equal(out.length, 2);
+  assert.ok(tholianSpace(S, out[0].at));
+  // A web-spinner goes out, spins for three weeks, and the world is Tholian territory.
+  S.turn = 14; aiTurn(S);   // 14 % 9 === 5 on normal
+  const e = Object.values(S.enemies).find((x) => x.power === "tholian" && x.goal === "web");
+  assert.ok(e, "a web-spinner goes out");
+  const tgt = Object.values(S.systems).find((s) => s.at === e.target);
+  e.at = tgt.at; for (let i = 0; i < 3; i++) { S.turn++; aiTurn(S); }
+  assert.equal(tgt.kind, "annexed");
+  assert.equal(releaseWebs(S, "all"), 1); assert.notEqual(tgt.kind, "annexed");
+  // Entering Tholian space without orders: a vessel comes.
+  const near = Object.keys(S.hexes).find((k) => tholianSpace(S, k) && !S.sysAt[k]);
+  S.pelion.at = near; S.pelion.days = 7; S.pelion.warp = 6; S.pelion.mp = 9;
+  const n0 = Object.values(S.enemies).filter((x) => x.goal === "intercept").length;
+  const step = Object.keys(S.hexes).find((k) => tholianSpace(S, k) && k !== near && Math.abs(Number(k.split(",")[0]) - Number(near.split(",")[0])) + Math.abs(Number(k.split(",")[1]) - Number(near.split(",")[1])) <= 1);
+  if (step) { moveTo(S, "pelion", step); assert.equal(Object.values(S.enemies).filter((x) => x.goal === "intercept").length, n0 + 1); }
+  annex(S, Object.values(S.systems).find((s) => s.kind === "independent"));
+  assert.equal(S.lostTholian, 1); assert.equal(S.command, 1);   // an independent world lost to the webs marks a box
+});
+test("Found a colony: a habitable world, surveyed, becomes a Federation colony", () => {
+  const S = newGame({ seed: "colony" });
+  const w = Object.values(S.systems).find((s) => s.kind === "empty" && s.habitable);
+  assert.ok(w);
+  S.pelion.at = w.at; S.pelion.docked = false; w.surveyed = true; S.supplies = 50;
+  const a = actionsFor(S).find((x) => x.id === "colonize"); assert.ok(a && !a.why);
+  for (let i = 0; i < 20 && w.kind === "empty"; i++) {
+    S.tried = {}; for (const id in S.crew) S.crew[id].acted = false; S.supplies = 50;
+    const r = attempt(S, "pelion", "colonize"); if (S.pending) resolve(S, false);
+    assert.ok(!r.error, r.error);
+  }
+  assert.equal(w.kind, "colony"); assert.equal(S.founded, 1);
+});
+test("the campaigns follow the frontier's rivals: Klingon, then Romulan, then Tholian", async () => {
+  const { SERIES } = await import("../src/campaigns.js");
+  assert.deepEqual(SERIES.map((c) => c.id), ["coldfire", "web"]);
+  const { STORIES } = await import("../src/stories.js");
+  for (const c of SERIES) assert.ok(STORIES[c.finale] && STORIES[c.finale].complication, c.finale);
+  assert.equal(STORIES["The Shipyard at the Edge"], undefined);
+});

@@ -1,6 +1,7 @@
 // The Corvan Sector: a hex map with the Federation's starbase and colonies to the southwest, two Klingon outposts on
 // the eastern border, the Romulan Neutral Zone along the top, and between them independent worlds, pre-warp peoples,
-// anomalies, ruins and empty systems (one of which hides an Orion pirate base).
+// anomalies, ruins and empty systems (one of which hides an Orion pirate base), and the Tholian Assembly's outposts in
+// the southeast, behind a border the Tholians draw for themselves.
 import { makeRng, hexagon, key, parse, distance, toPixel } from "./hex.js";
 import { NAMES } from "./data.js";
 
@@ -58,6 +59,13 @@ export function makeSector(seed) {
   const neb = open.filter((k) => hexes[k].terrain === "nebula" && free(k) && distance(k, sb) >= 7);
   place(neb.length ? R.pick(neb) : pickWhere((k) => distance(k, sb) >= 8), "orionBase", { baseHull: 0, baseShields: 0 });
   for (let i = 0; i < 9; i++) place(pickWhere(() => true), "empty");
+  // The Tholian Assembly: two outposts on the southeastern rim.
+  // The free hexes furthest to the southeast (east of south), at least three apart.
+  for (let i = 0; i < 2; i++) {
+    const se = open.filter((k) => free(k, 1) && P(k).x > 0 && P(k).y > 0).sort((a, b) => (P(b).x + 1.3 * P(b).y) - (P(a).x + 1.3 * P(a).y));
+    const k = se.find((x) => used.filter((u) => systems[sysAt[u]].kind === "tholian").every((u) => distance(u, x) >= 3)) || se[0];
+    if (k) place(k, "tholian", { surveyed: true });
+  }
   // Starfleet's charts: the core's worlds are known; the rest is "uncharted" until surveyed.
   return { hexes, systems, sysAt, starbase: systems[sysAt[sb]].id, corvan: systems[sysAt[cv]].id };
 }

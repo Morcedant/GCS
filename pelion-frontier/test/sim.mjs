@@ -26,7 +26,7 @@ function play(seed) {
     // Act here if worth it.
     if (!S.pelion.acted) {
       const acts = actionsFor(S).filter((a) => !a.why);
-      const pref = ["arc", "mission", "engage", ...(storesOf(S).dilithium <= 6 ? ["mine", "recrystallize"] : []), "investigate", "envoy", "aid", "survey", "observe", "repair", "mine"];
+      const pref = ["arc", "mission", "engage", ...(storesOf(S).dilithium <= 6 ? ["mine", "recrystallize"] : []), "colonize", "investigate", "envoy", "aid", "survey", "observe", "repair", "mine"];
       const a = pref.map((id) => acts.find((x) => x.id === id && !(x.id === "engage" && S.enemies[x.enemy]?.power === "klingon" && !S.enemies[x.enemy]?.hostile))).find(Boolean);
       if (a) { const r = attempt(S, "pelion", a.id, { order: a.order, enemy: a.enemy, arc: a.arc }); if (!r.error) continue; }
     }
@@ -46,7 +46,7 @@ function play(seed) {
     endTurn(S);
   }
   const sc = score(S);
-  return { seed, turn: S.turn, campaigns: (S.campaignsDone || []).map((c) => c.id + ":" + c.over).concat([(S.campaign.id || "watchers") + ":" + (S.campaign.over || (S.campaign.finale ? "finale" : S.campaign.threads.length))]).join(" "), stores: Object.values(S.pelion.stores).join("/"), over: S.over?.why.slice(0, 60), score: sc.total, joined: S.joined, records: S.records.length, done: S.done, failed: S.failed, command: S.command, lost: S.lostColonies, klingon: S.lostWorlds, arc: S.arc.stage, arcEnd: (S.log.find((l) => /Silence at Corvan II:|Breaking orbit|Too late/.test(l.text)) || {}).text?.slice(0, 50), countdown: S.arc.countdown, hull: S.pelion.hull, korvath: (S.campaign || {}).korvath, posts: Object.values(S.posts || {}).map((p) => p.lost ? "X" : p.harm).join(""), tension: S.tension, threads: (S.campaign || {}).threads?.length, gate: (S.campaign || {}).over || ((S.campaign || {}).finale ? "open" : "-"), parts: score(S).parts.filter((p) => p[1]).map((p) => p[0].slice(0, 14) + ":" + p[1]).join(" ") };
+  return { seed, turn: S.turn, campaigns: (S.campaignsDone || []).map((c) => c.id + ":" + c.over).concat([(S.campaign.id || "watchers") + ":" + (S.campaign.over || (S.campaign.finale ? "finale" : S.campaign.threads.length))]).join(" "), stores: Object.values(S.pelion.stores).join("/"), founded: S.founded || 0, annexed: S.annexed || 0, lostTholian: S.lostTholian || 0, over: S.over?.why.slice(0, 60), score: sc.total, joined: S.joined, records: S.records.length, done: S.done, failed: S.failed, command: S.command, lost: S.lostColonies, klingon: S.lostWorlds, arc: S.arc.stage, arcEnd: (S.log.find((l) => /Silence at Corvan II:|Breaking orbit|Too late/.test(l.text)) || {}).text?.slice(0, 50), countdown: S.arc.countdown, hull: S.pelion.hull, korvath: (S.campaign || {}).korvath, posts: Object.values(S.posts || {}).map((p) => p.lost ? "X" : p.harm).join(""), tension: S.tension, threads: (S.campaign || {}).threads?.length, gate: (S.campaign || {}).over || ((S.campaign || {}).finale ? "open" : "-"), parts: score(S).parts.filter((p) => p[1]).map((p) => p[0].slice(0, 14) + ":" + p[1]).join(" ") };
 }
 const [seed0 = "1", n = "5"] = process.argv.slice(2);
 for (let i = 0; i < +n; i++) console.log(JSON.stringify(play(seed0 + "-" + i)));

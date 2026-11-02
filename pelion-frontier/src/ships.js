@@ -14,9 +14,11 @@ export const SHIP_SHAPES = {
   rbop: "M11 0 L6.5 -2.6 Q1 -6 -6 -5 Q-9 -2.5 -9 0 Q-9 2.5 -6 5 Q1 6 6.5 2.6 Z M3 -6.4 L-11.5 -8.4 L-11.5 -6.6 L1 -4.8 M3 6.4 L-11.5 8.4 L-11.5 6.6 L1 4.8 M-2 -3 Q-4.5 0 -2 3 M-2 0 L4 0",
   // An Orion raider: a lean arrowhead with swept fins, built for speed.
   orion: "M12 0 L1 -2.4 L-5 -8.5 L-7 -8.5 L-4.5 -2.6 L-10.5 -1.2 L-10.5 1.2 L-4.5 2.6 L-7 8.5 L-5 8.5 L1 2.4 Z M3 -1 L-3 -1 M3 1 L-3 1",
+  // A Tholian vessel: a narrow crystalline wedge, its spine running to a point.
+  tholian: "M12 0 L-9 -6.5 L-6.5 0 L-9 6.5 Z M12 0 L-6.5 0 M3 -3.4 L-1 0 L3 3.4 M-9 -6.5 L-11.5 -8 M-9 6.5 L-11.5 8",
   // An Orion pirate base: a ring station on spokes.
   // A Federation listening post: a small station with a sensor dish, watching the Neutral Zone.
   post: "M-7 -2.2 L7 -2.2 L7 2.2 L-7 2.2 Z M-2.2 -6 L2.2 -6 L2.2 6 L-2.2 6 Z M-9.5 -3.5 L-7 -2.2 L-7 2.2 L-9.5 3.5 Z M9.5 -3.5 L7 -2.2 L7 2.2 L9.5 3.5 Z M0 -6 L0 -8.5 M-4 -9.5 Q0 -12.5 4 -9.5 Z",
   orionBase: "M10 0 A10 10 0 1 1 -10 0 A10 10 0 1 1 10 0 Z M7 0 A7 7 0 1 1 -7 0 A7 7 0 1 1 7 0 Z M3 0 A3 3 0 1 1 -3 0 A3 3 0 1 1 3 0 Z M3 0 L7 0 M-3 0 L-7 0 M0 3 L0 7 M0 -3 L0 -7",
 };
-export const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", science: "Science vessel", kbc: "Klingon battle cruiser", kbop: "Klingon bird-of-prey", rbop: "Romulan bird-of-prey", orion: "Orion raider", orionBase: "Orion pirate base", post: "Federation listening post" };
+export const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", science: "Science vessel", kbc: "Klingon battle cruiser", kbop: "Klingon bird-of-prey", rbop: "Romulan bird-of-prey", orion: "Orion raider", tholian: "Tholian vessel", orionBase: "Orion pirate base", post: "Federation listening post" };

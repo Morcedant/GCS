@@ -39,6 +39,8 @@ export function newGame({ seed, difficulty = "normal", captain = "", mode = "tou
   };
   for (const s of Object.values(S.systems)) if (KINDS[s.kind].known) S.seenSys[s.id] = true;
   // Dilithium deposits: about a third of the uncharted and anomalous systems have crystal seams, found by a survey.
+  // Habitable worlds: about half the uncharted systems have one, where the Federation could plant a colony.
+  for (const s of Object.values(S.systems)) if (s.kind === "empty" && hashString(S.seed + ":hab:" + s.id) % 2 === 0) s.habitable = true;
   for (const s of Object.values(S.systems)) if (["empty", "anomaly", "orionBase"].includes(s.kind) && hashString(S.seed + ":dil:" + s.id) % 3 === 0) s.dilithium = 3 + (hashString(S.seed + ":dn:" + s.id) % 4);
   S.seenSys[S.corvan] = true; S.systems[S.corvan].surveyed = true;
   // The first orders: The Silence at Corvan II. An Orion raider is already in orbit there.
@@ -182,6 +184,8 @@ export function warpText(w) {
 /** Orders that call for maximum warp. */
 export const isUrgent = (o) => !!(o && (o.urgent || (o.twist && o.twist.fx === "urgent")));
 /** Ly a week the Pelion makes at its current warp (what "speed" means now). */
+/** What a new colony costs in supplies: colonists, shelters, and a year's seed and power cells. */
+export const COLONY_COST = 30;
 // ---------- the ship's power ----------
 // The warp core makes Power (5, more with refits and records, less with damage or failing dilithium), and every week it is
 // shared out, as in battle: the engines take what the warp factor needs (1 up to warp 4, 2 up to warp 6, 3 for warp 7 and
@@ -288,6 +292,40 @@ export function consumeStores(S) {
   balancePower(S);
 }
 
+// ---------- the Tholian Assembly ----------
+// The Tholians draw their own borders: two light-years around each of their outposts, and a light-year around every
+// world they've enclosed in a web. Inside it, they expect the Pelion to leave, and send a ship to see that it does.
+export function tholianSpace(S, hex) {
+  for (const s of Object.values(S.systems)) {
+    if (s.kind === "tholian" && distance(s.at, hex) <= 2) return true;
+    if (s.kind === "annexed" && distance(s.at, hex) <= 1) return true;
+  }
+  return false;
+}
+/** A world enclosed in a Tholian web becomes Tholian territory. */
+export function annex(S, s, why = "") {
+  if (!s || ["tholian", "annexed", "starbase"].includes(s.kind)) return;
+  const was = s.kind; s.was = was; s.kind = "annexed"; s.harm = 0; S.seenSys[s.id] = true;
+  S.annexed = (S.annexed || 0) + 1;
+  if (was === "independent" || was === "colony" || was === "member") { S.lostTholian = (S.lostTholian || 0) + 1; markCommand(S, 1, `${s.name} was enclosed in a Tholian web${why ? `: ${why}` : ""}.`); }
+  log(S, `The web around ${s.name} closes. The Tholian Assembly declares it Tholian territory${was === "colony" ? ", and gives the colonists a day to leave" : ""}.`, "war");
+}
+/** Worlds the Tholians have enclosed, set free again (the nearest the Federation first). */
+export function releaseWebs(S, n) {
+  const sb = S.systems[S.starbase], list = Object.values(S.systems).filter((s) => s.kind === "annexed").sort((a, b) => distance(a.at, sb.at) - distance(b.at, sb.at));
+  const k = n === "all" ? list.length : n === "half" ? Math.ceil(list.length / 2) : n;
+  for (const s of list.slice(0, k)) { s.kind = s.was === "colony" || s.was === "member" ? s.was : s.was || "empty"; if (s.kind === "independent") s.accord = Math.max(1, s.accord || 0); log(S, `${s.name} is free of the Tholian web.`, "good"); }
+  return Math.min(k, list.length);
+}
+/** The Assembly answers: Tholian vessels make for a Federation world. */
+export function tholianReprisal(S, why) {
+  const out = Object.values(S.systems).filter((s) => s.kind === "tholian"), targets = Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member");
+  if (!out.length || !targets.length) return;
+  const from = pick(S, out), tgt = targets.sort((a, b) => distance(a.at, from.at) - distance(b.at, from.at))[0];
+  spawnEnemy(S, "tholian", from.at, { goal: "raid", target: tgt.at, hostile: true, home: from.at });
+  log(S, `Intelligence: after ${why}, a Tholian vessel has left ${from.name} for ${tgt.name}, precisely on the hour.`, "war");
+}
+
 // ---------- the listening posts on the Neutral Zone ----------
 // Three Federation listening posts watch the Romulan Neutral Zone from the row of hexes just outside it. When the Romulans
 // strike, it's at them: a bird-of-prey crosses, decloaks, fires and goes home. Three hits and a post is lost.
@@ -385,7 +423,7 @@ export function findPath(S, from, to, who = "pelion") {
     if (k === to) break;
     for (const n of neighbors(k)) {
       if (!S.hexes[n]) continue;
-      if (who === "klingon" || who === "orion") { if (inZone(n)) continue; }
+      if (who === "klingon" || who === "orion" || who === "tholian") { if (inZone(n)) continue; }
       const c = dist[k] + moveCost(S, n, who);
       if (dist[n] === undefined || c < dist[n]) { dist[n] = c; prev[n] = k; if (!open.includes(n)) open.push(n); }
     }
@@ -425,6 +463,12 @@ export function moveTo(S, unit, hex) {
   if (unit === "pelion") for (const o of S.orders) arriveAt(S, o);
   if (unit === "pelion") {
     S.pelion.docked = false;
+    if (tholianSpace(S, hex) && !orderHere(S, hex) && S.pelion.tholianWarned !== S.turn && !Object.values(S.enemies).some((e) => e.power === "tholian" && e.goal === "intercept")) {
+      S.pelion.tholianWarned = S.turn;
+      const out = Object.values(S.systems).filter((s) => s.kind === "tholian").sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0];
+      if (out) spawnEnemy(S, "tholian", out.at, { goal: "intercept", target: hex, home: out.at });
+      log(S, `The Pelion has crossed into space the Tholian Assembly calls its own. A message arrives, exact to the second: withdraw, or be removed. A Tholian vessel is on its way.`, "war");
+    }
     if (p && p.path.some(inZone) && !S.pelion.zoneMarked && !orderHere(S, hex, "border")) {
       S.pelion.zoneMarked = true; markCommand(S, 1, "The Pelion crossed into the Romulan Neutral Zone.");
     }
@@ -437,7 +481,7 @@ function arrive(S, hex) {
   const s = sysAt(S, hex);
   if (s) {
     const known = KINDS[s.kind]?.known || s.surveyed || ["member", "claimed", "lost"].includes(s.kind);
-    const what = { member: "a Federation member world", claimed: "a world of the Klingon Empire", lost: "an evacuated colony", independent: `an independent world (accord ${signedAccord(s.accord)})` }[s.kind] || (known ? "a " + KINDS[s.kind].name.toLowerCase() : "an uncharted system");
+    const what = { member: "a Federation member world", claimed: "a world of the Klingon Empire", annexed: "Tholian territory, enclosed in a web", tholian: "an outpost of the Tholian Assembly", lost: "an evacuated colony", independent: `an independent world (accord ${signedAccord(s.accord)})` }[s.kind] || (known ? "a " + KINDS[s.kind].name.toLowerCase() : "an uncharted system");
     const there = Object.values(S.enemies).filter((e) => e.at === hex && !e.cloaked && !e.hidden && !ENEMIES[e.type].base).map((e) => (/^[AEIOU]/.test(ENEMIES[e.type].name) ? "an " : "a ") + ENEMIES[e.type].name);
     log(S, `The Pelion arrives at ${s.name}, ${what}${s.harm ? `, harmed ${s.harm}/3` : ""}.${there.length ? ` In orbit: ${there.join(", ")}.` : ""}`, "move");
   }
@@ -507,6 +551,7 @@ export function actionsFor(S, unit = "pelion") {
   if (s && s.harm > 0 && ["colony", "member", "independent"].includes(s.kind)) add("aid", { sys: s.id, blurb: `Harm ${s.harm}/3. Clear a box.`, oppose: aidOpposition(S, s) });
   const P = S.pelion;
   if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair", { oppose: repairOpposition(S), blurb: ACTIONS.repair.blurb + ` Uses a crate of spares (${storesOf(S).spares} left)${storesOf(S).spares ? "" : ": none left, −3"}.` });
+  if (s && s.kind === "empty" && s.surveyed && s.habitable) add("colonize", { sys: s.id, blurb: `${s.name} has a world people could live on. Plant a Federation colony: ${COLONY_COST} supplies of colonists and equipment from Starfleet (you have ${S.supplies}), paid on success. It sends supplies every week, and the Federation's border moves out to it.`, why: S.supplies < COLONY_COST ? `Needs ${COLONY_COST} supplies.` : null, oppose: { name: "the new world's hazards", skill: "Hostility", target: 10 + (enemiesAt(S, s.at).some((e) => e.hostile) ? 2 : 0), why: "Strange weather, strange microbes, and nobody has ever lived here before." } });
   if (s && s.surveyed && s.dilithium > 0 && s.kind !== "prewarp") add("mine", { sys: s.id, blurb: `A seam of about ${s.dilithium} crystal${s.dilithium === 1 ? "" : "s"} here. Cut 2 (3 on success by 5) for the Pelion's matrix (${storesOf(S).dilithium}/10). Lose by 3 or more and the seam bites back.`, oppose: { name: "the crystal seams", skill: "Instability", target: 10, why: "Living dilithium fractures if it's cut wrong, and sometimes the rock around it does too." } });
   if (storesOf(S).dilithium < STORES.dilithium.max && storesOf(S).spares > 0) add("recrystallize", { blurb: `Restore worn crystals with a field from the warp core: +1 dilithium (+2 on success by 5), for a crate of spares. Dilithium ${storesOf(S).dilithium}/10, spares ${storesOf(S).spares}.`, oppose: { name: "the fractured lattice", skill: "Fracture", target: 11, why: "A worn crystal's lattice has to be coaxed back, plane by plane." } });
   add("sweep", { blurb: `Listen for cloaked ships and raiders within ${sweepRange(S)} light-years: reveals them. Finds a hidden base here.${P.refits.inverter ? " The cloak inverter helps: +2." : ""}`, oppose: { name: "cloaks and subspace static", skill: "Concealment", target: 11, why: "Anything worth finding is trying not to be found, and the sector's background noise helps it." } });
@@ -670,6 +715,7 @@ function applyAction(S, p) {
     case "survey": {
       if (!r.success) return say(S, `${name} couldn't make sense of ${s.name}'s readings. Try again next turn.`);
       s.surveyed = true; S.seenSys[s.id] = true;
+      if (s.habitable && s.kind === "empty") log(S, `${s.name} has a habitable world: the Federation could plant a colony there (Found a colony, ${COLONY_COST} supplies).`, "discovery");
       if (s.dilithium) log(S, `${s.name} has a seam of living dilithium, about ${s.dilithium} crystals: the Pelion can mine it.`, "discovery");
       const sci = 4 + (big ? 3 : 0) + (p.unit !== "pelion" ? 2 : 0); S.science += sci;
       const what = { prewarp: "a pre-warp people. The Prime Directive applies.", anomaly: "an anomaly worth investigating.", ruins: "the ruins of a vanished civilization.", empty: "nothing but rock and starlight.", orionBase: "nothing but rock and starlight." }[s.kind] || "charted.";
@@ -709,6 +755,14 @@ function applyAction(S, p) {
       while (n > 0 && P.shields > 0) { P.shields--; n--; fixed.push("shields"); }
       if (n > 0 && P.hull > 0) { P.hull--; fixed.push("hull"); }
       return say(S, `Repairs: ${fixed.join(", ") || "nothing needed"}${usedSpare ? ` (a crate of spares used; ${storesOf(S).spares} left)` : ", improvised without spare parts"}.`, "good");
+    }
+    case "colonize": {
+      if (!r.success) {
+        if (r.margin <= -3) { S.supplies = Math.max(0, S.supplies - 8); return say(S, `The first landing on ${s.name} goes badly: a storm nobody predicted wrecks the prefabricated shelters. 8 supplies lost; the colonists wait in orbit.`, "bad"); }
+        return say(S, `The survey teams on ${s.name} aren't ready to bring colonists down yet.`);
+      }
+      S.supplies -= COLONY_COST; s.kind = "colony"; s.founded = S.turn; s.harm = 0; S.founded = (S.founded || 0) + 1; S.commendations += 3; delete s.habitable;
+      return say(S, `A new Federation colony on ${s.name}: the first two hundred colonists come down by shuttle and transporter, and by nightfall there are lights on the ground. The Federation's frontier has moved. +3 commendations.`, "victory");
     }
     case "mine": {
       if (!r.success) {
@@ -915,6 +969,7 @@ function startNextCampaign(S) {
   (S.campaignsDone = S.campaignsDone || []).push({ id: campId(C), title: campaignDef(S).title, over: C.over, threads: C.threads.length, rival: C.korvath || 0, threadList: C.threads, beatText: C.beatText, beats: C.beats });
   S.campaign = { id: next.id, threads: [], beats: [], finale: false, over: null, started: S.turn };
   (S.unlocked = S.unlocked || []).push(next.id);
+  if (!S.unlocked.includes("syndicate")) S.unlocked.push("syndicate");   // the frontier's other troubles: the Syndicate's work
   campaignBeat(S, 0);
   const types = SERIES_MISSIONS.filter((m) => m.campaign === next.id).map((m) => m.text);
   log(S, `A new campaign: ${next.title}. New kinds of orders from Starfleet: ${types.join("; ")}.`, "order");
@@ -936,7 +991,14 @@ function rivalTick(S, D) {
   const near = Object.values(S.systems).filter((s) => ["colony", "member", "independent"].includes(s.kind) && distance(s.at, S.pelion.at) >= 3);
   const w = near.length ? pick(S, near) : null;
   let cost = "";
-  if (R.fx === "dilithium") {
+  let place = site;
+  if (R.fx === "annex") {
+    const out = Object.values(S.systems).filter((s) => s.kind === "tholian");
+    const near = (s) => Math.min(...out.map((t) => distance(t.at, s.at)));
+    const cand = out.length ? Object.values(S.systems).filter((s) => ["independent", "empty", "anomaly", "ruins", "prewarp", "colony"].includes(s.kind) && s.id !== S.corvan && (s.kind !== "colony" || C.korvath >= 3)).sort((a, b) => near(a) - near(b)) : [];
+    const t = cand[0];
+    if (t) { place = t.name; annex(S, t, "the Assembly's line moved"); cost = `${t.name} is Tholian territory now. ${t.was === "colony" ? "Its colonists have a day to leave." : t.was === "independent" ? "Its people were never asked." : "Nobody lived there. That isn't the point."}`; }
+  } else if (R.fx === "dilithium") {
     if (w) harmWorld(S, w, 1, "its reactors' crystals went grey overnight, and the power failed");
     const lost = -addStore(S, "dilithium", -1);
     cost = `${w ? `${w.name} is one of the places it reached: its power plant's crystals are grey. ` : ""}${lost ? `And aboard the Pelion, Grath reports one of the warp core's crystals gone grey in its housing overnight: dilithium ${storesOf(S).dilithium}/10.` : ""}`;
@@ -946,7 +1008,7 @@ function rivalTick(S, D) {
     cost = `${w ? `${w.name} was waiting for that convoy, and it's rationing now. ` : ""}${took ? `Starfleet's supply allotment to the Pelion is cut to cover the loss: −${took} supplies.` : ""}`;
   }
   const n = C.threads.length, ahead = C.korvath > n;
-  storyEvent(S, `${D.title}: ${R.head}`, `Rrinn brings the report to the captain's ready room herself. Starfleet Intelligence, priority one: ${R.name} ${R.verb} ${site}.\n\n${scene}\n\n${cost}\n\nThat's ${C.korvath} for ${R.name}, against the Pelion's ${n} thread${n === 1 ? "" : "s"}.${ahead ? ` ${R.Name} is ahead, and every week it stays ahead makes the end harder.` : ""}${C.korvath >= D.finaleAt ? "" : " Every campaign order the Pelion carries out sets it back two weeks."}`);
+  storyEvent(S, `${D.title}: ${R.head}`, `Rrinn brings the report to the captain's ready room herself. Starfleet Intelligence, priority one: ${R.name} ${R.verb} ${place}.\n\n${scene}\n\n${cost}\n\nThat's ${C.korvath} for ${R.name}, against the Pelion's ${n} thread${n === 1 ? "" : "s"}.${ahead ? ` ${R.Name} is ahead, and every week it stays ahead makes the end harder.` : ""}${C.korvath >= D.finaleAt ? "" : " Every campaign order the Pelion carries out sets it back two weeks."}`);
   if (C.korvath >= D.finaleAt) { for (const b of D.beats) if (b.at > 0) campaignBeat(S, b.at); issueFinale(S); }
 }
 // ---------- the race: House Kor'vath ----------
@@ -1052,7 +1114,7 @@ export function missionChoices(S, ev) {
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
   accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike", refit: (n) => `${REFITS[n] ? REFITS[n].name : n} fitted to the Pelion`, delay: (n) => `every other order's deadline ${n} weeks closer`,
-  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the Syndicate answers: a raider strikes a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
+  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the Syndicate answers: a raider strikes a Federation world", tholian: () => "the Assembly answers: a Tholian vessel makes for a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
 export function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
   if (!o || !opt) return { error: "No such choice." };
@@ -1064,6 +1126,8 @@ export function chooseMission(S, orderId, optId) {
     else if (k === "supplies") S.supplies = Math.max(0, S.supplies + n);
     else if (k === "dilithium" || k === "antimatter" || k === "spares") addStore(S, k, n);
     else if (k === "orion") orionReprisal(S, o.title);
+    else if (k === "tholian") tholianReprisal(S, o.title);
+    else if (k === "release") { const n2 = releaseWebs(S, n); lines.push(`${n2} world${n2 === 1 ? "" : "s"} freed from the Tholian webs`); continue; }
     else if (k === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, Math.min(5, (s.accord || 0) + n)); if (s.accord >= 5 && s.kind === "independent") join(S, s); }
     else if (k === "accord") continue;
     else if (k === "command") markCommand(S, n, `${o.title}: ${opt.how.toLowerCase()}`);
@@ -1268,6 +1332,9 @@ export function score(S) {
     ["Orders carried out", S.done * 4],
     ["Commendations", S.commendations],
     ["Colonies safe", sys.filter((s) => s.kind === "colony").length * 5],
+    ["Colonies founded", (S.founded || 0) * 5],
+    ["Worlds lost to the Tholian Assembly", -(S.lostTholian || 0) * 8],
+    ["Systems inside the Tholian webs", -sys.filter((s) => s.kind === "annexed").length * 3],
     ["Systems surveyed", sys.filter((s) => s.surveyed && !KINDS[s.kind]?.known && s.id !== S.corvan).length],
     ["Starfleet Command track", -S.command * 4],
     ["Worlds lost to the Klingon Empire", -S.lostWorlds * 8],
@@ -1284,8 +1351,8 @@ export function score(S) {
 }
 export function rating(total) {
   // Every officer acts each turn, so a good tour scores high: these thresholds assume it.
-  return total >= 290 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 210 ? "Commended: a fine tour, and a ship Starfleet is proud of"
-    : total >= 140 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
+  return total >= 330 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 240 ? "Commended: a fine tour, and a ship Starfleet is proud of"
+    : total >= 160 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
 }
 export function checkEnd(S) {
   if (S.over) return;
