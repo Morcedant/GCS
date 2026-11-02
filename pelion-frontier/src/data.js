@@ -72,6 +72,8 @@ export const ACTIONS = {
   observe: { name: "Observe from orbit", skills: ["Sensors", "Life Sciences", "Psychology"], blurb: "Study them from orbit: a pre-warp people can't see a starship, so the Prime Directive is safe. A failure only means nothing useful this turn." },
   aid: { name: "Relief and repairs", skills: ["Engineering", "Medicine", "Leadership"], blurb: "Help a world that's been raided: clear a harm box." },
   repair: { name: "Repairs underway", skills: ["Engineering"], blurb: "Clear a box from the shields or a system (two on success by 5), or patch one hull box." },
+  mine: { name: "Mine dilithium", skills: ["Engineering", "Physical Sciences", "Sensors"], blurb: "Cut living crystals from a seam for the Pelion's matrix." },
+  recrystallize: { name: "Recrystallize dilithium", skills: ["Engineering", "Physical Sciences"], blurb: "Restore worn crystals with a field from the warp core." },
   sweep: { name: "Sensor sweep", skills: ["Sensors", "Communications", "Computers"], blurb: "Listen for cloaked ships and raiders within 3: reveals them. Finds a hidden base here." },
   hail: { name: "Hail them", skills: ["Diplomacy", "Communications", "Psychology"], blurb: "Talk a ship into leaving, against its captain's Will. No shots, no incident." },
   mission: { name: "Carry out orders", skills: [], blurb: "Work on the mission here." },
@@ -140,6 +142,7 @@ export const RECORDS = [
   { id: "dilithium", name: "Dilithium resonance", text: "+1 Power in battle.", perk: "power1" },
   { id: "warpfield", name: "A folded warp field", text: "+2 to warp strain checks: the field holds at high warp.", perk: "speed1" },
   { id: "makers", name: "The Makers' library", text: "Everything beyond the Gate the Makers chose to share: +2 science a turn's worth of insight, and the Federation's envy.", perk: "none", story: true },
+  { id: "quietengine", name: "The Quiet Engine", text: "How the Romulans tuned a crystal to ring every dilithium lattice for light-years, and how to shield against it: +1 Power in battle.", perk: "power1", story: true },
   { id: "caretaker", name: "The caretaker of Corvan II", text: "A machine's account of a vanished civilization: +1 to diplomatic missions.", perk: "envoy1", story: true },
 ];
 

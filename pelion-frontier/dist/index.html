@@ -276,6 +276,8 @@ const ACTIONS = {
   observe: { name: "Observe from orbit", skills: ["Sensors", "Life Sciences", "Psychology"], blurb: "Study them from orbit: a pre-warp people can't see a starship, so the Prime Directive is safe. A failure only means nothing useful this turn." },
   aid: { name: "Relief and repairs", skills: ["Engineering", "Medicine", "Leadership"], blurb: "Help a world that's been raided: clear a harm box." },
   repair: { name: "Repairs underway", skills: ["Engineering"], blurb: "Clear a box from the shields or a system (two on success by 5), or patch one hull box." },
+  mine: { name: "Mine dilithium", skills: ["Engineering", "Physical Sciences", "Sensors"], blurb: "Cut living crystals from a seam for the Pelion's matrix." },
+  recrystallize: { name: "Recrystallize dilithium", skills: ["Engineering", "Physical Sciences"], blurb: "Restore worn crystals with a field from the warp core." },
   sweep: { name: "Sensor sweep", skills: ["Sensors", "Communications", "Computers"], blurb: "Listen for cloaked ships and raiders within 3: reveals them. Finds a hidden base here." },
   hail: { name: "Hail them", skills: ["Diplomacy", "Communications", "Psychology"], blurb: "Talk a ship into leaving, against its captain's Will. No shots, no incident." },
   mission: { name: "Carry out orders", skills: [], blurb: "Work on the mission here." },
@@ -344,6 +346,7 @@ const RECORDS = [
   { id: "dilithium", name: "Dilithium resonance", text: "+1 Power in battle.", perk: "power1" },
   { id: "warpfield", name: "A folded warp field", text: "+2 to warp strain checks: the field holds at high warp.", perk: "speed1" },
   { id: "makers", name: "The Makers' library", text: "Everything beyond the Gate the Makers chose to share: +2 science a turn's worth of insight, and the Federation's envy.", perk: "none", story: true },
+  { id: "quietengine", name: "The Quiet Engine", text: "How the Romulans tuned a crystal to ring every dilithium lattice for light-years, and how to shield against it: +1 Power in battle.", perk: "power1", story: true },
   { id: "caretaker", name: "The caretaker of Corvan II", text: "A machine's account of a vanished civilization: +1 to diplomatic missions.", perk: "envoy1", story: true },
 ];
 
@@ -387,6 +390,335 @@ const SHIP_SHAPES = {
 };
 const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", science: "Science vessel", kbc: "Klingon battle cruiser", kbop: "Klingon bird-of-prey", rbop: "Romulan bird-of-prey", orion: "Orion raider", orionBase: "Orion pirate base", post: "Federation listening post" };
 
+// ---- campaigns.js ----
+// The campaigns after the first. When Watchers of the Void is over, however it ended, Starfleet's attention turns, and a
+// new campaign begins a few weeks later, with order types of its own that stay in Starfleet's book for good. Each campaign
+// has a premise, beats (the story, told as the threads come in), a rival that gains ground on its own every few weeks,
+// and a finale. Each order type has one story: a briefing, an arrival, a scene for each stage, a decision and a failure.
+// `why` is Starfleet's reason while the campaign runs; `reason` is the reason once it's over; `thread` is what the order
+// turns up for the campaign.
+
+/** The campaigns that follow Watchers of the Void, in order. */
+const SERIES = [
+  {
+    id: "coldfire",
+    title: "The Cold Fire",
+    finaleAt: 4,
+    finale: "The Quiet Engine",
+    finaleSkills: ["Physical Sciences", "Engineering", "Diplomacy"],
+    finaleOppose: { name: "the Romulan warbird sent to take it home", skill: "Will", target: 12, why: "The Empire wants its weapon back, and has a warbird to say so." },
+    premise: "Dilithium is dying across the Corvan Sector. In the mines, in freighters' reactors, in the colonies' power plants, the crystals are losing their lattice overnight and turning to grey glass that won't regulate a matter-antimatter reaction. Without dilithium, a starship can't hold warp, a colony can't keep its lights on, and a winter world can't keep its people warm. Starfleet Command is worried because it is spreading, a little further every few weeks, and nobody knows why. The Pelion's own crystals are no safer than anyone else's.",
+    rival: {
+      name: "the cold", Name: "The cold", every: { easy: 7, normal: 5, hard: 4 }, fx: "dilithium",
+      verb: "goes dark", head: "the cold spreads",
+      sites: [
+        ["the Brightwater crystal fields", "The night shift at Brightwater felt it first: a shiver through the rock, too faint for the seismographs, and then the glow in the seams went out, metre by metre, like a tide going out. By morning every crystal in the fields was grey. The miners stood on the gantries in the dark and didn't say anything for a long time."],
+        ["a freighter convoy in the Hadley lanes", "Six freighters were running in convoy when their reactors failed one after another, a minute apart, in the order they were sailing. They drifted for nine days before a Tellarite trader found them, their crews huddled in the few compartments with chemical heaters. Nobody died. It was close."],
+        ["the power plant on a winter colony", "The plant had run for forty years without a fault. Its crystals went grey in the middle of the night, and the town woke to frost on the inside of the windows. They burned furniture until the relief ship came. The old people say the winter was the coldest they remember; the children say it was an adventure."],
+        ["an independent world's only mine", "It was their one export, the thing they traded for everything else they had. Now the mine is a hole full of grey glass, and the traders who came for crystals have stopped coming. The world's council has asked the Federation, stiffly, whether this is how it treats its friends."],
+        ["a Starfleet supply depot", "Starfleet kept a reserve of crystals in a depot two days from Starbase 23, shielded, guarded, catalogued. The quartermaster opened the vault on a routine inspection and found every one of them grey. The shielding hadn't stopped whatever this is. The quartermaster's report runs to one line, and then a blank page."],
+        ["a mining moon near the Zone", "The miners on the moon had been listening for weeks to a faint ticking on subspace, a heartbeat, regular as a clock. They thought it was equipment. When it got louder, they knew it wasn't, and they were already loading the transports when the seams went dark around them."],
+      ],
+    },
+    beats: [
+      { at: 0, act: "Act I: Grey Glass", title: "The crystals are dying", text: "The order comes from Starfleet Command itself, and it begins with a photograph: a dilithium crystal held up to a lamp, the size of a fist, grey and dull as river stone. A week ago it was violet and full of light.\n\nIt's happening across the Corvan Sector. Mines first, then freighters, then a colony's power plant: the crystals lose their lattice overnight and turn to glass that won't regulate a warp reaction. No radiation, no contamination, no pattern anyone can find. It moves a little further every few weeks.\n\nStarfleet Command is worried for three reasons. Dilithium is what every ship and every colony reactor in the sector runs on, and a winter world without power is a world that freezes. It is spreading, and nobody can say where it stops. And the Pelion's own crystals are as exposed as anyone's.\n\nGrath runs a full assay of the ship's matrix that night and comes to the bridge looking grim. \"They're fine,\" he says. \"For now. I want it on the record that I don't like 'for now'.\"\n\nYour orders: find out what is killing the sector's dilithium, and stop it before the cold reaches anything that can't survive it." },
+      { at: 2, act: "Act II: The Heartbeat", title: "It isn't natural", text: "Sevek lays the dead sites on the sector chart, each with the date its crystals went grey, and draws the lines between them. They aren't random. They're a wave, spreading outward from a single point, and before each site died, someone nearby heard a faint ticking on subspace: a heartbeat, regular as a clock.\n\n\"It is a signal,\" Sevek says. \"Tuned to the resonant frequency of dilithium, and strong enough to shake the lattice apart. Nature does not make such signals, Captain. Engineers do.\"\n\nRrinn has been listening to the heartbeat for a week. Under it, very faint, there's a second signal: a Romulan telemetry code, the kind a research vessel uses to report back to a mothership. The Romulans built this, or they know who did. And they're not saying anything at all." },
+      { at: 4, act: "Act III: The Quiet Engine", title: "The source", text: "The last thread closes the search. Sevek's wave has a centre, to within a light-hour, in empty space, and the Pelion's long-range sensors turn toward it and find a ship: Romulan, small, dark, adrift, with its engines cold and its crew gone. In its hold, something is beating like a heart.\n\nRrinn hears a Romulan warbird leave the Neutral Zone on a heading straight for it. Starfleet's orders are short: get there first, and stop the heartbeat." },
+    ],
+  },
+  {
+    id: "syndicate",
+    title: "The Syndicate's Due",
+    finaleAt: 4,
+    finale: "The Shipyard at the Edge",
+    finaleSkills: ["Helm", "Phasers", "Leadership"],
+    finaleOppose: { name: "Mother Sessaly's fleet", skill: "Ruthlessness", target: 12, why: "A shipyard full of raiders, and a matriarch who has never lost a war she started." },
+    premise: "The Orion Syndicate has decided the Corvan Sector owes it. A Syndicate matriarch called Mother Sessaly has come out from Orion space with ships, money and patience, and she is taking the sector's supply lines apart: convoys vanish, freighter crews are held for ransom, colonies that miss a shipment start rationing. Starfleet Command is worried because she always knows where the convoys will be, which means someone is telling her; because the colonies can't hold out long without their shipments; and because a Syndicate that owns a sector's supply lines owns the sector.",
+    rival: {
+      name: "the Syndicate", Name: "The Syndicate", every: { easy: 7, normal: 5, hard: 4 }, fx: "convoy",
+      verb: "takes", head: "another convoy taken",
+      sites: [
+        ["the Tessaly grain convoy", "Four freighters of grain and medical stores, bound for the colonies, with an escort that was called away at the last minute by a distress call nobody can now trace. The freighters were found empty a week later, their crews alive and locked in their own cargo holds. The Syndicate's mark was painted on every hatch: a green hand, open."],
+        ["an antimatter tanker", "The tanker carried enough antimatter to fuel a starbase for a month. It never reached Starbase 23. Its transponder went quiet in the Okafor lanes, and when the Pelion's sister ships went looking, they found nothing but a green hand painted on a navigation buoy, and the buoy's log wiped."],
+        ["the Sorrel colony's medical shipment", "The shipment was small, light enough to fit in a shuttle, and worth more than its weight in latinum: the vaccines for Sorrel's children. The Syndicate took it, and then, three days later, offered to sell it back. The colony paid. Starfleet is furious. The children are fine."],
+        ["a convoy of spare parts", "Warp coils, plasma injectors, coolant: the things that keep starships flying, bound for Starbase 23. The convoy's captain swears the Syndicate knew her route before she did. Rrinn, reading the report, says quietly that she believes her."],
+        ["the ore haulers of Kerrigan", "The haulers were independent, working for themselves, and the Syndicate didn't take their cargo: it took the haulers themselves, crews and all, and sent the families a price. The independent worlds are watching to see whether the Federation will do anything about it."],
+        ["a relief convoy for a raided world", "It was carrying everything a raided world needs to rebuild: shelter, food, power cells, medical stores. The Syndicate took it in the open, in daylight, as if to make a point. The point has been made."],
+      ],
+    },
+    beats: [
+      { at: 0, act: "Act I: Missing Convoys", title: "The open green hand", text: "Starfleet Command's message is short and angry. Seven convoys lost in the Corvan Sector in a month, and on every one of them, painted on a hatch or a buoy or a cargo container, the same mark: a green hand, open, palm up. The Orion Syndicate's mark. It means: pay.\n\nStarfleet Intelligence has a name for the hand behind it. Mother Sessaly, a Syndicate matriarch who has never lost a war she started, has come out from Orion space with ships, money and all the patience in the world. She isn't raiding the sector. She's taxing it.\n\nStarfleet Command is worried for three reasons. She always knows where the convoys will be, and when: someone is telling her. The colonies live on those convoys, and a colony that misses enough of them starts to ration, and then to leave. And a Syndicate that owns a sector's supply lines owns the sector, whatever the flags on the charts say.\n\nYour orders: keep the convoys moving, find out who is selling their routes, and find Mother Sessaly." },
+      { at: 2, act: "Act II: The Leak", title: "Someone at Starbase 23", text: "The threads come together in the briefing room. Every convoy the Syndicate took had one thing in common: its route was filed at Starbase 23 less than a day before it sailed. Rrinn pulls the starbase's message logs and finds a pattern in the noise: a short burst, encrypted, sent to an Orion relay buoy every time a convoy route is filed. The bursts come from a quartermaster's terminal.\n\nThe quartermaster, when Reyes and two security officers come for him, doesn't run. He's been waiting, he says, for someone to notice. The Syndicate has his brother. He gives them everything: the relay codes, the buoy positions, and a name the Syndicate uses for the place where Mother Sessaly's ships are built and repaired. The Edge." },
+      { at: 4, act: "Act III: The Shipyard", title: "The Edge", text: "The last thread closes the search. The relay codes, the captured crews' stories and the quartermaster's buoys all point the same way: a dead star at the sector's edge, ringed with asteroids, and inside the ring, hidden in the rubble, a shipyard. Mother Sessaly's ships are built there. Her prisoners are held there. Her ledgers are kept there.\n\nRrinn hears the shipyard's traffic change overnight: Sessaly knows Starfleet has found her, and she's getting ready to move. Starfleet's orders are short: get there before she does." },
+    ],
+  },
+];
+
+/** The new order types, one story each. `campaign`: the campaign they belong to; they stay in Starfleet's book after it. */
+const SERIES_MISSIONS = [
+  { roll: 6, campaign: "coldfire", text: "Assay a dying dilithium mine", oppose: { name: "the failing seams", skill: "Instability", target: 11, why: "A mine whose crystals are dying is a mine whose walls are holding up on habit." }, where: ["colony", "independent"], skills: ["Physical Sciences", "Engineering", "Sensors"], segs: 3 },
+  { roll: 9, campaign: "coldfire", text: "Track a subspace pulse", oppose: { name: "the pulse's distortion", skill: "Distortion", target: 12, why: "Whatever sends it bends every sensor beam that touches it." }, where: ["empty", "anomaly"], skills: ["Sensors", "Physical Sciences", "Navigation"], segs: 3 },
+  { roll: 12, campaign: "coldfire", text: "Escort a dilithium convoy", oppose: { name: "raiders hungry for crystal", skill: "Ambush", target: 11, why: "Good crystals are worth more every week, and everyone knows this convoy is carrying them." }, where: ["colony", "member"], skills: ["Helm", "Sensors", "Leadership"], segs: 2 },
+  { roll: 14, campaign: "coldfire", text: "Negotiate for a dilithium reserve", oppose: { name: "a seller's market", skill: "Greed", target: 12, why: "They have what everyone needs, and they know it." }, where: ["independent"], skills: ["Diplomacy", "Psychology", "Communications"], segs: 3 },
+  { roll: 8, campaign: "coldfire", text: "Rescue a powerless ship", oppose: { name: "the cold", skill: "Severity", target: 11, why: "No power means no heat, no air scrubbers, and no time." }, where: ["empty", "anomaly"], skills: ["Engineering", "Helm", "Leadership"], segs: 2 },
+  { roll: 11, campaign: "syndicate", text: "Guard a supply convoy", oppose: { name: "Orion raiders lying in wait", skill: "Ambush", target: 12, why: "The Syndicate knows the route. It always knows the route." }, where: ["colony", "member"], skills: ["Helm", "Sensors", "Leadership"], segs: 2 },
+  { roll: 7, campaign: "syndicate", text: "Free a ransomed crew", oppose: { name: "the Syndicate's guards", skill: "Vigilance", target: 12, why: "They're paid to watch, and paid more if nobody gets out." }, where: ["empty", "independent"], skills: ["Stealth", "Phasers", "Communications"], segs: 3 },
+  { roll: 15, campaign: "syndicate", text: "Find the leak at Starbase 23", oppose: { name: "a careful traitor", skill: "Deception", target: 12, why: "Whoever it is has been doing this for months and hasn't been caught." }, where: ["starbase"], skills: ["Computers", "Psychology", "Communications"], segs: 3 },
+  { roll: 13, campaign: "syndicate", text: "Turn a Syndicate captain", oppose: { name: "her fear of the Syndicate", skill: "Fear", target: 12, why: "Everyone knows what the Syndicate does to people who talk." }, where: ["independent"], skills: ["Diplomacy", "Psychology", "Leadership"], segs: 3 },
+  { roll: 10, campaign: "syndicate", text: "Break a blockade", oppose: { name: "the blockade line", skill: "Discipline", target: 12, why: "Three raiders, a minefield, and orders to let nothing through." }, where: ["independent", "colony"], skills: ["Helm", "Phasers", "Leadership"], segs: 2 },
+];
+
+const SERIES_STORIES = {
+  // ---------- The Cold Fire ----------
+  "Assay a dying dilithium mine": {
+    mission: "Assay a dying dilithium mine", name: "The grey seam", type: "Technology", campaign: "coldfire",
+    reason: "A mine on {world} is losing its crystals, and its people want to know why before it costs them their livelihood.",
+    why: "The mine on {world} is dying now, while it happens: the first chance anyone has had to watch the cold at work.",
+    thread: "The crystals on {world} didn't decay: they were shaken apart from inside, every lattice in the seam at once, by something that rang them like a bell from light-years away.",
+    keys: ["Hannah Okoro|the mine's foreman, thirty years underground", "Pell Varrus|the mine's owner, who has borrowed against every crystal in it", "Ama Teague|the mine's geologist, who saw it coming and was ignored"],
+    strange: ["a seam that hums", "crystals that go grey as you watch", "a tremor no seismograph can find"],
+    brief: "The dilithium mine on {world} is going grey, a little more every day, and its people have called for help. {key} has kept the mine running for decades. It has never done this.",
+    arrive: "The mine is a black scar on the hillside above the town, its gantries lit up against the dusk. Down on the landing pad, {key} is waiting for the away team in a hard hat and a coat that hasn't been warm enough for weeks.\n\n\"Thirty years,\" {key} says, shaking the captain's hand. \"Thirty years, and I've never seen a seam die. Now I see one die every morning.\" A nod at the dark tunnel mouth. \"Come and look. You'll want to.\"",
+    steps: [
+      ["Go down", "The lift drops two kilometres in the dark. At the bottom, the seam runs along the tunnel wall like a vein of violet light, and as the away team watches, a hand's breadth of it goes grey. Not slowly: all at once, as if a light behind it had been switched off. Sevek kneels and puts a tricorder against the rock. \"Again,\" he says, a minute later, as the next hand's breadth dies."],
+      ["Take samples", "Grath cuts samples from the living seam and the dead one, side by side, and runs them under the Pelion's scanners all night. In the morning he has an answer, and he doesn't like it. The grey crystals aren't damaged. They're shattered at the smallest scale there is, every lattice in them broken in exactly the same way, as if each one had been struck by the same blow."],
+      ["Listen to the rock", "{key} takes them to the deepest gallery, where the seam is still alive, and tells everyone to be quiet. In the silence, Rrinn hears it before the instruments do: a faint ticking, below hearing, regular as a heartbeat. Every time it ticks, somewhere along the seam, another hand's breadth goes grey. The rock is being rung like a bell, from very far away."],
+    ],
+    choice: { title: "The seam", text: "The last of the living seam is going grey, a little more with every tick. Grath thinks he can save part of it: a field around the deepest gallery, tuned against the heartbeat, would shield the crystals there. It would take power the Pelion needs, and crystals of the Pelion's own to tune it. Or the Pelion can take what's left out of the rock now, before the heartbeat gets to it, and leave the mine to die.",
+      options: [
+        { id: "shield", name: "Shield the deep gallery", blurb: "The mine lives, small but alive: +2 commendations, accord +1. It costs the Pelion 2 dilithium to tune the field.", how: "The mine's deepest gallery shielded against the heartbeat, at the cost of the Pelion's own crystals.", fx: { commendations: 2, accord: 1, dilithium: -2 }, text: "Grath tunes the field with two of the Pelion's own crystals, cut and set in the gallery wall like a ward. When the next tick comes, the seam inside the field flickers, and holds. {key} stands looking at it for a long time. The mine will be small now, one gallery where there were forty. But it will be a mine, and the town will still be a town." },
+        { id: "take", name: "Take what's left", blurb: "Cut the last good crystal out before it dies: +3 dilithium for the Pelion, +6 science. The mine is finished.", how: "The last living crystal cut out of the mine on {world} before the heartbeat reached it.", fx: { dilithium: 3, science: 6 }, text: "The mining crews cut the last of the living seam out in a single shift, working fast, with the ticking getting louder in the rock around them. Some of it goes to the Pelion; the rest goes to the town's stores, to trade. By morning the seam is grey from end to end. {key} switches off the gantry lights one by one, and doesn't look back." },
+      ] },
+    fail: "The Pelion never came. The seam on {world} went grey to the last crystal, and the mine closed. The town is still there, for now. Its people are deciding where to go.",
+  },
+  "Track a subspace pulse": {
+    mission: "Track a subspace pulse", name: "The heartbeat", type: "Exploration", campaign: "coldfire",
+    reason: "Listening posts have heard a strange pulse on subspace near {world}, and Starfleet wants it charted before someone runs into it.",
+    why: "The heartbeat has been heard near {world}, closer and clearer than anywhere else: follow it back toward where it comes from.",
+    thread: "The heartbeat near {world} carries a second signal under it: a Romulan research vessel's telemetry, reporting home on a code Starfleet hasn't heard in twenty years.",
+    keys: ["Ensign Yuki Hara|a young sensor officer who heard it first", "Dr. Ilan Morrow|a subspace physicist hitching a ride", "Commander Nerys Tal|of the listening post that logged it"],
+    strange: ["a pulse that echoes before it arrives", "a ringing in every crystal aboard", "a pattern in the static that looks like writing"],
+    brief: "Something near {world} has been ticking on subspace for a week, regular as a clock: the same heartbeat the dying mines heard. {key} has been logging it. Find out where it comes from.",
+    arrive: "Near {world} the heartbeat is loud enough that nobody needs an instrument to hear it. It comes through the Pelion's hull as a faint tick, felt in the teeth more than heard, every eleven seconds. The dilithium in the warp core rings with it, very slightly, a note Grath says he can hear in his sleep.\n\n{key} meets the captain at the transporter room with a padd full of readings and the look of someone who hasn't slept. \"It's getting stronger,\" {key} says. \"Every day. Whatever's sending it, it's either getting closer, or getting louder.\"",
+    steps: [
+      ["Fix the bearing", "Sevek and {key} take readings from three points around {world}, a day apart, and lay them on the chart. The heartbeat comes from one direction, steady and unwavering: from deeper in the sector, toward the Neutral Zone. And it is, Sevek confirms, getting louder."],
+      ["Shield the core", "The heartbeat finds the Pelion's crystals. Grath reports the first hairline fracture in the matrix at 0400, and by 0600 there are three. He runs a damping field around the warp core, a thing of his own invention held together with optimism, and the fractures stop spreading. \"For now,\" he says, and everyone is getting very tired of the phrase."],
+      ["Read what's under it", "Rrinn listens for a day and a night, with her eyes shut and her ears turned toward the speaker, and finds it at last: under the heartbeat, faint as a whisper, a second signal riding the first. A code. {strange}. When the computer finishes with it, it turns out to be telemetry: a ship's systems, reporting home."],
+    ],
+    choice: { title: "The heartbeat", text: "Sevek has the heartbeat's frequency to six decimal places. With it, he could build a jamming pulse to cancel it out around {world}, protecting the worlds nearby, but the Pelion would have to stay and transmit, and the heartbeat's sender would hear it. Or the Pelion can stay quiet, log everything, and let the sender go on believing no one is listening.",
+      options: [
+        { id: "jam", name: "Jam it", blurb: "Protect the worlds nearby: +2 commendations, and the heartbeat around {world} goes quiet for now. The sender hears the Pelion. The Romulans answer.", how: "The heartbeat jammed around {world}.", fx: { commendations: 2, romulan: 1 }, text: "The jamming pulse goes out from the Pelion's deflector, the heartbeat's own note turned inside out, and around {world} the ticking falters, stutters, and stops. Every crystal aboard stops ringing at once, and the silence is enormous. Two days later, Rrinn hears a Romulan bird-of-prey cross the Neutral Zone. Someone heard." },
+        { id: "listen", name: "Stay quiet and listen", blurb: "+10 science, and the sender never knows the Pelion was there.", how: "The heartbeat logged near {world}, its sender none the wiser.", fx: { science: 10 }, text: "The Pelion goes quiet: running lights dimmed, active sensors off, a week of listening and nothing else. The log grows to a gigaquad of the heartbeat and the whisper beneath it, every tick and every word. Whoever is sending it never knows they had an audience. Somewhere in that log, Sevek is sure, is the way to find them." },
+      ] },
+    fail: "The Pelion never came. The heartbeat near {world} went on ticking, louder every week, and the crystals of the worlds around it went grey one after another.",
+  },
+  "Escort a dilithium convoy": {
+    mission: "Escort a dilithium convoy", name: "The last good crystals", type: "Security", campaign: "coldfire",
+    reason: "A dilithium convoy needs an escort to {world}: crystals are scarce, and scarce things attract raiders.",
+    why: "With the sector's crystals dying, the convoy bound for {world} is carrying some of the last good dilithium in the Corvan Sector. Everyone knows it.",
+    thread: "The convoy's crystals were cut from a mine the heartbeat hasn't reached, and Sevek's chart shows why: it lies behind a dead star, in the heartbeat's shadow. Whatever sends the heartbeat sends it in straight lines.",
+    keys: ["Captain Dara Wen|the convoy's commodore, who has been running cargo for forty years", "Bosun Tiko Raal|a freighter crewman with a gambling debt", "Liaison Mirelle Shan|from the colony that's waiting for the crystals"],
+    strange: ["a raider that knows the convoy's route", "an empty freighter riding at the back of the line", "a signal flare nobody fired"],
+    brief: "Five freighters of dilithium, cut from one of the last living mines in the sector, are bound for {world}, whose reactors are running on crystals that are going grey. {key} has the convoy. The Pelion has the escort.",
+    arrive: "The convoy is five old freighters in a line, their hulls patched and painted and patched again, holding station off {world} with their running lights dimmed. {key} hails from the lead ship, a craggy face on the viewer with a mug of something in one hand.\n\n\"Starfleet. Good. I've run cargo through raider country for forty years,\" {key} says, \"and I've never had a cargo like this one. Every pirate in the sector knows what's in my holds. I'd like to get it where it's going.\"",
+    steps: [
+      ["Run the lanes", "The convoy sails at the slowest freighter's best speed, which is not fast, with the Pelion pacing it a light-hour out on the threatened side. For two days nothing happens, and the waiting is worse than anything would be. Then sensors pick up three ships running dark behind a gas giant, exactly where an ambush would be. Exactly where the convoy would be, if anyone knew its route."],
+      ["Bring it in", "The Pelion turns toward the gas giant with its shields up and its weapons hot, and makes sure the three ships see it coming. They think about it for a long minute. Then they break and run. The convoy reaches {world} two days later, and the colony's people line the landing field to watch the crystals come down. Some of them are crying. {key} pretends not to notice."],
+    ],
+    choice: { title: "The crystals", text: "The convoy has delivered every crystal it promised to {world}, and there are a few left over: the convoy's own reserve, against a bad run. {key} offers them to the Pelion, for the escort. sh'Vari points out quietly that {world}'s reactors are older than they look, and the colony could use every crystal it can get.",
+      options: [
+        { id: "keep", name: "Accept the gift", blurb: "+3 dilithium for the Pelion's matrix, +1 commendation.", how: "The convoy brought in to {world}; its reserve crystals given to the Pelion.", fx: { dilithium: 3, commendations: 1 }, text: "{key} has the crystals beamed across in a battered strongbox with the convoy's mark on the lid, and won't hear a word of thanks. \"You kept my ships whole,\" {key} says. \"That's worth crystals. That's worth a lot more than crystals.\" Grath sets them into the matrix himself and the warp core's note steadies, very slightly, for the first time in weeks." },
+        { id: "give", name: "Give them to the colony", blurb: "+2 commendations, accord +1, and {world}'s harm −1.", how: "The convoy brought in to {world}, with its reserve crystals left for the colony.", fx: { commendations: 2, accord: 1, heal: 1 }, text: "The reserve goes down to {world} with the rest of the cargo, and the colony's reactors, running on grey glass and good luck for a month, come back up to full power that night. The lights come on across the town one district at a time, and from orbit it looks like a slow dawn. {key} sends a single line to the Pelion's bridge: \"Good call, Starfleet.\"" },
+      ] },
+    fail: "The convoy sailed without the Pelion. Raiders took it in the Hadley lanes, every crystal, and {world}'s reactors went cold that winter.",
+  },
+  "Negotiate for a dilithium reserve": {
+    mission: "Negotiate for a dilithium reserve", name: "The hoard", type: "Diplomatic", campaign: "coldfire",
+    reason: "{world} has a dilithium reserve the Federation would like to buy, and an asking price the Federation would like to talk down.",
+    why: "{world} has the largest reserve of living dilithium left in the sector, sealed in vaults the heartbeat can't reach. The Federation needs it, and so does everyone else.",
+    thread: "{world}'s vaults are lined with a mineral from their own moon that the heartbeat can't pass through. Sevek takes a sample: whatever sends the heartbeat can be shielded against, and so it can be found by the shadow it leaves.",
+    keys: ["Treasurer Ossa Venn|who has never once lost a negotiation", "Chancellor Lio Marr|young, new, and out of her depth", "Broker Tal Ghessi|a Ferengi who got here first"],
+    strange: ["a vault no one has opened in a century", "a rival bid from an unknown buyer", "crystals that sing when they're touched"],
+    brief: "{world} sealed its dilithium in deep vaults a century ago, against hard times, and the hard times have come. {key} will sell, at a price. Starfleet needs those crystals, and the Pelion has been sent to agree on one.",
+    arrive: "{world}'s treasury is a cool stone hall, very old and very quiet, and on its long table, set out on black velvet like jewels, are three dilithium crystals the size of a child's fist, glowing violet. They're the first living crystals anyone on the Pelion has seen in weeks.\n\n{key} lets the away team look at them for a long, deliberate moment, and then has them covered. \"You see what we have,\" {key} says. \"Everyone sees. Now, Captain: what do you have?\"",
+    steps: [
+      ["The first offer", "The first offer is absurd, and everyone in the room knows it. sh'Vari doesn't laugh. She counters with an offer just as absurd in the other direction, and {key}, very slightly, smiles. Now they can talk."],
+      ["The other bidder", "On the second day, the treasury receives another bid, in latinum, from a buyer who won't give a name. It's higher than anything the Federation can offer. Rrinn traces the message to a relay in Orion space; {key} notices the Pelion's crew noticing, and raises the price."],
+      ["What they really want", "Vessik, who has been sitting at the back of the room for two days saying nothing, finally says something. {world} doesn't want latinum, he points out: they already have more than they can spend. They want what the latinum can't buy. Their winter hospitals are a century out of date. {key} is quiet for a long time. Then the covers come off the crystals again."],
+    ],
+    choice: { title: "The bargain", text: "{key} will sell the reserve to the Federation, for the Federation's help with their hospitals, and the Pelion's word on it. There's a sweetener on the table if the Pelion wants it: a share of the crystals for the ship itself, in exchange for a share of the Pelion's own medical stores, now.",
+      options: [
+        { id: "fair", name: "The Federation's bargain", blurb: "The reserve goes to the colonies; Starfleet sends doctors. +3 commendations, accord +2.", how: "{world}'s dilithium reserve bought for the sector's colonies, for the Federation's help with its hospitals.", fx: { commendations: 3, accord: 2 }, text: "The agreement is signed on the long stone table, in ink, the old way. {world}'s crystals go out to the colonies over the following month in sealed cargo pods, and Starfleet Medical sends a team to {world}'s winter hospitals. {key} shakes the captain's hand at the end with something like warmth. \"You listened,\" {key} says. \"Most people don't, when they want something.\"" },
+        { id: "share", name: "And a share for the Pelion", blurb: "+4 dilithium for the Pelion, accord +1, −8 supplies from the ship's medical stores.", how: "{world}'s reserve bought, with a share for the Pelion in trade for its medical stores.", fx: { dilithium: 4, accord: 1, supplies: -8 }, text: "The agreement is signed, and a small extra clause added in {key}'s own hand. The Pelion's sickbay is emptied of half its stores, Vessik grumbling the whole way down to the transporter room, and four violet crystals come up in their place. Grath holds one up to the light and, for once, has nothing to complain about." },
+      ] },
+    fail: "The Pelion never came. {world} sold its reserve to the unnamed bidder, in latinum, and the crystals vanished into Orion space.",
+  },
+  "Rescue a powerless ship": {
+    mission: "Rescue a powerless ship", name: "The dark liner", type: "Rescue", campaign: "coldfire",
+    reason: "A passenger liner near {world} has lost power, and its people are running out of air.",
+    why: "A liner near {world} lost power when its crystals went grey in flight: the first ship the cold has caught away from port.",
+    thread: "The liner's crystals died in flight, between one tick and the next, and its log caught the moment: the heartbeat, and just before it, a burst of Romulan telemetry. The sender was close enough to hear.",
+    keys: ["Captain Eli Vance|the liner's master, on his last run before retirement", "Purser Anaya Rhee|who has been keeping the passengers calm", "Dr. Hollis Burke|the liner's only doctor, out of medicine"],
+    strange: ["frost on the inside of the hull", "a child who says she heard the ship's heart stop", "a passenger who isn't on the manifest"],
+    brief: "The liner Aurelian Star, three hundred passengers, lost power near {world} when its crystals went grey in flight. It's drifting, cold, and its air is running out. {key} is still aboard.",
+    arrive: "The Aurelian Star hangs in the dark near {world}, her windows black, frost feathering across her hull where the heat is leaking out of her. On a weak emergency channel, {key} answers the Pelion's hail on the first try, as if he's been sitting by the speaker for days, which he has.\n\n\"Three hundred and six aboard,\" {key} says. His breath is a cloud in the camera's light. \"We've got them all in the main lounge, around the chemical heaters. We have about two days of air. Maybe less. The children are cold.\"",
+    steps: [
+      ["Power her up", "Grath beams across with two engineers and an armful of cable, and runs power from the Pelion to the liner's life support through a transporter-tethered conduit that should not work. It works. The air scrubbers cough, and start. In the main lounge, three hundred people hear them start, and the sound they make is something nobody aboard the Pelion will forget."],
+      ["Bring them home", "The Aurelian Star can't fly, and the Pelion can't carry three hundred passengers far. So the Pelion tows her, at a crawl, with Grath's conduit humming between the ships, and the passengers' children pressed to the lounge windows to watch the Pelion's lights. Two days later the liner is safe in orbit over {world}. {key} is the last off, as captains should be."],
+    ],
+    choice: { title: "The liner's crystals", text: "The Aurelian Star's crystals are grey, but Grath thinks they could be brought back: recrystallized, slowly, with a field from the Pelion's own warp core. It would take days, and wear the Pelion's matrix doing it. Or the liner can stay at {world} and wait for new crystals that may never come.",
+      options: [
+        { id: "restore", name: "Bring her crystals back", blurb: "The liner flies again: +3 commendations. The Pelion's matrix pays for it: −2 dilithium.", how: "The Aurelian Star's passengers saved, and her crystals recrystallized by the Pelion's own warp core.", fx: { commendations: 3, dilithium: -2 }, text: "It takes four days, the Pelion's warp core feeding a slow field into the liner's dead crystals while Grath watches the readings and doesn't sleep. On the fourth day, one of them glows: faintly, then brighter. Then the others. The Aurelian Star leaves orbit under her own power, with three hundred and six people aboard and {key} at the helm for one more run." },
+        { id: "wait", name: "Leave her at {world}", blurb: "+2 commendations, +6 science from her dead crystals.", how: "The Aurelian Star's passengers saved; the liner left in orbit at {world} to wait for crystals.", fx: { commendations: 2, science: 6 }, text: "The Aurelian Star stays in orbit over {world}, cold and dark again once the Pelion's conduit comes down, but empty now: her passengers are safe on the planet, waiting for ships home. Grath takes her grey crystals aboard for study. Somewhere in them, he says, is the shape of the blow that killed them." },
+      ] },
+    fail: "The Pelion never came. Another ship reached the Aurelian Star in the end, too late for some of her passengers.",
+  },
+  "The Quiet Engine": {
+    type: "Campaign", campaign: "coldfire", finale: true,
+    keys: ["Commander T'Lera|of the Romulan warbird sent to take it home"], strange: ["the Quiet Engine"],
+    why: "Every thread of The Cold Fire leads here. While the Quiet Engine beats, the sector's dilithium dies.",
+    thread: "The heartbeat has stopped.",
+    complication: { title: "The warbird decloaks", text: "The warbird decloaks a kilometre off the Pelion's bow, close enough to see the green-and-grey hull plates, its plasma torpedo glowing in its launcher like a coal. {key} appears on the viewer, unhurried.\n\n\"Federation ship. That vessel and everything aboard it are the property of the Romulan Star Empire. Withdraw.\"\n\nsh'Vari, very quietly: \"She hasn't fired. She doesn't want to fire, here, beside that thing. Neither do we.\"", press: "Hold position and keep working", skills: ["Leadership", "Diplomacy", "Helm"], oppose: { name: "Commander T'Lera", skill: "Will", target: 13 }, win: "The captain holds the Pelion where it is, between the warbird and the derelict, and says nothing at all for a very long minute. {key} looks at the Pelion on her viewer, and then, for the first time, at the derelict beside it, beating like a heart. Something in her face changes. The warbird's torpedo light dims. \"You have one hour,\" she says.", lose: "{key} doesn't wait. A plasma torpedo slams into the Pelion's shields, not to destroy, only to make a point, and the point lands: the shields buckle, and three crewmen on deck nine are thrown against a bulkhead. The warbird holds position afterward, watching, waiting for the Pelion to decide whether it's staying.", cost: "hurt", costText: "the warbird's warning shot hurts a crew member" },
+    brief: "At the centre of the cold's spread, sensors find a Romulan ship, small and dark, adrift with its crew gone, and in its hold something beating like a heart: the Quiet Engine, sending the heartbeat that is killing the sector's dilithium. A Romulan warbird under {key} is coming to take it home. Get there first.",
+    arrive: "The derelict turns slowly in the dark, a small Romulan science vessel with its running lights out and its hatches open to space. The heartbeat is so loud here that the Pelion's deck plates tick with it. Every crystal in the warp core is singing.\n\nThe away team finds the crew in the mess hall. All of them. They died at their stations, of the cold, when their own crystals failed: the first victims of the thing they built. In the hold, in a cradle of cables, the Quiet Engine pulses with a soft violet light, like a living crystal, which, Sevek says after a long scan, is very nearly what it is.",
+    steps: [
+      ["Understand it", "Sevek and Grath spend a night in the derelict's hold with the Engine. It's a crystal, grown in a lab, tuned so finely that it rings with every dilithium lattice for light-years around and shakes them apart. A weapon: a way to make an enemy's fleet fall out of warp without firing a shot. It worked too well. It killed its own ship, and then it went on working, with no one left to switch it off."],
+      ["Hold off the warbird", "{key}'s warbird decloaks beside the derelict and orders the Pelion away. Hours of hails later, nobody has fired. {key} wants the Engine back. She also, it becomes clear in the way she doesn't look at the derelict, didn't know what it had done to its crew."],
+      ["Silence it", "Grath and Sevek find a way: a field from the Pelion's own core, tuned against the heartbeat, can hold the Engine silent. The heartbeat falters, and stops. Across the Corvan Sector, the crystals that were still alive stop dying. Now the captain has to decide what happens to the thing in the cradle."],
+    ],
+    choice: { title: "The Quiet Engine", text: "The Engine is silent, held in the Pelion's field, and it will stay silent only as long as someone holds it. {key} wants it home, and has a warbird to say so. Destroy it, and no one ever uses it again, and the Romulans will have their reply ready. Take it for Starfleet, and the Federation learns how it was done, and how to defend against it, and the Empire will never forgive the theft.",
+      options: [
+        { id: "destroy", name: "Destroy it", blurb: "No one ever uses it again: +5 commendations, +4 dilithium from the derelict's stores. The Romulans answer with a reprisal.", how: "The Quiet Engine destroyed, and the cold ended.", fx: { commendations: 5, dilithium: 4, romulan: 1 }, text: "The Pelion tows the derelict a safe distance off and the torpedo room fires a single spread. The Quiet Engine goes up in a flash of violet that every crystal in the sector feels as a single, final note, and then silence. {key} watches it go from her bridge. She says nothing. A week later, a bird-of-prey crosses the Neutral Zone, because that is what the Empire does. But across the Corvan Sector, the mines are glowing again." },
+        { id: "take", name: "Take it for Starfleet", blurb: "+30 science, a library record, +2 commendations. The Romulans answer with a reprisal, and Starfleet Command marks the risk.", how: "The Quiet Engine silenced and taken to Starfleet for study.", fx: { science: 30, commendations: 2, romulan: 1, command: 1 }, record: "quietengine", text: "The Engine comes aboard in the Pelion's field, silent, and goes into a shielded vault in the cargo bay where Grath checks it every hour. {key} lets the Pelion go, and promises, on an open channel, that the Empire will remember. Starfleet R&D is overjoyed. Starfleet Command, less so: they mark the risk on the captain's file. But the Federation will know how to shield against the next one." },
+      ] },
+    fail: "The warbird reached the Quiet Engine first. The heartbeat stopped a day later, and the Romulans have it still. One day, somewhere, it will beat again.",
+  },
+  // ---------- The Syndicate's Due ----------
+  "Guard a supply convoy": {
+    mission: "Guard a supply convoy", name: "The grain run", type: "Security", campaign: "syndicate",
+    reason: "A supply convoy for {world} needs an escort through raider country.",
+    why: "The grain convoy for {world} is the first since the Syndicate started taking them. If it gets through, the colonies know Starfleet can still keep the lanes open.",
+    thread: "The raiders waiting for the grain convoy had its route before it sailed: the Pelion's sweep catches their orders being relayed from a buoy that has no business being there, coded with a Starbase 23 filing number.",
+    keys: ["Captain Ruth Abara|the convoy's master, who has lost two ships to the Syndicate already", "Ensign Paolo Brandt|on his first escort duty", "Factor Lem Oduya|from {world}, who arranged the shipment"],
+    strange: ["a navigation buoy that wasn't on the charts", "a green hand painted on a freighter's hull overnight", "a freighter running two transponders"],
+    brief: "Six freighters of grain, medical stores and power cells for {world}, the first convoy since the Syndicate started taking them. {key} won't sail without an escort, and Starfleet has sent the best it has.",
+    arrive: "The convoy is waiting at {world}'s outer marker: six freighters, one of them still scorched from the last time. {key} comes aboard in person to go over the route, a broad, quiet woman with a datapad full of names.\n\n\"The crews of the ships I've lost,\" {key} says, when sh'Vari asks. \"They're alive. They're in a Syndicate hold somewhere, waiting for someone to pay. I'd like not to add to the list.\"",
+    steps: [
+      ["Sail", "The convoy sails with the Pelion out ahead, sweeping. A day out, Rrinn finds {strange}, transmitting on a tight beam toward a cluster of asteroids off the route. Whatever's in those asteroids, it's being told exactly where the convoy will be, and when."],
+      ["Spring the trap", "The Pelion goes to the asteroids first, at full impulse, before the convoy arrives, and finds three Orion raiders waiting in the rubble with their engines cold. They weren't expecting a Heavy Cruiser. The raiders run, and the convoy sails past an empty ambush. At {world}, the grain comes down, and the colony eats properly for the first time in a month."],
+    ],
+    choice: { title: "The buoy", text: "The buoy that sold the convoy's route is still out there, transmitting. Destroy it, and the Syndicate loses its eyes on this lane. Or leave it, and feed it a false route for the next convoy: let the Syndicate wait in the wrong place for once, and see who comes to complain.",
+      options: [
+        { id: "destroy", name: "Destroy the buoy", blurb: "The lane is safe: +2 commendations, +6 supplies from a grateful colony.", how: "The convoy brought in to {world}, and the Syndicate's buoy destroyed.", fx: { commendations: 2, supplies: 6 }, text: "One phaser shot, and the buoy is a spreading cloud of sparks. On the lane to {world}, at least, the Syndicate is blind now. {key} sends the Pelion a crate from the colony's first good harvest in a month, with a note in a child's handwriting. Reyes pins the note up in the security office and won't let anyone take it down." },
+        { id: "feed", name: "Feed it a false route", blurb: "+8 science from the Syndicate traffic it draws, +1 commendation; the trap is set.", how: "The convoy brought in to {world}, and the Syndicate's buoy turned against it.", fx: { science: 8, commendations: 1 }, text: "Rrinn writes a convoy route that never was, and feeds it to the buoy in the Starbase 23 code it expects. A week later, four Syndicate raiders spend three days waiting in an empty asteroid field. The traffic between them, complaining, is the most useful intelligence Starfleet has had in a month." },
+      ] },
+    fail: "The convoy sailed without the Pelion. The Syndicate took it, and painted its green hand on every hatch.",
+  },
+  "Free a ransomed crew": {
+    mission: "Free a ransomed crew", name: "The ransom", type: "Rescue", campaign: "syndicate",
+    reason: "The Syndicate is holding a freighter crew for ransom near {world}, and Starfleet doesn't pay ransoms.",
+    why: "The crew held near {world} were taken from a Syndicate convoy raid. They've seen the inside of Mother Sessaly's operation: get them out, and get them talking.",
+    thread: "The freed crew were held aboard a Syndicate ship that had just come from the yards: its hull still wore fresh repair work, and its navigation log, wiped, still had a fragment of a course toward the sector's edge. Somewhere out there, the Syndicate builds ships.",
+    keys: ["Mara Teller|the captured freighter's captain", "Jem Ostrava|a freighter boy of fifteen who got away and called for help", "Overseer Hask|the Syndicate's man in charge of the hostages"],
+    strange: ["a cell with a Starfleet uniform hanging in it", "a ledger written in Orion trade code", "a hostage who doesn't want to be rescued"],
+    brief: "The Syndicate has a freighter crew of eleven in a compound near {world} and has asked a price for them that no freighter company can pay. {key} has been their only voice to the outside. Starfleet doesn't pay ransoms. Get them out.",
+    arrive: "The compound sits in a canyon on {world}, low prefab buildings behind a fence that hums, with a Syndicate raider parked on the pad. Reyes studies it from a ridge a kilometre off, through a scope, for an hour without speaking.\n\n\"Twelve guards that I can see,\" she says at last. \"Probably twenty. They rotate on the hour. The hostages are in the long building on the left, and the transporter scramblers are on the roof.\" She lowers the scope. \"It can be done. Quietly. Ask me again how quietly after dark.\"",
+    steps: [
+      ["Get close", "Reyes takes the team in after dark, down the canyon wall on lines, in black, with phasers on stun. Two guards on the perimeter never know what happened to them. At the fence, she kneels beside the power junction and works on it for six minutes while everyone else holds their breath."],
+      ["Kill the scramblers", "The fence goes dark, and with it, the transporter scramblers on the roof. For ninety seconds, until the backup generator kicks in, the Pelion can reach anyone in the compound. Rrinn, on the bridge, has every hostage's life sign marked and ready."],
+      ["Out", "The transporter takes them in threes, eleven freighter crew and then the away team, with the alarms going and the guards running and somebody firing wildly into the dark. The last beam-out is Reyes, alone, holding the door. In the transporter room, eleven people who had stopped hoping are hugging people they've never met."],
+    ],
+    choice: { title: "The overseer", text: "On the way out, Reyes stunned the compound's overseer, {key} if the freighter crew have the name right, and he's lying on the transporter pad with everyone else. He knows the Syndicate's operation from the inside. Take him, and Starfleet can question him: the Syndicate will want him back, and will make that known. Or leave him for the local authorities, who will hold him for a week and then let him go.",
+      options: [
+        { id: "take", name: "Take him to the brig", blurb: "+10 science (intelligence), +2 commendations. The Syndicate will retaliate: a raider strikes.", how: "The ransomed crew freed near {world}, with the Syndicate's overseer taken for questioning.", fx: { science: 10, commendations: 2, orion: 1 }, text: "The overseer wakes up in the Pelion's brig, looks around, and laughs. \"She'll want me back,\" he says. \"You'll see.\" A week later, an Orion raider hits a Federation world, and leaves the green hand painted on a wall: a message. But the overseer, in the brig, has started to talk." },
+        { id: "leave", name: "Leave him for the locals", blurb: "+2 commendations, accord +1: no reprisal.", how: "The ransomed crew freed near {world}; the overseer left to the local authorities.", fx: { commendations: 2, accord: 1 }, text: "The overseer goes down to {world}'s constables, who are delighted and say so. He'll be free in a week, everyone knows it, but {world} has seen the Federation come for eleven people nobody else would pay for, and they'll remember that longer." },
+      ] },
+    fail: "The Pelion never came. The freighter company couldn't pay. The Syndicate moved the eleven somewhere else, and they haven't been heard from since.",
+  },
+  "Find the leak at Starbase 23": {
+    mission: "Find the leak at Starbase 23", name: "The quartermaster's ledger", type: "Crew", campaign: "syndicate",
+    reason: "Someone at Starbase 23 has been selling Starfleet secrets, and Starfleet wants them found quietly.",
+    why: "Every convoy the Syndicate took had its route filed at Starbase 23 a day before it sailed. Someone at the starbase is selling them.",
+    thread: "The leak at Starbase 23 was a quartermaster, selling routes to save his brother from a Syndicate hold. He gave up the relay codes, and a name the Syndicate uses for its shipyard: the Edge.",
+    keys: ["Lieutenant Commander Owen Halloran|the starbase's quartermaster, eighteen years in Starfleet", "Commodore Inés Batista|the starbase's commander, who wants this kept quiet", "Yeoman Pia Sorel|a clerk who noticed something and is frightened"],
+    strange: ["a message burst sent every time a route is filed", "a ledger with two sets of numbers", "a family photograph hidden in a duty locker"],
+    brief: "Someone at Starbase 23 is telling the Syndicate where the convoys will be. {key} wants the Pelion's crew to find out who, quietly, without frightening the leak into running.",
+    arrive: "Starbase 23 looks exactly as it always does: the docks busy, the corridors bright, the promenade full of off-duty crew. That's the hard part. Somewhere in all that ordinary business is someone who has been selling it out for months.\n\n{key} meets the captain in a sealed office with the blinds down. \"Eleven hundred people work on this station,\" {key} says. \"I've known most of them for years. I'd like you to tell me which one it is, and I'd like you to be wrong.\"",
+    steps: [
+      ["Follow the routes", "Rrinn goes through the starbase's message logs, every burst sent in the last three months, with her ears flat and her tail very still. It takes her two days to find it: {strange}, encrypted, to an Orion relay buoy. The bursts come from a terminal in the supply office."],
+      ["Watch the office", "Six people use the supply office's terminals. sh'Vari arranges for the next convoy route, a false one, to be filed with each of them separately, each with a different detail. Then everyone waits to see which version the Syndicate acts on."],
+      ["The ledger", "The Syndicate acts on the version given to the quartermaster. When Reyes comes to his quarters with two security officers, he's sitting at his desk with {strange} in front of him, as if he's been waiting. He has, he says. For weeks. The Syndicate has his brother, and he has been buying his brother's life one convoy at a time."],
+    ],
+    choice: { title: "The quartermaster", text: "He has given up everything: the relay codes, the buoys, and the name of the Syndicate's shipyard. He'll be court-martialled, and he knows it. But his brother is still in a Syndicate hold, and the moment the Syndicate knows he's been caught, his brother is dead. Keep the arrest quiet, and let him go on sending routes, false ones, for as long as it takes to find his brother. Or arrest him openly, by the book, and send the message to everyone else at the starbase that the leak is closed.",
+      options: [
+        { id: "quiet", name: "Keep it quiet", blurb: "+12 science (the Syndicate's traffic, read for months), +1 commendation. Starfleet Command marks the risk of running a traitor.", how: "The leak at Starbase 23 found, and quietly turned against the Syndicate.", fx: { science: 12, commendations: 1, command: 1 }, text: "The quartermaster goes on sending routes to the Syndicate, every one of them false, written by Rrinn and approved by {key}. The Syndicate spends a month chasing convoys that aren't there. And somewhere in the traffic they send back, there's a ship carrying eleven prisoners, one of them his brother. Starfleet Command doesn't like it, and says so in the captain's file. But it works." },
+        { id: "arrest", name: "Arrest him openly", blurb: "+3 commendations: the leak is closed, by the book.", how: "The leak at Starbase 23 found and arrested by the book.", fx: { commendations: 3 }, text: "The quartermaster is arrested on the promenade, in uniform, in front of everyone, and walks to the brig without a word. By evening the whole starbase knows. The convoys stop vanishing. He asks the captain, before the court-martial, to find his brother. The captain says the Pelion will try." },
+      ] },
+    fail: "The Pelion never came. The leak at Starbase 23 went on selling routes for another month, and then was gone: transferred out, under another name, and the Syndicate found another.",
+  },
+  "Turn a Syndicate captain": {
+    mission: "Turn a Syndicate captain", name: "The captain who wants out", type: "Diplomatic", campaign: "syndicate",
+    reason: "A smuggler at {world} wants to come in from the cold, and has something to trade for it.",
+    why: "A Syndicate raider captain at {world} has sent word that she wants out. She knows where Mother Sessaly's ships go between raids.",
+    thread: "Captain Vessa Thane gave up the Syndicate's repair schedule: every ship Sessaly owns goes to the same place for refit, a dead star at the sector's edge, inside a ring of asteroids.",
+    keys: ["Captain Vessa Thane|of the Syndicate raider Green Viper", "First Mate Korro|Thane's mate, who doesn't know yet", "Mother Sessaly's factor|a soft-spoken man who is watching Thane very closely"],
+    strange: ["a raider with its guns already cold", "a coded message hidden in a trade manifest", "a Syndicate tracker in Thane's own blood"],
+    brief: "A message reached Starfleet through three cutouts: a Syndicate raider captain at {world}, {key}, wants out, and will trade what she knows for a new name and a safe place to live it. It may be a trap. It may not.",
+    arrive: "The Green Viper sits in {world}'s spaceport with its guns cold and its crew on shore leave, a lean, scarred raider that has taken at least two of the convoys the Pelion was sent to protect. Its captain meets the away team in a back room of a spaceport bar, alone, with her hands flat on the table where they can be seen.\n\n\"You came,\" {key} says. Up close, she's younger than her record. And frightened. \"Good. I'd like to do this fast. I'm being watched.\"",
+    steps: [
+      ["Hear her out", "{key} talks for an hour, quietly, to sh'Vari and the captain. She's been with the Syndicate since she was fourteen. She's taken ships, and she's never killed anyone, and lately she's been told to start. She wants out before she does. The question is whether to believe her."],
+      ["Find the tracker", "Vessik finds it on the second meeting, in a scan she didn't know he was running: {strange}, a Syndicate tracker in her blood, the kind they put in captains to know where they are. If she defects with it in her, the Syndicate will know where she is for the rest of her life. Vessik says he can take it out. It'll take an hour, and it'll hurt."],
+      ["Make the deal", "With the tracker out and in a dish on Vessik's table, still faintly blinking, {key} gives them everything. The Syndicate's codes. Its schedules. And the place every Syndicate ship in the sector goes for refit, every few months, without fail. Then she asks what happens to her crew."],
+    ],
+    choice: { title: "The crew", text: "{key} will come in. Her crew, nineteen of them, are Syndicate to the bone, and some of them have done things she never would. Offer them all amnesty, and the Syndicate loses a ship and a crew, and the Federation takes on nineteen people it can't quite trust. Or take {key} alone, and let the Green Viper go back to the Syndicate under a new captain, as if nothing had happened.",
+      options: [
+        { id: "all", name: "Amnesty for all of them", blurb: "The Green Viper comes over: +3 commendations, +8 supplies (its cargo), +4 spares (its stores).", how: "Captain Thane turned at {world}, with her ship and crew.", fx: { commendations: 3, supplies: 8, spares: 4 }, text: "{key} tells her crew on the Green Viper's bridge, with the Pelion's security officers waiting outside the door. There's shouting. Then there isn't. Nineteen people put their weapons on the deck. The Green Viper comes over to Starfleet with its holds full, and its crew go to Starbase 23 to start again. Some of them won't make it. Most of them will." },
+        { id: "alone", name: "Take her alone", blurb: "+12 science (her intelligence), +1 commendation; the Syndicate never knows she's gone.", how: "Captain Thane turned at {world}, alone and in secret.", fx: { science: 12, commendations: 1 }, text: "{key} leaves the Green Viper in the night with nothing but the clothes she's wearing, and the Syndicate thinks she's dead: the Pelion arranges that. Her crew get a new captain. She gets a new name, and a long debriefing at Starbase 23, and somewhere quiet to be afraid for a while. Everything she knows goes into Starfleet's files." },
+      ] },
+    fail: "The Pelion never came. A week later, the Green Viper sailed from {world} with a new captain. Nobody knows what happened to the old one.",
+  },
+  "Break a blockade": {
+    mission: "Break a blockade", name: "The starving moon", type: "Security", campaign: "syndicate",
+    reason: "Raiders are blockading {world}, and the Pelion has been sent to open it up.",
+    why: "The Syndicate is blockading {world} to make an example of it: it refused to pay. Every world in the sector is watching to see whether Starfleet lets it starve.",
+    thread: "The blockade ships were fresh from refit, and their crews talked on the open channel when they thought no one was listening: about the yards at the Edge, and the matriarch who was waiting there for them to come home.",
+    keys: ["Governor Teo Amari|of {world}, who refused to pay", "Captain Rhosk|the blockade's commander, an Orion with a reputation", "Sister Ilana Merrow|who runs {world}'s only hospital"],
+    strange: ["a minefield laid in a perfect lattice", "a raider flying a Federation transponder", "a message from Mother Sessaly herself"],
+    brief: "{world} refused to pay the Syndicate, and the Syndicate has blockaded it: three raiders and a minefield, and no ship in or out for a month. The food is running out. {key} won't give in. Break the blockade.",
+    arrive: "{world} hangs behind its blockade like a prisoner behind bars: three Orion raiders in a slow orbit, and around them, glittering in the sunlight, {strange}. A freighter that tried to run it a week ago is still out there, tumbling, broken in half.\n\n{key} manages a hail through the jamming, a thin face on a flickering screen. \"We have food for nine days,\" {key} says. \"Maybe eleven if the children eat less, and they're already eating less. We are not going to pay.\"",
+    steps: [
+      ["Clear the mines", "Grath and Sevek map the minefield from outside it, a day of patient sweeps, and find the lattice's pattern: a gap, one ship wide, that the raiders use themselves. The Pelion goes through it at a crawl, with Helm holding her own breath and every mine on the sensors close enough to touch."],
+      ["Face the line", "Inside the minefield, the Pelion comes face to face with the three raiders, and with {key}'s hail playing on every channel to the whole of {world}. The raiders' commander looks at the Heavy Cruiser that has just come through his minefield, and at his three small ships, and thinks about it for a long time. Then the raiders break formation and run. The first freighter lands on {world} an hour later, and the town square is full of people."],
+    ],
+    choice: { title: "The raiders", text: "The raiders are running for the edge of the system, damaged by their own mines on the way out and slower than they'd like. The Pelion could run them down, and the Syndicate would lose three ships. Or the Pelion could let them go, and stay at {world} to help the freighters in and the hospital stock up.",
+      options: [
+        { id: "chase", name: "Run them down", blurb: "+3 commendations, +4 spares salvaged from the raiders; the Syndicate loses three ships.", how: "The blockade of {world} broken, and its raiders run down.", fx: { commendations: 3, spares: 4 }, text: "The Pelion runs them down one at a time at the edge of the system, and the raiders surrender rather than fight. Their crews go to {world}'s constables; their ships go to the salvage yards, and their spare parts go to the Pelion. Three fewer ships for Mother Sessaly. She'll notice." },
+        { id: "stay", name: "Stay and help", blurb: "+2 commendations, accord +2, and {world}'s harm −1.", how: "The blockade of {world} broken; the Pelion stayed to help it recover.", fx: { commendations: 2, accord: 2, heal: 1 }, text: "The Pelion stays a week, running freighters in, beaming medical supplies down to {key}'s hospital, and helping {world} remember what it's like not to be hungry. The raiders get away. Nobody on {world} cares. They'll remember who came." },
+      ] },
+    fail: "The Pelion never came. {world} paid the Syndicate in the end, when the food ran out, and every world in the sector saw it.",
+  },
+  "The Shipyard at the Edge": {
+    type: "Campaign", campaign: "syndicate", finale: true,
+    keys: ["Mother Sessaly|the Syndicate matriarch who has come to tax the sector"], strange: ["the Edge"],
+    why: "Every thread of The Syndicate's Due leads here. While the Edge stands, the Syndicate owns the sector's supply lines.",
+    thread: "The green hand has closed.",
+    complication: { title: "The yard's guns", text: "The shipyard's defence platforms come awake all at once: a dozen gun turrets hidden in the asteroids, swinging toward the Pelion with a groan the sensors can hear. {key}'s voice comes over every channel, warm as honey. \"Captain. You've come all this way. Let me show you how we welcome guests.\"\n\nsh'Vari: \"If we stay in the ring, we're in their field of fire. If we pull back, she gets away.\"", press: "Hold the ring", skills: ["Helm", "Phasers", "Leadership"], oppose: { name: "the shipyard's defences", skill: "Firepower", target: 13 }, win: "The Pelion weaves through the asteroids under fire, using the rocks as cover, and Reyes takes the turrets out one by one with short, careful bursts. When the last one falls silent, the shipyard is open, and {key}'s voice on the channel isn't warm any more.", lose: "The turrets catch the Pelion between two asteroids, and the shields take a beating before Helm gets her clear. A conduit on deck six blows; the sensors go fuzzy. But the Pelion is still in the ring.", cost: "sensors", costText: "the yard's guns damage the sensors" },
+    brief: "At the sector's edge, inside a ring of asteroids around a dead star, sensors find the Edge: Mother Sessaly's shipyard, where her ships are built, her prisoners held and her ledgers kept. She knows Starfleet has found her. Get there before she moves.",
+    arrive: "The Edge is a city in the rubble: docks and cranes and hab modules built into the asteroids, lit up like a festival, with half a dozen Syndicate raiders in their berths and twice as many half-built. In the middle of it all, in an asteroid carved into a palace, is {key}.\n\nShe hails the Pelion before it can hail her, a tall Orion woman in green and gold, smiling. \"Captain. I wondered when you'd come. Sit down. Let's talk about what the Corvan Sector owes me.\"",
+    steps: [
+      ["Find the prisoners", "Rrinn finds them in the first hour: eighty-three life signs in a hab module deep in the ring, Federation and independent, freighter crews and ore haulers and one quartermaster's brother. {key} hasn't moved them. She doesn't think she needs to."],
+      ["Get past the guns", "The yard's defences come up as the Pelion closes, a ring of turrets hidden in the rocks. Hours of manoeuvre later, the Pelion is inside the ring, the turrets are silent, and {key} has stopped smiling."],
+      ["Get them out", "The transporters take the prisoners in groups of six, eighty-three people beamed up through a gap in the yard's shields that Grath holds open with sheer stubbornness. The last one up is the quartermaster's brother. Now there's only {key}, in her palace, with her ships and her ledgers, and a decision to make."],
+    ],
+    choice: { title: "Mother Sessaly", text: "The prisoners are safe, and {key} is trapped in her palace in the rock, with her ledgers: every bribe, every contact, every official in the sector who took Syndicate money. Take her, and her ledgers, and the Syndicate's operation in the sector comes down with her, and the Syndicate will never forgive it. Or let her go, back to Orion space, in exchange for the ledgers and her word that she's done with the Corvan Sector.",
+      options: [
+        { id: "take", name: "Arrest her", blurb: "+5 commendations, +15 supplies (the yard's stores), +4 spares. The Syndicate answers: a raider strikes.", how: "Mother Sessaly arrested at the Edge, and her shipyard taken.", fx: { commendations: 5, supplies: 15, spares: 4, orion: 1 }, text: "{key} comes out of her palace on her own feet, in green and gold, with her head high, and walks to the Pelion's brig as if she's going to dinner. Her ledgers bring down eleven officials across the sector in a month. The Syndicate sends a raider to burn a world in her name, because it has to. But the convoys sail, and nobody paints green hands on them any more." },
+        { id: "deal", name: "Let her go, for the ledgers", blurb: "+20 science (the ledgers), +3 commendations; no reprisal. Starfleet Command doesn't like the deal.", how: "Mother Sessaly let go at the Edge, in exchange for her ledgers and her word.", fx: { science: 20, commendations: 3, command: 1 }, text: "{key} leaves for Orion space in a single ship, with her word given and her ledgers left behind on the palace table, neatly stacked. The Syndicate's operation in the sector collapses without her within weeks. Starfleet Command marks the deal on the captain's file: they wanted her in a cell. But the convoys sail, and nobody died for it." },
+      ] },
+    fail: "Mother Sessaly moved the shipyard before the Pelion arrived. The Edge is empty rock now. Somewhere else in the sector, the green hand is open again.",
+  },
+};
+
 // ---- stories.js ----
 // The stories behind each kind of order, in the way of The Silence at Corvan II: a briefing, a scene on arrival, a scene
 // for each stage of the work, a decision at the end with two ways to go, and what happens if the Pelion is too late.
@@ -401,6 +733,7 @@ const SHIP_LABELS = { cruiser: "USS Pelion (Heavy Cruiser)", escort: "Escort", s
  * house that wants what they guard. Every order the Pelion carries out turns up a thread; enough threads lead to the
  * Makers' Gate.
  */
+
 const CAMPAIGN = {
   title: "Watchers of the Void",
   premise: "The caretaker of Corvan II was not alone. A vanished people, the Makers, left machines like it across the Corvan Sector to watch over younger worlds. Two of those sites have already been dug up, and no one who was there is left to say by whom: a Federation survey team of six, gone without a trace, and a mining settlement of forty, its homes standing empty with the meals still on the tables. Starfleet Command is worried for three reasons. Someone is killing, or taking, everyone who sees them. The worlds those machines watched over are now unguarded, and one of them is already in trouble. And a machine that could pull a Heavy Cruiser out of orbit is a weapon in the wrong hands, on a border with the Klingon Empire. Every order Starfleet gives the Pelion this tour comes back to the same questions: who is doing this, and what are they looking for?",
@@ -751,6 +1084,8 @@ const FIRST_NAMES = {
   "Mediate a dispute between two worlds": "The contested moon", "Test experimental technology": "The cloak inverter", "Ferry a delegation to a world that left the Federation": "The scorched spaceport",
   "Shore leave that goes wrong": "The carnival", "Carry a message across the Neutral Zone": "The sealed message", "The Makers' Gate": "The Makers' Gate",
 };
+// The campaigns after the first bring their own order types and stories.
+Object.assign(STORIES, SERIES_STORIES);
 for (const [k, n] of Object.entries(FIRST_NAMES)) if (STORIES[k]) { STORIES[k].name = n; STORIES[k].mission = k; }
 Object.assign(STORIES, {
   "Answer a distress call#2": {
@@ -1163,6 +1498,7 @@ function makeSector(seed) {
 
 
 
+
 // ---------- dice ----------
 function rand(S) { const r = makeRng(0); r.setState(S.rng); const v = r.next(); S.rng = r.state(); return v; }
 const d6 = (S) => 1 + Math.floor(rand(S) * 6);
@@ -1175,14 +1511,15 @@ function check(S, target) {
 }
 
 // ---------- a new game ----------
-function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
+function newGame({ seed, difficulty = "normal", captain = "", mode = "tour" } = {}) {
   seed = seed || String(Math.floor(Math.random() * 1e9));
   const sec = makeSector(seed);
   const sb = sec.systems[sec.starbase];
   const S = {
-    v: 1, seed: String(seed), difficulty, captain: captain.trim() || "Captain", turn: 1, rng: hashString("dice:" + seed),
+    v: 1, seed: String(seed), difficulty, mode: mode === "open" ? "open" : "tour", captain: captain.trim() || "Captain", turn: 1, rng: hashString("dice:" + seed),
     hexes: sec.hexes, systems: sec.systems, sysAt: sec.sysAt, starbase: sec.starbase, corvan: sec.corvan,
-    pelion: { at: sb.at, warp: CRUISE_WARP, days: 7, mp: lyPerWeek(CRUISE_WARP), acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true },
+    pelion: { at: sb.at, warp: CRUISE_WARP, days: 7, mp: lyPerWeek(CRUISE_WARP), acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true,
+      alloc: { shields: 1, sensors: 1, labs: 0, ops: 0 }, stores: { dilithium: 10, antimatter: STORES.antimatter.max, spares: 6 }, wear: 0, lyWeek: 0 },
     stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
     crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false }])),
     backlog: [],   // orders waiting their turn
@@ -1194,6 +1531,8 @@ function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
     visible: {}, seenSys: {}, log: [], over: null, pending: null, battle: null, event: null, tutorial: { on: true },
   };
   for (const s of Object.values(S.systems)) if (KINDS[s.kind].known) S.seenSys[s.id] = true;
+  // Dilithium deposits: about a third of the uncharted and anomalous systems have crystal seams, found by a survey.
+  for (const s of Object.values(S.systems)) if (["empty", "anomaly", "orionBase"].includes(s.kind) && hashString(S.seed + ":dil:" + s.id) % 3 === 0) s.dilithium = 3 + (hashString(S.seed + ":dn:" + s.id) % 4);
   S.seenSys[S.corvan] = true; S.systems[S.corvan].surveyed = true;
   // The first orders: The Silence at Corvan II. An Orion raider is already in orbit there.
   const cv = S.systems[S.corvan];
@@ -1274,6 +1613,13 @@ function target(S, id, skill, ctx = {}) {
     const r = sensorsRating(S); if (r !== 2) parts.push(["Ship's sensors", r - 2]);
     if (P.sys.sensors) parts.push(["Sensors damaged", Math.max(-6, sysPenalty(P.sys.sensors))]);
   }
+  if (!ctx.combat && !ctx.unit && id !== "captain") {   // the week's power
+    const A = S.pelion.alloc || {};
+    if (skill === "Sensors" && A.sensors) parts.push(["Power to sensors", A.sensors]);
+    if (["Physical Sciences", "Life Sciences", "Computers"].includes(skill) && A.labs) parts.push(["Power to the labs", A.labs]);
+    if (["Engineering", "Medicine"].includes(skill) && A.ops) parts.push(["Power to operations", A.ops]);
+  }
+  if (ctx.action === "repair" && !ctx.combat && storesOf(S).spares <= 0) parts.push(["No spare parts", -3]);
   if ((ctx.action === "survey" || ctx.action === "investigate") && hasRecord(S, "science1")) parts.push(["Graviton lensing", 1]);
   if (ctx.action === "envoy" && hasRecord(S, "envoy1")) parts.push(["A dead language", 1]);
   if (ctx.action === "sweep" && hasRecord(S, "sweep2")) parts.push(["Cloaked wake", 2]);
@@ -1302,8 +1648,12 @@ const daysPerLy = (w) => (w > 0 ? 365.25 / lightSpeeds(w) : Infinity);
 /** The highest warp the engines allow: warp 8, the emergency maximum, less 2 for each box of engine damage. */
 const EMERGENCY_WARP = 8;
 function maxWarp(S) {
-  const e = S.pelion.sys.engines;
-  return e >= 3 ? 1 : EMERGENCY_WARP - 2 * e;
+  const P = S.pelion, e = P.sys.engines, st = storesOf(S), pw = reactorPower(S);
+  let m = e >= 3 ? 1 : EMERGENCY_WARP - 2 * e;
+  if (st.antimatter <= 0) m = Math.min(m, 2);          // running on the reserve
+  if (st.dilithium <= 0) m = Math.min(m, 4); else if (st.dilithium <= 2) m = Math.min(m, 6);   // a failing matrix won't hold high warp
+  if (pw < 3) m = Math.min(m, pw >= 2 ? 6 : 4);        // the engines need the power: warp 7 and 8 take 3
+  return m;
 }
 /** Light-years the Pelion has left this turn: the days left in the week at its warp factor. */
 function syncMp(S) { const P = S.pelion; P.mp = P.days * lightSpeeds(P.warp) / 365.25; }
@@ -1311,8 +1661,10 @@ function syncMp(S) { const P = S.pelion; P.mp = P.days * lightSpeeds(P.warp) / 3
 function setWarp(S, w) {
   const P = S.pelion, m = maxWarp(S);
   w = Math.max(0, Math.min(m, Math.round(w)));
-  P.warp = w; syncMp(S);
-  return { ok: true, warp: w };
+  P.warp = w;
+  const took = balancePower(S, "warp");   // the engines take what they need from the other systems
+  syncMp(S);
+  return { ok: true, warp: P.warp, took };
 }
 /** How a warp factor reads: "Warp 6: 216 × the speed of light, 4.1 ly a week, 1.7 days a light-year". */
 function warpText(w) {
@@ -1323,6 +1675,112 @@ function warpText(w) {
 /** Orders that call for maximum warp. */
 const isUrgent = (o) => !!(o && (o.urgent || (o.twist && o.twist.fx === "urgent")));
 /** Ly a week the Pelion makes at its current warp (what "speed" means now). */
+// ---------- the ship's power ----------
+// The warp core makes Power (5, more with refits and records, less with damage or failing dilithium), and every week it is
+// shared out, as in battle: the engines take what the warp factor needs (1 up to warp 4, 2 up to warp 6, 3 for warp 7 and
+// 8), and the rest goes to the shields on standby, the sensors, the science labs and operations, up to 2 each.
+const POWER_SYSTEMS = {
+  shields: { name: "Shields on standby", blurb: ["Down: an ambush catches the Pelion cold.", "On standby: an ambush's first volley loses its edge (no +2).", "Raised: as standby, and +1 Shields box in any battle this week."] },
+  sensors: { name: "Sensors", blurb: ["Passive only.", "+1 to Sensors rolls.", "+2 to Sensors rolls, sweeps reach a light-year further, and the Pelion sees a hex further."] },
+  labs: { name: "Science labs", blurb: ["Dark.", "+1 to Physical Sciences, Life Sciences and Computers rolls.", "+2 to those rolls, and +2 science a week from the labs' own work."] },
+  ops: { name: "Operations", blurb: ["Minimum: life support and the transporters.", "+1 to Engineering and Medicine rolls: repairs, relief, sickbay.", "+2 to Engineering and Medicine rolls."] },
+};
+const warpPower = (w) => (w <= 0 ? 0 : w <= 4 ? 1 : w <= 6 ? 2 : 3);
+/** What failing dilithium costs the reactor: −1 at 4 crystals or fewer, −2 at 2 or fewer, −3 with none. */
+const dilithiumPenalty = (S) => { const d = storesOf(S).dilithium; return d <= 0 ? 3 : d <= 2 ? 2 : d <= 4 ? 1 : 0; };
+const reactorPower = (S) => Math.max(1, PELION.power + (S.pelion.refits.power ? 1 : 0) + (hasRecord(S, "power1") ? 1 : 0) - (S.pelion.powerLoss || 0) - dilithiumPenalty(S));
+const allocOf = (S) => (S.pelion.alloc = S.pelion.alloc || { shields: 1, sensors: 1, labs: 0, ops: 0 });
+const powerUsed = (S) => warpPower(S.pelion.warp ?? CRUISE_WARP) + Object.values(allocOf(S)).reduce((t, n) => t + n, 0);
+const powerFree = (S) => reactorPower(S) - powerUsed(S);
+/** Set the power to one system (0–2). */
+function setAlloc(S, sys, n) {
+  const A = allocOf(S); if (!(sys in POWER_SYSTEMS)) return { error: "No such system." };
+  n = Math.max(0, Math.min(2, Math.round(n)));
+  if (n > A[sys] && powerFree(S) < n - A[sys]) return { error: `Not enough power: ${reactorPower(S)} in all, and the engines need ${warpPower(S.pelion.warp)} at warp ${S.pelion.warp}. Lower the warp or take power from another system.` };
+  A[sys] = n;
+  return { ok: true };
+}
+/**
+ * Make the power add up: when the warp needs more, or the reactor makes less, the labs give it up first, then
+ * operations, then the sensors, then the shields; if that isn't enough, the warp drops. Returns what was taken.
+ */
+function balancePower(S, why = "") {
+  const A = allocOf(S), P = S.pelion, took = [];
+  for (const k of ["labs", "ops", "sensors", "shields"]) while (powerFree(S) < 0 && A[k] > 0) { A[k]--; took.push(POWER_SYSTEMS[k].name); }
+  while (powerFree(S) < 0 && P.warp > 0) { P.warp--; took.push("warp"); }
+  if (took.length && why !== "warp") log(S, `Power: the reactor makes ${reactorPower(S)}; ${[...new Set(took)].join(", ").toLowerCase()} lose power to make it add up.`, "bad");
+  return [...new Set(took)];
+}
+
+// ---------- the ship's stores ----------
+// What the warp drive eats. Antimatter is fuel: burned by the light-year, faster above warp 6. Dilithium regulates the
+// reaction and wears with use (a crystal every four weeks at warp, sooner at emergency speed or in battle); with too few
+// crystals the reactor makes less Power and won't hold high warp. Spare parts (plasma injectors, warp coils, coolant) go
+// into every repair and every week at emergency warp. Starbase 23 refuels the antimatter; the rest is bought, traded,
+// mined, salvaged or recrystallized.
+const STORES = {
+  dilithium: { name: "Dilithium", max: 10, unit: "crystal", blurb: "Regulates the warp reaction. Wears: a crystal every four weeks at warp, every two at emergency warp, and a quarter of one each battle. At 4 or fewer the reactor makes 1 less Power; at 2 or fewer, 2 less and no more than warp 6; with none, 3 less and no more than warp 4." },
+  antimatter: { name: "Antimatter", max: 20, unit: "unit", blurb: "The fuel: about 1 a week at warp 6, 4 a week at warp 8, and 1 a battle. With none, the Pelion limps on its reserve at warp 2 until it reaches fuel, or a tender reaches it." },
+  spares: { name: "Spare parts", max: 10, unit: "crate", blurb: "Plasma injectors, warp coils, coolant. Every repair uses one (−3 to repair without), and so does every week at emergency warp." },
+};
+const storesOf = (S) => (S.pelion.stores = S.pelion.stores || { dilithium: 10, antimatter: STORES.antimatter.max, spares: 6 });
+/** Add (or take) stores, within their limits. Returns what actually changed. */
+function addStore(S, k, n) {
+  const st = storesOf(S), was = st[k];
+  st[k] = Math.max(0, Math.min(STORES[k].max, st[k] + n));
+  if (k === "dilithium" && st[k] !== was) balancePower(S);
+  return st[k] - was;
+}
+/** Where stores can be had, and at what price in supplies. */
+function marketAt(S) {
+  const s = sysAt(S, S.pelion.at); if (!s) return null;
+  const C = campaignOf(S), cold = (C.id === "coldfire" && !C.over) ? 2 : 1;   // while the cold spreads, dilithium is dear
+  if (s.id === S.starbase) return { name: "Starbase 23", items: { dilithium: 4 * cold, spares: 3 } };
+  if (s.kind === "colony" || s.kind === "member") return { name: s.name, items: { antimatter: 1, spares: 4 } };
+  if (s.kind === "independent" && s.accord >= 1) return { name: s.name, items: { dilithium: 5 * cold, antimatter: 2 } };
+  return null;
+}
+function buyStore(S, k, n = 1) {
+  const m = marketAt(S); if (!m || !m.items[k]) return { error: "Nobody here sells that." };
+  if (S.battle || S.over) return { error: "Not now." };
+  const st = storesOf(S), room = STORES[k].max - st[k], price = m.items[k];
+  n = Math.min(n, room, Math.floor(S.supplies / price));
+  if (room <= 0) return { error: "The holds are full." };
+  if (n <= 0) return { error: `Needs ${price} supplies.` };
+  S.supplies -= n * price; addStore(S, k, n);
+  log(S, `Stores: ${n} ${STORES[k].unit}${n === 1 ? "" : "s"} of ${STORES[k].name.toLowerCase()} from ${m.name}, ${n * price} supplies. Now ${st[k]}/${STORES[k].max}.`, "good");
+  return { ok: true, n };
+}
+/** A fuel tender from Starbase 23, when the antimatter runs low far from home: 10 supplies, here in two weeks. */
+function requestTender(S) {
+  const st = storesOf(S);
+  if (S.tender) return { error: "A tender is already on its way." };
+  if (S.pelion.docked) return { error: "Docked: the starbase refuels the Pelion." };
+  if (st.antimatter > 3) return { error: "The antimatter isn't low enough to call a tender." };
+  if (S.supplies < 10) return { error: "Needs 10 supplies." };
+  S.supplies -= 10; S.tender = { due: S.turn + 2 };
+  log(S, "A fuel tender leaves Starbase 23 for the Pelion: 10 supplies, due in two weeks, wherever the Pelion is by then.", "order");
+  return { ok: true };
+}
+/** The week's wear: antimatter by the light-year, dilithium by the week at warp and the battle, spares at emergency warp. */
+function consumeStores(S) {
+  const P = S.pelion, st = storesOf(S), ly = P.lyWeek || 0, emerg = (P.strain || 0) > CRUISE_WARP, lines = [];
+  if (ly > 0) {
+    const am = Math.max(1, Math.round(ly * (emerg ? 0.4 : 0.25)));
+    const used = -addStore(S, "antimatter", -am); lines.push(`${used} antimatter for ${ly.toFixed(1)} light-years`);
+    P.wear = (P.wear || 0) + (emerg ? 2 : 1);
+    if (emerg) { if (st.spares > 0) { addStore(S, "spares", -1); lines.push("a crate of spares burned out at emergency warp"); } else lines.push("no spares left to burn at emergency warp: the engines run hot"); }
+  }
+  while ((P.wear || 0) >= 4) { P.wear -= 4; if (addStore(S, "dilithium", -1)) lines.push("a dilithium crystal worn out"); }
+  if ((S.pelion.alloc || {}).labs >= 2) { S.science += 2; lines.push("+2 science from the labs"); }
+  P.lyWeek = 0;
+  if (lines.length) log(S, `Stores this week: ${lines.join("; ")}. Dilithium ${st.dilithium}/10, antimatter ${st.antimatter}/${STORES.antimatter.max}, spares ${st.spares}/${STORES.spares.max}.`, "turn");
+  if (st.antimatter <= 3 && st.antimatter > 0) log(S, `Antimatter low: ${st.antimatter} left. Refuel at Starbase 23 or a colony, or call a tender (the Ship tab).`, "bad");
+  if (st.antimatter <= 0 && !P.docked) log(S, "Antimatter gone: the Pelion is running on its reserve, at warp 2 at most.", "bad");
+  if (S.tender && S.turn + 1 >= S.tender.due) { S.tender = null; addStore(S, "antimatter", 12); addStore(S, "spares", 2); log(S, "The fuel tender reaches the Pelion: +12 antimatter, +2 spares.", "good"); }
+  balancePower(S);
+}
+
 // ---------- the listening posts on the Neutral Zone ----------
 // Three Federation listening posts watch the Romulan Neutral Zone from the row of hexes just outside it. When the Romulans
 // strike, it's at them: a bird-of-prey crosses, decloaks, fires and goes home. Three hits and a post is lost.
@@ -1406,7 +1864,7 @@ function chooseCloak(S, id) {
   return { text: "The Pelion lets it go." };
 }
 /** How far a sensor sweep reaches for cloaked ships: 3 light-years, 5 with the tuned cloak inverter. */
-const sweepRange = (S) => 3 + ((S.pelion.refits.inverter || 0) >= 2 ? 2 : 0);
+const sweepRange = (S) => 3 + ((S.pelion.refits.inverter || 0) >= 2 ? 2 : 0) + ((S.pelion.alloc || {}).sensors >= 2 ? 1 : 0);
 function speedOf(S) { return lyPerWeek(S.pelion.warp ?? CRUISE_WARP); }
 /** Travel time, in days, for a number of light-years at a warp factor. */
 const travelDays = (ly, w) => ly * daysPerLy(w);
@@ -1454,7 +1912,7 @@ function moveTo(S, unit, hex) {
   const p = findPath(S, U.at, hex, unit === "pelion" ? "pelion" : "support");
   // The ship now faces the hex side it last crossed.
   if (p && p.path.length) { const prev = p.path.length > 1 ? p.path[p.path.length - 2] : U.at, d = neighbors(prev).indexOf(hex); if (d >= 0) U.facing = d; }
-  if (unit === "pelion") { U.days = Math.max(0, U.days - r[hex] * daysPerLy(U.warp)); syncMp(S); U.strain = Math.max(U.strain || 0, U.warp); }
+  if (unit === "pelion") { U.days = Math.max(0, U.days - r[hex] * daysPerLy(U.warp)); syncMp(S); U.strain = Math.max(U.strain || 0, U.warp); U.lyWeek = (U.lyWeek || 0) + r[hex]; }
   else U.mp -= r[hex];
   U.at = hex;
   if (unit === "pelion") for (const o of S.orders) arriveAt(S, o);
@@ -1492,9 +1950,11 @@ function dock(S) {
   const fixed = P.shields + P.hull + P.sys.weapons + P.sys.engines + P.sys.sensors > 0 || P.torps < PELION.torps;
   P.shields = 0; P.hull = 0; P.sys = { weapons: 0, engines: 0, sensors: 0 }; P.torps = PELION.torps;
   for (const id in S.crew) { const c = S.crew[id]; c.inj = 0; c.duty = 2; }
-  log(S, `Docked at Starbase 23: ${fixed ? "repaired, rearmed and " : ""}crew rested; Duty points restored.`, "good");
+  // Starfleet refuels the antimatter and issues spares up to six crates; dilithium is bought (the Ship tab).
+  const st = storesOf(S), am = addStore(S, "antimatter", STORES.antimatter.max), sp = st.spares < 6 ? addStore(S, "spares", 6 - st.spares) : 0;
+  log(S, `Docked at Starbase 23: ${fixed ? "repaired, rearmed and " : ""}crew rested; Duty points restored.${am ? ` Refuelled: +${am} antimatter.` : ""}${sp ? ` Spares issued: +${sp}.` : ""}${st.dilithium < 10 ? ` Dilithium ${st.dilithium}/10: the quartermaster has crystals, for supplies.` : ""}`, "good");
 }
-function sightRange(S) { return 2 + (S.pelion.refits.sensors ? 1 : 0); }
+function sightRange(S) { return 2 + (S.pelion.refits.sensors ? 1 : 0) + ((S.pelion.alloc || {}).sensors >= 2 ? 1 : 0); }
 function updateVisibility(S) {
   const v = {};
   const see = (hex, n) => { for (const k of within(hex, n)) if (S.hexes[k]) v[k] = true; };
@@ -1539,7 +1999,9 @@ function actionsFor(S, unit = "pelion") {
   if (s && s.kind === "prewarp" && s.surveyed && !s.observed) add("observe", { sys: s.id });   // from orbit: nothing on the planet can oppose a starship
   if (s && s.harm > 0 && ["colony", "member", "independent"].includes(s.kind)) add("aid", { sys: s.id, blurb: `Harm ${s.harm}/3. Clear a box.`, oppose: aidOpposition(S, s) });
   const P = S.pelion;
-  if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair", { oppose: repairOpposition(S) });
+  if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair", { oppose: repairOpposition(S), blurb: ACTIONS.repair.blurb + ` Uses a crate of spares (${storesOf(S).spares} left)${storesOf(S).spares ? "" : ": none left, −3"}.` });
+  if (s && s.surveyed && s.dilithium > 0 && s.kind !== "prewarp") add("mine", { sys: s.id, blurb: `A seam of about ${s.dilithium} crystal${s.dilithium === 1 ? "" : "s"} here. Cut 2 (3 on success by 5) for the Pelion's matrix (${storesOf(S).dilithium}/10). Lose by 3 or more and the seam bites back.`, oppose: { name: "the crystal seams", skill: "Instability", target: 10, why: "Living dilithium fractures if it's cut wrong, and sometimes the rock around it does too." } });
+  if (storesOf(S).dilithium < STORES.dilithium.max && storesOf(S).spares > 0) add("recrystallize", { blurb: `Restore worn crystals with a field from the warp core: +1 dilithium (+2 on success by 5), for a crate of spares. Dilithium ${storesOf(S).dilithium}/10, spares ${storesOf(S).spares}.`, oppose: { name: "the fractured lattice", skill: "Fracture", target: 11, why: "A worn crystal's lattice has to be coaxed back, plane by plane." } });
   add("sweep", { blurb: `Listen for cloaked ships and raiders within ${sweepRange(S)} light-years: reveals them. Finds a hidden base here.${P.refits.inverter ? " The cloak inverter helps: +2." : ""}`, oppose: { name: "cloaks and subspace static", skill: "Concealment", target: 11, why: "Anything worth finding is trying not to be found, and the sector's background noise helps it." } });
   for (const e of enemiesAt(S, U.at)) if ((!e.cloaked || e.revealed) && !e.hidden && !ENEMIES[e.type].base) {
     if (ENEMIES[e.type].will) add("hail", { enemy: e.id, name: `Hail the ${ENEMIES[e.type].name}`, oppose: { name: `the ${ENEMIES[e.type].name}'s captain`, skill: "Will", target: ENEMIES[e.type].will + (e.power === "romulan" ? 2 : 0), why: e.power === "klingon" ? "A Klingon captain backs down from nothing lightly." : e.power === "romulan" ? "Romulans don't negotiate from weakness, and never think they're weak." : "Pirates weigh the odds, and the profit." } });
@@ -1547,7 +2009,7 @@ function actionsFor(S, unit = "pelion") {
   }
   const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && e.at === U.at && e.found);
   if (base) out.push({ id: "engage", enemy: base.id, name: "Attack the Orion base", skills: [], blurb: "Its guns and shields against yours. Destroy it and the raids stop." });
-  for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, ...(o.oppose ? { oppose: o.finale && S.pelion.refits.inverter ? { ...o.oppose, target: o.oppose.target - 2, why: o.oppose.why + " But their cruiser's cloak is no use against the cloak inverter: −2 to them." } : o.oppose } : { extra: [["In the field", -2]] }) });
+  for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, ...(o.oppose ? { oppose: o.finale && S.pelion.refits.inverter && o.campaignId !== "syndicate" ? { ...o.oppose, target: o.oppose.target - 2, why: o.oppose.why + " But their cruiser's cloak is no use against the cloak inverter: −2 to them." } : o.oppose } : { extra: [["In the field", -2]] }) });
   if (s && s.id === S.corvan) out.push(...arcActionsHook(S));
   // With an away team on Corvan II's surface, the away team does the mission's work and the bridge crew (whoever stayed
   // aboard) runs the ship: its operations are theirs alone.
@@ -1701,6 +2163,7 @@ function applyAction(S, p) {
     case "survey": {
       if (!r.success) return say(S, `${name} couldn't make sense of ${s.name}'s readings. Try again next turn.`);
       s.surveyed = true; S.seenSys[s.id] = true;
+      if (s.dilithium) log(S, `${s.name} has a seam of living dilithium, about ${s.dilithium} crystals: the Pelion can mine it.`, "discovery");
       const sci = 4 + (big ? 3 : 0) + (p.unit !== "pelion" ? 2 : 0); S.science += sci;
       const what = { prewarp: "a pre-warp people. The Prime Directive applies.", anomaly: "an anomaly worth investigating.", ruins: "the ruins of a vanished civilization.", empty: "nothing but rock and starlight.", orionBase: "nothing but rock and starlight." }[s.kind] || "charted.";
       return say(S, `Survey of ${s.name}: ${what} +${sci} science.`, "discovery");
@@ -1734,10 +2197,24 @@ function applyAction(S, p) {
     case "repair": {
       if (!r.success) return say(S, `${name}'s repairs don't hold.`);
       const P = S.pelion; let n = big ? 2 : 1; const fixed = [];
+      const usedSpare = addStore(S, "spares", -1) < 0;
       for (const k of ["engines", "weapons", "sensors"]) while (n > 0 && P.sys[k] > 0) { P.sys[k]--; n--; fixed.push(k); }
       while (n > 0 && P.shields > 0) { P.shields--; n--; fixed.push("shields"); }
       if (n > 0 && P.hull > 0) { P.hull--; fixed.push("hull"); }
-      return say(S, `Repairs: ${fixed.join(", ") || "nothing needed"}.`, "good");
+      return say(S, `Repairs: ${fixed.join(", ") || "nothing needed"}${usedSpare ? ` (a crate of spares used; ${storesOf(S).spares} left)` : ", improvised without spare parts"}.`, "good");
+    }
+    case "mine": {
+      if (!r.success) {
+        if (r.margin <= -3) { const hurt = hazard(S, p); return say(S, `The seam at ${s.name} fractures under the cutters: ${hurt}`, "bad"); }
+        return say(S, `The crystals at ${s.name} won't come out clean this time.`);
+      }
+      const n = Math.min(s.dilithium, big ? 3 : 2), got = addStore(S, "dilithium", n); s.dilithium -= n;
+      return say(S, `Mining at ${s.name}: ${n} crystal${n === 1 ? "" : "s"} cut from the seam${got < n ? ` (the matrix had room for ${got}; the rest go to the stores' trade)` : ""}. Dilithium ${storesOf(S).dilithium}/10.${s.dilithium ? ` About ${s.dilithium} left in the seam.` : " The seam is worked out."}`, "good");
+    }
+    case "recrystallize": {
+      if (!r.success) return say(S, `${name} can't coax the crystals back this time.`);
+      addStore(S, "spares", -1); const got = addStore(S, "dilithium", big ? 2 : 1);
+      return say(S, `${name} recrystallizes the worn dilithium: +${got}, for a crate of spares. Dilithium ${storesOf(S).dilithium}/10, spares ${storesOf(S).spares}.`, "good");
     }
     case "sweep": {
       if (!r.success) return say(S, `The sweep finds nothing${r.margin <= -2 ? "" : " (or nothing that wants to be found)"}.`);
@@ -1821,7 +2298,7 @@ function missionStep(S, p) {
   const st = storyOf(o);
   if (st) for (let i = was; i < o.have; i++) if (st.steps[i]) storyEvent(S, `${o.title}: ${st.steps[i][0].toLowerCase()}`, storyText(S, o, st.steps[i][1]));
   // Partway through, something can go wrong: once an order, a third of the time.
-  if (st && o.have < o.segs && !o.complicated && COMPLICATIONS[st.type] && rand(S) < 0.33) {
+  if (st && o.have < o.segs && !o.complicated && complicationOf(st) && rand(S) < 0.33) {
     o.complicated = true;
     const ev = { kind: "complication", orderId: o.id };
     if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
@@ -1851,25 +2328,32 @@ function missionReport(S, o, result, how, rewards) {
 }
 // ---------- the campaign: Watchers of the Void ----------
 const campaignOf = (S) => (S.campaign = S.campaign || { threads: [], beats: [], finale: false, over: null });
+/** A campaign's definition by id: Watchers of the Void, or one of the series that follows it. */
+const defOf = (id) => (!id || id === "watchers" ? { id: "watchers", ...CAMPAIGN, finale: "The Makers' Gate" } : SERIES.find((c) => c.id === id));
+/** The campaign under way (or the last one, once it's over). */
+const campaignDef = (S) => defOf(campaignOf(S).id);
+const campId = (x) => (x && x.id) || "watchers";
 /** The current act, from the beats reached so far. */
-const campaignAct = (S) => { const C = campaignOf(S), b = CAMPAIGN.beats.filter((x) => C.beats.includes(x.at)); return b.length ? b[b.length - 1].act : "Prologue: The Silence at Corvan II"; };
+const campaignAct = (S) => { const C = campaignOf(S), D = campaignDef(S), b = D.beats.filter((x) => C.beats.includes(x.at)); return b.length ? b[b.length - 1].act : "Prologue: The Silence at Corvan II"; };
+/** The order types Starfleet has: the first fourteen, and each new campaign's, from the moment it begins. */
+const missionPool = (S) => MISSIONS.concat(SERIES_MISSIONS.filter((m) => (S.unlocked || []).includes(m.campaign)));
 /** Is the campaign known yet? Only once Corvan II is over: before that, nothing about it may show. */
 const campaignOpen = (S) => campaignOf(S).beats.includes(0);
 /** Starfleet's reason for an order, tied to the campaign: only once the campaign is known. */
 /** Is this order part of the campaign (and is that known yet)? About half are; the rest are the frontier's ordinary work. */
-const orderTied = (S, o) => !!(o && (o.finale || o.campaign) && campaignOpen(S));
+const orderTied = (S, o) => !!(o && (o.finale || o.campaign) && campaignOpen(S) && (o.campaignId || "watchers") === campId(campaignOf(S)));
 /** Starfleet's reason for an order: the campaign's, if it's part of it and the campaign is known; otherwise its own. */
 const orderReason = (S, o) => { const st = storyOf(o); if (!st) return null; return orderTied(S, o) && st.why ? st.why : st.reason || null; };
 /** What kind of mission an order is: Diplomatic, Rescue, Technology, Exploration, Security, Crew, or the Campaign. */
 const orderType = (o) => (storyOf(o) && storyOf(o).type) || null;
 /** A beat of the campaign's story, once. */
 function campaignBeat(S, at) {
-  const C = campaignOf(S), b = CAMPAIGN.beats.find((x) => x.at === at);
+  const C = campaignOf(S), D = campaignDef(S), b = D.beats.find((x) => x.at === at);
   if (!b || C.beats.includes(at)) return;
   C.beats.push(at);
-  const text = at === 2 ? actTwo(S) : b.text;
+  const text = at === 2 && D.id === "watchers" ? actTwo(S) : b.text;
   C.beatText = C.beatText || {}; C.beatText[at] = text;   // the story so far shows what was actually said
-  storyEvent(S, `${CAMPAIGN.title}, ${b.act}: ${b.title}`, text);
+  storyEvent(S, `${D.title}, ${b.act}: ${b.title}`, text);
 }
 /**
  * Act II, House Kor'vath: how the Pelion learns who is behind the digging, from what it actually has. The two threads it
@@ -1892,22 +2376,71 @@ function campaignThread(S, o) {
   if (o.finale) return null;
   if (o.arc) { campaignBeat(S, 0); return null; }
   // Before Corvan II is over, nothing is known of the Makers: no threads, no reasons. Once the Gate is decided, it's over.
-  if (!st || !st.thread || C.over || !C.beats.includes(0) || !o.campaign) return null;
+  if (!st || !st.thread || C.over || !C.beats.includes(0) || !o.campaign || (o.campaignId || "watchers") !== campId(C)) return null;
+  const D = campaignDef(S);
   C.threads.push({ title: o.title, text: storyText(S, o, st.thread), turn: S.turn });
   const n = C.threads.length;
-  log(S, `${CAMPAIGN.title}, thread ${n}: ${storyText(S, o, st.thread)}`, "discovery");
-  for (const b of CAMPAIGN.beats) if (b.at > 0 && n >= b.at) campaignBeat(S, b.at);
-  if (n >= CAMPAIGN.finaleAt) issueFinale(S);
+  log(S, `${D.title}, thread ${n}: ${storyText(S, o, st.thread)}`, "discovery");
+  for (const b of D.beats) if (b.at > 0 && n >= b.at) campaignBeat(S, b.at);
+  if (n >= D.finaleAt) issueFinale(S);
   // Every thread costs the diggers time: their next site is two weeks further off.
   if (C.korvathNext) C.korvathNext += 2;
   return storyText(S, o, st.thread);
 }
 /** The end of the campaign: once Corvan II is done, whatever happened there, and late in the tour if need be. */
 function campaignTick(S) {
-  const C = campaignOf(S);
-  if (S.arc.stage === "done") campaignBeat(S, 0);
-  korvathTick(S);
-  if (S.arc.stage === "done" && !C.finale && S.turn >= TOUR - 14) { campaignBeat(S, CAMPAIGN.finaleAt); issueFinale(S); }
+  const C = campaignOf(S), D = campaignDef(S);
+  if (D.id === "watchers") {
+    if (S.arc.stage === "done") campaignBeat(S, 0);
+    korvathTick(S);
+    // In a fifty-week tour, the finale comes in time for the end of it; in open command, the race decides.
+    if (S.mode !== "open" && S.arc.stage === "done" && !C.finale && S.turn >= TOUR - 14) { campaignBeat(S, CAMPAIGN.finaleAt); issueFinale(S); }
+  } else rivalTick(S, D);
+  // When a campaign is over, Starfleet's attention turns: the next begins three weeks later (in a tour, only with
+  // twelve weeks or more still to go; in open command, always).
+  if (C.over && !C.endedAt) C.endedAt = S.turn;
+  if (C.over && S.turn >= C.endedAt + 3 && (S.mode === "open" || S.turn <= TOUR - 12)) startNextCampaign(S);
+}
+/** The next campaign in the series, with its own order types added to Starfleet's book. */
+function startNextCampaign(S) {
+  const C = campaignOf(S), i = campId(C) === "watchers" ? 0 : SERIES.findIndex((x) => x.id === C.id) + 1, next = SERIES[i];
+  if (!next) return;
+  (S.campaignsDone = S.campaignsDone || []).push({ id: campId(C), title: campaignDef(S).title, over: C.over, threads: C.threads.length, rival: C.korvath || 0, threadList: C.threads, beatText: C.beatText, beats: C.beats });
+  S.campaign = { id: next.id, threads: [], beats: [], finale: false, over: null, started: S.turn };
+  (S.unlocked = S.unlocked || []).push(next.id);
+  campaignBeat(S, 0);
+  const types = SERIES_MISSIONS.filter((m) => m.campaign === next.id).map((m) => m.text);
+  log(S, `A new campaign: ${next.title}. New kinds of orders from Starfleet: ${types.join("; ")}.`, "order");
+}
+/**
+ * The rival of a campaign after the first: every few weeks it gains ground on its own (the cold reaches another place, the
+ * Syndicate takes another convoy), and each thread the Pelion turns up sets it back two weeks. If it reaches the finale
+ * first, the finale begins with it ahead.
+ */
+function rivalTick(S, D) {
+  const C = campaignOf(S), R = D.rival;
+  if (!C.beats.includes(0) || C.over || C.finale) return;
+  C.korvath = C.korvath || 0;   // the rival's count (named for Watchers' House Kor'vath, whose race it was first)
+  const every = R.every[S.difficulty] || 5;
+  if (!C.korvathNext) { C.korvathNext = S.turn + every; return; }
+  if (S.turn < C.korvathNext) return;
+  C.korvath++; C.korvathNext = S.turn + every;
+  const [site, scene] = R.sites[(C.korvath - 1) % R.sites.length];
+  const near = Object.values(S.systems).filter((s) => ["colony", "member", "independent"].includes(s.kind) && distance(s.at, S.pelion.at) >= 3);
+  const w = near.length ? pick(S, near) : null;
+  let cost = "";
+  if (R.fx === "dilithium") {
+    if (w) harmWorld(S, w, 1, "its reactors' crystals went grey overnight, and the power failed");
+    const lost = -addStore(S, "dilithium", -1);
+    cost = `${w ? `${w.name} is one of the places it reached: its power plant's crystals are grey. ` : ""}${lost ? `And aboard the Pelion, Grath reports one of the warp core's crystals gone grey in its housing overnight: dilithium ${storesOf(S).dilithium}/10.` : ""}`;
+  } else {
+    const took = Math.min(S.supplies, 6); S.supplies -= took;
+    if (w) harmWorld(S, w, 1, "its convoy never came");
+    cost = `${w ? `${w.name} was waiting for that convoy, and it's rationing now. ` : ""}${took ? `Starfleet's supply allotment to the Pelion is cut to cover the loss: −${took} supplies.` : ""}`;
+  }
+  const n = C.threads.length, ahead = C.korvath > n;
+  storyEvent(S, `${D.title}: ${R.head}`, `Rrinn brings the report to the captain's ready room herself. Starfleet Intelligence, priority one: ${R.name} ${R.verb} ${site}.\n\n${scene}\n\n${cost}\n\nThat's ${C.korvath} for ${R.name}, against the Pelion's ${n} thread${n === 1 ? "" : "s"}.${ahead ? ` ${R.Name} is ahead, and every week it stays ahead makes the end harder.` : ""}${C.korvath >= D.finaleAt ? "" : " Every campaign order the Pelion carries out sets it back two weeks."}`);
+  if (C.korvath >= D.finaleAt) { for (const b of D.beats) if (b.at > 0) campaignBeat(S, b.at); issueFinale(S); }
 }
 // ---------- the race: House Kor'vath ----------
 // Once the campaign has begun, the diggers take another Makers' site every few weeks: a world nearby is harmed and Klingon
@@ -1935,6 +2468,7 @@ function korvathTick(S) {
 /** The final order: the Makers' Gate, in empty space where every relay points. */
 function issueFinale(S) {
   const C = campaignOf(S); if (C.finale) return;
+  if (campId(C) !== "watchers") return seriesFinale(S);
   C.finale = true;
   const sb = S.systems[S.starbase];
   const hexes = Object.keys(S.hexes).filter((k) => !S.sysAt[k] && !inZone(k) && S.hexes[k].terrain === "space" && distance(k, sb.at) >= 5);
@@ -1946,9 +2480,22 @@ function issueFinale(S) {
   o.text = storyText(S, o, st.brief);
   activateOrder(S, o, "issued: the finale of Watchers of the Void");
 }
+/** The finale of a campaign after the first: its own story, in empty space far from the starbase. */
+function seriesFinale(S) {
+  const C = campaignOf(S), D = campaignDef(S); C.finale = true;
+  const sb = S.systems[S.starbase];
+  const hexes = Object.keys(S.hexes).filter((k) => !S.sysAt[k] && !inZone(k) && S.hexes[k].terrain === "space" && distance(k, sb.at) >= 5).sort((a, b) => distance(b, sb.at) - distance(a, sb.at)).slice(0, 12);
+  const at = pick(S, hexes) || sb.at, st = STORIES[D.finale], ahead = (C.korvath || 0) > C.threads.length;
+  const o = { id: "o" + S.nextId++, issued: S.turn, title: D.finale, at, sys: null, place: D.finale.replace(/^The /, "the "), where: "", skills: D.finaleSkills, segs: 3, have: 0,
+    urgent: true, finale: true, campaign: true, campaignId: D.id, twist: null, story: D.finale, strange: st.strange[0], key: st.keys[0],
+    oppose: { ...D.finaleOppose, target: D.finaleOppose.target + Math.max(0, (C.korvath || 0) - C.threads.length), why: D.finaleOppose.why + (ahead ? ` ${D.rival.Name} got ahead: +${(C.korvath || 0) - C.threads.length}.` : "") } };
+  o.text = storyText(S, o, st.brief);
+  activateOrder(S, o, `issued: the finale of ${D.title}`);
+}
+const complicationOf = (st) => st.complication || COMPLICATIONS[st.type];
 /** A complication's choices: press on (an opposed roll) or fall back (a week lost). */
 function complicationChoices(S, ev) {
-  const o = S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && COMPLICATIONS[st.type];
+  const o = S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && complicationOf(st);
   if (!o || !c) return null;
   return { order: o, title: c.title, text: c.text, options: [
     { id: "press", name: c.press, blurb: `Opposed by ${c.oppose.name} (${c.oppose.skill} ${c.oppose.target}), with ${c.skills.join(", ")}. Win: the work leaps ahead (+1 success). Lose: ${c.costText}.` },
@@ -1957,7 +2504,7 @@ function complicationChoices(S, ev) {
 }
 function chooseComplication(S, optId) {
   const ev = S.event; S.event = null;
-  const o = ev && S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && COMPLICATIONS[st.type];
+  const o = ev && S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && complicationOf(st);
   if (!o || !c) return { text: "" };
   if (optId === "back") { o.deadline--; log(S, `${o.title}: ${c.title.toLowerCase()}. The captain orders everyone back to regroup: safe, but a week lost (due by turn ${o.deadline} now).`, "bad"); storyEvent(S, `${o.title}: falling back`, "The order goes out on every channel: pull back, regroup, nobody takes the risk. The crew obey, and nobody argues, and nobody is hurt. It takes a week to get back to where they were, and everyone aboard can feel the deadline coming closer while they do."); return { text: "" }; }
   const b = bestOfficer(S, c.skills, {}, null) || { officer: "captain", skill: c.skills[0] };
@@ -1998,7 +2545,7 @@ function missionChoices(S, ev) {
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
   accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike", refit: (n) => `${REFITS[n] ? REFITS[n].name : n} fitted to the Pelion`, delay: (n) => `every other order's deadline ${n} weeks closer`,
-  heal: (n, w) => `${w}'s harm −${n}`, inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
+  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the Syndicate answers: a raider strikes a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
 function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
   if (!o || !opt) return { error: "No such choice." };
@@ -2007,7 +2554,9 @@ function chooseMission(S, orderId, optId) {
   for (const [k, n] of Object.entries(fx)) {
     if (k === "commendations") S.commendations += n;
     else if (k === "science") S.science += n;
-    else if (k === "supplies") S.supplies += n;
+    else if (k === "supplies") S.supplies = Math.max(0, S.supplies + n);
+    else if (k === "dilithium" || k === "antimatter" || k === "spares") addStore(S, k, n);
+    else if (k === "orion") orionReprisal(S, o.title);
     else if (k === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, Math.min(5, (s.accord || 0) + n)); if (s.accord >= 5 && s.kind === "independent") join(S, s); }
     else if (k === "accord") continue;
     else if (k === "command") markCommand(S, n, `${o.title}: ${opt.how.toLowerCase()}`);
@@ -2021,7 +2570,8 @@ function chooseMission(S, orderId, optId) {
     else if (k === "inverter") S.pelion.refits.inverter = Math.max(S.pelion.refits.inverter || 0, n);
     lines.push(FX_TEXT[k] ? FX_TEXT[k](n, w) : k);
   }
-  if (opt.record && !S.records.includes("makers")) { S.records.push("makers"); lines.push("Library record: the Makers' library"); }
+  const recId = opt.record === true ? "makers" : opt.record;
+  if (recId && !S.records.includes(recId)) { S.records.push(recId); lines.push(`Library record: ${RECORDS.find((r) => r.id === recId)?.name || recId}`); }
   if (o.finale) campaignOf(S).over = opt.id;
   storyEvent(S, `${o.title}: ${storyText(S, o, opt.name).toLowerCase()}`, storyText(S, o, opt.text));
   log(S, `${o.title}: the captain's decision, ${storyText(S, o, opt.name).toLowerCase()} (${lines.join(", ")}).`, "order");
@@ -2055,7 +2605,7 @@ function completeOrder(S, o, ok, how) {
   } else {
     S.failed++; S.streak = 0; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
     const st = storyOf(o); if (st) storyEvent(S, `Too late: ${o.title}`, storyText(S, o, st.fail));
-    if (o.finale) { campaignOf(S).over = "lost"; S.tension = Math.min(10, S.tension + 2); }
+    if (o.finale) { campaignOf(S).over = "lost"; if (campId(campaignOf(S)) === "watchers") S.tension = Math.min(10, S.tension + 2); }
     const s = o.sys && S.systems[o.sys];
     if (s && /Evacuate|distress|medical/i.test(o.title) && ["colony", "member", "independent"].includes(s.kind)) harmWorld(S, s, 1, "help never came");
     fillFromBacklog(S);
@@ -2119,12 +2669,15 @@ function newOrder(S) {
     const sys = pick(S, cands); S.seenSys[sys.id] = true; return { at: sys.at, sys };
   };
   let m = null, place = null, storyKey = null;
-  for (const x of [...MISSIONS].sort((a, b) => Math.abs(a.roll - roll) - Math.abs(b.roll - roll))) {
+  const C0 = campaignOf(S), pool = missionPool(S).sort((a, b) => Math.abs(a.roll - roll) - Math.abs(b.roll - roll));
+  // While a campaign after the first is under way, more than half of Starfleet's orders are its own.
+  const mine = campId(C0) !== "watchers" && !C0.over && rand(S) < 0.6 ? pool.filter((x) => x.campaign === C0.id) : [];
+  for (const x of mine.concat(pool)) {
     const left = untold(x); if (!left.length) continue;
     const p = placeFor(x); if (!p) continue;
     m = x; place = p; storyKey = pick(S, left); break;
   }
-  if (!m) return null;   // every story has been told
+  if (!m) { if (!S.quietLogged) { S.quietLogged = true; log(S, "Starfleet Command has no new orders for the Pelion: every story this sector had to tell has been told. The sector is yours to keep.", "order"); } return null; }
   used.push(storyKey);
   const st = STORIES[storyKey], at = place.at, sys = place.sys;
   const twist = rand(S) < 0.6 ? pick(S, TWISTS) : null;
@@ -2136,7 +2689,9 @@ function newOrder(S) {
   if (postAt(S, at)) o.place = postAt(S, at).name;
   o.story = storyKey; o.text = storyText(S, o, st.brief);
   // About half of all orders are part of the campaign (once it has begun); the rest are the frontier's ordinary work.
-  const C = campaignOf(S); o.campaign = !C.over && rand(S) < 0.5;
+  const C = campaignOf(S);
+  if (st.campaign) { o.campaignId = st.campaign; o.campaign = st.campaign === campId(C) && !C.over; }
+  else { o.campaignId = "watchers"; o.campaign = campId(C) === "watchers" && !C.over && rand(S) < 0.5; }
   S.backlog = S.backlog || [];
   if (busy(S)) {
     o.backlog = true; o.received = S.turn; S.backlog.push(o);
@@ -2145,6 +2700,15 @@ function newOrder(S) {
   }
   activateOrder(S, o);
   return o;
+}
+/** The Syndicate answers an insult: an Orion raider strikes a Federation world, from its base or from the sector's edge. */
+function orionReprisal(S, why) {
+  const targets = Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member");
+  if (!targets.length) return;
+  const tgt = pick(S, targets), b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base);
+  const edge = Object.keys(S.hexes).filter((k) => !inZone(k)).sort((a, c) => distance(c, tgt.at) - distance(a, tgt.at))[0];
+  spawnEnemy(S, "orion", b ? b.at : edge, { goal: "raid", target: tgt.at, hostile: true });
+  log(S, `Intelligence: after ${why}, an Orion raider has left ${b ? "the pirate base" : "the sector's edge"}, bound for ${tgt.name}. The Syndicate wants it known that it remembers.`, "war");
 }
 const closestOutpost = (S, at) => Object.values(S.systems).filter((s) => s.kind === "klingon").sort((a, b) => distance(a.at, at) - distance(b.at, at))[0];
 function harmWorld(S, s, n, why) {
@@ -2202,9 +2766,13 @@ function score(S) {
     ["Worlds lost to the Klingon Empire", -S.lostWorlds * 8],
     ["Colonies lost", -S.lostColonies * 10],
     ["Listening posts lost", -Object.values(postsOf(S)).filter((p) => p.lost).length * 5],
-    [`${CAMPAIGN.title}: threads found`, Math.min(CAMPAIGN.finaleAt, campaignOf(S).threads.length) * 2],
-    [`${CAMPAIGN.title}: the Gate`, campaignOf(S).over === "close" || campaignOf(S).over === "guard" ? 25 : campaignOf(S).over === "lost" ? -10 : 0],
   ];
+  const C = campaignOf(S), all = (S.campaignsDone || []).concat([{ id: campId(C), over: C.over, threads: C.threads.length }]);
+  for (const c of all) {
+    const D = defOf(c.id); if (c.id !== "watchers" && !c.threads && !c.over) continue;
+    parts.push([`${D.title}: threads found`, Math.min(D.finaleAt, c.threads) * 2]);
+    parts.push([`${D.title}: ${c.id === "watchers" ? "the Gate" : D.finale.replace(/^The /, "the ")}`, c.over && c.over !== "lost" ? 25 : c.over === "lost" ? -10 : 0]);
+  }
   return { parts, total: parts.reduce((t, p) => t + p[1], 0) };
 }
 function rating(total) {
@@ -2215,7 +2783,20 @@ function rating(total) {
 function checkEnd(S) {
   if (S.over) return;
   if (S.pelion.hull >= PELION.hull) S.over = { win: false, why: "The Pelion's hull gave way. The crew abandoned ship, and Starfleet lost a Heavy Cruiser." };
-  else if (S.turn > TOUR) S.over = { win: true, why: "The Pelion's tour of the Corvan Sector is over." };
+  else if (S.mode !== "open" && S.turn > TOUR) S.over = { win: true, why: "The Pelion's tour of the Corvan Sector is over." };
+}
+/** At the end of a tour, keep command: the game goes on with no end, as open command. */
+function keepCommand(S) {
+  if (!S.over || !S.over.win || S.mode === "open") return { error: "Only at the end of a tour." };
+  S.mode = "open"; S.over = null;
+  log(S, "Starfleet Command extends the Pelion's assignment to the Corvan Sector with no end date: open command. The tour's score stands; the sector goes on.", "order");
+  return { ok: true };
+}
+/** In open command, the captain chooses when to hand the Pelion over. */
+function retire(S) {
+  if (S.over) return { error: "Already over." };
+  S.over = { win: true, why: `After ${S.turn - 1} weeks in the Corvan Sector, the captain hands the Pelion over at Starbase 23.` };
+  return { ok: true };
 }
 
 // ---------- hooks set by the other modules (they import game.js, so they register here) ----------
@@ -2228,8 +2809,9 @@ function registerHooks(h) { if (h.startBattle) startBattleHook = h.startBattle; 
 // roll for every hit that reaches the Hull; Engineering to repair mid-fight; a Helm contest to break away.
 
 
-const shieldsMax = (S) => PELION.shields + (S.pelion.refits.shields ? 1 : 0) + (hasRecord(S, "shield1") ? 1 : 0);
-const powerOf = (S) => Math.max(1, PELION.power + (S.pelion.refits.power ? 1 : 0) + (hasRecord(S, "power1") ? 1 : 0) - (S.pelion.powerLoss || 0));
+const shieldsMax = (S) => PELION.shields + (S.pelion.refits.shields ? 1 : 0) + (hasRecord(S, "shield1") ? 1 : 0) + (S.battle && S.battle.raised ? 1 : 0);
+/** The reactor's Power: refits and records add to it, damage and failing dilithium take from it. */
+const powerOf = (S) => reactorPower(S);
 /** The Pelion's numbers for this exchange, with who stands each station. */
 function battleStats(S) {
   const P = S.pelion, helmId = stationOfficer(S, "helm"), gunId = stationOfficer(S, "tactical"), engId = stationOfficer(S, "engineering");
@@ -2249,8 +2831,9 @@ function startBattle(S, enemyId, initiator) {
   const ambush = initiator === "enemy" && E.ambush && e.cloaked && !seenIt;
   if (seenIt && initiator === "enemy" && E.ambush) log(S, `The cloak inverter sees the ${E.name} coming before it decloaks: no ambush.`, "good");
   e.cloaked = false; e.revealed = false; e.seen = true;
-  const P = S.pelion;
-  S.battle = { enemy: enemyId, ex: 0, log: [], ambush, over: null, initiator, start: { hull: P.hull, torps: P.torps, sys: P.sys.weapons + P.sys.engines + P.sys.sensors } };
+  const P = S.pelion, standby = (P.alloc || {}).shields || 0;
+  S.battle = { enemy: enemyId, ex: 0, log: [], ambush, over: null, initiator, standby, raised: standby >= 2, start: { hull: P.hull, torps: P.torps, sys: P.sys.weapons + P.sys.engines + P.sys.sensors } };
+  if (ambush && standby) log(S, "The shields were on standby: they're up before the first volley lands.", "good");
   log(S, `Battle: the Pelion against ${E.base ? "the Orion base" : (/^[AEIOU]/.test(E.name) ? "an " : "a ") + E.name}${ambush ? ", which decloaks firing" : ""}.`, "war");
 }
 registerHooks({ startBattle });
@@ -2298,13 +2881,20 @@ function exchange(S, choice = {}) {
   const B = S.battle; if (!B || B.over) return [];
   const e = S.enemies[B.enemy], E = ENEMIES[e.type], P = S.pelion, st = battleStats(S), L = [];
   B.ex++;
-  // Power: shields, phasers, torpedoes; what's left is a bonus to one roll (+2 at most).
+  // Power, shared out like the week's: shields (1 up, 2 reinforced: the first hit to reach them is turned aside),
+  // phasers (1 to fire, 2 overloaded: a hit does a box more), torpedoes (1), engines (1 or 2: +1 each to evade and to
+  // break away). Given as numbers, that's the split; given as yes/no (the old way), what's left is +2 at most to one roll.
   let power = st.power;
-  const up = !!choice.shields && power > 0; if (up) power--;
-  const phas = !!choice.phasers && !st.weaponsOut && power > 0 && !choice.breakOff; if (phas) power--;
+  const split = typeof choice.shields === "number" || typeof choice.phasers === "number" || choice.engines !== undefined;
+  const want = (k, max) => Math.max(0, Math.min(max, typeof choice[k] === "number" ? choice[k] : choice[k] ? 1 : 0));
+  const shN = Math.min(power, want("shields", 2)); power -= shN; const up = shN > 0;
+  const phN = !st.weaponsOut && !choice.breakOff ? Math.min(power, want("phasers", 2)) : 0; power -= phN; const phas = phN > 0;
   const torp = !!choice.torps && P.torps > 0 && !st.weaponsOut && power > 0 && !choice.breakOff; if (torp) power--;
-  const spare = Math.min(2, power);
-  let hit = 0, evade = 0;
+  const engN = split ? Math.min(power, want("engines", 2)) : 0; power -= engN;
+  const spare = split ? 0 : Math.min(2, power);
+  B.reinforced = shN >= 2;
+  if (phN >= 2) P.wear = (P.wear || 0) + 1;   // overloading the phasers works the crystals hard
+  let hit = 0, evade = engN;
   // The captain's order.
   if (choice.order === "command") {
     const r = check(S, CAPTAIN.skills.Leadership);
@@ -2335,7 +2925,7 @@ function exchange(S, choice = {}) {
     else {
       const ev = E.base ? null : check(S, E.helm + Math.max(0, -md));
       if (ev && ev.success) L.push(`Phasers (${R(r)}): on target, but they evade (${R(ev)}).`);
-      else hitEnemy(S, e, PELION.phaser, L, `Phasers (${R(r)})`);
+      else hitEnemy(S, e, PELION.phaser + (phN >= 2 ? 1 : 0), L, `${phN >= 2 ? "Overloaded phasers" : "Phasers"} (${R(r)})`);
     }
   }
   if (torp) {
@@ -2360,7 +2950,7 @@ function exchange(S, choice = {}) {
   // They fire: at the Pelion, or at an escort beside it.
   const escorts = Object.values(S.support).filter((u) => u.at === P.at);
   const tgt = escorts.length && rand(S) < 0.3 ? pick(S, escorts) : null;
-  const gun = E.gunner + (B.ambush && B.ex === 1 ? 2 : 0);
+  const gun = E.gunner + (B.ambush && B.ex === 1 && !B.standby ? 2 : 0);
   const volley = (label, dmg, evadable) => {
     const r = check(S, gun + (label === "torpedo" ? 1 : 0));
     const name = { kbc: "Disruptors", kbop: "Disruptors", rbop: "Plasma torpedo", orion: "Disruptors", orionBase: "The base's guns" }[e.type];
@@ -2378,20 +2968,23 @@ function exchange(S, choice = {}) {
       const ev = check(S, st.helm + evade + (phas ? 0 : spare) + Math.max(0, md) + (E.plasma ? 2 : 0));
       if (ev.success) { L.push(`Their ${what.toLowerCase()} (${R(r)}): Helm evades (${R(ev)}).`); return; }
     }
+    if (B.reinforced && up) { B.reinforced = false; if (dmg <= 1) { L.push(`Their ${what.toLowerCase()} (${R(r)}) hits the reinforced shields and is turned aside.`); return; } dmg--; }
     hitPelion(S, dmg, up, L, `Their ${what.toLowerCase()} (${R(r)}) hits`);
   };
   volley("main", E.dmg, true);
   if (e.type === "kbc" && B.ex % 2 === 0) volley("torpedo", 2, false);
   // Damage control.
   if (choice.repair && st.engId) {
-    const r = check(S, st.eng);
+    const noParts = storesOf(S).spares <= 0;
+    const r = check(S, st.eng - (noParts ? 3 : 0));
     if (r.success) {
+      if (!noParts) addStore(S, "spares", -1);
       let n = r.margin >= 5 ? 2 : 1; const fixed = [];
       if (P.powerLoss && n) { P.powerLoss--; n--; fixed.push("power"); }
       for (const k of ["weapons", "engines", "sensors"]) while (n && P.sys[k]) { P.sys[k]--; n--; fixed.push(k); }
       while (n && P.shields) { P.shields--; n--; fixed.push("shields"); }
-      L.push(`Damage control, ${officer(st.engId).short} (${R(r)}): ${fixed.join(", ") || "nothing left to fix"}.`);
-    } else L.push(`Damage control (${R(r)}): no luck.`);
+      L.push(`Damage control, ${officer(st.engId).short} (${R(r)}): ${fixed.join(", ") || "nothing left to fix"}${noParts ? ", improvised without spares" : ", a crate of spares used"}.`);
+    } else L.push(`Damage control (${R(r)}${noParts ? ", no spare parts: −3" : ""}): no luck.`);
   }
   if (P.hull >= PELION.hull) { B.over = "lost"; return finish(S, L); }
   if (B.ex >= 12) { L.push("Both ships pull back to lick their wounds."); sendHome(S, e, 3); e.cooldown = 2; B.over = "fled"; }
@@ -2404,9 +2997,9 @@ function finish(S, L) {
   const e = S.enemies[B.enemy], E = ENEMIES[e.type];
   if (B.over === "destroyed") {
     delete S.enemies[e.id];
-    if (e.type === "orionBase") { S.commendations += 6; S.supplies += 15; S.orionBaseDown = true; log(S, "The Orion pirate base is destroyed. The raids on the sector will stop.", "victory"); }
-    else if (e.power === "orion") { S.commendations += 2; S.supplies += 6; log(S, `The Pelion destroys an Orion raider. Salvage: +6 supplies.`, "good"); }
-    else if (e.power === "romulan") { S.commendations += 3; log(S, "The Romulan bird-of-prey is destroyed.", "good"); }
+    if (e.type === "orionBase") { S.commendations += 6; S.supplies += 15; addStore(S, "spares", 4); addStore(S, "dilithium", 3); addStore(S, "antimatter", 6); S.orionBaseDown = true; log(S, "The Orion pirate base is destroyed. The raids on the sector will stop. Salvage: +15 supplies, +4 spares, +3 dilithium, +6 antimatter.", "victory"); }
+    else if (e.power === "orion") { S.commendations += 2; S.supplies += 6; addStore(S, "spares", 2); addStore(S, "dilithium", 1); log(S, `The Pelion destroys an Orion raider. Salvage: +6 supplies, +2 spares, +1 dilithium.`, "good"); }
+    else if (e.power === "romulan") { S.commendations += 3; addStore(S, "spares", 1); log(S, "The Romulan bird-of-prey is destroyed. Salvage: +1 spares.", "good"); }
     else { S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
   } else if (B.over === "lost") log(S, "The Pelion's hull is breaking up.", "bad");
   else if (e.arcRaider && (B.over === "fled" || B.over === "hailed")) {
@@ -2415,6 +3008,8 @@ function finish(S, L) {
     log(S, `The ${E.name} ${B.over === "fled" ? "breaks off" : "stands down"} and runs for the sector's edge. It won't be back.`, "good");
   }
   else log(S, { fled: `The ${E.name} breaks off.`, hailed: `The ${E.name} stands down.`, escaped: "The Pelion breaks away." }[B.over] || "The battle ends.");
+  // What the battle cost the stores: antimatter (a unit for every four exchanges) and wear on the dilithium.
+  { const Pw = S.pelion; Pw.wear = (Pw.wear || 0) + 1; addStore(S, "antimatter", -Math.max(1, Math.ceil(B.ex / 4))); }
   // What the battle cost: one line for the log.
   const P = S.pelion, st = B.start || { hull: P.hull, torps: P.torps, sys: 0 };
   const hullLost = P.hull - st.hull, sysHit = P.sys.weapons + P.sys.engines + P.sys.sensors - st.sys, torps = st.torps - P.torps;
@@ -3006,6 +3601,7 @@ function endTurn(S) {
   const active = S.orders.filter((o) => !o.arc).length, waiting = (S.backlog || []).length;
   if (S.turn >= 3 && waiting < BACKLOG_MAX && (S.turn % 4 === 0 || active === 0 && !waiting && S.turn % 2 === 0)) newOrder(S);
   warpStrain(S);
+  consumeStores(S);
   campaignTick(S);
   tensionWarnings(S);
   // Next turn.
@@ -3032,7 +3628,7 @@ function warpStrain(S) {
   if (w <= CRUISE_WARP) return;
   const eng = available(S, "grath") ? "grath" : bestOfficer(S, ["Engineering"])?.officer;
   if (!eng) return;
-  const extra = [[`Emergency warp ${w}`, -(2 * (w - CRUISE_WARP) - 1)]].concat(P.refits.warp ? [["Nacelle tuning", 2]] : [], hasRecord(S, "speed1") ? [["Folded warp field", 2]] : []);
+  const extra = [[`Emergency warp ${w}`, -(2 * (w - CRUISE_WARP) - 1)]].concat(P.refits.warp ? [["Nacelle tuning", 2]] : [], hasRecord(S, "speed1") ? [["Folded warp field", 2]] : [], storesOf(S).spares <= 0 ? [["No spares to burn", -2]] : []);
   const t = target(S, eng, "Engineering", { extra }), r = check(S, t.total), urgent = S.orders.some(isUrgent);
   if (r.success) log(S, `Warp ${w} this week: ${officer(eng).short} keeps the engines in the green (Engineering, ${r.total} against ${r.target}).`, "good");
   else { P.sys.engines = Math.min(3, P.sys.engines + 1); log(S, `Warp ${w} this week strains the engines past their limit (${officer(eng).short}, Engineering, ${r.total} against ${r.target}): engines damaged ${P.sys.engines}/3, maximum warp now ${maxWarp(S)} until repaired.${urgent ? " The orders were urgent; Starfleet will understand." : ""}`, "bad"); }
@@ -3050,7 +3646,8 @@ function newWeek(S) {
   if (P.warp === undefined) P.warp = CRUISE_WARP;
   const carry = P.strain !== undefined && P.strain > 0 ? Math.min(P.days || 0, daysPerLy(P.warp), 7) : 0;
   P.days = 7 + carry; P.strain = 0;
-  if (P.warp > maxWarp(S)) { P.warp = maxWarp(S); log(S, `Engine damage: the Pelion can make warp ${P.warp} at most.`, "bad"); }
+  if (P.warp > maxWarp(S)) { P.warp = maxWarp(S); log(S, `The Pelion can make warp ${P.warp} at most this week (engines, power or stores).`, "bad"); }
+  balancePower(S);
   syncMp(S);
 }
 /** An hour on Corvan II while the away team is down: everyone acts again, the drain goes on; the rest of the sector waits. */
@@ -3402,12 +3999,19 @@ let surfaceSite = null;
 // ---------- the bar and the tabs ----------
 const boxes = (n, max, cls = "") => `<span class="boxes ${cls}">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? "on" : ""}"><\/i>`).join("")}<\/span>`;
 function renderAll() { renderBar(); renderTabs(); renderPanel(); draw(); }
+/** "Turn 12 of 50", or in open command "Week 62 · open command". */
+const turnText = () => (S.mode === "open" ? `Week ${S.turn} · open command` : `Turn ${Math.min(S.turn, TOUR)} of ${TOUR}`);
 function renderBar() {
+  const st = storesOf(S), low = (k, n) => (st[k] <= n ? ' class="bad"' : "");
   $("bar-stats").innerHTML = `<span><b>Supplies<\/b>${S.supplies}<\/span><span><b>Science<\/b>${S.science}<\/span>`
+    + `<span title="Power: in use of what the reactor makes this week (the Ship tab)"><b>Power<\/b>${Math.max(0, reactorPower(S) - powerFree(S))}/${reactorPower(S)}<\/span>`
+    + `<span title="Dilithium crystals in the warp core's matrix"><b>Dilithium<\/b><span${low("dilithium", 4)}>${st.dilithium}/10<\/span><\/span>`
+    + `<span title="Antimatter: the warp drive's fuel"><b>Antimatter<\/b><span${low("antimatter", 3)}>${st.antimatter}/${STORES.antimatter.max}<\/span><\/span>`
+    + `<span title="Spare parts: plasma injectors, warp coils, coolant"><b>Spares<\/b><span${low("spares", 1)}>${st.spares}<\/span><\/span>`
     + `<span title="Starfleet Command: five boxes and you're relieved of command"><b>Starfleet Command<\/b>${boxes(S.command, 5)}<\/span>`
     + `<span title="Tension with the Klingon Empire"><b>Klingon tension<\/b>${boxes(S.tension, 10, "gold")}<\/span>`;
   const hr = hourly(S);
-  $("bar-turn").textContent = `Stardate ${stardate(S)} · Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hr ? ` · Hour ${(S.hour || 0) + 1} on Corvan II` : ""}`;
+  $("bar-turn").textContent = `Stardate ${stardate(S)} · ${turnText()}${hr ? ` · Hour ${(S.hour || 0) + 1} on Corvan II` : ""}`;
   $("end-turn").disabled = !canEndTurn(S);
   $("end-turn").textContent = hr ? "End hour" : "End turn";
 }
@@ -3429,8 +4033,14 @@ function warpHTML() {
   const P = S.pelion, mw = maxWarp(S), opts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter((w) => w <= Math.max(8, mw));
   const left = P.days || 0;
   return `<div class="card small" style="padding:8px 10px"><label><b>Speed<\/b> <select data-warp aria-label="Warp factor">${opts.map((w) => `<option value="${w}" ${w === P.warp ? "selected" : ""} ${w > mw ? "disabled" : ""}>${w ? `Warp ${w}${w === CRUISE_WARP ? " (maximum stable)" : w === 8 ? " (emergency maximum)" : w > CRUISE_WARP ? " (emergency)" : ""}` : "Impulse"}${w > mw ? " (engines damaged)" : ""}<\/option>`).join("")}<\/select><\/label>
-    <div class="muted" style="margin-top:4px">${esc(warpText(P.warp))}. v = W³ × c.<\/div>
+    <div class="muted" style="margin-top:4px">${esc(warpText(P.warp))}. v = W³ × c. Engines take ${warpPower(P.warp)} of ${reactorPower(S)} Power${powerFree(S) > 0 ? `; ${powerFree(S)} unassigned (the Ship tab)` : ""}.${storesOf(S).antimatter <= 0 ? ` <span class="bad">No antimatter: warp 2 on the reserve.<\/span>` : ""}<\/div>
     <div style="margin-top:2px">This week: ${left.toFixed(1)} of 7 days left${P.warp ? `, ${P.mp.toFixed(1)} ly at this warp` : ""}.${P.warp > CRUISE_WARP ? ` <span class="bad">Emergency speed: an Engineering check at the end of the week, or the engines take damage.<\/span>` : ""}<\/div><\/div>`;
+}
+/** Stores for sale where the Pelion is. */
+function marketHTML() {
+  const m = marketAt(S); if (!m) return "";
+  const st = storesOf(S);
+  return `<div class="card violet small"><h4>Stores at ${esc(m.name)}<\/h4>${Object.entries(m.items).map(([k, price]) => `<div class="roll-row"><span style="min-width:150px">${esc(STORES[k].name)} ${st[k]}/${STORES[k].max}<\/span><button class="btn small" data-buy="${k}" data-n="1" ${st[k] >= STORES[k].max || S.supplies < price ? "disabled" : ""}>+1 for ${price}<\/button><button class="btn small" data-buy="${k}" data-n="99" ${st[k] >= STORES[k].max || S.supplies < price ? "disabled" : ""}>Fill up<\/button><\/div>`).join("")}<div class="muted" style="margin-top:4px">Prices in supplies (you have ${S.supplies}).${m.name === "Starbase 23" ? " The starbase refuels the antimatter for nothing when the Pelion docks." : ""}<\/div><\/div>`;
 }
 function units() {
   const list = [["pelion", "USS Pelion"], ...Object.values(S.support).map((u) => [u.id, u.name])];
@@ -3454,7 +4064,7 @@ function hint() {
 }
 function hereHTML() {
   const u = U(), hex = selHex || u.at, s = sysAt(S, hex), here = hex === u.at;
-  let h = units() + hint() + (unit === "pelion" ? warpHTML() : "");
+  let h = units() + hint() + (unit === "pelion" ? warpHTML() : "") + (unit === "pelion" && (!selHex || selHex === S.pelion.at) ? marketHTML() : "");
   if (S.pending && S.pending.unit === unit) h += pendingHTML();
   else if (lastResult) h += resultHTML(lastResult);
   // The place.
@@ -3568,7 +4178,8 @@ function shipHTML() {
   h += `<div class="kv"><span>Shields<\/span><span>${boxes(sm - P.shields, sm, "blue")}<\/span><span>Hull<\/span><span>${boxes(PELION.hull - P.hull, PELION.hull, "gold")}<\/span>`
     + ["weapons", "engines", "sensors"].map((k) => `<span>${k[0].toUpperCase() + k.slice(1)}<\/span><span>${boxes(P.sys[k], 3)} ${["", "Damaged", "Crippled", "Offline"][P.sys[k]]}<\/span>`).join("")
     + `<span>Power<\/span><span>${powerOf(S)}${P.powerLoss ? ` (−${P.powerLoss})` : ""}<\/span><span>Torpedoes<\/span><span>${P.torps}/${PELION.torps}<\/span><span>Speed<\/span><span>Warp ${P.warp}${P.warp === CRUISE_WARP ? " (maximum stable)" : P.warp > CRUISE_WARP ? " (emergency)" : ""}: ${speedOf(S).toFixed(1)} ly a week. Maximum stable warp ${CRUISE_WARP}; emergency maximum warp ${maxWarp(S)}${maxWarp(S) < 8 ? " (engines damaged)" : ""}<\/span><span>Sensors<\/span><span>rating ${sensorsRating(S)}; sees ${2 + (P.refits.sensors ? 1 : 0)} hexes<\/span>${P.refits.inverter ? `<span>Cloak inverter<\/span><span>Fitted by Starfleet R&D after the field trials: +2 to sensor sweeps${P.refits.inverter >= 2 ? "; tuned at full power, sweeps reach 5 light-years for cloaked ships" : ""}<\/span>` : ""}<\/div>`;
-  h += `<p class="small muted">Hull and systems are repaired at Starbase 23 (or by Engineering, a box at a time). Shields come back after each battle.<\/p>`;
+  h += `<p class="small muted">Hull and systems are repaired at Starbase 23 (or by Engineering, a box at a time, using a crate of spares). Shields come back after each battle.<\/p>`;
+  h += powerHTML() + storesHTML();
   h += `<h3>Refits ${P.docked ? "" : "(at Starbase 23)"}<\/h3>`;
   for (const [id, R] of Object.entries(REFITS)) h += `<div class="card ${P.refits[id] ? "green" : "violet"}"><h4>${esc(R.name)}<\/h4><div class="small muted">${esc(R.blurb)}<\/div><div class="roll-row">${P.refits[id] ? `<span class="good small">Fitted<\/span>` : `<button class="btn small" data-refit="${id}" ${!P.docked || S.science < R.cost ? "disabled" : ""}>Fit it: ${R.cost} science<\/button>`}<\/div><\/div>`;
   h += `<h3>Your ships<\/h3>`;
@@ -3576,6 +4187,25 @@ function shipHTML() {
   if (!Object.keys(S.support).length) h += `<p class="small muted">Only the Pelion, for now.<\/p>`;
   for (const [id, T] of Object.entries(SUPPORT)) h += `<div class="card violet"><h4>Requisition: ${esc(T.name)}<\/h4><div class="small muted">${esc(T.blurb)}<\/div><div class="roll-row"><button class="btn small" data-req="${id}" ${!P.docked || S.supplies < T.cost || Object.keys(S.support).length >= 3 ? "disabled" : ""}>${T.cost} supplies<\/button>${P.docked ? "" : `<span class="small muted">At Starbase 23<\/span>`}<\/div><\/div>`;
   h += `<h3>Library records<\/h3>` + (S.records.length ? S.records.map((id) => { const r = RECORDS.find((x) => x.id === id); return `<div class="card green"><h4>${esc(r.name)}<\/h4><div class="small muted">${esc(r.text)}<\/div><\/div>`; }).join("") : `<p class="small muted">None yet. Investigate anomalies and ruins.<\/p>`);
+  return h;
+}
+
+/** The week's power: the engines' share from the warp factor, the rest shared out by the captain. */
+function powerHTML() {
+  const A = allocOf(S), pw = reactorPower(S), fr = powerFree(S), P = S.pelion;
+  const why = [P.powerLoss ? `damage −${P.powerLoss}` : "", dilithiumPenalty(S) ? `failing dilithium −${dilithiumPenalty(S)}` : "", P.refits.power ? "power couplings +1" : ""].filter(Boolean).join(", ");
+  let h = `<h3>Power: ${pw - fr} of ${pw} in use<\/h3><p class="small muted">The warp core makes ${pw}${why ? ` (${esc(why)})` : ""}. The engines take what the warp factor needs: 1 up to warp 4, 2 up to warp 6, 3 for warp 7 and 8. Share out the rest, up to 2 to a system. In battle, the same Power goes to shields, phasers, torpedoes and engines.<\/p>`;
+  h += `<div class="card small"><div class="roll-row"><span style="min-width:150px"><b>Engines<\/b><\/span>${boxes(warpPower(P.warp), 3, "gold")} <span class="muted">warp ${P.warp}: ${warpPower(P.warp)}<\/span><\/div>`;
+  for (const [k, Y] of Object.entries(POWER_SYSTEMS)) h += `<div class="roll-row"><span style="min-width:150px"><b>${esc(Y.name)}<\/b><\/span><button class="btn small" data-alloc="${k}" data-n="${A[k] - 1}" ${A[k] <= 0 ? "disabled" : ""} aria-label="Less power to ${esc(Y.name)}">−<\/button>${boxes(A[k], 2, "blue")}<button class="btn small" data-alloc="${k}" data-n="${A[k] + 1}" ${A[k] >= 2 || fr <= 0 ? "disabled" : ""} aria-label="More power to ${esc(Y.name)}">+<\/button><span class="muted">${esc(Y.blurb[A[k]])}<\/span><\/div>`;
+  return h + `<div class="muted" style="margin-top:4px">${fr > 0 ? `${fr} Power unassigned.` : "Every point of Power is in use."}<\/div><\/div>`;
+}
+/** What the warp drive eats, and where to get more. */
+function storesHTML() {
+  const st = storesOf(S), P = S.pelion;
+  let h = `<h3>Stores<\/h3>`;
+  for (const [k, T] of Object.entries(STORES)) h += `<div class="card small ${st[k] <= (k === "antimatter" ? 3 : k === "dilithium" ? 4 : 1) ? "red" : ""}"><h4>${esc(T.name)} ${st[k]}/${T.max}<\/h4>${bar(st[k], T.max, k === "dilithium" ? "var(--violet)" : k === "antimatter" ? "var(--blue)" : "var(--gold)")}<div class="muted">${esc(T.blurb)}<\/div><\/div>`;
+  h += `<p class="small muted">Where to get more: Starbase 23 refuels the antimatter free when the Pelion docks, issues spares up to six crates, and sells dilithium and spares. Colonies and member worlds sell antimatter and spares; independent worlds at accord +1 or better sell dilithium and antimatter. Surveys find seams of living dilithium to mine. Engineering can recrystallize worn crystals for a crate of spares. Orion ships and bases leave salvage. Some orders pay in stores.<\/p>`;
+  h += `<div class="btn-row"><button class="btn small" data-tender="1" ${S.tender || P.docked || st.antimatter > 3 || S.supplies < 10 ? "disabled" : ""}>Call a fuel tender: 10 supplies, here in two weeks<\/button>${S.tender ? `<span class="small gold">A tender is on its way.<\/span>` : ""}<\/div>`;
   return h;
 }
 
@@ -3659,7 +4289,7 @@ function ordersHTML() {
   let h = hint() + `<h2>Orders<\/h2>`;
   const hist = S.history || [], back = S.backlog || [];
   const doneN = hist.filter((x) => x.result !== "failed").length, failN = hist.filter((x) => x.result === "failed").length;
-  h += `<div class="kv small" style="margin-bottom:10px"><span>Tour<\/span><span>${bar(Math.min(S.turn, TOUR), TOUR, "var(--gold)")} Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hourly(S) ? ` · hour ${(S.hour || 0) + 1} on Corvan II` : ""}<\/span>
+  h += `<div class="kv small" style="margin-bottom:10px"><span>${S.mode === "open" ? "Command" : "Tour"}<\/span><span>${S.mode === "open" ? "" : bar(Math.min(S.turn, TOUR), TOUR, "var(--gold)")} ${turnText()}${hourly(S) ? ` · hour ${(S.hour || 0) + 1} on Corvan II` : ""}<\/span>
     <span>Starfleet Command<\/span><span>${boxes(S.command, 5)} ${S.command} of 5 against the captain: failed orders, Prime Directive violations and incidents each mark one. Three orders carried out in a row clear one (now ${S.streak || 0} of 3). At 5 the captain is relieved of command.<\/span>
     <span>Orders<\/span><span><b>${S.orders.length}<\/b> under way · <b>${back.length}<\/b> in the backlog · <b class="good">${doneN}<\/b> carried out · <b class="bad">${failN}<\/b> failed<\/span><\/div>`;
   h += `<h3>Under way<\/h3>`;
@@ -3683,9 +4313,11 @@ function ordersHTML() {
   return h;
 }
 /** An order's type, and whether it's part of the campaign: little labels for its card. */
-const orderTags = (o) => (orderType(o) ? ` <span class="badge-status">${esc(orderType(o))}<\/span>` : "") + (orderTied(S, o) && !o.finale ? ` <span class="badge-status good">${esc(CAMPAIGN.title)}<\/span>` : "");
+const orderTags = (o) => (orderType(o) ? ` <span class="badge-status">${esc(orderType(o))}<\/span>` : "") + (orderTied(S, o) && !o.finale ? ` <span class="badge-status good">${esc(defOf(o.campaignId).title)}<\/span>` : "");
 /** The campaign this tour: Watchers of the Void, its act, the threads found, and the story so far. */
 function campaignHTML() {
+  const D = campaignDef(S);
+  if (D.id !== "watchers") return seriesHTML(D) + pastCampaigns();
   if (!campaignOpen(S)) return `<div class="card gold"><h4>The campaign <span class="badge-status">Prologue<\/span><\/h4><p class="small">The tour begins with your first orders: The Silence at Corvan II. What the Pelion finds there will set the course of everything after it.<\/p><\/div>`;
   const C = campaignOf(S), n = Math.min(C.threads.length, CAMPAIGN.finaleAt), beats = CAMPAIGN.beats.filter((b) => C.beats.includes(b.at));
   const next = CAMPAIGN.beats.find((b) => !C.beats.includes(b.at) && b.at > 0);
@@ -3696,7 +4328,24 @@ function campaignHTML() {
     ${C.over ? "" : `<span class="bad">${esc(diggersName(S)[0].toUpperCase() + diggersName(S).slice(1))}<\/span><span>${boxes(Math.min(C.korvath || 0, CAMPAIGN.finaleAt), CAMPAIGN.finaleAt)} ${C.korvath || 0} Makers' site${(C.korvath || 0) === 1 ? "" : "s"} dug up${C.finale ? "" : C.korvathNext ? `; the next in about ${Math.max(1, C.korvathNext - S.turn)} week${C.korvathNext - S.turn === 1 ? "" : "s"}` : ""}. ${(C.korvath || 0) > n ? "They're ahead: the Gate will be harder." : "Each campaign order you carry out sets them back two weeks."}<\/span>`}<\/div>`;
   if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})<\/summary>${beats.map((b) => `<p style="white-space:pre-line"><b>${esc(b.act)}: ${esc(b.title)}.<\/b> ${esc((C.beatText && C.beatText[b.at]) || b.text)}<\/p>`).join("")}<\/details>`;
   if (C.threads.length) h += `<details class="small" style="margin-top:4px"><summary>Threads found (${C.threads.length})<\/summary><ol>${C.threads.map((t) => `<li><b>${esc(t.title)}<\/b> (turn ${t.turn}): ${esc(t.text)}<\/li>`).join("")}<\/ol><\/details>`;
+  if (C.over) h += `<p class="small">${S.mode === "open" || S.turn <= TOUR - 12 ? "Starfleet's next campaign for the Pelion begins three weeks after this one ends." : "Too late in the tour for another campaign. Keep command at the tour's end (open command) and the next one begins."}<\/p>`;
   return h + `<\/div>`;
+}
+/** A campaign after the first: its premise, threads, rival, and the story so far. */
+function seriesHTML(D) {
+  const C = campaignOf(S), n = Math.min(C.threads.length, D.finaleAt), beats = D.beats.filter((b) => C.beats.includes(b.at)), next = D.beats.find((b) => !C.beats.includes(b.at) && b.at > 0);
+  const status = C.over === "lost" ? `Lost: ${D.rival.name} reached ${D.finale.replace(/^The /, "the ")} first.` : C.over ? `Resolved at ${D.finale.replace(/^The /, "the ")}.` : C.finale ? `The finale: ${D.finale} (the Orders tab).` : `${n} of ${D.finaleAt} threads to the finale${next ? `; the next revelation at ${next.at}` : ""}. Orders marked ${D.title} turn up threads.`;
+  let h = `<div class="card gold"><h4>The campaign: ${esc(D.title)} <span class="badge-status ${C.over === "lost" ? "bad" : C.over ? "good" : ""}">${esc(campaignAct(S))}<\/span><\/h4><p class="small">${esc(D.premise)}<\/p>
+    <div class="kv small"><span>Threads<\/span><span>${boxes(n, D.finaleAt, "blue")} ${esc(status)}<\/span>
+    ${C.over ? "" : `<span class="bad">${esc(D.rival.Name)}<\/span><span>${boxes(Math.min(C.korvath || 0, D.finaleAt), D.finaleAt)} ${C.korvath || 0} so far${C.finale ? "" : C.korvathNext ? `; the next in about ${Math.max(1, C.korvathNext - S.turn)} week${C.korvathNext - S.turn === 1 ? "" : "s"}` : ""}. ${(C.korvath || 0) > n ? "Ahead: the finale will be harder." : "Each campaign order carried out sets it back two weeks."}<\/span>`}<\/div>`;
+  if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})<\/summary>${beats.map((b) => `<p style="white-space:pre-line"><b>${esc(b.act)}: ${esc(b.title)}.<\/b> ${esc((C.beatText && C.beatText[b.at]) || b.text)}<\/p>`).join("")}<\/details>`;
+  if (C.threads.length) h += `<details class="small" style="margin-top:4px"><summary>Threads found (${C.threads.length})<\/summary><ol>${C.threads.map((t) => `<li><b>${esc(t.title)}<\/b> (turn ${t.turn}): ${esc(t.text)}<\/li>`).join("")}<\/ol><\/details>`;
+  return h + `<\/div>`;
+}
+/** Campaigns already over. */
+function pastCampaigns() {
+  const done = S.campaignsDone || []; if (!done.length) return "";
+  return `<details class="card small"><summary>Earlier campaigns (${done.length})<\/summary>${done.map((c) => `<p><b>${esc(defOf(c.id).title)}<\/b>: ${c.over === "lost" ? "lost" : "resolved"}, ${c.threads} thread${c.threads === 1 ? "" : "s"} found.<\/p>`).join("")}<\/details>`;
 }
 /** The Mission tab: how each order under way is progressing, step by step, with its clock and what counts as success. */
 function missionHTML() {
@@ -3744,7 +4393,7 @@ function missionHTML() {
 // ---------- Sector ----------
 function sectorHTML() {
   const sc = score(S);
-  let h = `<h2>The Corvan Sector<\/h2><p class="small muted">Turn ${Math.min(S.turn, TOUR)} of ${TOUR}. Score so far: <b class="gold">${sc.total}<\/b>.<\/p>`;
+  let h = `<h2>The Corvan Sector<\/h2><p class="small muted">${turnText()}. Score so far: <b class="gold">${sc.total}<\/b>.<\/p>`;
   h += `<table class="tbl"><tr><th>World<\/th><th>What<\/th><th>Status<\/th><\/tr>`;
   const order = { member: 0, colony: 1, starbase: 2, independent: 3, claimed: 4, klingon: 5, lost: 6 };
   for (const s of Object.values(S.systems).filter((x) => shownKind(x) && order[shownKind(x)] !== undefined).sort((a, b) => order[a.kind] - order[b.kind])) {
@@ -3797,6 +4446,9 @@ function bindChrome() {
       after(); return;
     }
     if (b.dataset.resolve) { const since = mark(); const r = resolve(S, b.dataset.resolve === "reroll"); lastResult = r.done ? r.result : null; if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill, contest: !!r.result.opposed }); after(); return; }
+    if (b.dataset.alloc) { const r = setAlloc(S, b.dataset.alloc, +b.dataset.n); if (r.error) toast(r.error, true); after(); return; }
+    if (b.dataset.buy) { const r = buyStore(S, b.dataset.buy, +b.dataset.n); if (r.error) toast(r.error, true); else toast(S.log[S.log.length - 1].text); after(); return; }
+    if (b.dataset.tender) { const since = mark(); const r = requestTender(S); if (r.error) toast(r.error, true); else reportSince("A fuel tender", since); after(); return; }
     if (b.dataset.refit) { const since = mark(); const r = fitRefit(S, b.dataset.refit); if (r.error) toast(r.error, true); else reportSince(REFITS[b.dataset.refit].name, since); after(); return; }
     if (b.dataset.req) { const since = mark(); const r = requisition(S, b.dataset.req); if (r.error) toast(r.error, true); else reportSince("Requisition: " + SUPPORT[b.dataset.req].name, since); after(); return; }
   });
@@ -3838,21 +4490,24 @@ function showStarter(canContinue) {
   <div class="grid2">
     <div class="brief"><h3>The ship<\/h3><p>Double-click a hex to fly there. A hex is a light-year and a turn a week; speed is v = W³ × c, so warp 6, the Pelion's maximum stable speed, covers about 4 light-years a week, and warp 8, its emergency maximum, about 10, at a risk to the engines. Urgent orders call for emergency warp. Nebulae count double. Then the crew goes to work where you are: every officer acts once a turn (survey, investigate, negotiate, sweep, repair), each job once. Starbase 23 repairs, rearms and refits you.<\/p><\/div>
     <div class="brief"><h3>The crew<\/h3><p>The six officers from the Players' Guide do the work. Every action is the tabletop roll: 3d6 at or under their skill. Pick who does it, and whether a second officer assists (+1, using their turn); a Duty point rerolls a failure.<\/p><\/div>
-    <div class="brief"><h3>The campaign<\/h3><p>The tour is one long story, and it begins with your first orders, The Silence at Corvan II. What you find there sets the course of everything after it: every order that follows will turn up a piece of it.<\/p><\/div>
+    <div class="brief"><h3>The campaigns<\/h3><p>The tour is one long story, and it begins with your first orders, The Silence at Corvan II. What you find there sets the course of everything after it. When that campaign is over, Starfleet's attention turns: a new campaign begins, with new kinds of orders of its own.<\/p><\/div>
+    <div class="brief"><h3>Power and stores<\/h3><p>The warp core's Power is shared out every week, as in battle: the engines take what the warp factor needs, and the rest goes to shields, sensors, the labs and operations. The warp drive eats antimatter by the light-year and wears out its dilithium; repairs use spare parts. Refuel at the starbase, buy at colonies and friendly worlds, mine seams, salvage, recrystallize.<\/p><\/div>
     <div class="brief"><h3>Orders<\/h3><p>Starfleet sends missions, each with a deadline, a twist, its own story, and a reason tied to the campaign. Each ends with a decision that's yours to make.<\/p><\/div>
     <div class="brief"><h3>The worlds<\/h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.<\/p><\/div>
-    <div class="brief"><h3>Battles<\/h3><p>Ship combat from the Players' Guide: spend Power on shields, phasers and torpedoes, give the captain's order, and break away if it goes wrong.<\/p><\/div>
+    <div class="brief"><h3>Battles<\/h3><p>Ship combat from the Players' Guide: split the Power between shields (reinforce them with a second point), phasers (overload them with a second), torpedoes and the engines (evasion), give the captain's order, and break away if it goes wrong.<\/p><\/div>
     <div class="brief"><h3>Starfleet Command<\/h3><p>Five boxes and you're relieved of command: failed orders, the Prime Directive, incidents and lost colonies mark it. Three orders carried out in a row clear a box. Survive the tour and earn your rating.<\/p><\/div>
   <\/div>
   <div class="ng-row"><label>Captain's name<input type="text" id="ng-name" placeholder="Captain" maxlength="30"><\/label>
+  <label>Game<select id="ng-mode"><option value="tour" selected>A tour: fifty weeks, then your rating<\/option><option value="open">Open command: no end, campaign after campaign<\/option><\/select><\/label>
   <label>Difficulty<select id="ng-diff"><option value="easy">Easy<\/option><option value="normal" selected>Normal<\/option><option value="hard">Hard<\/option><\/select><\/label>
   <label>Sector seed (optional)<input type="text" id="ng-seed" placeholder="random" maxlength="30"><\/label><\/div>
   <div class="btn-row" style="margin-top:16px"><button class="btn primary" data-m="new">Take command<\/button>${canContinue ? `<button class="btn" data-m="continue">Continue your tour<\/button>` : ""}<\/div>
   <p class="small muted">An unofficial fan game for the USS Pelion campaign, inspired by Star Trek. Not affiliated with or endorsed by Paramount or CBS Studios, who own Star Trek.<\/p>`);
 }
 function showMenu() {
-  modal(`<h2>Menu<\/h2><p class="muted">${esc(S.captain)}, turn ${S.turn} of ${TOUR}. This sector's seed: <span class="seed">${esc(S.seed)}<\/span><\/p>
-    <div class="btn-row"><button class="btn primary" data-m="close">Back to the bridge<\/button><button class="btn" data-m="help">How to play<\/button><button class="btn" data-m="restart">New tour<\/button><button class="btn" data-m="replay">Replay this sector<\/button><\/div>
+  modal(`<h2>Menu<\/h2><p class="muted">${esc(S.captain)}, ${turnText().toLowerCase()}. This sector's seed: <span class="seed">${esc(S.seed)}<\/span><\/p>
+    <div class="btn-row"><button class="btn primary" data-m="close">Back to the bridge<\/button><button class="btn" data-m="help">How to play<\/button><button class="btn" data-m="restart">New tour<\/button><button class="btn" data-m="replay">Replay this sector<\/button>${S.mode === "open" && !S.over ? `<button class="btn red" data-m="retire">Retire from command<\/button>` : ""}<\/div>
+    ${S.mode === "open" ? `<p class="small muted">Open command has no end: retire when you choose, and the score is counted then.<\/p>` : ""}
     <h3>Save code<\/h3><p class="small muted">The game saves in this browser after every move. To move it to another browser, copy this code, then paste it there under Load.<\/p>
     <textarea id="code" rows="3" readonly>${esc(btoa(unescape(encodeURIComponent(JSON.stringify(S)))))}<\/textarea>
     <div class="btn-row"><button class="btn small" data-m="copy">Copy<\/button><\/div>
@@ -3905,16 +4560,18 @@ function successHTML(ev) {
   const tasks = ev.arc ? arcSteps().replace(/<p class="small muted"[^]*$/, "") : `<ol class="steps-list">${ev.tasks.map((t) => `<li class="done"><span>✓<\/span>${esc(t)}<\/li>`).join("")}<\/ol>`;
   return `<h2>${part ? "Mission partly successful" : "Mission success"}<\/h2><h3 style="margin-top:0">${esc(ev.title)}<\/h3>
     <p class="small muted">Turn ${ev.turn} · ${ev.weeks} week${ev.weeks === 1 ? "" : "s"} from orders to done<\/p>
-    <h3>What was done<\/h3>${tasks}${ev.choice ? `<p><b>The decision:<\/b> ${esc(ev.choice)}<\/p>` : ""}<p>${esc(ev.how)}<\/p>${ev.thread ? `<p><b>${esc(CAMPAIGN.title)}, thread ${Math.min(campaignOf(S).threads.length, 99)}:<\/b> ${esc(ev.thread)}<\/p>` : ""}
+    <h3>What was done<\/h3>${tasks}${ev.choice ? `<p><b>The decision:<\/b> ${esc(ev.choice)}<\/p>` : ""}<p>${esc(ev.how)}<\/p>${ev.thread ? `<p><b>${esc(campaignDef(S).title)}, thread ${Math.min(campaignOf(S).threads.length, 99)}:<\/b> ${esc(ev.thread)}<\/p>` : ""}
     <h3>Starfleet Command<\/h3><ul class="small">${ev.rewards.map((r) => `<li>${esc(r)}<\/li>`).join("")}<\/ul>
     ${ev.next ? `<p class="small"><b>Up next, from the backlog:<\/b> ${esc(ev.next.join("; "))} (the Orders tab).<\/p>` : ""}
     <div class="btn-row"><button class="btn primary" data-m="event-ok">Continue<\/button><\/div>`;
 }
 function showBattle() {
   const B = S.battle, e = S.enemies[B.enemy], E = e ? ENEMIES[e.type] : null, P = S.pelion, st = battleStats(S), sm = shieldsMax(S);
-  if (!bchoice) bchoice = { order: "command", shields: true, phasers: true, torps: P.torps > 0, repair: false, breakOff: false };
-  const used = (bchoice.shields ? 1 : 0) + (bchoice.phasers && !bchoice.breakOff ? 1 : 0) + (bchoice.torps && !bchoice.breakOff ? 1 : 0), spare = Math.max(0, st.power - used);
+  if (!bchoice) { const t = P.torps > 0 ? 1 : 0; bchoice = { order: "command", shields: 1, phasers: 1, torps: !!t, engines: Math.max(0, Math.min(2, st.power - 2 - t)), repair: false, breakOff: false }; }
+  const fire = !bchoice.breakOff && !st.weaponsOut;
+  const used = bchoice.shields + (fire ? bchoice.phasers : 0) + (fire && bchoice.torps && P.torps ? 1 : 0) + bchoice.engines, spare = st.power - used;
   const chip = (k, label, dis) => `<label class="chip ${dis ? "off" : ""}"><input type="checkbox" data-b="${k}" ${bchoice[k] ? "checked" : ""} ${dis ? "disabled" : ""}>${label}<\/label>`;
+  const step = (k, label, notes, dis) => `<div class="roll-row"><span style="min-width:96px"><b>${label}<\/b><\/span><button class="btn small" data-bset="${k}" data-n="${bchoice[k] - 1}" ${bchoice[k] <= 0 || dis ? "disabled" : ""} aria-label="Less power to ${label}">−<\/button>${boxes(dis ? 0 : bchoice[k], 2, "blue")}<button class="btn small" data-bset="${k}" data-n="${bchoice[k] + 1}" ${bchoice[k] >= 2 || spare <= 0 || dis ? "disabled" : ""} aria-label="More power to ${label}">+<\/button><span class="small muted">${dis ? "—" : notes[bchoice[k]]}<\/span><\/div>`;
   const ord = (k, label) => `<label class="chip"><input type="radio" name="ord" data-o="${k}" ${bchoice.order === k ? "checked" : ""}>${label}<\/label>`;
   const who = (id) => (id ? esc(officer(id).short) : "nobody");
   const over = B.over;
@@ -3930,17 +4587,22 @@ function showBattle() {
   <\/div>
   ${over ? `<div class="result ${over === "destroyed" || over === "hailed" || over === "escaped" || over === "fled" ? "ok" : "no"}"><b>${{ destroyed: "Destroyed.", fled: "They broke off.", hailed: "They stood down.", escaped: "The Pelion broke away.", lost: "The Pelion is lost." }[over]}<\/b><\/div><div class="btn-row"><button class="btn primary" data-m="battle-done">Continue<\/button><\/div>`
   : `<h3>The captain's order<\/h3><div class="orders-choice">${ord("command", `Command (Leadership ${CAPTAIN.skills.Leadership}, ${pct(CAPTAIN.skills.Leadership)}): +2 to Tactical`)}${ord("read", `Read the enemy (Psychology ${CAPTAIN.skills.Psychology}): +2 evade, +1 to hit`)}${E && !E.base && e.power !== "romulan" ? ord("hail", `Hail (Diplomacy ${CAPTAIN.skills.Diplomacy} vs Will ${E.will}): they may stand down`) : ""}${ord("none", "No order")}<\/div>
-  <h3>Power: ${st.power} · ${used} spent · ${spare ? `+${Math.min(2, spare)} to ${bchoice.phasers && !bchoice.breakOff ? "phasers" : "evade"}` : "nothing spare"}<\/h3>
-  <div class="orders-choice">${chip("shields", "Shields up")}${chip("phasers", `Phasers (${st.gun}, ${pct(st.gun)})`, st.weaponsOut || bchoice.breakOff)}${chip("torps", `Torpedoes (${st.gun + 1}; can't be evaded)`, !P.torps || st.weaponsOut || bchoice.breakOff)}${chip("repair", `Damage control (${st.eng})`)}${chip("breakOff", `Break away (Helm ${st.helm}): instead of firing`)}<\/div>
+  <h3>Power: ${used} of ${st.power} spent${spare > 0 ? ` · ${spare} unassigned` : ""}<\/h3>
+  ${step("shields", "Shields", ["Down: every hit reaches the hull", "Up", "Reinforced: the first hit to reach them is turned aside"])}
+  ${step("phasers", "Phasers", ["Silent", `Firing (${st.gun}, ${pct(st.gun)})`, `Overloaded (${st.gun}): a hit does a box more, and wears the crystals`], !fire)}
+  ${step("engines", "Engines", ["Station-keeping", `+1 to evade${bchoice.breakOff ? " and break away" : ""}`, `+2 to evade${bchoice.breakOff ? " and break away" : ""}`])}
+  <div class="orders-choice">${chip("torps", `Torpedoes, 1 Power (${st.gun + 1}; can't be evaded; ${P.torps} left)`, !P.torps || !fire || (!bchoice.torps && spare <= 0))}${chip("repair", `Damage control (${st.eng}${storesOf(S).spares ? ", uses a crate of spares" : ", no spares: −3"})`)}${chip("breakOff", `Break away (Helm ${st.helm}): instead of firing`)}<\/div>
   <div class="btn-row"><button class="btn primary" data-m="exchange">Next exchange<\/button><\/div>`}
   <div class="blog">${B.log.slice().reverse().map((l) => `<div>${esc(l)}<\/div>`).join("") || `<span class="muted">${B.ambush ? "They decloak, firing." : "Both ships close. Your orders, Captain?"}<\/span>`}<\/div>`);
 }
 function showEnd() {
   const sc = score(S);
-  modal(`<h1>${S.over.win ? "The tour is over" : "Relieved"}<\/h1><p class="lede">${esc(S.over.why)}<\/p>
+  const canKeep = S.over.win && S.mode !== "open";
+  modal(`<h1>${S.over.win ? (S.mode === "open" ? "Retired" : "The tour is over") : "Relieved"}<\/h1><p class="lede">${esc(S.over.why)}<\/p>
+  ${canKeep ? `<p class="small">Starfleet Command would like the Pelion to stay. Keep command and the game goes on with no end, in open command: ${campaignOf(S).over ? "the next campaign begins in a few weeks, with new kinds of orders" : "finish the campaign under way, and the next begins after it"}.<\/p>` : ""}
   <h3>${esc(rating(sc.total))}<\/h3><table class="tbl">${sc.parts.map(([n, v]) => `<tr><td>${esc(n)}<\/td><td style="text-align:right">${v}<\/td><\/tr>`).join("")}<tr><td><b>Total<\/b><\/td><td style="text-align:right"><b>${sc.total}<\/b><\/td><\/tr><\/table>
   <p class="small muted" style="margin-top:10px">This sector's seed: <span class="seed">${esc(S.seed)}<\/span><\/p>
-  <div class="btn-row"><button class="btn primary" data-m="restart">New tour<\/button><button class="btn" data-m="replay">Replay this sector<\/button><button class="btn" data-m="close">Look at the map<\/button><\/div>`);
+  <div class="btn-row">${canKeep ? `<button class="btn primary" data-m="keep">Keep command: open command<\/button>` : ""}<button class="btn ${canKeep ? "" : "primary"}" data-m="restart">New tour<\/button><button class="btn" data-m="replay">Replay this sector<\/button><button class="btn" data-m="close">Look at the map<\/button><\/div>`);
 }
 function modalClick(e) {
   const b = e.target.closest("button"); if (!b) return;
@@ -3957,12 +4619,14 @@ function modalClick(e) {
     after(); if (!report && !S.event && !S.battle && !S.over) closeModal(); return;
   }
   if (m === "report-ok") { report = null; closeModal(); after(); return; }
-  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value }); openingScene(s); startGame(s); return; }
+  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value, mode: $("ng-mode").value }); openingScene(s); startGame(s); return; }
   if (m === "continue") { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } return; }
   if (m === "close") { closeModal(); return; }
   if (m === "help") { showHelp(); return; }
   if (m === "restart") { showStarter(false); return; }
-  if (m === "replay") { startGame(newGame({ seed: S.seed, difficulty: S.difficulty, captain: S.captain })); return; }
+  if (m === "replay") { const s = newGame({ seed: S.seed, difficulty: S.difficulty, captain: S.captain, mode: S.mode }); openingScene(s); startGame(s); return; }
+  if (m === "keep") { keepCommand(S); closeModal(); after(); return; }
+  if (m === "retire") { retire(S); closeModal(); after(); return; }
   if (m === "copy") { const t = $("code"); t.select(); try { navigator.clipboard.writeText(t.value); toast("Copied."); } catch { document.execCommand("copy"); } return; }
   if (m === "load") { try { startGame(JSON.parse(decodeURIComponent(escape(atob($("load").value.trim()))))); } catch { toast("That code didn't load.", true); } return; }
   if (m === "event-ok") { dismissEvent(S); closeModal(); after(); return; }
@@ -3972,6 +4636,10 @@ function modalClick(e) {
   if (m === "exchange") { exchange(S, { ...bchoice, order: bchoice.order === "none" ? null : bchoice.order }); save(); renderAll(); showBattle(); return; }
   if (m === "battle-done") { closeBattle(S); bchoice = null; closeModal(); after(); return; }
 }
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-bset]"); if (!b || !S || !S.battle || !bchoice) return;
+  bchoice[b.dataset.bset] = Math.max(0, Math.min(2, +b.dataset.n)); showBattle();
+});
 document.addEventListener("change", (e) => {
   if (!S || !S.battle || !bchoice) return;
   const t = e.target;

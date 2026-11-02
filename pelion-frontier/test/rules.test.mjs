@@ -25,7 +25,8 @@ test("the sector has a starbase, three colonies, Corvan II and an Orion base", (
 });
 test("targets add the officer's advantage and the ship's sensors", () => {
   const S = newGame({ seed: "t" });
-  assert.equal(target(S, "sevek", "Sensors").total, 14 + 1);                       // sensors 3: +1
+  assert.equal(target(S, "sevek", "Sensors").total, 14 + 1 + 1);                   // sensors 3: +1; a point of power to the sensors: +1
+  S.pelion.alloc.sensors = 0; assert.equal(target(S, "sevek", "Sensors").total, 14 + 1);
   assert.equal(target(S, "sevek", "Physical Sciences", { action: "investigate" }).total, 16 + 2);  // Eidetic Recall
   S.crew.sevek.inj = 2; assert.equal(target(S, "sevek", "Physical Sciences").total, 14);
 });
@@ -425,6 +426,86 @@ test("every order is unique: no story is told twice in a tour, and each has its 
   const S = newGame({ seed: "unique" }); S.orders = []; S.backlog = []; S.arc.stage = "done";
   const seen = new Set(), titles = new Set();
   for (let i = 0; i < 60; i++) { const o = newOrder(S); S.orders = []; S.backlog = []; if (!o) continue; assert.ok(!seen.has(o.story), "repeated " + o.story); seen.add(o.story); titles.add(o.title); assert.ok(!/\{/.test(o.text)); }
-  const all = Object.keys(STORIES).filter((k) => k !== "The Makers' Gate");
+  const all = Object.keys(STORIES).filter((k) => k !== "The Makers' Gate" && !STORIES[k].campaign);   // the later campaigns' stories wait for their campaigns
   assert.ok(seen.size >= all.length - 4);             // nearly every story, each once (a few may have nowhere to happen)
+});
+
+test("power: the engines take what the warp needs; the rest is shared out, 2 at most to a system", async () => {
+  const { reactorPower, powerFree, setAlloc, warpPower } = await import("../src/game.js");
+  const S = newGame({ seed: "power" }), P = S.pelion;
+  assert.equal(reactorPower(S), 5);
+  assert.equal(warpPower(6), 2); assert.equal(warpPower(8), 3); assert.equal(warpPower(4), 1);
+  assert.equal(powerFree(S), 5 - 2 - 2);                     // warp 6, shields 1, sensors 1
+  assert.ok(setAlloc(S, "labs", 1).ok); assert.equal(powerFree(S), 0);
+  assert.ok(setAlloc(S, "ops", 1).error);                    // nothing left
+  const r = setWarp(S, 8);                                     // warp 8 needs 3: the labs give theirs up
+  assert.equal(P.warp, 8); assert.ok(r.took.includes("Science labs")); assert.equal(P.alloc.labs, 0);
+  assert.ok(setAlloc(S, "sensors", 2).error);                 // warp 8, shields 1, sensors 1: all 5 spent
+  setWarp(S, 6); assert.ok(setAlloc(S, "sensors", 5).ok); assert.equal(P.alloc.sensors, 2);   // 2 at most
+});
+test("stores: dilithium wears, failing crystals cost Power and warp; antimatter burns by the light-year", async () => {
+  const { reactorPower, storesOf, addStore, consumeStores } = await import("../src/game.js");
+  const S = newGame({ seed: "stores" }), st = storesOf(S);
+  st.dilithium = 4; assert.equal(reactorPower(S), 4);
+  st.dilithium = 2; assert.equal(reactorPower(S), 3); assert.equal(maxWarp(S), 6);
+  st.dilithium = 0; assert.equal(maxWarp(S), 4);
+  st.dilithium = 10; st.antimatter = 0; assert.equal(maxWarp(S), 2);
+  st.antimatter = 20; S.pelion.lyWeek = 4; S.pelion.strain = 6; consumeStores(S);
+  assert.equal(st.antimatter, 19); assert.equal(S.pelion.wear, 1);
+  S.pelion.wear = 3; S.pelion.lyWeek = 9; S.pelion.strain = 8; consumeStores(S);
+  assert.equal(st.antimatter, 15); assert.equal(st.dilithium, 9); assert.equal(st.spares, 5);   // emergency warp: 4 antimatter, 2 wear, a spare
+  assert.equal(addStore(S, "spares", 99), 5);                   // within the limit
+});
+test("stores: bought at the starbase, refuelled on docking, mined from a seam, used by repairs", async () => {
+  const { storesOf, buyStore, marketAt } = await import("../src/game.js");
+  const S = newGame({ seed: "market" }), st = storesOf(S);
+  st.dilithium = 5; S.supplies = 40;
+  assert.equal(marketAt(S).name, "Starbase 23");
+  assert.ok(buyStore(S, "dilithium", 3).ok); assert.equal(st.dilithium, 8); assert.equal(S.supplies, 40 - 12);
+  // A seam: survey reveals it, and mining cuts crystals.
+  const seam = Object.values(S.systems).find((s) => s.dilithium && s.id !== S.corvan);
+  assert.ok(seam);
+  S.pelion.at = seam.at; S.pelion.docked = false; seam.surveyed = true; st.dilithium = 3;
+  const a = actionsFor(S).find((x) => x.id === "mine"); assert.ok(a && a.oppose);
+  // Repairs use a crate of spares, and without spares they're harder.
+  S.pelion.sys.engines = 1; st.spares = 0;
+  const rep = actionsFor(S).find((x) => x.id === "repair"); assert.ok(rep);
+  assert.ok(target(S, "grath", "Engineering", { action: "repair" }).parts.some((p) => p[0] === "No spare parts"));
+});
+test("open command: no end at fifty weeks; a tour's end can become open command", async () => {
+  const { keepCommand, retire, checkEnd } = await import("../src/game.js");
+  const O = newGame({ seed: "open", mode: "open" }); O.turn = 60; checkEnd(O); assert.equal(O.over, null);
+  assert.ok(retire(O).ok); assert.ok(O.over.win);
+  const T = newGame({ seed: "tour" }); T.turn = 51; checkEnd(T); assert.ok(T.over && T.over.win);
+  assert.ok(keepCommand(T).ok); assert.equal(T.over, null); assert.equal(T.mode, "open");
+});
+test("after Watchers of the Void, a new campaign begins with its own order types, threads and finale", async () => {
+  const { campaignTick, campaignDef, missionPool } = await import("../src/game.js");
+  const { SERIES } = await import("../src/campaigns.js");
+  const S = newGame({ seed: "series", mode: "open" }); S.arc.stage = "done"; S.orders = []; S.backlog = [];
+  campaignTick(S); S.campaign.over = "close"; campaignTick(S);
+  const n0 = missionPool(S).length;
+  S.turn += 3; S.event = null; S.eventQueue = []; campaignTick(S);
+  assert.equal(S.campaign.id, "coldfire"); assert.equal(campaignDef(S).title, SERIES[0].title);
+  assert.ok(missionPool(S).length > n0);                                   // new kinds of orders
+  assert.ok(S.campaign.beats.includes(0));
+  let tied = 0;
+  for (let i = 0; i < 40 && S.campaign.threads.length < SERIES[0].finaleAt; i++) {
+    const o = newOrder(S); S.event = null; S.eventQueue = [];
+    if (!o) break;
+    if (o.campaign) { tied++; assert.equal(o.campaignId, "coldfire"); }
+    S.orders = S.orders.filter((x) => x !== o); S.backlog = [];
+    if (o.campaign) { S.orders.push(o); completeOrder(S, o, true); S.event = null; S.eventQueue = []; }
+  }
+  assert.ok(tied >= SERIES[0].finaleAt);
+  const fin = S.orders.find((o) => o.finale);
+  assert.ok(fin && fin.title === "The Quiet Engine" && fin.campaignId === "coldfire" && !/\{/.test(fin.text));
+});
+test("battle power: split as numbers, reinforced shields and overloaded phasers", () => {
+  const S = newGame({ seed: "bpower" });
+  const e = Object.values(S.enemies).find((x) => x.type === "orion");
+  e.at = S.pelion.at; e.hidden = false; startBattle(S, e.id, "pelion");
+  const L = exchange(S, { order: null, shields: 2, phasers: 2, torps: false, engines: 1 });
+  assert.ok(Array.isArray(L) && L.length);
+  assert.ok(S.battle.log.some((l) => /Overloaded phasers|Phasers|evade/.test(l)) || S.battle.over);
 });

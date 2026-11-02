@@ -2,7 +2,7 @@
 // Also the one place that ties the modules together, so the page imports this.
 import { CREW, SUPPORT, ENEMIES } from "./data.js";
 import { distance, within } from "./hex.js";
-import { hourly, BACKLOG_MAX, campaignTick, check, target, CRUISE_WARP, daysPerLy, maxWarp, syncMp, isUrgent, available, log, storyEvent, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
+import { consumeStores, balancePower, storesOf, hourly, BACKLOG_MAX, campaignTick, check, target, CRUISE_WARP, daysPerLy, maxWarp, syncMp, isUrgent, available, log, storyEvent, completeOrder, newOrder, updateVisibility, checkEnd, speedOf, officer, markCommand, hasRecord, bestOfficer } from "./game.js";
 import { startBattle, endBattle } from "./combat.js";
 import { aiTurn, claim } from "./ai.js";
 import { arcTurn, arcTick, arcEventChoose } from "./arc.js";
@@ -54,6 +54,7 @@ export function endTurn(S) {
   const active = S.orders.filter((o) => !o.arc).length, waiting = (S.backlog || []).length;
   if (S.turn >= 3 && waiting < BACKLOG_MAX && (S.turn % 4 === 0 || active === 0 && !waiting && S.turn % 2 === 0)) newOrder(S);
   warpStrain(S);
+  consumeStores(S);
   campaignTick(S);
   tensionWarnings(S);
   // Next turn.
@@ -80,7 +81,7 @@ function warpStrain(S) {
   if (w <= CRUISE_WARP) return;
   const eng = available(S, "grath") ? "grath" : bestOfficer(S, ["Engineering"])?.officer;
   if (!eng) return;
-  const extra = [[`Emergency warp ${w}`, -(2 * (w - CRUISE_WARP) - 1)]].concat(P.refits.warp ? [["Nacelle tuning", 2]] : [], hasRecord(S, "speed1") ? [["Folded warp field", 2]] : []);
+  const extra = [[`Emergency warp ${w}`, -(2 * (w - CRUISE_WARP) - 1)]].concat(P.refits.warp ? [["Nacelle tuning", 2]] : [], hasRecord(S, "speed1") ? [["Folded warp field", 2]] : [], storesOf(S).spares <= 0 ? [["No spares to burn", -2]] : []);
   const t = target(S, eng, "Engineering", { extra }), r = check(S, t.total), urgent = S.orders.some(isUrgent);
   if (r.success) log(S, `Warp ${w} this week: ${officer(eng).short} keeps the engines in the green (Engineering, ${r.total} against ${r.target}).`, "good");
   else { P.sys.engines = Math.min(3, P.sys.engines + 1); log(S, `Warp ${w} this week strains the engines past their limit (${officer(eng).short}, Engineering, ${r.total} against ${r.target}): engines damaged ${P.sys.engines}/3, maximum warp now ${maxWarp(S)} until repaired.${urgent ? " The orders were urgent; Starfleet will understand." : ""}`, "bad"); }
@@ -98,7 +99,8 @@ function newWeek(S) {
   if (P.warp === undefined) P.warp = CRUISE_WARP;
   const carry = P.strain !== undefined && P.strain > 0 ? Math.min(P.days || 0, daysPerLy(P.warp), 7) : 0;
   P.days = 7 + carry; P.strain = 0;
-  if (P.warp > maxWarp(S)) { P.warp = maxWarp(S); log(S, `Engine damage: the Pelion can make warp ${P.warp} at most.`, "bad"); }
+  if (P.warp > maxWarp(S)) { P.warp = maxWarp(S); log(S, `The Pelion can make warp ${P.warp} at most this week (engines, power or stores).`, "bad"); }
+  balancePower(S);
   syncMp(S);
 }
 /** An hour on Corvan II while the away team is down: everyone acts again, the drain goes on; the rest of the sector waits. */

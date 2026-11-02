@@ -2,7 +2,8 @@
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
-  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, postsOf, postAt, missionChoices, chooseMission, openingScene, cloakChoices, chooseCloak, complicationChoices, chooseComplication, diggersName, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType } from "./game.js";
+  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, postsOf, postAt, missionChoices, chooseMission, openingScene, cloakChoices, chooseCloak, complicationChoices, chooseComplication, diggersName, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType,
+  POWER_SYSTEMS, STORES, storesOf, allocOf, setAlloc, reactorPower, powerFree, warpPower, marketAt, buyStore, requestTender, keepCommand, retire, campaignDef, defOf, dilithiumPenalty } from "./game.js";
 import { storyOf, CAMPAIGN } from "./stories.js";
 import { SHIP_SHAPES } from "./ships.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
@@ -321,12 +322,19 @@ let surfaceSite = null;
 // ---------- the bar and the tabs ----------
 const boxes = (n, max, cls = "") => `<span class="boxes ${cls}">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>`;
 function renderAll() { renderBar(); renderTabs(); renderPanel(); draw(); }
+/** "Turn 12 of 50", or in open command "Week 62 · open command". */
+const turnText = () => (S.mode === "open" ? `Week ${S.turn} · open command` : `Turn ${Math.min(S.turn, TOUR)} of ${TOUR}`);
 function renderBar() {
+  const st = storesOf(S), low = (k, n) => (st[k] <= n ? ' class="bad"' : "");
   $("bar-stats").innerHTML = `<span><b>Supplies</b>${S.supplies}</span><span><b>Science</b>${S.science}</span>`
+    + `<span title="Power: in use of what the reactor makes this week (the Ship tab)"><b>Power</b>${Math.max(0, reactorPower(S) - powerFree(S))}/${reactorPower(S)}</span>`
+    + `<span title="Dilithium crystals in the warp core's matrix"><b>Dilithium</b><span${low("dilithium", 4)}>${st.dilithium}/10</span></span>`
+    + `<span title="Antimatter: the warp drive's fuel"><b>Antimatter</b><span${low("antimatter", 3)}>${st.antimatter}/${STORES.antimatter.max}</span></span>`
+    + `<span title="Spare parts: plasma injectors, warp coils, coolant"><b>Spares</b><span${low("spares", 1)}>${st.spares}</span></span>`
     + `<span title="Starfleet Command: five boxes and you're relieved of command"><b>Starfleet Command</b>${boxes(S.command, 5)}</span>`
     + `<span title="Tension with the Klingon Empire"><b>Klingon tension</b>${boxes(S.tension, 10, "gold")}</span>`;
   const hr = hourly(S);
-  $("bar-turn").textContent = `Stardate ${stardate(S)} · Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hr ? ` · Hour ${(S.hour || 0) + 1} on Corvan II` : ""}`;
+  $("bar-turn").textContent = `Stardate ${stardate(S)} · ${turnText()}${hr ? ` · Hour ${(S.hour || 0) + 1} on Corvan II` : ""}`;
   $("end-turn").disabled = !canEndTurn(S);
   $("end-turn").textContent = hr ? "End hour" : "End turn";
 }
@@ -348,8 +356,14 @@ function warpHTML() {
   const P = S.pelion, mw = maxWarp(S), opts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter((w) => w <= Math.max(8, mw));
   const left = P.days || 0;
   return `<div class="card small" style="padding:8px 10px"><label><b>Speed</b> <select data-warp aria-label="Warp factor">${opts.map((w) => `<option value="${w}" ${w === P.warp ? "selected" : ""} ${w > mw ? "disabled" : ""}>${w ? `Warp ${w}${w === CRUISE_WARP ? " (maximum stable)" : w === 8 ? " (emergency maximum)" : w > CRUISE_WARP ? " (emergency)" : ""}` : "Impulse"}${w > mw ? " (engines damaged)" : ""}</option>`).join("")}</select></label>
-    <div class="muted" style="margin-top:4px">${esc(warpText(P.warp))}. v = W³ × c.</div>
+    <div class="muted" style="margin-top:4px">${esc(warpText(P.warp))}. v = W³ × c. Engines take ${warpPower(P.warp)} of ${reactorPower(S)} Power${powerFree(S) > 0 ? `; ${powerFree(S)} unassigned (the Ship tab)` : ""}.${storesOf(S).antimatter <= 0 ? ` <span class="bad">No antimatter: warp 2 on the reserve.</span>` : ""}</div>
     <div style="margin-top:2px">This week: ${left.toFixed(1)} of 7 days left${P.warp ? `, ${P.mp.toFixed(1)} ly at this warp` : ""}.${P.warp > CRUISE_WARP ? ` <span class="bad">Emergency speed: an Engineering check at the end of the week, or the engines take damage.</span>` : ""}</div></div>`;
+}
+/** Stores for sale where the Pelion is. */
+function marketHTML() {
+  const m = marketAt(S); if (!m) return "";
+  const st = storesOf(S);
+  return `<div class="card violet small"><h4>Stores at ${esc(m.name)}</h4>${Object.entries(m.items).map(([k, price]) => `<div class="roll-row"><span style="min-width:150px">${esc(STORES[k].name)} ${st[k]}/${STORES[k].max}</span><button class="btn small" data-buy="${k}" data-n="1" ${st[k] >= STORES[k].max || S.supplies < price ? "disabled" : ""}>+1 for ${price}</button><button class="btn small" data-buy="${k}" data-n="99" ${st[k] >= STORES[k].max || S.supplies < price ? "disabled" : ""}>Fill up</button></div>`).join("")}<div class="muted" style="margin-top:4px">Prices in supplies (you have ${S.supplies}).${m.name === "Starbase 23" ? " The starbase refuels the antimatter for nothing when the Pelion docks." : ""}</div></div>`;
 }
 function units() {
   const list = [["pelion", "USS Pelion"], ...Object.values(S.support).map((u) => [u.id, u.name])];
@@ -373,7 +387,7 @@ function hint() {
 }
 function hereHTML() {
   const u = U(), hex = selHex || u.at, s = sysAt(S, hex), here = hex === u.at;
-  let h = units() + hint() + (unit === "pelion" ? warpHTML() : "");
+  let h = units() + hint() + (unit === "pelion" ? warpHTML() : "") + (unit === "pelion" && (!selHex || selHex === S.pelion.at) ? marketHTML() : "");
   if (S.pending && S.pending.unit === unit) h += pendingHTML();
   else if (lastResult) h += resultHTML(lastResult);
   // The place.
@@ -487,7 +501,8 @@ function shipHTML() {
   h += `<div class="kv"><span>Shields</span><span>${boxes(sm - P.shields, sm, "blue")}</span><span>Hull</span><span>${boxes(PELION.hull - P.hull, PELION.hull, "gold")}</span>`
     + ["weapons", "engines", "sensors"].map((k) => `<span>${k[0].toUpperCase() + k.slice(1)}</span><span>${boxes(P.sys[k], 3)} ${["", "Damaged", "Crippled", "Offline"][P.sys[k]]}</span>`).join("")
     + `<span>Power</span><span>${powerOf(S)}${P.powerLoss ? ` (−${P.powerLoss})` : ""}</span><span>Torpedoes</span><span>${P.torps}/${PELION.torps}</span><span>Speed</span><span>Warp ${P.warp}${P.warp === CRUISE_WARP ? " (maximum stable)" : P.warp > CRUISE_WARP ? " (emergency)" : ""}: ${speedOf(S).toFixed(1)} ly a week. Maximum stable warp ${CRUISE_WARP}; emergency maximum warp ${maxWarp(S)}${maxWarp(S) < 8 ? " (engines damaged)" : ""}</span><span>Sensors</span><span>rating ${sensorsRating(S)}; sees ${2 + (P.refits.sensors ? 1 : 0)} hexes</span>${P.refits.inverter ? `<span>Cloak inverter</span><span>Fitted by Starfleet R&D after the field trials: +2 to sensor sweeps${P.refits.inverter >= 2 ? "; tuned at full power, sweeps reach 5 light-years for cloaked ships" : ""}</span>` : ""}</div>`;
-  h += `<p class="small muted">Hull and systems are repaired at Starbase 23 (or by Engineering, a box at a time). Shields come back after each battle.</p>`;
+  h += `<p class="small muted">Hull and systems are repaired at Starbase 23 (or by Engineering, a box at a time, using a crate of spares). Shields come back after each battle.</p>`;
+  h += powerHTML() + storesHTML();
   h += `<h3>Refits ${P.docked ? "" : "(at Starbase 23)"}</h3>`;
   for (const [id, R] of Object.entries(REFITS)) h += `<div class="card ${P.refits[id] ? "green" : "violet"}"><h4>${esc(R.name)}</h4><div class="small muted">${esc(R.blurb)}</div><div class="roll-row">${P.refits[id] ? `<span class="good small">Fitted</span>` : `<button class="btn small" data-refit="${id}" ${!P.docked || S.science < R.cost ? "disabled" : ""}>Fit it: ${R.cost} science</button>`}</div></div>`;
   h += `<h3>Your ships</h3>`;
@@ -495,6 +510,25 @@ function shipHTML() {
   if (!Object.keys(S.support).length) h += `<p class="small muted">Only the Pelion, for now.</p>`;
   for (const [id, T] of Object.entries(SUPPORT)) h += `<div class="card violet"><h4>Requisition: ${esc(T.name)}</h4><div class="small muted">${esc(T.blurb)}</div><div class="roll-row"><button class="btn small" data-req="${id}" ${!P.docked || S.supplies < T.cost || Object.keys(S.support).length >= 3 ? "disabled" : ""}>${T.cost} supplies</button>${P.docked ? "" : `<span class="small muted">At Starbase 23</span>`}</div></div>`;
   h += `<h3>Library records</h3>` + (S.records.length ? S.records.map((id) => { const r = RECORDS.find((x) => x.id === id); return `<div class="card green"><h4>${esc(r.name)}</h4><div class="small muted">${esc(r.text)}</div></div>`; }).join("") : `<p class="small muted">None yet. Investigate anomalies and ruins.</p>`);
+  return h;
+}
+
+/** The week's power: the engines' share from the warp factor, the rest shared out by the captain. */
+function powerHTML() {
+  const A = allocOf(S), pw = reactorPower(S), fr = powerFree(S), P = S.pelion;
+  const why = [P.powerLoss ? `damage −${P.powerLoss}` : "", dilithiumPenalty(S) ? `failing dilithium −${dilithiumPenalty(S)}` : "", P.refits.power ? "power couplings +1" : ""].filter(Boolean).join(", ");
+  let h = `<h3>Power: ${pw - fr} of ${pw} in use</h3><p class="small muted">The warp core makes ${pw}${why ? ` (${esc(why)})` : ""}. The engines take what the warp factor needs: 1 up to warp 4, 2 up to warp 6, 3 for warp 7 and 8. Share out the rest, up to 2 to a system. In battle, the same Power goes to shields, phasers, torpedoes and engines.</p>`;
+  h += `<div class="card small"><div class="roll-row"><span style="min-width:150px"><b>Engines</b></span>${boxes(warpPower(P.warp), 3, "gold")} <span class="muted">warp ${P.warp}: ${warpPower(P.warp)}</span></div>`;
+  for (const [k, Y] of Object.entries(POWER_SYSTEMS)) h += `<div class="roll-row"><span style="min-width:150px"><b>${esc(Y.name)}</b></span><button class="btn small" data-alloc="${k}" data-n="${A[k] - 1}" ${A[k] <= 0 ? "disabled" : ""} aria-label="Less power to ${esc(Y.name)}">−</button>${boxes(A[k], 2, "blue")}<button class="btn small" data-alloc="${k}" data-n="${A[k] + 1}" ${A[k] >= 2 || fr <= 0 ? "disabled" : ""} aria-label="More power to ${esc(Y.name)}">+</button><span class="muted">${esc(Y.blurb[A[k]])}</span></div>`;
+  return h + `<div class="muted" style="margin-top:4px">${fr > 0 ? `${fr} Power unassigned.` : "Every point of Power is in use."}</div></div>`;
+}
+/** What the warp drive eats, and where to get more. */
+function storesHTML() {
+  const st = storesOf(S), P = S.pelion;
+  let h = `<h3>Stores</h3>`;
+  for (const [k, T] of Object.entries(STORES)) h += `<div class="card small ${st[k] <= (k === "antimatter" ? 3 : k === "dilithium" ? 4 : 1) ? "red" : ""}"><h4>${esc(T.name)} ${st[k]}/${T.max}</h4>${bar(st[k], T.max, k === "dilithium" ? "var(--violet)" : k === "antimatter" ? "var(--blue)" : "var(--gold)")}<div class="muted">${esc(T.blurb)}</div></div>`;
+  h += `<p class="small muted">Where to get more: Starbase 23 refuels the antimatter free when the Pelion docks, issues spares up to six crates, and sells dilithium and spares. Colonies and member worlds sell antimatter and spares; independent worlds at accord +1 or better sell dilithium and antimatter. Surveys find seams of living dilithium to mine. Engineering can recrystallize worn crystals for a crate of spares. Orion ships and bases leave salvage. Some orders pay in stores.</p>`;
+  h += `<div class="btn-row"><button class="btn small" data-tender="1" ${S.tender || P.docked || st.antimatter > 3 || S.supplies < 10 ? "disabled" : ""}>Call a fuel tender: 10 supplies, here in two weeks</button>${S.tender ? `<span class="small gold">A tender is on its way.</span>` : ""}</div>`;
   return h;
 }
 
@@ -578,7 +612,7 @@ function ordersHTML() {
   let h = hint() + `<h2>Orders</h2>`;
   const hist = S.history || [], back = S.backlog || [];
   const doneN = hist.filter((x) => x.result !== "failed").length, failN = hist.filter((x) => x.result === "failed").length;
-  h += `<div class="kv small" style="margin-bottom:10px"><span>Tour</span><span>${bar(Math.min(S.turn, TOUR), TOUR, "var(--gold)")} Turn ${Math.min(S.turn, TOUR)} of ${TOUR}${hourly(S) ? ` · hour ${(S.hour || 0) + 1} on Corvan II` : ""}</span>
+  h += `<div class="kv small" style="margin-bottom:10px"><span>${S.mode === "open" ? "Command" : "Tour"}</span><span>${S.mode === "open" ? "" : bar(Math.min(S.turn, TOUR), TOUR, "var(--gold)")} ${turnText()}${hourly(S) ? ` · hour ${(S.hour || 0) + 1} on Corvan II` : ""}</span>
     <span>Starfleet Command</span><span>${boxes(S.command, 5)} ${S.command} of 5 against the captain: failed orders, Prime Directive violations and incidents each mark one. Three orders carried out in a row clear one (now ${S.streak || 0} of 3). At 5 the captain is relieved of command.</span>
     <span>Orders</span><span><b>${S.orders.length}</b> under way · <b>${back.length}</b> in the backlog · <b class="good">${doneN}</b> carried out · <b class="bad">${failN}</b> failed</span></div>`;
   h += `<h3>Under way</h3>`;
@@ -602,9 +636,11 @@ function ordersHTML() {
   return h;
 }
 /** An order's type, and whether it's part of the campaign: little labels for its card. */
-const orderTags = (o) => (orderType(o) ? ` <span class="badge-status">${esc(orderType(o))}</span>` : "") + (orderTied(S, o) && !o.finale ? ` <span class="badge-status good">${esc(CAMPAIGN.title)}</span>` : "");
+const orderTags = (o) => (orderType(o) ? ` <span class="badge-status">${esc(orderType(o))}</span>` : "") + (orderTied(S, o) && !o.finale ? ` <span class="badge-status good">${esc(defOf(o.campaignId).title)}</span>` : "");
 /** The campaign this tour: Watchers of the Void, its act, the threads found, and the story so far. */
 function campaignHTML() {
+  const D = campaignDef(S);
+  if (D.id !== "watchers") return seriesHTML(D) + pastCampaigns();
   if (!campaignOpen(S)) return `<div class="card gold"><h4>The campaign <span class="badge-status">Prologue</span></h4><p class="small">The tour begins with your first orders: The Silence at Corvan II. What the Pelion finds there will set the course of everything after it.</p></div>`;
   const C = campaignOf(S), n = Math.min(C.threads.length, CAMPAIGN.finaleAt), beats = CAMPAIGN.beats.filter((b) => C.beats.includes(b.at));
   const next = CAMPAIGN.beats.find((b) => !C.beats.includes(b.at) && b.at > 0);
@@ -615,7 +651,24 @@ function campaignHTML() {
     ${C.over ? "" : `<span class="bad">${esc(diggersName(S)[0].toUpperCase() + diggersName(S).slice(1))}</span><span>${boxes(Math.min(C.korvath || 0, CAMPAIGN.finaleAt), CAMPAIGN.finaleAt)} ${C.korvath || 0} Makers' site${(C.korvath || 0) === 1 ? "" : "s"} dug up${C.finale ? "" : C.korvathNext ? `; the next in about ${Math.max(1, C.korvathNext - S.turn)} week${C.korvathNext - S.turn === 1 ? "" : "s"}` : ""}. ${(C.korvath || 0) > n ? "They're ahead: the Gate will be harder." : "Each campaign order you carry out sets them back two weeks."}</span>`}</div>`;
   if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})</summary>${beats.map((b) => `<p style="white-space:pre-line"><b>${esc(b.act)}: ${esc(b.title)}.</b> ${esc((C.beatText && C.beatText[b.at]) || b.text)}</p>`).join("")}</details>`;
   if (C.threads.length) h += `<details class="small" style="margin-top:4px"><summary>Threads found (${C.threads.length})</summary><ol>${C.threads.map((t) => `<li><b>${esc(t.title)}</b> (turn ${t.turn}): ${esc(t.text)}</li>`).join("")}</ol></details>`;
+  if (C.over) h += `<p class="small">${S.mode === "open" || S.turn <= TOUR - 12 ? "Starfleet's next campaign for the Pelion begins three weeks after this one ends." : "Too late in the tour for another campaign. Keep command at the tour's end (open command) and the next one begins."}</p>`;
   return h + `</div>`;
+}
+/** A campaign after the first: its premise, threads, rival, and the story so far. */
+function seriesHTML(D) {
+  const C = campaignOf(S), n = Math.min(C.threads.length, D.finaleAt), beats = D.beats.filter((b) => C.beats.includes(b.at)), next = D.beats.find((b) => !C.beats.includes(b.at) && b.at > 0);
+  const status = C.over === "lost" ? `Lost: ${D.rival.name} reached ${D.finale.replace(/^The /, "the ")} first.` : C.over ? `Resolved at ${D.finale.replace(/^The /, "the ")}.` : C.finale ? `The finale: ${D.finale} (the Orders tab).` : `${n} of ${D.finaleAt} threads to the finale${next ? `; the next revelation at ${next.at}` : ""}. Orders marked ${D.title} turn up threads.`;
+  let h = `<div class="card gold"><h4>The campaign: ${esc(D.title)} <span class="badge-status ${C.over === "lost" ? "bad" : C.over ? "good" : ""}">${esc(campaignAct(S))}</span></h4><p class="small">${esc(D.premise)}</p>
+    <div class="kv small"><span>Threads</span><span>${boxes(n, D.finaleAt, "blue")} ${esc(status)}</span>
+    ${C.over ? "" : `<span class="bad">${esc(D.rival.Name)}</span><span>${boxes(Math.min(C.korvath || 0, D.finaleAt), D.finaleAt)} ${C.korvath || 0} so far${C.finale ? "" : C.korvathNext ? `; the next in about ${Math.max(1, C.korvathNext - S.turn)} week${C.korvathNext - S.turn === 1 ? "" : "s"}` : ""}. ${(C.korvath || 0) > n ? "Ahead: the finale will be harder." : "Each campaign order carried out sets it back two weeks."}</span>`}</div>`;
+  if (beats.length) h += `<details class="small" style="margin-top:6px"><summary>The story so far (${beats.length})</summary>${beats.map((b) => `<p style="white-space:pre-line"><b>${esc(b.act)}: ${esc(b.title)}.</b> ${esc((C.beatText && C.beatText[b.at]) || b.text)}</p>`).join("")}</details>`;
+  if (C.threads.length) h += `<details class="small" style="margin-top:4px"><summary>Threads found (${C.threads.length})</summary><ol>${C.threads.map((t) => `<li><b>${esc(t.title)}</b> (turn ${t.turn}): ${esc(t.text)}</li>`).join("")}</ol></details>`;
+  return h + `</div>`;
+}
+/** Campaigns already over. */
+function pastCampaigns() {
+  const done = S.campaignsDone || []; if (!done.length) return "";
+  return `<details class="card small"><summary>Earlier campaigns (${done.length})</summary>${done.map((c) => `<p><b>${esc(defOf(c.id).title)}</b>: ${c.over === "lost" ? "lost" : "resolved"}, ${c.threads} thread${c.threads === 1 ? "" : "s"} found.</p>`).join("")}</details>`;
 }
 /** The Mission tab: how each order under way is progressing, step by step, with its clock and what counts as success. */
 function missionHTML() {
@@ -663,7 +716,7 @@ function missionHTML() {
 // ---------- Sector ----------
 function sectorHTML() {
   const sc = score(S);
-  let h = `<h2>The Corvan Sector</h2><p class="small muted">Turn ${Math.min(S.turn, TOUR)} of ${TOUR}. Score so far: <b class="gold">${sc.total}</b>.</p>`;
+  let h = `<h2>The Corvan Sector</h2><p class="small muted">${turnText()}. Score so far: <b class="gold">${sc.total}</b>.</p>`;
   h += `<table class="tbl"><tr><th>World</th><th>What</th><th>Status</th></tr>`;
   const order = { member: 0, colony: 1, starbase: 2, independent: 3, claimed: 4, klingon: 5, lost: 6 };
   for (const s of Object.values(S.systems).filter((x) => shownKind(x) && order[shownKind(x)] !== undefined).sort((a, b) => order[a.kind] - order[b.kind])) {
@@ -716,6 +769,9 @@ function bindChrome() {
       after(); return;
     }
     if (b.dataset.resolve) { const since = mark(); const r = resolve(S, b.dataset.resolve === "reroll"); lastResult = r.done ? r.result : null; if (r.done) reportSince(r.result.name, since, { ...r.result.roll, officer: r.result.officer, skill: r.result.skill, contest: !!r.result.opposed }); after(); return; }
+    if (b.dataset.alloc) { const r = setAlloc(S, b.dataset.alloc, +b.dataset.n); if (r.error) toast(r.error, true); after(); return; }
+    if (b.dataset.buy) { const r = buyStore(S, b.dataset.buy, +b.dataset.n); if (r.error) toast(r.error, true); else toast(S.log[S.log.length - 1].text); after(); return; }
+    if (b.dataset.tender) { const since = mark(); const r = requestTender(S); if (r.error) toast(r.error, true); else reportSince("A fuel tender", since); after(); return; }
     if (b.dataset.refit) { const since = mark(); const r = fitRefit(S, b.dataset.refit); if (r.error) toast(r.error, true); else reportSince(REFITS[b.dataset.refit].name, since); after(); return; }
     if (b.dataset.req) { const since = mark(); const r = requisition(S, b.dataset.req); if (r.error) toast(r.error, true); else reportSince("Requisition: " + SUPPORT[b.dataset.req].name, since); after(); return; }
   });
@@ -757,21 +813,24 @@ function showStarter(canContinue) {
   <div class="grid2">
     <div class="brief"><h3>The ship</h3><p>Double-click a hex to fly there. A hex is a light-year and a turn a week; speed is v = W³ × c, so warp 6, the Pelion's maximum stable speed, covers about 4 light-years a week, and warp 8, its emergency maximum, about 10, at a risk to the engines. Urgent orders call for emergency warp. Nebulae count double. Then the crew goes to work where you are: every officer acts once a turn (survey, investigate, negotiate, sweep, repair), each job once. Starbase 23 repairs, rearms and refits you.</p></div>
     <div class="brief"><h3>The crew</h3><p>The six officers from the Players' Guide do the work. Every action is the tabletop roll: 3d6 at or under their skill. Pick who does it, and whether a second officer assists (+1, using their turn); a Duty point rerolls a failure.</p></div>
-    <div class="brief"><h3>The campaign</h3><p>The tour is one long story, and it begins with your first orders, The Silence at Corvan II. What you find there sets the course of everything after it: every order that follows will turn up a piece of it.</p></div>
+    <div class="brief"><h3>The campaigns</h3><p>The tour is one long story, and it begins with your first orders, The Silence at Corvan II. What you find there sets the course of everything after it. When that campaign is over, Starfleet's attention turns: a new campaign begins, with new kinds of orders of its own.</p></div>
+    <div class="brief"><h3>Power and stores</h3><p>The warp core's Power is shared out every week, as in battle: the engines take what the warp factor needs, and the rest goes to shields, sensors, the labs and operations. The warp drive eats antimatter by the light-year and wears out its dilithium; repairs use spare parts. Refuel at the starbase, buy at colonies and friendly worlds, mine seams, salvage, recrystallize.</p></div>
     <div class="brief"><h3>Orders</h3><p>Starfleet sends missions, each with a deadline, a twist, its own story, and a reason tied to the campaign. Each ends with a decision that's yours to make.</p></div>
     <div class="brief"><h3>The worlds</h3><p>Diplomatic missions bring independent worlds toward the Federation: at accord +5 they join. The Klingons court them too, and at −5 they're lost.</p></div>
-    <div class="brief"><h3>Battles</h3><p>Ship combat from the Players' Guide: spend Power on shields, phasers and torpedoes, give the captain's order, and break away if it goes wrong.</p></div>
+    <div class="brief"><h3>Battles</h3><p>Ship combat from the Players' Guide: split the Power between shields (reinforce them with a second point), phasers (overload them with a second), torpedoes and the engines (evasion), give the captain's order, and break away if it goes wrong.</p></div>
     <div class="brief"><h3>Starfleet Command</h3><p>Five boxes and you're relieved of command: failed orders, the Prime Directive, incidents and lost colonies mark it. Three orders carried out in a row clear a box. Survive the tour and earn your rating.</p></div>
   </div>
   <div class="ng-row"><label>Captain's name<input type="text" id="ng-name" placeholder="Captain" maxlength="30"></label>
+  <label>Game<select id="ng-mode"><option value="tour" selected>A tour: fifty weeks, then your rating</option><option value="open">Open command: no end, campaign after campaign</option></select></label>
   <label>Difficulty<select id="ng-diff"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label>
   <label>Sector seed (optional)<input type="text" id="ng-seed" placeholder="random" maxlength="30"></label></div>
   <div class="btn-row" style="margin-top:16px"><button class="btn primary" data-m="new">Take command</button>${canContinue ? `<button class="btn" data-m="continue">Continue your tour</button>` : ""}</div>
   <p class="small muted">An unofficial fan game for the USS Pelion campaign, inspired by Star Trek. Not affiliated with or endorsed by Paramount or CBS Studios, who own Star Trek.</p>`);
 }
 function showMenu() {
-  modal(`<h2>Menu</h2><p class="muted">${esc(S.captain)}, turn ${S.turn} of ${TOUR}. This sector's seed: <span class="seed">${esc(S.seed)}</span></p>
-    <div class="btn-row"><button class="btn primary" data-m="close">Back to the bridge</button><button class="btn" data-m="help">How to play</button><button class="btn" data-m="restart">New tour</button><button class="btn" data-m="replay">Replay this sector</button></div>
+  modal(`<h2>Menu</h2><p class="muted">${esc(S.captain)}, ${turnText().toLowerCase()}. This sector's seed: <span class="seed">${esc(S.seed)}</span></p>
+    <div class="btn-row"><button class="btn primary" data-m="close">Back to the bridge</button><button class="btn" data-m="help">How to play</button><button class="btn" data-m="restart">New tour</button><button class="btn" data-m="replay">Replay this sector</button>${S.mode === "open" && !S.over ? `<button class="btn red" data-m="retire">Retire from command</button>` : ""}</div>
+    ${S.mode === "open" ? `<p class="small muted">Open command has no end: retire when you choose, and the score is counted then.</p>` : ""}
     <h3>Save code</h3><p class="small muted">The game saves in this browser after every move. To move it to another browser, copy this code, then paste it there under Load.</p>
     <textarea id="code" rows="3" readonly>${esc(btoa(unescape(encodeURIComponent(JSON.stringify(S)))))}</textarea>
     <div class="btn-row"><button class="btn small" data-m="copy">Copy</button></div>
@@ -824,16 +883,18 @@ function successHTML(ev) {
   const tasks = ev.arc ? arcSteps().replace(/<p class="small muted"[^]*$/, "") : `<ol class="steps-list">${ev.tasks.map((t) => `<li class="done"><span>✓</span>${esc(t)}</li>`).join("")}</ol>`;
   return `<h2>${part ? "Mission partly successful" : "Mission success"}</h2><h3 style="margin-top:0">${esc(ev.title)}</h3>
     <p class="small muted">Turn ${ev.turn} · ${ev.weeks} week${ev.weeks === 1 ? "" : "s"} from orders to done</p>
-    <h3>What was done</h3>${tasks}${ev.choice ? `<p><b>The decision:</b> ${esc(ev.choice)}</p>` : ""}<p>${esc(ev.how)}</p>${ev.thread ? `<p><b>${esc(CAMPAIGN.title)}, thread ${Math.min(campaignOf(S).threads.length, 99)}:</b> ${esc(ev.thread)}</p>` : ""}
+    <h3>What was done</h3>${tasks}${ev.choice ? `<p><b>The decision:</b> ${esc(ev.choice)}</p>` : ""}<p>${esc(ev.how)}</p>${ev.thread ? `<p><b>${esc(campaignDef(S).title)}, thread ${Math.min(campaignOf(S).threads.length, 99)}:</b> ${esc(ev.thread)}</p>` : ""}
     <h3>Starfleet Command</h3><ul class="small">${ev.rewards.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>
     ${ev.next ? `<p class="small"><b>Up next, from the backlog:</b> ${esc(ev.next.join("; "))} (the Orders tab).</p>` : ""}
     <div class="btn-row"><button class="btn primary" data-m="event-ok">Continue</button></div>`;
 }
 function showBattle() {
   const B = S.battle, e = S.enemies[B.enemy], E = e ? ENEMIES[e.type] : null, P = S.pelion, st = battleStats(S), sm = shieldsMax(S);
-  if (!bchoice) bchoice = { order: "command", shields: true, phasers: true, torps: P.torps > 0, repair: false, breakOff: false };
-  const used = (bchoice.shields ? 1 : 0) + (bchoice.phasers && !bchoice.breakOff ? 1 : 0) + (bchoice.torps && !bchoice.breakOff ? 1 : 0), spare = Math.max(0, st.power - used);
+  if (!bchoice) { const t = P.torps > 0 ? 1 : 0; bchoice = { order: "command", shields: 1, phasers: 1, torps: !!t, engines: Math.max(0, Math.min(2, st.power - 2 - t)), repair: false, breakOff: false }; }
+  const fire = !bchoice.breakOff && !st.weaponsOut;
+  const used = bchoice.shields + (fire ? bchoice.phasers : 0) + (fire && bchoice.torps && P.torps ? 1 : 0) + bchoice.engines, spare = st.power - used;
   const chip = (k, label, dis) => `<label class="chip ${dis ? "off" : ""}"><input type="checkbox" data-b="${k}" ${bchoice[k] ? "checked" : ""} ${dis ? "disabled" : ""}>${label}</label>`;
+  const step = (k, label, notes, dis) => `<div class="roll-row"><span style="min-width:96px"><b>${label}</b></span><button class="btn small" data-bset="${k}" data-n="${bchoice[k] - 1}" ${bchoice[k] <= 0 || dis ? "disabled" : ""} aria-label="Less power to ${label}">−</button>${boxes(dis ? 0 : bchoice[k], 2, "blue")}<button class="btn small" data-bset="${k}" data-n="${bchoice[k] + 1}" ${bchoice[k] >= 2 || spare <= 0 || dis ? "disabled" : ""} aria-label="More power to ${label}">+</button><span class="small muted">${dis ? "—" : notes[bchoice[k]]}</span></div>`;
   const ord = (k, label) => `<label class="chip"><input type="radio" name="ord" data-o="${k}" ${bchoice.order === k ? "checked" : ""}>${label}</label>`;
   const who = (id) => (id ? esc(officer(id).short) : "nobody");
   const over = B.over;
@@ -849,17 +910,22 @@ function showBattle() {
   </div>
   ${over ? `<div class="result ${over === "destroyed" || over === "hailed" || over === "escaped" || over === "fled" ? "ok" : "no"}"><b>${{ destroyed: "Destroyed.", fled: "They broke off.", hailed: "They stood down.", escaped: "The Pelion broke away.", lost: "The Pelion is lost." }[over]}</b></div><div class="btn-row"><button class="btn primary" data-m="battle-done">Continue</button></div>`
   : `<h3>The captain's order</h3><div class="orders-choice">${ord("command", `Command (Leadership ${CAPTAIN.skills.Leadership}, ${pct(CAPTAIN.skills.Leadership)}): +2 to Tactical`)}${ord("read", `Read the enemy (Psychology ${CAPTAIN.skills.Psychology}): +2 evade, +1 to hit`)}${E && !E.base && e.power !== "romulan" ? ord("hail", `Hail (Diplomacy ${CAPTAIN.skills.Diplomacy} vs Will ${E.will}): they may stand down`) : ""}${ord("none", "No order")}</div>
-  <h3>Power: ${st.power} · ${used} spent · ${spare ? `+${Math.min(2, spare)} to ${bchoice.phasers && !bchoice.breakOff ? "phasers" : "evade"}` : "nothing spare"}</h3>
-  <div class="orders-choice">${chip("shields", "Shields up")}${chip("phasers", `Phasers (${st.gun}, ${pct(st.gun)})`, st.weaponsOut || bchoice.breakOff)}${chip("torps", `Torpedoes (${st.gun + 1}; can't be evaded)`, !P.torps || st.weaponsOut || bchoice.breakOff)}${chip("repair", `Damage control (${st.eng})`)}${chip("breakOff", `Break away (Helm ${st.helm}): instead of firing`)}</div>
+  <h3>Power: ${used} of ${st.power} spent${spare > 0 ? ` · ${spare} unassigned` : ""}</h3>
+  ${step("shields", "Shields", ["Down: every hit reaches the hull", "Up", "Reinforced: the first hit to reach them is turned aside"])}
+  ${step("phasers", "Phasers", ["Silent", `Firing (${st.gun}, ${pct(st.gun)})`, `Overloaded (${st.gun}): a hit does a box more, and wears the crystals`], !fire)}
+  ${step("engines", "Engines", ["Station-keeping", `+1 to evade${bchoice.breakOff ? " and break away" : ""}`, `+2 to evade${bchoice.breakOff ? " and break away" : ""}`])}
+  <div class="orders-choice">${chip("torps", `Torpedoes, 1 Power (${st.gun + 1}; can't be evaded; ${P.torps} left)`, !P.torps || !fire || (!bchoice.torps && spare <= 0))}${chip("repair", `Damage control (${st.eng}${storesOf(S).spares ? ", uses a crate of spares" : ", no spares: −3"})`)}${chip("breakOff", `Break away (Helm ${st.helm}): instead of firing`)}</div>
   <div class="btn-row"><button class="btn primary" data-m="exchange">Next exchange</button></div>`}
   <div class="blog">${B.log.slice().reverse().map((l) => `<div>${esc(l)}</div>`).join("") || `<span class="muted">${B.ambush ? "They decloak, firing." : "Both ships close. Your orders, Captain?"}</span>`}</div>`);
 }
 function showEnd() {
   const sc = score(S);
-  modal(`<h1>${S.over.win ? "The tour is over" : "Relieved"}</h1><p class="lede">${esc(S.over.why)}</p>
+  const canKeep = S.over.win && S.mode !== "open";
+  modal(`<h1>${S.over.win ? (S.mode === "open" ? "Retired" : "The tour is over") : "Relieved"}</h1><p class="lede">${esc(S.over.why)}</p>
+  ${canKeep ? `<p class="small">Starfleet Command would like the Pelion to stay. Keep command and the game goes on with no end, in open command: ${campaignOf(S).over ? "the next campaign begins in a few weeks, with new kinds of orders" : "finish the campaign under way, and the next begins after it"}.</p>` : ""}
   <h3>${esc(rating(sc.total))}</h3><table class="tbl">${sc.parts.map(([n, v]) => `<tr><td>${esc(n)}</td><td style="text-align:right">${v}</td></tr>`).join("")}<tr><td><b>Total</b></td><td style="text-align:right"><b>${sc.total}</b></td></tr></table>
   <p class="small muted" style="margin-top:10px">This sector's seed: <span class="seed">${esc(S.seed)}</span></p>
-  <div class="btn-row"><button class="btn primary" data-m="restart">New tour</button><button class="btn" data-m="replay">Replay this sector</button><button class="btn" data-m="close">Look at the map</button></div>`);
+  <div class="btn-row">${canKeep ? `<button class="btn primary" data-m="keep">Keep command: open command</button>` : ""}<button class="btn ${canKeep ? "" : "primary"}" data-m="restart">New tour</button><button class="btn" data-m="replay">Replay this sector</button><button class="btn" data-m="close">Look at the map</button></div>`);
 }
 function modalClick(e) {
   const b = e.target.closest("button"); if (!b) return;
@@ -876,12 +942,14 @@ function modalClick(e) {
     after(); if (!report && !S.event && !S.battle && !S.over) closeModal(); return;
   }
   if (m === "report-ok") { report = null; closeModal(); after(); return; }
-  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value }); openingScene(s); startGame(s); return; }
+  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value, mode: $("ng-mode").value }); openingScene(s); startGame(s); return; }
   if (m === "continue") { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } return; }
   if (m === "close") { closeModal(); return; }
   if (m === "help") { showHelp(); return; }
   if (m === "restart") { showStarter(false); return; }
-  if (m === "replay") { startGame(newGame({ seed: S.seed, difficulty: S.difficulty, captain: S.captain })); return; }
+  if (m === "replay") { const s = newGame({ seed: S.seed, difficulty: S.difficulty, captain: S.captain, mode: S.mode }); openingScene(s); startGame(s); return; }
+  if (m === "keep") { keepCommand(S); closeModal(); after(); return; }
+  if (m === "retire") { retire(S); closeModal(); after(); return; }
   if (m === "copy") { const t = $("code"); t.select(); try { navigator.clipboard.writeText(t.value); toast("Copied."); } catch { document.execCommand("copy"); } return; }
   if (m === "load") { try { startGame(JSON.parse(decodeURIComponent(escape(atob($("load").value.trim()))))); } catch { toast("That code didn't load.", true); } return; }
   if (m === "event-ok") { dismissEvent(S); closeModal(); after(); return; }
@@ -891,6 +959,10 @@ function modalClick(e) {
   if (m === "exchange") { exchange(S, { ...bchoice, order: bchoice.order === "none" ? null : bchoice.order }); save(); renderAll(); showBattle(); return; }
   if (m === "battle-done") { closeBattle(S); bchoice = null; closeModal(); after(); return; }
 }
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-bset]"); if (!b || !S || !S.battle || !bchoice) return;
+  bchoice[b.dataset.bset] = Math.max(0, Math.min(2, +b.dataset.n)); showBattle();
+});
 document.addEventListener("change", (e) => {
   if (!S || !S.battle || !bchoice) return;
   const t = e.target;

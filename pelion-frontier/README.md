@@ -1,7 +1,7 @@
 # USS Pelion: Frontier
 
 A turn-based hex strategy game for the USS Pelion fan game: command the Pelion through a fifty-week tour of the
-Corvan Sector, a frontier between the Federation, the Klingon Empire and the Romulan Neutral Zone. Solo, against the
+Corvan Sector (or open command, with no end), a frontier between the Federation, the Klingon Empire and the Romulan Neutral Zone. Solo, against the
 other powers. An unofficial fan work inspired by *Star Trek*, for our table only (see `fan-games/README.md`).
 
 It's built from the tabletop game's own books:
@@ -21,13 +21,24 @@ It's built from the tabletop game's own books:
 - **The sector:** survey the uncharted, investigate anomalies and ruins for **library records** (perks), court
   independent worlds (accord +5 joins the Federation, −5 joins the Empire), observe pre-warp peoples unseen,
   requisition escorts and science vessels and fit refits at Starbase 23.
+- **Power and stores:** the warp core's Power (5) is shared out every week as in battle: the engines take what the
+  warp factor needs (1 to warp 4, 2 to warp 6, 3 for warp 7–8), the rest goes to shields on standby, sensors, the
+  science labs and operations (up to 2 each, each a bonus). The warp drive burns antimatter by the light-year, wears
+  out dilithium crystals (fewer crystals, less Power and lower warp) and uses spare parts in repairs and at emergency
+  warp. Starbase 23 refuels; colonies and friendly worlds sell; surveys find seams to mine; Engineering
+  recrystallizes; Orion ships leave salvage; a fuel tender comes when the antimatter runs out. In battle, Power is
+  split between shields (2: reinforced), phasers (2: overloaded), torpedoes and engines (evasion).
+- **Campaigns:** Watchers of the Void runs from Corvan II; after it, *The Cold Fire* (the sector's dilithium dying)
+  and *The Syndicate's Due* (the Orion Syndicate taxing the supply lines), each with its own rival, beats, finale and
+  five new kinds of orders that stay in Starfleet's book (`src/campaigns.js`). In a tour, a new campaign starts only
+  with twelve weeks to go; at the tour's end, *Keep command* turns the game into open command.
 - **Starfleet Command track:** five boxes and you're relieved. Incidents (firing first on a Klingon ship), the
   Prime Directive, the Neutral Zone, lost colonies and failed orders mark it; carried-out orders clear it.
 
 ## Files
 
 - `src/hex.js` hex maths and the seeded generator (shared with Fracture Lines: Dominion); `src/data.js` the numbers;
-  `src/sector.js` the map; `src/game.js` the rules (pure functions over one JSON state); `src/combat.js` ship
+  `src/sector.js` the map; `src/campaigns.js` the campaigns after the first; `src/game.js` the rules (pure functions over one JSON state); `src/combat.js` ship
   combat; `src/arc.js` The Silence at Corvan II; `src/ai.js` the other powers; `src/turn.js` the end of a turn;
   `src/ui.js` the page.
 - `index.html` markup and styles; `build.mjs` inlines the modules into `dist/index.html` (artifact) and
@@ -38,6 +49,7 @@ It's built from the tabletop game's own books:
     node build.mjs                    # build dist/
     node --test test/rules.test.mjs   # the rules' tests
     node test/sim.mjs 7 5             # five automatic tours, for balance
+    MODE=open node test/sim.mjs 7 3   # three games of open command, retiring at week 120
 
 Games save in the browser after every action; the menu gives a save code to move a game to another browser, and the
 sector's seed to replay it.

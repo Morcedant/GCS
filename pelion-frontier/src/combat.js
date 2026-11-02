@@ -2,10 +2,11 @@
 // torpedoes (and what's left over as a bonus); the captain's order; Helm to evade; Shields before Hull; a concussive
 // roll for every hit that reaches the Hull; Engineering to repair mid-fight; a Helm contest to break away.
 import { PELION, ENEMIES, SUPPORT, CAPTAIN, CREW } from "./data.js";
-import { check, target, stationOfficer, hasRecord, sysPenalty, markCommand, log, sendHome, checkEnd, rand, pick, officer, registerHooks, harmWorld, sysAt } from "./game.js";
+import { check, target, stationOfficer, hasRecord, sysPenalty, markCommand, log, sendHome, checkEnd, rand, pick, officer, registerHooks, harmWorld, sysAt, reactorPower, addStore, storesOf } from "./game.js";
 
-export const shieldsMax = (S) => PELION.shields + (S.pelion.refits.shields ? 1 : 0) + (hasRecord(S, "shield1") ? 1 : 0);
-export const powerOf = (S) => Math.max(1, PELION.power + (S.pelion.refits.power ? 1 : 0) + (hasRecord(S, "power1") ? 1 : 0) - (S.pelion.powerLoss || 0));
+export const shieldsMax = (S) => PELION.shields + (S.pelion.refits.shields ? 1 : 0) + (hasRecord(S, "shield1") ? 1 : 0) + (S.battle && S.battle.raised ? 1 : 0);
+/** The reactor's Power: refits and records add to it, damage and failing dilithium take from it. */
+export const powerOf = (S) => reactorPower(S);
 /** The Pelion's numbers for this exchange, with who stands each station. */
 export function battleStats(S) {
   const P = S.pelion, helmId = stationOfficer(S, "helm"), gunId = stationOfficer(S, "tactical"), engId = stationOfficer(S, "engineering");
@@ -25,8 +26,9 @@ export function startBattle(S, enemyId, initiator) {
   const ambush = initiator === "enemy" && E.ambush && e.cloaked && !seenIt;
   if (seenIt && initiator === "enemy" && E.ambush) log(S, `The cloak inverter sees the ${E.name} coming before it decloaks: no ambush.`, "good");
   e.cloaked = false; e.revealed = false; e.seen = true;
-  const P = S.pelion;
-  S.battle = { enemy: enemyId, ex: 0, log: [], ambush, over: null, initiator, start: { hull: P.hull, torps: P.torps, sys: P.sys.weapons + P.sys.engines + P.sys.sensors } };
+  const P = S.pelion, standby = (P.alloc || {}).shields || 0;
+  S.battle = { enemy: enemyId, ex: 0, log: [], ambush, over: null, initiator, standby, raised: standby >= 2, start: { hull: P.hull, torps: P.torps, sys: P.sys.weapons + P.sys.engines + P.sys.sensors } };
+  if (ambush && standby) log(S, "The shields were on standby: they're up before the first volley lands.", "good");
   log(S, `Battle: the Pelion against ${E.base ? "the Orion base" : (/^[AEIOU]/.test(E.name) ? "an " : "a ") + E.name}${ambush ? ", which decloaks firing" : ""}.`, "war");
 }
 registerHooks({ startBattle });
@@ -74,13 +76,20 @@ export function exchange(S, choice = {}) {
   const B = S.battle; if (!B || B.over) return [];
   const e = S.enemies[B.enemy], E = ENEMIES[e.type], P = S.pelion, st = battleStats(S), L = [];
   B.ex++;
-  // Power: shields, phasers, torpedoes; what's left is a bonus to one roll (+2 at most).
+  // Power, shared out like the week's: shields (1 up, 2 reinforced: the first hit to reach them is turned aside),
+  // phasers (1 to fire, 2 overloaded: a hit does a box more), torpedoes (1), engines (1 or 2: +1 each to evade and to
+  // break away). Given as numbers, that's the split; given as yes/no (the old way), what's left is +2 at most to one roll.
   let power = st.power;
-  const up = !!choice.shields && power > 0; if (up) power--;
-  const phas = !!choice.phasers && !st.weaponsOut && power > 0 && !choice.breakOff; if (phas) power--;
+  const split = typeof choice.shields === "number" || typeof choice.phasers === "number" || choice.engines !== undefined;
+  const want = (k, max) => Math.max(0, Math.min(max, typeof choice[k] === "number" ? choice[k] : choice[k] ? 1 : 0));
+  const shN = Math.min(power, want("shields", 2)); power -= shN; const up = shN > 0;
+  const phN = !st.weaponsOut && !choice.breakOff ? Math.min(power, want("phasers", 2)) : 0; power -= phN; const phas = phN > 0;
   const torp = !!choice.torps && P.torps > 0 && !st.weaponsOut && power > 0 && !choice.breakOff; if (torp) power--;
-  const spare = Math.min(2, power);
-  let hit = 0, evade = 0;
+  const engN = split ? Math.min(power, want("engines", 2)) : 0; power -= engN;
+  const spare = split ? 0 : Math.min(2, power);
+  B.reinforced = shN >= 2;
+  if (phN >= 2) P.wear = (P.wear || 0) + 1;   // overloading the phasers works the crystals hard
+  let hit = 0, evade = engN;
   // The captain's order.
   if (choice.order === "command") {
     const r = check(S, CAPTAIN.skills.Leadership);
@@ -111,7 +120,7 @@ export function exchange(S, choice = {}) {
     else {
       const ev = E.base ? null : check(S, E.helm + Math.max(0, -md));
       if (ev && ev.success) L.push(`Phasers (${R(r)}): on target, but they evade (${R(ev)}).`);
-      else hitEnemy(S, e, PELION.phaser, L, `Phasers (${R(r)})`);
+      else hitEnemy(S, e, PELION.phaser + (phN >= 2 ? 1 : 0), L, `${phN >= 2 ? "Overloaded phasers" : "Phasers"} (${R(r)})`);
     }
   }
   if (torp) {
@@ -136,7 +145,7 @@ export function exchange(S, choice = {}) {
   // They fire: at the Pelion, or at an escort beside it.
   const escorts = Object.values(S.support).filter((u) => u.at === P.at);
   const tgt = escorts.length && rand(S) < 0.3 ? pick(S, escorts) : null;
-  const gun = E.gunner + (B.ambush && B.ex === 1 ? 2 : 0);
+  const gun = E.gunner + (B.ambush && B.ex === 1 && !B.standby ? 2 : 0);
   const volley = (label, dmg, evadable) => {
     const r = check(S, gun + (label === "torpedo" ? 1 : 0));
     const name = { kbc: "Disruptors", kbop: "Disruptors", rbop: "Plasma torpedo", orion: "Disruptors", orionBase: "The base's guns" }[e.type];
@@ -154,20 +163,23 @@ export function exchange(S, choice = {}) {
       const ev = check(S, st.helm + evade + (phas ? 0 : spare) + Math.max(0, md) + (E.plasma ? 2 : 0));
       if (ev.success) { L.push(`Their ${what.toLowerCase()} (${R(r)}): Helm evades (${R(ev)}).`); return; }
     }
+    if (B.reinforced && up) { B.reinforced = false; if (dmg <= 1) { L.push(`Their ${what.toLowerCase()} (${R(r)}) hits the reinforced shields and is turned aside.`); return; } dmg--; }
     hitPelion(S, dmg, up, L, `Their ${what.toLowerCase()} (${R(r)}) hits`);
   };
   volley("main", E.dmg, true);
   if (e.type === "kbc" && B.ex % 2 === 0) volley("torpedo", 2, false);
   // Damage control.
   if (choice.repair && st.engId) {
-    const r = check(S, st.eng);
+    const noParts = storesOf(S).spares <= 0;
+    const r = check(S, st.eng - (noParts ? 3 : 0));
     if (r.success) {
+      if (!noParts) addStore(S, "spares", -1);
       let n = r.margin >= 5 ? 2 : 1; const fixed = [];
       if (P.powerLoss && n) { P.powerLoss--; n--; fixed.push("power"); }
       for (const k of ["weapons", "engines", "sensors"]) while (n && P.sys[k]) { P.sys[k]--; n--; fixed.push(k); }
       while (n && P.shields) { P.shields--; n--; fixed.push("shields"); }
-      L.push(`Damage control, ${officer(st.engId).short} (${R(r)}): ${fixed.join(", ") || "nothing left to fix"}.`);
-    } else L.push(`Damage control (${R(r)}): no luck.`);
+      L.push(`Damage control, ${officer(st.engId).short} (${R(r)}): ${fixed.join(", ") || "nothing left to fix"}${noParts ? ", improvised without spares" : ", a crate of spares used"}.`);
+    } else L.push(`Damage control (${R(r)}${noParts ? ", no spare parts: −3" : ""}): no luck.`);
   }
   if (P.hull >= PELION.hull) { B.over = "lost"; return finish(S, L); }
   if (B.ex >= 12) { L.push("Both ships pull back to lick their wounds."); sendHome(S, e, 3); e.cooldown = 2; B.over = "fled"; }
@@ -180,9 +192,9 @@ function finish(S, L) {
   const e = S.enemies[B.enemy], E = ENEMIES[e.type];
   if (B.over === "destroyed") {
     delete S.enemies[e.id];
-    if (e.type === "orionBase") { S.commendations += 6; S.supplies += 15; S.orionBaseDown = true; log(S, "The Orion pirate base is destroyed. The raids on the sector will stop.", "victory"); }
-    else if (e.power === "orion") { S.commendations += 2; S.supplies += 6; log(S, `The Pelion destroys an Orion raider. Salvage: +6 supplies.`, "good"); }
-    else if (e.power === "romulan") { S.commendations += 3; log(S, "The Romulan bird-of-prey is destroyed.", "good"); }
+    if (e.type === "orionBase") { S.commendations += 6; S.supplies += 15; addStore(S, "spares", 4); addStore(S, "dilithium", 3); addStore(S, "antimatter", 6); S.orionBaseDown = true; log(S, "The Orion pirate base is destroyed. The raids on the sector will stop. Salvage: +15 supplies, +4 spares, +3 dilithium, +6 antimatter.", "victory"); }
+    else if (e.power === "orion") { S.commendations += 2; S.supplies += 6; addStore(S, "spares", 2); addStore(S, "dilithium", 1); log(S, `The Pelion destroys an Orion raider. Salvage: +6 supplies, +2 spares, +1 dilithium.`, "good"); }
+    else if (e.power === "romulan") { S.commendations += 3; addStore(S, "spares", 1); log(S, "The Romulan bird-of-prey is destroyed. Salvage: +1 spares.", "good"); }
     else { S.tension = Math.min(10, S.tension + 2); if (e.hostile && B.initiator !== "pelion") S.commendations += 2; log(S, `The ${E.name} is destroyed. The Empire will remember.`, "war"); }
   } else if (B.over === "lost") log(S, "The Pelion's hull is breaking up.", "bad");
   else if (e.arcRaider && (B.over === "fled" || B.over === "hailed")) {
@@ -191,6 +203,8 @@ function finish(S, L) {
     log(S, `The ${E.name} ${B.over === "fled" ? "breaks off" : "stands down"} and runs for the sector's edge. It won't be back.`, "good");
   }
   else log(S, { fled: `The ${E.name} breaks off.`, hailed: `The ${E.name} stands down.`, escaped: "The Pelion breaks away." }[B.over] || "The battle ends.");
+  // What the battle cost the stores: antimatter (a unit for every four exchanges) and wear on the dilithium.
+  { const Pw = S.pelion; Pw.wear = (Pw.wear || 0) + 1; addStore(S, "antimatter", -Math.max(1, Math.ceil(B.ex / 4))); }
   // What the battle cost: one line for the log.
   const P = S.pelion, st = B.start || { hull: P.hull, torps: P.torps, sys: 0 };
   const hullLost = P.hull - st.hull, sysHit = P.sys.weapons + P.sys.engines + P.sys.sensors - st.sys, torps = st.torps - P.torps;

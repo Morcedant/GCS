@@ -4,6 +4,7 @@ import { makeRng, neighbors, distance, within, hashString } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, SUPPORT_NAMES, ENEMIES, KINDS, ACTIONS, MISSIONS, STRANGE, KEYS, TWISTS, REFITS, RECORDS } from "./data.js";
 import { makeSector, inZone, nearZone } from "./sector.js";
 import { STORIES, CAMPAIGN, COMPLICATIONS, KORVATH_SITES, storyText, storyOf } from "./stories.js";
+import { SERIES, SERIES_MISSIONS } from "./campaigns.js";
 
 // ---------- dice ----------
 export function rand(S) { const r = makeRng(0); r.setState(S.rng); const v = r.next(); S.rng = r.state(); return v; }
@@ -17,14 +18,15 @@ export function check(S, target) {
 }
 
 // ---------- a new game ----------
-export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
+export function newGame({ seed, difficulty = "normal", captain = "", mode = "tour" } = {}) {
   seed = seed || String(Math.floor(Math.random() * 1e9));
   const sec = makeSector(seed);
   const sb = sec.systems[sec.starbase];
   const S = {
-    v: 1, seed: String(seed), difficulty, captain: captain.trim() || "Captain", turn: 1, rng: hashString("dice:" + seed),
+    v: 1, seed: String(seed), difficulty, mode: mode === "open" ? "open" : "tour", captain: captain.trim() || "Captain", turn: 1, rng: hashString("dice:" + seed),
     hexes: sec.hexes, systems: sec.systems, sysAt: sec.sysAt, starbase: sec.starbase, corvan: sec.corvan,
-    pelion: { at: sb.at, warp: CRUISE_WARP, days: 7, mp: lyPerWeek(CRUISE_WARP), acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true },
+    pelion: { at: sb.at, warp: CRUISE_WARP, days: 7, mp: lyPerWeek(CRUISE_WARP), acted: false, shields: 0, hull: 0, sys: { weapons: 0, engines: 0, sensors: 0 }, torps: PELION.torps, refits: {}, zoneMarked: false, docked: true,
+      alloc: { shields: 1, sensors: 1, labs: 0, ops: 0 }, stores: { dilithium: 10, antimatter: STORES.antimatter.max, spares: 6 }, wear: 0, lyWeek: 0 },
     stations: { helm: "shvari", tactical: "reyes", science: "sevek", engineering: "grath", comms: "rrinn" },
     crew: Object.fromEntries(CREW.map((c) => [c.id, { inj: 0, duty: 2, xp: 0, plus: {}, acted: false }])),
     backlog: [],   // orders waiting their turn
@@ -36,6 +38,8 @@ export function newGame({ seed, difficulty = "normal", captain = "" } = {}) {
     visible: {}, seenSys: {}, log: [], over: null, pending: null, battle: null, event: null, tutorial: { on: true },
   };
   for (const s of Object.values(S.systems)) if (KINDS[s.kind].known) S.seenSys[s.id] = true;
+  // Dilithium deposits: about a third of the uncharted and anomalous systems have crystal seams, found by a survey.
+  for (const s of Object.values(S.systems)) if (["empty", "anomaly", "orionBase"].includes(s.kind) && hashString(S.seed + ":dil:" + s.id) % 3 === 0) s.dilithium = 3 + (hashString(S.seed + ":dn:" + s.id) % 4);
   S.seenSys[S.corvan] = true; S.systems[S.corvan].surveyed = true;
   // The first orders: The Silence at Corvan II. An Orion raider is already in orbit there.
   const cv = S.systems[S.corvan];
@@ -116,6 +120,13 @@ export function target(S, id, skill, ctx = {}) {
     const r = sensorsRating(S); if (r !== 2) parts.push(["Ship's sensors", r - 2]);
     if (P.sys.sensors) parts.push(["Sensors damaged", Math.max(-6, sysPenalty(P.sys.sensors))]);
   }
+  if (!ctx.combat && !ctx.unit && id !== "captain") {   // the week's power
+    const A = S.pelion.alloc || {};
+    if (skill === "Sensors" && A.sensors) parts.push(["Power to sensors", A.sensors]);
+    if (["Physical Sciences", "Life Sciences", "Computers"].includes(skill) && A.labs) parts.push(["Power to the labs", A.labs]);
+    if (["Engineering", "Medicine"].includes(skill) && A.ops) parts.push(["Power to operations", A.ops]);
+  }
+  if (ctx.action === "repair" && !ctx.combat && storesOf(S).spares <= 0) parts.push(["No spare parts", -3]);
   if ((ctx.action === "survey" || ctx.action === "investigate") && hasRecord(S, "science1")) parts.push(["Graviton lensing", 1]);
   if (ctx.action === "envoy" && hasRecord(S, "envoy1")) parts.push(["A dead language", 1]);
   if (ctx.action === "sweep" && hasRecord(S, "sweep2")) parts.push(["Cloaked wake", 2]);
@@ -144,8 +155,12 @@ export const daysPerLy = (w) => (w > 0 ? 365.25 / lightSpeeds(w) : Infinity);
 /** The highest warp the engines allow: warp 8, the emergency maximum, less 2 for each box of engine damage. */
 export const EMERGENCY_WARP = 8;
 export function maxWarp(S) {
-  const e = S.pelion.sys.engines;
-  return e >= 3 ? 1 : EMERGENCY_WARP - 2 * e;
+  const P = S.pelion, e = P.sys.engines, st = storesOf(S), pw = reactorPower(S);
+  let m = e >= 3 ? 1 : EMERGENCY_WARP - 2 * e;
+  if (st.antimatter <= 0) m = Math.min(m, 2);          // running on the reserve
+  if (st.dilithium <= 0) m = Math.min(m, 4); else if (st.dilithium <= 2) m = Math.min(m, 6);   // a failing matrix won't hold high warp
+  if (pw < 3) m = Math.min(m, pw >= 2 ? 6 : 4);        // the engines need the power: warp 7 and 8 take 3
+  return m;
 }
 /** Light-years the Pelion has left this turn: the days left in the week at its warp factor. */
 export function syncMp(S) { const P = S.pelion; P.mp = P.days * lightSpeeds(P.warp) / 365.25; }
@@ -153,8 +168,10 @@ export function syncMp(S) { const P = S.pelion; P.mp = P.days * lightSpeeds(P.wa
 export function setWarp(S, w) {
   const P = S.pelion, m = maxWarp(S);
   w = Math.max(0, Math.min(m, Math.round(w)));
-  P.warp = w; syncMp(S);
-  return { ok: true, warp: w };
+  P.warp = w;
+  const took = balancePower(S, "warp");   // the engines take what they need from the other systems
+  syncMp(S);
+  return { ok: true, warp: P.warp, took };
 }
 /** How a warp factor reads: "Warp 6: 216 × the speed of light, 4.1 ly a week, 1.7 days a light-year". */
 export function warpText(w) {
@@ -165,6 +182,112 @@ export function warpText(w) {
 /** Orders that call for maximum warp. */
 export const isUrgent = (o) => !!(o && (o.urgent || (o.twist && o.twist.fx === "urgent")));
 /** Ly a week the Pelion makes at its current warp (what "speed" means now). */
+// ---------- the ship's power ----------
+// The warp core makes Power (5, more with refits and records, less with damage or failing dilithium), and every week it is
+// shared out, as in battle: the engines take what the warp factor needs (1 up to warp 4, 2 up to warp 6, 3 for warp 7 and
+// 8), and the rest goes to the shields on standby, the sensors, the science labs and operations, up to 2 each.
+export const POWER_SYSTEMS = {
+  shields: { name: "Shields on standby", blurb: ["Down: an ambush catches the Pelion cold.", "On standby: an ambush's first volley loses its edge (no +2).", "Raised: as standby, and +1 Shields box in any battle this week."] },
+  sensors: { name: "Sensors", blurb: ["Passive only.", "+1 to Sensors rolls.", "+2 to Sensors rolls, sweeps reach a light-year further, and the Pelion sees a hex further."] },
+  labs: { name: "Science labs", blurb: ["Dark.", "+1 to Physical Sciences, Life Sciences and Computers rolls.", "+2 to those rolls, and +2 science a week from the labs' own work."] },
+  ops: { name: "Operations", blurb: ["Minimum: life support and the transporters.", "+1 to Engineering and Medicine rolls: repairs, relief, sickbay.", "+2 to Engineering and Medicine rolls."] },
+};
+export const warpPower = (w) => (w <= 0 ? 0 : w <= 4 ? 1 : w <= 6 ? 2 : 3);
+/** What failing dilithium costs the reactor: −1 at 4 crystals or fewer, −2 at 2 or fewer, −3 with none. */
+export const dilithiumPenalty = (S) => { const d = storesOf(S).dilithium; return d <= 0 ? 3 : d <= 2 ? 2 : d <= 4 ? 1 : 0; };
+export const reactorPower = (S) => Math.max(1, PELION.power + (S.pelion.refits.power ? 1 : 0) + (hasRecord(S, "power1") ? 1 : 0) - (S.pelion.powerLoss || 0) - dilithiumPenalty(S));
+export const allocOf = (S) => (S.pelion.alloc = S.pelion.alloc || { shields: 1, sensors: 1, labs: 0, ops: 0 });
+export const powerUsed = (S) => warpPower(S.pelion.warp ?? CRUISE_WARP) + Object.values(allocOf(S)).reduce((t, n) => t + n, 0);
+export const powerFree = (S) => reactorPower(S) - powerUsed(S);
+/** Set the power to one system (0–2). */
+export function setAlloc(S, sys, n) {
+  const A = allocOf(S); if (!(sys in POWER_SYSTEMS)) return { error: "No such system." };
+  n = Math.max(0, Math.min(2, Math.round(n)));
+  if (n > A[sys] && powerFree(S) < n - A[sys]) return { error: `Not enough power: ${reactorPower(S)} in all, and the engines need ${warpPower(S.pelion.warp)} at warp ${S.pelion.warp}. Lower the warp or take power from another system.` };
+  A[sys] = n;
+  return { ok: true };
+}
+/**
+ * Make the power add up: when the warp needs more, or the reactor makes less, the labs give it up first, then
+ * operations, then the sensors, then the shields; if that isn't enough, the warp drops. Returns what was taken.
+ */
+export function balancePower(S, why = "") {
+  const A = allocOf(S), P = S.pelion, took = [];
+  for (const k of ["labs", "ops", "sensors", "shields"]) while (powerFree(S) < 0 && A[k] > 0) { A[k]--; took.push(POWER_SYSTEMS[k].name); }
+  while (powerFree(S) < 0 && P.warp > 0) { P.warp--; took.push("warp"); }
+  if (took.length && why !== "warp") log(S, `Power: the reactor makes ${reactorPower(S)}; ${[...new Set(took)].join(", ").toLowerCase()} lose power to make it add up.`, "bad");
+  return [...new Set(took)];
+}
+
+// ---------- the ship's stores ----------
+// What the warp drive eats. Antimatter is fuel: burned by the light-year, faster above warp 6. Dilithium regulates the
+// reaction and wears with use (a crystal every four weeks at warp, sooner at emergency speed or in battle); with too few
+// crystals the reactor makes less Power and won't hold high warp. Spare parts (plasma injectors, warp coils, coolant) go
+// into every repair and every week at emergency warp. Starbase 23 refuels the antimatter; the rest is bought, traded,
+// mined, salvaged or recrystallized.
+export const STORES = {
+  dilithium: { name: "Dilithium", max: 10, unit: "crystal", blurb: "Regulates the warp reaction. Wears: a crystal every four weeks at warp, every two at emergency warp, and a quarter of one each battle. At 4 or fewer the reactor makes 1 less Power; at 2 or fewer, 2 less and no more than warp 6; with none, 3 less and no more than warp 4." },
+  antimatter: { name: "Antimatter", max: 20, unit: "unit", blurb: "The fuel: about 1 a week at warp 6, 4 a week at warp 8, and 1 a battle. With none, the Pelion limps on its reserve at warp 2 until it reaches fuel, or a tender reaches it." },
+  spares: { name: "Spare parts", max: 10, unit: "crate", blurb: "Plasma injectors, warp coils, coolant. Every repair uses one (−3 to repair without), and so does every week at emergency warp." },
+};
+export const storesOf = (S) => (S.pelion.stores = S.pelion.stores || { dilithium: 10, antimatter: STORES.antimatter.max, spares: 6 });
+/** Add (or take) stores, within their limits. Returns what actually changed. */
+export function addStore(S, k, n) {
+  const st = storesOf(S), was = st[k];
+  st[k] = Math.max(0, Math.min(STORES[k].max, st[k] + n));
+  if (k === "dilithium" && st[k] !== was) balancePower(S);
+  return st[k] - was;
+}
+/** Where stores can be had, and at what price in supplies. */
+export function marketAt(S) {
+  const s = sysAt(S, S.pelion.at); if (!s) return null;
+  const C = campaignOf(S), cold = (C.id === "coldfire" && !C.over) ? 2 : 1;   // while the cold spreads, dilithium is dear
+  if (s.id === S.starbase) return { name: "Starbase 23", items: { dilithium: 4 * cold, spares: 3 } };
+  if (s.kind === "colony" || s.kind === "member") return { name: s.name, items: { antimatter: 1, spares: 4 } };
+  if (s.kind === "independent" && s.accord >= 1) return { name: s.name, items: { dilithium: 5 * cold, antimatter: 2 } };
+  return null;
+}
+export function buyStore(S, k, n = 1) {
+  const m = marketAt(S); if (!m || !m.items[k]) return { error: "Nobody here sells that." };
+  if (S.battle || S.over) return { error: "Not now." };
+  const st = storesOf(S), room = STORES[k].max - st[k], price = m.items[k];
+  n = Math.min(n, room, Math.floor(S.supplies / price));
+  if (room <= 0) return { error: "The holds are full." };
+  if (n <= 0) return { error: `Needs ${price} supplies.` };
+  S.supplies -= n * price; addStore(S, k, n);
+  log(S, `Stores: ${n} ${STORES[k].unit}${n === 1 ? "" : "s"} of ${STORES[k].name.toLowerCase()} from ${m.name}, ${n * price} supplies. Now ${st[k]}/${STORES[k].max}.`, "good");
+  return { ok: true, n };
+}
+/** A fuel tender from Starbase 23, when the antimatter runs low far from home: 10 supplies, here in two weeks. */
+export function requestTender(S) {
+  const st = storesOf(S);
+  if (S.tender) return { error: "A tender is already on its way." };
+  if (S.pelion.docked) return { error: "Docked: the starbase refuels the Pelion." };
+  if (st.antimatter > 3) return { error: "The antimatter isn't low enough to call a tender." };
+  if (S.supplies < 10) return { error: "Needs 10 supplies." };
+  S.supplies -= 10; S.tender = { due: S.turn + 2 };
+  log(S, "A fuel tender leaves Starbase 23 for the Pelion: 10 supplies, due in two weeks, wherever the Pelion is by then.", "order");
+  return { ok: true };
+}
+/** The week's wear: antimatter by the light-year, dilithium by the week at warp and the battle, spares at emergency warp. */
+export function consumeStores(S) {
+  const P = S.pelion, st = storesOf(S), ly = P.lyWeek || 0, emerg = (P.strain || 0) > CRUISE_WARP, lines = [];
+  if (ly > 0) {
+    const am = Math.max(1, Math.round(ly * (emerg ? 0.4 : 0.25)));
+    const used = -addStore(S, "antimatter", -am); lines.push(`${used} antimatter for ${ly.toFixed(1)} light-years`);
+    P.wear = (P.wear || 0) + (emerg ? 2 : 1);
+    if (emerg) { if (st.spares > 0) { addStore(S, "spares", -1); lines.push("a crate of spares burned out at emergency warp"); } else lines.push("no spares left to burn at emergency warp: the engines run hot"); }
+  }
+  while ((P.wear || 0) >= 4) { P.wear -= 4; if (addStore(S, "dilithium", -1)) lines.push("a dilithium crystal worn out"); }
+  if ((S.pelion.alloc || {}).labs >= 2) { S.science += 2; lines.push("+2 science from the labs"); }
+  P.lyWeek = 0;
+  if (lines.length) log(S, `Stores this week: ${lines.join("; ")}. Dilithium ${st.dilithium}/10, antimatter ${st.antimatter}/${STORES.antimatter.max}, spares ${st.spares}/${STORES.spares.max}.`, "turn");
+  if (st.antimatter <= 3 && st.antimatter > 0) log(S, `Antimatter low: ${st.antimatter} left. Refuel at Starbase 23 or a colony, or call a tender (the Ship tab).`, "bad");
+  if (st.antimatter <= 0 && !P.docked) log(S, "Antimatter gone: the Pelion is running on its reserve, at warp 2 at most.", "bad");
+  if (S.tender && S.turn + 1 >= S.tender.due) { S.tender = null; addStore(S, "antimatter", 12); addStore(S, "spares", 2); log(S, "The fuel tender reaches the Pelion: +12 antimatter, +2 spares.", "good"); }
+  balancePower(S);
+}
+
 // ---------- the listening posts on the Neutral Zone ----------
 // Three Federation listening posts watch the Romulan Neutral Zone from the row of hexes just outside it. When the Romulans
 // strike, it's at them: a bird-of-prey crosses, decloaks, fires and goes home. Three hits and a post is lost.
@@ -248,7 +371,7 @@ export function chooseCloak(S, id) {
   return { text: "The Pelion lets it go." };
 }
 /** How far a sensor sweep reaches for cloaked ships: 3 light-years, 5 with the tuned cloak inverter. */
-export const sweepRange = (S) => 3 + ((S.pelion.refits.inverter || 0) >= 2 ? 2 : 0);
+export const sweepRange = (S) => 3 + ((S.pelion.refits.inverter || 0) >= 2 ? 2 : 0) + ((S.pelion.alloc || {}).sensors >= 2 ? 1 : 0);
 export function speedOf(S) { return lyPerWeek(S.pelion.warp ?? CRUISE_WARP); }
 /** Travel time, in days, for a number of light-years at a warp factor. */
 export const travelDays = (ly, w) => ly * daysPerLy(w);
@@ -296,7 +419,7 @@ export function moveTo(S, unit, hex) {
   const p = findPath(S, U.at, hex, unit === "pelion" ? "pelion" : "support");
   // The ship now faces the hex side it last crossed.
   if (p && p.path.length) { const prev = p.path.length > 1 ? p.path[p.path.length - 2] : U.at, d = neighbors(prev).indexOf(hex); if (d >= 0) U.facing = d; }
-  if (unit === "pelion") { U.days = Math.max(0, U.days - r[hex] * daysPerLy(U.warp)); syncMp(S); U.strain = Math.max(U.strain || 0, U.warp); }
+  if (unit === "pelion") { U.days = Math.max(0, U.days - r[hex] * daysPerLy(U.warp)); syncMp(S); U.strain = Math.max(U.strain || 0, U.warp); U.lyWeek = (U.lyWeek || 0) + r[hex]; }
   else U.mp -= r[hex];
   U.at = hex;
   if (unit === "pelion") for (const o of S.orders) arriveAt(S, o);
@@ -334,9 +457,11 @@ function dock(S) {
   const fixed = P.shields + P.hull + P.sys.weapons + P.sys.engines + P.sys.sensors > 0 || P.torps < PELION.torps;
   P.shields = 0; P.hull = 0; P.sys = { weapons: 0, engines: 0, sensors: 0 }; P.torps = PELION.torps;
   for (const id in S.crew) { const c = S.crew[id]; c.inj = 0; c.duty = 2; }
-  log(S, `Docked at Starbase 23: ${fixed ? "repaired, rearmed and " : ""}crew rested; Duty points restored.`, "good");
+  // Starfleet refuels the antimatter and issues spares up to six crates; dilithium is bought (the Ship tab).
+  const st = storesOf(S), am = addStore(S, "antimatter", STORES.antimatter.max), sp = st.spares < 6 ? addStore(S, "spares", 6 - st.spares) : 0;
+  log(S, `Docked at Starbase 23: ${fixed ? "repaired, rearmed and " : ""}crew rested; Duty points restored.${am ? ` Refuelled: +${am} antimatter.` : ""}${sp ? ` Spares issued: +${sp}.` : ""}${st.dilithium < 10 ? ` Dilithium ${st.dilithium}/10: the quartermaster has crystals, for supplies.` : ""}`, "good");
 }
-export function sightRange(S) { return 2 + (S.pelion.refits.sensors ? 1 : 0); }
+export function sightRange(S) { return 2 + (S.pelion.refits.sensors ? 1 : 0) + ((S.pelion.alloc || {}).sensors >= 2 ? 1 : 0); }
 export function updateVisibility(S) {
   const v = {};
   const see = (hex, n) => { for (const k of within(hex, n)) if (S.hexes[k]) v[k] = true; };
@@ -381,7 +506,9 @@ export function actionsFor(S, unit = "pelion") {
   if (s && s.kind === "prewarp" && s.surveyed && !s.observed) add("observe", { sys: s.id });   // from orbit: nothing on the planet can oppose a starship
   if (s && s.harm > 0 && ["colony", "member", "independent"].includes(s.kind)) add("aid", { sys: s.id, blurb: `Harm ${s.harm}/3. Clear a box.`, oppose: aidOpposition(S, s) });
   const P = S.pelion;
-  if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair", { oppose: repairOpposition(S) });
+  if (P.shields || P.sys.weapons || P.sys.engines || P.sys.sensors || P.hull) add("repair", { oppose: repairOpposition(S), blurb: ACTIONS.repair.blurb + ` Uses a crate of spares (${storesOf(S).spares} left)${storesOf(S).spares ? "" : ": none left, −3"}.` });
+  if (s && s.surveyed && s.dilithium > 0 && s.kind !== "prewarp") add("mine", { sys: s.id, blurb: `A seam of about ${s.dilithium} crystal${s.dilithium === 1 ? "" : "s"} here. Cut 2 (3 on success by 5) for the Pelion's matrix (${storesOf(S).dilithium}/10). Lose by 3 or more and the seam bites back.`, oppose: { name: "the crystal seams", skill: "Instability", target: 10, why: "Living dilithium fractures if it's cut wrong, and sometimes the rock around it does too." } });
+  if (storesOf(S).dilithium < STORES.dilithium.max && storesOf(S).spares > 0) add("recrystallize", { blurb: `Restore worn crystals with a field from the warp core: +1 dilithium (+2 on success by 5), for a crate of spares. Dilithium ${storesOf(S).dilithium}/10, spares ${storesOf(S).spares}.`, oppose: { name: "the fractured lattice", skill: "Fracture", target: 11, why: "A worn crystal's lattice has to be coaxed back, plane by plane." } });
   add("sweep", { blurb: `Listen for cloaked ships and raiders within ${sweepRange(S)} light-years: reveals them. Finds a hidden base here.${P.refits.inverter ? " The cloak inverter helps: +2." : ""}`, oppose: { name: "cloaks and subspace static", skill: "Concealment", target: 11, why: "Anything worth finding is trying not to be found, and the sector's background noise helps it." } });
   for (const e of enemiesAt(S, U.at)) if ((!e.cloaked || e.revealed) && !e.hidden && !ENEMIES[e.type].base) {
     if (ENEMIES[e.type].will) add("hail", { enemy: e.id, name: `Hail the ${ENEMIES[e.type].name}`, oppose: { name: `the ${ENEMIES[e.type].name}'s captain`, skill: "Will", target: ENEMIES[e.type].will + (e.power === "romulan" ? 2 : 0), why: e.power === "klingon" ? "A Klingon captain backs down from nothing lightly." : e.power === "romulan" ? "Romulans don't negotiate from weakness, and never think they're weak." : "Pirates weigh the odds, and the profit." } });
@@ -389,7 +516,7 @@ export function actionsFor(S, unit = "pelion") {
   }
   const base = Object.values(S.enemies).find((e) => ENEMIES[e.type].base && e.at === U.at && e.found);
   if (base) out.push({ id: "engage", enemy: base.id, name: "Attack the Orion base", skills: [], blurb: "Its guns and shields against yours. Destroy it and the raids stop." });
-  for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, ...(o.oppose ? { oppose: o.finale && S.pelion.refits.inverter ? { ...o.oppose, target: o.oppose.target - 2, why: o.oppose.why + " But their cruiser's cloak is no use against the cloak inverter: −2 to them." } : o.oppose } : { extra: [["In the field", -2]] }) });
+  for (const o of S.orders) if (!o.arc && o.at === U.at) add("mission", { order: o.id, name: `Orders: ${o.title}`, skills: o.skills, blurb: `${o.have}/${o.segs} done.`, ...(o.oppose ? { oppose: o.finale && S.pelion.refits.inverter && o.campaignId !== "syndicate" ? { ...o.oppose, target: o.oppose.target - 2, why: o.oppose.why + " But their cruiser's cloak is no use against the cloak inverter: −2 to them." } : o.oppose } : { extra: [["In the field", -2]] }) });
   if (s && s.id === S.corvan) out.push(...arcActionsHook(S));
   // With an away team on Corvan II's surface, the away team does the mission's work and the bridge crew (whoever stayed
   // aboard) runs the ship: its operations are theirs alone.
@@ -543,6 +670,7 @@ function applyAction(S, p) {
     case "survey": {
       if (!r.success) return say(S, `${name} couldn't make sense of ${s.name}'s readings. Try again next turn.`);
       s.surveyed = true; S.seenSys[s.id] = true;
+      if (s.dilithium) log(S, `${s.name} has a seam of living dilithium, about ${s.dilithium} crystals: the Pelion can mine it.`, "discovery");
       const sci = 4 + (big ? 3 : 0) + (p.unit !== "pelion" ? 2 : 0); S.science += sci;
       const what = { prewarp: "a pre-warp people. The Prime Directive applies.", anomaly: "an anomaly worth investigating.", ruins: "the ruins of a vanished civilization.", empty: "nothing but rock and starlight.", orionBase: "nothing but rock and starlight." }[s.kind] || "charted.";
       return say(S, `Survey of ${s.name}: ${what} +${sci} science.`, "discovery");
@@ -576,10 +704,24 @@ function applyAction(S, p) {
     case "repair": {
       if (!r.success) return say(S, `${name}'s repairs don't hold.`);
       const P = S.pelion; let n = big ? 2 : 1; const fixed = [];
+      const usedSpare = addStore(S, "spares", -1) < 0;
       for (const k of ["engines", "weapons", "sensors"]) while (n > 0 && P.sys[k] > 0) { P.sys[k]--; n--; fixed.push(k); }
       while (n > 0 && P.shields > 0) { P.shields--; n--; fixed.push("shields"); }
       if (n > 0 && P.hull > 0) { P.hull--; fixed.push("hull"); }
-      return say(S, `Repairs: ${fixed.join(", ") || "nothing needed"}.`, "good");
+      return say(S, `Repairs: ${fixed.join(", ") || "nothing needed"}${usedSpare ? ` (a crate of spares used; ${storesOf(S).spares} left)` : ", improvised without spare parts"}.`, "good");
+    }
+    case "mine": {
+      if (!r.success) {
+        if (r.margin <= -3) { const hurt = hazard(S, p); return say(S, `The seam at ${s.name} fractures under the cutters: ${hurt}`, "bad"); }
+        return say(S, `The crystals at ${s.name} won't come out clean this time.`);
+      }
+      const n = Math.min(s.dilithium, big ? 3 : 2), got = addStore(S, "dilithium", n); s.dilithium -= n;
+      return say(S, `Mining at ${s.name}: ${n} crystal${n === 1 ? "" : "s"} cut from the seam${got < n ? ` (the matrix had room for ${got}; the rest go to the stores' trade)` : ""}. Dilithium ${storesOf(S).dilithium}/10.${s.dilithium ? ` About ${s.dilithium} left in the seam.` : " The seam is worked out."}`, "good");
+    }
+    case "recrystallize": {
+      if (!r.success) return say(S, `${name} can't coax the crystals back this time.`);
+      addStore(S, "spares", -1); const got = addStore(S, "dilithium", big ? 2 : 1);
+      return say(S, `${name} recrystallizes the worn dilithium: +${got}, for a crate of spares. Dilithium ${storesOf(S).dilithium}/10, spares ${storesOf(S).spares}.`, "good");
     }
     case "sweep": {
       if (!r.success) return say(S, `The sweep finds nothing${r.margin <= -2 ? "" : " (or nothing that wants to be found)"}.`);
@@ -663,7 +805,7 @@ function missionStep(S, p) {
   const st = storyOf(o);
   if (st) for (let i = was; i < o.have; i++) if (st.steps[i]) storyEvent(S, `${o.title}: ${st.steps[i][0].toLowerCase()}`, storyText(S, o, st.steps[i][1]));
   // Partway through, something can go wrong: once an order, a third of the time.
-  if (st && o.have < o.segs && !o.complicated && COMPLICATIONS[st.type] && rand(S) < 0.33) {
+  if (st && o.have < o.segs && !o.complicated && complicationOf(st) && rand(S) < 0.33) {
     o.complicated = true;
     const ev = { kind: "complication", orderId: o.id };
     if (S.event) (S.eventQueue = S.eventQueue || []).push(ev); else S.event = ev;
@@ -693,25 +835,32 @@ export function missionReport(S, o, result, how, rewards) {
 }
 // ---------- the campaign: Watchers of the Void ----------
 export const campaignOf = (S) => (S.campaign = S.campaign || { threads: [], beats: [], finale: false, over: null });
+/** A campaign's definition by id: Watchers of the Void, or one of the series that follows it. */
+export const defOf = (id) => (!id || id === "watchers" ? { id: "watchers", ...CAMPAIGN, finale: "The Makers' Gate" } : SERIES.find((c) => c.id === id));
+/** The campaign under way (or the last one, once it's over). */
+export const campaignDef = (S) => defOf(campaignOf(S).id);
+const campId = (x) => (x && x.id) || "watchers";
 /** The current act, from the beats reached so far. */
-export const campaignAct = (S) => { const C = campaignOf(S), b = CAMPAIGN.beats.filter((x) => C.beats.includes(x.at)); return b.length ? b[b.length - 1].act : "Prologue: The Silence at Corvan II"; };
+export const campaignAct = (S) => { const C = campaignOf(S), D = campaignDef(S), b = D.beats.filter((x) => C.beats.includes(x.at)); return b.length ? b[b.length - 1].act : "Prologue: The Silence at Corvan II"; };
+/** The order types Starfleet has: the first fourteen, and each new campaign's, from the moment it begins. */
+export const missionPool = (S) => MISSIONS.concat(SERIES_MISSIONS.filter((m) => (S.unlocked || []).includes(m.campaign)));
 /** Is the campaign known yet? Only once Corvan II is over: before that, nothing about it may show. */
 export const campaignOpen = (S) => campaignOf(S).beats.includes(0);
 /** Starfleet's reason for an order, tied to the campaign: only once the campaign is known. */
 /** Is this order part of the campaign (and is that known yet)? About half are; the rest are the frontier's ordinary work. */
-export const orderTied = (S, o) => !!(o && (o.finale || o.campaign) && campaignOpen(S));
+export const orderTied = (S, o) => !!(o && (o.finale || o.campaign) && campaignOpen(S) && (o.campaignId || "watchers") === campId(campaignOf(S)));
 /** Starfleet's reason for an order: the campaign's, if it's part of it and the campaign is known; otherwise its own. */
 export const orderReason = (S, o) => { const st = storyOf(o); if (!st) return null; return orderTied(S, o) && st.why ? st.why : st.reason || null; };
 /** What kind of mission an order is: Diplomatic, Rescue, Technology, Exploration, Security, Crew, or the Campaign. */
 export const orderType = (o) => (storyOf(o) && storyOf(o).type) || null;
 /** A beat of the campaign's story, once. */
 function campaignBeat(S, at) {
-  const C = campaignOf(S), b = CAMPAIGN.beats.find((x) => x.at === at);
+  const C = campaignOf(S), D = campaignDef(S), b = D.beats.find((x) => x.at === at);
   if (!b || C.beats.includes(at)) return;
   C.beats.push(at);
-  const text = at === 2 ? actTwo(S) : b.text;
+  const text = at === 2 && D.id === "watchers" ? actTwo(S) : b.text;
   C.beatText = C.beatText || {}; C.beatText[at] = text;   // the story so far shows what was actually said
-  storyEvent(S, `${CAMPAIGN.title}, ${b.act}: ${b.title}`, text);
+  storyEvent(S, `${D.title}, ${b.act}: ${b.title}`, text);
 }
 /**
  * Act II, House Kor'vath: how the Pelion learns who is behind the digging, from what it actually has. The two threads it
@@ -734,22 +883,71 @@ function campaignThread(S, o) {
   if (o.finale) return null;
   if (o.arc) { campaignBeat(S, 0); return null; }
   // Before Corvan II is over, nothing is known of the Makers: no threads, no reasons. Once the Gate is decided, it's over.
-  if (!st || !st.thread || C.over || !C.beats.includes(0) || !o.campaign) return null;
+  if (!st || !st.thread || C.over || !C.beats.includes(0) || !o.campaign || (o.campaignId || "watchers") !== campId(C)) return null;
+  const D = campaignDef(S);
   C.threads.push({ title: o.title, text: storyText(S, o, st.thread), turn: S.turn });
   const n = C.threads.length;
-  log(S, `${CAMPAIGN.title}, thread ${n}: ${storyText(S, o, st.thread)}`, "discovery");
-  for (const b of CAMPAIGN.beats) if (b.at > 0 && n >= b.at) campaignBeat(S, b.at);
-  if (n >= CAMPAIGN.finaleAt) issueFinale(S);
+  log(S, `${D.title}, thread ${n}: ${storyText(S, o, st.thread)}`, "discovery");
+  for (const b of D.beats) if (b.at > 0 && n >= b.at) campaignBeat(S, b.at);
+  if (n >= D.finaleAt) issueFinale(S);
   // Every thread costs the diggers time: their next site is two weeks further off.
   if (C.korvathNext) C.korvathNext += 2;
   return storyText(S, o, st.thread);
 }
 /** The end of the campaign: once Corvan II is done, whatever happened there, and late in the tour if need be. */
 export function campaignTick(S) {
-  const C = campaignOf(S);
-  if (S.arc.stage === "done") campaignBeat(S, 0);
-  korvathTick(S);
-  if (S.arc.stage === "done" && !C.finale && S.turn >= TOUR - 14) { campaignBeat(S, CAMPAIGN.finaleAt); issueFinale(S); }
+  const C = campaignOf(S), D = campaignDef(S);
+  if (D.id === "watchers") {
+    if (S.arc.stage === "done") campaignBeat(S, 0);
+    korvathTick(S);
+    // In a fifty-week tour, the finale comes in time for the end of it; in open command, the race decides.
+    if (S.mode !== "open" && S.arc.stage === "done" && !C.finale && S.turn >= TOUR - 14) { campaignBeat(S, CAMPAIGN.finaleAt); issueFinale(S); }
+  } else rivalTick(S, D);
+  // When a campaign is over, Starfleet's attention turns: the next begins three weeks later (in a tour, only with
+  // twelve weeks or more still to go; in open command, always).
+  if (C.over && !C.endedAt) C.endedAt = S.turn;
+  if (C.over && S.turn >= C.endedAt + 3 && (S.mode === "open" || S.turn <= TOUR - 12)) startNextCampaign(S);
+}
+/** The next campaign in the series, with its own order types added to Starfleet's book. */
+function startNextCampaign(S) {
+  const C = campaignOf(S), i = campId(C) === "watchers" ? 0 : SERIES.findIndex((x) => x.id === C.id) + 1, next = SERIES[i];
+  if (!next) return;
+  (S.campaignsDone = S.campaignsDone || []).push({ id: campId(C), title: campaignDef(S).title, over: C.over, threads: C.threads.length, rival: C.korvath || 0, threadList: C.threads, beatText: C.beatText, beats: C.beats });
+  S.campaign = { id: next.id, threads: [], beats: [], finale: false, over: null, started: S.turn };
+  (S.unlocked = S.unlocked || []).push(next.id);
+  campaignBeat(S, 0);
+  const types = SERIES_MISSIONS.filter((m) => m.campaign === next.id).map((m) => m.text);
+  log(S, `A new campaign: ${next.title}. New kinds of orders from Starfleet: ${types.join("; ")}.`, "order");
+}
+/**
+ * The rival of a campaign after the first: every few weeks it gains ground on its own (the cold reaches another place, the
+ * Syndicate takes another convoy), and each thread the Pelion turns up sets it back two weeks. If it reaches the finale
+ * first, the finale begins with it ahead.
+ */
+function rivalTick(S, D) {
+  const C = campaignOf(S), R = D.rival;
+  if (!C.beats.includes(0) || C.over || C.finale) return;
+  C.korvath = C.korvath || 0;   // the rival's count (named for Watchers' House Kor'vath, whose race it was first)
+  const every = R.every[S.difficulty] || 5;
+  if (!C.korvathNext) { C.korvathNext = S.turn + every; return; }
+  if (S.turn < C.korvathNext) return;
+  C.korvath++; C.korvathNext = S.turn + every;
+  const [site, scene] = R.sites[(C.korvath - 1) % R.sites.length];
+  const near = Object.values(S.systems).filter((s) => ["colony", "member", "independent"].includes(s.kind) && distance(s.at, S.pelion.at) >= 3);
+  const w = near.length ? pick(S, near) : null;
+  let cost = "";
+  if (R.fx === "dilithium") {
+    if (w) harmWorld(S, w, 1, "its reactors' crystals went grey overnight, and the power failed");
+    const lost = -addStore(S, "dilithium", -1);
+    cost = `${w ? `${w.name} is one of the places it reached: its power plant's crystals are grey. ` : ""}${lost ? `And aboard the Pelion, Grath reports one of the warp core's crystals gone grey in its housing overnight: dilithium ${storesOf(S).dilithium}/10.` : ""}`;
+  } else {
+    const took = Math.min(S.supplies, 6); S.supplies -= took;
+    if (w) harmWorld(S, w, 1, "its convoy never came");
+    cost = `${w ? `${w.name} was waiting for that convoy, and it's rationing now. ` : ""}${took ? `Starfleet's supply allotment to the Pelion is cut to cover the loss: −${took} supplies.` : ""}`;
+  }
+  const n = C.threads.length, ahead = C.korvath > n;
+  storyEvent(S, `${D.title}: ${R.head}`, `Rrinn brings the report to the captain's ready room herself. Starfleet Intelligence, priority one: ${R.name} ${R.verb} ${site}.\n\n${scene}\n\n${cost}\n\nThat's ${C.korvath} for ${R.name}, against the Pelion's ${n} thread${n === 1 ? "" : "s"}.${ahead ? ` ${R.Name} is ahead, and every week it stays ahead makes the end harder.` : ""}${C.korvath >= D.finaleAt ? "" : " Every campaign order the Pelion carries out sets it back two weeks."}`);
+  if (C.korvath >= D.finaleAt) { for (const b of D.beats) if (b.at > 0) campaignBeat(S, b.at); issueFinale(S); }
 }
 // ---------- the race: House Kor'vath ----------
 // Once the campaign has begun, the diggers take another Makers' site every few weeks: a world nearby is harmed and Klingon
@@ -777,6 +975,7 @@ function korvathTick(S) {
 /** The final order: the Makers' Gate, in empty space where every relay points. */
 function issueFinale(S) {
   const C = campaignOf(S); if (C.finale) return;
+  if (campId(C) !== "watchers") return seriesFinale(S);
   C.finale = true;
   const sb = S.systems[S.starbase];
   const hexes = Object.keys(S.hexes).filter((k) => !S.sysAt[k] && !inZone(k) && S.hexes[k].terrain === "space" && distance(k, sb.at) >= 5);
@@ -788,9 +987,22 @@ function issueFinale(S) {
   o.text = storyText(S, o, st.brief);
   activateOrder(S, o, "issued: the finale of Watchers of the Void");
 }
+/** The finale of a campaign after the first: its own story, in empty space far from the starbase. */
+function seriesFinale(S) {
+  const C = campaignOf(S), D = campaignDef(S); C.finale = true;
+  const sb = S.systems[S.starbase];
+  const hexes = Object.keys(S.hexes).filter((k) => !S.sysAt[k] && !inZone(k) && S.hexes[k].terrain === "space" && distance(k, sb.at) >= 5).sort((a, b) => distance(b, sb.at) - distance(a, sb.at)).slice(0, 12);
+  const at = pick(S, hexes) || sb.at, st = STORIES[D.finale], ahead = (C.korvath || 0) > C.threads.length;
+  const o = { id: "o" + S.nextId++, issued: S.turn, title: D.finale, at, sys: null, place: D.finale.replace(/^The /, "the "), where: "", skills: D.finaleSkills, segs: 3, have: 0,
+    urgent: true, finale: true, campaign: true, campaignId: D.id, twist: null, story: D.finale, strange: st.strange[0], key: st.keys[0],
+    oppose: { ...D.finaleOppose, target: D.finaleOppose.target + Math.max(0, (C.korvath || 0) - C.threads.length), why: D.finaleOppose.why + (ahead ? ` ${D.rival.Name} got ahead: +${(C.korvath || 0) - C.threads.length}.` : "") } };
+  o.text = storyText(S, o, st.brief);
+  activateOrder(S, o, `issued: the finale of ${D.title}`);
+}
+const complicationOf = (st) => st.complication || COMPLICATIONS[st.type];
 /** A complication's choices: press on (an opposed roll) or fall back (a week lost). */
 export function complicationChoices(S, ev) {
-  const o = S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && COMPLICATIONS[st.type];
+  const o = S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && complicationOf(st);
   if (!o || !c) return null;
   return { order: o, title: c.title, text: c.text, options: [
     { id: "press", name: c.press, blurb: `Opposed by ${c.oppose.name} (${c.oppose.skill} ${c.oppose.target}), with ${c.skills.join(", ")}. Win: the work leaps ahead (+1 success). Lose: ${c.costText}.` },
@@ -799,7 +1011,7 @@ export function complicationChoices(S, ev) {
 }
 export function chooseComplication(S, optId) {
   const ev = S.event; S.event = null;
-  const o = ev && S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && COMPLICATIONS[st.type];
+  const o = ev && S.orders.find((x) => x.id === ev.orderId), st = storyOf(o), c = st && complicationOf(st);
   if (!o || !c) return { text: "" };
   if (optId === "back") { o.deadline--; log(S, `${o.title}: ${c.title.toLowerCase()}. The captain orders everyone back to regroup: safe, but a week lost (due by turn ${o.deadline} now).`, "bad"); storyEvent(S, `${o.title}: falling back`, "The order goes out on every channel: pull back, regroup, nobody takes the risk. The crew obey, and nobody argues, and nobody is hurt. It takes a week to get back to where they were, and everyone aboard can feel the deadline coming closer while they do."); return { text: "" }; }
   const b = bestOfficer(S, c.skills, {}, null) || { officer: "captain", skill: c.skills[0] };
@@ -840,7 +1052,7 @@ export function missionChoices(S, ev) {
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
   accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike", refit: (n) => `${REFITS[n] ? REFITS[n].name : n} fitted to the Pelion`, delay: (n) => `every other order's deadline ${n} weeks closer`,
-  heal: (n, w) => `${w}'s harm −${n}`, inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
+  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the Syndicate answers: a raider strikes a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
 export function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
   if (!o || !opt) return { error: "No such choice." };
@@ -849,7 +1061,9 @@ export function chooseMission(S, orderId, optId) {
   for (const [k, n] of Object.entries(fx)) {
     if (k === "commendations") S.commendations += n;
     else if (k === "science") S.science += n;
-    else if (k === "supplies") S.supplies += n;
+    else if (k === "supplies") S.supplies = Math.max(0, S.supplies + n);
+    else if (k === "dilithium" || k === "antimatter" || k === "spares") addStore(S, k, n);
+    else if (k === "orion") orionReprisal(S, o.title);
     else if (k === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, Math.min(5, (s.accord || 0) + n)); if (s.accord >= 5 && s.kind === "independent") join(S, s); }
     else if (k === "accord") continue;
     else if (k === "command") markCommand(S, n, `${o.title}: ${opt.how.toLowerCase()}`);
@@ -863,7 +1077,8 @@ export function chooseMission(S, orderId, optId) {
     else if (k === "inverter") S.pelion.refits.inverter = Math.max(S.pelion.refits.inverter || 0, n);
     lines.push(FX_TEXT[k] ? FX_TEXT[k](n, w) : k);
   }
-  if (opt.record && !S.records.includes("makers")) { S.records.push("makers"); lines.push("Library record: the Makers' library"); }
+  const recId = opt.record === true ? "makers" : opt.record;
+  if (recId && !S.records.includes(recId)) { S.records.push(recId); lines.push(`Library record: ${RECORDS.find((r) => r.id === recId)?.name || recId}`); }
   if (o.finale) campaignOf(S).over = opt.id;
   storyEvent(S, `${o.title}: ${storyText(S, o, opt.name).toLowerCase()}`, storyText(S, o, opt.text));
   log(S, `${o.title}: the captain's decision, ${storyText(S, o, opt.name).toLowerCase()} (${lines.join(", ")}).`, "order");
@@ -897,7 +1112,7 @@ export function completeOrder(S, o, ok, how) {
   } else {
     S.failed++; S.streak = 0; markCommand(S, 1, `orders not carried out in time: ${o.title}.`);
     const st = storyOf(o); if (st) storyEvent(S, `Too late: ${o.title}`, storyText(S, o, st.fail));
-    if (o.finale) { campaignOf(S).over = "lost"; S.tension = Math.min(10, S.tension + 2); }
+    if (o.finale) { campaignOf(S).over = "lost"; if (campId(campaignOf(S)) === "watchers") S.tension = Math.min(10, S.tension + 2); }
     const s = o.sys && S.systems[o.sys];
     if (s && /Evacuate|distress|medical/i.test(o.title) && ["colony", "member", "independent"].includes(s.kind)) harmWorld(S, s, 1, "help never came");
     fillFromBacklog(S);
@@ -961,12 +1176,15 @@ export function newOrder(S) {
     const sys = pick(S, cands); S.seenSys[sys.id] = true; return { at: sys.at, sys };
   };
   let m = null, place = null, storyKey = null;
-  for (const x of [...MISSIONS].sort((a, b) => Math.abs(a.roll - roll) - Math.abs(b.roll - roll))) {
+  const C0 = campaignOf(S), pool = missionPool(S).sort((a, b) => Math.abs(a.roll - roll) - Math.abs(b.roll - roll));
+  // While a campaign after the first is under way, more than half of Starfleet's orders are its own.
+  const mine = campId(C0) !== "watchers" && !C0.over && rand(S) < 0.6 ? pool.filter((x) => x.campaign === C0.id) : [];
+  for (const x of mine.concat(pool)) {
     const left = untold(x); if (!left.length) continue;
     const p = placeFor(x); if (!p) continue;
     m = x; place = p; storyKey = pick(S, left); break;
   }
-  if (!m) return null;   // every story has been told
+  if (!m) { if (!S.quietLogged) { S.quietLogged = true; log(S, "Starfleet Command has no new orders for the Pelion: every story this sector had to tell has been told. The sector is yours to keep.", "order"); } return null; }
   used.push(storyKey);
   const st = STORIES[storyKey], at = place.at, sys = place.sys;
   const twist = rand(S) < 0.6 ? pick(S, TWISTS) : null;
@@ -978,7 +1196,9 @@ export function newOrder(S) {
   if (postAt(S, at)) o.place = postAt(S, at).name;
   o.story = storyKey; o.text = storyText(S, o, st.brief);
   // About half of all orders are part of the campaign (once it has begun); the rest are the frontier's ordinary work.
-  const C = campaignOf(S); o.campaign = !C.over && rand(S) < 0.5;
+  const C = campaignOf(S);
+  if (st.campaign) { o.campaignId = st.campaign; o.campaign = st.campaign === campId(C) && !C.over; }
+  else { o.campaignId = "watchers"; o.campaign = campId(C) === "watchers" && !C.over && rand(S) < 0.5; }
   S.backlog = S.backlog || [];
   if (busy(S)) {
     o.backlog = true; o.received = S.turn; S.backlog.push(o);
@@ -987,6 +1207,15 @@ export function newOrder(S) {
   }
   activateOrder(S, o);
   return o;
+}
+/** The Syndicate answers an insult: an Orion raider strikes a Federation world, from its base or from the sector's edge. */
+export function orionReprisal(S, why) {
+  const targets = Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member");
+  if (!targets.length) return;
+  const tgt = pick(S, targets), b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base);
+  const edge = Object.keys(S.hexes).filter((k) => !inZone(k)).sort((a, c) => distance(c, tgt.at) - distance(a, tgt.at))[0];
+  spawnEnemy(S, "orion", b ? b.at : edge, { goal: "raid", target: tgt.at, hostile: true });
+  log(S, `Intelligence: after ${why}, an Orion raider has left ${b ? "the pirate base" : "the sector's edge"}, bound for ${tgt.name}. The Syndicate wants it known that it remembers.`, "war");
 }
 export const closestOutpost = (S, at) => Object.values(S.systems).filter((s) => s.kind === "klingon").sort((a, b) => distance(a.at, at) - distance(b.at, at))[0];
 export function harmWorld(S, s, n, why) {
@@ -1044,9 +1273,13 @@ export function score(S) {
     ["Worlds lost to the Klingon Empire", -S.lostWorlds * 8],
     ["Colonies lost", -S.lostColonies * 10],
     ["Listening posts lost", -Object.values(postsOf(S)).filter((p) => p.lost).length * 5],
-    [`${CAMPAIGN.title}: threads found`, Math.min(CAMPAIGN.finaleAt, campaignOf(S).threads.length) * 2],
-    [`${CAMPAIGN.title}: the Gate`, campaignOf(S).over === "close" || campaignOf(S).over === "guard" ? 25 : campaignOf(S).over === "lost" ? -10 : 0],
   ];
+  const C = campaignOf(S), all = (S.campaignsDone || []).concat([{ id: campId(C), over: C.over, threads: C.threads.length }]);
+  for (const c of all) {
+    const D = defOf(c.id); if (c.id !== "watchers" && !c.threads && !c.over) continue;
+    parts.push([`${D.title}: threads found`, Math.min(D.finaleAt, c.threads) * 2]);
+    parts.push([`${D.title}: ${c.id === "watchers" ? "the Gate" : D.finale.replace(/^The /, "the ")}`, c.over && c.over !== "lost" ? 25 : c.over === "lost" ? -10 : 0]);
+  }
   return { parts, total: parts.reduce((t, p) => t + p[1], 0) };
 }
 export function rating(total) {
@@ -1057,7 +1290,20 @@ export function rating(total) {
 export function checkEnd(S) {
   if (S.over) return;
   if (S.pelion.hull >= PELION.hull) S.over = { win: false, why: "The Pelion's hull gave way. The crew abandoned ship, and Starfleet lost a Heavy Cruiser." };
-  else if (S.turn > TOUR) S.over = { win: true, why: "The Pelion's tour of the Corvan Sector is over." };
+  else if (S.mode !== "open" && S.turn > TOUR) S.over = { win: true, why: "The Pelion's tour of the Corvan Sector is over." };
+}
+/** At the end of a tour, keep command: the game goes on with no end, as open command. */
+export function keepCommand(S) {
+  if (!S.over || !S.over.win || S.mode === "open") return { error: "Only at the end of a tour." };
+  S.mode = "open"; S.over = null;
+  log(S, "Starfleet Command extends the Pelion's assignment to the Corvan Sector with no end date: open command. The tour's score stands; the sector goes on.", "order");
+  return { ok: true };
+}
+/** In open command, the captain chooses when to hand the Pelion over. */
+export function retire(S) {
+  if (S.over) return { error: "Already over." };
+  S.over = { win: true, why: `After ${S.turn - 1} weeks in the Corvan Sector, the captain hands the Pelion over at Starbase 23.` };
+  return { ok: true };
 }
 
 // ---------- hooks set by the other modules (they import game.js, so they register here) ----------

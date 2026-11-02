@@ -11,6 +11,7 @@
  * house that wants what they guard. Every order the Pelion carries out turns up a thread; enough threads lead to the
  * Makers' Gate.
  */
+import { SERIES_STORIES } from "./campaigns.js";
 export const CAMPAIGN = {
   title: "Watchers of the Void",
   premise: "The caretaker of Corvan II was not alone. A vanished people, the Makers, left machines like it across the Corvan Sector to watch over younger worlds. Two of those sites have already been dug up, and no one who was there is left to say by whom: a Federation survey team of six, gone without a trace, and a mining settlement of forty, its homes standing empty with the meals still on the tables. Starfleet Command is worried for three reasons. Someone is killing, or taking, everyone who sees them. The worlds those machines watched over are now unguarded, and one of them is already in trouble. And a machine that could pull a Heavy Cruiser out of orbit is a weapon in the wrong hands, on a border with the Klingon Empire. Every order Starfleet gives the Pelion this tour comes back to the same questions: who is doing this, and what are they looking for?",
@@ -361,6 +362,8 @@ const FIRST_NAMES = {
   "Mediate a dispute between two worlds": "The contested moon", "Test experimental technology": "The cloak inverter", "Ferry a delegation to a world that left the Federation": "The scorched spaceport",
   "Shore leave that goes wrong": "The carnival", "Carry a message across the Neutral Zone": "The sealed message", "The Makers' Gate": "The Makers' Gate",
 };
+// The campaigns after the first bring their own order types and stories.
+Object.assign(STORIES, SERIES_STORIES);
 for (const [k, n] of Object.entries(FIRST_NAMES)) if (STORIES[k]) { STORIES[k].name = n; STORIES[k].mission = k; }
 Object.assign(STORIES, {
   "Answer a distress call#2": {
