@@ -2,7 +2,7 @@
 import { key, toPixel, fromPixel, distance } from "./hex.js";
 import { TOUR, STARDATE0, CREW, CAPTAIN, PELION, SUPPORT, ENEMIES, KINDS, REFITS, RECORDS, POWERS, chance } from "./data.js";
 import { newGame, navBearing, sideHeading, position, hourly, stardate, sysAt, officer, available, free, helperFor, skillOf, target, rollTarget, bestOfficer, actionsFor, attempt, resolve, canReroll, moveTo, reachable, findPath,
-  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, postsOf, postAt, missionChoices, chooseMission, cloakChoices, chooseCloak, complicationChoices, chooseComplication, diggersName, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType } from "./game.js";
+  speedOf, setWarp, maxWarp, warpText, lyPerWeek, travelDays, isUrgent, CRUISE_WARP, visibleEnemies, enemiesAt, requisition, fitRefit, setStation, acceptOrder, score, rating, stationOfficer, sensorsRating, exchangeOdds, postsOf, postAt, missionChoices, chooseMission, openingScene, cloakChoices, chooseCloak, complicationChoices, chooseComplication, diggersName, campaignOf, campaignAct, campaignOpen, orderReason, orderTied, orderType } from "./game.js";
 import { storyOf, CAMPAIGN } from "./stories.js";
 import { SHIP_SHAPES } from "./ships.js";
 import { exchange, battleStats, shieldsMax, powerOf } from "./combat.js";
@@ -789,7 +789,7 @@ function showEvent() {
   const ev = S.event;
   if (ev.kind === "arc-arrive") {
     const ch = arcEventChoices(S);
-    modal(`<h2>Corvan II</h2><p>The active sweep finds what passive sensors couldn't: an Orion raider holding station on the far side of the moon. Caught, it hails: they're "legitimate salvagers", and this is unclaimed space.</p>
+    modal(`<h2>Corvan II: the raider</h2><p style="white-space:pre-line">${esc("The active sweep finds what passive sensors couldn't: an Orion raider, lean and dark, holding station on the far side of the moon with its engines damped right down. Caught, it doesn't run. It hails.\n\nIts captain is all teeth and gold rings, lounging in a chair too big for him. \"Starfleet! A pleasure. We're legitimate salvagers, as I'm sure your sensors will tell you. This system is unclaimed space, and we have every right to be in it. Whatever you're here for, I'm sure we needn't trouble each other.\"\n\nBehind him, half out of sight, a crewman is loading something into a crate that looks very much like a Starfleet-pattern phaser.")}</p>
       ${eventResult ? `<div class="result ${eventResult.opposed ? (eventResult.won ? "ok" : "no") : eventResult.roll ? (eventResult.roll.success ? "ok" : "no") : ""}">${eventResult.opposed ? `${esc(eventResult.line)} ` : eventResult.roll ? `${diceHTML(eventResult.roll)} ${eventResult.roll.total} against ${eventResult.roll.target} (${esc(officer(eventResult.roll.officer)?.short || "Captain")}, ${esc(eventResult.roll.skill)}). ` : ""}${esc(eventResult.text)}</div>` : ""}
       <div class="grid2">${ch.map((c) => `<div class="brief"><h3>${esc(c.name)}</h3><p>${esc(c.blurb)}</p><div class="btn-row"><button class="btn ${c.id === "engage" ? "red" : "primary"} small" data-ev="${c.id}" ${c.disabled ? "disabled" : ""}>${esc(c.name)}</button></div></div>`).join("")}</div>`);
     return;
@@ -876,7 +876,7 @@ function modalClick(e) {
     after(); if (!report && !S.event && !S.battle && !S.over) closeModal(); return;
   }
   if (m === "report-ok") { report = null; closeModal(); after(); return; }
-  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value }); startGame(s); return; }
+  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value }); openingScene(s); startGame(s); return; }
   if (m === "continue") { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } return; }
   if (m === "close") { closeModal(); return; }
   if (m === "help") { showHelp(); return; }

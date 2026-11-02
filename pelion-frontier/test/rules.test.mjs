@@ -73,7 +73,7 @@ test("a battle runs to an end and the Pelion's numbers come from the bridge crew
 });
 test("Corvan II: the raider hides behind the moon until an active sweep finds it; the pull waits for a sweep of the ruins", () => {
   const S = newGame({ seed: "cv" });
-  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
+  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at); if (S.event && S.event.kind === "story") { assert.ok(/orbit/i.test(S.event.title)); S.event = null; S.eventQueue = []; }
   assert.equal(S.event, null);                                         // passive sensors: nothing
   assert.equal(S.arc.stage, "orbit");
   assert.ok(!visibleEnemies(S).some((e) => e.goal === "arc"));
@@ -94,7 +94,7 @@ test("Corvan II: the raider hides behind the moon until an active sweep finds it
   const r = attempt(S, "pelion", "arc", { arc: "scan" }); if (S.pending) resolve(S, false);
   assert.ok(r.ok);
   assert.equal(S.arc.stage, "pull");
-  assert.equal(S.event.title, "The pull");
+  assert.ok([S.event].concat(S.eventQueue || []).some((e) => e && e.title === "The pull"));   // after the sweep's own scene
   // No clues until an away team beams down; then only the away team can work them.
   assert.ok(!actionsFor(S).some((a) => a.arc === "clue-logs"));
   assert.ok(actionsFor(S).some((a) => a.id === "beam"));
@@ -120,7 +120,7 @@ test("every discovery is in the log, and trimming never drops one", async () => 
 
 test("left undetected, the raider comes around the moon firing before the day is out", () => {
   const S = newGame({ seed: "sw" });
-  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
+  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at); if (S.event && S.event.kind === "story") { assert.ok(/orbit/i.test(S.event.title)); S.event = null; S.eventQueue = []; }
   assert.equal(S.battle, null);
   endTurn(S);                                                          // no sweep on the day of arrival
   assert.ok(S.battle);
@@ -153,7 +153,7 @@ test("every officer acts once a turn; each action can be tried once a turn", () 
 });
 test("with the away team down, they work the surface and the bridge crew runs the ship", () => {
   const S = newGame({ seed: "aw" });
-  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
+  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at); if (S.event && S.event.kind === "story") { assert.ok(/orbit/i.test(S.event.title)); S.event = null; S.eventQueue = []; }
   const e = Object.values(S.enemies).find((x) => x.goal === "arc"); delete S.enemies[e.id]; S.event = null; dismissEvent(S);
   attempt(S, "pelion", "arc", { arc: "scan" }); if (S.pending) resolve(S, false); S.event = null; S.eventQueue = [];
   beamDown(S, ["sevek", "vessik", "reyes", "rrinn"]);
@@ -167,7 +167,7 @@ test("with the away team down, they work the surface and the bridge crew runs th
 });
 test("what's in the ruins is earned: three clues and Sevek forms his theory, no roll; the caretaker only when it speaks", () => {
   const S = newGame({ seed: "th" });
-  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
+  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at); if (S.event && S.event.kind === "story") { assert.ok(/orbit/i.test(S.event.title)); S.event = null; S.eventQueue = []; }
   const e = Object.values(S.enemies).find((x) => x.goal === "arc"); delete S.enemies[e.id]; S.event = null; dismissEvent(S);
   attempt(S, "pelion", "arc", { arc: "scan" }); if (S.pending) resolve(S, false); S.event = null; S.eventQueue = [];
   beamDown(S, ["sevek", "vessik", "reyes", "rrinn"]);
@@ -205,10 +205,10 @@ test("what's in the ruins is earned: three clues and Sevek forms his theory, no 
 test("with the away team down, a turn is an hour: the week waits, the Countdown runs, the ship stays", async () => {
   const { hourly } = await import("../src/game.js");
   const S = newGame({ seed: "hr" });
-  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
+  S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at); if (S.event && S.event.kind === "story") { assert.ok(/orbit/i.test(S.event.title)); S.event = null; S.eventQueue = []; }
   const e = Object.values(S.enemies).find((x) => x.goal === "arc"); delete S.enemies[e.id];
   attempt(S, "pelion", "arc", { arc: "scan" }); if (S.pending) resolve(S, false); S.event = null; S.eventQueue = [];
-  beamDown(S, ["sevek", "vessik", "reyes", "rrinn"]);
+  beamDown(S, ["sevek", "vessik", "reyes", "rrinn"]); S.event = null; S.eventQueue = [];   // past the "Energize" scene
   assert.ok(hourly(S));
   const turn = S.turn, cd = S.arc.countdown, supplies = S.supplies;
   S.crew.rrinn.acted = true;
@@ -228,7 +228,7 @@ test("the Corvan II raider, chased off, leaves for good", () => {
   let checked = 0;
   for (let n = 0; n < 40 && checked < 3; n++) {
     const S = newGame({ seed: "chase" + n });
-    S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at);
+    S.pelion.mp = 99; moveTo(S, "pelion", S.systems[S.corvan].at); if (S.event && S.event.kind === "story") { assert.ok(/orbit/i.test(S.event.title)); S.event = null; S.eventQueue = []; }
     const e = Object.values(S.enemies).find((x) => x.arcRaider); e.hidden = false;
     startBattle(S, e.id, "pelion");
     for (let i = 0; i < 20 && !S.battle.over; i++) exchange(S, { shields: true, phasers: true });

@@ -822,6 +822,8 @@ export function chooseComplication(S, optId) {
   else log(S, `${o.title}: ${c.costText}.`, "bad");
   return { text: "" };
 }
+/** The opening scene of a tour: the orders for Corvan II, read in the ready room. The page shows it when a tour begins. */
+export function openingScene(S) { storyEvent(S, "Orders: The Silence at Corvan II", "The message comes in on the command frequency at 0300 ship's time, priority one, and the captain reads it in the ready room in a dressing gown.\n\nThe Federation research outpost on Corvan II, eight archaeologists studying the ruins of a vanished city, has missed three check-ins. No distress call. No message of any kind. The planet has a native people, the Ketari, at a bronze-age level of development, so the outpost works under the Prime Directive, and any rescue will have to as well. An Orion raider was reported in the sector a week ago. Proceed at maximum warp.\n\nThe captain calls the senior staff together. It's Rrinn who goes still at the name. Her sister, Mirrah, flies the outpost's supply run; she was due there the same week the messages stopped. Rrinn asks, very quietly, to be on whatever team goes down. Then she goes back to her station, and doesn't say anything else for the rest of the shift, and nobody on the bridge pretends not to notice."); }
 /** The scene when the Pelion first reaches an order's location. */
 function arriveAt(S, o) {
   const st = storyOf(o);

@@ -116,6 +116,7 @@ export function arcStep(S, p) {
   if (k === "scan") {
     if (r.success) { A.readings = true; alog(S, `${who}'s sweep of the ruins at Corvan II: an energy source older than anything in the Federation's records, and eight life signs deep below it, barely there. Not an answer, but readings Sevek can use later.`, "discovery"); }
     else alog(S, `${who}'s sweep of the ruins at Corvan II: interference, and then the readings go strange.`);
+    astory(S, "The sweep", r.success ? "Sevek runs the sweep himself, and for a long moment says nothing at all. Then he puts it on the main viewer. Under the ruins, deep, older than anything in the Federation's records: an energy source, steady, enormous, patient. And below it, very faint, eight life signs. Barely there. Slow. But there.\n\nRrinn makes a small sound and covers it at once. Eight. There were eight scientists." : "The sweep goes into the ruins and comes back as noise: interference, rising, and then readings that make no sense at all, as if the ruins were looking back at the ship. Sevek frowns at his console. \"Something is shielding the site, Captain. Or something is objecting to being looked at.\"");
     startPull(S);
     return "";
   }
@@ -137,17 +138,19 @@ export function arcStep(S, p) {
     return "";
   }
   if (k === "time") {
-    if (r.success) { A.countdown = Math.max(0, A.countdown - 1); A.boughtTime = true; alog(S, `${who} reroutes power around the drain: the Countdown ${A.countdown}/${COUNTDOWN}.`, "good"); }
-    else { A.boughtTime = true; alog(S, `${who} can't find a way around the drain.`, "bad"); }
+    if (r.success) { A.countdown = Math.max(0, A.countdown - 1); A.boughtTime = true; alog(S, `${who} reroutes power around the drain: the Countdown ${A.countdown}/${COUNTDOWN}.`, "good"); storyEvent(S, "Buying time", "Grath goes down into the guts of the ship with two engineers, a toolkit and a vocabulary that turns the air blue, and for four hours nobody on the bridge hears from him. Then the lights steady. The helm alarm stops chiming. \"I've rerouted the deflector around the drain,\" Grath reports. \"Bought us an hour. Maybe two. Don't ask me for a third, because I'll say something unforgivable.\"".replace("Grath go", who === "Grath" ? "Grath go" : who + " go").replace("Grath report", who + " report").replace("Grath's voice", who + "'s voice")); }
+    else { A.boughtTime = true; alog(S, `${who} can't find a way around the drain.`, "bad"); storyEvent(S, "Buying time", "The engineers try for hours, rerouting power through every path the Pelion has, and the drain finds every one of them, patiently, as if it can see what they're doing. Grath comes up from engineering at last, filthy and quiet, which is worse than any amount of shouting. \"It's learning,\" he says. \"Whatever's down there. It knows our ship better every hour.\""); }
     return "";
   }
   if (k === "stun" || k === "kill") {
     if (!r.success) {
       A.countdown++; const id = p.officer; S.crew[id].inj = Math.min(3, S.crew[id].inj + 1);
       alog(S, `The Orions fight back: ${officer(id).short} is hurt (${S.crew[id].inj}/3). The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
+      astory(S, "The diggers fight back", "The diggers are ready for them. Three Orions, armed with disruptors and cutting gear, dug in behind the ruins' broken pillars, and they've done this before. The first shot comes from somewhere nobody was watching. {hurt} goes down, hit, and the away team has to pull back into the ruins' outer halls, dragging them, while disruptor fire chews the stone overhead. Somewhere below, the cutting gear starts up again.".replace("{hurt}", officer(id).short));
       return checkCountdown(S);
     }
     if (k === "kill") markCommand(S, 1, "Orion pirates killed on Corvan II when stun would have done.");
+    astory(S, "The diggers", k === "kill" ? "There's no careful way to do it, and the away team doesn't try. Phasers set to kill, the Orions fire first, and the exchange is over in seconds. When the smoke clears, three diggers lie among the broken pillars and won't get up again.\n\nNobody speaks for a while. Then Reyes, very carefully, steps over the nearest of them and looks at the cutting gear, and at the hole it's been making, down into the dark under the ruins. Starfleet Command will have questions about this. Right now, there's a ramp going down." : "Reyes leads them in the long way round, through a collapsed colonnade the Orions haven't thought to watch. The diggers are bent over their cutting gear, arguing about the price of something, when the first stun beam takes the biggest of them off his feet. The other two have their disruptors half up before the second and third beams find them.\n\nThe silence afterwards is very loud. Reyes checks each of them, rolls them into the recovery position, and calls the Pelion for three to beam directly to the brig. Then she looks at the cutting gear, and at the hole it's been making, down into the dark under the ruins.");
     A.diggers = k === "kill" ? "killed" : "prisoners";   // what became of the Orion diggers matters later: the campaign's Act II
     A.stage = "caretaker";
     if (!A.knowPhasers) { A.knowPhasers = true; alog(S, "The Orion diggers' gear includes a tally: eleven disruptor pistols traded to the Ketari for their labor. Starfleet weapons can't be left in a bronze-age village: the away team has to get them back.", "discovery"); }
@@ -159,7 +162,9 @@ export function arcStep(S, p) {
   if (k === "reason") return argue(S, p);
   if (k === "phasers") {
     if (!r.success) {
-      if (r.margin <= -3 && !A.seen) { A.seen = true; markCommand(S, 1, "the Ketari saw the away team. The Prime Directive."); }
+      const seenNow = r.margin <= -3 && !A.seen;
+      if (seenNow) { A.seen = true; markCommand(S, 1, "the Ketari saw the away team. The Prime Directive."); }
+      astory(S, "The talismans", "The village is awake tonight. Someone has a fever and someone else is sitting up with them; a dog barks at every shadow; the warriors at the chieftain's hall are restless, and their talismans are in their hands, not on their cords. {who} lies in the long grass at the edge of the firelight for an hour, then two, and in the end has to pull back with nothing.".replace("{who}", who) + (seenNow ? " Worse: a sentry turns at the wrong moment and sees, for one long second, a figure that isn't Ketari. He shouts. By morning the whole village is talking about sky-demons in the grass." : ""));
       if (A.stage === "phasers") { alog(S, `The village is awake tonight: ${who} can't get near the phasers without being seen.${A.seen ? " Worse: a sentry saw strangers, and the village talks of sky-demons." : " Try again next hour."}`, "bad"); return ""; }
       A.countdown++;
       alog(S, `The village is awake tonight: ${who} can't get near the phasers.${A.seen ? " Worse: a sentry saw strangers." : ""} The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
@@ -167,6 +172,7 @@ export function arcStep(S, p) {
     }
     A.phasers = true;
     alog(S, `${who} recovers the Orion phasers from the Ketari village: all eleven, from the chieftain's hall, the warriors' cords and the smithy, swapped for bronze copies. Come morning the talismans are still there; they just don't burn trees any more.`, "good");
+    astory(S, "The talismans", "{who} goes into the Ketari village at the darkest hour of the night, when even the dogs are asleep. Eleven disruptor pistols: two on cords around the necks of sleeping warriors, four hung like ornaments on the chieftain's hall, the rest wrapped in cloth in the smithy, where the smith has been trying, patiently, to work out how to make more.\n\nOne by one they're lifted, and one by one replaced: bronze copies, the same weight, the same shape, cast in the Pelion's fabricators that afternoon. By dawn the village wakes to its talismans exactly where it left them. They just don't burn trees any more. And nobody, anywhere, saw a thing.".replace("{who}", who));
     if (A.stage === "phasers") completeArc(S, A.resolved);
     return "";
   }
@@ -175,6 +181,7 @@ export function arcStep(S, p) {
       A.countdown++;
       if (k === "leave" && r.margin <= -3 && !A.seen) { A.seen = true; markCommand(S, 1, "the Ketari saw the away team. The Prime Directive."); }
       alog(S, `The caretaker doesn't yield. The Countdown ${A.countdown}/${COUNTDOWN}.`, "bad");
+      if (k === "shutdown") astory(S, "It will not be stopped", "The caretaker doesn't yield. Its column of light brightens, and the air in the chamber goes heavy, like the moment before a storm. \"No,\" it says, from everywhere at once, without anger. \"I have watched for eleven thousand years. I will not be stopped by a moment's cleverness.\" Overhead, through the rock, the Pelion's orbit decays a little further.");
       return checkCountdown(S);
     }
     finishArc(S, k);
@@ -241,7 +248,7 @@ function checkCountdown(S) {
   if (A.countdown < COUNTDOWN || A.stage === "done") return "";
   A.stage = "done";
   const o = arcOrder(S); if (o) completeOrder(S, o, false, "The Countdown ran out: the Pelion had to break orbit, and the scientists were left asleep.");
-  astory(S, "Breaking orbit", "The Countdown runs out: the drain on the Pelion's power is too much, and the ship has to break orbit or fall. The away team beams up with nothing. The scientists sleep on in the ruins, and Rrinn never hears the end of that message.");
+  astory(S, "Breaking orbit", "The Countdown runs out. The drain on the Pelion is too much now: every system dimming, the orbit decaying faster than the engines can fight it, the deck tilting under everyone's feet as the ship starts, very slowly, to fall.\n\n\"Captain,\" sh'Vari says, very steadily, \"we break orbit now, or we don't break orbit.\"\n\nThe away team beams up with nothing. The Pelion climbs out of Corvan II's gravity on emergency power, shaking, and the drain lets go of her like a hand opening. Below, in the dark under the ruins, the eight scientists sleep on. Rrinn stands at her station with her ears flat and her eyes on the viewscreen until the planet is a dot, and never hears the end of her sister's last message.");
   return "";
 }
 /** The caretaker's fate is decided. The orders aren't carried out until the Orion phasers are back as well. */
@@ -256,8 +263,8 @@ function finishArc(S, how) {
   completeArc(S, how, true);
 }
 const resolvedText = (how) => how === "reason"
-  ? "The caretaker is silent for a long time: the longest, it says afterward, that it has been silent since its makers left. \"The argument holds. I am an outsider here, and the eight are outsiders, and what does not belong to this world must leave it. I release them. I will go on watching, and I will not act again. If harm comes to the Ketari, I will tell you, and you will decide; I find I would rather someone decided.\" The pods open one by one. Rrinn's sister is the first one out, and finally finishes that sentence."
-  : "The caretaker goes dark. The eight scientists wake, cold and confused and alive, and the Ketari will never know what watched over them, or that it's gone. Rrinn's sister is among the sleepers, and finally finishes that sentence.";
+  ? "The caretaker is silent for a long time: the longest, it says afterward, that it has been silent since its makers left. \"The argument holds. I am an outsider here, and the eight are outsiders, and what does not belong to this world must leave it. I release them. I will go on watching, and I will not act again. If harm comes to the Ketari, I will tell you, and you will decide. I find I would rather someone decided.\"\n\nThe pods open one by one, gently, like flowers. The scientists wake into the column's soft light, confused, unhurt. Mirrah is the first one out. She sees her sister, and stops, and then finishes the sentence she started three weeks ago, very quietly: \"...walking toward the ruins. Rrinn, it's singing.\" Rrinn holds her for a long time. Sevek, for once, looks away."
+  : "Grath and Sevek work at the column of light for an hour, in silence except for Grath's breathing, cutting the caretaker's power one path at a time while it watches them do it and does nothing to stop them. Then the last path goes, and the light goes out, and the chamber is just a chamber, very dark and very old.\n\nOne by one the pods open. The eight scientists wake, cold and confused and alive, coughing, asking what day it is. The Ketari will never know what watched over them for eleven thousand years, or that it's gone. And in the third pod, Mirrah sits up, sees her sister, and finally finishes the sentence she started three weeks ago: \"...walking toward the ruins. Rrinn, it's singing.\"";
 /** Everything done: the orders carried out (or, leaving the scientists asleep, partly). */
 function completeArc(S, how, fresh) {
   const A = S.arc; A.stage = "done";
@@ -265,7 +272,7 @@ function completeArc(S, how, fresh) {
   if (how === "leave") {
     S.science += 8;
     A.phasers = true;
-    astory(S, "The Ketari's own history", "The away team has every Orion phaser back from the village, and leaves the caretaker to its watch. Ketari history stays their own. The eight scientists sleep on, and Starfleet will have to send a team that can wake them. Rrinn takes the news quietly.");
+    astory(S, "The Ketari's own history", "The away team takes back every Orion phaser from the village, quietly, and then stands for a long time in the caretaker's chamber, looking at the eight pods.\n\nIn the end the captain gives the order: leave it be. The caretaker watches them go up the ramp without a word. The Ketari will keep their guardian, and their history will stay their own. The eight scientists sleep on, warm and safe and breathing once a minute, and Starfleet will have to send a team that can wake them without breaking the thing that keeps them.\n\nRrinn is the last to leave the chamber. She puts her hand flat on the third pod, where Mirrah sleeps, and says something in her own language that nobody asks her to translate. Then she follows the others up into the light.");
     alog(S, "The Silence at Corvan II: the Ketari are safe from the Orions' weapons; the scientists are still asleep.", "order");
     if (o) { const how = "Partly: the Orion phasers recovered and the Ketari left their history, but the scientists still asleep."; S.orders = S.orders.filter((x) => x !== o); S.done++; S.commendations += 1; S.streak = 0; recordOrder(S, o, "partly", how); missionReport(S, o, "partly", how, ["+8 science", "+1 commendation", "Only partly carried out: the run of orders in a row starts again."]); }
   } else {
@@ -289,6 +296,7 @@ export function arcTick(S) {
     A.stage = "orbit";
     const o = arcOrder(S); if (o) o.deadline = 999;
     alog(S, "Standard orbit over Corvan II. Passive sensors show nothing in orbit but the moon's shadow, and the outpost doesn't answer hails. The ruins are two kilometers from the Ketari village. A Sensor sweep would check the space around the planet; sweeping the ruins would tell you what happened below (the Here tab).", "order");
+    astory(S, "Standard orbit", "Standard orbit over Corvan II. A green and amber world below, ochre plains and dark forest; on the edge of a river, a scatter of thatched roofs and cook-smoke where the Ketari live. Two kilometres from the village, a grey ruin of stone and buried metal, a city older than anyone's memory. Beside it, very small, the outpost's prefabricated domes.\n\nThe outpost doesn't answer. Rrinn tries every frequency, and then tries them again. Nothing. On passive sensors there's nothing in orbit either, just the planet's single moon and the long shadow it throws.\n\nsh'Vari folds her arms. \"An Orion raider was reported in the sector,\" she says. \"If it's still here, it could be anywhere behind that moon. An active sweep would find it.\" Sevek is looking at the ruins. \"And a sweep of the ruins would tell us what happened below,\" he says. \"Though I suspect that whatever is down there will notice us looking.\"");
   }
 }
 export function arcArrive(S) { arcTick(S); }
@@ -296,7 +304,7 @@ export function arcArrive(S) { arcTick(S); }
 function startPull(S) {
   const A = S.arc; if (A.stage !== "orbit") return;
   A.stage = "pull";
-  astory(S, "The pull", "The moment the Pelion's sensors sweep the ruins, the lights flicker: something below is drawing on the ship's power, and the orbit begins to decay. The Countdown has started (6): it fills a segment every hour the Pelion stays in orbit, and with each failure on the surface. When it fills, the Pelion has to break orbit. Below, the outpost is dark: choose an away team and beam them down to find out what happened.");
+  astory(S, "The pull", "The moment the sweep touches the ruins, the lights on the bridge flicker. Then the deck shudders, faintly, and Grath's voice comes over the comm, sharp with surprise. \"Captain! Something's drawing power. Through the deflector, through the sensor array, through every system that touched that sweep. It's pulling on us.\"\n\nThe helm alarm chimes. sh'Vari reads it off, flat. \"Our orbit is decaying. Slowly. But it's decaying.\"\n\nThe Pelion can stay in orbit for a while, with the drain growing every hour, and with every failure on the surface. When it's too much, she'll have to break orbit or fall. Below, the outpost's domes are dark. Somebody has to go down and find out what happened, and they'll have to be quick." + "\n\n(The Countdown has started: 6 segments. It fills one every hour the Pelion stays in orbit, and one with each failure on the surface. Choose an away team and beam them down.)");
 }
 /** Beam an away team down (2 to 4 officers fit for duty), or beam them all back up (ids empty). Takes no action. */
 export function beamDown(S, ids) {
@@ -306,6 +314,7 @@ export function beamDown(S, ids) {
   ids = [...new Set(ids)].filter((id) => available(S, id));
   if (ids.length < 2 || ids.length > 4) return { error: "An away team is two to four officers fit for duty." };
   A.team = ids; A.pos = Object.fromEntries(ids.map((id) => [id, "outpost"]));
+  astory(S, "Energize", "The transporter room hums. On the pad: {team}. Rrinn is among them{rrinn}. The chief of the watch looks at the captain, and the captain nods.\n\nThey materialize in the outpost's main dome, in the dark. Hand-lights snap on. Chairs, workbenches, a half-eaten meal on a table, a coat over the back of a chair. Everything as if the people who lived here had stepped out for a moment, three weeks ago, and simply not come back. It's very quiet. Somewhere in the ruins beyond the dome wall, very faint, something is humming.".replace("{team}", ids.map((id) => officer(id).name).join(", ")).replace("Rrinn is among them{rrinn}. ", ids.includes("rrinn") ? "Rrinn is among them, her ears flat, her face very still. " : "Rrinn, at her station on the bridge, watches them go. "));
   alog(S, `Away team: ${ids.map((id) => officer(id).name).join(", ")} beam down to the outpost on Corvan II. ${CREW.filter((c) => !ids.includes(c.id)).map((c) => c.short).join(", ")} stay${CREW.length - ids.length === 1 ? "s" : ""} aboard.`, "move");
   return { ok: true };
 }
@@ -321,7 +330,7 @@ export function arcTurn(S, hours = 0) {
   const e = raider(S);
   if (e && e.hidden && S.pelion.at === S.systems[S.corvan].at) {
     S.arc.raiderHours = (S.arc.raiderHours || 0) + (hours || 24);
-    if (S.arc.raiderHours >= 24) { e.hidden = false; e.seen = true; S.arc.raiderMet = true; alog(S, "Before the day is out, an Orion raider swings out from behind Corvan II's moon, where it was hiding all along, and opens fire. An active sweep would have found it.", "war"); startBattle(S, e.id, "enemy"); }
+    if (S.arc.raiderHours >= 24) { e.hidden = false; e.seen = true; S.arc.raiderMet = true; alog(S, "Before the day is out, an Orion raider swings out from behind Corvan II's moon, where it was hiding all along, and opens fire. An active sweep would have found it.", "war"); storyEvent(S, "Out of the moon's shadow", "Before the day is out, the Orion raider that has been hiding behind Corvan II's moon all along swings out of the shadow at full impulse, every weapon firing.\n\nThe first shots hit before the shields are fully up. The bridge lurches; consoles spark; someone is thrown out of their chair. \"Raider!\" Reyes shouts, already at tactical. \"Off the moon, bearing two-nine-five! They were there the whole time.\" sh'Vari, on her feet, says nothing at all, and her antennae say everything: an active sweep would have found them."); startBattle(S, e.id, "enemy"); }
   }
   const A = S.arc;
   // The drain decays the orbit each turn the Pelion stays (an hour while the away team is down); failures on the surface
@@ -349,15 +358,15 @@ export function arcEventChoose(S, id, roll) {
     log(S, o.line, o.win ? "good" : "bad");
     if (r.success) S.arc.knowPhasers = true;
     if (r.success) log(S, "Scan of the Orion raider at Corvan II: its hold is full of digging gear, and its manifest lists Starfleet-pattern phasers \"traded\" planetside. They're arming the natives.", "discovery");
-    return { roll: raw, opposed: true, won: o.win, line: o.line, text: (r.success ? "Their hold is full of digging gear, and their manifest lists Starfleet-pattern phasers \"traded\" planetside. They're arming the natives." : "Their hull scatters the scan.") };
+    return { roll: raw, opposed: true, won: o.win, line: o.line, text: (r.success ? "Sevek's scan slips past their baffles and reads them like a book: a hold full of digging gear, cutting tools, ore sacks, and a cargo manifest that lists Starfleet-pattern phasers, eleven of them, \"traded\" planetside. Reyes reads it over his shoulder and her jaw sets. \"They're arming the natives,\" she says. \"For labour. On a Prime Directive world.\"" : "The scan hits the raider's baffles and scatters into noise. Whatever they're carrying, they've gone to some trouble to hide it, which tells Sevek almost as much as seeing it would.") };
   }
   if (id === "warn") {
     const raw = roll("Communications", "hail", S.arc.scanned ? [["You know what they've done", 2]] : []);
     const o = opposed(S, raw, { name: "the Orion captain", skill: "Will", target: 10 }, officer(raw.officer)?.short || "The captain"), r = { ...raw, success: o.win };
     log(S, o.line, o.win ? "good" : "bad");
     S.event = null;
-    if (r.success) { sendHome(S, e, 6); e.goal = "home"; delete S.enemies[e.id]; log(S, "The Orion raider runs for the sector's edge.", "good"); arcTick(S); return { roll: raw, opposed: true, won: true, line: o.line, text: "\"Legitimate salvagers\" don't argue with a Heavy Cruiser. The raider runs." }; }
-    startBattle(S, e.id, "enemy"); return { roll: raw, opposed: true, won: false, line: o.line, text: "The Orion captain cuts the channel, and the raider opens fire." };
+    if (r.success) { sendHome(S, e, 6); e.goal = "home"; delete S.enemies[e.id]; log(S, "The Orion raider runs for the sector's edge.", "good"); arcTick(S); return { roll: raw, opposed: true, won: true, line: o.line, text: "The Orion captain's smile thins, and holds, and then goes out like a light. \"Of course, Captain. We were just leaving.\" The channel cuts. On the viewer the raider turns, engines flaring, and runs for the sector's edge as fast as it can go. Legitimate salvagers don't argue with a Heavy Cruiser. Reyes watches it all the way out of sensor range anyway." }; }
+    startBattle(S, e.id, "enemy"); return { roll: raw, opposed: true, won: false, line: o.line, text: "The Orion captain laughs, a short ugly sound, and leans toward the screen. \"Starfleet. You talk too much.\" The channel cuts. A heartbeat later the raider comes around the moon at full impulse with every weapon it has firing, and the bridge goes to red alert." };
   }
   if (id === "engage") { S.event = null; startBattle(S, e.id, "pelion"); return { text: "Shields up." }; }
   return {};
