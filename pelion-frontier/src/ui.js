@@ -143,7 +143,7 @@ function draw() {
     ctx.strokeStyle = h.terrain === "zone" ? "rgba(224,86,74,.35)" : "rgba(140,150,200,.14)"; ctx.lineWidth = 1; ctx.stroke();
   }
   // The Neutral Zone's label.
-  if (view.zoom > 0.5) { const p = toPixel(key(4, -RADIUS), size); ctx.fillStyle = "rgba(255,150,140,.55)"; ctx.font = "600 12px Antonio, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ROMULAN NEUTRAL ZONE", p.x, p.y + 4); ctx.textAlign = "left"; }
+  if (view.zoom > 0.5) { const p = toPixel(key(Math.floor(RADIUS / 2), -RADIUS), size); ctx.fillStyle = "rgba(255,150,140,.55)"; ctx.font = "600 12px Antonio, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ROMULAN NEUTRAL ZONE", p.x, p.y + 4); ctx.textAlign = "left"; }
   // Orders.
   for (const o of S.orders) { const { x, y } = toPixel(o.at, size), late = !o.arc && o.deadline - S.turn <= 2; ctx.strokeStyle = late ? "#e0564a" : "#f2c14e"; ctx.lineWidth = 2; ctx.setLineDash([4, 3]); hexPath(ctx, x, y, size - 3); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = late ? "#e0564a" : "#f2c14e"; ctx.font = "bold 13px system-ui, sans-serif"; ctx.fillText("!", x + size * 0.45, y - size * 0.35); }
   // Systems.

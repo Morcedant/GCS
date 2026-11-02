@@ -166,4 +166,7 @@ export const chance = (target) => target >= 16 ? ODDS[16] : target < 4 ? ODDS[4]
 export const NAMES = ["Corvan", "Tessaly", "Marrow's Reach", "Hadley", "Ilyra", "Brennus", "Okafor", "Saltire", "Veyl", "Kerrigan", "Drummond",
   "Ashkelon", "Penhallow", "Rigaud", "Thessaly", "Calloway", "Imbrium", "Zan'tor", "Sorrel", "Halcyon", "Quillon", "Vasquez", "Ostrava",
   "Delmar", "Kethis", "Nadir", "Erebus", "Tarsus", "Larkspur", "Yarrow", "Oberth", "Fennimore", "Castellan", "Rho Draconis", "Iota Pavonis",
-  "Mendez", "Aldana", "Talgorn", "Brightwater", "Usher"];
+  "Mendez", "Aldana", "Talgorn", "Brightwater", "Usher", "Corrigan", "Ashfall", "Meridian", "Tolland", "Vashti", "Eckhart",
+  "Pellucid", "Harrow", "Sable Reach", "Kestrel", "Ondine", "Marchetti", "Quorra", "Lindqvist", "Thule", "Cassia", "Varden",
+  "Holloway", "Ixion", "Bellamy", "Sunder", "Okonjo", "Peregrine", "Wexford", "Ysolde", "Carrow", "Tamsin", "Ruskin",
+  "Galloway", "Nerine", "Albrecht", "Solace", "Dunmore", "Iridia", "Fallow", "Kessan"];

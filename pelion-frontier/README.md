@@ -3,7 +3,8 @@
 A turn-based hex strategy game for the USS Pelion fan game: command the Pelion through a fifty-week tour of the
 Corvan Sector (or open command, with no end). The theme of the whole game is **the Corvan Frontier**: the Federation
 expanding into the sector against the three powers that want it closed: the Klingon Empire (east), the Romulan Star
-Empire (behind the Neutral Zone, north) and the Tholian Assembly (southeast). Solo, against the
+Empire (behind the Neutral Zone, north) and the Tholian Assembly (southeast). The sector is a hexagon of radius 11 (397
+hexes, a light-year each), with about sixty systems. Solo, against the
 other powers. An unofficial fan work inspired by *Star Trek*, for our table only (see `fan-games/README.md`).
 
 It's built from the tabletop game's own books:

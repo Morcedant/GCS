@@ -15,10 +15,10 @@ test("3d6 roll-under: 3 or 4 always succeeds, 17 or 18 always fails", () => {
   for (let i = 0; i < 2000; i++) { const r = check(S, 10); if (r.total <= 4) assert.ok(r.success); if (r.total >= 17) assert.ok(!r.success); if (r.total > 4 && r.total < 17) assert.equal(r.success, r.total <= 10); }
   assert.equal(chance(10), 0.5);
 });
-test("the sector has a starbase, three colonies, Corvan II and an Orion base", () => {
+test("the sector has a starbase, four colonies, Corvan II and an Orion base", () => {
   const S = newGame({ seed: "s" }), k = Object.values(S.systems).map((s) => s.kind);
   assert.equal(k.filter((x) => x === "starbase").length, 1);
-  assert.equal(k.filter((x) => x === "colony").length, 3);
+  assert.equal(k.filter((x) => x === "colony").length, 4);
   assert.equal(S.systems[S.corvan].name, "Corvan II");
   assert.ok(Object.values(S.enemies).some((e) => e.type === "orionBase"));
   assert.equal(S.orders[0].title, "The Silence at Corvan II");
@@ -108,7 +108,7 @@ test("Corvan II: the raider hides behind the moon until an active sweep finds it
   const p = S.pending || null, last = S.log[S.log.length - 1].text;
   assert.ok(p ? p.officer !== "rrinn" : !last.startsWith("Rrinn"));
 });
-test("the score counts", () => { const S = newGame({ seed: "sc" }); assert.equal(score(S).total, 15); });
+test("the score counts", () => { const S = newGame({ seed: "sc" }); assert.equal(score(S).total, 20); });   // four colonies safe
 test("every discovery is in the log, and trimming never drops one", async () => {
   const { log, storyEvent } = await import("../src/game.js");
   const S = newGame({ seed: "log" });
@@ -515,7 +515,7 @@ test("the Tholian Assembly: outposts in the southeast, webs that annex worlds, a
   const { aiTurn } = await import("../src/ai.js");
   const S = newGame({ seed: "tholian" });
   const out = Object.values(S.systems).filter((s) => s.kind === "tholian");
-  assert.equal(out.length, 2);
+  assert.equal(out.length, 3);
   assert.ok(tholianSpace(S, out[0].at));
   // A web-spinner goes out, spins for three weeks, and the world is Tholian territory.
   S.turn = 14; aiTurn(S);   // 14 % 9 === 5 on normal
@@ -531,8 +531,9 @@ test("the Tholian Assembly: outposts in the southeast, webs that annex worlds, a
   const n0 = Object.values(S.enemies).filter((x) => x.goal === "intercept").length;
   const step = Object.keys(S.hexes).find((k) => tholianSpace(S, k) && k !== near && Math.abs(Number(k.split(",")[0]) - Number(near.split(",")[0])) + Math.abs(Number(k.split(",")[1]) - Number(near.split(",")[1])) <= 1);
   if (step) { moveTo(S, "pelion", step); assert.equal(Object.values(S.enemies).filter((x) => x.goal === "intercept").length, n0 + 1); }
+  const lost0 = S.lostTholian || 0, cmd0 = S.command;
   annex(S, Object.values(S.systems).find((s) => s.kind === "independent"));
-  assert.equal(S.lostTholian, 1); assert.equal(S.command, 1);   // an independent world lost to the webs marks a box
+  assert.equal(S.lostTholian, lost0 + 1); assert.equal(S.command, cmd0 + 1);   // an independent world lost to the webs marks a box
 });
 test("Found a colony: a habitable world, surveyed, becomes a Federation colony", () => {
   const S = newGame({ seed: "colony" });

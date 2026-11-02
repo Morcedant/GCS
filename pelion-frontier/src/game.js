@@ -1352,8 +1352,8 @@ export function score(S) {
 }
 export function rating(total) {
   // Every officer acts each turn, so a good tour scores high: these thresholds assume it.
-  return total >= 330 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 240 ? "Commended: a fine tour, and a ship Starfleet is proud of"
-    : total >= 160 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
+  return total >= 300 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 210 ? "Commended: a fine tour, and a ship Starfleet is proud of"
+    : total >= 140 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
 }
 export function checkEnd(S) {
   if (S.over) return;

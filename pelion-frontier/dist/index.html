@@ -370,7 +370,10 @@ const chance = (target) => target >= 16 ? ODDS[16] : target < 4 ? ODDS[4] : ODDS
 const NAMES = ["Corvan", "Tessaly", "Marrow's Reach", "Hadley", "Ilyra", "Brennus", "Okafor", "Saltire", "Veyl", "Kerrigan", "Drummond",
   "Ashkelon", "Penhallow", "Rigaud", "Thessaly", "Calloway", "Imbrium", "Zan'tor", "Sorrel", "Halcyon", "Quillon", "Vasquez", "Ostrava",
   "Delmar", "Kethis", "Nadir", "Erebus", "Tarsus", "Larkspur", "Yarrow", "Oberth", "Fennimore", "Castellan", "Rho Draconis", "Iota Pavonis",
-  "Mendez", "Aldana", "Talgorn", "Brightwater", "Usher"];
+  "Mendez", "Aldana", "Talgorn", "Brightwater", "Usher", "Corrigan", "Ashfall", "Meridian", "Tolland", "Vashti", "Eckhart",
+  "Pellucid", "Harrow", "Sable Reach", "Kestrel", "Ondine", "Marchetti", "Quorra", "Lindqvist", "Thule", "Cassia", "Varden",
+  "Holloway", "Ixion", "Bellamy", "Sunder", "Okonjo", "Peregrine", "Wexford", "Ysolde", "Carrow", "Tamsin", "Ruskin",
+  "Galloway", "Nerine", "Albrecht", "Solace", "Dunmore", "Iridia", "Fallow", "Kessan"];
 
 // ---- ships.js ----
 // Ship outlines, pointing right (+x), in a box from −12 to 12. SVG path data, usable on a canvas (Path2D) or in an <svg>.
@@ -1570,7 +1573,8 @@ const KORVATH_SITES = [
 // the southeast, behind a border the Tholians draw for themselves.
 
 
-const RADIUS = 8;
+const RADIUS = 11;
+const F = RADIUS / 8;   // the map was laid out for radius 8: distances scale with it, counts with its area
 const px = (k) => toPixel(k, 1);
 const inZone = (k) => parse(k).r <= -RADIUS + 1;                 // the top two rows
 const nearZone = (k) => parse(k).r === -RADIUS + 2;
@@ -1579,11 +1583,11 @@ function makeSector(seed) {
   const R = makeRng(seed);
   const hexes = {};
   for (const k of hexagon(RADIUS)) hexes[k] = { terrain: inZone(k) ? "zone" : "space" };
-  // Nebulae: three clouds, away from the zone.
+  // Nebulae: five clouds, away from the zone.
   const open = Object.keys(hexes).filter((k) => !inZone(k));
-  for (let n = 0; n < 3; n++) {
+  for (let n = 0; n < 5; n++) {
     let c = R.pick(open);
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 6; i++) {
       if (hexes[c] && !inZone(c)) hexes[c].terrain = "nebula";
       const { q, r } = parse(c), d = [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]][R.int(6)];
       c = key(q + d[0], r + d[1]);
@@ -1592,7 +1596,7 @@ function makeSector(seed) {
   const systems = {}, sysAt = {};
   const used = [];
   const free = (k, gap = 2) => hexes[k] && !inZone(k) && !sysAt[k] && used.every((u) => distance(u, k) >= gap);
-  let names = [...NAMES];
+  let names = NAMES.filter((n) => n !== "Corvan");   // the name is Corvan II's alone
   const take = () => { const i = R.int(names.length); const n = names[i]; names.splice(i, 1); return n; };
   const place = (k, kind, extra = {}) => {
     const id = "s" + (Object.keys(systems).length + 1);
@@ -1606,28 +1610,28 @@ function makeSector(seed) {
   };
   const P = (k) => px(k);
   // The starbase, southwest; colonies around it.
-  const sb = pickWhere((k) => P(k).x < -6 && P(k).y > 4.5 && distance(k, "0,0") >= 6 && distance(k, "0,0") <= 7);
+  const sb = pickWhere((k) => P(k).x < -6 * F && P(k).y > 4.5 * F && distance(k, "0,0") >= RADIUS - 2 && distance(k, "0,0") <= RADIUS - 1);
   place(sb, "starbase", { name: "Starbase 23", surveyed: true });
-  for (let i = 0; i < 3; i++) place(pickWhere((k) => distance(k, sb) >= 2 && distance(k, sb) <= 5 && P(k).x < 0), "colony", { surveyed: true });
+  for (let i = 0; i < 4; i++) place(pickWhere((k) => distance(k, sb) >= 2 && distance(k, sb) <= 6 && P(k).x < 0), "colony", { surveyed: true });
   // Klingon outposts on the eastern edge.
-  for (let i = 0; i < 2; i++) place(pickWhere((k) => P(k).x > 8 && Math.abs(P(k).y) < 9, 4), "klingon", { surveyed: true });
+  for (let i = 0; i < 3; i++) place(pickWhere((k) => P(k).x > 8 * F && Math.abs(P(k).y) < 6 * F, 3), "klingon", { surveyed: true });
   // Corvan II: the first mission, a few days out from the starbase.
   const cv = pickWhere((k) => distance(k, sb) >= 5 && distance(k, sb) <= 7 && P(k).x < 4 && P(k).y > -6);
   names = names.filter((n) => n !== "Corvan");
   place(cv, "prewarp", { name: "Corvan II", ruinsToo: true });
   // Independent worlds in the middle band, where the Federation and the Empire compete for them.
-  for (let i = 0; i < 6; i++) place(pickWhere((k) => P(k).x > -6 && P(k).x < 10 && distance(k, sb) >= 5, 3), "independent", { surveyed: true, accord: i < 2 ? 1 : 0 });
-  for (let i = 0; i < 3; i++) place(pickWhere(() => true), "prewarp");
-  for (let i = 0; i < 5; i++) place(pickWhere(() => true), "anomaly", { clock: 0, need: 3 + R.int(3) });
-  for (let i = 0; i < 3; i++) place(pickWhere(() => true), "ruins", { clock: 0, need: 4 + R.int(2) });
+  for (let i = 0; i < 9; i++) place(pickWhere((k) => P(k).x > -6 * F && P(k).x < 10 * F && distance(k, sb) >= 5, 3), "independent", { surveyed: true, accord: i < 3 ? 1 : 0 });
+  for (let i = 0; i < 5; i++) place(pickWhere(() => true), "prewarp");
+  for (let i = 0; i < 8; i++) place(pickWhere(() => true), "anomaly", { clock: 0, need: 3 + R.int(3) });
+  for (let i = 0; i < 5; i++) place(pickWhere(() => true), "ruins", { clock: 0, need: 4 + R.int(2) });
   // The Orion base: far from the starbase, in a nebula if one is free.
-  const neb = open.filter((k) => hexes[k].terrain === "nebula" && free(k) && distance(k, sb) >= 7);
-  place(neb.length ? R.pick(neb) : pickWhere((k) => distance(k, sb) >= 8), "orionBase", { baseHull: 0, baseShields: 0 });
-  for (let i = 0; i < 9; i++) place(pickWhere(() => true), "empty");
-  // The Tholian Assembly: two outposts on the southeastern rim.
-  // The free hexes furthest to the southeast (east of south), at least three apart.
-  for (let i = 0; i < 2; i++) {
-    const se = open.filter((k) => free(k, 1) && P(k).x > 0 && P(k).y > 0).sort((a, b) => (P(b).x + 1.3 * P(b).y) - (P(a).x + 1.3 * P(a).y));
+  const neb = open.filter((k) => hexes[k].terrain === "nebula" && free(k) && distance(k, sb) >= 9);
+  place(neb.length ? R.pick(neb) : pickWhere((k) => distance(k, sb) >= 10), "orionBase", { baseHull: 0, baseShields: 0 });
+  for (let i = 0; i < 15; i++) place(pickWhere(() => true), "empty");
+  // The Tholian Assembly: three outposts on the southeastern rim, the free hexes furthest that way, three or more apart.
+  for (let i = 0; i < 3; i++) {
+    const jit = {}, sc = (k) => P(k).x + 1.3 * P(k).y + (jit[k] ??= R.next() * 4);   // a little of the seed in where they sit
+    const se = open.filter((k) => free(k, 1) && P(k).x > 0 && P(k).y > 0).sort((a, b) => sc(b) - sc(a));
     const k = se.find((x) => used.filter((u) => systems[sysAt[u]].kind === "tholian").every((u) => distance(u, x) >= 3)) || se[0];
     if (k) place(k, "tholian", { surveyed: true });
   }
@@ -2989,8 +2993,8 @@ function score(S) {
 }
 function rating(total) {
   // Every officer acts each turn, so a good tour scores high: these thresholds assume it.
-  return total >= 330 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 240 ? "Commended: a fine tour, and a ship Starfleet is proud of"
-    : total >= 160 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
+  return total >= 300 ? "Legendary: the Corvan Sector will tell stories about the Pelion" : total >= 210 ? "Commended: a fine tour, and a ship Starfleet is proud of"
+    : total >= 140 ? "Satisfactory: the sector is no worse than you found it" : "Recalled: Starfleet Command has questions";
 }
 function checkEnd(S) {
   if (S.over) return;
@@ -4064,7 +4068,7 @@ function draw() {
     ctx.strokeStyle = h.terrain === "zone" ? "rgba(224,86,74,.35)" : "rgba(140,150,200,.14)"; ctx.lineWidth = 1; ctx.stroke();
   }
   // The Neutral Zone's label.
-  if (view.zoom > 0.5) { const p = toPixel(key(4, -RADIUS), size); ctx.fillStyle = "rgba(255,150,140,.55)"; ctx.font = "600 12px Antonio, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ROMULAN NEUTRAL ZONE", p.x, p.y + 4); ctx.textAlign = "left"; }
+  if (view.zoom > 0.5) { const p = toPixel(key(Math.floor(RADIUS / 2), -RADIUS), size); ctx.fillStyle = "rgba(255,150,140,.55)"; ctx.font = "600 12px Antonio, sans-serif"; ctx.textAlign = "center"; ctx.fillText("ROMULAN NEUTRAL ZONE", p.x, p.y + 4); ctx.textAlign = "left"; }
   // Orders.
   for (const o of S.orders) { const { x, y } = toPixel(o.at, size), late = !o.arc && o.deadline - S.turn <= 2; ctx.strokeStyle = late ? "#e0564a" : "#f2c14e"; ctx.lineWidth = 2; ctx.setLineDash([4, 3]); hexPath(ctx, x, y, size - 3); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = late ? "#e0564a" : "#f2c14e"; ctx.font = "bold 13px system-ui, sans-serif"; ctx.fillText("!", x + size * 0.45, y - size * 0.35); }
   // Systems.
