@@ -48,7 +48,7 @@ export const POWERS = {
   federation: { name: "Federation", color: "#6fb4ff" },
   klingon: { name: "Klingon Empire", color: "#e0564a" },
   romulan: { name: "Romulan Star Empire", color: "#59c48a" },
-  orion: { name: "Orion Syndicate", color: "#e6a640" },
+  orion: { name: "Orion pirates", color: "#e6a640" },
   tholian: { name: "Tholian Assembly", color: "#ff8fb8" },
   independent: { name: "Independent", color: "#c9c3e8" },
 };

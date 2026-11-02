@@ -969,14 +969,14 @@ function startNextCampaign(S) {
   (S.campaignsDone = S.campaignsDone || []).push({ id: campId(C), title: campaignDef(S).title, over: C.over, threads: C.threads.length, rival: C.korvath || 0, threadList: C.threads, beatText: C.beatText, beats: C.beats });
   S.campaign = { id: next.id, threads: [], beats: [], finale: false, over: null, started: S.turn };
   (S.unlocked = S.unlocked || []).push(next.id);
-  if (!S.unlocked.includes("syndicate")) S.unlocked.push("syndicate");   // the frontier's other troubles: the Syndicate's work
+  if (!S.unlocked.includes("syndicate")) S.unlocked.push("syndicate");   // the frontier's other trouble: Orion pirates and raiders
   campaignBeat(S, 0);
   const types = SERIES_MISSIONS.filter((m) => m.campaign === next.id).map((m) => m.text);
   log(S, `A new campaign: ${next.title}. New kinds of orders from Starfleet: ${types.join("; ")}.`, "order");
 }
 /**
  * The rival of a campaign after the first: every few weeks it gains ground on its own (the cold reaches another place, the
- * Syndicate takes another convoy), and each thread the Pelion turns up sets it back two weeks. If it reaches the finale
+ * Tholians enclose another world), and each thread the Pelion turns up sets it back two weeks. If it reaches the finale
  * first, the finale begins with it ahead.
  */
 function rivalTick(S, D) {
@@ -1114,7 +1114,7 @@ export function missionChoices(S, ev) {
 }
 const FX_TEXT = { commendations: (n) => `${n > 0 ? "+" : ""}${n} commendation${Math.abs(n) === 1 ? "" : "s"}`, science: (n) => `+${n} science`, supplies: (n) => `+${n} supplies`,
   accord: (n, w) => `accord with ${w} ${n > 0 ? "+" : "−"}${Math.abs(n)}`, command: () => "a Starfleet Command box marked", tension: (n) => `tension with the Klingon Empire ${n > 0 ? "up" : "down"} ${Math.abs(n)}`, romulan: () => "the Romulans answer: a bird-of-prey crosses the Neutral Zone to strike", refit: (n) => `${REFITS[n] ? REFITS[n].name : n} fitted to the Pelion`, delay: (n) => `every other order's deadline ${n} weeks closer`,
-  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the Syndicate answers: a raider strikes a Federation world", tholian: () => "the Assembly answers: a Tholian vessel makes for a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
+  heal: (n, w) => `${w}'s harm −${n}`, dilithium: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} dilithium`, antimatter: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} antimatter`, spares: (n) => `${n > 0 ? "+" : "−"}${Math.abs(n)} spare parts`, orion: () => "the pirates answer: a raider strikes a Federation world", base: () => "the hidden pirate base found and charted", tholian: () => "the Assembly answers: a Tholian vessel makes for a Federation world", inverter: (n) => `a cloak inverter fitted to the Pelion: +2 to sensor sweeps${n >= 2 ? ", and sweeps reach 5 light-years" : ""}`, hurt: () => "a crew member hurt", sensors: () => "the sensors damaged" };
 export function chooseMission(S, orderId, optId) {
   const o = S.orders.find((x) => x.id === orderId), st = storyOf(o), opt = st && st.choice.options.find((x) => x.id === optId && (!x.needs || S.pelion.refits.inverter));
   if (!o || !opt) return { error: "No such choice." };
@@ -1127,6 +1127,7 @@ export function chooseMission(S, orderId, optId) {
     else if (k === "dilithium" || k === "antimatter" || k === "spares") addStore(S, k, n);
     else if (k === "orion") orionReprisal(S, o.title);
     else if (k === "tholian") tholianReprisal(S, o.title);
+    else if (k === "base") { const b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base); if (b && !b.found) { b.found = true; const sy = sysAt(S, b.at); if (sy) { sy.surveyed = true; S.seenSys[sy.id] = true; } log(S, `The Orion pirate base is found: ${sy ? `hidden at ${sy.name}` : "in the dust"}. It's on the charts now.`, "discovery"); } else if (!b) { lines.push("the pirate base is already gone"); continue; } }
     else if (k === "release") { const n2 = releaseWebs(S, n); lines.push(`${n2} world${n2 === 1 ? "" : "s"} freed from the Tholian webs`); continue; }
     else if (k === "accord" && s && ["independent", "member"].includes(s.kind)) { s.accord = Math.max(-5, Math.min(5, (s.accord || 0) + n)); if (s.accord >= 5 && s.kind === "independent") join(S, s); }
     else if (k === "accord") continue;
@@ -1272,14 +1273,14 @@ export function newOrder(S) {
   activateOrder(S, o);
   return o;
 }
-/** The Syndicate answers an insult: an Orion raider strikes a Federation world, from its base or from the sector's edge. */
+/** The Orion pirates answer an insult: a raider strikes a Federation world, from its base or from the sector's edge. */
 export function orionReprisal(S, why) {
   const targets = Object.values(S.systems).filter((s) => s.kind === "colony" || s.kind === "member");
   if (!targets.length) return;
   const tgt = pick(S, targets), b = Object.values(S.enemies).find((e) => ENEMIES[e.type].base);
   const edge = Object.keys(S.hexes).filter((k) => !inZone(k)).sort((a, c) => distance(c, tgt.at) - distance(a, tgt.at))[0];
   spawnEnemy(S, "orion", b ? b.at : edge, { goal: "raid", target: tgt.at, hostile: true });
-  log(S, `Intelligence: after ${why}, an Orion raider has left ${b ? "the pirate base" : "the sector's edge"}, bound for ${tgt.name}. The Syndicate wants it known that it remembers.`, "war");
+  log(S, `Intelligence: after ${why}, an Orion raider has left ${b ? "the pirate base" : "the sector's edge"}, bound for ${tgt.name}. The pirates want it known that they remember.`, "war");
 }
 export const closestOutpost = (S, at) => Object.values(S.systems).filter((s) => s.kind === "klingon").sort((a, b) => distance(a.at, at) - distance(b.at, at))[0];
 export function harmWorld(S, s, n, why) {

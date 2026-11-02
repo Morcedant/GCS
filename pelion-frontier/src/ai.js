@@ -1,7 +1,7 @@
 // The other powers in the Corvan Sector, each turn.
 //  - The Klingon Empire: a cold war. Most of its ships court the independent worlds (lowering their accord); some
 //    raid, more as tension rises. Firing first on one that hasn't fired is an incident.
-//  - The Orion Syndicate: raiders from a hidden base strike colonies and member worlds, steal supplies and run.
+//  - Orion pirates: raiders from a hidden base strike colonies and member worlds, steal supplies and run.
 //  - The Romulan Star Empire: now and then a cloaked bird-of-prey crosses the Neutral Zone to strike, and goes home.
 //  - The Tholian Assembly: every few weeks a Tholian vessel goes out from its outposts and spins a web around the
 //    nearest world it wants; three weeks of spinning and the world is Tholian territory. Hail it or fight it off.

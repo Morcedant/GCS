@@ -40,8 +40,9 @@ It's built from the tabletop game's own books:
 - **Campaigns, one for each rival:** Watchers of the Void (the Klingons' House Kor'vath) runs from Corvan II; then
   *The Cold Fire* (a Romulan weapon killing the sector's dilithium) and *The Web* (the Tholian line, and what it
   fences), each with its own rival, beats, finale and five new kinds of orders that stay in Starfleet's book
-  (`src/campaigns.js`). The Orion Syndicate's five order types join Starfleet's book with the second campaign, as
-  the frontier's ordinary trouble. In a tour, a new campaign starts only
+  (`src/campaigns.js`). The Orions stay pirates and raiders, not a campaign: a hidden base, raids on convoys
+  and worlds, and five order types (convoys, ransoms, a leak at the starbase, a captain who wants out, a blockade)
+  that join Starfleet's book with the second campaign; some of them find the pirate base. In a tour, a new campaign starts only
   with twelve weeks to go; at the tour's end, *Keep command* turns the game into open command.
 - **Starfleet Command track:** five boxes and you're relieved. Incidents (firing first on a Klingon ship), the
   Prime Directive, the Neutral Zone, lost colonies and failed orders mark it; carried-out orders clear it.
