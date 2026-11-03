@@ -27,7 +27,7 @@ const U = () => (unit === "pelion" ? S.pelion : S.support[unit]) || (unit = "pel
 // ---------- start ----------
 function debugHook() {
   try { if (!/[?&]debug\b/.test(location.search)) return; } catch { return; }
-  window.__pelion = { state: () => S, render: () => renderAll(), screenOf: (hex) => { const c = $("map"), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
+  window.__pelion = { state: () => S, render: () => renderAll(), after: () => after(), screenOf: (hex) => { const c = $("map"), r = c.getBoundingClientRect(), p = toPixel(hex, view.size); return { x: r.left + r.width / 2 + (p.x - view.x) * view.zoom, y: r.top + r.height / 2 + (p.y - view.y) * view.zoom }; }, centerOn: (h) => { centerOn(h); draw(); } };
 }
 function boot() { bindMap(); bindChrome(); debugHook(); showStarter(!!store.get()); }
 function startGame(state) {
@@ -102,7 +102,15 @@ function goTo(hex, warp) {
   if (r.error) { toast(r.error, true); return; }
   selHex = dest === hex ? hex : selHex; lastResult = null;
   if (dest !== hex) { selHex = hex; toast(`Under way, ${navBearing(S, U().at, hex).text} from the bow: you'll get there next turn or after.`); }
+  else { tab = "here"; showOptionsOnPhone(); }
   after();
+}
+/** On a phone the panel sits below the map: on arriving somewhere with something to do, bring it into view. */
+function showOptionsOnPhone() {
+  try {
+    if (!matchMedia("(max-width: 820px)").matches || !actionsFor(S, unit).some((a) => !a.why && a.id !== "sweep")) return;
+    setTimeout(() => document.querySelector(".side").scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+  } catch {}
 }
 /** A ship's outline on the map: its shape, turned and scaled, stroked in its color over a faint fill. */
 const SHIP_PATHS = {};
