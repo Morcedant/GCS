@@ -17,3 +17,4 @@ writeFileSync(new URL("dist/index.html", here), page);
 // A standalone copy with its own document skeleton, for a website or opening from disk.
 writeFileSync(new URL("dist/play.html", here), `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>\n${page}\n</body></html>\n`);
 console.log(`wrote dist/index.html (${Math.round(page.length / 1024)} KB)`);
+await import("./tokens.mjs");   // the printable ship tokens, from the same outlines

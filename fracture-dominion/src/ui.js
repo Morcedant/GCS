@@ -1,6 +1,6 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES } from "./data.js";
 import { newGame, endTurn, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto } from "./game.js";
@@ -123,6 +123,20 @@ function territory() {
   }
   return own;
 }
+// ---------- ship outlines ----------
+const SHIP_PATHS = {};
+/** The biggest ship in a fleet: what the map draws for it. */
+const flagship = (f) => f.ships.reduce((a, x) => (!a || SHIPS[x.type].cost > SHIPS[a].cost ? x.type : a), null) || "frigate";
+function drawShip(ctx, kind, x, y, angle, scale, color, ring) {
+  const p = SHIP_PATHS[kind] || (SHIP_PATHS[kind] = new Path2D(SHIP_SHAPES[kind] || SHIP_SHAPES.frigate));
+  ctx.save(); ctx.translate(x, y); ctx.rotate(angle); ctx.scale(scale, scale);
+  ctx.lineJoin = "round"; ctx.lineWidth = (ring ? 3.6 : 2.8) / scale; ctx.strokeStyle = ring || "rgba(3,5,10,.85)"; ctx.stroke(p);
+  ctx.globalAlpha = 0.35; ctx.fillStyle = color; ctx.fill(p); ctx.globalAlpha = 1;
+  ctx.lineWidth = 1.4 / scale; ctx.strokeStyle = color; ctx.stroke(p);
+  ctx.restore();
+}
+/** The same outline as a little SVG, for the panels. */
+const shipSVG = (kind, color, px = 26) => `<svg width="${px}" height="${px}" viewBox="-13.5 -13.5 27 27" style="vertical-align:middle;flex:none" aria-hidden="true"><path d="${SHIP_SHAPES[kind]}" fill="${color}" fill-opacity=".25" stroke="${color}" stroke-width=".9" stroke-linejoin="round"/></svg>`;
 function hexPath(ctx, cx, cy, r) {
   ctx.beginPath();
   for (let i = 0; i < 6; i++) { const a = (Math.PI / 180) * (60 * i - 30); const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
@@ -211,11 +225,13 @@ function draw() {
   for (const [hex, list] of Object.entries(byHex)) {
     const { x, y } = toPixel(hex, size);
     list.forEach((f, i) => {
-      const fx = x - 10 + i * 9, fy = y - 14;
+      const fx = x - 11 + i * 13, fy = y - 15;
       const war = f.owner !== me.id && atWar(S, me.id, f.owner);
-      ctx.fillStyle = colorOf(f.owner); ctx.strokeStyle = sel && sel.id === f.id ? "#fff6b0" : war ? "#ff6b5b" : "rgba(0,0,0,.7)"; ctx.lineWidth = sel && sel.id === f.id ? 2.5 : 1.5;
-      ctx.beginPath(); ctx.moveTo(fx + 8, fy); ctx.lineTo(fx - 4, fy - 6); ctx.lineTo(fx - 1, fy); ctx.lineTo(fx - 4, fy + 6); ctx.closePath(); ctx.fill(); ctx.stroke();
-      if (f.ships.length > 1 && view.zoom > 0.5) { ctx.fillStyle = "#fff"; ctx.font = "bold 9px system-ui, sans-serif"; ctx.fillText(String(f.ships.length), fx + 8, fy - 4); }
+      // The fleet's outline: its biggest ship, pointing where it's going.
+      const ring = sel && sel.id === f.id ? "#fff6b0" : war ? "#ff6b5b" : null;
+      const to = f.path.length ? toPixel(f.path[0].hex, size) : null, angle = to ? Math.atan2(to.y - y, to.x - x) : 0;
+      drawShip(ctx, flagship(f), fx, fy, angle, 0.62, colorOf(f.owner), ring);
+      if (f.ships.length > 1 && view.zoom > 0.5) { ctx.fillStyle = "#fff"; ctx.font = "bold 9px system-ui, sans-serif"; ctx.fillText(String(f.ships.length), fx + 7, fy - 6); }
     });
   }
   // Hover and selection rings.
@@ -271,7 +287,7 @@ function systemHTML() {
     h += `<ol class="queue">${c.queue.map((q, i) => `<li><span>${esc(q.name)}${q.exotics ? ` <i class="exo">${q.exotics}◆</i>` : ""}</span>${bar(q.progress, q.cost)}<span class="small">${Math.floor(q.progress)}/${q.cost}${i === 0 ? ` · ${y.ind ? Math.max(1, Math.ceil((q.cost - q.progress) / y.ind)) + "t" : "—"}` : ""}</span><button class="x" data-deq="${i}" title="Remove">×</button></li>`).join("")}</ol>`;
     if (c.queue.length) { const rc = rushCost(S, sys.id); h += `<button class="btn small" data-rush ${me.credits < rc ? "disabled" : ""}>Rush ${esc(c.queue[0].name)} for ${rc} credits</button>`; }
     const opts = buildOptions(S, sys);
-    h += `<h3>Add to the queue</h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text : BUILDINGS[o.id].text)}"><b>${esc(o.name)}</b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}</span></button>`).join("")}</div>`;
+    h += `<h3>Add to the queue</h3><div class="opts">${opts.map((o) => `<button class="opt" data-build="${o.kind}:${o.id}" title="${esc(o.kind === "ship" ? SHIPS[o.id].text : BUILDINGS[o.id].text)}"><b>${o.kind === "ship" ? shipSVG(o.id, player(S).color, 18) + " " : ""}${esc(o.name)}</b><span>${o.cost}${o.exotics ? ` + ${o.exotics}◆` : ""}</span></button>`).join("")}</div>`;
     if (!c.buildings.shipyard) h += `<p class="small muted">Build a Shipyard here to build ships.</p>`;
   }
   const fl = fleetsAt(S, sys.at).filter((f) => f.owner === me.id || seen);
@@ -288,7 +304,7 @@ function fleetHTML() {
   const mine = f.owner === me.id, F = faction(S, f.owner);
   const sid = S.sysAt[f.at], sys = sid && S.systems[sid];
   let h = `<h2><span class="dot" style="background:${F.color}"></span>${mine ? "Your fleet" : esc(F.name)}</h2><p class="muted">${sys ? `At ${esc(sys.name)}` : "In deep space"}${S.hexes[f.at].terrain === "nebula" ? ", inside a nebula" : ""}. Speed ${fleetSpeed(S, f)}.</p>`;
-  h += `<ul class="ships">${f.ships.map((x) => { const st = shipStats(S, f.owner, x.type); return `<li><b>${esc(st.name)}</b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg</span>` : ""}${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")}<span class="small">${x.hull}/${st.hull}</span></li>`; }).join("")}</ul>`;
+  h += `<ul class="ships">${f.ships.map((x) => { const st = shipStats(S, f.owner, x.type); return `<li><b>${shipSVG(x.type, F.color, 22)} ${esc(st.name)}</b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg</span>` : ""}${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")}<span class="small">${x.hull}/${st.hull}</span></li>`; }).join("")}</ul>`;
   if (!mine) return h + (atWar(S, me.id, f.owner) ? `<p class="bad">At war with you.</p>` : "");
   if (armed(f)) {
     const ok = inSupply(S, f), st = STANCES[f.stance] || STANCES.balanced;
@@ -450,7 +466,7 @@ function empireHTML() {
     ${focusHTML()}${protosHTML()}
     <h3>Worlds (${cols.length})</h3><table class="tbl"><tr><th>World</th><th>Pop</th><th>Ind</th><th>Sci</th><th>Building</th></tr>
     ${cols.map((sys) => { const y = yields(S, sys); return `<tr data-selsys="${sys.id}"><td>${sys.colony.capital ? "★ " : ""}${esc(sys.name)}${sys.colony.kind === "outpost" ? " <i>(outpost)</i>" : ""}</td><td>${sys.colony.pop || "–"}</td><td>${fmt(y.ind)}</td><td>${fmt(y.sci)}</td><td>${esc(sys.colony.queue[0] ? sys.colony.queue[0].name : sys.colony.kind === "colony" ? "—" : "")}</td></tr>`; }).join("")}</table>
-    <h3>Fleets (${fleetsOf(S, me.id).length})</h3>${fleetsOf(S, me.id).map((f) => `<button class="row" data-selfleet="${f.id}">${esc(fleetName(f))}<span class="small muted">${f.path.length ? " · moving" : " · idle"}</span></button>`).join("")}
+    <h3>Fleets (${fleetsOf(S, me.id).length})</h3>${fleetsOf(S, me.id).map((f) => `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}<span class="small muted">${f.path.length ? " · moving" : " · idle"}</span></button>`).join("")}
     <h3>Rivals</h3><table class="tbl"><tr><th>Faction</th><th>Worlds</th><th>Score</th></tr>${S.factions.slice(1).map((F) => `<tr><td><span class="dot" style="background:${F.color}"></span>${me.met[F.id] ? esc(F.name) : "Unknown"}${F.alive ? "" : " †"}</td><td>${me.met[F.id] ? coloniesOf(S, F.id).length : "?"}</td><td>${me.met[F.id] ? score(S, F.id) : "?"}</td></tr>`).join("")}</table>`;
   return h;
 }
@@ -846,6 +862,7 @@ function showMenu() {
     <button class="btn" id="m-guide">The starter guide</button>
     <button class="btn" id="m-guide-go">${guideOn() ? "Restart" : "Start"} the guide</button>
     <button class="btn" id="m-steps">${S && S.tutorial && S.tutorial.on ? "Hide" : "Show"} the First steps checklist</button>
+    <a class="btn" href="tokens.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Printable ship tokens</a>
     <button class="btn" id="m-export">Save code (copy)</button>
     <button class="btn" id="m-load">Load a saved game</button>
     ${S && S.mode === "open" && !S.winner ? `<button class="btn" id="m-retire">Retire: end the game here</button>` : ""}

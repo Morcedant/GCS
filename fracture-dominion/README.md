@@ -29,12 +29,15 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **The guide:** a first game, step by step: a coach card walks a new player through the first turns (research,
   building, the scout, a second colony, ending a turn, the ways to win, directives and campaigns, Focus, stances and
   supply), rings what to use next and moves on by itself. On by default for a first game; the menu restarts it.
+- **Ship outlines:** each of the seven ships has its own outline, on the map (a fleet shows its biggest ship, pointing
+  where it's going), in the panels, and on a printable token sheet (`tokens.mjs` writes `dist/tokens.html`; the
+  menu links to it).
 
 ## Files
 
 - `src/hex.js` hex maths and the seeded random generator; `src/data.js` the numbers; `src/galaxy.js` the map;
   `src/game.js` the rules (pure functions over one JSON state); `src/orders.js` directives, campaigns and prototypes; `src/ai.js` the computer factions; `src/ui.js` the page.
-- `index.html` the page's markup and styles; `build.mjs` inlines the modules into `dist/index.html` (for an artifact)
+- `index.html` the page's markup and styles; `tokens.mjs` the printable ship tokens; `build.mjs` inlines the modules into `dist/index.html` (for an artifact)
   and `dist/play.html` (standalone; the website copies it to `/dominion/`).
 
 ## Commands

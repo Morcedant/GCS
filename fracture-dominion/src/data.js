@@ -51,6 +51,18 @@ export const SHIPS = {
   dreadnought: { name: "Dreadnought", cost: 180, exotics: 3, upkeep: 4, speed: 2, hull: 8, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
 };
 
+// Ship outlines, bow pointing right (+x), in a box from −12 to 12: SVG path data, for the map (a canvas Path2D), the
+// page and the printable token sheet (tokens.mjs).
+export const SHIP_SHAPES = {
+  scout: "M12 0 L-6 -3.5 L-3 0 L-6 3.5 Z M-3 0 L-11 0 M3 -1.6 L7 -6.5 M3 1.6 L7 6.5",
+  colony: "M10 0 Q10 -6 0 -6 L-8 -6 Q-11 -6 -11 0 Q-11 6 -8 6 L0 6 Q10 6 10 0 Z M-4 -6 L-4 6 M2 -6 L2 6 M-11 -3 L-13 -3 M-11 3 L-13 3",
+  outpost: "M9 -4 L9 4 L-9 4 L-9 -4 Z M9 0 L12 0 M-2 -4 L-2 -8 L2 -8 L2 -4 M0 -8 L0 -11.5 M-9 -1.5 L-12 -1.5 M-9 1.5 L-12 1.5",
+  frigate: "M12 0 L-7 -5 L-10 -8.5 L-8 -3 L-8 3 L-10 8.5 L-7 5 Z M3 -1.8 L-4 -1.8 M3 1.8 L-4 1.8",
+  transport: "M11 0 L6 -5 L-9 -5 L-9 5 L6 5 Z M-9 -3 L-12 -3 L-12 3 L-9 3 M-3 -5 L-3 -8 L1 -8 L1 -5 M-3 5 L-3 8 L1 8 L1 5",
+  cruiser: "M12 0 L6 -3 L-2 -3 L-6 -9.5 L-9 -9.5 L-8 -3 L-11 -3 L-11 3 L-8 3 L-9 9.5 L-6 9.5 L-2 3 L6 3 Z M6 0 L-3 0",
+  dreadnought: "M12 -5 L12 5 L6 5 L4 8.5 L-10 8.5 L-12 4 L-12 -4 L-10 -8.5 L4 -8.5 L6 -5 Z M-12 -2 L-13.5 -2 M-12 2 L-13.5 2 M4 -8.5 L4 8.5 M-4 -8.5 L-4 8.5 M12 0 L6 0",
+};
+
 // Research: three fields. cost in science; needs: earlier techs.
 export const TECHS = [
   { id: "sensors", name: "Deep sensors", field: "Physics", cost: 150, needs: [], text: "+1 sensor range for ships and worlds." },
