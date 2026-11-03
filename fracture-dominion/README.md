@@ -26,6 +26,9 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   lances, ablative plating, long-range scanners, supply tenders, yard drones, an orbital shield grid, hab
   arcologies). Winning a campaign brings one; the computer powers field-test their own every 25 turns.
 - **Galaxies:** small, medium, large or vast (radius 19, 136 systems).
+- **The guide:** a first game, step by step: a coach card walks a new player through the first turns (research,
+  building, the scout, a second colony, ending a turn, the ways to win, directives and campaigns, Focus, stances and
+  supply), rings what to use next and moves on by itself. On by default for a first game; the menu restarts it.
 
 ## Files
 

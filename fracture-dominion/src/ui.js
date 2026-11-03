@@ -46,7 +46,7 @@ function startGame(state) {
   ensureDirectives(S);
   $("app").hidden = false; closeModal();
   renderAll(); renderSteps();
-  if (S.turn === 1) toast(`You lead ${player(S).name}. Explore, settle, and find out who else is out here.`);
+  if (S.turn === 1 && !guideOn()) toast(`You lead ${player(S).name}. Explore, settle, and find out who else is out here.`);
 }
 function save() { if (S) store.set(JSON.stringify(S)); }
 
@@ -106,7 +106,7 @@ function orderMove(hex) {
   moveMode = false;
   if (!r.error && f.ships.some((x) => x.type === "scout") && S.tutorial) S.tutorial.scouted = true;
   if (r.error) toast(r.error, true); else if (hex !== f.at) toast(`On course: ${r.turns} turn${r.turns === 1 ? "" : "s"}.`);
-  save(); renderPanel(); renderSteps(); draw();
+  save(); renderPanel(); renderSteps(); draw(); renderCoach();
 }
 
 function territory() {
@@ -225,7 +225,7 @@ function draw() {
 }
 
 // ---------- the bar and the panels ----------
-function renderAll() { renderBar(); renderTabs(); renderPanel(); renderSteps(); draw(); }
+function renderAll() { renderBar(); renderTabs(); renderPanel(); renderSteps(); draw(); renderCoach(); }
 function renderBar() {
   const me = player(S), t = totals(S, me.id), R = me.research, tech = R.current && TECHS.find((x) => x.id === R.current);
   $("bar-faction").innerHTML = `<span class="dot" style="background:${me.color}"></span>${esc(me.name)}`;
@@ -560,7 +560,8 @@ function bindChrome() {
     } else return;
     checkDirectives(S); save(); renderAll(); if (report) showReport(); else showNextMission();
   });
-  document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; renderTabs(); renderPanel(); }));
+  document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; seeTab(tab); renderTabs(); renderPanel(); renderCoach(); }));
+  $("coach").addEventListener("click", coachClick);
   $("steps").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b || !S) return;
     if (b.dataset.show) showMe(b.dataset.show);
@@ -647,7 +648,7 @@ function showNewGame(canContinue, preset) {
       <label>Difficulty <select id="ng-diff"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label>
       <label>Seed <input type="text" id="ng-seed" placeholder="random" size="10"></label>
     </div>
-    <label class="small check-line"><input type="checkbox" id="ng-steps" checked> Show the First steps checklist</label>
+    <label class="small check-line"><input type="checkbox" id="ng-steps" ${canContinue ? "" : "checked"}> Guide me through my first game, step by step</label>
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin</button><button class="btn" id="ng-guide">New here? The starter guide</button><button class="btn" id="ng-load">Load a saved game</button></div>
     <p class="small muted">Version: ${esc(VERSION)}</p>`);
   if (preset) {
@@ -659,7 +660,7 @@ function showNewGame(canContinue, preset) {
     const seedText = $("ng-seed").value.trim();
     const st = newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
       difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value });
-    if ($("ng-steps").checked) st.tutorial = { on: true };
+    if ($("ng-steps").checked) st.tutorial = { on: true, guide: true, ack: {}, seen: {} };
     startGame(st); save();
   };
   $("ng-guide").onclick = () => showStarter(canContinue);
@@ -689,7 +690,7 @@ function showStarter(canContinue) {
     <div class="sg-keys"><span><kbd>Drag</kbd> pan</span><span><kbd>Scroll</kbd> zoom</span><span><kbd>Click</kbd> select</span><span><kbd>Right-click</kbd> move</span><span><kbd>N</kbd> next idle</span><span><kbd>Enter</kbd> end turn</span></div>
     <div class="btn-row"><button class="btn primary big" id="sg-first">Start my first game</button><button class="btn" id="sg-choose">Choose my own settings</button>${canContinue ? `<button class="btn" id="sg-continue">Continue your game</button>` : ""}</div>
     <p class="small muted">The first game is set up to learn on: the Concord, a small galaxy, two easy rivals, and the First steps checklist.</p></div>`);
-  $("sg-first").onclick = () => { const st = newGame({ player: "concord", size: "small", rivals: 2, difficulty: "easy" }); st.tutorial = { on: true }; startGame(st); save(); };
+  $("sg-first").onclick = () => { const st = newGame({ player: "concord", size: "small", rivals: 2, difficulty: "easy" }); st.tutorial = { on: true, guide: true, ack: {}, seen: {} }; startGame(st); save(); };
   $("sg-choose").onclick = () => showNewGame(canContinue);
   if ($("sg-continue")) $("sg-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
 }
@@ -707,7 +708,7 @@ function stepsList() {
 }
 function renderSteps() {
   const el = $("steps");
-  if (!S || !S.tutorial || !S.tutorial.on) { el.hidden = true; return; }
+  if (!S || !S.tutorial || !S.tutorial.on || guideOn()) { el.hidden = true; return; }   // the guide does this job while it runs
   const list = stepsList(), n = list.filter((x) => x.done).length;
   el.hidden = false;
   if (n === list.length) {
@@ -745,6 +746,61 @@ function showMe(id) {
   }
   if (id === "turn") { const b = $("end-turn"); b.classList.add("pulse"); setTimeout(() => b.classList.remove("pulse"), 2400); toast("Press End turn (or Enter) when your orders are given."); }
 }
+
+// ---------- the guide: a first game, step by step ----------
+// A card that walks a new player through the first turns. Each step says what to do and why, puts a gold ring on what
+// to use, and moves on by itself once it's done ("read" steps wait for Got it). Skippable; the menu starts it again.
+const GUIDE = [
+  { id: "welcome", read: true, title: "Welcome to the Fracture Lines", text: "You lead one world, a scout, a frigate and a colony ship. Rivals are out there in the dark, building the same way. This guide walks you through your first turns; it moves on by itself as you do each thing. Tap Got it on the ones that only explain." },
+  { id: "bar", read: true, target: ".bar", title: "Your empire at a glance", text: "Across the top: Credits (income less upkeep), Industry (what your worlds build with), Science (research) and Exotics (for heavy ships and great works), and the turn." },
+  { id: "research", target: '[data-tab="research"]', tab: "research", show: "research", title: "Choose what to research", text: "Open the Research tab and pick a technology. Deep sensors or Xenology (harsher worlds to settle) are good first picks. You can't end a turn with nothing to research.", done: () => !!player(S).research.current || player(S).research.done.length > 0 },
+  { id: "build", target: "#panel", show: "build", title: "Build something at your capital", text: "Your capital is selected: under Add to the queue, pick a Scout, a Factory or a Colony ship. Industry fills the queue a little every turn; credits can rush the front of it.", done: () => coloniesOf(S, player(S).id).some((x) => x.colony.queue.length) || player(S).stats.built > 0 },
+  { id: "scout", target: "#map", show: "scout", title: "Send your scout into the dark", text: "Select your scout, then click a dark hex far from home (or press Move, then the hex). Dashed lines are corridors: one move takes a ship all the way along one.", done: () => !!(S.tutorial && S.tutorial.scouted) || S.turn > 12 },
+  { id: "colony", target: "#map", show: "colony", title: "Found a second colony", text: "Send the colony ship to a good world nearby (Show me picks one), and when it arrives, select it and press Found a colony. More worlds mean more of everything.", done: () => coloniesOf(S, player(S).id).filter((x) => x.colony.kind === "colony").length >= 2 || fleetsOf(S, player(S).id).some((f) => f.dest && f.ships.some((x) => x.type === "colony")) },
+  { id: "end", target: "#end-turn", title: "End the turn", text: "Press End turn (or Enter). Everyone moves at once; then worlds grow, build and research, and a report tells you what happened.", done: () => S.turn >= 2 },
+  { id: "objectives", target: '[data-tab="objectives"]', tab: "objectives", title: "Three ways to win", text: "The Objectives tab: conquest (the last power standing), the Corridor Engine (research it, then build it at your capital), or the best score at turn 200. It shows how close everyone is.", done: () => S.tutorial.seen && S.tutorial.seen.objectives },
+  { id: "mission", target: '[data-tab="mission"]', tab: "mission", title: "Directives and campaigns", text: "Your people send directives (the Mission tab): each pays credits, and each is a race against a rival. From turn 8, campaigns: three in a row, each against your nearest rival. Your research arm sends field tests that leave a prototype upgrade.", done: () => S.tutorial.seen && S.tutorial.seen.mission },
+  { id: "empire", target: '[data-tab="empire"]', tab: "empire", title: "Focus", text: "The Empire tab: share three Focus points between industry, science, credits and defense (2 at most to one). Change it whenever you like. Your prototypes are listed here too.", done: () => S.tutorial.seen && S.tutorial.seen.empire },
+  { id: "fleets", read: true, title: "Fleets: stance and supply", text: "Select a fleet to set its battle stance (aggressive, balanced, defensive). Warships more than 3 hexes from your worlds and outposts are out of supply and wear down: outposts push your supply line out." },
+  { id: "done", read: true, title: "The galaxy is yours", text: "That's the turn: research, build, move, end the turn. Next: a Factory and a Research lab at your capital, two or three frigates at home, and meet your neighbours (Diplomacy). Menu → Restart the guide brings this back any time." },
+];
+const guideOn = () => S && S.tutorial && S.tutorial.guide && !S.tutorial.guideDone;
+function guideStep() {
+  const T = S.tutorial; T.ack = T.ack || {}; T.done = T.done || {};
+  // A step once done stays done (a colony ship that arrives no longer has a course, but it was sent).
+  for (let i = 0; i < GUIDE.length; i++) { const g = GUIDE[i]; if (!g.read && !T.done[g.id] && g.done()) T.done[g.id] = true; if (g.read ? !T.ack[g.id] : !T.done[g.id]) return [g, i]; }
+  return [null, GUIDE.length];
+}
+function renderCoach() {
+  const el = $("coach"); document.querySelectorAll(".coach-target").forEach((x) => x.classList.remove("coach-target"));
+  if (!guideOn()) { el.hidden = true; return; }
+  const [g, i] = guideStep();
+  if (!g) { S.tutorial.guideDone = true; el.hidden = true; save(); return; }
+  if (S.tutorial.minFor && S.tutorial.minFor !== g.id) { S.tutorial.min = false; S.tutorial.minFor = null; }   // a new step opens the card again
+  el.hidden = false; el.classList.toggle("min", !!S.tutorial.min);
+  el.innerHTML = `<div class="coach-step">Your first game · step ${i + 1} of ${GUIDE.length}</div><h4>${esc(g.title)}</h4><p>${esc(g.text)}</p>
+    <div class="btn-row">${g.read ? `<button class="btn small primary" data-coach="ack">Got it</button>` : g.target ? `<button class="btn small primary" data-coach="show">Show me</button>` : ""}<button class="btn small" data-coach="min">${S.tutorial.min ? "Open" : "Hide for now"}</button><button class="coach-skip" data-coach="skip">End the guide</button></div>`;
+  if (g.target) document.querySelectorAll(g.target).forEach((x) => x.classList.add("coach-target"));
+}
+const seeTab = (t) => { if (S && S.tutorial) { (S.tutorial.seen = S.tutorial.seen || {})[t] = true; save(); } };
+function coachClick(e) {
+  const b = e.target.closest("[data-coach]"); if (!b || !S) return;
+  const [g] = guideStep(), a = b.dataset.coach, T = S.tutorial;
+  if (a === "ack" && g) T.ack[g.id] = true;
+  else if (a === "skip") { T.guideDone = true; toast("Guide ended. Menu → Restart the guide brings it back."); }
+  else if (a === "min") T.min = !T.min;
+  else if (a === "show" && g) {
+    if (g.show && g.id !== "research") showMe(g.show);
+    if (g.tab) { tab = g.tab; seeTab(tab); renderTabs(); renderPanel(); }
+    if (g.id === "research") toast("Click a technology to research it. Deep sensors and Xenology are good first picks.");
+    if (g.id === "end") showMe("turn");
+    const t = g.target && document.querySelector(g.target); if (t) t.scrollIntoView({ behavior: "smooth", block: "center" });
+    // On a phone the card would cover the map: fold it down while the map step is done.
+    if (g.target === "#map" && matchMedia("(max-width: 820px)").matches) { T.min = true; T.minFor = g.id; window.scrollTo({ top: 0, behavior: "smooth" }); }
+  }
+  save(); renderAll();
+}
+function startGuide() { S.tutorial = { ...(S.tutorial || {}), on: true, guide: true, guideDone: false, ack: {}, seen: {}, done: {}, min: false }; save(); renderAll(); }
 
 function showHelp(back) {
   modal(`<h1>How to play</h1>
@@ -788,6 +844,7 @@ function showMenu() {
     <button class="btn" id="m-resume">Back to the game</button>
     <button class="btn" id="m-help">How to play</button>
     <button class="btn" id="m-guide">The starter guide</button>
+    <button class="btn" id="m-guide-go">${guideOn() ? "Restart" : "Start"} the guide</button>
     <button class="btn" id="m-steps">${S && S.tutorial && S.tutorial.on ? "Hide" : "Show"} the First steps checklist</button>
     <button class="btn" id="m-export">Save code (copy)</button>
     <button class="btn" id="m-load">Load a saved game</button>
@@ -799,6 +856,7 @@ function showMenu() {
   $("m-resume").onclick = closeModal;
   $("m-help").onclick = () => showHelp(showMenu);
   $("m-guide").onclick = () => showStarter(true);
+  $("m-guide-go").onclick = () => { closeModal(); startGuide(); };
   $("m-steps").onclick = () => { S.tutorial = S.tutorial || {}; S.tutorial.on = !S.tutorial.on; save(); closeModal(); renderSteps(); };
   $("m-new").onclick = () => showNewGame(!!S);
   $("m-load").onclick = () => showLoad(showMenu);

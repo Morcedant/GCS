@@ -52,6 +52,9 @@ It's built from the tabletop game's own books:
   with twelve weeks to go; at the tour's end, *Keep command* turns the game into open command.
 - **Starfleet Command track:** five boxes and you're relieved. Incidents (firing first on a Klingon ship), the
   Prime Directive, the Neutral Zone, lost colonies and failed orders mark it; carried-out orders clear it.
+- **The guide:** a first tour, step by step: a coach card walks a new captain through the first turns (the status bar,
+  the orders, flying to Corvan II, ending a turn, the crew's actions and rolls, the away team, power and stores, the
+  Mission tab), rings what to use next and moves on by itself. On by default for a first game; the menu restarts it.
 
 ## Files
 

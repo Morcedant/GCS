@@ -35,7 +35,7 @@ function startGame(state) {
   fitView();
   $("app").hidden = false; closeModal();
   after();
-  if (S.turn === 1 && !S.log.some((l) => l.text.startsWith("Captain"))) toast(`Orders: Corvan II has gone silent. Double-click it (marked !) to set course: urgent, so at emergency warp 8.`);
+  if (S.turn === 1 && !guideOn() && !S.log.some((l) => l.text.startsWith("Captain"))) toast(`Orders: Corvan II has gone silent. Double-click it (marked !) to set course: urgent, so at emergency warp 8.`);
 }
 function save() { if (S) store.set(JSON.stringify(S)); }
 /** After anything changes: save, redraw, and open whatever dialog the state calls for. */
@@ -331,7 +331,7 @@ let surfaceSite = null;
 
 // ---------- the bar and the tabs ----------
 const boxes = (n, max, cls = "") => `<span class="boxes ${cls}">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>`;
-function renderAll() { renderBar(); renderTabs(); renderPanel(); draw(); }
+function renderAll() { renderBar(); renderTabs(); renderPanel(); draw(); renderCoach(); }
 /** "Turn 12 of 50", or in open command "Week 62 · open command". */
 const turnText = () => (S.mode === "open" ? `Week ${S.turn} · open command` : `Turn ${Math.min(S.turn, TOUR)} of ${TOUR}`);
 function renderBar() {
@@ -381,7 +381,7 @@ function units() {
   return `<div class="btn-row">${list.map(([id, n]) => `<button class="btn small ${unit === id ? "primary" : ""}" data-unit="${id}">${esc(n)}</button>`).join("")}</div>`;
 }
 function hint() {
-  if (!S.tutorial.on || S.turn > 12) return "";
+  if (!S.tutorial.on || S.turn > 12 || (S.tutorial.guide && !S.tutorial.guideDone)) return "";   // the guide does this job while it runs
   const A = S.arc, cv = S.systems[S.corvan];
   let t = "";
   if (A.stage === "travel") t = S.pelion.at === cv.at ? "" : `<b>Next:</b> fly to Corvan II (the gold <b>!</b>). The orders are urgent: double-click it on the map and the helm goes to emergency warp (warp ${maxWarp(S)}, 512 × light speed; warp 6 is the Pelion's maximum stable speed), as far as it can this turn. Then <b>End turn</b>.`;
@@ -770,7 +770,7 @@ function logHTML() {
 
 // ---------- the side panel's buttons ----------
 function bindChrome() {
-  document.querySelector(".tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-tab]"); if (!b) return; tab = b.dataset.tab; renderTabs(); renderPanel(); });
+  document.querySelector(".tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-tab]"); if (!b) return; tab = b.dataset.tab; seeTab(tab); renderTabs(); renderPanel(); renderCoach(); });
   $("panel").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b || !S) return;
     if (b.dataset.logf) { logFilter = b.dataset.logf; renderPanel(); return; }
@@ -818,6 +818,7 @@ function bindChrome() {
     if (e.key === "Enter" && !e.repeat) { e.preventDefault(); doEndTurn(); }
   });
   $("modal").addEventListener("click", modalClick);
+  $("coach").addEventListener("click", coachClick);
 }
 function doEndTurn() {
   if (!S || S.over) return;
@@ -829,6 +830,62 @@ function doEndTurn() {
   if (news.length) toast(news[0].text, news[0].kind !== "order");
   after();
 }
+
+// ---------- the guide: a first tour, step by step ----------
+// A card that walks a new captain through the first turns. Each step says what to do and why, puts a gold ring on what
+// to use, and moves on by itself once it's done ("read" steps wait for Got it). Skippable; the menu starts it again.
+const GUIDE = [
+  { id: "welcome", read: true, title: "Welcome aboard, Captain", text: "The USS Pelion is yours: a Heavy Cruiser on a frontier the Klingons, the Romulans and the Tholians all want closed. This guide walks you through your first turns. It moves on by itself as you do each thing; tap Got it on the ones that only explain." },
+  { id: "bar", read: true, target: ".bar", title: "The status bar", text: "Across the top: Supplies (Starfleet's currency) and Science, the warp core's Power, and the warp drive's stores: Dilithium, Antimatter and Spares. Then the Starfleet Command track (five boxes and you're relieved) and Klingon tension. Keep an eye on all of it." },
+  { id: "orders", target: '[data-tab="orders"]', tab: "orders", title: "Your orders", text: "Open the Orders tab. Your first mission is already there: The Silence at Corvan II, a research outpost that has stopped answering. It's urgent, so it has a deadline.", done: () => S.tutorial.seen && S.tutorial.seen.orders },
+  { id: "fly", target: "#map", title: "Fly to Corvan II", text: "Corvan II is marked with a gold ! on the map. Double-click it (on a phone, double-tap). Urgent orders send the helm to emergency warp: a light-year in hours, at a risk to the engines.", done: () => S.pelion.at !== S.tutorial.start || S.arc.stage !== "travel" },
+  { id: "end", target: "#end-turn", title: "End the turn", text: "A turn is a week. When the ship has moved and the crew have done what they can, press End turn. The other powers move, supplies come in, and the week's wear goes on the stores.", done: () => S.turn >= 2 },
+  { id: "arrive", target: "#end-turn", title: "Keep going", text: "Corvan II is a few weeks out. Double-tap it again each turn if the Pelion stops short, and End turn until you arrive. When you get there, a scene pops up: read it, and choose what to do.", done: () => S.arc.stage !== "travel" },
+  { id: "here", target: '[data-tab="here"]', tab: "here", title: "What the crew can do here", text: "The Here tab lists every action at the Pelion's location. Each card is a roll: pick who does it, with what skill, and see your chance before you roll. Each officer acts once a turn. Try a Sensor sweep, then sweep the ruins.", done: () => !["travel", "orbit"].includes(S.arc.stage) },
+  { id: "rolls", read: true, title: "How rolls work", text: "Every action is the tabletop roll: 3d6, at or under the officer's skill. A second officer can assist (+1, using their turn), and a Duty point rerolls a failure. Most actions have opposition too: both sides roll, and the better margin wins." },
+  { id: "team", target: '[data-tab="here"]', tab: "here", title: "Beam an away team down", text: "On the Here tab, choose up to four officers and Energize. On the surface, turns become hours: find clues, deal with the diggers, and reach whatever is draining your ship before the Countdown fills.", done: () => !!S.arc.team || ["orions", "caretaker", "phasers", "done"].includes(S.arc.stage) },
+  { id: "ship", target: '[data-tab="ship"]', tab: "ship", title: "Power and stores", text: "Open the Ship tab. Share out the Power: the engines take what the warp needs, the rest goes to shields, sensors, the labs and operations. Below: the stores, and where to get more (Starbase 23 refuels you free).", done: () => S.tutorial.seen && S.tutorial.seen.ship },
+  { id: "mission", target: '[data-tab="mission"]', tab: "mission", title: "The Mission tab", text: "How each order is going, step by step, and the campaign that every order belongs to. Orders end with a decision that's yours to make; failures and the Prime Directive mark the Starfleet Command track.", done: () => S.tutorial.seen && S.tutorial.seen.mission },
+  { id: "done", read: true, title: "The bridge is yours", text: "That's the job: fly, act, end the turn. Survey the uncharted (?), plant colonies, bring independent worlds in, and watch for raiders. The Sector tab keeps the score. Menu → Restart the guide brings this back any time." },
+];
+const guideOn = () => S && S.tutorial && S.tutorial.guide && !S.tutorial.guideDone;
+/** The current step: the first one not yet done (read steps: not yet acknowledged). */
+function guideStep() {
+  const T = S.tutorial; T.ack = T.ack || {}; T.done = T.done || {};
+  // A step once done stays done (a colony ship that arrives no longer has a course, but it was sent).
+  for (let i = 0; i < GUIDE.length; i++) { const g = GUIDE[i]; if (!g.read && !T.done[g.id] && g.done()) T.done[g.id] = true; if (g.read ? !T.ack[g.id] : !T.done[g.id]) return [g, i]; }
+  return [null, GUIDE.length];
+}
+function renderCoach() {
+  const el = $("coach"); document.querySelectorAll(".coach-target").forEach((x) => x.classList.remove("coach-target"));
+  if (!guideOn()) { el.hidden = true; return; }
+  const [g, i] = guideStep();
+  if (!g) { S.tutorial.guideDone = true; el.hidden = true; save(); return; }
+  if (S.tutorial.minFor && S.tutorial.minFor !== g.id) { S.tutorial.min = false; S.tutorial.minFor = null; }   // a new step opens the card again
+  el.hidden = false; el.classList.toggle("min", !!S.tutorial.min);
+  el.innerHTML = `<div class="coach-step">Your first tour · step ${i + 1} of ${GUIDE.length}</div><h4>${esc(g.title)}</h4><p>${esc(g.text)}</p>
+    <div class="btn-row">${g.read ? `<button class="btn small primary" data-coach="ack">Got it</button>` : g.target ? `<button class="btn small primary" data-coach="show">Show me</button>` : ""}<button class="btn small" data-coach="min">${S.tutorial.min ? "Open" : "Hide for now"}</button><button class="coach-skip" data-coach="skip">End the guide</button></div>`;
+  if (g.target) document.querySelectorAll(g.target).forEach((x) => x.classList.add("coach-target"));
+}
+function coachClick(e) {
+  const b = e.target.closest("[data-coach]"); if (!b || !S) return;
+  const [g] = guideStep(), a = b.dataset.coach, T = S.tutorial;
+  if (a === "ack" && g) T.ack[g.id] = true;
+  else if (a === "skip") { T.guideDone = true; toast("Guide ended. Menu → Restart the guide brings it back."); }
+  else if (a === "min") T.min = !T.min;
+  else if (a === "show" && g) {
+    if (g.tab) { tab = g.tab; seeTab(tab); renderTabs(); renderPanel(); }
+    if (g.id === "fly") { centerOn(S.systems[S.corvan].at); selHex = S.systems[S.corvan].at; draw(); }
+    const t = g.target && document.querySelector(g.target); if (t) t.scrollIntoView({ behavior: "smooth", block: "center" });
+    // On a phone the card would cover the map: fold it down while the map step is done.
+    if (g.target === "#map" && matchMedia("(max-width: 820px)").matches) { T.min = true; T.minFor = g.id; window.scrollTo({ top: 0, behavior: "smooth" }); }
+  }
+  save(); renderAll();
+}
+/** The guide notices which tabs the captain has opened. */
+const seeTab = (t) => { if (S && S.tutorial) { (S.tutorial.seen = S.tutorial.seen || {})[t] = true; save(); } };
+/** Start (or restart) the guide on this game. */
+function startGuide() { S.tutorial = { ...(S.tutorial || {}), on: true, guide: true, guideDone: false, ack: {}, seen: {}, done: {}, start: S.pelion.at, min: false }; save(); renderAll(); }
 
 // ---------- dialogs ----------
 function modal(html) { $("modal-body").innerHTML = html; $("modal").hidden = false; }
@@ -851,6 +908,7 @@ function showStarter(canContinue) {
   <label>Game<select id="ng-mode"><option value="tour" selected>A tour: fifty weeks, then your rating</option><option value="open">Open command: no end, campaign after campaign</option></select></label>
   <label>Difficulty<select id="ng-diff"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label>
   <label>Sector seed (optional)<input type="text" id="ng-seed" placeholder="random" maxlength="30"></label></div>
+  <label class="small" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ng-guide" ${canContinue ? "" : "checked"}> Guide me through my first tour, step by step</label>
   <div class="btn-row" style="margin-top:16px"><button class="btn primary" data-m="new">Take command</button>${canContinue ? `<button class="btn" data-m="continue">Continue your tour</button>` : ""}</div>
   <p class="small muted">Version: ${esc(typeof BUILD === "string" ? BUILD : "development")}.</p>
   <p class="small muted">An unofficial fan game for the USS Pelion campaign, inspired by Star Trek. Not affiliated with or endorsed by Paramount or CBS Studios, who own Star Trek.</p>`);
@@ -858,7 +916,7 @@ function showStarter(canContinue) {
 function showMenu() {
   modal(`<h2>Menu</h2><p class="muted">${esc(S.captain)}, ${turnText().toLowerCase()}. This sector's seed: <span class="seed">${esc(S.seed)}</span></p>
     <p class="small muted">Version: ${esc(typeof BUILD === "string" ? BUILD : "development")}</p>
-    <div class="btn-row"><button class="btn primary" data-m="close">Back to the bridge</button><button class="btn" data-m="help">How to play</button><button class="btn" data-m="restart">New tour</button><button class="btn" data-m="replay">Replay this sector</button>${S.mode === "open" && !S.over ? `<button class="btn red" data-m="retire">Retire from command</button>` : ""}</div>
+    <div class="btn-row"><button class="btn primary" data-m="close">Back to the bridge</button><button class="btn" data-m="help">How to play</button><button class="btn" data-m="restart">New tour</button><button class="btn" data-m="replay">Replay this sector</button>${S.mode === "open" && !S.over ? `<button class="btn red" data-m="retire">Retire from command</button>` : ""}<button class="btn" data-m="guide">${guideOn() ? "Restart" : "Start"} the guide</button></div>
     ${S.mode === "open" ? `<p class="small muted">Open command has no end: retire when you choose, and the score is counted then.</p>` : ""}
     <h3>Save code</h3><p class="small muted">The game saves in this browser after every move. To move it to another browser, copy this code, then paste it there under Load.</p>
     <textarea id="code" rows="3" readonly>${esc(btoa(unescape(encodeURIComponent(JSON.stringify(S)))))}</textarea>
@@ -971,12 +1029,13 @@ function modalClick(e) {
     after(); if (!report && !S.event && !S.battle && !S.over) closeModal(); return;
   }
   if (m === "report-ok") { report = null; closeModal(); after(); return; }
-  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value, mode: $("ng-mode").value }); openingScene(s); startGame(s); return; }
+  if (m === "new") { const s = newGame({ seed: $("ng-seed").value.trim() || undefined, difficulty: $("ng-diff").value, captain: $("ng-name").value, mode: $("ng-mode").value }); if ($("ng-guide") && $("ng-guide").checked) s.tutorial = { on: true, guide: true, ack: {}, seen: {}, start: s.pelion.at }; openingScene(s); startGame(s); return; }
   if (m === "continue") { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } return; }
   if (m === "close") { closeModal(); return; }
   if (m === "help") { showHelp(); return; }
   if (m === "restart") { showStarter(false); return; }
   if (m === "replay") { const s = newGame({ seed: S.seed, difficulty: S.difficulty, captain: S.captain, mode: S.mode }); openingScene(s); startGame(s); return; }
+  if (m === "guide") { closeModal(); startGuide(); return; }
   if (m === "keep") { keepCommand(S); closeModal(); after(); return; }
   if (m === "retire") { retire(S); closeModal(); after(); return; }
   if (m === "copy") { const t = $("code"); t.select(); try { navigator.clipboard.writeText(t.value); toast("Copied."); } catch { document.execCommand("copy"); } return; }
