@@ -1,11 +1,14 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES } from "./data.js";
 import { newGame, endTurn, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds,
-  declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY } from "./game.js";
+  declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto } from "./game.js";
 import { aiTurn } from "./ai.js";
-import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX } from "./orders.js";
+import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX, CAMPAIGNS, campaignDef, campaignText } from "./orders.js";
+const VERSION = typeof BUILD === "string" ? BUILD : "development";
+/** "Turn 12 of 200", or in open rule "Turn 212 · open rule". */
+const turnText = () => (S.mode === "open" ? `Turn ${S.turn} · open rule` : `Turn ${S.turn} of ${RULES.maxTurns}`);
 
 const SAVE_KEY = "fracture-dominion.save.v1";
 const $ = (id) => document.getElementById(id);
@@ -232,7 +235,7 @@ function renderBar() {
     `<span title="Research each turn"><b>Science</b> ${fmt(t.sci)}${tech ? ` → ${esc(tech.name)} ${Math.floor((R.progress / tech.cost) * 100)}%` : ` <i class="neg">pick research</i>`}</span>`,
     `<span title="Exotics: for cruisers, dreadnoughts and great works"><b>Exotics</b> ${me.exotics} <i>${signed(t.exo)}</i></span>`,
   ].join("");
-  $("bar-turn").textContent = `Turn ${S.turn} of ${RULES.maxTurns}`;
+  $("bar-turn").textContent = turnText();
   const idle = idleThings().length; $("next").textContent = idle ? `Next (${idle})` : "Next"; $("next").title = "Idle fleets, and worlds with nothing to build (N)";
   $("end-turn").disabled = !!S.winner;
 }
@@ -287,6 +290,11 @@ function fleetHTML() {
   let h = `<h2><span class="dot" style="background:${F.color}"></span>${mine ? "Your fleet" : esc(F.name)}</h2><p class="muted">${sys ? `At ${esc(sys.name)}` : "In deep space"}${S.hexes[f.at].terrain === "nebula" ? ", inside a nebula" : ""}. Speed ${fleetSpeed(S, f)}.</p>`;
   h += `<ul class="ships">${f.ships.map((x) => { const st = shipStats(S, f.owner, x.type); return `<li><b>${esc(st.name)}</b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg</span>` : ""}${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")}<span class="small">${x.hull}/${st.hull}</span></li>`; }).join("")}</ul>`;
   if (!mine) return h + (atWar(S, me.id, f.owner) ? `<p class="bad">At war with you.</p>` : "");
+  if (armed(f)) {
+    const ok = inSupply(S, f), st = STANCES[f.stance] || STANCES.balanced;
+    h += `<p class="small ${ok ? "" : "bad"}"><b>Supply:</b> ${ok ? `in supply (within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours)` : `out of supply${f.out ? ` for ${f.out} turn${f.out === 1 ? "" : "s"}` : ""}: from the second turn its warships wear down a hull point a turn. Bring it within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours.`}</p>`;
+    h += `<h3>Battle stance</h3><div class="opts">${Object.entries(STANCES).map(([k, x]) => `<button class="opt ${(f.stance || "balanced") === k ? "on" : ""}" data-stance="${k}" aria-pressed="${(f.stance || "balanced") === k}"><b>${esc(x.name)}</b><small>${esc(x.text)}</small></button>`).join("")}</div>`;
+  }
   if (f.path.length) h += `<p>Heading for ${esc(S.sysAt[f.dest] ? S.systems[S.sysAt[f.dest]].name : "a point in space")}: ${Math.ceil(f.path.reduce((t, x) => t + x.cost, 0) / fleetSpeed(S, f))} turn(s).</p>`;
   h += `<div class="btn-row"><button class="btn primary" data-move>${moveMode ? "Click a hex…" : "Move"}</button>${f.path.length ? `<button class="btn" data-stop>Stop</button>` : `<button class="btn" data-sentry>${f.sentry ? "Wake" : "Hold here"}</button>`}</div>`;
   if (sys && !sys.colony) {
@@ -323,7 +331,7 @@ function objectivesHTML() {
   const turnsLeft = RULES.maxTurns - S.turn;
   const ranked = alive.map((f) => ({ f, sc: score(S, f.id) })).sort((a, b) => b.sc - a.sc), myRank = ranked.findIndex((x) => x.f.id === me.id) + 1, mine = score(S, me.id), lead = ranked[0];
   let h = `<h2>Objectives</h2>`;
-  h += `<div class="kv small" style="margin-bottom:10px"><span>Game</span><span>${ibar(S.turn, RULES.maxTurns, "var(--gold)")} Turn ${S.turn} of ${RULES.maxTurns} (${turnsLeft} left)</span>
+  h += `<div class="kv small" style="margin-bottom:10px"><span>Game</span><span>${S.mode === "open" ? `${turnText()}: no end but the one you choose (Menu → Retire)` : `${ibar(S.turn, RULES.maxTurns, "var(--gold)")} Turn ${S.turn} of ${RULES.maxTurns} (${turnsLeft} left)`}</span>
     <span>Standing</span><span>Score <b>${mine}</b>, ${myRank === 1 ? `<b class="good">first</b> of ${alive.length}` : `<b>${ordinal(myRank)}</b> of ${alive.length}`}</span></div>`;
   h += `<p class="small muted">Win one of three ways. Lose if your last world falls, or if a rival wins first.</p>`;
   // 1. Conquest.
@@ -368,13 +376,13 @@ function objectivesHTML() {
 /** The Mission tab: the directives under way (progress, deadline, reward), the backlog, and past directives. */
 function missionHTML() {
   const D = ensureDirectives(S), A = authorityOf(S);
-  let h = `<h2>Mission</h2><p class="small muted">Directives from ${esc(A.name)}: what your people ask of you, beyond winning. ${ACTIVE_MAX} at a time; each pays credits when it's done.</p>`;
+  let h = `<h2>Mission</h2><p class="small muted">Directives from ${esc(A.name)}: what your people ask of you, beyond winning. ${ACTIVE_MAX} at a time; each pays credits when it's done.</p>` + campaignHTML();
   h += `<h3>Under way</h3>`;
   if (!D.active.length) h += `<p class="small muted">None under way.${D.backlog.length ? " Take one on from the backlog below." : ` ${esc(A.name[0].toUpperCase() + A.name.slice(1))} will send more.`}</p>`;
   for (const d of D.active) {
     const p = progress(S, d), left = d.deadline - S.turn, total = Math.max(1, d.deadline - d.issued);
     const badge = left <= 1 ? ["Due now", "bad"] : left <= 3 ? ["Running out of time", "bad"] : p ? ["Under way", "good"] : ["Not started", ""];
-    h += `<div class="card obj"><h3 class="obj-h">${esc(d.title)} <span class="badge-status ${badge[1]}">${badge[0]}</span></h3>
+    h += `<div class="card obj"><h3 class="obj-h">${esc(d.title)} <span class="badge-status ${badge[1]}">${badge[0]}</span>${d.campaign ? ` <span class="badge-status good">${esc(campaignDef(d.campaign).title)}</span>` : ""}${d.kind === "prototype" ? ` <span class="badge-status">Prototype</span>` : ""}</h3>
       <ol class="steps-list">${stepLi(p >= d.need ? "done" : "now", `${esc(d.title)}: ${p} of ${d.need}`)}${stepLi(p >= d.need ? "now" : "", `Report to ${esc(d.from || A.name)}: ${d.reward} credits`)}</ol>
       <div class="kv small"><span>Progress</span><span>${ibar(p, d.need, "var(--accent)")} ${p} of ${d.need}</span>
       <span>Deadline</span><span>${ibar(Math.max(0, left), total, "var(--gold)")} turn ${d.deadline} (${left} turn${left === 1 ? "" : "s"} left)</span></div>
@@ -391,10 +399,31 @@ function missionHTML() {
   h += `<h3>Past directives</h3>` + (D.history.length ? `<ul class="log">${D.history.slice().reverse().map((x) => `<li class="${x.result === "done" ? "good" : "bad"}"><b>${x.result === "failed" ? "✗ Not done" : x.result === "beaten" ? `✗ Beaten by ${esc(x.by)}` : "✓ Done"}</b> · turn ${x.turn} · ${esc(x.title)}</li>`).join("")}</ul>` : `<p class="small muted">None yet.</p>`);
   return h;
 }
+/** The campaign under way: its rival, its threads, the rival's gains, and the story so far. */
+function campaignHTML() {
+  const D = ensureDirectives(S), C = D.campaign;
+  if (!C) return `<div class="card obj"><h3 class="obj-h">Campaigns <span class="badge-status">Turn 8</span></h3><p class="small">The first campaign begins at turn 8: a race against your nearest rival, with directives of its own. Three campaigns follow one another, and each brings new kinds of directives.</p></div>`;
+  const def = campaignDef(C.id), R = faction(S, C.rival), known = player(S).met[C.rival];
+  const status = C.over === "won" ? ["Won", "good"] : C.over === "lost" ? ["Lost", "bad"] : C.finale ? ["The finale", "good"] : ["Under way", ""];
+  const next = CAMPAIGNS[C.i + 1];
+  let h = `<div class="card obj"><h3 class="obj-h">Campaign ${C.i + 1} of ${CAMPAIGNS.length}: ${esc(def.title)} <span class="badge-status ${status[1]}">${status[0]}</span></h3>
+    <p class="small">${esc(campaignText(S, def.premise))}</p>
+    <div class="kv small"><span>Rival</span><span><span class="dot" style="background:${R ? R.color : "#888"}"></span>${esc(known && R ? R.name : "your nearest rival, not yet met")}</span>
+    <span>Threads</span><span>${ibar(Math.min(C.threads.length, def.finaleAt), def.finaleAt, "var(--accent)")} ${C.threads.length} of ${def.finaleAt}: directives marked with this campaign's name turn them up; then the finale</span>
+    ${C.over ? "" : `<span class="bad">Their gains</span><span>${ibar(Math.min(C.gains, def.finaleAt + 1), def.finaleAt + 1, "var(--bad)")} ${C.gains}${C.finale ? "" : `; the next in about ${Math.max(1, C.nextGain - S.turn)} turn${C.nextGain - S.turn === 1 ? "" : "s"}. Each thread you turn up sets them back two turns`}</span>`}</div>
+    ${C.over ? `<p class="small">${next ? (C.endedAt != null ? `The next campaign, ${esc(next.title)}, begins about turn ${C.endedAt + 5}.` : `The next campaign, ${esc(next.title)}, begins five turns after this one ends.`) : "That was the last campaign. The directives go on."}</p>` : ""}</div>`;
+  if ((D.past || []).length) h += `<details class="card small"><summary>Earlier campaigns (${D.past.length})</summary>${D.past.map((p) => `<p><b>${esc(campaignDef(p.id).title)}</b>: ${p.over === "won" ? "won" : "lost"}, ${p.threads} thread${p.threads === 1 ? "" : "s"}.</p>`).join("")}</details>`;
+  return h;
+}
 /** Mission Success reports, one after another, after whatever report is showing. */
 function showNextMission() {
   const D = S && S.directives; if (!D || !D.reports.length) return false;
   const r = D.reports[0];
+  if (r.result === "story") {
+    modal(`<h2>${esc(r.title)}</h2><p class="small muted">Turn ${r.turn}</p><p style="white-space:pre-line">${esc(r.text)}</p><div class="btn-row"><button class="btn primary" id="mission-ok">Continue</button></div>`);
+    $("mission-ok").onclick = () => { D.reports.shift(); closeModal(); save(); renderAll(); showNextMission(); };
+    return true;
+  }
   if (r.result === "beaten") {
     modal(`<h2>Directive lost</h2><h3 style="margin-top:0">${esc(r.title)}</h3><p class="small muted">Turn ${r.turn} · for ${esc(r.from)}</p>
       <p>${esc(r.by)} got there first: ${r.rivalNeed} of ${r.rivalNeed}, while you had ${r.progress} of ${r.need}. ${esc(r.from[0].toUpperCase() + r.from.slice(1))} takes note.</p>
@@ -405,7 +434,7 @@ function showNextMission() {
   }
   modal(`<h2>Mission success</h2><h3 style="margin-top:0">${esc(r.title)}</h3><p class="small muted">Turn ${r.turn} · ${r.turns} turn${r.turns === 1 ? "" : "s"} from directive to done · for ${esc(r.from)}</p>
     <h3>What was done</h3><ol class="steps-list">${stepLi("done", esc(r.title))}${stepLi("done", `Reported to ${esc(r.from)}`)}</ol>
-    ${r.beat ? `<p class="small"><b>Against the opposition:</b> you got there first. ${esc(r.beat)}</p>` : ""}
+    ${r.beat ? `<p class="small"><b>Against the opposition:</b> you got there first. ${esc(r.beat)}</p>` : ""}${r.thread ? `<p class="small"><b>Campaign:</b> ${esc(r.thread)}</p>` : ""}
     <h3>Reward</h3><ul class="small">${r.rewards.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
     ${r.next ? `<p class="small"><b>Up next, from the backlog:</b> ${esc(r.next.join("; "))} (the Mission tab).</p>` : ""}
     <div class="btn-row"><button class="btn primary" id="mission-ok">Continue</button></div>`);
@@ -418,11 +447,25 @@ function empireHTML() {
   const cols = coloniesOf(S, me.id).sort((a, b) => (b.colony.pop || 0) - (a.colony.pop || 0));
   let h = `<h2>${esc(me.name)}</h2><p class="small muted">${esc(FACTIONS.find((f) => f.id === me.id).trait)}: ${esc(FACTIONS.find((f) => f.id === me.id).traitText)}</p>
     <div class="yields"><span>Income <b>${fmt(t.cr)}</b></span><span>Upkeep <b>${fmt(t.upkeep)}</b></span><span>Score <b>${score(S, me.id)}</b></span><span>Fleet power <b>${militaryPower(S, me.id)}</b></span></div>
+    ${focusHTML()}${protosHTML()}
     <h3>Worlds (${cols.length})</h3><table class="tbl"><tr><th>World</th><th>Pop</th><th>Ind</th><th>Sci</th><th>Building</th></tr>
     ${cols.map((sys) => { const y = yields(S, sys); return `<tr data-selsys="${sys.id}"><td>${sys.colony.capital ? "★ " : ""}${esc(sys.name)}${sys.colony.kind === "outpost" ? " <i>(outpost)</i>" : ""}</td><td>${sys.colony.pop || "–"}</td><td>${fmt(y.ind)}</td><td>${fmt(y.sci)}</td><td>${esc(sys.colony.queue[0] ? sys.colony.queue[0].name : sys.colony.kind === "colony" ? "—" : "")}</td></tr>`; }).join("")}</table>
     <h3>Fleets (${fleetsOf(S, me.id).length})</h3>${fleetsOf(S, me.id).map((f) => `<button class="row" data-selfleet="${f.id}">${esc(fleetName(f))}<span class="small muted">${f.path.length ? " · moving" : " · idle"}</span></button>`).join("")}
     <h3>Rivals</h3><table class="tbl"><tr><th>Faction</th><th>Worlds</th><th>Score</th></tr>${S.factions.slice(1).map((F) => `<tr><td><span class="dot" style="background:${F.color}"></span>${me.met[F.id] ? esc(F.name) : "Unknown"}${F.alive ? "" : " †"}</td><td>${me.met[F.id] ? coloniesOf(S, F.id).length : "?"}</td><td>${me.met[F.id] ? score(S, F.id) : "?"}</td></tr>`).join("")}</table>`;
   return h;
+}
+/** The empire's Focus: three points to share between industry, science, credits and defense. */
+function focusHTML() {
+  const me = player(S), fo = focusOf(S, me.id), left = FOCUS.points - focusUsed(S, me.id);
+  return `<h3>Focus: ${FOCUS.points - left} of ${FOCUS.points} points</h3><p class="small muted">Where the empire puts its effort this turn, 2 points at most to one priority. Change it whenever you like.</p>
+    <div class="card small">${Object.entries(FOCUS.kinds).map(([k, x]) => `<div class="focus-row"><span><b>${esc(x.name)}</b></span><button class="btn small" data-focus="${k}" data-n="${fo[k] - 1}" ${fo[k] <= 0 ? "disabled" : ""} aria-label="Less to ${esc(x.name)}">−</button><span class="pips">${[0, 1].map((i) => `<i class="${i < fo[k] ? "on" : ""}"></i>`).join("")}</span><button class="btn small" data-focus="${k}" data-n="${fo[k] + 1}" ${fo[k] >= 2 || left <= 0 ? "disabled" : ""} aria-label="More to ${esc(x.name)}">+</button><span class="muted">${esc(x.text)}</span></div>`).join("")}
+    <div class="muted" style="margin-top:4px">${left ? `${left} point${left === 1 ? "" : "s"} unassigned.` : "Every point is in use."}</div></div>`;
+}
+/** Prototypes: unique upgrades from field tests (prototype directives) and campaign wins. */
+function protosHTML() {
+  const me = player(S), have = Object.keys(PROTOTYPES).filter((k) => proto(S, me.id, k));
+  return `<h3>Prototypes (${have.length} of ${Object.keys(PROTOTYPES).length})</h3>` + (have.length ? `<ul class="small">${have.map((k) => `<li><b>${esc(PROTOTYPES[k].name)}:</b> ${esc(PROTOTYPES[k].text)}</li>`).join("")}</ul>`
+    : `<p class="small muted">None yet. Your research arm sends field tests as directives (the Mission tab); carry one out and its prototype stays with you. Winning a campaign brings one too.</p>`);
 }
 function researchHTML() {
   const me = player(S), R = me.research, cur = R.current && TECHS.find((t) => t.id === R.current), t = totals(S, me.id);
@@ -478,6 +521,8 @@ function bindChrome() {
     const b = e.target.closest("button, tr[data-selsys]"); if (!b || !S) return;
     const d = b.dataset, me = player(S);
     if (d.logf) { logFilter = d.logf; renderPanel(); return; }
+    if (d.focus) { const r = setFocus(S, me.id, d.focus, +d.n); if (r.error) toast(r.error, true); save(); renderAll(); return; }
+    if (d.stance) { setStance(S, sel.id, d.stance); toast(`${STANCES[d.stance].name}: ${STANCES[d.stance].text}`); save(); renderAll(); return; }
     if (d.accept) { const r = acceptDirective(S, d.accept); if (r.error) toast(r.error, true); else toast("Directive taken on: its clock starts now."); checkDirectives(S); save(); renderAll(); showNextMission(); return; }
     if (d.selfleet) { select({ kind: "fleet", id: d.selfleet }); const f = S.fleets[d.selfleet]; if (f) { centerOn(f.at); draw(); } return; }
     if (d.selsys) { select({ kind: "system", id: d.selsys }); centerOn(S.systems[d.selsys].at); draw(); return; }
@@ -527,6 +572,7 @@ function bindChrome() {
   $("home").addEventListener("click", () => { if (S) { centerOn(S.systems[player(S).capital].at); draw(); } });
   $("menu").addEventListener("click", () => showMenu());
   $("next").addEventListener("click", nextIdle);
+  $("to-panel").addEventListener("click", () => document.querySelector(".side").scrollIntoView({ behavior: "smooth", block: "start" }));
   document.addEventListener("keydown", (e) => {
     if (!S || e.target.closest("input, textarea, select") || !$("modal").hidden) return;
     if (e.key === "Escape") { moveMode = false; renderPanel(); draw(); }
@@ -595,13 +641,15 @@ function showNewGame(canContinue, preset) {
     ${canContinue ? `<div class="btn-row"><button class="btn primary" id="ng-continue">Continue your game</button></div>` : ""}
     <h3>Choose your people</h3><div class="factions">${FACTIONS.map((f, i) => `<label class="fac"><input type="radio" name="fac" value="${f.id}" ${i === 0 ? "checked" : ""}><span><b><span class="dot" style="background:${f.color}"></span>${esc(f.name)}</b><small><b>${esc(f.trait)}:</b> ${esc(f.traitText)}</small></span></label>`).join("")}</div>
     <div class="ng-row">
-      <label>Galaxy <select id="ng-size"><option value="small">Small</option><option value="medium" selected>Medium</option><option value="large">Large</option></select></label>
+      <label>Galaxy <select id="ng-size"><option value="small">Small</option><option value="medium" selected>Medium</option><option value="large">Large</option><option value="vast">Vast</option></select></label>
+      <label>Game <select id="ng-mode"><option value="standard" selected>Standard: 200 turns</option><option value="open">Open: no end</option></select></label>
       <label>Rivals <select id="ng-rivals"><option>1</option><option>2</option><option selected>3</option><option>4</option></select></label>
       <label>Difficulty <select id="ng-diff"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label>
       <label>Seed <input type="text" id="ng-seed" placeholder="random" size="10"></label>
     </div>
     <label class="small check-line"><input type="checkbox" id="ng-steps" checked> Show the First steps checklist</label>
-    <div class="btn-row"><button class="btn primary" id="ng-start">Begin</button><button class="btn" id="ng-guide">New here? The starter guide</button><button class="btn" id="ng-load">Load a saved game</button></div>`);
+    <div class="btn-row"><button class="btn primary" id="ng-start">Begin</button><button class="btn" id="ng-guide">New here? The starter guide</button><button class="btn" id="ng-load">Load a saved game</button></div>
+    <p class="small muted">Version: ${esc(VERSION)}</p>`);
   if (preset) {
     $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty;
     const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
@@ -610,7 +658,7 @@ function showNewGame(canContinue, preset) {
   $("ng-start").onclick = () => {
     const seedText = $("ng-seed").value.trim();
     const st = newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
-      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value });
+      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value });
     if ($("ng-steps").checked) st.tutorial = { on: true };
     startGame(st); save();
   };
@@ -743,8 +791,10 @@ function showMenu() {
     <button class="btn" id="m-steps">${S && S.tutorial && S.tutorial.on ? "Hide" : "Show"} the First steps checklist</button>
     <button class="btn" id="m-export">Save code (copy)</button>
     <button class="btn" id="m-load">Load a saved game</button>
+    ${S && S.mode === "open" && !S.winner ? `<button class="btn" id="m-retire">Retire: end the game here</button>` : ""}
     <button class="btn danger" id="m-new">New game</button></div>
-    <p class="small muted">Your game saves itself in this browser after every action.</p>${galaxyBox()}`);
+    <p class="small muted">Your game saves itself in this browser after every action. Version: ${esc(VERSION)}</p>${galaxyBox()}`);
+  if ($("m-retire")) $("m-retire").onclick = () => { retire(S); save(); closeModal(); renderAll(); showEnd(); };
   bindGalaxyBox();
   $("m-resume").onclick = closeModal;
   $("m-help").onclick = () => showHelp(showMenu);
@@ -769,11 +819,13 @@ function showLoad(back) {
 }
 function showEnd() {
   const me = player(S), won = S.winner === me.id, W = S.winner && S.winner !== "none" ? faction(S, S.winner) : null;
-  const why = { conquest: "by conquest", engine: "by finishing the Corridor Engine", score: `with the highest score at turn ${RULES.maxTurns}`, fallen: "" }[S.winReason] || "";
+  const why = { conquest: "by conquest", engine: "by finishing the Corridor Engine", score: `with the highest score at turn ${RULES.maxTurns}`, fallen: "", retired: `on your own terms, at turn ${S.turn}` }[S.winReason] || "";
   modal(`<h1>${won ? "Victory" : "Defeat"}</h1><p class="lede">${won ? `You win ${why}.` : W ? `${esc(W.name)} wins ${why}.` : "Your people have fallen."}</p>
     <table class="tbl"><tr><th>Faction</th><th>Worlds</th><th>Score</th></tr>${S.factions.map((F) => `<tr><td><span class="dot" style="background:${F.color}"></span>${esc(F.name)}${F.alive ? "" : " †"}</td><td>${coloniesOf(S, F.id).length}</td><td>${score(S, F.id)}</td></tr>`).join("")}</table>
-    <div class="btn-row"><button class="btn primary" id="end-new">New game</button><button class="btn" id="end-look">Look at the map</button></div>${galaxyBox()}`);
+    ${won && S.winReason !== "retired" ? `<p class="small">Keep ruling and the game goes on in open rule, with no end but the one you choose. The directives and campaigns go on too.</p>` : ""}
+    <div class="btn-row">${won && S.winReason !== "retired" ? `<button class="btn primary" id="end-keep">Keep ruling</button>` : ""}<button class="btn ${won && S.winReason !== "retired" ? "" : "primary"}" id="end-new">New game</button><button class="btn" id="end-look">Look at the map</button></div>${galaxyBox()}`);
   bindGalaxyBox();
+  if ($("end-keep")) $("end-keep").onclick = () => { keepRuling(S); save(); closeModal(); renderAll(); };
   $("end-new").onclick = () => showNewGame(false);
   $("end-look").onclick = closeModal;
 }

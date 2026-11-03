@@ -3,7 +3,7 @@
 import { makeRng, hexagon, distance, neighbors, within, key } from "./hex.js";
 import { WORLDS, STAR_NAMES } from "./data.js";
 
-export const SIZES = { small: { radius: 9, systems: 34 }, medium: { radius: 12, systems: 58 }, large: { radius: 15, systems: 88 } };
+export const SIZES = { small: { radius: 9, systems: 34 }, medium: { radius: 12, systems: 58 }, large: { radius: 15, systems: 88 }, vast: { radius: 19, systems: 136 } };
 
 /** @returns {{ radius, hexes, systems, sysAt, corridors, adj, homes }} */
 export function makeGalaxy(seed, sizeName, factionCount) {

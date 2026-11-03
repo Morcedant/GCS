@@ -75,6 +75,42 @@ export const STAR_NAMES = ["Achernar", "Brannoc", "Calyx", "Draeven", "Esk", "Fe
   "Oberth", "Pallas", "Quessa", "Rhune", "Sable", "Tarn", "Ulric", "Vesper", "Wyrd", "Xantha", "Ysolde", "Zhaq", "Ashkarr", "Bellwether", "Corvan", "Dunmere",
   "Ember", "Faro", "Gethsem", "Harrow", "Ione", "Jubal", "Kestrel", "Lattice", "Morrow", "Noct", "Orrin", "Peregrine", "Quill", "Rasp", "Sere", "Thule",
   "Umber", "Varro", "Weald", "Xeno", "Yarrow", "Zenith", "Aster", "Brine", "Cinder", "Dusk", "Eyrie", "Flint", "Gloam", "Hearth", "Isle", "Juniper",
-  "Kiln", "Loom", "Mire", "Nimbus", "Onyx", "Pyre", "Quarry", "Rook", "Shoal", "Tithe", "Usher", "Vale", "Wick", "Yew"];
+  "Kiln", "Loom", "Mire", "Nimbus", "Onyx", "Pyre", "Quarry", "Rook", "Shoal", "Tithe", "Usher", "Vale", "Wick", "Yew",
+  "Anvil", "Bastion", "Cairn", "Delve", "Embral", "Fathom", "Garnet", "Halcyon", "Ingot", "Jasper", "Kythera", "Lodestar", "Meridian", "Nocturne",
+  "Ossuary", "Palisade", "Quorra", "Reliquary", "Solstice", "Talon", "Undertow", "Verdigris", "Wraith", "Xerxes", "Yarrowmere", "Zephyr",
+  "Alcove", "Brimstone", "Cobalt", "Driftwood", "Equinox", "Foundry", "Gyre", "Hollow", "Iolite", "Jetsam", "Keel", "Lantern", "Monolith",
+  "Nacre", "Obelisk", "Perihelion", "Quiver", "Rampart", "Sextant", "Tamarind", "Umbra", "Vigil", "Wellspring", "Xyst", "Yonder", "Zircon",
+  "Aurel", "Bracken", "Crucible", "Dross", "Escarp", "Ferrule", "Gantry", "Hyssop", "Inlet", "Jade"];
 
+/**
+ * Prototypes: unique upgrades a faction gets by carrying out a prototype directive (a field test for its research arm).
+ * `test`: the directive kind the field test asks for, and how much of it.
+ */
+export const PROTOTYPES = {
+  lances: { name: "Fold lances", text: "+1 to every warship's skill.", test: ["fleet", 6] },
+  plating: { name: "Ablative plating", text: "+1 hull for every warship.", test: ["ships", 2] },
+  scanners: { name: "Long-range scanners", text: "+1 sensor range for every ship.", test: ["explore", 3] },
+  tenders: { name: "Supply tenders", text: "Fleets stay in supply 2 hexes farther from your worlds.", test: ["outpost", 1] },
+  drones: { name: "Yard drones", text: "Every ship costs 10% less.", test: ["ships", 3] },
+  grid: { name: "Orbital shield grid", text: "+1 to every world's orbital guns, and +1 defense on every world with guns.", test: ["exotics", 3] },
+  arcologies: { name: "Hab arcologies", text: "+1 population on every colony.", test: ["growth", 3] },
+};
+/** The empire's Focus: points to share between its priorities each turn, 2 at most to one. */
+export const FOCUS = {
+  points: 3,
+  kinds: {
+    industry: { name: "Industry", text: "+10% industry on every world for each point." },
+    science: { name: "Science", text: "+10% science for each point." },
+    credits: { name: "Credits", text: "+10% credits for each point." },
+    defense: { name: "Defense", text: "+1 to your worlds' orbital guns for each point." },
+  },
+};
+/** Battle stances: how a fleet fights. atk: to its own rolls; def: to the rolls of those shooting at it. */
+export const STANCES = {
+  balanced: { name: "Balanced", atk: 0, def: 0, text: "No change." },
+  aggressive: { name: "Aggressive", atk: 1, def: 1, text: "+1 to its rolls, but +1 to the enemy's rolls against it." },
+  defensive: { name: "Defensive", atk: -1, def: -1, text: "−1 to its rolls, and −1 to the enemy's rolls against it." },
+};
+/** Fleets out of supply (farther than this from every world and outpost of theirs) wear down. */
+export const SUPPLY = { range: 3, graceTurns: 1 };
 export const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };

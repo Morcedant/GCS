@@ -103,7 +103,10 @@ test("directives: from the player's own faction, two under way, a backlog, and a
     const s = newGame({ seed: 5, player: fid, rivals: 2 });
     const D = ensureDirectives(s);
     assert.equal(D.active.length, 2); assert.equal(D.backlog.length, 1);
-    for (const d of D.active.concat(D.backlog)) { assert.ok(AUTHORITY[fid].kinds.includes(d.kind) || ["outpost", "explore", "ships"].includes(d.kind), fid + " " + d.kind); assert.equal(d.from, AUTHORITY[fid].name); }
+    for (const d of D.active.concat(D.backlog)) {
+      if (d.kind === "prototype") { assert.ok(/research arm/.test(d.from)); continue; }   // field tests come from the research arm
+      assert.ok(AUTHORITY[fid].kinds.includes(d.kind) || ["outpost", "explore", "ships"].includes(d.kind), fid + " " + d.kind); assert.equal(d.from, AUTHORITY[fid].name);
+    }
   }
   const s = newGame({ seed: 5, player: "tessan", rivals: 2 });
   const D = ensureDirectives(s), d = D.active[0], waiting = D.backlog[0];
@@ -127,4 +130,53 @@ test("directives have opposition: the nearest rival races for the same thing, an
   assert.ok(!D.active.includes(d));
   assert.equal(D.history.at(-1).result, "beaten");
   assert.equal(D.reports.at(-1).result, "beaten");
+});
+
+test("Focus: three points to share, 2 at most to one; each point lifts that output 10%", async () => {
+  const { setFocus, focusOf, yields } = await import("../src/game.js");
+  const s = newGame({ seed: 21, size: "small", player: "concord", rivals: 1 }), cap = s.systems[faction(s, "concord").capital];
+  const base = yields(s, cap).ind;
+  assert.ok(setFocus(s, "concord", "industry", 2).error);   // all three points are in use (1 each to industry, science, credits)
+  assert.ok(setFocus(s, "concord", "credits", 0).ok);
+  assert.ok(setFocus(s, "concord", "industry", 3).ok); assert.equal(focusOf(s, "concord").industry, 2);   // capped at 2
+  assert.ok(yields(s, cap).ind > base);
+});
+test("supply: warships far from home wear down after a turn; Vael fleets don't", async () => {
+  const { inSupply } = await import("../src/game.js");
+  const s = newGame({ seed: 22, size: "medium", player: "concord", rivals: 1 }), F = faction(s, "concord");
+  const far = Object.keys(s.hexes).find((k) => s.hexes[k].terrain === "space" && coloniesOf(s, "concord").every((x) => distance(x.at, k) > 6));
+  const f = spawnFleet(s, "concord", far, ["frigate"]);
+  assert.equal(inSupply(s, f), false);
+  endTurn(s, null); assert.equal(f.ships[0].hull, 2);   // the first turn out: a warning
+  endTurn(s, null); assert.equal(f.ships[0].hull, 1);   // then a hull point a turn
+  endTurn(s, null); assert.equal(f.ships[0].hull, 1);   // never below 1
+});
+test("open rule, keep ruling after a win, and retiring", async () => {
+  const { keepRuling, retire } = await import("../src/game.js");
+  const o = newGame({ seed: 23, size: "small", player: "kel", rivals: 1, mode: "open" });
+  o.turn = 250; endTurn(o, null); assert.equal(o.winner, null);
+  assert.ok(retire(o).ok); assert.equal(o.winReason, "retired");
+  const t = newGame({ seed: 23, size: "small", player: "kel", rivals: 1 });
+  t.winner = "kel"; t.winReason = "score";
+  assert.ok(keepRuling(t).ok); assert.equal(t.winner, null); assert.equal(t.mode, "open");
+});
+test("campaigns: the first begins at turn 8 against a rival; threads lead to a finale; a prototype stays", async () => {
+  const { ensureDirectives, directivesTurn, checkDirectives } = await import("../src/orders.js");
+  const { PROTOTYPES } = await import("../src/data.js");
+  const s = newGame({ seed: 24, player: "concord", rivals: 2 }), D = ensureDirectives(s);
+  for (let i = 0; i < 8; i++) { s.turn++; directivesTurn(s); }
+  assert.ok(D.campaign && D.campaign.id === "frontier" && D.campaign.rival);
+  assert.ok(D.reports.some((r) => r.result === "story"));
+  // Carry out three campaign directives: the finale follows.
+  for (let i = 0; i < 3; i++) { const d = { id: "x" + i, kind: "explore", need: 1, received: s.turn, campaign: "frontier", base: -99, issued: s.turn, deadline: s.turn + 5, reward: 10, title: "t", from: "f" }; D.active.push(d); checkDirectives(s); }
+  assert.equal(D.campaign.threads.length, 3); assert.ok(D.campaign.finale);
+  const fin = D.active.find((d) => d.kind === "finale"); assert.ok(fin && fin.rival === D.campaign.rival);
+  fin.base = -99; checkDirectives(s); assert.equal(D.campaign.over, "won");
+  assert.ok(Object.keys(faction(s, "concord").protos).some((k) => PROTOTYPES[k]));
+});
+test("battle stances change the rolls", async () => {
+  const { setStance } = await import("../src/game.js");
+  const s = newGame({ seed: 25, size: "small", player: "hegemony", rivals: 1 }), f = fleetsOf(s, "hegemony").find((x) => x.ships.some((y) => y.type === "frigate"));
+  assert.ok(setStance(s, f.id, "aggressive").ok); assert.equal(f.stance, "aggressive");
+  assert.ok(setStance(s, f.id, "reckless").error);
 });

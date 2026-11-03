@@ -2,11 +2,11 @@
 // The player gives orders through these functions; endTurn() lets the computer factions give theirs, then resolves
 // movement, battles, the economy, research and victory for everyone at once.
 import { makeRng, distance, neighbors, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SUPPLY } from "./data.js";
 import { makeGalaxy } from "./galaxy.js";
 
 // ---- a new game ----
-/** opts: { seed, size: small|medium|large, player: faction id, rivals: number (1–4), difficulty: easy|normal|hard } */
+/** opts: { seed, size: small|medium|large|vast, player: faction id, rivals: number (1–4), difficulty: easy|normal|hard, mode: standard|open } */
 export function newGame(opts) {
   const seed = opts.seed || Math.floor(Math.random() * 1e9);
   const pool = FACTIONS.filter((f) => f.id !== opts.player);
@@ -16,7 +16,7 @@ export function newGame(opts) {
   const list = [FACTIONS.find((f) => f.id === opts.player) || FACTIONS[0], ...rivals];
   const g = makeGalaxy(seed, opts.size || "medium", list.length);
   const state = {
-    version: 1, seed, turn: 1, size: opts.size || "medium", difficulty: opts.difficulty || "normal", radius: g.radius,
+    version: 1, seed, turn: 1, size: opts.size || "medium", difficulty: opts.difficulty || "normal", radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
     hexes: g.hexes, systems: g.systems, sysAt: g.sysAt, corridors: g.corridors, adj: g.adj,
     factions: [], fleets: {}, nextId: 1, log: [], winner: null, winReason: null, rngState: makeRng("play:" + seed).state(), events: [], offers: [],
   };
@@ -24,7 +24,7 @@ export function newGame(opts) {
     const home = g.homes[i];
     state.factions.push({ id: f.id, name: f.name, color: f.color, ai: i > 0, alive: true, capital: home,
       credits: 80, exotics: 0, research: { current: null, progress: 0, done: [] }, explored: {}, visible: {},
-      relations: {}, met: {}, stats: { built: 0, lost: 0, won: 0 } });
+      relations: {}, met: {}, stats: { built: 0, lost: 0, won: 0, ruins: 0 }, focus: { industry: 1, science: 1, credits: 1, defense: 0 }, protos: {} });
     state.systems[home].colony = { owner: f.id, kind: "colony", pop: f.id === "concord" ? 4 : 4, growth: 0, buildings: { shipyard: true, factory: false, lab: false, market: false },
       queue: [], stock: 0, defense: 2, capital: true };
     state.systems[home].name = f.homeworld;
@@ -54,15 +54,51 @@ export function fleetsOf(s, fid) { return Object.values(s.fleets).filter((f) => 
 export function fleetsAt(s, hex) { return Object.values(s.fleets).filter((f) => f.at === hex); }
 export const atWar = (s, a, b) => a !== b && faction(s, a).relations[b] && faction(s, a).relations[b].status === "war";
 
+/** Does this faction have this prototype fitted? */
+export const proto = (s, fid, id) => !!((faction(s, fid).protos || {})[id]);
 export function shipStats(s, fid, type) {
   const base = SHIPS[type], warship = base.skill > 0;
   return { ...base,
     speed: base.speed + (has(s, fid, "foldDrives") ? 1 : 0) + (fid === "vael" ? 1 : 0),
-    hull: base.hull + (warship && has(s, fid, "shields") ? 1 : 0),
-    skill: warship ? base.skill + (has(s, fid, "targeting") ? 1 : 0) + (fid === "hegemony" ? 1 : 0) : 0,
-    sensors: base.sensors + (has(s, fid, "sensors") ? 1 : 0),
+    hull: base.hull + (warship && has(s, fid, "shields") ? 1 : 0) + (warship && proto(s, fid, "plating") ? 1 : 0),
+    skill: warship ? base.skill + (has(s, fid, "targeting") ? 1 : 0) + (fid === "hegemony" ? 1 : 0) + (proto(s, fid, "lances") ? 1 : 0) : 0,
+    sensors: base.sensors + (has(s, fid, "sensors") ? 1 : 0) + (proto(s, fid, "scanners") ? 1 : 0),
     troops: (base.troops || 0) * (fid === "hegemony" ? 2 : 1),
-    cost: Math.round(base.cost * (has(s, fid, "orbitalYards") ? 0.8 : 1) * ((type === "colony" || type === "outpost") && fid === "concord" ? 0.75 : 1)) };
+    cost: Math.round(base.cost * (has(s, fid, "orbitalYards") ? 0.8 : 1) * (proto(s, fid, "drones") ? 0.9 : 1) * ((type === "colony" || type === "outpost") && fid === "concord" ? 0.75 : 1)) };
+}
+// ---- the empire's Focus ----
+export const focusOf = (s, fid) => (faction(s, fid).focus = faction(s, fid).focus || { industry: 1, science: 1, credits: 1, defense: 0 });
+export const focusUsed = (s, fid) => Object.values(focusOf(s, fid)).reduce((t, n) => t + n, 0);
+/** Set a priority's points (0–2), within the empire's Focus points. */
+export function setFocus(s, fid, kind, n) {
+  const fo = focusOf(s, fid); if (!(kind in FOCUS.kinds)) return { error: "No such priority." };
+  n = Math.max(0, Math.min(2, Math.round(n)));
+  if (focusUsed(s, fid) - fo[kind] + n > FOCUS.points) return { error: `Only ${FOCUS.points} Focus points: take one from another priority first.` };
+  fo[kind] = n; return { ok: true };
+}
+// ---- supply ----
+/** How far from its own worlds and outposts a faction's fleets stay in supply. */
+export const supplyRange = (s, fid) => SUPPLY.range + (proto(s, fid, "tenders") ? 2 : 0);
+export function inSupply(s, f) {
+  if (f.owner === "vael") return true;   // living hulls feed themselves
+  const r = supplyRange(s, f.owner);
+  return coloniesOf(s, f.owner).some((x) => distance(x.at, f.at) <= r);
+}
+/** Set a fleet's battle stance. */
+export function setStance(s, fleetId, stance) { const f = s.fleets[fleetId]; if (!f || !STANCES[stance]) return { error: "No such stance." }; f.stance = stance; return { ok: true }; }
+/** Open mode: no turn limit. After a win, keep ruling; in open mode, retire when you choose. */
+export function keepRuling(s) {
+  if (!s.winner || s.winner !== player(s).id) return { error: "Only after a victory of your own." };
+  s.kept = (s.kept || []).concat([{ turn: s.turn, reason: s.winReason }]);
+  s.winner = null; s.winReason = null; s.mode = "open";
+  log(s, player(s).id, "The game goes on: open rule, with no end but the one you choose.", "victory");
+  return { ok: true };
+}
+export function retire(s) {
+  if (s.winner) return { error: "The game is already over." };
+  s.winner = player(s).id; s.winReason = "retired";
+  log(s, player(s).id, `${player(s).name} sets down the crown at turn ${s.turn}.`, "victory");
+  return { ok: true };
 }
 export function spawnFleet(s, owner, at, types) {
   const id = "f" + s.nextId++;
@@ -81,7 +117,7 @@ export function canSettle(s, fid, sys, kind) {
 }
 export function maxPop(s, sys) {
   const c = sys.colony; if (!c || c.kind !== "colony") return 0;
-  return WORLDS[sys.world].pop + sys.size * 2 + (has(s, c.owner, "terraforming") ? 2 : 0) + (c.owner === "kel" ? 2 : 0);
+  return WORLDS[sys.world].pop + sys.size * 2 + (has(s, c.owner, "terraforming") ? 2 : 0) + (c.owner === "kel" ? 2 : 0) + (proto(s, c.owner, "arcologies") ? 1 : 0);
 }
 /** What a world gives each turn: { ind, sci, cr, exo, upkeep }. */
 export function yields(s, sys) {
@@ -95,6 +131,8 @@ export function yields(s, sys) {
     if (B.factory) ind *= 1.5;
     if (B.lab) sci *= 1.5;
     if (fid === "tessan") cr *= 1.25;
+    const fo = focusOf(s, fid);   // the empire's Focus
+    ind *= 1 + 0.1 * fo.industry; sci *= 1 + 0.1 * fo.science; cr *= 1 + 0.1 * fo.credits;
   } else cr = 0.5;
   const exo = sys.exotics ? 1 + (B.refinery ? 1 : 0) : 0;
   const upkeep = Object.keys(B).filter((b) => B[b] && BUILDINGS[b]).reduce((t, b) => t + BUILDINGS[b].upkeep, 0) * 0.5;
@@ -304,7 +342,8 @@ function battles(s) {
     const units = [];
     for (const [fid, fl] of Object.entries(sides)) for (const f of fl) for (const sh of f.ships) units.push({ fid, fleet: f, ship: sh, st: shipStats(s, fid, sh.type) });
     const worldGuns = sys && sys.colony && (sys.colony.buildings.battery || sys.colony.capital) && sys.colony.defense > 0;
-    if (worldGuns) units.push({ fid: sys.colony.owner, world: sys, st: { skill: 13 + (has(s, sys.colony.owner, "targeting") ? 1 : 0), dmg: 1, name: "Orbital guns" } });
+    if (worldGuns) { const o = sys.colony.owner; units.push({ fid: o, world: sys, st: { skill: 13 + (has(s, o, "targeting") ? 1 : 0) + focusOf(s, o).defense + (proto(s, o, "grid") ? 1 : 0), dmg: 1, name: "Orbital guns" } }); }
+    const stance = (u) => (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced;
     const hp = (u) => (u.world ? u.world.colony.defense : u.ship.hull);
     const hit = (u, n) => { if (u.world) u.world.colony.defense = Math.max(0, u.world.colony.defense - n); else u.ship.hull -= n; };
     let fights = 0;
@@ -316,7 +355,8 @@ function battles(s) {
         if (!foes.length) continue;
         const t = foes[R.int(foes.length)], roll = r3d6(R);
         fights++;
-        if (roll <= 4 || (roll < 17 && roll <= u.st.skill)) hit(t, u.st.dmg);
+        const need = u.st.skill + stance(u).atk + stance(t).def;
+        if (roll <= 4 || (roll < 17 && roll <= need)) hit(t, u.st.dmg);
       }
     }
     if (!fights) continue;
@@ -325,6 +365,8 @@ function battles(s) {
     for (const u of units) if (u.ship && u.ship.hull <= 0) { lost[u.fid] = (lost[u.fid] || 0) + 1; u.fleet.ships = u.fleet.ships.filter((x) => x !== u.ship); }
     for (const f of fleetsAt(s, hex)) if (!f.ships.length) delete s.fleets[f.id];
     for (const [fid, n] of Object.entries(lost)) faction(s, fid).stats.lost += n;
+    // A battle won: you destroyed ships of theirs, and lost fewer than they did.
+    for (const fid of list) { const theirs = Object.entries(lost).filter(([o]) => atWar(s, fid, o)).reduce((t, [, n]) => t + n, 0); if (theirs > (lost[fid] || 0)) faction(s, fid).stats.won = (faction(s, fid).stats.won || 0) + 1; }
     const where = sys ? sys.name : "deep space";
     const names = list.map((x) => faction(s, x).name).join(" and ");
     log(s, null, `Battle at ${where} between ${names}: ${Object.entries(lost).map(([fid, n]) => `${faction(s, fid).name} lost ${n} ship${n > 1 ? "s" : ""}`).join("; ") || "no ships lost"}.`, "war");
@@ -394,7 +436,7 @@ export function updateVision(s, F) {
   }
   // Ruins: the first to see them learns something.
   for (const sys of Object.values(s.systems)) if (sys.ruins && vis[sys.at] && fleetsAt(s, sys.at).some((f) => f.owner === F.id)) {
-    sys.ruins = false; F.research.progress += 60;
+    sys.ruins = false; F.research.progress += 60; F.stats.ruins = (F.stats.ruins || 0) + 1;
     const cur = TECHS.find((x) => x.id === F.research.current);
     log(s, F.id, `${F.name} surveyed the ruins at ${sys.name}: what the old empires left there is worth +60 research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}.`, "explore");
   }
@@ -480,7 +522,7 @@ function economy(s, F) {
       if (c.pop < max) { c.growth += RULES.growthPerTurn * (F.id === "kel" ? 1.5 : 1) * (1 + (max - c.pop) / max); if (c.growth >= 1) { c.growth -= 1; c.pop++; } }
       else c.growth = 0;
     }
-    const maxDef = c.buildings.battery ? 3 : c.capital ? 2 : 0;
+    const maxDef = (c.buildings.battery ? 3 : c.capital ? 2 : 0) + ((c.buildings.battery || c.capital) && proto(s, F.id, "grid") ? 1 : 0);
     if (c.defense < maxDef) c.defense = Math.min(maxDef, c.defense + 1);
   }
   // Living hulls heal anywhere; others at their own worlds.
@@ -488,8 +530,24 @@ function economy(s, F) {
     const home = s.sysAt[f.at] && s.systems[s.sysAt[f.at]].colony && s.systems[s.sysAt[f.at]].colony.owner === F.id;
     if (home || F.id === "vael") for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type).hull, x.hull + 1);
   }
+  // The computer powers' research arms field-test prototypes too: one every 25 turns.
+  if (F.ai && s.turn % 25 === 12) {
+    const p = Object.keys(PROTOTYPES).find((x) => !(F.protos || {})[x]);
+    if (p) { F.protos = F.protos || {}; F.protos[p] = true; if (player(s).met[F.id]) log(s, player(s).id, `${F.name} field-tested a prototype: ${PROTOTYPES[p].name} (${PROTOTYPES[p].text})`, "research"); }
+  }
+  // Supply: warships too far from every world and outpost of theirs wear down, a hull point a turn after the first
+  // (never below 1). Scouts, colony ships, outposts and transports carry what they need.
+  for (const f of fleetsOf(s, F.id)) {
+    if (!armed(f) || inSupply(s, f)) { f.out = 0; continue; }
+    f.out = (f.out || 0) + 1;
+    if (f.out <= SUPPLY.graceTurns) { if (!F.ai) log(s, F.id, `A fleet near ${nearestName(s, f.at)} is out of supply: from next turn its warships wear down a hull point a turn.`, "war"); continue; }
+    let worn = 0;
+    for (const x of f.ships) if (SHIPS[x.type].skill > 0 && x.hull > 1) { x.hull--; worn++; }
+    if (worn && !F.ai) log(s, F.id, `Out of supply near ${nearestName(s, f.at)}: ${worn} warship${worn === 1 ? "" : "s"} wear down a hull point. Bring them back within ${supplyRange(s, F.id)} hexes of a world or outpost of yours.`, "war");
+  }
 }
 
+const nearestName = (s, hex) => { const n = Object.values(s.systems).sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0]; return n ? n.name : "deep space"; };
 // ---- winning ----
 export function score(s, fid) {
   const cols = coloniesOf(s, fid);
@@ -498,9 +556,9 @@ export function score(s, fid) {
 function checkVictory(s) {
   if (s.winner) return;
   const alive = s.factions.filter((f) => f.alive);
-  if (alive.length === 1) { s.winner = alive[0].id; s.winReason = "conquest"; log(s, alive[0].id, `${alive[0].name} stands alone. Conquest victory.`, "victory"); return; }
+  if (alive.length === 1 && !(s.kept || []).some((k) => k.reason === "conquest")) { s.winner = alive[0].id; s.winReason = "conquest"; log(s, alive[0].id, `${alive[0].name} stands alone. Conquest victory.`, "victory"); return; }
   if (!player(s).alive) { s.winner = "none"; s.winReason = "fallen"; return; }
-  if (s.turn >= RULES.maxTurns) {
+  if (s.mode !== "open" && s.turn >= RULES.maxTurns) {
     const best = alive.sort((a, b) => score(s, b.id) - score(s, a.id))[0];
     s.winner = best.id; s.winReason = "score"; log(s, best.id, `Turn ${RULES.maxTurns}: ${best.name} leads on score.`, "victory");
   }

@@ -254,6 +254,8 @@ def main():
     # Fracture Lines: Dominion, the strategy game (fracture-dominion/, built by its own build.mjs): its standalone page.
     dom = ROOT / "fracture-dominion" / "dist" / "play.html"
     if dom.exists(): write("dominion/index.html", dom.read_text())
+    # Cloudflare Pages: always check for a newer copy of the pages, so a new upload shows at once.
+    write("_headers", "/*\n  Cache-Control: no-cache\n")
     write("playtest/index.html", page("/playtest", "Playtest · Legend Dynamics", "Played a Legend Dynamics playtest? How to play in two minutes, and four questions about how it went.",
                                       [PLAYTEST_HERO, PLAYTEST_HOW, PLAYTEST_FORM], fonts=font_links({bw.BRAND_FONTS}), blog=True))
     write("blog/write/index.html", page(BLOG_SLUG + "/write", "Write · Dev blog · Legend Dynamics", "The dev blog's author page.",
