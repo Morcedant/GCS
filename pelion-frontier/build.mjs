@@ -8,7 +8,9 @@ const strip = (src) => src
   .replace(/^import [^;]+;\s*$/gm, "")        // the modules share one scope once inlined
   .replace(/^export \{[^}]*\};\s*$/gm, "")
   .replace(/^export (?=(async )?function|const|let|class)/gm, "");
-const body = ORDER.map((m) => `// ---- ${m}.js ----\n` + strip(readFileSync(new URL(`src/${m}.js`, here), "utf8"))).join("\n");
+// A build stamp, shown on the start screen and in the menu, so it's plain which version a browser has.
+const BUILD_STAMP = new Date().toISOString().slice(0, 16).replace("T", " ") + " UTC";
+const body = `const BUILD = ${JSON.stringify(BUILD_STAMP)};\n` + ORDER.map((m) => `// ---- ${m}.js ----\n` + strip(readFileSync(new URL(`src/${m}.js`, here), "utf8"))).join("\n");
 const page = readFileSync(new URL("index.html", here), "utf8").replace("/* APP */", () => `(() => {\n"use strict";\n${body.replace(/<\//g, "<\\/")}\n})();`);
 mkdirSync(new URL("dist/", here), { recursive: true });
 writeFileSync(new URL("dist/index.html", here), page);

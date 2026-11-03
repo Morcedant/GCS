@@ -164,6 +164,8 @@ Fan works, not for sale or distribution; Star Trek and Grimm belong to their own
 """)
     write("playtest/index.html", playtest())
     write("robots.txt", "User-agent: *\nDisallow: /\n")
+    # Cloudflare Pages: always check for a newer copy of the pages, so a new upload shows at once.
+    write("_headers", "/*\n  Cache-Control: no-cache\n")
     n = sum(1 for p in SITE.rglob("*") if p.is_file())
     print(f"wrote {SITE.relative_to(ROOT)} ({n} files)")
     if a.zip:

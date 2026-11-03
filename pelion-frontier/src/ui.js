@@ -852,10 +852,12 @@ function showStarter(canContinue) {
   <label>Difficulty<select id="ng-diff"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label>
   <label>Sector seed (optional)<input type="text" id="ng-seed" placeholder="random" maxlength="30"></label></div>
   <div class="btn-row" style="margin-top:16px"><button class="btn primary" data-m="new">Take command</button>${canContinue ? `<button class="btn" data-m="continue">Continue your tour</button>` : ""}</div>
+  <p class="small muted">Version: ${esc(typeof BUILD === "string" ? BUILD : "development")}.</p>
   <p class="small muted">An unofficial fan game for the USS Pelion campaign, inspired by Star Trek. Not affiliated with or endorsed by Paramount or CBS Studios, who own Star Trek.</p>`);
 }
 function showMenu() {
   modal(`<h2>Menu</h2><p class="muted">${esc(S.captain)}, ${turnText().toLowerCase()}. This sector's seed: <span class="seed">${esc(S.seed)}</span></p>
+    <p class="small muted">Version: ${esc(typeof BUILD === "string" ? BUILD : "development")}</p>
     <div class="btn-row"><button class="btn primary" data-m="close">Back to the bridge</button><button class="btn" data-m="help">How to play</button><button class="btn" data-m="restart">New tour</button><button class="btn" data-m="replay">Replay this sector</button>${S.mode === "open" && !S.over ? `<button class="btn red" data-m="retire">Retire from command</button>` : ""}</div>
     ${S.mode === "open" ? `<p class="small muted">Open command has no end: retire when you choose, and the score is counted then.</p>` : ""}
     <h3>Save code</h3><p class="small muted">The game saves in this browser after every move. To move it to another browser, copy this code, then paste it there under Load.</p>
