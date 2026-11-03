@@ -651,7 +651,7 @@ function showNewGame(canContinue, preset) {
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin</button><button class="btn" id="ng-guide">New here? The starter guide</button><button class="btn" id="ng-load">Load a saved game</button></div>
     <p class="small muted">Version: ${esc(VERSION)}</p>`);
   if (preset) {
-    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty;
+    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard";
     const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
   }
   if ($("ng-continue")) $("ng-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
@@ -764,10 +764,10 @@ function showHelp(back) {
 }
 /** This game's galaxy: its seed and the settings that, with it, rebuild the same map. */
 function galaxyInfo() {
-  const size = { small: "Small", medium: "Medium", large: "Large" }[S.size] || S.size, rivals = S.factions.length - 1;
+  const size = { small: "Small", medium: "Medium", large: "Large", vast: "Vast" }[S.size] || S.size, rivals = S.factions.length - 1;
   const diff = { easy: "Easy", normal: "Normal", hard: "Hard" }[S.difficulty] || S.difficulty;
   return { seed: String(S.seed), text: `Seed ${S.seed} · ${size} galaxy · ${rivals} rival${rivals === 1 ? "" : "s"} · ${diff}`,
-    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id } };
+    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard" } };
 }
 function galaxyBox() {
   const g = galaxyInfo();
