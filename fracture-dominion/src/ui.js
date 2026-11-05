@@ -6,6 +6,7 @@ import { newGame, endTurn, faction, player, coloniesOf, fleetsOf, fleetsAt, ship
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto } from "./game.js";
 import { aiTurn } from "./ai.js";
 import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
+import { crisisTurn, crisisState } from "./crisis.js";
 import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX, CAMPAIGNS, campaignDef, campaignText } from "./orders.js";
 const VERSION = typeof BUILD === "string" ? BUILD : "development";
 /** "Turn 12 of 200", or in open rule "Turn 212 · open rule". */
@@ -235,6 +236,10 @@ function draw() {
       if (f.ships.length > 1 && view.zoom > 0.5) { ctx.fillStyle = "#fff"; ctx.font = "bold 9px system-ui, sans-serif"; ctx.fillText(String(f.ships.length), fx + 7, fy - 6); }
     });
   }
+  // The Heart of the Wardens, once it's woken: a ring of their colour round its hex.
+  const cr = S.crisis && S.crisis.stage === "awake" && S.crisis.heart;
+  if (cr && me.explored[cr]) { const { x, y } = toPixel(cr, size); ctx.beginPath(); ctx.arc(x, y, size * 0.92, 0, Math.PI * 2); ctx.strokeStyle = colorOf("wardens"); ctx.lineWidth = 2.5; ctx.setLineDash([3, 3]); ctx.stroke(); ctx.setLineDash([]);
+    if (view.zoom > 0.45) { ctx.fillStyle = colorOf("wardens"); ctx.font = "bold 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillText("THE HEART", x, y + size * 0.92 + 11); ctx.textAlign = "left"; } }
   // Hover and selection rings.
   if (sel && sel.kind === "system") { const { x, y } = toPixel(S.systems[sel.id].at, size); hexPath(ctx, x, y, size - 1); ctx.strokeStyle = "#fff6b0"; ctx.lineWidth = 2; ctx.stroke(); }
   if (moveMode && hoverHex && S.hexes[hoverHex]) { const { x, y } = toPixel(hoverHex, size); hexPath(ctx, x, y, size - 1); ctx.strokeStyle = "rgba(255,230,140,.9)"; ctx.lineWidth = 2; ctx.stroke(); }
@@ -351,6 +356,8 @@ function objectivesHTML() {
   h += `<div class="kv small" style="margin-bottom:10px"><span>Game</span><span>${S.mode === "open" ? `${turnText()}: no end but the one you choose (Menu → Retire)` : `${ibar(S.turn, RULES.maxTurns, "var(--gold)")} Turn ${S.turn} of ${RULES.maxTurns} (${turnsLeft} left)`}</span>
     <span>Standing</span><span>Score <b>${mine}</b>, ${myRank === 1 ? `<b class="good">first</b> of ${alive.length}` : `<b>${ordinal(myRank)}</b> of ${alive.length}`}</span></div>`;
   h += `<p class="small muted">Win one of three ways. Lose if your last world falls, or if a rival wins first.</p>`;
+  const live = S.crisis && (S.crisis.stage === "stirring" || S.crisis.stage === "awake");
+  if (live) h += crisisHTML();
   // 1. Conquest.
   const met = all.filter((f) => me.met[f.id]).length, fallen = all.filter((f) => !f.alive).length, atWarWith = rivals.filter((f) => atWar(S, me.id, f.id)).length;
   const cBadge = rivals.length === 0 ? ["Won", "good"] : fallen ? ["Under way", "good"] : atWarWith ? ["At war", ""] : ["Not started", ""];
@@ -378,7 +385,8 @@ function objectivesHTML() {
   h += `<div class="card obj"><h3 class="obj-h">Highest score at turn ${RULES.maxTurns} <span class="badge-status ${sBadge[1]}">${sBadge[0]}</span></h3>
     <div class="kv small"><span>Yours</span><span>${ibar(mine, Math.max(1, lead.sc), "var(--accent)")} ${mine}</span>
     <span>${lead.f.id === me.id ? "Next best" : "Leader"}</span><span>${lead.f.id === me.id ? (ranked[1] ? `${me.met[ranked[1].f.id] ? esc(ranked[1].f.name) : "An unmet rival"}: ${ranked[1].sc} (you lead by ${gap})` : "No one") : `${me.met[lead.f.id] ? esc(lead.f.name) : "An unmet rival"}: ${lead.sc} (${gap} ahead of you)`}</span></div>
-    <p class="small" style="margin-top:6px"><b class="good">Win:</b> lead on score when turn ${RULES.maxTurns} ends. Score: 5 per colony and 2 per population, 2 per outpost, 6 per technology, and a quarter of your fleet's strength.</p></div>`;
+    <p class="small" style="margin-top:6px"><b class="good">Win:</b> lead on score when turn ${RULES.maxTurns} ends. Score: 5 per colony and 2 per population, 2 per outpost, 6 per technology, and a quarter of your fleet's strength${S.crisisOff ? "" : "; when the Wardens wake, points for every machine of theirs destroyed and 30 for breaking their Heart"}.</p></div>`;
+  if (!live) h += crisisHTML();
   // The rivals' race.
   const threats = [];
   for (const f of rivals) {
@@ -389,6 +397,24 @@ function objectivesHTML() {
   h += `<h3>Threats</h3>` + (threats.length ? `<ul class="log">${threats.join("")}</ul>` : `<p class="small muted">No rival is close to winning yet.</p>`);
   h += `<p class="small muted"><b>Defeat:</b> your last world falls; a rival finishes the Corridor Engine or stands alone; or a rival leads on score at turn ${RULES.maxTurns}.</p>`;
   return h;
+}
+/** The late-game crisis, on the Objectives tab: the warning, then the Heart, its waves and who is fighting them. */
+function crisisHTML() {
+  const c = crisisState(S); if (!c) return "";
+  const me = player(S);
+  if (c.stage === "stirring") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">Stirring</span></h3>
+    <p class="small">A signal is coming out of the rifts: the Wardens, war machines of the old empires, wake in about ${Math.max(1, c.at - S.turn)} turn${c.at - S.turn === 1 ? "" : "s"}. They'll burn any world they reach, whoever's it is. Build warships, and put guns on your outer worlds.</p></div>`;
+  const fighters = [me, ...S.factions.filter((f) => f.id !== me.id && me.met[f.id])].map((f) => ({ f, n: f.stats.wardens || 0 })).sort((a, b) => b.n - a.n);
+  const table = `<table class="tbl"><tr><th>Fighting them</th><th>Machines destroyed</th></tr>${fighters.map(({ f, n }) => `<tr><td><span class="dot" style="background:${f.color}"></span>${f.id === me.id ? "You" : esc(f.name)}${f.alive ? "" : " †"}</td><td>${n}</td></tr>`).join("")}</table>`;
+  if (c.stage === "over") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status good">Broken</span></h3>
+    <p class="small">${c.by ? `${c.by === me.id ? "You" : me.met[c.by] ? esc(faction(S, c.by).name) : "A power you haven't met"} broke the Heart` : "The Heart is broken"}${S.crisis.over ? ` on turn ${S.crisis.over}` : ""}. Every machine went dark.</p>${table}</div>`;
+  return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">Awake</span></h3>
+    <div class="kv small"><span>The Heart</span><span>${ibar(c.hull, c.max, "var(--bad)")} ${c.hull} of ${c.max} hull, at <button class="linkish" data-center="${c.heart}">${esc(c.place)}</button></span>
+    <span>Waves</span><span>${c.wave} sent · the next in ${Math.max(0, c.nextWave - S.turn)} turn${c.nextWave - S.turn === 1 ? "" : "s"} · ${c.ships} machines out there</span>
+    <span>Truce</span><span>${c.truce ? "Holding: no power starts a new war while the Heart lives" : "None: wars go on"}</span></div>
+    <ol class="steps-list">${stepLi("now", "Keep their waves off your worlds: a world with guns or warships in orbit can't be burned, only fought over")}${stepLi("", `Break the Heart: its guard must fall before it can be hit, it mends ${2 * (S.crisis.m || 1)} hull a turn, and it fires ${1 + (S.crisis.m || 1)} times a round`)}</ol>
+    ${table}
+    <p class="small" style="margin-top:6px"><b class="good">Reward:</b> score for every machine destroyed; breaking the Heart is worth 30 more, and its wreck.</p></div>`;
 }
 /** The Mission tab: the directives under way (progress, deadline, reward), the backlog, and past directives. */
 function missionHTML() {
@@ -542,6 +568,7 @@ function bindChrome() {
     if (d.focus) { const r = setFocus(S, me.id, d.focus, +d.n); if (r.error) toast(r.error, true); save(); renderAll(); return; }
     if (d.stance) { setStance(S, sel.id, d.stance); toast(`${STANCES[d.stance].name}: ${STANCES[d.stance].text}`); save(); renderAll(); return; }
     if (d.accept) { const r = acceptDirective(S, d.accept); if (r.error) toast(r.error, true); else toast("Directive taken on: its clock starts now."); checkDirectives(S); save(); renderAll(); showNextMission(); return; }
+    if (d.center) { centerOn(d.center); draw(); return; }
     if (d.selfleet) { select({ kind: "fleet", id: d.selfleet }); const f = S.fleets[d.selfleet]; if (f) { centerOn(f.at); draw(); } return; }
     if (d.selsys) { select({ kind: "system", id: d.selsys }); centerOn(S.systems[d.selsys].at); draw(); return; }
     if (d.build) { const [k, id] = d.build.split(":"); const r = enqueue(S, sel.id, k, id); if (r.error) toast(r.error, true); }
@@ -620,6 +647,7 @@ function doEndTurn() {
     S.offers = S.offers.filter((o) => S.turn - o.turn < 3);
     endTurn(S, aiTurn);
     if (!S.winner) directivesTurn(S);
+    if (!S.winner) crisisTurn(S);
     if (!S.winner) eventsTurn(S);
     $("end-turn").textContent = "End turn";
     save();
@@ -648,7 +676,7 @@ function showBattle(then) {
   const B = S.battleReports && S.battleReports[0]; if (!B) { then(); return; }
   const me = player(S).id, n = B.events.length;
   let shown = 0;
-  const unitName = (u) => { const who = u.fid === me ? "Your" : faction(S, u.fid).name.replace(/^The /, ""); return u.type === "guns" ? `${who} orbital guns at ${u.name.replace(/'s orbital guns$/, "")}` : `${who} ${u.name.toLowerCase()}`; };
+  const unitName = (u) => { if (u.fid === "wardens") return u.type === "heart" ? "The Heart" : `Warden ${u.name.toLowerCase()}`; const who = u.fid === me ? "Your" : faction(S, u.fid).name.replace(/^The /, ""); return u.type === "guns" ? `${who} orbital guns at ${u.name.replace(/'s orbital guns$/, "")}` : `${who} ${u.name.toLowerCase()}`; };
   const hullAt = (k) => B.units.map((u, i) => Math.max(0, u.hull - B.events.slice(0, k).filter((e) => e.t === i).reduce((t, e) => t + e.dmg, 0)));
   const icon = (u) => (u.type === "guns" ? `<svg width="22" height="22" viewBox="-13.5 -13.5 27 27" aria-hidden="true"><circle r="7" fill="${faction(S, u.fid).color}" fill-opacity=".3" stroke="${faction(S, u.fid).color}" stroke-width="1"/><path d="M0 -7 V-12 M7 0 H12 M0 7 V12 M-7 0 H-12" stroke="${faction(S, u.fid).color}" stroke-width="1"/></svg>` : shipSVG(u.type, faction(S, u.fid).color, 22));
   const sideHTML = (fids, hull, title) => `<div class="bside"><h3>${title}</h3>${B.units.map((u, i) => fids.includes(u.fid) ? `<div class="bunit ${hull[i] <= 0 ? "dead" : ""}">${icon(u)}<span>${esc(unitName(u))}${u.stance && u.stance !== "balanced" ? ` <i class="small muted">(${esc(STANCES[u.stance].name.toLowerCase())})</i>` : ""}</span><span class="pips">${Array.from({ length: u.max }, (_, k) => `<i class="${k < hull[i] ? "on" : ""}"></i>`).join("")}</span></div>` : "").join("")}</div>`;
@@ -719,18 +747,19 @@ function showNewGame(canContinue, preset) {
       <label>Difficulty <select id="ng-diff"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label>
       <label>Seed <input type="text" id="ng-seed" placeholder="random" size="10"></label>
     </div>
+    <label class="small check-line"><input type="checkbox" id="ng-crisis" checked> A late-game crisis: around turn 110 the Wardens, old war machines, wake in the rifts and come for every world</label>
     <label class="small check-line"><input type="checkbox" id="ng-steps" ${canContinue ? "" : "checked"}> Guide me through my first game, step by step</label>
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin</button><button class="btn" id="ng-guide">New here? The starter guide</button><button class="btn" id="ng-load">Load a saved game</button></div>
     <p class="small muted">Version: ${esc(VERSION)}</p>`);
   if (preset) {
-    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard";
+    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard"; $("ng-crisis").checked = !preset.crisisOff;
     const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
   }
   if ($("ng-continue")) $("ng-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
   $("ng-start").onclick = () => {
     const seedText = $("ng-seed").value.trim();
     const st = newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
-      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value });
+      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked });
     if ($("ng-steps").checked) st.tutorial = { on: true, guide: true, ack: {}, seen: {} };
     startGame(st); save();
   };
@@ -894,7 +923,7 @@ function galaxyInfo() {
   const size = { small: "Small", medium: "Medium", large: "Large", vast: "Vast" }[S.size] || S.size, rivals = S.factions.length - 1;
   const diff = { easy: "Easy", normal: "Normal", hard: "Hard" }[S.difficulty] || S.difficulty;
   return { seed: String(S.seed), text: `Seed ${S.seed} · ${size} galaxy · ${rivals} rival${rivals === 1 ? "" : "s"} · ${diff}`,
-    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard" } };
+    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff } };
 }
 function galaxyBox() {
   const g = galaxyInfo();

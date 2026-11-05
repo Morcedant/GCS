@@ -80,6 +80,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .card.obj { background: var(--panel-2); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: 8px; padding: 10px 12px; margin: 10px 0; }
 .obj-h { margin: 0 0 6px; color: var(--ink); text-transform: none; letter-spacing: .02em; font-size: 15px; }
 .badge-status { font: 600 11px var(--body); letter-spacing: .04em; text-transform: none; border: 1px solid var(--line); border-radius: 10px; padding: 1px 8px; margin-left: 6px; vertical-align: 2px; color: var(--muted); }
+.card.obj.crisis { border-left-color: #e8e4d0; }
+.linkish { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; text-decoration: underline; cursor: pointer; }
 .badge-status.good { color: var(--good); border-color: rgba(123,196,127,.5); } .badge-status.bad { color: var(--bad); border-color: rgba(255,122,107,.6); }
 .steps-list { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 3px; font-size: 13px; }
 .steps-list li { display: flex; gap: 8px; color: var(--muted); } .steps-list li > span { width: 14px; flex: none; text-align: center; }
@@ -188,7 +190,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-05 22:11 UTC";
+const BUILD = "2026-11-05 22:36 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -307,6 +309,10 @@ const SHIPS = {
   transport: { name: "Troop transport", cost: 45, upkeep: 1, speed: 3, hull: 1, skill: 0, dmg: 0, sensors: 1, troops: 2, text: "Takes an enemy world whose orbit you hold. Used up." },
   cruiser: { name: "Cruiser", cost: 90, exotics: 1, upkeep: 2, speed: 3, hull: 4, skill: 12, dmg: 2, sensors: 2, needs: "heavyHulls", text: "Heavier guns and hull." },
   dreadnought: { name: "Dreadnought", cost: 180, exotics: 3, upkeep: 4, speed: 2, hull: 8, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
+  // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
+  sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
+  colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
+  heart: { name: "Heart", cost: 0, upkeep: 0, speed: 0, hull: 20, skill: 14, dmg: 3, sensors: 3, warden: true, text: "The Wardens' mind and forge. It never moves, mends itself, and sends out the waves. Break it and they go dark." },
 };
 
 // Ship outlines, bow pointing right (+x), in a box from −12 to 12: SVG path data, for the map (a canvas Path2D), the
@@ -319,6 +325,9 @@ const SHIP_SHAPES = {
   transport: "M11 0 L6 -5 L-9 -5 L-9 5 L6 5 Z M-9 -3 L-12 -3 L-12 3 L-9 3 M-3 -5 L-3 -8 L1 -8 L1 -5 M-3 5 L-3 8 L1 8 L1 5",
   cruiser: "M12 0 L6 -3 L-2 -3 L-6 -9.5 L-9 -9.5 L-8 -3 L-11 -3 L-11 3 L-8 3 L-9 9.5 L-6 9.5 L-2 3 L6 3 Z M6 0 L-3 0",
   dreadnought: "M12 -5 L12 5 L6 5 L4 8.5 L-10 8.5 L-12 4 L-12 -4 L-10 -8.5 L4 -8.5 L6 -5 Z M-12 -2 L-13.5 -2 M-12 2 L-13.5 2 M4 -8.5 L4 8.5 M-4 -8.5 L-4 8.5 M12 0 L6 0",
+  sentinel: "M12 0 L2 -4 L-4 -10 L-2 -3 L-10 0 L-2 3 L-4 10 L2 4 Z M2 0 L-4 0",
+  colossus: "M12 0 L7 -6 L0 -6 L-3 -11 L-8 -11 L-7 -6 L-12 -4 L-12 4 L-7 6 L-8 11 L-3 11 L0 6 L7 6 Z M7 0 L-7 0 M0 -6 L0 6",
+  heart: "M0 -12 L8.5 -8.5 L12 0 L8.5 8.5 L0 12 L-8.5 8.5 L-12 0 L-8.5 -8.5 Z M0 -6 L6 0 L0 6 L-6 0 Z M0 -12 L0 -6 M12 0 L6 0 M0 12 L0 6 M-12 0 L-6 0",
 };
 
 // Research: three fields. cost in science; needs: earlier techs.
@@ -383,6 +392,8 @@ const STANCES = {
 };
 /** Fleets out of supply (farther than this from every world and outpost of theirs) wear down. */
 const SUPPLY = { range: 3, graceTurns: 1 };
+/** The late-game crisis: when the Wardens wake, and how hard they come. */
+const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
 const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };
 
 // ---- galaxy.js ----
@@ -481,7 +492,7 @@ function newGame(opts) {
   const list = [FACTIONS.find((f) => f.id === opts.player) || FACTIONS[0], ...rivals];
   const g = makeGalaxy(seed, opts.size || "medium", list.length);
   const state = {
-    version: 1, seed, turn: 1, size: opts.size || "medium", difficulty: opts.difficulty || "normal", radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
+    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, size: opts.size || "medium", difficulty: opts.difficulty || "normal", radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
     hexes: g.hexes, systems: g.systems, sysAt: g.sysAt, corridors: g.corridors, adj: g.adj,
     factions: [], fleets: {}, nextId: 1, log: [], winner: null, winReason: null, rngState: makeRng("play:" + seed).state(), events: [], offers: [],
   };
@@ -502,7 +513,9 @@ function newGame(opts) {
 }
 
 // ---- helpers ----
-const faction = (s, id) => s.factions.find((f) => f.id === id);
+// The Wardens (the late-game crisis, crisis.js) are a power of their own, kept out of s.factions: they have no worlds,
+// no diplomacy and no score, and they're at war with everyone.
+const faction = (s, id) => s.factions.find((f) => f.id === id) || (s.crisis && s.crisis.F && s.crisis.F.id === id ? s.crisis.F : undefined);
 const has = (s, fid, tech) => faction(s, fid).research.done.includes(tech);
 const player = (s) => s.factions[0];
 function rng(s) { const r = makeRng(1); r.setState(s.rngState); return { ...r, save: () => { s.rngState = r.state(); } }; }
@@ -517,12 +530,14 @@ function log(s, fid, text, kind = "info") {
 function coloniesOf(s, fid) { return Object.values(s.systems).filter((x) => x.colony && x.colony.owner === fid); }
 function fleetsOf(s, fid) { return Object.values(s.fleets).filter((f) => f.owner === fid); }
 function fleetsAt(s, hex) { return Object.values(s.fleets).filter((f) => f.at === hex); }
-const atWar = (s, a, b) => a !== b && faction(s, a).relations[b] && faction(s, a).relations[b].status === "war";
+const atWar = (s, a, b) => a !== b && (a === "wardens" || b === "wardens" || !!(faction(s, a).relations[b] && faction(s, a).relations[b].status === "war"));
 
 /** Does this faction have this prototype fitted? */
 const proto = (s, fid, id) => !!((faction(s, fid).protos || {})[id]);
 function shipStats(s, fid, type) {
   const base = SHIPS[type], warship = base.skill > 0;
+  // The Heart of the Wardens grows with the galaxy it wakes in (crisis.js): more hull, more guns.
+  if (type === "heart") { const m = (s.crisis && s.crisis.m) || 1; return { ...base, hull: s.crisis && s.crisis.heartMax || base.hull * m, shots: 1 + m }; }
   return { ...base,
     speed: base.speed + (has(s, fid, "foldDrives") ? 1 : 0) + (fid === "vael" ? 1 : 0),
     hull: base.hull + (warship && has(s, fid, "shields") ? 1 : 0) + (warship && proto(s, fid, "plating") ? 1 : 0),
@@ -621,7 +636,7 @@ function totals(s, fid) {
 function buildOptions(s, sys) {
   const c = sys.colony, fid = c.owner, out = [];
   if (c.kind !== "colony") return out;
-  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.needs || has(s, fid, d.needs)) out.push({ kind: "ship", id: t, name: d.name, cost: shipStats(s, fid, t).cost, exotics: d.exotics || 0 });
+  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.warden && (!d.needs || has(s, fid, d.needs))) out.push({ kind: "ship", id: t, name: d.name, cost: shipStats(s, fid, t).cost, exotics: d.exotics || 0 });
   for (const [b, d] of Object.entries(BUILDINGS)) {
     if (c.buildings[b] || (d.needs && !has(s, fid, d.needs)) || c.queue.some((q) => q.id === b)) continue;
     if (d.wonder && !c.capital) continue;
@@ -793,6 +808,17 @@ function checkAlive(s, fid) {
   }
 }
 
+/** A world burned to nothing (the Wardens do this): the colony is gone; a capital moves; a power with no colony falls. */
+function razeWorld(s, sys) {
+  const was = sys.colony.owner, wasCapital = sys.colony.capital;
+  sys.colony = null;
+  if (wasCapital) {
+    const rest = coloniesOf(s, was).filter((x) => x.colony.kind === "colony").sort((a, b) => b.colony.pop - a.colony.pop);
+    if (rest[0]) { rest[0].colony.capital = true; rest[0].colony.buildings.shipyard = true; faction(s, was).capital = rest[0].id; log(s, was, `${faction(s, was).name} moved its capital to ${rest[0].name}.`, "war"); }
+  }
+  checkAlive(s, was);
+}
+
 // ---- battles: 3d6 roll-under, three exchanges ----
 function battles(s) {
   const R = rng(s), hexes = new Set(Object.values(s.fleets).map((f) => f.at));
@@ -813,20 +839,33 @@ function battles(s) {
     const hp = (u) => (u.world ? u.world.colony.defense : u.ship.hull);
     const hit = (u, n) => { if (u.world) u.world.colony.defense = Math.max(0, u.world.colony.defense - n); else u.ship.hull -= n; };
     // A battle the player is in is recorded roll by roll, for the battle pop-up.
-    const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: sys ? sys.name : "deep space", hex, sides: list,
+    const where = sys ? sys.name : s.crisis && s.crisis.heart === hex ? "the Heart of the Wardens" : "deep space";
+    const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: where, hex, sides: list,
       units: units.map((u) => ({ fid: u.fid, type: u.world ? "guns" : u.ship.type, name: u.world ? `${u.world.name}'s orbital guns` : u.st.name, hull: hp(u), max: u.world ? hp(u) : u.st.hull, stance: u.fleet ? u.fleet.stance || "balanced" : null })), events: [] } : null;
     let fights = 0;
     for (let round = 0; round < 3; round++) {
       const live = units.filter((u) => hp(u) > 0);
       for (const u of live) {
+        for (let shot = 0; shot < (u.st.shots || 1); shot++) {
         if (!u.st.skill || hp(u) <= 0) continue;
-        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid));
+        // The Heart of the Wardens can't be fired on while its guard still stands.
+        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && v.ship.type === "heart" && live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0)));
         if (!foes.length) continue;
         const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
         const need = u.st.skill + stance(u).atk + stance(t).def, landed = roll <= 4 || (roll < 17 && roll <= need);
-        if (landed) hit(t, u.st.dmg);
+        if (landed) {
+          const was = hp(t); hit(t, u.st.dmg);
+          // A Warden machine destroyed counts for whoever destroyed it; the Heart, for everyone who fought it.
+          if (was > 0 && hp(t) <= 0 && t.fid === "wardens" && u.fid !== "wardens") {
+            const K = faction(s, u.fid); K.stats.wardens = (K.stats.wardens || 0) + 1;
+            // Score: by what the machine was worth, against how hard the Wardens came (a hunter is worth less in a swarm).
+            K.stats.wardenPts = (K.stats.wardenPts || 0) + (SHIPS[t.ship.type].hull * SHIPS[t.ship.type].dmg / 3) / ((s.crisis && s.crisis.m) || 1) * (K.glory ? 2 : 1);
+            if (t.ship.type === "heart" && s.crisis) { s.crisis.heartBy = u.fid; s.crisis.heartWith = list.filter((x) => x !== "wardens"); }
+          }
+        }
         if (rec) rec.events.push({ round, a: units.indexOf(u), t: units.indexOf(t), dice, need, hit: landed, dmg: landed ? u.st.dmg : 0 });
+        }
       }
     }
     if (!fights) continue;
@@ -837,7 +876,6 @@ function battles(s) {
     for (const [fid, n] of Object.entries(lost)) faction(s, fid).stats.lost += n;
     // A battle won: you destroyed ships of theirs, and lost fewer than they did.
     for (const fid of list) { const theirs = Object.entries(lost).filter(([o]) => atWar(s, fid, o)).reduce((t, [, n]) => t + n, 0); if (theirs > (lost[fid] || 0)) faction(s, fid).stats.won = (faction(s, fid).stats.won || 0) + 1; }
-    const where = sys ? sys.name : "deep space";
     const names = list.map((x) => faction(s, x).name).join(" and ");
     log(s, null, `Battle at ${where} between ${names}: ${Object.entries(lost).map(([fid, n]) => `${faction(s, fid).name} lost ${n} ship${n > 1 ? "s" : ""}`).join("; ") || "no ships lost"}.`, "war");
     s.events.push({ turn: s.turn, kind: "battle", hex, sides: list });
@@ -1025,7 +1063,9 @@ const nearestName = (s, hex) => { const n = Object.values(s.systems).sort((a, b)
 // ---- winning ----
 function score(s, fid) {
   const cols = coloniesOf(s, fid);
-  return Math.round(cols.reduce((t, x) => t + (x.colony.kind === "colony" ? 5 + x.colony.pop * 2 : 2), 0) + faction(s, fid).research.done.length * 6 + militaryPower(s, fid) / 4);
+  const F = faction(s, fid);
+  return Math.round(cols.reduce((t, x) => t + (x.colony.kind === "colony" ? 5 + x.colony.pop * 2 : 2), 0) + F.research.done.length * 6 + militaryPower(s, fid) / 4
+    + (F.stats.wardenPts || 0) + (F.stats.heart ? 30 : 0));
 }
 function checkVictory(s) {
   if (s.winner) return;
@@ -1354,11 +1394,197 @@ function F_bonus(s, rep) {
 
 const cap = (t) => t[0].toUpperCase() + t.slice(1);
 
+// ---- crisis.js ----
+// The late-game crisis: the Wardens. Around turn 105–120, war machines the old empires left to guard the corridors
+// wake in the rifts. Six turns before, a signal gives warning. Then their Heart (it never moves) sends out a wave
+// every few turns. The waves hunt the nearest worlds of every power and burn them while their orbits stand
+// unguarded. The Wardens are at war with everyone and talk to no one. Break the Heart and they go dark.
+// The player meets them in three scenes with choices (warning, waking, the Heart broken), shown like galactic events.
+
+
+
+const WARDENS = "wardens";
+const crMe = (s) => player(s);
+const crAlive = (s) => s.factions.filter((f) => f.alive);
+const crResearch = (s, F, n) => { F.research.progress += n; const cur = TECHS.find((t) => t.id === F.research.current); return `+${n} research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}`; };
+const crPlace = (s, hex) => (s.sysAt[hex] ? s.systems[s.sysAt[hex]].name : (() => { const n = Object.values(s.systems).sort((a, b) => distance(a.at, hex) - distance(b.at, hex))[0]; return n ? `deep space near ${n.name}` : "deep space"; })());
+
+/** Where things stand, for the panels: null before the warning. */
+function crisisState(s) {
+  const C = s.crisis; if (!C || C.stage === "quiet") return null;
+  const heart = heartShip(s);
+  return { stage: C.stage, at: C.at, heart: C.heart, place: C.heart ? crPlace(s, C.heart) : null, hull: heart ? heart.hull : 0, max: C.heartMax || SHIPS.heart.hull,
+    wave: C.wave || 0, nextWave: C.nextWave, ships: wardenFleets(s).reduce((t, f) => t + f.ships.length, 0), truce: !!C.truce, by: C.heartBy || null };
+}
+const wardenFleets = (s) => fleetsOf(s, WARDENS);
+function heartShip(s) { for (const f of wardenFleets(s)) { const h = f.ships.find((x) => x.type === "heart"); if (h) return h; } return null; }
+
+/** Once a turn, after the turn resolves (and before galactic events): the warning, the waking, the waves, the burning. */
+function crisisTurn(s) {
+  if (s.crisisOff || s.winner) return;
+  const C = s.crisis || (s.crisis = { stage: "quiet", at: Math.max(s.turn + CRISIS.warning + 2, CRISIS.earliest + makeRng("crisis:" + s.seed).int(CRISIS.spread)) });
+  if (C.stage === "quiet") {
+    if (s.turn >= C.at - CRISIS.warning && !s.galEvent) {
+      C.stage = "stirring"; s.galEvent = { id: "stirring", ctx: {}, turn: s.turn };
+      log(s, null, "A signal is coming out of the rifts: the same pattern, over and over, on every band.", "war");
+    }
+    return;
+  }
+  if (C.stage === "stirring") { if (s.turn >= C.at && !s.galEvent) wake(s); return; }
+  if (C.stage !== "awake") { if (C.queued && !s.galEvent) { s.galEvent = C.queued; C.queued = null; } return; }
+  const heart = heartShip(s);
+  if (!heart) { breakHeart(s); return; }
+  heart.hull = Math.min(C.heartMax, heart.hull + CRISIS.heartHeal * (C.m || 1));
+  const R = rng(s);
+  // A wave every few turns, unless the Wardens already have plenty out.
+  if (s.turn >= C.nextWave) { if (wardenFleets(s).reduce((t, f) => t + f.ships.length, 0) < 12 * (C.m || 1)) sendWave(s, R); else C.nextWave = s.turn + 1; }
+  // The waves: burn the world they hold, or find the next one.
+  for (const f of wardenFleets(s)) {
+    if (f.ships.some((x) => x.type === "heart") || f.path.length) continue;
+    const sys = s.sysAt[f.at] && s.systems[s.sysAt[f.at]];
+    if (sys && sys.colony) { if (!guarded(s, sys, WARDENS)) burn(s, sys, R); continue; }
+    hunt(s, f, R);
+  }
+  reveal(s);
+  R.save();
+}
+
+/** The Heart's hex is always in view once it's woken: everyone saw where the signal came from. */
+function reveal(s) { const me = crMe(s); for (const k of within(s.crisis.heart, 1)) if (s.hexes[k]) { me.explored[k] = 1; me.visible[k] = 1; } }
+
+function wake(s) {
+  const C = s.crisis, R = rng(s);
+  // The Heart wakes beside a rift, in space, as far from every world as it can be.
+  const cols = Object.values(s.systems).filter((x) => x.colony);
+  const space = Object.keys(s.hexes).filter((k) => s.hexes[k].terrain === "space" && !s.sysAt[k] && distance(k, "0,0") <= s.radius - 2 && !fleetsAt(s, k).length);
+  const byRift = space.filter((k) => neighbors(k).some((n) => s.hexes[n] && s.hexes[n].terrain === "rift"));
+  const far = (k) => Math.min(99, ...cols.map((c) => distance(c.at, k)));
+  const pool = (byRift.length ? byRift : space).sort((a, b) => far(b) - far(a) || (a < b ? -1 : 1));
+  C.heart = pool[0];
+  C.F = { id: WARDENS, name: "The Wardens", color: CRISIS.color, ai: true, alive: true, crisis: true, capital: null, credits: 0, exotics: 0,
+    research: { current: null, progress: 0, done: [] }, explored: {}, visible: {}, relations: {}, met: {}, stats: { built: 0, lost: 0, won: 0 },
+    focus: { industry: 0, science: 0, credits: 0, defense: 0 }, protos: {} };
+  // How hard they come: with the strength of the strongest power they wake among.
+  const P = Math.max(0, ...crAlive(s).map((f) => militaryPower(s, f.id)));
+  C.m = Math.max(1, Math.min(10, Math.round((P / 250) * ({ easy: 0.7, hard: 1.25 }[s.difficulty] || 1))));
+  C.heartMax = SHIPS.heart.hull * C.m - (C.studied ? CRISIS.studied * C.m : 0);
+  const hf = spawnFleet(s, WARDENS, C.heart, []);
+  hf.ships.push({ type: "heart", hull: C.heartMax });
+  for (let i = 0; i < C.m; i++) hf.ships.push({ type: "colossus", hull: SHIPS.colossus.hull });
+  C.stage = "awake"; C.woke = s.turn; C.wave = 0; C.nextWave = s.turn;
+  sendWave(s, R);
+  // The rivals' own wars: most of them stop, for now.
+  const ended = [];
+  for (const A of crAlive(s)) for (const B of crAlive(s)) if (A.ai && B.ai && A.id < B.id && atWar(s, A.id, B.id) && R.next() < 0.6) {
+    A.relations[B.id].status = B.relations[A.id].status = "peace"; ended.push(`${A.name} and ${B.name}`);
+  }
+  if (ended.length) log(s, null, `Against the common threat, ${ended.join("; ")} made peace.`, "diplo");
+  log(s, null, `The Wardens have woken at ${crPlace(s, C.heart)}. Their Heart sends out the first wave.`, "war");
+  s.galEvent = { id: "waking", ctx: {}, turn: s.turn };
+  reveal(s);
+  R.save();
+}
+
+function sendWave(s, R) {
+  const C = s.crisis; C.wave++; C.nextWave = s.turn + CRISIS.waveEvery;
+  const m = C.m || 1, n = Math.min(7, 2 + C.wave) * m, big = Math.min(4, Math.ceil(C.wave / 2)) * m;
+  const f = spawnFleet(s, WARDENS, C.heart, []);
+  for (let i = 0; i < n; i++) f.ships.push({ type: "sentinel", hull: SHIPS.sentinel.hull });
+  for (let i = 0; i < big; i++) f.ships.push({ type: "colossus", hull: SHIPS.colossus.hull });
+  // The Heart keeps a guard of its own, growing to two (times the crisis's strength).
+  const hf = wardenFleets(s).find((x) => x.ships.some((y) => y.type === "heart"));
+  if (hf && C.wave > 1) for (let i = 0; i < m && hf.ships.filter((x) => x.type === "colossus").length < 2 * m; i++) hf.ships.push({ type: "colossus", hull: SHIPS.colossus.hull });
+  hunt(s, f, R);
+  const target = f.dest && s.sysAt[f.dest] ? s.systems[s.sysAt[f.dest]] : null;
+  const mine = target && target.colony && target.colony.owner === crMe(s).id;
+  log(s, crMe(s).id, `Wave ${C.wave} leaves the Heart: ${n} sentinel${n === 1 ? "" : "s"}${big ? ` and ${big} coloss${big === 1 ? "us" : "i"}` : ""}${mine ? `, heading for your world ${target.name}` : ""}.`, "war");
+}
+
+/** A wave picks one of the three nearest worlds of anyone's, and sets out. */
+function hunt(s, f, R) {
+  const near = Object.values(s.systems).filter((x) => x.colony).map((x) => ({ x, d: distance(f.at, x.at) - (x.colony.kind === "colony" ? x.colony.pop * 0.3 : 0) }))
+    .sort((a, b) => a.d - b.d).slice(0, 3);
+  for (const pick of [near[R.int(Math.max(1, near.length))], ...near]) if (pick && setDestination(s, f.id, pick.x.at).ok) return;
+}
+
+/** A world whose orbit the Wardens hold, unguarded: an outpost is gone at once; a colony loses a million people a turn
+ * (and, every other turn, a building) until nothing is left. */
+function burn(s, sys, R) {
+  const c = sys.colony, owner = faction(s, c.owner), me = crMe(s), seen = me.visible[sys.at];
+  const tell = (text) => { log(s, owner.id, text, "war"); if (owner.id !== me.id && seen) log(s, me.id, text, "war"); };
+  if (c.kind === "outpost") { tell(`The Wardens burned ${owner.id === me.id ? "your" : `${owner.name}'s`} outpost at ${sys.name}.`); razeWorld(s, sys); return; }
+  c.pop -= 1;
+  if (c.pop % 2 === 0) { const b = Object.keys(c.buildings).filter((k) => c.buildings[k] && k !== "engine"); if (b.length) c.buildings[b[R.int(b.length)]] = false; }
+  if (c.pop <= 0) { tell(`The Wardens burned ${sys.name} to bare rock. ${owner.id === me.id ? "Your" : `${owner.name}'s`} colony there is gone.`); razeWorld(s, sys); return; }
+  tell(`The Wardens are burning ${owner.id === me.id ? "your world " : `${owner.name}'s world `}${sys.name}: population down to ${c.pop}. Drive them off, or put guns or warships in its orbit.`);
+}
+
+function breakHeart(s) {
+  const C = s.crisis, by = C.heartBy && faction(s, C.heartBy), me = crMe(s), with_ = C.heartWith || [];
+  C.stage = "over"; C.over = s.turn;
+  const left = wardenFleets(s).reduce((t, f) => t + f.ships.length, 0);
+  for (const f of wardenFleets(s)) delete s.fleets[f.id];
+  if (by) { by.stats.heart = true; by.exotics += 6; if (by.ai) crResearch(s, by, 150); }
+  log(s, null, `The Heart of the Wardens is broken${by ? `, by ${by.name}` : ""}. ${left ? `The ${left} machine${left === 1 ? "" : "s"} still out there went dark at once.` : "Every machine went dark."}`, "victory");
+  const ev = { id: with_.includes(me.id) ? "broken" : "brokenBy", ctx: { by: C.heartBy || null }, turn: s.turn };
+  if (s.galEvent) C.queued = ev; else s.galEvent = ev;
+}
+
+// ---- the three scenes: shown and chosen like galactic events (events.js looks here) ----
+const CRISIS_EVENTS = {
+  stirring: {
+    title: "Something stirs in the rifts",
+    text: () => "Your listening posts on the rim of the rifts all report the same thing: a signal, one pattern repeated on every band, growing stronger each day. Your archivists know it. It's in the oldest records of the old empires: the call of the Wardens, the machines they built to guard the corridors and then could not stop. In six turns, perhaps less, they wake. They'll burn any world they can reach, yours and everyone's.",
+    options: [
+      { id: "study", label: "Study the signal", does: "+120 research, and the Wardens' Heart wakes weaker (−8 hull).", apply: (s) => { s.crisis.studied = true; return `Your cryptographers find the Heart's maintenance cycle in the noise: it will wake unfinished. ${crResearch(s, crMe(s), 120)}.`; } },
+      { id: "warn", label: "Warn the other powers", does: "+12 standing with every rival you've met; they'll take a truce when the Wardens wake.", apply: (s) => { s.crisis.warned = true; const met = crAlive(s).filter((f) => f.id !== crMe(s).id && crMe(s).met[f.id]); for (const f of met) { const r = f.relations[crMe(s).id]; r.score = Math.min(40, r.score + 12); } return met.length ? `Your envoys carry the archives to ${met.map((f) => f.name).join(", ")}. They listen, and they remember who told them.` : "You send the warning out on every band. No one you know is there to answer, yet."; } },
+      { id: "fortify", label: "Fortify the frontier", does: "Orbital batteries on your two most populous worlds besides the capital, now.", apply: (s) => { const w = coloniesOf(s, crMe(s).id).filter((x) => x.colony.kind === "colony" && !x.colony.capital && !x.colony.buildings.battery).sort((a, b) => b.colony.pop - a.colony.pop).slice(0, 2); for (const x of w) { x.colony.buildings.battery = true; x.colony.defense = 3; } return w.length ? `Crews work around the clock: ${w.map((x) => x.name).join(" and ")} now have orbital batteries.` : "You have no world besides your capital to fortify; the crews strengthen what you have."; } },
+    ],
+  },
+  waking: {
+    title: "The Wardens wake",
+    text: (s) => `It came out of the rift at ${crPlace(s, s.crisis.heart)}: the Heart of the Wardens, a machine the size of a small moon, and the first wave of its hunters with it. It doesn't answer hails. Its waves will come every ${CRISIS.waveEvery} turns, each larger than the last, and they'll burn the worlds nearest them, whoever's they are. Break the Heart and they go dark. Every power has heard. Some are already making peace with each other.`,
+    options: [
+      { id: "truce", label: "Call a truce against them", does: "Your wars end where the rival will listen, and no one declares a new war while the Heart lives.", apply: (s) => {
+        const me = crMe(s), C = s.crisis; C.truce = true;
+        const yes = [], no = [];
+        for (const f of crAlive(s)) if (f.ai && atWar(s, me.id, f.id)) {
+          const r = f.relations[me.id];
+          if (C.warned || r.score >= -30 || militaryPower(s, f.id) < militaryPower(s, me.id) * 1.5) { f.relations[me.id].status = me.relations[f.id].status = "peace"; r.score = Math.min(40, r.score + 10); yes.push(f.name); } else no.push(f.name);
+        }
+        return `Your envoys go out under white flags. ${yes.length ? `${yes.join(", ")} agreed: your wars with them are over.` : "You weren't at war with anyone who'd listen."}${no.length ? ` ${no.join(", ")} refused: that war goes on.` : ""} While the Heart lives, no power will start a new war.`;
+      } },
+      { id: "arm", label: "Arm for the fight", does: "−60 credits: two warships (cruisers, if you can build them) at your capital now.", apply: (s) => {
+        const me = crMe(s), cap = s.systems[me.capital]; if (!cap) return "You have no capital to arm.";
+        const t = has(s, me.id, "heavyHulls") ? "cruiser" : "frigate"; me.credits -= 60;
+        const f = spawnFleet(s, me.id, cap.at, [t, t]); for (const x of f.ships) x.hull = SHIPS[t].hull + (has(s, me.id, "shields") ? 1 : 0);
+        return `The yards at ${cap.name} turn out two ${SHIPS[t].name.toLowerCase()}s in record time: they're in orbit, waiting for orders.`;
+      } },
+      { id: "glory", label: "Let the others bleed first", does: "Nothing changes now, but every Warden machine you destroy is worth double the score.", apply: (s) => { crMe(s).glory = true; return "You keep your fleets close and your wars as they are. Let the rivals take the first blows; the glory will be yours."; } },
+    ],
+  },
+  broken: {
+    title: "The Heart is broken",
+    text: (s) => `${s.crisis.heartBy === crMe(s).id ? "Your guns broke it." : `${faction(s, s.crisis.heartBy).name} landed the last blow, but your fleet was in the fight.`} The Heart of the Wardens hangs dead in the dark, split open, and every hunter it sent out has gone silent where it stood. What's left of the Heart is the greatest wreck since the Fracture.`,
+    options: [
+      { id: "salvage", label: "Salvage the Heart", does: "+8 exotics.", apply: (s) => { crMe(s).exotics += 8; return "Your salvage crews strip the Heart's forges: +8 exotics."; } },
+      { id: "study", label: "Study what's left", does: "+250 research.", apply: (s) => `Your engineers live inside the wreck for a year. ${crResearch(s, crMe(s), 250)}.` },
+      { id: "memorial", label: "Raise a memorial for the fallen", does: "+12 standing with every rival you've met.", apply: (s) => { const met = crAlive(s).filter((f) => f.id !== crMe(s).id && crMe(s).met[f.id]); for (const f of met) { const r = f.relations[crMe(s).id]; r.score = Math.min(40, r.score + 12); } return "A beacon at the wreck names every ship that fell fighting the Wardens, whoever's it was. The other powers notice."; } },
+    ],
+  },
+  brokenBy: {
+    title: "The Heart is broken",
+    text: (s) => `${s.crisis.heartBy ? `${crMe(s).met[s.crisis.heartBy] ? faction(s, s.crisis.heartBy).name : "A power you haven't met"} broke the Heart of the Wardens.` : "The Heart of the Wardens is dead."} Every hunter it sent out has gone silent where it stood. The galaxy breathes again, and the wars it put off are still waiting.`,
+    options: [{ id: "ok", label: "Back to the work of empire", does: "The crisis is over.", apply: () => "The Wardens are gone." }],
+  },
+};
+
 // ---- events.js ----
 // Galactic events: every few turns something happens to the player's empire that asks for a decision. Each event is a
 // short scene and two or three choices; each choice does something real (credits, research, exotics, population,
 // ships, relations, a few turns of a golden age) and says what came of it. Ruins of the old empires are events too:
 // surveying one asks what to do with what's found there.
+
 
 
 
@@ -1508,13 +1734,13 @@ function eventsTurn(s) {
 /** The event waiting for the player: its scene and its choices, ready to show. */
 function currentEvent(s) {
   const e = s.galEvent; if (!e) return null;
-  const E = EVENTS[e.id];
+  const E = EVENTS[e.id] || CRISIS_EVENTS[e.id];
   return { title: E.title, text: E.text(s, e.ctx), options: E.options.map((o) => ({ id: o.id, label: o.label, does: o.does })) };
 }
 /** The player's choice: what it does, and what came of it. */
 function chooseEvent(s, optId) {
   const e = s.galEvent; if (!e) return { error: "Nothing is waiting." };
-  const E = EVENTS[e.id], o = E.options.find((x) => x.id === optId); if (!o) return { error: "No such choice." };
+  const E = EVENTS[e.id] || CRISIS_EVENTS[e.id], o = E.options.find((x) => x.id === optId); if (!o) return { error: "No such choice." };
   const R = rng(s), text = o.apply(s, e.ctx, R); R.save();
   s.galEvent = null;
   log(s, evMe(s).id, `${E.title}: ${o.label}. ${text}`, "contact");
@@ -1566,6 +1792,8 @@ function diplomacy(s, F, diff) {
       }
     } else {
       const angry = r.score < -18 / (AGGRESSION[F.id] || 1);
+      // While the Heart of the Wardens lives and a truce holds, no one starts a war.
+      if (s.crisis && s.crisis.stage === "awake" && s.crisis.truce) continue;
       if (s.turn > 25 && angry && mine > 6 && mine >= theirs * 1.25 / diff) { declareWar(s, F.id, oid); continue; }
       if (!r.treaty && r.score >= 0 && s.turn % 7 === 0) {
         if (O.ai) propose(s, F.id, oid, "trade");
@@ -1604,7 +1832,8 @@ function production(s, F, diff) {
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
   const threat = Math.max(0, ...Object.keys(F.relations).filter((o) => faction(s, o).alive && F.met[o]).map((o) => militaryPower(s, o)));
   const power = militaryPower(s, F.id);
-  const wantPower = Math.max(4, threat * (enemies.length ? 1.2 : 0.7)) * diff * (AGGRESSION[F.id] || 1);
+  const wardens = s.crisis && s.crisis.stage === "awake" ? militaryPower(s, "wardens") * 0.5 : 0;
+  const wantPower = Math.max(4, wardens, threat * (enemies.length ? 1.2 : 0.7)) * diff * (AGGRESSION[F.id] || 1);
   const best = (list) => list.find((x) => x);
   for (const sys of cols) {
     const c = sys.colony;
@@ -1677,6 +1906,7 @@ function fleets(s, F) {
       const o = invasionOdds(s, f.id);
       if (o && !o.guarded && o.troops >= o.defense && atWar(s, F.id, s.systems[s.sysAt[f.at]].colony.owner)) { invade(s, f.id); continue; }
       if (f.path.length) continue;
+      if (huntWardens(s, F, f, 3)) continue;
       if (enemies.length) {
         const mine = f.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, F.id, x.type).hull : 0), 0);
         const targets = enemies.flatMap((e) => coloniesOf(s, e)).filter((sys) => F.explored[sys.at])
@@ -1684,6 +1914,7 @@ function fleets(s, F) {
           .filter((x) => x.guard <= mine * 1.3).sort((a, b) => a.d - b.d);
         if (targets[0] && f.ships.length >= 2) { setDestination(s, f.id, targets[0].sys.at); continue; }
       }
+      if (huntWardens(s, F, f, 7)) continue;
       // Otherwise guard the capital, or the world nearest an enemy.
       const guard = cap && cap.colony && cap.colony.owner === F.id ? cap : coloniesOf(s, F.id)[0];
       if (guard && f.at !== guard.at) setDestination(s, f.id, guard.at);
@@ -1691,8 +1922,22 @@ function fleets(s, F) {
   }
 }
 
+/** While the Wardens are awake: go after a wave within `reach` hexes of one of this faction's worlds, if this fleet can
+ * take it; a strong fleet goes for the Heart itself, once the powers have had time to see what they face. */
+function huntWardens(s, F, f, reach) {
+  if (!s.crisis || s.crisis.stage !== "awake") return false;
+  const hullOf = (fl, fid) => fl.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, fid, x.type).hull * SHIPS[x.type].dmg : 0), 0);
+  const mine = hullOf(f, F.id), cols = coloniesOf(s, F.id);
+  const waves = fleetsOf(s, "wardens").map((w) => ({ w, heart: w.ships.some((x) => x.type === "heart"), near: Math.min(99, ...cols.map((c) => distance(c.at, w.at))), d: distance(f.at, w.at) }));
+  const heartAt = (waves.find((x) => x.heart) || {}).w;
+  const pick = waves.filter((x) => !x.heart && (!heartAt || x.w.at !== heartAt.at) && x.near <= reach && hullOf(x.w, "wardens") <= mine * 1.1).sort((a, b) => a.d - b.d)[0]
+    || (reach > 3 && s.turn >= s.crisis.woke + 12 ? waves.filter((x) => x.heart && x.d <= 14 && hullOf(x.w, "wardens") <= mine * 0.9)[0] : null);
+  return !!(pick && pick.w.at !== f.at && setDestination(s, f.id, pick.w.at).ok);
+}
+
 // ---- ui.js ----
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
+
 
 
 
@@ -1927,6 +2172,10 @@ function draw() {
       if (f.ships.length > 1 && view.zoom > 0.5) { ctx.fillStyle = "#fff"; ctx.font = "bold 9px system-ui, sans-serif"; ctx.fillText(String(f.ships.length), fx + 7, fy - 6); }
     });
   }
+  // The Heart of the Wardens, once it's woken: a ring of their colour round its hex.
+  const cr = S.crisis && S.crisis.stage === "awake" && S.crisis.heart;
+  if (cr && me.explored[cr]) { const { x, y } = toPixel(cr, size); ctx.beginPath(); ctx.arc(x, y, size * 0.92, 0, Math.PI * 2); ctx.strokeStyle = colorOf("wardens"); ctx.lineWidth = 2.5; ctx.setLineDash([3, 3]); ctx.stroke(); ctx.setLineDash([]);
+    if (view.zoom > 0.45) { ctx.fillStyle = colorOf("wardens"); ctx.font = "bold 10px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.fillText("THE HEART", x, y + size * 0.92 + 11); ctx.textAlign = "left"; } }
   // Hover and selection rings.
   if (sel && sel.kind === "system") { const { x, y } = toPixel(S.systems[sel.id].at, size); hexPath(ctx, x, y, size - 1); ctx.strokeStyle = "#fff6b0"; ctx.lineWidth = 2; ctx.stroke(); }
   if (moveMode && hoverHex && S.hexes[hoverHex]) { const { x, y } = toPixel(hoverHex, size); hexPath(ctx, x, y, size - 1); ctx.strokeStyle = "rgba(255,230,140,.9)"; ctx.lineWidth = 2; ctx.stroke(); }
@@ -2043,6 +2292,8 @@ function objectivesHTML() {
   h += `<div class="kv small" style="margin-bottom:10px"><span>Game<\/span><span>${S.mode === "open" ? `${turnText()}: no end but the one you choose (Menu → Retire)` : `${ibar(S.turn, RULES.maxTurns, "var(--gold)")} Turn ${S.turn} of ${RULES.maxTurns} (${turnsLeft} left)`}<\/span>
     <span>Standing<\/span><span>Score <b>${mine}<\/b>, ${myRank === 1 ? `<b class="good">first<\/b> of ${alive.length}` : `<b>${ordinal(myRank)}<\/b> of ${alive.length}`}<\/span><\/div>`;
   h += `<p class="small muted">Win one of three ways. Lose if your last world falls, or if a rival wins first.<\/p>`;
+  const live = S.crisis && (S.crisis.stage === "stirring" || S.crisis.stage === "awake");
+  if (live) h += crisisHTML();
   // 1. Conquest.
   const met = all.filter((f) => me.met[f.id]).length, fallen = all.filter((f) => !f.alive).length, atWarWith = rivals.filter((f) => atWar(S, me.id, f.id)).length;
   const cBadge = rivals.length === 0 ? ["Won", "good"] : fallen ? ["Under way", "good"] : atWarWith ? ["At war", ""] : ["Not started", ""];
@@ -2070,7 +2321,8 @@ function objectivesHTML() {
   h += `<div class="card obj"><h3 class="obj-h">Highest score at turn ${RULES.maxTurns} <span class="badge-status ${sBadge[1]}">${sBadge[0]}<\/span><\/h3>
     <div class="kv small"><span>Yours<\/span><span>${ibar(mine, Math.max(1, lead.sc), "var(--accent)")} ${mine}<\/span>
     <span>${lead.f.id === me.id ? "Next best" : "Leader"}<\/span><span>${lead.f.id === me.id ? (ranked[1] ? `${me.met[ranked[1].f.id] ? esc(ranked[1].f.name) : "An unmet rival"}: ${ranked[1].sc} (you lead by ${gap})` : "No one") : `${me.met[lead.f.id] ? esc(lead.f.name) : "An unmet rival"}: ${lead.sc} (${gap} ahead of you)`}<\/span><\/div>
-    <p class="small" style="margin-top:6px"><b class="good">Win:<\/b> lead on score when turn ${RULES.maxTurns} ends. Score: 5 per colony and 2 per population, 2 per outpost, 6 per technology, and a quarter of your fleet's strength.<\/p><\/div>`;
+    <p class="small" style="margin-top:6px"><b class="good">Win:<\/b> lead on score when turn ${RULES.maxTurns} ends. Score: 5 per colony and 2 per population, 2 per outpost, 6 per technology, and a quarter of your fleet's strength${S.crisisOff ? "" : "; when the Wardens wake, points for every machine of theirs destroyed and 30 for breaking their Heart"}.<\/p><\/div>`;
+  if (!live) h += crisisHTML();
   // The rivals' race.
   const threats = [];
   for (const f of rivals) {
@@ -2081,6 +2333,24 @@ function objectivesHTML() {
   h += `<h3>Threats<\/h3>` + (threats.length ? `<ul class="log">${threats.join("")}<\/ul>` : `<p class="small muted">No rival is close to winning yet.<\/p>`);
   h += `<p class="small muted"><b>Defeat:<\/b> your last world falls; a rival finishes the Corridor Engine or stands alone; or a rival leads on score at turn ${RULES.maxTurns}.<\/p>`;
   return h;
+}
+/** The late-game crisis, on the Objectives tab: the warning, then the Heart, its waves and who is fighting them. */
+function crisisHTML() {
+  const c = crisisState(S); if (!c) return "";
+  const me = player(S);
+  if (c.stage === "stirring") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">Stirring<\/span><\/h3>
+    <p class="small">A signal is coming out of the rifts: the Wardens, war machines of the old empires, wake in about ${Math.max(1, c.at - S.turn)} turn${c.at - S.turn === 1 ? "" : "s"}. They'll burn any world they reach, whoever's it is. Build warships, and put guns on your outer worlds.<\/p><\/div>`;
+  const fighters = [me, ...S.factions.filter((f) => f.id !== me.id && me.met[f.id])].map((f) => ({ f, n: f.stats.wardens || 0 })).sort((a, b) => b.n - a.n);
+  const table = `<table class="tbl"><tr><th>Fighting them<\/th><th>Machines destroyed<\/th><\/tr>${fighters.map(({ f, n }) => `<tr><td><span class="dot" style="background:${f.color}"><\/span>${f.id === me.id ? "You" : esc(f.name)}${f.alive ? "" : " †"}<\/td><td>${n}<\/td><\/tr>`).join("")}<\/table>`;
+  if (c.stage === "over") return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status good">Broken<\/span><\/h3>
+    <p class="small">${c.by ? `${c.by === me.id ? "You" : me.met[c.by] ? esc(faction(S, c.by).name) : "A power you haven't met"} broke the Heart` : "The Heart is broken"}${S.crisis.over ? ` on turn ${S.crisis.over}` : ""}. Every machine went dark.<\/p>${table}<\/div>`;
+  return `<div class="card obj crisis"><h3 class="obj-h">The Wardens <span class="badge-status bad">Awake<\/span><\/h3>
+    <div class="kv small"><span>The Heart<\/span><span>${ibar(c.hull, c.max, "var(--bad)")} ${c.hull} of ${c.max} hull, at <button class="linkish" data-center="${c.heart}">${esc(c.place)}<\/button><\/span>
+    <span>Waves<\/span><span>${c.wave} sent · the next in ${Math.max(0, c.nextWave - S.turn)} turn${c.nextWave - S.turn === 1 ? "" : "s"} · ${c.ships} machines out there<\/span>
+    <span>Truce<\/span><span>${c.truce ? "Holding: no power starts a new war while the Heart lives" : "None: wars go on"}<\/span><\/div>
+    <ol class="steps-list">${stepLi("now", "Keep their waves off your worlds: a world with guns or warships in orbit can't be burned, only fought over")}${stepLi("", `Break the Heart: its guard must fall before it can be hit, it mends ${2 * (S.crisis.m || 1)} hull a turn, and it fires ${1 + (S.crisis.m || 1)} times a round`)}<\/ol>
+    ${table}
+    <p class="small" style="margin-top:6px"><b class="good">Reward:<\/b> score for every machine destroyed; breaking the Heart is worth 30 more, and its wreck.<\/p><\/div>`;
 }
 /** The Mission tab: the directives under way (progress, deadline, reward), the backlog, and past directives. */
 function missionHTML() {
@@ -2234,6 +2504,7 @@ function bindChrome() {
     if (d.focus) { const r = setFocus(S, me.id, d.focus, +d.n); if (r.error) toast(r.error, true); save(); renderAll(); return; }
     if (d.stance) { setStance(S, sel.id, d.stance); toast(`${STANCES[d.stance].name}: ${STANCES[d.stance].text}`); save(); renderAll(); return; }
     if (d.accept) { const r = acceptDirective(S, d.accept); if (r.error) toast(r.error, true); else toast("Directive taken on: its clock starts now."); checkDirectives(S); save(); renderAll(); showNextMission(); return; }
+    if (d.center) { centerOn(d.center); draw(); return; }
     if (d.selfleet) { select({ kind: "fleet", id: d.selfleet }); const f = S.fleets[d.selfleet]; if (f) { centerOn(f.at); draw(); } return; }
     if (d.selsys) { select({ kind: "system", id: d.selsys }); centerOn(S.systems[d.selsys].at); draw(); return; }
     if (d.build) { const [k, id] = d.build.split(":"); const r = enqueue(S, sel.id, k, id); if (r.error) toast(r.error, true); }
@@ -2312,6 +2583,7 @@ function doEndTurn() {
     S.offers = S.offers.filter((o) => S.turn - o.turn < 3);
     endTurn(S, aiTurn);
     if (!S.winner) directivesTurn(S);
+    if (!S.winner) crisisTurn(S);
     if (!S.winner) eventsTurn(S);
     $("end-turn").textContent = "End turn";
     save();
@@ -2340,7 +2612,7 @@ function showBattle(then) {
   const B = S.battleReports && S.battleReports[0]; if (!B) { then(); return; }
   const me = player(S).id, n = B.events.length;
   let shown = 0;
-  const unitName = (u) => { const who = u.fid === me ? "Your" : faction(S, u.fid).name.replace(/^The /, ""); return u.type === "guns" ? `${who} orbital guns at ${u.name.replace(/'s orbital guns$/, "")}` : `${who} ${u.name.toLowerCase()}`; };
+  const unitName = (u) => { if (u.fid === "wardens") return u.type === "heart" ? "The Heart" : `Warden ${u.name.toLowerCase()}`; const who = u.fid === me ? "Your" : faction(S, u.fid).name.replace(/^The /, ""); return u.type === "guns" ? `${who} orbital guns at ${u.name.replace(/'s orbital guns$/, "")}` : `${who} ${u.name.toLowerCase()}`; };
   const hullAt = (k) => B.units.map((u, i) => Math.max(0, u.hull - B.events.slice(0, k).filter((e) => e.t === i).reduce((t, e) => t + e.dmg, 0)));
   const icon = (u) => (u.type === "guns" ? `<svg width="22" height="22" viewBox="-13.5 -13.5 27 27" aria-hidden="true"><circle r="7" fill="${faction(S, u.fid).color}" fill-opacity=".3" stroke="${faction(S, u.fid).color}" stroke-width="1"/><path d="M0 -7 V-12 M7 0 H12 M0 7 V12 M-7 0 H-12" stroke="${faction(S, u.fid).color}" stroke-width="1"/><\/svg>` : shipSVG(u.type, faction(S, u.fid).color, 22));
   const sideHTML = (fids, hull, title) => `<div class="bside"><h3>${title}<\/h3>${B.units.map((u, i) => fids.includes(u.fid) ? `<div class="bunit ${hull[i] <= 0 ? "dead" : ""}">${icon(u)}<span>${esc(unitName(u))}${u.stance && u.stance !== "balanced" ? ` <i class="small muted">(${esc(STANCES[u.stance].name.toLowerCase())})<\/i>` : ""}<\/span><span class="pips">${Array.from({ length: u.max }, (_, k) => `<i class="${k < hull[i] ? "on" : ""}"><\/i>`).join("")}<\/span><\/div>` : "").join("")}<\/div>`;
@@ -2411,18 +2683,19 @@ function showNewGame(canContinue, preset) {
       <label>Difficulty <select id="ng-diff"><option value="easy">Easy<\/option><option value="normal" selected>Normal<\/option><option value="hard">Hard<\/option><\/select><\/label>
       <label>Seed <input type="text" id="ng-seed" placeholder="random" size="10"><\/label>
     <\/div>
+    <label class="small check-line"><input type="checkbox" id="ng-crisis" checked> A late-game crisis: around turn 110 the Wardens, old war machines, wake in the rifts and come for every world<\/label>
     <label class="small check-line"><input type="checkbox" id="ng-steps" ${canContinue ? "" : "checked"}> Guide me through my first game, step by step<\/label>
     <div class="btn-row"><button class="btn primary" id="ng-start">Begin<\/button><button class="btn" id="ng-guide">New here? The starter guide<\/button><button class="btn" id="ng-load">Load a saved game<\/button><\/div>
     <p class="small muted">Version: ${esc(VERSION)}<\/p>`);
   if (preset) {
-    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard";
+    $("ng-seed").value = preset.seed; $("ng-size").value = preset.size; $("ng-rivals").value = String(preset.rivals); $("ng-diff").value = preset.difficulty; $("ng-mode").value = preset.mode || "standard"; $("ng-crisis").checked = !preset.crisisOff;
     const r = document.querySelector(`input[name="fac"][value="${preset.player}"]`); if (r) r.checked = true;
   }
   if ($("ng-continue")) $("ng-continue").onclick = () => { try { startGame(JSON.parse(store.get())); } catch { toast("That save couldn't be read.", true); } };
   $("ng-start").onclick = () => {
     const seedText = $("ng-seed").value.trim();
     const st = newGame({ seed: seedText ? (/^\d+$/.test(seedText) ? +seedText : seedText) : undefined, size: $("ng-size").value, rivals: +$("ng-rivals").value,
-      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value });
+      difficulty: $("ng-diff").value, player: document.querySelector('input[name="fac"]:checked').value, mode: $("ng-mode").value, crisis: $("ng-crisis").checked });
     if ($("ng-steps").checked) st.tutorial = { on: true, guide: true, ack: {}, seen: {} };
     startGame(st); save();
   };
@@ -2586,7 +2859,7 @@ function galaxyInfo() {
   const size = { small: "Small", medium: "Medium", large: "Large", vast: "Vast" }[S.size] || S.size, rivals = S.factions.length - 1;
   const diff = { easy: "Easy", normal: "Normal", hard: "Hard" }[S.difficulty] || S.difficulty;
   return { seed: String(S.seed), text: `Seed ${S.seed} · ${size} galaxy · ${rivals} rival${rivals === 1 ? "" : "s"} · ${diff}`,
-    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard" } };
+    preset: { seed: String(S.seed), size: S.size, rivals, difficulty: S.difficulty, player: player(S).id, mode: S.mode || "standard", crisisOff: !!S.crisisOff } };
 }
 function galaxyBox() {
   const g = galaxyInfo();

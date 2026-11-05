@@ -44,6 +44,8 @@ function diplomacy(s, F, diff) {
       }
     } else {
       const angry = r.score < -18 / (AGGRESSION[F.id] || 1);
+      // While the Heart of the Wardens lives and a truce holds, no one starts a war.
+      if (s.crisis && s.crisis.stage === "awake" && s.crisis.truce) continue;
       if (s.turn > 25 && angry && mine > 6 && mine >= theirs * 1.25 / diff) { declareWar(s, F.id, oid); continue; }
       if (!r.treaty && r.score >= 0 && s.turn % 7 === 0) {
         if (O.ai) propose(s, F.id, oid, "trade");
@@ -82,7 +84,8 @@ function production(s, F, diff) {
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
   const threat = Math.max(0, ...Object.keys(F.relations).filter((o) => faction(s, o).alive && F.met[o]).map((o) => militaryPower(s, o)));
   const power = militaryPower(s, F.id);
-  const wantPower = Math.max(4, threat * (enemies.length ? 1.2 : 0.7)) * diff * (AGGRESSION[F.id] || 1);
+  const wardens = s.crisis && s.crisis.stage === "awake" ? militaryPower(s, "wardens") * 0.5 : 0;
+  const wantPower = Math.max(4, wardens, threat * (enemies.length ? 1.2 : 0.7)) * diff * (AGGRESSION[F.id] || 1);
   const best = (list) => list.find((x) => x);
   for (const sys of cols) {
     const c = sys.colony;
@@ -155,6 +158,7 @@ function fleets(s, F) {
       const o = invasionOdds(s, f.id);
       if (o && !o.guarded && o.troops >= o.defense && atWar(s, F.id, s.systems[s.sysAt[f.at]].colony.owner)) { invade(s, f.id); continue; }
       if (f.path.length) continue;
+      if (huntWardens(s, F, f, 3)) continue;
       if (enemies.length) {
         const mine = f.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, F.id, x.type).hull : 0), 0);
         const targets = enemies.flatMap((e) => coloniesOf(s, e)).filter((sys) => F.explored[sys.at])
@@ -162,9 +166,23 @@ function fleets(s, F) {
           .filter((x) => x.guard <= mine * 1.3).sort((a, b) => a.d - b.d);
         if (targets[0] && f.ships.length >= 2) { setDestination(s, f.id, targets[0].sys.at); continue; }
       }
+      if (huntWardens(s, F, f, 7)) continue;
       // Otherwise guard the capital, or the world nearest an enemy.
       const guard = cap && cap.colony && cap.colony.owner === F.id ? cap : coloniesOf(s, F.id)[0];
       if (guard && f.at !== guard.at) setDestination(s, f.id, guard.at);
     }
   }
+}
+
+/** While the Wardens are awake: go after a wave within `reach` hexes of one of this faction's worlds, if this fleet can
+ * take it; a strong fleet goes for the Heart itself, once the powers have had time to see what they face. */
+function huntWardens(s, F, f, reach) {
+  if (!s.crisis || s.crisis.stage !== "awake") return false;
+  const hullOf = (fl, fid) => fl.ships.reduce((t, x) => t + (SHIPS[x.type].skill ? shipStats(s, fid, x.type).hull * SHIPS[x.type].dmg : 0), 0);
+  const mine = hullOf(f, F.id), cols = coloniesOf(s, F.id);
+  const waves = fleetsOf(s, "wardens").map((w) => ({ w, heart: w.ships.some((x) => x.type === "heart"), near: Math.min(99, ...cols.map((c) => distance(c.at, w.at))), d: distance(f.at, w.at) }));
+  const heartAt = (waves.find((x) => x.heart) || {}).w;
+  const pick = waves.filter((x) => !x.heart && (!heartAt || x.w.at !== heartAt.at) && x.near <= reach && hullOf(x.w, "wardens") <= mine * 1.1).sort((a, b) => a.d - b.d)[0]
+    || (reach > 3 && s.turn >= s.crisis.woke + 12 ? waves.filter((x) => x.heart && x.d <= 14 && hullOf(x.w, "wardens") <= mine * 0.9)[0] : null);
+  return !!(pick && pick.w.at !== f.at && setDestination(s, f.id, pick.w.at).ok);
 }

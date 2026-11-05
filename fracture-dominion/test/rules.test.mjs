@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { distance, neighbors, hexagon, fromPixel, toPixel, within } from "../src/hex.js";
 import { newGame, endTurn, findPath, setDestination, settle, spawnFleet, coloniesOf, fleetsOf, faction, declareWar, invade, invasionOdds,
-  enqueue, rush, totals, yields, setResearch, availableTechs, propose, score, canSettle } from "../src/game.js";
+  enqueue, rush, totals, yields, setResearch, availableTechs, propose, score, canSettle, atWar } from "../src/game.js";
 import { aiTurn } from "../src/ai.js";
 import { TECHS } from "../src/data.js";
 
@@ -211,4 +211,37 @@ test("galactic events: they come, each choice does what it says, and ruins becom
   const u = newGame({ seed: 34, size: "small", player: "vael", rivals: 1 });
   const ruin = Object.values(u.systems).find((x) => x.ruins);
   if (ruin) { spawnFleet(u, "vael", ruin.at, ["scout"]); endTurn(u, null); eventsTurn(u); assert.equal(u.galEvent && u.galEvent.id, "ruins"); }
+});
+test("the late-game crisis: warning, waking, waves that burn, a truce, and the Heart broken", async () => {
+  const { crisisTurn, crisisState, WARDENS } = await import("../src/crisis.js");
+  const { currentEvent, chooseEvent } = await import("../src/events.js");
+  const s = newGame({ seed: 41, player: "concord", rivals: 2 }), me = s.factions[0], foe = s.factions[1];
+  me.met[foe.id] = foe.met[me.id] = true; declareWar(s, me.id, foe.id);
+  crisisTurn(s); assert.equal(s.crisis.stage, "quiet"); assert.ok(s.crisis.at >= 105 && s.crisis.at < 121);
+  // The warning, six turns before.
+  s.turn = s.crisis.at - 6; crisisTurn(s); assert.equal(s.crisis.stage, "stirring"); assert.equal(s.galEvent.id, "stirring");
+  assert.ok(currentEvent(s).options.length === 3); assert.ok(chooseEvent(s, "warn").ok); assert.ok(s.crisis.warned);
+  // The waking: the Heart and its guard in space, the first wave out, the waking scene; a truce ends the war.
+  s.turn = s.crisis.at; crisisTurn(s); assert.equal(s.crisis.stage, "awake"); assert.equal(s.galEvent.id, "waking");
+  const c = crisisState(s); assert.ok(c.hull > 0 && c.wave === 1 && c.ships > 2); assert.ok(!s.sysAt[c.heart]);
+  assert.ok(atWar(s, me.id, WARDENS) && atWar(s, WARDENS, foe.id));
+  assert.ok(chooseEvent(s, "truce").ok); assert.ok(!atWar(s, me.id, foe.id)); assert.ok(s.crisis.truce);
+  // A wave on an unguarded colony burns it, a million a turn.
+  const cap = s.systems[me.capital], col = Object.values(s.systems).find((x) => !x.colony && x.world === "ocean") || Object.values(s.systems).find((x) => !x.colony);
+  col.colony = { owner: me.id, kind: "colony", pop: 2, growth: 0, buildings: { shipyard: false, factory: true, lab: false, market: false }, queue: [], stock: 0, defense: 0, capital: false };
+  const wave = spawnFleet(s, WARDENS, col.at, ["sentinel", "sentinel"]);
+  crisisTurn(s); assert.equal(col.colony.pop, 1); crisisTurn(s); assert.equal(col.colony, null);
+  delete s.fleets[wave.id];
+  // Battles: the Heart can't be hit while its guard stands; breaking it ends the crisis and gives the scene.
+  const hf = fleetsOf(s, WARDENS).find((f) => f.ships.some((x) => x.type === "heart"));
+  for (const f of fleetsOf(s, WARDENS)) if (f !== hf) delete s.fleets[f.id];
+  hf.ships = hf.ships.filter((x) => x.type === "heart"); hf.ships[0].hull = 1;
+  spawnFleet(s, me.id, hf.at, ["frigate", "frigate", "frigate", "frigate", "frigate", "frigate"]);
+  s.galEvent = null;
+  for (let i = 0; i < 6 && s.crisis.stage === "awake"; i++) { endTurn(s, null); for (const f of fleetsOf(s, WARDENS)) if (!f.ships.some((x) => x.type === "heart")) delete s.fleets[f.id]; crisisTurn(s); }
+  assert.equal(s.crisis.stage, "over"); assert.equal(s.crisis.heartBy, me.id); assert.ok(me.stats.heart && me.stats.wardens >= 1);
+  assert.equal(s.galEvent.id, "broken"); assert.ok(chooseEvent(s, "study").ok);
+  assert.equal(fleetsOf(s, WARDENS).length, 0);
+  // Off at the start: never.
+  const t = newGame({ seed: 41, player: "concord", rivals: 1, crisis: false }); t.turn = 150; crisisTurn(t); assert.equal(t.crisis, undefined);
 });

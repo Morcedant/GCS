@@ -16,7 +16,7 @@ export function newGame(opts) {
   const list = [FACTIONS.find((f) => f.id === opts.player) || FACTIONS[0], ...rivals];
   const g = makeGalaxy(seed, opts.size || "medium", list.length);
   const state = {
-    version: 1, seed, turn: 1, size: opts.size || "medium", difficulty: opts.difficulty || "normal", radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
+    version: 1, seed, turn: 1, crisisOff: opts.crisis === false, size: opts.size || "medium", difficulty: opts.difficulty || "normal", radius: g.radius, mode: opts.mode === "open" ? "open" : "standard",
     hexes: g.hexes, systems: g.systems, sysAt: g.sysAt, corridors: g.corridors, adj: g.adj,
     factions: [], fleets: {}, nextId: 1, log: [], winner: null, winReason: null, rngState: makeRng("play:" + seed).state(), events: [], offers: [],
   };
@@ -37,7 +37,9 @@ export function newGame(opts) {
 }
 
 // ---- helpers ----
-export const faction = (s, id) => s.factions.find((f) => f.id === id);
+// The Wardens (the late-game crisis, crisis.js) are a power of their own, kept out of s.factions: they have no worlds,
+// no diplomacy and no score, and they're at war with everyone.
+export const faction = (s, id) => s.factions.find((f) => f.id === id) || (s.crisis && s.crisis.F && s.crisis.F.id === id ? s.crisis.F : undefined);
 export const has = (s, fid, tech) => faction(s, fid).research.done.includes(tech);
 export const player = (s) => s.factions[0];
 export function rng(s) { const r = makeRng(1); r.setState(s.rngState); return { ...r, save: () => { s.rngState = r.state(); } }; }
@@ -52,12 +54,14 @@ export function log(s, fid, text, kind = "info") {
 export function coloniesOf(s, fid) { return Object.values(s.systems).filter((x) => x.colony && x.colony.owner === fid); }
 export function fleetsOf(s, fid) { return Object.values(s.fleets).filter((f) => f.owner === fid); }
 export function fleetsAt(s, hex) { return Object.values(s.fleets).filter((f) => f.at === hex); }
-export const atWar = (s, a, b) => a !== b && faction(s, a).relations[b] && faction(s, a).relations[b].status === "war";
+export const atWar = (s, a, b) => a !== b && (a === "wardens" || b === "wardens" || !!(faction(s, a).relations[b] && faction(s, a).relations[b].status === "war"));
 
 /** Does this faction have this prototype fitted? */
 export const proto = (s, fid, id) => !!((faction(s, fid).protos || {})[id]);
 export function shipStats(s, fid, type) {
   const base = SHIPS[type], warship = base.skill > 0;
+  // The Heart of the Wardens grows with the galaxy it wakes in (crisis.js): more hull, more guns.
+  if (type === "heart") { const m = (s.crisis && s.crisis.m) || 1; return { ...base, hull: s.crisis && s.crisis.heartMax || base.hull * m, shots: 1 + m }; }
   return { ...base,
     speed: base.speed + (has(s, fid, "foldDrives") ? 1 : 0) + (fid === "vael" ? 1 : 0),
     hull: base.hull + (warship && has(s, fid, "shields") ? 1 : 0) + (warship && proto(s, fid, "plating") ? 1 : 0),
@@ -156,7 +160,7 @@ export function totals(s, fid) {
 export function buildOptions(s, sys) {
   const c = sys.colony, fid = c.owner, out = [];
   if (c.kind !== "colony") return out;
-  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.needs || has(s, fid, d.needs)) out.push({ kind: "ship", id: t, name: d.name, cost: shipStats(s, fid, t).cost, exotics: d.exotics || 0 });
+  if (c.buildings.shipyard) for (const [t, d] of Object.entries(SHIPS)) if (!d.warden && (!d.needs || has(s, fid, d.needs))) out.push({ kind: "ship", id: t, name: d.name, cost: shipStats(s, fid, t).cost, exotics: d.exotics || 0 });
   for (const [b, d] of Object.entries(BUILDINGS)) {
     if (c.buildings[b] || (d.needs && !has(s, fid, d.needs)) || c.queue.some((q) => q.id === b)) continue;
     if (d.wonder && !c.capital) continue;
@@ -284,7 +288,7 @@ export function invasionOdds(s, fleetId) {
   const defense = sys.colony.kind === "outpost" ? 0.5 : sys.colony.pop * RULES.troopDefensePerPop + (sys.colony.capital ? 2 : 0);
   return { troops, defense: round1(defense), guarded: guarded(s, sys, f.owner) };
 }
-function guarded(s, sys, attacker) {
+export function guarded(s, sys, attacker) {
   return (sys.colony.buildings.battery || sys.colony.capital) && sys.colony.defense > 0
     || fleetsAt(s, sys.at).some((o) => o.owner === sys.colony.owner && armed(o));
 }
@@ -328,6 +332,17 @@ function checkAlive(s, fid) {
   }
 }
 
+/** A world burned to nothing (the Wardens do this): the colony is gone; a capital moves; a power with no colony falls. */
+export function razeWorld(s, sys) {
+  const was = sys.colony.owner, wasCapital = sys.colony.capital;
+  sys.colony = null;
+  if (wasCapital) {
+    const rest = coloniesOf(s, was).filter((x) => x.colony.kind === "colony").sort((a, b) => b.colony.pop - a.colony.pop);
+    if (rest[0]) { rest[0].colony.capital = true; rest[0].colony.buildings.shipyard = true; faction(s, was).capital = rest[0].id; log(s, was, `${faction(s, was).name} moved its capital to ${rest[0].name}.`, "war"); }
+  }
+  checkAlive(s, was);
+}
+
 // ---- battles: 3d6 roll-under, three exchanges ----
 function battles(s) {
   const R = rng(s), hexes = new Set(Object.values(s.fleets).map((f) => f.at));
@@ -348,20 +363,33 @@ function battles(s) {
     const hp = (u) => (u.world ? u.world.colony.defense : u.ship.hull);
     const hit = (u, n) => { if (u.world) u.world.colony.defense = Math.max(0, u.world.colony.defense - n); else u.ship.hull -= n; };
     // A battle the player is in is recorded roll by roll, for the battle pop-up.
-    const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: sys ? sys.name : "deep space", hex, sides: list,
+    const where = sys ? sys.name : s.crisis && s.crisis.heart === hex ? "the Heart of the Wardens" : "deep space";
+    const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: where, hex, sides: list,
       units: units.map((u) => ({ fid: u.fid, type: u.world ? "guns" : u.ship.type, name: u.world ? `${u.world.name}'s orbital guns` : u.st.name, hull: hp(u), max: u.world ? hp(u) : u.st.hull, stance: u.fleet ? u.fleet.stance || "balanced" : null })), events: [] } : null;
     let fights = 0;
     for (let round = 0; round < 3; round++) {
       const live = units.filter((u) => hp(u) > 0);
       for (const u of live) {
+        for (let shot = 0; shot < (u.st.shots || 1); shot++) {
         if (!u.st.skill || hp(u) <= 0) continue;
-        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid));
+        // The Heart of the Wardens can't be fired on while its guard still stands.
+        const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid) && !(v.ship && v.ship.type === "heart" && live.some((g) => g !== v && g.fid === v.fid && hp(g) > 0)));
         if (!foes.length) continue;
         const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
         const need = u.st.skill + stance(u).atk + stance(t).def, landed = roll <= 4 || (roll < 17 && roll <= need);
-        if (landed) hit(t, u.st.dmg);
+        if (landed) {
+          const was = hp(t); hit(t, u.st.dmg);
+          // A Warden machine destroyed counts for whoever destroyed it; the Heart, for everyone who fought it.
+          if (was > 0 && hp(t) <= 0 && t.fid === "wardens" && u.fid !== "wardens") {
+            const K = faction(s, u.fid); K.stats.wardens = (K.stats.wardens || 0) + 1;
+            // Score: by what the machine was worth, against how hard the Wardens came (a hunter is worth less in a swarm).
+            K.stats.wardenPts = (K.stats.wardenPts || 0) + (SHIPS[t.ship.type].hull * SHIPS[t.ship.type].dmg / 3) / ((s.crisis && s.crisis.m) || 1) * (K.glory ? 2 : 1);
+            if (t.ship.type === "heart" && s.crisis) { s.crisis.heartBy = u.fid; s.crisis.heartWith = list.filter((x) => x !== "wardens"); }
+          }
+        }
         if (rec) rec.events.push({ round, a: units.indexOf(u), t: units.indexOf(t), dice, need, hit: landed, dmg: landed ? u.st.dmg : 0 });
+        }
       }
     }
     if (!fights) continue;
@@ -372,7 +400,6 @@ function battles(s) {
     for (const [fid, n] of Object.entries(lost)) faction(s, fid).stats.lost += n;
     // A battle won: you destroyed ships of theirs, and lost fewer than they did.
     for (const fid of list) { const theirs = Object.entries(lost).filter(([o]) => atWar(s, fid, o)).reduce((t, [, n]) => t + n, 0); if (theirs > (lost[fid] || 0)) faction(s, fid).stats.won = (faction(s, fid).stats.won || 0) + 1; }
-    const where = sys ? sys.name : "deep space";
     const names = list.map((x) => faction(s, x).name).join(" and ");
     log(s, null, `Battle at ${where} between ${names}: ${Object.entries(lost).map(([fid, n]) => `${faction(s, fid).name} lost ${n} ship${n > 1 ? "s" : ""}`).join("; ") || "no ships lost"}.`, "war");
     s.events.push({ turn: s.turn, kind: "battle", hex, sides: list });
@@ -560,7 +587,9 @@ const nearestName = (s, hex) => { const n = Object.values(s.systems).sort((a, b)
 // ---- winning ----
 export function score(s, fid) {
   const cols = coloniesOf(s, fid);
-  return Math.round(cols.reduce((t, x) => t + (x.colony.kind === "colony" ? 5 + x.colony.pop * 2 : 2), 0) + faction(s, fid).research.done.length * 6 + militaryPower(s, fid) / 4);
+  const F = faction(s, fid);
+  return Math.round(cols.reduce((t, x) => t + (x.colony.kind === "colony" ? 5 + x.colony.pop * 2 : 2), 0) + F.research.done.length * 6 + militaryPower(s, fid) / 4
+    + (F.stats.wardenPts || 0) + (F.stats.heart ? 30 : 0));
 }
 function checkVictory(s) {
   if (s.winner) return;

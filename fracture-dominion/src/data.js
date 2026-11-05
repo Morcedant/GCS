@@ -49,6 +49,10 @@ export const SHIPS = {
   transport: { name: "Troop transport", cost: 45, upkeep: 1, speed: 3, hull: 1, skill: 0, dmg: 0, sensors: 1, troops: 2, text: "Takes an enemy world whose orbit you hold. Used up." },
   cruiser: { name: "Cruiser", cost: 90, exotics: 1, upkeep: 2, speed: 3, hull: 4, skill: 12, dmg: 2, sensors: 2, needs: "heavyHulls", text: "Heavier guns and hull." },
   dreadnought: { name: "Dreadnought", cost: 180, exotics: 3, upkeep: 4, speed: 2, hull: 8, skill: 13, dmg: 3, sensors: 2, needs: "capitalShips", text: "A fortress that moves." },
+  // The Wardens' machines (the late-game crisis, crisis.js): nobody builds these.
+  sentinel: { name: "Sentinel", cost: 0, upkeep: 0, speed: 3, hull: 3, skill: 12, dmg: 1, sensors: 2, warden: true, text: "A Warden hunter: quick, and never alone." },
+  colossus: { name: "Colossus", cost: 0, upkeep: 0, speed: 2, hull: 6, skill: 13, dmg: 2, sensors: 2, warden: true, text: "A Warden war machine the size of a moon's mountain." },
+  heart: { name: "Heart", cost: 0, upkeep: 0, speed: 0, hull: 20, skill: 14, dmg: 3, sensors: 3, warden: true, text: "The Wardens' mind and forge. It never moves, mends itself, and sends out the waves. Break it and they go dark." },
 };
 
 // Ship outlines, bow pointing right (+x), in a box from −12 to 12: SVG path data, for the map (a canvas Path2D), the
@@ -61,6 +65,9 @@ export const SHIP_SHAPES = {
   transport: "M11 0 L6 -5 L-9 -5 L-9 5 L6 5 Z M-9 -3 L-12 -3 L-12 3 L-9 3 M-3 -5 L-3 -8 L1 -8 L1 -5 M-3 5 L-3 8 L1 8 L1 5",
   cruiser: "M12 0 L6 -3 L-2 -3 L-6 -9.5 L-9 -9.5 L-8 -3 L-11 -3 L-11 3 L-8 3 L-9 9.5 L-6 9.5 L-2 3 L6 3 Z M6 0 L-3 0",
   dreadnought: "M12 -5 L12 5 L6 5 L4 8.5 L-10 8.5 L-12 4 L-12 -4 L-10 -8.5 L4 -8.5 L6 -5 Z M-12 -2 L-13.5 -2 M-12 2 L-13.5 2 M4 -8.5 L4 8.5 M-4 -8.5 L-4 8.5 M12 0 L6 0",
+  sentinel: "M12 0 L2 -4 L-4 -10 L-2 -3 L-10 0 L-2 3 L-4 10 L2 4 Z M2 0 L-4 0",
+  colossus: "M12 0 L7 -6 L0 -6 L-3 -11 L-8 -11 L-7 -6 L-12 -4 L-12 4 L-7 6 L-8 11 L-3 11 L0 6 L7 6 Z M7 0 L-7 0 M0 -6 L0 6",
+  heart: "M0 -12 L8.5 -8.5 L12 0 L8.5 8.5 L0 12 L-8.5 8.5 L-12 0 L-8.5 -8.5 Z M0 -6 L6 0 L0 6 L-6 0 Z M0 -12 L0 -6 M12 0 L6 0 M0 12 L0 6 M-12 0 L-6 0",
 };
 
 // Research: three fields. cost in science; needs: earlier techs.
@@ -125,4 +132,6 @@ export const STANCES = {
 };
 /** Fleets out of supply (farther than this from every world and outpost of theirs) wear down. */
 export const SUPPLY = { range: 3, graceTurns: 1 };
+/** The late-game crisis: when the Wardens wake, and how hard they come. */
+export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
 export const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };

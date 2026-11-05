@@ -5,6 +5,7 @@
 import { player, faction, coloniesOf, fleetsOf, spawnFleet, log, maxPop, atWar, militaryPower, rng } from "./game.js";
 import { TECHS, SHIPS, PROTOTYPES } from "./data.js";
 import { distance } from "./hex.js";
+import { CRISIS_EVENTS } from "./crisis.js";
 
 const evMe = (s) => player(s);
 const evMetRivals = (s) => s.factions.filter((f) => f.id !== evMe(s).id && f.alive && evMe(s).met[f.id]);
@@ -152,13 +153,13 @@ export function eventsTurn(s) {
 /** The event waiting for the player: its scene and its choices, ready to show. */
 export function currentEvent(s) {
   const e = s.galEvent; if (!e) return null;
-  const E = EVENTS[e.id];
+  const E = EVENTS[e.id] || CRISIS_EVENTS[e.id];
   return { title: E.title, text: E.text(s, e.ctx), options: E.options.map((o) => ({ id: o.id, label: o.label, does: o.does })) };
 }
 /** The player's choice: what it does, and what came of it. */
 export function chooseEvent(s, optId) {
   const e = s.galEvent; if (!e) return { error: "Nothing is waiting." };
-  const E = EVENTS[e.id], o = E.options.find((x) => x.id === optId); if (!o) return { error: "No such choice." };
+  const E = EVENTS[e.id] || CRISIS_EVENTS[e.id], o = E.options.find((x) => x.id === optId); if (!o) return { error: "No such choice." };
   const R = rng(s), text = o.apply(s, e.ctx, R); R.save();
   s.galEvent = null;
   log(s, evMe(s).id, `${E.title}: ${o.label}. ${text}`, "contact");
