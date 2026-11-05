@@ -18,6 +18,11 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
 - **Supply and stances:** warships more than 3 hexes from every world and outpost of theirs wear down a hull point a
   turn after the first (Vael fleets feed themselves). Each fleet fights balanced, aggressive (+1 to its rolls and to
   theirs against it) or defensive (−1 to both).
+- **Battle pop-ups:** a battle you're in opens a report after the turn: both sides' ships and hulls, then every
+  shot with its three dice, which you can step through one at a time, a round at a time, or skip to the result.
+- **Galactic events:** every nine turns or so, from turn 6, something happens that you decide about: a derelict of
+  the old empires, refugees, a plague, a rich deposit, a defecting admiral, raiders, a trader, a golden age, a border
+  incident. Surveying ruins is a scene with a choice too (rivals' surveys still give plain research).
 - **Directives and campaigns:** your faction's authority sends directives, each a race against a rival. Three
   campaigns follow one another from turn 8 (The Open Frontier, The Arms Race, The Old Empires' Secrets), each against
   your nearest rival, with threads, a rival that gains ground on its own, a finale (a lead over the rival) and new

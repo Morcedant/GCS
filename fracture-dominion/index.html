@@ -122,6 +122,18 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 .help { padding-left: 18px; display: grid; gap: 6px; color: #c6d0e6; }
 .toast { position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); max-width: min(560px, calc(100vw - 32px)); background: #1b2440; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; opacity: 0; pointer-events: none; transition: .25s; z-index: 30; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); } .toast.bad { border-color: var(--bad); }
+/* Battles, exchange by exchange, and galactic events. */
+.battle { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0; } @media (max-width: 560px) { .battle { grid-template-columns: 1fr; } }
+.bside { background: var(--panel-2); border-radius: 8px; padding: 8px 10px; min-width: 0; } .bside h3 { margin: 0 0 6px; }
+.bunit { display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 2px 0; } .bunit > span:nth-child(2) { flex: 1; min-width: 0; }
+.bunit.dead { opacity: .4; text-decoration: line-through; } .bunit .pips i { width: 9px; height: 9px; }
+.pips.hull i.on, .bunit .pips i.on { background: var(--good); border-color: var(--good); }
+.blog-list { list-style: none; padding: 8px 10px; margin: 8px 0; max-height: 240px; overflow-y: auto; background: var(--bg); border-radius: 8px; display: grid; gap: 4px; font-size: 13px; }
+.blog-list li.good { color: var(--good); } .blog-list li.bad { color: var(--bad); } .blog-list li.now { font-weight: 600; } .blog-list .bround { color: var(--gold); font: 600 12px var(--display); letter-spacing: .08em; text-transform: uppercase; margin-top: 4px; }
+.dice { display: inline-flex; gap: 3px; vertical-align: -3px; } .die { width: 18px; height: 18px; border-radius: 4px; background: #f3efe2; color: #111; display: inline-grid; place-items: center; font: 700 11px var(--body); }
+.ev-opts { display: grid; gap: 8px; margin-top: 12px; }
+.ev-opt { display: grid; gap: 2px; text-align: left; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+.ev-opt:hover, .ev-opt:focus-visible { border-color: var(--accent); } .ev-opt small { color: var(--muted); }
 /* The guide for a first game: a card that walks through the first turns, and a gold ring on what to use next. */
 .coach { position: fixed; left: max(12px, env(safe-area-inset-left, 0px)); bottom: 64px; width: min(360px, calc(100vw - 24px)); box-sizing: border-box; z-index: 15; background: #141c31; border: 1px solid var(--gold); border-radius: 12px; padding: 12px 14px; box-shadow: 0 16px 40px rgba(0,0,0,.55); }
 .coach[hidden] { display: none; }

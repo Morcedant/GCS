@@ -180,3 +180,35 @@ test("battle stances change the rolls", async () => {
   assert.ok(setStance(s, f.id, "aggressive").ok); assert.equal(f.stance, "aggressive");
   assert.ok(setStance(s, f.id, "reckless").error);
 });
+
+test("battles the player fights are recorded roll by roll, for the battle pop-up", () => {
+  const s = newGame({ seed: 31, size: "small", player: "hegemony", rivals: 1 }), foe = s.factions[1].id;
+  declareWar(s, "hegemony", foe);
+  const at = s.systems[faction(s, foe).capital].at;
+  spawnFleet(s, "hegemony", at, ["cruiser", "frigate", "frigate"]);
+  endTurn(s, null);
+  const B = (s.battleReports || [])[0];
+  assert.ok(B && B.events.length && B.units.length >= 4);
+  for (const e of B.events) { assert.equal(e.dice.length, 3); assert.ok(B.units[e.a] && B.units[e.t]); }
+  assert.ok(["won", "lost", "even"].includes(B.won));
+});
+test("galactic events: they come, each choice does what it says, and ruins become one", async () => {
+  const { EVENTS, eventsTurn, currentEvent, chooseEvent } = await import("../src/events.js");
+  const s = newGame({ seed: 32, player: "concord", rivals: 2 });
+  for (let i = 0; i < 40 && !s.galEvent; i++) { s.turn++; eventsTurn(s); }
+  assert.ok(s.galEvent, "an event comes within 40 turns");
+  const e = currentEvent(s); assert.ok(e.title && e.options.length >= 2);
+  const r = chooseEvent(s, e.options[0].id); assert.ok(r.ok && r.text); assert.equal(s.galEvent, null);
+  // Every event's every choice runs without error where it can happen.
+  for (const [k, E] of Object.entries(EVENTS)) for (const o of E.options) {
+    const t = newGame({ seed: 33, player: "kel", rivals: 2 });
+    const ctx = k === "ruins" ? { sys: Object.keys(t.systems)[0], fleet: Object.keys(t.fleets)[0] } : E.can(t) || (k === "refugees" || k === "plague" || k === "raiders" || k === "golden" || k === "incident" || k === "defector" ? null : {});
+    if (!ctx) continue;
+    t.galEvent = { id: k, ctx, turn: 1 };
+    assert.ok(chooseEvent(t, o.id).ok, k + ":" + o.id);
+  }
+  // A ruin surveyed by the player's fleet waits as an event.
+  const u = newGame({ seed: 34, size: "small", player: "vael", rivals: 1 });
+  const ruin = Object.values(u.systems).find((x) => x.ruins);
+  if (ruin) { spawnFleet(u, "vael", ruin.at, ["scout"]); endTurn(u, null); eventsTurn(u); assert.equal(u.galEvent && u.galEvent.id, "ruins"); }
+});

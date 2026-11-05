@@ -123,6 +123,18 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 .help { padding-left: 18px; display: grid; gap: 6px; color: #c6d0e6; }
 .toast { position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); max-width: min(560px, calc(100vw - 32px)); background: #1b2440; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; opacity: 0; pointer-events: none; transition: .25s; z-index: 30; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); } .toast.bad { border-color: var(--bad); }
+/* Battles, exchange by exchange, and galactic events. */
+.battle { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0; } @media (max-width: 560px) { .battle { grid-template-columns: 1fr; } }
+.bside { background: var(--panel-2); border-radius: 8px; padding: 8px 10px; min-width: 0; } .bside h3 { margin: 0 0 6px; }
+.bunit { display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 2px 0; } .bunit > span:nth-child(2) { flex: 1; min-width: 0; }
+.bunit.dead { opacity: .4; text-decoration: line-through; } .bunit .pips i { width: 9px; height: 9px; }
+.pips.hull i.on, .bunit .pips i.on { background: var(--good); border-color: var(--good); }
+.blog-list { list-style: none; padding: 8px 10px; margin: 8px 0; max-height: 240px; overflow-y: auto; background: var(--bg); border-radius: 8px; display: grid; gap: 4px; font-size: 13px; }
+.blog-list li.good { color: var(--good); } .blog-list li.bad { color: var(--bad); } .blog-list li.now { font-weight: 600; } .blog-list .bround { color: var(--gold); font: 600 12px var(--display); letter-spacing: .08em; text-transform: uppercase; margin-top: 4px; }
+.dice { display: inline-flex; gap: 3px; vertical-align: -3px; } .die { width: 18px; height: 18px; border-radius: 4px; background: #f3efe2; color: #111; display: inline-grid; place-items: center; font: 700 11px var(--body); }
+.ev-opts { display: grid; gap: 8px; margin-top: 12px; }
+.ev-opt { display: grid; gap: 2px; text-align: left; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+.ev-opt:hover, .ev-opt:focus-visible { border-color: var(--accent); } .ev-opt small { color: var(--muted); }
 /* The guide for a first game: a card that walks through the first turns, and a gold ring on what to use next. */
 .coach { position: fixed; left: max(12px, env(safe-area-inset-left, 0px)); bottom: 64px; width: min(360px, calc(100vw - 24px)); box-sizing: border-box; z-index: 15; background: #141c31; border: 1px solid var(--gold); border-radius: 12px; padding: 12px 14px; box-shadow: 0 16px 40px rgba(0,0,0,.55); }
 .coach[hidden] { display: none; }
@@ -177,7 +189,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-03 20:43 UTC";
+const BUILD = "2026-11-05 22:11 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -587,6 +599,8 @@ function yields(s, sys) {
     if (fid === "tessan") cr *= 1.25;
     const fo = focusOf(s, fid);   // the empire's Focus
     ind *= 1 + 0.1 * fo.industry; sci *= 1 + 0.1 * fo.science; cr *= 1 + 0.1 * fo.credits;
+    const bo = faction(s, fid).boost;   // a golden age from a galactic event: +25% to one output for a few turns
+    if (bo && s.turn <= bo.until) { if (bo.kind === "industry") ind *= 1.25; else if (bo.kind === "science") sci *= 1.25; else cr *= 1.25; }
   } else cr = 0.5;
   const exo = sys.exotics ? 1 + (B.refinery ? 1 : 0) : 0;
   const upkeep = Object.keys(B).filter((b) => B[b] && BUILDINGS[b]).reduce((t, b) => t + BUILDINGS[b].upkeep, 0) * 0.5;
@@ -781,7 +795,6 @@ function checkAlive(s, fid) {
 }
 
 // ---- battles: 3d6 roll-under, three exchanges ----
-const r3d6 = (R) => R.d6() + R.d6() + R.d6();
 function battles(s) {
   const R = rng(s), hexes = new Set(Object.values(s.fleets).map((f) => f.at));
   for (const hex of hexes) {
@@ -800,6 +813,9 @@ function battles(s) {
     const stance = (u) => (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced;
     const hp = (u) => (u.world ? u.world.colony.defense : u.ship.hull);
     const hit = (u, n) => { if (u.world) u.world.colony.defense = Math.max(0, u.world.colony.defense - n); else u.ship.hull -= n; };
+    // A battle the player is in is recorded roll by roll, for the battle pop-up.
+    const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: sys ? sys.name : "deep space", hex, sides: list,
+      units: units.map((u) => ({ fid: u.fid, type: u.world ? "guns" : u.ship.type, name: u.world ? `${u.world.name}'s orbital guns` : u.st.name, hull: hp(u), max: u.world ? hp(u) : u.st.hull, stance: u.fleet ? u.fleet.stance || "balanced" : null })), events: [] } : null;
     let fights = 0;
     for (let round = 0; round < 3; round++) {
       const live = units.filter((u) => hp(u) > 0);
@@ -807,10 +823,11 @@ function battles(s) {
         if (!u.st.skill || hp(u) <= 0) continue;
         const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid));
         if (!foes.length) continue;
-        const t = foes[R.int(foes.length)], roll = r3d6(R);
+        const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
-        const need = u.st.skill + stance(u).atk + stance(t).def;
-        if (roll <= 4 || (roll < 17 && roll <= need)) hit(t, u.st.dmg);
+        const need = u.st.skill + stance(u).atk + stance(t).def, landed = roll <= 4 || (roll < 17 && roll <= need);
+        if (landed) hit(t, u.st.dmg);
+        if (rec) rec.events.push({ round, a: units.indexOf(u), t: units.indexOf(t), dice, need, hit: landed, dmg: landed ? u.st.dmg : 0 });
       }
     }
     if (!fights) continue;
@@ -825,6 +842,7 @@ function battles(s) {
     const names = list.map((x) => faction(s, x).name).join(" and ");
     log(s, null, `Battle at ${where} between ${names}: ${Object.entries(lost).map(([fid, n]) => `${faction(s, fid).name} lost ${n} ship${n > 1 ? "s" : ""}`).join("; ") || "no ships lost"}.`, "war");
     s.events.push({ turn: s.turn, kind: "battle", hex, sides: list });
+    if (rec) { rec.lost = lost; rec.won = (() => { const mine = lost[me] || 0, theirs = Object.entries(lost).filter(([o]) => atWar(s, me, o)).reduce((t, [, n]) => t + n, 0); return theirs > mine ? "won" : mine > theirs ? "lost" : "even"; })(); (s.battleReports = s.battleReports || []).push(rec); }
   }
   R.save();
 }
@@ -890,7 +908,10 @@ function updateVision(s, F) {
   }
   // Ruins: the first to see them learns something.
   for (const sys of Object.values(s.systems)) if (sys.ruins && vis[sys.at] && fleetsAt(s, sys.at).some((f) => f.owner === F.id)) {
-    sys.ruins = false; F.research.progress += 60; F.stats.ruins = (F.stats.ruins || 0) + 1;
+    sys.ruins = false; F.stats.ruins = (F.stats.ruins || 0) + 1;
+    // The player decides what to do with a ruin (a galactic event, events.js); the computer powers study it.
+    if (!F.ai) { (s.ruinsFound = s.ruinsFound || []).push({ sys: sys.id, fleet: fleetsAt(s, sys.at).find((f) => f.owner === F.id).id, turn: s.turn }); log(s, F.id, `${F.name} found ruins of the old empires at ${sys.name}: what to do with them is yours to decide.`, "explore"); continue; }
+    F.research.progress += 60;
     const cur = TECHS.find((x) => x.id === F.research.current);
     log(s, F.id, `${F.name} surveyed the ruins at ${sys.name}: what the old empires left there is worth +60 research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}.`, "explore");
   }
@@ -1334,6 +1355,173 @@ function F_bonus(s, rep) {
 
 const cap = (t) => t[0].toUpperCase() + t.slice(1);
 
+// ---- events.js ----
+// Galactic events: every few turns something happens to the player's empire that asks for a decision. Each event is a
+// short scene and two or three choices; each choice does something real (credits, research, exotics, population,
+// ships, relations, a few turns of a golden age) and says what came of it. Ruins of the old empires are events too:
+// surveying one asks what to do with what's found there.
+
+
+
+const evMe = (s) => player(s);
+const evMetRivals = (s) => s.factions.filter((f) => f.id !== evMe(s).id && f.alive && evMe(s).met[f.id]);
+const evRelate = (s, fid, n) => { const r = faction(s, fid).relations[evMe(s).id]; if (r) r.score = Math.max(-60, Math.min(40, r.score + n)); };
+const evName = (s, fid) => faction(s, fid).name;
+const evResearch = (s, n) => { evMe(s).research.progress += n; const cur = TECHS.find((t) => t.id === evMe(s).research.current); return `+${n} research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}`; };
+const evRoll3 = (R) => R.d6() + R.d6() + R.d6();
+
+/**
+ * Each event: when it can happen (`can` returns its context, or null), its scene, and its choices. A choice's `does`
+ * says up front what it costs and brings; `apply` makes it so and returns what happened.
+ */
+const EVENTS = {
+  derelict: {
+    title: "A derelict of the old empires",
+    can: (s) => { const f = fleetsOf(s, evMe(s).id).find((x) => !s.sysAt[x.at]) || fleetsOf(s, evMe(s).id)[0]; return f ? { fleet: f.id } : null; },
+    text: () => "Your long-range sensors find it tumbling in the dark: a ship of the old empires, three kilometres of hull, dead since before the Fracture. No power, no life signs. Its holds are sealed. Its engines are a design nobody has built in a thousand years.",
+    options: [
+      { id: "salvage", label: "Strip it for salvage", does: "Exotics, maybe a lot; its old defences may still bite.", apply: (s, c, R) => { const r = evRoll3(R); if (r <= 12) { const n = 2 + (r <= 7 ? 2 : 0); evMe(s).exotics += n; return `The salvage crews cut into the holds and find exotics, packed in crystal: +${n} exotics.`; } const f = s.fleets[c.fleet]; if (f) for (const x of f.ships) x.hull = Math.max(1, x.hull - 1); return "The derelict's defences wake when the cutters touch the hull. The crews get out, but the fleet that found it is battered: every ship loses a hull point."; } },
+      { id: "study", label: "Study its engines", does: "+90 research, safely.", apply: (s) => `Your engineers spend months inside the drive section, drawing what they find. ${evResearch(s, 90)}.` },
+      { id: "sell", label: "Sell the coordinates", does: "+60 credits now.", apply: (s) => { evMe(s).credits += 60; return "A salvage guild pays well for the coordinates and asks no questions: +60 credits."; } },
+    ],
+  },
+  refugees: {
+    title: "Refugees at the border",
+    can: (s) => {
+      const wars = s.factions.filter((a) => a.alive && a.id !== evMe(s).id && s.factions.some((b) => b.alive && b.id !== evMe(s).id && atWar(s, a.id, b.id)));
+      const home = coloniesOf(s, evMe(s).id).find((x) => x.colony.kind === "colony" && x.colony.pop < maxPop(s, x));
+      if (!home) return null;
+      const from = wars[0] || evMetRivals(s)[0]; if (!from) return null;
+      return { world: home.id, from: from.id };
+    },
+    text: (s, c) => `A column of ships, old freighters and liners lashed together, limps into orbit over ${s.systems[c.world].name}. They're fleeing ${evMe(s).met[c.from] ? evName(s, c.from) : "a war beyond your borders"}. Ten thousand people, out of food and fuel. Their spokeswoman asks only for somewhere to land.`,
+    options: [
+      { id: "take", label: "Take them in", does: "+2 population on that world; the power they fled won't thank you.", apply: (s, c) => { const w = s.systems[c.world]; w.colony.pop = Math.min(maxPop(s, w), w.colony.pop + 2); evRelate(s, c.from, -8); return `They land on ${w.name} and start building that night: +2 population there. ${evName(s, c.from)} take note of where they went.`; } },
+      { id: "colony", label: "Give them a ship and a world of their own", does: "A free colony ship at your capital, for 40 credits of supplies.", apply: (s) => { evMe(s).credits -= 40; const cap = s.systems[evMe(s).capital]; spawnFleet(s, evMe(s).id, cap.at, ["colony"]); return `You fit out a colony ship for them at ${cap.name} (−40 credits). Send it to a good world, and they'll be your newest colony.`; } },
+      { id: "away", label: "Turn them away", does: "No cost. Nobody will forget it.", apply: (s, c) => { evRelate(s, c.from, 4); return "The column turns back into the dark. Some of your own people watch it go and say nothing. The power they fled sends a short, cold note of thanks."; } },
+    ],
+  },
+  plague: {
+    title: "Sickness on a colony",
+    can: (s) => { const w = coloniesOf(s, evMe(s).id).filter((x) => x.colony.kind === "colony" && x.colony.pop >= 3 && !x.colony.capital); return w.length ? { world: w[w.length - 1].id } : null; },
+    text: (s, c) => `A fever is spreading through ${s.systems[c.world].name}'s cities: fast, and resistant to everything the clinics have. The governor asks for a decision before it reaches the spaceport.`,
+    options: [
+      { id: "cure", label: "Fund a cure", does: "−50 credits; no lives lost, and the doctors may learn something.", apply: (s, c, R) => { evMe(s).credits -= 50; const extra = R.next() < 0.5 ? ` What they learn goes into your labs: ${evResearch(s, 40)}.` : ""; return `The best doctors in your empire land within a week. The fever breaks (−50 credits).${extra}`; } },
+      { id: "quarantine", label: "Quarantine the world", does: "−1 population there; it can't spread.", apply: (s, c) => { const w = s.systems[c.world]; w.colony.pop = Math.max(1, w.colony.pop - 1); return `${w.name} is sealed. The fever burns itself out inside the cordon, but not before it costs a population point.`; } },
+      { id: "ignore", label: "Let it run its course", does: "No cost, unless it gets worse.", apply: (s, c, R) => { const w = s.systems[c.world]; if (R.next() < 0.5) { w.colony.pop = Math.max(1, w.colony.pop - 2); return `It gets worse. ${w.name} loses 2 population before it's over.`; } return `It fades on its own within a month. ${w.name} was lucky.`; } },
+    ],
+  },
+  deposit: {
+    title: "A rich deposit",
+    can: (s) => { const w = coloniesOf(s, evMe(s).id).filter((x) => !x.exotics); return w.length ? { world: w[0].id } : null; },
+    text: (s, c) => `Prospectors on ${s.systems[c.world].name} strike something deep under the crust: a seam of exotic matter nobody had found, because nobody had dug that far.`,
+    options: [
+      { id: "mine", label: "Open a mine", does: "−40 credits; the system yields exotics from now on.", apply: (s, c) => { evMe(s).credits -= 40; s.systems[c.world].exotics = true; return `The mine opens within the year (−40 credits). ${s.systems[c.world].name} now has an exotics deposit: +1 exotics a turn, more with a refinery.`; } },
+      { id: "sell", label: "Sell the rights", does: "+80 credits now.", apply: (s) => { evMe(s).credits += 80; return "A mining consortium pays handsomely for the rights, and promptly runs into trouble getting at it: +80 credits."; } },
+    ],
+  },
+  defector: {
+    title: "An admiral wants to defect",
+    can: (s) => { const r = evMetRivals(s).filter((f) => militaryPower(s, f.id) > 0); return r.length ? { from: r[0].id } : null; },
+    text: (s, c) => `A message on a private channel, from an admiral of ${evName(s, c.from)}: tired of their government, she offers you her ships and her loyalty, in return for a place in your fleet.`,
+    options: [
+      { id: "accept", label: "Welcome her", does: "Two frigates join you at your capital; her old masters will be furious.", apply: (s, c) => { const cap = s.systems[evMe(s).capital]; spawnFleet(s, evMe(s).id, cap.at, ["frigate", "frigate"]); evRelate(s, c.from, -15); return `Her ships arrive at ${cap.name} with their old markings painted over: two frigates join your fleet. ${evName(s, c.from)} are furious.`; } },
+      { id: "secrets", label: "Take her secrets, not her ships", does: "+70 research; they'll suspect.", apply: (s, c) => { evRelate(s, c.from, -5); return `She defects alone, with everything she knows. ${evResearch(s, 70)}.`; } },
+      { id: "return", label: "Send her back", does: "Their trust: relations with them improve.", apply: (s, c) => { evRelate(s, c.from, 15); return `You hand her back. ${evName(s, c.from)} are grateful, in their way.`; } },
+    ],
+  },
+  raiders: {
+    title: "Raiders on the frontier",
+    can: (s) => { const w = coloniesOf(s, evMe(s).id).filter((x) => !x.colony.capital); return w.length ? { world: w[0].id } : null; },
+    text: (s, c) => `A band of raiders, deserters from the old wars, has set up in the asteroids near ${s.systems[c.world].name}. They've sent a price for leaving it alone.`,
+    options: [
+      { id: "pay", label: "Pay them off", does: "−50 credits; they leave.", apply: (s) => { evMe(s).credits -= 50; return "You pay. They leave, this time (−50 credits)."; } },
+      { id: "hire", label: "Hire them", does: "−90 credits; two frigates join your fleet at that world.", apply: (s, c) => { evMe(s).credits -= 90; spawnFleet(s, evMe(s).id, s.systems[c.world].at, ["frigate", "frigate"]); return `For 90 credits and a pardon, they're yours: two frigates at ${s.systems[c.world].name}.`; } },
+      { id: "refuse", label: "Refuse", does: "No cost, if the world's defences hold.", apply: (s, c, R) => { const w = s.systems[c.world], guarded = fleetsOf(s, evMe(s).id).some((f) => f.at === w.at && f.ships.some((x) => SHIPS[x.type].skill > 0)) || w.colony.defense > 0; if (guarded || R.next() < 0.4) return `They try their luck against ${w.name}, and think better of it.`; if (w.colony.kind === "colony") w.colony.pop = Math.max(1, w.colony.pop - 1); w.colony.queue = []; return `They raid ${w.name}: its build queue is lost${w.colony.kind === "colony" ? ", and a population point with it" : ""}. Guard your worlds.`; } },
+    ],
+  },
+  trader: {
+    title: "A trader from beyond the rifts",
+    can: (s) => (evMe(s).credits >= 40 ? {} : null),
+    text: () => "A single ship, old and beautifully kept, asks for permission to dock. Its captain trades in knowledge: star charts, formulas, the notebooks of dead scientists. Everything has a price.",
+    options: [
+      { id: "buy", label: "Buy what she knows", does: "−80 credits, +130 research.", apply: (s) => { evMe(s).credits -= 80; return `The notebooks are worth every credit (−80). ${evResearch(s, 130)}.`; } },
+      { id: "sell", label: "Sell her your exotics", does: "−2 exotics, +90 credits.", apply: (s) => { if (evMe(s).exotics < 2) return "You have no exotics to spare. She shrugs and moves on."; evMe(s).exotics -= 2; evMe(s).credits += 90; return "She pays well for exotics: −2 exotics, +90 credits."; } },
+      { id: "no", label: "Send her on", does: "Nothing.", apply: () => "She leaves the way she came, back toward the rifts." },
+    ],
+  },
+  golden: {
+    title: "A golden age",
+    can: (s) => (coloniesOf(s, evMe(s).id).length >= 3 ? {} : null),
+    text: (s) => `${evMe(s).name} is at peace with itself for a season: the harvests are good, the yards are busy, the universities are full. Where should the moment go?`,
+    options: [
+      { id: "industry", label: "Into the yards", does: "+25% industry for 6 turns.", apply: (s) => { evMe(s).boost = { kind: "industry", until: s.turn + 6 }; return "The yards work through the night: +25% industry for 6 turns."; } },
+      { id: "science", label: "Into the universities", does: "+25% science for 6 turns.", apply: (s) => { evMe(s).boost = { kind: "science", until: s.turn + 6 }; return "A generation of scholars comes of age at once: +25% science for 6 turns."; } },
+      { id: "credits", label: "Into trade", does: "+25% credits for 6 turns.", apply: (s) => { evMe(s).boost = { kind: "credits", until: s.turn + 6 }; return "The markets boom: +25% credits for 6 turns."; } },
+    ],
+  },
+  incident: {
+    title: "A border incident",
+    can: (s) => { const r = evMetRivals(s).filter((f) => !atWar(s, evMe(s).id, f.id) && coloniesOf(s, f.id).some((x) => coloniesOf(s, evMe(s).id).some((y) => distance(x.at, y.at) <= 6))); return r.length ? { from: r[0].id } : null; },
+    text: (s, c) => `A patrol of yours and a patrol of ${evName(s, c.from)} met on the border. Someone fired. Nobody agrees who. Their ambassador is waiting in your anteroom, and so are your admirals.`,
+    options: [
+      { id: "apologise", label: "Apologise", does: "−30 credits in compensation; they'll like you better.", apply: (s, c) => { evMe(s).credits -= 30; evRelate(s, c.from, 12); return `You pay compensation (−30 credits) and the ambassador leaves mollified. ${evName(s, c.from)} like you better for it.`; } },
+      { id: "firm", label: "Stand firm", does: "No cost; they'll like you less.", apply: (s, c) => { evRelate(s, c.from, -12); return `You concede nothing. ${evName(s, c.from)} recall their ambassador for a while.`; } },
+      { id: "demand", label: "Demand reparations", does: "Maybe +60 credits; maybe a much worse quarrel.", apply: (s, c, R) => { if (R.next() < 0.5) { evMe(s).credits += 60; evRelate(s, c.from, -5); return `They pay, through gritted teeth: +60 credits.`; } evRelate(s, c.from, -25); return `They refuse, loudly and in public. Relations with ${evName(s, c.from)} are worse than they've ever been.`; } },
+    ],
+  },
+  ruins: {
+    title: "Ruins of the old empires",
+    can: () => null,   // only when a ruin is surveyed
+    text: (s, c) => `Your survey team walks into the ruins at ${s.systems[c.sys].name}: halls cut into the rock, machines under a thousand years of dust, writing nobody living can read. Something here still has power.`,
+    options: [
+      { id: "study", label: "Study it carefully", does: "+70 research, safely.", apply: (s) => `Your scholars map every hall and copy every inscription. ${evResearch(s, 70)}.` },
+      { id: "dig", label: "Dig for relics", does: "Exotics, maybe a prototype; the guardians may wake.", apply: (s, c, R) => {
+        const r = evRoll3(R);
+        if (r <= 6) { const p = Object.keys(PROTOTYPES).find((x) => !(evMe(s).protos || {})[x]); if (p) { evMe(s).protos = evMe(s).protos || {}; evMe(s).protos[p] = true; return `Deep in the vaults, a machine that still works: your engineers have it running in a month. A prototype: ${PROTOTYPES[p].name} (${PROTOTYPES[p].text})`; } }
+        if (r <= 12) { evMe(s).exotics += 3; return "The diggers find a cache of exotic matter, sealed in glass: +3 exotics."; }
+        const f = s.fleets[c.fleet]; if (f) for (const x of f.ships) x.hull = Math.max(1, x.hull - 1);
+        return "The diggers wake something that should have stayed asleep. The ruins' guardians drive them out, and the fleet overhead takes fire: every ship loses a hull point.";
+      } },
+      { id: "seal", label: "Seal it and charge admission", does: "+25% credits for 6 turns.", apply: (s) => { evMe(s).boost = { kind: "credits", until: s.turn + 6 }; return "Scholars and pilgrims come from across your worlds to see it: +25% credits for 6 turns."; } },
+    ],
+  },
+};
+
+/** Every turn: a ruin surveyed becomes an event; otherwise, now and then, something happens. */
+function eventsTurn(s) {
+  if (s.winner || s.galEvent) return;
+  const found = (s.ruinsFound || []).shift();
+  if (found) { s.galEvent = { id: "ruins", ctx: found, turn: s.turn }; return; }
+  if (s.turn < 6 || s.turn - (s.lastEvent || 0) < 6) return;
+  const R = rng(s);
+  const roll = R.next();
+  if (roll > 0.25) { R.save(); return; }
+  const seen = (s.eventsSeen = s.eventsSeen || {});
+  const pool = Object.keys(EVENTS).filter((k) => k !== "ruins").sort((a, b) => (seen[a] || 0) - (seen[b] || 0));   // the least seen first
+  const fresh = pool.filter((k) => (seen[k] || 0) === (seen[pool[0]] || 0));
+  for (const k of [...fresh.sort(() => R.next() - 0.5), ...pool]) {
+    const ctx = EVENTS[k].can(s);
+    if (ctx) { s.galEvent = { id: k, ctx, turn: s.turn }; seen[k] = (seen[k] || 0) + 1; s.lastEvent = s.turn; break; }
+  }
+  R.save();
+}
+/** The event waiting for the player: its scene and its choices, ready to show. */
+function currentEvent(s) {
+  const e = s.galEvent; if (!e) return null;
+  const E = EVENTS[e.id];
+  return { title: E.title, text: E.text(s, e.ctx), options: E.options.map((o) => ({ id: o.id, label: o.label, does: o.does })) };
+}
+/** The player's choice: what it does, and what came of it. */
+function chooseEvent(s, optId) {
+  const e = s.galEvent; if (!e) return { error: "Nothing is waiting." };
+  const E = EVENTS[e.id], o = E.options.find((x) => x.id === optId); if (!o) return { error: "No such choice." };
+  const R = rng(s), text = o.apply(s, e.ctx, R); R.save();
+  s.galEvent = null;
+  log(s, evMe(s).id, `${E.title}: ${o.label}. ${text}`, "contact");
+  return { ok: true, title: E.title, choice: o.label, text };
+}
+
 // ---- ai.js ----
 // The computer factions: each turn they pick research, fill their build queues, explore, settle, defend and, when
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
@@ -1506,6 +1694,7 @@ function fleets(s, F) {
 
 // ---- ui.js ----
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
+
 
 
 
@@ -1938,6 +2127,7 @@ function campaignHTML() {
 }
 /** Mission Success reports, one after another, after whatever report is showing. */
 function showNextMission() {
+  if (S && S.galEvent && !S.winner) { showGalEvent(); return true; }
   const D = S && S.directives; if (!D || !D.reports.length) return false;
   const r = D.reports[0];
   if (r.result === "story") {
@@ -2123,6 +2313,7 @@ function doEndTurn() {
     S.offers = S.offers.filter((o) => S.turn - o.turn < 3);
     endTurn(S, aiTurn);
     if (!S.winner) directivesTurn(S);
+    if (!S.winner) eventsTurn(S);
     $("end-turn").textContent = "End turn";
     save();
     // News: what happened to you this turn.
@@ -2132,12 +2323,64 @@ function doEndTurn() {
     if (S.winner) { showEnd(); return; }
     // A report of the turn, when anything happened to you: the books first, then the rest; charted systems are counted.
     const charted = S.log.slice(before.log).filter((l) => l.fid === me.id && l.text.startsWith("Charted ")).length;
-    if (news.length || charted) {
-      const books = S.log.slice(before.log).find((l) => l.fid === me.id && l.kind === "turn");
-      report = { title: `Turn ${S.turn - 1}: what happened`, lines: [...news.map((l) => l.text), ...(charted ? [`${charted} new system${charted === 1 ? "" : "s"} charted (see the Log).`] : []), ...(books ? [books.text] : [])] };
-      showReport();
-    } else showNextMission();
+    const go = () => {
+      if (news.length || charted) {
+        const books = S.log.slice(before.log).find((l) => l.fid === me.id && l.kind === "turn");
+        report = { title: `Turn ${S.turn - 1}: what happened`, lines: [...news.map((l) => l.text), ...(charted ? [`${charted} new system${charted === 1 ? "" : "s"} charted (see the Log).`] : []), ...(books ? [books.text] : [])] };
+        showReport();
+      } else showNextMission();
+    };
+    // Battles first, as they happened; then the turn's report; then any event and directive reports.
+    if (S.battleReports && S.battleReports.length) showBattle(go); else go();
   }, 30);
+}
+
+// ---------- battles, exchange by exchange ----------
+/** The first battle report waiting: both sides' ships and every roll, stepped through, then the result. */
+function showBattle(then) {
+  const B = S.battleReports && S.battleReports[0]; if (!B) { then(); return; }
+  const me = player(S).id, n = B.events.length;
+  let shown = 0;
+  const unitName = (u) => { const who = u.fid === me ? "Your" : faction(S, u.fid).name.replace(/^The /, ""); return u.type === "guns" ? `${who} orbital guns at ${u.name.replace(/'s orbital guns$/, "")}` : `${who} ${u.name.toLowerCase()}`; };
+  const hullAt = (k) => B.units.map((u, i) => Math.max(0, u.hull - B.events.slice(0, k).filter((e) => e.t === i).reduce((t, e) => t + e.dmg, 0)));
+  const icon = (u) => (u.type === "guns" ? `<svg width="22" height="22" viewBox="-13.5 -13.5 27 27" aria-hidden="true"><circle r="7" fill="${faction(S, u.fid).color}" fill-opacity=".3" stroke="${faction(S, u.fid).color}" stroke-width="1"/><path d="M0 -7 V-12 M7 0 H12 M0 7 V12 M-7 0 H-12" stroke="${faction(S, u.fid).color}" stroke-width="1"/><\/svg>` : shipSVG(u.type, faction(S, u.fid).color, 22));
+  const sideHTML = (fids, hull, title) => `<div class="bside"><h3>${title}<\/h3>${B.units.map((u, i) => fids.includes(u.fid) ? `<div class="bunit ${hull[i] <= 0 ? "dead" : ""}">${icon(u)}<span>${esc(unitName(u))}${u.stance && u.stance !== "balanced" ? ` <i class="small muted">(${esc(STANCES[u.stance].name.toLowerCase())})<\/i>` : ""}<\/span><span class="pips">${Array.from({ length: u.max }, (_, k) => `<i class="${k < hull[i] ? "on" : ""}"><\/i>`).join("")}<\/span><\/div>` : "").join("")}<\/div>`;
+  const draw = () => {
+    const hull = hullAt(shown), done = shown >= n;
+    const mine = [me], theirs = B.sides.filter((x) => x !== me);
+    const lines = B.events.slice(0, shown).map((e, k) => {
+      const a = B.units[e.a], t = B.units[e.t], killed = e.hit && hullAt(k + 1)[e.t] <= 0 && hullAt(k)[e.t] > 0;
+      const head = k === 0 || B.events[k - 1].round !== e.round ? `<li class="bround">Exchange ${e.round + 1}<\/li>` : "";
+      return `${head}<li class="${e.hit ? (a.fid === me ? "good" : "bad") : "muted"}${k === shown - 1 ? " now" : ""}">${esc(unitName(a))} fires on ${esc(unitName(t).replace(/^Your /, "your "))}: <span class="dice">${e.dice.map((d) => `<span class="die">${d}<\/span>`).join("")}<\/span> ${e.dice.reduce((x, y) => x + y, 0)} against ${e.need}: <b>${e.hit ? (killed ? "destroyed!" : `hit, −${e.dmg}`) : "miss"}<\/b><\/li>`;
+    }).join("");
+    const lostMine = (B.lost || {})[me] || 0, lostTheirs = Object.entries(B.lost || {}).filter(([f]) => f !== me).reduce((t, [, x]) => t + x, 0);
+    const result = B.won === "won" ? `<b class="good">Victory.<\/b> You lost ${lostMine} ship${lostMine === 1 ? "" : "s"}; they lost ${lostTheirs}.` : B.won === "lost" ? `<b class="bad">Defeat.<\/b> You lost ${lostMine} ship${lostMine === 1 ? "" : "s"}; they lost ${lostTheirs}.` : `<b>No clear winner.<\/b> You lost ${lostMine}; they lost ${lostTheirs}. The fight goes on next turn if both sides stay.`;
+    modal(`<h1>Battle at ${esc(B.at)}<\/h1><p class="small muted">Turn ${B.turn} · ${esc(B.sides.map((f) => f === me ? "you" : faction(S, f).name).join(" against "))} · each shot is 3d6 at or under the gunner's skill<\/p>
+      <div class="battle">${sideHTML(mine, hull, "Your side")}${sideHTML(theirs, hull, esc(theirs.map((f) => faction(S, f).name).join(", ")))}<\/div>
+      <ol class="blog-list">${lines || `<li class="muted">The fleets close. Three exchanges of fire.<\/li>`}<\/ol>
+      ${done ? `<p>${result}<\/p>` : ""}
+      <div class="btn-row">${done ? `<button class="btn primary" id="b-ok">Continue<\/button>` : `<button class="btn primary" id="b-next">Next shot<\/button><button class="btn" id="b-round">Finish the exchange<\/button><button class="btn" id="b-all">Skip to the result<\/button>`}<\/div>`);
+    const L = document.querySelector(".blog-list"); if (L) L.scrollTop = L.scrollHeight;
+    if (done) $("b-ok").onclick = () => { S.battleReports.shift(); save(); closeModal(); renderAll(); showBattle(then); };
+    else {
+      $("b-next").onclick = () => { shown++; draw(); };
+      $("b-round").onclick = () => { const r = B.events[shown].round; while (shown < n && B.events[shown].round === r) shown++; draw(); };
+      $("b-all").onclick = () => { shown = n; draw(); };
+    }
+  };
+  draw();
+}
+
+// ---------- galactic events ----------
+function showGalEvent() {
+  const e = currentEvent(S); if (!e) return;
+  modal(`<h1>${esc(e.title)}<\/h1><p style="white-space:pre-line">${esc(e.text)}<\/p>
+    <div class="ev-opts">${e.options.map((o) => `<button class="ev-opt" data-ev="${o.id}"><b>${esc(o.label)}<\/b><small>${esc(o.does)}<\/small><\/button>`).join("")}<\/div>`);
+  document.querySelectorAll("[data-ev]").forEach((b) => b.onclick = () => {
+    const r = chooseEvent(S, b.dataset.ev); save();
+    modal(`<h1>${esc(r.title)}<\/h1><p class="small muted">Your choice: ${esc(r.choice)}<\/p><p>${esc(r.text)}<\/p><div class="btn-row"><button class="btn primary" id="ev-ok">Continue<\/button><\/div>`);
+    $("ev-ok").onclick = () => { closeModal(); renderAll(); showNextMission(); };
+  });
 }
 
 // ---------- reports: what a choice led to, in a pop-up ----------

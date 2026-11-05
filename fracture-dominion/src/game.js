@@ -40,7 +40,7 @@ export function newGame(opts) {
 export const faction = (s, id) => s.factions.find((f) => f.id === id);
 export const has = (s, fid, tech) => faction(s, fid).research.done.includes(tech);
 export const player = (s) => s.factions[0];
-function rng(s) { const r = makeRng(1); r.setState(s.rngState); return { ...r, save: () => { s.rngState = r.state(); } }; }
+export function rng(s) { const r = makeRng(1); r.setState(s.rngState); return { ...r, save: () => { s.rngState = r.state(); } }; }
 /** Discoveries (systems charted, ruins surveyed, contacts, technologies) are never trimmed from the log. */
 export const DISCOVERY = ["explore", "research", "contact"];
 export function log(s, fid, text, kind = "info") {
@@ -133,6 +133,8 @@ export function yields(s, sys) {
     if (fid === "tessan") cr *= 1.25;
     const fo = focusOf(s, fid);   // the empire's Focus
     ind *= 1 + 0.1 * fo.industry; sci *= 1 + 0.1 * fo.science; cr *= 1 + 0.1 * fo.credits;
+    const bo = faction(s, fid).boost;   // a golden age from a galactic event: +25% to one output for a few turns
+    if (bo && s.turn <= bo.until) { if (bo.kind === "industry") ind *= 1.25; else if (bo.kind === "science") sci *= 1.25; else cr *= 1.25; }
   } else cr = 0.5;
   const exo = sys.exotics ? 1 + (B.refinery ? 1 : 0) : 0;
   const upkeep = Object.keys(B).filter((b) => B[b] && BUILDINGS[b]).reduce((t, b) => t + BUILDINGS[b].upkeep, 0) * 0.5;
@@ -327,7 +329,6 @@ function checkAlive(s, fid) {
 }
 
 // ---- battles: 3d6 roll-under, three exchanges ----
-const r3d6 = (R) => R.d6() + R.d6() + R.d6();
 function battles(s) {
   const R = rng(s), hexes = new Set(Object.values(s.fleets).map((f) => f.at));
   for (const hex of hexes) {
@@ -346,6 +347,9 @@ function battles(s) {
     const stance = (u) => (u.fleet && STANCES[u.fleet.stance]) || STANCES.balanced;
     const hp = (u) => (u.world ? u.world.colony.defense : u.ship.hull);
     const hit = (u, n) => { if (u.world) u.world.colony.defense = Math.max(0, u.world.colony.defense - n); else u.ship.hull -= n; };
+    // A battle the player is in is recorded roll by roll, for the battle pop-up.
+    const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: sys ? sys.name : "deep space", hex, sides: list,
+      units: units.map((u) => ({ fid: u.fid, type: u.world ? "guns" : u.ship.type, name: u.world ? `${u.world.name}'s orbital guns` : u.st.name, hull: hp(u), max: u.world ? hp(u) : u.st.hull, stance: u.fleet ? u.fleet.stance || "balanced" : null })), events: [] } : null;
     let fights = 0;
     for (let round = 0; round < 3; round++) {
       const live = units.filter((u) => hp(u) > 0);
@@ -353,10 +357,11 @@ function battles(s) {
         if (!u.st.skill || hp(u) <= 0) continue;
         const foes = live.filter((v) => hp(v) > 0 && atWar(s, u.fid, v.fid));
         if (!foes.length) continue;
-        const t = foes[R.int(foes.length)], roll = r3d6(R);
+        const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
-        const need = u.st.skill + stance(u).atk + stance(t).def;
-        if (roll <= 4 || (roll < 17 && roll <= need)) hit(t, u.st.dmg);
+        const need = u.st.skill + stance(u).atk + stance(t).def, landed = roll <= 4 || (roll < 17 && roll <= need);
+        if (landed) hit(t, u.st.dmg);
+        if (rec) rec.events.push({ round, a: units.indexOf(u), t: units.indexOf(t), dice, need, hit: landed, dmg: landed ? u.st.dmg : 0 });
       }
     }
     if (!fights) continue;
@@ -371,6 +376,7 @@ function battles(s) {
     const names = list.map((x) => faction(s, x).name).join(" and ");
     log(s, null, `Battle at ${where} between ${names}: ${Object.entries(lost).map(([fid, n]) => `${faction(s, fid).name} lost ${n} ship${n > 1 ? "s" : ""}`).join("; ") || "no ships lost"}.`, "war");
     s.events.push({ turn: s.turn, kind: "battle", hex, sides: list });
+    if (rec) { rec.lost = lost; rec.won = (() => { const mine = lost[me] || 0, theirs = Object.entries(lost).filter(([o]) => atWar(s, me, o)).reduce((t, [, n]) => t + n, 0); return theirs > mine ? "won" : mine > theirs ? "lost" : "even"; })(); (s.battleReports = s.battleReports || []).push(rec); }
   }
   R.save();
 }
@@ -436,7 +442,10 @@ export function updateVision(s, F) {
   }
   // Ruins: the first to see them learns something.
   for (const sys of Object.values(s.systems)) if (sys.ruins && vis[sys.at] && fleetsAt(s, sys.at).some((f) => f.owner === F.id)) {
-    sys.ruins = false; F.research.progress += 60; F.stats.ruins = (F.stats.ruins || 0) + 1;
+    sys.ruins = false; F.stats.ruins = (F.stats.ruins || 0) + 1;
+    // The player decides what to do with a ruin (a galactic event, events.js); the computer powers study it.
+    if (!F.ai) { (s.ruinsFound = s.ruinsFound || []).push({ sys: sys.id, fleet: fleetsAt(s, sys.at).find((f) => f.owner === F.id).id, turn: s.turn }); log(s, F.id, `${F.name} found ruins of the old empires at ${sys.name}: what to do with them is yours to decide.`, "explore"); continue; }
+    F.research.progress += 60;
     const cur = TECHS.find((x) => x.id === F.research.current);
     log(s, F.id, `${F.name} surveyed the ruins at ${sys.name}: what the old empires left there is worth +60 research${cur ? ` toward ${cur.name}` : ", banked for your next technology"}.`, "explore");
   }

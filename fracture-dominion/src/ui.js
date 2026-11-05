@@ -5,6 +5,7 @@ import { newGame, endTurn, faction, player, coloniesOf, fleetsOf, fleetsAt, ship
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds,
   declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto } from "./game.js";
 import { aiTurn } from "./ai.js";
+import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
 import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX, CAMPAIGNS, campaignDef, campaignText } from "./orders.js";
 const VERSION = typeof BUILD === "string" ? BUILD : "development";
 /** "Turn 12 of 200", or in open rule "Turn 212 · open rule". */
@@ -433,6 +434,7 @@ function campaignHTML() {
 }
 /** Mission Success reports, one after another, after whatever report is showing. */
 function showNextMission() {
+  if (S && S.galEvent && !S.winner) { showGalEvent(); return true; }
   const D = S && S.directives; if (!D || !D.reports.length) return false;
   const r = D.reports[0];
   if (r.result === "story") {
@@ -618,6 +620,7 @@ function doEndTurn() {
     S.offers = S.offers.filter((o) => S.turn - o.turn < 3);
     endTurn(S, aiTurn);
     if (!S.winner) directivesTurn(S);
+    if (!S.winner) eventsTurn(S);
     $("end-turn").textContent = "End turn";
     save();
     // News: what happened to you this turn.
@@ -627,12 +630,64 @@ function doEndTurn() {
     if (S.winner) { showEnd(); return; }
     // A report of the turn, when anything happened to you: the books first, then the rest; charted systems are counted.
     const charted = S.log.slice(before.log).filter((l) => l.fid === me.id && l.text.startsWith("Charted ")).length;
-    if (news.length || charted) {
-      const books = S.log.slice(before.log).find((l) => l.fid === me.id && l.kind === "turn");
-      report = { title: `Turn ${S.turn - 1}: what happened`, lines: [...news.map((l) => l.text), ...(charted ? [`${charted} new system${charted === 1 ? "" : "s"} charted (see the Log).`] : []), ...(books ? [books.text] : [])] };
-      showReport();
-    } else showNextMission();
+    const go = () => {
+      if (news.length || charted) {
+        const books = S.log.slice(before.log).find((l) => l.fid === me.id && l.kind === "turn");
+        report = { title: `Turn ${S.turn - 1}: what happened`, lines: [...news.map((l) => l.text), ...(charted ? [`${charted} new system${charted === 1 ? "" : "s"} charted (see the Log).`] : []), ...(books ? [books.text] : [])] };
+        showReport();
+      } else showNextMission();
+    };
+    // Battles first, as they happened; then the turn's report; then any event and directive reports.
+    if (S.battleReports && S.battleReports.length) showBattle(go); else go();
   }, 30);
+}
+
+// ---------- battles, exchange by exchange ----------
+/** The first battle report waiting: both sides' ships and every roll, stepped through, then the result. */
+function showBattle(then) {
+  const B = S.battleReports && S.battleReports[0]; if (!B) { then(); return; }
+  const me = player(S).id, n = B.events.length;
+  let shown = 0;
+  const unitName = (u) => { const who = u.fid === me ? "Your" : faction(S, u.fid).name.replace(/^The /, ""); return u.type === "guns" ? `${who} orbital guns at ${u.name.replace(/'s orbital guns$/, "")}` : `${who} ${u.name.toLowerCase()}`; };
+  const hullAt = (k) => B.units.map((u, i) => Math.max(0, u.hull - B.events.slice(0, k).filter((e) => e.t === i).reduce((t, e) => t + e.dmg, 0)));
+  const icon = (u) => (u.type === "guns" ? `<svg width="22" height="22" viewBox="-13.5 -13.5 27 27" aria-hidden="true"><circle r="7" fill="${faction(S, u.fid).color}" fill-opacity=".3" stroke="${faction(S, u.fid).color}" stroke-width="1"/><path d="M0 -7 V-12 M7 0 H12 M0 7 V12 M-7 0 H-12" stroke="${faction(S, u.fid).color}" stroke-width="1"/></svg>` : shipSVG(u.type, faction(S, u.fid).color, 22));
+  const sideHTML = (fids, hull, title) => `<div class="bside"><h3>${title}</h3>${B.units.map((u, i) => fids.includes(u.fid) ? `<div class="bunit ${hull[i] <= 0 ? "dead" : ""}">${icon(u)}<span>${esc(unitName(u))}${u.stance && u.stance !== "balanced" ? ` <i class="small muted">(${esc(STANCES[u.stance].name.toLowerCase())})</i>` : ""}</span><span class="pips">${Array.from({ length: u.max }, (_, k) => `<i class="${k < hull[i] ? "on" : ""}"></i>`).join("")}</span></div>` : "").join("")}</div>`;
+  const draw = () => {
+    const hull = hullAt(shown), done = shown >= n;
+    const mine = [me], theirs = B.sides.filter((x) => x !== me);
+    const lines = B.events.slice(0, shown).map((e, k) => {
+      const a = B.units[e.a], t = B.units[e.t], killed = e.hit && hullAt(k + 1)[e.t] <= 0 && hullAt(k)[e.t] > 0;
+      const head = k === 0 || B.events[k - 1].round !== e.round ? `<li class="bround">Exchange ${e.round + 1}</li>` : "";
+      return `${head}<li class="${e.hit ? (a.fid === me ? "good" : "bad") : "muted"}${k === shown - 1 ? " now" : ""}">${esc(unitName(a))} fires on ${esc(unitName(t).replace(/^Your /, "your "))}: <span class="dice">${e.dice.map((d) => `<span class="die">${d}</span>`).join("")}</span> ${e.dice.reduce((x, y) => x + y, 0)} against ${e.need}: <b>${e.hit ? (killed ? "destroyed!" : `hit, −${e.dmg}`) : "miss"}</b></li>`;
+    }).join("");
+    const lostMine = (B.lost || {})[me] || 0, lostTheirs = Object.entries(B.lost || {}).filter(([f]) => f !== me).reduce((t, [, x]) => t + x, 0);
+    const result = B.won === "won" ? `<b class="good">Victory.</b> You lost ${lostMine} ship${lostMine === 1 ? "" : "s"}; they lost ${lostTheirs}.` : B.won === "lost" ? `<b class="bad">Defeat.</b> You lost ${lostMine} ship${lostMine === 1 ? "" : "s"}; they lost ${lostTheirs}.` : `<b>No clear winner.</b> You lost ${lostMine}; they lost ${lostTheirs}. The fight goes on next turn if both sides stay.`;
+    modal(`<h1>Battle at ${esc(B.at)}</h1><p class="small muted">Turn ${B.turn} · ${esc(B.sides.map((f) => f === me ? "you" : faction(S, f).name).join(" against "))} · each shot is 3d6 at or under the gunner's skill</p>
+      <div class="battle">${sideHTML(mine, hull, "Your side")}${sideHTML(theirs, hull, esc(theirs.map((f) => faction(S, f).name).join(", ")))}</div>
+      <ol class="blog-list">${lines || `<li class="muted">The fleets close. Three exchanges of fire.</li>`}</ol>
+      ${done ? `<p>${result}</p>` : ""}
+      <div class="btn-row">${done ? `<button class="btn primary" id="b-ok">Continue</button>` : `<button class="btn primary" id="b-next">Next shot</button><button class="btn" id="b-round">Finish the exchange</button><button class="btn" id="b-all">Skip to the result</button>`}</div>`);
+    const L = document.querySelector(".blog-list"); if (L) L.scrollTop = L.scrollHeight;
+    if (done) $("b-ok").onclick = () => { S.battleReports.shift(); save(); closeModal(); renderAll(); showBattle(then); };
+    else {
+      $("b-next").onclick = () => { shown++; draw(); };
+      $("b-round").onclick = () => { const r = B.events[shown].round; while (shown < n && B.events[shown].round === r) shown++; draw(); };
+      $("b-all").onclick = () => { shown = n; draw(); };
+    }
+  };
+  draw();
+}
+
+// ---------- galactic events ----------
+function showGalEvent() {
+  const e = currentEvent(S); if (!e) return;
+  modal(`<h1>${esc(e.title)}</h1><p style="white-space:pre-line">${esc(e.text)}</p>
+    <div class="ev-opts">${e.options.map((o) => `<button class="ev-opt" data-ev="${o.id}"><b>${esc(o.label)}</b><small>${esc(o.does)}</small></button>`).join("")}</div>`);
+  document.querySelectorAll("[data-ev]").forEach((b) => b.onclick = () => {
+    const r = chooseEvent(S, b.dataset.ev); save();
+    modal(`<h1>${esc(r.title)}</h1><p class="small muted">Your choice: ${esc(r.choice)}</p><p>${esc(r.text)}</p><div class="btn-row"><button class="btn primary" id="ev-ok">Continue</button></div>`);
+    $("ev-ok").onclick = () => { closeModal(); renderAll(); showNextMission(); };
+  });
 }
 
 // ---------- reports: what a choice led to, in a pop-up ----------
