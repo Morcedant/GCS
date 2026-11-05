@@ -35,6 +35,8 @@ button { font: inherit; color: inherit; }
 .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
 #panel { overflow-y: auto; padding: 12px 14px 20px; min-height: 0; }
 .side-foot { padding: 10px 14px; border-top: 1px solid var(--line); display: flex; gap: 8px; }
+/* Fixed rows, so a hidden steps box doesn't let the footer take the panel's stretchy row. */
+.side > #panel { grid-row: 3; } .side > .side-foot { grid-row: 4; }
 h1, h2, h3 { font-family: var(--display); letter-spacing: .03em; margin: 0; text-wrap: balance; }
 h1 { font-size: 28px; margin-bottom: 8px; } h2 { font-size: 18px; margin-bottom: 6px; display: flex; align-items: center; }
 h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 16px 0 6px; }
@@ -82,6 +84,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .obj-h { margin: 0 0 6px; color: var(--ink); text-transform: none; letter-spacing: .02em; font-size: 15px; }
 .badge-status { font: 600 11px var(--body); letter-spacing: .04em; text-transform: none; border: 1px solid var(--line); border-radius: 10px; padding: 1px 8px; margin-left: 6px; vertical-align: 2px; color: var(--muted); }
 .card.obj.crisis { border-left-color: #e8e4d0; }
+.envoy { margin: 10px 0 14px; padding: 10px 14px; border-left: 3px solid var(--gold); background: var(--panel-2); font-style: italic; line-height: 1.5; }
+.envoy-kicker { margin: 0 0 4px; } .adm { margin: 8px 0; } .adm ul { margin: 4px 0 0 16px; padding: 0; } .mem { margin: 0 0 6px 16px; padding: 0; } .mem li { margin: 0; }
+.mood-friendly, .mood-allied { color: var(--good); } .mood-hostile { color: var(--bad); } .mood-wary { color: #e0a050; }
 .linkish { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; text-decoration: underline; cursor: pointer; }
 .badge-status.good { color: var(--good); border-color: rgba(123,196,127,.5); } .badge-status.bad { color: var(--bad); border-color: rgba(255,122,107,.6); }
 .steps-list { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 3px; font-size: 13px; }
@@ -191,7 +196,7 @@ kbd { font: 600 11px var(--body); background: var(--panel-2); border: 1px solid 
 <script>
 (() => {
 "use strict";
-const BUILD = "2026-11-05 22:36 UTC";
+const BUILD = "2026-11-05 23:08 UTC";
 // ---- hex.js ----
 // Hex grid helpers (axial coordinates, pointy-top) and a seeded random generator.
 // Every hex is "q,r"; the map is a hexagon of a given radius around 0,0.
@@ -397,6 +402,89 @@ const SUPPLY = { range: 3, graceTurns: 1 };
 const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
 const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };
 
+/**
+ * Rivals' personalities: who speaks for each people, what they care about, and how they say it. `weights` lean their
+ * choice of message (demand, warn, alliance, joint war, gift); `voice` is each kind of message in their words, with
+ * {you} (your people), {them} (a third power), {world}, {n} and {admiral} filled in.
+ */
+const PERSONALITIES = {
+  concord: { title: "Idealists", leader: "First Speaker Amara Voss", text: "They prize treaties and keep their word; they don't forgive a broken one.",
+    weights: { demand: 0.3, warn: 0.8, alliance: 1.4, joint: 0.8, gift: 1.2 },
+    voice: {
+      hello: "First Speaker Amara Voss, for the Concord. We came out here to build, not to burn. If {you} want the same, you'll find no better neighbours.",
+      demand: "The Concord's frontier worlds are struggling, and {you} are rich. A contribution of {n} credits would be remembered. So would a refusal.",
+      warn: "Your warships are holding station off {world}. Our people are frightened. Please move them, and we'll say no more about it.",
+      alliance: "We've watched {you} long enough to trust you. Stand with the Concord: an attack on one of us is an attack on both.",
+      joint: "{them} have shown what they are. We're at war with them. Join us, and we'll end it sooner.",
+      gift: "Our research council sends you its findings, freely. Knowledge should travel.",
+      war: "You've left us no choice. The Concord is at war with {you}. {admiral} has our fleet.",
+    } },
+  tessan: { title: "Merchant princes", leader: "Dynast Oruvel Tess", text: "Everything has a price with them, and they remember every debt, both ways.",
+    weights: { demand: 1.4, warn: 0.7, alliance: 0.8, joint: 0.6, gift: 1.4 },
+    voice: {
+      hello: "Dynast Oruvel Tess greets {you}. The Dynasties trade with anyone who pays on time. Shall we find out which kind you are?",
+      demand: "Our ledgers show {you} owe the Dynasties for the corridors you use. {n} credits settles the account. Unsettled accounts are... collected.",
+      warn: "Your fleet near {world} is frightening our insurers, and frightened insurers raise prices. Move it.",
+      alliance: "Our partnership has been profitable. Let's make it formal: the Dynasties will stand behind {you}, and you behind us.",
+      joint: "{them} have been very bad for business. The Dynasties are at war with them. Join us, and we'll split what's left.",
+      gift: "A gift from the Dynast's own treasury, for good customers. Spend it well.",
+      war: "The Dynasties have closed your account. We're at war with {you}. {admiral} will collect.",
+    } },
+  kel: { title: "The patient hive", leader: "the Speaker-Mind of Kel'vaar", text: "Slow to anger and slower to forget. They hate anyone who settles near the hives.",
+    weights: { demand: 0.6, warn: 1.6, alliance: 0.9, joint: 0.7, gift: 0.9 },
+    voice: {
+      hello: "The Speaker-Mind of Kel'vaar speaks for ten billion. We have noted {you}. We will go on noting you.",
+      demand: "The hives are growing. They need what {you} have. {n} credits. The hives do not ask twice.",
+      warn: "Your ships are near {world}. The hives feel them. Take them away.",
+      alliance: "The hives have decided {you} are not prey. Stand with us. The hives protect what is theirs.",
+      joint: "{them} have harmed the hives. The hives will end them. You may help.",
+      gift: "The hives have more than they need of this. Take it.",
+      war: "The hives have decided. We are at war with {you}. {admiral} leads the swarm.",
+    } },
+  hegemony: { title: "Proud legions", leader: "Warlord Ozhan Dresh", text: "They respect strength and despise weakness. Refuse them and be ready to back it up.",
+    weights: { demand: 1.8, warn: 1.2, alliance: 0.7, joint: 1.5, gift: 0.4 },
+    voice: {
+      hello: "I am Warlord Ozhan Dresh of the Hegemony. Once, all of this was ours. Remember that when you speak to us.",
+      demand: "The Hegemony requires tribute: {n} credits, as the old empires paid it. Pay, and keep your worlds.",
+      warn: "Your warships are off {world}. If they're still there tomorrow, I'll take it as a challenge.",
+      alliance: "You've fought well. The legions honour that. Stand with the Hegemony and no one will dare touch you.",
+      joint: "We march on {them}. Join the legions, and share the spoils.",
+      gift: "Spoils of the last campaign. The Warlord shares with those who've earned it.",
+      war: "Your weakness offends the legions. The Hegemony is at war with {you}. {admiral} leads the attack.",
+    } },
+  vael: { title: "The wanderers", leader: "Shipmother Ilae", text: "Curious and proud of their freedom; they hate being fenced in, and love a fellow traveller.",
+    weights: { demand: 0.5, warn: 1.0, alliance: 1.1, joint: 0.9, gift: 1.3 },
+    voice: {
+      hello: "Shipmother Ilae of the Long Flotilla. We've drifted a long way to meet {you}. Let's see if it was worth it.",
+      demand: "The Flotilla needs hull-feed for the young ships, and {you} have plenty. {n} credits, and we'll drift on.",
+      warn: "Your guns are pointed at {world}, our resting place. Point them somewhere else.",
+      alliance: "The Flotilla has sailed beside {you} long enough. Sail with us, and we'll guard each other's wakes.",
+      joint: "{them} have hunted the Flotilla's young. We hunt them now. Hunt with us.",
+      gift: "The Flotilla found this in the dark between stars. We think you'll know what to do with it.",
+      war: "The Flotilla turns against {you}. We are at war. {admiral} leads the hunt.",
+    } },
+};
+
+/** Admirals: named commanders who learn from every battle they win, and can be lost. */
+const ADMIRAL_RANKS = ["Commodore", "Rear Admiral", "Vice Admiral", "Fleet Admiral"];
+/** Wins after which an admiral gains a trait (and a rank). */
+const ADMIRAL_STEPS = [2, 4, 7];
+const ADMIRAL_TRAITS = {
+  gunnery: { name: "Gunnery master", text: "+1 to the fleet's rolls." },
+  steady: { name: "Steady", text: "−1 to enemy rolls against the fleet." },
+  swift: { name: "Swift", text: "The fleet moves 1 hex farther." },
+  quartermaster: { name: "Quartermaster", text: "The fleet never wears down out of supply." },
+  shipwright: { name: "Shipwright", text: "The fleet mends a hull point a turn, anywhere." },
+  hunter: { name: "Warden hunter", text: "+2 to the fleet's rolls against the Wardens." },
+};
+const ADMIRAL_NAMES = {
+  concord: { first: ["Mara", "Idris", "Leni", "Tomas", "Ayo", "Sun-hee", "Rafael", "Ingrid", "Kofi", "Priya", "Eamon", "Yusuf"], last: ["Okafor", "Lindqvist", "Ruiz", "Tanaka", "Haddad", "Mbeki", "Novak", "Castell", "Asante", "Reyes", "Moreau", "Iqbal"] },
+  tessan: { first: ["Oru", "Tesmé", "Valan", "Isk", "Merrah", "Sollo", "Dace", "Prenna"], last: ["of House Tess", "of House Varr", "of House Quill", "of House Ossan", "of House Merrow", "of House Dahl"] },
+  kel: { first: ["Brood-Marshal", "Swarm-Leader", "Hive-Warden", "Brood-Mother"], last: ["Vekk'a", "Th'rii", "Ossk", "Kaa'vel", "Zhirr", "Ul'tek", "Mmor", "Ix'ka"] },
+  hegemony: { first: ["Ozhan", "Drezh", "Vorak", "Ishka", "Tal", "Kurro", "Zhenna", "Ruvek"], last: ["Dresh", "Ozhvar", "Kael", "Morrud", "Vash", "Torr", "Ixhal", "Brannoc"] },
+  vael: { first: ["Ilae", "Senn", "Oruë", "Tavi", "Wren", "Lio", "Maë", "Fael"], last: ["of the Long Wake", "Drift-born", "of the Seventh Hull", "Star-sung", "of the Quiet Reach", "Tide-runner"] },
+};
+
 // ---- galaxy.js ----
 // Building a galaxy: a hexagon of space with nebulae and rifts, star systems scattered across it, and the corridors
 // that link them. The same seed always builds the same galaxy.
@@ -507,6 +595,8 @@ function newGame(opts) {
     state.systems[home].name = f.homeworld;
     for (const t of ["scout", "frigate", "colony"]) spawnFleet(state, f.id, state.systems[home].at, [t]);
   });
+  // Every power starts with one admiral, on its frigate.
+  for (const F of state.factions) { const fr = fleetsOf(state, F.id).find(armed); if (fr) fr.admiral = makeAdmiral(state, F.id, rng); }
   for (const a of state.factions) for (const b of state.factions) if (a !== b) a.relations[b.id] = { status: "peace", treaty: false, score: 0, turnsAtWar: 0 };
   for (const f of state.factions) updateVision(state, f);
   log(state, null, "The corridors are open. Turn 1.");
@@ -581,12 +671,91 @@ function retire(s) {
   log(s, player(s).id, `${player(s).name} sets down the crown at turn ${s.turn}.`, "victory");
   return { ok: true };
 }
+// ---- admirals ----
+/** Does this fleet's admiral have this trait? */
+const admTrait = (f, t) => !!(f && f.admiral && f.admiral.traits.includes(t));
+const admRank = (a) => ADMIRAL_RANKS[Math.min(a.traits.length, ADMIRAL_RANKS.length - 1)];
+const admTitle = (a) => `${admRank(a)} ${a.name}`;
+/** Every admiral of a faction: commanding fleets, and in reserve. */
+function admiralsOf(s, fid) {
+  return [...fleetsOf(s, fid).filter((f) => f.admiral).map((f) => ({ a: f.admiral, fleet: f })), ...((faction(s, fid).reserve || []).map((a) => ({ a, fleet: null })))];
+}
+/** How many admirals a power can keep: two, and one more for every four worlds, five at most. */
+const admiralCap = (s, fid) => Math.min(5, 2 + Math.floor(coloniesOf(s, fid).length / 4));
+function makeAdmiral(s, fid, R) {
+  const pool = ADMIRAL_NAMES[fid] || ADMIRAL_NAMES.concord, F = faction(s, fid);
+  const used = new Set([...(F ? admiralsOf(s, fid).map((x) => x.a.name) : []), ...((F && F.fallen) || []).map((x) => x.name)]);
+  let name = "";
+  for (let i = 0; i < 40 && (!name || used.has(name)); i++) name = `${pool.first[R.int(pool.first.length)]} ${pool.last[R.int(pool.last.length)]}`;
+  return { id: "a" + s.nextId++, name, wins: 0, traits: [], since: s.turn };
+}
+/** Two fleets join: the more seasoned admiral commands; the other goes to the reserve. */
+function joinAdmirals(s, into, from) {
+  if (!from.admiral) return;
+  if (!into.admiral) { into.admiral = from.admiral; return; }
+  const [keep, spare] = into.admiral.wins >= from.admiral.wins ? [into.admiral, from.admiral] : [from.admiral, into.admiral];
+  into.admiral = keep; const F = faction(s, into.owner); (F.reserve = F.reserve || []).push(spare);
+}
+/** A fleet that's no longer needed (used up, scrapped): its admiral goes to the reserve. */
+function dropFleet(s, f) {
+  if (f.admiral) { const F = faction(s, f.owner); if (F) (F.reserve = F.reserve || []).push(f.admiral); }
+  delete s.fleets[f.id];
+}
+function assignAdmiral(s, fleetId, admId) {
+  const f = s.fleets[fleetId]; if (!f) return { error: "No such fleet." };
+  const F = faction(s, f.owner), i = (F.reserve || []).findIndex((a) => a.id === admId);
+  if (i < 0) return { error: "That admiral isn't in the reserve." };
+  if (!armed(f)) return { error: "Admirals command warships." };
+  const [a] = F.reserve.splice(i, 1);
+  if (f.admiral) F.reserve.push(f.admiral);
+  f.admiral = a; return { ok: true };
+}
+function relieveAdmiral(s, fleetId) {
+  const f = s.fleets[fleetId]; if (!f || !f.admiral) return { error: "No admiral here." };
+  const F = faction(s, f.owner); (F.reserve = F.reserve || []).push(f.admiral); f.admiral = null; return { ok: true };
+}
+/** After a battle: the winners' admirals learn (a trait at 2, 4 and 7 wins); a winning fleet without one may find one;
+ * an admiral whose fleet is destroyed is usually lost with it. Returns lines for the battle report. */
+function admiralsAfterBattle(s, fleets, outcome, at, R) {
+  const news = [], me = player(s).id;
+  const say = (fid, text) => { news.push({ fid, text }); log(s, fid, text, "war"); };
+  for (const f of fleets) {
+    const F = faction(s, f.owner); if (!F || F.crisis) continue;
+    const gone = !s.fleets[f.id];
+    if (f.admiral && gone) {
+      const a = f.admiral; f.admiral = null;
+      if (R.next() < 0.66) { (F.fallen = F.fallen || []).push({ name: admTitle(a), turn: s.turn, at, wins: a.wins }); say(F.id, `${F.id === me ? "Your" : F.name + "'s"} ${admTitle(a)} went down with the fleet at ${at}.`); }
+      else { (F.reserve = F.reserve || []).push(a); say(F.id, `${admTitle(a)} escaped the wreck of ${F.id === me ? "your" : "their"} fleet at ${at}, and is back in the reserve.`); }
+      continue;
+    }
+    if (gone || !armed(f)) continue;
+    const res = outcome[F.id];
+    if (res === "won") {
+      if (f.admiral) {
+        const a = f.admiral; a.wins++;
+        if (ADMIRAL_STEPS.includes(a.wins)) {
+          const fought = (s.battleWith || []).includes("wardens");
+          const pool = Object.keys(ADMIRAL_TRAITS).filter((t) => !a.traits.includes(t) && (t !== "hunter" || fought || (s.crisis && s.crisis.stage === "awake")));
+          if (pool.length) { const t = pool[R.int(pool.length)]; a.traits.push(t); if (F.id === me || player(s).met[F.id]) say(F.id, `For the victory at ${at}, ${a.name} is promoted to ${admRank(a)}: ${ADMIRAL_TRAITS[t].name} (${ADMIRAL_TRAITS[t].text})`); }
+        }
+      } else if (f.ships.filter((x) => SHIPS[x.type].skill).length >= 2 && admiralsOf(s, F.id).length < admiralCap(s, F.id) && R.next() < 0.35) {
+        f.admiral = makeAdmiral(s, F.id, R); f.admiral.wins = 1;
+        if (F.id === me) say(F.id, `Captain ${f.admiral.name} held the line at ${at}, and is given command of the fleet: ${admTitle(f.admiral)}.`);
+      }
+    } else if (res === "lost" && f.admiral && R.next() < 0.1) {
+      const a = f.admiral; f.admiral = null; (F.fallen = F.fallen || []).push({ name: admTitle(a), turn: s.turn, at, wins: a.wins });
+      say(F.id, `${F.id === me ? "Your" : F.name + "'s"} ${admTitle(a)} was killed on the bridge at ${at}. The fleet fights on without them.`);
+    }
+  }
+  return news;
+}
+
 function spawnFleet(s, owner, at, types) {
   const id = "f" + s.nextId++;
   s.fleets[id] = { id, owner, at, ships: types.map((t) => ({ type: t, hull: shipStats(s, owner, t).hull })), path: [], dest: null };
   return s.fleets[id];
 }
-const fleetSpeed = (s, f) => Math.min(...f.ships.map((x) => shipStats(s, f.owner, x.type).speed));
+const fleetSpeed = (s, f) => Math.min(...f.ships.map((x) => shipStats(s, f.owner, x.type).speed)) + (admTrait(f, "swift") && f.ships.every((x) => SHIPS[x.type].speed > 0) ? 1 : 0);
 const armed = (f) => f.ships.some((x) => SHIPS[x.type].skill > 0);
 
 // ---- worlds ----
@@ -706,7 +875,7 @@ function setDestination(s, fleetId, hex) {
 function mergeFleets(s, intoId, fromId) {
   const a = s.fleets[intoId], b = s.fleets[fromId];
   if (!a || !b || a.owner !== b.owner || a.at !== b.at) return { error: "They need to be in the same place." };
-  a.ships.push(...b.ships); delete s.fleets[fromId]; return { ok: true };
+  a.ships.push(...b.ships); joinAdmirals(s, a, b); delete s.fleets[fromId]; return { ok: true };
 }
 function splitFleet(s, fleetId, type) {
   const f = s.fleets[fleetId]; const i = f.ships.findIndex((x) => x.type === type);
@@ -730,7 +899,7 @@ function moveFleets(s) {
   const byHex = {};
   // Warships only: colony ships, outposts, scouts and transports keep their own fleets until the player joins them.
   const warOnly = (f) => f.ships.every((x) => SHIPS[x.type].skill > 0);
-  for (const f of Object.values(s.fleets)) { if (f.path.length || !warOnly(f)) continue; const k = f.owner + "|" + f.at; if (byHex[k]) { byHex[k].ships.push(...f.ships); delete s.fleets[f.id]; } else byHex[k] = f; }
+  for (const f of Object.values(s.fleets)) { if (f.path.length || !warOnly(f)) continue; const k = f.owner + "|" + f.at; if (byHex[k]) { byHex[k].ships.push(...f.ships); joinAdmirals(s, byHex[k], f); delete s.fleets[f.id]; } else byHex[k] = f; }
 }
 
 // ---- settling and invading ----
@@ -749,14 +918,14 @@ function settle(s, fleetId) {
     sys.colony = { owner: f.owner, kind: "outpost", pop: 0, growth: 0, buildings: {}, queue: [], stock: 0, defense: 0, capital: false };
     log(s, f.owner, `${faction(s, f.owner).name} claimed ${sys.name} as an outpost: ${worldDesc(sys)}. It extends your borders${sys.exotics ? " and mines its exotics" : ""}.`, "settle");
   } else return { error: "This fleet has no colony or outpost ship." };
-  if (!f.ships.length) delete s.fleets[f.id];
+  if (!f.ships.length) dropFleet(s, f);
   noticeSettling(s, f.owner, sys);
   updateVision(s, faction(s, f.owner));
   return { ok: true };
 }
 /** Others don't like it when you settle next door. */
 function noticeSettling(s, fid, sys) {
-  for (const o of s.factions) if (o.id !== fid && o.alive && coloniesOf(s, o.id).some((x) => distance(x.at, sys.at) <= 4)) o.relations[fid].score -= 8;
+  for (const o of s.factions) if (o.id !== fid && o.alive && coloniesOf(s, o.id).some((x) => distance(x.at, sys.at) <= 4)) remember(s, o.id, fid, `settled ${sys.name}, close to our worlds`, o.id === "kel" ? -12 : -8);
 }
 function invasionOdds(s, fleetId) {
   const f = s.fleets[fleetId], sid = s.sysAt[f.at], sys = sid && s.systems[sid];
@@ -777,7 +946,7 @@ function invade(s, fleetId) {
   if (!o.troops) return { error: "This fleet carries no troops." };
   if (o.guarded) return { error: "Its defenses still hold the orbit: destroy them first." };
   f.ships = f.ships.filter((x) => x.type !== "transport");
-  if (!f.ships.length) delete s.fleets[f.id];
+  if (!f.ships.length) dropFleet(s, f);
   if (o.troops >= o.defense) {
     capture(s, sys, f.owner);
     return { ok: true, taken: true };
@@ -790,6 +959,7 @@ function capture(s, sys, by) {
   const was = sys.colony.owner, wasCapital = sys.colony.capital;
   log(s, by, `${faction(s, by).name} took ${sys.name} from ${faction(s, was).name}.`, "war");
   faction(s, by).stats.taken = (faction(s, by).stats.taken || 0) + 1;
+  remember(s, was, by, `took ${sys.name} from us`, -15);
   sys.colony.owner = by; sys.colony.capital = false; sys.colony.queue = []; sys.colony.stock = 0;
   if (sys.colony.kind === "colony") sys.colony.pop = Math.max(1, sys.colony.pop - 1);
   delete sys.colony.buildings.engine;
@@ -842,7 +1012,8 @@ function battles(s) {
     // A battle the player is in is recorded roll by roll, for the battle pop-up.
     const where = sys ? sys.name : s.crisis && s.crisis.heart === hex ? "the Heart of the Wardens" : "deep space";
     const me = player(s).id, rec = list.includes(me) ? { turn: s.turn, at: where, hex, sides: list,
-      units: units.map((u) => ({ fid: u.fid, type: u.world ? "guns" : u.ship.type, name: u.world ? `${u.world.name}'s orbital guns` : u.st.name, hull: hp(u), max: u.world ? hp(u) : u.st.hull, stance: u.fleet ? u.fleet.stance || "balanced" : null })), events: [] } : null;
+      units: units.map((u) => ({ fid: u.fid, type: u.world ? "guns" : u.ship.type, name: u.world ? `${u.world.name}'s orbital guns` : u.st.name, hull: hp(u), max: u.world ? hp(u) : u.st.hull, stance: u.fleet ? u.fleet.stance || "balanced" : null })), events: [],
+      admirals: [...new Set(units.filter((u) => u.fleet && u.fleet.admiral).map((u) => u.fleet))].map((f) => ({ fid: f.owner, name: admTitle(f.admiral), traits: f.admiral.traits.map((t) => ADMIRAL_TRAITS[t].name) })) } : null;
     let fights = 0;
     for (let round = 0; round < 3; round++) {
       const live = units.filter((u) => hp(u) > 0);
@@ -854,7 +1025,7 @@ function battles(s) {
         if (!foes.length) continue;
         const t = foes[R.int(foes.length)], dice = [R.d6(), R.d6(), R.d6()], roll = dice[0] + dice[1] + dice[2];
         fights++;
-        const need = u.st.skill + stance(u).atk + stance(t).def, landed = roll <= 4 || (roll < 17 && roll <= need);
+        const need = u.st.skill + stance(u).atk + stance(t).def + (admTrait(u.fleet, "gunnery") ? 1 : 0) - (admTrait(t.fleet, "steady") ? 1 : 0) + (t.fid === "wardens" && admTrait(u.fleet, "hunter") ? 2 : 0), landed = roll <= 4 || (roll < 17 && roll <= need);
         if (landed) {
           const was = hp(t); hit(t, u.st.dmg);
           // A Warden machine destroyed counts for whoever destroyed it; the Heart, for everyone who fought it.
@@ -871,27 +1042,52 @@ function battles(s) {
     }
     if (!fights) continue;
     // The dead are removed; who was there hears about it.
+    const inBattle = [...new Set(units.filter((u) => u.fleet).map((u) => u.fleet))];
     const lost = {};
     for (const u of units) if (u.ship && u.ship.hull <= 0) { lost[u.fid] = (lost[u.fid] || 0) + 1; u.fleet.ships = u.fleet.ships.filter((x) => x !== u.ship); }
     for (const f of fleetsAt(s, hex)) if (!f.ships.length) delete s.fleets[f.id];
     for (const [fid, n] of Object.entries(lost)) faction(s, fid).stats.lost += n;
+    const outcome = {};
+    for (const fid of list) { const theirs = Object.entries(lost).filter(([o]) => atWar(s, fid, o)).reduce((t, [, n]) => t + n, 0), mine = lost[fid] || 0; outcome[fid] = theirs > mine ? "won" : mine > theirs ? "lost" : "even"; }
+    s.battleWith = list;
+    const news = admiralsAfterBattle(s, inBattle, outcome, where, R);
     // A battle won: you destroyed ships of theirs, and lost fewer than they did.
     for (const fid of list) { const theirs = Object.entries(lost).filter(([o]) => atWar(s, fid, o)).reduce((t, [, n]) => t + n, 0); if (theirs > (lost[fid] || 0)) faction(s, fid).stats.won = (faction(s, fid).stats.won || 0) + 1; }
     const names = list.map((x) => faction(s, x).name).join(" and ");
     log(s, null, `Battle at ${where} between ${names}: ${Object.entries(lost).map(([fid, n]) => `${faction(s, fid).name} lost ${n} ship${n > 1 ? "s" : ""}`).join("; ") || "no ships lost"}.`, "war");
     s.events.push({ turn: s.turn, kind: "battle", hex, sides: list });
-    if (rec) { rec.lost = lost; rec.won = (() => { const mine = lost[me] || 0, theirs = Object.entries(lost).filter(([o]) => atWar(s, me, o)).reduce((t, [, n]) => t + n, 0); return theirs > mine ? "won" : mine > theirs ? "lost" : "even"; })(); (s.battleReports = s.battleReports || []).push(rec); }
+    if (rec) { rec.news = news.filter((x) => x.fid === me || x.text.includes("Your")).map((x) => x.text); rec.lost = lost; rec.won = (() => { const mine = lost[me] || 0, theirs = Object.entries(lost).filter(([o]) => atWar(s, me, o)).reduce((t, [, n]) => t + n, 0); return theirs > mine ? "won" : mine > theirs ? "lost" : "even"; })(); (s.battleReports = s.battleReports || []).push(rec); }
   }
   R.save();
 }
 
 // ---- diplomacy ----
-function declareWar(s, a, b) {
+/** `holder` remembers something `about` did: their standing changes by `delta`, and the act is kept (the last 12). */
+function remember(s, holder, about, text, delta) {
+  const H = faction(s, holder), r = H && H.relations[about]; if (!r) return;
+  r.score = Math.max(-60, Math.min(40, r.score + delta));
+  (r.memory = r.memory || []).push({ turn: s.turn, text, d: delta });
+  if (r.memory.length > 12) r.memory.shift();
+}
+const allied = (s, a, b) => !!(faction(s, a).relations[b] && faction(s, a).relations[b].allied);
+/** A message waiting for the player from a rival (envoys.js shows and answers them). */
+function sendEnvoy(s, from, kind, ctx = {}) { (s.inbox = s.inbox || []).push({ kind, from, ctx, turn: s.turn }); }
+/** War. Breaking an alliance to do it is remembered for a long time. The one attacked calls on its allies: a computer
+ * ally joins the war; the player is asked (a message). */
+function declareWar(s, a, b, joining) {
   const A = faction(s, a), B = faction(s, b);
+  const betrayal = allied(s, a, b);
   A.relations[b].status = "war"; B.relations[a].status = "war"; A.relations[b].treaty = B.relations[a].treaty = false;
+  A.relations[b].allied = B.relations[a].allied = false;
   A.relations[b].turnsAtWar = B.relations[a].turnsAtWar = 0;
-  B.relations[a].score -= 30;
-  log(s, a, `${A.name} declared war on ${B.name}.`, "war");
+  remember(s, b, a, betrayal ? "broke our alliance and declared war on us" : joining ? `joined the war against us, for ${faction(s, joining).name}` : "declared war on us", betrayal ? -50 : -30);
+  log(s, a, `${A.name} declared war on ${B.name}${betrayal ? ", breaking their alliance" : joining ? `, honouring its alliance with ${faction(s, joining).name}` : ""}.`, "war");
+  if (B.id === player(s).id && A.ai) sendEnvoy(s, a, "war", { joining: joining || null });
+  if (!joining) for (const X of s.factions) {
+    if (!X.alive || X.id === a || X.id === b || !allied(s, X.id, b) || atWar(s, X.id, a) || allied(s, X.id, a)) continue;
+    if (X.ai) declareWar(s, X.id, a, b);
+    else sendEnvoy(s, b, "callToArms", { enemy: a });
+  }
   return { ok: true };
 }
 /** Ask for peace or a trade treaty. The computer says yes or no now. */
@@ -903,14 +1099,23 @@ function propose(s, from, to, what) {
     if (rel.status !== "war") return { error: "You're already at peace." };
     const mine = militaryPower(s, to), theirs = militaryPower(s, from);
     yes = !B.ai || rel.turnsAtWar >= 8 || mine < theirs * 0.8 || rel.score > -10;
-    if (yes) { A.relations[to].status = B.relations[from].status = "peace"; rel.score += 10; log(s, from, `${A.name} and ${B.name} made peace.`, "diplo"); }
+    if (yes) { A.relations[to].status = B.relations[from].status = "peace"; remember(s, to, from, "made peace with us", 10); if (B.ai === false) remember(s, from, to, "made peace with us", 10); log(s, from, `${A.name} and ${B.name} made peace.`, "diplo"); }
   } else if (what === "trade") {
     if (rel.status === "war") return { error: "Not while you're at war." };
     if (rel.treaty) return { error: "You already trade." };
     yes = !B.ai || rel.score >= -5;
-    if (yes) { A.relations[to].treaty = B.relations[from].treaty = true; rel.score += 5; log(s, from, `${A.name} and ${B.name} signed a trade treaty.`, "diplo"); }
+    if (yes) { A.relations[to].treaty = B.relations[from].treaty = true; remember(s, to, from, "signed a trade treaty with us", 5); log(s, from, `${A.name} and ${B.name} signed a trade treaty.`, "diplo"); }
   } else if (what === "endTrade") {
-    A.relations[to].treaty = B.relations[from].treaty = false; rel.score -= 5; yes = true;
+    A.relations[to].treaty = B.relations[from].treaty = false; remember(s, to, from, "ended our trade treaty", -5); yes = true;
+  } else if (what === "alliance") {
+    if (rel.status === "war") return { error: "Not while you're at war." };
+    if (rel.allied) return { error: "You're already allies." };
+    yes = !B.ai || rel.score >= 20;
+    if (yes) { A.relations[to].allied = B.relations[from].allied = true; remember(s, to, from, "became our ally", 8); log(s, from, `${A.name} and ${B.name} are allies now: if either is attacked, the other joins the war.`, "diplo"); }
+  } else if (what === "endAlliance") {
+    if (!rel.allied) return { error: "You're not allies." };
+    A.relations[to].allied = B.relations[from].allied = false; remember(s, to, from, "ended our alliance", -15); yes = true;
+    log(s, from, `${A.name} ended its alliance with ${B.name}.`, "diplo");
   }
   return { ok: true, accepted: !!yes };
 }
@@ -926,6 +1131,8 @@ function updateVision(s, F) {
   const bonus = has(s, F.id, "sensors") ? 1 : 0;
   for (const sys of coloniesOf(s, F.id)) see(sys.at, (sys.colony.kind === "colony" ? 2 : 1) + bonus);
   for (const f of fleetsOf(s, F.id)) see(f.at, Math.max(...f.ships.map((x) => shipStats(s, F.id, x.type).sensors)));
+  // Allies share what their worlds see.
+  for (const o of s.factions) if (o.id !== F.id && o.alive && allied(s, F.id, o.id)) for (const sys of coloniesOf(s, o.id)) see(sys.at, 1);
   F.visible = vis;
   // Every system the player charts goes into the log, with what's there.
   for (const sys of charted) {
@@ -939,6 +1146,7 @@ function updateVision(s, F) {
     const seen = coloniesOf(s, o.id).some((x) => vis[x.at]) || fleetsOf(s, o.id).some((f) => vis[f.at]);
     if (seen) {
       F.met[o.id] = true; o.met[F.id] = true;
+      if (!F.ai && o.ai) sendEnvoy(s, o.id, "hello"); else if (!o.ai && F.ai) sendEnvoy(s, F.id, "hello");
       const w = coloniesOf(s, o.id).find((x) => vis[x.at]), fl = fleetsOf(s, o.id).find((f) => vis[f.at]);
       const where = w ? `their world ${w.name}` : `${fl.ships.length > 1 ? "a fleet" : "a ship"} of theirs${s.sysAt[fl.at] ? ` at ${s.systems[s.sysAt[fl.at]].name}` : " in deep space"}`;
       log(s, F.id, `${F.name} made contact with ${o.name}: ${where} came into view. Diplomacy is open with them now.`, "contact");
@@ -1041,7 +1249,7 @@ function economy(s, F) {
   // Living hulls heal anywhere; others at their own worlds.
   for (const f of fleetsOf(s, F.id)) {
     const home = s.sysAt[f.at] && s.systems[s.sysAt[f.at]].colony && s.systems[s.sysAt[f.at]].colony.owner === F.id;
-    if (home || F.id === "vael") for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type).hull, x.hull + 1);
+    if (home || F.id === "vael" || admTrait(f, "shipwright")) for (const x of f.ships) x.hull = Math.min(shipStats(s, F.id, x.type).hull, x.hull + 1);
   }
   // The computer powers' research arms field-test prototypes too: one every 25 turns.
   if (F.ai && s.turn % 25 === 12) {
@@ -1051,7 +1259,7 @@ function economy(s, F) {
   // Supply: warships too far from every world and outpost of theirs wear down, a hull point a turn after the first
   // (never below 1). Scouts, colony ships, outposts and transports carry what they need.
   for (const f of fleetsOf(s, F.id)) {
-    if (!armed(f) || inSupply(s, f)) { f.out = 0; continue; }
+    if (!armed(f) || inSupply(s, f) || admTrait(f, "quartermaster")) { f.out = 0; continue; }
     f.out = (f.out || 0) + 1;
     if (f.out <= SUPPLY.graceTurns) { if (!F.ai) log(s, F.id, `A fleet near ${nearestName(s, f.at)} is out of supply: from next turn its warships wear down a hull point a turn.`, "war"); continue; }
     let worn = 0;
@@ -1538,7 +1746,7 @@ const CRISIS_EVENTS = {
     text: () => "Your listening posts on the rim of the rifts all report the same thing: a signal, one pattern repeated on every band, growing stronger each day. Your archivists know it. It's in the oldest records of the old empires: the call of the Wardens, the machines they built to guard the corridors and then could not stop. In six turns, perhaps less, they wake. They'll burn any world they can reach, yours and everyone's.",
     options: [
       { id: "study", label: "Study the signal", does: "+120 research, and the Wardens' Heart wakes weaker (−8 hull).", apply: (s) => { s.crisis.studied = true; return `Your cryptographers find the Heart's maintenance cycle in the noise: it will wake unfinished. ${crResearch(s, crMe(s), 120)}.`; } },
-      { id: "warn", label: "Warn the other powers", does: "+12 standing with every rival you've met; they'll take a truce when the Wardens wake.", apply: (s) => { s.crisis.warned = true; const met = crAlive(s).filter((f) => f.id !== crMe(s).id && crMe(s).met[f.id]); for (const f of met) { const r = f.relations[crMe(s).id]; r.score = Math.min(40, r.score + 12); } return met.length ? `Your envoys carry the archives to ${met.map((f) => f.name).join(", ")}. They listen, and they remember who told them.` : "You send the warning out on every band. No one you know is there to answer, yet."; } },
+      { id: "warn", label: "Warn the other powers", does: "+12 standing with every rival you've met; they'll take a truce when the Wardens wake.", apply: (s) => { s.crisis.warned = true; const met = crAlive(s).filter((f) => f.id !== crMe(s).id && crMe(s).met[f.id]); for (const f of met) remember(s, f.id, crMe(s).id, "warned us the Wardens were waking", 12); return met.length ? `Your envoys carry the archives to ${met.map((f) => f.name).join(", ")}. They listen, and they remember who told them.` : "You send the warning out on every band. No one you know is there to answer, yet."; } },
       { id: "fortify", label: "Fortify the frontier", does: "Orbital batteries on your two most populous worlds besides the capital, now.", apply: (s) => { const w = coloniesOf(s, crMe(s).id).filter((x) => x.colony.kind === "colony" && !x.colony.capital && !x.colony.buildings.battery).sort((a, b) => b.colony.pop - a.colony.pop).slice(0, 2); for (const x of w) { x.colony.buildings.battery = true; x.colony.defense = 3; } return w.length ? `Crews work around the clock: ${w.map((x) => x.name).join(" and ")} now have orbital batteries.` : "You have no world besides your capital to fortify; the crews strengthen what you have."; } },
     ],
   },
@@ -1551,7 +1759,7 @@ const CRISIS_EVENTS = {
         const yes = [], no = [];
         for (const f of crAlive(s)) if (f.ai && atWar(s, me.id, f.id)) {
           const r = f.relations[me.id];
-          if (C.warned || r.score >= -30 || militaryPower(s, f.id) < militaryPower(s, me.id) * 1.5) { f.relations[me.id].status = me.relations[f.id].status = "peace"; r.score = Math.min(40, r.score + 10); yes.push(f.name); } else no.push(f.name);
+          if (C.warned || r.score >= -30 || militaryPower(s, f.id) < militaryPower(s, me.id) * 1.5) { f.relations[me.id].status = me.relations[f.id].status = "peace"; remember(s, f.id, me.id, "made a truce with us against the Wardens", 10); yes.push(f.name); } else no.push(f.name);
         }
         return `Your envoys go out under white flags. ${yes.length ? `${yes.join(", ")} agreed: your wars with them are over.` : "You weren't at war with anyone who'd listen."}${no.length ? ` ${no.join(", ")} refused: that war goes on.` : ""} While the Heart lives, no power will start a new war.`;
       } },
@@ -1570,7 +1778,7 @@ const CRISIS_EVENTS = {
     options: [
       { id: "salvage", label: "Salvage the Heart", does: "+8 exotics.", apply: (s) => { crMe(s).exotics += 8; return "Your salvage crews strip the Heart's forges: +8 exotics."; } },
       { id: "study", label: "Study what's left", does: "+250 research.", apply: (s) => `Your engineers live inside the wreck for a year. ${crResearch(s, crMe(s), 250)}.` },
-      { id: "memorial", label: "Raise a memorial for the fallen", does: "+12 standing with every rival you've met.", apply: (s) => { const met = crAlive(s).filter((f) => f.id !== crMe(s).id && crMe(s).met[f.id]); for (const f of met) { const r = f.relations[crMe(s).id]; r.score = Math.min(40, r.score + 12); } return "A beacon at the wreck names every ship that fell fighting the Wardens, whoever's it was. The other powers notice."; } },
+      { id: "memorial", label: "Raise a memorial for the fallen", does: "+12 standing with every rival you've met.", apply: (s) => { const met = crAlive(s).filter((f) => f.id !== crMe(s).id && crMe(s).met[f.id]); for (const f of met) remember(s, f.id, crMe(s).id, "raised a memorial to all who fell against the Wardens", 12); return "A beacon at the wreck names every ship that fell fighting the Wardens, whoever's it was. The other powers notice."; } },
     ],
   },
   brokenBy: {
@@ -1748,6 +1956,156 @@ function chooseEvent(s, optId) {
   return { ok: true, title: E.title, choice: o.label, text };
 }
 
+// ---- envoys.js ----
+// Envoys: the rivals speak. Each people has a leader and a personality (data.js PERSONALITIES), and now and then sends
+// the player a message in its own voice: a greeting at first contact, a demand for tribute, a warning to move a fleet,
+// an offer of alliance, a call to join a war, a gift, a declaration of war, or (for an ally) a call to arms. Most ask for
+// an answer, and every answer is remembered (game.js remember()): it moves their standing with you, and the Diplomacy
+// tab lists what they remember.
+
+
+
+const enMe = (s) => player(s);
+const enP = (fid) => PERSONALITIES[fid] || PERSONALITIES.concord;
+const enRivals = (s) => s.factions.filter((f) => f.id !== enMe(s).id && f.alive && enMe(s).met[f.id]);
+const enScore = (s, fid) => faction(s, fid).relations[enMe(s).id].score;
+/** Their best admiral, by wins, for a war message. */
+const enAdmiral = (s, fid) => { const a = admiralsOf(s, fid).sort((x, y) => y.a.wins - x.a.wins)[0]; return a ? admTitle(a.a) : "our fleet"; };
+/** A name inside a sentence ("the Concord"), and every sentence starting with a capital. */
+const enIn = (n) => n.replace(/^The /, "the ");
+const enCap = (t) => t.replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
+const enFill = (s, fid, kind, ctx) => enCap(enP(fid).voice[kind].replace(/\{you\}/g, enIn(enMe(s).name)).replace(/\{them\}/g, ctx.them ? enIn(faction(s, ctx.them).name) : "")
+  .replace(/\{world\}/g, ctx.world ? s.systems[ctx.world].name : "").replace(/\{n\}/g, ctx.n || "").replace(/\{admiral\}/g, enAdmiral(s, fid)));
+const ATTITUDES = [[25, "friendly"], [8, "cordial"], [-8, "neutral"], [-25, "wary"], [-99, "hostile"]];
+/** One word for how a rival feels about you. */
+function attitude(s, fid) { const r = faction(s, fid).relations[enMe(s).id]; if (r.allied) return "allied"; return ATTITUDES.find(([n]) => r.score >= n)[1]; }
+
+/** What a message would be about, if this rival sent one now (null: nothing to say). */
+const CANDIDATES = {
+  demand: (s, F) => {
+    const me = enMe(s), n = Math.min(120, Math.round(30 + s.turn * 0.4));
+    if (atWar(s, F.id, me.id) || allied(s, F.id, me.id) || me.credits < n || enScore(s, F.id) > 10 || s.turn - (F.lastDemand || -99) < 20) return null;
+    return militaryPower(s, F.id) >= militaryPower(s, me.id) * 1.2 || enP(F.id).weights.demand >= 1.4 ? { n } : null;
+  },
+  warn: (s, F) => {
+    if (atWar(s, F.id, enMe(s).id) || allied(s, F.id, enMe(s).id)) return null;
+    for (const f of fleetsOf(s, enMe(s).id)) {
+      if (!armed(f)) continue;
+      const w = coloniesOf(s, F.id).find((x) => distance(x.at, f.at) <= 2);
+      if (w && !(s.sysAt[f.at] && s.systems[s.sysAt[f.at]].colony && s.systems[s.sysAt[f.at]].colony.owner === enMe(s).id)) return { world: w.id, fleet: f.id };
+    }
+    return null;
+  },
+  alliance: (s, F) => {
+    const me = enMe(s), sc = enScore(s, F.id);
+    if (atWar(s, F.id, me.id) || allied(s, F.id, me.id) || sc < 18) return null;
+    const common = s.factions.some((z) => z.alive && z.id !== me.id && z.id !== F.id && atWar(s, F.id, z.id) && atWar(s, me.id, z.id));
+    return common || sc >= 28 || (s.crisis && s.crisis.stage === "awake") ? {} : null;
+  },
+  joint: (s, F) => {
+    const me = enMe(s); if (atWar(s, F.id, me.id) || enScore(s, F.id) < 8) return null;
+    const z = s.factions.find((x) => x.alive && x.id !== me.id && x.id !== F.id && me.met[x.id] && atWar(s, F.id, x.id) && !atWar(s, me.id, x.id) && !allied(s, me.id, x.id));
+    return z ? { them: z.id } : null;
+  },
+  gift: (s, F) => (!atWar(s, F.id, enMe(s).id) && enScore(s, F.id) >= 15 ? { what: ["credits", "research", "exotics"][s.turn % 3] } : null),
+};
+
+/** Once a turn: now and then (every four turns at most), one rival has something to say. */
+function envoysTurn(s) {
+  if (s.winner) return;
+  s.inbox = (s.inbox || []).filter((m) => ["hello", "war", "callToArms"].includes(m.kind) || s.turn - m.turn <= 3);
+  if (s.turn < 8 || s.turn - (s.lastEnvoy || 0) < 4 || s.inbox.some((m) => CANDIDATES[m.kind])) return;
+  const R = rng(s);
+  if (R.next() > 0.4) { R.save(); return; }
+  const options = [];
+  for (const F of enRivals(s)) for (const [kind, can] of Object.entries(CANDIDATES)) {
+    const ctx = can(s, F); if (ctx) options.push({ F, kind, ctx, w: enP(F.id).weights[kind] * ((s.envoysSeen || {})[kind] ? 1 / (1 + s.envoysSeen[kind]) : 1.5) });
+  }
+  if (options.length) {
+    let roll = R.next() * options.reduce((t, o) => t + o.w, 0), pick = options[0];
+    for (const o of options) { roll -= o.w; if (roll <= 0) { pick = o; break; } }
+    (s.inbox = s.inbox || []).push({ kind: pick.kind, from: pick.F.id, ctx: pick.ctx, turn: s.turn });
+    if (pick.kind === "demand") pick.F.lastDemand = s.turn;
+    s.lastEnvoy = s.turn; s.envoysSeen = s.envoysSeen || {}; s.envoysSeen[pick.kind] = (s.envoysSeen[pick.kind] || 0) + 1;
+  }
+  R.save();
+}
+
+const enResearch = (s, n) => { const me = enMe(s); me.research.progress += n; const cur = TECHS.find((t) => t.id === me.research.current); return `+${n} research${cur ? ` toward ${cur.name}` : ""}`; };
+/** The answers to each kind of message: what each does, and what came of it. */
+const ANSWERS = {
+  hello: [
+    { id: "warm", label: "Greet them warmly", does: "+6 standing with them.", apply: (s, F) => { remember(s, F.id, enMe(s).id, "greeted us warmly", 6); return `${enP(F.id).leader} seems pleased. It's a start.`; } },
+    { id: "charts", label: "Trade star charts", does: "You learn where their capital is; they learn about you too.", apply: (s, F) => { const cap = s.systems[F.capital]; if (cap) enMe(s).explored[cap.at] = 1; remember(s, F.id, enMe(s).id, "traded star charts with us", 2); return cap ? `Their charts show their capital: ${cap.name}.` : "Their charts are old and patchy."; } },
+    { id: "cold", label: "Keep your distance", does: "Nothing promised, nothing given.", apply: (s, F) => `${enP(F.id).leader} notes your silence.` },
+  ],
+  demand: [
+    { id: "pay", label: "Pay", does: "−{n} credits; +12 standing with them.", apply: (s, F, c) => { enMe(s).credits -= c.n; remember(s, F.id, enMe(s).id, `paid the ${c.n} credits we asked for`, 12); return `You pay ${c.n} credits. ${F.name} are satisfied, for now.`; } },
+    { id: "refuse", label: "Refuse", does: "−10 standing; if they're much stronger and quick to anger, it may mean war.", apply: (s, F, c, R) => {
+      remember(s, F.id, enMe(s).id, "refused our demand", -10);
+      const angry = enP(F.id).weights.demand >= 1.4 && militaryPower(s, F.id) >= militaryPower(s, enMe(s).id) * 1.3 && R.next() < 0.5;
+      if (angry) { declareWar(s, F.id, enMe(s).id); s.inbox = s.inbox.filter((m) => !(m.kind === "war" && m.from === F.id)); return `${F.name} don't take refusal well. They've declared war.`; }
+      return `${F.name} won't forget it.`;
+    } },
+  ],
+  warn: [
+    { id: "withdraw", label: "Withdraw the fleet", does: "Your fleet heads for your nearest world; +6 standing.", apply: (s, F, c) => {
+      const f = s.fleets[c.fleet], home = f && coloniesOf(s, enMe(s).id).sort((a, b) => distance(a.at, f.at) - distance(b.at, f.at))[0];
+      if (f && home) setDestination(s, f.id, home.at);
+      remember(s, F.id, enMe(s).id, "withdrew a fleet when we asked", 6); return home ? `Your fleet turns for ${home.name}.` : "You agree, though there's nowhere to send it.";
+    } },
+    { id: "stay", label: "Stay where you are", does: "−12 standing; the proud and the strong may take it as a challenge.", apply: (s, F, c, R) => {
+      remember(s, F.id, enMe(s).id, "ignored our warning", -12);
+      if (["hegemony", "kel"].includes(F.id) && militaryPower(s, F.id) >= militaryPower(s, enMe(s).id) && R.next() < 0.3) { declareWar(s, F.id, enMe(s).id); s.inbox = s.inbox.filter((m) => !(m.kind === "war" && m.from === F.id)); return `${F.name} take it as a challenge: they've declared war.`; }
+      return `${F.name} watch your fleet, and remember.`;
+    } },
+  ],
+  alliance: [
+    { id: "accept", label: "Accept the alliance", does: "If either of you is attacked, the other joins the war; you see what their worlds see.", apply: (s, F) => { enMe(s).relations[F.id].allied = F.relations[enMe(s).id].allied = true; remember(s, F.id, enMe(s).id, "became our ally", 8); log(s, enMe(s).id, `${enMe(s).name} and ${F.name} are allies now.`, "diplo"); return `It's done: ${F.name} are your allies. Attack one of you and you attack both.`; } },
+    { id: "decline", label: "Decline, politely", does: "−3 standing.", apply: (s, F) => { remember(s, F.id, enMe(s).id, "turned down our alliance", -3); return `${F.name} accept your answer, a little coolly.`; } },
+  ],
+  joint: [
+    { id: "join", label: "Declare war on them too", does: "War with {them}; +15 standing with these.", apply: (s, F, c) => { declareWar(s, enMe(s).id, c.them); remember(s, F.id, enMe(s).id, `joined our war against ${faction(s, c.them).name}`, 15); return `You're at war with ${faction(s, c.them).name}, beside ${F.name}.`; } },
+    { id: "decline", label: "Stay out of it", does: "−4 standing.", apply: (s, F, c) => { remember(s, F.id, enMe(s).id, `stayed out of our war with ${faction(s, c.them).name}`, -4); return "You keep out of their war."; } },
+  ],
+  gift: [
+    { id: "thanks", label: "Thank them", does: "Accept the gift; +3 standing.", apply: (s, F, c) => {
+      remember(s, F.id, enMe(s).id, "thanked us for a gift", 3);
+      if (c.what === "credits") { enMe(s).credits += 40; return "+40 credits."; }
+      if (c.what === "exotics") { enMe(s).exotics += 2; return "+2 exotics."; }
+      return `${enResearch(s, 60)}.`;
+    } },
+  ],
+  war: [{ id: "ok", label: "So be it", does: "Their worlds and fleets are fair targets now, and yours are theirs.", apply: (s, F) => `War with ${F.name}. Peace can be proposed from the Diplomacy tab once it has cost them.` }],
+  callToArms: [
+    { id: "honour", label: "Honour the alliance", does: "War with {enemy}; +15 standing with your ally.", apply: (s, F, c) => { if (!atWar(s, enMe(s).id, c.enemy)) declareWar(s, enMe(s).id, c.enemy, F.id); remember(s, F.id, enMe(s).id, "honoured our alliance", 15); return `You stand by ${F.name}: you're at war with ${faction(s, c.enemy).name}.`; } },
+    { id: "abandon", label: "Stay out of it", does: "The alliance ends; −25 standing with them.", apply: (s, F) => { enMe(s).relations[F.id].allied = F.relations[enMe(s).id].allied = false; remember(s, F.id, enMe(s).id, "abandoned us when we were attacked", -25); return `${F.name} will remember that you left them alone.`; } },
+  ],
+};
+const CALL_TO_ARMS = "{them} have attacked us. By our alliance, we call on {you} to stand with us. Will you?";
+
+/** The message waiting for the player: who sends it, what they say, the answers. */
+function currentEnvoy(s) {
+  const m = (s.inbox || [])[0]; if (!m) return null;
+  const F = faction(s, m.from); if (!F || !F.alive) { s.inbox.shift(); return currentEnvoy(s); }
+  const ctx = { ...m.ctx, them: m.ctx.them || m.ctx.enemy };
+  const text = m.kind === "callToArms" ? CALL_TO_ARMS.replace("{them}", faction(s, m.ctx.enemy).name).replace("{you}", enMe(s).name)
+    : m.kind === "war" && m.ctx.joining ? `${enFill(s, m.from, "war", ctx)} We stand with ${faction(s, m.ctx.joining).name}.` : enFill(s, m.from, m.kind, ctx);
+  const fill = (t) => t.replace("{n}", m.ctx.n || "").replace("{them}", ctx.them ? faction(s, ctx.them).name : "").replace("{enemy}", m.ctx.enemy ? faction(s, m.ctx.enemy).name : "");
+  return { from: F.id, name: F.name, color: F.color, leader: enCap(enP(F.id).leader), title: enP(F.id).title, kind: m.kind, text, attitude: attitude(s, F.id),
+    options: ANSWERS[m.kind].map((o) => ({ id: o.id, label: o.label, does: fill(o.does) })) };
+}
+/** The player's answer: what it does, and what came of it. */
+function answerEnvoy(s, optId) {
+  const m = (s.inbox || [])[0]; if (!m) return { error: "No message is waiting." };
+  const o = ANSWERS[m.kind].find((x) => x.id === optId); if (!o) return { error: "No such answer." };
+  const F = faction(s, m.from), R = rng(s);
+  s.inbox.shift();
+  const text = enCap(o.apply(s, F, m.ctx, R)); R.save();
+  if (m.kind !== "war") log(s, enMe(s).id, `${enP(F.id).leader} of ${F.name}: you answered "${o.label}". ${text}`, "diplo");
+  return { ok: true, name: F.name, choice: o.label, text };
+}
+
 // ---- ai.js ----
 // The computer factions: each turn they pick research, fill their build queues, explore, settle, defend and, when
 // they're strong enough and angry enough, go to war. Simple rules, read from what each faction can see.
@@ -1795,6 +2153,7 @@ function diplomacy(s, F, diff) {
       const angry = r.score < -18 / (AGGRESSION[F.id] || 1);
       // While the Heart of the Wardens lives and a truce holds, no one starts a war.
       if (s.crisis && s.crisis.stage === "awake" && s.crisis.truce) continue;
+      if (allied(s, F.id, oid)) continue;
       if (s.turn > 25 && angry && mine > 6 && mine >= theirs * 1.25 / diff) { declareWar(s, F.id, oid); continue; }
       if (!r.treaty && r.score >= 0 && s.turn % 7 === 0) {
         if (O.ai) propose(s, F.id, oid, "trade");
@@ -1826,7 +2185,7 @@ function production(s, F, diff) {
     const f = fleetsOf(s, F.id).find((x) => x.ships.some((y) => y.type === "frigate")) || fleetsOf(s, F.id).find(armed);
     if (!f) break;
     const i = f.ships.findIndex((y) => y.type === "frigate"); f.ships.splice(i >= 0 ? i : f.ships.findIndex((y) => SHIPS[y.type].skill), 1);
-    if (!f.ships.length) delete s.fleets[f.id];
+    if (!f.ships.length) dropFleet(s, f);
   }
   const cols = coloniesOf(s, F.id).filter((c) => c.colony.kind === "colony");
   const t = totals(s, F.id);
@@ -1881,6 +2240,8 @@ function fleets(s, F) {
   }
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
   const cap = s.systems[F.capital];
+  // Admirals in reserve take the biggest war fleets that have none.
+  for (const a of [...(F.reserve || [])]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && !x.admiral).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignAdmiral(s, f.id, a.id); }
   for (const f of fleetsOf(s, F.id)) {
     if (!s.fleets[f.id]) continue;
     const types = new Set(f.ships.map((x) => x.type));
@@ -1938,6 +2299,7 @@ function huntWardens(s, F, f, reach) {
 
 // ---- ui.js ----
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
+
 
 
 
@@ -2248,7 +2610,12 @@ function fleetHTML() {
   const sid = S.sysAt[f.at], sys = sid && S.systems[sid];
   let h = `<h2><span class="dot" style="background:${F.color}"><\/span>${mine ? "Your fleet" : esc(F.name)}<\/h2><p class="muted">${sys ? `At ${esc(sys.name)}` : "In deep space"}${S.hexes[f.at].terrain === "nebula" ? ", inside a nebula" : ""}. Speed ${fleetSpeed(S, f)}.<\/p>`;
   h += `<ul class="ships">${f.ships.map((x) => { const st = shipStats(S, f.owner, x.type); return `<li><b>${shipSVG(x.type, F.color, 22)} ${esc(st.name)}<\/b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg<\/span>` : ""}${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")}<span class="small">${x.hull}/${st.hull}<\/span><\/li>`; }).join("")}<\/ul>`;
+  if (f.admiral) h += admiralCard(f.admiral, mine);
   if (!mine) return h + (atWar(S, me.id, f.owner) ? `<p class="bad">At war with you.<\/p>` : "");
+  const reserve = me.reserve || [];
+  if (armed(f)) h += f.admiral ? `<div class="btn-row"><button class="btn small" data-relieve>Send ${esc(f.admiral.name)} to the reserve<\/button><\/div>`
+    : reserve.length ? `<h3>Give it an admiral<\/h3>${reserve.map((a) => `<button class="row" data-assign="${a.id}">${esc(admTitle(a))}<span class="small muted"> · ${a.wins} win${a.wins === 1 ? "" : "s"}${a.traits.length ? " · " + a.traits.map((t) => ADMIRAL_TRAITS[t].name).join(", ") : ""}<\/span><\/button>`).join("")}`
+    : `<p class="small muted">No admiral. A fleet of two warships or more that wins a battle may find one among its captains.<\/p>`;
   if (armed(f)) {
     const ok = inSupply(S, f), st = STANCES[f.stance] || STANCES.balanced;
     h += `<p class="small ${ok ? "" : "bad"}"><b>Supply:<\/b> ${ok ? `in supply (within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours)` : `out of supply${f.out ? ` for ${f.out} turn${f.out === 1 ? "" : "s"}` : ""}: from the second turn its warships wear down a hull point a turn. Bring it within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours.`}<\/p>`;
@@ -2398,6 +2765,7 @@ function campaignHTML() {
 /** Mission Success reports, one after another, after whatever report is showing. */
 function showNextMission() {
   if (S && S.galEvent && !S.winner) { showGalEvent(); return true; }
+  if (S && !S.winner && currentEnvoy(S)) { showEnvoy(); return true; }
   const D = S && S.directives; if (!D || !D.reports.length) return false;
   const r = D.reports[0];
   if (r.result === "story") {
@@ -2431,9 +2799,25 @@ function empireHTML() {
     ${focusHTML()}${protosHTML()}
     <h3>Worlds (${cols.length})<\/h3><table class="tbl"><tr><th>World<\/th><th>Pop<\/th><th>Ind<\/th><th>Sci<\/th><th>Building<\/th><\/tr>
     ${cols.map((sys) => { const y = yields(S, sys); return `<tr data-selsys="${sys.id}"><td>${sys.colony.capital ? "★ " : ""}${esc(sys.name)}${sys.colony.kind === "outpost" ? " <i>(outpost)<\/i>" : ""}<\/td><td>${sys.colony.pop || "–"}<\/td><td>${fmt(y.ind)}<\/td><td>${fmt(y.sci)}<\/td><td>${esc(sys.colony.queue[0] ? sys.colony.queue[0].name : sys.colony.kind === "colony" ? "—" : "")}<\/td><\/tr>`; }).join("")}<\/table>
-    <h3>Fleets (${fleetsOf(S, me.id).length})<\/h3>${fleetsOf(S, me.id).map((f) => `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}<span class="small muted">${f.path.length ? " · moving" : " · idle"}<\/span><\/button>`).join("")}
+    <h3>Fleets (${fleetsOf(S, me.id).length})<\/h3>${fleetsOf(S, me.id).map((f) => `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}${f.admiral ? ` <span class="small">· ${esc(admTitle(f.admiral))}<\/span>` : ""}<span class="small muted">${f.path.length ? " · moving" : " · idle"}<\/span><\/button>`).join("")}
+    ${admiralsHTML()}
     <h3>Rivals<\/h3><table class="tbl"><tr><th>Faction<\/th><th>Worlds<\/th><th>Score<\/th><\/tr>${S.factions.slice(1).map((F) => `<tr><td><span class="dot" style="background:${F.color}"><\/span>${me.met[F.id] ? esc(F.name) : "Unknown"}${F.alive ? "" : " †"}<\/td><td>${me.met[F.id] ? coloniesOf(S, F.id).length : "?"}<\/td><td>${me.met[F.id] ? score(S, F.id) : "?"}<\/td><\/tr>`).join("")}<\/table>`;
   return h;
+}
+/** An admiral: rank, name, wins, traits, and how far to the next. */
+function admiralCard(a, mine) {
+  const next = ADMIRAL_STEPS.find((n) => n > a.wins);
+  return `<div class="card small adm"><b>${esc(admTitle(a))}<\/b> · ${a.wins} win${a.wins === 1 ? "" : "s"}${mine && next && a.traits.length < 3 ? ` · next promotion at ${next}` : ""}
+    ${a.traits.length ? `<ul>${a.traits.map((t) => `<li><b>${esc(ADMIRAL_TRAITS[t].name)}:<\/b> ${esc(ADMIRAL_TRAITS[t].text)}<\/li>`).join("")}<\/ul>` : `<div class="muted">No traits yet: each is earned by winning battles.<\/div>`}<\/div>`;
+}
+/** The Empire tab's admirals: in command, in reserve, and those who fell. */
+function admiralsHTML() {
+  const me = player(S), all = admiralsOf(S, me.id), fallen = me.fallen || [];
+  return `<h3>Admirals (${all.length} of ${admiralCap(S, me.id)})<\/h3>
+    <p class="small muted">Named commanders. They win promotions and traits (at ${ADMIRAL_STEPS.join(", ")} wins), and can be lost with their fleets. You can keep two, and one more for every four worlds.<\/p>
+    ${all.map(({ a, fleet }) => fleet ? `<button class="row" data-selfleet="${fleet.id}"><b>${esc(admTitle(a))}<\/b><span class="small muted"> · ${a.wins} win${a.wins === 1 ? "" : "s"}${a.traits.length ? " · " + a.traits.map((t) => ADMIRAL_TRAITS[t].name).join(", ") : ""} · ${esc(fleetName(fleet))}<\/span><\/button>`
+      : `<div class="row"><b>${esc(admTitle(a))}<\/b><span class="small muted"> · in reserve: select a war fleet without an admiral to give them its command<\/span><\/div>`).join("") || `<p class="small muted">None.<\/p>`}
+    ${fallen.length ? `<details class="small"><summary>The fallen (${fallen.length})<\/summary><ul>${fallen.map((x) => `<li>${esc(x.name)}, at ${esc(x.at)} on turn ${x.turn} (${x.wins} win${x.wins === 1 ? "" : "s"})<\/li>`).join("")}<\/ul><\/details>` : ""}`;
 }
 /** The empire's Focus: three points to share between industry, science, credits and defense. */
 function focusHTML() {
@@ -2472,10 +2856,12 @@ function diplomacyHTML() {
   if (!met.length) h += `<p class="muted">You haven't met anyone yet. Send out scouts.<\/p>`;
   for (const F of met) {
     const r = me.relations[F.id], them = F.relations[me.id];
-    const mood = !F.alive ? "gone" : them.score > 15 ? "friendly" : them.score > -5 ? "wary" : them.score > -20 ? "hostile" : "furious";
+    const mood = !F.alive ? "gone" : attitude(S, F.id), P = PERSONALITIES[F.id] || {}, mem = (them.memory || []).slice(-5).reverse();
     h += `<div class="dip"><h3><span class="dot" style="background:${F.color}"><\/span>${esc(F.name)}${F.alive ? "" : " †"}<\/h3>
-      <p class="small">${r.status === "war" ? `<b class="bad">At war<\/b> for ${r.turnsAtWar} turns` : "<b>At peace<\/b>"}${r.treaty ? " · trading" : ""} · they are ${mood}. ${esc(FACTIONS.find((x) => x.id === F.id).trait)}. Worlds ${coloniesOf(S, F.id).length}, fleet power ${militaryPower(S, F.id)}.<\/p>
-      ${F.alive ? `<div class="btn-row">${r.status === "war" ? `<button class="btn" data-dip="${F.id}:peace">Propose peace<\/button>` : `<button class="btn" data-dip="${F.id}:${r.treaty ? "endTrade" : "trade"}">${r.treaty ? "End the trade treaty" : "Propose trade"}<\/button><button class="btn danger" data-dip="${F.id}:war">Declare war<\/button>`}<\/div>` : ""}<\/div>`;
+      <p class="small"><b>${esc((P.leader || "").replace(/^./, (c) => c.toUpperCase()))}<\/b> · ${esc(P.title || "")}: ${esc(P.text || "")}<\/p>
+      <p class="small">${r.status === "war" ? `<b class="bad">At war<\/b> for ${r.turnsAtWar} turn${r.turnsAtWar === 1 ? "" : "s"}` : r.allied ? "<b class=\"good\">Allied<\/b>" : "<b>At peace<\/b>"}${r.treaty ? " · trading" : ""} · they are <b class="mood-${mood}">${mood}<\/b> (${Math.round(them.score)}). ${esc(FACTIONS.find((x) => x.id === F.id).trait)}. Worlds ${coloniesOf(S, F.id).length}, fleet power ${militaryPower(S, F.id)}.<\/p>
+      ${mem.length ? `<p class="small muted" style="margin:4px 0 2px">They remember that you:<\/p><ul class="small mem">${mem.map((m) => `<li class="${m.d >= 0 ? "good" : "bad"}">${esc(m.text)} <span class="muted">(turn ${m.turn}, ${m.d >= 0 ? "+" : "−"}${Math.abs(m.d)})<\/span><\/li>`).join("")}<\/ul>` : ""}
+      ${F.alive ? `<div class="btn-row">${r.status === "war" ? `<button class="btn" data-dip="${F.id}:peace">Propose peace<\/button>` : `<button class="btn" data-dip="${F.id}:${r.treaty ? "endTrade" : "trade"}">${r.treaty ? "End the trade treaty" : "Propose trade"}<\/button><button class="btn" data-dip="${F.id}:${r.allied ? "endAlliance" : "alliance"}">${r.allied ? "End the alliance" : "Propose an alliance"}<\/button><button class="btn danger" data-dip="${F.id}:war">${r.allied ? "Break the alliance: war" : "Declare war"}<\/button>`}<\/div>` : ""}<\/div>`;
   }
   return h;
 }
@@ -2503,6 +2889,8 @@ function bindChrome() {
     const d = b.dataset, me = player(S);
     if (d.logf) { logFilter = d.logf; renderPanel(); return; }
     if (d.focus) { const r = setFocus(S, me.id, d.focus, +d.n); if (r.error) toast(r.error, true); save(); renderAll(); return; }
+    if (d.assign) { const r = assignAdmiral(S, sel.id, d.assign); if (r.error) toast(r.error, true); save(); renderAll(); return; }
+    if (d.relieve !== undefined) { relieveAdmiral(S, sel.id); save(); renderAll(); return; }
     if (d.stance) { setStance(S, sel.id, d.stance); toast(`${STANCES[d.stance].name}: ${STANCES[d.stance].text}`); save(); renderAll(); return; }
     if (d.accept) { const r = acceptDirective(S, d.accept); if (r.error) toast(r.error, true); else toast("Directive taken on: its clock starts now."); checkDirectives(S); save(); renderAll(); showNextMission(); return; }
     if (d.center) { centerOn(d.center); draw(); return; }
@@ -2534,6 +2922,8 @@ function bindChrome() {
         else { reportSince(what === "peace" ? `Peace with ${F.name}?` : what === "trade" ? `A trade treaty with ${F.name}?` : `Trade with ${F.name}`, since);
           report = report || { title: F.name, lines: [] };
           if (what === "endTrade") report.lines.push(`The trade treaty with ${F.name} is over: +3 credits a turn less for each of you.`);
+          else if (what === "endAlliance") report.lines.push(`The alliance with ${F.name} is over. They won't forget it soon.`);
+          else if (what === "alliance" && r.accepted) report.lines.push(`If either of you is attacked, the other joins the war, and you see what their worlds see.`);
           else if (!r.accepted) report.lines.push(`${F.name} refuse${what === "peace" ? ": the war goes on" : ""}. ${F.relations[me.id].score < 0 ? "They don't trust you yet." : "Ask again later."}`); }
       }
     } else if (d.offer) {
@@ -2586,6 +2976,7 @@ function doEndTurn() {
     if (!S.winner) directivesTurn(S);
     if (!S.winner) crisisTurn(S);
     if (!S.winner) eventsTurn(S);
+    if (!S.winner) envoysTurn(S);
     $("end-turn").textContent = "End turn";
     save();
     // News: what happened to you this turn.
@@ -2630,7 +3021,8 @@ function showBattle(then) {
     modal(`<h1>Battle at ${esc(B.at)}<\/h1><p class="small muted">Turn ${B.turn} · ${esc(B.sides.map((f) => f === me ? "you" : faction(S, f).name).join(" against "))} · each shot is 3d6 at or under the gunner's skill<\/p>
       <div class="battle">${sideHTML(mine, hull, "Your side")}${sideHTML(theirs, hull, esc(theirs.map((f) => faction(S, f).name).join(", ")))}<\/div>
       <ol class="blog-list">${lines || `<li class="muted">The fleets close. Three exchanges of fire.<\/li>`}<\/ol>
-      ${done ? `<p>${result}<\/p>` : ""}
+      ${(B.admirals || []).length ? `<p class="small muted">Commanding: ${B.admirals.map((x) => `${x.fid === me ? "yours, " : `${esc(faction(S, x.fid).name)}, `}<b>${esc(x.name)}<\/b>${x.traits.length ? ` (${esc(x.traits.join(", "))})` : ""}`).join("; ")}<\/p>` : ""}
+      ${done ? `<p>${result}<\/p>${(B.news || []).map((t) => `<p class="small"><b>${esc(t)}<\/b><\/p>`).join("")}` : ""}
       <div class="btn-row">${done ? `<button class="btn primary" id="b-ok">Continue<\/button>` : `<button class="btn primary" id="b-next">Next shot<\/button><button class="btn" id="b-round">Finish the exchange<\/button><button class="btn" id="b-all">Skip to the result<\/button>`}<\/div>`);
     const L = document.querySelector(".blog-list"); if (L) L.scrollTop = L.scrollHeight;
     if (done) $("b-ok").onclick = () => { S.battleReports.shift(); save(); closeModal(); renderAll(); showBattle(then); };
@@ -2652,6 +3044,21 @@ function showGalEvent() {
     const r = chooseEvent(S, b.dataset.ev); save();
     modal(`<h1>${esc(r.title)}<\/h1><p class="small muted">Your choice: ${esc(r.choice)}<\/p><p>${esc(r.text)}<\/p><div class="btn-row"><button class="btn primary" id="ev-ok">Continue<\/button><\/div>`);
     $("ev-ok").onclick = () => { closeModal(); renderAll(); showNextMission(); };
+  });
+}
+
+// ---------- envoys: the rivals' messages ----------
+function showEnvoy() {
+  const m = currentEnvoy(S); if (!m) return;
+  const head = { hello: "First contact", demand: "A demand", warn: "A warning", alliance: "An offer of alliance", joint: "A call to war", gift: "A gift", war: "A declaration of war", callToArms: "A call to arms" }[m.kind];
+  modal(`<p class="small muted envoy-kicker"><span class="dot" style="background:${m.color}"><\/span>${esc(head)} · from ${esc(m.name)} · they are ${esc(m.attitude)}<\/p>
+    <h1>${esc(m.leader[0].toUpperCase() + m.leader.slice(1))}<\/h1><p class="small muted" style="margin-top:-6px">${esc(m.title)}<\/p>
+    <blockquote class="envoy">${esc(m.text)}<\/blockquote>
+    <div class="ev-opts">${m.options.map((o) => `<button class="ev-opt" data-env="${o.id}"><b>${esc(o.label)}<\/b><small>${esc(o.does)}<\/small><\/button>`).join("")}<\/div>`);
+  document.querySelectorAll("[data-env]").forEach((b) => b.onclick = () => {
+    const r = answerEnvoy(S, b.dataset.env); save();
+    modal(`<h1>${esc(r.name)}<\/h1><p class="small muted">Your answer: ${esc(r.choice)}<\/p><p>${esc(r.text)}<\/p><div class="btn-row"><button class="btn primary" id="env-ok">Continue<\/button><\/div>`);
+    $("env-ok").onclick = () => { closeModal(); renderAll(); showNextMission(); };
   });
 }
 

@@ -135,3 +135,86 @@ export const SUPPLY = { range: 3, graceTurns: 1 };
 /** The late-game crisis: when the Wardens wake, and how hard they come. */
 export const CRISIS = { earliest: 105, spread: 16, warning: 6, waveEvery: 6, heartHeal: 2, studied: 8, color: "#e8e4d0" };
 export const RULES = { maxTurns: 200, growthPerTurn: 0.12, rushRate: 2, troopDefensePerPop: 0.5, engineTurnsHeld: 0 };
+
+/**
+ * Rivals' personalities: who speaks for each people, what they care about, and how they say it. `weights` lean their
+ * choice of message (demand, warn, alliance, joint war, gift); `voice` is each kind of message in their words, with
+ * {you} (your people), {them} (a third power), {world}, {n} and {admiral} filled in.
+ */
+export const PERSONALITIES = {
+  concord: { title: "Idealists", leader: "First Speaker Amara Voss", text: "They prize treaties and keep their word; they don't forgive a broken one.",
+    weights: { demand: 0.3, warn: 0.8, alliance: 1.4, joint: 0.8, gift: 1.2 },
+    voice: {
+      hello: "First Speaker Amara Voss, for the Concord. We came out here to build, not to burn. If {you} want the same, you'll find no better neighbours.",
+      demand: "The Concord's frontier worlds are struggling, and {you} are rich. A contribution of {n} credits would be remembered. So would a refusal.",
+      warn: "Your warships are holding station off {world}. Our people are frightened. Please move them, and we'll say no more about it.",
+      alliance: "We've watched {you} long enough to trust you. Stand with the Concord: an attack on one of us is an attack on both.",
+      joint: "{them} have shown what they are. We're at war with them. Join us, and we'll end it sooner.",
+      gift: "Our research council sends you its findings, freely. Knowledge should travel.",
+      war: "You've left us no choice. The Concord is at war with {you}. {admiral} has our fleet.",
+    } },
+  tessan: { title: "Merchant princes", leader: "Dynast Oruvel Tess", text: "Everything has a price with them, and they remember every debt, both ways.",
+    weights: { demand: 1.4, warn: 0.7, alliance: 0.8, joint: 0.6, gift: 1.4 },
+    voice: {
+      hello: "Dynast Oruvel Tess greets {you}. The Dynasties trade with anyone who pays on time. Shall we find out which kind you are?",
+      demand: "Our ledgers show {you} owe the Dynasties for the corridors you use. {n} credits settles the account. Unsettled accounts are... collected.",
+      warn: "Your fleet near {world} is frightening our insurers, and frightened insurers raise prices. Move it.",
+      alliance: "Our partnership has been profitable. Let's make it formal: the Dynasties will stand behind {you}, and you behind us.",
+      joint: "{them} have been very bad for business. The Dynasties are at war with them. Join us, and we'll split what's left.",
+      gift: "A gift from the Dynast's own treasury, for good customers. Spend it well.",
+      war: "The Dynasties have closed your account. We're at war with {you}. {admiral} will collect.",
+    } },
+  kel: { title: "The patient hive", leader: "the Speaker-Mind of Kel'vaar", text: "Slow to anger and slower to forget. They hate anyone who settles near the hives.",
+    weights: { demand: 0.6, warn: 1.6, alliance: 0.9, joint: 0.7, gift: 0.9 },
+    voice: {
+      hello: "The Speaker-Mind of Kel'vaar speaks for ten billion. We have noted {you}. We will go on noting you.",
+      demand: "The hives are growing. They need what {you} have. {n} credits. The hives do not ask twice.",
+      warn: "Your ships are near {world}. The hives feel them. Take them away.",
+      alliance: "The hives have decided {you} are not prey. Stand with us. The hives protect what is theirs.",
+      joint: "{them} have harmed the hives. The hives will end them. You may help.",
+      gift: "The hives have more than they need of this. Take it.",
+      war: "The hives have decided. We are at war with {you}. {admiral} leads the swarm.",
+    } },
+  hegemony: { title: "Proud legions", leader: "Warlord Ozhan Dresh", text: "They respect strength and despise weakness. Refuse them and be ready to back it up.",
+    weights: { demand: 1.8, warn: 1.2, alliance: 0.7, joint: 1.5, gift: 0.4 },
+    voice: {
+      hello: "I am Warlord Ozhan Dresh of the Hegemony. Once, all of this was ours. Remember that when you speak to us.",
+      demand: "The Hegemony requires tribute: {n} credits, as the old empires paid it. Pay, and keep your worlds.",
+      warn: "Your warships are off {world}. If they're still there tomorrow, I'll take it as a challenge.",
+      alliance: "You've fought well. The legions honour that. Stand with the Hegemony and no one will dare touch you.",
+      joint: "We march on {them}. Join the legions, and share the spoils.",
+      gift: "Spoils of the last campaign. The Warlord shares with those who've earned it.",
+      war: "Your weakness offends the legions. The Hegemony is at war with {you}. {admiral} leads the attack.",
+    } },
+  vael: { title: "The wanderers", leader: "Shipmother Ilae", text: "Curious and proud of their freedom; they hate being fenced in, and love a fellow traveller.",
+    weights: { demand: 0.5, warn: 1.0, alliance: 1.1, joint: 0.9, gift: 1.3 },
+    voice: {
+      hello: "Shipmother Ilae of the Long Flotilla. We've drifted a long way to meet {you}. Let's see if it was worth it.",
+      demand: "The Flotilla needs hull-feed for the young ships, and {you} have plenty. {n} credits, and we'll drift on.",
+      warn: "Your guns are pointed at {world}, our resting place. Point them somewhere else.",
+      alliance: "The Flotilla has sailed beside {you} long enough. Sail with us, and we'll guard each other's wakes.",
+      joint: "{them} have hunted the Flotilla's young. We hunt them now. Hunt with us.",
+      gift: "The Flotilla found this in the dark between stars. We think you'll know what to do with it.",
+      war: "The Flotilla turns against {you}. We are at war. {admiral} leads the hunt.",
+    } },
+};
+
+/** Admirals: named commanders who learn from every battle they win, and can be lost. */
+export const ADMIRAL_RANKS = ["Commodore", "Rear Admiral", "Vice Admiral", "Fleet Admiral"];
+/** Wins after which an admiral gains a trait (and a rank). */
+export const ADMIRAL_STEPS = [2, 4, 7];
+export const ADMIRAL_TRAITS = {
+  gunnery: { name: "Gunnery master", text: "+1 to the fleet's rolls." },
+  steady: { name: "Steady", text: "−1 to enemy rolls against the fleet." },
+  swift: { name: "Swift", text: "The fleet moves 1 hex farther." },
+  quartermaster: { name: "Quartermaster", text: "The fleet never wears down out of supply." },
+  shipwright: { name: "Shipwright", text: "The fleet mends a hull point a turn, anywhere." },
+  hunter: { name: "Warden hunter", text: "+2 to the fleet's rolls against the Wardens." },
+};
+export const ADMIRAL_NAMES = {
+  concord: { first: ["Mara", "Idris", "Leni", "Tomas", "Ayo", "Sun-hee", "Rafael", "Ingrid", "Kofi", "Priya", "Eamon", "Yusuf"], last: ["Okafor", "Lindqvist", "Ruiz", "Tanaka", "Haddad", "Mbeki", "Novak", "Castell", "Asante", "Reyes", "Moreau", "Iqbal"] },
+  tessan: { first: ["Oru", "Tesmé", "Valan", "Isk", "Merrah", "Sollo", "Dace", "Prenna"], last: ["of House Tess", "of House Varr", "of House Quill", "of House Ossan", "of House Merrow", "of House Dahl"] },
+  kel: { first: ["Brood-Marshal", "Swarm-Leader", "Hive-Warden", "Brood-Mother"], last: ["Vekk'a", "Th'rii", "Ossk", "Kaa'vel", "Zhirr", "Ul'tek", "Mmor", "Ix'ka"] },
+  hegemony: { first: ["Ozhan", "Drezh", "Vorak", "Ishka", "Tal", "Kurro", "Zhenna", "Ruvek"], last: ["Dresh", "Ozhvar", "Kael", "Morrud", "Vash", "Torr", "Ixhal", "Brannoc"] },
+  vael: { first: ["Ilae", "Senn", "Oruë", "Tavi", "Wren", "Lio", "Maë", "Fael"], last: ["of the Long Wake", "Drift-born", "of the Seventh Hull", "Star-sung", "of the Quiet Reach", "Tide-runner"] },
+};

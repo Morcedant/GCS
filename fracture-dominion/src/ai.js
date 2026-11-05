@@ -3,7 +3,7 @@
 import { distance, neighbors } from "./hex.js";
 import { SHIPS, WORLDS, TECHS } from "./data.js";
 import { faction, coloniesOf, fleetsOf, fleetsAt, shipStats, canSettle, maxPop, availableTechs, setResearch, enqueue, rush, totals,
-  setDestination, settle, splitFleet, invade, invasionOdds, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
+  setDestination, settle, splitFleet, dropFleet, assignAdmiral, allied, invade, invasionOdds, armed, atWar, declareWar, propose, militaryPower, player, has, log, yields } from "./game.js";
 
 const PRIORITY = {
   concord: ["xenology", "automation", "sensors", "domes", "commerce", "heavyHulls", "foldDrives", "terraforming", "refining", "orbitalYards"],
@@ -46,6 +46,7 @@ function diplomacy(s, F, diff) {
       const angry = r.score < -18 / (AGGRESSION[F.id] || 1);
       // While the Heart of the Wardens lives and a truce holds, no one starts a war.
       if (s.crisis && s.crisis.stage === "awake" && s.crisis.truce) continue;
+      if (allied(s, F.id, oid)) continue;
       if (s.turn > 25 && angry && mine > 6 && mine >= theirs * 1.25 / diff) { declareWar(s, F.id, oid); continue; }
       if (!r.treaty && r.score >= 0 && s.turn % 7 === 0) {
         if (O.ai) propose(s, F.id, oid, "trade");
@@ -77,7 +78,7 @@ function production(s, F, diff) {
     const f = fleetsOf(s, F.id).find((x) => x.ships.some((y) => y.type === "frigate")) || fleetsOf(s, F.id).find(armed);
     if (!f) break;
     const i = f.ships.findIndex((y) => y.type === "frigate"); f.ships.splice(i >= 0 ? i : f.ships.findIndex((y) => SHIPS[y.type].skill), 1);
-    if (!f.ships.length) delete s.fleets[f.id];
+    if (!f.ships.length) dropFleet(s, f);
   }
   const cols = coloniesOf(s, F.id).filter((c) => c.colony.kind === "colony");
   const t = totals(s, F.id);
@@ -132,6 +133,8 @@ function fleets(s, F) {
   }
   const enemies = Object.entries(F.relations).filter(([oid, r]) => faction(s, oid).alive && r.status === "war").map(([oid]) => oid);
   const cap = s.systems[F.capital];
+  // Admirals in reserve take the biggest war fleets that have none.
+  for (const a of [...(F.reserve || [])]) { const f = fleetsOf(s, F.id).filter((x) => armed(x) && !x.admiral).sort((x, y) => y.ships.length - x.ships.length)[0]; if (!f) break; assignAdmiral(s, f.id, a.id); }
   for (const f of fleetsOf(s, F.id)) {
     if (!s.fleets[f.id]) continue;
     const types = new Set(f.ships.map((x) => x.type));

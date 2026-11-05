@@ -245,3 +245,63 @@ test("the late-game crisis: warning, waking, waves that burn, a truce, and the H
   // Off at the start: never.
   const t = newGame({ seed: 41, player: "concord", rivals: 1, crisis: false }); t.turn = 150; crisisTurn(t); assert.equal(t.crisis, undefined);
 });
+test("admirals: everyone starts with one; they win traits, fight better, join up, and can be lost", async () => {
+  const g = await import("../src/game.js");
+  const s = newGame({ seed: 51, size: "small", player: "hegemony", rivals: 1 }), me = s.factions[0], foe = s.factions[1];
+  for (const F of s.factions) assert.equal(g.admiralsOf(s, F.id).length, 1);
+  const flag = fleetsOf(s, me.id).find((f) => f.admiral), a = flag.admiral;
+  assert.match(g.admTitle(a), /^Commodore /);
+  // Wins bring traits and ranks at 2, 4 and 7.
+  me.met[foe.id] = foe.met[me.id] = true; declareWar(s, me.id, foe.id);
+  for (let i = 0; i < 7 && a.traits.length < 3; i++) {
+    const at = s.systems[foe.capital].at;
+    const ours = spawnFleet(s, me.id, "0,0", []); ours.ships = Array.from({ length: 6 }, () => ({ type: "frigate", hull: 2 })); ours.admiral = a; flag.admiral = null;
+    spawnFleet(s, foe.id, "0,0", ["scout"]);
+    endTurn(s, null);
+    const now = fleetsOf(s, me.id).find((f) => f.admiral === a); if (now) { now.admiral = null; flag.admiral = a; }
+    for (const f of fleetsOf(s, me.id)) if (f !== flag && f.at === "0,0") delete s.fleets[f.id];
+  }
+  assert.ok(a.wins >= 2 && a.traits.length >= 1, `wins ${a.wins}, traits ${a.traits}`);
+  assert.notEqual(g.admRank(a), "Commodore");
+  // Swift: a hex farther.
+  a.traits = []; const base = g.fleetSpeed(s, flag); a.traits = ["swift"]; assert.equal(g.fleetSpeed(s, flag), base + 1);
+  // Two fleets with admirals join: the seasoned one commands, the other goes to the reserve; and can be given a fleet.
+  const other = spawnFleet(s, me.id, flag.at, ["frigate"]); other.admiral = g.makeAdmiral(s, me.id, g.rng(s));
+  assert.ok(g.mergeFleets(s, flag.id, other.id).ok); assert.equal(flag.admiral, a); assert.equal(me.reserve.length, 1);
+  const third = spawnFleet(s, me.id, flag.at, ["frigate"]);
+  assert.ok(g.assignAdmiral(s, third.id, me.reserve[0].id).ok); assert.ok(third.admiral); assert.equal(me.reserve.length, 0);
+  assert.ok(g.relieveAdmiral(s, third.id).ok); assert.equal(me.reserve.length, 1);
+});
+test("rivals: memory, alliances that pull allies into wars, and messages in their own voice", async () => {
+  const g = await import("../src/game.js");
+  const { envoysTurn, currentEnvoy, answerEnvoy, attitude } = await import("../src/envoys.js");
+  const s = newGame({ seed: 52, player: "concord", rivals: 3 }), [me, A, B] = s.factions;
+  for (const F of s.factions) for (const O of s.factions) if (F !== O) F.met[O.id] = true;
+  // Memory: settling next door, remembered with the reason.
+  g.remember(s, A.id, me.id, "greeted us warmly", 25);
+  assert.equal(A.relations[me.id].memory.at(-1).text, "greeted us warmly"); assert.equal(attitude(s, A.id), "friendly");
+  // An alliance: accepted when they like you; an attack on your ally pulls them... and asks you.
+  assert.ok(g.propose(s, me.id, A.id, "alliance").accepted); assert.ok(g.allied(s, me.id, A.id));
+  s.inbox = [];
+  g.declareWar(s, B.id, A.id);
+  const call = s.inbox.find((m) => m.kind === "callToArms"); assert.ok(call && call.ctx.enemy === B.id);
+  s.inbox = [call];
+  const m = currentEnvoy(s); assert.match(m.text, new RegExp(B.name)); assert.ok(answerEnvoy(s, "honour").ok);
+  assert.ok(atWar(s, me.id, B.id)); assert.ok(A.relations[me.id].memory.some((x) => /honoured/.test(x.text)));
+  // A computer ally joins your war when you're attacked; the attacker's message comes in its own voice.
+  const t = newGame({ seed: 53, player: "concord", rivals: 3 }), [p, X, Y] = t.factions;
+  for (const F of t.factions) for (const O of t.factions) if (F !== O) F.met[O.id] = true;
+  X.relations[p.id].score = 30; assert.ok(g.propose(t, p.id, X.id, "alliance").accepted);
+  t.inbox = []; g.declareWar(t, Y.id, p.id);
+  assert.ok(atWar(t, X.id, Y.id), "the ally joined");
+  const war = t.inbox.find((x) => x.kind === "war" && x.from === Y.id); assert.ok(war);
+  t.inbox = [war]; const w = currentEnvoy(t); assert.ok(w.leader && w.text.length > 20 && !/\{/.test(w.text));
+  // Breaking an alliance by declaring war is remembered as betrayal.
+  g.declareWar(t, p.id, X.id); assert.ok(X.relations[p.id].memory.some((x) => /broke our alliance/.test(x.text)));
+  // Messages come, and every answer of every kind runs.
+  const u = newGame({ seed: 54, player: "tessan", rivals: 3 }); for (const F of u.factions) for (const O of u.factions) if (F !== O) F.met[O.id] = true;
+  u.factions[0].credits = 500; let seen = 0;
+  for (const F of u.factions.slice(1)) F.relations[u.factions[0].id].score = 20;
+  for (let i = 0; i < 120; i++) { u.turn = 10 + i * 4; envoysTurn(u); for (let e; (e = currentEnvoy(u)); seen++) assert.ok(answerEnvoy(u, e.options[i % e.options.length].id).ok); }
+  assert.ok(seen >= 5, `messages: ${seen}`);
+});

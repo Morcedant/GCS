@@ -29,6 +29,16 @@ Fleets) from one world to an empire across a hex galaxy, against up to four comp
   chooses how to meet them (study the signal, warn the rivals, fortify; then a truce, an arms drive, or glory).
   The Heart can't be hit while its guard stands, and breaking it makes every machine go dark. Destroyed machines
   and the Heart count toward score. It can be switched off on the new-game screen. `src/crisis.js`.
+- **Rivals with personalities:** each people has a leader and a character (the Concord's idealists, the Tessan merchant
+  princes, the patient Kel hive, the proud Hegemony legions, the Vael wanderers). They send messages in their own voice:
+  a greeting at first contact, demands for tribute, warnings to move a fleet, offers of alliance, calls to join a war,
+  gifts, declarations of war. Every answer, and every act (wars, peace, treaties, settling next door, taking worlds),
+  is remembered: the Diplomacy tab shows their mood and what they remember. Alliances pull allies into each other's
+  defensive wars (the player is asked) and share vision; breaking one to declare war is remembered as betrayal.
+  `src/envoys.js`.
+- **Admirals:** every power starts with one; a fleet of two or more warships that wins a battle may find another
+  (two, plus one per four worlds, five at most). They earn a rank and a trait at 2, 4 and 7 wins (gunnery, steady,
+  swift, quartermaster, shipwright, Warden hunter), usually die with their fleet, and can move to and from the reserve.
 - **Directives and campaigns:** your faction's authority sends directives, each a race against a rival. Three
   campaigns follow one another from turn 8 (The Open Frontier, The Arms Race, The Old Empires' Secrets), each against
   your nearest rival, with threads, a rival that gains ground on its own, a finale (a lead over the rival) and new

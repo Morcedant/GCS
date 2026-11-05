@@ -1,12 +1,13 @@
 // The browser game: the hex map on a canvas, the side panel, the turn bar and the dialogs.
 import { key, parse, toPixel, fromPixel, distance, within } from "./hex.js";
-import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES } from "./data.js";
+import { FACTIONS, WORLDS, BUILDINGS, SHIPS, TECHS, RULES, PROTOTYPES, FOCUS, STANCES, SHIP_SHAPES, PERSONALITIES, ADMIRAL_TRAITS, ADMIRAL_STEPS } from "./data.js";
 import { newGame, endTurn, faction, player, coloniesOf, fleetsOf, fleetsAt, shipStats, fleetSpeed, armed, atWar, canSettle, maxPop, yields, totals,
   buildOptions, enqueue, dequeue, rush, rushCost, availableTechs, setResearch, setDestination, findPath, splitFleet, settle, invade, invasionOdds,
-  declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto } from "./game.js";
+  declareWar, propose, score, militaryPower, has, mergeFleets, DISCOVERY, focusOf, focusUsed, setFocus, inSupply, supplyRange, setStance, keepRuling, retire, proto, admTitle, admRank, admiralsOf, admiralCap, assignAdmiral, relieveAdmiral, allied } from "./game.js";
 import { aiTurn } from "./ai.js";
 import { eventsTurn, currentEvent, chooseEvent } from "./events.js";
 import { crisisTurn, crisisState } from "./crisis.js";
+import { envoysTurn, currentEnvoy, answerEnvoy, attitude } from "./envoys.js";
 import { ensureDirectives, checkDirectives, directivesTurn, acceptDirective, progress, howText, authorityOf, opposition, ACTIVE_MAX, CAMPAIGNS, campaignDef, campaignText } from "./orders.js";
 const VERSION = typeof BUILD === "string" ? BUILD : "development";
 /** "Turn 12 of 200", or in open rule "Turn 212 · open rule". */
@@ -311,7 +312,12 @@ function fleetHTML() {
   const sid = S.sysAt[f.at], sys = sid && S.systems[sid];
   let h = `<h2><span class="dot" style="background:${F.color}"></span>${mine ? "Your fleet" : esc(F.name)}</h2><p class="muted">${sys ? `At ${esc(sys.name)}` : "In deep space"}${S.hexes[f.at].terrain === "nebula" ? ", inside a nebula" : ""}. Speed ${fleetSpeed(S, f)}.</p>`;
   h += `<ul class="ships">${f.ships.map((x) => { const st = shipStats(S, f.owner, x.type); return `<li><b>${shipSVG(x.type, F.color, 22)} ${esc(st.name)}</b>${st.skill ? `<span class="small">skill ${st.skill}, ${st.dmg} dmg</span>` : ""}${bar(x.hull, st.hull, x.hull < st.hull ? "#e0a050" : "#7bc47f")}<span class="small">${x.hull}/${st.hull}</span></li>`; }).join("")}</ul>`;
+  if (f.admiral) h += admiralCard(f.admiral, mine);
   if (!mine) return h + (atWar(S, me.id, f.owner) ? `<p class="bad">At war with you.</p>` : "");
+  const reserve = me.reserve || [];
+  if (armed(f)) h += f.admiral ? `<div class="btn-row"><button class="btn small" data-relieve>Send ${esc(f.admiral.name)} to the reserve</button></div>`
+    : reserve.length ? `<h3>Give it an admiral</h3>${reserve.map((a) => `<button class="row" data-assign="${a.id}">${esc(admTitle(a))}<span class="small muted"> · ${a.wins} win${a.wins === 1 ? "" : "s"}${a.traits.length ? " · " + a.traits.map((t) => ADMIRAL_TRAITS[t].name).join(", ") : ""}</span></button>`).join("")}`
+    : `<p class="small muted">No admiral. A fleet of two warships or more that wins a battle may find one among its captains.</p>`;
   if (armed(f)) {
     const ok = inSupply(S, f), st = STANCES[f.stance] || STANCES.balanced;
     h += `<p class="small ${ok ? "" : "bad"}"><b>Supply:</b> ${ok ? `in supply (within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours)` : `out of supply${f.out ? ` for ${f.out} turn${f.out === 1 ? "" : "s"}` : ""}: from the second turn its warships wear down a hull point a turn. Bring it within ${supplyRange(S, f.owner)} hexes of a world or outpost of yours.`}</p>`;
@@ -461,6 +467,7 @@ function campaignHTML() {
 /** Mission Success reports, one after another, after whatever report is showing. */
 function showNextMission() {
   if (S && S.galEvent && !S.winner) { showGalEvent(); return true; }
+  if (S && !S.winner && currentEnvoy(S)) { showEnvoy(); return true; }
   const D = S && S.directives; if (!D || !D.reports.length) return false;
   const r = D.reports[0];
   if (r.result === "story") {
@@ -494,9 +501,25 @@ function empireHTML() {
     ${focusHTML()}${protosHTML()}
     <h3>Worlds (${cols.length})</h3><table class="tbl"><tr><th>World</th><th>Pop</th><th>Ind</th><th>Sci</th><th>Building</th></tr>
     ${cols.map((sys) => { const y = yields(S, sys); return `<tr data-selsys="${sys.id}"><td>${sys.colony.capital ? "★ " : ""}${esc(sys.name)}${sys.colony.kind === "outpost" ? " <i>(outpost)</i>" : ""}</td><td>${sys.colony.pop || "–"}</td><td>${fmt(y.ind)}</td><td>${fmt(y.sci)}</td><td>${esc(sys.colony.queue[0] ? sys.colony.queue[0].name : sys.colony.kind === "colony" ? "—" : "")}</td></tr>`; }).join("")}</table>
-    <h3>Fleets (${fleetsOf(S, me.id).length})</h3>${fleetsOf(S, me.id).map((f) => `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}<span class="small muted">${f.path.length ? " · moving" : " · idle"}</span></button>`).join("")}
+    <h3>Fleets (${fleetsOf(S, me.id).length})</h3>${fleetsOf(S, me.id).map((f) => `<button class="row" data-selfleet="${f.id}">${shipSVG(flagship(f), me.color, 18)} ${esc(fleetName(f))}${f.admiral ? ` <span class="small">· ${esc(admTitle(f.admiral))}</span>` : ""}<span class="small muted">${f.path.length ? " · moving" : " · idle"}</span></button>`).join("")}
+    ${admiralsHTML()}
     <h3>Rivals</h3><table class="tbl"><tr><th>Faction</th><th>Worlds</th><th>Score</th></tr>${S.factions.slice(1).map((F) => `<tr><td><span class="dot" style="background:${F.color}"></span>${me.met[F.id] ? esc(F.name) : "Unknown"}${F.alive ? "" : " †"}</td><td>${me.met[F.id] ? coloniesOf(S, F.id).length : "?"}</td><td>${me.met[F.id] ? score(S, F.id) : "?"}</td></tr>`).join("")}</table>`;
   return h;
+}
+/** An admiral: rank, name, wins, traits, and how far to the next. */
+function admiralCard(a, mine) {
+  const next = ADMIRAL_STEPS.find((n) => n > a.wins);
+  return `<div class="card small adm"><b>${esc(admTitle(a))}</b> · ${a.wins} win${a.wins === 1 ? "" : "s"}${mine && next && a.traits.length < 3 ? ` · next promotion at ${next}` : ""}
+    ${a.traits.length ? `<ul>${a.traits.map((t) => `<li><b>${esc(ADMIRAL_TRAITS[t].name)}:</b> ${esc(ADMIRAL_TRAITS[t].text)}</li>`).join("")}</ul>` : `<div class="muted">No traits yet: each is earned by winning battles.</div>`}</div>`;
+}
+/** The Empire tab's admirals: in command, in reserve, and those who fell. */
+function admiralsHTML() {
+  const me = player(S), all = admiralsOf(S, me.id), fallen = me.fallen || [];
+  return `<h3>Admirals (${all.length} of ${admiralCap(S, me.id)})</h3>
+    <p class="small muted">Named commanders. They win promotions and traits (at ${ADMIRAL_STEPS.join(", ")} wins), and can be lost with their fleets. You can keep two, and one more for every four worlds.</p>
+    ${all.map(({ a, fleet }) => fleet ? `<button class="row" data-selfleet="${fleet.id}"><b>${esc(admTitle(a))}</b><span class="small muted"> · ${a.wins} win${a.wins === 1 ? "" : "s"}${a.traits.length ? " · " + a.traits.map((t) => ADMIRAL_TRAITS[t].name).join(", ") : ""} · ${esc(fleetName(fleet))}</span></button>`
+      : `<div class="row"><b>${esc(admTitle(a))}</b><span class="small muted"> · in reserve: select a war fleet without an admiral to give them its command</span></div>`).join("") || `<p class="small muted">None.</p>`}
+    ${fallen.length ? `<details class="small"><summary>The fallen (${fallen.length})</summary><ul>${fallen.map((x) => `<li>${esc(x.name)}, at ${esc(x.at)} on turn ${x.turn} (${x.wins} win${x.wins === 1 ? "" : "s"})</li>`).join("")}</ul></details>` : ""}`;
 }
 /** The empire's Focus: three points to share between industry, science, credits and defense. */
 function focusHTML() {
@@ -535,10 +558,12 @@ function diplomacyHTML() {
   if (!met.length) h += `<p class="muted">You haven't met anyone yet. Send out scouts.</p>`;
   for (const F of met) {
     const r = me.relations[F.id], them = F.relations[me.id];
-    const mood = !F.alive ? "gone" : them.score > 15 ? "friendly" : them.score > -5 ? "wary" : them.score > -20 ? "hostile" : "furious";
+    const mood = !F.alive ? "gone" : attitude(S, F.id), P = PERSONALITIES[F.id] || {}, mem = (them.memory || []).slice(-5).reverse();
     h += `<div class="dip"><h3><span class="dot" style="background:${F.color}"></span>${esc(F.name)}${F.alive ? "" : " †"}</h3>
-      <p class="small">${r.status === "war" ? `<b class="bad">At war</b> for ${r.turnsAtWar} turns` : "<b>At peace</b>"}${r.treaty ? " · trading" : ""} · they are ${mood}. ${esc(FACTIONS.find((x) => x.id === F.id).trait)}. Worlds ${coloniesOf(S, F.id).length}, fleet power ${militaryPower(S, F.id)}.</p>
-      ${F.alive ? `<div class="btn-row">${r.status === "war" ? `<button class="btn" data-dip="${F.id}:peace">Propose peace</button>` : `<button class="btn" data-dip="${F.id}:${r.treaty ? "endTrade" : "trade"}">${r.treaty ? "End the trade treaty" : "Propose trade"}</button><button class="btn danger" data-dip="${F.id}:war">Declare war</button>`}</div>` : ""}</div>`;
+      <p class="small"><b>${esc((P.leader || "").replace(/^./, (c) => c.toUpperCase()))}</b> · ${esc(P.title || "")}: ${esc(P.text || "")}</p>
+      <p class="small">${r.status === "war" ? `<b class="bad">At war</b> for ${r.turnsAtWar} turn${r.turnsAtWar === 1 ? "" : "s"}` : r.allied ? "<b class=\"good\">Allied</b>" : "<b>At peace</b>"}${r.treaty ? " · trading" : ""} · they are <b class="mood-${mood}">${mood}</b> (${Math.round(them.score)}). ${esc(FACTIONS.find((x) => x.id === F.id).trait)}. Worlds ${coloniesOf(S, F.id).length}, fleet power ${militaryPower(S, F.id)}.</p>
+      ${mem.length ? `<p class="small muted" style="margin:4px 0 2px">They remember that you:</p><ul class="small mem">${mem.map((m) => `<li class="${m.d >= 0 ? "good" : "bad"}">${esc(m.text)} <span class="muted">(turn ${m.turn}, ${m.d >= 0 ? "+" : "−"}${Math.abs(m.d)})</span></li>`).join("")}</ul>` : ""}
+      ${F.alive ? `<div class="btn-row">${r.status === "war" ? `<button class="btn" data-dip="${F.id}:peace">Propose peace</button>` : `<button class="btn" data-dip="${F.id}:${r.treaty ? "endTrade" : "trade"}">${r.treaty ? "End the trade treaty" : "Propose trade"}</button><button class="btn" data-dip="${F.id}:${r.allied ? "endAlliance" : "alliance"}">${r.allied ? "End the alliance" : "Propose an alliance"}</button><button class="btn danger" data-dip="${F.id}:war">${r.allied ? "Break the alliance: war" : "Declare war"}</button>`}</div>` : ""}</div>`;
   }
   return h;
 }
@@ -566,6 +591,8 @@ function bindChrome() {
     const d = b.dataset, me = player(S);
     if (d.logf) { logFilter = d.logf; renderPanel(); return; }
     if (d.focus) { const r = setFocus(S, me.id, d.focus, +d.n); if (r.error) toast(r.error, true); save(); renderAll(); return; }
+    if (d.assign) { const r = assignAdmiral(S, sel.id, d.assign); if (r.error) toast(r.error, true); save(); renderAll(); return; }
+    if (d.relieve !== undefined) { relieveAdmiral(S, sel.id); save(); renderAll(); return; }
     if (d.stance) { setStance(S, sel.id, d.stance); toast(`${STANCES[d.stance].name}: ${STANCES[d.stance].text}`); save(); renderAll(); return; }
     if (d.accept) { const r = acceptDirective(S, d.accept); if (r.error) toast(r.error, true); else toast("Directive taken on: its clock starts now."); checkDirectives(S); save(); renderAll(); showNextMission(); return; }
     if (d.center) { centerOn(d.center); draw(); return; }
@@ -597,6 +624,8 @@ function bindChrome() {
         else { reportSince(what === "peace" ? `Peace with ${F.name}?` : what === "trade" ? `A trade treaty with ${F.name}?` : `Trade with ${F.name}`, since);
           report = report || { title: F.name, lines: [] };
           if (what === "endTrade") report.lines.push(`The trade treaty with ${F.name} is over: +3 credits a turn less for each of you.`);
+          else if (what === "endAlliance") report.lines.push(`The alliance with ${F.name} is over. They won't forget it soon.`);
+          else if (what === "alliance" && r.accepted) report.lines.push(`If either of you is attacked, the other joins the war, and you see what their worlds see.`);
           else if (!r.accepted) report.lines.push(`${F.name} refuse${what === "peace" ? ": the war goes on" : ""}. ${F.relations[me.id].score < 0 ? "They don't trust you yet." : "Ask again later."}`); }
       }
     } else if (d.offer) {
@@ -649,6 +678,7 @@ function doEndTurn() {
     if (!S.winner) directivesTurn(S);
     if (!S.winner) crisisTurn(S);
     if (!S.winner) eventsTurn(S);
+    if (!S.winner) envoysTurn(S);
     $("end-turn").textContent = "End turn";
     save();
     // News: what happened to you this turn.
@@ -693,7 +723,8 @@ function showBattle(then) {
     modal(`<h1>Battle at ${esc(B.at)}</h1><p class="small muted">Turn ${B.turn} · ${esc(B.sides.map((f) => f === me ? "you" : faction(S, f).name).join(" against "))} · each shot is 3d6 at or under the gunner's skill</p>
       <div class="battle">${sideHTML(mine, hull, "Your side")}${sideHTML(theirs, hull, esc(theirs.map((f) => faction(S, f).name).join(", ")))}</div>
       <ol class="blog-list">${lines || `<li class="muted">The fleets close. Three exchanges of fire.</li>`}</ol>
-      ${done ? `<p>${result}</p>` : ""}
+      ${(B.admirals || []).length ? `<p class="small muted">Commanding: ${B.admirals.map((x) => `${x.fid === me ? "yours, " : `${esc(faction(S, x.fid).name)}, `}<b>${esc(x.name)}</b>${x.traits.length ? ` (${esc(x.traits.join(", "))})` : ""}`).join("; ")}</p>` : ""}
+      ${done ? `<p>${result}</p>${(B.news || []).map((t) => `<p class="small"><b>${esc(t)}</b></p>`).join("")}` : ""}
       <div class="btn-row">${done ? `<button class="btn primary" id="b-ok">Continue</button>` : `<button class="btn primary" id="b-next">Next shot</button><button class="btn" id="b-round">Finish the exchange</button><button class="btn" id="b-all">Skip to the result</button>`}</div>`);
     const L = document.querySelector(".blog-list"); if (L) L.scrollTop = L.scrollHeight;
     if (done) $("b-ok").onclick = () => { S.battleReports.shift(); save(); closeModal(); renderAll(); showBattle(then); };
@@ -715,6 +746,21 @@ function showGalEvent() {
     const r = chooseEvent(S, b.dataset.ev); save();
     modal(`<h1>${esc(r.title)}</h1><p class="small muted">Your choice: ${esc(r.choice)}</p><p>${esc(r.text)}</p><div class="btn-row"><button class="btn primary" id="ev-ok">Continue</button></div>`);
     $("ev-ok").onclick = () => { closeModal(); renderAll(); showNextMission(); };
+  });
+}
+
+// ---------- envoys: the rivals' messages ----------
+function showEnvoy() {
+  const m = currentEnvoy(S); if (!m) return;
+  const head = { hello: "First contact", demand: "A demand", warn: "A warning", alliance: "An offer of alliance", joint: "A call to war", gift: "A gift", war: "A declaration of war", callToArms: "A call to arms" }[m.kind];
+  modal(`<p class="small muted envoy-kicker"><span class="dot" style="background:${m.color}"></span>${esc(head)} · from ${esc(m.name)} · they are ${esc(m.attitude)}</p>
+    <h1>${esc(m.leader[0].toUpperCase() + m.leader.slice(1))}</h1><p class="small muted" style="margin-top:-6px">${esc(m.title)}</p>
+    <blockquote class="envoy">${esc(m.text)}</blockquote>
+    <div class="ev-opts">${m.options.map((o) => `<button class="ev-opt" data-env="${o.id}"><b>${esc(o.label)}</b><small>${esc(o.does)}</small></button>`).join("")}</div>`);
+  document.querySelectorAll("[data-env]").forEach((b) => b.onclick = () => {
+    const r = answerEnvoy(S, b.dataset.env); save();
+    modal(`<h1>${esc(r.name)}</h1><p class="small muted">Your answer: ${esc(r.choice)}</p><p>${esc(r.text)}</p><div class="btn-row"><button class="btn primary" id="env-ok">Continue</button></div>`);
+    $("env-ok").onclick = () => { closeModal(); renderAll(); showNextMission(); };
   });
 }
 
